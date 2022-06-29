@@ -303,9 +303,6 @@
             else  ETR_ENTRUST.PS
             end) =#{ps}
         </if>
-        <if test="finprodType2 != null and finprodType2!='' ">
-            AND ETR_ENTRUST_ADD.ASSET_TYPE  = #{finprodType2}
-        </if>
         <if test="busiTypePosition != null and busiTypePosition!='' ">
             AND btm.busi_type  = #{busiTypePosition}
         </if>
@@ -623,9 +620,6 @@
                 else  WFL_ETR_ENTRUST.PS
                 end) =#{ps}
             </if>
-            <if test="finprodType2 != null and finprodType2!='' ">
-                AND WFL_ETR_ENTRUST_ADD.ASSET_TYPE  = #{finprodType2}
-            </if>
             <if test="busiTypePosition != null and busiTypePosition!='' ">
                 AND btm.busi_type = #{busiTypePosition}
             </if>
@@ -680,6 +674,11 @@
         left join SYS_DATADICT_LIST sdl5 on sdl5.DICT_CODE='TRADE_MARKET' and t.tradeMarket=sdl5.ITEM_CODE
         left join SYS_DATADICT_LIST sdl6 on sdl6.DICT_CODE='ACCOUNT_SPEED' and t.settleSpeed=sdl6.ITEM_CODE
         left join SYS_DATADICT_LIST sdl7 on sdl7.DICT_CODE='CCY' and t.ccy=sdl7.ITEM_CODE
+        <where>
+            <if test="finprodType2 != null and finprodType2!='' ">
+                AND t.finprodType2  = #{finprodType2}
+            </if>
+        </where>
         <!-- 关键字模糊查询 -->
         <include refid="vagueQueryWhere"></include>
         order by t.finprodType2,t.entrustStatusOrder,t.busiTypePosition,t.ps)

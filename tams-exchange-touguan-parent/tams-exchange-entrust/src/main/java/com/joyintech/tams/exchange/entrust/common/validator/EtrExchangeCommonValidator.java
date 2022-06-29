@@ -1213,17 +1213,17 @@ public interface EtrExchangeCommonValidator extends BeanValidator {
                     param = riskNamListCommonValidatorService.名单是否匹配(param);
                     if (Boolean.parseBoolean(param.get("isAssetMatch").toString())) {
                         if (param.containsKey("listTypeAsset")) {
-                            confirmMessage.append("资产在黑名单内，禁止投资!");
+                            confirmMessage.append("资产在黑名单内!");
                         }
                     } else if (!Boolean.parseBoolean(param.get("isAssetMatch").toString()) && Boolean.parseBoolean(param.get("isAssetWhiteList").toString())) {
-                        confirmMessage.append("该资产不在白名单内，禁止投资!");
+                        confirmMessage.append("该资产不在白名单内!");
                     }
                     if (!Boolean.parseBoolean(param.get("isOrgBlackMatch").toString())) {
                         if (param.containsKey("listTypeOrg")) {
-                            confirmMessage.append("资产所属机构（或交易对手）在黑名单内，禁止投资!");
+                            confirmMessage.append("资产所属机构（或交易对手）在黑名单内!");
                         }
                     } else if (!Boolean.parseBoolean(param.get("isOrgWhiteMatch").toString())) {
-                        confirmMessage.append("该资产所属机构（或交易对手）不在白名单内，禁止投资!");
+                        confirmMessage.append("该资产所属机构（或交易对手）不在白名单内!");
                     }
                 }
             }
