@@ -493,6 +493,13 @@ public class StlDataGatherService {
                     if (totleTradeId != null) {
                         trdTradeFeeTotal.setTotleTradeId(dealMap.get(feeDetail.getTradeId()).get(0).getTotleTradeId());
                     }
+                    TrdTradeFeeTotalKey key = new TrdTradeFeeTotalKey();
+                    key.setTotleTradeId(trdTradeFeeTotal.getTotleTradeId());
+                    key.setFeeType(trdTradeFeeTotal.getFeeType());
+                    TrdTradeFeeTotal total = trdTradeFeeTotalMapper.selectByPrimaryKey(key);
+                    if(total != null){
+                        trdTradeFeeTotalMapper.deleteByPrimaryKey(key);
+                    }
                     trdTradeFeeTotalMapper.insertSelective(trdTradeFeeTotal);
                 }
             }

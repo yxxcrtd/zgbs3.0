@@ -330,13 +330,7 @@ public class CfetsEtrDispatcherService extends BaseService {
         }
 
         String finprodType2Old = (String) pageParam.get("finprodType2");
-        //资产类型转换 同业存单转换为债券
-        if (StringUtil.isNotEmpty(finprodType2Old)) {
-            if (DictCodeList.平安资产类型_同业存单.getValue().equals(finprodType2Old)) {
-                pageParam.put("finprodType2", DictCodeList.平安资产类型_债券.getValue());
-                pageParam.put("TYPE_9", "01");
-            }
-        }
+
         if (StringUtil.isNotEmpty(finprodType2Old) || StringUtil.isNotEmpty(pageParam.get("ps"))) {
             List<String> finprodType2ListOld = StringUtil.splitToList(GlobalConstant.COMMA, finprodType2Old);
 //            pageParam.put("finprodType2List", finprodType2ListOld);

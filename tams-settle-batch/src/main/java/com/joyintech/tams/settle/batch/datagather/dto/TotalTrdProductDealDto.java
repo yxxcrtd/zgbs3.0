@@ -104,6 +104,76 @@ public class TotalTrdProductDealDto extends TrdFinProductDealTotal {
 	 */
 	private BigDecimal amount;
 
+	private BigDecimal stampFee;
+
+	private BigDecimal jsfFee;
+
+	private BigDecimal ghfFee;
+
+	private BigDecimal zgfFee;
+
+	private BigDecimal sxfFee;
+
+	private BigDecimal settleFee;
+
+	private BigDecimal commissionAmt;
+
+	public BigDecimal getStampFee() {
+		return stampFee;
+	}
+
+	public void setStampFee(BigDecimal stampFee) {
+		this.stampFee = stampFee;
+	}
+
+	public BigDecimal getJsfFee() {
+		return jsfFee;
+	}
+
+	public void setJsfFee(BigDecimal jsfFee) {
+		this.jsfFee = jsfFee;
+	}
+
+	public BigDecimal getGhfFee() {
+		return ghfFee;
+	}
+
+	public void setGhfFee(BigDecimal ghfFee) {
+		this.ghfFee = ghfFee;
+	}
+
+	public BigDecimal getZgfFee() {
+		return zgfFee;
+	}
+
+	public void setZgfFee(BigDecimal zgfFee) {
+		this.zgfFee = zgfFee;
+	}
+
+	public BigDecimal getSxfFee() {
+		return sxfFee;
+	}
+
+	public void setSxfFee(BigDecimal sxfFee) {
+		this.sxfFee = sxfFee;
+	}
+
+	public BigDecimal getSettleFee() {
+		return settleFee;
+	}
+
+	public void setSettleFee(BigDecimal settleFee) {
+		this.settleFee = settleFee;
+	}
+
+	public BigDecimal getCommissionAmt() {
+		return commissionAmt;
+	}
+
+	public void setCommissionAmt(BigDecimal commissionAmt) {
+		this.commissionAmt = commissionAmt;
+	}
+
 	public BigDecimal getAmount() {
 		return amount;
 	}

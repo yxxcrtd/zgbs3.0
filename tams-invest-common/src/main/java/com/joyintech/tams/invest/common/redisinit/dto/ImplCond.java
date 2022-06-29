@@ -73,6 +73,8 @@ public class ImplCond  implements ICond {
      */
     private  boolean isUpdParVal;
 
+    private String source;
+
     @Override
     public Date getPlateDate() {
         return platDate;
@@ -200,4 +202,12 @@ public class ImplCond  implements ICond {
 	public List<String> getCondList() {
 		return condList;
 	}
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
 }

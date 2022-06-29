@@ -8,7 +8,6 @@ import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
 import com.joyintech.tams.business.common.dto.PageMode;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.constant.DictCodeList;
@@ -24,6 +23,7 @@ import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeUni
 import com.joyintech.tams.exchange.entrust.etrexchange.hqjj.dto.EtrExchangeTradeQuotationHqResponse;
 import com.joyintech.tams.exchange.entrust.etrexchange.hqjj.service.EtrExchangeTradeJj001Service;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.service.EtrExchangeTradeSecRepo001Service;
+import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.service.EtrExchangeTradeSecRepo002Service;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constant.TempConstant;
 import com.joyintech.tams.invest.common.dto.position.PositionCashSecDto;
@@ -31,6 +31,7 @@ import com.joyintech.tams.invest.common.entrust.inter.EtrTradeCommonervice;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.systemtools.util.CommonUtil;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,13 +51,13 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
 
     @Autowired
     private EtrExchangeTradeCpc002Mapper etrExchangeTradeCpc002Mapper;
-    @Autowired
-    private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
+
     @Autowired
     private EtrTradeCommonervice etrTradeCommonervice;
     @Autowired
     private EtrExchangeTradeJj001Service exchangeTradeJj001Service;
-
+    @Autowired
+    private EtrExchangeTradeSecRepo002Service etrExchangeTradeSecRepo002Service;
     @Autowired
     private EtrExchangeTradeSecRepo001Service etrExchangeTradeSecRepo001Service;
     /**
@@ -191,6 +192,9 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
                         //可用数量
                         PositionCashSecDto secDto = new PositionCashSecDto();
                         BeanUtil.copyPropertiesIgnoreNull(secDto, entity);
+                        if (StringUtils.equals(entity.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
+                            secDto.setTradePlat(DictCodeList.交易平台_新债平台.getValue());
+                        }
                         BigDecimal sellNum = etrTradeCommonervice.selectAvailableNum(secDto);
                         entity.setSellNum(ArithmeticUtil.divide(sellNum,new BigDecimal("100"),2));
                         //过滤掉实际持仓和可用持仓都等于0
@@ -249,7 +253,6 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
                 Map<String, EtrExchangeUnitCostDto> unitCostMap = calcEachCostAmtMap(DateUtil.parse(platDate), pList, fList, "");
                 // 计算单位成本、计算持仓成本、最新净价、持仓市值、浮动盈亏
                 return calculationAmount(unitCostMap, result, platDate);
-
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -372,7 +375,8 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
     public List<BaseMap> selectLastCostAmt(Date cdate, List<String> portfolioIdList, List<String> finprodIdList, String secType1) {
         BaseMap reqMap = BaseMap.newMap()
                 .put("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue())    // 债券
-                .put("FINPROD_TYPE_TG_F37", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())    // 债券
+                .put("FINPROD_TYPE_TG_F37", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())
+                .put("SVR_TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue())
                 .put("SVR_TRADE_MARKET_03", DictCodeListExt1.交易场所_上海证券交易所.getValue())
                 .put("SVR_TRADE_MARKET_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue())
                 .put("cdate", DateUtil.addDay(cdate, -1));
@@ -402,9 +406,12 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
         BaseMap reqMap = BaseMap.newMap()
                 .put("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue())    // 债券
                 .put("FINPROD_TYPE_TG_F37", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())
+                .put("SVR_TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue())           // 银行间
                 .put("PS_T01", DictCodeList.交易方向_买入.getValue())
                 .put("PS_T02", DictCodeList.交易方向_卖出.getValue())
+                .put("PS_T03", DictCodeList.交易方向_行权_回售.getValue())
                 .put("PS_T04", DictCodeList.交易方向_申购.getValue())
+                .put("PS_T49", DictCodeListExt1.交易方向_债转股.getValue())
                 .put("SVR_TRADE_MARKET_03", DictCodeListExt1.交易场所_上海证券交易所.getValue())
                 .put("SVR_TRADE_MARKET_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue())
                 .put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue())
