@@ -609,10 +609,16 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         cfetsTrdFirstBidFirmInfoDto.setProductDtos(productDtos);
         cfetsTrdFirstBidFirmInfoDto.setCounterId(counterId);
         if (StringUtil.isEmpty(bidModel)) {
+            param.put("WIN_TYPE", DictCodeListExt4.投标方式_分销买入.getValue());
             bidModel = cfetsTrdFirstBidFirm002Mapper.selectBidModelInData(param);
         }
         if (StringUtil.isNotEmpty(bidModel)) {
             cfetsTrdFirstBidFirmInfoDto.setBiddingMethod(bidModel);
+        }
+        if (StringUtil.equals(bidModel, DictCodeListExt4.投标方式_分销买入.getValue())) {
+            cfetsTrdFirstBidFirmInfoDto.setIsFx(DictCodeList.是否_是.getValue());
+        } else {
+            cfetsTrdFirstBidFirmInfoDto.setIsFx(DictCodeList.是否_否.getValue());
         }
         cfetsTrdFirstBidFirmInfoDto.setTradeDate(iPlatformDate.getSysDate());
         //  自主投标和代投代缴
@@ -3622,10 +3628,20 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
 //            errorList.add(new ValidMessage(getMessage("COMMON_NOTEMPTY_003", errorInfo,"调整策略")));
         }
         BigDecimal totalBiddingNum = BigDecimal.ZERO;
+        Map<String, Object> param = new HashMap<>();
+        this.setParam(param);
+        param.put("WIN_TYPE", DictCodeListExt4.投标方式_分销买入.getValue());
         for (CfetsTrdFirstBidFirmProductDto item : dto.getProductDtos()) {
             // 指令代码
             if (!StringUtil.isNotEmpty(item.getEntrustId())) {
                 errorList.add(new ValidMessage("投标产品列表中指令代码不可为空!"));
+            } else {
+                param.put("entrustIdList", Arrays.asList(item.getEntrustId()));
+                String bidModel = cfetsTrdFirstBidFirm002Mapper.selectBidModelInData(param);
+                if (StringUtil.equals(bidModel, dto.getBiddingMethod())) {
+                    errorList.add(new ValidMessage("指令(" + item.getEntrustId() + ")存在投标方式为"
+                            + SysDataUtil.getNameFromDataDict(DictCode.投标方式, bidModel) + "的投标确认数据!"));
+                }
             }
             // 组合名称
             if (!StringUtil.isNotEmpty(item.getPortfolioName())) {
