@@ -221,10 +221,10 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         if (StringUtil.isNotEmpty(entity.getMstFileInputParameter()) && CollectionUtils.isNotEmpty(entity.getMstFileInputParameter().getFileList())
                 && StringUtil.isNotEmpty(entity.getFinprodId())) {
             // 将附件和当前业务对象绑定（更新附件的业务代码）
-            fileAttachmentProcess.updateBussinessNo(
-                    entity.getMstFileInputParameter().getFileList().stream().map(SysUploadFileInfo::getSeqNo).collect(
-                            Collectors.toList()),
-                    entity.getFinprodId());
+            for (SysUploadFileInfo fileInfo:entity.getMstFileInputParameter().getFileList()){
+                fileInfo.setBusinessId(entity.getFinprodId());
+                finBondAssetMapper.updateFileByPrimaryKey(fileInfo);
+            }
         }
         if (StringUtil.equals(entity.getIsAddSec(),DictCodeList.是否_是.getValue())) {
             updateCfetsOprHis(entity.getFinprodMarketId(), DictCodeListExt3.操作类型_债券自动加券.getValue(),entity.getWorkflowId());
@@ -245,10 +245,10 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         if (StringUtil.isNotEmpty(entity.getMstFileInputParameter()) && CollectionUtils.isNotEmpty(entity.getMstFileInputParameter().getFileList())
                 && StringUtil.isNotEmpty(entity.getFinprodId())) {
             // 将附件和当前业务对象绑定（更新附件的业务代码）
-            fileAttachmentProcess.updateBussinessNo(
-                    entity.getMstFileInputParameter().getFileList().stream().map(SysUploadFileInfo::getSeqNo).collect(
-                            Collectors.toList()),
-                    entity.getFinprodId());
+            for (SysUploadFileInfo fileInfo:entity.getMstFileInputParameter().getFileList()){
+                fileInfo.setBusinessId(entity.getFinprodId());
+                finBondAssetMapper.updateFileByPrimaryKey(fileInfo);
+            }
         }
         entity.setFinprodMarketId(entity.getFinprodMarketId()+entity.getTradeMarketId());
         updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_INSERT,entity.getWorkflowId());

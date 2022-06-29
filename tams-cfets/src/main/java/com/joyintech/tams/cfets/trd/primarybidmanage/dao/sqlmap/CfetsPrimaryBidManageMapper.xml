@@ -203,6 +203,8 @@
             BOBP.BID_ID       bidId,
             BOBP.ENTRUST_ID   entrustId,
             BOBP.PORTFOLIO_ID   portfolioId,
+            BOBP.ACCT_NO        acctNo,
+            SCI.ACCT_NAME       acctName,
             pp.PORTFOLIO_NAME portfolioName,
             NVL(NVL(BOBP.THE_WIN_PRIN_AMT,0)/10000,TPD.SHARE_AMT) totalBidPrinamt,
             NVL(EEBP.BID_PRIN_AMT,0)/100 winPrinAmt,
@@ -223,6 +225,7 @@
             ) TPD  ON TPD.ENTRUST_ID = BOBP.ENTRUST_ID
             AND BOBP.BID_ID = TPD.BID_ID
         LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BOBP.BID_ID
+        LEFT JOIN STL_CAPACCT_INFO SCI ON SCI.ACCT_NO = BOBP.ACCT_NO
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = BO.FINPROD_ID
         LEFT JOIN PTL_PORTFOLIO pp on BOBP.PORTFOLIO_ID = pp.PORTFOLIO_ID
         LEFT JOIN ETR_ENTRUST_BID_PRICE EEBP on BOBP.PORTFOLIO_ID = EEBP.PORTFOLIO_ID
@@ -1132,10 +1135,21 @@
         WHERE B_TRADE_ID = #{bTradeId}
     </select>
 
+    <select id="getTrdFinProductDealTotalTemp" resultType="com.joyintech.tams.common.base.entity.TrdFinProductDealTotal">
+        SELECT <include refid="com.joyintech.tams.common.base.dao.TrdProductTempDealTotalMapper.Sql_All_Data" />
+        WHERE B_TRADE_ID = #{bTradeId}
+    </select>
+
     <!-- 根据汇总交易编号查询交易信息 -->
     <select id="queryTrdProductDealByTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.TrdProductDealMapper.BaseResultMap">
         select <include refid="com.joyintech.tams.common.base.dao.TrdProductDealMapper.Base_Column_List" />
         from TRD_PRODUCT_DEAL where TOTLE_TRADE_ID = #{tradeId}
+    </select>
+
+    <!-- 根据汇总交易编号查询交易信息 -->
+    <select id="queryTrdProductDealTempByTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.TrdProductTempDealMapper.BaseResultMap">
+        select <include refid="com.joyintech.tams.common.base.dao.TrdProductTempDealMapper.Sql_All_Data" />
+        where TOTLE_TRADE_ID = #{tradeId}
     </select>
 
     <!-- 根据划款指令信息 -->

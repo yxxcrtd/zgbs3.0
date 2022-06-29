@@ -902,6 +902,9 @@ public class EtrTradeCommonervice extends BaseService {
             holdingType = DictCodeListExt3.资产类型_通用回购融资券折算后额度.getValue();
             dto.setFinprodId("XN_PRODID999");
         }
+        if(dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())) {
+            holdingType = DictCodeListExt3.资产类型_场内信用保护凭证可用持仓.getValue();
+        }
         dto.setHoldingType(holdingType);
     }
 

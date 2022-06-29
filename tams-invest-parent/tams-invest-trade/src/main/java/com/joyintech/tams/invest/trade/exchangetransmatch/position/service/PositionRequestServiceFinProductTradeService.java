@@ -488,10 +488,8 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         if (百元券面 == null) {
             百元券面 = BigDecimal.valueOf(100);
         }
-        BigDecimal hundred = BigDecimal.valueOf(100);
         // 标准券总额
-        map.put(STANDARD_SEC_AMOUNT, ArithmeticUtil.divide(ArithmeticUtil.multiply(dealEntity.getShareAmt(),
-                converseRadio, 百元券面), hundred, 2, RoundingMode.HALF_UP));
+        map.put(STANDARD_SEC_AMOUNT, ArithmeticUtil.multiply(dealEntity.getShareAmt(), converseRadio, 百元券面));
         // 再折算率	reConversionRate "调用【再折算率查询】参数：资金账户 = 指令资金账户
         Map<String, Object> paramMap = Maps.newHashMap();
         paramMap.put("acctNo", cashAcctId);

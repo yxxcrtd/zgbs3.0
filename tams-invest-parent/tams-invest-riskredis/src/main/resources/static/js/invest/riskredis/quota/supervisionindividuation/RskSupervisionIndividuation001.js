@@ -365,15 +365,15 @@
 					url: JoyinUtil.getRealPath("invest/riskredis/quota/supervisionindividuation/RskSupervisionIndividuation001/queryConditionList")
 				}
 			} //条件项
-			,{field:'controlType', sortable:false,width:120 , title: 'RskSupervisionIndividuation001.controlType',edit:true
+			,{field:'controlType', sortable:false,width:100 , title: 'RskSupervisionIndividuation001.controlType',edit:true
 				,editOption:{type:'select',id:"controlType",formatoption:true,result: CONTROL_TYPE}}//控制类型
-			,{field:'valueStr', title: 'RskSupervisionIndividuation001.valueStart', width:200,sortable: false,edit:true}//数值
-			,{field:'valueEnd', title: 'RskSupervisionIndividuation001.valueEnd', width:150,sortable: false,edit:true}//数值
-			,{field:'isBagCalc',title: 'RskSupervisionIndividuation001.isBagCalc', width:200, sortable: false,edit:true
+			,{field:'valueStr', title: 'RskSupervisionIndividuation001.valueStart', width:100,sortable: false,edit:true}//数值
+			,{field:'valueEnd', title: 'RskSupervisionIndividuation001.valueEnd', width:100,sortable: false,edit:true}//数值
+			,{field:'isBagCalc',title: 'RskSupervisionIndividuation001.isBagCalc', width:120, sortable: false,edit:true
 				,editOption:{type:'select',id:"isBagCalc",formatoption:true,result: YES_OR_NO}}//是否计算组合包
-			,{field:'warnCond', width:200, title: 'RskSupervisionIndividuation001.warnCond', type: 'number', sortable: false,edit:true,render: parseValue}//预警线
-			,{field:'approveCond', width:200, title: 'RskSupervisionIndividuation001.approveCond', type: 'number',sortable: false,edit:true,render: parseValue}//审批线
-			,{field:'foulCond', width:200, title: 'RskSupervisionIndividuation001.foulCond', type: 'number',sortable: false,edit:true,render: parseValue}//禁止线
+			,{field:'warnCond', width:100, title: 'RskSupervisionIndividuation001.warnCond', type: 'number', sortable: false,edit:true,render: parseValue}//预警线
+			,{field:'approveCond', width:100, title: 'RskSupervisionIndividuation001.approveCond', type: 'number',sortable: false,edit:true,render: parseValue}//审批线
+			,{field:'foulCond', width:100, title: 'RskSupervisionIndividuation001.foulCond', type: 'number',sortable: false,edit:true,render: parseValue}//禁止线
 			,{field: 'operation', width: 100, title: 'SysCommon.operation', type: 'action', fixed:true,
 				buttons: ['delt']
 			}

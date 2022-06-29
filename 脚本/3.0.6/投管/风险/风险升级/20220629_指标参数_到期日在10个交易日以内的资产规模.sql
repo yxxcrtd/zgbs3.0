@@ -1,0 +1,171 @@
+DECLARE
+V_CONTENT_01_02_03 CLOB :='WITH t2 AS
+  (
+  SELECT FINPROD_ID,MDATE,CALENDAR_ID,CDATE,FINPROD_TYPE2 FROM (
+  SELECT s1.FINPROD_ID,s1.MDATE,s1.CALENDAR_ID,s1.CDATE,s1.FINPROD_TYPE2,ROW_NUMBER() OVER(PARTITION BY s1.FINPROD_ID ORDER BY s1.CDATE asc) AS rn FROM (
+          SELECT s.FINPROD_ID,s.MDATE,s.CALENDAR_ID,s.CDATE,s.FINPROD_TYPE2,s.rowno FROM (
+          SELECT m.FINPROD_ID,m.MDATE,m.FINPROD_TYPE2,m.CALENDAR_ID,n.CDATE,ROW_NUMBER() OVER(PARTITION BY m.FINPROD_ID ORDER BY n.CDATE desc) AS  rowno FROM (
+        SELECT FINPROD_ID,FINPROD_TYPE2,MDATE,CASE WHEN CALENDAR_ID IS NULL THEN ''01'' ELSE CALENDAR_ID end CALENDAR_ID FROM FIN_PRODUCT WHERE MDATE IS NOT null) m
+        INNER JOIN MST_HOLIDAY n ON  m.CALENDAR_ID=n.CALENDAR_ID  AND n.CDATE<=m.MDATE AND n.CDATE > m.MDATE - 25 AND n.IS_HOLIDAY=0 ) s WHERE s.rowno<=10
+      ) s1
+    )  WHERE rn=1
+  ),t3 AS
+   (
+     SELECT FINPROD_ID,MDATE,CALENDAR_ID,CDATE,FINPROD_TYPE2 FROM (
+    SELECT s1.FINPROD_ID,s1.MDATE,s1.CALENDAR_ID,s1.CDATE,s1.FINPROD_TYPE2,ROW_NUMBER() OVER(PARTITION BY s1.FINPROD_ID ORDER BY s1.CDATE asc) AS rn FROM (
+            SELECT s.FINPROD_ID,s.MDATE,s.CALENDAR_ID,s.CDATE,s.FINPROD_TYPE2,s.rowno FROM (
+            SELECT m.FINPROD_ID,m.MDATE,m.FINPROD_TYPE2,m.CALENDAR_ID,n.CDATE,ROW_NUMBER() OVER(PARTITION BY m.FINPROD_ID ORDER BY n.CDATE desc) AS  rowno FROM (
+          SELECT FINPROD_ID,FINPROD_TYPE2,MDATE,CASE WHEN CALENDAR_ID IS NULL THEN ''01'' ELSE CALENDAR_ID end CALENDAR_ID FROM FIN_TRADE_PRODUCT WHERE  BRANCH=0 AND  FINPROD_TYPE2 not in (''F02'',  ''F04'', ''F08'',''F11'',''F12'',''F13'',''F14'',''F15'',''F25'') and MDATE IS NOT null) m
+          INNER JOIN MST_HOLIDAY n ON  m.CALENDAR_ID=n.CALENDAR_ID  AND n.CDATE<=m.MDATE AND n.CDATE > m.MDATE - 25 AND n.IS_HOLIDAY=0 ) s WHERE s.rowno<=10
+        ) s1
+    )  WHERE rn=1
+  )
+
+  SELECT PORTFOLIO_ID RKEY,nvl(sum(RVALUE),0) RVALUE FROM (
+   select t1.PORTFOLIO_ID,NVL(SUM(NVL(t1.MARKET_VALUE,0)+nvl(t1.TDY_INTINCEXP, 0)),0) as  RVALUE from PTL_SEC_PIERCE_VALUTION t1
+  inner join  t2
+  on t1.FINPROD_ID = t2.FINPROD_ID and t2.MDATE>=date''${valDate}''-1  and t2.CDATE<=date''${valDate}''-1
+  where t1.PORTFOLIO_ID!=t1.FINPROD_ID  and t1.CDATE=date''${valDate}''-1  GROUP BY t1.PORTFOLIO_ID
+
+  UNION ALL
+   select t1.PORTFOLIO_ID,NVL(SUM(NVL(t1.MARKET_VALUE,0)+nvl(t1.TDY_INTINCEXP, 0)),0) as  RVALUE from PTL_SEC_PIERCE_VALUTION t1
+  inner join  t3
+  on t1.FINPROD_ID = t3.FINPROD_ID and t3.MDATE>=date''${valDate}''-1  and t3.CDATE<=date''${valDate}''-1
+  where t1.PORTFOLIO_ID!=t1.FINPROD_ID and t1.CDATE=date''${valDate}''-1  GROUP BY t1.PORTFOLIO_ID
+  ) GROUP BY PORTFOLIO_ID';
+    V_CONTENT_04 CLOB := 'WITH t2 AS
+  (
+  SELECT FINPROD_ID,MDATE,CALENDAR_ID,CDATE,FINPROD_TYPE2 FROM (
+  SELECT s1.FINPROD_ID,s1.MDATE,s1.CALENDAR_ID,s1.CDATE,s1.FINPROD_TYPE2,ROW_NUMBER() OVER(PARTITION BY s1.FINPROD_ID ORDER BY s1.CDATE asc) AS rn FROM (
+          SELECT s.FINPROD_ID,s.MDATE,s.CALENDAR_ID,s.CDATE,s.FINPROD_TYPE2,s.rowno FROM (
+          SELECT m.FINPROD_ID,m.MDATE,m.FINPROD_TYPE2,m.CALENDAR_ID,n.CDATE,ROW_NUMBER() OVER(PARTITION BY m.FINPROD_ID ORDER BY n.CDATE desc) AS  rowno FROM (
+        SELECT FINPROD_ID,FINPROD_TYPE2,MDATE,CASE WHEN CALENDAR_ID IS NULL THEN ''01'' ELSE CALENDAR_ID end CALENDAR_ID FROM FIN_PRODUCT WHERE MDATE IS NOT null) m
+        INNER JOIN MST_HOLIDAY n ON  m.CALENDAR_ID=n.CALENDAR_ID  AND n.CDATE<=m.MDATE AND n.CDATE > m.MDATE - 25 AND n.IS_HOLIDAY=0 ) s WHERE s.rowno<=10
+      ) s1
+    )  WHERE rn=1
+  ),t3 AS
+   (
+     SELECT FINPROD_ID,MDATE,CALENDAR_ID,CDATE,FINPROD_TYPE2 FROM (
+    SELECT s1.FINPROD_ID,s1.MDATE,s1.CALENDAR_ID,s1.CDATE,s1.FINPROD_TYPE2,ROW_NUMBER() OVER(PARTITION BY s1.FINPROD_ID ORDER BY s1.CDATE asc) AS rn FROM (
+            SELECT s.FINPROD_ID,s.MDATE,s.CALENDAR_ID,s.CDATE,s.FINPROD_TYPE2,s.rowno FROM (
+            SELECT m.FINPROD_ID,m.MDATE,m.FINPROD_TYPE2,m.CALENDAR_ID,n.CDATE,ROW_NUMBER() OVER(PARTITION BY m.FINPROD_ID ORDER BY n.CDATE desc) AS  rowno FROM (
+          SELECT FINPROD_ID,FINPROD_TYPE2,MDATE,CASE WHEN CALENDAR_ID IS NULL THEN ''01'' ELSE CALENDAR_ID end CALENDAR_ID FROM FIN_TRADE_PRODUCT WHERE  BRANCH=0 AND  FINPROD_TYPE2 not in (''F02'',  ''F04'', ''F08'',''F11'',''F12'',''F13'',''F14'',''F15'',''F25'') and MDATE IS NOT null) m
+          INNER JOIN MST_HOLIDAY n ON  m.CALENDAR_ID=n.CALENDAR_ID  AND n.CDATE<=m.MDATE AND n.CDATE > m.MDATE - 25 AND n.IS_HOLIDAY=0 ) s WHERE s.rowno<=10
+        ) s1
+    )  WHERE rn=1
+  )
+
+  SELECT sum(RVALUE) RVALUE FROM (
+   select NVL(SUM(NVL(t1.MARKET_VALUE,0)+nvl(t1.TDY_INTINCEXP, 0)),0) as  RVALUE from PTL_SEC_PIERCE_VALUTION t1
+  inner join  t2
+  on t1.FINPROD_ID = t2.FINPROD_ID and t2.MDATE>=date''${valDate}''-1  and t2.CDATE<=date''${valDate}''-1
+  where t1.PORTFOLIO_ID!=t1.FINPROD_ID AND t1.PORTFOLIO_ID in ${portfolioCode} and t1.CDATE=date''${valDate}''-1
+
+  UNION ALL
+   select NVL(SUM(NVL(t1.MARKET_VALUE,0)+nvl(t1.TDY_INTINCEXP, 0)),0) as  RVALUE from PTL_SEC_PIERCE_VALUTION t1
+  inner join  t3
+  on t1.FINPROD_ID = t3.FINPROD_ID and t3.MDATE>=date''${valDate}''-1  and t3.CDATE<=date''${valDate}''-1
+  where t1.PORTFOLIO_ID!=t1.FINPROD_ID AND t1.PORTFOLIO_ID in ${portfolioCode} and t1.CDATE=date''${valDate}''-1
+    union all
+ select
+   nvl(sum(decode(n.PS,''T01'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  +nvl(sum(decode(n.PS,''T04'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  +nvl(sum(decode(n.PS,''T52'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T02'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T03'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T19'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T07'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T08'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T09'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T22'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T23'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T11'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0) as TRADE_AMT
+  from TRD_PRODUCT_DEAL n
+  inner join TRD_PRODUCT_DEAL_ADD n1 ON n.TRADE_ID =n1.TRADE_ID
+  inner join  t2   on n.FINPROD_ID = t2.FINPROD_ID and t2.MDATE>=date''${valDate}'' and t2.CDATE<=date''${valDate}''
+  where n1.PORTFOLIO_ID in ${portfolioCode} and  n.TRADE_DATE = date''${valDate}''
+  and n.PS in (''T01'',''T02'',''T03'',''T04'',''T19'',''T07'',''T08'',''T09'',''T11'',''T52'',''T22'',''T23'')
+    union all
+ select
+   nvl(sum(decode(n.PS,''T01'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  +nvl(sum(decode(n.PS,''T04'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  +nvl(sum(decode(n.PS,''T52'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T02'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T03'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T19'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T07'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T08'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T09'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T22'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T23'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T11'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0) as TRADE_AMT
+  from TRD_PRODUCT_TEMP_DEAL n
+  inner join TRD_PRODUCT_TEMP_DEAL_ADD n1 ON n.TRADE_ID =n1.TRADE_ID
+  inner join  t2   on n.FINPROD_ID = t2.FINPROD_ID and t2.MDATE>=date''${valDate}'' and t2.CDATE<=date''${valDate}''
+  inner join FIN_PRODUCT FP on n.FINPROD_ID=FP.FINPROD_ID AND FP.TRADE_MARKET IN (''03'',''04'')
+  where n1.PORTFOLIO_ID in ${portfolioCode} and  n.TRADE_DATE = date''${valDate}''
+  and n.PS in (''T01'',''T02'',''T03'',''T04'',''T19'',''T07'',''T08'',''T09'',''T11'',''T52'',''T22'',''T23'')
+
+  union all
+ select
+  nvl(sum(decode(n.PS,''T01'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  +nvl(sum(decode(n.PS,''T04'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  +nvl(sum(decode(n.PS,''T52'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T02'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T03'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0)
+  -nvl(sum(decode(n.PS,''T19'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0) as TRADE_AMT
+  from WFL_TRD_PRODUCT_DEAL_ADD m
+  inner join WFL_TRD_PRODUCT_DEAL n on m.TRADE_ID=n.TRADE_ID and n.TRADE_STATUS != ''03''
+  INNER JOIN SYS_WFL_BUSINESS_LIST swbl on n.WORKFLOW_ID = swbl.SEQ_NO and swbl.PROCESS_STATE != ''BACK''
+  inner join  t3  on n.FINPROD_ID = t3.FINPROD_ID and t3.MDATE>=date''${valDate}'' and t3.CDATE<=date''${valDate}''
+  where m.PORTFOLIO_ID in ${portfolioCode} and  n.TRADE_DATE = date''${valDate}''
+  and n.PS in (''T01'',''T02'',''T03'',''T04'',''T19'',''T52'')
+  union all
+ select
+  nvl(sum(decode(n.PS,''T02'',decode(TRADE_STATUS,''03'',n.TRADE_AMT*-1,n.TRADE_AMT))),0) as TRADE_AMT
+  from WFL_TRD_PRODUCT_DEAL_ADD m
+  inner join WFL_TRD_PRODUCT_DEAL n on m.TRADE_ID=n.TRADE_ID and n.TRADE_STATUS != ''03''
+  INNER JOIN SYS_WFL_BUSINESS_LIST swbl on n.WORKFLOW_ID = swbl.SEQ_NO and swbl.PROCESS_STATE != ''BACK''
+  inner join  t3  on n.FINPROD_ID = t3.FINPROD_ID and t3.MDATE>=date''${valDate}'' and t3.CDATE<=date''${valDate}''
+  where n.counter_id IN ${portfolioCode} AND n.TRADE_DATE = DATE''${valDate}''
+  AND n.PS = ''T02''
+  AND EXISTS (SELECT 1 FROM SYS_PARA WHERE PARA_CODE = ''is_auto_generate_negate_deal'' AND PARAM_VALUE = ''Y'')
+  )';
+    V_CONTENT_05 CLOB := 'SELECT nvl(sum(RVALUE),0) AS RVALUE FROM (
+select NVL(SUM(NVL(t1.MARKET_VALUE,0)+nvl(t1.TDY_INTINCEXP, 0)),0) as  RVALUE from PTL_SEC_PIERCE_VALUTION t1
+  inner join (
+  SELECT FINPROD_ID,MDATE,CALENDAR_ID,CDATE,FINPROD_TYPE2 FROM (
+  SELECT s1.FINPROD_ID,s1.MDATE,s1.CALENDAR_ID,s1.CDATE,s1.FINPROD_TYPE2,ROW_NUMBER() OVER(PARTITION BY s1.FINPROD_ID ORDER BY s1.CDATE asc) AS rn FROM (
+          SELECT s.FINPROD_ID,s.MDATE,s.CALENDAR_ID,s.CDATE,s.FINPROD_TYPE2,s.rowno FROM (
+          SELECT m.FINPROD_ID,m.MDATE,m.FINPROD_TYPE2,m.CALENDAR_ID,n.CDATE,ROW_NUMBER() OVER(PARTITION BY m.FINPROD_ID ORDER BY n.CDATE desc) AS  rowno FROM (
+        SELECT FINPROD_ID,FINPROD_TYPE2,MDATE,CASE WHEN CALENDAR_ID IS NULL THEN ''01'' ELSE CALENDAR_ID end CALENDAR_ID FROM FIN_PRODUCT WHERE MDATE IS NOT null) m
+        INNER JOIN MST_HOLIDAY n ON  m.CALENDAR_ID=n.CALENDAR_ID  AND n.CDATE<=m.MDATE AND n.CDATE > m.MDATE - 25 AND n.IS_HOLIDAY=0 ) s WHERE s.rowno<=10
+      ) s1
+    )  WHERE rn=1
+  ) t2
+  on t1.FINPROD_ID = t2.FINPROD_ID and t2.MDATE>=date''${valDate}'' and t2.CDATE<=date''${valDate}''
+  where t1.PORTFOLIO_ID!=t1.FINPROD_ID AND t1.PORTFOLIO_ID in ${portfolioCode} and t1.CDATE=date''${valDate}''
+  GROUP BY T2.FINPROD_ID
+
+  UNION ALL
+
+  select NVL(SUM(NVL(t1.MARKET_VALUE,0)+nvl(t1.TDY_INTINCEXP, 0)),0) as  RVALUE from PTL_SEC_PIERCE_VALUTION t1
+  inner join (
+  SELECT FINPROD_ID,MDATE,CALENDAR_ID,CDATE,FINPROD_TYPE2 FROM (
+  SELECT s1.FINPROD_ID,s1.MDATE,s1.CALENDAR_ID,s1.CDATE,s1.FINPROD_TYPE2,ROW_NUMBER() OVER(PARTITION BY s1.FINPROD_ID ORDER BY s1.CDATE asc) AS rn FROM (
+          SELECT s.FINPROD_ID,s.MDATE,s.CALENDAR_ID,s.CDATE,s.FINPROD_TYPE2,s.rowno FROM (
+          SELECT m.FINPROD_ID,m.MDATE,m.FINPROD_TYPE2,m.CALENDAR_ID,n.CDATE,ROW_NUMBER() OVER(PARTITION BY m.FINPROD_ID ORDER BY n.CDATE desc) AS  rowno FROM (
+        SELECT FINPROD_ID,FINPROD_TYPE2,MDATE,CASE WHEN CALENDAR_ID IS NULL THEN ''01'' ELSE CALENDAR_ID end CALENDAR_ID FROM FIN_TRADE_PRODUCT WHERE BRANCH=0 AND  FINPROD_TYPE2 not in (''F02'',  ''F04'', ''F08'',''F11'',''F12'',''F13'',''F14'',''F15'',''F25'') AND MDATE IS NOT null) m
+        INNER JOIN MST_HOLIDAY n ON  m.CALENDAR_ID=n.CALENDAR_ID  AND n.CDATE<=m.MDATE AND n.CDATE > m.MDATE - 25 AND n.IS_HOLIDAY=0 ) s WHERE s.rowno<=10
+      ) s1
+    )  WHERE rn=1
+  ) t2
+  on t1.FINPROD_ID = t2.FINPROD_ID and t2.MDATE>=date''${valDate}'' and t2.CDATE<=date''${valDate}''
+  where t1.PORTFOLIO_ID!=t1.FINPROD_ID AND t1.PORTFOLIO_ID in ${portfolioCode} and t1.CDATE=date''${valDate}''
+  GROUP BY T2.FINPROD_ID
+  )';
+BEGIN
+    UPDATE RSK_ISUP_INDICATOR_PARA_DTL SET CONTENT = V_CONTENT_01_02_03 WHERE PARA_CODE = 'DQRZSGJYRYNDZCJZ' and PARA_GRANULARITY IN ('01','02','03');
+    UPDATE RSK_ISUP_INDICATOR_PARA_DTL SET CONTENT = V_CONTENT_04 WHERE PARA_CODE = 'DQRZSGJYRYNDZCJZ' and PARA_GRANULARITY ='04';
+    UPDATE RSK_ISUP_INDICATOR_PARA_DTL SET CONTENT = V_CONTENT_05 WHERE PARA_CODE = 'DQRZSGJYRYNDZCJZ' and PARA_GRANULARITY ='05';
+END ;

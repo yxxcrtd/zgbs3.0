@@ -365,7 +365,7 @@
 
     <select id="getCountByFinprodMarketId" resultType="java.lang.Integer">
         select sum(qty) from (
-            select count(*) as qty from INTERF_WIND_UNRELEASE_SEC_INFO where  SEC_ID=#{finprodMarketId,jdbcType=VARCHAR}
+            select count(*) as qty from INTERF_PAYHSRCSECINFO where  SECID=#{finprodMarketId,jdbcType=VARCHAR}
             union all
             select count(*) as qty from FIN_PRODUCT where FINPROD_MARKET_ID=#{finprodMarketId,jdbcType=VARCHAR}
         ) t
