@@ -470,7 +470,7 @@
             eed.ENTRUST_NUM*100 portfolioTotalBidPrinAmt,
             eed.INV_AIM businessModel
         FROM ETR_ENTRUST_BID_PRICE eebp
-                 LEFT JOIN ETR_ENTRUST_DETAIL eed ON eed.ENTRUST_ID = eebp.ENTRUST_ID
+                 LEFT JOIN ETR_ENTRUST_DETAIL eed ON eed.ENTRUST_ID = eebp.ENTRUST_ID AND eed.PORTFOLIO_ID = eebp.PORTFOLIO_ID
                  LEFT JOIN PTL_PORTFOLIO pp ON eebp.PORTFOLIO_ID = pp.PORTFOLIO_ID
                  LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = eed.ACCT_NO
         WHERE eebp.ENTRUST_ID = #{entrustId}
@@ -486,7 +486,7 @@
             eed.INV_AIM businessModel
         FROM WFL_ETR_ENTRUST_BID_PRICE eebp
                  LEFT JOIN WFL_ETR_ENTRUST_DETAIL eed ON eed.ENTRUST_ID = eebp.ENTRUST_ID
-                 LEFT JOIN PTL_PORTFOLIO pp ON eebp.PORTFOLIO_ID = pp.PORTFOLIO_ID
+                 LEFT JOIN PTL_PORTFOLIO pp ON eed.ENTRUST_ID = eebp.ENTRUST_ID AND eed.PORTFOLIO_ID = eebp.PORTFOLIO_ID
                  LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = eed.ACCT_NO
         WHERE eebp.ENTRUST_ID = #{entrustId}
     </select>
