@@ -26,7 +26,7 @@ import static com.joyintech.tams.constant.DictCodeListExt3.*;
  * 风险升级 4合一接口
  */
 @RestController
-@RequestMapping("/riskTrial")
+@RequestMapping("/")
 public class RiskTrialController {
 
     private static final Logger logger = LoggerFactory.getLogger(RiskTrialController.class);
@@ -36,7 +36,7 @@ public class RiskTrialController {
 
 
     @ApiOperation(value = "风险试算", notes = "风险试算")
-    @PostMapping("/doRiskcal/{pageId}")
+    @PostMapping("riskTrial/doRiskcal/{pageId}")
     public Message<AjaxResult> doRiskcal(@RequestBody Map<String, Object> param, @PathVariable("pageId") String pageId) {
         try {
             RiskCommonOutputDto outputDto = paramSerivce.buildParamThenRisk(param, 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), pageId,null);
@@ -73,7 +73,7 @@ public class RiskTrialController {
     }
 
     @ApiOperation(value = "风险占用", notes = "风险占用")
-    @PostMapping("/doOccupy/{pageId}/{decisionAct}/{flowStatus}")
+    @PostMapping("cfets/riskTrial/doOccupy/{pageId}/{decisionAct}/{flowStatus}")
     public Message<AjaxResult> doOccupy(@RequestBody Map<String, Object> param,
                                         @PathVariable("pageId") String pageId,
                                         @PathVariable("decisionAct") String decisionAct,

@@ -546,6 +546,7 @@ public class StlDataGatherRepoDurationProcessor extends BaseProcessor<NeedOperat
                     BigDecimal bigDecimal = intAmtMap.get(key);
                     intAmtMap.put(key, ArithmeticUtil.subtract(bigDecimal,settleTransDataDto.getIntAmt()));
                 }
+                trdProductDealDto.setPrinAmt(BigDecimal.ZERO);
                 trdProductDeals.add(trdProductDealDto);
             }
             if(null!=settleTransDataDto.getShareAmt()&&settleTransDataDto.getShareAmt().compareTo(BigDecimal.ZERO)!=0){

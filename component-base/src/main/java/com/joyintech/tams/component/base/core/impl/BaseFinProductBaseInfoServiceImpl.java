@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 标的类金融产品基本信息组件 〈功能详细描述〉
@@ -274,7 +275,15 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
                 //债券评级信息
                 if (null != dto.getMstBondCreditRatingList() && !dto.getMstBondCreditRatingList().isEmpty()) {
                     for (MstBondCreditRating mstBondCreditRating : dto.getMstBondCreditRatingList()) {
-                        mstBondCreditRatingMapper.insert(mstBondCreditRating);
+                        MstBondCreditRatingKey key = new MstBondCreditRatingKey();
+                        key.setoCode(mstBondCreditRating.getoCode());
+                        key.setoType(mstBondCreditRating.getoType());
+                        key.setGradeDate(mstBondCreditRating.getGradeDate());
+                        key.setGradeOrgId(mstBondCreditRating.getGradeOrgId());
+                        MstBondCreditRating mstBondCreditRatingLocal = mstBondCreditRatingMapper.selectByPrimaryKey(key);
+                        if (Objects.isNull(mstBondCreditRatingLocal)) {
+                            mstBondCreditRatingMapper.insert(mstBondCreditRating);
+                        }
                     }
                 }
                 //发行信息

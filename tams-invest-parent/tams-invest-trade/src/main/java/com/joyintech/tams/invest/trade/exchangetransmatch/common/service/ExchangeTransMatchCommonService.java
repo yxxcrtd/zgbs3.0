@@ -598,8 +598,14 @@ public class ExchangeTransMatchCommonService extends BaseService {
         }
         String finprodId = DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(entrustDto.getFinprodType2())
                 ? StringUtil.EMPTY : entrustDto.getFinprodId();
-        return trdCommonBaseService.getMinTrdUnitLimit(finprodId, tradePlat,
+        MinTrdUnitLimitDto minTrdUnitLimitDto = trdCommonBaseService.getMinTrdUnitLimit(finprodId, tradePlat,
                 entrustDto.getTradeMarket(), entrustDto.getFinprodType2(),entrustDto.getPs());
+        if(minTrdUnitLimitDto == null){
+            minTrdUnitLimitDto = new MinTrdUnitLimitDto();
+            minTrdUnitLimitDto.setMinStep(BigDecimal.ONE);
+            minTrdUnitLimitDto.setMinNum(BigDecimal.ONE);
+        }
+        return minTrdUnitLimitDto;
     }
 
     /**

@@ -3062,7 +3062,7 @@
 			 CASE
 			   WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
 			   WHEN STD.DELIVERY_RESULT = '04' THEN  '0'
-			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME || '%'
+			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME * 100 || ''
 			 END                                                   DELIVERY_SCHEDULE,
 			 TTH.ACCOUNT_ID                                        ACCT_ACCOUNT
 		FROM SETTLE_TRANS_DATA STD
@@ -3112,7 +3112,7 @@
 			 CASE
 			   WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
 			   WHEN STD.DELIVERY_RESULT = '04' THEN '0'
-			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME || '%'
+			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME * 100 || ''
 			 END                                                   DELIVERY_SCHEDULE,
 			 TT.ACCOUNT_ID                                         ACCT_ACCOUNT
 		FROM T_TRADE TT
@@ -3186,7 +3186,7 @@
             END DELIVERY_RESULT,
             CASE
                 WHEN std1.DELIVERY_RESULT != #{DELIVERY_RESULT_05} THEN '100'
-                ELSE std2.SHARE_AMT / std1.SHARE_AMT || '%'
+                ELSE std2.SHARE_AMT / std1.SHARE_AMT * 100 || ''
             END DELIVERY_SCHEDULE,
             std1.ACCT_NO ACCT_ACCOUNT
         FROM

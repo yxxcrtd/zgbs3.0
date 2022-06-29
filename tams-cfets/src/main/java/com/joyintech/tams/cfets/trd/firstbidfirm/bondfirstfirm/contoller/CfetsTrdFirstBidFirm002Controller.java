@@ -399,17 +399,15 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
             tradeAmt = "汇总投标券面总额:" + ArithmeticUtil.divide(dto.getTotalBiddingNum(), new BigDecimal(10000), 2, RoundingMode.HALF_UP) + "万元";
         }
         params.setElementId(dto.getElementId());
+        // 分销买入
+        params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_投标.getValue());
         if (StringUtil.equals(DictCodeListExt4.投标方式_自主投标.getValue(), dto.getBiddingMethod())) {
             //  自主投标
-            params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_投标_自主投标.getValue());
             dto.setBidId(cfetsTrdFirstBidFirm002Service.getBidId(BussinessDictCodeList.共同业务类型_一级投标确认_投标_自主投标));
         } else if (StringUtil.equals(DictCodeListExt4.投标方式_代投代缴.getValue(), dto.getBiddingMethod())) {
             //代投代缴
-            params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_投标_代投代缴.getValue());
             dto.setBidId(cfetsTrdFirstBidFirm002Service.getBidId(BussinessDictCodeList.共同业务类型_一级投标确认_投标_代投代缴));
         } else if (StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), dto.getBiddingMethod())) {
-            // 分销买入
-            params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue());
             dto.setBidId(cfetsTrdFirstBidFirm002Service.getBidId(BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入));
             str = "交易日期:" + DateUtil.format(iPlatformDate.getSysDate());
             tradeAmt = "分销买入券面总额:" +

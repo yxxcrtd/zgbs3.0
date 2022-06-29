@@ -114,7 +114,7 @@ values ('TRANS_MATCH', 'F01', 'T09', '19', 'TRD', 'com.joyintech.tams.invest.com
 
 
 /*回购存续期接口*/
-DELETE FROM INTERF_POSITION_CONFIG WHERE TRADE_PLAT = 'TRANS_MATCH' AND INTERF_TYPE IN ('REPO002', 'REPO003') AND FINPROD_TYPE IN ('F02-H01', 'F03-H01') AND PS IN ('T22', 'T23') AND ENTITY = 'com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto';
+DELETE FROM INTERF_POSITION_CONFIG WHERE TRADE_PLAT = 'TRANS_MATCH' AND INTERF_TYPE IN ('REPO002', 'REPO003') AND FINPROD_TYPE IN ('F02-H01', 'F03-H01', 'F03-H02') AND PS IN ('T22', 'T23', 'T07') AND ENTITY = 'com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto';
 
 INSERT INTO INTERF_POSITION_CONFIG (TRADE_PLAT, FINPROD_TYPE, PS, BUSI_ACT, POSITION_TYPE, ENTITY, INTERF_TYPE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, REMARK, ENABLE) 
 VALUES ('TRANS_MATCH', 'F02-H01', 'T22', '19', 'TRD', 'com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto', 'REPO002', 'system', null, sysdate, 'system', sysdate, '正回购存续期接口-协议回购-成交匹配-收息到账', 'Y');
@@ -132,6 +132,8 @@ INSERT INTO INTERF_POSITION_CONFIG (TRADE_PLAT, FINPROD_TYPE, PS, BUSI_ACT, POSI
 VALUES ('TRANS_MATCH', 'F03-H02', 'T22', '19', 'TRD', 'com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto', 'REPO003', 'system', null, sysdate, 'system', sysdate, '逆回购存续期接口-竞价回购-成交匹配-收息到账', 'Y');
 INSERT INTO INTERF_POSITION_CONFIG (TRADE_PLAT, FINPROD_TYPE, PS, BUSI_ACT, POSITION_TYPE, ENTITY, INTERF_TYPE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, REMARK, ENABLE) 
 VALUES ('TRANS_MATCH', 'F03-H02', 'T23', '19', 'TRD', 'com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto', 'REPO003', 'system', null, sysdate, 'system', sysdate, '逆回购存续期接口-竞价回购-成交匹配-收息到账', 'Y');
+INSERT INTO INTERF_POSITION_CONFIG (TRADE_PLAT, FINPROD_TYPE, PS, BUSI_ACT, POSITION_TYPE, ENTITY, INTERF_TYPE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, REMARK, ENABLE) 
+VALUES ('TRANS_MATCH', 'F03-H02', 'T07', '19', 'TRD', 'com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto', 'REPO003', 'system', null, sysdate, 'system', sysdate, '逆回购存续期接口-竞价回购-成交匹配-到期', 'Y');
 
 
 /*基金存续期接口*/
