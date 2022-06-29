@@ -1142,7 +1142,7 @@
     </select>
 
     <select id="getTrdFinProductDealTotalTemp" resultType="com.joyintech.tams.common.base.entity.TrdFinProductDealTotal">
-        SELECT <include refid="com.joyintech.tams.common.base.dao.TrdProductTempDealTotalMapper.Sql_All_Data" />
+        <include refid="com.joyintech.tams.common.base.dao.TrdProductTempDealTotalMapper.Sql_All_Data" />
         WHERE B_TRADE_ID = #{bTradeId}
     </select>
 
@@ -1154,7 +1154,7 @@
 
     <!-- 根据汇总交易编号查询交易信息 -->
     <select id="queryTrdProductDealTempByTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.TrdProductTempDealMapper.BaseResultMap">
-        select <include refid="com.joyintech.tams.common.base.dao.TrdProductTempDealMapper.Sql_All_Data" />
+        <include refid="com.joyintech.tams.common.base.dao.TrdProductTempDealMapper.Sql_All_Data" />
         where TOTLE_TRADE_ID = #{tradeId}
     </select>
 
