@@ -5258,6 +5258,7 @@
     </select>
 
     <select id="findYjtbBidTradeDetailInfo" resultType="com.joyintech.tams.cfets.trdquery.dto.CfetsTrdBidInfoResponse">
+            SELECT DISTINCT * from (
             SELECT  FP.finprod_id as finprodId,
                 FP.FINPROD_MARKET_ID   AS	finprodMarketId,
                 FP.FINPROD_ABBR	  AS	finprodAbbr,
@@ -5370,7 +5371,7 @@
             LEFT JOIN SYS_USER su ON su.USER_NAME = WBO.OUR_TRADER
             LEFT JOIN MST_COUNTER_PARTY mcci ON WBO.COUNTER_ID= mcci.COUNTER_ID
             LEFT JOIN MST_CFETS_CUSTOMER_INFO m1 on WBO.OUR_TRADER=m1.PARTY_ID
-            WHERE WBO.BID_ID = #{bidId}
+            WHERE WBO.BID_ID = #{bidId})
     </select>
 
     <select id="findYjtbFenPeiInfoList" resultType="com.joyintech.tams.cfets.trdquery.dto.BidPortIntFenPeiInfoDto">

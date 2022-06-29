@@ -2540,11 +2540,17 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         List<CfetsTrdFirstBidFirmInvestTradeDto> list = new ArrayList<>();
         // 数据库取值
         List<TrdFinProductDealTotal> totals = cfetsTrdFirstBidFirm002Mapper.findTotalByPTotleTradeId(dto.getBidId());
+        if (CollectionUtils.isEmpty(totals)) {
+            totals = cfetsTrdFirstBidFirm002Mapper.findTempTotalByPTotleTradeId(dto.getBidId());
+        }
         for (TrdFinProductDealTotal total : totals) {
             CfetsTrdFirstBidFirmInvestTradeDto tradeDto = new CfetsTrdFirstBidFirmInvestTradeDto();
             tradeDto.setTrdFinProductDealTotal(total);
+            tradeDto.setTrdFinProductDealTempTotal(total);
             TrdDealTotalAdd totalAdd = trdDealTotalAddMapper.selectByPrimaryKey(total.getTotleTradeId());
             tradeDto.setTrdDealTotalAdd(totalAdd);
+            TrdTempDealTotalAdd totalTempAdd = trdTempDealTotalAddMapper.selectByPrimaryKey(total.getTotleTradeId());
+            tradeDto.setTrdDealTempTotalAdd(totalTempAdd);
             // 汇总费用
             TrdTradeFeeTotal ttfd = new TrdTradeFeeTotal();
             ttfd.setTotleTradeId(total.getTotleTradeId());
@@ -2601,6 +2607,16 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             tradeDto.setTrdProductDealAdds(dealAdds);
             tradeDto.setTrdTradeFeeDetails(feeDetails);
             tradeDto.setPtlTrades(ptlTrades);
+            // 数据库取值
+            List<TrdProductTempDeal> dealTemps = cfetsTrdFirstBidFirm002Mapper.findTempDealByTotleTradeId(total.getTotleTradeId());
+            List<TrdProductTempDealAdd> dealTempsAdds = new ArrayList<>();
+            for (TrdProductTempDeal deal : dealTemps) {
+                TrdProductTempDealAdd dealAdd = new TrdProductTempDealAdd();
+                dealAdd = trdProductTempDealAddMapper.selectByPrimaryKey(deal.getTradeId());
+                dealTempsAdds.add(dealAdd);
+            }
+            tradeDto.setTrdProductTempDeals(dealTemps);
+            tradeDto.setTrdProductTempDealAdds(dealTempsAdds);
             list.add(tradeDto);
         }
         return list;
@@ -2842,7 +2858,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                         String.class);
             }else {
                 // 金融产品交易汇总
-                TrdFinProductDealTotal trdFinProductDealTotal = entity.getTrdFinProductDealTotal();
+                TrdFinProductDealTotal trdFinProductDealTotal = entity.getTrdFinProductDealTempTotal();
                 if (trdFinProductDealTotal != null) {
                     // 原数据 是否撤销 => 是
                     trdFinProductDealTotal.setIsCancel(DictCodeList.是否_是.getValue());
@@ -2866,24 +2882,19 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                     trdProductTempDealTotalMapper.insertSelective(trdFinProductDealTotal1);
                 }
 
-                for (TrdProductDeal trdProductDeal : entity.getTrdProductDeals()) {
-                    TrdProductTempDeal trdProductTempDeal = new TrdProductTempDeal();
-                    BeanUtil.copyPropertiesIgnoreNull(trdProductTempDeal, trdProductDeal);
+                for (TrdProductTempDeal trdProductTempDeal : entity.getTrdProductTempDeals()) {
                     trdProductTempDeal.setIsCancel(DictCodeList.是否_是.getValue());  // 原数据 是否撤销 => 是
                     trdProductTempDealMapper.updateByPrimaryKey(trdProductTempDeal);
-                    String oldTradeId = trdProductDeal.getTradeId();
-                    String newTradeId = trdProductDeal.getTradeId() + "R";
+                    String oldTradeId = trdProductTempDeal.getTradeId();
+                    String newTradeId = trdProductTempDeal.getTradeId() + "R";
                     TrdProductTempDeal trdProductTempDeal1 = new TrdProductTempDeal();
                     BeanUtil.copyPropertiesIgnoreNull(trdProductTempDeal1, trdProductTempDeal);
-                    trdProductTempDeal1.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue()); // 调用估值接口时，状态是撤销
+                    trdProductTempDeal1.setTotleTradeId(trdProductTempDeal.getTotleTradeId() + "R");
                     trdProductTempDeal1.setpTradeId(oldTradeId);
                     trdProductTempDeal1.setTradeId(newTradeId);
-                    trdProductDeal.setTotleTradeId(trdProductDeal.getTotleTradeId() + "R");
-                    trdProductDeal.setpTradeId(oldTradeId);
-                    trdProductDeal.setTradeId(newTradeId);
-                    trdProductDeal.setCancelRemark(settleRemark);
-                    trdProductDeal.setIsCancel(DictCodeList.是否_否.getValue());
-                    trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
+                    trdProductTempDeal1.setCancelRemark(settleRemark);
+                    trdProductTempDeal1.setIsCancel(DictCodeList.是否_否.getValue());
+                    trdProductTempDeal1.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
                     trdProductTempDealMapper.insertSelective(trdProductTempDeal1);
                 }
             }
