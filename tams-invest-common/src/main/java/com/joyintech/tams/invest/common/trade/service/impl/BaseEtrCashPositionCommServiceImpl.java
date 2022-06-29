@@ -358,19 +358,20 @@ public class BaseEtrCashPositionCommServiceImpl extends BaseService implements B
     public CommonResult entrustCloseExecute(String entrustId, String isExistNew, BigDecimal forcedFinishAmt) {
         if (StringUtil.isNotEmpty(entrustId)) {
             EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(entrustId);
-            if ((etrEntrust != null && etrEntrust.getEntrustClass() != null && StringUtil.equals(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue(), etrEntrust.getEntrustClass()))
-            || StringUtils.equals(etrEntrust.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())) {
+            if (etrEntrust != null && ((etrEntrust.getEntrustClass() != null
+                    && StringUtil.equals(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue(), etrEntrust.getEntrustClass()))
+                    || StringUtils.equals(etrEntrust.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue()))) {
                 List<EntrustCommonDto> entrustCommonDtoList = EtrCommonCashPositionDealService.findEntrustMulti(entrustId);
                 if (!CollectionUtils.isEmpty(entrustCommonDtoList)) {
-                    entrustCommonDtoList.stream().forEach(entrustCommonDto -> {
+                    for (EntrustCommonDto entrustCommonDto : entrustCommonDtoList) {
                         entrustCommonDto.setIsExistNew(isExistNew);
                         entrustCloseExecuteSinglePortfolio(entrustCommonDto);
-                    });
+                    }
                 }
             } else {
                 EntrustCommonDto entrustCommonDto = EtrCommonCashPositionDealService.findEntrust(entrustId);
                 // 委托指令附属表查询
-                EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entrustId);
+//                EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entrustId);
                 if (StringUtil.isNotEmpty(forcedFinishAmt)) {
                     entrustCommonDto.setForcedFinishAmt(forcedFinishAmt);//强制完成额度
                 }

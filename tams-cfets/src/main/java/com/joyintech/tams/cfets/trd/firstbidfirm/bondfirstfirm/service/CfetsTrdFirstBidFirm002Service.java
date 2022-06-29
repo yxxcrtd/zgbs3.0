@@ -31,6 +31,7 @@ import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbClosePosEtrRequest;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbClosePositionRequest;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsBiddingProductDto;
 import com.joyintech.tams.cfets.position.service.PositionInfoService;
 import com.joyintech.tams.cfets.trd.bond.dto.CalRequest;
 import com.joyintech.tams.cfets.trd.bond.dto.CalRespone;
@@ -697,7 +698,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
      */
     private CfetsTrdFirstBidFirmInfoDto dealInfoDistribution(CfetsTrdFirstBidFirmInfoDto dto) {
         // 排序
-        List<CfetsTrdFirstBidFirmProductDto> list = productDtoSort(dto);
+        List<CfetsTrdFirstBidFirmProductDto> list = this.productDtoSort(dto);
         //缴款方式
         dto.setPayType(this.getPayType(dto.getBiddingMethod()));
         BigDecimal bidPriceTotal = BigDecimal.ZERO;
@@ -1805,25 +1806,36 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
     public CfetsTrdFirstBidFirmInfoDto winPriceLink(CfetsTrdFirstBidFirmInfoDto dto) {
         // 招标标的 IN（利率，利差）时，投标产品列表中，只展示投标标位小于等于基本信息.中标标位的记录
         List<CfetsTrdFirstBidFirmProductDto> list = new ArrayList<>();
+        List<CfetsTrdFirstBidFirmProductDto> backList = new ArrayList<>();
+        List<CfetsTrdFirstBidFirmProductDto> allList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(dto.getProductDtos())) {
+            allList.addAll(dto.getProductDtos());
+        }
+        if (CollectionUtils.isNotEmpty(dto.getProductBackDtos())) {
+            allList.addAll(dto.getProductBackDtos());
+        }
         // 剩余指令额度汇总
-        BigDecimal avaNumTotal = BigDecimal.ZERO;
+        BigDecimal avaNumTotal = dto.getProductDtos().stream()
+                .filter(item -> StringUtil.isNotEmpty(item.getAvaNum()))
+                .map(CfetsTrdFirstBidFirmProductDto::getAvaNum)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         // 指令投标券面总额  SUM（委托投标标位.投标券面），转化成万元展示，为满足投标标位的标位券面总额汇总
         BigDecimal etrBidPriceTotal = BigDecimal.ZERO;
-        for (CfetsTrdFirstBidFirmProductDto productDto : dto.getProductDtos()) {
+        for (CfetsTrdFirstBidFirmProductDto productDto : allList) {
             if ((StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())
                     || StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue()))
                     && BigDecimalUtil.ACompareToB(productDto.getBidPrice(), dto.getWinPrice(), 6) <= 0) {
                 list.add(productDto);
-                etrBidPriceTotal = ArithmeticUtil.doAdd(etrBidPriceTotal, productDto.getBidPriceTotal());
+                etrBidPriceTotal = ArithmeticUtil.doAdd(etrBidPriceTotal, productDto.getEtrBidPriceTotal());
                 continue;
             }
             if (StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_价格.getValue())
                     && BigDecimalUtil.ACompareToB(productDto.getBidPrice(), dto.getWinPrice(), 6) >= 0) {
                 list.add(productDto);
-                etrBidPriceTotal = ArithmeticUtil.doAdd(etrBidPriceTotal, productDto.getBidPriceTotal());
+                etrBidPriceTotal = ArithmeticUtil.doAdd(etrBidPriceTotal, productDto.getEtrBidPriceTotal());
                 continue;
             }
-            avaNumTotal = ArithmeticUtil.doAdd(avaNumTotal, productDto.getAvaNum());
+            backList.add(productDto);
         }
         dto.setEtrBidPriceTotal(etrBidPriceTotal);
         // 若券面总额在修改中标标位前手动修改过，不变；若没有手动修改过，重新计算，=指令投标券面总额
@@ -1831,6 +1843,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             dto.setBidPriceTotal(etrBidPriceTotal);
         }
         dto.setProductDtos(list);
+        // 保留未中标的数据
+        dto.setProductBackDtos(backList);
         // 重新计算金额并自动分配
         this.calAmtAndAutoAllocation(dto, null);
         return dto;
