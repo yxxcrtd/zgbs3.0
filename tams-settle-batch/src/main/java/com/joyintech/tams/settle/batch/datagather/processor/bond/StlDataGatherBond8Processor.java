@@ -179,7 +179,7 @@ public class StlDataGatherBond8Processor extends BaseProcessor<NeedOperateEntity
                 .map(TrdFinProductDealTotal::getShareAmt)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         for(int i=0; i<sortedNotifyDealTotalList.size(); i++){
-            TrdFinProductDealTotal notifyDealTotal = sortedNotifyDealTotalList.get(0);
+            TrdFinProductDealTotal notifyDealTotal = sortedNotifyDealTotalList.get(i);
             TotalTrdProductDealDto resultDealTotal = new TotalTrdProductDealDto();
             BeanUtil.copyPropertiesIgnoreNull(resultDealTotal, notifyDealTotal);
             // 汇总交易编号

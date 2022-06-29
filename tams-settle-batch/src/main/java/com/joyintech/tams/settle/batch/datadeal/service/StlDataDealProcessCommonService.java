@@ -156,7 +156,7 @@ public class StlDataDealProcessCommonService {
 		if (StringUtil.equals(StlDataDealProcessConstant.JSFS_002, jsfs) || StringUtil.equals(StlDataDealProcessConstant.SJSMX_JSFS_N, jsfs) || StringUtil.equals(StlDataDealProcessConstant.SJSMX_JSFS_R, jsfs)) {
 			return DictCodeListStl.交收方式_非担保.getValue();
 		}
-		return null;
+		return DictCodeListStl.交收方式_担保.getValue();
 	}
 
 	/**

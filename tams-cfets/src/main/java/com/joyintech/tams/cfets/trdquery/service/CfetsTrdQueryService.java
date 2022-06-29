@@ -577,6 +577,7 @@ public class CfetsTrdQueryService extends BaseService {
         //资产类型
         pageParam.put("REG_ASSET_TYPE_01", DictCodeListExt1.登记资产类型_债券.getValue());
         pageParam.put("REG_ASSET_TYPE_02", DictCodeListExt1.登记资产类型_质押式回购.getValue());
+        pageParam.put("REG_ASSET_TYPE_04", DictCodeListExt1.登记资产类型_同业存单.getValue());
 
 
         //报价状态为已撤销就是已撤销

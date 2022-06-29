@@ -260,11 +260,11 @@ public class CfetsTradeHandlerAop {
             ajaxResult.setErrorList(ar.getErrorList());
             return;
         }
-        String message = ajaxResult.getMessage() == null ? "" : ajaxResult.getMessage();
+        String message = ajaxResult.getData() == null ? "" : ajaxResult.getData().toString();
         if (ar != null && ar.getMessage() != null) {
             message += ar.getMessage();
         }
-        ajaxResult.setMessage(message, MessageType.确认消息);
+        ajaxResult.setData(message);
     }
 
 
@@ -306,6 +306,7 @@ public class CfetsTradeHandlerAop {
         }
         Object[] args = joinPoint.getArgs();
         AjaxResult result = new AjaxResult();
+        ajaxResultMessage.setData(result);
         try {
             RiskCommonOutputDto outputDto = inputParamSerivce.buildParamThenRisk(args[0], decisionAct, flowStatus, pageId, NodeConfigConstant.TRADE);
             if (StringUtil.isNotEmpty(outputDto.getErrorMsg())) {
@@ -316,7 +317,7 @@ public class CfetsTradeHandlerAop {
                 if (StringUtil.equals(outputDto.getRskStatus(), 试算结果_风险审批.getValue())) {
                     result.setData(是否_是.getValue());
                 }
-                ajaxResultMessage.setData(result);
+
             }
         } catch (Exception e) {
             logger.error("风险校验异常:", e);

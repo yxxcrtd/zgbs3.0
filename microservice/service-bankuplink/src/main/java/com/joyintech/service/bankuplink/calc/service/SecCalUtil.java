@@ -54,7 +54,7 @@ public class SecCalUtil {
                 algInterScheduleBond.setInterestEndDay(DateUtil.format(finCashPlan.getMdate()));
                 algInterScheduleBond.setTotalInterestStartDay(DateUtil.format(finCashPlan.getVdateUnadjust()));
                 algInterScheduleBond.setTotalInterestEndDay(DateUtil.format(finCashPlan.getMdateUnadjust()));
-                algInterScheduleBond.setCashpay(finCashPlan.getCashAmt().doubleValue());
+                algInterScheduleBond.setCashpay(StringUtil.isNotEmpty(finCashPlan.getCashAmt())?finCashPlan.getCashAmt().doubleValue():0);
                 algInterScheduleBond.setCoupon(finCashPlan.getRangeYield().doubleValue());
                 
                 list_interScheduleBond.add(algInterScheduleBond);

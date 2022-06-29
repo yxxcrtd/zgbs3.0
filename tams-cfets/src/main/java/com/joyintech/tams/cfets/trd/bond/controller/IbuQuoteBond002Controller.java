@@ -2,6 +2,8 @@ package com.joyintech.tams.cfets.trd.bond.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.JoyinMessage;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
@@ -562,6 +564,9 @@ public class IbuQuoteBond002Controller extends BaseController {
 
             ar.setData(this.getMessage("COMMON_C_0001", msg));
         }*/
+        if(CollectionUtils.isEmpty(ar.getErrorList())){
+            return commonCheck(null,"submit");
+        }
         return ar;
     }
 
