@@ -460,9 +460,9 @@
                 OR T.protectObject like '%' || #{search} || '%'
                 OR T.protectObjectStr like '%' || #{search} || '%'
                 OR T.refSecFeatures like '%' || #{search} || '%'
-                OR T.refSec like '%' || #{search} || '%'
+                <!--OR T.refSec like '%' || #{search} || '%'-->
                 OR T.refEntityId like '%' || #{search} || '%'
-                OR T.refEntity like '%' || #{search} || '%'
+                <!--OR T.refEntity like '%' || #{search} || '%'-->
                 OR T.calendarIdStr like '%' || #{search} || '%'
                 OR T.gracePeriod||'' = #{search}
                 OR T.calendarId||'' like '%' || #{search} || '%'
@@ -474,6 +474,11 @@
                 OR TO_CHAR(T.payDate,'yyyy-MM-dd') ||''= #{search}
                 OR TO_CHAR(T.listingDate,'yyyy-MM-dd') ||''= #{search}
                 OR TO_CHAR(T.pledgeDeadlineDate,'yyyy-MM-dd') ||''= #{search}
+                <if test="refSearch != null and refSearch.size() > 0">
+                    <foreach collection="refSearch" item="item"  separator=",">
+                        or T.refSec like '%'  || #{item} || '%'
+                    </foreach>
+                </if>
                 )
         </if>
     </sql>

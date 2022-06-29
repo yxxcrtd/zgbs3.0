@@ -658,7 +658,6 @@
             $('#CfetsBondDealQuotedPrice004_unitInt').val($('#CfetsBondDealQuotedPrice004_unitIntEdit').val()).trigger('blur');
             if(!entrustIdChangeFlag){
                 calcAmt(null,'Y');
-                debugger;
                 autoAllocation();
             }
         });
@@ -680,10 +679,10 @@
             // 应计利息总额
             var intAmt = $('#CfetsBondDealQuotedPrice004_intAmt').val();
             //金额面板.应计利息 金额面板.应计利息总额/(券面总额（万元）*10000)*100
-            $('#CfetsBondDealQuotedPrice004_unitInt').val(JoyinMath.doDiv(intAmt*100, cpriceAmt, 5)).trigger('blur');;
+            var newUnitInt = JoyinMath.doDiv(intAmt*100, cpriceAmt, 5);
+            $('#CfetsBondDealQuotedPrice004_unitInt').val(newUnitInt).trigger('blur');;
             //金额面板.全价=净价+应计利息
-            $('#CfetsBondDealQuotedPrice004_unitFprice').val(JoyinMath.doAdd(unitCprice, unitInt, 2)).trigger('blur');;
-            debugger;
+            $('#CfetsBondDealQuotedPrice004_unitFprice').val(JoyinMath.doAdd(unitCprice, newUnitInt, 4)).trigger('blur');;
             autoAllocation();
         });
     }

@@ -166,14 +166,14 @@
                  select distinct t1.BID_MODLE, t2.ENTRUST_ID
                  from BID_ORDER t1
                           left join BID_ORDER_BID_PRICE t2 on t1.BID_ID = t2.BID_ID
-                 where t1.IS_CANCEL = 'N'
-                   and t1.TRADE_STATUS = '01'
+                 where t1.IS_CANCEL = #{YN_N}
+                   and t1.TRADE_STATUS = #{TRADE_STATUS_01}
                  union all
                  select distinct t1.BID_MODLE, t2.ENTRUST_ID
                  from WFL_BID_ORDER t1
                           left join WFL_BID_ORDER_BID_PRICE t2 on t1.BID_ID = t2.BID_ID
              )
-        where BID_MODLE = '03'
+        where BID_MODLE = #{WIN_TYPE}
         <if test="entrustIdList != null and entrustIdList.size()>0">
             and ENTRUST_ID in
             <foreach collection="entrustIdList" open=" (" close=") " separator="," item="item">

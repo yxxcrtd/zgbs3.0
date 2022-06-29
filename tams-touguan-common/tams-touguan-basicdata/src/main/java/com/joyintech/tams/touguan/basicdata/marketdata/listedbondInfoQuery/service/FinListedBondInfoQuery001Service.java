@@ -402,7 +402,11 @@ public class FinListedBondInfoQuery001Service extends BaseService {
             for (InterfPayhsrcsecrating interfPayhsrcsecrating : interfPayhsrcsecratingList) {
                 MstBondCreditRating mstBondCreditRating = new MstBondCreditRating();
                 //债券ID
-                mstBondCreditRating.setoCode(interfPayhsrcsecrating.getSecid());
+                if (DictCodeList.评级类型_主体评级.getValue().equals(interfPayhsrcsecrating.getRatingtype())) {
+                    mstBondCreditRating.setoCode(finListedBondInfoQuery001Dto.getIssuerCode());
+                } else {
+                    mstBondCreditRating.setoCode(interfPayhsrcsecrating.getSecid());//债券ID
+                }
                 //评级机构
                 mstBondCreditRating.setGradeOrgId(interfPayhsrcsecrating.getRatingorg());
                 //评级日期取发布日期

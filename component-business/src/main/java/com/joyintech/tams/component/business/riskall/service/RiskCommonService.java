@@ -371,7 +371,7 @@ public class RiskCommonService {
                         return;
                     }else {
                         // 软控消息拼接，并且一种风险类型只拼接一次
-                        confirmMsg.append("名单风险试算不通过!");
+                        confirmMsg.append("名单风险试算不通过！");
                         break;
                     }
                 }
@@ -389,7 +389,7 @@ public class RiskCommonService {
                         return;
                     }else {
                         // 软控消息拼接，并且一种风险类型只拼接一次
-                        confirmMsg.append("授信风险试算不通过!");
+                        confirmMsg.append("授信风险试算不通过！");
                         break;
                     }
                 }
@@ -416,7 +416,7 @@ public class RiskCommonService {
                 confirmMsg.append("风险审批，是否进入下一审批流？");
             }else {
                 // 软控消息拼接，并且一种风险类型只拼接一次
-                confirmMsg.append("指标审批!");
+                confirmMsg.append("指标审批！");
             }
 
         }
@@ -436,14 +436,14 @@ public class RiskCommonService {
                         return;
                     }else {
                         // 软控消息拼接，并且一种风险类型只拼接一次
-                        confirmMsg.append("发起人超授权!");
+                        confirmMsg.append("发起人超授权！");
                         break;
                     }
                 }
             }
         }
         if(StringUtil.isNotEmpty(confirmMsg)) {
-            confirmMsg.append("是否确认提交?");
+            confirmMsg.append(" 是否确认提交？");
         }
         riskCommonOutputDto.setConfirmMsg(confirmMsg.toString());
     }
