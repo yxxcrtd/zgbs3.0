@@ -5343,6 +5343,7 @@
             LEFT JOIN SYS_USER su
                       ON su.USER_NAME = BO.OUR_TRADER
             WHERE  BO.TRADE_STATUS = #{TRADE_STATUS_01}
+              and BRT.STATUS = #{TRADE_STATUS_01}
             AND  BO.BID_ID = #{bidId}
             UNION ALL
             SELECT FP.FINPROD_ID as finprodId,
