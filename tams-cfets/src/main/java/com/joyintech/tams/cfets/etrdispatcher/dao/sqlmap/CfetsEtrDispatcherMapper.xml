@@ -1457,7 +1457,7 @@
         bo.BID_MODLE AS biddingMethod/*投标方式*/,
         bo.PAY_TYPE AS payType/*缴款方式*/,
         BRT.WIN_TYPE AS winType/*中标方式*/,
-        BRT.WIN_PRINAMT AS winPrinamt/*中标券面总额(万元)*/,
+        DECODE(brt.IS_WIN , 'Y', BRT.WIN_PRINAMT, NULL , BRT.WIN_PRINAMT) AS winPrinamt/*中标券面总额(万元)*/,
         CASE
         WHEN fpi.TENDER_TARGET = '01' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE * 100,
         'FM9999999999999990.9990') || '%'
@@ -1467,8 +1467,8 @@
         'FM9999999999999990.90') || 'BP'
         END winPrice /*中标标位*/,
         BRT.SETT_FEE_AMT settFeeAmt/*结算服务费*/,
-        BRT.PAY_DATE payDate/*缴款日*/,
-        BRT.CREDITOR_DEBT_DATE assignRegdate/*债权债务登记日*/,
+        DECODE(brt.IS_WIN , 'Y', BRT.PAY_DATE, NULL , BRT.PAY_DATE) payDate/*缴款日*/,
+        DECODE(brt.IS_WIN , 'Y', BRT.CREDITOR_DEBT_DATE, NULL , BRT.CREDITOR_DEBT_DATE) assignRegdate/*债权债务登记日*/,
         FPA.LISTING_DATE listingDate/*上市日*/,
         BRT.WIN_DATE AS bidConfirmDate/*中标日期*/,
         to_char(TFPDT.TRADE_DATE,'yyyy-MM-dd') tradeDate,
@@ -1552,7 +1552,7 @@
         bo.BID_MODLE AS biddingMethod/*投标方式*/,
         bo.PAY_TYPE AS payType/*缴款方式*/,
         BRT.WIN_TYPE AS winType/*中标方式*/,
-        BRT.WIN_PRINAMT AS winPrinamt/*中标券面总额(万元)*/,
+        DECODE(brt.IS_WIN , 'Y', BRT.WIN_PRINAMT, NULL , BRT.WIN_PRINAMT)  AS winPrinamt/*中标券面总额(万元)*/,
         CASE
         WHEN fpi.TENDER_TARGET = '01' AND BRT.WIN_PRICE IS NOT NULL THEN to_char(BRT.WIN_PRICE * 100,
         'FM9999999999999990.9990') || '%'
@@ -1562,8 +1562,8 @@
         'FM9999999999999990.90') || 'BP'
         END winPrice /*中标标位*/,
         BRT.SETT_FEE_AMT settFeeAmt/*结算服务费*/,
-        BRT.PAY_DATE payDate/*缴款日*/,
-        BRT.CREDITOR_DEBT_DATE assignRegdate/*债权债务登记日*/,
+        DECODE(brt.IS_WIN , 'Y', BRT.PAY_DATE, NULL , BRT.PAY_DATE) payDate/*缴款日*/,
+        DECODE(brt.IS_WIN , 'Y', BRT.CREDITOR_DEBT_DATE, NULL , BRT.CREDITOR_DEBT_DATE) assignRegdate/*债权债务登记日*/,
         FPA.LISTING_DATE listingDate/*上市日*/,
         BRT.WIN_DATE AS bidConfirmDate/*中标日期*/,
         to_char(TFPDT.TRADE_DATE,'yyyy-MM-dd') tradeDate,
