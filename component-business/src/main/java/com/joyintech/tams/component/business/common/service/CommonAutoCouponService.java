@@ -10,6 +10,7 @@
 
 package com.joyintech.tams.component.business.common.service;
 
+import com.google.common.base.Joiner;
 import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
@@ -437,6 +438,24 @@ public class CommonAutoCouponService extends BaseService {
                 finProductAdd.setIsNetprice(interfPayhsrcsecinfo.getIsNetprice());
                 finProductAdd.setCrossMarket(StringUtil.isNotBlank(interfPayhsrcsecinfo.getCrossMarketCode()) ? DictCodeList.是否_是.getValue() : DictCodeList.是否_否.getValue());
                 finProductAdd.setCrossMarketCode(interfPayhsrcsecinfo.getCrossMarketCode());
+                //概念板块
+                List<String> conceptType = new ArrayList<>();
+                if (DictCodeList.是否_是.getValue().equals(interfPayhsrcsecinfo.getCityInvestSecChb())) {
+                    conceptType.add("01");
+                }
+                if (DictCodeList.是否_是.getValue().equals(interfPayhsrcsecinfo.getIsGreenBond())) {
+                    conceptType.add("02");
+                }
+                if (DictCodeList.是否_是.getValue().equals(interfPayhsrcsecinfo.getIssecbond())) {
+                    conceptType.add("04");
+                }
+                if (DictCodeList.是否_是.getValue().equals(interfPayhsrcsecinfo.getIssus())) {
+                    conceptType.add("05");
+                }
+                if (DictCodeList.是否_是.getValue().equals(interfPayhsrcsecinfo.getCalloption()) || DictCodeList.是否_是.getValue().equals(interfPayhsrcsecinfo.getPutoption())) {
+                    conceptType.add("06");
+                }
+                Joiner.on(",").join(conceptType);
                 baseFinProductBaseInfoDto.setFinProductAdd(finProductAdd);
                 //new金融产品分类
                 FinProductType finProductType = new FinProductType();

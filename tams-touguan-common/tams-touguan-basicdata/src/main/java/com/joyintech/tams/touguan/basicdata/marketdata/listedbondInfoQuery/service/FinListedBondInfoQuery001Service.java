@@ -364,13 +364,15 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProductIssue.setIssueSdate(finListedBondInfoQuery001Dto.getIssueStartTime());
         finProductIssue.setIssueEdate(finListedBondInfoQuery001Dto.getIssueEndTime());
         try {
-            if (finListedBondInfoQuery001Dto.getReleaseType().equals(DictCodeListExt4.发行类型_首发.getValue())) {
-                finProductIssue.setTenderSdate(Objects.nonNull(finListedBondInfoQuery001Dto.getBidBeginDate()) ? DateUtil.parseDate(finListedBondInfoQuery001Dto.getBidBeginDate(), DateUtil.DEFAULT_DATETIME_FORMAT) : null);
-                finProductIssue.setTenderEdate(Objects.nonNull(finListedBondInfoQuery001Dto.getBidEndDate()) ? DateUtil.parseDate(finListedBondInfoQuery001Dto.getBidEndDate(), DateUtil.DEFAULT_DATETIME_FORMAT) : null);
-            } else {
-                finProductIssue.setTenderSdate(Objects.nonNull(finListedBondInfoQuery001Dto.getAdditionalTenderBeginDate()) ? DateUtil.parseDate(finListedBondInfoQuery001Dto.getAdditionalTenderBeginDate(), DateUtil.DEFAULT_DATETIME_FORMAT) : null);
-                finProductIssue.setTenderEdate(Objects.nonNull(finListedBondInfoQuery001Dto.getAdditionalTenderEndDate()) ? DateUtil.parseDate(finListedBondInfoQuery001Dto.getAdditionalTenderEndDate(), DateUtil.DEFAULT_DATETIME_FORMAT) : null);
+            if(StringUtil.isNotBlank(finListedBondInfoQuery001Dto.getReleaseType())){
+                if (DictCodeListExt4.发行类型_首发.getValue().equals(finListedBondInfoQuery001Dto.getReleaseType())) {
+                    finProductIssue.setTenderSdate(Objects.nonNull(finListedBondInfoQuery001Dto.getBidBeginDate()) ? DateUtil.parseDate(finListedBondInfoQuery001Dto.getBidBeginDate(), DateUtil.DEFAULT_DATETIME_FORMAT) : null);
+                    finProductIssue.setTenderEdate(Objects.nonNull(finListedBondInfoQuery001Dto.getBidEndDate()) ? DateUtil.parseDate(finListedBondInfoQuery001Dto.getBidEndDate(), DateUtil.DEFAULT_DATETIME_FORMAT) : null);
+                } else {
+                    finProductIssue.setTenderSdate(Objects.nonNull(finListedBondInfoQuery001Dto.getAdditionalTenderBeginDate()) ? DateUtil.parseDate(finListedBondInfoQuery001Dto.getAdditionalTenderBeginDate(), DateUtil.DEFAULT_DATETIME_FORMAT) : null);
+                    finProductIssue.setTenderEdate(Objects.nonNull(finListedBondInfoQuery001Dto.getAdditionalTenderEndDate()) ? DateUtil.parseDate(finListedBondInfoQuery001Dto.getAdditionalTenderEndDate(), DateUtil.DEFAULT_DATETIME_FORMAT) : null);
 
+                }
             }
         } catch (ParseException e) {
             logger.error("时间转换异常：", e);
