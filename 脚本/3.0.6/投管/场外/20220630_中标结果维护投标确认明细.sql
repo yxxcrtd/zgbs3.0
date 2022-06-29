@@ -15,15 +15,15 @@ VALUES('CfetsPrimaryBidManage001', 'CfetsPrimaryInfo', '999999', 'bidDate', '投
 INSERT INTO CFG_READONLY_FORM_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, EXTENDCFG, STATUS, REMARK1, REMARK2, REMARK3)
 VALUES('CfetsPrimaryBidManage001', 'CfetsPrimaryInfo', '999999', 'payDate', '缴款截止日', NULL, 7, '{"colAlign": "left"}', 1, 0, NULL, NULL);
 INSERT INTO CFG_READONLY_FORM_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, EXTENDCFG, STATUS, REMARK1, REMARK2, REMARK3)
-VALUES('CfetsPrimaryBidManage001', 'CfetsPrimaryInfo', '999999', 'winTypeStr', '投标方式', NULL, 8, '{"colAlign": "left"}', 1, 0, NULL, NULL);
+VALUES('CfetsPrimaryBidManage001', 'CfetsPrimaryInfo', '999999', 'bidModleStr', '投标方式', NULL, 8, '{"colAlign": "left"}', 1, 0, NULL, NULL);
 INSERT INTO CFG_READONLY_FORM_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, EXTENDCFG, STATUS, REMARK1, REMARK2, REMARK3)
 VALUES('CfetsPrimaryBidManage001', 'CfetsPrimaryInfo', '999999', 'payTypeStr', '缴款方式', NULL, 9, '{"colAlign": "left"}', 1, 0, NULL, NULL);
 INSERT INTO CFG_READONLY_FORM_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, EXTENDCFG, STATUS, REMARK1, REMARK2, REMARK3)
-VALUES('CfetsPrimaryBidManage001', 'CfetsPrimaryInfo', '999999', 'bidPrinAmt', '指令投标券面总额（万元）', NULL, 10, '{"colAlign": "left","dataType":"amount","precision":"2"}', 1, 0, NULL, NULL);
+VALUES('CfetsPrimaryBidManage001', 'CfetsPrimaryInfo', '999999', 'bidPrinAmt', '指令投标券面总额', NULL, 10, '{"colAlign": "left","dataType":"amount","precision":"2","unit":"wanYuan"}', 1, 0, NULL, NULL);
 INSERT INTO CFG_READONLY_FORM_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, EXTENDCFG, STATUS, REMARK1, REMARK2, REMARK3)
-VALUES('CfetsPrimaryBidManage001', 'CfetsPrimaryInfo', '999999', 'totalBiddingNum', '汇总投标券面总额（万元）', NULL, 11, '{"colAlign": "left","dataType":"amount","precision":"2"}', 1, 0, NULL, NULL);
+VALUES('CfetsPrimaryBidManage001', 'CfetsPrimaryInfo', '999999', 'totalBiddingNum', '汇总投标券面总额', NULL, 11, '{"colAlign": "left","dataType":"amount","precision":"2","unit":"wanYuan"}', 1, 0, NULL, NULL);
 INSERT INTO CFG_READONLY_FORM_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, EXTENDCFG, STATUS, REMARK1, REMARK2, REMARK3)
-VALUES('CfetsPrimaryBidManage001', 'CfetsPrimaryInfo', '999999', 'trader', '本方交易员', NULL, 13, '{"colAlign": "left"}', 1, 0, NULL, NULL);
+VALUES('CfetsPrimaryBidManage001', 'CfetsPrimaryInfo', '999999', 'traderStr', '本方交易员', NULL, 13, '{"colAlign": "left"}', 1, 0, NULL, NULL);
 INSERT INTO CFG_READONLY_FORM_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, EXTENDCFG, STATUS, REMARK1, REMARK2, REMARK3)
 VALUES('CfetsPrimaryBidManage001', 'CfetsPrimaryInfo', '999999', 'counterName', '交易对手', NULL, 14, '{"colAlign": "left"}', 1, 0, NULL, NULL);
 INSERT INTO CFG_READONLY_FORM_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, EXTENDCFG, STATUS, REMARK1, REMARK2, REMARK3)
