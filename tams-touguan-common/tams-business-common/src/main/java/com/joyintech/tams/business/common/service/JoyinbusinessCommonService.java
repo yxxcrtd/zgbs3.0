@@ -199,10 +199,10 @@ public class JoyinbusinessCommonService extends BaseService {
         dto.setSeqNo(IDGenerator.generate(32));
         dto.setOperDate(new Date());
         if (StringUtil.isEmpty(dto.getUserId())) {
-            dto.setUserId(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
-            dto.setCreateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
+            dto.setUserId(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "system");
+            dto.setCreateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "system");
             dto.setCreateDept(CommonUtil.getDeptCode());
-            dto.setUpdateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
+            dto.setUpdateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "system");
         }
         List<CfetsOprHisInfoRequest> wflDto = new ArrayList<>();
         if (StringUtil.isNotEmpty(dto.getWorkflowId())) {
