@@ -1641,7 +1641,9 @@ public class CfetsTrdQueryService extends BaseService {
             pageParam.put("TENDER_TARGET_03", DictCodeListExt4.招标标的_利差.getValue());
             //表单data
             CfetsTrdBidInfoResponse dataform = cfetsTrdQueryMapper.findFxmrManualSettleInfo(pageParam);
-            dataform.setDipType(SysDataUtil.getNameFromDataDict(DictCode.分配方式, dataform.getDipType()));
+            if (dataform != null) {
+                dataform.setDipType(SysDataUtil.getNameFromDataDict(DictCode.分配方式, dataform.getDipType()));
+            }
             //表格组合分配data
             pageParam.put("totleTradeId", settleDto.getTotleTradeId());
             List<BidPortIntFenPeiInfoDto> portIntFenPeiInfoDtoList = cfetsTrdQueryMapper.findFxmrPortIntFenPeiInfoList(pageParam);

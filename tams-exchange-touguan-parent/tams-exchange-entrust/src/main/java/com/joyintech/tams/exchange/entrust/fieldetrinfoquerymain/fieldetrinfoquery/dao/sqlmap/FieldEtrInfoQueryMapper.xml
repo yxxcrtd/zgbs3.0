@@ -1733,8 +1733,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         GROUP BY EED.ENTRUST_ID ) detail ON ee.ENTRUST_ID = detail.ENTRUST_ID
         WHERE
         ee.ENTRUST_ID = #{entrustId}
-        AND (tpd.TRADE_ID in (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID = #{entrustId})
-        OR tpd.B_TRADE_ID in (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID = #{entrustId}))
+        AND (tpd.TRADE_ID in (SELECT TRADE_ID FROM TRD_PRODUCT_TEMP_DEAL_ADD WHERE ENTRUST_ID = #{entrustId})
+        OR tpd.B_TRADE_ID in (SELECT TRADE_ID FROM TRD_PRODUCT_TEMP_DEAL_ADD WHERE ENTRUST_ID = #{entrustId}))
         union all
         SELECT
         #{TRADE_FLOW_STATUS01} effectFlag,
