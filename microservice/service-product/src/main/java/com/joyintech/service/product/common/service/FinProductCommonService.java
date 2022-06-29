@@ -1900,35 +1900,41 @@ public class FinProductCommonService extends BaseService {
             baseFinProductBaseInfoDto.setFinProduct(finProduct);
             // 一体化对应etliu start
 
-            // 自动生成第一条 期次   起息日为 产品起息日  到期日 为  单一/多固定: 产品起息日+投资周期   无固定 到期日为空
-            // 1.  生成 FinTradeProduct 表记录
-            FinTradeProduct finTradeProduct = new FinTradeProduct();
-            finTradeProduct.setFinprodId(prdLayerParam.getFinprodId());
-            finTradeProduct.setBranch(Long.valueOf(baseGetBussinessIdMapper.getNextValBySequenceName("QCGL_FZXH_SEQUENCE")));
+            //根据产品代码+期次开始日+期次结束日判断数据是否已经存在，如果不存在则新增期次信息，如果存在则不新增期次信息
+            Date mdate = DateUtil.addDay(entity.getVdate(), Integer.parseInt(entity.getInvestmentCycle()));
+            FinTradeProduct finTradeProduct = getFinTradeProduct(prdLayerParam.getFinprodId(), entity.getVdate(), mdate);
+            if (Objects.isNull(finTradeProduct)) {
+                // 自动生成第一条 期次   起息日为 产品起息日  到期日 为  单一/多固定: 产品起息日+投资周期   无固定 到期日为空
+                // 1.  生成 FinTradeProduct 表记录
+                finTradeProduct = new FinTradeProduct();
+                finTradeProduct.setFinprodId(prdLayerParam.getFinprodId());
+                finTradeProduct.setBranch(Long.valueOf(baseGetBussinessIdMapper.getNextValBySequenceName("QCGL_FZXH_SEQUENCE")));
 
-            String sequence_6 = com.joyintech.tams.systemtools.util.CommonUtil.getSequenceIndexData(DataIndexSequenceType.期次管理, "%06d");
-            String periodId = DateUtil.format(entity.getVdate(), "yyyyMMdd") + entity.getTermDays() + sequence_6;
-            finTradeProduct.setPeriodId(periodId);
+                String sequence_6 = com.joyintech.tams.systemtools.util.CommonUtil.getSequenceIndexData(DataIndexSequenceType.期次管理, "%06d");
+                String periodId = DateUtil.format(entity.getVdate(), "yyyyMMdd") + entity.getTermDays() + sequence_6;
+                finTradeProduct.setPeriodId(periodId);
 
-            finTradeProduct.setVdate(entity.getVdate());
-            if (StringUtil.equals(entity.getTermType(), DictCodeListExt2.期限类型_单一固定期限.getValue())) {
-                finTradeProduct.setMdate(DateUtil.addDay(entity.getVdate(), Integer.parseInt(entity.getInvestmentCycle())));
+                finTradeProduct.setVdate(entity.getVdate());
+                if (StringUtil.equals(entity.getTermType(), DictCodeListExt2.期限类型_单一固定期限.getValue())) {
+                    finTradeProduct.setMdate(mdate);
+                }
+                finTradeProduct.setFinprodType(BussinessDictCodeList.金融产品类型_理财子产品.getValue());
+                finTradeProduct.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_理财子产品.getValue());
+                finTradeProduct.setProfitType(entity.getProfitType());
+                finTradeProduct.setCcy(entity.getCcy());
+
+                if (StringUtil.isEmpty(entity.getInvestmentCycle())) {
+                    finTradeProduct.setTerm(entity.getTermDays());
+                } else {
+                    finTradeProduct.setTerm(Long.valueOf(entity.getInvestmentCycle()));
+                }
+                finTradeProductMapper.insertSelective(finTradeProduct);
+
+                //2.  生成 finTradeProductAdd
+                FinTradeProductAdd finTradeProductAdd = new FinTradeProductAdd();
+                BeanUtil.copyProperties(finTradeProductAdd, finTradeProduct);
+                finTradeProductAddMapper.insertSelective(finTradeProductAdd);
             }
-            finTradeProduct.setFinprodType(BussinessDictCodeList.金融产品类型_理财子产品.getValue());
-            finTradeProduct.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_理财子产品.getValue());
-            finTradeProduct.setProfitType(entity.getProfitType());
-            finTradeProduct.setCcy(entity.getCcy());
-
-            if (StringUtil.isEmpty(entity.getInvestmentCycle())) {
-                finTradeProduct.setTerm(entity.getTermDays());
-            } else {
-                finTradeProduct.setTerm(Long.valueOf(entity.getInvestmentCycle()));
-            }
-            finTradeProductMapper.insertSelective(finTradeProduct);
-            //2.  生成 finTradeProductAdd
-            FinTradeProductAdd finTradeProductAdd = new FinTradeProductAdd();
-            BeanUtil.copyProperties(finTradeProductAdd, finTradeProduct);
-            finTradeProductAddMapper.insertSelective(finTradeProductAdd);
 
             // 二级法人权限处理
             if (MultilevelDataAuthorityUtil.isEnabled()) {
@@ -2146,6 +2152,10 @@ public class FinProductCommonService extends BaseService {
             //  则不生成  finBaseRuleInfo 则 第一个有效期次无法展示在期次管理页面
             if (StringUtil.equals(DictCodeList.处理模式_周期型.getValue(), entity.getDealMode()) &&
                     StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), entity.getProfitType()) && entity.getBussBenchMarkInfoDto() != null) {
+                // 刪除已存在数据
+                logger.info("刪除【BussBenchMarkInfoDto】已存在数据：finprodId={},branch={}", finTradeProduct.getFinprodId(), finTradeProduct.getBranch());
+                benchMarketInfoMapper.deleteBaseRuleInfoByFinprodIdAndBranch(finTradeProduct.getFinprodId(), finTradeProduct.getBranch());
+
                 // 重新生成 第一个期次的数据 branch 为 fintradeProduct的branch
                 BussBenchMarkInfoDto bussBenchMarkInfoDto = new BussBenchMarkInfoDto();
                 bussBenchMarkInfoDto.setBranch(finTradeProduct.getBranch());
@@ -2300,28 +2310,35 @@ public class FinProductCommonService extends BaseService {
                 finProduct.setRemark(entity.getRemark());
                 baseFinProductBaseInfoDto.setFinProduct(finProduct);
                 // 一体化对应etliu start
+                Date mdate = DateUtil.addDay(entity.getVdate(), bussFinProductInvestPeriodDto.getInvestDays());
+                FinTradeProduct finTradeProduct = getFinTradeProduct(prdLayerParam.getFinprodId(), entity.getVdate(), mdate);
+                if (Objects.isNull(finTradeProduct)) {
+                    // 自动生成第一条 期次   起息日为 产品起息日  到期日 为  单一/多固定: 产品起息日+投资周期   无固定 到期日为空
+                    // 1.  生成 FinTradeProduct 表记录
+                    finTradeProduct = new FinTradeProduct();
+                    finTradeProduct.setFinprodId(prdLayerParam.getFinprodId());
+                    finTradeProduct.setBranch(Long.valueOf(baseGetBussinessIdMapper.getNextValBySequenceName("QCGL_FZXH_SEQUENCE")));
 
-                // 自动生成第一条 期次   起息日为 产品起息日  到期日 为  单一/多固定: 产品起息日+投资周期   无固定 到期日为空
-                // 1.  生成 FinTradeProduct 表记录
-                FinTradeProduct finTradeProduct = new FinTradeProduct();
-                finTradeProduct.setFinprodId(prdLayerParam.getFinprodId());
-                finTradeProduct.setBranch(Long.valueOf(baseGetBussinessIdMapper.getNextValBySequenceName("QCGL_FZXH_SEQUENCE")));
+                    String sequence_6 = com.joyintech.tams.systemtools.util.CommonUtil.getSequenceIndexData(DataIndexSequenceType.期次管理, "%06d");
+                    String periodId = DateUtil.format(entity.getVdate(), "yyyyMMdd") + bussFinProductInvestPeriodDto.getInvestDays() + sequence_6;
+                    finTradeProduct.setPeriodId(periodId);
 
-                String sequence_6 = com.joyintech.tams.systemtools.util.CommonUtil.getSequenceIndexData(DataIndexSequenceType.期次管理, "%06d");
-                String periodId = DateUtil.format(entity.getVdate(), "yyyyMMdd") + bussFinProductInvestPeriodDto.getInvestDays() + sequence_6;
-                finTradeProduct.setPeriodId(periodId);
+                    finTradeProduct.setVdate(entity.getVdate());
+                    finTradeProduct.setMdate(mdate);
 
-                finTradeProduct.setVdate(entity.getVdate());
+                    finTradeProduct.setFinprodType(BussinessDictCodeList.金融产品类型_理财子产品.getValue());
+                    finTradeProduct.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_理财子产品.getValue());
+                    finTradeProduct.setProfitType(entity.getProfitType());
+                    finTradeProduct.setCcy(entity.getCcy());
+                    finTradeProduct.setTerm(bussFinProductInvestPeriodDto.getInvestDays().longValue());
 
-                finTradeProduct.setMdate(DateUtil.addDay(entity.getVdate(), bussFinProductInvestPeriodDto.getInvestDays()));
+                    finTradeProductMapper.insertSelective(finTradeProduct);
 
-                finTradeProduct.setFinprodType(BussinessDictCodeList.金融产品类型_理财子产品.getValue());
-                finTradeProduct.setFinprodType2(BussinessDictCodeList.金融产品类型_投管用_理财子产品.getValue());
-                finTradeProduct.setProfitType(entity.getProfitType());
-                finTradeProduct.setCcy(entity.getCcy());
-                finTradeProduct.setTerm(bussFinProductInvestPeriodDto.getInvestDays().longValue());
-
-                finTradeProductMapper.insertSelective(finTradeProduct);
+                    //2.  生成 finTradeProductAdd
+                    FinTradeProductAdd finTradeProductAdd = new FinTradeProductAdd();
+                    BeanUtil.copyProperties(finTradeProductAdd, finTradeProduct);
+                    finTradeProductAddMapper.insertSelective(finTradeProductAdd);
+                }
 
                 // 二级法人权限处理
                 if (MultilevelDataAuthorityUtil.isEnabled()) {
@@ -2341,11 +2358,6 @@ public class FinProductCommonService extends BaseService {
                     // 记录二级法人权限
                     insertDataAuthTypeInst(finTradeProduct.getFinprodId(), searchOrgCodeList, editOrgCodeList, DictCodeList.共通业务类型_期次管理.getValue());
                 }
-
-                //2.  生成 finTradeProductAdd
-                FinTradeProductAdd finTradeProductAdd = new FinTradeProductAdd();
-                BeanUtil.copyProperties(finTradeProductAdd, finTradeProduct);
-                finTradeProductAddMapper.insertSelective(finTradeProductAdd);
 
                 //3.FinBaseRuleInfo  通过业绩基准和 浮动管理费 生成的 下面都已经生成
                 //inBaseRuleInfoMapper.insertSelective(finBaseRuleInfo业绩基准);
@@ -2603,6 +2615,18 @@ public class FinProductCommonService extends BaseService {
         }
     }
 
+    private FinTradeProduct getFinTradeProduct(String finprodId, Date vdate, Date mdate) {
+        final String startDate = DateUtil.format(vdate);
+        final String endDate = DateUtil.format(mdate);
+        logger.info("查询自动生产的期次信息：FinprodId={},startDate={},endDate={}", finprodId, startDate, endDate);
+        List<FinTradeProduct> list = finTradeProductMapper.selectByFinprodId(finprodId);
+        Optional<FinTradeProduct> optional = list.stream()
+                .filter(o -> StringUtil.equals(startDate, DateUtil.format(o.getVdate()))
+                        && StringUtil.equals(endDate, DateUtil.format(o.getMdate())))
+                .findFirst();
+        return optional.orElse(null);
+    }
+
     private void cycleProdInfo(FinProduct parentFinProduct, FinProductCommonInfoDto entity, HashMap<String, String> cashMap) throws InvocationTargetException, IllegalAccessException {
         PrdLayerParam prdLayerParam = new PrdLayerParam();
         // 生成金融产品代码
@@ -2815,6 +2839,9 @@ public class FinProductCommonService extends BaseService {
 //            if(termType!=)
 //            FinProductFloatFeeDto bussFinProductFloatFeeDto = finProductCommonInfoDto.getBussFinProductFloatFeeDto();
         if (finProductFloatFeeDto != null && StringUtil.isNotEmpty(finProductFloatFeeDto.getFeeId())) {
+            // 刪除已存在数据
+            logger.info("刪除【FinCashInfo】已存在数据：finprodId={},branch={}", finTradeProduct.getFinprodId(), finTradeProduct.getBranch());
+            finCashInfoMapper.deleteByFinprodIdAndBranch(finTradeProduct.getFinprodId(), finTradeProduct.getBranch());
 
             FinCashInfo finCashInfo = new FinCashInfo();
             BeanUtil.copyProperties(finCashInfo, finProductCommonInfoDto);
@@ -2839,14 +2866,24 @@ public class FinProductCommonService extends BaseService {
 
             // FinFloatCalcRule
             // 业绩报酬计算规则
+            Date effDate = StringUtil.isNotEmpty(finProductCommonInfoDto.getVdate()) ? finProductCommonInfoDto.getVdate() : DateUtil.platDateFromCache();
+            String cashId = finCashInfo.getCashId();
+
+            logger.info("刪除【FinFloatCalcRule】已存在数据：cashId={},effDate={}", cashId, effDate);
+            FinFloatCalcRuleKey calcRuleKey = new FinFloatCalcRuleKey();
+            calcRuleKey.setCashId(cashId);
+            calcRuleKey.setEffDate(effDate);
+            finFloatCalcRuleMapper.deleteByPrimaryKey(calcRuleKey);
+
             FinFloatCalcRule finFloatCalcRule = new FinFloatCalcRule();
             BeanUtil.copyProperties(finFloatCalcRule, finProductCommonInfoDto);
-            finFloatCalcRule.setCashId(finCashInfo.getCashId());
-            if (StringUtil.isNotEmpty(finProductCommonInfoDto.getVdate())) {
-                finFloatCalcRule.setEffDate(finProductCommonInfoDto.getVdate());
-            } else {
-                finFloatCalcRule.setEffDate(DateUtil.platDateFromCache());
-            }
+            finFloatCalcRule.setCashId(cashId);
+            finFloatCalcRule.setEffDate(effDate);
+//            if (StringUtil.isNotEmpty(finProductCommonInfoDto.getVdate())) {
+//                finFloatCalcRule.setEffDate(finProductCommonInfoDto.getVdate());
+//            } else {
+//                finFloatCalcRule.setEffDate(DateUtil.platDateFromCache());
+//            }
             finFloatCalcRule.setBaseRule(DictCodeListExt1.业绩报酬计算规则_业绩基准.getValue());
             if (StringUtil.isNotEmpty(finProductFloatFeeDto.getFloatBaseRule())) {
                 finFloatCalcRule.setBaseRule(finProductFloatFeeDto.getFloatBaseRule());
@@ -2869,7 +2906,12 @@ public class FinProductCommonService extends BaseService {
             // FinBaseRuleInfo
             FinBaseRuleInfo finBaseRuleInfo = new FinBaseRuleInfo();
             String baseRuleId = CommonUtil.generateCashFlowCode(finTradeProduct.getFinprodId(), null, finTradeProduct.getBranch(), DictCodeListExt1.业绩基准类型_浮动管理费.getValue());
-            if (StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), finProductCommonInfoDto.getProfitType()) && StringUtil.isNotEmpty(finProductFloatFeeDto.getRateType())) {
+            if (StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), finProductCommonInfoDto.getProfitType())
+                    && StringUtil.isNotEmpty(finProductFloatFeeDto.getRateType())) {
+                // 刪除已存在数据
+                logger.info("刪除【finBaseRuleInfo】已存在数据：finprodId={},branch={}", finTradeProduct.getFinprodId(), finTradeProduct.getBranch());
+                benchMarketInfoMapper.deleteBaseRuleInfoByFinprodIdAndBranch(finTradeProduct.getFinprodId(), finTradeProduct.getBranch());
+
                 finBaseRuleInfo.setBaseRuleId(baseRuleId);
                 finBaseRuleInfo.setBaseRuleType(DictCodeListExt1.披露类型_单值披露.getValue());
                 finBaseRuleInfo.setBranch(finTradeProduct.getBranch());
@@ -2903,12 +2945,15 @@ public class FinProductCommonService extends BaseService {
 
             // FinFloatCalcRuledetail
             List<FinFloatCalcRuleDetail> finFloatCalcRuleDetailList = finProductFloatFeeDto.getFinFloatCalcRuleDetailDtoList();
-            Date effDate = StringUtil.isNotEmpty(
-                    finProductCommonInfoDto.getVdate()) ? finProductCommonInfoDto.getVdate() : DateUtil.platDateFromCache();
             if (!StringUtil.isEmptyList(finFloatCalcRuleDetailList)) {
+                logger.info("刪除【FinFloatCalcRuleDetail】已存在数据：cashId={},effDate={}", cashId, effDate);
+                FinFloatCalcRuleDetailKey key = new FinFloatCalcRuleDetailKey();
+                key.setCashId(cashId);
+                key.setEffDate(effDate);
+                finFloatCalcRuleDetailMapper.deleteByCashIdAndEffDate(key);
                 for (FinFloatCalcRuleDetail finFloatCalcRuleDetail : finFloatCalcRuleDetailList) {
                     BeanUtil.copyProperties(finFloatCalcRuleDetail, finProductCommonInfoDto);
-                    finFloatCalcRuleDetail.setCashId(finCashInfo.getCashId());
+                    finFloatCalcRuleDetail.setCashId(cashId);
                     finFloatCalcRuleDetail.setEffDate(effDate);
                     finFloatCalcRuleDetail.setLev(finFloatCalcRuleDetail.getLev());
                     finFloatCalcRuleDetail.setBaseRuleId(baseRuleId);// 业绩基准代码
