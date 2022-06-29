@@ -504,7 +504,7 @@ public class PositionRequestManualSettleService {
         //信用事件结算方式
         resultMap.put("ceSettleType", null);
         //日期
-        resultMap.put("cdate", entity.getTradeDate());
+        resultMap.put("cdate", entity.getSettleDate());
         //币种
         resultMap.put("ccy", infContractDetailfile.getCcy());
 
