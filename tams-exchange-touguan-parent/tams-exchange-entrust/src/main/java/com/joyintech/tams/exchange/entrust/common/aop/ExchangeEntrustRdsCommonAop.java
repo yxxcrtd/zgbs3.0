@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.thymeleaf.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -392,6 +393,9 @@ public class ExchangeEntrustRdsCommonAop {
         Object finprodId = mapTrd.get(InterfUtil.finprodId);
         Object finprodType2 = mapTrd.get(InterfUtil.finprodType2);
         // 取得资产类型
+        if(StringUtils.equals(finprodType2, "F37")){
+            return ;
+        }
         if (StringUtil.isNotEmpty(finprodId)) {
             IAssetInfo assetInfo = assetInfoSrc.getInfoFromRedis(RedisKeyEnum.资产基本信息.key(),
                 finprodId.toString());
