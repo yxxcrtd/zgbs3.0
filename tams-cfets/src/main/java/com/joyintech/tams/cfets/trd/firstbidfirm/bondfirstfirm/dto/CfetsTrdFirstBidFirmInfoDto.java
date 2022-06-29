@@ -207,6 +207,9 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
     @ApiModelProperty(name = "productBackDtos", value = "投标产品备份列表")
     private List<CfetsTrdFirstBidFirmProductDto> productBackDtos;
 
+    @ApiModelProperty(name = "isFx", value = "是否分销买入", example = "Y")
+    private String isFx;
+
     private String rskApproval;
 
     public String getValidStatus() {
@@ -756,6 +759,14 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
 
     public void setProductBackDtos(List<CfetsTrdFirstBidFirmProductDto> productBackDtos) {
         this.productBackDtos = productBackDtos;
+    }
+
+    public String getIsFx() {
+        return isFx;
+    }
+
+    public void setIsFx(String isFx) {
+        this.isFx = isFx;
     }
 }
 

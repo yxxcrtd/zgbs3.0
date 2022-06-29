@@ -32,18 +32,20 @@
         FP.TRADE_MARKET tradeMarket,
         BO.COUNTER_ID counterId,
         MCP.COUNTER_NAME counterName,
+        BOBP.ACCT_NAME acctName,
         BOBP.REMARK remark
         FROM BID_ORDER BO
         LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
         SELECT BOBP.BID_ID,wm_concat(decode(FPI.TENDER_TARGET,'01',to_char(BOBP.BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BOBP.BID_PRICE,'fm999999990.9990')||'元','03',to_char(BOBP.BID_PRICE*10000,'fm999999990.90')||'BP')) BID_PRICE,
-               SUM(EEBP.BID_PRIN_AMT) ENTRUST_NUM,wm_concat(hisInfo.remark) REMARK
+               SUM(EEBP.BID_PRIN_AMT) ENTRUST_NUM,wm_concat(hisInfo.remark) REMARK,wm_concat(SCI.ACCT_NAME) ACCT_NAME
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
         LEFT JOIN BID_ORDER BO ON BOBP.BID_ID = BO.BID_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = BO.FINPROD_ID
         LEFT JOIN ETR_ENTRUST_BID_PRICE EEBP ON EEBP.ENTRUST_ID = BOBP.ENTRUST_ID AND BOBP.BID_PRICE = EEBP.BID_PRICE AND BOBP.PORTFOLIO_ID = EEBP.PORTFOLIO_ID
+        LEFT JOIN STL_CAPACCT_INFO SCI ON SCI.ACCT_NO = BOBP.ACCT_NO
         LEFT JOIN ( <include refid="com.joyintech.tams.common.base.dao.EtrEntrustOperHisMapper.selectHisInfo" />) hisInfo
         ON ee.ENTRUST_ID = hisInfo.ENTRUST_ID
         group by BOBP.BID_ID
@@ -141,7 +143,7 @@
         <if test="search != null and search != ''">
             <where>( sdl_otherEffectFlag.ITEM_VALUE || '|' || sdl_isWin.ITEM_VALUE || '|' || ss.finprodAbbr || '|' || ss.finprodMarketId || '|'
                 || '|' || ss.bidId || '|' || sdl_tp.ITEM_VALUE || '|' || sdl_tt.ITEM_VALUE || '|' || sdl_wt.ITEM_VALUE
-                || '|' || sdl_ept.ITEM_VALUE || '|' || ss.bidPrice || '|' || ss.counterName
+                || '|' || sdl_ept.ITEM_VALUE || '|' || ss.bidPrice || '|' || ss.counterName || '|' || ss.acctName
                 || '|' || ss.remark
                 like '%' || #{search} || '%'
                 or to_char(ss.bidPrinAmt)=#{search}
@@ -205,10 +207,12 @@
             BOBP.PORTFOLIO_ID   portfolioId,
             BOBP.ACCT_NO        acctNo,
             SCI.ACCT_NAME       acctName,
+            FPI.TENDER_TARGET   tenderTarget,
             pp.PORTFOLIO_NAME portfolioName,
             NVL(NVL(BOBP.THE_WIN_PRIN_AMT,0)/10000,TPD.SHARE_AMT) totalBidPrinamt,
             NVL(EEBP.BID_PRIN_AMT,0)/100 winPrinAmt,
             decode(FPI.TENDER_TARGET,'01',to_char(BOBP.BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BOBP.BID_PRICE,'fm999999990.9990')||'元','03',to_char(BOBP.BID_PRICE*10000,'fm999999990.90')||'BP')   winPrice,
+            BOBP.BID_PRICE bidPrice,
             BOBP.INV_AIM   invAim,
             BO.DIP_TYPE  dipType
         from BID_ORDER_BID_PRICE BOBP
@@ -356,9 +360,9 @@
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = BO.FINPROD_ID
         group by BOBP.BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
-        LEFT JOIN (SELECT TFPDT.B_TRADE_ID, SUM(TFPDT.SHARE_AMT) SHARE_AMT,MAX(TFPDT.TRADE_DATE) TRADE_DATE
+        LEFT JOIN (SELECT TFPDT.B_TRADE_ID, SUM(TFPDT.SHARE_AMT)*100 SHARE_AMT,MAX(TFPDT.TRADE_DATE) TRADE_DATE
           FROM TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT GROUP BY B_TRADE_ID
-        )TFPDT ON BO.BID_ID = TFPDT.B_TRADE_ID
+        )TFPDT ON  BRT.TOTAL_WIN_ID = TFPDT.B_TRADE_ID
         AND TFPDT.SHARE_AMT = BRT.WIN_PRINAMT
         LEFT JOIN (
         SELECT TOTAL_WIN_ID,SUM(BRD.PAY_AMT) PAY_AMT

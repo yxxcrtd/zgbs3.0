@@ -57,6 +57,10 @@ public class BidProductDto {
     @ApiModelProperty(name="acctName",value="账户名称")
     private String acctName;
 
+    private String tenderTarget;
+
+    private BigDecimal bidPrice;
+
 
     public String getBidId() {
         return bidId;
@@ -160,5 +164,21 @@ public class BidProductDto {
 
     public void setAcctName(String acctName) {
         this.acctName = acctName;
+    }
+
+    public String getTenderTarget() {
+        return tenderTarget;
+    }
+
+    public void setTenderTarget(String tenderTarget) {
+        this.tenderTarget = tenderTarget;
+    }
+
+    public BigDecimal getBidPrice() {
+        return bidPrice;
+    }
+
+    public void setBidPrice(BigDecimal bidPrice) {
+        this.bidPrice = bidPrice;
     }
 }

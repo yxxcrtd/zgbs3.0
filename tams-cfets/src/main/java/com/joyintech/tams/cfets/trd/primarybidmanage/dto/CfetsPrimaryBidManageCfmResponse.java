@@ -136,6 +136,9 @@ public class CfetsPrimaryBidManageCfmResponse {
     @ApiModelProperty(name="tradeMarket",value="交易场所")
     private String tradeMarketStr;
 
+    @ApiModelProperty(name="acctName",value="资金账户")
+    private String acctName;
+
     private String issueClass;
 
     @ApiModelProperty(name="bidProductList",value="投标产品列表")
@@ -454,6 +457,14 @@ public class CfetsPrimaryBidManageCfmResponse {
 
     public String getTotalBiddingNumStr() {
         return totalBiddingNumStr;
+    }
+
+    public String getAcctName() {
+        return acctName;
+    }
+
+    public void setAcctName(String acctName) {
+        this.acctName = acctName;
     }
 
     public void setTotalBiddingNumStr(String totalBiddingNumStr) {

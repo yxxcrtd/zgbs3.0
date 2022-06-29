@@ -937,8 +937,8 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile> 
         baseTradeProductDealDto.setTrdProductDeal(trdProductDeal);
         // 金融产品附属
         baseTradeProductDealDto.setTrdProductDealAdd(trdProductDealAdd);
-        // 是否来自场内交易下单成交标识
-        baseTradeProductDealDto.setIsFromExchange(DictCodeList.是否_是.getValue());
+        // 是否来自场内交易下单成交标识 申购需要回冲流水
+        baseTradeProductDealDto.setIsFromExchange(DictCodeList.是否_否.getValue());
         // 划款指令
         if (stlPayOrdersDto != null) {
             baseTradeProductDealDto.setStlPayOrdersList(Arrays.asList(stlPayOrdersDto));

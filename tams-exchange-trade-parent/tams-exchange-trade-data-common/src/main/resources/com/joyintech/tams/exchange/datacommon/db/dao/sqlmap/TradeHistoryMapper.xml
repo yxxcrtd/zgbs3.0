@@ -295,7 +295,7 @@
                CASE
                  WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
                  WHEN STD.DELIVERY_RESULT = '04' THEN '0'
-                 ELSE STD.SHARE_AMT / TT.TRADED_VOLUME || '%'
+                 ELSE STD.SHARE_AMT / TT.TRADED_VOLUME * 100 || ''
                END                                                       DELIVERY_SCHEDULE,
                STD.CREATE_TIME
           FROM SETTLE_TRANS_DATA STD

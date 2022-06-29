@@ -200,6 +200,7 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
                 else{
                     String busiKey = getSettleTransDataBusiKey(settleTransDataDto);
                     if(!etrEntrustMap.containsKey(busiKey)){
+                        logger.debug("[normalTrade指令未匹配成功], busiKey={}", busiKey);
                         continue;
                     }
                     List<EtrEntrustDto> currEtrEntrustList = etrEntrustMap.get(busiKey);

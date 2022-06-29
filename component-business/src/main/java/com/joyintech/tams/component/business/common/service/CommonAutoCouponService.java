@@ -334,7 +334,7 @@ public class CommonAutoCouponService extends BaseService {
 //              finProduct.setTradeMarket(windCovCom(inputParaDto));
                 finProduct.setTradeMarket(interfPayhsrcsecinfo.getMarket());
                 /**--交易场所modify 2019-04-15 end--**/
-                finProduct.setIssuer(getIssuer(interfPayhsrcsecinfo));
+                finProduct.setIssuer(interfPayhsrcsecinfo.getIssuershort());
                 //2019年5月27日  交易日历
                 if (StringUtil.equals(DictCodeListExt1.交易场所_银行间.getValue(), interfPayhsrcsecinfo.getMarket())) {
                     finProduct.setCalendarId("03");//银行间
@@ -799,11 +799,15 @@ public class CommonAutoCouponService extends BaseService {
                 //查询资讯_债券信息评级list
                 List<InterfPayhsrcsecrating> interfPayhsrcsecratingList = selectInterfPayhsrcsecrating(secid);
                 //new债券信用评级
-                List<MstBondCreditRating> mstBondCreditRatingList = new ArrayList<MstBondCreditRating>();
+                List<MstBondCreditRating> mstBondCreditRatingList = new ArrayList<>();
                 if (null != interfPayhsrcsecratingList && interfPayhsrcsecratingList.size() != 0) {
                     for (InterfPayhsrcsecrating interfPayhsrcsecrating : interfPayhsrcsecratingList) {
                         MstBondCreditRating mstBondCreditRating = new MstBondCreditRating();
-                        mstBondCreditRating.setoCode(interfPayhsrcsecrating.getSecid());//债券ID
+                        if (DictCodeList.评级类型_主体评级.getValue().equals(interfPayhsrcsecrating.getRatingtype())) {
+                            mstBondCreditRating.setoCode(interfPayhsrcsecinfo.getIssuershort());
+                        } else {
+                            mstBondCreditRating.setoCode(interfPayhsrcsecrating.getSecid());//债券ID
+                        }
                         mstBondCreditRating.setGradeOrgId(interfPayhsrcsecrating.getRatingorg());//评级机构
                         mstBondCreditRating.setGradeDate(interfPayhsrcsecrating.getPubdate());//评级日期取发布日期
                         //mstBondCreditRating.setIsrecommand(interfPayhsrcsecrating.getIsrecommand());//是否推荐
