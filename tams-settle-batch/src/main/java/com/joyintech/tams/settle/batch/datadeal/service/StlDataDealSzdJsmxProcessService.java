@@ -227,6 +227,7 @@ public class StlDataDealSzdJsmxProcessService {
 				settleTransData.setCcy(stlDataDealProcessCommonService.getCcy(szdJsmx.getBz()));
 				// 交收方式
 				settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdJsmx.getJsfs()));
+				// 交收结果
 				settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdJsmx.getJgdm()));
 				// 交易方向
 				settleTransData.setPs(getSzdJsmxBondPs(stlDownDataDealOperatorDto.getDataFile(), szdJsmx.getMmbz(), szdJsmx.getYwlx(),
@@ -453,6 +454,7 @@ public class StlDataDealSzdJsmxProcessService {
 				// 清算速度:申购是T+2
 				if(DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())){
 					settleTransData.setSettleSpeed(2L);
+					settleTransData.setDeliveryResult(DictCodeListExt4.交收结果_交收通知.getValue());
 				}
 				if(DictCodeList.交易方向_申购确认.getValue().equals(settleTransData.getPs())){
 					// 交割日期
@@ -1728,6 +1730,7 @@ public class StlDataDealSzdJsmxProcessService {
 			settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdJsmx.getJyfs()));
 			// 交收方式
 			settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdJsmx.getJsfs()));
+			// 交收结果
 			settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdJsmx.getJgdm()));
 			// 单位净价
 			settleTransData.setUnitCprice(new BigDecimal(szdJsmx.getJg1()));
@@ -1989,6 +1992,9 @@ public class StlDataDealSzdJsmxProcessService {
 			settleTransData.setAcctNo(accountInfoDtolist.get(0).getAcctNo());
 			// 临时表流水号
 			settleTransData.setSeqNo(szdJsmx.getSeqno());
+			if(DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())){
+				settleTransData.setDeliveryResult(DictCodeListExt4.交收结果_交收通知.getValue());
+			}
 			// 交易方向是配股的时候，需要重新设置资产代码
 			if (StringUtils.equals(settleTransData.getPs(), DictCodeListExt2.交易方向_配股.getValue())) {
 				String approvalNo = StringUtils.isNotEmpty(szdJsmx.getZqdm1()) ? szdJsmx.getZqdm1() : szdJsmx.getZqdm2();
