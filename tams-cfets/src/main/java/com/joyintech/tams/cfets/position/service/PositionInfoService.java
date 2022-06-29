@@ -360,6 +360,7 @@ public class PositionInfoService {
         BaseMap rs = new BaseMap();
         BigDecimal cashT = BigDecimal.ZERO; // 指令t日可用
         BigDecimal cashT1 = BigDecimal.ZERO; // 指令t1日可用
+        BigDecimal realCash = BigDecimal.ZERO; // 指令t1日可用
         BigDecimal secDesirableCash = BigDecimal.ZERO; // 证券户可取现金
         if (CollectionUtils.isEmpty(acctTypes)) {
             acctTypes = new ArrayList<>();
@@ -410,6 +411,14 @@ public class PositionInfoService {
                 positionQueryDto1.setCdate(t1Day);
                 positionQueryDto1.setAcctType(acctTypeList);
                 cashT1 = ArithmeticUtil.doAdd(cashT1, basePtlCashPositionInfoService.queryUsableCashPosition(positionQueryDto1));
+
+                PtlCashPositionFlowDto positionQueryDto2 = new PtlCashPositionFlowDto();
+                positionQueryDto2.setPortfolioId(portfolioId);
+                positionQueryDto2.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+                positionQueryDto2.setCdate(iPlatformDate.getSysDate());
+                // 实际现金（账户现金）
+                realCash = ArithmeticUtil.doAdd(realCash, basePtlCashPositionInfoService.queryUsableCashPosition(positionQueryDto2));
+
                 Map<String, String> secIdMap = new HashMap<>();
                 Map<String, String> map = new HashMap<>();
                 map.put("portfolioId", portfolioId);
@@ -444,7 +453,7 @@ public class PositionInfoService {
 
         rs.put("cashT", ArithmeticUtil.doAdd(cashT, outMap.getBigDecimal("T0KYXJ")));
         rs.put("cashT1", ArithmeticUtil.doAdd(cashT1, outMap.getBigDecimal("T1KYXJ")));
-        rs.put("realCash", ArithmeticUtil.doAdd(cashT, outMap.getBigDecimal("ZHXJ")));
+        rs.put("realCash", ArithmeticUtil.doAdd(realCash));
         rs.put("secDesirableCash", secDesirableCash);
         return rs;
     }
