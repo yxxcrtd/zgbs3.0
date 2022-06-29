@@ -180,7 +180,7 @@ application:
       assetService: http://127.0.0.1:8080/tams
       portfolioService: http://127.0.0.1:8080/tams
       productService: http://127.0.0.1:8080/tams
-      quotaService: http://127.0.0.1:8080/tams
+      quotaService: http://127.0.0.1:8080/tams/service
       reportService: http://127.0.0.1:8080/tams
       riskService: http://127.0.0.1:8080/tams
       riskRdsService: http://127.0.0.1:8080/tams
@@ -195,7 +195,7 @@ application:
       pbcService: http://127.0.0.1:8080/tams
       investInterfService: http://127.0.0.1:8080/tams
       tamsServer: http://127.0.0.1:8080/tams
-      exchangeService: http://127.0.0.1:8080/tams
+      exchangeService: http://127.0.0.1:8080/tams/service
 #base数据库配置
 base:
   datasource:
