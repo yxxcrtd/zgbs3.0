@@ -809,6 +809,9 @@ public class CfetsEtrDispatcherService extends BaseService {
                     response.setTradedVolume(ArithmeticUtil.divide(response.getTradedVolume(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                     response.setEntrustVolume(ArithmeticUtil.divide(response.getEntrustVolume(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                 }
+                if (StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_信用保护凭证.getValue()) ) {
+                    response.setTradedVolume(ArithmeticUtil.divide(response.getTradedVolume(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
+                }
                 if (response.getEntrustBs().equals(DictCodeListExt3.交易方向_质押券出库.getValue())
                 || response.getEntrustBs().equals(DictCodeListExt3.交易方向_质押券入库.getValue())) {
                     response.setEntrustPrice(StringUtil.isNotEmpty(response.getEntrustPrice())?ArithmeticUtil.multiply(response.getEntrustPrice(),BigDecimal.valueOf(100)):null);
@@ -1270,8 +1273,10 @@ public class CfetsEtrDispatcherService extends BaseService {
     @Transactional(rollbackFor = Exception.class)
     public void doDispatcherDeal(Map<String, Object> pageParam) {
         // 删除原先分发过的所有交易员记录
-        List<String> entrustIds = StringUtil.splitToList(",", (String) pageParam.get("entrustId"));
-        List<String> tradersList = StringUtil.splitToList(",", (String) pageParam.get("traders"));
+        //add wsz 添加去重 修复主键冲突  20220628	ZGCPCN-1767	指令分发 【集成环境-指令分发】一个待分发指令无法同时分发给多个交易员
+        List<String> entrustIds = StringUtil.splitToList(",", (String) pageParam.get("entrustId")).stream().distinct().collect(Collectors.toList());;
+        List<String> tradersList = StringUtil.splitToList(",", (String) pageParam.get("traders")).stream().distinct().collect(Collectors.toList());
+        //add wsz 添加去重 修复主键冲突  20220628	ZGCPCN-1767	指令分发 【集成环境-指令分发】一个待分发指令无法同时分发给多个交易员
         EtrDistributeKey key = new EtrDistributeKey();
         EtrDistribute record = new EtrDistribute();
         for (int j = 0; j < entrustIds.size(); j++) {

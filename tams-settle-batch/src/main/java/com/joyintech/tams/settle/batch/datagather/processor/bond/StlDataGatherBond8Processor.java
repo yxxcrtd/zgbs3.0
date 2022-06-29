@@ -67,7 +67,7 @@ public class StlDataGatherBond8Processor extends BaseProcessor<NeedOperateEntity
                 // 查询投管交易编号(汇总交易编号)
                 Map<String, Object> paraMap = new HashMap<>(4);
                 paraMap.put("applyTradeId", settleTransDataTotal.getApplyTradeId());
-                paraMap.put("dealDate", settleTransDataTotal.getDealDate());
+                paraMap.put("settleDate", settleTransDataTotal.getSettleDate());
                 paraMap.put("secAcctId", settleTransDataTotal.getSecAcctId());
                 paraMap.put("seatNumber", settleTransDataTotal.getSeatNumber());
                 List<String> tradeIdTgList = stlDataGatherMapper.selectTradeIdTgs(paraMap);
@@ -434,7 +434,7 @@ public class StlDataGatherBond8Processor extends BaseProcessor<NeedOperateEntity
         // 分支序号
         trdProductDeal.setBranch(0L);
         // 交易日
-        trdProductDeal.setTradeDate(settleTransDataTotal.getTradeDate());
+        trdProductDeal.setTradeDate(settleTransDataTotal.getSettleDate());
         // 起息日
         trdProductDeal.setVdate(null);
         // 到期日

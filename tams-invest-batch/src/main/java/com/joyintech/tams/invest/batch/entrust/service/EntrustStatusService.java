@@ -187,12 +187,15 @@ public class EntrustStatusService {
             closeItem.setBusiAct(DictCodeListExt3.业务动作_指令日终关闭.getValue());
             etrList.add(closeItem);
         }
-        req.setData(etrList);
-        req.setUserId("SYSTEM");
-        req.setTotalTradeId(IDGenerator.generate());
-        req.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
-        logger.info("[关闭委托状态更新]批处理发送头寸开始");
-        PositionHttpRequest.batchClose(req);
+        if (CollectionUtils.isNotEmpty(etrList)) {
+            req.setData(etrList);
+            req.setUserId("SYSTEM");
+            req.setTotalTradeId(IDGenerator.generate());
+            req.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
+            logger.info("[关闭委托状态更新]批处理发送头寸开始");
+            PositionHttpRequest.batchClose(req);
+        }
+
     }
 
     private void closeDelegatOprHisMethod(List<EntrustClosePosEtrReqDto> entrustIdList) {

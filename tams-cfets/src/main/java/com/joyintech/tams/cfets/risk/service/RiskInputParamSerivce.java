@@ -467,9 +467,9 @@ public class RiskInputParamSerivce extends RiskCommonService {
         }
         //try {
             doOccupy(inputDto);
-       /* }catch (Exception e) {
-            e.printStackTrace();
-        }*/
+       // }catch (Exception e) {
+        //    e.printStackTrace();
+       // }
     }
 
 
@@ -570,6 +570,11 @@ public class RiskInputParamSerivce extends RiskCommonService {
                     || StringUtil.equals(dto.getTrdBankManualSettleInfo().getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue()))) {
                 riskRdsDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
                 riskRdsDto.setEventStatus(BussinessDictCodeListRds.事件类型_投资交易_存续期.getValue());
+                if(StringUtil.equals(dto.getTrdBankManualSettleInfo().getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())){
+                    riskRdsDto.setAssetType2(交易方向_正回购.getValue());
+                }else {
+                    riskRdsDto.setAssetType2(交易方向_逆回购.getValue());
+                }
             } else {
                 riskRdsDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
             }
@@ -650,7 +655,7 @@ public class RiskInputParamSerivce extends RiskCommonService {
             riskRdsDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
             businessDto.getTrdProductDeals().forEach(item -> {
                 item.setTotleTradeId(null);
-                item.setFinprodId(null);
+                //item.setFinprodId(null);
                 item.setPs(businessDto.getPs());
             });
             list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, businessDto.getTrdProductDeals(), null);

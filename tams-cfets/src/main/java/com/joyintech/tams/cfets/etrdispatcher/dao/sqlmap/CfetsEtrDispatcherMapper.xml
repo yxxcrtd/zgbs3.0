@@ -366,7 +366,7 @@
         LEFT JOIN (
         SELECT bo.BID_MODLE, brt.IS_WIN ,bo.FINPROD_ID ,bobp.ENTRUST_ID  FROM  BID_ORDER bo
         LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
-        LEFT JOIN BID_RESULT_TOTAL brt ON   brt.BID_ID = bo.BID_ID AND brt.STATUS = '01'
+        LEFT JOIN BID_RESULT_TOTAL brt ON   brt.BID_ID = bo.BID_ID
         AND brt.FINPROD_ID = bo.FINPROD_ID
         WHERE  bo.TRADE_STATUS = '01'
         GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID,bobp.ENTRUST_ID
@@ -1168,6 +1168,7 @@
         group by t0.BID_ID) bobp
         ON bobp.BID_ID = bo.BID_ID
         WHERE TFPDT.TRADE_STATUS = '01'
+        AND tpd.TRADE_STATUS = '01'
         <if test="entrustId != null and entrustId != ''">
             AND tpda.entrust_id = #{entrustId}
         </if>
@@ -1274,6 +1275,7 @@
         group by t0.BID_ID) bobp
         ON bobp.BID_ID = bo.BID_ID
         WHERE TFPDT.TRADE_STATUS = '01'
+        AND tpd.TRADE_STATUS = '01'
         <if test="entrustId != null and entrustId != ''">
             AND tpda.entrust_id = #{entrustId}
         </if>) T
@@ -1358,6 +1360,7 @@
         left join sys_user mcct on mcct.user_name = bo.OUR_TRADER
         left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
         WHERE 1=1
+        AND tpd.TRADE_STATUS = '01'
         <if test="entrustId != null and entrustId != ''">
             AND tpda.entrust_id = #{entrustId}
         </if>
@@ -1409,6 +1412,7 @@
         left join sys_user mcct on mcct.user_name = bo.OUR_TRADER
         left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
         WHERE 1=1
+        AND tpd.TRADE_STATUS = '01'
         <if test="entrustId != null and entrustId != ''">
             AND tpda.entrust_id = #{entrustId}
         </if>) T
@@ -1728,6 +1732,8 @@
             on bo.BID_ID = bobp2.BID_ID
             left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
         WHERE tpda.entrust_id = #{entrustId}
+          AND tfpdt.TRADE_STATUS = '01'
+          AND tpd.TRADE_STATUS = '01'
         union all
         SELECT
             #{TRADE_FLOW_STATUS01} effectFlag,
@@ -1847,7 +1853,9 @@
             group by t0.ENTRUST_ID, t0.BID_ID, eed.SEC_ACCT_ID) bobp2
             on bo.BID_ID = bobp2.BID_ID
             left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
-        WHERE tpda.entrust_id = #{entrustId}) T
+        WHERE tpda.entrust_id = #{entrustId}
+          AND tfpdt.TRADE_STATUS = '01'
+          AND tpd.TRADE_STATUS = '01') T
         ORDER BY T.updateTime DESC
 
     </select>
@@ -2688,12 +2696,18 @@
         left join (select sum(ENT_FINISH_AMT) ENT_FINISH_AMT, sum(FINISH_AMT) FINISH_AMT, ENTRUST_ID
                    from ETR_FINISH_STATUS
                    group by ENTRUST_ID) efs on ee.ENTRUST_ID = efs.ENTRUST_ID
-        left join (select sum(t1.SHARE_AMT) SHARE_AMT, t2.ENTRUST_ID
-                   from TRD_PRODUCT_DEAL t1
-                            left join TRD_PRODUCT_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
-                            where t1.IS_CANCEL = 'N'
-                              and t1.TRADE_STATUS != '03'
-                            group by t2.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
+        left join (
+            select sum(T.SHARE_AMT) SHARE_AMT, T.ENTRUST_ID from (
+                select t1.SHARE_AMT SHARE_AMT, t2.ENTRUST_ID
+                from TRD_PRODUCT_DEAL t1
+                         left join TRD_PRODUCT_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
+                where t1.IS_CANCEL = 'N' and t1.TRADE_STATUS != '03'
+                union all
+                select t1.SHARE_AMT SHARE_AMT, t2.ENTRUST_ID
+                from TRD_PRODUCT_TEMP_DEAL t1
+                         left join TRD_PRODUCT_TEMP_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
+                where t1.IS_CANCEL = 'N' and t1.TRADE_STATUS != '03') T
+            group by T.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
         where ee.ENTRUST_ID=#{entrustId,jdbcType=VARCHAR}
     </select>
 

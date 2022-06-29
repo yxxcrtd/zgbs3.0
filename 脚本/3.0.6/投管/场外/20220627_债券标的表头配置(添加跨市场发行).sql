@@ -1,2 +1,0 @@
-delete from CFG_DATATABLE_SHOW where PAGECODE = 'FinBondAsset001' and DTCODE = 'FinBondPageInfo' and COLCODE = 'crossMarketStr';
-INSERT INTO CFG_DATATABLE_SHOW (PAGECODE, DTCODE, SPCDCODE, COLCODE, COLNAME, DICTCODE, SEQNO, DISPLAYED, FROZEN, SORT, MAXLEN, EXTENDCFG, EFFERANGE, RANGEID, STATUS, REMARK1, REMARK2, REMARK3, ISKEY, SPCDCODE_DESC) VALUES ('FinBondAsset001', 'FinBondPageInfo', '999999', 'crossMarketStr', '跨市场发行', null, 29, 1, 0, 1, 100, '{"colAlign": "left","supportSearch":"模糊"}', 0, 'COMM', 1, 0, null, null, 0, '999999');

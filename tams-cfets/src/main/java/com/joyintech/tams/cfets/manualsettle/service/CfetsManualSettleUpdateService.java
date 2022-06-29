@@ -6,6 +6,7 @@ import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.dto.PositionRulePtlData;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
+import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
 import com.joyintech.tams.cfets.manualsettle.dto.*;
 import com.joyintech.tams.common.base.dao.*;
@@ -390,7 +391,8 @@ public class CfetsManualSettleUpdateService extends BaseService<CfetsManualSettl
         req.setCcy(cfetsManualSettleUpdateRequest.getCcy());
         req.setFinprodId(cfetsManualSettleUpdateRequest.getFinprodId());
         req.setPtlList(ptlList);
-        PositionHttpRequest.send(req);
+        Map<String, Object> param = PositionHttpRequest.send(req);
+        ThreadLocalUtil.setLocalCache(param);
     }
 
 

@@ -10,11 +10,8 @@
 
 package com.joyintech.tams.invest.basicdata.mstmarketinstitutions.service;
 
-import java.util.*;
-
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,19 +28,32 @@ import com.joyintech.framework.jdbc.enums.DataSourceType;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.invest.basicdata.mstmarketinstitutions.dto.MstMarketInstitutionsDto;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.common.base.dao.InterfCompintroductionMapper;
+import com.joyintech.tams.common.base.dao.MstCustomerInfoMapper;
+import com.joyintech.tams.common.base.entity.InterfCmsInstitution;
+import com.joyintech.tams.common.base.entity.InterfCompintroduction;
+import com.joyintech.tams.common.base.entity.MstCustomerInfo;
+import com.joyintech.tams.common.base.entity.MstCustomerInfoAddWithBLOBs;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.invest.basicdata.mstmarketinstitutions.dto.MstMarketInstitutionsDto;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.dto.common.InvestInterfCommDto;
 import com.joyintech.tams.invest.common.service.InvestInterfCommService;
-import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.constant.OperationType;
+import com.joyintech.workflow.engine.service.BaseProcessService;
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
-import javax.validation.ValidationException;
+import java.util.*;
 
 /**
  * 市场机构管理
@@ -57,6 +67,8 @@ import javax.validation.ValidationException;
 @Service
 public class MstMarketInstitutionsService extends CommonExportService<MstMarketInstitutionsDto>
         implements BaseProcessService<MstMarketInstitutionsDto> {
+
+    private Logger logger = LoggerFactory.getLogger(MstMarketInstitutionsService.class);
 
     /**
      * wind_公司简介
@@ -368,6 +380,7 @@ public class MstMarketInstitutionsService extends CommonExportService<MstMarketI
             mstDto.setOperateType("NEW");
             mstDto.setMstBondCreditRating(new ArrayList<>());
             Set<ConstraintViolation<MstMarketInstitutionsDto>> validate = Validation.buildDefaultValidatorFactory().getValidator().validate(mstDto, ValidateGroupEdit.class);
+            logger.info("autoAddInstitutions >> 发行人校验结果：{}", JsonUtils.object2Json(validate));
             if (CollectionUtils.isNotEmpty(validate)) {//没有校验通过
                 result.put("errorCode", 0);
                 result.put("message", "匹配失败");

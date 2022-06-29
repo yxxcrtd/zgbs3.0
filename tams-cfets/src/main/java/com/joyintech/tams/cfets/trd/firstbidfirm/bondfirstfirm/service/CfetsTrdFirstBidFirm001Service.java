@@ -500,6 +500,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
     private void setParam(Map<String, Object> param) {
         param.put("ISSUE_CLASS_02", DictCodeListExt4.新债_发行方式_招标发行.getValue());
         param.put("ISSUE_CLASS_03", DictCodeListExt4.新债_发行方式_簿记建档.getValue());
+        param.put("TRADE_STATUS01", DictCodeListExt1.交易状态_初始.getValue());
         param.put("TRADE_STATUS03", DictCodeListExt1.交易状态_撤销.getValue());
         param.put("YN_N", DictCodeListExt1.是否_否.getValue());
         String loginUserId = LoginUserUtil.getUserName();

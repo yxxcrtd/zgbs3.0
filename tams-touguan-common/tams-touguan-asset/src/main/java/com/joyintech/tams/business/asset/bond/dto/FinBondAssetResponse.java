@@ -142,7 +142,7 @@ public class FinBondAssetResponse {
     private String exerciseTypeStr;
 
     @ApiModelProperty(name="exerciseDate",value="理论行权日")
-    private Date exerciseDate;
+    private String exerciseDate;
 
     @ApiModelProperty(name="isSus",value="是否永续")
     private String isSus;
@@ -482,12 +482,11 @@ public class FinBondAssetResponse {
         this.exerciseTypeStr = exerciseTypeStr;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
-    public Date getExerciseDate() {
+    public String getExerciseDate() {
         return exerciseDate;
     }
 
-    public void setExerciseDate(Date exerciseDate) {
+    public void setExerciseDate(String exerciseDate) {
         this.exerciseDate = exerciseDate;
     }
 

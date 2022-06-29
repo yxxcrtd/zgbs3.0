@@ -2,12 +2,13 @@ package com.joyintech.tams.business.asset.tenderbond.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.google.common.collect.Lists;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.asset.tenderbond.dao.FinTenderBondAssetMapper;
+import com.joyintech.tams.business.asset.tenderbond.dto.*;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.util.ValidUtils;
@@ -18,14 +19,11 @@ import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.*;
-import com.joyintech.tams.business.asset.tenderbond.dao.FinTenderBondAssetMapper;
-import com.joyintech.tams.business.asset.tenderbond.dto.*;
 import com.joyintech.tams.invest.common.asset.dao.AssetCommon002Mapper;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
-import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -624,7 +621,7 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         if (StringUtil.equals(operateType, OperationType.MODIFY.name())) {
             this.emptyCheck(dto, validList);
             //修改时以及流程中修改数据审批时，需要判断当前资产是否存在有效或流程中的待执行指令及交易数据，如存在，则不允许修改；
-            Integer count = finTenderBondAssetMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue(), null);
+            Integer count = finTenderBondAssetMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue(), null, null);
             if (Objects.nonNull(count) && count > 0) {
                 validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
             }
@@ -646,14 +643,14 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         }
         if (StringUtil.equals(operateType, OperationType.MODIFY.name())) {
             //修改时以及流程中修改数据审批时，需要判断当前资产是否存在有效或流程中的待执行指令及交易数据，如存在，则不允许修改；
-            Integer count = finTenderBondAssetMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue(), null);
+            Integer count = finTenderBondAssetMapper.countFinprodIdUse(dto.getFinprodId(), null, DictCodeList.是否_否.getValue(), null);
             if (Objects.nonNull(count) && count > 0) {
                 validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
             }
         }
         if (StringUtil.equals(operateType, OperationType.DELETE.name())) {
             //删除时，需要判断当前资产是否存在指令及交易数据，如存在，则不允许删除；
-            Integer count = finTenderBondAssetMapper.countFinprodIdUse(dto.getFinprodId(), null, null);
+            Integer count = finTenderBondAssetMapper.countFinprodIdUse(dto.getFinprodId(), null, DictCodeList.是否_否.getValue(), null);
             if (Objects.nonNull(count) && count > 0) {
                 validList.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
             }

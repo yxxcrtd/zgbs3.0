@@ -499,6 +499,9 @@
             <if test="isCancel !=null and isCancel !=''">
                 and ENTRUST_STATUS not in ('05','07') <!-- 撤销、退回 -->
             </if>
+            <if test="isClose !=null and isClose !=''">
+                and ENTRUST_STATUS not in ('06') <!-- 撤销、退回 -->
+            </if>
             union all
             select count(1) as qty from WFL_ETR_ENTRUST where FINPROD_ID=#{finprodId}
             union all

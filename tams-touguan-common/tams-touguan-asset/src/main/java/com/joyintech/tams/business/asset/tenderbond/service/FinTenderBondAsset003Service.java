@@ -427,7 +427,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                     validMessages.add(new ValidMessage("发行阶段不为已上市的不能进行撤销"));
                 }
             }
-            Integer count = finTenderBoundAssetMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue(), DictCodeList.是否_否.getValue());
+            Integer count = finTenderBoundAssetMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue(), null, DictCodeList.是否_否.getValue());
             if (Objects.nonNull(count) && count > 0) {
                 validMessages.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
             }

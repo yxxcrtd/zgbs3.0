@@ -74,8 +74,18 @@
         AND	T8.IS_INITIAL = 'Y'
         LEFT JOIN MST_CUSTOMER_INFO_ADD T7 ON T7.CUSTOMER_ID = T3.CUSTOMER_ID
         LEFT JOIN FIN_CASH_PAY_RULE T9 ON T9.CASH_ID = T8.CASH_ID AND T8.EFF_DATE = T9.EFF_DATE
-        LEFT JOIN (select A.FINPROD_ID,max(A.EXERCISE_DATE) EXERCISE_DATE,A.EXERCISE_TYPE
-        from FIN_EXERCISE_PLAN A group by A.FINPROD_ID,A.EXERCISE_TYPE) B
+        LEFT JOIN (
+        SELECT
+        A.FINPROD_ID,
+        listagg ( TO_CHAR(A.EXERCISE_DATE, 'yyyy-MM-dd'), ',' ) WITHIN GROUP ( ORDER BY A.EXERCISE_DATE ) EXERCISE_DATE,
+        listagg ( sdl_fu.ITEM_VALUE, ',' ) WITHIN GROUP ( ORDER BY sdl_fu.ITEM_VALUE ) EXERCISE_TYPE
+        FROM
+        FIN_EXERCISE_PLAN A
+        LEFT JOIN SYS_DATADICT_LIST sdl_fu ON A.EXERCISE_TYPE = sdl_fu.ITEM_CODE
+        AND sdl_fu.DICT_CODE = 'EXEC_MODE'
+        GROUP BY
+        A.FINPROD_ID
+        ) B
         on T1.FINPROD_ID = B.FINPROD_ID
         LEFT JOIN (SELECT ASSET_CODE,RATING,GRADE_ORG_ID FROM (
         SELECT MBCR.O_CODE AS ASSET_CODE,MBCR.GRADE_RESULT AS RATING,MBCR.GRADE_ORG_ID as GRADE_ORG_ID
@@ -267,7 +277,6 @@
                 or to_char(ss.mdate,'YYYY-MM-DD')=#{search}
                 or to_char(ss.delistingDate,'YYYY-MM-DD')=#{search}
                 or to_char(ss.firstRateFixDate,'YYYY-MM-DD')=#{search}
-                or to_char(ss.exerciseDate,'YYYY-MM-DD')=#{search}
                 )
             </where>
         </if>
@@ -548,7 +557,7 @@
         INNER JOIN FIN_PRODUCT FPB
                 ON FPA.FINPROD_ID = FPB.FINPROD_ID
                AND FPB.ISSUE_TYPE = '01'
-        WHERE FP.FINPROD_ID = #{finprodId}
+        WHERE FP.FINPROD_ID = #{finprodId} and FPA.ISSUE_STATUS = '01'
     </select>
 
     <select id="getFinCashPayRuleList"
@@ -1105,6 +1114,7 @@
                his.BUSI_DES, his.OPER_TIME ORDER_TIME,
                CASE WHEN his.OPER_TYPE = '01' THEN
                         nvl(SU2.real_name,nvl(SUR.REAL_NAME,SUB.REAL_NAME))
+                    WHEN his.OPER_TYPE = '20' THEN his.user_id
                     ELSE SU.real_name
                    END AS userId
            from ETR_ENTRUST_OPER_HIS his

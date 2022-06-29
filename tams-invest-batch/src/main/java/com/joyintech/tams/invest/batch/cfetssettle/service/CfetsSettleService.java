@@ -553,6 +553,9 @@ public class CfetsSettleService extends BaseService {
                 cfetsSettleReaderResult.setFinprodType2(cfetsSettleAllInfoDto.getFinprodType2());
                 cfetsSettleReaderResult.setBusiType(cfetsSettleAllInfoDto.getBusiType());
                 cfetsSettleReaderResult.setTotalTradeId(cfetsSettleAllInfoDto.getTotalTradeId());
+                cfetsSettleReaderResult.setFinprodId(cfetsSettleAllInfoDto.getFinprodId());
+                cfetsSettleReaderResult.setCounterId(cfetsSettleAllInfoDto.getCounterId());
+                cfetsSettleReaderResult.setSettleAmt(cfetsSettleAllInfoDto.getSettleAmtT());
                 listTemp.add(cfetsSettleReaderResult);
             }
         }

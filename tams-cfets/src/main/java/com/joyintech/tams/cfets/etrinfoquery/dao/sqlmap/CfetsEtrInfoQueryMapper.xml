@@ -257,7 +257,7 @@
             SELECT brt1.BID_ID , brt1.STATUS , brt1.FINPROD_ID, brt1.IS_WIN FROM BID_RESULT_TOTAL brt1
             UNION ALL
             SELECT brt2.BID_ID , brt2.STATUS , brt2.FINPROD_ID, brt2.IS_WIN FROM WFL_BID_RESULT_TOTAL brt2
-            ) brt  ON   brt.BID_ID = bo.BID_ID AND brt.STATUS = '01'
+            ) brt  ON   brt.BID_ID = bo.BID_ID
             AND brt.FINPROD_ID = bo.FINPROD_ID
             WHERE bo.TRADE_STATUS = '01'
             GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID,bobp.ENTRUST_ID

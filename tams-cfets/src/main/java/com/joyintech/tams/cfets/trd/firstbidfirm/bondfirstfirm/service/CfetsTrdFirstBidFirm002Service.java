@@ -26,8 +26,10 @@ import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbClosePosEtrRequest;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbClosePositionRequest;
+import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
 import com.joyintech.tams.cfets.position.service.PositionInfoService;
 import com.joyintech.tams.cfets.trd.bond.dto.CalRequest;
 import com.joyintech.tams.cfets.trd.bond.dto.CalRespone;
@@ -41,6 +43,7 @@ import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
+import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
@@ -66,6 +69,7 @@ import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCash
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
+import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.apache.commons.collections4.CollectionUtils;
@@ -2783,6 +2787,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             //处理指令完成进度
             finishEtrList.forEach(this::closeDelegatePositionMethod);
         } catch (Exception e) {
+            logger.error("处理异常",e);
             throw new BusinessException("MSG:" + e.getMessage());
         }
     }
@@ -2842,11 +2847,12 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             stlPayOrdersMapper.insertSelective(entity.getStlPayOrders());
 
             entity.getTrdProductDealAdds().forEach(trdProductDealAdd -> {
-                trdProductDealAddMapper.insertSelective(trdProductDealAdd);
                 if (isYJFS) {
                     TrdProductTempDealAdd trdTempDealTotalAdd = new TrdProductTempDealAdd();
                     BeanUtil.copyPropertiesIgnoreNull(trdTempDealTotalAdd, trdProductDealAdd);
                     trdProductTempDealAddMapper.insertSelective(trdTempDealTotalAdd);
+                }else {
+                    trdProductDealAddMapper.insertSelective(trdProductDealAdd);
                 }
             });
 
@@ -3546,10 +3552,10 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             // 汇总投标券面总额
             if (!StringUtil.isNotEmpty(item.getTotalBiddingNum())) {
                 errorList.add(new ValidMessage("投标产品列表中汇总投标券面总额不可为空!"));
-            } else if (BigDecimalUtil.ACompareToB(item.getTotalBiddingNum(), BigDecimal.ZERO, 4) <= 0
+            } else if (BigDecimalUtil.ACompareToB(item.getTotalBiddingNum(), BigDecimal.ZERO, 4) < 0
                     || BigDecimalUtil.ACompareToB(item.getTotalBiddingNum(), item.getEtrBidPriceTotal(), 4) > 0) {
                 // 投标产品列表中汇总投标券面总额要小于等于指令投标券面总额
-                errorList.add(new ValidMessage("投标产品列表中汇总投标券面总额必须大于0，小于等于指令投标券面总额!"));
+                errorList.add(new ValidMessage("投标产品列表中汇总投标券面总额必须大于等于0，小于等于指令投标券面总额!"));
             }
             // 指令投标券面总额
             if (!StringUtil.isNotEmpty(item.getEtrBidPriceTotal())) {
@@ -3804,7 +3810,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         req.setCdate(entity.getTradeDate());
         req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         req.setPtlList(ptlList);
-        PositionHttpRequest.send(req);
+        Map<String, Object> param = PositionHttpRequest.send(req);
+        ThreadLocalUtil.setLocalCache(param);
     }
 
     /**
@@ -3894,7 +3901,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         req.setCdate(entity.getTradeDate());
         req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         req.setPtlList(ptlList);
-        PositionHttpRequest.send(req);
+        Map<String, Object> param = PositionHttpRequest.send(req);
+        ThreadLocalUtil.setLocalCache(param);
     }
 
     /**
@@ -4160,6 +4168,54 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             return finishEtrList;
         }
         return null;
+    }
+
+    @Override
+    public Map<String, Object> getRuntimeVariables(ProcessMark entity, String taskId) throws WorkFlowException {
+        CfetsTrdFirstBidFirmInfoDto dto = this.getBussinessEntity(entity);
+        CommonBusinessService commonBusinessService = SpringContextUtil.getBean(CommonBusinessService.class);
+        if (taskId != null) {
+            try {
+                if (StringUtil.equals(CacheUtil.getSysParam(BussinessConstant.ETRLIMIT_SWITCH_IS_TOTAL), "Y")) {
+                    return getEtrLimitSwitch(entity.getWorkflowId(), dto, commonBusinessService);
+                } else {
+//           		BussinessConstant.是否需要上级审批
+                    Map<String, Object> result = new HashMap<>();
+                    for (CfetsTrdFirstBidFirmProductDto productDto : dto.getProductDtos()) {
+                        CfetsTrdFirstBidFirmInfoDto dto1 = new CfetsTrdFirstBidFirmInfoDto();
+                        BeanUtil.copyPropertiesIgnoreNull(dto1,dto);
+                        dto1.setPayableAmount(productDto.getPayAmt());
+                        dto1.setTotalBiddingNum(productDto.getTotalBiddingNum());
+                        result = getEtrLimitSwitch(entity.getWorkflowId(), dto1, commonBusinessService);
+                        if ((boolean) result.get(BussinessConstant.是否需要上级审批) == true) {
+                            return result;
+                        }
+                    }
+                    return result;
+                }
+            } catch (WorkFlowException e) {
+                // 未设置授权或设置成不授权时，抛出异常，当前用户只能退回
+                throw new WorkFlowException(e);
+            }
+        } else {
+            return null;
+        }
+    }
+
+    private Map<String, Object> getEtrLimitSwitch(String workflowId, CfetsTrdFirstBidFirmInfoDto dto,
+                                                  CommonBusinessService commonBusinessService) throws WorkFlowException {
+        BigDecimal amount = dto.getPayableAmount();
+        if (amount == null) {
+            amount = dto.getTotalBiddingNum();
+        }
+        Map<String, Object> params = CommonBusinessService.setParams(dto.getCounterId(), amount, LoginUserUtil.getUserName(),
+                BussinessDictCodeList.平安资产类型_债券.getValue(), null, dto.getTradeMarket(), DictCodeList.交易方向_买入.getValue()
+                , dto.getFinprodId(), workflowId
+        );
+        // add by zhangrui1 风险审批修改 start
+        params.put("riskTrialRetDto", dto.getRiskcalResponse().getRiskcalReturnList());
+        // add by zhangrui1 风险审批修改 end
+        return commonBusinessService.是否需要上级审批_委托用(params);
     }
 }
 

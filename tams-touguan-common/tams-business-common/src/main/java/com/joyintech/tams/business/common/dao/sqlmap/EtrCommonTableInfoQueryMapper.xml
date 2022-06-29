@@ -12,7 +12,7 @@
 		his.BUSI_DES,
 	    CASE WHEN his.OPER_TYPE = '01' THEN
                 nvl(nvl(SU2.real_name,nvl(SUR.REAL_NAME,SUB.REAL_NAME)),SU.real_name)
-            WHEN his.OPER_TYPE = '20' THEN his.user_id
+            WHEN his.OPER_TYPE = '20' or his.OPER_TYPE = '17' THEN his.user_id
         ELSE SU.real_name
 		END AS userId
         from ETR_ENTRUST_OPER_HIS his

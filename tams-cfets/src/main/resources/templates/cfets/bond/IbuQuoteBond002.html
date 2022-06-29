@@ -50,6 +50,10 @@
             <input type="hidden" name="settleSpreedCode" th:value="${entity?.settleSpreedCode}" />
             <input type="hidden" id="finprodAbbr" name="finprodAbbr" th:value="${entity?.finprodAbbr}" />
             <input type="hidden" id="counterName" name="counterName" th:value="${entity?.counterName}" />
+            <input type="hidden" id="isAbs" name="isAbs" th:value="${entity?.isAbs}" />
+            <input type="hidden" id="isSpecialDebt" name="isSpecialDebt" th:value="${entity?.isSpecialDebt}" />
+            <input type="hidden" id="isDefaultBondIndicator" name="isDefaultBondIndicator" th:value="${entity?.isDefaultBondIndicator}" />
+            <input type="hidden" id="isSpecial" name="isSpecial" th:value="${entity?.isSpecial}" />
             <div class="pro-module-wrapper pro-module-base" th:title="#{CfetsBondDealQuotedPrice004.baseinfo}">
                 <div class="pro-module-wrap">
                     <div class="pro-module">
@@ -285,6 +289,20 @@
                             </div>
                         </div>
                         <div class="layui-form-item">
+                            <div class="form-inline-wrap" id="unitIntEditDiv">
+                                <label class="layui-form-label form-label-wrap" th:text="#{CfetsBondDealQuotedPrice002.unitInt}">应计利息</label>
+                                <div class="layui-input-inline input-inline">
+                                    <input required type="text" id="CfetsBondDealQuotedPrice004_unitIntEdit" data-textrange="5" data-th-value="${entity?.unitInt}" class="layui-input form-input text-number" placeholder="请输入">
+                                    <span class="input-right-show">元</span>
+                                </div>
+                            </div>
+                            <div class="form-inline-wrap" id="fpriceAmtEditDiv">
+                                <label class="layui-form-label form-label-wrap">结算金额</label>
+                                <div class="layui-input-inline input-inline">
+                                    <input required type="text" id="CfetsBondDealQuotedPrice004_fpriceAmtEdit" data-th-value="${entity?.fpriceAmt}" class="layui-input form-input text-number" placeholder="请输入">
+                                    <span class="input-right-show">元</span>
+                                </div>
+                            </div>
                             <div class="form-inline-wrap" id="dealFeeAmtDiv">
                                 <label class="layui-form-label form-label-wrap">交易手续费</label>
                                 <div class="layui-input-inline input-inline">

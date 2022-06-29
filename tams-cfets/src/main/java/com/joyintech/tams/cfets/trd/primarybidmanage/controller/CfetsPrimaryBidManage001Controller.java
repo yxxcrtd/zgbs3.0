@@ -355,6 +355,11 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
                         errorList.add(new ValidMessage("投标方式为自主投标的已中标有效数据，仅支持当日撤销"));
                         break;
                     }
+                    List<String> manualList = cfetsPrimaryBidManageService.selectManualSettleInfo(request.getTotalWinId());
+                    if (manualList.size() > 0) {
+                        errorList.add(new ValidMessage("所选中标结果数据已做交收不支持撤销!业务编号:"+StringUtil.join(manualList,",")));
+                        break;
+                    }
                 }
             }
             if (CollectionUtils.isNotEmpty(errorList)){
@@ -389,11 +394,11 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
                 selectedItem.add(saveRequest);
             }
             dto.setSelectedItem(selectedItem);
-            ProcessParameter<CfetsPrimaryBidManageSaveRequest> processParameter = new ProcessParameter<CfetsPrimaryBidManageSaveRequest>();
-            WorkFlowParameter<CfetsPrimaryBidManageSaveRequest> params = new WorkFlowParameter<CfetsPrimaryBidManageSaveRequest>();
+            ProcessParameter<CfetsPrimaryBidManageSaveRequest> processParameter = new ProcessParameter<>();
+            WorkFlowParameter<CfetsPrimaryBidManageSaveRequest> params = new WorkFlowParameter<>();
             params.setPageId("CfetsPrimaryBidManage002");
             params.setElementId(dto.getElementId());
-            params.setBusinessCode(item -> item.getBidId());
+            params.setBusinessCode(CfetsPrimaryBidManageSaveRequest::getBidId);
             params.setBusinessType(item->{
                 if (StringUtil.equals(item.getBidModle(),DictCodeListExt4.投标方式_自主投标.getValue())) {
                     return DictCodeListExt4.共通业务类型_中标结果维护自主投标.getValue();
@@ -404,17 +409,18 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
             // 设置流程业务说明, entity即传入的dto
             //中标日期+资产简称+中标方式+中标标位+中标券面总额 ArithmeticUtil.multiply(entity.getAllocationDetails().get(0).getBidPrice(), BigDecimal.valueOf(100))+"%"
             params.setComment(entity -> {
-                if (StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
+                if (StringUtil.equals(entity.getIsWin(), DictCodeList.是否_是.getValue())
+                        || StringUtil.equals(entity.getIsWin(), DictCodeList.一级投标中标状态_已投标.getValue())) {
                     return WorkFlowUtil.concatComment("中标日期" +
                             GlobalConstant.OPEN_PARENTHESIS + iPlatformDate.getSysDateStr() + GlobalConstant.CLOSE_PARENTHESIS +
                             "资产简称" + GlobalConstant.OPEN_PARENTHESIS + entity.getFinprodAbbr() + GlobalConstant.CLOSE_PARENTHESIS
                             + "中标方式" + GlobalConstant.OPEN_PARENTHESIS + SysDataUtil.getNameFromDataDict(DictCode.中标方式, entity.getWinType()) + GlobalConstant.CLOSE_PARENTHESIS
                             + "中标标位" + GlobalConstant.OPEN_PARENTHESIS + cfetsPrimaryBidManageService.getBidPriceStr(entity) + GlobalConstant.CLOSE_PARENTHESIS
                             + "中标券面总额" + GlobalConstant.OPEN_PARENTHESIS + ArithmeticUtil.divide(entity.getWinPrinamt(), BigDecimal.valueOf(10000), 2) + "万元" + GlobalConstant.CLOSE_PARENTHESIS);
-                }else{
-                    return WorkFlowUtil.concatComment("未中标日期"+
-                            GlobalConstant.OPEN_PARENTHESIS+ iPlatformDate.getSysDateStr() +GlobalConstant.CLOSE_PARENTHESIS+
-                            "资产简称"+GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS+"未中标");
+                } else {
+                    return WorkFlowUtil.concatComment("未中标日期" +
+                            GlobalConstant.OPEN_PARENTHESIS + iPlatformDate.getSysDateStr() + GlobalConstant.CLOSE_PARENTHESIS +
+                            "资产简称" + GlobalConstant.OPEN_PARENTHESIS + entity.getFinprodAbbr() + GlobalConstant.CLOSE_PARENTHESIS + "未中标");
                 }
             });
             processParameter.setOperationType(OperationType.DELETE);
