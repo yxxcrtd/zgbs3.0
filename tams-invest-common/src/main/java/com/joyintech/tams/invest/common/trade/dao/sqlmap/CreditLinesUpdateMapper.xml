@@ -395,14 +395,6 @@
 			AND T1.AST_TYPE_3 = T3.TYPE_10
 			AND T1.AST_TYPE_4 = T3.TYPE_11
 			AND T1.AST_TYPE_5 = T3.TYPE_12
-			<if test="isSus != null and isSus == 'Y'.toString()">
-				AND T2.IS_PERPETUAL_SEC = 'Y'
-			</if>
-			<if test="isSus == null or isSus == 'N'.toString()">
-				<if test="secBond != null and secBond != ''">
-					AND T1.IS_SUB_BOND = #{secBond,jdbcType=VARCHAR}
-				</if>
-			</if>
 		</if>
 		/**匹配到四级*/
 		<if test="level != null and level == '4'.toString()">
@@ -412,14 +404,6 @@
 			AND T1.AST_TYPE_3 = T3.TYPE_10
 			AND T1.AST_TYPE_4 = T3.TYPE_11
 			AND T1.AST_TYPE_5 is null
-			<if test="isSus != null and isSus == 'Y'.toString()">
-				AND T2.IS_PERPETUAL_SEC = 'Y'
-			</if>
-			<if test="isSus == null or isSus == 'N'.toString()">
-				<if test="secBond != null and secBond != ''">
-					AND T1.IS_SUB_BOND = #{secBond,jdbcType=VARCHAR}
-				</if>
-			</if>
 		</if>
 		/**匹配到三级*/
 		<if test="level != null and level == '3'.toString()">
@@ -429,14 +413,6 @@
 			AND T1.AST_TYPE_3 = T3.TYPE_10
 			AND T1.AST_TYPE_4 is null
 			AND T1.AST_TYPE_5 is null
-			<if test="isSus != null and isSus == 'Y'.toString()">
-				AND T2.IS_PERPETUAL_SEC = 'Y'
-			</if>
-			<if test="isSus == null or isSus == 'N'.toString()">
-				<if test="secBond != null and secBond != ''">
-					AND T1.IS_SUB_BOND = #{secBond,jdbcType=VARCHAR}
-				</if>
-			</if>
 		</if>
 		/**匹配到二级*/
 		<if test="level != null and level == '2'.toString()">
@@ -446,9 +422,6 @@
 			AND T1.AST_TYPE_3 IS NULL
 			AND T1.AST_TYPE_4 is null
 			AND T1.AST_TYPE_5 is null
-			<if test="isSus != null and isSus == 'Y'.toString()">
-				AND T2.IS_PERPETUAL_SEC = 'Y'
-			</if>
 		</if>
 		/**匹配到一级*/
 		<if test="level != null and level == '1'.toString()">
@@ -457,9 +430,6 @@
 			AND T1.AST_TYPE_3 IS NULL
 			AND T1.AST_TYPE_4 is null
 			AND T1.AST_TYPE_5 is null
-			<if test="isSus != null and isSus == 'Y'.toString()">
-				AND T2.IS_PERPETUAL_SEC = 'Y'
-			</if>
 		</if>
 		WHERE T1.FINPROD_ID IS NULL
 	</select>
