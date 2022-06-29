@@ -286,6 +286,19 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 bidProduct.setTotalBidPrinamt(ArithmeticUtil.round(bidProduct.getTotalBidPrinamt(),2, RoundingMode.HALF_UP));
                 bidProduct.setWinPrinAmt(ArithmeticUtil.round(bidProduct.getWinPrinAmt(),2, RoundingMode.HALF_UP));
             }
+            List<BidProductDto> bidProductResultList = bidProductList;
+            if(!StringUtil.isEmptyList(bidProductList)&&StringUtil.isNotEmpty(bidProductList.get(0))){
+                Comparator<BidProductDto> byBidPrice;
+                if (StringUtil.equals(bidProductList.get(0).getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())
+                        || StringUtil.equals(bidProductList.get(0).getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
+                    // 招标标的为利率和利差时 投标标位 从小到大排列
+                    byBidPrice = Comparator.comparing(BidProductDto::getBidPrice);
+                } else {
+                    //招标标的为价格时，投标标位 从大到小排列
+                    byBidPrice = Comparator.comparing(BidProductDto::getBidPrice).reversed();
+                }
+                bidProductResultList = bidProductList.stream().sorted(byBidPrice).collect(Collectors.toList());
+            }
             if(StringUtil.isNotEmpty(response.getBidModle()) && response.getBidModle().equals(DictCodeListExt4.投标方式_自主投标.getValue())) {
                 Map<String, List<BidProductDto>> summaryBidMap = bidProductList.stream().collect(JoyinCollectors.groupingBy(item -> item.getWinPrice()));
                 List<SummaryBidDto> summaryBidList = new ArrayList<>();
@@ -296,6 +309,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     for (BidProductDto bidProductDto : summaryBidMap.get(winPrice)) {
                         totalBidPrinamt = ArithmeticUtil.doAdd(totalBidPrinamt, bidProductDto.getTotalBidPrinamt());
                         winPrinAmt = ArithmeticUtil.doAdd(winPrinAmt, bidProductDto.getWinPrinAmt());
+                    }
+                    if(totalBidPrinamt.compareTo(BigDecimal.ZERO.stripTrailingZeros())==0){
+                        continue;
                     }
                     summaryBidDto.setTotalBidPrinamt(totalBidPrinamt);
                     summaryBidDto.setWinPrinAmt(winPrinAmt);
@@ -309,7 +325,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             resultData.put(dtCode + "_form", infoForm);
             resultData.put(dtCode + "_formDetail", detailTable);
             resultData.put(dtCode + "_data", response);
-            resultData.put(dtCode + "_detail", bidProductList);
+            resultData.put(dtCode + "_detail", bidProductResultList);
             return resultData;
         }
         return null;
