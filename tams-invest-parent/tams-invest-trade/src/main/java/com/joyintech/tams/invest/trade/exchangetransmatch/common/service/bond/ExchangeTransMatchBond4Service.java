@@ -47,6 +47,7 @@ public class ExchangeTransMatchBond4Service extends ExchangeTransMatchBondCommon
 //        // 债转股的零股折算现金赋值 add by fuyongsheng 20220116 start
 //        trdFinProductDealTotal.setTradeAmt(dealDto.getFpriceAmt());
 //        // 债转股的零股折算现金赋值 add by fuyongsheng 20220116 end
+        trdFinProductDealTotal.setUnitCprice(dealDto.getUnitCprice());
     }
 
     @Override
@@ -179,7 +180,7 @@ public class ExchangeTransMatchBond4Service extends ExchangeTransMatchBondCommon
             // 处理转股数量分配
             this.handleCovertSharesQtyAllocation(sortedEntrustDetailDtoList, dealDto.getSettleTransDataTotalAdd());
             for (int i=0; i<sortedEntrustDetailDtoList.size(); i++) {
-                ExchangeTransMatchCommonEntrustDetailDto detailDto = sortedEntrustDetailDtoList.get(0);
+                ExchangeTransMatchCommonEntrustDetailDto detailDto = sortedEntrustDetailDtoList.get(i);
                 ExchangeTransMatchCommonEntrustDto entrustDtoTmp = new ExchangeTransMatchCommonEntrustDto();
                 BeanUtil.copyPropertiesIgnoreNull(entrustDtoTmp,entrustDto);
                 entrustDtoTmp.setPortfolioId(detailDto.getPortfolioId());
@@ -277,7 +278,7 @@ public class ExchangeTransMatchBond4Service extends ExchangeTransMatchBondCommon
             // 分配数量
             BigDecimal conAmt = ArithmeticUtil.multiply(conMinStep, stepTimes);
             entrustDetailDto.setConAmt(conAmt);
-            remainConAmt = ArithmeticUtil.subtract(totalConAmt, conAmt);
+            remainConAmt = ArithmeticUtil.subtract(remainConAmt, conAmt);
         }
         // 第一轮分配完,如还有剩余数量,则按照最小交易单元一次依次进行分配,直到分配完为止
         if(remainConAmt.compareTo(BigDecimal.ZERO) > 0){

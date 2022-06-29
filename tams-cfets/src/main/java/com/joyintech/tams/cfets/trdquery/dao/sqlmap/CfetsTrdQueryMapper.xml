@@ -5317,8 +5317,8 @@
                     WHEN fpi.TENDER_TARGET = '02' AND nvl(BO.WIN_PRICE, brt.WIN_PRICE) IS NOT NULL THEN to_char(nvl(BO.WIN_PRICE, brt.WIN_PRICE), 'FM9999999999999990.9990') || '元'
                     WHEN fpi.TENDER_TARGET = '03' AND nvl(BO.WIN_PRICE, brt.WIN_PRICE) IS NOT NULL THEN to_char(nvl(BO.WIN_PRICE, brt.WIN_PRICE) * 10000, 'FM9999999999999990.90') || 'BP'
                     end              winPrice/*中标标位*/,
-                BO.UNIT_CPRICE unitCprice,
-                BO.UNIT_INT unitInt,
+                tfpdt.UNIT_CPRICE unitCprice,
+                tfpdt.UNIT_INT unitInt,
                 nvl(BO.SETT_FEE_AMT, BRT.SETT_FEE_AMT) settleFeeAmt,
                 BO.REMARK remark
             FROM BID_ORDER BO
@@ -5328,8 +5328,8 @@
                        SUM(bobp.THE_WIN_PRIN_AMT) THE_WIN_PRIN_AMT,
                        bobp.BID_ID
                 from ETR_ENTRUST_BID_PRICE eebp
-                         left join BID_ORDER_BID_PRICE bobp on eebp.ENTRUST_ID = bobp.ENTRUST_ID
-                    and eebp.PORTFOLIO_ID = bobp.PORTFOLIO_ID and eebp.BID_PRICE = bobp.BID_PRICE
+                left join BID_ORDER_BID_PRICE bobp on eebp.ENTRUST_ID = bobp.ENTRUST_ID
+                      and eebp.PORTFOLIO_ID = bobp.PORTFOLIO_ID and eebp.BID_PRICE = bobp.BID_PRICE
                 group by bobp.BID_ID
             ) BRBP ON BRBP.BID_ID = bo.BID_ID
             LEFT JOIN FIN_PRODUCT FP
@@ -5340,6 +5340,15 @@
             LEFT JOIN MST_COUNTER_PARTY MCCI
             ON BO.COUNTER_ID= MCCI.COUNTER_ID
             LEFT JOIN MST_CFETS_CUSTOMER_INFO m1 on BO.OUR_TRADER=m1.PARTY_ID
+            LEFT JOIN (
+                    SELECT brt.BID_ID, sum(tfpdt.UNIT_CPRICE)     UNIT_CPRICE,
+                           SUM(tfpdt.UNIT_INT) UNIT_INT
+                    from TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt
+                    left join BID_RESULT_TOTAL brt
+                           on brt.TOTAL_WIN_ID = tfpdt.B_TRADE_ID
+                    group by brt.BID_ID
+                ) tfpdt
+            ON tfpdt.BID_ID = bo.BID_ID
             LEFT JOIN SYS_USER su
                       ON su.USER_NAME = BO.OUR_TRADER
             WHERE  BO.TRADE_STATUS = #{TRADE_STATUS_01}
@@ -5376,8 +5385,8 @@
                     WHEN fpi.TENDER_TARGET = '02' AND nvl(WBO.WIN_PRICE, brt.WIN_PRICE) IS NOT NULL THEN to_char(nvl(WBO.WIN_PRICE, brt.WIN_PRICE), 'FM9999999999999990.9990') || '元'
                     WHEN fpi.TENDER_TARGET = '03' AND nvl(WBO.WIN_PRICE, brt.WIN_PRICE) IS NOT NULL THEN to_char(nvl(WBO.WIN_PRICE, brt.WIN_PRICE) * 10000, 'FM9999999999999990.90') || 'BP'
                     end              winPrice/*中标标位*/,
-                WBO.UNIT_CPRICE unitCprice,
-                WBO.UNIT_INT unitInt,
+                tfpdt.UNIT_CPRICE unitCprice,
+                tfpdt.UNIT_INT unitInt,
                 nvl(WBO.SETT_FEE_AMT, BRT.SETT_FEE_AMT) settleFeeAmt,
                 WBO.REMARK remark
             FROM WFL_BID_ORDER WBO
@@ -5397,6 +5406,15 @@
             ON FPI.FINPROD_ID = FP.FINPROD_ID
             LEFT JOIN FIN_PRODUCT_TYPE FPT
             ON FPT.FINPROD_ID = FP.FINPROD_ID
+            LEFT JOIN (
+                SELECT brt.BID_ID, sum(tfpdt.UNIT_CPRICE)     UNIT_CPRICE,
+                       SUM(tfpdt.UNIT_INT) UNIT_INT
+                from TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt
+                         left join BID_RESULT_TOTAL brt
+                                   on brt.TOTAL_WIN_ID = tfpdt.B_TRADE_ID
+                group by brt.BID_ID
+            ) tfpdt
+                 ON tfpdt.BID_ID = WBO.BID_ID
             LEFT JOIN SYS_USER su ON su.USER_NAME = WBO.OUR_TRADER
             LEFT JOIN MST_COUNTER_PARTY mcci ON WBO.COUNTER_ID= mcci.COUNTER_ID
             LEFT JOIN MST_CFETS_CUSTOMER_INFO m1 on WBO.OUR_TRADER=m1.PARTY_ID
