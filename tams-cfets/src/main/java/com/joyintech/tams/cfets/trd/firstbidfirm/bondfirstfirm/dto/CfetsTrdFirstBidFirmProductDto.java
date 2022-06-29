@@ -77,6 +77,9 @@ public class CfetsTrdFirstBidFirmProductDto {
     @ApiModelProperty(name = "acctNo", value = "资金账户", example = "1")
     private String acctNo;
 
+    @ApiModelProperty(name = "acctNoStr", value = "资金账户名称", example = "1")
+    private String acctNoStr;
+
     @ApiModelProperty(name = "secManageAcctId", value = "证券账户ID", example = "1")
     private String secManageAcctId;
 
@@ -305,6 +308,14 @@ public class CfetsTrdFirstBidFirmProductDto {
 
     public String getAcctNo() {
         return acctNo;
+    }
+
+    public String getAcctNoStr() {
+        return acctNoStr;
+    }
+
+    public void setAcctNoStr(String acctNoStr) {
+        this.acctNoStr = acctNoStr;
     }
 
     public void setAcctNo(String acctNo) {

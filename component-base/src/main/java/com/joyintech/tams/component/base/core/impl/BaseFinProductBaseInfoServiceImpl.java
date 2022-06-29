@@ -64,6 +64,9 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
     @Autowired
     private FinProductRecommentMapper finProductRecommentMapper;
 
+    @Autowired
+    private FinProductConvertibleMapper finProductConvertibleMapper;
+
     /**
      * 标的类金融产品推荐mapper对象
      */
@@ -271,6 +274,10 @@ public class BaseFinProductBaseInfoServiceImpl implements BaseFinProductBaseInfo
                 //债券中债报送
                 if (null != dto.getRepAssetDept()) {
 //                    repAssetDeptMapper.insert(dto.getRepAssetDept());
+                }
+                //转债信息
+                if (null != dto.getFinProductConvertible()) {
+                    finProductConvertibleMapper.insert(dto.getFinProductConvertible());
                 }
                 //债券评级信息
                 if (null != dto.getMstBondCreditRatingList() && !dto.getMstBondCreditRatingList().isEmpty()) {

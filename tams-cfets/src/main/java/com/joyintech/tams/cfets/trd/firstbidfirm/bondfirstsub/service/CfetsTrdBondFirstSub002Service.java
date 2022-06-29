@@ -1160,7 +1160,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         }
         // 更新撤销的原交易数据
         if (type.equals(OperationType.REVOKE) || type.equals(OperationType.DELETE)) {
-            cfetsTrdBondFirstSub002Mapper.updateBidOrder(entity.getBidId(), entity.getRemark());
+            cfetsTrdBondFirstSub002Mapper.updateBidOrder(entity.getBidId(), bidOrder.getRemark());
             cfetsTrdBondFirstSub002Mapper.updateBidOrderBidPrice(entity.getBidId());
         }
     }

@@ -541,6 +541,7 @@ from
                     etrptl.PTL_BOND_ZHCC != 0 or etrptl.ETR_SUM_KYCC != 0 or etrptl.ETR_PLEDGE_KZYCC != 0 or etrptl.ETR_PLEDGE_YZYCC != 0
                     or etrptl.PTL_BOND_BFQKYCC != 0 
                 ) and d.TRADE_MARKET in ('01','02') <!--只展示交易场所为银行间和商业柜台的数据-->
+              and d.FINPROD_TYPE2= #{FINPROD_TYPE_TG_F01}
             <!-- 关键字模糊查询 -->
             <include refid="positionQueryAnd"/>
             <if test="secType1 != null and secType1 != ''">

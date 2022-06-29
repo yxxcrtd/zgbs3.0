@@ -881,6 +881,18 @@ public class CommonAutoCouponService extends BaseService {
                 baseFinProductBaseInfoDto.setRepAssetBond(repAssetBond);//存中债报送界面机构类型等字段
                 baseFinProductBaseInfoDto.setRepAssetDept(repAssetDept);//存中债报送界面资产负债类别
                 baseFinProductBaseInfoDto.setRepAssetType(interfPayhsrcsecinfo.getAssetClass());
+                //转债信息
+                if(DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue().equals(interfPayhsrcsecinfo.getSectype())){
+                    FinProductConvertible finProductConvertible = new FinProductConvertible();
+                    finProductConvertible.setConFinprodId(interfPayhsrcsecinfo.getConFinprodId());
+                    finProductConvertible.setFinprodId(interfPayhsrcsecinfo.getFinprodId());
+                    finProductConvertible.setConShareId(interfPayhsrcsecinfo.getConShareId());
+                    finProductConvertible.setConVdate(interfPayhsrcsecinfo.getConVdate());
+                    finProductConvertible.setConPrice(interfPayhsrcsecinfo.getConPrice());
+                    finProductConvertible.setRedeemPrice(interfPayhsrcsecinfo.getRedeemPrice());
+                    finProductConvertible.setResalePrice(interfPayhsrcsecinfo.getResalePrice());
+                    baseFinProductBaseInfoDto.setFinProductConvertible(finProductConvertible);
+                }
                 baseFinProductBaseInfoList.add(baseFinProductBaseInfoDto);
             }
         }

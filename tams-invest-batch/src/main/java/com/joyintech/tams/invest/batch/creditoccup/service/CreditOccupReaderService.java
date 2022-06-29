@@ -1,5 +1,6 @@
 package com.joyintech.tams.invest.batch.creditoccup.service;
 
+import com.google.common.collect.Lists;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
@@ -31,6 +32,7 @@ public class CreditOccupReaderService extends BaseService {
 
     @Autowired
     private CreditOccupMapper creditOccupMapper;
+
 
     /**
      * 查询释放授信的数据
@@ -114,6 +116,19 @@ public class CreditOccupReaderService extends BaseService {
         creditOccupReaderResult.setCreditLinesInputs(creditLinesInputsObj);
         resultList.add(creditOccupReaderResult);
         return resultList;
+    }
+
+
+    /**
+     * 处理一级市场债的授信释放
+     *
+     * @param param
+     * @return
+     */
+    public List<CreditOccupReaderResult> execute3(Map<String, Object> param) {
+        CreditOccupReaderResult result = new CreditOccupReaderResult();
+        result.setCreditLinesInputs(creditOccupMapper.listTotalTempDeal(param));
+        return Lists.newArrayList(result);
     }
 }
 

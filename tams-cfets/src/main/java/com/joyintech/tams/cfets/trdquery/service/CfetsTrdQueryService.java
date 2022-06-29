@@ -131,9 +131,10 @@ public class CfetsTrdQueryService extends BaseService {
             pageParam.put("busiTypePositionList", StringUtil.splitToList(null, dto.getBusiTypePosition()));
         }
         String regAssetType = (String) pageParam.get("regAssetType");
+        pageParam.put("regAssetType", regAssetType);
         if (StringUtil.isNotEmpty(regAssetType)) {
             List<String> finprodType2List = new ArrayList<>();
-            if (StringUtil.equals(regAssetType, "01")) {
+            if (StringUtil.equals(regAssetType, "01") || StringUtil.equals(regAssetType, "04")) {
                 finprodType2List.add(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
             } else {
                 finprodType2List.add(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
@@ -1003,9 +1004,10 @@ public class CfetsTrdQueryService extends BaseService {
             pageParam.put("effectiveStatusList", StringUtil.splitToList(GlobalConstant.COMMA, effectiveStatus));
         }
         String regAssetType = (String) pageParam.get("regAssetType");
+        pageParam.put("regAssetType", regAssetType);
         if (StringUtil.isNotEmpty(regAssetType)) {
             List<String> finprodType2List = new ArrayList<>();
-            if (StringUtil.equals(regAssetType, "01")) {
+            if (StringUtil.equals(regAssetType, "01") || StringUtil.equals(regAssetType, "04") ) {
                 finprodType2List.add(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
             } else {
                 finprodType2List.add(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
@@ -1124,9 +1126,10 @@ public class CfetsTrdQueryService extends BaseService {
             pageParam.put("effectiveStatusList", list);
         }
         String regAssetType = (String) pageParam.get("regAssetType");
+        pageParam.put("regAssetType", regAssetType);
         if (StringUtil.isNotEmpty(regAssetType)) {
             List<String> finprodType2List = new ArrayList<>();
-            if (StringUtil.equals(regAssetType, "01")) {
+            if (StringUtil.equals(regAssetType, "01") || StringUtil.equals(regAssetType, "04")) {
                 finprodType2List.add(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
             } else {
                 finprodType2List.add(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
