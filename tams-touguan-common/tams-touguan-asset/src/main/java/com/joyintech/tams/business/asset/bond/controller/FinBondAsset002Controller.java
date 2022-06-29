@@ -803,7 +803,7 @@ public class FinBondAsset002Controller extends BaseController {
             for (FinCashPlanDto finCashPlan : finCashPlanList) {
                 BondFinCashPlanDto bondFinCashPlanDto = new BondFinCashPlanDto();
                 BeanUtil.copyPropertiesIgnoreNull(bondFinCashPlanDto, finCashPlan);
-                bondFinCashPlanDto.setRangeYield(dto.getInvRepayList().get(0).getRangeYield());
+                bondFinCashPlanDto.setRangeYield(dto.getInvScheduleList().get(0).getRangeYield());
                 bondFinCashPlanDto.setLirs(null);
                 invList.add(bondFinCashPlanDto);
             }
