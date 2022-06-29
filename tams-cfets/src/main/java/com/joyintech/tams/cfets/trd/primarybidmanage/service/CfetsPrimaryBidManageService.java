@@ -1578,6 +1578,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 // 结算服务费
                 detailDto.setSettFeeAmt(BigDecimal.ZERO);
             }
+            if (detailDto.getIntAmt() == null) {
+                // 应计利息
+                detailDto.setIntAmt(BigDecimal.ZERO);
+            }
             // 计算净价
             detailDto.setWinCprice(this.calPrice(detailDto, request.getTenderTarget(), request.getFinprodMarketId(), request.getPayDate()));
         }

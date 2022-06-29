@@ -284,14 +284,7 @@ public class CfetsTrdQueryCstpInfoListResponse {
     }
 
     public String getBusinesstypeStr() {
-        if(StringUtil.equals("BOND",getBusinesstype())){
-            return "现券买卖";
-        }else if(StringUtil.equals("BOND1",getBusinesstype())){
-            return "债券";
-        }else{
-            return "质押式回购";
-        }
-        //return SysDataUtil.getNameFromDataDict(DictCode.CSTP资产类型, getBusinesstype());
+        return SysDataUtil.getNameFromDataDict(DictCode.CSTP资产类型, getBusinesstype());
     }
 
     public void setBusinesstypeStr(String businesstypeStr) {

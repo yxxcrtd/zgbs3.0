@@ -284,7 +284,7 @@ public class EntrustStatusService {
             } else {
                 pageId = "CfetsEtrIbRepoinfo003";
             }
-            url = tamsSerever + String.format("cfets/riskTrial/doOccupy/%s/%s/%s", pageId, 系统动作_关闭.getValue(), 流程节点_流程提交.getValue());
+            url = tamsSerever + String.format("/cfets/riskTrial/doOccupy/%s/%s/%s", pageId, 系统动作_关闭.getValue(), 流程节点_流程提交.getValue());
             Map<String,Object> param = new HashMap<>();
             param.put("entrustId",cfetsEntrustClosePosEtrReqDto.getCloseId());
             param.put("ps",cfetsEntrustClosePosEtrReqDto.getPs());

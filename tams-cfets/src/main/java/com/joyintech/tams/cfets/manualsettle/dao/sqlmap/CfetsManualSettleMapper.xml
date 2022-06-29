@@ -13,8 +13,8 @@
             to_char(T1.SETTLE_DATE,'yyyy-MM-dd') settleDate,
             nvl(T2.FINPROD_MARKET_ID,rfpd.TERM_TYPE) finprodMarketId,
             T2.FINPROD_ABBR finprodAbbr,
-            FIN_PRODUCT_TYPE.TYPE_9                                                     assetType,
-            sdl7.ITEM_VALUE                                                             assetTypeStr,
+            T1.finprod_type2                                                 assetType,
+            decode(FIN_PRODUCT_TYPE.TYPE_9,'01','同业存单', sdl7.ITEM_VALUE)        assetTypeStr,
             T1.FINPROD_TYPE2 finprodType2,
             sdl1.item_value finprodType2Str,
             btm.busi_type tgBusiType,
@@ -84,8 +84,7 @@
         LEFT JOIN SYS_DATADICT_LIST sdl4 on sdl4.dict_code ='TRADE_PLACE' and sdl4.item_code = T1.TRADE_MARKET
         LEFT JOIN SYS_DATADICT_LIST sdl5 on sdl5.dict_code ='SHARES_TRADE_PLATFORM' and sdl5.item_code = T1.TRADE_PLAT
         LEFT JOIN SYS_DATADICT_LIST sdl6 on sdl6.dict_code ='SHARES_TRADE_MARKET' and sdl6.item_code = T1.TRADE_MARKET_MODE
-        LEFT JOIN SYS_DATADICT_LIST sdl7
-        on sdl7.dict_code = 'CUSTOM_ASSET_TYPE_TWO' and sdl7.item_code = FIN_PRODUCT_TYPE.TYPE_9
+        LEFT JOIN SYS_DATADICT_LIST sdl7 on sdl7.dict_code = 'PINAN_ASSET_TYPE' and sdl7.item_code = FIN_PRODUCT_TYPE.TYPE_8
         left join trdquto_match_info match on T1.totle_trade_id=match.trd_id
         left join reg_fin_product_deal_total_add regAdd on match.PRE_TRADE_ID=regAdd.totle_trade_id
         left join ibu_quote_bond_det ibuDet on match.PRE_TRADE_ID=ibuDet.QUOTE_ID and ibuDet.TRADE_STATUS='07'
@@ -121,8 +120,8 @@
         <if test="finprodType2 != null and finprodType2!='' ">
             AND FIN_PRODUCT_TYPE.TYPE_8= #{finprodType2}
         </if>
-        <if test="assetType != null and assetType!='' ">
-            AND FIN_PRODUCT_TYPE.TYPE_9= #{assetType}
+        <if test="assetType != null and (assetType =='04' or assetType =='01') ">
+            AND  decode(FIN_PRODUCT_TYPE.TYPE_9,'01','04','02','01') = #{assetType}
         </if>
         <if test="tgBusiType != null and tgBusiType!='' ">
             AND btm.busi_type = #{tgBusiType}
@@ -175,8 +174,8 @@
             to_char(T1.SETTLE_DATE,'yyyy-MM-dd') settleDate,
             nvl(T2.FINPROD_MARKET_ID,rfpd.TERM_TYPE) finprodMarketId,
             T2.FINPROD_ABBR finprodAbbr,
-            FIN_PRODUCT_TYPE.TYPE_9                                                     assetType,
-            sdl7.ITEM_VALUE                                                             assetTypeStr,
+            T1.finprod_type2                                                 assetType,
+            decode(FIN_PRODUCT_TYPE.TYPE_9,'01','同业存单', sdl7.ITEM_VALUE)        assetTypeStr,
             T1.FINPROD_TYPE2 finprodType2,
             sdl1.item_value finprodType2Str,
             btm.busi_type tgBusiType,
@@ -246,8 +245,7 @@
         LEFT JOIN SYS_DATADICT_LIST sdl4 on sdl4.dict_code ='TRADE_PLACE' and sdl4.item_code = T1.TRADE_MARKET
         LEFT JOIN SYS_DATADICT_LIST sdl5 on sdl5.dict_code ='SHARES_TRADE_PLATFORM' and sdl5.item_code = T1.TRADE_PLAT
         LEFT JOIN SYS_DATADICT_LIST sdl6 on sdl6.dict_code ='SHARES_TRADE_MARKET' and sdl6.item_code = T1.TRADE_MARKET_MODE
-        LEFT JOIN SYS_DATADICT_LIST sdl7
-        on sdl7.dict_code = 'CUSTOM_ASSET_TYPE_TWO' and sdl7.item_code = FIN_PRODUCT_TYPE.TYPE_9
+        LEFT JOIN SYS_DATADICT_LIST sdl7 on sdl7.dict_code = 'PINAN_ASSET_TYPE' and sdl7.item_code = FIN_PRODUCT_TYPE.TYPE_8
         left join trdquto_match_info match on T1.totle_trade_id=match.trd_id
         left join reg_fin_product_deal_total_add regAdd on match.PRE_TRADE_ID=regAdd.totle_trade_id
         left join ibu_quote_bond_det ibuDet on match.PRE_TRADE_ID=ibuDet.QUOTE_ID and ibuDet.TRADE_STATUS='07'
@@ -283,8 +281,8 @@
         <if test="finprodType2 != null and finprodType2!='' ">
             AND FIN_PRODUCT_TYPE.TYPE_8= #{finprodType2}
         </if>
-        <if test="assetType != null and assetType!='' ">
-            AND FIN_PRODUCT_TYPE.TYPE_9= #{assetType}
+        <if test="assetType != null and (assetType =='04' or assetType =='01') ">
+            AND  decode(FIN_PRODUCT_TYPE.TYPE_9,'01','04','02','01') = #{assetType}
         </if>
         <if test="tgBusiType != null and tgBusiType!='' ">
             AND btm.busi_type = #{tgBusiType}
@@ -338,8 +336,8 @@
             to_char(T0.SETTLE_DATE,'yyyy-MM-dd') settleDate,
             nvl(T2.FINPROD_MARKET_ID,rfpd.TERM_TYPE) finprodMarketId,
             T2.FINPROD_ABBR finprodAbbr,
-            FIN_PRODUCT_TYPE.TYPE_9                                                     assetType,
-            sdl7.ITEM_VALUE                                                             assetTypeStr,
+            FIN_PRODUCT_TYPE.TYPE_9                                                 assetType,
+            decode(FIN_PRODUCT_TYPE.TYPE_9,'01','同业存单', sdl7.ITEM_VALUE)        assetTypeStr,
             T1.FINPROD_TYPE2 finprodType2,
             sdl1.item_value finprodType2Str,
             btm.busi_type tgBusiType,
@@ -409,8 +407,7 @@
         LEFT JOIN SYS_DATADICT_LIST sdl4 on sdl4.dict_code ='TRADE_PLACE' and sdl4.item_code = T1.TRADE_MARKET
         LEFT JOIN SYS_DATADICT_LIST sdl5 on sdl5.dict_code ='SHARES_TRADE_PLATFORM' and sdl5.item_code = T1.TRADE_PLAT
         LEFT JOIN SYS_DATADICT_LIST sdl6 on sdl6.dict_code ='SHARES_TRADE_MARKET' and sdl6.item_code = T1.TRADE_MARKET_MODE
-        LEFT JOIN SYS_DATADICT_LIST sdl7
-        on sdl7.dict_code = 'CUSTOM_ASSET_TYPE_TWO' and sdl7.item_code = FIN_PRODUCT_TYPE.TYPE_9
+        LEFT JOIN SYS_DATADICT_LIST sdl7 on sdl7.dict_code = 'PINAN_ASSET_TYPE' and sdl7.item_code = FIN_PRODUCT_TYPE.TYPE_8
         left join trdquto_match_info match on T1.totle_trade_id=match.trd_id
         left join reg_fin_product_deal_total_add regAdd on match.PRE_TRADE_ID=regAdd.totle_trade_id
         left join ibu_quote_bond_det ibuDet on match.PRE_TRADE_ID=ibuDet.QUOTE_ID and ibuDet.TRADE_STATUS='07'
@@ -443,8 +440,8 @@
         <if test="finprodType2 != null and finprodType2!='' ">
             AND FIN_PRODUCT_TYPE.TYPE_8= #{finprodType2}
         </if>
-        <if test="assetType != null and assetType!='' ">
-            AND FIN_PRODUCT_TYPE.TYPE_9= #{assetType}
+        <if test="assetType != null and (assetType =='04' or assetType =='01') ">
+            AND  decode(FIN_PRODUCT_TYPE.TYPE_9,'01','04','02','01') = #{assetType}
         </if>
         <if test="tgBusiType != null and tgBusiType!='' ">
             AND btm.busi_type= #{tgBusiType}
@@ -496,7 +493,7 @@
             AND t.cleanStatus= #{cleanStatus}
         </if>
         <if test="tradePlat_01 != null and tradePlat_01 != '' and tradePlat_02 != null and tradePlat_02 != ''">
-            AND ( t.tradePlat in( #{tradePlat_01},#{tradePlat_02} ) or t.tradePlat is null )
+            AND t.tradeMarket in( #{tradePlat_01},#{tradePlat_02})
         </if>
         <!-- 关键字模糊查询 -->
         <include refid="vagueQueryWhere"></include>

@@ -592,7 +592,7 @@ public class CfetsSettleService extends BaseService {
             cfetsManualSettleInsertDto.setButtonType(交收操作类型_交收.getValue());
             cfetsManualSettleInsertDto.setTradeId(cfetsManualSettleInsertDto.getTotalTradeId());
             Message<AjaxResult> message;
-            String url = String.format("cfets/riskTrial/doOccupy/%s/%s/%s", "CfetsManualSettle", 系统动作_新建.getValue(), 流程节点_审批生效.getValue());
+            String url = String.format("/cfets/riskTrial/doOccupy/%s/%s/%s", "CfetsManualSettle", 系统动作_新建.getValue(), 流程节点_审批生效.getValue());
             if (isSingle) {
                 message = simpleRestTemplate.postForObject(tamsSerever + url, cfetsManualSettleInsertDto, Message.class);
             } else {

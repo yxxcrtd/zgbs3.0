@@ -171,6 +171,10 @@ public class CfetsTrdQueryTradeInfoListResponse {
     @ApiModelProperty(name="bidModle",value="交易员")
     private String bidModle;
 
+
+    @ApiModelProperty(name="otherId",value="其他id")
+    private String otherId;
+
     @ApiModelProperty(name="selectedItem",value="选择的数据",example="1")
     private transient List<CfetsTrdQueryTradeInfoListResponse> selectedItem;
     @ApiModelProperty(name="operateType",value="操作类型",example="1")
@@ -585,5 +589,13 @@ public class CfetsTrdQueryTradeInfoListResponse {
 
     public void setBidModle(String bidModle) {
         this.bidModle = bidModle;
+    }
+
+    public String getOtherId() {
+        return otherId;
+    }
+
+    public void setOtherId(String otherId) {
+        this.otherId = otherId;
     }
 }
