@@ -105,6 +105,9 @@ public class CfetsPrimaryBidManageSaveDetailDto {
     @ApiModelProperty(name="acctNo",value="资金账户")
     private String acctNo;
 
+    @ApiModelProperty(name="acctNoStr",value="资金账户")
+    private String acctNoStr;
+
     /**净价*/
     @ApiModelProperty(name="unitCprice",value="净价（元）")
     private BigDecimal unitCprice;
@@ -264,6 +267,14 @@ public class CfetsPrimaryBidManageSaveDetailDto {
 
     public void setAcctNo(String acctNo) {
         this.acctNo = acctNo;
+    }
+
+    public String getAcctNoStr() {
+        return acctNoStr;
+    }
+
+    public void setAcctNoStr(String acctNoStr) {
+        this.acctNoStr = acctNoStr;
     }
 
     public BigDecimal getUnitCprice() {

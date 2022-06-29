@@ -1816,6 +1816,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
      * @date 2022/6/25 19:51
      */
     public CfetsPrimaryBidManageSaveRequest editList(CfetsPrimaryBidManageSaveRequest request, String type) {
+        if(!StringUtil.equals(request.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                && !StringUtil.equals(request.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue())){
+            request.getAllocationDetails().forEach(item->item.setIntAmt(request.getIntAmt()));
+        }
         if("1".equals(type)){
             // 计算分配明细中中标净价
             this.calCprice(request.getAllocationDetails());
