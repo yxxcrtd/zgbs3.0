@@ -248,12 +248,19 @@
         AND ((ETR_ENTRUST.FINPROD_TYPE2 = 'F32' and btm.issueClass = FIN_PRODUCT_ISSUE.ISSUE_CLASS) or
         ETR_ENTRUST.FINPROD_TYPE2 != 'F32' and btm.issueClass is null)
         LEFT JOIN (
-        SELECT bo.BID_MODLE, brt.IS_WIN ,bo.FINPROD_ID ,bobp.ENTRUST_ID  FROM  BID_ORDER bo
-        LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
-        LEFT JOIN BID_RESULT_TOTAL brt ON   brt.BID_ID = bo.BID_ID AND brt.STATUS = '01'
-        AND brt.FINPROD_ID = bo.FINPROD_ID
-        WHERE bo.IS_CANCEL = 'N' AND bo.TRADE_STATUS = '01'
-        GROUP BY bo.BID_MODLE, brt.IS_WIN, bo.FINPROD_ID,bobp.ENTRUST_ID
+        SELECT * FROM (
+            SELECT bo.BID_MODLE, brt.IS_WIN ,bo.FINPROD_ID ,bobp.ENTRUST_ID  FROM  BID_ORDER bo
+            LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
+            LEFT JOIN BID_RESULT_TOTAL brt ON   brt.BID_ID = bo.BID_ID AND brt.STATUS = '01'
+            AND brt.FINPROD_ID = bo.FINPROD_ID
+            WHERE bo.TRADE_STATUS = '01'
+            UNION
+            SELECT bo.BID_MODLE, brt.IS_WIN ,bo.FINPROD_ID ,bobp.ENTRUST_ID  FROM  WFL_BID_ORDER bo
+            LEFT JOIN WFL_BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
+            LEFT JOIN WFL_BID_RESULT_TOTAL brt ON   brt.BID_ID = bo.BID_ID AND brt.STATUS = '01'
+            AND brt.FINPROD_ID = bo.FINPROD_ID
+            WHERE bo.TRADE_STATUS = '01') T
+        GROUP BY T.BID_MODLE, T.IS_WIN, T.FINPROD_ID, T.ENTRUST_ID
         ) bobrt ON 	bobrt.FINPROD_ID = FIN_PRODUCT.FINPROD_ID AND bobrt.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
         <where>
             AND ETR_ENTRUST.ENTRUST_STATUS
