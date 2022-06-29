@@ -546,6 +546,10 @@ public class ExchangeTransMatchCommonService extends BaseService {
                         || StringUtil.equals(item.getPs(), DictCodeListExt3.交易方向_质押券出库.getValue())) {
                     portfolioMatchAmtMap.put(portfolioId, ArithmeticUtil.multiply(matchQty,item.getPrice()));
                 }
+                // 债转股不重新计算分配金额
+                else if(StringUtil.equals(item.getPs(), DictCodeListExt3.交易方向_债转股.getValue())){
+                    portfolioMatchAmtMap.put(portfolioId, matchDto.getTradeAmt());
+                }
                 else {
                     portfolioMatchAmtMap.put(portfolioId, ArithmeticUtil.multiply(matchQty,matchDto.getUnitFprice()));
                 }

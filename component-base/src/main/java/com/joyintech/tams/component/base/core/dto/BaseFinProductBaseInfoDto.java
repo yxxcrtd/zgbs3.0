@@ -27,6 +27,11 @@ import com.joyintech.tams.component.base.report.dto.BaseRepAssetEquityInfoDto;
 public class BaseFinProductBaseInfoDto {
 
     /**
+     * 转债信息
+     */
+    private FinProductConvertible finProductConvertible;
+
+    /**
      * 标的类金融产品entity
      */
     private FinProduct finProduct;
@@ -448,5 +453,13 @@ public class BaseFinProductBaseInfoDto {
 
     public void setFinProductIssue(FinProductIssue finProductIssue) {
         this.finProductIssue = finProductIssue;
+    }
+
+    public FinProductConvertible getFinProductConvertible() {
+        return finProductConvertible;
+    }
+
+    public void setFinProductConvertible(FinProductConvertible finProductConvertible) {
+        this.finProductConvertible = finProductConvertible;
     }
 }
