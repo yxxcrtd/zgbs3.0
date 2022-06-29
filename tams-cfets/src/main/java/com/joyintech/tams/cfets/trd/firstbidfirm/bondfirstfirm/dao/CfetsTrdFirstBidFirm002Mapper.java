@@ -118,6 +118,7 @@ public interface CfetsTrdFirstBidFirm002Mapper {
      */
     List<TrdFinProductDealTotal> findTotalByPTotleTradeId(@Param("PTotleTradeId") String PTotleTradeId);
 
+    List<TrdFinProductDealTotal> findTempTotalByPTotleTradeId(@Param("PTotleTradeId") String PTotleTradeId);
     /**
      * 根据汇总编号查询流程中汇总信息表
      *
@@ -137,6 +138,8 @@ public interface CfetsTrdFirstBidFirm002Mapper {
      * @date 2022/5/26 16:06
      */
     List<TrdProductDeal> findDealByTotleTradeId(@Param("totleTradeId") String totleTradeId);
+
+    List<TrdProductTempDeal> findTempDealByTotleTradeId(@Param("totleTradeId") String totleTradeId);
 
     /**
      * 按组合维度查询指令剩余额度,含流程中
