@@ -53,6 +53,9 @@ public class CfetsPrimaryBidManageSaveDetailDto {
     @ApiModelProperty(name="actWinPrinamt",value="实际中标券面总额（万元）")
     private BigDecimal actWinPrinamt;
 
+    @ApiModelProperty(name="samePriceTotalBidPrinamt",value="同标位汇总投标券面,计算用")
+    private BigDecimal samePriceTotalBidPrinamt;
+
     /**投标标位*/
     @ApiModelProperty(name="bidPrice",value="投标标位")
     private BigDecimal bidPrice;
@@ -101,6 +104,9 @@ public class CfetsPrimaryBidManageSaveDetailDto {
     /**资金账户*/
     @ApiModelProperty(name="acctNo",value="资金账户")
     private String acctNo;
+
+    @ApiModelProperty(name="acctNoStr",value="资金账户")
+    private String acctNoStr;
 
     /**净价*/
     @ApiModelProperty(name="unitCprice",value="净价（元）")
@@ -263,6 +269,14 @@ public class CfetsPrimaryBidManageSaveDetailDto {
         this.acctNo = acctNo;
     }
 
+    public String getAcctNoStr() {
+        return acctNoStr;
+    }
+
+    public void setAcctNoStr(String acctNoStr) {
+        this.acctNoStr = acctNoStr;
+    }
+
     public BigDecimal getUnitCprice() {
         return unitCprice;
     }
@@ -388,5 +402,13 @@ public class CfetsPrimaryBidManageSaveDetailDto {
 
     public void setSecDesirableCash(BigDecimal secDesirableCash) {
         this.secDesirableCash = secDesirableCash;
+    }
+
+    public BigDecimal getSamePriceTotalBidPrinamt() {
+        return samePriceTotalBidPrinamt;
+    }
+
+    public void setSamePriceTotalBidPrinamt(BigDecimal samePriceTotalBidPrinamt) {
+        this.samePriceTotalBidPrinamt = samePriceTotalBidPrinamt;
     }
 }

@@ -36,6 +36,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.constant.DictCodeListRsk.试算结果_风险审批;
@@ -368,6 +369,9 @@ public class CfetsTradeHandlerAop {
     @AfterReturning("insertPoint()")
     public void occupyOnInsert(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
+        if(isSave(args[0])) {
+            return;
+        }
         OperationType op = (OperationType) args[1];
         try {
             if (!StringUtil.equals(op.name(), OperationType.REVOKE.name())) {
@@ -425,6 +429,9 @@ public class CfetsTradeHandlerAop {
     public void occupyOnUpdate(JoinPoint joinPoint) throws BusinessException {
         try {
             Object[] args = joinPoint.getArgs();
+            if(isSave(args[0])) {
+                return;
+            }
             inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), null);
         } catch (BusinessException e) {
             List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
@@ -675,4 +682,17 @@ public class CfetsTradeHandlerAop {
         ar.setMessageType(messageType);
         return ar;
     }
+
+
+    public static boolean isSave(Object obj) {
+        Map<String,Object>  map = BeanUtil.object2Map(obj);
+        if(Objects.nonNull(map.get("operateType")) && StringUtil.equals("save",map.get("operateType"))) {
+            return true;
+        }
+        if(Objects.nonNull(map.get("operatorType")) && StringUtil.equals("save",map.get("operatorType"))) {
+            return true;
+        }
+        return false;
+    }
+
 }

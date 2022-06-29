@@ -463,7 +463,7 @@
             Joyin.error("组合分配信息,请填写完整")
             return false;
         }
-        if(riskFlag === 0) {
+        if(riskFlag === 0 && ps === 'T03') {
             Joyin.error("请先进行风险试算")
             return false;
         }
