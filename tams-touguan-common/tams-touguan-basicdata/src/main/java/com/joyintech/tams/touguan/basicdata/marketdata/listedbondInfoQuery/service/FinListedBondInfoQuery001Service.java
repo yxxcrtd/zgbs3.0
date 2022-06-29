@@ -200,7 +200,7 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         //发行处理
         if (StringUtil.isNotBlank(finListedBondInfoQuery001Dto.getIssuerCode())) {
             String customerId = finBondMarketInfoQuery001Service.handleIssuer(validMessages, finListedBondInfoQuery001Dto.getIssuerCode());
-            if(StringUtil.isNotBlank(customerId)){
+            if (StringUtil.isNotBlank(customerId)) {
                 finListedBondInfoQuery001Dto.setIssuerCode(customerId);
             }
         }
@@ -393,6 +393,32 @@ public class FinListedBondInfoQuery001Service extends BaseService {
         finProductIssue.setIntType(finListedBondInfoQuery001Dto.getRateType());
         baseFinProductBaseInfoDto.setFinProductIssue(finProductIssue);
 
+        //添加评级信息
+        //查询资讯_债券信息评级list
+        List<InterfPayhsrcsecrating> interfPayhsrcsecratingList = commonAutoCouponService.selectInterfPayhsrcsecrating(secId);
+        //new债券信用评级
+        List<MstBondCreditRating> mstBondCreditRatingList = new ArrayList<>();
+        if (null != interfPayhsrcsecratingList && interfPayhsrcsecratingList.size() != 0) {
+            for (InterfPayhsrcsecrating interfPayhsrcsecrating : interfPayhsrcsecratingList) {
+                MstBondCreditRating mstBondCreditRating = new MstBondCreditRating();
+                //债券ID
+                mstBondCreditRating.setoCode(interfPayhsrcsecrating.getSecid());
+                //评级机构
+                mstBondCreditRating.setGradeOrgId(interfPayhsrcsecrating.getRatingorg());
+                //评级日期取发布日期
+                mstBondCreditRating.setGradeDate(interfPayhsrcsecrating.getPubdate());
+                //评级类型
+                mstBondCreditRating.setoType(interfPayhsrcsecrating.getRatingtype());
+                //长期短期
+                mstBondCreditRating.setShortLongTerm(interfPayhsrcsecrating.getRatingsubtype());
+                //评级结果
+                mstBondCreditRating.setGradeResult(interfPayhsrcsecrating.getRating());
+                //录入方式
+                mstBondCreditRating.setInputType(BussinessDictCodeList.录入方式_接口导入.getValue());
+                mstBondCreditRatingList.add(mstBondCreditRating);
+            }
+            baseFinProductBaseInfoDto.setMstBondCreditRatingList(mstBondCreditRatingList);//组装到baseInfoDto
+        }
         baseFinProductBaseInfoList.add(baseFinProductBaseInfoDto);
         interfPayhsrcsecinfoDto.setBaseFinProductBaseInfoList(baseFinProductBaseInfoList);
         return interfPayhsrcsecinfoDto;

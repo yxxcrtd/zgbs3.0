@@ -359,8 +359,7 @@ public class FinBondAsset001Controller extends BaseController{
         List<FinBondAssetSaveRequest> selectedItem = new ArrayList<>();
         entity.setElementId(dto.getElementId());
         for (FinBondAssetSaveRequest saveRequest:dto.getSelectedItem()){
-            String finProdId = commonBusinessService.getFinProdId(saveRequest.getFinprodMarketId(), DictCodeListExt1.金融产品类型_投管用_债券.getValue(), null);
-            FinBondAssetSaveRequest request = finBondAssetService.getBasicInfos(finProdId, null);
+            FinBondAssetSaveRequest request = finBondAssetService.getBasicInfos(saveRequest.getFinprodMarketId(), null);
             request.setOperateStatus(dto.getOperateStatus());
             selectedItem.add(request);
         }

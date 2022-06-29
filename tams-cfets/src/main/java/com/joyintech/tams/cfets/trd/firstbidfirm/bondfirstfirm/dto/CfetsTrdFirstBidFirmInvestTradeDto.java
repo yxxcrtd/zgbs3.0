@@ -26,7 +26,7 @@ public class CfetsTrdFirstBidFirmInvestTradeDto {
     private TrdTradeFeeTotal trdTradeFeeTotal;
     private StlPayOrders stlPayOrders;
     private TrdFinProductDealTotal trdFinProductDealTempTotal;
-    private TrdDealTotalAdd trdDealTempTotalAdd;
+    private TrdTempDealTotalAdd trdDealTempTotalAdd;
 
     private WflTrdFinProductDealTotal wflTrdFinProductDealTotal;
     private WflTrdDealTotalAdd wflTrdDealTotalAdd;
@@ -116,11 +116,11 @@ public class CfetsTrdFirstBidFirmInvestTradeDto {
         this.trdFinProductDealTempTotal = trdFinProductDealTempTotal;
     }
 
-    public TrdDealTotalAdd getTrdDealTempTotalAdd() {
+    public TrdTempDealTotalAdd getTrdDealTempTotalAdd() {
         return trdDealTempTotalAdd;
     }
 
-    public void setTrdDealTempTotalAdd(TrdDealTotalAdd trdDealTempTotalAdd) {
+    public void setTrdDealTempTotalAdd(TrdTempDealTotalAdd trdDealTempTotalAdd) {
         this.trdDealTempTotalAdd = trdDealTempTotalAdd;
     }
 

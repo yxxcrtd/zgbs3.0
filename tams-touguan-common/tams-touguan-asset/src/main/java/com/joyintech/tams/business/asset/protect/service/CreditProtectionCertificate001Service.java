@@ -55,6 +55,20 @@ public class CreditProtectionCertificate001Service extends BaseService implement
         pageParam.put("finprodIdList", StringUtil.splitToList(null, request.getFinprodIdAbrr()));
         pageParam.put("refSec", StringUtil.splitToList(null, request.getRefSec())); //参考债项
 
+        if(StringUtils.isNotEmpty((String)pageParam.get("search"))){
+            Map<String, Object> params = new HashMap<>();
+            params.put("finprodType2", DictCodeListExt1.金融产品类型_债券.getValue());
+            params.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
+            params.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+            params.put("search",pageParam.get("search"));
+            List<String> refList = creditProtectionCertificateMapper.getRefNameList(params);
+            String refSec = refList.stream().map(String::valueOf).collect(Collectors.joining(","));
+            if(CollectionUtils.isNotEmpty (refList)){
+                pageParam.put("search", refSec); //参考债项
+            }
+        }
+
+
         Page<CreditProtectionCertificateDto> page
                 =  super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),
                 () -> creditProtectionCertificateMapper.queryForPage(pageParam));

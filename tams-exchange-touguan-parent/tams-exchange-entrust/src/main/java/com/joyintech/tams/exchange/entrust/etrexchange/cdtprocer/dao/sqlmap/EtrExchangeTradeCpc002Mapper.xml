@@ -508,6 +508,7 @@
             select
             mcmi.SECID SECID, max(mcmi.CDATE) MAXCDATE
             from MST_CREDIT_MARKET_INFO mcmi
+            where mcmi.VALUE_SOURCE = 'CSD'
             group by mcmi.SECID
             ) maxmcmi
             on FP.FINPROD_MARKET_ID = maxmcmi.SECID
