@@ -734,7 +734,7 @@
             Joyin.error("券面总额与组合分配处的券面总额不一致")
             return false;
         }
-        if(riskFlag === 1) {
+        if(riskFlag === 1 && ps != 'T03') {
             Joyin.error("请先点击风险试算")
             return false;
         }
@@ -1050,6 +1050,8 @@
         query("#matureYieldDiv").hide();
         query("#exerYieldDiv").hide();
         query("#priceModel").attr("disabled", true);
+        query("#riskTrialRet_div").hide();
+        query("#CfetsEtrIbBondinfo003_btn_riskcal").hide();
         layui.form.render();
     }
     if(ps == 'T01' || ps == 'T02') {
