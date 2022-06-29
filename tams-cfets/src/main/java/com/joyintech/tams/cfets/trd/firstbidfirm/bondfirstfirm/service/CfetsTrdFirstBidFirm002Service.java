@@ -3610,11 +3610,18 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         if (!StringUtil.isNotEmpty(dto.getTotalBiddingNum())) {
             errorList.add(new ValidMessage(errorInfo + "汇总投标券面总额不可为空!"));
         }
+        if (StringUtil.isNotEmpty(dto.getTotalBiddingNum())
+                && StringUtil.isNotEmpty(dto.getEtrBidPriceTotal())
+                && BigDecimalUtil.ACompareToB(dto.getTotalBiddingNum(), dto.getEtrBidPriceTotal(), 2) > 0) {
+            errorList.add(new ValidMessage(errorInfo + "汇总投标券面总额必须小于等于指令投标券面总额汇总!"));
+
+        }
         // 调整策略
         if (!StringUtil.isNotEmpty(dto.getAdjustStrategy())) {
             errorList.add(new ValidMessage(errorInfo + "调整策略不可为空!"));
 //            errorList.add(new ValidMessage(getMessage("COMMON_NOTEMPTY_003", errorInfo,"调整策略")));
         }
+        BigDecimal totalBiddingNum = BigDecimal.ZERO;
         for (CfetsTrdFirstBidFirmProductDto item : dto.getProductDtos()) {
             // 指令代码
             if (!StringUtil.isNotEmpty(item.getEntrustId())) {
@@ -3631,6 +3638,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                     || BigDecimalUtil.ACompareToB(item.getTotalBiddingNum(), item.getEtrBidPriceTotal(), 4) > 0) {
                 // 投标产品列表中汇总投标券面总额要小于等于指令投标券面总额
                 errorList.add(new ValidMessage("投标产品列表中汇总投标券面总额必须大于等于0，小于等于指令投标券面总额!"));
+            } else {
+                totalBiddingNum = ArithmeticUtil.doAdd(totalBiddingNum, item.getTotalBiddingNum());
             }
             // 指令投标券面总额
             if (!StringUtil.isNotEmpty(item.getEtrBidPriceTotal())) {
@@ -3648,6 +3657,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             if (!StringUtil.isNotEmpty(item.getInvManagerName())) {
                 errorList.add(new ValidMessage("投标产品列表中投资经理不可为空!"));
             }
+        }
+        if (BigDecimalUtil.ACompareToB(totalBiddingNum, dto.getTotalBiddingNum(), 2) != 0) {
+            errorList.add(new ValidMessage("投标产品列表中汇总投标券面总额需要等于基本信息中汇总投标券面总额!"));
         }
         return errorList;
     }
