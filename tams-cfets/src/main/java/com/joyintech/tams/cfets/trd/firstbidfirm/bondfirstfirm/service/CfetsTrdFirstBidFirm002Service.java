@@ -615,10 +615,12 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         if (StringUtil.isNotEmpty(bidModel)) {
             cfetsTrdFirstBidFirmInfoDto.setBiddingMethod(bidModel);
         }
-        if (StringUtil.equals(bidModel, DictCodeListExt4.投标方式_分销买入.getValue())) {
-            cfetsTrdFirstBidFirmInfoDto.setIsFx(DictCodeList.是否_是.getValue());
-        } else {
-            cfetsTrdFirstBidFirmInfoDto.setIsFx(DictCodeList.是否_否.getValue());
+        if(StringUtil.isNotEmpty(cfetsTrdFirstBidFirmInfoDto.getIsFx())) {
+            if (StringUtil.equals(bidModel, DictCodeListExt4.投标方式_分销买入.getValue())) {
+                cfetsTrdFirstBidFirmInfoDto.setIsFx(DictCodeList.是否_是.getValue());
+            } else {
+                cfetsTrdFirstBidFirmInfoDto.setIsFx(DictCodeList.是否_否.getValue());
+            }
         }
         cfetsTrdFirstBidFirmInfoDto.setTradeDate(iPlatformDate.getSysDate());
         //  自主投标和代投代缴
