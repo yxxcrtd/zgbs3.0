@@ -1165,7 +1165,6 @@
         group by t0.BID_ID) bobp
         ON bobp.BID_ID = bo.BID_ID
         WHERE TFPDT.TRADE_STATUS = '01'
-        AND tpd.TRADE_STATUS = '01'
         <if test="entrustId != null and entrustId != ''">
             AND tpda.entrust_id = #{entrustId}
         </if>
@@ -1272,7 +1271,6 @@
         group by t0.BID_ID) bobp
         ON bobp.BID_ID = bo.BID_ID
         WHERE TFPDT.TRADE_STATUS = '01'
-        AND tpd.TRADE_STATUS = '01'
         <if test="entrustId != null and entrustId != ''">
             AND tpda.entrust_id = #{entrustId}
         </if>) T
@@ -1357,7 +1355,6 @@
         left join sys_user mcct on mcct.user_name = bo.OUR_TRADER
         left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
         WHERE 1=1
-        AND tpd.TRADE_STATUS = '01'
         <if test="entrustId != null and entrustId != ''">
             AND tpda.entrust_id = #{entrustId}
         </if>
@@ -1409,7 +1406,6 @@
         left join sys_user mcct on mcct.user_name = bo.OUR_TRADER
         left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fp.ISSUER
         WHERE 1=1
-        AND tpd.TRADE_STATUS = '01'
         <if test="entrustId != null and entrustId != ''">
             AND tpda.entrust_id = #{entrustId}
         </if>) T
@@ -1730,7 +1726,6 @@
             left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
         WHERE tpda.entrust_id = #{entrustId}
           AND tfpdt.TRADE_STATUS = '01'
-          AND tpd.TRADE_STATUS = '01'
         union all
         SELECT
             #{TRADE_FLOW_STATUS01} effectFlag,
@@ -1851,8 +1846,7 @@
             on bo.BID_ID = bobp2.BID_ID
             left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = bo.FINPROD_ID
         WHERE tpda.entrust_id = #{entrustId}
-          AND tfpdt.TRADE_STATUS = '01'
-          AND tpd.TRADE_STATUS = '01') T
+          AND tfpdt.TRADE_STATUS = '01') T
         ORDER BY T.updateTime DESC
 
     </select>
@@ -3038,19 +3032,19 @@
     <select id="queryTrade2Touguan" resultMap="TradeResultMap" parameterType="java.lang.String">
  	SELECT DISTINCT A.*, EE.ENTRUST_TYPE, <!--PP.PORTFOLIO_NAME,--> SCI.ACCT_NAME  ACCOUNT_NAME
 	  FROM (
-	  SELECT decode(TT.INSTRUCTION_ID, NULL, TTH.INSTRUCTION_ID)   INSTRUCTION_ID,
-			 STD.APPLY_TRADE_ID                                    ENTRUST_ID,
-			 STD.CJBH                                              BROKER_TRADE_ID,
-			 STD.TRADE_MARKET                                      MARKET,
-			 FP.FINPROD_MARKET_ID                                  STOCK_CODE,
-			 FP.FINPROD_ABBR                                       STOCK_NAME,
-			 DECODE(TT.PS, NULL, TTH.PS)                           ENTRUST_BS,
-			 DECODE(TT.TRADED_VOLUME, NULL, TTH.TRADED_VOLUME)     TRADED_VOLUME,
-			 DECODE(TT.TRADED_PRICE, NULL, TTH.TRADED_PRICE)       TRADED_PRICE,
-			 DECODE(TT.TRADED_BALANCE, NULL, TTH.TRADED_BALANCE)   TRADED_BALANCE,
-			 DECODE(TT.TRADING_DAY, NULL, TTH.TRADING_DAY)         TRADING_DAY,
-             TO_CHAR(DECODE(TT.CREATE_TIME, NULL, TTH.CREATE_TIME),'HH24:Mi:ss')                  TRADE_TIME,
-             TT.CREATE_TIME CREATE_TIME,
+	  SELECT  decode(TT.INSTRUCTION_ID, NULL, DECODE(TTH.INSTRUCTION_ID,NULL,DECODE(tdta.ENTRUST_ID,NULL,tpda.ENTRUST_ID,tdta.ENTRUST_ID),TTH.INSTRUCTION_ID), TT.INSTRUCTION_ID)   INSTRUCTION_ID,
+            STD.APPLY_TRADE_ID                                    ENTRUST_ID,
+            STD.CJBH                                              BROKER_TRADE_ID,
+            STD.TRADE_MARKET                                      MARKET,
+            FP.FINPROD_MARKET_ID                                  STOCK_CODE,
+            FP.FINPROD_ABBR                                       STOCK_NAME,
+            DECODE(TT.PS, NULL, DECODE(TTH.PS,NULL,std.ps,TTH.ps), TT.PS) ENTRUST_BS,
+            DECODE(TT.TRADED_VOLUME, NULL, DECODE(TTH.TRADED_VOLUME,NULL,std.SHARE_AMT,TTH.TRADED_VOLUME), TT.TRADED_VOLUME)     TRADED_VOLUME,
+            DECODE(TT.TRADED_PRICE, NULL, DECODE(TTH.TRADED_PRICE,NULL,std.UNIT_FPRICE,TTH.TRADED_PRICE), TT.TRADED_PRICE)       TRADED_PRICE,
+            DECODE(TT.TRADED_BALANCE, NULL, DECODE(TTH.TRADED_BALANCE,NULL,std.TRADE_AMT,TTH.TRADED_BALANCE),TT.TRADED_BALANCE)   TRADED_BALANCE,
+            DECODE(TT.TRADING_DAY, NULL, DECODE(TTH.TRADING_DAY,NULL,TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'),TTH.TRADING_DAY), TT.TRADING_DAY)         TRADING_DAY,
+            TO_CHAR(DECODE(TT.CREATE_TIME, NULL, DECODE(TTH.CREATE_TIME,NULL,std.CREATE_TIME,TTH.CREATE_TIME),TT.CREATE_TIME),'HH24:Mi:ss') TRADE_TIME,
+            TT.CREATE_TIME CREATE_TIME,
 			 CASE
 			   WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
 			   WHEN STD.DELIVERY_RESULT = '01'  THEN '正常交收'
@@ -3069,10 +3063,21 @@
 		LEFT JOIN T_TRADE TT ON (TT.BROKER_TRADE_ID = STD.CJBH AND TT.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TT.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD') AND TT.TRADE_TYPE = '0')
 		LEFT JOIN T_TRADEHISTORY TTH ON (TTH.BROKER_TRADE_ID = STD.CJBH AND TTH.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TTH.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
 		LEFT JOIN FIN_PRODUCT FP ON STD.FINPROD_ID = FP.FINPROD_ID
+        LEFT JOIN ( SELECT te.TRADE_ID, wm_concat ( te.ENTRUST_ID )  ENTRUST_ID
+                    FROM (SELECT A.ENTRUST_ID, sttm.TRADE_ID from SETTLE_TRANS_TG_MAPPING sttm
+                    LEFT JOIN RD_FIN_PRODUCT_DEAL_TOTAL tfpdt ON sttm.TRADE_ID_TG = tfpdt.TOTLE_TRADE_ID
+                    LEFT JOIN TRD_DEAL_TOTAL_ADD A ON tfpdt.TOTLE_TRADE_ID = A.TOTLE_TRADE_ID
+                    )te group by te.TRADE_ID  ) tdta on STD.TRADE_ID = tdta.TRADE_ID
+        LEFT JOIN ( SELECT te.TRADE_ID, wm_concat ( te.ENTRUST_ID )  ENTRUST_ID
+                    FROM ( SELECT sttm1.TRADE_ID, a.ENTRUST_ID FROM SETTLE_TRANS_TG_MAPPING sttm1
+                    LEFT JOIN TRD_PRODUCT_DEAL tpd ON sttm1.TRADE_ID_TG = tpd.TRADE_ID
+                    LEFT JOIN TRD_PRODUCT_DEAL_ADD a ON a.TRADE_ID = tpd.TRADE_ID
+                    )te group by te.TRADE_ID) tpda ON STD.TRADE_ID = tpda.TRADE_ID
 	   WHERE STD.DELIVERY_RESULT IN ('01', '02', '03', '05')
 		 AND ((STD.PS = 'T56' AND STD.TRADE_MARKET = '03' AND STD.BUSI_SCENE_CALSS NOT IN ('0902RB02', '0902RS03'))
                 OR (STD.PS = 'T56' AND STD.TRADE_MARKET = '04') OR (STD.PS != 'T56'))
-	  UNION
+            AND ( STD.SETTLE_SPEED = '0' OR STD.SETTLE_SPEED IS NULL )
+        UNION
 	  SELECT TT.INSTRUCTION_ID                                     INSTRUCTION_ID,
 			 TT.BROKER_ENTRUST_ID                                  ENTRUST_ID,
 			 TT.BROKER_TRADE_ID                                    BROKER_TRADE_ID,
@@ -3112,8 +3117,8 @@
 		 AND TT.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD')
 		 AND ((STD.PS = 'T56' AND STD.TRADE_MARKET = '03' AND STD.BUSI_SCENE_CALSS NOT IN ('0902RB02', '0902RS03'))
                 OR (STD.PS = 'T56' AND STD.TRADE_MARKET = '04') OR (STD.PS != 'T56'))
-        <!-- 信用保护凭证新家逻辑-->
-        AND ( STD.SETTLE_SPEED = '0' OR STD.SETTLE_SPEED IS NULL ) UNION
+	    UNION
+        <!-- 信用保护凭证逻辑-->
         SELECT
             tpda.ENTRUST_ID INSTRUCTION_ID,
             NULL ENTRUST_ID,
@@ -3148,9 +3153,86 @@
             AND tpd.FINPROD_TYPE2 = 'F37'
             AND tpd.PS = 'T04'
             AND tpd.TRADE_DATE &lt; to_date(#{sysDate},'yyyy-mm-dd')
+        <!--新增处理T+1场景的通知及对应结果-->
+        UNION
+        SELECT
+            tdta.ENTRUST_ID INSTRUCTION_ID,
+            std1.APPLY_TRADE_ID ENTRUST_ID,
+            std1.CJBH BROKER_TRADE_ID,
+            CASE
+                WHEN std1.TRADE_MARKET = '03' THEN '上海证券交易所'
+                WHEN std1.TRADE_MARKET = '04' THEN '深圳证券交易所'
+                ELSE NULL
+            END MARKET,
+            fp.FINPROD_MARKET_ID STOCK_CODE,
+            fp.FINPROD_ABBR STOCK_NAME,
+            std1.PS ENTRUST_BS,
+            std1.SHARE_AMT TRADED_VOLUME,
+            std1.CPRICE_AMT TRADED_PRICE,
+            std1.FPRICE_AMT TRADED_BALANCE,
+            TO_CHAR(std1.TRADE_DATE, 'YYYY-MM-DD' ) TRADING_DAY,
+            TO_CHAR(std1.CREATE_TIME, 'HH24:Mi:ss' ) TRADE_TIME,
+            std1.CREATE_TIME CREATE_TIME,
+            CASE
+                WHEN std1.DELIVERY_RESULT = #{DELIVERY_RESULT_05} AND std2.DELIVERY_RESULT IS NULL THEN #{DELIVERY_RESULT_04}
+                WHEN std1.DELIVERY_RESULT = #{DELIVERY_RESULT_05} AND std2.DELIVERY_RESULT IS NOT NULL THEN std2.DELIVERY_RESULT
+                ELSE std1.DELIVERY_RESULT
+            END DELIVERY_RESULT,
+            CASE
+                WHEN std1.DELIVERY_RESULT != #{DELIVERY_RESULT_05} THEN '100'
+                ELSE std2.SHARE_AMT / std1.SHARE_AMT || '%'
+            END DELIVERY_SCHEDULE,
+            std1.ACCT_NO ACCT_ACCOUNT
+        FROM
+            SETTLE_TRANS_DATA std1
+        LEFT JOIN
+            SETTLE_TRANS_DATA std2 ON std1.APPLY_TRADE_ID = std2.APPLY_TRADE_ID
+            AND std1.CJBH = std2.CJBH
+            AND std1.SEC_ACCT_ID = std2.SEC_ACCT_ID
+            AND std1.SEAT_NUMBER = std2.SEAT_NUMBER
+            AND std1.SETTLE_DATE = std2.SETTLE_DATE
+        LEFT JOIN
+            FIN_PRODUCT fp ON std1.FINPROD_ID = fp.FINPROD_ID
+        LEFT JOIN
+            SETTLE_TRANS_TG_MAPPING sttm ON std1.TRADE_ID = sttm.TRADE_ID
+        LEFT JOIN
+            TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt ON sttm.TRADE_ID_TG = tfpdt.TOTLE_TRADE_ID
+        LEFT JOIN
+            TRD_DEAL_TOTAL_ADD tdta ON tfpdt.TOTLE_TRADE_ID = tdta.TOTLE_TRADE_ID
+        WHERE
+            std1.DELIVERY_RESULT = #{DELIVERY_RESULT_05}
+            AND std2.DELIVERY_RESULT != #{DELIVERY_RESULT_05}
         ) A
 	  LEFT JOIN STL_CAPACCT_INFO SCI ON A.ACCT_ACCOUNT = SCI.ACCT_NO
 	  LEFT JOIN ETR_ENTRUST EE ON A.INSTRUCTION_ID = EE.ENTRUST_ID
+        LEFT JOIN (
+            SELECT
+                EED.ENTRUST_ID,
+                wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
+                wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
+                wm_concat (EED.SEC_ACCT_ID) AS SEC_ACCT_ID,
+                wm_concat (sci.ACCT_NO) AS ACCT_NO,
+                wm_concat (sci.ACCT_NAME) AS ACCT_NAME
+            FROM
+                ETR_ENTRUST_DETAIL EED
+            left join
+                (
+                    select
+                        PORTFOLIO_ID,
+                        PORTFOLIO_NAME
+                    from
+                        PTL_PORTFOLIO
+                    order by
+                        PORTFOLIO_ID,
+                        PORTFOLIO_NAME
+                ) FP on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
+            LEFT JOIN
+                STL_SEC_ACCT_INFO ssai ON EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
+            LEFT JOIN
+                STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
+            GROUP BY
+                EED.ENTRUST_ID
+        ) detail ON A.INSTRUCTION_ID = detail.ENTRUST_ID
         <!-- LEFT JOIN ETR_ENTRUST_DETAIL EED ON EE.ENTRUST_ID = EED.ENTRUST_ID
         LEFT JOIN PTL_PORTFOLIO PP ON EED.PORTFOLIO_ID = PP.PORTFOLIO_ID -->
       WHERE A.INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR}
