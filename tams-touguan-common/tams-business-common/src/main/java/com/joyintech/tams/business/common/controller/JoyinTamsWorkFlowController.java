@@ -185,7 +185,7 @@ public class JoyinTamsWorkFlowController  {
 			if(e.getCause() instanceof MessageException){
 				AjaxResult ajaxResult = new AjaxResult();
 				MessageException messageException =  (MessageException) e.getCause();
-				if(messageException.getMessageType()!=null&&StringUtil.equals("confirm",messageException.getMessageType().getCode())){
+				if (messageException.getMessageType() != null && StringUtil.equals("confirm", messageException.getMessageType().getCode())) {
 					ajaxResult.setMessageType(MessageType.确认消息);
 					ajaxResult.setData(messageException.getMessage());
 					return new Message<AjaxResult>().success().setData(ajaxResult);

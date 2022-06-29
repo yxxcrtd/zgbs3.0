@@ -3180,7 +3180,7 @@
             END DELIVERY_RESULT,
             CASE
                 WHEN std1.DELIVERY_RESULT != #{DELIVERY_RESULT_05} THEN '100'
-                ELSE std2.SHARE_AMT / std1.SHARE_AMT || '%'
+                ELSE std2.SHARE_AMT / std1.SHARE_AMT * 100 || ''
             END DELIVERY_SCHEDULE,
             std1.ACCT_NO ACCT_ACCOUNT
         FROM

@@ -1071,11 +1071,18 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     }
                 }
             }
-            posport.setCashAmount(productDto.getPayAmt());
-            posport.setSecAmount(productDto.getActWinPrinamt());
-            if (StringUtil.isNotEmpty(productDto.getActWinPrinamt())) {
-                posport.setOwnSecAmount(productDto.getActWinPrinamt().toString());
+            if(!StringUtil.isNotEmpty(productDto.getWinCprice())) {
+                posport.setCashAmount(BigDecimal.ZERO);
+                posport.setSecAmount(BigDecimal.ZERO);
+                posport.setOwnSecAmount("0");
                 posport.setIntegrateSecAmount("0");
+            }else {
+                posport.setCashAmount(productDto.getPayAmt());
+                posport.setSecAmount(productDto.getActWinPrinamt());
+                if (StringUtil.isNotEmpty(productDto.getActWinPrinamt())) {
+                    posport.setOwnSecAmount(productDto.getActWinPrinamt().toString());
+                    posport.setIntegrateSecAmount("0");
+                }
             }
             ptlList.add(posport);
         }
@@ -1191,7 +1198,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     stlPayOrder.setMyAcctNo(acctId);
                     stlPayOrder.setOrderId(entity.getBidId());
                     stlPayOrder.setCcy(finProduct.getCcy());
-                    stlPayOrder.setSettleAmt(deal.getSettFeeAmt());
+                    stlPayOrder.setSettleAmt(deal.getPayAmt());
                     stlPayOrder.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
                     stlPayOrder.setPs(DictCodeListExt1.收支方向_支出.getValue());
                     stlPayOrder.setSettleDate(iPlatformDate.getSysDate());
