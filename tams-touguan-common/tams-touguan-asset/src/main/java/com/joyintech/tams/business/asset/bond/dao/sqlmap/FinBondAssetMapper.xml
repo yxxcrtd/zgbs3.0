@@ -1290,7 +1290,7 @@
     </delete>
 
     <delete id="deleteFinCashCalcRule">
-        delete from FIN_CASH_CALC_RULE where FINPROD_ID =#{finprodId} and IS_INITIAL = 'Y'
+        delete from FIN_CASH_CALC_RULE where FINPROD_ID =#{finprodId}
     </delete>
 
     <delete id="deleteFinCashPayRule">
