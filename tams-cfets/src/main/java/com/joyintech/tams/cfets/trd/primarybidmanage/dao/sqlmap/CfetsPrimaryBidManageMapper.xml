@@ -32,18 +32,20 @@
         FP.TRADE_MARKET tradeMarket,
         BO.COUNTER_ID counterId,
         MCP.COUNTER_NAME counterName,
+        BOBP.ACCT_NAME acctName,
         BOBP.REMARK remark
         FROM BID_ORDER BO
         LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN (
         SELECT BOBP.BID_ID,wm_concat(decode(FPI.TENDER_TARGET,'01',to_char(BOBP.BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BOBP.BID_PRICE,'fm999999990.9990')||'元','03',to_char(BOBP.BID_PRICE*10000,'fm999999990.90')||'BP')) BID_PRICE,
-               SUM(EEBP.BID_PRIN_AMT) ENTRUST_NUM,wm_concat(hisInfo.remark) REMARK
+               SUM(EEBP.BID_PRIN_AMT) ENTRUST_NUM,wm_concat(hisInfo.remark) REMARK,wm_concat(SCI.ACCT_NAME) ACCT_NAME
         from BID_ORDER_BID_PRICE BOBP
         LEFT JOIN ETR_ENTRUST EE ON BOBP.ENTRUST_ID = EE.ENTRUST_ID
         LEFT JOIN BID_ORDER BO ON BOBP.BID_ID = BO.BID_ID
         LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = BO.FINPROD_ID
         LEFT JOIN ETR_ENTRUST_BID_PRICE EEBP ON EEBP.ENTRUST_ID = BOBP.ENTRUST_ID AND BOBP.BID_PRICE = EEBP.BID_PRICE AND BOBP.PORTFOLIO_ID = EEBP.PORTFOLIO_ID
+        LEFT JOIN STL_CAPACCT_INFO SCI ON SCI.ACCT_NO = BOBP.ACCT_NO
         LEFT JOIN ( <include refid="com.joyintech.tams.common.base.dao.EtrEntrustOperHisMapper.selectHisInfo" />) hisInfo
         ON ee.ENTRUST_ID = hisInfo.ENTRUST_ID
         group by BOBP.BID_ID
@@ -141,7 +143,7 @@
         <if test="search != null and search != ''">
             <where>( sdl_otherEffectFlag.ITEM_VALUE || '|' || sdl_isWin.ITEM_VALUE || '|' || ss.finprodAbbr || '|' || ss.finprodMarketId || '|'
                 || '|' || ss.bidId || '|' || sdl_tp.ITEM_VALUE || '|' || sdl_tt.ITEM_VALUE || '|' || sdl_wt.ITEM_VALUE
-                || '|' || sdl_ept.ITEM_VALUE || '|' || ss.bidPrice || '|' || ss.counterName
+                || '|' || sdl_ept.ITEM_VALUE || '|' || ss.bidPrice || '|' || ss.counterName || '|' || ss.acctName
                 || '|' || ss.remark
                 like '%' || #{search} || '%'
                 or to_char(ss.bidPrinAmt)=#{search}
