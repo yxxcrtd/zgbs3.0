@@ -982,19 +982,11 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         // 交易生成的现金流水
         EtrCashPositionFlowDto etrCashPositionFlowDto = EtrCommonCashPositionDealService.getEtrCashPositionFlowDto(
                 finProductTradeDto);
-        etrCashPositionFlowDto.setOrderId(finProductTradeDto.getTrdProductDeal().getTotleTradeId());
+        etrCashPositionFlowDto.setOrderId(finProductTradeDto.getTrdProductDeal().getTotleTradeId() == null ? finProductTradeDto.getTrdProductDeal().getTradeId() : finProductTradeDto.getTrdProductDeal().getTotleTradeId());
         // 交易场所为一级市场且是交易所的交易，付款账户为托管户 add by 马数凯 20210430
         String 账号;
-        if (StringUtil.equals(finProductTradeDto.getTrdProductDeal().getTradeMarketMode(),DictCodeListExt1.交易市场_一级市场.getValue())
-                && (StringUtil.equals(finProductTradeDto.getTrdProductDeal().getTradeMarket(),DictCodeListExt1.交易场所_上海证券交易所.getValue())
-                || StringUtil.equals(finProductTradeDto.getTrdProductDeal().getTradeMarket(),DictCodeListExt1.交易场所_深圳证券交易所.getValue()))){
-            账号 = EtrCommonCashPositionDealService.select组合托管户(finProductTradeDto.getTrdProductDealAdd().getPortfolioId(), finProductTradeDto.getTrdProductDeal().getCcy(),DictCodeListExt2.资金账户类型_托管户.getValue());
-        }else{
-            账号 = gen账号(finProductTradeDto.getTrdProductDeal().getTradeMarket(),
-                    finProductTradeDto.getTrdProductDeal().getChlId(), finProductTradeDto.getTrdProductDealAdd().getPortfolioId(),
-                    finProductTradeDto.getTrdProductDeal().getCcy(), finProductTradeDto.getTrdProductDeal().getSecManageAcctId(),
-                    finProductTradeDto.getTrdProductDeal().getCounterId(),etrCashPositionFlowDto);
-        }
+        账号 = EtrCommonCashPositionDealService.select组合托管户(finProductTradeDto.getTrdProductDealAdd().getPortfolioId(), finProductTradeDto.getTrdProductDeal().getCcy(),DictCodeListExt2.资金账户类型_托管户.getValue());
+
         // 设置账号
         etrCashPositionFlowDto.setAcctId(账号);
         // 交易生效
@@ -1488,8 +1480,13 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
      */
     public static BigDecimal gen委托全价(String entrustId, Date dealDate, String tradePlace,EntrustCommonDto entrustCommons) {
         EntrustCommonDto entrustCommonDto = EtrCommonCashPositionDealService.findEntrust(entrustId);
+
         //产品化_债券二级指令 如果entrustCommonDto为空，则赋值为流程中的数据  add by zhangpei 20201119 start
         if(StringUtil.isNotEmpty(entrustCommonDto)){
+            //信用保护凭证直接取指令表价格
+            if(StringUtil.isNotEmpty(entrustCommonDto.getEtrEntrust()) && StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue(),entrustCommonDto.getEtrEntrust().getFinprodType2())){
+                return entrustCommonDto.getEtrEntrust().getPrice();
+            }
         	 if(!StringUtil.isNotEmpty(entrustCommonDto.getEtrEntrust())||!StringUtil.isNotEmpty(entrustCommonDto.getEtrEntrustAdd())){
                  if (null != entrustCommons) {
                      BeanUtil.copyPropertiesIgnoreNull(entrustCommonDto, entrustCommons);

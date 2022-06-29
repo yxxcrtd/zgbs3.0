@@ -17,10 +17,13 @@ import com.joyintech.batch.batchbase.exception.BatchException;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.invest.batch.common.util.BatchConstant;
+import com.joyintech.tams.invest.batch.creditoccup.processor.CreditOccupFirstProcessor;
 import com.joyintech.tams.invest.batch.creditoccup.processor.CreditOccupProcessor;
 import com.joyintech.tams.invest.batch.creditoccup.processor.CreditOccupSzProcessor;
+import com.joyintech.tams.invest.batch.creditoccup.reader.CreditOccupFirstReader;
 import com.joyintech.tams.invest.batch.creditoccup.reader.CreditOccupReader;
 import com.joyintech.tams.invest.batch.creditoccup.reader.CreditOccupSzReader;
+import com.joyintech.tams.invest.batch.creditoccup.writer.CreditOccupFirstWriter;
 import com.joyintech.tams.invest.batch.creditoccup.writer.CreditOccupSzWriter;
 import com.joyintech.tams.invest.batch.creditoccup.writer.CreditOccupWriter;
 import org.slf4j.Logger;
@@ -70,6 +73,15 @@ public class CreditOccupTask extends BatchBaseService {
     private CreditOccupSzWriter step2Writer;
 
 
+    @Autowired
+    private CreditOccupFirstReader step3Reader;
+
+    @Autowired
+    private CreditOccupFirstProcessor step3Processor;
+
+    @Autowired
+    private CreditOccupFirstWriter step3Writer;
+
 
 
     /**
@@ -96,10 +108,16 @@ public class CreditOccupTask extends BatchBaseService {
         step1Writer.setParams(params);
         step2Reader.setParams(params);
         step2Processor.setParams(params);
+        step3Reader.setParams(params);
+        step3Processor.setParams(params);
 
         return batchBuilder.init(this).batch("step1", (BaseReader)step1Reader,
-            (BaseProcessor)step1Processor, (BaseWriter)step1Writer).batch("step2",(BaseReader)step2Reader,
-                        (BaseProcessor)step2Processor,step2Writer).builder(
+            (BaseProcessor)step1Processor, (BaseWriter)step1Writer)
+                .batch("step2",(BaseReader)step2Reader,
+                        (BaseProcessor)step2Processor,step2Writer)
+                .batch("step3",(BaseReader)step3Reader,
+                        (BaseProcessor)step3Processor,step3Writer)
+                .builder(
                     this.getBatchTask().getBeanName() + this.getBatchTask().getTaskId()).run();
     }
 
