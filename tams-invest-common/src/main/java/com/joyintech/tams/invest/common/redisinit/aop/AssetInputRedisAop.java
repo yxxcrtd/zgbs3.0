@@ -144,6 +144,7 @@ public class AssetInputRedisAop {
                                 condp.setDel(false);
                                 condp.setLoadOffset(true);
                                 condp.setIsUpdParVal(true);
+                                condp.setSource("asset");
                                 condp.setCondList(Arrays.asList(finProduct.getFinprodId()));
                                 Set<String> fields = new HashSet<>();
                                 for(IParam iParam:params.get(RedisKeyEnum.指标参数配置.key()).values()) {

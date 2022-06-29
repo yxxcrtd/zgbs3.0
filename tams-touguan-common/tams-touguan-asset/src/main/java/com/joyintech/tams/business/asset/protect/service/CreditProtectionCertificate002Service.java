@@ -48,6 +48,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -693,66 +694,5 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
      */
     public int checkAssertOnDealed(String finprodId) {
         return creditProtectionCertificateMapper.checkAssertOnDealed(finprodId);
-    }
-
-    public void downloadFileInfo(String seqNo, HttpServletResponse response) throws FileNotFoundException {
-        ServletOutputStream out = null;
-        FileInputStream ips = null;
-        try {
-            //获取文件存放的路径
-            SysUploadFileInfo fileInfo = joyinFSMapper.selectByPrimaryKey(seqNo);
-            File file = new SafelyFile(fileInfo.getPath());
-            String fileName=fileInfo.getFileName();
-            //获取到文字 数据库里对应的附件名字加上老的文件名字：filename 截取到后面的文件类型 例：txt 组成一个新的文件名字：newFileName
-            if(!file.exists()) {
-                //如果文件不存在就跳出
-                return;
-            }
-            ips = new FileInputStream(file);
-            response.reset();
-//            response.setContentType("multipart/form-data");
-            response.setContentType("application/octet-stream");
-            //为文件重新设置名字，采用数据库内存储的文件名称
-//            response.addHeader("Content-Disposition", "attachment; fileName=\"" + new String(fileName.getBytes("UTF-8"),"ISO8859-1") + "\"");
-            response.addHeader("Content-Disposition",
-                    "attachment;filename=" + new String(fileName.getBytes()));
-            response.addHeader("Content-Length", "" + file.length());
-            out = response.getOutputStream();
-            //读取文件流
-            int len = 0;
-            byte[] buffer = new byte[1024 * 10];
-            while ((len = ips.read(buffer)) != -1){
-                out.write(buffer,0,len);
-            }
-            out.flush();
-        }catch (Exception e){
-        }finally {
-            try {
-                out.close();
-                ips.close();
-            } catch (IOException e) {
-                System.out.println("关闭流出现异常");
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private MultipartFile createMultipartFile(File file) {
-        try {
-            FileItem fileItem = null;
-            MultipartFile multipartFile = null;
-            fileItem = new DiskFileItem(file.getName(), Files.probeContentType(file.toPath()),
-                    false, file.getName(), (int) file.length(), file.getParentFile());
-            InputStream input = new FileInputStream(file);
-            OutputStream os = fileItem.getOutputStream();
-            IOUtils.copy(input, os);
-            multipartFile = new CommonsMultipartFile(fileItem);
-            os.close();
-            input.close();
-            return multipartFile;
-        } catch (Exception e) {
-            e.getStackTrace();
-            throw new RuntimeException("File转MultipartFile失败");
-        }
     }
 }
