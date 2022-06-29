@@ -3226,8 +3226,10 @@
                 T7.SEC_ACCT_NAME secManageAcctIdStr,
                 CASE WHEN FPI.ISSUE_CLASS IN (#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN BO.WIN_PRIN_AMT/10000
                      WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN BO.SUBSCRIPTION_AMOUNT/10000 END faceValue,
-                case WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN to_char(FPI.REFER_YIELD*100,'fm999999990.9990')||'%'
-                     when BO.BID_MODLE IS NULL THEN TO_CHAR(ROUND(TFPDT.RATE,4), 'FM990.0000')
+                case
+                     when BO.BID_MODLE IS NULL THEN ( case when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
+                                                            then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0)||'BP'
+                                                            else to_char(fpi.REFER_YIELD*100,'FM999999999990.9990') end )
                      when BO.BID_MODLE=#{WIN_TYPE_03} THEN decode(FPI.TENDER_TARGET,'01',to_char(BO.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BO.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BO.WIN_PRICE*10000,'fm999999990.90')||'BP')
                      when BO.BID_MODLE IN(#{WIN_TYPE_01},#{WIN_TYPE_02}) THEN decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP') END tradeYield,
                 null termDays,
@@ -3278,6 +3280,7 @@
             LEFT JOIN SYS_DATADICT_LIST sdl7 on sdl7.dict_code ='CCY' and sdl7.item_code = TFPDT.ccy
             LEFT JOIN MST_COUNTER_PARTY T6 ON TFPDT.COUNTER_ID = T6.COUNTER_ID
             LEFT JOIN STL_SEC_ACCT_INFO T7 ON TFPDT.SEC_MANAGE_ACCT_ID = T7.SEC_ACCT_ID
+            left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
             WHERE TFPDT.TRADE_STATUS = #{TRADE_STATUS_01}
               AND	TFPDT.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F32}
               AND	FP.TRADE_MARKET IN (#{TRADE_PLACE_01},#{TRADE_PLACE_02})
@@ -5224,7 +5227,10 @@
             mci.CUSTOMER_NAME issuer,
             T1.CCY ccy,
             fpi.ISSUE_PRICE  issuePrice,
-            fpi.REFER_YIELD  rate,
+            case
+                when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
+                    then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0)||'BP'
+                else to_char(fpi.REFER_YIELD*100,'FM999999999990.9990')||'%' end rateStr,
             T1.SHARE_AMT*100  subAmt,
             T1.TRADE_AMT payAmt,
             T1.FEE_AMT settleFeeAmt,
@@ -5242,6 +5248,8 @@
         LEFT JOIN SYS_USER T10 ON T10.USER_NAME = T1.TRADER
         LEFT JOIN sys_datadict_list sdl
         ON sdl.dict_code = 'DISTRIBUTION' and sdl.item_code = bo.DIP_TYPE
+        left join FIN_PRODUCT fp on fp.FINPROD_ID = T1.FINPROD_ID
+        left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
         WHERE T1.TRADE_STATUS = #{TRADE_STATUS_01}
         <if test="tradeId != null and tradeId != ''">
             AND T1.TOTLE_TRADE_ID IN (SELECT TOTLE_TRADE_ID FROM TRD_PRODUCT_DEAL WHERE TRADE_ID = #{tradeId})

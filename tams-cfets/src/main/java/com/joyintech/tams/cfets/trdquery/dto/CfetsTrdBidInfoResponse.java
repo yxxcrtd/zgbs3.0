@@ -195,7 +195,7 @@ public class CfetsTrdBidInfoResponse {
     @ApiModelProperty(name="rate",value="参考收益率")
     private BigDecimal rate;
 
-    @ApiModelProperty(name="rate",value="参考收益率")
+    @ApiModelProperty(name="rateStr",value="参考收益率")
     private String rateStr;
 
     @ApiModelProperty(name="rateYleid",value="票面利率")
