@@ -1,0 +1,1 @@
+update SYS_DATADICT_LIST set ITEM_VALUE = '一级投标确认-申购-成交确认' where DICT_CODE = 'COMMON_BUSINESS_TYPE'  and ITEM_CODE = 'TRD120'
