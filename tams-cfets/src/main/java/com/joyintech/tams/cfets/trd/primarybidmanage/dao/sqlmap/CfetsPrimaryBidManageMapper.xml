@@ -205,10 +205,12 @@
             BOBP.PORTFOLIO_ID   portfolioId,
             BOBP.ACCT_NO        acctNo,
             SCI.ACCT_NAME       acctName,
+            FPI.TENDER_TARGET   tenderTarget,
             pp.PORTFOLIO_NAME portfolioName,
             NVL(NVL(BOBP.THE_WIN_PRIN_AMT,0)/10000,TPD.SHARE_AMT) totalBidPrinamt,
             NVL(EEBP.BID_PRIN_AMT,0)/100 winPrinAmt,
             decode(FPI.TENDER_TARGET,'01',to_char(BOBP.BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BOBP.BID_PRICE,'fm999999990.9990')||'元','03',to_char(BOBP.BID_PRICE*10000,'fm999999990.90')||'BP')   winPrice,
+            BOBP.BID_PRICE bidPrice,
             BOBP.INV_AIM   invAim,
             BO.DIP_TYPE  dipType
         from BID_ORDER_BID_PRICE BOBP
