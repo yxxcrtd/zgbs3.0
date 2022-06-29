@@ -475,7 +475,7 @@
                 OR TO_CHAR(T.listingDate,'yyyy-MM-dd') ||''= #{search}
                 OR TO_CHAR(T.pledgeDeadlineDate,'yyyy-MM-dd') ||''= #{search}
                 <if test="refSearch != null and refSearch.size() > 0">
-                    <foreach collection="refSearch" item="item"  separator=",">
+                    <foreach collection="refSearch" item="item"  >
                         or T.refSec like '%'  || #{item} || '%'
                     </foreach>
                 </if>
