@@ -85,6 +85,10 @@ public class BaseEtrCashPositionCommServiceImpl extends BaseService implements B
 
         // 资产类型
         String finprodType = finProductTradeDto.getTrdProductDeal().getFinprodType2();
+        // 指令编号
+        if(finProductTradeDto.getTrdProductDealAdd() != null){
+            finProductTradeDto.setEntrustId(finProductTradeDto.getTrdProductDealAdd().getEntrustId());
+        }
         // 处理结果
         EtrPositionHoldDto etrPositionHoldDto = new EtrPositionHoldDto();
         // 持仓流水

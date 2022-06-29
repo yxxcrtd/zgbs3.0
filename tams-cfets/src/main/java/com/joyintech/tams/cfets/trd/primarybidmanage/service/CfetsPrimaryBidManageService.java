@@ -1509,8 +1509,6 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             return;
         }
         for (CfetsPrimaryBidManageSaveDetailDto detailDto : list) {
-            // 应计利息置为 0
-            detailDto.setIntAmt(BigDecimal.ZERO);
             // 判断是否中标
             if (tenderTargetFlag) {
                 // 中标指令列表范围：当【招标标的】为利率和利差时，【投标标位】小于等于基本信息中【中标标位】的指令中标。
@@ -1567,11 +1565,21 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             // if 分配明细.中标标位 != 待填补标位
             if (Objects.isNull(isJudgePrice)
                     && BigDecimalUtil.ACompareToB(toBeFilledPrice, detailDto.getBidPrice(), 6) != 0) {
-                this.clearDetailAmt(detailDto);
-            } else {
-                // 计算净价
-                detailDto.setWinCprice(this.calPrice(detailDto, request.getTenderTarget(), request.getFinprodMarketId(), request.getPayDate()));
+                // 理论中标券面总额
+                detailDto.setTheWinPrinamt(BigDecimal.ZERO);
+                // 实际中标券面总额
+                detailDto.setActWinPrinamt(BigDecimal.ZERO);
+                // 中标净价
+                detailDto.setWinCprice(BigDecimal.ZERO);
+                // 应计利息
+                detailDto.setIntAmt(BigDecimal.ZERO);
+                // 缴款金额
+                detailDto.setPayAmt(BigDecimal.ZERO);
+                // 结算服务费
+                detailDto.setSettFeeAmt(BigDecimal.ZERO);
             }
+            // 计算净价
+            detailDto.setWinCprice(this.calPrice(detailDto, request.getTenderTarget(), request.getFinprodMarketId(), request.getPayDate()));
         }
         if (CollectionUtils.isNotEmpty(toDoList)) {
             // 定义 剩余中标券面总额2 = 剩余中标券面总额
@@ -1718,7 +1726,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         int index = 0;
         for (CfetsPrimaryBidManageSaveDetailDto item : productDtos) {
             index++;
-            if(!StringUtil.isNotEmpty(item.getWinPrice())){
+            if(BigDecimalUtil.isZeroOrNull(item.getActWinPrinamt())){
                 continue;
             }
             //费用金额
@@ -1762,7 +1770,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 if (BigDecimalUtil.isZero(feeTailDifference)) {
                     break;
                 }
-                if(!StringUtil.isNotEmpty(item.getWinPrice())){
+                if(BigDecimalUtil.isZeroOrNull(item.getActWinPrinamt())){
                     if (feeSet.add(item.getEntrustId())) {
                         feeSize--;
                     }
@@ -1958,7 +1966,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             allocationDetails.get(0).setActWinPrinamt(ArithmeticUtil.doAdd(allocationDetails.get(0).getActWinPrinamt(), remainWinPrinamt));
             //更新中标净价、缴款金额、结算服务费
             for (CfetsPrimaryBidManageSaveDetailDto detailDto : request.getAllocationDetails()) {
-                if (StringUtil.isNotEmpty(detailDto.getWinPrice())) {
+                if (!BigDecimalUtil.isZeroOrNull(detailDto.getActWinPrinamt())) {
                     if (StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue()) ||
                             StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
                         if (StringUtil.isNotEmpty(finProduct.getCirculationCode())) {

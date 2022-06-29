@@ -210,10 +210,9 @@ public class FieldEtrInfoQueryController extends BaseController {
     public Message<Page<TradeQueryBean>> getEtrDispatcherDealListInfo(@RequestBody CommonSearchInfoRequest dto)
             throws Exception {
         try {
-            Page<TradeQueryBean> returnDto = fieldEtrInfoQueryService.getEtrDispatcherDealListInfo(dto);
-            if (Objects.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_信用保护凭证.getValue())
-                    || returnDto.getTotal() == 0 && CollectionUtils.isEmpty(returnDto.getRoot())) {
-                returnDto = fieldEtrInfoQueryService.getEtrDispatcherDealListInfoByExe(dto);
+            Page<TradeQueryBean> returnDto = fieldEtrInfoQueryService.getEtrDispatcherDealListInfoByExe(dto);
+            if (returnDto.getTotal() == 0 && CollectionUtils.isEmpty(returnDto.getRoot())) {
+                returnDto = fieldEtrInfoQueryService.getEtrDispatcherDealListInfo(dto);
             }
             return new Message<Page<TradeQueryBean>>().success().setData(returnDto);
         } catch (Exception e) {
