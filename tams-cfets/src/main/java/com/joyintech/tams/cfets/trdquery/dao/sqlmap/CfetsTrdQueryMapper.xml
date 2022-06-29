@@ -1158,7 +1158,7 @@
         ib.send_status as sendStatus,
         ib.quote_role_type as quoteRoleType,
         ib.ps as ps,
-        #{REG_ASSET_TYPE_01} as finprodType2,
+        CASE WHEN fpt.TYPE_9 = '01' THEN #{REG_ASSET_TYPE_04} ELSE  #{REG_ASSET_TYPE_01} END  AS finprodType2,
         ib.finprod_id as finprodId,
         fp.finprod_market_id as finprodMarketId,
         fp.finprod_abbr as finprodAbbr,
@@ -1188,6 +1188,7 @@
         from ibu_quote_bond ib
         left join fin_product fp
         on ib.finprod_id=fp.finprod_id
+        left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID  = fp.FINPROD_ID
         left join (
             select ibd.quote_id,ibd.cp_party_id as cp_party_id,mccic.PARTY_ABBR as PARTY_ABBR,
             nvl(su.TRADER_NAME,ibd.cp_trader) cp_trader,ibd.execid,
@@ -1275,9 +1276,6 @@
         </if>
         <if test="ps != null and !ps.equals('')">
             AND ib.ps=#{ps}
-        </if>
-        <if test="regAssetType != null and !regAssetType.equals('')">
-            AND #{REG_ASSET_TYPE_01}=#{regAssetType}
         </if>
         <if test="finprodIdList != null and finprodIdList.size() > 0">
             AND ib.finprod_id in
@@ -1394,9 +1392,6 @@
         <if test="ps != null and !ps.equals('')">
             AND ic.repo_ps=#{ps}
         </if>
-        <if test="regAssetType != null and !regAssetType.equals('')">
-            AND #{REG_ASSET_TYPE_02}=#{regAssetType}
-        </if>
         <if test="finprodIdList != null and finprodIdList.size() > 0">
             AND ic.term_type in
             <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
@@ -1432,7 +1427,7 @@
         ib.send_status as sendStatus,
         ib.quote_role_type as quoteRoleType,
         ib.ps as ps,
-        '01' as finprodType2,
+        CASE WHEN fpt.TYPE_9 = '01' THEN #{REG_ASSET_TYPE_04} ELSE  #{REG_ASSET_TYPE_01} END  AS finprodType2,
         ib.finprod_id as finprodId,
         fp.finprod_market_id as finprodMarketId,
         fp.finprod_abbr as finprodAbbr,
@@ -1462,6 +1457,7 @@
         from wfl_ibu_quote_bond2 ib
         left join fin_product fp
         on ib.finprod_id=fp.finprod_id
+        left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID  = fp.FINPROD_ID
         left join (
             select ibd.quote_id,ibd.cp_party_id as cp_party_id,mccic.PARTY_ABBR as PARTY_ABBR,
             nvl(su.TRADER_NAME,ibd.cp_trader) cp_trader,ibd.execid,
@@ -1550,9 +1546,6 @@
                   #{item}
               </foreach>
           </if>-->
-        <if test="regAssetType != null and !regAssetType.equals('')">
-            AND #{REG_ASSET_TYPE_01}=#{regAssetType}
-        </if>
         <if test="finprodIdList != null and finprodIdList.size() > 0">
             AND ib.finprod_id in
             <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
@@ -1597,7 +1590,7 @@
         ic.send_status as sendStatus,
         ic.quote_role_type as quoteRoleType,
         ic.repo_ps as ps,
-        '02' as finprodType2,
+        #{REG_ASSET_TYPE_02} as finprodType2,
         ic.term_type as finprodId,
         ic.term_type as finprodMarketId,
         null as finprodAbbr,
@@ -1671,9 +1664,6 @@
         <if test="ps != null and !ps.equals('')">
             AND ic.repo_ps=#{ps}
         </if>
-        <if test="regAssetType != null and !regAssetType.equals('')">
-            AND #{REG_ASSET_TYPE_02}=#{regAssetType}
-        </if>
         <if test="finprodIdList != null and finprodIdList.size() > 0">
             AND ic.term_type in
             <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
@@ -1712,6 +1702,9 @@
     </sql>
     <sql id="vagueQueryIbuWhere">
         <where>
+            <if test="regAssetType != null and !regAssetType.equals('')">
+                AND aaa.finprodType2 = #{regAssetType}
+            </if>
             <if test="quotationStateList != null and quotationStateList.size() > 0">
                 and  aaa.quotationState in
                 <foreach collection="quotationStateList" item="item" open="(" close=")" separator=",">

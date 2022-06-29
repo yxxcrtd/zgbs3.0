@@ -75,7 +75,7 @@ public class PositionUtil {
                     // 头寸返回对象
                     BaseMap data = JsonUtils.json2Object(arr[1], BaseMap.class);
 
-                    StringBuffer strb = new StringBuffer("【<br/>");
+                    StringBuffer strb = new StringBuffer("【");
                     Map responseMap_data = (Map) data.get("data");
                     if (responseMap_data != null){
                         List checkResults = (List) responseMap_data.get("checkResults");
