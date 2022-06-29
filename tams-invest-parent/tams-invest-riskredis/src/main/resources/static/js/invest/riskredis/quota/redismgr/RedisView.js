@@ -36,7 +36,7 @@
             ,{field:'field', title: 'RedisView.field', width:'23%'}
 			,{field:'value', title: 'RedisView.value', width:'43%',sort:false}
             ,{field:'operation', title: 'SysCommon.operation', type:'action', buttons: [{
-                text: '&#xe614;',
+                text: '&#xe669;',
                 clas: 'config',
                 title: '刷新'
             },{ text: '&#xe642;',ignore:true, clas: 'edit', title: '更新参数值' }]}
