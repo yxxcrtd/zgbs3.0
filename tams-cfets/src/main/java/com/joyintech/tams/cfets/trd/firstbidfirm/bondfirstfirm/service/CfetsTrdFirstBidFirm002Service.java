@@ -3725,6 +3725,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 && BigDecimalUtil.ACompareToB(dto.getSettFeeAmt(), BigDecimal.ZERO, 4) < 0) {
             errorList.add(new ValidMessage(errorInfo + "结算服务费必须大于等于0!"));
         }
+        BigDecimal settFeeAmt = BigDecimal.ZERO;
+        BigDecimal bidPriceTotal = BigDecimal.ZERO;
         for (CfetsTrdFirstBidFirmProductDto item : dto.getProductDtos()) {
             // 指令代码
             if (!StringUtil.isNotEmpty(item.getEntrustId())) {
@@ -3740,11 +3742,15 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             } else if (BigDecimalUtil.ACompareToB(item.getBidPriceTotal(), BigDecimal.ZERO, 4) <= 0
                     || BigDecimalUtil.ACompareToB(item.getBidPriceTotal(), item.getAvaNum(), 4) > 0) {
                 errorList.add(new ValidMessage("投标产品列表中券面总额必须大于0，小于等于剩余指令额度!"));
+            }else{
+                bidPriceTotal = ArithmeticUtil.doAdd(bidPriceTotal, item.getBidPriceTotal());
             }
             // 结算服务费
             if (StringUtil.isNotEmpty(item.getSettFeeAmt())
                     && BigDecimalUtil.ACompareToB(item.getSettFeeAmt(), BigDecimal.ZERO, 4) < 0) {
                 errorList.add(new ValidMessage("投标产品列表中结算服务费必须大于等于0!"));
+            } else {
+                settFeeAmt = ArithmeticUtil.doAdd(settFeeAmt, item.getSettFeeAmt());
             }
             // 交易金额
             if (!StringUtil.isNotEmpty(item.getTradeAmt())) {
@@ -3796,6 +3802,12 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             if (BigDecimalUtil.ACompareToB(etrAvaNum, item.getBidPriceTotal(), 6) < 0) {
                 errorList.add(new ValidMessage("指令【" + item.getEntrustId() + "】中组合【" + item.getPortfolioName() + "】剩余指令额度不足(存在流程中数据)!"));
             }
+        }
+        if (!isJys && BigDecimalUtil.ACompareToB(settFeeAmt, dto.getSettFeeAmt(), 4) != 0) {
+            errorList.add(new ValidMessage("标产品列表中结算服务费合计必须等于基本信息中结算服务费!"));
+        }
+        if (!isJys && BigDecimalUtil.ACompareToB(bidPriceTotal, dto.getBidPriceTotal(), 4) != 0) {
+            errorList.add(new ValidMessage("标产品列表中券面总额合计必须等于基本信息中券面总额!"));
         }
         return errorList;
     }

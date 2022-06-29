@@ -813,6 +813,7 @@
             BOBP.SEC_ACCT_ID secAcctId,
             stlinfo.sec_acct_name secManageAcctIdName,
             BOBP.ACCT_NO  acctNo,
+            sci.ACCT_NAME acctNoStr,
             EE.INV_MANAGER_ID invManagerId,
             SU.REAL_NAME invManagerName
         FROM BID_ORDER_BID_PRICE BOBP
@@ -821,6 +822,7 @@
         LEFT JOIN PTL_PORTFOLIO PP ON BOBP.PORTFOLIO_ID = PP.PORTFOLIO_ID
         left join stl_sec_acct_info stlinfo on BOBP.SEC_ACCT_ID = stlinfo.sec_acct_id
         LEFT JOIN SYS_USER SU ON EE.INV_MANAGER_ID = SU.USER_NAME
+        left join STL_CAPACCT_INFO sci on sci.ACCT_NO = BOBP.ACCT_NO
         WHERE BO.BID_ID = #{bidId}
     </select>
 
@@ -914,6 +916,7 @@
             stlinfo.sec_acct_name secManageAcctIdName,
             EE.INV_MANAGER_ID invManagerId,
             SU.REAL_NAME invManagerName,
+            sci.ACCT_NAME acctNoStr,
             BOBR.ACCT_NO   acctNo
         FROM BID_RESULT_DETAIL BRD
         LEFT JOIN BID_RESULT_TOTAL BRT ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
@@ -926,6 +929,7 @@
         LEFT JOIN PTL_PORTFOLIO PP ON BRD.PORTFOLIO_ID = PP.PORTFOLIO_ID
         left join stl_sec_acct_info stlinfo on BRD.SEC_ACCT_ID = stlinfo.sec_acct_id
         LEFT JOIN SYS_USER SU ON EE.INV_MANAGER_ID = SU.USER_NAME
+        left join STL_CAPACCT_INFO sci on sci.ACCT_NO = BOBR.ACCT_NO
         WHERE BRT.TOTAL_WIN_ID = #{totalWinId}
         UNION ALL
         SELECT
@@ -947,6 +951,7 @@
             stlinfo.sec_acct_name secManageAcctIdName,
             EE.INV_MANAGER_ID invManagerId,
             SU.REAL_NAME invManagerName,
+            sci.ACCT_NAME acctNoStr,
             BOBR.ACCT_NO   acctNo
         FROM WFL_BID_RESULT_DETAIL BRD
         LEFT JOIN WFL_BID_RESULT_TOTAL BRT ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
@@ -959,6 +964,7 @@
         LEFT JOIN PTL_PORTFOLIO PP ON BRD.PORTFOLIO_ID = PP.PORTFOLIO_ID
         left join stl_sec_acct_info stlinfo on BRD.SEC_ACCT_ID = stlinfo.sec_acct_id
         LEFT JOIN SYS_USER SU ON EE.INV_MANAGER_ID = SU.USER_NAME
+        left join STL_CAPACCT_INFO sci on sci.ACCT_NO = BOBR.ACCT_NO
         WHERE BRT.TOTAL_WIN_ID = #{totalWinId}
     </select>
 
@@ -1136,7 +1142,7 @@
     </select>
 
     <select id="getTrdFinProductDealTotalTemp" resultType="com.joyintech.tams.common.base.entity.TrdFinProductDealTotal">
-        SELECT <include refid="com.joyintech.tams.common.base.dao.TrdProductTempDealTotalMapper.Sql_All_Data" />
+        <include refid="com.joyintech.tams.common.base.dao.TrdProductTempDealTotalMapper.Sql_All_Data" />
         WHERE B_TRADE_ID = #{bTradeId}
     </select>
 
@@ -1148,7 +1154,7 @@
 
     <!-- 根据汇总交易编号查询交易信息 -->
     <select id="queryTrdProductDealTempByTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.TrdProductTempDealMapper.BaseResultMap">
-        select <include refid="com.joyintech.tams.common.base.dao.TrdProductTempDealMapper.Sql_All_Data" />
+        <include refid="com.joyintech.tams.common.base.dao.TrdProductTempDealMapper.Sql_All_Data" />
         where TOTLE_TRADE_ID = #{tradeId}
     </select>
 

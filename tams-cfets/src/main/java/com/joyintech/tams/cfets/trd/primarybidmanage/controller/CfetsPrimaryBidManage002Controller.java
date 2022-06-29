@@ -249,7 +249,7 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
      * @author jiangpeng
      * @date 2022/6/25 14:41
      */
-    @ApiOperation(value = "编辑明细中中标净价", notes = "编辑明细中中标净价")
+    @ApiOperation(value = "编辑明细中中标净价,应计利息", notes = "编辑明细中中标净价")
     @ResponseBody
     @PostMapping("/editWinCprice")
     public Message<CfetsPrimaryBidManageSaveRequest> editWinCprice(@RequestBody CfetsPrimaryBidManageSaveRequest request) {
