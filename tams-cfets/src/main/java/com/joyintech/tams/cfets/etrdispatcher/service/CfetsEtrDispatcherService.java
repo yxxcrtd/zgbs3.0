@@ -806,8 +806,8 @@ public class CfetsEtrDispatcherService extends BaseService {
                 if (StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_信用保护凭证.getValue()) ) {
                     response.setTradedVolume(ArithmeticUtil.divide(response.getTradedVolume(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                 }
-                if (response.getEntrustBs().equals(DictCodeListExt3.交易方向_质押券出库.getValue())
-                || response.getEntrustBs().equals(DictCodeListExt3.交易方向_质押券入库.getValue())) {
+                if (StringUtils.equals(response.getEntrustBs(),DictCodeListExt3.交易方向_质押券出库.getValue())
+                || StringUtils.equals(response.getEntrustBs(),DictCodeListExt3.交易方向_质押券入库.getValue())) {
                     response.setEntrustPrice(StringUtil.isNotEmpty(response.getEntrustPrice())?ArithmeticUtil.multiply(response.getEntrustPrice(),BigDecimal.valueOf(100)):null);
                     response.setTradedPrice(StringUtil.isNotEmpty(response.getTradedPrice())?ArithmeticUtil.multiply(response.getTradedPrice(),BigDecimal.valueOf(100)):null);
                 }

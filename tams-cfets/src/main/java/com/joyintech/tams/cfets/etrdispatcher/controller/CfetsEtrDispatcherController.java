@@ -214,9 +214,9 @@ public class CfetsEtrDispatcherController extends BaseController {
     public Message<Page<CfetsEtrDispatcherDealListInfoResponse>> getEtrDispatcherDealListInfo(@RequestBody CommonSearchInfoRequest dto)
             throws Exception {
         try {
-            Page<CfetsEtrDispatcherDealListInfoResponse> returnDto = cfetsEtrDispatcherService.getEtrDispatcherDealListInfo(dto);
+            Page<CfetsEtrDispatcherDealListInfoResponse> returnDto = cfetsEtrDispatcherService.getEtrDispatcherDealListInfoByExe(dto);
             if (returnDto.getTotal() == 0 && CollectionUtils.isEmpty(returnDto.getRoot())) {
-                returnDto = cfetsEtrDispatcherService.getEtrDispatcherDealListInfoByExe(dto);
+                returnDto = cfetsEtrDispatcherService.getEtrDispatcherDealListInfo(dto);
             }
             return new Message<Page<CfetsEtrDispatcherDealListInfoResponse>>().success().setData(returnDto);
         } catch (Exception e) {
