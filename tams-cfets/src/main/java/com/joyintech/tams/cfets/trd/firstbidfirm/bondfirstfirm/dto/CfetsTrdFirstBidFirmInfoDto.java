@@ -204,6 +204,9 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
     @ApiModelProperty(name = "editFeild", value = "编辑字段", example = "1 基本信息的汇总投标券面总额联动 2 汇总投标列表的投标标位联动")
     private String editFeild;
 
+    @ApiModelProperty(name = "productBackDtos", value = "投标产品备份列表")
+    private List<CfetsTrdFirstBidFirmProductDto> productBackDtos;
+
     private String rskApproval;
 
     public String getValidStatus() {
@@ -745,6 +748,14 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
 
     public void setRskApproval(String rskApproval) {
         this.rskApproval = rskApproval;
+    }
+
+    public List<CfetsTrdFirstBidFirmProductDto> getProductBackDtos() {
+        return productBackDtos;
+    }
+
+    public void setProductBackDtos(List<CfetsTrdFirstBidFirmProductDto> productBackDtos) {
+        this.productBackDtos = productBackDtos;
     }
 }
 

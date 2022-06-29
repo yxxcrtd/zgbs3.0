@@ -3065,7 +3065,7 @@
 		LEFT JOIN FIN_PRODUCT FP ON STD.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN ( SELECT te.TRADE_ID, wm_concat ( te.ENTRUST_ID )  ENTRUST_ID
                     FROM (SELECT A.ENTRUST_ID, sttm.TRADE_ID from SETTLE_TRANS_TG_MAPPING sttm
-                    LEFT JOIN RD_FIN_PRODUCT_DEAL_TOTAL tfpdt ON sttm.TRADE_ID_TG = tfpdt.TOTLE_TRADE_ID
+                    LEFT JOIN TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt ON sttm.TRADE_ID_TG = tfpdt.TOTLE_TRADE_ID
                     LEFT JOIN TRD_DEAL_TOTAL_ADD A ON tfpdt.TOTLE_TRADE_ID = A.TOTLE_TRADE_ID
                     )te group by te.TRADE_ID  ) tdta on STD.TRADE_ID = tdta.TRADE_ID
         LEFT JOIN ( SELECT te.TRADE_ID, wm_concat ( te.ENTRUST_ID )  ENTRUST_ID

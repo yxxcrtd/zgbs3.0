@@ -415,7 +415,20 @@
              }
             object.ptlAllocatios= ptlAllocations;
         }
-        Joyin.confirm("请确认是否要提交?",
+        //提交 走流程
+        if (operatorType === 'submit') {
+            Joyin.ajaxJson(basePath + 'cfets/bond/IbuQuoteBond002/checkByHome', object, function(result) {
+                Joyin.confirm(result.data, function () {
+                    WorkFlow.doSubmitList(basePath + 'cfets/bond/IbuQuoteBond002/save', object, "IbuQuoteBond002_btn_submit", "IbuQuoteBond002",
+                        function() {
+                            var index = window.parent.layer.getFrameIndex(window.name);
+                            window.parent.layer.close(index);
+                        })
+                });
+            })
+
+        }else{
+            Joyin.confirm("请确认是否要提交?",
             function() {
                 //保存 走流程
                 if (operatorType === 'save') {
@@ -433,16 +446,16 @@
                             window.parent.layer.close(index);
                         })
                 }
-                //提交 走流程
-                else if (operatorType === 'submit') {
-                    Joyin.ajaxJson(basePath + 'cfets/bond/IbuQuoteBond002/checkByHome', object, function(result1) {
-                        WorkFlow.doSubmitList(basePath + 'cfets/bond/IbuQuoteBond002/save', object, "IbuQuoteBond002_btn_submit", "IbuQuoteBond002",
-                            function() {
-                                var index = window.parent.layer.getFrameIndex(window.name);
-                                window.parent.layer.close(index);
-                        })
-                    })
-                }
+                // //提交 走流程
+                // else if (operatorType === 'submit') {
+                //     Joyin.ajaxJson(basePath + 'cfets/bond/IbuQuoteBond002/checkByHome', object, function() {
+                //         WorkFlow.doSubmitList(basePath + 'cfets/bond/IbuQuoteBond002/save', object, "IbuQuoteBond002_btn_submit", "IbuQuoteBond002",
+                //             function() {
+                //                 var index = window.parent.layer.getFrameIndex(window.name);
+                //                 window.parent.layer.close(index);
+                //         })
+                //     })
+                // }
                 //拒绝 不走流程
                 else if (operatorType === 'refuse'){
                     Joyin.ajaxJson(basePath + 'invest/bankuplink/bond/CfetsBondDealQuotedPrice004/saveData', object, function(result){
@@ -451,6 +464,7 @@
                     })
                 }
             })
+        }
     };
     /**
      * 计算金额相关
@@ -553,7 +567,7 @@
                     $('#settFeeAmt').val(result.data.settFeeAmt).trigger('blur');
                     entrustIdChangeFlag = false;
                 }
-            })
+            },false)
         }
     };
 
@@ -644,6 +658,8 @@
             $('#CfetsBondDealQuotedPrice004_unitInt').val($('#CfetsBondDealQuotedPrice004_unitIntEdit').val()).trigger('blur');
             if(!entrustIdChangeFlag){
                 calcAmt(null,'Y');
+                debugger;
+                autoAllocation();
             }
         });
         /**
@@ -664,9 +680,11 @@
             // 应计利息总额
             var intAmt = $('#CfetsBondDealQuotedPrice004_intAmt').val();
             //金额面板.应计利息 金额面板.应计利息总额/(券面总额（万元）*10000)*100
-            $('#CfetsBondDealQuotedPrice004_unitInt').val(JoyinMath.doDiv(intAmt, cpriceAmt, 2)).trigger('blur');;
+            $('#CfetsBondDealQuotedPrice004_unitInt').val(JoyinMath.doDiv(intAmt*100, cpriceAmt, 5)).trigger('blur');;
             //金额面板.全价=净价+应计利息
             $('#CfetsBondDealQuotedPrice004_unitFprice').val(JoyinMath.doAdd(unitCprice, unitInt, 2)).trigger('blur');;
+            debugger;
+            autoAllocation();
         });
     }
 
