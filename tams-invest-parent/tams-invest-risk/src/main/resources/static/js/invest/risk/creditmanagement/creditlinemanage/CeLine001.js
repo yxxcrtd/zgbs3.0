@@ -39,16 +39,16 @@
         
         cols:[
              {field:'creditTagId', width:50 ,visible: false}
-            ,{field:'creditTypeText', width:150 , title: 'CeLine001.creditType', sortField:'t.CREDIT_TYPE'}
-            ,{field:'creditTagName', width:200 , title: 'CeLine001.creditTagName', sortField:'t.CREDIT_TAG_NAME'}
+            ,{field:'creditTypeText', width:350 , title: 'CeLine001.creditType', sortField:'t.CREDIT_TYPE'}
+            ,{field:'creditTagName', width:400 , title: 'CeLine001.creditTagName', sortField:'t.CREDIT_TAG_NAME'}
             // ,{field:'deductRuleText', width:200 , title: 'CeLine001.deductRule', sortField:'t.DEDUCT_RULE'}
-            ,{field:'isPerpetualSecText', width:200 , title: 'CeLine001.isPerpetualSec', sortField:'t.IS_PERPETUAL_SEC'}
-            ,{field:'issueTypeText', width:200 ,title: 'CeLine001.issueType', sortField:'t.ISSUE_TYPE'}
+            // ,{field:'isPerpetualSecText', width:200 , title: 'CeLine001.isPerpetualSec', sortField:'t.IS_PERPETUAL_SEC'}
+            // ,{field:'issueTypeText', width:200 ,title: 'CeLine001.issueType', sortField:'t.ISSUE_TYPE'}
             ,{field:'creditUsingTypeText',visible: false,width:150 , title: 'CeLine001.creditUsingType', sortField:'t.CREDIT_USING_TYPE'}
-            ,{field:'isFxText',visible: false, width:150 ,title: 'CeLine001.isFx', sortField:'t.IS_FX'}           
+            ,{field:'isFxText',visible: false, width:150 ,title: 'CeLine001.isFx', sortField:'t.IS_FX'}
             ,{field:'curPairText',visible: false,width:150,  title: 'CeLine001.curPair', sortField:'t.CUR_PAIR'}
-            ,{field:'termValueStr',width:170 , title: 'CeLine001.termValue', sortField:'t.TERM_VALUE'}
-            ,{field:'riskRatio',width:150 ,  title: 'CeLine001.riskRatio', sortField:'t.RISK_RATIO'}
+            // ,{field:'termValueStr',width:170 , title: 'CeLine001.termValue', sortField:'t.TERM_VALUE'}
+            ,{field:'riskRatio',width:350 ,  title: 'CeLine001.riskRatio', sortField:'t.RISK_RATIO'}
             ,{field:'operation',width:150 , title: 'SysCommon.operation', type:'action', buttons: ['edit', 'delt']}
         ]
     });    
