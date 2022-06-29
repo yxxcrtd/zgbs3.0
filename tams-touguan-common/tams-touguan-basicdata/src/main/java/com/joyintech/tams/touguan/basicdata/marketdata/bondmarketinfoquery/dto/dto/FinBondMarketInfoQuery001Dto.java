@@ -625,12 +625,20 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
         return ztGradeResult;
     }
 
+    public String getZtGradeResultStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.评级结果, this.getZtGradeResult());
+    }
+
     public void setZtGradeResult(String ztGradeResult) {
         this.ztGradeResult = ztGradeResult;
     }
 
     public String getZtGradeOrgId() {
         return ztGradeOrgId;
+    }
+
+    public String getZtGradeOrgIdStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.评级机构, this.getZtGradeOrgId());
     }
 
     public void setZtGradeOrgId(String ztGradeOrgId) {
@@ -641,12 +649,21 @@ public class FinBondMarketInfoQuery001Dto extends BaseDto {
         return zxGradeResult;
     }
 
+    public String getZxGradeResultStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.评级结果, this.getZxGradeResult());
+    }
+
     public void setZxGradeResult(String zxGradeResult) {
         this.zxGradeResult = zxGradeResult;
     }
 
     public String getZxGradeOrgId() {
         return zxGradeOrgId;
+    }
+
+
+    public String getZxGradeOrgIdStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.评级机构, this.getZxGradeOrgId());
     }
 
     public void setZxGradeOrgId(String zxGradeOrgId) {

@@ -140,7 +140,7 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
      @ApiModelProperty(name="tradeMarket",value="交易场所（交易所）")
      private String tradeMarket;
 
-     /**结算服务费*/
+     /**应计利息*/
      @ApiModelProperty(name="intAmt",value="应计利息（元）")
      private BigDecimal intAmt;
 

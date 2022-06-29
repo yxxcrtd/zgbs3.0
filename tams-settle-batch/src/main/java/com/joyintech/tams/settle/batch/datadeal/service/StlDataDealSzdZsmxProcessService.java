@@ -7,6 +7,7 @@ import com.joyintech.tams.common.base.entity.SettleTransData;
 import com.joyintech.tams.common.base.entity.SzdZsmx;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.constant.DictCodeListStl;
 import com.joyintech.tams.settle.batch.datadeal.constant.StlDataDealProcessConstant;
 import com.joyintech.tams.settle.batch.datadeal.dto.StlDownDataDealOperatorDto;
@@ -94,7 +95,7 @@ public class StlDataDealSzdZsmxProcessService {
             // 交易方向
             settleTransData.setPs(StringUtil.equalsIgnoreCase(szdZsmx.getMxywlb(), StlDataDealProcessConstant.ZSMX_YWLB_ZS) ? DictCodeList.交易方向_税费缴税.getValue() : null);
             //交易结果
-            settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdZsmx.getJgdm()));
+            settleTransData.setDeliveryResult(DictCodeListExt4.交收结果_正常交收.getValue());
             // 成交编号
             String generate = IDGenerator.generate();
             settleTransData.setTradeId(generate);
