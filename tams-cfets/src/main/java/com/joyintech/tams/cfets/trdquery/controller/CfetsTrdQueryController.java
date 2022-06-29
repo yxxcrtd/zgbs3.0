@@ -435,7 +435,7 @@ public class CfetsTrdQueryController extends BaseController {
                 workFlowParameter.setPageId("CfetsTrdFirstBondInvestTrade002");
                 workFlowParameter.setElementId(this.getParam("elementId"));
                 workFlowParameter.setBusinessCode(totleTradeId);
-                workFlowParameter.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_申购_成交确认撤销.getValue());
+                workFlowParameter.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_申购_成交确认.getValue());
                 logger.debug("撤销数据{}",JsonUtils.object2Json(inputDto));
                 // 成交日期+资产简称+发行人+认购量
                 workFlowParameter.setComment((entity) -> WorkFlowUtil.concatComment(

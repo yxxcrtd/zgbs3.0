@@ -72,7 +72,11 @@ public interface CfetsPrimaryBidManageMapper {
 
 	List<TrdFinProductDealTotal> getTrdFinProductDealTotal(@Param("bTradeId") String bTradeId);
 
+	List<TrdFinProductDealTotal> getTrdFinProductDealTotalTemp(@Param("bTradeId") String bTradeId);
+
 	List<TrdProductDeal> queryTrdProductDealByTotleTradeId(@Param("tradeId") String tradeId);
+
+	List<TrdProductTempDeal> queryTrdProductDealTempByTotleTradeId(@Param("tradeId") String tradeId);
 
 	List<StlPayOrders> queryStlPayOrdersByTradeId(@Param("tradeId") String tradeId);
 
