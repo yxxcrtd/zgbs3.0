@@ -371,7 +371,6 @@ public class FinListedBondInfoQuery001Service extends BaseService {
                 } else {
                     finProductIssue.setTenderSdate(Objects.nonNull(finListedBondInfoQuery001Dto.getAdditionalTenderBeginDate()) ? DateUtil.parseDate(finListedBondInfoQuery001Dto.getAdditionalTenderBeginDate(), DateUtil.DEFAULT_DATETIME_FORMAT) : null);
                     finProductIssue.setTenderEdate(Objects.nonNull(finListedBondInfoQuery001Dto.getAdditionalTenderEndDate()) ? DateUtil.parseDate(finListedBondInfoQuery001Dto.getAdditionalTenderEndDate(), DateUtil.DEFAULT_DATETIME_FORMAT) : null);
-
                 }
             }
         } catch (ParseException e) {

@@ -455,7 +455,10 @@ public class CommonAutoCouponService extends BaseService {
                 if (DictCodeList.是否_是.getValue().equals(interfPayhsrcsecinfo.getCalloption()) || DictCodeList.是否_是.getValue().equals(interfPayhsrcsecinfo.getPutoption())) {
                     conceptType.add("06");
                 }
-                Joiner.on(",").join(conceptType);
+                String conceptTypeStr = Joiner.on(",").join(conceptType);
+                if(StringUtil.isNotBlank(conceptTypeStr)){
+                    finProductAdd.setConceptType(conceptTypeStr);
+                }
                 baseFinProductBaseInfoDto.setFinProductAdd(finProductAdd);
                 //new金融产品分类
                 FinProductType finProductType = new FinProductType();
