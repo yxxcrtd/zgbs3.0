@@ -556,7 +556,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             entrustIdList.add(item.getEntrustId());
         });
         param.put("entrustIdList", entrustIdList);
-        cfetsTrdFirstBidFirmInfoDto = this.dealInitData(param, null);
+        cfetsTrdFirstBidFirmInfoDto = this.dealInitData(param, null,null);
         logger.debug("初始化<投标确认>界面,结果:" + JsonUtils.object2Json(cfetsTrdFirstBidFirmInfoDto));
         return cfetsTrdFirstBidFirmInfoDto;
     }
@@ -577,7 +577,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             entrustIdList.add(item.getEntrustId());
         });
         param.put("entrustIdList", entrustIdList);
-        cfetsTrdFirstBidFirmInfoDto = this.dealInitData(param, cfetsTrdFirstBidFirmInfoDto.getBiddingMethod());
+        cfetsTrdFirstBidFirmInfoDto = this.dealInitData(param, cfetsTrdFirstBidFirmInfoDto.getBiddingMethod(),DictCodeList.是否_否.getValue());
         return cfetsTrdFirstBidFirmInfoDto;
     }
 
@@ -589,7 +589,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
      * @author jiangpeng
      * @date 2022/5/27 15:59
      */
-    private CfetsTrdFirstBidFirmInfoDto dealInitData(Map<String, Object> param, String bidModel) {
+    private CfetsTrdFirstBidFirmInfoDto dealInitData(Map<String, Object> param, String bidModel,String isFx) {
         CfetsTrdFirstBidFirmInfoDto cfetsTrdFirstBidFirmInfoDto = new CfetsTrdFirstBidFirmInfoDto();
         this.setParam(param);
         List<CfetsTrdFirstBidFirmInfoDto> list = cfetsTrdFirstBidFirm002Mapper.selectProductsInit(param);
@@ -615,8 +615,10 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         if (StringUtil.isNotEmpty(bidModel)) {
             cfetsTrdFirstBidFirmInfoDto.setBiddingMethod(bidModel);
         }
-        if(StringUtil.isNotEmpty(cfetsTrdFirstBidFirmInfoDto.getIsFx())) {
-            if (StringUtil.equals(bidModel, DictCodeListExt4.投标方式_分销买入.getValue())) {
+        if (StringUtil.isEmpty(cfetsTrdFirstBidFirmInfoDto.getIsFx())) {
+            if(StringUtil.isNotEmpty(isFx)){
+                cfetsTrdFirstBidFirmInfoDto.setIsFx(isFx);
+            }else if (StringUtil.equals(cfetsTrdFirstBidFirmInfoDto.getBiddingMethod(), DictCodeListExt4.投标方式_分销买入.getValue())) {
                 cfetsTrdFirstBidFirmInfoDto.setIsFx(DictCodeList.是否_是.getValue());
             } else {
                 cfetsTrdFirstBidFirmInfoDto.setIsFx(DictCodeList.是否_否.getValue());
