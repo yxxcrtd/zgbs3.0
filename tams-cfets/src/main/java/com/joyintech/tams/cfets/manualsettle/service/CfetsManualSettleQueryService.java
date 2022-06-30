@@ -355,6 +355,8 @@ public class CfetsManualSettleQueryService extends BaseService{
             // 查看页面表格不可编辑,不会有个性化配置
             List<CfgDataTableShow> infoForm4 = cfgDataTableMapper.getByPageCode(pageCode, dtCode, spcdCodeTemp + "ZBP", EFFERANGE_NO, USER_ID);
             List<PortIntFenPeiInfoDto> portIntFenPeiInfoDtoList = cfetsManualSettleMapper.findBidFirmPortIntFenPeiInfoList(pageParam);
+            respond.setWinPrinamt(portIntFenPeiInfoDtoList.stream().map(PortIntFenPeiInfoDto::getTheWinPrinamt).reduce(BigDecimal::add).get());
+            respond.setTotalBidPrinamt(portIntFenPeiInfoDtoList.stream().map(PortIntFenPeiInfoDto::getTotalBiddingNum).reduce(BigDecimal::add).get());
             BigDecimal etrBidPriceTotal = BigDecimal.ZERO;
             for (PortIntFenPeiInfoDto item : portIntFenPeiInfoDtoList) {
                 etrBidPriceTotal = ArithmeticUtil.doAdd(etrBidPriceTotal, item.getUnFinshAmt());

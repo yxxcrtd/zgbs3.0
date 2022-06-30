@@ -1319,6 +1319,10 @@ public class CfetsTrdQueryService extends BaseService {
             //表格组合分配data
             pageParam.put("totleTradeId", settleDto.getTotleTradeId());
             List<BidPortIntFenPeiInfoDto> portIntFenPeiInfoDtoList = cfetsTrdQueryMapper.findFxmrPortIntFenPeiInfoList(pageParam);
+            // 分配方式
+            List<CfgReadonlyFormShow> dipTypeForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, "03WP");
+            dataform.setDipType(SysDataUtil.getNameFromDataDict(DictCode.分配方式,  portIntFenPeiInfoDtoList.get(0).getDipType()));
+            resultData.put("CfetsTrdQueryBidInfo_dipTypeForm", dipTypeForm);
             resultData.put("CfetsTrdQueryBidInfo_dataform", dataform);
             resultData.put("CfetsTrdQueryBidInfo_datatablep", portIntFenPeiInfoDtoList);
             return resultData;
@@ -1374,6 +1378,10 @@ public class CfetsTrdQueryService extends BaseService {
             //表格组合分配data
             pageParam.put("totleTradeId", settleDto.getTotleTradeId());
             List<BidPortIntFenPeiInfoDto> portIntFenPeiInfoDtoList = cfetsTrdQueryMapper.findZztbPortIntFenPeiInfoList(pageParam);
+            dataform.setDipType(SysDataUtil.getNameFromDataDict(DictCode.中标方式, portIntFenPeiInfoDtoList.get(0).getDipType()));
+            // 分配方式
+            List<CfgReadonlyFormShow> dipTypeForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, "01WP");
+            resultData.put("CfetsTrdQueryBidInfo_dipTypeForm", dipTypeForm);
             resultData.put("CfetsTrdQueryBidInfo_dataform", dataform);
             resultData.put("CfetsTrdQueryBidInfo_datatablep", portIntFenPeiInfoDtoList);
             return resultData;
@@ -1644,15 +1652,15 @@ public class CfetsTrdQueryService extends BaseService {
             pageParam.put("TENDER_TARGET_03", DictCodeListExt4.招标标的_利差.getValue());
             //表单data
             CfetsTrdBidInfoResponse dataform = cfetsTrdQueryMapper.findFxmrManualSettleInfo(pageParam);
-            if (dataform != null) {
-                dataform.setDipType(SysDataUtil.getNameFromDataDict(DictCode.分配方式, dataform.getDipType()));
-            }
-
+            // 分配方式
+            List<CfgReadonlyFormShow> dipTypeForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, "03WP");
             //表格组合分配data
             pageParam.put("totleTradeId", settleDto.getTotleTradeId());
             List<BidPortIntFenPeiInfoDto> portIntFenPeiInfoDtoList = cfetsTrdQueryMapper.findFxmrPortIntFenPeiInfoList(pageParam);
+            dataform.setDipType(SysDataUtil.getNameFromDataDict(DictCode.分配方式,  portIntFenPeiInfoDtoList.get(0).getDipType()));
             resultData.put("CfetsTrdQueryBidInfo_dataform", dataform);
             resultData.put("CfetsTrdQueryBidInfo_datatablep", portIntFenPeiInfoDtoList);
+            resultData.put("CfetsTrdQueryBidInfo_dipTypeForm", dipTypeForm);
             return resultData;
         } else if (DictCodeListExt4.投标方式_自主投标.getValue().equals(settleDto.getBidModle())) {
             //基础信息
@@ -1703,14 +1711,16 @@ public class CfetsTrdQueryService extends BaseService {
             pageParam.put("TENDER_TARGET_03", DictCodeListExt4.招标标的_利差.getValue());
             //表单data
             CfetsTrdBidInfoResponse dataform = cfetsTrdQueryMapper.findZztbManualSettleInfo(pageParam);
-            if (dataform != null) {
-                dataform.setDipType(SysDataUtil.getNameFromDataDict(DictCode.调整策略, dataform.getDipType()));
-            }
+            dataform.setDipType(SysDataUtil.getNameFromDataDict(DictCode.调整策略, dataform.getDipType()));
             //表格组合分配data
             pageParam.put("totleTradeId", settleDto.getTotleTradeId());
             List<BidPortIntFenPeiInfoDto> portIntFenPeiInfoDtoList = cfetsTrdQueryMapper.findZztbPortIntFenPeiInfoList(pageParam);
+            dataform.setDipType(SysDataUtil.getNameFromDataDict(DictCode.中标方式, portIntFenPeiInfoDtoList.get(0).getDipType()));
+            // 分配方式
+            List<CfgReadonlyFormShow> dipTypeForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, "01WP");
             resultData.put("CfetsTrdQueryBidInfo_dataform", dataform);
             resultData.put("CfetsTrdQueryBidInfo_datatablep", portIntFenPeiInfoDtoList);
+            resultData.put("CfetsTrdQueryBidInfo_dipTypeForm", dipTypeForm);
             return resultData;
         } else if (DictCodeListExt3.头寸业务类型_债券一级申购.getValue().equals(settleDto.getTgBusiType())
                 && !StringUtil.isNotEmpty(settleDto.getBidModle())) {//一级申购
