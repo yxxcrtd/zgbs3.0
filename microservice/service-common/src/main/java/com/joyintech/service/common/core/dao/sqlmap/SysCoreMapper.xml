@@ -414,7 +414,8 @@
         CON_VDATE conVdate,
         CON_PRICE conPrice,
         REDEEM_PRICE redeemPrice,
-        RESALE_PRICE resalePrice
+        RESALE_PRICE resalePrice,
+        CITY_INVEST_SEC_CHB CITYINVESTSECCHB
 	FROM
 		INTERF_PAYHSRCSECINFO
 		where SECID = #{secid}
