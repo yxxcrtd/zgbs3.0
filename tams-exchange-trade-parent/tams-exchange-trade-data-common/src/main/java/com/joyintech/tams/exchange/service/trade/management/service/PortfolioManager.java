@@ -26,6 +26,7 @@ import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.InstructionDetail;
 import com.joyintech.tams.exchange.common.db.domain.PortfolioDetail;
 import com.joyintech.tams.exchange.common.dto.PortfolioInstructionContextDto;
+import com.joyintech.tams.exchange.common.dto.PositionCashSecRespDto;
 import com.joyintech.tams.exchange.common.enums.exchange.PortfolioDetailBusiTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
@@ -72,6 +73,7 @@ import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3
 public class PortfolioManager extends BaseService {
 
     public static final String AMOUNT = "amount";
+    public static final String FIELD = "field";
     /**
      * 日志对象
      */
@@ -361,13 +363,22 @@ public class PortfolioManager extends BaseService {
             for (PositionCashSecSingleResp item : positionCashSecSingleResps) {
                 List<BaseMap> baseMapList = item.getBaseMapList();
 
+                List<PositionCashSecRespDto> list = JsonUtils.getObjectListFromJson(JsonUtils.getJsonFromObject(baseMapList), PositionCashSecRespDto.class);
+                Map<String, PositionCashSecRespDto> map = list.stream().collect(Collectors.toMap(PositionCashSecRespDto::getField, o -> o));
+                PositionCashSecRespDto usableAmount = map.get("usableAmount");
+                PositionCashSecRespDto porUsableCash = map.get("porUsableCash");
+                PositionCashSecRespDto acctNoUsableCash = map.get("acctNoUsableCash");
+
                 infoResponse = new PortfolioInfoResponse();
                 infoResponse.setPortfolioId(item.getPortfolioId());
-                infoResponse.setProAvailablePositionT0((ObjectUtil.isNotNull(baseMapList.get(3).get(AMOUNT))) ? (BigDecimal) baseMapList.get(3).get(AMOUNT) : BigDecimal.ZERO);
+//                infoResponse.setProAvailablePositionT0((ObjectUtil.isNotNull(baseMapList.get(3).get(AMOUNT))) ? (BigDecimal) baseMapList.get(3).get(AMOUNT) : BigDecimal.ZERO);
+                infoResponse.setProAvailablePositionT0((ObjectUtil.isNotNull(usableAmount)) ? usableAmount.getAmount() : BigDecimal.ZERO);
                 infoResponse.setProAvailablePositionT1(BigDecimal.ZERO);
-                infoResponse.setProAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(0).get(AMOUNT))) ? (BigDecimal) baseMapList.get(0).get(AMOUNT) : BigDecimal.ZERO);
+//                infoResponse.setProAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(0).get(AMOUNT))) ? (BigDecimal) baseMapList.get(0).get(AMOUNT) : BigDecimal.ZERO);
+                infoResponse.setProAvailableCashT0((ObjectUtil.isNotNull(porUsableCash)) ? porUsableCash.getAmount() : BigDecimal.ZERO);
                 infoResponse.setProAvailableCashT1(BigDecimal.ZERO);
-                infoResponse.setSecManageAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(1).get(AMOUNT))) ? (BigDecimal) baseMapList.get(1).get(AMOUNT) : BigDecimal.ZERO);
+//                infoResponse.setSecManageAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(1).get(AMOUNT))) ? (BigDecimal) baseMapList.get(1).get(AMOUNT) : BigDecimal.ZERO);
+                infoResponse.setSecManageAvailableCashT0((ObjectUtil.isNotNull(acctNoUsableCash)) ? acctNoUsableCash.getAmount() : BigDecimal.ZERO);
                 infoResponse.setSecManageAvailableCashT1(BigDecimal.ZERO);
 
                 portfolioInfoResponseMap.put(infoResponse.getPortfolioId(), infoResponse);
@@ -634,13 +645,22 @@ public class PortfolioManager extends BaseService {
         PortfolioInfoResponse infoResponse;
         for (PositionCashSecSingleResp item : positionCashSecSingleResps) {
             List<BaseMap> baseMapList = item.getBaseMapList();
+            List<PositionCashSecRespDto> list = JsonUtils.getObjectListFromJson(JsonUtils.getJsonFromObject(baseMapList), PositionCashSecRespDto.class);
+            Map<String, PositionCashSecRespDto> map = list.stream().collect(Collectors.toMap(PositionCashSecRespDto::getField, o -> o));
+            PositionCashSecRespDto usableAmount = map.get("usableAmount");
+            PositionCashSecRespDto porUsableCash = map.get("porUsableCash");
+            PositionCashSecRespDto acctNoUsableCash = map.get("acctNoUsableCash");
+
             infoResponse = new PortfolioInfoResponse();
             infoResponse.setPortfolioId(item.getPortfolioId());
-            infoResponse.setProAvailablePositionT0((ObjectUtil.isNotNull(baseMapList.get(3).get(AMOUNT))) ? (BigDecimal) baseMapList.get(3).get(AMOUNT) : BigDecimal.ZERO);
+//                infoResponse.setProAvailablePositionT0((ObjectUtil.isNotNull(baseMapList.get(3).get(AMOUNT))) ? (BigDecimal) baseMapList.get(3).get(AMOUNT) : BigDecimal.ZERO);
+            infoResponse.setProAvailablePositionT0((ObjectUtil.isNotNull(usableAmount)) ? usableAmount.getAmount() : BigDecimal.ZERO);
             infoResponse.setProAvailablePositionT1(BigDecimal.ZERO);
-            infoResponse.setProAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(0).get(AMOUNT))) ? (BigDecimal) baseMapList.get(0).get(AMOUNT) : BigDecimal.ZERO);
+//                infoResponse.setProAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(0).get(AMOUNT))) ? (BigDecimal) baseMapList.get(0).get(AMOUNT) : BigDecimal.ZERO);
+            infoResponse.setProAvailableCashT0((ObjectUtil.isNotNull(porUsableCash)) ? porUsableCash.getAmount() : BigDecimal.ZERO);
             infoResponse.setProAvailableCashT1(BigDecimal.ZERO);
-            infoResponse.setSecManageAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(1).get(AMOUNT))) ? (BigDecimal) baseMapList.get(1).get(AMOUNT) : BigDecimal.ZERO);
+//                infoResponse.setSecManageAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(1).get(AMOUNT))) ? (BigDecimal) baseMapList.get(1).get(AMOUNT) : BigDecimal.ZERO);
+            infoResponse.setSecManageAvailableCashT0((ObjectUtil.isNotNull(acctNoUsableCash)) ? acctNoUsableCash.getAmount() : BigDecimal.ZERO);
             infoResponse.setSecManageAvailableCashT1(BigDecimal.ZERO);
 
             portfolioInfoResponseMap.put(infoResponse.getPortfolioId(), infoResponse);
