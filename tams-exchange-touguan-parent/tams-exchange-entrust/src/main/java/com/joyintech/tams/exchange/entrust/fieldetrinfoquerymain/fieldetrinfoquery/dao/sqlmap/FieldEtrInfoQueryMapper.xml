@@ -1715,12 +1715,21 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         LEFT JOIN BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND BO.BID_ID = tpdt.P_TOTLE_TRADE_ID
         LEFT JOIN ETR_ENTRUST ee ON tpda.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN (
-        SELECT
-        brd.ENTRUST_ID,
-        wm_concat ( brd.WIN_PRICE ) AS WIN_PRICE
-        FROM BID_RESULT_DETAIL brd
-        GROUP BY brd.ENTRUST_ID
-        ) brd ON brd.ENTRUST_ID = ee.ENTRUST_ID
+            SELECT
+            brd.ENTRUST_ID,
+            listagg(case
+            when fpi2.TENDER_TARGET = '01'
+            then to_char(brd.WIN_PRICE * 100, 'FM9999999999999990.9990')
+            when fpi2.TENDER_TARGET = '02'
+            then to_char(brd.WIN_PRICE, 'FM9999999999999990.9990')
+            when fpi2.TENDER_TARGET = '03'
+            then to_char(brd.WIN_PRICE * 10000, 'FM9999999999999990.90')
+            end, ',') within group (order by brd.ENTRUST_ID)  AS WIN_PRICE
+            FROM
+            BID_RESULT_DETAIL brd
+            LEFT JOIN ETR_ENTRUST ee2 ON ee2.ENTRUST_ID = brd.ENTRUST_ID
+            LEFT JOIN FIN_PRODUCT_ISSUE fpi2 ON fpi2.FINPROD_ID = ee2.FINPROD_ID
+            GROUP BY brd.ENTRUST_ID ) brd ON brd.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN (
         SELECT
         EED.ENTRUST_ID,
@@ -1766,12 +1775,21 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         tpdt.P_TOTLE_TRADE_ID
         LEFT JOIN ETR_ENTRUST ee ON tpda.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN (
-        SELECT
-        brd.ENTRUST_ID,
-        wm_concat ( brd.WIN_PRICE ) AS WIN_PRICE
-        FROM BID_RESULT_DETAIL brd
-        GROUP BY brd.ENTRUST_ID
-        ) brd ON brd.ENTRUST_ID = ee.ENTRUST_ID
+            SELECT
+            brd.ENTRUST_ID,
+            listagg(case
+            when fpi2.TENDER_TARGET = '01'
+            then to_char(brd.WIN_PRICE * 100, 'FM9999999999999990.9990')
+            when fpi2.TENDER_TARGET = '02'
+            then to_char(brd.WIN_PRICE, 'FM9999999999999990.9990')
+            when fpi2.TENDER_TARGET = '03'
+            then to_char(brd.WIN_PRICE * 10000, 'FM9999999999999990.90')
+            end, ',') within group (order by brd.ENTRUST_ID)  AS WIN_PRICE
+            FROM
+            BID_RESULT_DETAIL brd
+            LEFT JOIN ETR_ENTRUST ee2 ON ee2.ENTRUST_ID = brd.ENTRUST_ID
+            LEFT JOIN FIN_PRODUCT_ISSUE fpi2 ON fpi2.FINPROD_ID = ee2.FINPROD_ID
+            GROUP BY brd.ENTRUST_ID ) brd ON brd.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN (
         SELECT
         EED.ENTRUST_ID,
@@ -1816,12 +1834,21 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         LEFT JOIN BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND BO.BID_ID = tpdt.P_TOTLE_TRADE_ID
         LEFT JOIN ETR_ENTRUST ee ON tpda.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN (
-        SELECT
-        brd.ENTRUST_ID,
-        wm_concat ( brd.WIN_PRICE ) AS WIN_PRICE
-        FROM BID_RESULT_DETAIL brd
-        GROUP BY brd.ENTRUST_ID
-        ) brd ON brd.ENTRUST_ID = ee.ENTRUST_ID
+            SELECT
+            brd.ENTRUST_ID,
+            listagg(case
+            when fpi2.TENDER_TARGET = '01'
+            then to_char(brd.WIN_PRICE * 100, 'FM9999999999999990.9990')
+            when fpi2.TENDER_TARGET = '02'
+            then to_char(brd.WIN_PRICE, 'FM9999999999999990.9990')
+            when fpi2.TENDER_TARGET = '03'
+            then to_char(brd.WIN_PRICE * 10000, 'FM9999999999999990.90')
+            end, ',') within group (order by brd.ENTRUST_ID)  AS WIN_PRICE
+            FROM
+            BID_RESULT_DETAIL brd
+            LEFT JOIN ETR_ENTRUST ee2 ON ee2.ENTRUST_ID = brd.ENTRUST_ID
+            LEFT JOIN FIN_PRODUCT_ISSUE fpi2 ON fpi2.FINPROD_ID = ee2.FINPROD_ID
+            GROUP BY brd.ENTRUST_ID ) brd ON brd.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN (
         SELECT
         EED.ENTRUST_ID,
@@ -1977,11 +2004,14 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         bo.BID_MODLE       AS   biddingMethod/*投标方式*/,
         bo.PAY_DATE       AS   payDate/*缴款日*/,
 	    detail.ACCT_NAME  AS   accountName,
-        case
-           when fpi.TENDER_TARGET = '01' AND brd.WIN_PRICE IS NOT NULL then to_char(brd.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
-           when fpi.TENDER_TARGET = '02' AND brd.WIN_PRICE IS NOT NULL then to_char(brd.WIN_PRICE, 'FM9999999999999990.9990') || '元'
-           when fpi.TENDER_TARGET = '03' AND brd.WIN_PRICE IS NOT NULL then to_char(brd.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
-        end          AS    winPrice/*中标标位(成交价格)*/,
+        CASE
+				WHEN fpi.TENDER_TARGET = '01'
+				AND brd.WIN_PRICE IS NOT NULL THEN brd.WIN_PRICE || '%'
+				WHEN fpi.TENDER_TARGET = '02'
+				AND brd.WIN_PRICE IS NOT NULL THEN brd.WIN_PRICE || '元'
+				WHEN fpi.TENDER_TARGET = '03'
+				AND brd.WIN_PRICE IS NOT NULL THEN brd.WIN_PRICE || 'BP'
+        END AS winPrice /*中标标位(成交价格)*/,
         tpd.UPDATE_TIME updateTime
 
     </sql>
