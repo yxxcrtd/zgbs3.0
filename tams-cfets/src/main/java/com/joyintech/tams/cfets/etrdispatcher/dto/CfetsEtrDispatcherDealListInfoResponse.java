@@ -747,11 +747,11 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
     @ApiModelProperty(value = "成交数量")
     private BigDecimal tradedVolume;
 
-    
+
     @ApiModelProperty(value = "成交价格")
     private BigDecimal tradedPrice;
 
-    
+
     @ApiModelProperty(value = "成交金额")
     private BigDecimal tradedBalance;
 
@@ -796,16 +796,16 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
 
     @ApiModelProperty(value = "成交类别", hidden = true)
     private int tradeType;
- 
+
     @ApiModelProperty(value = "全价价格", hidden = true)
     private BigDecimal fullPrice;
- 
+
     @ApiModelProperty(value = "清算金额", hidden = true)
     private BigDecimal clearBalance;
 
     @ApiModelProperty(value = "成交时间", hidden = true)
     private String tradeTime;
- 
+
     @ApiModelProperty(value = "质押券折算比例", hidden = true)
     private BigDecimal discount;
 
@@ -848,7 +848,7 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
     }
 
     public String getBrokerEntrustId() {
-        return brokerEntrustId;
+        return brokerEntrustId == null ? this.entrustId : brokerEntrustId;
     }
 
     public void setBrokerEntrustId(String brokerEntrustId) {

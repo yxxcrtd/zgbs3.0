@@ -5,13 +5,12 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 /**
  * 中标结果维护信息DTO
@@ -279,7 +278,7 @@ public class CfetsPrimaryBidManageResponse {
     }
 
     public String getPayTypeStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.缴款方式, this.getPayType());
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.缴款方式, this.getPayType());
     }
 
     public void setPayTypeStr(String payTypeStr) {

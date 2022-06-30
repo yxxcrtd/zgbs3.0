@@ -3437,7 +3437,8 @@
             tot.remark,
             nvl(regAdd.CAL_MODE,ibuDet.CALCULATE_FIELD) as calMode,
             ''  bidId,
-            ''  bidModle
+            ''  bidModle,
+            tot.P_TOTLE_TRADE_ID otherId
         from trd_product_deal t1
         left join trd_product_deal_add t2 on t1.trade_id=t2.trade_id
         left join TRD_FIN_PRODUCT_DEAL_TOTAL tot on tot.TOTLE_TRADE_ID=t1.TOTLE_TRADE_ID
@@ -3588,7 +3589,8 @@
             tot.remark,
             nvl(regAdd.CAL_MODE,ibuDet.CALCULATE_FIELD) as calMode,
             ''  bidId,
-            ''  bidModle
+            ''  bidModle,
+            tot.P_TOTLE_TRADE_ID otherId
         from trd_product_deal t1
         left join trd_product_deal_add t2 on t1.trade_id=t2.trade_id
         left join TRD_FIN_PRODUCT_DEAL_TOTAL tot on tot.TOTLE_TRADE_ID=t1.TOTLE_TRADE_ID
@@ -3738,7 +3740,8 @@
             tot.remark,
             nvl(regAdd.CAL_MODE,ibuDet.CALCULATE_FIELD) as calMode,
             ''  bidId,
-            ''  bidModle
+            ''  bidModle,
+            tot.P_TOTLE_TRADE_ID otherId
         from trd_product_temp_deal t1
         left join trd_product_temp_deal_add t2 on t1.trade_id=t2.trade_id
         left join TRD_PRODUCT_TEMP_DEAL_TOTAL tot on tot.TOTLE_TRADE_ID=t1.TOTLE_TRADE_ID
@@ -3888,7 +3891,8 @@
         '' calMode,
         CASE WHEN FPI.ISSUE_CLASS IN(#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN BO.BID_ID
         WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN '' END  bidId,
-        BO.BID_MODLE  bidModle
+        BO.BID_MODLE  bidModle,
+        TFPDT.P_TOTLE_TRADE_ID otherId
         FROM  TRD_PRODUCT_DEAL TPD
         LEFT JOIN TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT
             ON TFPDT.TOTLE_TRADE_ID = TPD.TOTLE_TRADE_ID
