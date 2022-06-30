@@ -1712,41 +1712,13 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID = tpd.CHL_ID
         LEFT JOIN FIN_PRODUCT fp3 ON fp3.FINPROD_ID = FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID
         LEFT JOIN BID_RESULT_TOTAL BRT ON BRT.TOTAL_WIN_ID = tpdt.B_TRADE_ID AND BRT.STATUS ='01'
+        left join BID_RESULT_DETAIL brd on brd.ENTRUST_ID = tpda.ENTRUST_ID and brd.PORTFOLIO_ID = tpda.PORTFOLIO_ID
         LEFT JOIN BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND BO.BID_ID = tpdt.P_TOTLE_TRADE_ID
+        left join BID_ORDER_BID_PRICE bobp on bobp.PORTFOLIO_ID = tpda.PORTFOLIO_ID and bobp.BID_ID = tpdt.P_TOTLE_TRADE_ID
+        and bobp.ENTRUST_ID = tpda.ENTRUST_ID
+        left join STL_SEC_ACCT_INFO ssai2 on ssai2.SEC_ACCT_ID = bobp.SEC_ACCT_ID
+        LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
         LEFT JOIN ETR_ENTRUST ee ON tpda.ENTRUST_ID = ee.ENTRUST_ID
-        LEFT JOIN (
-            SELECT
-            brd.ENTRUST_ID,
-            listagg(case
-            when fpi2.TENDER_TARGET = '01'
-            then to_char(brd.WIN_PRICE * 100, 'FM9999999999999990.9990')
-            when fpi2.TENDER_TARGET = '02'
-            then to_char(brd.WIN_PRICE, 'FM9999999999999990.9990')
-            when fpi2.TENDER_TARGET = '03'
-            then to_char(brd.WIN_PRICE * 10000, 'FM9999999999999990.90')
-            end, ',') within group (order by brd.ENTRUST_ID)  AS WIN_PRICE
-            FROM
-            BID_RESULT_DETAIL brd
-            LEFT JOIN ETR_ENTRUST ee2 ON ee2.ENTRUST_ID = brd.ENTRUST_ID
-            LEFT JOIN FIN_PRODUCT_ISSUE fpi2 ON fpi2.FINPROD_ID = ee2.FINPROD_ID
-            GROUP BY brd.ENTRUST_ID ) brd ON brd.ENTRUST_ID = ee.ENTRUST_ID
-        LEFT JOIN (
-        SELECT
-        EED.ENTRUST_ID,
-        wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
-        wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
-        wm_concat (EED.SEC_ACCT_ID) AS SEC_ACCT_ID,
-        wm_concat (sci.ACCT_NO) AS ACCT_NO,
-        wm_concat (sci.ACCT_NAME) AS ACCT_NAME
-        FROM ETR_ENTRUST_DETAIL EED
-        left join
-        (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)
-        FP on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
-        LEFT JOIN STL_SEC_ACCT_INFO ssai ON
-        EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
-        LEFT JOIN STL_CAPACCT_INFO sci ON
-        sci.ACCT_NO = ssai.TRD_ACCT_ID
-        GROUP BY EED.ENTRUST_ID ) detail ON ee.ENTRUST_ID = detail.ENTRUST_ID
         WHERE
         ee.ENTRUST_ID = #{entrustId}
         AND (tpd.TRADE_ID in (SELECT TRADE_ID FROM TRD_PRODUCT_TEMP_DEAL_ADD WHERE ENTRUST_ID = #{entrustId})
@@ -1770,43 +1742,15 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         left join FIN_DEAL_PLEDGE on tpd.FINPROD_ID = FIN_DEAL_PLEDGE.FINPROD_ID
         LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID = tpd.CHL_ID
         LEFT JOIN FIN_PRODUCT fp3 ON fp3.FINPROD_ID = FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID
-        LEFT JOIN WFL_BID_RESULT_TOTAL BRT ON BRT.TOTAL_WIN_ID = tpdt.B_TRADE_ID AND BRT.STATUS ='01'
-        LEFT JOIN WFL_BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND BO.BID_ID =
+        LEFT JOIN BID_RESULT_TOTAL BRT ON BRT.TOTAL_WIN_ID = tpdt.B_TRADE_ID AND BRT.STATUS ='01'
+        left join BID_RESULT_DETAIL brd on brd.ENTRUST_ID = tpda.ENTRUST_ID and brd.PORTFOLIO_ID = tpda.PORTFOLIO_ID
+        LEFT JOIN BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND BO.BID_ID =
         tpdt.P_TOTLE_TRADE_ID
+        left join BID_ORDER_BID_PRICE bobp on bobp.PORTFOLIO_ID = tpda.PORTFOLIO_ID and bobp.BID_ID = tpdt.P_TOTLE_TRADE_ID
+        and bobp.ENTRUST_ID = tpda.ENTRUST_ID
+        left join STL_SEC_ACCT_INFO ssai2 on ssai2.SEC_ACCT_ID = bobp.SEC_ACCT_ID
+        LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
         LEFT JOIN ETR_ENTRUST ee ON tpda.ENTRUST_ID = ee.ENTRUST_ID
-        LEFT JOIN (
-            SELECT
-            brd.ENTRUST_ID,
-            listagg(case
-            when fpi2.TENDER_TARGET = '01'
-            then to_char(brd.WIN_PRICE * 100, 'FM9999999999999990.9990')
-            when fpi2.TENDER_TARGET = '02'
-            then to_char(brd.WIN_PRICE, 'FM9999999999999990.9990')
-            when fpi2.TENDER_TARGET = '03'
-            then to_char(brd.WIN_PRICE * 10000, 'FM9999999999999990.90')
-            end, ',') within group (order by brd.ENTRUST_ID)  AS WIN_PRICE
-            FROM
-            BID_RESULT_DETAIL brd
-            LEFT JOIN ETR_ENTRUST ee2 ON ee2.ENTRUST_ID = brd.ENTRUST_ID
-            LEFT JOIN FIN_PRODUCT_ISSUE fpi2 ON fpi2.FINPROD_ID = ee2.FINPROD_ID
-            GROUP BY brd.ENTRUST_ID ) brd ON brd.ENTRUST_ID = ee.ENTRUST_ID
-        LEFT JOIN (
-        SELECT
-        EED.ENTRUST_ID,
-        wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
-        wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
-        wm_concat (EED.SEC_ACCT_ID) AS SEC_ACCT_ID,
-        wm_concat (sci.ACCT_NO) AS ACCT_NO,
-        wm_concat (sci.ACCT_NAME) AS ACCT_NAME
-        FROM ETR_ENTRUST_DETAIL EED
-        left join
-        (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)
-        FP on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
-        LEFT JOIN STL_SEC_ACCT_INFO ssai ON
-        EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
-        LEFT JOIN STL_CAPACCT_INFO sci ON
-        sci.ACCT_NO = ssai.TRD_ACCT_ID
-        GROUP BY EED.ENTRUST_ID ) detail ON ee.ENTRUST_ID = detail.ENTRUST_ID
         WHERE
         ee.ENTRUST_ID = #{entrustId}
         AND (tpd.TRADE_ID in (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID = #{entrustId})
@@ -1831,41 +1775,13 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID = tpd.CHL_ID
         LEFT JOIN FIN_PRODUCT fp3 ON fp3.FINPROD_ID = FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID
         LEFT JOIN BID_RESULT_TOTAL BRT ON BRT.TOTAL_WIN_ID = tpdt.B_TRADE_ID AND BRT.STATUS ='01'
+        left join BID_RESULT_DETAIL brd on brd.ENTRUST_ID = tpda.ENTRUST_ID and brd.PORTFOLIO_ID = tpda.PORTFOLIO_ID
         LEFT JOIN BID_ORDER BO ON BO.TRADE_STATUS = '01' AND BO.IS_CANCEL = 'N' AND BO.BID_ID = tpdt.P_TOTLE_TRADE_ID
+        left join BID_ORDER_BID_PRICE bobp on bobp.PORTFOLIO_ID = tpda.PORTFOLIO_ID and bobp.BID_ID = tpdt.P_TOTLE_TRADE_ID
+        and bobp.ENTRUST_ID = tpda.ENTRUST_ID
+        left join STL_SEC_ACCT_INFO ssai2 on ssai2.SEC_ACCT_ID = bobp.SEC_ACCT_ID
+        LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
         LEFT JOIN ETR_ENTRUST ee ON tpda.ENTRUST_ID = ee.ENTRUST_ID
-        LEFT JOIN (
-            SELECT
-            brd.ENTRUST_ID,
-            listagg(case
-            when fpi2.TENDER_TARGET = '01'
-            then to_char(brd.WIN_PRICE * 100, 'FM9999999999999990.9990')
-            when fpi2.TENDER_TARGET = '02'
-            then to_char(brd.WIN_PRICE, 'FM9999999999999990.9990')
-            when fpi2.TENDER_TARGET = '03'
-            then to_char(brd.WIN_PRICE * 10000, 'FM9999999999999990.90')
-            end, ',') within group (order by brd.ENTRUST_ID)  AS WIN_PRICE
-            FROM
-            BID_RESULT_DETAIL brd
-            LEFT JOIN ETR_ENTRUST ee2 ON ee2.ENTRUST_ID = brd.ENTRUST_ID
-            LEFT JOIN FIN_PRODUCT_ISSUE fpi2 ON fpi2.FINPROD_ID = ee2.FINPROD_ID
-            GROUP BY brd.ENTRUST_ID ) brd ON brd.ENTRUST_ID = ee.ENTRUST_ID
-        LEFT JOIN (
-        SELECT
-        EED.ENTRUST_ID,
-        wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
-        wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
-        wm_concat (EED.SEC_ACCT_ID) AS SEC_ACCT_ID,
-        wm_concat (sci.ACCT_NO) AS ACCT_NO,
-        wm_concat (sci.ACCT_NAME) AS ACCT_NAME
-        FROM ETR_ENTRUST_DETAIL EED
-        left join
-        (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)
-        FP on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
-        LEFT JOIN STL_SEC_ACCT_INFO ssai ON
-        EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
-        LEFT JOIN STL_CAPACCT_INFO sci ON
-        sci.ACCT_NO = ssai.TRD_ACCT_ID
-        GROUP BY EED.ENTRUST_ID ) detail ON ee.ENTRUST_ID = detail.ENTRUST_ID
         WHERE
         ee.ENTRUST_ID = #{entrustId}
         AND (tpd.TRADE_ID in (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID = #{entrustId})
@@ -2003,15 +1919,13 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         bo.PAY_TYPE       AS   payType/*缴款方式*/,
         bo.BID_MODLE       AS   biddingMethod/*投标方式*/,
         bo.PAY_DATE       AS   payDate/*缴款日*/,
-	    detail.ACCT_NAME  AS   accountName,
-        CASE
-				WHEN fpi.TENDER_TARGET = '01'
-				AND brd.WIN_PRICE IS NOT NULL THEN brd.WIN_PRICE || '%'
-				WHEN fpi.TENDER_TARGET = '02'
-				AND brd.WIN_PRICE IS NOT NULL THEN brd.WIN_PRICE || '元'
-				WHEN fpi.TENDER_TARGET = '03'
-				AND brd.WIN_PRICE IS NOT NULL THEN brd.WIN_PRICE || 'BP'
-        END AS winPrice /*中标标位(成交价格)*/,
+	    sci.ACCT_NAME  AS   accountName,
+		case
+                    when brd.WIN_PRICE is null then null
+                    when fpi.TENDER_TARGET = '01' then to_char(brd.WIN_PRICE * 100, 'FM9999999999999990.9990') || '%'
+                    when fpi.TENDER_TARGET = '02' then to_char(brd.WIN_PRICE, 'FM9999999999999990.9990') || '元'
+                    when fpi.TENDER_TARGET = '03' then to_char(brd.WIN_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+        end              winPrice/*中标标位*/,
         tpd.UPDATE_TIME updateTime
 
     </sql>
