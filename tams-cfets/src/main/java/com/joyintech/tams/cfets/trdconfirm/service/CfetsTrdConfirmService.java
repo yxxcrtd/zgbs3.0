@@ -1547,7 +1547,8 @@ public class CfetsTrdConfirmService extends BaseService{
             // 分支序号 = 系统参数.分支序号固定值（和估值核算保持一致，0）
             finProductType.setBranch(Long.parseLong(CacheUtil.getSysParam(BussinessConstant.NOBRANCHNOVALUE)));
             // 分类6 = 画面.回购类型
-            finProductType.setType6(regDeal.getRepoType());
+//            finProductType.setType6(regDeal.getRepoType());
+            finProductType.setType6(DictCodeList.回购类型_质押式回购.getValue());
             // 分类7 = 画面.回购类型
             finProductType.setType7(regDeal.getPs());
             // 分类8 = 画面.回购类型
