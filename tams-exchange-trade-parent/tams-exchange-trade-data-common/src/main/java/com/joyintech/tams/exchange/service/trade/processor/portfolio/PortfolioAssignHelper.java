@@ -181,13 +181,18 @@ public class PortfolioAssignHelper {
             price = BigDecimal.valueOf(100L);
         }
 
-        // 历史明细
+        // 历史下单明细
         List<PortfolioDetail> portfolioDetails = portfolioDetailByManualMapper.selectListByInstructionAndBusiType(instructionId, busiType.getCode());
-        log.info("查询的历史组合分配明细：{}", portfolioDetails);
-        // 历史数量
+        // 历史撤单明细
+        List<PortfolioDetail> canselDetails = portfolioDetailByManualMapper.selectListByInstructionAndBusiType(instructionId, PortfolioDetailBusiTypeEnum.CANCEL.getCode());
+        log.info("查询的历史组合下单分配明细：{}", portfolioDetails);
+        log.info("查询的历史组合撤单分配明细：{}", canselDetails);
+        // 历史下单数量
         BigDecimal historyVolume = portfolioDetails.stream().map(PortfolioDetail::getTargetNum).reduce(BigDecimal.ZERO, BigDecimal::add);
+        // 历史撤单数量
+        BigDecimal canselVolume = canselDetails.stream().map(PortfolioDetail::getTargetNum).reduce(BigDecimal.ZERO, BigDecimal::add);
         // 订单数量
-        BigDecimal totalVolume = NumberUtil.add(orginVolume, historyVolume);
+        BigDecimal totalVolume = NumberUtil.add(orginVolume, historyVolume).subtract(canselVolume);
         //考虑最小交易数量修改
 //        BigDecimal totalVolume = NumberUtil.add(orginVolumeWithOutMinNum, historyVolume);
         // 指令委托数量

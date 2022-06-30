@@ -26,6 +26,7 @@ import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.InstructionDetail;
 import com.joyintech.tams.exchange.common.db.domain.PortfolioDetail;
 import com.joyintech.tams.exchange.common.dto.PortfolioInstructionContextDto;
+import com.joyintech.tams.exchange.common.dto.PositionCashSecRespDto;
 import com.joyintech.tams.exchange.common.enums.exchange.PortfolioDetailBusiTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
@@ -36,6 +37,7 @@ import com.joyintech.tams.exchange.common.response.PortfolioAllocationResponse;
 import com.joyintech.tams.exchange.common.response.PortfolioCalculateResponse;
 import com.joyintech.tams.exchange.common.response.PortfolioInfoResponse;
 import com.joyintech.tams.exchange.common.utils.*;
+import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailByManualMapper;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionDetailService;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
 import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioAssignHelper;
@@ -71,6 +73,7 @@ import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3
 public class PortfolioManager extends BaseService {
 
     public static final String AMOUNT = "amount";
+    public static final String FIELD = "field";
     /**
      * 日志对象
      */
@@ -95,6 +98,8 @@ public class PortfolioManager extends BaseService {
     private QuoteService quoteService;
     @Autowired
     private PortfolioAssignHelper portfolioAssignHelper;
+    @Autowired
+    private PortfolioDetailByManualMapper portfolioDetailByManualMapper;
 
 
     /**
@@ -358,13 +363,22 @@ public class PortfolioManager extends BaseService {
             for (PositionCashSecSingleResp item : positionCashSecSingleResps) {
                 List<BaseMap> baseMapList = item.getBaseMapList();
 
+                List<PositionCashSecRespDto> list = JsonUtils.getObjectListFromJson(JsonUtils.getJsonFromObject(baseMapList), PositionCashSecRespDto.class);
+                Map<String, PositionCashSecRespDto> map = list.stream().collect(Collectors.toMap(PositionCashSecRespDto::getField, o -> o));
+                PositionCashSecRespDto usableAmount = map.get("usableAmount");
+                PositionCashSecRespDto porUsableCash = map.get("porUsableCash");
+                PositionCashSecRespDto acctNoUsableCash = map.get("acctNoUsableCash");
+
                 infoResponse = new PortfolioInfoResponse();
                 infoResponse.setPortfolioId(item.getPortfolioId());
-                infoResponse.setProAvailablePositionT0((ObjectUtil.isNotNull(baseMapList.get(3).get(AMOUNT))) ? (BigDecimal) baseMapList.get(3).get(AMOUNT) : BigDecimal.ZERO);
+//                infoResponse.setProAvailablePositionT0((ObjectUtil.isNotNull(baseMapList.get(3).get(AMOUNT))) ? (BigDecimal) baseMapList.get(3).get(AMOUNT) : BigDecimal.ZERO);
+                infoResponse.setProAvailablePositionT0((ObjectUtil.isNotNull(usableAmount)) ? usableAmount.getAmount() : BigDecimal.ZERO);
                 infoResponse.setProAvailablePositionT1(BigDecimal.ZERO);
-                infoResponse.setProAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(0).get(AMOUNT))) ? (BigDecimal) baseMapList.get(0).get(AMOUNT) : BigDecimal.ZERO);
+//                infoResponse.setProAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(0).get(AMOUNT))) ? (BigDecimal) baseMapList.get(0).get(AMOUNT) : BigDecimal.ZERO);
+                infoResponse.setProAvailableCashT0((ObjectUtil.isNotNull(porUsableCash)) ? porUsableCash.getAmount() : BigDecimal.ZERO);
                 infoResponse.setProAvailableCashT1(BigDecimal.ZERO);
-                infoResponse.setSecManageAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(1).get(AMOUNT))) ? (BigDecimal) baseMapList.get(1).get(AMOUNT) : BigDecimal.ZERO);
+//                infoResponse.setSecManageAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(1).get(AMOUNT))) ? (BigDecimal) baseMapList.get(1).get(AMOUNT) : BigDecimal.ZERO);
+                infoResponse.setSecManageAvailableCashT0((ObjectUtil.isNotNull(acctNoUsableCash)) ? acctNoUsableCash.getAmount() : BigDecimal.ZERO);
                 infoResponse.setSecManageAvailableCashT1(BigDecimal.ZERO);
 
                 portfolioInfoResponseMap.put(infoResponse.getPortfolioId(), infoResponse);
@@ -428,18 +442,41 @@ public class PortfolioManager extends BaseService {
             }
         }
 
+        // 历史下单明细
+        List<PortfolioDetail> portfolioDetails = portfolioDetailByManualMapper.selectListByInstructionAndBusiType(instructionId, PortfolioDetailBusiTypeEnum.ORDER.getCode());
+        // 历史撤单明细
+        List<PortfolioDetail> canselDetails = portfolioDetailByManualMapper.selectListByInstructionAndBusiType(instructionId, PortfolioDetailBusiTypeEnum.CANCEL.getCode());
+
+        Map<String, List<PortfolioDetail>> map = portfolioDetails.stream().collect(Collectors.groupingBy(PortfolioDetail::getPortfolioId));
+        Map<String, List<PortfolioDetail>> canselMap = canselDetails.stream().collect(Collectors.groupingBy(PortfolioDetail::getPortfolioId));
+
         // 处理指令剩余数量、指令剩余金额
-        BigDecimal leftAmt = isVolume ? BigDecimal.ZERO : NumberUtil.sub(instruction.getEntrustAmt(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity());
-        long leftNum = isVolume ? NumberUtil.sub(instruction.getEntrustNum(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity()).longValue() : 0L;
-        boolean isFirstOrder = leftNum == instruction.getEntrustNum();
+//        BigDecimal leftAmt = isVolume ? BigDecimal.ZERO : NumberUtil.sub(instruction.getEntrustAmt(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity());
+//        long leftNum = isVolume ? NumberUtil.sub(instruction.getEntrustNum(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity()).longValue() : 0L;
         for (PortfolioCalculateResponse item : list) {
-            if (isFirstOrder) {
-                item.setInstructionLeftAmt(item.getInstructionTotalAmt());
-                item.setInstructionLeftNum(item.getInstructionTotalNum());
+            List<PortfolioDetail> details = map.get(item.getPortfolioId());
+            List<PortfolioDetail> cansels = canselMap.get(item.getPortfolioId());
+            //数量单
+            if (instruction.volumeInstruction()) {
+                // 历史下单数量
+                BigDecimal historyVolume = CollectionUtils.isEmpty(details) ? BigDecimal.ZERO : details.stream().map(PortfolioDetail::getTargetNum).reduce(BigDecimal.ZERO, BigDecimal::add);
+                // 历史撤单数量
+                BigDecimal canselVolume = CollectionUtils.isEmpty(cansels) ? BigDecimal.ZERO : cansels.stream().map(PortfolioDetail::getTargetNum).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                item.setInstructionLeftNum(NumberUtil.sub(item.getInstructionTotalNum(), historyVolume).longValue() + canselVolume.longValue());
+                item.setInstructionLeftAmt(BigDecimal.ZERO);
             } else {
-                item.setInstructionLeftAmt(BigDecimal.ZERO.compareTo(orderAmt) == 0 ? NumberUtil.mul(leftAmt, item.getDisRate()) : NumberUtil.div(NumberUtil.mul(leftAmt, item.getEntrustAmt()), orderAmt));
-                item.setInstructionLeftNum(BigDecimal.ZERO.compareTo(orderVolume) == 0 ? NumberUtil.mul(leftNum, item.getDisRate()).longValue() : NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
+                // 历史下单金额
+                BigDecimal historyAmt = CollectionUtils.isEmpty(details) ? BigDecimal.ZERO : details.stream().map(PortfolioDetail::getTargetAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+                // 历史撤单金额
+                BigDecimal canselAmt = CollectionUtils.isEmpty(cansels) ? BigDecimal.ZERO : cansels.stream().map(PortfolioDetail::getTargetAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                item.setInstructionLeftAmt(NumberUtil.sub(item.getInstructionTotalAmt(), historyAmt).add(canselAmt));
+                item.setInstructionLeftNum(0L);
             }
+
+//            item.setInstructionLeftAmt(BigDecimal.ZERO.compareTo(orderAmt) == 0 ? NumberUtil.mul(leftAmt, item.getDisRate()) : NumberUtil.div(NumberUtil.mul(leftAmt, item.getEntrustAmt()), orderAmt));
+//            item.setInstructionLeftNum(BigDecimal.ZERO.compareTo(orderVolume) == 0 ? NumberUtil.mul(leftNum, item.getDisRate()).longValue() : NumberUtil.div(leftNum * item.getEntrustNum(), orderVolume).longValue());
 
             // 处理分配比例
             item.setDisRate(BigDecimal.ZERO.compareTo(orderVolume) == 0 ? BigDecimal.ZERO : NumberUtil.mul(NumberUtil.div(item.getEntrustNum(), orderVolume), 100));
@@ -608,13 +645,22 @@ public class PortfolioManager extends BaseService {
         PortfolioInfoResponse infoResponse;
         for (PositionCashSecSingleResp item : positionCashSecSingleResps) {
             List<BaseMap> baseMapList = item.getBaseMapList();
+            List<PositionCashSecRespDto> list = JsonUtils.getObjectListFromJson(JsonUtils.getJsonFromObject(baseMapList), PositionCashSecRespDto.class);
+            Map<String, PositionCashSecRespDto> map = list.stream().collect(Collectors.toMap(PositionCashSecRespDto::getField, o -> o));
+            PositionCashSecRespDto usableAmount = map.get("usableAmount");
+            PositionCashSecRespDto porUsableCash = map.get("porUsableCash");
+            PositionCashSecRespDto acctNoUsableCash = map.get("acctNoUsableCash");
+
             infoResponse = new PortfolioInfoResponse();
             infoResponse.setPortfolioId(item.getPortfolioId());
-            infoResponse.setProAvailablePositionT0((ObjectUtil.isNotNull(baseMapList.get(3).get(AMOUNT))) ? (BigDecimal) baseMapList.get(3).get(AMOUNT) : BigDecimal.ZERO);
+//                infoResponse.setProAvailablePositionT0((ObjectUtil.isNotNull(baseMapList.get(3).get(AMOUNT))) ? (BigDecimal) baseMapList.get(3).get(AMOUNT) : BigDecimal.ZERO);
+            infoResponse.setProAvailablePositionT0((ObjectUtil.isNotNull(usableAmount)) ? usableAmount.getAmount() : BigDecimal.ZERO);
             infoResponse.setProAvailablePositionT1(BigDecimal.ZERO);
-            infoResponse.setProAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(0).get(AMOUNT))) ? (BigDecimal) baseMapList.get(0).get(AMOUNT) : BigDecimal.ZERO);
+//                infoResponse.setProAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(0).get(AMOUNT))) ? (BigDecimal) baseMapList.get(0).get(AMOUNT) : BigDecimal.ZERO);
+            infoResponse.setProAvailableCashT0((ObjectUtil.isNotNull(porUsableCash)) ? porUsableCash.getAmount() : BigDecimal.ZERO);
             infoResponse.setProAvailableCashT1(BigDecimal.ZERO);
-            infoResponse.setSecManageAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(1).get(AMOUNT))) ? (BigDecimal) baseMapList.get(1).get(AMOUNT) : BigDecimal.ZERO);
+//                infoResponse.setSecManageAvailableCashT0((ObjectUtil.isNotNull(baseMapList.get(1).get(AMOUNT))) ? (BigDecimal) baseMapList.get(1).get(AMOUNT) : BigDecimal.ZERO);
+            infoResponse.setSecManageAvailableCashT0((ObjectUtil.isNotNull(acctNoUsableCash)) ? acctNoUsableCash.getAmount() : BigDecimal.ZERO);
             infoResponse.setSecManageAvailableCashT1(BigDecimal.ZERO);
 
             portfolioInfoResponseMap.put(infoResponse.getPortfolioId(), infoResponse);

@@ -2090,6 +2090,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                         }
                 );
                 basRiskMathCommService.insert(param, entity.getBidId());
+            } else {
+                logger.debug("一级投标风险数据为空");
             }
         }
         // AOP中处理操作履历
@@ -2753,6 +2755,21 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                         this.dealOldPosition(entity, false, false);
                     } else {
                         this.sendPositionMethodOther(entity, isSubmit, confirmOk);
+                    }
+                    //保存风险数据
+                    if (StringUtil.isNotEmpty(entity.getRiskcalResponse())
+                            && CollectionUtils.isNotEmpty(entity.getRiskcalResponse().getRiskcalReturnList())) {
+                        logger.debug("一级投标风险数据:"+JsonUtils.object2Json(entity.getRiskcalResponse().getRiskcalReturnList()));
+                        List<RiskTrialRetDto> param = new ArrayList<>();
+                        entity.getRiskcalResponse().getRiskcalReturnList().forEach(item-> {
+                                    RiskTrialRetDto risk = new RiskTrialRetDto();
+                                    BeanUtil.copyPropertiesIgnoreNull(risk,item);
+                                    param.add(risk);
+                                }
+                        );
+                        basRiskMathCommService.insert(param, entity.getBidId());
+                    } else {
+                        logger.debug("一级投标风险数据为空");
                     }
                 }
             } catch (PositionException e) {

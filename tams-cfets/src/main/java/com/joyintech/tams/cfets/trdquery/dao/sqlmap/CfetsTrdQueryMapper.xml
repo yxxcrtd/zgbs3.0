@@ -3272,7 +3272,6 @@
             ON		TMI.TRD_ID = TFPDT.TOTLE_TRADE_ID
             LEFT JOIN BID_ORDER BO
                 ON	 BO.TRADE_STATUS = #{TRADE_STATUS_01}
-                AND	 BO.IS_CANCEL = 'N'
                 AND	 (BO.BID_ID=TFPDT.B_TRADE_ID OR BO.BID_ID=BRT.BID_ID OR BO.BID_ID=TMI.PRE_TRADE_ID OR BO.BID_ID=TFPDT.P_TOTLE_TRADE_ID)
             LEFT JOIN TRD_BANK_MANUAL_SETTLE_INFO TMSI
             ON		TMSI.TRADE_ID = TFPDT.TOTLE_TRADE_ID
@@ -3870,8 +3869,10 @@
         T7.SEC_ACCT_NAME  secManageAcctIdStr,
         CASE WHEN FPI.ISSUE_CLASS IN (#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN BO.WIN_PRIN_AMT/10000
             WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN BO.SUBSCRIPTION_AMOUNT/10000 END faceValue,
-        case WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN to_char(FPI.REFER_YIELD*100,'fm999999990.9990')||'%'
-            when BO.BID_MODLE IS NULL THEN TO_CHAR(ROUND(TFPDT.RATE,4), 'FM990.0000')
+        case
+            when BO.BID_MODLE IS NULL THEN ( case when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
+                                            then sdl_sd.ITEM_VALUE|| '+'|| nvl(fpi.BP*10000, 0)||'BP'
+                                            else to_char(fpi.REFER_YIELD*100,'FM999999999990.9990') end )
             when BO.BID_MODLE=#{WIN_TYPE_03} THEN decode(FPI.TENDER_TARGET,'01',to_char(BO.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BO.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BO.WIN_PRICE*10000,'fm999999990.90')||'BP')
             when BO.BID_MODLE IN(#{WIN_TYPE_01},#{WIN_TYPE_02}) THEN decode(FPI.TENDER_TARGET,'01',to_char(BRT.WIN_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRT.WIN_PRICE,'fm999999990.9990')||'元','03',to_char(BRT.WIN_PRICE*10000,'fm999999990.90')||'BP') END tradeYield,
         null termDays,
@@ -3912,7 +3913,6 @@
         ON		TMI.TRD_ID = TFPDT.TOTLE_TRADE_ID
         LEFT JOIN  BID_ORDER BO
         ON		BO.TRADE_STATUS = #{TRADE_STATUS_01}
-        AND		BO.IS_CANCEL = 'N'
         AND		(BO.BID_ID=TFPDT.B_TRADE_ID OR BO.BID_ID=BRT.BID_ID OR BO.BID_ID=TMI.PRE_TRADE_ID OR BO.BID_ID = TFPDT.P_TOTLE_TRADE_ID)
         LEFT JOIN TRD_BANK_MANUAL_SETTLE_INFO TMSI
         ON		TMSI.TRADE_ID = TFPDT.TOTLE_TRADE_ID
@@ -3925,6 +3925,7 @@
         LEFT JOIN SYS_DATADICT_LIST sdl7 on sdl7.dict_code ='CCY' and sdl7.item_code = TPD.ccy
         LEFT JOIN MST_COUNTER_PARTY T6 ON TPD.COUNTER_ID = T6.counter_id
         LEFT JOIN STL_SEC_ACCT_INFO T7 ON TPD.SEC_MANAGE_ACCT_ID = T7.SEC_ACCT_ID
+        left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
         WHERE TPD.TRADE_STATUS = #{TRADE_STATUS_01}
           AND TFPDT.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F32}
           AND FP.TRADE_MARKET IN (#{TRADE_PLACE_01},#{TRADE_PLACE_02})
@@ -5442,13 +5443,13 @@
         SELECT  BO.DIP_TYPE as dipType,
                 BRBP.ENTRUST_ID   AS	entrustId,
                 PP.PORTFOLIO_NAME  portfolioName,
-                EE.ENTRUST_NUM/100  bidPrinAmt,
-                BRBP.THE_WIN_PRIN_AMT/10000 totalWinPrinAmt,
-                BRBP.THE_WIN_PRIN_AMT/10000 prinAmt,
+                BRBP.THE_WIN_PRIN_AMT/10000  bidPrinAmt,
+                brd.TOTAL_BID_PRINAMT/10000 totalWinPrinAmt,
+                EEBP.BID_PRIN_AMT/100 prinAmt,
                 nvl(EEBP.BID_PRIN_AMT*100,0)-nvl(BRBP.THE_WIN_PRIN_AMT,0) avaNum,
                 nvl(brd.SETT_FEE_AMT, BRBP.SETT_FEE_AMT) settleFeeAmt,
                 nvl(brd.ACT_WIN_PRINAMT, BRBP.TRADE_AMT)tradeAmt,
-                nvl(brd.INT_AMT , BRBP.INT_AMT) intAmt,
+                nvl(brd.INT_AMT*EE.ENTRUST_NUM , BRBP.INT_AMT) intAmt,
                 nvl(brd.PAY_AMT, BRBP.PAYABLE_AMOUNT) payAmt,
                 decode(FPI.TENDER_TARGET,'01',to_char(BRBP.BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRBP.BID_PRICE,'fm999999990.9990')||'元','03',to_char(BRBP.BID_PRICE*10000,'fm999999990.90')||'BP') bidPrice,
                 BRBP.INV_AIM invAim,
@@ -5485,13 +5486,13 @@
         SELECT  WBO.DIP_TYPE as dipType,
                 WBRBP.ENTRUST_ID   AS	entrustId,
                 PP.PORTFOLIO_NAME  portfolioName,
-                EE.ENTRUST_NUM/100  bidPrinAmt,
-                WBRBP.THE_WIN_PRIN_AMT/10000 totalWinPrinAmt,
-                WBRBP.THE_WIN_PRIN_AMT/10000 prinAmt,
+                WBRBP.THE_WIN_PRIN_AMT/10000 bidPrinAmt,
+                brd.TOTAL_BID_PRINAMT/10000 totalWinPrinAmt,
+                EEBP.BID_PRIN_AMT/100 prinAmt,
                 nvl(EEBP.BID_PRIN_AMT*100,0)-nvl(WBRBP.THE_WIN_PRIN_AMT,0) avaNum,
                 nvl(brd.SETT_FEE_AMT, WBRBP.SETT_FEE_AMT) settleFeeAmt,
                 nvl(brd.ACT_WIN_PRINAMT, WBRBP.TRADE_AMT)tradeAmt,
-                nvl(brd.INT_AMT , WBRBP.INT_AMT) intAmt,
+                nvl(brd.INT_AMT*EE.ENTRUST_NUM , WBRBP.INT_AMT) intAmt,
                 nvl(brd.PAY_AMT, WBRBP.PAYABLE_AMOUNT) payAmt,
                 decode(FPI.TENDER_TARGET,'01',to_char(WBRBP.BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(WBRBP.BID_PRICE,'fm999999990.9990')||'元','03',to_char(WBRBP.BID_PRICE*10000,'fm999999990.90')||'BP') bidPrice,
                 WBRBP.INV_AIM invAim,
