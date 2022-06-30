@@ -302,13 +302,17 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             if(StringUtil.isNotEmpty(response.getBidModle()) && response.getBidModle().equals(DictCodeListExt4.投标方式_自主投标.getValue())) {
                 Map<String, List<BidProductDto>> summaryBidMap = bidProductList.stream().collect(JoyinCollectors.groupingBy(item -> item.getWinPrice()));
                 List<SummaryBidDto> summaryBidList = new ArrayList<>();
+                String tenderTarget =null;
                 for (String winPrice : summaryBidMap.keySet()) {
                     SummaryBidDto summaryBidDto = new SummaryBidDto();
                     BigDecimal totalBidPrinamt = null;
                     BigDecimal winPrinAmt = null;
+                    BigDecimal bidPrice = null;
                     for (BidProductDto bidProductDto : summaryBidMap.get(winPrice)) {
                         totalBidPrinamt = ArithmeticUtil.doAdd(totalBidPrinamt, bidProductDto.getTotalBidPrinamt());
                         winPrinAmt = ArithmeticUtil.doAdd(winPrinAmt, bidProductDto.getWinPrinAmt());
+                        bidPrice = bidProductDto.getBidPrice();
+                        tenderTarget= bidProductDto.getTenderTarget();
                     }
                     if(totalBidPrinamt.compareTo(BigDecimal.ZERO.stripTrailingZeros())==0){
                         continue;
@@ -316,7 +320,20 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     summaryBidDto.setTotalBidPrinamt(totalBidPrinamt);
                     summaryBidDto.setWinPrinAmt(winPrinAmt);
                     summaryBidDto.setWinPrice(winPrice);
+                    summaryBidDto.setBidPrice(bidPrice);
                     summaryBidList.add(summaryBidDto);
+                }
+                if(!StringUtil.isEmptyList(summaryBidList)&&StringUtil.isNotEmpty(summaryBidList.get(0))){
+                    Comparator<SummaryBidDto> byBidPrice;
+                    if (StringUtil.equals(tenderTarget, DictCodeListExt4.招标标的_利率.getValue())
+                            || StringUtil.equals(tenderTarget, DictCodeListExt4.招标标的_利差.getValue())) {
+                        // 招标标的为利率和利差时 投标标位 从小到大排列
+                        byBidPrice = Comparator.comparing(SummaryBidDto::getBidPrice);
+                    } else {
+                        //招标标的为价格时，投标标位 从大到小排列
+                        byBidPrice = Comparator.comparing(SummaryBidDto::getBidPrice).reversed();
+                    }
+                    summaryBidList = summaryBidList.stream().sorted(byBidPrice).collect(Collectors.toList());
                 }
                 resultData.put(dtCode + "_formList", listTable);
                 resultData.put(dtCode + "_list", summaryBidList);
