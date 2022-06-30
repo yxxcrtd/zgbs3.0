@@ -5333,8 +5333,8 @@
                     WHEN fpi.TENDER_TARGET = '02' AND nvl(BO.WIN_PRICE, brt.WIN_PRICE) IS NOT NULL THEN to_char(nvl(BO.WIN_PRICE, brt.WIN_PRICE), 'FM9999999999999990.9990') || '元'
                     WHEN fpi.TENDER_TARGET = '03' AND nvl(BO.WIN_PRICE, brt.WIN_PRICE) IS NOT NULL THEN to_char(nvl(BO.WIN_PRICE, brt.WIN_PRICE) * 10000, 'FM9999999999999990.90') || 'BP'
                     end              winPrice/*中标标位*/,
-                tfpdt.UNIT_CPRICE unitCprice,
-                tfpdt.UNIT_INT unitInt,
+                nvl(BO.UNIT_CPRICE, tfpdt.UNIT_CPRICE) unitCprice,
+                nvl(BO.UNIT_INT, tfpdt.UNIT_INT) unitInt,
                 nvl(BO.SETT_FEE_AMT, BRT.SETT_FEE_AMT) settleFeeAmt,
                 BO.REMARK remark
             FROM BID_ORDER BO
@@ -5400,8 +5400,8 @@
                     WHEN fpi.TENDER_TARGET = '02' AND nvl(WBO.WIN_PRICE, brt.WIN_PRICE) IS NOT NULL THEN to_char(nvl(WBO.WIN_PRICE, brt.WIN_PRICE), 'FM9999999999999990.9990') || '元'
                     WHEN fpi.TENDER_TARGET = '03' AND nvl(WBO.WIN_PRICE, brt.WIN_PRICE) IS NOT NULL THEN to_char(nvl(WBO.WIN_PRICE, brt.WIN_PRICE) * 10000, 'FM9999999999999990.90') || 'BP'
                     end              winPrice/*中标标位*/,
-                tfpdt.UNIT_CPRICE unitCprice,
-                tfpdt.UNIT_INT unitInt,
+                nvl(WBO.UNIT_CPRICE, tfpdt.UNIT_CPRICE) unitCprice,
+                nvl(WBO.UNIT_INT, tfpdt.UNIT_INT) unitInt,
                 nvl(WBO.SETT_FEE_AMT, BRT.SETT_FEE_AMT) settleFeeAmt,
                 WBO.REMARK remark
             FROM WFL_BID_ORDER WBO
@@ -5442,7 +5442,7 @@
                 BRBP.ENTRUST_ID   AS	entrustId,
                 PP.PORTFOLIO_NAME  portfolioName,
                 BRBP.THE_WIN_PRIN_AMT/10000  bidPrinAmt,
-                brd.TOTAL_BID_PRINAMT/10000 totalWinPrinAmt,
+                nvl(brd.TOTAL_BID_PRINAMT, BRBP.THE_WIN_PRIN_AMT)/10000 totalWinPrinAmt,
                 EEBP.BID_PRIN_AMT/100 prinAmt,
                 nvl(EEBP.BID_PRIN_AMT*100,0)-nvl(BRBP.THE_WIN_PRIN_AMT,0) avaNum,
                 nvl(brd.SETT_FEE_AMT, BRBP.SETT_FEE_AMT) settleFeeAmt,
