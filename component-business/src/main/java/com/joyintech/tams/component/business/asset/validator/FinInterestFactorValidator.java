@@ -42,7 +42,7 @@ public class FinInterestFactorValidator implements BeanValidator{
     @Override
     public List<ValidMessage> valid(Object value) {
         FinInterestFactorDto dto = (FinInterestFactorDto)value;
-        List<ValidMessage> resultList = new ArrayList<ValidMessage>();
+        List<ValidMessage> resultList = new ArrayList<>();
         //资产类型
         String finprodType = dto.getFinprodType2();
         //计息基础
@@ -162,7 +162,7 @@ public class FinInterestFactorValidator implements BeanValidator{
             	// 一体化对应etliu
 //                if(dto.getRateMax().compareTo(dto.getRateMin())!=1){
             	if(dto.getHighestRate().compareTo(dto.getLowestRate())!=1){
-                    resultList.add(new ValidMessage("",
+                    resultList.add(new ValidMessage(
                         getMessage("BUSS_COM_E_0035", getMessage("FinInterestFactor.rateMin"), getMessage("FinInterestFactor.rateMax"))));
                 }
             }

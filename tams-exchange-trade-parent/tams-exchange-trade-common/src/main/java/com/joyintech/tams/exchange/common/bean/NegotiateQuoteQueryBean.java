@@ -19,15 +19,12 @@ public class NegotiateQuoteQueryBean {
     @ApiModelProperty(name = "side", value = "买卖方向")
     private String side;
 
-//	@NotBlank(message = "本方交易员代码不能为空")
     @ApiModelProperty(name = "traderCode", value = "本方交易员代码")
     private String traderCode;
 
-//	@NotBlank(message = "本方交易主体代码不能为空")
     @ApiModelProperty(name = "investorId", value = "本方交易主体代码")
     private String investorId;
 
-//	@NotBlank(message = "本方交易商代码不能为空")
 	@ApiModelProperty(name = "memberId", value = "本方交易商代码")
 	private String memberId;
     
