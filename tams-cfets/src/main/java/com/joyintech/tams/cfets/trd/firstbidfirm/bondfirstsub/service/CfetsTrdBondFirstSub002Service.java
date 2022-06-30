@@ -877,6 +877,19 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                         entity.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
                         this.sendPositionMethod(entity, isSubmit, confirmOk);
                     }
+                    //保存风险数据
+                    if (StringUtil.isNotEmpty(entity.getRiskcalResponse())
+                            && CollectionUtils.isNotEmpty(entity.getRiskcalResponse().getRiskcalReturnList())) {
+                        logger.debug("一级申购风险数据:"+JsonUtils.object2Json(entity.getRiskcalResponse().getRiskcalReturnList()));
+                        List<RiskTrialRetDto> param = new ArrayList<>();
+                        entity.getRiskcalResponse().getRiskcalReturnList().forEach(item-> {
+                                    RiskTrialRetDto risk = new RiskTrialRetDto();
+                                    BeanUtil.copyPropertiesIgnoreNull(risk,item);
+                                    param.add(risk);
+                                }
+                        );
+                        basRiskMathCommService.insert(param, entity.getBidId());
+                    }
                 }
             } catch (PositionException e) {
                 Message message = PositionUtil.ajaxErrorReturn(e);
