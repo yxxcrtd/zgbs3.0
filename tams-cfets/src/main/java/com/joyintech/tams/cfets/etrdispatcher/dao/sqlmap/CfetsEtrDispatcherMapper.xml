@@ -1112,8 +1112,8 @@
         'FM9999999999999990.90') || 'BP'
         END winPrice /*中标标位*/,
         TFPDT.UNIT_CPRICE price,
-        TFPDT.TRADE_AMT payableAmount,
-        TFPDT.FEE_AMT settFeeAmt,
+        TPD.TRADE_AMT payableAmount,
+        TPD.FEE_AMT settFeeAmt,
         BO.PAY_DATE payDate,
         BO.ASSIGN_REGDATE assignRegdate,
         bo.ONMARKET_DATE listingDate/*上市日*/,
@@ -1207,8 +1207,8 @@
         'FM9999999999999990.90') || 'BP'
         END winPrice /*中标标位*/,
         TFPDT.UNIT_CPRICE price,
-        TFPDT.TRADE_AMT payableAmount,
-        TFPDT.FEE_AMT settFeeAmt,
+        TPD.TRADE_AMT payableAmount,
+        TPD.FEE_AMT settFeeAmt,
         BO.PAY_DATE payDate,
         BO.ASSIGN_REGDATE assignRegdate,
         bo.ONMARKET_DATE listingDate/*上市日*/,
