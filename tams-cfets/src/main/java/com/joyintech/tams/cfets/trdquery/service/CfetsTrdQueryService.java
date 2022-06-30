@@ -414,9 +414,9 @@ public class CfetsTrdQueryService extends BaseService {
             CfetsTrdBidInfoResponse dataform = cfetsTrdQueryMapper.findYjtbBidTradeDetailInfo(pageParam);
             List<BidPortIntFenPeiInfoDto> datalist = cfetsTrdQueryMapper.findYjtbFenPeiInfoList(pageParam);
             List<BidPortIntFenPeiInfoDto> datahlist = new ArrayList<>();
-            BidPortIntFenPeiInfoDto bidPortIntFenPeiInfoDto = new BidPortIntFenPeiInfoDto();
             Map<String, List<BidPortIntFenPeiInfoDto>> collect = datalist.stream().collect(JoyinCollectors.groupingBy(item -> item.getBidPrice()));
             for (String bidPrice : collect.keySet()) {
+                BidPortIntFenPeiInfoDto bidPortIntFenPeiInfoDto = new BidPortIntFenPeiInfoDto();
                 BigDecimal totalWinPrinAmt = null;
                 BigDecimal bidPrinAmt = null;
                 for (BidPortIntFenPeiInfoDto fenPeiInfoDto : collect.get(bidPrice)) {

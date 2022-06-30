@@ -1127,7 +1127,7 @@
                     LEFT JOIN SYS_USER SUB ON iqb.CREATE_USER = SUB.user_name
            WHERE his.entrust_id = #{entrustId}
              AND his.BUSINESS_TYPE = #{busiType}
-             AND FP.FINPROD_TYPE = 'F01') t order by t.ORDER_TIME desc
+             AND FP.FINPROD_TYPE2 = 'F01') t order by t.ORDER_TIME desc
     </select>
 
     <select id="getfinAssetRateAdjByProductId"   resultType="com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjResponse">
