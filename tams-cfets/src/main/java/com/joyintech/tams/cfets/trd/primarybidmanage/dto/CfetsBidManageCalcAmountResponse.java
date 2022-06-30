@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 /**
  *
- * 指令下拉框模糊查询
+ * 新建指令金额计算功能返回参数
  */
 @ApiModel(value="新建指令金额计算功能返回参数",description="新建指令金额计算功能返回参数")
 public class CfetsBidManageCalcAmountResponse {
