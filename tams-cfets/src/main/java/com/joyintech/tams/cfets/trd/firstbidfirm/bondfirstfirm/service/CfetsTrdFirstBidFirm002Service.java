@@ -2090,6 +2090,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                         }
                 );
                 basRiskMathCommService.insert(param, entity.getBidId());
+            } else {
+                logger.debug("一级投标风险数据为空");
             }
         }
         // AOP中处理操作履历
@@ -2766,6 +2768,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                                 }
                         );
                         basRiskMathCommService.insert(param, entity.getBidId());
+                    } else {
+                        logger.debug("一级投标风险数据为空");
                     }
                 }
             } catch (PositionException e) {
