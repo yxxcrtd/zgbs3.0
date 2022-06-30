@@ -5334,7 +5334,7 @@
                 nvl(BO.SETT_FEE_AMT, BRT.SETT_FEE_AMT) settleFeeAmt,
                 BO.REMARK remark
             FROM BID_ORDER BO
-            LEFT JOIN BID_RESULT_TOTAL brt ON brt.BID_ID  = bo.BID_ID
+            LEFT JOIN BID_RESULT_TOTAL brt ON brt.BID_ID  = bo.BID_ID  and BRT.STATUS = #{TRADE_STATUS_01}
             LEFT JOIN (
                 select sum(eebp.BID_PRIN_AMT)     ENTRUST_NUM,
                        SUM(bobp.THE_WIN_PRIN_AMT) THE_WIN_PRIN_AMT,
@@ -5364,7 +5364,6 @@
             LEFT JOIN SYS_USER su
                       ON su.USER_NAME = BO.OUR_TRADER
             WHERE  BO.TRADE_STATUS = #{TRADE_STATUS_01}
-              and BRT.STATUS = #{TRADE_STATUS_01}
             AND  BO.BID_ID = #{bidId}
             UNION ALL
             SELECT FP.FINPROD_ID as finprodId,
