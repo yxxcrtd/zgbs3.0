@@ -53,7 +53,7 @@ import com.joyintech.tams.invest.entrust.etrexchangetrade.service.EtrExchangeTra
 
 /**
  * 交易所指令交易（债券股票回购基金场内指令交易）
- * 
+ *
  * @author chendijun
  * @version 1.0 2020年7月1日
  * @see EtrExchangeTrade001Validator
@@ -64,7 +64,7 @@ public class EtrExchangeTrade001Validator implements EtrCommonValidator {
 
 	@Autowired
 	EtrExchangeTrade001Service etrExchangeTrade001Service;
-	
+
 	 /**
      * 委托指令Mapper
      */
@@ -73,9 +73,9 @@ public class EtrExchangeTrade001Validator implements EtrCommonValidator {
 
 	@Autowired
 	private FinProductConvertibleMapper finProductConvertibleMapper;
-	
+
 	List<ValidMessage> resultList = new ArrayList<ValidMessage>();
-	
+
 
 	/**
 	 * {@inheritDoc}
@@ -364,7 +364,7 @@ public class EtrExchangeTrade001Validator implements EtrCommonValidator {
 //					}
 //				}
 //			}
-			
+
 			//行权回售
 			if (DictCodeList.交易方向_行权_回售.getValue().equals(dto.getPs())) {
 				Map<String, Object> param = new HashMap<String, Object>();
@@ -376,7 +376,7 @@ public class EtrExchangeTrade001Validator implements EtrCommonValidator {
 					errorList.add(new ValidMessage("vdate", this.getMessage("ETR_ERROR_0024")));
 				}
 			}
-			
+
 			//配股
 			if (DictCodeListExt2.交易方向_配股.getValue().equals(dto.getPs())) {
 				Map<String, Object> param = new HashMap<String, Object>();
@@ -388,7 +388,7 @@ public class EtrExchangeTrade001Validator implements EtrCommonValidator {
 					errorList.add(new ValidMessage("stockId", getMessage("ETR_ERROR_0025",DictCodeListExt2.交易方向_配股.getCodeName())));
 				}
 			}
-			
+
 			//配债
 			if (DictCodeListExt3.交易方向_配债.getValue().equals(dto.getPs())) {
 				Map<String, Object> param = new HashMap<String, Object>();
@@ -400,7 +400,7 @@ public class EtrExchangeTrade001Validator implements EtrCommonValidator {
 					errorList.add(new ValidMessage("stockId", getMessage("ETR_ERROR_0025",DictCodeListExt3.交易方向_配债.getCodeName())));
 				}
 			}
-			
+
 			//申购
 			if (DictCodeList.交易方向_申购.getValue().equals(dto.getPs()) && DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(dto.getFinprodType2())) {
 				Map<String, Object> param = new HashMap<String, Object>();
@@ -410,7 +410,7 @@ public class EtrExchangeTrade001Validator implements EtrCommonValidator {
 					errorList.add(new ValidMessage("stockId", getMessage("ETR_ERROR_0025",DictCodeList.交易方向_申购.getCodeName())));
 				}
 			}
-			
+
 			//债转股
 			if (DictCodeListExt3.交易方向_债转股.getValue().equals(dto.getPs()) && DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(dto.getFinprodType2())) {
 				Map<String, Object> param = new HashMap<String, Object>();
@@ -426,7 +426,7 @@ public class EtrExchangeTrade001Validator implements EtrCommonValidator {
 				}
 				// 验证转股起始日和委托终止日 fuyongsheng 20211103 add end
 			}
-			
+
 			//正回购、质押券出库
 			// 委托指令组合的可用持仓不足时  01 提醒 02 禁止
 			if ((DictCodeListExt3.交易方向_正回购.getValue().equals(dto.getPs()) || DictCodeListExt3.交易方向_质押券出库.getValue().equals(dto.getPs()))
@@ -468,10 +468,11 @@ public class EtrExchangeTrade001Validator implements EtrCommonValidator {
 					errorList.add(new ValidMessage(getMessage("ETR_ERROR_0064")));
 				}
 
+				/** 目前新股申购没有计算额度 by yangxunpeng 20220630
 				BigDecimal entrustNum = etrExchangeTrade001Service.getEntrustNum(param);
 				if (etrExchangeTrade001Service.getFinProductQutoInfo(param).size()>0&&entrustNum.compareTo(dto.getEntrustNum())<0) {
 					errorList.add(new ValidMessage("entrustNum", getMessage("ETR_ERROR_0059")));
-				}
+				}**/
 			}
 			// 可转债申购
 			if (DictCodeList.交易方向_申购.getValue().equals(dto.getPs()) && DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(dto.getFinprodType2()) && DictCodeList.交易平台_竞价撮合平台.getValue().equals(dto.getTradePlat())) {
@@ -525,11 +526,11 @@ public class EtrExchangeTrade001Validator implements EtrCommonValidator {
 					errorList.add(new ValidMessage("entrustNum", getMessage("ETR_ERROR_0060_2", tempMsg)));
 				}
 			}
-			
+
 			//提交的时候还要判断指令状态、避免关闭后再提交指令
 			if(null != dto.getEntrustId()){
 				EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(dto.getEntrustId());
-				if(null != etrEntrust && !DictCodeList.委托状态_已退回.getValue().equals(etrEntrust.getEntrustStatus()) 
+				if(null != etrEntrust && !DictCodeList.委托状态_已退回.getValue().equals(etrEntrust.getEntrustStatus())
 						&& !DictCodeList.委托状态_已撤回.getValue().equals(etrEntrust.getEntrustStatus()) ){
 					String entrustStatusStr = SysDataUtil.getNameFromDataDict(DictCode.委托状态, etrEntrust.getEntrustStatus());
 					errorList.add(new ValidMessage(entrustStatusStr + "的指令不允许修改!"));
