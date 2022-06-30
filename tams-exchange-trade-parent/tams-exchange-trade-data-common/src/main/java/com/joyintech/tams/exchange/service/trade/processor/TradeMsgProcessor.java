@@ -418,9 +418,9 @@ public class TradeMsgProcessor {
 //    	integratedEntrustService.asyncUpdate(integratedEntrust, dbSaveType);
 
         TerminalId terminalId = new TerminalId();
+        integratedEntrust.setBrokerEntrustId(integratedEntrust.getId().substring(2));
         BeanUtils.copyProperties(integratedEntrust, terminalId);
         terminalId.setId(integratedEntrust.getId());
-        integratedEntrust.setBrokerEntrustId(integratedEntrust.getId().substring(2));
 
         TradeMsgReceiver tradeMsgReceiver = msgReceiverManager.getMsgReceiverByInstruction(integratedEntrust.getInstructionId());
         tradeMsgReceiver.addMsg(MsgType.RESP_INTEGRATED, terminalId);

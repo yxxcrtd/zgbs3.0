@@ -39,7 +39,7 @@ public class FinPayInterestStdInfoValidator implements BeanValidator{
     @Override
     public List<ValidMessage> valid(Object value) {
         FinPayInterestStdInfoDto dto = (FinPayInterestStdInfoDto)value;
-        List<ValidMessage> resultList = new ArrayList<ValidMessage>();
+        List<ValidMessage> resultList = new ArrayList<>();
         if((StringUtil.equals(dto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())
             &&StringUtil.equals(dto.getCouponSpecies(), DictCodeList.息票品种_附息.getValue()))
             ||StringUtil.equals(dto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_存款.getValue())
@@ -81,7 +81,7 @@ public class FinPayInterestStdInfoValidator implements BeanValidator{
             if(StringUtil.equals(dto.getPayCycle(), DictCodeList.频率_不规则.getValue())){
          // 一体化对应etliu end
                 if(StringUtil.isEmpty(dto.getRemark())){
-                    resultList.add(new ValidMessage("",
+                    resultList.add(new ValidMessage(
                         getMessage("COMMON_E_0057", getMessage("FinPayInterestStdInfo.remark"))));
                 }
             }
@@ -102,12 +102,12 @@ public class FinPayInterestStdInfoValidator implements BeanValidator{
             if(StringUtil.equals(dto.getPayCycle(), DictCodeList.频率_年.getValue())
             ||StringUtil.equals(dto.getPayCycle(), DictCodeList.频率_季.getValue())){
                 if(StringUtil.isEmpty(dto.getPayMonth())){
-                    resultList.add(new ValidMessage("",
+                    resultList.add(new ValidMessage(
                             getMessage("COMMON_E_0057", getMessage("FinPayInterestStdInfo.payMonth"))));
                 }
             }
             if(StringUtil.isEmpty(dto.getDayValue())){
-                resultList.add(new ValidMessage("",
+                resultList.add(new ValidMessage(
                         getMessage("COMMON_E_0057", getMessage("FinPayInterestStdInfo.dayValue"))));
             }
         }
@@ -115,7 +115,7 @@ public class FinPayInterestStdInfoValidator implements BeanValidator{
         //保存
         if(StringUtil.equals(dto.getOperateType(),"save")){
             if(null == dto.getFinCashPlanList()){
-                resultList.add(new ValidMessage("",getMessage("FIN_ASSET_E_0008")));
+                resultList.add(new ValidMessage(getMessage("FIN_ASSET_E_0008")));
             }else{
                 dto.getFinCashPlanList().forEach(entity ->{
                     if(null==entity.getVdateUnadjust()||null==entity.getMdateUnadjust()

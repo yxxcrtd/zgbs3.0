@@ -608,12 +608,14 @@ public class TerminalHelper {
     }
 
     public List<NegotiateQuoteReceiveBean> queryNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean) {
+        List<NegotiateQuoteReceiveBean> list = new ArrayList<>();
+        if(StringUtil.isEmpty(negotiateQuoteQueryBean.getConfirmId())){
+            return list;
+        }
         int pageSize = negotiateQuoteQueryBean.getPageSize();
         if (pageSize > 1000) {
             negotiateQuoteQueryBean.setPageSize(1000);
         }
-        List<NegotiateQuoteReceiveBean> list = new ArrayList<>();
-
         final String side = negotiateQuoteQueryBean.getSide();
         if (StringUtil.isNotEmpty(side)) {
             negotiateQuoteQueryBean.setSide(EntrustSide.getOpEntrustBs(side));
