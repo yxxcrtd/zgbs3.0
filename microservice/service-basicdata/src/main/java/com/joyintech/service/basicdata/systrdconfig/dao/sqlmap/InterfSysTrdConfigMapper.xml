@@ -28,12 +28,11 @@
             <if test="assetType != null and assetType != ''">
                 and tmc.ASSET_CLASSIFY1 = #{assetType}
             </if>
-
             <if test="assetType1 != null and assetType1 != ''">
-                and tmc.ASSET_CLASSIFY2 = #{assetType1}
+                and (tmc.ASSET_CLASSIFY2 = #{assetType1} or tmc.ASSET_CLASSIFY2 is null)
             </if>
             <if test="assetType2 != null and assetType2 != ''">
-                and tmc.ASSET_CLASSIFY3 = #{assetType2}
+                and (tmc.ASSET_CLASSIFY3 = #{assetType2} or tmc.ASSET_CLASSIFY3 is null)
             </if>
             and tmc.SEQ_NO in (
             SELECT SEQ_NO FROM (SELECT ROW_NUMBER()OVER (PARTITION BY TRADE_MARKET ,TRADE_PLAT, ASSET_CLASSIFY1 ,ASSET_CLASSIFY2 ,ASSET_CLASSIFY3 ORDER BY EFF_DATE DESC)tn,SEQ_NO
