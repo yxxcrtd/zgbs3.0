@@ -25,7 +25,7 @@ import com.joyintech.tams.common.base.entity.RskPreOccupyInfo;
 
 /**
  * 风险试算接口-输入
- * 
+ *
  * @author zhangrui1
  * @version 1.0 2019年8月13日
  * @see Rsk001InEntity
@@ -42,12 +42,12 @@ public class Rsk001InEntity extends RskPreOccupyInfo {
      * 组合代码
      */
     private String portfolioCode;
-    
+
     /**
      * 市场代码
      */
     private String marketCode;
-    
+
     /**
      * 交易场所
      */
@@ -67,7 +67,7 @@ public class Rsk001InEntity extends RskPreOccupyInfo {
 
     /**
      * 取得 组合代码
-     * 
+     *
      * @return 组合代码
      */
     @NotEmpty
@@ -78,7 +78,7 @@ public class Rsk001InEntity extends RskPreOccupyInfo {
 
     /**
      * 设置 组合代码
-     * 
+     *
      * @param portfolioCode 组合代码
      */
     public void setPortfolioCode(String portfolioCode) {
@@ -99,7 +99,7 @@ public class Rsk001InEntity extends RskPreOccupyInfo {
      */
     @Override
     @NotEmpty
-    @Size(max = 32)
+    @Size(max = 128)
     public String getEventId() {
         return super.getEventId();
     }
@@ -159,7 +159,7 @@ public class Rsk001InEntity extends RskPreOccupyInfo {
 
     /**
      * 获取 达到预警线是否需要人工确认
-     * 
+     *
      * @return 达到预警线是否需要人工确认.
      */
     @NotEmpty
@@ -169,7 +169,7 @@ public class Rsk001InEntity extends RskPreOccupyInfo {
 
     /**
      * 设置 达到预警线是否需要人工确认
-     * 
+     *
      * @param isWarnNeedConfirm 达到预警线是否需要人工确认
      */
     public void setIsWarnNeedConfirm(String isWarnNeedConfirm) {
@@ -178,7 +178,7 @@ public class Rsk001InEntity extends RskPreOccupyInfo {
 
     /**
      * 获取 达到审批线是否需要人工确认
-     * 
+     *
      * @return 达到审批线是否需要人工确认.
      */
     @NotEmpty
@@ -188,7 +188,7 @@ public class Rsk001InEntity extends RskPreOccupyInfo {
 
     /**
      * 设置 达到审批线是否需要人工确认
-     * 
+     *
      * @param isApprNeedConfirm 达到审批线是否需要人工确认
      */
     public void setIsApprNeedConfirm(String isApprNeedConfirm) {
