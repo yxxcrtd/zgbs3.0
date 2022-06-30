@@ -241,6 +241,27 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
         }
     }
 
+
+    /**
+     * 计算金额信息
+     *
+     * @param request 画面元素
+     * @return com.joyintech.tams.business.common.pojo.Message<com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest>
+     * @author jiangpeng
+     * @date 2022/6/25 14:41
+     */
+    @ApiOperation(value = "计算金额信息", notes = "计算金额信息")
+    @ResponseBody
+    @PostMapping("/calAmtInfo")
+    public Message<CfetsBidManageCalcAmountResponse> calAmtInfo(@RequestBody CfetsPrimaryBidManageSaveRequest request) {
+        try {
+            CfetsBidManageCalcAmountResponse result = cfetsPrimaryBidManageService.calAmtInfo(request);
+            return new Message<CfetsBidManageCalcAmountResponse>().success().setData(result);
+        } catch (Exception e) {
+            logger.error("计算金额信息异常", e);
+            return new Message<CfetsBidManageCalcAmountResponse>().fail().setMessage("计算金额信息异常");
+        }
+    }
     /**
      * 编辑明细中缴款金额
      *

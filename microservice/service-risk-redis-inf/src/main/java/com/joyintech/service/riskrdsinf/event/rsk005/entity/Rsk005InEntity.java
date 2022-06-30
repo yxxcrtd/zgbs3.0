@@ -24,7 +24,7 @@ import com.joyintech.tams.common.base.entity.RskPreOccupyInfo;
 
 /**
  * RSK005接口-输入
- * 
+ *
  * @author zhangrui1
  * @version 1.0 2019年8月27日
  * @see Rsk005InEntity
@@ -63,7 +63,7 @@ public class Rsk005InEntity extends RskPreOccupyInfo {
      */
     @Override
     @NotEmpty
-    @Size(max = 32)
+    @Size(max = 128)
     public String getEventId() {
         return super.getEventId();
     }
