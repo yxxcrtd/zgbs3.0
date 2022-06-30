@@ -1060,10 +1060,12 @@
                 T.counterId,
                 T.counterName,
                 T.remark,
-                T.updateTime
+                T.totleTradeId,
+                T.tradeId
 
-        FROM
-        (SELECT
+        FROM(
+             select T1.* from
+        ( SELECT
         decode(tpd.is_cancel,'Y',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) effectFlag,
         #{BUSI_TYPE_POSITION_01} AS busiTypePosition,
         '02' firstBidStatus /*中标状态*/,
@@ -1095,11 +1097,12 @@
         TFPDT.PRIN_AMT totalBiddingNum,
         BO.BID_MODLE biddingMethod,
         BO.PAY_TYPE payType,
-        CASE
-        WHEN fpi.TENDER_TARGET = '01' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '%'
-        WHEN fpi.TENDER_TARGET = '02' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '元'
-        WHEN fpi.TENDER_TARGET = '03' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || 'BP'
-        END bidprice /*投标标位, 多个逗号分隔展示*/,
+        case
+        when bobp.BID_PRICE is null then null
+        when fpi.TENDER_TARGET = '01' then to_char(bobp.BID_PRICE * 100, 'FM9999999999999990.9990') || '%'
+        when fpi.TENDER_TARGET = '02' then to_char(bobp.BID_PRICE, 'FM9999999999999990.9990') || '元'
+        when fpi.TENDER_TARGET = '03' then to_char(bobp.BID_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+        end              bidPrice/*投标标位*/,
         CASE
         WHEN fpi.TENDER_TARGET = '01' AND bo.WIN_PRICE IS NOT NULL THEN to_char(bo.WIN_PRICE * 100,
         'FM9999999999999990.9990') || '%'
@@ -1119,6 +1122,8 @@
         TFPDT.COUNTER_ID counterId,
         mcci.counter_name as counterName,
         TFPDT.REMARK remark,
+        TFPDT.TOTLE_TRADE_ID totleTradeId,
+        TPD.TRADE_ID  tradeId,
         TFPDT.UPDATE_TIME updateTime
         FROM TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT
         LEFT JOIN TRD_PRODUCT_DEAL TPD
@@ -1133,6 +1138,9 @@
         ON BO.TRADE_STATUS = '01'
         AND BO.BID_ID = TFPDT.P_TOTLE_TRADE_ID
         AND BO.BID_MODLE = '03'
+        left join BID_ORDER_BID_PRICE bobp
+        on bobp.PORTFOLIO_ID = tpda.PORTFOLIO_ID and bobp.BID_ID = BO.BID_ID and
+        bobp.ENTRUST_ID = tpda.ENTRUST_ID
         LEFT JOIN ( select TPD.TOTLE_TRADE_ID, SUM(EEBP.BID_PRIN_AMT) BID_PRIN_AMT
         from TRD_PRODUCT_DEAL TPD
         LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA
@@ -1146,24 +1154,6 @@
         ) EEBP ON TFPDT.TOTLE_TRADE_ID = EEBP.TOTLE_TRADE_ID
         LEFT JOIN MST_CFETS_CUSTOMER_INFO m1 on TFPDT.TRADER=m1.PARTY_ID
         LEFT JOIN MST_COUNTER_PARTY mcci ON TFPDT.COUNTER_ID = mcci.counter_id
-        LEFT JOIN (select listagg(case
-        when t3.TENDER_TARGET = '01'
-        then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
-        when t3.TENDER_TARGET = '02'
-        then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
-        when t3.TENDER_TARGET = '03'
-        then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
-        end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
-        t0.BID_ID
-        from BID_ORDER_BID_PRICE t0
-        LEFT JOIN BID_ORDER t1 on t1.BID_ID = t0.BID_ID
-        LEFT JOIN FIN_PRODUCT t2
-        ON t2.FINPROD_ID = t1.FINPROD_ID
-        LEFT JOIN
-        FIN_PRODUCT_ISSUE t3
-        ON t3.FINPROD_ID = t2.FINPROD_ID
-        group by t0.BID_ID) bobp
-        ON bobp.BID_ID = bo.BID_ID
         WHERE TFPDT.TRADE_STATUS = '01'
         AND tpd.TRADE_STATUS = '01'
         <if test="entrustId != null and entrustId != ''">
@@ -1202,11 +1192,12 @@
         TFPDT.PRIN_AMT totalBiddingNum,
         BO.BID_MODLE biddingMethod,
         BO.PAY_TYPE payType,
-        CASE
-        WHEN fpi.TENDER_TARGET = '01' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '%'
-        WHEN fpi.TENDER_TARGET = '02' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || '元'
-        WHEN fpi.TENDER_TARGET = '03' AND bobp.BID_PRICE IS NOT NULL THEN bobp.BID_PRICE || 'BP'
-        END bidprice /*投标标位, 多个逗号分隔展示*/,
+        case
+        when bobp.BID_PRICE is null then null
+        when fpi.TENDER_TARGET = '01' then to_char(bobp.BID_PRICE * 100, 'FM9999999999999990.9990') || '%'
+        when fpi.TENDER_TARGET = '02' then to_char(bobp.BID_PRICE, 'FM9999999999999990.9990') || '元'
+        when fpi.TENDER_TARGET = '03' then to_char(bobp.BID_PRICE * 10000, 'FM9999999999999990.90') || 'BP'
+        end              bidPrice/*投标标位*/,
         CASE
         WHEN fpi.TENDER_TARGET = '01' AND bo.WIN_PRICE IS NOT NULL THEN to_char(bo.WIN_PRICE * 100,
         'FM9999999999999990.9990') || '%'
@@ -1226,6 +1217,8 @@
         TFPDT.COUNTER_ID counterId,
         mcci.counter_name as counterName,
         TFPDT.REMARK remark,
+        TFPDT.TOTLE_TRADE_ID totleTradeId,
+        TPD.TRADE_ID  tradeId,
         TFPDT.UPDATE_TIME updateTime
         FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL TFPDT
         LEFT JOIN WFL_TRD_PRODUCT_DEAL TPD
@@ -1240,6 +1233,9 @@
         ON BO.TRADE_STATUS = '01'
         AND BO.BID_ID = TFPDT.P_TOTLE_TRADE_ID
         AND BO.BID_MODLE = '03'
+        left join BID_ORDER_BID_PRICE bobp
+        on bobp.PORTFOLIO_ID = tpda.PORTFOLIO_ID and bobp.BID_ID = BO.BID_ID and
+        bobp.ENTRUST_ID = tpda.ENTRUST_ID
         LEFT JOIN ( select TPD.TOTLE_TRADE_ID, SUM(EEBP.BID_PRIN_AMT) BID_PRIN_AMT
         from WFL_TRD_PRODUCT_DEAL TPD
         LEFT JOIN WFL_TRD_PRODUCT_DEAL_ADD TPDA
@@ -1253,29 +1249,12 @@
         ) EEBP ON TFPDT.TOTLE_TRADE_ID = EEBP.TOTLE_TRADE_ID
         LEFT JOIN MST_CFETS_CUSTOMER_INFO m1 on TFPDT.TRADER=m1.PARTY_ID
         LEFT JOIN MST_COUNTER_PARTY mcci ON TFPDT.COUNTER_ID = mcci.counter_id
-        LEFT JOIN (select listagg(case
-        when t3.TENDER_TARGET = '01'
-        then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
-        when t3.TENDER_TARGET = '02'
-        then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
-        when t3.TENDER_TARGET = '03'
-        then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
-        end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
-        t0.BID_ID
-        from WFL_BID_ORDER_BID_PRICE t0
-        LEFT JOIN WFL_BID_ORDER t1 on t1.BID_ID = t0.BID_ID
-        LEFT JOIN FIN_PRODUCT t2
-        ON t2.FINPROD_ID = t1.FINPROD_ID
-        LEFT JOIN
-        FIN_PRODUCT_ISSUE t3
-        ON t3.FINPROD_ID = t2.FINPROD_ID
-        group by t0.BID_ID) bobp
-        ON bobp.BID_ID = bo.BID_ID
         WHERE TFPDT.TRADE_STATUS = '01'
         AND tpd.TRADE_STATUS = '01'
         <if test="entrustId != null and entrustId != ''">
             AND tpda.entrust_id = #{entrustId}
-        </if>) T
+        </if>) T1
+        ORDER BY T1.updateTime DESC) T
         GROUP BY
         T.effectFlag,
         T.busiTypePosition,
@@ -1305,8 +1284,9 @@
         T.counterId,
         T.counterName,
         T.remark,
-        T.updateTime
-        ORDER BY T.updateTime DESC
+        T.totleTradeId,
+        T.tradeId
+
     </select>
     <select id="getEtrSubBidDealListInfo" resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse">
         SELECT T.* FROM

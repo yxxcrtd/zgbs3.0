@@ -887,6 +887,7 @@ public class CfetsEtrDispatcherService extends BaseService {
                         }
                         response.setTgBusiType(response.getBusiTypePosition());
                         response.setBidModle(response.getBiddingMethod());
+                        response.setTotleTradeId(response.getTotleTradeId());
 
                     }
 
