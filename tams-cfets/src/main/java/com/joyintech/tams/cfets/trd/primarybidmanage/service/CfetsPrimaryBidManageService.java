@@ -465,6 +465,13 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             Map<String, Object> param = BeanUtil.object2Map(request);
             CfetsPrimaryBidManageSaveRequest response = cfetsPrimaryBidManageMapper.selectBasicInfo(param);
             List<CfetsPrimaryBidManageSaveDetailDto> detailDtos = cfetsPrimaryBidManageMapper.selectBasicDtail(param);
+            // 交易所 应计利息取值
+            if (CollectionUtils.isNotEmpty(detailDtos)
+                    && !(StringUtil.equals(response.getTradeMarket(), DictCodeListExt3.交易场所_银行间.getValue())
+                    || StringUtil.equals(response.getTradeMarket(), DictCodeListExt3.交易场所_商业银行柜台.getValue()))
+                    && StringUtil.isNotEmpty(detailDtos.get(0).getIntAmt())) {
+                response.setIntAmt(detailDtos.get(0).getIntAmt());
+            }
             response.setAllocationDetails(detailDtos);
             return response;
         }
