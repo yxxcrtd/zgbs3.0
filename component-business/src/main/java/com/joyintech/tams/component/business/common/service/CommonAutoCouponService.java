@@ -906,8 +906,8 @@ public class CommonAutoCouponService extends BaseService {
                 //转债信息
                 if(DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue().equals(interfPayhsrcsecinfo.getSectype())){
                     FinProductConvertible finProductConvertible = new FinProductConvertible();
+                    finProductConvertible.setFinprodId(finprodId);
                     finProductConvertible.setConFinprodId(interfPayhsrcsecinfo.getConFinprodId());
-                    finProductConvertible.setFinprodId(interfPayhsrcsecinfo.getFinprodId());
                     finProductConvertible.setConShareId(interfPayhsrcsecinfo.getConShareId());
                     finProductConvertible.setConVdate(interfPayhsrcsecinfo.getConVdate());
                     finProductConvertible.setConPrice(interfPayhsrcsecinfo.getConPrice());
