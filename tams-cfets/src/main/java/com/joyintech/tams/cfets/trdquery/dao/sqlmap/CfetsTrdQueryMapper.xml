@@ -5449,7 +5449,7 @@
                 nvl(EEBP.BID_PRIN_AMT*100,0)-nvl(BRBP.THE_WIN_PRIN_AMT,0) avaNum,
                 nvl(brd.SETT_FEE_AMT, BRBP.SETT_FEE_AMT) settleFeeAmt,
                 nvl(brd.ACT_WIN_PRINAMT, BRBP.TRADE_AMT)tradeAmt,
-                nvl(brd.INT_AMT*EE.ENTRUST_NUM , BRBP.INT_AMT) intAmt,
+                nvl(brd.INT_AMT*brd.ACT_WIN_PRINAMT , BRBP.INT_AMT) intAmt,
                 nvl(brd.PAY_AMT, BRBP.PAYABLE_AMOUNT) payAmt,
                 decode(FPI.TENDER_TARGET,'01',to_char(BRBP.BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRBP.BID_PRICE,'fm999999990.9990')||'元','03',to_char(BRBP.BID_PRICE*10000,'fm999999990.90')||'BP') bidPrice,
                 BRBP.INV_AIM invAim,
