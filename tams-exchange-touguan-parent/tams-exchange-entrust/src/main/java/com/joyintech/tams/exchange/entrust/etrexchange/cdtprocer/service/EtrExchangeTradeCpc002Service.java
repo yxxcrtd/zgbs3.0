@@ -334,8 +334,7 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
                     dto = new EtrExchangeUnitCostDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
                     resultMap.put(key, dto);
                 }
-                if (StringUtil.equals(i.getString("PS"), DictCodeList.交易方向_买入.getValue())
-                ||StringUtil.equals(i.getString("PS"), DictCodeList.交易方向_申购.getValue())) {
+                if (StringUtil.equals(i.getString("PS"), DictCodeList.交易方向_买入.getValue())) {
                     // 成本
                     BigDecimal thisBuyCostAmt = dto.getBuyCostAmt()
                             .add(ArithmeticUtil.multiply(i.getBigDecimal("PRICE"), i.getBigDecimal("AMT")));
@@ -344,19 +343,37 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
                     dto.setShareAmt(dto.getShareAmt().add(i.getBigDecimal("AMT")));
                     // 单位成本 = 成本/数量
                     dto.setUnitCost(ArithmeticUtil.divide(dto.getBuyCostAmt(), dto.getShareAmt(), 4));
-                } else { // 卖出或行权回售
+                } else if (StringUtil.equals(i.getString("PS"), DictCodeList.交易方向_申购.getValue())) {
                     // 成本
                     BigDecimal thisBuyCostAmt = dto.getBuyCostAmt()
-                            .subtract(ArithmeticUtil.multiply(i.getBigDecimal("PRICE"), i.getBigDecimal("AMT")));
+                            .add(ArithmeticUtil.multiply(i.getBigDecimal("PRICE"), i.getBigDecimal("AMT")));
                     dto.setBuyCostAmt(thisBuyCostAmt);
                     // 数量
-                    dto.setShareAmt(dto.getShareAmt().subtract(i.getBigDecimal("AMT")));
+                    dto.setShareAmt(dto.getShareAmt().add(i.getBigDecimal("AMT")));
                     // 单位成本 = 成本/数量
-                    dto.setUnitCost(ArithmeticUtil.divide(dto.getBuyCostAmt(), dto.getShareAmt(), 2));
+                    dto.setUnitCost(ArithmeticUtil.divide(dto.getBuyCostAmt(), dto.getShareAmt(), 4));
+                }
+                //add wsz 修改 3.0.6场内 ZGCPCN-1810、ZGCPCN-1811 satrt
+                resultMap.put(key, dto);
+            });
+            currTrdData.forEach(i -> {
+                String key = getKey(i);
+                EtrExchangeUnitCostDto dto = resultMap.get(key);
+                if (dto == null) {
+                    dto = new EtrExchangeUnitCostDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+                    resultMap.put(key, dto);
+                }
+                if (!StringUtil.equals(i.getString("PS"), DictCodeList.交易方向_买入.getValue()) &&
+                        !StringUtil.equals(i.getString("PS"), DictCodeList.交易方向_申购.getValue())) { // 卖出或行权回售
+                    // 成本
+                    BigDecimal thisBuyCostAmt = dto.getBuyCostAmt()
+                            .subtract(ArithmeticUtil.multiply(dto.getUnitCost(), i.getBigDecimal("AMT")));
+                    dto.setBuyCostAmt(thisBuyCostAmt);
                 }
 
                 resultMap.put(key, dto);
             });
+            //add wsz 修改 3.0.6场内 ZGCPCN-1810、ZGCPCN-1811 end
         }
         return resultMap;
     }
