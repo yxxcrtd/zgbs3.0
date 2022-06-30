@@ -302,13 +302,17 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             if(StringUtil.isNotEmpty(response.getBidModle()) && response.getBidModle().equals(DictCodeListExt4.投标方式_自主投标.getValue())) {
                 Map<String, List<BidProductDto>> summaryBidMap = bidProductList.stream().collect(JoyinCollectors.groupingBy(item -> item.getWinPrice()));
                 List<SummaryBidDto> summaryBidList = new ArrayList<>();
+                String tenderTarget =null;
                 for (String winPrice : summaryBidMap.keySet()) {
                     SummaryBidDto summaryBidDto = new SummaryBidDto();
                     BigDecimal totalBidPrinamt = null;
                     BigDecimal winPrinAmt = null;
+                    BigDecimal bidPrice = null;
                     for (BidProductDto bidProductDto : summaryBidMap.get(winPrice)) {
                         totalBidPrinamt = ArithmeticUtil.doAdd(totalBidPrinamt, bidProductDto.getTotalBidPrinamt());
                         winPrinAmt = ArithmeticUtil.doAdd(winPrinAmt, bidProductDto.getWinPrinAmt());
+                        bidPrice = bidProductDto.getBidPrice();
+                        tenderTarget= bidProductDto.getTenderTarget();
                     }
                     if(totalBidPrinamt.compareTo(BigDecimal.ZERO.stripTrailingZeros())==0){
                         continue;
@@ -316,7 +320,20 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     summaryBidDto.setTotalBidPrinamt(totalBidPrinamt);
                     summaryBidDto.setWinPrinAmt(winPrinAmt);
                     summaryBidDto.setWinPrice(winPrice);
+                    summaryBidDto.setBidPrice(bidPrice);
                     summaryBidList.add(summaryBidDto);
+                }
+                if(!StringUtil.isEmptyList(summaryBidList)&&StringUtil.isNotEmpty(summaryBidList.get(0))){
+                    Comparator<SummaryBidDto> byBidPrice;
+                    if (StringUtil.equals(tenderTarget, DictCodeListExt4.招标标的_利率.getValue())
+                            || StringUtil.equals(tenderTarget, DictCodeListExt4.招标标的_利差.getValue())) {
+                        // 招标标的为利率和利差时 投标标位 从小到大排列
+                        byBidPrice = Comparator.comparing(SummaryBidDto::getBidPrice);
+                    } else {
+                        //招标标的为价格时，投标标位 从大到小排列
+                        byBidPrice = Comparator.comparing(SummaryBidDto::getBidPrice).reversed();
+                    }
+                    summaryBidList = summaryBidList.stream().sorted(byBidPrice).collect(Collectors.toList());
                 }
                 resultData.put(dtCode + "_formList", listTable);
                 resultData.put(dtCode + "_list", summaryBidList);
@@ -789,12 +806,13 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 unitCprice = detailDto.getWinCprice();
                 unitInt = detailDto.getIntAmt();
                 winPrinamt = ArithmeticUtil.doAdd(winPrinamt,detailDto.getTheWinPrinamt());
-                intAmt= ArithmeticUtil.doAdd(intAmt,detailDto.getIntAmt());
-                settFeeAmt= ArithmeticUtil.doAdd(settFeeAmt,detailDto.getSettFeeAmt());
+                intAmt = ArithmeticUtil.doAdd(intAmt, ArithmeticUtil.divide(
+                        ArithmeticUtil.multiply(detailDto.getIntAmt(), detailDto.getActWinPrinamt()), BigDecimal.valueOf(100), 4));
+                settFeeAmt = ArithmeticUtil.doAdd(settFeeAmt, detailDto.getSettFeeAmt());
             }
             trdFinProductDealTotal.setUnitCprice(unitCprice);
             trdFinProductDealTotal.setUnitInt(unitInt);
-            trdFinProductDealTotal.setUnitFprice(ArithmeticUtil.doAdd(unitCprice,intAmt));
+            trdFinProductDealTotal.setUnitFprice(ArithmeticUtil.doAdd(unitCprice, unitInt));
             trdFinProductDealTotal.setParValue(BigDecimal.valueOf(100));
             CfetsBidManageCalcAmountRequest request = new CfetsBidManageCalcAmountRequest();
             request.setWinPrinamt(winPrinamt);
@@ -899,14 +917,17 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             BigDecimal intAmt =null;
             BigDecimal fpriceAmt = null;
             BigDecimal settFeeAmt = null;
+            BigDecimal unitInt = null;
             String invAim = null;
             for(CfetsPrimaryBidManageSaveDetailDto detailDto: detailDtos) {
-                cpriceAmt = ArithmeticUtil.doAdd(cpriceAmt,detailDto.getTradeAmt());
+                cpriceAmt = ArithmeticUtil.doAdd(cpriceAmt, detailDto.getTradeAmt());
                 winPrinamt = ArithmeticUtil.doAdd(winPrinamt,detailDto.getTheWinPrinamt());
-                intAmt = ArithmeticUtil.doAdd(intAmt,detailDto.getIntAmt());
+                intAmt = ArithmeticUtil.doAdd(intAmt, ArithmeticUtil.divide(
+                        ArithmeticUtil.multiply(detailDto.getIntAmt(), detailDto.getActWinPrinamt()), BigDecimal.valueOf(100), 4));
                 fpriceAmt = ArithmeticUtil.doAdd(fpriceAmt,detailDto.getPayAmt());
                 settFeeAmt= ArithmeticUtil.doAdd(settFeeAmt,detailDto.getSettFeeAmt());
                 invAim = detailDto.getInvAim();
+                unitInt = detailDto.getIntAmt();
             }
             trdProductDeal.setCpriceAmt(cpriceAmt);
             trdProductDeal.setShareAmt(ArithmeticUtil.divide(winPrinamt,BigDecimal.valueOf(100),4));
@@ -916,6 +937,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             trdProductDeal.setTradeAmt(fpriceAmt);
             trdProductDeal.setFeeAmtUnpay(settFeeAmt);
             trdProductDeal.setFeeAmt(settFeeAmt);
+            trdProductDeal.setUnitInt(unitInt);
             trdProductDeal.setPs(DictCodeList.交易方向_买入.getValue());
             trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
             trdProductDeal.setIsCancel(DictCodeList.是否_否.getValue());

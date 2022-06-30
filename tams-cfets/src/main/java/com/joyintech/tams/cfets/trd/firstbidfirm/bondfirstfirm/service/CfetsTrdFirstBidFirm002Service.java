@@ -2081,6 +2081,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             //保存风险数据
             if (StringUtil.isNotEmpty(entity.getRiskcalResponse())
                     && CollectionUtils.isNotEmpty(entity.getRiskcalResponse().getRiskcalReturnList())) {
+                logger.debug("一级投标风险数据:"+JsonUtils.object2Json(entity.getRiskcalResponse().getRiskcalReturnList()));
                 List<RiskTrialRetDto> param = new ArrayList<>();
                 entity.getRiskcalResponse().getRiskcalReturnList().forEach(item-> {
                             RiskTrialRetDto risk = new RiskTrialRetDto();
