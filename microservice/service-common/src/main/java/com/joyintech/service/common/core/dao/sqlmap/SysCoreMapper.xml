@@ -408,7 +408,13 @@
         BASE_RATE_ACCURACY BASERATEACCURACY,
         FIRST_RATE_DETERMINATION_DATE FIRSTRATEDETERMINATION_DATE,
         IS_DEBT_WITH_RIGTHS isRight,
-        ORIGINAL_OWNER originalOwner
+        ORIGINAL_OWNER originalOwner,
+        CON_SHARE_ID conShareId,
+        CON_FINPROD_ID conFinprodId,
+        CON_VDATE conVdate,
+        CON_PRICE conPrice,
+        REDEEM_PRICE redeemPrice,
+        RESALE_PRICE resalePrice
 	FROM
 		INTERF_PAYHSRCSECINFO
 		where SECID = #{secid}
