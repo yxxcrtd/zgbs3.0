@@ -294,10 +294,7 @@ public class FinBondAsset001Controller extends BaseController {
                 }
             }
             for (FinBondAssetSaveRequest entity : request.getSelectedItem()) {
-                String finProdId = entity.getFinprodId();
-                if (StringUtil.isBlank(finProdId)) {
-                    finProdId = commonBusinessService.getFinProdId(entity.getFinprodMarketId(), DictCodeListExt1.金融产品类型_投管用_债券.getValue(), null);
-                }
+                String finProdId = commonBusinessService.getFinProdId(entity.getFinprodMarketId(), DictCodeListExt1.金融产品类型_投管用_债券.getValue(), null);
                 if (finBondAssetService.selectCountByfinprodId(finProdId) == 0) {
                     errorList.add(new ValidMessage("",
                             getMessage("该数据已被删除!")));

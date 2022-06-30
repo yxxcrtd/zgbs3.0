@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
@@ -27,14 +28,12 @@ import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
-import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
-import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.valuationusemerge.WflValidInputParameter;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
-import com.joyintech.tams.invest.common.trade.dao.EtrCommonCashPositionMapper;
-import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 //import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,15 +54,14 @@ import java.util.*;
 @Service
 @Scope("prototype")
 public class FinTenderBondAssetBatchService {
+    private Logger logger = LoggerFactory.getLogger(getClass());
+
 
     @Resource
     private FinTenderBondAssetBatchMapper finTenderBoundAssetMapper;
 
     @Resource
     private AutoPeriodCommonService autoPeriodCommonService;
-
-    @Resource
-    private CommonAutoCouponService commonAutoCouponService;
 
     @Resource
     private TrdFinProductDealTotalMapper trdFinProductDealTotalMapper;
@@ -266,7 +264,7 @@ public class FinTenderBondAssetBatchService {
         productAdd.setIssueStatus(DictCodeListExt1.发行状态_发行成功.getValue());
         finProductAddMapper.updateForTenderBound(productAdd);
         //记录操作日志
-        saveOperate(dto.getFinprodMarketId(), "");
+        saveOperate(productAdd);
         //发送头寸
         dto.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
         this.sendPosition(dto, plateDate, seqList);
@@ -302,26 +300,6 @@ public class FinTenderBondAssetBatchService {
                         basePtlSecPositionInfoService.inertSecPositionFlow(twoDto);
                     }
                 }
-                //5.处理指令流水
-         /*       List<EtrSecPositionFlowDto> etrFlowList = etrCommonCashPositionMapper.selectAllPositionByFinprodId(dto.getFinprodId());
-                if (CollectionUtils.isNotEmpty(etrFlowList)) {
-                    List<EtrSecPositionFlowDto> list = new ArrayList<>();
-                    for (EtrSecPositionFlowDto flowDto : list) {
-                        EtrSecPositionFlowDto dto1 = new EtrSecPositionFlowDto();
-                        BeanUtil.copyPropertiesIgnoreNull(dto1, flowDto);
-                        dto1.setAmount(dto1.getAmount().negate());
-                        list.add(dto1);
-                        flowDto.setFinprodId(finproductId);
-                    }
-                    //先生成一笔一级反向流水
-                    EtrPositionHoldDto holdDto = new EtrPositionHoldDto();
-                    holdDto.setPtlSecPositionFlows(list);
-                    etrCommonCashPositionDealService.持久化流水Dto(holdDto);
-                    //重新插入二级
-                    EtrPositionHoldDto holdDto1 = new EtrPositionHoldDto();
-                    holdDto1.setPtlSecPositionFlows(etrFlowList);
-                    etrCommonCashPositionDealService.持久化流水Dto(holdDto1);
-                }*/
             }
         }
     }
@@ -396,29 +374,17 @@ public class FinTenderBondAssetBatchService {
     /**
      * 保存操作类型
      *
-     * @param tradeId
-     * @param remark
+     * @param productAdd
      */
-    public void saveOperate(String tradeId, String remark) {
+    public void saveOperate(FinProductAdd productAdd) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-        oprHisReq.setEntrustId(tradeId);
+        oprHisReq.setEntrustId(productAdd.getFinprodId());
         oprHisReq.setOperType(DictCodeListExt3.操作类型_上市流通.getValue());
         oprHisReq.setBusiDes("上市流通");
         oprHisReq.setBusiType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
+        logger.info("上市流通日志：" + JsonUtils.object2Json(oprHisReq));
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 
-    /**
-     * 处理履历
-     */
-    public void updateCfetsOprHis(String entrustId, String workflowId) {
-        CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-        oprHisReq.setEntrustId(entrustId);
-        oprHisReq.setWorkflowId(workflowId);
-        oprHisReq.setOperType(DictCodeListExt3.操作类型_自动加券.getValue());
-        oprHisReq.setBusiType(DictCodeList.共通业务类型_债券类资产信息.getValue());
-        joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
-
-    }
 
 }
