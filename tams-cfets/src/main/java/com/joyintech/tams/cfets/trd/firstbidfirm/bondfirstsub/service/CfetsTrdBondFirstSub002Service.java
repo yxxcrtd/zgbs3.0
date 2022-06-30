@@ -834,6 +834,8 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                         }
                 );
                 basRiskMathCommService.insert(param, entity.getBidId());
+            } else {
+                logger.debug("一级申购风险数据为空");
             }
         }
         // AOP中处理操作履历
@@ -889,6 +891,8 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                                 }
                         );
                         basRiskMathCommService.insert(param, entity.getBidId());
+                    } else {
+                        logger.debug("一级申购风险数据为空");
                     }
                 }
             } catch (PositionException e) {
