@@ -95,7 +95,9 @@ public class InterfRiskController {
             if("指标状态_不通过".equals(e.getMessage())) {
 				String resStr = JsonUtils.object2Json(szcliendata.getBody());
 				logger.info("返回报文:{}", resStr);
-				return szcliendata.getBody();
+				Map<String, Object> retMap = szcliendata.getBody();
+				retMap.put("message", e.getMessage());
+				return retMap;
 			}
 
 			return doExceptionMsg("接口异常");
