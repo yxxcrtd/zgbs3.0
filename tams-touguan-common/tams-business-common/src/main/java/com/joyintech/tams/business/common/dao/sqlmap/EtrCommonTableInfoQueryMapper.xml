@@ -88,6 +88,57 @@
         </if>-->
         <!-- AND rit.conclusion is null
          AND fp.finprod_id is not null 注释掉这个过滤条件否则质押式回购的风险试算信息无法查出,add by gaowenlong at 20220110-->
+        union all
+        SELECT rit.sup_stat                           supStat,
+            rii.ind_name                           indName,
+            rii.ind_type                           indType,
+            pp.portfolio_name                      portfolioName,
+            nvl(fp.finprod_abbr, fpp.finprod_abbr) finprodAbbr,
+            rit.warn_cond                          warnCond,
+            rit.approve_cond                       approveCond,
+            rit.foul_cond                          foulCond,
+            rit.sup_val                            supVal,
+            rit.old_sup_val                        oldSupVal,
+            rit.sup_trend                          supTrend
+        FROM (select replace(TRADE_ID, PORTFOLIO_ID, '') TRADE_ID,sup_stat,warn_cond,approve_cond,
+        foul_cond,sup_val,old_sup_val,sup_trend,ind_id,portfolio_id,asset_code,SEQ_NO
+        from RSK_ISUP_TRIAL where not exists(select 1 from RSK_ISUP_TRIAL where 1 =1
+        <if test="entrustIdList != null and entrustIdList.size() > 0">
+            and TRADE_ID IN (
+            <foreach item="item" index="index" collection="entrustIdList" separator=",">
+                #{item}
+            </foreach>)
+        </if>)
+        ) rit
+        INNER JOIN RSK_ISUP_INDICATOR rii ON rit.ind_id = rii.ind_id
+        LEFT JOIN ptl_portfolio pp ON rit.portfolio_id = pp.portfolio_id
+        LEFT JOIN fin_product fp ON rit.asset_code = fp.finprod_id
+        LEFT JOIN ETR_ENTRUST ee ON rit.TRADE_ID = ee.ENTRUST_ID
+        LEFT JOIN fin_product fpp ON ee.finprod_id = fpp.finprod_id
+        WHERE 1=1
+        <if test="entrustIdList != null and entrustIdList.size() > 0">
+            and  rit.trade_id IN (
+            <foreach item="item" index="index" collection="entrustIdList" separator=",">
+                #{item}
+            </foreach>)
+        </if>
+        and rit.SEQ_NO IN (select SEQ_NO from
+            (select MAX(SEQ_NO) SEQ_NO from
+                    (select replace(TRADE_ID, PORTFOLIO_ID, '') TRADE_ID,SEQ_NO,PORTFOLIO_ID
+                                    from RSK_ISUP_TRIAL where not exists(select 1 from RSK_ISUP_TRIAL where 1 =1
+                                        <if test="entrustIdList != null and entrustIdList.size() > 0">
+                                            and TRADE_ID IN (
+                                            <foreach item="item" index="index" collection="entrustIdList" separator=",">
+                                                #{item}
+                                            </foreach>)
+                                        </if>)
+                    ) where 1=1
+        <if test="entrustIdList != null and entrustIdList.size() > 0">
+            and trade_id IN (
+            <foreach item="item" index="index" collection="entrustIdList" separator=",">
+                #{item}
+            </foreach>)
+        </if> GROUP BY PORTFOLIO_ID,TRADE_ID) t)
     </select>
 
     <resultMap id="queryAllWorkFlowInfoListMap" type="com.joyintech.tams.business.common.dto.CommonSearchQueryWorkflowResponse">
