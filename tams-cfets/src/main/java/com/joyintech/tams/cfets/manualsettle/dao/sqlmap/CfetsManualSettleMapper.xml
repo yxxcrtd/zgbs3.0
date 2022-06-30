@@ -690,7 +690,7 @@
                tpd.SHARE_AMT*100                            qtyd,
                tpd.FEE_AMT_UNPAY                        jsFeeAmt,
                tpd.CPRICE_AMT                           tradeAmt,
-               tpd.INT_AMT                              intAmt,
+               tpd.UNIT_INT                              intAmt,
                tpd.TRADE_AMT                            payAmt,
                 case
                     when brd.BID_PRICE is null then null
