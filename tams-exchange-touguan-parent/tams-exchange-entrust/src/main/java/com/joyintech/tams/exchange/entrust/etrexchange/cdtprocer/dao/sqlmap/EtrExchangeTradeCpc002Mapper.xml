@@ -667,10 +667,11 @@
         LEFT JOIN FIN_PRODUCT c ON a.FINPROD_ID =c.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_TYPE d ON d.FINPROD_ID =a.FINPROD_ID
         LEFT JOIN TRD_MANUAL_SETTLE_INFO tmsi on a.TRADE_ID = tmsi.TRADE_ID
+        LEFT JOIN TRD_MANUAL_SETTLE_INFO tmsi2 ON a.TOTLE_TRADE_ID = tmsi2.TRADE_ID
         WHERE a.TRADE_DATE =#{cdate} AND c.TRADE_MARKET in (#{SVR_TRADE_MARKET_03},#{SVR_TRADE_MARKET_04})
         AND a.PS IN (#{PS_T01},#{PS_T02},#{PS_T03},#{PS_T04},#{PS_T49})
         AND a.IS_CANCEL=#{YN_N}
-        AND (tmsi.TRADE_ID is null or tmsi.SETTLE_STATUS ='02')
+        AND ( tmsi.SETTLE_STATUS ='02'or tmsi2.SETTLE_STATUS = '02' or (tmsi.TRADE_ID is null and tmsi2.TRADE_ID is null))
         <if test="portfolioIdList != null">
             AND b.PORTFOLIO_ID in
             <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
