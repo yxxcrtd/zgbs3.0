@@ -3,23 +3,22 @@
 <mapper
 	namespace="com.joyintech.service.trade.investtrade.commandreceive.dao.TrdCommandReceive001Mapper">
 
+	<!-- modify by swwan start 2022-06-28 TISHKS-1447 -->
     <!-- 不显示二级市场的非通道投资和非内部转仓的交易(银行间债券的二级市场买入卖出指令、银行间质押式回购指令) -->
 	<sql id="notShowEntrustData">
-	   <if test = "secondaryMarketTrade != null and secondaryMarketTrade == 'N'.toString()">
-	        AND ETR_ENTRUST.ENTRUST_ID NOT IN (
-	            SELECT
-	                ENTRUST_ID
-	            FROM
-	                ETR_ENTRUST
-	            WHERE
-	                ETR_ENTRUST.TRADE_MARKET = '01'
-	                AND ETR_ENTRUST.CHL_ID IS NULL
-	                AND ( (ETR_ENTRUST.FINPROD_TYPE2 = 'F01' AND ETR_ENTRUST.TRADE_MARKET_MODE = '02' AND ETR_ENTRUST.PS IN('T01', 'T02'))
-	                    OR ETR_ENTRUST.FINPROD_TYPE2 IN ('F02', 'F03') 
-	                ) 
-	        )
-        </if>
+		AND ETR_ENTRUST.ENTRUST_ID NOT IN (
+			SELECT
+				ENTRUST_ID
+			FROM
+				ETR_ENTRUST
+			WHERE
+				ETR_ENTRUST.TRADE_MARKET in ('01','02')
+				AND ( (ETR_ENTRUST.FINPROD_TYPE2 = 'F01' AND ETR_ENTRUST.TRADE_MARKET_MODE = '02' AND ETR_ENTRUST.PS IN('T01', 'T02' , 'T03'))
+					OR ETR_ENTRUST.FINPROD_TYPE2 IN ('F02', 'F03')
+				)
+		)
 	</sql>
+	<!-- modify by swwan end 2022-06-28 TISHKS-1447 -->
 	
 	<!-- 已接收查询 -->
 	<!-- modify by  gaopeng 20191126 增加可转债转股 委托额度查询 start -->

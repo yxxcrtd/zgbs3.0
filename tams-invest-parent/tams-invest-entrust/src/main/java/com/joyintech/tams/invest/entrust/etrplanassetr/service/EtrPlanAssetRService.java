@@ -663,7 +663,11 @@ public class EtrPlanAssetRService extends CommonExportService<EtrPlanAssetRDto> 
                 String indexId = rowData.get(0).toString();
                 if (StringUtil.isBlank(indexId)) {
                     confirmMsg = "第" + (i + 1) + "行序号不能为空";
-                    break;
+                    //TISHKS-1390:导入模板中“序号”为空，为提示导入失败 start
+                    confirmMsg1 = etrCommonService.StringAddByBr(confirmMsg1, confirmMsg);
+                    errorNum++ ;
+                    continue;
+                    //TISHKS-1390:导入模板中“序号”为空，为提示导入失败 end
                 }
                 // 委托开始日非空
                 confirmMsg = etrCommonService.StringAddByBr(confirmMsg,

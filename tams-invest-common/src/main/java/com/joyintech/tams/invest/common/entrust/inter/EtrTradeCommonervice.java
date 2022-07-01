@@ -197,8 +197,10 @@ public class EtrTradeCommonervice extends BaseService {
                 if (newRealSecAmount != null) { //持仓数量
                     realSec = realSec.add(newRealSecAmount);
                 }
+                // modify by swwan 2022-06-28 TISHKS-1434 start
+                requestDto.setPtlList(secList);  //覆盖请求参数，非交易平台赋值了
+                // modify by swwan 2022-06-28 TISHKS-1434 end
             }
-            requestDto.setPtlList(secList);  //覆盖请求参数，非交易平台赋值了
 
         }
         return assemble(portfolioCash, canCash, realCash, canSec, realSec, requestDto);
@@ -329,8 +331,10 @@ public class EtrTradeCommonervice extends BaseService {
                     BeanUtil.copyPropertiesIgnoreNull(cashSecDto, dto); //复制资产信息
                     handleSecType(cashSecDto);
                     secList.add(cashSecDto);
+                    // modify by swwan 2022-06-28 TISHKS-1434 start
+                    requestDto.setPtlList(secList);  //覆盖请求参数，非交易平台赋值了
+                    // modify by swwan 2022-06-28 TISHKS-1434 end
                 }
-                requestDto.setPtlList(secList);  //覆盖请求参数，非交易平台赋值了
                 //资金可用金额
                 if (!CollectionUtils.isEmpty(secList) && secList.size() > 0) {
                     BigDecimal newSecAmount = queryPosition(secList, flowType, "");

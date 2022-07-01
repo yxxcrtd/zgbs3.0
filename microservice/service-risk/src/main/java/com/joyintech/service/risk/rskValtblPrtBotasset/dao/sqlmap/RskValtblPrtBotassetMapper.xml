@@ -23,8 +23,10 @@
 		 join RSK_VALTBL_SUBRELATION T3 ON T2.SUB_CODE LIKE concat(T3.int_subject,'%')
 		 where T1.PTL_ID = T2.PTL_ID and T1.SUB_CODE = T2.SUB_CODE
 		 )
-	and (T1.SUB_CODE not like '2%' or T1.SUB_CODE like '2701%')
-    and T1.SUB_CLASS not in ('ZHG','NHG') /**回购资产无需做映射 **/
+	<!--TISHKS-1508:回购资产需要做底层映射 modify by fuyongsheng 20220630 start-->
+	<!--and (T1.SUB_CODE not like '2%' or T1.SUB_CODE like '2701%')-->
+    <!--and T1.SUB_CLASS not in ('ZHG','NHG') /**回购资产无需做映射 **/-->
+	<!--TISHKS-1508:回购资产需要做底层映射 modify by fuyongsheng 20220630 end-->
 	<if test="ptlId !=null and ptlId !=''">
 		and T1.PTL_ID = #{ptlId}
 	</if>
@@ -178,8 +180,10 @@
 		join RSK_VALTBL_SUBRELATION r3 ON r2.SUB_CODE LIKE concat(r3.int_subject,'%')
 		where T1.PTL_ID = r2.PTL_ID and T1.SUB_CODE = r2.SUB_CODE
 		)
-		and (T1.SUB_CODE not like '2%' or T1.SUB_CODE like '2701%')
-		and T1.SUB_CLASS not in ('ZHG','NHG') /**回购资产无需做映射 **/
+		<!--TISHKS-1508:回购资产需要做底层映射 modify by fuyongsheng 20220630 start-->
+		<!--and (T1.SUB_CODE not like '2%' or T1.SUB_CODE like '2701%')-->
+		<!--and T1.SUB_CLASS not in ('ZHG','NHG') /**回购资产无需做映射 **/-->
+		<!--TISHKS-1508:回购资产需要做底层映射 modify by fuyongsheng 20220630 end-->
 		AND T1.FINPROD_ID is null
 		<if test="ptlId !=null and ptlId !=''">
 			and T1.PTL_ID = #{ptlId}
@@ -207,9 +211,11 @@
 		join RSK_VALTBL_SUBRELATION r3 ON r2.SUB_CODE LIKE concat(r3.int_subject,'%')
 		where T1.PTL_ID = r2.PTL_ID and T1.SUB_CODE = r2.SUB_CODE
 		)
-		and (T1.SUB_CODE not like '2%' or T1.SUB_CODE like '2701%')
+		<!--TISHKS-1508:回购资产需要做底层映射 modify by fuyongsheng 20220630 start-->
+		<!--and (T1.SUB_CODE not like '2%' or T1.SUB_CODE like '2701%')-->
+		<!--and T1.SUB_CLASS not in ('ZHG','NHG') /**回购资产无需做映射 **/-->
+		<!--TISHKS-1508:回购资产需要做底层映射 modify by fuyongsheng 20220630 end-->
 		and T1.FINPROD_ID is null
-		and T1.SUB_CLASS not in ('ZHG','NHG') /**回购资产无需做映射 **/
 		<if test="ptlId !=null and ptlId !=''">
 			and T1.PTL_ID = #{ptlId}
 		</if>
@@ -235,7 +241,9 @@
 		join RSK_VALTBL_SUBRELATION r3 ON r2.SUB_CODE LIKE concat(r3.int_subject,'%')
 		where T1.PTL_ID = r2.PTL_ID and T1.SUB_CODE = r2.SUB_CODE
 		)
-		and T1.SUB_CLASS not in ('ZHG','NHG') /**回购资产无需做映射 **/
+		<!--TISHKS-1508:回购资产需要做底层映射 modify by fuyongsheng 20220630 start-->
+		<!--and T1.SUB_CLASS not in ('ZHG','NHG') /**回购资产无需做映射 **/-->
+		<!--TISHKS-1508:回购资产需要做底层映射 modify by fuyongsheng 20220630 end-->
 		and T1.FINPROD_ID is not null
 		<if test="ptlId !=null and ptlId !=''">
 			and T1.PTL_ID = #{ptlId}

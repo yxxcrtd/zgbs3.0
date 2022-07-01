@@ -5,6 +5,7 @@ import com.joyintech.framework.validation.BeanValidator;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.invest.risk.quota.rskspecificassettype.dto.RskSpecificAssetTypeDto;
 import com.joyintech.tams.invest.risk.quota.rskspecificassettype.service.RskSpecificAssetTypeService;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,11 +40,16 @@ public class RskSpecificAssetTypeValidator implements BeanValidator {
 					resultList.add(new ValidMessage("资产代码重复，无法提交!"));
 					return resultList;
 				}
-				// 资产代码作为主键
-				dto.setSpecificId(dto.getFinprodId());
-				if (rskSpecificAssetTypeService.checkBusinessDataInFlow(dto)){
-					resultList.add(new ValidMessage("该资产代码存在流程中数据，无法提交!"));
-					return resultList;
+				// modify by swwan TISHKS-1300 start
+				// 存在流程中数据
+				if (WorkFlowUtil.isNotFromToDoList()) {
+					// modify by swwan TISHKS-1300 end
+					// 资产代码作为主键
+					dto.setSpecificId(dto.getFinprodId());
+					if (rskSpecificAssetTypeService.checkBusinessDataInFlow(dto)) {
+						resultList.add(new ValidMessage("该资产代码存在流程中数据，无法提交!"));
+						return resultList;
+					}
 				}
 			}
 			else{
