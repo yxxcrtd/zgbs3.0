@@ -5,6 +5,8 @@ package com.joyintech.tams.cfets.trdquery.dao;
 
 import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleInfoOtherListRespond;
 import com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto;
+import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveDetailDto;
+import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmExecFirstBondInfoResponse;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdFirstBondInvestTradeDto;
 import com.joyintech.tams.cfets.trdquery.dto.*;
@@ -315,4 +317,18 @@ public interface CfetsTrdQueryMapper {
 
 
     List<TrdProductDeal> selectTrdProductDealsByTotleTradeId(@Param("totleTradeId") String totleTradeId);
+
+    /**
+     * 自主投标未中标 分配明细
+     * @param pageParam
+     * @return
+     */
+    List<BidPortIntFenPeiInfoDto> findZztbZbjgFenPeiInfoList(Map<String, Object> pageParam);
+
+    /**
+     * 自主投标未中标 基本信息
+     * @param pageParam
+     * @return
+     */
+    CfetsTrdBidInfoResponse findZztbZbjgManualSettleInfo(Map<String, Object> pageParam);
 }
