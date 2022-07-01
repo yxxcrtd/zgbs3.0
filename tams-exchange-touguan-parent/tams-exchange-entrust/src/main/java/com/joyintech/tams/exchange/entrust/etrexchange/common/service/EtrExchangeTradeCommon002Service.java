@@ -577,13 +577,13 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
     }
 
     public static String getKey(BaseMap bm) {
-        return bm.getString("PORTFOLIO_ID") + bm.get("secAcctId") + bm.get("FINPROD_ID");
+        return bm.getString("PORTFOLIO_ID") + bm.get("SECACCTID") + bm.get("FINPROD_ID");
     }
 
     private Page<EtrExchangeTradePositionsCommonResponse> calculationAmount(Map<String, EtrExchangeUnitCostDto> unitCostMap, Page<EtrExchangeTradePositionsCommonResponse> pages, String platDate) {
         if (pages != null && pages.getRoot() != null && !pages.getRoot().isEmpty()) {
             pages.getRoot().forEach(r -> {
-                EtrExchangeUnitCostDto dto = unitCostMap.get(r.getPortfolioId() + r.getFinprodId());
+                EtrExchangeUnitCostDto dto = unitCostMap.get(r.getPortfolioId()+r.getSecAcctId() + r.getFinprodId());
                 if (dto != null) {
                     // 1.持仓成本（元）
                     r.setPositionsAmt(dto.getBuyCostAmt());
