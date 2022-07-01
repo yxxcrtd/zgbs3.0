@@ -6,22 +6,10 @@ import com.joyintech.framework.export.ExportParam;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.jdbc.enums.DataSourceType;
 import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.JsonUtils;
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.framework.util.SysDataUtil;
-import com.joyintech.tams.common.base.dao.AssetTargetDbMapper;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.dao.MstCounterPartyMapper;
 import com.joyintech.tams.common.base.dao.MstCustomerInfoMapper;
-import com.joyintech.tams.common.base.dao.TargetDetailMapper;
-import com.joyintech.tams.common.base.entity.AssetTargetDb;
-import com.joyintech.tams.common.base.entity.FinCashCalcRule;
-import com.joyintech.tams.common.base.entity.FinExercisePlan;
-import com.joyintech.tams.common.base.entity.MstCounterParty;
-import com.joyintech.tams.common.base.entity.MstCustomerInfo;
-import com.joyintech.tams.common.base.entity.TargetDetail;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.basicdata.dto.BusiFinProductRatingDto;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
@@ -35,14 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -140,7 +121,7 @@ public class PtlPositionAnalysis002Service extends CommonExportService<PtlPositi
                             typeName.setPosCost(v.get(0).getPosCost());
                             typeName.setPosValue(v.get(0).getPosValue());
                             typeName.setTdyIntincexp(v.get(0).getTdyIntincexp());
-
+                            typeName.setPrin(v.get(0).getPrin());
                             pageList.add(typeName);
                         });
 
@@ -1064,7 +1045,8 @@ public class PtlPositionAnalysis002Service extends CommonExportService<PtlPositi
                 item.setTradeMarket(SysDataUtil.getNameFromDataDict(DictCode.交易场所, item.getTradeMarket()));
 
                 //名义本金 对于利率互换，显示为名义本金；其他类资产显示为空
-                if (!item.getPinanAssetType().equals(DictCodeListExt1.金融产品类型_投管用_利率互换.getValue())) {
+                if (!item.getPinanAssetType().equals(DictCodeListExt1.金融产品类型_投管用_利率互换.getValue())
+                        && !item.getPinanAssetType().equals(DictCodeListExt1.金融产品类型_信用保护凭证.getCodeName())) {
                     item.setPrin(null);
                 }
 

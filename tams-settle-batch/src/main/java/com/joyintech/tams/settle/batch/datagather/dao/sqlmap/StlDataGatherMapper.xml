@@ -281,7 +281,7 @@
 		SETTLE_TRANS_TG_MAPPING M ON M.TRADE_ID = stdsq.TRADE_ID
 		<!--GNS-889:使用首期成交编号 modify by fuyongsheng 20220219 end-->
 		INNER JOIN TRD_PRODUCT_DEAL T1
-		ON M.TRADE_ID_TG = T1.TRADE_ID
+		ON (M.TRADE_ID_TG = T1.TRADE_ID OR M.TRADE_ID_TG = T1.TOTLE_TRADE_ID)
 		<!-- ON T1.F_TRADE_ID = std.CJBH
 		AND T1.SEAT_ID = std.SEAT_NUMBER
 		AND T1.VDATE = STD .TRADE_DATE -->
@@ -1583,6 +1583,73 @@
 			</if>
 		</where>
 	</select>
+
+	<!--ZGCPCN-1469:一级投标债查询指令特殊处理,关联ETR_ENTRUST_DETAIL表 modify by fuyongsheng 20220617 start-->
+	<select id="selectFirstBondEtrEntrustData" resultType="com.joyintech.tams.settle.batch.datagather.dto.EtrEntrustDto">
+		SELECT
+			T1.ENTRUST_ID,
+			T1.FINPROD_ID,
+			T1.PS,
+			T1.ENTRUST_DATE,
+			T2.SEC_ACCT_ID,
+			T2.ACCT_NO DEAL_CUR_ACCT,
+			T2.ENTRUST_NUM ,
+			T2.ENTRUST_AMT
+		FROM
+			ETR_ENTRUST T1
+		LEFT JOIN
+			ETR_ENTRUST_DETAIL T2 ON T2.ENTRUST_ID = T1.ENTRUST_ID
+		<where>
+			T1.TRADE_MARKET in ('03', '04')
+			<if test="dataList != null and dataList.size() > 0">
+				AND T1.FINPROD_ID IN
+				<foreach collection="dataList" item="currData" open=" (" close=")" separator=",">
+					#{currData.finprodId,jdbcType=VARCHAR}
+				</foreach>
+			</if>
+			<if test="finprodTypeList != null and finprodTypeList.size()>0">
+				AND T1.FINPROD_TYPE2  IN
+				<foreach item="item" index="index" collection="finprodTypeList" open="(" separator=","  close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="psList != null and psList.size()>0">
+				AND T1.PS  IN
+				<foreach item="item" index="index" collection="psList" open="(" separator=","  close=")">
+					#{item}
+				</foreach>
+			</if>
+			AND EXISTS (
+				SELECT
+					bobp.ENTRUST_ID
+				FROM
+					BID_ORDER_BID_PRICE bobp
+				LEFT JOIN
+					BID_ORDER bo ON bobp.BID_ID = bo.BID_ID
+				WHERE
+					bobp.ENTRUST_ID = T1.ENTRUST_ID
+					AND bobp.TRADE_STATUS = #{TRADE_STATUS_01}
+					AND bobp.IS_CANCEL = #{IS_CANCEL_N}
+					AND bo.BID_MODLE = #{BID_MODLE_03}
+				UNION
+				SELECT
+					brd.ENTRUST_ID
+				FROM
+					BID_RESULT_DETAIL brd
+				LEFT JOIN
+					BID_RESULT_TOTAL brt ON brd.TOTAL_WIN_ID = brt.TOTAL_WIN_ID
+				INNER JOIN
+					BID_ORDER bo ON brt.BID_ID = bo.BID_ID
+				WHERE
+					brd.ENTRUST_ID = T1.ENTRUST_ID
+					AND brt.STATUS = #{TRADE_STATUS_01}
+					AND brt.IS_WIN = #{IS_WIN_Y}
+					AND bo.BID_MODLE = #{BID_MODLE_03}
+			)
+		</where>
+	</select>
+	<!--ZGCPCN-1469:一级投标债查询指令特殊处理,关联ETR_ENTRUST_DETAIL表 modify by fuyongsheng 20220617 end-->
+
 	<!--查询行权-回售计划-->
 	<select id="selectFinExercisePlanData" resultType="com.joyintech.tams.common.base.entity.FinExercisePlan">
 		SELECT
@@ -1641,10 +1708,10 @@
 		DISTINCT  sttm.TRADE_ID_TG
 		FROM SETTLE_TRANS_TG_MAPPING sttm
 		WHERE sttm.TRADE_ID in(
-			SELECT std.SEQ_NO
+			SELECT std.TRADE_ID
 			FROM SETTLE_TRANS_DATA std
 			WHERE std.APPLY_TRADE_ID = #{applyTradeId, jdbcType=VARCHAR}
-			AND  std.DEAL_DATE = #{dealDate,jdbcType=DATE}
+			AND  std.TRADE_DATE = #{tradeDate,jdbcType=DATE}
 			AND std.SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
 			AND std.SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
 		)
@@ -1652,12 +1719,20 @@
 	<!--add 查询投管交易编号 by liujs 20220512 end-->
 	<!--add 根据汇总交易编号查询出所有汇总交易 by liujs 20220512 start-->
 	<select id="selectTotalTradesBytotleTradeId" resultType="com.joyintech.tams.common.base.entity.TrdFinProductDealTotal">
-		SELECT *
+		SELECT
+		       DISTINCT *
 		FROM TRD_FIN_PRODUCT_DEAL_TOTAL t
 		where t.TOTLE_TRADE_ID IN
 		<foreach collection="tradeIdTgList" item="item" open="(" close=")" separator=",">
 			#{item,jdbcType=VARCHAR}
 		</foreach>
+	</select>
+
+	<select id="selectTradesByTotleTradeId" resultType="com.joyintech.tams.common.base.entity.TrdProductDeal">
+		SELECT
+			 *
+		FROM TRD_PRODUCT_DEAL t
+		where t.TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
 	</select>
 	<!--add 根据汇总交易编号查询出所有汇总交易 by liujs 20220512 end-->
 	<!--add 根据汇总的成交明细查询出原成交明细列表 by liujs 20220512 start-->
@@ -1666,6 +1741,7 @@
 		FROM SETTLE_TRANS_DATA std
 		WHERE std.APPLY_TRADE_ID = #{applyTradeId, jdbcType=VARCHAR}
 		AND  std.DEAL_DATE = #{dealDate,jdbcType=DATE}
+	  	AND  std.TRADE_DATE = #{tradeDate,jdbcType=DATE}
 		AND std.SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
 		AND std.SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
 	</select>
@@ -1702,5 +1778,9 @@
 			AND std.SETTLE_MODE = #{SETTLE_MODE_02}
 			AND std.SETTLE_SPEED = #{ACCOUNT_SPEED_01}
 		</where>
+	</select>
+
+	<select id="selectBidEntrustIds" resultType="java.lang.String">
+
 	</select>
 </mapper>

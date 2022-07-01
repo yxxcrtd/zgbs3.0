@@ -354,7 +354,7 @@
             round(TEMP.AMOUNT/10000,2)     AS positionsNum,
             invaim.INV_AIM as invAim,
             invaim.BUSINESS_MODEL as businessModel,
-            invaim.TRADE_PLAT tradePlat,
+            <!-- invaim.TRADE_PLAT tradePlat, -->
             FP.FINPROD_TYPE2                          AS finprodType2,
             FP.TRADE_MARKET                           AS tradeMarket,
             c1.acctNo1                          AS acctNo,
@@ -453,14 +453,18 @@
         on SSAI.TRD_ACCT_ID = c1.acctNo1
         <!-- 业务模式查交易表 -->
         left join (
-            select FINPROD_ID, PORTFOLIO_ID,TRADE_PLAT,
+            select FINPROD_ID, PORTFOLIO_ID,
+                   <!--TRADE_PLAT,-->
                    listagg(INV_AIM, ',') WITHIN GROUP (ORDER BY PORTFOLIO_ID, FINPROD_ID) as INV_AIM,
         listagg(BUSINESS_MODEL, ',') WITHIN GROUP (ORDER BY PORTFOLIO_ID, FINPROD_ID) as BUSINESS_MODEL
         from (
-            SELECT FINPROD_ID, PORTFOLIO_ID, TRADE_PLAT,INV_AIM,BUSINESS_MODEL
+            SELECT FINPROD_ID, PORTFOLIO_ID,
+                   <!--TRADE_PLAT,-->
+                   INV_AIM,BUSINESS_MODEL
             FROM (
             select
-            a.INV_AIM ,a.BUSINESS_MODEL, a.TRADE_DATE ,a.FINPROD_ID,b.PORTFOLIO_ID,a.TRADE_PLAT,
+            a.INV_AIM ,a.BUSINESS_MODEL, a.TRADE_DATE ,a.FINPROD_ID,b.PORTFOLIO_ID,
+                   <!--a.TRADE_PLAT,-->
             ROW_NUMBER () over(
             PARTITION BY a.TRADE_ID
             ORDER BY a.TRADE_DATE DESC
@@ -477,7 +481,9 @@
             AND a.TRADE_DATE &lt;= #{sysDate}
             ) WHERE rn = 1
             UNION
-            SELECT a.FINPROD_ID, b.PORTFOLIO_ID, a.TRADE_PLAT,a.INV_AIM,a.BUSINESS_MODEL
+            SELECT a.FINPROD_ID, b.PORTFOLIO_ID,
+                   <!--a.TRADE_PLAT,-->
+                   a.INV_AIM,a.BUSINESS_MODEL
             from TRD_PRODUCT_TEMP_DEAL a
             LEFT JOIN TRD_PRODUCT_TEMP_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
             WHERE 1=1
@@ -488,7 +494,8 @@
                 </foreach>
             </if>
             AND a.TRADE_DATE = #{sysDate}
-            ) GROUP BY FINPROD_ID, PORTFOLIO_ID,TRADE_PLAT
+            ) GROUP BY FINPROD_ID, PORTFOLIO_ID
+                     <!--,TRADE_PLAT-->
         ) invaim on invaim.FINPROD_ID=TEMP.FINPROD_ID and invaim.PORTFOLIO_ID=TEMP.PORTFOLIO_ID
         lEFT JOIN FIN_PRODUCT_TYPE FPT
         on FP.FINPROD_ID = FPT.FINPROD_ID
@@ -499,7 +506,7 @@
         <if test="portfolioIdList != null and portfolioIdList.size()>0">
             <foreach collection="portfolioIdList" open="AND TEMP.PORTFOLIO_ID IN (" item="portfolioId" separator="," close=")">
                     #{portfolioId,jdbcType=VARCHAR}
-            </foreach> 
+            </foreach>
         </if>
         <if test="finprodName != null and finprodName !=''">
             AND FP.FINPROD_ABBR LIKE CONCAT('%', CONCAT(#{finprodName}, '%'))
@@ -545,7 +552,7 @@
         INNER JOIN STL_SEC_ACCT_INFO B
         ON A.ACCT_NO = B.SEC_ACCT_ID
         <where>
-            1 = 1 
+            1 = 1
             <if test="search != null and search != ''">
                 AND
                 (
@@ -752,7 +759,7 @@
 		select count(*) from FIN_CASH_INFO r
 		inner join FIN_EXERCISE_PLAN q
 		on r.cash_id = q.cash_id
-		and q.exercise_type = #{EXEC_MODE_02}  
+		and q.exercise_type = #{EXEC_MODE_02}
 		where r.cash_type_2 = #{CASH_TYPE_2_C01}
 		and r.branch = 0
 		<if test="finprodId != null and !finprodId.equals('')">
@@ -763,7 +770,7 @@
             AND q.MDATE &gt;=to_date(#{startDate},'yyyy-MM-dd')
         </if>
 	</select>
-	
+
 	<select id="selectStdsecConverseRatio" resultType="java.lang.String">
 		select t.scale from FIN_STDSEC_CONVERSE_RADIO t where t.branch = 0 and rownum = 1
 		<if test="finprodId != null and !finprodId.equals('')">
@@ -773,7 +780,7 @@
         AND t.MDATE <![CDATA[>=]]> #{date}
         order by t.VDATE desc
 	</select>
-	
+
 	<!-- 自定义二级类型查询 -->
 	<select id="getCustomerTypeTwo" resultType="java.lang.String">
 		select r.type_6
@@ -822,7 +829,7 @@
 		</if>
         GROUP BY SSAI.TRADE_PLACE
 	</select>
-	
+
 	<select id="getDistributeByEntrustId" resultType="com.joyintech.tams.common.base.entity.EtrDistribute">
 	SELECT T.ENTRUST_ID, T.TRADER
       FROM ETR_DISTRIBUTE T
@@ -984,7 +991,7 @@
 		AND a.FUND_CODE = #{secId}
 		and a.VALUE_DATE = to_date(#{date},'yyyy-MM-dd') - 1
 	</select>
-	
+
 	<select id="qryInterfFundMarketInfo" resultType="java.lang.String">
 		SELECT a.CLOSE_PRICE as price
 		FROM INTERF_F_MARKET_INFO a
@@ -994,7 +1001,7 @@
 		AND a.FUND_CODE = #{secId}
 		and a.VALUE_DATE = to_date(#{date},'yyyy-MM-dd') - 1
 	</select>
-	
+
 	<select id="qryMstShareMarketInfo" resultType="java.lang.String">
 		SELECT a.CLOSE_PRICE as price
 		FROM MST_SHARE_PRICE a
@@ -1004,7 +1011,7 @@
 		AND a.SHARES_ID = #{secId}
 		and a.DEAL_DATE = to_date(#{date},'yyyy-MM-dd') - 1
 	</select>
-	
+
 	<select id="qryInterfShareMarketInfo" resultType="java.lang.String">
 		SELECT a.CLOSE_PRICE as price
 		FROM INTERF_STOCK_QUOTE a
@@ -1041,7 +1048,7 @@
             </if>
         </where>
     </select>
-    
+
     <select id="getFinProductQutoInfo" resultType="com.joyintech.tams.common.base.entity.FinProductQuto">
         select
         QUTO,
@@ -1487,9 +1494,12 @@
         LEFT JOIN TRD_PRODUCT_TEMP_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
         LEFT JOIN FIN_PRODUCT c ON a.FINPROD_ID =c.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_TYPE d ON d.FINPROD_ID =a.FINPROD_ID
+        LEFT JOIN TRD_MANUAL_SETTLE_INFO tmsi on a.TRADE_ID = tmsi.TRADE_ID
+        LEFT JOIN TRD_MANUAL_SETTLE_INFO tmsi2 ON a.TOTLE_TRADE_ID = tmsi2.TRADE_ID
         WHERE a.TRADE_DATE =#{cdate} AND c.TRADE_MARKET in (#{SVR_TRADE_MARKET_03},#{SVR_TRADE_MARKET_04})
         AND a.PS IN (#{PS_T01},#{PS_T02},#{PS_T03},#{PS_T04},#{PS_T49})
         AND a.IS_CANCEL=#{YN_N}
+        AND ( tmsi.SETTLE_STATUS ='02'or tmsi2.SETTLE_STATUS = '02' or (tmsi.TRADE_ID is null and tmsi2.TRADE_ID is null))
         <if test="portfolioIdList != null">
             AND b.PORTFOLIO_ID in
             <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">

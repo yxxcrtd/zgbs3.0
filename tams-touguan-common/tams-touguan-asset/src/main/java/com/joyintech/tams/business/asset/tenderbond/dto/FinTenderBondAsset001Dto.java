@@ -342,7 +342,7 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     }
 
     public String getIssueTypeValue() {
-        return SysDataUtil.getNameFromDataDict(DictCode.募集方式, this.issueType);
+        return SysDataUtil.getNameFromDataDict(DictCode.债券类资产募集方式, this.issueType);
     }
 
     public void setIssueTypeValue(String issueTypeValue) {
@@ -614,7 +614,7 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     }
 
     public String getSubRate() {
-        return subRate;
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.评级结果, this.subRate);
     }
 
     public void setSubRate(String subRate) {
@@ -622,7 +622,7 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     }
 
     public String getDebRate() {
-        return debRate;
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.评级结果, this.debRate);
     }
 
     public void setDebRate(String debRate) {
@@ -630,7 +630,7 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     }
 
     public String getSubRateOrg() {
-        return subRateOrg;
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.评级机构, this.subRateOrg);
     }
 
     public void setSubRateOrg(String subRateOrg) {
@@ -638,7 +638,7 @@ public class FinTenderBondAsset001Dto extends BaseDto {
     }
 
     public String getDebRateOrg() {
-        return debRateOrg;
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.评级机构, this.debRateOrg);
     }
 
     public void setDebRateOrg(String debRateOrg) {

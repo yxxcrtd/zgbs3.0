@@ -1,8 +1,10 @@
 package com.joyintech.tams.business.common.service;
 
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.ArithmeticUtil;
@@ -18,8 +20,9 @@ import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.systemtools.util.CommonUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.jasypt.commons.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +40,12 @@ public class JoyinbusinessCommonService extends BaseService {
     private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
     @Autowired(required = false)
     private IPlatformDate iPlatformDate;
+
+    /**
+     * FileAttachmentProcess
+     */
+    @Autowired(required = false)
+    private FileAttachmentProcess fileAttachmentProcess;
 
     /**
      * 根据条件查询证券账户
@@ -93,7 +102,9 @@ public class JoyinbusinessCommonService extends BaseService {
         Map<String, Object> param = new HashMap<>();
         param.put("search", dto.getSearch());
         List<String> assestTypes = new ArrayList<>();
-        assestTypes.add(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+        if (!StringUtil.equals(dto.getIsOnlyNewBond(), DictCodeList.是否_否.getValue())) {
+            assestTypes.add(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+        }
         // 部分接口不需要查询新债信息
         if (!StringUtil.equals(dto.getIsNewBond(), DictCodeList.是否_否.getValue())) {
             assestTypes.add(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
@@ -113,6 +124,10 @@ public class JoyinbusinessCommonService extends BaseService {
             param.put("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
             //需要查询债券资产、回购期限、项目类资产、公募基金、计划类净值型、计划类利率型、计划类货币型、存款
             return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.getfinprodIdForAll(param));
+        }
+        // 查询债券信息含接口表数据
+        if(StringUtil.isNotEmpty(dto.getDealType()) && StringUtil.equals(dto.getDealType(), "02")){
+            return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.getfinprodIdAndInterfData(param));
         }
         if (StringUtil.isNotEmpty(dto.getPs()) && (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_行权_回售.getValue())
                 || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_行权_赎回.getValue()))) {
@@ -184,10 +199,10 @@ public class JoyinbusinessCommonService extends BaseService {
         dto.setSeqNo(IDGenerator.generate(32));
         dto.setOperDate(new Date());
         if (StringUtil.isEmpty(dto.getUserId())) {
-            dto.setUserId(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
-            dto.setCreateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
+            dto.setUserId(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "system");
+            dto.setCreateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "system");
             dto.setCreateDept(CommonUtil.getDeptCode());
-            dto.setUpdateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
+            dto.setUpdateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "system");
         }
         List<CfetsOprHisInfoRequest> wflDto = new ArrayList<>();
         if (StringUtil.isNotEmpty(dto.getWorkflowId())) {
@@ -524,5 +539,55 @@ public class JoyinbusinessCommonService extends BaseService {
      */
     public List<FinProductSpecialDto> queryFinProductSpecialByFinprodIds(List<String> finprodIds) {
         return joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(finprodIds);
+    }
+
+    /**
+     * 根据业务编号获取附件信息
+     * @param businessId 业务编号
+     * @return 附件信息
+     */
+    public CommonMstFileInputParameter selectFileInfoByBusId(String businessId) {
+        List<UploadFile> files = fileAttachmentProcess.fetchByBusinessCode(businessId);
+
+        CommonMstFileInputParameter result = new CommonMstFileInputParameter();
+        List<CommonUploadFileInfo> fileList = new ArrayList<>();
+        CommonUploadFileInfo tempFileInfo;
+        if (!StringUtil.isEmptyList(files)) {
+            for (UploadFile uploadFile : files) {
+                tempFileInfo = new CommonUploadFileInfo();
+                tempFileInfo.setSeqNo(uploadFile.getFileNo());
+                tempFileInfo.setFileName(uploadFile.getFileName());
+                tempFileInfo.setPath(uploadFile.getTargetFile().getPath());
+                tempFileInfo.setBusinessId(businessId);
+                tempFileInfo.setSize(ArithmeticUtil.divide(BigDecimal.valueOf(uploadFile.getTargetFile().length()), 1024, 2));
+                fileList.add(tempFileInfo);
+            }
+        }
+
+        result.setFileList(fileList);
+        result.setBussinessId(businessId);
+
+        return result;
+    }
+
+    /**
+     * 查询新操作记录
+     * @param entrustId 交易编号
+     * @return
+     */
+    public List<EtrEntrustOperHisDto> selectCfetsOprHisByEntrustId(@Param("entrustId") String entrustId){
+        return joyinbusinessCommonMapper.selectCfetsOprHisByEntrustId(entrustId);
+    }
+
+    /**
+     * 根据证券账户查询产品资金账户
+     *
+     * @param map
+     * @return java.lang.String
+     * @author jiangpeng
+     * @date 2022/6/21 10:40
+     */
+    public String qryCashAcctIdBySecAcctId(Map<String, Object> map) {
+        return joyinbusinessCommonMapper.qryCashAcctIdBySecAcctId(map);
     }
 }

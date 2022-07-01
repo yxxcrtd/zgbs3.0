@@ -1,28 +1,32 @@
 package com.joyintech.tams.valuation.common.interf.base.util;
 
-import com.joyintech.tams.common.base.entity.ValInterflog;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.valuation.common.interf.base.dto.TemplateColMatchDTO;
-import com.joyintech.tams.valuation.common.interf.base.dto.TemplateOrderInfoReaderDTO;
-import com.joyintech.tams.valuation.common.interf.base.dto.TemplateOrderInfoReaderResult;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.xml.sax.helpers.DefaultHandler;
-
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.joyintech.tams.common.base.entity.ValInterflog;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.valuation.common.interf.base.dto.TemplateColMatchDTO;
+import com.joyintech.tams.valuation.common.interf.base.dto.TemplateOrderInfoReaderDTO;
+import com.joyintech.tams.valuation.common.interf.base.dto.TemplateOrderInfoReaderResult;
 
 public class DatParserHandler {
 
-    Logger logger = Logger.getLogger(DefaultHandler.class);
+	private static Logger logger = LoggerFactory.getLogger(DatParserHandler.class);
+	 
+//    Logger logger = Logger.getLogger(DefaultHandler.class);
 
     private Class<?> T;
 

@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.thymeleaf.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -344,6 +345,9 @@ public class ExchangeEntrustRdsCommonAop {
         if(StringUtil.equals("F36", mapTrd.get("finprodType2"))) {
         	return;
         }
+        if(StringUtil.equals("F37", mapTrd.get("finprodType2"))) {
+            return;
+        }
         // add by yzg 期货暂时不用风险 20201211 end
         if (StringUtil.equals(getOperateType(mapTrd), BussinessConstant.SUBMIT)) {
             //如果是撤销的退回再提交直接退去，不需要调实占
@@ -389,6 +393,9 @@ public class ExchangeEntrustRdsCommonAop {
         Object finprodId = mapTrd.get(InterfUtil.finprodId);
         Object finprodType2 = mapTrd.get(InterfUtil.finprodType2);
         // 取得资产类型
+        if(StringUtils.equals(finprodType2, "F37")){
+            return ;
+        }
         if (StringUtil.isNotEmpty(finprodId)) {
             IAssetInfo assetInfo = assetInfoSrc.getInfoFromRedis(RedisKeyEnum.资产基本信息.key(),
                 finprodId.toString());

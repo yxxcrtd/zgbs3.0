@@ -210,6 +210,15 @@ public class FieldEtrInfoQueryService extends BaseService {
                         response.setDealProgress(dto2.getDealProgress());
                     }
                 }
+                //add wsz 3.0.6场内 ZGCPCN-1659 20220623 start
+                //【场内指令查询-信用保护凭证】指令金额排序有误将sql中的转化为字符串逻辑放在此处处理，解决金额排序问题
+                if(!StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())&&
+                  !StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())
+                        &&StringUtils.equals(response.getOutputValue(), DictCodeListExt3.投管业务类型_债转股.getValue())
+                ){
+                    response.setEntrustAmt(null);
+                }
+                //add wsz 3.0.6场内 ZGCPCN-1659 20220623 end
             }
 
         }
@@ -287,8 +296,15 @@ public class FieldEtrInfoQueryService extends BaseService {
         if (StringUtil.isBlank(dto.getEntrustId()) || entrustIdList.size() > 1) {
             return new Page<TradeQueryBean>();
         }
-        Page<TradeQueryBean>
-                page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> fieldEtrInfoQueryMapper.getEtrDispatcherDealListInfo(pageParam));
+        Page<TradeQueryBean> page = null;
+        //一级投标
+        if (StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())) {
+            page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(),
+                    () -> fieldEtrInfoQueryMapper.getEtrDispatcherBidDealListInfo(pageParam));
+        } else {
+            page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(),
+                    () -> fieldEtrInfoQueryMapper.getEtrDispatcherDealListInfo(pageParam));
+        }
         return page;
     }
 
@@ -297,11 +313,16 @@ public class FieldEtrInfoQueryService extends BaseService {
         Map<String, Object> pageParam = BeanUtil.object2Map(dto);
         pageParam.put("instructionId", dto.getEntrustId());
         pageParam.put("sysDate", iPlatformDate.getSysDateStr());
+        pageParam.put("DELIVERY_RESULT_05", "05");
+        pageParam.put("DELIVERY_RESULT_04", "04");
         Page<TradeQueryBean> page = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(),
                 () -> fieldEtrInfoQueryMapper.queryTrade2Touguan(pageParam));
         if (!CollectionUtils.isEmpty(page.getRoot())) {
             for (TradeQueryBean response : page.getRoot()) {
                 if (StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_现券交易.getValue())) {
+                    response.setTradedVolume(ArithmeticUtil.divide(response.getTradedVolume(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
+                }
+                if (StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_信用保护凭证.getValue())) {
                     response.setTradedVolume(ArithmeticUtil.divide(response.getTradedVolume(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                 }
                 if (StringUtils.equals(response.getEntrustBs(), DictCodeListExt3.交易方向_质押券出库.getValue())

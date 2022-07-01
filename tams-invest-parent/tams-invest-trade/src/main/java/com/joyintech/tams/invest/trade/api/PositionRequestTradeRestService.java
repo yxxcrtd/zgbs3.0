@@ -492,7 +492,13 @@ public class PositionRequestTradeRestService {
         resultMap.put("busiAct", getBusiAct(trdProductDeal));
         // ZGTFCP-1608:还本到账/收息到账交易方向转换 modify by fuyongsheng 20220322 start
         if(DictCodeList.交易方向_还本到账.getValue().equals(trdProductDeal.getPs())){
-            resultMap.put("ps", DictCodeList.交易方向_还本.getValue());
+            // ZGCPCN-1667:根据total表的交易方向判断是否是到期的还本到账 modify by fuyongsheng 20220623 start
+            if(DictCodeList.交易方向_到期.getValue().equals(trdProductDealTotal.getPs())){
+                resultMap.put("ps", DictCodeList.交易方向_到期.getValue());
+            }else{
+                resultMap.put("ps", DictCodeList.交易方向_还本.getValue());
+            }
+            // ZGCPCN-1667:根据total表的交易方向判断是否是到期的还本到账 modify by fuyongsheng 20220623 end
         }else if(DictCodeList.交易方向_收息到账.getValue().equals(trdProductDeal.getPs())){
             resultMap.put("ps", DictCodeList.交易方向_收息.getValue());
         }else{
@@ -527,11 +533,11 @@ public class PositionRequestTradeRestService {
         pltMap.put("ordSecAmount", BigDecimal.ZERO);
         pltMap.put("cashAcctId", accountNo);
         pltMap.put("secAcctId", trdProductDealTotal.getSecManageAcctId());
-        pltMap.put("secAmount", trdProductDeal.getShareAmt());
+        pltMap.put("secAmount", ArithmeticUtil.multiply(trdProductDeal.getShareAmt(), new BigDecimal(100)));
         pltMap.put("cashAmount", trdProductDeal.getTradeAmt());
         pltMap.put("invAim", trdProductDeal.getInvAim());
         pltMap.put("integrateSecAmount", BigDecimal.ZERO);
-        pltMap.put("ownSecAmount", BigDecimal.ZERO);
+        pltMap.put("ownSecAmount", ArithmeticUtil.multiply(trdProductDeal.getShareAmt(), new BigDecimal(100)));
         ptlList.add(pltMap);
         resultMap.put("ptlList", ptlList);
     }

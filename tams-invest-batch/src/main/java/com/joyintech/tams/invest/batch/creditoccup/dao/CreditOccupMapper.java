@@ -2,6 +2,7 @@ package com.joyintech.tams.invest.batch.creditoccup.dao;
 
 import com.joyintech.tams.invest.batch.creditoccup.dto.CreditUsingDto;
 import com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -66,6 +67,12 @@ public interface CreditOccupMapper {
      */
     List<CreditLinesInputDto> listWwSec(Map<String,Object> param);
 
-
+    /**
+     * 查询一级债日间交易
+     *
+     * @param param
+     * @return
+     */
+    List<CreditLinesInputDto> listTotalTempDeal(Map<String,Object> param);
 }
 

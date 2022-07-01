@@ -5,6 +5,9 @@ import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
+import com.joyintech.tams.common.base.dao.TrdFinProductDealTotalMapper;
+import com.joyintech.tams.common.base.dao.TrdProductDealAddMapper;
+import com.joyintech.tams.common.base.dao.TrdProductDealMapper;
 import com.joyintech.tams.common.base.entity.StlPayOrders;
 import com.joyintech.tams.common.base.entity.TrdFinProductDealTotal;
 import com.joyintech.tams.common.base.entity.TrdProductDeal;
@@ -23,10 +26,11 @@ import com.joyintech.tams.invest.common.position.service.CommonPositionEngineSer
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
+import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonRevokeDto;
 import com.joyintech.tams.invest.common.valuationinterf.ValuationInterfService;
 import com.joyintech.tams.invest.trade.exchangetransmatch.position.constant.PositionConstant;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,9 +39,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author 何阳阳
@@ -67,6 +69,15 @@ public class TradeRestApi {
      */
     @Autowired
     private ValuationInterfService valuationInterfService;
+
+    @Autowired
+    private TrdProductDealAddMapper trdProductDealAddMapper;
+
+    @Autowired
+    private TrdFinProductDealTotalMapper trdFinProductDealTotalMapper;
+
+    @Autowired
+    private TrdProductDealMapper trdProductDealMapper;
 
 	@Autowired
     private PositionRequestTradeRestService positionRequestTradeRestService;    
@@ -106,34 +117,34 @@ public class TradeRestApi {
                 }
                 if (CollectionUtils.isNotEmpty(tradeIdList) && CollectionUtils.isEmpty(baseTradeProductDealDtos)) {
                     baseTradeProductDealDtos = baseTradeProductDealService.select(tradeIdList);
-                    // add by etliu 20220219 start
-                    if (!CollectionUtils.isEmpty(baseTradeProductDealDtos)) {
-                        for (BaseTradeProductDealDto tempDto : baseTradeProductDealDtos) {
-                            if (tempDto.getTrdProductDeal() != null && StringUtil.equals(DictCodeList.交易方向_收息到账.getValue(), tempDto.getTrdProductDeal().getPs())) {
-                                if(正回购_逆回购.contains(tempDto.getTrdProductDeal().getFinprodType2())){
-                                    tempDto.getTrdProductDeal().setPs(DictCodeList.交易方向_到期.getValue());
-                                }else{
-                                    tempDto.getTrdProductDeal().setPs(DictCodeList.交易方向_收息.getValue());
-                                }
-                            }
-                            else if (tempDto.getTrdProductDeal() != null && StringUtil.equals(DictCodeList.交易方向_还本到账.getValue(), tempDto.getTrdProductDeal().getPs())) {
-                                if(正回购_逆回购.contains(tempDto.getTrdProductDeal().getFinprodType2())){
-                                    tempDto.getTrdProductDeal().setPs(DictCodeList.交易方向_到期.getValue());
-                                }else{
-                                    tempDto.getTrdProductDeal().setPs(DictCodeList.交易方向_还本.getValue());
-                                }
-                            }
-                            else if (tempDto.getTrdProductDeal() != null && StringUtil.equals(DictCodeList.交易方向_赎回到账.getValue(), tempDto.getTrdProductDeal().getPs())) {
-                                tempDto.getTrdProductDeal().setPs(DictCodeList.交易方向_赎回.getValue());
-                            }
-                            if (tempDto.getTrdFinProductDealTotal() != null
-                                    && StringUtil.equals(DictCodeList.交易方向_到期.getValue(), tempDto.getTrdFinProductDealTotal().getPs())) {
+                }
+                // add by etliu 20220219 start
+                if (!CollectionUtils.isEmpty(baseTradeProductDealDtos)) {
+                    for (BaseTradeProductDealDto tempDto : baseTradeProductDealDtos) {
+                        if (tempDto.getTrdProductDeal() != null && StringUtil.equals(DictCodeList.交易方向_收息到账.getValue(), tempDto.getTrdProductDeal().getPs())) {
+                            if(正回购_逆回购.contains(tempDto.getTrdProductDeal().getFinprodType2())){
                                 tempDto.getTrdProductDeal().setPs(DictCodeList.交易方向_到期.getValue());
+                            }else{
+                                tempDto.getTrdProductDeal().setPs(DictCodeList.交易方向_收息.getValue());
                             }
                         }
+                        else if (tempDto.getTrdProductDeal() != null && StringUtil.equals(DictCodeList.交易方向_还本到账.getValue(), tempDto.getTrdProductDeal().getPs())) {
+                            if(正回购_逆回购.contains(tempDto.getTrdProductDeal().getFinprodType2())){
+                                tempDto.getTrdProductDeal().setPs(DictCodeList.交易方向_到期.getValue());
+                            }else{
+                                tempDto.getTrdProductDeal().setPs(DictCodeList.交易方向_还本.getValue());
+                            }
+                        }
+                        else if (tempDto.getTrdProductDeal() != null && StringUtil.equals(DictCodeList.交易方向_赎回到账.getValue(), tempDto.getTrdProductDeal().getPs())) {
+                            tempDto.getTrdProductDeal().setPs(DictCodeList.交易方向_赎回.getValue());
+                        }
+                        if (tempDto.getTrdFinProductDealTotal() != null
+                                && StringUtil.equals(DictCodeList.交易方向_到期.getValue(), tempDto.getTrdFinProductDealTotal().getPs())) {
+                            tempDto.getTrdProductDeal().setPs(DictCodeList.交易方向_到期.getValue());
+                        }
                     }
-                    // add by etliu 20220219 end
                 }
+                // add by etliu 20220219 end
                 
                 finProductTradeDto.setBaseTradeProductDealDtos(baseTradeProductDealDtos);
                 
@@ -166,6 +177,8 @@ public class TradeRestApi {
                 // ZGTFCP-1955,ZGTFCP-1510:上市流通、质押券出入库的头寸是在撤销批处理任务里处理的,不用走老头存逻辑 modify by fuyongsheng 20220327 end
 
                 // 发送新头寸接口数据
+                // 债券存续期finProductTradeDto对象处理老头存时是totalDeal维度,新头寸是deal维度,处理新头寸前需补齐交易
+                this.preHandleNewPositionData(finProductTradeDto);
                 positionRequestTradeRestService.sendTradeRestPositionRequest(finProductTradeDto);
 
                 // 结算数据下行都是单产品单组合，不会有母组合的，该逻辑去掉                
@@ -262,4 +275,40 @@ public class TradeRestApi {
         }
         return new CommonResult(CommonResult.SUCCED, "OK");
     }
+
+    // ZGCPCN-1655:新头寸需将缺少的交易信息补齐 modify by fuyongsheng 20220623 start
+    /**
+     * 预处理新头寸数据
+     * @param finProductTradeDto
+     */
+    private void preHandleNewPositionData(FinProductTradeDto finProductTradeDto){
+        List<BaseTradeProductDealDto> baseTradeProductDealDtos = finProductTradeDto.getBaseTradeProductDealDtos();
+        if(CollectionUtils.isNotEmpty(baseTradeProductDealDtos)){
+            Map<String, TrdProductDeal> tradeProductDealMap = new HashMap<>();
+            Set<String> currentTradeIds = new HashSet<>();
+            Set<String> allTradeIds = new HashSet<>();
+            for(BaseTradeProductDealDto baseTradeProductDealDto : baseTradeProductDealDtos){
+                TrdFinProductDealTotal dealTotal = baseTradeProductDealDto.getTrdFinProductDealTotal();
+                currentTradeIds.add(baseTradeProductDealDto.getTrdProductDeal().getTradeId());
+                if(dealTotal != null){
+                    List<TrdProductDeal> trdProductDeals = EtrCommonCashPositionDealService.selectTrdProductDealByTotleTradeId(dealTotal.getTotleTradeId());
+                    for(TrdProductDeal trdProductDeal : trdProductDeals){
+                        tradeProductDealMap.put(trdProductDeal.getTradeId(), trdProductDeal);
+                        allTradeIds.add(trdProductDeal.getTradeId());
+                    }
+                }
+            }
+            // 取差集,得出需补的交易数据
+            allTradeIds.removeAll(currentTradeIds);
+            for(String tradeId : allTradeIds){
+                BaseTradeProductDealDto baseTradeProductDealDto = new BaseTradeProductDealDto();
+                TrdProductDeal trdProductDeal = tradeProductDealMap.get(tradeId);
+                baseTradeProductDealDto.setTrdProductDeal(trdProductDeal);
+                baseTradeProductDealDto.setTrdProductDealAdd(trdProductDealAddMapper.selectByPrimaryKey(tradeId));
+                baseTradeProductDealDto.setTrdFinProductDealTotal(trdFinProductDealTotalMapper.selectByPrimaryKey(trdProductDeal.getTotleTradeId()));
+                baseTradeProductDealDtos.add(baseTradeProductDealDto);
+            }
+        }
+    }
+    // ZGCPCN-1655:新头寸需将缺少的交易信息补齐 modify by fuyongsheng 20220623 end
 }

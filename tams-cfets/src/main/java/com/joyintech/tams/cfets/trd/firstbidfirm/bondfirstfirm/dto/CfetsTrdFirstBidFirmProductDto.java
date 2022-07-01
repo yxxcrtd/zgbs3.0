@@ -77,6 +77,9 @@ public class CfetsTrdFirstBidFirmProductDto {
     @ApiModelProperty(name = "acctNo", value = "资金账户", example = "1")
     private String acctNo;
 
+    @ApiModelProperty(name = "acctNoStr", value = "资金账户名称", example = "1")
+    private String acctNoStr;
+
     @ApiModelProperty(name = "secManageAcctId", value = "证券账户ID", example = "1")
     private String secManageAcctId;
 
@@ -110,7 +113,9 @@ public class CfetsTrdFirstBidFirmProductDto {
     @ApiModelProperty(name = "secDesirableCash", value = "券商户可取现金(元)")
     private BigDecimal secDesirableCash;
 
-    List<CfetsTrdFirstBidFirmProductDto> list;
+    private List<CfetsTrdFirstBidFirmProductDto> list;
+
+    private String finprodId;
 
     public String getEntrustId() {
         return entrustId;
@@ -305,6 +310,14 @@ public class CfetsTrdFirstBidFirmProductDto {
         return acctNo;
     }
 
+    public String getAcctNoStr() {
+        return acctNoStr;
+    }
+
+    public void setAcctNoStr(String acctNoStr) {
+        this.acctNoStr = acctNoStr;
+    }
+
     public void setAcctNo(String acctNo) {
         this.acctNo = acctNo;
     }
@@ -403,5 +416,13 @@ public class CfetsTrdFirstBidFirmProductDto {
 
     public void setList(List<CfetsTrdFirstBidFirmProductDto> list) {
         this.list = list;
+    }
+
+    public String getFinprodId() {
+        return finprodId;
+    }
+
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
     }
 }

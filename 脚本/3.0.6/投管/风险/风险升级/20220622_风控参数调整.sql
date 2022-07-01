@@ -1,0 +1,12 @@
+-- 设置授权为硬控
+update SYS_PARA set PARAM_VALUE='false' where PARA_CODE='IS_AUTHORIZATION_SOFTCONTROL';
+
+update SYS_PARA set REMARK='是否启用指令授权(01:是,02:否)' where PARA_CODE='etrlimit_switch';
+update SYS_PARA set REMARK='是否启用交易授权(01:是,02:否)',PARAM_VALUE='02' where PARA_CODE='AUTHORIZE_LIMIT';
+
+
+DELETE FROM SYS_PARA T WHERE T.SYSTEM_CODE = 'RSK' AND T.PARA_CODE = 'IS_SUPPORT_OCUPPY_CALC';
+INSERT INTO SYS_PARA (SYSTEM_CODE, PARA_CODE, PARAM_VALUE, DATA_TYPE, DATA_SCOPE, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, UPDATE_FLG)
+VALUES ('RSK', 'IS_SUPPORT_OCUPPY_CALC', 'N', null, null, '预占重计算之后是否需要重新计算T日占用记录（Y:需要  N: 不需要）', 'system', null, sysdate, 'chendi', sysdate, null, '01');
+
+

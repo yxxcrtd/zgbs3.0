@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-    layout:decorator="~{layout/default}">
+    layout:decorate="~{layout/default}">
 <head>
 <title data-th-text="#{ComYieldCurveInfo001}">收益率曲线信息</title>
 </head>
@@ -34,7 +34,7 @@
                     <div class="layui-input-inline input-inline">
                     <select type="text" id="curveType" name="curveType" 
                             class="layui-input form-input input-select" 
-                            data-th-data-result='${CURVE_TYPE}' allowClear="true"
+                            data-th-data-result='${CURVE_INT_TYPE}' allowClear="true"
                             placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"
                             formatoption = "true" >
                           <option></option>

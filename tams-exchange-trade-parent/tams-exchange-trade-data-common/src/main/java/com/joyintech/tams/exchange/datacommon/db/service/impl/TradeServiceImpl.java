@@ -21,7 +21,7 @@ import com.joyintech.tams.exchange.datacommon.db.dao.IMybatisMapper;
 import com.joyintech.tams.exchange.datacommon.db.dao.IntegratedEntrustMapper;
 import com.joyintech.tams.exchange.datacommon.db.dao.TradeMapper;
 import com.joyintech.tams.exchange.datacommon.db.service.TradeService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;

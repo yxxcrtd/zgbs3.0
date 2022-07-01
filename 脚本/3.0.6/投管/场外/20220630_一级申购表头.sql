@@ -1,0 +1,2 @@
+UPDATE CFG_DATATABLE_SHOW SET  EXTENDCFG = '{"colAlign": "right","supportSearch":"精确"}' WHERE PAGECODE = 'TenderBondSub' AND DTCODE = 'DAYSUBINFO' AND SPCDCODE = '999999' AND COLCODE = 'rate' ;
+UPDATE CFG_READONLY_FORM_SHOW SET COLCODE = 'rateStr', EXTENDCFG = '{"colAlign": "left"}' WHERE PAGECODE = 'cfetsManualSettleQuery' AND DTCODE = 'CfetsManualSettleInfo' AND SPCDCODE = '34W' AND COLCODE = 'rate';

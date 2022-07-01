@@ -51,6 +51,17 @@ public class BidProductDto {
     @ApiModelProperty(name="dipTypeStr",value="分配方式")
     private String dipTypeStr;
 
+    @ApiModelProperty(name="acctNo",value="账户")
+    private String acctNo;
+
+    @ApiModelProperty(name="acctName",value="账户名称")
+    private String acctName;
+
+    private String tenderTarget;
+
+    private BigDecimal bidPrice;
+
+
     public String getBidId() {
         return bidId;
     }
@@ -137,5 +148,37 @@ public class BidProductDto {
 
     public void setDipType(String dipType) {
         this.dipType = dipType;
+    }
+
+    public String getAcctNo() {
+        return acctNo;
+    }
+
+    public void setAcctNo(String acctNo) {
+        this.acctNo = acctNo;
+    }
+
+    public String getAcctName() {
+        return acctName;
+    }
+
+    public void setAcctName(String acctName) {
+        this.acctName = acctName;
+    }
+
+    public String getTenderTarget() {
+        return tenderTarget;
+    }
+
+    public void setTenderTarget(String tenderTarget) {
+        this.tenderTarget = tenderTarget;
+    }
+
+    public BigDecimal getBidPrice() {
+        return bidPrice;
+    }
+
+    public void setBidPrice(BigDecimal bidPrice) {
+        this.bidPrice = bidPrice;
     }
 }

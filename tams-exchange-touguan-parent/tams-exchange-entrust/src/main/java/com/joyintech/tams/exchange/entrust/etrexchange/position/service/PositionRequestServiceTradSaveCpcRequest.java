@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
+import com.joyintech.tams.business.common.service.TamsBusinessCommonService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -14,7 +15,7 @@ import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTr
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradePortfolioSecRepoRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeSaveSecRepoRequest;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,9 @@ public class PositionRequestServiceTradSaveCpcRequest {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     @Autowired
     private CommonPositionEngineService commonPositionEngineService;
+
+    @Autowired
+    private TamsBusinessCommonService tamsBusinessCommonService;
 
     public void sendEtrExchangeTradeSaveRequest(EtrCreditProtectionCertificateApplyRequest entity, String decisionAct, String systemAct) {
         Map<String, Object> resultMap = new HashMap<>();
@@ -130,20 +134,27 @@ public class PositionRequestServiceTradSaveCpcRequest {
             fillAttributes(entity);
             for (EtrExchangeTradePortfolioSecRepoRequest item : entity.getPortfolioList()) {
                 bean = new PositionRequestBaseBean(item);
-                BigDecimal price = Objects.isNull(entity.getPrice()) ? new BigDecimal(0) : entity.getPrice();
-                bean.setCashAmount(price.multiply(item.getEntrustNum()).setScale(2, RoundingMode.HALF_UP));
-                BigDecimal secAmount = commonPositionEngineService.getSecAmountByBondUnit(item.getEntrustNum());
-                bean.setSecAmount(secAmount.setScale(2, RoundingMode.HALF_UP));
+//                BigDecimal price = Objects.isNull(entity.getPrice()) ? new BigDecimal(0) : entity.getPrice();
+//                bean.setCashAmount(price.multiply(item.getEntrustNum()).setScale(2, RoundingMode.HALF_UP));
+//                BigDecimal secAmount = commonPositionEngineService.getSecAmountByBondUnit(item.getEntrustNum());
+//                bean.setSecAmount(secAmount.setScale(2, RoundingMode.HALF_UP));
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);
-                map.put("etrSecAmount", entity.getEntrustNum());
+                if (StringUtil.equals(entity.getPs(), DictCodeList.交易方向_申购.getValue())) {
+                    String acctId = tamsBusinessCommonService.selectProdTghCapacctNo(item.getPortfolioId());
+                    map.put("cashAcctId", acctId);
+                }
+//                map.put("etrSecAmount", ArithmeticUtil.multiply(entity.getEntrustNum(),BigDecimal.valueOf(10000)));
+                map.put("secAmount", ArithmeticUtil.multiply(item.getEntrustNum(),BigDecimal.valueOf(10000)));
+                map.put("cashAmount", item.getEntrustAmt());
                 map.put("tradeId", "");
                 ptlList.add(map);
+
                 Map<String, Object> map2 = new HashMap<>();
                 map2.put("portfolioId", bean.getPortfolioId());
                 map2.put("finprodId", bean.getFinprodId());
                 map2.put("secAcctId", bean.getSecAcctId());
-                map2.put("secAmount", bean.getSecAmount());
+                map2.put("secAmount", ArithmeticUtil.multiply(item.getEntrustNum(),BigDecimal.valueOf(10000)));
                 map2.put("tradeId", "");
                 ptlSubList.add(map2);
             }

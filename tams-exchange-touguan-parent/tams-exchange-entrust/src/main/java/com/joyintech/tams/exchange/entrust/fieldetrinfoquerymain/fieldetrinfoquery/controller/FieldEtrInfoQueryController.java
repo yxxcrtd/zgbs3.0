@@ -21,6 +21,7 @@ import com.joyintech.tams.business.common.dto.FieldExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.EntrustQueryBean;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FieldEtrBondFirstExeListInfoResponse;
 import com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoquery.dto.FieldEtrInfoQueryListRequest;
@@ -35,16 +36,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Controller
@@ -211,9 +210,9 @@ public class FieldEtrInfoQueryController extends BaseController {
     public Message<Page<TradeQueryBean>> getEtrDispatcherDealListInfo(@RequestBody CommonSearchInfoRequest dto)
             throws Exception {
         try {
-            Page<TradeQueryBean> returnDto = fieldEtrInfoQueryService.getEtrDispatcherDealListInfo(dto);
+            Page<TradeQueryBean> returnDto = fieldEtrInfoQueryService.getEtrDispatcherDealListInfoByExe(dto);
             if (returnDto.getTotal() == 0 && CollectionUtils.isEmpty(returnDto.getRoot())) {
-                returnDto = fieldEtrInfoQueryService.getEtrDispatcherDealListInfoByExe(dto);
+                returnDto = fieldEtrInfoQueryService.getEtrDispatcherDealListInfo(dto);
             }
             return new Message<Page<TradeQueryBean>>().success().setData(returnDto);
         } catch (Exception e) {

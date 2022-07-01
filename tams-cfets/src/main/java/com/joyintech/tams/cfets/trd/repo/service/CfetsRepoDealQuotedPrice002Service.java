@@ -43,6 +43,8 @@ import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.business.common.util.ThreadLocalUtil;
+import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtribRepoInfo003Dto;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
 import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepo003Mapper;
 import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepoMapper;
@@ -84,9 +86,10 @@ import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
+import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1576,6 +1579,13 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
         joyinbusinessCommonService.updateCfetsOprHis(cfetsOprHisInfoRequest);
     }
 
+    @Override
+    public Map<String, Object> getRuntimeVariables(ProcessMark entity, String taskId) throws WorkFlowException {
+        Map<String, Object> variables = new HashMap();
+        variables.put("needNextCheck", false);
+        return variables;
+    }
+
     /**
      * 处理指令完成度
      *
@@ -2255,7 +2265,8 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
         req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         req.setPtlCashList(ptlCashList);
         req.setPtlSecList(ptlSecList);
-        PositionHttpRequest.send(req);
+        Map<String, Object> param = PositionHttpRequest.send(req);
+        ThreadLocalUtil.setLocalCache(param);
     }
 
     /**

@@ -25,6 +25,7 @@ import com.joyintech.tams.invest.common.trade.dto.EtrSecPositionDto;
 import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.*;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +56,7 @@ public class BaseEtrCashPositionCommServiceImpl extends BaseService implements B
 
     @Autowired
     private BaseAssetCashPositionCommMapper baseAssetCashPositionCommMapper;
-    
+
     /**
      * 平台日期
      */
@@ -84,6 +85,10 @@ public class BaseEtrCashPositionCommServiceImpl extends BaseService implements B
 
         // 资产类型
         String finprodType = finProductTradeDto.getTrdProductDeal().getFinprodType2();
+        // 指令编号
+        if(finProductTradeDto.getTrdProductDealAdd() != null){
+            finProductTradeDto.setEntrustId(finProductTradeDto.getTrdProductDealAdd().getEntrustId());
+        }
         // 处理结果
         EtrPositionHoldDto etrPositionHoldDto = new EtrPositionHoldDto();
         // 持仓流水
@@ -357,18 +362,20 @@ public class BaseEtrCashPositionCommServiceImpl extends BaseService implements B
     public CommonResult entrustCloseExecute(String entrustId, String isExistNew, BigDecimal forcedFinishAmt) {
         if (StringUtil.isNotEmpty(entrustId)) {
             EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(entrustId);
-            if (etrEntrust != null && etrEntrust.getEntrustClass() != null && StringUtil.equals(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue(), etrEntrust.getEntrustClass())) {
+            if (etrEntrust != null && ((etrEntrust.getEntrustClass() != null
+                    && StringUtil.equals(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue(), etrEntrust.getEntrustClass()))
+                    || StringUtils.equals(etrEntrust.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue()))) {
                 List<EntrustCommonDto> entrustCommonDtoList = EtrCommonCashPositionDealService.findEntrustMulti(entrustId);
                 if (!CollectionUtils.isEmpty(entrustCommonDtoList)) {
-                    entrustCommonDtoList.stream().forEach(entrustCommonDto -> {
+                    for (EntrustCommonDto entrustCommonDto : entrustCommonDtoList) {
                         entrustCommonDto.setIsExistNew(isExistNew);
                         entrustCloseExecuteSinglePortfolio(entrustCommonDto);
-                    });
+                    }
                 }
             } else {
                 EntrustCommonDto entrustCommonDto = EtrCommonCashPositionDealService.findEntrust(entrustId);
                 // 委托指令附属表查询
-                EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entrustId);
+//                EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entrustId);
                 if (StringUtil.isNotEmpty(forcedFinishAmt)) {
                     entrustCommonDto.setForcedFinishAmt(forcedFinishAmt);//强制完成额度
                 }
@@ -429,7 +436,7 @@ public class BaseEtrCashPositionCommServiceImpl extends BaseService implements B
      * 产品端影响实时现金共通方法
      * // modify by jiangpeng on 20210429 start
      * // ZGBSS-1148 【债券借贷存续期】：到期交易中有“是否现金交割”的功能没有按照预期实现。
-     * 
+     *
      * @param cashInputDto
      * @return
      */
@@ -481,7 +488,7 @@ public class BaseEtrCashPositionCommServiceImpl extends BaseService implements B
     				|| StringUtil.equals(ps, DictCodeList.交易方向_产品现金分红.getValue()))){//fixed BSTOZ-858bug
             	ret.setAmount(ret.getAmount().negate());//赎回撤销交易金额取反  add by zhouxiuping at 2019/10/31
             }*/// 上面已对撤销的交易金额取反,此处注释
-            
+
             // 添加现金流水到目标dto
             if(flag) {
                 etrPositionHoldDto.getPtlCashPositionFlows().add(ret);
@@ -626,6 +633,11 @@ public class BaseEtrCashPositionCommServiceImpl extends BaseService implements B
                 EtrNetCashPositionDealService.deal计划类EntrustClose(entrustCommonDto, etrPositionHoldDto);
             }
             // add by etliu 20210421 权益类资产相关代码合并 end
+
+            else if(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue().equals(finprodType)){
+                EtrCpcCashPositionDealService.deal信用保护凭证EntrustClose(entrustCommonDto, etrPositionHoldDto);
+            }
+
             // 委托撤回或拒绝时，当前平台日处理实时持仓
             //协议是回购处理头寸  走配置化头寸共通
             for(EtrCashPositionFlowDto flowDto:etrPositionHoldDto.getPtlCashPositionFlows()){

@@ -40,7 +40,7 @@ import com.joyintech.tams.invest.common.trade.dto.PortfolioCalculateDto;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dao.TrdCommonBaseMapper;
 import com.joyintech.tams.invest.common.trade.dto.AllTradeCommonInputDto;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -1330,7 +1330,8 @@ public class TrdCommonBaseService extends BaseService {
             portfolioDto.setOrderId(infContractDetailfile.getOrderId());
             if(DictCodeListExt3.目标类型_数量.getValue().equals(portfolioDetail.getTargetType())){
                 // 指令券面总额
-                if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())) {
+                if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())
+                    || DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue().equals(etrEntrust.getFinprodType2())) {
                     portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrustDetail.getEntrustNum(), new BigDecimal(100)));
                 } else {
                     portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrustDetail.getEntrustNum()));
@@ -1343,7 +1344,8 @@ public class TrdCommonBaseService extends BaseService {
             portfolioDto.setCashAmount(portfolioDetail.getTradeAmt());
             if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())
                     || DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(etrEntrust.getFinprodType2())
-                    || DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(etrEntrust.getFinprodType2())) {
+                    || DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(etrEntrust.getFinprodType2())
+                    || DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue().equals(etrEntrust.getFinprodType2())) {
                 // 券面总额
                 portfolioDto.setSecAmount(ArithmeticUtil.multiply(portfolioDetail.getShareAmt(), new BigDecimal(100)));
                 // 下单券面总额
@@ -1399,7 +1401,8 @@ public class TrdCommonBaseService extends BaseService {
         portfolioDto.setCashAmount(infContractDetailfile.getTradeAmt());
         if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())
                 || DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(etrEntrust.getFinprodType2())
-                || DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(etrEntrust.getFinprodType2())){
+                || DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(etrEntrust.getFinprodType2())
+                || DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue().equals(etrEntrust.getFinprodType2())){
             // 指令券面总额
             portfolioDto.setEtrSecAmount(ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), new BigDecimal(100)));
             // 下单券面总额
@@ -1472,6 +1475,19 @@ public class TrdCommonBaseService extends BaseService {
         map.put("TARGET_BACK_TYPE_H01", DictCodeList.回购类型_质押式协议回购.getValue());
         map.put("PS_T07", DictCodeList.交易方向_到期.getValue());
         return trdCommonBaseMapper.getUnFinishMatchSettleTransDataNum(map);
+    }
+
+    /**
+     * 获取当日对账数据不一致和待处理数量
+     * @return
+     */
+    public Integer getCheckDisaccordCountDataNum(Date executeDate){
+        Map<String, Object> param = new HashMap<>();
+        param.put("CHECK_RESULT_0", DictCodeListExt3.对账状态结果_不一致.getValue());
+        param.put("CHECK_RESULT_2", DictCodeListExt3.对账状态结果_待处理.getValue());
+        param.put("executeDate", executeDate);
+        // 查询对账结果不一致和待处理的数量
+        return trdCommonBaseMapper.getCheckDisaccordCountDataNum(param);
     }
 
     /**
@@ -1569,6 +1585,8 @@ public class TrdCommonBaseService extends BaseService {
                     || StringUtils.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())
                     || StringUtils.equals(finprodType2, "ZYSHG")) {
                 assetType = DictCodeList.平安资产类型_质押式回购.getValue();
+            } else if(StringUtils.equals(finprodType2, DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())){
+                assetType = DictCodeListExt2.平安资产类型_一级市场债.getValue();
             }
         }
         return assetType;

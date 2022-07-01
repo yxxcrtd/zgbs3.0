@@ -179,4 +179,12 @@ public interface StlDownDataDealMapper {
     List<FinProduct> getFinproductByFinProdMarketId(@Param("finProdMarketId") String finProdMarketId);
 
     List<SzdSjsjg> getSzdSjsjgByApplyTradeId(@Param("applyTradeId") String applyTradeId);
+
+    /**
+     * 查询标的
+     * @param finProdMarketId
+     * @param finprodType2
+     * @return
+     */
+    List<FinProduct> getFinproduct(@Param("finProdMarketId") String finProdMarketId, @Param("finprodType2") String finprodType2);
 }

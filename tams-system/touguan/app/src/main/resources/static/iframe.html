@@ -18,7 +18,7 @@
 </head>
 <body>
   <div style="width: 100%;">
-    <iframe id="iframe" style="height: 200px" src="http://localhost:8300/?processInstanceId=d20d94fd-e645-11ec-aab9-5254009c7c87&taskId=d20e585f-e645-11ec-aab9-5254009c7c87&workflowId=00000000000000000000000000069137&pageModel=1&editable=true&isTodoList=true#/approve/biddingInstructionAudit"></iframe>
+    <iframe id="iframe" style="height: 100px" src="http://localhost:8300/?processInstanceId=4bbb2442-f2e9-11ec-b58c-5254009c7c87&taskId=4bbb7274-f2e9-11ec-b58c-5254009c7c87&workflowId=00000000000000000000000000078126&pageModel=1&editable=true&isTodoList=true#/approve/certificateProtect"></iframe>
 
     <button id="btnSave_wfl">保存</button>
     <button id="btnSubmit_wfl">提交</button>
@@ -26,7 +26,16 @@
   </div>
 
   <script>
-    console.log('1111', window.self !== window.parent)
+    document.getElementById('btnSubmit_wfl').onclick = function() {
+      console.log(123)
+      document.getElementById('iframe').contentWindow.document.getElementById('wfl_btn_submit').click()
+
+    }
+    document.getElementById('btnSave_wfl').onclick = function() {
+      console.log(123)
+
+      document.getElementById('iframe').contentWindow.document.getElementById('wfl_btn_save').click()
+    }
   </script>
 </body>
 </html>

@@ -99,7 +99,7 @@ import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCash
 import com.joyintech.tams.invest.entrust.common.service.EtrCommonService;
 import com.joyintech.tams.invest.entrust.etrinvestbondinfo.dto.EtrInvestBondInfoDto;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -178,7 +178,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
      */
     @Autowired
     private EtrCommonService etrCommonService;
-    
+
 	@Autowired
     private BasePtlCashPositionInfoService basePtlCashPositionInfoService;
     @Autowired
@@ -323,16 +323,16 @@ public class CfetsEtrIbBondinfoService extends BaseService{
      * PositionFutureManager.send(createMessage(dto, DictCodeListExt3.流程节点_审批生效.getValue(), DictCodeListExt3.系统动作_新建.getValue()));
      * 冲正方式
      * PositionFutureManager.revoke(dto.getEntrustId(), DictCodeListExt1.子系统代码_委托.getValue(), e);
-     * 
+     *
      * 撤回
      * PositionRuleInterDto pDto = PositionUtil.initDto(dto.getEntrustId());
-     * pDto.setSystemAct(DictCodeListExt3.系统动作_新建.getValue()); // 
+     * pDto.setSystemAct(DictCodeListExt3.系统动作_新建.getValue()); //
      * pDto.setModelType(DictCodeListExt1.子系统代码_委托.getValue());// 委托
      * pDto.setFlowStatus(DictCodeListExt3.流程节点_流程退回.getValue());
      *
      *         // 调用头寸引擎
      *         PositionFutureManager.sendRevoke(pDto);
-     *         
+     *
      * @param dto
      * @param flowStatus
      * @param systemAct
@@ -343,20 +343,20 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         PositionBondExecuteParam result = PositionUtil.initDto(dto.getEntrustId());
         try {
             // head
-            result.setFlowStatus(flowStatus); // 
+            result.setFlowStatus(flowStatus); //
             result.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
 
             if (StringUtil.isNotEmpty(dto.getBalanceCheck())){
                 result.setBalanceCheck(dto.getBalanceCheck());
             }
 
-            // body 
+            // body
             result.setBusiType(DictCodeListExt3.头寸业务类型_现券交易.getValue()); // 业务类型：01债券一级投标，02现券交易，03债券行权交易，04债券存续期交易
             if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_行权_回售.getValue())){
-                result.setBusiType(DictCodeListExt3.头寸业务类型_债券行权交易.getValue()); // 业务类型：01债券一级投标，02现券交易，03债券行权交易，04债券存续期交易    
+                result.setBusiType(DictCodeListExt3.头寸业务类型_债券行权交易.getValue()); // 业务类型：01债券一级投标，02现券交易，03债券行权交易，04债券存续期交易
             }
 
-            result.setSettleSpeed(dto.getSettleSpreed()); // 清算速度 
+            result.setSettleSpeed(dto.getSettleSpreed()); // 清算速度
             result.setTradePlace(dto.getTradeMarket()); // 上交所或深交所
             result.setDeliveryType("03"); // 结算方式
             result.setCcy(dto.getCcy()); // 币种
@@ -602,10 +602,10 @@ public class CfetsEtrIbBondinfoService extends BaseService{
     public Page<CfetsEtrIbBondPosinfo001Dto> queryPositionsPage(CfetsEtrIbBondPosiPage001RequestDto requestDto) {
         String platDate = iPlatformDate.getSysDateStr();
         if (!StringUtil.isNotBlank(requestDto.getCdate())){
-            requestDto.setCdate(platDate); 
+            requestDto.setCdate(platDate);
         }
         // 初始化请求参数
-        BaseMap req = getRequestMap(requestDto); 
+        BaseMap req = getRequestMap(requestDto);
         // 分页查询列表
         Page<CfetsEtrIbBondPosinfo001Dto> pages = super.queryForPage(
                 requestDto.getPageNo(), requestDto.getPageSize(), () -> cfetsetrIbBondinfoMapper.queryPositionsPage(req));
@@ -653,10 +653,10 @@ public class CfetsEtrIbBondinfoService extends BaseService{
 
                 if (r.getPrice() != null){
                     // 4.持仓市值（元）=（交易可用券面总额+交易在途券面总额）* 最新净价 / 单位面值
-                    BigDecimal doAdd = ArithmeticUtil.multiply(ArithmeticUtil.doAdd(r.getTrdAvaShareAmt(), r.getTrdIntransShareAmt()), 
+                    BigDecimal doAdd = ArithmeticUtil.multiply(ArithmeticUtil.doAdd(r.getTrdAvaShareAmt(), r.getTrdIntransShareAmt()),
                             BigDecimal.valueOf(10000L));
                     r.setPositionsPrice(ArithmeticUtil.multiply(doAdd, r.getPrice()).divide(BigDecimal.valueOf(100)));
-                    
+
                     if (dto != null){
                         // 5.持仓成本=（交易可用券面总额+交易在途券面总额）* 持仓成本价（元）
                         r.setPositionsAmt(ArithmeticUtil.multiply(doAdd, r.getUnitCost()).divide(BigDecimal.valueOf(100)));
@@ -738,10 +738,10 @@ public class CfetsEtrIbBondinfoService extends BaseService{
          * VALUE:持仓单位成本dto
          */
         Map<String, CfetsUnitCostDto> resultMap = new HashMap<>();
-        
+
         // 查询前一日持仓指标
         List<BaseMap> lastCostAmt = selectLastCostAmt(cdate, portfolioIdList, finprodIdList, secType1);
-        
+
         if (lastCostAmt != null){
             lastCostAmt.forEach(e->{
                 if(BigDecimal.ZERO.compareTo(e.getBigDecimal("SHARE_AMT")) != 0){
@@ -759,7 +759,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                 }
             });
         }
-        
+
         // 当日交易数据查询
         List<BaseMap> currTrdData = selectCurrTrdData(cdate, portfolioIdList, finprodIdList, secType1);
         if (currTrdData != null){
@@ -770,7 +770,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                     dto = new CfetsUnitCostDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
                     resultMap.put(key, dto);
                 }
-                
+
                 if (StringUtil.equals(i.getString("PS"), DictCodeList.交易方向_买入.getValue())){
                     // 成本
                     BigDecimal thisBuyCostAmt = dto.getBuyCostAmt()
@@ -790,7 +790,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                     // 单位成本 = 成本/数量
                     dto.setUnitCost(ArithmeticUtil.divide(dto.getBuyCostAmt(), dto.getShareAmt(), 2));
                 }
-                
+
                 resultMap.put(key, dto);
             });
         }
@@ -800,7 +800,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
     private static String getKey(BaseMap bm){
         return bm.getString("PORTFOLIO_ID") + bm.get("FINPROD_ID");
     }
-    
+
     /**
      * 查询前一日持仓指标
      * @param cdate 交易日期
@@ -816,10 +816,10 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         if(portfolioIdList != null && !portfolioIdList.isEmpty()) reqMap.put("portfolioIdList", portfolioIdList);
         if(finprodIdList != null && !finprodIdList.isEmpty()) reqMap.put("finprodIdList",finprodIdList);
         if(StringUtil.isNotEmpty(secType1)) reqMap.put("secType1",secType1);
-        
+
         List<BaseMap> list = cfetsetrIbBondinfoMapper.selectLastCostAmt(reqMap);
         /**
-         * 返回结果 
+         * 返回结果
          * PORTFOLIO_ID、FINPROD_ID、INV_AIM、
          * BUY_COST_AMT 成本
          * SHARE_AMT    数量
@@ -856,7 +856,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
          */
         return list;
     }
-    
+
     /**
      * 银行间指令，头寸信息
      * @return
@@ -888,6 +888,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                         .put("ccy", DictCodeList.币种_人民币_CNY.getValue())
                         .put("vdate", requestDto.getCdate())
                         .put("calId", "03") // 银行间
+                        .put("onlyA01", true) // ZGCPCN-1557
                         ;
                 Map<String, Object> mapRst = etrCommonService.getProAvailableCash(paramMap);
                 if (mapRst != null){ // 指令t日可用，指令t1日可用
@@ -921,7 +922,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                 secDesirableCash = ArithmeticUtil.doAdd(secDesirableCash, newRealCashAmount);
             }
         }
-        
+
         BaseMap bm = BaseMap.newMap()
                 .put("S_001", DictCodeListExt3.资产类型_指令汇总可用持仓.getValue())
                 .put("S_003", DictCodeListExt3.资产类型_融入券卖空待购回持仓.getValue())
@@ -935,7 +936,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                 .put("acctId", requestDto.getAcctId());
         // 查询头寸信息
         Map map = cfetsetrIbBondinfoMapper.queryPositionInfo(bm);
-        
+
         return assemble(sellFlag, map, cashT, cashT1, realCash,secDesirableCash);
     }
 
@@ -967,7 +968,13 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         /*账户现金*/
         resp.add(BaseMap.newMap()
                 .put("field", "ZHXJ")
-                .put("name", "账户现金（元）")
+                .put("name", "托管户账户现金（元）")
+                .put("amount", "--")
+                .put("type", "xj"));
+        /*券商户可取现金*/
+        resp.add(BaseMap.newMap()
+                .put("field", "ZQHKQXJ")
+                .put("name", "券商户可取现金（元）")
                 .put("amount", "--")
                 .put("type", "xj"));
 
@@ -976,7 +983,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             /*融入券卖空待购回持仓*/
             resp.add(BaseMap.newMap()
                     .put("field", "RRQMKDGHCC")
-                    .put("name", "融入券卖空待购回持仓（元）")
+                    .put("name", "卖空待回购持仓（元）")
                     .put("amount", "--")
                     .put("type", "cc"));
         }
@@ -1063,7 +1070,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         DecimalFormat df1 = new DecimalFormat(pattern);
         return df1.format(b);
     }
-    
+
     private List<BaseMap> assemble(String flag, Map map, BigDecimal cashT, BigDecimal cashT1, BigDecimal realCash,BigDecimal secDesirableCash) {
         String T0KYXJ="T0KYXJ",T1KYXJ="T1KYXJ",ZHXJ="ZHXJ",ZQHKQXJ="ZQHKQXJ",RRQMKDGHCC="RRQMKDGHCC",ZCTRKYCC="ZCTRKYCC";
         String ZCT1RKYCC="ZCT1RKYCC",BFQTRKYCC="BFQTRKYCC",BFQT1RKYCC="BFQT1RKYCC",RRQTRKYCC="RRQTRKYCC",RRQT1RKYCC="RRQT1RKYCC";
@@ -1287,15 +1294,15 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             }
 
             //付息频率
-            if (dto.getPayCycle().equals("月")||dto.getPayCycle().equals("季")||dto.getPayCycle().equals("年")||dto.getPayCycle().equals("半年")) {
-                dto.setPayCycle(dto.getPayCycle()+"付");
+            if ("月".equals(dto.getPayCycle())||"季".equals(dto.getPayCycle())||"年".equals(dto.getPayCycle())||"半年".equals(dto.getPayCycle())) {
+                dto.setPayCycle(dto.getPayCycle() + "付");
             }
 
             //如果估价净价（行权）、估价净价（推荐）为空，显示为--
-            if (dto.getPriceXq().equals("元")) {
+            if ("元".equals(dto.getPriceXq())) {
                 dto.setPriceXq("--");
             }
-            if (dto.getPriceTj().equals("元")) {
+            if ("元".equals(dto.getPriceTj())) {
                 dto.setPriceTj("--");
             }
             //下一行权日若无，则显示为“—”  计划行权日>交易日取最小
@@ -1316,7 +1323,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                 dto.setXqdate("--");
             }
 //            如果估值收益率没有数据，则显示为空
-            if (dto.getGzRate().equals("%")) {
+            if ("%".equals(dto.getGzRate())) {
                 dto.setGzRate(" ");
             }
 //            若为含权债，显示为含权债的行权方式；若有多个行权方式，用分号“;”隔开    非含权债，显示为“无”
@@ -2342,17 +2349,22 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         List<CfetsEtrIbClosePosEtrRequest> etrList=new ArrayList<>();
         for(CfetsEtribBondInfo003Dto t: dtolist){
             CfetsEtrIbClosePosEtrRequest closeItem=new CfetsEtrIbClosePosEtrRequest();
-            String busiTypePosition=DictCodeListExt3.头寸业务类型_现券交易.getValue();
-            if (StringUtil.equals(assetType, DictCodeList.平安资产类型_质押式回购.getValue())) {
-                busiTypePosition = DictCodeListExt3.头寸业务类型_质押式回购首期.getValue();
-            } else if (StringUtil.equals(assetType, DictCodeList.平安资产类型_一级市场债.getValue())) {
-                busiTypePosition = DictCodeListExt3.头寸业务类型_债券一级投标.getValue();
+            String busiTypePosition = DictCodeListExt3.头寸业务类型_现券交易.getValue();
+            if (StringUtil.isNotEmpty(t.getBusiTypePosition())) {
+                busiTypePosition = t.getBusiTypePosition();
             } else {
-                if (StringUtil.isNotEmpty(t.getPs())
-                        && StringUtil.equals(t.getPs(), BussinessDictCodeList.交易方向_行权回售.getValue())) {
-                    busiTypePosition = DictCodeListExt3.头寸业务类型_债券行权交易.getValue(); // 业务类型：01债券一级投标，02现券交易，03债券行权交易，04债券存续期交易
+                if (StringUtil.equals(assetType, DictCodeList.平安资产类型_质押式回购.getValue())) {
+                    busiTypePosition = DictCodeListExt3.头寸业务类型_质押式回购首期.getValue();
+                } else if (StringUtil.equals(assetType, DictCodeList.平安资产类型_一级市场债.getValue())) {
+                    busiTypePosition = DictCodeListExt3.头寸业务类型_债券一级投标.getValue();
+                } else {
+                    if (StringUtil.isNotEmpty(t.getPs())
+                            && StringUtil.equals(t.getPs(), BussinessDictCodeList.交易方向_行权回售.getValue())) {
+                        busiTypePosition = DictCodeListExt3.头寸业务类型_债券行权交易.getValue(); // 业务类型：01债券一级投标，02现券交易，03债券行权交易，04债券存续期交易
+                    }
                 }
             }
+
             closeItem.setBusiType(busiTypePosition);
             closeItem.setPs(t.getPs());
             closeItem.setCloseId(t.getEntrustId());

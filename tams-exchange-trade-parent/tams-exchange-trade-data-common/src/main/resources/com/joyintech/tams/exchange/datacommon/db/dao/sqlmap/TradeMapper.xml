@@ -268,8 +268,7 @@
 		 CASE
 		   WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
 		   WHEN STD.DELIVERY_RESULT = '04' THEN  '0'
-		   ELSE STD.SHARE_AMT /
-                A.TRADED_VOLUME || '%'
+		   ELSE STD.SHARE_AMT / A.TRADED_VOLUME * 100 || ''
 		 END                                                   DELIVERY_SCHEDULE
     </sql>
     <sql id="queryCondition2">
@@ -390,6 +389,7 @@
 
     <select id="selectTradeByPage" resultMap="QueryResultMap"
             parameterType="com.joyintech.tams.exchange.common.bean.TradeQryBean">
+        SELECT * FROM (
         SELECT
         <include refid="Query_Column_List"/>
         FROM T_TRADE A
@@ -402,7 +402,8 @@
         OR (STD.PS = 'T56' AND STD.TRADE_MARKET = '04') OR (STD.PS != 'T56'))
         LEFT JOIN STL_CAPACCT_INFO SCI ON A.FINANCE_ACCOUNT = SCI.ACCT_NO
         <include refid="queryCondition2"/>
-        ORDER BY A.CREATE_TIME DESC
+        )
+        ORDER BY CREATE_TIME DESC
     </select>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">

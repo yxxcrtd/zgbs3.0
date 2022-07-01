@@ -228,7 +228,7 @@ public class CfetsTrdFirstBidFirmTenderInfoDto extends BaseEntity implements Pro
 
     public String getBidDateStr() {
         if(!StringUtil.isNotEmpty(this.getBidDateEndStr())){
-            this.getBidDateStartStr();
+            return this.getBidDateStartStr();
         }
         return this.getBidDateStartStr() + "~" + this.getBidDateEndStr();
     }

@@ -76,7 +76,7 @@ public class CommonUtils {
             result.put(IbuDictCode.银行间上行报价状态.getValue(), DictCodeList.银行间上行报价状态_修改中.getValue());
             result.put(IbuDictCode.银行间上行发送状态.getValue(), DictCodeList.银行间上行发送状态_失败.getValue());
         }
-        else if (DictCodeList.银行间上行操作类型_本方修改发送.getValue().equals(operationType)) {
+        /*else if (DictCodeList.银行间上行操作类型_本方修改发送.getValue().equals(operationType)) {
             result.put(IbuDictCode.银行间上行报价状态.getValue(), DictCodeList.银行间上行报价状态_修改中.getValue());
             result.put(IbuDictCode.银行间上行发送状态.getValue(), DictCodeList.银行间上行发送状态_已发送.getValue());
         }
@@ -87,7 +87,7 @@ public class CommonUtils {
         else if (DictCodeList.银行间上行操作类型_本方修改发送成功.getValue().equals(operationType)) {
             result.put(IbuDictCode.银行间上行报价状态.getValue(), DictCodeList.银行间上行报价状态_已修改.getValue());
             result.put(IbuDictCode.银行间上行发送状态.getValue(), DictCodeList.银行间上行发送状态_成功.getValue());
-        }
+        }*/
         else if (DictCodeList.银行间上行操作类型_本方报价撤回.getValue().equals(operationType)) {
             result.put(IbuDictCode.银行间上行报价状态.getValue(), DictCodeList.银行间上行报价状态_撤回中.getValue());
             result.put(IbuDictCode.银行间上行发送状态.getValue(), DictCodeList.银行间上行发送状态_已发送.getValue());
@@ -417,10 +417,10 @@ public class CommonUtils {
             result.put(IbuDictCode.银行间上行报价状态.getValue(), DictCodeList.银行间上行报价状态_已成交.getValue());
             result.put(IbuDictCode.银行间上行发送状态.getValue(), DictCodeList.银行间上行发送状态_成功.getValue());
         }
-        else if(DictCodeList.银行间上行操作类型_本方回复成交失败.getValue().equals(operationType)){
+        /*else if(DictCodeList.银行间上行操作类型_本方回复成交失败.getValue().equals(operationType)){
             result.put(IbuDictCode.银行间上行报价状态.getValue(), DictCodeList.银行间上行报价状态_成交中.getValue());
             result.put(IbuDictCode.银行间上行发送状态.getValue(), DictCodeList.银行间上行发送状态_失败.getValue());
-        }
+        }*/
         else if(DictCodeList.银行间上行操作类型_本方回复成交.getValue().equals(operationType)){
             result.put(IbuDictCode.银行间上行报价状态.getValue(), DictCodeList.银行间上行报价状态_成交中.getValue());
             result.put(IbuDictCode.银行间上行发送状态.getValue(), DictCodeList.银行间上行发送状态_已发送.getValue());

@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 /**
  *
- * 指令下拉框模糊查询
+ * 新建指令金额计算功能返回参数
  */
 @ApiModel(value="新建指令金额计算功能返回参数",description="新建指令金额计算功能返回参数")
 public class CfetsBidManageCalcAmountResponse {
@@ -27,6 +27,9 @@ public class CfetsBidManageCalcAmountResponse {
 
     @ApiModelProperty(name="unitFpriceAmt",value="全价总额")
     private BigDecimal unitFpriceAmt;
+
+    @ApiModelProperty(name="unitFprice",value="全价")
+    private BigDecimal unitFprice;
 
     @ApiModelProperty(name="tradeAmt",value="交易金额")
     private BigDecimal tradeAmt;
@@ -77,5 +80,13 @@ public class CfetsBidManageCalcAmountResponse {
 
     public void setTradeAmt(BigDecimal tradeAmt) {
         this.tradeAmt = tradeAmt;
+    }
+
+    public BigDecimal getUnitFprice() {
+        return unitFprice;
+    }
+
+    public void setUnitFprice(BigDecimal unitFprice) {
+        this.unitFprice = unitFprice;
     }
 }

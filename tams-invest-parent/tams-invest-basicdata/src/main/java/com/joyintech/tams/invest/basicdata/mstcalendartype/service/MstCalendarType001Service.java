@@ -205,4 +205,11 @@ public class MstCalendarType001Service extends CommonExportService<MstCalendarTy
             ServiceApplication.BASICDATA_SERVICE_NAME + "/MstCalendarType/getTradeCalendarName",
             map, SuggestDto.class);
     }
+
+    // TISHKS-725:增加日历类型是否被使用校验 modify by fuyongsheng 20220507 start
+    public Integer hasCalendarName(String calendarName){
+        return restTemplate.getForObject(ServiceApplication.BASICDATA_SERVICE_NAME +
+                "/MstCalendarType/hasCalendarName?calendarName=" + calendarName, Integer.class);
+    }
+    // TISHKS-725:增加日历类型是否被使用校验 modify by fuyongsheng 20220507 end
 }

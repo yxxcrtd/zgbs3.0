@@ -180,6 +180,8 @@
             $(".unitNum").text('元');
         }
         if (entity.finprodId){
+            $("#finprodId").trigger("change").attr("disabled", true);
+            $("#purchModle").trigger("change").attr("disabled", true);
             $("#assetType1").trigger("change").attr("disabled", true);
             $("#ccy").trigger("change").attr("disabled", true);
             $("#tradeMarket").trigger("change").attr("disabled", true);

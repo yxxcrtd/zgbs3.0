@@ -23,7 +23,7 @@ import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.service.valuation.accounadjustmanage.subjectset.validator.ValBokSubjectDtoValidator;
 import com.joyintech.tams.common.base.entity.BokSubject;
 import com.joyintech.tams.valuation.common.utils.ExpressionUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;

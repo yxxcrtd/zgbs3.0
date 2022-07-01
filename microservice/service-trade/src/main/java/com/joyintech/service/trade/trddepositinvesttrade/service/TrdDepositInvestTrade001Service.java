@@ -7,7 +7,7 @@
  * 修改内容：新建
  * 系统名称：理财资管管理系统V2.0
  */
- 
+
 package com.joyintech.service.trade.trddepositinvesttrade.service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -77,14 +77,14 @@ public class TrdDepositInvestTrade001Service extends BaseService<TrdDepositInves
     /**
      * 金融产品交易Mapper
      */
-    @Autowired 
+    @Autowired
     private PaTrdProductDealMapper paTrdProductDealMapper;
-    
+
     /**
      * 组合可用持仓和实际持仓Service
      */
     @Autowired(required = false)
-    private BasePtlSecPositionInfoService basePtlSecPositionInfoService; 
+    private BasePtlSecPositionInfoService basePtlSecPositionInfoService;
     /**
      * 组合可用现金和实际现金Service
      */
@@ -99,14 +99,14 @@ public class TrdDepositInvestTrade001Service extends BaseService<TrdDepositInves
      * 分页查询
      * @param map 查询参数
      * @return 存款类投资交易实体类
-     * @throws Exception 
+     * @throws Exception
      * @see
      * @since 1.0
      */
     public Page<TrdDepositInvestTrade001Dto> selectForPage(int page,int length,Map<String,Object> map) {
         return super.queryForPage(page, length, () -> trdDepositInvestTrade001Mapper.selectForPage(map));
     }
-    
+
     /**
      * 获取委托代码联想框集合
      * @param entrustId 委托代码入参
@@ -196,7 +196,7 @@ public class TrdDepositInvestTrade001Service extends BaseService<TrdDepositInves
         TrdDepositInvestTrade001Dto dto = trdDepositInvestTrade001Mapper.getFinInfo(map);
         if (StringUtil.isNotEmpty(dto)) {
             dto.setTradeDate(DateUtil.parse(DateUtil.getSysDate()));
-        } 
+        }
         return dto;
     }
     /**
@@ -231,17 +231,18 @@ public class TrdDepositInvestTrade001Service extends BaseService<TrdDepositInves
             BigDecimal s = basePtlCashPositionInfoService.queryUsableCashPosition(dto);
 //            dto.setCdate(DateUtil.addDay(DateUtil.parse(map.get("tradeDate").toString()), day));
             SuggestDto sDto = new SuggestDto();
-            
+
             final Date tradeDay = DateUtil.parse(map.get("tradeDay").toString());
             dto.setCdate(tradeDay);
             BigDecimal s1 = basePtlCashPositionInfoService.queryUsableCashPosition(dto);
-             
+
             acctTypeList.clear();
             acctTypeList.add(DictCodeListExt1.资金账户类型_券商资金账户.getValue());
             BigDecimal s4 = basePtlCashPositionInfoService.queryUsableCashPosition(dto);
             sDto = new SuggestDto();
+            //ZGCPCN-1557 T1 也取 托管户加券商户
             sDto.setCode("T1");
-            sDto.setName(s1.toString());
+            sDto.setName(String.valueOf(ArithmeticUtil.doAdd(s1,s4)));
             list.add(sDto);
             sDto = new SuggestDto();
             sDto.setCode("T2");
@@ -274,7 +275,7 @@ public class TrdDepositInvestTrade001Service extends BaseService<TrdDepositInves
             list.add(sDto);
             s = s = ArithmeticUtil.doAdd(s, s4 == null ? BigDecimal.ZERO : s4);
             sDto.setCode("T");
-            sDto.setName(s.toString());            
+            sDto.setName(s.toString());
             list.add(0, sDto);
 
 //            String acctNo = getAcctNo(map);//等待持仓流水接口完成
@@ -344,7 +345,7 @@ public class TrdDepositInvestTrade001Service extends BaseService<TrdDepositInves
         return 1;
     }
     /**
-     * 作废清空流程表数据  
+     * 作废清空流程表数据
      * @param workflowId 工作流ID
      * @see
      * @since 1.0
@@ -399,7 +400,7 @@ public class TrdDepositInvestTrade001Service extends BaseService<TrdDepositInves
     public List<InterfSendOpics> getOpics(String tradeId){
         return trdDepositInvestTrade001Mapper.getOpics(tradeId);
     }
-    
+
     /**
      * 获取组合代码
      * @return 联想文本框
@@ -411,7 +412,7 @@ public class TrdDepositInvestTrade001Service extends BaseService<TrdDepositInves
         map.put("portType1", DictCodeListExt1.组合类型_子组合.getValue());
         return trdDepositInvestTrade001Mapper.getPortfolioIdSug(map);
     }
-    
+
     /**
      * 获取opics下拉框
      * @param map 请求类型
@@ -460,7 +461,7 @@ public class TrdDepositInvestTrade001Service extends BaseService<TrdDepositInves
         return flag;
 
     }
-    
+
     /**
      * 验证标的是否做过终止协议交易
      * @param dto 请求参数

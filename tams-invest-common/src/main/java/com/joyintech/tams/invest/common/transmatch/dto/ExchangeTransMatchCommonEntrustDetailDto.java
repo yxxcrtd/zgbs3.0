@@ -50,6 +50,19 @@ public class ExchangeTransMatchCommonEntrustDetailDto extends EtrEntrustDetail {
      */
     private EtrPledge etrPledge;
 
+    /**
+     * 转股数量
+     */
+    private BigDecimal conAmt;
+
+    public BigDecimal getConAmt() {
+        return conAmt;
+    }
+
+    public void setConAmt(BigDecimal conAmt) {
+        this.conAmt = conAmt;
+    }
+
     public BigDecimal getMarchQty() {
         return marchQty;
     }

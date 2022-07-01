@@ -71,6 +71,23 @@ public class ExchangeTransMatchCommonEntrustDto extends EtrEntrust {
      */
     private boolean lastEntrust;
 
+    /**
+     * 证券账户
+     */
+    private String secAcctId;
+
+    /**
+     * 转股数量
+     */
+    private BigDecimal conAmt;
+
+    public BigDecimal getConAmt() {
+        return conAmt;
+    }
+
+    public void setConAmt(BigDecimal conAmt) {
+        this.conAmt = conAmt;
+    }
 
     /**
      * 指令多组合明细list
@@ -211,5 +228,13 @@ public class ExchangeTransMatchCommonEntrustDto extends EtrEntrust {
 
     public void setDealMode(String dealMode) {
         this.dealMode = dealMode;
+    }
+
+    public String getSecAcctId() {
+        return secAcctId;
+    }
+
+    public void setSecAcctId(String secAcctId) {
+        this.secAcctId = secAcctId;
     }
 }

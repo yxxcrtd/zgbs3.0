@@ -58,6 +58,8 @@ public interface CfetsPrimaryBidManageMapper {
 
 	List<String> getBusinessData(WflValidInputParameter parameter);
 
+	List<String> getWflData(WflValidInputParameter parameter);
+
 	List<StlCapacctInfo> selectCounterCapacctInfoList(@Param("counterId") String counterId, @Param("acctType") String acctType, @Param("ccy") String ccy);
 
     SecInfoModelDto getSecInfoModel(Map<String, Object> tempParamMap);
@@ -70,9 +72,15 @@ public interface CfetsPrimaryBidManageMapper {
 
 	List<TrdFinProductDealTotal> getTrdFinProductDealTotal(@Param("bTradeId") String bTradeId);
 
+	List<TrdFinProductDealTotal> getTrdFinProductDealTotalTemp(@Param("bTradeId") String bTradeId);
+
 	List<TrdProductDeal> queryTrdProductDealByTotleTradeId(@Param("tradeId") String tradeId);
 
-	List<StlOrders> queryStlPayOrdersByTradeId(@Param("tradeId") String tradeId);
+	List<TrdProductTempDeal> queryTrdProductDealTempByTotleTradeId(@Param("tradeId") String tradeId);
+
+	List<StlPayOrders> queryStlPayOrdersByTradeId(@Param("tradeId") String tradeId);
+
+	List<StlOrders> queryStlOrdersByTradeId(@Param("tradeId") String tradeId);
 
 	List<PtlTrade> queryPtlTradeByTradeId(@Param("tradeId") String tradeId);
 
@@ -85,4 +93,11 @@ public interface CfetsPrimaryBidManageMapper {
 	 * @return
 	 */
 	String selectSecAcctSource(Map<String, Object> param);
+
+	int updateBidOrder(@Param("bidId") String bidId);
+
+
+	List<String> selectEntrustIdByBidId(@Param("bidId") String bidId);
+
+	List<String>  selectManualSettleInfo(@Param("totalWinId") String totalWinId);
 }

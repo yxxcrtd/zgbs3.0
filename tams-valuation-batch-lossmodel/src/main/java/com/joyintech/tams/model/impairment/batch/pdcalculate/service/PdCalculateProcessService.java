@@ -12,6 +12,7 @@ import com.joyintech.tams.model.impairment.batch.pdcalculate.dto.*;
 import com.joyintech.tams.valuation.common.service.CalCommonService;
 import com.joyintech.tams.valuation.component.batch.service.ModLogsService;
 import com.joyintech.tams.valuation.component.common.constant.ValComponentConstant;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.beans.BeanUtils;

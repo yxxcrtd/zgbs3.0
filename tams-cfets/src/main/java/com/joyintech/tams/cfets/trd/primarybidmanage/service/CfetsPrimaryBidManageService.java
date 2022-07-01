@@ -14,12 +14,15 @@ import com.joyintech.calculation.util.BasicUtil;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
-import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysWflBusinessList;
+import com.joyintech.tams.business.common.dao.CfgDataTableFlagMapper;
+import com.joyintech.tams.business.common.dao.CfgDataTableMapper;
 import com.joyintech.tams.business.common.dao.CfgReadonlyFormShowMapper;
 import com.joyintech.tams.business.common.dto.CfetsBondPortfolioCashRequest;
 import com.joyintech.tams.business.common.dto.CfetsBondPositionRequest;
@@ -32,16 +35,20 @@ import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
+import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubEntrustDto;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubProductDto;
+import com.joyintech.tams.business.common.util.ThreadLocalUtil;
+import com.joyintech.tams.cfets.position.service.PositionInfoService;
+import com.joyintech.tams.cfets.trd.bond.dto.CalRequest;
+import com.joyintech.tams.cfets.trd.bond.dto.CalRespone;
+import com.joyintech.tams.cfets.trd.bond.service.IbuQuoteBondCalService;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao.CfetsTrdFirstBidFirm002Mapper;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dao.CfetsPrimaryBidManageMapper;
-import com.joyintech.tams.business.common.dao.CfgDataTableFlagMapper;
-import com.joyintech.tams.business.common.dao.CfgDataTableMapper;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.*;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
+import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.settle.dto.BussSettleOrderParameterDto;
@@ -49,34 +56,40 @@ import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommServi
 import com.joyintech.tams.component.business.trade.BussTrdTransferOrderService;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.asset.dto.FinCashPlanDto;
+import com.joyintech.tams.invest.common.component.base.entrust.dto.BaseEtrFinishAmtDto;
+import com.joyintech.tams.invest.common.component.base.entrust.impl.BaseEtrInvestInfoServiceImpl;
+import com.joyintech.tams.invest.common.component.business.basicdata.BaseTradeFeeCommService;
+import com.joyintech.tams.invest.common.component.business.basicdata.dto.BasicTradeFeeInputDto;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
 import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
+import com.joyintech.tams.invest.common.dto.trade.entrust.EtrFinishStatusDto;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
-import com.joyintech.tams.invest.common.trade.dto.AllTradeCommonInputDto;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
 import com.joyintech.tams.invest.common.trade.dto.SecInfoModelDto;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tools.collectors.JoyinCollectors;
 import com.joyintech.workflow.engine.constant.OperationType;
+import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.joyintech.tams.invest.common.asset.service.BondAssetCalcService.*;
-import static com.joyintech.tams.invest.common.asset.service.BondAssetCalcService.toLocalDate;
 
 /**
  * 债券标的信息新建
@@ -88,6 +101,7 @@ import static com.joyintech.tams.invest.common.asset.service.BondAssetCalcServic
  */
 @Service
 public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidManageSaveRequest> implements BaseProcessService<CfetsPrimaryBidManageSaveRequest>{
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired(required = false)
     private CfetsPrimaryBidManageMapper cfetsPrimaryBidManageMapper;
@@ -143,9 +157,6 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     @Autowired(required = false)
     private StlOrdersMapper stlOrdersMapper;
 
-    @Autowired
-    private IPlatformDate iplatformDate;
-
     @Autowired(required = false)
     private BaseTradeProductDealCommService baseTradeProductDealCommService;
     /**
@@ -174,6 +185,49 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
 
     @Autowired(required=false)
     private SysWflBusinessListMapper sysWflBusinessListMapper;
+
+    @Autowired
+    private MstWorkflowCommonServiceMapperImpl mstWorkflowCommonServiceMapperImpl;
+
+    @Autowired
+    private FinProductTypeMapper finProductTypeMapper;
+
+    /**
+     * 投资委托信息Service
+     */
+    @Autowired
+    private BaseEtrInvestInfoServiceImpl etrInvestInfoServiceImpl;
+
+    @Autowired
+    private CfetsTrdFirstBidFirm002Mapper cfetsTrdFirstBidFirm002Mapper;
+
+    /**
+     * 平台日期组件接口，提供平台日期的获取和更新
+     */
+    @Autowired
+    private IPlatformDate iPlatformDate;
+
+    @Autowired
+    private IbuQuoteBondCalService ibuQuoteBondCalService;
+
+    @Autowired(required = false)
+    private BaseTradeFeeCommService baseTradeFeeCommService;
+
+    @Autowired
+    private TrdProductTempDealTotalMapper trdProductTempDealTotalMapper;
+
+    @Autowired
+    private TrdProductTempDealMapper trdProductTempDealMapper;
+
+    @Autowired
+    private TrdProductTempDealAddMapper trdProductTempDealAddMapper;
+
+    @Autowired
+    private TrdTempDealTotalAddMapper trdTempDealTotalAddMapper;
+
+    @Autowired
+    private PositionInfoService positionInfoService;
+
     /**
      * 默认设置
      */
@@ -189,6 +243,11 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
      * 用户自定义设置
      */
     private static final int EFFERANGE_IS = 1;
+
+    /**
+     * 金额最小变动单位
+     */
+    private static final BigDecimal payMinChangeUnit = new BigDecimal("0.01");
 
     public Map<String,Object> getBidManageCfmInfo(CfetsPrimaryBidManageCfmRequest request) {
         if (StringUtil.isNotEmpty(request.getBidId())) {
@@ -223,21 +282,58 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             }
             CfetsPrimaryBidManageCfmResponse response = cfetsPrimaryBidManageMapper.getBidManageCfmInfo(param);
             List<BidProductDto> bidProductList = cfetsPrimaryBidManageMapper.getBidProductList(param);
+            for(BidProductDto bidProduct:bidProductList){
+                bidProduct.setTotalBidPrinamt(ArithmeticUtil.round(bidProduct.getTotalBidPrinamt(),2, RoundingMode.HALF_UP));
+                bidProduct.setWinPrinAmt(ArithmeticUtil.round(bidProduct.getWinPrinAmt(),2, RoundingMode.HALF_UP));
+            }
+            List<BidProductDto> bidProductResultList = bidProductList;
+            if(!StringUtil.isEmptyList(bidProductList)&&StringUtil.isNotEmpty(bidProductList.get(0))){
+                Comparator<BidProductDto> byBidPrice;
+                if (StringUtil.equals(bidProductList.get(0).getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())
+                        || StringUtil.equals(bidProductList.get(0).getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
+                    // 招标标的为利率和利差时 投标标位 从小到大排列
+                    byBidPrice = Comparator.comparing(BidProductDto::getBidPrice);
+                } else {
+                    //招标标的为价格时，投标标位 从大到小排列
+                    byBidPrice = Comparator.comparing(BidProductDto::getBidPrice).reversed();
+                }
+                bidProductResultList = bidProductList.stream().sorted(byBidPrice).collect(Collectors.toList());
+            }
             if(StringUtil.isNotEmpty(response.getBidModle()) && response.getBidModle().equals(DictCodeListExt4.投标方式_自主投标.getValue())) {
                 Map<String, List<BidProductDto>> summaryBidMap = bidProductList.stream().collect(JoyinCollectors.groupingBy(item -> item.getWinPrice()));
                 List<SummaryBidDto> summaryBidList = new ArrayList<>();
+                String tenderTarget =null;
                 for (String winPrice : summaryBidMap.keySet()) {
                     SummaryBidDto summaryBidDto = new SummaryBidDto();
                     BigDecimal totalBidPrinamt = null;
                     BigDecimal winPrinAmt = null;
+                    BigDecimal bidPrice = null;
                     for (BidProductDto bidProductDto : summaryBidMap.get(winPrice)) {
                         totalBidPrinamt = ArithmeticUtil.doAdd(totalBidPrinamt, bidProductDto.getTotalBidPrinamt());
                         winPrinAmt = ArithmeticUtil.doAdd(winPrinAmt, bidProductDto.getWinPrinAmt());
+                        bidPrice = bidProductDto.getBidPrice();
+                        tenderTarget= bidProductDto.getTenderTarget();
+                    }
+                    if(totalBidPrinamt.compareTo(BigDecimal.ZERO.stripTrailingZeros())==0){
+                        continue;
                     }
                     summaryBidDto.setTotalBidPrinamt(totalBidPrinamt);
                     summaryBidDto.setWinPrinAmt(winPrinAmt);
                     summaryBidDto.setWinPrice(winPrice);
+                    summaryBidDto.setBidPrice(bidPrice);
                     summaryBidList.add(summaryBidDto);
+                }
+                if(!StringUtil.isEmptyList(summaryBidList)&&StringUtil.isNotEmpty(summaryBidList.get(0))){
+                    Comparator<SummaryBidDto> byBidPrice;
+                    if (StringUtil.equals(tenderTarget, DictCodeListExt4.招标标的_利率.getValue())
+                            || StringUtil.equals(tenderTarget, DictCodeListExt4.招标标的_利差.getValue())) {
+                        // 招标标的为利率和利差时 投标标位 从小到大排列
+                        byBidPrice = Comparator.comparing(SummaryBidDto::getBidPrice);
+                    } else {
+                        //招标标的为价格时，投标标位 从大到小排列
+                        byBidPrice = Comparator.comparing(SummaryBidDto::getBidPrice).reversed();
+                    }
+                    summaryBidList = summaryBidList.stream().sorted(byBidPrice).collect(Collectors.toList());
                 }
                 resultData.put(dtCode + "_formList", listTable);
                 resultData.put(dtCode + "_list", summaryBidList);
@@ -246,7 +342,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             resultData.put(dtCode + "_form", infoForm);
             resultData.put(dtCode + "_formDetail", detailTable);
             resultData.put(dtCode + "_data", response);
-            resultData.put(dtCode + "_detail", bidProductList);
+            resultData.put(dtCode + "_detail", bidProductResultList);
             return resultData;
         }
         return null;
@@ -256,17 +352,63 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         if (StringUtil.isNotEmpty(request.getBidId())) {
             Map<String, Object> param = BeanUtil.object2Map(request);
             CfetsPrimaryBidManageSaveRequest response = cfetsPrimaryBidManageMapper.selectBidOrderInfo(param);
+            List<CfetsPrimaryBidManageSaveDetailDto> details =new  ArrayList<>();
             List<CfetsPrimaryBidManageSaveDetailDto> detailDtos = cfetsPrimaryBidManageMapper.selectBidOrderDtail(param);
-            response.setAllocationDetails(detailDtos);
+            if (StringUtil.equals(response.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue()) ||
+                    StringUtil.equals(response.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())){
+                details.addAll(detailDtos.stream().filter(item->item.getTotalBidPrinamt().compareTo(BigDecimal.ZERO)!=0).sorted(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getBidPrice)
+                        ).collect(Collectors.toList()));
+            }else if (StringUtil.equals(response.getTenderTarget(), DictCodeListExt4.招标标的_价格.getValue())){
+                details.addAll(detailDtos.stream().filter(item->item.getTotalBidPrinamt().compareTo(BigDecimal.ZERO)!=0).sorted(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getBidPrice).reversed()
+                        ).collect(Collectors.toList()));
+            }
+            response.setAllocationDetails(details);
+            // 计算费用
+            this.calFee(response);
             return response;
         }
         return null;
+    }
+
+    /**
+     * 计算费用
+     *
+     * @param response   计算参数
+     * @return java.util.List<com.joyintech.tams.common.base.entity.TrdTradeFeeDetail>
+     * @author jiangpeng
+     * @date 2022/5/25 14:18
+     */
+    public CfetsPrimaryBidManageSaveRequest calFee(CfetsPrimaryBidManageSaveRequest response) {
+        FinProduct finProduct = finProductMapper.selectByPrimaryKey(response.getFinprodId());
+        BasicTradeFeeInputDto inputDto = new BasicTradeFeeInputDto();
+        inputDto.setTradeAmt(response.getWinPrinamt());
+        inputDto.setTradeDate(iPlatformDate.getSysDate());
+        inputDto.setTradeMarket(finProduct.getTradeMarket());
+        inputDto.setTradeMarketMode(DictCodeListExt1.交易市场_一级市场.getValue());
+        inputDto.setFinprodType2(DictCodeList.平安资产类型_债券.getValue());
+        inputDto.setPs(DictCodeList.交易方向_买入.getValue());// 交易方向
+        inputDto.setFpriceAmt(response.getWinPrinamt());// 全价总额
+        inputDto.setPrinAmt(response.getWinPrinamt());// 券面总额
+        inputDto.setIsGrade("1");
+        inputDto.setRegistOrg(finProduct.getRegistOrg());
+        inputDto.setFeeTypeList(Arrays.asList(BussinessDictCodeList.费用类型_交易手续费.getValue(), BussinessDictCodeList.费用类型_结算手续费.getValue()));
+        List<TrdTradeFeeDetail> trdTradeFeeDetails = baseTradeFeeCommService.innerBankFeeDeal(inputDto);
+        if (CollectionUtils.isNotEmpty(trdTradeFeeDetails)) {
+            trdTradeFeeDetails.forEach(item -> {
+                if (StringUtil.equals(item.getFeeType(), BussinessDictCodeList.费用类型_结算手续费.getValue())) {
+                    response.setSettFeeAmt(item.getFeeAmt());
+                }
+            });
+        }
+        return response;
     }
 
     public void unBidSave(CfetsPrimaryBidManageSaveRequest request) {
         Map<String, Object> param = BeanUtil.object2Map(request);
         BidResultTotal bidResultTotal = new BidResultTotal();
         BeanUtil.copyPropertiesIgnoreNull(bidResultTotal,request);
+        wflBidResultTotalMapper.deleteByPrimaryKey(bidResultTotal.getTotalWinId());
+        wflBidResultDetailMapper.deleteByTotalWinId(bidResultTotal.getTotalWinId());
         bidResultTotal.setStatus(DictCodeListExt1.有效状态_有效.getValue());
         bidResultTotalMapper.insertSelective(bidResultTotal);
         BidOrder record = new BidOrder();
@@ -280,6 +422,12 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             bidResultDetail.setDetailWinId(IDGenerator.generate());
             bidResultDetail.setStatus(DictCodeListExt1.有效状态_有效.getValue());
             bidResultDetailMapper.insertSelective(bidResultDetail);
+        }
+        Map<String, List<CfetsPrimaryBidManageSaveDetailDto>> allocationListTwoMap = request.getAllocationDetails().stream()
+                .collect(JoyinCollectors.groupingBy(item ->  item.getEntrustId() ));
+        for (String entrustId:allocationListTwoMap.keySet()) {
+            // 如果满足，则调用投资委托组件的更新委托状态接口，将委托状态设置为“委托状态_已完成”
+            etrInvestInfoServiceImpl.updateDelegateStatus(entrustId, DictCodeList.委托状态_已完成.getValue());
         }
     }
 
@@ -317,6 +465,13 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             Map<String, Object> param = BeanUtil.object2Map(request);
             CfetsPrimaryBidManageSaveRequest response = cfetsPrimaryBidManageMapper.selectBasicInfo(param);
             List<CfetsPrimaryBidManageSaveDetailDto> detailDtos = cfetsPrimaryBidManageMapper.selectBasicDtail(param);
+            // 交易所 应计利息取值
+            if (CollectionUtils.isNotEmpty(detailDtos)
+                    && !(StringUtil.equals(response.getTradeMarket(), DictCodeListExt3.交易场所_银行间.getValue())
+                    || StringUtil.equals(response.getTradeMarket(), DictCodeListExt3.交易场所_商业银行柜台.getValue()))
+                    && StringUtil.isNotEmpty(detailDtos.get(0).getIntAmt())) {
+                response.setIntAmt(detailDtos.get(0).getIntAmt());
+            }
             response.setAllocationDetails(detailDtos);
             return response;
         }
@@ -335,76 +490,166 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     public void doComplete(CfetsPrimaryBidManageSaveRequest entity, OperationType type) {
         String action = StringUtil.EMPTY;
         if (OperationType.REVOKE.equals(type)) {
+            // 是否交易所
+            boolean isJys = !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                    && !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue());
+            // 是否交易所一级分销
+            boolean isYJFS = isJys && StringUtil.equals(entity.getPayType(), BussinessDictCodeList.缴款方式_一级分销.getValue());
             action = OperationType.REVOKE.name();
             BidResultTotal bidResultTotal = new BidResultTotal();
             bidResultTotal.setTotalWinId(entity.getTotalWinId());
             bidResultTotal.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
-            bidResultTotalMapper.updateByPrimaryKey(bidResultTotal);
-            if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
+            bidResultTotal.setRemark(entity.getRemark());
+            bidResultTotalMapper.updateByPrimaryKeySelective(bidResultTotal);
+            cfetsPrimaryBidManageMapper.updateBidOrder(entity.getBidId());
+            BaseBidManageBaseInfoDto  baseInfoDto = new BaseBidManageBaseInfoDto();
+            if (StringUtil.equals(entity.getIsWin(), DictCodeList.是否_是.getValue())) {
                 List<TrdFinProductDealTotal> trdFinProductDealTotalList = cfetsPrimaryBidManageMapper.getTrdFinProductDealTotal(entity.getTotalWinId());
+                if(CollectionUtils.isEmpty(trdFinProductDealTotalList)){
+                    trdFinProductDealTotalList = cfetsPrimaryBidManageMapper.getTrdFinProductDealTotalTemp(entity.getTotalWinId());
+                }
+                List<TrdProductDeal> trdProductDeals = new ArrayList<>();
                 for (TrdFinProductDealTotal trdFinProductDealTotal : trdFinProductDealTotalList) {
                     TrdFinProductDealTotal trdFinProductDealTotalRevoke = new TrdFinProductDealTotal();
                     trdFinProductDealTotalRevoke.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
                     trdFinProductDealTotalRevoke.setIsCancel(DictCodeList.是否_是.getValue());
-                    trdFinProductDealTotalMapper.updateByPrimaryKeySelective(trdFinProductDealTotalRevoke);
+                    if (isYJFS) {
+                        trdProductTempDealTotalMapper.updateByPrimaryKeySelective(trdFinProductDealTotalRevoke);
+                    } else {
+                        trdFinProductDealTotalMapper.updateByPrimaryKeySelective(trdFinProductDealTotalRevoke);
+                    }
                     trdFinProductDealTotal.setpTradeId(trdFinProductDealTotal.getTotleTradeId());
                     trdFinProductDealTotal.setTotleTradeId(
                             trdFinProductDealTotal.getTotleTradeId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
                     trdFinProductDealTotal.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
-                    TrdFinProductDealTotal trdFinProductDealTotalR = trdFinProductDealTotalMapper.selectByPrimaryKey(trdFinProductDealTotal.getTotleTradeId());
-                    if (StringUtil.isNotEmpty(trdFinProductDealTotalR)) {
-                        trdFinProductDealTotalMapper.updateByPrimaryKey(trdFinProductDealTotal);
+                    TrdFinProductDealTotal trdFinProductDealTotalR = new TrdFinProductDealTotal();
+                    if (isYJFS) {
+                        trdFinProductDealTotalR = trdProductTempDealTotalMapper.selectByPrimaryKey(trdFinProductDealTotal.getTotleTradeId());
                     } else {
-                        trdFinProductDealTotalMapper.insertSelective(trdFinProductDealTotal);
+                        trdFinProductDealTotalR = trdFinProductDealTotalMapper.selectByPrimaryKey(trdFinProductDealTotal.getTotleTradeId());
                     }
-                    // 根据汇总交易编号查询金融产品交易
-                    List<TrdProductDeal> trdProductDealList = cfetsPrimaryBidManageMapper.queryTrdProductDealByTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
-                    if (!trdProductDealList.isEmpty()) {
-                        for (TrdProductDeal trdProductDeal : trdProductDealList) {
-                            /**金融产品交易表**/
-                            TrdProductDeal trdProductDealRevoke = new TrdProductDeal();
-                            trdProductDealRevoke.setTradeId(trdProductDeal.getTradeId());
-                            trdProductDealRevoke.setIsCancel(DictCodeList.是否_是.getValue());
-                            trdProductDealMapper.updateByPrimaryKeySelective(trdProductDealRevoke);
-
-                            trdProductDeal.setpTradeId(trdProductDeal.getTradeId());
-                            trdProductDeal.setTradeId(trdProductDeal.getTradeId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
-                            trdProductDeal.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
-                            trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
-                            trdProductDealMapper.insert(trdProductDeal);
-                            /**交易附属表 **/
-                            TrdProductDealAdd trdProductDealAdd = trdProductDealAddMapper.selectByPrimaryKey(trdProductDeal.getTradeId());
-                            if (trdProductDealAdd != null) {
-                                trdProductDealAdd.setTradeId(trdProductDealAdd.getTradeId()
-                                        + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
-                                trdProductDealAddMapper.insert(trdProductDealAdd);
-                            }
-                            // 组合交易表
-                            List<PtlTrade> ptlTradeList = cfetsPrimaryBidManageMapper.queryPtlTradeByTradeId(trdProductDeal.getTradeId());
-                            if (!ptlTradeList.isEmpty()) {
-                                for (PtlTrade ptlTrade : ptlTradeList) {
-                                    ptlTrade.setBusiNo(ptlTrade.getBusiNo() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
-                                    ptlTrade.setCreateUser(entity.getCreateUser());
-                                    ptlTrade.setCreateTime(new Date());
-                                    ptlTrade.setUpdateUser(entity.getCreateUser());
-                                    ptlTrade.setUpdateTime(new Date());
-                                    ptlTradeMapper.insert(ptlTrade);
+                    if (StringUtil.isNotEmpty(trdFinProductDealTotalR)) {
+                        if (isYJFS) {
+                            trdProductTempDealTotalMapper.updateByPrimaryKey(trdFinProductDealTotal);
+                        } else {
+                            trdFinProductDealTotalMapper.updateByPrimaryKey(trdFinProductDealTotal);
+                        }
+                    } else {
+                        if (isYJFS) {
+                            trdProductTempDealTotalMapper.insertSelective(trdFinProductDealTotal);
+                        } else {
+                            trdFinProductDealTotalMapper.insertSelective(trdFinProductDealTotal);
+                        }
+                    }
+                    if (!isYJFS) {
+                        // 根据汇总交易编号查询金融产品交易
+                        List<TrdProductDeal> trdProductDealList = cfetsPrimaryBidManageMapper.queryTrdProductDealByTotleTradeId(trdFinProductDealTotalRevoke.getTotleTradeId());
+                        if (!trdProductDealList.isEmpty()) {
+                            for (TrdProductDeal trdProductDeal : trdProductDealList) {
+                                /**金融产品交易表**/
+                                TrdProductDeal trdProductDealRevoke = new TrdProductDeal();
+                                trdProductDealRevoke.setTradeId(trdProductDeal.getTradeId());
+                                trdProductDealRevoke.setIsCancel(DictCodeList.是否_是.getValue());
+                                trdProductDealMapper.updateByPrimaryKeySelective(trdProductDealRevoke);
+                                trdProductDeal.setpTradeId(trdProductDeal.getTradeId());
+                                trdProductDeal.setTradeId(trdProductDeal.getTradeId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
+                                trdProductDeal.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
+                                trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
+                                trdProductDealMapper.insert(trdProductDeal);
+                                /**交易附属表 **/
+                                TrdProductDealAdd trdProductDealAdd = trdProductDealAddMapper.selectByPrimaryKey(trdProductDealRevoke.getTradeId());
+                                if (trdProductDealAdd != null) {
+                                    trdProductDeal.setEntrustId(trdProductDealAdd.getEntrustId());
+                                    trdProductDealAdd.setTradeId(trdProductDealAdd.getTradeId()
+                                            + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
+                                    trdProductDealAddMapper.insert(trdProductDealAdd);
+                                }
+                                trdProductDeals.add(trdProductDeal);
+                                // 组合交易表
+                                List<PtlTrade> ptlTradeList = cfetsPrimaryBidManageMapper.queryPtlTradeByTradeId(trdProductDealRevoke.getTradeId());
+                                if (!ptlTradeList.isEmpty()) {
+                                    for (PtlTrade ptlTrade : ptlTradeList) {
+                                        ptlTrade.setBusiNo(ptlTrade.getBusiNo() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
+                                        ptlTrade.setCreateUser(entity.getCreateUser());
+                                        ptlTrade.setCreateTime(new Date());
+                                        ptlTrade.setUpdateUser(entity.getCreateUser());
+                                        ptlTrade.setUpdateTime(new Date());
+                                        ptlTradeMapper.insert(ptlTrade);
+                                    }
                                 }
                             }
-                        }
 
-                    }
-                    // 划款指令表
-                    List<StlOrders> stlPayOrdersList = cfetsPrimaryBidManageMapper.queryStlPayOrdersByTradeId(trdFinProductDealTotal.getTotleTradeId());
-                    if (!stlPayOrdersList.isEmpty()) {
-                        for (StlOrders stlOrders : stlPayOrdersList) {
-                            stlOrders.setOrderId(stlOrders.getOrderId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
-                            stlOrders.setpOrderId(stlOrders.getOrderId());
-                            stlOrders.setTradeId(trdFinProductDealTotal.getTotleTradeId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
-                            stlOrders.setOrderStatus(DictCodeListExt1.指令状态_撤销.getValue());
-                            stlOrdersMapper.insert(stlOrders);
                         }
+                        // 划款指令表
+                        List<StlOrders> stlOrdersList = cfetsPrimaryBidManageMapper.queryStlOrdersByTradeId(trdFinProductDealTotalRevoke.getTotleTradeId());
+                        if (!stlOrdersList.isEmpty()) {
+                            for (StlOrders stlOrders : stlOrdersList) {
+                                stlOrders.setOrderId(stlOrders.getOrderId().substring(0, 30) + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
+                                stlOrders.setpOrderId(stlOrders.getOrderId());
+                                stlOrders.setTradeId(trdFinProductDealTotal.getTotleTradeId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
+                                stlOrders.setOrderStatus(DictCodeListExt1.指令状态_撤销.getValue());
+                                stlOrdersMapper.insert(stlOrders);
+                            }
+                        }
+                        baseInfoDto.setTrdProductDealList(trdProductDeals);
+                        entity.setBaseBidManageBaseInfoDto(baseInfoDto);
+                    }else{
+                        // 根据汇总交易编号查询金融产品交易
+                        List<TrdProductTempDeal> trdProductDealList = cfetsPrimaryBidManageMapper.queryTrdProductDealTempByTotleTradeId(trdFinProductDealTotalRevoke.getTotleTradeId());
+                        if (!trdProductDealList.isEmpty()) {
+                            for (TrdProductTempDeal trdProductDeal : trdProductDealList) {
+                                /**金融产品交易表**/
+                                TrdProductTempDeal trdProductDealRevoke = new TrdProductTempDeal();
+                                trdProductDealRevoke.setTradeId(trdProductDeal.getTradeId());
+                                trdProductDealRevoke.setIsCancel(DictCodeList.是否_是.getValue());
+                                trdProductTempDealMapper.updateByPrimaryKeySelective(trdProductDealRevoke);
+                                trdProductDeal.setpTradeId(trdProductDeal.getTradeId());
+                                trdProductDeal.setTradeId(trdProductDeal.getTradeId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
+                                trdProductDeal.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
+                                trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
+                                trdProductTempDealMapper.insert(trdProductDeal);
+                                /**交易附属表 **/
+                                TrdProductTempDealAdd trdProductDealAdd = trdProductTempDealAddMapper.selectByPrimaryKey(trdProductDealRevoke.getTradeId());
+                                TrdProductDeal deal = new TrdProductDeal();
+                                BeanUtil.copyPropertiesIgnoreNull(deal,trdProductDeal);
+                                if (trdProductDealAdd != null) {
+                                    deal.setEntrustId(trdProductDealAdd.getEntrustId());
+                                    trdProductDealAdd.setTradeId(trdProductDealAdd.getTradeId()
+                                            + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
+                                    trdProductTempDealAddMapper.insert(trdProductDealAdd);
+                                }
+                                trdProductDeals.add(deal);
+                            }
+                        }
+                        // 划款指令表
+                        List<StlOrders> stlOrdersList = cfetsPrimaryBidManageMapper.queryStlOrdersByTradeId(trdFinProductDealTotalRevoke.getTotleTradeId());
+                        if (!stlOrdersList.isEmpty()) {
+                            for (StlOrders stlOrders : stlOrdersList) {
+                                stlOrders.setOrderId(stlOrders.getOrderId().substring(0, 30) + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
+                                stlOrders.setpOrderId(stlOrders.getOrderId());
+                                stlOrders.setTradeId(trdFinProductDealTotal.getTotleTradeId() + BussinessConstant.TRADE_REVOKE_TRADE_ID_SPLIT_STR);
+                                stlOrders.setOrderStatus(DictCodeListExt1.指令状态_撤销.getValue());
+                                stlOrdersMapper.insert(stlOrders);
+                            }
+                        }
+                        baseInfoDto.setTrdProductDealList(trdProductDeals);
+                        entity.setBaseBidManageBaseInfoDto(baseInfoDto);
                     }
+                }
+            } else {
+                List<String> entrustIdList = cfetsPrimaryBidManageMapper.selectEntrustIdByBidId(entity.getBidId());
+                for (String entrustId : entrustIdList) {
+                    // 如果满足，则调用投资委托组件的更新委托状态接口，将委托状态设置为“已接收”
+                    etrInvestInfoServiceImpl.updateDelegateStatus(entrustId, DictCodeList.委托状态_已接收.getValue());
+                }
+            }
+            if (type.equals(OperationType.REVOKE) || type.equals(OperationType.DELETE)) {
+                // 匹配取消
+                PositionHttpRequest.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
+                        DictCodeListExt3.头寸业务类型_债券一级投标.getValue(), DictCodeList.交易方向_买入.getValue());
+                if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
+                    // 老头寸处理
+                    this.dealOldPosition(entity, true);
                 }
             }
             updateCfetsOprHis(entity.getTotalWinId(),action);
@@ -418,10 +663,16 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             }
             updateCfetsOprHis(entity.getTotalWinId(),action);
         }
+        baseTradeCommExecute(entity, type);
     }
 
     private void doCompleteInsert(CfetsPrimaryBidManageSaveRequest entity) {
         BaseBidManageBaseInfoDto dto = entity.getBaseBidManageBaseInfoDto();
+        // 是否交易所
+        boolean isJys = !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                && !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue());
+        // 是否交易所一级分销
+        boolean isYJFS = isJys && StringUtil.equals(entity.getPayType(), BussinessDictCodeList.缴款方式_一级分销.getValue());
         //中标结果汇总表
         BidResultTotal bidResultTotal = dto.getBidResultTotal();
         wflBidResultTotalMapper.deleteByPrimaryKey(bidResultTotal.getTotalWinId());
@@ -439,15 +690,33 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         }
         //金融产品交易汇总表
         for(TrdFinProductDealTotal trdFinProductDealTotal: dto.getTrdFinProductDealTotalList()) {
-            trdFinProductDealTotalMapper.insertSelective(trdFinProductDealTotal);
+            if (isYJFS) {
+                trdProductTempDealTotalMapper.insert(trdFinProductDealTotal);
+            } else {
+                trdFinProductDealTotalMapper.insertSelective(trdFinProductDealTotal);
+            }
         }
         //金融产品交易表
         for(TrdProductDeal trdProductDeal: dto.getTrdProductDealList()) {
-            trdProductDealMapper.insertSelective(trdProductDeal);
+            if (isYJFS) {
+                TrdProductTempDeal trdProductTempDeal = new TrdProductTempDeal();
+                BeanUtil.copyPropertiesIgnoreNull(trdProductTempDeal, trdProductDeal);
+                trdProductTempDealMapper.insertSelective(trdProductTempDeal);
+            } else {
+                trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
+                trdProductDeal.setIsCancel(DictCodeList.是否_否.getValue());
+                trdProductDealMapper.insertSelective(trdProductDeal);
+            }
         }
         //金融产品交易附属表
         for(TrdProductDealAdd trdProductDealAdd: dto.getTrdProductDealAddList()) {
-            trdProductDealAddMapper.insertSelective(trdProductDealAdd);
+            if (isYJFS) {
+                TrdProductTempDealAdd trdTempDealTotalAdd = new TrdProductTempDealAdd();
+                BeanUtil.copyPropertiesIgnoreNull(trdTempDealTotalAdd, trdProductDealAdd);
+                trdProductTempDealAddMapper.insertSelective(trdTempDealTotalAdd);
+            }else {
+                trdProductDealAddMapper.insertSelective(trdProductDealAdd);
+            }
         }
         //汇总交易费用表
         for(TrdTradeFeeTotal trdTradeFeeTotal: dto.getTrdTradeFeeTotalList()) {
@@ -462,9 +731,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             ptlTradeMapper.insertSelective(ptlTrade);
         }
         //委托完成状况表
-        for(EtrFinishStatus etrFinishStatus: dto.getEtrFinishStatusList()) {
-            etrFinishStatusMapper.insertSelective(etrFinishStatus);
-        }
+//        for(EtrFinishStatus etrFinishStatus: dto.getEtrFinishStatusList()) {
+//            etrFinishStatusMapper.insertSelective(etrFinishStatus);
+//        }
         //结算指令表
         for(StlOrders stlOrders: dto.getStlOrdersList()) {
             stlOrdersMapper.insertSelective(stlOrders);
@@ -501,7 +770,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         //中标结果汇总
         BidResultTotal bidResultTotal = new BidResultTotal();
         BeanUtil.copyPropertiesIgnoreNull(bidResultTotal,dto);
-        bidResultTotal.setWinDate(iplatformDate.getSysDate());
+        bidResultTotal.setWinDate(iPlatformDate.getSysDate());
         bidResultTotal.setStatus(DictCodeListExt1.有效状态_有效.getValue());
         //中标结果明细表
         List<BidResultDetail> bidResultDetailList = new ArrayList<>();
@@ -531,7 +800,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             trdFinProductDealTotal.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
             trdFinProductDealTotal.setBusiType(BussinessDictCodeList.共同业务类型_中标结果维护.getValue());
             trdFinProductDealTotal.setBranch(branch);
-            trdFinProductDealTotal.setTradeDate(iplatformDate.getSysDate());
+            trdFinProductDealTotal.setTradeDate(iPlatformDate.getSysDate());
             trdFinProductDealTotal.setSettleDate(dto.getCreditorDebtDate());
             trdFinProductDealTotal.setCcy(dto.getCcy());
             BigDecimal unitCprice = null;
@@ -544,13 +813,13 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 unitCprice = detailDto.getWinCprice();
                 unitInt = detailDto.getIntAmt();
                 winPrinamt = ArithmeticUtil.doAdd(winPrinamt,detailDto.getTheWinPrinamt());
-                intAmt= ArithmeticUtil.doAdd(intAmt,detailDto.getIntAmt());
-                settFeeAmt= ArithmeticUtil.doAdd(settFeeAmt,detailDto.getSettFeeAmt());
+                intAmt = ArithmeticUtil.doAdd(intAmt, ArithmeticUtil.divide(
+                        ArithmeticUtil.multiply(detailDto.getIntAmt(), detailDto.getActWinPrinamt()), BigDecimal.valueOf(100), 4));
+                settFeeAmt = ArithmeticUtil.doAdd(settFeeAmt, detailDto.getSettFeeAmt());
             }
-            if (StringUtil.equals(dto.getTenderTarget(),DictCodeListExt4.招标标的_价格.getValue())) {
-                trdFinProductDealTotal.setUnitCprice(unitCprice);
-            }
+            trdFinProductDealTotal.setUnitCprice(unitCprice);
             trdFinProductDealTotal.setUnitInt(unitInt);
+            trdFinProductDealTotal.setUnitFprice(ArithmeticUtil.doAdd(unitCprice, unitInt));
             trdFinProductDealTotal.setParValue(BigDecimal.valueOf(100));
             CfetsBidManageCalcAmountRequest request = new CfetsBidManageCalcAmountRequest();
             request.setWinPrinamt(winPrinamt);
@@ -641,28 +910,31 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             TrdProductDeal trdProductDeal = new TrdProductDeal();
             BussinessCodeParameter bussinessCodeParameter = new BussinessCodeParameter();
             bussinessCodeParameter.setCommonBusinessType(DictCodeList.共通业务类型_债券买入);
-            bussinessCodeParameter.setType1(DictCodeList.业务编号一级分类_同业借款);
             trdProductDeal.setTradeId((baseGetBusinessId != null && baseGetBusinessId.buildBussinessCode(bussinessCodeParameter) != null)? baseGetBusinessId.buildBussinessCode(bussinessCodeParameter): IDGenerator.generate().substring(0, 30));
             trdProductDeal.setSecManageAcctId(secAcctId);
             trdProductDeal.setFinprodId(dto.getFinprodId());
             trdProductDeal.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
             trdProductDeal.setBranch(branch);
-            trdProductDeal.setTradeDate(iplatformDate.getSysDate());
+            trdProductDeal.setTradeDate(iPlatformDate.getSysDate());
             trdProductDeal.setSettleDate(dto.getCreditorDebtDate());
             trdProductDeal.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+            trdProductDeal.setEntrustId(entrustId);
             BigDecimal cpriceAmt =null;
             BigDecimal winPrinamt =null;
             BigDecimal intAmt =null;
             BigDecimal fpriceAmt = null;
             BigDecimal settFeeAmt = null;
+            BigDecimal unitInt = null;
             String invAim = null;
             for(CfetsPrimaryBidManageSaveDetailDto detailDto: detailDtos) {
-                cpriceAmt = ArithmeticUtil.doAdd(cpriceAmt,detailDto.getTradeAmt());
+                cpriceAmt = ArithmeticUtil.doAdd(cpriceAmt, detailDto.getTradeAmt());
                 winPrinamt = ArithmeticUtil.doAdd(winPrinamt,detailDto.getTheWinPrinamt());
-                intAmt = ArithmeticUtil.doAdd(intAmt,detailDto.getIntAmt());
+                intAmt = ArithmeticUtil.doAdd(intAmt, ArithmeticUtil.divide(
+                        ArithmeticUtil.multiply(detailDto.getIntAmt(), detailDto.getActWinPrinamt()), BigDecimal.valueOf(100), 4));
                 fpriceAmt = ArithmeticUtil.doAdd(fpriceAmt,detailDto.getPayAmt());
                 settFeeAmt= ArithmeticUtil.doAdd(settFeeAmt,detailDto.getSettFeeAmt());
                 invAim = detailDto.getInvAim();
+                unitInt = detailDto.getIntAmt();
             }
             trdProductDeal.setCpriceAmt(cpriceAmt);
             trdProductDeal.setShareAmt(ArithmeticUtil.divide(winPrinamt,BigDecimal.valueOf(100),4));
@@ -672,6 +944,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             trdProductDeal.setTradeAmt(fpriceAmt);
             trdProductDeal.setFeeAmtUnpay(settFeeAmt);
             trdProductDeal.setFeeAmt(settFeeAmt);
+            trdProductDeal.setUnitInt(unitInt);
             trdProductDeal.setPs(DictCodeList.交易方向_买入.getValue());
             trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
             trdProductDeal.setIsCancel(DictCodeList.是否_否.getValue());
@@ -690,6 +963,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             trdProductDeal.setCounterId(dto.getCounterId());
             trdProductDeal.setRemark(dto.getRemark());
             trdProductDeal.setInvAim(invAim);
+            trdProductDeal.setTrader(dto.getOuTraderId());
             trdProductDealList.add(trdProductDeal);
             //金融产品交易附属表
             TrdProductDealAdd  trdProductDealAdd = new TrdProductDealAdd();
@@ -714,13 +988,13 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             trdTradeFeeDetail.setIsPayWithTrade(DictCodeList.是否_否.getValue());
             trdTradeFeeDetail.setFeeAmt(settFeeAmt);
             //委托完成状况表
-            EtrFinishStatus  etrFinishStatus = new EtrFinishStatus();
-            etrFinishStatus.setEntrustId(entrustId);
-            etrFinishStatus.setTradeId(secAcctIdTotleTradeId.get(secAcctId));
-            etrFinishStatus.setFinishDate(iplatformDate.getSysDate());
-            etrFinishStatus.setTrader(dto.getOuTraderId());
-            etrFinishStatus.setTranFinishAmt(trdProductDeal.getPrinAmt());
-            etrFinishStatusList.add(etrFinishStatus);
+//            EtrFinishStatus  etrFinishStatus = new EtrFinishStatus();
+//            etrFinishStatus.setEntrustId(entrustId);
+//            etrFinishStatus.setTradeId(secAcctIdTotleTradeId.get(secAcctId));
+//            etrFinishStatus.setFinishDate(iplatformDate.getSysDate());
+//            etrFinishStatus.setTrader(dto.getOuTraderId());
+//            etrFinishStatus.setTranFinishAmt(trdProductDeal.getPrinAmt());
+//            etrFinishStatusList.add(etrFinishStatus);
             BussSettleOrderParameterDto bussSettleOrderParameterDto = new BussSettleOrderParameterDto();
             bussSettleOrderParameterDto.setIsTotalTrade(BussinessDictCodeList.是否_是.getValue());
             bussSettleOrderParameterDto.setBankLendingType(null);
@@ -756,13 +1030,12 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         baseBidManageBaseInfoDto.setTrdTradeFeeTotalList(trdTradeFeeTotalList);
         baseBidManageBaseInfoDto.setTrdTradeFeeDetailList(trdTradeFeeDetailList);
         baseBidManageBaseInfoDto.setPtlTradeList(ptlTradeList);
-        baseBidManageBaseInfoDto.setEtrFinishStatusList(etrFinishStatusList);
+//        baseBidManageBaseInfoDto.setEtrFinishStatusList(etrFinishStatusList);
         baseBidManageBaseInfoDto.setStlOrdersList(stlOrdersList);
         baseBidManageBaseInfoDto.setBussTrdTransferOrderList(bussTrdTransferOrderList);
         dto.setBaseBidManageBaseInfoDto(baseBidManageBaseInfoDto);
         return dto;
     }
-
 
     /**
      * {@inheritDoc}
@@ -772,20 +1045,35 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         if ("save".equals(entity.getOperateType())) {
             return;
         }
-
-        if (type.toString().equals("NEW") && entity.getOperateType().equals("submit")) {
+        if (type.toString().equals("NEW") && !StringUtil.isNotEmpty(entity.getOperateType())) {
             if(!StringUtil.equals(CacheUtil.getSysParam(BussinessConstant.WFL_AUTO), "02")){
                 beforeWorkFlow(entity);
             }
             // 发送头寸
             this.sendPositionMethod(entity, true, null);
-            // 老头寸处理
-            this.dealOldPosition(entity, false);
+        }else if (type.toString().equals("NEW") && entity.getOperateType().equals("submit")) {
+            if(!StringUtil.equals(CacheUtil.getSysParam(BussinessConstant.WFL_AUTO), "02")){
+                beforeWorkFlow(entity);
+            }
+            // 发送头寸
+            this.sendPositionMethod(entity, true, null);
+            if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
+                // 老头寸处理
+                this.dealOldPosition(entity, false);
+            }
         }
         else if (type.toString().equals("REVOKE")) {
             entity.setOperateType("revoke");
             beforeWorkFlow(entity);
         }
+    }
+
+    @Override
+    public void doBack(CfetsPrimaryBidManageSaveRequest request){
+        BidResultTotal bidResultTotal = new BidResultTotal();
+        BeanUtil.copyPropertiesIgnoreNull(bidResultTotal,request);
+        wflBidResultTotalMapper.deleteByPrimaryKey(bidResultTotal.getTotalWinId());
+        wflBidResultDetailMapper.deleteByTotalWinId(bidResultTotal.getTotalWinId());
     }
 
     /**
@@ -797,6 +1085,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     private void sendPositionMethod(CfetsPrimaryBidManageSaveRequest entity, boolean isSubmit, String confirmOk) {
         List<CfetsBondPortfolioCashRequest> ptlList = new ArrayList<>();
         for (CfetsPrimaryBidManageSaveDetailDto productDto : entity.getAllocationDetails()) {
+//            if(!StringUtil.isNotEmpty(productDto.getWinCprice())){
+//                continue;
+//            }
             //调用头寸
             CfetsBondPortfolioCashRequest posport = new CfetsBondPortfolioCashRequest();
             posport.setPortfolioId(productDto.getPortfolioId());
@@ -806,34 +1097,78 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 posport.setSecAcctId(productDto.getSecAcctId()); // 证券户
             }
             if (StringUtil.isNotEmpty(productDto.getPortfolioId())) {
-                Map<String, Object> map = new HashMap<String, Object>();
-                map.put("portfolioId", productDto.getPortfolioId());
-                map.put("acctType", BussinessDictCodeList.资金账户类型_托管账户.getValue());
-                String cashAcctId = joyinbusinessCommonService.qryPortfolioCashAcctId(map);
-                if (StringUtil.isNotEmpty(cashAcctId)) {
-                    posport.setCashAcctId(cashAcctId); // 托管户
+                if (StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                        || StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue())
+                        || StringUtil.equals(entity.getPayType(), BussinessDictCodeList.缴款方式_一级缴款.getValue())) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("portfolioId", productDto.getPortfolioId());
+                    map.put("acctType", BussinessDictCodeList.资金账户类型_托管账户.getValue());
+                    String cashAcctId = joyinbusinessCommonService.qryPortfolioCashAcctId(map);
+                    if (StringUtil.isNotEmpty(cashAcctId)) {
+                        posport.setCashAcctId(cashAcctId); // 托管户
+                    }
+                } else {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("secAcctId", productDto.getSecAcctId());
+                    String cashAcctId = joyinbusinessCommonService.qryCashAcctIdBySecAcctId(map);
+                    if (StringUtil.isNotEmpty(cashAcctId)) {
+                        posport.setCashAcctId(cashAcctId); // 证券账户对应的资金账户
+                    }
                 }
             }
-            posport.setCashAmount(productDto.getTotalBidPrinamt());
-            posport.setSecAmount(productDto.getTotalBidPrinamt());
-            if (StringUtil.isNotEmpty(productDto.getTotalBidPrinamt())) {
-                posport.setOwnSecAmount(productDto.getTotalBidPrinamt().toString());
+            if(!StringUtil.isNotEmpty(productDto.getWinCprice())) {
+                posport.setCashAmount(BigDecimal.ZERO);
+                posport.setSecAmount(BigDecimal.ZERO);
+                posport.setOwnSecAmount("0");
                 posport.setIntegrateSecAmount("0");
+            }else {
+                posport.setCashAmount(productDto.getPayAmt());
+                posport.setSecAmount(productDto.getActWinPrinamt());
+                if (StringUtil.isNotEmpty(productDto.getActWinPrinamt())) {
+                    posport.setOwnSecAmount(productDto.getActWinPrinamt().toString());
+                    posport.setIntegrateSecAmount("0");
+                }
             }
             ptlList.add(posport);
         }
         //调用头寸
         CfetsBondPositionRequest req = new CfetsBondPositionRequest();
-        req.setInterfaceType("Bond001");//报文类型
+        if (StringUtil.equals(entity.getTradeMarket(),DictCodeListExt1.交易场所_上海证券交易所.getValue())
+         ||StringUtil.equals(entity.getTradeMarket(),DictCodeListExt1.交易场所_上海证券交易所.getValue()) ){
+            req.setInterfaceType("Bond002");//报文类型
+            req.setTradePlace(entity.getTradeMarket());
+            req.setPayType(entity.getPayType());//缴款方式
+            FinProductTypeKey finProductTypeKey = new FinProductTypeKey();
+            finProductTypeKey.setFinprodId(entity.getFinprodId());
+            finProductTypeKey.setBranch(0L);
+            FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(finProductTypeKey);
+            String[] arrzqtype = {BussinessDictCodeList.行内资产三级分类_国债.getValue(),
+                    BussinessDictCodeList.行内资产三级分类_地方政府债.getValue(), BussinessDictCodeList.行内资产三级分类_政策性金融债.getValue()};
+            // 交易所分销买入且缴款方式为一级分销时，国债、地方政府债、政策性金融债采用净额结算，其他的采用逐笔全额结算。
+            if (StringUtil.equals(entity.getPayType(), BussinessDictCodeList.缴款方式_一级分销.getValue())
+                    && Arrays.asList(arrzqtype).contains(finProductType.getType10())) {
+                req.setDeliveryType(DictCodeListExt3.结算方式_头寸引擎_净额结算.getValue());//结算方式
+            } else {
+                req.setDeliveryType(DictCodeListExt3.结算方式_头寸引擎_逐笔全额结算.getValue());//结算方式
+            }
+        }else{
+            req.setInterfaceType("Bond001");//报文类型
+            req.setTradePlace(BussinessDictCodeList.交易场所_银行间.getValue());
+        }
         req.setUserId(SecurityUtil.getLoginUser().getUserName());
         req.setTotalTradeId(entity.getBidId());
         req.setFlowStatus(DictCodeListExt3.流程节点_流程提交.getValue());
         req.setModelType(DictCodeListExt1.子系统代码_交易.getValue());
         req.setWorkFlowId(entity.getWorkflowId());
         String balanceCheck = DictCodeList.是否_是.getValue();
+        if (isSubmit&&(StringUtil.isNotEmpty(entity.getSoftSkipMode())
+                && StringUtil.equals(entity.getSoftSkipMode(), DictCodeList.是否_是.getValue()))) {
+            balanceCheck = DictCodeList.是否_否.getValue();
+        }else if ( StringUtil.isNotEmpty(confirmOk)) {
+            balanceCheck = DictCodeList.是否_否.getValue();
+        }
         req.setBalanceCheck(balanceCheck);
         req.setBusiType(DictCodeListExt3.头寸业务类型_债券一级投标.getValue());
-        req.setTradePlace(BussinessDictCodeList.交易场所_银行间.getValue());
         req.setBusiAct(DictCodeListExt3.业务动作_中标结果维护.getValue());
         req.setPs(DictCodeList.交易方向_买入.getValue());
         req.setFinprodId(entity.getFinprodId());
@@ -848,20 +1183,21 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             req.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
         } else {
             req.setDecisionAct(DictCodeListExt3.系统动作_修改.getValue());
-            req.setSystemAct(DictCodeListExt3.系统动作_修改.getValue());
+            req.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
             req.setbTotalTradeId(entity.getBidId());
         }
-        req.setCdate(iplatformDate.getSysDate());
+        req.setCdate(iPlatformDate.getSysDate());
         req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         req.setPtlList(ptlList);
-        PositionHttpRequest.send(req);
+        Map<String, Object> param = PositionHttpRequest.send(req);
+        ThreadLocalUtil.setLocalCache(param);
     }
 
     /**
      * 老头存处理 系统参数是否处理旧头寸标识(IS_HANDLE_OLDPOS_FLAG)为Y时处理
      *
      * @param entity   页面元素
-     * @param flowType 交易流程状态 参数字典 TRADE_FLOW_STATUS
+     * @param isRevokeOrBack 交易流程状态 参数字典 TRADE_FLOW_STATUS
      * @author jiangpeng
      * @date 2022/4/28 10:37
      */
@@ -872,7 +1208,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 baseAssetCashPositionCommMapper.deleteCashPositionByOrderIds(Arrays.asList(entity.getBidId()));
             } else {
                 for (CfetsPrimaryBidManageSaveDetailDto deal : entity.getAllocationDetails()) {
-                    AllTradeCommonInputDto inputDto = new AllTradeCommonInputDto();
+                    if(!StringUtil.isNotEmpty(deal.getWinCprice())){
+                        continue;
+                    }
                     FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
                     finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
                     finProductTradeDto.setAssetType2("ISSUE_CLASS_01");
@@ -885,10 +1223,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     trdProductDeal.setFinprodId(entity.getFinprodId());
                     trdProductDeal.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
                     trdProductDeal.setPs(DictCodeList.交易方向_买入.getValue());
-                    trdProductDeal.setSettleDate(iplatformDate.getSysDate());
+                    trdProductDeal.setSettleDate(iPlatformDate.getSysDate());
                     trdProductDeal.setPrinAmt(deal.getActWinPrinamt());
-                    trdProductDeal.setTradeDate(iplatformDate.getSysDate());
-                    trdProductDeal.setSettleDate(iplatformDate.getSysDate());
+                    trdProductDeal.setTradeDate(iPlatformDate.getSysDate());
+                    trdProductDeal.setSettleDate(iPlatformDate.getSysDate());
                     trdProductDeal.setSecManageAcctId(deal.getSecAcctId());
                     baseTradeProductDealDto.setTrdProductDeal(trdProductDeal);
                     TrdProductDealAdd add = new TrdProductDealAdd();
@@ -905,10 +1243,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     stlPayOrder.setMyAcctNo(acctId);
                     stlPayOrder.setOrderId(entity.getBidId());
                     stlPayOrder.setCcy(finProduct.getCcy());
-                    stlPayOrder.setSettleAmt(deal.getSettFeeAmt());
+                    stlPayOrder.setSettleAmt(deal.getPayAmt());
                     stlPayOrder.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
                     stlPayOrder.setPs(DictCodeListExt1.收支方向_支出.getValue());
-                    stlPayOrder.setSettleDate(iplatformDate.getSysDate());
+                    stlPayOrder.setSettleDate(iPlatformDate.getSysDate());
                     stlPayOrders.add(stlPayOrder);
                     baseTradeProductDealDto.setStlPayOrdersList(stlPayOrders);
                     finProductTradeDto.setBaseTradeProductDealDtos(Arrays.asList(baseTradeProductDealDto));
@@ -924,7 +1262,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     @Override
     public void doUpdate(CfetsPrimaryBidManageSaveRequest entity) {
         if (entity.getOperateType().equals("submit")) {
-            doDelete(entity.getWorkflowId());
+            wflBidResultTotalMapper.deleteByWorkflowId(entity.getWorkflowId());
+            wflBidResultDetailMapper.deleteByWorkflowId(entity.getWorkflowId());
             beforeWorkFlow(entity);
             // 发头寸
             String confirmOk = RequestUtil.getParam("confirmOk");
@@ -942,19 +1281,32 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             } catch (PositionException e) {
                 Message message = PositionUtil.ajaxErrorReturn(e);
                 BaseMap bm = (BaseMap) message.getData();
-                String code = (String) bm.get("code");
-                String messageStr = JsonUtils.json2Object((String) bm.get("message").toString(), String.class);
-                if (StringUtil.isEmpty(confirmOk)
-                        && StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
-                    WorkFlowUtil.showMessage(messageStr, MessageType.确认消息);
-                }
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
-                    WorkFlowUtil.showMessage(messageStr, MessageType.错误消息);
+                String messageStr = null;
+                if (StringUtil.isNotEmpty(bm)) {
+                    String code = (String) bm.get("code");
+                    messageStr = JsonUtils.json2Object((String) bm.get("message").toString(), String.class);
+                    if (StringUtil.isEmpty(confirmOk)
+                            && StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                        WorkFlowUtil.showMessage(messageStr, MessageType.确认消息);
+                    }
+                    if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK,code)) {
+                        WorkFlowUtil.showMessage(messageStr, MessageType.错误消息);
+                    }
+                }else{
+                    messageStr = message.getMessage();
+                    if (StringUtil.isEmpty(confirmOk)
+                            && StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, message.getCode())) {
+                        WorkFlowUtil.showMessage(messageStr, MessageType.确认消息);
+                    }else {
+                        WorkFlowUtil.showMessage(messageStr, MessageType.错误消息);
+                    }
                 }
                 throw new PositionException(messageStr);
             }
-            // 老头寸处理
-            this.dealOldPosition(entity, false);
+            if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
+                // 老头寸处理
+                this.dealOldPosition(entity, false);
+            }
         }
     }
 
@@ -963,6 +1315,13 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
      */
     @Override
     public void doDelete(String workflowId) {
+        ProcessMark processMark = mstWorkflowCommonServiceMapperImpl.getBusinessInfo(workflowId);
+        CfetsPrimaryBidManageSaveRequest entity = getBussinessEntityByWorkflowId(workflowId);
+        if (StringUtil.isNotEmpty(processMark)
+                && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
+            PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(), DictCodeListExt1.子系统代码_交易.getValue(),
+                    DictCodeListExt3.头寸业务类型_债券一级投标.getValue(), DictCodeList.交易方向_买入.getValue());
+        }
         wflBidResultTotalMapper.deleteByWorkflowId(workflowId);
         wflBidResultDetailMapper.deleteByWorkflowId(workflowId);
     }
@@ -981,35 +1340,35 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
      * @since 1.0
      */
     public void beforeWorkFlow(CfetsPrimaryBidManageSaveRequest request) {
-        if (request.getOperateType().equals("revoke")) {
-            WflBidResultTotal wflBidResultTotal = new WflBidResultTotal();
-            BeanUtil.copyPropertiesIgnoreNull(wflBidResultTotal, request);
-            wflBidResultTotal.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
-            wflBidResultTotal.setWorkflowStatus(DictCodeListExt1.交易流程状态_撤销.getValue());
-            wflBidResultTotal.setWorkflowId(request.getWorkflowId());
-            wflBidResultTotal.setWinDate(iplatformDate.getSysDate());
+        if (StringUtil.isNotEmpty(request.getOperateType()) && request.getOperateType().equals("revoke")) {
+//            WflBidResultTotal wflBidResultTotal = new WflBidResultTotal();
+//            BeanUtil.copyPropertiesIgnoreNull(wflBidResultTotal, request);
+//            wflBidResultTotal.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
+//            wflBidResultTotal.setWorkflowStatus(DictCodeListExt1.交易流程状态_撤销.getValue());
+//            wflBidResultTotal.setWorkflowId(request.getWorkflowId());
+//            wflBidResultTotal.setWinDate(iplatformDate.getSysDate());
 //                wflBidResultTotal.setpTotalWinId(wflBidResultTotal.getTotalWinId());
-            wflBidResultTotal.setTotalWinId(request.getTotalWinId() + "R");
-            wflBidResultTotalMapper.insertSelective(wflBidResultTotal);
-            if (request.getAllocationDetails() != null && request.getAllocationDetails().size() > 0) {
-                for (CfetsPrimaryBidManageSaveDetailDto detail : request.getAllocationDetails()) {
-                    WflBidResultDetail wflBidResultDetail = new WflBidResultDetail();
-                    BeanUtil.copyPropertiesIgnoreNull(wflBidResultDetail, detail);
-                    wflBidResultDetail.setDetailWinId(IDGenerator.generate());
-                    wflBidResultDetail.setWorkflowId(request.getWorkflowId());
-                    wflBidResultDetail.setWorkflowStatus(DictCodeListExt1.交易流程状态_撤销.getValue());
-                    wflBidResultDetail.setTotalWinId(request.getTotalWinId() + "R");
-                    wflBidResultDetail.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
-                    wflBidResultDetailMapper.insertSelective(wflBidResultDetail);
-                }
-            }
+//            wflBidResultTotal.setTotalWinId(request.getTotalWinId() + "R");
+//            wflBidResultTotalMapper.insertSelective(wflBidResultTotal);
+//            if (request.getAllocationDetails() != null && request.getAllocationDetails().size() > 0) {
+//                for (CfetsPrimaryBidManageSaveDetailDto detail : request.getAllocationDetails()) {
+//                    WflBidResultDetail wflBidResultDetail = new WflBidResultDetail();
+//                    BeanUtil.copyPropertiesIgnoreNull(wflBidResultDetail, detail);
+//                    wflBidResultDetail.setDetailWinId(IDGenerator.generate());
+//                    wflBidResultDetail.setWorkflowId(request.getWorkflowId());
+//                    wflBidResultDetail.setWorkflowStatus(DictCodeListExt1.交易流程状态_撤销.getValue());
+//                    wflBidResultDetail.setTotalWinId(request.getTotalWinId() + "R");
+//                    wflBidResultDetail.setStatus(DictCodeListExt1.有效状态_撤销.getValue());
+//                    wflBidResultDetailMapper.insertSelective(wflBidResultDetail);
+//                }
+//            }
         }
         else {
             WflBidResultTotal wflBidResultTotal = new WflBidResultTotal();
             BeanUtil.copyPropertiesIgnoreNull(wflBidResultTotal, request);
             wflBidResultTotal.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
             wflBidResultTotal.setWorkflowId(request.getWorkflowId());
-            wflBidResultTotal.setWinDate(iplatformDate.getSysDate());
+            wflBidResultTotal.setWinDate(iPlatformDate.getSysDate());
             wflBidResultTotal.setStatus(DictCodeListExt1.有效状态_流程中.getValue());
             wflBidResultTotalMapper.insertSelective(wflBidResultTotal);
             if (request.getAllocationDetails() != null && request.getAllocationDetails().size() > 0) {
@@ -1028,6 +1387,539 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     }
 
     /**
+     * 计算分配明细中缴款金额<br>
+     * 分配明细中【缴款金额】计算：分配明细中【中标净价】计算后，自动计算【缴款金额】=（中标净价+应计利息）*实际中标券面总额/100，可修改，修改后联动计算【中标净价】；<br>
+     * @param productDtos 分配明细
+     * @author jiangpeng
+     * @date 2022/6/25 17:37
+     */
+    private void calPayAmt(List<CfetsPrimaryBidManageSaveDetailDto> productDtos) {
+        for (CfetsPrimaryBidManageSaveDetailDto detailDto : productDtos) {
+            if (!StringUtil.isNotEmpty(detailDto.getWinCprice())) {
+                continue;
+            }
+            detailDto.setPayAmt(ArithmeticUtil.divide(
+                    ArithmeticUtil.multiply(
+                            ArithmeticUtil.doAdd(detailDto.getWinCprice(), detailDto.getIntAmt()),
+                            detailDto.getActWinPrinamt()),
+                    BigDecimal.valueOf(100), 2));
+        }
+    }
+
+    /**
+     * 自动分配
+     */
+    public CfetsPrimaryBidManageSaveRequest autoAllocation(CfetsPrimaryBidManageSaveRequest request) {
+        if (CollectionUtils.isEmpty(request.getAllocationDetails())) {
+            logger.error("中标结果维护 自动分配错误,分配明细为空");
+            return request;
+        }
+        // 排序
+        List<CfetsPrimaryBidManageSaveDetailDto> list = this.productDtoSort(request);
+        // 更新汇总理论中标券面（同标位的汇总）
+        this.updateSumBidPrintAmt(list);
+        // 更新中标券面
+        this.updateBidPrintAmt(list, request);
+        // 计算分配明细中缴款金额
+        this.calPayAmt(list);
+        request.setAllocationDetails(list);
+        // 结算服务费 分配
+        this.otherDistribution(request);
+        // 计算金额信息
+        request.setCalcAmountDto(this.calAmtInfo(request));
+        return request;
+    }
+
+    /**
+     * 清空数据
+     * 未能中标的指令及组合【理论中标券面总额】、【实际中标券面总额】、【中标标位】、【中标净价】、【应计利息】、【缴款金额】、【结算服务费】默认为空，置灰不可修改；
+     *
+     * @param detailDto
+     * @author jiangpeng
+     * @date 2022/6/28 13:51
+     */
+    private void clearDetailAmt(CfetsPrimaryBidManageSaveDetailDto detailDto) {
+        // 理论中标券面总额
+        detailDto.setTheWinPrinamt(null);
+        // 实际中标券面总额
+        detailDto.setActWinPrinamt(null);
+        // 中标标位
+        detailDto.setWinPrice(null);
+        // 中标净价
+        detailDto.setWinCprice(null);
+        // 应计利息
+        detailDto.setIntAmt(null);
+        // 缴款金额
+        detailDto.setPayAmt(null);
+        // 结算服务费
+        detailDto.setSettFeeAmt(null);
+    }
+
+    /**
+     * 更新汇总理论中标券面（同标位的汇总）
+     *
+     * @param list
+     * @author jiangpeng
+     * @date 2022/6/29 13:38
+     */
+    private void updateSumBidPrintAmt(List<CfetsPrimaryBidManageSaveDetailDto> list){
+        // 定义 临时投标标位 ，同标位汇总投标券面，行号=0
+        BigDecimal tempBidPrice = null, samePriceTotalBidPrinamt = null;
+        int index = 0;
+        // 循环上一步排序后LIST
+        for (int i = 0; i < list.size(); i++) {
+            // IF 临时投标标位 = null
+            // 临时投标标位 = 分配明细i.投标标位
+            if (Objects.isNull(tempBidPrice)) {
+                tempBidPrice = list.get(i).getBidPrice();
+            }
+            // IF 分配明细i.投标标位 = 临时投标标位
+            if (BigDecimalUtil.ACompareToB(tempBidPrice, list.get(i).getBidPrice(), 6) == 0) {
+                // 同标位汇总投标券面 = 同标位汇总投标券面 + 分配明细i.投标券面
+                samePriceTotalBidPrinamt = ArithmeticUtil.doAdd(list.get(i).getTotalBidPrinamt(), samePriceTotalBidPrinamt);
+            }
+            // ELSE
+            else {
+                // FOR (int j=行号，j<=i，j++)
+                for (int j = index; j <= i; j++) {
+                    // 配明细j.同标位汇总投标券面 = 同标位汇总投标券面
+                    list.get(j).setSamePriceTotalBidPrinamt(samePriceTotalBidPrinamt);
+                }
+                //		同标位汇总投标券面 = 分配明细i.投标券面
+                samePriceTotalBidPrinamt = list.get(i).getTotalBidPrinamt();
+                //		临时投标标位 = 分配明细i.投标标位
+                tempBidPrice = list.get(i).getBidPrice();
+                //		行号 = i
+                index = i;
+            }
+            if (i == list.size() - 1) {
+                for (int j = index; j <= i; j++) {
+                    // 配明细j.同标位汇总投标券面 = 同标位汇总投标券面
+                    list.get(j).setSamePriceTotalBidPrinamt(samePriceTotalBidPrinamt);
+                }
+            }
+        }
+    }
+
+    /**
+     * 更新汇总理论中标券面（同标位的汇总）
+     *
+     * @param list
+     * @param request
+     * @author jiangpeng
+     * @date 2022/6/29 13:38
+     */
+    private void updateBidPrintAmt(List<CfetsPrimaryBidManageSaveDetailDto> list, CfetsPrimaryBidManageSaveRequest request) {
+        // 剩余尾差
+        BigDecimal tailDifference = BigDecimal.ZERO;
+        // 中标最小单位
+        BigDecimal bidMinUnit = new BigDecimal(CacheUtil.getSysParam("BID_MIN_UNIT"));
+        // 招标标的标识,利率及利差为true 价格为flase
+        boolean tenderTargetFlag;
+        // 剩余中标券面总额 = 基本信息.中标券面总额
+        BigDecimal lastWinPrinamt = request.getWinPrinamt();
+        // 待填补标位 = null
+        BigDecimal toBeFilledPrice = null;
+        // 已判断标位 = null
+        BigDecimal isJudgePrice = null;
+        // 最大中标券面
+        BigDecimal maxTheWinPrinamt = BigDecimal.ZERO;
+        // 待填补分配LIST
+        List<CfetsPrimaryBidManageSaveDetailDto> toDoList = new ArrayList<>();
+        // 记录最大中标券面的投标信息
+        CfetsPrimaryBidManageSaveDetailDto saveDetailDto = new CfetsPrimaryBidManageSaveDetailDto();
+        if (StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue()) ||
+                StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
+            tenderTargetFlag = true;
+        } else if (StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_价格.getValue())) {
+            tenderTargetFlag = false;
+        } else {
+            logger.error("中标结果维护 自动分配错误,招标标的错误");
+            return;
+        }
+        for (CfetsPrimaryBidManageSaveDetailDto detailDto : list) {
+            // 判断是否中标
+            if (tenderTargetFlag) {
+                // 中标指令列表范围：当【招标标的】为利率和利差时，【投标标位】小于等于基本信息中【中标标位】的指令中标。
+                if (BigDecimalUtil.ACompareToB(detailDto.getBidPrice(), request.getWinPrice(), 6) > 0) {
+                    this.clearDetailAmt(detailDto);
+                    continue;
+                }
+            } else {
+                // 当【招标标的】为价格时，【投标标位】大于等于基本信息中【中标标位】的指令中标；
+                if (BigDecimalUtil.ACompareToB(detailDto.getBidPrice(), request.getWinPrice(), 6) < 0) {
+                    this.clearDetailAmt(detailDto);
+                    continue;
+                }
+            }
+            // 设置中标标位
+            if (StringUtil.equals(DictCodeListExt4.中标方式_单标位中标.getValue(), request.getWinType())) {
+                // 中标标位：全部中标指令对应【中标标位】均等于基本信息中【中标标位】；
+                detailDto.setWinPrice(request.getWinPrice());
+            } else if (StringUtil.equals(DictCodeListExt4.中标方式_多标位中标.getValue(), request.getWinType())) {
+                // 中标标位：全部中标指令对应【中标标位】均等于分配明细中【投标标位】；
+                detailDto.setWinPrice(detailDto.getBidPrice());
+            } else {
+                logger.error("中标结果维护 自动分配错误,中标方式错误");
+                return;
+            }
+            // if 分配明细.同标位汇总投标券面 <= 剩余中标券面总额
+            if ((BigDecimalUtil.ACompareToB(detailDto.getSamePriceTotalBidPrinamt(), lastWinPrinamt, 2) <= 0
+                    || BigDecimalUtil.ACompareToB(isJudgePrice, detailDto.getBidPrice(), 6) == 0)
+                    && Objects.isNull(toBeFilledPrice)) {
+                // 分配明细.中标券面总额 = 投标券面总额
+                detailDto.setTheWinPrinamt(detailDto.getTotalBidPrinamt());
+                detailDto.setActWinPrinamt(detailDto.getTheWinPrinamt());
+                // 剩余中标券面总额 值递减
+                lastWinPrinamt = ArithmeticUtil.subtract(lastWinPrinamt, detailDto.getActWinPrinamt());
+                isJudgePrice = detailDto.getBidPrice();
+            }//else if 分配明细.同标位汇总投标券面 > 剩余中标券面总额 and 剩余中标券面总额>0
+            else if (BigDecimalUtil.ACompareToB(detailDto.getSamePriceTotalBidPrinamt(), lastWinPrinamt, 2) > 0
+                    && BigDecimalUtil.ACompareToB(lastWinPrinamt, bidMinUnit, 6) >= 0) {
+                // if 待填补标位 = null
+                if (Objects.isNull(toBeFilledPrice)) {
+                    // 待填补标位 = 分配明细.中标标位
+                    toBeFilledPrice = detailDto.getBidPrice();
+                }
+                // if 分配明细.中标标位 = 待填补标位
+                if (BigDecimalUtil.ACompareToB(toBeFilledPrice, detailDto.getBidPrice(), 6) == 0) {
+                    // 待填补分配LIST.ADD(分配明细)
+                    toDoList.add(detailDto);
+                }else {
+                    isJudgePrice = null;
+                }
+            } else {
+                isJudgePrice = null;
+            }
+            // if 分配明细.中标标位 != 待填补标位
+            if (Objects.isNull(isJudgePrice)
+                    && BigDecimalUtil.ACompareToB(toBeFilledPrice, detailDto.getBidPrice(), 6) != 0) {
+                // 理论中标券面总额
+                detailDto.setTheWinPrinamt(BigDecimal.ZERO);
+                // 实际中标券面总额
+                detailDto.setActWinPrinamt(BigDecimal.ZERO);
+                // 中标净价
+                detailDto.setWinCprice(BigDecimal.ZERO);
+                // 应计利息
+                detailDto.setIntAmt(BigDecimal.ZERO);
+                // 缴款金额
+                detailDto.setPayAmt(BigDecimal.ZERO);
+                // 结算服务费
+                detailDto.setSettFeeAmt(BigDecimal.ZERO);
+            }
+            if (detailDto.getIntAmt() == null) {
+                // 应计利息
+                detailDto.setIntAmt(BigDecimal.ZERO);
+            }
+            // 计算净价
+            detailDto.setWinCprice(this.calPrice(detailDto, request.getTenderTarget(), request.getFinprodMarketId(), request.getPayDate()));
+        }
+        if (CollectionUtils.isNotEmpty(toDoList)) {
+            // 定义 剩余中标券面总额2 = 剩余中标券面总额
+            BigDecimal lastWinPrinamt2 = lastWinPrinamt;
+            for (CfetsPrimaryBidManageSaveDetailDto toDo : toDoList) {
+                // 分配明细.中标券面总额 = 剩余中标券面总额*投标券面总额/同标位汇总投标券面 - 剩余中标券面总额*投标券面总额/同标位汇总投标券面 取余 参数.中标最小单位
+                // 中间值 剩余中标券面总额*投标券面总额/同标位汇总投标券面
+                BigDecimal medianBigdecimal = ArithmeticUtil.divide(
+                        ArithmeticUtil.multiply(lastWinPrinamt, toDo.getTotalBidPrinamt())
+                        , toDo.getSamePriceTotalBidPrinamt(), 2);
+                BigDecimal[] results = medianBigdecimal.divideAndRemainder(bidMinUnit);
+                toDo.setTheWinPrinamt(ArithmeticUtil.multiply(results[0], bidMinUnit));
+                toDo.setActWinPrinamt(toDo.getTheWinPrinamt());
+                // 剩余中标券面总额2 值递减
+                lastWinPrinamt2 = ArithmeticUtil.subtract(lastWinPrinamt2, toDo.getActWinPrinamt());
+            }
+            for (CfetsPrimaryBidManageSaveDetailDto toDo : toDoList) {
+                // IF 剩余中标券面总额2 > 参数.中标最小单位
+                if (BigDecimalUtil.ACompareToB(lastWinPrinamt2, bidMinUnit, 2) > 0) {
+                    //分配明细.中标券面总额 = 中标券面总额 + 参数.中标最小单位
+                    toDo.setTheWinPrinamt(ArithmeticUtil.doAdd(toDo.getActWinPrinamt(), bidMinUnit));
+                    toDo.setActWinPrinamt(toDo.getTheWinPrinamt());
+                    //剩余中标券面总额2 = 剩余中标券面总额2 - 参数.中标最小单位
+                    lastWinPrinamt2 = ArithmeticUtil.subtract(lastWinPrinamt2, toDo.getActWinPrinamt());
+                } else {
+                    // 分配明细.中标券面总额 = 中标券面总额 + 剩余中标券面总额2
+                    toDo.setTheWinPrinamt(ArithmeticUtil.doAdd(toDo.getActWinPrinamt(), lastWinPrinamt2));
+                    toDo.setActWinPrinamt(toDo.getTheWinPrinamt());
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * if 招标标的 = 利率/利差<br>
+     * 		分配明细取中标的记录按各指令及组合【投标标位】标位从小到大排列 order by 投标标位，指令，组合<br>
+     * if 招标标的 = 价格<br>
+     * 		分配明细取中标的记录按各指令及组合【投标标位】标位从大到小排列 order by 投标标位 desc，指令，组合<br>
+     *
+     * @param dto 页面元素
+     * @return java.util.List<com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmProductDto>
+     * @author jiangpeng
+     * @date 2022/6/25 15:45
+     */
+    private List<CfetsPrimaryBidManageSaveDetailDto> productDtoSort(CfetsPrimaryBidManageSaveRequest dto) {
+        // 按各指令及组合【投标标位】标位从小到大排列
+        List<CfetsPrimaryBidManageSaveDetailDto> list = dto.getAllocationDetails();
+        // 投标标的升序
+        Comparator<CfetsPrimaryBidManageSaveDetailDto> byBidPrice;
+        if (StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue())
+                || StringUtil.equals(dto.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
+            // 招标标的为利率和利差时 投标标位 从小到大排列
+            byBidPrice = Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getBidPrice);
+        } else {
+            //招标标的为价格时，投标标位 从大到小排列
+            byBidPrice = Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getBidPrice).reversed();
+        }
+        // 指令代码升序
+        Comparator<CfetsPrimaryBidManageSaveDetailDto> byEntIdASC = Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getEntrustId, String.CASE_INSENSITIVE_ORDER);
+        // 组合名称升序
+        Comparator<CfetsPrimaryBidManageSaveDetailDto> byPNameASC = Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getPortfolioId, String.CASE_INSENSITIVE_ORDER);
+        // 联合排序
+        Comparator<CfetsPrimaryBidManageSaveDetailDto> finalComparator = byBidPrice.thenComparing(byEntIdASC).thenComparing(byPNameASC);
+        // 排序
+        return list.stream().sorted(finalComparator).collect(Collectors.toList());
+    }
+
+    /**
+     * 计算净价
+     *
+     * @param dto 页面元素
+     * @return java.math.BigDecimal
+     * @author jiangpeng
+     * @date 2022/5/25 14:19
+     */
+    public BigDecimal calPrice(CfetsPrimaryBidManageSaveDetailDto dto, String tenderTarget, String finprodId, Date tradeDate) {
+
+        CalRequest calRequest = new CalRequest();
+        calRequest.setFpriceAmt(dto.getActWinPrinamt());
+        calRequest.setSettleDate(tradeDate);
+        calRequest.setPs(DictCodeList.交易方向_买入.getValue());
+        calRequest.setSecManageAcctId(dto.getSecAcctId());
+        calRequest.setShareAmt(dto.getActWinPrinamt());
+        calRequest.setFinprodId(dto.getFinprodId());
+        // 当【招标标的】为利率或利差时，如该资产已完成上市流通，则根据【中标标位】计算【中标净价】，可修改
+        calRequest.setCalculateField("02");
+        if (StringUtil.equals(tenderTarget, DictCodeListExt4.招标标的_利差.getValue())
+                || StringUtil.equals(tenderTarget, DictCodeListExt4.招标标的_利率.getValue())) {
+            FinProduct finProduct = finProductMapper.selectByFinprodMarketId(finprodId);//前台传值为市场代码
+            //CASE WHEN （标的类金融产品发行信息.招标标的 IN（利率，利差） AND 标的类金融产品.上市流通日期 IS NOT NULL）
+            // 通过上市流通代码查找二级债 避免出现二级债未录入系统的问题
+            FinProduct finProduct2 = cfetsTrdFirstBidFirm002Mapper.selectByFinprodMarketId(finProduct.getFinprodMarketId());
+            if (StringUtil.isNotEmpty(finProduct2)) {
+                calRequest.setFinprodId(finProduct2.getFinprodId());
+                //THEN 参照原债券二级交易画面，到期收益率反算净价的算法，计算净价
+                if (StringUtil.equals(tenderTarget, DictCodeListExt4.招标标的_利率.getValue())) {
+                    // 招标标的=利率时，将中标标位作为到期收益率计算；
+                    calRequest.setMatureYield(ArithmeticUtil.divide(dto.getWinPrice(), BigDecimal.valueOf(100), 6));
+                } else {
+                    //招标标的=利差时，取现金流利率信息表.基准编号当天的利率（结合现金流利率信息表.基准利率精度）*现金流利率信息表.系数+投标标位（作为利差）作为到期收益率计算。
+                    Map<String, Object> pageParam = new HashMap<>();
+                    pageParam.put("finprodId", finProduct2.getFinprodId());
+                    pageParam.put("sysDate", iPlatformDate.getSysDateStr());
+                    calRequest.setMatureYield(cfetsTrdFirstBidFirm002Mapper.getRate(pageParam));
+                }
+                CalRespone calRespone = ibuQuoteBondCalService.calAmt(calRequest);
+                return calRespone.getPrice();
+            } else if (StringUtil.equals(finProduct.getCouponSpecies(), DictCodeList.息票品种_附息.getValue())
+                    || StringUtil.equals(finProduct.getCouponSpecies(), DictCodeList.息票品种_利随本清.getValue())) {
+                //WHEN （标的类金融产品发行信息.招标标的 IN（利率，利差） AND 标的类金融产品.上市流通日期 IS NULL AND 标的类金融产品.息票品种 IN（附息，利随本清））
+                //THEN 100
+                return BigDecimal.valueOf(100);
+            } else {
+                //WHEN （标的类金融产品发行信息.招标标的 IN（利率，利差） AND 标的类金融产品.上市流通日期 IS NULL AND 标的类金融产品.息票品种 IN（零息，贴现））
+                //THEN NULL
+                return null;
+            }
+        } else if (StringUtil.equals(tenderTarget, DictCodeListExt4.招标标的_价格.getValue())) {
+            //WHEN 标的类金融产品发行信息.招标标的 = 价格          THEN 中标标位
+            // 【净价】
+            return dto.getWinPrice();
+        }
+        return null;
+    }
+    /**
+     * 结算服务费 分配
+     *
+     * @param dto 页面元素
+     * @return java.util.List<com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdFirstBidFirmProductDto>
+     * @author jiangpeng
+     * @date 2022/4/24 14:06
+     */
+    public List<CfetsPrimaryBidManageSaveDetailDto> otherDistribution(CfetsPrimaryBidManageSaveRequest dto) {
+        // 根据投标产品列表中指令条数平均分配结算服务费
+        BigDecimal settFeeAmt = StringUtil.isNotEmpty(dto.getSettFeeAmt()) ? dto.getSettFeeAmt() : BigDecimal.ZERO;
+        List<CfetsPrimaryBidManageSaveDetailDto> productDtos = dto.getAllocationDetails().stream().filter(item -> StringUtil.isNotEmpty(item.getPayAmt())).collect(Collectors.toList());
+        List<CfetsPrimaryBidManageSaveDetailDto> productNullDtos = dto.getAllocationDetails().stream().filter(item -> !StringUtil.isNotEmpty(item.getPayAmt())).collect(Collectors.toList());
+        productDtos.sort(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getPayAmt).reversed());
+        // 费用平均值
+        BigDecimal avg = ArithmeticUtil.divide(settFeeAmt, new BigDecimal(productDtos.size()), 2, RoundingMode.DOWN);
+        // 费用剩余尾差
+        BigDecimal feeTailDifference = settFeeAmt;
+        int index = 0;
+        for (CfetsPrimaryBidManageSaveDetailDto item : productDtos) {
+            index++;
+            if(BigDecimalUtil.isZeroOrNull(item.getActWinPrinamt())){
+                continue;
+            }
+            //费用金额
+            BigDecimal feeAmountDetail = avg;
+            // 最后一笔且尾差小于计算出的分配值时,用倒减值
+            if (index == productDtos.size()) {
+                if (BigDecimalUtil.ACompareToB(avg, feeTailDifference, 3) >= 0) {
+                    feeAmountDetail = feeTailDifference;
+                }
+            }
+            // 结算服务费
+            item.setSettFeeAmt(feeAmountDetail);
+            feeTailDifference = ArithmeticUtil.subtract(feeTailDifference, item.getSettFeeAmt());
+        }
+        this.handleTailDifferenceOhter(productDtos, feeTailDifference);
+        productDtos.addAll(productNullDtos);
+        dto.setAllocationDetails(productDtos);
+        dto.setAllocationDetails(this.productDtoSort(dto));
+        return dto.getAllocationDetails();
+    }
+
+    /**
+     * 计算结算服务费尾差
+     *
+     * @param productDtos 分配明细
+     * @param feeTailDifference 尾差
+     * @author jiangpeng
+     * @date 2022/6/25 17:37
+     */
+    private void handleTailDifferenceOhter(List<CfetsPrimaryBidManageSaveDetailDto> productDtos, BigDecimal feeTailDifference) {
+        // 费用分配值
+        BigDecimal feeAssign;
+        int feeSize = productDtos.size();
+        Set<String> feeSet = new HashSet<>();
+        while (feeTailDifference.compareTo(BigDecimal.ZERO) > 0 && feeSize != 0) {
+            if (feeTailDifference.compareTo(payMinChangeUnit) > 0) {
+                feeAssign = ArithmeticUtil.divide(feeTailDifference, new BigDecimal(feeSize), 2, RoundingMode.DOWN);
+            }
+            for (CfetsPrimaryBidManageSaveDetailDto item : productDtos) {
+                // 尾差等于0,循环结束
+                if (BigDecimalUtil.isZero(feeTailDifference)) {
+                    break;
+                }
+                if(BigDecimalUtil.isZeroOrNull(item.getActWinPrinamt())){
+                    if (feeSet.add(item.getEntrustId())) {
+                        feeSize--;
+                    }
+                    continue;
+                }
+                // 处理尾差值的不同
+                if (BigDecimalUtil.ACompareToB(feeTailDifference, payMinChangeUnit, 4) >= 0) {
+                    // 尾差值大于等于最小分配单位
+                    feeAssign = payMinChangeUnit;
+                } else {
+                    feeAssign = feeTailDifference;
+                    if (feeSet.add(item.getEntrustId())) {
+                        feeSize--;
+                    }
+                }
+                // 结算费用加上分配值
+                item.setSettFeeAmt(ArithmeticUtil.doAdd(item.getSettFeeAmt(), feeAssign));
+                // 尾差减去分配值
+                feeTailDifference = ArithmeticUtil.subtract(feeTailDifference, feeAssign);
+            }
+        }
+    }
+
+    /**
+     * 计算金额信息
+     *
+     * @param request
+     * @return com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsBidManageCalcAmountResponse
+     * @author jiangpeng
+     * @date 2022/6/25 19:17
+     */
+    public CfetsBidManageCalcAmountResponse calAmtInfo(CfetsPrimaryBidManageSaveRequest request) {
+        CfetsBidManageCalcAmountResponse amountResponse = new CfetsBidManageCalcAmountResponse();
+        // 净价
+        BigDecimal cprice = BigDecimal.ZERO;
+        // 应计利息
+        BigDecimal intAmt = BigDecimal.ZERO;
+        if (CollectionUtils.isNotEmpty(request.getAllocationDetails())
+                && request.getAllocationDetails().get(0).getWinCprice() != null) {
+            cprice = request.getAllocationDetails().get(0).getWinCprice();
+            intAmt = request.getAllocationDetails().get(0).getIntAmt();
+        }
+        if (StringUtil.equals(DictCodeListExt4.中标方式_多标位中标.getValue(), request.getWinType())) {
+            BigDecimal total = null; // 总净价
+            BigDecimal weightTotal = null; // 权重汇总
+            for (CfetsPrimaryBidManageSaveDetailDto allocationDetail : request.getAllocationDetails()) {
+                total = ArithmeticUtil.doAdd(total, allocationDetail.getActWinPrinamt());
+                weightTotal = ArithmeticUtil.doAdd(weightTotal, ArithmeticUtil.multiply(allocationDetail.getActWinPrinamt(), allocationDetail.getWinCprice()));
+            }
+            cprice = ArithmeticUtil.divide(weightTotal, total, 4);
+        }
+        // 中标净价
+        amountResponse.setWinCprice(cprice);
+        // 全价 = 中标净价 + 应计利息
+        amountResponse.setUnitFprice(ArithmeticUtil.doAdd(cprice,intAmt));
+        // 应计利息=分配明细中的应计利息
+        amountResponse.setIntAmt(intAmt);
+        // 交易金额=基本信息中中标券面总额*中标净价/100
+        amountResponse.setTradeAmt(ArithmeticUtil.divide(
+                ArithmeticUtil.multiply(request.getWinPrinamt(), cprice), BigDecimal.valueOf(100), 2));
+        // 应计利息总额=基本信息中中标券面总额*应计利息/100
+        amountResponse.setEntrustOwnInt(ArithmeticUtil.divide(
+                ArithmeticUtil.multiply(request.getWinPrinamt(), intAmt), BigDecimal.valueOf(100), 2));
+        // 缴款金额=交易金额+应计利息总额
+        amountResponse.setPayAmt(ArithmeticUtil.doAdd(amountResponse.getTradeAmt(), amountResponse.getEntrustOwnInt()));
+        return amountResponse;
+    }
+
+    /**
+     * 编辑列表中金额计算
+     *
+     * @param request
+     * @param type    编辑字段 1 缴款金额 2 编辑中标净价
+     * @return com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest
+     * @author jiangpeng
+     * @date 2022/6/25 19:51
+     */
+    public CfetsPrimaryBidManageSaveRequest editList(CfetsPrimaryBidManageSaveRequest request, String type) {
+        if(!StringUtil.equals(request.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                && !StringUtil.equals(request.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue())){
+            request.getAllocationDetails().forEach(item->item.setIntAmt(request.getIntAmt()));
+        }
+        if("1".equals(type)){
+            // 计算分配明细中中标净价
+            this.calCprice(request.getAllocationDetails());
+        }
+        if("2".equals(type)){
+            // 计算分配明细中缴款金额
+            this.calPayAmt(request.getAllocationDetails());
+        }
+        request.setCalcAmountDto(this.calAmtInfo(request));
+        return request;
+    }
+
+    /**
+     * 计算分配明细中缴款金额<br>
+     * 分配明细中【缴款金额】计算：分配明细中【中标净价】计算后，自动计算【缴款金额】=（中标净价+应计利息）*实际中标券面总额/100，可修改，修改后联动计算【中标净价】；<br>
+     * @param productDtos 分配明细
+     * @author jiangpeng
+     * @date 2022/6/25 17:37
+     */
+    private void calCprice(List<CfetsPrimaryBidManageSaveDetailDto> productDtos) {
+        for (CfetsPrimaryBidManageSaveDetailDto detailDto : productDtos) {
+            if (!StringUtil.isNotEmpty(detailDto.getPayAmt())) {
+                continue;
+            }
+            detailDto.setWinCprice(ArithmeticUtil.subtract(
+                    ArithmeticUtil.divide(
+                            ArithmeticUtil.multiply(detailDto.getPayAmt(), BigDecimal.valueOf(100)),
+                            detailDto.getActWinPrinamt(), 2),
+                    detailDto.getIntAmt()));
+        }
+    }
+
+
+    /**
      *
      * 	2.2.1、更新中标标位
      *
@@ -1035,64 +1927,64 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
      *
      * 	2.2.3、更新中标净价、缴款金额、结算服务费
      */
-    public CfetsPrimaryBidManageSaveRequest autoAllocation(CfetsPrimaryBidManageSaveRequest request) {
-        if (CollectionUtils.isNotEmpty(request.getAllocationDetails())){
+    public CfetsPrimaryBidManageSaveRequest autoAllocation1(CfetsPrimaryBidManageSaveRequest request) {
+        if (CollectionUtils.isNotEmpty(request.getAllocationDetails())) {
             //更新中标标位
             BigDecimal bidMinUnit = new BigDecimal(CacheUtil.getSysParam("BID_MIN_UNIT"));
             String isModifiedIntamt = CacheUtil.getSysParam("IS_MODIFIED_INTAMT");
             FinProduct finProduct = finProductMapper.selectByPrimaryKey(request.getFinprodId());
             if (null != request.getAllocationDetails().get(0).getBidType()
-            && StringUtil.equals(request.getAllocationDetails().get(0).getBidType(), DictCodeListExt4.中标方式_单标位中标.getValue())){
+                    && StringUtil.equals(request.getAllocationDetails().get(0).getBidType(), DictCodeListExt4.中标方式_单标位中标.getValue())) {
                 if (StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue()) ||
-                        StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())){
-                    for (CfetsPrimaryBidManageSaveDetailDto detailDto : request.getAllocationDetails()){
-                        if (detailDto.getBidPrice().compareTo(request.getWinPrice())<=0){
+                        StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
+                    for (CfetsPrimaryBidManageSaveDetailDto detailDto : request.getAllocationDetails()) {
+                        if (detailDto.getBidPrice().compareTo(request.getWinPrice()) <= 0) {
                             detailDto.setWinPrice(request.getWinPrice());
                         }
                     }
-                }else if (StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_价格.getValue())){
-                    for (CfetsPrimaryBidManageSaveDetailDto detailDto : request.getAllocationDetails()){
-                        if (detailDto.getBidPrice().compareTo(request.getWinPrice())>=0){
+                } else if (StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_价格.getValue())) {
+                    for (CfetsPrimaryBidManageSaveDetailDto detailDto : request.getAllocationDetails()) {
+                        if (detailDto.getBidPrice().compareTo(request.getWinPrice()) >= 0) {
                             detailDto.setWinPrice(request.getWinPrice());
                         }
                     }
                 }
-            }else{
+            } else {
                 if (StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue()) ||
-                        StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())){
-                    for (CfetsPrimaryBidManageSaveDetailDto detailDto : request.getAllocationDetails()){
-                        if (detailDto.getBidPrice().compareTo(request.getWinPrice())<=0){
+                        StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
+                    for (CfetsPrimaryBidManageSaveDetailDto detailDto : request.getAllocationDetails()) {
+                        if (detailDto.getBidPrice().compareTo(request.getWinPrice()) <= 0) {
                             detailDto.setWinPrice(detailDto.getBidPrice());
                         }
                     }
-                }else if (StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_价格.getValue())){
-                    for (CfetsPrimaryBidManageSaveDetailDto detailDto : request.getAllocationDetails()){
-                        if (detailDto.getBidPrice().compareTo(request.getWinPrice())>=0){
+                } else if (StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_价格.getValue())) {
+                    for (CfetsPrimaryBidManageSaveDetailDto detailDto : request.getAllocationDetails()) {
+                        if (detailDto.getBidPrice().compareTo(request.getWinPrice()) >= 0) {
                             detailDto.setWinPrice(detailDto.getBidPrice());
                         }
                     }
                 }
             }
             //更新理论中标券面
-           BigDecimal remainWinPrinamt = request.getWinPrinamt();
-           List<CfetsPrimaryBidManageSaveDetailDto> allocationDetails = request.getAllocationDetails();
-           if (StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue()) ||
-                    StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())){
-               allocationDetails = allocationDetails.stream().filter(item->StringUtil.isNotEmpty(item.getWinPrice())).sorted(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getBidPrice)
-                       .thenComparing(CfetsPrimaryBidManageSaveDetailDto::getEntrustId).thenComparing(CfetsPrimaryBidManageSaveDetailDto::getPortfolioId)).collect(Collectors.toList());
-           }else if (StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_价格.getValue())){
-               allocationDetails = allocationDetails.stream().filter(item->StringUtil.isNotEmpty(item.getWinPrice())).sorted(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getBidPrice).reversed()
-                       .thenComparing(CfetsPrimaryBidManageSaveDetailDto::getEntrustId).thenComparing(CfetsPrimaryBidManageSaveDetailDto::getPortfolioId)).collect(Collectors.toList());
+            BigDecimal remainWinPrinamt = request.getWinPrinamt();
+            List<CfetsPrimaryBidManageSaveDetailDto> allocationDetails = request.getAllocationDetails();
+            if (StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue()) ||
+                    StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
+                allocationDetails = allocationDetails.stream().filter(item -> StringUtil.isNotEmpty(item.getWinPrice())).sorted(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getBidPrice)
+                        .thenComparing(CfetsPrimaryBidManageSaveDetailDto::getEntrustId).thenComparing(CfetsPrimaryBidManageSaveDetailDto::getPortfolioId)).collect(Collectors.toList());
+            } else if (StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_价格.getValue())) {
+                allocationDetails = allocationDetails.stream().filter(item -> StringUtil.isNotEmpty(item.getWinPrice())).sorted(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getBidPrice).reversed()
+                        .thenComparing(CfetsPrimaryBidManageSaveDetailDto::getEntrustId).thenComparing(CfetsPrimaryBidManageSaveDetailDto::getPortfolioId)).collect(Collectors.toList());
             }
-           for (CfetsPrimaryBidManageSaveDetailDto detailDto:allocationDetails) {
-                if (detailDto.getTotalBidPrinamt().compareTo(remainWinPrinamt)<=0){
+            for (CfetsPrimaryBidManageSaveDetailDto detailDto : allocationDetails) {
+                if (detailDto.getTotalBidPrinamt().compareTo(remainWinPrinamt) <= 0) {
                     detailDto.setTheWinPrinamt(detailDto.getTotalBidPrinamt());
                     detailDto.setActWinPrinamt(detailDto.getTotalBidPrinamt());
-                }else if(remainWinPrinamt.compareTo(bidMinUnit)>=0){
-                    BigDecimal winPrinamt =  ArithmeticUtil.subtract(remainWinPrinamt,remainWinPrinamt.divideAndRemainder(bidMinUnit)[1]);
+                } else if (remainWinPrinamt.compareTo(bidMinUnit) >= 0) {
+                    BigDecimal winPrinamt = ArithmeticUtil.subtract(remainWinPrinamt, remainWinPrinamt.divideAndRemainder(bidMinUnit)[1]);
                     detailDto.setTheWinPrinamt(winPrinamt);
                     detailDto.setActWinPrinamt(winPrinamt);
-                }else{
+                } else {
                     //中标标位、中标净价、应计利息、缴款金额、结算服务费
                     detailDto.setWinPrice(null);
                     detailDto.setWinCprice(null);
@@ -1100,36 +1992,36 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     detailDto.setPayAmt(null);
                     detailDto.setSettFeeAmt(null);
                 }
-                remainWinPrinamt = ArithmeticUtil.subtract(remainWinPrinamt,detailDto.getTheWinPrinamt());
+                remainWinPrinamt = ArithmeticUtil.subtract(remainWinPrinamt, detailDto.getTheWinPrinamt());
             }
             allocationDetails = allocationDetails.stream().sorted(Comparator.comparing(CfetsPrimaryBidManageSaveDetailDto::getTheWinPrinamt).reversed()).collect(Collectors.toList());
-            allocationDetails.get(0).setTheWinPrinamt(ArithmeticUtil.doAdd(allocationDetails.get(0).getTheWinPrinamt(),remainWinPrinamt));
-            allocationDetails.get(0).setActWinPrinamt(ArithmeticUtil.doAdd(allocationDetails.get(0).getActWinPrinamt(),remainWinPrinamt));
+            allocationDetails.get(0).setTheWinPrinamt(ArithmeticUtil.doAdd(allocationDetails.get(0).getTheWinPrinamt(), remainWinPrinamt));
+            allocationDetails.get(0).setActWinPrinamt(ArithmeticUtil.doAdd(allocationDetails.get(0).getActWinPrinamt(), remainWinPrinamt));
             //更新中标净价、缴款金额、结算服务费
-            for (CfetsPrimaryBidManageSaveDetailDto detailDto:request.getAllocationDetails()) {
-                 if (StringUtil.isNotEmpty(detailDto.getWinPrice())){
-                     if (StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue()) ||
-                             StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())){
-                         if(StringUtil.isNotEmpty(finProduct.getCirculationCode())){
-                             //TODO
-                             Map<String,Object> param = new HashMap<>();
-                             param.put("finprodId",request.getFinprodId());
-                             param.put("tradeMarket",request.getTradeMarket());
-                             param.put("ps",DictCodeList.交易方向_买入.getValue());
-                             param.put("calculateField",DictCodeListExt3.债券计算模式_到期收益率.getValue());
-                             param.put("yield",detailDto.getWinPrice());
-                             Map<String, BigDecimal> calcPriceAndYieldMap = calcPriceAndYield(param);
-                             if (StringUtil.isNotEmpty(calcPriceAndYieldMap)) {
-                                 detailDto.setWinCprice(calcPriceAndYieldMap.get("cprice"));
-                             }
-                         }else if(StringUtil.equals(finProduct.getCouponSpecies(), DictCodeList.息票品种_附息.getValue())
-                         || StringUtil.equals(finProduct.getCouponSpecies(), DictCodeList.息票品种_利随本清.getValue())){
-                             detailDto.setWinCprice(BigDecimal.valueOf(100));
-                         }
-                     }else if (StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_价格.getValue())){
-                         detailDto.setWinCprice(detailDto.getWinPrice());
-                     }
-                 }
+            for (CfetsPrimaryBidManageSaveDetailDto detailDto : request.getAllocationDetails()) {
+                if (!BigDecimalUtil.isZeroOrNull(detailDto.getActWinPrinamt())) {
+                    if (StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_利率.getValue()) ||
+                            StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_利差.getValue())) {
+                        if (StringUtil.isNotEmpty(finProduct.getCirculationCode())) {
+                            //TODO
+                            Map<String, Object> param = new HashMap<>();
+                            param.put("finprodId", request.getFinprodId());
+                            param.put("tradeMarket", request.getTradeMarket());
+                            param.put("ps", DictCodeList.交易方向_买入.getValue());
+                            param.put("calculateField", DictCodeListExt3.债券计算模式_到期收益率.getValue());
+                            param.put("yield", detailDto.getWinPrice());
+                            Map<String, BigDecimal> calcPriceAndYieldMap = calcPriceAndYield(param);
+                            if (StringUtil.isNotEmpty(calcPriceAndYieldMap)) {
+                                detailDto.setWinCprice(calcPriceAndYieldMap.get("cprice"));
+                            }
+                        } else if (StringUtil.equals(finProduct.getCouponSpecies(), DictCodeList.息票品种_附息.getValue())
+                                || StringUtil.equals(finProduct.getCouponSpecies(), DictCodeList.息票品种_利随本清.getValue())) {
+                            detailDto.setWinCprice(BigDecimal.valueOf(100));
+                        }
+                    } else if (StringUtil.equals(request.getTenderTarget(), DictCodeListExt4.招标标的_价格.getValue())) {
+                        detailDto.setWinCprice(detailDto.getWinPrice());
+                    }
+                }
             }
         }
         return null;
@@ -1143,6 +2035,15 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     public boolean isInWflProcess(WflValidInputParameter parameter) {
         parameter.setSeachMode("01");
         List<String> result = cfetsPrimaryBidManageMapper.getBusinessData(parameter);
+        if (CollectionUtils.isNotEmpty(result)) {
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
+    }
+
+    public boolean isInWflData(WflValidInputParameter parameter) {
+        parameter.setSeachMode("01");
+        List<String> result = cfetsPrimaryBidManageMapper.getWflData(parameter);
         if (CollectionUtils.isNotEmpty(result)) {
             return Boolean.TRUE;
         }
@@ -1171,10 +2072,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
      */
     public void calcAmt(CfetsPrimaryBidManageSaveRequest dto) {
         String isModifiedIntamt = CacheUtil.getSysParam("IS_MODIFIED_INTAMT");
-        if (StringUtil.equals(isModifiedIntamt,DictCodeList.是否_是.getValue())){
-            for (CfetsPrimaryBidManageSaveDetailDto detailDto:dto.getAllocationDetails()) {
-                if (StringUtil.equals(isModifiedIntamt,DictCodeList.是否_是.getValue())){
-                    detailDto.setPayAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(ArithmeticUtil.doAdd(detailDto.getWinCprice(),detailDto.getIntAmt()),detailDto.getActWinPrinamt()),BigDecimal.valueOf(100),4));
+        if (StringUtil.equals(isModifiedIntamt, DictCodeList.是否_是.getValue())) {
+            for (CfetsPrimaryBidManageSaveDetailDto detailDto : dto.getAllocationDetails()) {
+                if (StringUtil.equals(isModifiedIntamt, DictCodeList.是否_是.getValue())) {
+                    detailDto.setPayAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(ArithmeticUtil.doAdd(detailDto.getWinCprice(), detailDto.getIntAmt()), detailDto.getActWinPrinamt()), BigDecimal.valueOf(100), 4));
                 }
             }
         }
@@ -1203,7 +2104,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             BigDecimal total = null; // 总净价
             BigDecimal weightTotal = null; // 权重汇总
             for (CfetsPrimaryBidManageSaveDetailDto allocationDetail : dto.getAllocationDetails()) {
-                total = ArithmeticUtil.doAdd(total, allocationDetail.getWinCprice());
+                total = ArithmeticUtil.doAdd(total, allocationDetail.getActWinPrinamt());
                 weightTotal = ArithmeticUtil.doAdd(weightTotal, ArithmeticUtil.multiply(allocationDetail.getActWinPrinamt(), allocationDetail.getWinCprice()));
                 if (StringUtil.isNotEmpty(allocationDetail.getIntAmt())) {
                     intAmt = allocationDetail.getIntAmt();
@@ -1689,17 +2590,167 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     public String getBidPriceStr(CfetsPrimaryBidManageSaveRequest request){
         String bidPriceStr = null;
         if (StringUtil.equals(request.getTenderTarget(),DictCodeListExt4.招标标的_利率.getValue())){
-            BigDecimal bidPrice = ArithmeticUtil.multiply(request.getAllocationDetails().get(0).getBidPrice(), BigDecimal.valueOf(100));
+            BigDecimal bidPrice = ArithmeticUtil.multiply(request.getWinPrice(), BigDecimal.valueOf(100));
             bidPriceStr = ArithmeticUtil.round(bidPrice,4,RoundingMode.HALF_UP)+"%";
         }
         if (StringUtil.equals(request.getTenderTarget(),DictCodeListExt4.招标标的_利差.getValue())){
-            BigDecimal bidPrice = ArithmeticUtil.multiply(request.getAllocationDetails().get(0).getBidPrice(), BigDecimal.valueOf(10000));
-            bidPriceStr = ArithmeticUtil.round(bidPrice,4,RoundingMode.HALF_UP)+"BP";
-        }
-        if (StringUtil.equals(request.getTenderTarget(),DictCodeListExt4.招标标的_价格.getValue())){
-            BigDecimal bidPrice = request.getAllocationDetails().get(0).getBidPrice();
+            BigDecimal bidPrice = ArithmeticUtil.multiply(request.getWinPrice(), BigDecimal.valueOf(10000));
             bidPriceStr = ArithmeticUtil.round(bidPrice,2,RoundingMode.HALF_UP)+"BP";
         }
+        if (StringUtil.equals(request.getTenderTarget(),DictCodeListExt4.招标标的_价格.getValue())){
+            BigDecimal bidPrice = request.getWinPrice();
+            bidPriceStr = ArithmeticUtil.round(bidPrice,4,RoundingMode.HALF_UP)+"元";
+        }
         return bidPriceStr;
+    }
+
+    /**
+     * 处理指令完成情况
+     *
+     * @param dto  交易数据
+     * @param type 操作类型
+     * @return java.util.List<java.lang.String>
+     * @author jiangpeng
+     * @date 2022/4/7 20:07
+     */
+    public List<String> baseTradeCommExecute(CfetsPrimaryBidManageSaveRequest dto, OperationType type) {
+        if (dto == null) {
+            return null;
+        }
+        List<String> entrustIdList = new ArrayList<>();
+        if (dto.getBaseBidManageBaseInfoDto() == null
+                || dto.getBaseBidManageBaseInfoDto().getTrdProductDealList() == null) {
+            return null;
+        }
+        for (TrdProductDeal trdProductDeal : dto.getBaseBidManageBaseInfoDto().getTrdProductDealList()) {
+            if (StringUtil.isEmpty(trdProductDeal.getEntrustId())) {
+                continue;
+            }
+            EtrFinishStatusDto status = new EtrFinishStatusDto();
+            status.setEntrustId(trdProductDeal.getEntrustId());
+            status.setTradeId(trdProductDeal.getTradeId());
+            status.setFinishDate(trdProductDeal.getTradeDate());
+            status.setFinishAmt(trdProductDeal.getShareAmt());
+            status.setTrader(trdProductDeal.getTrader());
+            // 调用委托完成状况查询
+            entrustIdList.add(status.getEntrustId());
+            if (OperationType.REVOKE.equals(type) || OperationType.DELETE.equals(type)) {
+                etrFinishStatusMapper.deleteByPrimaryKey(status);
+            } else {
+                // 遍历List<委托完成状况表Entity>，保存到“委托完成状况表”
+                etrFinishStatusMapper.insertSelective(status);
+            }
+        }
+        if (CollectionUtils.isEmpty(entrustIdList)) {
+            return null;
+        }
+        if (OperationType.REVOKE.equals(type) || OperationType.DELETE.equals(type)) {
+            for (String entrustId : entrustIdList) {
+                // 如果满足，则调用投资委托组件的更新委托状态接口，将委托状态设置为“已接收”
+                etrInvestInfoServiceImpl.updateDelegateStatus(entrustId, DictCodeList.委托状态_已接收.getValue());
+            }
+        } else {
+            if (StringUtil.equals(DictCodeListExt4.投标方式_自主投标.getValue(), dto.getBidModle())) {
+                for (String entrustId : entrustIdList) {
+                    // 如果满足，则调用投资委托组件的更新委托状态接口，将委托状态设置为“已完成”
+                    etrInvestInfoServiceImpl.updateDelegateStatus(entrustId, DictCodeList.委托状态_已完成.getValue());
+                }
+            } else {
+                List<BaseEtrFinishAmtDto> etrFinishAmtDtoList = etrInvestInfoServiceImpl.queryDelegateStatus(entrustIdList);
+                List<String> finishEtrList = new ArrayList<>();
+                // 判断委托代码的完成额度是否大于等于100
+                for (BaseEtrFinishAmtDto etrFinishAmtDto : etrFinishAmtDtoList) {
+                    if (etrFinishAmtDto.getSumFinishPercent().compareTo(BigDecimal.valueOf(100)) >= 0 ) {
+                        // 如果满足，则调用投资委托组件的更新委托状态接口，将委托状态设置为“已完成”
+                        etrInvestInfoServiceImpl.updateDelegateStatus(etrFinishAmtDto.getEntrustId(), DictCodeList.委托状态_已完成.getValue());
+                        finishEtrList.add(etrFinishAmtDto.getEntrustId());
+                    }
+                }
+                return finishEtrList;
+            }
+
+        }
+        return null;
+    }
+
+    /**
+     * 获取组合头寸信息
+     *
+     * @param dto 投标确认数据
+     * @author jiangpeng
+     * @date 2022/5/18 19:10
+     */
+    public void selectCash(CfetsPrimaryBidManageSaveRequest dto) {
+        for (CfetsPrimaryBidManageSaveDetailDto productDto : dto.getAllocationDetails()) {
+            BaseMap cashMap = positionInfoService.queryTrdAvailableCash(
+                    Collections.singletonList(productDto.getPortfolioId()),
+                    iPlatformDate.getSysDateStr(),
+                    null,
+                    null,
+                    null,
+                    Collections.singletonList(DictCodeListExt1.资金账户类型_产品托管户.getValue()),
+                    Collections.singletonList(DictCodeListExt1.资金账户类型_产品托管户.getValue()),
+                    dto.getFinprodId()
+            );
+            productDto.setCashT(cashMap.getBigDecimal("cashT"));
+            productDto.setCashT1(cashMap.getBigDecimal("cashT1"));
+            productDto.setRealCash(cashMap.getBigDecimal("realCash"));
+            productDto.setSecDesirableCash(cashMap.getBigDecimal("secDesirableCash"));
+        }
+    }
+
+    public List<String>  selectManualSettleInfo(String totalWinId) {
+        return cfetsPrimaryBidManageMapper.selectManualSettleInfo(totalWinId);
+    }
+
+    @Override
+    public Map<String, Object> getRuntimeVariables(ProcessMark entity, String taskId) throws WorkFlowException {
+        CfetsPrimaryBidManageSaveRequest dto = this.getBussinessEntity(entity);
+        CommonBusinessService commonBusinessService = SpringContextUtil.getBean(CommonBusinessService.class);
+        if (taskId != null) {
+            try {
+                if (StringUtil.equals(CacheUtil.getSysParam(BussinessConstant.ETRLIMIT_SWITCH_IS_TOTAL), "Y")) {
+                    return getEtrLimitSwitch(entity.getWorkflowId(), dto, commonBusinessService);
+                } else {
+//           		BussinessConstant.是否需要上级审批
+                    Map<String, Object> result = new HashMap<>();
+                    for (CfetsPrimaryBidManageSaveDetailDto productDto : dto.getAllocationDetails()) {
+                        if(!StringUtil.isNotEmpty(productDto.getWinCprice())){
+                            continue;
+                        }
+                        CfetsPrimaryBidManageSaveRequest dto1 = new CfetsPrimaryBidManageSaveRequest();
+                        BeanUtil.copyPropertiesIgnoreNull(dto1, dto);
+                        dto1.getCalcAmountDto().setTradeAmt(productDto.getTradeAmt());
+                        dto1.setTotalBiddingNum(productDto.getTradeAmt());
+                        result = getEtrLimitSwitch(entity.getWorkflowId(), dto1, commonBusinessService);
+                        if ((boolean) result.get(BussinessConstant.是否需要上级审批) == true) {
+                            return result;
+                        }
+                    }
+                    return result;
+                }
+            } catch (WorkFlowException e) {
+                // 未设置授权或设置成不授权时，抛出异常，当前用户只能退回
+                throw new WorkFlowException(e);
+            }
+        } else {
+            return null;
+        }
+    }
+
+    private Map<String, Object> getEtrLimitSwitch(String workflowId, CfetsPrimaryBidManageSaveRequest dto,
+                                                  CommonBusinessService commonBusinessService) throws WorkFlowException {
+        BigDecimal amount = dto.getCalcAmountDto().getTradeAmt();
+        if (amount == null) {
+            amount = dto.getCalcAmountDto().getPayAmt();
+        }
+        Map<String, Object> params = CommonBusinessService.setParams(dto.getCounterId(), amount, LoginUserUtil.getUserName(),
+                BussinessDictCodeList.平安资产类型_债券.getValue(), null, dto.getTradeMarket(), DictCodeList.交易方向_买入.getValue()
+                , dto.getFinprodId(), workflowId
+        );
+        // add by zhangrui1 风险审批修改 start
+        params.put("riskTrialRetDto", null);
+        // add by zhangrui1 风险审批修改 end
+        return commonBusinessService.是否需要上级审批_委托用(params);
     }
 }

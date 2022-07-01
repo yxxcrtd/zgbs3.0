@@ -15,19 +15,40 @@ import com.joyintech.tams.valuation.batch.common.accounting.entity.BookLatestInf
 import com.joyintech.tams.valuation.batch.common.accounting.entity.StayDrawSubprdEntity;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalance;
 import com.joyintech.tams.valuation.batch.common.accounting.entity.SubjectBalanceSearchDto;
-import com.joyintech.tams.valuation.batch.common.accounting.service.AccountingCommonService;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.valuation.batch.common.accounting.service.AccountingCommonService;
 import com.joyintech.tams.valuation.batch.positionmake.dao.PositionMakeWithoutDispatchMapper;
+import com.joyintech.tams.valuation.batch.positionmake.dto.BlanceDto;
+import com.joyintech.tams.valuation.batch.positionmake.dto.BokPositionPrdWithOtherFieldDto;
+import com.joyintech.tams.valuation.batch.positionmake.dto.BokPositionPrdfeeWithOtherFieldDto;
+import com.joyintech.tams.valuation.batch.positionmake.dto.BookSetInfoDto;
+import com.joyintech.tams.valuation.batch.positionmake.dto.JcInfoDto;
+import com.joyintech.tams.valuation.batch.positionmake.dto.PortfolioIdInfoDto;
 import com.joyintech.tams.valuation.batch.positionmake.dto.PositionMakeReaderResult;
+import com.joyintech.tams.valuation.batch.positionmake.dto.PtlPortfolioValuationWithOtherFieldDto;
+import com.joyintech.tams.valuation.batch.positionmake.dto.PtlSecReceivablesDto;
+import com.joyintech.tams.valuation.batch.positionmake.dto.PtlSecValutionWithOtherFieldDto;
+import com.joyintech.tams.valuation.batch.positionmake.dto.SubjectNatureFeeTypeInfo;
+import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrue;
+import com.joyintech.tams.valuation.common.constants.ValDictCodeList;
+import com.joyintech.tams.valuation.common.utils.ValDateUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 头寸生成批处理 - reader
@@ -40,6 +61,9 @@ public class PositionMakeReader extends BaseReader<PositionMakeReaderResult> {
 
     @Autowired
     private PositionMakeWithoutDispatchMapper positionMakeWithoutDispatchMapper;
+
+    @Autowired
+    private AccountingCommonService accountingCommonService;
 
     @SuppressWarnings("unchecked")
 	@Override
@@ -90,7 +114,7 @@ public class PositionMakeReader extends BaseReader<PositionMakeReaderResult> {
 				ptlSecValutionListWithNoTd.add(item);
 	        }
         }
-        
+
         // 查询成本信息B
         List<PtlSecValutionWithOtherFieldDto> listCostInfo = positionMakeWithoutDispatchMapper.getCostInfo(sqlMap);
         // 定义 变量.组合资产信息C
@@ -99,7 +123,7 @@ public class PositionMakeReader extends BaseReader<PositionMakeReaderResult> {
         //定义 变量.减值准备D
         List<PtlSecValutionWithOtherFieldDto> listJzzbD = new ArrayList<>();
         /**add by wujie on 20201109 e**/
-        
+
         // LOOP 上面查询结果 ENTITY
         if (CollectionUtils.isNotEmpty(listCostInfo)) {
             for (PtlSecValutionWithOtherFieldDto item : listCostInfo) {
@@ -130,7 +154,7 @@ public class PositionMakeReader extends BaseReader<PositionMakeReaderResult> {
                     // ENTITY.投资目的不为空，则 ENTITY.投资目的= 科目余额.投资目的
                     if(StringUtil.isNotEmpty(balance.getInvAim())){
                         dto.setInvAim(balance.getInvAim());
-                    } 
+                    }
                     listCostInfoC.add(dto);
                 }
                 /**add by wujie on 20201109 start remark:处理成本为0时，减值余额不为0**/
@@ -157,7 +181,7 @@ public class PositionMakeReader extends BaseReader<PositionMakeReaderResult> {
                     // ENTITY.投资目的不为空，则 ENTITY.投资目的= 科目余额.投资目的
                     if(StringUtil.isNotEmpty(balance.getInvAim())){
                         dto.setInvAim(balance.getInvAim());
-                    } 
+                    }
                     // ENTITY.减值余额 = 科目余额.科目余额
                     dto.setTdyLossAmt(balance.getBalance());
                     // ENTITY.减值余额_本位币 = 科目余额.本币余额
@@ -293,7 +317,7 @@ public class PositionMakeReader extends BaseReader<PositionMakeReaderResult> {
                 ptlSecValutionListWithNoTd.addAll(listCostInfoC);
             }
         }
-        
+
         /**add by wujie on 20201109 start remark:处理成本为0时，减值余额不为0**/
         if (CollectionUtils.isEmpty(ptlSecValutionListWithNoTd)
         		&& CollectionUtils.isNotEmpty(listJzzbD)){
@@ -557,7 +581,7 @@ public class PositionMakeReader extends BaseReader<PositionMakeReaderResult> {
         Map<String, SubjectNatureFeeTypeInfo> subjectNatureFeeTypeMap = new HashMap<String, SubjectNatureFeeTypeInfo>();
         if (subjectNatureList != null && !subjectNatureList.isEmpty()) {
             List<SubjectNatureFeeTypeInfo> subjectNatureFeeTypeInfoList = positionMakeWithoutDispatchMapper.getSubjectNatureFeeTypeInfo(
-                subjectNatureList);
+                subjectNatureList, null);
             // 组装MAP<基础科目性质，费用信息>
             for (SubjectNatureFeeTypeInfo vo : subjectNatureFeeTypeInfoList) {
                 subjectNatureFeeTypeMap.put(vo.getBaseSubjectNature(), vo);

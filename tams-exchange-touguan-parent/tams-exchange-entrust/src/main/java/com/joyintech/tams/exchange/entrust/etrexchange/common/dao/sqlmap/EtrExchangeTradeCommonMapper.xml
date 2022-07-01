@@ -1055,9 +1055,10 @@
             <if test="secAcctId != null and secAcctId != ''">
                 and SEC_ACCT_ID = #{secAcctId,jdbcType=VARCHAR}
             </if>
-            <if test="portfolioId != null and portfolioId != ''">
-                and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
-            </if>
+            <!--交易所品种额度 表数据 无组合维度-->
+<!--            <if test="portfolioId != null and portfolioId != ''">-->
+<!--                and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}-->
+<!--            </if>-->
             <if test="finprodId != null and finprodId != ''">
                 and FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
             </if>
@@ -1596,9 +1597,12 @@
         LEFT JOIN TRD_PRODUCT_TEMP_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
         LEFT JOIN FIN_PRODUCT c ON a.FINPROD_ID =c.FINPROD_ID
         LEFT JOIN FIN_PRODUCT_TYPE d ON d.FINPROD_ID =a.FINPROD_ID
+        LEFT JOIN TRD_MANUAL_SETTLE_INFO tmsi on a.TRADE_ID = tmsi.TRADE_ID
+        LEFT JOIN TRD_MANUAL_SETTLE_INFO tmsi2 ON a.TOTLE_TRADE_ID = tmsi2.TRADE_ID
         WHERE a.TRADE_DATE =#{cdate} AND c.TRADE_MARKET in (#{SVR_TRADE_MARKET_03},#{SVR_TRADE_MARKET_04})
         AND a.PS IN (#{PS_T01},#{PS_T02},#{PS_T03},#{PS_T04},#{PS_T49})
         AND a.IS_CANCEL=#{YN_N}
+        AND ( tmsi.SETTLE_STATUS ='02'or tmsi2.SETTLE_STATUS = '02' or (tmsi.TRADE_ID is null and tmsi2.TRADE_ID is null))
         <if test="portfolioIdList != null">
             AND b.PORTFOLIO_ID in
             <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
@@ -1912,6 +1916,7 @@
         WHERE
         TMP.PORTFOLIO_ID =#{ portfolioId,jdbcType = VARCHAR }
         AND TMP.FINPROD_ID =#{ finprodId,jdbcType = VARCHAR }
+         AND TMP.BUSINESS_MODEL  is not  null
     </select>
 
     <delete id="deleteRskIsupTrial">

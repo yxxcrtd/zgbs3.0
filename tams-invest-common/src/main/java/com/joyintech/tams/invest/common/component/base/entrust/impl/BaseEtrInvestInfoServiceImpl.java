@@ -29,7 +29,7 @@ import com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto;
 import com.joyintech.tams.invest.common.dto.trade.entrust.EtrFinishStatusDto;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
 import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -548,7 +548,12 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
                     }
                     etrDistributeMapper.insertSelective(etrDistribute);
                 }
-            }else if (!DictCodeListExt3.委托状态_待分发.getValue().equals(dto.getEtrEntrust().getEntrustStatus())) {
+            } else if (StringUtil.equals(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue(), dto.getEtrEntrust().getFinprodType2()) &&
+                    (StringUtil.equals(DictCodeList.委托状态_已退回.getValue(), dto.getEtrEntrust().getEntrustStatus())
+                            || StringUtil.equals(DictCodeList.委托状态_已撤回.getValue(), dto.getEtrEntrust().getEntrustStatus()))) {
+                dto.getEtrEntrust().setEntrustStatus(DictCodeListExt3.委托状态_待分发.getValue());
+            } else if (!StringUtil.equals(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue(), dto.getEtrEntrust().getFinprodType2()) &&
+                    !DictCodeListExt3.委托状态_待分发.getValue().equals(dto.getEtrEntrust().getEntrustStatus())) {
                 dto.getEtrEntrust().setEntrustStatus(DictCodeListExt3.委托状态_待分发.getValue());
             }
             etrEntrustMapper.insertSelective(dto.getEtrEntrust());

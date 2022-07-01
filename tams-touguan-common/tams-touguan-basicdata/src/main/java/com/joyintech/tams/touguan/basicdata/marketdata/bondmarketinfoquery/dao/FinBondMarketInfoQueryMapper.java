@@ -72,6 +72,14 @@ public interface FinBondMarketInfoQueryMapper {
     List<FinBondMarketCashPlanDto> selectInvScheduleList(Map<String, Object> map);
 
     /**
+     * 查询还本计划信息
+     *
+     * @param map
+     * @return
+     */
+    List<FinBondMarketCashPlanDto> selectInvRepayList(Map<String, Object> map);
+
+    /**
      * 行权计划信息
      *
      * @param map

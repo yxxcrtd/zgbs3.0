@@ -155,6 +155,9 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
     @ApiModelProperty(name = "remark", value = "备注", example = "XXX")
     private String remark;
 
+    @ApiModelProperty(name = "revokeReason", value = "撤销备注", example = "XXX")
+    private String revokeReason;
+
     @ApiModelProperty(name = "adjustStrategy", value = "调整策略", example = "XXX")
     private String adjustStrategy;
 
@@ -200,6 +203,14 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
 
     @ApiModelProperty(name = "editFeild", value = "编辑字段", example = "1 基本信息的汇总投标券面总额联动 2 汇总投标列表的投标标位联动")
     private String editFeild;
+
+    @ApiModelProperty(name = "productBackDtos", value = "投标产品备份列表")
+    private List<CfetsTrdFirstBidFirmProductDto> productBackDtos;
+
+    @ApiModelProperty(name = "isFx", value = "是否分销买入", example = "Y")
+    private String isFx;
+
+    private String rskApproval;
 
     public String getValidStatus() {
         return validStatus;
@@ -582,6 +593,14 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
         this.remark = remark;
     }
 
+    public String getRevokeReason() {
+        return revokeReason;
+    }
+
+    public void setRevokeReason(String revokeReason) {
+        this.revokeReason = revokeReason;
+    }
+
     public String getAdjustStrategy() {
         return adjustStrategy;
     }
@@ -724,6 +743,30 @@ public class CfetsTrdFirstBidFirmInfoDto extends BaseEntity implements ProcessEn
 
     public void setEditFeild(String editFeild) {
         this.editFeild = editFeild;
+    }
+
+    public String getRskApproval() {
+        return rskApproval;
+    }
+
+    public void setRskApproval(String rskApproval) {
+        this.rskApproval = rskApproval;
+    }
+
+    public List<CfetsTrdFirstBidFirmProductDto> getProductBackDtos() {
+        return productBackDtos;
+    }
+
+    public void setProductBackDtos(List<CfetsTrdFirstBidFirmProductDto> productBackDtos) {
+        this.productBackDtos = productBackDtos;
+    }
+
+    public String getIsFx() {
+        return isFx;
+    }
+
+    public void setIsFx(String isFx) {
+        this.isFx = isFx;
     }
 }
 

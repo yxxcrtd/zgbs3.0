@@ -80,7 +80,7 @@ public interface FinTenderBondAssetMapper {
      * @param finprodId
      * @return
      */
-    Integer countFinprodIdUse(@Param("finprodId") String finprodId, @Param("isCancel") String isCancel,@Param("ps") String ps);
+    Integer countFinprodIdUse(@Param("finprodId") String finprodId, @Param("isCancel") String isCancel, @Param("isClose") String isClose, @Param("ps") String ps);
 
     /**
      * 判断是否存在上市流通交易数据
@@ -144,4 +144,26 @@ public interface FinTenderBondAssetMapper {
      * @return
      */
     FinTenderBondAsset003Dto getByFinProductId(@Param("finprodId") String finprodId);
+
+    /**
+     * 判断资产代码是否存在
+     * @param param
+     * @return
+     */
+    String selectExistFinprodId(Map<String, Object> param);
+
+    /**
+     * 查询是否有多条发行信息
+     *
+     * @param finprodMarketId
+     * @return
+     */
+    Integer  getCount(@Param("finprodMarketId") String finprodMarketId);
+
+    /**
+     * 查询标的表和接口表是否存在待上市的代码
+     * @param finprodMarketId
+     * @return
+     */
+    Integer getCountByFinprodMarketId(@Param("finprodMarketId") String finprodMarketId);
 }

@@ -10,17 +10,20 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.business.common.util.ValidUtils;
-import com.joyintech.tams.cfets.risk.aop.CfetsEntrustHanderAop;
 import com.joyintech.tams.cfets.risk.aop.CfetsTradeHandlerAop;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.*;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManage001Service;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManageService;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManageValidatorService;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
-import com.joyintech.tams.constant.*;
-import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
+import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -29,7 +32,7 @@ import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -155,6 +158,16 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
             CfetsPrimaryBidManageSaveRequest response = new CfetsPrimaryBidManageSaveRequest();
             if (StringUtil.isNotEmpty(workflowId)) {
                 response = cfetsPrimaryBidManageService.getBussinessEntityByWorkflowId(workflowId);
+                if (StringUtil.equals(response.getIsWin(),DictCodeList.是否_否.getValue())){
+                    response.setPayDate(null);
+                    response.setCreditorDebtDate(null);
+                    response.setListingDate(null);
+                    response.setWinPrinamt(null);response.setRemark("未中标");
+                    response.getAllocationDetails().forEach(item->{
+                        item.setBidType(null);
+                        item.setIntAmt(null);
+                    });
+                }
             }else if (StringUtil.isNotEmpty(request.getTotalWinId())){
                 response = cfetsPrimaryBidManageService.selectBasicInfo(request);
             }
@@ -166,21 +179,106 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
     }
 
     /**
-     * 查询投标确认信息
-     * @return
-     * @throws Exception
-     * @see
-     * @since 1.0
+     * 分配明细联动处理
+     *
+     * @param request 画面元素
+     * @return com.joyintech.tams.business.common.pojo.Message<com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest>
+     * @author jiangpeng
+     * @date 2022/6/25 14:41
      */
-    @ApiOperation(value="分配明细联动处理",notes = "分配明细联动处理")
+    @ApiOperation(value = "分配明细联动处理", notes = "分配明细联动处理")
     @ResponseBody
-    @PostMapping("autoAllocation")
+    @PostMapping("/autoAllocation")
     public Message<CfetsPrimaryBidManageSaveRequest> autoAllocation(@RequestBody CfetsPrimaryBidManageSaveRequest request) {
         try {
-            CfetsPrimaryBidManageSaveRequest response = cfetsPrimaryBidManageService.autoAllocation(request);
-            return new Message<CfetsPrimaryBidManageSaveRequest>().success().setData(response);
-        }catch (Exception e) {
-            logger.error("查询投标确认信息数据异常",e);
+            CfetsPrimaryBidManageSaveRequest result = cfetsPrimaryBidManageService.autoAllocation(request);
+            return new Message<CfetsPrimaryBidManageSaveRequest>().success().setData(result);
+        } catch (Exception e) {
+            logger.error("查询投标确认信息数据异常", e);
+            return new Message<CfetsPrimaryBidManageSaveRequest>().fail().setMessage("查询投标确认信息异常");
+        }
+    }
+
+    /**
+     * 分配费用
+     *
+     * @param request 画面元素
+     * @return com.joyintech.tams.business.common.pojo.Message<com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest>
+     * @author jiangpeng
+     * @date 2022/6/25 14:41
+     */
+    @ApiOperation(value = "分配费用", notes = "分配费用处理")
+    @ResponseBody
+    @PostMapping("/feeAllocation")
+    public Message<List<CfetsPrimaryBidManageSaveDetailDto>> feeAllocation(@RequestBody CfetsPrimaryBidManageSaveRequest request) {
+        try {
+            List<CfetsPrimaryBidManageSaveDetailDto> result = cfetsPrimaryBidManageService.otherDistribution(request);
+            return new Message<List<CfetsPrimaryBidManageSaveDetailDto>>().success().setData(result);
+        } catch (Exception e) {
+            logger.error("查询投标确认信息数据异常", e);
+            return new Message<List<CfetsPrimaryBidManageSaveDetailDto>>().fail().setMessage("查询投标确认信息异常");
+        }
+    }
+
+    /**
+     * 编辑明细中缴款金额
+     *
+     * @param request 画面元素
+     * @return com.joyintech.tams.business.common.pojo.Message<com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest>
+     * @author jiangpeng
+     * @date 2022/6/25 14:41
+     */
+    @ApiOperation(value = "编辑明细中缴款金额", notes = "编辑明细中缴款金额")
+    @ResponseBody
+    @PostMapping("/editPayAmt")
+    public Message<CfetsPrimaryBidManageSaveRequest> editPayAmt(@RequestBody CfetsPrimaryBidManageSaveRequest request) {
+        try {
+            CfetsPrimaryBidManageSaveRequest result = cfetsPrimaryBidManageService.editList(request,"1");
+            return new Message<CfetsPrimaryBidManageSaveRequest>().success().setData(result);
+        } catch (Exception e) {
+            logger.error("查询投标确认信息数据异常", e);
+            return new Message<CfetsPrimaryBidManageSaveRequest>().fail().setMessage("查询投标确认信息异常");
+        }
+    }
+
+
+    /**
+     * 计算金额信息
+     *
+     * @param request 画面元素
+     * @return com.joyintech.tams.business.common.pojo.Message<com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest>
+     * @author jiangpeng
+     * @date 2022/6/25 14:41
+     */
+    @ApiOperation(value = "计算金额信息", notes = "计算金额信息")
+    @ResponseBody
+    @PostMapping("/calAmtInfo")
+    public Message<CfetsBidManageCalcAmountResponse> calAmtInfo(@RequestBody CfetsPrimaryBidManageSaveRequest request) {
+        try {
+            CfetsBidManageCalcAmountResponse result = cfetsPrimaryBidManageService.calAmtInfo(request);
+            return new Message<CfetsBidManageCalcAmountResponse>().success().setData(result);
+        } catch (Exception e) {
+            logger.error("计算金额信息异常", e);
+            return new Message<CfetsBidManageCalcAmountResponse>().fail().setMessage("计算金额信息异常");
+        }
+    }
+    /**
+     * 编辑明细中缴款金额
+     *
+     * @param request 画面元素
+     * @return com.joyintech.tams.business.common.pojo.Message<com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest>
+     * @author jiangpeng
+     * @date 2022/6/25 14:41
+     */
+    @ApiOperation(value = "编辑明细中中标净价,应计利息", notes = "编辑明细中中标净价")
+    @ResponseBody
+    @PostMapping("/editWinCprice")
+    public Message<CfetsPrimaryBidManageSaveRequest> editWinCprice(@RequestBody CfetsPrimaryBidManageSaveRequest request) {
+        try {
+            CfetsPrimaryBidManageSaveRequest result = cfetsPrimaryBidManageService.editList(request,"2");
+            return new Message<CfetsPrimaryBidManageSaveRequest>().success().setData(result);
+        } catch (Exception e) {
+            logger.error("查询投标确认信息数据异常", e);
             return new Message<CfetsPrimaryBidManageSaveRequest>().fail().setMessage("查询投标确认信息异常");
         }
     }
@@ -233,6 +331,7 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
             dto.setTotalWinId(IDGenerator.generate());
         }
         dto.setIsWin(DictCodeList.是否_是.getValue());
+        cfetsPrimaryBidManageService.selectCash(dto);
         WorkFlowParameter<CfetsPrimaryBidManageSaveRequest> params = new WorkFlowParameter<CfetsPrimaryBidManageSaveRequest>();
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
@@ -244,23 +343,27 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
         }
         // 设置流程业务说明
         params.setComment(entity -> {
-            return WorkFlowUtil.concatComment("中标日期"+
-                    GlobalConstant.OPEN_PARENTHESIS+ iPlatformDate.getSysDateStr() +GlobalConstant.CLOSE_PARENTHESIS+
-                    "资产简称"+GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS
-                    +"中标方式"+GlobalConstant.OPEN_PARENTHESIS+SysDataUtil.getNameFromDataDict(DictCode.中标方式, entity.getWinType())+GlobalConstant.CLOSE_PARENTHESIS
-                    +"中标标位"+GlobalConstant.OPEN_PARENTHESIS+cfetsPrimaryBidManageService.getBidPriceStr(entity)+GlobalConstant.CLOSE_PARENTHESIS
-                    +"中标券面总额"+GlobalConstant.OPEN_PARENTHESIS+ ArithmeticUtil.divide(dto.getWinPrinamt(),BigDecimal.valueOf(10000),2)+"万元"+GlobalConstant.CLOSE_PARENTHESIS);
+            return WorkFlowUtil.concatComment("中标日期" +
+                    GlobalConstant.OPEN_PARENTHESIS + iPlatformDate.getSysDateStr() + GlobalConstant.CLOSE_PARENTHESIS +
+                    "资产简称" + GlobalConstant.OPEN_PARENTHESIS + entity.getFinprodAbbr() + GlobalConstant.CLOSE_PARENTHESIS
+                    + "中标方式" + GlobalConstant.OPEN_PARENTHESIS + SysDataUtil.getNameFromDataDict(DictCode.中标方式, entity.getWinType()) + GlobalConstant.CLOSE_PARENTHESIS
+                    + "中标标位" + GlobalConstant.OPEN_PARENTHESIS + cfetsPrimaryBidManageService.getBidPriceStr(entity) + GlobalConstant.CLOSE_PARENTHESIS
+                    + "中标券面总额" + GlobalConstant.OPEN_PARENTHESIS + ArithmeticUtil.divide(dto.getWinPrinamt(), BigDecimal.valueOf(10000), 2) + "万元" + GlobalConstant.CLOSE_PARENTHESIS);
         });
         ProcessParameter<CfetsPrimaryBidManageSaveRequest> parameter = new ProcessParameter<CfetsPrimaryBidManageSaveRequest>();
         parameter.setOperationType(OperationType.NEW);
         parameter.setWorkFlowParameter(params);
-        String msg = cfetsPrimaryBidManageService.start(parameter, dto);
-        return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
+        try {
+            String msg = cfetsPrimaryBidManageService.start(parameter, dto);
+            return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
+        } catch (Exception e) {
+            logger.error("保存中标结果维护失败", e);
+            return PositionUtil.ajaxErrorReturn(e);
+        }
     }
 
     /**
      * 净价、行权收益率、到期收益率
-     * <功能详细描述>
      *
      * @param dto
      * @return
@@ -373,4 +476,31 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
             return new Message<AjaxResult>().fail().setMessage("风险试算异常");
         }
     }
+
+    @PostMapping("/getManagers")
+    @ApiOperation(value = "投资经理查询", notes = "投资经理查询")
+    @ResponseBody
+    public Message<Page<SelectOptionDto>> getManagers(@RequestBody SelectOptionCommonRequest item) {
+        try {
+            Page<SelectOptionDto> list = cfetsPrimaryBidManage001Service.getManager(item);
+            return new Message<Page<SelectOptionDto>>().success().setData(list);
+        } catch (Exception e) {
+            logger.error("查询功能异常", e);
+            return new Message<Page<SelectOptionDto>>().fail().setMessage("查询异常");
+        }
+    }
+
+    @PostMapping("/selectPortfolioIdList")
+    @ApiOperation(value = "组合列表查询", notes = "组合列表查询")
+    @ResponseBody
+    public Message<Page<SelectOptionDto>> selectPortfolioIdList(@RequestBody SelectOptionCommonRequest item) {
+        try {
+            Page<SelectOptionDto> dto = cfetsPrimaryBidManage001Service.selectPortfolioIdList(item);
+            return new Message<Page<SelectOptionDto>>().success().setData(dto);
+        } catch (Exception e) {
+            logger.error("查询组合列表异常", e);
+            return new Message<Page<SelectOptionDto>>().fail().setMessage("查询异常");
+        }
+    }
+
 }

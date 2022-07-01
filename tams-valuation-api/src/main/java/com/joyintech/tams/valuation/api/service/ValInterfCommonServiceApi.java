@@ -36,7 +36,7 @@ import com.joyintech.tams.valuation.common.interf.val.dao.BorrowBaseInfoInitMapp
 import com.joyintech.tams.valuation.common.interf.val.dto.ProdInfoDto;
 import com.joyintech.tams.valuation.common.interf.val.service.ValSysParaService;
 import com.joyintech.tams.valuation.common.service.BookAccountCommonService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

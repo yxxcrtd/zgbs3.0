@@ -1,0 +1,3 @@
+----TRD_PRODUCT_DEAL 表增加字段：发行方式（暂时股票用）
+ALTER TABLE TRD_PRODUCT_DEAL ADD  ISSUE_TYPE VARCHAR(50);
+comment on column TRD_PRODUCT_DEAL.ISSUE_TYPE is '发行方式(暂时股票用)';

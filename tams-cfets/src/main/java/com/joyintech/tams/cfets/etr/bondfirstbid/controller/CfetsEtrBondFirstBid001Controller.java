@@ -275,7 +275,7 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
         list1.setKriStatus("3");
         list1.setKriStatusCn("违规");
         list1.setKriName("每只现金管理类产品持有不低于该产品资产净值5%的现金、国债、中央银行票据、政策性金融债券");
-        list1.setGroupId("0");
+        list1.setGroupId(0);
         list1.setKriType("LIMIT_FLUID");
         list1.setKriExpr("((0-100000.0)+100000)/100000000");
         list1.setKriOldExpr("(0+0)/100000000");
@@ -353,7 +353,7 @@ public class CfetsEtrBondFirstBid001Controller extends BaseController {
         //对选择的数据进行check
         AjaxResult ajaxResult = cfetsEtrBondFirstBid001Service.modifyDelegateCheckMethod(dto);
         if (!StringUtil.isEmptyList(ajaxResult.getErrorList())) {
-            return new Message<AjaxResult>().fail().setData(ajaxResult);
+            return new Message<AjaxResult>().success().setData(ajaxResult);
         }
         try {
             CfetsEtrBondFirstBidReqDto item = dto.getSelectedItem().get(0);

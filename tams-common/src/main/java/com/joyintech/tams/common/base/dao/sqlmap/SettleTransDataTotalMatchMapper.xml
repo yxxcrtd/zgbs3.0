@@ -16,12 +16,13 @@
         <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
         <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
         <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+        <result column="SEC_ACCT_ID" property="secAcctId" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
         SEQ_NO SEQ_NO, ENTRUNST_TRADE_ID ENTRUNST_TRADE_ID, MATCH_CLASS MATCH_CLASS, MATCH_TYPE MATCH_TYPE, 
         MARCH_QTY MARCH_QTY, MARCH_AMT MARCH_AMT, MARCH_QTY_EN MARCH_QTY_EN, MARCH_AMT_EN MARCH_AMT_EN, 
         CCY CCY, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, 
-        UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME
+        UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, SEC_ACCT_ID SEC_ACCT_ID
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -52,12 +53,12 @@
             MATCH_TYPE, MARCH_QTY, MARCH_AMT, 
             MARCH_QTY_EN, MARCH_AMT_EN, CCY, 
             CREATE_USER, CREATE_DEPT, CREATE_TIME, 
-            UPDATE_USER, UPDATE_TIME)
+            UPDATE_USER, UPDATE_TIME, SEC_ACCT_ID)
         values (#{seqNo,jdbcType=VARCHAR}, #{entrunstTradeId,jdbcType=VARCHAR}, #{matchClass,jdbcType=VARCHAR}, 
             #{matchType,jdbcType=VARCHAR}, #{marchQty,jdbcType=DECIMAL}, #{marchAmt,jdbcType=DECIMAL}, 
             #{marchQtyEn,jdbcType=DECIMAL}, #{marchAmtEn,jdbcType=DECIMAL}, #{ccy,jdbcType=VARCHAR}, 
             #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-            #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+            #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{secAcctId,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.SettleTransDataTotalMatch" >
         insert into SETTLE_TRANS_DATA_TOTAL_MATCH
@@ -104,6 +105,9 @@
             <if test="updateTime != null" >
                 UPDATE_TIME,
             </if>
+            <if test="secAcctId != null" >
+                SEC_ACCT_ID,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="seqNo != null" >
@@ -148,15 +152,18 @@
             <if test="updateTime != null" >
                 #{updateTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="secAcctId != null" >
+                #{secAcctId,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.SettleTransDataTotalMatch" >
         insert into SETTLE_TRANS_DATA_TOTAL_MATCH(SEQ_NO, ENTRUNST_TRADE_ID, MATCH_CLASS, 
         MATCH_TYPE, MARCH_QTY, MARCH_AMT, MARCH_QTY_EN, MARCH_AMT_EN, CCY, CREATE_USER, CREATE_DEPT, 
-        CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+        CREATE_TIME, UPDATE_USER, UPDATE_TIME, SEC_ACCT_ID)
         select SEQ_NO, ENTRUNST_TRADE_ID, MATCH_CLASS, 
             MATCH_TYPE, MARCH_QTY, MARCH_AMT, MARCH_QTY_EN, MARCH_AMT_EN, CCY, CREATE_USER, CREATE_DEPT, 
-            CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
+            CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, SEC_ACCT_ID
              from SETTLE_TRANS_DATA_TOTAL_MATCH
              where 1 = 1 and SEQ_NO = #{seqNo,jdbcType=VARCHAR} and ENTRUNST_TRADE_ID = #{entrunstTradeId,jdbcType=VARCHAR} and MATCH_CLASS = #{matchClass,jdbcType=VARCHAR}
     </insert>
@@ -187,6 +194,9 @@
             <if test="updateTime != null" >
                 UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="secAcctId != null" >
+                SEC_ACCT_ID = #{secAcctId,jdbcType=VARCHAR},
+            </if>
         </set>
         where SEQ_NO = #{seqNo,jdbcType=VARCHAR}
           and ENTRUNST_TRADE_ID = #{entrunstTradeId,jdbcType=VARCHAR}
@@ -201,7 +211,8 @@
             MARCH_AMT_EN = #{marchAmtEn,jdbcType=DECIMAL},
             CCY = #{ccy,jdbcType=VARCHAR},
             UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
-            UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+            UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            SEC_ACCT_ID = #{secAcctId,jdbcType=VARCHAR}
         where SEQ_NO = #{seqNo,jdbcType=VARCHAR}
           and ENTRUNST_TRADE_ID = #{entrunstTradeId,jdbcType=VARCHAR}
           and MATCH_CLASS = #{matchClass,jdbcType=VARCHAR}

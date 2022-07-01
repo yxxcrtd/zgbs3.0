@@ -33,7 +33,7 @@ import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -466,7 +466,7 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
             ProcessMark processMark = cfetsRepoQuotedPrice004Service.getBusinessInfoByPageIdAndPk(wflValidInputParameter);
             CfetsTrdBondFirstSubInfoDto dto = cfetsTrdBondFirstSub002Service.getBussinessEntity(processMark);
             dto.setBidId(cfetsBondFirstSubCheckDetaileRequst.getBidId());
-            dto.setRemark(StringUtil.join("申购撤销原因：", requst.getRemark()));
+            dto.setRevokeReason(StringUtil.join("申购撤销原因：", requst.getRemark()));
             dto.setOperateType("revoke");
             cfetsTrdBondFirstSubInfoDtos.add(dto);
         }

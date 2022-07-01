@@ -10,22 +10,25 @@
 
 package com.joyintech.tams.valuation.interf.valuation.send.common.writer;
 
+import java.io.File;
+import java.util.Date;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.valuation.common.interf.base.constant.DictCodeInterfList;
 import com.joyintech.tams.valuation.common.interf.base.constant.TempConstant;
+import com.joyintech.tams.valuation.common.interf.base.util.TxtParserHander;
 import com.joyintech.tams.valuation.interf.core.InterfBaseWriter;
 import com.joyintech.tams.valuation.interf.core.entity.InterfExecuteInfo;
 import com.joyintech.tams.valuation.interf.valuation.send.assetmangementsys.vatflow.dto.ValAddTaxFlowprocessorResult;
 import com.joyintech.tams.valuation.interf.valuation.send.common.service.InterfSendFtpService;
 import com.joyintech.tams.valuation.interf.valuation.send.xmlCommon.util.XmlUtil;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
-
-import java.io.File;
-import java.util.Date;
-import java.util.List;
 @Service
 @Scope("prototype")
 public class InterfSendCommonWriter extends InterfBaseWriter<ValAddTaxFlowprocessorResult> {
@@ -33,7 +36,8 @@ public class InterfSendCommonWriter extends InterfBaseWriter<ValAddTaxFlowproces
     @Autowired
     private XmlUtil xmlUtil;
 
-    private Logger log = Logger.getLogger(getClass());
+//    private Logger log = Logger.getLogger(getClass());
+    private static Logger log = LoggerFactory.getLogger(InterfSendCommonWriter.class);
 
     @Autowired
     private InterfSendFtpService interfSendFtpService;

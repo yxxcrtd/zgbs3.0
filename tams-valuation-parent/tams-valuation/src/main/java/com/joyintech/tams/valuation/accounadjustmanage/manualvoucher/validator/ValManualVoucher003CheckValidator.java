@@ -22,7 +22,7 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.accounadjustmanage.manualvoucher.dao.ValManualVoucher003Mapper;
 import com.joyintech.tams.valuation.accounadjustmanage.manualvoucher.dto.ValManualVoucher003CheckValidatorDto;
 import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrue;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

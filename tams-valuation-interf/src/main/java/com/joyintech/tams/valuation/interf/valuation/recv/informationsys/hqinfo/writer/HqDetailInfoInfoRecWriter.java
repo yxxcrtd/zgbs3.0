@@ -17,7 +17,7 @@ import com.joyintech.tams.valuation.common.interf.base.service.common.InterfComm
 import com.joyintech.tams.valuation.interf.core.InterfBaseWriter;
 import com.joyintech.tams.valuation.interf.core.entity.InterfExecuteInfo;
 import com.joyintech.tams.valuation.interf.valuation.recv.informationsys.hqinfo.dto.HqDetailInfoProcessorResult;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;

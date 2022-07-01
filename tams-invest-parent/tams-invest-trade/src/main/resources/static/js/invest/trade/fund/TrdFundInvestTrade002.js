@@ -457,6 +457,25 @@ $(function () {
     });
 
     $("#tradeAmt").on("change", function () {
+        // add gl GLTZJY-197 交易金额联动带出交易份额 by xuhongfeng 20220531 start
+        var tradeAmt = $('#tradeAmt').val();
+        var ps = $('#ps').val();
+        if(ps == ps_T04 || ps == ps_T06){
+           if(tradeAmt){
+                 $('#shareAmt').val('').attr('disabled',true).attr('required',false);
+           }else{
+                 $('#shareAmt').attr('disabled',false).attr('required',true);
+           }
+                  star();
+           }
+           if(ps == ps_mr || ps == ps_mc){
+               var feeAmtPay = $('#feeAmtPay').val();
+               var unitCprice = $('#unitCprice').val();
+               if(unitCprice && $('#tradeAmt').val()){
+               $('#shareAmt').val($('#tradeAmt').val()/unitCprice).trigger('blur');
+           }
+        }
+        // add gl GLTZJY-197 交易金额联动带出交易份额 by xuhongfeng 20220531 end
         changeTradeAmtAndFee();
     });
 

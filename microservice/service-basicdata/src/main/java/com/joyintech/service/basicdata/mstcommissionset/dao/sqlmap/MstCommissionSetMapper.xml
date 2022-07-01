@@ -117,21 +117,21 @@
 
 	<select id="getTrdFeeConfigDetailList"
 			resultType="com.joyintech.tams.common.base.entity.TrdFeeConfigDetail">
-		SELECT 
+		SELECT
 			CHARGE_VALUE       chargeValue,
 			FEE_MAXI           feeMaxi,
 			FEE_MINI           feeMini,
 			CHARGE_RATE * 1000 chargeRate,
 			GRADE_AMT / 10000  gradeAmt,
 			GRADE_CONDITION gradeCondition
-	  FROM 
+	  FROM
 	  		TRD_FEE_CONFIG_DETAIL T1
 	  		LEFT JOIN TRD_FEE_CONFIG T2 ON T1.CONFIG_SEQ_NO = T2.SEQ_NO
-	  WHERE 
+	  WHERE
 	  	T2.BATCH_SEQ =#{batchSeq,jdbcType=VARCHAR}
 	  	AND T2.FEE_TYPE IN ('B01','B02','B03','B04','B05','B06','B07')
 	</select>
-    
+
     <!-- 客户代码联想查询 -->
 	<select id="getSecAcctName" parameterType="Map" resultType="com.joyintech.framework.select.SelectOptionDto">
 		SELECT
@@ -141,44 +141,63 @@
 		FROM STL_SEC_ACCT_INFO m
 			 where m.TRADE_PLACE in ('03','04') and ((m.SEC_ACCT_NAME like concat('%',concat(#{secAcctId,jdbcType=VARCHAR},'%'))) or (m.SEC_ACCT_ID like concat('%',concat(#{secAcctId,jdbcType=VARCHAR},'%'))))
 	</select>
-	
+
 	<select id="searchRepeatBySecPs" parameterType="Map" resultType="java.lang.Integer">
 		SELECT
-		    count(1)
-		 FROM TRD_FEE_CONFIG m
-		 where 
-		 m.ps = #{ps,jdbcType=VARCHAR}
-		 and m.TRADE_TYPE = #{tradeType,jdbcType=VARCHAR}
-		 and m.FEE_TYPE = #{feeType,jdbcType=VARCHAR}
-		 and m.EFF_DATE = to_date(#{effDate,jdbcType=VARCHAR},'yyyy-mm-dd HH24:mi:ss')
-		 <if test="secAcctId != null and secAcctId != '' and secAcctId != 'null'">
-		 and m.SEC_ACCT_ID = #{secAcctId,jdbcType=VARCHAR}
-		 </if>
-		<if test="batchSeq != null and batchSeq != ''">
-			 <![CDATA[and  BATCH_SEQ <> #{batchSeq}]]>
+		count(1)
+		FROM TRD_FEE_CONFIG m
+		where
+		<!--交易品种-->
+		m.TRADE_TYPE = #{tradeType,jdbcType=VARCHAR}
+		<!--交易方向-->
+		<if test="ps != null and ps != ''">
+			and m.ps = #{ps,jdbcType=VARCHAR}
 		</if>
+		<!--费用类型-->
+		<if test="feeType != null and feeType != ''">
+			and m.FEE_TYPE = #{feeType,jdbcType=VARCHAR}
+		</if>
+		<!--生效日-->
+		<if test="effDate != null">
+			and m.EFF_DATE = to_date(#{effDate,jdbcType=VARCHAR},'yyyy-mm-dd HH24:mi:ss')
+		</if>
+		<!--证券账户-->
+		<if test="secAcctId != null and secAcctId != '' and secAcctId != 'null'">
+			and m.SEC_ACCT_ID = #{secAcctId,jdbcType=VARCHAR}
+		</if>
+		<if test="batchSeq != null and batchSeq != ''">
+			<![CDATA[and  BATCH_SEQ <> #{batchSeq}]]>
+		</if>
+		<!--期限品种-->
 		<if test="termType != null and termType != ''">
 			and m.TERM_TYPE = #{termType,jdbcType=VARCHAR}
 		</if>
+		<!--交易场所-->
 		<if test="tradeMarket != null and tradeMarket != ''">
 			and m.TRADE_MARKET = #{tradeMarket,jdbcType=VARCHAR}
 		</if>
+		<!-- modify by swwan 2022-06-27 start -->
 		<!-- add by hudongyang 2020-08-05 start -->
-		<if test="customerId != null and customerId != ''">
-			and m.CUSTOMER_ID = #{customerId,jdbcType=VARCHAR}
-		</if>
+		<!--		<if test="customerId != null and customerId != ''">-->
+		<!--			and m.CUSTOMER_ID = #{customerId,jdbcType=VARCHAR}-->
+		<!--		</if>-->
 		<if test="assetClassify1 != null and assetClassify1 != ''">
 			and m.ASSET_CLASSIFY1 = #{assetClassify1,jdbcType=VARCHAR}
 		</if>
 		<if test="assetClassify2 != null and assetClassify2 != ''">
 			and m.ASSET_CLASSIFY2 = #{assetClassify2,jdbcType=VARCHAR}
 		</if>
-		<if test="tradePlat != null and tradePlat != ''">
-			and m.TRADE_PLAT = #{tradePlat,jdbcType=VARCHAR}
+		<!--交易市场-->
+		<if test="tradeMarketMode != null and tradeMarketMode != ''">
+			and m.TRADE_MARKET_MODE = #{tradeMarketMode,jdbcType=VARCHAR}
 		</if>
+		<!--		<if test="tradePlat != null and tradePlat != ''">-->
+		<!--			and m.TRADE_PLAT = #{tradePlat,jdbcType=VARCHAR}-->
+		<!--		</if>-->
 		<!-- add by hudongyang 2020-08-05 start -->
+		<!-- modify by swwan 2022-06-27 end -->
 	</select>
-	
+
 	<select id="getSecRegistOrg" parameterType="Map" resultType="java.lang.String">
 		SELECT
 		    distinct

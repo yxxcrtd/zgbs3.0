@@ -138,4 +138,8 @@ public interface CreditLinesDealsMapper {
 	FinProductType selectByPrimaryKey(FinProductTypeKey key);
 
 	List<PledgeBondInfoDto> findPledgeBondInfo(Map<String, Object> param);
+
+	List<BidOrder> selectBidOrderByFinprodIds(Map<String, Object> param);
+
+	List<BidOrderBidPrice> selectBidOrderBidPriceByFinprodIds(Map<String, Object> param);
 }

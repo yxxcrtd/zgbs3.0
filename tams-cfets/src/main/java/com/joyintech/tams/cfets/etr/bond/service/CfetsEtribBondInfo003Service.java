@@ -65,6 +65,7 @@ import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrIbBondinfo002Mapper;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrCalcAmountRequest;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrCalcAmountResponse;
@@ -116,7 +117,7 @@ import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -437,6 +438,8 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
             }
         }
     }
+
+
 
     /**
      * 修改指令回退时,从废弃表将数据取出重新插入
@@ -1768,9 +1771,10 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
         req.setFlowStatus(DictCodeListExt3.流程节点_流程提交.getValue());
         req.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
         String balanceCheck="Y";
-        if ((StringUtil.isNotEmpty(entity.getSoftSkipMode())
-                && StringUtil.equals(entity.getSoftSkipMode(), DictCodeList.是否_是.getValue()))
-                || StringUtil.isNotEmpty(confirmOk)) {
+        if (isSubmit&&(StringUtil.isNotEmpty(entity.getSoftSkipMode())
+                && StringUtil.equals(entity.getSoftSkipMode(), DictCodeList.是否_是.getValue()))) {
+            balanceCheck = DictCodeList.是否_否.getValue();
+        }else if ( StringUtil.isNotEmpty(confirmOk)) {
             balanceCheck = DictCodeList.是否_否.getValue();
         }
         req.setBalanceCheck(balanceCheck);
@@ -1795,6 +1799,7 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
         req.setCcy(entity.getCcy());
         req.setFinprodId(entity.getFinprodId());
         req.setPtlList(ptlList);
-        PositionHttpRequest.send(req);
+        Map<String, Object> param = PositionHttpRequest.send(req);
+        ThreadLocalUtil.setLocalCache(param);
     }
 }

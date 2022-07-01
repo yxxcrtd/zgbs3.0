@@ -56,6 +56,11 @@ public class PeriodicManagement001Dto extends BaseEntity implements ProcessEntit
 	 * 产品代码
 	 */
 	private String finprodId;
+
+	/**
+	 * 产品代码
+	 */
+	private String finprodMarketId;
 	
 	/**
 	 * 期次代码
@@ -168,6 +173,11 @@ public class PeriodicManagement001Dto extends BaseEntity implements ProcessEntit
 	 * 业绩报酬计算规则明细List
 	 */
 	private List<FinFloatCalcRuleDetail> finFloatCalcRuleDetailList;
+
+	/**
+	 * 保存/提交
+	 */
+	private String saveOrSubmit;
 	 
     /**
      * 获取 effDate
@@ -228,6 +238,14 @@ public class PeriodicManagement001Dto extends BaseEntity implements ProcessEntit
 
 	public void setFinprodId(String finprodId) {
 		this.finprodId = finprodId;
+	}
+
+	public String getFinprodMarketId() {
+		return finprodMarketId;
+	}
+
+	public void setFinprodMarketId(String finprodMarketId) {
+		this.finprodMarketId = finprodMarketId;
 	}
 
 	public String getPeriodId() {
@@ -455,4 +473,12 @@ public class PeriodicManagement001Dto extends BaseEntity implements ProcessEntit
     public String getEndDateStr() {
         return DateUtil.format(this.getEndDate());
     }
+
+	public String getSaveOrSubmit() {
+		return saveOrSubmit;
+	}
+
+	public void setSaveOrSubmit(String saveOrSubmit) {
+		this.saveOrSubmit = saveOrSubmit;
+	}
 }

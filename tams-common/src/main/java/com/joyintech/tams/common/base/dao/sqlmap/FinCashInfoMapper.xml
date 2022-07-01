@@ -241,4 +241,8 @@
             COLLECT_TYPE = #{collectType,jdbcType=VARCHAR}
         where CASH_ID = #{cashId,jdbcType=VARCHAR}
     </update>
+
+    <delete id="deleteByFinprodIdAndBranch">
+        delete from FIN_CASH_INFO where FINPROD_ID = #{finprodId,jdbcType=VARCHAR} and BRANCH = #{branch}
+    </delete>
 </mapper>

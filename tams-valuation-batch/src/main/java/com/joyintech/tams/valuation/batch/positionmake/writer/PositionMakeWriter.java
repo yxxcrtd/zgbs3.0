@@ -10,6 +10,9 @@ import com.joyintech.tams.valuation.batch.positionmake.dto.PositionMakeWriterRes
 import com.joyintech.tams.valuation.common.constants.BookConstant;
 import com.joyintech.tams.valuation.common.utils.DataHandleUtil;
 import org.apache.commons.collections.CollectionUtils;
+import com.joyintech.tools.collectors.JoyinCollectors;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;

@@ -195,9 +195,12 @@ public class RealTimeValMainService {
         List<BokTradeOrder> 交易排序规则 = realTimeValCommonMapper.selectValTradeOrder(
             DictCodeListExt2.会计准则_企业准则.getValue());
 
-        MockCalcAssetValuationResult result = 资产估值及产品交易处理(资产基本信息列表, 组合基本信息DTO, 组合资产估值Map, 资产端交易Map,
-            负债端交易列表, 费用交易列表, 负债端T_N交易列表, t_N资产变化_内部, t_N现金变化_内部, t_N负债变化, 资产端T_N交易Map, 测算开始日,
-            测算结束日, 基准日期, 汇率行情列表, 组合费用头寸扩展列表, 组合估值列表, 划款类交易列表, 划款类T_N交易列表, 交易排序规则);
+        MockCalcAssetValuationResult result = new MockCalcAssetValuationResult();
+        if(资产基本信息列表!=null) {
+            result = 资产估值及产品交易处理(资产基本信息列表, 组合基本信息DTO, 组合资产估值Map, 资产端交易Map,
+                    负债端交易列表, 费用交易列表, 负债端T_N交易列表, t_N资产变化_内部, t_N现金变化_内部, t_N负债变化, 资产端T_N交易Map, 测算开始日,
+                    测算结束日, 基准日期, 汇率行情列表, 组合费用头寸扩展列表, 组合估值列表, 划款类交易列表, 划款类T_N交易列表, 交易排序规则);
+        }
 
         // 现金及费用计提处理
         现金及费用计提处理(组合基本信息DTO, 组合资产估值Map, result, 组合现金Map, 汇率行情列表, 融资成本, 再投收益率, 综合费率, 测算开始日, 测算结束日,

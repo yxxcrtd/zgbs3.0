@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorator="~{invest/settle/fundback/print}">
+      layout:decorate="~{invest/settle/fundback/print}">
 <head>
     <title data-th-if="${paBussType eq PA_BUSINESS_TYPE16}" data-th-text="|拆借录入划款单打印|"></title>
     <title data-th-if="${paBussType eq PA_BUSINESS_TYPE42}" data-th-text="|拆入到期划款单打印|"></title>

@@ -95,6 +95,12 @@ public class MstMarketInstitutionsValidator implements BeanValidator {
                             errorList.add(new ValidMessage("", "市场机构名称已存在！"));
                         }
                     }
+                    // add by swwan 2022-06-27 start TISHKS-1391
+                    // 组织机构代码/统一社会信用代码唯一性check
+                    if (mstMarketInstitutionsService.insitituteCodeCheck(dto.getInsitituteCode()) > 0) {
+                        errorList.add(new ValidMessage("", "组织机构代码/统一社会信用代码已存在！"));
+                    }
+                    // add by swwan 2022-06-27 end
                     // 新建校验
                     List<MstBondCreditRating> mstBondCreditRatingList = dto.getMstBondCreditRating();
                     //判断传入的字段是否为空

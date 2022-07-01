@@ -33,7 +33,7 @@ import com.joyintech.tams.systemtools.dao.TamsBaseMapper;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -280,6 +280,26 @@ public class CfetsIbuQuoteBondController extends BaseController {
 		}
 	}
 
+
+	@ApiOperation(value = "其他分配", notes = "其他分配")
+	@PostMapping("/otherForPtlAllocation")
+	@ResponseBody
+	public Message<List<PtlAllocationDto>> otherForPtlAllocation(@RequestBody AutoAllocationRequest autoAllocationRequest) {
+		try {
+			ibuQuoteBondCalService.calOtherForPtlAllocation(autoAllocationRequest.getPtlAllocations(), autoAllocationRequest);
+			if (CollectionUtils.isNotEmpty(autoAllocationRequest.getPtlAllocations())){
+				for (PtlAllocationDto ptlAllocationDto : autoAllocationRequest.getPtlAllocations()){
+					ptlAllocationDto.setIntAmt(ArithmeticUtil.divide(ptlAllocationDto.getIntAmt(),BigDecimal.valueOf(10000),4));
+					ptlAllocationDto.setCpriceAmt(ArithmeticUtil.divide(ptlAllocationDto.getCpriceAmt(),BigDecimal.valueOf(10000),4));
+					ptlAllocationDto.setFpriceAmt(ArithmeticUtil.divide(ptlAllocationDto.getFpriceAmt(),BigDecimal.valueOf(10000),4));
+				}
+			}
+			return new Message<List<PtlAllocationDto>>().success().setData(autoAllocationRequest.getPtlAllocations());
+		} catch (Exception e) {
+			logger.error("其他分配异常", e);
+			return new Message<List<PtlAllocationDto>>().fail().setMessage("其他分配异常");
+		}
+	}
 
 	@ApiOperation(value = "自动分配", notes = "自动分配")
 	@PostMapping("/autoAllocation")

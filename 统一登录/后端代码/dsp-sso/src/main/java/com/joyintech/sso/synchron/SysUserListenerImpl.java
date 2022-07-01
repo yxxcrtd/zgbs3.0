@@ -7,7 +7,7 @@ import com.joyintech.sso.config.service.SsoPlatformService;
 import com.joyintech.system.base.entity.SysUser;
 import com.joyintech.system.user.SysUserListener;
 import com.joyintech.system.user.service.SysUser002Service;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

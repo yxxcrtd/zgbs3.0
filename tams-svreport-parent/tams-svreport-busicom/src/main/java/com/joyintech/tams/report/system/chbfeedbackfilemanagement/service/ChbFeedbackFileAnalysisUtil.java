@@ -7,7 +7,7 @@ import cn.hutool.core.util.ZipUtil;
 import com.joyintech.component.svrreport.chb.dto.XbrliDownLoadXml;
 import com.joyintech.component.svrreport.chb.feedbackmsg.service.ChbFeedbackMsgService;
 import com.joyintech.component.svrreport.chb.util.ChbXmlUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

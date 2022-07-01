@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="~{layout/default}">
+	layout:decorate="~{layout/default}">
 <head>
 <meta charset="UTF-8">
 <title>每日基金行情</title>
@@ -74,7 +74,9 @@
 				</div>
 			</form>
 		</div>
-		<div id="dataTable"></div>
+		<div>
+			<table class="layui-table" id="dataTable"></table>
+		</div>
 	</div>
 </body>
 <div layout:fragment="script">

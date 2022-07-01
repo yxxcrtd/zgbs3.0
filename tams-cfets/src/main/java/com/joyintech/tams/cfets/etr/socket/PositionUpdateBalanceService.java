@@ -1,9 +1,11 @@
 package com.joyintech.tams.cfets.etr.socket;
 
 import com.joyintech.framework.listener.AppStartupListener;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.cfets.etr.bond.dao.WebSocketMapper;
+import com.joyintech.tams.constant.DictCodeList;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -73,8 +76,15 @@ public class PositionUpdateBalanceService implements  ApplicationListener<Applic
     @Override
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
         if(applicationEvent instanceof ContextRefreshedEvent){
-            logger.info("启动头寸余额检测");
-            star();
+            Map<String,Object> param = new HashMap<>();
+            param.put("paraCode","positionMqEnable");
+            String paraValue =webSocketMapper.selectSysParaByCode(param);
+            if(StringUtils.equals(paraValue, DictCodeList.是否_是.getValue())){
+                logger.info("启动头寸余额检测");
+                star();
+            }else{
+                fixedThreadPool.shutdown();
+            }
         }else if(applicationEvent instanceof ContextClosedEvent ||applicationEvent instanceof ContextStoppedEvent){
             logger.info("关闭头寸余额检测");
             stop = true;

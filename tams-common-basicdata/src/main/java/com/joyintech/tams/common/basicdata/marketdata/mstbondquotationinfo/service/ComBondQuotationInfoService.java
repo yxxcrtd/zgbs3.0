@@ -13,7 +13,7 @@ import com.joyintech.tams.common.basicdata.marketdata.mstbondquotationinfo.dto.C
 import com.joyintech.tams.common.basicdata.util.ComBasicDataExcelUtil;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.systemtools.dto.ExcelValidDto;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -77,7 +77,7 @@ public class PositionCommonConstant {
     /**
      * 信用保护凭证
      */
-    public static final String INTERF_TYPE_CERTIFICATE001 = "Certificate001";
+    public static final String INTERF_TYPE_CERTIFICATE001 = "CPC001";
 
     /**
      * 信用保护凭证

@@ -1,10 +1,12 @@
 package com.joyintech.tams.business.asset.protect.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.tams.business.common.dto.CommonMstFileInputParameter;
 import com.joyintech.tams.component.business.core.dto.FileCommonDto;
 import com.joyintech.tams.invest.common.dto.MstFileInputParameter;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
@@ -135,7 +137,7 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
     /**
      * 计息基础 - 计费年度天数
      */
-    @ApiModelProperty(name="basis",value="计费年度天数",required = true)
+    @ApiModelProperty(name="basis",value="计费年度天数")
     private String basis;
     /**
      * 结算方式
@@ -216,7 +218,7 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
      * 附件
      */
     @ApiModelProperty(name="mstFileInputParameter",value="附件")
-    private MstFileInputParameter mstFileInputParameter;
+    private CommonMstFileInputParameter mstFileInputParameter;
 
     private String isOrNoStr;
     private String settleMethodStr;
@@ -224,6 +226,8 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
     private String issuershortStr;
     private String tradeMarketStr;
     private String refSecList;
+
+    private String refSecLists;
 
     public String getIsOrNoStr() {
         return isOrNoStr;
@@ -271,6 +275,14 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
 
     public void setRefSecList(String refSecList) {
         this.refSecList = refSecList;
+    }
+
+    public String getRefSecLists() {
+        return refSecLists;
+    }
+
+    public void setRefSecLists(String refSecLists) {
+        this.refSecLists = refSecLists;
     }
 
     public String getFinprodId() {
@@ -570,11 +582,11 @@ public class CreditProtectionCertificate002Dto extends BaseEntity implements Pro
         this.fileArray = fileArray;
     }
 
-    public MstFileInputParameter getMstFileInputParameter() {
+    public CommonMstFileInputParameter getMstFileInputParameter() {
         return mstFileInputParameter;
     }
 
-    public void setMstFileInputParameter(MstFileInputParameter mstFileInputParameter) {
+    public void setMstFileInputParameter(CommonMstFileInputParameter mstFileInputParameter) {
         this.mstFileInputParameter = mstFileInputParameter;
     }
 }

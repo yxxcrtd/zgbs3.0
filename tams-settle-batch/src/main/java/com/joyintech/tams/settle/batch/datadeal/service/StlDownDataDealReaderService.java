@@ -12,6 +12,7 @@ import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonDto;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonParamDto;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ public class StlDownDataDealReaderService {
 	/**
 	 * 是否单体服务
 	 */
-	@Value("${application.micorservice.contextPath.single:false}")
+	@Value("${application.micorservice.contextpath.single:false}")
 	private boolean isSingle;
 
 	@Autowired(required = false)
@@ -55,7 +56,7 @@ public class StlDownDataDealReaderService {
 	@Qualifier("simpleRestTemplate")
 	protected JoyinRestTemplate simpleRestTemplate;
 
-	@Value("${application.micorservice.contextPath.tamsServer:http://tams-server}")
+	@Value("${application.micorservice.contextpath.tamsServer:http://tams-server}")
 	private String tamsSerever;
 
     @Autowired
@@ -210,7 +211,22 @@ public class StlDownDataDealReaderService {
 						szdJsmxList.clear();
     					for(Map.Entry<String,List<SzdJsmx>> entry : szdJsmxGroupMap.entrySet()){
 							List<SzdJsmx> groupItemSzdJsmxList = entry.getValue();
-							groupItemSzdJsmxList.removeIf(ele ->  StlDataDealProcessConstant.JLLX_002.equals(ele.getJllx()));
+							if(CollectionUtils.isNotEmpty(groupItemSzdJsmxList)){
+								boolean notifyFlag = false;
+								boolean resultFlag = false;
+								for(SzdJsmx szdJsmx : groupItemSzdJsmxList){
+									if(StlDataDealProcessConstant.JLLX_002.equals(szdJsmx.getJllx())){
+										notifyFlag = true;
+									}
+									if(StlDataDealProcessConstant.JLLX_003.equals(szdJsmx.getJllx())){
+										resultFlag = true;
+									}
+								}
+								// 如果当天既有通知又有结果,要去除通知
+								if(notifyFlag && resultFlag){
+									groupItemSzdJsmxList.removeIf(ele ->  StlDataDealProcessConstant.JLLX_002.equals(ele.getJllx()));
+								}
+							}
 							szdJsmxList.addAll(groupItemSzdJsmxList);
 						}
 					}

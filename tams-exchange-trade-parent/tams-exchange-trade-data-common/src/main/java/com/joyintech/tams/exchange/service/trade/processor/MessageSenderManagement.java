@@ -52,14 +52,14 @@ public class MessageSenderManagement extends BaseService {
     @Qualifier("simpleRestTemplate")
     protected JoyinRestTemplate simpleRestTemplate;
 
+    @Value("${trd-info-push-mode:1}")
+    private int trdInfoPushMode;
+    
     /**
      * 是否单体服务
      */
-    @Value("${application.micorservice.contextPath.single:false}")
+    @Value("${application.micorservice.contextpath.single:false}")
     private boolean isSingle;
-
-    @Value("${trd-info-push-mode:1}")
-    private int trdInfoPushMode;
 
     private static final int MQ = 1;
     private static final int INTERFACE = 2;

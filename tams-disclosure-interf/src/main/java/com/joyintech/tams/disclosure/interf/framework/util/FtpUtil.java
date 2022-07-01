@@ -2,7 +2,7 @@ package com.joyintech.tams.disclosure.interf.framework.util;
 
 import com.joyintech.framework.file.SafelyFile;
 import com.joyintech.framework.util.DateUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;

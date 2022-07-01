@@ -9,7 +9,7 @@ import com.joyintech.tams.constant.DictCodeListStl;
 import com.joyintech.tams.settle.batch.datadeal.service.StlDownDataDealReaderService;
 import com.joyintech.tams.settle.batch.datagather.service.StlDataGatherService;
 import com.joyintech.tools.collectors.JoyinCollectors;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.StepExecution;
@@ -48,7 +48,7 @@ public class StlDataGatherJobListener implements JobExecutionListener {
         Date dealDate = jobExecution.getJobParameters().getDate("date");
 
         // 日志处理
-        long bondSuccessCount=0,bondReadCount=0,fundSuccessCount=0,fundReadCount=0,repoSuccessCount=0,repoReadCount=0,sharesSuccessCount=0,sharesReadCount=0;
+        long bondSuccessCount=0,bondReadCount=0,fundSuccessCount=0,fundReadCount=0,repoSuccessCount=0,repoReadCount=0,sharesSuccessCount=0,sharesReadCount=0,creditSuccessCount=0,creditReadCount=0;
         for(StepExecution stepExecution : jobExecution.getStepExecutions()) {
             String stepName = stepExecution.getStepName();
             if(StringUtil.startsWith(stepName, "bond")) {
@@ -71,6 +71,11 @@ public class StlDataGatherJobListener implements JobExecutionListener {
                 sharesReadCount += stepExecution.getReadCount();
                 sharesSuccessCount += stepExecution.getWriteCount();
             }
+            else if(StringUtil.startsWith(stepName, "credit")) {
+                // 信用保护凭证
+                creditSuccessCount += stepExecution.getReadCount();
+                creditReadCount += stepExecution.getWriteCount();
+            }
         }
         List<SettleBatchPara> list = stlDownDataDealService.selectAllParam(dealDate);
         if(CollectionUtils.isNotEmpty(list)) {
@@ -89,6 +94,9 @@ public class StlDataGatherJobListener implements JobExecutionListener {
                 }
                 else if(StringUtil.equals(DictCodeListExt1.证券品种_回购.getValue(), key)) {
                     saveLogBySecType(paramMap.get(key).get(0).getSeqno(), new Date(), repoReadCount, repoSuccessCount);
+                }
+                else if(StringUtil.equals(DictCodeListStl.证券品种_信用保护凭证.getValue(), key)) {
+                    saveLogBySecType(paramMap.get(key).get(0).getSeqno(), new Date(), creditSuccessCount, creditReadCount);
                 }
             }
         }

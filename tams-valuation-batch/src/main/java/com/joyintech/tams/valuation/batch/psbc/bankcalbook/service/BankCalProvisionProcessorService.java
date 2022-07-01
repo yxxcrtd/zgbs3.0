@@ -17,7 +17,7 @@ import java.util.Map;
 
 import com.joyintech.tams.valuation.common.constants.DictCodeBankBaseSubjectNatrue;
 import com.joyintech.tams.valuation.common.constants.DictCodeBaseSubjectNatrue;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;

@@ -1,24 +1,14 @@
 package com.joyintech.tams.invest.common.trade.service.impl.etrcash;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import com.joyintech.tams.constant.DictCodeListExt3;
-import org.apache.ibatis.annotations.Param;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
-
 import com.joyintech.calculation.CalculatorFactory;
 import com.joyintech.calculation.bonds.PaperIrReset;
 import com.joyintech.calculation.bonds.SecIntSchedule;
-import com.joyintech.calculation.bonds.constant.*;
+import com.joyintech.calculation.bonds.constant.AllocationType;
+import com.joyintech.calculation.bonds.constant.Basis;
+import com.joyintech.calculation.bonds.constant.IntFrequency;
+import com.joyintech.calculation.bonds.constant.IntRateType;
+import com.joyintech.calculation.bonds.constant.SecIntSchCalMethod;
+import com.joyintech.calculation.bonds.constant.Variety;
 import com.joyintech.calculation.shell.AccurIntCalculator;
 import com.joyintech.calculation.shell.param.AccurIntCalInParameter;
 import com.joyintech.calculation.shell.param.AccurIntCalOutParameter;
@@ -26,12 +16,51 @@ import com.joyintech.calculation.shell.param.SecInfoModel;
 import com.joyintech.calculation.util.BasicUtil;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
-import com.joyintech.framework.util.*;
-import com.joyintech.tams.common.base.dao.*;
-import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.framework.util.ArithmeticUtil;
+import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.IDGenerator;
+import com.joyintech.framework.util.SpringContextUtil;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.dao.EtrCashPositionFlowMapper;
+import com.joyintech.tams.common.base.dao.EtrCashPositionMapper;
+import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
+import com.joyintech.tams.common.base.dao.EtrEntrustDetailMapper;
+import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
+import com.joyintech.tams.common.base.dao.EtrSecPositionFlowMapper;
+import com.joyintech.tams.common.base.dao.EtrSecPositionMapper;
+import com.joyintech.tams.common.base.dao.FinProductAddMapper;
+import com.joyintech.tams.common.base.dao.FinProductMapper;
+import com.joyintech.tams.common.base.dao.PtlCapacctInfoMapper;
+import com.joyintech.tams.common.base.dao.WflEtrEntrustAddMapper;
+import com.joyintech.tams.common.base.dao.WflEtrEntrustDetailMapper;
+import com.joyintech.tams.common.base.dao.WflEtrEntrustMapper;
+import com.joyintech.tams.common.base.entity.EtrCashPosition;
+import com.joyintech.tams.common.base.entity.EtrEntrust;
+import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
+import com.joyintech.tams.common.base.entity.EtrEntrustDetail;
+import com.joyintech.tams.common.base.entity.EtrSecPosition;
+import com.joyintech.tams.common.base.entity.FinCashCalcRule;
+import com.joyintech.tams.common.base.entity.FinProduct;
+import com.joyintech.tams.common.base.entity.FinProductAdd;
+import com.joyintech.tams.common.base.entity.PtlCapacctInfo;
+import com.joyintech.tams.common.base.entity.PtlCapacctInfoKey;
+import com.joyintech.tams.common.base.entity.PtlSecPositionFlow;
+import com.joyintech.tams.common.base.entity.PtlSecValution;
+import com.joyintech.tams.common.base.entity.PtlSecValutionKey;
+import com.joyintech.tams.common.base.entity.StlCapacctInfo;
+import com.joyintech.tams.common.base.entity.TrdProductDeal;
+import com.joyintech.tams.common.base.entity.WflEtrEntrust;
+import com.joyintech.tams.common.base.entity.WflEtrEntrustAdd;
+import com.joyintech.tams.common.base.entity.WflEtrEntrustAddKey;
+import com.joyintech.tams.common.base.entity.WflEtrEntrustDetail;
+import com.joyintech.tams.common.base.entity.WflEtrEntrustDetailKey;
+import com.joyintech.tams.common.base.entity.WflEtrEntrustKey;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
@@ -48,7 +77,28 @@ import com.joyintech.tams.invest.common.trade.dto.EtrSecPositionDto;
 import com.joyintech.tams.invest.common.trade.dto.FinCashPlanDto;
 import com.joyintech.tams.invest.common.trade.dto.SecInfoModelDto;
 import com.joyintech.tams.invest.common.trade.service.BussRepoSecService;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * @program: 2.1.0
@@ -909,7 +959,6 @@ public class EtrCommonCashPositionDealService extends BaseService {
         position.setWorkflowId(positionFlowDto.getWorkflowId());
         position.setCreateUser(positionFlowDto.getCreateUser());
         position.setCreateDept(positionFlowDto.getCreateDept());
-        position.setIsExistNew(positionFlowDto.getIsExistNew());
         return position;
     }
 
@@ -1585,8 +1634,9 @@ public class EtrCommonCashPositionDealService extends BaseService {
             }
         }
         if(null != etrEntrust){
-            if(StringUtil.equals(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue(),etrEntrust.getEntrustClass())&&
-                    CollectionUtils.isEmpty(etrEntrustDetailList)) {
+            if((StringUtil.equals(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue(),etrEntrust.getEntrustClass())&&
+                    CollectionUtils.isEmpty(etrEntrustDetailList))
+            || StringUtils.equals(etrEntrust.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())) {
                 WflEtrEntrustDetailKey wflEtrEntrustDetailKey = new WflEtrEntrustDetailKey();
                 wflEtrEntrustDetailKey.setEntrustId(entrustId);
                 wflEtrEntrustDetailKey.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
@@ -1600,7 +1650,8 @@ public class EtrCommonCashPositionDealService extends BaseService {
                     }
                 }
             }
-            if(StringUtil.equals(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue(),etrEntrust.getEntrustClass())){
+            if((StringUtil.equals(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue(),etrEntrust.getEntrustClass()))
+            || StringUtils.equals(etrEntrust.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())){
                 for(int i=0;i<etrEntrustDetailList.size();i++) {
                     EtrEntrustDetail etrEntrustDetail =etrEntrustDetailList.get(i);
                     EtrEntrust newEtrEntrust=new EtrEntrust();

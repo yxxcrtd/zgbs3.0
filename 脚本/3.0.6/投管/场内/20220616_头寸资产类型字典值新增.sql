@@ -1,0 +1,2 @@
+delete from SYS_DATADICT_LIST where DICT_CODE = 'POSITION_TYPE_RULE_ENGINE' and ITEM_CODE = 'A_160';
+insert into SYS_DATADICT_LIST (DICT_CODE, ITEM_CODE, ITEM_VALUE, ORDER_NO, DEFAULT_VALUE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME) values ('POSITION_TYPE_RULE_ENGINE','A_160','场内信用保护凭证可用持仓','500','0','system','',to_date('2019/03/05', 'yyyy/mm/dd'), 'system',to_date('2019/03/05', 'yyyy/mm/dd'));

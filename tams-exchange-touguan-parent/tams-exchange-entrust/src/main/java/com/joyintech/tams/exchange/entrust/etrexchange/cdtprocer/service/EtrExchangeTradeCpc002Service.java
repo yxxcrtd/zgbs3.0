@@ -8,7 +8,6 @@ import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
 import com.joyintech.tams.business.common.dto.PageMode;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.constant.DictCodeList;
@@ -23,9 +22,8 @@ import com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dto.EtrCreditPr
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeUnitCostDto;
 import com.joyintech.tams.exchange.entrust.etrexchange.hqjj.dto.EtrExchangeTradeQuotationHqResponse;
 import com.joyintech.tams.exchange.entrust.etrexchange.hqjj.service.EtrExchangeTradeJj001Service;
-import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeEtrExchangeSecRepoRequest;
-import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradePositionsSecRepoRequest;
-import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradePositionsSecRepoResponse;
+import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.service.EtrExchangeTradeSecRepo001Service;
+import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.service.EtrExchangeTradeSecRepo002Service;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constant.TempConstant;
 import com.joyintech.tams.invest.common.dto.position.PositionCashSecDto;
@@ -52,12 +50,15 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
 
     @Autowired
     private EtrExchangeTradeCpc002Mapper etrExchangeTradeCpc002Mapper;
-    @Autowired
-    private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
+
     @Autowired
     private EtrTradeCommonervice etrTradeCommonervice;
     @Autowired
     private EtrExchangeTradeJj001Service exchangeTradeJj001Service;
+    @Autowired
+    private EtrExchangeTradeSecRepo002Service etrExchangeTradeSecRepo002Service;
+    @Autowired
+    private EtrExchangeTradeSecRepo001Service etrExchangeTradeSecRepo001Service;
     /**
      * 指令列表查询
      * @param request
@@ -161,6 +162,25 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
                 }
                 param.put("A_001", DictCodeListExt3.资产类型_资产账户持仓.getValue());
                 param.put("NO_TRADE_BUSINESS_ETR", TempConstant.NO_TRADE_BUSINESS_ETR);
+                if(Objects.equals(param.get("sort"), "finprodType2Str")){
+                    param.put("sort","finprodType2");
+                } else if (Objects.equals(param.get("sort"), "tradeMarketStr")) {
+                    param.put("sort","tradeMarket");
+                } else if (Objects.equals(param.get("sort"), "businessModelStr")){
+                    param.put("sort","businessModel");
+                }
+                if(Objects.equals(param.get("sort"), "sellNum")){
+                    param.put("sort","");
+                }
+                if(Objects.equals(param.get("sort"), "positionUnitCost")){
+                    param.put("sort","");
+                }
+                if(Objects.equals(param.get("sort"), "positionsAmt")){
+                    param.put("sort","");
+                }
+                if(Objects.equals(param.get("sort"), "price")){
+                    param.put("sort","");
+                }
                 // 浮动盈亏计算修改 modify by yufei 20200806 start
                 Page<EtrCreditProtectionCertificateHoldResponse> result = new Page<>();
                 List<EtrCreditProtectionCertificateHoldResponse> queryList = etrExchangeTradeCpc002Mapper.findPositionsPage(param);
@@ -171,6 +191,9 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
                         //可用数量
                         PositionCashSecDto secDto = new PositionCashSecDto();
                         BeanUtil.copyPropertiesIgnoreNull(secDto, entity);
+                        if (StringUtils.equals(entity.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
+                            secDto.setTradePlat(DictCodeList.交易平台_新债平台.getValue());
+                        }
                         BigDecimal sellNum = etrTradeCommonervice.selectAvailableNum(secDto);
                         entity.setSellNum(ArithmeticUtil.divide(sellNum,new BigDecimal("100"),2));
                         //过滤掉实际持仓和可用持仓都等于0
@@ -178,11 +201,35 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
                             continue;
                         }
                         //最新价从行情取
-                        EtrExchangeTradeQuotationHqResponse hqResponse = exchangeTradeJj001Service.findQuotations(entity.getFinprodMarketId());
-                        if (hqResponse != null) {
-                            BigDecimal lastPrice = hqResponse.getLastPrice() != null ? hqResponse.getLastPrice().setScale(2, BigDecimal.ROUND_HALF_UP) : BigDecimal.valueOf(0.00);
-                            entity.setPrice(lastPrice);
+                        //add wsz 获取 最新估价 作为最新价 start
+                        if(StringUtils.equals(entity.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())){
+//                            EtrCreditProtectionCertificateHoldResponse priceEntity = this.getPrice(entity);
+                            if(entity.getPrice() == null) {
+                                entity.setPrice(new BigDecimal(0.00));
+                            }
+                        } else if (StringUtils.equals(entity.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
+                            EtrExchangeTradeQuotationHqResponse hqResponse = exchangeTradeJj001Service.findQuotations(entity.getFinprodMarketId());
+                            if (hqResponse != null) {
+                                BigDecimal lastPrice = hqResponse.getLastPrice() != null ? hqResponse.getLastPrice().setScale(2, BigDecimal.ROUND_HALF_UP) : BigDecimal.valueOf(0.00);
+                                entity.setPrice(lastPrice);
+                            }
+                            if(entity.getIsNetprice().equals("N") && entity.getFinprodId() != null){
+                                Map<String, Object> map = new HashMap<>();
+                                map.put("ps", "T02");
+                                map.put("calculateField", "02");
+                                map.put("finprodId", entity.getFinprodId());
+                                map.put("prinAmt", new BigDecimal(100));
+                                map.put("fprice", entity.getPrice());
+                                map.put("tradeMarket", entity.getTradeMarket());
+                                Map<String, BigDecimal> returnMap = etrExchangeTradeSecRepo001Service.calcPriceAndYield(map);
+                                if(!Objects.isNull(returnMap) && !Objects.isNull(returnMap.get("cprice"))){
+                                    BigDecimal cPrice = entity.getPrice();
+                                    entity.setPrice(returnMap.get("cprice"));
+                                    entity.setcPrice(cPrice);
+                                }
+                            };
                         }
+                        //add wsz 获取 最新估价 作为最新价end
                         returnList.add(entity);
                     }
                     result.setRoot(returnList);
@@ -213,6 +260,14 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
         return null;
     }
 
+//    public EtrCreditProtectionCertificateHoldResponse getPrice(EtrCreditProtectionCertificateHoldResponse request) {
+//        Map<String,Object> map= new HashMap<>();
+//        map.put("secid",request.getFinprodMarketId());
+//        Date platDate = DateUtil.platDateFromCache();
+//        map.put("nowDate",DateUtil.format(platDate));
+//        return etrExchangeTradeCpc002Mapper.getPrice(map);
+//    }
+
     private Page<EtrCreditProtectionCertificateHoldResponse> calculationAmount(Map<String, EtrExchangeUnitCostDto> unitCostMap,
                                                                                Page<EtrCreditProtectionCertificateHoldResponse> pages,
                                                                                String platDate) {
@@ -226,14 +281,17 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
                     r.setPositionUnitCost(dto.getUnitCost());
                 }
                 // 最新净价*组合持仓.数量 - 持仓成本 as 浮动盈亏
-                BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(),
-                        ArithmeticUtil.multiply(r.getPositionsNum(),new BigDecimal("100")));
+                //数量转化为张
+                BigDecimal num = r.getPositionsNum();
+                if(StringUtils.equals(r.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())){
+                    num = ArithmeticUtil.divide(r.getPositionsNum(), new BigDecimal(10000),0);
+                }
+                BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(),ArithmeticUtil.multiply(num,new BigDecimal("100")));
                 floatFd = ArithmeticUtil.subtract(floatFd, r.getPositionsAmt());
                 r.setFloating(floatFd);
-                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, ArithmeticUtil.multiply(r.getPrice(),
-                        ArithmeticUtil.multiply(r.getPositionsNum(),new BigDecimal("100"))), 2);
+                BigDecimal floatPL = ArithmeticUtil.divide(floatFd,r.getPositionsAmt(),4).multiply(new BigDecimal("100"));
                 r.setFloatingPL(floatPL);
-
+                r.setPositionsNum(ArithmeticUtil.divide(r.getPositionsNum(),new BigDecimal(10000),4));
             });
         }
         return pages;
@@ -248,16 +306,13 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
          * VALUE:持仓单位成本dto
          */
         Map<String, EtrExchangeUnitCostDto> resultMap = new HashMap<>();
-
         // 查询前一日持仓指标
         List<BaseMap> lastCostAmt = selectLastCostAmt(cdate, portfolioIdList, finprodIdList, "");
-
         if (lastCostAmt != null) {
             lastCostAmt.forEach(e -> {
                 if (BigDecimal.ZERO.compareTo(e.getBigDecimal("SHARE_AMT")) != 0) {
                     // 数量不为0时生成单位净价
                     EtrExchangeUnitCostDto dto = new EtrExchangeUnitCostDto();
-
                     dto.setBuyCostAmt(e.getBigDecimal("BUY_COST_AMT"));
                     dto.setShareAmt(e.getBigDecimal("SHARE_AMT"));
                     // 单位成本=成本/数量， （EACH_COST = BUY_COST_AMT / SHARE_AMT）
@@ -269,7 +324,6 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
                 }
             });
         }
-
         // 当日交易数据查询
         List<BaseMap> currTrdData = selectCurrTrdData(cdate, portfolioIdList, finprodIdList, secType1);
         if (currTrdData != null) {
@@ -298,19 +352,28 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
                     dto.setShareAmt(dto.getShareAmt().add(i.getBigDecimal("AMT")));
                     // 单位成本 = 成本/数量
                     dto.setUnitCost(ArithmeticUtil.divide(dto.getBuyCostAmt(), dto.getShareAmt(), 4));
-                } else { // 卖出或行权回售
+                }
+                //add wsz 修改 3.0.6场内 ZGCPCN-1810、ZGCPCN-1811 satrt
+                resultMap.put(key, dto);
+            });
+            currTrdData.forEach(i -> {
+                String key = getKey(i);
+                EtrExchangeUnitCostDto dto = resultMap.get(key);
+                if (dto == null) {
+                    dto = new EtrExchangeUnitCostDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+                    resultMap.put(key, dto);
+                }
+                if (!StringUtil.equals(i.getString("PS"), DictCodeList.交易方向_买入.getValue()) &&
+                        !StringUtil.equals(i.getString("PS"), DictCodeList.交易方向_申购.getValue())) { // 卖出或行权回售
                     // 成本
                     BigDecimal thisBuyCostAmt = dto.getBuyCostAmt()
-                            .subtract(ArithmeticUtil.multiply(i.getBigDecimal("PRICE"), i.getBigDecimal("AMT")));
+                            .subtract(ArithmeticUtil.multiply(dto.getUnitCost(), i.getBigDecimal("AMT")));
                     dto.setBuyCostAmt(thisBuyCostAmt);
-                    // 数量
-                    dto.setShareAmt(dto.getShareAmt().subtract(i.getBigDecimal("AMT")));
-                    // 单位成本 = 成本/数量
-                    dto.setUnitCost(ArithmeticUtil.divide(dto.getBuyCostAmt(), dto.getShareAmt(), 2));
                 }
 
                 resultMap.put(key, dto);
             });
+            //add wsz 修改 3.0.6场内 ZGCPCN-1810、ZGCPCN-1811 end
         }
         return resultMap;
     }
@@ -328,7 +391,8 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
     public List<BaseMap> selectLastCostAmt(Date cdate, List<String> portfolioIdList, List<String> finprodIdList, String secType1) {
         BaseMap reqMap = BaseMap.newMap()
                 .put("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue())    // 债券
-                .put("FINPROD_TYPE_TG_F37", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())    // 债券
+                .put("FINPROD_TYPE_TG_F37", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())
+                .put("SVR_TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue())
                 .put("SVR_TRADE_MARKET_03", DictCodeListExt1.交易场所_上海证券交易所.getValue())
                 .put("SVR_TRADE_MARKET_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue())
                 .put("cdate", DateUtil.addDay(cdate, -1));
@@ -358,9 +422,12 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
         BaseMap reqMap = BaseMap.newMap()
                 .put("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue())    // 债券
                 .put("FINPROD_TYPE_TG_F37", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())
+                .put("SVR_TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue())           // 银行间
                 .put("PS_T01", DictCodeList.交易方向_买入.getValue())
                 .put("PS_T02", DictCodeList.交易方向_卖出.getValue())
+                .put("PS_T03", DictCodeList.交易方向_行权_回售.getValue())
                 .put("PS_T04", DictCodeList.交易方向_申购.getValue())
+                .put("PS_T49", DictCodeListExt1.交易方向_债转股.getValue())
                 .put("SVR_TRADE_MARKET_03", DictCodeListExt1.交易场所_上海证券交易所.getValue())
                 .put("SVR_TRADE_MARKET_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue())
                 .put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue())

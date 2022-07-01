@@ -7,7 +7,10 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
+import com.joyintech.tams.business.common.dto.CfetsSearchInfoRequest;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dao.CfetsPrimaryBidManageMapper;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.*;
 import com.joyintech.tams.constant.DictCodeList;
@@ -18,6 +21,7 @@ import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +47,7 @@ public class CfetsPrimaryBidManage001Service extends BaseService{
      * 基础--中债报送(资产)
      */
     @Autowired(required = false)
-    private JoyinbusinessCommonService joyinbusinessCommonService;
+    private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
 
     @Autowired
     private IPlatformDate iplatformDate;
@@ -184,13 +188,15 @@ public class CfetsPrimaryBidManage001Service extends BaseService{
                 pageParam.put("listingDateEnd",listingDateEnd);
             }
         }
-        pageParam.put("finprodIdList", StringUtil.splitToList(null, request.getFinprodId()));
+        pageParam.put("userId",SecurityUtil.getLoginUser().getUserName());
+        pageParam.put("finprodIdList", StringUtil.splitToList(null, request.getFinprodMarketId()));
         pageParam.put("tradeMarketList", StringUtil.splitToList(null, request.getTradeMarket()));
         pageParam.put("tenderTargetList", StringUtil.splitToList(null, request.getTenderTarget()));
         pageParam.put("winTypeList", StringUtil.splitToList(null, request.getWinType()));
         pageParam.put("payTypeList", StringUtil.splitToList(null, request.getPayType()));
         pageParam.put("bidTypeList", StringUtil.splitToList(null, request.getBidType()));
         pageParam.put("isWinList", StringUtil.splitToList(null, request.getIsWin()));
+        pageParam.put("counterIdList", StringUtil.splitToList(null, request.getCounterId()));
         pageParam.put("platDate", DateUtil.format(DateUtil.platDateFromCache()));
         pageParam.put("sort",request.getPageMode().getSort());
         pageParam.put("direction",request.getPageMode().getDirection());
@@ -215,4 +221,18 @@ public class CfetsPrimaryBidManage001Service extends BaseService{
         return page;
     }
 
+    public Page<SelectOptionDto> getManager(SelectOptionCommonRequest dto) {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("manager", dto.getSearch());
+        return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), ()->joyinbusinessCommonMapper.getManagers(param));
+    }
+
+    public Page<SelectOptionDto> selectPortfolioIdList(SelectOptionCommonRequest dto) {
+        Map<String, Object> param =new HashMap<>();
+        param.put("search",dto.getSearch());
+        param.put("platDate",DateUtil.platDateFromCache());
+        param.put("initValue",dto.getInitValue());
+        param.put("portfolioId", dto.getPortfolioId());
+        return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.selectPortfolioIdList(param));
+    }
 }

@@ -666,6 +666,17 @@ public class FinPlanProfitAssetService extends CommonExportService<FinPlanProfit
         ptlPortfolio.setMdate(finProduct.getMdate());
         ptlPortfolio.setProfitType(finProduct.getProfitType());
         dto.setPtlPortfolio(ptlPortfolio);
+
+        //add by lpf 20220517 start 委外组合塞PA表用于组合关联指标 start
+        PaPtlPortfolio paPtlPortfolio = new PaPtlPortfolio();
+        paPtlPortfolio.setPortfolioId(ptlPortfolio.getPortfolioId());
+        paPtlPortfolio.setInvestNature(finProductAdd.getInvestNature());
+        // modify by swwan TISHKS-1483 start
+        /*paPtlPortfolio.setOpenType("02");
+        paPtlPortfolio.setRaiseType("2");*/
+        // modify by swwan TISHKS-1483 end
+        dto.setPaPtlPortfolio(paPtlPortfolio);
+        //add by lpf 20220517 start 委外组合塞PA表用于组合关联指标 end
         //add end
         /**
          * 构建标的类金融产品买断利率entity

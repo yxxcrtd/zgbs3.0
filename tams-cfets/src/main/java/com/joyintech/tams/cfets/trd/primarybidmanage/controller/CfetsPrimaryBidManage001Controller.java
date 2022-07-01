@@ -3,7 +3,6 @@ package com.joyintech.tams.cfets.trd.primarybidmanage.controller;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
-import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
@@ -11,17 +10,19 @@ import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
+import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.*;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManage001Service;
 import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManageService;
-import com.joyintech.tams.cfets.trd.primarybidmanage.service.CfetsPrimaryBidManageValidatorService;
+import com.joyintech.tams.common.base.dao.BidResultTotalMapper;
 import com.joyintech.tams.common.base.entity.BidOrder;
 import com.joyintech.tams.common.base.entity.BidResultTotal;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -30,7 +31,7 @@ import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -64,7 +66,7 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
     /**
      * 日志
      */
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private CfetsPrimaryBidManageService cfetsPrimaryBidManageService;
@@ -73,22 +75,24 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
     private CfetsPrimaryBidManage001Service cfetsPrimaryBidManage001Service;
 
     @Autowired
-    private CfetsPrimaryBidManageValidatorService cfetsPrimaryBidManageValidatorService;
+    private IPlatformDate iPlatformDate;
 
     @Autowired
-    private IPlatformDate iPlatformDate;
+    private BidResultTotalMapper bidResultTotalMapper;
 
     @ApiOperation(value="查询页面初始化参数", notes = "查询页面初始化参数")
     @PostMapping("/init")
     @ResponseBody
-    public Message<Map<String,Object>> init(){
+    public Message init(){
         Map<String, Object> model = new HashMap<>();
         model.put("TRADE_PLACE", this.getSelectDataFromDataDic(DictCode.交易场所, null));
         model.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
         model.put("BID_STATUS", this.getSelectDataFromDataDic(DictCode.中标方式, null));
         model.put("WIN_TYPE", this.getSelectDataFromDataDic(DictCode.投标方式, null));
-        model.put("PAY_TYPE", this.getSelectDataFromDataDic(DictCode.缴款方式, null));
+        model.put("PAY_TYPE", this.getSelectDataFromDataDic(BussinessDictCode.缴款方式, null));
         model.put("BID_TYPE", this.getSelectDataFromDataDic(DictCode.中标方式, null));
+        model.put("CfetsPrimaryBidCfmManage_list_refresh_period", CacheUtil.getSysParam("CfetsPrimaryBidCfmManage_list_refresh_period"));
+        model.put("CfetsPrimaryBidDetailManage_list_refresh_period", CacheUtil.getSysParam("CfetsPrimaryBidDetailManage_list_refresh_period"));
         model.put("CfetsPrimaryBidManage_list_refresh_period", CacheUtil.getSysParam("CfetsPrimaryBidManage_list_refresh_period"));
         return Message.success("查询页面初始化参数",model);
     }
@@ -288,12 +292,23 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
         public Message<AjaxResult> unWinCheck(@RequestBody CfetsPrimaryBidManageSaveRequest dto, BindingResult result) {
             AjaxResult res= new AjaxResult();
             List<ValidMessage> errorList = new ArrayList<>();
+            if (CollectionUtils.isEmpty(dto.getAllocationDetails())){
+                CfetsPrimaryBidManageCfmRequest request = new CfetsPrimaryBidManageCfmRequest();
+                BeanUtil.copyPropertiesIgnoreNull(request,dto);
+                CfetsPrimaryBidManageSaveRequest saveRequest = cfetsPrimaryBidManageService.getBidManageCfmInsert(request);
+                dto.setAllocationDetails(saveRequest.getAllocationDetails());
+            }
             if(StringUtil.isNotEmpty(dto.getBidId())) {
                 WflValidInputParameter parameter = new WflValidInputParameter();
                 parameter.setPageId("CfetsPrimaryBidManage002");
                 parameter.setBusinessDataPk1(dto.getBidId());
-                if (cfetsPrimaryBidManageService.isInWflProcess(parameter)) {
+                if (cfetsPrimaryBidManageService.isInWflData(parameter)) {
                     errorList.add(new ValidMessage("存在流程中数据，不可进行中标结果维护！"));
+                }
+                parameter.setPageId("CfetsTrdFirstBidFirm002");
+                parameter.setBusinessDataPk1(dto.getBidId());
+                if (cfetsPrimaryBidManageService.isInWflProcess(parameter)) {
+                    errorList.add(new ValidMessage("选择数据须已投标且不存在流程中数据，请重新选择！"));
                 }
                 res.setErrorList(errorList);
                 return new Message<AjaxResult>().success().setData(res);
@@ -313,19 +328,38 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
         @ApiOperation(value = "中标撤销的check", notes = "中标撤销的check")
         @ResponseBody
         @PostMapping("check")
-        public Message<AjaxResult> check(@RequestBody CfetsPrimaryBidManageSaveRequest dto, BindingResult result) {
+        public Message<AjaxResult> revokeCheck(@RequestBody CfetsPrimaryBidManageSaveRequest dto, BindingResult result) {
             AjaxResult res= new AjaxResult();
             List<ValidMessage> errorList = new ArrayList<>();
-            dto.setOperateType("revoke");
-            List<ValidMessage> valid = cfetsPrimaryBidManageValidatorService.valid(dto);
-            errorList.addAll(valid);
+//            List<ValidMessage> valid = cfetsPrimaryBidManageValidatorService.valid(dto);
+//            errorList.addAll(valid);
             if(CollectionUtils.isNotEmpty(dto.getSelectedItem())) {
                 WflValidInputParameter parameter = new WflValidInputParameter();
                 parameter.setPageId("CfetsPrimaryBidManage002");
                 for (CfetsPrimaryBidManageSaveRequest request:dto.getSelectedItem()) {
-                    parameter.setBusinessDataPk2(request.getTotalWinId());
+                    if (CollectionUtils.isEmpty(dto.getAllocationDetails())){
+                        CfetsPrimaryBidManageSaveRequest saveRequest = cfetsPrimaryBidManageService.selectBasicInfo(request);
+                        request.setAllocationDetails(saveRequest.getAllocationDetails());
+                    }
+                    parameter.setBusinessDataPk1(request.getBidId());
                     if (cfetsPrimaryBidManageService.isInWflProcess(parameter)) {
-                        errorList.add(new ValidMessage("存在流程中数据，不可进行中标结果维护！"));
+                        errorList.add(new ValidMessage("存在流程中数据，不可撤销，请重新选择"));
+                        break;
+                    }
+                    if (!request.getStatus().equals(DictCodeListExt1.有效状态_有效.getValue())) {
+                        errorList.add(new ValidMessage("仅可对有效已中标或未中标的数据进行撤销，请重新选择"));
+                        break;
+                    }
+                    BidResultTotal bidResultTotal = bidResultTotalMapper.selectByPrimaryKey(request.getTotalWinId());
+                    if (StringUtil.equals(request.getIsWin(),DictCodeList.是否_是.getValue()) &&
+                            DateUtil.compareDate(iPlatformDate.getSysDate(),bidResultTotal.getWinDate()) != 0) {
+                        errorList.add(new ValidMessage("投标方式为自主投标的已中标有效数据，仅支持当日撤销"));
+                        break;
+                    }
+                    List<String> manualList = cfetsPrimaryBidManageService.selectManualSettleInfo(request.getTotalWinId());
+                    if (manualList.size() > 0) {
+                        errorList.add(new ValidMessage("所选中标结果数据已做交收不支持撤销!业务编号:"+StringUtil.join(manualList,",")));
+                        break;
                     }
                 }
             }
@@ -353,6 +387,7 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
             if (br.hasErrors()) {
                 return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
             }
+            dto.setRemark("中标结果撤销原因："+dto.getRemark());
             List<CfetsPrimaryBidManageSaveRequest> selectedItem = new ArrayList<>();
             for (CfetsPrimaryBidManageSaveRequest requestDto: dto.getSelectedItem()) {
                 CfetsPrimaryBidManageSaveRequest saveRequest = cfetsPrimaryBidManageService.selectBasicInfo(requestDto);
@@ -360,25 +395,34 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
                 selectedItem.add(saveRequest);
             }
             dto.setSelectedItem(selectedItem);
-            ProcessParameter<CfetsPrimaryBidManageSaveRequest> processParameter = new ProcessParameter<CfetsPrimaryBidManageSaveRequest>();
-            WorkFlowParameter<CfetsPrimaryBidManageSaveRequest> params = new WorkFlowParameter<CfetsPrimaryBidManageSaveRequest>();
+            ProcessParameter<CfetsPrimaryBidManageSaveRequest> processParameter = new ProcessParameter<>();
+            WorkFlowParameter<CfetsPrimaryBidManageSaveRequest> params = new WorkFlowParameter<>();
             params.setPageId("CfetsPrimaryBidManage002");
             params.setElementId(dto.getElementId());
-            params.setBusinessCode(item -> item.getBidId());
-            if (StringUtil.equals(dto.getBidModle(),DictCodeListExt4.投标方式_自主投标.getValue())) {
-                params.setBusinessType(DictCodeListExt4.共通业务类型_中标结果维护自主投标.getValue());
-            }else{
-                params.setBusinessType(DictCodeListExt4.共通业务类型_中标结果维护代投代缴.getValue());
-            }
+            params.setBusinessCode(CfetsPrimaryBidManageSaveRequest::getBidId);
+            params.setBusinessType(item->{
+                if (StringUtil.equals(item.getBidModle(),DictCodeListExt4.投标方式_自主投标.getValue())) {
+                    return DictCodeListExt4.共通业务类型_中标结果维护自主投标.getValue();
+                }else{
+                    return DictCodeListExt4.共通业务类型_中标结果维护代投代缴.getValue();
+                }
+            });
             // 设置流程业务说明, entity即传入的dto
             //中标日期+资产简称+中标方式+中标标位+中标券面总额 ArithmeticUtil.multiply(entity.getAllocationDetails().get(0).getBidPrice(), BigDecimal.valueOf(100))+"%"
             params.setComment(entity -> {
-                return WorkFlowUtil.concatComment("中标日期"+
-                        GlobalConstant.OPEN_PARENTHESIS+ iPlatformDate.getSysDateStr() +GlobalConstant.CLOSE_PARENTHESIS+
-                        "资产简称"+GlobalConstant.OPEN_PARENTHESIS+entity.getFinprodAbbr()+GlobalConstant.CLOSE_PARENTHESIS
-                        +"中标方式"+GlobalConstant.OPEN_PARENTHESIS+SysDataUtil.getNameFromDataDict(DictCode.中标方式, entity.getWinType())+GlobalConstant.CLOSE_PARENTHESIS
-                        +"中标标位"+GlobalConstant.OPEN_PARENTHESIS+cfetsPrimaryBidManageService.getBidPriceStr(entity)+GlobalConstant.CLOSE_PARENTHESIS
-                        +"中标券面总额"+GlobalConstant.OPEN_PARENTHESIS+ ArithmeticUtil.divide(entity.getWinPrinamt(),BigDecimal.valueOf(10000),2)+"万元"+GlobalConstant.CLOSE_PARENTHESIS);
+                if (StringUtil.equals(entity.getIsWin(), DictCodeList.是否_是.getValue())
+                        || StringUtil.equals(entity.getIsWin(), DictCodeList.一级投标中标状态_已投标.getValue())) {
+                    return WorkFlowUtil.concatComment("中标日期" +
+                            GlobalConstant.OPEN_PARENTHESIS + iPlatformDate.getSysDateStr() + GlobalConstant.CLOSE_PARENTHESIS +
+                            "资产简称" + GlobalConstant.OPEN_PARENTHESIS + entity.getFinprodAbbr() + GlobalConstant.CLOSE_PARENTHESIS
+                            + "中标方式" + GlobalConstant.OPEN_PARENTHESIS + SysDataUtil.getNameFromDataDict(DictCode.中标方式, entity.getWinType()) + GlobalConstant.CLOSE_PARENTHESIS
+                            + "中标标位" + GlobalConstant.OPEN_PARENTHESIS + cfetsPrimaryBidManageService.getBidPriceStr(entity) + GlobalConstant.CLOSE_PARENTHESIS
+                            + "中标券面总额" + GlobalConstant.OPEN_PARENTHESIS + ArithmeticUtil.divide(entity.getWinPrinamt(), BigDecimal.valueOf(10000), 2) + "万元" + GlobalConstant.CLOSE_PARENTHESIS);
+                } else {
+                    return WorkFlowUtil.concatComment("未中标日期" +
+                            GlobalConstant.OPEN_PARENTHESIS + iPlatformDate.getSysDateStr() + GlobalConstant.CLOSE_PARENTHESIS +
+                            "资产简称" + GlobalConstant.OPEN_PARENTHESIS + entity.getFinprodAbbr() + GlobalConstant.CLOSE_PARENTHESIS + "未中标");
+                }
             });
             processParameter.setOperationType(OperationType.DELETE);
             processParameter.setWorkFlowParameter(params);
@@ -398,7 +442,9 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
             CfetsPrimaryBidManageCfmRequest request = new CfetsPrimaryBidManageCfmRequest();
             request.setBidId(dto.getBidId());
             dto = cfetsPrimaryBidManageService.getBidManageCfmInsert(request);
+            dto.setSettFeeAmt(null);
             dto.setIsWin(DictCodeList.是否_否.getValue());
+            dto.setRemark("未中标");
             dto.setTotalWinId(IDGenerator.generate());
             ProcessParameter<CfetsPrimaryBidManageSaveRequest> processParameter = new ProcessParameter<CfetsPrimaryBidManageSaveRequest>();
             WorkFlowParameter<CfetsPrimaryBidManageSaveRequest> params = new WorkFlowParameter<CfetsPrimaryBidManageSaveRequest>();
@@ -419,8 +465,13 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
             });
             processParameter.setOperationType(OperationType.NEW);
             processParameter.setWorkFlowParameter(params);
-            String msg = cfetsPrimaryBidManageService.start(processParameter, dto);
-            return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
+            try {
+                String msg = cfetsPrimaryBidManageService.start(processParameter, dto);
+                return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
+            } catch (Exception e) {
+                logger.error("保存中标结果维护失败", e);
+                return PositionUtil.ajaxErrorReturn(e);
+            }
         }
 //    /**
 //     * 未中标
@@ -442,4 +493,5 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
 //            return new Message<AjaxResult>().fail().setMessage("未中标保存信息异常");
 //        }
 //    }
+
   }

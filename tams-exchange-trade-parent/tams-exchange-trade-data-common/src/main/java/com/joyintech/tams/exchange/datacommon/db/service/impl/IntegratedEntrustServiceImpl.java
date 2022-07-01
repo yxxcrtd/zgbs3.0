@@ -10,6 +10,7 @@ import com.joyintech.tams.exchange.common.bean.EntrustQryBean;
 import com.joyintech.tams.exchange.common.bean.EntrustQueryBean;
 import com.joyintech.tams.exchange.common.constant.EntrustStatus;
 import com.joyintech.tams.exchange.common.constant.EntrustType;
+import com.joyintech.tams.exchange.common.enums.invest.BussTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrustExample;
@@ -84,11 +85,7 @@ public class IntegratedEntrustServiceImpl extends AsyncServiceImpl<String, Integ
 
     @Override
     public List<IntegratedEntrust> queryCancelIntegratedEntrustByOrigEntrustIdAndAccount(String origEntrustId, String accountId) {
-        return new ArrayList<IntegratedEntrust>(accountIdMap.getOrDefault(accountId, new HashMap<>()).values())
-                .stream().filter(entrust -> origEntrustId.equals(entrust.getOrigEntrustId())
-                        && EntrustType.CANCEL.value.equals(entrust.getEntrustType())
-                        && EntrustStatus.INVALID.value != entrust.getEntrustStatus()
-                        && EntrustStatus.SYSTEM_INVALID.value != entrust.getEntrustStatus()).collect(Collectors.toList());
+        return new ArrayList<IntegratedEntrust>(accountIdMap.getOrDefault(accountId, new HashMap<>()).values()).stream().filter(entrust -> origEntrustId.equals(entrust.getOrigEntrustId()) && EntrustType.CANCEL.value.equals(entrust.getEntrustType()) && EntrustStatus.INVALID.value != entrust.getEntrustStatus() && EntrustStatus.SYSTEM_INVALID.value != entrust.getEntrustStatus()).collect(Collectors.toList());
     }
 
     @Override
@@ -99,9 +96,8 @@ public class IntegratedEntrustServiceImpl extends AsyncServiceImpl<String, Integ
             Map<String, IntegratedEntrust> entrustMap = entry.getValue();
             for (Map.Entry<String, IntegratedEntrust> e : entrustMap.entrySet()) {
                 IntegratedEntrust entrust = e.getValue();
-                if (!EntrustType.CANCEL.value.equals(entrust.getEntrustType())
-                        && statusList.contains(String.valueOf(entrust.getEntrustStatus()))
-                        /*&& ptlAuthList.contains(entrust.getPortfolioId())*/) {
+                if (!EntrustType.CANCEL.value.equals(entrust.getEntrustType()) && statusList.contains(String.valueOf(entrust.getEntrustStatus()))
+                    /*&& ptlAuthList.contains(entrust.getPortfolioId())*/) {
                     entrustList.add(entrust);
                 }
             }
@@ -114,8 +110,7 @@ public class IntegratedEntrustServiceImpl extends AsyncServiceImpl<String, Integ
         Map<String, IntegratedEntrust> accountIntegratedEntrustMap = accountIdMap.get(accountId);
         if (Objects.nonNull(accountIntegratedEntrustMap)) {
             for (IntegratedEntrust integratedEntrust : accountIntegratedEntrustMap.values()) {
-                if (localEntrustId.equals(integratedEntrust.getLocalEntrustId()))
-                    return integratedEntrust;
+                if (localEntrustId.equals(integratedEntrust.getLocalEntrustId())) return integratedEntrust;
             }
         }
         return null;
@@ -125,20 +120,14 @@ public class IntegratedEntrustServiceImpl extends AsyncServiceImpl<String, Integ
     public PageInfo<IntegratedEntrust> queryAllForPage(int pageNum, int pageSize, String accountId, String portfolioId, String market, String stockCode, String entrustProp, int entrustStatus, List<String> ptlAuthList) {
         IntegratedEntrustExample integratedEntrustExample = new IntegratedEntrustExample();
         IntegratedEntrustExample.Criteria criteria = integratedEntrustExample.createCriteria();
-        if (!Strings.isNullOrEmpty(accountId))
-            criteria.andAccountIdEqualTo(accountId);
-        if (!Strings.isNullOrEmpty(portfolioId))
-            criteria.andPortfolioIdEqualTo(portfolioId);
+        if (!Strings.isNullOrEmpty(accountId)) criteria.andAccountIdEqualTo(accountId);
+        if (!Strings.isNullOrEmpty(portfolioId)) criteria.andPortfolioIdEqualTo(portfolioId);
         if (Strings.isNullOrEmpty(portfolioId) && Objects.nonNull(ptlAuthList) && ptlAuthList.size() > 0)
             criteria.andPortfolioIdIn(ptlAuthList);
-        if (!Strings.isNullOrEmpty(market))
-            criteria.andMarketEqualTo(market);
-        if (!Strings.isNullOrEmpty(stockCode))
-            criteria.andStockCodeEqualTo(stockCode);
-        if (!Strings.isNullOrEmpty(entrustProp))
-            criteria.andEntrustPropEqualTo(entrustProp);
-        if (entrustStatus > -100)
-            criteria.andEntrustStatusEqualTo(entrustStatus);
+        if (!Strings.isNullOrEmpty(market)) criteria.andMarketEqualTo(market);
+        if (!Strings.isNullOrEmpty(stockCode)) criteria.andStockCodeEqualTo(stockCode);
+        if (!Strings.isNullOrEmpty(entrustProp)) criteria.andEntrustPropEqualTo(entrustProp);
+        if (entrustStatus > -100) criteria.andEntrustStatusEqualTo(entrustStatus);
         // 过滤撤单委托
         criteria.andEntrustTypeNotEqualTo(EntrustType.CANCEL.value);
         PageHelper.startPage(pageNum, pageSize);
@@ -196,8 +185,8 @@ public class IntegratedEntrustServiceImpl extends AsyncServiceImpl<String, Integ
             if (InvestAssetTypeEnum.isFutures(entrustQueryBean.getAssetType())) {
                 entrustQueryBean.setStockCode(StockCodeUtils.getStockCode(entrustQueryBean.getStockCode()));
             }
-            if("EX005".equals(entrustQueryBean.getBusiTypeTg())){
-                entrustQueryBean.setEntrustPrice(entrustQueryBean.getEntrustPrice().multiply(BigDecimal.valueOf(100)));
+            if (BussTypeEnum.STANDARD_COUPONS_IN_AND_OUT.codeEquals(entrustQueryBean.getBusiTypeTg())) {
+                entrustQueryBean.setEntrustPriceView(entrustQueryBean.getEntrustPrice().multiply(BigDecimal.valueOf(100)));
             }
         });
         return new PageInfo<>(entrustQueryBeanList);

@@ -31,6 +31,8 @@ public interface CreditProtectionCertificatePeriodMapper {
 
     CreditProtectionCertificatePeriodSaveDto getEntityByBusinessCode(@Param("businessCode") String businessCode);
 
+    String getFinprodName(@Param("finprodId") String finprodId);
+
     List<BillingDetailsDto> getBillingDetailByBusinessCode(@Param("businessCode") String businessCode);
 
     /**
@@ -49,24 +51,20 @@ public interface CreditProtectionCertificatePeriodMapper {
 
     /**
      * 发行人=参考实体的债券
-     * @param refEntity
-     * @return
      */
     List<String> getRefSecsByRefEntity(@Param("refEntityArray") String[] refEntityArray);
 
     /**
      * 通过组合代码查询可用数量
-     * @param portfolioId
-     * @param iplatDate
      * @return
      */
     BigDecimal getAmountByPortfolioIdOld(@Param("finprodMarketId") String finprodMarketId, @Param("portfolioId") String portfolioId, @Param("tradeDate") Date tradeDate);
 
     /**
      * 通过组合代码查询可用数量
-     * @param portfolioId
-     * @param iplatDate
      * @return
      */
     BigDecimal getAmountByPortfolioId(@Param("finprodMarketId") String finprodMarketId, @Param("portfolioId") String portfolioId, @Param("tradeDate") Date tradeDate);
+
+    List<SelectOptionDto> queryOptionsForRefSecs(@Param("refSecs") List<String> refSecs);
 }

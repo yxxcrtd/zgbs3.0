@@ -8,6 +8,7 @@
             select
                 aaa.effectiveStatusName,
                 aaa.entrustStatus,
+                aaa.busiTypePosition,
                 aaa.execFinishAmt,
                 aaa.execRemainderAmt,
                 aaa.execProcess,
@@ -60,9 +61,11 @@
         left join SYS_DATADICT_LIST tradeMarketSdl on aaa.tradeMarket=tradeMarketSdl.ITEM_CODE and tradeMarketSdl.DICT_CODE='TRADE_PLACE'
         <where>
             <if test="issueDateStart!=null and issueDateStart!='' and  issueDateEnd!=null and issueDateEnd!='' ">
-                AND  (
-                (aaa.issueDateStart <![CDATA[<=]]> to_date(#{issueDateStart}, 'yyyy-MM-dd') and to_date(#{issueDateStart}, 'yyyy-MM-dd') <![CDATA[<=]]> aaa.issueDateEnd)
-                OR (aaa.issueDateStart <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')  and to_date(#{issueDateEnd}, 'yyyy-MM-dd') <![CDATA[<=]]> aaa.issueDateEnd )
+                AND (
+                (aaa.issueDateStart <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd') and to_date(#{issueDateStart},
+                'yyyy-MM-dd') <![CDATA[<=]]> aaa.issueDateStart)
+                OR (aaa.issueDateEnd <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd') and
+                to_date(#{issueDateStart}, 'yyyy-MM-dd') <![CDATA[<=]]> aaa.issueDateEnd )
                 )
             </if>
             <!-- 组合匹配 -->
@@ -118,6 +121,7 @@
         SELECT
             decode(ee.ENTRUST_STATUS,'08','流程中','有效') AS effectiveStatusName,
             ee.ENTRUST_STATUS entrustStatus,
+            eea.BUSI_TYPE_POSITION busiTypePosition,
             trunc(nvl(efs.ENT_FINISH_AMT, 0)/10000, 2)               execFinishAmt,
             trunc((nvl(ee.ENTRUST_NUM*100,0) -  nvl(efs.ENT_FINISH_AMT, 0))/10000,2) execRemainderAmt,
             trunc(nvl(efs.ENT_FINISH_AMT, 0) /
@@ -134,7 +138,6 @@
                 WHEN bobrt.BID_MODLE IS NULL THEN '01'
                 WHEN bobrt.IS_WIN = 'N' THEN '03'
                 WHEN (bobrt.BID_MODLE IN ('01', '02') AND bobrt.IS_WIN IS NULL) THEN '02'
-                ELSE '05'
             END AS firstBidStatus,
             ee.FINPROD_ID finprodId,
             fp.FINPROD_MARKET_ID finprodMarketId,
@@ -165,7 +168,7 @@
             END AS bidPriceStr,
             CASE
                 WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
-                    fpi.PAY_EDATE
+                    nvl(fpi.PAY_EDATE, fpi.PAY_DATE)
                 ELSE fpi.PAY_DATE
                 END AS payEdate,
             T2.PORTFOLIO_ID portfolioId,
@@ -180,7 +183,7 @@
             ee.REMARK remark,
             CASE
             WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
-            TO_CHAR(fpi.PAY_EDATE, 'yyyy-MM-dd')
+            nvl(TO_CHAR(fpi.PAY_EDATE, 'yyyy-MM-dd'), TO_CHAR(fpi.PAY_DATE, 'yyyy-MM-dd'))
             ELSE TO_CHAR(fpi.PAY_DATE, 'yyyy-MM-dd')
             END AS payEdateStr,
             TO_CHAR(ee.ENTRUST_DATE, 'yyyy-MM-dd')  as etrDateStr,
@@ -191,6 +194,7 @@
             end as issueDateStr
 
         FROM ETR_ENTRUST ee
+        LEFT JOIN ETR_ENTRUST_ADD eea ON ee.ENTRUST_ID = eea.ENTRUST_ID
         LEFT JOIN (select  ENTRUST_ID ,PORTFOLIO_ID from(select ol.ENTRUST_ID,ol.PORTFOLIO_ID, row_number() OVER(PARTITION BY ol.ENTRUST_ID ORDER BY ol.ENTRUST_ID) ds
         from ETR_ENTRUST_DETAIL ol where ol.ENTRUST_ID is not null) where ds = 1   ) det2 ON det2.ENTRUST_ID  = ee.ENTRUST_ID
         INNER JOIN PTL_PORTFOLIO_AUTHORITY PPA ON det2.PORTFOLIO_ID = PPA.PORTFOLIO_ID
@@ -204,12 +208,18 @@
         left join (select sum(ENT_FINISH_AMT) ENT_FINISH_AMT, sum(FINISH_AMT) FINISH_AMT, ENTRUST_ID
         from ETR_FINISH_STATUS
         group by ENTRUST_ID) efs on ee.ENTRUST_ID = efs.ENTRUST_ID
-        left join (select sum(t1.SHARE_AMT) SHARE_AMT, t2.ENTRUST_ID
-        from TRD_PRODUCT_DEAL t1
-        left join TRD_PRODUCT_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
-        where t1.IS_CANCEL = 'N'
-        and t1.TRADE_STATUS != '03'
-        group by t2.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
+        left join (
+            select sum(T.SHARE_AMT) SHARE_AMT, T.ENTRUST_ID from (
+            select t1.SHARE_AMT SHARE_AMT, t2.ENTRUST_ID
+            from TRD_PRODUCT_DEAL t1
+            left join TRD_PRODUCT_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
+            where t1.IS_CANCEL = 'N' and t1.TRADE_STATUS != '03'
+            union all
+            select t1.SHARE_AMT SHARE_AMT, t2.ENTRUST_ID
+            from TRD_PRODUCT_TEMP_DEAL t1
+            left join TRD_PRODUCT_TEMP_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
+            where t1.IS_CANCEL = 'N' and t1.TRADE_STATUS != '03') T
+            group by T.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
         LEFT JOIN
             (select listagg(case
@@ -296,6 +306,7 @@
         SELECT
             decode(ee.ENTRUST_STATUS,'08','流程中','有效') AS effectiveStatusName,
             ee.ENTRUST_STATUS entrustStatus,
+            eea.BUSI_TYPE_POSITION busiTypePosition,
             trunc(nvl(efs.ENT_FINISH_AMT, 0)/10000, 2)               execFinishAmt,
             trunc((nvl(ee.ENTRUST_NUM*100,0) -  nvl(efs.ENT_FINISH_AMT, 0))/10000,2) execRemainderAmt,
             trunc(nvl(efs.ENT_FINISH_AMT, 0) /
@@ -339,7 +350,7 @@
             END AS bidPriceStr,
             CASE
                 WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
-                    fpi.PAY_EDATE
+                    nvl(fpi.PAY_EDATE, fpi.PAY_DATE)
                 ELSE fpi.PAY_DATE
                 END AS payEdate,
             T2.PORTFOLIO_ID portfolioId,
@@ -354,7 +365,7 @@
             ee.REMARK remark,
             CASE
             WHEN fpi.ISSUE_CLASS IN ('02', '03') THEN
-            TO_CHAR(fpi.PAY_EDATE, 'yyyy-MM-dd')
+            nvl(TO_CHAR(fpi.PAY_EDATE, 'yyyy-MM-dd'), TO_CHAR(fpi.PAY_DATE, 'yyyy-MM-dd'))
             ELSE TO_CHAR(fpi.PAY_DATE, 'yyyy-MM-dd')
             END AS payEdateStr,
             TO_CHAR(ee.ENTRUST_DATE, 'yyyy-MM-dd')  as etrDateStr,
@@ -365,6 +376,7 @@
             end as issueDateStr
 
         FROM WFL_ETR_ENTRUST ee
+        LEFT JOIN WFL_ETR_ENTRUST_ADD eea ON ee.ENTRUST_ID = eea.ENTRUST_ID
         LEFT JOIN (select  ENTRUST_ID ,PORTFOLIO_ID from(select ol.ENTRUST_ID,ol.PORTFOLIO_ID, row_number() OVER(PARTITION BY ol.ENTRUST_ID ORDER BY ol.ENTRUST_ID) ds
         from WFL_ETR_ENTRUST_DETAIL ol where ol.ENTRUST_ID is not null) where ds = 1   ) det2 ON det2.ENTRUST_ID  = ee.ENTRUST_ID
         INNER JOIN PTL_PORTFOLIO_AUTHORITY PPA ON det2.PORTFOLIO_ID = PPA.PORTFOLIO_ID
@@ -378,12 +390,18 @@
         left join (select sum(ENT_FINISH_AMT) ENT_FINISH_AMT, sum(FINISH_AMT) FINISH_AMT, ENTRUST_ID
         from ETR_FINISH_STATUS
         group by ENTRUST_ID) efs on ee.ENTRUST_ID = efs.ENTRUST_ID
-        left join (select sum(t1.SHARE_AMT) SHARE_AMT, t2.ENTRUST_ID
-        from TRD_PRODUCT_DEAL t1
-        left join TRD_PRODUCT_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
-        where t1.IS_CANCEL = 'N'
-        and t1.TRADE_STATUS != '03'
-        group by t2.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
+        left join (
+            select sum(T.SHARE_AMT) SHARE_AMT, T.ENTRUST_ID from (
+            select t1.SHARE_AMT SHARE_AMT, t2.ENTRUST_ID
+            from TRD_PRODUCT_DEAL t1
+            left join TRD_PRODUCT_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
+            where t1.IS_CANCEL = 'N' and t1.TRADE_STATUS != '03'
+            union all
+            select t1.SHARE_AMT SHARE_AMT, t2.ENTRUST_ID
+            from TRD_PRODUCT_TEMP_DEAL t1
+            left join TRD_PRODUCT_TEMP_DEAL_ADD t2 on t1.TRADE_ID = t2.TRADE_ID
+            where t1.IS_CANCEL = 'N' and t1.TRADE_STATUS != '03') T
+            group by T.ENTRUST_ID) tpd on tpd.ENTRUST_ID = ee.ENTRUST_ID
         LEFT JOIN MST_COUNTER_PARTY mcp ON mcp.COUNTER_ID  = ee.COUNTER_ID
         LEFT JOIN
             (select listagg(case
@@ -591,6 +609,9 @@
             <if test="tradeMarket !=null and tradeMarket !=''">
                 AND aaa.tradeMarket=#{tradeMarket,jdbcType=VARCHAR}
             </if>
+            <if test="tradeplace !=null and tradeplace !=''">
+                AND aaa.tradeMarket=#{tradeplace,jdbcType=VARCHAR}
+            </if>
             <if test="finprodIdList != null and finprodIdList.size() > 0">
                 AND aaa.finprodId in
                 <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
@@ -598,10 +619,12 @@
                 </foreach>
             </if>
             <if test="issueDateStart!=null and issueDateStart!='' and  issueDateEnd!=null and issueDateEnd!='' ">
-                AND  (
-                    (aaa.issueDateStart <![CDATA[<=]]> to_date(#{issueDateStart}, 'yyyy-MM-dd') and to_date(#{issueDateStart}, 'yyyy-MM-dd') <![CDATA[<=]]> aaa.issueDateEnd)
-                OR (aaa.issueDateStart <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd')  and to_date(#{issueDateEnd}, 'yyyy-MM-dd') <![CDATA[<=]]> aaa.issueDateEnd )
-                    )
+                AND (
+                (aaa.issueDateStart <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd') and to_date(#{issueDateStart},
+                'yyyy-MM-dd') <![CDATA[<=]]> aaa.issueDateStart)
+                OR (aaa.issueDateEnd <![CDATA[<=]]> to_date(#{issueDateEnd}, 'yyyy-MM-dd') and
+                to_date(#{issueDateStart}, 'yyyy-MM-dd') <![CDATA[<=]]> aaa.issueDateEnd )
+                )
             </if>
             <if test="issueStage != null and issueStage.size() > 0">
                 AND aaa.issueStage in
@@ -612,6 +635,7 @@
             <!-- 关键字模糊查询 -->
             <include refid="keywordsWhereIssue"></include>
         </where>
+        ORDER BY issueDateStr
         )
         <!--前端传入排序字段-->
         <if test="pageMode != null and pageMode.sort != null and pageMode.sort != '' and pageMode.direction != null and pageMode.direction != ''">
@@ -690,12 +714,15 @@
                  LEFT JOIN MST_CUSTOMER_INFO CUSTOMER_INFO on CUSTOMER_INFO_ADD.CUSTOMER_ID = CUSTOMER_INFO.CUSTOMER_ID
                  LEFT JOIN FIN_PRODUCT PRODUCT on SEC_INFO.SEC_ID = PRODUCT.FINPROD_MARKET_ID
         <where>
-            SEC_INFO.TRADING_PLACES in ('01','02','03','04') <!-- 限制为银行间和商业柜台,上交所和深交所-->
+            <!-- 限制为银行间和商业柜台,上交所和深交所；排除交易所可转债，可交换债-->
             AND (
-                CASE
-                WHEN RELEASE_INFO.LISTING_DATE IS NOT NULL THEN RELEASE_INFO.LISTING_DATE -1
-                WHEN RELEASE_INFO.ISSUE_DATE IS NOT NULL THEN RELEASE_INFO.ISSUE_DATE
-                END <![CDATA[>=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
+            SEC_INFO.TRADING_PLACES IN ('01', '02')
+            OR (SEC_INFO.TRADING_PLACES IN ('03', '04') AND SEC_INFO.SECONDARY_CLASSIFICATION NOT IN ('70','71') ))
+            AND (
+            CASE
+            WHEN RELEASE_INFO.LISTING_DATE IS NOT NULL THEN RELEASE_INFO.LISTING_DATE -1
+            WHEN RELEASE_INFO.ISSUE_DATE IS NOT NULL THEN RELEASE_INFO.ISSUE_DATE
+            END <![CDATA[>=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
             )
         </where>
     </sql>
@@ -755,19 +782,20 @@
         LEFT JOIN FIN_PRODUCT_TYPE PRODUCT_TYPE ON PRODUCT.FINPROD_ID = PRODUCT_TYPE.FINPROD_ID
         LEFT JOIN MST_INT_RATE_INFO miri ON miri.INT_RATE_ID  = ISSUE.INT_RATE_ID AND miri.EFF_DATE >= TO_DATE(#{platformDate},'YYYY-MM-DD')
         LEFT JOIN (select * from  SYS_DATADICT_LIST where DICT_CODE='SECRATE_DATA') SDLDATA on ISSUE.INT_RATE_ID = SDLDATA.ITEM_CODE
-        <where>
-            PRODUCT.FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR}
-            AND PRODUCT.TRADE_MARKET in ('01','02','03','04') <!-- 限制为银行间和商业柜台,上交所和深交所-->
-            AND (PRODUCT_ADD.ISSUE_STATUS != '02' OR PRODUCT_ADD.ISSUE_STATUS IS NULL ) <!-- 限制为发行状态不为发行失败-->
-            AND (
+            <where>
+                PRODUCT.FINPROD_TYPE2=#{finprodType2,jdbcType=VARCHAR}
+                <!-- 限制为银行间和商业柜台,上交所和深交所；排除交易所可转债，可交换债-->
+                AND (PRODUCT.TRADE_MARKET IN ('01', '02')
+                OR (PRODUCT.TRADE_MARKET IN ('03', '04') AND PRODUCT_TYPE.TYPE_10 NOT IN ('70','71') ))
+                AND (PRODUCT_ADD.ISSUE_STATUS != '02' OR PRODUCT_ADD.ISSUE_STATUS IS NULL ) <!-- 限制为发行状态不为发行失败-->
+                AND (
                 CASE
                 WHEN PRODUCT_ADD.LISTING_DATE IS NOT NULL THEN PRODUCT_ADD.LISTING_DATE -1
                 WHEN ISSUE.ISSUE_DATE IS NOT NULL THEN ISSUE.ISSUE_DATE
                 WHEN ISSUE.TENDER_EDATE IS NOT NULL THEN ISSUE.TENDER_EDATE
                 END <![CDATA[>=]]> TO_DATE(#{platformDate},'YYYY-MM-DD')
-            )
-        </where>
-
+                )
+            </where>
     </sql>
     <select id="selectEntrustById" resultType="com.joyintech.tams.common.base.entity.EtrEntrust" parameterType="java.lang.String" >
         select

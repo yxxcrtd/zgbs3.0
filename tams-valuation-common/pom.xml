@@ -9,9 +9,13 @@
 	<parent>
 		<groupId>com.joyintech</groupId>
 		<artifactId>tams-parent</artifactId>
-		<version>0.0.4</version>
+		<version>0.0.5.1</version>
 	</parent>
 	<dependencies>
+		<dependency>
+			<groupId>dom4j</groupId>
+			<artifactId>dom4j</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
@@ -22,10 +26,10 @@
 			<artifactId>tams-common</artifactId>
 			<version>2.0.0</version>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>dom4j</groupId>
 			<artifactId>dom4j</artifactId>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>com.github.albfernandez</groupId>
 			<artifactId>javadbf</artifactId>
@@ -36,11 +40,13 @@
 		   <artifactId>dc-client</artifactId>
 		   <version>3.2</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports -->
 		<dependency>
-		   <groupId>net.sf</groupId>
-		   <artifactId>jasperreports</artifactId>
-		   <version>6.4.31</version>
+		    <groupId>net.sf.jasperreports</groupId>
+		    <artifactId>jasperreports</artifactId>
+		    <version>6.8.0</version>
 		</dependency>
+		
 		 <dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>

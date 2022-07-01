@@ -21,7 +21,7 @@ import com.joyintech.tams.invest.common.risktrialrds.service.RiskTrialCommCallab
 import com.joyintech.tams.invest.common.risktrialrds.service.SupervisionCalcSvc;
 import com.joyintech.tams.invest.common.risktrialrds.util.Const;
 import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -352,6 +352,10 @@ public class RiskTrialCommImpl  implements RiskTrialComm {
         riskTrialRetDto.setSupFrequency(SupFrequency);
         if (null != param.get(Const.parAstCode))
             riskTrialRetDto.setAssetCode(param.get(Const.parAstCode).toString());
+        // 无法将 NULL 插入 ("RSK_ISUP_POINT_DET_VAL"."ASSET_CODE")
+        if(!StringUtil.isNotEmpty(param.get(Const.parAstCode))){
+            riskTrialRetDto.setAssetCode(" ");
+        }
         if (null != param.get(Const.parAstName))
             riskTrialRetDto.setAssetName(param.get(Const.parAstName).toString());
         riskTrialRetDto.setSupDate(DateUtil.parse(sysParam.getValDate()));

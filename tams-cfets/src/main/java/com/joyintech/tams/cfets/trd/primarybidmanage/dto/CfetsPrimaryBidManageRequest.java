@@ -43,6 +43,9 @@ public class CfetsPrimaryBidManageRequest {
     @ApiModelProperty(name="finprodId",value="资产代码")
     private String finprodId ;
 
+    @ApiModelProperty(name="finprodMarketId",value="资产代码")
+    private String finprodMarketId ;
+
     @ApiModelProperty(name="tenderTarget",value="招标标的code")
     private String tenderTarget;
 
@@ -102,6 +105,25 @@ public class CfetsPrimaryBidManageRequest {
 
     @ApiModelProperty(name="tradeMarket",value="交易场所code")
     private String tradeMarket;
+
+    @ApiModelProperty(name="counterId",value="交易对手")
+    private String counterId;
+
+    public String getFinprodMarketId() {
+        return finprodMarketId;
+    }
+
+    public void setFinprodMarketId(String finprodMarketId) {
+        this.finprodMarketId = finprodMarketId;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
 
     public String getSearch() {
         return search;

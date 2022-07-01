@@ -296,6 +296,15 @@ public interface EtrCommonCashPositionMapper {
 
     List<EtrSecPositionFlowDto> selectAllPositionByTotle(String tradeId);
 
+    /**
+     * 根据产品代码查出所有流水
+     *
+     * @param finprodId
+     * @return
+     */
+    List<EtrSecPositionFlowDto> selectAllPositionByFinprodId(@Param("finprodId") String finprodId);
+
+
     List<EtrCashPositionFlowDto> selectAllCashPositionByTotle(String tradeId);
 
     /**

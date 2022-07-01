@@ -478,11 +478,17 @@ public class PositionRequestManualSettleService {
         //业务动作
         if (StringUtil.equals(entity.getPageModel(), DictCodeListExt3.交收操作类型_交收.getValue())) {
             resultMap.put("busiAct", DictCodeListExt3.业务动作_交收确认.getValue());
+            //前次交易编号
+            resultMap.put("bTotalTradeId", entity.getTradeId());
         } else if (StringUtil.equals(entity.getPageModel(), DictCodeListExt3.交收操作类型_回溯.getValue())) {
             resultMap.put("busiAct", DictCodeListExt3.业务动作_交收回溯.getValue());
+            resultMap.put("bTotalTradeId", entity.getSettleSeqNo());
         } else if (StringUtil.equals(entity.getPageModel(), DictCodeListExt3.交收操作类型_交收失败.getValue())) {
             resultMap.put("busiAct", DictCodeListExt3.业务动作_交收失败.getValue());
+            resultMap.put("bTotalTradeId", entity.getTradeId());
         }
+        resultMap.put("totalTradeId", entity.getSettleSeqNo());
+        resultMap.put("interfaceType", INTERF_TYPE_CERTIFICATE001);
         // 业务类型
         resultMap.put("busiType", DictCodeListExt3.头寸业务类型_信用保护凭证交易.getValue());
         //交易方向
@@ -498,11 +504,9 @@ public class PositionRequestManualSettleService {
         //信用事件结算方式
         resultMap.put("ceSettleType", null);
         //日期
-        resultMap.put("cdate", entity.getTradeDate());
+        resultMap.put("cdate", entity.getSettleDate());
         //币种
         resultMap.put("ccy", infContractDetailfile.getCcy());
-        //前次交易编号
-        resultMap.put("bTotalTradeId", null);
 
         Map<String,Object> paraMap = new HashMap<>();
         paraMap.put("dealNo", entity.getTradeId());

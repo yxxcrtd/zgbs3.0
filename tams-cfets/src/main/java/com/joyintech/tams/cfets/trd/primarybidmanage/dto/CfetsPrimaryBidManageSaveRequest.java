@@ -2,7 +2,10 @@
 
  import com.joyintech.framework.annotation.PageId;
  import com.joyintech.framework.base.BaseEntity;
+ import com.joyintech.framework.util.DateUtil;
+ import com.joyintech.framework.util.StringUtil;
  import com.joyintech.tams.component.business.riskrds.dto.PageModel;
+ import com.joyintech.tams.constant.DictCodeListExt4;
  import com.joyintech.workflow.engine.annotation.PrimaryKey;
  import com.joyintech.workflow.engine.dto.ProcessEntity;
  import io.swagger.annotations.ApiModel;
@@ -137,7 +140,7 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
      @ApiModelProperty(name="tradeMarket",value="交易场所（交易所）")
      private String tradeMarket;
 
-     /**结算服务费*/
+     /**应计利息*/
      @ApiModelProperty(name="intAmt",value="应计利息（元）")
      private BigDecimal intAmt;
 
@@ -168,6 +171,31 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
      @ApiModelProperty(name="bidModle",value="投标方式")
      private String bidModle;
 
+     @ApiModelProperty(name = "softSkipMode", value = "是否忽略头寸软控,编辑页面/提交用", example = "Y")
+     private String softSkipMode;
+
+     @ApiModelProperty(name = "systemAct", value = "头寸_系统动作,编辑页面/提交用", example = "Y")
+     private String systemAct;
+
+     private Date issueDate;
+
+     private String issueClass;
+
+     public String getSoftSkipMode() {
+         return softSkipMode;
+     }
+
+     public void setSoftSkipMode(String softSkipMode) {
+         this.softSkipMode = softSkipMode;
+     }
+
+     public String getSystemAct() {
+         return systemAct;
+     }
+
+     public void setSystemAct(String systemAct) {
+         this.systemAct = systemAct;
+     }
 
      private BaseBidManageBaseInfoDto baseBidManageBaseInfoDto;
 
@@ -495,5 +523,21 @@ public class CfetsPrimaryBidManageSaveRequest extends BaseEntity implements Proc
 
      public void setBidModle(String bidModle) {
          this.bidModle = bidModle;
+     }
+
+     public Date getIssueDate() {
+         return issueDate;
+     }
+
+     public void setIssueDate(Date issueDate) {
+         this.issueDate = issueDate;
+     }
+
+     public String getIssueClass() {
+         return issueClass;
+     }
+
+     public void setIssueClass(String issueClass) {
+         this.issueClass = issueClass;
      }
  }

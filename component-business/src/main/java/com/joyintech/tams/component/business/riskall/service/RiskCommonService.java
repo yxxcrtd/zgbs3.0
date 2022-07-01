@@ -5,10 +5,7 @@ import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.security.LoginUserUtil;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.JsonUtils;
-import com.joyintech.framework.util.SpringContextUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
 import com.joyintech.tams.common.base.dao.PtlPortfolioMapper;
 import com.joyintech.tams.common.base.entity.FinProductType;
@@ -16,6 +13,7 @@ import com.joyintech.tams.common.base.entity.FinProductTypeConfig;
 import com.joyintech.tams.common.base.entity.FinProductTypeKey;
 import com.joyintech.tams.common.base.entity.PtlPortfolio;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
+import com.joyintech.tams.component.business.riskall.constant.NodeConfigConstant;
 import com.joyintech.tams.component.business.riskall.dao.RiskCommonMapper;
 import com.joyintech.tams.component.business.riskall.dto.*;
 import com.joyintech.tams.component.business.riskrds.constant.InterfUtil;
@@ -23,6 +21,8 @@ import com.joyintech.tams.component.business.riskrds.dto.InterfRiskRdsDto;
 import com.joyintech.tams.component.business.riskrds.service.InterfRiskRdsService;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.client.ClientData;
+import com.joyintech.tams.invest.common.constant.BussinessConstant;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.risk.dao.RiskNamListCommonMapper;
@@ -35,7 +35,7 @@ import com.joyintech.tams.invest.common.trade.CreditLinesUpdateImpl;
 import com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto;
 import com.joyintech.tams.invest.common.trade.dto.CreditLinesOutputDto;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,12 +64,6 @@ public class RiskCommonService {
     private InterfRiskRdsService<InterfRiskRdsDto> interfRiskRdsService;
 
     @Autowired
-    private RiskNameListCommonBatchService riskNameListCommonBatchService;
-
-    @Autowired
-    private CommonBusinessService commonBusinessService;
-
-    @Autowired
     private IPlatformDate platformDate;
 
     @Autowired
@@ -89,24 +83,15 @@ public class RiskCommonService {
     private JoyinRestTemplate restTemplate;
 
     /**
-     * 匹配场景信息
-     * @return RiskSceneConfigDto
-     */
-    protected RiskSceneConfigDto matchRiskSceneConfig(){
-
-
-        return new RiskSceneConfigDto();
-    }
-
-    /**
      * 风险占用
      * @param riskCommonInputDto
      */
     protected void doOccupy(RiskCommonInputDto riskCommonInputDto){
         // 判断授信是否控制
         // 入参不为空、授信控制类别为软控、硬控
-        if (!StringUtil.equals(riskCommonInputDto.getCreditControl(), DictCodeListRsk.风险控制类别_不控.getValue())
-            && !StringUtil.isEmptyList(riskCommonInputDto.getCreditInputList())){
+        if (!StringUtil.equals(BussinessDictCodeList.监控授信开关_关.getValue(), CacheUtil.getSysParam(BussinessConstant.ISCREDIT)) &&
+            !StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_不占.getValue())
+                && !StringUtil.isEmptyList(riskCommonInputDto.getCreditInputList())){
             String occupyType = "";
             List<CreditLinesInputDto> list = new ArrayList<>();
             if (StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_预占.getValue())) {
@@ -148,6 +133,9 @@ public class RiskCommonService {
                     list.add(item);
                 });
             }else if (StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_实占预占释放.getValue())) {
+                occupyType = DictCodeListRsk.授信占用类别_实占.getValue();
+                list.addAll(riskCommonInputDto.getCreditInputList());
+                list.forEach(item -> item.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue()));
                 // 接口调用方式待梳理
             }
 
@@ -163,7 +151,7 @@ public class RiskCommonService {
             }
         }
         // 入参不为空、指标控制类别为软控、硬控
-        if (!StringUtil.equals(riskCommonInputDto.getIndicatorControl(), DictCodeListRsk.风险控制类别_不控.getValue())
+        if (!StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_不占.getValue())
             && !StringUtil.isEmptyList(riskCommonInputDto.getRiskRdsDtoList())) {
             InterfRiskRdsDto interfRiskRdsDto = new InterfRiskRdsDto();
             interfRiskRdsDto.setAssetType(riskCommonInputDto.getAssetType());
@@ -178,28 +166,37 @@ public class RiskCommonService {
             if (StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_预占释放.getValue())) {
                 interfRiskRdsDto.setEventType(BussinessDictCodeListRds.事件类型_投资委托.getValue());
                 interfRiskRdsDto.setInfCode(BussinessDictCodeListRds.接口系统ID_预占释放批量接口.getValue());
+                riskCommonInputDto.getRiskRdsDtoList().forEach(item -> item.setRevokeFlg(DictCodeList.是否_是.getValue()));
             }
             if (StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_实占释放.getValue())) {
                 interfRiskRdsDto.setEventType(BussinessDictCodeListRds.事件类型_投资交易.getValue());
                 interfRiskRdsDto.setInfCode(BussinessDictCodeListRds.接口系统ID_实占释放批量接口.getValue());
+                riskCommonInputDto.getRiskRdsDtoList().forEach(item -> item.setRevokeFlg(DictCodeList.是否_是.getValue()));
             }
             if (StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_预占释放再预占.getValue())) {
                 interfRiskRdsDto.setEventType(BussinessDictCodeListRds.事件类型_投资委托.getValue());
                 interfRiskRdsDto.setInfCode(BussinessDictCodeListRds.接口系统ID_预占批量接口.getValue());
                 // 处理差分预占参数，接口支持程度待确认
-                riskCommonInputDto.getRiskRdsDtoList().forEach(item -> {
+                /*riskCommonInputDto.getRiskRdsDtoList().forEach(item -> {
                     item.setIsDiffOccupy(DictCodeList.是否_是.getValue());
                     item.setDiffOccupyFlg(item.getEventId());
 //                    item.setIsReverseOccupy(DictCodeList.是否_是.getValue());
-                });
+                });*/
             }
             if (StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_实占释放再实占.getValue())) {
                 interfRiskRdsDto.setEventType(BussinessDictCodeListRds.事件类型_投资交易.getValue());
                 interfRiskRdsDto.setInfCode(BussinessDictCodeListRds.接口系统ID_实占批量接口.getValue());
                 // 处理差分实占参数，接口暂未支持
-                riskCommonInputDto.getRiskRdsDtoList().forEach(item -> item.setIsDiffOccupy(DictCodeList.是否_是.getValue()));
+               /* riskCommonInputDto.getRiskRdsDtoList().forEach(item -> {
+                    item.setIsDiffOccupy(DictCodeList.是否_是.getValue());
+                    item.setDiffOccupyFlg(item.getEventId());
+//                    item.setIsReverseOccupy(DictCodeList.是否_是.getValue());
+                });*/
             }
             if (StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_实占预占释放.getValue())) {
+                interfRiskRdsDto.setEventType(BussinessDictCodeListRds.事件类型_投资交易.getValue());
+                interfRiskRdsDto.setInfCode(BussinessDictCodeListRds.接口系统ID_实占释放批量接口.getValue());
+                riskCommonInputDto.getRiskRdsDtoList().forEach(item -> item.setRevokeFlg(DictCodeList.是否_是.getValue()));
                 // 接口调用方式待梳理
             }
             // 处理软硬控参数
@@ -233,9 +230,10 @@ public class RiskCommonService {
     protected RiskCommonOutputDto doRisk(RiskCommonInputDto riskCommonInputDto){
         RiskCommonOutputDto riskCommonOutputDto = new RiskCommonOutputDto();
         // 判断授信是否控制
-        // 入参不为空、授信控制类别为软控、硬控
-        if (!StringUtil.equals(riskCommonInputDto.getCreditControl(), DictCodeListRsk.风险控制类别_不控.getValue())
-            && !StringUtil.isEmptyList(riskCommonInputDto.getCreditInputList())){
+        if (!StringUtil.equals(BussinessDictCodeList.监控授信开关_关.getValue(), CacheUtil.getSysParam(BussinessConstant.ISCREDIT))
+            && !StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_不占.getValue())
+            && !StringUtil.isEmptyList(riskCommonInputDto.getCreditInputList())
+            && !StringUtil.equals(riskCommonInputDto.getCreditControl(), DictCodeListRsk.风险控制类别_不控.getValue())){
             List<CreditLinesInputDto> list = new ArrayList<>();
             if (StringUtil.equals(riskCommonInputDto.getCreditOccupy(), DictCodeListRsk.风险占用类型_预占.getValue())) {
                 list.addAll(riskCommonInputDto.getCreditInputList());
@@ -268,22 +266,27 @@ public class RiskCommonService {
             }
         }
         // 判断风险指标是否控制
-        // 入参不为空、指标控制类别为软控、硬控
-        if (!StringUtil.equals(riskCommonInputDto.getIndicatorControl(), DictCodeListRsk.风险控制类别_不控.getValue())
-            && !StringUtil.isEmptyList(riskCommonInputDto.getRiskRdsDtoList())){
-
+        //风险试算开关是否打开
+        if (StringUtil.equals(DictCodeListExt1.是或否_是.getValue(),CacheUtil.getSysParam("risk_math_switch"))
+            && !StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_不占.getValue())
+            && !StringUtil.isEmptyList(riskCommonInputDto.getRiskRdsDtoList())
+            && !StringUtil.equals(riskCommonInputDto.getIndicatorControl(), DictCodeListRsk.风险控制类别_不控.getValue())) {
             if (StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_预占释放再预占.getValue())) {
                 // 处理差分预占参数，接口支持程度待确认
-                riskCommonInputDto.getRiskRdsDtoList().forEach(item -> {
-                    item.setIsDiffOccupy(DictCodeList.是否_是.getValue());
-                    item.setDiffOccupyFlg(item.getEventId());
-                    item.setEntrustCode(item.getEventId());
-//                    item.setIsReverseOccupy(DictCodeList.是否_是.getValue());
-                });
+//                riskCommonInputDto.getRiskRdsDtoList().forEach(item -> {
+//                    item.setIsDiffOccupy(DictCodeList.是否_是.getValue());
+//                    item.setDiffOccupyFlg(item.getEventId());
+//                    item.setEntrustCode(item.getEventId());
+////                    item.setIsReverseOccupy(DictCodeList.是否_是.getValue());
+//                });
             }
             if (StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_实占释放再实占.getValue())) {
                 // 处理差分预占参数，接口支持程度待确认
-                riskCommonInputDto.getRiskRdsDtoList().forEach(item -> item.setIsDiffOccupy(DictCodeList.是否_是.getValue()));
+//                riskCommonInputDto.getRiskRdsDtoList().forEach(item -> {
+//                    item.setIsDiffOccupy(DictCodeList.是否_是.getValue());
+//                    item.setDiffOccupyFlg(item.getEventId());
+////                    item.setIsReverseOccupy(DictCodeList.是否_是.getValue());
+//                });
             }
             try {
                 List<Map<String, Object>> sourceList = riskCommonInputDto.getRiskRdsDtoList().stream().map(JsonUtils::object2Map).collect(Collectors.toList());
@@ -297,7 +300,8 @@ public class RiskCommonService {
         }
         // 判断授权是否控制
         // 入参不为空、授权控制类别为软控、硬控
-        if (!StringUtil.equals(riskCommonInputDto.getAuthorizeControl(), DictCodeListRsk.风险控制类别_不控.getValue())){
+        if ((StringUtil.equals(riskCommonInputDto.getEventType(), NodeConfigConstant.ENTRUST) && DictCodeListExt1.是或否_是.getValue().equals(CacheUtil.getSysParam(BussinessConstant.ETRLIMIT_SWITCH)))
+           || (StringUtil.equals(riskCommonInputDto.getEventType(), NodeConfigConstant.TRADE) && DictCodeListExt1.是或否_是.getValue().equals(CacheUtil.getSysParam(BussinessConstant.AUTHORIZE_LIMIT)))) {
             List<RiskAuthorizeDto> authorizeList = new ArrayList<>();
             RiskAuthorizeDto riskAuthorizeDto = excessTraderAuthorizeAmt(riskCommonInputDto);
             if (Objects.nonNull(riskAuthorizeDto)){
@@ -306,12 +310,17 @@ public class RiskCommonService {
             riskCommonOutputDto.setAuthorizeList(authorizeList);
         }
         // 判断名单是否控制
-        // 名单控制类别为软控、硬控
-        if (!StringUtil.equals(riskCommonInputDto.getNameListControl(), DictCodeListRsk.风险控制类别_不控.getValue())){
-            if(!StringUtil.isEmptyList(riskCommonInputDto.getRiskNameList())) {
-                List<RiskNameListDto> riskNameListDtoList = riskCommonInputDto.getRiskNameList();
-                List<RiskNameListResult> resultList = riskNameListValid(riskNameListDtoList,riskCommonInputDto.getNameListType());
-                riskCommonOutputDto.setRiskNameListResultList(resultList);
+        //是否验证资产
+        boolean isCheckAsset = Boolean.parseBoolean(CacheUtil.getSysParam("IS_CHECK_ASSET"));
+        //是否验证机构
+        boolean isCheckOrg = Boolean.parseBoolean(CacheUtil.getSysParam("IS_CHECK_ORG"));
+        if (isCheckAsset || isCheckOrg){
+            if(!StringUtil.equals(riskCommonInputDto.getNameListControl(),DictCodeListRsk.风险控制类别_不控.getValue())) {
+                if (!StringUtil.isEmptyList(riskCommonInputDto.getRiskNameList())) {
+                    List<RiskNameListDto> riskNameListDtoList = riskCommonInputDto.getRiskNameList();
+                    List<RiskNameListResult> resultList = riskNameListValid(riskNameListDtoList, isCheckAsset, isCheckOrg);
+                    riskCommonOutputDto.setRiskNameListResultList(resultList);
+                }
             }
         }
         // 根据软硬控参数处理风险试算结果
@@ -362,7 +371,7 @@ public class RiskCommonService {
                         return;
                     }else {
                         // 软控消息拼接，并且一种风险类型只拼接一次
-                        confirmMsg.append("名单风险试算不通过，是否确认提交！");
+                        confirmMsg.append("名单风险试算不通过！");
                         break;
                     }
                 }
@@ -372,8 +381,7 @@ public class RiskCommonService {
         List<CreditLinesOutputDto> creditResultList = riskCommonOutputDto.getCreditResultList();
         if (!StringUtil.isEmptyList(creditResultList)){
             for (CreditLinesOutputDto creditLinesOutputDto : creditResultList){
-                if (StringUtil.equals(creditLinesOutputDto.getRskStatus(),DictCodeListRsk.试算结果_不通过.getValue())
-                    && StringUtil.isNotEmpty(creditLinesOutputDto.getErrMessage())){
+                if (StringUtil.equals(creditLinesOutputDto.getRskStatus(),DictCodeListRsk.试算结果_不通过.getValue())){
                     riskCommonOutputDto.setRskStatus(DictCodeListRsk.试算结果_不通过.getValue());
                     if (StringUtil.equals(riskCommonInputDto.getCreditControl(),DictCodeListRsk.风险控制类别_硬控.getValue())){
                         riskCommonOutputDto.setErrorMsg("授信风险试算不通过，不允许提交！");
@@ -381,7 +389,7 @@ public class RiskCommonService {
                         return;
                     }else {
                         // 软控消息拼接，并且一种风险类型只拼接一次
-                        confirmMsg.append("授信风险试算不通过，是否确认提交！");
+                        confirmMsg.append("授信风险试算不通过！");
                         break;
                     }
                 }
@@ -397,7 +405,7 @@ public class RiskCommonService {
                 return;
             }else {
                 // 软控消息拼接，并且一种风险类型只拼接一次
-                confirmMsg.append("指标风险试算不通过，是否确认提交！");
+                confirmMsg.append("指标风险试算不通过!");
             }
 
         }
@@ -408,7 +416,7 @@ public class RiskCommonService {
                 confirmMsg.append("风险审批，是否进入下一审批流？");
             }else {
                 // 软控消息拼接，并且一种风险类型只拼接一次
-                confirmMsg.append("指标审批，是否确认提交!");
+                confirmMsg.append("指标审批！");
             }
 
         }
@@ -419,16 +427,23 @@ public class RiskCommonService {
                 if (StringUtil.equals(riskAuthorizeDto.getRskStatus(),DictCodeListRsk.试算结果_不通过.getValue())){
                     riskCommonOutputDto.setRskStatus(DictCodeListRsk.试算结果_不通过.getValue());
                     if (StringUtil.equals(riskCommonInputDto.getAuthorizeControl(),DictCodeListRsk.风险控制类别_硬控.getValue())){
-                        riskCommonOutputDto.setErrorMsg("发起人超授权，不允许提交！");
+                        if(StringUtil.isNotEmpty(riskAuthorizeDto.getAuthorizeType())) {
+                            riskCommonOutputDto.setErrorMsg("发起人超授权，不允许提交！");
+                        }else {
+                            riskCommonOutputDto.setErrorMsg("未维护授权，不允许提交！");
+                        }
                         // 存在硬控消息只提示其中一个，返回结果
                         return;
                     }else {
                         // 软控消息拼接，并且一种风险类型只拼接一次
-                        confirmMsg.append("发起人超授权，是否确认提交！");
+                        confirmMsg.append("发起人超授权！");
                         break;
                     }
                 }
             }
+        }
+        if(StringUtil.isNotEmpty(confirmMsg)) {
+            confirmMsg.append(" 是否确认提交？");
         }
         riskCommonOutputDto.setConfirmMsg(confirmMsg.toString());
     }
@@ -520,7 +535,7 @@ public class RiskCommonService {
      * @param nameListType
      * @return
      */
-    private List<RiskNameListResult> riskNameListValid(List<RiskNameListDto> riskNameListDtoList,String nameListType){
+    private List<RiskNameListResult> riskNameListValid(List<RiskNameListDto> riskNameListDtoList,boolean isCheckAsset,boolean isCheckOrg){
         List<RiskNamListCommonDto> dtoList = new ArrayList<RiskNamListCommonDto>();
         List<RiskNameListResult> resultList = new ArrayList<>();
         for(RiskNameListDto riskNameList : riskNameListDtoList){
@@ -544,19 +559,9 @@ public class RiskCommonService {
                 if (item == null || StringUtil.isEmpty(item.getListId())){
                     continue;
                 }
-                // 名单控制类别为资产名单时，过滤掉机构名单(名单主体明细类型 不是资产)，不校验
-                if (StringUtil.equals(nameListType,DictCodeListRsk.名单控制类别_资产.getValue())
-                    && !StringUtil.equals(item.getListDetailIdType(), DictCodeListExt2.名单主体明细类型_资产.getValue())){
-                    continue;
-                }
-                // 名单控制类别为机构名单时，过滤掉资产名单(名单主体明细类型是资产)，不校验
-                if (StringUtil.equals(nameListType,DictCodeListRsk.名单控制类别_机构.getValue())
-                    && StringUtil.equals(item.getListDetailIdType(), DictCodeListExt2.名单主体明细类型_资产.getValue())){
-                    continue;
-                }
                 // 名单主体明细类型为资产、资产代码为空时
                 if (StringUtil.equals(item.getListDetailIdType(), DictCodeListExt2.名单主体明细类型_资产.getValue())
-                    && StringUtil.isNotEmpty(item.getFinprodId())){
+                    && StringUtil.isNotEmpty(item.getFinprodId()) && isCheckAsset){
                     Map<String, Object> nameListMap = new HashMap<>();
                     nameListMap.put("listId", item.getListId());
                     nameListMap.put("finprodId", item.getFinprodId());
@@ -580,55 +585,56 @@ public class RiskCommonService {
                         resultList.add(riskNameListResult);
                     }
                     continue;
-                }
-                Map<String, Object> nameListMap = new HashMap<>();
-                nameListMap.put("listId", item.getListId());
-                String customerId = "";
-                if (StringUtil.equals(item.getListDetailIdType(), DictCodeListExt2.名单主体明细类型_发行人.getValue())){
-                    customerId = item.getIssuer();
-                }
-                if (StringUtil.equals(item.getListDetailIdType(), DictCodeListExt2.名单主体明细类型_管理人.getValue())){
-                    customerId = item.getManager();
-                }
-                if (StringUtil.equals(item.getListDetailIdType(), DictCodeListExt2.名单主体明细类型_融资人.getValue())){
-                    customerId = item.getFinancier();
-                }
-                if (StringUtil.isNotEmpty(customerId)){
-                    RiskNamListCommonDto riskNameListCommonDto = riskNamListCommonMapper.selectCustomerInfo(customerId);
-                    if (isCustomerMatch(riskNameListCommonDto, nameListMap)) {
-                        RiskNameListResult riskNameListResult = new RiskNameListResult();
-                        riskNameListResult.setListName(item.getListName());
-                        riskNameListResult.setName(item.getFinprodAbbr());
-                        riskNameListResult.setListDetailType("机构名单");
-                        if (StringUtil.equals(item.getListType(), DictCodeListRsk.名单属性_黑名单.getValue())) {
-                            riskNameListResult.setErrorMsg("机构在黑名单内: "+riskNameListCommonDto.getCustomerName());
-                            riskNameListResult.setRskStatus(DictCodeListRsk.试算结果_不通过.getValue());
-                            riskNameListResult.setListType(DictCodeListRsk.名单属性_黑名单.getValue());
-                        }else {
-                            riskNameListResult.setRskStatus(DictCodeListRsk.试算结果_通过.getValue());
-                            riskNameListResult.setListType(DictCodeListRsk.名单属性_白名单.getValue());
-                        }
-                        resultList.add(riskNameListResult);
+                }else if(isCheckOrg) {
+                    Map<String, Object> nameListMap = new HashMap<>();
+                    nameListMap.put("listId", item.getListId());
+                    String customerId = "";
+                    if (StringUtil.equals(item.getListDetailIdType(), DictCodeListExt2.名单主体明细类型_发行人.getValue())) {
+                        customerId = item.getIssuer();
                     }
-                    continue;
-                }
-                if (StringUtil.equals(item.getListDetailIdType(), DictCodeListExt3.名单主体明细类型_交易对手.getValue())) {
-                    if (param.containsKey("counterId") && StringUtil.isNotEmpty(param.get("counterId"))) {
-                        RiskNamListCommonDto riskNameListCommonDto = riskNamListCommonMapper.selectCustomerInfo2(param.get("counterId").toString(), DictCodeListExt1.交易对手类型_市场机构.getValue());
+                    if (StringUtil.equals(item.getListDetailIdType(), DictCodeListExt2.名单主体明细类型_管理人.getValue())) {
+                        customerId = item.getManager();
+                    }
+                    if (StringUtil.equals(item.getListDetailIdType(), DictCodeListExt2.名单主体明细类型_融资人.getValue())) {
+                        customerId = item.getFinancier();
+                    }
+                    if (StringUtil.isNotEmpty(customerId)) {
+                        RiskNamListCommonDto riskNameListCommonDto = riskNamListCommonMapper.selectCustomerInfo(customerId);
                         if (isCustomerMatch(riskNameListCommonDto, nameListMap)) {
                             RiskNameListResult riskNameListResult = new RiskNameListResult();
                             riskNameListResult.setListName(item.getListName());
                             riskNameListResult.setName(item.getFinprodAbbr());
                             riskNameListResult.setListDetailType("机构名单");
                             if (StringUtil.equals(item.getListType(), DictCodeListRsk.名单属性_黑名单.getValue())) {
-                                riskNameListResult.setErrorMsg("交易对手在黑名单内: "+riskNameListCommonDto.getCustomerName());
-                                riskNameListResult.setRskStatus(DictCodeListRsk.试算结果_不通过.getCodeName());
-                                riskNameListResult.setListType(DictCodeListRsk.名单属性_黑名单.getCodeName());
-                            }else {
-                                riskNameListResult.setRskStatus(DictCodeListRsk.试算结果_通过.getCodeName());
-                                riskNameListResult.setListType(DictCodeListRsk.名单属性_白名单.getCodeName());
+                                riskNameListResult.setErrorMsg("机构在黑名单内: " + riskNameListCommonDto.getCustomerName());
+                                riskNameListResult.setRskStatus(DictCodeListRsk.试算结果_不通过.getValue());
+                                riskNameListResult.setListType(DictCodeListRsk.名单属性_黑名单.getValue());
+                            } else {
+                                riskNameListResult.setRskStatus(DictCodeListRsk.试算结果_通过.getValue());
+                                riskNameListResult.setListType(DictCodeListRsk.名单属性_白名单.getValue());
                             }
                             resultList.add(riskNameListResult);
+                        }
+                        continue;
+                    }
+                    if (StringUtil.equals(item.getListDetailIdType(), DictCodeListExt3.名单主体明细类型_交易对手.getValue())) {
+                        if (param.containsKey("counterId") && StringUtil.isNotEmpty(param.get("counterId"))) {
+                            RiskNamListCommonDto riskNameListCommonDto = riskNamListCommonMapper.selectCustomerInfo2(param.get("counterId").toString(), DictCodeListExt1.交易对手类型_市场机构.getValue());
+                            if (isCustomerMatch(riskNameListCommonDto, nameListMap)) {
+                                RiskNameListResult riskNameListResult = new RiskNameListResult();
+                                riskNameListResult.setListName(item.getListName());
+                                riskNameListResult.setName(item.getFinprodAbbr());
+                                riskNameListResult.setListDetailType("机构名单");
+                                if (StringUtil.equals(item.getListType(), DictCodeListRsk.名单属性_黑名单.getValue())) {
+                                    riskNameListResult.setErrorMsg("交易对手在黑名单内: " + riskNameListCommonDto.getCustomerName());
+                                    riskNameListResult.setRskStatus(DictCodeListRsk.试算结果_不通过.getValue());
+                                    riskNameListResult.setListType(DictCodeListRsk.名单属性_黑名单.getValue());
+                                } else {
+                                    riskNameListResult.setRskStatus(DictCodeListRsk.试算结果_通过.getValue());
+                                    riskNameListResult.setListType(DictCodeListRsk.名单属性_白名单.getValue());
+                                }
+                                resultList.add(riskNameListResult);
+                            }
                         }
                     }
                 }

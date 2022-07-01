@@ -53,6 +53,16 @@ public class CfetsSettleReaderResult extends NeedOperateEntity{
     private String busiType;
     //汇总交易编号
     private String totalTradeId;
+    //操作类型，交收/回溯
+    private String buttonType;
+    //交易编号
+    private String tradeId;
+    //
+    private String finprodId;
+
+    private String counterId;
+
+    private BigDecimal settleAmt;
 
     public TrdBankManualSettleInfo getTrdBankManualSettleInfo() {
         return trdBankManualSettleInfo;
@@ -124,5 +134,47 @@ public class CfetsSettleReaderResult extends NeedOperateEntity{
 
     public void setTotalTradeId(String totalTradeId) {
         this.totalTradeId = totalTradeId;
+    }
+
+    public String getButtonType() {
+        return buttonType;
+    }
+
+    public void setButtonType(String buttonType) {
+        this.buttonType = buttonType;
+    }
+
+    @Override
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    @Override
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
+
+    public String getFinprodId() {
+        return finprodId;
+    }
+
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    public BigDecimal getSettleAmt() {
+        return settleAmt;
+    }
+
+    public void setSettleAmt(BigDecimal settleAmt) {
+        this.settleAmt = settleAmt;
     }
 }

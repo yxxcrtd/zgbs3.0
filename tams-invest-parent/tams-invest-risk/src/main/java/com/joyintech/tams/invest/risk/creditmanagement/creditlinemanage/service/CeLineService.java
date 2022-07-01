@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.util.*;
 
 import com.joyintech.framework.util.*;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.dto.common.ExcelValidDto;
 import com.joyintech.tams.systemtools.util.CommonUtil;
 
@@ -57,12 +58,24 @@ public class CeLineService extends CommonExportService<CreditTagInfoDto>
 	            if(entity.getRiskRatio()==null){
 	            	entity.setRiskRatio(new BigDecimal(100));        		
 	        	}
+                if(StringUtil.isBlank(entity.getIsPerpetualSec())){
+                    entity.setIsPerpetualSec(DictCodeList.是否_否.getValue());
+                }
+                if(StringUtil.isBlank(entity.getIssueType())){
+                    entity.setIssueType(DictCodeList.发行方式_公开发行.getValue());
+                }
 	        }
 	        else {
 	            action = "update";
 	            if(entity.getRiskRatio()==null){
 	            	entity.setRiskRatio(new BigDecimal(100));       		
 	        	}
+                if(StringUtil.isBlank(entity.getIsPerpetualSec())){
+                    entity.setIsPerpetualSec(DictCodeList.是否_否.getValue());
+                }
+                if(StringUtil.isBlank(entity.getIssueType())){
+                    entity.setIssueType(DictCodeList.发行方式_公开发行.getValue());
+                }
 	        }
 	        restTemplate.postForObject(
 	            ServiceApplication.RISK_SERVICE_NAME + "/CeLine002/" + action, entity,

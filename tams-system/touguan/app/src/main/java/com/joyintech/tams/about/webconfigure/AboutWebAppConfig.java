@@ -2,8 +2,8 @@ package com.joyintech.tams.about.webconfigure;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.codingapi.txlcn.tracing.http.spring.WebMvcConfigurer;
 import com.joyintech.tams.about.handlerinterceptor.AboutHandlerInterceptor;
 
 /**

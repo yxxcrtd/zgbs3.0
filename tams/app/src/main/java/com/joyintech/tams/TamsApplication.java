@@ -1,11 +1,12 @@
 package com.joyintech.tams;
 
-import com.joyintech.framework.JoyinApplication;
-import com.joyintech.framework.config.WebApplication;
-import org.springframework.boot.web.support.ErrorPageFilter;
+import java.util.Locale;
+
+import org.springframework.boot.web.servlet.support.ErrorPageFilter;
 import org.springframework.context.annotation.Bean;
 
-import java.util.Locale;
+import com.joyintech.framework.JoyinApplication;
+import com.joyintech.framework.config.WebApplication;
 
 /**
  * @author 王波

@@ -50,7 +50,7 @@ import com.joyintech.tams.invest.period.trdprojduration.dto.TrdProjectDurationPr
 import com.joyintech.tams.invest.period.trdrepoduration.dto.TrdRepoDuration002Dto;
 import com.joyintech.tams.invest.period.trdseclendduration.dto.TrdSecLendDuration002Dto;
 import com.joyintech.workflow.engine.constant.OperationType;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

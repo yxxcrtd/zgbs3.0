@@ -11,14 +11,7 @@
 package com.joyintech.tams.invest.common.redisinit.service.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -467,9 +460,25 @@ public class RiskRedisInitServiceImpl extends BaseService implements RiskRedisIn
             batchSucMap.put("redisErrorMessageList",exceptions);
         }
         if (!CollectionUtils.isEmpty(totalParamValMap)) {
-            totalParamValMap.entrySet().forEach(en -> {
-                if (StringUtil.isNotEmpty(en.getKey())) {
-                    indicatorParamService.deleteInfoFromRedis(RedisKeyEnum.指标参数值.key() + en.getKey(), null);
+            totalParamValMap.forEach((key, value) -> {
+                if (StringUtil.isNotEmpty(key)) {
+                    String[] fieldArray = new String[0];
+                    if(StringUtil.equals("asset",cond.getSource())){
+                        if (!StringUtil.isEmptyList(cond.getCondList())) {
+                            fieldArray = cond.getCondList().toArray(new String[0]);
+                        }
+                        // 过滤掉其他资产，只保留当前新建或编辑的资产
+                        if(value != null && cond != null && cond.getCondList() != null){
+                            value.entrySet().removeIf(map -> {
+                                if(map == null){
+                                    return false;
+                                }
+                                return !cond.getCondList().contains(map.getKey());
+                            });
+                        }
+                    }
+                    // 只删除当前新建或编辑的资产
+                    indicatorParamService.deleteInfoFromRedis(RedisKeyEnum.指标参数值.key() + key, fieldArray);
                 }
             });
         }

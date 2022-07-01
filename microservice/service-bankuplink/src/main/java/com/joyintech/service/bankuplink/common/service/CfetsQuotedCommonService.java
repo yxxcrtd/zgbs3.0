@@ -43,6 +43,7 @@ import com.joyintech.service.bankuplink.repo.dto.CfetsRepoDealQuotedPrice003Dto;
 import com.joyintech.service.bankuplink.repo.service.CfetsRepoDealQuotedPrice001Service;
 import com.joyintech.system.base.entity.SysUserAdd;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
+import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.base.entrust.BusiAutoEtrDispService;
@@ -57,7 +58,7 @@ import com.joyintech.tams.invest.common.dto.cstp.CfetsRepoDealQuotedPriceDto;
 import com.joyintech.tams.invest.common.dto.cstp.CfetsRepoPledgeBondDto;
 import com.joyintech.tams.invest.common.dto.cstp.IbuQuoteEntCrepPledgeCommonDto;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1584,7 +1585,8 @@ public class CfetsQuotedCommonService extends BaseService {
         req.setCcy(com.joyintech.tams.constant.DictCodeList.币种_人民币_CNY.getValue());
         req.setPtlCashList(ptlCashList);
         req.setPtlSecList(ptlSecList);
-        PositionHttpRequest.send(req);
+        Map<String, Object> param = PositionHttpRequest.send(req);
+        ThreadLocalUtil.setLocalCache(param);
     }
 
     /**

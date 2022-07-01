@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorator="~{layout/default}">
+      layout:decorate="~{layout/default}">
 <meta charset="UTF-8">
 <head>
     <title>手工交收</title>
@@ -19,13 +19,15 @@
             <a id="ManualSettle001_btn_settlefail" class="layui-btn layui-btn-sm">交收失败</a>
             <a id="ManualSettle001_btn_export" class="layui-btn layui-btn-sm btn-export btn-default">导出</a>
         </div>
-        <div id="settleStatus_div" style="float:left;margin-left:30px;display:block;line-height:30px;">
-            <label><input name="settleStatus" type="radio" checked lay-filter="settleStatus" value=""  />全部</label>
-            <label><input name="settleStatus" type="radio" value="01" lay-filter="settleStatus"/>未交收</label>
-            <label><input name="settleStatus" type="radio" value="02" lay-filter="settleStatus"/>已交收</label>
-            <label><input name="settleStatus" type="radio" value="03" lay-filter="settleStatus"/>交收延期</label>
-            <label><input name="settleStatus" type="radio" value="04" lay-filter="settleStatus"/>交收失败</label>
-        </div>
+        <!-- ZGCPCN-1553 -->
+<!--        <div id="settleStatus_div" style="float:left;margin-left:30px;display:block;line-height:30px;">-->
+<!--            <label><input name="settleStatus" type="radio" checked lay-filter="settleStatus" value=""  />全部</label>-->
+<!--            <label><input name="settleStatus" type="radio" value="01" lay-filter="settleStatus"/>未交收</label>-->
+<!--            <label><input name="settleStatus" type="radio" value="02" lay-filter="settleStatus"/>已交收</label>-->
+<!--            <label><input name="settleStatus" type="radio" value="03" lay-filter="settleStatus"/>交收延期</label>-->
+<!--            <label><input name="settleStatus" type="radio" value="04" lay-filter="settleStatus"/>交收失败</label>-->
+<!--        </div>-->
+        <!-- ZGCPCN-1553 -->
     </div>
     <div class="joyin-form-wrap joyin-filter-form condition-area">
         <form class="layui-form" id="searchForm">

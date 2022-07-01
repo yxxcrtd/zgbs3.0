@@ -60,6 +60,7 @@
             <result property="bidPrice" column="BID_PRICE" jdbcType="DECIMAL"/>
             <result property="businessModel" column="INV_AIM" jdbcType="VARCHAR"/>
             <result property="acctNo" column="ACCT_NO" jdbcType="VARCHAR"/>
+            <result property="acctNoStr" column="ACCT_NAME" jdbcType="VARCHAR"/>
             <result property="secManageAcctId" column="SEC_ACCT_ID" jdbcType="VARCHAR"/>
             <result property="secManageAcctIdName" column="SEC_ACCT_NAME" jdbcType="VARCHAR"/>
             <result property="invManagerId" column="INV_MANAGER_ID" jdbcType="VARCHAR"/>
@@ -123,6 +124,7 @@
                     eed.PORTFOLIO_ID,
                     pp.PORTFOLIO_NAME/*组合名称*/,
                     eed.ACCT_NO/*资金账户*/,
+                    sci.ACCT_NAME/*资金账户名称*/,
                     case
                         when fpi.TENDER_TARGET = '01' then eebp.BID_PRICE * 100
                         when fpi.TENDER_TARGET = '02' then eebp.BID_PRICE
@@ -145,6 +147,7 @@
                  LEFT JOIN SYS_USER SU ON ee.INV_MANAGER_ID = SU.USER_NAME
                  LEFT JOIN STL_SEC_ACCT_INFO ssai ON eed.SEC_ACCT_ID = ssai.SEC_ACCT_ID
                  LEFT JOIN MST_COUNTER_PARTY MCP ON ee.COUNTER_ID = MCP.COUNTER_ID
+                 left join STL_CAPACCT_INFO sci on sci.ACCT_NO = eed.ACCT_NO
                  left join (select sum(nvl(THE_WIN_PRIN_AMT, 0)) finshNum, ENTRUST_ID, PORTFOLIO_ID, BID_PRICE
                                 from BID_ORDER_BID_PRICE
                                 where IS_CANCEL = 'N'
@@ -166,14 +169,14 @@
                  select distinct t1.BID_MODLE, t2.ENTRUST_ID
                  from BID_ORDER t1
                           left join BID_ORDER_BID_PRICE t2 on t1.BID_ID = t2.BID_ID
-                 where t1.IS_CANCEL = 'N'
-                   and t1.TRADE_STATUS = '01'
+                 where t1.IS_CANCEL = #{YN_N}
+                   and t1.TRADE_STATUS = #{TRADE_STATUS_01}
                  union all
                  select distinct t1.BID_MODLE, t2.ENTRUST_ID
                  from WFL_BID_ORDER t1
                           left join WFL_BID_ORDER_BID_PRICE t2 on t1.BID_ID = t2.BID_ID
              )
-        where BID_MODLE = '03'
+        where BID_MODLE = #{WIN_TYPE}
         <if test="entrustIdList != null and entrustIdList.size()>0">
             and ENTRUST_ID in
             <foreach collection="entrustIdList" open=" (" close=") " separator="," item="item">
@@ -183,10 +186,10 @@
         and ROWNUM = 1
     </select>
 
-    <select id="selectBidFirmCountByEntrustId" resultType="java.lang.Integer">
-        select count(*)
+    <select id="selectBidFirmCountByEntrustId" resultType="java.lang.String">
+        select distinct ENTRUST_ID
         from (
-        select distinct bo.BID_ID
+        select distinct bo.BID_ID,bobp.ENTRUST_ID
         from BID_ORDER bo
         left join BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
         where bo.IS_CANCEL = 'N'
@@ -204,10 +207,11 @@
             </foreach>
         </if>
         union all
-        select distinct bo.BID_ID
+        select distinct bo.BID_ID,bobp.ENTRUST_ID
         from Wfl_BID_ORDER bo
         left join Wfl_BID_ORDER_BID_PRICE bobp on bo.BID_ID = bobp.BID_ID
-        where
+        where bo.IS_CANCEL = 'N'
+        and bo.TRADE_STATUS = '01'
         <if test="bidModles != null and bidModles.size()>0">
             and bo.BID_MODLE in
             <foreach collection="bidModles" open=" (" close=") " separator="," item="item">
@@ -232,7 +236,6 @@
                             WHEN bobrt.BID_MODLE IS NULL THEN '01'
                             WHEN bobrt.IS_WIN = 'N' THEN '03'
                             WHEN (bobrt.BID_MODLE IN ('01', '02') AND bobrt.IS_WIN IS NULL) THEN '02'
-                            ELSE '05'
                             END AS        firstBidStatus,
                         CASE
                             WHEN fpi.ISSUE_CLASS = '02' AND fpi.TENDER_TYPE IN ('01', '02')
@@ -297,11 +300,18 @@
                         and teer.TOTLE_ID = #{totleId}
                     </if>
                    )
-        where issueDateEnd = #{issueDateEnd} and issueDateStart = #{issueDateStart}
+               <where>
+                   <if test="issueDateEnd != null ">
+                       and issueDateEnd = #{issueDateEnd}
+                   </if>
+                   <if test="issueDateStart != null">
+                       and issueDateStart = #{issueDateStart}
+                   </if>
+               </where>
     </select>
 
     <update id="updateBidOrder">
-        UPDATE BID_ORDER SET IS_CANCEL = 'Y',REMARK = #{remark} WHERE BID_ID = #{bidId}
+        UPDATE BID_ORDER SET IS_CANCEL = 'Y',REMARK = #{remark,jdbcType=VARCHAR} WHERE BID_ID = #{bidId}
     </update>
 
     <update id="updateBidOrderBidPrice">
@@ -330,8 +340,8 @@
                        OR fpi.ISSUE_CLASS = '03'
                        THEN fpi.TENDER_EDATE
                    END           AS bidDateEnd/*投标日 结束*/,
-               bo.PAY_DATE          payDate/*缴款日*/,
-               fpi.PAY_EDATE          payEdate/*缴款截止日*/,
+               bo.PAY_DATE payDate/*缴款日*/,
+               bo.PAY_DATE payEdate/*缴款日*/,
                bo.ASSIGN_REGDATE    assignRegdate/*债权债务登记日*/,
                bo.ONMARKET_DATE     listingDate/*上市日*/,
                bo.BID_MODLE      AS biddingMethod/*投标方式*/,
@@ -359,6 +369,7 @@
                bobp.TRADE_AMT/*交易金额*/,
                bobp.INT_AMT/*应计利息总额*/,
                bobp.ACCT_NO/*资金账户*/,
+               sci.ACCT_NAME/*资金账户名称*/,
                bobp.PAYABLE_AMOUNT/*缴款金额*/,
                nvl(nvl(eebp.BID_PRIN_AMT,0)*100 - nvl(T.finshNum,0),0) avaNum /*剩余券面总额*/,
                case
@@ -389,6 +400,7 @@
                  left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = bo.OUR_TRADER
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
                  left join SYS_USER su on su.USER_NAME = ee.INV_MANAGER_ID
+                 left join STL_CAPACCT_INFO sci on sci.ACCT_NO = bobp.ACCT_NO
                  left join ETR_ENTRUST_BID_PRICE eebp on eebp.ENTRUST_ID = bobp.ENTRUST_ID and bobp.PORTFOLIO_ID = eebp.PORTFOLIO_ID and eebp.BID_PRICE = bobp.BID_PRICE
                  left join (select sum(nvl(THE_WIN_PRIN_AMT, 0)) finshNum,  ENTRUST_ID, PORTFOLIO_ID, BID_PRICE
                                 from BID_ORDER_BID_PRICE
@@ -420,7 +432,7 @@
                        THEN fpi.TENDER_EDATE
                    END           AS bidDateEnd/*投标日 结束*/,
                bo.PAY_DATE          payDate/*缴款日*/,
-               fpi.PAY_EDATE          payEdate/*缴款截止日*/,
+               bo.PAY_DATE payEdate/*缴款日*/,
                bo.ASSIGN_REGDATE    assignRegdate/*债权债务登记日*/,
                bo.ONMARKET_DATE     listingDate/*上市日*/,
                bo.BID_MODLE      AS biddingMethod/*投标方式*/,
@@ -448,9 +460,14 @@
                bobp.TRADE_AMT/*交易金额*/,
                bobp.INT_AMT/*应计利息总额*/,
                bobp.ACCT_NO/*资金账户*/,
+               sci.ACCT_NAME/*资金账户名称*/,
                bobp.PAYABLE_AMOUNT/*缴款金额*/,
                nvl(nvl(eebp.BID_PRIN_AMT,0)*100 - nvl(T.finshNum,0),0) avaNum /*剩余券面总额*/,
-               bobp.BID_PRICE/*标位*/,
+               case
+                   when fpi.TENDER_TARGET = '01' then bobp.BID_PRICE * 100
+                   when fpi.TENDER_TARGET = '02' then bobp.BID_PRICE
+                   when fpi.TENDER_TARGET = '03' then bobp.BID_PRICE * 10000
+                   end              BID_PRICE/*标位*/,
                eebp.BID_PRIN_AMT*100 ENTRUST_NUM,
                eed.INV_AIM/*业务模式*/,
                eed.SEC_ACCT_ID,
@@ -475,6 +492,7 @@
                  left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = eed.SEC_ACCT_ID
                  left join SYS_USER su on su.USER_NAME = ee.INV_MANAGER_ID
                  left join ETR_ENTRUST_BID_PRICE eebp on eebp.ENTRUST_ID = bobp.ENTRUST_ID and bobp.PORTFOLIO_ID = eebp.PORTFOLIO_ID and eebp.BID_PRICE = bobp.BID_PRICE
+                 left join STL_CAPACCT_INFO sci on sci.ACCT_NO = bobp.ACCT_NO
                  left join (select sum(nvl(THE_WIN_PRIN_AMT, 0)) finshNum, ENTRUST_ID, PORTFOLIO_ID, BID_PRICE
                                 from BID_ORDER_BID_PRICE
                                 where IS_CANCEL = 'N'
@@ -500,6 +518,11 @@
         WHERE P_TOTLE_TRADE_ID = #{PTotleTradeId}
     </select>
 
+    <select id="findTempTotalByPTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.TrdProductTempDealTotalMapper.BaseResultMap">
+        <include refid="com.joyintech.tams.common.base.dao.TrdProductTempDealTotalMapper.Sql_All_Data" />
+        WHERE P_TOTLE_TRADE_ID = #{PTotleTradeId}
+    </select>
+
     <select id="findTotalByPTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.TrdFinProductDealTotalMapper.BaseResultMap">
         <include refid="com.joyintech.tams.common.base.dao.TrdFinProductDealTotalMapper.Sql_All_Data" />
         WHERE P_TOTLE_TRADE_ID = #{PTotleTradeId}
@@ -512,6 +535,11 @@
 
     <select id="findDealByTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.TrdProductDealMapper.BaseResultMap">
         <include refid="com.joyintech.tams.common.base.dao.TrdProductDealMapper.Sql_All_Data" />
+        WHERE TOTLE_TRADE_ID = #{totleTradeId}
+    </select>
+
+    <select id="findTempDealByTotleTradeId" resultMap="com.joyintech.tams.common.base.dao.TrdProductTempDealMapper.BaseResultMap">
+        <include refid="com.joyintech.tams.common.base.dao.TrdProductTempDealMapper.Sql_All_Data" />
         WHERE TOTLE_TRADE_ID = #{totleTradeId}
     </select>
 
@@ -545,5 +573,22 @@
         select count(*) num
         from BID_RESULT_TOTAL
         where BID_ID = #{bidId}
+    </select>
+
+    <select id="selectByFinprodMarketId" resultType="com.joyintech.tams.common.base.entity.FinProduct">
+        select
+        <include refid="com.joyintech.tams.common.base.dao.FinProductMapper.Base_Column_List" />
+        from FIN_PRODUCT
+        where FINPROD_MARKET_ID in (select CIRCULATION_CODE from FIN_PRODUCT where FINPROD_MARKET_ID = #{finprodMarketId,jdbcType=VARCHAR})
+        and ROWNUM = 1
+    </select>
+
+    <select id="selectSumTotalBidNumByFinprodId" resultType="java.math.BigDecimal">
+        select sum(WIN_PRIN_AMT) amt
+        FROM (
+                 select WIN_PRIN_AMT from BID_ORDER where FINPROD_ID = #{finprodId,jdbcType=VARCHAR} and BID_MODLE = #{WIN_TYPE_01,jdbcType=VARCHAR}
+                 union
+                 select WIN_PRIN_AMT from WFL_BID_ORDER where FINPROD_ID = #{finprodId,jdbcType=VARCHAR} and BID_MODLE = #{WIN_TYPE_01,jdbcType=VARCHAR}
+             )
     </select>
 </mapper>

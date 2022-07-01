@@ -51,48 +51,6 @@ public class ProductReportRegister002Validator implements BeanValidator {
 	public List<ValidMessage> valid(Object value) {
 		ProductReportRegister002Dto entity = (ProductReportRegister002Dto) value;
 		List<ValidMessage> validList = new ArrayList<ValidMessage>();
-		/*
-		 * if (StringUtil.equals(entity.getRepInvestArea(),
-		 * DictCodeListExt2.资金投向地区_境外.getValue()) ||
-		 * StringUtil.equals(entity.getRepInvestArea(),
-		 * DictCodeListExt2.资金投向地区_境内和境外.getValue())) { if
-		 * (!StringUtil.isNotEmpty(entity.getRepInvestCountry())) { validList.add(new
-		 * ValidMessage( this.getMessage("FIN_PROD_E_0001",
-		 * this.getMessage("BussRepFinProductInfo.repInvestCountry")))); } else if
-		 * (entity.getRepInvestCountry() != null &&
-		 * entity.getRepInvestCountry().contains(DictCodeListExt2.所属国家或地区_中国.getValue())
-		 * ) { validList.add(new ValidMessage(this.getMessage(
-		 * "ProductReportRegister001.repInvestCountry.validator"))); } //境外托管机构国别 if
-		 * (!StringUtil.isNotEmpty(entity.getRepInDepName())) { validList.add(new
-		 * ValidMessage( this.getMessage("FIN_PROD_E_0001",
-		 * this.getMessage("BussRepFinProductInfo.repInDepName")))); } else if
-		 * (entity.getRepInDepName() != null &&
-		 * entity.getRepInDepName().contains(DictCodeListExt2.所属国家或地区_中国.getValue())) {
-		 * validList.add(new ValidMessage(this.getMessage(
-		 * "ProductReportRegister001.repInDepName.validator"))); } //境外托管机构名称 if
-		 * (!StringUtil.isNotEmpty(entity.getRepOutDepName())) { validList.add(new
-		 * ValidMessage( this.getMessage("FIN_PROD_E_0001",
-		 * this.getMessage("BussRepFinProductInfo.repOutDepName")))); } } if
-		 * (StringUtil.equals(entity.getRepInvestArea(),
-		 * DictCodeListExt2.资金投向地区_境内.getValue()) ||
-		 * StringUtil.equals(entity.getRepInvestArea(),
-		 * DictCodeListExt2.资金投向地区_境内和境外.getValue())) { if
-		 * (!StringUtil.isNotEmpty(entity.getRepFinanSerModel())) { validList.add(new
-		 * ValidMessage( this.getMessage("FIN_PROD_E_0001",
-		 * this.getMessage("BussRepFinProductInfo.repFinanSerModel")))); }
-		 * if(StringUtils.isEmpty(entity.getRepInDepName())) { validList.add(new
-		 * ValidMessage( this.getMessage("FIN_PROD_E_0001",
-		 * this.getMessage("BussRepFinProductInfo.repInDepName")))); } }
-		 */
-		/*
-		 * if (StringUtil.equals(entity.getRepPmmode(),
-		 * DictCodeListExt2.管理模式_其他机构为实际管理人.getValue()) ||
-		 * StringUtil.equals(entity.getRepPmmode(),
-		 * DictCodeListExt2.管理模式_资产管理公司为实际管理人.getValue())) { if
-		 * (StringUtils.isEmpty(entity.getRepMname())) { validList.add(new ValidMessage(
-		 * this.getMessage("FIN_PROD_E_0001",
-		 * this.getMessage("BussRepFinProductInfo.repMname")))); } }
-		 */
 		//OPEX-597 新建行内识别码输入类似#@#￥的字符，可以保存成功，却无法查看详细信息 guyunfei 20191224 start
 		if(StringUtil.isNotEmpty(entity.getRepFinprodInsId())){
 			String regEx="[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
@@ -309,10 +267,15 @@ public class ProductReportRegister002Validator implements BeanValidator {
 //			}
 //		}
 		// 境内托管机构名称
-		if (StringUtil.isNotEmpty(entity.getRepInDepName())
-				&& RepCheckUtil.checkByteLength(entity.getRepInDepName(), 120)) {
-			validList.add(new ValidMessage("repInDepName",
-					this.getMessage("FW_E_0002", this.getMessage("BussRepFinProductInfo.repInDepName"))));
+		if (StringUtil.isNotEmpty(entity.getRepInDepName())) {
+			if (RepCheckUtil.checkByteLength(entity.getRepInDepName(), 120)) {
+				validList.add(new ValidMessage("repInDepName",
+						this.getMessage("FW_E_0002", this.getMessage("BussRepFinProductInfo.repInDepName"))));
+			}
+			// “当境内托管机构名称为其他时,备注要素不可为空”
+			else if (StringUtil.equals(entity.getRepInDepName(), "99") && StringUtil.isEmpty(entity.getRepRemark())) {
+				validList.add(new ValidMessage("repInDepName", getMessage("BussRepFinProductInfo.repInDepNamAndRepRemark")));
+			}
 		}
 //		if (StringUtil.isNotEmpty(entity.getRepCoopName())) {
 //			if (RepCheckUtil.checkByteLength(entity.getRepCoopName(), 120)) {

@@ -142,7 +142,7 @@ public class FinBondAssetResponse {
     private String exerciseTypeStr;
 
     @ApiModelProperty(name="exerciseDate",value="理论行权日")
-    private Date exerciseDate;
+    private String exerciseDate;
 
     @ApiModelProperty(name="isSus",value="是否永续")
     private String isSus;
@@ -164,6 +164,9 @@ public class FinBondAssetResponse {
 
     @ApiModelProperty(name="crossMarketCode",value="跨市场代码")
     private String crossMarketCode;
+
+    @ApiModelProperty(name="crossMarket",value="跨市场发行")
+    private String crossMarket;
 
     @ApiModelProperty(name="conceptType",value="概念标识Code")
     private String conceptType;
@@ -479,12 +482,11 @@ public class FinBondAssetResponse {
         this.exerciseTypeStr = exerciseTypeStr;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd",timezone = "GMT+8")
-    public Date getExerciseDate() {
+    public String getExerciseDate() {
         return exerciseDate;
     }
 
-    public void setExerciseDate(Date exerciseDate) {
+    public void setExerciseDate(String exerciseDate) {
         this.exerciseDate = exerciseDate;
     }
 
@@ -620,7 +622,7 @@ public class FinBondAssetResponse {
     }
 
     public String getIssueTypeStr() {
-        return SysDataUtil.getNameFromDataDict(DictCode.募集方式, this.getIssueType());
+        return SysDataUtil.getNameFromDataDict(DictCode.债券类资产募集方式, this.getIssueType());
     }
 
     public void setIssueTypeStr(String issueTypeStr) {
@@ -662,5 +664,18 @@ public class FinBondAssetResponse {
 
     public String getBasisRateStr() {
        return SysDataUtil.getNameFromDataDict(DictCode.利率行情, this.getBasisRate());
+    }
+
+
+    public String getCrossMarketStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.是否, this.getCrossMarket());
+    }
+
+    public String getCrossMarket() {
+        return crossMarket;
+    }
+
+    public void setCrossMarket(String crossMarket) {
+        this.crossMarket = crossMarket;
     }
 }

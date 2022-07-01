@@ -7,7 +7,7 @@ import com.joyintech.tams.common.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.valuation.component.business.dao.MstFileCommonServiceMapperImpl;
 import com.joyintech.tams.valuation.component.business.dto.MstFileInputParameter;
 import com.joyintech.tams.valuation.component.business.dto.MstFileOutputParameter;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;

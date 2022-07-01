@@ -59,6 +59,8 @@ public class CfetsSettleAllInfoDto {
     //业务类型
     private String busiType;
 
+    private String counterId;
+
     @Valid
     private List<CfetsSettleDetailInfoDto> cfetsSettleDetailInfoDtoList;
 
@@ -204,5 +206,13 @@ public class CfetsSettleAllInfoDto {
 
     public void setBusiType(String busiType) {
         this.busiType = busiType;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
     }
 }

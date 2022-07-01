@@ -9,19 +9,16 @@ import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
-import com.joyintech.system.base.dao.SysWflBusinessListMapper;
-import com.joyintech.system.base.entity.SysWflBusinessList;
 import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.service.PositionHttpRequest;
+import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
-import com.joyintech.tams.cfets.etr.bond.service.CfetsEtrIbBondinfoService;
-import com.joyintech.tams.cfets.etr.bond.service.CfetsEtribBondInfo003Service;
 import com.joyintech.tams.cfets.risk.service.RiskInputParamSerivce;
+import com.joyintech.tams.component.business.riskall.constant.NodeConfigConstant;
 import com.joyintech.tams.component.business.riskall.dto.RiskCommonOutputDto;
-import com.joyintech.tams.component.business.riskall.service.RiskCommonService;
-import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListRsk;
 import com.joyintech.workflow.engine.constant.OperationType;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -31,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,8 +35,8 @@ import java.util.Map;
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.constant.DictCodeListRsk.试算结果_风险审批;
 
-//@Component
-//@Aspect
+@Component
+@Aspect
 public class CfetsEntrustHanderAop {
     /**
      * 日志
@@ -72,7 +68,8 @@ public class CfetsEntrustHanderAop {
      * 不保存至代办，提交到流程中，需要执行风险占用
      */
     @Pointcut("execution(* com.joyintech.tams.cfets.etr..*.*.doInsert(..))")
-    protected void insertPoint() {}
+    protected void insertPoint() {
+    }
 
     /**
      * 不保存至代办，提交到流程中，需要执行风险占用
@@ -110,14 +107,14 @@ public class CfetsEntrustHanderAop {
         Object[] args = joinPoint.getArgs();
         AjaxResult result = new AjaxResult();
         try {
-            RiskCommonOutputDto outputDto = inputParamSerivce.buildParamThenRisk(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), null);
+            RiskCommonOutputDto outputDto = inputParamSerivce.buildParamThenRisk(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), null, NodeConfigConstant.ENTRUST);
             if (StringUtil.isNotEmpty(outputDto.getErrorMsg())) {
                 result.setErrorList(Lists.newArrayList(new ValidMessage(outputDto.getErrorMsg())));
                 ajaxResultMessage.setData(result);
             } else if (StringUtil.isNotEmpty(outputDto.getConfirmMsg())) {
                 result.setMessage(outputDto.getConfirmMsg(), MessageType.确认消息);
-                if(StringUtil.equals(outputDto.getRskStatus(),试算结果_风险审批.getValue())) {
-                    result.setData(是否_是);
+                if (StringUtil.equals(outputDto.getRskStatus(), 试算结果_风险审批.getValue())) {
+                    result.setData(是否_是.getValue());
                 }
                 ajaxResultMessage.setData(result);
             }
@@ -140,12 +137,26 @@ public class CfetsEntrustHanderAop {
         Object[] args = joinPoint.getArgs();
         Map<String, Object> map = JsonUtils.object2Map(args[0]);
         String operateType = String.valueOf(map.get("operateType"));
-        if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
-            if(StringUtil.equals(args[1].toString(), OperationType.NEW.toString())) {
-                inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
-            }else {
-                inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), null);
+        try {
+            if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
+                if (StringUtil.equals(args[1].toString(), OperationType.NEW.toString())) {
+                    inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+                } else {
+                    inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), null);
+                }
             }
+        } catch (BusinessException e) {
+            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
+            if (CollectionUtils.isEmpty(mapList)) {
+                throw new BusinessException(e);
+            }
+            mapList.forEach(item -> {
+                String revokeId = String.valueOf(item.get("seqno"));
+                String modelType = (String) item.get("modelType");
+                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+            });
+        } finally {
+            ThreadLocalUtil.cleanLocalCache();
         }
     }
 
@@ -160,8 +171,22 @@ public class CfetsEntrustHanderAop {
         Object[] args = joinPoint.getArgs();
         Map<String, Object> map = JsonUtils.object2Map(args[0]);
         String operateType = String.valueOf(map.get("operateType"));
-        if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
-            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), null);
+        try {
+            if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
+                inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), null);
+            }
+        } catch (BusinessException e) {
+            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
+            if (CollectionUtils.isEmpty(mapList)) {
+                throw new BusinessException(e);
+            }
+            mapList.forEach(item -> {
+                String revokeId = String.valueOf(item.get("seqno"));
+                String modelType = (String) item.get("modelType");
+                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+            });
+        } finally {
+            ThreadLocalUtil.cleanLocalCache();
         }
     }
 
@@ -176,8 +201,22 @@ public class CfetsEntrustHanderAop {
         Object[] args = joinPoint.getArgs();
         Map<String, Object> map = JsonUtils.object2Map(args[0]);
         String operateType = String.valueOf(map.get("operateType"));
-        if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
-            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
+        try {
+            if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
+                inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
+            }
+        } catch (BusinessException e) {
+            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
+            if (CollectionUtils.isEmpty(mapList)) {
+                throw new BusinessException(e);
+            }
+            mapList.forEach(item -> {
+                String revokeId = String.valueOf(item.get("seqno"));
+                String modelType = (String) item.get("modelType");
+                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+            });
+        } finally {
+            ThreadLocalUtil.cleanLocalCache();
         }
     }
 
@@ -190,7 +229,21 @@ public class CfetsEntrustHanderAop {
     @AfterReturning("deletePoint()")
     public void occupyOnDelete(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_作废.getValue(), 流程节点_流程提交.getValue(), null);
+        try {
+            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_作废.getValue(), 流程节点_流程提交.getValue(), null);
+        } catch (BusinessException e) {
+            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
+            if (CollectionUtils.isEmpty(mapList)) {
+                throw new BusinessException(e);
+            }
+            mapList.forEach(item -> {
+                String revokeId = String.valueOf(item.get("seqno"));
+                String modelType = (String) item.get("modelType");
+                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+            });
+        } finally {
+            ThreadLocalUtil.cleanLocalCache();
+        }
     }
 
     /**
@@ -202,13 +255,27 @@ public class CfetsEntrustHanderAop {
     @AfterReturning("closePoint()")
     public void occupyOnClose(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_关闭.getValue(), 流程节点_流程提交.getValue(), null);
+        try {
+            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_关闭.getValue(), 流程节点_流程提交.getValue(), null);
+        } catch (BusinessException e) {
+            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
+            if (CollectionUtils.isEmpty(mapList)) {
+                throw new BusinessException(e);
+            }
+            mapList.forEach(item -> {
+                String revokeId = String.valueOf(item.get("seqno"));
+                String modelType = (String) item.get("modelType");
+                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+            });
+        } finally {
+            ThreadLocalUtil.cleanLocalCache();
+        }
     }
 
     /**
      * 风险试算
      *
-     * @param dto 委托指令内容
+     * @param dto    委托指令内容
      * @param pageId 画面代码
      * @return 执行结果
      * @throws Exception 异常
@@ -217,7 +284,7 @@ public class CfetsEntrustHanderAop {
         //风险试算check
         RiskInputParamSerivce riskInputParamSerivce = getRiskInputParamSerivce();
         //风险试算组装dto
-        RiskCommonOutputDto riskCommonOutput = riskInputParamSerivce.buildParamThenRisk(dto, 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), pageId);
+        RiskCommonOutputDto riskCommonOutput = riskInputParamSerivce.buildParamThenRisk(dto, 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), pageId, NodeConfigConstant.ENTRUST);
         CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
         result.setRiskMathFlag("02");
         if (riskCommonOutput != null && CollectionUtils.isNotEmpty(riskCommonOutput.getRiskTrialRetDto())) {
@@ -225,20 +292,20 @@ public class CfetsEntrustHanderAop {
             result.setRskStatus(riskCommonOutput.getRskTrialStatus());
             if (com.joyintech.background.component.common.pack.common.util.StringUtil.equals(riskCommonOutput.getRskTrialStatus(), "3")) {
                 result.setRiskTrialSpan(DictCodeListRsk.试算结果_不通过.getCodeName());
-            }else {
+            } else {
                 result.setRiskTrialSpan(DictCodeListRsk.试算结果_通过.getCodeName());
             }
-            riskCommonOutput.getRiskTrialRetDto().forEach(e->{
+            riskCommonOutput.getRiskTrialRetDto().forEach(e -> {
                 CfetsEtribdoRiskcalResponse riskcalResponse = new CfetsEtribdoRiskcalResponse();
-                BeanUtil.copyPropertiesIgnoreNull(riskcalResponse,e);
+                BeanUtil.copyPropertiesIgnoreNull(riskcalResponse, e);
                 resultList.add(riskcalResponse);
             });
             result.setRiskcalReturnList(resultList);
-            return getAjaxResult(result,null,null);
+            return getAjaxResult(result, null, null);
         } else {
             result.setRskStatus(DictCodeListRsk.试算结果_通过.getValue());
             result.setRiskTrialSpan(DictCodeListRsk.试算结果_通过.getCodeName());
-            return getAjaxResult(result,null,null);
+            return getAjaxResult(result, null, null);
         }
     }
 
@@ -246,13 +313,14 @@ public class CfetsEntrustHanderAop {
     public static RiskInputParamSerivce getRiskInputParamSerivce() {
         return SpringContextUtil.getApplicationContext().getBean(RiskInputParamSerivce.class);
     }
- 
+
     /**
      * 获取返回的信息
+     *
      * @param message
      * @return
      */
-    public static AjaxResult getAjaxResult(Object data,String message, MessageType messageType){
+    public static AjaxResult getAjaxResult(Object data, String message, MessageType messageType) {
         AjaxResult ar = new AjaxResult();
         ar.setData(data);
         List<ValidMessage> warnList = new ArrayList<>();

@@ -18,7 +18,7 @@ import com.joyintech.tams.common.base.dao.SppiTestQaMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.common.base.entity.SppiTestQa;
 import com.joyintech.tams.constant.DictCodeListExt3;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

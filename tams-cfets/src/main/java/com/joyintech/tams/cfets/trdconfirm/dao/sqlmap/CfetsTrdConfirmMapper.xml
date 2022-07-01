@@ -211,6 +211,7 @@
             left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
             left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = fp.FINPROD_ID
             left join FIN_PRODUCT_ISSUE fpi on fpi.FINPROD_ID = bo.FINPROD_ID
+            left join FIN_PRODUCT_ADD fpa on fpa.FINPROD_ID = fp.FINPROD_ID
             LEFT JOIN SYS_DATADICT_LIST SDL on fpi.INT_RATE_ID = SDL.ITEM_CODE and DICT_CODE='SECRATE_DATA'
             left join (select INT_RATE_ID,row_number() over(partition by INT_RATE_ID order by INT_RATE_ID,EFF_DATE desc) as rn
             from MST_INT_RATE_INFO
@@ -243,6 +244,9 @@
             AND NOT EXISTS (SELECT 1 FROM trdquto_match_info match where bo.BID_ID=match.pre_trade_id)
             <if test="userId != null and userId != ''">
                 and bo.OUR_TRADER = #{userId}
+            </if>
+            <if test="userId != null and userId != ''">
+                and ( fpa.ISSUE_STATUS != #{ISSUE_STATUS_01} or fpa.ISSUE_STATUS is null )
             </if>
             <if test="finprodIdList != null and finprodIdList.size() > 0">
                 AND bo.finprod_id in
@@ -1199,6 +1203,7 @@
         fp.finprod_id as finprodId,
         decode(I.BUSINESSTYPE,'BOND',ts.SECID,'REPO',tr.secid) as finprodMarketId,
         decode(I.BUSINESSTYPE,'BOND',fp.finprod_abbr,'REPO',null) as finprodAbbr,
+        fp.FINPROD_TYPE2 finprodType2,
         nvl(ts.ps,tr.ps) as ps,
         decode(decode(I.BUSINESSTYPE,'BOND',ts.SETTLE_SPEED,'REPO',tr.SETTLE_SPEED),'1','01','2','02','3','03') settleSpeed,
         nvl(ts.OURDEPOSITACCOUNTNUMBER,tr.OURDEPOSITACCOUNTNUMBER) as  acctNo,
@@ -1318,8 +1323,9 @@
         select distinct null                    as                                   execid,
                 'BID'                           as                                   businesstype,
                 fp.finprod_id                   as                                   finprodId,
-                icb.INSTRUMENT_ID               as                                   finprodMarketId,
+                CONCAT(icb.INSTRUMENT_ID, '.IB')                                     finprodMarketId,
                 icb.INSTRUMENT_SHORT_NAME       as                                   finprodAbbr,
+                fp.FINPROD_TYPE2                as                                   finprodType2,
                 'T01'                           as                                   ps,
                 null                                                                 settleSpeed,
                 null                            as                                   acctNo,
@@ -1330,9 +1336,9 @@
                     when icb.SPREAD is not null then icb.SPREAD
                     when icb.COUPON_RATE is not null then icb.COUPON_RATE  end tradeYield,
                 case
-                when icb.ISSUE_PRICE is not null then to_char(icb.ISSUE_PRICE,'FM990.9990') || '元'
-                when icb.SPREAD is not null then to_char(icb.SPREAD,'FM990.90') || 'BP'
-                when icb.COUPON_RATE is not null then to_char(icb.COUPON_RATE,'FM990.9990') ||'%' end tradeYieldStr,
+                when icb.ISSUE_PRICE is not null then to_char(icb.ISSUE_PRICE,'FM99999999990.9990') || '元'
+                when icb.SPREAD is not null then to_char(icb.SPREAD,'FM99999999990.90') || 'BP'
+                when icb.COUPON_RATE is not null then to_char(icb.COUPON_RATE,'FM99999999990.9990') ||'%' end tradeYieldStr,
                 null                                                                 termDays,
                 icb.ACTUAL_FEE                  as                                   tradeAmt,
                 null                            as                                   quoteid,
@@ -1354,7 +1360,7 @@
                 null                            as                                   pledgeFaceValues,
                 null                            as                                   mtradeAmt
         from INTERF_CSTP_BJFXJG icb
-                 left join fin_product fp on icb.INSTRUMENT_ID = fp.finprod_market_id
+                 left join fin_product fp on CONCAT(icb.INSTRUMENT_ID,'.IB') = fp.finprod_market_id
                  LEFT JOIN SYS_USER_ADD sua ON icb.SUBMIT_USER = sua.IBU_TRADER
                  LEFT JOIN SYS_USER su ON sua.USER_ID = su.USER_ID
                  LEFT JOIN MST_CFETS_CUSTOMER_INFO mccit ON icb.SUBSCRIBE_INSTITUTION_ID = mccit.PARTY_ID
@@ -1365,11 +1371,11 @@
             AND 'BID' = #{regAssetType,jdbcType=VARCHAR}
         </if>
         <if test="finprodIdList != null and finprodIdList.size() > 0">
-            AND (icb.INSTRUMENT_ID  in
+            AND (fp.finprod_market_id  in
             <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
-            or icb.INSTRUMENT_ID in
+            or fp.finprod_market_id in
             <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
                 CONCAT(#{item},'.IB')
             </foreach>
@@ -1514,7 +1520,10 @@
                                                                    '03',
                                                                    TO_CHAR(ROUND(reg.exer_yield * 100, 4), 'FM990.0000') || '%')
                         when reg.finprod_type2 in ('F02', 'F03') then TO_CHAR(ROUND(reg.rate * 100, 4), 'FM990.0000') || '%'
-                        else null end                                                     as tradeYield,
+                        else null end                                                     as tradeYieldStr,
+                    decode(reg.finprod_type2,'F01',
+                            decode(regAdd.CAL_MODE, '01',reg.unit_cprice,'02',reg.yield * 100,'03',reg.exer_yield * 100),
+                            'F02',reg.rate * 100,'F03',reg.rate * 100,null) as tradeYield,
                     reg.repo_term                                                         as termDays,
                     decode(reg.finprod_type2, 'F01', reg.fprice_amt, tr.repoamt)          as tradeAmt,
                     reg.trade_date                                                        as tradeDate,
@@ -1640,8 +1649,9 @@
                nvl(ts.OURDEPOSITACCOUNTNUMBER, tr.OURDEPOSITACCOUNTNUMBER)   as secManageAcctId,
                stlinfo.sec_acct_name                                         as secManageAcctIdName,
                decode(ct.BUSINESSTYPE, 'BOND', ib.share_amt / 100, null)     as printAmt,
-               decode(ct.BUSINESSTYPE, 'BOND', ib.tradeYield,
-                      TO_CHAR(ROUND(ic.rate * 100, 4), 'FM990.0000') || '%') as tradeYield,
+               decode(ct.BUSINESSTYPE, 'BOND', TO_CHAR(ib.tradeYield, 'FM990.0000'),
+                      TO_CHAR(ROUND(ic.rate * 100, 4), 'FM990.0000') || '%') as tradeYieldStr,
+               decode(ct.BUSINESSTYPE, 'BOND', ib.tradeYield, ic.rate * 100) as tradeYield,
                decode(ct.BUSINESSTYPE, 'REPO', ic.term, null)                as termDays,
                decode(ct.BUSINESSTYPE, 'BOND', ib.fprice_amt, tr.repoamt)    as tradeAmt,
                nvl(ib.quote_date, ic.quote_date)                             as tradeDate,
@@ -1673,7 +1683,9 @@
                    decode(t2.CALCULATE_FIELD, '01', TO_CHAR(ROUND(t2.unit_cprice, 4), 'FM990.0000'),
                           '02', TO_CHAR(ROUND(t2.yield * 100, 4), 'FM990.0000') || '%',
                           '03', TO_CHAR(ROUND(t2.exer_yield * 100, 4), 'FM990.0000') || '%',
-                          TO_CHAR(ROUND(t2.yield * 100, 4), 'FM990.0000') || '%') as tradeYield
+                          TO_CHAR(ROUND(t2.yield * 100, 4), 'FM990.0000') || '%') as tradeYieldStr,
+                   decode(t2.CALCULATE_FIELD, '01', t2.unit_cprice,'02', t2.yield * 100,
+                          '03', t2.exer_yield * 100, t2.yield * 100)              as tradeYield
             from ibu_quote_bond t1
                      inner join ibu_quote_bond_det t2
                                 on t1.quote_id = t2.quote_id
@@ -1792,7 +1804,12 @@
                     when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' then SDL_SD.ITEM_VALUE || '+' || to_char(nvl(fpi.BP*10000, 0),'FM999990.90')||'BP'
                     when fp.COUPON_SPECIES in ('02', '03') then to_char(fpi.REFER_YIELD*100,'FM99990.9990') || '%'
                     when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
-                    then to_char(fpi.REFER_YIELD*100,'FM99990.9990') || '%' end                tradeYield,
+                    then to_char(fpi.REFER_YIELD*100,'FM99990.9990') || '%' end                tradeYieldStr,
+                case
+                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' then fpi.BP*10000
+                    when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD*100
+                    when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
+                    then fpi.REFER_YIELD*100 end                tradeYield,
                 null                            as termDays,
                 bo.PAYABLE_AMOUNT               as tradeAmt,
                 bo.BID_DATE                     as tradeDate,
@@ -1879,7 +1896,7 @@
                 || '|' || aaa.counterIdName || '|' || dictquoteTpe.ITEM_VALUE
                 like '%' || #{search} || '%')
                 or to_char(aaa.printAmt,'FM9999999999999990.90')=#{search} or to_char(aaa.printAmt)=#{search}
-                or aaa.tradeYield=#{search} or  aaa.tradeYield =#{search}||'%'
+                or aaa.tradeYieldStr=#{search} or  aaa.tradeYieldStr =#{search}||'%'
                 or aaa.termDays||'' =#{search}
                 or to_char(aaa.tradeAmt,'FM9999999999999990.90')=#{search} or to_char(aaa.tradeAmt)=#{search}
                 or to_char(aaa.trdFeeAmt,'FM9999999999999990.90')=#{search} or to_char(aaa.trdFeeAmt)=#{search}
@@ -1903,6 +1920,7 @@
         fp.finprod_id as finprodId,
         fp.finprod_market_id as finprodMarketId,
         fp.finprod_abbr as finprodAbbr,
+        fp.FINPROD_TYPE2 finprodType2,
         reg.ps as ps,
         reg.sec_manage_acct_id as secManageAcctId,
         stlinfo.sec_acct_name as secManageAcctIdName,
@@ -1961,6 +1979,7 @@
         fp.finprod_id as finprodId,
         fp.finprod_market_id as finprodMarketId,
         fp.finprod_abbr as finprodAbbr,
+        fp.FINPROD_TYPE2 finprodType2,
         ib.ps as ps,
         ib.sec_manage_acct_id as secManageAcctId,
         stlinfo.sec_acct_name as secManageAcctIdName,
@@ -2194,6 +2213,7 @@
         fp.finprod_id as finprodId,
         fp.finprod_market_id as finprodMarketId,
         fp.finprod_abbr as finprodAbbr,
+        fp.FINPROD_TYPE2 finprodType2,
         ts.ps as ps,
         decode(ts.settle_speed,'1','01','2','02','3','03') settleSpeed,
         ts.ourdepositaccountnumber as acctNo,

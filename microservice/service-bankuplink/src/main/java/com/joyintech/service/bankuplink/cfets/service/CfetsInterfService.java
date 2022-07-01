@@ -39,7 +39,7 @@ import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.common.base.entity.FinProductType;
 import com.joyintech.tams.common.base.entity.FinProductTypeKey;
 import com.joyintech.tools.collectors.JoyinCollectors;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +63,8 @@ public class CfetsInterfService {
 //     */
 //    private static Logger logger = LoggerFactory.getLogger(CfetsInterfService.class);
 
+    @Autowired
+    private QuoteIdConverService quoteIdConverService;
     /**
      * {@linkplain}
      */
@@ -287,11 +289,15 @@ public class CfetsInterfService {
         quoteBody.setQuoteType(1); // 537域-报价类型(1-对话报价) 应该接口里赋值
         quoteBody.setQuoteTransType(this.convertSystemCodeToCfetsCode("quoteTransType",
             ibuQuoteBondDto.getTradeStatus()).charAt(0)); // 10272域-操作类型(N:新增,R:修改)
-        quoteBody.setClOrdID(ibuQuoteBondDto.getQuoteId()); // 11域-客户参考编号
-        if(StringUtil.equals(DictCodeList.银行间上行操作类型_本方修改发送,
-                bondDialogueQuoteDto.getIbuQuoteBondDto().getExeType())){
-            quoteBody.setOrigClOrdID(ibuQuoteBondDto.getQuoteId()); // 41域-原客户参考编号
+        /* add by lidong 20220628 TISHKS-184同步补充 start */
+        String clOrdID = quoteIdConverService.getClOrdIdByQuoteIdConver(ibuQuoteBondDto.getQuoteDate(),ibuQuoteBondDto.getQuoteId());
+        quoteBody.setClOrdID(clOrdID); // 11域-客户参考编号
+
+        if (StringUtil.equals(DictCodeList.银行间上行操作类型_本方修改发送.getValue(),
+                bondDialogueQuoteDto.getIbuQuoteBondDto().getExeType())) {
+            quoteBody.setOrigClOrdID(clOrdID); // 41域-原客户参考编号
         }
+        /* add by lidong 20220628 TISHKS-184同步补充 end */
         if (StringUtil.isNotBlank(ibuQuoteBondDto.getCfetsQuoteId())) {
             quoteBody.setQuoteID(ibuQuoteBondDto.getCfetsQuoteId()); // 117域-报价编号
         }
@@ -452,8 +458,11 @@ public class CfetsInterfService {
 
 //        quoteBody.setSendingTime(DateUtil.format(DateUtil.now(), CfetsConstant.DATETIME_FORMAT)); // 52域-发送时间
         quoteBody.setQuoteType(1); // 537域-报价类型(1-对话报价) 应该接口里赋值
-        quoteBody.setClOrdID(ibuQuoteBondDto.getQuoteId()); // 11域-客户参考编号
-        quoteBody.setOrigClOrdID(ibuQuoteBondDto.getQuoteId()); // 41域-原客户参考编号
+        /* add by lidong 20220628 TISHKS-184同步补充 start */
+        String clOrdID = quoteIdConverService.getClOrdIdByQuoteIdConver(ibuQuoteBondDto.getQuoteDate(),ibuQuoteBondDto.getQuoteId());
+        quoteBody.setClOrdID(clOrdID); // 11域-客户参考编号
+        quoteBody.setOrigClOrdID(clOrdID); // 41域-原客户参考编号
+        /* add by lidong 20220628 TISHKS-184同步补充 end */
         quoteBody.setQuoteID(ibuQuoteBondDto.getCfetsQuoteId()); // 117域-报价编号
         quoteBody.setTransactTime(ibuQuoteBondDto.getTransactime()); // 60域-业务发生时间
 
@@ -490,6 +499,10 @@ public class CfetsInterfService {
         quoteBody.setQuoteType(1); // 537域-报价类型(1-对话报价) 应该接口里赋值
         quoteBody.setQuoteRespType(Integer.valueOf(
             this.convertSystemCodeToCfetsCode("quoteRespType", ibuQuoteBondDto.getExeType()))); // 694域-操作类型(1:成交确认,7:报价拒绝)
+        /* add by lidong 20220628 TISHKS-184同步补充 start */
+        String clOrdID = quoteIdConverService.getClOrdIdByQuoteIdConver(ibuQuoteBondDto.getQuoteDate(),ibuQuoteBondDto.getQuoteId());
+        quoteBody.setClOrdID(clOrdID); // 11域-客户参考编号
+        /* add by lidong 20220628 TISHKS-184同步补充 end */
         quoteBody.setClOrdID(ibuQuoteBondDto.getQuoteId()); // 11域-客户参考编号
         quoteBody.setQuoteID(ibuQuoteBondDto.getCfetsQuoteId()); // 117域-报价编号
         quoteBody.setTransactTime(ibuQuoteBondDto.getTransactime()); // 60域-业务发生时间
@@ -551,8 +564,10 @@ public class CfetsInterfService {
         List<IbuQuoteBondDetDto> ibuQuoteBondDetDtoList = bondRequestQuoteDto.getIbuQuoteBondDetDtoList();
 
         QuoteRequestBody quoteBody = new QuoteRequestBody();
-        
-        quoteBody.setClOrdID(ibuQuoteBondDto.getQuoteId()); // 11域-客户参考编号
+        /* add by lidong 20220628 TISHKS-184同步补充 start */
+        String clOrdID = quoteIdConverService.getClOrdIdByQuoteIdConver(ibuQuoteBondDto.getQuoteDate(),ibuQuoteBondDto.getQuoteId());
+        quoteBody.setClOrdID(clOrdID); // 11域-客户参考编号
+        /* add by lidong 20220628 TISHKS-184同步补充 end */
         quoteBody.setQueryRequestID(null); // 10168域-查询请求编号 
         quoteBody.setAllocInd("0"); // 11960域-分账标识：0 普通请求报价 无allocation
         quoteBody.setQuoteReqID(null); // 131域-请求报价编号
@@ -675,9 +690,11 @@ public class CfetsInterfService {
 //        List<IbuQuoteBondDetDto> ibuQuoteBondDetDtoList = bondRequestQuoteDto.getIbuQuoteBondDetDtoList();
 
         QuoteRequestCancelBody quoteBody = new QuoteRequestCancelBody();
-        
-        quoteBody.setClOrdID(ibuQuoteBondDto.getQuoteId()); // 11域-客户参考编号
-        quoteBody.setOrigClOrdID(ibuQuoteBondDto.getQuoteId()); // 41域-原客户参考编号
+        /* add by lidong 20220628 TISHKS-184同步补充 start */
+        String clOrdID = quoteIdConverService.getClOrdIdByQuoteIdConver(ibuQuoteBondDto.getQuoteDate(),ibuQuoteBondDto.getQuoteId());
+        quoteBody.setClOrdID(clOrdID); // 11域-客户参考编号
+        quoteBody.setOrigClOrdID(clOrdID); // 41域-原客户参考编号
+        /* add by lidong 20220628 TISHKS-184同步补充 end */
         quoteBody.setQuoteReqID(ibuQuoteBondDto.getCfetsQuoteId()); // 131域-请求报价编号
         
         // 146域
@@ -746,7 +763,10 @@ public class CfetsInterfService {
         quoteBody.setQuoteType(113); // 537域-报价类型(113-请求回复) 应该接口里赋值
         quoteBody.setQuoteRespType(Integer.valueOf(
             this.convertSystemCodeToCfetsCode("quoteRespType", ibuQuoteBondDto.getExeType()))); // 694域-操作类型(1:成交确认)
-        quoteBody.setClOrdID(ibuQuoteBondDto.getQuoteId()); // 11域-客户参考编号
+        /* add by lidong 20220628 TISHKS-184同步补充 start */
+        String clOrdID = quoteIdConverService.getClOrdIdByQuoteIdConver(ibuQuoteBondDto.getQuoteDate(),ibuQuoteBondDto.getQuoteId());
+        quoteBody.setClOrdID(clOrdID); // 11域-客户参考编号
+        /* add by lidong 20220628 TISHKS-184同步补充 end */
         quoteBody.setAllocInd("0"); // 11960域-分账标识：0 普通请求报价 无allocation
         quoteBody.setQuoteID(ibuQuoteBondDetDto.getCfetsReqId()); // 117域-请求回复编号
         quoteBody.setTransactTime(ibuQuoteBondDetDto.getTransactime()); // 60域-业务发生时间
@@ -807,7 +827,10 @@ public class CfetsInterfService {
         }
         
 //        quoteBody.setQuoteStatus(16); // 297域-报价状态(16:正常,19:撤销,5:拒绝,21:过期,107:全部成交)
-        quoteBody.setClOrdID(ibuQuoteCrepDto.getQuoteId()); // 11域-客户参考编号
+        /* add by lidong 20220628 TISHKS-184同步补充 start */
+        String clOrdID = quoteIdConverService.getClOrdIdByQuoteIdConver(ibuQuoteCrepDto.getQuoteDate(),ibuQuoteCrepDto.getQuoteId());
+        quoteBody.setClOrdID(clOrdID); // 11域-客户参考编号
+        /* add by lidong 20220628 TISHKS-184同步补充 end */
         quoteBody.setQueryRequestID(null); // 10168域-查询请求编号
 //        quoteBody.setOrigClOrdID(ibuQuoteCrepDto.getQuoteId()); // 41域-原客户参考编号
         if (StringUtil.isNotBlank(ibuQuoteCrepDto.getCfetsQuoteId())) {
@@ -949,8 +972,10 @@ public class CfetsInterfService {
 
         quoteBody.setTradeRecordID(null); // 11888域-交易记录编号
         quoteBody.setQuoteType(1); // 537域-报价类型(1-对话报价) 应该接口里赋值
-        quoteBody.setClOrdID(ibuQuoteCrepDto.getQuoteId()); // 11域-客户参考编号
-        quoteBody.setQuoteID(ibuQuoteCrepDto.getCfetsQuoteId()); // 117域-报价编号
+        /* add by lidong 20220628 TISHKS-184同步补充 start */
+        String clOrdID = quoteIdConverService.getClOrdIdByQuoteIdConver(ibuQuoteCrepDto.getQuoteDate(),ibuQuoteCrepDto.getQuoteId());
+        quoteBody.setClOrdID(clOrdID); // 11域-客户参考编号
+        /* add by lidong 20220628 TISHKS-184同步补充 end */
         quoteBody.setTransactTime(ibuQuoteCrepDto.getTransactime()); // 60域-业务发生时间
         
         // 295域
@@ -1026,7 +1051,10 @@ public class CfetsInterfService {
         quoteBody.setQuoteRespType(Integer.valueOf(
             this.convertSystemCodeToCfetsCode("quoteRespType", ibuQuoteCrepDto.getExeType()))); // 694域-操作类型((1-成交确认,7-报价拒绝,2-交谈,101-修改,102-撤销))
 //        quoteBody.setQuoteStatus(16); // 297域-报价状态(16:正常,19:撤销,5:拒绝,21:过期,107:全部成交)
-        quoteBody.setClOrdID(ibuQuoteCrepDto.getQuoteId()); // 11域-客户参考编号
+        /* add by lidong 20220628 TISHKS-184同步补充 start */
+        String clOrdID = quoteIdConverService.getClOrdIdByQuoteIdConver(ibuQuoteCrepDto.getQuoteDate(),ibuQuoteCrepDto.getQuoteId());
+        quoteBody.setClOrdID(clOrdID); // 11域-客户参考编号
+        /* add by lidong 20220628 TISHKS-184同步补充 end */
         quoteBody.setQuoteID(ibuQuoteCrepDto.getCfetsQuoteId()); // 117域-报价编号
         quoteBody.setTransactTime(ibuQuoteCrepDto.getTransactime()); // 60域-业务发生时间
         

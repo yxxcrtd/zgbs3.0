@@ -31,7 +31,7 @@ import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +64,7 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
     private static final Logger logger = LoggerFactory.getLogger(CfetsTrdBondFirstSub002Controller.class);
 
     @Autowired
-    CfetsTrdFirstBidFirm002Service cfetsTrdFirstBidFirm002Service;
+    private CfetsTrdFirstBidFirm002Service cfetsTrdFirstBidFirm002Service;
 
     @Autowired
     private CfetsRepoQuotedPrice004Service cfetsRepoQuotedPrice004Service;
@@ -114,6 +114,9 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         if (StringUtil.isNotEmpty(workflowId)) {
             CfetsTrdFirstBidFirmInfoDto entity = cfetsTrdFirstBidFirm002Service.getBussinessEntityByWorkflowId(workflowId);
 //            test(entity);
+            if(StringUtil.isNotEmpty(entity.getRevokeReason())){
+                entity.setRemark(StringUtil.join(entity.getRemark(), entity.getRevokeReason()));
+            }
             initPageParams.put(GlobalConstant.WORKFLOW_ID, workflowId);
             initPageParams.put(GlobalConstant.ENTITY, entity);
         }
@@ -334,20 +337,6 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         return new Message<AjaxResult>().success().setData(ajaxResult);
     }
 
-//    @ResponseBody
-//    @ApiOperation(value = "风险试算", notes = "风险试算")
-//    @PostMapping("doRiskcal")
-//    public Message<AjaxResult> doRiskcal(@RequestBody RiskCalRequest riskCalRequest) {
-//        CfetsEtribdoRiskcalResponse result = new CfetsEtribdoRiskcalResponse();
-//        try {
-//            AjaxResult m = new AjaxResult();
-//            m.setData(result);
-//            return new Message<AjaxResult>().success().setData(m);
-//        } catch (Exception e) {
-//            return new Message<AjaxResult>().fail().setMessage("风险试算异常");
-//        }
-//    }
-
     /**
      * 投标确认提交检查
      *
@@ -410,17 +399,15 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
             tradeAmt = "汇总投标券面总额:" + ArithmeticUtil.divide(dto.getTotalBiddingNum(), new BigDecimal(10000), 2, RoundingMode.HALF_UP) + "万元";
         }
         params.setElementId(dto.getElementId());
+        // 分销买入
+        params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_投标.getValue());
         if (StringUtil.equals(DictCodeListExt4.投标方式_自主投标.getValue(), dto.getBiddingMethod())) {
             //  自主投标
-            params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_投标_自主投标.getValue());
             dto.setBidId(cfetsTrdFirstBidFirm002Service.getBidId(BussinessDictCodeList.共同业务类型_一级投标确认_投标_自主投标));
         } else if (StringUtil.equals(DictCodeListExt4.投标方式_代投代缴.getValue(), dto.getBiddingMethod())) {
             //代投代缴
-            params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_投标_代投代缴.getValue());
             dto.setBidId(cfetsTrdFirstBidFirm002Service.getBidId(BussinessDictCodeList.共同业务类型_一级投标确认_投标_代投代缴));
         } else if (StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), dto.getBiddingMethod())) {
-            // 分销买入
-            params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue());
             dto.setBidId(cfetsTrdFirstBidFirm002Service.getBidId(BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入));
             str = "交易日期:" + DateUtil.format(iPlatformDate.getSysDate());
             tradeAmt = "分销买入券面总额:" +
@@ -470,7 +457,7 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
             ProcessMark processMark = cfetsRepoQuotedPrice004Service.getBusinessInfoByPageIdAndPk(wflValidInputParameter);
             CfetsTrdFirstBidFirmInfoDto dto = cfetsTrdFirstBidFirm002Service.getBussinessEntity(processMark);
             dto.setBidId(detail.getBidId());
-            dto.setRemark(StringUtil.join("投标确认撤销原因：", requst.getRemark()));
+            dto.setRevokeReason(StringUtil.join("投标确认撤销原因：", requst.getRemark()));
             dto.setOperateType("revoke");
             biddingMethod = dto.getBiddingMethod();
             dtos.add(dto);
@@ -480,16 +467,7 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         workFlowParameter.setPageId(getPageId());
         workFlowParameter.setElementId(getPageId() + "_btn_revoke");
         workFlowParameter.setBusinessCode(CfetsTrdFirstBidFirmInfoDto::getBidId);
-        if (StringUtil.equals(DictCodeListExt4.投标方式_自主投标.getValue(), biddingMethod)) {
-            //  自主投标
-            workFlowParameter.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_投标_自主投标.getValue());
-        } else if (StringUtil.equals(DictCodeListExt4.投标方式_代投代缴.getValue(), biddingMethod)) {
-            //代投代缴
-            workFlowParameter.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_投标_代投代缴.getValue());
-        } else if (StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), biddingMethod)) {
-            // 分销买入
-            workFlowParameter.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue());
-        }
+        workFlowParameter.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标确认_投标.getValue());
         workFlowParameter.setComment(entity -> "投标编号 (" + entity.getBidId() + ")");
         processParameter.setPageId(workFlowParameter.getPageId());
         processParameter.setWorkFlowParameter(workFlowParameter);
@@ -504,25 +482,4 @@ public class CfetsTrdFirstBidFirm002Controller extends BaseController {
         }
     }
 
-//    @ResponseBody
-//    @ApiOperation(value = "风险试算", notes = "风险试算")
-//    @PostMapping("doRiskcal")
-//    public Message<AjaxResult> doRiskcal(@RequestBody CfetsTrdFirstBidFirmInfoDto dto){
-//        try {
-//            String message = cfetsTrdFirstBidFirm002Service.doRiskcalCheckMethod(dto);
-//            if (com.joyintech.framework.util.StringUtil.isNotEmpty(message)) {
-//                AjaxResult ar = new AjaxResult();
-//                List<ValidMessage> warnList = new ArrayList<>();
-//                warnList.add(new ValidMessage(message));
-//                ar.setErrorList(warnList);
-//                ar.setMessageType(MessageType.错误消息);
-//                return new Message<AjaxResult>().setData(ar);
-//            }
-//            AjaxResult ajaxResult = CfetsEntrustHanderAop.doRiskcal(dto,this.getPageId());
-//            return new Message<AjaxResult>().setData(ajaxResult);
-//        } catch (Exception e) {
-//            logger.error("风险试算", e);
-//            return new Message<AjaxResult>().fail().setMessage("风险试算异常");
-//        }
-//    }
 }

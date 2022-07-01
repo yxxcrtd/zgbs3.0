@@ -6,8 +6,10 @@ package com.joyintech.tams.cfets.trdquery.dao;
 import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleInfoOtherListRespond;
 import com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmExecFirstBondInfoResponse;
+import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdFirstBondInvestTradeDto;
 import com.joyintech.tams.cfets.trdquery.dto.*;
 import com.joyintech.tams.common.base.entity.RegFinProductDealTotal;
+import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -160,12 +162,25 @@ public interface CfetsTrdQueryMapper {
      * @return
      */
     CfetsTrdBondInvestTradeDto getTrdBondInvestTradeDto(Map<String, Object> params);
+
+    /**
+     * 查询债券交易基本信息
+     * @param params
+     * @return
+     */
+    CfetsTrdFirstBondInvestTradeDto getTrdFirstBondInvestTradeDto(Map<String, Object> params);
     /**
      * 根据主键查询登记信息
      * @param pageParam
      * @return
      */
     RegFinProductDealTotal selectRegTotalInfoById(String bizCode);
+    /**
+     * 根据主键查询一级申购登记信息
+     * @param bizCode
+     * @return
+     */
+    RegFinProductDealTotal selectBidOrderById(String bizCode);
     /**
      * 根据主键更新登记数据
      * @param pageParam
@@ -256,6 +271,7 @@ public interface CfetsTrdQueryMapper {
      * @return List<PortIntFenPeiInfoDto>
      */
     List<PortIntFenPeiInfoDto> findRepoPortIntFenPeiInfoList(Map<String, Object> pageParam);
+    List<PortIntFenPeiInfoDto> findRepoPortIntFenPeiInfoList2(Map<String, Object> pageParam);
     /**
      * 查询交易质押券,针对交易明细回购
      *
@@ -286,7 +302,7 @@ public interface CfetsTrdQueryMapper {
 
     List<BidPortIntFenPeiInfoDto> findYjsgPortIntFenPeiInfoList(Map<String, Object> pageParam);
 
-    CfetsTrdQueryCstpInfoListResponse selectCstpBidFormDataByKey(Map<String, Object> pageParam);
+    CfetsTrdQueryCstpBidInfoListResponse selectCstpBidFormDataByKey(Map<String, Object> pageParam);
 
 
     CfetsTrdBidInfoResponse findYjtbBidTradeDetailInfo(Map<String, Object> pageParam);
@@ -297,4 +313,6 @@ public interface CfetsTrdQueryMapper {
 
     List<BidPortIntFenPeiInfoDto> findYjsgFenPeiInfoList(Map<String, Object> pageParam);
 
+
+    List<TrdProductDeal> selectTrdProductDealsByTotleTradeId(@Param("totleTradeId") String totleTradeId);
 }

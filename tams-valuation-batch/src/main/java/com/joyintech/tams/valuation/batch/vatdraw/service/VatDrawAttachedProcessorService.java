@@ -23,7 +23,7 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.constant.*;
 
 import com.joyintech.tams.systemtools.util.CommonUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;

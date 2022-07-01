@@ -11,7 +11,7 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.invest.batch.cfetsPositionPrice.dao.CfetsPositionPriceMapper;
 import com.joyintech.tams.invest.batch.cfetsPositionPrice.dto.CfetsUnitCostDto;
 import org.activiti.engine.impl.util.CollectionUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.SqlSessionTemplate;

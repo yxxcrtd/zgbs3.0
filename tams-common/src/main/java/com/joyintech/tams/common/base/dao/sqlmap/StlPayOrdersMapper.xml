@@ -444,4 +444,33 @@
         from STL_PAY_ORDERS
         where TRADE_ID = #{tradeid,jdbcType=VARCHAR}
     </select>
+
+    <select id="selectCounterCapacctInfoList" resultType="com.joyintech.tams.common.base.entity.StlCapacctInfo">
+        SELECT DISTINCT
+        B.ACCT_NO as acctNo,
+        B.BUSI_ACCT_NO busiAcctNo,
+        B.CCY CCY,
+        A.ACCT_TYPE acctType,
+        B.ACCT_NAME as acctName,
+        B.OWN_DEPT stockExchangeNo,
+        '1' status,
+        B.ACC_PASS acctPwd,
+        B.TRADE_PASS tradePwd
+        FROM
+        MST_COUNTER_ACCT A, STL_CAPACCT_INFO B
+        <where>
+            A.COUNTER_ID = #{counterId,jdbcType=VARCHAR}
+            <if test="acctType != null and !acctType.isEmpty()">
+                and A.ACCT_TYPE =#{acctType,jdbcType=VARCHAR}
+            </if>
+            <!-- AND A.ACCT_TYPE = #{acctType}-->
+            AND A.ACCT_NO = B.ACCT_NO
+            AND A.IS_OPEN = '01'    /**add  by  张年  20190904 交易对手资金账户只能选择启用状态下的账户**/
+            AND A.CCY = B.CCY
+            <if test="ccy != null and !ccy.isEmpty()">
+                AND A.CCY = #{ccy,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
 </mapper>

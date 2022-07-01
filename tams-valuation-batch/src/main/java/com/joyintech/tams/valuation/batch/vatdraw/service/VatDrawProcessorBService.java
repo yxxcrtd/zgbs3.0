@@ -33,7 +33,7 @@ import com.joyintech.tams.valuation.common.utils.CalendarUtil;
 import com.joyintech.tams.valuation.common.utils.DBUtil;
 import com.joyintech.tams.valuation.common.utils.ValStringUtil;
 import com.joyintech.tools.collectors.JoyinCollectors;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;

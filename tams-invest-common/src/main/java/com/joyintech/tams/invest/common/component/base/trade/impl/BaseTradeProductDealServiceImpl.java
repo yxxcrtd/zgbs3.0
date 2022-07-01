@@ -11,10 +11,12 @@
 package com.joyintech.tams.invest.common.component.base.trade.impl;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.invest.common.dto.*;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,10 +29,6 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.invest.common.component.base.core.MstFileCommonService;
 import com.joyintech.tams.invest.common.component.base.trade.BaseTradeProductDealService;
 import com.joyintech.tams.invest.common.component.base.trade.impl.dao.BaseTradeProductDealMapper;
-import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
-import com.joyintech.tams.invest.common.dto.BaseTradeProductDealRevokeDto;
-import com.joyintech.tams.invest.common.dto.MstFileInputParameter;
-import com.joyintech.tams.invest.common.dto.MstFileOutputParameter;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dto.AllTradeCommonInputDto;
 
@@ -400,6 +398,13 @@ public class BaseTradeProductDealServiceImpl implements BaseTradeProductDealServ
                     entity.setStlPayOrdersList(baseTradeProductDealMapper.selectStlPayOrdersList1(paramMap));
                 }
                 // add by ysfu 20220228 end
+                if(CollectionUtils.isNotEmpty(entity.getStlPayOrdersList())){
+                    // 过滤出自己组合的划款指令
+                    List<StlPayOrdersDto> filterStlPayOrders = entity.getStlPayOrdersList().stream()
+                            .filter(item-> item.getPortfolioId().equals(entity.getActPortfolioId()))
+                            .collect(Collectors.toList());
+                    entity.setStlPayOrdersList(filterStlPayOrders);
+                }
             }
             baseTradeProductDealList.addAll(baseTradeProductDealDto);
         }

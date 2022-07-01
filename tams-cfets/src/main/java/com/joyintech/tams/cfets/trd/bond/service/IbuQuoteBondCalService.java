@@ -39,7 +39,7 @@ import com.joyintech.tams.invest.entrust.etribbondinfo.dto.FinCashPlanDto;
 import com.joyintech.tams.invest.entrust.etribbondinfo.dto.SecInfoModelDto;
 import com.joyintech.tams.invest.trade.bond.service.TrdBondInvestTrade002Service;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,7 +112,7 @@ public class IbuQuoteBondCalService extends BaseService {
         // 特殊债券信息查询
         List<FinProductSpecialDto> list = joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(Arrays.asList(calRequest.getFinprodId()));
         if (CollectionUtils.isNotEmpty(list)) {
-            if (StringUtil.equals(list.get(0).getIsSpecialDebt(), DictCodeListExt1.是否_是.getValue())) {
+            if (!StringUtil.equals(list.get(0).getIsSpecialDebt(), DictCodeListExt1.是否_是.getValue())) {
                 calRequest.setUnitInt(null);
             }
         }

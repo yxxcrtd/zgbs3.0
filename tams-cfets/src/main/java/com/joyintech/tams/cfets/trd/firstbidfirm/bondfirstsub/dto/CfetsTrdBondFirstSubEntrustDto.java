@@ -6,6 +6,7 @@ import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.tams.business.common.dto.EtrEntrustOperHisDto;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import io.swagger.annotations.ApiModel;
@@ -13,6 +14,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 指令列表
@@ -111,6 +113,10 @@ public class CfetsTrdBondFirstSubEntrustDto {
 
     @ApiModelProperty(name = "avaDealAmt", value = "剩余成交额度", example = "1000.00")
     private BigDecimal avaDealAmt;
+
+    @ApiModelProperty(name = "remarks", value = "备注列表 ")
+    private List<EtrEntrustOperHisDto> remarks;
+
 
     public Date getIssueDate() {
         return issueDate;
@@ -356,6 +362,14 @@ public class CfetsTrdBondFirstSubEntrustDto {
 
     public void setAvaDealAmt(BigDecimal avaDealAmt) {
         this.avaDealAmt = avaDealAmt;
+    }
+
+    public List<EtrEntrustOperHisDto> getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(List<EtrEntrustOperHisDto> remarks) {
+        this.remarks = remarks;
     }
 }
 

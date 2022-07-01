@@ -31,6 +31,7 @@ import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealRegisterQuoteDto;
@@ -66,6 +67,7 @@ import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.trade.entrust.EtrFinishStatusDto;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
+import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.dto.AllTradeCommonInputDto;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
 import com.joyintech.tams.invest.common.trade.service.BussRepoSecService;
@@ -77,9 +79,10 @@ import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tools.collectors.JoyinCollectors;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
+import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -231,6 +234,9 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
      * 质押券递增维度
      */
     private final static String pledgeDimension = "0.1";
+
+    @Autowired
+    BaseAssetCashPositionCommMapper baseAssetCashPositionCommMapper;
 
     /**
      * 提交保存check 必填项
@@ -469,7 +475,8 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
         cfetsSearchInfoRequest.setDealType("01");
         cfetsSearchInfoRequest.setInitValue(entity.getCounterId());
         List<SelectOptionDto> list = joyinbusinessCommonService.queryMySideOrCount(cfetsSearchInfoRequest);
-        if (StringUtil.isNotEmpty(list.get(0).getObject())
+        if (CollectionUtils.isNotEmpty(list)
+                && StringUtil.isNotEmpty(list.get(0).getObject())
                 && StringUtil.equals(CacheUtil.getSysParam("EXPORT_SHOW"), "01")
                 && !StringUtil.isNotEmpty(entity.getCounterTrader())
                 && StringUtil.equals(entity.getQuoteStyle(), BussinessDictCodeList.报价方式_对话报价.getValue())) {
@@ -1797,7 +1804,8 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
         req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         req.setPtlCashList(ptlCashList);
         req.setPtlSecList(ptlSecList);
-        PositionHttpRequest.send(req);
+        Map<String, Object> param = PositionHttpRequest.send(req);
+        ThreadLocalUtil.setLocalCache(param);
     }
 
     /**
@@ -1840,9 +1848,6 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
         param.put("POSITION_TYPE_05", DictCodeList.持仓类型_融入.getValue());
         param.put("TRADEPLACE03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
         param.put("TRADEPLACE04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
-        if ("admin".equals(loginUserId)) {
-            loginUserId = "jp";//TODO 测试写死登录用户 提交代码时修改
-        }
         param.put("loginUserId", loginUserId);
         param.put("A_012", DictCodeListExt3.资产类型_质押式双边回购本方券已质押持仓.getValue());
         param.put("S_002", DictCodeListExt3.资产类型_可质押持仓.getValue());
@@ -2051,6 +2056,7 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
         etrPositionHoldDto.setDealEtr(true);
         // 冲销时（撤销）
         if (isNegate) {
+            List<String> tradeIdList = new ArrayList<>();
             // 标记委托编号,避免重复操作
             Map<String,String> entrustIdList = new HashMap<>();
             for (RegFinProductDeal deal : input.getRegFinProductDeals()) {
@@ -2058,8 +2064,10 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
                 if (StringUtil.isEmpty(entrustIdList.get(deal.getEntrustId()))) {
                     this.revokeEtrSecPosition(deal.getEntrustId(), null, false, null);
                     entrustIdList.put(deal.getEntrustId(), deal.getEntrustId());
+                    tradeIdList.add(deal.getpTradeId());
                 }
             }
+            baseAssetCashPositionCommMapper.deleteCashPositionByOrderIds(tradeIdList);
         } else {
             // List<组合持仓流水DTO>(若上记的List<回购质押品DTO>为空，则此为空，反之循环构造DTO)
             // 通过上记输出的List<输出的质押品DTO>，循环该List构造组合持仓流水DTO
@@ -2314,5 +2322,12 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
 
     public int getIsExistCounterId(List<String> entrustIdList){
         return cfetsIbuQuoteRepo004Mapper.getIsExistCounterId(entrustIdList);
+    }
+
+    @Override
+    public Map<String, Object> getRuntimeVariables(ProcessMark entity, String taskId) throws WorkFlowException {
+        Map<String, Object> variables = new HashMap();
+        variables.put("needNextCheck", false);
+        return variables;
     }
 }

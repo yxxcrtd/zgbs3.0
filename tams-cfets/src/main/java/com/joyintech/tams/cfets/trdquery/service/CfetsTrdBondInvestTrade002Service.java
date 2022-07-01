@@ -39,9 +39,10 @@ import com.joyintech.service.bankuplink.common.service.CfetsQuotedCommonService;
 import com.joyintech.system.base.dao.SysUploadFileInfoMapper;
 import com.joyintech.system.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
-import com.joyintech.tams.cfets.trd.bond.service.CfetsBondDealQuotedPrice004Service;
 import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
 import com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto;
+import com.joyintech.tams.cfets.trd.bond.service.CfetsBondDealQuotedPrice004Service;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub002Service;
 import com.joyintech.tams.cfets.trdconfirm.dao.CfetsTrdConfirmMapper;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmMatchDto;
 import com.joyintech.tams.cfets.trdquery.dao.CfetsTrdQueryMapper;
@@ -57,8 +58,6 @@ import com.joyintech.tams.component.business.common.service.DateCalService;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
-import com.joyintech.tams.component.business.riskrds.dto.InterfRiskRdsDto;
-import com.joyintech.tams.component.business.riskrds.service.InterfRiskRdsService;
 import com.joyintech.tams.component.business.settle.dto.BussSettleOrderParameterDto;
 import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommService;
 import com.joyintech.tams.component.business.trade.BussTrdAvailableCashQueryService;
@@ -78,7 +77,6 @@ import com.joyintech.tams.invest.common.component.business.basicdata.dto.BasicTr
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
-import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.cstp.service.CstpCommonService;
 import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
@@ -115,7 +113,7 @@ import com.joyintech.workflow.engine.entity.FlowEntity;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -361,6 +359,9 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
 
     @Autowired
     private CfetsQuotedCommonService cfetsQuotedCommonService;
+
+    @Autowired
+    private CfetsTrdBondFirstSub002Service cfetsTrdBondFirstSub002Service;
 
     // 交易份额小数保留位数
     private int decimalPlaces_4 = 4;
@@ -1215,6 +1216,9 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
         String exeId = cfetsTrdQueryMapper.seleteByTrdId(bizCode);
         cfetsTrdConfirmMapper.deleteByTrdId(bizCode);
 
+        if(StringUtil.equals(entity.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
+            cfetsTrdBondFirstSub002Service.dorevoke(entity.getBidId(), entity.getRemark(), true, DictCodeListExt3.头寸业务类型_债券一级申购.getValue());
+        }
        //发送头寸
         if(isNeedDealPosition) {
             String ps = entity.getPs();
@@ -4455,11 +4459,26 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
             WflValidInputParameter parameter = new WflValidInputParameter();
             if(StringUtil.equals(inputDto.getFinprodType2(),DictCodeListExt1.金融产品类型_债券.getValue())){
                 parameter.setPageId("CfetsTrdBondInvestTrade002");
+                parameter.setBusinessDataPk1(inputDto.getTotleTradeId() + "R");
             }else if(StringUtil.equals(inputDto.getFinprodType2(),DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())
                     || StringUtil.equals(inputDto.getFinprodType2(),DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue())){
                 parameter.setPageId("CfetsTrdRepoTrade002");
+                parameter.setBusinessDataPk1(inputDto.getTotleTradeId() + "R");
+            } else if (StringUtil.equals(inputDto.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())
+                    && StringUtil.equals(inputDto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
+                if(!StringUtil.equals(inputDto.getSettleStatus(),DictCodeListExt3.交收状态_未交收.getValue())){
+                    AjaxResult m = new AjaxResult();
+                    m.setErrorList(Arrays.asList(new ValidMessage("已完成交收,不可撤销")));
+                    return m;
+                }
+                parameter.setPageId("CfetsTrdFirstBondInvestTrade002");
+                parameter.setBusinessDataPk1(inputDto.getTotleTradeId());
             }
-            parameter.setBusinessDataPk1(inputDto.getTotleTradeId() + "R");
+            if(StringUtil.equals(inputDto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())){
+                AjaxResult m = new AjaxResult();
+                m.setErrorList(Arrays.asList(new ValidMessage("一级投标成交数据不允许撤销,请撤销中标结果维护/分销买入数据")));
+                return m;
+            }
             //parameter.setBusinessDataPk2("F01");
             if (mstWorkflowCommonService.isInWflProcess(parameter)) {
                 AjaxResult m = new AjaxResult();

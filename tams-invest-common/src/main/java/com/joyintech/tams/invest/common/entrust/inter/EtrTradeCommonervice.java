@@ -114,16 +114,28 @@ public class EtrTradeCommonervice extends BaseService {
                     }
                 }
             }
-            //组合资金可用 1、老资金相关表
-            BigDecimal oldPortfolioAmount=BigDecimal.ZERO;
+            //组合资金可用 1、老资金相关表 ZGCPCN-1557
+            BigDecimal oldPortfolioAmount = BigDecimal.ZERO;
+            for (PositionCashSecDto dto : list) {
+                if (StringUtil.isEmpty(dto.getCdate())) {
+                    dto.setCdate(iPlatformDate.getSysDateStr());
+                }
+                if (StringUtil.isEmpty(dto.getPortfolioId())) {
+                    continue;
+                }
+                oldPortfolioAmount = oldPortfolioAmount.add(getPortfolioAvailableCashForChangnei(dto.getPortfolioId()));
+            }
             if (!CollectionUtils.isEmpty(sumPortfolioAcctNoList)) {
 
+                // ZGCPCN-1557
+                /**
                 for (PositionCashSecDto dto : sumPortfolioAcctNoList) {
                     PositionCashSecData data = querySingleCash(dto);
                     if (data != null && data.getCashT() != null) {
                         oldPortfolioAmount = oldPortfolioAmount.add(data.getCashT());
                     }
-                }
+                }**/
+
                 //组合资金可用 2、新头寸引擎
                 BigDecimal newPortfolioAmount = queryPosition(sumPortfolioAcctNoList, flowType, DictCodeListExt3.资产类型_托管户可用资金.getValue());
                 if (newPortfolioAmount != null) {
@@ -185,11 +197,34 @@ public class EtrTradeCommonervice extends BaseService {
                 if (newRealSecAmount != null) { //持仓数量
                     realSec = realSec.add(newRealSecAmount);
                 }
+                // modify by swwan 2022-06-28 TISHKS-1434 start
+                requestDto.setPtlList(secList);  //覆盖请求参数，非交易平台赋值了
+                // modify by swwan 2022-06-28 TISHKS-1434 end
             }
-            requestDto.setPtlList(secList);  //覆盖请求参数，非交易平台赋值了
 
         }
         return assemble(portfolioCash, canCash, realCash, canSec, realSec, requestDto);
+    }
+
+    /**
+     * 场内指令，组合资金可用
+     * @param portfolioId
+     * @return
+     */
+    public BigDecimal getPortfolioAvailableCashForChangnei(String portfolioId) {
+        BigDecimal cash = BigDecimal.ZERO;
+        if (null != baseEtrCashPositionCommService) {
+            PtlCashPositionFlowDto dto = new PtlCashPositionFlowDto();
+            Date sysdate = DateUtil.parse(DateUtil.getSysDate());
+            dto.setCdate(sysdate);
+            dto.setPortfolioId(portfolioId);
+            dto.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+            BigDecimal availableCash = baseEtrCashPositionCommService.qryCommandAvailableCash(dto);
+            if (null != availableCash) {
+                cash = ArithmeticUtil.doAdd(cash, availableCash);
+            }
+        }
+        return cash;
     }
 
 
@@ -296,8 +331,10 @@ public class EtrTradeCommonervice extends BaseService {
                     BeanUtil.copyPropertiesIgnoreNull(cashSecDto, dto); //复制资产信息
                     handleSecType(cashSecDto);
                     secList.add(cashSecDto);
+                    // modify by swwan 2022-06-28 TISHKS-1434 start
+                    requestDto.setPtlList(secList);  //覆盖请求参数，非交易平台赋值了
+                    // modify by swwan 2022-06-28 TISHKS-1434 end
                 }
-                requestDto.setPtlList(secList);  //覆盖请求参数，非交易平台赋值了
                 //资金可用金额
                 if (!CollectionUtils.isEmpty(secList) && secList.size() > 0) {
                     BigDecimal newSecAmount = queryPosition(secList, flowType, "");
@@ -552,6 +589,7 @@ public class EtrTradeCommonervice extends BaseService {
         if(ptList!=null&&ptList.size()>0
                 &&StringUtil.isNotEmpty(ptList.get(0).getFinprodType2())
                 &&(StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue(),ptList.get(0).getFinprodType2())||ptList.get(0).getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+                ||StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue(),ptList.get(0).getFinprodType2())
                 ||ptList.get(0).getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())
                 ||ptList.get(0).getFinprodType2().equals("ZYSHG"))
                 &&(StringUtil.equals(flowType,"02")||StringUtil.equals(flowType,"04"))){
@@ -847,6 +885,9 @@ public class EtrTradeCommonervice extends BaseService {
                 }
             }
         }
+        if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())){
+            holdingType = DictCodeListExt3.资产类型_场内信用保护凭证可用持仓.getValue();
+        }
         if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
                 ||dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())
                 ||dto.getFinprodType2().equals("ZYSHG")) {
@@ -864,6 +905,9 @@ public class EtrTradeCommonervice extends BaseService {
                 ||dto.getFinprodType2().equals("ZYSHG")) {
             holdingType = DictCodeListExt3.资产类型_通用回购融资券折算后额度.getValue();
             dto.setFinprodId("XN_PRODID999");
+        }
+        if(dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())) {
+            holdingType = DictCodeListExt3.资产类型_场内信用保护凭证可用持仓.getValue();
         }
         dto.setHoldingType(holdingType);
     }

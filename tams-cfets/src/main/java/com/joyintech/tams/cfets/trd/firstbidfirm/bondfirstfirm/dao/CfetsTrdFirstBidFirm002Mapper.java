@@ -2,10 +2,7 @@ package com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao;
 
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmInfoDto;
-import com.joyintech.tams.common.base.entity.TrdFinProductDealTotal;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
-import com.joyintech.tams.common.base.entity.WflTrdFinProductDealTotal;
-import com.joyintech.tams.common.base.entity.WflTrdProductDeal;
+import com.joyintech.tams.common.base.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -50,7 +47,7 @@ public interface CfetsTrdFirstBidFirm002Mapper {
      * @author jiangpeng
      * @date 2022/5/17 16:27
      */
-    int selectBidFirmCountByEntrustId(Map<String, Object> param);
+    List<String> selectBidFirmCountByEntrustId(Map<String, Object> param);
 
     /**
      * 按同资产+同一投标日+同一交易对手维度查询指令数据
@@ -121,6 +118,7 @@ public interface CfetsTrdFirstBidFirm002Mapper {
      */
     List<TrdFinProductDealTotal> findTotalByPTotleTradeId(@Param("PTotleTradeId") String PTotleTradeId);
 
+    List<TrdFinProductDealTotal> findTempTotalByPTotleTradeId(@Param("PTotleTradeId") String PTotleTradeId);
     /**
      * 根据汇总编号查询流程中汇总信息表
      *
@@ -140,6 +138,8 @@ public interface CfetsTrdFirstBidFirm002Mapper {
      * @date 2022/5/26 16:06
      */
     List<TrdProductDeal> findDealByTotleTradeId(@Param("totleTradeId") String totleTradeId);
+
+    List<TrdProductTempDeal> findTempDealByTotleTradeId(@Param("totleTradeId") String totleTradeId);
 
     /**
      * 按组合维度查询指令剩余额度,含流程中
@@ -169,4 +169,24 @@ public interface CfetsTrdFirstBidFirm002Mapper {
      * @date 2022/6/9 15:38
      */
     int selectResultCount(Map<String, Object> param);
+
+    /**
+     * 查询是否存在已中标结果维护数据
+     *
+     * @param param
+     * @return int
+     * @author jiangpeng
+     * @date 2022/6/9 15:38
+     */
+    FinProduct selectByFinprodMarketId(@Param("finprodMarketId") String finprodMarketId);
+
+    /**
+     * 根据资产代码查询自主投标生效及流程中总汇总投标券面总额
+     *
+     * @param param
+     * @return com.joyintech.tams.common.base.entity.FinProduct
+     * @author jiangpeng
+     * @date 2022/6/21 11:29
+     */
+    BigDecimal selectSumTotalBidNumByFinprodId(Map<String, Object> param);
 }

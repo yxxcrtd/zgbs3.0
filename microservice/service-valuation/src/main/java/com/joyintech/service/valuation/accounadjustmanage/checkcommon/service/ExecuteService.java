@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 
 import com.jcraft.jsch.JSchException;
 import com.joyintech.framework.file.SafelyFile;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

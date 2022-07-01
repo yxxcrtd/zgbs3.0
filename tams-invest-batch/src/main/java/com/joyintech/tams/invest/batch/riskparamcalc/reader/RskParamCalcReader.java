@@ -62,6 +62,11 @@ public class RskParamCalcReader extends BaseReader<RskParamReCalcReaderDto> {
     @SuppressWarnings("unchecked")
     @Override
     public List<RskParamReCalcReaderDto> createList() {
+        // 预占重计算之后是否需要重新计算T日占用记录
+        if(StringUtil.equals(CacheUtil.getSysParam("IS_SUPPORT_OCUPPY_CALC"),"N")){
+            return new ArrayList<>();
+        }
+
         Map<String, Object> params = getParams();
         List<String> prodIdList = (List<String>)params.get(BatchConstant.KEY_PRODID_LIST);
         Date sysDate = (Date) params.get("sysDate");
@@ -83,7 +88,8 @@ public class RskParamCalcReader extends BaseReader<RskParamReCalcReaderDto> {
 
         // 按照预占编号分组
         groupMap = newList.stream().collect(Collectors.groupingBy(
-                dto -> isPreOccupy(dto.getInfCode()) ? dto.getEventId() : dto.getPreOccupyCode()));
+                dto -> isPreOccupy(dto.getInfCode()) ? dto.getEventId() :
+                        (StringUtil.isEmpty(dto.getPreOccupyCode()) ? dto.getEventId() : dto.getPreOccupyCode())));
         // 返回计算对象
         return groupMap.entrySet().stream().map(
                 en -> new RskParamReCalcReaderDto(en.getKey(), en.getValue())).collect(

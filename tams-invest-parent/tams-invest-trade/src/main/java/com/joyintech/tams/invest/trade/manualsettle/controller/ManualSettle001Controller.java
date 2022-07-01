@@ -8,7 +8,6 @@ import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.RequestUtil;
-import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
@@ -43,7 +42,7 @@ import java.util.List;
 @RequestMapping("/invest/trade/manualsettle/ManualSettle001")
 public class ManualSettle001Controller extends BaseController {
 
-    private static final IDictCode[] DICT_CODES = new DictCode[] {DictCode.交易场所,DictCode.交收状态,DictCode.交收业务类别};
+    private static final IDictCode[] DICT_CODES = new DictCode[]{DictCode.交易场所, DictCode.交收状态, DictCode.交收业务类别};
     @Autowired
     private ManualSettleService manualSettleService;
 
@@ -59,7 +58,7 @@ public class ManualSettle001Controller extends BaseController {
 
     @ResponseBody
     @RequestMapping("getIPlatformDate")
-    public String getIPlatformDate(){
+    public String getIPlatformDate() {
         Date platformDate = DateUtil.platDateFromCache();
         return DateUtil.format(platformDate);
     }
@@ -72,17 +71,18 @@ public class ManualSettle001Controller extends BaseController {
         return page;
     }
 
-  /**
-   * 交收流水
-   * @author zhangnian
-   * @date 2020/10/22 0022
-   * @param  * @param
-   * @return com.joyintech.framework.grid.Page<com.joyintech.tams.invest.settle.manualsettle.dto.ManualSettleDto>
-  */
+    /**
+     * 交收流水
+     *
+     * @param * @param
+     * @return com.joyintech.framework.grid.Page<com.joyintech.tams.invest.settle.manualsettle.dto.ManualSettleDto>
+     * @author zhangnian
+     * @date 2020/10/22 0022
+     */
     @ResponseBody
     @RequestMapping("queryForFlowPage")
     public List<ManualSettleFlowDto> selectTransDetailPage() throws Exception {
-        return  manualSettleService.queryForFlowPage(RequestUtil.getPageParam());
+        return manualSettleService.queryForFlowPage(RequestUtil.getPageParam());
     }
 
     @ResponseBody
@@ -101,9 +101,9 @@ public class ManualSettle001Controller extends BaseController {
         params.setBusinessType(DictCodeList.共通业务类型_债券类资产信息.getValue());
         // 设置流程业务说明, entity即传入的dto
         params.setComment(entity -> {
-            return WorkFlowUtil.concatComment(getMessage("FinBondTargetAsset002.finprodId")+
-                    GlobalConstant.OPEN_PARENTHESIS+GlobalConstant.CLOSE_PARENTHESIS+
-                    getMessage("FinBondTargetAsset002.finprodName")+GlobalConstant.OPEN_PARENTHESIS+
+            return WorkFlowUtil.concatComment(getMessage("FinBondTargetAsset002.finprodId") +
+                    GlobalConstant.OPEN_PARENTHESIS + GlobalConstant.CLOSE_PARENTHESIS +
+                    getMessage("FinBondTargetAsset002.finprodName") + GlobalConstant.OPEN_PARENTHESIS +
                     GlobalConstant.CLOSE_PARENTHESIS);
         });
         processParameter.setWorkFlowParameter(params);
@@ -124,7 +124,7 @@ public class ManualSettle001Controller extends BaseController {
     @RequestMapping("export")
     public ResponseEntity<byte[]> export()
             throws Exception {
-        return manualSettleService.export(this.getPageId(),RequestUtil.getParameters(getRequest()));
+        return manualSettleService.export(this.getPageId(), RequestUtil.getParameters(getRequest()));
     }
 } 
 

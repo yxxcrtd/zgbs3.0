@@ -29,7 +29,7 @@ import com.joyintech.component.svrreport.chb.msglog.dao.ChbComponentMsgLogMapper
 import com.joyintech.component.svrreport.chb.msglog.service.ChbComponentMsgLogService;
 import com.joyintech.component.svrreport.chb.msgsend.dto.ExtFprDClient;
 import com.joyintech.component.svrreport.chb.util.ChbXmlUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;

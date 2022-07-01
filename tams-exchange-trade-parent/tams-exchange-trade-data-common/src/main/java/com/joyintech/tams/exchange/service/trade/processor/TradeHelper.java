@@ -1,8 +1,10 @@
 package com.joyintech.tams.exchange.service.trade.processor;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.joyintech.exchange.service.quote.service.QuoteService;
@@ -17,6 +19,7 @@ import com.joyintech.tams.exchange.common.bean.terminal.RTGSStatusBean;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.instrument.SubStockType;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt2;
+import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.dto.EntrustPriceAndYieldDto;
@@ -72,7 +75,8 @@ import static com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetT
 @Service
 public class TradeHelper {
     private static final Logger logger = LoggerFactory.getLogger(TradeHelper.class);
-
+    @Autowired
+    FuturesInstrumentService futuresInstrumentService;
     @Autowired
     private TradeAgentManager tradeAgentManager;
     @Autowired
@@ -85,8 +89,6 @@ public class TradeHelper {
     private IntegratedEntrustService integratedEntrustService;
     @Autowired
     private InstrumentService instrumentService;
-    @Autowired
-    FuturesInstrumentService futuresInstrumentService;
     @Autowired
     private InvestmentManagement investmentManagement;
     @Autowired
@@ -207,7 +209,7 @@ public class TradeHelper {
         logger.info("准备通过风控：instruction {}  entrust {}", instruction.getEntrustId(), entrust.getId());
         if (checkCommonParam(entrust.getFullPrice(), entrust.getEntrustPrice(), entrust.getEntrustVolume(), entrust, instruction)) {
             //意向单无需进风控
-            if (EntrustUtils.isIntentionEntrust(entrust.getEntrustProp())) {
+            if (EntrustUtils.isIntentionEntrust(entrust.getEntrustProp()) || StringUtil.equals(DictCodeListExt3.投管业务类型_信用保护凭证.getValue(), instruction.getBusiTypeTg())) {
                 addEntrustToReceiver(entrust, instruction, msgType);
             } else {
                 RiskOccupyBean riskOccupyBean = investRiskManagement.riskCheck(Arrays.asList(entrust));
@@ -245,7 +247,7 @@ public class TradeHelper {
         //TODO 目前只对具体业务判断，后续可通过全局簿记开关控制：
         //（1）开关开启所有业务走簿记功能，不在依赖终端；
         //（2）开关关闭所有业务走交易接口，需要依赖终端；
-        if(StringUtil.equals(BussTypeEnum.CREDIT_PROTECTION_CERTIFICATE.getCode(),instruction.getBusiTypeTg())){
+        if (StringUtil.equals(BussTypeEnum.CREDIT_PROTECTION_CERTIFICATE.getCode(), instruction.getBusiTypeTg())) {
             TradeMsgReceiver tradeMsgReceiver = msgReceiverManager.getMsgReceiverByInstruction(entrust.getInstructionId());
             if (Constants.PROCESS_TYPE_ENTRUST == msgType) {
                 tradeMsgReceiver.addMsg(MsgType.REQ_ENTRUST, entrust, agent);
@@ -371,6 +373,10 @@ public class TradeHelper {
         order.setTradingDay(tradingDay);
         Account account = accountManager.getAccountById(order.getAccountId());
         if (Objects.isNull(account)) {
+            if (EntrustUtils.isCreditProtectionCertificate(order.getBusiTypeTg())) {
+                logger.warn("【簿记功能】不需要填充账号信息： {}", order.getBusiTypeTg());
+                return false;
+            }
             order.setErrorCode(ErrorCode.ACCOUNT_NOT_LOGIN.value);
             order.setErrorMsg(ErrorCode.ACCOUNT_NOT_LOGIN.errorMsg);
             logger.warn("未找到相关账号信息 {}", order.getAccountId());
@@ -531,7 +537,7 @@ public class TradeHelper {
      * 1、是否满足指令价格限定；
      * 2、是否满足行情涨跌停价限制
      */
-    private void checkPrice(BatchInfo batchInfo,OrderInterface entrust, Instruction instruction) {
+    private void checkPrice(BatchInfo batchInfo, OrderInterface entrust, Instruction instruction) {
         BigDecimal entrustPrice = entrust.getEntrustPrice();
         BigDecimal instructionPrice = instruction.getEntrustPrice();
         if (instruction.convertibleBond() || (instruction.newBond() && instruction.fullPrice())) {
@@ -732,6 +738,9 @@ public class TradeHelper {
         }
         order.setOrderStatus(OrderStatus.CREATE.value);
         logger.info("指令检查完成，当前指令基本信息： instruction {}, entrustNum:{}, entrustAmt:{}, frozen:{}, finished:{}", instruction.getEntrustId(), instruction.getEntrustNum(), instruction.getEntrustAmt(), instruction.getFrozenQuantity(), instruction.getEntrustLeftAmt());
+        order.setBusiTypeTg(instruction.getBusiTypeTg());
+        order.setFinanceAccount(instruction.getBusiAcctNo());
+        order.setAccountName(instruction.getAcctName());
         // 若账号不存在，直接返回订单
         if (createOrderByAccount(order, tradingDay, new Date(System.currentTimeMillis()))) {
             return order;
@@ -747,7 +756,6 @@ public class TradeHelper {
         order.setFinprodType2(instruction.getFinprodType2());
         order.setInvManagerId(instruction.getInvManagerId());
         order.setPs(instruction.getTradeSide());
-        order.setBusiTypeTg(instruction.getBusiTypeTg());
         order.setConNum(instruction.getConNum());
         order.setEntrustClass(instruction.getEntrustClass());
         order.setTargetType(instruction.getTargetType());
@@ -1289,6 +1297,9 @@ public class TradeHelper {
                 integratedEntrust.setMarket(StockCodeUtils.getMarket(integratedEntrust.getStockCode()));
                 integratedEntrust.setStockCode(integratedEntrust.getStockCode());
             }
+            integratedEntrust.setBusiTypeTg(instruction.getBusiTypeTg());
+            integratedEntrust.setFinanceAccount(instruction.getBusiAcctNo());
+            integratedEntrust.setAccountName(instruction.getAcctName());
             // 若账号不存在，直接返回订单
             if (createOrderByAccount(integratedEntrust, tradingDay, now)) {
                 return integratedEntrust;
@@ -1308,7 +1319,6 @@ public class TradeHelper {
             integratedEntrust.setFinprodType2(instruction.getFinprodType2());
             integratedEntrust.setInvManagerId(instruction.getInvManagerId());
             integratedEntrust.setPs(instruction.getTradeSide());
-            integratedEntrust.setBusiTypeTg(instruction.getBusiTypeTg());
             integratedEntrust.setEntrustClass(instruction.getEntrustClass());
             integratedEntrust.setAccountName(instruction.getAcctName());
 

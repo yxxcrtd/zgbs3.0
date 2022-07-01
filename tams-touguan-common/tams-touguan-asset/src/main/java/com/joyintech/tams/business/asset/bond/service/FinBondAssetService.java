@@ -5,6 +5,7 @@ import com.joyintech.calculation.shell.PriceByYieldCalculator;
 import com.joyintech.calculation.shell.YieldByPriceCalculator;
 import com.joyintech.calculation.shell.param.*;
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.file.SafelyFile;
@@ -18,7 +19,10 @@ import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.asset.bond.dao.FinBondAssetMapper;
 import com.joyintech.tams.business.asset.bond.dto.*;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
+import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.asset.dto.BussFinRepaymentDto;
@@ -50,11 +54,13 @@ import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.entity.FlowEntity;
 import com.joyintech.workflow.engine.service.BaseProcessService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,15 +68,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.file.Files;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.现金流类型_中间还本;
+import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.现金流类型_到期还本;
 
 /**
  * 债券标的信息新建
@@ -203,6 +217,15 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
 
     @Override
     public void doInsert(FinBondAssetSaveRequest entity, OperationType type){
+        //文件信息
+        if (StringUtil.isNotEmpty(entity.getMstFileInputParameter()) && CollectionUtils.isNotEmpty(entity.getMstFileInputParameter().getFileList())
+                && StringUtil.isNotEmpty(entity.getFinprodId())) {
+            // 将附件和当前业务对象绑定（更新附件的业务代码）
+            for (SysUploadFileInfo fileInfo:entity.getMstFileInputParameter().getFileList()){
+                fileInfo.setBusinessId(entity.getFinprodId());
+                finBondAssetMapper.updateFileByPrimaryKey(fileInfo);
+            }
+        }
         if (StringUtil.equals(entity.getIsAddSec(),DictCodeList.是否_是.getValue())) {
             updateCfetsOprHis(entity.getFinprodMarketId(), DictCodeListExt3.操作类型_债券自动加券.getValue(),entity.getWorkflowId());
         }else{
@@ -218,6 +241,15 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
 
     @Override
     public void doUpdate(FinBondAssetSaveRequest entity) {
+        //文件信息
+        if (StringUtil.isNotEmpty(entity.getMstFileInputParameter()) && CollectionUtils.isNotEmpty(entity.getMstFileInputParameter().getFileList())
+                && StringUtil.isNotEmpty(entity.getFinprodId())) {
+            // 将附件和当前业务对象绑定（更新附件的业务代码）
+            for (SysUploadFileInfo fileInfo:entity.getMstFileInputParameter().getFileList()){
+                fileInfo.setBusinessId(entity.getFinprodId());
+                finBondAssetMapper.updateFileByPrimaryKey(fileInfo);
+            }
+        }
         entity.setFinprodMarketId(entity.getFinprodMarketId()+entity.getTradeMarketId());
         updateCfetsOprHis(entity.getFinprodMarketId(), ENTRUST_RECORD_INSERT,entity.getWorkflowId());
     }
@@ -318,6 +350,9 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             //现金流计划表（FIN_CASH_PLAN）
             List<FinCashPlan> finCashPlanList = dto.getFinCashPlanList();
             for(FinCashPlan finCashPlan: finCashPlanList) {
+                if(!StringUtil.equals(finCashPlan.getCashType(),现金流类型_到期还本.getValue()) && !StringUtil.equals(finCashPlan.getCashType(),现金流类型_中间还本.getValue())) {
+                    finCashPlan.setCashAmt(finCashPlan.getIntAmt());
+                }
                 finCashPlanMapper.insertSelective(finCashPlan);
             }
             //行权计划表（FIN_EXERCISE_PLAN）
@@ -382,6 +417,9 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             finBondAssetMapper.deleteFinCashPlan(entity.getFinprodId());
             List<FinCashPlan> finCashPlanList = dto.getFinCashPlanList();
             for(FinCashPlan finCashPlan: finCashPlanList) {
+                if(!StringUtil.equals(finCashPlan.getCashType(),现金流类型_到期还本.getValue()) && !StringUtil.equals(finCashPlan.getCashType(),现金流类型_中间还本.getValue())) {
+                    finCashPlan.setCashAmt(finCashPlan.getIntAmt());
+                }
                 finCashPlanMapper.insertSelective(finCashPlan);
             }
             //行权计划表（FIN_EXERCISE_PLAN）
@@ -645,6 +683,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
             finProductAdd.setIsPpb(DictCodeList.是否_否.getValue());
         }
         finProductAdd.setFaceValue(BigDecimal.valueOf(100));
+        finProductAdd.setInvestNature(DictCodeList.投资性质_固定收益类.getValue());
         //----add by jjpei 20190727 添加投资性质----start----
 //        if(StringUtil.isNotBlank(dto.getType4())&&DictCodeList.WIND一级分类_含债券一级分类等_优先股.getValue().equals(dto.getType4())){
 //            finProductAdd.setInvestNature(DictCodeList.投资性质_权益类.getValue());
@@ -1008,7 +1047,7 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
                 //付息
                 List<BondFinCashPlanDto> payInvestDtos = new ArrayList<>();
                 for (FinCashPlan finCashPlan : finCashPlanList) {
-                    if (BussinessDictCodeList.现金流类型_中间还本.getValue().equals(finCashPlan.getCashType())
+                    if (现金流类型_中间还本.getValue().equals(finCashPlan.getCashType())
                             || BussinessDictCodeList.现金流类型_到期还本.getValue().equals(finCashPlan.getCashType())){
                         FinCashPlanDto finCashPlanDto = new FinCashPlanDto();
                         BeanUtil.copyPropertiesIgnoreNull(finCashPlanDto,finCashPlan);
@@ -1691,34 +1730,4 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         return finBondAssetMapper.isTransInAssetTwo(finprodId);
     }
 
-    public MultipartFile downloadFileInfo(String seqNo) {
-        SysUploadFileInfo file = joyinFSMapper.selectByPrimaryKey(seqNo);
-        File pathFile = new SafelyFile(file.getPath());
-        FileItem fileItem = createFileItem(pathFile, pathFile.getName());
-        MultipartFile multipartFile = null;
-        //  生成文件夹
-        if (pathFile.exists()){
-            multipartFile = new CommonsMultipartFile(fileItem);
-        }
-        return multipartFile;
-    }
-
-    private FileItem createFileItem(File file, String fieldName) {
-        FileItemFactory factory = new DiskFileItemFactory(16, null);
-        FileItem item = factory.createItem(fieldName, "text/plain", true, file.getName());
-        int bytesRead = 0;
-        byte[] buffer = new byte[8192];
-        try {
-            FileInputStream fis = new FileInputStream(file);
-            OutputStream os = item.getOutputStream();
-            while ((bytesRead = fis.read(buffer, 0, 8192)) != -1) {
-                os.write(buffer, 0, bytesRead);
-            }
-            os.close();
-            fis.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return item;
-    }
 }

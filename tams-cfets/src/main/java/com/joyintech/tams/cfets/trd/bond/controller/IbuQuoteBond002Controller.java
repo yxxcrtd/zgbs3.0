@@ -2,6 +2,8 @@ package com.joyintech.tams.cfets.trd.bond.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.JoyinMessage;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
@@ -9,14 +11,15 @@ import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
+import com.joyintech.tams.business.common.dto.FinProductSpecialDto;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.cfets.position.service.PositionInfoService;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
-import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealQuoteCommonDto;
 import com.joyintech.tams.cfets.trd.bond.service.CfetsBondDealQuotedPrice002Service;
-import com.joyintech.tams.cfets.position.service.PositionInfoService;
 import com.joyintech.tams.common.base.dao.StlSecAcctInfoMapper;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -35,7 +38,7 @@ import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -96,7 +99,7 @@ public class IbuQuoteBond002Controller extends BaseController {
     private PositionInfoService positionInfoService;
 
     @Autowired
-    private CfetsIbuQuoteBondMapper cfetsIbuQuoteBondMapper;
+    private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
 
     @Override
     public String init(Model model) {
@@ -266,6 +269,18 @@ public class IbuQuoteBond002Controller extends BaseController {
 
         if (!StringUtil.isNotEmpty(cfetsBondDealDialogueQuoteDto.getCalculateField())) {
             cfetsBondDealDialogueQuoteDto.setCalculateField(DictCodeListExt3.债券计算模式_单位净价.getValue());
+        }
+        // 特殊债券信息查询
+        List<FinProductSpecialDto> list = joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(Arrays.asList(cfetsBondDealDialogueQuoteDto.getFinprodId()));
+        if (CollectionUtils.isNotEmpty(list)) {
+            cfetsBondDealDialogueQuoteDto.setIsDefaultBondIndicator(list.get(0).getIsDefaultBondIndicator());
+            cfetsBondDealDialogueQuoteDto.setIsSpecialDebt(list.get(0).getIsSpecialDebt());
+            cfetsBondDealDialogueQuoteDto.setIsAbs(list.get(0).getIsAbs());
+            if (StringUtil.equals(cfetsBondDealDialogueQuoteDto.getIsAbs(), DictCodeListExt1.是否_是.getValue())
+                    || StringUtil.equals(cfetsBondDealDialogueQuoteDto.getIsDefaultBondIndicator(), DictCodeListExt1.是否_是.getValue())
+                    || StringUtil.equals(cfetsBondDealDialogueQuoteDto.getIsSpecialDebt(), DictCodeListExt1.是否_是.getValue())) {
+                cfetsBondDealDialogueQuoteDto.setIsSpecial(DictCodeListExt1.是否_是.getValue());
+            }
         }
         model.addAttribute("assetTypeOne",cfetsBondDealDialogueQuoteDto.getAssetTypeOne());
 
@@ -549,6 +564,9 @@ public class IbuQuoteBond002Controller extends BaseController {
 
             ar.setData(this.getMessage("COMMON_C_0001", msg));
         }*/
+        if(CollectionUtils.isEmpty(ar.getErrorList())){
+            return commonCheck(null,"submit");
+        }
         return ar;
     }
 

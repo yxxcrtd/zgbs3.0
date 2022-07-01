@@ -10,6 +10,7 @@
  
 package com.joyintech.tams.invest.asset.project.controller;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,7 +20,7 @@ import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.invest.asset.depo.dto.FinDepositTargetDto;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -182,6 +183,10 @@ public class FinProjectTargetAsset002Controller extends BaseController{
                     }
                 }
             }*/
+            if(isQuickInput){
+                // 快录时，不默认带出附件信息
+                finProjectTargetAssetDto.setFinprodId("");
+            }
             model.addAttribute("entity", finProjectTargetAssetDto);
         }//来自于代办
         else if(!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(workflowId)){

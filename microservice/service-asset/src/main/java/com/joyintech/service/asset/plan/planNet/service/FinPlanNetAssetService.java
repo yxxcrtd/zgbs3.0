@@ -90,6 +90,12 @@ public class FinPlanNetAssetService extends BaseService<FinPlanNetAssetDto> {
      */
     @Autowired
     private PtlPortfolioMapper ptlPortfolioMapper;
+
+    /**
+     * Pa组合表mapper
+     */
+    @Autowired
+    private PaPtlPortfolioMapper paPtlPortfolioMapper;
     // 投后信息表mapper by赵东东 2019.9.29 start
     /**
      * 投后信息表mapper
@@ -266,7 +272,8 @@ public class FinPlanNetAssetService extends BaseService<FinPlanNetAssetDto> {
         repAssetOtherMapper.deleteByPrimaryKey(dto.getFinprodId());
       //删除委外组合 add wangpeng 2019.07.23
         if(StringUtil.isNotEmpty(dto.getFinprodMarketId())){
-        	 ptlPortfolioMapper.deleteByPrimaryKey(dto.getFinprodMarketId());
+            ptlPortfolioMapper.deleteByPrimaryKey(dto.getFinprodMarketId());
+            paPtlPortfolioMapper.deleteByPrimaryKey(dto.getFinprodMarketId());
         }
     }
 
@@ -356,6 +363,7 @@ public class FinPlanNetAssetService extends BaseService<FinPlanNetAssetDto> {
         	 //组合表插入
             ptlPortfolioMapper.deleteByPrimaryKey(dto.getPtlPortfolio().getPortfolioId());
             ptlPortfolioMapper.insert(dto.getPtlPortfolio());
+            paPtlPortfolioMapper.insert(dto.getPaPtlPortfolio());
         }
         //end
         

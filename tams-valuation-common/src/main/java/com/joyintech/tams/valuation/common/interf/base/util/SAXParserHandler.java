@@ -10,7 +10,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -20,8 +21,6 @@ import com.joyintech.tams.common.base.entity.Prdbokstl;
 import com.joyintech.tams.common.base.entity.TempCheckInfo;
 import com.joyintech.tams.common.base.entity.ValInterflog;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.valuation.common.interf.base.dto.TargetFinProduct;
 import com.joyintech.tams.valuation.common.interf.base.dto.TemplateColMatchDTO;
 import com.joyintech.tams.valuation.common.interf.base.dto.TemplateOrderInfoReaderDTO;
@@ -34,7 +33,9 @@ import com.joyintech.tams.valuation.common.interf.base.dto.TemplateOrderInfoRead
  */
 public class SAXParserHandler extends DefaultHandler {
 	
-	Logger logger = Logger.getLogger(DefaultHandler.class);
+//	Logger logger = Logger.getLogger(DefaultHandler.class);
+
+	private static Logger logger = LoggerFactory.getLogger(SAXParserHandler.class);
 	
 	private int bookIndex = 0;
     

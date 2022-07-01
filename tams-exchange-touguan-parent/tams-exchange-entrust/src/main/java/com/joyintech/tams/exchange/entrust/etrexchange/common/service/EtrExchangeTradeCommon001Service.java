@@ -2107,7 +2107,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         if (baseEtrCashPositionCommService != null && (DictCodeList.委托状态_待接收.getValue().equals(entity.getEntrustStatus())
                 || DictCodeListExt3.委托状态_待分发.getValue().equals(entity.getEntrustStatus()))) {
             baseEtrCashPositionCommService.entrustCloseExecute(entity.getEntrustId(), DictCodeList.是否_是.getValue());
-//			positionRequestService.sendRevoke(entity);
+			//positionRequestService.sendRevoke(entity);
         }
         //处理履历
         updateCfetsOprHis(entity.getEntrustId(), "revoke",null,null);
@@ -2524,6 +2524,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
             } else {
                 entrustAmt = ArithmeticUtil.multiply(entrustNum, entrustPrice);
             }
+//            }
             if (StringUtils.equals(DictCodeListExt3.交易方向_质押券入库.getValue(), ps) ||
                     StringUtils.equals(DictCodeListExt3.交易方向_质押券出库.getValue(), ps)) {
                 if (null != entrustNum) {//entrustAmt 代表标准券数量
@@ -5426,6 +5427,18 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         etrExchangeTrade001Dto.setStockId(dto.getStockId());
         etrExchangeTrade001Dto.setEntrustDate(DateUtil.parse(DateUtil.format(dto.getEntrustDate(), DateUtil.DEFAULT_DATE_FORMAT_EN)));
         etrExchangeTrade001Dto.setOptType(dto.getOptType());
+
+        //风险试算 ZGCPCN-1582 保留单组合信息
+        if (dto.getPortfolioList().size() > 1 && !CollectionUtils.isEmpty(dto.getRiskTrialRetDto())) {
+            List<RiskTrialRetDto> riskTrialRetDtos1 = new ArrayList<>();
+            dto.getRiskTrialRetDto().forEach(riskTrialRetDto -> {
+                if (StringUtil.equals(riskTrialRetDto.getPortfolioCode(), etrExchangeTrade001Dto.getPortfolioId())
+                        || StringUtil.equals(riskTrialRetDto.getPortfolioId(), etrExchangeTrade001Dto.getPortfolioId())) {
+                    riskTrialRetDtos1.add(riskTrialRetDto);
+                }
+            });
+            etrExchangeTrade001Dto.setRiskTrialRetDto(riskTrialRetDtos1);
+        }
 
         return etrExchangeTrade001Dto;
     }

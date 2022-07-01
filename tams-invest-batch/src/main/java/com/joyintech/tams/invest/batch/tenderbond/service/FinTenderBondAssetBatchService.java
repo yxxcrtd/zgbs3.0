@@ -1,8 +1,12 @@
 package com.joyintech.tams.invest.batch.tenderbond.service;
 
+import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.CacheUtil;
 import com.google.common.collect.Lists;
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.JoyinRestTemplate;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
@@ -19,10 +23,17 @@ import com.joyintech.tams.invest.batch.tenderbond.dto.FinTenderBondAssetBatchDto
 import com.joyintech.tams.invest.batch.valbatchimport.common.dto.InterfPayhsrcsecinfoDto;
 import com.joyintech.tams.invest.batch.valbatchimport.common.service.CommonAutoCouponService;
 import com.joyintech.tams.invest.common.autoperiod.common.AutoPeriodCommonService;
+import com.joyintech.tams.invest.common.component.base.group.BasePtlSecPositionInfoService;
+import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.valuationusemerge.WflValidInputParameter;
-import org.apache.commons.collections.CollectionUtils;
+import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
+//import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,15 +54,14 @@ import java.util.*;
 @Service
 @Scope("prototype")
 public class FinTenderBondAssetBatchService {
+    private Logger logger = LoggerFactory.getLogger(getClass());
+
 
     @Resource
     private FinTenderBondAssetBatchMapper finTenderBoundAssetMapper;
 
     @Resource
     private AutoPeriodCommonService autoPeriodCommonService;
-
-    @Resource
-    private CommonAutoCouponService commonAutoCouponService;
 
     @Resource
     private TrdFinProductDealTotalMapper trdFinProductDealTotalMapper;
@@ -68,10 +78,16 @@ public class FinTenderBondAssetBatchService {
     @Resource
     private JoyinbusinessCommonService joyinbusinessCommonService;
 
+    @Resource
+    private BaseAssetCashPositionCommMapper baseAssetCashPositionCommMapper;
+
+    @Resource
+    private BasePtlSecPositionInfoService basePtlSecPositionInfoService;
+
     /**
      * 是否单体服务
      */
-    @Value("${application.micorservice.contextPath.single:false}")
+    @Value("${application.micorservice.contextpath.single:false}")
     private boolean isSingle;
 
     @Autowired(required = false)
@@ -81,7 +97,7 @@ public class FinTenderBondAssetBatchService {
     @Qualifier("simpleRestTemplate")
     protected JoyinRestTemplate simpleRestTemplate;
 
-    @Value("${application.micorservice.contextPath.tamsServer:http://tams-server}")
+    @Value("${application.micorservice.contextpath.tamsServer:http://tams-server}")
     private String tamsSerever;
 
     /**
@@ -248,12 +264,45 @@ public class FinTenderBondAssetBatchService {
         productAdd.setIssueStatus(DictCodeListExt1.发行状态_发行成功.getValue());
         finProductAddMapper.updateForTenderBound(productAdd);
         //记录操作日志
-        saveOperate(dto.getFinprodMarketId(), "");
+        saveOperate(productAdd);
         //发送头寸
         dto.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
         this.sendPosition(dto, plateDate, seqList);
     }
 
+    /**
+     * 处理旧头寸
+     *
+     * @param dto
+     */
+    private void insertOldPostion(FinTenderBondAssetBatchDto dto,String finproductId,Date plateDate) {
+        if (com.joyintech.framework.util.StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
+            //1.查出二级债对应的金融产品代码
+            Map<String, String> params = new HashMap();
+            params.put("finprodType2", DictCodeList.平安资产类型_债券.getValue());
+            params.put("finprodMarketId", dto.getAppearMarketId());
+            //2.查出新债的流水
+            List<PtlSecPosition> flowList = baseAssetCashPositionCommMapper.selectPositionByFinproductId(dto.getFinprodId(), DateUtil.format(plateDate,"yyyy-MM-dd"));
+            if (com.joyintech.framework.util.StringUtil.isNotEmpty(finproductId)) {
+                if (CollectionUtils.isNotEmpty(flowList)) {
+                    //3.冲正新债的流水
+                    for (PtlSecPosition flow : flowList) {
+                        PtlSecPositionFlowDto flowDto = new PtlSecPositionFlowDto();
+                        BeanUtil.copyPropertiesIgnoreNull(flowDto, flow);
+                        flowDto.setAmount(flow.getAmount().negate());
+                        flowDto.setTradeId(dto.getTotleTradeId());
+                        basePtlSecPositionInfoService.inertSecPositionFlow(flowDto);
+                        //4.重新插入二级债的流水
+                        PtlSecPositionFlowDto twoDto = new PtlSecPositionFlowDto();
+                        BeanUtil.copyPropertiesIgnoreNull(twoDto, flow);
+                        twoDto.setFinprodId(finproductId);
+                        twoDto.setTradeId(dto.getTotleTradeId());
+                        basePtlSecPositionInfoService.inertSecPositionFlow(twoDto);
+                    }
+                }
+            }
+        }
+    }
 
     private void sendPosition(FinTenderBondAssetBatchDto dto, Date plateDate, List<Long> seqList) {
         long seqNo = (long) Arrays.deepHashCode(new Object[]{dto.getTotleTradeId(), DictCodeListExt1.子系统代码_交易.getValue(), new Date().getTime(), Thread.currentThread().getId()});
@@ -287,6 +336,8 @@ public class FinTenderBondAssetBatchService {
         }
         seqList.add(seqNo);
         PositionHttpRequest.send(param);
+        //处理旧头寸
+        this.insertOldPostion(dto,finproductId,plateDate);
     }
 
 
@@ -311,11 +362,11 @@ public class FinTenderBondAssetBatchService {
             return false;
         }
         if(Objects.nonNull(message) && message.getCode().equals("000") && Objects.isNull(message.getData())) {
-            InterfPayhsrcsecinfoDto interfPayhsrcsecinfoDto = commonAutoCouponService.autoBondCoupon(dto);
-            if (Objects.nonNull(interfPayhsrcsecinfoDto) && CollectionUtils.isNotEmpty(interfPayhsrcsecinfoDto.getErrorBondList())) {
-                return false;
+            message =  simpleRestTemplate.postForObject(tamsSerever + "/asset/tenderBondAsset003/autoCoupons", paramMap, Message.class);
+            if (Objects.nonNull(message) && message.getCode().equals("000")) {
+                return true;
             }
-            return true;
+            return false;
         }
         return false;
     }
@@ -323,16 +374,17 @@ public class FinTenderBondAssetBatchService {
     /**
      * 保存操作类型
      *
-     * @param tradeId
-     * @param remark
+     * @param productAdd
      */
-    public void saveOperate(String tradeId, String remark) {
+    public void saveOperate(FinProductAdd productAdd) {
         CfetsOprHisInfoRequest oprHisReq = new CfetsOprHisInfoRequest();
-        oprHisReq.setEntrustId(tradeId);
+        oprHisReq.setEntrustId(productAdd.getFinprodId());
         oprHisReq.setOperType(DictCodeListExt3.操作类型_上市流通.getValue());
-        oprHisReq.setBusiDes(remark);
+        oprHisReq.setBusiDes("上市流通");
         oprHisReq.setBusiType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
+        logger.info("上市流通日志：" + JsonUtils.object2Json(oprHisReq));
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
+
 
 }

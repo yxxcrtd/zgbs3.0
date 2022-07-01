@@ -93,6 +93,8 @@ public class CfetsManualSettleTradeListRespond {
     @ApiModelProperty(name="counterName",value="交易对手",example="admin")
     private String counterName;
 
+    private String counterId;
+
     @ApiModelProperty(name="cleanStlStatus",value="结算指令状态CODE",example="A1")
     private String cleanStlStatus;
 
@@ -457,5 +459,13 @@ public class CfetsManualSettleTradeListRespond {
 
     public void setCalMode(String calMode) {
         this.calMode = calMode;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
     }
 }

@@ -30,7 +30,7 @@ import com.joyintech.tams.systemtools.dao.TamsBaseMapper;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,7 +116,10 @@ public class CfetsIbuQuoteRepoController extends BaseController {
         // 登记托管机构
         initPageParams.put("REGIST_ORG", this.getSelectDataFromDataDic(DictCode.登记托管机构, null));
         // 债券类型
-        initPageParams.put("BOND_TYPE", this.getSelectDataFromDataDic(DictCode.行内资产四级分类, null));
+        //initPageParams.put("BOND_TYPE", this.getSelectDataFromDataDic(DictCode.行内资产四级分类, null));
+        initPageParams.put("CUSTOM_ASSET_TYPE_TWO", this.getSelectDataFromDataDic(DictCode.行内资产二级分类, null));
+        initPageParams.put("CUSTOM_ASSET_TYPE_THREE", this.getSelectDataFromDataDic(DictCode.行内资产三级分类, null));
+        initPageParams.put("CUSTOM_ASSET_TYPE_FOUR", this.getSelectDataFromDataDic(DictCode.行内资产四级分类, null));
         // 回购方式_双边回购
         initPageParams.put("REPO_METHOD_1", DictCodeListExt3.回购方式_双边回购.getValue());
         // 资金账户类型_托管账户

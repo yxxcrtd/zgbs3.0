@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="~{layout/default}">
+	layout:decorate="~{layout/default}">
 <head>
 <meta charset="UTF-8">
 <title>期次管理-新建</title>
@@ -9,6 +9,7 @@
 .rate-inline-wrapper .select2-container{
 width: 33%!important;
 }
+
 </style>
 </head>
 <body>
@@ -41,7 +42,7 @@ width: 33%!important;
 						<div class="layui-input-inline input-inline">
 							<select th:id="ccy" th:name="ccy"
 								class="layui-input form-input input-select"
-								th:initValue="${entity?.ccy}" data-th-data-result="${CCY}"
+								data-th-initValue="${entity?.ccy}" data-th-data-result="${CCY}"
 								searchable="false">
 							</select>
 						</div>
@@ -69,17 +70,18 @@ width: 33%!important;
 					<div class="layui-inline layui-col-md4">
 						<label class="layui-form-label form-lable">投资周期(天)</label>
 						<div class="layui-input-inline input-inline" id="investCycleSelect">
-							<select id="investCycle" name="investCycle" 
+							<select id="investCycle" name="investCycle"
 								class="layui-input form-input input-select"
 								data-th-placeholder="#{SysCommon.placeholder}"
 								formatoption=false parentIds="finprodId"
 								data-th-data-url="|@{/invest/product/productelement/periodicmanagement/PeriodicManagement002/getInvestCycle}|"
-								data-th-initValue='${entity?.investCycle}'>
+								data-th-initValue='${entity?.investCycle}' required>
 							</select>
 						</div>
 						<div class="layui-input-inline input-inline" id="investCycleInput">
 							<input type="text" id="investCycle2" name="investCycle2" class="layui-input form-input"
-								 th:value="${entity?.investCycle2}?:${entity?.investCycle}" />
+								   data-th-placeholder="#{SysCommon.placeholder}"
+								 th:value="${entity?.investCycle2}?:${entity?.investCycle}" required>
 						</div>
 					</div>
 					<div class="layui-inline layui-col-md4">
@@ -139,7 +141,7 @@ width: 33%!important;
 			            <div class="layui-form-item">
 			                <div class="form-inline-wrap" style="width: 100%!important;" id="BussBenchMarkInfo_indexId1">
 			                    <label class="layui-form-label form-label-wrap" style="width: 11.9%!important;" th:text="|#{BussBenchMarkInfo.indexId}=|">浮动利率(%)=</label>
-			                    <div class="layui-input-inline input-inline rate-inline-wrap rate-inline-wrapper" style="width: 85%!important;">
+			                    <div class="layui-input-inline input-inline rate-inline-wrap2 rate-inline-wrapper" style="width: 85%!important;">
 			                        <select th:id="BussBenchMarkInfo_indexId"
 										th:name="bussBenchMarkInfoDto.indexId"
 										class="layui-input form-input input-select"
@@ -284,7 +286,7 @@ width: 33%!important;
 								<label class="layui-form-label form-label-wrap"
 									style="width: 11.9% !important;"
 									th:text="|#{BussBenchMarkInfo.indexId}=|">浮动利率(%)=</label>
-								<div class="layui-input-inline input-inline rate-inline-wrap rate-inline-wrapper"
+								<div class="layui-input-inline input-inline rate-inline-wrap2 rate-inline-wrapper"
 									style="width: 85% !important;">
 									<select th:id="BussFinProductFloatFee_indexId"
 										th:name="bussFinProductFloatFeeDto.indexId"

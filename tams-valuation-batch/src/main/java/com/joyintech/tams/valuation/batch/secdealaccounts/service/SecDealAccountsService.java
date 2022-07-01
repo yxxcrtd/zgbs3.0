@@ -55,7 +55,7 @@ import com.joyintech.tams.valuation.common.constants.GlobalConstant;
 import com.joyintech.tams.valuation.common.constants.ValDictCodeList;
 import com.joyintech.tams.valuation.common.dto.TrdFinProductBarterDto;
 import com.joyintech.tams.valuation.common.service.BookAccountCommonService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;

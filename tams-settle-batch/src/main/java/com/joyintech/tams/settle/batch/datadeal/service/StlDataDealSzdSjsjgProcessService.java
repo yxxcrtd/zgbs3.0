@@ -23,7 +23,7 @@ import com.joyintech.tams.settle.batch.datadeal.function.PersonalityFunction;
 import com.joyintech.tams.settle.common.dto.FundInfoDto;
 import com.joyintech.tams.settle.common.dto.StlDownDataDealAccountInfoDto;
 import com.joyintech.tams.settle.common.service.SettleCommonService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
@@ -582,6 +582,17 @@ public class StlDataDealSzdSjsjgProcessService {
             }else{
                 settleTransData.setSettleDate(DateUtil.parse(szdSjsjg.getJgqsrq()));
             }
+            if(DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())){
+                // 交易日期
+                settleTransData.setTradeDate(DateUtil.parseDate(szdSjsjg.getJgcjrq(), DateUtil.DEFAULT_OTHER_FORMAT));
+
+                if(StringUtil.equals(DictCodeListStl.交收方式_非担保.getValue(), settleTransData.getSettleMode())){
+                    String calendarId = CacheUtil.getSysParam(StlDataDealProcessConstant.STL_DOWNDATA_DEAL_SZJYS_CALID);
+                    settleTransData.setSettleDate(stlDataDealProcessCommonService.getNextWorkDay(settleTransData.getTradeDate(), calendarId));
+                }else{
+                    settleTransData.setSettleDate(DateUtil.parse(szdSjsjg.getJgcjrq()));
+                }
+            }
         }
     }
 
@@ -1123,7 +1134,11 @@ public class StlDataDealSzdSjsjgProcessService {
                     if(!bondAssetList.contains(finprodId) && !sharesAssetList.contains(shareFinprodId)) {
                         continue;
                     }
-                }else{
+                }
+                // 一级投标业务不做资产校验
+                else if(StringUtil.equals(StlDataDealProcessConstant.SJSMX_YWLB_JY02, szdSjsjg.getJgywlb())){
+                }
+                else{
                     if(!bondAssetList.contains(finprodId)) {
                         continue;
                     }
@@ -1321,7 +1336,7 @@ public class StlDataDealSzdSjsjgProcessService {
         //交易方向
         settleTransData.setPs(DictCodeList.交易方向_买入.getValue());
         // 金融产品代码
-        settleTransData.setFinprodId(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue()+szdSjsjg.getJgzqdm()+".SZ");
+        settleTransData.setFinprodId(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue()+ GlobalConstant.UNDER_LINE +szdSjsjg.getJgzqdm()+".SZ");
         // 金融产品类型(估值核算)
         settleTransData.setFinprodType(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
         // 金融产品类型(投管分类)
@@ -1502,8 +1517,9 @@ public class StlDataDealSzdSjsjgProcessService {
         // ImplCalendar implCalendar = new ImplCalendar();
         // settleTransData.setTradeDate(DateUtil.parse(implCalendar.calcDate(szdSjsjg.getJgqsrq(), 1,
         //        BussinessDictCodeListRds.操作符_加.getValue(), BussinessDictCodeListRds.特征值偏移单位_自然日.getValue())));
-        settleTransData.setTradeDate(DateUtil.parse(szdSjsjg.getJgqsrq()));
+        // settleTransData.setTradeDate(DateUtil.parse(szdSjsjg.getJgqsrq()));
         // modify by fuyongsheng 交易日无需+1自然日 end
+        settleTransData.setTradeDate(DateUtil.parse(szdSjsjg.getJgjsrq()));
         // 交割日期
         settleTransData.setSettleDate(DateUtil.parse(szdSjsjg.getJgjsrq()));
         // 交易币种
@@ -1513,7 +1529,7 @@ public class StlDataDealSzdSjsjgProcessService {
         // 交收方式
         settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdSjsjg.getJgjsfs()));
         // 交收结果
-        settleTransData.setDeliveryResult(setDeliveryResult(szdSjsjg));
+        settleTransData.setDeliveryResult(DictCodeListExt4.交收结果_正常交收.getValue());
         // 执行日期
         settleTransData.setDealDate(stlDownDataDealOperatorDto.getDealDate());
         // 证券品种
@@ -1602,6 +1618,13 @@ public class StlDataDealSzdSjsjgProcessService {
             settleTransData.setIntAmt(ArithmeticUtil.subtract(szdSjsjg.getJgsfje().abs(), settleTransData.getCpriceAmt()));
             // 全价总额 abs(清算数据Entity.收付净额)
             settleTransData.setFpriceAmt(szdSjsjg.getJgsfje().abs());
+            settleTransData.setTradeDate(DateUtil.parse(szdSjsjg.getJgqsrq()));
+            // 交割日期
+            if(StringUtil.equals(DictCodeListStl.交收方式_非担保.getValue(), settleTransData.getSettleMode())){
+                settleTransData.setSettleDate(DateUtil.parse(szdSjsjg.getJgjsrq()));
+            }else{
+                settleTransData.setSettleDate(DateUtil.parse(szdSjsjg.getJgqsrq()));
+            }
         }
         // 印花税
         settleTransData.setStampFee(BigDecimal.ZERO);

@@ -17,7 +17,7 @@ import com.joyintech.tams.settle.batch.datagather.dto.InvestTradeReaderDto;
 import com.joyintech.tams.settle.batch.datagather.dto.SettleTransDataDto;
 import com.joyintech.tams.settle.batch.datagather.service.StlDataGatherService;
 import com.joyintech.tools.collectors.JoyinCollectors;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -165,7 +165,7 @@ public abstract class StlDataGatherReader extends BaseReader<InvestTradeReaderDt
      */
     private List<InvestTradeReaderDto> getRepoDurationSettleTransData(Map<String, Object> searchParam){
         InvestTradeReaderDto investTradeReaderDto = new InvestTradeReaderDto();
-        List<SettleTransDataDto> settleTransDataDtos = new ArrayList<>();
+        List<SettleTransDataDto> settleTransDataDtoResult = new ArrayList<>();
         if(StringUtil.equals(searchParam.get("readerRepoType"), DictCodeList.回购类型_质押式竞价回购.getValue())){
             // 资产类型
             searchParam.put("finprodTypes", Arrays.asList(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue()
@@ -178,9 +178,45 @@ public abstract class StlDataGatherReader extends BaseReader<InvestTradeReaderDt
                     ,DictCodeListStl.业务场景分类明细_债券质押式竞价正回购_到期.getValue()));
             // ZGZGST-4214:增加业务场景类型条件 fuyongsheng 20211214 add end
             // 查询竞价回购存续期成交明细数据
-            settleTransDataDtos = stlDataGatherService.listRepoSettleTransData(searchParam);
+            List<SettleTransDataDto> settleTransDataDtos = stlDataGatherService.listRepoSettleTransData(searchParam);
+            // 按照交易编号分组
+            Map<String, List<SettleTransDataDto>> settleTransDataMap = new HashMap<>();
+            if(CollectionUtils.isNotEmpty(settleTransDataDtos)) {
+                settleTransDataDtos.stream()
+                        .collect(JoyinCollectors.groupingBy(SettleTransDataDto::getTradeId2))
+                        .forEach(settleTransDataMap::put);
+            }
+            for(String tradeId : settleTransDataMap.keySet()){
+                List<SettleTransDataDto> settleTransDataDtos1 = settleTransDataMap.get(tradeId);
+                SettleTransDataDto settleTransDataDtoInit = settleTransDataDtos1.get(0);
+                SettleTransDataDto total = new SettleTransDataDto();
+                BeanUtil.copyPropertiesIgnoreNull(total, settleTransDataDtoInit);
+                total.setCpriceAmt(settleTransDataDtos1.stream().map(ele -> null == ele.getCpriceAmt()? BigDecimal.ZERO : ele.getCpriceAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setPrinAmt(settleTransDataDtos1.stream().map(ele -> null == ele.getPrinAmt()? BigDecimal.ZERO : ele.getPrinAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setTradeAmt(settleTransDataDtos1.stream().map(ele -> null == ele.getTradeAmt()? BigDecimal.ZERO : ele.getTradeAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setmTradeAmt(settleTransDataDtos1.stream().map(ele -> null == ele.getmTradeAmt()? BigDecimal.ZERO : ele.getmTradeAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setShareAmt(settleTransDataDtos1.stream().map(ele -> null == ele.getShareAmt()? BigDecimal.ZERO : ele.getShareAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setFpriceAmt(settleTransDataDtos1.stream().map(ele -> null == ele.getFpriceAmt()? BigDecimal.ZERO : ele.getFpriceAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setIntAmt(settleTransDataDtos1.stream().map(ele -> null == ele.getIntAmt()? BigDecimal.ZERO : ele.getIntAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setmIntAmt(settleTransDataDtos1.stream().map(ele -> null == ele.getmIntAmt()? BigDecimal.ZERO : ele.getmIntAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setCommissionAmt(settleTransDataDtos1.stream().map(ele -> null == ele.getCommissionAmt()? BigDecimal.ZERO : ele.getCommissionAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setCommissionAmtRaw(settleTransDataDtos1.stream().map(ele -> null == ele.getCommissionAmtRaw()? BigDecimal.ZERO : ele.getCommissionAmtRaw()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setSxfAmt(settleTransDataDtos1.stream().map(ele -> null == ele.getSxfAmt()? BigDecimal.ZERO : ele.getSxfAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setSxfAmtRaw(settleTransDataDtos1.stream().map(ele -> null == ele.getSxfAmtRaw()? BigDecimal.ZERO : ele.getSxfAmtRaw()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setStampFee(settleTransDataDtos1.stream().map(ele -> null == ele.getStampFee()? BigDecimal.ZERO : ele.getStampFee()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setStampFeeRaw(settleTransDataDtos1.stream().map(ele -> null == ele.getStampFeeRaw()? BigDecimal.ZERO : ele.getStampFeeRaw()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setSettleFee(settleTransDataDtos1.stream().map(ele -> null == ele.getSettleFee()? BigDecimal.ZERO : ele.getSettleFee()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setSettleFeeRaw(settleTransDataDtos1.stream().map(ele -> null == ele.getSettleFeeRaw()? BigDecimal.ZERO : ele.getSettleFeeRaw()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setZgfAmt(settleTransDataDtos1.stream().map(ele -> null == ele.getZgfAmt()? BigDecimal.ZERO : ele.getZgfAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setZgfAmtRaw(settleTransDataDtos1.stream().map(ele -> null == ele.getZgfAmtRaw()? BigDecimal.ZERO : ele.getZgfAmtRaw()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setJsfAmt(settleTransDataDtos1.stream().map(ele -> null == ele.getJsfAmt()? BigDecimal.ZERO : ele.getJsfAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setJsfAmtRaw(settleTransDataDtos1.stream().map(ele -> null == ele.getJsfAmtRaw()? BigDecimal.ZERO : ele.getJsfAmtRaw()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setGhfAmt(settleTransDataDtos1.stream().map(ele -> null == ele.getGhfAmt()? BigDecimal.ZERO : ele.getGhfAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                total.setGhfAmtRaw(settleTransDataDtos1.stream().map(ele -> null == ele.getGhfAmtRaw()? BigDecimal.ZERO : ele.getGhfAmtRaw()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                settleTransDataDtoResult.add(total);
+            }
         }
-        investTradeReaderDto.setSettleTransDataList(settleTransDataDtos);
+        investTradeReaderDto.setSettleTransDataList(settleTransDataDtoResult);
         List<InvestTradeReaderDto> result = new ArrayList<>();
         result.add(investTradeReaderDto);
         return result;
@@ -286,7 +322,12 @@ public abstract class StlDataGatherReader extends BaseReader<InvestTradeReaderDt
                         //变量.汇总成交明细dto.净价总额:				空
                         //变量.汇总成交明细dto.单位面值:				空
                         //变量.汇总成交明细dto.交易日期:				变量.temp_当前成交数据明细数据list第一条数据的对应字段
+                        settleTransDataTotal.setApplyTradeId(settleTransDataDtoInit.getApplyTradeId());
                         settleTransDataTotal.setTradeDate(settleTransDataDtoInit.getTradeDate());
+                        settleTransDataTotal.setDealDate(settleTransDataDtoInit.getDealDate());
+                        settleTransDataTotal.setIsPayWithTrade(settleTransDataDtoInit.getIsPayWithTrade());
+                        //变量.汇总成交明细dto.交割日期:				变量.temp_当前成交数据明细数据list第一条数据的对应字段
+                        settleTransDataTotal.setSettleDate(settleTransDataDtoInit.getSettleDate());
                         //变量.汇总成交明细dto.交易份额:				∑temp_当前成交数据明细数据list所有数据的对应字段
                         settleTransDataTotal.setShareAmt(settleTransDataDtoGroupList.stream().map(ele -> null == ele.getShareAmt() ? BigDecimal.ZERO : ele.getShareAmt() ).reduce(BigDecimal.ZERO, BigDecimal::add));
                         //变量.汇总成交明细dto.交易本金:				∑temp_当前成交数据明细数据list所有数据的对应字段

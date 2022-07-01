@@ -58,6 +58,20 @@ public class TrdBankManualSettleInfo extends BaseEntity {
     private String remark;
 
     /**
+     * 交易方向
+     */
+    private String ps;
+
+    /**
+     * 交易对手
+     */
+    private String counterId;
+
+    /**
+     * 类型
+     */
+    private String finprodType2;
+    /**
      * 交收编号
      * @return SETTLE_SEQ_NO 交收编号
      */
@@ -191,5 +205,29 @@ public class TrdBankManualSettleInfo extends BaseEntity {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getPs() {
+        return ps;
+    }
+
+    public void setPs(String ps) {
+        this.ps = ps;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    public String getFinprodType2() {
+        return finprodType2;
+    }
+
+    public void setFinprodType2(String finprodType2) {
+        this.finprodType2 = finprodType2;
     }
 }

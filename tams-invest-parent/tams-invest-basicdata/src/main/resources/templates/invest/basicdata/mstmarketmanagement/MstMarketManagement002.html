@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-    layout:decorator="~{layout/default}">
+    layout:decorate="~{layout/default}">
 <head>
 <title data-th-text="#{MstMarketManagement002}">评级信息新建</title>
     <style>
@@ -124,17 +124,6 @@
                                             <input type="text" id="directionChange" name="directionChange" allowClear="true"
                                                    class="layui-input form-input input-select" data-th-data-result='${CHANGE_DIRECTION}'
                                                    data-th-value="${entity?.directionChange}" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="layui-form-item">
-                                    <div class="form-inline-wrap oCodeType01">
-                                        <label class="layui-form-label form-lable">内评/外评</label>
-                                        <div class="layui-input-inline input-inline">
-                                            <input type="text" id="gradeSourceType" name="gradeSourceType" allowClear="true"
-                                                   class="layui-input form-input input-select"
-                                                   data-result='[{"id":"01","text":"外部评级","col":""},{"id":"02","text":"内部评级","col":""}]'
-                                                   data-th-value="${entity?.gradeSourceType}" />
                                         </div>
                                     </div>
                                 </div>

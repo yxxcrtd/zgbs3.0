@@ -13,7 +13,7 @@ import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.invest.common.dto.channel.ChannelFeeInfoDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;

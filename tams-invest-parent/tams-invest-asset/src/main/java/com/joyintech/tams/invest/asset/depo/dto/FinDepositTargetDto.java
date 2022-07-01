@@ -869,20 +869,11 @@ public class FinDepositTargetDto extends FinProduct implements ITableRow, Proces
         this.fileArray = fileArray;
     }
 
-    /**
-     * 获取 finPayInterestStdInfoDto
-     *
-     * @return finPayInterestStdInfoDto.
-     */
+
     public FinPayInterestStdInfoDto getFinPayInterestStdInfoDto() {
         return finPayInterestStdInfoDto;
     }
 
-    /**
-     * 设置 finPayInterestStdInfoDto
-     *
-     * @param finPayInterestStdInfoDto finPayInterestStdInfoDto
-     */
     public void setFinPayInterestStdInfoDto(FinPayInterestStdInfoDto finPayInterestStdInfoDto) {
         this.finPayInterestStdInfoDto = finPayInterestStdInfoDto;
     }

@@ -82,6 +82,10 @@ public class FinPlanNetAssetDto extends FinProduct{
      */
     private PtlPortfolio ptlPortfolio;
     /**
+     * pa组合entity
+     */
+    private PaPtlPortfolio paPtlPortfolio;
+    /**
      * 资产负债报送信息entity
      */
     private RepAssetDept repAssetDept;
@@ -1151,5 +1155,13 @@ public class FinPlanNetAssetDto extends FinProduct{
 
     public void setBussFinProductOpenPlanRedDto(BussFinProductOpenPlanDto bussFinProductOpenPlanRedDto) {
         this.bussFinProductOpenPlanRedDto = bussFinProductOpenPlanRedDto;
+    }
+
+    public PaPtlPortfolio getPaPtlPortfolio() {
+        return paPtlPortfolio;
+    }
+
+    public void setPaPtlPortfolio(PaPtlPortfolio paPtlPortfolio) {
+        this.paPtlPortfolio = paPtlPortfolio;
     }
 }

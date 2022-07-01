@@ -368,6 +368,20 @@
             sortable: false
         }
         , {
+            /*资产名称*/
+            field: 'assetName',
+            width: 150,
+            title: 'BaseRiskMathComm.assetName',
+            sortable: false
+        }
+        , {
+            /*违规阈值*/
+            field: 'forbiddenLn',
+            width: 150,
+            title: 'BaseRiskMathComm.forbiddenLn',
+            sortable: false
+        }
+        , {
             /*审批线*/
             field: 'approveLine',
             width: 150,
@@ -430,6 +444,9 @@
     });
 
     var init = function () {
+        if(!!query("#finprodName").val()){
+            query("#finprodName").attr("disabled", true);
+        }
         query("#calculateField_price").prop('checked', true);
         layui.form.render('radio');
         if (calculateField) {
@@ -456,7 +473,7 @@
         var riskLists = entity_RiskTrialRetList || [];
         if (riskLists.length > 0) {
             $("#riskTrialSpan").html("&nbsp;&nbsp;" + riskLists[0].conclusion);
-            setRiskFlag(0);
+            setRiskFlag(1);
         }
     }
 
@@ -729,6 +746,10 @@
         }
         if(Number(tradeAmt) !== entrustNumAll) {
             Joyin.error("券面总额与组合分配处的券面总额不一致")
+            return false;
+        }
+        if(riskFlag === 1 && ps != 'T03') {
+            Joyin.error("请先点击风险试算")
             return false;
         }
         var obj = getSubmitParam("submit");
@@ -1043,6 +1064,8 @@
         query("#matureYieldDiv").hide();
         query("#exerYieldDiv").hide();
         query("#priceModel").attr("disabled", true);
+        query("#riskTrialRet_div").hide();
+        query("#CfetsEtrIbBondinfo003_btn_riskcal").hide();
         layui.form.render();
     }
     if(ps == 'T01' || ps == 'T02') {

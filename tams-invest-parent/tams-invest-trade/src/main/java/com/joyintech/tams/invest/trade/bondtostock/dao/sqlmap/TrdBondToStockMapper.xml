@@ -59,6 +59,65 @@
         total.CHL_ID chlId,
         total.SEC_MANAGE_ACCT_ID secManageAcctId,
     </sql>
+
+    <sql id="selectCloumn1">
+        <!--业务编号-->
+
+        total.TOTLE_TRADE_ID busiCode,
+        total.TOTLE_TRADE_ID totleTradeId,
+        <!--委托代码-->
+        totalAdd.ENTRUST_ID entrustId,
+        <!--组合代码-->
+        total.PORTFOLIO_ID portfolioId,
+        <!--组合名称-->
+        pp.PORTFOLIO_NAME portfolioName,
+        <!--转债代码-->
+        total.FINPROD_ID finprodId,
+        <!--转债名称-->
+        fpzz.FINPROD_ABBR finprodName,
+        <!--正股代码-->
+        fpzg.FINPROD_MARKET_ID finprodMarketId,
+        <!--正股金融产品代码-->
+        fpzg.FINPROD_ID shareFinprodId,
+        <!--正股名称-->
+        fpzg.FINPROD_ABBR finprodMarketName,
+        <!--转股券面总额-->
+        total.SHARE_AMT * 100 shareAmt,
+        <!--转股价-->
+        <!--GZYHTZJY-1137:转股价从交易表取 modify fuyongsheng 20220115 start-->
+        <!--fpc.CON_PRICE conPrice,-->
+        total.UNIT_CPRICE conPrice,
+        <!--GZYHTZJY-1137:转股价从交易表取 modify fuyongsheng 20220115 end-->
+        <!--转股数-->
+        tfpbt.SHARE_AMT conNum,
+        <!--零股数量-->
+        totalAdd.SPO_SHARE_NUM spoShareNum,
+        <!--零股折算现金-->
+        total.TRADE_AMT tradeAmt,
+        <!--现金到账日-->
+        total.SETTLE_DATE settleDate,
+        <!--转股溢价率-->
+        totalAdd.PREB,
+        <!--投资目的-->
+        total.INV_AIM invAim,
+        <!--交易场所-->
+        total.TRADE_MARKET tradeMarket,
+        <!--币种-->
+        total.CCY,
+        <!--交易日期-->
+        total.TRADE_DATE tradeDate,
+        <!--备注-->
+        total.REMARK,
+        <!-- 原交易编号 -->
+        total.P_TRADE_ID pTradeId,
+        total.TRADER,
+        total.COUNTER_ID counterId,
+        total.COUNTER_TRADER,
+        total.COUNTER_CONTACT contactInfo,
+        total.COUNTER_CONTACT,
+        total.CHL_ID chlId,
+        total.SEC_MANAGE_ACCT_ID secManageAcctId,
+    </sql>
     <sql id="linkTable">
         <!--组合信息-->
         LEFT JOIN PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = total.PORTFOLIO_ID
@@ -72,6 +131,18 @@
         LEFT JOIN TRD_FIN_PRODUCT_BARTER_TOTAL tfpbt on tfpbt.TRADE_ID = total.TOTLE_TRADE_ID
         <!--金融产品交易表-->
         LEFT JOIN TRD_PRODUCT_DEAL tfpd on tfpd.TOTLE_TRADE_ID = total.TOTLE_TRADE_ID
+    </sql>
+    <sql id="linkTable1">
+        <!--组合信息-->
+        LEFT JOIN PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = total.PORTFOLIO_ID
+        <!--转债信息-->
+        LEFT JOIN FIN_PRODUCT_CONVERTIBLE fpc on fpc.FINPROD_ID = total.FINPROD_ID
+        <!--转债信息-->
+        LEFT JOIN FIN_PRODUCT fpzz on fpzz.FINPROD_ID = total.FINPROD_ID
+        <!--转股信息-->
+        LEFT JOIN FIN_PRODUCT fpzg on fpzg.FINPROD_ID = fpc.CON_FINPROD_ID
+        <!--实物交易汇总表-->
+        LEFT JOIN TRD_FIN_PRODUCT_BARTER_TOTAL tfpbt on tfpbt.TRADE_ID = total.TOTLE_TRADE_ID
     </sql>
     <sql id="whereSql">
         WHERE
@@ -153,7 +224,7 @@
         <trim prefixOverrides="UNION ALL">
             <if test="validStatus == null or validStatus == '' or validStatus == VALID_STATUS_YX">
                 SELECT
-                    <include refid="selectCloumn"/>
+                    <include refid="selectCloumn1"/>
                     <!--有效状态-->
                     #{VALID_STATUS_YX} validStatus,
                     '' workflowId
@@ -161,7 +232,7 @@
                    TRD_FIN_PRODUCT_DEAL_TOTAL total
                    <!--金融产品交易汇总附属表-->
                    LEFT JOIN TRD_DEAL_TOTAL_ADD totalAdd on total.TOTLE_TRADE_ID = totalAdd.TOTLE_TRADE_ID
-                <include refid="linkTable"/>
+                <include refid="linkTable1"/>
                 <include refid="whereSql"/>
                 and total.TRADE_STATUS = #{TRADE_STATUS_CS}
             </if>
@@ -202,13 +273,13 @@
     </select>
     <select id="findEffectData" resultType="com.joyintech.tams.invest.trade.bondtostock.dto.TrdBondToStock001Dto">
         SELECT
-        <include refid="selectCloumn"/>
+        <include refid="selectCloumn1"/>
         '' workflowId
         FROM
         TRD_FIN_PRODUCT_DEAL_TOTAL total
         <!--金融产品交易汇总附属表-->
         LEFT JOIN TRD_DEAL_TOTAL_ADD totalAdd on total.TOTLE_TRADE_ID = totalAdd.TOTLE_TRADE_ID
-        <include refid="linkTable"/>
+        <include refid="linkTable1"/>
         <include refid="whereSqlWithLoginUser"/>
         and total.TOTLE_TRADE_ID = #{busiCode}
     </select>

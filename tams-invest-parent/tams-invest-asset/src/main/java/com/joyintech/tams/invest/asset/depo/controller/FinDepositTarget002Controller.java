@@ -41,7 +41,7 @@ import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -160,7 +160,10 @@ public class FinDepositTarget002Controller extends BaseController{
             //START modify by wj 20200426 是否占用机构授信 默认为否 防止前台页面不展示授信机构 报错。
             finDepositTargetDto.setCreditFlag(DictCodeList.是否_否.getValue());
             //END modify by wj 20200426 是否占用机构授信 默认为否 防止前台页面不展示授信机构 报错。
-            
+            // 快录时，不默认带出附件信息
+            if (isQuickInput){
+                finDepositTargetDto.setFinprodId("");
+            }
             model.addAttribute("entity", finDepositTargetDto);
         } else if(WorkFlowUtil.isNotFromToDoList() && !StringUtil.isNotEmpty(workflowId)){
             //新建

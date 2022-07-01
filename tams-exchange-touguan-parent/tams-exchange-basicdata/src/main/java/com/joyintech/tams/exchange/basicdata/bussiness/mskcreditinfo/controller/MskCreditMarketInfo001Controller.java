@@ -29,7 +29,7 @@ import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,7 +98,7 @@ public class MskCreditMarketInfo001Controller extends BaseController {
             return new Message<Page<MskCreditInfoProSaveRequest>>().success().setData(page);
         }catch (Exception e) {
             logger.error("查询信用保护凭证行情信息分页数据异常",e);
-            return new Message<Page<MskCreditInfoProSaveRequest>>().fail().setMessage("信用保护凭证行情信息");
+            return new Message<Page<MskCreditInfoProSaveRequest>>().fail().setMessage("查询信用保护凭证行情信息分页数据异常");
         }
     }
 
@@ -141,8 +141,9 @@ public class MskCreditMarketInfo001Controller extends BaseController {
                 WflValidInputParameter parameter = new WflValidInputParameter();
                 parameter.setPageId("MstCreditMarketInfo002");
                 parameter.setBusinessDataPk1(entity.getSecid());
+                parameter.setBusinessDataPk2(entity.getCdate());
                 if (mskCreditMarketInfoPro001Service.isInWflProcess(parameter)) {
-                    errorList.add(new ValidMessage("", getMessage("所选信用保护凭证存在流程中的数据！,不可删除!")));
+                    errorList.add(new ValidMessage("", getMessage("所选信用保护凭证存在流程中的数据！")));
                     res.setErrorList(errorList);
                     res.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(res);
@@ -177,8 +178,9 @@ public class MskCreditMarketInfo001Controller extends BaseController {
                 WflValidInputParameter parameter = new WflValidInputParameter();
                 parameter.setPageId("MstCreditMarketInfo002");
                 parameter.setBusinessDataPk1((String) param.get("secid"));
+                parameter.setBusinessDataPk2((String) param.get("cdate"));
                 if (mskCreditMarketInfoPro001Service.isInWflProcess(parameter)) {
-                    errorList.add(new ValidMessage("", getMessage("所选信用保护凭证存在流程中的数据！,不可修改!")));
+                    errorList.add(new ValidMessage("", getMessage("所选信用保护凭证存在流程中的数据！")));
                     wr.setErrorList(errorList);
                     wr.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(wr);
@@ -189,12 +191,12 @@ public class MskCreditMarketInfo001Controller extends BaseController {
                     wr.setMessageType(MessageType.错误消息);
                     return new Message<AjaxResult>().success().setData(wr);
                 }
-                if(mskCreditMarketInfoPro001Service.selectByKey(null,(String) param.get("secid"), (String)param.get("cdate"),(String)param.get("valueSource")) == null){
-                    errorList.add(new ValidMessage(this.getMessage("BUSS_COM_E_0022")));
-                    wr.setErrorList(errorList);
-                    wr.setMessageType(MessageType.错误消息);
-                    return new Message<AjaxResult>().success().setData(wr);
-                }
+//                if(!mskCreditMarketInfoPro001Service.selectByKeys(null,(String) param.get("secid"), (String)param.get("cdate"),(String)param.get("valueSource"))){
+//                    errorList.add(new ValidMessage(this.getMessage("BUSS_COM_E_0022")));
+//                    wr.setErrorList(errorList);
+//                    wr.setMessageType(MessageType.错误消息);
+//                    return new Message<AjaxResult>().success().setData(wr);
+//                }
            // }
        // }
         return new Message<AjaxResult>().success().setData(wr);
@@ -209,13 +211,18 @@ public class MskCreditMarketInfo001Controller extends BaseController {
      * @throws Exception 异常
      */
     @ResponseBody
-    @RequestMapping(ACTION_DELETE)
-    public AjaxResult delete(@RequestBody @Validated({
+    @PostMapping("/delete")
+    @ApiOperation(value = "删除", notes = "删除")
+    public Message<AjaxResult> delete(@RequestBody @Validated({
             ValidateGroupDelete.class}) MskCreditInfoProSaveRequest dto, BindingResult br)
             throws Exception {
         if (br.hasErrors()) {
-            return new AjaxResult(br);
+            return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
         }
+        for (MskCreditInfoProSaveRequest saveRequest:dto.getSelectedItem()){
+            saveRequest.setOperateType(OperationType.DELETE.name());
+        }
+        dto.setOperateType(OperationType.DELETE.name());
         ProcessParameter<MskCreditInfoProSaveRequest> processParameter = new ProcessParameter<MskCreditInfoProSaveRequest>();
         WorkFlowParameter<MskCreditInfoProSaveRequest> params = new WorkFlowParameter<MskCreditInfoProSaveRequest>();
         params.setPageId("MstCreditMarketInfo002");
@@ -223,17 +230,20 @@ public class MskCreditMarketInfo001Controller extends BaseController {
         params.setBusinessCode(item -> item.getSecid());
         params.setBusinessType(DictCodeList.共通业务类型_信用保护凭证行情.getValue());
         params.setComment(entity1 -> {
-            return WorkFlowUtil.concatComment("资产代码"+
-                    GlobalConstant.OPEN_PARENTHESIS+entity1.getSecid()+GlobalConstant.CLOSE_PARENTHESIS
-                    +"估值日期"+GlobalConstant.OPEN_PARENTHESIS+entity1.getCdate()+GlobalConstant.CLOSE_PARENTHESIS
-                     +"估值来源"+GlobalConstant.OPEN_PARENTHESIS+entity1.getValueSourceStr()+GlobalConstant.CLOSE_PARENTHESIS);
+//            return WorkFlowUtil.concatComment("资产代码"+
+//                    GlobalConstant.OPEN_PARENTHESIS+entity1.getSecid()+GlobalConstant.CLOSE_PARENTHESIS
+//                    +"估值日期"+GlobalConstant.OPEN_PARENTHESIS+entity1.getCdate()+GlobalConstant.CLOSE_PARENTHESIS
+//                     +"估值来源"+GlobalConstant.OPEN_PARENTHESIS+entity1.getValueSourceStr()+GlobalConstant.CLOSE_PARENTHESIS);
+            return WorkFlowUtil.concatComment("资产代码" + GlobalConstant.OPEN_PARENTHESIS + StringUtil.getOrElse(entity1.getSecid(), "") + GlobalConstant.CLOSE_PARENTHESIS
+                    , "估值日期" + GlobalConstant.OPEN_PARENTHESIS + StringUtil.getOrElse(entity1.getCdate(), "") + GlobalConstant.CLOSE_PARENTHESIS
+                    , "估值来源" + GlobalConstant.OPEN_PARENTHESIS + StringUtil.getOrElse(entity1.getValueSourceStr(), "") + GlobalConstant.CLOSE_PARENTHESIS);
         });
         processParameter.setWorkFlowParameter(params);
         processParameter.setOperationType(OperationType.DELETE);
         String msg = mskCreditMarketInfoPro001Service.start(processParameter,
                 dto.getSelectedItem().toArray(
                         new MskCreditInfoProSaveRequest[dto.getSelectedItem().size()]));
-        return new AjaxResult(msg);
+        return new Message<AjaxResult>().success().setData(new AjaxResult(msg));
 
     }
 

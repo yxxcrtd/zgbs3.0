@@ -40,6 +40,7 @@ import com.joyintech.tams.valuation.common.utils.DataHandleUtil;
 import com.joyintech.tams.valuation.common.utils.ValStringUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.LoggerFactory;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

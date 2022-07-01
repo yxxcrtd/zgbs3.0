@@ -22,7 +22,7 @@ import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,17 +66,20 @@ public class FinTenderBondAsset002Controller extends BaseController {
                 if (Objects.nonNull(entity) && Objects.nonNull(entity.getCirculationCode())) {
                     entity.getProductAddDto().setAppearMarketId(entity.getCirculationCode());
                     entity.getProductAddDto().setListingDate(entity.getCirculationDate());
-                } else if(Objects.isNull(entity)){
-                    entity = finTenderBoundAssetService.addCoupons(finprodId);
+                } else if (Objects.isNull(entity)) {
+                    String additionalBatches = getParam("additionalBatches");
+                    entity = finTenderBoundAssetService.addCoupons(finprodId, additionalBatches, "1");
                 }
-                params.put("businessId", entity.getFinprodMarketId());
+                if (Objects.nonNull(entity)) {
+                    params.put("businessId", entity.getFinprodMarketId());
+                }
             }
         }
         //数据字典初始化数据
         params.put("ISSUE_STAGE", this.getSelectDataFromDataDic(DictCode.发行阶段, null));
         params.put("TRADE_PLACE", this.getSelectDataFromDataDic(DictCode.交易场所, null));
         params.put("REGIST_ORG", this.getSelectDataFromDataDic(DictCode.登记托管机构, null));
-        params.put("RAISE_TYPE", this.getSelectDataFromDataDic(DictCode.募集方式, null));
+        params.put("RAISE_TYPE", this.getSelectDataFromDataDic(DictCode.债券类资产募集方式, null));
         params.put("ISSUE_TYPE", this.getSelectDataFromDataDic(DictCode.新债_发行方式, null));
         params.put("TENDER_TYPE", this.getSelectDataFromDataDic(DictCode.招标方式, null));
         params.put("TENDER_TARGET", this.getSelectDataFromDataDic(DictCode.招标标的, null));
@@ -151,17 +154,18 @@ public class FinTenderBondAsset002Controller extends BaseController {
     public Message<AjaxResult> save(@RequestBody FinTenderBondAsset002Dto dto) {
         ProcessParameter<FinTenderBondAsset002Dto> processParameter = new ProcessParameter<>();
         WorkFlowParameter<FinTenderBondAsset002Dto> params = new WorkFlowParameter<>();
-        params.setPageId(this.getPageId());
-        params.setElementId(dto.getElementId());
-        params.setBusinessCode(FinTenderBondAsset002Dto::getFinprodMarketId);
-        params.setBusinessType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
         if (StringUtil.equals(dto.getOperateType(), OperationType.NEW.name())) {
             processParameter.setOperationType(OperationType.NEW);
+            dto.setFinprodId(finTenderBoundAssetService.getFinprodId(dto));
         } else if (StringUtil.equals(dto.getOperateType(), OperationType.MODIFY.name())) {
             processParameter.setOperationType(OperationType.MODIFY);
         } else {
             processParameter.setOperationType(OperationType.DELETE);
         }
+        params.setPageId(this.getPageId());
+        params.setElementId(dto.getElementId());
+        params.setBusinessCode(FinTenderBondAsset002Dto::getFinprodId);
+        params.setBusinessType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
         processParameter.setWorkFlowParameter(params);
         try {
             finTenderBoundAssetService.start(processParameter, dto);
@@ -180,7 +184,7 @@ public class FinTenderBondAsset002Controller extends BaseController {
         WorkFlowParameter<FinTenderBondAsset002Dto> params = new WorkFlowParameter<>();
         params.setPageId(this.getPageId());
         params.setElementId(asset004Dto.getElementId());
-        params.setBusinessCode(FinTenderBondAsset002Dto::getFinprodMarketId);
+        params.setBusinessCode(FinTenderBondAsset002Dto::getFinprodId);
         params.setBusinessType(BussinessDictCodeList.共同业务类型_新债标的.getValue());
         FinTenderBondAsset002Dto dto = finTenderBoundAssetService.getById(asset004Dto.getFinprodId());
         dto.setRemark(asset004Dto.getRemark());

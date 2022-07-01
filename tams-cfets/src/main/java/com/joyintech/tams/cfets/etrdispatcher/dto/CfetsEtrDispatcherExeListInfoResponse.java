@@ -94,6 +94,9 @@ public class CfetsEtrDispatcherExeListInfoResponse extends CfetsEtrDispatcherBas
     @ApiModelProperty(name="counterName",value="交易对手",example="A1")
     private String counterName;
 
+    @ApiModelProperty(name="propAcctNo",value="交易对手",example="A1")
+    private String propAcctNo;
+
     @ApiModelProperty(name="remark",value="备注",example="A1")
     private String remark;
 
@@ -320,6 +323,14 @@ public class CfetsEtrDispatcherExeListInfoResponse extends CfetsEtrDispatcherBas
 
     public void setCounterName(String counterName) {
         this.counterName = counterName;
+    }
+
+    public String getPropAcctNo() {
+        return propAcctNo;
+    }
+
+    public void setPropAcctNo(String propAcctNo) {
+        this.propAcctNo = propAcctNo;
     }
 
     public String getRemark() {

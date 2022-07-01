@@ -8,8 +8,10 @@ import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
 import com.joyintech.batch.batchbase.baseclass.entity.NeedToWriteEntity;
 import com.joyintech.batch.batchbase.exception.BatchException;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.web.PlatformDate;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import com.joyintech.tams.settle.batch.datagather.dto.InvestTradeWriteDto;
 import com.joyintech.tams.settle.batch.datagather.listener.StlDataGatherJobListener;
@@ -22,7 +24,12 @@ import com.joyintech.tams.settle.batch.datagather.reader.StlDataGatherReader;
 import com.joyintech.tams.settle.batch.datagather.reader.StlDataGatherShares2Reader;
 import com.joyintech.tams.settle.batch.datagather.reader.bond.StlDataGatherBondDurationReader;
 import com.joyintech.tams.settle.batch.datagather.reader.repo.StlDataGatherRepoDurationReader;
+import com.joyintech.tams.settle.batch.datagather.service.StlDataGatherService;
 import com.joyintech.tams.settle.batch.datagather.writer.StlDataGatherWriter;
+import com.joyintech.tams.settle.batch.dealrevoke.service.BondRevokeService;
+import com.joyintech.tams.settle.batch.dealrevoke.service.FundRevokeService;
+import com.joyintech.tams.settle.batch.dealrevoke.service.RepoRevokeService;
+import com.joyintech.tams.settle.batch.dealrevoke.service.SharesRevokeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -32,6 +39,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 存续期交易生成批处理任务
@@ -88,6 +97,9 @@ public class StlDownDurationDataGatherTask extends BatchBaseService {
     @Autowired(required = false)
     private PlatformDate platformDateService;
 
+    @Autowired
+    private StlDataGatherService stlDataGatherService;
+
     /**
      * BatchBuilder
      */
@@ -105,6 +117,17 @@ public class StlDownDurationDataGatherTask extends BatchBaseService {
         if(null == batchExecuteInfo.getExecuteDate()){
             date = platformDateService.getSysDate();
         }
+        // ZGCPCN-1706:增加当日对账是否完成条件 modify by fuyongsheng 20220625 start
+        // 当日未对账完成数据
+        Integer unFinishReconNum = trdCommonBaseService.getCheckDisaccordCountDataNum(date);
+        if(unFinishReconNum >0){
+            logger.debug("当日未对账完成数量大于0,批处理退出。");
+            JobExecution result = new JobExecution(1l);
+            result.setStatus(BatchStatus.STOPPED);
+            return result;
+        }
+        // ZGCPCN-1706:增加当日对账是否完成条件 modify by fuyongsheng 20220625 end
+        // 当日未完全成交匹配数据
         Integer unFinishMatchNum = trdCommonBaseService.getUnFinishMatchSettleTransDataNum(date);
         if(unFinishMatchNum > 0){
             logger.debug("当日未完全成交匹配数量大于0,批处理退出。");
@@ -112,6 +135,9 @@ public class StlDownDurationDataGatherTask extends BatchBaseService {
             result.setStatus(BatchStatus.STOPPED);
             return result;
         }
+        // 撤销当日生成的存续期交易
+        stlDataGatherService.revokeCurrentDayDurationDeal(date);
+
         JobExecution jobExecution = batchBuilder.init(this)
             .batch("fund2", stlDataGatherFund2Reader, stlDataGatherFund2Processor, stlDataGatherWriter)
             .batch("repo5", stlDataGatherRepoDurationReader, stlDataGatherRepoDurationProcessor, stlDataGatherWriter)

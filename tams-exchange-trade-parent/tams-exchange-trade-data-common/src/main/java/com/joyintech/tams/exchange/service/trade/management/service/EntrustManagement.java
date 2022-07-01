@@ -22,6 +22,7 @@ import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.PageEntrustInfoRequest;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
+import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.common.vo.EntrustVo;
 import com.joyintech.tams.exchange.common.vo.IntegratedEntrustVo;
@@ -84,7 +85,7 @@ public class EntrustManagement extends BaseService {
     /**
      * 是否单体服务
      */
-    @Value("${application.micorservice.contextPath.single:false}")
+    @Value("${application.micorservice.contextpath.single:false}")
     private boolean isSingle;
 
     @Autowired(required = false)
@@ -268,6 +269,14 @@ public class EntrustManagement extends BaseService {
                 entrust.setTradedVolumeView(BigDecimal.valueOf(entrust.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
                 entrust.setFrozenVolumeView(BigDecimal.valueOf(entrust.getFrozenVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
                 entrust.setCancelVolumeView(BigDecimal.valueOf(entrust.getCancelVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+            } else if (投管业务类型_信用保护凭证.getValue().equals(entrust.getBusiTypeTg())) {
+                entrust.setTradedVolumeView(BigDecimal.valueOf(entrust.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                //成交编号 借用reportNo字段
+                String extend2 = entrust.getExtend2();
+                if (StringUtil.isNotEmpty(extend2) && extend2.contains("brokerTradeId")) {
+                    Map map = JsonUtils.getObjectFromJson(extend2, Map.class);
+                    entrust.setReportNo((String)map.get("brokerTradeId"));
+                }
             }
 
             entrusts.add(entrust);
@@ -283,6 +292,11 @@ public class EntrustManagement extends BaseService {
             entrust = integratedEntrustService.findById(entrustId);
         }
         if (Objects.nonNull(entrust)) {
+            if (!canCancelEntrust(entrust)) {
+                logger.error("该类业务不可撤单：entrustProp={}，market={}", entrust.getEntrustProp(), entrust.getMarket());
+                return new ResultBean(ErrorCode.CANCEL_ENTRUST_BUSI_ERROR);
+            }
+
             if (EntrustUtils.hasNoCancelEntrust(entrust.getEntrustStatus())) {
                 logger.info("entrust entrustStatus is {} ,no cancelEntrust", entrust.getEntrustStatus());
                 return new ResultBean(ErrorCode.CANCEL_ENTRUST_STATUS_ERROR);
@@ -293,6 +307,41 @@ public class EntrustManagement extends BaseService {
             return new ResultBean(ErrorCode.SUCCESS);
         }
         return new ResultBean(ErrorCode.REQ_PARAMETER_ERROR);
+    }
+
+    /**
+     * 债回售：委托当日，允许撤单；
+     * 网上申购：委托申报确认不允许撤单；
+     * 配股：上交所委托申报确认后，不允许撤单；深交所委托申报确认后，允许撤单；
+     * 配债：上交所委托申报确认后，不允许撤单；深交所委托申报确认后，允许撤单；
+     * 债转股：上交所未经交易所确认的委托可以撤单，已确认委托不允许撤单；深交所当日均可以撤单；
+     */
+    private boolean canCancelEntrust(EntrustInterface entrust) {
+        final String entrustProp = entrust.getEntrustProp();
+        if (EntrustUtils.isNoTrade(entrustProp)) {
+            //债回售：委托当日，允许撤单；
+            if (EntrustProp.HS.value.equals(entrustProp)) {
+                return true;
+            }
+            //网上申购：委托申报确认不允许撤单；
+            if (EntrustProp.APPLY.value.equals(entrustProp)) {
+                return false;
+            }
+            //配股：上交所委托申报确认后，不允许撤单；深交所委托申报确认后，允许撤单；
+            //配债：上交所委托申报确认后，不允许撤单；深交所委托申报确认后，允许撤单；
+            //债转股：上交所未经交易所确认的委托可以撤单，已确认委托不允许撤单；深交所当日均可以撤单；
+            if (EntrustProp.CHANGE_TO_STOCK.value.equals(entrustProp)
+                    || EntrustProp.ALLOTMENT.value.equals(entrustProp)
+                    || EntrustProp.PS.value.equals(entrustProp)) {
+                if (Market.SZSE.value.equals(entrust.getMarket())) {
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public ResultBean cancelExceptionEntrust(String userId, String userName, String entrustId) {

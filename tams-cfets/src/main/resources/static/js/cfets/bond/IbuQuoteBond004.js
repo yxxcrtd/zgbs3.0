@@ -4,7 +4,18 @@
      * 是否可编辑
      */
     var editFlag = true;
+    var riskFlag = 0;//风险试算标识，提交前需要点击风险试算
     var rskApproval;
+    var entrustIdChangeFlag =false;
+
+    // 是否 abs
+    let isAbs = $('#isAbs').val();
+    // 是否特殊债
+    let isSpecialDebt = $('#isSpecialDebt').val();
+    // 是否到期违约债
+    let isDefaultBondIndicator = $('#isDefaultBondIndicator').val();
+    // 是否锚定净价
+    let isSpecial = $('#isSpecial').val();
 
     var el = function (ele) {
         return $("#IbuQuoteBond004_bodydiv " + ele);
@@ -373,6 +384,7 @@
         }
         object.workflowId = workflowId;
         object.rskApproval = rskApproval;
+        object.riskTrialRetDto = entity_RiskTrialRetList;
         return object;
     }
 
@@ -451,26 +463,10 @@
             Joyin.error("组合分配信息,请填写完整")
             return false;
         }
-        var obj = getSubmitParam("submit");
-        //风险校验
-        var riskFlag = false;
-        $.ajax({
-            type: "POST",
-            url: basePath + '/riskTrial/doRiskcal/IbuQuoteBond',
-            dataType: "json",
-            contentType: "application/json",
-            async: false,
-            data: JSON.stringify(obj),
-            success: function (result) {
-                console.log(result);//只记录不影响提交
-                if(result.code === '200') {
-                    riskFlag = true;
-                }
-            }
-        });
-      /*  if(!riskFlag) {
+        if(riskFlag === 0 && ps === 'T03') {
+            Joyin.error("请先进行风险试算")
             return false;
-        }*/
+        }
         var obj = getSubmitParam("submit");
         var errorMsg = "";
         var confirmMsg = "";
@@ -482,6 +478,8 @@
            }
             if(result.data && result.data.message && result.data.messageType === 'confirm') {
                 confirmMsg = result.data.message;
+                rskApproval = result.data.data;
+
             }
         },false)
         if(errorMsg && errorMsg.length > 0) {
@@ -490,7 +488,6 @@
         }
 
         if(confirmMsg && confirmMsg.length > 0) {
-            rskApproval = result.data.data;
             return Joyin.confirm(confirmMsg, function (){
                 saveOrSubmitAction('submit');
             });
@@ -502,7 +499,10 @@
     /**
      * 计算金额相关
      */
-    var calcAmt = function () {
+    var calcAmt = function (calculateField,isIntAmt){
+        if(entrustIdChangeFlag){
+            return;
+        }
         var calcField = $("[name=calculateField]:checked").val();
         var finprodId = $('#CfetsBondDealQuotedPrice004_hidden_finprodId').val();
         if (calcField === calcTypeUnitCprice && !$('#CfetsBondDealQuotedPrice004_unitCprice').val()) {
@@ -522,6 +522,9 @@
         param.settleDate = object.settleDate;
         param.price = object.price;
         param.fpriceAmt = object.fpriceAmt;
+        if (isIntAmt && isIntAmt !== '') {
+            param.unitInt = object.unitIntShow;
+        }
         if(el("#CfetsBondDealQuotedPrice004_matureYield").val()) {
             param.matureYield = el("#CfetsBondDealQuotedPrice004_matureYield").val() / 100;
         }
@@ -532,6 +535,7 @@
         param.secManageAcctId = object.secManageAcctId;
         Joyin.ajaxJson(basePath + 'cfets/bankuplink/bond/IbuQuoteBond/calculation', param, function (result) {
             if (result.data) {
+                entrustIdChangeFlag =true;
                 var data = result.data;
                 el("#CfetsBondDealQuotedPrice004_unitCprice").val(JoyinMath.doDiv(data.price, 1, 4));
                 el("#CfetsBondDealQuotedPrice004_unitCprice2").val(JoyinMath.doDiv(data.price, 1, 4));
@@ -541,9 +545,11 @@
                 }
                 el("#CfetsBondDealQuotedPrice004_cpriceAmt").val(JoyinMath.doDiv(data.cpriceAmt, 1, 2));
                 el("#CfetsBondDealQuotedPrice004_unitInt").val(JoyinMath.doDiv(data.unitInt, 1, 5));
+                el("#CfetsBondDealQuotedPrice004_unitIntEdit").val(JoyinMath.doDiv(data.unitInt, 1, 5));
                 el("#CfetsBondDealQuotedPrice004_unitFprice").val(JoyinMath.doDiv(data.unitFprice, 1, 4));
                 el("#CfetsBondDealQuotedPrice004_intAmt").val(JoyinMath.doDiv(data.intAmt, 1, 2));
                 el("#CfetsBondDealQuotedPrice004_fpriceAmt").val(JoyinMath.doDiv(data.fpriceAmt, 1, 2));
+                el("#CfetsBondDealQuotedPrice004_fpriceAmtEdit").val(JoyinMath.doDiv(data.fpriceAmt, 1, 2));
                 el("#dealFeeAmt").val(JoyinMath.doDiv(data.dealFeeAmt, 1, 2));
                 el("#settFeeAmt").val(JoyinMath.doDiv(data.settFeeAmt, 1, 2));
 
@@ -569,8 +575,9 @@
                     el("#CfetsBondDealQuotedPrice004_parValue").val(data.parValue);
                     el("#CfetsBondDealQuotedPrice004_parValueAmt").val(data.parValueAmt);
                 }
+                entrustIdChangeFlag =false;
             }
-        })
+        },false)
     };
 
     /**
@@ -601,8 +608,8 @@
         param.finprodId = finprodId;
         param.shareAmt = object.shareAmt * 10000;
         param.settleDate = object.settleDate;
-        param.price = object.price;
-        param.fpriceAmt = object.fpriceAmt;
+        param.price = object.priceShow;
+        param.fpriceAmt = object.fpriceAmtShow;
         if(calcField === calcTypeYield && el("#CfetsBondDealQuotedPrice004_matureYield").val()) {
             param.matureYield = el("#CfetsBondDealQuotedPrice004_matureYield").val() / 100;
         }
@@ -611,13 +618,13 @@
         }
         param.ps = object.ps;
         param.secManageAcctId = object.secManageAcctId;
-        param.cpriceAmt = object.cpriceAmt;
+        param.cpriceAmt = object.cpriceAmtShow;
         param.dealFeeAmt = object.dealFeeAmt;
         param.distribution = object.distribution;
-        param.intAmt = object.intAmt;
+        param.intAmt = object.intAmtShow;
         param.settFeeAmt = object.settFeeAmt;
-        param.unitFprice = object.unitFprice;
-        param.fpriceAmt = object.fpriceAmt;
+        param.unitFprice = object.unitFpriceShow;
+        param.fpriceAmt = object.fpriceAmtShow;
         if (object.cfetsBondDealDialogueQuoteDtoList) {
             $.each(object.cfetsBondDealDialogueQuoteDtoList, function (index, obj) {
                 obj.shareAmt = JoyinMath.doMul(obj.shareAmt, 10000);
@@ -649,7 +656,13 @@
      * 画面初始化
      */
     var initPage = function () {
-
+        if ('Y' === isSpecialDebt) {
+            $('#unitIntEditDiv').show();
+            $('#fpriceAmtEditDiv').hide();
+        }else{
+            $('#unitIntEditDiv').hide();
+            $('#fpriceAmtEditDiv').show();
+        }
     }
 
 
@@ -700,10 +713,19 @@
     $('#IbuQuoteBond004_btn_riskcal').click(function () {
         var object = $.serializeToObject('#submitForm');
         var param = JSON.parse(JSON.stringify(object));
-        param.ptlAllocations = param.cfetsBondDealDialogueQuoteDtoList;
+        param.ptlAllocatios = param.cfetsBondDealDialogueQuoteDtoList;
+        if ( param.ptlAllocatios) {
+            $.each(param.ptlAllocatios, function (index, obj) {
+                obj.shareAmt = JoyinMath.doMul(obj.shareAmt, 10000);
+                obj.avaNum = JoyinMath.doMul(obj.avaNum, 10000);
+                obj.avaNumOld = JoyinMath.doMul(obj.avaNumOld, 10000);
+                obj.ourEntNum = JoyinMath.doMul(obj.ourEntNum, 10000);
+                obj.lendinEntNum = JoyinMath.doMul(obj.lendinEntNum, 10000);
+            });
+        }
         $.ajax({
             type: "POST",
-            url: basePath + '/riskTrial/doRiskcal/IbuQuoteBond',
+            url: basePath + '/riskTrial/doRiskcal/IbuQuoteBond004',
             dataType: "json",
             contentType: "application/json",
             async: false,
@@ -726,6 +748,7 @@
                 }else if(result.message){
                     Joyin.error(result.message);
                 }
+                riskFlag = 1;
             }
         });
     });
@@ -793,6 +816,42 @@
         $('#CfetsBondDealQuotedPrice004_counterId').change(function () {
             counterIdChangeAction();
         });
+
+        /**
+         * 应计利息
+         */
+        $('#CfetsBondDealQuotedPrice004_unitIntEdit').on('change',function(){
+            $('#CfetsBondDealQuotedPrice004_unitInt').val($('#CfetsBondDealQuotedPrice004_unitIntEdit').val()).trigger('blur');
+            if(!entrustIdChangeFlag){
+                calcAmt(null,'Y');
+                autoAllocation();
+            }
+        });
+        /**
+         * 结算金额
+         */
+        $('#CfetsBondDealQuotedPrice004_fpriceAmtEdit').on('change', function () {
+            $('#CfetsBondDealQuotedPrice004_fpriceAmt').val($('#CfetsBondDealQuotedPrice004_fpriceAmtEdit').val()).trigger('blur');;
+            // 结算金额
+            var fpriceAmt = $('#CfetsBondDealQuotedPrice004_fpriceAmt').val();
+            // 应计利息
+            var unitInt = $('#CfetsBondDealQuotedPrice004_unitInt').val();
+            // 交易金额
+            var cpriceAmt = $('#CfetsBondDealQuotedPrice004_cpriceAmt').val();
+            // 净价
+            var unitCprice = $('#CfetsBondDealQuotedPrice004_unitCprice').val();
+            //金额面板.应计利息总额=画面.结算金额-画面.交易金额
+            $('#CfetsBondDealQuotedPrice004_intAmt').val(JoyinMath.doMinus(fpriceAmt, cpriceAmt, 2)).trigger('blur');;
+            // 应计利息总额
+            var intAmt = $('#CfetsBondDealQuotedPrice004_intAmt').val();
+            //金额面板.应计利息 金额面板.应计利息总额/(券面总额（万元）*10000)*100
+            var newUnitInt = JoyinMath.doDiv(intAmt*100, cpriceAmt, 5);
+            $('#CfetsBondDealQuotedPrice004_unitInt').val(newUnitInt).trigger('blur');;
+            //金额面板.全价=净价+应计利息
+            $('#CfetsBondDealQuotedPrice004_unitFprice').val(JoyinMath.doAdd(unitCprice, newUnitInt, 4)).trigger('blur');;
+            autoAllocation();
+        });
+
         el("#CfetsBondDealQuotedPrice004_unitCprice").change(function () {//净价
             if(el("#CfetsBondDealQuotedPrice004_unitCprice").val()) {
                 el("#CfetsBondDealQuotedPrice004_hidden_price").val(el("#CfetsBondDealQuotedPrice004_unitCprice").val());

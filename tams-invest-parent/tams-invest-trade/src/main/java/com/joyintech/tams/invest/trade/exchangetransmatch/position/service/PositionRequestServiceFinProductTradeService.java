@@ -7,8 +7,8 @@ import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
+import com.joyintech.tams.common.base.dao.EtrEntrustDetailMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
-import com.joyintech.tams.common.base.dao.StlSecAcctInfoMapper;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -27,7 +27,7 @@ import com.joyintech.tams.invest.trade.exchangetransmatch.common.dao.ExchangeTra
 import com.joyintech.tams.invest.trade.exchangetransmatch.position.bean.PositionRequestBaseBean;
 import com.joyintech.tams.invest.trade.exchangetransmatch.position.bean.TrdMoreConvrateDto;
 import com.joyintech.tams.invest.trade.exchangetransmatch.position.constant.PositionConstant;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +54,9 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
 
     @Autowired
     private EtrEntrustAddMapper etrEntrustAddMapper;
+
+    @Autowired
+    private EtrEntrustDetailMapper etrEntrustDetailMapper;
 
     @Autowired
     private ExchangeTransMatchCommonMapper exchangeTransMatchCommonMapper;
@@ -164,10 +167,11 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         pltMap.put("portfolioId", trdProductDealAdd.getPortfolioId());
         pltMap.put("tradeId", dealEntity.getTradeId());
         pltMap.put("etrId", trdProductDealAdd.getEntrustId());
-        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(trdProductDealAdd.getEntrustId());
-        if(etrEntrust != null){
-            pltMap.put("etrSecAmount", ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), new BigDecimal(100)));
-        }
+
+        // 查询组合指令数量
+        BigDecimal portfolioEntrustNum = this.getPortfolioEntrustNum(trdProductDealAdd.getEntrustId(), trdProductDealAdd.getPortfolioId());
+        pltMap.put("etrSecAmount", ArithmeticUtil.multiply(portfolioEntrustNum, new BigDecimal(100)));
+
         pltMap.put("ordId", null);
         pltMap.put("ordSecAmount", null);
         // ZGTFCP-1699: 修改资金账户赋值 modify by fuyongsheng 20220323 start
@@ -258,11 +262,11 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         map.put("tradeId", dealEntity.getTradeId());
         // 资金账号
         map.put("cashAcctId", exchangeTransMatchCommonMapper.queryAccountNo(dealEntity.getSecManageAcctId()));
-        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(trdProductDealAdd.getEntrustId());
-        // 指令券面总额
-        if(etrEntrust != null){
-            map.put("etrSecAmount", ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), new BigDecimal(100)));
-        }
+
+        // 查询组合指令数量
+        BigDecimal portfolioEntrustNum = this.getPortfolioEntrustNum(trdProductDealAdd.getEntrustId(), trdProductDealAdd.getPortfolioId());
+        map.put("etrSecAmount", ArithmeticUtil.multiply(portfolioEntrustNum, new BigDecimal(100)));
+
         // 指令编号
         map.put("etrId", trdProductDealAdd.getEntrustId());
         // ZGTFCP-1718: modify by fuyongsheng 20220323 start
@@ -379,10 +383,9 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         // 下单委托编号	ordEntrustId
         map.put(ORD_ENTRUST_ID, null);
         // 指令份额	etrSecAmount
-        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(trdProductDealAdd.getEntrustId());
-        if(etrEntrust != null){
-            map.put("etrSecAmount", etrEntrust.getEntrustNum());
-        }
+        BigDecimal portfolioEntrustNum = this.getPortfolioEntrustNum(trdProductDealAdd.getEntrustId(), trdProductDealAdd.getPortfolioId());
+        map.put("etrSecAmount", portfolioEntrustNum);
+
         // 下单编号	ordId
         map.put("ordId", null);
         // 下单份额	ordSecAmount
@@ -400,8 +403,6 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         resultMap.put(BUSI_ACT, getBusiAct(trdProductDeal));
         resultMap.put(PS, trdProductDeal.getPs());
         resultMap.put(TRADE_PLACE, trdProductDeal.getTradeMarket());
-        resultMap.put("decisionAct", DictCodeListExt3.系统动作_新建);
-        resultMap.put("systemAct", DictCodeListExt3.系统动作_新建);
         resultMap.put(WORK_FLOW_ID, trdProductDeal.getWorkflowId());
         resultMap.put("ceSettleType", null);
         resultMap.put("cdate", DateUtil.format(trdProductDeal.getTradeDate()));
@@ -416,23 +417,16 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         pltMap.put(FINPROD_ID, trdProductDeal.getFinprodId());
         pltMap.put("tradeId", trdProductDeal.getTradeId());
         pltMap.put("etrId", trdProductDealAdd.getEntrustId());
-        pltMap.put("etrSecAmount", null);
+        // 指令份额	etrSecAmount
+        BigDecimal portfolioEntrustNum = this.getPortfolioEntrustNum(trdProductDealAdd.getEntrustId(), trdProductDealAdd.getPortfolioId());
+        pltMap.put("etrSecAmount", ArithmeticUtil.multiply(portfolioEntrustNum, new BigDecimal(100)));
+
         pltMap.put("cashAcctId", exchangeTransMatchCommonMapper.queryAccountNo(trdProductDeal.getSecManageAcctId()));
         pltMap.put("secAcctId", trdProductDeal.getSecManageAcctId());
         pltMap.put("secAmount", ArithmeticUtil.multiply(trdProductDeal.getShareAmt(), new BigDecimal(100)));
         pltMap.put("cashAmount", trdProductDeal.getTradeAmt());
         ptlList.add(pltMap);
-
-        List<Map<String, Object>> ptlSubList = new ArrayList<>();
-        Map<String, Object> ptlSubMap = new HashMap<>();
-        ptlSubMap.put("portfolioId", null);
-        ptlSubMap.put(FINPROD_ID, null);
-        ptlSubMap.put("tradeId", null);
-        ptlSubMap.put("secAcctId", null);
-        ptlSubMap.put("secAmount", null);
-
         resultMap.put("ptlList", ptlList);
-        resultMap.put("ptlSubList", ptlSubList);
     }
 
     /**
@@ -462,7 +456,6 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         // ZGTFCP-1042: add by fuyongsheng 20220315 end
         TrdProductDeal dealEntity = entity.getTrdProductDeal();
         TrdProductDealAdd trdProductDealAdd = entity.getTrdProductDealAdd();
-        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(entity.getTrdProductDealAdd().getEntrustId());
         String ps = dealEntity.getPs();
         String cashAcctId = exchangeTransMatchCommonMapper.queryAccountNo(dealEntity.getSecManageAcctId());
         PositionRequestBaseBean bean;
@@ -495,10 +488,8 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         if (百元券面 == null) {
             百元券面 = BigDecimal.valueOf(100);
         }
-        BigDecimal hundred = BigDecimal.valueOf(100);
         // 标准券总额
-        map.put(STANDARD_SEC_AMOUNT, ArithmeticUtil.divide(ArithmeticUtil.multiply(dealEntity.getShareAmt(),
-                converseRadio, 百元券面), hundred, 2, RoundingMode.HALF_UP));
+        map.put(STANDARD_SEC_AMOUNT, ArithmeticUtil.multiply(dealEntity.getShareAmt(), converseRadio, 百元券面));
         // 再折算率	reConversionRate "调用【再折算率查询】参数：资金账户 = 指令资金账户
         Map<String, Object> paramMap = Maps.newHashMap();
         paramMap.put("acctNo", cashAcctId);
@@ -509,8 +500,11 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         if (DictCodeListExt3.交易方向_质押券入库.getValue().equals(ps) || DictCodeListExt3.交易方向_质押券出库.getValue().equals(ps)) {
             map.put("cashAmount", new BigDecimal(0));
         }
+
         // 指令券面总额
-        map.put("etrSecAmount", ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), hundred));
+        BigDecimal portfolioEntrustNum = this.getPortfolioEntrustNum(trdProductDealAdd.getEntrustId(), trdProductDealAdd.getPortfolioId());
+        map.put("etrSecAmount", ArithmeticUtil.multiply(portfolioEntrustNum, new BigDecimal(100)));
+
         ptlList.add(map);
         resultMap.put(PTL_LIST, ptlList);
         // 质押券数据集	ptlSecList
@@ -796,10 +790,9 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         bean.setCashAmount(dealEntity.getTradeAmt());
         Map<String, Object> map = BeanUtil.object2Map(bean);
         // 指令份额	etrSecAmount
-        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(trdProductDealAdd.getEntrustId());
-        if(etrEntrust != null){
-            map.put("etrSecAmount", etrEntrust.getEntrustNum());
-        }
+        BigDecimal portfolioEntrustNum = this.getPortfolioEntrustNum(trdProductDealAdd.getEntrustId(), trdProductDealAdd.getPortfolioId());
+        map.put("etrSecAmount", portfolioEntrustNum);
+
         // ZGTFCP-1615:增加本方券/融入券赋值 modify by fuyongsheng 20220322 start
         map.put("ownSecAmount", dealEntity.getShareAmt());
         map.put("integrateSecAmount", new BigDecimal(0));
@@ -824,9 +817,7 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
             bean.setFinprodId(getStockId(dealEntity.getFinprodId(), dealEntity.getFinprodType2(), dealEntity.getPs()));
             bean.setCashAmount(dealEntity.getTradeAmt());
             Map<String, Object> ptlRoMap = BeanUtil.object2Map(bean);
-            if(etrEntrust != null){
-                ptlRoMap.put("etrSecAmount", etrEntrust.getEntrustNum());
-            }
+            ptlRoMap.put("etrSecAmount", portfolioEntrustNum);
             ptlRoMap.put("ordId", null);
             ptlRoMap.put("ordSecAmount", null);
             // ZGTFCP-1615:增加本方券/融入券赋值 modify by fuyongsheng 20220322 start
@@ -961,4 +952,30 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         FinProductOthCode finProductOthCode = commonPositionService.selectFinProductOthCode(map);
         return finProductOthCode != null ? finProductOthCode.getOthCode() : StringUtil.EMPTY;
     }
+
+    // ZGCPCN-1618:查询指令下组合的指令数量 modify by fuyongsheng 20220622 start
+    /**
+     * 查询该指令下组合的指令数量
+     * @param entrustId
+     * @param portfolioId
+     * @return
+     */
+    private BigDecimal getPortfolioEntrustNum(String entrustId, String portfolioId){
+        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(entrustId);
+        if(etrEntrust == null){
+            return BigDecimal.ZERO;
+        }
+        if(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue().equals(etrEntrust.getEntrustClass())){
+            List<EtrEntrustDetail> etrEntrustDetails = etrEntrustDetailMapper.selectList(entrustId);
+            for(EtrEntrustDetail etrEntrustDetail : etrEntrustDetails){
+                if(etrEntrustDetail.getPortfolioId().equals(portfolioId)){
+                    return etrEntrustDetail.getEntrustNum();
+                }
+            }
+        }else{
+            return etrEntrust.getEntrustNum();
+        }
+        return etrEntrust.getEntrustNum();
+    }
+    // ZGCPCN-1618:查询指令下组合的指令数量 modify by fuyongsheng 20220622 end
 }

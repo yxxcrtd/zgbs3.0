@@ -42,6 +42,7 @@
         T1.ISSUE_TYPE issueType,
         T1.CCY ccy,
         T2.CROSS_MARKET_CODE crossMarketCode,
+        T2.CROSS_MARKET crossMarket,
         T2.CONCEPT_TYPE conceptType,
         B.EXERCISE_TYPE exerciseType,
         B.EXERCISE_DATE exerciseDate,
@@ -73,8 +74,18 @@
         AND	T8.IS_INITIAL = 'Y'
         LEFT JOIN MST_CUSTOMER_INFO_ADD T7 ON T7.CUSTOMER_ID = T3.CUSTOMER_ID
         LEFT JOIN FIN_CASH_PAY_RULE T9 ON T9.CASH_ID = T8.CASH_ID AND T8.EFF_DATE = T9.EFF_DATE
-        LEFT JOIN (select A.FINPROD_ID,max(A.EXERCISE_DATE) EXERCISE_DATE,A.EXERCISE_TYPE
-        from FIN_EXERCISE_PLAN A group by A.FINPROD_ID,A.EXERCISE_TYPE) B
+        LEFT JOIN (
+        SELECT
+        A.FINPROD_ID,
+        listagg ( TO_CHAR(A.EXERCISE_DATE, 'yyyy-MM-dd'), ',' ) WITHIN GROUP ( ORDER BY A.EXERCISE_DATE ) EXERCISE_DATE,
+        listagg ( sdl_fu.ITEM_VALUE, ',' ) WITHIN GROUP ( ORDER BY sdl_fu.ITEM_VALUE ) EXERCISE_TYPE
+        FROM
+        FIN_EXERCISE_PLAN A
+        LEFT JOIN SYS_DATADICT_LIST sdl_fu ON A.EXERCISE_TYPE = sdl_fu.ITEM_CODE
+        AND sdl_fu.DICT_CODE = 'EXEC_MODE'
+        GROUP BY
+        A.FINPROD_ID
+        ) B
         on T1.FINPROD_ID = B.FINPROD_ID
         LEFT JOIN (SELECT ASSET_CODE,RATING,GRADE_ORG_ID FROM (
         SELECT MBCR.O_CODE AS ASSET_CODE,MBCR.GRADE_RESULT AS RATING,MBCR.GRADE_ORG_ID as GRADE_ORG_ID
@@ -266,7 +277,6 @@
                 or to_char(ss.mdate,'YYYY-MM-DD')=#{search}
                 or to_char(ss.delistingDate,'YYYY-MM-DD')=#{search}
                 or to_char(ss.firstRateFixDate,'YYYY-MM-DD')=#{search}
-                or to_char(ss.exerciseDate,'YYYY-MM-DD')=#{search}
                 )
             </where>
         </if>
@@ -302,6 +312,7 @@
             T1.CAPI_INCOME_FEATURE  CAPI_INCOME_FEATURE,
             T2.CONCEPT_TYPE  CONCEPT_TYPE,
             T2.CROSS_MARKET_CODE CROSS_MARKET_CODE,
+            T2.CROSS_MARKET CROSS_MARKET,
             T1.SUSTAINABLE_REMARK sustainableRemark,
             T5.CON_FINPROD_ID CON_FINPROD_ID,
             T6.FINPROD_ABBR conFinprodName,
@@ -546,7 +557,7 @@
         INNER JOIN FIN_PRODUCT FPB
                 ON FPA.FINPROD_ID = FPB.FINPROD_ID
                AND FPB.ISSUE_TYPE = '01'
-        WHERE FP.FINPROD_ID = #{finprodId}
+        WHERE FP.FINPROD_ID = #{finprodId} and FPA.ISSUE_STATUS = '01'
     </select>
 
     <select id="getFinCashPayRuleList"
@@ -1094,7 +1105,7 @@
     </select>
 
     <select id="getSearchTabInfoQueryOperate" resultType="com.joyintech.tams.business.asset.bond.dto.SearchInfoOperateListResponse">
-        SELECT distinct row_number() over( order by ORDER_TIME) SEQ_NO,t.* from (select
+        SELECT distinct row_number() over( order by ORDER_TIME desc) SEQ_NO,t.* from (select
                his.ENTRUST_ID,
                FP.FINPROD_ABBR,
                his.OPER_TYPE,
@@ -1103,6 +1114,7 @@
                his.BUSI_DES, his.OPER_TIME ORDER_TIME,
                CASE WHEN his.OPER_TYPE = '01' THEN
                         nvl(SU2.real_name,nvl(SUR.REAL_NAME,SUB.REAL_NAME))
+                    WHEN his.OPER_TYPE = '20' THEN his.user_id
                     ELSE SU.real_name
                    END AS userId
            from ETR_ENTRUST_OPER_HIS his
@@ -1115,7 +1127,7 @@
                     LEFT JOIN SYS_USER SUB ON iqb.CREATE_USER = SUB.user_name
            WHERE his.entrust_id = #{entrustId}
              AND his.BUSINESS_TYPE = #{busiType}
-             AND FP.FINPROD_TYPE = 'F01') t order by t.ORDER_TIME desc
+             AND FP.FINPROD_TYPE2 = 'F01') t order by t.ORDER_TIME desc
     </select>
 
     <select id="getfinAssetRateAdjByProductId"   resultType="com.joyintech.tams.business.asset.bond.dto.FinAssetRateAdjResponse">
@@ -1240,26 +1252,31 @@
 
     <select id="getCustomer" resultType="com.joyintech.framework.select.SelectOptionDto">
         SELECT
-        CUSTOMER_ID id,
-        CUSTOMER_NAME text
-        FROM MST_CUSTOMER_INFO
+        i.CUSTOMER_ID id,
+        i.CUSTOMER_NAME text
+        FROM MST_CUSTOMER_INFO i
+        LEFT JOIN MST_CUSTOMER_INFO_ADD a on i.CUSTOMER_ID=a.CUSTOMER_ID
         <where>
             <if test="search != null and search != ''">
                 (
-                CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                i.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{search}, '%'))
                 OR
-                CUSTOMER_ABBR LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                i.CUSTOMER_ABBR LIKE CONCAT('%', CONCAT(#{search}, '%'))
                 OR
-                CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                i.CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{search}, '%'))
+                OR
+                a.INSITITUTE_CODE LIKE CONCAT('%', CONCAT(#{search}, '%'))
                 )
             </if>
             <if test="initValue != null and initValue != ''">
                 (
-                CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+                i.CUSTOMER_NAME LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
                 OR
-                CUSTOMER_ABBR LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+                i.CUSTOMER_ABBR LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
                 OR
-                CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+                i.CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{initValue}, '%'))
+                OR
+                a.INSITITUTE_CODE LIKE CONCAT('%', CONCAT(#{initValue,jdbcType=VARCHAR}, '%'))
                 )
             </if>
             <if test="IS_ISSUER != null and IS_ISSUER != ''">
@@ -1273,7 +1290,7 @@
     </delete>
 
     <delete id="deleteFinCashCalcRule">
-        delete from FIN_CASH_CALC_RULE where FINPROD_ID =#{finprodId} and IS_INITIAL = 'Y'
+        delete from FIN_CASH_CALC_RULE where FINPROD_ID =#{finprodId}
     </delete>
 
     <delete id="deleteFinCashPayRule">

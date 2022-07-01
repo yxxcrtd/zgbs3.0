@@ -1,10 +1,8 @@
 package com.joyintech.tams.invest.batch.creditprotectioncertificate.service;
 
+import com.joyintech.batch.batchbase.exception.BatchException;
 import com.joyintech.framework.JoyinRestTemplate;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.IDGenerator;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -16,8 +14,18 @@ import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditPro
 import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodWriterDto;
 import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.DateCalService;
 import com.joyintech.tams.invest.common.component.base.core.BaseGetBussinessId;
+import com.joyintech.tams.invest.common.component.base.group.impl.BasePtlCashPositionInfoServiceImpl;
+import com.joyintech.tams.invest.common.component.base.group.impl.BasePtlSecPositionInfoServiceImpl;
 import com.joyintech.tams.invest.common.constant.InterfCommonConstant;
+import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
+import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
+import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
+import com.joyintech.tams.invest.common.position.service.CommonPositionService;
+import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
+import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,8 +89,18 @@ public class CreditProtectionCertificatePeriodRunnerService {
     @Autowired
     private BaseGetBussinessId baseGetBussinessId;
 
+    @Autowired
+    private CommonPositionService commonPositionService;
 
-    public void dealExpireData(CreditProtectionCertificatePeriodWriterDto writerDto) {
+    @Autowired
+    private BasePtlSecPositionInfoServiceImpl basePtlSecPositionInfoServiceImpl;
+
+    @Autowired
+    private BasePtlCashPositionInfoServiceImpl basePtlCashPositionInfoServiceImpl;
+
+
+
+    public void dealExpireData(CreditProtectionCertificatePeriodWriterDto writerDto) throws BatchException {
         try {
 
             List<CreditProtectionCertificatePeriodExpireDataDto> expireDatas = writerDto.getExpireDatas();
@@ -206,7 +224,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
             dealOldPosition(writerDto, nextWorkDate, false);
         } catch (Exception e) {
             logger.error("信用保护凭证自动生成错误", e);
-            throw e;
+            throw new BatchException(RiskUtil.getLogString(e));
         }
     }
 
@@ -264,13 +282,14 @@ public class CreditProtectionCertificatePeriodRunnerService {
             etrSecPositionFlow.setSecAcctId(expireData.getSecAcctId());
             etrSecPositionFlow.setFinprodId(expireData.getFinprodId());
             etrSecPositionFlow.setBranch(InterfCommonConstant.分支序号_默认);
-            etrSecPositionFlow.setInvAim(null);
-            etrSecPositionFlow.setHodingType(DictCodeList.持仓类型_实际.getValue());
+            etrSecPositionFlow.setInvAim("999999");
+            etrSecPositionFlow.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());
             etrSecPositionFlow.setCdate(iPlatformDate.getSysDate());
             etrSecPositionFlow.setAmount(isRevoke ? expireData.getRepNomCapi() : expireData.getRepNomCapi().negate());
+            etrSecPositionFlow.setAmount(ArithmeticUtil.divide(etrSecPositionFlow.getAmount(), 100, 4));
             etrSecPositionFlow.setpFinprodId(null);
-            etrSecPositionFlow.setTradeId(expireData.getTradeId());
-            etrSecPositionFlow.setOffsetId(expireData.getTradeId());
+            etrSecPositionFlow.setTradeId(writerDto.getBussinessCode());
+            etrSecPositionFlow.setOffsetId(writerDto.getBussinessCode());
             etrSecPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
             etrSecPositionFlow.setCreateUser("SYSTEM");
             etrSecPositionFlow.setCreateTime(iPlatformDate.getSysDate());
@@ -287,13 +306,14 @@ public class CreditProtectionCertificatePeriodRunnerService {
             ptlSecPositionFlow.setSecAcctId(expireData.getSecAcctId());
             ptlSecPositionFlow.setFinprodId(expireData.getFinprodId());
             ptlSecPositionFlow.setBranch(InterfCommonConstant.分支序号_默认);
-            ptlSecPositionFlow.setInvAim(null);
+            ptlSecPositionFlow.setInvAim("999999");
             ptlSecPositionFlow.setHodingType(DictCodeList.持仓类型_可用.getValue());
             ptlSecPositionFlow.setCdate(iPlatformDate.getSysDate());
             ptlSecPositionFlow.setAmount(isRevoke ? expireData.getRepNomCapi() : expireData.getRepNomCapi().negate());
+            ptlSecPositionFlow.setAmount(ArithmeticUtil.divide(ptlSecPositionFlow.getAmount(), 100, 4));
             ptlSecPositionFlow.setpFinprodId(null);
-            ptlSecPositionFlow.setTradeId(expireData.getTradeId());
-            ptlSecPositionFlow.setOffsetId(expireData.getTradeId());
+            ptlSecPositionFlow.setTradeId(writerDto.getBussinessCode());
+            ptlSecPositionFlow.setOffsetId(writerDto.getBussinessCode());
             ptlSecPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
             ptlSecPositionFlow.setCreateUser("SYSTEM");
             ptlSecPositionFlow.setCreateTime(iPlatformDate.getSysDate());
@@ -308,6 +328,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
             ptlSecPositionFlow2.setSeqno(IDGenerator.generate());
             ptlSecPositionFlow2.setCdate(nextWorkDate);
             ptlSecPositionFlow2.setAmount(isRevoke ? expireData.getRepNomCapi().negate() : expireData.getRepNomCapi());
+            ptlSecPositionFlow2.setAmount(ArithmeticUtil.divide(ptlSecPositionFlow2.getAmount(), 100, 4));
             ptlSecPositionFlows.add(ptlSecPositionFlow2);
 
             PtlSecPositionFlow ptlSecPositionFlow3 = new PtlSecPositionFlow();
@@ -315,15 +336,28 @@ public class CreditProtectionCertificatePeriodRunnerService {
             ptlSecPositionFlow3.setSeqno(IDGenerator.generate());
             ptlSecPositionFlow3.setHodingType(DictCodeList.持仓类型_实际.getValue());
             ptlSecPositionFlow3.setCdate(nextWorkDate);
-            ptlSecPositionFlow2.setAmount(isRevoke ? expireData.getRepNomCapi() : expireData.getRepNomCapi().negate());
+            ptlSecPositionFlow3.setAmount(isRevoke ? expireData.getRepNomCapi() : expireData.getRepNomCapi().negate());
+            ptlSecPositionFlow3.setAmount(ArithmeticUtil.divide(ptlSecPositionFlow3.getAmount(), 100, 4));
             ptlSecPositionFlows.add(ptlSecPositionFlow3);
         }
-        for (PtlSecPositionFlow ptlSecPositionFlow : ptlSecPositionFlows) {
-            ptlSecPositionFlowMapper.insertSelective(ptlSecPositionFlow);
-        }
+
+        EtrPositionHoldDto etrPositionHoldDto = new EtrPositionHoldDto();
+        etrPositionHoldDto.setPtlSecPositionFlows(new ArrayList<EtrSecPositionFlowDto>());
+        etrPositionHoldDto.setPtlCashPositionFlows(new ArrayList<EtrCashPositionFlowDto>());
+
         for (EtrSecPositionFlow etrSecPositionFlow : etrSecPositionFlows) {
-            etrSecPositionFlowMapper.insertSelective(etrSecPositionFlow);
+//            commonPositionService.insertEtrSecPositionFlow(etrSecPositionFlow);
+            EtrSecPositionFlowDto etrSecPositionFlowDto = new EtrSecPositionFlowDto();
+            BeanUtils.copyProperties(etrSecPositionFlow, etrSecPositionFlowDto);
+            etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
         }
+        for (PtlSecPositionFlow ptlSecPositionFlow : ptlSecPositionFlows) {
+//            commonPositionService.insertPtlSecPositionFlow(ptlSecPositionFlow);
+            PtlSecPositionFlowDto ptlSecPositionFlowDto = new PtlSecPositionFlowDto();
+            BeanUtils.copyProperties(ptlSecPositionFlow, ptlSecPositionFlowDto);
+            basePtlSecPositionInfoServiceImpl.inertSecPositionFlow(ptlSecPositionFlowDto);
+        }
+        EtrCommonCashPositionDealService.持久化流水Dto(etrPositionHoldDto);
     }
 
 
@@ -339,14 +373,14 @@ public class CreditProtectionCertificatePeriodRunnerService {
         resultMap.put(TOTAL_TRADE_ID, writerDto.getBussinessCode());
         resultMap.put("modelType", DictCodeListExt1.子系统代码_交易.getValue());
         resultMap.put("balanceCheck", "N");
-        resultMap.put("busiType", "36");
+        resultMap.put(BUSI_TYPE, DictCodeListExt3.头寸业务类型_信用保护凭证存续期.getValue());
         resultMap.put(BUSI_ACT, DictCodeListExt3.业务动作_交易登记.getValue());
         resultMap.put(PS, DictCodeList.交易方向_到期.getValue());
 
         List<CreditProtectionCertificatePeriodExpireDataDto> expireDatas = writerDto.getExpireDatas();
         resultMap.put(TRADE_PLACE, expireDatas.get(0).getTradeMarket());
 
-        resultMap.put("cDate", DateUtil.format(iPlatformDate.getSysDate()));
+        resultMap.put("cdate", DateUtil.format(iPlatformDate.getSysDate()));
         resultMap.put(CCY, DictCodeList.币种_人民币_CNY.getValue());
 
         List<Map<String, Object>> ptlList = new ArrayList<>();
@@ -354,12 +388,12 @@ public class CreditProtectionCertificatePeriodRunnerService {
         for (CreditProtectionCertificatePeriodExpireDataDto expireDataDto : expireDatas) {
             Map<String, Object> ptl = new HashMap<>();
             ptl.put("portfolioId", expireDataDto.getPortfolioId());
-            ptl.put("finprodId", expireDataDto.getFinprodId());
+            ptl.put(FINPROD_ID, expireDataDto.getFinprodId());
             ptl.put("tradeId", expireDataDto.getTradeId());
-            ptl.put("cashAcctId",expireDataDto.getAcctNo());
+            ptl.put("cashAcctId", expireDataDto.getAcctNo());
             ptl.put("secAcctId", expireDataDto.getSecAcctId());
             ptl.put("secAmount", expireDataDto.getRepNomCapi());
-            ptl.put("cashAmount", BigDecimal.ZERO);
+            ptl.put("cashAmount", expireDataDto.getRepNomCapi());
             ptlList.add(ptl);
         }
         resultMap.put("ptlList", ptlList);
@@ -367,7 +401,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
     }
 
     public void doRevokePositionForNew(String busiCode) {
-        PositionHttpRequest.dorevoke(busiCode, DictCodeListExt1.子系统代码_交易.getValue(), "36", DictCodeList.交易方向_到期.getValue());
+        PositionHttpRequest.dorevoke(busiCode, DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_信用保护凭证存续期.getValue(), DictCodeList.交易方向_到期.getValue());
     }
 
     public void doRevokePositionForOld(String busiCode) {

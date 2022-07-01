@@ -605,6 +605,9 @@ public class CalcOccupyInfoService {
      * @return 目标金额
      */
     protected BigDecimal calcMixAmount(IProdAssetAmount info, BigDecimal newNum) {
+        if(info == null){
+            return BigDecimal.ZERO;
+        }
         BigDecimal newAmt = ArithmeticUtil.multiply(2, RoundingMode.HALF_UP, newNum,
             info.getAmount());
         return CommonUtil.math(newAmt, info.getNum(), BussinessDictCodeListRds.操作符_除.getValue());
@@ -711,6 +714,9 @@ public class CalcOccupyInfoService {
         paraIdList.forEach(paraCode -> {
             IParam param = paramMap.get(paraCode);
             // Redis识别域
+            if(param == null){
+                return;
+            }
             String[] arr = param.getRedisFieldArr();
             // 枚举型、不更新Redis、非Redis、不是SQL的、redis识别域为空的统统跳过
             if (param.isEnumType() || !param.isUpRedis()
@@ -1427,7 +1433,7 @@ public class CalcOccupyInfoService {
         // 取得剔除资产代码信息
         Set<String> tpList = ind.getPtlIndividAstDel(ptlCode);
         // 若目标资产在剔除的列表中，则删除该组合与指标的关系
-        if (tpList.contains(assetCode)) {
+        if (tpList != null && tpList.contains(assetCode)) {
             indList.remove(ind.getIndId());
         }
     }

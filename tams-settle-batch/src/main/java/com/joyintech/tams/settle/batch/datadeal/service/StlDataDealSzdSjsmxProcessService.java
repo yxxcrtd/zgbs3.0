@@ -18,7 +18,7 @@ import com.joyintech.tams.settle.batch.datadeal.function.PersonalityFunction;
 import com.joyintech.tams.settle.common.dto.FundInfoDto;
 import com.joyintech.tams.settle.common.dto.StlDownDataDealAccountInfoDto;
 import com.joyintech.tams.settle.common.service.SettleCommonService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -181,12 +181,13 @@ public class StlDataDealSzdSjsmxProcessService {
             }
             // 全价总额
             settleTransData.setFpriceAmt(abs(szdSjsmx.getMxqsbj()));
-            if ("B14".equals(getFinProductTypeType6(settleTransData))) {
+            if ("B14".equals(stlDataDealProcessCommonService.getFinProductTypeType6(settleTransData))) {
                 settleTransData.setTradePlat(stlDataDealProcessCommonService.getTradePlat(szdSjsmx.getMxjyfs()));
             }
             // 日终过来的文件结算价格就是全价的，需要反算净价总额、应计利息总额
-            stlDownDataDealService.calc(settleTransData);
-
+            if(BussinessDictCodeList.金融产品类型_投管用_债券.getValue().equals(settleTransData.getFinprodType2())){
+                stlDownDataDealService.calc(settleTransData);
+            }
             return true;
         }));
     }
@@ -323,7 +324,10 @@ public class StlDataDealSzdSjsmxProcessService {
             // 交收方式
             settleTransData.setSettleMode(stlDataDealProcessCommonService.getSettleMode(szdSjsmx.getMxjsfs()));
             //交收结果
-            settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdSjsmx.getJgdm()));
+            // ZGCPCN-1574:sjsmx交收结果都是正常交收 modify by fuyongsheng 20220621 start
+            // settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdSjsmx.getJgdm()));
+            settleTransData.setDeliveryResult(DictCodeListExt4.交收结果_正常交收.getValue());
+            // ZGCPCN-1574:sjsmx交收结果都是正常交收 modify by fuyongsheng 20220621 end
             // 成交编号
             String generate = IDGenerator.generate();
             settleTransData.setTradeId(generate);
@@ -630,7 +634,7 @@ public class StlDataDealSzdSjsmxProcessService {
         // 交易方向
         settleTransData.setPs(DictCodeList.交易方向_买入.getValue());
         // 金融产品代码
-        settleTransData.setFinprodId(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue()+szdSjsmx.getMxzqdm()+".SZ");
+        settleTransData.setFinprodId(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue() + GlobalConstant.UNDER_LINE + szdSjsmx.getMxzqdm()+".SZ");
         // 金融产品类型(估值核算)
         settleTransData.setFinprodType(BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
         // 金融产品类型(投管分类)
@@ -837,19 +841,4 @@ public class StlDataDealSzdSjsmxProcessService {
         return stlDataDealProcessCommonService.getNextWorkDay(parseDate, calendarId);
     }
 
-    /**
-     * 根据金融产品代码查询FIN_PRODUCT_TYPE.TYPE_6 -- 投管一级类型
-     */
-    private String getFinProductTypeType6(SettleTransData settleTransData) {
-        FinProductTypeKey finProductTypeKey = new FinProductTypeKey();
-        finProductTypeKey.setBranch(0L);
-        finProductTypeKey.setFinprodId(settleTransData.getFinprodId());
-        FinProductType finProductType = new FinProductType();
-        try {
-            finProductType = finProductTypeMapper.selectByPrimaryKey(finProductTypeKey);
-        } catch (Exception e) {
-            logger.error("根据金融产品代码查询投管一级类型出错信息：" + e);
-        }
-        return finProductType.getType6();
-    }
 }

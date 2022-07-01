@@ -45,7 +45,7 @@ public class FinPayInterestStdInfoValidator implements BeanValidator{
         	for(FinCashPlanDto dto1:dto.getFinCashPlanList()){
             	//计息截止日不可重复
                 if(!set.add(dto1.getMdate())){
-                    resultList.add(new ValidMessage("",
+                    resultList.add(new ValidMessage("mdate",
                         getMessage("FIN_ASSET_E_0009", getMessage("BussFinRepayment.mdate"))));
                 }
             }
@@ -106,12 +106,12 @@ public class FinPayInterestStdInfoValidator implements BeanValidator{
             if(StringUtil.equals(dto.getPayCycle(), DictCodeList.频率_年.getValue())
             ||StringUtil.equals(dto.getPayCycle(), DictCodeList.频率_季.getValue())){
                 if(StringUtil.isEmpty(dto.getPayMonth())){
-                    resultList.add(new ValidMessage("",
+                    resultList.add(new ValidMessage("payMonth",
                             getMessage("COMMON_E_0057", getMessage("FinPayInterestStdInfo.payMonth"))));
                 }
             }
             if(StringUtil.isEmpty(dto.getDayValue())){
-                resultList.add(new ValidMessage("",
+                resultList.add(new ValidMessage("dayValue",
                         getMessage("COMMON_E_0057", getMessage("FinPayInterestStdInfo.dayValue"))));
             }
         }

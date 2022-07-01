@@ -9,10 +9,7 @@ import com.joyintech.tams.common.base.entity.SettleTransData;
 import com.joyintech.tams.common.base.entity.SettleTransDataAdd;
 import com.joyintech.tams.common.base.entity.SettleTransTgMapping;
 import com.joyintech.tams.common.base.entity.SzdSjsfx;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListStl;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.settle.batch.datadeal.constant.StlDataDealProcessConstant;
 import com.joyintech.tams.settle.batch.datadeal.dao.StlDownDataDealMapper;
 import com.joyintech.tams.settle.batch.datadeal.dto.StlDownDataDealOperatorDto;
@@ -21,7 +18,7 @@ import com.joyintech.tams.settle.batch.datadeal.dto.step2.StlDownDataDealWriteBa
 import com.joyintech.tams.settle.batch.datadeal.function.PersonalityFunction;
 import com.joyintech.tams.settle.common.dto.StlDownDataDealAccountInfoDto;
 import com.joyintech.tams.settle.common.service.SettleCommonService;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -154,6 +151,7 @@ public class StlDataDealSzdSjsfxProcessService {
             // 清算速度:申购是T+2
             if(DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())){
                 settleTransData.setSettleSpeed(2L);
+                settleTransData.setDeliveryResult(DictCodeListExt4.交收结果_交收通知.getValue());
             }
             // GNS-908:申购和申购确认需要通过申报代码查询资产代码 modify by fuyongsheng 20220218 start
             if(DictCodeList.交易方向_申购确认.getValue().equals(settleTransData.getPs())
@@ -226,6 +224,9 @@ public class StlDataDealSzdSjsfxProcessService {
             if(DictCodeList.交易方向_申购确认.getValue().equals(settleTransData.getPs())
                     || DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())){
                 settleTransData.setFinprodId(stlDownDataDealMapper.getLastFinproductIdByApprovalNo(szdSjsfx.getFxzqdm()));
+            }
+            if(DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())){
+                settleTransData.setDeliveryResult(DictCodeListExt4.交收结果_交收通知.getValue());
             }
             if(!assetList.contains(settleTransData.getFinprodId())) {
                 // 不是债券类资产时，忽略
@@ -305,7 +306,7 @@ public class StlDataDealSzdSjsfxProcessService {
 			// 临时表流水号
 			settleTransData.setSeqNo(szdSjsfx.getSeqno());
             //交收结果
-            settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdSjsfx.getJgdm()));
+            settleTransData.setDeliveryResult(DictCodeListExt4.交收结果_正常交收.getValue());
             // 日终过来的文件结算价格就是全价的，需要反算净价总额、应计利息总额
             stlDownDataDealService.calc(settleTransData);
 

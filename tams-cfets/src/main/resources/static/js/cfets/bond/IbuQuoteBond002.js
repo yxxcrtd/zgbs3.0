@@ -6,6 +6,15 @@
     var editFlag = true;
     //这个标志是防止查询结果返回赋值后不停的联动calcAmt;
     var entrustIdChangeFlag = false;
+
+    // 是否 abs
+    let isAbs = $('#isAbs').val();
+    // 是否特殊债
+    let isSpecialDebt = $('#isSpecialDebt').val();
+    // 是否到期违约债
+    let isDefaultBondIndicator = $('#isDefaultBondIndicator').val();
+    // 是否锚定净价
+    let isSpecial = $('#isSpecial').val();
     /**
      * 委托代码
      */
@@ -72,11 +81,13 @@
                         $('#CfetsBondDealQuotedPrice004_matureYield').val(result.data.matureYield).trigger('blur');
                         $('#CfetsBondDealQuotedPrice004_exerYield').val(result.data.exerYield).trigger('blur');
                         $('#CfetsBondDealQuotedPrice004_unitInt').val(result.data.unitInt).trigger('blur');
+                        $('#CfetsBondDealQuotedPrice004_unitIntEdit').val(result.data.unitInt).trigger('blur');
                         $('#CfetsBondDealQuotedPrice004_unitFprice').val(result.data.unitFprice).trigger('blur');
                         $('#CfetsBondDealQuotedPrice004_cpriceAmt').val(result.data.cpriceAmt).trigger('blur');
                         $('#CfetsBondDealQuotedPrice004_parValue').val(result.data.parValue).trigger('blur');
                         $('#CfetsBondDealQuotedPrice004_intAmt').val(result.data.intAmt).trigger('blur');
                         $('#CfetsBondDealQuotedPrice004_fpriceAmt').val(result.data.fpriceAmt).trigger('blur');
+                        $('#CfetsBondDealQuotedPrice004_fpriceAmtEdit').val(result.data.fpriceAmt).trigger('blur');
                         $('#CfetsBondDealQuotedPrice004_parValueAmt').val(result.data.parValueAmt).trigger('blur');
 
                         $('#CfetsBondDealQuotedPrice004_portfolioName').attr('disabled', true);
@@ -137,11 +148,13 @@
                 $('#CfetsBondDealQuotedPrice004_matureYield').val('').trigger('blur').attr('disabled', false);;
                 $('#CfetsBondDealQuotedPrice004_exerYield').val('').trigger('blur');
                 $('#CfetsBondDealQuotedPrice004_unitInt').val('').trigger('blur');
+                $('#CfetsBondDealQuotedPrice004_unitIntEdit').val('').trigger('blur');
                 $('#CfetsBondDealQuotedPrice004_unitFprice').val('').trigger('blur');
                 $('#CfetsBondDealQuotedPrice004_cpriceAmt').val('').trigger('blur');
                 $('#CfetsBondDealQuotedPrice004_parValue').val('').trigger('blur');
                 $('#CfetsBondDealQuotedPrice004_intAmt').val('').trigger('blur');
                 $('#CfetsBondDealQuotedPrice004_fpriceAmt').val('').trigger('blur');
+                $('#CfetsBondDealQuotedPrice004_fpriceAmtEdit').val('').trigger('blur');
                 $('#CfetsBondDealQuotedPrice004_parValueAmt').val('').trigger('blur');
             }else if(quotaPageModel == 'dialogueResponse'){
                 $('#CfetsBondDealQuotedPrice004_portfolioName').val('').trigger('change');
@@ -402,7 +415,20 @@
              }
             object.ptlAllocatios= ptlAllocations;
         }
-        Joyin.confirm("请确认是否要提交?",
+        //提交 走流程
+        if (operatorType === 'submit') {
+            Joyin.ajaxJson(basePath + 'cfets/bond/IbuQuoteBond002/checkByHome', object, function(result) {
+                Joyin.confirm(result.data, function () {
+                    WorkFlow.doSubmitList(basePath + 'cfets/bond/IbuQuoteBond002/save', object, "IbuQuoteBond002_btn_submit", "IbuQuoteBond002",
+                        function() {
+                            var index = window.parent.layer.getFrameIndex(window.name);
+                            window.parent.layer.close(index);
+                        })
+                });
+            })
+
+        }else{
+            Joyin.confirm("请确认是否要提交?",
             function() {
                 //保存 走流程
                 if (operatorType === 'save') {
@@ -420,16 +446,16 @@
                             window.parent.layer.close(index);
                         })
                 }
-                //提交 走流程
-                else if (operatorType === 'submit') {
-                    Joyin.ajaxJson(basePath + 'cfets/bond/IbuQuoteBond002/checkByHome', object, function(result1) {
-                        WorkFlow.doSubmitList(basePath + 'cfets/bond/IbuQuoteBond002/save', object, "IbuQuoteBond002_btn_submit", "IbuQuoteBond002",
-                            function() {
-                                var index = window.parent.layer.getFrameIndex(window.name);
-                                window.parent.layer.close(index);
-                        })
-                    })
-                }
+                // //提交 走流程
+                // else if (operatorType === 'submit') {
+                //     Joyin.ajaxJson(basePath + 'cfets/bond/IbuQuoteBond002/checkByHome', object, function() {
+                //         WorkFlow.doSubmitList(basePath + 'cfets/bond/IbuQuoteBond002/save', object, "IbuQuoteBond002_btn_submit", "IbuQuoteBond002",
+                //             function() {
+                //                 var index = window.parent.layer.getFrameIndex(window.name);
+                //                 window.parent.layer.close(index);
+                //         })
+                //     })
+                // }
                 //拒绝 不走流程
                 else if (operatorType === 'refuse'){
                     Joyin.ajaxJson(basePath + 'invest/bankuplink/bond/CfetsBondDealQuotedPrice004/saveData', object, function(result){
@@ -438,12 +464,12 @@
                     })
                 }
             })
+        }
     };
     /**
      * 计算金额相关
      */
-    var calcAmt = function(calculateField){
-    debugger;
+    var calcAmt = function(calculateField,isIntAmt){
         if(entrustIdChangeFlag){
             return;
         }
@@ -494,6 +520,9 @@
              param.settleDate = object.settleDate;
              param.price = object.price;
              param.fpriceAmt = object.fpriceAmt;
+            if (isIntAmt && isIntAmt !== '') {
+                 param.unitInt = object.unitInt;
+             }
              if($("#CfetsBondDealQuotedPrice004_matureYield").val()) {
                  param.matureYield = $("#CfetsBondDealQuotedPrice004_matureYield").val() / 100;
              }
@@ -526,17 +555,19 @@
                         $('#CfetsBondDealQuotedPrice004_exerYield').val(result.data.exerYield*100).trigger('blur');
                     }
                     $('#CfetsBondDealQuotedPrice004_unitInt').val(result.data.unitInt).trigger('blur');
+                    $('#CfetsBondDealQuotedPrice004_unitIntEdit').val(result.data.unitInt).trigger('blur');
                     $('#CfetsBondDealQuotedPrice004_unitFprice').val(result.data.unitFprice).trigger('blur');
                     $('#CfetsBondDealQuotedPrice004_cpriceAmt').val(result.data.cpriceAmt).trigger('blur');
                     $('#CfetsBondDealQuotedPrice004_parValue').val(result.data.parValue).trigger('blur');
                     $('#CfetsBondDealQuotedPrice004_intAmt').val(result.data.intAmt).trigger('blur');
                     $('#CfetsBondDealQuotedPrice004_fpriceAmt').val(result.data.fpriceAmt).trigger('blur');
+                    $('#CfetsBondDealQuotedPrice004_fpriceAmtEdit').val(result.data.fpriceAmt).trigger('blur');
                     $('#CfetsBondDealQuotedPrice004_parValueAmt').val(result.data.parValueAmt).trigger('blur');
                     $('#dealFeeAmt').val(result.data.dealFeeAmt).trigger('blur');
                     $('#settFeeAmt').val(result.data.settFeeAmt).trigger('blur');
                     entrustIdChangeFlag = false;
                 }
-            })
+            },false)
         }
     };
 
@@ -620,6 +651,40 @@
              calcAmt('03');
            }
         });
+        /**
+         * 应计利息
+         */
+        $('#CfetsBondDealQuotedPrice004_unitIntEdit').on('change',function(){
+            $('#CfetsBondDealQuotedPrice004_unitInt').val($('#CfetsBondDealQuotedPrice004_unitIntEdit').val()).trigger('blur');
+            if(!entrustIdChangeFlag){
+                calcAmt(null,'Y');
+                autoAllocation();
+            }
+        });
+        /**
+         * 结算金额
+         */
+        $('#CfetsBondDealQuotedPrice004_fpriceAmtEdit').on('change', function () {
+            $('#CfetsBondDealQuotedPrice004_fpriceAmt').val($('#CfetsBondDealQuotedPrice004_fpriceAmtEdit').val()).trigger('blur');;
+            // 结算金额
+            var fpriceAmt = $('#CfetsBondDealQuotedPrice004_fpriceAmt').val();
+            // 应计利息
+            var unitInt = $('#CfetsBondDealQuotedPrice004_unitInt').val();
+            // 交易金额
+            var cpriceAmt = $('#CfetsBondDealQuotedPrice004_cpriceAmt').val();
+            // 净价
+            var unitCprice = $('#CfetsBondDealQuotedPrice004_unitCprice').val();
+            //金额面板.应计利息总额=画面.结算金额-画面.交易金额
+            $('#CfetsBondDealQuotedPrice004_intAmt').val(JoyinMath.doMinus(fpriceAmt, cpriceAmt, 2)).trigger('blur');;
+            // 应计利息总额
+            var intAmt = $('#CfetsBondDealQuotedPrice004_intAmt').val();
+            //金额面板.应计利息 金额面板.应计利息总额/(券面总额（万元）*10000)*100
+            var newUnitInt = JoyinMath.doDiv(intAmt*100, cpriceAmt, 5);
+            $('#CfetsBondDealQuotedPrice004_unitInt').val(newUnitInt).trigger('blur');;
+            //金额面板.全价=净价+应计利息
+            $('#CfetsBondDealQuotedPrice004_unitFprice').val(JoyinMath.doAdd(unitCprice, newUnitInt, 4)).trigger('blur');;
+            autoAllocation();
+        });
     }
 
     var  disabledElementByDzh = function(entrustList){
@@ -665,6 +730,13 @@
     $(function () {
         // 初始化页面
         initPage();
+        if ('Y' === isSpecialDebt) {
+            $('#unitIntEditDiv').show();
+            $('#fpriceAmtEditDiv').hide();
+        }else{
+            $('#unitIntEditDiv').hide();
+            $('#fpriceAmtEditDiv').show();
+        }
 
         // 委托代码
         var entrustId = $('#CfetsBondDealQuotedPrice004_hidden_entrustId').val();
@@ -980,7 +1052,6 @@
      * 计算金额相关
      */
     var autoAllocation = function () {
-    debugger;
         var finprodId = $('#CfetsBondDealQuotedPrice004_hidden_finprodId').val();
         if (!$("#distribution").val()) {
             Joyin.error("无法自动分配，请先选择分配方式");

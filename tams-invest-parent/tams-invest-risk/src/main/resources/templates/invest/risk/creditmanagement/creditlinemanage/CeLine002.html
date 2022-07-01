@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="~{layout/default}">
+	layout:decorate="~{layout/default}">
 <head>
 <title data-th-text="#{CeLine002}"></title>
 
@@ -73,35 +73,35 @@
 					</div>
 				</div>
 			</div>-->
-			<div class="layui-form-item"  name="isPerpetualSecDiv"  id="isPerpetualSecDiv" >
-				<div>
-					<label class="layui-form-label form-lable mst-lable"
-						data-th-text="#{CeLine002.isPerpetualSec}">是否永续债</label>
-					<div class="layui-input-inline input-inline" style="width: 100px !important;">
-                         <input type="checkbox" name="isPerpetualSec" required="required"
-							id="isPerpetualSec" lay-skin="switch"
-							data-th-value="${YES}" lay-text="是|否" lay-filter="isPerpetualSec"
-							data-th-checked="${YES} == ${entity?.isPerpetualSec} ">
-					</div>
+<!--			<div class="layui-form-item"  name="isPerpetualSecDiv"  id="isPerpetualSecDiv" >-->
+<!--				<div>-->
+<!--					<label class="layui-form-label form-lable mst-lable"-->
+<!--						data-th-text="#{CeLine002.isPerpetualSec}">是否永续债</label>-->
+<!--					<div class="layui-input-inline input-inline" style="width: 100px !important;">-->
+<!--                         <input type="checkbox" name="isPerpetualSec" required="required"-->
+<!--							id="isPerpetualSec" lay-skin="switch"-->
+<!--							data-th-value="${YES}" lay-text="是|否" lay-filter="isPerpetualSec"-->
+<!--							data-th-checked="${YES} == ${entity?.isPerpetualSec} ">-->
+<!--					</div>-->
 
-				</div>
-			</div>
-			<div class="layui-form-item" name="issueTypeDiv"  id="issueTypeDiv">
-				<div>
-					<label class="layui-form-label form-lable mst-lable"
-						data-th-text="#{CeLine002.issueType}">发行方式</label>
-					<div class="layui-input-inline input-inline">
-						<select type="text" id="issueType"
-							name="issueType" required="required"
-							class="layui-input form-input input-select"  
-                            data-th-data-result="${ISSUE_TYPE}"							
-                            allowClear="true"  placeholder="请输入内容"
-							data-th-placeholder="#{SysCommon.placeholder}"
-							data-th-initValue="${entity?.issueType}">
-						</select>
-					</div>
-				</div>
-			</div>
+<!--				</div>-->
+<!--			</div>-->
+<!--			<div class="layui-form-item" name="issueTypeDiv"  id="issueTypeDiv">-->
+<!--				<div>-->
+<!--					<label class="layui-form-label form-lable mst-lable"-->
+<!--						data-th-text="#{CeLine002.issueType}">发行方式</label>-->
+<!--					<div class="layui-input-inline input-inline">-->
+<!--						<select type="text" id="issueType"-->
+<!--							name="issueType" required="required"-->
+<!--							class="layui-input form-input input-select"  -->
+<!--                            data-th-data-result="${ISSUE_TYPE}"							-->
+<!--                            allowClear="true"  placeholder="请输入内容"-->
+<!--							data-th-placeholder="#{SysCommon.placeholder}"-->
+<!--							data-th-initValue="${entity?.issueType}">-->
+<!--						</select>-->
+<!--					</div>-->
+<!--				</div>-->
+<!--			</div>-->
 			<div class="layui-form-item" style="display: none;">
 				<div>
 					<label class="layui-form-label form-lable mst-lable"
@@ -131,32 +131,32 @@
 					</div>
 				</div>
 			</div>
-			<div class="layui-form-item">
-				 <div>
-					  <label class="layui-form-label form-lable mst-lable"
-						  data-th-text="#{CeLine002.termValue}">期限</label>
-					  <div class="layui-input-inline input-inline">
-					 
-						<div class="layui-inline layui-col-md8 layui-col-sm8 layui-col-lg8">
-											<input type="text" id="termValue" name="termValue"
-											class="layui-input form-input  text-number"
-											placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"
-											 data-th-value="${entity?.termValue}" data-textrange="0">
-							</div>
-						   <div class="layui-inline layui-col-md4 layui-col-sm4 layui-col-lg4" >
-			
-									<div class="layui-input-inline input-inline">
-										<input type="text" id="termUnit" name="termUnit"
-											class="layui-input form-input input-select"
-											placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"
-											data-th-data-result = '${TERM_UNIT}' data-th-value="${entity?.termUnit}">
-									</div>
-		
-							</div>
-						</div>	
-					</div>
+<!--			<div class="layui-form-item">-->
+<!--				 <div>-->
+<!--					  <label class="layui-form-label form-lable mst-lable"-->
+<!--						  data-th-text="#{CeLine002.termValue}">期限</label>-->
+<!--					  <div class="layui-input-inline input-inline">-->
+<!--					 -->
+<!--						<div class="layui-inline layui-col-md8 layui-col-sm8 layui-col-lg8">-->
+<!--											<input type="text" id="termValue" name="termValue"-->
+<!--											class="layui-input form-input  text-number"-->
+<!--											placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"-->
+<!--											 data-th-value="${entity?.termValue}" data-textrange="0">-->
+<!--							</div>-->
+<!--						   <div class="layui-inline layui-col-md4 layui-col-sm4 layui-col-lg4" >-->
+<!--			-->
+<!--									<div class="layui-input-inline input-inline">-->
+<!--										<input type="text" id="termUnit" name="termUnit"-->
+<!--											class="layui-input form-input input-select"-->
+<!--											placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"-->
+<!--											data-th-data-result = '${TERM_UNIT}' data-th-value="${entity?.termUnit}">-->
+<!--									</div>-->
+<!--		-->
+<!--							</div>-->
+<!--						</div>	-->
+<!--					</div>-->
 
-			</div>
+<!--			</div>-->
 			<div class="layui-form-item">
 				<div>
 					<label class="layui-form-label form-lable mst-lable"

@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.cloud.netflix.eureka.EurekaDiscoveryClient;
+//import org.springframework.cloud.netflix.eureka.EurekaDiscoveryClient;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -62,7 +62,7 @@ public class ChangePlatformDateTask extends BatchBaseService {
     /**
      * 是否单体服务
      */
-    @Value("${application.micorservice.contextPath.single:false}")
+    @Value("${application.micorservice.contextpath.single:false}")
     private boolean isSingle;
 
     /**
@@ -163,9 +163,12 @@ public class ChangePlatformDateTask extends BatchBaseService {
         final String serviceNameFinal = serverName;
         if (appList != null) {
             appList.forEach(serviceInstance -> {
-                EurekaDiscoveryClient.EurekaServiceInstance client = (EurekaDiscoveryClient.EurekaServiceInstance)serviceInstance;
+//                EurekaDiscoveryClient.EurekaServiceInstance client = (EurekaDiscoveryClient.EurekaServiceInstance)serviceInstance;
+//                String apiUrl = StringUtil.replaceOnce(ServiceApplication.PINGAN_SERVICE_NAME, serviceNameFinal,
+//                        client.getInstanceInfo().getIPAddr() + ":" + client.getInstanceInfo().getPort());
+                //nacos处理
                 String apiUrl = StringUtil.replaceOnce(ServiceApplication.PINGAN_SERVICE_NAME, serviceNameFinal,
-                        client.getInstanceInfo().getIPAddr() + ":" + client.getInstanceInfo().getPort());
+                        serviceInstance.getHost()+":"+serviceInstance.getPort());
                 logger.debug("更新平台日缓存刷新接口：{}", apiUrl);
                 HttpClient.getString(apiUrl + ServiceApplication.SERVLET_CONTEXT_PATH + "/api/sys/refreshPlatDate?institutionCode="+institutionCode, null, null);
             });

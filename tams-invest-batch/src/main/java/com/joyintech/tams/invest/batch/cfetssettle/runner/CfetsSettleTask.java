@@ -16,6 +16,7 @@ import com.joyintech.batch.batchbase.baseclass.*;
 import com.joyintech.framework.constant.BatchDictCodeList;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.invest.batch.cfetssettle.service.CfetsSettleService;
+import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -66,6 +67,7 @@ public class CfetsSettleTask extends BatchBaseService {
             logger.info("无启动参数，批处理退出。");
             return result;
         }
+        logger.info("自动交收批处理，批处理启动。");
         // 自动批处理，取平台日期为跑批日，手动批处理，取画面选择日期为跑批日
         Date batchDate = batchExecuteInfo.getExecuteDate();
         if (StringUtil.equals(BatchDictCodeList.批处理启动模式_自动.getValue(),batchExecuteInfo.getStartMode())) {
@@ -76,6 +78,8 @@ public class CfetsSettleTask extends BatchBaseService {
             result.setStatus(BatchStatus.COMPLETED);
         } catch (Exception e) {
            logger.error(e.getMessage());
+            //异常信息记录到批处理的日志详情
+            throw new BatchException(RiskUtil.getLogString(e));
         }
         return result;
     }

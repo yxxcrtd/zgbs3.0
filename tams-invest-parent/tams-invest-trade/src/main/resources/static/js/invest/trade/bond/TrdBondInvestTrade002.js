@@ -1097,6 +1097,9 @@ var calculateField;
             } else {
 	        	//自动加券 yjm
 	        	var autoCoupon = AutoCoupon.autoBondTradeCoupon($('#finprodId').val());
+	        	// TISHKS-532:自动加券债券风险试算报错 modify by fuyongsheng 20220509 start
+                $('#finprodId').val(autoCoupon.finprodId).trigger('change');
+                // TISHKS-532:自动加券债券风险试算报错 modify by fuyongsheng 20220509 end
                 isautobond = true;
 	            // 资产名称文本框根据资产代码选择自动显示对应名称;
 	            $("#finprodName").val(autoCoupon.finprodMarketId).trigger('change');

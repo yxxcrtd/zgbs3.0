@@ -19,10 +19,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.report.interf.common.dto.InterfEntity;
@@ -58,7 +58,7 @@ public class DataArrangeUtil {
      */
     public static <T extends InterfEntity> void arrangeData(Class<T> targetClass, String tableName,
                                                             Date sysDate,
-                                                            BasicDataSource basicDataSource)
+                                                            DruidDataSource basicDataSource)
         throws InstantiationException, IllegalAccessException {
         List<String> cons = new ArrayList<String>();
         cons.add("CHB_SYS_DATE = '" + DateUtil.format(sysDate, "yyyyMMdd") + "'");

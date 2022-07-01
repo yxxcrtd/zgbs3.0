@@ -17,12 +17,14 @@ import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto;
+import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.service.FinBondMarketInfoQuery001Service;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +49,9 @@ public class FinTenderBondAsset003Controller extends BaseController {
 
     @Autowired
     private FinTenderBondAsset003Service finTenderBoundAsset003Service;
+
+    @Autowired
+    private FinBondMarketInfoQuery001Service finBondMarketInfoQuery001Service;
 
 
     @ResponseBody
@@ -112,7 +117,7 @@ public class FinTenderBondAsset003Controller extends BaseController {
     @PostMapping("/checkAddCoupons")
     @ApiOperation(value = "上市流通前自动加券校验是否通过", notes = "上市流通前自动加券校验是否通过")
     public Message checkAddCoupons(@RequestBody FinTenderBondAsset003Dto dto) {
-        FinBondAssetSaveRequest request = finTenderBoundAsset003Service.validAddCoupons(dto);
+        FinBondMarketInfoDetailQueryDto request = finTenderBoundAsset003Service.validAddCoupons(dto);
         if (Objects.isNull(request)) {
             return Message.success("校验成功", null);
         } else {
@@ -132,16 +137,31 @@ public class FinTenderBondAsset003Controller extends BaseController {
         }
     }
 
+    @ResponseBody
+    @PostMapping("/autoCoupons")
+    @ApiOperation(value = "自动加券", notes = "自动加券")
+    public Message autoCoupons(@RequestBody FinTenderBondAsset003Dto dto) {
+        AjaxResult ajaxResult = finTenderBoundAsset003Service.addCoupons(dto);
+        if (CollectionUtils.isEmpty(ajaxResult.getErrorList())) {
+            return Message.success("加券成功", null);
+        } else {
+            return Message.fail("加券失败");
+        }
+    }
+
 
     @ResponseBody
     @PostMapping("/save")
     @ApiOperation(value = "上市流通/撤销", notes = "上市流通/撤销")
     public Message<AjaxResult> save(@RequestBody FinTenderBondAsset003Dto dto) {
+        if(!finTenderBoundAsset003Service.validAppearMarketId(dto)) {
+            return Message.fail("上市代码不存在");
+        }
         ProcessParameter<FinTenderBondAsset003Dto> processParameter = new ProcessParameter<>();
         WorkFlowParameter<FinTenderBondAsset003Dto> params = new WorkFlowParameter<>();
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
-        params.setBusinessCode(FinTenderBondAsset003Dto::getFinprodMarketId);
+        params.setBusinessCode(FinTenderBondAsset003Dto::getFinprodId);
         params.setBusinessType(BussinessDictCodeList.共同业务类型_一级投标债券类资产管理.getValue());
         if (StringUtil.equals(dto.getOperateType(), OperationType.NEW.name())) {
             processParameter.setOperationType(OperationType.NEW);

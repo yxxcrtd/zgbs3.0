@@ -49,7 +49,7 @@ import com.joyintech.tams.invest.common.dto.common.FinAssetIntInfo;
 import com.joyintech.tams.invest.common.dto.period.trdbondduration.TrdBondDurDbInertDto;
 import com.joyintech.tams.invest.common.dto.period.trdbondduration.TrdBondDurationDto;
 import com.joyintech.tams.systemtools.util.CommonUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -221,7 +221,7 @@ public class CfetsBondAutoDurDealGenerateProcessorService extends BaseService {
                     positionRulePtlData.setSecAcctId(secAcctId); // 证券账户
                 }
             }
-            positionRulePtlData.setSecAmount(dto.getShareAmt());
+            positionRulePtlData.setSecAmount(dto.getShareAmt() == null? BigDecimal.ZERO : ArithmeticUtil.multiply(dto.getShareAmt(),new BigDecimal(100)));
             positionRulePtlData.setCashAmount(dto.getTradeAmt());
             positionRulePtlData.setInvAim(dto.getInvAim());
             positionRulePtlData.setOwnSecAmount(dto.getOurShareAmt() == null? BigDecimal.ZERO : ArithmeticUtil.multiply(dto.getOurShareAmt(),new BigDecimal(100)));

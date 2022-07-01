@@ -70,8 +70,8 @@ public abstract class OccupyReleasService<V> extends EventBaseService<V> {
                             +*/ (String)request.getBodyField(EVENT_ID);
         mapData.put(EVENT_ID, occupyCode);
         // 从Redis取得预占/实占信息
-        IOccupyRelParam ocpRelParam = getOccupyRelParam(occupyCode, getOccupyType());
-        boolean isPreOcp = getOccupyType() == PRE_OCCUPY;
+        IOccupyRelParam ocpRelParam = getOccupyRelParam(occupyCode, StringUtil.equals(request.getBodyField(EVENT_TYPE), "0") ? PRE_OCCUPY : REL_OCCUPY);
+        boolean isPreOcp = StringUtil.equals(request.getBodyField(EVENT_TYPE), "0");
         // 若预占/实占信息不存在
         if (ocpRelParam == null /*|| CollectionUtils.isEmpty(ocpRelParam.getItems())*/) {
             //---update by zxjjpei 20200318--不予提示 start----------
@@ -129,6 +129,12 @@ public abstract class OccupyReleasService<V> extends EventBaseService<V> {
             }
             // 计算参数值、预占/实占额度
             calcParamVal(paraValMap, mapData, items, details, preOcpParam2);
+            // 有编号相同的占用的情况下进行试算，要在释放的基础上进行试算，并且不能写入Redis,所以释放结果存到线程变量
+            if (StringUtil.equals(mapData.get("writeRedis"),BussinessDictCodeListRds.是否_否.getValue())){
+                String ocpCode = (String) request.getBody().get("eventId");
+                setServiceInfo(ocpCode,paraValMap);
+                return ocpRelParam;
+            }
             // 更新参数值信息
             paramValSrv.setParamVal(paraValMap);
             // 实占撤销的场合，直接删除实占信息

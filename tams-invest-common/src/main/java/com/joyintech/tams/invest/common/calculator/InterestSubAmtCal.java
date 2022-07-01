@@ -64,9 +64,15 @@ public class InterestSubAmtCal {
 
         BigDecimal amt = null;
         // 分段区间总天数
-        BigDecimal dayCount = CalendarUtil.calendarDays(isd.getVdate(), isd.getMdate());
+        BigDecimal dayCount = new BigDecimal(0);
+        if (null != isd) {
+            dayCount = CalendarUtil.calendarDays(isd.getVdate(), isd.getMdate());
+        }
         // 计息基础
-        String basis = StringUtil.isNotEmpty(is.getBasis())?is.getBasis():scai.getBasis();
+        String basis = "";
+        if (null != is) {
+            basis = StringUtil.isNotEmpty(is.getBasis())?is.getBasis():scai.getBasis();
+        }
         // 计息基础天数计算
         BigDecimal basisDayCount = BasisDaysCal.cal(basis,
             isr == null ? null : isr.getCalcRule(),
@@ -238,7 +244,7 @@ public class InterestSubAmtCal {
         secInfoModel.setStartDate(BasicUtil.dateToLocal(scai.getVdate()));
         secInfoModel.setEndDate(BasicUtil.dateToLocal(scai.getMdate()));
         secInfoModel.setBondsType(Variety.附息);
-        secInfoModel.setFirstPayDate(BasicUtil.dateToLocal(isr.getFirstPayDate()));
+        secInfoModel.setFirstPayDate(BasicUtil.dateToLocal(null == isr ? null : isr.getFirstPayDate()));
         if(StringUtil.equals(DictCodeListExt1.计息基础_A_A_D.getValue(), basis)){
             secInfoModel.setBasis(Basis.A_A_D);
         }

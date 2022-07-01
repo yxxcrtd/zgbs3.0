@@ -10,6 +10,7 @@ import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.trade.exchangetransmatch.manualmatch.dto.ExchangeTransMatch002Dto;
 import com.joyintech.tams.invest.trade.exchangetransmatch.manualmatch.dto.ExchangeTransMatch003Dto;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -47,6 +48,14 @@ public class ExchangeTransMatchValidator implements BeanValidator {
             }
             // ZGTFCP-1133:增加协议回购匹配数量校验 modify by fuyongsheng 20220317 end
 
+            // ZGCPCN-1730:债转股只支持跟指令一对一匹配,并且份额小于指令的剩余数量 modify by fuyongsheng 20220627 start
+            if(DictCodeListExt3.交易方向_债转股.getValue().equals(dealDto.getPs())){
+                if(dealDto.getEntrustList().size() > 1 || dealDto.getShareAmt().compareTo(dealDto.getEntrustList().get(0).getEntrustNum()) > 0){
+                    errorList.add(new ValidMessage("不符合债转股匹配规则!"));
+                }
+            }
+            // ZGCPCN-1730:债转股只支持跟指令一对一匹配,并且份额小于指令的剩余数量 modify by fuyongsheng 20220627 end
+
             //比较基本信息
             String ps = dealDto.getPs();
             if(StringUtil.equals(dealDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
@@ -74,6 +83,7 @@ public class ExchangeTransMatchValidator implements BeanValidator {
             )
                     || com.joyintech.framework.util.StringUtil.equals(DictCodeListExt3.交易方向_配债.getValue(), ps)
                     || com.joyintech.framework.util.StringUtil.equals(DictCodeListExt2.交易方向_配股.getValue(), ps)
+                    || com.joyintech.framework.util.StringUtil.equals(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue(), dealDto.getFinprodType2())
             ){
                 if(!StringUtil.equals(dealDto.getSecAcctId(),entrustDto.getSecAcctId())
                         || !StringUtil.equals(dealDto.getAcctNo(),entrustDto.getAcctNo())

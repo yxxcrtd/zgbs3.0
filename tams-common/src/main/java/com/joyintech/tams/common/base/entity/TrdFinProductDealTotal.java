@@ -404,6 +404,11 @@ public class TrdFinProductDealTotal extends BaseEntity {
      */
     private String institutionCode;
     //多级法人改造 add by caiqun 20200615
+
+    /**
+     * 机构名称
+     */
+    private String institutionName;
     
     /**
      * 权益登记日
@@ -1662,6 +1667,14 @@ public class TrdFinProductDealTotal extends BaseEntity {
     }
     //多级法人改造 add by caiqun 20200615
 
+
+    public String getInstitutionName() {
+        return institutionName;
+    }
+
+    public void setInstitutionName(String institutionName) {
+        this.institutionName = institutionName;
+    }
 
     public String getPsStr() {
         return psStr;

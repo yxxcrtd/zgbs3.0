@@ -1,18 +1,17 @@
 package com.joyintech.service.risk.conf;
 
 import java.sql.SQLException;
+
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp2.BasicDataSource;
+//import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.jdbc.DatabaseDriver;
 import org.springframework.context.annotation.Bean;
-import org.springframework.jdbc.datasource.lookup.DataSourceLookupFailureException;
-import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 import org.springframework.stereotype.Component;
 
 import com.joyintech.framework.config.ConnectionPoolProperties;
+import com.joyintech.framework.config.DruidConnectionPoolProperties;
 import com.joyintech.framework.jdbc.helper.DataSourceAppender;
 import com.joyintech.framework.util.StringUtil;
 
@@ -28,7 +27,7 @@ import com.joyintech.framework.util.StringUtil;
 public class StressTestDataSourceAppender extends DataSourceAppender {
 
 	@ConfigurationProperties(prefix = "stresstest.datasource")
-	class StressTestDataSourceProperties extends ConnectionPoolProperties {
+	class StressTestDataSourceProperties extends DruidConnectionPoolProperties {
 
 	}
 
@@ -40,37 +39,38 @@ public class StressTestDataSourceAppender extends DataSourceAppender {
 		 */
 		@Bean(name = "stresstestDataSource", destroyMethod = "close")
 		public DataSource dataSource(StressTestDataSourceProperties properties) throws SQLException {
-			DataSource dataSource = null;
-			if (StringUtil.isNotEmpty(properties.getJndiName())) {
-				JndiDataSourceLookup dataSourceLookup = new JndiDataSourceLookup();
-				dataSourceLookup.setResourceRef(true);
-				try {
-					dataSource = dataSourceLookup.getDataSource(properties.getJndiName());
-				} catch (DataSourceLookupFailureException e) {
-					logger.error("无法获取JNDI数据源：" + properties.getJndiName(), e);
-					throw e;
-				}
-			} else {
-				dataSource = properties.initializeDataSourceBuilder().build();
-			}
-
-			if (dataSource instanceof BasicDataSource) {
-				DatabaseDriver databaseDriver = DatabaseDriver.fromJdbcUrl(properties.determineUrl());
-				String validationQuery = databaseDriver.getValidationQuery();
-				if (validationQuery != null) {
-					((BasicDataSource) dataSource).setTestOnBorrow(true);
-					((BasicDataSource) dataSource).setValidationQuery(validationQuery);
-					bindPropertiesForBasicDataSource((BasicDataSource) dataSource, properties);
-				}
-			}
-/*			else if (dataSource instanceof org.apache.tomcat.jdbc.pool.DataSource) {
-		        ((org.apache.tomcat.jdbc.pool.DataSource)dataSource).setLogValidationErrors(true);
-		        bindPropertiesForPoolDataSource((org.apache.tomcat.jdbc.pool.DataSource)dataSource, properties);
-			}*/
-			// 参数dbType命名有些不妥，应改为shcemaName更合适些。JIAOXUJIN
-			//initDataSource(DatabaseType.DATABASE_TYPE_ORACLE.getValue(), dataSource);
-			initDataSource("stresstestDataSource", dataSource);
-			return dataSource;
+//			DataSource dataSource = null;
+//			if (StringUtil.isNotEmpty(properties.getJndiName())) {
+//				JndiDataSourceLookup dataSourceLookup = new JndiDataSourceLookup();
+//				dataSourceLookup.setResourceRef(true);
+//				try {
+//					dataSource = dataSourceLookup.getDataSource(properties.getJndiName());
+//				} catch (DataSourceLookupFailureException e) {
+//					logger.error("无法获取JNDI数据源：" + properties.getJndiName(), e);
+//					throw e;
+//				}
+//			} else {
+//				dataSource = properties.initializeDataSourceBuilder().build();
+//			}
+//
+//			if (dataSource instanceof DruidDataSource) {
+//				DatabaseDriver databaseDriver = DatabaseDriver.fromJdbcUrl(properties.determineUrl());
+//				String validationQuery = databaseDriver.getValidationQuery();
+//				if (validationQuery != null) {
+//					((DruidDataSource) dataSource).setTestOnBorrow(true);
+//					((DruidDataSource) dataSource).setValidationQuery(validationQuery);
+//					bindPropertiesForBasicDataSource((DruidDataSource) dataSource, properties);
+//				}
+//			}
+///*			else if (dataSource instanceof org.apache.tomcat.jdbc.pool.DataSource) {
+//		        ((org.apache.tomcat.jdbc.pool.DataSource)dataSource).setLogValidationErrors(true);
+//		        bindPropertiesForPoolDataSource((org.apache.tomcat.jdbc.pool.DataSource)dataSource, properties);
+//			}*/
+//			// 参数dbType命名有些不妥，应改为shcemaName更合适些。JIAOXUJIN
+//			//initDataSource(DatabaseType.DATABASE_TYPE_ORACLE.getValue(), dataSource);
+//			initDataSource("stresstestDataSource", dataSource);
+//			return dataSource;
+			return buildDruidDataSource("stresstestDataSource", properties);
 		}
 	}
 /**

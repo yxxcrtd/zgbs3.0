@@ -2,9 +2,12 @@ package com.joyintech.tams.cfets.trd.primarybidmanage.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -63,6 +66,8 @@ public class CfetsPrimaryBidManageCfmResponse {
     @ApiModelProperty(name="bidDateEnd",value="投标结束日")
     private Date bidDateEnd;
 
+    @ApiModelProperty(name="issueDate",value="投标结束日")
+    private Date issueDate;
 
     @ApiModelProperty(name="bidPrinAmt",value="指令投标券面总额(万元)")
     private BigDecimal bidPrinAmt;
@@ -130,6 +135,11 @@ public class CfetsPrimaryBidManageCfmResponse {
 
     @ApiModelProperty(name="tradeMarket",value="交易场所")
     private String tradeMarketStr;
+
+    @ApiModelProperty(name="acctName",value="资金账户")
+    private String acctName;
+
+    private String issueClass;
 
     @ApiModelProperty(name="bidProductList",value="投标产品列表")
     private List<BidProductDto> bidProductList;
@@ -202,11 +212,30 @@ public class CfetsPrimaryBidManageCfmResponse {
     }
 
     public String getBidDate() {
-        return DateUtil.format(this.getBidDateStart(),DateUtil.DEFAULT_DATE_FORMAT_EN) +"~"+DateUtil.format(this.getBidDateEnd(),DateUtil.DEFAULT_DATE_FORMAT_EN) ;
+        if (StringUtil.isNotEmpty(this.getBidDateStart())){
+            return DateUtil.format(this.getBidDateStart(),DateUtil.DEFAULT_DATE_FORMAT_EN) +"~"+DateUtil.format(this.getBidDateEnd(),DateUtil.DEFAULT_DATE_FORMAT_EN) ;
+        }
+        return DateUtil.format(this.getIssueDate(),DateUtil.DEFAULT_DATE_FORMAT_EN);
+     }
+
+    public String getIssueClass() {
+        return issueClass;
+    }
+
+    public void setIssueClass(String issueClass) {
+        this.issueClass = issueClass;
     }
 
     public void setBidDate(String bidDate) {
         this.bidDate = bidDate;
+    }
+
+    public Date getIssueDate() {
+        return issueDate;
+    }
+
+    public void setIssueDate(Date issueDate) {
+        this.issueDate = issueDate;
     }
 
     public BigDecimal getBidPrinAmt() {
@@ -428,6 +457,14 @@ public class CfetsPrimaryBidManageCfmResponse {
 
     public String getTotalBiddingNumStr() {
         return totalBiddingNumStr;
+    }
+
+    public String getAcctName() {
+        return acctName;
+    }
+
+    public void setAcctName(String acctName) {
+        this.acctName = acctName;
     }
 
     public void setTotalBiddingNumStr(String totalBiddingNumStr) {
