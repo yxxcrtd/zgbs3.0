@@ -458,7 +458,7 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
     }
 
     public static String getKey(BaseMap bm) {
-        return bm.getString("PORTFOLIO_ID") + bm.get("FINPROD_ID");
+        return bm.getString("PORTFOLIO_ID") + bm.get("secAcctId") + bm.get("FINPROD_ID");
     }
 
     private Page<EtrExchangeTradePositionsSecRepoResponse> calculationAmount(Map<String, EtrExchangeUnitCostDto> unitCostMap, Page<EtrExchangeTradePositionsSecRepoResponse> pages, String platDate) {

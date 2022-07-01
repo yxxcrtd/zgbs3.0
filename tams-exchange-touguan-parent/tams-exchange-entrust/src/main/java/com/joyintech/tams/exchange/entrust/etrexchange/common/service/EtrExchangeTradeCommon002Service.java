@@ -577,7 +577,7 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
     }
 
     public static String getKey(BaseMap bm) {
-        return bm.getString("PORTFOLIO_ID") + bm.get("FINPROD_ID");
+        return bm.getString("PORTFOLIO_ID") + bm.get("secAcctId") + bm.get("FINPROD_ID");
     }
 
     private Page<EtrExchangeTradePositionsCommonResponse> calculationAmount(Map<String, EtrExchangeUnitCostDto> unitCostMap, Page<EtrExchangeTradePositionsCommonResponse> pages, String platDate) {

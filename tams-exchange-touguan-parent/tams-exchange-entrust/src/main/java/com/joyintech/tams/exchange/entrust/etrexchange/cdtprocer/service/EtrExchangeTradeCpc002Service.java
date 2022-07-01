@@ -379,7 +379,7 @@ public class EtrExchangeTradeCpc002Service extends BaseService {
     }
 
     public static String getKey(BaseMap bm) {
-        return bm.getString("PORTFOLIO_ID") + bm.get("FINPROD_ID");
+        return bm.getString("PORTFOLIO_ID") + bm.get("secAcctId") + bm.get("FINPROD_ID");
     }
     /**
      * 查询前一日持仓指标
