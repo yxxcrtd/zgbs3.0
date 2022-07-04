@@ -212,7 +212,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
     public Page<EtrExchangeAgreRepTrade002Dto> calculationAmount(Map<String, EtrExchangeUnitCostDto> unitCostMap, Page<EtrExchangeAgreRepTrade002Dto> pages, String platDate) {
         if(pages != null && pages.getRoot()!= null && !pages.getRoot().isEmpty()){
             pages.getRoot().forEach( r->{
-                EtrExchangeUnitCostDto dto = unitCostMap.get(r.getPortfolioId() + r.getFinprodId());
+                EtrExchangeUnitCostDto dto = unitCostMap.get(r.getPortfolioId() +r.getSecAcctId()+ r.getFinprodId());
                 if (dto != null){
                     // 1.持仓成本（元）
                     r.setPositionsAmt(dto.getBuyCostAmt());
