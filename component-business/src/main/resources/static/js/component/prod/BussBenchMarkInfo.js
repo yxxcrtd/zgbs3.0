@@ -67,6 +67,9 @@
     }
 
     var rateTypeChange = function () {
+        console.log("---------rateTypeChange---------");
+        console.log(getElementById('rateType').val());
+
         if (getElementById('publishType').val() === PUBLISH_TYPE_01) return;
 
         if (getElementById('rateType').val() === '') {
@@ -129,7 +132,7 @@
             getElementById('div').show();
         }
         getElementById('publishType').val('02').trigger('change');
-        getElementById('rateType').val('').trigger('change');
+        //getElementById('rateType').val('').trigger('change');
     }
     /**
      * 期限联动
@@ -145,7 +148,7 @@
                 getElementById('div').show();
             }
             getElementById('publishType').val('02').trigger('change');
-            getElementById('rateType').val('').trigger('change');
+            //getElementById('rateType').val('').trigger('change');
         }
     }
 
