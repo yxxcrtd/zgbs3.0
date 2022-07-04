@@ -31,8 +31,8 @@ import io.swagger.annotations.ApiModelProperty;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
+
+import java.util.ArrayList;import java.util.Collection;
 import java.util.List;
 
 /**
