@@ -8,20 +8,22 @@
         <div layout:fragment="content">
             <div class="layui-tab">
                 <ul class="layui-tab-title">
-                    <li class="layui-this" th:value='${PINAN_ASSET_TYPE_F01}'>债券</li>
+<!--修改屏蔽:债券、质押式回购、可转债申购、可转债转股。 基金中的（上交所、深交所） add wsz 20220704  3.0.7 7.13版本 start-->
+<!--                    <li class="layui-this" th:value='${PINAN_ASSET_TYPE_F01}'>债券</li>-->
                     <li th:value='${PINAN_ASSET_TYPE_F02}'>基金</li>
                     <li th:value='${PINAN_ASSET_TYPE_F03}'>计划类利率型</li>
                     <li th:value='${PINAN_ASSET_TYPE_F04}'>计划类净值型</li>
                     <li th:value='${PINAN_ASSET_TYPE_F05}'>存款</li>
                     <li th:value='${PINAN_ASSET_TYPE_F06}'>项目类</li>
-                    <li th:value='${PINAN_ASSET_TYPE_F07}'>质押式回购</li>
+<!--                    <li th:value='${PINAN_ASSET_TYPE_F07}'>质押式回购</li>-->
                     <li th:value='${PINAN_ASSET_TYPE_F08}'>拆借</li>
                     <li th:value='${PINAN_ASSET_TYPE_F09}'>计划类货币型</li>
                     <li th:value='${PINAN_ASSET_TYPE_F10}'>买断式回购</li>
                     <li th:value='${PINAN_ASSET_TYPE_F11}'>股票</li>
                     <!-- <li th:value='${PINAN_ASSET_TYPE_F17}'>债券一级投标</li> -->
-                    <li value='Con1'>可转债申购</li>
-                    <li value='Con2'>可转债转股</li>
+<!--                    <li value='Con1'>可转债申购</li>-->
+<!--                    <li value='Con2'>可转债转股</li>-->
+<!--修改屏蔽:债券、质押式回购、可转债申购、可转债转股。 基金中的（上交所、深交所） add wsz 20220704  3.0.7 7.13版本 end-->
                 </ul>
             </div>
             <div class="form-button-area" filter="false">

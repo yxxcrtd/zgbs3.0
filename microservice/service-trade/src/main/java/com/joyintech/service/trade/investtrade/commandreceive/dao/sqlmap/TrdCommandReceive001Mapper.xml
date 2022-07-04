@@ -105,6 +105,7 @@
 		ON PTL_PORTFOLIO.PORTFOLIO_ID = ETR_ENTRUST.PORTFOLIO_ID
 		LEFT JOIN FIN_PRODUCT
 		ON FIN_PRODUCT.FINPROD_ID = ETR_ENTRUST.FINPROD_ID
+		left join fin_product_type fpt on FIN_PRODUCT.FINPROD_ID=fpt.FINPROD_ID
 		LEFT JOIN (SELECT ETR_FINISH_STATUS.ENTRUST_ID,sum(FINISH_AMT) AS FINISH_AMT FROM ETR_FINISH_STATUS
 		WHERE ENTRUST_ID !=TRADE_ID GROUP BY ENTRUST_ID) ETR_FINISH_STATUS_A
 		ON ETR_FINISH_STATUS_A.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
@@ -173,6 +174,22 @@
 			</if>
 			<if test="tradeMarket != null and tradeMarket !='' ">
 				AND ETR_ENTRUST.TRADE_MARKET = #{tradeMarket}
+			</if>
+			<if test="tradeMarket != null and tradeMarket !='' and tradeMarket.equals('01')">
+				AND ETR_ENTRUST_ADD.ASSET_TYPE not IN ( 'F01', 'F07' )
+			</if>
+			<if test="tradeMarket != null and tradeMarket !='' and tradeMarket.equals('05')">
+				AND ETR_ENTRUST_ADD.ASSET_TYPE not IN ( 'F01', 'F07' )
+			</if>
+			<if test="tradeMarket != null and tradeMarket !='' and tradeMarket.equals('03')">
+				AND ETR_ENTRUST_ADD.ASSET_TYPE IN ( 'F01' )
+				AND fpt.TYPE_1 = '028'
+				AND ETR_ENTRUST.PS = 'T04'
+			</if>
+			<if test="tradeMarket != null and tradeMarket !='' and tradeMarket.equals('04')">
+				AND ETR_ENTRUST_ADD.ASSET_TYPE IN ( 'F01' )
+				AND fpt.TYPE_1 = '028'
+				AND ETR_ENTRUST.PS = 'T04'
 			</if>
 			<if test="ps != null and ps !='' ">
 				<!-- AND (ETR_ENTRUST.PS = #{ps}
@@ -303,6 +320,7 @@
 		ON PTL_PORTFOLIO.PORTFOLIO_ID = ETR_ENTRUST.PORTFOLIO_ID
 		LEFT JOIN FIN_PRODUCT
 		ON FIN_PRODUCT.FINPROD_ID = ETR_ENTRUST.FINPROD_ID
+		left join fin_product_type fpt on FIN_PRODUCT.FINPROD_ID=fpt.FINPROD_ID
 		LEFT JOIN (SELECT ETR_FINISH_STATUS.ENTRUST_ID,sum(FINISH_AMT) AS FINISH_AMT FROM ETR_FINISH_STATUS GROUP BY
 		ENTRUST_ID) ETR_FINISH_STATUS_A
 		ON ETR_FINISH_STATUS_A.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
@@ -334,6 +352,26 @@
 			<if test="tradeMarket != null and tradeMarket !='' ">
 				AND ETR_ENTRUST.TRADE_MARKET = #{tradeMarket}
 			</if>
+			<!-- add wsz 3.0.7 2022-7.13桂林版本 机构为：银行间、机构间私募系统。屏蔽：债券，质押式回购
+			交易场所为：上交所、深交所，只查询可转债申购
+			start -->
+			<if test="tradeMarket != null and tradeMarket !='' and tradeMarket.equals('01')">
+				AND ETR_ENTRUST_ADD.ASSET_TYPE not IN ( 'F01', 'F07' )
+			</if>
+			<if test="tradeMarket != null and tradeMarket !='' and tradeMarket.equals('05')">
+				AND ETR_ENTRUST_ADD.ASSET_TYPE not IN ( 'F01', 'F07' )
+			</if>
+			<if test="tradeMarket != null and tradeMarket !='' and tradeMarket.equals('03')">
+				AND ETR_ENTRUST_ADD.ASSET_TYPE IN ( 'F01' )
+				AND fpt.TYPE_1 = '028'
+				AND ETR_ENTRUST.PS = 'T04'
+			</if>
+			<if test="tradeMarket != null and tradeMarket !='' and tradeMarket.equals('04')">
+				AND ETR_ENTRUST_ADD.ASSET_TYPE IN ( 'F01' )
+				AND fpt.TYPE_1 = '028'
+				AND ETR_ENTRUST.PS = 'T04'
+			</if>
+			<!-- add wsz 3.0.7 2022-7.13桂林版本 机构为：银行间、机构间私募系统。屏蔽：债券，质押式回购 end -->
 			<if test="ps != null and ps !='' ">
 				<!-- AND (ETR_ENTRUST.PS = #{ps}
 				or (ETR_ENTRUST.FINPROD_TYPE2 = #{F08} and #{ps} = #{LEND_01})
