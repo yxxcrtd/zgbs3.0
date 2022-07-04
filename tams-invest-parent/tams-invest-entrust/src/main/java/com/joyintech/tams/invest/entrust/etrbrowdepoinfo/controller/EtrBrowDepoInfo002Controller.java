@@ -143,9 +143,9 @@ public class EtrBrowDepoInfo002Controller extends BaseController{
             model.addAttribute("workflowId", workflowId_T);
 
             if (Objects.nonNull(personInfoDto) && StringUtil.isEmpty(personInfoDto.getTrader())) {
-                EtrPlanAssetRDto planAssetRDto = etrPlanAssetService.getBussinessEntityByWorkflowId(workflowId_T);
-                if (Objects.nonNull(planAssetRDto.getEtrInvestPersonInfo())) {
-                    personInfoDto.setTrader(planAssetRDto.getEtrInvestPersonInfo().getTrader());
+                EtrBrowDepoInfoDto planAssetRDto = etrBrowDepoInfoService.getBussinessEntityByWorkflowId(workflowId_T);
+                if (Objects.nonNull(planAssetRDto.getBussEtrInvestPersonInfoDto())) {
+                    personInfoDto.setTrader(planAssetRDto.getBussEtrInvestPersonInfoDto().getTrader());
                 }
             }
             model.addAttribute("person_entity", JsonUtils.object2Json(personInfoDto));
