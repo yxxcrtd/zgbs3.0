@@ -20,6 +20,7 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
+import com.joyintech.tams.component.business.trade.dto.BussEtrInvestPersonInfoDto;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -32,6 +33,7 @@ import com.joyintech.tams.invest.entrust.common.aop.EntrustRdsCommonAop;
 import com.joyintech.tams.invest.entrust.common.controller.EtrCommonController;
 import com.joyintech.tams.invest.entrust.etrbrowdepoinfo.dto.EtrBrowDepoInfoDto;
 import com.joyintech.tams.invest.entrust.etrbrowdepoinfo.service.EtrBrowDepoInfoService;
+import com.joyintech.tams.invest.entrust.etrplanassetr.dto.EtrPlanAssetRDto;
 import com.joyintech.tams.systemtools.dto.PageElementConfigDto;
 import com.joyintech.tams.systemtools.util.PageElementUtil;
 import com.joyintech.workflow.engine.WorkflowContext;
@@ -51,6 +53,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 存款委托新建
@@ -124,9 +127,10 @@ public class EtrBrowDepoInfo002Controller extends BaseController{
         }
         else if (StringUtil.isNotEmpty(entrustId) && WorkFlowUtil.isNotFromToDoList()) {
             EtrBrowDepoInfoDto etrBrowDepoInfoDto = etrBrowDepoInfoService.selectByKey(entrustId,finprodId,portfolioId);
+            BussEtrInvestPersonInfoDto personInfoDto = etrBrowDepoInfoDto.getBussEtrInvestPersonInfoDto();
             model.addAttribute(GlobalConstant.ENTITY, etrBrowDepoInfoDto);
             model.addAttribute("tradeId", entrustId);
-            model.addAttribute("person_entity", JsonUtils.object2Json(etrBrowDepoInfoDto.getBussEtrInvestPersonInfoDto()));
+//            model.addAttribute("person_entity", JsonUtils.object2Json(personInfoDto));
             model.addAttribute("businessId", etrBrowDepoInfoDto.getEntrustId());
 
             // 获取workflowId 加载风险试算结果
@@ -137,6 +141,14 @@ public class EtrBrowDepoInfo002Controller extends BaseController{
             processMark.setPageId("EtrBrowDepoInfo002");
             String workflowId_T = WorkflowContext.getProcessMarkService().getLastWorkflowId(processMark);
             model.addAttribute("workflowId", workflowId_T);
+
+            if (Objects.nonNull(personInfoDto) && StringUtil.isEmpty(personInfoDto.getTrader())) {
+                EtrPlanAssetRDto planAssetRDto = etrPlanAssetService.getBussinessEntityByWorkflowId(workflowId_T);
+                if (Objects.nonNull(planAssetRDto.getEtrInvestPersonInfo())) {
+                    personInfoDto.setTrader(planAssetRDto.getEtrInvestPersonInfo().getTrader());
+                }
+            }
+            model.addAttribute("person_entity", JsonUtils.object2Json(personInfoDto));
         }
         model.addAttribute("MY_SUP_TIME_TYPE_02", DictCodeListExt1.监督时分_委托监控.getValue());
         model.addAttribute("T01",DictCodeList.交易方向_买入.getValue());
