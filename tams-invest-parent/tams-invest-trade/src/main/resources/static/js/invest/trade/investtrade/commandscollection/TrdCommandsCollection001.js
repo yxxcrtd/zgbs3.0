@@ -1669,9 +1669,11 @@ $(function() {
         // psF11Selections.push(PS_SELECTIONS[104].id);
         tradeMarket12Selections.push(TRADE_PLACE_SELECTIONS[2].id);
         tradeMarket12Selections.push(TRADE_PLACE_SELECTIONS[1].id);
+        // 修改屏蔽 基金为（上交所、深交所） add wsz 20220704  3.0.7 7.13版本
         tradeMarket124Selections.push(TRADE_PLACE_SELECTIONS[1].id);
         tradeMarket124Selections.push(TRADE_PLACE_SELECTIONS[2].id);
-        tradeMarket124Selections.push(TRADE_PLACE_SELECTIONS[4].id);
+        // tradeMarket124Selections.push(TRADE_PLACE_SELECTIONS[4].id);
+        // 修改屏蔽 基金为（上交所、深交所） add wsz 20220704  3.0.7 7.13版本
         tradeMarket012Selections.push(TRADE_PLACE_SELECTIONS[0].id);
         tradeMarket012Selections.push(TRADE_PLACE_SELECTIONS[2].id);
         tradeMarket012Selections.push(TRADE_PLACE_SELECTIONS[1].id);

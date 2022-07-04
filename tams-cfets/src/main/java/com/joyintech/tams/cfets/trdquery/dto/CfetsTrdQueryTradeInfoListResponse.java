@@ -183,6 +183,10 @@ public class CfetsTrdQueryTradeInfoListResponse {
     private String revokeReason;
     @ApiModelProperty(name="workflowParameter",value="撤销参数",example="1")
     private String workflowParameter;
+
+    @ApiModelProperty(name="firstBidStatus",value="中标状态",example="1")
+    private String firstBidStatus;
+
     public String getCalMode() {
         return calMode;
     }
@@ -597,5 +601,13 @@ public class CfetsTrdQueryTradeInfoListResponse {
 
     public void setOtherId(String otherId) {
         this.otherId = otherId;
+    }
+
+    public String getFirstBidStatus() {
+        return firstBidStatus;
+    }
+
+    public void setFirstBidStatus(String firstBidStatus) {
+        this.firstBidStatus = firstBidStatus;
     }
 }
