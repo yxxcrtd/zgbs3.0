@@ -99,6 +99,7 @@ public class PtlSingleAssetPositionAnalysisService extends BaseService<PtlSingle
         list.add(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         list.add(DictCodeListExt1.金融产品类型_投管用_基金.getValue());
         list.add(DictCodeListExt1.金融产品类型_投管用_股票.getValue());
+        list.add(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
         map.put("FINTYPE_F01_LIST",list);
         list = new ArrayList<>();
         list.add(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());

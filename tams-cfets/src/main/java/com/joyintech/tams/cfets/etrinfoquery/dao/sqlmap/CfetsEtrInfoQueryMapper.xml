@@ -255,6 +255,7 @@
             LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
             LEFT JOIN (
             SELECT brt1.BID_ID , brt1.STATUS , brt1.FINPROD_ID, brt1.IS_WIN FROM BID_RESULT_TOTAL brt1
+            WHERE brt1.STATUS = '01'
             UNION ALL
             SELECT brt2.BID_ID , brt2.STATUS , brt2.FINPROD_ID, brt2.IS_WIN FROM WFL_BID_RESULT_TOTAL brt2
             ) brt  ON   brt.BID_ID = bo.BID_ID

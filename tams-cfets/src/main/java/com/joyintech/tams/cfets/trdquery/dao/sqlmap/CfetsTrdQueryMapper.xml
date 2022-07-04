@@ -5721,6 +5721,168 @@
                  left join TRD_PRODUCT_DEAL_ADD tpda on tpd.TRADE_ID = tpda.TRADE_ID
         where tpd.TOTLE_TRADE_ID = #{totleTradeId}
     </select>
+
+    <select id="findZztbZbjgFenPeiInfoList" resultType="com.joyintech.tams.cfets.trdquery.dto.BidPortIntFenPeiInfoDto" parameterType="Map">
+        SELECT
+            BRD.TOTAL_WIN_ID totalWinId,
+            BRD.ENTRUST_ID  entrustId,
+            BRD.PORTFOLIO_ID portfolioId,
+            PP.PORTFOLIO_NAME portfolioName,
+            BRD.TOTAL_BID_PRINAMT/10000 winPrinAmt,
+            BRD.THE_WIN_PRINAMT theWinPrinAmt,
+            BRD.ACT_WIN_PRINAMT actWinPrinamt,
+            CASE
+                WHEN  BRD.BID_PRICE IS  NULL THEN null
+                WHEN fpi.TENDER_TARGET = '01'  THEN to_char(BRD.BID_PRICE*100,'fm999,999,999,990.9990')||'%'
+                WHEN fpi.TENDER_TARGET = '02'  THEN to_char(BRD.BID_PRICE,'fm999,999,999,990.9990')||'元'
+                WHEN fpi.TENDER_TARGET = '03'  THEN to_char(BRD.BID_PRICE*10000,'fm999,999,999,990.90')||'BP'
+                END bidPrice /*投标标位, 多个逗号分隔展示*/,
+            BRD.WIN_PRICE   winPrice,
+            BRD.WIN_CPRICE   winCprice,
+            decode(BRT.IS_WIN,'Y',BRD.INT_AMT)   intAmt,
+            BRD.PAY_AMT   payAmt,
+            BRD.SETT_FEE_AMT     settFeeAmt,
+            BRD.INV_AIM   invAim,
+            BRD.SEC_ACCT_ID secAcctId,
+            stlinfo.sec_acct_name secManageAcctIdStr,
+            EE.INV_MANAGER_ID invManagerId,
+            SU.REAL_NAME invManagerName,
+            sci.ACCT_NAME acctNoStr,
+            BOBR.ACCT_NO   acctNo
+        FROM BID_RESULT_DETAIL BRD
+                 LEFT JOIN BID_RESULT_TOTAL BRT ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+                 LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
+                 LEFT JOIN BID_ORDER_BID_PRICE BOBR ON BOBR.BID_ID = BRT.BID_ID
+            AND BOBR.ENTRUST_ID = BRD.ENTRUST_ID
+            AND BOBR.PORTFOLIO_ID = BRD.PORTFOLIO_ID
+            AND BOBR.BID_PRICE = BRD.BID_PRICE
+                 LEFT JOIN ETR_ENTRUST EE ON EE.ENTRUST_ID = BRD.ENTRUST_ID
+                 LEFT JOIN PTL_PORTFOLIO PP ON BRD.PORTFOLIO_ID = PP.PORTFOLIO_ID
+                 left join stl_sec_acct_info stlinfo on BRD.SEC_ACCT_ID = stlinfo.sec_acct_id
+                 LEFT JOIN SYS_USER SU ON EE.INV_MANAGER_ID = SU.USER_NAME
+                 left join STL_CAPACCT_INFO sci on sci.ACCT_NO = BOBR.ACCT_NO
+                 LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = EE.FINPROD_ID
+        WHERE BRT.TOTAL_WIN_ID = #{totalWinId}
+        UNION ALL
+        SELECT
+            BRD.TOTAL_WIN_ID totalWinId,
+            BRD.ENTRUST_ID  entrustId,
+            BRD.PORTFOLIO_ID portfolioId,
+            PP.PORTFOLIO_NAME portfolioName,
+            BRD.TOTAL_BID_PRINAMT/10000 winPrinAmt,
+            BRD.THE_WIN_PRINAMT theWinPrinAmt,
+            BRD.ACT_WIN_PRINAMT actWinPrinamt,
+            CASE
+                WHEN  BRD.BID_PRICE IS  NULL THEN null
+                WHEN fpi.TENDER_TARGET = '01'  THEN to_char(BRD.BID_PRICE*100,'fm999,999,999,990.9990')||'%'
+                WHEN fpi.TENDER_TARGET = '02'  THEN to_char(BRD.BID_PRICE,'fm999,999,999,990.9990')||'元'
+                WHEN fpi.TENDER_TARGET = '03'  THEN to_char(BRD.BID_PRICE*10000,'fm999,999,999,990.90')||'BP'
+                END bidPrice /*投标标位, 多个逗号分隔展示*/,
+            BRD.WIN_PRICE   winPrice,
+            BRD.WIN_CPRICE   winCprice,
+            decode(BRT.IS_WIN,'Y',BRD.INT_AMT)   intAmt,
+            BRD.PAY_AMT   payAmt,
+            BRD.SETT_FEE_AMT     settFeeAmt,
+            BRD.INV_AIM   invAim,
+            BRD.SEC_ACCT_ID secAcctId,
+            stlinfo.sec_acct_name secManageAcctIdStr,
+            EE.INV_MANAGER_ID invManagerId,
+            SU.REAL_NAME invManagerName,
+            sci.ACCT_NAME acctNoStr,
+            BOBR.ACCT_NO   acctNo
+        FROM WFL_BID_RESULT_DETAIL BRD
+                 LEFT JOIN WFL_BID_RESULT_TOTAL BRT ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+                 LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
+                 LEFT JOIN ETR_ENTRUST EE ON EE.ENTRUST_ID = BRD.ENTRUST_ID
+                 LEFT JOIN BID_ORDER_BID_PRICE BOBR ON BOBR.BID_ID = BRT.BID_ID
+                 LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = EE.FINPROD_ID
+            AND BOBR.ENTRUST_ID = BRD.ENTRUST_ID
+            AND BOBR.PORTFOLIO_ID = BRD.PORTFOLIO_ID
+            AND BOBR.BID_PRICE = BRD.BID_PRICE
+                 LEFT JOIN PTL_PORTFOLIO PP ON BRD.PORTFOLIO_ID = PP.PORTFOLIO_ID
+                 left join stl_sec_acct_info stlinfo on BRD.SEC_ACCT_ID = stlinfo.sec_acct_id
+                 LEFT JOIN SYS_USER SU ON EE.INV_MANAGER_ID = SU.USER_NAME
+                 left join STL_CAPACCT_INFO sci on sci.ACCT_NO = BOBR.ACCT_NO
+        WHERE BRT.TOTAL_WIN_ID = #{totalWinId}
+    </select>
+
+    <select id="findZztbZbjgManualSettleInfo" resultType="com.joyintech.tams.cfets.trdquery.dto.CfetsTrdBidInfoResponse" parameterType="Map">
+        SELECT
+            BRT.TOTAL_WIN_ID totalWinId,
+            BRT.FINPROD_ID finprodId,
+            FP.FINPROD_MARKET_ID finprodMarketId,
+            FP.FINPROD_ABBR finprodAbbr,
+            BO.OUR_TRADER   ouTraderId,
+            su.REAL_NAME as traderidStr,
+            BO.COUNTER_ID   counterId,
+            mcci.counter_name as counterIdStr,
+            FPI.TENDER_TARGET tenderTarget,
+            FP.CCY                   ccy,
+            FPI.TENDER_SDATE   bidDateStart,
+            FPI.TENDER_EDATE   bidDateEnd,
+            FPI.ISSUE_DATE   issueDate,
+            FPI.ISSUE_CLASS  issueClass,
+            case when FP.TRADE_MARKET in ('01','02') then decode(BRT.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE) end creditorDebtDate,
+            decode(BRT.IS_WIN,'Y',FPA.LISTING_DATE)  listingDate,
+            decode(BRT.IS_WIN,'Y',BRT.WIN_TYPE)   winType,
+            BO.BID_MODLE     bidModle,
+            BO.WIN_PRIN_AMT/10000 bidPrinAmt,
+            decode(BRT.IS_WIN,'Y',BRT.WIN_PRINAMT)  winPrinAmt,
+            BRT.WIN_PRICE       winPrice,
+            BRT.SETT_FEE_AMT     settFeeAmt,
+            decode(BRT.IS_WIN,'Y',BRT.REMARK,'未中标')  remark,
+            FP.TRADE_MARKET  tradeMarket,
+            BO.BID_ID  bidId,
+            decode(BRT.IS_WIN,'Y',BRT.PAY_DATE)   payDate,
+            BO.PAY_TYPE  payType,
+            BRT.IS_WIN  isWin
+        FROM BID_RESULT_TOTAL BRT
+                 LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
+                 LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
+                 LEFT JOIN FIN_PRODUCT_ADD FPA ON FPA.FINPROD_ID = FP.FINPROD_ID
+                 LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
+                 LEFT JOIN SYS_USER su ON su.USER_NAME = BO.OUR_TRADER
+                 LEFT JOIN MST_COUNTER_PARTY mcci ON BO.COUNTER_ID = mcci.counter_id
+        WHERE BRT.TOTAL_WIN_ID = #{totalWinId}
+        UNION ALL
+        SELECT
+            BRT.TOTAL_WIN_ID totalWinId,
+            BRT.FINPROD_ID finprodId,
+            FP.FINPROD_MARKET_ID finprodMarketId,
+            FP.FINPROD_ABBR finprodAbbr,
+            BO.OUR_TRADER   ouTraderId,
+            su.REAL_NAME as traderidStr,
+            BO.COUNTER_ID   counterId,
+            mcci.counter_name as counterIdStr,
+            FPI.TENDER_TARGET tenderTarget,
+            FP.CCY                   ccy,
+            FPI.TENDER_SDATE   bidDateStart,
+            FPI.TENDER_EDATE   bidDateEnd,
+            FPI.ISSUE_DATE   issueDate,
+            FPI.ISSUE_CLASS  issueClass,
+            case when FP.TRADE_MARKET in ('01','02') then decode(BRT.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE) end creditorDebtDate,
+            decode(BRT.IS_WIN,'Y',FPA.LISTING_DATE) listingDate,
+            decode(BRT.IS_WIN,'Y',BRT.WIN_TYPE)   winType,
+            BO.BID_MODLE     bidModle,
+            BO.WIN_PRIN_AMT/10000 bidPrinAmt,
+            decode(BRT.IS_WIN,'Y',BRT.WIN_PRINAMT)   winPrinAmt,
+            BRT.WIN_PRICE       winPrice,
+            BRT.SETT_FEE_AMT     settFeeAmt,
+            decode(BRT.IS_WIN,'Y',BRT.REMARK,'未中标') remark,
+            FP.TRADE_MARKET  tradeMarket,
+            BO.BID_ID  bidId,
+            decode(BRT.IS_WIN,'Y',BRT.PAY_DATE)  payDate,
+            BO.PAY_TYPE  payType,
+            BRT.IS_WIN  isWin
+        FROM WFL_BID_RESULT_TOTAL BRT
+                 LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
+                 LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
+                 LEFT JOIN FIN_PRODUCT_ADD FPA ON FPA.FINPROD_ID = FP.FINPROD_ID
+                 LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
+                 LEFT JOIN SYS_USER su ON su.USER_NAME = BO.OUR_TRADER
+                 LEFT JOIN MST_COUNTER_PARTY mcci ON BO.COUNTER_ID = mcci.counter_id
+        WHERE BRT.TOTAL_WIN_ID = #{totalWinId}
+    </select>
 </mapper>
 
 
