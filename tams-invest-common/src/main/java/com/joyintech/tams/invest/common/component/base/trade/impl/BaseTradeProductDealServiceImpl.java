@@ -401,9 +401,12 @@ public class BaseTradeProductDealServiceImpl implements BaseTradeProductDealServ
                 if(CollectionUtils.isNotEmpty(entity.getStlPayOrdersList())){
                     // 过滤出自己组合的划款指令
                     List<StlPayOrdersDto> filterStlPayOrders = entity.getStlPayOrdersList().stream()
-                            .filter(item-> item.getPortfolioId().equals(entity.getActPortfolioId()))
+                            .filter(item-> StringUtils.equals(entity.getActPortfolioId(), item.getPortfolioId()))
                             .collect(Collectors.toList());
-                    entity.setStlPayOrdersList(filterStlPayOrders);
+                    if (CollectionUtils.isNotEmpty(filterStlPayOrders)) {
+                        entity.setStlPayOrdersList(filterStlPayOrders);
+                    }
+
                 }
             }
             baseTradeProductDealList.addAll(baseTradeProductDealDto);
