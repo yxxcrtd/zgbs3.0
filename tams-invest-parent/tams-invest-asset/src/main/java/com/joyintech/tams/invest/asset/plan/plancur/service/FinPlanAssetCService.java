@@ -145,7 +145,7 @@ public class FinPlanAssetCService extends CommonExportService<FinPlanAssetCDto>
         // add by swwan TISHKS-1483 start
         PaPtlPortfolio paPtlPortfolio = new PaPtlPortfolio();
         paPtlPortfolio.setPortfolioId(ptlPortfolio.getPortfolioId());
-        paPtlPortfolio.setInvestNature(entity.getFinProductAdd().getInvestNature());
+        paPtlPortfolio.setInvestNature(entity.getInvestmentAttributes());
         /*paPtlPortfolio.setOpenType("02");
         paPtlPortfolio.setRaiseType("2");*/
         entity.setPaPtlPortfolio(paPtlPortfolio);
