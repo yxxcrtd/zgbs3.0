@@ -74,7 +74,8 @@ public class MstFileCommonServiceImpl implements MstFileCommonService {
                 }
             });
             MstFileOutputParameter result = new MstFileOutputParameter();
-            if (!uploadFileList.isEmpty()) {
+            if (!uploadFileList.isEmpty() && uploadFileList.size() > 0) {
+                result.setBusinessId(uploadFileList.get(0).getBusinessId());
                 result.setUploadFileList(uploadFileList);
                 mstFileCommonServiceMapper.updateFileBusinessId(result);
             }
