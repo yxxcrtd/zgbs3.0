@@ -152,6 +152,7 @@ public class RiskCommonService {
         }
         // 入参不为空、指标控制类别为软控、硬控
         if (!StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_不占.getValue())
+            && StringUtil.equals(DictCodeList.是否_是.getValue(),CacheUtil.getSysParam("pageRedisFlag"))
             && !StringUtil.isEmptyList(riskCommonInputDto.getRiskRdsDtoList())) {
             InterfRiskRdsDto interfRiskRdsDto = new InterfRiskRdsDto();
             interfRiskRdsDto.setAssetType(riskCommonInputDto.getAssetType());
