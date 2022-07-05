@@ -944,6 +944,8 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         if (!StringUtil.isEmptyList(trdTempDto.getBussTrdTransferOrder())) {
             stlPayOrdersDto = new StlPayOrdersDto();
             BeanUtil.copyPropertiesIgnoreNull(stlPayOrdersDto, trdTempDto.getBussTrdTransferOrder().get(0));
+            stlPayOrdersDto.setPs(DictCodeListExt1.收付方向_支出.getValue());
+            stlPayOrdersDto.setIsNeedSend(DictCodeListExt1.是否_是.getValue());
         }
         FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
         finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_有效.getValue());
