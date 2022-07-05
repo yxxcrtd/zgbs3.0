@@ -1,9 +1,11 @@
 package com.joyintech.tams.exchange.common.constant;
 
+import com.joyintech.tams.exchange.common.enums.IEnum;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public enum EntrustStatus {
+public enum EntrustStatus implements IEnum<Integer> {
 
     CREATED("新建", -10),
     PENDING_APPROVAL("待审批", -9),
@@ -88,5 +90,15 @@ public enum EntrustStatus {
 
     public static String getEntrustStatusName(int entrustStatus) {
         return entrustStatusMap.get(entrustStatus);
+    }
+
+    @Override
+    public Integer getCode() {
+        return value;
+    }
+
+    @Override
+    public String getDescription() {
+        return name;
     }
 }

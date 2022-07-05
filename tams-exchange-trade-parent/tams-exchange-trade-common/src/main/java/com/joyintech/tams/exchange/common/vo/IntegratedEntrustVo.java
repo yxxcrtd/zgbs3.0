@@ -180,6 +180,9 @@ public class IntegratedEntrustVo extends BaseEntity implements Serializable, Ent
     @ApiModelProperty(required = true, name = "compactTerm", value = "回购期限")
     private int compactTerm;
 
+    @ApiModelProperty(required = false, name = "capDays", value = "占款天数")
+    private String capDays;
+
     @ApiModelProperty(required = true, name = "backBalance", value = "到期结算金额")
     @JsonSerialize(using = DoubleSerializerUtils.class)
     private BigDecimal backBalance;
@@ -283,10 +286,10 @@ public class IntegratedEntrustVo extends BaseEntity implements Serializable, Ent
     @ApiModelProperty(name = "ps", value = "交易方向", hidden = true)
     private String ps;
 
-	@ApiModelProperty(name="softSkipMode",value="软控是否继续？Y：继续",example="Y")
+    @ApiModelProperty(name = "softSkipMode", value = "软控是否继续？Y：继续", example = "Y")
     private String softSkipMode;
 
-	@ApiModelProperty(name = "busiTypeTg", value = "投管业务类型")
+    @ApiModelProperty(name = "busiTypeTg", value = "投管业务类型")
     private String busiTypeTg;
     @ApiModelProperty(name = "extend1", value = "扩展信息1")
     private String extend1;
@@ -326,7 +329,14 @@ public class IntegratedEntrustVo extends BaseEntity implements Serializable, Ent
     @Digits(integer = 20, fraction = 2)
     private BigDecimal entrustPriceView;
 
-    // 信用保护凭证使用 --start
+    @ApiModelProperty(name = "cancelBalance", value = "撤单金额")
+    public BigDecimal cancelBalance;
+
+    @ApiModelProperty(required = true, name = "ownerTypeStr", value = "本方报价所有者类型")
+    private String ownerTypeStr;
+    @ApiModelProperty(required = true, name = "propOwnerTypeStr", value = "对手方报价所有者类型")
+    private String propOwnerTypeStr;
+// 信用保护凭证使用 --start
     @ApiModelProperty(name = "counterName", value = "交易对手名称")
     private String counterName;
 
@@ -336,14 +346,13 @@ public class IntegratedEntrustVo extends BaseEntity implements Serializable, Ent
     @ApiModelProperty(name = "propAcctName", value = "对手资金账户名称")
     private String propAcctName;
     // 信用保护凭证使用 --end
-
     public String getSoftSkipMode() {
         return softSkipMode;
     }
 
-	public void setSoftSkipMode(String softSkipMode) {
-		this.softSkipMode = softSkipMode;
-	}
+    public void setSoftSkipMode(String softSkipMode) {
+        this.softSkipMode = softSkipMode;
+    }
 
     @Override
     public boolean isNoCancelEntrust() {
@@ -1162,6 +1171,39 @@ public class IntegratedEntrustVo extends BaseEntity implements Serializable, Ent
 
     public void setEntrustPriceView(BigDecimal entrustPriceView) {
         this.entrustPriceView = entrustPriceView;
+    }
+
+
+    public BigDecimal getCancelBalance() {
+        return cancelBalance;
+    }
+
+    public void setCancelBalance(BigDecimal cancelBalance) {
+        this.cancelBalance = cancelBalance;
+    }
+
+    public String getCapDays() {
+        return capDays;
+    }
+
+    public void setCapDays(String capDays) {
+        this.capDays = capDays;
+    }
+
+    public String getOwnerTypeStr() {
+        return ownerTypeStr;
+    }
+
+    public void setOwnerTypeStr(String ownerTypeStr) {
+        this.ownerTypeStr = ownerTypeStr;
+    }
+
+    public String getPropOwnerTypeStr() {
+        return propOwnerTypeStr;
+    }
+
+    public void setPropOwnerTypeStr(String propOwnerTypeStr) {
+        this.propOwnerTypeStr = propOwnerTypeStr;
     }
 
     public String getCounterName() {

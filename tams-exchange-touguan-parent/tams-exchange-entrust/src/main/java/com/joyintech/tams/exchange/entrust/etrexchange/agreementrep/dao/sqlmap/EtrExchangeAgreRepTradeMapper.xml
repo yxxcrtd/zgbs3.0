@@ -200,7 +200,7 @@
         ELSE FP.FINPROD_MARKET_ID
         END             AS secId,
         FP.FINPROD_ABBR AS secName,
-        floor(NVL(TEMP.AMOUNT, 0)/100)     AS positionsNum,
+        floor(NVL(TEMP.AMOUNT, 0)/10000)     AS positionsNum,
         invaim.INV_AIM as invAim,
         invaim.BUSINESS_MODEL as businessModel,
         TEMP.ptlPositionsNum AS ptlPositionsNum,
@@ -345,9 +345,14 @@
         ) GROUP BY FINPROD_ID, PORTFOLIO_ID
         ) invaim on invaim.FINPROD_ID=TEMP.FINPROD_ID and invaim.PORTFOLIO_ID=TEMP.PORTFOLIO_ID
         LEFT JOIN SYS_DATADICT_LIST SDL ON SDL.DICT_CODE = 'TRADE_PLACE' AND FP.TRADE_MARKET = SDL.ITEM_CODE
+        lEFT JOIN FIN_PRODUCT_TYPE FPT
+        on FP.FINPROD_ID = FPT.FINPROD_ID
         WHERE
         FP.TRADE_MARKET IN (#{TRADE_PLACE_03}, #{TRADE_PLACE_04})
         AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01}
+        <if test="assetType != null and assetType !=''">
+            AND FPT.TYPE_10 = #{assetType,jdbcType=VARCHAR}
+        </if>
         <if test="portfolioName != null and portfolioName !=''">
             AND TEMP.PORTFOLIO_ID = #{portfolioName,jdbcType=VARCHAR}
         </if>
@@ -458,7 +463,14 @@
         case when trd_product_deal_2.FINPROD_TYPE2 = 'F03' then eea.TRADER
             else ee.COUNTER_TRADER end as revRepurTraderId, /**逆回购方交易员代码**/
         case when trd_product_deal_2.FINPROD_TYPE2 = 'F03' then ''
-        else eea.COUNTER_ORG end as revRepurOrgId /**逆回购方交易商代码**/
+        else eea.COUNTER_ORG end as revRepurOrgId, /**逆回购方交易商代码**/
+        trd_product_deal_2.TRADER			 trader,
+        trd_product_deal_add.DEALER_NO tradeName,
+        trd_product_deal_add.DEALER_PARTY_NO AS investorName,
+        trd_product_deal_2.COUNTER_TRADER  	 counterTradeName,
+        trd_product_deal_add.OUT_DEALER_NO counterDealerName,
+        trd_product_deal_add.OUT_DEALER_PARTY_NO as counterInvestorName,
+        trd_product_deal_2.trade_id firstTradeId
         from fin_trade_product /** 交易类金融产品 **/
         inner join FIN_PRODUCT_TYPE /** 金融产品分类表 **/
             on fin_trade_product.finprod_id = FIN_PRODUCT_TYPE.Finprod_Id
@@ -603,7 +615,7 @@
         fin_product.Finprod_Market_Id finprodMarketId, /** 质押代码 **/
         fin_product.finprod_abbr finprodAbbr, /** 质押券名称 **/
         etr_pledge.Pledge_Ratio * 100 conRatio, /** 折算率 **/
-        etr_pledge.PLEDGE_NUMBER repSecNum, /** 质押数量  **/
+        etr_pledge.PLEDGE_NUMBER/100 repSecNum, /** 质押数量  **/
         case
         when etr_entrust.trade_market = #{TRADE_PLACE_03} then
         #{UNIT_04}
@@ -626,7 +638,7 @@
         SDL3.ITEM_VALUE tradePlatString,
         SDL4.ITEM_VALUE psStr,
         SDL5.ITEM_VALUE busiTypeTgString,
-        btm.OUTPUT_VALUE_1 busiTypeTg,
+        etr_entrust_add.BUSI_TYPE_POSITION busiTypeTg,
         SYS_USER.REAL_NAME invManagerName,
         etr_entrust_add.TRADER as homeTrader,
         etr_entrust.REMARK as addCla,
@@ -663,11 +675,8 @@
         LEFT JOIN SYS_DATADICT_LIST SDL2 ON SDL2.DICT_CODE ='TRADE_PLACE' AND SDL2.ITEM_CODE = etr_entrust.trade_market
         LEFT JOIN SYS_DATADICT_LIST SDL3 ON SDL3.DICT_CODE ='SHARES_TRADE_PLATFORM' AND SDL3.ITEM_CODE = etr_entrust.Trade_Plat
         LEFT JOIN SYS_DATADICT_LIST SDL4 ON SDL4.DICT_CODE ='PS' AND SDL4.ITEM_CODE = etr_entrust_add.BUSI_PS
-        LEFT JOIN FIN_PRODUCT_TYPE_CONFIG btm ON (ETR_ENTRUST.FINPROD_TYPE2 = btm.INPUT_VALUE_2 OR  btm.INPUT_VALUE_2 is null)
-            AND (ETR_ENTRUST.Ps = btm.INPUT_VALUE_3 OR  btm.INPUT_VALUE_3 is null)
-            AND (ETR_ENTRUST.TRADE_PLAT = btm.INPUT_VALUE_1 OR btm.INPUT_VALUE_1 IS NULL)
         LEFT JOIN SYS_USER ON ETR_ENTRUST.INV_MANAGER_ID = SYS_USER.USER_NAME
-        LEFT JOIN SYS_DATADICT_LIST SDL5 ON SDL5.DICT_CODE ='BUSI_TYPE_TG' AND SDL5.ITEM_CODE = btm.OUTPUT_VALUE_1
+        LEFT JOIN SYS_DATADICT_LIST SDL5 ON SDL5.DICT_CODE ='BUSI_TYPE_TG' AND SDL5.ITEM_CODE = etr_entrust_add.BUSI_TYPE_POSITION
         where etr_entrust.TRADE_MARKET IN ('03','04')
         and etr_entrust_add.ASSET_TYPE1 = 'H01'
         <if test="entrustStatus != null and entrustStatus != ''">
@@ -783,7 +792,7 @@
             SDL3.ITEM_VALUE tradePlatString,
             SDL4.ITEM_VALUE psStr,
             SDL5.ITEM_VALUE busiTypeTgString,
-            btm.OUTPUT_VALUE_1 busiTypeTg,
+            wfl_etr_entrust_add.BUSI_TYPE_POSITION busiTypeTg,
             SYS_USER.REAL_NAME invManagerName,
             wfl_etr_entrust_add.TRADER as homeTrader,
             wfl_etr_entrust.REMARK as addCla,
@@ -820,11 +829,8 @@
             LEFT JOIN SYS_DATADICT_LIST SDL2 ON SDL2.DICT_CODE ='TRADE_PLACE' AND SDL2.ITEM_CODE = wfl_etr_entrust.trade_market
             LEFT JOIN SYS_DATADICT_LIST SDL3 ON SDL3.DICT_CODE ='SHARES_TRADE_PLATFORM' AND SDL3.ITEM_CODE = wfl_etr_entrust.Trade_Plat
             LEFT JOIN SYS_DATADICT_LIST SDL4 ON SDL4.DICT_CODE ='PS' AND SDL4.ITEM_CODE = wfl_etr_entrust_add.BUSI_PS
-            LEFT JOIN FIN_PRODUCT_TYPE_CONFIG btm ON (wfl_etr_entrust.FINPROD_TYPE2 = btm.INPUT_VALUE_2 OR  btm.INPUT_VALUE_2 is null)
-                AND (wfl_etr_entrust.Ps = btm.INPUT_VALUE_3 OR  btm.INPUT_VALUE_3 is null)
-                AND (wfl_etr_entrust.TRADE_PLAT = btm.INPUT_VALUE_1 OR btm.INPUT_VALUE_1 IS NULL)
             LEFT JOIN SYS_USER ON wfl_etr_entrust.INV_MANAGER_ID = SYS_USER.USER_NAME
-            LEFT JOIN SYS_DATADICT_LIST SDL5 ON SDL5.DICT_CODE ='BUSI_TYPE_TG' AND SDL5.ITEM_CODE = btm.OUTPUT_VALUE_1
+            LEFT JOIN SYS_DATADICT_LIST SDL5 ON SDL5.DICT_CODE ='BUSI_TYPE_TG' AND SDL5.ITEM_CODE = wfl_etr_entrust_add.BUSI_TYPE_POSITION
             where wfl_etr_entrust.TRADE_MARKET IN ('03','04')
             and wfl_etr_entrust_add.ASSET_TYPE1 = 'H01'
             <if test="entrustStatus != null and entrustStatus != ''">
@@ -1063,5 +1069,63 @@
         <foreach collection="finprodIdList" open=" FP.FINPROD_ID in(" close=")" separator="," item="item">
             #{item}
         </foreach>
+    </select>
+
+    <select id="selectCurrPledgeInfo" resultType="com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepCurrResp">
+        SELECT
+        wm_concat(FP.FINPROD_MARKET_ID)  finprodMarketId,
+        SUM(B.PLEDGE_NUMBER)/100	 repSecNum,
+        SUM(B.PLEDGE_NUMBER*PLEDGE_FACE_VALUE)  pledgeAmt,
+        C.TYPE_7								repType,
+        A.PRIN/SUM(B.PLEDGE_NUMBER*PLEDGE_FACE_VALUE) conRatio,
+        A.PRIN prin,
+        A.COUNTER_ID counterId,
+        A.TERM term,
+        A.INT_RATE intRate,
+        A.VPAY_DATE vpayDate,
+        A.MPAY_DATE mpayDate,
+        A.ACT_CAP_DAYS actCapDays,
+        A.M_INT_AMT mIntAmt,
+        A.M_TRADE_AMT mTradeAmt
+        FROM
+            FIN_TRADE_PRODUCT A
+                INNER JOIN FIN_DEAL_PLEDGE B ON B.FINPROD_ID = A.FINPROD_ID AND B.BRANCH = A.BRANCH
+                INNER JOIN FIN_PRODUCT_TYPE C ON B.PLEDGE_FINPROD_ID=C.FINPROD_ID
+                AND C.BRANCH = A.BRANCH
+                and C.TYPE_6 = #{TARGET_BACK_TYPE_H01}
+                AND C.TYPE_7 in (#{BACK_LEND_DIRECTION_03},#{BACK_LEND_DIRECTION_04})
+                INNER JOIN FIN_PRODUCT FP ON FP.FINPROD_ID=B.PLEDGE_FINPROD_ID
+        WHERE A.FINPROD_ID = #{tradeId}  and A.BRANCH=0
+        group by
+            A.FINPROD_ID,
+            A.BRANCH,
+			C.TYPE_7,
+			A.PRIN,
+			A.COUNTER_ID,
+			A.TERM,
+			A.INT_RATE,
+			A.VPAY_DATE,
+			A.MPAY_DATE,
+			A.ACT_CAP_DAYS,
+			A.M_INT_AMT,
+			A.M_TRADE_AMT
+
+    </select>
+
+    <select id="selectCurrPledgeList" resultType="com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreOutRepResp">
+        SELECT
+            FP.FINPROD_MARKET_ID  id,
+            FP.finprod_market_id || '|' || FP.finprod_abbr as text,
+            B.PLEDGE_NUMBER	 repSecNum
+        FROM
+            FIN_TRADE_PRODUCT A
+                INNER JOIN FIN_DEAL_PLEDGE B ON B.FINPROD_ID = A.FINPROD_ID AND B.BRANCH = A.BRANCH
+                INNER JOIN FIN_PRODUCT_TYPE C ON B.PLEDGE_FINPROD_ID=C.FINPROD_ID
+                AND C.BRANCH = A.BRANCH
+                and C.TYPE_6 = #{TARGET_BACK_TYPE_H01}
+                AND C.TYPE_7 in (#{BACK_LEND_DIRECTION_03},#{BACK_LEND_DIRECTION_04})
+                INNER JOIN FIN_PRODUCT FP ON FP.FINPROD_ID=B.PLEDGE_FINPROD_ID
+        WHERE A.FINPROD_ID = #{tradeId}  and A.BRANCH=0
+
     </select>
 </mapper>

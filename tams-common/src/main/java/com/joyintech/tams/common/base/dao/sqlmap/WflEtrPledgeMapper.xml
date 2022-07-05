@@ -159,6 +159,9 @@
             <if test="workflowStatus != null" >
                 WORKFLOW_STATUS,
             </if>
+            <if test="displaceDir != null" >
+                DISPLACE_DIR,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="entrustId != null" >
@@ -199,6 +202,9 @@
             </if>
             <if test="workflowStatus != null" >
                 #{workflowStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="displaceDir != null" >
+                #{displaceDir,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>

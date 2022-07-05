@@ -436,6 +436,19 @@ public class EntrCommandDispatcherDto extends BaseEntity{
      */
     private String isNetPrice;
 
+    /**
+     * 行情请求编号
+     */
+    private String quoteRequestId;
+
+    public String getQuoteRequestId() {
+        return quoteRequestId;
+    }
+
+    public void setQuoteRequestId(String quoteRequestId) {
+        this.quoteRequestId = quoteRequestId;
+    }
+
     public String getIsNetPrice() {
         return isNetPrice;
     }
@@ -1264,5 +1277,44 @@ public class EntrCommandDispatcherDto extends BaseEntity{
 
     public void setEntrustBussType(String entrustBussType) {
         this.entrustBussType = entrustBussType;
+    }
+
+    /**
+     * 对手方交易主体代码
+     */
+    private String counterInvestorId;
+
+    /**
+     * 对手方交易主体类型
+     */
+    private String counterInvestorType;
+
+    public String getCounterInvestorId() {
+        return counterInvestorId;
+    }
+
+    public void setCounterInvestorId(String counterInvestorId) {
+        this.counterInvestorId = counterInvestorId;
+    }
+
+    public String getCounterInvestorType() {
+        return counterInvestorType;
+    }
+
+    public void setCounterInvestorType(String counterInvestorType) {
+        this.counterInvestorType = counterInvestorType;
+    }
+
+    /**
+     * 回购到期日
+     */
+    private Date repoMdate;
+
+    public Date getRepoMdate() {
+        return repoMdate;
+    }
+
+    public void setRepoMdate(Date repoMdate) {
+        this.repoMdate = repoMdate;
     }
 }

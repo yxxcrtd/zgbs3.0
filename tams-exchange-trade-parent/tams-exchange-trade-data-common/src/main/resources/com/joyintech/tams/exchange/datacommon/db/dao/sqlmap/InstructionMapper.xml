@@ -71,6 +71,7 @@
         <result column="IS_AUTO_RECEIVE" property="isAutoReceive" jdbcType="VARCHAR"/>
         <result column="V_PAY_DATE" property="vPayDate" jdbcType="TIMESTAMP"/>
         <result column="M_PAY_DATE" property="mPayDate" jdbcType="TIMESTAMP"/>
+        <result column="REPO_MDATE" property="repoMdate" jdbcType="TIMESTAMP"/>
         <result column="CAP_DAYS" property="capDays" jdbcType="NUMERIC"/>
         <result column="M_INT_AMT" property="mIntAmt" jdbcType="NUMERIC"/>
         <result column="M_TRADE_AMT" property="mTradeAmt" jdbcType="NUMERIC"/>
@@ -87,6 +88,9 @@
         <result column="TARGET_TYPE" property="targetType" jdbcType="VARCHAR"/>
         <result column="IS_NO_GUARD" property="isNoGuard" jdbcType="VARCHAR"/>
         <result column="IS_NET_PRICE" property="isNetPrice" jdbcType="VARCHAR"/>
+        <result column="QUOTE_REQUEST_ID" property="quoteRequestId" jdbcType="VARCHAR"/>
+        <result column="COUNTER_INVESTOR_ID" property="counterInvestorId" jdbcType="VARCHAR"/>
+        <result column="COUNTER_INVESTOR_TYPE" property="counterInvestorType" jdbcType="VARCHAR"/>
     </resultMap>
     <resultMap id="ResultMapWithBLOBs" type="com.joyintech.tams.exchange.common.db.domain.Instruction"
                extends="BaseResultMap">
@@ -163,9 +167,10 @@
     MATURITY_DATE, MATURITY_DATE2, TERM_DAYS, TERM_DAYS2, PURCH_TYPE, SALE_CODE, MIN_AMT,
     TAR_FINPROD_ID, TARINPROD_ABBR, TARINPROD_MARKET_ID, TRADE_ID, TRADER_NAME, INV_MANAGER_ID,
     ASSET_TYPE, ASSET_TYPE1, ASSET_TYPE10, ASSET_TYPE11, INV_AIM, APPROVER_FLAGE, OUR_TRADER,
-    IS_AUTO_RECEIVE, V_PAY_DATE, M_PAY_DATE, CAP_DAYS, M_INT_AMT, M_TRADE_AMT, FIRST_REPO_PS, REMARK,
+    IS_AUTO_RECEIVE, V_PAY_DATE, M_PAY_DATE, REPO_MDATE, CAP_DAYS, M_INT_AMT, M_TRADE_AMT, FIRST_REPO_PS, REMARK,
     DERIVATIVE_BS_DIR, DERIVATIVE_OC_FLAG, ENTRUST_BUSS_TYPE, DELIVERY_METHOD,ENTRUST_CLASS,BUSI_TYPE_TG,
-    CREATE_TIME,UPDATE_TIME,TARGET_TYPE,IS_NO_GUARD,IS_NET_PRICE
+    CREATE_TIME,UPDATE_TIME,TARGET_TYPE,IS_NO_GUARD,IS_NET_PRICE,QUOTE_REQUEST_ID,COUNTER_INVESTOR_ID,
+        COUNTER_INVESTOR_TYPE
     </sql>
     <sql id="Blob_Column_List">
         TRADERS_INFO
@@ -255,11 +260,12 @@
                                    INV_MANAGER_ID, ASSET_TYPE, ASSET_TYPE1,
                                    ASSET_TYPE10, ASSET_TYPE11, INV_AIM,
                                    APPROVER_FLAGE, OUR_TRADER, IS_AUTO_RECEIVE,
-                                   V_PAY_DATE, M_PAY_DATE, CAP_DAYS,
+                                   V_PAY_DATE, M_PAY_DATE, REPO_MDATE, CAP_DAYS,
                                    M_INT_AMT, M_TRADE_AMT, FIRST_REPO_PS, TRADERS_INFO,
                                    REMARK, DERIVATIVE_BS_DIR, DERIVATIVE_OC_FLAG,
                                    ENTRUST_BUSS_TYPE, DELIVERY_METHOD, ENTRUST_CLASS, BUSI_TYPE_TG,
-                                   CREATE_TIME, UPDATE_TIME, TARGET_TYPE, IS_NO_GUARD, IS_NET_PRICE)
+                                   CREATE_TIME, UPDATE_TIME, TARGET_TYPE, IS_NO_GUARD, IS_NET_PRICE, QUOTE_REQUEST_ID,
+                                   COUNTER_INVESTOR_ID, COUNTER_INVESTOR_TYPE)
         values (#{entrustId,jdbcType=VARCHAR}, #{portfolioId,jdbcType=VARCHAR}, #{portfolioName,jdbcType=VARCHAR},
                 #{finprodId,jdbcType=VARCHAR}, #{finprodAbbr,jdbcType=VARCHAR}, #{finprodName,jdbcType=VARCHAR},
                 #{finprodType2,jdbcType=VARCHAR}, #{acctNo,jdbcType=VARCHAR}, #{ccy,jdbcType=VARCHAR},
@@ -283,13 +289,14 @@
                 #{invManagerId,jdbcType=VARCHAR}, #{assetType,jdbcType=VARCHAR}, #{assetType1,jdbcType=VARCHAR},
                 #{assetType10,jdbcType=VARCHAR}, #{assetType11,jdbcType=VARCHAR}, #{invAim,jdbcType=VARCHAR},
                 #{approverFlage,jdbcType=VARCHAR}, #{ourTrader,jdbcType=VARCHAR}, #{isAutoReceive,jdbcType=VARCHAR},
-                #{vPayDate,jdbcType=TIMESTAMP}, #{mPayDate,jdbcType=TIMESTAMP}, #{capDays,jdbcType=NUMERIC},
+                #{vPayDate,jdbcType=TIMESTAMP}, #{mPayDate,jdbcType=TIMESTAMP},#{repoMdate,jdbcType=TIMESTAMP}, #{capDays,jdbcType=NUMERIC},
                 #{mIntAmt,jdbcType=NUMERIC}, #{mTradeAmt,jdbcType=NUMERIC}, #{firstRepoPs,jdbcType=VARCHAR},
                 #{remark,jdbcType=VARCHAR}, #{tradersInfo,jdbcType=CLOB}, #{derivativeBsDir,jdbcType=VARCHAR},
                 #{derivativeOcFlag,jdbcType=VARCHAR}, #{entrustBussType,jdbcType=VARCHAR},
                 #{deliveryMethod,jdbcType=VARCHAR}, #{entrustClass,jdbcType=VARCHAR}, #{busiTypeTg,jdbcType=VARCHAR},
                 #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{targetType,jdbcType=VARCHAR},
-                #{isNoGuard,jdbcType=VARCHAR}, #{isNetPrice,jdbcType=VARCHAR})
+                #{isNoGuard,jdbcType=VARCHAR}, #{isNetPrice,jdbcType=VARCHAR}, #{quoteRequestId,jdbcType=VARCHAR},
+                #{counterInvestorId,jdbcType=VARCHAR}, #{counterInvestorType,jdbcType=VARCHAR})
     </insert>
 
     <sql id="insertSql">
@@ -502,6 +509,9 @@
             <if test="mPayDate != null">
                 M_PAY_DATE,
             </if>
+            <if test="repoMdate != null">
+                REPO_MDATE,
+            </if>
             <if test="capDays != null">
                 CAP_DAYS,
             </if>
@@ -552,6 +562,15 @@
             </if>
             <if test="isNetPrice != null">
                 IS_NET_PRICE,
+            </if>
+            <if test="quoteRequestId != null">
+                QUOTE_REQUEST_ID,
+            </if>
+            <if test="counterInvestorId != null">
+                COUNTER_INVESTOR_ID,
+            </if>
+            <if test="counterInvestorType != null">
+                COUNTER_INVESTOR_TYPE,
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -762,6 +781,9 @@
             <if test="mPayDate != null">
                 #{mPayDate,jdbcType=TIMESTAMP},
             </if>
+            <if test="repoMdate != null">
+                #{repoMdate,jdbcType=TIMESTAMP},
+            </if>
             <if test="capDays != null">
                 #{capDays,jdbcType=NUMERIC},
             </if>
@@ -812,6 +834,15 @@
             </if>
             <if test="isNetPrice != null">
                 #{isNetPrice,jdbcType=VARCHAR},
+            </if>
+            <if test="quoteRequestId != null">
+                #{quoteRequestId,jdbcType=VARCHAR},
+            </if>
+            <if test="counterInvestorId != null">
+                #{counterInvestorId,jdbcType=VARCHAR},
+            </if>
+            <if test="counterInvestorType != null">
+                #{counterInvestorType,jdbcType=VARCHAR},
             </if>
         </trim>
     </sql>
@@ -1023,6 +1054,9 @@
             <if test="mPayDate != null">
                 M_PAY_DATE = #{mPayDate,jdbcType=TIMESTAMP},
             </if>
+            <if test="repoMdate != null">
+                REPO_MDATE = #{repoMdate,jdbcType=TIMESTAMP},
+            </if>
             <if test="capDays != null">
                 CAP_DAYS = #{capDays,jdbcType=NUMERIC},
             </if>
@@ -1073,6 +1107,15 @@
             </if>
             <if test="isNetPrice != null">
                 IS_NET_PRICE = #{isNetPrice,jdbcType=VARCHAR},
+            </if>
+            <if test="quoteRequestId != null">
+                QUOTE_REQUEST_ID = #{quoteRequestId,jdbcType=VARCHAR},
+            </if>
+            <if test="counterInvestorId != null">
+                COUNTER_INVESTOR_ID = #{counterInvestorId,jdbcType=VARCHAR},
+            </if>
+            <if test="counterInvestorType != null">
+                COUNTER_INVESTOR_TYPE = #{counterInvestorType,jdbcType=VARCHAR},
             </if>
         </set>
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
@@ -1310,6 +1353,9 @@
             <if test="record.mPayDate != null">
                 M_PAY_DATE = #{record.mPayDate,jdbcType=TIMESTAMP},
             </if>
+            <if test="record.repoMdate != null">
+                REPO_MDATE = #{record.repoMdate,jdbcType=TIMESTAMP},
+            </if>
             <if test="record.capDays != null">
                 CAP_DAYS = #{record.capDays,jdbcType=NUMERIC},
             </if>
@@ -1360,6 +1406,15 @@
             </if>
             <if test="record.isNetPrice != null">
                 IS_NET_PRICE = #{record.isNetPrice,jdbcType=VARCHAR},
+            </if>
+            <if test="record.quoteRequestId != null">
+                QUOTE_REQUEST_ID = #{record.quoteRequestId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.counterInvestorId != null">
+                COUNTER_INVESTOR_ID = #{record.counterInvestorId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.counterInvestorType != null">
+                COUNTER_INVESTOR_TYPE = #{record.counterInvestorType,jdbcType=VARCHAR},
             </if>
         </set>
         <if test="_parameter != null">
@@ -1437,6 +1492,7 @@
         IS_AUTO_RECEIVE = #{record.isAutoReceive,jdbcType=VARCHAR},
         V_PAY_DATE = #{record.vPayDate,jdbcType=TIMESTAMP},
         M_PAY_DATE = #{record.mPayDate,jdbcType=TIMESTAMP},
+        REPO_MDATE = #{record.repoMdate,jdbcType=TIMESTAMP},
         CAP_DAYS = #{record.capDays,jdbcType=NUMERIC},
         M_INT_AMT = #{record.mIntAmt,jdbcType=NUMERIC},
         M_TRADE_AMT = #{record.mTradeAmt,jdbcType=NUMERIC},
@@ -1452,7 +1508,10 @@
         UPDATE_TIME = #{record.updateTime,jdbcType=TIMESTAMP},
         TARGET_TYPE = #{record.targetType,jdbcType=VARCHAR},
         IS_NO_GUARD = #{record.isNoGuard,jdbcType=VARCHAR},
-        IS_NET_PRICE = #{record.isNetPrice,jdbcType=VARCHAR}
+        IS_NET_PRICE = #{record.isNetPrice,jdbcType=VARCHAR},
+        QUOTE_REQUEST_ID = #{record.quoteRequestId,jdbcType=VARCHAR},
+        COUNTER_INVESTOR_ID = #{record.counterInvestorId,jdbcType=VARCHAR},
+        COUNTER_INVESTOR_TYPE = #{record.counterInvestorType,jdbcType=VARCHAR}
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
@@ -1528,6 +1587,7 @@
         IS_AUTO_RECEIVE = #{record.isAutoReceive,jdbcType=VARCHAR},
         V_PAY_DATE = #{record.vPayDate,jdbcType=TIMESTAMP},
         M_PAY_DATE = #{record.mPayDate,jdbcType=TIMESTAMP},
+        REPO_MDATE = #{record.repoMdate,jdbcType=TIMESTAMP},
         CAP_DAYS = #{record.capDays,jdbcType=NUMERIC},
         M_INT_AMT = #{record.mIntAmt,jdbcType=NUMERIC},
         M_INT_AMT = #{record.mIntAmt,jdbcType=NUMERIC},
@@ -1542,7 +1602,10 @@
         UPDATE_TIME = #{record.updateTime,jdbcType=TIMESTAMP},
         TARGET_TYPE = #{record.targetType,jdbcType=VARCHAR},
         IS_NO_GUARD = #{record.isNoGuard,jdbcType=VARCHAR},
-        IS_NET_PRICE = #{record.isNetPrice,jdbcType=VARCHAR}
+        IS_NET_PRICE = #{record.isNetPrice,jdbcType=VARCHAR},
+        QUOTE_REQUEST_ID = #{record.quoteRequestId,jdbcType=VARCHAR},
+        COUNTER_INVESTOR_ID = #{record.counterInvestorId,jdbcType=VARCHAR},
+        COUNTER_INVESTOR_TYPE = #{record.counterInvestorType,jdbcType=VARCHAR}
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
@@ -1622,6 +1685,7 @@
             IS_AUTO_RECEIVE     = #{isAutoReceive,jdbcType=VARCHAR},
             V_PAY_DATE          = #{vPayDate,jdbcType=TIMESTAMP},
             M_PAY_DATE          = #{mPayDate,jdbcType=TIMESTAMP},
+            REPO_MDATE          = #{repoMdate,jdbcType=TIMESTAMP},
             CAP_DAYS            = #{capDays,jdbcType=NUMERIC},
             M_INT_AMT           = #{mIntAmt,jdbcType=NUMERIC},
             M_TRADE_AMT         = #{mTradeAmt,jdbcType=NUMERIC},
@@ -1638,7 +1702,10 @@
             UPDATE_TIME         = #{updateTime,jdbcType=TIMESTAMP},
             TARGET_TYPE         = #{targetType, jdbcType= VARCHAR},
             IS_NO_GUARD         = #{isNoGuard,jdbcType=VARCHAR},
-            IS_NET_PRICE        = #{isNetPrice,jdbcType=VARCHAR}
+            IS_NET_PRICE        = #{isNetPrice,jdbcType=VARCHAR},
+            QUOTE_REQUEST_ID    = #{quoteRequestId,jdbcType=VARCHAR},
+            COUNTER_INVESTOR_ID   = #{counterInvestorId,jdbcType=VARCHAR},
+            COUNTER_INVESTOR_TYPE = #{counterInvestorType,jdbcType=VARCHAR}
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.exchange.common.db.domain.Instruction">
@@ -1711,6 +1778,7 @@
             IS_AUTO_RECEIVE     = #{isAutoReceive,jdbcType=VARCHAR},
             V_PAY_DATE          = #{vPayDate,jdbcType=TIMESTAMP},
             M_PAY_DATE          = #{mPayDate,jdbcType=TIMESTAMP},
+            REPO_MDATE          = #{repoMdate,jdbcType=TIMESTAMP},
             CAP_DAYS            = #{capDays,jdbcType=NUMERIC},
             M_INT_AMT           = #{mIntAmt,jdbcType=NUMERIC},
             M_TRADE_AMT         = #{mTradeAmt,jdbcType=NUMERIC},
@@ -1726,7 +1794,10 @@
             UPDATE_TIME         = #{updateTime,jdbcType=TIMESTAMP},
             TARGET_TYPE         = #{targetType, jdbcType= VARCHAR},
             IS_NO_GUARD         = #{isNoGuard,jdbcType=VARCHAR},
-            IS_NET_PRICE        = #{isNetPrice,jdbcType=VARCHAR}
+            IS_NET_PRICE        = #{isNetPrice,jdbcType=VARCHAR},
+            QUOTE_REQUEST_ID    = #{quoteRequestId,jdbcType=VARCHAR},
+            COUNTER_INVESTOR_ID   = #{counterInvestorId,jdbcType=VARCHAR},
+            COUNTER_INVESTOR_TYPE = #{counterInvestorType,jdbcType=VARCHAR}
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
     </update>
 </mapper>

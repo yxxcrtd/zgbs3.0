@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.background.component.order.exchange.common.dto.EtrPledgeDto;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.*;
@@ -33,11 +34,15 @@ import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreOutRepResp;
+import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepCurrResp;
+import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeTradePortfolioRequest;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.BindingResult;
 
@@ -771,8 +776,89 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, agreRepHwayChgSecDto);
             if(StringUtil.isNotEmpty(agreRepHwayChgSecDto.getFinprodId())) {
             	BeanUtil.copyPropertiesIgnoreNull(etrPledge, agreRepHwayChgSecDto);
-            	list.add(etrPledge);
+                etrPledge.setPledgeAmt(ArithmeticUtil.multiply(entity.getNewRepSecNum(),entity.getNewpledgeFaceValue()));
+                etrPledge.setFinprodId(entity.getNewfinprodId());
+                etrPledge.setDisplaceDir(DictCodeListExt3.质押券置换_置换方向_换入.getValue());
+                list.add(etrPledge);
+                //换出券
+                if(entity.getOutRepSecNum()!=null){
+                    EtrPledge outPledge=new EtrPledge();
+                    outPledge.setEntrustId(entity.getEntrustId());
+                    outPledge.setFinprodId(entity.getOutfinprodId());
+                    // 质押面值
+                    outPledge.setPledgeFaceValue(entity.getOutPledgeFaceValue());
+                    //质押率
+                    outPledge.setPledgeRatio(ArithmeticUtil.divide(entity.getConRatio(),new BigDecimal(100),2));
+                    // 质押数量
+                    outPledge.setPledgeNumber(entity.getOutRepSecNum());
+                    // 质押金额
+                    outPledge.setPledgeAmt(ArithmeticUtil.multiply(entity.getOutRepSecNum(),entity.getOutPledgeFaceValue()));
+                    outPledge.setDisplaceDir(DictCodeListExt3.质押券置换_置换方向_换出.getValue());
+                    list.add(outPledge);
+                }
             }
+        }else if (上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
+
+            BeanUtil.copyProperties(agreRepHwayChgSecDto, etrSinglePortfolioDto);
+
+            // 请求号
+            agreRepHwayChgSecDto.setRequestId(entity.getReqOnId());
+
+            // 交易对手
+            agreRepHwayChgSecDto.setCounterId(entity.getCounterId());
+            //备注
+            agreRepHwayChgSecDto.setRemark(entity.getAddCla());
+            //回购方向
+            agreRepHwayChgSecDto.setBusiPs(entity.getRepPs());
+            // 质押券代码
+            agreRepHwayChgSecDto.setRepSecId(entity.getNewRepSecId());
+            // 目标类型
+            agreRepOpenSecDto.setTargetType(DictCodeListExt3.目标类型_金额.getValue());
+            agreRepHwayChgSecDto.setTradeId(entity.getIntiTradeId());
+
+            if(DictCodeList.回购拆借方向_正回购.getValue().equals(entity.getRepPs())){
+                agreRepHwayChgSecDto.setAssetType10("H03");
+            }else if(DictCodeList.回购拆借方向_逆回购.getValue().equals(entity.getRepPs())){
+                agreRepHwayChgSecDto.setAssetType10("H04");
+            }
+            agreRepHwayChgSecDto.setEntrustAmt(entity.getOutAmt());
+            agreRepHwayChgSecDto.setEntrustNum(entity.getOutAmt());
+
+            //无法从页面带回购首期的部分数据，需要重新查一次
+            Map<String, Object> queryMap = new HashMap<>();
+            queryMap.put("tradeId",agreRepHwayChgSecDto.getTradeId());
+            List<EtrExchangeAgreRepTrade001Dto> repFristList = etrExchangeAgreRepTradeMapper.getEntrustInfoByTradeId(queryMap);
+            if(!StringUtil.isEmptyList(repFristList)) {
+                repFristList.forEach(item->{
+                    // 到期应计利息
+                    agreRepHwayChgSecDto.setmIntAmt(item.getIntAmt());
+
+                    //到期结算金额
+                    agreRepHwayChgSecDto.setmTradeAmt(item.getExpireSettleAmt());
+
+                    // 首次交收日
+                    if(StringUtil.isNotEmpty(item.getFristSettleDate())){
+                        agreRepHwayChgSecDto.setVpayDate(DateUtil.parse(item.getFristSettleDate()));
+                    }
+                    if(StringUtil.isNotEmpty(item.getExpireSettleDate())){
+                        // 到期交收日
+                        agreRepHwayChgSecDto.setMpayDate(DateUtil.parse(item.getExpireSettleDate()));
+                    }
+
+                    //占款天数
+                    if(item.getOccupyDays()!=null){
+                        agreRepHwayChgSecDto.setCapDays(BigDecimal.valueOf(item.getOccupyDays()));
+                    }
+
+                    // 期限天数，到期日-起息日
+                    if(item.getTerm()!=null){
+                        agreRepHwayChgSecDto.setTermDays(Long.valueOf(item.getTerm()));
+                    }
+                });
+            }
+
+            BeanUtil.copyPropertiesIgnoreNull(etrEntrust, agreRepHwayChgSecDto);
+            BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, agreRepHwayChgSecDto);
         }else if (DictCodeListExt3.上农商_指令业务类型_协议回购解除质押指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
         	
             BeanUtil.copyProperties(agreRepOpenSecDto, etrSinglePortfolioDto);  
@@ -888,6 +974,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         }
         dto.setEtrEntrustAdd(etrEntrustAdd);
         dto.setEtrPledgeList(list);
+        dto.setEtrEntrustDetailList(handleEtrEntrustDetail(etrEntrust,etrEntrustAdd));
         return dto;
     }
     /**
@@ -1321,6 +1408,32 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, agreRepHwayChgSecDto);
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, agreRepHwayChgSecDto);
+            List<EtrPledgeDto> list=new ArrayList<>();
+            EtrPledgeDto etrPledge=new EtrPledgeDto();
+            if(StringUtil.isNotEmpty(agreRepHwayChgSecDto.getFinprodId())) {
+                BeanUtil.copyPropertiesIgnoreNull(etrPledge, agreRepHwayChgSecDto);
+                etrPledge.setPledgeAmt(ArithmeticUtil.multiply(entity.getNewRepSecNum(),entity.getNewpledgeFaceValue()));
+                etrPledge.setFinprodId(entity.getNewfinprodId());
+                etrPledge.setDisplaceDir(DictCodeListExt3.质押券置换_置换方向_换入.getValue());
+                list.add(etrPledge);
+                //换出券
+                if(entity.getOutRepSecNum()!=null){
+                    EtrPledgeDto outPledge=new EtrPledgeDto();
+                    outPledge.setEntrustId(entity.getEntrustId());
+                    outPledge.setFinprodId(entity.getOutfinprodId());
+                    // 质押面值
+                    outPledge.setPledgeFaceValue(entity.getOutPledgeFaceValue());
+                    //质押率
+                    outPledge.setPledgeRatio(ArithmeticUtil.divide(entity.getConRatio(),new BigDecimal(100),2));
+                    // 质押数量
+                    outPledge.setPledgeNumber(entity.getOutRepSecNum());
+                    // 质押金额
+                    outPledge.setPledgeAmt(ArithmeticUtil.multiply(entity.getOutRepSecNum(),entity.getOutPledgeFaceValue()));
+                    outPledge.setDisplaceDir(DictCodeListExt3.质押券置换_置换方向_换出.getValue());
+                    list.add(outPledge);
+                }
+                agreRepHwayChgSecDto.setList(list);
+            }
         }else if (DictCodeListExt3.上农商_指令业务类型_协议回购解除质押指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
 
             BeanUtil.copyProperties(agreRepOpenSecDto, etrSinglePortfolioDto);
@@ -1543,6 +1656,12 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
            	    EtrComponentFactory.getComponentService(AgreRepOpenSecDto.class).updateSettings(paraDto);
            	    EtrComponentFactory.getComponentService(AgreRepOpenSecDto.class).entrustEdit(agreRepOpenSecDto);
            }
+        }
+        //指令组合详情
+        List<EtrEntrustDetail> etrEntrustDetailList=handleEtrEntrustDetail(etrEntrust,etrEntrustAdd);
+        etrEntrustDetailMapper.deleteByEntrustId(etrEntrustDetailList.get(0).getEntrustId());
+        for (EtrEntrustDetail etrEntrustDetail : etrEntrustDetailList) {
+            etrEntrustDetailMapper.insertSelective(etrEntrustDetail);
         }
         // 自动分发数据入库 add by yufei 20200808 start
         if(!StringUtil.isEmptyList(etrDistributeList)){
@@ -2017,19 +2136,8 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         etrSinglePortfolioDto.setInvAim(null);// 投资目的
         etrSinglePortfolioDto.setTradeMarket(dto.getTradeMarket());// 交易场所
         etrSinglePortfolioDto.setBusiTypePosition(dto.getBusiTypePosition());
-        //etrSinglePortfolioDto.setTradePlat(dto.getTradePlat());// 交易平台
-        /*
-         * if 画面.交易平台 = 数据字典.交易平台.大宗交易平台 and 画面.交易场所 = 数据字典.交易场所.深圳证券交易所
-         * 交易平台 = 数据字典.交易平台.综合协议平台
-         * else if 画面.交易平台 = 数据字典.交易平台.大宗交易平台 and 画面.交易场所 = 数据字典.交易场所.上海证券交易所
-         * 交易平台 = 数据字典.交易平台.大宗交易平台 end
-         */
-        if (DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(dto.getTradeMarket())) {
-            etrSinglePortfolioDto.setTradePlat(DictCodeList.交易平台_综合协议交易平台.getValue());
+        etrSinglePortfolioDto.setTradePlat(DictCodeList.交易平台_综合协议交易平台.getValue());
 
-        } else if (DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(dto.getTradeMarket())) {
-            etrSinglePortfolioDto.setTradePlat(DictCodeList.交易平台_固定收益平台.getValue());
-        }
 
         /***********************************************************************/
         
@@ -2593,5 +2701,48 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         }
         return tradeId;
 
+    }
+    //构建组合详情
+    private List<EtrEntrustDetail> handleEtrEntrustDetail(EtrEntrust etrEntrust,EtrEntrustAdd etrEntrustAdd){
+        //组合详情
+        List<EtrEntrustDetail> etrEntrustDetailList = new ArrayList<>();
+        EtrEntrustDetail etrEntrustDetail = new EtrEntrustDetail();
+        etrEntrustDetail.setPortfolioId(etrEntrust.getPortfolioId());
+        etrEntrustDetail.setEntrustId(etrEntrust.getEntrustId());
+        etrEntrustDetail.setEntrustAmt(etrEntrust.getEntrustAmt());
+        etrEntrustDetail.setEntrustNum(etrEntrust.getEntrustNum());
+        etrEntrustDetail.setDisRate(new BigDecimal(1));
+        etrEntrustDetail.setTargetType(etrEntrustAdd.getTargetType());
+        etrEntrustDetailList.add(etrEntrustDetail);
+        return etrEntrustDetailList;
+    }
+
+    /**
+     * 质押券下拉框
+     * @param dto
+     * @return
+     */
+    public EtrExchangeAgreRepCurrResp selectCurrPledgeInfo(String tradeId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("TARGET_BACK_TYPE_H01", DictCodeList.回购类型_质押式协议回购.getValue());
+        map.put("BACK_LEND_DIRECTION_03", DictCodeList.回购拆借方向_正回购.getValue());
+        map.put("BACK_LEND_DIRECTION_04", DictCodeList.回购拆借方向_逆回购.getValue());
+        map.put("tradeId",tradeId);
+        return etrExchangeAgreRepTradeMapper.selectCurrPledgeInfo(map);
+    }
+
+    /**
+     * 质押券下拉框列表
+     * @param dto
+     * @return
+     */
+    public List<EtrExchangeAgreOutRepResp> selectCurrPledgeList(String tradeId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("TARGET_BACK_TYPE_H01", DictCodeList.回购类型_质押式协议回购.getValue());
+        map.put("BACK_LEND_DIRECTION_03", DictCodeList.回购拆借方向_正回购.getValue());
+        map.put("BACK_LEND_DIRECTION_04", DictCodeList.回购拆借方向_逆回购.getValue());
+        map.put("tradeId",tradeId);
+        List<EtrExchangeAgreOutRepResp> list=etrExchangeAgreRepTradeMapper.selectCurrPledgeList(map);
+        return list;
     }
 }

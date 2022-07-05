@@ -7,10 +7,7 @@ import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
-import com.joyintech.tams.exchange.common.bean.investment.BasicMessage;
-import com.joyintech.tams.exchange.common.bean.investment.PortfolioTradeMessage;
-import com.joyintech.tams.exchange.common.bean.investment.ProgressMessage;
-import com.joyintech.tams.exchange.common.bean.investment.TradeMessage;
+import com.joyintech.tams.exchange.common.bean.investment.*;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
@@ -68,7 +65,7 @@ public class MessageSenderManagement extends BaseService {
      * 成交推送
      */
     public void pushTrade(Trade trade, Instruction instruction, EntrustInterface entrust,
-                          List<PortfolioTradeMessage> portfolioTradeMessages) {
+                          List<PortfolioTradeMessage> portfolioTradeMessages, List<PledgeTradeMessage> pledgeTradeMessages) {
         logger.info("【pushTrade】 parameters：{}", JsonUtils.getJsonFromObject(trade));
         if (Objects.isNull(trade) || Strings.isNullOrEmpty(trade.getId())) {
             logger.error("【pushTrade】 check parameter failed");
@@ -77,6 +74,7 @@ public class MessageSenderManagement extends BaseService {
         //组装推送消息
         TradeMessage tradeMessage = messageSenderHelper.createTradeMessage(trade, instruction, entrust);
         tradeMessage.setPortfolioTradeMessages(portfolioTradeMessages);
+        tradeMessage.setPledgeTradeMessages(pledgeTradeMessages);
         //保存记录日志
         RecordLog recordLog = saveRecordLog(trade.getBrokerTradeId(), entrust.getId(), instruction.getEntrustId(), 1, tradeMessage);
         //推送消息
@@ -87,7 +85,7 @@ public class MessageSenderManagement extends BaseService {
      * 成交手动交收推送
      */
     public void pushTradeForFixedIncome(Trade trade, Instruction instruction, EntrustInterface entrust,
-                                        List<PortfolioTradeMessage> portfolioTradeMessages) {
+                                        List<PortfolioTradeMessage> portfolioTradeMessages, List<PledgeTradeMessage> pledgeTradeMessages) {
         logger.info("【pushTradeForFixedIncome】 parameters：{}", JsonUtils.getJsonFromObject(trade));
         if (Objects.isNull(trade) || StringUtil.isEmpty(trade.getId()) || Objects.isNull(instruction)) {
             logger.error("【pushTradeForFixedIncome】 check parameter failed");
@@ -96,6 +94,7 @@ public class MessageSenderManagement extends BaseService {
         //组装推送消息
         TradeMessage tradeMessage = messageSenderHelper.createTradeMsg(trade, instruction, entrust);
         tradeMessage.setPortfolioTradeMessages(portfolioTradeMessages);
+        tradeMessage.setPledgeTradeMessages(pledgeTradeMessages);
         //保存记录日志
         RecordLog recordLog = saveRecordLog(trade.getBrokerTradeId(), entrust.getId(), instruction.getEntrustId(), 2, tradeMessage);
         //推送消息

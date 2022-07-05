@@ -4,6 +4,7 @@ import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.dao.TrdProductDealAddMapper;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCodeList;
@@ -38,7 +39,8 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
     @Autowired
     private ExchangeTransMatchCommonMapper exchangeTransMatchCommonMapper;
 
-
+    @Autowired
+    private TrdProductDealAddMapper trdProductDealAddMapper;
 
     /**
      * 生成金融产品交易信息实体
@@ -58,6 +60,7 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
 //                ,entrustDto.getPortfolioId());
         TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(), dealDto.getMpayDate(), dealDto.getSeatNumber(),
                 dealDto.getSecAcctId());
+        TrdProductDealAdd  firstRepoTradeAdd = trdProductDealAddMapper.selectByPrimaryKey(firstRepoTrade.getTradeId());
 
         List<SettleTransData> settleTransDataList = this.handleSettleTransData(dealDto,entrustDto);
 
@@ -71,7 +74,15 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
             //生成金融产品交易信息
             exchangeTransMatchBaseTradeDto.setTrdProductDeal(trdProductDeal);
             //生成金融产品交易附属表信息
-            exchangeTransMatchBaseTradeDto.setTrdProductDealAdd(this.genTrdProductDealAdd(dealDto, entrustDto, trdProductDeal));
+            TrdProductDealAdd trdProductDealAdd = this.genTrdProductDealAdd(dealDto, entrustDto, trdProductDeal);
+            if(DictCodeList.交易方向_收息到账.getValue().equals(trdProductDeal.getPs())
+                    || DictCodeList.交易方向_还本到账.getValue().equals(trdProductDeal.getPs())){
+                trdProductDealAdd.setDealerNo(firstRepoTradeAdd.getDealerNo());
+                trdProductDealAdd.setDealerPartyNo(firstRepoTradeAdd.getDealerPartyNo());
+                trdProductDealAdd.setOutDealerNo(firstRepoTradeAdd.getOutDealerNo());
+                trdProductDealAdd.setOutDealerPartyNo(firstRepoTradeAdd.getOutDealerPartyNo());
+            }
+            exchangeTransMatchBaseTradeDto.setTrdProductDealAdd(trdProductDealAdd);
             //生成组合交易表数据
             exchangeTransMatchBaseTradeDto.setPtlTrade(this.generatePtlTrade(dealDto, entrustDto, trdProductDeal));
             //生成费用信息list
@@ -85,6 +96,11 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
                 exchangeTransMatchBaseTradeDto.setFinTradeProduct(this.genFinTradeProduct(settleTransData, trdProductDeal));
                 exchangeTransMatchBaseTradeDto.setFinProductType(this.genFinProductType(dealDto,trdProductDeal));
                 exchangeTransMatchBaseTradeDto.setFinDealPledgeList(this.genFinDealPledgeList(dealDto,trdProductDeal));
+                BigDecimal finDealPledgeTotalNum = exchangeTransMatchBaseTradeDto.getFinDealPledgeList().stream()
+                        .map(FinDealPledge::getPledgeNumber)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                // 汇总交易表的交易份额 = SUM(回购质押品的质押数量)
+                trdFinProductDealTotal.setShareAmt(finDealPledgeTotalNum);
             }
 
             exchangeTransMatchBaseTradeDtoList.add(exchangeTransMatchBaseTradeDto);
@@ -267,7 +283,10 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
         dealTotal.setIsOverdueDeal(DictCodeList.是否_否.getValue());
         // 备注
         dealTotal.setRemark("数据清算自动处理");
-
+        // 本方交易员
+        dealTotal.setTrader(dealDto.getTrader());
+        // 对手方交易员
+        dealTotal.setCounterTrader(dealDto.getCounterTrader());
         return dealTotal;
     }
 
@@ -391,15 +410,16 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
                 trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
             }
             // 本方交易员
-            trdProductDeal.setTrader(null);
+            trdProductDeal.setTrader(dealDto.getTrader());
             // 对手方交易员
-            trdProductDeal.setCounterTrader(null);
+            trdProductDeal.setCounterTrader(dealDto.getCounterTrader());
             // 对手方联系方式
             trdProductDeal.setCounterContact(null);
             // 证券管理户代码
             trdProductDeal.setSecManageAcctId(settleTransData.getSecAcctId());
             // 关联系统交易编号
-            trdProductDeal.setfTradeId(settleTransData.getCjbh());
+            // trdProductDeal.setfTradeId(settleTransData.getCjbh());
+            trdProductDeal.setfTradeId(dealDto.getSeqId());
             // 现金流代码
             trdProductDeal.setCashId(null);
             // 登记托管机构

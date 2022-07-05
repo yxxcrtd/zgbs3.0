@@ -21,6 +21,7 @@
         <result column="OLD_PLEDGE_NUMBER" property="oldPledgeNumber" jdbcType="NUMERIC"/>
         <result column="OLD_PLEDGE_RATIO" property="oldPledgeRatio" jdbcType="NUMERIC"/>
         <result column="OLD_PLEDGE_AMT" property="oldPledgeAmt" jdbcType="NUMERIC"/>
+        <result column="DISPLACE_DIR" property="displaceDir" jdbcType="VARCHAR"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -87,7 +88,7 @@
     ID, ENTRUST_ID, FINPROD_ID, FINPROD_ABBR, TRADE_MARKET, FINPROD_MARKET_ID, PLEDGE_FACE_VALUE,
     PLEDGE_NUMBER, USED_PLEDGE_NUMBER, PLEDGE_RATIO, PLEDGE_AMT, OLD_FINPROD_ID, OLD_FINPROD_ABBR, OLD_TRADE_MARKET,
     OLD_FINPROD_MARKET_ID, OLD_PLEDGE_FACE_VALUE, OLD_PLEDGE_NUMBER, OLD_PLEDGE_RATIO,
-    OLD_PLEDGE_AMT
+    OLD_PLEDGE_AMT, DISPLACE_DIR
   </sql>
     <select id="selectByExample" resultMap="BaseResultMap"
             parameterType="com.joyintech.tams.exchange.common.db.domain.InstructionPledgeExample">
@@ -136,14 +137,14 @@
       PLEDGE_FACE_VALUE, PLEDGE_NUMBER, USED_PLEDGE_NUMBER, PLEDGE_RATIO,
       PLEDGE_AMT, OLD_FINPROD_ID, OLD_FINPROD_ABBR,
       OLD_TRADE_MARKET, OLD_FINPROD_MARKET_ID, OLD_PLEDGE_FACE_VALUE,
-      OLD_PLEDGE_NUMBER, OLD_PLEDGE_RATIO, OLD_PLEDGE_AMT
+      OLD_PLEDGE_NUMBER, OLD_PLEDGE_RATIO, OLD_PLEDGE_AMT, DISPLACE_DIR
       )
     values (#{id,jdbcType=VARCHAR}, #{entrustId,jdbcType=VARCHAR}, #{finprodId,jdbcType=VARCHAR},
       #{finprodAbbr,jdbcType=VARCHAR}, #{tradeMarket,jdbcType=VARCHAR}, #{finprodMarketId,jdbcType=VARCHAR},
       #{pledgeFaceValue,jdbcType=NUMERIC}, #{pledgeNumber,jdbcType=NUMERIC},#{usedPledgeNumber,jdbcType=NUMERIC}, #{pledgeRatio,jdbcType=NUMERIC},
       #{pledgeAmt,jdbcType=NUMERIC}, #{oldFinprodId,jdbcType=VARCHAR}, #{oldFinprodAbbr,jdbcType=VARCHAR},
       #{oldTradeMarket,jdbcType=VARCHAR}, #{oldFinprodMarketId,jdbcType=VARCHAR}, #{oldPledgeFaceValue,jdbcType=NUMERIC},
-      #{oldPledgeNumber,jdbcType=NUMERIC}, #{oldPledgeRatio,jdbcType=NUMERIC}, #{oldPledgeAmt,jdbcType=NUMERIC}
+      #{oldPledgeNumber,jdbcType=NUMERIC}, #{oldPledgeRatio,jdbcType=NUMERIC}, #{oldPledgeAmt,jdbcType=NUMERIC}, #{displaceDir,jdbcType=VARCHAR}
       )
   </insert>
 
@@ -207,6 +208,9 @@
             <if test="oldPledgeAmt != null">
                 OLD_PLEDGE_AMT,
             </if>
+            <if test="displaceDir != null">
+                DISPLACE_DIR,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -266,6 +270,9 @@
             <if test="oldPledgeAmt != null">
                 #{oldPledgeAmt,jdbcType=NUMERIC},
             </if>
+            <if test="displaceDir != null">
+                #{displaceDir,jdbcType=VARCHAR},
+            </if>
         </trim>
     </sql>
     <sql id="updateSql">
@@ -324,6 +331,9 @@
             </if>
             <if test="oldPledgeAmt != null">
                 OLD_PLEDGE_AMT = #{oldPledgeAmt,jdbcType=NUMERIC},
+            </if>
+            <if test="displaceDir != null">
+                DISPLACE_DIR = #{displaceDir,jdbcType=VARCHAR},
             </if>
         </set>
         where ID = #{id,jdbcType=VARCHAR}
@@ -412,6 +422,9 @@
             <if test="record.oldPledgeAmt != null">
                 OLD_PLEDGE_AMT = #{record.oldPledgeAmt,jdbcType=NUMERIC},
             </if>
+            <if test="record.displaceDir != null">
+                DISPLACE_DIR = #{record.displaceDir,jdbcType=VARCHAR},
+            </if>
         </set>
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
@@ -437,7 +450,8 @@
         OLD_PLEDGE_FACE_VALUE = #{record.oldPledgeFaceValue,jdbcType=NUMERIC},
         OLD_PLEDGE_NUMBER = #{record.oldPledgeNumber,jdbcType=NUMERIC},
         OLD_PLEDGE_RATIO = #{record.oldPledgeRatio,jdbcType=NUMERIC},
-        OLD_PLEDGE_AMT = #{record.oldPledgeAmt,jdbcType=NUMERIC}
+        OLD_PLEDGE_AMT = #{record.oldPledgeAmt,jdbcType=NUMERIC},
+        DISPLACE_DIR = #{record.displaceDir,jdbcType=VARCHAR}
         <if test="_parameter != null">
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
@@ -465,7 +479,8 @@
       OLD_PLEDGE_FACE_VALUE = #{oldPledgeFaceValue,jdbcType=NUMERIC},
       OLD_PLEDGE_NUMBER = #{oldPledgeNumber,jdbcType=NUMERIC},
       OLD_PLEDGE_RATIO = #{oldPledgeRatio,jdbcType=NUMERIC},
-      OLD_PLEDGE_AMT = #{oldPledgeAmt,jdbcType=NUMERIC}
+      OLD_PLEDGE_AMT = #{oldPledgeAmt,jdbcType=NUMERIC},
+      DISPLACE_DIR = #{displaceDir,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
 </mapper>
