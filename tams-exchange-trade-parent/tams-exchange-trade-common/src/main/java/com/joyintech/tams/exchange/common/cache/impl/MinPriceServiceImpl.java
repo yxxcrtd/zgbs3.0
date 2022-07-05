@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.MinPrice;
 import com.joyintech.tams.exchange.common.cache.MinPriceService;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
@@ -21,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.joyintech.tams.exchange.common.constant.InvestmentAssetType.PLEDGE_REPURCHASE;
 
 /**
  * 最小价格变动单位
@@ -80,6 +83,9 @@ public class MinPriceServiceImpl implements MinPriceService {
         String tradePlat = TradePlatUtils.trd2EtrTradePlat(instruction);
         String assetType = instrument.getAssetType();
         String assetType1 = instrument.getAssetType1();
+        if(PLEDGE_REPURCHASE.codeEquals(assetType) ){
+            assetType1 = instruction.getAssetType1();
+        }
 
         MinPrice minPrice = getMinPrice(tradeMarket, tradePlat, assetType, assetType1);
         if (ObjectUtil.isNull(minPrice)) {

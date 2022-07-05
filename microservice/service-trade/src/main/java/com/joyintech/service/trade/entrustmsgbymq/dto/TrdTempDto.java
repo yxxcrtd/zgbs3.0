@@ -17,8 +17,11 @@ import com.joyintech.tams.component.business.trade.dto.BussTrdTransfenpeiDto;
 import com.joyintech.tams.component.business.trade.dto.TrdInvestPersonInfo002Dto;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.position.dto.PositionBaseData;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -47,7 +50,7 @@ public class TrdTempDto extends TrdProductDeal{
 	 * 组合分配
 	 */
 	private List<BussTrdTransfenpeiDto> bussTrdTransfenpeiDto;
-	
+
 	/**
 	 * 锁定截止日
 	 */
@@ -72,7 +75,7 @@ public class TrdTempDto extends TrdProductDeal{
 	 * 组合代码
 	 */
 	private String portfolioId;
-	
+
 	/**
 	 * 实体组合代码
 	 */
@@ -112,7 +115,7 @@ public class TrdTempDto extends TrdProductDeal{
 	 * 计算类型
 	 */
 	private String calculateField;
-	
+
 	/**
 	 * 金融产品交易
 	 */
@@ -132,17 +135,22 @@ public class TrdTempDto extends TrdProductDeal{
 	 * 金融产品交易附属，到期续作的的购回交易
 	 */
 	private TrdProductTempDealAdd trdProductTempDealAddB;
-	
+
 	/**
 	 * 回购质押品
 	 */
 	private FinDealPledge finDealPledge;
-	
+
+	/**
+	 * 回购质押品列表
+	 */
+	private List<FinDealPledge> finDealPledgeList;
+
 	/**
 	 * 交易类金融产品
 	 */
 	private FinTradeProduct finTradeProduct;
-	
+
 	/**
 	 * 金融产品分类
 	 */
@@ -188,7 +196,7 @@ public class TrdTempDto extends TrdProductDeal{
 	 * 委托数量
 	 */
 	private BigDecimal entrustAmt;
-	
+
 	/**
 	 * 委托额度
 	 */
@@ -198,7 +206,7 @@ public class TrdTempDto extends TrdProductDeal{
 	 * 委托单价
 	 */
 	private BigDecimal price;
-	
+
 	/**
 	 * 完成数量
 	 */
@@ -208,7 +216,7 @@ public class TrdTempDto extends TrdProductDeal{
 	 * 通道性质
 	 */
 	private String payType;
-	
+
 	/**
 	 * 金额信息
 	 */
@@ -238,7 +246,7 @@ public class TrdTempDto extends TrdProductDeal{
 	 * 托管户剩余现金
 	 */
 	private BigDecimal accAvailableCash;
-	
+
 	/**
 	 * 资金账户可用现金
 	 */
@@ -257,7 +265,7 @@ public class TrdTempDto extends TrdProductDeal{
 	 * 印花税
 	 */
 	private BigDecimal stampDuty;
-	
+
 	/**
 	 * 佣金
 	 */
@@ -267,7 +275,7 @@ public class TrdTempDto extends TrdProductDeal{
 	 * 印花税是否随交易支付
 	 */
 	private String stampDutyIsPayWithTrade;
-	
+
 	/**
 	 * 佣金是否随交易支付
 	 */
@@ -277,12 +285,12 @@ public class TrdTempDto extends TrdProductDeal{
 	 * 是否手工交收
 	 */
 	private String isManualSettle;
-	
+
 	/**
 	 * 交易保证金
 	 */
 	private BigDecimal dealMargin;
-	
+
 	/**
 	 * 质押券置换临时表
 	 */
@@ -752,7 +760,7 @@ public class TrdTempDto extends TrdProductDeal{
 	public void setPageModel(String pageModel) {
 		this.pageModel = pageModel;
 	}
-	
+
 	/**
 	 * 获取 trdProductTempDeal
 	 *
@@ -825,7 +833,7 @@ public class TrdTempDto extends TrdProductDeal{
 	public void setFinDealPledge(FinDealPledge finDealPledge) {
 		this.finDealPledge = finDealPledge;
 	}
-	
+
 	/**
 	 * 获取 finTradeProduct
 	 *
@@ -1098,7 +1106,7 @@ public class TrdTempDto extends TrdProductDeal{
 		this.price = price;
 	}
 
- 
+
 	/**
 	 * 获取 actPortfolioId
 	 *
@@ -1155,5 +1163,28 @@ public class TrdTempDto extends TrdProductDeal{
 
 	public void setOrderId(String orderId) {
 		this.orderId = orderId;
+	}
+
+	public static long getSerialVersionUID() {
+		return serialVersionUID;
+	}
+
+	public List<FinDealPledge> getFinDealPledgeList() {
+		return finDealPledgeList;
+	}
+
+	public void setFinDealPledgeList(List<FinDealPledge> finDealPledgeList) {
+		this.finDealPledgeList = finDealPledgeList;
+	}
+
+	@ApiModelProperty(required = false, name = "entrustBussType", value = "指令业务类型")
+	private String entrustBussType;
+
+	public String getEntrustBussType() {
+		return entrustBussType;
+	}
+
+	public void setEntrustBussType(String entrustBussType) {
+		this.entrustBussType = entrustBussType;
 	}
 }

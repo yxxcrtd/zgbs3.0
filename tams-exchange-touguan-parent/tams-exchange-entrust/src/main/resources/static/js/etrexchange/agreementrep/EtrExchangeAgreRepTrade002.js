@@ -124,9 +124,9 @@
         if(etrData.trader){
             $("#trader").val(etrData.trader).trigger('change');
         }
-        if(etrData.counterTrader){
-            $("#counterTrader").val(etrData.counterTrader).trigger('change');
-        }
+        // if(etrData.counterTrader){
+        //     $("#counterTrader").val(etrData.counterTrader).trigger('change');
+        // }
         if(etrData.tradeId){
             $("#tradeId").val(etrData.tradeId).trigger('change');
         }
@@ -155,7 +155,7 @@
      */
     var doReset = function(opt) {
         $("#trader").attr({maxlength:"6"});
-        $("#counterTrader").attr({maxlength:"6"});
+        // $("#counterTrader").attr({maxlength:"6"});
         //设置指令记录操作类型
         optType = ENTRUST_RECORD_NEW;
         $("#entrustId").val('').trigger('change');
@@ -192,7 +192,7 @@
         $("#origConRatio").val('').trigger('change');
         $("#counterId").val('').trigger('change');
         $("#trader").val('').trigger('change');
-        $("#counterTrader").val('').trigger('change');
+        // $("#counterTrader").val('').trigger('change');
         $("#tradeId").val('').trigger('change');
         $("#reqOnId").val('').trigger('change');
         $("#seatId").val('').trigger('change');
@@ -568,7 +568,7 @@
             //本方交易员
             $("#trader_div").show();
             //对手交易员
-            $("#counterTrader_div").show();
+            // $("#counterTrader_div").show();
             if(!tradeMarket || !ps || !repPs){
                 //新质押券
                 $("#newRepSecId_div").hide();
@@ -627,7 +627,7 @@
                 //本方交易员
                 $("#trader").attr("disabled", true);
                 //对手交易员
-                $("#counterTrader").attr("disabled", true);
+                // $("#counterTrader").attr("disabled", true);
                 //组合名称
                 $("#portfolioId").attr("disabled", false);
                 //资金账号
@@ -679,7 +679,7 @@
                     //本方交易员
                     $("#trader").attr("disabled", false);
                     //对手交易员
-                    $("#counterTrader").attr("disabled", false);
+                    // $("#counterTrader").attr("disabled", false);
                     //新质押券
                     $("#newRepSecId_div").hide();
                     //新折算比例
@@ -748,7 +748,7 @@
                     //本方交易员
                     $("#trader").attr("disabled", false);
                     //对手交易员
-                    $("#counterTrader").attr("disabled", false);
+                    // $("#counterTrader").attr("disabled", false);
                     //新质押券
                     $("#newRepSecId_div").hide();
                     //新折算比例
@@ -825,7 +825,7 @@
                         //本方交易员
                         $("#trader").attr("disabled", false);
                         //对手交易员
-                        $("#counterTrader").attr("disabled", false);
+                        // $("#counterTrader").attr("disabled", false);
                         //新质押券
                         $("#newRepSecId_div").hide();
                         //新折算比例
@@ -894,7 +894,7 @@
                         //本方交易员
                         $("#trader").attr("disabled", false);
                         //对手交易员
-                        $("#counterTrader").attr("disabled", false);
+                        // $("#counterTrader").attr("disabled", false);
                         //新质押券
                         $("#newRepSecId_div").hide();
                         //新折算比例
@@ -974,7 +974,7 @@
                         //本方交易员
                         $("#trader").attr("disabled", false);
                         //对手交易员
-                        $("#counterTrader").attr("disabled", false);
+                        // $("#counterTrader").attr("disabled", false);
                         //新质押券
                         $("#newRepSecId_div").hide();
                         //新折算比例
@@ -1043,7 +1043,7 @@
                         //本方交易员
                         $("#trader").attr("disabled", false);
                         //对手交易员
-                        $("#counterTrader").attr("disabled", false);
+                        // $("#counterTrader").attr("disabled", false);
                         //新质押券
                         $("#newRepSecId_div").hide();
                         //新折算比例
@@ -1120,7 +1120,7 @@
                         //本方交易员
                         $("#trader").attr("disabled", false);
                         //对手交易员
-                        $("#counterTrader").attr("disabled", false);
+                        // $("#counterTrader").attr("disabled", false);
                         //新质押券
                         $("#newRepSecId_div").hide();
                         //新折算比例
@@ -1195,7 +1195,7 @@
                         //本方交易员
                         $("#trader").attr("disabled", false);
                         //对手交易员
-                        $("#counterTrader").attr("disabled", false);
+                        // $("#counterTrader").attr("disabled", false);
                         //新质押券
                         $("#newRepSecId_div").hide();
                         //新折算比例
@@ -1295,7 +1295,7 @@
                         //本方交易员
                         $("#trader").attr("disabled", false);
                         //对手交易员
-                        $("#counterTrader").attr("disabled", false);
+                        // $("#counterTrader").attr("disabled", false);
 
                         //成交编号
                         $("#tradeId_div").show();
@@ -1377,7 +1377,7 @@
                         //本方交易员
                         $("#trader").attr("disabled", false);
                         //对手交易员
-                        $("#counterTrader").attr("disabled", false);
+                        // $("#counterTrader").attr("disabled", false);
 
                         //成交编号
                         $("#tradeId_div").show();
@@ -1455,7 +1455,7 @@
                         //本方交易员
                         $("#trader").attr("disabled", false);
                         //对手交易员
-                        $("#counterTrader").attr("disabled", false);
+                        // $("#counterTrader").attr("disabled", false);
 
                         //成交编号
                         $("#tradeId_div").show();
@@ -1529,7 +1529,7 @@
                         //本方交易员
                         $("#trader").attr("disabled", false);
                         //对手交易员
-                        $("#counterTrader").attr("disabled", false);
+                        // $("#counterTrader").attr("disabled", false);
 
                         //成交编号
                         $("#tradeId_div").show();
@@ -1838,6 +1838,15 @@
                     object.finprodId = tempFinprodData.finprodId;
                 }
             }
+            if(object.repSecNum){
+                object.repSecNum = object.repSecNum * 100;
+            }
+            if(object.newRepSecNum){
+                object.newRepSecNum = object.newRepSecNum * 100;
+            }
+            if(object.outRepSecNum){
+                object.outRepSecNum = object.outRepSecNum * 100;
+            }
 
             if (object.operateType === 'save') {
                 Joyin.confirm("请确认是否要保存？",function() {
@@ -1895,6 +1904,18 @@
 //            entrustNumChange();
 //            psChange();
 //            priceModelChange(true);
+                    var repSecNum = $("#repSecNum").val();
+                    if(repSecNum){
+                        $("#repSecNum").val(repSecNum/100);
+                    }
+                    var newRepSecNum = $("#newRepSecNum").val();
+                    if(newRepSecNum){
+                        $("#newRepSecNum").val(newRepSecNum/100);
+                    }
+                    var outRepSecNum = $("#outRepSecNum").val();
+                    if(outRepSecNum){
+                        $("#outRepSecNum").val(outRepSecNum/100);
+                    }
                     var ps =  $("#ps").val();
                     if(ps == 'T93' || ps == 'T94'
                         || ps == 'T95' || ps == 'T96'){

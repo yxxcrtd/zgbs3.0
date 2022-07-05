@@ -1,27 +1,50 @@
 package com.joyintech.tams.exchange.service.trade.management.service;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.exchange.common.bean.*;
+import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveQryRequest;
+import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveRequest;
+import com.joyintech.tams.exchange.common.bean.response.quote.repurchase.*;
 import com.joyintech.tams.exchange.common.cache.QuoteTickService;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
-import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
+import com.joyintech.tams.exchange.common.db.domain.Instruction;
+import com.joyintech.tams.exchange.common.db.domain.InstructionPledge;
+import com.joyintech.tams.exchange.common.enums.exchange.QuoteStatusEnum;
+import com.joyintech.tams.exchange.common.enums.exchange.RepoBsEnum;
+import com.joyintech.tams.exchange.common.enums.exchange.RepurchaseTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.PledgeDisPlaceDirEnum;
+import com.joyintech.tams.exchange.common.enums.invest.PsEnum;
 import com.joyintech.tams.exchange.common.request.EntrustQueryRequest;
+import com.joyintech.tams.exchange.common.request.RepurchaseQuoteSendRequest;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import com.joyintech.tams.exchange.common.utils.TickConverter;
 import com.joyintech.tams.exchange.common.vo.IntegratedEntrustVo;
 import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
+import com.joyintech.tams.exchange.datacommon.db.service.InstructionPledgeService;
+import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
+import com.joyintech.tams.exchange.service.trade.processor.invest.InvestInterfaceHelper;
 import com.joyintech.tams.exchange.service.trade.processor.others.TerminalHelper;
 import com.joyintech.tams.exchange.service.trade.scheduled.quote.QuoteJob;
+import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.joyintech.tams.exchange.common.constant.EntrustStatus.*;
 
 /**
  * @ClassName IntegratedQuoteManagement
@@ -32,6 +55,11 @@ import java.util.stream.Collectors;
  **/
 @Component
 public class IntegratedQuoteManagement {
+    public static final String ROOT = "root";
+    /**
+     * 日志对象
+     */
+    private static final Logger log = LoggerFactory.getLogger(IntegratedQuoteManagement.class);
     @Autowired
     private TerminalHelper terminalHelper;
     @Autowired
@@ -43,6 +71,10 @@ public class IntegratedQuoteManagement {
     private FuturesInstrumentService futuresInstrumentService;
     @Autowired
     private EntrustManagement entrustManagement;
+    @Autowired
+    private InstructionService instructionService;
+    @Autowired
+    private InstructionPledgeService instructionPledgeService;
 
     public ResultBean getTick(String stockCode) {
         if ("*".equals(stockCode)) {
@@ -100,14 +132,14 @@ public class IntegratedQuoteManagement {
 
     public ResultBean queryNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean) {
         Map<String, Object> map = Maps.newHashMap();
-        map.put("root", terminalHelper.queryNegotiateQuoteReceive(negotiateQuoteQueryBean));
+        map.put(ROOT, terminalHelper.queryNegotiateQuoteReceive(negotiateQuoteQueryBean));
         return new ResultBean(ErrorCode.SUCCESS, map);
     }
 
     public ResultBean queryNegotiateQuoteSend(EntrustQueryRequest request) {
         ResultBean resultBean = entrustManagement.queryIntegratedEntrust(request.getUserId(), request.getInstructionId(), request.getAccountId(), request.getOrderId());
         if (null != resultBean && null != resultBean.getData()) {
-            List<NegotiateQuoteSendBean> retList = new ArrayList<NegotiateQuoteSendBean>();
+            List<NegotiateQuoteSendBean> retList = new ArrayList<>();
             List<IntegratedEntrustVo> entrustList = (List<IntegratedEntrustVo>) resultBean.getData();
             for (IntegratedEntrustVo integratedEntrust : entrustList) {
                 if (integratedEntrust.getEntrustStatus() == EntrustStatus.REPORTED.value
@@ -132,7 +164,7 @@ public class IntegratedQuoteManagement {
                 }
             }
             Map<String, Object> map = Maps.newHashMap();
-            map.put("root", retList);
+            map.put(ROOT, retList);
             return new ResultBean(ErrorCode.SUCCESS, map);
         }
         return resultBean;
@@ -169,6 +201,354 @@ public class IntegratedQuoteManagement {
         negotiateQuoteSendBean.setInvestorTypeStr(investorTypeName);
         String cpInvestorTypeName = EnumUtil.getDescriptionByCode(InvestorType.class, negotiateQuoteSendBean.getCpInvestorType());
         negotiateQuoteSendBean.setCpInvestorTypeStr(cpInvestorTypeName);
+    }
+
+    public ResultBean addIntegratedRepurchaseQuoteReceive(RepurchaseQuoteReceiveResponse bean) {
+        if (ObjectUtil.isNull(bean)) {
+            return ResultBean.error(ErrorCode.REQ_PARAMETER_ERROR);
+        }
+
+        quoteJob.addIntegratedRepurchaseQuoteReceive(bean);
+        return ResultBean.success();
+    }
+
+    /**
+     * 我收到的协议回购行情
+     *
+     * @param request 查询条件对象
+     * @return 我收到的协议回购行情
+     */
+    public ResultBean queryRepurchaseQuoteReceive(RepurchaseQuoteReceiveRequest request) {
+        List<RepurchaseQuoteReceiveResponse> list = Lists.newArrayList();
+
+        RepurchaseQuoteReceiveQryRequest quoteQryBean = new RepurchaseQuoteReceiveQryRequest();
+//        Instruction instruction = instructionService.findById(request.getInstructionId());
+//        String entrustProp = EntrustPropUtils.getEntrustProp(instruction, quoteQryBean.getEntrustProp());
+//        quoteQryBean.setEntrustProp(entrustProp);
+//        quoteQryBean.setAccountId(instruction.getAcctNo());
+
+        List<RepurchaseQuoteReceiveResponse> beanList = terminalHelper.queryRepurchaseQuoteReceive(quoteQryBean);
+        if (CollectionUtils.isNotEmpty(beanList)) {
+//            RepurchaseQuoteReceiveResponse response = null;
+//            for (RepurchaseQuoteReceiveResponse bean : beanList) {
+//                response = new RepurchaseQuoteReceiveResponse();
+//                filterRepurchaseQuoteReceive(response, bean);
+//
+//                list.add(response);
+//            }
+            list.addAll(beanList);
+            filterRepurchaseQuoteReceive(list, request);
+        }
+
+        return ResultBean.success(MapUtil.builder().put(ROOT, list).build());
+    }
+
+    private void filterRepurchaseQuoteReceive(RepurchaseQuoteReceiveResponse response, IntegratedRepurchaseQuoteBean bean) {
+        response.setRequestNo(bean.getEntrustNo() + "");
+        response.setRequestType(bean.getExchangeType());
+        response.setBs(bean.getEntrustBs());
+        response.setTradeMarket(null);
+        response.setStockCode(bean.getStockCode());
+        response.setStockName(bean.getStockName());
+        response.setPledgeNumber(BigDecimal.valueOf(bean.getImpawnAmount()));
+        response.setRepoAmount(null);
+        response.setRepoRate(null);
+        response.setDiscount(BigDecimal.valueOf(bean.getFunderRatio()));
+        response.setFirstSettleDate(bean.getFirstExchdate() + "");
+        response.setCompactTerm(bean.getRepoTerm());
+        response.setBackDate(bean.getSettleEndDate() + "");
+        response.setRepoMdate(bean.getRepurchaseDate() + "");
+        response.setCapDays(bean.getFundUsedDays());
+        response.setSwapIntoBonds(bean.getStockCode());
+        response.setSwapIntoBondsName(bean.getStockName());
+        response.setSwapIntoBondsVolume(null);
+        response.setSwapOutBonds(null);
+        response.setSwapOutBondsName(null);
+        response.setSwapOutBondsVolume(null);
+        response.setOrigBonds(bean.getOldImpawnCode());
+        response.setOrigBondsName(null);
+        response.setOrigBondsVolume(null);
+        response.setOrigRepoAmount(BigDecimal.valueOf(bean.getPrevImpawnBalance()));
+        response.setTransCode("");
+        response.setmIntAmt(BigDecimal.valueOf(bean.getProfit()));
+        response.setBackBalance(BigDecimal.valueOf(bean.getSettleBalance()));
+
+        response.setTraderCode(bean.getTraderId());
+        response.setMemberId(bean.getAgencyNo());
+        response.setInvestorId(null);
+        response.setInvestorType(null);
+
+        response.setCpTraderCode(bean.getOppoTraderId());
+        response.setCpMemberId(bean.getOppoAgency());
+        response.setCpInvestorId(null);
+        response.setCpInvestorType(null);
+
+        response.setCpClientName(null);
+        response.setOrigSerialNo(null);
+        response.setRemark(bean.getRemark());
+        response.setAccount(bean.getFundAccount());
+        response.setAccountName(null);
+    }
+
+
+    private void filterRepurchaseQuoteReceive(List<RepurchaseQuoteReceiveResponse> list, RepurchaseQuoteReceiveRequest request) {
+        log.info("filterRepurchaseQuoteReceive() called with parameters => 【list = {}】, 【request = {}】", list, request);
+        if (ObjectUtil.isEmpty(request)) {
+            return;
+        }
+        Stream<RepurchaseQuoteReceiveResponse> stream = list.stream();
+
+        String requestNo = request.getRequestNo();
+        if (ObjectUtil.isNotEmpty(requestNo)) {
+            stream = stream.filter(item -> StrUtil.equals(item.getRequestNo(), requestNo));
+        }
+
+        String origSerialNo = request.getOrigSerialNo();
+        if (ObjectUtil.isNotEmpty(origSerialNo)) {
+            stream = stream.filter(item -> StrUtil.equals(item.getOrigSerialNo(), origSerialNo));
+        }
+
+        String account = request.getAccount();
+        if (ObjectUtil.isNotEmpty(account)) {
+            stream = stream.filter(item -> (ObjectUtil.isNotEmpty(item.getAccount()) && item.getAccount().contains(account))
+                    || (ObjectUtil.isNotEmpty(item.getAccountName()) && item.getAccountName().contains(account)));
+        }
+
+        String requestType = request.getRequestType();
+        if (ObjectUtil.isNotEmpty(requestType)) {
+            stream = stream.filter(item -> StrUtil.equals(item.getRequestType(), requestType));
+        }
+
+        String stockCode = request.getStockCode();
+        if (ObjectUtil.isNotEmpty(stockCode)) {
+            stream = stream.filter(item -> (ObjectUtil.isNotEmpty(item.getStockCode()) && item.getStockCode().contains(stockCode))
+                    || (ObjectUtil.isNotEmpty(item.getStockName()) && item.getStockName().contains(stockCode)));
+        }
+
+        BigDecimal pledgeNumber = request.getPledgeNumber();
+        if (ObjectUtil.isNotEmpty(pledgeNumber)) {
+            stream = stream.filter(item -> NumberUtil.equals(item.getPledgeNumber(), pledgeNumber));
+        }
+
+        BigDecimal repoAmount = request.getRepoAmount();
+        if (ObjectUtil.isNotEmpty(repoAmount)) {
+            stream = stream.filter(item -> NumberUtil.equals(NumberUtil.round(item.getRepoAmount(), 2), repoAmount));
+        }
+
+        Integer compactTerm = request.getCompactTerm();
+        if (ObjectUtil.isNotEmpty(compactTerm)) {
+            stream = stream.filter(item -> NumberUtil.equals(item.getCompactTerm(), compactTerm));
+        }
+
+        BigDecimal repoRate = request.getRepoRate();
+        if (ObjectUtil.isNotEmpty(repoRate)) {
+            stream = stream.filter(item -> NumberUtil.equals(NumberUtil.round(item.getRepoRate(), 3), repoRate));
+        }
+
+        BigDecimal settleAmount = request.getSettleAmount();
+        if (ObjectUtil.isNotEmpty(settleAmount)) {
+            stream = stream.filter(item -> NumberUtil.equals(NumberUtil.round(item.getBackBalance(), 2), settleAmount));
+        }
+
+        String firstSettleDate = request.getFirstSettleDate();
+        if (ObjectUtil.isNotEmpty(firstSettleDate)) {
+            stream = stream.filter(item -> StrUtil.equals(item.getFirstSettleDate(), firstSettleDate));
+        }
+
+        String remark = request.getRemark();
+        if (ObjectUtil.isNotEmpty(remark)) {
+            stream = stream.filter(item -> StrUtil.equals(item.getRemark(), remark));
+        }
+
+        List<RepurchaseQuoteReceiveResponse> filterList = stream.collect(Collectors.toList());
+        list.clear();
+        list.addAll(filterList);
+    }
+
+    /**
+     * 我发起的协议回购行情
+     * 查询本地委托信息，只查询委托状态为 待确认/已成交/已回复/已撤销 的数据
+     *
+     * @param request 查询条件对象
+     * @return 我发起的协议回购行情
+     */
+    public ResultBean queryRepurchaseQuoteSend(RepurchaseQuoteSendRequest request) {
+        ResultBean resultBean = entrustManagement.queryIntegratedEntrust(request.getUserId(),
+                request.getInstructionId(), request.getAccountId(), request.getOrderId());
+        if (ErrorCode.isFail(resultBean.getErrorCode()) || ObjectUtil.isEmpty(resultBean.getData())) {
+            return resultBean;
+        }
+
+        List<BaseRepurchaseQuoteSendResponse> retList = Lists.newArrayList();
+        List<IntegratedEntrustVo> entrustList = (List<IntegratedEntrustVo>) resultBean.getData();
+
+        BaseRepurchaseQuoteSendResponse sendBean;
+        for (IntegratedEntrustVo integratedEntrust : entrustList) {
+            int entrustStatus = integratedEntrust.getEntrustStatus();
+            Instruction instruction = instructionService.findById(integratedEntrust.getInstructionId());
+            if (ObjectUtil.isNull(instruction)) {
+                log.warn("查询指令失败，无法组装我发起的协议回购行情 => 【entrustId = {}】，【instructionId = {}】", integratedEntrust.getId(), integratedEntrust.getInstructionId());
+                continue;
+            }
+            sendBean = createSendQuoteByIntegratedEntrust(integratedEntrust, instruction);
+
+            if (EnumUtil.in(entrustStatus, REPORTED, REPORTED_TOBE_CANCEL)) {
+                sendBean.setRequestStatus(QuoteStatusEnum.TO_BE_CONFIRMED.getCode());
+            } else if (CANCELED.codeEquals(entrustStatus)) {
+                sendBean.setRequestStatus(QuoteStatusEnum.REVOKED.getCode());
+            } else if (EnumUtil.in(entrustStatus, PART_TRADED_TOBE_CANCELED, PART_SUCCESS, PART_TRADED_CANCELED, SUCCEEDED)) {
+                sendBean.setRequestStatus(QuoteStatusEnum.DEAL_DONE.getCode());
+            }
+
+//            fillRepurchaseQuoteSendResponseDescription(sendBean);
+
+            if (EnumUtil.in(entrustStatus, REPORTED, REPORTED_TOBE_CANCEL, CANCELED, PART_TRADED_CANCELED, PART_SUCCESS, PART_TRADED_CANCELED, SUCCEEDED)) {
+                retList.add(sendBean);
+            }
+        }
+
+        List<Integer> requestStatusList = request.getRequestStatus();
+        if (CollUtil.isNotEmpty(requestStatusList)) {
+            retList = retList.stream().filter(item -> requestStatusList.contains(item.getRequestStatus())).collect(Collectors.toList());
+        }
+
+        return ResultBean.success(MapUtil.builder().put(ROOT, retList).build());
+
+    }
+
+//    private void fillRepurchaseQuoteSendResponseDescription(BaseRepurchaseQuoteSendResponse sendBean) {
+//        sendBean.setRequestStatusStr(EnumUtil.getDescriptionByCode(QuoteStatusEnum.class, sendBean.getRequestStatus()));
+//        sendBean.setRequestTypeStr(EnumUtil.getDescriptionByCode(RepurchaseTypeEnum.class, sendBean.getRequestType()));
+//        sendBean.setBsStr(EnumUtil.getDescriptionByCode(RepoBsEnum.class, sendBean.getBs()));
+////        sendBean.setPledgeNumberStr();
+////        sendBean.setInvestorTypeStr();
+////        sendBean.setCpInvestorTypeStr();
+//    }
+
+    private BaseRepurchaseQuoteSendResponse createSendQuoteByIntegratedEntrust(IntegratedEntrustVo entrust, Instruction instruction) {
+
+        BaseRepurchaseQuoteSendResponse baseRepurchaseQuoteSendResponse ;
+        String busiTypeTg = entrust.getBusiTypeTg();
+        // 正回购
+        if (RepurchaseTypeEnum.首期.getBusiTypeTgCode().equals(busiTypeTg) ) {
+            baseRepurchaseQuoteSendResponse = new SQRepurchaseQuoteSendResponse();
+            baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.首期.getCode());
+
+            fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse, instruction);
+        }
+
+        // 中途换券
+        else if (RepurchaseTypeEnum.中途换券.getBusiTypeTgCode().equals(busiTypeTg)) {
+            baseRepurchaseQuoteSendResponse = new ZTHQRepurchaseQuoteSendResponse();
+            baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.中途换券.getCode());
+            ((NonFirstBaseRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse).setOrigSerialNo(entrust.getOrigSerialNo());
+
+            ZTHQRepurchaseQuoteSendResponse sendResponse = (ZTHQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
+
+            sendResponse.setDiscount(entrust.getDiscount());
+            sendResponse.setExchangeAmount(instruction.getEntrustAmt());
+            List<InstructionPledge> pledges = instructionPledgeService.queryInstructionPledgesByInstructionId(instruction.getEntrustId());
+            InstructionPledge swapInPledge = pledges.stream().filter(item -> PledgeDisPlaceDirEnum.SWAP_IN.codeEquals(item.getDisplaceDir())).findFirst().orElse(null);
+            if (ObjectUtil.isNotNull(swapInPledge)) {
+                sendResponse.setNewDiscount(swapInPledge.getPledgeRatio());
+                sendResponse.setSwapIntoBonds(swapInPledge.getFinprodMarketId());
+                sendResponse.setSwapIntoBondsVolume(swapInPledge.getPledgeNumber());
+            }
+            InstructionPledge swapOutPledge = pledges.stream().filter(item -> PledgeDisPlaceDirEnum.SWAP_OUT.codeEquals(item.getDisplaceDir())).findFirst().orElse(null);
+            if (ObjectUtil.isNotNull(swapOutPledge)) {
+                sendResponse.setSwapOutBonds(swapOutPledge.getFinprodMarketId());
+                sendResponse.setSwapOutBondsVolume(swapOutPledge.getPledgeNumber());
+            }
+        }
+
+        // 提前购回
+        else if (RepurchaseTypeEnum.提前购回.getBusiTypeTgCode().equals(busiTypeTg)) {
+            baseRepurchaseQuoteSendResponse = new TQGHRepurchaseQuoteSendResponse();
+            baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.提前购回.getCode());
+            ((TQGHRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse).setOrigSerialNo(entrust.getOrigSerialNo());
+
+            fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse, instruction);
+
+            TQGHRepurchaseQuoteSendResponse sendResponse = (TQGHRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
+            sendResponse.setRepoAdvanceDate(DateUtil.getSysDate());
+        }
+
+        // 到期购回
+/*        else if (RepurchaseTypeEnum.首期.getBusiTypeTgCode().equals(busiTypeTg)) {
+            baseRepurchaseQuoteSendResponse.setRequestType(RepoTypeEnum.REPO_MATURITY.getCode());
+
+            fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse);
+
+            DQGHRepurchaseQuoteSendResponse sendResponse = (DQGHRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
+
+            sendResponse.setCompactTerm(entrust.getCompactTerm());
+        }*/
+
+        // 到期续做
+        else if (RepurchaseTypeEnum.到期续做.getBusiTypeTgCode().equals(busiTypeTg)) {
+            baseRepurchaseQuoteSendResponse = new DQXZRepurchaseQuoteSendResponse();
+            baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.到期续做.getCode());
+            ((DQXZRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse).setOrigSerialNo(entrust.getOrigSerialNo());
+
+            fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse, instruction);
+
+            DQXZRepurchaseQuoteSendResponse sendResponse = (DQXZRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
+
+            sendResponse.setCompactTerm(entrust.getCompactTerm());
+        }
+
+        // 解除质押
+        else if (RepurchaseTypeEnum.解除质押.getBusiTypeTgCode().equals(busiTypeTg)) {
+            baseRepurchaseQuoteSendResponse = new JCZYRepurchaseQuoteSendResponse();
+            baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.解除质押.getCode());
+            ((NonFirstBaseRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse).setOrigSerialNo(entrust.getOrigSerialNo());
+
+            JCZYRepurchaseQuoteSendResponse sendResponse = (JCZYRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
+            sendResponse.setSettleAmount(instruction.getEntrustAmt());
+        } else {
+            baseRepurchaseQuoteSendResponse = new BaseRepurchaseQuoteSendResponse();
+        }
+
+        baseRepurchaseQuoteSendResponse.setStockCode(entrust.getStockCode());
+        baseRepurchaseQuoteSendResponse.setStockName(entrust.getStockName());
+        baseRepurchaseQuoteSendResponse.setPledgeNumber(BigDecimal.valueOf(entrust.getEntrustVolume()));
+        baseRepurchaseQuoteSendResponse.setCounterId(entrust.getCounterId());
+        baseRepurchaseQuoteSendResponse.setTraderCode(entrust.getTradeId());
+        baseRepurchaseQuoteSendResponse.setTraderCodeStr(entrust.getTradeName());
+        baseRepurchaseQuoteSendResponse.setMemberId(entrust.getDealerId());
+        baseRepurchaseQuoteSendResponse.setMemberIdStr(entrust.getDealerName());
+        baseRepurchaseQuoteSendResponse.setInvestorId(entrust.getInvestorId());
+        baseRepurchaseQuoteSendResponse.setInvestorIdStr(entrust.getInvestorName());
+        baseRepurchaseQuoteSendResponse.setInvestorType(entrust.getOwnerType());
+        baseRepurchaseQuoteSendResponse.setInvestorTypeStr(entrust.getOwnerType());
+        baseRepurchaseQuoteSendResponse.setCpTraderCode(entrust.getPropTradeId());
+        baseRepurchaseQuoteSendResponse.setCpTraderCodeStr(entrust.getPropTradeName());
+        baseRepurchaseQuoteSendResponse.setCpMemberId(entrust.getPropDealerId());
+        baseRepurchaseQuoteSendResponse.setCpMemberIdStr(entrust.getPropDealerName());
+        baseRepurchaseQuoteSendResponse.setCpInvestorId(entrust.getPropInvestorId());
+        baseRepurchaseQuoteSendResponse.setCpInvestorIdStr(entrust.getPropInvestorName());
+        baseRepurchaseQuoteSendResponse.setInvestorId(entrust.getInvestorId());
+        baseRepurchaseQuoteSendResponse.setInvestorIdStr(entrust.getInvestorName());
+        baseRepurchaseQuoteSendResponse.setCpInvestorType(entrust.getPropOwnerType());
+        baseRepurchaseQuoteSendResponse.setCpInvestorTypeStr(entrust.getPropOwnerType());
+        baseRepurchaseQuoteSendResponse.setCpClientName(entrust.getPortfolioName());
+        baseRepurchaseQuoteSendResponse.setRemark(entrust.getRemark());
+        baseRepurchaseQuoteSendResponse.setBs(entrust.getPs());
+
+        return baseRepurchaseQuoteSendResponse;
+    }
+
+    private void fillSQQuoteSendResponse(IntegratedEntrustVo entrust, SQRepurchaseQuoteSendResponse baseRepurchaseQuoteSendResponse, Instruction instruction) {
+        baseRepurchaseQuoteSendResponse.setBackBalance(entrust.getBackBalance());
+        baseRepurchaseQuoteSendResponse.setBackDate(entrust.getBackDate());
+        baseRepurchaseQuoteSendResponse.setCapDays(instruction.getCapDays().intValue());
+        baseRepurchaseQuoteSendResponse.setDiscount(entrust.getDiscount());
+        baseRepurchaseQuoteSendResponse.setmIntAmt(NumberUtil.sub(entrust.getBackBalance(), entrust.getEntrustBalance()));
+        baseRepurchaseQuoteSendResponse.setRepoAmount(entrust.getEntrustBalance());
+        baseRepurchaseQuoteSendResponse.setRepoRate(entrust.getEntrustPrice());
+        baseRepurchaseQuoteSendResponse.setRepoMdate(DateUtil.format(instruction.getRepoMdate()));
+        baseRepurchaseQuoteSendResponse.setFirstSettleDate(entrust.getFirstSettleDate());
+        baseRepurchaseQuoteSendResponse.setBackDate(entrust.getBackDate());
     }
 }
 

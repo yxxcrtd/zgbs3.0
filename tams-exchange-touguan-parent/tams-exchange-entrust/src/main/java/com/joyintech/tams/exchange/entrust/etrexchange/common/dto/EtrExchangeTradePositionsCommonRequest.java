@@ -62,6 +62,10 @@ public class EtrExchangeTradePositionsCommonRequest {
     private String finprodMarketIds;
     @ApiModelProperty(name="tradePlat",value="交易平台",example="A")
     private String tradePlat;
+    @ApiModelProperty(name="assetType",value="资产类型",example="A1")
+    private String assetType;
+
+
 
     @ApiModelProperty(name="queryList",value="导出时传入整个列表",example="A1")
     private List<EtrExchangeTradePositionsCommonResponse> queryList;
@@ -178,4 +182,12 @@ public class EtrExchangeTradePositionsCommonRequest {
     public void setQueryList(List<EtrExchangeTradePositionsCommonResponse> queryList) {
         this.queryList = queryList;
     }
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
+    }
+
 }

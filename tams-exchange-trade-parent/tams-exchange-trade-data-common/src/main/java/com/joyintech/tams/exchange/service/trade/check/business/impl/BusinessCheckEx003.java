@@ -1,26 +1,27 @@
 package com.joyintech.tams.exchange.service.trade.check.business.impl;
 
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
+import com.joyintech.tams.exchange.service.trade.check.business.AbstractCheck;
 import com.joyintech.tams.exchange.service.trade.check.business.Check;
-import com.joyintech.tams.exchange.service.trade.check.business.IBusinessCheck;
-import com.joyintech.tams.exchange.service.trade.check.chain.CheckChainBean;
+import com.joyintech.tams.exchange.service.trade.check.business.CheckBean;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 /**
- * 行权
+ * 行权-回售
  *
  * @author lifangpeng
  * @date 2022/4/6 17:06
  */
 @Check(action = "EX003")
 @Component
-public class BusinessCheckEx003 implements IBusinessCheck {
+public class BusinessCheckEx003 extends AbstractCheck {
 
     @Override
-    public void check(CheckChainBean chainBean) {
+    public void doBusinessCheck(CheckBean chainBean) {
+        super.doBusinessCheck(chainBean);
         Map<String, Object> checkRsp = chainBean.getCheckRsp();
         Instruction instruction = chainBean.getInstruction();
         if (StringUtils.isBlank(instruction.getStockHolderNo())) {

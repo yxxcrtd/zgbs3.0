@@ -216,7 +216,10 @@ public class ExchangeTransMatchRepo5Service extends ExchangeTransMatchRepoCommon
         dealTotal.setmDeliveryType(DictCodeListExt1.结算方式_券款对付.getValue());
         // 备注
         dealTotal.setRemark("数据清算自动处理");
-
+        // 本方交易员
+        dealTotal.setTrader(dealDto.getTrader());
+        // 对手方交易员
+        dealTotal.setCounterTrader(dealDto.getCounterTrader());
         return dealTotal;
     }
 
@@ -347,7 +350,7 @@ public class ExchangeTransMatchRepo5Service extends ExchangeTransMatchRepoCommon
             // 证券管理户代码
             trdProductDeal.setSecManageAcctId(settleTransData.getSecAcctId());
             // 关联系统交易编号
-            trdProductDeal.setfTradeId(null);
+            trdProductDeal.setfTradeId(dealDto.getSeqId());
             // 现金流代码
             trdProductDeal.setCashId(null);
             // 登记托管机构

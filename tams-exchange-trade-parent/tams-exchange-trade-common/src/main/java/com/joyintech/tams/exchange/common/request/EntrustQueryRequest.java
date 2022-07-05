@@ -13,8 +13,11 @@ public class EntrustQueryRequest extends BaseRequest {
 	@ApiModelProperty(required = false, name = "instructionId", value = "指令Id", example = "")
 	private String instructionId;
 	
-	@ApiModelProperty(required = false, name = "orderId", value = "订单Id", example = "")
+	@ApiModelProperty(required = false, name = "orderId", value = "订单Id", example = "o2022030568941")
 	private String orderId;
+
+	@ApiModelProperty(required = false, name = "requestStatus", value = "请求状态", example = "3")
+	private Integer requestStatus;
 
 	public String getAccountId() {
 		return accountId;
@@ -39,5 +42,12 @@ public class EntrustQueryRequest extends BaseRequest {
 	public void setOrderId(String orderId) {
 		this.orderId = orderId;
 	}
-	
+
+	public Integer getRequestStatus() {
+		return requestStatus;
+	}
+
+	public void setRequestStatus(Integer requestStatus) {
+		this.requestStatus = requestStatus;
+	}
 }

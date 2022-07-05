@@ -28,6 +28,7 @@ import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dao.EtrExchangeAgreRepTradeMapper;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.*;
+import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.enums.RepurchaseTypeEnum;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeTradePositionsCommonRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeUnitCostDto;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.service.EtrExchangeTradeCommon002Service;
@@ -85,6 +86,8 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
     public static final String ENTRUST_RECORD_NEW = "new";
 
     public static String queryrRepurchaseQuote = "/joyin/entrust/integrated/repurchase_quote";
+
+    public static String queryrRepurchaseQuoteNew = "/joyin/entrust/integrated/repurchaseQuoteReceive";
 
     public static String queryIntegratedTick = "/joyin/quote/tick";
     /**
@@ -173,6 +176,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
                 secDto.setTradePlat(TempConstant.AGR_EREP_ETR); //临时变量
                 secDto.setHoldingType(DictCodeListExt3.资产类型_质押式协议回购本方券非净额结算可用持仓.getValue());
                 BigDecimal canRepoNum=etrTradeCommonervice.selectAvailableNum(secDto);
+                canRepoNum=canRepoNum==null?BigDecimal.ZERO:ArithmeticUtil.divide(canRepoNum,new BigDecimal(100),2);
                 entity.setSellNum(canRepoNum);
                 //过滤掉实际持仓和可用持仓都等于0
                 if(entity.getPositionsNum().compareTo(BigDecimal.ZERO)==0&&canRepoNum.compareTo(BigDecimal.ZERO)==0){
@@ -646,6 +650,8 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         param.put("portfolioIdList", request.getPortfolioIdList());
         param.put("zyj", request.getZyj());
         param.put("search_isNumberFlag", BaseMap.isNumeric(request.getKeywords()));
+        param.put("DISPLACE DIRECTION_01", DictCodeListExt3.质押券置换_置换方向_换入.getValue());
+
         Page<EtrExchangeAgreRepTrade003Dto> page =  super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> etrExchangeAgreRepTradeMapper.selectEtrEntrust(param));
 
         List<SysUser> userList = restTemplate.postForList(ServiceApplication.ENTRUST_SERVICE_NAME + "/EntrustCommon/getAllUserList",
@@ -660,4 +666,308 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         }
         return page;
     }
+
+    /**
+     * 调用非公开行情接口
+     * @param request
+     * @return
+     */
+    public Page<EtrExchangeUnOpenQuota002Dto> findUnOpenQuotaPageNew(EtrExchangeUnOpenQuotaRequestDto request) {
+        Page<EtrExchangeUnOpenQuota002Dto> page = new Page<>();
+        List<EtrExchangeUnOpenQuota002Dto> list = new ArrayList<>();
+        List<Map<String, Object>> repurchaseQuotes = new ArrayList<>();
+        //接行情数据  start
+        String param = "?action_in=1";
+        //actionIn   0：公开行情查询 1:非公开行情查询
+        // entrustProp 非必填
+        Map quoteMap = restTemplate.postForObject(ServiceApplication.EXCHANGE_SERVICE_NAME + queryrRepurchaseQuoteNew,request, Map.class);
+        if (quoteMap != null && quoteMap.get("data") != null) {
+            Map dataMap=(Map)quoteMap.get("data");
+            if (dataMap != null && dataMap.get("root") != null) {
+                List<Map<String, Object>> quoteList = (List<Map<String, Object>>) dataMap.get("root");
+                if (!StringUtil.isEmptyList(quoteList)) {
+                    repurchaseQuotes.addAll(quoteList);
+                }
+            }
+        }
+        //接行情数据 end
+
+
+        //去重
+        HashSet<String> hSet = new HashSet<>();
+        List<Map<String, Object>> newRepurchaseQuotes = new ArrayList<>();
+        List<String> stockCodes = new ArrayList<>();
+        List<String> origPledgeList = new ArrayList<>();
+        repurchaseQuotes.forEach(temp->{
+            if(StringUtil.isNotEmpty(temp.get("requestNo"))&&hSet.add(temp.get("requestNo").toString())){
+                newRepurchaseQuotes.add(temp);
+                // 质押券代码
+                if (StringUtil.isNotEmpty(temp.get("stockCode"))) {
+                    stockCodes.add(temp.get("stockCode").toString());
+                }
+                // 原质押券代码
+                if (StringUtil.isNotEmpty(temp.get("origBonds"))) {
+                    origPledgeList.add(temp.get("origBonds").toString());
+                }
+            }
+        });
+        hSet.clear();repurchaseQuotes.clear();
+        List<Map<String,Object>> faceValues = new ArrayList<>();
+        //封装dto
+        //处理标的和面值
+        Map<String,Object> tempPara = new HashMap<String, Object>();
+        tempPara.put("finprodMarketIdList",stockCodes);
+        tempPara.put("tradeDate",DateUtil.getSysDate());
+        if (stockCodes.size() > 0) {
+            faceValues.addAll(restTemplate.postForObject(
+                    ServiceApplication.BASICDATA_SERVICE_NAME + "/MstSecuritiesAccountInfo/getFaceValueList", tempPara,
+                    List.class));
+        }
+        final Map<String, Object> faceValueMap =
+                StringUtil.isEmptyList(faceValues) ? new HashMap<>() : faceValues.stream().collect(JoyinCollectors.toMap(x -> x.get("finprodMarketId").toString(), x -> x.get("faceValue")));
+
+        // 原质押券资产信息
+        List<FinProduct> origPledgeFinProductList = null;
+        if (!StringUtil.isEmptyList(origPledgeList)) {
+            Map<String,Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("finprodMarketIdList", origPledgeList);
+            origPledgeFinProductList = etrExchangeAgreRepTradeMapper.selectFinProductData(paramMap);
+        }
+        final Map<String, String> origPledgeFinProductMap = StringUtil.isEmptyList(origPledgeFinProductList) ? new HashMap<>() :
+                origPledgeFinProductList.stream().collect(JoyinCollectors.toMap(x -> x.getFinprodMarketId(), x -> x.getFinprodAbbr()));
+
+        newRepurchaseQuotes.forEach(tmp -> {
+            EtrExchangeUnOpenQuota002Dto dto = new EtrExchangeUnOpenQuota002Dto();
+            //资金账号
+            ///dto.setAcctNo(model.getId());
+//            if(StringUtil.isNotEmpty(tmp.get("account_id").toString())){
+//                dto.setAcctNo(tmp.get("account_id").toString());
+//            }
+            // 请求号
+            if (StringUtil.isNotEmpty(tmp.get("requestNo"))) {
+                dto.setReqOnId(tmp.get("requestNo").toString());
+            }
+            // 对手方请求类型
+            if (StringUtil.isNotEmpty(tmp.get("requestType"))) {
+                dto.setReqType(cn.hutool.core.util.EnumUtil.getFieldBy(RepurchaseTypeEnum::getPs, RepurchaseTypeEnum::getCode, tmp.get("requestType").toString()));
+            }
+            //对手方请求类型（首期、提前购回、中途换券、到期续做、解除质押、到期购回）
+            if (StringUtil.isNotEmpty(tmp.get("requestTypeStr"))) {
+                dto.setReqTypeStr(tmp.get("requestTypeStr").toString());
+            }
+            //对手方委托方向
+            if (StringUtil.isNotEmpty(tmp.get("bs"))) {
+                dto.setPs(tmp.get("bs").toString());
+            }
+            //对手方委托方向
+            if (StringUtil.isNotEmpty(tmp.get("bsStr"))) {
+                dto.setPsStr(tmp.get("bsStr").toString());
+            }
+            // 交易场所
+            if (StringUtil.isNotEmpty(tmp.get("tradeMarket"))) {
+                dto.setTradeMarket(tmp.get("tradeMarket").toString());
+            }
+            // 交易场所
+            if (StringUtil.isNotEmpty(tmp.get("tradeMarketStr"))) {
+                dto.setTradeMarketStr(tmp.get("tradeMarketStr").toString());
+            }
+            // 质押券代码
+            if (StringUtil.isNotEmpty(tmp.get("stockCode"))) {
+                dto.setRepSecId(tmp.get("stockCode").toString());
+            }
+            // 质押券名称
+            if (StringUtil.isNotEmpty(tmp.get("stockName"))) {
+                dto.setPledgeStampName(tmp.get("stockName").toString());
+            }
+            // 质押数量
+            if (StringUtil.isNotEmpty(tmp.get("pledgeNumber"))) {
+                dto.setRepSecNum(BigDecimal.valueOf(Double.valueOf(tmp.get("pledgeNumber").toString())));
+            }
+            // 质押券面总额合计 = 质押数量 * 最新面值 [FinProductCommonBatchService.getFaceValue(String finprodId, Date happenDate)]
+            if (StringUtil.isNotEmpty(dto.getRepSecNum())) {
+//                faceValues.forEach(item ->{
+//                    if(StringUtil.isNotEmpty(tmp.get("stockCode"))&&StringUtil.isNotEmpty(item.get("finprodMarketId"))&&StringUtil.isNotEmpty(item.get("faceValue"))
+//                            &&StringUtil.equals(tmp.get("stockCode").toString(),item.get("finprodMarketId").toString())){
+//                        dto.setPledgeStampBalance(dto.getRepSecNum().multiply(new BigDecimal(item.get("faceValue").toString())));
+//                    }
+//                });
+                if (faceValueMap.containsKey(tmp.get("stockCode"))) {
+                    dto.setPledgeStampBalance(dto.getRepSecNum().multiply(new BigDecimal(faceValueMap.get(tmp.get("stockCode").toString()).toString())));
+                } else {
+                    dto.setPledgeStampBalance(dto.getRepSecNum().multiply(new BigDecimal(100)));
+                }
+            }
+            // 折算比例
+            if (StringUtil.isNotEmpty(tmp.get("discount"))) {
+                dto.setConRatio(BigDecimal.valueOf(Double.valueOf(tmp.get("discount").toString())));
+            }
+            // 回购金额 = 质押券面总额合计*折算比例
+            if (StringUtil.isNotEmpty(tmp.get("repoAmount"))) {
+                dto.setTradeAmt(BigDecimal.valueOf(Double.valueOf(tmp.get("repoAmount").toString())));
+            }
+            // 回购利率
+            if (StringUtil.isNotEmpty(tmp.get("repoRate"))) {
+                dto.setYield(BigDecimal.valueOf(Double.valueOf(tmp.get("repoRate").toString())));
+            }
+            // 回购利率
+//            if (StringUtil.isNotEmpty(tmp.get("discount"))) {
+//                dto.setConRatio(BigDecimal.valueOf(Double.valueOf(tmp.get("discount").toString())));
+//            }
+            // 回购期限
+            if (StringUtil.isNotEmpty(tmp.get("compactTerm"))) {
+                dto.setTerm(Integer.valueOf(tmp.get("compactTerm").toString()));
+            }
+            // 实际占款天数
+            if (StringUtil.isNotEmpty(tmp.get("capDays"))) {
+                dto.setOccupyDays(Integer.valueOf(tmp.get("capDays").toString()));
+            }
+            // 首次结算日
+            if (StringUtil.isNotEmpty(tmp.get("firstSettleDate"))&&DateUtil.isDateStr(tmp.get("firstSettleDate").toString())) {
+                dto.setFristSettleDate(DateUtil.format(DateUtil.parse(tmp.get("firstSettleDate").toString())));
+            }
+            // 回购到期日
+            if (StringUtil.isNotEmpty(tmp.get("repoMdate"))&&DateUtil.isDateStr(tmp.get("repoMdate").toString())) {
+                dto.setBackDate(DateUtil.format(DateUtil.parse(tmp.get("repoMdate").toString())));
+            }
+            // 到期结算日
+            if (StringUtil.isNotEmpty(tmp.get("backDate"))&&DateUtil.isDateStr(tmp.get("backDate").toString())) {
+                dto.setExpireSettleDate(DateUtil.format(DateUtil.parse(tmp.get("backDate").toString())));
+            }
+            // 换入质押券代码
+            if (StringUtil.isNotEmpty(tmp.get("swapIntoBonds"))) {
+                dto.setNewRepSecId(tmp.get("swapIntoBonds").toString());
+            }
+            // 换入质押券名称
+            if (StringUtil.isNotEmpty(tmp.get("swapIntoBondsName"))) {
+                dto.setNewRepSecName(tmp.get("swapIntoBondsName").toString());
+            }
+            // 换入质押券数量
+            if (StringUtil.isNotEmpty(tmp.get("swapIntoBondsVolume"))) {
+                dto.setNewRepSecNum(BigDecimal.valueOf(Double.valueOf(tmp.get("swapIntoBondsVolume").toString())));
+            }
+            // 换出质押券代码
+            if (StringUtil.isNotEmpty(tmp.get("swapOutBonds"))) {
+                dto.setOutRepSecId(tmp.get("swapOutBonds").toString());
+            }
+            // 换出质押券名称
+            if (StringUtil.isNotEmpty(tmp.get("swapOutBondsName"))) {
+                dto.setOutRepSecName(tmp.get("swapOutBondsName").toString());
+            }
+            // 换出质押券数量
+            if (StringUtil.isNotEmpty(tmp.get("swapOutBondsVolume"))) {
+                dto.setOutRepSecNum(BigDecimal.valueOf(Double.valueOf(tmp.get("swapOutBondsVolume").toString())));
+            }
+            // 原质押券代码
+            if (StringUtil.isNotEmpty(tmp.get("origBonds"))) {
+                dto.setOrigPledgeStampCode(tmp.get("origBonds").toString());
+            }
+            // 原质押券名称
+            if (StringUtil.isNotEmpty(tmp.get("origBondsName"))) {
+                dto.setOrigPledgeStampName(tmp.get("origBondsName").toString());
+            }
+            //原质押券数量
+            if (StringUtil.isNotEmpty(tmp.get("origBondsVolume"))) {
+                dto.setOrigPledgeStampNum(tmp.get("origBondsVolume").toString());
+            }
+            //原质押券金额
+            if (StringUtil.isNotEmpty(tmp.get("origRepoAmount"))) {
+                dto.setOrigTradeAmt(BigDecimal.valueOf(Double.valueOf(tmp.get("origRepoAmount").toString())));
+            }
+            // 到期续做类型
+            if (StringUtil.isNotEmpty(tmp.get("transCode"))) {
+                dto.setTransCode(tmp.get("transCode").toString());
+            }
+            // 回购利息
+            if (StringUtil.isNotEmpty(tmp.get("mIntAmt"))) {
+                dto.setIntAmt(BigDecimal.valueOf(Double.valueOf(tmp.get("mIntAmt").toString())));
+            }
+            // 到期结算金额
+            if (StringUtil.isNotEmpty(tmp.get("backBalance"))) {
+                dto.setExpireSettleAmt(BigDecimal.valueOf(Double.valueOf(tmp.get("backBalance").toString())));
+            }
+            // 成交编号
+            if (StringUtil.isNotEmpty(tmp.get("origSerialNo"))) {
+                dto.setTradeId(tmp.get("origSerialNo").toString());
+            }
+            // 本方交易员
+            if (StringUtil.isNotEmpty(tmp.get("traderCode"))) {
+                dto.setTraderCode(tmp.get("traderCode").toString());
+            }
+            // 本方交易商代码
+            if (StringUtil.isNotEmpty(tmp.get("memberId"))) {
+                dto.setMemberId(tmp.get("memberId").toString());
+            }
+            // 本方交易主体（深交所展示，否则为空）
+            if (StringUtil.isNotEmpty(tmp.get("investorId"))) {
+                dto.setInvestorId(tmp.get("investorId").toString());
+            }
+            // 本方交易主体类型（深交所展示，否则为空）
+            if (StringUtil.isNotEmpty(tmp.get("investorType"))) {
+                dto.setInvestorType(tmp.get("investorType").toString());
+            }
+            //对手方交易员
+            if (StringUtil.isNotEmpty(tmp.get("cpTraderCode"))) {
+                dto.setCpTraderCode(tmp.get("cpTraderCode").toString());
+            }
+            //对手方交易商
+            if (StringUtil.isNotEmpty(tmp.get("cpMemberId"))) {
+                dto.setCpMemberId(tmp.get("cpMemberId").toString());
+            }
+            //对手方主体
+            if (StringUtil.isNotEmpty(tmp.get("cpInvestorId"))) {
+                dto.setCpInvestorId(tmp.get("cpInvestorId").toString());
+            }
+            //对手方主体类型
+            if (StringUtil.isNotEmpty(tmp.get("cpInvestorType"))) {
+                dto.setCpInvestorType(tmp.get("cpInvestorType").toString());
+            }
+            //对手方客户名称
+            if (StringUtil.isNotEmpty(tmp.get("cpClientName"))) {
+                dto.setCpClientName(tmp.get("cpClientName").toString());
+            }
+            // 补充协议
+            if (StringUtil.isNotEmpty(tmp.get("remark"))) {
+                dto.setAddCla(tmp.get("remark").toString());
+            }
+            // 本方资金账号
+            if (StringUtil.isNotEmpty(tmp.get("account"))) {
+                dto.setAcctNo(tmp.get("account").toString());
+            }
+            // 本方资金账号名称
+            if (StringUtil.isNotEmpty(tmp.get("accountName"))) {
+                dto.setAcctName(tmp.get("accountName").toString());
+            }
+
+            // 回购利率和折算率应该乘以100
+            if (dto.getYield() != null) {
+                dto.setYield(dto.getYield());
+            }
+            if (dto.getConRatio() != null) {
+                dto.setConRatio(ArithmeticUtil.multiply(dto.getConRatio(), BigDecimal.valueOf(100)));
+            }
+
+            list.add(dto);
+        });
+
+        page.setRoot(list);
+        return page;
+    }
+
+    private String mathEntrustPs(String prop){
+        switch (prop) {
+            case SB_SHXYHGCJ:
+                return DictCodeListExt3.交易方向_正回购.getCodeName();
+            case SB_SHXYHGDQXZ:
+                return DictCodeListExt3.交易方向_到期续做.getCodeName();
+            case SB_SHXYHGJCZY:
+                return DictCodeListExt3.交易方向_解除质押.getCodeName();
+            case SB_SHXYHGHJSB:
+                return DictCodeListExt3.交易方向_中途换券.getCodeName();
+            case SB_SHXYHGTQZZSB:
+                return DictCodeListExt3.交易方向_提前购回.getCodeName();
+            default:
+                return prop;
+        }
+    }
+
 }

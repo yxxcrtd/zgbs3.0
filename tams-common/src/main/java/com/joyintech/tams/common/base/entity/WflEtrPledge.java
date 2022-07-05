@@ -38,6 +38,10 @@ public class WflEtrPledge extends WflEtrPledgeKey {
      * 数据状态
      */
     private String workflowStatus;
+    /**
+     * 置换方向
+     */
+    private String displaceDir;
 
     /**
      * 取得 质押面值
@@ -133,5 +137,13 @@ public class WflEtrPledge extends WflEtrPledgeKey {
      */
     public void setWorkflowStatus(String workflowStatus) {
         this.workflowStatus = workflowStatus == null ? null : workflowStatus.trim();
+    }
+
+    public String getDisplaceDir() {
+        return displaceDir;
+    }
+
+    public void setDisplaceDir(String displaceDir) {
+        this.displaceDir = displaceDir;
     }
 }

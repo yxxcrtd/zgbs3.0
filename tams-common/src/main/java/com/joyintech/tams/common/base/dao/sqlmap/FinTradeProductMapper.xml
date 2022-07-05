@@ -668,4 +668,19 @@
         where deal.IS_CANCEL ='N' and deal.TRADE_STATUS = '01'
         and deal.TRADE_ID  = #{tradeId,jdbcType=VARCHAR}
     </select>
+    <select id="getOriFinDealPledgeList" resultType="com.joyintech.tams.common.base.pojo.OriPledgeInfo">
+		SELECT F2.PLEDGE_FINPROD_ID                    pledgeFinprodId,
+			   F2.PLEDGE_NUMBER                        pledgeNumber,
+			   F2.PLEDGE_NUMBER * 100                  pledgeTradeAmt,
+			   F2.PLEDGE_RATIO                         pledgeRatio,
+			   F2.PLEDGE_NUMBER * F2.PLEDGE_FACE_VALUE pledgeFaceValue,
+			   F.PRIN                                  prin,
+			   F.FINPROD_ID                            finprodId
+		FROM FIN_TRADE_PRODUCT F
+				 LEFT JOIN FIN_DEAL_PLEDGE F2 ON F.FINPROD_ID = F2.FINPROD_ID AND F2.BRANCH = F.BRANCH
+				 LEFT JOIN FIN_PRODUCT_TYPE F3
+						   ON F3.FINPROD_ID = F.FINPROD_ID AND F3.BRANCH = F.BRANCH AND F3.TYPE_6 = 'H01' AND F3.TYPE_7 = '03'
+		WHERE F.FINPROD_ID = #{finprodId, jdbcType=VARCHAR}
+		  AND F.BRANCH = 0
+    </select>
 </mapper>

@@ -1,11 +1,6 @@
 package com.joyintech.tams.invest.trade.exchangetransmatch.common.service.repo;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.entity.SettleTransDataTotalPledge;
-import com.joyintech.tams.common.base.entity.TrdDealTotalAdd;
-import com.joyintech.tams.common.base.entity.TrdFinProductDealTotal;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -16,7 +11,6 @@ import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.common.TrdProductDealDto;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonDto;
-import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonEntrustDetailDto;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonEntrustDto;
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.dto.ExchangeTransMatchBaseTradeDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +57,12 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
             baseTradeProductDealDto.setPtlTrade(this.generatePtlTrade(dealDto, entrustDto, trdProductDeal));
             //生成金融产品交易扩展
             baseTradeProductDealDto.setPaTrdProductDeal(this.genPaTrdProductDeal(dealDto, entrustDto, trdProductDeal));
-
+            //生成划款指令表
+            baseTradeProductDealDto.setStlPayOrdersList(this.generateStlPayOrdersList(dealDto, entrustDto, trdProductDeal));
+            //质押品信息表
+            if(!DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换钱.getValue().equals(dealDto.getBusiSceneCalss())){
+                baseTradeProductDealDto.setFinDealPledgeList(this.genFinDealPledgeList(dealDto,trdFinProductDealTotal));
+            }
             baseTradeProductDealDtoList.add(baseTradeProductDealDto);
         }
         return baseTradeProductDealDtoList;
@@ -141,7 +140,7 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         // 随交易支付费用
         dealTotal.setFeeAmtPay(null);
         // 交易金额
-        dealTotal.setTradeAmt(null);
+        dealTotal.setTradeAmt(entrustDto.getMarchAmt());
         // 未随交易支付费用
         dealTotal.setFeeAmtUnpay(null);
         // 总交易费用
@@ -194,7 +193,10 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         dealTotal.setIsOverdueDeal(DictCodeList.是否_否.getValue());
         // 备注
         dealTotal.setRemark("数据清算自动处理");
-
+        // 本方交易员
+        dealTotal.setTrader(dealDto.getTrader());
+        // 对手方交易员
+        dealTotal.setCounterTrader(dealDto.getCounterTrader());
         // 处理换钱场景
         if(DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换钱.getValue().equals(dealDto.getBusiSceneCalss())){
             dealTotal.setShareAmt(null);
@@ -235,7 +237,18 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
             }
             trdProductDealList.add(trdProductDeal);
         }
-
+        if(DictCodeListExt3.交易方向_解除质押.getValue().equals(entrustDto.getPs())){
+            TrdProductDealDto trdProductDeal = createTrdProductDealCommon(dealDto, entrustDto, trdFinProductDealTotal);
+            //交易方向
+            trdProductDeal.setPs(DictCodeList.交易方向_到期.getValue());
+            //全价总额
+            trdProductDeal.setFpriceAmt(trdFinProductDealTotal.getFpriceAmt());
+            //交易总额
+            trdProductDeal.setTradeAmt(trdFinProductDealTotal.getTradeAmt());
+            // 金融产品类型
+            trdProductDeal.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+            trdProductDealList.add(trdProductDeal);
+        }
         return trdProductDealList;
     }
 
@@ -318,15 +331,15 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
             trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
         }
         // 本方交易员
-        trdProductDeal.setTrader(null);
+        trdProductDeal.setTrader(dealDto.getTrader());
         // 对手方交易员
-        trdProductDeal.setCounterTrader(null);
+        trdProductDeal.setCounterTrader(dealDto.getCounterTrader());
         // 对手方联系方式
         trdProductDeal.setCounterContact(null);
         // 证券管理户代码
         trdProductDeal.setSecManageAcctId(dealDto.getSecAcctId());
         // 关联系统交易编号
-        trdProductDeal.setfTradeId(null);
+        trdProductDeal.setfTradeId(dealDto.getSeqId());
         // 现金流代码
         trdProductDeal.setCashId(null);
         // 登记托管机构
@@ -349,4 +362,30 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         trdProductDeal.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
         return trdProductDeal;
     }
+
+    /**
+     * 生成质押品信息表
+     * @param dealDto
+     * @param total
+     * @return
+     */
+    private List<FinDealPledge> genFinDealPledgeList(ExchangeTransMatchCommonDto dealDto, TrdFinProductDealTotal total){
+        List<FinDealPledge> finDealPledgeList = new ArrayList<>();
+        if(!StringUtil.isEmptyList(dealDto.getSettleTransDataTotalPledgeList())) {
+            for(SettleTransDataTotalPledge transDataTotalPledge:dealDto.getSettleTransDataTotalPledgeList()) {
+                FinDealPledge finDealPledge = new FinDealPledge();
+                finDealPledge.setFinprodId(total.getFinprodId());
+                finDealPledge.setBranch(total.getBranch());
+                finDealPledge.setPledgeFinprodId(transDataTotalPledge.getPledgeFinprodId());
+                finDealPledge.setPledgeFaceValue(transDataTotalPledge.getPledgeFaceValue());
+                finDealPledge.setPledgeNumber(transDataTotalPledge.getPledgeNumber());
+                finDealPledge.setPledgeRatio(transDataTotalPledge.getPledgeRatio());
+                finDealPledge.setPledgeAmt(transDataTotalPledge.getPledgeAmt());
+                finDealPledgeList.add(finDealPledge);
+            }
+        }
+
+        return finDealPledgeList;
+    }
+
 }

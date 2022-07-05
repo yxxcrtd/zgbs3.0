@@ -20,6 +20,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @ApiModel(value = "指令导出信息", description = "指令导出信息")
@@ -146,6 +147,14 @@ public class InstructionExportVo {
     @ApiModelProperty(name = "counterDealerId", value = "对手方交易商代码")
     @Size(max = 32)
     private String counterDealerId = "";
+
+    @ApiModelProperty(name = "counterInvestorId", value = "对手方交易主体代码")
+    @Size(max = 32)
+    private String counterInvestorId = "";
+
+    @ApiModelProperty(name = "counterInvestorType", value = "对手方交易主体类型")
+    @Size(max = 32)
+    private String counterInvestorType = "";
 
     @ApiModelProperty(name = "appointmentNumber", value = "约定号")
     @Size(max = 10)
@@ -408,8 +417,14 @@ public class InstructionExportVo {
     @ApiModelProperty(name = "entrustPriceView", value = "指令价格(展示)")
     private BigDecimal entrustPriceView;
 
+    @ApiModelProperty(name = "quoteRequestId", value = "行情请求编号")
+    private String quoteRequestId;
+
     @ApiModelProperty(name = "minPriceAndMinTrdUnitLimitBean", value = "最小价差、买卖单位及交易上下限控制")
     private MinPriceAndMinTrdUnitLimitBean minPriceAndMinTrdUnitLimitBean;
+
+    @ApiModelProperty(name = "pledges", value = "质押券信息")
+    public List<InstructionPledge> pledges;
 
     @Id
     public String getEntrustId() {
@@ -610,6 +625,22 @@ public class InstructionExportVo {
 
     public void setCounterDealerId(String counterDealerId) {
         this.counterDealerId = counterDealerId;
+    }
+
+    public String getCounterInvestorId() {
+        return counterInvestorId;
+    }
+
+    public void setCounterInvestorId(String counterInvestorId) {
+        this.counterInvestorId = counterInvestorId;
+    }
+
+    public String getCounterInvestorType() {
+        return counterInvestorType;
+    }
+
+    public void setCounterInvestorType(String counterInvestorType) {
+        this.counterInvestorType = counterInvestorType;
     }
 
     public String getAppointmentNumber() {
@@ -1267,5 +1298,25 @@ public class InstructionExportVo {
 
     public void setEntrustPriceView(BigDecimal entrustPriceView) {
         this.entrustPriceView = entrustPriceView;
+    }
+
+    public String getQuoteRequestId() {
+        return quoteRequestId;
+    }
+
+    public void setQuoteRequestId(String quoteRequestId) {
+        this.quoteRequestId = quoteRequestId;
+    }
+
+    public List<InstructionPledge> getPledges() {
+        return pledges;
+    }
+
+    public void setPledges(List<InstructionPledge> pledges) {
+        this.pledges = pledges;
+    }
+
+    public void setLeftVolume(long leftVolume) {
+        this.leftVolume = leftVolume;
     }
 }

@@ -207,7 +207,8 @@ public enum ErrorCode implements IEnum<Integer> {
 
     INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR(4058, "公平交易卖出或逆回购委托价格不得低于最优价"),
 
-    INSTRUCTIONS_NO_GUARD_BOND_ERROR(4059, "非担保债券不支持公平交易"),
+    ENTRUST_BSFLAG_PARSE_ERROR(4996, "委托买卖类别解析异常"),
+INSTRUCTIONS_NO_GUARD_BOND_ERROR(4059, "非担保债券不支持公平交易"),
 
     APPOINT_INSTRUCTION_EXIST_PARAMETER_ERROR(4997, "分发指令数据存在不合法"),
 

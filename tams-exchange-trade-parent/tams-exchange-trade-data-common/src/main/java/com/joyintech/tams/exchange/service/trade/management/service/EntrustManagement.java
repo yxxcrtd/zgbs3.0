@@ -22,6 +22,7 @@ import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.PageEntrustInfoRequest;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
+import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.common.vo.EntrustVo;
@@ -260,11 +261,12 @@ public class EntrustManagement extends BaseService {
                 entrust.setEntrustPriceView(o.getEntrustPrice());
             }
 
-            if ((投管业务类型_大宗交易.getValue().equals(entrust.getBusiTypeTg()) && InvestAssetTypeEnum.isBond(entrust.getAssetType()))
-                    || 投管业务类型_协议现券.getValue().equals(entrust.getBusiTypeTg())) {
+            String busiTypeTg = entrust.getBusiTypeTg();
+            if ((投管业务类型_大宗交易.getValue().equals(busiTypeTg) && InvestmentAssetType.isBond(entrust.getAssetType()))
+                    || 投管业务类型_协议现券.getValue().equals(busiTypeTg)) {
                 //可转债券大宗交易、协议现券 委托价格展示全价
                 entrust.setEntrustPrice(entrust.getFullPrice());
-            } else if (投管业务类型_现券交易.getValue().equals(entrust.getBusiTypeTg())) {
+            } else if (投管业务类型_现券交易.getValue().equals(busiTypeTg) || EntrustUtils.isPledgeAgreementRepurchase(busiTypeTg)) {
                 entrust.setEntrustVolumeView(BigDecimal.valueOf(entrust.getEntrustVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
                 entrust.setTradedVolumeView(BigDecimal.valueOf(entrust.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
                 entrust.setFrozenVolumeView(BigDecimal.valueOf(entrust.getFrozenVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
@@ -278,7 +280,21 @@ public class EntrustManagement extends BaseService {
                     entrust.setReportNo((String)map.get("brokerTradeId"));
                 }
             }
+            if (EntrustUtils.isPledgeAgreementRepurchase(busiTypeTg)) {
+                entrust.setCancelBalance(BigDecimal.valueOf(o.getCancelVolume()).multiply(BigDecimal.valueOf(100)));
+                String extend2 = o.getExtend2();
+                if (StringUtil.isNotEmpty(extend2) && extend2.contains("capDays")) {
+                    Map map = JsonUtils.getObjectFromJson(extend2, Map.class);
+                    entrust.setCapDays(map.get("capDays").toString());
+                }
+                if (StringUtil.equals(投管业务类型_到期续做.getValue(), busiTypeTg)) {
+                    entrust.setTransCode(StringUtil.equals("0", o.getTransCode()) ? "非第三方" : "第三方");
+                }
+                entrust.setOwnerTypeStr(EnumUtil.getDescriptionByCode(InvestorType.class, o.getOwnerType()));
+                entrust.setPropOwnerTypeStr(EnumUtil.getDescriptionByCode(InvestorType.class, o.getPropOwnerType()));
+            }
 
+            entrust.setMarket(Market.getMarketName(o.getMarket()));
             entrusts.add(entrust);
         });
         return entrusts;

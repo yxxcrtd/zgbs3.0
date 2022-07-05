@@ -146,7 +146,8 @@
 	<select id="listBondSettleTransData" parameterType="java.util.Map"
 			resultType="com.joyintech.tams.settle.batch.datagather.dto.SettleTransDataDto">
 		SELECT
-			TMIN.CASH_ID CASH_ID,
+			TMIN.CASH_ID intPayCashId,
+			TMINPRIN.CASH_ID prinCashId,
 			TMAX.MDATE VDATE,
 			TMIN.MDATE MDATE2,
 			fp.MDATE MDATE,
@@ -217,6 +218,38 @@
 						AND T2.MDATE = T1.MDATE
 			    )
 		) TMAX ON TMAX.FINPROD_ID = std.FINPROD_ID
+		LEFT JOIN (
+			SELECT
+				T1.CASH_ID,
+				T1.MDATE ,
+				T1.FINPROD_ID
+			FROM
+				FIN_CASH_PLAN T1
+			WHERE
+				EXISTS(
+					SELECT
+						1
+					FROM
+						(
+							SELECT
+								CASH_ID,
+								FINPROD_ID ,
+								MIN(MDATE) MDATE
+							FROM
+								FIN_CASH_PLAN fcp2
+							WHERE
+								fcp2.CASH_TYPE IN('02','03')
+								AND  <![CDATA[fcp2.MDATE > #{dealDate,jdbcType=DATE}]]>
+							GROUP BY
+								CASH_ID,
+								FINPROD_ID
+						)T2
+					WHERE
+						T2.CASH_ID = T1.CASH_ID
+						AND T2.FINPROD_ID = T1.FINPROD_ID
+						AND T2.MDATE = T1.MDATE
+				)
+		) TMINPRIN ON TMINPRIN.FINPROD_ID = std.FINPROD_ID
 		<where>
 			std.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})
 			<if test="dealDate != null">
@@ -411,6 +444,12 @@
 		NVL(NVL(te.INSTRUCTION_ID, teh.INSTRUCTION_ID), NVL(tie.INSTRUCTION_ID, tieh.INSTRUCTION_ID)) ORDER_ID,
 		case when ptl.PROFIT_TYPE = '01' then 'FVTPL' else 'AC' end as invAim,ee.ENTRUST_ID,
 		stdta.REPO_TYPE,
+		NVL(tie.TRADE_ID, tieh.TRADE_ID) trader,
+		NVL(tie.PROP_TRADE_ID, tieh.PROP_TRADE_ID) counterTrader,
+		NVL(tie.INVESTOR_ID, tieh.INVESTOR_ID) dealerPartyNo,
+		NVL(tie.PROP_INVESTOR_ID, tieh.PROP_INVESTOR_ID) outDealerPartyNo,
+		NVL(tie.DEALER_ID, tieh.DEALER_ID) dealerNo,
+		NVL(tie.PROP_DEALER_ID, tieh.PROP_DEALER_ID) outDealerNo,
 		<!--<include refid="settleTransDataSql"></include>-->
 		<include refid="settleTransDataTotalSql"></include>
 		LEFT JOIN SETTLE_TRANS_DATA_TOTAL_STATUS stdts ON std.SEQ_ID = stdts.SEQ_NO

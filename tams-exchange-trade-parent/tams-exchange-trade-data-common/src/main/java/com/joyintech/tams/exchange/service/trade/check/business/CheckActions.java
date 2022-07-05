@@ -18,7 +18,7 @@ public enum CheckActions {
     /**
      * 业务类型与数据检查器的映射Map
      */
-    private static final Map<String, IBusinessCheck> ACTION_MAP = Maps.newHashMap();
+    private static final Map<String, ICheck> ACTION_MAP = Maps.newHashMap();
 
 
     /**
@@ -27,7 +27,7 @@ public enum CheckActions {
      * @param action        业务类型
      * @param businessCheck 数据检查器
      */
-    public void put(String action, IBusinessCheck businessCheck) {
+    public void put(String action, ICheck businessCheck) {
         ACTION_MAP.putIfAbsent(action, businessCheck);
     }
 
@@ -37,7 +37,7 @@ public enum CheckActions {
      * @param action 业务类型
      * @return 数据检查器
      */
-    public IBusinessCheck action(String action) {
+    public ICheck action(String action) {
         return ACTION_MAP.get(action);
     }
 }

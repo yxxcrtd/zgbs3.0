@@ -12,10 +12,12 @@ package com.joyintech.background.component.order.exchange.business.service;
 
 import java.math.BigDecimal;
 
+import com.joyintech.background.component.order.exchange.common.dto.EtrPledgeDto;
 import com.joyintech.background.component.order.exchange.database.dao.EntrustComponentMapper;
 import com.joyintech.background.component.order.exchange.database.entity.EntrustComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
@@ -130,10 +132,19 @@ class AgreRepHwayChgSecService extends EtrSubComponentService<AgreRepHwayChgSecD
 
 	       // 先根据指令编号删除所有该指令下的质押券数据，再插入新的质押券数据
 			etrPledgeComponentMapper.deleteByEntrustId(etrPledgeEntity);
+			if(!CollectionUtils.isEmpty(dto.getList())){
+				for(EtrPledgeDto etrPledgeDto:dto.getList()){
+					EtrPledgeComponent etrPledgeEntityDto = new EtrPledgeComponent();
+					BeanUtil.copyPropertiesIgnoreNull(etrPledgeEntityDto, etrPledgeDto);
+					etrPledgeComponentMapper.insertSelective(etrPledgeEntityDto);
+				}
+			}else{
+				if(StringUtil.isNotEmpty(dto.getFinprodId())) {
+					etrPledgeComponentMapper.insertSelective(etrPledgeEntity);
+				}
+			}
 
-	       if(StringUtil.isNotEmpty(dto.getFinprodId())) {
-			   etrPledgeComponentMapper.insertSelective(etrPledgeEntity);
-		   }
+
 
 	   }
 		

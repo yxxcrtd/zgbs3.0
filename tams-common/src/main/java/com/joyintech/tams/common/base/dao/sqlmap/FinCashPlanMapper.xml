@@ -498,4 +498,11 @@
             AND PAY_DATE=#{payDate}
         </if>
     </select>
+
+    <select id = "selectFaceValue" resultType = "java.math.BigDecimal">
+        SELECT 100 - SUM(NVL(PRIN_AMT, 0))
+          FROM FIN_CASH_PLAN
+         WHERE FINPROD_ID = #{finprodId}
+           AND MDATE &lt;= TO_DATE(#{sysDate}, 'yyyy-MM-dd')
+    </select>
 </mapper>

@@ -78,6 +78,10 @@ public enum Market implements IEnum<String> {
         return Objects.nonNull(market) ? market.investValue : value;
     }
 
+    public String getInvestValue() {
+        return investValue;
+    }
+
     @Override
     public String getCode() {
         return value;

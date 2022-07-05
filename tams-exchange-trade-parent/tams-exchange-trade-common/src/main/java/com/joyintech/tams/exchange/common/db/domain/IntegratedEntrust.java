@@ -398,7 +398,16 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @ApiModelProperty(name = "isNoGuard", value = "是否非担保")
     private String isNoGuard;
 
-    // 信用保护凭证使用 --start
+    @ApiModelProperty( name = "origStockCode", value = "换出债券")
+    private String origStockCode;
+    @ApiModelProperty( name = "origEntrustVolume", value = "换出债券数量")
+    private long origEntrustVolume;
+    @ApiModelProperty( name = "execId", value = "执行编号")
+    private String execId;
+    @ApiModelProperty( name = "conformOrRefuse", value = "确认或拒绝：conform-确认，refuse-拒绝")
+    private String conformOrRefuse;
+
+// 信用保护凭证使用 --start
     @ApiModelProperty(name = "counterName", value = "交易对手名称")
     private String counterName;
 
@@ -408,7 +417,6 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @ApiModelProperty(name = "propAcctName", value = "对手资金账户名称")
     private String propAcctName;
     // 信用保护凭证使用 --end
-
     public String getSoftSkipMode() {
         return softSkipMode;
     }
@@ -1197,7 +1205,38 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
         this.counterId = counterId;
     }
 
-    public String getCounterName() {
+    public String getExecId() {
+        return execId;
+    }
+
+    public void setExecId(String execId) {
+        this.execId = execId;
+    }
+
+    public String getConformOrRefuse() {
+        return conformOrRefuse;
+    }
+
+    public void setConformOrRefuse(String conformOrRefuse) {
+        this.conformOrRefuse = conformOrRefuse;
+    }
+
+    public String getOrigStockCode() {
+        return origStockCode;
+    }
+
+    public void setOrigStockCode(String origStockCode) {
+        this.origStockCode = origStockCode;
+    }
+
+    public long getOrigEntrustVolume() {
+        return origEntrustVolume;
+    }
+
+    public void setOrigEntrustVolume(long origEntrustVolume) {
+        this.origEntrustVolume = origEntrustVolume;
+    }
+public String getCounterName() {
         return counterName;
     }
 

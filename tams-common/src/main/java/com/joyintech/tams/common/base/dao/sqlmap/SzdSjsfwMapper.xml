@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.common.base.dao.SzdSjsfwMapper" >
+    <resultMap id="BaseResultMap" type="com.joyintech.tams.common.base.entity.SzdSjsfw" >
+        <id column="SEQNO" property="seqNo" jdbcType="VARCHAR" />
+		<result column="IMPORT_DATE" property="importDate" jdbcType="DATE" />
+		<result column="DATA_FILE" property="dataFile" jdbcType="VARCHAR" />
+		<result column="IS_SETTLE_TARGET" property="isSettleTarget" jdbcType="VARCHAR" />
+		<result column="FWSJLB" property="fwsjlb" jdbcType="VARCHAR" />
+		<result column="FWJSZH" property="fwjszh" jdbcType="VARCHAR" />
+		<result column="FWBFZH" property="fwbfzh" jdbcType="VARCHAR" />
+		<result column="FWTGDY" property="fwtgdy" jdbcType="VARCHAR" />
+		<result column="FWZQDM" property="fwzqdm" jdbcType="VARCHAR" />
+		<result column="FWZQZH" property="fwzqzh" jdbcType="VARCHAR" />
+		<result column="FWGFXZ" property="fwgfxz" jdbcType="VARCHAR" />
+		<result column="FWLTLX" property="fwltlx" jdbcType="VARCHAR" />
+		<result column="FWMRJE" property="fwmrje" jdbcType="DECIMAL" />
+		<result column="FWMCJE" property="fwmcje" jdbcType="DECIMAL" />
+		<result column="FWZJYE" property="fwzjye" jdbcType="DECIMAL" />
+		<result column="FWSL1" property="fwsl1" jdbcType="DECIMAL" />
+		<result column="FWSL2" property="fwsl2" jdbcType="DECIMAL" />
+		<result column="FWCLRQ" property="fwclrq" jdbcType="VARCHAR" />
+		<result column="FWFSRQ" property="fwfsrq" jdbcType="VARCHAR" />
+		<result column="FWZYSM" property="fwzysm" jdbcType="VARCHAR" />
+		<result column="FWBZSM" property="fwbzsm" jdbcType="VARCHAR" />
+		<result column="FWBYBZ" property="fwbybz" jdbcType="VARCHAR" />
+        <result column="CREATE_USER" property="createUser" jdbcType="VARCHAR" />
+        <result column="CREATE_DEPT" property="createDept" jdbcType="VARCHAR" />
+        <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
+        <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+    <select id="selectPledgeSjsfw" resultType="com.joyintech.tams.common.base.entity.SzdSjsfw">
+		SELECT SFW.FWZQDM, SFW.FWZJYE
+		  FROM SZD_SJSFW SFW
+		 WHERE SUBSTR(SFW.FWZYSM, 23, 5) = #{fCjbh, jdbcType=VARCHAR}
+		   AND SFW.FWFSRQ = #{jgcjrq, jdbcType=VARCHAR}
+		   AND SFW.FWTGDY = #{jgtgdy, jdbcType=VARCHAR}
+		   AND SFW.FWSJLB = '11'
+	</select>
+</mapper>

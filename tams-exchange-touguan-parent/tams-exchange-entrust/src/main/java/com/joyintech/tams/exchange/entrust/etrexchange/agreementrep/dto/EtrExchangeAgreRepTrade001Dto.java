@@ -63,6 +63,11 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 	private BigDecimal newConRatio;
 	private BigDecimal newRepSecNum;
 	private BigDecimal newPrintAmt;
+	private String outfinprodId;
+	private BigDecimal outRepSecNum;
+	private String outRepSecId;
+	private BigDecimal outAmt;  //换出金额
+	private BigDecimal outPledgeFaceValue;
 	private String reqOnId;
 	private String vdate;
 	private String mdate;
@@ -566,5 +571,45 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 
 	public void setBusiTypePosition(String busiTypePosition) {
 		this.busiTypePosition = busiTypePosition;
+	}
+
+	public BigDecimal getOutRepSecNum() {
+		return outRepSecNum;
+	}
+
+	public void setOutRepSecNum(BigDecimal outRepSecNum) {
+		this.outRepSecNum = outRepSecNum;
+	}
+
+	public String getOutRepSecId() {
+		return outRepSecId;
+	}
+
+	public void setOutRepSecId(String outRepSecId) {
+		this.outRepSecId = outRepSecId;
+	}
+
+	public BigDecimal getOutAmt() {
+		return outAmt;
+	}
+
+	public void setOutAmt(BigDecimal outAmt) {
+		this.outAmt = outAmt;
+	}
+
+	public BigDecimal getOutPledgeFaceValue() {
+		return outPledgeFaceValue;
+	}
+
+	public void setOutPledgeFaceValue(BigDecimal outPledgeFaceValue) {
+		this.outPledgeFaceValue = outPledgeFaceValue;
+	}
+
+	public String getOutfinprodId() {
+		return outfinprodId;
+	}
+
+	public void setOutfinprodId(String outfinprodId) {
+		this.outfinprodId = outfinprodId;
 	}
 }

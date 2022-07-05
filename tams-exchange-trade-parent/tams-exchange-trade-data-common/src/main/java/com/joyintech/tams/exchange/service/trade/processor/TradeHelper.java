@@ -66,6 +66,7 @@ import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押�
 import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押券出库;
 import static com.joyintech.tams.exchange.common.constant.BatchPriceMode.*;
 import static com.joyintech.tams.exchange.common.constant.EntrustProp.*;
+import static com.joyintech.tams.exchange.common.constant.ErrorCode.ENTRUST_BSFLAG_PARSE_ERROR;
 import static com.joyintech.tams.exchange.common.constant.ErrorCode.INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR;
 import static com.joyintech.tams.exchange.common.constant.ErrorCode.NOT_FAIR_ORDER_ERROR;
 import static com.joyintech.tams.exchange.common.constant.OthCodeType.*;
@@ -1291,7 +1292,26 @@ public class TradeHelper {
             integratedEntrust.setEntrustStatus(EntrustStatus.CREATED.value);
             integratedEntrust.setEntrustType(EntrustType.LARGE.value);
             integratedEntrust.setTransCode(instruction.getPledgeeType());
-            integratedEntrust.setBsFlag(EntrustUtils.getBsFlag(integratedEntrust.getEntrustProp(), integratedEntrust.getEntrustBs()));
+            String busiTypeTg = instruction.getBusiTypeTg();
+            //协议回购
+            if (EntrustUtils.isPledgeAgreementRepurchase(busiTypeTg)) {
+                //保存占款天数
+                if (Objects.nonNull(instruction.getCapDays())) {
+                    Map<String, Object> extend2 = Maps.newHashMap();
+                    extend2.put("capDays", instruction.getCapDays().intValue());
+                    integratedEntrust.setExtend2(JsonUtils.getJsonFromObject(extend2));
+                }
+                integratedEntrust.setBsFlag(EntrustUtils.getPledgeAgreementBsFlag(busiTypeTg, integratedEntrust.getEntrustProp(), integratedEntrust.getEntrustBs(), integratedEntrust.getConformOrRefuse()));
+            } else {
+                integratedEntrust.setBsFlag(EntrustUtils.getBsFlag(integratedEntrust.getEntrustProp(), integratedEntrust.getEntrustBs()));
+            }
+            if (StringUtil.isEmpty(integratedEntrust.getBsFlag())) {
+                logger.info("handIntegratedEntrust 委托买卖类别解析异常：[{}]", integratedEntrust.getInstructionId());
+                integratedEntrust.setErrorCode(ENTRUST_BSFLAG_PARSE_ERROR.value);
+                integratedEntrust.setErrorMsg(ENTRUST_BSFLAG_PARSE_ERROR.errorMsg);
+                return integratedEntrust;
+            }
+
             integratedEntrust.setReductionType("0");
             if (Objects.nonNull(integratedEntrust.getStockCode())) {
                 integratedEntrust.setMarket(StockCodeUtils.getMarket(integratedEntrust.getStockCode()));
@@ -1319,6 +1339,7 @@ public class TradeHelper {
             integratedEntrust.setFinprodType2(instruction.getFinprodType2());
             integratedEntrust.setInvManagerId(instruction.getInvManagerId());
             integratedEntrust.setPs(instruction.getTradeSide());
+            integratedEntrust.setBusiTypeTg(busiTypeTg);
             integratedEntrust.setEntrustClass(instruction.getEntrustClass());
             integratedEntrust.setAccountName(instruction.getAcctName());
 
@@ -1338,8 +1359,7 @@ public class TradeHelper {
     }
 
     private void fillSelfDealerTradeInfo(IntegratedEntrust integratedEntrust) {
-        if (!StringUtil.equals(投管业务类型_现券交易.getValue(), integratedEntrust.getBusiTypeTg())
-                || !EntrustProp.isConsultingTrade(integratedEntrust.getEntrustProp())) {
+        if (!isFillDealerTradeInfo(integratedEntrust)) {
             return;
         }
         TradeInfoProRequest dto = new TradeInfoProRequest();
@@ -1363,8 +1383,7 @@ public class TradeHelper {
     }
 
     private void fillPropDealerTradeInfo(IntegratedEntrust integratedEntrust) {
-        if (!StringUtil.equals(投管业务类型_现券交易.getValue(), integratedEntrust.getBusiTypeTg())
-                || !EntrustProp.isConsultingTrade(integratedEntrust.getEntrustProp())) {
+        if (!isFillDealerTradeInfo(integratedEntrust)) {
             return;
         }
 
@@ -1391,6 +1410,20 @@ public class TradeHelper {
         Optional<TradeInfoProResponse> propTrade = list.stream()
                 .filter(o -> StringUtil.equals(o.getTraderNo(), integratedEntrust.getPropTradeId())).findFirst();
         propTrade.ifPresent(response -> integratedEntrust.setPropTradeName(response.getTraderName()));
+    }
+
+    private boolean isFillDealerTradeInfo(IntegratedEntrust integratedEntrust) {
+        //新债-协商成交
+        if (StringUtil.equals(投管业务类型_现券交易.getValue(), integratedEntrust.getBusiTypeTg())
+                && EntrustProp.isConsultingTrade(integratedEntrust.getEntrustProp())) {
+            return true;
+        }
+        //协议回购
+        if (EntrustUtils.isPledgeAgreementRepurchase(integratedEntrust.getBusiTypeTg())) {
+            return true;
+        }
+
+        return false;
     }
 
     public String getEntrustId(Entrust entrust) {
@@ -1662,6 +1695,10 @@ public class TradeHelper {
         if (Objects.nonNull(order.getFullPrice()) && order.getFullPrice().compareTo(BigDecimal.ZERO) > 0) {
             return;
         }
+
+        BigDecimal minPrice = instruction.queryMinPrice(order.getEntrustProp());
+        int round = Objects.nonNull(minPrice) ? minPrice.scale() : 4;
+
         //资产类型是债券
         if (InvestAssetTypeEnum.isBond(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
