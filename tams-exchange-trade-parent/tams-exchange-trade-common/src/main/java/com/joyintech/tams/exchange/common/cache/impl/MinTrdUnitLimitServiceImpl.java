@@ -23,7 +23,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.joyintech.tams.exchange.common.constant.InvestmentAssetType.PLEDGE_REPURCHASE;
+import static com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum.PLEDGE_REPURCHASE;
+
 
 /**
  * 有效价格申报范围

@@ -371,7 +371,7 @@ public String getPropAcctNo() {
                 tradeMessage.setDealerId(integratedEntrust.getDealerId());
                 tradeMessage.setPropDealerId(integratedEntrust.getPropDealerId());
                 tradeMessage.setPropInvestorId(integratedEntrust.getPropInvestorId());
-            } else if (InvestmentAssetType.isBond(trade.getAssetType())
+            } else if (InvestAssetTypeEnum.isBond(trade.getAssetType())
                     && EntrustProp.isTrade(entrust.getEntrustProp())
                     && Objects.nonNull(tradeMessage.getFullPrice())
                     && tradeMessage.getFullPrice() != 0) {

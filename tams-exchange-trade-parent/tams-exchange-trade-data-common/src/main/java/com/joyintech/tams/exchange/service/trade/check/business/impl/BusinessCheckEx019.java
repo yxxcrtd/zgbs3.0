@@ -4,9 +4,9 @@ import cn.hutool.core.util.StrUtil;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
+import com.joyintech.tams.exchange.service.trade.check.business.AbstractCheck;
 import com.joyintech.tams.exchange.service.trade.check.business.Check;
-import com.joyintech.tams.exchange.service.trade.check.business.IBusinessCheck;
-import com.joyintech.tams.exchange.service.trade.check.chain.CheckChainBean;
+import com.joyintech.tams.exchange.service.trade.check.business.CheckBean;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -21,10 +21,10 @@ import static com.joyintech.tams.exchange.common.constant.InstructionPs.*;
  */
 @Check(action = "EX019")
 @Component
-public class BusinessCheckEx019 implements IBusinessCheck {
+public class BusinessCheckEx019 extends AbstractCheck {
 
     @Override
-    public void check(CheckChainBean chainBean) {
+    public void check(CheckBean chainBean) {
         Map<String, Object> checkRsp = chainBean.getCheckRsp();
         Instruction instruction = chainBean.getInstruction();
         if (!InvestAssetTypeEnum.isCreditProtectionCertificate(instruction.getAssetType())) {

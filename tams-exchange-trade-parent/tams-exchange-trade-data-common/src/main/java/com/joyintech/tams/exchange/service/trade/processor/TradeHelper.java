@@ -1702,8 +1702,6 @@ public class TradeHelper {
         //资产类型是债券
         if (InvestAssetTypeEnum.isBond(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
-            BigDecimal minPrice = instruction.queryMinPrice(order.getEntrustProp());
-            int round = Objects.nonNull(minPrice) ? minPrice.scale() : 4;
             EntrustPriceAndYieldDto dto = new EntrustPriceAndYieldDto();
             dto.setPrice(order.getEntrustPrice());
             dto.setEntrustVolume(order.getEntrustVolume());

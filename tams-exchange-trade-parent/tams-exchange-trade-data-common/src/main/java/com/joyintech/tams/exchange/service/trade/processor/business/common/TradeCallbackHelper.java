@@ -335,7 +335,7 @@ public class TradeCallbackHelper {
 //                }
                 //信用证保护凭证买入、卖出推手动交收 申购推成交回报
             }else if(InvestAssetTypeEnum.isCreditProtectionCertificate(instruction.getAssetType()) && (DictCodeList.交易方向_买入.getValue().equals(instruction.getPs()) || DictCodeList.交易方向_卖出.getValue().equals(instruction.getPs()))){
-                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages);
+                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages,pledgeTradeMessages);
                 return;
             }
 //            messageSenderService.pushTradeToMQ(tradeRecord, instruction, entrust);
@@ -374,7 +374,7 @@ public class TradeCallbackHelper {
      */
     private boolean needSGJSWithRepurchase(Instruction instruction, Trade trade) {
         if (Market.isSzMarket(trade.getMarket())
-                && EnumUtil.in(instruction.getPs(), PsEnum.REPO_EXCHANGE_COUPONS_MIDWAY, PsEnum.REPO_UNSTAKE)) {
+                && EnumUtil.in(instruction.getPs(), PsEnum.REPO_EXCHANGE, PsEnum.REPO_UNSTAKE)) {
             return false;
         }
         if (IntegratedEntrustUtils.isProtocolBack(trade.getEntrustProp())) {
