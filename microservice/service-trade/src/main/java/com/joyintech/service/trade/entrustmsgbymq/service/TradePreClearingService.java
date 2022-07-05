@@ -37,6 +37,8 @@ import com.joyintech.tams.invest.common.position.dto.PositionBaseData;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
 import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
+
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -888,10 +890,10 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
             // 写入金融产品分类
             finProductTypeMapper.insertSelective(trdTempDto.getFinProductType());
             // 写入回购质押品表
-            if (DictCodeList.回购类型_质押式协议回购.getValue().equals(trdTempDto.getFinProductType().getType6())
-                    && trdTempDto.getFinDealPledge().getPledgeFinprodId() != null) {
-                finDealPledgeMapper.insertSelective(trdTempDto.getFinDealPledge());
-            }
+            if (DictCodeList.回购类型_质押式协议回购.getValue().equals(trdTempDto.getFinProductType().getType6())){
+//                    && trdTempDto.getFinDealPledge().getPledgeFinprodId() != null) {
+//                finDealPledgeMapper.insertSelective(trdTempDto.getFinDealPledge());
+//            }
                 for (FinDealPledge finDealPledge : trdTempDto.getFinDealPledgeList()) {
                     finDealPledgeMapper.insertSelective(finDealPledge);
                 }
@@ -2069,12 +2071,9 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                 BigDecimal faceValue = trdCommonBaseService.getFaceValue(infContractDetailfile.getFinprodId(), infContractDetailfile.getTradeDate());
                 //如果成交信息中存在折算比例取成交信息中的，如果不存在就计算
                 BigDecimal scale = infContractDetailfile.getScale();
-                if(!StringUtil.isNotEmpty(scale) && infContractDetailfile.getShareAmt()!=null && faceValue!=null && infContractDetailfile.getTradeAmt()!=null){
-                    scale = ArithmeticUtil.divide(infContractDetailfile.getTradeAmt(),ArithmeticUtil.multiply(faceValue,infContractDetailfile.getShareAmt()),4);
                 if (!StringUtil.isNotEmpty(scale) && infContractDetailfile.getShareAmt() != null && faceValue != null && infContractDetailfile.getTradeAmt() != null) {
                     scale = ArithmeticUtil.divide(infContractDetailfile.getTradeAmt(), ArithmeticUtil.multiply(faceValue, infContractDetailfile.getShareAmt()), 4);
                 }
-
 
                 if(!CollectionUtils.isEmpty(infContractDetailfile.getPledgeList())) {
                     //首期质押品列表
