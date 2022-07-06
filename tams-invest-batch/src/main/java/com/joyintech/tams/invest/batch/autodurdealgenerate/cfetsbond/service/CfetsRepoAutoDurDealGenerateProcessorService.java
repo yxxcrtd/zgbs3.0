@@ -312,6 +312,14 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
         trdProductDeal.setSettleDate(DateUtil.parse(entity.getSettleDate()));
         trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
         trdProductDeal.setIsCancel(DictCodeList.是否_否.getValue());
+
+        // 查找cashId
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("CASH_TYPE_1", DictCodeListExt1.现金流一级类型_本金.getValue());
+        paramMap.put("CASH_TYPE_2", DictCodeListExt1.现金流二级类型_本金.getValue());
+        paramMap.put("finprodId", trdProductDeal.getFinprodId());
+        String cashId = cfetsBondAutoDurDealGenerateMapper.findCashIdByFinprodId(paramMap);
+        trdProductDeal.setCashId(cashId);
         trdProductDeals.add(trdProductDeal);
         //交易明细附属表
         List<TrdProductDealAdd> trdProductDealAdds = new ArrayList<>();

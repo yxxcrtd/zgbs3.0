@@ -81,4 +81,14 @@ public interface CfetsBondAutoDurDealGenerateMapper {
      * @return
      */
     String findInvAimData(Map<String, Object> paramMap);
+
+    /**
+     * 根据资产代码查询cashId
+     *
+     * @param paramMap 入参
+     * @return java.lang.String
+     * @author jiangpeng
+     * @date 2022/7/6 14:29
+     */
+    String findCashIdByFinprodId(Map<String, Object> paramMap);
 }
