@@ -16,7 +16,8 @@ var showDetailByFinprodId=function(finprodId,finprodType2){
 	//债券标的信息查看
 	if(finprodType2 == PINAN_ASSET_TYPE_F01){
 		label='FinBondTargetAsset002.title';
-	    pagePath = "invest/asset/bond/FinBondTargetAsset002/init";
+	    // pagePath = "invest/asset/bond/FinBondTargetAsset002/init";
+		pagePath = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a";
 		Joyin.dialog(JoyinUtil.getLabel(label),basePath+pagePath,
 		    "95%", "90%",{
 		    pageModel:PAGE_MODEL_REFERENCE,
@@ -153,11 +154,11 @@ $(function(){
     	obj.queryType = IS_QUERY_ASSETS_LOSS;
     	return obj;
     };
-    
+
     /**
      * 定义已接收的数据表格
      */
-    
+
     var table=$("#dataTable").joyintable({
         ajax: {
             url: 'findPage',
@@ -205,7 +206,7 @@ $(function(){
                     workflowStatus : data.validStatus
                  });
             }
-            
+
             //债券委托详情
             else if(data.finprodType2 == PINAN_ASSET_TYPE_F01){
                 label='TrdBondInvestTrade002';
@@ -250,7 +251,7 @@ $(function(){
                 }else{
                     pagePath = "invest/trade/plannet/TrdPlanNetInvestTrade003/init";
                 }
-                
+
                 Joyin.dialog(JoyinUtil.getLabel(label),basePath+pagePath,
                     "95%", "90%",{
                     	pageModel:PAGE_MODEL_REFERENCE,
@@ -459,8 +460,8 @@ $(function(){
         ],
         initSort: {field: 'tradeDate',type: 'desc'}
     });
-    
-    
+
+
     /**
      * 导出事件
      */
@@ -474,8 +475,8 @@ $(function(){
         paramObj.selectedItem = selectedItem.join(',');
         Joyin.exportExcel('export', paramObj);
     };
-    
-    
+
+
     var newSingleExportExcel = function(){
     	if(table!=null && table!=''){
             var selArr = table.getAllCheckedRows();
@@ -485,7 +486,7 @@ $(function(){
             Joyin.error(JoyinUtil.getMessage("COMMON_E_0002"));
             return;
         }
-        
+
 //        var paramObj = {};
 //        //勾选导出
 //        var selectedItem = [];
@@ -493,17 +494,17 @@ $(function(){
 //            selectedItem.push(item.tradeId);
 //        });
 //        paramObj.tradeIds = selectedItem.join(',');
-        
-        
+
+
         var param = {selectedItem: selArr, operateType:"singleExport"};
         Joyin.ajaxJson(basePath + 'invest/trade/investtrade/investdealquery/TrdInvestDealQuery001/check', param, function(result) {
         	Joyin.exportExcel('newSingleExportExcel',{dtoStr:JSON.stringify(param)});
-        }); 
-        
+        });
+
     };
-    
+
     var newBatchExportExcel = function(){
-    	
+
     	if(table!=null && table!=''){
             var selArr = table.getAllCheckedRows();
         }
@@ -512,7 +513,7 @@ $(function(){
             Joyin.error(JoyinUtil.getMessage("COMMON_E_0002"));
             return;
         }
-        
+
 //    	var paramObj = {};
 //        //勾选导出
 //        var selectedItem = [];
@@ -520,15 +521,15 @@ $(function(){
 //            selectedItem.push(item.tradeId);
 //        });
 //        paramObj.tradeIds = selectedItem.join(',');
-        
+
         var param = {selectedItem: selArr, operateType:"batchExport"};
-        
+
         Joyin.ajaxJson(basePath + 'invest/trade/investtrade/investdealquery/TrdInvestDealQuery001/check', param, function(result) {
         	Joyin.exportExcel('newBatchExportExcel', {dtoStr:JSON.stringify(param)});
         });
-        
+
     };
-    
+
     /**
      * 【吉林银行个性化代码】
      * add by wangyang1
@@ -547,9 +548,9 @@ $(function(){
         var param = {selectedItem: selArr, operateType:"singleExport"};
         Joyin.ajaxJson(basePath + 'invest/trade/investtrade/investdealquery/TrdInvestDealQuery001/check', param, function(result) {
             Joyin.exportExcel(basePath + "invest/trade/investtrade/investdealquery/TrdInvestDealQuery001/singleExport",{dtoStr:JSON.stringify(param)});
-        }); 
+        });
     };
-    
+
     /**
      * 【吉林银行个性化代码】
      * add by wangyang1
@@ -568,7 +569,7 @@ $(function(){
         var param = {selectedItem: selArr, operateType:"batchExport"};
         Joyin.ajaxJson(basePath + 'invest/trade/investtrade/investdealquery/TrdInvestDealQuery001/check', param, function(result) {
             Joyin.exportExcel(basePath + "invest/trade/investtrade/investdealquery/TrdInvestDealQuery001/batchExportExcel",{dtoStr:JSON.stringify(param)});
-        }); 
+        });
     };
 
 	/**
@@ -605,14 +606,14 @@ $(function(){
         //导出
         $('#TrdInvestDealQuery001_btn_export').click(function() {
             exportExcel();
-        }); 
+        });
         /**
          * 【吉林银行个性化代码】
          * add by wangyang1
          * 2019年9月23日
          */
         $('#TrdInvestDealQuery001_btn_singleExport').click(function() {
-        	newSingleExportExcel(); 
+        	newSingleExportExcel();
         });
         /**
          * 【吉林银行个性化代码】
@@ -628,5 +629,5 @@ $(function(){
     			exportPdf();
     		});
     });
-    
+
 }());

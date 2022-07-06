@@ -103,7 +103,7 @@
                 Joyin.dialog(JoyinUtil.getLabel(label),basePath+pagePath,
                     "95%", "90%",data,
                     function(){table.reload();});//交易所指令详情
-                
+
             }*/
             if(data.assetType == F01 && data.ps != PS_T04 && data.ps != PS_T49){
                 Joyin.dialog(JoyinUtil.getLabel("EtrInvestAllInfo001.etrBond"),
@@ -240,7 +240,7 @@
                         portfolioId:data.portfolioId
                     },
                     function(){table.reload();});
-                //ADD  BY GAOPENG 20191123 增加可转债转股委托 start 
+                //ADD  BY GAOPENG 20191123 增加可转债转股委托 start
             }else if(data.assetType == F01 && data.ps == PS_T49){
                 Joyin.dialog(JoyinUtil.getLabel("EtrBondToStock002.dblclick"),
                     basePath
@@ -345,9 +345,15 @@
     table.bind('click','.finprodIdLink', function(row) {
         //在新建界面进行显示单行的详细信息
         if(row.assetType == F01){
+            // Joyin.dialog(JoyinUtil.getLabel("EtrInvestAllInfo001.astBond"),
+            //     basePath
+            //     + "invest/asset/bond/FinBondTargetAsset002/init",
+            //     "95%", "80%", {pageModel:PAGE_MODEL_REFERENCE,
+            //         finprodId:row.finprodId,  //金融产品代码
+            //     });
             Joyin.dialog(JoyinUtil.getLabel("EtrInvestAllInfo001.astBond"),
                 basePath
-                + "invest/asset/bond/FinBondTargetAsset002/init",
+                + "home.html?a=a&finprodMarketId=" + row.finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a",
                 "95%", "80%", {pageModel:PAGE_MODEL_REFERENCE,
                     finprodId:row.finprodId,  //金融产品代码
                 });
