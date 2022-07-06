@@ -2,7 +2,7 @@ $(function() {
     /**
      * 当前所选大类
      * */
-    var assetType = PINAN_ASSET_TYPE_F01;
+    var assetType = PINAN_ASSET_TYPE_F02;
     var assetTypeFormer = PINAN_ASSET_TYPE_F01;
     // 第一次加载 的判断标志
     var F02flag = F03flag = F04flag = F05flag = F06flag = F07flag = F08flag =
