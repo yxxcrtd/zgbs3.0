@@ -2489,6 +2489,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             stlPayOrders.setStatus(DictCodeListExt1.交易状态_初始.getValue());
             stlPayOrders.setOrderStatus(DictCodeListExt1.交易状态_初始.getValue());
             stlPayOrders.setOrderRetStatus(DictCodeList.指令处理状态_处理成功.getValue());
+            stlPayOrders.setIsNeedSend(DictCodeList.是否_是.getValue());
             tradeDto.setStlPayOrders(stlPayOrders);
             // 清算指令表（STL_ACT_ORDER）
             StlActOrder stlActOrder = new StlActOrder();

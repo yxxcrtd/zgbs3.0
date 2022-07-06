@@ -721,6 +721,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
                 stlPayOrders.setOrderStatus(DictCodeListExt1.指令状态_新建.getValue());
                 stlPayOrders.setTradeId(entity.getTotleTradeId());
                 stlPayOrders.setWorkflowId(entity.getWorkflowId());
+                stlPayOrders.setIsNeedSend(DictCodeList.是否_是.getValue());
                 stlPayOrdersMapper.insertSelective(stlPayOrders);
             }
 
