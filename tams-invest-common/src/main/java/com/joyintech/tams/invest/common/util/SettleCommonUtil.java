@@ -1,10 +1,7 @@
 package com.joyintech.tams.invest.common.util;
 
 import com.joyintech.framework.util.DateUtil;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 
 import java.util.Map;
@@ -34,6 +31,7 @@ public class SettleCommonUtil {
         params.put("CD_FLOW_01", DictCodeList.托管流水借贷方向_借.getValue());
         params.put("T01", DictCodeList.交易方向_买入.getValue());
         params.put("T02", DictCodeList.交易方向_卖出.getValue());
+        params.put("T04", DictCodeList.交易方向_申购.getValue());
 
         params.put("T39", DictCodeList.交易方向_行权_赎回.getValue());
         params.put("T03", DictCodeList.交易方向_行权_回售.getValue());
@@ -182,6 +180,9 @@ public class SettleCommonUtil {
         params.put("PA_BUSINESS_TYPE147", DictCodeListExt3.平安业务类型_期权放弃行权.getValue());
         params.put("PA_BUSINESS_TYPE148", DictCodeListExt3.平安业务类型_期权提前行权.getValue());
         params.put("PA_BUSINESS_TYPE149", DictCodeListExt3.平安业务类型_期权到期行权.getValue());
+        params.put("PA_BUSINESS_TYPE151", DictCodeListExt4.平安业务类型_中标结果维护.getValue());
+        params.put("PA_BUSINESS_TYPE202",DictCodeListExt4.平安业务类型_债券分销买入确认.getValue());
+        params.put("PA_BUSINESS_TYPE180",DictCodeListExt4.平安业务类型_一级申购.getValue());
 
         params.put("F10", DictCodeListExt1.金融产品类型_投管用_股票.getValue());
         params.put("F29", DictCodeListExt1.金融产品类型_投管用_债券借贷融入.getValue());
@@ -191,6 +192,7 @@ public class SettleCommonUtil {
         params.put("F12", DictCodeListExt1.金融产品类型_投管用_远期.getValue());
         params.put("F13", DictCodeListExt1.金融产品类型_投管用_掉期.getValue());
         params.put("F35", DictCodeListExt1.金融产品类型_投管用_期权.getValue());
+        params.put("F37", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
 
         params.put("TRADE_FLOW_STATUS01", DictCodeListExt1.交易流程状态_流程中.getValue());
         params.put("TRADE_FLOW_STATUS02", DictCodeListExt1.交易流程状态_有效.getValue());

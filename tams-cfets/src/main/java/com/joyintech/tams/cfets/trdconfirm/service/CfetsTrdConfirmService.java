@@ -535,6 +535,7 @@ public class CfetsTrdConfirmService extends BaseService{
             deal.setCounterTrader(entity.getCounterTrader());
             deal.setShareAmt(ArithmeticUtil.divide(regDeal.getFaceValue(), new BigDecimal(100), decimalPlaces_4, RoundingMode.HALF_UP));
             deal.setEntrustId(regDeal.getEntrustId());
+            deal.setbTradeId(regDeal.getTradeId());
             deals.add(deal);
 
             // 金融产品交易附属表Entity 构造开始----------------------------------------------------------
@@ -631,6 +632,7 @@ public class CfetsTrdConfirmService extends BaseService{
         bussTrdTransferOrderDto.setOrderRetStatus(DictCodeList.指令处理状态_处理成功.getValue());
         bussTrdTransferOrderDto.setPortfolioId(null);//可能是多组合，此时该字段为空
         bussTrdTransferOrderDto.setPortfolioName(null);
+        bussTrdTransferOrderDto.setIsNeedSend(DictCodeList.是否_是.getValue());
         bussTrdTransferOrder.add(bussTrdTransferOrderDto);
         entity.setBussTrdTransferOrder(bussTrdTransferOrderService.save(bussTrdTransferOrder));
         // =====================划款指令信息=====================
@@ -821,6 +823,7 @@ public class CfetsTrdConfirmService extends BaseService{
             deal.setTrader(entity.getTrader());
             deal.setCounterId(entity.getCounterId());
             deal.setCounterTrader(entity.getCounterTrader());
+            deal.setbTradeId(regDeal.getTradeId());
             deals.add(deal);
 
             // 金融产品交易附属表Entity 构造开始----------------------------------------------------------
@@ -907,6 +910,7 @@ public class CfetsTrdConfirmService extends BaseService{
         bussTrdTransferOrderDto.setOrderRetStatus(DictCodeList.指令处理状态_处理成功.getValue());
         bussTrdTransferOrderDto.setPortfolioId(null);//可能是多组合，此时该字段为空
         bussTrdTransferOrderDto.setPortfolioName(null);
+        bussTrdTransferOrderDto.setIsNeedSend(DictCodeList.是否_是.getValue());
         bussTrdTransferOrder.add(bussTrdTransferOrderDto);
         entity.setBussTrdTransferOrder(bussTrdTransferOrderService.save(bussTrdTransferOrder));
         // =====================划款指令信息=====================
@@ -1207,8 +1211,9 @@ public class CfetsTrdConfirmService extends BaseService{
         bussTrdTransferOrderDto.setPayAcctNoList(null);
         bussTrdTransferOrderDto.setRecAcctNoList(null);
         bussTrdTransferOrderDto.setIsTotalTrade(BussinessDictCodeList.是否_是.getValue());
+        bussTrdTransferOrderDto.setIsNeedSend(DictCodeList.是否_是.getValue());
         if (StringUtil.isNotEmpty(dtoReg.getSecManageAcctId())) {
-            Map<String, Object> param = new HashMap<String, Object>();
+            Map<String, Object> param = new HashMap<>();
             param.put("secAcctId", dtoReg.getSecManageAcctId());
             String secAcctSource = cfetsTrdConfirmMapper.selectSecAcctSource(param);
             if (StringUtil.equals(BussinessDictCodeList.账户来源_自营.getValue(), secAcctSource)
@@ -1411,6 +1416,7 @@ public class CfetsTrdConfirmService extends BaseService{
             deal.setFeeAmt(getDeatil费用金额(regFeeDetailList, null));
             deal.setFeeAmtPay(getDeatil费用金额(regFeeDetailList, DictCodeList.是否_是.getValue()));
             deal.setFeeAmtUnpay(getDeatil费用金额(regFeeDetailList, DictCodeList.是否_否.getValue()));
+            deal.setbTradeId(regDeal.getTradeId());
             deals.add(deal);
 
             // 金融产品交易附属表Entity 构造开始----------------------------------------------------------
@@ -1616,6 +1622,7 @@ public class CfetsTrdConfirmService extends BaseService{
         bussTrdTransferOrderDto.setPayAcctNoList(null);
         bussTrdTransferOrderDto.setRecAcctNoList(null);
         bussTrdTransferOrderDto.setIsTotalTrade(BussinessDictCodeList.是否_是.getValue());
+        bussTrdTransferOrderDto.setIsNeedSend(DictCodeList.是否_是.getValue());
         if (StringUtil.isNotEmpty(dtoReg.getSecManageAcctId())) {
             Map<String, Object> param = new HashMap<String, Object>();
             param.put("secAcctId", dtoReg.getSecManageAcctId());
@@ -2047,6 +2054,7 @@ public class CfetsTrdConfirmService extends BaseService{
         bussTrdTransferOrderDto.setPayAcctNoList(null);
         bussTrdTransferOrderDto.setRecAcctNoList(null);
         bussTrdTransferOrderDto.setIsTotalTrade(BussinessDictCodeList.是否_是.getValue());
+        bussTrdTransferOrderDto.setIsNeedSend(DictCodeList.是否_是.getValue());
         if (StringUtil.isNotEmpty(dtoReg.getSecManageAcctId())) {
             Map<String, Object> param = new HashMap<String, Object>();
             param.put("secAcctId", dtoReg.getSecManageAcctId());

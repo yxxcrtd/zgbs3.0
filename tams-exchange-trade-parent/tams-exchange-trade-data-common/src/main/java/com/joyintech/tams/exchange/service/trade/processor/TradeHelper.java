@@ -210,7 +210,7 @@ public class TradeHelper {
         logger.info("准备通过风控：instruction {}  entrust {}", instruction.getEntrustId(), entrust.getId());
         if (checkCommonParam(entrust.getFullPrice(), entrust.getEntrustPrice(), entrust.getEntrustVolume(), entrust, instruction)) {
             //意向单无需进风控
-            if (EntrustUtils.isIntentionEntrust(entrust.getEntrustProp()) || StringUtil.equals(DictCodeListExt3.投管业务类型_信用保护凭证.getValue(), instruction.getBusiTypeTg())) {
+            if (EntrustUtils.isIntentionEntrust(entrust.getEntrustProp())) {
                 addEntrustToReceiver(entrust, instruction, msgType);
             } else {
                 RiskOccupyBean riskOccupyBean = investRiskManagement.riskCheck(Arrays.asList(entrust));

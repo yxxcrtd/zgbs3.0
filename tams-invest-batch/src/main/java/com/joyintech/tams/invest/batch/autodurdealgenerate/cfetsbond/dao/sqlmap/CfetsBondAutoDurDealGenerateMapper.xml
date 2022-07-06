@@ -780,4 +780,13 @@
             )
             AND T1.TRADE_ID = #{finprodId}
     </select>
+
+    <select id="findCashIdByFinprodId" resultType="java.lang.String">
+        select CASH_ID
+        from FIN_CASH_INFO
+        where FINPROD_ID = #{finprodId}
+          and CASH_TYPE_1 = #{CASH_TYPE_1}
+          and CASH_TYPE_2 = #{CASH_TYPE_2}
+          and ROWNUM = 1
+    </select>
 </mapper>

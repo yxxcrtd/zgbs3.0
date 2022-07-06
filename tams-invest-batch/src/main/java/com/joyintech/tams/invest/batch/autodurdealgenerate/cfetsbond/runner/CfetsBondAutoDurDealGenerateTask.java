@@ -17,6 +17,7 @@ import com.joyintech.framework.constant.BatchDictCodeList;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.web.PlatformDate;
 import com.joyintech.tams.invest.batch.autodurdealgenerate.cfetsbond.service.CfetsAutoDurDealProcessorService;
+import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -56,7 +57,6 @@ public class CfetsBondAutoDurDealGenerateTask extends BatchBaseService {
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public JobExecution execute()
         throws BatchException {
@@ -82,7 +82,8 @@ public class CfetsBondAutoDurDealGenerateTask extends BatchBaseService {
         catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-           throw new RuntimeException(e);
+            //异常信息记录到批处理的日志详情
+            throw new BatchException(RiskUtil.getLogString(e));
         }
 
         return result;

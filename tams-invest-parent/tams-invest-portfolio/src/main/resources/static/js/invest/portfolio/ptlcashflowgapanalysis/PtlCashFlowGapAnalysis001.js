@@ -7,10 +7,10 @@ $(function () {
     	//add by 张年  2019/08/09  start
         //获取查询日期
         if ($("#searchDate").val() != null && $("#searchDate").val() != '') {
-            if ($("#searchDate").endDate() > sysDate) {
-                Joyin.error("日期必须小于等于平台日");
-                return;
-            }
+            // if ($("#searchDate").endDate() > sysDate) {
+            //     Joyin.error("日期必须小于等于平台日");
+            //     return;
+            // }
             result.searchDateStart = $("#searchDate").startDate();
             result.searchDateEnd = $("#searchDate").endDate();
         }else{
