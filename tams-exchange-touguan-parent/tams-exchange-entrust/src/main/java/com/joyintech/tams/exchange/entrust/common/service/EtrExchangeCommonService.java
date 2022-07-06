@@ -1792,7 +1792,23 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
             for (int i = 0; i < sumSize; i++) {
                 EtrExchangeProtfolioDetailRequest item = portfolioList.get(i);
                 if (i != sumSize - 1) {
-                    item.setEntrustNum(ArithmeticUtil.divide(entrustNum, sumSize, 0));
+                    if(dto.getMinPrice()!=null){ //最小交易单位
+                        //获取小数点的位置
+                        int bitPos=dto.getMinPrice().toString().indexOf(".");
+                        //字符串总长度减去小数点位置，再减去1，就是小数位数
+                        int numOfBits=dto.getMinPrice().toString().length()-bitPos-1;
+                        BigDecimal tempEntrustNum=BigDecimal.ZERO;
+                        if(dto.getEntrustPrice()!=null){
+                            tempEntrustNum=ArithmeticUtil.divide(entrustAmt, dto.getEntrustPrice(), numOfBits);
+                        }
+                        item.setEntrustNum(tempEntrustNum);
+                    }else{
+                        BigDecimal tempEntrustNum=BigDecimal.ZERO;
+                        if(dto.getEntrustPrice()!=null){
+                            tempEntrustNum=ArithmeticUtil.divide(entrustAmt, dto.getEntrustPrice(), 0);
+                        }
+                        item.setEntrustNum(tempEntrustNum);
+                    }
                     item.setEntrustAmt(ArithmeticUtil.divide(entrustAmt, sumSize, 2));
                 } else {
                     BigDecimal tempEntrustNum = dto.getPortfolioList().stream().map(EtrExchangeProtfolioDetailRequest::getEntrustNum).reduce(BigDecimal::add).get();

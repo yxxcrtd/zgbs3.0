@@ -33,6 +33,8 @@ public class EtrExchangePortfolioAllocationRequest  {
     private BigDecimal minStep;
     @ApiModelProperty(name="price",value="净价",example="")
     private BigDecimal price;
+    @ApiModelProperty(name="minPrice",value="最小交易单元",example="")
+    private BigDecimal minPrice;
 
     @ApiModelProperty(name="declaType",value="全价价格",example="")
     private BigDecimal fprice;
@@ -128,5 +130,13 @@ public class EtrExchangePortfolioAllocationRequest  {
 
     public void setEntrustPrice(BigDecimal entrustPrice) {
         this.entrustPrice = entrustPrice;
+    }
+
+    public BigDecimal getMinPrice() {
+        return minPrice;
+    }
+
+    public void setMinPrice(BigDecimal minPrice) {
+        this.minPrice = minPrice;
     }
 }
