@@ -278,6 +278,7 @@
         where 1=1
         /*and tpd.CASH_ID = fcp.CASH_ID  */
         and( (tpd.CASH_ID is not null and tpd.CASH_ID    = fcp.CASH_ID)
+        or (tpd.cash_id is not null and tpd.cash_id = (select cash_id from FIN_CASH_PLAN fcp1 where fcp1.mdate=fcp.mdate and fcp1.FINPROD_ID=fcp.FINPROD_ID and fcp1.cash_type in('02','03') ))
         or(tpd.CASH_ID is null and tpd.FINPROD_ID = fcp.FINPROD_ID
         and tpd.FINPROD_TYPE2 = 'F16' and tpd.ps = decode(fcp.CASH_TYPE,'01','C7')))
         /* TISHKBS-632  产品端中间付息交易TRD_PRODUCT_DEAL.CASH_ID 为空 ，故不能过滤产品中间付息交易 modify by caojin 2020/6/7 end */
@@ -309,7 +310,7 @@
             </foreach>
 
         </if>
-        and not exists (
+        <!--and not exists (
         SELECT 1
         FROM
         PTL_CASH_POSITION_FLOW pcpf
@@ -341,7 +342,7 @@
                 #{item}
             </foreach>)
         </if>
-        <!--  add by wangyang1 【吉林银行】 增加 产品经理  2019年9月29日 start -->
+        &lt;!&ndash;  add by wangyang1 【吉林银行】 增加 产品经理  2019年9月29日 start &ndash;&gt;
         <if test=" prodManager !=null and prodManager.size()>0" >
             AND (FIN_PRODUCT_ADD.PROD_MANAGER IN
             <foreach collection="prodManager" item="item" index="index" open="(" close=")" separator=",">
@@ -352,8 +353,8 @@
             </foreach>)
 
         </if>
-        <!--  add by wangyang1 【吉林银行】 增加 产品经理end -->
-        <!--  add by swwan [重庆银行] 组合系列 20210722 start -->
+        &lt;!&ndash;  add by wangyang1 【吉林银行】 增加 产品经理end &ndash;&gt;
+        &lt;!&ndash;  add by swwan [重庆银行] 组合系列 20210722 start &ndash;&gt;
         <if test="portfolioSeriesList !=null and portfolioSeriesList.size()>0" >
             AND (ppp.PORTFOLIO_SERIES IN
             <foreach collection="portfolioSeriesList" item="item" index="index" open="(" close=")" separator=",">
@@ -363,7 +364,7 @@
                 #{item}
             </foreach>)
         </if>
-        <!--  add by swwan [重庆银行] 组合系列 20210722 end -->
+        &lt;!&ndash;  add by swwan [重庆银行] 组合系列 20210722 end &ndash;&gt;
         <if test="fundAccountList != null and fundAccountList.size()>0 ">
             and (pcpf.ACCT_ID in
             <foreach collection="fundAccountList" item="item" index= "index" open="(" close=")" separator="," >
@@ -412,7 +413,7 @@
             </foreach>
             )
         </if>
-        )
+        )-->
         and psp.AMOUNT > 0
         union all
 
@@ -500,7 +501,9 @@
         </if>
         and not exists (
         select 1 from TRD_PRODUCT_DEAL tpd
-        where tpd.CASH_ID = fcp.CASH_ID
+        where (tpd.CASH_ID = fcp.CASH_ID
+            or ( tpd.cash_id = (select cash_id from FIN_CASH_PLAN fcp1 where fcp1.mdate=fcp.mdate and fcp1.FINPROD_ID=fcp.FINPROD_ID and fcp1.cash_type in('02','03') ))
+            )
         and tpd.MDATE >= fcp.VDATE
         and fcp.MDATE >= tpd.MDATE
         and tpd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR}
