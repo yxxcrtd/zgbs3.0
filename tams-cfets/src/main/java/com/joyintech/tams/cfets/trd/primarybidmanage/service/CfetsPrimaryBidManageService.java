@@ -473,6 +473,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 response.setIntAmt(detailDtos.get(0).getIntAmt());
             }
             response.setAllocationDetails(detailDtos);
+            detailDtos = this.productDtoSort(response);
+            response.setAllocationDetails(detailDtos);
             return response;
         }
         return null;
@@ -1837,19 +1839,20 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
      */
     public CfetsBidManageCalcAmountResponse calAmtInfo(CfetsPrimaryBidManageSaveRequest request) {
         CfetsBidManageCalcAmountResponse amountResponse = new CfetsBidManageCalcAmountResponse();
+        List<CfetsPrimaryBidManageSaveDetailDto> list = this.productDtoSort(request);
         // 净价
         BigDecimal cprice = BigDecimal.ZERO;
         // 应计利息
         BigDecimal intAmt = BigDecimal.ZERO;
-        if (CollectionUtils.isNotEmpty(request.getAllocationDetails())
-                && request.getAllocationDetails().get(0).getWinCprice() != null) {
-            cprice = request.getAllocationDetails().get(0).getWinCprice();
-            intAmt = request.getAllocationDetails().get(0).getIntAmt();
+        if (CollectionUtils.isNotEmpty(list)
+                && list.get(0).getWinCprice() != null) {
+            cprice = list.get(0).getWinCprice();
+            intAmt = list.get(0).getIntAmt();
         }
         if (StringUtil.equals(DictCodeListExt4.中标方式_多标位中标.getValue(), request.getWinType())) {
             BigDecimal total = null; // 总净价
             BigDecimal weightTotal = null; // 权重汇总
-            for (CfetsPrimaryBidManageSaveDetailDto allocationDetail : request.getAllocationDetails()) {
+            for (CfetsPrimaryBidManageSaveDetailDto allocationDetail : list) {
                 total = ArithmeticUtil.doAdd(total, allocationDetail.getActWinPrinamt());
                 weightTotal = ArithmeticUtil.doAdd(weightTotal, ArithmeticUtil.multiply(allocationDetail.getActWinPrinamt(), allocationDetail.getWinCprice()));
             }
