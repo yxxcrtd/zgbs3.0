@@ -49,6 +49,10 @@ public class EtrExchangePortfolioAllocationRequest  {
 
     @ApiModelProperty(name="entrustNum",value="指令数量",example="12")
     private BigDecimal entrustNum=BigDecimal.ZERO;
+
+    @ApiModelProperty(name="ps",value="交易方向",example="T01")
+    private String ps;
+
     @ApiModelProperty(name="portfolioIdList",value="组合代码集合",example="[对象1,对象1,...]", required = true)
     List<EtrExchangeProtfolioDetailRequest> portfolioList;
 
@@ -138,5 +142,13 @@ public class EtrExchangePortfolioAllocationRequest  {
 
     public void setMinPrice(BigDecimal minPrice) {
         this.minPrice = minPrice;
+    }
+
+    public String getPs() {
+        return ps;
+    }
+
+    public void setPs(String ps) {
+        this.ps = ps;
     }
 }
