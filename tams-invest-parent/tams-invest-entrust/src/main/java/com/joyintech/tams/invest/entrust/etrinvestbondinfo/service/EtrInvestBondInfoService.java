@@ -555,7 +555,7 @@ public class EtrInvestBondInfoService extends CommonExportService<EtrInvestBondI
         	dto.setSettleDate(tradingDay);
         }*/
         //update by zhangnian 20200212  start  债券二级指令改造
-        if(StringUtil.isNotEmpty(dto.getSettleSpreed())){
+        if(StringUtil.isNotEmpty(dto.getSettleSpreed())&&!StringUtils.equals(dto.getSettleSpreed(),"null")){
             if(Integer.parseInt(dto.getSettleSpreed())!=0){
                 List<String> holiday = dateCalService.getDealCalendarHoliday(dto.getVdate(),
                         DateUtil.addDays(dto.getVdate(), 31),dto.getCalendarId());

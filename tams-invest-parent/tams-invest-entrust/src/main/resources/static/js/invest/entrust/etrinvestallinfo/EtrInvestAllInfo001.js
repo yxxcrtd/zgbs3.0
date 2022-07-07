@@ -219,11 +219,12 @@
                     "95%", "90%",
                     param);
             }
-            //大宗交易、协议现券 、债转股 、质押券出入库、配债、配股、新股申购、可转债申购
+            //大宗交易、协议现券 、债转股 、质押券出入库、配债、配股、新股申购、可转债申购、场内债券
             else if(data.busiTypePosition == 'EX002' || data.busiTypePosition == 'EX016'
                 || data.busiTypePosition == 'EX004' || data.busiTypePosition == 'EX005'
                 || data.busiTypePosition == 'EX006' || data.busiTypePosition == 'EX008'
-                || data.busiTypePosition == 'EX009' || data.busiTypePosition == 'EX007'){
+                || data.busiTypePosition == 'EX009' || data.busiTypePosition == 'EX007'
+                || data.busiTypePosition == 'EX017'){
                 var param = {
                     "busiCode": data.entrustId
                 };
