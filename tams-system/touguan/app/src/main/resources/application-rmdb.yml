@@ -10,13 +10,13 @@ tx-lcn:
     onlyError: true
          
 spring:
-  #============Master Datasource============# BSINV306_GL_TEST  BSINV306_GL_DEV  BS303INIT_TEST1008_03
+  #============Master Datasource============# BSINV306_GL_TEST  BSINV306_GL_DEV  BSINV306_GL_TEST
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: oracle.jdbc.driver.OracleDriver
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    username: BS303INIT_TEST1008_03
-    password: BS303INIT_TEST1008_03
+    username: BSINV306_GL_TEST
+    password: BSINV306_GL_TEST
     #defaultTransactionIsolation: 
     name: master                             #数据库名称
     initialSize: 10                          #在连接池中初始化多少个连接
@@ -45,8 +45,8 @@ base:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: oracle.jdbc.driver.OracleDriver
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    username: BS303INIT_TEST1008_03
-    password: BS303INIT_TEST1008_03
+    username: BSINV306_GL_TEST
+    password: BSINV306_GL_TEST
     #defaultTransactionIsolation: 
     name: base                               #数据库名称
     initialSize: 10                          #在连接池中初始化多少个连接
@@ -72,8 +72,8 @@ chbsend:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: oracle.jdbc.driver.OracleDriver
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    username: BS303INIT_TEST1008_03
-    password: BS303INIT_TEST1008_03
+    username: BSINV306_GL_TEST
+    password: BSINV306_GL_TEST
     #defaultTransactionIsolation: 
     name: chbSend                            #数据库名称
     initialSize: 10                          #在连接池中初始化多少个连接
@@ -99,8 +99,8 @@ interf:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: oracle.jdbc.driver.OracleDriver
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    username: BS303INIT_TEST1008_03
-    password: BS303INIT_TEST1008_03
+    username: BSINV306_GL_TEST
+    password: BSINV306_GL_TEST
     #defaultTransactionIsolation: 
     name: interf                             #数据库名称
     initialSize: 10                          #在连接池中初始化多少个连接
@@ -126,8 +126,8 @@ stresstest:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: oracle.jdbc.driver.OracleDriver
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    username: BS303INIT_TEST1008_03
-    password: BS303INIT_TEST1008_03
+    username: BSINV306_GL_TEST
+    password: BSINV306_GL_TEST
     #defaultTransactionIsolation: 
     name: stresstest                         #数据库名称
     initialSize: 10                          #在连接池中初始化多少个连接
@@ -154,8 +154,8 @@ wind:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: oracle.jdbc.driver.OracleDriver
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    username: BS303INIT_TEST1008_03
-    password: BS303INIT_TEST1008_03
+    username: BSINV306_GL_TEST
+    password: BSINV306_GL_TEST
     #defaultTransactionIsolation: 
     name: wind                               #数据库名称
     initialSize: 10                          #在连接池中初始化多少个连接
@@ -179,6 +179,6 @@ wind:
 application:
   sqldirurl: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
   driverClassName: oracle.jdbc.driver.OracleDriver
-  sqldiruserName: BS303INIT_TEST1008_03
-  sqldirpassword: BS303INIT_TEST1008_03
+  sqldiruserName: BSINV306_GL_TEST
+  sqldirpassword: BSINV306_GL_TEST
     

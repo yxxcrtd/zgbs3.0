@@ -63,18 +63,73 @@
 		</where>
 	</select>
 
+	<select id="getById" resultType="com.joyintech.service.entrust.etrinvestallinfo.dto.EtrInvestAllInfoDto">
+		SELECT
+			TT.*
+		FROM
+			(
+			SELECT
+				T1.ENTRUST_STATUS entrustStatus,
+				T1.ENTRUST_ID entrustId,
+				T1.PORTFOLIO_ID portfolioId,
+				T1.FINPROD_TYPE2 finprodType2,
+				T1.PS ps,
+				T1.TRADE_MARKET tradeMarket,
+				T4.BUSI_TYPE_POSITION busiTypePosition
+			FROM
+				ETR_ENTRUST T1
+				LEFT JOIN ETR_ENTRUST_ADD T4 ON T4.ENTRUST_ID = T1.ENTRUST_ID
+			WHERE
+				T1.FINPROD_TYPE2 != 'F36' UNION
+			SELECT
+				'08' entrustStatus,
+				T1.ENTRUST_ID entrustId,
+				T1.PORTFOLIO_ID portfolioId,
+				T1.FINPROD_TYPE2 finprodType2,
+				T1.PS ps,
+				T1.TRADE_MARKET tradeMarket,
+				T4.BUSI_TYPE_POSITION busiTypePosition
+			FROM
+				WFL_ETR_ENTRUST T1
+				LEFT JOIN WFL_ETR_ENTRUST_ADD T4 ON T4.ENTRUST_ID = T1.ENTRUST_ID
+			WHERE
+				T1.FINPROD_TYPE2 != 'F36' UNION
+			SELECT
+				T1.ENTRUST_STATUS entrustStatus,
+				T1.ENTRUST_ID entrustId,
+				T1.PORTFOLIO_ID portfolioId,
+				T1.FINPROD_TYPE2 finprodType2,
+				T1.PS ps,
+				T1.TRADE_MARKET tradeMarket,
+				T4.BUSI_TYPE_POSITION busiTypePosition
+			FROM
+				ETR_ENTRUST T1
+				LEFT JOIN ETR_ENTRUST_ADD T4 ON T4.ENTRUST_ID = T1.ENTRUST_ID
+			WHERE
+				T1.FINPROD_TYPE2 = 'F36'
+			) TT
+		WHERE
+			TT.entrustId = #{entrustId}
+	</select>
+
 	<select id="select"
 			resultType="com.joyintech.service.entrust.etrinvestallinfo.dto.EtrInvestAllInfoDto">
-		select * from (
+		select TT.* from (
 		SELECT
 		T1.ENTRUST_STATUS entrustStatus,
 		T1.ENTRUST_ID entrustId,
-		T1.PORTFOLIO_ID portfolioId,
+		nvl( detail.PORTFOLIO_ID, T1.PORTFOLIO_ID ) portfolioId,
+		nvl( detail.PORTFOLIO_NAME, T2.PORTFOLIO_NAME ) portfolioName,
 		CASE
-		WHEN T1.ENTRUST_CLASS= #{ENTRUST_CLASS_02} THEN TREE.TREE_NAME
-		ELSE T2.PORTFOLIO_NAME END AS portfolioName,
-		CASE WHEN T4.ASSET_TYPE = 'F07' AND T1.PS IN('03','04') THEN T1.STOCK_ID ELSE T3.FINPROD_ID end finprodId,
-		CASE WHEN T4.ASSET_TYPE = 'F07' AND T1.PS IN('03','04') THEN T1.STOCK_ID ELSE T3.FINPROD_MARKET_ID end finprodMarketId,
+		WHEN T4.ASSET_TYPE = 'F07'
+		AND T1.PS IN ( '03', '04' ) THEN
+		T1.STOCK_ID ELSE T3.FINPROD_ID
+		END finprodId,
+		CASE
+		WHEN T4.ASSET_TYPE = 'F07'
+		AND T1.PS IN ( '03', '04', 'T56', 'T93', 'T94', 'T95', 'T96' ) THEN
+		nvl(T1.STOCK_ID, T4.TERM_TYPE) ELSE ( CASE WHEN T3.FINPROD_MARKET_ID IS NOT NULL THEN T3.FINPROD_MARKET_ID ELSE T4.ASSET_TYPE_10 END )
+		END finprodMarketId,
 		T3.FINPROD_TYPE2 finprodType2,
 		CASE WHEN T4.ASSET_TYPE = 'F07' AND T1.PS IN('03','04') AND T1.TRADE_MARKET NOT IN ('03','04')  AND T4.ASSET_TYPE1 = 'H01' THEN T1.FINPROD_ID ELSE T3.FINPROD_NAME end finprodName,
 		T1.PS ps,
@@ -88,7 +143,22 @@
 		T1.TRADE_MARKET tradeMarket,
 		T1.TRADE_PLAT tradePlat,
 		T4.SETTLE_SPREED settleSpreed,
-		(CASE WHEN T4.ASSET_TYPE = #{assetBond} THEN T1.ENTRUST_NUM*100 ELSE  NVL(T1.ENTRUST_AMT,T1.ENTRUST_NUM*100) END) entrustAmt,
+		CASE
+			WHEN T4.BUSI_TYPE_POSITION IN ( '01', '34' ) THEN
+				T1.ENTRUST_NUM * 100 ELSE decode(
+					T4.BUSI_TYPE_POSITION,
+					'EX004',
+					NVL( T1.ENTRUST_AMT * T1.ENTRUST_NUM, 0 ),
+			decode(
+				T4.ASSET_TYPE,
+				'F01',
+				NVL( T1.ENTRUST_AMT, T1.ENTRUST_NUM ),
+				'F10',
+				NVL( T1.ENTRUST_NUM * 100, 0 ),
+				NVL( T1.ENTRUST_AMT, T1.ENTRUST_NUM )
+			)
+		)
+		END AS entrustAmt,
 		NVL(T1.CCY , 'CNY' ) ccy,
 		T1.VDATE vdate,
 		T1.MDATE mdate,
@@ -99,20 +169,34 @@
 		T1.REMARK remark
 		,T4.PB_EXPORTSTATUS pbExportstatus/*PB是否已导出;PB上下行关联改造 add by caoxue 2019-12-27*/
 		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 start -->
-		,SSAI.SEC_ACCT_NAME AS secAcctName
+		,nvl( SSAI.SEC_ACCT_NAME, sci.ACCT_NAME ) AS secAcctName
 		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 end -->
 		<!-- add by wanshiwei 2021-09-22 指令创建来源 start -->
 		,T4.ENTRUST_CREATE_SOURCE AS entrustCreateSource
 		<!-- add by wanshiwei 2021-09-22 指令创建来源 end -->
 		,'' nextUser
-		,T1.ENTRUST_CLASS
+		,T1.ENTRUST_CLASS,
+		T4.BUSI_TYPE_POSITION busiTypePosition
 		FROM ETR_ENTRUST T1
 		LEFT JOIN MUTIPTL_PORTFOLIO_TREE TREE ON T1.PORTFOLIO_ID = TREE.TREE_ID AND TREE.PAR_TREE_ID IS NOT NULL
 		LEFT JOIN PTL_PORTFOLIO T2 ON T1.PORTFOLIO_ID = T2.PORTFOLIO_ID
 		LEFT JOIN FIN_PRODUCT T3 ON T1.FINPROD_ID = T3.FINPROD_ID
-		<!-- INNER JOIN PTL_PORTFOLIO_AUTHORITY T6
-		ON
-		T2.PORTFOLIO_ID = T6.PORTFOLIO_ID -->
+		LEFT JOIN (
+		SELECT
+		EED.ENTRUST_ID,
+		wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID,
+		wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
+		wm_concat ( EED.SEC_ACCT_ID ) AS SEC_ACCT_ID,
+		wm_concat ( sci.ACCT_NO ) AS ACCT_NO,
+		wm_concat ( sci.ACCT_NAME ) AS ACCT_NAME
+		FROM
+		ETR_ENTRUST_DETAIL EED
+		LEFT JOIN ( SELECT PORTFOLIO_ID, PORTFOLIO_NAME FROM PTL_PORTFOLIO ORDER BY PORTFOLIO_ID, PORTFOLIO_NAME ) FP ON EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
+		LEFT JOIN STL_SEC_ACCT_INFO ssai ON EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
+		LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
+		GROUP BY
+		EED.ENTRUST_ID
+		) detail ON T1.ENTRUST_ID = detail.ENTRUST_ID
 		LEFT JOIN ETR_ENTRUST_ADD T4 ON T4.ENTRUST_ID = T1.ENTRUST_ID
 		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 start -->
 		LEFT JOIN
@@ -120,19 +204,17 @@
 		ON
 		T4.SEC_ACCT_ID = SSAI.SEC_ACCT_ID
 		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 end -->
-		INNER JOIN
-		PTL_PORTFOLIO_AUTHORITY T6
-		ON
-		T2.PORTFOLIO_ID = T6.PORTFOLIO_ID
+		LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
+		LEFT JOIN (
+		select ENTRUST_ID ,PORTFOLIO_ID
+		from(select ol.ENTRUST_ID,ol.PORTFOLIO_ID, row_number() OVER(PARTITION BY ol.ENTRUST_ID ORDER BY ol.ENTRUST_ID)
+		ds
+		from ETR_ENTRUST_DETAIL ol where ol.ENTRUST_ID is not null) where ds = 1 ) det2 ON det2.ENTRUST_ID =
+		T1.ENTRUST_ID
+		INNER JOIN PTL_PORTFOLIO_AUTHORITY T6 ON (T2.PORTFOLIO_ID = T6.PORTFOLIO_ID OR T6.PORTFOLIO_ID = det2.PORTFOLIO_ID)
 		<where>
 			AND  T1.FINPROD_TYPE2 != 'F36'
 			AND T6.USER_ID = #{userId}
-			<!-- AND T6.USER_ID = #{userId}
-			AND T1.INV_MANAGER_ID=#{userId} -->
-			<!-- <if test="portfolioId != null and !portfolioId.equals('')">
-                AND (T1.PORTFOLIO_ID like concat('%',concat(#{portfolioId},'%'))
-                    OR T2.PORTFOLIO_NAME like concat('%',concat(#{portfolioId},'%')))
-            </if> -->
 			<if test="portfolioIdList != null and portfolioIdList.size() >0">
 				AND ((T2.PORTFOLIO_ID IN
 				<foreach collection="portfolioIdList" index="index" item="prot" open="(" separator="," close=")" >
@@ -167,12 +249,6 @@
 				and #{tradePlat} = T4.SETTLE_SPREED
 			</if>
 			<if test="ps != null and !ps.equals('')">
-				<!-- <if test="ps.equals(ps01) or ps.equals(ps02) or ps.equals(ps03) or ps.equals(ps04) or ps.equals(ps05) or ps.equals(ps06)">
-                    and #{ps} = T4.BUSI_PS
-                </if>
-                <if test="!ps.equals(ps01) and !ps.equals(ps02) and !ps.equals(ps03) and !ps.equals(ps04) and !ps.equals(ps05) and !ps.equals(ps06)">
-                    and #{ps} = T1.PS
-                </if> -->
 				AND (case
 				<if test="IRSType_01.equals(IRSps) or IRSType_02.equals(IRSps) or PS_T01.equals(ps)">
 					when  T4.ASSET_TYPE IN (#{ASSET_TYPE_16})
@@ -221,12 +297,18 @@
 		SELECT
 		'08' entrustStatus,
 		T1.ENTRUST_ID entrustId,
-		T1.PORTFOLIO_ID portfolioId,
+		nvl( detail.PORTFOLIO_ID, T1.PORTFOLIO_ID ) portfolioId,
+		nvl( detail.PORTFOLIO_NAME, T2.PORTFOLIO_NAME ) portfolioName,
 		CASE
-		WHEN T1.ENTRUST_CLASS= #{ENTRUST_CLASS_02} THEN TREE.TREE_NAME
-		ELSE T2.PORTFOLIO_NAME END AS portfolioName,
-		CASE WHEN T4.ASSET_TYPE = 'F07' AND T1.PS IN('03','04') THEN T1.STOCK_ID ELSE T3.FINPROD_ID end finprodId,
-		CASE WHEN T4.ASSET_TYPE = 'F07' AND T1.PS IN('03','04') THEN T1.STOCK_ID ELSE T3.FINPROD_MARKET_ID end finprodMarketId,
+		WHEN T4.ASSET_TYPE = 'F07'
+		AND T1.PS IN ( '03', '04' ) THEN
+		T1.STOCK_ID ELSE T3.FINPROD_ID
+		END finprodId,
+		CASE
+		WHEN T4.ASSET_TYPE = 'F07'
+		AND T1.PS IN ( '03', '04', 'T56', 'T93', 'T94', 'T95', 'T96' ) THEN
+		nvl(T1.STOCK_ID, T4.TERM_TYPE) ELSE ( CASE WHEN T3.FINPROD_MARKET_ID IS NOT NULL THEN T3.FINPROD_MARKET_ID ELSE T4.ASSET_TYPE_10 END )
+		END finprodMarketId,
 		T3.FINPROD_TYPE2 finprodType2,
 		CASE WHEN T4.ASSET_TYPE = 'F07' AND T1.PS IN('03','04') AND T1.TRADE_MARKET NOT IN ('03','04')  AND T4.ASSET_TYPE1 = 'H01' THEN T1.FINPROD_ID ELSE T3.FINPROD_NAME end finprodName,
 		T1.PS ps,
@@ -240,7 +322,22 @@
 		T1.TRADE_MARKET tradeMarket,
 		T1.TRADE_PLAT tradePlat,
 		T4.SETTLE_SPREED settleSpreed,
-		(CASE WHEN T4.ASSET_TYPE = #{assetBond} THEN T1.ENTRUST_NUM*100 ELSE  NVL(T1.ENTRUST_AMT,T1.ENTRUST_NUM*100) END) entrustAmt,
+		CASE
+		WHEN T4.BUSI_TYPE_POSITION IN ( '01', '34' ) THEN
+		T1.ENTRUST_NUM * 100 ELSE decode(
+		T4.BUSI_TYPE_POSITION,
+		'EX004',
+		NVL( T1.ENTRUST_AMT * T1.ENTRUST_NUM, 0 ),
+		decode(
+		T4.ASSET_TYPE,
+		'F01',
+		NVL( T1.ENTRUST_AMT, T1.ENTRUST_NUM ),
+		'F10',
+		NVL( T1.ENTRUST_NUM * 100, 0 ),
+		NVL( T1.ENTRUST_AMT, T1.ENTRUST_NUM )
+		)
+		)
+		END AS entrustAmt,
 		nvl(T1.CCY,'CNY') ccy,
 		T1.VDATE vdate,
 		T1.MDATE mdate,
@@ -251,21 +348,35 @@
 		T1.REMARK remark
 		,T4.PB_EXPORTSTATUS pbExportstatus/*PB是否已导出;PB上下行关联改造 add by caoxue 2019-12-27*/
 		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 start -->
-		,SSAI.SEC_ACCT_NAME AS secAcctName
+		,nvl( SSAI.SEC_ACCT_NAME, sci.ACCT_NAME ) AS secAcctName
 		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 end -->
 		<!-- add by wanshiwei 2021-09-22 指令创建来源 start -->
 		,T4.ENTRUST_CREATE_SOURCE AS entrustCreateSource
 		<!-- add by wanshiwei 2021-09-22 指令创建来源 end -->
 		,SWBL.NEXT_USER nextUser
-		,T1.ENTRUST_CLASS
+		,T1.ENTRUST_CLASS,
+		T4.BUSI_TYPE_POSITION busiTypePosition
 		FROM WFL_ETR_ENTRUST T1
 		LEFT JOIN MUTIPTL_PORTFOLIO_TREE TREE ON T1.PORTFOLIO_ID = TREE.TREE_ID AND TREE.PAR_TREE_ID IS NOT NULL
 		LEFT JOIN SYS_WFL_BUSINESS_LIST SWBL ON SWBL.SEQ_NO = T1.WORKFLOW_ID and SWBL.PROCESS_STATE != 'END'
 		LEFT JOIN PTL_PORTFOLIO T2 ON T1.PORTFOLIO_ID = T2.PORTFOLIO_ID
 		LEFT JOIN FIN_PRODUCT T3 ON T1.FINPROD_ID = T3.FINPROD_ID
-		<!-- INNER JOIN PTL_PORTFOLIO_AUTHORITY T6
-		ON
-		T2.PORTFOLIO_ID = T6.PORTFOLIO_ID -->
+		LEFT JOIN (
+		SELECT
+		EED.ENTRUST_ID,
+		wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID,
+		wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
+		wm_concat ( EED.SEC_ACCT_ID ) AS SEC_ACCT_ID,
+		wm_concat ( sci.ACCT_NO ) AS ACCT_NO,
+		wm_concat ( sci.ACCT_NAME ) AS ACCT_NAME
+		FROM
+		WFL_ETR_ENTRUST_DETAIL EED
+		LEFT JOIN ( SELECT PORTFOLIO_ID, PORTFOLIO_NAME FROM PTL_PORTFOLIO ORDER BY PORTFOLIO_ID, PORTFOLIO_NAME ) FP ON EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
+		LEFT JOIN STL_SEC_ACCT_INFO ssai ON EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
+		LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
+		GROUP BY
+		EED.ENTRUST_ID
+		) detail ON T1.ENTRUST_ID = detail.ENTRUST_ID
 		LEFT JOIN WFL_ETR_ENTRUST_ADD T4 ON T4.ENTRUST_ID = T1.ENTRUST_ID
 		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 start -->
 		LEFT JOIN
@@ -273,19 +384,18 @@
 		ON
 		T4.SEC_ACCT_ID = SSAI.SEC_ACCT_ID
 		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 end -->
-		INNER JOIN
-		PTL_PORTFOLIO_AUTHORITY T6
-		ON
-		T2.PORTFOLIO_ID = T6.PORTFOLIO_ID
+		LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
+		LEFT JOIN (
+			select ENTRUST_ID ,PORTFOLIO_ID
+			from(select ol.ENTRUST_ID,ol.PORTFOLIO_ID, row_number() OVER(PARTITION BY ol.ENTRUST_ID ORDER BY ol.ENTRUST_ID)
+			ds
+			from ETR_ENTRUST_DETAIL ol where ol.ENTRUST_ID is not null) where ds = 1 ) det2 ON det2.ENTRUST_ID =
+			T1.ENTRUST_ID
+		INNER JOIN PTL_PORTFOLIO_AUTHORITY T6
+			ON (T2.PORTFOLIO_ID = T6.PORTFOLIO_ID OR T6.PORTFOLIO_ID = det2.PORTFOLIO_ID)
 		<where>
-			AND  T1.FINPROD_TYPE2 != 'F36'
+			AND  T1.FINPROD_TYPE2 !='F36'
 			AND T6.USER_ID = #{userId}
-			<!-- AND T6.USER_ID = #{userId}
-			AND T1.INV_MANAGER_ID=#{userId} -->
-			<!-- <if test="portfolioId != null and !portfolioId.equals('')">
-                AND (T1.PORTFOLIO_ID like concat('%',concat(#{portfolioId},'%'))
-                    OR T2.PORTFOLIO_NAME like concat('%',concat(#{portfolioId},'%')))
-            </if> -->
 			<if test="portfolioIdList != null and portfolioIdList.size() >0">
 				AND ((T2.PORTFOLIO_ID IN
 				<foreach collection="portfolioIdList" index="index" item="prot" open="(" separator="," close=")" >
@@ -369,68 +479,97 @@
 		</where>
 		union
 		SELECT
-		T1.ENTRUST_STATUS entrustStatus,
-		T1.ENTRUST_ID entrustId,
-		T1.PORTFOLIO_ID portfolioId,
-		CASE
-		WHEN T1.ENTRUST_CLASS= #{ENTRUST_CLASS_02} THEN TREE.TREE_NAME
-		ELSE T2.PORTFOLIO_NAME END AS portfolioName,
-		T1.FINPROD_ID finprodId,
-		T3.FINPROD_MARKET_ID finprodMarketId,
-		T1.FINPROD_TYPE2 finprodType2,
-		T3.FINPROD_ABBR finprodName,
-		T1.PS ps,
-		CASE
-		WHEN T4.ASSET_TYPE IN (#{ASSET_TYPE_16})
-		THEN (SELECT ITEM_VALUE FROM sys_datadict_list WHERE DICT_CODE = 'IRS_TYPE' AND ITEM_CODE = T4.BUSI_PS)
-		WHEN T4.ASSET_TYPE IN (#{ASSET_TYPE_07},#{ASSET_TYPE_10}, #{ASSET_TYPE_12},#{ASSET_TYPE_16})
-		THEN (SELECT ITEM_VALUE FROM sys_datadict_list WHERE DICT_CODE = 'BACK_LEND_DIRECTION' AND ITEM_CODE = T4.BUSI_PS)
-		ELSE (SELECT ITEM_VALUE FROM sys_datadict_list WHERE DICT_CODE = 'PS' AND ITEM_CODE = T1.PS)
-		END AS psStr,
-		T1.TRADE_MARKET tradeMarket,
-		T1.TRADE_PLAT tradePlat,
-		T4.SETTLE_SPREED settleSpreed,
-		(CASE WHEN T4.ASSET_TYPE = #{assetBond} THEN T1.ENTRUST_NUM*100 ELSE  NVL(T1.ENTRUST_AMT,T1.ENTRUST_NUM) END) entrustAmt,
-		nvl(T1.CCY,'CNY' ) ccy,
-		T1.VDATE vdate,
-		T1.MDATE mdate,
-		T1.INV_MANAGER_ID invManagerId,
-		T4.ASSET_TYPE assetType,
-		T4.BUSI_PS busiPs,
-		T1.entrust_Type entrustType,
-		T1.REMARK remark
-		,T4.PB_EXPORTSTATUS pbExportstatus/*PB是否已导出;PB上下行关联改造 add by caoxue 2019-12-27*/
-		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 start -->
-		,SSAI.SEC_ACCT_NAME AS secAcctName
-		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 end -->
-		<!-- add by wanshiwei 2021-09-22 指令创建来源 start -->
-		,T4.ENTRUST_CREATE_SOURCE AS entrustCreateSource
-		<!-- add by wanshiwei 2021-09-22 指令创建来源 end -->
-		,'' nextUser
-		,T1.ENTRUST_CLASS
+			T1.ENTRUST_STATUS entrustStatus,
+			T1.ENTRUST_ID entrustId,
+			nvl( detail.PORTFOLIO_ID, T1.PORTFOLIO_ID ) portfolioId,
+			nvl( detail.PORTFOLIO_NAME, T2.PORTFOLIO_NAME ) portfolioName,
+			CASE
+				WHEN T4.ASSET_TYPE = 'F07'
+				AND T1.PS IN ( '03', '04' ) THEN
+				T1.STOCK_ID ELSE T3.FINPROD_ID
+			END finprodId,
+			CASE
+				WHEN T4.ASSET_TYPE = 'F07'
+				AND T1.PS IN ( '03', '04', 'T56', 'T93', 'T94', 'T95', 'T96' ) THEN
+				nvl(T1.STOCK_ID, T4.TERM_TYPE) ELSE ( CASE WHEN T3.FINPROD_MARKET_ID IS NOT NULL THEN T3.FINPROD_MARKET_ID ELSE T4.ASSET_TYPE_10 END )
+			END finprodMarketId,
+			T1.FINPROD_TYPE2 finprodType2,
+			T3.FINPROD_ABBR finprodName,
+			T1.PS ps,
+			CASE
+				WHEN T4.ASSET_TYPE IN (#{ASSET_TYPE_16})
+				THEN (SELECT ITEM_VALUE FROM sys_datadict_list WHERE DICT_CODE = 'IRS_TYPE' AND ITEM_CODE = T4.BUSI_PS)
+				WHEN T4.ASSET_TYPE IN (#{ASSET_TYPE_07},#{ASSET_TYPE_10}, #{ASSET_TYPE_12},#{ASSET_TYPE_16})
+				THEN (SELECT ITEM_VALUE FROM sys_datadict_list WHERE DICT_CODE = 'BACK_LEND_DIRECTION' AND ITEM_CODE = T4.BUSI_PS)
+				ELSE (SELECT ITEM_VALUE FROM sys_datadict_list WHERE DICT_CODE = 'PS' AND ITEM_CODE = T1.PS)
+			END AS psStr,
+			T1.TRADE_MARKET tradeMarket,
+			T1.TRADE_PLAT tradePlat,
+			T4.SETTLE_SPREED settleSpreed,
+			CASE
+				WHEN T4.BUSI_TYPE_POSITION IN ( '01', '34' ) THEN
+				T1.ENTRUST_NUM * 100 ELSE decode(
+				T4.BUSI_TYPE_POSITION,
+				'EX004',
+				NVL( T1.ENTRUST_AMT * T1.ENTRUST_NUM, 0 ),
+				decode(
+				T4.ASSET_TYPE,
+				'F01',
+				NVL( T1.ENTRUST_AMT, T1.ENTRUST_NUM ),
+				'F10',
+				NVL( T1.ENTRUST_NUM * 100, 0 ),
+				NVL( T1.ENTRUST_AMT, T1.ENTRUST_NUM )
+				)
+			)
+			END AS entrustAmt,
+			nvl(T1.CCY,'CNY' ) ccy,
+			T1.VDATE vdate,
+			T1.MDATE mdate,
+			T1.INV_MANAGER_ID invManagerId,
+			T4.ASSET_TYPE assetType,
+			T4.BUSI_PS busiPs,
+			T1.entrust_Type entrustType,
+			T1.REMARK remark
+			,T4.PB_EXPORTSTATUS pbExportstatus/*PB是否已导出;PB上下行关联改造 add by caoxue 2019-12-27*/
+			<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 start -->
+			,nvl( SSAI.SEC_ACCT_NAME, sci.ACCT_NAME ) AS secAcctName
+			<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 end -->
+			<!-- add by wanshiwei 2021-09-22 指令创建来源 start -->
+			,T4.ENTRUST_CREATE_SOURCE AS entrustCreateSource
+			<!-- add by wanshiwei 2021-09-22 指令创建来源 end -->
+			,'' nextUser
+			,T1.ENTRUST_CLASS,
+			T4.BUSI_TYPE_POSITION busiTypePosition
 		FROM ETR_ENTRUST T1
 		LEFT JOIN MUTIPTL_PORTFOLIO_TREE TREE ON T1.PORTFOLIO_ID = TREE.TREE_ID AND TREE.PAR_TREE_ID IS NOT NULL
 		LEFT JOIN PTL_PORTFOLIO T2 ON T1.PORTFOLIO_ID = T2.PORTFOLIO_ID
 		LEFT JOIN FIN_PRODUCT T3 ON T1.FINPROD_ID = T3.FINPROD_ID
-		<!-- INNER JOIN PTL_PORTFOLIO_AUTHORITY T6
-		ON
-		T2.PORTFOLIO_ID = T6.PORTFOLIO_ID -->
+		LEFT JOIN (
+			SELECT
+				EED.ENTRUST_ID,
+				wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID,
+				wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
+				wm_concat ( EED.SEC_ACCT_ID ) AS SEC_ACCT_ID,
+				wm_concat ( sci.ACCT_NO ) AS ACCT_NO,
+				wm_concat ( sci.ACCT_NAME ) AS ACCT_NAME
+			FROM
+				WFL_ETR_ENTRUST_DETAIL EED
+				LEFT JOIN ( SELECT PORTFOLIO_ID, PORTFOLIO_NAME FROM PTL_PORTFOLIO ORDER BY PORTFOLIO_ID, PORTFOLIO_NAME ) FP ON EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
+				LEFT JOIN STL_SEC_ACCT_INFO ssai ON EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
+				LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
+			GROUP BY
+				EED.ENTRUST_ID
+		) detail ON T1.ENTRUST_ID = detail.ENTRUST_ID
 		LEFT JOIN ETR_ENTRUST_ADD T4 ON T4.ENTRUST_ID = T1.ENTRUST_ID
 		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 start -->
 		LEFT JOIN
 		STL_SEC_ACCT_INFO SSAI
 		ON
 		T4.SEC_ACCT_ID = SSAI.SEC_ACCT_ID
+		LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
 		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 end -->
 		<where>
-
 			AND  T1.FINPROD_TYPE2 = 'F36'
-			<!-- AND T6.USER_ID = #{userId}
-			AND T1.INV_MANAGER_ID=#{userId} -->
-			<!-- <if test="portfolioId != null and !portfolioId.equals('')">
-                AND (T1.PORTFOLIO_ID like concat('%',concat(#{portfolioId},'%'))
-                    OR T2.PORTFOLIO_NAME like concat('%',concat(#{portfolioId},'%')))
-            </if> -->
 			<if test="portfolioIdList != null and portfolioIdList.size() >0">
 				AND (T2.PORTFOLIO_ID IN
 				<foreach collection="portfolioIdList" index="index" item="prot" open="(" separator="," close=")" >
@@ -466,12 +605,6 @@
 				and #{tradePlat} = T4.SETTLE_SPREED
 			</if>
 			<if test="ps != null and !ps.equals('')">
-				<!-- <if test="ps.equals(ps01) or ps.equals(ps02) or ps.equals(ps03) or ps.equals(ps04) or ps.equals(ps05) or ps.equals(ps06)">
-                    and #{ps} = T4.BUSI_PS
-                </if>
-                <if test="!ps.equals(ps01) and !ps.equals(ps02) and !ps.equals(ps03) and !ps.equals(ps04) and !ps.equals(ps05) and !ps.equals(ps06)">
-                    and #{ps} = T1.PS
-                </if> -->
 				AND (case
 				<if test="IRSType_01.equals(IRSps) or IRSType_02.equals(IRSps) or PS_T01.equals(ps)">
 					when  T4.ASSET_TYPE IN (#{ASSET_TYPE_16})
@@ -511,7 +644,7 @@
 				)
 			</if>
 		</where>
-		) order by vdate desc
+		) TT order by vdate desc
 	</select>
 	<select id="selectExportPB"
 			resultType="com.joyintech.service.entrust.etrinvestallinfo.dto.EtrInvestAllInfoDto">

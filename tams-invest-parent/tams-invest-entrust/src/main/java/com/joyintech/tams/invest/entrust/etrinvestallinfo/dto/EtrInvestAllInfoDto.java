@@ -87,6 +87,8 @@ public class EtrInvestAllInfoDto extends EtrEntrust {
 	 */
 	private String entrustCreateSource;
 
+	private String busiTypePosition;
+
 	/**
 	 * <功能详细描述>
 	 * @return
@@ -332,6 +334,14 @@ public class EtrInvestAllInfoDto extends EtrEntrust {
 	 */
 	public void setEntrustCreateSource(String entrustCreateSource) {
 		this.entrustCreateSource = entrustCreateSource == null ? null : entrustCreateSource.trim();
+	}
+
+	public String getBusiTypePosition() {
+		return busiTypePosition;
+	}
+
+	public void setBusiTypePosition(String busiTypePosition) {
+		this.busiTypePosition = busiTypePosition;
 	}
 
 	/**
