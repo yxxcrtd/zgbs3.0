@@ -81,6 +81,11 @@ public class WflBidResultTotal extends BaseEntity {
      */
     private String workflowStatus;
 
+    /**
+     * 上市日
+     */
+    private Date listingDate;
+
 
     /**
      * 获取 中标编号
@@ -369,5 +374,13 @@ public class WflBidResultTotal extends BaseEntity {
      */
     public void setWorkflowStatus(String workflowStatus) {
         this.workflowStatus = workflowStatus;
+    }
+
+    public Date getListingDate() {
+        return listingDate;
+    }
+
+    public void setListingDate(Date listingDate) {
+        this.listingDate = listingDate;
     }
 }
