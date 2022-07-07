@@ -1024,6 +1024,10 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
             BeanUtil.copyPropertiesIgnoreNull(stlPayTempOrders,
                     trdTempDto.getBussTrdTransferOrder().get(0));
             stlPayTempOrders.setMyAcctNo(myAcctNo);
+            // GLCP-31:IsNeedSend和ps赋值 modify by fuyongsheng 20220707 start
+            stlPayTempOrders.setPs(DictCodeListExt1.收付方向_支出.getValue());
+            stlPayTempOrders.setIsNeedSend(DictCodeListExt1.是否_是.getValue());
+            // GLCP-31:IsNeedSend和ps赋值 modify by fuyongsheng 20220707 end
             stlPayTempOrders.setPayType(DictCodeListExt1.平安划款类型_清算划款.getValue());
             //查询对手方交易账号
             List<StlCapacctInfo> stlCapacctInfos = stlPayOrdersMapper.selectCounterCapacctInfoList(trdTempDto.getCounterId(), DictCodeListExt1.资金账户类型_交易对手账户.getValue(), trdTempDto.getCcy());
