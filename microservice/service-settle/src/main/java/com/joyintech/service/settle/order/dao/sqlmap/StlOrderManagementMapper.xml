@@ -149,7 +149,10 @@
             AND T10.SETTLE_DATE &lt;= TO_DATE(#{cashDateEnd}, 'yyyy-MM-dd')
         </if>
         <if test="paBusinessType != null and !paBusinessType.isEmpty()">
-            <foreach collection="paBusinessType" open="AND t5.PA_BUSS_TYPE in (" close=")" item="item" separator=",">#{item}</foreach>
+            AND (
+            <foreach collection="paBusinessType" open=" t5.PA_BUSS_TYPE in (" close=")" item="item" separator=",">#{item}</foreach>
+            <foreach collection="paBusinessType" open="OR T4.TG_BUSI_TYPE in (" close=")" item="item" separator=",">#{item}</foreach>
+            )
         </if>
         UNION ALL
 
@@ -229,11 +232,10 @@
 		<!--add by  caiqun 20200921 09债券类资产买入  用TRD_FIN_PRODUCT_DEAL_TOTAL关联STL_PAY_ORDERS  end-->
         OR (T4.FINPROD_TYPE2 IN (#{F29},#{F30}, #{F10}, #{F11}, #{F12}, #{F13}, #{F14}) AND T10.PS = #{PS01})
 	    OR (T4.FINPROD_TYPE2 = #{F35})
-        OR (T4.FINPROD_TYPE2 = #{F37} AND T4.PS = #{T04})
         OR T4.TG_BUSI_TYPE IN ( #{PA_BUSINESS_TYPE12}, #{PA_BUSINESS_TYPE16},
         #{PA_BUSINESS_TYPE63},  #{PA_BUSINESS_TYPE65}, #{PA_BUSINESS_TYPE86}, #{PA_BUSINESS_TYPE64},
         #{PA_BUSINESS_TYPE21}, #{PA_BUSINESS_TYPE22}, #{PA_BUSINESS_TYPE25}, #{PA_BUSINESS_TYPE97},
-        #{PA_BUSINESS_TYPE29}, #{PA_BUSINESS_TYPE200} ,#{PA_BUSINESS_TYPE151})
+        #{PA_BUSINESS_TYPE29}, #{PA_BUSINESS_TYPE200} ,#{PA_BUSINESS_TYPE151},#{PA_BUSINESS_TYPE212})
         )
         /*金融产品交易扩展.平安业务类型 IN (数据字典.平安业务类型.存款类资产买入、项目类资产买入、普通拆入、普通拆出、普通拆入到期)*/
         /*金融产品交易扩展.平安业务类型 IN (数据字典.平安业务类型.特拆拆入、特拆拆入到期)*/
@@ -268,7 +270,10 @@
             AND NVL(T10.SETTLE_DATE, T12.SETTLE_DATE) &lt;= TO_DATE(#{cashDateEnd}, 'yyyy-MM-dd')
         </if>
         <if test="paBusinessType != null and !paBusinessType.isEmpty()">
-            <foreach collection="paBusinessType" open="AND T8.PA_BUSS_TYPE in (" close=")" item="item" separator=",">#{item}</foreach>
+           AND (
+            <foreach collection="paBusinessType" open=" T8.PA_BUSS_TYPE in (" close=")" item="item" separator=",">#{item}</foreach>
+            <foreach collection="paBusinessType" open="OR T4.TG_BUSI_TYPE in (" close=")" item="item" separator=",">#{item}</foreach>
+            )
         </if>
         <if test="(finprodId == null or finprodId.isEmpty()) and (paBusinessType == null or paBusinessType.isEmpty() or paBusinessType.contains(PA_BUSINESS_TYPE81))">
             UNION ALL

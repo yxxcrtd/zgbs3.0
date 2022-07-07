@@ -131,7 +131,10 @@
             <foreach collection="bizCode" separator="," item="item" open="AND T1.FINPROD_ID IN (" close=")">#{item}</foreach>
         </if>
         <if test="bizType != null and !bizType.isEmpty()">
-            <foreach collection="bizType" separator="," item="item" open="AND T4.PA_BUSS_TYPE IN (" close=")">#{item}</foreach>
+            AND (
+                <foreach collection="bizType" separator="," item="item" open="T4.PA_BUSS_TYPE IN (" close=")">#{item}</foreach>
+                <foreach collection="bizType" separator="," item="item" open="OR T1.TG_BUSI_TYPE IN (" close=")">#{item}</foreach>
+            )
         </if>
         <if test="operateType != null and !operateType.isEmpty()">
             and t5.ORDER_STATUS = #{operateType}
@@ -198,7 +201,7 @@
             SELECT
             '${STATUS_VALID_03}' statusValid,
             NVL(T1.P_TRADE_ID, T1.TOTLE_TRADE_ID) bizCode,/*金融产品交易汇总.交易编号 业务编号*/
-            T4.PA_BUSS_TYPE,/*金融产品交易汇总扩展业务流程.平安业务类型 业务类型*/
+            nvl(T4.PA_BUSS_TYPE,T1.TG_BUSI_TYPE ) PA_BUSS_TYPE,/*金融产品交易汇总扩展业务流程.平安业务类型 业务类型*/
             T5.ORDER_STATUS operateType,/*划款指令业务流程.指令状态 操作类型*/
             T5.PAY_TYPE,/*划款指令业务流程.划款类型 划款类型*/
             <!-- modify by mashukai 20201203 TISHKBS-1209 start -->
@@ -288,7 +291,7 @@
             '${STATUS_VALID_03}' statusValid,
             case when T4.PA_BUSS_TYPE IN ('${PA_BUSINESS_TYPE64}', '${PA_BUSINESS_TYPE65}','${PA_BUSINESS_TYPE86}','${PA_BUSINESS_TYPE87}') THEN T5.ORDER_ID ELSE
             NVL(T1.P_TRADE_ID, T1.TRADE_ID) END bizCode,
-            T4.PA_BUSS_TYPE,
+            nvl(T4.PA_BUSS_TYPE,T1.TG_BUSI_TYPE ) PA_BUSS_TYPE,
             T5.ORDER_STATUS operateType,
             T5.PAY_TYPE,
             T10.PORTFOLIO_ID,
@@ -339,12 +342,11 @@
                 #{PA_BUSINESS_TYPE97}, #{PA_BUSINESS_TYPE29}, #{PA_BUSINESS_TYPE69}
                 )
                 OR T1.FINPROD_TYPE2 IN (#{F29}, #{F30}, #{F10}, #{F11}, #{F12}, #{F13}, #{F35})
-                OR (T1.FINPROD_TYPE2 = #{F37} AND T1.PS = #{T04})
                 OR T1.TG_BUSI_TYPE IN (#{PA_BUSINESS_TYPE12}, #{PA_BUSINESS_TYPE13}, #{PA_BUSINESS_TYPE14},#{PA_BUSINESS_TYPE15},
                     #{PA_BUSINESS_TYPE16},  #{PA_BUSINESS_TYPE09}, #{PA_BUSINESS_TYPE10},
                     #{PA_BUSINESS_TYPE11}, #{PA_BUSINESS_TYPE63}, #{PA_BUSINESS_TYPE64}, #{PA_BUSINESS_TYPE65}, #{PA_BUSINESS_TYPE118},
                     #{PA_BUSINESS_TYPE86}, #{PA_BUSINESS_TYPE87}, #{PA_BUSINESS_TYPE25}, #{PA_BUSINESS_TYPE21},#{PA_BUSINESS_TYPE19}, #{PA_BUSINESS_TYPE75},
-                    #{PA_BUSINESS_TYPE97}, #{PA_BUSINESS_TYPE29}, #{PA_BUSINESS_TYPE69},#{PA_BUSINESS_TYPE151}
+                    #{PA_BUSINESS_TYPE97}, #{PA_BUSINESS_TYPE29}, #{PA_BUSINESS_TYPE69},#{PA_BUSINESS_TYPE151},#{PA_BUSINESS_TYPE212}
                     )
                 )
                 AND NOT EXISTS (SELECT 1 FROM SYS_WFL_BUSINESS_NODE TT WHERE TT.SEQ_NO = T6.SEQ_NO AND TT.HIS_NO > T7.HIS_NO)
@@ -368,7 +370,7 @@
             SELECT
             '${STATUS_VALID_05}' statusValid,
             NVL(T1.P_TRADE_ID, T1.TOTLE_TRADE_ID) bizCode,/*金融产品交易汇总.交易编号 业务编号*/
-            T4.PA_BUSS_TYPE,/*金融产品交易汇总扩展.平安业务类型 业务类型*/
+            nvl(T4.PA_BUSS_TYPE,T1.TG_BUSI_TYPE ) PA_BUSS_TYPE,/*金融产品交易汇总扩展.平安业务类型 业务类型*/
             T5.ORDER_STATUS operateType,/*划款指令.指令状态 操作类型*/
             T5.PAY_TYPE,/*划款指令.划款类型 划款类型*/
             <!-- modify by mashukai 20201203 TISHKBS-1209 start -->
@@ -445,7 +447,7 @@
             '${STATUS_VALID_05}' statusValid,
             case when T4.PA_BUSS_TYPE IN ('${PA_BUSINESS_TYPE64}', '${PA_BUSINESS_TYPE65}','${PA_BUSINESS_TYPE86}','${PA_BUSINESS_TYPE87}') THEN T5.ORDER_ID
             ELSE NVL(T1.P_TRADE_ID, T1.TRADE_ID) END bizCode,
-            T4.PA_BUSS_TYPE,
+            nvl(T4.PA_BUSS_TYPE,T1.TG_BUSI_TYPE ) PA_BUSS_TYPE,
             T5.ORDER_STATUS operateType,
             T5.PAY_TYPE,
             T10.PORTFOLIO_ID,
@@ -488,12 +490,11 @@
                 #{PA_BUSINESS_TYPE97}, #{PA_BUSINESS_TYPE29},  #{PA_BUSINESS_TYPE69}
                 )
                 OR T1.FINPROD_TYPE2 IN (#{F29}, #{F30}, #{F10}, #{F11}, #{F12}, #{F13}, #{F35} )
-                OR (T1.FINPROD_TYPE2 = #{F37} AND T1.PS = #{T04})
                 OR T1.TG_BUSI_TYPE IN (#{PA_BUSINESS_TYPE12}, #{PA_BUSINESS_TYPE13}, #{PA_BUSINESS_TYPE14},#{PA_BUSINESS_TYPE15},
                     #{PA_BUSINESS_TYPE16},   #{PA_BUSINESS_TYPE10},
                     #{PA_BUSINESS_TYPE11}, #{PA_BUSINESS_TYPE63}, #{PA_BUSINESS_TYPE64}, #{PA_BUSINESS_TYPE65}, #{PA_BUSINESS_TYPE118},
                     #{PA_BUSINESS_TYPE86},#{PA_BUSINESS_TYPE87}, #{PA_BUSINESS_TYPE25}, #{PA_BUSINESS_TYPE21}, #{PA_BUSINESS_TYPE19}, #{PA_BUSINESS_TYPE75},
-                    #{PA_BUSINESS_TYPE97}, #{PA_BUSINESS_TYPE29},  #{PA_BUSINESS_TYPE69},#{PA_BUSINESS_TYPE151}
+                    #{PA_BUSINESS_TYPE97}, #{PA_BUSINESS_TYPE29},  #{PA_BUSINESS_TYPE69},#{PA_BUSINESS_TYPE151},#{PA_BUSINESS_TYPE212}
                     )
                 )
                 AND (T1.IS_CANCEL IS NULL OR T1.IS_CANCEL = #{NO}) AND T1.TRADE_STATUS = #{TRADE_STATUS_01}

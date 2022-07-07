@@ -183,6 +183,7 @@ public class SettleCommonUtil {
         params.put("PA_BUSINESS_TYPE151", DictCodeListExt4.平安业务类型_中标结果维护.getValue());
         params.put("PA_BUSINESS_TYPE202",DictCodeListExt4.平安业务类型_债券分销买入确认.getValue());
         params.put("PA_BUSINESS_TYPE180",DictCodeListExt4.平安业务类型_一级申购.getValue());
+        params.put("PA_BUSINESS_TYPE212",DictCodeListExt4.平安业务类型_信用保护凭证_申购.getValue());
 
         params.put("F10", DictCodeListExt1.金融产品类型_投管用_股票.getValue());
         params.put("F29", DictCodeListExt1.金融产品类型_投管用_债券借贷融入.getValue());
