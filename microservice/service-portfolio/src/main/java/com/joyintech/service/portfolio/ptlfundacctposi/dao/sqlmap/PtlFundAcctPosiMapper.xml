@@ -30,7 +30,7 @@
                     PTL.CDATE,
                     PTL.CCY,
                     PTL.HODING_TYPE,
-					FP.TRUSTEE_ID,
+					nvl(mci.CUSTOMER_NAME,FP.TRUSTEE_ID) TRUSTEE_ID,
                     SUM(PTL.AMOUNT) AMOUNT1,
 					SUM(case when PTL.AMOUNT &gt;0 then PTL.AMOUNT else 0 end ) quotaIn,
 					SUM(case when PTL.AMOUNT &lt;0 then PTL.AMOUNT else 0 end ) quotaOut
@@ -43,13 +43,14 @@
 				ON FIN_PRODUCT_ADD.PORTFOLIO_ID = PTL.PORTFOLIO_ID	 
 	            LEFT JOIN FIN_PRODUCT FP
                 ON FP.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
+  				left join MST_CUSTOMER_INFO mci on FP.TRUSTEE_ID = mci.CUSTOMER_ID
                 <include refid="sqlwhere"></include>
               GROUP BY PTL.PORTFOLIO_ID,
                        PTL.ACCT_ID,
                        PTL.CDATE,
                        PTL.CCY,
                        PTL.HODING_TYPE,
-					   FP.TRUSTEE_ID
+						nvl(mci.CUSTOMER_NAME,FP.TRUSTEE_ID)
 	) FLOW
     ON PTL.PORTFOLIO_ID = FLOW.PORTFOLIO_ID
    AND PTL.ACCT_ID = FLOW.ACCT_ID
