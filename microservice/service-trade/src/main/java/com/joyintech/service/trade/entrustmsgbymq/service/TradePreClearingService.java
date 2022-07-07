@@ -946,6 +946,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
             BeanUtil.copyPropertiesIgnoreNull(stlPayOrdersDto, trdTempDto.getBussTrdTransferOrder().get(0));
             stlPayOrdersDto.setPs(DictCodeListExt1.收付方向_支出.getValue());
             stlPayOrdersDto.setIsNeedSend(DictCodeListExt1.是否_是.getValue());
+            stlPayOrdersDto.setIsTotalTrade(DictCodeListExt1.是否_否.getValue());
         }
         FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
         finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_有效.getValue());
@@ -1027,6 +1028,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
             // GLCP-31:IsNeedSend和ps赋值 modify by fuyongsheng 20220707 start
             stlPayTempOrders.setPs(DictCodeListExt1.收付方向_支出.getValue());
             stlPayTempOrders.setIsNeedSend(DictCodeListExt1.是否_是.getValue());
+            stlPayTempOrders.setIsTotalTrade(DictCodeListExt1.是否_否.getValue());
             // GLCP-31:IsNeedSend和ps赋值 modify by fuyongsheng 20220707 end
             stlPayTempOrders.setPayType(DictCodeListExt1.平安划款类型_清算划款.getValue());
             //查询对手方交易账号
