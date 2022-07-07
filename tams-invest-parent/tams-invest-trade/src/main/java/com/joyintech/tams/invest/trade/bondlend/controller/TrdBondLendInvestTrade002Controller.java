@@ -473,16 +473,18 @@ public class TrdBondLendInvestTrade002Controller extends BaseController {
                 dto.setTradeId(IDGenerator.generate());
             }
         }
+        //GLCP-51:债券借贷交易无需实占 modify by fuyongsheng 20220707 start
         //----------add by jjpei 20200114 核风险版本 start----------
-        if(dto.getOperateType().equals(BussinessConstant.SUBMIT)&& CommonUtil.isType(CacheUtil.getSysParam("pageRedisFlag"), BussinessDictCodeListRds.是否_是)){
-            AjaxResult ar=interfRiskRdsService.checkRiskRds(new InterfRiskRdsDto(), BussinessDictCodeListRds.事件类型_投资交易.getValue(),
-                    BussinessDictCodeListRds.接口系统ID_实占接口.getValue(),DictCodeListExt2.平安资产类型_债券借贷.getValue(),
-                    (en)->interfRiskRdsService.sendRiskRdsData(dto,en));
-            if (StringUtil.isNotEmpty(ar)) {
-                return ar;
-            }
-        }
+//        if(dto.getOperateType().equals(BussinessConstant.SUBMIT)&& CommonUtil.isType(CacheUtil.getSysParam("pageRedisFlag"), BussinessDictCodeListRds.是否_是)){
+//            AjaxResult ar=interfRiskRdsService.checkRiskRds(new InterfRiskRdsDto(), BussinessDictCodeListRds.事件类型_投资交易.getValue(),
+//                    BussinessDictCodeListRds.接口系统ID_实占接口.getValue(),DictCodeListExt2.平安资产类型_债券借贷.getValue(),
+//                    (en)->interfRiskRdsService.sendRiskRdsData(dto,en));
+//            if (StringUtil.isNotEmpty(ar)) {
+//                return ar;
+//            }
+//        }
         //----------add by jjpei 20200114 核风险版本 end----------
+        //GLCP-51:债券借贷交易无需实占 modify by fuyongsheng 20220707 end
         // 金融产品类型（投管分类）= 数据字典缓存.金融产品类型（投管用）数据字典（根据交易方向与回购类型来综合判断）
         if (StringUtil.equals(dto.getPs(), DictCodeList.回购拆借方向_融入.getValue())) {
             dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券借贷融入.getValue());
