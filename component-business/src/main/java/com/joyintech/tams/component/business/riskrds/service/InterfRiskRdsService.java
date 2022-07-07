@@ -1841,10 +1841,8 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             infRiskRdsDto.setPs(DictCodeList.交易方向_买入.getValue());
             infRiskRdsDto.setAssetType(DictCodeListExt2.平安资产类型_债券借贷.getValue());
             infRiskRdsDto.setAssetType2(finDto.getBusiPs());
-            // GLCP-20:解决提交报错 modify by fuyongsheng 20220707 start
-            // infRiskRdsDto.setAssetCode(null);
-            // infRiskRdsDto.setMarketCode(null);
-            // GLCP-20:解决提交报错 modify by fuyongsheng 20220707 end
+            infRiskRdsDto.setAssetCode(null);
+            infRiskRdsDto.setMarketCode(null);
             infRiskRdsDto.setCalendarCode((String) dataMap.get("calendarId"));
             infRiskRdsDto.setDeadline(StringUtil.isNotEmpty(dataMap.get("termDays")) ? new BigDecimal(dataMap.get("termDays").toString()) : null);
             if (StringUtil.isNotEmpty(dataMap.get("mdate"))) {
