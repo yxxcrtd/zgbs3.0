@@ -187,6 +187,9 @@ public class TrdBondLendTargetDuration002Service extends BaseService<TrdBondLend
                 PtlCashPositionFlowDto ptlCashPositionFlow1 = new PtlCashPositionFlowDto();
                 BeanUtil.copyPropertiesIgnoreNull(ptlCashPositionFlow1, ptlCashPositionFlow);
                 ptlCashPositionFlow1.setPortfolioId(entity.getPortfolioId());
+                if (StringUtil.isEmpty(ptlCashPositionFlow.getPortfolioId())) {
+                    ptlCashPositionFlow.setPortfolioId(entity.getPortfolioId());
+                }
                 basePtlCashPositionInfoService.insertCashPositionFlow(ptlCashPositionFlow);
                 if (entity.getActPortfolioId() != null && !entity.getActPortfolioId().equals(entity.getPortfolioId())) {
                     basePtlCashPositionInfoService.insertCashPositionFlow(ptlCashPositionFlow1);
