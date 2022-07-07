@@ -10,7 +10,7 @@ tx-lcn:
     onlyError: true
          
 spring:
-  #============Master Datasource============#    
+  #============Master Datasource============# BSINV306_GL_TEST  BSINV306_GL_DEV  BS303INIT_TEST1008_03
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: oracle.jdbc.driver.OracleDriver
