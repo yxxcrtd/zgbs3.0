@@ -1816,6 +1816,7 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                     item.setEntrustNum(ArithmeticUtil.subtract(entrustNum, tempEntrustNum));
                     item.setEntrustAmt(ArithmeticUtil.subtract(entrustAmt, tempEntrustAmt));
                 }
+                item.setEntrustNum(item.getEntrustNum().divide(minStep,0,RoundingMode.DOWN).multiply(minStep));
             }
         }
         BeanUtil.copyPropertiesIgnoreNull(response, dto);
