@@ -244,7 +244,7 @@
                 WHEN 'F18' THEN financier
                 WHEN 'F17' THEN manager
                 WHEN 'F32' THEN ISSUER
-                WHEN 'F37' THEN financier
+                WHEN 'F37' THEN ISSUER
                 ELSE null end as ISSUER_CODE from  FIN_PRODUCT) m
         inner join FIN_PRODUCT_ADD n on m.FINPROD_ID=n.FINPROD_ID
         inner join FIN_PRODUCT_TYPE y on m.FINPROD_ID=y.FINPROD_ID and y.BRANCH='0'
