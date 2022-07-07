@@ -2250,7 +2250,14 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         }
 
         // 投管业务类型
-        dto.setTgBusiType(DictCodeListExt2.平安业务类型_股票交易.getValue());
+        // dto.setTgBusiType(DictCodeListExt2.平安业务类型_股票交易.getValue());
+        if (DictCodeList.交易方向_买入.getValue().equals(infContractDetailfile.getPs())) {
+            dto.setTgBusiType(DictCodeListExt4.平安业务类型_信用保护凭证_买入.getValue());
+        } else if (DictCodeList.交易方向_卖出.getValue().equals(infContractDetailfile.getPs())) {
+            dto.setTgBusiType(DictCodeListExt4.平安业务类型_信用保护凭证_卖出.getValue());
+        } else if (DictCodeList.交易方向_申购.getValue().equals(infContractDetailfile.getPs())) {
+            dto.setTgBusiType(DictCodeListExt4.平安业务类型_信用保护凭证_申购.getValue());
+        }
 
         TrdProductTempDeal trdProductTempDeal = new TrdProductTempDeal();
         BeanUtil.copyPropertiesIgnoreNull(trdProductTempDeal, dto);
