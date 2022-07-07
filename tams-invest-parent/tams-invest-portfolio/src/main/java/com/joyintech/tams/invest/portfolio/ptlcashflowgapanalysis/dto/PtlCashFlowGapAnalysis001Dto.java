@@ -197,7 +197,7 @@ public class PtlCashFlowGapAnalysis001Dto extends BaseEntity {
 		if (StringUtil.isNotEmpty(this.getCashFlowType())) {
 			if (isPaType()) {
 				cashFlowTypeStr = SysDataUtil.getNameFromDataDict(DictCode.金融产品类型_投管用, this.getCashFlowType());
-				if (StringUtil.isEmpty(cashFlowTypeStr)) {
+				if (cashFlowTypeStr.equals(this.getCashFlowType())) {
 					if (StringUtil.equals(this.getCashFlowType(), DictCodeList.费用品种类型_销售手续费.getValue())
 					|| StringUtil.equals(this.getCashFlowType(), DictCodeList.费用品种类型_固定管理费.getValue())
 					|| StringUtil.equals(this.getCashFlowType(), DictCodeList.费用品种类型_托管费.getValue())
@@ -216,7 +216,7 @@ public class PtlCashFlowGapAnalysis001Dto extends BaseEntity {
 					||StringUtil.equals(this.getCashFlowType(), DictCodeListExt2.费用品种类型_投资顾问费.getValue())){
 						cashFlowTypeStr =  "理财产品";
 					}else{
-						cashFlowTypeStr =  "";
+						cashFlowTypeStr = SysDataUtil.getNameFromDataDict(DictCode.平安业务类型, this.getCashFlowType());
 					}
 				}
 				cashFlowTypeStr = cashFlowTypeStr ;
@@ -300,7 +300,7 @@ public class PtlCashFlowGapAnalysis001Dto extends BaseEntity {
 	
 	public String getFeetypeStr() {
 		if (StringUtil.isNotEmpty(feetype)) {
-			return SysDataUtil.getNameFromDataDict(DictCode.金融产品类型_投管用, feetype);
+			return SysDataUtil.getNameFromDataDict(DictCode.费用品种类型, feetype);
 		}
 		return feetype;
 	}
