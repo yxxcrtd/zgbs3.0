@@ -1,94 +1,77 @@
-///*
-// * 文件名：TrdDepositInvestTrade002Controller.java
-// * 版权：Copyright 2017-2018 JoyinTech. Co. Ltd. All Rights Reserved.
-// * 描述：理财资管管理系统V2.0
-// * 修改人：fanshuanghu
-// * 修改时间：2018年10月17日
-// * 修改内容：新建
-// * 系统名称：理财资管管理系统V2.0
-// */
-//
-//package com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.controller;
-//
-//import com.joyintech.framework.ajax.AjaxResult;
-//import com.joyintech.framework.annotation.PageId;
-//import com.joyintech.framework.base.BaseController;
-//import com.joyintech.framework.base.dto.UploadFile;
-//import com.joyintech.framework.constant.GlobalConstant;
-//import com.joyintech.framework.grid.Page;
-//import com.joyintech.framework.listener.FileAttachmentProcess;
-//import com.joyintech.framework.security.LoginUserUtil;
-//import com.joyintech.framework.security.SecurityUtil;
-//import com.joyintech.framework.select.SelectOptionDto;
-//import com.joyintech.framework.select.SuggestDto;
-//import com.joyintech.framework.util.*;
-//import com.joyintech.framework.validation.groups.ValidateGroupEdit;
-//import com.joyintech.tams.common.base.dao.*;
-//import com.joyintech.tams.common.base.entity.*;
-//
-//import com.joyintech.tams.constant.DictCode;
-//import com.joyintech.tams.constant.DictCodeList;
-//import com.joyintech.tams.constant.DictCodeListExt1;
-//import com.joyintech.tams.constant.DictCodeListExt2;
-//
-//import com.joyintech.tams.valuation.basicdata.business.dto.BussinessCodeParameter;
-//import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
-//import com.joyintech.tams.valuation.component.common.constant.BussinessConstant;
-//import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.dto.TrdDepositValuationTrade001Dto;
-//import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.service.TrdDepositValuationTrade002Service;
-//
-//import com.joyintech.workflow.engine.dto.ProcessParameter;
-//import com.joyintech.workflow.engine.dto.WorkFlowParameter;
-//import com.joyintech.workflow.engine.util.WorkFlowUtil;
-//import org.apache.commons.collections4.CollectionUtils;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Controller;
-//import org.springframework.ui.Model;
-//import org.springframework.validation.BindingResult;
-//import org.springframework.validation.annotation.Validated;
-//import org.springframework.web.bind.annotation.PostMapping;
-//import org.springframework.web.bind.annotation.RequestBody;
-//import org.springframework.web.bind.annotation.RequestMapping;
-//import org.springframework.web.bind.annotation.ResponseBody;
-//
-//import javax.servlet.http.HttpServletRequest;
-//import java.math.BigDecimal;
-//import java.util.ArrayList;
-//import java.util.HashMap;
-//import java.util.List;
-//import java.util.Map;
-//import java.util.stream.Collectors;
-//
-///**
-// * 存款交易新建
-// * @author fanshuanghu
-// * @version 1.0 2018年10月10日
-// * @see TrdDepositValuationTrade002Controller
-// * @since 1.0
-// */
-//@Controller
-//@PageId("TrdDepositValuationTrade002")
-//@RequestMapping("/valuation/trademanage/trddepositvaluationtrade/TrdDepositValuationTrade002")
-//public class TrdDepositValuationTrade002Controller extends BaseController {
-////	@Autowired
-////	private TradeCommonService tradeCommonService;
-////    /**
-////     * 注入业务主键生产类
-////     */
-////    @Autowired(required=false)
-////    private BaseGetBusinessId baseGetBusinessId;
-//
-//    /**
-//     * 注入存款类交易Service
-//     */
-//    @Autowired
-//    private TrdDepositValuationTrade002Service trdDepositValuationTrade002Service;
-//
-//
-//    @Autowired(required = false)
-//    private CommonBusinessService commonBusinessService;
-//
-//
+/*
+ * 文件名：TrdDepositInvestTrade002Controller.java
+ * 版权：Copyright 2017-2018 JoyinTech. Co. Ltd. All Rights Reserved.
+ * 描述：理财资管管理系统V2.0
+ * 修改人：fanshuanghu
+ * 修改时间：2018年10月17日
+ * 修改内容：新建
+ * 系统名称：理财资管管理系统V2.0
+ */
+
+package com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.controller;
+
+import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.annotation.PageId;
+import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.base.dto.UploadFile;
+import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.listener.FileAttachmentProcess;
+import com.joyintech.framework.security.LoginUserUtil;
+import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.select.SuggestDto;
+import com.joyintech.framework.util.*;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.common.base.dao.*;
+import com.joyintech.tams.common.base.entity.*;
+
+import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt2;
+
+import com.joyintech.tams.valuation.basicdata.business.dto.BussinessCodeParameter;
+import com.joyintech.tams.valuation.component.business.service.CommonBusinessService;
+import com.joyintech.tams.valuation.component.common.constant.BussinessConstant;
+import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.dto.TrdDepositValuationTrade001Dto;
+import com.joyintech.tams.valuation.trademanage.trddepositvaluationtrade.service.TrdDepositValuationTrade002Service;
+
+import com.joyintech.workflow.engine.dto.ProcessParameter;
+import com.joyintech.workflow.engine.dto.WorkFlowParameter;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * 存款交易新建
+ * @author fanshuanghu
+ * @version 1.0 2018年10月10日
+ * @see TrdDepositValuationTrade002Controller
+ * @since 1.0
+ */
+@Controller
+@PageId("TrdDepositValuationTrade002")
+@RequestMapping("/valuation/trademanage/trddepositvaluationtrade/TrdDepositValuationTrade002")
+public class TrdDepositValuationTrade002Controller extends BaseController {
+//	@Autowired
+//	private TradeCommonService tradeCommonService;
 //    /**
 //     * 初始化方法
 //     * {@inheritDoc}
