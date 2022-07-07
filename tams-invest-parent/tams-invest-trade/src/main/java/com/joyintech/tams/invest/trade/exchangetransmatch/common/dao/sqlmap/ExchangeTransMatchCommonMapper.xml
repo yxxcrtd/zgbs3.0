@@ -591,4 +591,14 @@
             <!--ZGCPCN-1498:查询非撤销有效数据 modify by fuyongsheng 20220620 end-->
         </where>
     </select>
+
+    <select id="getFinCashInfosByFinprodId" resultType = "com.joyintech.tams.common.base.entity.FinCashInfo">
+        SELECT
+        <include refid="com.joyintech.tams.common.base.dao.FinCashInfoMapper.Base_Column_List" />
+        FROM
+        FIN_CASH_INFO
+        <where>
+            FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+        </where>
+    </select>
 </mapper>

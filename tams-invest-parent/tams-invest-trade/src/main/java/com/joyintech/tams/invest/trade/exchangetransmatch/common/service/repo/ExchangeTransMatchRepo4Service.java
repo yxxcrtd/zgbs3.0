@@ -1,9 +1,6 @@
 package com.joyintech.tams.invest.trade.exchangetransmatch.common.service.repo;
 
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.dao.TrdProductDealAddMapper;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
@@ -19,6 +16,7 @@ import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonD
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonEntrustDto;
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.dao.ExchangeTransMatchCommonMapper;
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.dto.ExchangeTransMatchBaseTradeDto;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 质押式协议回购（到期续作）
@@ -94,6 +93,8 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
 
             if(StringUtil.equals(trdProductDeal.getPs(),DictCodeList.交易方向_买入.getValue())) {
                 exchangeTransMatchBaseTradeDto.setFinTradeProduct(this.genFinTradeProduct(settleTransData, trdProductDeal));
+                exchangeTransMatchBaseTradeDto.setFinCashInfos(this.genFinCashInfos(trdProductDeal));
+                exchangeTransMatchBaseTradeDto.setFinCashPlans(this.genFinCashPlans(exchangeTransMatchBaseTradeDto.getFinCashInfos(), exchangeTransMatchBaseTradeDto.getFinTradeProduct()));
                 exchangeTransMatchBaseTradeDto.setFinProductType(this.genFinProductType(dealDto,trdProductDeal));
                 exchangeTransMatchBaseTradeDto.setFinDealPledgeList(this.genFinDealPledgeList(dealDto,trdProductDeal));
                 BigDecimal finDealPledgeTotalNum = exchangeTransMatchBaseTradeDto.getFinDealPledgeList().stream()
@@ -104,6 +105,24 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
             }
 
             exchangeTransMatchBaseTradeDtoList.add(exchangeTransMatchBaseTradeDto);
+        }
+
+        ExchangeTransMatchBaseTradeDto tradeDtoT01 = exchangeTransMatchBaseTradeDtoList.stream()
+                .filter(item->DictCodeList.交易方向_买入.getValue().equals(item.getTrdProductDeal()))
+                .findFirst().get();
+        for(ExchangeTransMatchBaseTradeDto exchangeTransMatchBaseTradeDto : exchangeTransMatchBaseTradeDtoList){
+            if(DictCodeList.交易方向_收息到账.getValue().equals(exchangeTransMatchBaseTradeDto.getTrdProductDeal().getPs())){
+                FinCashInfo finCashInfoInt = tradeDtoT01.getFinCashInfos().stream()
+                        .filter(item -> DictCodeListExt1.现金流一级类型_利息.getValue().equals(item.getCashType1()))
+                        .findFirst().get();
+                exchangeTransMatchBaseTradeDto.getTrdProductDeal().setCashId(finCashInfoInt.getCashId());
+            }
+            else if(DictCodeList.交易方向_还本到账.getValue().equals(exchangeTransMatchBaseTradeDto.getTrdProductDeal().getPs())){
+                FinCashInfo finCashInfoPrin = tradeDtoT01.getFinCashInfos().stream()
+                        .filter(item -> DictCodeListExt1.现金流一级类型_本金.getValue().equals(item.getCashType1()))
+                        .findFirst().get();
+                exchangeTransMatchBaseTradeDto.getTrdProductDeal().setCashId(finCashInfoPrin.getCashId());
+            }
         }
 
         //存在第三方无首期，直接做到期续做的场景，金融产品ID需要特殊处理，如果存在首期就取首期的金融产品代码，没有就用买入的交易编号

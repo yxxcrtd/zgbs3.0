@@ -205,4 +205,11 @@ public interface ExchangeTransMatchCommonMapper {
      * @return
      */
     List<TrdProductDeal> getFirstBondTrdProductDeals(@Param("entrustId") String entrustId, @Param("secAcctId") String secAcctId);
+
+    /**
+     * 根据金融产品代码查询现金流信息
+     * @param finprodId
+     * @return
+     */
+    List<FinCashInfo> getFinCashInfosByFinprodId(@Param("finprodId") String finprodId);
 }

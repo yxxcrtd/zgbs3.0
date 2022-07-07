@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.trade.dto.MinTrdUnitLimitDto;
@@ -29,33 +30,6 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
-import com.joyintech.tams.common.base.dao.FinDealPledgeMapper;
-import com.joyintech.tams.common.base.dao.FinPledgeDisplaceDetailMapper;
-import com.joyintech.tams.common.base.dao.FinPledgeDisplaceMapper;
-import com.joyintech.tams.common.base.dao.FinPledgeDisplaceResultMapper;
-import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
-import com.joyintech.tams.common.base.dao.FinTradeProductMapper;
-import com.joyintech.tams.common.base.dao.PaTrdFinProductDealTotalMapper;
-import com.joyintech.tams.common.base.dao.PaTrdProductDealMapper;
-import com.joyintech.tams.common.base.dao.PtlTradeMapper;
-import com.joyintech.tams.common.base.dao.SettleDataTotalPledgeMatchMapper;
-import com.joyintech.tams.common.base.dao.SettleTransDataTotalAddMapper;
-import com.joyintech.tams.common.base.dao.SettleTransDataTotalMapper;
-import com.joyintech.tams.common.base.dao.SettleTransDataTotalMatchMapper;
-import com.joyintech.tams.common.base.dao.SettleTransDataTotalStatusMapper;
-import com.joyintech.tams.common.base.dao.SettleTransTgMappingMapper;
-import com.joyintech.tams.common.base.dao.StlPayOrdersMapper;
-import com.joyintech.tams.common.base.dao.TrdDealTotalAddMapper;
-import com.joyintech.tams.common.base.dao.TrdFinProductBarterMapper;
-import com.joyintech.tams.common.base.dao.TrdFinProductBarterTotalMapper;
-import com.joyintech.tams.common.base.dao.TrdFinProductDealTotalMapper;
-import com.joyintech.tams.common.base.dao.TrdProductDealAddMapper;
-import com.joyintech.tams.common.base.dao.TrdProductDealMapper;
-import com.joyintech.tams.common.base.dao.TrdStasecFlowDetailMapper;
-import com.joyintech.tams.common.base.dao.TrdStasecFlowMapper;
-import com.joyintech.tams.common.base.dao.TrdTradeFeeDetailMapper;
-import com.joyintech.tams.common.base.dao.TrdTradeFeeTotalMapper;
 import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -206,6 +180,13 @@ public class ExchangeTransMatchCommonService extends BaseService {
     private FinPledgeDisplaceResultMapper finPledgeDisplaceResultMapper;
     @Autowired
     private FinTradeProductMapper finTradeProductMapper;
+
+    @Autowired
+    private FinCashInfoMapper finCashInfoMapper;
+
+    @Autowired
+    private FinCashPlanMapper finCashPlanMapper;
+
     @Autowired
     private FinProductTypeMapper finProductTypeMapper;
     @Autowired
@@ -1075,28 +1056,26 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 trdStasecFlowDetailMapper.insertSelective(trdStasecFlowDetail);
             }
 
-            //竞价回购
-            if(dto.getSettleTransDataTotalAdd() != null && !StringUtil.equals(dto.getSettleTransDataTotalAdd().getRepoType(),DictCodeList.回购类型_质押式协议回购.getValue())) {
-                if(StringUtil.equals(commonEntrustDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
-                        || StringUtil.equals(commonEntrustDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())) {
-                    SettleTransData settleTransData = new SettleTransData();
-                    BeanUtil.copyPropertiesIgnoreNull(settleTransData,dto);
-                    FinTradeProduct finTradeProduct = exchangeTransMatchRepo1Service.genFinTradeProduct(settleTransData, baseTradeProductDealDto.getTrdProductDeal());
-                    finTradeProductMapper.insertSelective(finTradeProduct);
+            if(StringUtil.isNotEmpty(baseTradeProductDealDto.getFinTradeProduct())) {
+                finTradeProductMapper.insertSelective(baseTradeProductDealDto.getFinTradeProduct());
+            }
 
-                    FinProductType finProductType = exchangeTransMatchRepo1Service.genFinProductType(dto,baseTradeProductDealDto.getTrdProductDeal());
-
-                    finProductTypeMapper.insertSelective(finProductType);
-                }
-            }else{
-                if(StringUtil.isNotEmpty(baseTradeProductDealDto.getFinTradeProduct())) {
-                    finTradeProductMapper.insertSelective(baseTradeProductDealDto.getFinTradeProduct());
-                }
-
-                if(StringUtil.isNotEmpty(baseTradeProductDealDto.getFinProductType())) {
-                    finProductTypeMapper.insertSelective(baseTradeProductDealDto.getFinProductType());
+            if(CollectionUtils.isNotEmpty(baseTradeProductDealDto.getFinCashInfos())){
+                for(FinCashInfo finCashInfo : baseTradeProductDealDto.getFinCashInfos()){
+                    finCashInfoMapper.insertSelective(finCashInfo);
                 }
             }
+
+            if(CollectionUtils.isNotEmpty(baseTradeProductDealDto.getFinCashPlans())){
+                for(FinCashPlan finCashPlan : baseTradeProductDealDto.getFinCashPlans()){
+                    finCashPlanMapper.insertSelective(finCashPlan);
+                }
+            }
+
+            if(StringUtil.isNotEmpty(baseTradeProductDealDto.getFinProductType())) {
+                finProductTypeMapper.insertSelective(baseTradeProductDealDto.getFinProductType());
+            }
+
             if(!StringUtil.isEmptyList(baseTradeProductDealDto.getFinDealPledgeList())) {
                 for(FinDealPledge finTradeProduct:baseTradeProductDealDto.getFinDealPledgeList()) {
                     finDealPledgeMapper.insertSelective(finTradeProduct);

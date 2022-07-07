@@ -630,6 +630,74 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
         return finTradeProduct;
     }
 
+    /**
+     * 生成现金流信息
+     * @param trdProductDeal
+     * @return
+     */
+    public List<FinCashInfo> genFinCashInfos(TrdProductDeal trdProductDeal){
+        List<FinCashInfo> finCashInfos = new ArrayList<>();
+        FinCashInfo finCashInfoPrin = new FinCashInfo();
+        finCashInfoPrin.setFinprodId(trdProductDeal.getFinprodId());
+        finCashInfoPrin.setBranch(0L);
+        finCashInfoPrin.setFinprodType(DictCodeListExt1.现金流业务类型_金融产品.getValue());
+        finCashInfoPrin.setCashType1(DictCodeListExt1.现金流一级类型_本金.getValue());
+        finCashInfoPrin.setCashType2(DictCodeListExt1.现金流二级类型_本金.getValue());
+        finCashInfoPrin.setCashId(EncryptUtil.getInstance().md5(finCashInfoPrin.getFinprodId() + (char) 256 + finCashInfoPrin.getFinprodType()
+                + (char) 256 + finCashInfoPrin.getBranch() + (char) 256 + finCashInfoPrin.getCashType2()));
+        finCashInfoPrin.setCcy(trdProductDeal.getCcy());
+
+        FinCashInfo finCashInfoInt = new FinCashInfo();
+        finCashInfoInt.setFinprodId(trdProductDeal.getFinprodId());
+        finCashInfoInt.setBranch(0L);
+        finCashInfoInt.setFinprodType(DictCodeListExt1.现金流业务类型_金融产品.getValue());
+        finCashInfoInt.setCashType1(DictCodeListExt1.现金流一级类型_利息.getValue());
+        finCashInfoInt.setCashType2(DictCodeListExt1.现金流二级类型_利息.getValue());
+        finCashInfoInt.setCashId(EncryptUtil.getInstance().md5(finCashInfoPrin.getFinprodId() + (char) 256 + finCashInfoPrin.getFinprodType()
+                + (char) 256 + finCashInfoPrin.getBranch() + (char) 256 + finCashInfoPrin.getCashType2()));
+        finCashInfoInt.setCcy(trdProductDeal.getCcy());
+
+        finCashInfos.add(finCashInfoPrin);
+        finCashInfos.add(finCashInfoInt);
+        return finCashInfos;
+    }
+
+
+    /**
+     * 生成现金流计划
+     * @param finCashInfos
+     * @param finTradeProduct
+     * @return
+     */
+    public List<FinCashPlan> genFinCashPlans(List<FinCashInfo> finCashInfos, FinTradeProduct finTradeProduct){
+        List<FinCashPlan> finCashPlans = new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(finCashInfos)){
+            for(int i=0; i < finCashInfos.size(); i++){
+                FinCashInfo finCashInfo = finCashInfos.get(i);
+                FinCashPlan finCashPlan = new FinCashPlan();
+                finCashPlan.setBranch(0L);
+                finCashPlan.setCashNum(Long.getLong(String.valueOf(i)));
+                finCashPlan.setCashId(finCashInfo.getCashId());
+                if(DictCodeListExt1.现金流一级类型_本金.getValue().equals(finCashInfo.getCashType1())){
+                    finCashPlan.setCashType(DictCodeList.现金流类型_到期还本.getValue());
+                    finCashPlan.setPrinAmt(finTradeProduct.getmPrinAmt());
+                }
+                else if(DictCodeListExt1.现金流一级类型_利息.getValue().equals(finCashInfo.getCashType1())){
+                    finCashPlan.setCashType(DictCodeList.现金流类型_到期收息.getValue());
+                    finCashPlan.setIntAmt(finTradeProduct.getmIntAmt());
+                }
+                finCashPlan.setVdate(finTradeProduct.getVpayDate());
+                finCashPlan.setMdate(finTradeProduct.getMpayDate());
+                finCashPlan.setCashAmt(ArithmeticUtil.doAdd(finCashPlan.getPrinAmt(), finCashPlan.getIntAmt()));
+                finCashPlan.setCashUnitType(DictCodeList.现金流单位_总额.getValue());
+                finCashPlan.setFinprodId(finTradeProduct.getFinprodId());
+                finCashPlan.setFinprodType2(finTradeProduct.getFinprodType2());
+                finCashPlan.setPayType(DictCodeList.支付方式_现金.getValue());
+            }
+        }
+        return finCashPlans;
+    }
+
     public FinProductType genFinProductType(ExchangeTransMatchCommonDto dealDto,TrdProductDeal trdProductDeal) {
         FinProductType finProductType = new FinProductType();
         finProductType.setFinprodId(trdProductDeal.getFinprodId());
