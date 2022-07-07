@@ -1561,9 +1561,9 @@
                     OR fpi.ISSUE_CLASS = #{ISSUE_CLASS_03}
                     THEN fpi.TENDER_EDATE
                 END                       AS bidDateEnd/*投标日 结束*/,
-                case when tfpdt.BUSI_TYPE = 'TRD61' then brt.PAY_DATE else bo.PAY_DATE end                 payDate,
+                case when tfpdt.BUSI_TYPE = 'TRD61' then brt.PAY_DATE else bo.PAY_DATE end           payDate,
                 case when tfpdt.BUSI_TYPE = 'TRD61' then brt.CREDITOR_DEBT_DATE else bo.ASSIGN_REGDATE end assignRegdate,
-                case when tfpdt.BUSI_TYPE = 'TRD97' then bo.ONMARKET_DATE else decode(bo.IS_WIN,'Y',FPA.LISTING_DATE) end  listingDate,
+                case when tfpdt.BUSI_TYPE = 'TRD97' then bo.ONMARKET_DATE else brt.LISTING_DATE end  listingDate,
                 bo.BID_MODLE                                                                         bidModle,
                 bo.PAY_TYPE                                                                          payType,
                 null                                                                                 etrBidPriceTotal,
@@ -1573,7 +1573,7 @@
                 tfpdt.FEE_AMT_UNPAY                                                                  jsFeeAmt,
                 bo.BID_ID                                                                            tradeId,
                 tfpdt.UNIT_FPRICE      allPrice,
-                tfpdt.FPRICE_AMT                                                                     tradeAmt,
+                case when tfpdt.BUSI_TYPE = 'TRD61' then nvl(tfpdt.UNIT_CPRICE*brt.WIN_PRINAMT,0)/100 else tfpdt.FPRICE_AMT  end                 tradeAmt,
                 tfpdt.INT_AMT                                                                        intAmt,
                 tfpdt.TRADE_AMT                                                                      payAmt,
                 case when tfpdt.BUSI_TYPE = 'TRD61' then brt.WIN_TYPE else bo.DIP_TYPE end           spanTextOne,
