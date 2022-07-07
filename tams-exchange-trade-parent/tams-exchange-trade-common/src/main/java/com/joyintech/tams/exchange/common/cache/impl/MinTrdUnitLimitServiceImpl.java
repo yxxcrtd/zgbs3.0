@@ -80,7 +80,8 @@ public class MinTrdUnitLimitServiceImpl implements MinTrdUnitLimitService {
         String tradePlat = TradePlatUtils.trd2EtrTradePlat(instruction);
         String assetType = instrument.getAssetType();
         String assetType1 = instrument.getAssetType1();
-        if(PLEDGE_REPURCHASE.codeEquals(assetType) ){
+        if(PLEDGE_REPURCHASE.codeEquals(instruction.getAssetType()) ){
+            assetType = instruction.getAssetType();
             assetType1 = instruction.getAssetType1();
         }
         String subStockType = instrument.getSubStockType();
