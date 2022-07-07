@@ -21,12 +21,13 @@
         <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
         <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
         <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+        <result column="LISTING_DATE" property="listingDate" jdbcType="DATE" />
     </resultMap>
     <sql id="Base_Column_List" >
         TOTAL_WIN_ID TOTAL_WIN_ID, BID_ID BID_ID, WIN_DATE WIN_DATE, FINPROD_ID FINPROD_ID, IS_WIN IS_WIN,
         WIN_TYPE WIN_TYPE, WIN_PRINAMT WIN_PRINAMT, WIN_PRICE WIN_PRICE, SETT_FEE_AMT SETT_FEE_AMT, PAY_DATE PAY_DATE,
         CREDITOR_DEBT_DATE CREDITOR_DEBT_DATE, COUNTER_ID COUNTER_ID, REMARK REMARK,STATUS STATUS,
-        CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME
+        CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME,LISTING_DATE LISTING_DATE
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -51,13 +52,13 @@
     <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.BidResultTotal" >
         insert into BID_RESULT_TOTAL (TOTAL_WIN_ID, BID_ID, WIN_DATE, FINPROD_ID, IS_WIN, WIN_TYPE,
             WIN_PRINAMT, WIN_PRICE, SETT_FEE_AMT, PAY_DATE, CREDITOR_DEBT_DATE, COUNTER_ID, REMARK,STATUS,
-            CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME
+            CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME,LISTING_DATE
             )
         values (#{totalWinId,jdbcType=VARCHAR}, #{bidId,jdbcType=VARCHAR}, #{winDate,jdbcType=DATE}, #{finprodId,jdbcType=VARCHAR},
             #{isWin,jdbcType=VARCHAR}, #{winType,jdbcType=VARCHAR}, #{winPrinamt,jdbcType=DECIMAL}, #{winPrice,jdbcType=DECIMAL},
             #{settFeeAmt,jdbcType=DECIMAL}, #{payDate,jdbcType=DATE}, #{creditorDebtDate,jdbcType=DATE}, #{counterId,jdbcType=VARCHAR},
             #{remark,jdbcType=VARCHAR} ,#{status,jdbcType=VARCHAR} ,#{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
-            #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
+            #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{listingDate,jdbcType=DATE}
             )
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.BidResultTotal" >
@@ -120,6 +121,9 @@
             <if test="updateTime != null" >
                 UPDATE_TIME,
             </if>
+            <if test="listingDate != null" >
+                LISTING_DATE,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="totalWinId != null" >
@@ -179,15 +183,18 @@
             <if test="updateTime != null" >
                 #{updateTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="listingDate != null" >
+                #{listingDate,jdbcType=TIMESTAMP},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.BidResultTotal" >
         insert into BID_RESULT_TOTAL(TOTAL_WIN_ID, BID_ID, WIN_DATE, FINPROD_ID, IS_WIN, WIN_TYPE,
         WIN_PRINAMT, WIN_PRICE, SETT_FEE_AMT, PAY_DATE, CREDITOR_DEBT_DATE, COUNTER_ID, REMARK, STATUS,
-        CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+        CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME,LISTING_DATE)
         select TOTAL_WIN_ID, BID_ID, WIN_DATE, FINPROD_ID, IS_WIN, WIN_TYPE,
                WIN_PRINAMT, WIN_PRICE, SETT_FEE_AMT, PAY_DATE, CREDITOR_DEBT_DATE, COUNTER_ID, REMARK, STATUS,
-               CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
+               CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME,LISTING_DATE
              from BID_RESULT_TOTAL
              where TOTAL_WIN_ID = #{totalWinId,jdbcType=VARCHAR}
     </insert>
@@ -239,6 +246,9 @@
             <if test="updateTime != null" >
                 UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="listingDate != null" >
+                LISTING_DATE = #{listingDate,jdbcType=DATE},
+            </if>
         </set>
         where TOTAL_WIN_ID = #{totalWinId,jdbcType=VARCHAR}
     </update>
@@ -258,7 +268,8 @@
              REMARK =  #{remark ,jdbcType=VARCHAR},
              STATUS = #{status,jdbcType=VARCHAR},
              UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
-             UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+             UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+             LISTING_DATE =  #{listingDate,jdbcType=DATE}
         where TOTAL_WIN_ID = #{totalWinId,jdbcType=VARCHAR}
     </update>
 </mapper>

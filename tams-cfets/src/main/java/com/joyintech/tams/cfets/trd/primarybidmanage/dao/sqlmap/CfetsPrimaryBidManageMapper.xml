@@ -339,7 +339,7 @@
             BRT.SETT_FEE_AMT        settFeeAmt,
             decode(BRT.IS_WIN,'Y',BRT.PAY_DATE)            payDate,
             case when FP.TRADE_MARKET in ('01','02') then decode(BRT.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE) end creditorDebtDate,
-            decode(BRT.IS_WIN,'Y',FPA.LISTING_DATE)        listingDate,
+            decode(BRT.IS_WIN,'Y',BRT.LISTING_DATE)        listingDate,
             decode(BRT.IS_WIN,'Y', BRT.WIN_DATE )           winDate,
             TFPDT.TRADE_DATE        tradeDate,
             FP.TRADE_MARKET         tradeMarket,
@@ -418,10 +418,10 @@
             <![CDATA[AND  BRT.PAY_DATE  <= TO_DATE(#{payDateEnd},'YYYY-MM-DD')]]>
         </if>
         <if test="listingDateStart != null and listingDateStart != ''">
-            <![CDATA[AND  FPA.LISTING_DATE  >= TO_DATE(#{listingDateStart},'YYYY-MM-DD') ]]>
+            <![CDATA[AND  BRT.LISTING_DATE  >= TO_DATE(#{listingDateStart},'YYYY-MM-DD') ]]>
         </if>
         <if test="listingDateEnd != null and listingDateEnd != ''">
-            <![CDATA[AND  FPA.LISTING_DATE  <= TO_DATE(#{listingDateEnd},'YYYY-MM-DD')]]>
+            <![CDATA[AND  BRT.LISTING_DATE  <= TO_DATE(#{listingDateEnd},'YYYY-MM-DD')]]>
         </if>
         <if test="payTypeList != null and payTypeList.size() > 0">
             AND BO.PAY_TYPE in
@@ -483,7 +483,7 @@
         BRT.SETT_FEE_AMT        settFeeAmt,
         decode(BRT.IS_WIN,'Y',BRT.PAY_DATE)            payDate,
         case when FP.TRADE_MARKET in ('01','02') then decode(BRT.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE) end creditorDebtDate,
-        decode(BRT.IS_WIN,'Y',FPA.LISTING_DATE)        listingDate,
+        decode(BRT.IS_WIN,'Y',BRT.LISTING_DATE)        listingDate,
         decode(BRT.IS_WIN,'Y', BRT.WIN_DATE )           winDate,
         TFPDT.TRADE_DATE        tradeDate,
         FP.TRADE_MARKET         tradeMarket,
@@ -566,10 +566,10 @@
             <![CDATA[AND  BRT.PAY_DATE  <= TO_DATE(#{payDateEnd},'YYYY-MM-DD')]]>
         </if>
         <if test="listingDateStart != null and listingDateStart != ''">
-            <![CDATA[AND  FPA.LISTING_DATE  >= TO_DATE(#{listingDateStart},'YYYY-MM-DD') ]]>
+            <![CDATA[AND  BRT.LISTING_DATE  >= TO_DATE(#{listingDateStart},'YYYY-MM-DD') ]]>
         </if>
         <if test="listingDateEnd != null and listingDateEnd != ''">
-            <![CDATA[AND  FPA.LISTING_DATE  <= TO_DATE(#{listingDateEnd},'YYYY-MM-DD')]]>
+            <![CDATA[AND  BRT.LISTING_DATE  <= TO_DATE(#{listingDateEnd},'YYYY-MM-DD')]]>
         </if>
         <if test="payTypeList != null and payTypeList.size() > 0">
             AND BO.PAY_TYPE in
@@ -845,7 +845,7 @@
             FPI.ISSUE_DATE   issueDate,
             FPI.ISSUE_CLASS  issueClass,
             case when FP.TRADE_MARKET in ('01','02') then decode(BRT.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE) end creditorDebtDate,
-            decode(BRT.IS_WIN,'Y',FPA.LISTING_DATE)  listingDate,
+            decode(BRT.IS_WIN,'Y',BRT.LISTING_DATE)  listingDate,
             decode(BRT.IS_WIN,'Y',BRT.WIN_TYPE)   winType,
             BO.BID_MODLE     bidModle,
             BO.WIN_PRIN_AMT totalBiddingNum,
@@ -879,7 +879,7 @@
             FPI.ISSUE_DATE   issueDate,
             FPI.ISSUE_CLASS  issueClass,
             case when FP.TRADE_MARKET in ('01','02') then decode(BRT.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE) end creditorDebtDate,
-            decode(BRT.IS_WIN,'Y',FPA.LISTING_DATE) listingDate,
+            decode(BRT.IS_WIN,'Y',BRT.LISTING_DATE) listingDate,
             decode(BRT.IS_WIN,'Y',BRT.WIN_TYPE)   winType,
             BO.BID_MODLE     bidModle,
             BO.WIN_PRIN_AMT totalBiddingNum,
