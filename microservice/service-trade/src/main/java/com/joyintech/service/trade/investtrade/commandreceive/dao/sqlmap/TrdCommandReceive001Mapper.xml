@@ -120,6 +120,7 @@
 				ETR_DISTRIBUTE.REC_STATUS IN(#{entrustCompleted},#{entrustReceive},#{entrustClose})
 			AND
 				(ETR_ENTRUST_ADD.ENTRUST_CREATE_SOURCE is null or ETR_ENTRUST_ADD.ENTRUST_CREATE_SOURCE != '02')
+			AND ETR_ENTRUST_ADD.ASSET_TYPE not IN ('F37' )
 			<!-- <if test="finprodType2List != null and finprodType2List.size()>0">
 				AND (ETR_ENTRUST.FINPROD_TYPE2 IN(
 						<foreach item="item" index="index" collection="finprodType2List" separator=",">
@@ -334,6 +335,7 @@
 			ETR_ENTRUST.ENTRUST_STATUS IN(#{entrustCompleted},#{entrustReceive},#{entrustClose})
 			AND
 			ETR_DISTRIBUTE.REC_STATUS IN(#{entrustCompleted},#{entrustReceive},#{entrustClose})
+			AND ETR_ENTRUST_ADD.ASSET_TYPE not IN ('F37')
 			AND
 			(ETR_ENTRUST_ADD.ENTRUST_CREATE_SOURCE is null or ETR_ENTRUST_ADD.ENTRUST_CREATE_SOURCE != '02')
 			<if test="finprodType2List != null and finprodType2List.size()>0">

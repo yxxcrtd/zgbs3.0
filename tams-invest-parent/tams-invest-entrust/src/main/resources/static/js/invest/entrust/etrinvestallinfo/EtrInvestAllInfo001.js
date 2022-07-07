@@ -142,7 +142,7 @@
                     "finprodType2": F11
                 };
                 var url = "home.html?a=a&busiCode=" + data.entrustId + "&finprodType2=" + F11 +
-                    "&pageModel=1&editable=false&isTodoList=true#/instructionSearch/detail?a=a";
+                    "&pageModel=1&editable=false&isTodoList=true#/instructionsSearch/detail?a=a";
 
                 Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                     basePath + url,
@@ -156,7 +156,7 @@
                     "finprodType2": F11
                 };
                 var url = "home.html?a=a&busiCode=" + data.entrustId + "&finprodType2=" + F11 +
-                    "&pageModel=1&editable=false&isTodoList=true#/instructionSearch/detail?a=a";
+                    "&pageModel=1&editable=false&isTodoList=true#/instructionsSearch/detail?a=a";
                 console.log(url, '...url')
                 Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                     basePath + url,
@@ -170,7 +170,7 @@
                     "finprodType2": F11
                 };
                 var url = "home.html?a=a&busiCode=" + data.entrustId + "&finprodType2=" + F11 +
-                    "&pageModel=1&editable=false&isTodoList=true#/instructionSearch/detail?a=a";
+                    "&pageModel=1&editable=false&isTodoList=true#/instructionsSearch/detail?a=a";
                 console.log(url, '...url')
                 Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                     basePath + url,
@@ -184,7 +184,7 @@
                     "finprodType2": F07
                 };
                 var url = "home.html?a=a&busiCode=" + data.entrustId + "&finprodType2=" + F07 +
-                    "&pageModel=1&editable=false&isTodoList=true#/instructionSearch/detail?a=a";
+                    "&pageModel=1&editable=false&isTodoList=true#/instructionsSearch/detail?a=a";
                 console.log(url, '...url')
                 Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                     basePath + url,
@@ -198,7 +198,7 @@
                     "finprodType2": F01
                 };
                 var url = "home.html?a=a&busiCode=" + data.entrustId + "&finprodType2=" + F01 +
-                    "&pageModel=1&editable=false&isTodoList=true#/instructionSearch/detail?a=a";
+                    "&pageModel=1&editable=false&isTodoList=true#/instructionsSearch/detail?a=a";
 
                 Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                     basePath + url,
@@ -212,7 +212,7 @@
                     "finprodType2": F02
                 };
                 var url = "home.html?a=a&busiCode=" + data.entrustId + "&finprodType2=" + F02 +
-                    "&pageModel=1&editable=false&isTodoList=true#/instructionSearch/detail?a=a";
+                    "&pageModel=1&editable=false&isTodoList=true#/instructionsSearch/detail?a=a";
 
                 Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                     basePath + url,
@@ -228,7 +228,7 @@
                     "busiCode": data.entrustId
                 };
                 var url = "home.html?a=a&busiCode=" + data.entrustId +
-                    "&pageModel=1&editable=false&isTodoList=true#/instructionSearch/detail?a=a";
+                    "&pageModel=1&editable=false&isTodoList=true#/instructionsSearch/detail?a=a";
 
                 Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                     basePath + url,
@@ -241,7 +241,7 @@
                     "busiCode": data.entrustId
                 };
                 var url = "home.html?a=a&busiCode=" + data.entrustId +
-                    "&pageModel=1&editable=false&isTodoList=true#/instructionSearch/detail?a=a";
+                    "&pageModel=1&editable=false&isTodoList=true#/instructionsSearch/detail?a=a";
 
                 Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                     basePath + url,
@@ -254,7 +254,7 @@
                     "busiCode": data.entrustId
                 };
                 var url = "home.html?a=a&busiCode=" + data.entrustId +
-                    "&pageModel=1&editable=false&isTodoList=true#/instructionSearch/detail?a=a";
+                    "&pageModel=1&editable=false&isTodoList=true#/instructionsSearch/detail?a=a";
 
                 Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                     basePath + url,
