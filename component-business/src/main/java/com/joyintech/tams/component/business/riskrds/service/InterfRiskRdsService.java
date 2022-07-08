@@ -10,6 +10,7 @@
 
 package com.joyintech.tams.component.business.riskrds.service;
 
+import com.alibaba.fastjson.JSON;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.constant.GlobalConstant;
@@ -399,6 +400,7 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
     public <T> ClientData sendRiskRdsData(T t, V v) throws IOException, InstantiationException {
         logger.info("==========后端交易或委托类转换接口:{} start==========", v.getEventType() + v.getInfCode());
         Map<String, Object> dataMap = JsonUtils.object2Map(t);
+        logger.debug("=========后端交易或委托类转换datamap:{}", JSON.toJSONString(dataMap));
         ClientData returnCli = this.sendRiskRdsDataCommon(dataMap, v);
         logger.info("==========后端交易或委托类转换接口:{} end==========", v.getEventType() + v.getInfCode());
         return returnCli;
