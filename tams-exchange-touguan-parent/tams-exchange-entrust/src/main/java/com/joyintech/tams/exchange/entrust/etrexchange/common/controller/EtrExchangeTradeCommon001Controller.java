@@ -1442,7 +1442,7 @@ public class EtrExchangeTradeCommon001Controller extends BaseController{
 					tempItem.setDisRate(disRate);
 				}
 				dto.setEntrustAmt(totalEntrustAmt);
-				dto.setEntrustNum(totalEntrustNum);
+				//dto.setEntrustNum(totalEntrustNum);
 				dto.setIsMulti(DictCodeList.是否_是.getValue());
 				dto.setVdate(dto.getEntrustDate());
 				dto.setMdate(dto.getEntrustDate());

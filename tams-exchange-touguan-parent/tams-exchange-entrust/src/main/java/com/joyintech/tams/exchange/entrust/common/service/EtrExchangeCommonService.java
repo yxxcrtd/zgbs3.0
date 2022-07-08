@@ -1796,31 +1796,22 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
         } else { //目标类型是金额还是平均分配
             for (int i = 0; i < sumSize; i++) {
                 EtrExchangeProtfolioDetailRequest item = portfolioList.get(i);
-                item.setEntrustAmt(ArithmeticUtil.divide(entrustAmt, sumSize, 2));
-                BigDecimal tempEntrustNum = BigDecimal.ZERO;
-                if (dto.getEntrustPrice() != null) {
-                    tempEntrustNum = ArithmeticUtil.divide(item.getEntrustAmt(), dto.getEntrustPrice(), 0);
-                }
-                item.setEntrustNum(tempEntrustNum.divide(minStep, 0, RoundingMode.DOWN).multiply(minStep));
 
-//                if (i != sumSize - 1) {
-//                    item.setEntrustAmt(ArithmeticUtil.divide(entrustAmt, sumSize, 2));
-//                    BigDecimal tempEntrustNum = BigDecimal.ZERO;
-//                    if (dto.getEntrustPrice() != null) {
-//                        tempEntrustNum = ArithmeticUtil.divide(item.getEntrustAmt(), dto.getEntrustPrice(), 0);
-//                    }
-//                    item.setEntrustNum(tempEntrustNum);
-//                } else {
+                if (i != sumSize - 1) {
+                    item.setEntrustAmt(ArithmeticUtil.divide(entrustAmt, sumSize, 2));
+                    BigDecimal tempEntrustNum = BigDecimal.ZERO;
+                    if (dto.getEntrustPrice() != null) {
+                        tempEntrustNum = ArithmeticUtil.divide(item.getEntrustAmt(), dto.getEntrustPrice(), 0);
+                    }
+                    item.setEntrustNum(tempEntrustNum.divide(minStep, 0, RoundingMode.DOWN).multiply(minStep));
+                } else {
 //                    BigDecimal tempEntrustNum = dto.getPortfolioList().stream().map(EtrExchangeProtfolioDetailRequest::getEntrustNum).reduce(BigDecimal::add).get();
-//                    BigDecimal tempEntrustAmt = dto.getPortfolioList().stream().map(EtrExchangeProtfolioDetailRequest::getEntrustAmt).reduce(BigDecimal::add).get();
+                    BigDecimal tempEntrustAmt = dto.getPortfolioList().stream().map(EtrExchangeProtfolioDetailRequest::getEntrustAmt).reduce(BigDecimal::add).get();
 //                    item.setEntrustNum(ArithmeticUtil.subtract(entrustNum, tempEntrustNum));
-//                    item.setEntrustAmt(ArithmeticUtil.subtract(entrustAmt, tempEntrustAmt));
-//                }
-
-                //卖出不考虑最小交易单位
-//                if (StringUtil.equals(DictCodeList.交易方向_买入.getValue(), ps)) {
-//                    item.setEntrustNum(item.getEntrustNum().divide(minStep, 0, RoundingMode.DOWN).multiply(minStep));
-//                }
+                    item.setEntrustAmt(ArithmeticUtil.subtract(entrustAmt, tempEntrustAmt));
+                    BigDecimal tempEntrustNum  =ArithmeticUtil.divide(item.getEntrustAmt(), dto.getEntrustPrice(), 0);
+                    item.setEntrustNum(tempEntrustNum.divide(minStep, 0, RoundingMode.DOWN).multiply(minStep));
+                }
             }
         }
         BeanUtil.copyPropertiesIgnoreNull(response, dto);
