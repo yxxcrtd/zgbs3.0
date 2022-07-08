@@ -117,14 +117,18 @@ var table
             printPayOrders();
         })
         $("#FundBackgroundManagement001_btn_export").click(exportExcel)
-        $(document).on("click", "div.laytable-cell-checkbox div.layui-form-checkbox", function (e) {
-        	refreshTotalPrinAmt();
-        	});
-        $("#FundBackgroundManagement001_btn_calculate").click(function(){
-        	refreshTotalPrinAmt();
+        // $(document).on("click", "div.laytable-cell-checkbox div.layui-form-checkbox", function (e) {
+        // 	refreshTotalPrinAmt();
+        // 	});
+        // $("#FundBackgroundManagement001_btn_calculate").click(function(){
+        // 	refreshTotalPrinAmt();
+        // });
+        // $(".layTableCheckbox").on("click", function () {
+        // 	refreshTotalPrinAmt();
+        // });
+        $("#dataTableDiv").on("click", function () {
+            refreshTotalPrinAmt();
         });
-        $(".layTableCheckbox").on("click", function () {
-        	refreshTotalPrinAmt();
-        });
+
     });
 }());
