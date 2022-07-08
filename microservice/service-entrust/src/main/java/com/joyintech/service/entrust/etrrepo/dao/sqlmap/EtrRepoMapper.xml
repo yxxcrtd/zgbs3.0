@@ -233,6 +233,46 @@
 		<where>
 				T1.ENTRUST_ID = #{entrustId}
 		</where>
+
+		union all
+
+		SELECT
+		T1.ENTRUST_ID entrustId,
+		T1.PORTFOLIO_ID portfolioId,
+		T1.VDATE vdate,
+		T1.MDATE mdate,
+		T6.ASSET_TYPE1 assetType1,
+		T6.VDATE vdateAdd,
+		T6.MDATE mdateAdd,
+		T6.TERM_DAYS repoTerm,
+		T6.SETTLE_SPREED settleSpeed,
+		T6.CASH_USEDATE availableDay,
+		T6.SEC_ACCT_ID securitiesCust,
+		T6.TERM_TYPE termType,
+		T1.CCY ccy,
+		T1.PS ps,
+		T1.PRICE * 100 price,
+		T1.PRICE_MODEL priceModel,
+		T1.ENTRUST_AMT entrustAmt,
+		T6.MIN_AMT minAmt,
+		T1.TRADE_MARKET tradeMarket,
+		T1.CALENDAR_ID calendarId,
+		T1.PRO_AVAILABLE_CASH proAvailableCash,
+		T1.ACC_AVAILABLE_CASH accAvailableCash,
+		T1.REMARK remark,
+		T1.COUNTER_ID counterId,
+		T1.COUNTER_TRADER counterTrader,
+		T1.CONTACT_INFO contactInfo,
+		T2.TRADER trader,
+		T1.INV_MANAGER_ID invManagerId,
+		T1.CHL_ID
+		FROM
+		WFL_ETR_ENTRUST T1
+		LEFT JOIN ETR_DISTRIBUTE T2 ON T1.ENTRUST_ID = T2.ENTRUST_ID
+		LEFT JOIN WFL_ETR_ENTRUST_ADD T6 ON T1.ENTRUST_ID = T6.ENTRUST_ID
+		<where>
+			T1.ENTRUST_ID = #{entrustId}
+		</where>
 	</select>
 	
 	<select id="searchType" resultType="java.lang.String">
