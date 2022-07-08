@@ -585,6 +585,13 @@
                 "95%", "80%", {pageModel:PAGE_MODEL_REFERENCE,
                     finprodId:row.finprodId,  //金融产品代码
                 });
+        }else if(row.assetType == F11){
+            Joyin.dialog(JoyinUtil.getLabel("EtrInvestAllInfo001.astStock"),
+                basePath
+                + "/invest/asset/stock/FinStockInfo002/init",
+                "95%", "80%", {pageModel:PAGE_MODEL_REFERENCE,
+                    finprodId:row.finprodId,  //金融产品代码
+                });
         }
     });
     /**
