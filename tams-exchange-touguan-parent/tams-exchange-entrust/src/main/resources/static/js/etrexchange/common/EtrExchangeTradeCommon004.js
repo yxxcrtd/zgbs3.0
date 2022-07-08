@@ -1111,6 +1111,7 @@
         var finprodType2 = $("#finprodType2_" + currentTab).val();
         var ps = $("#ps_" + currentTab).val();
         var secId = $("#secId_" + currentTab).val();
+
         if (priceModel) {
             // if 画面.价格模式 = 市价指令  and 点击成交成报
             if (priceModel == PRICE_MODEL_PRM03 || (currentTab == "dz" && declaType == DECLA_TYPE_PRM08)) {
@@ -3353,7 +3354,7 @@
                 $("#targetType_div_" + currentTab).hide();
             }
 
-            if (finprodType2 == FINPROD_TYPE_TG_F06) {
+            if (finprodType2 == FINPROD_TYPE_TG_F06 || finprodType2 == FINPROD_TYPE_TG_F01 || finprodType2 == FINPROD_TYPE_TG_F10) {
                 $("#priceModel_div_" + currentTab).show();
                 $("#entrustNumUnit_" + currentTab).text("份");
             }
@@ -4641,7 +4642,7 @@
             var param = {};
             param.secId = secId;
             var finprodType2 = $("#finprodType2_" + currentTab).val();
-            if (finprodType2 == FINPROD_TYPE_TG_F06) {
+            if (finprodType2 == FINPROD_TYPE_TG_F06 || finprodType2 == FINPROD_TYPE_TG_F01 || finprodType2 == FINPROD_TYPE_TG_F10) {
                 $("#priceModel_div_" + currentTab).show();
             }
             if(secId){
