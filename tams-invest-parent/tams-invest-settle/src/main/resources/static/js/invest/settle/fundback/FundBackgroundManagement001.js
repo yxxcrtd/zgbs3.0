@@ -40,6 +40,9 @@ var table
             {field: 'statusValidString', width: 200, sortField:'statusValid', title: '有效状态'}
             , {
                 field: 'bizCode', width: 200, title: '业务编号', render: function (data, type, row, meta) {
+                    if(row.paBussType==='212'||row.paBussType==='180'||row.paBussType==='151'||row.paBussType==='202'){
+                        return  data ;
+                    }
                     return "<a class='pro-link' style='cursor: pointer;' " +
                         "href='javascript:openOperateWindow(\"" + row.statusValid + "\",\"" + row.paBussType + "\",\"" + row.portfolioId + "\",\""
                         + row.bizCode + "\",\"" + row.workflowId + "\",\"" + row.finprodId + "\",\"" + row.ps + "\",\"" + row.wflWorkflowId + "\","+row.todo+ ",\""+ row.profitType + "\",\"" + row.finprodId + "\",\"" + row.operateType + "\")'>" + data + "</a>";
