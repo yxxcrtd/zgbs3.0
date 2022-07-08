@@ -88,10 +88,6 @@
 			<version>3.0.4</version>
 			<scope>compile</scope>
 		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
         <!--<dependency>
             <groupId>com.joyintech</groupId>
             <artifactId>tams-disclosure-common</artifactId>
