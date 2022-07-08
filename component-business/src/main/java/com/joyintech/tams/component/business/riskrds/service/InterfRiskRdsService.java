@@ -3076,8 +3076,18 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
         }
         if (CommonUtil.isType(v.getAssetType(), DictCodeList.平安资产类型_买断式回购)
                 || CommonUtil.isType(v.getAssetType(), DictCodeList.平安资产类型_质押式回购)) {
-            long oneDay = DateUtil.getBetweenDayNumber(DateUtil.platDateFromCache(),
-                    new Date((Long)dataMap.get("mdate")));
+            // GLCP-42:兼容mdate和mDate modify by fuyongsheng 20220708 start
+//            long oneDay = DateUtil.getBetweenDayNumber(DateUtil.platDateFromCache(),
+//                    new Date((Long)dataMap.get("mdate")));
+            Date mdate;
+            Object mdateTemp = null != dataMap.get("mdate") ? dataMap.get("mdate") : dataMap.get("mDate");
+            if (mdateTemp instanceof Long) {
+                mdate = new Date(Long.parseLong(mdateTemp.toString()));
+            } else {
+                mdate = DateUtil.parse(mdateTemp.toString());
+            }
+            long oneDay = DateUtil.getBetweenDayNumber(DateUtil.platDateFromCache(), mdate);
+            // GLCP-42:兼容mdate和mDate modify by fuyongsheng 20220708 end
             infRiskRdsDto.setOneDay(oneDay);
             //wangyang1 add by 增加期限金额 2021年9月10日 start
             if (StringUtil.isNotEmpty(infRiskRdsDto.getAmount()) && StringUtil.isNotEmpty(oneDay)) {
