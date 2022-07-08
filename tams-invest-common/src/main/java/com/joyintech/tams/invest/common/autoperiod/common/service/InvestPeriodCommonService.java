@@ -148,6 +148,12 @@ public class InvestPeriodCommonService {
     @Autowired(required = false)
     private IPlatformDate iPlatformDate;
 
+    @Autowired
+    private FinCashInfoMapper finCashInfoMapper;
+
+    @Autowired
+    private FinCashPlanMapper finCashPlanMapper;
+
     public void revoke后续交易相关表(String bizCode, String updateUser, String revokeReason, String type6, String actPortfolio) {
     	// 现金分红场景
         Map<String, Object> map = new HashMap<>();
@@ -1631,6 +1637,18 @@ public class InvestPeriodCommonService {
     	// 一体化对应etliu end
 
     	for (TrdProductDeal trdProductDeal1 : trdProductDeals) {
+    	    // 回购首期撤销需删除现金流信息和现金流计划
+    	    if((trdProductDeal1.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+                    || trdProductDeal1.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue()))
+                    && trdProductDeal1.getPs().equals(DictCodeList.交易方向_买入.getValue())){
+                List<FinCashInfo> finCashInfos = periodCommonMapper.getFinCashInfosByFinprodId(trdProductDeal1.getFinprodId());
+                if(CollectionUtils.isNotEmpty(finCashInfos)){
+                    for(FinCashInfo finCashInfo : finCashInfos){
+                        finCashInfoMapper.deleteByPrimaryKey(finCashInfo.getCashId());
+                        periodCommonMapper.deleteFinCashPlanByCashId(finCashInfo.getCashId());
+                    }
+                }
+            }
     		//授信占用
     		if (DictCodeList.交易方向_还本到账.getValue().equals(trdProductDeal1.getPs())){
     			// 调用授信共通

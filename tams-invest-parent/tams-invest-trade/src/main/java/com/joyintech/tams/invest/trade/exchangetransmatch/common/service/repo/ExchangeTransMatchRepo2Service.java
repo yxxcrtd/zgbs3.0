@@ -81,6 +81,10 @@ public class ExchangeTransMatchRepo2Service extends ExchangeTransMatchRepoCommon
                 SettleTransData settleTransData = new SettleTransData();
                 BeanUtil.copyPropertiesIgnoreNull(settleTransData,dealDto);
                 baseTradeProductDealDto.setFinTradeProduct(this.genFinTradeProduct(settleTransData, baseTradeProductDealDto.getTrdProductDeal()));
+                // 生成现金流信息列表
+                baseTradeProductDealDto.setFinCashInfos(this.genFinCashInfos(baseTradeProductDealDto.getTrdProductDeal()));
+                // 生成现金流计划列表
+                baseTradeProductDealDto.setFinCashPlans(this.genFinCashPlans(baseTradeProductDealDto.getFinCashInfos(), baseTradeProductDealDto.getFinTradeProduct()));
                 baseTradeProductDealDto.setFinProductType(this.genFinProductType(dealDto,baseTradeProductDealDto.getTrdProductDeal()));
                 baseTradeProductDealDto.setFinDealPledgeList(this.genFinDealPledgeList(dealDto,baseTradeProductDealDto.getTrdProductDeal()));
 
@@ -110,6 +114,10 @@ public class ExchangeTransMatchRepo2Service extends ExchangeTransMatchRepoCommon
             BeanUtil.copyPropertiesIgnoreNull(settleTransData,dealDto);
             settleTransData.setCjbh(dealDto.getApplyTradeId());
             baseTradeProductDealDto.setFinTradeProduct(this.genFinTradeProduct(settleTransData, baseTradeProductDealDto.getTrdProductDeal()));
+            // 生成现金流信息列表
+            baseTradeProductDealDto.setFinCashInfos(this.genFinCashInfos(baseTradeProductDealDto.getTrdProductDeal()));
+            // 生成现金流计划列表
+            baseTradeProductDealDto.setFinCashPlans(this.genFinCashPlans(baseTradeProductDealDto.getFinCashInfos(), baseTradeProductDealDto.getFinTradeProduct()));
             baseTradeProductDealDto.setFinProductType(this.genFinProductType(dealDto,baseTradeProductDealDto.getTrdProductDeal()));
             baseTradeProductDealDto.setFinDealPledgeList(this.genFinDealPledgeList(dealDto,baseTradeProductDealDto.getTrdProductDeal()));
 

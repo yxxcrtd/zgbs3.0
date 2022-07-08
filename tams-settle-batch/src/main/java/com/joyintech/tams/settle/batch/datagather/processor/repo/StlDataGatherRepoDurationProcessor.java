@@ -126,6 +126,11 @@ public class StlDataGatherRepoDurationProcessor extends BaseProcessor<NeedOperat
                 for (TrdProductDealDto  trdProductDealDto: settleTransData.getTrdProductDealList()) {
                     TrdProductDealDto trdProductDeal = new TrdProductDealDto();
                     trdProductDeal.setPs(trdProductDealDto.getPs());
+                    if(DictCodeList.交易方向_还本到账.getValue().equals(trdProductDeal.getPs())){
+                        trdProductDeal.setCashId(trdProductDealDto.getPrinCashId());
+                    }else{
+                        trdProductDeal.setCashId(trdProductDealDto.getIntPayCashId());
+                    }
                     //交易份额
                     trdProductDeal.setShareAmt(trdProductDealDto.getShareAmt());
                     //交易本金
@@ -547,6 +552,7 @@ public class StlDataGatherRepoDurationProcessor extends BaseProcessor<NeedOperat
                     intAmtMap.put(key, ArithmeticUtil.subtract(bigDecimal,settleTransDataDto.getIntAmt()));
                 }
                 trdProductDealDto.setPrinAmt(BigDecimal.ZERO);
+                trdProductDealDto.setIntPayCashId(settleTransDataDto.getIntPayCashId());
                 trdProductDeals.add(trdProductDealDto);
             }
             if(null!=settleTransDataDto.getShareAmt()&&settleTransDataDto.getShareAmt().compareTo(BigDecimal.ZERO)!=0){
@@ -558,6 +564,7 @@ public class StlDataGatherRepoDurationProcessor extends BaseProcessor<NeedOperat
                 trdProductDealDto.setIntAmt(BigDecimal.ZERO);
                 trdProductDealDto.setFpriceAmt(shareNum);
                 trdProductDealDto.setTradeAmt(shareNum);
+                trdProductDealDto.setPrinCashId(settleTransDataDto.getPrinCashId());
                 trdProductDeals.add(trdProductDealDto);
             }
             settleTransDataDto.setTrdProductDealList(trdProductDeals);

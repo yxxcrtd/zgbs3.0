@@ -169,7 +169,6 @@ public class EtrProject003Controller extends BaseController {
     /**
      *excel导入数据check
      *
-     * @param map dto
      * @return check结果
      * @see
      * @since 1.0
@@ -183,7 +182,6 @@ public class EtrProject003Controller extends BaseController {
     /**
      * 保存/提交
      * 
-     * @param dto dto
      * @param br br
      * @return 结果
      * @throws WorkFlowException 异常
@@ -222,7 +220,7 @@ public class EtrProject003Controller extends BaseController {
         // add by zhangrui1 批量提交设置风控指标明细 end
         ProcessParameter<EtrProjectDto> processParameter = new ProcessParameter<EtrProjectDto>();
         WorkFlowParameter<EtrProjectDto> params = new WorkFlowParameter<EtrProjectDto>();
-        params.setPageId(this.getPageId());
+        params.setPageId("EtrProject002");
         params.setElementId(dtoList.get(0).getElementId());
         params.setBusinessCode(EtrProjectDto::getEntrustId);
         params.setBusinessType(DictCodeList.共通业务类型_项目类资产投资委托.getValue());
