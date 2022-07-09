@@ -10,6 +10,7 @@
 
 package com.joyintech.tams.component.business.riskrds.service;
 
+import com.alibaba.fastjson.JSON;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.constant.GlobalConstant;
@@ -399,6 +400,7 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
     public <T> ClientData sendRiskRdsData(T t, V v) throws IOException, InstantiationException {
         logger.info("==========后端交易或委托类转换接口:{} start==========", v.getEventType() + v.getInfCode());
         Map<String, Object> dataMap = JsonUtils.object2Map(t);
+        logger.debug("=========后端交易或委托类转换datamap:{}", JSON.toJSONString(dataMap));
         ClientData returnCli = this.sendRiskRdsDataCommon(dataMap, v);
         logger.info("==========后端交易或委托类转换接口:{} end==========", v.getEventType() + v.getInfCode());
         return returnCli;
@@ -3074,8 +3076,18 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
         }
         if (CommonUtil.isType(v.getAssetType(), DictCodeList.平安资产类型_买断式回购)
                 || CommonUtil.isType(v.getAssetType(), DictCodeList.平安资产类型_质押式回购)) {
-            long oneDay = DateUtil.getBetweenDayNumber(DateUtil.platDateFromCache(),
-                    new Date((Long)dataMap.get("mdate")));
+            // GLCP-42:兼容mdate和mDate modify by fuyongsheng 20220708 start
+//            long oneDay = DateUtil.getBetweenDayNumber(DateUtil.platDateFromCache(),
+//                    new Date((Long)dataMap.get("mdate")));
+            Date mdate;
+            Object mdateTemp = null != dataMap.get("mdate") ? dataMap.get("mdate") : dataMap.get("mDate");
+            if (mdateTemp instanceof Long) {
+                mdate = new Date(Long.parseLong(mdateTemp.toString()));
+            } else {
+                mdate = DateUtil.parse(mdateTemp.toString());
+            }
+            long oneDay = DateUtil.getBetweenDayNumber(DateUtil.platDateFromCache(), mdate);
+            // GLCP-42:兼容mdate和mDate modify by fuyongsheng 20220708 end
             infRiskRdsDto.setOneDay(oneDay);
             //wangyang1 add by 增加期限金额 2021年9月10日 start
             if (StringUtil.isNotEmpty(infRiskRdsDto.getAmount()) && StringUtil.isNotEmpty(oneDay)) {

@@ -243,6 +243,10 @@ public class TrdInvestDealQuery001Service extends BaseService<TrdInvestDealQuery
 			return DictCodeListExt3.平安资产类型_权益类资产.getValue();
 		}
 		// add by etliu 20210421 权益类资产相关代码合并 end
+		else if (StringUtil.equals(finType2, DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())){
+			return DictCodeList.平安资产类型_信用保护凭证.getValue();
+		}
+
 		return StringUtil.EMPTY;
 	}
 

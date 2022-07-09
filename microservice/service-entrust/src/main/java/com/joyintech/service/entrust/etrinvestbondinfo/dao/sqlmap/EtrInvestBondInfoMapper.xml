@@ -33,12 +33,12 @@
 			    T1.TRADE_MARKET      tradeMarket,
 			    T1.TRADE_PLAT        tradePlat,
 			    T1.TRADE_MARKET_MODE tradeMarketMode,
-			    T1.ENTRUST_NUM*100   entrustNum,
+			    T1.ENTRUST_AMT		 entrustNum,
 			    T1.CCY               ccy,
 			    T1.VDATE             vdate,
 			    T1.MDATE             mdate,
 			    NVL(T5.FINISH_AMT,0)*100 finishAmt,
-			    round(NVL(T5.FINISH_AMT,0)*100/(T1.ENTRUST_NUM*100),4)*100		transactioncom,
+			    round(NVL(T5.FINISH_AMT,0)*100/decode(( T1.ENTRUST_AMT ),0,1), 4 ) * 100	transactioncom,
 			    T1.REMARK            remark,
 			    T1.INV_AIM			 invAim,
 			    T1.PRICE_MODEL		 priceModel,
@@ -485,6 +485,7 @@ SELECT interf.SECID id,
 		<result column="invAim"  property="invAim"/>
 		<result column="availableNum"  property="availableNum"/>
 		<result column="entrustNum"  property="entrustNum"/>
+		<result column="entrustAmt"  property="entrustAmt"/>
 		<result column="entrustOwnNum"  property="entrustOwnNum"/>
 		<result column="minAmt"  property="minAmt"/>
 		<result column="entrustIntegrateNum"  property="entrustIntegrateNum"/>
@@ -529,7 +530,8 @@ SELECT interf.SECID id,
 			    T1.TRADE_MARKET_MODE tradeMarketMode,
 			    T1.INV_AIM			 invAim,
 			    T1.AVAILABLE_NUM	 availableNum,
-			    T1.ENTRUST_NUM*100	 entrustNum,
+			    T1.ENTRUST_AMT		 entrustNum,
+				T1.ENTRUST_AMT		 entrustAmt,
 			    T6.MIN_AMT	         minAmt,
 			    T1.PRICE			 price,
 			    T1.PRICE_MODEL		 priceModel,
@@ -597,7 +599,8 @@ SELECT interf.SECID id,
 		T1.TRADE_MARKET_MODE tradeMarketMode,
 		T1.INV_AIM			 invAim,
 		T1.AVAILABLE_NUM	 availableNum,
-		T1.ENTRUST_NUM*100	 entrustNum,
+		T1.ENTRUST_AMT		 entrustNum,
+		T1.ENTRUST_AMT		 entrustAmt,
 		T6.MIN_AMT	         minAmt,
 		T1.PRICE			 price,
 		T1.PRICE_MODEL		 priceModel,

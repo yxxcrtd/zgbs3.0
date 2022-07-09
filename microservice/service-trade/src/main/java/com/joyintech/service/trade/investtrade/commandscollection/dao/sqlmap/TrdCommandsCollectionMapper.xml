@@ -246,8 +246,9 @@
             LEFT JOIN FIN_PRODUCT_TYPE T11 ON T1.FINPROD_ID = T11.FINPROD_ID
         </if>
         <where>
-            T1.ENTRUST_CLASS= #{ENTRUST_CLASS_01}
-            AND T5.TRADER = #{user}
+<!--             T1.ENTRUST_CLASS= #{ENTRUST_CLASS_01}
+          AND-->
+            T5.TRADER = #{user}
             AND T1.ENTRUST_STATUS = #{entrustStatus}
             AND (T2.ENTRUST_CREATE_SOURCE is null or T2.ENTRUST_CREATE_SOURCE != '02')
             <if test="assetType == PINAN_ASSET_TYPE_F01 and (ps == '' or ps == null)">
