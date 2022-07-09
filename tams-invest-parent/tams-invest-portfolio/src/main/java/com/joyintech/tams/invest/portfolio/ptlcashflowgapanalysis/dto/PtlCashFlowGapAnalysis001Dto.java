@@ -322,7 +322,7 @@ public class PtlCashFlowGapAnalysis001Dto extends BaseEntity {
 				psStr = psStr ;
 			}
 			else {
-				psStr = SysDataUtil.getNameFromDataDict(DictCode.交易方向, this.getCashType());
+				psStr = SysDataUtil.getNameFromDataDict(DictCode.现金流类型, this.getCashType());
 				if(StringUtil.isEmpty(psStr) && "行权".equals(this.getCashType())){
 					psStr="行权";
 				}

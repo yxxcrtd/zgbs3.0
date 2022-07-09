@@ -31,7 +31,7 @@
         SELECT
         NVL(T4.P_TOTLE_TRADE_ID, T4.TOTLE_TRADE_ID) bizCode,
         T10.ORDER_ID orderId,
-        t5.PA_BUSS_TYPE paBizType,
+        nvl(t5.PA_BUSS_TYPE,T4.TG_BUSI_TYPE) paBizType,
         T10.PAY_TYPE,
         t4.PORTFOLIO_ID,
         t7.PORTFOLIO_NAME,
@@ -161,7 +161,7 @@
         ELSE T4.TRADE_ID
         END bizCode,
         T10.ORDER_ID orderId,
-        T8.PA_BUSS_TYPE paBizType,
+        nvl(T8.PA_BUSS_TYPE,T4.TG_BUSI_TYPE) paBizType,
         NVL(T10.PAY_TYPE, T12.PAY_TYPE) PAY_TYPE,
         T5.PORTFOLIO_ID,
         t7.PORTFOLIO_NAME,
