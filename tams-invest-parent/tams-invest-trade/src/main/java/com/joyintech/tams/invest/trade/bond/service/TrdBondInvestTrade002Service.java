@@ -4897,12 +4897,12 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
             pltMap.put("secAcctId",trdProductDealMapper.getSecAcctId(trdProductDealAdd.getPortfolioId(),entity.getFinprodId(),entity.getTradeMarket()));
             pltMap.put("secAmount",ArithmeticUtil.multiply(trdProductDeal.getShareAmt(),new BigDecimal(100))); //券面总额
             if(null!=trdProductDeal.getFpriceAmt()&&BigDecimal.ZERO.compareTo(trdProductDeal.getFpriceAmt())!=0){
-                pltMap.put("cashAmount",trdProductDeal.getFpriceAmt().setScale(4,RoundingMode.DOWN));//全价总额
+                pltMap.put("cashAmount",trdProductDeal.getFpriceAmt().setScale(2,RoundingMode.DOWN));//全价总额
             }else{
                 if(null!=entity.getUnitFprice()&&BigDecimal.ZERO.compareTo(entity.getUnitFprice())!=0){
-                    pltMap.put("cashAmount",ArithmeticUtil.multiply(trdProductDeal.getShareAmt(),entity.getUnitFprice()).setScale(4,RoundingMode.DOWN));
+                    pltMap.put("cashAmount",ArithmeticUtil.multiply(trdProductDeal.getShareAmt(),entity.getUnitFprice()).setScale(2,RoundingMode.DOWN));
                 }else{
-                    pltMap.put("cashAmount",ArithmeticUtil.multiply(trdProductDeal.getShareAmt(),new BigDecimal(100)).setScale(4,RoundingMode.DOWN));
+                    pltMap.put("cashAmount",ArithmeticUtil.multiply(trdProductDeal.getShareAmt(),new BigDecimal(100)).setScale(2,RoundingMode.DOWN));
                 }
             }
             pltMap.put("ownSecAmount",ArithmeticUtil.multiply(trdProductDeal.getShareAmt(),new BigDecimal(100)));
