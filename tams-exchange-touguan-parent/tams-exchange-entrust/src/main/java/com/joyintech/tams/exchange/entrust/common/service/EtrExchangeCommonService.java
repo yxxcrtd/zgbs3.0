@@ -1801,7 +1801,7 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                     item.setEntrustAmt(ArithmeticUtil.divide(entrustAmt, sumSize, 2));
                     BigDecimal tempEntrustNum = BigDecimal.ZERO;
                     if (dto.getEntrustPrice() != null) {
-                        tempEntrustNum = ArithmeticUtil.divide(item.getEntrustAmt(), dto.getEntrustPrice(), 0);
+                        tempEntrustNum = ArithmeticUtil.divide(item.getEntrustAmt(), dto.getEntrustPrice(), 0,RoundingMode.DOWN);
                     }
                     item.setEntrustNum(tempEntrustNum.divide(minStep, 0, RoundingMode.DOWN).multiply(minStep));
                 } else {
@@ -1809,7 +1809,7 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                     BigDecimal tempEntrustAmt = dto.getPortfolioList().stream().map(EtrExchangeProtfolioDetailRequest::getEntrustAmt).reduce(BigDecimal::add).get();
 //                    item.setEntrustNum(ArithmeticUtil.subtract(entrustNum, tempEntrustNum));
                     item.setEntrustAmt(ArithmeticUtil.subtract(entrustAmt, tempEntrustAmt));
-                    BigDecimal tempEntrustNum  =ArithmeticUtil.divide(item.getEntrustAmt(), dto.getEntrustPrice(), 0);
+                    BigDecimal tempEntrustNum  =ArithmeticUtil.divide(item.getEntrustAmt(), dto.getEntrustPrice(), 0,RoundingMode.DOWN);
                     item.setEntrustNum(tempEntrustNum.divide(minStep, 0, RoundingMode.DOWN).multiply(minStep));
                 }
             }
