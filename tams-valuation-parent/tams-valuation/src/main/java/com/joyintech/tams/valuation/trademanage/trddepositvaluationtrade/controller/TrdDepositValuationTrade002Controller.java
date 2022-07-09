@@ -73,140 +73,157 @@ public class TrdDepositValuationTrade002Controller extends BaseController {
 //	@Autowired
 //	private TradeCommonService tradeCommonService;
 //    /**
-//     * 初始化方法
-//     * {@inheritDoc}
+//     * 注入业务主键生产类
 //     */
-//    @Override
-//    public String init(Model model) {
-//        this.setSelectOptionToModel(model, DictCode.交易方向, DictCode.计息基础, DictCode.是否, DictCode.存款类资产类型, DictCode.币种
-//        		);// 新增资产二、三、四级分类 王贵奇 2019/8/1
-//        // 一体化对应etliu start
-//        model.addAttribute("PS_T01", DictCodeList.交易方向_买入.getValue());
-//        model.addAttribute("PS_T02", DictCodeList.交易方向_卖出.getValue());
-//        // 一体化对应etliu end
-//
-//        model.addAttribute("YES_OR_NO_N", DictCodeList.是否_否.getValue());
-//        model.addAttribute("FINPROD_TYPE_F07", DictCodeListExt1.金融产品类型_存款.getValue());
-//        String portfolioId = getParam("portfolioId");
-//        String tradeId = getParam("tradeId");
-//        String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
-//        if (!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(workflowId)) {
-//            TrdDepositValuationTrade001Dto entity = trdDepositValuationTrade002Service.getBussinessEntityByWorkflowId(
-//                    workflowId);
-//            model.addAttribute("entity",entity);
-//            model.addAttribute("workflowId", workflowId);
-//            model.addAttribute("tradeId", entity.getTradeId());
-//        }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
-//            TrdDepositValuationTrade001Dto entity = trdDepositValuationTrade002Service.queryTradeInfoByTradeId(tradeId);
-//            model.addAttribute("entity", entity);
-//        }else{
-//            //初始化值
-//            TrdDepositValuationTrade001Dto entity = new TrdDepositValuationTrade001Dto();
-//            entity.setOtherAmt(new BigDecimal("0.00"));   //其他费用
-//            entity.setCcy(DictCodeList.币种_人民币_CNY.getValue());
-//            model.addAttribute("entity", entity);
-//        }
-//        model.addAttribute("YES_OR_NO_N", DictCodeList.是否_否.getValue());
-//        return super.init(model);
-//
-//    }
-//
-//
-//    /**
-//     * 策略计划类交易代码生成
-//     * @see
-//     * @since 1.0
-//     */
-//    @PostMapping("createPlanTradeId")
-//    public String createPlanTradeId() {
-//        return trdDepositValuationTrade002Service.createPlanTradeId();
-//    }
-//
-//    /**
-//     * 自定义产品代码下拉框
-//     * @param request
-//     * @return
-//     */
-//    @RequestMapping("/findPortfolioId")
-//    @ResponseBody
-//    public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
-//        Map<String, Object> param =RequestUtil.getPageParam();
-//        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
-////        param.put("finprodType", "F01"); //测试
-//        return trdDepositValuationTrade002Service.findPortfolioId(param);
-//    }
-//
-//
-//    /**
-//     * 自定义资产代码下拉框
-//     * @param request
-//     * @return
-//     */
-//    @RequestMapping("/findFinprodId")
-//    @ResponseBody
-//    public Page<SelectOptionDto> findFinprodId(HttpServletRequest request) {
-//        Map<String, Object> param =RequestUtil.getPageParam();
-//        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
+//    @Autowired(required=false)
+//    private BaseGetBusinessId baseGetBusinessId;
+
+    /**
+     * 注入存款类交易Service
+     */
+    @Autowired
+    private TrdDepositValuationTrade002Service trdDepositValuationTrade002Service;
+
+
+    @Autowired(required = false)
+    private CommonBusinessService commonBusinessService;
+
+
+    /**
+     * 初始化方法
+     * {@inheritDoc}
+     */
+    @Override
+    public String init(Model model) {
+        this.setSelectOptionToModel(model, DictCode.交易方向, DictCode.计息基础, DictCode.是否, DictCode.存款类资产类型, DictCode.币种
+        		);// 新增资产二、三、四级分类 王贵奇 2019/8/1
+        // 一体化对应etliu start
+        model.addAttribute("PS_T01", DictCodeList.交易方向_买入.getValue());
+        model.addAttribute("PS_T02", DictCodeList.交易方向_卖出.getValue());
+        // 一体化对应etliu end
+
+        model.addAttribute("YES_OR_NO_N", DictCodeList.是否_否.getValue());
+        model.addAttribute("FINPROD_TYPE_F07", DictCodeListExt1.金融产品类型_存款.getValue());
+        String portfolioId = getParam("portfolioId");
+        String tradeId = getParam("tradeId");
+        String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
+        if (!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(workflowId)) {
+            TrdDepositValuationTrade001Dto entity = trdDepositValuationTrade002Service.getBussinessEntityByWorkflowId(
+                    workflowId);
+            model.addAttribute("entity",entity);
+            model.addAttribute("workflowId", workflowId);
+            model.addAttribute("tradeId", entity.getTradeId());
+        }else if (!StringUtil.isNotEmpty(workflowId) && StringUtil.isNotEmpty(tradeId)){
+            TrdDepositValuationTrade001Dto entity = trdDepositValuationTrade002Service.queryTradeInfoByTradeId(tradeId);
+            model.addAttribute("entity", entity);
+        }else{
+            //初始化值
+            TrdDepositValuationTrade001Dto entity = new TrdDepositValuationTrade001Dto();
+            entity.setOtherAmt(new BigDecimal("0.00"));   //其他费用
+            entity.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+            model.addAttribute("entity", entity);
+        }
+        model.addAttribute("YES_OR_NO_N", DictCodeList.是否_否.getValue());
+        return super.init(model);
+
+    }
+
+
+    /**
+     * 策略计划类交易代码生成
+     * @see
+     * @since 1.0
+     */
+    @PostMapping("createPlanTradeId")
+    public String createPlanTradeId() {
+        return trdDepositValuationTrade002Service.createPlanTradeId();
+    }
+
+    /**
+     * 自定义产品代码下拉框
+     * @param request
+     * @return
+     */
+    @RequestMapping("/findPortfolioId")
+    @ResponseBody
+    public Page<SelectOptionDto> findPortfolioId(HttpServletRequest request) {
+        Map<String, Object> param =RequestUtil.getPageParam();
+        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
 //        param.put("finprodType", "F01"); //测试
-//        return trdDepositValuationTrade002Service.findFinprodId(param);
-//    }
-//
-//    @ResponseBody
-//    @RequestMapping("/getCounterId")
-//    public Page<SelectOptionDto> getCounterId(){
-//        return trdDepositValuationTrade002Service.getCounterId(RequestUtil.getPageParam());
-//    }
-//
-//    /**
-//     * 获取产品代码
-//     * @return 联想下拉框实体类集合
-//     */
-//    @ResponseBody
-//    @RequestMapping("getProdId")
-//    public List<SelectOptionDto> getProdId(){
-//        Map<String,Object> map = RequestUtil.getPageParam();
-//        return commonBusinessService.getProdId(map);
-//    }
-//
-//    /**
-//     * 获取资产代码
-//     * @return 联想下拉框实体类集合
-//     */
-//    @ResponseBody
-//    @RequestMapping("getAssetId")
-//    public List<SelectOptionDto> getAssetId(){
-//        Map<String,Object> map = RequestUtil.getPageParam();
-//        return commonBusinessService.getAssetId(map);
-//    }
-//    /**
-//     * 获取资金账户
-//     * @return 联想下拉框实体类集合
-//     */
-//    @ResponseBody
-//    @RequestMapping("getTrdAcctId")
-//    public List<SelectOptionDto> getTrdAcctId(){
-//        Map<String,Object> map = RequestUtil.getPageParam();
-//        return commonBusinessService.getTrdAcctId(map);
-//    }
-//
-//
-//    /**
-//     * 保存按钮点击时的check
-//     * @param dto dto
-//     * @param result BindingResult
-//     * @return check结果
-//     * @see
-//     * @since 1.0
-//     */
-//    @ResponseBody
-//    @RequestMapping("check")
-//    public AjaxResult check(@RequestBody @Validated({
-//            ValidateGroupEdit.class}) TrdDepositValuationTrade001Dto dto, BindingResult result) {
-//        return commonCheck(result, dto.getOperateType());
-//    }
-//
-//
-//
-//
-//
-//}
+        return trdDepositValuationTrade002Service.findPortfolioId(param);
+    }
+
+
+    /**
+     * 自定义资产代码下拉框
+     * @param request
+     * @return
+     */
+    @RequestMapping("/findFinprodId")
+    @ResponseBody
+    public Page<SelectOptionDto> findFinprodId(HttpServletRequest request) {
+        Map<String, Object> param =RequestUtil.getPageParam();
+        //param.put("finprodType", BussinessDictCodeList.金融产品类型_计划类资产.getValue()); //F17
+        param.put("finprodType", "F01"); //测试
+        return trdDepositValuationTrade002Service.findFinprodId(param);
+    }
+
+    @ResponseBody
+    @RequestMapping("/getCounterId")
+    public Page<SelectOptionDto> getCounterId(){
+        return trdDepositValuationTrade002Service.getCounterId(RequestUtil.getPageParam());
+    }
+
+    /**
+     * 获取产品代码
+     * @return 联想下拉框实体类集合
+     */
+    @ResponseBody
+    @RequestMapping("getProdId")
+    public List<SelectOptionDto> getProdId(){
+        Map<String,Object> map = RequestUtil.getPageParam();
+        return commonBusinessService.getProdId(map);
+    }
+
+    /**
+     * 获取资产代码
+     * @return 联想下拉框实体类集合
+     */
+    @ResponseBody
+    @RequestMapping("getAssetId")
+    public List<SelectOptionDto> getAssetId(){
+        Map<String,Object> map = RequestUtil.getPageParam();
+        return commonBusinessService.getAssetId(map);
+    }
+    /**
+     * 获取资金账户
+     * @return 联想下拉框实体类集合
+     */
+    @ResponseBody
+    @RequestMapping("getTrdAcctId")
+    public List<SelectOptionDto> getTrdAcctId(){
+        Map<String,Object> map = RequestUtil.getPageParam();
+        return commonBusinessService.getTrdAcctId(map);
+    }
+
+
+    /**
+     * 保存按钮点击时的check
+     * @param dto dto
+     * @param result BindingResult
+     * @return check结果
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("check")
+    public AjaxResult check(@RequestBody @Validated({
+            ValidateGroupEdit.class}) TrdDepositValuationTrade001Dto dto, BindingResult result) {
+        return commonCheck(result, dto.getOperateType());
+    }
+
+
+
+
+
+}
