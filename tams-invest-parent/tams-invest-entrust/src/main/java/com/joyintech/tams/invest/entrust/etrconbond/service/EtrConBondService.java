@@ -33,6 +33,7 @@ import com.joyintech.tams.component.business.common.service.BasRiskMathCommServi
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.common.service.DateCalService;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
@@ -110,6 +111,7 @@ public class EtrConBondService extends CommonExportService<EtrConBondDto> implem
     @Override
     public void doComplete(EtrConBondDto dto, OperationType operationType) {
         dto.setOperateType(operationType.toString());
+        dto.setBusiTypePosition(DictCodeListExt3.投管业务类型_可转债申购.getValue());
         basRiskMathCommService.insert(dto.getRiskTrialRetDto(), dto.getEntrustId());
         restTemplate.postForObject(
                 ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrConBond/doComplete", dto,
@@ -118,6 +120,7 @@ public class EtrConBondService extends CommonExportService<EtrConBondDto> implem
 
     @Override
     public void doInsert(EtrConBondDto entity, OperationType type) {
+        entity.setBusiTypePosition(DictCodeListExt3.投管业务类型_可转债申购.getValue());
         if (type == OperationType.MODIFY) {
             restTemplate.postForObject(
                     ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrConBond/doUpdate", entity,
@@ -131,6 +134,7 @@ public class EtrConBondService extends CommonExportService<EtrConBondDto> implem
 
     @Override
     public void doUpdate(EtrConBondDto entity) {
+        entity.setBusiTypePosition(DictCodeListExt3.投管业务类型_可转债申购.getValue());
         restTemplate.postForObject(
                 ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrConBond/doUpdate", entity,
                 Integer.class);
