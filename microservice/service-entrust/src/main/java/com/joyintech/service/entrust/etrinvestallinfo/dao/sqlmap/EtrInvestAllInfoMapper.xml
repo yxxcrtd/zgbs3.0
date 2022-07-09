@@ -170,7 +170,7 @@
 		,T4.PB_EXPORTSTATUS pbExportstatus/*PB是否已导出;PB上下行关联改造 add by caoxue 2019-12-27*/
 		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 start
 		,nvl( SSAI.SEC_ACCT_NAME, sci.ACCT_NAME ) AS secAcctName-->
-		,nvl( SSAI.SEC_ACCT_NAME, detail.SEC_ACCT_NAME ) AS secAcctName
+		,nvl(nvl( SSAI.SEC_ACCT_NAME, detail.SEC_ACCT_NAME ),detail.ACCT_NAME) AS secAcctName
 		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 end -->
 		<!-- add by wanshiwei 2021-09-22 指令创建来源 start -->
 		,T4.ENTRUST_CREATE_SOURCE AS entrustCreateSource
@@ -351,7 +351,7 @@
 		,T4.PB_EXPORTSTATUS pbExportstatus/*PB是否已导出;PB上下行关联改造 add by caoxue 2019-12-27*/
 		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 start
 		,nvl( SSAI.SEC_ACCT_NAME, sci.ACCT_NAME ) AS secAcctName-->
-		,nvl( SSAI.SEC_ACCT_NAME, detail.SEC_ACCT_NAME ) AS secAcctName
+		,nvl(nvl( SSAI.SEC_ACCT_NAME, detail.SEC_ACCT_NAME ),detail.ACCT_NAME) AS secAcctName
 		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 end -->
 		<!-- add by wanshiwei 2021-09-22 指令创建来源 start -->
 		,T4.ENTRUST_CREATE_SOURCE AS entrustCreateSource
@@ -537,7 +537,7 @@
 			,T4.PB_EXPORTSTATUS pbExportstatus/*PB是否已导出;PB上下行关联改造 add by caoxue 2019-12-27*/
 			<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 start
 			,nvl( SSAI.SEC_ACCT_NAME, sci.ACCT_NAME ) AS secAcctName -->
-			,nvl( SSAI.SEC_ACCT_NAME, detail.SEC_ACCT_NAME ) AS secAcctName
+			,nvl(nvl( SSAI.SEC_ACCT_NAME, detail.SEC_ACCT_NAME ),detail.ACCT_NAME) AS secAcctName
 			<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 end -->
 			<!-- add by wanshiwei 2021-09-22 指令创建来源 start -->
 			,T4.ENTRUST_CREATE_SOURCE AS entrustCreateSource

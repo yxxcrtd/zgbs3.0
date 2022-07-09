@@ -488,7 +488,7 @@
             ,{field:'finprodId',visible:false}
             ,{field:'finprodMarketId', title: 'EtrInvestAllInfo001.finprodId', width:'200',
                 render : function(data, type, row, meta) {
-                    if(row.assetType != F07 && row.assetType != F37){
+                    if(row.assetType != F07 ){
                         return "<a  class='pro-link finprodIdLink' style='cursor: pointer;'>"+data+"</ a>";
                     }
                 },sortField:"finprodMarketId"
@@ -529,13 +529,54 @@
      */
     table.bind('click','.finprodIdLink', function(row) {
         //在新建界面进行显示单行的详细信息
-        if(row.assetType == F01){
-            Joyin.dialog(JoyinUtil.getLabel("EtrInvestAllInfo001.astBond"),
-                basePath
-                + "invest/asset/bond/FinBondTargetAsset002/init",
-                "95%", "80%", {pageModel:PAGE_MODEL_REFERENCE,
-                    finprodId:row.finprodId,  //金融产品代码
-                });
+        if (row.assetType == F01) {
+            debugger
+            if(row.finprodType2 == F01 ){
+                let finprodId = row.finprodMarketId
+                var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a"; // 默认债券标的
+                var param = {
+                    pageModel: PAGE_MODEL_REFERENCE,
+                    isQuickInput: true,
+                    finprodId: finprodId
+                };
+                Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+                    basePath + url,
+                    "98%", "98%",
+                    param);
+                //
+            } else if(row.finprodType2 == "F32" ){
+                let finprodId = row.finprodMarketId
+                var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/newbonetargets?a=a"; // 默认债券标的
+                var param = {
+                    pageModel: PAGE_MODEL_REFERENCE,
+                    isQuickInput: true,
+                    finprodId: finprodId
+                };
+                Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+                    basePath + url,
+                    "98%", "98%",
+                    param);
+                //newbonetargets
+            } else {
+                Joyin.dialog(JoyinUtil.getLabel("EtrInvestAllInfo001.astBond"),
+                    basePath
+                    + "invest/asset/bond/FinBondTargetAsset002/init",
+                    "95%", "80%", {pageModel:PAGE_MODEL_REFERENCE,
+                        finprodId:row.finprodId,  //金融产品代码
+                    });
+            }
+        } else if(row.assetType == F37){
+            let finprodId = row.finprodId
+            var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/newCreditProject?a=a";
+            var param = {
+                pageModel: PAGE_MODEL_REFERENCE,
+                isQuickInput: true,
+                finprodId: finprodId
+            };
+            Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+                basePath + url,
+                "98%", "98%",
+                param);
         }else if(row.assetType == F02){
             Joyin.dialog(JoyinUtil.getLabel("EtrInvestAllInfo001.astFund"),
                 basePath
