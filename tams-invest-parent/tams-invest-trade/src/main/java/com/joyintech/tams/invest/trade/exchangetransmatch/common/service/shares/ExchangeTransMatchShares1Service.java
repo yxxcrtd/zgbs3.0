@@ -128,11 +128,13 @@ public class ExchangeTransMatchShares1Service extends ExchangeTransMatchSharesCo
         // 交易市场
         trdProductDeal.setTradeMarketMode(dealDto.getTradeMarketMode());
 
-        if (StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
-            trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
-        } else if (StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())) {
-            trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
-        }
+        // GLCP-118:不登录交易对手 modify by fuyongsheng 20220711 start
+//        if (StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+//            trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
+//        } else if (StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())) {
+//            trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
+//        }
+        // GLCP-118:不登录交易对手 modify by fuyongsheng 20220711 end
         // 证券管理户代码
         trdProductDeal.setSecManageAcctId(dealDto.getSecAcctId());
         // 登记托管机构
