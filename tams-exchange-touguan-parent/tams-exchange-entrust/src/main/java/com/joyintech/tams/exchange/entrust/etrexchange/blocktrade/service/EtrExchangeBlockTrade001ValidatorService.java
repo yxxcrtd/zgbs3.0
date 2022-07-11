@@ -177,6 +177,49 @@ public class EtrExchangeBlockTrade001ValidatorService implements EtrExchangeComm
 							dto.getFinprodId(), dto.getTradePlat(), dto.getTradeMarket(), dto.getFinprodType2(),
 							dto.getPs());
 					if (null != minTrdUnitLimitDto) {
+						BigDecimal amt = new BigDecimal(0.00);
+						BigDecimal num = new BigDecimal(0.00);
+						for (EtrExchangeTradePortfolioRequest request : dto.getPortfolioList()) {
+							if(request.getEntrustAmt() != null
+									&& request.getEntrustAmt().compareTo(BigDecimal.ZERO) > 0){
+								amt = amt.add(request.getEntrustAmt());
+							}
+							if(request.getEntrustNum() != null
+									&& request.getEntrustNum().compareTo(BigDecimal.ZERO) > 0){
+								num = num.add(request.getEntrustNum());
+							}
+						}
+						boolean flag3 = false;
+						boolean flag4 = false;
+						if (null == minTrdUnitLimitDto.getMinAmt() || (minTrdUnitLimitDto.getMinAmt() != null
+								&& minTrdUnitLimitDto.getMinAmt().compareTo(BigDecimal.ZERO) > 0
+								&& amt.compareTo(minTrdUnitLimitDto.getMinAmt()) < 0)) {
+							flag3 = true;
+						}
+						if (null == minTrdUnitLimitDto.getMinNum() || (minTrdUnitLimitDto.getMinNum() != null
+								&& minTrdUnitLimitDto.getMinNum().compareTo(BigDecimal.ZERO) > 0
+								&& num.compareTo(minTrdUnitLimitDto.getMinNum()) < 0)) {
+							flag4 = true;
+						}
+						if(flag3 && flag4){
+							String prompt = "";
+							if (flag4 && null != minTrdUnitLimitDto.getMinNum()) {
+								prompt += "不低于" + etrExchangeTrade001Service.getNumAndUnit(
+										minTrdUnitLimitDto.getMinNum(), minTrdUnitLimitDto.getMinNumUnit());
+							}
+							if (flag3 && flag4  && null != minTrdUnitLimitDto.getMinNum()
+									&& null != minTrdUnitLimitDto.getMinAmt()) {
+								prompt += "或者";
+							}
+							if (flag3 && null != minTrdUnitLimitDto.getMinAmt()) {
+								prompt += "交易金额不低于"
+										+ etrExchangeTrade001Service.getNumAndUnit(minTrdUnitLimitDto.getMinAmt())
+										+"人民币";
+							}
+							errorList.add(new ValidMessage(prompt));
+							return errorList;
+						}
+
 						boolean flag1 = false;
 						boolean flag2 = false;
 						for (EtrExchangeTradePortfolioRequest request : dto.getPortfolioList()) {
