@@ -15,7 +15,7 @@
 
     <properties>
         <jackson.version>2.9.2</jackson.version>
-        <framework.version>0.0.5.2</framework.version>
+        <framework.version>0.0.5.3</framework.version>
     </properties>
 
     <dependencies>
