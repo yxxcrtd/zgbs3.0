@@ -188,7 +188,9 @@ public class EtrStockService extends CommonExportService<EtrStockDto> implements
      */
      @Override
      public void doInsert(EtrStockDto dto, OperationType type){
-         dto.setOperateType(type.toString());
+         //GLCP-119:【指令查询】股票指令流程中数据在指令查询里看不到 start
+         //dto.setOperateType(type.toString());
+         //GLCP-119:【指令查询】股票指令流程中数据在指令查询里看不到 end
          restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrStock/doInsert",dto, Integer.class);
      }
 
