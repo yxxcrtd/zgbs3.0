@@ -174,7 +174,7 @@
 
 
         var openOperateWindow = function (statusValid, paBussType, portfolioId, bizCode, workflowId, finprodMarketId, ps, wflWorkflowId,
-                                          isTodo, profitType, finprodId, operateType, finprodType2) {
+                                          isTodo, profitType, finprodId, operateType, finprodType2,mdateStr) {
             if (paBussType == 平安业务类型_DVP划款) {
                 //在新建界面进行显示单行的详细信息
                 var params = {}
@@ -207,7 +207,8 @@
                 finprodId: finprodId,
                 ps: ps && ps != 'null' && ps != 'undefined' ? ps : '',
                 workflowId: workflowId && workflowId != 'null' && workflowId != 'undefined' ? workflowId : '',
-                isFromCheck: true
+                isFromCheck: true,
+                mDate:mdateStr
             };
             if(workflowId == 'OrderNewBuild001')// 指令新建特殊处理
             {

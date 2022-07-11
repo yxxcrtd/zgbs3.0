@@ -127,7 +127,10 @@ public class PageFieldToInterfFactory {
             // 债券借贷到期确认.组合代码-接口.组合代码
             FieldStruct.PORTFOLIOID,
             // 债券借贷到期确认.转债代码-接口.资产代码
-            FieldStruct.FINPRODID,
+            // GLCP-12:资产代码应该是债券代码 modify by fuyongsheng 20220711 start
+            // FieldStruct.FINPRODID,
+            FieldStruct.F12_PLEDGEFINPRODID,
+            // GLCP-12:资产代码应该是债券代码 modify by fuyongsheng 20220711 end
             FieldStruct.FINPRODTYPE2,
             // 债券借贷到期确认.业务编码-接口.事件代码
             FieldStruct.BUSICODE,
