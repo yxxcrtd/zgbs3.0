@@ -2418,8 +2418,10 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
             StringBuilder mySideTrader = new StringBuilder();
             dto.getOuTraderNameList().forEach(
                     ouTraderName ->
-                            mySideTrader.append(GlobalConstant.COMMA + ouTraderName)
+                            mySideTrader.append(GlobalConstant.COMMA).append(ouTraderName)
             );
+            User user = SecurityUtil.getLoginUser();
+            mySideTrader.append(GlobalConstant.COMMA).append(user.getIbuTrader());
             stringObjectMap.put("mySideTrader", mySideTrader.toString());
         }
         if (CollectionUtils.isNotEmpty(dto.getCpPartyNameList())) {
@@ -2427,7 +2429,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
             StringBuilder counterId = new StringBuilder();
             dto.getCpPartyNameList().forEach(
                     cpPartyName ->
-                            counterId.append(GlobalConstant.COMMA + cpPartyName)
+                            counterId.append(GlobalConstant.COMMA).append(cpPartyName)
             );
             stringObjectMap.put("counterId", counterId.toString());
         }
@@ -2436,7 +2438,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
             StringBuilder counterTrader = new StringBuilder();
             dto.getCpTraderNameList().forEach(
                     cpTraderName ->
-                            counterTrader.append(GlobalConstant.COMMA + cpTraderName)
+                            counterTrader.append(GlobalConstant.COMMA).append(cpTraderName)
             );
             stringObjectMap.put("counterTrader", counterTrader.toString());
         }
