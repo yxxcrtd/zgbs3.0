@@ -256,6 +256,12 @@
             <if test="outDealerPartyNo != null" >
                 OUT_DEALER_PARTY_NO,
             </if>
+            <if test="creditEventHappenedDate != null" >
+                CREDIT_EVENT_HAPPENED_DATE,
+            </if>
+            <if test="creditEventResolveDate != null" >
+                CREDIT_EVENT_RESOLVE_DATE,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="totleTradeId != null" >
@@ -395,6 +401,12 @@
             </if>
             <if test="outDealerPartyNo != null" >
                 #{outDealerPartyNo,jdbcType=VARCHAR},
+            </if>
+            <if test="creditEventHappenedDate != null" >
+                #{creditEventHappenedDate,jdbcType=DATE},
+            </if>
+            <if test="creditEventResolveDate != null" >
+                #{creditEventResolveDate,jdbcType=DATE},
             </if>
         </trim>
     </insert>
