@@ -476,8 +476,9 @@
 		</if>
 		<!-- wangyang1 07-16-20 二级法人改造 end -->
         <where>
-            T1.ENTRUST_CLASS= #{ENTRUST_CLASS_01}
-            AND T5.TRADER = #{user}
+            <!--T1.ENTRUST_CLASS= #{ENTRUST_CLASS_01}
+            AND -->
+            T5.TRADER = #{user}
             AND T1.ENTRUST_STATUS = #{entrustStatus}
             AND (T2.ENTRUST_CREATE_SOURCE is null or T2.ENTRUST_CREATE_SOURCE != '02')
             <if test="assetType != 'Con1' and assetType != 'Con2' ">
