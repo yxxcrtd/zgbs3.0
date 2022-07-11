@@ -1041,6 +1041,20 @@ public class PtlFundAllocationService extends BaseService<PtlFundAllocationDto> 
             acctTypeList.add(DictCodeListExt1.资金账户类型_券商资金账户.getValue());
             ptlCashPositionFlowDto.setAcctType(acctTypeList);
             amount = basePtlCashPositionInfoService.queryActCashPosition(ptlCashPositionFlowDto);
+
+            //查询新表可用现金
+            PtlCashPositionFlowDto dtoNew = new PtlCashPositionFlowDto();
+//            dtoNew.setHodingType(DictCodeListExt3.资产类型_汇总可用现金.getValue());
+            dtoNew.setCdate(ptlCashPositionFlowDto.getCdate());
+            dtoNew.setPortfolioId(ptlCashPositionFlowDto.getPortfolioId());
+            dtoNew.setCcy(ptlCashPositionFlowDto.getCcy());
+            dtoNew.setDateType(0);
+            dtoNew.setAcctId(ptlCashPositionFlowDto.getAcctId());
+            BigDecimal cashT0_new = basePtlCashPositionInfoService.queryTrdAvailableCashNew(dtoNew);
+
+            if(StringUtil.isNotEmpty(cashT0_new)){
+               amount =  ArithmeticUtil.doAdd(amount, cashT0_new);
+            }
         }
         catch (Exception e) {
             logger.error(e.getMessage(),e);
