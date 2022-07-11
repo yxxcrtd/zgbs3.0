@@ -472,11 +472,11 @@
             ,{field:'entrustStatusStr', title: 'EtrInvestAllInfo001.entrustStatus', width:'200',sortField:"entrustStatus"}
             ,{field:'portfolioId', title: 'EtrInvestAllInfo001.portfolioId', width:'200',
                 render : function(data, type, row, meta) {
-                    // if(row.portfolioId&&row.entrustClass==ENTRUST_CLASS_01){
+                    if(row.portfolioId){
                         return "<a  class='pro-link portfolioIdLink' style='cursor: pointer;'>"+row.portfolioId+"</ a>";
-                    // }else{
-                    //     return '';
-                    // }
+                    }else{
+                        return '';
+                    }
                 } ,sortField:"portfolioId"
             }
             ,{field:'portfolioName', title: 'EtrInvestAllInfo001.portfolioName', width:'200',sortField:"portfolioName"}
@@ -519,10 +519,15 @@
      * 组合代码链接
      */
     table.bind('click','.portfolioIdLink', function(row) {
+        let portfolioId = row.portfolioId;
+        if(portfolioId){
+            let content = row.portfolioId.split(',')
+            portfolioId = content[0];
+        }
         Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
             basePath + "invest/portfolio/ptlmanagementinfo/PtlManagementInfo002/init",
             "98%", "90%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
-                portfolioId:row.portfolioId});//主键组合代码
+                portfolioId:portfolioId});//主键组合代码
     });
     /**
      * 资产代码链接
@@ -530,7 +535,6 @@
     table.bind('click','.finprodIdLink', function(row) {
         //在新建界面进行显示单行的详细信息
         if (row.assetType == F01) {
-            debugger
             if(row.finprodType2 == F01 ){
                 let finprodId = row.finprodMarketId
                 var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a"; // 默认债券标的
@@ -565,7 +569,23 @@
                         finprodId:row.finprodId,  //金融产品代码
                     });
             }
-        } else if(row.assetType == F37){
+        } else if (row.assetType == F10){
+            if(row.finprodType2 == F01 ){
+                let finprodId = row.finprodMarketId
+                var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a"; // 默认债券标的
+                var param = {
+                    pageModel: PAGE_MODEL_REFERENCE,
+                    isQuickInput: true,
+                    finprodId: finprodId
+                };
+                Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+                    basePath + url,
+                    "98%", "98%",
+                    param);
+                //
+            }
+        }
+        else if(row.assetType == F37){
             let finprodId = row.finprodId
             var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/newCreditProject?a=a";
             var param = {
