@@ -19,6 +19,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
@@ -748,7 +749,8 @@ public class InvestmentManagement extends BaseService {
         instructionPledge.setFinprodAbbr(String.join(",", finprodAbbrs));
         instructionPledge.setPledgeAmt(pledgeAmt);
         instructionPledge.setPledgeNumber(pledgeNumber);
-        instructionPledge.setPledgeRatio(pledgeRatioAmt.divide(pledgeNumber, 2, RoundingMode.HALF_UP));
+        // instructionPledge.setPledgeRatio(pledgeRatioAmt.divide(pledgeNumber, 2, RoundingMode.HALF_UP));
+        instructionPledge.setPledgeRatio(ArithmeticUtil.divide(pledgeRatioAmt, pledgeNumber, 2, RoundingMode.HALF_UP));
 
         pledges.clear();
         pledges.add(instructionPledge);
