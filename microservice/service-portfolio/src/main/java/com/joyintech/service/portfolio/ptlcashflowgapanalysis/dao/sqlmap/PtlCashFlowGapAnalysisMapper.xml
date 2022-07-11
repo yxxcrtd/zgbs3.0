@@ -236,7 +236,7 @@
         LEFT JOIN FIN_PRODUCT_ADD PRODADD ON (PSP.PORTFOLIO_ID = PRODADD.PORTFOLIO_ID or pp.PARENT_PORTFOLIO_ID = PRODADD.PORTFOLIO_ID)
         LEFT JOIN FIN_PRODUCT PROD ON PRODADD.FINPROD_ID = PROD.FINPROD_ID
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
-        where PROD.VDATE &lt;= FCP.VDATE /*过滤掉产品陈立日之前的计划*/
+        where 1=1/*PROD.VDATE &lt;= FCP.VDATE*/ /*过滤掉产品陈立日之前的计划*/
         <if test="portfolioIdList != null and portfolioIdList.size()>0 ">
             and psp.PORTFOLIO_ID in
             <foreach collection="portfolioIdList" item="item" separator="," open="(" close=")">
@@ -449,7 +449,7 @@
         LEFT JOIN FIN_PRODUCT_ADD PRODADD ON (PSP.PORTFOLIO_ID = PRODADD.PORTFOLIO_ID or pp.PARENT_PORTFOLIO_ID = PRODADD.PORTFOLIO_ID)
         LEFT JOIN FIN_PRODUCT PROD ON PRODADD.FINPROD_ID = PROD.FINPROD_ID
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
-        where PROD.VDATE &lt;= FCP.VDATE /*过滤掉产品陈立日之前的计划*/
+        where 1=1/*PROD.VDATE &lt;= FCP.VDATE*/ /*过滤掉产品陈立日之前的计划*/
         <if test="portfolioIdList != null and portfolioIdList.size()>0 ">
             and psp.PORTFOLIO_ID in
             <foreach collection="portfolioIdList" item="item" separator="," open="(" close=")">
@@ -568,7 +568,7 @@
         LEFT JOIN FIN_PRODUCT PROD ON PRODADD.FINPROD_ID = PROD.FINPROD_ID
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
         <where>
-            PROD.VDATE &lt;= fep1.VDATE /*过滤掉产品陈立日之前的计划*/
+            1=1 /*PROD.VDATE &lt;= fep1.VDATE*/ /*过滤掉产品陈立日之前的计划*/
             AND psp.AMOUNT > 0
             AND NOT EXISTS (SELECT 1 FROM FIN_EXERCISE_PLAN FEP WHERE FEP.CASH_ID = FEP1.CASH_ID AND FEP.EXERCISE_DATE &lt; FEP1.EXERCISE_DATE
             AND FEP.FINPROD_ID = FEP1.FINPROD_ID)
@@ -754,17 +754,13 @@
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
         fp.ccy CCY,
         sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as fundAccount,
-        case when fp.FINPROD_TYPE2 = 'F02' and -1*psp.AMOUNT*fcp.CASH_AMT &lt; 0
-        then -1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2)
-        when fp.FINPROD_TYPE2 != 'F02' and psp.AMOUNT*fcp.CASH_AMT &gt; 0
-        then ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2) else 0 end as INCASHFLOW,
-        case when fp.FINPROD_TYPE2 = 'F02' and psp.AMOUNT*fcp.CASH_AMT &gt; 0
-        then -1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2)
-        when fp.FINPROD_TYPE2 != 'F02' and psp.AMOUNT*fcp.CASH_AMT &lt; 0
-        then ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2) else 0 end as OUTCASHFLOW,
-        case when fp.FINPROD_TYPE2 != 'F02'
-        then -1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2)
-        else ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2)
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F30')
+        then 0 else  nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0) end as INCASHFLOW,
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F30')
+        then nvl(-1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0) else 0 end as OUTCASHFLOW,
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F30')
+        then nvl(-1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0)
+        else nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0)
         end as NETCASHFLOW,
         <!--多级法人改造 add by jingqiongqiong 20200615-->
         pp.PORTFOLIO_ID as portfolioId1
@@ -782,6 +778,7 @@
         left join STL_CAPACCT_INFO sci on sci.ACCT_NO = pci.ACCT_NO
         left join PTL_PORTFOLIO_AUTHORITY pa on pa.portfolio_id = pp.portfolio_id
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
+        left join FIN_TRADE_PRODUCT FTP on FTP.FINPROD_ID = psp.FINPROD_ID
 
         where 1 = 1
         <if test="portfolioIdList1 != null and portfolioIdList1.size()>0 ">
@@ -818,7 +815,8 @@
         </if>
         and not exists (
         select 1 from TRD_PRODUCT_DEAL tpd
-        where tpd.CASH_ID = fcp.CASH_ID
+        where (tpd.CASH_ID = fcp.CASH_ID
+        or (tpd.cash_id is not null and tpd.cash_id = (select cash_id from FIN_CASH_PLAN fcp1 where fcp1.mdate=fcp.mdate and fcp1.FINPROD_ID=fcp.FINPROD_ID and fcp1.cash_type in('02','03') )))
         and tpd.MDATE >= FCP.VDATE
         AND FCP.MDATE >= TPD.MDATE
         and tpd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR}
@@ -894,7 +892,8 @@
         </if>
         and not exists (
         select 1 from TRD_PRODUCT_DEAL tpd
-        where tpd.CASH_ID = fcp.CASH_ID
+        where (tpd.CASH_ID = fcp.CASH_ID
+        or (tpd.cash_id is not null and tpd.cash_id = (select cash_id from FIN_CASH_PLAN fcp1 where fcp1.mdate=fcp.mdate and fcp1.FINPROD_ID=fcp.FINPROD_ID and fcp1.cash_type in('02','03') )))
         and tpd.MDATE >= FCP.VDATE
         AND FCP.MDATE >= TPD.MDATE
         and tpd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR}
@@ -1124,17 +1123,13 @@
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
         fp.ccy CCY ,
         sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as fundAccount,
-        case when fp.FINPROD_TYPE2 = 'F02' and -1*psp.AMOUNT*fcp.CASH_AMT &lt; 0
-        then -1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2)
-        when fp.FINPROD_TYPE2 != 'F02' and psp.AMOUNT*fcp.CASH_AMT &gt; 0
-        then ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2) else 0 end as INCASHFLOW,
-        case when fp.FINPROD_TYPE2 = 'F02' and psp.AMOUNT*fcp.CASH_AMT &gt; 0
-        then -1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2)
-        when fp.FINPROD_TYPE2 != 'F02' and psp.AMOUNT*fcp.CASH_AMT &lt; 0
-        then ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2) else 0 end as OUTCASHFLOW,
-        case when fp.FINPROD_TYPE2 != 'F02'
-        then -1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2)
-        else ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2)
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F30')
+        then 0 else  nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0) end as INCASHFLOW,
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F30')
+        then nvl(-1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0) else 0 end as OUTCASHFLOW,
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F30')
+        then nvl(-1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0)
+        else nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0)
         end as NETCASHFLOW,
         <!--多级法人改造 add by jingqiongqiong 20200615-->
         pp.PORTFOLIO_ID portfolioId1
@@ -1186,7 +1181,8 @@
         and fcp.PAY_DATE &gt;= to_date(#{sysDate},'YYYY-MM-DD')
         and not exists (
         select 1 from TRD_PRODUCT_DEAL tpd
-        where tpd.CASH_ID = fcp.CASH_ID
+        where (tpd.CASH_ID = fcp.CASH_ID
+        or (tpd.cash_id is not null and tpd.cash_id = (select cash_id from FIN_CASH_PLAN fcp1 where fcp1.mdate=fcp.mdate and fcp1.FINPROD_ID=fcp.FINPROD_ID and fcp1.cash_type in('02','03') )))
         and tpd.MDATE > FCP.VDATE
         AND FCP.MDATE >= TPD.MDATE
         and tpd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR}
@@ -1263,7 +1259,8 @@
 
         and not exists (
         select 1 from TRD_PRODUCT_DEAL tpd
-        where tpd.CASH_ID = fcp.CASH_ID
+        where (tpd.CASH_ID = fcp.CASH_ID
+        or (tpd.cash_id is not null and tpd.cash_id = (select cash_id from FIN_CASH_PLAN fcp1 where fcp1.mdate=fcp.mdate and fcp1.FINPROD_ID=fcp.FINPROD_ID and fcp1.cash_type in('02','03') )))
         and tpd.MDATE > FCP.VDATE
         AND FCP.MDATE >= TPD.MDATE
         and tpd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR}
