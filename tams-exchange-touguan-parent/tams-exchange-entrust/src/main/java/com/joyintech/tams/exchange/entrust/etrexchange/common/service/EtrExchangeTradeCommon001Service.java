@@ -2843,6 +2843,10 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
                 tradePlat = DictCodeList.交易平台_大宗交易平台.getValue();
             } else if ("gd".equals(currentTab) || currentTab.equals(DictCodeList.交易平台_固定收益平台.getValue())) {
                 tradePlat = DictCodeList.交易平台_固定收益平台.getValue();
+            //add wsz 3.0.6桂林产品化 GLCP-115 修改提交验证异常 start
+            } else if ("99".equals(currentTab) ) {
+                return currentTab;
+            //add wsz 3.0.6桂林产品化 GLCP-115 修改提交验证异常 end
             }
         }
         return tradePlat;
