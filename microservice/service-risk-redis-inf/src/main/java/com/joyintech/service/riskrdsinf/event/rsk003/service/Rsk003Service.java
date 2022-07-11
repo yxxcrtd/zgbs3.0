@@ -13,6 +13,7 @@ package com.joyintech.service.riskrdsinf.event.rsk003.service;
 import java.math.BigDecimal;
 import java.util.*;
 
+import com.alibaba.fastjson.JSON;
 import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
 import com.joyintech.service.riskrdsinf.event.rsk004.service.Rsk004Service;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -103,6 +104,8 @@ public class Rsk003Service extends EventBaseService<Rsk003InEntity> {
             }
             // 取得资产基本信息
             Map<String, Object> assetInfo = getAssetInfo(mapData);
+            getLogger().debug("[isAssetNoNeeds is {}]", isAssetNoNeeds());
+            getLogger().debug("[assetInfo is {}]", JSON.toJSONString(assetInfo));
             if (!isAssetNoNeeds()) {
                 // 若资产基本信息不为空
                 if (!CollectionUtils.isEmpty(assetInfo)) {
