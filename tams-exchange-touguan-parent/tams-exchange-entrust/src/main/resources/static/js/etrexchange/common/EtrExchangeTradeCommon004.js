@@ -1299,6 +1299,7 @@
             $("#entrustAmt_" + currentTab).prop("disabled", true);
         }
         calcEntrustNumAndAmt(init);
+        linkTableEntrustNumAmt();
     };
     /**
      * 委托数量变更时联动计算委托金额
@@ -4193,6 +4194,7 @@
         }
         var params = {
             targetType: targetType,
+            ps: ps,
             // minNum
             entrustPrice: entrustPrice,
             minStep: minStep,
@@ -4244,7 +4246,8 @@
     dateTable.bind('click', '.delt', function (data, index) {
         setRiskFlag(1)
         dateTable.removeRow(data);
-        linkTableEntrustNumAmtFF();
+        // linkTableEntrustNumAmtFF();
+        linkTableEntrustNumAmt();
     });
 
     var colsRiskTrialRet = [
@@ -4892,7 +4895,8 @@
             var temp = {};
             dateTable.addRow(temp);
             if (currentTab == 'dz'){
-             linkTableEntrustNumAmtFF();
+             // linkTableEntrustNumAmtFF();
+                linkTableEntrustNumAmt()
             }
         });
     });
