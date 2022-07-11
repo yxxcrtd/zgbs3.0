@@ -47,7 +47,7 @@
                     field: 'sysTradeId', title: '业务编号', sortable: false, width:200, render: function (data, type, row, meta) {
                         return "<a class='pro-link' style='cursor: pointer;' " +
                             "href='javascript:openOperateWindow(\""+STATUS_VALID_05+"\",\"" + row.sysBussType + "\",\"" + row.sysPortfolioId + "\",\""
-                            + row.sysTradeId + "\",null,\"" + row.sysFinprodId + "\",\"" + row.ps + "\",null,null,\""+row.profitType+"\",\"" + row.finprodId+ "\")'>" + data + "</a>";
+                            + row.sysTradeId + "\",null,\"" + row.sysFinprodId + "\",\"" + row.ps + "\",null,null,\""+row.profitType+"\",\"" + row.finprodId+ "\",null,null,\"" +row.mdateStr+"\")'>" + data + "</a>";
                     }
                 }
                 , {field: 'sysCdate', title: '现金流日期', sortable: false, type: 'date'}
