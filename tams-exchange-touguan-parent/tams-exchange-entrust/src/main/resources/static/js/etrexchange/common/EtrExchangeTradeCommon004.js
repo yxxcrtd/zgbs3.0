@@ -4039,7 +4039,34 @@
                     $("#entrustAmt_" + currentTab).val(entrustAmt);
                     calcEntrustNumAndAmt();
                     var entrustNum = $("#entrustNum_" + currentTab).val();
-                    dateTable.renderRow(data.LAY_TABLE_INDEX, {"entrustNum": parseFloat(entrustNum) * parseInt(value) / entrustAmt});
+                    console.log("----------------111-------------------");
+                    console.log(entrustNum);
+                    console.log(value);
+                    console.log(entrustAmt);
+
+                    var minStep;
+                    var param = {
+                        finprodId: $("#finprodId_" + currentTab).val(),
+                        targetType: $("#targetType_" + currentTab).val(),
+                        finprodType2: $("#finprodType2_" + currentTab).val(),
+                        tradeMarket: $("#tradeMarket_" + currentTab).val(),
+                        ps: $("#ps_" + currentTab).val(),
+                        currentTab: currentTab
+                    };
+                    Joyin.ajaxJson(basePath + 'invest/entrust/etrexchangetrade/EtrExchangeTrade001/getMinNumStep', param, function (result) {
+                        if (result.minNum) {
+                            minStep = result.minNum;
+                        }
+                    }, false);
+
+                    var entrustNum0 = parseFloat(entrustNum) * parseInt(value) / entrustAmt;
+                    var entrustNum1 = Math.floor(entrustNum0 / minStep) * minStep;
+                    console.log("---------------222--------------------");
+                    console.log(minStep);
+                    console.log(entrustNum0);
+                    console.log(entrustNum1);
+
+                    dateTable.renderRow(data.LAY_TABLE_INDEX, {"entrustNum": entrustNum1});
                 }
             }
         },
