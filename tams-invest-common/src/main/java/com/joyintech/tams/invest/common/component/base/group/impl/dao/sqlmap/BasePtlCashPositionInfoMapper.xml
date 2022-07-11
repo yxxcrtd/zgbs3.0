@@ -246,9 +246,14 @@
         LEFT JOIN PTL_POSITION_CFG b
         ON a.HODING_TYPE =b.HOLDINGTYPE AND b.S_HOLDINGTYPE  = #{hodingType,jdbcType=VARCHAR}
         where a.cdate =#{cdate,jdbcType=DATE}
-        and b.S_HOLDINGTYPE =#{hodingType,jdbcType=VARCHAR}
         and a.ccy = #{ccy,jdbcType=VARCHAR}
         AND a.PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
         and a.DATE_TYPE=#{dateType,jdbcType=INTEGER}
+        <if test="hodingType != null and hodingType != ''">
+            and b.S_HOLDINGTYPE =#{hodingType,jdbcType=VARCHAR}
+        </if>
+        <if test="acctId != null and acctId != ''">
+            and a.ACCT_ID = #{acctId, jdbcType=VARCHAR}
+        </if>
     </select>
 </mapper>

@@ -64,6 +64,7 @@ import com.joyintech.workflow.engine.entity.WorkflowEntity;
 import com.joyintech.workflow.engine.service.ProcessService;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1763,16 +1764,19 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
         BigDecimal entrustAmt = Objects.equals(dto.getEntrustAmt(), "--")? BigDecimal.ZERO : dto.getEntrustAmt();
         BigDecimal entrustPrice = dto.getEntrustPrice() == null || Objects.equals(dto.getEntrustAmt(), "--") ? BigDecimal.ZERO : dto.getEntrustPrice();
         BigDecimal leftEntrustNum = entrustNum;
+        List<EtrExchangeProtfolioDetailRequest> portfolioList = dto.getPortfolioList();
+        if (CollectionUtils.isEmpty(portfolioList)) {
+            return response;
+        }
         //初始化为0
-        dto.getPortfolioList().stream().forEach(item -> {
+        portfolioList.stream().forEach(item -> {
             item.setEntrustNum(BigDecimal.ZERO);
             item.setEntrustAmt(BigDecimal.ZERO);
         });
 
         boolean flag = true;
         //目标类型是数量安装步长分配
-        List<EtrExchangeProtfolioDetailRequest> portfolioList = dto.getPortfolioList();
-        int sumSize = dto.getPortfolioList().size();
+        int sumSize = portfolioList.size();
         String ps = dto.getPs();
         if (StringUtil.equals(DictCodeListExt3.交易方向_质押券出库.getValue(), ps) || StringUtil.equals(DictCodeListExt3.交易方向_质押券入库.getValue(), ps)) {
             entrustPrice = ArithmeticUtil.divide(entrustPrice, new BigDecimal(100), 2);
@@ -1805,7 +1809,7 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                     item.setEntrustAmt(ArithmeticUtil.divide(entrustAmt, sumSize, 2));
                     BigDecimal tempEntrustNum = BigDecimal.ZERO;
                     if (dto.getEntrustPrice() != null) {
-                        tempEntrustNum = ArithmeticUtil.divide(item.getEntrustAmt(), dto.getEntrustPrice(), 0,RoundingMode.DOWN);
+                        tempEntrustNum = ArithmeticUtil.divide(item.getEntrustAmt(), dto.getEntrustPrice(), 0, RoundingMode.DOWN);
                     }
                     item.setEntrustNum(tempEntrustNum.divide(minStep, 0, RoundingMode.DOWN).multiply(minStep));
                 } else {
@@ -1813,7 +1817,7 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                     BigDecimal tempEntrustAmt = dto.getPortfolioList().stream().map(EtrExchangeProtfolioDetailRequest::getEntrustAmt).reduce(BigDecimal::add).get();
 //                    item.setEntrustNum(ArithmeticUtil.subtract(entrustNum, tempEntrustNum));
                     item.setEntrustAmt(ArithmeticUtil.subtract(entrustAmt, tempEntrustAmt));
-                    BigDecimal tempEntrustNum  =ArithmeticUtil.divide(item.getEntrustAmt(), dto.getEntrustPrice(), 0,RoundingMode.DOWN);
+                    BigDecimal tempEntrustNum = ArithmeticUtil.divide(item.getEntrustAmt(), dto.getEntrustPrice(), 0, RoundingMode.DOWN);
                     item.setEntrustNum(tempEntrustNum.divide(minStep, 0, RoundingMode.DOWN).multiply(minStep));
                 }
             }
