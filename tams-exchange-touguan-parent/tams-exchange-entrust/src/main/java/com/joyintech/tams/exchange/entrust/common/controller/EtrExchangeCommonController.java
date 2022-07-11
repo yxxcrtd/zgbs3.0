@@ -3,7 +3,7 @@ package com.joyintech.tams.exchange.entrust.common.controller;
 import com.alibaba.fastjson.JSON;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseController;
-import com.joyintech.framework.util.*;
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.component.base.core.MstWorkflowCommonService;
@@ -21,9 +21,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/etrexchange/common/")
@@ -74,17 +78,17 @@ public class EtrExchangeCommonController extends BaseController {
      *
      * @param dto dto
      * @return 处理结果
-     * @throws Exception
-     *             异常
+     * @throws Exception 异常
      */
     @ApiOperation(value = "查询指令组合分配列表", notes = "查询指令组合分配列表")
     @PostMapping("/selectEtrPortfolioAllocationList")
     @ResponseBody
-    public Message<EtrExchangePortfolioAllocationResponse>  selectEtrPortfolioAllocationList(@RequestBody EtrExchangePortfolioAllocationRequest dto )  {
-        try{
-            EtrExchangePortfolioAllocationResponse response=etrExchangeCommonService.selectEtrPortfolioAllocationList(dto);
+    public Message<EtrExchangePortfolioAllocationResponse> selectEtrPortfolioAllocationList(@RequestBody EtrExchangePortfolioAllocationRequest dto) {
+        try {
+            EtrExchangePortfolioAllocationResponse response = etrExchangeCommonService.selectEtrPortfolioAllocationList(dto);
             return new Message<EtrExchangePortfolioAllocationResponse>().success().setData(response);
-        }catch (Exception e){
+        } catch (Exception e) {
+            logger.error("查询指令组合分配列表异常：errorMsg:{}", e.getMessage(), e);
             return new Message<EtrExchangePortfolioAllocationResponse>().fail().setData(null);
         }
     }
