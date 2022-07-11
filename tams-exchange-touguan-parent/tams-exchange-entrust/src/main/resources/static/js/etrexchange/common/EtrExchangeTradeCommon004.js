@@ -3895,7 +3895,9 @@
                             linkTableEntrustNumAmt();
                         }
                     } else {
-                        dateTable.renderRow(data.LAY_TABLE_INDEX, {"acctNo": null});
+                        Joyin.error("没有资金账户，重新选中组合", function () {
+                            dateTable.renderRow(data.LAY_TABLE_INDEX, {"portfolioId":null, "acctNo": null});
+                        });
                     }
                 });
             } else if (field == "acctNo") {
@@ -4556,7 +4558,6 @@
 
 
     $(function () {
-
 
         //按tab键定位按钮事件
         var inp = $(".input-control").val();
