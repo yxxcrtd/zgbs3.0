@@ -13,7 +13,6 @@ var showPtlManagement = function (portfolioId) {
 var showDetailByFinprodId = function (finprodId, finprodType2) {
     var label = '';
     var pagePath = '';
-    debugger
     //债券标的信息查看
     if (finprodType2 == PINAN_ASSET_TYPE_F01
         || finprodType2 == PINAN_ASSET_TYPE_F10) {

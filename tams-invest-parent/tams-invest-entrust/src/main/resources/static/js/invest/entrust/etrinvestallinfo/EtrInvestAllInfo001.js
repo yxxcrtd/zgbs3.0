@@ -553,7 +553,7 @@
                     param);
                 //
             } else if(row.finprodType2 == "F32" ){
-                let finprodId = "F32_" + row.finprodMarketId
+                let finprodId = row.finprodId
                 var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/newbonetargets?a=a"; // 默认债券标的
                 var param = {
                     pageModel: PAGE_MODEL_REFERENCE,
@@ -601,7 +601,11 @@
                 basePath + url,
                 "98%", "98%",
                 param);
-        }else if(row.assetType == F02){
+        } else if (row.assetType == "F18"){
+            Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+                basePath + "valuation/basicdata/asset/option/FinOptionTarget002/init",
+                "95%", "80%", {pageModel:PAGE_MODEL_REFERENCE,targetId:row.finprodId});
+        } else if(row.assetType == F02){
             Joyin.dialog(JoyinUtil.getLabel("EtrInvestAllInfo001.astFund"),
                 basePath
                 + "invest/asset/fund/FinFundTarget002/init",
