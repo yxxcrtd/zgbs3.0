@@ -2288,6 +2288,9 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
     }
 
     public BaseEtrInvestInfoDto buildMultiEtrFlow(EtrExchangeTradeSaveSecRepoRequest dto) {
+        //填充指令开始日期和结束日期
+        dto.setMdate(DateUtil.parse(DateUtil.format(dto.getEntrustDate(), DateUtil.DEFAULT_DATE_FORMAT_EN)));
+        dto.setVdate(DateUtil.parse(DateUtil.format(dto.getEntrustDate(), DateUtil.DEFAULT_DATE_FORMAT_EN)));
 
         BaseEtrInvestInfoDto baseEtrInvestInfoDto = this.buildEtrFlow(dto);
 

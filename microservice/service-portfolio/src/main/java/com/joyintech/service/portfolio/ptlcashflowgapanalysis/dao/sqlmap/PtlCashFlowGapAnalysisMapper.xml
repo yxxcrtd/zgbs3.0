@@ -208,8 +208,8 @@
         WHEN FP.FINPROD_TYPE2 = #{F01}/*到期还本*100*/ THEN ROUND(psp.AMOUNT*fcp.CASH_AMT/#{displayAccuracy},2)
         WHEN FP.FINPROD_TYPE2 = 'F16' and fcp.CASH_TYPE = '05' /*产品费用支付*/ THEN ROUND(BPP.TDY_UNPAID_INTINCEXP,2)
         WHEN FP.FINPROD_TYPE2 = 'F16' and fcp.CASH_TYPE = '01' /*产品中间收息*/ THEN ROUND(BPP1.TDY_UNPAID_INTINCEXP,2)
-        when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F30') then -1 * ROUND(fcp.CASH_AMT/#{displayAccuracy},2)
-        when FTP.FINPROD_TYPE2 IN ('F03', 'F05', 'F09', 'F29') then ROUND(fcp.CASH_AMT/#{displayAccuracy},2)
+        when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29') then -1 * ROUND(fcp.CASH_AMT/#{displayAccuracy},2)
+        when FTP.FINPROD_TYPE2 IN ('F03', 'F05', 'F09', 'F30') then ROUND(fcp.CASH_AMT/#{displayAccuracy},2)
         else ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1)/#{displayAccuracy},2)
         end as CASHFLOW,
         psp.ccy,
@@ -754,11 +754,11 @@
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
         fp.ccy CCY,
         sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as fundAccount,
-        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F30')
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29')
         then 0 else  nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0) end as INCASHFLOW,
-        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F30')
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29')
         then nvl(-1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0) else 0 end as OUTCASHFLOW,
-        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F30')
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29')
         then nvl(-1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0)
         else nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0)
         end as NETCASHFLOW,
@@ -1123,11 +1123,11 @@
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
         fp.ccy CCY ,
         sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as fundAccount,
-        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F30')
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29')
         then 0 else  nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0) end as INCASHFLOW,
-        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F30')
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29')
         then nvl(-1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0) else 0 end as OUTCASHFLOW,
-        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F30')
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29')
         then nvl(-1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0)
         else nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0)
         end as NETCASHFLOW,

@@ -3021,7 +3021,9 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             infRiskRdsDto.setAssetType(DictCodeList.平安资产类型_买断式回购.getValue());
             infRiskRdsDto.setAssetType2(StringUtil.equals(finDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券买断式正回购.getValue()) ? DictCodeList.回购拆借方向_正回购.getValue() : DictCodeList.回购拆借方向_逆回购.getValue());
             infRiskRdsDto.setPs(DictCodeList.交易方向_到期.getValue());
-            infRiskRdsDto.setAssetCode(null);
+            // GLCP-15:买断式存续期需要传资产代码 modify by fuyongsheng 20220711 start
+            // infRiskRdsDto.setAssetCode(null);
+            // GLCP-15:买断式存续期需要传资产代码 modify by fuyongsheng 20220711 end
             infRiskRdsDto.setMarketCode(null);
 
             infRiskRdsDto.setCalendarCode(AssetCommonUtil.getAssetInfo(finDto.getFinprodId(), obj -> obj.getCalendarCode()));
