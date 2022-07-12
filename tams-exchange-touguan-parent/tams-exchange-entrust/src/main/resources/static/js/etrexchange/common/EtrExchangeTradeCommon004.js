@@ -3632,7 +3632,7 @@
             },
             {
                 field: 'entrustAmt',
-                title: currentTab == 'gd' ? 'EtrExchangeTrade001.netPriceAmt' : 'EtrExchangeTrade001.entrustAmt',
+                title: currentTab == 'gd' ? '全价金额' : 'EtrExchangeTrade001.entrustAmt',
                 sortField: 'entrustAmt',
                 width: 200,
                 type: 'number',
@@ -3917,8 +3917,8 @@
                                         dateTable.renderRow(data.LAY_TABLE_INDEX, {"accAvailablePos": result.data});
                                     }
                                 }, false);
-                            linkTableEntrustNumAmt();
                         }
+                        linkTableEntrustNumAmt();
                     } else {
                         Joyin.error("没有资金账户，重新选中组合", function () {
                             dateTable.renderRow(data.LAY_TABLE_INDEX, {"portfolioId": null, "acctNo": null});
@@ -4100,9 +4100,16 @@
                             minStep = result.minNum;
                         }
                     }, false);
+                    console.log("--------------11-------------------")
+                    console.log(entrustNum)
+                    console.log(value)
+                    console.log(entrustAmt)
 
-                    var entrustNum0 = parseFloat(entrustNum) * parseInt(value) / entrustAmt;
+
+                    var entrustNum0 = parseFloat(entrustNum) * parseFloat(value) / entrustAmt;
                     var entrustNum1 = Math.floor(entrustNum0 / minStep) * minStep;
+                    console.log(entrustNum0)
+                    console.log(entrustNum1)
 
                     dateTable.renderRow(data.LAY_TABLE_INDEX, {"entrustNum": entrustNum1});
                 }
