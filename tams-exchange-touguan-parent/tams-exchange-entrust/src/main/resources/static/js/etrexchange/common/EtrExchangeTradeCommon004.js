@@ -3707,7 +3707,7 @@
                 var param = {};
                 var finprodType2 = $("#finprodType2_" + currentTab).val();
 
-
+                var flag = true;
                 if (finprodType2 != FINPROD_TYPE_TG_F06 && finprodType2 != FINPROD_TYPE_TG_F10 && finprodType2 != FINPROD_TYPE_TG_ZYSHG) {
                     var param1 = {};
                     param1.portfolioId = data.portfolioId;
@@ -3722,8 +3722,6 @@
                             rows.push(allRows[i]);
                         }
                     }
-
-                    var flag = true;
 
                     if (ps == PS_T68 || ps == PS_T69 || ps == PS_T02 || ps == PS_T49 || ps == PS_T03) {
                         if (ps == PS_T02) { //卖出
@@ -3831,7 +3829,8 @@
                         }
                     }
                 }
-
+                console.log("-------flag--------")
+                console.log(flag)
                 if (!flag) {
                     return;
                 }
@@ -3918,8 +3917,8 @@
                                         dateTable.renderRow(data.LAY_TABLE_INDEX, {"accAvailablePos": result.data});
                                     }
                                 }, false);
+                            linkTableEntrustNumAmt();
                         }
-                        linkTableEntrustNumAmt();
                     } else {
                         Joyin.error("没有资金账户，重新选中组合", function () {
                             dateTable.renderRow(data.LAY_TABLE_INDEX, {"portfolioId": null, "acctNo": null});
@@ -4013,8 +4012,8 @@
                             }
                         }, false);
 
+                    linkTableEntrustNumAmt();
                 }
-                linkTableEntrustNumAmt();
             } else if (field == 'entrustNum') {
                 if (parseFloat(value) < 0) {
                     Joyin.error("指令数量不能为负数！", function () {
@@ -4275,14 +4274,14 @@
             entrustAmt: $("#entrustAmt_" + currentTab).val(),
             portfolioList: array
         }
-
+        console.log("-------------------------------")
+        console.log(array)
         Joyin.ajaxJson(basePath + '/etrexchange/common/selectEtrPortfolioAllocationList', params, function (result) {
             if (result.data && result.data.portfolioList) {
                 var rows = result.data.portfolioList;
-                for (var i = 0; i < array.length; i++) {
-                    if (array[i].portfolioId == rows[i].portfolioId) {
-                        dateTable.renderRow(array[i].LAY_TABLE_INDEX, rows[i]);
-                    }
+                console.log(rows)
+                for (var i = 0; i < rows.length; i++) {
+                    dateTable.renderRow(i, rows[i]);
                 }
             }
         })
