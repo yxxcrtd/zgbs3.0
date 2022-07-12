@@ -3832,7 +3832,7 @@
                     }
                 }
 
-                if(!flag){
+                if (!flag) {
                     return;
                 }
 
@@ -3918,11 +3918,11 @@
                                         dateTable.renderRow(data.LAY_TABLE_INDEX, {"accAvailablePos": result.data});
                                     }
                                 }, false);
-                            linkTableEntrustNumAmt();
                         }
+                        linkTableEntrustNumAmt();
                     } else {
                         Joyin.error("没有资金账户，重新选中组合", function () {
-                            dateTable.renderRow(data.LAY_TABLE_INDEX, {"portfolioId":null, "acctNo": null});
+                            dateTable.renderRow(data.LAY_TABLE_INDEX, {"portfolioId": null, "acctNo": null});
                         });
                     }
                 });
@@ -4013,8 +4013,8 @@
                             }
                         }, false);
 
-                    linkTableEntrustNumAmt();
                 }
+                linkTableEntrustNumAmt();
             } else if (field == 'entrustNum') {
                 if (parseFloat(value) < 0) {
                     Joyin.error("指令数量不能为负数！", function () {
@@ -4280,7 +4280,7 @@
             if (result.data && result.data.portfolioList) {
                 var rows = result.data.portfolioList;
                 for (var i = 0; i < array.length; i++) {
-                    if(array[i].portfolioId==rows[i].portfolioId){
+                    if (array[i].portfolioId == rows[i].portfolioId) {
                         dateTable.renderRow(array[i].LAY_TABLE_INDEX, rows[i]);
                     }
                 }
@@ -4967,12 +4967,23 @@
             });
         });
         $("#etrExchangeTradeMulti001_btn_add").click(function () {
-            var temp = {};
-            dateTable.addRow(temp);
-            if (currentTab == 'dz') {
-                // linkTableEntrustNumAmtFF();
-                linkTableEntrustNumAmt()
+            var rows = [];
+            var allRows = dateTable.getAllRows();
+            for (var i = 0; i < allRows.length; i++) {
+                if (!allRows[i].portfolioId) {
+                    rows.push(allRows[i]);
+                }
             }
+            if (rows.length > 0) {
+                Joyin.warn("只允许添加一条空组合分配");
+            } else {
+                var temp = {};
+                dateTable.addRow(temp);
+            }
+            // if (currentTab == 'dz') {
+            //     // linkTableEntrustNumAmtFF();
+            //     linkTableEntrustNumAmt()
+            // }
         });
     });
 }());
