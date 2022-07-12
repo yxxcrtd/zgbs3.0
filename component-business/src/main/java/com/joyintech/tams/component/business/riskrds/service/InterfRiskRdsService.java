@@ -2563,9 +2563,9 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             infRiskRdsDto.setDeliveryDate(finDto.getTradeDate());
             //回购利率
             infRiskRdsDto.setAssetRate(StringUtil.isNotEmpty(dataMap.get("repoRate")) ? dataMap.get("repoRate") instanceof BigDecimal ? ArithmeticUtil.divide((BigDecimal) dataMap.get("repoRate"), new BigDecimal(100), 4) : ArithmeticUtil.divide(new BigDecimal(dataMap.get("repoRate").toString()), new BigDecimal(100), 4) : null);
-            // GLCP-15:买断式回购交易需要传资产代码 modify by fuyongsheng 20220712 start
-            // infRiskRdsDto.setAssetCode(null);
-            // GLCP-15:买断式回购交易需要传资产代码 modify by fuyongsheng 20220712 end
+            // GLCP-15:买断式回购交易需要传资产代码,为首期的交易编号 modify by fuyongsheng 20220712 start
+            infRiskRdsDto.setAssetCode(finDto.getTradeId());
+            // GLCP-15:买断式回购交易需要传资产代码,为首期的交易编号 modify by fuyongsheng 20220712 end
             infRiskRdsDto.setMarketCode(null);
             //添加期限品种 add by wz 20200509
             //infRiskRdsDto.setVarietyCode(StringUtil.equals(finDto.getTradeMarket(),DictCodeListExt1.交易场所_银行间.getValue())?"D"+(String) dataMap.get("termTypeReback"):(String) dataMap.get("termTypeReback"));

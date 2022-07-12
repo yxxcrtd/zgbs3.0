@@ -4459,6 +4459,7 @@
                         Joyin.error("请分配组合")
                         return false;
                     }
+                    var minStep = getMinStep();
                     for (var index in object.portfolioList) {
                         var item = object.portfolioList[index];
                         if (!item.portfolioId || !item.acctNo) {
@@ -4468,11 +4469,10 @@
                             Joyin.error("组合分配中指令数量不能为空")
                             return false;
                         }
-                        if (item.entrustNum % 10 != 0) {
-                            Joyin.error("指令数量，请输入数量最小交易单位10的整数倍")
+                        if (item.entrustNum <= 0 || item.entrustNum % minStep != 0) {
+                            Joyin.error("指令数量，请输入数量最小交易单位[" + minStep + "]的整数倍")
                             return false;
                         }
-
                     }
                     if (!checkFlag) {
                         Joyin.error("请填写完整组合信息")
@@ -4498,6 +4498,42 @@
         if (($('#riskTrialSpan').text() && $('#riskTrialSpan').text().trim() == '试算通过') || (ps == PS_T68 || ps == PS_T69)) {
             saveOrSubmit('submit');
         }
+    }
+
+    function getMinStep() {
+        var minStep;
+        var param = {
+            finprodId: $("#finprodId_" + currentTab).val(),
+            targetType: $("#targetType_" + currentTab).val(),
+            finprodType2: $("#finprodType2_" + currentTab).val(),
+            tradeMarket: $("#tradeMarket_" + currentTab).val(),
+            ps: $("#ps_" + currentTab).val(),
+            currentTab: currentTab
+        };
+        Joyin.ajaxJson(basePath + 'invest/entrust/etrexchangetrade/EtrExchangeTrade001/getMinNumStep', param, function (result) {
+            if (result.minNum) {
+                minStep = result.minNum;
+            }
+        }, false);
+
+        return minStep;
+    }
+
+    function checkMinStep(operateType) {
+        if (operateType === 'save') {
+            return true;
+        }
+        var object = getSearchParams();
+        var minStep = getMinStep();
+        for (var index in object.portfolioList) {
+            var item = object.portfolioList[index];
+            if (item.entrustNum % minStep != 0) {
+                Joyin.error("指令数量，请输入数量最小交易单位[" + minStep + "]的整数倍")
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -4537,7 +4573,6 @@
                 item.entrustNum = item.entrustNum * 100;
                 item.entrustAmt = item.entrustAmt * 100;
             }
-            console.log(object);
         }
 
         //TODO 风险和授信
@@ -4560,6 +4595,7 @@
                     return;
                 }
             }
+
 
             saveOrSubmitQues(object, posSwitch);
         }
@@ -4947,9 +4983,11 @@
         $('#EtrExchangeTradeCommon004_btn_riskcal').click(function () {
             var object = getSearchParams();
             var tradeMarket = $("#tradeMarket_" + currentTab).val();
-            var res = parseFloat(object.entrustNum) % 10;
-            if (tradeMarket == '03' && res != 0) {
-                Joyin.error("组合分配指令数量需满足最小交易单位10的整数倍！");
+            var minStep = getMinStep();
+            var entrustNum = parseFloat(object.entrustNum);
+            var res = entrustNum % minStep;
+            if (!object.entrustNum || entrustNum <= 0 || res != 0) {
+                Joyin.error("组合分配指令数量需满足最小交易单位["+minStep+"]的整数倍！");
                 return;
             }
             var param = JSON.parse(JSON.stringify(object))

@@ -653,8 +653,12 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
         finCashInfoInt.setFinprodType(DictCodeListExt1.现金流业务类型_金融产品.getValue());
         finCashInfoInt.setCashType1(DictCodeListExt1.现金流一级类型_利息.getValue());
         finCashInfoInt.setCashType2(DictCodeListExt1.现金流二级类型_利息.getValue());
-        finCashInfoInt.setCashId(EncryptUtil.getInstance().md5(finCashInfoPrin.getFinprodId() + (char) 256 + finCashInfoPrin.getFinprodType()
-                + (char) 256 + finCashInfoPrin.getBranch() + (char) 256 + finCashInfoPrin.getCashType2()));
+        // GLCP-180:修改利息现金流信息cashId采番 modify by fuyongsheng 20220712 start
+//        finCashInfoInt.setCashId(EncryptUtil.getInstance().md5(finCashInfoPrin.getFinprodId() + (char) 256 + finCashInfoPrin.getFinprodType()
+//                + (char) 256 + finCashInfoPrin.getBranch() + (char) 256 + finCashInfoPrin.getCashType2()));
+        finCashInfoInt.setCashId(EncryptUtil.getInstance().md5(finCashInfoInt.getFinprodId() + (char) 256 + finCashInfoInt.getFinprodType()
+                + (char) 256 + finCashInfoInt.getBranch() + (char) 256 + finCashInfoInt.getCashType2()));
+        // GLCP-180:修改利息现金流信息cashId采番 modify by fuyongsheng 20220712 end
         finCashInfoInt.setCcy(trdProductDeal.getCcy());
 
         finCashInfos.add(finCashInfoPrin);
