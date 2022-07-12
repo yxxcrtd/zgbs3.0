@@ -597,6 +597,144 @@ select TT.* from (
 				)
 			</if>
 		</where>
+		
+		UNION
+
+		SELECT  T1.ENTRUST_STATUS entrustStatus,
+				T1.ENTRUST_ID entrustId,
+				nvl( detail.PORTFOLIO_ID, T1.PORTFOLIO_ID ) portfolioId,
+				nvl( detail.PORTFOLIO_NAME, T2.PORTFOLIO_NAME ) portfolioName,
+				CASE WHEN T4.ASSET_TYPE = 'F07' AND T1.PS IN ( '03', '04' ) THEN T1.STOCK_ID
+					 ELSE T3.FINPROD_ID
+				END finprodId,
+				CASE WHEN T4.ASSET_TYPE = 'F07' AND T1.PS IN ( '03', '04', 'T56', 'T93', 'T94', 'T95', 'T96' ) THEN nvl(T1.STOCK_ID, T4.TERM_TYPE)
+					 ELSE ( CASE WHEN T3.FINPROD_MARKET_ID IS NOT NULL THEN T3.FINPROD_MARKET_ID ELSE T4.ASSET_TYPE_10 END )
+				END finprodMarketId,
+				T1.FINPROD_TYPE2 finprodType2,
+				T3.FINPROD_ABBR finprodName,
+				T1.PS ps,
+				CASE WHEN T4.ASSET_TYPE IN (#{ASSET_TYPE_16})
+						THEN (SELECT ITEM_VALUE FROM sys_datadict_list WHERE DICT_CODE = 'IRS_TYPE' AND ITEM_CODE = T4.BUSI_PS)
+					 WHEN T4.ASSET_TYPE IN (#{ASSET_TYPE_07},#{ASSET_TYPE_10}, #{ASSET_TYPE_12},#{ASSET_TYPE_16})
+						THEN (SELECT ITEM_VALUE FROM sys_datadict_list WHERE DICT_CODE = 'BACK_LEND_DIRECTION' AND ITEM_CODE = T4.BUSI_PS)
+					 ELSE (SELECT ITEM_VALUE FROM sys_datadict_list WHERE DICT_CODE = 'PS' AND ITEM_CODE = T1.PS)
+				END AS psStr,
+				T1.TRADE_MARKET tradeMarket,
+				T1.TRADE_PLAT tradePlat,
+				T4.SETTLE_SPREED settleSpreed,
+				CASE WHEN T4.BUSI_TYPE_POSITION IN ( '01', '34' ) THEN T1.ENTRUST_NUM * 100
+					 ELSE decode(T4.BUSI_TYPE_POSITION, 'EX004', NVL( T1.ENTRUST_AMT , T1.ENTRUST_NUM * T1.PRICE),
+						  decode(T4.ASSET_TYPE, 'F01', NVL( T1.ENTRUST_AMT, T1.ENTRUST_NUM*100 ), 'F10', NVL( T1.ENTRUST_NUM * 100, 0 ), NVL( T1.ENTRUST_AMT, T1.ENTRUST_NUM *100) ) )
+				END AS entrustAmt,
+				nvl(T1.CCY,'CNY' ) ccy,
+				T1.VDATE vdate,
+				T1.MDATE mdate,
+				T1.INV_MANAGER_ID invManagerId,
+				T4.ASSET_TYPE assetType,
+				T4.BUSI_PS busiPs,
+				T1.entrust_Type entrustType,
+				T1.REMARK remark,
+				T4.PB_EXPORTSTATUS pbExportstatus, 		/*PB是否已导出;PB上下行关联改造 add by caoxue 2019-12-27*/
+				nvl(nvl( SSAI.SEC_ACCT_NAME, detail.SEC_ACCT_NAME ),detail.ACCT_NAME) AS secAcctName,
+				T4.ENTRUST_CREATE_SOURCE AS entrustCreateSource,
+				'' nextUser,
+				T1.ENTRUST_CLASS,
+				T4.BUSI_TYPE_POSITION busiTypePosition
+		FROM WFL_ETR_ENTRUST T1
+		LEFT JOIN MUTIPTL_PORTFOLIO_TREE TREE ON T1.PORTFOLIO_ID = TREE.TREE_ID AND TREE.PAR_TREE_ID IS NOT NULL
+		LEFT JOIN PTL_PORTFOLIO T2 ON T1.PORTFOLIO_ID = T2.PORTFOLIO_ID
+		LEFT JOIN FIN_PRODUCT T3 ON T1.FINPROD_ID = T3.FINPROD_ID
+		LEFT JOIN ( SELECT  EED.ENTRUST_ID,
+							wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID,
+							wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
+							wm_concat ( EED.SEC_ACCT_ID ) AS SEC_ACCT_ID,
+							wm_concat ( ssai.SEC_ACCT_NAME ) AS SEC_ACCT_NAME,
+							wm_concat ( sci.ACCT_NO ) AS ACCT_NO,
+							wm_concat ( sci.ACCT_NAME ) AS ACCT_NAME
+					  FROM  WFL_ETR_ENTRUST_DETAIL EED
+					  LEFT JOIN ( SELECT PORTFOLIO_ID, PORTFOLIO_NAME FROM PTL_PORTFOLIO ORDER BY PORTFOLIO_ID, PORTFOLIO_NAME ) FP ON EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
+					  LEFT JOIN STL_SEC_ACCT_INFO ssai ON EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
+					  LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
+					  GROUP BY EED.ENTRUST_ID ) detail ON T1.ENTRUST_ID = detail.ENTRUST_ID
+		LEFT JOIN WFL_ETR_ENTRUST_ADD T4 ON T4.ENTRUST_ID = T1.ENTRUST_ID
+		LEFT JOIN STL_SEC_ACCT_INFO SSAI ON T4.SEC_ACCT_ID = SSAI.SEC_ACCT_ID
+		LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
+		<where>
+			AND  T1.FINPROD_TYPE2 = 'F36'
+			<if test="portfolioIdList != null and portfolioIdList.size() >0">
+				AND (T2.PORTFOLIO_ID IN
+				<foreach collection="portfolioIdList" index="index" item="prot" open="(" separator="," close=")" >
+					#{prot,jdbcType=VARCHAR}
+				</foreach>
+				or
+				T2.PARENT_PORTFOLIO_ID IN
+				<foreach collection="portfolioIdList" index="index" item="prot" open="(" separator="," close=")" >
+					#{prot,jdbcType=VARCHAR}
+				</foreach>)
+			</if>
+			<if test="finprodType2List != null">
+				and T4.ASSET_TYPE in
+				<foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">
+					<choose>
+						<when test="item!=null and item!='' and item.equals('F36')">
+							'TRD75'
+						</when>
+						<otherwise>
+							#{item}
+						</otherwise>
+					</choose>
+				</foreach>
+			</if>
+			<if test="finprodId != null and !finprodId.equals('')">
+				and	(T3.FINPROD_MARKET_ID like concat('%',concat(#{finprodId},'%'))
+				or T3.FINPROD_ABBR like concat('%',concat(#{finprodId},'%')))
+			</if>
+			<if test="tradeMarket != null and !tradeMarket.equals('')">
+				and #{tradeMarket} = T1.TRADE_MARKET
+			</if>
+			<if test="tradePlat != null and !tradePlat.equals('')">
+				and #{tradePlat} = T4.SETTLE_SPREED
+			</if>
+			<if test="ps != null and !ps.equals('')">
+				AND (case
+				<if test="IRSType_01.equals(IRSps) or IRSType_02.equals(IRSps) or PS_T01.equals(ps)">
+					when  T4.ASSET_TYPE IN (#{ASSET_TYPE_16})
+					then  T4.BUSI_PS
+				</if>
+				<if test="!IRSType_01.equals(IRSps) and !IRSType_02.equals(IRSps)">
+					when  T4.ASSET_TYPE IN (#{ASSET_TYPE_07}, #{ASSET_TYPE_08}, #{ASSET_TYPE_10}, #{ASSET_TYPE_12})
+					then  T4.BUSI_PS
+				</if>
+				else  T1.PS
+				end) =#{ps}
+			</if>
+			<if test="entrustStatus != null and !entrustStatus.equals('')">
+				and #{entrustStatus} = T1.ENTRUST_STATUS
+			</if>
+			<if test="startDate != null and !startDate.equals('')">
+				and to_date(#{startDate},'yyyy-MM-dd') &lt;= T1.VDATE
+			</if>
+			<if test="endDate != null and !endDate.equals('')">
+				and to_date(#{endDate},'yyyy-MM-dd') &gt;= T1.MDATE
+			</if>
+			<if test="etridList != null and etridList.size() >0">
+				and (T1.ENTRUST_ID in
+				<foreach collection="etridList" item="item" index= "index" open="(" close=")" separator="," >
+					<if test="(index % 998) == 0">
+						null) or T1.ENTRUST_ID in (
+					</if>
+					#{item}
+				</foreach>
+				)
+			</if>
+			<if test="pbExportstatus != null and !pbExportstatus.equals('')">
+				and (#{pbExportstatus} = T4.PB_EXPORTSTATUS
+				<if test='pbExportstatus =="N"'>
+					or T4.PB_EXPORTSTATUS is null
+				</if>
+				)
+			</if>
+		</where>
 		) TT order by vdate desc
 	</select>
 	<select id="selectExportPB"
