@@ -52,7 +52,7 @@ import com.joyintech.tams.invest.common.risk.dto.RiskNameListDto;
 import com.joyintech.tams.invest.common.trade.dao.CreditLinesDealsMapper;
 import com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto;
 import com.joyintech.workflow.engine.WorkflowContext;
-import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +63,6 @@ import java.math.RoundingMode;
 import java.util.*;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
-import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.交易方向_到期;
 import static com.joyintech.tams.invest.common.constant.BussinessDictCodeList.交易方向_行权回售;
 
 /**
@@ -1028,17 +1027,6 @@ public class RiskInputParamSerivce extends RiskCommonService {
             dto.setAssetSecType((String) map.get("assetSecType"));
             dto.setFinprodId((String) map.get("finprodId"));
         }
-    }
-
-    /**
-     * 为空或者不控返回true
-     *
-     * @param control
-     * @return
-     */
-    private boolean isControl(String control) {
-        return StringUtil.isEmpty(control) || StringUtil.equals(control, DictCodeListRsk.风险控制类别_不控.getValue());
-        //return false;
     }
 
     /**

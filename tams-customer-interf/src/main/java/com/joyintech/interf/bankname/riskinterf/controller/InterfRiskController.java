@@ -11,10 +11,10 @@
 package com.joyintech.interf.bankname.riskinterf.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
+import com.joyintech.interf.bankname.riskinterf.service.ExchangeTrdRiskInputParamService;
+import com.joyintech.tams.constant.DictCodeList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +31,9 @@ import com.joyintech.tams.component.business.riskrds.dto.InterfRiskRdsDto;
 import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.invest.common.client.ClientData;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
+
+import static com.joyintech.tams.constant.DictCodeListExt3.流程节点_流程提交;
+import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_新建;
 
 
 /**
@@ -49,6 +52,9 @@ public class InterfRiskController {
 
     @Autowired
     private InterfRiskInterfService<InterfRiskRdsDto> interfRiskRdsService;
+
+	@Autowired
+	private ExchangeTrdRiskInputParamService riskInputParamService;
 
 	/**
 	 * 实占列表
@@ -80,7 +86,16 @@ public class InterfRiskController {
 				String resStr = JsonUtils.object2Json(dataMap);
 				logger.info("请求报文:{}", resStr);
 			}
-
+			// 信用保护凭证走风险四合一接口 start
+			String assetType = (String) dataMap.get("assetType");
+			if(StringUtil.equals(assetType, DictCodeList.平安资产类型_信用保护凭证.getValue())){
+				Map<String, Object> resMap = riskInputParamService.buildParamThenOccupy(dataMap,系统动作_新建.getValue(), 流程节点_流程提交.getValue(),szcliendata);
+				logger.info("==========风险三合一服务结束==========");
+				String resStr = JsonUtils.object2Json(resMap);
+				logger.info("返回报文:{}", resStr);
+				return resMap;
+			}
+			// 信用保护凭证走风险四合一接口 end
 			Map<String, Object> occupyBatchDataMap = interfRiskRdsService.doOccupyBatchData(dataMap, szcliendata);
 			logger.info("==========风险三合一服务结束==========");
 
