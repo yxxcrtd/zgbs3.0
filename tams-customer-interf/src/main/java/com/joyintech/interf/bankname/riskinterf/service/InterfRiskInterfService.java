@@ -417,7 +417,7 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
      * @return
      * @throws Exception
      */
-    private InterfRiskRdsDto prepareRiskEntity(Map<String, Object> dataMap,V v) throws Exception{
+    public InterfRiskRdsDto prepareRiskEntity(Map<String, Object> dataMap,V v) throws Exception{
         if(StringUtil.isNotEmpty(dataMap.get(InterfUtil.finprodId))&&!StringUtil.isNotEmpty(v.getAssetType())){
             Map<String, IAssetInfo> mapAsset = assetInfoSrc.getMapFromRedis(RedisKeyEnum.资产基本信息.key(), Arrays.asList(dataMap.get(InterfUtil.finprodId).toString()));
             for(IAssetInfo iAst:mapAsset.values()){

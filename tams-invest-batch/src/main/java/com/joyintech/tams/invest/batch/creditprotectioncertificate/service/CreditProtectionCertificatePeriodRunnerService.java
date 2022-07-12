@@ -2,7 +2,9 @@ package com.joyintech.tams.invest.batch.creditprotectioncertificate.service;
 
 import com.joyintech.batch.batchbase.exception.BatchException;
 import com.joyintech.framework.JoyinRestTemplate;
+import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.util.*;
+import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -31,12 +33,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;
 
+import static com.joyintech.tams.constant.DictCodeListExt3.流程节点_审批生效;
 import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_新建;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.*;
 
@@ -98,7 +103,16 @@ public class CreditProtectionCertificatePeriodRunnerService {
     @Autowired
     private BasePtlCashPositionInfoServiceImpl basePtlCashPositionInfoServiceImpl;
 
-
+    /**
+     * 是否单体服务
+     */
+    @Value("${application.micorservice.contextPath.single:false}")
+    private boolean isSingle;
+    @Autowired(required = false)
+    @Qualifier("simpleRestTemplate")
+    protected JoyinRestTemplate simpleRestTemplate;
+    @Value("${application.micorservice.contextPath.tamsServer:http://127.0.0.1:8080/tams}")
+    private String tamsServer;
 
     public void dealExpireData(CreditProtectionCertificatePeriodWriterDto writerDto) throws BatchException {
         try {
@@ -222,6 +236,15 @@ public class CreditProtectionCertificatePeriodRunnerService {
 
             sendNewPosition(writerDto);
             dealOldPosition(writerDto, nextWorkDate, false);
+            //信用保护凭证到期风险调用共通处理
+            Map<String,Object> params = new HashMap<>();
+            params.put("totleTradeId",businessCode);
+            String url = String.format("/interf/risk/riskTrial/doOccupy/exchangeTrd/%s/%s/%s", "CreditProtectionCertificatePeriod002", 系统动作_新建.getValue(), 流程节点_审批生效.getValue());
+            if (isSingle) {
+                simpleRestTemplate.postForObject(tamsServer + url, params, AjaxResult.class);
+            } else {
+                restTemplate.postForObject(tamsServer + url, params, AjaxResult.class);
+            }
         } catch (Exception e) {
             logger.error("信用保护凭证自动生成错误", e);
             throw new BatchException(RiskUtil.getLogString(e));

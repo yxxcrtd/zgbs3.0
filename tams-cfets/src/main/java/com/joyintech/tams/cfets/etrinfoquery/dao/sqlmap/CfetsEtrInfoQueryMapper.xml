@@ -57,7 +57,13 @@
     B.realName realName,
     ETR_ENTRUST.REMARK remark,
     btm.busi_type busiTypePosition,
-    nvl(ssa.sec_acct_name,ssall.secAcctName) secAcctId,
+<!--     nvl(ssa.sec_acct_name,ssall.secAcctName) secAcctId,-->
+        CASE
+        WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F07'
+        AND ETR_ENTRUST.PS IN ( '03', '04', 'T56', 'T93', 'T94', 'T95', 'T96' ) THEN
+        cct.SEC_ACCT_NAME  ELSE nvl( ssa.sec_acct_name, ssall.secAcctName )
+        END secAcctId,
+
     DECODE(ETR_ENTRUST_ADD.SETTLE_SPREED,0,'01',1,'02','2','03') settleSpeed,
     decode(ETR_ENTRUST_ADD.ASSET_TYPE,'F01','','F07',ETR_ENTRUST_ADD.TERM_DAYS,'F10',ETR_ENTRUST_ADD.TERM_DAYS,'F12',ETR_ENTRUST_ADD.TERM_DAYS,'F16',ETR_ENTRUST_ADD.TERM_DAYS,'') termDays,
     CASE WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' AND FIN_PRODUCT_ISSUE.ISSUE_CLASS = '01' THEN
@@ -113,11 +119,19 @@
     PTL_PORTFOLIO
     ON
     PTL_PORTFOLIO.PORTFOLIO_ID = ETR_ENTRUST.PORTFOLIO_ID
-    LEFT JOIN
-    FIN_PRODUCT
-    ON
-    FIN_PRODUCT.FINPROD_ID = ETR_ENTRUST.FINPROD_ID
-    LEFT JOIN
+        LEFT JOIN WFL_ETR_PLEDGE ep ON ETR_ENTRUST.ENTRUST_ID = ep.ENTRUST_ID
+        LEFT JOIN FIN_PRODUCT ON ep.FINPROD_ID = FIN_PRODUCT.FINPROD_ID
+        LEFT JOIN (
+        SELECT
+        ssai.SEC_ACCT_NAME,
+        psa.PORTFOLIO_ID,
+        ssai.REGIST_ORG,ssai.TRADE_PLACE
+        FROM
+        PTL_SEC_ACCT psa
+        LEFT JOIN STL_SEC_ACCT_INFO ssai ON psa.ACCT_NO = ssai.SEC_ACCT_ID
+        ) cct ON FIN_PRODUCT.regist_Org = cct.REGIST_ORG and cct.TRADE_PLACE = '01'
+        AND ETR_ENTRUST.PORTFOLIO_ID = cct.PORTFOLIO_ID
+        LEFT JOIN
     (SELECT
     listagg(TRADER, ',')  within group ( order by TRADER ) TRADER,
     listagg(REAL_NAME, ',') within group(order by TRADER) realName,
@@ -402,7 +416,14 @@
         B.realName realName,
         WFL_ETR_ENTRUST.REMARK remark,
         btm.busi_type busiTypePosition,
-        nvl(ssa.sec_acct_name,ssall.secAcctName) secAcctId,
+
+        CASE
+
+        WHEN WFL_ETR_ENTRUST_ADD.ASSET_TYPE = 'F07'
+        AND WFL_ETR_ENTRUST.PS IN ( '03', '04', 'T56', 'T93', 'T94', 'T95', 'T96' ) THEN
+        cct.SEC_ACCT_NAME  ELSE nvl( ssa.sec_acct_name, ssall.secAcctName )
+        END secAcctId,
+
         DECODE(WFL_ETR_ENTRUST_ADD.SETTLE_SPREED,0,'01',1,'02','2','03') settleSpeed,
         decode(WFL_ETR_ENTRUST_ADD.ASSET_TYPE,'F01','','F07',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'F10',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'F12',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'F16',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'') termDays,
         CASE WHEN WFL_ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' AND FIN_PRODUCT_ISSUE.ISSUE_CLASS = '01' THEN
@@ -458,10 +479,20 @@
         PTL_PORTFOLIO
         ON
         PTL_PORTFOLIO.PORTFOLIO_ID = WFL_ETR_ENTRUST.PORTFOLIO_ID
-        LEFT JOIN
-        FIN_PRODUCT
-        ON
-        FIN_PRODUCT.FINPROD_ID = WFL_ETR_ENTRUST.FINPROD_ID
+
+        LEFT JOIN WFL_ETR_PLEDGE ep ON WFL_ETR_ENTRUST.ENTRUST_ID = ep.ENTRUST_ID
+        LEFT JOIN FIN_PRODUCT ON ep.FINPROD_ID = FIN_PRODUCT.FINPROD_ID
+        LEFT JOIN (
+        SELECT
+        ssai.SEC_ACCT_NAME,
+        psa.PORTFOLIO_ID,
+        ssai.REGIST_ORG,ssai.TRADE_PLACE
+        FROM
+        PTL_SEC_ACCT psa
+        LEFT JOIN STL_SEC_ACCT_INFO ssai ON psa.ACCT_NO = ssai.SEC_ACCT_ID
+        ) cct ON FIN_PRODUCT.regist_Org = cct.REGIST_ORG and cct.TRADE_PLACE = '01'
+        AND WFL_ETR_ENTRUST.PORTFOLIO_ID = cct.PORTFOLIO_ID
+
         LEFT JOIN
         (SELECT
         listagg(TRADER, ',')  within group ( order by TRADER ) TRADER,

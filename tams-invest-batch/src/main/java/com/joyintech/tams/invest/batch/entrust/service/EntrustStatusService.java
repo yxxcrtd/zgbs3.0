@@ -78,7 +78,7 @@ public class EntrustStatusService {
     @Qualifier("simpleRestTemplate")
     protected JoyinRestTemplate simpleRestTemplate;
 
-    @Value("${application.micorservice.contextpath.tamsServer:http://tams-server}")
+    @Value("${application.micorservice.contextpath.tamsServer:http://127.0.0.1:8080/tams}")
     private String tamsSerever;
 
     public void run(SysBatchExecInfo batchExecuteInfo) {
@@ -301,6 +301,12 @@ public class EntrustStatusService {
             param1.put("finprodId",cfetsEntrustClosePosEtrReqDto.getFinprodId());
             list.add(param1);
             param.put("selectedItem",list);
+            if (StringUtil.equals(cfetsEntrustClosePosEtrReqDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())) {
+                pageId = "etrCreditProtectionCertificate003";
+                url = tamsSerever + String.format("/interf/risk/riskTrial/doOccupy/exchangeEtr/%s/%s/%s", pageId, 系统动作_关闭.getValue(), 流程节点_流程提交.getValue());
+                List<String> portfolioIdList = entrustStatusMapper.findPortfolioIdList(param);
+                param.put("portfolioId",StringUtil.joinString(portfolioIdList,","));
+            }
             if (isSingle) {
                 message = simpleRestTemplate.postForObject(url, param, Message.class);
             } else {

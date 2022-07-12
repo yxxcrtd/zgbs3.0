@@ -7,6 +7,7 @@ import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.constant.DictCodeListRsk;
 import com.joyintech.tams.invest.trade.bond.dto.TrdBondInvestTradeDto;
 import com.joyintech.tams.invest.trade.common.service.TradeCommonService;
@@ -136,7 +137,11 @@ public class TradeCreditHandlerAop {
                 }
             }
             // add by etliu 20210129 end
-            
+            //信用保护凭证买入、信用保护凭证卖出的交收失败风险不在这里处理
+            if(StringUtil.equals(mapTrd.get("pageModel"), DictCodeListExt3.交收操作类型_交收失败.getValue())
+                    &&(StringUtil.equals(mapTrd.get("busiType"),"27") || StringUtil.equals(mapTrd.get("busiType"),"28"))){
+                return;
+            }
             if (StringUtil.isNotEmpty(mapTrd.get("operateType"))&& mapTrd.get("operateType").equals("submit") && (operationType.equals(OperationType.NEW)||operationType.equals(OperationType.MODIFY))) {
                 tradeCommonService.executeOccupyCreditLines(args[0], DictCodeListExt1.交易状态_初始.getValue(),DictCodeListRsk.授信占用类别_实占.getValue(),"doInsert");
             }
@@ -168,7 +173,11 @@ public class TradeCreditHandlerAop {
                 }
             }
             // add by etliu 20210129 end
-            
+            //信用保护凭证买入、信用保护凭证卖出的交收失败风险不在这里处理
+            if(StringUtil.equals(mapTrd.get("pageModel"), DictCodeListExt3.交收操作类型_交收失败.getValue())
+                    &&(StringUtil.equals(mapTrd.get("busiType"),"27") || StringUtil.equals(mapTrd.get("busiType"),"28"))){
+                return;
+            }
             if (StringUtil.isNotEmpty(mapTrd.get("operateType"))&& mapTrd.get("operateType").equals("submit")) {
                 tradeCommonService.executeOccupyCreditLines(args[0], DictCodeListExt1.交易状态_初始.getValue(),DictCodeListRsk.授信占用类别_实占.getValue(),"doUpdate");
             }
@@ -200,7 +209,11 @@ public class TradeCreditHandlerAop {
                 }
             }
             // add by etliu 20210129 end
-            
+            //信用保护凭证买入、信用保护凭证卖出的交收失败风险不在这里处理
+            if(StringUtil.equals(mapTrd.get("pageModel"), DictCodeListExt3.交收操作类型_交收失败.getValue())
+                    &&(StringUtil.equals(mapTrd.get("busiType"),"27") || StringUtil.equals(mapTrd.get("busiType"),"28"))){
+                return;
+            }
             tradeCommonService.executeOccupyCreditLines(args[0], DictCodeListExt1.交易状态_撤销.getValue(),DictCodeListRsk.授信占用类别_实占.getValue(),"doBack");
         }catch (Exception e){
             e.printStackTrace();
@@ -230,6 +243,11 @@ public class TradeCreditHandlerAop {
                 }
             }
             // add by etliu 20210129 end
+            //信用保护凭证买入、信用保护凭证卖出的交收失败风险不在这里处理
+            if(StringUtil.equals(mapTrd.get("pageModel"), DictCodeListExt3.交收操作类型_交收失败.getValue())
+                &&(StringUtil.equals(mapTrd.get("busiType"),"27") || StringUtil.equals(mapTrd.get("busiType"),"28"))){
+                return;
+            }
             
             if (operationType.equals(OperationType.REVOKE)||operationType.equals(OperationType.DELETE)) {
                 tradeCommonService.executeOccupyCreditLines(args[0], DictCodeListExt1.交易状态_撤销.getValue(),DictCodeListRsk.授信占用类别_实占.getValue(),"doComplete");

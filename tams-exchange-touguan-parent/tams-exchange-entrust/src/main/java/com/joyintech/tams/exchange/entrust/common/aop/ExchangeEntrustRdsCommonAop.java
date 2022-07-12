@@ -416,8 +416,9 @@ public class ExchangeEntrustRdsCommonAop {
         // 资产类型
         interfRiskRdsDto.setAssetType(initRepoLendCommon((String)finprodType2, assetType));
         // 金融产品类型
-        interfRiskRdsDto.setFinType(
-            finprodType2 != null ? finprodType2.toString() : StringUtil.EMPTY);
+        interfRiskRdsDto.setFinType(finprodType2 != null ? finprodType2.toString() : StringUtil.EMPTY);
+        //交易方向
+        interfRiskRdsDto.setPs(mapTrd.get("ps").toString());
         try {
             ClientData result = getInterfRiskRdsService().sendRiskRdsData(mapTrd,
                 interfRiskRdsDto);
