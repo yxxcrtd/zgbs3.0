@@ -234,7 +234,11 @@ public class TradeRdsCommonAop {
                 }
             }
             // add by etliu 20210129 end
-            
+            //信用保护凭证买入、信用保护凭证卖出的交收失败风险不在这里处理
+            if(StringUtil.equals(mapTrd.get("pageModel"), DictCodeListExt3.交收操作类型_交收失败.getValue())
+                    &&(StringUtil.equals(mapTrd.get("busiType"),"27") || StringUtil.equals(mapTrd.get("busiType"),"28"))){
+                return;
+            }
             // modify by zhangrui1 20200509 批量接口逻辑 start
 //            revokeBackRiskCommon(mapTrd,BussinessDictCodeListRds.接口系统ID_实占接口.getValue(),joinPoint);
             String infCode = BussinessDictCodeListRds.接口系统ID_实占接口.getValue();
@@ -266,7 +270,11 @@ public class TradeRdsCommonAop {
                 }
             }
             // add by etliu 20210129 end
-            
+            //信用保护凭证买入、信用保护凭证卖出的交收失败风险不在这里处理
+            if(StringUtil.equals(mapTrd.get("pageModel"), DictCodeListExt3.交收操作类型_交收失败.getValue())
+                    &&(StringUtil.equals(mapTrd.get("busiType"),"27") || StringUtil.equals(mapTrd.get("busiType"),"28"))){
+                return;
+            }
             // modify by zhangrui1 20200509 批量接口逻辑 start
 //            revokeBackRiskCommon(mapTrd,BussinessDictCodeListRds.接口系统ID_实占释放接口.getValue(),joinPoint);
             String infCode = BussinessDictCodeListRds.接口系统ID_实占释放接口.getValue();
@@ -361,7 +369,11 @@ public class TradeRdsCommonAop {
             }
         }
         // add by etliu 20210129 end
-        
+        //信用保护凭证买入、信用保护凭证卖出的交收失败风险不在这里处理
+        if(StringUtil.equals(mapTrd.get("pageModel"), DictCodeListExt3.交收操作类型_交收失败.getValue())
+                &&(StringUtil.equals(mapTrd.get("busiType"),"27") || StringUtil.equals(mapTrd.get("busiType"),"28"))){
+            return;
+        }
         // modify by zhangrui1 20200509 批量接口逻辑 start
 //        revokeBackRiskCommon(mapTrd,BussinessDictCodeListRds.接口系统ID_实占释放接口.getValue(),joinPoint);
         String infCode = BussinessDictCodeListRds.接口系统ID_实占释放接口.getValue();
