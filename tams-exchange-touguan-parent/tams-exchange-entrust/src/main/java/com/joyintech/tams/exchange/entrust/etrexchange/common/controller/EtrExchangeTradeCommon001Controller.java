@@ -1091,8 +1091,8 @@ public class EtrExchangeTradeCommon001Controller extends BaseController {
             return ajax;
         }
 
-        //检查组合最小交易数量
-        if(StringUtil.equals(dto.getOperateType(), "submit")){
+        //买入：检查组合最小交易数量
+        if (StringUtil.equals(dto.getOperateType(), "submit") && StringUtil.equals(dto.getPs(), DictCodeList.交易方向_买入.getValue())) {
             String checkMsg = check(dto);
             if (StringUtil.isNotEmpty(checkMsg)) {
                 List<ValidMessage> validListEnt = new ArrayList<>();
@@ -1266,8 +1266,8 @@ public class EtrExchangeTradeCommon001Controller extends BaseController {
                 list.add(portfolio.getPortfolioId());
             }
         }
-        if(!CollectionUtils.isEmpty(list)){
-            return StrUtil.format("组合[{}]分配数量，不能低于最小交易数量{}",String.join(",",list),minNum.toString()) ;
+        if (!CollectionUtils.isEmpty(list)) {
+            return StrUtil.format("组合[{}]分配数量，不能低于最小交易数量{}", String.join(",", list), minNum.toString());
         }
 
         return null;
