@@ -235,7 +235,8 @@ public class EtrExchangeBlockTrade001ValidatorService implements EtrExchangeComm
 								if (StringUtils.equals(dto.getTradePlat(), DictCodeList.交易平台_竞价撮合平台.getValue())
 										&& (DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(finprodType2)
 										|| DictCodeListExt1.金融产品类型_投管用_股票.getValue().equals(finprodType2)
-										|| DictCodeListExt1.金融产品类型_投管用_基金.getValue().equals(finprodType2))
+//										|| DictCodeListExt1.金融产品类型_投管用_基金.getValue().equals(finprodType2)
+										)
 										&& StringUtils.equals(dto.getPs(), DictCodeList.交易方向_卖出.getValue())
 										&& etrExchangeTrade001Service.isSalesOfSmallShares(dto.getAvailableNum(),
 										minTrdUnitLimitDto.getMinStep(), request.getEntrustNum())) {
