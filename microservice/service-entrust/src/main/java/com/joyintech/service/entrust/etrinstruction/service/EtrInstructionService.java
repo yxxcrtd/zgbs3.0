@@ -242,9 +242,7 @@ public class EtrInstructionService extends BaseService<EtrInstructionDto> {
      * @see
      * @since 1.0
      */
-    public void doInsert(EtrInstructionDto dto)
-        throws IllegalAccessException,
-        InvocationTargetException {
+    public void doInsert(EtrInstructionDto dto) throws IllegalAccessException, InvocationTargetException {
         //文件
         MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
         mstFileInputParameter.setFileList(dto.getFileArray());
@@ -253,8 +251,7 @@ public class EtrInstructionService extends BaseService<EtrInstructionDto> {
             mstFileCommonService.updateBusinessId(mstFileInputParameter);
         }
 
-        if (!StringUtil.equals("HTQS", dto.getOperateType()) 
-                && "submit".equals(dto.getOperateType())) {
+        if (!StringUtil.equals("HTQS", dto.getOperateType()) && "submit".equals(dto.getOperateType())) {
             BaseEtrInvestInfoDto entity = initBaseDto(dto);
             if(StringUtil.isEmpty(entity.getWorkFlowId())){
                 throw new RuntimeException("WorkFlowId初始化不能为空!");

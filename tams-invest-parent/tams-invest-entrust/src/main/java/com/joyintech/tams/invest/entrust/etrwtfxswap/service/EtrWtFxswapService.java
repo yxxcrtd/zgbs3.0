@@ -225,7 +225,9 @@ public class EtrWtFxswapService extends CommonExportService<EtrWtFxswapDto> impl
      */
      @Override
      public void doInsert(EtrWtFxswapDto dto, OperationType type){
-         dto.setOperateType(type.toString());
+         // GLCP-161 : 【指令查询】外汇掉期流程中数据没有在指令查询里显示 start
+         //dto.setOperateType(type.toString());
+         // GLCP-161 : 【指令查询】外汇掉期流程中数据没有在指令查询里显示 end
          restTemplate.postForObject(
              ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrWtFxswap/doInsert",dto,
              Integer.class);
