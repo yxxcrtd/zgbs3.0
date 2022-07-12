@@ -3708,20 +3708,30 @@
                 var finprodType2 = $("#finprodType2_" + currentTab).val();
 
                 var flag = true;
+
+                var rows = [];
+                var allRows = dateTable.getAllRows();
+                for (var i = 0; i < allRows.length; i++) {
+                    if (allRows[i].portfolioId) {
+                        rows.push(allRows[i]);
+                    }
+                }
+
+                for (var i = 0; i < allRows.length; i++) {
+                    if (rows[i].portfolioId == data.portfolioId && rows[i].LAY_TABLE_INDEX != data.LAY_TABLE_INDEX) {
+                        flag = false;
+                        Joyin.error("组合代码[" + data.portfolioId + "]已存在，不可重复添加");
+                        dateTable.deleteRow(data.LAY_TABLE_INDEX);
+                        return;
+                    }
+                }
+
                 if (finprodType2 != FINPROD_TYPE_TG_F06 && finprodType2 != FINPROD_TYPE_TG_F10 && finprodType2 != FINPROD_TYPE_TG_ZYSHG) {
                     var param1 = {};
                     param1.portfolioId = data.portfolioId;
                     param1.finprodId = $("#finprodId_" + currentTab).val();
                     param1.cdate = iPlatformDate;
                     var ps = $("#ps_" + currentTab).val();
-
-                    var rows = [];
-                    var allRows = dateTable.getAllRows();
-                    for (var i = 0; i < allRows.length; i++) {
-                        if (allRows[i].portfolioId) {
-                            rows.push(allRows[i]);
-                        }
-                    }
 
                     if (ps == PS_T68 || ps == PS_T69 || ps == PS_T02 || ps == PS_T49 || ps == PS_T03) {
                         if (ps == PS_T02) { //卖出
@@ -4993,7 +5003,7 @@
             var entrustNum = parseFloat(object.entrustNum);
             var res = entrustNum % minStep;
             if (!object.entrustNum || entrustNum <= 0 || res != 0) {
-                Joyin.error("组合分配指令数量需满足最小交易单位["+minStep+"]的整数倍！");
+                Joyin.error("组合分配指令数量需满足最小交易单位[" + minStep + "]的整数倍！");
                 return;
             }
             var param = JSON.parse(JSON.stringify(object))
