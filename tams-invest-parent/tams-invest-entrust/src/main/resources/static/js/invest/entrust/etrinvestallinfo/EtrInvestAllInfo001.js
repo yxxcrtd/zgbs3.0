@@ -442,6 +442,11 @@
                     basePath
                     + "invest/entrust/etrprojectnet/EtrProjectNet002/init",
                     "95%", "80%", data);
+            } else if(data.assetType == TRD75){
+                Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+                    basePath
+                    + "invest/entrust/etrinstruction/EtrInstruction002/init",
+                    "95%", "80%", {pageModel:PAGE_MODEL_REFERENCE,entrustId:data.entrustId});
             }
         },
         cols:[

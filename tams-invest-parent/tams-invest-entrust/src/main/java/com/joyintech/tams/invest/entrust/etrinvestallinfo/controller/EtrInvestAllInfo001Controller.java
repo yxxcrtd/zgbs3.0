@@ -118,6 +118,7 @@ public class EtrInvestAllInfo001Controller extends BaseController {
         model.addAttribute("ENTRUST_CREATE_SOURCE_02", DictCodeListExt3.指令创建来源_场内实时.getValue());
         model.addAttribute("ENTRUST_CLASS_01", DictCodeListExt3.投资指令类型_单组合单资产指令.getValue());
         model.addAttribute("ENTRUST_CLASS_02", DictCodeListExt3.投资指令类型_多组合单资产指令.getValue());
+        model.addAttribute("TRD75", DictCodeListExt3.共通业务类型_立项指令.getValue());
 
         return super.init(model);
     }
