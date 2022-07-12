@@ -627,12 +627,23 @@
                     finprodId:row.finprodId,  //金融产品代码
                 });
         }else if(row.assetType == F12){
+            let finprodId = row.finprodMarketId
+            var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a"; // 默认债券标的
+            var param = {
+                pageModel: PAGE_MODEL_REFERENCE,
+                isQuickInput: true,
+                finprodId: finprodId
+            };
             Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
-                basePath
-                + "invest/asset/bond/FinBondTargetAsset002/init",
-                "95%", "80%", {pageModel:PAGE_MODEL_REFERENCE,
-                    finprodId:row.finprodId,  //债券借贷委托查看
-                });
+                basePath + url,
+                "98%", "98%",
+                param);
+            // Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+            //     basePath
+            //     + "invest/asset/bond/FinBondTargetAsset002/init",
+            //     "95%", "80%", {pageModel:PAGE_MODEL_REFERENCE,
+            //         finprodId:row.finprodId,  //债券借贷委托查看
+            //     });
         }else if(row.assetType == F17){
             Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                 basePath
