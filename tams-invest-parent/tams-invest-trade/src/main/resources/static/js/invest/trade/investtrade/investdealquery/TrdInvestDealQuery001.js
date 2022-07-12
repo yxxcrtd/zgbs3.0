@@ -119,7 +119,22 @@ var showDetailByFinprodId = function (finprodId, finprodType2) {
                 finprodId: finprodId
             });
     }
+    //信用保护凭证
+    else if(finprodType2 == PINAN_ASSET_TYPE_F37){
+        var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/newCreditProject?a=a";
+        var param = {
+            pageModel: PAGE_MODEL_REFERENCE,
+            isQuickInput: true,
+            finprodId: finprodId
+        };
+        Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+            basePath + url,
+            "98%", "98%",
+            param);
+    }
+
 };
+
 $(function () {
     /**
      * 获取查询参数

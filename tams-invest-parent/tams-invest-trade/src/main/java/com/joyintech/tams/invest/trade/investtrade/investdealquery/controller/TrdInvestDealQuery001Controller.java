@@ -99,6 +99,8 @@ public class TrdInvestDealQuery001Controller extends BaseController{
 		// add by etliu 20210421 权益类资产相关代码合并 start
 		model.addAttribute("PINAN_ASSET_TYPE_F19", DictCodeListExt3.平安资产类型_权益类资产.getValue());
 		// add by etliu 20210421 权益类资产相关代码合并 end
+		model.addAttribute("PINAN_ASSET_TYPE_F37", DictCodeList.平安资产类型_信用保护凭证.getValue());
+
 		List<SelectOptionDto> psList = makeAllFloatRate();
         model.addAttribute("psList", JsonUtils.objectArray2Json(psList.toArray()));
 

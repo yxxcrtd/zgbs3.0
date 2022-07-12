@@ -50,6 +50,9 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static com.joyintech.tams.constant.DictCodeListExt1.交易场所_商业银行柜台;
+import static com.joyintech.tams.constant.DictCodeListExt1.交易场所_银行间;
+
 
 /**
  * 交易查询service
@@ -190,9 +193,9 @@ public class TrdInvestDealQuery001Service extends CommonExportService<TrdInvestD
                     list1.add(DictCodeListExt3.金融产品类型_投管用_权益类资产.getValue());
                 }
                 // add by etliu 20210421 权益类资产相关代码合并 end
-				else if (StringUtil.equals(DictCodeList.平安资产类型_信用保护凭证.getValue(), finprodType2)) {
-					list1.add(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
-				}
+                else if (StringUtil.equals(DictCodeList.平安资产类型_信用保护凭证.getValue(), finprodType2)) {
+                    list1.add(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
+                }
             }
             //交易方向买入卖出
 //            if( list1.isEmpty() ){
@@ -316,8 +319,13 @@ public class TrdInvestDealQuery001Service extends CommonExportService<TrdInvestD
                         dto.setRate(dto.getExerYield());
                     }
                 }
-
                 // add by caozhenming 20210730 end
+
+                if (!StringUtil.equals(dto.getTradeMarket(), 交易场所_银行间.getValue()) &&
+                        !StringUtil.equals(dto.getTradeMarket(), 交易场所_商业银行柜台.getValue())) {
+                    dto.setfTradeId(null);
+                }
+
             }
         }
         return returnList;
