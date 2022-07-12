@@ -10,7 +10,7 @@ var table;
         checkbox:false,
         cols:[
             {field:'payDateUnadjust',title:'TrdBondLendInvestTrade002.initPayDate',width:400,type: 'date',sortable:false}
-            ,{field:'intAmt',title:'TrdBondLendInvestTrade002.intAmt',width:400,sortable:false}
+            ,{field:'intAmt',type:'number',title:'TrdBondLendInvestTrade002.intAmt',type:'money',width:400,sortable:false}
             ,{field:'intAmtInit',visible:false}
             ,{field:'newRate',width:400,title:'TrdBondLendInvestTrade002.rate',sortable:false}
         ],
