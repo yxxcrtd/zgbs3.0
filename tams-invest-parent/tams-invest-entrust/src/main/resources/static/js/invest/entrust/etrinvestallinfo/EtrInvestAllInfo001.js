@@ -437,7 +437,12 @@
                         pageModel:PAGE_MODEL_REFERENCE,
                         entrustId:data.entrustId
                     });
-            } else if(data.assetType == F19){
+            } else if(data.assetType == "F18"){
+                Joyin.dialog(JoyinUtil.getLabel("EtrOption002.dblclick"),
+                    JoyinUtil.getRealPath("invest/entrust/etroption/EtrOption002/init"),
+                    "95%", "80%", data,
+                    function(){table.reload();});
+            }else if(data.assetType == F19){
                 Joyin.dialog(JoyinUtil.getLabel("EtrInvestAllInfo001.etrProjectnet"),
                     basePath
                     + "invest/entrust/etrprojectnet/EtrProjectNet002/init",
@@ -587,8 +592,8 @@
                 param);
         } else if (row.assetType == "F18"){
             Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
-                basePath + "valuation/basicdata/asset/option/FinOptionTarget002/init",
-                "95%", "80%", {pageModel:PAGE_MODEL_REFERENCE,targetId:row.finprodId});
+                basePath + "invest/asset/option/FinOptionTarget002/init",
+                "95%", "80%", {pageModel:PAGE_MODEL_REFERENCE,targetId:row.finprodMarketId});
         } else if(row.assetType == F02){
             Joyin.dialog(JoyinUtil.getLabel("EtrInvestAllInfo001.astFund"),
                 basePath
