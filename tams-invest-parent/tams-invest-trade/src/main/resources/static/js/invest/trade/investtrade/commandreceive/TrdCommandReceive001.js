@@ -107,13 +107,24 @@ var showDetailByFinprodId = function (finprodId, finprodType2) {
                 finprodId: finprodId
             });
     } else if (finprodType2 == PINAN_ASSET_TYPE_F12) {
-        label = 'SysCommon.refrence';
-        pagePath = "invest/asset/bond/FinBondTargetAsset002/init";
-        Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
-            "95%", "90%", {
-                pageModel: PAGE_MODEL_REFERENCE,
-                finprodId: finprodId
-            });//债券借贷委托查看
+        // label = 'SysCommon.refrence';
+        // pagePath = "invest/asset/bond/FinBondTargetAsset002/init";
+        // Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
+        //     "95%", "90%", {
+        //         pageModel: PAGE_MODEL_REFERENCE,
+        //         finprodId: finprodId
+        //     });
+        var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a"; // 默认债券标的
+        var param = {
+            pageModel: PAGE_MODEL_REFERENCE,
+            isQuickInput: true,
+            finprodId: finprodId
+        };
+        Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+            basePath + url,
+            "98%", "98%",
+            param);
+        //债券借贷委托查看
     } else if (finprodType2 == PINAN_ASSET_TYPE_F16) {
         label = 'SysCommon.refrence';
         pagePath = "invest/entrust/etrirs/EtrIRS002/init";
