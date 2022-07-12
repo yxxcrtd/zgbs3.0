@@ -3706,6 +3706,8 @@
             if (field == "portfolioId") {
                 var param = {};
                 var finprodType2 = $("#finprodType2_" + currentTab).val();
+
+
                 if (finprodType2 != FINPROD_TYPE_TG_F06 && finprodType2 != FINPROD_TYPE_TG_F10 && finprodType2 != FINPROD_TYPE_TG_ZYSHG) {
                     var param1 = {};
                     param1.portfolioId = data.portfolioId;
@@ -3721,20 +3723,21 @@
                         }
                     }
 
-                    console.log("--------rows-----------")
-                    console.log(rows)
+                    var flag = true;
 
                     if (ps == PS_T68 || ps == PS_T69 || ps == PS_T02 || ps == PS_T49 || ps == PS_T03) {
                         if (ps == PS_T02) { //卖出
                             if (rows.length >= 2) {
                                 Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
                                     if (result.data.length == 2) {
+                                        flag = false;
                                         Joyin.error("组合持有该资产存在多个业务模式，不允许委托方向" + ps);
                                         dateTable.deleteRow(data.LAY_TABLE_INDEX);
                                         return;
                                     } else if (result.data.length == 1) {
                                         $("#businessModel_" + currentTab).textSelect('setValue', result.data[0].BUSINESSMODEL);
                                     } else {
+                                        flag = false;
                                         Joyin.error("组合无选择业务模式的资产持仓");
                                         dateTable.deleteRow(data.LAY_TABLE_INDEX);
                                         return;
@@ -3743,13 +3746,16 @@
                             } else {
                                 Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
                                     if (result.data.length == 2) {
+                                        flag = false;
                                         Joyin.error("组合持有该资产存在多个业务模式,不允许卖出");
                                         dateTable.deleteRow(data.LAY_TABLE_INDEX);
                                         return;
                                     } else {
                                         if (result.data.length == 1) {
+                                            flag = true;
                                             $("#businessModel_" + currentTab).textSelect('setValue', result.data[0].BUSINESSMODEL);
                                         } else {
+                                            flag = false;
                                             Joyin.error("组合无该资产持仓数据");
                                             dateTable.deleteRow(data.LAY_TABLE_INDEX);
                                             return;
@@ -3761,12 +3767,14 @@
                             if (rows.length >= 2) {
                                 Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
                                     if (result.data.length == 2) {
+                                        flag = false;
                                         Joyin.error("组合持有该资产存在多个业务模式，不允许委托方向" + ps);
                                         dateTable.deleteRow(data.LAY_TABLE_INDEX);
                                         return;
                                     } else if (result.data.length == 1) {
                                         $("#businessModel_" + currentTab).textSelect('setValue', result.data[0].BUSINESSMODEL);
                                     } else {
+                                        flag = false;
                                         Joyin.error("组合无选择业务模式的资产持仓");
                                         dateTable.deleteRow(data.LAY_TABLE_INDEX);
                                         return;
@@ -3775,6 +3783,7 @@
                             } else {
                                 Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
                                     if (result.data.length == 2) {
+                                        flag = false;
                                         Joyin.error("组合持有该资产存在多个业务模式，不允许委托方向" + ps);
                                         dateTable.deleteRow(data.LAY_TABLE_INDEX);
                                         return;
@@ -3789,6 +3798,7 @@
                                 Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
                                     if (result.data.length != 0) {
                                         if (result.data[0].BUSINESSMODEL != businessModel) {
+                                            flag = false;
                                             Joyin.error("业务模式与组合最新持仓业务模式不一致");
                                             dateTable.deleteRow(data.LAY_TABLE_INDEX);
                                         }
@@ -3796,6 +3806,7 @@
                                 }, false)
                             } else {
                                 if (businessModel == '') {
+                                    flag = false;
                                     Joyin.error("请选择业务模式");
                                     dateTable.deleteRow(data.LAY_TABLE_INDEX);
                                 } else {
@@ -3819,6 +3830,10 @@
                             }
                         }
                     }
+                }
+
+                if(!flag){
+                    return;
                 }
 
                 param.portfolioId = data.portfolioId;
@@ -4260,13 +4275,10 @@
             entrustAmt: $("#entrustAmt_" + currentTab).val(),
             portfolioList: array
         }
-        console.log("***************************")
-        console.log(array)
+
         Joyin.ajaxJson(basePath + '/etrexchange/common/selectEtrPortfolioAllocationList', params, function (result) {
             if (result.data && result.data.portfolioList) {
                 var rows = result.data.portfolioList;
-                console.log("####################")
-                console.log(rows)
                 for (var i = 0; i < array.length; i++) {
                     if(array[i].portfolioId==rows[i].portfolioId){
                         dateTable.renderRow(array[i].LAY_TABLE_INDEX, rows[i]);
