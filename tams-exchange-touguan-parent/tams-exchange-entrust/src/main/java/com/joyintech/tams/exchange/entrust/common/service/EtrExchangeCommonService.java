@@ -1762,7 +1762,7 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
         BigDecimal minStep = Objects.equals(dto.getMinStep(), "--")? BigDecimal.ZERO : dto.getMinStep();
         BigDecimal entrustNum = Objects.equals(dto.getEntrustNum(), "--")? BigDecimal.ZERO : dto.getEntrustNum();
         BigDecimal entrustAmt = Objects.equals(dto.getEntrustAmt(), "--")? BigDecimal.ZERO : dto.getEntrustAmt();
-        BigDecimal entrustPrice = dto.getEntrustPrice() == null || Objects.equals(dto.getEntrustAmt(), "--") ? BigDecimal.ZERO : dto.getEntrustPrice();
+        BigDecimal entrustPrice = dto.getEntrustPrice() == null || Objects.equals(dto.getEntrustPrice(), "--") ? BigDecimal.ZERO : dto.getEntrustPrice();
         BigDecimal leftEntrustNum = entrustNum;
         List<EtrExchangeProtfolioDetailRequest> portfolioList = dto.getPortfolioList();
         if (CollectionUtils.isEmpty(portfolioList)) {
