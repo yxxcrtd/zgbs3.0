@@ -149,15 +149,18 @@ public class PtlFutureCashPosiService extends BaseService<PtlFutureCashPosiDto> 
                     && m.getMdate().compareTo(DateUtil.parse(dateArrayList.get(i + 1))) <= 0) {
                     m.setPrdEndAmt(ArithmeticUtil.multiply(ArithmeticUtil.doAdd(m.getUsableAmt(),
                         m.getAssetPeriodInAmt(), m.getAssetPeriodOutAmt()), new BigDecimal(-1)));
+                    m.setCashGapAmt(ArithmeticUtil.doAdd(ArithmeticUtil.doSub(m.getUsableAmt(),
+                            m.getAssetPeriodOutAmt()), m.getAssetPeriodInAmt(), m.getPrdEndAmt()));
+                }else{
+                    // 到期缺口：各时间区间的组合可用现金+产品到期+资产存续期（资金流入）+资产存续期（资金流出）
+    //                m.setCashGapAmt(ArithmeticUtil.doAdd(m.getUsableAmt(), m.getPrdEndAmt(),
+    //                    m.getAssetPeriodInAmt(), m.getAssetPeriodOutAmt()));
+                    // add by liuwenjuan 到期缺口计算 start
+                    // 到期缺口:各时间区间的组合可用现金-产品到期+资产存续期（资金流入）-资产存续期（资金流出）
+                    m.setCashGapAmt(ArithmeticUtil.doAdd(ArithmeticUtil.doSub(m.getUsableAmt(), m.getPrdEndAmt(),
+                            m.getAssetPeriodOutAmt()), m.getAssetPeriodInAmt()));
+                    // add by liuwenjuan 到期缺口计算 end
                 }
-                // 到期缺口：各时间区间的组合可用现金+产品到期+资产存续期（资金流入）+资产存续期（资金流出）
-//                m.setCashGapAmt(ArithmeticUtil.doAdd(m.getUsableAmt(), m.getPrdEndAmt(),
-//                    m.getAssetPeriodInAmt(), m.getAssetPeriodOutAmt()));
-                // add by liuwenjuan 到期缺口计算 start
-                // 到期缺口:各时间区间的组合可用现金-产品到期+资产存续期（资金流入）-资产存续期（资金流出）
-                m.setCashGapAmt(ArithmeticUtil.doAdd(ArithmeticUtil.doSub(m.getUsableAmt(), m.getPrdEndAmt(), 
-                		m.getAssetPeriodOutAmt()), m.getAssetPeriodInAmt()));
-                // add by liuwenjuan 到期缺口计算 end
                 // 计算汇总金额
                 total.setAssetPeriodInAmt(
                     ArithmeticUtil.doAdd(total.getAssetPeriodInAmt(), m.getAssetPeriodInAmt()));
@@ -241,6 +244,8 @@ public class PtlFutureCashPosiService extends BaseService<PtlFutureCashPosiDto> 
         pageParam.put("FINPROD_TYPE_TG_F05", DictCodeListExt1.金融产品类型_投管用_债券买断式逆回购.getValue());
         pageParam.put("FINPROD_TYPE_TG_F10", DictCodeListExt1.金融产品类型_投管用_股票.getValue());
         pageParam.put("FINPROD_TYPE_TG_F16", DictCodeListExt1.金融产品类型_投管用_理财产品.getValue());
+        pageParam.put("FINPROD_TYPE_TG_F29", DictCodeListExt1.金融产品类型_投管用_债券借贷融入.getValue());
+        pageParam.put("FINPROD_TYPE_TG_F30", DictCodeListExt1.金融产品类型_投管用_债券借贷融出.getValue());
         pageParam.put("PROFIT_TYPE_02", DictCodeListExt2.收益类型_预期收益.getValue());
         pageParam.put("PROFIT_TYPE_01", DictCodeListExt2.收益类型_净值.getValue());
         pageParam.put("PROFIT_TYPE_03", DictCodeListExt2.收益类型_货币.getValue());
