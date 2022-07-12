@@ -353,7 +353,7 @@
 		    FIN_CASH_PLAN.PAY_DATE                                     payDate,
 		    PTL_PORTFOLIO.PORTFOLIO_ID                                 portfolioId,
 		    FIN_TRADE_PRODUCT.CCY                                            ccy,
-		    case when FIN_TRADE_PRODUCT.FINPROD_TYPE2 IN ('${FINPROD_TYPE_TG_F03}', '${FINPROD_TYPE_TG_F09}', '${FINPROD_TYPE_TG_F29}') then '01' else '02' end cashType,
+		    case when FIN_TRADE_PRODUCT.FINPROD_TYPE2 IN ('${FINPROD_TYPE_TG_F03}', '${FINPROD_TYPE_TG_F09}', '${FINPROD_TYPE_TG_F30}') then '01' else '02' end cashType,
 		    ROUND(PTL_SEC_POSITION.AMOUNT * FIN_CASH_PLAN.CASH_AMT/FIN_TRADE_PRODUCT.PRIN, 2) cashAmt
 		FROM
 		    PTL_PORTFOLIO

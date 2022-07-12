@@ -237,6 +237,7 @@
         LEFT JOIN FIN_PRODUCT PROD ON PRODADD.FINPROD_ID = PROD.FINPROD_ID
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
         where 1=1/*PROD.VDATE &lt;= FCP.VDATE*/ /*过滤掉产品陈立日之前的计划*/
+        and psp.HODING_TYPE = '03'
         <if test="portfolioIdList != null and portfolioIdList.size()>0 ">
             and psp.PORTFOLIO_ID in
             <foreach collection="portfolioIdList" item="item" separator="," open="(" close=")">
@@ -450,6 +451,7 @@
         LEFT JOIN FIN_PRODUCT PROD ON PRODADD.FINPROD_ID = PROD.FINPROD_ID
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
         where 1=1/*PROD.VDATE &lt;= FCP.VDATE*/ /*过滤掉产品陈立日之前的计划*/
+        and psp.HODING_TYPE = '03'
         <if test="portfolioIdList != null and portfolioIdList.size()>0 ">
             and psp.PORTFOLIO_ID in
             <foreach collection="portfolioIdList" item="item" separator="," open="(" close=")">
@@ -570,6 +572,7 @@
         <where>
             1=1 /*PROD.VDATE &lt;= fep1.VDATE*/ /*过滤掉产品陈立日之前的计划*/
             AND psp.AMOUNT > 0
+            and psp.HODING_TYPE = '03'
             AND NOT EXISTS (SELECT 1 FROM FIN_EXERCISE_PLAN FEP WHERE FEP.CASH_ID = FEP1.CASH_ID AND FEP.EXERCISE_DATE &lt; FEP1.EXERCISE_DATE
             AND FEP.FINPROD_ID = FEP1.FINPROD_ID)
             <if test="portfolioIdList != null and portfolioIdList.size()>0 ">
@@ -754,13 +757,13 @@
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
         fp.ccy CCY,
         sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as fundAccount,
-        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29')
-        then 0 else  nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0) end as INCASHFLOW,
-        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29')
-        then nvl(-1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0) else 0 end as OUTCASHFLOW,
-        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29')
-        then nvl(-1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0)
-        else nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0)
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29') then 0
+             when FTP.FINPROD_TYPE2 IN ('F03', 'F05', 'F09', 'F30') then nvl(ROUND(fcp.CASH_AMT,2),0)
+            else  nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0) end as INCASHFLOW,
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29') then nvl(-1 * ROUND(fcp.CASH_AMT,2),0) else 0 end as OUTCASHFLOW,
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29') then nvl(-1 * ROUND(fcp.CASH_AMT,2),0)
+                when FTP.FINPROD_TYPE2 IN ('F03', 'F05', 'F09', 'F30') then nvl(ROUND(fcp.CASH_AMT,2),0)
+            else nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0)
         end as NETCASHFLOW,
         <!--多级法人改造 add by jingqiongqiong 20200615-->
         pp.PORTFOLIO_ID as portfolioId1
@@ -781,6 +784,7 @@
         left join FIN_TRADE_PRODUCT FTP on FTP.FINPROD_ID = psp.FINPROD_ID
 
         where 1 = 1
+        and psp.HODING_TYPE = '03'
         <if test="portfolioIdList1 != null and portfolioIdList1.size()>0 ">
             and psp.PORTFOLIO_ID in
             <foreach collection="portfolioIdList1" item="item" separator="," open="(" close=")">
@@ -858,6 +862,7 @@
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
 
         where 1 = 1
+        and psp.HODING_TYPE = '03'
         <if test="portfolioIdList1 != null and portfolioIdList1.size()>0 ">
             and psp.PORTFOLIO_ID in
             <foreach collection="portfolioIdList1" item="item" separator="," open="(" close=")">
@@ -957,7 +962,7 @@
         left join STL_CAPACCT_INFO sci on sci.ACCT_NO = pci.ACCT_NO
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
         where 1 = 1
-
+        and psp.HODING_TYPE = '03'
         <if test="portfolioIdList1 != null and portfolioIdList1.size()>0 ">
             and psp.PORTFOLIO_ID in
             <foreach collection="portfolioIdList1" item="item" separator="," open="(" close=")">
@@ -1113,6 +1118,11 @@
         and pcpf.HODING_TYPE = '03'
         and pcpf.CCY = #{ccy1,jdbcType=VARCHAR}
         and pa.USER_ID = #{userId}
+        AND (SPO.ORDER_STATUS = #{ORDER_STATUS_01} OR SPO.ORDER_STATUS IS NULL)
+        AND PCPF.ORDER_ID NOT IN
+            (SELECT RTRIM(SPO1.ORDER_ID, 'R')
+                FROM STL_PAY_ORDERS SPO1
+                WHERE SPO1.ORDER_STATUS = #{ORDER_STATUS_02})
         union all
 
         <!-- 2、查询非含权资产未来现金流。（资产收息预测、资产还本预测、资产到期预测） -->
@@ -1121,14 +1131,14 @@
         '' seqno,
         fcp.PAY_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
-        fp.ccy CCY ,
+        psp.ccy CCY ,
         sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as fundAccount,
-        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29')
-        then 0 else  nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0) end as INCASHFLOW,
-        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29')
-        then nvl(-1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0) else 0 end as OUTCASHFLOW,
-        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29')
-        then nvl(-1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0)
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29') then 0
+        when FTP.FINPROD_TYPE2 IN ('F03', 'F05', 'F09', 'F30') then nvl(ROUND(fcp.CASH_AMT,2),0)
+        else  nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0) end as INCASHFLOW,
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29') then nvl(-1 * ROUND(fcp.CASH_AMT,2),0) else 0 end as OUTCASHFLOW,
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29') then nvl(-1 * ROUND(fcp.CASH_AMT,2),0)
+        when FTP.FINPROD_TYPE2 IN ('F03', 'F05', 'F09', 'F30') then nvl(ROUND(fcp.CASH_AMT,2),0)
         else nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0)
         end as NETCASHFLOW,
         <!--多级法人改造 add by jingqiongqiong 20200615-->
@@ -1150,6 +1160,7 @@
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
 
         where 1 = 1
+        and psp.HODING_TYPE = '03'
         <if test="portfolioIdList1 != null and portfolioIdList1.size()>0 ">
             and psp.PORTFOLIO_ID in
             <foreach collection="portfolioIdList1" item="item" separator="," open="(" close=")">
@@ -1202,7 +1213,7 @@
         '' seqno,
         fcp.PAY_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
-        fp.ccy CCY ,
+        psp.ccy CCY ,
         sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as fundAccount,
         case when psp.AMOUNT*fcp.CASH_AMT &gt; 0
         then ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2) else 0 end as INCASHFLOW,
@@ -1227,6 +1238,7 @@
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
 
         where 1 = 1
+        and psp.HODING_TYPE = '03'
         <if test="portfolioIdList1 != null and portfolioIdList1.size()>0 ">
             and psp.PORTFOLIO_ID in
             <foreach collection="portfolioIdList1" item="item" separator="," open="(" close=")">
@@ -1295,7 +1307,7 @@
         '' seqno,
         fep1.EXERCISE_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
-        fp.ccy CCY ,
+        psp.ccy CCY ,
         sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as fundAccount,
         case when psp.AMOUNT*fep1.EXERCISE_PRICE &gt; 0
         then ROUND(psp.AMOUNT*fep1.EXERCISE_PRICE/100,2) else 0 end as INCASHFLOW,
@@ -1316,18 +1328,18 @@
         left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT_ADD on fp.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
         left join (select fep.FINPROD_ID,fep.EXERCISE_DATE,fep.EXERCISE_PRICE
-        from FIN_EXERCISE_PLAN fep
-        where fep.EXERCISE_DATE = (
-        select min(fep.EXERCISE_DATE)
-        from FIN_EXERCISE_PLAN fep
-        where 1 = 1
-        and fep.EXERCISE_DATE &gt;= to_date(#{sysDate},'YYYY-MM-DD')
-        )
+            from FIN_EXERCISE_PLAN fep
+            where fep.EXERCISE_DATE = (
+            select min(fep.EXERCISE_DATE)
+            from FIN_EXERCISE_PLAN fep
+            where 1 = 1
+            and fep.EXERCISE_DATE &gt;= to_date(#{sysDate},'YYYY-MM-DD')
+            )
         ) fep1 on fep1.FINPROD_ID = psp.FINPROD_ID
         left join STL_CAPACCT_INFO sci on sci.ACCT_NO = pci.ACCT_NO
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
         where 1 = 1
-
+        and psp.HODING_TYPE = '03'
         <if test="portfolioIdList1 != null and portfolioIdList1.size()>0 ">
             and psp.PORTFOLIO_ID in
             <foreach collection="portfolioIdList1" item="item" separator="," open="(" close=")">
