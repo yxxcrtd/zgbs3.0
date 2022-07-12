@@ -236,7 +236,6 @@ public class EtrInstructionService extends BaseService<EtrInstructionDto> {
      *
      * <一句话功能简述>
      * <功能详细描述>
-     * @param entity EtrFundDto
      * @throws IllegalAccessException IllegalAccessException
      * @throws InvocationTargetException InvocationTargetException
      * @see
@@ -443,7 +442,7 @@ public class EtrInstructionService extends BaseService<EtrInstructionDto> {
 
             // etrEntrustAdd
             EtrEntrustAdd etrEntrustAdd = new EtrEntrustAdd();
-            etrEntrustAdd.setAssetType(DictCodeList.平安资产类型_立项指令.getValue());
+            etrEntrustAdd.setAssetType(DictCodeListExt3.共通业务类型_立项指令.getValue());
             BeanUtil.copyProperties(etrEntrustAdd, dto);
             //设置起息日到期日
             etrEntrustAdd.setVdate(null);
