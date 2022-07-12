@@ -593,7 +593,7 @@
         <include refid="getFinprodMarketIdWhere"></include>
         <!-- modify by etliu start 20220601:【3.0.6场内 ZGCPCN-1047 场外公募基金指令新建画面，资产代码下拉框为空，应该为场外基金】 start -->
         <!-- AND FIN_PRODUCT.MDATE > sysdate-->
-        AND ( FIN_PRODUCT.MDATE > sysdate or FIN_PRODUCT.MDATE is null )
+        AND ( FIN_PRODUCT.MDATE <![CDATA[>]]> #{sysdate,jdbcType=DATE} or FIN_PRODUCT.MDATE is null )
         <!-- modify by etliu start 20220601:【3.0.6场内 ZGCPCN-1047 场外公募基金指令新建画面，资产代码下拉框为空，应该为场外基金】 end -->
         <if test="ps != null and ps != ''">
             <if test="ps == PS_T04 or ps == PS_T06 ">
