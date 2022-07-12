@@ -434,7 +434,7 @@ public class EtrInstructionService extends BaseService<EtrInstructionDto> {
             BeanUtil.copyProperties(etrEntrust, dto.getBussEtrInvestPersonInfoDto());
             //设置委托状态
             etrEntrust.setEntrustStatus(DictCodeListExt3.委托状态_流程中.getValue());
-            etrEntrust.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_基金.getValue());
+            etrEntrust.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_立项指令.getValue());
             etrEntrust.setIsOutTrade(DictCodeList.是否_是.getValue());
             if(platformDateImpl != null){
                 etrEntrust.setEntrustDate(platformDateImpl.getSysDate());
@@ -443,7 +443,7 @@ public class EtrInstructionService extends BaseService<EtrInstructionDto> {
 
             // etrEntrustAdd
             EtrEntrustAdd etrEntrustAdd = new EtrEntrustAdd();
-            etrEntrustAdd.setAssetType(DictCodeList.平安资产类型_基金.getValue());
+            etrEntrustAdd.setAssetType(DictCodeList.平安资产类型_立项指令.getValue());
             BeanUtil.copyProperties(etrEntrustAdd, dto);
             //设置起息日到期日
             etrEntrustAdd.setVdate(null);

@@ -3713,9 +3713,20 @@
                     param1.cdate = iPlatformDate;
                     var ps = $("#ps_" + currentTab).val();
 
+                    var rows = [];
+                    var allRows = dateTable.getAllRows();
+                    for (var i = 0; i < allRows.length; i++) {
+                        if (allRows[i].portfolioId) {
+                            rows.push(allRows[i]);
+                        }
+                    }
+
+                    console.log("--------rows-----------")
+                    console.log(rows)
+
                     if (ps == PS_T68 || ps == PS_T69 || ps == PS_T02 || ps == PS_T49 || ps == PS_T03) {
                         if (ps == PS_T02) { //卖出
-                            if (dateTable.getAllRows().length >= 2) {
+                            if (rows.length >= 2) {
                                 Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
                                     if (result.data.length == 2) {
                                         Joyin.error("组合持有该资产存在多个业务模式，不允许委托方向" + ps);
@@ -3747,7 +3758,7 @@
                                 }, false);
                             }
                         } else {
-                            if (dateTable.getAllRows().length >= 2) {
+                            if (rows.length >= 2) {
                                 Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
                                     if (result.data.length == 2) {
                                         Joyin.error("组合持有该资产存在多个业务模式，不允许委托方向" + ps);
@@ -3774,7 +3785,7 @@
                     } else {
                         if (ps == PS_T01) {
                             var businessModel = $("#businessModel_" + currentTab).val();
-                            if (dateTable.getAllRows().length >= 2) {
+                            if (rows.length >= 2) {
                                 Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
                                     if (result.data.length != 0) {
                                         if (result.data[0].BUSINESSMODEL != businessModel) {
@@ -3998,7 +4009,22 @@
                 }
                 var datas = dateTable.getAllRows();
                 if (datas) {
-                    var entrustNum = Number(0)
+                    var minStep;
+                    var param = {
+                        finprodId: $("#finprodId_" + currentTab).val(),
+                        targetType: $("#targetType_" + currentTab).val(),
+                        finprodType2: $("#finprodType2_" + currentTab).val(),
+                        tradeMarket: $("#tradeMarket_" + currentTab).val(),
+                        ps: $("#ps_" + currentTab).val(),
+                        currentTab: currentTab
+                    };
+                    Joyin.ajaxJson(basePath + 'invest/entrust/etrexchangetrade/EtrExchangeTrade001/getMinNumStep', param, function (result) {
+                        if (result.minNum) {
+                            minStep = result.minNum;
+                        }
+                    }, false);
+
+                    var entrustNum = Number(0);
                     for (var i in datas) {
                         var num = 0;
                         if (datas[i].entrustNum == '' || datas[i].entrustNum == undefined) {
@@ -4006,17 +4032,21 @@
                         } else {
                             num = parseFloat(datas[i].entrustNum);
                         }
+                        num = Math.floor(num / minStep) * minStep;
                         var ps1 = $("#ps_" + currentTab).val();
-                        console.log("3939 +++ " + num + ps + ":" + PS_T68);
                         if (ps1 == PS_T68 || ps1 == PS_T69) {
                             entrustNum += num;
                         } else {
                             entrustNum += parseInt(num);
                         }
                     }
+                    value = Math.floor(value / minStep) * minStep;
+
                     $("#entrustNum_" + currentTab).val(entrustNum);
                     calcEntrustNumAndAmt();
                     var entrustAmt = $("#entrustAmt_" + currentTab).val();
+
+                    dateTable.renderRow(data.LAY_TABLE_INDEX, {"entrustNum": value});
                     dateTable.renderRow(data.LAY_TABLE_INDEX, {"entrustAmt": parseFloat(entrustAmt) * parseInt(value) / entrustNum});
                 }
             } else if (field == 'entrustAmt') {
@@ -4041,10 +4071,6 @@
                     $("#entrustAmt_" + currentTab).val(entrustAmt);
                     calcEntrustNumAndAmt();
                     var entrustNum = $("#entrustNum_" + currentTab).val();
-                    console.log("----------------111-------------------");
-                    console.log(entrustNum);
-                    console.log(value);
-                    console.log(entrustAmt);
 
                     var minStep;
                     var param = {
@@ -4063,10 +4089,6 @@
 
                     var entrustNum0 = parseFloat(entrustNum) * parseInt(value) / entrustAmt;
                     var entrustNum1 = Math.floor(entrustNum0 / minStep) * minStep;
-                    console.log("---------------222--------------------");
-                    console.log(minStep);
-                    console.log(entrustNum0);
-                    console.log(entrustNum1);
 
                     dateTable.renderRow(data.LAY_TABLE_INDEX, {"entrustNum": entrustNum1});
                 }
@@ -4162,11 +4184,20 @@
             });
             return;
         }
-        var entrustAmt = $("#entrustAmt_" + currentTab).val();
-        var array = dateTable.getAllRows();
-        var len = array.length;
-        var entrustNumForOne = entrustNum / len;
-        var ps = $("#ps_" + currentTab).val();
+        // var entrustAmt = $("#entrustAmt_" + currentTab).val();
+        // var array = dateTable.getAllRows();
+
+        var array = [];
+        var allRows = dateTable.getAllRows();
+        for (var i = 0; i < allRows.length; i++) {
+            if (allRows[i].portfolioId) {
+                array.push(allRows[i]);
+            }
+        }
+
+        // var len = array.length;
+        // var entrustNumForOne = entrustNum / len;
+        // var ps = $("#ps_" + currentTab).val();
         // for (var i = 0; i < array.length; i++) {
         //     if (array[i].acctNo) {
         //         if(i == 0){
@@ -4229,12 +4260,17 @@
             entrustAmt: $("#entrustAmt_" + currentTab).val(),
             portfolioList: array
         }
+        console.log("***************************")
+        console.log(array)
         Joyin.ajaxJson(basePath + '/etrexchange/common/selectEtrPortfolioAllocationList', params, function (result) {
             if (result.data && result.data.portfolioList) {
-                console.log(result.data);
-                array = result.data.portfolioList;
+                var rows = result.data.portfolioList;
+                console.log("####################")
+                console.log(rows)
                 for (var i = 0; i < array.length; i++) {
-                    dateTable.renderRow(i, array[i]);
+                    if(array[i].portfolioId==rows[i].portfolioId){
+                        dateTable.renderRow(array[i].LAY_TABLE_INDEX, rows[i]);
+                    }
                 }
             }
         })
