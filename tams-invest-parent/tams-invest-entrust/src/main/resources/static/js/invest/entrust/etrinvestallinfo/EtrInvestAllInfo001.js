@@ -473,8 +473,16 @@
             ,{field:'portfolioId', title: 'EtrInvestAllInfo001.portfolioId', width:'200',
                 render : function(data, type, row, meta) {
                     if(row.portfolioId){
-                        return "<a  class='pro-link portfolioIdLink' style='cursor: pointer;'>"+row.portfolioId+"</ a>";
-                    }else{
+                        let url = ""
+                        row.portfolioId.split(',').map((item, index) => {
+                            console.log(item, '...item')
+                            url += "<a  class='pro-link portfolioIdLink' style='cursor: pointer;'>"+item+"</a>";
+                            if(index !== row.portfolioId.split(',').length - 1 ){
+                                url+=","
+                            }
+                        })
+                        return url
+                    } else{
                         return '';
                     }
                 } ,sortField:"portfolioId"
@@ -519,11 +527,7 @@
      * 组合代码链接
      */
     table.bind('click','.portfolioIdLink', function(row) {
-        let portfolioId = row.portfolioId;
-        if(portfolioId){
-            let content = row.portfolioId.split(',')
-            portfolioId = content[0];
-        }
+        let portfolioId = this.html();
         Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
             basePath + "invest/portfolio/ptlmanagementinfo/PtlManagementInfo002/init",
             "98%", "90%", {pageModel:PAGE_MODEL_REFERENCE,//page_model:查看
@@ -549,7 +553,7 @@
                     param);
                 //
             } else if(row.finprodType2 == "F32" ){
-                let finprodId = row.finprodMarketId
+                let finprodId = row.finprodId
                 var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/newbonetargets?a=a"; // 默认债券标的
                 var param = {
                     pageModel: PAGE_MODEL_REFERENCE,
