@@ -1158,12 +1158,23 @@ $(function() {
                  * 买断式回购质押标的代码链接跳转
                  */
                 tableF10.bind('click','.finprodId-link', function(row) {
-                    Joyin.dialog(JoyinUtil.getLabel("FinBondTargetAsset002.title"),
-                            basePath + "invest/asset/bond/FinBondTargetAsset002/init",
-                            "95%", "90%",
-                            { pageModel:PAGE_MODEL_REFERENCE,
-                            finprodId: row.finprodId,
-                            finprodName: row.finprodName });
+                    debugger
+                    var url = "home.html?a=a&finprodMarketId=" + row.finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a"; // 默认债券标的
+                    var param = {
+                        pageModel: PAGE_MODEL_REFERENCE,
+                        isQuickInput: true,
+                        finprodId: row.finprodId
+                    };
+                    Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+                        basePath + url,
+                        "98%", "98%",
+                        param);
+                    // Joyin.dialog(JoyinUtil.getLabel("FinBondTargetAsset002.title"),
+                    //         basePath + "invest/asset/bond/FinBondTargetAsset002/init",
+                    //         "95%", "90%",
+                    //         { pageModel:PAGE_MODEL_REFERENCE,
+                    //         finprodId: row.finprodId,
+                    //         finprodName: row.finprodName });
                 });
                 
                 entrustTableF10 = $("#entrustTableF10").joyintable({

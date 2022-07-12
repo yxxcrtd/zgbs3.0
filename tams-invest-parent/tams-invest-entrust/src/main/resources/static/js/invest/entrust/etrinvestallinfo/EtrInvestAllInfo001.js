@@ -553,7 +553,7 @@
                     param);
                 //
             } else if(row.finprodType2 == "F32" ){
-                let finprodId = row.finprodId
+                let finprodId = "F32_" + row.finprodMarketId
                 var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/newbonetargets?a=a"; // 默认债券标的
                 var param = {
                     pageModel: PAGE_MODEL_REFERENCE,
