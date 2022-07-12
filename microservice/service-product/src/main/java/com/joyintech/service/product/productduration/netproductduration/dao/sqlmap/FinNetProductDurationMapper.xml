@@ -164,7 +164,7 @@
 		       ftpr.period_id purPeriodId,
 		       pur.mdate purCycleEndDate,
 				<!--【产品存续期交易查询】交易查看页面，期次支付日为空,不等产品修改，这里暂时存pay_date jianxx 20210331 start-->
-				total.pay_date as purCyclePayDate,
+				(pur.mdate +1) as purCyclePayDate,
 				<!--【产品存续期交易查询】交易查看页面，期次支付日为空,不等产品修改，这里暂时存pay_date jianxx 20210331 end-->
        		</if>
 	       	<if test="dealType=='C4' or dealType=='C17' or dealType=='C18'">
