@@ -604,13 +604,13 @@
         </if>
         <choose>
             <when test="tradePlat != null and tradePlat != '' and tradePlat == '04'.toString()">
-                and ((a.finprod_type2='F01' and r.type_6='B14') or (a.finprod_type2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 债券 、股票 、基金 -->
+                and ((a.finprod_type2='F01' and r.type_6 in (#{FINPROD_TYPE_TG_F01_B14}, #{FINPROD_TYPE_TG_F01_B16})) or (a.finprod_type2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 债券 、股票 、基金 -->
             </when>
             <when test="tradePlat != null and tradePlat != '' and tradePlat == '02'.toString()">
-                and ((a.finprod_type2='F01' and r.type_6='B14') or (a.finprod_type2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 债券 、股票 、基金 -->
+                and ((a.finprod_type2='F01' and r.type_6 in (#{FINPROD_TYPE_TG_F01_B14}, #{FINPROD_TYPE_TG_F01_B16})) or (a.finprod_type2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 债券 、股票 、基金 -->
             </when>
             <when test="tradePlat != null and tradePlat != '' and tradePlat == '03'.toString()">
-                and a.finprod_type2='F01' and r.type_6='B14'
+                and a.finprod_type2='F01' and r.type_6 in (#{FINPROD_TYPE_TG_F01_B14}, #{FINPROD_TYPE_TG_F01_B16})
             </when>
             <otherwise>
                 and a.finprod_type2 in (#{FINPROD_TYPE_TG_F01})<!--  债券 -->
@@ -694,7 +694,7 @@
             and a.trade_market = #{acctTradeMarket}
         </if>
         and a.finprod_type2 in (#{FINPROD_TYPE_TG_F01})<!--  债券 -->
-        and r.type_6 != #{type6_B14}
+        and r.type_6 not in (#{type6_B14}, #{type6_B16})
         union
         select distinct a.MARKET_ID as finprod_market_id,
         concat(concat(a.MARKET_ID,'|'),a.TERM_TYPE) as finprod_name,
