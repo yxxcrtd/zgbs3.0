@@ -421,9 +421,12 @@ public class TrdFundInvestTradeValidator implements TradeCommonValidator {
                     if (prinAmt != null && entrustAmt != null) {
                         entrustAmt = entrustAmt.subtract(prinAmt);
                     }
-                    if (entrustAmt != null && tradeAmt.compareTo(entrustAmt) == 0) {
+                    // TISHKS-1571:交易金额大于指令金额提示语 modify by fuyongsheng 20220712 start
+                    // if (entrustAmt != null && tradeAmt.compareTo(entrustAmt) == 0) {
+                    if (entrustAmt != null && tradeAmt.compareTo(entrustAmt) > 0) {
                         errorList.add(new ValidMessage("tradeAmt", this.getMessage("TRD_X_0004") + entrustAmt));
                     }
+                    // TISHKS-1571:交易金额大于指令金额提示语 modify by fuyongsheng 20220712 end
                     //add  wsz 修改数据为空判定失败问题 ZGCPCN-1139 end
                 }
             }
