@@ -28,8 +28,8 @@ public class InstructionQueryRequest implements Serializable {
     @ApiModelProperty(required = false, name = "portfolioId", value = "组合代码")
     private String portfolioId;
 
-    @ApiModelProperty(required = false, name = "entrustStatus", value = "指令状态")
-    private List<String> entrustStatus;
+//    @ApiModelProperty(required = false, name = "entrustStatus", value = "指令状态")
+//    private List<String> entrustStatus;
 
     @ApiModelProperty(required = false, name = "tradeMarket", value = "交易场所")
     private String tradeMarket;
@@ -99,13 +99,13 @@ public class InstructionQueryRequest implements Serializable {
         this.portfolioId = portfolioId;
     }
 
-    public List<String> getEntrustStatus() {
-        return entrustStatus;
-    }
-
-    public void setEntrustStatus(List<String> entrustStatus) {
-        this.entrustStatus = entrustStatus;
-    }
+//    public List<String> getEntrustStatus() {
+//        return entrustStatus;
+//    }
+//
+//    public void setEntrustStatus(List<String> entrustStatus) {
+//        this.entrustStatus = entrustStatus;
+//    }
 
     public String getTradeMarket() {
         return tradeMarket;
