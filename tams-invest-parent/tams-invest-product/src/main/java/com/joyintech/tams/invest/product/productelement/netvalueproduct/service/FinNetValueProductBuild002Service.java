@@ -734,7 +734,7 @@ public class FinNetValueProductBuild002Service extends BaseService<FinNetValuePr
                     bussRepFinProductInfoService.update(entity.getBussRepFinProductInfoDto());
                 }
 
-                if (ptlFlag) {
+                if (!ptlFlag) {
                     this.insertOtherData(entity);// edit by dongenkuo 20190312 创建组合放在service层，此处注释掉
                 }
             }
