@@ -62,6 +62,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 债券借贷交易新建
@@ -266,6 +267,10 @@ public class TrdBondLendInvestTrade002Controller extends BaseController {
 //            }
             invList.forEach(item->{
             	item.setNewRate(item.getRangeYield());
+                // 处理支付日（前端使用payDateUnadjust进行展示）
+                if (Objects.isNull(item.getPayDateUnadjust())) {
+                    item.setPayDateUnadjust(item.getPayDate());
+                }
             });
         }
         return invList;
