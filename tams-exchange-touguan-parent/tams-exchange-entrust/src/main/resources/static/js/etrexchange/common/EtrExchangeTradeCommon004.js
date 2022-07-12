@@ -3488,9 +3488,9 @@
                 ps: ps,
                 currentTab: currentTab
             };
-            Joyin.ajaxJson(basePath + 'invest/entrust/etrexchangetrade/EtrExchangeTrade001/getMinNumStep', param, function (result) {
-                if (result.minNum) {
-                    input.val(getNumResult(type, num, Number(result.minNum))).blur().trigger('change');
+            Joyin.ajaxJson(basePath + 'etrexchange/common/etrExchangeTrade001/getMinNumStep', param, function (result) {
+                if (result.data) {
+                    input.val(getNumResult(type, num, Number(result.data))).blur().trigger('change');
                 }
             }, false);
             return
@@ -4042,9 +4042,9 @@
                         ps: $("#ps_" + currentTab).val(),
                         currentTab: currentTab
                     };
-                    Joyin.ajaxJson(basePath + 'invest/entrust/etrexchangetrade/EtrExchangeTrade001/getMinNumStep', param, function (result) {
-                        if (result.minNum) {
-                            minStep = result.minNum;
+                    Joyin.ajaxJson(basePath + 'etrexchange/common/etrExchangeTrade001/getMinNumStep', param, function (result) {
+                        if (result.data) {
+                            minStep = result.data;
                         }
                     }, false);
 
@@ -4105,9 +4105,9 @@
                         ps: $("#ps_" + currentTab).val(),
                         currentTab: currentTab
                     };
-                    Joyin.ajaxJson(basePath + 'invest/entrust/etrexchangetrade/EtrExchangeTrade001/getMinNumStep', param, function (result) {
-                        if (result.minNum) {
-                            minStep = result.minNum;
+                    Joyin.ajaxJson(basePath + 'etrexchange/common/etrExchangeTrade001/getMinNumStep', param, function (result) {
+                        if (result.data) {
+                            minStep = result.data;
                         }
                     }, false);
                     console.log("--------------11-------------------")
@@ -4255,7 +4255,6 @@
         var ps = $("#ps_" + currentTab).val();
         var minStep;
         if (targetType) {
-            var step = 1;
             var param = {
                 finprodId: finprodId,
                 targetType: targetType,
@@ -4264,12 +4263,16 @@
                 ps: ps,
                 currentTab: currentTab
             };
-            Joyin.ajaxJson(basePath + 'invest/entrust/etrexchangetrade/EtrExchangeTrade001/getMinNumStep', param, function (result) {
-                if (result.minNum) {
-                    minStep = result.minNum;
+            Joyin.ajaxJson(basePath + 'etrexchange/common/etrExchangeTrade001/getMinNumStep', param, function (result) {
+                console.log("------result----------")
+                console.log(result)
+                if (result.data) {
+                    minStep = parseInt(result.data);
                 }
             }, false);
         }
+        console.log("----------minStep----------")
+        console.log(minStep)
         var object = getSearchParams();
         var entrustPrice = object.entrustPrice;
         //券
@@ -4293,6 +4296,7 @@
         }
         console.log("-------------------------------")
         console.log(array)
+
         Joyin.ajaxJson(basePath + '/etrexchange/common/selectEtrPortfolioAllocationList', params, function (result) {
             if (result.data && result.data.portfolioList) {
                 var rows = result.data.portfolioList;
@@ -4526,9 +4530,9 @@
             ps: $("#ps_" + currentTab).val(),
             currentTab: currentTab
         };
-        Joyin.ajaxJson(basePath + 'invest/entrust/etrexchangetrade/EtrExchangeTrade001/getMinNumStep', param, function (result) {
-            if (result.minNum) {
-                minStep = result.minNum;
+        Joyin.ajaxJson(basePath + 'etrexchange/common/etrExchangeTrade001/getMinNumStep', param, function (result) {
+            if (result.data) {
+                minStep = parseInt(result.data);
             }
         }, false);
 
