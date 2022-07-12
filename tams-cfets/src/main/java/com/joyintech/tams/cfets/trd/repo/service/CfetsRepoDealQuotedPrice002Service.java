@@ -142,9 +142,6 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
     private IbuComponentCommonService ibuComponentCommonService;
 
     @Autowired
-    private IbuMainService ibuMainService;
-
-    @Autowired
     private RepoDialogueQuoteSubService repoDialogueQuoteSubService;
 
     @Autowired
@@ -183,18 +180,6 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
     @Autowired
     private JoyinbusinessCommonService joyinbusinessCommonService;
 
-    /**
-     * 组合可用现金和实际现金查询更新
-     */
-    @Autowired(required = false)
-    private BasePtlCashPositionInfoService basePtlCashPositionInfoService;
-
-    /**
-     * 组合可用持仓和实际持仓查询更新
-     */
-    @Autowired(required = false)
-    private BasePtlSecPositionInfoService basePtlSecPositionInfoService;
-
     @Autowired
     private CfetsRepoDealQuotedPrice001Service oldCfetsRepoDealQuotedPrice001Service;
 
@@ -210,7 +195,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
     /**
      * 报价初始化校验
      *
-     * @param param
+     * @param request
      * @return com.joyintech.framework.ajax.AjaxResult
      * @author jiangpeng
      * @date 2021/12/30 11:37
@@ -235,7 +220,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
     /**
      * 报价初始化校验
      *
-     * @param param
+     * @param request
      * @return com.joyintech.framework.ajax.AjaxResult
      * @author jiangpeng
      * @date 2021/12/30 11:37
@@ -1349,14 +1334,6 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
         // 组件调用共通处理
         ibuComponentCommonService.resCommonHandle(quoteResultDto, userInfo, true);
 
-        long endTime = System.currentTimeMillis();
-        Date startDate = new Date();
-        startDate.setTime(startTime);
-        Date endDate = new Date();
-        endDate.setTime(endTime);
-        logger.info("deal程序运行开始时间：" + new SimpleDateFormat().format(startDate));
-        logger.info("deal程序运行结束时间：" + new SimpleDateFormat().format(endDate)); //程序运行结束时间
-        logger.info("deal程序运行时间：" + (endTime - startTime) + "ms");    //输出程序运行时间
         return true;
     }
 
@@ -1378,6 +1355,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
             inputbean.setExeTypeIBU(exeTypeIBU);
             // 现券对话报价必须项校验
             ResultBaseDto validation = routeIntfSubService.inputRepoDlgCheck(inputbean);
+            logger.info("质押式回购对话报价数据:{}", JsonUtils.object2Json(inputbean));
 
             // 校验不通过
             if (validation != null && !validation.isStatus()) {
@@ -1531,7 +1509,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
     public void doComplete(CfetsRepoDealQuotedPrice001Dto entity, OperationType type) {
         com.joyintech.service.bankuplink.repo.dto.CfetsRepoDealQuotedPrice001Dto dto
                 = this.investDto2ServiceDto(entity);
-        Map<String, Object> pageParam = BeanUtil.object2Map(entity);
+        logger.info("质押式回购报价,前台传入数据", JsonUtils.object2Json(entity));
         CfetsOprHisInfoRequest cfetsOprHisInfoRequest = new CfetsOprHisInfoRequest();
         cfetsOprHisInfoRequest.setEntrustId(entity.getQuoteId());
         cfetsOprHisInfoRequest.setOperType(DictCodeListExt3.操作类型_新建.getValue());
