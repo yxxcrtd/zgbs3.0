@@ -231,7 +231,7 @@
         FROM ETR_ENTRUST A1
             LEFT JOIN PTL_PORTFOLIO B1
                 ON A1.PORTFOLIO_ID = B1.PORTFOLIO_ID
-            LEFT JOIN (SELECT ENTRUST_ID, wm_concat ( ETR_ENTRUST_DETAIL.PORTFOLIO_ID ) PORTFOLIO_ID,  wm_concat ( PORTFOLIO_NAME ) PORTFOLIO_NAME FROM ETR_ENTRUST_DETAIL LEFT JOIN PTL_PORTFOLIO
+            LEFT JOIN (SELECT ENTRUST_ID,to_char(wm_concat ( ETR_ENTRUST_DETAIL.PORTFOLIO_ID )) PORTFOLIO_ID,  to_char(wm_concat ( PORTFOLIO_NAME )) PORTFOLIO_NAME FROM ETR_ENTRUST_DETAIL LEFT JOIN PTL_PORTFOLIO
                 ON ETR_ENTRUST_DETAIL.portfolio_id = PTL_PORTFOLIO.portfolio_id GROUP BY ENTRUST_ID ) det on det.ENTRUST_ID = A1.ENTRUST_ID
             LEFT JOIN FIN_PRODUCT C1
                 ON A1.FINPROD_ID = C1.FINPROD_ID
@@ -347,8 +347,8 @@
             (SELECT
                 ENTRUST_ID,
                 SEC_ACCT_ID,
-                wm_concat ( ETR_ENTRUST_DETAIL.PORTFOLIO_ID ) PORTFOLIO_ID,
-                wm_concat ( PORTFOLIO_NAME ) PORTFOLIO_NAME
+        to_char(wm_concat ( ETR_ENTRUST_DETAIL.PORTFOLIO_ID )) PORTFOLIO_ID,
+        to_char(wm_concat ( PORTFOLIO_NAME )) PORTFOLIO_NAME
             FROM
                 ETR_ENTRUST_DETAIL
             LEFT JOIN
@@ -637,7 +637,7 @@
                            ON f1.FINPROD_ID=s3.FINPROD_ID
                  LEFT join PTL_PORTFOLIO p1
                            on p1.PORTFOLIO_ID=e1.PORTFOLIO_ID
-                 LEFT JOIN (SELECT ENTRUST_ID, wm_concat ( ETR_ENTRUST_DETAIL.PORTFOLIO_ID ) PORTFOLIO_ID,  wm_concat ( PORTFOLIO_NAME ) PORTFOLIO_NAME FROM ETR_ENTRUST_DETAIL LEFT JOIN PTL_PORTFOLIO
+                 LEFT JOIN (SELECT ENTRUST_ID, to_char(wm_concat ( ETR_ENTRUST_DETAIL.PORTFOLIO_ID )) PORTFOLIO_ID,  to_char(wm_concat ( PORTFOLIO_NAME )) PORTFOLIO_NAME FROM ETR_ENTRUST_DETAIL LEFT JOIN PTL_PORTFOLIO
                                                                                                                                                                                           ON ETR_ENTRUST_DETAIL.portfolio_id = PTL_PORTFOLIO.portfolio_id GROUP BY ENTRUST_ID ) det on det.ENTRUST_ID = e1.ENTRUST_ID
                  LEFT JOIN (
                       SELECT SEQ_NO,

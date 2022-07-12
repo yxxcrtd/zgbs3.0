@@ -130,7 +130,7 @@
                 SELECT
                     ENTRUST_ID,
                     SEC_ACCT_ID,
-                    wm_concat (PORTFOLIO_ID) PORTFOLIO_ID,
+        to_char(wm_concat (PORTFOLIO_ID)) PORTFOLIO_ID,
                     NVL(SUM(ENTRUST_NUM), 0) ENTRUST_NUM,
                     NVL(SUM(ENTRUST_AMT), 0) ENTRUST_AMT
                 FROM
