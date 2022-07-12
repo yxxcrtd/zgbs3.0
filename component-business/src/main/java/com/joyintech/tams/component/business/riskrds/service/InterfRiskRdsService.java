@@ -3188,6 +3188,9 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                 (String) infMap.get(PageFieldToInterfFactory.INF_EVENTID) + (String) infMap.get(
                         PageFieldToInterfFactory.INF_PS));
         infMap.put("isIgnoreFoul", DictCodeListExt2.是否_是.getValue());
+        // GLCP-166:债券借贷债券的数据需要增加资产大类 modify by fuyongsheng modify by fuyongsheng 20220712 start
+        infMap.put(PageFieldToInterfFactory.INF_ASSETTYPE, DictCodeListExt2.平安资产类型_债券.getValue());
+        // GLCP-166:债券借贷债券的数据需要增加资产大类 modify by fuyongsheng modify by fuyongsheng 20220712 end
         result.add(infMap);
         return result;
     }
