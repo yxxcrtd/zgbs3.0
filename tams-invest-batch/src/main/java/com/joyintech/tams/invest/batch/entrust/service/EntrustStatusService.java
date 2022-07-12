@@ -78,7 +78,7 @@ public class EntrustStatusService {
     @Qualifier("simpleRestTemplate")
     protected JoyinRestTemplate simpleRestTemplate;
 
-    @Value("${application.micorservice.contextpath.tamsServer:http://tams-server}")
+    @Value("${application.micorservice.contextpath.tamsServer:http://127.0.0.1:8080/tams}")
     private String tamsSerever;
 
     public void run(SysBatchExecInfo batchExecuteInfo) {
