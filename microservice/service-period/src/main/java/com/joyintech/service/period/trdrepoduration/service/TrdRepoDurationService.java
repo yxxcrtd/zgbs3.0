@@ -172,7 +172,7 @@ public class TrdRepoDurationService extends BaseService<TrdRepoDurationDto> {
 
     public List<TrdRepoDurationDto> selectAllData(Map<String, Object> param) {
         setParams(param);
-        return trdRepoDurationMapper.findPage(param);
+        return trdRepoDurationMapper.selectAllData(param);
     }
 
     private void setParams(Map<String, Object> param) {
