@@ -692,6 +692,7 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
                 }
                 finCashPlan.setVdate(finTradeProduct.getVpayDate());
                 finCashPlan.setMdate(finTradeProduct.getMpayDate());
+                finCashPlan.setPayDate(finTradeProduct.getMpayDate());
                 finCashPlan.setCashAmt(ArithmeticUtil.doAdd(finCashPlan.getPrinAmt(), finCashPlan.getIntAmt()));
                 finCashPlan.setCashUnitType(DictCodeList.现金流单位_总额.getValue());
                 finCashPlan.setFinprodId(finTradeProduct.getFinprodId());
