@@ -1055,7 +1055,11 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
             etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
             
             //添加指令可用持仓
-            if (StringUtil.isEmpty(entrustId)) {
+            if (StringUtil.isEmpty(entrustId)
+                    // 正回购登录指令持仓 modify by fuyongsheng  20220713 start
+                    || null != finProductTradeDto.getTrdProductDeal()
+                    // 正回购登录指令持仓 modify by fuyongsheng  20220713 end
+            ) {
                 etrSecPositionFlowDto.setAmount(交易券面总额);
                 etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
             }
