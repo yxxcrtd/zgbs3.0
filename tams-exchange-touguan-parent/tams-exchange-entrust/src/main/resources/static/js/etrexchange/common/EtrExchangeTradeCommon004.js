@@ -5032,13 +5032,23 @@
         $('#EtrExchangeTradeCommon004_btn_riskcal').click(function () {
             var object = getSearchParams();
             var tradeMarket = $("#tradeMarket_" + currentTab).val();
-            var minStep = getMinStep();
+
             var entrustNum = parseFloat(object.entrustNum);
-            var res = entrustNum % minStep;
-            if (!object.entrustNum || entrustNum <= 0 || res != 0) {
-                Joyin.error("组合分配指令数量需满足最小交易单位[" + minStep + "]的整数倍！");
-                return;
+            var ps = $("#ps_" + currentTab).val();
+            if (currentTab == 'jj' && ps == 'T02') {
+                if (!object.entrustNum || entrustNum <= 0) {
+                    Joyin.error("组合分配指令数量不能为0！");
+                    return;
+                }
+            } else {
+                var minStep = getMinStep();
+                var res = entrustNum % minStep;
+                if (!object.entrustNum || entrustNum <= 0 || res != 0) {
+                    Joyin.error("组合分配指令数量需满足最小交易单位[" + minStep + "]的整数倍！");
+                    return;
+                }
             }
+
             var param = JSON.parse(JSON.stringify(object))
             Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTradeCommonRiskcal/doRiskcal', param, function (data) {
                 $("#riskTrialSpan").html("&nbsp;&nbsp;" + data.data.data.riskTrialSpan);
