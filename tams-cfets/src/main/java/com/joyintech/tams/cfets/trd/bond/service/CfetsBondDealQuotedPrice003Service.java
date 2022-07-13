@@ -653,7 +653,16 @@ public class CfetsBondDealQuotedPrice003Service extends BaseService<CfetsBondDea
 		map.put("loginUserId", LoginUserUtil.getUserName());
         CfetsBondDealRequestQuoteDto cfetsBondDealRequestQuoteDto = new CfetsBondDealRequestQuoteDto();
         com.joyintech.service.bankuplink.bond.dto.CfetsBondDealRequestQuoteDto bondRequestQuote = cfetsBondDealQuotedPriceService.getBondRequestQuote(map);
-        BeanUtil.copyPropertiesIgnoreNull(cfetsBondDealRequestQuoteDto,bondRequestQuote);
+        BeanUtil.copyPropertiesIgnoreNull(cfetsBondDealRequestQuoteDto, bondRequestQuote);
+        if (CollectionUtils.isNotEmpty(bondRequestQuote.getCounterInfoList())) {
+            List<CounterInfoDto> counterInfoList = new ArrayList<>();
+            bondRequestQuote.getCounterInfoList().forEach(item -> {
+                CounterInfoDto counterInfoDto = new CounterInfoDto();
+                BeanUtil.copyPropertiesIgnoreNull(counterInfoDto, item);
+                counterInfoList.add(counterInfoDto);
+            });
+            cfetsBondDealRequestQuoteDto.setCounterInfoList(counterInfoList);
+        }
         return cfetsBondDealRequestQuoteDto;
       /*  return restTemplate.postForObject(
 				ServiceApplication.BANKUPLINK_SERVICE_NAME + "/CfetsBondDealQuotedPrice/getBondRequestQuote", map,
