@@ -325,8 +325,8 @@
         on ETR_FINISH_STATUS_A.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
         LEFT JOIN (
             SELECT ENTRUST_ID,
-                wm_concat ( ETR_ENTRUST_DETAIL.PORTFOLIO_ID ) PORTFOLIO_ID,
-                wm_concat ( PORTFOLIO_NAME ) PORTFOLIO_NAME
+        to_char(wm_concat ( ETR_ENTRUST_DETAIL.PORTFOLIO_ID )) PORTFOLIO_ID,
+        to_char(wm_concat ( PORTFOLIO_NAME )) PORTFOLIO_NAME
                 FROM ETR_ENTRUST_DETAIL
                 LEFT JOIN
         (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)
@@ -689,7 +689,7 @@
                  LEFT JOIN MST_CALENDAR_INFO mci2 ON mci2.CALENDAR_ID  = ete.CALENDAR_ID
                  LEFT JOIN STL_SEC_ACCT_INFO ssai ON eted.SEC_ACCT_ID = ssai.SEC_ACCT_ID
                  LEFT JOIN FIN_PRODUCT_ADD fpa ON ete.finprod_id = fpa.finprod_id
-                 LEFT JOIN (SELECT ENTRUST_ID, wm_concat(PORTFOLIO_ID) PORTFOLIO_ID from ETR_ENTRUST_DETAIL GROUP BY ENTRUST_ID) det on det.ENTRUST_ID = ete.ENTRUST_ID
+                 LEFT JOIN (SELECT ENTRUST_ID, to_char(wm_concat(PORTFOLIO_ID)) PORTFOLIO_ID from ETR_ENTRUST_DETAIL GROUP BY ENTRUST_ID) det on det.ENTRUST_ID = ete.ENTRUST_ID
         WHERE ete.entrust_id = #{entrustId}
 
         union
@@ -747,7 +747,7 @@
                  LEFT JOIN MST_CALENDAR_INFO mci2 ON mci2.CALENDAR_ID  = ete.CALENDAR_ID
                  LEFT JOIN STL_SEC_ACCT_INFO ssai ON eted.SEC_ACCT_ID = ssai.SEC_ACCT_ID
                  LEFT JOIN FIN_PRODUCT_ADD fpa ON ete.finprod_id = fpa.finprod_id
-                 LEFT JOIN (SELECT ENTRUST_ID, wm_concat(PORTFOLIO_ID) PORTFOLIO_ID from WFL_ETR_ENTRUST_DETAIL GROUP BY ENTRUST_ID) det on det.ENTRUST_ID = ete.ENTRUST_ID
+                 LEFT JOIN (SELECT ENTRUST_ID, to_char(wm_concat(PORTFOLIO_ID)) PORTFOLIO_ID from WFL_ETR_ENTRUST_DETAIL GROUP BY ENTRUST_ID) det on det.ENTRUST_ID = ete.ENTRUST_ID
         WHERE ete.entrust_id = #{entrustId}
     </select>
 
@@ -834,7 +834,7 @@
                                     LEFT JOIN ETR_TARGET T4 ON ete.ENTRUST_ID = T4.ENTRUST_ID
                                     LEFT JOIN FIN_PRODUCT T5 ON T4.TARGET_FINPROD_ID = T5.FINPROD_ID
                                     LEFT JOIN MST_CALENDAR_INFO mci2 ON mci2.CALENDAR_ID  = ete.CALENDAR_ID
-                                    LEFT JOIN ( SELECT ENTRUST_ID, wm_concat ( PORTFOLIO_ID ) PORTFOLIO_ID FROM ETR_ENTRUST_DETAIL GROUP BY ENTRUST_ID ) det ON det.ENTRUST_ID = ete.ENTRUST_ID
+                                    LEFT JOIN ( SELECT ENTRUST_ID, to_char(wm_concat ( PORTFOLIO_ID )) PORTFOLIO_ID FROM ETR_ENTRUST_DETAIL GROUP BY ENTRUST_ID ) det ON det.ENTRUST_ID = ete.ENTRUST_ID
                            WHERE ete.entrust_id = #{entrustId}
 
                            union
@@ -919,7 +919,7 @@
                                     LEFT JOIN ETR_TARGET T4 ON ete.ENTRUST_ID = T4.ENTRUST_ID
                                     LEFT JOIN FIN_PRODUCT T5 ON T4.TARGET_FINPROD_ID = T5.FINPROD_ID
                                     LEFT JOIN MST_CALENDAR_INFO mci2 ON mci2.CALENDAR_ID  = ete.CALENDAR_ID
-                                    LEFT JOIN ( SELECT ENTRUST_ID, wm_concat ( PORTFOLIO_ID ) PORTFOLIO_ID FROM WFL_ETR_ENTRUST_DETAIL GROUP BY ENTRUST_ID ) det ON det.ENTRUST_ID = ete.ENTRUST_ID
+                                    LEFT JOIN ( SELECT ENTRUST_ID, to_char(wm_concat ( PORTFOLIO_ID )) PORTFOLIO_ID FROM WFL_ETR_ENTRUST_DETAIL GROUP BY ENTRUST_ID ) det ON det.ENTRUST_ID = ete.ENTRUST_ID
                            WHERE ete.entrust_id = #{entrustId}) T
         where rownum &lt;=1
     </select>
@@ -2774,7 +2774,7 @@
         LEFT JOIN (SELECT * FROM FIN_STDSEC_CONVERSE_RADIO FSCR2 WHERE FSCR2.VDATE = (( select max(fscr3.VDATE) from FIN_STDSEC_CONVERSE_RADIO fscr3
         where FSCR2.FINPROD_ID= fscr3.FINPROD_ID and FSCR2.BRANCH = fscr3.BRANCH ))) fscr ON ete.FINPROD_ID = fscr.FINPROD_ID
         AND fscr.VDATE &lt;= to_date(#{sysDateStr},'yyyy-mm-dd') AND fscr.MDATE >= to_date(#{sysDateStr},'yyyy-mm-dd')
-        LEFT JOIN ( SELECT ENTRUST_ID, wm_concat ( PORTFOLIO_ID ) PORTFOLIO_ID FROM ETR_ENTRUST_DETAIL GROUP BY ENTRUST_ID ) det ON det.ENTRUST_ID = ete.ENTRUST_ID
+        LEFT JOIN ( SELECT ENTRUST_ID, to_char(wm_concat ( PORTFOLIO_ID )) PORTFOLIO_ID FROM ETR_ENTRUST_DETAIL GROUP BY ENTRUST_ID ) det ON det.ENTRUST_ID = ete.ENTRUST_ID
         left join MST_COUNTER_PARTY mcpdata on ete.COUNTER_ID = mcpdata.COUNTER_ID
         LEFT JOIN FIN_PRODUCT T7 ON ete.STOCK_ID = T7.FINPROD_MARKET_ID and ete.FINPROD_TYPE2 = T7.FINPROD_TYPE2
         WHERE ete.entrust_id = #{entrustId}
@@ -2879,7 +2879,7 @@
         LEFT JOIN FIN_PRODUCT T6 ON oete.FINPROD_ID = T6.FINPROD_ID
         LEFT JOIN FIN_STDSEC_CONVERSE_RADIO fscr ON ete.FINPROD_ID = fscr.FINPROD_ID
               AND fscr.VDATE &lt;= to_date(#{sysDateStr},'yyyy-mm-dd') AND fscr.MDATE >= to_date(#{sysDateStr},'yyyy-mm-dd')
-        LEFT JOIN ( SELECT ENTRUST_ID, wm_concat ( PORTFOLIO_ID ) PORTFOLIO_ID FROM WFL_ETR_ENTRUST_DETAIL GROUP BY ENTRUST_ID ) det ON det.ENTRUST_ID = ete.ENTRUST_ID
+        LEFT JOIN ( SELECT ENTRUST_ID, to_char(wm_concat ( PORTFOLIO_ID )) PORTFOLIO_ID FROM WFL_ETR_ENTRUST_DETAIL GROUP BY ENTRUST_ID ) det ON det.ENTRUST_ID = ete.ENTRUST_ID
         left join MST_COUNTER_PARTY mcpdata on ete.COUNTER_ID = mcpdata.COUNTER_ID
         LEFT JOIN FIN_PRODUCT T7 ON ete.STOCK_ID = T7.FINPROD_MARKET_ID and ete.FINPROD_TYPE2 = T7.FINPROD_TYPE2
         WHERE ete.entrust_id = #{entrustId}
@@ -2991,12 +2991,12 @@
 		LEFT JOIN T_TRADE TT ON (TT.BROKER_TRADE_ID = STD.CJBH AND TT.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TT.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD') AND TT.TRADE_TYPE = '0')
 		LEFT JOIN T_TRADEHISTORY TTH ON (TTH.BROKER_TRADE_ID = STD.CJBH AND TTH.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TTH.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
 		LEFT JOIN FIN_PRODUCT FP ON STD.FINPROD_ID = FP.FINPROD_ID
-        LEFT JOIN ( SELECT te.TRADE_ID, wm_concat ( te.ENTRUST_ID )  ENTRUST_ID
+        LEFT JOIN ( SELECT te.TRADE_ID, to_char(wm_concat ( te.ENTRUST_ID ))  ENTRUST_ID
                     FROM (SELECT A.ENTRUST_ID, sttm.TRADE_ID from SETTLE_TRANS_TG_MAPPING sttm
                     LEFT JOIN TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt ON sttm.TRADE_ID_TG = tfpdt.TOTLE_TRADE_ID
                     LEFT JOIN TRD_DEAL_TOTAL_ADD A ON tfpdt.TOTLE_TRADE_ID = A.TOTLE_TRADE_ID
                     )te group by te.TRADE_ID  ) tdta on STD.TRADE_ID = tdta.TRADE_ID
-        LEFT JOIN ( SELECT te.TRADE_ID, wm_concat ( te.ENTRUST_ID )  ENTRUST_ID
+        LEFT JOIN ( SELECT te.TRADE_ID, to_char(wm_concat ( te.ENTRUST_ID ))  ENTRUST_ID
                     FROM ( SELECT sttm1.TRADE_ID, a.ENTRUST_ID FROM SETTLE_TRANS_TG_MAPPING sttm1
                     LEFT JOIN TRD_PRODUCT_DEAL tpd ON sttm1.TRADE_ID_TG = tpd.TRADE_ID
                     LEFT JOIN TRD_PRODUCT_DEAL_ADD a ON a.TRADE_ID = tpd.TRADE_ID
@@ -3136,11 +3136,11 @@
         LEFT JOIN (
             SELECT
                 EED.ENTRUST_ID,
-                wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
-                wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
-                wm_concat (EED.SEC_ACCT_ID) AS SEC_ACCT_ID,
-                wm_concat (sci.ACCT_NO) AS ACCT_NO,
-                wm_concat (sci.ACCT_NAME) AS ACCT_NAME
+        to_char(wm_concat ( FP.PORTFOLIO_ID )) AS PORTFOLIO_ID ,
+        to_char(wm_concat ( FP.PORTFOLIO_NAME )) AS PORTFOLIO_NAME,
+        to_char(wm_concat (EED.SEC_ACCT_ID)) AS SEC_ACCT_ID,
+        to_char(wm_concat (sci.ACCT_NO)) AS ACCT_NO,
+        to_char(wm_concat (sci.ACCT_NAME)) AS ACCT_NAME
             FROM
                 ETR_ENTRUST_DETAIL EED
             left join
@@ -3328,11 +3328,11 @@
         LEFT JOIN (
         SELECT
         EED.ENTRUST_ID,
-        wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
-        wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
-        wm_concat (EED.SEC_ACCT_ID) AS SEC_ACCT_ID,
-        wm_concat (sci.ACCT_NO) AS ACCT_NO,
-        wm_concat (sci.ACCT_NAME) AS ACCT_NAME
+        to_char(wm_concat ( FP.PORTFOLIO_ID )) AS PORTFOLIO_ID ,
+        to_char(wm_concat ( FP.PORTFOLIO_NAME)) AS PORTFOLIO_NAME,
+        to_char(wm_concat (EED.SEC_ACCT_ID)) AS SEC_ACCT_ID,
+        to_char(wm_concat (sci.ACCT_NO)) AS ACCT_NO,
+        to_char(wm_concat (sci.ACCT_NAME)) AS ACCT_NAME
         FROM ETR_ENTRUST_DETAIL EED
         left join
         (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)

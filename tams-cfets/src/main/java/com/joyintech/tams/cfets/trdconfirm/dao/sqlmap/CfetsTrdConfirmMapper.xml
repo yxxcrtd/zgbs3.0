@@ -84,7 +84,7 @@
         left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = fp.FINPROD_ID
         inner join
         (
-        select regdeal.totle_trade_id,wm_concat(regdeal.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName
+        select regdeal.totle_trade_id,to_char(wm_concat(regdeal.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName
         from reg_fin_product_deal regdeal
         left join ptl_portfolio pp
         on regdeal.portfolio_id=pp.portfolio_id
@@ -449,7 +449,7 @@
         on ib.finprod_id=fp.finprod_id
         left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = fp.FINPROD_ID
         inner join(
-        select ir.quote_id,wm_concat(ir.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName
+        select ir.quote_id,to_char(wm_concat(ir.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName
         from ibu_quote_etr_re ir
         left join ptl_portfolio pp
         on ir.portfolio_id=pp.portfolio_id
@@ -576,7 +576,7 @@
         )icpledge
         on  ic.quote_id=icpledge.quote_id
         inner join(
-        select ir.quote_id,wm_concat(ir.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName
+        select ir.quote_id,to_char(wm_concat(ir.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName
         from ibu_quote_etr_re ir
         left join ptl_portfolio pp
         on ir.portfolio_id=pp.portfolio_id

@@ -185,12 +185,12 @@ select TT.* from (
 				AND cct.TRADE_PLACE = '01'
 				AND T1.PORTFOLIO_ID = cct.PORTFOLIO_ID
 		LEFT JOIN ( SELECT  EED.ENTRUST_ID,
-							wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID,
-							wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
-							wm_concat ( EED.SEC_ACCT_ID ) AS SEC_ACCT_ID,
-							wm_concat ( ssai.SEC_ACCT_NAME ) AS SEC_ACCT_NAME,
-							wm_concat ( sci.ACCT_NO ) AS ACCT_NO,
-							wm_concat ( sci.ACCT_NAME ) AS ACCT_NAME
+		to_char(wm_concat ( FP.PORTFOLIO_ID )) AS PORTFOLIO_ID,
+		to_char(wm_concat ( FP.PORTFOLIO_NAME )) AS PORTFOLIO_NAME,
+		to_char(wm_concat ( EED.SEC_ACCT_ID )) AS SEC_ACCT_ID,
+		to_char(wm_concat ( ssai.SEC_ACCT_NAME )) AS SEC_ACCT_NAME,
+		to_char(wm_concat ( sci.ACCT_NO )) AS ACCT_NO,
+		to_char(wm_concat ( sci.ACCT_NAME )) AS ACCT_NAME
 					FROM ETR_ENTRUST_DETAIL EED
 					LEFT JOIN ( SELECT PORTFOLIO_ID, PORTFOLIO_NAME FROM PTL_PORTFOLIO ORDER BY PORTFOLIO_ID, PORTFOLIO_NAME ) FP ON EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
 					LEFT JOIN STL_SEC_ACCT_INFO ssai ON EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
@@ -365,12 +365,12 @@ select TT.* from (
 		AND cct.TRADE_PLACE = '01'
 		AND T1.PORTFOLIO_ID = cct.PORTFOLIO_ID
 		LEFT JOIN (SELECT EED.ENTRUST_ID,
-						  wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID,
-						  wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
-						  wm_concat ( EED.SEC_ACCT_ID ) AS SEC_ACCT_ID,
-						  wm_concat ( ssai.SEC_ACCT_NAME ) AS SEC_ACCT_NAME,
-						  wm_concat ( sci.ACCT_NO ) AS ACCT_NO,
-						  wm_concat ( sci.ACCT_NAME ) AS ACCT_NAME
+		to_char(wm_concat ( FP.PORTFOLIO_ID )) AS PORTFOLIO_ID,
+		to_char(wm_concat ( FP.PORTFOLIO_NAME )) AS PORTFOLIO_NAME,
+		to_char(wm_concat ( EED.SEC_ACCT_ID )) AS SEC_ACCT_ID,
+		to_char(wm_concat ( ssai.SEC_ACCT_NAME )) AS SEC_ACCT_NAME,
+		to_char(wm_concat ( sci.ACCT_NO )) AS ACCT_NO,
+		to_char(wm_concat ( sci.ACCT_NAME )) AS ACCT_NAME
 					FROM
 					WFL_ETR_ENTRUST_DETAIL EED
 					LEFT JOIN ( SELECT PORTFOLIO_ID, PORTFOLIO_NAME FROM PTL_PORTFOLIO ORDER BY PORTFOLIO_ID, PORTFOLIO_NAME ) FP ON EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
@@ -569,12 +569,12 @@ select TT.* from (
 		LEFT JOIN (
 			SELECT
 				EED.ENTRUST_ID,
-				wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID,
-				wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
-				wm_concat ( EED.SEC_ACCT_ID ) AS SEC_ACCT_ID,
-				wm_concat ( ssai.SEC_ACCT_NAME ) AS SEC_ACCT_NAME,
-				wm_concat ( sci.ACCT_NO ) AS ACCT_NO,
-				wm_concat ( sci.ACCT_NAME ) AS ACCT_NAME
+		to_char(wm_concat ( FP.PORTFOLIO_ID )) AS PORTFOLIO_ID,
+		to_char(wm_concat ( FP.PORTFOLIO_NAME )) AS PORTFOLIO_NAME,
+		to_char(wm_concat ( EED.SEC_ACCT_ID )) AS SEC_ACCT_ID,
+		to_char(wm_concat ( ssai.SEC_ACCT_NAME )) AS SEC_ACCT_NAME,
+		to_char(wm_concat ( sci.ACCT_NO )) AS ACCT_NO,
+		to_char(wm_concat ( sci.ACCT_NAME )) AS ACCT_NAME
 			FROM
 				ETR_ENTRUST_DETAIL EED
 				LEFT JOIN ( SELECT PORTFOLIO_ID, PORTFOLIO_NAME FROM PTL_PORTFOLIO ORDER BY PORTFOLIO_ID, PORTFOLIO_NAME ) FP ON EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
@@ -736,12 +736,12 @@ select TT.* from (
 		AND T1.PORTFOLIO_ID = cct.PORTFOLIO_ID
         LEFT JOIN FIN_PRODUCT T6 ON T1.FINPROD_ID = T6.FINPROD_MARKET_ID
 		LEFT JOIN ( SELECT  EED.ENTRUST_ID,
-							wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID,
-							wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
-							wm_concat ( EED.SEC_ACCT_ID ) AS SEC_ACCT_ID,
-							wm_concat ( ssai.SEC_ACCT_NAME ) AS SEC_ACCT_NAME,
-							wm_concat ( sci.ACCT_NO ) AS ACCT_NO,
-							wm_concat ( sci.ACCT_NAME ) AS ACCT_NAME
+		to_char(wm_concat ( FP.PORTFOLIO_ID )) AS PORTFOLIO_ID,
+		to_char(wm_concat ( FP.PORTFOLIO_NAME )) AS PORTFOLIO_NAME,
+		to_char(wm_concat ( EED.SEC_ACCT_ID )) AS SEC_ACCT_ID,
+		to_char(wm_concat ( ssai.SEC_ACCT_NAME )) AS SEC_ACCT_NAME,
+		to_char(wm_concat ( sci.ACCT_NO )) AS ACCT_NO,
+		to_char(wm_concat ( sci.ACCT_NAME )) AS ACCT_NAME
 					  FROM  WFL_ETR_ENTRUST_DETAIL EED
 					  LEFT JOIN ( SELECT PORTFOLIO_ID, PORTFOLIO_NAME FROM PTL_PORTFOLIO ORDER BY PORTFOLIO_ID, PORTFOLIO_NAME ) FP ON EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
 					  LEFT JOIN STL_SEC_ACCT_INFO ssai ON EED.SEC_ACCT_ID = ssai.SEC_ACCT_ID
@@ -985,8 +985,8 @@ select TT.* from (
 				EE.PRICE*100 price,/*回购利率*/
 				EE.ENTRUST_AMT/10000 entrustAmt,/*交易金额*/
 				MCP.COUNTER_NAME counterName,/*交易对手*/
-				(SELECT WM_CONCAT(FP1.FINPROD_MARKET_ID) FROM ETR_PLEDGE EP LEFT JOIN FIN_PRODUCT FP1 ON EP.FINPROD_ID = FP1.FINPROD_ID WHERE EE.ENTRUST_ID = EP.ENTRUST_ID) repSecId,/*质押券*/
-				(SELECT WM_CONCAT(EP.PLEDGE_RATIO*100) FROM ETR_PLEDGE EP WHERE EE.ENTRUST_ID = EP.ENTRUST_ID) conRatio,/*折算比列*/
+				(SELECT to_char(WM_CONCAT(FP1.FINPROD_MARKET_ID)) FROM ETR_PLEDGE EP LEFT JOIN FIN_PRODUCT FP1 ON EP.FINPROD_ID = FP1.FINPROD_ID WHERE EE.ENTRUST_ID = EP.ENTRUST_ID) repSecId,/*质押券*/
+				(SELECT to_char(WM_CONCAT(EP.PLEDGE_RATIO*100)) FROM ETR_PLEDGE EP WHERE EE.ENTRUST_ID = EP.ENTRUST_ID) conRatio,/*折算比列*/
 				EE.REMARK remark, /*备注*/
 				SWBN1.OPINIONS jbyj,/*经办意见*/
 				CASE WHEN SWBN1.CREATE_TIME IS NOT NULL THEN TO_CHAR(SWBN1.CREATE_TIME,'yyyy"年"MM"月"dd"日"') ELSE '  年  月  日' END jbrq,/*经办审批日期*/

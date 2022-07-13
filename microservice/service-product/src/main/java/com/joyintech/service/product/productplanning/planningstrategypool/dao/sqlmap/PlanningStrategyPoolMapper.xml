@@ -59,7 +59,7 @@
     			'' strategyId,
     			'' useStatus,
     			'' strategyName,
-    			wm_concat(DISTINCT detClass.TYPE_2) type2,
+		to_char(wm_concat(DISTINCT detClass.TYPE_2)) type2,
     			inv.STRATEGY_ID||',1,'||detClass.BATCH_ID assetTypeId,
     			#{parentId} pAssetTypeId,
     			'1' fiterFlag,
@@ -109,7 +109,7 @@
 		SELECT inv.USE_STATUS useStatus,
 		      inv.STRATEGY_ID strategyId,
 			  inv.STRATEGY_NAME strategyName,
-			  wm_concat(DISTINCT detClass.TYPE_2) type2,
+		to_char(wm_concat(DISTINCT detClass.TYPE_2)) type2,
 			  detClass.BATCH_ID batchId,
 			  det.RATIO*100 ratio
 			FROM PTL_INV_STRATEGY inv

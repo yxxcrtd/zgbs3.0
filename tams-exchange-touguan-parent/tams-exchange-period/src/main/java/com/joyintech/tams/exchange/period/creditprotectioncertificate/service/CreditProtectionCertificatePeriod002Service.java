@@ -370,10 +370,10 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             wflStlPayOrders.setWorkflowId(entity.getWorkflowId());
             wflStlPayOrdersMapper.insertSelective(wflStlPayOrders);
             //组合交易表
-            if (baseBussinessDto1.getPtlTrade() != null) {
+            /*if (baseBussinessDto1.getPtlTrade() != null) {
                 PtlTrade ptlTrade = baseBussinessDto1.getPtlTrade();
                 ptlTradeMapper.insertSelective(ptlTrade);
-            }
+            }*/
         }
     }
 

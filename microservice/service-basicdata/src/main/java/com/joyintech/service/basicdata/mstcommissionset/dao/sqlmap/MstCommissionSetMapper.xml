@@ -50,7 +50,7 @@
 			select n.BATCH_SEQ,
 			<!-- wm_concat(DISTINCT n.sec_acct_id)as secAcctId  -->
 			regexp_replace(LISTAGG( n.customer_id, ',') WITHIN GROUP (order by (n.customer_id)) ,'([^,]+)(,\1)*(,|$)','\1\3') customerId ,
-			wm_concat(DISTINCT n1.customer_name)as secAcctName from TRD_FEE_CONFIG n
+		to_char(wm_concat(DISTINCT n1.customer_name))as secAcctName from TRD_FEE_CONFIG n
 			left join mst_customer_info n1 on n.customer_id=n1.customer_id where n.FEE_TYPE  IN('B01','B02','B03','B04','B05','B06','B07') GROUP BY n.BATCH_SEQ,TRADE_MARKET ,FEE_TYPE,TRADE_TYPE,CHARGE_TYPE,EFF_DATE
 			) t1 on m.BATCH_SEQ=t1.BATCH_SEQ
 			INNER JOIN (
