@@ -240,7 +240,7 @@ public class TerminalClientTest {
         logger.info("----------- 账户登录接口测试 ----------");
         ITradeRequest tradeRequest = SpringContextUtils.getBean(agentType);
         // 账号登录及初始化
-        ServerExtendInfo serverExtendInfo = JsonUtils.getObjectFromJson(accountConfig.getServerInfo(), ServerExtendInfo.class);
+        ServerExtendInfo serverExtendInfo = JsonUtils.getObjectFromJson(accountConfig.getServerinfo(), ServerExtendInfo.class);
         tradeRequest.init(terminalAgentTest, serverExtendInfo, terminalAgentTest);
         List<Account> accountList = JsonUtils.getObjectListFromJson(accountConfig.getAccounts(), Account.class);
         if (AgentType.KD_GATEWAY.value.equals(agentType))

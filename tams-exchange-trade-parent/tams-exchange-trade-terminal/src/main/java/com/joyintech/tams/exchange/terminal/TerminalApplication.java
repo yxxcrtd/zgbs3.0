@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.terminal;
 
+import com.joyintech.framework.JoyinApplication;
 import org.activiti.spring.boot.SecurityAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,10 +11,10 @@ import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
 //@EnableEurekaClient
-@EnableDiscoveryClient(autoRegister = true)
+//@EnableDiscoveryClient(autoRegister = true)
 public class TerminalApplication {
     public static void main(String[] args) {
-        SpringApplication.run(TerminalApplication.class, args);
+        JoyinApplication.run(TerminalApplication.class, args);
     }
 
     @Bean

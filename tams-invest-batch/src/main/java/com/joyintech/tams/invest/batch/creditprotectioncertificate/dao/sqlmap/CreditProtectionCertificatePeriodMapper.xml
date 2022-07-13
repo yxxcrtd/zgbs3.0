@@ -96,4 +96,117 @@
                  LEFT JOIN TRD_PRODUCT_DEAL_ADD A ON A.TRADE_ID = T.TRADE_ID
         WHERE TOTLE_TRADE_ID = #{busiCode}
     </select>
+
+    <select id="getEntityByBusinessCode"
+            resultType="com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodSaveDto">
+        select fp.FINPROD_MARKET_ID            finprodMarketId,
+               fp.FINPROD_NAME                 finprodMarketName,
+               fp.VDATE                        vDate,
+               fp.MDATE                        mDate,
+               fpd.REF_ENTITY                  refEntity,
+               mci.CUSTOMER_NAME               refEntityStr,
+               tfpdl.TG_BUSI_TYPE              creditEvent,
+               tfpdl.TG_BUSI_TYPE              paBussType,
+               TDTA.CREDIT_EVENT_HAPPENED_DATE creditEventHappenedDate,
+               TDTA.CREDIT_EVENT_RESOLVE_DATE  creditEventResolveDate,
+               tfpdl.M_DELIVERY_TYPE           settleMethod,
+               TDTA.DELIVER_BOND               deliverBond,
+               tfpdl.TRADE_DATE                deliverDate,
+               tfpdl.TRADE_DATE                tradeDate,
+               tfpdl.TOTLE_TRADE_ID            busiCode,
+               fp.TRADE_MARKET                 tradeMarket
+        from TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
+                 left join TRD_DEAL_TOTAL_ADD TDTA ON tfpdl.TOTLE_TRADE_ID = TDTA.TOTLE_TRADE_ID
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
+                 left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
+                 left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fpd.REF_ENTITY
+        where tfpdl.TOTLE_TRADE_ID = #{businessCode,jdbcType=VARCHAR}
+        union all
+        select fp.FINPROD_MARKET_ID            finprodMarketId,
+               fp.FINPROD_NAME                 finprodMarketName,
+               fp.VDATE                        vDate,
+               fp.MDATE                        mDate,
+               fpd.REF_ENTITY                  refEntity,
+               mci.CUSTOMER_NAME               refEntityStr,
+               tfpdl.TG_BUSI_TYPE              creditEvent,
+               tfpdl.TG_BUSI_TYPE              paBussType,
+               TDTA.CREDIT_EVENT_HAPPENED_DATE creditEventHappenedDate,
+               TDTA.CREDIT_EVENT_RESOLVE_DATE  creditEventResolveDate,
+               tfpdl.M_DELIVERY_TYPE           settleMethod,
+               TDTA.DELIVER_BOND               deliverBond,
+               tfpdl.TRADE_DATE                deliverDate,
+               tfpdl.TRADE_DATE                tradeDate,
+               tfpdl.TOTLE_TRADE_ID            busiCode,
+               fp.TRADE_MARKET                 tradeMarket
+        from WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tfpdl
+                 left join WFL_TRD_DEAL_TOTAL_ADD TDTA ON tfpdl.TOTLE_TRADE_ID = TDTA.TOTLE_TRADE_ID
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
+                 left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
+                 left join MST_CUSTOMER_INFO mci on mci.CUSTOMER_ID = fpd.REF_ENTITY
+        where tfpdl.TOTLE_TRADE_ID = #{businessCode,jdbcType=VARCHAR}
+    </select>
+    <select id="getBillingDetailByBusinessCode"
+            resultType="com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.BillingDetailsDto">
+        select tfpdl.TOTLE_TRADE_ID        busiCode,
+               TPDA.PORTFOLIO_ID           portfolioId,
+               pp.PORTFOLIO_NAME           portfolioName,
+               sci.BUSI_ACCT_NO            acctNo,
+               tfpdl.SEC_MANAGE_ACCT_ID    secManageAcctId,
+               nvl(tfpdl.SHARE_AMT, 0)     repNomCapi,
+               nvl(T.SHARE_AMT, 0)         deliverBondAmount,
+               DECODE(TG.M_DELIVERY_TYPE, '02', nvl(tfpdl.TRADE_AMT, 0),
+                      NVL(T.TRADE_AMT, 0)) deliveryAmount,
+               tfpdl.REMARK                remark
+        from TRD_PRODUCT_DEAL tfpdl
+                 left join TRD_FIN_PRODUCT_DEAL_TOTAL TG ON TG.TOTLE_TRADE_ID = tfpdl.TOTLE_TRADE_ID
+                 LEFT JOIN TRD_PRODUCT_DEAL_ADD TPDA ON TPDA.TRADE_ID = tfpdl.TRADE_ID
+                 LEFT JOIN (SELECT T1.TOTLE_TRADE_ID,
+                                   T1.FINPROD_ID,
+                                   T1.SHARE_AMT,
+                                   T1.TRADE_AMT,
+                                   T1.SEC_MANAGE_ACCT_ID,
+                                   T2.PORTFOLIO_ID
+                            FROM TRD_PRODUCT_DEAL T1
+                                     LEFT JOIN TRD_PRODUCT_DEAL_ADD T2 ON T1.TRADE_ID = T2.TRADE_ID
+                            WHERE T1.FINPROD_TYPE2 = 'F01') T ON T.TOTLE_TRADE_ID = tfpdl.TOTLE_TRADE_ID
+            AND TFPDL.SEC_MANAGE_ACCT_ID = T.SEC_MANAGE_ACCT_ID AND TPDA.PORTFOLIO_ID = T.PORTFOLIO_ID
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
+                 left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
+                 left join PTL_PORTFOLIO pp on TPDA.PORTFOLIO_ID = pp.PORTFOLIO_ID
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = tfpdl.SEC_MANAGE_ACCT_ID
+                 left join STL_CAPACCT_INFO sci on ssai.TRD_ACCT_ID = sci.ACCT_NO
+        where tfpdl.TOTLE_TRADE_ID = #{businessCode,jdbcType=VARCHAR}
+          and tfpdl.FINPROD_TYPE2 = 'F37'
+        union all
+        select tfpdl.TOTLE_TRADE_ID        busiCode,
+               TPDA.PORTFOLIO_ID           portfolioId,
+               pp.PORTFOLIO_NAME           portfolioName,
+               sci.BUSI_ACCT_NO            acctNo,
+               tfpdl.SEC_MANAGE_ACCT_ID    secManageAcctId,
+               nvl(tfpdl.SHARE_AMT, 0)     repNomCapi,
+               nvl(T.SHARE_AMT, 0)         deliverBondAmount,
+               DECODE(TG.M_DELIVERY_TYPE, '02', nvl(tfpdl.TRADE_AMT, 0),
+                      NVL(T.TRADE_AMT, 0)) deliveryAmount,
+               tfpdl.REMARK                remark
+        from WFL_TRD_PRODUCT_DEAL tfpdl
+                 left join WFL_TRD_FIN_PRODUCT_DEAL_TOTAL TG ON TG.TOTLE_TRADE_ID = tfpdl.TOTLE_TRADE_ID
+                 LEFT JOIN WFL_TRD_PRODUCT_DEAL_ADD TPDA ON TPDA.TRADE_ID = tfpdl.TRADE_ID
+                 LEFT JOIN (SELECT T1.TOTLE_TRADE_ID,
+                                   T1.FINPROD_ID,
+                                   T1.SHARE_AMT,
+                                   T1.TRADE_AMT,
+                                   T1.SEC_MANAGE_ACCT_ID,
+                                   T2.PORTFOLIO_ID
+                            FROM WFL_TRD_PRODUCT_DEAL T1
+                                     LEFT JOIN WFL_TRD_PRODUCT_DEAL_ADD T2 ON T1.TRADE_ID = T2.TRADE_ID
+                            WHERE T1.FINPROD_TYPE2 = 'F01') T ON T.TOTLE_TRADE_ID = tfpdl.TOTLE_TRADE_ID
+            AND TFPDL.SEC_MANAGE_ACCT_ID = T.SEC_MANAGE_ACCT_ID AND TPDA.PORTFOLIO_ID = T.PORTFOLIO_ID
+                 left join FIN_PRODUCT fp on fp.FINPROD_ID = tfpdl.FINPROD_ID
+                 left join FIN_PRODUCT_ADD fpd on fpd.FINPROD_ID = tfpdl.FINPROD_ID
+                 left join PTL_PORTFOLIO pp on TPDA.PORTFOLIO_ID = pp.PORTFOLIO_ID
+                 left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = tfpdl.SEC_MANAGE_ACCT_ID
+                 left join STL_CAPACCT_INFO sci on ssai.TRD_ACCT_ID = sci.ACCT_NO
+        where tfpdl.TOTLE_TRADE_ID = #{businessCode,jdbcType=VARCHAR}
+          and tfpdl.FINPROD_TYPE2 = 'F37'
+    </select>
 </mapper>

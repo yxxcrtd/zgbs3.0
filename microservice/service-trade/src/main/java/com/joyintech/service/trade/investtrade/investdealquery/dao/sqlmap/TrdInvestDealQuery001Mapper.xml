@@ -423,7 +423,7 @@
 
 		WITH WFL_TEMP AS(
 			(
-				SELECT tpd.TRADE_ID TRADE_ID,fpt.TYPE_6 TYPE_6,null as PURCH_MODLE
+				SELECT tpd.TRADE_ID TRADE_ID,fpt.TYPE_6 TYPE_6
 		        FROM WFL_TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
 		        WHERE
 				(
@@ -457,7 +457,7 @@
 			)
 			UNION ALL
 			(
-				SELECT tpd.TOTLE_TRADE_ID TRADE_ID,fpt.TYPE_6 TYPE_6,tdta.PURCH_MODLE PURCH_MODLE
+				SELECT tpd.TOTLE_TRADE_ID TRADE_ID,fpt.TYPE_6 TYPE_6
 		        FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
 		        left join WFL_TRD_DEAL_TOTAL_ADD tdta on tpd.TOTLE_TRADE_ID = tdta.TOTLE_TRADE_ID
 		        WHERE
@@ -475,8 +475,10 @@
 				or (
 					<!-- 交易所-->
 					tpd.TRADE_MARKET in ('03','04') and (
-					<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
+					<!--            债券: 买入、卖出、回售、申购确认、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T05','T97'))
+					<!--            债券: 网上申购-->
+					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS = 'T04' and tdta.PURCH_MODLE = '01')
 					<!--            质押式回购: 正回购、逆回购-->
 					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
 					<!--            一级市场债: 买入-->
@@ -704,7 +706,7 @@
 		<where>
             <!--排除新UI业务 -->
             NOT EXISTS (
-				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = WFL_TEMP.TRADE_ID and WFL_TEMP.PURCH_MODLE='01'
+				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = WFL_TEMP.TRADE_ID
             )
 
 			<if test="portfolioId != null and !portfolioId.isEmpty() ">
@@ -1219,7 +1221,7 @@
 
 		WITH VALID_TEMP AS(
 			(
-				 SELECT tpd.TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6,null as PURCH_MODLE
+				 SELECT tpd.TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
 				 FROM TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
 				 WHERE
 				 (
@@ -1253,7 +1255,7 @@
 		    )
 		    UNION ALL
 			(
-		        SELECT tpd.TOTLE_TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6,tdta.PURCH_MODLE PURCH_MODLE
+		        SELECT tpd.TOTLE_TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
 		        FROM TRD_FIN_PRODUCT_DEAL_TOTAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
 		        left join TRD_DEAL_TOTAL_ADD tdta on tpd.TOTLE_TRADE_ID = tdta.TOTLE_TRADE_ID
 		        WHERE
@@ -1271,8 +1273,10 @@
 				or (
 					<!-- 交易所-->
 					tpd.TRADE_MARKET in ('03','04') and (
-					<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
+					<!--            债券: 买入、卖出、回售、申购确认、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T05','T97'))
+					<!--            债券: 网上申购-->
+					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS ='T04' and tdta.PURCH_MODLE = '01')
 					<!--            质押式回购: 正回购、逆回购-->
 					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
 					<!--            一级市场债: 买入-->
@@ -1496,7 +1500,7 @@
 
 			<!--排除新UI业务 -->
 			AND NOT EXISTS (
-				SELECT 1 FROM VALID_TEMP WHERE TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = VALID_TEMP.TRADE_ID and VALID_TEMP.PURCH_MODLE = '01'
+				SELECT 1 FROM VALID_TEMP WHERE TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = VALID_TEMP.TRADE_ID
 			)
 
 			<if test="etridList != null and !etridList.isEmpty() ">
@@ -1998,7 +2002,7 @@
 <!--		</if>-->
 		WITH VALID_TEMP AS(
 			(
-				SELECT tpd.TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6,null as PURCH_MODLE
+				SELECT tpd.TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
 				FROM TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
 				WHERE
 				(
@@ -2016,7 +2020,7 @@
 					<!-- 交易所-->
 					tpd.TRADE_MARKET in ('03','04') and (
 					<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T05','T97'))
 					<!--            质押式回购: 正回购、逆回购-->
 					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
 					<!--            一级市场债: 买入-->
@@ -2032,7 +2036,7 @@
 			)
 			UNION ALL
 			(
-				SELECT tpd.TOTLE_TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6,tdta.PURCH_MODLE PURCH_MODLE
+				SELECT tpd.TOTLE_TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
 				FROM TRD_FIN_PRODUCT_DEAL_TOTAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
 		        left join TRD_DEAL_TOTAL_ADD tdta on tpd.TOTLE_TRADE_ID = tdta.TOTLE_TRADE_ID
 				WHERE
@@ -2050,8 +2054,10 @@
 				or (
 					<!-- 交易所-->
 					tpd.TRADE_MARKET in ('03','04') and (
-					<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
+					<!--            债券: 买入、卖出、回售、申购确认、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T05','T97'))
+					<!--            债券: 网上申购-->
+		            or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS='T04' and tdta.PURCH_MODLE='01')
 					<!--            质押式回购: 正回购、逆回购-->
 					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
 					<!--            一级市场债: 买入-->
@@ -2266,7 +2272,7 @@
 
             <!--排除新UI业务 -->
 			AND NOT EXISTS (
-				SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID and VALID_TEMP.PURCH_MODLE='01'
+				SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
 			)
 
 			<if test="portfolioId != null and !portfolioId.isEmpty()">
@@ -2773,7 +2779,7 @@
 <!--		</if>-->
 		WITH WFL_TEMP AS(
 			(
-				SELECT tpd.TRADE_ID TRADE_ID,fpt.TYPE_6 TYPE_6,null as PURCH_MODLE
+				SELECT tpd.TRADE_ID TRADE_ID,fpt.TYPE_6 TYPE_6
 				FROM WFL_TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
 				WHERE
 				(
@@ -2807,7 +2813,7 @@
 			)
 			UNION ALL
 			(
-				SELECT tpd.TOTLE_TRADE_ID TRADE_ID,fpt.TYPE_6 TYPE_6,tdta.PURCH_MODLE
+				SELECT tpd.TOTLE_TRADE_ID TRADE_ID,fpt.TYPE_6 TYPE_6
 				FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
 				left join WFL_TRD_DEAL_TOTAL_ADD tdta on tpd.TOTLE_TRADE_ID = tdta.TOTLE_TRADE_ID
 				WHERE
@@ -2825,8 +2831,10 @@
 				or (
 					<!-- 交易所-->
 					tpd.TRADE_MARKET in ('03','04') and (
-					<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
+					<!--            债券: 买入、卖出、回售、申购确认、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T05','T97'))
+					<!--            债券: 网上申购-->
+					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS ='T04' and tdta.PURCH_MODLE = '01')
 					<!--            质押式回购: 正回购、逆回购-->
 					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
 					<!--            一级市场债: 买入-->
@@ -2843,7 +2851,7 @@
 		),
 		VALID_TEMP AS(
 			(
-				SELECT tpd.TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6,null as PURCH_MODLE
+				SELECT tpd.TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
 				FROM TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
 				WHERE
 				(
@@ -2877,7 +2885,7 @@
 			)
 			UNION ALL
 			(
-				SELECT tpd.TOTLE_TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6,tdta.PURCH_MODLE
+				SELECT tpd.TOTLE_TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
 				FROM TRD_FIN_PRODUCT_DEAL_TOTAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
 		        left join TRD_DEAL_TOTAL_ADD tdta on tpd.TOTLE_TRADE_ID = tdta.TOTLE_TRADE_ID
 				WHERE
@@ -2895,8 +2903,10 @@
 				or (
 				<!-- 交易所-->
 					tpd.TRADE_MARKET in ('03','04') and (
-					<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
+					<!--            债券: 买入、卖出、回售、申购确认、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T05','T97'))
+					<!--            债券: 网上申购-->
+					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS ='T04' and tdta.PURCH_MODLE = '01')
 					<!--            质押式回购: 正回购、逆回购-->
 					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
 					<!--            一级市场债: 买入-->
@@ -3523,7 +3533,7 @@
 
 			<!--排除新UI业务 -->
 			NOT EXISTS (
-				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = WFL_TEMP.TRADE_ID and WFL_TEMP.PURCH_MODLE='01'
+				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = WFL_TEMP.TRADE_ID
 			)
 
 			<if test="portfolioId != null and !portfolioId.isEmpty()">
@@ -3656,7 +3666,7 @@
 
 			<!--排除新UI业务 -->
 			AND NOT EXISTS (
-				SELECT 1 FROM VALID_TEMP WHERE TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = VALID_TEMP.TRADE_ID and VALID_TEMP.PURCH_MODLE='01'
+				SELECT 1 FROM VALID_TEMP WHERE TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = VALID_TEMP.TRADE_ID
 			)
 
 			<if test="portfolioId != null and !portfolioId.isEmpty()">
@@ -3807,7 +3817,7 @@
 
 			<!--排除新UI业务 -->
 			AND NOT EXISTS (
-				SELECT 1 FROM VALID_TEMP WHERE TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = VALID_TEMP.TRADE_ID and VALID_TEMP.PURCH_MODLE='01'
+				SELECT 1 FROM VALID_TEMP WHERE TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = VALID_TEMP.TRADE_ID
 			)
 
 			<if test="portfolioId != null and !portfolioId.isEmpty()">

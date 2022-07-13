@@ -13,6 +13,7 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.batch.creditprotectioncertificate.dao.CreditProtectionCertificatePeriodRunnerMapper;
 import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodExpireDataDto;
+import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodSaveDto;
 import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodWriterDto;
 import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.DateCalService;
 import com.joyintech.tams.invest.common.component.base.core.BaseGetBussinessId;
@@ -237,18 +238,23 @@ public class CreditProtectionCertificatePeriodRunnerService {
             sendNewPosition(writerDto);
             dealOldPosition(writerDto, nextWorkDate, false);
             //信用保护凭证到期风险调用共通处理
-            Map<String,Object> params = new HashMap<>();
-            params.put("totleTradeId",businessCode);
+            CreditProtectionCertificatePeriodSaveDto dto = getEntityByBusinessCode(businessCode);
             String url = String.format("/interf/risk/riskTrial/doOccupy/exchangeTrd/%s/%s/%s", "CreditProtectionCertificatePeriod002", 系统动作_新建.getValue(), 流程节点_审批生效.getValue());
             if (isSingle) {
-                simpleRestTemplate.postForObject(tamsServer + url, params, AjaxResult.class);
+                simpleRestTemplate.postForObject(tamsServer + url, dto, AjaxResult.class);
             } else {
-                restTemplate.postForObject(tamsServer + url, params, AjaxResult.class);
+                restTemplate.postForObject(tamsServer + url, dto, AjaxResult.class);
             }
         } catch (Exception e) {
             logger.error("信用保护凭证自动生成错误", e);
             throw new BatchException(RiskUtil.getLogString(e));
         }
+    }
+
+    private CreditProtectionCertificatePeriodSaveDto getEntityByBusinessCode(String businessCode) {
+        CreditProtectionCertificatePeriodSaveDto entity = creditProtectionCertificatePeriodRunnerMapper.getEntityByBusinessCode(businessCode);
+        entity.setBillingDetails(creditProtectionCertificatePeriodRunnerMapper.getBillingDetailByBusinessCode(businessCode));
+        return entity;
     }
 
     private String generateBusinessCode() {

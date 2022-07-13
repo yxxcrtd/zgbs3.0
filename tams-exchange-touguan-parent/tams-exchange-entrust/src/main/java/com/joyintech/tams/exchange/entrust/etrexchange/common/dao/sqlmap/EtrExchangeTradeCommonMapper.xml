@@ -1930,7 +1930,6 @@
     <select id="selectAllBusModels" parameterType="Map" resultType="com.joyintech.tams.business.common.pojo.BaseMap">
         SELECT DISTINCT
                 BUSINESS_MODEL AS businessModel,
-                PORTFOLIO_ID portfolioId,
                 FINPROD_ID finprodId
         FROM
         (
@@ -1946,7 +1945,8 @@
                                 ROW_NUMBER ( ) OVER ( PARTITION BY a.TRADE_ID ORDER BY a.TRADE_DATE DESC ) rn
                         FROM TRD_PRODUCT_DEAL a
                         LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID = b.TRADE_ID
-                        WHERE 1 = 1  AND a.TRADE_DATE <![CDATA[<=]]> to_date( #{ cdate, jdbcType = VARCHAR }, 'yyyy-MM-dd' )
+                        WHERE a.FINPROD_ID =#{ finprodId,jdbcType = VARCHAR }
+                            AND a.TRADE_DATE <![CDATA[<=]]> to_date( #{ cdate, jdbcType = VARCHAR }, 'yyyy-MM-dd' )
                         )
                 WHERE rn = 1
                 UNION ALL
@@ -1963,12 +1963,12 @@
                             ROW_NUMBER ( ) OVER ( PARTITION BY a.TRADE_ID ORDER BY a.TRADE_DATE DESC ) rn
                         FROM TRD_PRODUCT_TEMP_DEAL a
                         LEFT JOIN TRD_PRODUCT_TEMP_DEAL_ADD b ON a.TRADE_ID = b.TRADE_ID
-                        WHERE 1 = 1 AND a.TRADE_DATE = to_date( #{ cdate, jdbcType = VARCHAR }, 'yyyy-MM-dd' )
+                        WHERE a.FINPROD_ID =#{ finprodId,jdbcType = VARCHAR }
+                        AND a.TRADE_DATE = to_date( #{ cdate, jdbcType = VARCHAR }, 'yyyy-MM-dd' )
                     )
                 WHERE rn = 1
-                ) TMP
+         ) TMP
         WHERE TMP.BUSINESS_MODEL  is not  null
-          AND TMP.FINPROD_ID =#{ finprodId,jdbcType = VARCHAR }
           AND TMP.PORTFOLIO_ID in
           <foreach collection="portfolioIds" item="item" open="(" separator="," close=")">
               #{ item }

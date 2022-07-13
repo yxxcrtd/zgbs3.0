@@ -105,7 +105,6 @@
         <result column="INV_MANAGER_ID" property="invManagerId" jdbcType="VARCHAR"/>
         <result column="PS" property="ps" jdbcType="VARCHAR"/>
         <result column="BUSI_TYPE_TG" property="busiTypeTg" jdbcType="VARCHAR"/>
-        <result column="BUSI_TYPE_TG_STR" property="busiTypeTgStr" jdbcType="VARCHAR"/>
         <result column="EXTEND1" property="extend1" jdbcType="VARCHAR"/>
         <result column="EXTEND2" property="extend2" jdbcType="VARCHAR"/>
         <result column="ENTRUST_CLASS" property="entrustClass" jdbcType="VARCHAR"/>
@@ -256,7 +255,6 @@
         a.REPORT_NO, a.CREATE_TIME, a.UPDATE_TIME, a.OFFSET_FLAG, a.HEDGE_FLAG, a.PORTFOLIO_ID, a.FULL_PRICE,
         a.ENTRUST_BS,a.PORTFOLIO_NAME,a.SEC_ACCT_ID,a.SEC_ACCT_NAME, a.TRADE_PLAT,a.FINPROD_TYPE2,a.INV_MANAGER_ID,a.PS,
         a.BUSI_TYPE_TG,a.EXTEND1,a.EXTEND2, a.ENTRUST_CLASS,a.IS_FULL_PRICE,a.NET_PRICE,a.NET_BALANCE,
-        a.BUSI_TYPE_TG    BUSI_TYPE_TG_STR,
         a.COUNTER_ID,a.COUNTER_NAME,a.PROP_ACCT_NO,a.PROP_ACCT_NAME,
 		CASE
 		   WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
@@ -387,8 +385,7 @@
         order by CREATE_TIME desc
     </select>-->
 
-    <select id="selectTradeByPage" resultMap="QueryResultMap"
-            parameterType="com.joyintech.tams.exchange.common.bean.TradeQryBean">
+    <!--<select id="selectTradeByPage" resultMap="QueryResultMap" parameterType="com.joyintech.tams.exchange.common.bean.TradeQryBean">
         SELECT * FROM (
         SELECT
         <include refid="Query_Column_List"/>
@@ -404,6 +401,112 @@
         <include refid="queryCondition2"/>
         )
         ORDER BY CREATE_TIME DESC
+    </select>-->
+
+    <select id="selectTradeByPage" resultMap="QueryResultMap" parameterType="com.joyintech.tams.exchange.common.bean.TradeQryBean">
+	SELECT TE.*,
+           CASE WHEN TE.PS = 'T04' AND TE.BUSI_TYPE_TG = 'EX019' THEN '正常交收'
+                ELSE TE.DELIVERY_RESULT_TEMP
+           END DELIVERY_RESULT,
+           CASE WHEN TE.PS = 'T04' AND TE.BUSI_TYPE_TG = 'EX019' THEN 100 || ''
+                ELSE TE.DELIVERY_SCHEDULE_TEMP
+           END DELIVERY_SCHEDULE
+        FROM (
+		SELECT A.INSTRUCTION_ID,
+			   A.BROKER_ENTRUST_ID,
+			   A.BROKER_TRADE_ID,
+			   DET.PORTFOLIO_NAME,
+			   DECODE(SCI.ACCT_NAME, NULL, A.ACCOUNT_NAME, SCI.ACCT_NAME)   ACCOUNT_NAME,
+               A.MARKET,
+			   A.STOCK_CODE,
+			   A.STOCK_NAME,
+			   A.BUSI_TYPE_TG,
+			   A.PS,
+			   A.TRADED_VOLUME,
+			   A.TRADED_PRICE,
+			   A.TRADED_BALANCE,
+			   A.CREATE_TIME,
+			   CASE
+				 WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
+				 WHEN STD.DELIVERY_RESULT = '01'  THEN '正常交收'
+				 WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'  
+				 WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败' 
+				 WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收' 
+			   END                                                   DELIVERY_RESULT_TEMP,
+			   CASE
+				 WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
+				 WHEN STD.DELIVERY_RESULT = '04' THEN  '0'
+				 ELSE STD.SHARE_AMT / A.TRADED_VOLUME * 100 || ''
+			   END                                                   DELIVERY_SCHEDULE_TEMP
+		  FROM T_TRADE A
+		  LEFT JOIN SETTLE_TRANS_DATA STD
+				 ON A.BROKER_TRADE_ID = STD.CJBH
+				AND A.SEC_ACCT_ID = STD.SEC_ACCT_ID
+				AND A.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD')
+				AND STD.DELIVERY_RESULT IN ('01', '02', '03')
+				AND ( (STD.PS = 'T56' AND STD.TRADE_MARKET = '03' AND STD.BUSI_SCENE_CALSS NOT IN ('0902RB02', '0902RS03'))
+					  OR (STD.PS = 'T56' AND STD.TRADE_MARKET = '04') OR (STD.PS != 'T56') )
+		  LEFT JOIN STL_CAPACCT_INFO SCI ON A.FINANCE_ACCOUNT = SCI.ACCT_NO
+		  LEFT JOIN (SELECT EED.ENTRUST_ID,
+							wm_concat(PP.PORTFOLIO_ID) AS PORTFOLIO_ID,
+							wm_concat(PP.PORTFOLIO_NAME) AS PORTFOLIO_NAME
+					   FROM ETR_ENTRUST_DETAIL EED, PTL_PORTFOLIO PP
+					  WHERE EED.PORTFOLIO_ID = PP.PORTFOLIO_ID
+					  GROUP BY EED.ENTRUST_ID) DET ON DET.ENTRUST_ID = A.INSTRUCTION_ID
+           WHERE A.TRADE_TYPE = 0
+
+		UNION
+
+		SELECT DET.ENTRUST_ID             INSTRUCTION_ID,
+			   std1.APPLY_TRADE_ID        BROKER_ENTRUST_ID,
+			   std1.CJBH                  BROKER_TRADE_ID,
+			   DET.PORTFOLIO_NAME,
+			   SCI.ACCT_NAME			  ACCOUNT_NAME,
+			   CASE WHEN std1.TRADE_MARKET = '03' THEN 'SH'
+					WHEN std1.TRADE_MARKET = '04' THEN 'SZ'
+					ELSE NULL
+			   END                        MARKET,
+			   fp.FINPROD_MARKET_ID       STOCK_CODE,
+			   fp.FINPROD_ABBR            STOCK_NAME,
+			   std1.BUSI_TYPE			  BUSI_TYPE_TG,
+			   std1.PS                    PS,
+			   std1.SHARE_AMT             TRADED_VOLUME,
+			   std1.CPRICE_AMT            TRADED_PRICE,
+			   std1.FPRICE_AMT            TRADED_BALANCE,
+			   <!-- TO_CHAR(std1.TRADE_DATE, 'YYYY-MM-DD')  TRADING_DAY, -->
+			   <!-- TO_CHAR(std1.CREATE_TIME, 'HH24:Mi:ss') TRADE_TIME,  -->
+			   std1.CREATE_TIME                        CREATE_TIME,
+			   CASE
+				 WHEN std1.DELIVERY_RESULT = '05' AND std2.DELIVERY_RESULT IS NULL THEN '04'
+				 WHEN std1.DELIVERY_RESULT = '05' AND std2.DELIVERY_RESULT IS NOT NULL THEN std2.DELIVERY_RESULT
+				 ELSE std1.DELIVERY_RESULT
+			   END                         DELIVERY_RESULT_TEMP,
+			   CASE WHEN std1.DELIVERY_RESULT != '05' THEN '100'
+					ELSE std2.SHARE_AMT / std1.SHARE_AMT * 100 || ''
+			   END                         DELIVERY_SCHEDULE_TEMP
+		  FROM SETTLE_TRANS_DATA std1
+		  LEFT JOIN SETTLE_TRANS_DATA std2
+				 ON std1.APPLY_TRADE_ID = std2.APPLY_TRADE_ID
+				AND std1.CJBH = std2.CJBH
+				AND std1.SEC_ACCT_ID = std2.SEC_ACCT_ID
+				AND std1.SEAT_NUMBER = std2.SEAT_NUMBER
+				AND std1.SETTLE_DATE = std2.SETTLE_DATE
+		  LEFT JOIN FIN_PRODUCT fp ON std1.FINPROD_ID = fp.FINPROD_ID
+		  LEFT JOIN SETTLE_TRANS_TG_MAPPING sttm ON std1.TRADE_ID = sttm.TRADE_ID
+		  LEFT JOIN STL_CAPACCT_INFO SCI ON STD2.ACCT_NO = SCI.ACCT_NO
+		  LEFT JOIN (SELECT sttm.TRADE_ID,
+							wm_concat(PP.PORTFOLIO_ID) AS PORTFOLIO_ID,
+							wm_concat(PP.PORTFOLIO_NAME) AS PORTFOLIO_NAME,
+							wm_concat(tdta.ENTRUST_ID) AS ENTRUST_ID
+						FROM SETTLE_TRANS_TG_MAPPING sttm
+						  LEFT JOIN TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt ON sttm.TRADE_ID_TG = tfpdt.TOTLE_TRADE_ID
+						  LEFT JOIN TRD_DEAL_TOTAL_ADD tdta ON tfpdt.TOTLE_TRADE_ID = tdta.TOTLE_TRADE_ID
+						  LEFT JOIN PTL_PORTFOLIO PP ON tfpdt.PORTFOLIO_ID = PP.PORTFOLIO_ID 
+						  GROUP BY sttm.TRADE_ID) DET ON std1.TRADE_ID = DET.TRADE_ID
+		 WHERE std1.DELIVERY_RESULT = '05'
+		   AND std2.DELIVERY_RESULT != '05'
+	) TE
+	ORDER BY CREATE_TIME DESC
     </select>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">

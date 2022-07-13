@@ -1300,6 +1300,14 @@
      * 委托数量变更时联动计算委托金额
      */
     var entrustNumChange = function () {
+        var ps = $("#ps_" + currentTab).val();
+        if (!(currentTab == 'jj' && ps == PS_T01)) {
+            var entrustNum = $("#entrustNum_" + currentTab).val();
+            var minStep = getMinStep();
+            let number = Math.floor(entrustNum / minStep) * minStep;
+            $("#entrustNum_" + currentTab).val(number);
+        }
+
         setRiskFlag(1);
         calcEntrustNumAndAmt();
         linkTableEntrustNumAmt();
@@ -2201,7 +2209,7 @@
                     $("#entrustAmt_label_" + currentTab).text("标准券数量").append($star.clone());
                     $("#entrustPriceUnit_" + currentTab).text("%");
                     $("#entrustAmtUnit_" + currentTab).text("万元");
-                    $("#entrustNumUnit_" + currentTab).text("万元");
+                    $("#entrustNumUnit_" + currentTab).text("张");
 
                     // var entrustAmt = $("#standardBondVolume_" + currentTab).val();
                     // $("#entrustAmt_" + currentTab).val(Math.floor(new Number(entrustAmt)));
@@ -2417,7 +2425,7 @@
                 //债券交易数量单位 edit by yeming 20210729 end
                 if (ps == PS_T68 || ps == PS_T69) {
                     $("#entrustAmtUnit_" + currentTab).text("万元");
-                    $("#entrustNumUnit_" + currentTab).text("万元");
+                    $("#entrustNumUnit_" + currentTab).text("张");
                 }
             }
         }
@@ -2568,7 +2576,7 @@
                     // entrustAmt = Math.floor(new Number(entrustAmt));
                     $("#entrustAmt_" + currentTab).val(entrustAmt);
                     $("#entrustAmt_" + currentTab).attr("data-textrange", 4);
-                    $("#entrustNum_" + currentTab).attr("data-textrange", 2);
+                    $("#entrustNum_" + currentTab).attr("data-textrange", 0);
                 } else {
                     $("#entrustAmt_" + currentTab).val(entrustAmt).trigger('blur');
                 }
@@ -3379,7 +3387,7 @@
 
             if (finprodType2 == FINPROD_TYPE_TG_F01 && (ps == PS_T68 || ps == PS_T69)) {
                 $("#entrustAmtUnit_" + currentTab).text("万元");
-                $("#entrustNumUnit_" + currentTab).text("万元");
+                $("#entrustNumUnit_" + currentTab).text("张");
                 $("#entrustPrice_" + currentTab).attr("data-textrange", 0);
                 var entrustNum = $("#entrustNum_" + currentTab).val();
                 if (entrustNum) {
@@ -3478,15 +3486,18 @@
         var finprodType2 = $("#finprodType2_" + currentTab).val();
         var tradeMarket = $("#tradeMarket_" + currentTab).val();
         var ps = $("#ps_" + currentTab).val();
+        var plat = currentTab;
+        if (ps == "T03" || ps == "T49" || ps == "T68" || ps == "T69") {
+            plat = "99";
+        }
         if (targetType) {
-            var step = 1;
             var param = {
                 finprodId: finprodId,
                 targetType: targetType,
                 finprodType2: finprodType2,
                 tradeMarket: tradeMarket,
                 ps: ps,
-                currentTab: currentTab
+                currentTab: plat
             };
             Joyin.ajaxJson(basePath + 'etrexchange/common/etrExchangeTrade001/getMinNumStep', param, function (result) {
                 if (result.data) {
@@ -4036,21 +4047,7 @@
                 }
                 var datas = dateTable.getAllRows();
                 if (datas) {
-                    var minStep;
-                    var param = {
-                        finprodId: $("#finprodId_" + currentTab).val(),
-                        targetType: $("#targetType_" + currentTab).val(),
-                        finprodType2: $("#finprodType2_" + currentTab).val(),
-                        tradeMarket: $("#tradeMarket_" + currentTab).val(),
-                        ps: $("#ps_" + currentTab).val(),
-                        currentTab: currentTab
-                    };
-                    Joyin.ajaxJson(basePath + 'etrexchange/common/etrExchangeTrade001/getMinNumStep', param, function (result) {
-                        if (result.data) {
-                            minStep = result.data;
-                        }
-                    }, false);
-
+                    var minStep = getMinStep()
                     var entrustNum = Number(0);
                     for (var i in datas) {
                         var num = 0;
@@ -4106,21 +4103,7 @@
                     calcEntrustNumAndAmt();
                     // var entrustNum = $("#entrustNum_" + currentTab).val();
 
-                    var minStep;
-                    var param = {
-                        finprodId: $("#finprodId_" + currentTab).val(),
-                        targetType: $("#targetType_" + currentTab).val(),
-                        finprodType2: $("#finprodType2_" + currentTab).val(),
-                        tradeMarket: $("#tradeMarket_" + currentTab).val(),
-                        ps: $("#ps_" + currentTab).val(),
-                        currentTab: currentTab
-                    };
-                    Joyin.ajaxJson(basePath + 'etrexchange/common/etrExchangeTrade001/getMinNumStep', param, function (result) {
-                        if (result.data) {
-                            minStep = result.data;
-                        }
-                    }, false);
-
+                    var minStep = getMinStep()
                     var entrustPrice = getEntrustPrice();
                     console.log("--------------11-------------------")
                     console.log(entrustPrice)
@@ -4266,28 +4249,11 @@
         //     }
         // }
         //组合分配调整
-        var finprodId = $("#finprodId_" + currentTab).val();
         var targetType = $("#targetType_" + currentTab).val();
-        var finprodType2 = $("#finprodType2_" + currentTab).val();
-        var tradeMarket = $("#tradeMarket_" + currentTab).val();
         var ps = $("#ps_" + currentTab).val();
         var minStep;
         if (targetType) {
-            var param = {
-                finprodId: finprodId,
-                targetType: targetType,
-                finprodType2: finprodType2,
-                tradeMarket: tradeMarket,
-                ps: ps,
-                currentTab: currentTab
-            };
-            Joyin.ajaxJson(basePath + 'etrexchange/common/etrExchangeTrade001/getMinNumStep', param, function (result) {
-                console.log("------result----------")
-                console.log(result)
-                if (result.data) {
-                    minStep = parseInt(result.data);
-                }
-            }, false);
+            minStep = getMinStep();
         }
         console.log("----------minStep----------")
         console.log(minStep)
@@ -4540,13 +4506,19 @@
 
     function getMinStep() {
         var minStep;
+        var plat = currentTab;
+        var ps = $("#ps_" + currentTab).val();
+        //债回售、债转股、质押券出入库
+        if (ps == "T03" || ps == "T49" || ps == "T68" || ps == "T69") {
+            plat = "99";
+        }
         var param = {
             finprodId: $("#finprodId_" + currentTab).val(),
             targetType: $("#targetType_" + currentTab).val(),
             finprodType2: $("#finprodType2_" + currentTab).val(),
             tradeMarket: $("#tradeMarket_" + currentTab).val(),
-            ps: $("#ps_" + currentTab).val(),
-            currentTab: currentTab
+            ps: ps,
+            currentTab: plat
         };
         Joyin.ajaxJson(basePath + 'etrexchange/common/etrExchangeTrade001/getMinNumStep', param, function (result) {
             if (result.data) {

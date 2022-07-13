@@ -177,12 +177,23 @@ $(function() {
      */
     table.bind('click','.finprodIdLink', function(row) {
         //在新建界面进行显示单行的详细信息
+        let finprodId = row.finprodId
+        var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a"; // 默认债券标的
+        var param = {
+            pageModel: PAGE_MODEL_REFERENCE,
+            isQuickInput: true,
+            finprodId: finprodId
+        };
         Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
-            basePath
-            + "invest/asset/bond/FinBondTargetAsset002/init",
-            "95%", "80%", {pageModel:PAGE_MODEL_REFERENCE,
-                finprodId:row.finprodId  //金融产品代码
-            });
+            basePath + url,
+            "95%", "80%",
+            param);
+        // Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+        //     basePath
+        //     + "invest/asset/bond/FinBondTargetAsset002/init",
+        //     "95%", "80%", {pageModel:PAGE_MODEL_REFERENCE,
+        //         finprodId:row.finprodId  //金融产品代码
+        //     });
     });
     /**
      * 绑定编辑事件

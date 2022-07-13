@@ -485,7 +485,7 @@
             ,{field:'finprodId',visible:false}
             ,{field:'finprodMarketId', title: 'EtrInvestAllInfo001.finprodId', width:'200',
                 render : function(data, type, row, meta) {
-                    if(row.assetType != F07 ){
+                    if(row.assetType != F07 && row.assetType != 'TRD75'){
                         return "<a  class='pro-link finprodIdLink' style='cursor: pointer;'>"+data+"</ a>";
                     }
                 },sortField:"finprodMarketId"
