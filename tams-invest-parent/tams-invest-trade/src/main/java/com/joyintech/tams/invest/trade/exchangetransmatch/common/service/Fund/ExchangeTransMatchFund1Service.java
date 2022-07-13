@@ -191,7 +191,7 @@ public class ExchangeTransMatchFund1Service extends BaseService {
         // 投资组合代码
         dealTotal.setPortfolioId(entrustDto.getPortfolioId());
         // 备注
-        dealTotal.setRemark(entrustDto.getRemark());
+        dealTotal.setRemark("数据清算自动处理");
         // 投管业务类型
 //        dealTotal.setTgBusiType(trdProductDealDto.getTgBusiType());
         // 利率
@@ -368,7 +368,9 @@ public class ExchangeTransMatchFund1Service extends BaseService {
             trdProductDeal.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
             trdFinProductDealTotal.setTgBusiType(trdProductDeal.getTgBusiType());
         }
-
+        // GLCP-209:新增备注 modify by fuyongsheng 20220713 start
+        trdProductDeal.setRemark("数据清算自动处理");
+        // GLCP-209:新增备注 modify by fuyongsheng 20220713 end
         return trdProductDeal;
     }
 
