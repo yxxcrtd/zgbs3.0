@@ -191,7 +191,7 @@ public class ExchangeTransMatchFund1Service extends BaseService {
         // 投资组合代码
         dealTotal.setPortfolioId(entrustDto.getPortfolioId());
         // 备注
-        dealTotal.setRemark(entrustDto.getRemark());
+        dealTotal.setRemark("数据清算自动处理");
         // 投管业务类型
 //        dealTotal.setTgBusiType(trdProductDealDto.getTgBusiType());
         // 利率
@@ -330,12 +330,14 @@ public class ExchangeTransMatchFund1Service extends BaseService {
         // 交易市场
         trdProductDeal.setTradeMarketMode(settleTransData.getTradeMarketMode());
 
-        if(StringUtil.equals(settleTransData.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
-            trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
-        }
-        else if(StringUtil.equals(settleTransData.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
-            trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
-        }
+        // GLCP-211基金无需对手方 modify by fuyongsheng 20220713 start
+//        if(StringUtil.equals(settleTransData.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+//            trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
+//        }
+//        else if(StringUtil.equals(settleTransData.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
+//            trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
+//        }
+        // GLCP-211基金无需对手方 modify by fuyongsheng 20220713 end
         // 证券管理户代码
         trdProductDeal.setSecManageAcctId(settleTransData.getSecAcctId());
 
@@ -368,7 +370,9 @@ public class ExchangeTransMatchFund1Service extends BaseService {
             trdProductDeal.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
             trdFinProductDealTotal.setTgBusiType(trdProductDeal.getTgBusiType());
         }
-
+        // GLCP-209:新增备注 modify by fuyongsheng 20220713 start
+        trdProductDeal.setRemark("数据清算自动处理");
+        // GLCP-209:新增备注 modify by fuyongsheng 20220713 end
         return trdProductDeal;
     }
 
