@@ -1,0 +1,5 @@
+
+DELETE FROM SYS_WFL_BUSINESS_MODULE T WHERE T.PAGE_ID = 'ComBondMarketInfo002' AND T.ELEMENT_ID = 'ValBondMarketInfo001_btn_delete';
+
+insert into SYS_WFL_BUSINESS_MODULE (PAGE_ID, ELEMENT_ID, MODULE_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, IS_SEND_UORG)
+values ('ComBondMarketInfo002', 'ValBondMarketInfo001_btn_delete', 'oneApproval', 'system', null, SYSDATE, 'system', SYSDATE, 'ALL', '02');

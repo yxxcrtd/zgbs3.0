@@ -876,7 +876,9 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
             }
         }
         if (DictCodeList.持仓类型_实际.equals(持仓类型) || etrPositionHoldDto.isNeedNegative()) {
-            if (StringUtil.isEmpty(entrustId)) { // 无委托
+            if (StringUtil.isEmpty(entrustId)
+            || null != finProductTradeDto.getTrdProductDeal()
+            ) { // 无委托
                 // 现金流水dto处理 交割日减少(交易金额-交易券面总额*委托全价/债券面值）
                 etrSecPositionFlowDto.setAmount(交易日金额);
                 // 添加现金流水到目标dto

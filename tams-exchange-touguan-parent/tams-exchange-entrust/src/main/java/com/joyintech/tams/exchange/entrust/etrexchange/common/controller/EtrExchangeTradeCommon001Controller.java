@@ -1289,6 +1289,13 @@ public class EtrExchangeTradeCommon001Controller extends BaseController {
             if (br.hasErrors()) {
                 return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
             }
+            // GLCP-192:组合维度需要传ps,风险是从组合维度取ps modify by fuyongsheng 20220713 start
+            if(!CollectionUtils.isEmpty(dto.getPortfolioList())){
+                for(EtrExchangeTradePortfolioRequest portfolio : dto.getPortfolioList()){
+                    portfolio.setPs(dto.getPs());
+                }
+            }
+            // GLCP-192:组合维度需要传ps,风险是从组合维度取ps modify by fuyongsheng 20220713 end
             String msg = "";
             List<EtrExchangeTradeSaveRequest> riskEtrExchangeTrade001DtoList = new ArrayList<>();
 
@@ -1378,6 +1385,9 @@ public class EtrExchangeTradeCommon001Controller extends BaseController {
                             List<EtrExchangeTradePortfolioRequest> portfolioList = new ArrayList<>();
                             EtrExchangeTradePortfolioRequest portfolioRequest = new EtrExchangeTradePortfolioRequest();
                             BeanUtil.copyPropertiesIgnoreNull(portfolioRequest, etrExchangeTrade001Dto);
+                            // GLCP-192:组合维度需要传ps,风险是从组合维度取ps modify by fuyongsheng 20220713 start
+                            portfolioRequest.setPs(dto.getPs());
+                            // GLCP-192:组合维度需要传ps,风险是从组合维度取ps modify by fuyongsheng 20220713 end
                             portfolioList.add(portfolioRequest);
                             etrExchangeTrade001Dto.setPortfolioList(portfolioList);
 
@@ -1523,6 +1533,9 @@ public class EtrExchangeTradeCommon001Controller extends BaseController {
                         List<EtrExchangeTradePortfolioRequest> portfolioList = new ArrayList<>();
                         EtrExchangeTradePortfolioRequest portfolioRequest = new EtrExchangeTradePortfolioRequest();
                         BeanUtil.copyPropertiesIgnoreNull(portfolioRequest, etrExchangeTrade001Dto);
+                        // GLCP-192:组合维度需要传ps,风险是从组合维度取ps modify by fuyongsheng 20220713 start
+                        portfolioRequest.setPs(dto.getPs());
+                        // GLCP-192:组合维度需要传ps,风险是从组合维度取ps modify by fuyongsheng 20220713 end
                         portfolioList.add(portfolioRequest);
                         etrExchangeTrade001Dto.setPortfolioList(portfolioList);
 
@@ -1620,6 +1633,9 @@ public class EtrExchangeTradeCommon001Controller extends BaseController {
                     List<EtrExchangeTradePortfolioRequest> portfolioList = new ArrayList<>();
                     EtrExchangeTradePortfolioRequest portfolioRequest = new EtrExchangeTradePortfolioRequest();
                     BeanUtil.copyPropertiesIgnoreNull(portfolioRequest, etrExchangeTrade001Dto);
+                    // GLCP-192:组合维度需要传ps,风险是从组合维度取ps modify by fuyongsheng 20220713 start
+                    portfolioRequest.setPs(dto.getPs());
+                    // GLCP-192:组合维度需要传ps,风险是从组合维度取ps modify by fuyongsheng 20220713 end
                     portfolioList.add(portfolioRequest);
                     etrExchangeTrade001Dto.setPortfolioList(portfolioList);
                     //设置头寸使用序列号
