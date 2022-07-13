@@ -420,6 +420,77 @@
 <!--				AND FP.FINPROD_TYPE2 = #{finType_F01}-->
 <!--			)-->
 <!--		</if>-->
+
+		WITH WFL_TEMP AS(
+			(
+				SELECT tpd.TRADE_ID TRADE_ID,fpt.TYPE_6 TYPE_6
+		        FROM WFL_TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
+		        WHERE
+				(
+					<!-- 银行间/商业银行柜台-->
+					tpd.TRADE_MARKET in ('01','02') and (
+					<!-- 债券: 买入、卖出、回售-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
+					<!-- 质押式回购: 正回购、逆回购-->
+					or (tpd.FINPROD_TYPE2 in ('F02','F03'))
+					<!-- 一级市场债: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
+					)
+				)
+				or (
+					<!-- 交易所-->
+					tpd.TRADE_MARKET in ('03','04') and (
+					<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
+					<!--            质押式回购: 正回购、逆回购-->
+					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
+					<!--            一级市场债: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
+					<!--            基金: 买入、卖出-->
+					or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
+					<!--            股票: 买入、卖出、申购确认、配股-->
+					or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
+					<!--            信用保护凭证: 买入、卖出、申购-->
+					or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
+					)
+				)
+			)
+			UNION ALL
+			(
+				SELECT tpd.TOTLE_TRADE_ID TRADE_ID,fpt.TYPE_6 TYPE_6
+		        FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
+		        WHERE
+				(
+					<!-- 银行间/商业银行柜台-->
+					tpd.TRADE_MARKET in ('01','02') and (
+					<!-- 债券: 买入、卖出、回售-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
+					<!-- 质押式回购: 正回购、逆回购-->
+					or (tpd.FINPROD_TYPE2 in ('F02','F03'))
+					<!-- 一级市场债: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
+					)
+				)
+				or (
+					<!-- 交易所-->
+					tpd.TRADE_MARKET in ('03','04') and (
+					<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
+					<!--            质押式回购: 正回购、逆回购-->
+					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
+					<!--            一级市场债: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
+					<!--            基金: 买入、卖出-->
+					or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
+					<!--            股票: 买入、卖出、申购确认、配股-->
+					or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
+					<!--            信用保护凭证: 买入、卖出、申购-->
+					or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
+					)
+				)
+			)
+		)
+
 		SELECT * FROM (
         (<include refid="BASE_COLUMNS"></include>
 		<where>
@@ -427,35 +498,7 @@
 
             <!--排除新UI业务 -->
             AND NOT EXISTS (
-            SELECT 1 FROM  WFL_TRD_PRODUCT_DEAL tpd WHERE
-            (
-            <!-- 银行间/商业银行柜台-->
-            tpd.TRADE_MARKET in ('01','02') and (
-            <!-- 债券: 买入、卖出、回售-->
-            (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
-            <!-- 质押式回购: 正回购、逆回购-->
-            or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-            <!-- 一级市场债: 买入-->
-            or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-            )
-            )
-            or (
-            <!-- 交易所-->
-            tpd.TRADE_MARKET in ('03','04') and (
-            <!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-            (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
-            <!--            质押式回购: 正回购、逆回购-->
-            or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-            <!--            一级市场债: 买入-->
-            or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-            <!--            基金: 买入、卖出-->
-            or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
-            <!--            股票: 买入、卖出、申购确认、配股-->
-            or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
-            <!--            信用保护凭证: 买入、卖出、申购-->
-            or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
-            )
-            )
+				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_PRODUCT_DEAL.TRADE_ID = WFL_TEMP.TRADE_ID
             )
 
 			<if test="portfolioId != null and !portfolioId.isEmpty() ">
@@ -660,35 +703,7 @@
 		<where>
             <!--排除新UI业务 -->
             NOT EXISTS (
-            SELECT 1 FROM  WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tpd WHERE
-            (
-            <!-- 银行间/商业银行柜台-->
-            tpd.TRADE_MARKET in ('01','02') and (
-            <!-- 债券: 买入、卖出、回售-->
-            (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
-            <!-- 质押式回购: 正回购、逆回购-->
-            or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-            <!-- 一级市场债: 买入-->
-            or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-            )
-            )
-            or (
-            <!-- 交易所-->
-            tpd.TRADE_MARKET in ('03','04') and (
-            <!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-            (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
-            <!--            质押式回购: 正回购、逆回购-->
-            or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-            <!--            一级市场债: 买入-->
-            or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-            <!--            基金: 买入、卖出-->
-            or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
-            <!--            股票: 买入、卖出、申购确认、配股-->
-            or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
-            <!--            信用保护凭证: 买入、卖出、申购-->
-            or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
-            )
-            )
+				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = WFL_TEMP.TRADE_ID
             )
 
 			<if test="portfolioId != null and !portfolioId.isEmpty() ">
@@ -833,36 +848,7 @@
 
             <!--包含新UI业务，排除协议回购 -->
             EXISTS (
-            SELECT 1 FROM WFL_TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
-            WHERE
-            (
-            <!-- 银行间/商业银行柜台-->
-            tpd.TRADE_MARKET in ('01','02') and (
-            <!-- 债券: 买入、卖出、回售-->
-            (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
-            <!-- 质押式回购: 正回购、逆回购-->
-            or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-            <!-- 一级市场债: 买入-->
-            or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-            )
-            )
-            or (
-            <!-- 交易所-->
-            tpd.TRADE_MARKET in ('03','04') and (
-            <!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-            (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
-            <!--            质押式回购: 正回购、逆回购-->
-            or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
-            <!--            一级市场债: 买入-->
-            or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-            <!--            基金: 买入、卖出-->
-            or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
-            <!--            股票: 买入、卖出、申购确认、配股-->
-            or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
-            <!--            信用保护凭证: 买入、卖出、申购-->
-            or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
-            )
-            )
+				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_PRODUCT_DEAL.TRADE_ID = WFL_TEMP.TRADE_ID
             )
 
             <if test="portfolioId != null and !portfolioId.isEmpty() ">
@@ -1069,6 +1055,7 @@
             SELECT 1 FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
             WHERE tpd.TRADE_MARKET in ('03','04') and tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H01'
             )
+
             <if test="portfolioId != null and !portfolioId.isEmpty() ">
                 AND (
                 PTL_PORTFOLIO.PORTFOLIO_ID  IN
@@ -1225,9 +1212,80 @@
 <!--			ON FPA.APPEAR_MARKET_ID = FP.FINPROD_MARKET_ID-->
 <!--			LEFT JOIN FIN_PRODUCT FP2 ON FPA.FINPROD_ID = FP2.FINPROD_ID-->
 <!--			WHERE FP.FINPROD_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))-->
-<!--			AND FP.FINPROD_TYPE2 = #{finType_F01}&ndash;&gt;-->
+<!--			AND FP.FINPROD_TYPE2 = #{finType_F01}-->
 <!--			)-->
 <!--		</if>-->
+
+		WITH VALID_TEMP AS(
+			(
+				 SELECT tpd.TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
+				 FROM TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
+				 WHERE
+				 (
+					<!-- 银行间/商业银行柜台-->
+					tpd.TRADE_MARKET in ('01','02') and (
+					<!-- 债券: 买入、卖出、回售-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
+					<!-- 质押式回购: 正回购、逆回购-->
+					or (tpd.FINPROD_TYPE2 in ('F02','F03'))
+					<!-- 一级市场债: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
+					)
+				 )
+				 or (
+					<!-- 交易所-->
+					tpd.TRADE_MARKET in ('03','04') and (
+					<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
+					<!--            质押式回购: 正回购、逆回购-->
+					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
+					<!--            一级市场债: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
+					<!--            基金: 买入、卖出-->
+					or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
+					<!--            股票: 买入、卖出、申购确认、配股-->
+					or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
+					<!--            信用保护凭证: 买入、卖出、申购-->
+					or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
+					)
+				 )
+		    )
+		    UNION ALL
+			(
+		        SELECT tpd.TOTLE_TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
+		        FROM TRD_FIN_PRODUCT_DEAL_TOTAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
+		        WHERE
+				(
+					<!-- 银行间/商业银行柜台-->
+					tpd.TRADE_MARKET in ('01','02') and (
+					<!-- 债券: 买入、卖出、回售-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
+					<!-- 质押式回购: 正回购、逆回购-->
+					or (tpd.FINPROD_TYPE2 in ('F02','F03'))
+					<!-- 一级市场债: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
+					)
+				)
+				or (
+					<!-- 交易所-->
+					tpd.TRADE_MARKET in ('03','04') and (
+					<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
+					<!--            质押式回购: 正回购、逆回购-->
+					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
+					<!--            一级市场债: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
+					<!--            基金: 买入、卖出-->
+					or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
+					<!--            股票: 买入、卖出、申购确认、配股-->
+					or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
+					<!--            信用保护凭证: 买入、卖出、申购-->
+					or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
+					)
+				)
+			)
+		)
+
 		SELECT * FROM (
 		(<include refid="VALID_COLUMNS"></include>
 		<where>
@@ -1235,35 +1293,7 @@
 
             <!--排除新UI业务 -->
 			AND NOT EXISTS (
-			SELECT 1 FROM  TRD_PRODUCT_DEAL tpd WHERE
-			(
-			<!-- 银行间/商业银行柜台-->
-			tpd.TRADE_MARKET in ('01','02') and (
-			<!-- 债券: 买入、卖出、回售-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
-			<!-- 质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-			<!-- 一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			)
-			)
-			or (
-			<!-- 交易所-->
-			tpd.TRADE_MARKET in ('03','04') and (
-			<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
-			<!--            质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-			<!--            一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			<!--            基金: 买入、卖出-->
-			or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
-			<!--            股票: 买入、卖出、申购确认、配股-->
-			or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
-			<!--            信用保护凭证: 买入、卖出、申购-->
-			or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
-			)
-			)
+			   SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
 			)
 
 			<if test="etridList != null and !etridList.isEmpty() ">
@@ -1464,35 +1494,7 @@
 
 			<!--排除新UI业务 -->
 			AND NOT EXISTS (
-			SELECT 1 FROM  TRD_FIN_PRODUCT_DEAL_TOTAL tpd WHERE
-			(
-			<!-- 银行间/商业银行柜台-->
-			tpd.TRADE_MARKET in ('01','02') and (
-			<!-- 债券: 买入、卖出、回售-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
-			<!-- 质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-			<!-- 一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			)
-			)
-			or (
-			<!-- 交易所-->
-			tpd.TRADE_MARKET in ('03','04') and (
-			<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
-			<!--            质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-			<!--            一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			<!--            基金: 买入、卖出-->
-			or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
-			<!--            股票: 买入、卖出、申购确认、配股-->
-			or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
-			<!--            信用保护凭证: 买入、卖出、申购-->
-			or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
-			)
-			)
+				SELECT 1 FROM VALID_TEMP WHERE TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = VALID_TEMP.TRADE_ID
 			)
 
 			<if test="etridList != null and !etridList.isEmpty() ">
@@ -1633,39 +1635,7 @@
 <!--			AND TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null-->
 			<!--包含新UI业务，排除协议回购 -->
 			AND EXISTS (
-			SELECT 1 from (
-				SELECT tpd.TRADE_ID FROM TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID =
-				fpt.FINPROD_ID
-				WHERE
-				(
-					<!-- 银行间/商业银行柜台-->
-					tpd.TRADE_MARKET in ('01','02') and (
-					<!-- 债券: 买入、卖出、回售-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
-					<!-- 质押式回购: 正回购、逆回购-->
-					or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-					<!-- 一级市场债: 买入-->
-					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-					)
-				)
-				or (
-					<!-- 交易所-->
-					tpd.TRADE_MARKET in ('03','04') and (
-					<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
-					<!--            质押式回购: 正回购、逆回购-->
-					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
-					<!--            一级市场债: 买入-->
-					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-					<!--            基金: 买入、卖出-->
-					or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
-					<!--            股票: 买入、卖出、申购确认、配股-->
-					or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
-					<!--            信用保护凭证: 买入、卖出、申购-->
-					or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
-					)
-				)
-				) ttt where ttt.TRADE_ID = TRD_PRODUCT_DEAL.TRADE_ID
+			    SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
 			)
 
 			<if test="etridList != null and !etridList.isEmpty() ">
@@ -2024,43 +1994,85 @@
 <!--				AND FP.FINPROD_TYPE2 = #{finType_F01}-->
 <!--			)-->
 <!--		</if>-->
+		WITH VALID_TEMP AS(
+			(
+				SELECT tpd.TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
+				FROM TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
+				WHERE
+				(
+					<!-- 银行间/商业银行柜台-->
+					tpd.TRADE_MARKET in ('01','02') and (
+					<!-- 债券: 买入、卖出、回售-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
+					<!-- 质押式回购: 正回购、逆回购-->
+					or (tpd.FINPROD_TYPE2 in ('F02','F03'))
+					<!-- 一级市场债: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
+					)
+				)
+				or (
+					<!-- 交易所-->
+					tpd.TRADE_MARKET in ('03','04') and (
+					<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
+					<!--            质押式回购: 正回购、逆回购-->
+					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
+					<!--            一级市场债: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
+					<!--            基金: 买入、卖出-->
+					or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
+					<!--            股票: 买入、卖出、申购确认、配股-->
+					or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
+					<!--            信用保护凭证: 买入、卖出、申购-->
+					or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
+					)
+				)
+			)
+			UNION ALL
+			(
+				SELECT tpd.TOTLE_TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
+				FROM TRD_FIN_PRODUCT_DEAL_TOTAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
+				WHERE
+				(
+					<!-- 银行间/商业银行柜台-->
+					tpd.TRADE_MARKET in ('01','02') and (
+					<!-- 债券: 买入、卖出、回售-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
+					<!-- 质押式回购: 正回购、逆回购-->
+					or (tpd.FINPROD_TYPE2 in ('F02','F03'))
+					<!-- 一级市场债: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
+					)
+				)
+				or (
+					<!-- 交易所-->
+					tpd.TRADE_MARKET in ('03','04') and (
+					<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
+					<!--            质押式回购: 正回购、逆回购-->
+					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
+					<!--            一级市场债: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
+					<!--            基金: 买入、卖出-->
+					or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
+					<!--            股票: 买入、卖出、申购确认、配股-->
+					or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
+					<!--            信用保护凭证: 买入、卖出、申购-->
+					or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
+					)
+				)
+			)
+		)
+
 		SELECT * FROM (
 		(<include refid="CANCEL_COLUMNS"></include>
 		<where>
 			PTL_PORTFOLIO.INVEST_YESORNO = 'Y' AND TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null
 
             <!--排除新UI业务 -->
-            AND NOT EXISTS (
-            SELECT 1 FROM  TRD_PRODUCT_DEAL tpd WHERE
-            (
-            <!-- 银行间/商业银行柜台-->
-            tpd.TRADE_MARKET in ('01','02') and (
-            <!-- 债券: 买入、卖出、回售-->
-            (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
-            <!-- 质押式回购: 正回购、逆回购-->
-            or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-            <!-- 一级市场债: 买入-->
-            or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-            )
-            )
-            or (
-            <!-- 交易所-->
-            tpd.TRADE_MARKET in ('03','04') and (
-            <!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-            (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
-            <!--            质押式回购: 正回购、逆回购-->
-            or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-            <!--            一级市场债: 买入-->
-            or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-            <!--            基金: 买入、卖出-->
-            or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
-            <!--            股票: 买入、卖出、申购确认、配股-->
-            or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
-            <!--            信用保护凭证: 买入、卖出、申购-->
-            or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
-            )
-            )
-            )
+			AND NOT EXISTS (
+			SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
+			)
 
 			<if test="portfolioId != null and !portfolioId.isEmpty()">
 				AND (
@@ -2250,37 +2262,9 @@
 			( TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2 = 'F17' AND FIN_PRODUCT.FINPROD_ID IS NOT NULL  ) )
 
             <!--排除新UI业务 -->
-            AND NOT EXISTS (
-            SELECT 1 FROM  TRD_FIN_PRODUCT_DEAL_TOTAL tpd WHERE
-            (
-            <!-- 银行间/商业银行柜台-->
-            tpd.TRADE_MARKET in ('01','02') and (
-            <!-- 债券: 买入、卖出、回售-->
-            (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
-            <!-- 质押式回购: 正回购、逆回购-->
-            or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-            <!-- 一级市场债: 买入-->
-            or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-            )
-            )
-            or (
-            <!-- 交易所-->
-            tpd.TRADE_MARKET in ('03','04') and (
-            <!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-            (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
-            <!--            质押式回购: 正回购、逆回购-->
-            or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-            <!--            一级市场债: 买入-->
-            or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-            <!--            基金: 买入、卖出-->
-            or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
-            <!--            股票: 买入、卖出、申购确认、配股-->
-            or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
-            <!--            信用保护凭证: 买入、卖出、申购-->
-            or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
-            )
-            )
-            )
+			AND NOT EXISTS (
+			SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
+			)
 
 			<if test="portfolioId != null and !portfolioId.isEmpty()">
 				AND (
@@ -2424,38 +2408,9 @@
 <!--			AND TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null-->
 
             <!--包含新UI业务，排除协议回购 -->
-            AND EXISTS (
-            SELECT 1 FROM TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
-            WHERE
-            (
-            <!-- 银行间/商业银行柜台-->
-            tpd.TRADE_MARKET in ('01','02') and (
-            <!-- 债券: 买入、卖出、回售-->
-            (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
-            <!-- 质押式回购: 正回购、逆回购-->
-            or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-            <!-- 一级市场债: 买入-->
-            or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-            )
-            )
-            or (
-            <!-- 交易所-->
-            tpd.TRADE_MARKET in ('03','04') and (
-            <!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-            (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
-            <!--            质押式回购: 正回购、逆回购-->
-            or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
-            <!--            一级市场债: 买入-->
-            or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-            <!--            基金: 买入、卖出-->
-            or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
-            <!--            股票: 买入、卖出、申购确认、配股-->
-            or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
-            <!--            信用保护凭证: 买入、卖出、申购-->
-            or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
-            )
-            )
-            )
+			AND EXISTS (
+			SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
+			)
 
             <if test="portfolioId != null and !portfolioId.isEmpty()">
                 AND (
@@ -2813,6 +2768,145 @@
 <!--				AND FP.FINPROD_TYPE2 = #{finType_F01}-->
 <!--			)-->
 <!--		</if>-->
+		WITH WFL_TEMP AS(
+			(
+				SELECT tpd.TRADE_ID TRADE_ID,fpt.TYPE_6 TYPE_6
+				FROM WFL_TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
+				WHERE
+				(
+					<!-- 银行间/商业银行柜台-->
+					tpd.TRADE_MARKET in ('01','02') and (
+					<!-- 债券: 买入、卖出、回售-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
+					<!-- 质押式回购: 正回购、逆回购-->
+					or (tpd.FINPROD_TYPE2 in ('F02','F03'))
+					<!-- 一级市场债: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
+					)
+				)
+				or (
+					<!-- 交易所-->
+					tpd.TRADE_MARKET in ('03','04') and (
+					<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
+					<!--            质押式回购: 正回购、逆回购-->
+					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
+					<!--            一级市场债: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
+					<!--            基金: 买入、卖出-->
+					or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
+					<!--            股票: 买入、卖出、申购确认、配股-->
+					or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
+					<!--            信用保护凭证: 买入、卖出、申购-->
+					or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
+					)
+				)
+			)
+			UNION ALL
+			(
+				SELECT tpd.TOTLE_TRADE_ID TRADE_ID,fpt.TYPE_6 TYPE_6
+				FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
+				WHERE
+				(
+					<!-- 银行间/商业银行柜台-->
+					tpd.TRADE_MARKET in ('01','02') and (
+					<!-- 债券: 买入、卖出、回售-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
+					<!-- 质押式回购: 正回购、逆回购-->
+					or (tpd.FINPROD_TYPE2 in ('F02','F03'))
+					<!-- 一级市场债: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
+					)
+				)
+				or (
+					<!-- 交易所-->
+					tpd.TRADE_MARKET in ('03','04') and (
+					<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
+					<!--            质押式回购: 正回购、逆回购-->
+					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
+					<!--            一级市场债: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
+					<!--            基金: 买入、卖出-->
+					or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
+					<!--            股票: 买入、卖出、申购确认、配股-->
+					or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
+					<!--            信用保护凭证: 买入、卖出、申购-->
+					or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
+					)
+				)
+			)
+		),
+		VALID_TEMP AS(
+			(
+				SELECT tpd.TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
+				FROM TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
+				WHERE
+				(
+					<!-- 银行间/商业银行柜台-->
+					tpd.TRADE_MARKET in ('01','02') and (
+					<!-- 债券: 买入、卖出、回售-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
+					<!-- 质押式回购: 正回购、逆回购-->
+					or (tpd.FINPROD_TYPE2 in ('F02','F03'))
+					<!-- 一级市场债: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
+					)
+				)
+				or (
+					<!-- 交易所-->
+					tpd.TRADE_MARKET in ('03','04') and (
+					<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
+					<!--            质押式回购: 正回购、逆回购-->
+					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
+					<!--            一级市场债: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
+					<!--            基金: 买入、卖出-->
+					or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
+					<!--            股票: 买入、卖出、申购确认、配股-->
+					or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
+					<!--            信用保护凭证: 买入、卖出、申购-->
+					or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
+					)
+				)
+			)
+			UNION ALL
+			(
+				SELECT tpd.TOTLE_TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
+				FROM TRD_FIN_PRODUCT_DEAL_TOTAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
+				WHERE
+				(
+					<!-- 银行间/商业银行柜台-->
+					tpd.TRADE_MARKET in ('01','02') and (
+					<!-- 债券: 买入、卖出、回售-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
+					<!-- 质押式回购: 正回购、逆回购-->
+					or (tpd.FINPROD_TYPE2 in ('F02','F03'))
+					<!-- 一级市场债: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
+					)
+				)
+				or (
+				<!-- 交易所-->
+					tpd.TRADE_MARKET in ('03','04') and (
+					<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
+					<!--            质押式回购: 正回购、逆回购-->
+					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
+					<!--            一级市场债: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
+					<!--            基金: 买入、卖出-->
+					or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
+					<!--            股票: 买入、卖出、申购确认、配股-->
+					or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
+					<!--            信用保护凭证: 买入、卖出、申购-->
+					or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
+					)
+				)
+			)
+		)
+
 		SELECT * FROM(
 		( <include refid="BASE_COLUMNS"></include>
 		<where>
@@ -2820,35 +2914,7 @@
 
 			<!--排除新UI业务 -->
 			AND NOT EXISTS (
-			SELECT 1 FROM  WFL_TRD_PRODUCT_DEAL tpd WHERE
-			(
-			<!-- 银行间/商业银行柜台-->
-			tpd.TRADE_MARKET in ('01','02') and (
-			<!-- 债券: 买入、卖出、回售-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
-			<!-- 质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03') )
-			<!-- 一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			)
-			)
-			or (
-			<!-- 交易所-->
-			tpd.TRADE_MARKET in ('03','04') and (
-			<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
-			<!--            质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03') )
-			<!--            一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			<!--            基金: 买入、卖出-->
-			or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
-			<!--            股票: 买入、卖出、申购确认、配股-->
-			or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
-			<!--            信用保护凭证: 买入、卖出、申购-->
-			or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
-			)
-			)
+				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_PRODUCT_DEAL.TRADE_ID = WFL_TEMP.TRADE_ID
 			)
 
 			<if test="portfolioId != null and !portfolioId.isEmpty()">
@@ -3028,221 +3094,6 @@
 			<!--add by qmh 角色岗位控制权限  end-->
 		</where>)
 
-		union all
-		( <include refid="BASE_COLUMNS"></include>
-		<where>
-<!--			WFL_TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null-->
-			<!--包含新UI业务，排除协议回购 -->
-			EXISTS (
-			SELECT 1 FROM WFL_TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
-			WHERE
-			(
-			<!-- 银行间/商业银行柜台-->
-			tpd.TRADE_MARKET in ('01','02') and (
-			<!-- 债券: 买入、卖出、回售-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
-			<!-- 质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03') )
-			<!-- 一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			)
-			)
-			or (
-			<!-- 交易所-->
-			tpd.TRADE_MARKET in ('03','04') and (
-			<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
-			<!--            质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
-			<!--            一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			<!--            基金: 买入、卖出-->
-			or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
-			<!--            股票: 买入、卖出、申购确认、配股-->
-			or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
-			<!--            信用保护凭证: 买入、卖出、申购-->
-			or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
-			)
-			)
-			)
-
-			<if test="portfolioId != null and !portfolioId.isEmpty()">
-				AND (
-				PTL_PORTFOLIO.PORTFOLIO_ID  IN (<foreach collection="portfolioId" item="item" separator=",">#{item}</foreach> )
-				or PTL_PORTFOLIO.PARENT_PORTFOLIO_ID in (<foreach collection="portfolioId" item="item" separator=",">#{item}</foreach> )
-				)
-			</if>
-			<if test="entrustId != null and entrustId !='' ">
-				ANd WFL_TRD_PRODUCT_DEAL_ADD.ENTRUST_ID
-				LIKE concat(concat('%',#{entrustId,jdbcType=VARCHAR}),'%')
-			</if>
-			<if test="fTradeId != null and fTradeId !='' ">
-				AND WFL_TRD_PRODUCT_DEAL.f_Trade_Id LIKE concat(concat('%',#{fTradeId,jdbcType=VARCHAR}),'%')
-			</if>
-			<if test="finprodMarketId != null and finprodMarketId !='' ">
-				AND (
-				FIN_PRODUCT.FINPROD_MARKET_ID LIKE concat(concat('%',#{finprodMarketId,jdbcType=VARCHAR}),'%')
-				OR FIN_PRODUCT.FINPROD_ABBR LIKE concat(concat('%',#{finprodMarketId,jdbcType=VARCHAR}),'%')
-				OR FIN_PRODUCT.FINPROD_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))
-				OR FIN_PRODUCT_ADD.APPEAR_MARKET_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))
-				)
-			</if>
-			<!-- <if test="finprodType2List != null and finprodType2List.size()>0 ">
-				AND (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 IN(
-					<foreach item="item" index="index" collection="finprodType2List" separator=",">
-    					#{item}
-  					</foreach>
-  					)
-  					<if test="profitType != null and profitType.size()>0">
-  						OR (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{finType_F17}
-						AND
-						FIN_PRODUCT.PROFIT_TYPE IN(
-						<foreach item="item" index="index" collection="profitType" separator=",">
-		    					#{item}
-		  				</foreach>
-		  				)
-		  				)
-  					</if>
-				)
-			</if> -->
-			<if test="finprodType2List != null and finprodType2List.size()>0">
-				AND (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 IN(
-				<foreach item="item" index="index" collection="finprodType2List" separator=",">
-					#{item}
-				</foreach>
-				)
-				<if test="profitType == null or profitType.size() == 0">
-					)
-				</if>
-			</if>
-			<if test="finprodType2List != null and finprodType2List.size()>0 and profitType != null and profitType.size()>0">
-				OR
-			</if>
-			<if test="(finprodType2List == null or finprodType2List.size() == 0) and profitType != null and profitType.size()>0">
-				AND (
-			</if>
-			<if test="profitType != null and profitType.size()>0 ">
-				FIN_PRODUCT.PROFIT_TYPE IN(
-				<foreach item="item" index="index" collection="profitType" separator=",">
-					#{item}
-				</foreach>
-				)
-			</if>
-			<if test="list3 != null and list3.size()>0">
-				AND WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 IN(
-				<foreach item="item" index="index" collection="list3" separator=",">
-					#{item}
-				</foreach>
-				)
-				)
-			</if>
-			<if test="prodPs != null and !prodPs.equals('')">
-				<!-- 				AND WFL_TRD_PRODUCT_DEAL.PS LIKE CONCAT(#{prodPs},'%') -->
-				AND INSTR(#{prodPs},WFL_TRD_PRODUCT_DEAL.PS) > 0
-			</if>
-			<!-- <if  test="finprodType2List == null or finprodType2List.size()==0 ">
-				<if test="profitType != null and profitType.size()>0">
-					AND (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{finType_F17}
-						AND
-						FIN_PRODUCT.PROFIT_TYPE IN(
-						<foreach item="item" index="index" collection="profitType" separator=",">
-		    					#{item}
-		  				</foreach>
-		  				))
-				</if>
-			</if> -->
-			<if test="tradeMarket != null and tradeMarket !='' ">
-				AND WFL_TRD_PRODUCT_DEAL.TRADE_MARKET = #{tradeMarket}
-			</if>
-			<if test="tradeMarketMode != null and tradeMarketMode !='' ">
-				<!--				AND WFL_TRD_PRODUCT_DEAL.TRADE_MARKET_MODE = #{tradeMarketMode}-->
-				<choose>
-					<when test="tradeMarketMode=='01'">
-						AND WFL_TRD_PRODUCT_DEAL.TRADE_MARKET_MODE = #{tradeMarketMode}
-					</when>
-					<otherwise>
-						AND (WFL_TRD_PRODUCT_DEAL.TRADE_MARKET_MODE = '02'
-						or WFL_TRD_PRODUCT_DEAL.TRADE_MARKET_MODE IS NULL
-						or WFL_TRD_PRODUCT_DEAL.TRADE_MARKET_MODE = '')
-					</otherwise>
-				</choose>
-			</if>
-			<if test="chlFinprodIdList != null and chlFinprodIdList.size() > 0">
-				AND (WFL_TRD_PRODUCT_DEAL.CHL_ID IN
-				<foreach collection="chlFinprodIdList" item="item" index="index" open="("
-						 close=")" separator=",">
-					<if test="(index % 998) == 0">
-						null) OR WFL_TRD_PRODUCT_DEAL.CHL_ID in (
-					</if>
-					#{item}
-				</foreach>
-				)
-			</if>
-			<if test="ps != null and ps !='' ">
-				<!-- AND WFL_TRD_PRODUCT_DEAL.PS = #{ps} -->
-				<!-- AND (WFL_TRD_PRODUCT_DEAL.PS = #{ps}
-					OR  (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F08} and #{ps} = #{LEND_01})
-					OR  (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F09} and #{ps} = #{LEND_02})
-					OR  (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F02} and #{ps} = #{LEND_03})
-					OR  (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F03} and #{ps} = #{LEND_04})
-					OR  (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F04} and #{ps} = #{LEND_03})
-					OR  (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F05} and #{ps} = #{LEND_04})
-					OR  (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F29} and #{ps} = #{LEND_05})
-					OR  (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F30} and #{ps} = #{LEND_06})
-					) -->
-				<!-- 外汇 利率互换 流程中使用回购交易方向 -->
-				AND (case
-				<if test="IRSType_01.equals(IRSps) or IRSType_02.equals(IRSps) or PS_T01.equals(ps)">
-					when WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 in(#{finType_F14})
-					then WFL_PA_TRD_PRODUCT_DEAL.BACK_LEND_DIRECTION
-				</if>
-				<if test="!IRSType_01.equals(IRSps) and !IRSType_02.equals(IRSps)">
-					when WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 in(#{finType_F02},#{finType_F03},#{finType_F04},
-					#{finType_F05},#{finType_F08},#{finType_F09},#{finType_F11},
-					#{finType_F12},#{finType_F13},#{finType_F25},#{finType_F29},#{finType_F30})
-					then WFL_PA_TRD_PRODUCT_DEAL.BACK_LEND_DIRECTION
-				</if>
-				else WFL_TRD_PRODUCT_DEAL.PS
-				end ) = #{ps}
-			</if>
-			<if test="isOutTrade != null and isOutTrade != ''">
-				<choose>
-					<when test="YES_NO_Y.equals(isOutTrade)">
-						AND MST_COUNTER_PARTY.COUNTER_TYPE = #{COUNTER_TYPE_05}
-						<!--		                AND WFL_TRD_PRODUCT_DEAL.PS = 'T02'-->
-					</when>
-					<otherwise>
-						AND ( MST_COUNTER_PARTY.COUNTER_TYPE != #{COUNTER_TYPE_05} OR MST_COUNTER_PARTY.COUNTER_TYPE IS NULL )
-					</otherwise>
-				</choose>
-			</if>
-			<if test="beginDate != null and beginDate != ''">
-				<![CDATA[ AND to_char(WFL_TRD_PRODUCT_DEAL.TRADE_DATE,'yyyy-MM-dd')  >= #{beginDate} ]]>
-			</if>
-			<if test="endDate != null and endDate != ''">
-				<![CDATA[ AND to_char(WFL_TRD_PRODUCT_DEAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
-			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND WFL_TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}
-			</if>
-			<if test= "allStatus02 != null and allStatus02 != ''">
-				AND WFL_TRD_PRODUCT_DEAL.TRADE_STATUS = #{allStatus01}
-			</if>
-			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
-			<if test="'02'.equals(queryType)">
-				AND WFL_TRD_PRODUCT_DEAL.PS != #{PS_T75}
-			</if>
-			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 end -->
-			<!--add by qmh 角色岗位控制权限  start-->
-			AND EXISTS (
-			SELECT 1 FROM (<include refid="USER_ROLE_POST"></include>) USER_ROLE_POST
-			WHERE USER_ROLE_POST.ISLEADERCOUNT>0 OR
-			(USER_ROLE_POST.ISMANAGERCOUNT>0 AND EXISTS (SELECT 1 FROM PTL_PORTFOLIO_AUTHORITY PPA WHERE PPA.USER_ID = USER_ROLE_POST.USER_ID AND PPA.PORTFOLIO_ID = WFL_TRD_PRODUCT_DEAL_ADD.PORTFOLIO_ID))
-			OR (USER_ROLE_POST.ISTRADERCOUNT>0 AND WFL_TRD_PRODUCT_DEAL.TRADER = USER_ROLE_POST.USER_ID )
-			)
-			<!--add by qmh 角色岗位控制权限  end-->
-		</where>)
-
 		UNION ALL
 		(<include refid="VALID_COLUMNS"></include>
 		<where>
@@ -3250,35 +3101,7 @@
 
 			<!--排除新UI业务 -->
 			AND NOT EXISTS (
-			SELECT 1 FROM  TRD_PRODUCT_DEAL tpd WHERE
-			(
-			<!-- 银行间/商业银行柜台-->
-			tpd.TRADE_MARKET in ('01','02') and (
-			<!-- 债券: 买入、卖出、回售-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
-			<!-- 质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-			<!-- 一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			)
-			)
-			or (
-			<!-- 交易所-->
-			tpd.TRADE_MARKET in ('03','04') and (
-			<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
-			<!--            质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-			<!--            一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			<!--            基金: 买入、卖出-->
-			or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
-			<!--            股票: 买入、卖出、申购确认、配股-->
-			or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
-			<!--            信用保护凭证: 买入、卖出、申购-->
-			or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
-			)
-			)
+				SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
 			)
 
 			<if test="etridList != null and !etridList.isEmpty() ">
@@ -3482,42 +3305,840 @@
 		</where>)
 
 		UNION ALL
+		( <include refid="CANCEL_COLUMNS"></include>
+		<where>
+			PTL_PORTFOLIO.INVEST_YESORNO = 'Y' AND TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null
+			<!--排除新UI业务 -->
+			AND NOT EXISTS (
+				SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
+			)
+
+			<if test="etridList != null and !etridList.isEmpty() ">
+				and TRD_PRODUCT_DEAL.TRADE_ID in
+				<foreach collection="etridList" index="index"  item="item" open="(" close=")" separator=",">
+			      #{item}
+				</foreach>
+			</if>
+			<if test="portfolioId != null and !portfolioId.isEmpty()">
+				AND (
+				PTL_PORTFOLIO.PORTFOLIO_ID  IN (<foreach collection="portfolioId" item="item" separator=",">#{item}</foreach> )
+				or PTL_PORTFOLIO.PARENT_PORTFOLIO_ID in (<foreach collection="portfolioId" item="item" separator=",">#{item}</foreach> )
+				)
+			</if>
+			<if test="entrustId != null and entrustId !='' ">
+				AND TRD_PRODUCT_DEAL_ADD.ENTRUST_ID
+				LIKE concat(concat('%',#{entrustId,jdbcType=VARCHAR}),'%')
+			</if>
+			<if test="fTradeId != null and fTradeId !='' ">
+				AND TRD_PRODUCT_DEAL.F_TRADE_ID LIKE concat(concat('%',#{fTradeId,jdbcType=VARCHAR}),'%')
+			</if>
+			<if test="finprodMarketId != null and finprodMarketId !='' ">
+				AND (
+				FIN_PRODUCT.FINPROD_MARKET_ID LIKE concat(concat('%',#{finprodMarketId,jdbcType=VARCHAR}),'%')
+				OR FIN_PRODUCT.FINPROD_ABBR LIKE concat(concat('%',#{finprodMarketId,jdbcType=VARCHAR}),'%')
+				OR FIN_PRODUCT.FINPROD_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))
+				OR FIN_PRODUCT_ADD.APPEAR_MARKET_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))
+				)
+			</if>
+			<!-- <if test="finprodType2List != null and finprodType2List.size()>0 ">
+				AND (TRD_PRODUCT_DEAL.FINPROD_TYPE2 IN(
+					<foreach item="item" index="index" collection="finprodType2List" separator=",">
+    					#{item}
+  					</foreach>
+  					)
+  					<if test="profitType != null and profitType.size()>0">
+  						OR (TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{finType_F17}
+						AND
+						FIN_PRODUCT.PROFIT_TYPE IN(
+						<foreach item="item" index="index" collection="profitType" separator=",">
+		    					#{item}
+		  				</foreach>
+		  				)
+		  				)
+  					</if>
+				)
+			</if> -->
+			<if test="finprodType2List != null and finprodType2List.size()>0">
+				AND (TRD_PRODUCT_DEAL.FINPROD_TYPE2 IN(
+						<foreach item="item" index="index" collection="finprodType2List" separator=",">
+    						#{item}
+  						</foreach>
+					)
+					<if test="profitType == null or profitType.size() == 0">
+						)
+					</if>
+			</if>
+			<if test="finprodType2List != null and finprodType2List.size()>0 and profitType != null and profitType.size()>0">
+				OR
+			</if>
+			<if test="(finprodType2List == null or finprodType2List.size() == 0) and profitType != null and profitType.size()>0">
+				AND (
+			</if>
+			<if test="profitType != null and profitType.size()>0 ">
+				FIN_PRODUCT.PROFIT_TYPE IN(
+					<foreach item="item" index="index" collection="profitType" separator=",">
+    					#{item}
+  					</foreach>
+				)
+			</if>
+			<if test="list3 != null and list3.size()>0">
+				AND TRD_PRODUCT_DEAL.FINPROD_TYPE2 IN(
+						<foreach item="item" index="index" collection="list3" separator=",">
+    						#{item}
+  						</foreach>
+					)
+					)
+			</if>
+			<if test="prodPs != null and !prodPs.equals('')">
+<!-- 				AND TRD_PRODUCT_DEAL.PS LIKE CONCAT(#{prodPs},'%') -->
+				AND INSTR(#{prodPs},TRD_PRODUCT_DEAL.PS) > 0
+			</if>
+			<!-- <if  test="finprodType2List == null or finprodType2List.size()==0 ">
+				<if test="profitType != null and profitType.size()>0">
+					AND (TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{finType_F17}
+						AND
+						FIN_PRODUCT.PROFIT_TYPE IN(
+						<foreach item="item" index="index" collection="profitType" separator=",">
+		    					#{item}
+		  				</foreach>
+		  				))
+				</if>
+			</if> -->
+			<if test="tradeMarket != null and tradeMarket !='' ">
+				AND TRD_PRODUCT_DEAL.TRADE_MARKET = #{tradeMarket}
+			</if>
+			<if test="tradeMarketMode != null and tradeMarketMode !='' ">
+<!--				AND TRD_PRODUCT_DEAL.TRADE_MARKET_MODE = #{tradeMarketMode}-->
+				<choose>
+					<when test="tradeMarketMode=='01'">
+						AND TRD_PRODUCT_DEAL.TRADE_MARKET_MODE = #{tradeMarketMode}
+					</when>
+					<otherwise>
+						AND (TRD_PRODUCT_DEAL.TRADE_MARKET_MODE = '02'
+						or TRD_PRODUCT_DEAL.TRADE_MARKET_MODE IS NULL
+						or TRD_PRODUCT_DEAL.TRADE_MARKET_MODE = '')
+					</otherwise>
+				</choose>
+			</if>
+			<if test="chlFinprodIdList != null and chlFinprodIdList.size() > 0">
+				AND (TRD_PRODUCT_DEAL.CHL_ID IN
+				<foreach collection="chlFinprodIdList" item="item" index="index" open="("
+						 close=")" separator=",">
+					<if test="(index % 998) == 0">
+						null) OR TRD_PRODUCT_DEAL.CHL_ID in (
+					</if>
+					#{item}
+				</foreach>
+				)
+			</if>
+			<if test="ps != null and ps !='' ">
+				<!-- AND TRD_PRODUCT_DEAL.PS = #{ps} -->
+				<!-- AND (TRD_PRODUCT_DEAL.PS = #{ps}
+					OR  (TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F08} and #{ps} = #{LEND_01})
+					OR  (TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F09} and #{ps} = #{LEND_02})
+					OR  (TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F02} and #{ps} = #{LEND_03})
+					OR  (TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F03} and #{ps} = #{LEND_04})
+					OR  (TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F04} and #{ps} = #{LEND_03})
+					OR  (TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F05} and #{ps} = #{LEND_04})
+					OR  (TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F29} and #{ps} = #{LEND_05})
+					OR  (TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F30} and #{ps} = #{LEND_06})
+					) -->
+					AND (case
+				        <if test="IRSType_01.equals(IRSps) or IRSType_02.equals(IRSps) or PS_T01.equals(ps)">
+				        when TRD_PRODUCT_DEAL.FINPROD_TYPE2 in(#{finType_F14})
+				        then FIN_TRADE_PRODUCT.irs_type
+				        </if>
+				        <if test="!IRSType_01.equals(IRSps) and !IRSType_02.equals(IRSps)">
+				        when TRD_PRODUCT_DEAL.FINPROD_TYPE2 in(#{finType_F02},#{finType_F03},#{finType_F04},
+				        		#{finType_F05},#{finType_F08},#{finType_F09},#{finType_F25},#{finType_F29},#{finType_F30})
+				        then PA_TRD_PRODUCT_DEAL.BACK_LEND_DIRECTION
+				        </if>
+				        when TRD_PRODUCT_DEAL.FINPROD_TYPE2 in (#{finType_F11},#{finType_F12},#{finType_F13})
+				        then FIN_TRADE_PRODUCT.exc_ps
+				        else TRD_PRODUCT_DEAL.PS
+				        end ) = #{ps}
+			</if>
+			<if test="isOutTrade != null and isOutTrade != ''">
+				<choose>
+		            <when test="YES_NO_Y.equals(isOutTrade)">
+		                AND MST_COUNTER_PARTY.COUNTER_TYPE = #{COUNTER_TYPE_05}
+<!--		                AND TRD_PRODUCT_DEAL.PS = 'T02'-->
+		            </when>
+		            <otherwise>
+		                AND ( MST_COUNTER_PARTY.COUNTER_TYPE != #{COUNTER_TYPE_05} OR MST_COUNTER_PARTY.COUNTER_TYPE IS NULL )
+		            </otherwise>
+		        </choose>
+			</if>
+			<if test="beginDate != null and beginDate !='' ">
+				<![CDATA[ AND to_char(TRD_PRODUCT_DEAL.TRADE_DATE,'yyyy-MM-dd')  >= #{beginDate} ]]>
+			</if>
+			<if test="endDate != null and endDate !='' ">
+				<![CDATA[ AND to_char(TRD_PRODUCT_DEAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
+			</if>
+			<if test="isCancel != null and isCancel !='' ">
+				<if test="isCancel == YORN_N">
+					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel} or TRD_PRODUCT_DEAL.IS_CANCEL is null )
+				</if>
+				<if test="isCancel != YORN_N">
+				AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel}
+			</if>
+			</if>
+			<if test="tradeStatus != null and tradeStatus !='' ">
+				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}
+			</if>
+			<if test="isCancelY != null and isCancelY !='' ">
+				<if test="isCancelY == YORN_N">
+					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancelY} or TRD_PRODUCT_DEAL.IS_CANCEL is null )
+				</if>
+				<if test="isCancelY != YORN_N">
+				AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancelY}
+			</if>
+			</if>
+			<if test= "allStatus03 != null and allStatus03 != ''">
+				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{allStatus03}
+			</if>
+			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
+			<if test="'02'.equals(queryType)">
+				AND TRD_PRODUCT_DEAL.PS != #{PS_T75}
+			</if>
+			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 end -->
+			<!--add by qmh 角色岗位控制权限  start-->
+				AND EXISTS (
+							SELECT 1 FROM (<include refid="USER_ROLE_POST"></include>) USER_ROLE_POST
+							WHERE USER_ROLE_POST.ISLEADERCOUNT>0 OR
+						    (USER_ROLE_POST.ISMANAGERCOUNT>0 AND EXISTS (SELECT 1 FROM PTL_PORTFOLIO_AUTHORITY PPA WHERE PPA.USER_ID = USER_ROLE_POST.USER_ID AND PPA.PORTFOLIO_ID = TRD_PRODUCT_DEAL_ADD.PORTFOLIO_ID))
+						     OR (USER_ROLE_POST.ISTRADERCOUNT>0 AND TRD_PRODUCT_DEAL.TRADER = USER_ROLE_POST.USER_ID )
+			    			)
+			<!--add by qmh 角色岗位控制权限  end-->
+		</where>)
+
+		UNION ALL
+		(<include refid="BASE_COLUMNS_TOTLE"></include>
+		<where>
+
+			<!--排除新UI业务 -->
+			NOT EXISTS (
+				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = WFL_TEMP.TRADE_ID
+			)
+
+			<if test="portfolioId != null and !portfolioId.isEmpty()">
+				AND (
+				PTL_PORTFOLIO.PORTFOLIO_ID  IN (<foreach collection="portfolioId" item="item" separator=",">#{item}</foreach> )
+				or PTL_PORTFOLIO.PARENT_PORTFOLIO_ID in (<foreach collection="portfolioId" item="item" separator=",">#{item}</foreach> )
+				)
+			</if>
+			<if test="entrustId != null and entrustId !='' ">
+				AND WFL_TRD_DEAL_TOTAL_ADD.ENTRUST_ID
+				LIKE concat(concat('%',#{entrustId,jdbcType=VARCHAR}),'%')
+			</if>
+			<if test="fTradeId != null and fTradeId !='' ">
+				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID LIKE concat(concat('%',#{fTradeId,jdbcType=VARCHAR}),'%')
+			</if>
+			<if test="finprodMarketId != null and finprodMarketId !='' ">
+				AND (
+				FIN_PRODUCT.FINPROD_MARKET_ID LIKE concat(concat('%',#{finprodMarketId,jdbcType=VARCHAR}),'%')
+				OR FIN_PRODUCT.FINPROD_ABBR LIKE concat(concat('%',#{finprodMarketId,jdbcType=VARCHAR}),'%')
+				OR FIN_PRODUCT.FINPROD_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))
+				OR FIN_PRODUCT_ADD.APPEAR_MARKET_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))
+				)
+			</if>
+			<if test="finprodType2List != null and finprodType2List.size()>0">
+				AND (WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2 IN(
+						<foreach item="item" index="index" collection="finprodType2List" separator=",">
+    						#{item}
+  						</foreach>
+					)
+					<if test="profitType == null or profitType.size() == 0">
+						)
+					</if>
+			</if>
+			<if test="finprodType2List != null and finprodType2List.size()>0 and profitType != null and profitType.size()>0">
+				OR
+			</if>
+			<if test="(finprodType2List == null or finprodType2List.size() == 0) and profitType != null and profitType.size()>0">
+				AND (
+			</if>
+			<if test="profitType != null and profitType.size()>0 ">
+				FIN_PRODUCT.PROFIT_TYPE IN(
+					<foreach item="item" index="index" collection="profitType" separator=",">
+    					#{item}
+  					</foreach>
+				)
+			</if>
+			<if test="list3 != null and list3.size()>0">
+				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2 IN(
+						<foreach item="item" index="index" collection="list3" separator=",">
+    						#{item}
+  						</foreach>
+					)
+					)
+			</if>
+			<if test="prodPs != null and !prodPs.equals('')">
+				AND INSTR(#{prodPs},WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.PS) > 0
+			</if>
+			<if test="tradeMarket != null and tradeMarket !='' ">
+				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET = #{tradeMarket}
+			</if>
+			<if test="tradeMarketMode != null and tradeMarketMode !='' ">
+<!--				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = #{tradeMarketMode}-->
+				<choose>
+					<when test="tradeMarketMode=='01'">
+						AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = #{tradeMarketMode}
+					</when>
+					<otherwise>
+						AND (WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = '02'
+						or WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE IS NULL
+						or WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = '')
+					</otherwise>
+				</choose>
+			</if>
+			<if test="chlFinprodIdList != null and chlFinprodIdList.size() > 0">
+				AND (WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.CHL_ID IN
+				<foreach collection="chlFinprodIdList" item="item" index="index" open="("
+						 close=")" separator=",">
+					<if test="(index % 998) == 0">
+						null) OR WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.CHL_ID in (
+					</if>
+					#{item}
+				</foreach>
+				)
+			</if>
+			<if test="ps != null and ps !='' ">
+				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.PS=#{ps}
+			</if>
+			<if test="isOutTrade != null and isOutTrade != ''">
+				<choose>
+		            <when test="YES_NO_Y.equals(isOutTrade)">
+		                AND MST_COUNTER_PARTY.COUNTER_TYPE = #{COUNTER_TYPE_05}
+<!--		                AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.PS = 'T02'-->
+		            </when>
+		            <otherwise>
+		                AND ( MST_COUNTER_PARTY.COUNTER_TYPE != #{COUNTER_TYPE_05} OR MST_COUNTER_PARTY.COUNTER_TYPE IS NULL )
+		            </otherwise>
+		        </choose>
+			</if>
+			<if test="beginDate != null and beginDate != ''">
+				<![CDATA[ AND to_char(WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  >= #{beginDate} ]]>
+			</if>
+			<if test="endDate != null and endDate != ''">
+				<![CDATA[ AND to_char(WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
+			</if>
+			<if test="tradeStatus != null and tradeStatus !='' ">
+				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}
+			</if>
+			<if test= "allStatus02 != null and allStatus02 != ''">
+				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{allStatus01}
+			</if>
+			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
+			<if test="'02'.equals(queryType)">
+				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.PS != #{PS_T75}
+			</if>
+			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 end -->
+			<!--add by qmh 角色岗位控制权限  start-->
+				AND EXISTS (
+							SELECT 1 FROM (<include refid="USER_ROLE_POST"></include>) USER_ROLE_POST
+							WHERE USER_ROLE_POST.ISLEADERCOUNT>0 OR
+						    (USER_ROLE_POST.ISMANAGERCOUNT>0 AND EXISTS (SELECT 1 FROM PTL_PORTFOLIO_AUTHORITY PPA WHERE PPA.USER_ID = USER_ROLE_POST.USER_ID AND PPA.PORTFOLIO_ID = WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.PORTFOLIO_ID))
+						     OR (USER_ROLE_POST.ISTRADERCOUNT>0 AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADER = USER_ROLE_POST.USER_ID )
+			    			)
+			<!--add by qmh 角色岗位控制权限  end-->
+		</where>)
+
+		union all
+		(<include refid="VALID_COLUMNS_TOTLE"></include>
+		<where>
+			PTL_PORTFOLIO.INVEST_YESORNO = 'Y'
+
+			<!--排除新UI业务 -->
+			AND NOT EXISTS (
+				SELECT 1 FROM VALID_TEMP WHERE TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = VALID_TEMP.TRADE_ID
+			)
+
+			<if test="portfolioId != null and !portfolioId.isEmpty()">
+				AND (
+				PTL_PORTFOLIO.PORTFOLIO_ID  IN (<foreach collection="portfolioId" item="item" separator=",">#{item}</foreach> )
+				or PTL_PORTFOLIO.PARENT_PORTFOLIO_ID in (<foreach collection="portfolioId" item="item" separator=",">#{item}</foreach> )
+				)
+			</if>
+			<if test="entrustId != null and entrustId !='' ">
+				AND TRD_DEAL_TOTAL_ADD.ENTRUST_ID
+				LIKE concat(concat('%',#{entrustId,jdbcType=VARCHAR}),'%')
+			</if>
+			<if test="fTradeId != null and fTradeId !='' ">
+				AND TRD_FIN_PRODUCT_DEAL_TOTAL.F_TRADE_ID LIKE concat(concat('%',#{fTradeId,jdbcType=VARCHAR}),'%')
+			</if>
+			<if test="finprodMarketId != null and finprodMarketId !='' ">
+				AND (
+				FIN_PRODUCT.FINPROD_MARKET_ID LIKE concat(concat('%',#{finprodMarketId,jdbcType=VARCHAR}),'%')
+				OR FIN_PRODUCT.FINPROD_ABBR LIKE concat(concat('%',#{finprodMarketId,jdbcType=VARCHAR}),'%')
+				OR FIN_PRODUCT.FINPROD_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))
+				OR FIN_PRODUCT_ADD.APPEAR_MARKET_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))
+				)
+			</if>
+			<if test="finprodType2List != null and finprodType2List.size()>0">
+				AND (TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2 IN(
+						<foreach item="item" index="index" collection="finprodType2List" separator=",">
+    						#{item}
+  						</foreach>
+					)
+					<if test="profitType == null or profitType.size() == 0">
+						)
+					</if>
+			</if>
+			<if test="finprodType2List != null and finprodType2List.size()>0 and profitType != null and profitType.size()>0">
+				OR
+			</if>
+			<if test="(finprodType2List == null or finprodType2List.size() == 0) and profitType != null and profitType.size()>0">
+				AND (
+			</if>
+			<if test="profitType != null and profitType.size()>0 ">
+				FIN_PRODUCT.PROFIT_TYPE IN(
+					<foreach item="item" index="index" collection="profitType" separator=",">
+    					#{item}
+  					</foreach>
+				)
+			</if>
+			<if test="list3 != null and list3.size()>0">
+				AND TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2 IN(
+						<foreach item="item" index="index" collection="list3" separator=",">
+    						#{item}
+  						</foreach>
+					)
+					)
+			</if>
+			<if test="prodPs != null and !prodPs.equals('')">
+				AND INSTR(#{prodPs},TRD_FIN_PRODUCT_DEAL_TOTAL.PS) > 0
+			</if>
+			<if test="tradeMarket != null and tradeMarket !='' ">
+				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET = #{tradeMarket}
+			</if>
+			<if test="tradeMarketMode != null and tradeMarketMode !='' ">
+<!--				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = #{tradeMarketMode}-->
+				<choose>
+					<when test="tradeMarketMode=='01'">
+						AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = #{tradeMarketMode}
+					</when>
+					<otherwise>
+						AND (TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = '02'
+						or TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE IS NULL
+						or TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = '')
+					</otherwise>
+				</choose>
+			</if>
+			<if test="chlFinprodIdList != null and chlFinprodIdList.size() > 0">
+				AND (TRD_FIN_PRODUCT_DEAL_TOTAL.CHL_ID IN
+				<foreach collection="chlFinprodIdList" item="item" index="index" open="("
+						 close=")" separator=",">
+					<if test="(index % 998) == 0">
+						null) OR TRD_FIN_PRODUCT_DEAL_TOTAL.CHL_ID in (
+					</if>
+					#{item}
+				</foreach>
+				)
+			</if>
+			<if test="ps != null and ps !='' ">
+				AND TRD_FIN_PRODUCT_DEAL_TOTAL.PS = #{ps}
+			</if>
+			<if test="isOutTrade != null and isOutTrade != ''">
+				<choose>
+		            <when test="YES_NO_Y.equals(isOutTrade)">
+		                AND MST_COUNTER_PARTY.COUNTER_TYPE = #{COUNTER_TYPE_05}
+<!--		                AND TRD_FIN_PRODUCT_DEAL_TOTAL.PS = 'T02'-->
+		            </when>
+		            <otherwise>
+		                AND ( MST_COUNTER_PARTY.COUNTER_TYPE != #{COUNTER_TYPE_05} OR MST_COUNTER_PARTY.COUNTER_TYPE IS NULL )
+		            </otherwise>
+		        </choose>
+			</if>
+			<if test="beginDate != null and beginDate !='' ">
+				<![CDATA[ AND to_char(TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  >= #{beginDate} ]]>
+			</if>
+			<if test="endDate != null and endDate !='' ">
+				<![CDATA[ AND to_char(TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
+			</if>
+			<if test="isCancel != null and isCancel !='' ">
+				<if test="isCancel == YORN_N">
+					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )
+				</if>
+				<if test="isCancel != YORN_N">
+				AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel}
+			</if>
+			</if>
+			<if test="isCancelN != null and isCancelN !='' ">
+				<if test="isCancelN == YORN_N">
+					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelN} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )
+				</if>
+				<if test="isCancelN != YORN_N">
+					AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelN}
+				</if>
+			</if>
+			<if test="tradeStatus != null and tradeStatus !='' ">
+				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}
+			</if>
+			<if test= "allStatus02 != null and allStatus02 != ''">
+				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{allStatus01}
+			</if>
+			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
+			<if test="'02'.equals(queryType)">
+				AND TRD_FIN_PRODUCT_DEAL_TOTAL.PS != #{PS_T75}
+			</if>
+			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 end -->
+			<!--add by qmh 角色岗位控制权限  start-->
+				AND EXISTS (
+							SELECT 1 FROM (<include refid="USER_ROLE_POST"></include>) USER_ROLE_POST
+							WHERE USER_ROLE_POST.ISLEADERCOUNT>0 OR
+						    (USER_ROLE_POST.ISMANAGERCOUNT>0 AND EXISTS (SELECT 1 FROM PTL_PORTFOLIO_AUTHORITY PPA WHERE PPA.USER_ID = USER_ROLE_POST.USER_ID AND PPA.PORTFOLIO_ID = TRD_FIN_PRODUCT_DEAL_TOTAL.PORTFOLIO_ID))
+						     OR (USER_ROLE_POST.ISTRADERCOUNT>0 AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADER = USER_ROLE_POST.USER_ID )
+			    			)
+			<!--add by qmh 角色岗位控制权限  end-->
+		</where>)
+
+		union all
+		(<include refid="CANCEL_COLUMNS_TOTLE"></include>
+		<where>
+			PTL_PORTFOLIO.INVEST_YESORNO = 'Y'
+			AND ( TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2   <![CDATA[<>]]>  'F17' OR
+			( TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2 = 'F17' AND FIN_PRODUCT.FINPROD_ID IS NOT NULL  ) )
+
+			<!--排除新UI业务 -->
+			AND NOT EXISTS (
+				SELECT 1 FROM VALID_TEMP WHERE TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = VALID_TEMP.TRADE_ID
+			)
+
+			<if test="portfolioId != null and !portfolioId.isEmpty()">
+				AND (
+				PTL_PORTFOLIO.PORTFOLIO_ID  IN (<foreach collection="portfolioId" item="item" separator=",">#{item}</foreach> )
+				or PTL_PORTFOLIO.PARENT_PORTFOLIO_ID in (<foreach collection="portfolioId" item="item" separator=",">#{item}</foreach> )
+				)
+			</if>
+			<if test="entrustId != null and entrustId !='' ">
+				AND TRD_DEAL_TOTAL_ADD.ENTRUST_ID
+				LIKE concat(concat('%',#{entrustId,jdbcType=VARCHAR}),'%')
+			</if>
+			<if test="fTradeId != null and fTradeId !='' ">
+				AND TRD_FIN_PRODUCT_DEAL_TOTAL.F_TRADE_ID LIKE concat(concat('%',#{fTradeId,jdbcType=VARCHAR}),'%')
+			</if>
+			<if test="finprodMarketId != null and finprodMarketId !='' ">
+				AND (
+				FIN_PRODUCT.FINPROD_MARKET_ID LIKE concat(concat('%',#{finprodMarketId,jdbcType=VARCHAR}),'%')
+				OR FIN_PRODUCT.FINPROD_ABBR LIKE concat(concat('%',#{finprodMarketId,jdbcType=VARCHAR}),'%')
+				OR FIN_PRODUCT.FINPROD_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))
+				OR FIN_PRODUCT_ADD.APPEAR_MARKET_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))
+				)
+			</if>
+			<if test="finprodType2List != null and finprodType2List.size()>0">
+				AND (TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2 IN(
+						<foreach item="item" index="index" collection="finprodType2List" separator=",">
+    						#{item}
+  						</foreach>
+					)
+					<if test="profitType == null or profitType.size() == 0">
+						)
+					</if>
+			</if>
+			<if test="finprodType2List != null and finprodType2List.size()>0 and profitType != null and profitType.size()>0">
+				OR
+			</if>
+			<if test="(finprodType2List == null or finprodType2List.size() == 0) and profitType != null and profitType.size()>0">
+				AND (
+			</if>
+			<if test="profitType != null and profitType.size()>0 ">
+				FIN_PRODUCT.PROFIT_TYPE IN(
+					<foreach item="item" index="index" collection="profitType" separator=",">
+    					#{item}
+  					</foreach>
+				)
+			</if>
+			<if test="list3 != null and list3.size()>0">
+				AND TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2 IN(
+						<foreach item="item" index="index" collection="list3" separator=",">
+    						#{item}
+  						</foreach>
+					)
+					)
+			</if>
+			<if test="prodPs != null and !prodPs.equals('')">
+					AND INSTR(#{prodPs},TRD_FIN_PRODUCT_DEAL_TOTAL.PS) > 0
+			</if>
+			<if test="tradeMarket != null and tradeMarket !='' ">
+				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET = #{tradeMarket}
+			</if>
+			<if test="tradeMarketMode != null and tradeMarketMode !='' ">
+<!--				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = #{tradeMarketMode}-->
+				<choose>
+					<when test="tradeMarketMode=='01'">
+						AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = #{tradeMarketMode}
+					</when>
+					<otherwise>
+						AND (TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = '02'
+						or TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE IS NULL
+						or TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = '')
+					</otherwise>
+				</choose>
+			</if>
+			<if test="chlFinprodIdList != null and chlFinprodIdList.size() > 0">
+				AND (TRD_FIN_PRODUCT_DEAL_TOTAL.CHL_ID IN
+				<foreach collection="chlFinprodIdList" item="item" index="index" open="("
+						 close=")" separator=",">
+					<if test="(index % 998) == 0">
+						null) OR TRD_FIN_PRODUCT_DEAL_TOTAL.CHL_ID in (
+					</if>
+					#{item}
+				</foreach>
+				)
+			</if>
+			<if test="ps != null and ps !='' ">
+				AND TRD_FIN_PRODUCT_DEAL_TOTAL.PS = #{ps}
+			</if>
+			<if test="isOutTrade != null and isOutTrade != ''">
+				<choose>
+		            <when test="YES_NO_Y.equals(isOutTrade)">
+		                AND MST_COUNTER_PARTY.COUNTER_TYPE = #{COUNTER_TYPE_05}
+<!--		                AND TRD_FIN_PRODUCT_DEAL_TOTAL.PS = 'T02'-->
+		            </when>
+		            <otherwise>
+		                AND ( MST_COUNTER_PARTY.COUNTER_TYPE != #{COUNTER_TYPE_05} OR MST_COUNTER_PARTY.COUNTER_TYPE IS NULL )
+		            </otherwise>
+		        </choose>
+			</if>
+			<if test="beginDate != null and beginDate !='' ">
+				<![CDATA[ AND to_char(TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  >= #{beginDate} ]]>
+			</if>
+			<if test="endDate != null and endDate !='' ">
+				<![CDATA[ AND to_char(TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
+			</if>
+			<if test="isCancel != null and isCancel !='' ">
+				<if test="isCancel == YORN_N">
+					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )
+				</if>
+				<if test="isCancel != YORN_N">
+				AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel}
+			</if>
+			</if>
+			<if test="isCancelY != null and isCancelY !='' ">
+				<if test="isCancelY == YORN_N">
+					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelY} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )
+				</if>
+				<if test="isCancelY != YORN_N">
+					AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelY}
+				</if>
+			</if>
+			<if test="tradeStatus != null and tradeStatus !='' ">
+				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}
+			</if>
+			<if test= "allStatus03 != null and allStatus03 != ''">
+				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{allStatus03}
+			</if>
+			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
+			<if test="'02'.equals(queryType)">
+				AND TRD_FIN_PRODUCT_DEAL_TOTAL.PS != #{PS_T75}
+			</if>
+			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 end -->
+			<!--add by qmh 角色岗位控制权限  start-->
+				AND EXISTS (
+							SELECT 1 FROM (<include refid="USER_ROLE_POST"></include>) USER_ROLE_POST
+							WHERE USER_ROLE_POST.ISLEADERCOUNT>0 OR
+						    (USER_ROLE_POST.ISMANAGERCOUNT>0 AND EXISTS (SELECT 1 FROM PTL_PORTFOLIO_AUTHORITY PPA WHERE PPA.USER_ID = USER_ROLE_POST.USER_ID AND PPA.PORTFOLIO_ID = TRD_FIN_PRODUCT_DEAL_TOTAL.PORTFOLIO_ID))
+						     OR (USER_ROLE_POST.ISTRADERCOUNT>0 AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADER = USER_ROLE_POST.USER_ID )
+			    			)
+			<!--add by qmh 角色岗位控制权限  end-->
+		</where>
+		)
+
+		union all
+		( <include refid="BASE_COLUMNS"></include>
+		<where>
+			<!--			WFL_TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null-->
+			<!--包含新UI业务，排除协议回购 -->
+			EXISTS (
+				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_PRODUCT_DEAL.TRADE_ID = WFL_TEMP.TRADE_ID
+			)
+
+			<if test="portfolioId != null and !portfolioId.isEmpty()">
+				AND (
+				PTL_PORTFOLIO.PORTFOLIO_ID  IN (<foreach collection="portfolioId" item="item" separator=",">#{item}</foreach> )
+				or PTL_PORTFOLIO.PARENT_PORTFOLIO_ID in (<foreach collection="portfolioId" item="item" separator=",">#{item}</foreach> )
+				)
+			</if>
+			<if test="entrustId != null and entrustId !='' ">
+				ANd WFL_TRD_PRODUCT_DEAL_ADD.ENTRUST_ID
+				LIKE concat(concat('%',#{entrustId,jdbcType=VARCHAR}),'%')
+			</if>
+			<if test="fTradeId != null and fTradeId !='' ">
+				AND WFL_TRD_PRODUCT_DEAL.f_Trade_Id LIKE concat(concat('%',#{fTradeId,jdbcType=VARCHAR}),'%')
+			</if>
+			<if test="finprodMarketId != null and finprodMarketId !='' ">
+				AND (
+				FIN_PRODUCT.FINPROD_MARKET_ID LIKE concat(concat('%',#{finprodMarketId,jdbcType=VARCHAR}),'%')
+				OR FIN_PRODUCT.FINPROD_ABBR LIKE concat(concat('%',#{finprodMarketId,jdbcType=VARCHAR}),'%')
+				OR FIN_PRODUCT.FINPROD_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))
+				OR FIN_PRODUCT_ADD.APPEAR_MARKET_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))
+				)
+			</if>
+			<!-- <if test="finprodType2List != null and finprodType2List.size()>0 ">
+				AND (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 IN(
+					<foreach item="item" index="index" collection="finprodType2List" separator=",">
+    					#{item}
+  					</foreach>
+  					)
+  					<if test="profitType != null and profitType.size()>0">
+  						OR (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{finType_F17}
+						AND
+						FIN_PRODUCT.PROFIT_TYPE IN(
+						<foreach item="item" index="index" collection="profitType" separator=",">
+		    					#{item}
+		  				</foreach>
+		  				)
+		  				)
+  					</if>
+				)
+			</if> -->
+			<if test="finprodType2List != null and finprodType2List.size()>0">
+				AND (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 IN(
+				<foreach item="item" index="index" collection="finprodType2List" separator=",">
+					#{item}
+				</foreach>
+				)
+				<if test="profitType == null or profitType.size() == 0">
+					)
+				</if>
+			</if>
+			<if test="finprodType2List != null and finprodType2List.size()>0 and profitType != null and profitType.size()>0">
+				OR
+			</if>
+			<if test="(finprodType2List == null or finprodType2List.size() == 0) and profitType != null and profitType.size()>0">
+				AND (
+			</if>
+			<if test="profitType != null and profitType.size()>0 ">
+				FIN_PRODUCT.PROFIT_TYPE IN(
+				<foreach item="item" index="index" collection="profitType" separator=",">
+					#{item}
+				</foreach>
+				)
+			</if>
+			<if test="list3 != null and list3.size()>0">
+				AND WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 IN(
+				<foreach item="item" index="index" collection="list3" separator=",">
+					#{item}
+				</foreach>
+				)
+				)
+			</if>
+			<if test="prodPs != null and !prodPs.equals('')">
+				<!-- 				AND WFL_TRD_PRODUCT_DEAL.PS LIKE CONCAT(#{prodPs},'%') -->
+				AND INSTR(#{prodPs},WFL_TRD_PRODUCT_DEAL.PS) > 0
+			</if>
+			<!-- <if  test="finprodType2List == null or finprodType2List.size()==0 ">
+				<if test="profitType != null and profitType.size()>0">
+					AND (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{finType_F17}
+						AND
+						FIN_PRODUCT.PROFIT_TYPE IN(
+						<foreach item="item" index="index" collection="profitType" separator=",">
+		    					#{item}
+		  				</foreach>
+		  				))
+				</if>
+			</if> -->
+			<if test="tradeMarket != null and tradeMarket !='' ">
+				AND WFL_TRD_PRODUCT_DEAL.TRADE_MARKET = #{tradeMarket}
+			</if>
+			<if test="tradeMarketMode != null and tradeMarketMode !='' ">
+				<!--				AND WFL_TRD_PRODUCT_DEAL.TRADE_MARKET_MODE = #{tradeMarketMode}-->
+				<choose>
+					<when test="tradeMarketMode=='01'">
+						AND WFL_TRD_PRODUCT_DEAL.TRADE_MARKET_MODE = #{tradeMarketMode}
+					</when>
+					<otherwise>
+						AND (WFL_TRD_PRODUCT_DEAL.TRADE_MARKET_MODE = '02'
+						or WFL_TRD_PRODUCT_DEAL.TRADE_MARKET_MODE IS NULL
+						or WFL_TRD_PRODUCT_DEAL.TRADE_MARKET_MODE = '')
+					</otherwise>
+				</choose>
+			</if>
+			<if test="chlFinprodIdList != null and chlFinprodIdList.size() > 0">
+				AND (WFL_TRD_PRODUCT_DEAL.CHL_ID IN
+				<foreach collection="chlFinprodIdList" item="item" index="index" open="("
+						 close=")" separator=",">
+					<if test="(index % 998) == 0">
+						null) OR WFL_TRD_PRODUCT_DEAL.CHL_ID in (
+					</if>
+					#{item}
+				</foreach>
+				)
+			</if>
+			<if test="ps != null and ps !='' ">
+				<!-- AND WFL_TRD_PRODUCT_DEAL.PS = #{ps} -->
+				<!-- AND (WFL_TRD_PRODUCT_DEAL.PS = #{ps}
+					OR  (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F08} and #{ps} = #{LEND_01})
+					OR  (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F09} and #{ps} = #{LEND_02})
+					OR  (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F02} and #{ps} = #{LEND_03})
+					OR  (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F03} and #{ps} = #{LEND_04})
+					OR  (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F04} and #{ps} = #{LEND_03})
+					OR  (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F05} and #{ps} = #{LEND_04})
+					OR  (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F29} and #{ps} = #{LEND_05})
+					OR  (WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F30} and #{ps} = #{LEND_06})
+					) -->
+				<!-- 外汇 利率互换 流程中使用回购交易方向 -->
+				AND (case
+				<if test="IRSType_01.equals(IRSps) or IRSType_02.equals(IRSps) or PS_T01.equals(ps)">
+					when WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 in(#{finType_F14})
+					then WFL_PA_TRD_PRODUCT_DEAL.BACK_LEND_DIRECTION
+				</if>
+				<if test="!IRSType_01.equals(IRSps) and !IRSType_02.equals(IRSps)">
+					when WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 in(#{finType_F02},#{finType_F03},#{finType_F04},
+					#{finType_F05},#{finType_F08},#{finType_F09},#{finType_F11},
+					#{finType_F12},#{finType_F13},#{finType_F25},#{finType_F29},#{finType_F30})
+					then WFL_PA_TRD_PRODUCT_DEAL.BACK_LEND_DIRECTION
+				</if>
+				else WFL_TRD_PRODUCT_DEAL.PS
+				end ) = #{ps}
+			</if>
+			<if test="isOutTrade != null and isOutTrade != ''">
+				<choose>
+					<when test="YES_NO_Y.equals(isOutTrade)">
+						AND MST_COUNTER_PARTY.COUNTER_TYPE = #{COUNTER_TYPE_05}
+						<!--		                AND WFL_TRD_PRODUCT_DEAL.PS = 'T02'-->
+					</when>
+					<otherwise>
+						AND ( MST_COUNTER_PARTY.COUNTER_TYPE != #{COUNTER_TYPE_05} OR MST_COUNTER_PARTY.COUNTER_TYPE IS NULL )
+					</otherwise>
+				</choose>
+			</if>
+			<if test="beginDate != null and beginDate != ''">
+				<![CDATA[ AND to_char(WFL_TRD_PRODUCT_DEAL.TRADE_DATE,'yyyy-MM-dd')  >= #{beginDate} ]]>
+			</if>
+			<if test="endDate != null and endDate != ''">
+				<![CDATA[ AND to_char(WFL_TRD_PRODUCT_DEAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
+			</if>
+			<if test="tradeStatus != null and tradeStatus !='' ">
+				AND WFL_TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}
+			</if>
+			<if test= "allStatus02 != null and allStatus02 != ''">
+				AND WFL_TRD_PRODUCT_DEAL.TRADE_STATUS = #{allStatus01}
+			</if>
+			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
+			<if test="'02'.equals(queryType)">
+				AND WFL_TRD_PRODUCT_DEAL.PS != #{PS_T75}
+			</if>
+			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 end -->
+			<!--add by qmh 角色岗位控制权限  start-->
+			AND EXISTS (
+			SELECT 1 FROM (<include refid="USER_ROLE_POST"></include>) USER_ROLE_POST
+			WHERE USER_ROLE_POST.ISLEADERCOUNT>0 OR
+			(USER_ROLE_POST.ISMANAGERCOUNT>0 AND EXISTS (SELECT 1 FROM PTL_PORTFOLIO_AUTHORITY PPA WHERE PPA.USER_ID = USER_ROLE_POST.USER_ID AND PPA.PORTFOLIO_ID = WFL_TRD_PRODUCT_DEAL_ADD.PORTFOLIO_ID))
+			OR (USER_ROLE_POST.ISTRADERCOUNT>0 AND WFL_TRD_PRODUCT_DEAL.TRADER = USER_ROLE_POST.USER_ID )
+			)
+			<!--add by qmh 角色岗位控制权限  end-->
+		</where>)
+
+		UNION ALL
 		(<include refid="VALID_COLUMNS"></include>
 		<where>
 			PTL_PORTFOLIO.INVEST_YESORNO = 'Y'
-<!--			AND TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null-->
+			<!--			AND TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null-->
 			<!--包含新UI业务，排除协议回购 -->
 			AND EXISTS (
-			SELECT 1 FROM TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
-			WHERE
-			(
-			<!-- 银行间/商业银行柜台-->
-			tpd.TRADE_MARKET in ('01','02') and (
-			<!-- 债券: 买入、卖出、回售-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
-			<!-- 质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-			<!-- 一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			)
-			)
-			or (
-			<!-- 交易所-->
-			tpd.TRADE_MARKET in ('03','04') and (
-			<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
-			<!--            质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
-			<!--            一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			<!--            基金: 买入、卖出-->
-			or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
-			<!--            股票: 买入、卖出、申购确认、配股-->
-			or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
-			<!--            信用保护凭证: 买入、卖出、申购-->
-			or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
-			)
-			)
+				SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
 			)
 
 			<if test="etridList != null and !etridList.isEmpty() ">
@@ -3723,276 +4344,11 @@
 		UNION ALL
 		( <include refid="CANCEL_COLUMNS"></include>
 		<where>
-			PTL_PORTFOLIO.INVEST_YESORNO = 'Y' AND TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null
-			<!--排除新UI业务 -->
-			AND NOT EXISTS (
-			SELECT 1 FROM  TRD_PRODUCT_DEAL tpd WHERE
-			(
-			<!-- 银行间/商业银行柜台-->
-			tpd.TRADE_MARKET in ('01','02') and (
-			<!-- 债券: 买入、卖出、回售-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
-			<!-- 质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-			<!-- 一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			)
-			)
-			or (
-			<!-- 交易所-->
-			tpd.TRADE_MARKET in ('03','04') and (
-			<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
-			<!--            质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-			<!--            一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			<!--            基金: 买入、卖出-->
-			or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
-			<!--            股票: 买入、卖出、申购确认、配股-->
-			or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
-			<!--            信用保护凭证: 买入、卖出、申购-->
-			or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
-			)
-			)
-			)
-
-			<if test="etridList != null and !etridList.isEmpty() ">
-				and TRD_PRODUCT_DEAL.TRADE_ID in
-				<foreach collection="etridList" index="index"  item="item" open="(" close=")" separator=",">
-			      #{item}
-				</foreach>
-			</if>
-			<if test="portfolioId != null and !portfolioId.isEmpty()">
-				AND (
-				PTL_PORTFOLIO.PORTFOLIO_ID  IN (<foreach collection="portfolioId" item="item" separator=",">#{item}</foreach> )
-				or PTL_PORTFOLIO.PARENT_PORTFOLIO_ID in (<foreach collection="portfolioId" item="item" separator=",">#{item}</foreach> )
-				)
-			</if>
-			<if test="entrustId != null and entrustId !='' ">
-				AND TRD_PRODUCT_DEAL_ADD.ENTRUST_ID
-				LIKE concat(concat('%',#{entrustId,jdbcType=VARCHAR}),'%')
-			</if>
-			<if test="fTradeId != null and fTradeId !='' ">
-				AND TRD_PRODUCT_DEAL.F_TRADE_ID LIKE concat(concat('%',#{fTradeId,jdbcType=VARCHAR}),'%')
-			</if>
-			<if test="finprodMarketId != null and finprodMarketId !='' ">
-				AND (
-				FIN_PRODUCT.FINPROD_MARKET_ID LIKE concat(concat('%',#{finprodMarketId,jdbcType=VARCHAR}),'%')
-				OR FIN_PRODUCT.FINPROD_ABBR LIKE concat(concat('%',#{finprodMarketId,jdbcType=VARCHAR}),'%')
-				OR FIN_PRODUCT.FINPROD_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))
-				OR FIN_PRODUCT_ADD.APPEAR_MARKET_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))
-				)
-			</if>
-			<!-- <if test="finprodType2List != null and finprodType2List.size()>0 ">
-				AND (TRD_PRODUCT_DEAL.FINPROD_TYPE2 IN(
-					<foreach item="item" index="index" collection="finprodType2List" separator=",">
-    					#{item}
-  					</foreach>
-  					)
-  					<if test="profitType != null and profitType.size()>0">
-  						OR (TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{finType_F17}
-						AND
-						FIN_PRODUCT.PROFIT_TYPE IN(
-						<foreach item="item" index="index" collection="profitType" separator=",">
-		    					#{item}
-		  				</foreach>
-		  				)
-		  				)
-  					</if>
-				)
-			</if> -->
-			<if test="finprodType2List != null and finprodType2List.size()>0">
-				AND (TRD_PRODUCT_DEAL.FINPROD_TYPE2 IN(
-						<foreach item="item" index="index" collection="finprodType2List" separator=",">
-    						#{item}
-  						</foreach>
-					)
-					<if test="profitType == null or profitType.size() == 0">
-						)
-					</if>
-			</if>
-			<if test="finprodType2List != null and finprodType2List.size()>0 and profitType != null and profitType.size()>0">
-				OR
-			</if>
-			<if test="(finprodType2List == null or finprodType2List.size() == 0) and profitType != null and profitType.size()>0">
-				AND (
-			</if>
-			<if test="profitType != null and profitType.size()>0 ">
-				FIN_PRODUCT.PROFIT_TYPE IN(
-					<foreach item="item" index="index" collection="profitType" separator=",">
-    					#{item}
-  					</foreach>
-				)
-			</if>
-			<if test="list3 != null and list3.size()>0">
-				AND TRD_PRODUCT_DEAL.FINPROD_TYPE2 IN(
-						<foreach item="item" index="index" collection="list3" separator=",">
-    						#{item}
-  						</foreach>
-					)
-					)
-			</if>
-			<if test="prodPs != null and !prodPs.equals('')">
-<!-- 				AND TRD_PRODUCT_DEAL.PS LIKE CONCAT(#{prodPs},'%') -->
-				AND INSTR(#{prodPs},TRD_PRODUCT_DEAL.PS) > 0
-			</if>
-			<!-- <if  test="finprodType2List == null or finprodType2List.size()==0 ">
-				<if test="profitType != null and profitType.size()>0">
-					AND (TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{finType_F17}
-						AND
-						FIN_PRODUCT.PROFIT_TYPE IN(
-						<foreach item="item" index="index" collection="profitType" separator=",">
-		    					#{item}
-		  				</foreach>
-		  				))
-				</if>
-			</if> -->
-			<if test="tradeMarket != null and tradeMarket !='' ">
-				AND TRD_PRODUCT_DEAL.TRADE_MARKET = #{tradeMarket}
-			</if>
-			<if test="tradeMarketMode != null and tradeMarketMode !='' ">
-<!--				AND TRD_PRODUCT_DEAL.TRADE_MARKET_MODE = #{tradeMarketMode}-->
-				<choose>
-					<when test="tradeMarketMode=='01'">
-						AND TRD_PRODUCT_DEAL.TRADE_MARKET_MODE = #{tradeMarketMode}
-					</when>
-					<otherwise>
-						AND (TRD_PRODUCT_DEAL.TRADE_MARKET_MODE = '02'
-						or TRD_PRODUCT_DEAL.TRADE_MARKET_MODE IS NULL
-						or TRD_PRODUCT_DEAL.TRADE_MARKET_MODE = '')
-					</otherwise>
-				</choose>
-			</if>
-			<if test="chlFinprodIdList != null and chlFinprodIdList.size() > 0">
-				AND (TRD_PRODUCT_DEAL.CHL_ID IN
-				<foreach collection="chlFinprodIdList" item="item" index="index" open="("
-						 close=")" separator=",">
-					<if test="(index % 998) == 0">
-						null) OR TRD_PRODUCT_DEAL.CHL_ID in (
-					</if>
-					#{item}
-				</foreach>
-				)
-			</if>
-			<if test="ps != null and ps !='' ">
-				<!-- AND TRD_PRODUCT_DEAL.PS = #{ps} -->
-				<!-- AND (TRD_PRODUCT_DEAL.PS = #{ps}
-					OR  (TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F08} and #{ps} = #{LEND_01})
-					OR  (TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F09} and #{ps} = #{LEND_02})
-					OR  (TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F02} and #{ps} = #{LEND_03})
-					OR  (TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F03} and #{ps} = #{LEND_04})
-					OR  (TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F04} and #{ps} = #{LEND_03})
-					OR  (TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F05} and #{ps} = #{LEND_04})
-					OR  (TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F29} and #{ps} = #{LEND_05})
-					OR  (TRD_PRODUCT_DEAL.FINPROD_TYPE2 = #{F30} and #{ps} = #{LEND_06})
-					) -->
-					AND (case
-				        <if test="IRSType_01.equals(IRSps) or IRSType_02.equals(IRSps) or PS_T01.equals(ps)">
-				        when TRD_PRODUCT_DEAL.FINPROD_TYPE2 in(#{finType_F14})
-				        then FIN_TRADE_PRODUCT.irs_type
-				        </if>
-				        <if test="!IRSType_01.equals(IRSps) and !IRSType_02.equals(IRSps)">
-				        when TRD_PRODUCT_DEAL.FINPROD_TYPE2 in(#{finType_F02},#{finType_F03},#{finType_F04},
-				        		#{finType_F05},#{finType_F08},#{finType_F09},#{finType_F25},#{finType_F29},#{finType_F30})
-				        then PA_TRD_PRODUCT_DEAL.BACK_LEND_DIRECTION
-				        </if>
-				        when TRD_PRODUCT_DEAL.FINPROD_TYPE2 in (#{finType_F11},#{finType_F12},#{finType_F13})
-				        then FIN_TRADE_PRODUCT.exc_ps
-				        else TRD_PRODUCT_DEAL.PS
-				        end ) = #{ps}
-			</if>
-			<if test="isOutTrade != null and isOutTrade != ''">
-				<choose>
-		            <when test="YES_NO_Y.equals(isOutTrade)">
-		                AND MST_COUNTER_PARTY.COUNTER_TYPE = #{COUNTER_TYPE_05}
-<!--		                AND TRD_PRODUCT_DEAL.PS = 'T02'-->
-		            </when>
-		            <otherwise>
-		                AND ( MST_COUNTER_PARTY.COUNTER_TYPE != #{COUNTER_TYPE_05} OR MST_COUNTER_PARTY.COUNTER_TYPE IS NULL )
-		            </otherwise>
-		        </choose>
-			</if>
-			<if test="beginDate != null and beginDate !='' ">
-				<![CDATA[ AND to_char(TRD_PRODUCT_DEAL.TRADE_DATE,'yyyy-MM-dd')  >= #{beginDate} ]]>
-			</if>
-			<if test="endDate != null and endDate !='' ">
-				<![CDATA[ AND to_char(TRD_PRODUCT_DEAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
-			</if>
-			<if test="isCancel != null and isCancel !='' ">
-				<if test="isCancel == YORN_N">
-					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel} or TRD_PRODUCT_DEAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancel != YORN_N">
-				AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel}
-			</if>
-			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}
-			</if>
-			<if test="isCancelY != null and isCancelY !='' ">
-				<if test="isCancelY == YORN_N">
-					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancelY} or TRD_PRODUCT_DEAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancelY != YORN_N">
-				AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancelY}
-			</if>
-			</if>
-			<if test= "allStatus03 != null and allStatus03 != ''">
-				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{allStatus03}
-			</if>
-			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
-			<if test="'02'.equals(queryType)">
-				AND TRD_PRODUCT_DEAL.PS != #{PS_T75}
-			</if>
-			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 end -->
-			<!--add by qmh 角色岗位控制权限  start-->
-				AND EXISTS (
-							SELECT 1 FROM (<include refid="USER_ROLE_POST"></include>) USER_ROLE_POST
-							WHERE USER_ROLE_POST.ISLEADERCOUNT>0 OR
-						    (USER_ROLE_POST.ISMANAGERCOUNT>0 AND EXISTS (SELECT 1 FROM PTL_PORTFOLIO_AUTHORITY PPA WHERE PPA.USER_ID = USER_ROLE_POST.USER_ID AND PPA.PORTFOLIO_ID = TRD_PRODUCT_DEAL_ADD.PORTFOLIO_ID))
-						     OR (USER_ROLE_POST.ISTRADERCOUNT>0 AND TRD_PRODUCT_DEAL.TRADER = USER_ROLE_POST.USER_ID )
-			    			)
-			<!--add by qmh 角色岗位控制权限  end-->
-		</where>)
-
-		UNION ALL
-		( <include refid="CANCEL_COLUMNS"></include>
-		<where>
 			PTL_PORTFOLIO.INVEST_YESORNO = 'Y'
-<!--			AND TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null-->
+			<!--			AND TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null-->
 			<!--包含新UI业务，排除协议回购 -->
 			AND EXISTS (
-			SELECT 1 FROM TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
-			WHERE
-			(
-			<!-- 银行间/商业银行柜台-->
-			tpd.TRADE_MARKET in ('01','02') and (
-			<!-- 债券: 买入、卖出、回售-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
-			<!-- 质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-			<!-- 一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			)
-			)
-			or (
-			<!-- 交易所-->
-			tpd.TRADE_MARKET in ('03','04') and (
-			<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
-			<!--            质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
-			<!--            一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			<!--            基金: 买入、卖出-->
-			or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
-			<!--            股票: 买入、卖出、申购确认、配股-->
-			or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
-			<!--            信用保护凭证: 买入、卖出、申购-->
-			or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
-			)
-			)
+				SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
 			)
 
 			<if test="etridList != null and !etridList.isEmpty() ">
@@ -4197,166 +4553,6 @@
 		UNION ALL
 		(<include refid="BASE_COLUMNS_TOTLE"></include>
 		<where>
-
-			<!--排除新UI业务 -->
-			NOT EXISTS (
-			SELECT 1 FROM  WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tpd WHERE
-			(
-			<!-- 银行间/商业银行柜台-->
-			tpd.TRADE_MARKET in ('01','02') and (
-			<!-- 债券: 买入、卖出、回售-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
-			<!-- 质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-			<!-- 一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			)
-			)
-			or (
-			<!-- 交易所-->
-			tpd.TRADE_MARKET in ('03','04') and (
-			<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
-			<!--            质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-			<!--            一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			<!--            基金: 买入、卖出-->
-			or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
-			<!--            股票: 买入、卖出、申购确认、配股-->
-			or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
-			<!--            信用保护凭证: 买入、卖出、申购-->
-			or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
-			)
-			)
-			)
-
-			<if test="portfolioId != null and !portfolioId.isEmpty()">
-				AND (
-				PTL_PORTFOLIO.PORTFOLIO_ID  IN (<foreach collection="portfolioId" item="item" separator=",">#{item}</foreach> )
-				or PTL_PORTFOLIO.PARENT_PORTFOLIO_ID in (<foreach collection="portfolioId" item="item" separator=",">#{item}</foreach> )
-				)
-			</if>
-			<if test="entrustId != null and entrustId !='' ">
-				AND WFL_TRD_DEAL_TOTAL_ADD.ENTRUST_ID
-				LIKE concat(concat('%',#{entrustId,jdbcType=VARCHAR}),'%')
-			</if>
-			<if test="fTradeId != null and fTradeId !='' ">
-				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID LIKE concat(concat('%',#{fTradeId,jdbcType=VARCHAR}),'%')
-			</if>
-			<if test="finprodMarketId != null and finprodMarketId !='' ">
-				AND (
-				FIN_PRODUCT.FINPROD_MARKET_ID LIKE concat(concat('%',#{finprodMarketId,jdbcType=VARCHAR}),'%')
-				OR FIN_PRODUCT.FINPROD_ABBR LIKE concat(concat('%',#{finprodMarketId,jdbcType=VARCHAR}),'%')
-				OR FIN_PRODUCT.FINPROD_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))
-				OR FIN_PRODUCT_ADD.APPEAR_MARKET_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))
-				)
-			</if>
-			<if test="finprodType2List != null and finprodType2List.size()>0">
-				AND (WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2 IN(
-						<foreach item="item" index="index" collection="finprodType2List" separator=",">
-    						#{item}
-  						</foreach>
-					)
-					<if test="profitType == null or profitType.size() == 0">
-						)
-					</if>
-			</if>
-			<if test="finprodType2List != null and finprodType2List.size()>0 and profitType != null and profitType.size()>0">
-				OR
-			</if>
-			<if test="(finprodType2List == null or finprodType2List.size() == 0) and profitType != null and profitType.size()>0">
-				AND (
-			</if>
-			<if test="profitType != null and profitType.size()>0 ">
-				FIN_PRODUCT.PROFIT_TYPE IN(
-					<foreach item="item" index="index" collection="profitType" separator=",">
-    					#{item}
-  					</foreach>
-				)
-			</if>
-			<if test="list3 != null and list3.size()>0">
-				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2 IN(
-						<foreach item="item" index="index" collection="list3" separator=",">
-    						#{item}
-  						</foreach>
-					)
-					)
-			</if>
-			<if test="prodPs != null and !prodPs.equals('')">
-				AND INSTR(#{prodPs},WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.PS) > 0
-			</if>
-			<if test="tradeMarket != null and tradeMarket !='' ">
-				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET = #{tradeMarket}
-			</if>
-			<if test="tradeMarketMode != null and tradeMarketMode !='' ">
-<!--				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = #{tradeMarketMode}-->
-				<choose>
-					<when test="tradeMarketMode=='01'">
-						AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = #{tradeMarketMode}
-					</when>
-					<otherwise>
-						AND (WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = '02'
-						or WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE IS NULL
-						or WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = '')
-					</otherwise>
-				</choose>
-			</if>
-			<if test="chlFinprodIdList != null and chlFinprodIdList.size() > 0">
-				AND (WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.CHL_ID IN
-				<foreach collection="chlFinprodIdList" item="item" index="index" open="("
-						 close=")" separator=",">
-					<if test="(index % 998) == 0">
-						null) OR WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.CHL_ID in (
-					</if>
-					#{item}
-				</foreach>
-				)
-			</if>
-			<if test="ps != null and ps !='' ">
-				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.PS=#{ps}
-			</if>
-			<if test="isOutTrade != null and isOutTrade != ''">
-				<choose>
-		            <when test="YES_NO_Y.equals(isOutTrade)">
-		                AND MST_COUNTER_PARTY.COUNTER_TYPE = #{COUNTER_TYPE_05}
-<!--		                AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.PS = 'T02'-->
-		            </when>
-		            <otherwise>
-		                AND ( MST_COUNTER_PARTY.COUNTER_TYPE != #{COUNTER_TYPE_05} OR MST_COUNTER_PARTY.COUNTER_TYPE IS NULL )
-		            </otherwise>
-		        </choose>
-			</if>
-			<if test="beginDate != null and beginDate != ''">
-				<![CDATA[ AND to_char(WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  >= #{beginDate} ]]>
-			</if>
-			<if test="endDate != null and endDate != ''">
-				<![CDATA[ AND to_char(WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
-			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}
-			</if>
-			<if test= "allStatus02 != null and allStatus02 != ''">
-				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{allStatus01}
-			</if>
-			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
-			<if test="'02'.equals(queryType)">
-				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.PS != #{PS_T75}
-			</if>
-			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 end -->
-			<!--add by qmh 角色岗位控制权限  start-->
-				AND EXISTS (
-							SELECT 1 FROM (<include refid="USER_ROLE_POST"></include>) USER_ROLE_POST
-							WHERE USER_ROLE_POST.ISLEADERCOUNT>0 OR
-						    (USER_ROLE_POST.ISMANAGERCOUNT>0 AND EXISTS (SELECT 1 FROM PTL_PORTFOLIO_AUTHORITY PPA WHERE PPA.USER_ID = USER_ROLE_POST.USER_ID AND PPA.PORTFOLIO_ID = WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.PORTFOLIO_ID))
-						     OR (USER_ROLE_POST.ISTRADERCOUNT>0 AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADER = USER_ROLE_POST.USER_ID )
-			    			)
-			<!--add by qmh 角色岗位控制权限  end-->
-		</where>)
-
-		UNION ALL
-		(<include refid="BASE_COLUMNS_TOTLE"></include>
-		<where>
 			<!--只查询交易所协议回购 -->
 			AND EXISTS (
 			SELECT 1 FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
@@ -4483,183 +4679,6 @@
 			(USER_ROLE_POST.ISMANAGERCOUNT>0 AND EXISTS (SELECT 1 FROM PTL_PORTFOLIO_AUTHORITY PPA WHERE PPA.USER_ID = USER_ROLE_POST.USER_ID AND PPA.PORTFOLIO_ID = WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.PORTFOLIO_ID))
 			OR (USER_ROLE_POST.ISTRADERCOUNT>0 AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADER = USER_ROLE_POST.USER_ID )
 			)
-			<!--add by qmh 角色岗位控制权限  end-->
-		</where>)
-
-		union all
-		(<include refid="VALID_COLUMNS_TOTLE"></include>
-		<where>
-			PTL_PORTFOLIO.INVEST_YESORNO = 'Y'
-
-			<!--排除新UI业务 -->
-			AND NOT EXISTS (
-			SELECT 1 FROM  TRD_FIN_PRODUCT_DEAL_TOTAL tpd WHERE
-			(
-			<!-- 银行间/商业银行柜台-->
-			tpd.TRADE_MARKET in ('01','02') and (
-			<!-- 债券: 买入、卖出、回售-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
-			<!-- 质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-			<!-- 一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			)
-			)
-			or (
-			<!-- 交易所-->
-			tpd.TRADE_MARKET in ('03','04') and (
-			<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
-			<!--            质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-			<!--            一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			<!--            基金: 买入、卖出-->
-			or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
-			<!--            股票: 买入、卖出、申购确认、配股-->
-			or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
-			<!--            信用保护凭证: 买入、卖出、申购-->
-			or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
-			)
-			)
-			)
-
-			<if test="portfolioId != null and !portfolioId.isEmpty()">
-				AND (
-				PTL_PORTFOLIO.PORTFOLIO_ID  IN (<foreach collection="portfolioId" item="item" separator=",">#{item}</foreach> )
-				or PTL_PORTFOLIO.PARENT_PORTFOLIO_ID in (<foreach collection="portfolioId" item="item" separator=",">#{item}</foreach> )
-				)
-			</if>
-			<if test="entrustId != null and entrustId !='' ">
-				AND TRD_DEAL_TOTAL_ADD.ENTRUST_ID
-				LIKE concat(concat('%',#{entrustId,jdbcType=VARCHAR}),'%')
-			</if>
-			<if test="fTradeId != null and fTradeId !='' ">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.F_TRADE_ID LIKE concat(concat('%',#{fTradeId,jdbcType=VARCHAR}),'%')
-			</if>
-			<if test="finprodMarketId != null and finprodMarketId !='' ">
-				AND (
-				FIN_PRODUCT.FINPROD_MARKET_ID LIKE concat(concat('%',#{finprodMarketId,jdbcType=VARCHAR}),'%')
-				OR FIN_PRODUCT.FINPROD_ABBR LIKE concat(concat('%',#{finprodMarketId,jdbcType=VARCHAR}),'%')
-				OR FIN_PRODUCT.FINPROD_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))
-				OR FIN_PRODUCT_ADD.APPEAR_MARKET_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))
-				)
-			</if>
-			<if test="finprodType2List != null and finprodType2List.size()>0">
-				AND (TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2 IN(
-						<foreach item="item" index="index" collection="finprodType2List" separator=",">
-    						#{item}
-  						</foreach>
-					)
-					<if test="profitType == null or profitType.size() == 0">
-						)
-					</if>
-			</if>
-			<if test="finprodType2List != null and finprodType2List.size()>0 and profitType != null and profitType.size()>0">
-				OR
-			</if>
-			<if test="(finprodType2List == null or finprodType2List.size() == 0) and profitType != null and profitType.size()>0">
-				AND (
-			</if>
-			<if test="profitType != null and profitType.size()>0 ">
-				FIN_PRODUCT.PROFIT_TYPE IN(
-					<foreach item="item" index="index" collection="profitType" separator=",">
-    					#{item}
-  					</foreach>
-				)
-			</if>
-			<if test="list3 != null and list3.size()>0">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2 IN(
-						<foreach item="item" index="index" collection="list3" separator=",">
-    						#{item}
-  						</foreach>
-					)
-					)
-			</if>
-			<if test="prodPs != null and !prodPs.equals('')">
-				AND INSTR(#{prodPs},TRD_FIN_PRODUCT_DEAL_TOTAL.PS) > 0
-			</if>
-			<if test="tradeMarket != null and tradeMarket !='' ">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET = #{tradeMarket}
-			</if>
-			<if test="tradeMarketMode != null and tradeMarketMode !='' ">
-<!--				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = #{tradeMarketMode}-->
-				<choose>
-					<when test="tradeMarketMode=='01'">
-						AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = #{tradeMarketMode}
-					</when>
-					<otherwise>
-						AND (TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = '02'
-						or TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE IS NULL
-						or TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = '')
-					</otherwise>
-				</choose>
-			</if>
-			<if test="chlFinprodIdList != null and chlFinprodIdList.size() > 0">
-				AND (TRD_FIN_PRODUCT_DEAL_TOTAL.CHL_ID IN
-				<foreach collection="chlFinprodIdList" item="item" index="index" open="("
-						 close=")" separator=",">
-					<if test="(index % 998) == 0">
-						null) OR TRD_FIN_PRODUCT_DEAL_TOTAL.CHL_ID in (
-					</if>
-					#{item}
-				</foreach>
-				)
-			</if>
-			<if test="ps != null and ps !='' ">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.PS = #{ps}
-			</if>
-			<if test="isOutTrade != null and isOutTrade != ''">
-				<choose>
-		            <when test="YES_NO_Y.equals(isOutTrade)">
-		                AND MST_COUNTER_PARTY.COUNTER_TYPE = #{COUNTER_TYPE_05}
-<!--		                AND TRD_FIN_PRODUCT_DEAL_TOTAL.PS = 'T02'-->
-		            </when>
-		            <otherwise>
-		                AND ( MST_COUNTER_PARTY.COUNTER_TYPE != #{COUNTER_TYPE_05} OR MST_COUNTER_PARTY.COUNTER_TYPE IS NULL )
-		            </otherwise>
-		        </choose>
-			</if>
-			<if test="beginDate != null and beginDate !='' ">
-				<![CDATA[ AND to_char(TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  >= #{beginDate} ]]>
-			</if>
-			<if test="endDate != null and endDate !='' ">
-				<![CDATA[ AND to_char(TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
-			</if>
-			<if test="isCancel != null and isCancel !='' ">
-				<if test="isCancel == YORN_N">
-					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancel != YORN_N">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel}
-			</if>
-			</if>
-			<if test="isCancelN != null and isCancelN !='' ">
-				<if test="isCancelN == YORN_N">
-					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelN} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancelN != YORN_N">
-					AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelN}
-				</if>
-			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}
-			</if>
-			<if test= "allStatus02 != null and allStatus02 != ''">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{allStatus01}
-			</if>
-			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
-			<if test="'02'.equals(queryType)">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.PS != #{PS_T75}
-			</if>
-			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 end -->
-			<!--add by qmh 角色岗位控制权限  start-->
-				AND EXISTS (
-							SELECT 1 FROM (<include refid="USER_ROLE_POST"></include>) USER_ROLE_POST
-							WHERE USER_ROLE_POST.ISLEADERCOUNT>0 OR
-						    (USER_ROLE_POST.ISMANAGERCOUNT>0 AND EXISTS (SELECT 1 FROM PTL_PORTFOLIO_AUTHORITY PPA WHERE PPA.USER_ID = USER_ROLE_POST.USER_ID AND PPA.PORTFOLIO_ID = TRD_FIN_PRODUCT_DEAL_TOTAL.PORTFOLIO_ID))
-						     OR (USER_ROLE_POST.ISTRADERCOUNT>0 AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADER = USER_ROLE_POST.USER_ID )
-			    			)
 			<!--add by qmh 角色岗位控制权限  end-->
 		</where>)
 
@@ -4812,187 +4831,6 @@
 			)
 			<!--add by qmh 角色岗位控制权限  end-->
 		</where>)
-
-		union all
-		(<include refid="CANCEL_COLUMNS_TOTLE"></include>
-		<where>
-			PTL_PORTFOLIO.INVEST_YESORNO = 'Y'
-			AND ( TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2   <![CDATA[<>]]>  'F17' OR
-			( TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2 = 'F17' AND FIN_PRODUCT.FINPROD_ID IS NOT NULL  ) )
-
-			<!--排除新UI业务 -->
-			AND NOT EXISTS (
-			SELECT 1 FROM  TRD_FIN_PRODUCT_DEAL_TOTAL tpd WHERE
-			(
-			<!-- 银行间/商业银行柜台-->
-			tpd.TRADE_MARKET in ('01','02') and (
-			<!-- 债券: 买入、卖出、回售-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03'))
-			<!-- 质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-			<!-- 一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			)
-			)
-			or (
-			<!-- 交易所-->
-			tpd.TRADE_MARKET in ('03','04') and (
-			<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-			(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
-			<!--            质押式回购: 正回购、逆回购-->
-			or (tpd.FINPROD_TYPE2 in ('F02','F03'))
-			<!--            一级市场债: 买入-->
-			or (tpd.FINPROD_TYPE2 ='F32' and tpd.PS ='T01')
-			<!--            基金: 买入、卖出-->
-			or (tpd.FINPROD_TYPE2 ='F06' and tpd.PS in ('T01','T02'))
-			<!--            股票: 买入、卖出、申购确认、配股-->
-			or (tpd.FINPROD_TYPE2 ='F10' and tpd.PS in ('T01','T02','T05','T46'))
-			<!--            信用保护凭证: 买入、卖出、申购-->
-			or (tpd.FINPROD_TYPE2 ='F37' and tpd.PS in ('T01','T02','T04'))
-			)
-			)
-			)
-
-
-			<if test="portfolioId != null and !portfolioId.isEmpty()">
-				AND (
-				PTL_PORTFOLIO.PORTFOLIO_ID  IN (<foreach collection="portfolioId" item="item" separator=",">#{item}</foreach> )
-				or PTL_PORTFOLIO.PARENT_PORTFOLIO_ID in (<foreach collection="portfolioId" item="item" separator=",">#{item}</foreach> )
-				)
-			</if>
-			<if test="entrustId != null and entrustId !='' ">
-				AND TRD_DEAL_TOTAL_ADD.ENTRUST_ID
-				LIKE concat(concat('%',#{entrustId,jdbcType=VARCHAR}),'%')
-			</if>
-			<if test="fTradeId != null and fTradeId !='' ">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.F_TRADE_ID LIKE concat(concat('%',#{fTradeId,jdbcType=VARCHAR}),'%')
-			</if>
-			<if test="finprodMarketId != null and finprodMarketId !='' ">
-				AND (
-				FIN_PRODUCT.FINPROD_MARKET_ID LIKE concat(concat('%',#{finprodMarketId,jdbcType=VARCHAR}),'%')
-				OR FIN_PRODUCT.FINPROD_ABBR LIKE concat(concat('%',#{finprodMarketId,jdbcType=VARCHAR}),'%')
-				OR FIN_PRODUCT.FINPROD_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))
-				OR FIN_PRODUCT_ADD.APPEAR_MARKET_ID LIKE CONCAT('%', CONCAT(#{finprodMarketId}, '%'))
-				)
-			</if>
-			<if test="finprodType2List != null and finprodType2List.size()>0">
-				AND (TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2 IN(
-						<foreach item="item" index="index" collection="finprodType2List" separator=",">
-    						#{item}
-  						</foreach>
-					)
-					<if test="profitType == null or profitType.size() == 0">
-						)
-					</if>
-			</if>
-			<if test="finprodType2List != null and finprodType2List.size()>0 and profitType != null and profitType.size()>0">
-				OR
-			</if>
-			<if test="(finprodType2List == null or finprodType2List.size() == 0) and profitType != null and profitType.size()>0">
-				AND (
-			</if>
-			<if test="profitType != null and profitType.size()>0 ">
-				FIN_PRODUCT.PROFIT_TYPE IN(
-					<foreach item="item" index="index" collection="profitType" separator=",">
-    					#{item}
-  					</foreach>
-				)
-			</if>
-			<if test="list3 != null and list3.size()>0">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2 IN(
-						<foreach item="item" index="index" collection="list3" separator=",">
-    						#{item}
-  						</foreach>
-					)
-					)
-			</if>
-			<if test="prodPs != null and !prodPs.equals('')">
-					AND INSTR(#{prodPs},TRD_FIN_PRODUCT_DEAL_TOTAL.PS) > 0
-			</if>
-			<if test="tradeMarket != null and tradeMarket !='' ">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET = #{tradeMarket}
-			</if>
-			<if test="tradeMarketMode != null and tradeMarketMode !='' ">
-<!--				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = #{tradeMarketMode}-->
-				<choose>
-					<when test="tradeMarketMode=='01'">
-						AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = #{tradeMarketMode}
-					</when>
-					<otherwise>
-						AND (TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = '02'
-						or TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE IS NULL
-						or TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_MARKET_MODE = '')
-					</otherwise>
-				</choose>
-			</if>
-			<if test="chlFinprodIdList != null and chlFinprodIdList.size() > 0">
-				AND (TRD_FIN_PRODUCT_DEAL_TOTAL.CHL_ID IN
-				<foreach collection="chlFinprodIdList" item="item" index="index" open="("
-						 close=")" separator=",">
-					<if test="(index % 998) == 0">
-						null) OR TRD_FIN_PRODUCT_DEAL_TOTAL.CHL_ID in (
-					</if>
-					#{item}
-				</foreach>
-				)
-			</if>
-			<if test="ps != null and ps !='' ">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.PS = #{ps}
-			</if>
-			<if test="isOutTrade != null and isOutTrade != ''">
-				<choose>
-		            <when test="YES_NO_Y.equals(isOutTrade)">
-		                AND MST_COUNTER_PARTY.COUNTER_TYPE = #{COUNTER_TYPE_05}
-<!--		                AND TRD_FIN_PRODUCT_DEAL_TOTAL.PS = 'T02'-->
-		            </when>
-		            <otherwise>
-		                AND ( MST_COUNTER_PARTY.COUNTER_TYPE != #{COUNTER_TYPE_05} OR MST_COUNTER_PARTY.COUNTER_TYPE IS NULL )
-		            </otherwise>
-		        </choose>
-			</if>
-			<if test="beginDate != null and beginDate !='' ">
-				<![CDATA[ AND to_char(TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  >= #{beginDate} ]]>
-			</if>
-			<if test="endDate != null and endDate !='' ">
-				<![CDATA[ AND to_char(TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
-			</if>
-			<if test="isCancel != null and isCancel !='' ">
-				<if test="isCancel == YORN_N">
-					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancel != YORN_N">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel}
-			</if>
-			</if>
-			<if test="isCancelY != null and isCancelY !='' ">
-				<if test="isCancelY == YORN_N">
-					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelY} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancelY != YORN_N">
-					AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelY}
-				</if>
-			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}
-			</if>
-			<if test= "allStatus03 != null and allStatus03 != ''">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{allStatus03}
-			</if>
-			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
-			<if test="'02'.equals(queryType)">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.PS != #{PS_T75}
-			</if>
-			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 end -->
-			<!--add by qmh 角色岗位控制权限  start-->
-				AND EXISTS (
-							SELECT 1 FROM (<include refid="USER_ROLE_POST"></include>) USER_ROLE_POST
-							WHERE USER_ROLE_POST.ISLEADERCOUNT>0 OR
-						    (USER_ROLE_POST.ISMANAGERCOUNT>0 AND EXISTS (SELECT 1 FROM PTL_PORTFOLIO_AUTHORITY PPA WHERE PPA.USER_ID = USER_ROLE_POST.USER_ID AND PPA.PORTFOLIO_ID = TRD_FIN_PRODUCT_DEAL_TOTAL.PORTFOLIO_ID))
-						     OR (USER_ROLE_POST.ISTRADERCOUNT>0 AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADER = USER_ROLE_POST.USER_ID )
-			    			)
-			<!--add by qmh 角色岗位控制权限  end-->
-		</where>
-		)
 
 		union all
 		(<include refid="CANCEL_COLUMNS_TOTLE"></include>
