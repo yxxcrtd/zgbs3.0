@@ -541,6 +541,9 @@ public class FieldEtrDispatcherService extends BaseService{
                             StringUtil.equals(DictCodeListExt3.投管业务类型_竞价交易.getValue(),dto.getBusiTypePosition()))||
                     (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_基金.getValue(),dto.getFinprodType2())
                             && StringUtil.equals(DictCodeListExt3.投管业务类型_竞价交易.getValue(),dto.getBusiTypePosition()) )
+                    ||
+                    (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_基金.getValue(),dto.getFinprodType2())
+                            && StringUtil.equals(DictCodeListExt3.投管业务类型_大宗交易.getValue(),dto.getBusiTypePosition()) )
                             ){
                 spcdCode = DictCodeList.平安资产类型_基金.getValue() + spcdCode;
                 infoForm.addAll(cfgReadonlyFormShowMapper.getReadonlyForm(pageCode,dtCode,spcdCode));
