@@ -466,6 +466,10 @@ public class PositionHttpRequest {
         return httpPostRequest(positionUrl + "/position/batch/main/autoGenerationTask", param);
     }
 
+    public static String updateBalance(Object param) {
+        return httpPostRequest(positionUrl + "/position/batch/main/updateBalance", param);
+    }
+
     private static String getBatchLogRequest(Object param) {
         return httpPostRequest(positionUrl + "/position/batch/main/getBatchLog", param);
     }
