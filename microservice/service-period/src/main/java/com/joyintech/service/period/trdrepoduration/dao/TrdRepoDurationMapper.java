@@ -35,6 +35,8 @@ public interface TrdRepoDurationMapper {
 
     List<TrdRepoDurationDto> findPage(Map<String, Object> param);
 
+    List<TrdRepoDurationDto> selectAllData(Map<String, Object> param);
+
     TrdRepoDurationDto findEffectiveData(Map<String, Object> param);
 
     List<RepoInfo> findRepoInfo(Map<String, Object> params);
