@@ -1301,7 +1301,8 @@
      */
     var entrustNumChange = function () {
         var ps = $("#ps_" + currentTab).val();
-        if (!(currentTab == 'jj' && ps == PS_T01)) {
+        //竞价卖出不检查最小交易单位
+        if (!(currentTab == 'jj' && ps == PS_T02)) {
             var entrustNum = $("#entrustNum_" + currentTab).val();
             var minStep = getMinStep();
 
