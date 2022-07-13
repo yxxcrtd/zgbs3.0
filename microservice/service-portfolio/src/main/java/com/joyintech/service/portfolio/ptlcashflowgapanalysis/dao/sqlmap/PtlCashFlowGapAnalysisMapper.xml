@@ -198,7 +198,7 @@
         '0' paType,
         fcp.PAY_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
-        sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as FUNDACCOUNT,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
         <!-- fp.FINPROD_TYPE2 || fcp.CASH_TYPE || '预测'  as CASHFLOWTYPE,   -->
         nvl(ftp.FINPROD_TYPE2,fp.FINPROD_TYPE2) CASHFLOWTYPE,
         fcp.CASH_TYPE,
@@ -224,6 +224,8 @@
         left join PTL_PORTFOLIO pp on psp.PORTFOLIO_ID = pp.PORTFOLIO_ID
         left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
         left join STL_CAPACCT_INFO sci on pci.ACCT_NO = sci.ACCT_NO
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
         left join FIN_CASH_PLAN fcp on fcp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_TRADE_PRODUCT FTP on FTP.FINPROD_ID = psp.FINPROD_ID
@@ -424,7 +426,7 @@
         '0' paType,
         fcp.PAY_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
-        sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as FUNDACCOUNT,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
         <!--  fp.FINPROD_TYPE2 || fcp.CASH_TYPE || '预测'  as CASHFLOWTYPE,   -->
         fp.FINPROD_TYPE2 as CASHFLOWTYPE,
         fcp.CASH_TYPE,
@@ -443,6 +445,8 @@
         left join PTL_PORTFOLIO pp on psp.PORTFOLIO_ID = pp.PORTFOLIO_ID
         left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
         left join STL_CAPACCT_INFO sci on pci.ACCT_NO = sci.ACCT_NO
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
         left join FIN_CASH_PLAN fcp on fcp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT_ADD on fp.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
@@ -543,7 +547,7 @@
         '0' paType,
         fep1.EXERCISE_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
-        sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as FUNDACCOUNT,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
         <!--  fp.FINPROD_TYPE2 || fcp.CASH_TYPE || '预测' as CASHFLOWTYPE,   -->
         fp.FINPROD_TYPE2 as CASHFLOWTYPE,
         '行权' CASH_TYPE,
@@ -563,6 +567,8 @@
         left join PTL_PORTFOLIO_AUTHORITY pa on pa.portfolio_id = pp.portfolio_id
         left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
         left join STL_CAPACCT_INFO sci on pci.ACCT_NO = sci.ACCT_NO
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT_ADD on fp.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
         left join FIN_EXERCISE_PLAN fep1 on fep1.FINPROD_ID = psp.FINPROD_ID
@@ -756,7 +762,7 @@
         fcp.PAY_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
         fp.ccy CCY,
-        sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as fundAccount,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
         case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29') then 0
              when FTP.FINPROD_TYPE2 IN ('F03', 'F05', 'F09', 'F30') then nvl(ROUND(fcp.CASH_AMT,2),0)
             else  nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0) end as INCASHFLOW,
@@ -775,6 +781,8 @@
         left join PTL_PORTFOLIO pp on psp.PORTFOLIO_ID = pp.PORTFOLIO_ID
         left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID
         and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
         left join FIN_CASH_PLAN fcp on fcp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT_ADD on fp.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
@@ -838,7 +846,7 @@
         fcp.PAY_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
         fp.ccy CCY,
-        sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as fundAccount,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
         case when psp.AMOUNT*fcp.CASH_AMT &gt; 0
         then ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2) else 0 end as INCASHFLOW,
         case when psp.AMOUNT*fcp.CASH_AMT &lt; 0
@@ -854,6 +862,8 @@
         left join PTL_PORTFOLIO pp on psp.PORTFOLIO_ID = pp.PORTFOLIO_ID
         left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID
         and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
         left join FIN_CASH_PLAN fcp on fcp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT_ADD on fp.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
@@ -931,7 +941,7 @@
         fep1.EXERCISE_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
         fp.ccy CCY,
-        sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as fundAccount,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
         case when psp.AMOUNT*fep1.EXERCISE_PRICE &gt; 0
         then ROUND(psp.AMOUNT*fep1.EXERCISE_PRICE/100,2) else 0 end as INCASHFLOW,
         case when psp.AMOUNT*fep1.EXERCISE_PRICE &lt; 0
@@ -948,6 +958,8 @@
         left join PTL_PORTFOLIO_AUTHORITY pa on pa.portfolio_id = pp.portfolio_id
         left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID
         and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT_ADD on fp.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
         left join (select fep.FINPROD_ID,fep.EXERCISE_DATE,fep.EXERCISE_PRICE
@@ -1132,7 +1144,7 @@
         fcp.PAY_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
         psp.ccy CCY ,
-        sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as fundAccount,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
         case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29') then 0
         when FTP.FINPROD_TYPE2 IN ('F03', 'F05', 'F09', 'F30') then nvl(ROUND(fcp.CASH_AMT,2),0)
         else  nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0) end as INCASHFLOW,
@@ -1152,6 +1164,8 @@
         left join PTL_PORTFOLIO_AUTHORITY pa on pa.portfolio_id = pp.portfolio_id
         left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID
         and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
         left join FIN_CASH_PLAN fcp on fcp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_TRADE_PRODUCT FTP on FTP.FINPROD_ID = psp.FINPROD_ID
@@ -1214,7 +1228,7 @@
         fcp.PAY_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
         psp.ccy CCY ,
-        sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as fundAccount,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
         case when psp.AMOUNT*fcp.CASH_AMT &gt; 0
         then ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2) else 0 end as INCASHFLOW,
         case when psp.AMOUNT*fcp.CASH_AMT &lt; 0
@@ -1230,6 +1244,8 @@
         left join PTL_PORTFOLIO pp on psp.PORTFOLIO_ID = pp.PORTFOLIO_ID
         left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID
         and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
         left join FIN_CASH_PLAN fcp on fcp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT_ADD on fp.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
@@ -1308,7 +1324,7 @@
         fep1.EXERCISE_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
         psp.ccy CCY ,
-        sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as fundAccount,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
         case when psp.AMOUNT*fep1.EXERCISE_PRICE &gt; 0
         then ROUND(psp.AMOUNT*fep1.EXERCISE_PRICE/100,2) else 0 end as INCASHFLOW,
         case when psp.AMOUNT*fep1.EXERCISE_PRICE &lt; 0
@@ -1325,6 +1341,8 @@
         left join PTL_PORTFOLIO_AUTHORITY pa on pa.portfolio_id = pp.portfolio_id
         left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID
         and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT_ADD on fp.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
         left join (select fep.FINPROD_ID,fep.EXERCISE_DATE,fep.EXERCISE_PRICE
