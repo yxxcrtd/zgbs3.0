@@ -1300,10 +1300,13 @@
      * 委托数量变更时联动计算委托金额
      */
     var entrustNumChange = function () {
-        var entrustNum = $("#entrustNum_" + currentTab).val();
-        var minStep = getMinStep();
-        let number = Math.floor(entrustNum / minStep) * minStep;
-        $("#entrustNum_" + currentTab).val(number);
+        var ps = $("#ps_" + currentTab).val();
+        if (!(currentTab == 'jj' && ps == PS_T01)) {
+            var entrustNum = $("#entrustNum_" + currentTab).val();
+            var minStep = getMinStep();
+            let number = Math.floor(entrustNum / minStep) * minStep;
+            $("#entrustNum_" + currentTab).val(number);
+        }
 
         setRiskFlag(1);
         calcEntrustNumAndAmt();
