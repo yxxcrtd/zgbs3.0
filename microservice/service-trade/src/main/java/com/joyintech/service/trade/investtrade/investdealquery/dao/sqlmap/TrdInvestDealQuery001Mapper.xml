@@ -344,8 +344,7 @@
 <!--			LEFT JOIN TEMP tp-->
 <!--			ON TRD_PRODUCT_DEAL.FINPROD_ID = tp.FINPROD_ID-->
 <!--		</if>-->
-		LEFT JOIN PTL_TRADE
-			ON TRD_PRODUCT_DEAL.P_TRADE_ID = PTL_TRADE.BUSI_NO
+		LEFT JOIN PTL_TRADE ON TRD_PRODUCT_DEAL.P_TRADE_ID = PTL_TRADE.BUSI_NO
 		LEFT JOIN	PTL_PORTFOLIO
 			ON	PTL_PORTFOLIO.PORTFOLIO_ID = PTL_TRADE.PORTFOLIO_ID
 		LEFT JOIN	FIN_PRODUCT
@@ -497,10 +496,10 @@
 				or (
 					<!-- 交易所-->
 					tpd.TRADE_MARKET in ('03','04') and (
-					<!--            债券: 买入、卖出、回售、申购确认、配债-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T05','T97'))
-					<!--            债券: 网上申购-->
-					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS = 'T04' and tdta.PURCH_MODLE = '01')
+					<!--            债券: 买入、卖出、回售、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T97'))
+					<!--            债券: 网上申购、申购确认-->
+					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T04','T05') and tdta.PURCH_MODLE = '01')
 					<!--            质押式回购: 正回购、逆回购-->
 					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
 					<!--            一级市场债: 买入-->
@@ -520,6 +519,7 @@
         (<include refid="BASE_COLUMNS"></include>
 		<where>
 			WFL_TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null
+			AND WFL_TRD_PRODUCT_DEAL.TRADE_STATUS = '01' AND WFL_TRD_PRODUCT_DEAL.IS_CANCEL ='N'
 
             <!--排除新UI业务 -->
             AND NOT EXISTS (
@@ -704,9 +704,9 @@
 			<if test="endDate != null and endDate != ''">
 				<![CDATA[ AND to_char(WFL_TRD_PRODUCT_DEAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
 			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND WFL_TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}
-			</if>
+<!--			<if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--				AND WFL_TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}-->
+<!--			</if>-->
 			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
 			<if test="'02'.equals(queryType)">
 				AND WFL_TRD_PRODUCT_DEAL.PS != #{PS_T75}
@@ -730,6 +730,7 @@
             NOT EXISTS (
 				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = WFL_TEMP.TRADE_ID
             )
+			AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = '01' AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL ='N'
 
 			<if test="portfolioId != null and !portfolioId.isEmpty() ">
 				AND (
@@ -875,6 +876,7 @@
             EXISTS (
 				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_PRODUCT_DEAL.TRADE_ID = WFL_TEMP.TRADE_ID
             )
+			AND WFL_TRD_PRODUCT_DEAL.TRADE_STATUS = '01' AND WFL_TRD_PRODUCT_DEAL.IS_CANCEL ='N'
 
             <if test="portfolioId != null and !portfolioId.isEmpty() ">
                 AND (
@@ -1075,6 +1077,7 @@
         union all
         (<include refid="BASE_COLUMNS_TOTLE"></include>
         <where>
+			WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = '01' AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL ='N'
             <!--只查询交易所协议回购 -->
             AND EXISTS (
             SELECT 1 FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
@@ -1295,10 +1298,10 @@
 				or (
 					<!-- 交易所-->
 					tpd.TRADE_MARKET in ('03','04') and (
-					<!--            债券: 买入、卖出、回售、申购确认、配债-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T05','T97'))
-					<!--            债券: 网上申购-->
-					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS ='T04' and tdta.PURCH_MODLE = '01')
+					<!--            债券: 买入、卖出、回售、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T97'))
+					<!--            债券: 网上申购、申购确认-->
+					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T04','T05') and tdta.PURCH_MODLE = '01')
 					<!--            质押式回购: 正回购、逆回购-->
 					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
 					<!--            一级市场债: 买入-->
@@ -1318,8 +1321,9 @@
 		(<include refid="VALID_COLUMNS"></include>
 		<where>
 			PTL_PORTFOLIO.INVEST_YESORNO = 'Y' AND TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null
+			AND TRD_PRODUCT_DEAL.TRADE_STATUS = '01' AND TRD_PRODUCT_DEAL.IS_CANCEL ='N'
 
-            <!--排除新UI业务 -->
+			<!--排除新UI业务 -->
 			AND NOT EXISTS (
 			   SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
 			)
@@ -1489,17 +1493,17 @@
 			<if test="endDate != null and endDate !='' ">
 				<![CDATA[ AND to_char(TRD_PRODUCT_DEAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
 			</if>
-			<if test="isCancel != null and isCancel !='' ">
-				<if test="isCancel == YORN_N">
-					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel} or TRD_PRODUCT_DEAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancel != YORN_N">
-				AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel}
-			</if>
-			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}
-			</if>
+<!--			<if test="isCancel != null and isCancel !='' ">-->
+<!--				<if test="isCancel == YORN_N">-->
+<!--					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel} or TRD_PRODUCT_DEAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancel != YORN_N">-->
+<!--				AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel}-->
+<!--			    </if>-->
+<!--			</if>-->
+<!--			<if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}-->
+<!--			</if>-->
 			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
 			<if test="'02'.equals(queryType)">
 				AND TRD_PRODUCT_DEAL.PS != #{PS_T75}
@@ -1519,6 +1523,7 @@
 		(<include refid="VALID_COLUMNS_TOTLE"></include>
 		<where>
 			PTL_PORTFOLIO.INVEST_YESORNO = 'Y'
+			AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = '01' AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL ='N'
 
 			<!--排除新UI业务 -->
 			AND NOT EXISTS (
@@ -1630,17 +1635,17 @@
 			<if test="endDate != null and endDate !='' ">
 				<![CDATA[ AND to_char(TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
 			</if>
-			<if test="isCancel != null and isCancel !='' ">
-				<if test="isCancel == YORN_N">
-					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancel != YORN_N">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel}
-			</if>
-			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}
-			</if>
+<!--			<if test="isCancel != null and isCancel !='' ">-->
+<!--				<if test="isCancel == YORN_N">-->
+<!--					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancel != YORN_N">-->
+<!--				AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel}-->
+<!--			</if>-->
+<!--			</if>-->
+<!--			<if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}-->
+<!--			</if>-->
 			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
 			<if test="'02'.equals(queryType)">
 				AND TRD_FIN_PRODUCT_DEAL_TOTAL.PS != #{PS_T75}
@@ -1660,6 +1665,8 @@
 		(<include refid="VALID_COLUMNS"></include>
 		<where>
 			PTL_PORTFOLIO.INVEST_YESORNO = 'Y'
+			AND TRD_PRODUCT_DEAL.TRADE_STATUS = '01' AND TRD_PRODUCT_DEAL.IS_CANCEL ='N'
+
 <!--			AND TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null-->
 			<!--包含新UI业务，排除协议回购 -->
 			AND EXISTS (
@@ -1831,17 +1838,17 @@
 			<if test="endDate != null and endDate !='' ">
 				<![CDATA[ AND to_char(TRD_PRODUCT_DEAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
 			</if>
-			<if test="isCancel != null and isCancel !='' ">
-				<if test="isCancel == YORN_N">
-					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel} or TRD_PRODUCT_DEAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancel != YORN_N">
-					AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel}
-				</if>
-			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}
-			</if>
+<!--			<if test="isCancel != null and isCancel !='' ">-->
+<!--				<if test="isCancel == YORN_N">-->
+<!--					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel} or TRD_PRODUCT_DEAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancel != YORN_N">-->
+<!--					AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel}-->
+<!--				</if>-->
+<!--			</if>-->
+<!--			<if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}-->
+<!--			</if>-->
 			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
 			<if test="'02'.equals(queryType)">
 				AND TRD_PRODUCT_DEAL.PS != #{PS_T75}
@@ -1861,6 +1868,8 @@
 		(<include refid="VALID_COLUMNS_TOTLE"></include>
 		<where>
 			PTL_PORTFOLIO.INVEST_YESORNO = 'Y'
+			AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = '01' AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL ='N'
+
 
 			<!--只查询交易所协议回购 -->
 			AND EXISTS (
@@ -1973,17 +1982,17 @@
 			<if test="endDate != null and endDate !='' ">
 				<![CDATA[ AND to_char(TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
 			</if>
-			<if test="isCancel != null and isCancel !='' ">
-				<if test="isCancel == YORN_N">
-					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancel != YORN_N">
-					AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel}
-				</if>
-			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}
-			</if>
+<!--			<if test="isCancel != null and isCancel !='' ">-->
+<!--				<if test="isCancel == YORN_N">-->
+<!--					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancel != YORN_N">-->
+<!--					AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel}-->
+<!--				</if>-->
+<!--			</if>-->
+<!--			<if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}-->
+<!--			</if>-->
 			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
 			<if test="'02'.equals(queryType)">
 				AND TRD_FIN_PRODUCT_DEAL_TOTAL.PS != #{PS_T75}
@@ -2076,10 +2085,10 @@
 				or (
 					<!-- 交易所-->
 					tpd.TRADE_MARKET in ('03','04') and (
-					<!--            债券: 买入、卖出、回售、申购确认、配债-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T05','T97'))
-					<!--            债券: 网上申购-->
-		            or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS='T04' and tdta.PURCH_MODLE='01')
+					<!--            债券: 买入、卖出、回售、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T97'))
+					<!--            债券: 网上申购、申购确认-->
+		            or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T04','T05') and tdta.PURCH_MODLE='01')
 					<!--            质押式回购: 正回购、逆回购-->
 					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
 					<!--            一级市场债: 买入-->
@@ -2099,6 +2108,7 @@
 		(<include refid="CANCEL_COLUMNS"></include>
 		<where>
 			PTL_PORTFOLIO.INVEST_YESORNO = 'Y' AND TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null
+			AND TRD_PRODUCT_DEAL.TRADE_STATUS = '03' AND TRD_PRODUCT_DEAL.IS_CANCEL ='N'
 
             <!--排除新UI业务 -->
 			AND NOT EXISTS (
@@ -2259,17 +2269,17 @@
 			<if test="endDate != null and endDate !='' ">
 				<![CDATA[ AND to_char(TRD_PRODUCT_DEAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
 			</if>
-			<if test="isCancel != null and isCancel !='' ">
-				<if test="isCancel == YORN_N">
-					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel} or TRD_PRODUCT_DEAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancel != YORN_N">
-				AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel}
-			</if>
-			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}
-			</if>
+<!--			<if test="isCancel != null and isCancel !='' ">-->
+<!--				<if test="isCancel == YORN_N">-->
+<!--					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel} or TRD_PRODUCT_DEAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancel != YORN_N">-->
+<!--				AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel}-->
+<!--			</if>-->
+<!--			</if>-->
+<!--			<if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}-->
+<!--			</if>-->
 			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
 			<if test="'02'.equals(queryType)">
 				AND TRD_PRODUCT_DEAL.PS != #{PS_T75}
@@ -2289,6 +2299,7 @@
 		(<include refid="CANCEL_COLUMNS_TOTLE"></include>
 		<where>
 			PTL_PORTFOLIO.INVEST_YESORNO = 'Y'
+			AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = '03' AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL ='N'
 			AND ( TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2   <![CDATA[<>]]>  'F17' OR
 			( TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2 = 'F17' AND FIN_PRODUCT.FINPROD_ID IS NOT NULL  ) )
 
@@ -2405,17 +2416,17 @@
 			<if test="endDate != null and endDate !='' ">
 				<![CDATA[ AND to_char(TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
 			</if>
-			<if test="isCancel != null and isCancel !='' ">
-				<if test="isCancel == YORN_N">
-					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancel != YORN_N">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel}
-			</if>
-			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}
-			</if>
+<!--			<if test="isCancel != null and isCancel !='' ">-->
+<!--				<if test="isCancel == YORN_N">-->
+<!--					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancel != YORN_N">-->
+<!--				AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel}-->
+<!--			</if>-->
+<!--			</if>-->
+<!--			<if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}-->
+<!--			</if>-->
 			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
 			<if test="'02'.equals(queryType)">
 				AND TRD_FIN_PRODUCT_DEAL_TOTAL.PS != #{PS_T75}
@@ -2436,6 +2447,7 @@
         (<include refid="CANCEL_COLUMNS"></include>
         <where>
             PTL_PORTFOLIO.INVEST_YESORNO = 'Y'
+			AND TRD_PRODUCT_DEAL.TRADE_STATUS = '03' AND TRD_PRODUCT_DEAL.IS_CANCEL ='N'
 <!--			AND TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null-->
 
             <!--包含新UI业务，排除协议回购 -->
@@ -2597,17 +2609,17 @@
             <if test="endDate != null and endDate !='' ">
                 <![CDATA[ AND to_char(TRD_PRODUCT_DEAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
             </if>
-            <if test="isCancel != null and isCancel !='' ">
-                <if test="isCancel == YORN_N">
-                    AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel} or TRD_PRODUCT_DEAL.IS_CANCEL is null )
-                </if>
-                <if test="isCancel != YORN_N">
-                    AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel}
-                </if>
-            </if>
-            <if test="tradeStatus != null and tradeStatus !='' ">
-                AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}
-            </if>
+<!--            <if test="isCancel != null and isCancel !='' ">-->
+<!--                <if test="isCancel == YORN_N">-->
+<!--                    AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel} or TRD_PRODUCT_DEAL.IS_CANCEL is null )-->
+<!--                </if>-->
+<!--                <if test="isCancel != YORN_N">-->
+<!--                    AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel}-->
+<!--                </if>-->
+<!--            </if>-->
+<!--            <if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--                AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}-->
+<!--            </if>-->
             <!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
             <if test="'02'.equals(queryType)">
                 AND TRD_PRODUCT_DEAL.PS != #{PS_T75}
@@ -2628,6 +2640,7 @@
         <include refid="CANCEL_COLUMNS_TOTLE"></include>
         <where>
             PTL_PORTFOLIO.INVEST_YESORNO = 'Y'
+			AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = '03' AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL ='N'
 
             <!--只查询交易所协议回购 -->
             AND EXISTS (
@@ -2743,17 +2756,17 @@
             <if test="endDate != null and endDate !='' ">
                 <![CDATA[ AND to_char(TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
             </if>
-            <if test="isCancel != null and isCancel !='' ">
-                <if test="isCancel == YORN_N">
-                    AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )
-                </if>
-                <if test="isCancel != YORN_N">
-                    AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel}
-                </if>
-            </if>
-            <if test="tradeStatus != null and tradeStatus !='' ">
-                AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}
-            </if>
+<!--            <if test="isCancel != null and isCancel !='' ">-->
+<!--                <if test="isCancel == YORN_N">-->
+<!--                    AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )-->
+<!--                </if>-->
+<!--                <if test="isCancel != YORN_N">-->
+<!--                    AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel}-->
+<!--                </if>-->
+<!--            </if>-->
+<!--            <if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--                AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}-->
+<!--            </if>-->
             <!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
             <if test="'02'.equals(queryType)">
                 AND TRD_FIN_PRODUCT_DEAL_TOTAL.PS != #{PS_T75}
@@ -2853,10 +2866,10 @@
 				or (
 					<!-- 交易所-->
 					tpd.TRADE_MARKET in ('03','04') and (
-					<!--            债券: 买入、卖出、回售、申购确认、配债-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T05','T97'))
-					<!--            债券: 网上申购-->
-					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS ='T04' and tdta.PURCH_MODLE = '01')
+					<!--            债券: 买入、卖出、回售、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T97'))
+					<!--            债券: 网上申购、申购确认-->
+					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T04','T05') and tdta.PURCH_MODLE = '01')
 					<!--            质押式回购: 正回购、逆回购-->
 					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
 					<!--            一级市场债: 买入-->
@@ -2925,10 +2938,10 @@
 				or (
 				<!-- 交易所-->
 					tpd.TRADE_MARKET in ('03','04') and (
-					<!--            债券: 买入、卖出、回售、申购确认、配债-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T05','T97'))
-					<!--            债券: 网上申购-->
-					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS ='T04' and tdta.PURCH_MODLE = '01')
+					<!--            债券: 买入、卖出、回售、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T97'))
+					<!--            债券: 网上申购、申购确认-->
+					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T04','T05') and tdta.PURCH_MODLE = '01')
 					<!--            质押式回购: 正回购、逆回购-->
 					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
 					<!--            一级市场债: 买入-->
@@ -2948,6 +2961,7 @@
 		( <include refid="BASE_COLUMNS"></include>
 		<where>
 		 	WFL_TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null
+			AND WFL_TRD_PRODUCT_DEAL.TRADE_STATUS = '01' AND WFL_TRD_PRODUCT_DEAL.IS_CANCEL ='N'
 
 			<!--排除新UI业务 -->
 			AND NOT EXISTS (
@@ -3110,12 +3124,12 @@
 			<if test="endDate != null and endDate != ''">
 				<![CDATA[ AND to_char(WFL_TRD_PRODUCT_DEAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
 			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND WFL_TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}
-			</if>
-			<if test= "allStatus02 != null and allStatus02 != ''">
-				AND WFL_TRD_PRODUCT_DEAL.TRADE_STATUS = #{allStatus01}
-			</if>
+<!--			<if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--				AND WFL_TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}-->
+<!--			</if>-->
+<!--			<if test= "allStatus02 != null and allStatus02 != ''">-->
+<!--				AND WFL_TRD_PRODUCT_DEAL.TRADE_STATUS = #{allStatus01}-->
+<!--			</if>-->
 			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
 			<if test="'02'.equals(queryType)">
 				AND WFL_TRD_PRODUCT_DEAL.PS != #{PS_T75}
@@ -3135,6 +3149,7 @@
 		(<include refid="VALID_COLUMNS"></include>
 		<where>
 			PTL_PORTFOLIO.INVEST_YESORNO = 'Y' AND TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null
+			AND TRD_PRODUCT_DEAL.TRADE_STATUS = '01' AND TRD_PRODUCT_DEAL.IS_CANCEL ='N'
 
 			<!--排除新UI业务 -->
 			AND NOT EXISTS (
@@ -3304,28 +3319,28 @@
 			<if test="endDate != null and endDate !='' ">
 				<![CDATA[ AND to_char(TRD_PRODUCT_DEAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
 			</if>
-			<if test="isCancel != null and isCancel !='' ">
-				<if test="isCancel == YORN_N">
-					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel} or TRD_PRODUCT_DEAL.IS_CANCEL is null )
-			</if>
-				<if test="isCancel != YORN_N">
-					AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel}
-				</if>
-			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}
-			</if>
-			<if test="isCancelN != null and isCancelN !='' ">
-				<if test="isCancelN == YORN_N">
-					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancelN} or TRD_PRODUCT_DEAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancelN != YORN_N">
-				AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancelN}
-			</if>
-			</if>
-			<if test= "allStatus01 != null and allStatus01 != ''">
-				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{allStatus01}
-			</if>
+<!--			<if test="isCancel != null and isCancel !='' ">-->
+<!--				<if test="isCancel == YORN_N">-->
+<!--					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel} or TRD_PRODUCT_DEAL.IS_CANCEL is null )-->
+<!--			</if>-->
+<!--				<if test="isCancel != YORN_N">-->
+<!--					AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel}-->
+<!--				</if>-->
+<!--			</if>-->
+<!--			<if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}-->
+<!--			</if>-->
+<!--			<if test="isCancelN != null and isCancelN !='' ">-->
+<!--				<if test="isCancelN == YORN_N">-->
+<!--					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancelN} or TRD_PRODUCT_DEAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancelN != YORN_N">-->
+<!--				AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancelN}-->
+<!--			</if>-->
+<!--			</if>-->
+<!--			<if test= "allStatus01 != null and allStatus01 != ''">-->
+<!--				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{allStatus01}-->
+<!--			</if>-->
 			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
 			<if test="'02'.equals(queryType)">
 				AND TRD_PRODUCT_DEAL.PS != #{PS_T75}
@@ -3345,6 +3360,7 @@
 		( <include refid="CANCEL_COLUMNS"></include>
 		<where>
 			PTL_PORTFOLIO.INVEST_YESORNO = 'Y' AND TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null
+			AND TRD_PRODUCT_DEAL.TRADE_STATUS = '03' AND TRD_PRODUCT_DEAL.IS_CANCEL ='N'
 			<!--排除新UI业务 -->
 			AND NOT EXISTS (
 				SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
@@ -3512,28 +3528,28 @@
 			<if test="endDate != null and endDate !='' ">
 				<![CDATA[ AND to_char(TRD_PRODUCT_DEAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
 			</if>
-			<if test="isCancel != null and isCancel !='' ">
-				<if test="isCancel == YORN_N">
-					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel} or TRD_PRODUCT_DEAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancel != YORN_N">
-				AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel}
-			</if>
-			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}
-			</if>
-			<if test="isCancelY != null and isCancelY !='' ">
-				<if test="isCancelY == YORN_N">
-					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancelY} or TRD_PRODUCT_DEAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancelY != YORN_N">
-				AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancelY}
-			</if>
-			</if>
-			<if test= "allStatus03 != null and allStatus03 != ''">
-				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{allStatus03}
-			</if>
+<!--			<if test="isCancel != null and isCancel !='' ">-->
+<!--				<if test="isCancel == YORN_N">-->
+<!--					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel} or TRD_PRODUCT_DEAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancel != YORN_N">-->
+<!--				AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel}-->
+<!--			</if>-->
+<!--			</if>-->
+<!--			<if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}-->
+<!--			</if>-->
+<!--			<if test="isCancelY != null and isCancelY !='' ">-->
+<!--				<if test="isCancelY == YORN_N">-->
+<!--					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancelY} or TRD_PRODUCT_DEAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancelY != YORN_N">-->
+<!--				AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancelY}-->
+<!--			</if>-->
+<!--			</if>-->
+<!--			<if test= "allStatus03 != null and allStatus03 != ''">-->
+<!--				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{allStatus03}-->
+<!--			</if>-->
 			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
 			<if test="'02'.equals(queryType)">
 				AND TRD_PRODUCT_DEAL.PS != #{PS_T75}
@@ -3552,9 +3568,9 @@
 		UNION ALL
 		(<include refid="BASE_COLUMNS_TOTLE"></include>
 		<where>
-
+			WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = '01' AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL ='N'
 			<!--排除新UI业务 -->
-			NOT EXISTS (
+			AND NOT EXISTS (
 				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = WFL_TEMP.TRADE_ID
 			)
 
@@ -3660,12 +3676,12 @@
 			<if test="endDate != null and endDate != ''">
 				<![CDATA[ AND to_char(WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
 			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}
-			</if>
-			<if test= "allStatus02 != null and allStatus02 != ''">
-				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{allStatus01}
-			</if>
+<!--			<if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}-->
+<!--			</if>-->
+<!--			<if test= "allStatus02 != null and allStatus02 != ''">-->
+<!--				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{allStatus01}-->
+<!--			</if>-->
 			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
 			<if test="'02'.equals(queryType)">
 				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.PS != #{PS_T75}
@@ -3685,6 +3701,7 @@
 		(<include refid="VALID_COLUMNS_TOTLE"></include>
 		<where>
 			PTL_PORTFOLIO.INVEST_YESORNO = 'Y'
+			AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = '01' AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL ='N'
 
 			<!--排除新UI业务 -->
 			AND NOT EXISTS (
@@ -3793,28 +3810,28 @@
 			<if test="endDate != null and endDate !='' ">
 				<![CDATA[ AND to_char(TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
 			</if>
-			<if test="isCancel != null and isCancel !='' ">
-				<if test="isCancel == YORN_N">
-					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancel != YORN_N">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel}
-			</if>
-			</if>
-			<if test="isCancelN != null and isCancelN !='' ">
-				<if test="isCancelN == YORN_N">
-					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelN} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancelN != YORN_N">
-					AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelN}
-				</if>
-			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}
-			</if>
-			<if test= "allStatus02 != null and allStatus02 != ''">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{allStatus01}
-			</if>
+<!--			<if test="isCancel != null and isCancel !='' ">-->
+<!--				<if test="isCancel == YORN_N">-->
+<!--					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancel != YORN_N">-->
+<!--				AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel}-->
+<!--			</if>-->
+<!--			</if>-->
+<!--			<if test="isCancelN != null and isCancelN !='' ">-->
+<!--				<if test="isCancelN == YORN_N">-->
+<!--					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelN} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancelN != YORN_N">-->
+<!--					AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelN}-->
+<!--				</if>-->
+<!--			</if>-->
+<!--			<if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}-->
+<!--			</if>-->
+<!--			<if test= "allStatus02 != null and allStatus02 != ''">-->
+<!--				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{allStatus01}-->
+<!--			</if>-->
 			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
 			<if test="'02'.equals(queryType)">
 				AND TRD_FIN_PRODUCT_DEAL_TOTAL.PS != #{PS_T75}
@@ -3834,12 +3851,13 @@
 		(<include refid="CANCEL_COLUMNS_TOTLE"></include>
 		<where>
 			PTL_PORTFOLIO.INVEST_YESORNO = 'Y'
+			AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = '03' AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL ='N'
 			AND ( TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2   <![CDATA[<>]]>  'F17' OR
 			( TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2 = 'F17' AND FIN_PRODUCT.FINPROD_ID IS NOT NULL  ) )
 
 			<!--排除新UI业务 -->
 			AND NOT EXISTS (
-				SELECT 1 FROM VALID_TEMP WHERE TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = VALID_TEMP.TRADE_ID
+				SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
 			)
 
 			<if test="portfolioId != null and !portfolioId.isEmpty()">
@@ -3944,28 +3962,28 @@
 			<if test="endDate != null and endDate !='' ">
 				<![CDATA[ AND to_char(TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
 			</if>
-			<if test="isCancel != null and isCancel !='' ">
-				<if test="isCancel == YORN_N">
-					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancel != YORN_N">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel}
-			</if>
-			</if>
-			<if test="isCancelY != null and isCancelY !='' ">
-				<if test="isCancelY == YORN_N">
-					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelY} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancelY != YORN_N">
-					AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelY}
-				</if>
-			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}
-			</if>
-			<if test= "allStatus03 != null and allStatus03 != ''">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{allStatus03}
-			</if>
+<!--			<if test="isCancel != null and isCancel !='' ">-->
+<!--				<if test="isCancel == YORN_N">-->
+<!--					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancel != YORN_N">-->
+<!--				AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel}-->
+<!--			</if>-->
+<!--			</if>-->
+<!--			<if test="isCancelY != null and isCancelY !='' ">-->
+<!--				<if test="isCancelY == YORN_N">-->
+<!--					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelY} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancelY != YORN_N">-->
+<!--					AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelY}-->
+<!--				</if>-->
+<!--			</if>-->
+<!--			<if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}-->
+<!--			</if>-->
+<!--			<if test= "allStatus03 != null and allStatus03 != ''">-->
+<!--				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{allStatus03}-->
+<!--			</if>-->
 			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
 			<if test="'02'.equals(queryType)">
 				AND TRD_FIN_PRODUCT_DEAL_TOTAL.PS != #{PS_T75}
@@ -3990,6 +4008,7 @@
 			EXISTS (
 				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_PRODUCT_DEAL.TRADE_ID = WFL_TEMP.TRADE_ID
 			)
+			AND WFL_TRD_PRODUCT_DEAL.TRADE_STATUS = '01' AND WFL_TRD_PRODUCT_DEAL.IS_CANCEL ='N'
 
 			<if test="portfolioId != null and !portfolioId.isEmpty()">
 				AND (
@@ -4147,12 +4166,12 @@
 			<if test="endDate != null and endDate != ''">
 				<![CDATA[ AND to_char(WFL_TRD_PRODUCT_DEAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
 			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND WFL_TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}
-			</if>
-			<if test= "allStatus02 != null and allStatus02 != ''">
-				AND WFL_TRD_PRODUCT_DEAL.TRADE_STATUS = #{allStatus01}
-			</if>
+<!--			<if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--				AND WFL_TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}-->
+<!--			</if>-->
+<!--			<if test= "allStatus02 != null and allStatus02 != ''">-->
+<!--				AND WFL_TRD_PRODUCT_DEAL.TRADE_STATUS = #{allStatus01}-->
+<!--			</if>-->
 			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
 			<if test="'02'.equals(queryType)">
 				AND WFL_TRD_PRODUCT_DEAL.PS != #{PS_T75}
@@ -4172,6 +4191,7 @@
 		(<include refid="VALID_COLUMNS"></include>
 		<where>
 			PTL_PORTFOLIO.INVEST_YESORNO = 'Y'
+			AND TRD_PRODUCT_DEAL.TRADE_STATUS = '01' AND TRD_PRODUCT_DEAL.IS_CANCEL ='N'
 			<!--			AND TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null-->
 			<!--包含新UI业务，排除协议回购 -->
 			AND EXISTS (
@@ -4341,28 +4361,28 @@
 			<if test="endDate != null and endDate !='' ">
 				<![CDATA[ AND to_char(TRD_PRODUCT_DEAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
 			</if>
-			<if test="isCancel != null and isCancel !='' ">
-				<if test="isCancel == YORN_N">
-					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel} or TRD_PRODUCT_DEAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancel != YORN_N">
-					AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel}
-				</if>
-			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}
-			</if>
-			<if test="isCancelN != null and isCancelN !='' ">
-				<if test="isCancelN == YORN_N">
-					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancelN} or TRD_PRODUCT_DEAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancelN != YORN_N">
-					AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancelN}
-				</if>
-			</if>
-			<if test= "allStatus01 != null and allStatus01 != ''">
-				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{allStatus01}
-			</if>
+<!--			<if test="isCancel != null and isCancel !='' ">-->
+<!--				<if test="isCancel == YORN_N">-->
+<!--					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel} or TRD_PRODUCT_DEAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancel != YORN_N">-->
+<!--					AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel}-->
+<!--				</if>-->
+<!--			</if>-->
+<!--			<if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}-->
+<!--			</if>-->
+<!--			<if test="isCancelN != null and isCancelN !='' ">-->
+<!--				<if test="isCancelN == YORN_N">-->
+<!--					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancelN} or TRD_PRODUCT_DEAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancelN != YORN_N">-->
+<!--					AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancelN}-->
+<!--				</if>-->
+<!--			</if>-->
+<!--			<if test= "allStatus01 != null and allStatus01 != ''">-->
+<!--				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{allStatus01}-->
+<!--			</if>-->
 			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
 			<if test="'02'.equals(queryType)">
 				AND TRD_PRODUCT_DEAL.PS != #{PS_T75}
@@ -4382,6 +4402,7 @@
 		( <include refid="CANCEL_COLUMNS"></include>
 		<where>
 			PTL_PORTFOLIO.INVEST_YESORNO = 'Y'
+			AND TRD_PRODUCT_DEAL.TRADE_STATUS = '03' AND TRD_PRODUCT_DEAL.IS_CANCEL ='N'
 			<!--			AND TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null-->
 			<!--包含新UI业务，排除协议回购 -->
 			AND EXISTS (
@@ -4550,28 +4571,28 @@
 			<if test="endDate != null and endDate !='' ">
 				<![CDATA[ AND to_char(TRD_PRODUCT_DEAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
 			</if>
-			<if test="isCancel != null and isCancel !='' ">
-				<if test="isCancel == YORN_N">
-					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel} or TRD_PRODUCT_DEAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancel != YORN_N">
-					AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel}
-				</if>
-			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}
-			</if>
-			<if test="isCancelY != null and isCancelY !='' ">
-				<if test="isCancelY == YORN_N">
-					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancelY} or TRD_PRODUCT_DEAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancelY != YORN_N">
-					AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancelY}
-				</if>
-			</if>
-			<if test= "allStatus03 != null and allStatus03 != ''">
-				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{allStatus03}
-			</if>
+<!--			<if test="isCancel != null and isCancel !='' ">-->
+<!--				<if test="isCancel == YORN_N">-->
+<!--					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel} or TRD_PRODUCT_DEAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancel != YORN_N">-->
+<!--					AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancel}-->
+<!--				</if>-->
+<!--			</if>-->
+<!--			<if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{tradeStatus}-->
+<!--			</if>-->
+<!--			<if test="isCancelY != null and isCancelY !='' ">-->
+<!--				<if test="isCancelY == YORN_N">-->
+<!--					AND (TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancelY} or TRD_PRODUCT_DEAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancelY != YORN_N">-->
+<!--					AND TRD_PRODUCT_DEAL.IS_CANCEL = #{isCancelY}-->
+<!--				</if>-->
+<!--			</if>-->
+<!--			<if test= "allStatus03 != null and allStatus03 != ''">-->
+<!--				AND TRD_PRODUCT_DEAL.TRADE_STATUS = #{allStatus03}-->
+<!--			</if>-->
 			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
 			<if test="'02'.equals(queryType)">
 				AND TRD_PRODUCT_DEAL.PS != #{PS_T75}
@@ -4590,6 +4611,7 @@
 		UNION ALL
 		(<include refid="BASE_COLUMNS_TOTLE"></include>
 		<where>
+			WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = '01' AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL ='N'
 			<!--只查询交易所协议回购 -->
 			AND EXISTS (
 			SELECT 1 FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
@@ -4698,12 +4720,12 @@
 			<if test="endDate != null and endDate != ''">
 				<![CDATA[ AND to_char(WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
 			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}
-			</if>
-			<if test= "allStatus02 != null and allStatus02 != ''">
-				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{allStatus01}
-			</if>
+<!--			<if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}-->
+<!--			</if>-->
+<!--			<if test= "allStatus02 != null and allStatus02 != ''">-->
+<!--				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{allStatus01}-->
+<!--			</if>-->
 			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
 			<if test="'02'.equals(queryType)">
 				AND WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.PS != #{PS_T75}
@@ -4723,6 +4745,7 @@
 		(<include refid="VALID_COLUMNS_TOTLE"></include>
 		<where>
 			PTL_PORTFOLIO.INVEST_YESORNO = 'Y'
+			AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = '01' AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL ='N'
 
 			<!--只查询交易所协议回购 -->
 			AND EXISTS (
@@ -4832,28 +4855,28 @@
 			<if test="endDate != null and endDate !='' ">
 				<![CDATA[ AND to_char(TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
 			</if>
-			<if test="isCancel != null and isCancel !='' ">
-				<if test="isCancel == YORN_N">
-					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancel != YORN_N">
-					AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel}
-				</if>
-			</if>
-			<if test="isCancelN != null and isCancelN !='' ">
-				<if test="isCancelN == YORN_N">
-					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelN} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancelN != YORN_N">
-					AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelN}
-				</if>
-			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}
-			</if>
-			<if test= "allStatus02 != null and allStatus02 != ''">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{allStatus01}
-			</if>
+<!--			<if test="isCancel != null and isCancel !='' ">-->
+<!--				<if test="isCancel == YORN_N">-->
+<!--					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancel != YORN_N">-->
+<!--					AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel}-->
+<!--				</if>-->
+<!--			</if>-->
+<!--			<if test="isCancelN != null and isCancelN !='' ">-->
+<!--				<if test="isCancelN == YORN_N">-->
+<!--					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelN} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancelN != YORN_N">-->
+<!--					AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelN}-->
+<!--				</if>-->
+<!--			</if>-->
+<!--			<if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}-->
+<!--			</if>-->
+<!--			<if test= "allStatus02 != null and allStatus02 != ''">-->
+<!--				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{allStatus01}-->
+<!--			</if>-->
 			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
 			<if test="'02'.equals(queryType)">
 				AND TRD_FIN_PRODUCT_DEAL_TOTAL.PS != #{PS_T75}
@@ -4873,6 +4896,7 @@
 		(<include refid="CANCEL_COLUMNS_TOTLE"></include>
 		<where>
 			PTL_PORTFOLIO.INVEST_YESORNO = 'Y'
+			AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = '03' AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL ='N'
 			AND ( TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2   <![CDATA[<>]]>  'F17' OR
 			( TRD_FIN_PRODUCT_DEAL_TOTAL.FINPROD_TYPE2 = 'F17' AND FIN_PRODUCT.FINPROD_ID IS NOT NULL  ) )
 
@@ -4984,28 +5008,28 @@
 			<if test="endDate != null and endDate !='' ">
 				<![CDATA[ AND to_char(TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_DATE,'yyyy-MM-dd')  <= #{endDate} ]]>
 			</if>
-			<if test="isCancel != null and isCancel !='' ">
-				<if test="isCancel == YORN_N">
-					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancel != YORN_N">
-					AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel}
-				</if>
-			</if>
-			<if test="isCancelY != null and isCancelY !='' ">
-				<if test="isCancelY == YORN_N">
-					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelY} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )
-				</if>
-				<if test="isCancelY != YORN_N">
-					AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelY}
-				</if>
-			</if>
-			<if test="tradeStatus != null and tradeStatus !='' ">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}
-			</if>
-			<if test= "allStatus03 != null and allStatus03 != ''">
-				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{allStatus03}
-			</if>
+<!--			<if test="isCancel != null and isCancel !='' ">-->
+<!--				<if test="isCancel == YORN_N">-->
+<!--					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancel != YORN_N">-->
+<!--					AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancel}-->
+<!--				</if>-->
+<!--			</if>-->
+<!--			<if test="isCancelY != null and isCancelY !='' ">-->
+<!--				<if test="isCancelY == YORN_N">-->
+<!--					AND (TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelY} or TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL is null )-->
+<!--				</if>-->
+<!--				<if test="isCancelY != YORN_N">-->
+<!--					AND TRD_FIN_PRODUCT_DEAL_TOTAL.IS_CANCEL = #{isCancelY}-->
+<!--				</if>-->
+<!--			</if>-->
+<!--			<if test="tradeStatus != null and tradeStatus !='' ">-->
+<!--				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{tradeStatus}-->
+<!--			</if>-->
+<!--			<if test= "allStatus03 != null and allStatus03 != ''">-->
+<!--				AND TRD_FIN_PRODUCT_DEAL_TOTAL.TRADE_STATUS = #{allStatus03}-->
+<!--			</if>-->
 			<!-- add by yzg 是否查询资产减值清理交易为否不查询清理核销交易 start -->
 			<if test="'02'.equals(queryType)">
 				AND TRD_FIN_PRODUCT_DEAL_TOTAL.PS != #{PS_T75}
