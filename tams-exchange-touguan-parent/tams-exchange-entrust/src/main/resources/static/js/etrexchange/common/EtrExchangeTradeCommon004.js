@@ -4068,10 +4068,17 @@
 
                     $("#entrustNum_" + currentTab).val(entrustNum);
                     calcEntrustNumAndAmt();
-                    var entrustAmt = $("#entrustAmt_" + currentTab).val();
+                    // var entrustAmt = $("#entrustAmt_" + currentTab).val();
+
+                    var entrustPrice = getEntrustPrice();
+                    var entrustAmt = parseInt(value) * entrustPrice;
+                    console.log("--------------11-------------------")
+                    console.log(entrustPrice)
+                    console.log(entrustAmt)
+
 
                     dateTable.renderRow(data.LAY_TABLE_INDEX, {"entrustNum": value});
-                    dateTable.renderRow(data.LAY_TABLE_INDEX, {"entrustAmt": parseFloat(entrustAmt) * parseInt(value) / entrustNum});
+                    dateTable.renderRow(data.LAY_TABLE_INDEX, {"entrustAmt": entrustAmt});
                 }
             } else if (field == 'entrustAmt') {
                 if (parseFloat(value) < 0) {
@@ -4094,7 +4101,7 @@
                     }
                     $("#entrustAmt_" + currentTab).val(entrustAmt);
                     calcEntrustNumAndAmt();
-                    var entrustNum = $("#entrustNum_" + currentTab).val();
+                    // var entrustNum = $("#entrustNum_" + currentTab).val();
 
                     var minStep;
                     var param = {
@@ -4110,13 +4117,14 @@
                             minStep = result.data;
                         }
                     }, false);
+
+                    var entrustPrice = getEntrustPrice();
                     console.log("--------------11-------------------")
-                    console.log(entrustNum)
+                    console.log(entrustPrice)
                     console.log(value)
-                    console.log(entrustAmt)
 
 
-                    var entrustNum0 = parseFloat(entrustNum) * parseFloat(value) / entrustAmt;
+                    var entrustNum0 = parseFloat(value) / parseFloat(entrustPrice);
                     var entrustNum1 = Math.floor(entrustNum0 / minStep) * minStep;
                     console.log(entrustNum0)
                     console.log(entrustNum1)
@@ -4169,6 +4177,13 @@
             }
         }
     });
+
+    function getEntrustPrice(){
+        if($("#finprodType2_" + currentTab).val() == FINPROD_TYPE_TG_F01){
+            return  $("#fprice_" + currentTab).val();
+        }
+        return $("#entrustPrice_" + currentTab).val();
+    }
 
     //新增行
     function countAddTable() {
