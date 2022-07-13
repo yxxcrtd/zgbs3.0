@@ -767,6 +767,13 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
 
     @Override
     public void doUpdate(EtrExchangeTradeSaveRequest entity) {
+        // GLCP-192:组合维度需要传ps,风险是从组合维度取ps modify by fuyongsheng 20220713 start
+        if(!CollectionUtils.isEmpty(entity.getPortfolioList())){
+            for(EtrExchangeTradePortfolioRequest portfolio : entity.getPortfolioList()){
+                portfolio.setPs(entity.getPs());
+            }
+        }
+        // GLCP-192:组合维度需要传ps,风险是从组合维度取ps modify by fuyongsheng 20220713 end
         // nothing to do just for aspect
         Map<String, Object> map = new HashMap<>();
         // 新增交易对手席位

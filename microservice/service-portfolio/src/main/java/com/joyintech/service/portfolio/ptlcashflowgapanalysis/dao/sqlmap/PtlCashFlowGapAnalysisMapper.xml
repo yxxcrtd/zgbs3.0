@@ -761,7 +761,7 @@
         '' seqno,
         fcp.PAY_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
-        fp.ccy CCY,
+        psp.ccy CCY,
         nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
         case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29') then 0
              when FTP.FINPROD_TYPE2 IN ('F03', 'F05', 'F09', 'F30') then nvl(ROUND(fcp.CASH_AMT,2),0)
@@ -836,7 +836,7 @@
         )
         and psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD')
         and (fp.IS_RIGHT = 'N' or fp.IS_RIGHT is null)
-        and fp.CCY = #{ccy1,jdbcType=VARCHAR}
+        and psp.ccy = #{ccy1,jdbcType=VARCHAR}
         and pa.USER_ID = #{userId}
         union all
 
