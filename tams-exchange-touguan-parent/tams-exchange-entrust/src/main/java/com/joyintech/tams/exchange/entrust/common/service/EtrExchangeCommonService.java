@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.entrust.common.service;
 
+import com.google.common.base.MoreObjects;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.export.paginator.domain.ITableRow;
@@ -63,7 +64,6 @@ import com.joyintech.workflow.engine.entity.FlowEntity;
 import com.joyintech.workflow.engine.entity.WorkflowEntity;
 import com.joyintech.workflow.engine.service.ProcessService;
 import org.activiti.engine.task.Task;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1759,9 +1759,9 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
      */
     public EtrExchangePortfolioAllocationResponse selectEtrPortfolioAllocationList(EtrExchangePortfolioAllocationRequest dto) {
         EtrExchangePortfolioAllocationResponse response = new EtrExchangePortfolioAllocationResponse();
-        BigDecimal minStep = Objects.equals(dto.getMinStep(), "--")? BigDecimal.ZERO : dto.getMinStep();
-        BigDecimal entrustNum = Objects.equals(dto.getEntrustNum(), "--")? BigDecimal.ZERO : dto.getEntrustNum();
-        BigDecimal entrustAmt = Objects.equals(dto.getEntrustAmt(), "--")? BigDecimal.ZERO : dto.getEntrustAmt();
+        BigDecimal minStep = Objects.equals(dto.getMinStep(), "--") ? BigDecimal.ZERO : dto.getMinStep();
+        BigDecimal entrustNum = Objects.equals(dto.getEntrustNum(), "--") ? BigDecimal.ZERO : MoreObjects.firstNonNull(dto.getEntrustNum(), BigDecimal.ZERO);
+        BigDecimal entrustAmt = Objects.equals(dto.getEntrustAmt(), "--") ? BigDecimal.ZERO : MoreObjects.firstNonNull(dto.getEntrustAmt(), BigDecimal.ZERO);
         BigDecimal entrustPrice = dto.getEntrustPrice() == null || Objects.equals(dto.getEntrustPrice(), "--") ? BigDecimal.ZERO : dto.getEntrustPrice();
         BigDecimal leftEntrustNum = entrustNum;
         List<EtrExchangeProtfolioDetailRequest> portfolioList = dto.getPortfolioList();
@@ -1785,8 +1785,8 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
             while (flag) {
                 for (int i = 0; i < sumSize; i++) {
                     EtrExchangeProtfolioDetailRequest item = portfolioList.get(i);
-                    item.setEntrustAmt(Objects.equals(item.getEntrustAmt(), "--")?new BigDecimal(0.00):item.getEntrustAmt());
-                    item.setEntrustNum(Objects.equals(item.getEntrustNum(), "--")?new BigDecimal(0.00):item.getEntrustNum());
+                    item.setEntrustAmt(Objects.equals(item.getEntrustAmt(), "--") ? new BigDecimal(0.00) : item.getEntrustAmt());
+                    item.setEntrustNum(Objects.equals(item.getEntrustNum(), "--") ? new BigDecimal(0.00) : item.getEntrustNum());
                     if (leftEntrustNum.compareTo(minStep) > 0) {
                         item.setEntrustNum(ArithmeticUtil.doAdd(item.getEntrustNum(), minStep));
                         item.setEntrustAmt(ArithmeticUtil.multiply(item.getEntrustNum(), entrustPrice));
@@ -1803,8 +1803,8 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
             for (int i = 0; i < sumSize; i++) {
                 EtrExchangeProtfolioDetailRequest item = portfolioList.get(i);
 
-                item.setEntrustAmt(Objects.equals(item.getEntrustAmt(), "--")?new BigDecimal(0.00):item.getEntrustAmt());
-                item.setEntrustNum(Objects.equals(item.getEntrustNum(), "--")?new BigDecimal(0.00):item.getEntrustNum());
+                item.setEntrustAmt(Objects.equals(item.getEntrustAmt(), "--") ? new BigDecimal(0.00) : item.getEntrustAmt());
+                item.setEntrustNum(Objects.equals(item.getEntrustNum(), "--") ? new BigDecimal(0.00) : item.getEntrustNum());
                 if (i != sumSize - 1) {
                     item.setEntrustAmt(ArithmeticUtil.divide(entrustAmt, sumSize, 2));
                     BigDecimal tempEntrustNum = BigDecimal.ZERO;
