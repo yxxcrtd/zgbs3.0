@@ -4069,9 +4069,11 @@
                             num = parseFloat(datas[i].entrustNum);
                         }
                         if (ps == PS_T68 || ps == PS_T69) {
-                            num = parseInt(num * 100);
-                            num = Math.floor(num / minStep) * minStep;
                             console.log("***********num*********")
+                            console.log(num)
+                            num = (num * 100).toFixed(0);
+                            console.log(num)
+                            num = Math.floor(num / minStep) * minStep;
                             console.log(num)
                             entrustNum += num;
                         } else {
