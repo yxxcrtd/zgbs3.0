@@ -1300,6 +1300,11 @@
      * 委托数量变更时联动计算委托金额
      */
     var entrustNumChange = function () {
+        var entrustNum = $("#entrustNum_" + currentTab).val();
+        var minStep = getMinStep();
+        let number = Math.floor(entrustNum / minStep) * minStep;
+        $("#entrustNum_" + currentTab).val(number);
+
         setRiskFlag(1);
         calcEntrustNumAndAmt();
         linkTableEntrustNumAmt();
@@ -2568,7 +2573,7 @@
                     // entrustAmt = Math.floor(new Number(entrustAmt));
                     $("#entrustAmt_" + currentTab).val(entrustAmt);
                     $("#entrustAmt_" + currentTab).attr("data-textrange", 4);
-                    $("#entrustNum_" + currentTab).attr("data-textrange", 2);
+                    $("#entrustNum_" + currentTab).attr("data-textrange", 0);
                 } else {
                     $("#entrustAmt_" + currentTab).val(entrustAmt).trigger('blur');
                 }
