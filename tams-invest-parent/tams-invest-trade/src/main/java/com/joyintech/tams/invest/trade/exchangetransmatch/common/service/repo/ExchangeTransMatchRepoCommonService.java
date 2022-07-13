@@ -697,6 +697,7 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
                 finCashPlan.setFinprodId(finTradeProduct.getFinprodId());
                 finCashPlan.setFinprodType2(finTradeProduct.getFinprodType2());
                 finCashPlan.setPayType(DictCodeList.支付方式_现金.getValue());
+                finCashPlans.add(finCashPlan);
             }
         }
         return finCashPlans;
