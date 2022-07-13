@@ -1304,8 +1304,18 @@
         if (!(currentTab == 'jj' && ps == PS_T01)) {
             var entrustNum = $("#entrustNum_" + currentTab).val();
             var minStep = getMinStep();
-            let number = Math.floor(entrustNum / minStep) * minStep;
-            $("#entrustNum_" + currentTab).val(number);
+
+            if (ps == "T68" || ps == "T69") {
+                entrustNum = parseInt(entrustNum * 100);
+                console.log("--------------entrustNumChange-----------------")
+                console.log(entrustNum)
+                let number = Math.floor(entrustNum / minStep) * minStep;
+
+                $("#entrustNum_" + currentTab).val(number / 100);
+            } else {
+                let number = Math.floor(entrustNum / minStep) * minStep;
+                $("#entrustNum_" + currentTab).val(number);
+            }
         }
 
         setRiskFlag(1);
@@ -2209,7 +2219,7 @@
                     $("#entrustAmt_label_" + currentTab).text("标准券数量").append($star.clone());
                     $("#entrustPriceUnit_" + currentTab).text("%");
                     $("#entrustAmtUnit_" + currentTab).text("万元");
-                    $("#entrustNumUnit_" + currentTab).text("张");
+                    $("#entrustNumUnit_" + currentTab).text("万元");
 
                     // var entrustAmt = $("#standardBondVolume_" + currentTab).val();
                     // $("#entrustAmt_" + currentTab).val(Math.floor(new Number(entrustAmt)));
@@ -2425,7 +2435,7 @@
                 //债券交易数量单位 edit by yeming 20210729 end
                 if (ps == PS_T68 || ps == PS_T69) {
                     $("#entrustAmtUnit_" + currentTab).text("万元");
-                    $("#entrustNumUnit_" + currentTab).text("张");
+                    $("#entrustNumUnit_" + currentTab).text("万元");
                 }
             }
         }
@@ -2576,7 +2586,7 @@
                     // entrustAmt = Math.floor(new Number(entrustAmt));
                     $("#entrustAmt_" + currentTab).val(entrustAmt);
                     $("#entrustAmt_" + currentTab).attr("data-textrange", 4);
-                    $("#entrustNum_" + currentTab).attr("data-textrange", 0);
+                    $("#entrustNum_" + currentTab).attr("data-textrange", 2);
                 } else {
                     $("#entrustAmt_" + currentTab).val(entrustAmt).trigger('blur');
                 }
@@ -3387,7 +3397,7 @@
 
             if (finprodType2 == FINPROD_TYPE_TG_F01 && (ps == PS_T68 || ps == PS_T69)) {
                 $("#entrustAmtUnit_" + currentTab).text("万元");
-                $("#entrustNumUnit_" + currentTab).text("张");
+                $("#entrustNumUnit_" + currentTab).text("万元");
                 $("#entrustPrice_" + currentTab).attr("data-textrange", 0);
                 var entrustNum = $("#entrustNum_" + currentTab).val();
                 if (entrustNum) {
@@ -4049,6 +4059,7 @@
                 if (datas) {
                     var minStep = getMinStep()
                     var entrustNum = Number(0);
+                    var ps = $("#ps_" + currentTab).val();
                     for (var i in datas) {
                         var num = 0;
                         if (datas[i].entrustNum == '' || datas[i].entrustNum == undefined) {
@@ -4056,19 +4067,35 @@
                         } else {
                             num = parseFloat(datas[i].entrustNum);
                         }
-                        num = Math.floor(num / minStep) * minStep;
-                        var ps1 = $("#ps_" + currentTab).val();
-                        if (ps1 == PS_T68 || ps1 == PS_T69) {
+                        if (ps == PS_T68 || ps == PS_T69) {
+                            num = parseInt(num * 100);
+                            num = Math.floor(num / minStep) * minStep;
+                            console.log("***********num*********")
+                            console.log(num)
                             entrustNum += num;
                         } else {
+                            num = Math.floor(num / minStep) * minStep;
                             entrustNum += parseInt(num);
                         }
                     }
-                    value = Math.floor(value / minStep) * minStep;
+
+                    if (ps == PS_T68 || ps == PS_T69) {
+                        value = parseInt(value * 100);
+                        value = Math.floor(value / minStep) * minStep;
+                        value = value / 100;
+
+                        entrustNum = entrustNum / 100;
+                    } else {
+                        value = Math.floor(value / minStep) * minStep;
+                    }
+
+
+                    console.log("***********entrustNum*********")
+                    console.log(entrustNum)
+                    console.log(value)
 
                     $("#entrustNum_" + currentTab).val(entrustNum);
                     calcEntrustNumAndAmt();
-                    // var entrustAmt = $("#entrustAmt_" + currentTab).val();
 
                     var entrustPrice = getEntrustPrice();
                     var entrustAmt = parseInt(value) * entrustPrice;
@@ -4216,9 +4243,7 @@
             });
             return;
         }
-        // var entrustAmt = $("#entrustAmt_" + currentTab).val();
-        // var array = dateTable.getAllRows();
-
+        var entrustAmt = $("#entrustAmt_" + currentTab).val();
         var array = [];
         var allRows = dateTable.getAllRows();
         for (var i = 0; i < allRows.length; i++) {
@@ -4226,28 +4251,6 @@
                 array.push(allRows[i]);
             }
         }
-
-        // var len = array.length;
-        // var entrustNumForOne = entrustNum / len;
-        // var ps = $("#ps_" + currentTab).val();
-        // for (var i = 0; i < array.length; i++) {
-        //     if (array[i].acctNo) {
-        //         if(i == 0){
-        //             if(ps == PS_T68 || ps == PS_T69){
-        //                 array[i].entrustNum = Math.ceil(entrustNumForOne*100)/100;
-        //             }else {
-        //                 array[i].entrustNum = Math.ceil(entrustNumForOne);
-        //             }
-        //         }else {
-        //             if(ps == PS_T68 || ps == PS_T69){
-        //                 array[i].entrustNum = Math.floor(entrustNumForOne*100)/100;
-        //             }else {
-        //                 array[i].entrustNum = Math.floor(entrustNumForOne);
-        //             }
-        //         }
-        //         array[i].entrustAmt = entrustAmt / len;
-        //     }
-        // }
         //组合分配调整
         var targetType = $("#targetType_" + currentTab).val();
         var ps = $("#ps_" + currentTab).val();
@@ -4255,8 +4258,7 @@
         if (targetType) {
             minStep = getMinStep();
         }
-        console.log("----------minStep----------")
-        console.log(minStep)
+
         var object = getSearchParams();
         var entrustPrice = object.entrustPrice;
         //券
@@ -4268,24 +4270,42 @@
                 entrustPrice = 0;
             }
         }
+
+        if (ps == 'T68' || ps == 'T69') {
+            entrustNum = entrustNum * 100;
+            entrustAmt = entrustAmt * 10000;
+            entrustPrice = entrustPrice / 100;
+        }
+
+        console.log("----------minStep----------")
+        console.log(minStep)
+        console.log(entrustNum)
+        console.log(entrustAmt)
+        console.log(entrustPrice)
+
         var params = {
             targetType: targetType,
             ps: ps,
-            // minNum
             entrustPrice: entrustPrice,
             minStep: minStep,
-            entrustNum: $("#entrustNum_" + currentTab).val(),
-            entrustAmt: $("#entrustAmt_" + currentTab).val(),
+            entrustNum: entrustNum,
+            entrustAmt: entrustAmt,
             portfolioList: array
         }
         console.log("-------------------------------")
-        console.log(array)
+        console.log(params)
 
         Joyin.ajaxJson(basePath + '/etrexchange/common/selectEtrPortfolioAllocationList', params, function (result) {
             if (result.data && result.data.portfolioList) {
                 var rows = result.data.portfolioList;
                 console.log(rows)
                 for (var i = 0; i < rows.length; i++) {
+                    if (ps == 'T68' || ps == 'T69') {
+                        var num = rows[i].entrustNum;
+                        var amt = rows[i].entrustAmt;
+                        rows[i].entrustNum = num / 100;
+                        rows[i].entrustAmt = amt / 10000;
+                    }
                     dateTable.renderRow(i, rows[i]);
                 }
             }
