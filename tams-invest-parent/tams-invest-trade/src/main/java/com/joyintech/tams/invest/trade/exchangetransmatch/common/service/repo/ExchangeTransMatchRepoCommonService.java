@@ -680,7 +680,7 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
                 FinCashInfo finCashInfo = finCashInfos.get(i);
                 FinCashPlan finCashPlan = new FinCashPlan();
                 finCashPlan.setBranch(0L);
-                finCashPlan.setCashNum(Long.getLong(String.valueOf(i)));
+                finCashPlan.setCashNum(Long.getLong(String.valueOf(i + 1)));
                 finCashPlan.setCashId(finCashInfo.getCashId());
                 if(DictCodeListExt1.现金流一级类型_本金.getValue().equals(finCashInfo.getCashType1())){
                     finCashPlan.setCashType(DictCodeList.现金流类型_到期还本.getValue());
