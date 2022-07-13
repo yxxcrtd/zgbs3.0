@@ -1301,6 +1301,9 @@
      */
     var entrustNumChange = function () {
         var ps = $("#ps_" + currentTab).val();
+        console.log("--------------entrustNumChange-----------------")
+        console.log(currentTab)
+        console.log(ps)
         //竞价卖出不检查最小交易单位
         if (!(currentTab == 'jj' && ps == PS_T02)) {
             var entrustNum = $("#entrustNum_" + currentTab).val();
@@ -2595,7 +2598,11 @@
                 $("#entrustAmt_" + currentTab).val(0).trigger('blur');
             }
             // modify by etliu 20210901 end
-            $("#entrustNum_" + currentTab).val(result.entrustNum).trigger('blur');
+            console.log("---------calcEntrustNumAndAmt------------")
+            console.log(result.entrustNum)
+            if(!(currentTab=='jj' && ps=='T02')){
+                $("#entrustNum_" + currentTab).val(result.entrustNum).trigger('blur');
+            }
         }, false);
     }
 
@@ -4076,7 +4083,9 @@
                             num = Math.floor(num / minStep) * minStep;
                             console.log(num)
                             entrustNum += num;
-                        } else {
+                        } else if(ps == PS_T02 && currentTab=='jj'){
+                            entrustNum += parseInt(num);
+                        }else {
                             num = Math.floor(num / minStep) * minStep;
                             entrustNum += parseInt(num);
                         }
@@ -4088,10 +4097,9 @@
                         value = value / 100;
 
                         entrustNum = entrustNum / 100;
-                    } else {
+                    } else if(!(ps == PS_T02 && currentTab=='jj')){
                         value = Math.floor(value / minStep) * minStep;
                     }
-
 
                     console.log("***********entrustNum*********")
                     console.log(entrustNum)
@@ -4287,6 +4295,7 @@
         console.log(entrustPrice)
 
         var params = {
+            currentTab: currentTab,
             targetType: targetType,
             ps: ps,
             entrustPrice: entrustPrice,
