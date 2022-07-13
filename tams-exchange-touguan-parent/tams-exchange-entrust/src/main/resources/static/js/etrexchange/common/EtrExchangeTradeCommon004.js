@@ -2600,7 +2600,7 @@
             // modify by etliu 20210901 end
             console.log("---------calcEntrustNumAndAmt------------")
             console.log(result.entrustNum)
-            if(!(currentTab=='jj' && ps=='T02')){
+            if (!(currentTab == 'jj' && ps == 'T02')) {
                 $("#entrustNum_" + currentTab).val(result.entrustNum).trigger('blur');
             }
         }, false);
@@ -4083,9 +4083,9 @@
                             num = Math.floor(num / minStep) * minStep;
                             console.log(num)
                             entrustNum += num;
-                        } else if(ps == PS_T02 && currentTab=='jj'){
+                        } else if (ps == PS_T02 && currentTab == 'jj') {
                             entrustNum += parseInt(num);
-                        }else {
+                        } else {
                             num = Math.floor(num / minStep) * minStep;
                             entrustNum += parseInt(num);
                         }
@@ -4097,7 +4097,7 @@
                         value = value / 100;
 
                         entrustNum = entrustNum / 100;
-                    } else if(!(ps == PS_T02 && currentTab=='jj')){
+                    } else if (!(ps == PS_T02 && currentTab == 'jj')) {
                         value = Math.floor(value / minStep) * minStep;
                     }
 
@@ -4505,9 +4505,16 @@
                             Joyin.error("组合分配中指令数量不能为空")
                             return false;
                         }
-                        if (item.entrustNum <= 0 || item.entrustNum % minStep != 0) {
-                            Joyin.error("指令数量，请输入数量最小交易单位[" + minStep + "]的整数倍")
+                        if (item.entrustNum <= 0) {
+                            Joyin.error("指令数量，请输入数量不能为0")
+
                             return false;
+                        }
+                        if (ps == 'T02' && currentTab == 'jj') {
+                            if (item.entrustNum % minStep != 0) {
+                                Joyin.error("指令数量，请输入数量最小交易单位[" + minStep + "]的整数倍")
+                                return false;
+                            }
                         }
                     }
                     if (!checkFlag) {
@@ -4608,12 +4615,12 @@
                 object.entrustNum = object.entrustNum * 100;
             }
             if (object.entrustAmt) {
-                object.entrustAmt = object.entrustAmt * 100;
+                object.entrustAmt = object.entrustAmt * 10000;
             }
             for (var j = 0; j < object.portfolioList.length; j++) {
                 var item = object.portfolioList[j];
                 item.entrustNum = item.entrustNum * 100;
-                item.entrustAmt = item.entrustAmt * 100;
+                item.entrustAmt = item.entrustAmt * 10000;
             }
         }
 
