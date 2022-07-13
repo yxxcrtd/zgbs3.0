@@ -256,8 +256,16 @@ public class RskSupervisionRiskAnalyzeDto extends RskIsupPointVal {
     @Override
     public String getSupVal() {
        if(StringUtil.isNotEmpty(super.getSupVal())&&(super.getSupVal().indexOf("E")>-1||super.getSupVal().indexOf("e")>-1)){
-           BigDecimal bd=new BigDecimal(super.getSupVal());
-           return  bd.toPlainString();
+           // modify by etliu 20220713 start
+           // 监督值不是数值的情况下，直接返回字符串
+           try {
+               BigDecimal bd=new BigDecimal(super.getSupVal());
+               return  bd.toPlainString();
+           } catch (NumberFormatException e) {
+               return super.getSupVal();
+           }
+           // modify by etliu 20220713 end
+
        }else {
            return super.getSupVal();
        }
