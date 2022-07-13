@@ -177,7 +177,7 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                         // 相同逻辑，若逻辑发生变化请重新写调用方法，不修改原方法。目的：便于理清业务逻辑
                         deal_交易所_逆回购到期(finProductTradeDto, 持仓类型, etrPositionHoldDto, stlPayOrdersDtos);
                     }
-                    else if (StringUtil.isEmpty(entrustId)) {
+                    else if (StringUtil.isEmpty(entrustId) || null != finProductTradeDto.getTrdProductDeal()) {
                         // 相同逻辑，若逻辑发生变化请重新写调用方法，不修改原方法。目的：便于理清业务逻辑
                         deal_交易所_逆回购(finProductTradeDto, 持仓类型, etrPositionHoldDto);
                     }
