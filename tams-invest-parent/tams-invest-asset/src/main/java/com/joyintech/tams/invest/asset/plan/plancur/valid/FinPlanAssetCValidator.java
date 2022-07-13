@@ -13,11 +13,14 @@ package com.joyintech.tams.invest.asset.plan.plancur.valid;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.BeanValidator;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.common.base.entity.FinOpenPlan;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
+import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
+import com.joyintech.tams.component.business.core.service.MstWorkflowCommonService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.asset.plan.plancur.dto.FinPlanAssetCDto;
 import com.joyintech.tams.invest.asset.plan.plancur.service.FinPlanAssetCService;
@@ -52,6 +55,11 @@ public class FinPlanAssetCValidator implements BeanValidator {
 
     @Autowired
     private InvDataCheckService chbInvDataCheckService;
+    /**
+     * 流程组件
+     */
+    @Autowired
+    private MstWorkflowCommonService mstWorkflowCommonService;
 
     /**
      * {@inheritDoc}
@@ -140,6 +148,27 @@ public class FinPlanAssetCValidator implements BeanValidator {
         if (dto.getOperateType() != null && !StringUtil.equals(dto.getOperateType(), "delete") && StringUtil.isNotEmpty(dto.getBussRepAssetMngProdInfo())) {
             errorList = chbInvDataCheckService.chbCheckCommon(errorList, value, null, dto.getBussRepAssetMngProdInfo().getRepAssetType());
         }
+
+
+        //add wsz 20220713 计划类净值型标的、计划类利率型标的、计划类货币型标的使用同一种资产类型F17，校验流程中数据由于区分页面id
+        //导致流程中数据可能存在资产代码重复。提交时添加另外两种资产流程中校验 start
+        if (dto.getOperateType() != null && StringUtil.equals(dto.getOperateType(), "submit")) {
+            WflValidInputParameter parameter = new WflValidInputParameter();
+            parameter.setPageId("FinPlanNetAsset002");
+            parameter.setBusinessDataPk1(dto.getFinprodMarketId());
+            if (mstWorkflowCommonService.isInWflProcess(parameter)) {
+                errorList.add(new ValidMessage(SpringContextUtil.getTextValue("COMMON_E_0012",dto.getFinprodMarketId())));
+            } else{
+                parameter.setPageId("FinPlanProfitAsset002");
+                parameter.setBusinessDataPk2(dto.getFinprodMarketId());
+                if (mstWorkflowCommonService.isInWflProcess(parameter)) {
+                    errorList.add(new ValidMessage(SpringContextUtil.getTextValue("COMMON_E_0012",dto.getFinprodMarketId())));
+                }
+            }
+        }
+        //add wsz 20220713 计划类净值型标的、计划类利率型标的、计划类货币型标的使用同一种资产类型F17，校验流程中数据由于区分页面id
+        //导致流程中数据可能存在资产代码重复。提交时添加另外两种资产流程中校验 end
+
 
         //同一数据行：开放开始日小于等于开放结束日，开放结束日小于等于开放确认日
         if (dto.getBussFinProductOpenPlanDto() != null) {
