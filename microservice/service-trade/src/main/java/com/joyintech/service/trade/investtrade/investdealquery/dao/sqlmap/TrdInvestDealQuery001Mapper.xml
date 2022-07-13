@@ -423,7 +423,7 @@
 
 		WITH WFL_TEMP AS(
 			(
-				SELECT tpd.TRADE_ID TRADE_ID,fpt.TYPE_6 TYPE_6
+				SELECT tpd.TRADE_ID TRADE_ID,fpt.TYPE_6 TYPE_6,null as PURCH_MODLE
 		        FROM WFL_TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
 		        WHERE
 				(
@@ -457,8 +457,9 @@
 			)
 			UNION ALL
 			(
-				SELECT tpd.TOTLE_TRADE_ID TRADE_ID,fpt.TYPE_6 TYPE_6
+				SELECT tpd.TOTLE_TRADE_ID TRADE_ID,fpt.TYPE_6 TYPE_6,tdta.PURCH_MODLE PURCH_MODLE
 		        FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
+		        left join WFL_TRD_DEAL_TOTAL_ADD tdta on tpd.TOTLE_TRADE_ID = tdta.TOTLE_TRADE_ID
 		        WHERE
 				(
 					<!-- 银行间/商业银行柜台-->
@@ -703,7 +704,7 @@
 		<where>
             <!--排除新UI业务 -->
             NOT EXISTS (
-				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = WFL_TEMP.TRADE_ID
+				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = WFL_TEMP.TRADE_ID and WFL_TEMP.PURCH_MODLE='01'
             )
 
 			<if test="portfolioId != null and !portfolioId.isEmpty() ">
@@ -1218,7 +1219,7 @@
 
 		WITH VALID_TEMP AS(
 			(
-				 SELECT tpd.TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
+				 SELECT tpd.TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6,null as PURCH_MODLE
 				 FROM TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
 				 WHERE
 				 (
@@ -1252,8 +1253,9 @@
 		    )
 		    UNION ALL
 			(
-		        SELECT tpd.TOTLE_TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
+		        SELECT tpd.TOTLE_TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6,tdta.PURCH_MODLE PURCH_MODLE
 		        FROM TRD_FIN_PRODUCT_DEAL_TOTAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
+		        left join TRD_DEAL_TOTAL_ADD tdta on tpd.TOTLE_TRADE_ID = tdta.TOTLE_TRADE_ID
 		        WHERE
 				(
 					<!-- 银行间/商业银行柜台-->
@@ -1494,7 +1496,7 @@
 
 			<!--排除新UI业务 -->
 			AND NOT EXISTS (
-				SELECT 1 FROM VALID_TEMP WHERE TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = VALID_TEMP.TRADE_ID
+				SELECT 1 FROM VALID_TEMP WHERE TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = VALID_TEMP.TRADE_ID and VALID_TEMP.PURCH_MODLE = '01'
 			)
 
 			<if test="etridList != null and !etridList.isEmpty() ">
@@ -1996,7 +1998,7 @@
 <!--		</if>-->
 		WITH VALID_TEMP AS(
 			(
-				SELECT tpd.TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
+				SELECT tpd.TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6,null as PURCH_MODLE
 				FROM TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
 				WHERE
 				(
@@ -2030,8 +2032,9 @@
 			)
 			UNION ALL
 			(
-				SELECT tpd.TOTLE_TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
+				SELECT tpd.TOTLE_TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6,tdta.PURCH_MODLE PURCH_MODLE
 				FROM TRD_FIN_PRODUCT_DEAL_TOTAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
+		        left join TRD_DEAL_TOTAL_ADD tdta on tpd.TOTLE_TRADE_ID = tdta.TOTLE_TRADE_ID
 				WHERE
 				(
 					<!-- 银行间/商业银行柜台-->
@@ -2263,7 +2266,7 @@
 
             <!--排除新UI业务 -->
 			AND NOT EXISTS (
-			SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
+				SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID and VALID_TEMP.PURCH_MODLE='01'
 			)
 
 			<if test="portfolioId != null and !portfolioId.isEmpty()">
@@ -2770,7 +2773,7 @@
 <!--		</if>-->
 		WITH WFL_TEMP AS(
 			(
-				SELECT tpd.TRADE_ID TRADE_ID,fpt.TYPE_6 TYPE_6
+				SELECT tpd.TRADE_ID TRADE_ID,fpt.TYPE_6 TYPE_6,null as PURCH_MODLE
 				FROM WFL_TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
 				WHERE
 				(
@@ -2804,8 +2807,9 @@
 			)
 			UNION ALL
 			(
-				SELECT tpd.TOTLE_TRADE_ID TRADE_ID,fpt.TYPE_6 TYPE_6
+				SELECT tpd.TOTLE_TRADE_ID TRADE_ID,fpt.TYPE_6 TYPE_6,tdta.PURCH_MODLE
 				FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
+				left join WFL_TRD_DEAL_TOTAL_ADD tdta on tpd.TOTLE_TRADE_ID = tdta.TOTLE_TRADE_ID
 				WHERE
 				(
 					<!-- 银行间/商业银行柜台-->
@@ -2839,7 +2843,7 @@
 		),
 		VALID_TEMP AS(
 			(
-				SELECT tpd.TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
+				SELECT tpd.TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6,null as PURCH_MODLE
 				FROM TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
 				WHERE
 				(
@@ -2873,8 +2877,9 @@
 			)
 			UNION ALL
 			(
-				SELECT tpd.TOTLE_TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
+				SELECT tpd.TOTLE_TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6,tdta.PURCH_MODLE
 				FROM TRD_FIN_PRODUCT_DEAL_TOTAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
+		        left join TRD_DEAL_TOTAL_ADD tdta on tpd.TOTLE_TRADE_ID = tdta.TOTLE_TRADE_ID
 				WHERE
 				(
 					<!-- 银行间/商业银行柜台-->
@@ -3518,7 +3523,7 @@
 
 			<!--排除新UI业务 -->
 			NOT EXISTS (
-				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = WFL_TEMP.TRADE_ID
+				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = WFL_TEMP.TRADE_ID and WFL_TEMP.PURCH_MODLE='01'
 			)
 
 			<if test="portfolioId != null and !portfolioId.isEmpty()">
@@ -3651,7 +3656,7 @@
 
 			<!--排除新UI业务 -->
 			AND NOT EXISTS (
-				SELECT 1 FROM VALID_TEMP WHERE TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = VALID_TEMP.TRADE_ID
+				SELECT 1 FROM VALID_TEMP WHERE TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = VALID_TEMP.TRADE_ID and VALID_TEMP.PURCH_MODLE='01'
 			)
 
 			<if test="portfolioId != null and !portfolioId.isEmpty()">
@@ -3802,7 +3807,7 @@
 
 			<!--排除新UI业务 -->
 			AND NOT EXISTS (
-				SELECT 1 FROM VALID_TEMP WHERE TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = VALID_TEMP.TRADE_ID
+				SELECT 1 FROM VALID_TEMP WHERE TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID = VALID_TEMP.TRADE_ID and VALID_TEMP.PURCH_MODLE='01'
 			)
 
 			<if test="portfolioId != null and !portfolioId.isEmpty()">

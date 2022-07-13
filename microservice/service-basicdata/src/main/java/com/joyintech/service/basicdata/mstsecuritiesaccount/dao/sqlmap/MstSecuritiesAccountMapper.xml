@@ -784,7 +784,7 @@
             and a.trade_market = #{acctTradeMarket}
         </if>
         and a.finprod_type2 in (#{FINPROD_TYPE_TG_F01})<!--  债券 -->
-        and r.type_6 != #{type6_B14}
+        and r.type_6 not in (#{type6_B14}, #{type6_B16})
         union
         select distinct a.MARKET_ID as finprod_market_id,
         concat(concat(a.MARKET_ID,'|'),a.TERM_TYPE) as finprod_name,

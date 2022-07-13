@@ -2167,6 +2167,17 @@ public class EtrExchangeTradeCommon001Controller extends BaseController {
         }
     }
 
-
+    @ApiOperation(value = "组合持有资产业务模式查询", notes = "组合持有资产业务模式查询")
+    @PostMapping("/selectAllBusModels")
+    @ResponseBody
+    public Message<List<BaseMap>> selectAllBusModels(@RequestBody Map<String, Object> param) {
+        try {
+            List<BaseMap> m = etrExchangeTrade001CommonService.selectAllBusModels(param);
+            return new Message<List<BaseMap>>().success().setData(m);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Message<List<BaseMap>>().fail().setMessage("查询失败");
+        }
+    }
 }
 	

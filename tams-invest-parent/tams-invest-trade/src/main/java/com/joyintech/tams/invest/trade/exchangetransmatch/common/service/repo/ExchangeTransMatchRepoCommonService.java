@@ -680,7 +680,7 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
                 FinCashInfo finCashInfo = finCashInfos.get(i);
                 FinCashPlan finCashPlan = new FinCashPlan();
                 finCashPlan.setBranch(0L);
-                finCashPlan.setCashNum(Long.getLong(String.valueOf(i)));
+                finCashPlan.setCashNum(Long.getLong(String.valueOf(i + 1)));
                 finCashPlan.setCashId(finCashInfo.getCashId());
                 if(DictCodeListExt1.现金流一级类型_本金.getValue().equals(finCashInfo.getCashType1())){
                     finCashPlan.setCashType(DictCodeList.现金流类型_到期还本.getValue());
@@ -692,11 +692,13 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
                 }
                 finCashPlan.setVdate(finTradeProduct.getVpayDate());
                 finCashPlan.setMdate(finTradeProduct.getMpayDate());
+                finCashPlan.setPayDate(finTradeProduct.getMpayDate());
                 finCashPlan.setCashAmt(ArithmeticUtil.doAdd(finCashPlan.getPrinAmt(), finCashPlan.getIntAmt()));
                 finCashPlan.setCashUnitType(DictCodeList.现金流单位_总额.getValue());
                 finCashPlan.setFinprodId(finTradeProduct.getFinprodId());
                 finCashPlan.setFinprodType2(finTradeProduct.getFinprodType2());
                 finCashPlan.setPayType(DictCodeList.支付方式_现金.getValue());
+                finCashPlans.add(finCashPlan);
             }
         }
         return finCashPlans;

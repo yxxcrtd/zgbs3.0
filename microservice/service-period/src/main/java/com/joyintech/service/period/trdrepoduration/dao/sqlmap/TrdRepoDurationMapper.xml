@@ -121,7 +121,9 @@
             FROM
             TRD_BANK_MANUAL_SETTLE_INFO
             WHERE
-            SETTLE_STATUS = '02') AND FINPROD_ID = T1.TRADE_ID
+            <!-- TISHKS-1570 【批处理启动】：存续期自动生成，跑批报错；-->
+            SETTLE_STATUS = '02') AND FINPROD_ID = T1.FINPROD_ID
+            <!-- TISHKS-1570 【批处理启动】：存续期自动生成，跑批报错；-->
             )
         </if>
         <!-- add by wangcheng 需求增加到期日筛选条件 2019-09-30 end -->

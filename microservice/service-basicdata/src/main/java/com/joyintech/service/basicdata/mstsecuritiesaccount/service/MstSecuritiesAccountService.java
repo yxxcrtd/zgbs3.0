@@ -487,6 +487,7 @@ public class MstSecuritiesAccountService extends BaseService<MstSecuritiesAccoun
         map.put("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         map.put("FINPROD_TYPE_TG_ZYSHG", "ZYSHG");
         map.put("type6_B14",DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue());
+        map.put("type6_B16",DictCodeList.WIND一级分类_含债券一级分类等_可分离转债存债.getValue());
         Map pageMode = (Map) map.get("pageMode");
         if(pageMode != null) { // 设置导出条数
             if(pageMode.get("pageNo")!=null){

@@ -3478,15 +3478,18 @@
         var finprodType2 = $("#finprodType2_" + currentTab).val();
         var tradeMarket = $("#tradeMarket_" + currentTab).val();
         var ps = $("#ps_" + currentTab).val();
+        var plat = currentTab;
+        if (ps == "T03" || ps == "T49" || ps == "T68" || ps == "T69") {
+            plat = "99";
+        }
         if (targetType) {
-            var step = 1;
             var param = {
                 finprodId: finprodId,
                 targetType: targetType,
                 finprodType2: finprodType2,
                 tradeMarket: tradeMarket,
                 ps: ps,
-                currentTab: currentTab
+                currentTab: plat
             };
             Joyin.ajaxJson(basePath + 'etrexchange/common/etrExchangeTrade001/getMinNumStep', param, function (result) {
                 if (result.data) {
@@ -3708,12 +3711,13 @@
                 var finprodType2 = $("#finprodType2_" + currentTab).val();
 
                 var flag = true;
-
+                var portfolioIds = [];
                 var rows = [];
                 var allRows = dateTable.getAllRows();
                 for (var i = 0; i < allRows.length; i++) {
                     if (allRows[i].portfolioId) {
                         rows.push(allRows[i]);
+                        portfolioIds.push(allRows[i].portfolioId);
                     }
                 }
 
@@ -3728,7 +3732,8 @@
 
                 if (finprodType2 != FINPROD_TYPE_TG_F06 && finprodType2 != FINPROD_TYPE_TG_F10 && finprodType2 != FINPROD_TYPE_TG_ZYSHG) {
                     var param1 = {};
-                    param1.portfolioId = data.portfolioId;
+                    // param1.portfolioId = data.portfolioId;
+                    param1.portfolioIds = portfolioIds;
                     param1.finprodId = $("#finprodId_" + currentTab).val();
                     param1.cdate = iPlatformDate;
                     var ps = $("#ps_" + currentTab).val();
@@ -3736,7 +3741,7 @@
                     if (ps == PS_T68 || ps == PS_T69 || ps == PS_T02 || ps == PS_T49 || ps == PS_T03) {
                         if (ps == PS_T02) { //卖出
                             if (rows.length >= 2) {
-                                Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
+                                Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModels', param1, function (result) {
                                     if (result.data.length == 2) {
                                         flag = false;
                                         Joyin.error("组合持有该资产存在多个业务模式，不允许委托方向" + ps);
@@ -3744,53 +3749,54 @@
                                         return;
                                     } else if (result.data.length == 1) {
                                         $("#businessModel_" + currentTab).textSelect('setValue', result.data[0].BUSINESSMODEL);
-                                    } else {
-                                        flag = false;
-                                        Joyin.error("组合无选择业务模式的资产持仓");
-                                        dateTable.deleteRow(data.LAY_TABLE_INDEX);
-                                        return;
                                     }
+                                    // else {
+                                    //     flag = false;
+                                    //     Joyin.error("组合无选择业务模式的资产持仓");
+                                    //     dateTable.deleteRow(data.LAY_TABLE_INDEX);
+                                    //     return;
+                                    // }
                                 }, false)
                             } else {
-                                Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
-                                    if (result.data.length == 2) {
+                                Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModels', param1, function (result) {
+                                    if (result.data.length >= 2) {
                                         flag = false;
                                         Joyin.error("组合持有该资产存在多个业务模式,不允许卖出");
                                         dateTable.deleteRow(data.LAY_TABLE_INDEX);
                                         return;
-                                    } else {
-                                        if (result.data.length == 1) {
-                                            flag = true;
-                                            $("#businessModel_" + currentTab).textSelect('setValue', result.data[0].BUSINESSMODEL);
-                                        } else {
-                                            flag = false;
-                                            Joyin.error("组合无该资产持仓数据");
-                                            dateTable.deleteRow(data.LAY_TABLE_INDEX);
-                                            return;
-                                        }
+                                    } else if (result.data.length == 1) {
+                                        flag = true;
+                                        $("#businessModel_" + currentTab).textSelect('setValue', result.data[0].BUSINESSMODEL);
                                     }
+                                    // else {
+                                    //     flag = false;
+                                    //     Joyin.error("组合无该资产持仓数据");
+                                    //     dateTable.deleteRow(data.LAY_TABLE_INDEX);
+                                    //     return;
+                                    // }
                                 }, false);
                             }
                         } else {
                             if (rows.length >= 2) {
-                                Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
-                                    if (result.data.length == 2) {
+                                Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModels', param1, function (result) {
+                                    if (result.data.length >= 2) {
                                         flag = false;
                                         Joyin.error("组合持有该资产存在多个业务模式，不允许委托方向" + ps);
                                         dateTable.deleteRow(data.LAY_TABLE_INDEX);
                                         return;
                                     } else if (result.data.length == 1) {
                                         $("#businessModel_" + currentTab).textSelect('setValue', result.data[0].BUSINESSMODEL);
-                                    } else {
-                                        flag = false;
-                                        Joyin.error("组合无选择业务模式的资产持仓");
-                                        dateTable.deleteRow(data.LAY_TABLE_INDEX);
-                                        return;
                                     }
+                                    // else {
+                                    //     flag = false;
+                                    //     Joyin.error("组合无选择业务模式的资产持仓");
+                                    //     dateTable.deleteRow(data.LAY_TABLE_INDEX);
+                                    //     return;
+                                    // }
                                 }, false)
                             } else {
-                                Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
-                                    if (result.data.length == 2) {
+                                Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModels', param1, function (result) {
+                                    if (result.data.length >= 2) {
                                         flag = false;
                                         Joyin.error("组合持有该资产存在多个业务模式，不允许委托方向" + ps);
                                         dateTable.deleteRow(data.LAY_TABLE_INDEX);
@@ -3803,7 +3809,7 @@
                         if (ps == PS_T01) {
                             var businessModel = $("#businessModel_" + currentTab).val();
                             if (rows.length >= 2) {
-                                Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
+                                Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModels', param1, function (result) {
                                     if (result.data.length != 0) {
                                         if (result.data[0].BUSINESSMODEL != businessModel) {
                                             flag = false;
@@ -3818,7 +3824,7 @@
                                     Joyin.error("请选择业务模式");
                                     dateTable.deleteRow(data.LAY_TABLE_INDEX);
                                 } else {
-                                    Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModelList', param1, function (result) {
+                                    Joyin.ajaxJson(basePath + '/etrexchange/common/etrExchangeTrade001/selectAllBusModels', param1, function (result) {
                                         if (result.data.length != 0) {
                                             var secId = $("#secId_" + currentTab).val();
                                             var param2 = {};
@@ -4033,21 +4039,7 @@
                 }
                 var datas = dateTable.getAllRows();
                 if (datas) {
-                    var minStep;
-                    var param = {
-                        finprodId: $("#finprodId_" + currentTab).val(),
-                        targetType: $("#targetType_" + currentTab).val(),
-                        finprodType2: $("#finprodType2_" + currentTab).val(),
-                        tradeMarket: $("#tradeMarket_" + currentTab).val(),
-                        ps: $("#ps_" + currentTab).val(),
-                        currentTab: currentTab
-                    };
-                    Joyin.ajaxJson(basePath + 'etrexchange/common/etrExchangeTrade001/getMinNumStep', param, function (result) {
-                        if (result.data) {
-                            minStep = result.data;
-                        }
-                    }, false);
-
+                    var minStep = getMinStep()
                     var entrustNum = Number(0);
                     for (var i in datas) {
                         var num = 0;
@@ -4068,10 +4060,17 @@
 
                     $("#entrustNum_" + currentTab).val(entrustNum);
                     calcEntrustNumAndAmt();
-                    var entrustAmt = $("#entrustAmt_" + currentTab).val();
+                    // var entrustAmt = $("#entrustAmt_" + currentTab).val();
+
+                    var entrustPrice = getEntrustPrice();
+                    var entrustAmt = parseInt(value) * entrustPrice;
+                    console.log("--------------11-------------------")
+                    console.log(entrustPrice)
+                    console.log(entrustAmt)
+
 
                     dateTable.renderRow(data.LAY_TABLE_INDEX, {"entrustNum": value});
-                    dateTable.renderRow(data.LAY_TABLE_INDEX, {"entrustAmt": parseFloat(entrustAmt) * parseInt(value) / entrustNum});
+                    dateTable.renderRow(data.LAY_TABLE_INDEX, {"entrustAmt": entrustAmt});
                 }
             } else if (field == 'entrustAmt') {
                 if (parseFloat(value) < 0) {
@@ -4094,29 +4093,16 @@
                     }
                     $("#entrustAmt_" + currentTab).val(entrustAmt);
                     calcEntrustNumAndAmt();
-                    var entrustNum = $("#entrustNum_" + currentTab).val();
+                    // var entrustNum = $("#entrustNum_" + currentTab).val();
 
-                    var minStep;
-                    var param = {
-                        finprodId: $("#finprodId_" + currentTab).val(),
-                        targetType: $("#targetType_" + currentTab).val(),
-                        finprodType2: $("#finprodType2_" + currentTab).val(),
-                        tradeMarket: $("#tradeMarket_" + currentTab).val(),
-                        ps: $("#ps_" + currentTab).val(),
-                        currentTab: currentTab
-                    };
-                    Joyin.ajaxJson(basePath + 'etrexchange/common/etrExchangeTrade001/getMinNumStep', param, function (result) {
-                        if (result.data) {
-                            minStep = result.data;
-                        }
-                    }, false);
+                    var minStep = getMinStep()
+                    var entrustPrice = getEntrustPrice();
                     console.log("--------------11-------------------")
-                    console.log(entrustNum)
+                    console.log(entrustPrice)
                     console.log(value)
-                    console.log(entrustAmt)
 
 
-                    var entrustNum0 = parseFloat(entrustNum) * parseFloat(value) / entrustAmt;
+                    var entrustNum0 = parseFloat(value) / parseFloat(entrustPrice);
                     var entrustNum1 = Math.floor(entrustNum0 / minStep) * minStep;
                     console.log(entrustNum0)
                     console.log(entrustNum1)
@@ -4169,6 +4155,13 @@
             }
         }
     });
+
+    function getEntrustPrice() {
+        if ($("#finprodType2_" + currentTab).val() == FINPROD_TYPE_TG_F01) {
+            return $("#fprice_" + currentTab).val();
+        }
+        return $("#entrustPrice_" + currentTab).val();
+    }
 
     //新增行
     function countAddTable() {
@@ -4248,28 +4241,11 @@
         //     }
         // }
         //组合分配调整
-        var finprodId = $("#finprodId_" + currentTab).val();
         var targetType = $("#targetType_" + currentTab).val();
-        var finprodType2 = $("#finprodType2_" + currentTab).val();
-        var tradeMarket = $("#tradeMarket_" + currentTab).val();
         var ps = $("#ps_" + currentTab).val();
         var minStep;
         if (targetType) {
-            var param = {
-                finprodId: finprodId,
-                targetType: targetType,
-                finprodType2: finprodType2,
-                tradeMarket: tradeMarket,
-                ps: ps,
-                currentTab: currentTab
-            };
-            Joyin.ajaxJson(basePath + 'etrexchange/common/etrExchangeTrade001/getMinNumStep', param, function (result) {
-                console.log("------result----------")
-                console.log(result)
-                if (result.data) {
-                    minStep = parseInt(result.data);
-                }
-            }, false);
+            minStep = getMinStep();
         }
         console.log("----------minStep----------")
         console.log(minStep)
@@ -4522,13 +4498,19 @@
 
     function getMinStep() {
         var minStep;
+        var plat = currentTab;
+        var ps = $("#ps_" + currentTab).val();
+        //债回售、债转股、质押券出入库
+        if (ps == "T03" || ps == "T49" || ps == "T68" || ps == "T69") {
+            plat = "99";
+        }
         var param = {
             finprodId: $("#finprodId_" + currentTab).val(),
             targetType: $("#targetType_" + currentTab).val(),
             finprodType2: $("#finprodType2_" + currentTab).val(),
             tradeMarket: $("#tradeMarket_" + currentTab).val(),
-            ps: $("#ps_" + currentTab).val(),
-            currentTab: currentTab
+            ps: ps,
+            currentTab: plat
         };
         Joyin.ajaxJson(basePath + 'etrexchange/common/etrExchangeTrade001/getMinNumStep', param, function (result) {
             if (result.data) {
