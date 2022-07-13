@@ -101,7 +101,8 @@ public class TrdSecLendDurationService extends BaseService<TrdRepoDurationDto> {
 
     public Page<TrdSecLendDurationDto> findPage(int page, int length, Map<String, Object> param) {
         setParams(param);
-        return queryForPageForSelectReturn(page, length, () -> trdSecLendDurationMapper.findPage(param));
+        Page<TrdSecLendDurationDto> pageList = queryForPageForSelectReturn(page, length, () -> trdSecLendDurationMapper.findPage(param));
+        return pageList;
     }
 
     public List<TrdSecLendDurationDto> selectAllData(Map<String, Object> param) {
