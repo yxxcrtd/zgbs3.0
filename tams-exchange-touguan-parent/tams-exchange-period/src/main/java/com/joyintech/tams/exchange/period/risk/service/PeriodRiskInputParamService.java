@@ -134,6 +134,9 @@ public class PeriodRiskInputParamService extends RiskCommonService {
             list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, dto.getBillingDetails(), map -> {
                 // 处理交易方向、交易金额等
                 map.put("tradeId",dto.getBusiCode() + "-" + map.get("portfolioId"));
+                map.put("ps",DictCodeList.交易方向_到期.getValue());
+                map.put("tradeAmt",map.get("repNomCapi"));
+                map.put("finprodId",dto.getFinprodId());
             });
         }
         // CDS(信用保护凭证),交收失败
@@ -144,7 +147,7 @@ public class PeriodRiskInputParamService extends RiskCommonService {
             riskRdsDto.setEventType(BussinessDictCodeListRds.事件类型_投资交易.getValue());
             list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, dto.getSelectedItem(), map -> {
                 // 处理交易方向、交易金额等
-                map.put("tradeId",dto.getOrderId() + "-" + map.get("portfolioId"));
+                map.put("tradeId",dto.getEntrustNo() + "-" + map.get("portfolioId") + "-" + dto.getOrderId() );
             });
         }
 
@@ -221,11 +224,9 @@ public class PeriodRiskInputParamService extends RiskCommonService {
         if (obj instanceof CreditProtectionCertificatePeriodSaveDto || StringUtil.equals(pageId, "CreditProtectionCertificatePeriod002")) {
             CreditProtectionCertificatePeriodSaveDto dto = JsonUtils.json2Object(businessJson, CreditProtectionCertificatePeriodSaveDto.class);
             return BaseMap.newMap().put(NodeConfigConstant.INTERFACE_TYPE, "CPC001")
-                    .put(NodeConfigConstant.BUSI_ACT, DictCodeListExt3.业务动作_投资指令.getValue())
                     .put(NodeConfigConstant.DECISION_ACT, decisionAct)
                     .put(NodeConfigConstant.FLOW_STATUS, flowStatus)
                     .put(NodeConfigConstant.BUSI_TYPE, DictCodeListExt3.头寸业务类型_信用保护凭证存续期.getValue())
-                    .put(NodeConfigConstant.TRADE_PLACE, dto.getTradeMarket())
                     .put(NodeConfigConstant.PS, DictCodeList.交易方向_到期.getValue())
                     .put(NodeConfigConstant.IS_CHECK, isCheck)
                     .put(NodeConfigConstant.DATA, dto);

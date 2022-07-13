@@ -1,7 +1,9 @@
 package com.joyintech.tams.invest.batch.creditprotectioncertificate.dao;
 
+import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.BillingDetailsDto;
 import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodExpireDataDto;
 import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodReaderDto;
+import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodSaveDto;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -29,4 +31,8 @@ public interface CreditProtectionCertificatePeriodRunnerMapper {
     List<CreditProtectionCertificatePeriodExpireDataDto> selectExpireDataForNew(@Param("executeDate") Date executeDate, @Param("finprodId") String finprodId);
 
     List<CreditProtectionCertificatePeriodExpireDataDto> selectDetailsByTotleTradeId(@Param("busiCode") String busiCode);
+
+    CreditProtectionCertificatePeriodSaveDto getEntityByBusinessCode(@Param("businessCode") String businessCode);
+
+    List<BillingDetailsDto> getBillingDetailByBusinessCode(@Param("businessCode") String businessCode);
 }
