@@ -37,16 +37,7 @@ public class PeriodRiskTrialController {
                                         @PathVariable("decisionAct") String decisionAct,
                                         @PathVariable("flowStatus") String flowStatus) {
         try {
-            if(StringUtil.equals(pageId,"CreditProtectionCertificatePeriod002")){
-                String tradeId = String.valueOf(param.get("totleTradeId"));
-                CreditProtectionCertificatePeriodSaveDto entity = creditProtectionCertificatePeriod002Service.getEntityByBusinessCode(tradeId);
-                if (entity != null){
-                    inputParamSerivce.buildParamThenOccupy(entity, decisionAct, flowStatus, pageId);
-                }
-                return new Message<AjaxResult>().success();
-            }else {
-                inputParamSerivce.buildParamThenOccupy(param, decisionAct, flowStatus, pageId);
-            }
+            inputParamSerivce.buildParamThenOccupy(param, decisionAct, flowStatus, pageId);
             return new Message<AjaxResult>().success();
         } catch (Exception e) {
             logger.error("风险占用更新异常", e);

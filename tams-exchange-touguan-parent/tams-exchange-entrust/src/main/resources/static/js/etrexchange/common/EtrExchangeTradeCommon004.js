@@ -2201,7 +2201,7 @@
                     $("#entrustAmt_label_" + currentTab).text("标准券数量").append($star.clone());
                     $("#entrustPriceUnit_" + currentTab).text("%");
                     $("#entrustAmtUnit_" + currentTab).text("万元");
-                    $("#entrustNumUnit_" + currentTab).text("万元");
+                    $("#entrustNumUnit_" + currentTab).text("张");
 
                     // var entrustAmt = $("#standardBondVolume_" + currentTab).val();
                     // $("#entrustAmt_" + currentTab).val(Math.floor(new Number(entrustAmt)));
@@ -2417,7 +2417,7 @@
                 //债券交易数量单位 edit by yeming 20210729 end
                 if (ps == PS_T68 || ps == PS_T69) {
                     $("#entrustAmtUnit_" + currentTab).text("万元");
-                    $("#entrustNumUnit_" + currentTab).text("万元");
+                    $("#entrustNumUnit_" + currentTab).text("张");
                 }
             }
         }
@@ -3379,7 +3379,7 @@
 
             if (finprodType2 == FINPROD_TYPE_TG_F01 && (ps == PS_T68 || ps == PS_T69)) {
                 $("#entrustAmtUnit_" + currentTab).text("万元");
-                $("#entrustNumUnit_" + currentTab).text("万元");
+                $("#entrustNumUnit_" + currentTab).text("张");
                 $("#entrustPrice_" + currentTab).attr("data-textrange", 0);
                 var entrustNum = $("#entrustNum_" + currentTab).val();
                 if (entrustNum) {
