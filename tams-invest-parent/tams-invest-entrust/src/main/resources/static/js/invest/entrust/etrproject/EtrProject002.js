@@ -75,6 +75,10 @@
             return  Joyin.error("资产名称不能为空");
         }
 
+        if (operateType === 'save' && object.entrustAmt == 0) {
+            return  Joyin.error("指令金额必须大于零");
+        }
+
         if(!$('#businessModel').val()){
             Joyin.error("请输入业务模式");
             return;
