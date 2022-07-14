@@ -4,6 +4,8 @@ import com.joyintech.background.component.uplink.interbank.database.entity.IbuQu
 import com.joyintech.background.component.uplink.interbank.database.entity.IbuQuoteEtrReKey;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface IbuQuoteEtrReMapper {
     int deleteByPrimaryKey(IbuQuoteEtrReKey key);
@@ -15,6 +17,8 @@ public interface IbuQuoteEtrReMapper {
     int insertBasicByBasicInfo(IbuQuoteEtrRe record);
 
     IbuQuoteEtrRe selectByPrimaryKey(IbuQuoteEtrReKey key);
+
+    List<IbuQuoteEtrRe> selectByQuoteId(String quoteId);
 
     int updateByPrimaryKeySelective(IbuQuoteEtrRe record);
 

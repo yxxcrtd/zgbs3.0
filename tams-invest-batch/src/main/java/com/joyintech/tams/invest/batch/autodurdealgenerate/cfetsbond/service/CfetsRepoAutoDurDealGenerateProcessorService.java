@@ -82,7 +82,7 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
                 }
             }
             //入库并处理头寸
-            insertAndSendPosition(trdBondDurDbInserts);
+            this.insertAndSendPosition(trdBondDurDbInserts);
         }
     }
 
@@ -91,7 +91,7 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
      * @param batchDate
      */
     public  List<TrdRepoDurationDto> listTrdRepoDuration(Date batchDate){
-        Map<String, Object> paramMap = new HashMap<String, Object>();
+        Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("statusValid", Arrays.asList(DictCodeListExt1.画面数据状态_待处理.getValue()));
         paramMap.put("ps", Arrays.asList(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue()));
         paramMap.put("notChannelFlag", "1");
@@ -358,7 +358,7 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
     public void insertAndSendPosition(List<TrdBondDurDbInertDto> trdBondDurDbInserts){
         for(TrdBondDurDbInertDto trdBondDurDbInertDto : trdBondDurDbInserts){
             autoPeriodCommonService.insertCfetsTempDealData(trdBondDurDbInertDto);
-            sendPositionMethod(trdBondDurDbInertDto);
+            this.sendPositionMethod(trdBondDurDbInertDto);
         }
     }
 

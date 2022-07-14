@@ -226,6 +226,28 @@
             </if>
         </trim>
     </insert>
+    <insert id="insertBatch" parameterType="com.joyintech.tams.common.base.entity.StlPayOrders" >
+        insert into STL_PAY_TEMP_ORDERS (ORDER_ID, ORDER_TYPE, PAY_TYPE,
+        SETTLE_DATE, MY_ACCT_NO, PS,
+        COUNTER_ACCT_NO, SETTLE_AMT, CCY,
+        SETTLE_STATUS, PURPOSE, IS_NEED_SEND,
+        IS_TOTAL_TRADE, TRADE_ID, ORDER_STATUS,
+        P_TRADE_ID, PORTFOLIO_ID, PROD_ID,
+        REMARK, CREATE_USER, CREATE_DEPT,
+        CREATE_TIME, UPDATE_USER, UPDATE_TIME
+        )
+        <foreach collection="list" item="item" separator="from dual union all select" open="select * from (select "
+                 close=" from dual)">
+            #{item.orderId,jdbcType=VARCHAR}, #{item.orderType,jdbcType=VARCHAR}, #{item.payType,jdbcType=VARCHAR},
+            #{item.settleDate,jdbcType=DATE}, #{item.myAcctNo,jdbcType=VARCHAR}, #{item.ps,jdbcType=VARCHAR},
+            #{item.counterAcctNo,jdbcType=VARCHAR}, #{item.settleAmt,jdbcType=DECIMAL}, #{item.ccy,jdbcType=VARCHAR},
+            #{item.settleStatus,jdbcType=VARCHAR}, #{item.purpose,jdbcType=VARCHAR}, #{item.isNeedSend,jdbcType=VARCHAR},
+            #{item.isTotalTrade,jdbcType=VARCHAR}, #{item.tradeId,jdbcType=VARCHAR}, #{item.orderStatus,jdbcType=VARCHAR},
+            #{item.pTradeId,jdbcType=VARCHAR}, #{item.portfolioId,jdbcType=VARCHAR}, #{item.prodId,jdbcType=VARCHAR},
+            #{item.remark,jdbcType=VARCHAR}, #{item.createUser,jdbcType=VARCHAR}, #{item.createDept,jdbcType=VARCHAR},
+            #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateUser,jdbcType=VARCHAR}, #{item.updateTime,jdbcType=TIMESTAMP}
+        </foreach>
+    </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.StlPayTempOrders" >
         insert into STL_PAY_TEMP_ORDERS(ORDER_ID, ORDER_TYPE, PAY_TYPE, SETTLE_DATE, MY_ACCT_NO, 
         PS, COUNTER_ACCT_NO, SETTLE_AMT, CCY, SETTLE_STATUS, PURPOSE, IS_NEED_SEND, IS_TOTAL_TRADE, 
@@ -328,4 +350,111 @@
             UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
         where ORDER_ID = #{orderId,jdbcType=VARCHAR}
     </update>
+
+    <update id="updateByTradeId" parameterType="com.joyintech.tams.common.base.entity.StlPayTempOrders" >
+        update STL_PAY_TEMP_ORDERS
+        <set >
+            <if test="orderType != null" >
+                ORDER_TYPE = #{orderType,jdbcType=VARCHAR},
+            </if>
+            <if test="payType != null" >
+                PAY_TYPE = #{payType,jdbcType=VARCHAR},
+            </if>
+            <if test="settleDate != null" >
+                SETTLE_DATE = #{settleDate,jdbcType=DATE},
+            </if>
+            <if test="myAcctNo != null" >
+                MY_ACCT_NO = #{myAcctNo,jdbcType=VARCHAR},
+            </if>
+            <if test="ps != null" >
+                PS = #{ps,jdbcType=VARCHAR},
+            </if>
+            <if test="counterAcctNo != null" >
+                COUNTER_ACCT_NO = #{counterAcctNo,jdbcType=VARCHAR},
+            </if>
+            <if test="settleAmt != null" >
+                SETTLE_AMT = #{settleAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="ccy != null" >
+                CCY = #{ccy,jdbcType=VARCHAR},
+            </if>
+            <if test="settleStatus != null" >
+                SETTLE_STATUS = #{settleStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="purpose != null" >
+                PURPOSE = #{purpose,jdbcType=VARCHAR},
+            </if>
+            <if test="isNeedSend != null" >
+                IS_NEED_SEND = #{isNeedSend,jdbcType=VARCHAR},
+            </if>
+            <if test="isTotalTrade != null" >
+                IS_TOTAL_TRADE = #{isTotalTrade,jdbcType=VARCHAR},
+            </if>
+            <if test="orderStatus != null" >
+                ORDER_STATUS = #{orderStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="pTradeId != null" >
+                P_TRADE_ID = #{pTradeId,jdbcType=VARCHAR},
+            </if>
+            <if test="portfolioId != null" >
+                PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR},
+            </if>
+            <if test="prodId != null" >
+                PROD_ID = #{prodId,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null" >
+                REMARK = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where  TRADE_ID = #{tradeId,jdbcType=VARCHAR}
+    </update>
+
+    <insert id="insertStlPayOrders" parameterType="java.util.List">
+        INSERT INTO STL_PAY_ORDERS(
+                ORDER_ID , ORDER_TYPE , PAY_TYPE , SETTLE_DATE ,
+                MY_ACCT_NO , PS , COUNTER_ACCT_NO , SETTLE_AMT ,
+                CCY , SETTLE_STATUS , PURPOSE , IS_NEED_SEND ,
+                IS_TOTAL_TRADE , TRADE_ID , ORDER_STATUS , P_TRADE_ID ,
+                PORTFOLIO_ID , PROD_ID , REMARK , CREATE_USER ,
+                CREATE_DEPT , CREATE_TIME , UPDATE_USER , UPDATE_TIME )
+        SELECT
+                ORDER_ID , ORDER_TYPE , PAY_TYPE , SETTLE_DATE ,
+                MY_ACCT_NO , PS , COUNTER_ACCT_NO , SETTLE_AMT ,
+                CCY , SETTLE_STATUS , PURPOSE , IS_NEED_SEND ,
+                IS_TOTAL_TRADE , TRADE_ID , ORDER_STATUS , P_TRADE_ID ,
+                PORTFOLIO_ID , PROD_ID , REMARK , CREATE_USER ,
+                CREATE_DEPT , CREATE_TIME , UPDATE_USER , UPDATE_TIME
+        FROM STL_PAY_TEMP_ORDERS
+        WHERE
+        <foreach collection="list" item="item" separator=" , " open="TRADE_ID in (" close=" )">
+            #{item,jdbcType=VARCHAR}
+        </foreach>
+    </insert>
+
+    <delete id="deleteByTradeIds" parameterType="java.util.List" >
+        delete from STL_PAY_TEMP_ORDERS
+        WHERE
+        <foreach collection="list" item="item" separator=" , " open="TRADE_ID in (" close=" )">
+            #{item,jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+
+    <select id="selectByTradeIds" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="com.joyintech.tams.common.base.dao.StlPayTempOrdersMapper.Base_Column_List" />
+        from STL_PAY_TEMP_ORDERS
+        <where>
+            <if test="list!=null and list.size()!=0">
+                <foreach collection="list" item="item" open=" TRADE_ID in ( " close=" )" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
 </mapper>

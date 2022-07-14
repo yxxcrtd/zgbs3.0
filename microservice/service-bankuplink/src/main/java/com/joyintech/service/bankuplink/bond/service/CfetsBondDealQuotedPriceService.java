@@ -1553,7 +1553,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
 		
 		// 插入现金流水
 		if (ptlPositionHoldDto.getPtlCashPositionFlows().size() > 0) {
-			List<String> quoteIds = new ArrayList<String>();
+			List<String> quoteIds = new ArrayList<>();
 			quoteIds.add(dto.getQuoteId());
 			if (!(StringUtil.equals(dto.getTradeStatus(), BussinessDictCodeList.银行间上行报价状态_已撤回.getValue())
 					|| (StringUtil.equals(dto.getOperateType(), "Restore") && StringUtil.equals(dto.getTradeStatus(),

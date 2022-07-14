@@ -25,6 +25,7 @@ import com.joyintech.tams.invest.common.dto.period.common.BaseTradeInfoDto;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.dto.period.trdbondduration.TrdBondDurDbInertDto;
 import com.joyintech.tams.invest.common.dto.period.trdbondduration.TrdBondDurationDto;
+import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.systemtools.util.CommonUtil;
 import com.joyintech.tools.collectors.JoyinCollectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -712,10 +713,10 @@ public class AutoPeriodBondCommonService {
         // 金融产品交易汇总扩展Entity -> 金融产品交易汇总扩展业务流程表
         WflPaTrdFinDealTotal wflPaTrdFinDealTotal = gen汇总扩展业务流程(entity, trdFinProductDealTotal);
 
-        // 金融产品交易信息DTO.划款指令表Entity -> 划款指令业务流程表
-        List<WflStlPayOrders> wflStlPayOrdersList = new ArrayList<WflStlPayOrders>();
-        WflStlPayOrders stlPayOrdersDto = genNew划款指令流程(entity,trdFinProductDealTotal);
-        wflStlPayOrdersList.add(stlPayOrdersDto);
+//        // 金融产品交易信息DTO.划款指令表Entity -> 划款指令业务流程表
+//        List<WflStlPayOrders> wflStlPayOrdersList = new ArrayList<WflStlPayOrders>();
+//        WflStlPayOrders stlPayOrdersDto = genNew划款指令流程(entity,trdFinProductDealTotal);
+//        wflStlPayOrdersList.add(stlPayOrdersDto);
 
         TrdBondDurDbInertDto trdBondDurDbInertTemp = genNew交易业务流程(entity);
 //        // 金融产品交易Entity -> 金融产品交易业务流程表
@@ -730,7 +731,7 @@ public class AutoPeriodBondCommonService {
         trdBondDurDbInertDto.setWflPaTrdFinDealTotal(wflPaTrdFinDealTotal);
         trdBondDurDbInertDto.setWflTrdProductDealList(trdBondDurDbInertTemp.getWflTrdProductDealList());
         trdBondDurDbInertDto.setWflTrdProductDealAdds(trdBondDurDbInertTemp.getWflTrdProductDealAdds());
-        trdBondDurDbInertDto.setWflStlPayOrdersList(wflStlPayOrdersList);
+        trdBondDurDbInertDto.setWflStlPayOrdersList(trdBondDurDbInertTemp.getWflStlPayOrdersList());
 //        trdBondDurDbInertDto.setPtlTrades(ptlTrades);
         entity.setTrdBondDurDbInertDto(trdBondDurDbInertDto);
     }
@@ -971,9 +972,10 @@ public class AutoPeriodBondCommonService {
         //已占用券面总额
         BigDecimal usedPrimAmtSum = BigDecimal.ZERO;
 
-        List<WflTrdProductDeal> wflTrdProductDeals = new ArrayList<WflTrdProductDeal>();
-        List<WflTrdProductDealAdd> wflTrdProductDealAdds = new ArrayList<WflTrdProductDealAdd>();
-        List<PtlTrade> ptlTradeList = new ArrayList<PtlTrade>();
+        List<WflTrdProductDeal> wflTrdProductDeals = new ArrayList<>();
+        List<WflTrdProductDealAdd> wflTrdProductDealAdds = new ArrayList<>();
+        List<PtlTrade> ptlTradeList = new ArrayList<>();
+        List<WflStlPayOrders> wflStlPayOrdersList = new ArrayList<>();
 
         for (int i = 0; i < entity.getFinAssetIntInfoList().size(); i++ ) {
             if (i == entity.getFinAssetIntInfoList().size() - 1) {
@@ -994,7 +996,8 @@ public class AutoPeriodBondCommonService {
                 entity.getFinAssetIntInfoList().get(i).setIntAmtTheory(intAmtTheory);
                 entity.getFinAssetIntInfoList().get(i).setPrinAmt(intPrimTheory);
             }
-            生成交易New(entity, ps , trdBondDurDbInertTemp, 0, entity.getFinAssetIntInfoList().get(i),wflTrdProductDeals,wflTrdProductDealAdds,ptlTradeList);
+            生成交易New(entity, ps, trdBondDurDbInertTemp, 0, entity.getFinAssetIntInfoList().get(i), wflTrdProductDeals,
+                    wflTrdProductDealAdds, ptlTradeList, wflStlPayOrdersList);
         }
 //        for(FinAssetIntInfo finAssetIntInfo : entity.getFinAssetIntInfoList()){
 //
@@ -1052,8 +1055,8 @@ public class AutoPeriodBondCommonService {
     }
 
     private void 生成交易New(TrdBondDurationDto entity, String 交易方向, TrdBondDurDbInertDto trdBondDurDbInertTemp,
-                      int i,FinAssetIntInfo finAssetIntInfo,List<WflTrdProductDeal> wflTrdProductDeals,
-                         List<WflTrdProductDealAdd> wflTrdProductDealAdds,List<PtlTrade> ptlTradeList) {
+                         int i, FinAssetIntInfo finAssetIntInfo, List<WflTrdProductDeal> wflTrdProductDeals,
+                         List<WflTrdProductDealAdd> wflTrdProductDealAdds, List<PtlTrade> ptlTradeList, List<WflStlPayOrders> wflStlPayOrdersList) {
 
         BussinessCodeParameter parameter = new BussinessCodeParameter();
         parameter.setCommonBusinessType(DictCodeList.共通业务类型_资产存续期交易);
@@ -1096,6 +1099,9 @@ public class AutoPeriodBondCommonService {
         dealadd.setWorkflowId(deal.getWorkflowId());
         dealadd.setStatus(DictCodeList.数据状态_新建.getValue());
         dealadd.setOurShareAmt(deal.getShareAmt());
+        // 金融产品交易信息DTO.划款指令表Entity -> 划款指令业务流程表
+        WflStlPayOrders stlPayOrdersDto = genNew划款指令流程(entity, deal, dealadd);
+        wflStlPayOrdersList.add(stlPayOrdersDto);
 
         PtlTrade ptlTrade2 = new PtlTrade();
         ptlTrade2.setPortfolioId(dealadd.getPortfolioId());
@@ -1114,6 +1120,7 @@ public class AutoPeriodBondCommonService {
         trdBondDurDbInertTemp.setWflTrdProductDealList(wflTrdProductDeals);
         trdBondDurDbInertTemp.setWflTrdProductDealAdds(wflTrdProductDealAdds);
         trdBondDurDbInertTemp.setPtlTrades(ptlTradeList);
+        trdBondDurDbInertTemp.setWflStlPayOrdersList(wflStlPayOrdersList);
     }
 
     private List<WflTrdProductDealAdd> genNew交易附属表(List<WflTrdProductDeal> wflTrdProductDeals, TrdBondDurationDto entity) {
@@ -1140,29 +1147,32 @@ public class AutoPeriodBondCommonService {
      * @see
      * @since 1.0
      */
-    private WflStlPayOrders genNew划款指令流程(TrdBondDurationDto entity,WflTrdFinProductDealTotal trdFinProductDealTotal) {
+    private WflStlPayOrders genNew划款指令流程(TrdBondDurationDto entity,WflTrdProductDeal trdProductDeal,WflTrdProductDealAdd trdProductDealAdd) {
         WflStlPayOrders wflstlPayOrders = new WflStlPayOrders();
         BussinessCodeParameter bussinessCodeParameter = new BussinessCodeParameter();
         bussinessCodeParameter.setSeqNo("9998");
         String orderId;
-        if(baseGetBussinessId != null){
+        if (baseGetBussinessId != null) {
             orderId = baseGetBussinessId.buildBussinessCode(bussinessCodeParameter);
-        }else{
+        } else {
             orderId = IDGenerator.generate();
         }
         wflstlPayOrders.setOrderId(orderId);
         wflstlPayOrders.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
-        String acctNo = autoPeriodCommonService.selectDealCapacctInfo(trdFinProductDealTotal.getSecManageAcctId(), trdFinProductDealTotal.getCcy());
-        wflstlPayOrders.setMyAcctNo(acctNo);
-        wflstlPayOrders.setSettleDate(trdFinProductDealTotal.getSettleDate() == null ? trdFinProductDealTotal.getTradeDate() : trdFinProductDealTotal.getSettleDate());
+//        String acctNo = autoPeriodCommonService.selectDealCapacctInfo(trdProductDeal.getSecManageAcctId(), trdProductDeal.getCcy());
+        String acctId = EtrCommonCashPositionDealService.select组合托管户(trdProductDealAdd.getPortfolioId(),
+                trdProductDeal.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
+        wflstlPayOrders.setMyAcctNo(acctId);
+        wflstlPayOrders.setSettleDate(trdProductDeal.getSettleDate() == null ? trdProductDeal.getTradeDate() : trdProductDeal.getSettleDate());
         wflstlPayOrders.setPs(DictCodeListExt1.收支方向_收入.getValue());
-        wflstlPayOrders.setSettleAmt(trdFinProductDealTotal.getTradeAmt());
-        wflstlPayOrders.setCcy(trdFinProductDealTotal.getCcy());
+        wflstlPayOrders.setSettleAmt(trdProductDeal.getTradeAmt());
+        wflstlPayOrders.setCcy(trdProductDeal.getCcy());
         wflstlPayOrders.setSettleStatus(DictCodeList.结算状态_已结算.getValue());
         wflstlPayOrders.setIsNeedSend(DictCodeListExt1.是否_是.getValue());
         wflstlPayOrders.setIsTotalTrade(DictCodeListExt1.是否_是.getValue());
-        wflstlPayOrders.setTradeId(trdFinProductDealTotal.getTotleTradeId());
+        wflstlPayOrders.setTradeId(trdProductDeal.getTradeId());
         wflstlPayOrders.setOrderStatus(DictCodeListExt1.指令状态_新建.getValue());
+        wflstlPayOrders.setPortfolioId(trdProductDealAdd.getPortfolioId());
         return wflstlPayOrders;
     }
 

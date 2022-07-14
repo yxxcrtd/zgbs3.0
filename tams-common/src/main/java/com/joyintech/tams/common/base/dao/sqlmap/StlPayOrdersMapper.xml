@@ -57,6 +57,27 @@
         from STL_PAY_ORDERS
         where ORDER_ID = #{orderId,jdbcType=VARCHAR}
     </select>
+    <select id="selectByTradeIds" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="com.joyintech.tams.common.base.dao.StlPayOrdersMapper.Base_Column_List" />
+        from STL_PAY_ORDERS
+        <where>
+            <if test="list!=null and list.size()!=0">
+                <foreach collection="list" item="item" open=" TRADE_ID in ( " close=" )" separator=",">
+                #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <delete id="deleteByTradeIds" parameterType="java.util.List" >
+        delete from STL_PAY_ORDERS
+        WHERE
+        <foreach collection="list" item="item" separator=" , " open="TRADE_ID in (" close=" )">
+            #{item,jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
         delete from STL_PAY_ORDERS
         where ORDER_ID = #{orderId,jdbcType=VARCHAR}
@@ -271,6 +292,31 @@
             ORDER_RET_STATUS
              from STL_PAY_ORDERS
              where 1 = 1 and ORDER_ID = #{orderId,jdbcType=VARCHAR}
+    </insert>
+    <insert id="insertBatch" parameterType="com.joyintech.tams.common.base.entity.StlPayOrders" >
+        insert into STL_PAY_ORDERS (ORDER_ID, ORDER_TYPE, PAY_TYPE,
+        SETTLE_DATE, MY_ACCT_NO, PS,
+        COUNTER_ACCT_NO, SETTLE_AMT, CCY,
+        SETTLE_STATUS, PURPOSE, IS_NEED_SEND,
+        IS_TOTAL_TRADE, TRADE_ID, ORDER_STATUS,
+        P_TRADE_ID, CREATE_USER, CREATE_DEPT,
+        CREATE_TIME, UPDATE_USER, UPDATE_TIME,
+        PORTFOLIO_ID, PROD_ID, REMARK,
+        SEND_DATE, SEND_STATUS, ORDER_REC_STATUS,
+        ORDER_RET_STATUS)
+        <foreach collection="list" item="item" separator="from dual union all select" open="select * from (select "
+                 close=" from dual)">
+            #{item.orderId,jdbcType=VARCHAR}, #{item.orderType,jdbcType=VARCHAR}, #{item.payType,jdbcType=VARCHAR},
+            #{item.settleDate,jdbcType=DATE}, #{item.myAcctNo,jdbcType=VARCHAR}, #{item.ps,jdbcType=VARCHAR},
+            #{item.counterAcctNo,jdbcType=VARCHAR}, #{item.settleAmt,jdbcType=DECIMAL}, #{item.ccy,jdbcType=VARCHAR},
+            #{item.settleStatus,jdbcType=VARCHAR}, #{item.purpose,jdbcType=VARCHAR}, #{item.isNeedSend,jdbcType=VARCHAR},
+            #{item.isTotalTrade,jdbcType=VARCHAR}, #{item.tradeId,jdbcType=VARCHAR}, #{item.orderStatus,jdbcType=VARCHAR},
+            #{item.pTradeId,jdbcType=VARCHAR}, #{item.createUser,jdbcType=VARCHAR}, #{item.createDept,jdbcType=VARCHAR},
+            #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateUser,jdbcType=VARCHAR}, #{item.updateTime,jdbcType=TIMESTAMP},
+            #{item.portfolioId,jdbcType=VARCHAR}, #{item.prodId,jdbcType=VARCHAR}, #{item.remark,jdbcType=VARCHAR},
+            #{item.sendDate,jdbcType=DATE}, #{item.sendStatus,jdbcType=VARCHAR}, #{item.orderRecStatus,jdbcType=VARCHAR},
+            #{item.orderRetStatus,jdbcType=VARCHAR}
+        </foreach>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.StlPayOrders" >
         update STL_PAY_ORDERS

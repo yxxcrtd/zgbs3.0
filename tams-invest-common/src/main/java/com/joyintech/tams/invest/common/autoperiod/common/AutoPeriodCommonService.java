@@ -88,6 +88,12 @@ public class AutoPeriodCommonService extends BaseService {
      */
     @Autowired
     private StlPayOrdersMapper stlPayOrdersMapper;
+
+    /**
+     * StlPayOrdersMapper
+     */
+    @Autowired
+    private StlPayTempOrdersMapper stlPayTempOrdersMapper;
     
     /**
      * PaTrdFinProductDealTotalMapper
@@ -582,9 +588,18 @@ public class AutoPeriodCommonService extends BaseService {
         }
 
         if (!StringUtil.isEmptyList(trdBondDurDbInertDto.getStlPayOrdersList())) {
-            for (StlPayOrders StlPayOrders : trdBondDurDbInertDto.getStlPayOrdersList()) {
-                stlPayOrdersMapper.insert(StlPayOrders);
-            }
+//            for (StlPayOrders StlPayOrders : trdBondDurDbInertDto.getStlPayOrdersList()) {
+//                stlPayOrdersMapper.insert(StlPayOrders);
+//            }
+            List<StlPayTempOrders> stlPayTempOrders = new ArrayList<>();
+            trdBondDurDbInertDto.getStlPayOrdersList().forEach(
+                    stlPayOrders -> {
+                        StlPayTempOrders tempOrders = new StlPayTempOrders();
+                        BeanUtil.copyPropertiesIgnoreNull(tempOrders,stlPayOrders);
+                        stlPayTempOrders.add(tempOrders);
+                    }
+            );
+            stlPayTempOrdersMapper.insertBatch(stlPayTempOrders);
         }
 
         if (trdBondDurDbInertDto.getPaTrdFinProductDealTotal() != null) {
@@ -682,9 +697,18 @@ public class AutoPeriodCommonService extends BaseService {
            trdDealTotalAddMapper.insert(trdBondDurDbInertDto.getTrdDealTotalAdd());
         }
         if (!StringUtil.isEmptyList(trdBondDurDbInertDto.getStlPayOrdersList())) {
-            for (StlPayOrders StlPayOrders : trdBondDurDbInertDto.getStlPayOrdersList()) {
-                stlPayOrdersMapper.insert(StlPayOrders);
-            }
+//            for (StlPayOrders StlPayOrders : trdBondDurDbInertDto.getStlPayOrdersList()) {
+//                stlPayOrdersMapper.insert(StlPayOrders);
+//            }
+            List<StlPayTempOrders> stlPayTempOrders = new ArrayList<>();
+            trdBondDurDbInertDto.getStlPayOrdersList().forEach(
+                    stlPayOrders -> {
+                        StlPayTempOrders tempOrders = new StlPayTempOrders();
+                        BeanUtil.copyPropertiesIgnoreNull(tempOrders,stlPayOrders);
+                        stlPayTempOrders.add(tempOrders);
+                    }
+            );
+            stlPayTempOrdersMapper.insertBatch(stlPayTempOrders);
         }
         if (trdBondDurDbInertDto.getPaTrdFinProductDealTotal() != null) {
             paTrdProdTempDealTotalMapper.insert(trdBondDurDbInertDto.getPaTrdFinProductDealTotal());

@@ -24,7 +24,7 @@ public class CfetsTrdFirstBidFirmInvestTradeDto {
     private TrdFinProductDealTotal trdFinProductDealTotal;
     private TrdDealTotalAdd trdDealTotalAdd;
     private TrdTradeFeeTotal trdTradeFeeTotal;
-    private StlPayOrders stlPayOrders;
+    private List<StlPayOrders> stlPayOrders;
     private TrdFinProductDealTotal trdFinProductDealTempTotal;
     private TrdTempDealTotalAdd trdDealTempTotalAdd;
 
@@ -68,11 +68,11 @@ public class CfetsTrdFirstBidFirmInvestTradeDto {
         this.trdTradeFeeTotal = trdTradeFeeTotal;
     }
 
-    public StlPayOrders getStlPayOrders() {
+    public List<StlPayOrders> getStlPayOrders() {
         return stlPayOrders;
     }
 
-    public void setStlPayOrders(StlPayOrders stlPayOrders) {
+    public void setStlPayOrders(List<StlPayOrders> stlPayOrders) {
         this.stlPayOrders = stlPayOrders;
     }
 

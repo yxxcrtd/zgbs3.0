@@ -1033,7 +1033,7 @@ public class IbuComponentReceiveService extends BaseService{
 					        //多组合 处理持仓 传入拆分后质押券
                             List<IbuQuoteEntCrepPledgeDto> ibuQuoteEntCrepPledges = quoteResultDto.getRepoDialogueQuote().getIbuQuoteEntCrepPledgeDtoList();
                             if(null != ibuQuoteEntCrepPledges && ibuQuoteEntCrepPledges.size()>0){
-                                ibuQuoteEntCrepPledges.stream().forEach(item -> {
+                                ibuQuoteEntCrepPledges.forEach(item -> {
                                     CfetsRepoDealQuotedPrice003Dto cfetsRepoDealQuotedPrice003Dto = new CfetsRepoDealQuotedPrice003Dto();
                                     BeanUtil.copyPropertiesIgnoreNull(cfetsRepoDealQuotedPrice003Dto, item);
                                     cfetsRepoDealQuotedPrice003Dto.setBondCode(item.getBondCode());
@@ -1046,11 +1046,11 @@ public class IbuComponentReceiveService extends BaseService{
                             List<IbuQuoteEtrReDto> ibuQuoteEtrRes = quoteResultDto.getRepoDialogueQuote().getIbuQuoteEtrReDtoList();
                             List<PtlAllocationDto> ptlAllocationList = new ArrayList<>();
                             if(null != ibuQuoteEtrRes && ibuQuoteEtrRes.size()>0){
-                                ibuQuoteEtrRes.stream().forEach(item -> {
+                                for (IbuQuoteEtrReDto item : ibuQuoteEtrRes) {
                                     PtlAllocationDto ptlAllocationDto = new PtlAllocationDto();
-                                    BeanUtil.copyPropertiesIgnoreNull(ptlAllocationDto,item);
+                                    BeanUtil.copyPropertiesIgnoreNull(ptlAllocationDto, item);
                                     ptlAllocationList.add(ptlAllocationDto);
-                                });
+                                }
                             }
                             dto.setPtlAllocationList(ptlAllocationList);
                         }else{
