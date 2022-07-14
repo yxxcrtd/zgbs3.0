@@ -517,7 +517,7 @@ $(function () {
             , {
                 field: 'finprodMarketId', title: 'TrdInvestDealQuery001.finprodMarketId',
                 render: function (data, type, row, meta) {
-                    if (row.finprodMarketId != undefined) {
+                    if (row.finprodMarketId != undefined && row.finprodType2 != 'F07') {
                         return "<a onclick=\"showDetailByFinprodId('" + row.finprodId + "','" + row.finprodType2 + "')\" + style='cursor: pointer;'>" + row.finprodMarketId + "</a>";
                     }
                 }
