@@ -7,10 +7,10 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.dao.PtlSecPositionFlowMapper;
-import com.joyintech.tams.common.base.entity.PtlSecPositionFlow;
-import com.joyintech.tams.common.base.entity.TrdFinProductBarter;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
-import com.joyintech.tams.common.base.entity.TrdProductDealAdd;
+import com.joyintech.tams.common.base.dao.StlPayOrdersMapper;
+import com.joyintech.tams.common.base.dao.TrdFinProductDealTotalMapper;
+import com.joyintech.tams.common.base.dao.TrdProductDealMapper;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
@@ -53,6 +53,15 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
      */
     @Autowired
     private PtlSecPositionFlowMapper ptlSecPositionFlowMapper;
+
+    @Autowired
+    private TrdFinProductDealTotalMapper trdFinProductDealTotalMapper;
+
+    @Autowired
+    private TrdProductDealMapper trdProductDealMapper;
+
+    @Autowired
+    private StlPayOrdersMapper stlPayOrdersMapper;
 
     private static final List<String> 正回购_逆回购 = Arrays.asList(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue(),
         DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue(), DictCodeListExt1.金融产品类型_投管用_债券买断式正回购.getValue(),
@@ -1527,41 +1536,32 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 return result;
             }
             else if (
-                    // GZYHTZJY-1001:债券的申购只处理现金,不处理持仓;申购确认只处理持仓,不处理现金 modify by fuyongsheng 20220104 start
-                    // (DictCodeList.交易方向_申购确认.getValue().equals(deal.getPs())
+                // GLCP-157:债券申购现金流水登录一笔在途,申购确认冲销申购的在途,登录一笔实际的流水 modify by fuyongsheng 20220714 start
                     (DictCodeList.交易方向_申购.getValue().equals(deal.getPs())
-                    // GZYHTZJY-1001:债券的申购只处理现金,不处理持仓;申购确认只处理持仓,不处理现金 modify by fuyongsheng 20220104 end
-                      && DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(deal.getFinprodType2()))) {
-                resultDto.setCdate(deal.getTradeDate());
-                resultDto.setAmount(ArithmeticUtil.multiply(stlPayOrder.getSettleAmt(), new BigDecimal(-1)));
-                resultDto.setSplitType(DictCodeListExt3.拆分标识_已拆分.getValue());
-                if (BigDecimal.ZERO.compareTo(resultDto.getAmount()) != 0
-                    && StringUtil.equals(stlPayOrder.getPs(), DictCodeListExt1.收付方向_支出.getValue())) {// 需求变更，出钱，入流水，否则不需要出实际流水
-                    result.add(resultDto);
+                            || DictCodeList.交易方向_申购确认.getValue().equals(deal.getPs()))
+                      && DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(deal.getFinprodType2())) {
+                // 申购确认冲销申购的在途,再登录一笔实际的流水
+                if(DictCodeList.交易方向_申购确认.getValue().equals(deal.getPs())){
+                    // 1、登录一笔冲销原申购的流水
+                    PtlCashPositionFlowDto cxsgPtlCashPositionFlow = this.genCxSgPtlCashPositionFlow(deal, stlPayOrder, chlId);
+                    if(null != cxsgPtlCashPositionFlow){
+                        result.add(cxsgPtlCashPositionFlow);
+                    }
+                    // 2、登录一笔实际的流水
+                    resultDto.setCdate(deal.getTradeDate());
+                    resultDto.setAmount(ArithmeticUtil.multiply(stlPayOrder.getSettleAmt(), new BigDecimal(-1)));
+                    resultDto.setSplitType(DictCodeListExt3.拆分标识_已拆分.getValue());
+                    if (BigDecimal.ZERO.compareTo(resultDto.getAmount()) != 0
+                            && StringUtil.equals(stlPayOrder.getPs(), DictCodeListExt1.收付方向_支出.getValue())) {// 需求变更，出钱，入流水，否则不需要出实际流水
+                        result.add(resultDto);
+                    }
                 }
-                if (inputDto.getPositionType().equals(DictCodeList.持仓类型_实际.getValue())) {
-                    PtlCashPositionFlowDto ztFlowDto = new PtlCashPositionFlowDto();
-                    // 输入参数.组合代码
-                    ztFlowDto.setPortfolioId(portfolioId);
-                    // 划款指令Entity.本方账户
-                    ztFlowDto.setAcctId(stlPayOrder.getMyAcctNo());
-                    // 输入参数.持仓类型
-                    ztFlowDto.setHodingType(DictCodeList.持仓类型_在途.getValue());
-                    // 日期
-                    ztFlowDto.setCdate(deal.getTradeDate());
-                    // 划款指令Entity.币种
-                    ztFlowDto.setCcy(stlPayOrder.getCcy());
-                    // 划款指令Entity.指令编号
-                    ztFlowDto.setOrderId(stlPayOrder.getOrderId());
-                    // 金融产品交易Entity.金融产品代码
-                    ztFlowDto.setChlFinprodId(chlId);
-                    ztFlowDto.setCreateUser(deal.getCreateUser());
-                    ztFlowDto.setCreateDept(deal.getCreateDept());
-                    ztFlowDto.setUpdateUser(deal.getCreateUser());
-                    ztFlowDto.setAmount(ArithmeticUtil.multiply(deal.getTradeAmt(), new BigDecimal(-1)));// 存为min(保证金,中签券面)
-                    ztFlowDto.setSplitType(DictCodeListExt3.拆分标识_已拆分.getValue());
+                // 申购登录一笔在途现金流水
+                if (DictCodeList.交易方向_申购.getValue().equals(deal.getPs())) {
+                    PtlCashPositionFlowDto ztFlowDto = this.genZtPtlCashPositionFlow(portfolioId, deal, stlPayOrder, chlId);
                     result.add(ztFlowDto);
                 }
+                // GLCP-157:债券申购现金流水登录一笔在途,申购确认冲销申购的在途,登录一笔实际的流水 modify by fuyongsheng 20220714 end
                 return result;
             }
             else if ((DictCodeListExt1.交易方向_保证金回款.getValue().equals(deal.getPs())
@@ -1717,20 +1717,42 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
             /*
              * 输入金融产品交易Entity.金融产品类型（投管分类）= 数据字典缓存.金融产品类型（投管分类).股票 and 金融产品交易Entity.交易方向 in （买入/配股/增发（配售））
              */
+            // GLCP-157:修改股票、债券申购、申购确认登录现金流水逻辑 modify by fuyongsheng 20220714 start
             else if (DictCodeListExt1.金融产品类型_投管用_股票.getValue().equals(deal.getFinprodType2())
                      && (DictCodeList.交易方向_买入.getValue().equals(deal.getPs())
                          || DictCodeListExt2.交易方向_配股.getValue().equals(deal.getPs())
                          || DictCodeListExt2.交易方向_增发.getValue().equals(deal.getPs())
                          || DictCodeListExt2.交易方向_新股中签.getValue().equals(deal.getPs()))
-                         // GZYHTZJY-1016:股票的申购只处理现金,不处理持仓;申购确认只处理持仓,不处理现金 modify fuyongsheng 20220104 start
-                         || DictCodeList.交易方向_申购.getValue().equals(deal.getPs())) {
-                         // GZYHTZJY-1016:股票的申购只处理现金,不处理持仓;申购确认只处理持仓,不处理现金 modify fuyongsheng 20220104 end
-                resultDto.setCdate(stlPayOrder.getSettleDate());
-                resultDto.setAmount(ArithmeticUtil.multiply(stlPayOrder.getSettleAmt(), new BigDecimal(-1)));
-                resultDto.setSplitType(DictCodeListExt3.拆分标识_已拆分.getValue());
-                result.add(resultDto);
+                         || DictCodeList.交易方向_申购.getValue().equals(deal.getPs())
+                         || DictCodeList.交易方向_申购确认.getValue().equals(deal.getPs())) {
+                if(DictCodeList.交易方向_申购.getValue().equals(deal.getPs())){
+                    // 申购登录在途的现金流水
+                    PtlCashPositionFlowDto ztFlowDto = this.genZtPtlCashPositionFlow(portfolioId, deal, stlPayOrder, chlId);
+                    result.add(resultDto);
+                }
+                // 申购确认登录1、一笔冲销原申购的现金流水 2、一笔申购确认的现金流水
+                else if(DictCodeList.交易方向_申购确认.getValue().equals(deal.getPs())){
+                    // 1、登录一笔冲销原申购的现金流水
+                    PtlCashPositionFlowDto cxsgPtlCashPositionFlow = this.genCxSgPtlCashPositionFlow(deal, stlPayOrder, chlId);
+                    if(null != cxsgPtlCashPositionFlow){
+                        result.add(cxsgPtlCashPositionFlow);
+                    }
+
+                    // 2、登录一笔申购确认的现金流水
+                    resultDto.setCdate(stlPayOrder.getSettleDate());
+                    resultDto.setAmount(ArithmeticUtil.multiply(stlPayOrder.getSettleAmt(), new BigDecimal(-1)));
+                    resultDto.setSplitType(DictCodeListExt3.拆分标识_已拆分.getValue());
+                    result.add(resultDto);
+                }
+                else{
+                    resultDto.setCdate(stlPayOrder.getSettleDate());
+                    resultDto.setAmount(ArithmeticUtil.multiply(stlPayOrder.getSettleAmt(), new BigDecimal(-1)));
+                    resultDto.setSplitType(DictCodeListExt3.拆分标识_已拆分.getValue());
+                    result.add(resultDto);
+                }
                 return result;
             }
+            // GLCP-157:修改股票、债券申购、申购确认登录现金流水逻辑 modify by fuyongsheng 20220714 end
             // add by wangpeng 20190724 end
 
             //add by  liutf 20200108 start
@@ -2565,4 +2587,93 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
         }
         return result;
     }
+
+    // GLCP-157:修改股票、债券申购、申购确认登录现金流水逻辑 modify by fuyongsheng 20220714 start
+    /**
+     * 生成冲销申购的现金流水
+     * @param deal
+     * @param stlPayOrder
+     * @param chlId
+     * @return
+     */
+    private PtlCashPositionFlowDto genCxSgPtlCashPositionFlow(TrdProductDeal deal, StlPayOrdersDto stlPayOrder, String chlId){
+        // 划款指令表TradeId(债券存的是totleTradeId,股票存的是tradeId)
+        String tradeId = StringUtil.EMPTY;
+        if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(deal.getFinprodType2())){
+            // 查询申购确认的totaltrade
+            TrdFinProductDealTotal trdFinProductDealTotal = trdFinProductDealTotalMapper.selectByPrimaryKey(deal.getTotleTradeId());
+            if(null != trdFinProductDealTotal){
+                // 根据申购确认total查询申购total
+                TrdFinProductDealTotal bDealTotal = trdFinProductDealTotalMapper.selectByPrimaryKey(trdFinProductDealTotal.getbTradeId());
+                if(null != bDealTotal){
+                    tradeId = bDealTotal.getTotleTradeId();
+                }
+            }
+        }
+        else if(DictCodeListExt1.金融产品类型_投管用_股票.getValue().equals(deal.getFinprodType2())){
+            // 根据申购确认查询申购
+            TrdProductDeal bTrdProductDeal = trdProductDealMapper.selectByPrimaryKey(deal.getbTradeId());
+            if(null != bTrdProductDeal){
+                tradeId = bTrdProductDeal.getTradeId();
+            }
+        }
+        if(StringUtil.isEmpty(tradeId)){
+            return null;
+        }
+        // 查询申购的划款指令
+        List<StlPayOrders> stlPayOrdersTemp = stlPayOrdersMapper.selectByTradeId(tradeId);
+        if(CollectionUtils.isNotEmpty(stlPayOrdersTemp)){
+            StlPayOrders sgStlPayOrders = stlPayOrdersTemp.get(0);
+            // 构建原申购冲销流水
+            PtlCashPositionFlowDto cxFlowDto = new PtlCashPositionFlowDto();
+            cxFlowDto.setPortfolioId(sgStlPayOrders.getPortfolioId());
+            cxFlowDto.setAcctId(sgStlPayOrders.getMyAcctNo());
+            cxFlowDto.setHodingType(DictCodeList.持仓类型_在途.getValue());
+            cxFlowDto.setCdate(deal.getTradeDate());
+            cxFlowDto.setCcy(sgStlPayOrders.getCcy());
+            cxFlowDto.setOrderId(stlPayOrder.getOrderId());
+            cxFlowDto.setChlFinprodId(chlId);
+            cxFlowDto.setCreateUser(deal.getCreateUser());
+            cxFlowDto.setCreateDept(deal.getCreateDept());
+            cxFlowDto.setUpdateUser(deal.getCreateUser());
+            cxFlowDto.setAmount(ArithmeticUtil.multiply(sgStlPayOrders.getSettleAmt(), new BigDecimal(-1)));
+            cxFlowDto.setSplitType(DictCodeListExt3.拆分标识_已拆分.getValue());
+            return cxFlowDto;
+        }
+        return null;
+    }
+
+    /**
+     * 生成在途的现金流水
+     * @param portfolioId
+     * @param deal
+     * @param stlPayOrder
+     * @param chlId
+     * @return
+     */
+    private PtlCashPositionFlowDto genZtPtlCashPositionFlow(String portfolioId, TrdProductDeal deal,
+                                                            StlPayOrdersDto stlPayOrder, String chlId){
+        PtlCashPositionFlowDto ztFlowDto = new PtlCashPositionFlowDto();
+        // 输入参数.组合代码
+        ztFlowDto.setPortfolioId(portfolioId);
+        // 划款指令Entity.本方账户
+        ztFlowDto.setAcctId(stlPayOrder.getMyAcctNo());
+        // 输入参数.持仓类型
+        ztFlowDto.setHodingType(DictCodeList.持仓类型_在途.getValue());
+        // 日期
+        ztFlowDto.setCdate(deal.getTradeDate());
+        // 划款指令Entity.币种
+        ztFlowDto.setCcy(stlPayOrder.getCcy());
+        // 划款指令Entity.指令编号
+        ztFlowDto.setOrderId(stlPayOrder.getOrderId());
+        // 金融产品交易Entity.金融产品代码
+        ztFlowDto.setChlFinprodId(chlId);
+        ztFlowDto.setCreateUser(deal.getCreateUser());
+        ztFlowDto.setCreateDept(deal.getCreateDept());
+        ztFlowDto.setUpdateUser(deal.getCreateUser());
+        ztFlowDto.setAmount(ArithmeticUtil.multiply(deal.getTradeAmt(), new BigDecimal(-1)));// 存为min(保证金,中签券面)
+        ztFlowDto.setSplitType(DictCodeListExt3.拆分标识_已拆分.getValue());
+        return ztFlowDto;
+    }
+    // GLCP-157:修改股票、债券申购、申购确认登录现金流水逻辑 modify by fuyongsheng 20220714 end
 }
