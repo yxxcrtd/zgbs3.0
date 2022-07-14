@@ -168,6 +168,9 @@ public class CfetsRepoDealQuoteCommonDto extends BaseEntity implements ProcessEn
 
     @ApiModelProperty(name = "tradeStatus", value = "交易状态", example = "01")
     private String tradeStatus;
+
+    @ApiModelProperty(name = "quoteRoleType", value = "本方角色", example = "01")
+    private String quoteRoleType;
     /**
      * 决策动作
      */
@@ -626,6 +629,14 @@ public class CfetsRepoDealQuoteCommonDto extends BaseEntity implements ProcessEn
 
     public void setPageId(String pageId) {
         this.pageId = pageId;
+    }
+
+    public String getQuoteRoleType() {
+        return quoteRoleType;
+    }
+
+    public void setQuoteRoleType(String quoteRoleType) {
+        this.quoteRoleType = quoteRoleType;
     }
 }
 

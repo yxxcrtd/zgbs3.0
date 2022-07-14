@@ -787,17 +787,17 @@
                 <if test="quoteId != null and quoteId !='' ">
                     <if test="repo_pledge_model != null and ( repo_pledge_model.equals('01') or repo_pledge_model.equals('03') ) ">
                         /* 查询条件 报价编号（内部代码）*/
-                        AND StockFinId.FINPROD_ID in (select iqcp.PLEDGE_FINPROD_ID
+                        AND ( StockFinId.FINPROD_ID in (select iqcp.PLEDGE_FINPROD_ID
                                                     from IBU_QUOTE_CREP_PLEDGE iqcp
                                                             left join IBU_QUOTE_CREP iqc on iqcp.QUOTE_ID = iqc.QUOTE_ID and iqcp.VERSION = iqc.VERSION
-                                                    where iqc.TRADE_STATUS = '09' and iqc.QUOTE_ID = #{quoteId})
+                                                    where iqc.TRADE_STATUS = '09' and iqc.QUOTE_ID = #{quoteId}) or ETR_ENTRUST.PS IN ( #{ps_04} ) )
                     </if>
                     <if test="repo_pledge_model != null and repo_pledge_model.equals('02')">
                         /* 查询条件 报价编号（内部代码）*/
-                        AND fp.FINPROD_ID in (select iqcp.PLEDGE_FINPROD_ID
+                        AND ( fp.FINPROD_ID in (select iqcp.PLEDGE_FINPROD_ID
                                                     from IBU_QUOTE_CREP_PLEDGE iqcp
                                                             left join IBU_QUOTE_CREP iqc on iqcp.QUOTE_ID = iqc.QUOTE_ID and iqcp.VERSION = iqc.VERSION
-                                                    where iqc.TRADE_STATUS = '09' and iqc.QUOTE_ID = #{quoteId})
+                                                    where iqc.TRADE_STATUS = '09' and iqc.QUOTE_ID = #{quoteId}) or ETR_ENTRUST.PS IN ( #{ps_04} ) )
                     </if>
                 </if>
                 <if test="entrustStatus != null and entrustStatus.size() > 0">
