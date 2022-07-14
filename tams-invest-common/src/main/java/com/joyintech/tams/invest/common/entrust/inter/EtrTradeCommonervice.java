@@ -473,7 +473,7 @@ public class EtrTradeCommonervice extends BaseService {
                 .put("amount", bm.get(acctNoCanCash)));
         //修改 add  页面 头寸单位显示问题 start
         String unit = "张";
-        String usableAmountText="可用数量（";
+        String usableAmountText="可质押数量（";
         String usableSecText="持仓数量（";
         if (StringUtil.isNotEmpty(requestDto.getPtlList().get(0).getFinprodType2())) {
             if (StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
