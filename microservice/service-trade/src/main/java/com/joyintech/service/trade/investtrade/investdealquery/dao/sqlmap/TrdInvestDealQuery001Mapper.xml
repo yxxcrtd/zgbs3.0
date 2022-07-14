@@ -496,9 +496,11 @@
 				or (
 					<!-- 交易所-->
 					tpd.TRADE_MARKET in ('03','04') and (
-					<!--            债券: 买入、卖出、回售、配债-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T97'))
-					<!--            债券: 网上申购、申购确认-->
+					<!--            债券: 卖出、回售、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T02','T03','T97'))
+					<!--            债券: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS ='T01' and (tdta.PURCH_MODLE = '01' OR tdta.PURCH_MODLE is null))
+					<!--            债券: 网上申购、网上申购确认-->
 					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T04','T05') and tdta.PURCH_MODLE = '01')
 					<!--            质押式回购: 正回购、逆回购-->
 					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
@@ -1248,6 +1250,7 @@
 			(
 				 SELECT tpd.TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
 				 FROM TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
+		         left join TRD_PRODUCT_DEAL_ADD tdta on tpd.TRADE_ID = tdta.TRADE_ID
 				 WHERE
 				 (
 					<!-- 银行间/商业银行柜台-->
@@ -1263,8 +1266,12 @@
 				 or (
 					<!-- 交易所-->
 					tpd.TRADE_MARKET in ('03','04') and (
-					<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
+					<!--            债券: 卖出、回售、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T02','T03','T97'))
+					<!--            债券: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS ='T01' and (tdta.PURCH_MODLE = '01' OR tdta.PURCH_MODLE is null))
+					<!--            债券: 网上申购、网上申购确认-->
+					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T04','T05') and tdta.PURCH_MODLE = '01')
 					<!--            质押式回购: 正回购、逆回购-->
 					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
 					<!--            一级市场债: 买入-->
@@ -1298,9 +1305,11 @@
 				or (
 					<!-- 交易所-->
 					tpd.TRADE_MARKET in ('03','04') and (
-					<!--            债券: 买入、卖出、回售、配债-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T97'))
-					<!--            债券: 网上申购、申购确认-->
+					<!--            债券: 卖出、回售、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T02','T03','T97'))
+					<!--            债券: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS ='T01' and (tdta.PURCH_MODLE = '01' OR tdta.PURCH_MODLE is null))
+					<!--            债券: 网上申购、网上申购确认-->
 					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T04','T05') and tdta.PURCH_MODLE = '01')
 					<!--            质押式回购: 正回购、逆回购-->
 					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
@@ -2035,6 +2044,7 @@
 			(
 				SELECT tpd.TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
 				FROM TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
+				left join TRD_PRODUCT_DEAL_ADD tdta on tpd.TRADE_ID = tdta.TRADE_ID
 				WHERE
 				(
 					<!-- 银行间/商业银行柜台-->
@@ -2050,8 +2060,12 @@
 				or (
 					<!-- 交易所-->
 					tpd.TRADE_MARKET in ('03','04') and (
-					<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T05','T97'))
+					<!--            债券: 卖出、回售、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T02','T03','T97'))
+					<!--            债券: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS ='T01' and (tdta.PURCH_MODLE = '01' OR tdta.PURCH_MODLE is null))
+					<!--            债券: 网上申购、网上申购确认-->
+					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T04','T05') and tdta.PURCH_MODLE = '01')
 					<!--            质押式回购: 正回购、逆回购-->
 					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
 					<!--            一级市场债: 买入-->
@@ -2085,10 +2099,12 @@
 				or (
 					<!-- 交易所-->
 					tpd.TRADE_MARKET in ('03','04') and (
-					<!--            债券: 买入、卖出、回售、配债-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T97'))
-					<!--            债券: 网上申购、申购确认-->
-		            or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T04','T05') and tdta.PURCH_MODLE='01')
+					<!--            债券: 卖出、回售、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T02','T03','T97'))
+					<!--            债券: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS ='T01' and (tdta.PURCH_MODLE = '01' OR tdta.PURCH_MODLE is null))
+					<!--            债券: 网上申购、网上申购确认-->
+					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T04','T05') and tdta.PURCH_MODLE = '01')
 					<!--            质押式回购: 正回购、逆回购-->
 					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
 					<!--            一级市场债: 买入-->
@@ -2866,9 +2882,11 @@
 				or (
 					<!-- 交易所-->
 					tpd.TRADE_MARKET in ('03','04') and (
-					<!--            债券: 买入、卖出、回售、配债-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T97'))
-					<!--            债券: 网上申购、申购确认-->
+					<!--            债券: 卖出、回售、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T02','T03','T97'))
+					<!--            债券: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS ='T01' and (tdta.PURCH_MODLE = '01' OR tdta.PURCH_MODLE is null))
+					<!--            债券: 网上申购、网上申购确认-->
 					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T04','T05') and tdta.PURCH_MODLE = '01')
 					<!--            质押式回购: 正回购、逆回购-->
 					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
@@ -2888,6 +2906,7 @@
 			(
 				SELECT tpd.TRADE_ID TRADE_ID, fpt.TYPE_6 TYPE_6
 				FROM TRD_PRODUCT_DEAL tpd left join FIN_PRODUCT_TYPE fpt on tpd.FINPROD_ID = fpt.FINPROD_ID
+				left join TRD_PRODUCT_DEAL_ADD tdta on tpd.TRADE_ID = tdta.TRADE_ID
 				WHERE
 				(
 					<!-- 银行间/商业银行柜台-->
@@ -2903,8 +2922,12 @@
 				or (
 					<!-- 交易所-->
 					tpd.TRADE_MARKET in ('03','04') and (
-					<!--            债券: 买入、卖出、回售、申购、申购确认、配债-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T04','T05','T97'))
+					<!--            债券: 卖出、回售、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T02','T03','T97'))
+					<!--            债券: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS ='T01' and (tdta.PURCH_MODLE = '01' OR tdta.PURCH_MODLE is null))
+					<!--            债券: 网上申购、网上申购确认-->
+					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T04','T05') and tdta.PURCH_MODLE = '01')
 					<!--            质押式回购: 正回购、逆回购-->
 					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
 					<!--            一级市场债: 买入-->
@@ -2938,9 +2961,11 @@
 				or (
 				<!-- 交易所-->
 					tpd.TRADE_MARKET in ('03','04') and (
-					<!--            债券: 买入、卖出、回售、配债-->
-					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T01','T02','T03','T97'))
-					<!--            债券: 网上申购、申购确认-->
+					<!--            债券: 卖出、回售、配债-->
+					(tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T02','T03','T97'))
+					<!--            债券: 买入-->
+					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS ='T01' and (tdta.PURCH_MODLE = '01' OR tdta.PURCH_MODLE is null))
+					<!--            债券: 网上申购、网上申购确认-->
 					or (tpd.FINPROD_TYPE2 ='F01' and tpd.PS in ('T04','T05') and tdta.PURCH_MODLE = '01')
 					<!--            质押式回购: 正回购、逆回购-->
 					or (tpd.FINPROD_TYPE2 in ('F02','F03') and fpt.TYPE_6='H02')
