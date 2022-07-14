@@ -213,6 +213,7 @@ public class TrdRepoDurationService extends BaseService<TrdRepoDurationDto> {
         param.put("SysDate", platformDateImpl.getSysDate());
         //有回购类型查询条件是 不显示银行间的数据
         param.put("TRADE_PLACE_01",DictCodeListExt1.交易场所_银行间.getValue());
+        param.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
 		
     }
 
@@ -895,6 +896,7 @@ public class TrdRepoDurationService extends BaseService<TrdRepoDurationDto> {
         param.put("PS_YQFS", DictCodeListExt3.交易方向_投资端_逾期返售.getValue());
         param.put("TRADE_MARKET_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
         param.put("TRADE_MARKET_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+        param.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
 
         return queryForPageForSelectReturn(page, length, () -> trdRepoDurationMapper.getBusiCode(param));
     }

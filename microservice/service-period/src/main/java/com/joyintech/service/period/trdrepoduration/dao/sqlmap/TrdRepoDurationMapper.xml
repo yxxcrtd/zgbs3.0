@@ -19,6 +19,7 @@
         T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TGF02}, #{FINPROD_TYPE_TGF03})
         and t1.TRADE_STATUS = #{TRADE_STATUS01}
         and t1.IS_CANCEL = #{YES_OR_NO_N}
+        AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
         AND T1.P_TRADE_ID IS NULL/*撤销流程中的数据不展示*/
         and T1.PORTFOLIO_ID <include refid="com.joyintech.service.period.trdbondduration.dao.TrdBondDurationMapper.portfolioAth"/>
         <if test="search != null and search != ''">
@@ -44,6 +45,7 @@
         and t1.TRADE_STATUS = #{TRADE_STATUS01}
         and t1.IS_CANCEL = #{YES_OR_NO_N}
         and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS})
+        AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
         <if test="search != null and search != ''">
             and (instr(T1.TOTLE_TRADE_ID, #{search}) > 0)
         </if>
@@ -64,6 +66,7 @@
         WHERE PP.INVEST_YESORNO = 'Y' AND T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TGF02}, #{FINPROD_TYPE_TGF03})
         and T1.PORTFOLIO_ID <include refid="com.joyintech.service.period.trdbondduration.dao.TrdBondDurationMapper.portfolioAth"/>
         and t1.TRADE_STATUS = #{TRADE_STATUS03}
+        AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
         and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS})
         <if test="search != null and search != ''">
             and (instr(T1.P_TRADE_ID, #{search}) > 0)
@@ -181,6 +184,7 @@
             LEFT JOIN TRD_PRODUCT_DEAL ptpd on ptpd.TRADE_ID =  T4.FINPROD_ID
             WHERE T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TGF02}, #{FINPROD_TYPE_TGF03})
             and t1.TRADE_STATUS = #{TRADE_STATUS01}
+            AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
             and t1.IS_CANCEL = #{YES_OR_NO_N}
             AND T1.P_TRADE_ID IS NULL/*撤销流程中的数据不展示*/
             and T1.PORTFOLIO_ID <include refid="com.joyintech.service.period.trdbondduration.dao.TrdBondDurationMapper.portfolioAth"/>
@@ -256,6 +260,7 @@
             AND T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TGF02}, #{FINPROD_TYPE_TGF03})
             and t1.IS_CANCEL = #{YES_OR_NO_N}
             AND T1.PS = #{PS_T01}
+            AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
             AND T2.PARENT_PORTFOLIO_ID is null
             AND SUBT2.INVEST_YESORNO = 'Y'
             <!--AND T1.TRADE_MARKET NOT IN (#{TRADE_MARKET_03},#{TRADE_MARKET_04})-->
@@ -375,6 +380,7 @@
                 and T1.PORTFOLIO_ID <include refid="com.joyintech.service.period.trdbondduration.dao.TrdBondDurationMapper.portfolioAth"/>
                 and t1.TRADE_STATUS = #{TRADE_STATUS01}
                 and t1.IS_CANCEL = #{YES_OR_NO_N}
+                AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
                 and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS})
             <if test="portfolioId != null and !portfolioId.isEmpty()">
                 AND (PP.PORTFOLIO_ID IN (<foreach collection="portfolioId" index= "index" item="item" separator=",">#{item}</foreach> )
@@ -448,6 +454,7 @@
             and T1.PORTFOLIO_ID <include refid="com.joyintech.service.period.trdbondduration.dao.TrdBondDurationMapper.portfolioAth"/>
             and t1.TRADE_STATUS = #{TRADE_STATUS03}
             and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS})
+            AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
             <if test="portfolioId != null and !portfolioId.isEmpty()">
                 AND (PP.PORTFOLIO_ID IN (<foreach collection="portfolioId" index= "index" item="item" separator=",">#{item}</foreach> )
                 or
@@ -517,6 +524,7 @@
                 and T1.PORTFOLIO_ID <include refid="com.joyintech.service.period.trdbondduration.dao.TrdBondDurationMapper.portfolioAth"/>
                 and t1.TRADE_STATUS = #{TRADE_STATUS01}
                 and t1.IS_CANCEL = #{YES_OR_NO_N}
+                AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
                 and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS})
                 <if test="portfolioId != null and !portfolioId.isEmpty()">
                     AND (PP.PORTFOLIO_ID IN (<foreach collection="portfolioId" index= "index" item="item" separator=",">#{item}</foreach> )

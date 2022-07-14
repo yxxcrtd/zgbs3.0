@@ -34,6 +34,7 @@
         FROM TRD_FIN_PRODUCT_DEAL_TOTAL T1
         <where>
             T1.FINPROD_TYPE2 = #{FINPROD_TYPE_TGF01}
+            AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
             AND T1.P_TOTLE_TRADE_ID IS NULL
             <if test="search != null and search != ''">
                 and (instr(TOTLE_TRADE_ID, #{search}) > 0)
@@ -44,6 +45,7 @@
     <select id="getSecManageAcctId" resultType="com.joyintech.framework.select.SelectOptionDto">
         select SEC_ACCT_ID id, SEC_ACCT_NAME text from STL_SEC_ACCT_INFO
         <where>
+            (TRADE_PLACE IS NULL OR TRADE_PLACE != #{TRADE_MARKET_01})
             <if test="search != null and search != ''">
                 and (instr(SEC_ACCT_ID, #{search}) > 0 or instr(SEC_ACCT_NAME, #{search}) > 0)
             </if>
@@ -53,6 +55,7 @@
     <select id="getFinprodMarketId" resultType="com.joyintech.framework.select.SelectOptionDto">
         select FINPROD_MARKET_ID id, NVL(FINPROD_ABBR, FINPROD_NAME) text, FINPROD_ID object from FIN_PRODUCT
         <where>
+            (TRADE_MARKET IS NULL OR TRADE_MARKET != #{TRADE_MARKET_01})
             <if test="search != null and search != ''">
                 and (instr(FINPROD_MARKET_ID, #{search}) > 0
                 or instr(FINPROD_ID, #{search}) > 0
@@ -161,6 +164,9 @@
             AND wtdta.MP_FINPROD_ID IS NULL
             AND T1.P_TRADE_ID IS NULL/*撤销流程中的数据不展示*/
             AND T1.P_TOTLE_TRADE_ID IS NULL <!-- 只展示汇总的汇总交易 -->
+            <!--GLCP-227:过滤银行间数据 modify by fuyongsheng 20220714 start-->
+            AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
+            <!--GLCP-227:过滤银行间数据 modify by fuyongsheng 20220714 end-->
             <if test="busiCode != null and !busiCode.isEmpty()">
                 AND T1.TOTLE_TRADE_ID = #{busiCode}
             </if>
@@ -255,6 +261,7 @@
             FROM PTL_SEC_POSITION T1 INNER JOIN FIN_CASH_PLAN T2 ON T1.FINPROD_ID = T2.FINPROD_ID
             AND T2.FINPROD_TYPE2 = #{FINPROD_TYPE_TGF01} AND t1.CDATE &lt; t2.MDATE
             LEFT JOIN PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = T1.PORTFOLIO_ID
+            LEFT JOIN FIN_PRODUCT fp ON fp.FINPROD_ID = T1.FINPROD_ID
             <!-- 多级法人改造 add by caiqun 20200615 -->
             <if test="institutionCode != null and institutionCode != ''">
                 INNER JOIN DATA_AUTH_NOTIFY_INST dani
@@ -267,6 +274,9 @@
             <where>
                 T1.AMOUNT > 0 AND T1.HODING_TYPE IN ('03', '05', '06', '11')
                 and nvl(pp.PARENT_PORTFOLIO_ID, 'null') = 'null'
+                <!--GLCP-227:过滤银行间数据 modify by fuyongsheng 20220714 start-->
+                AND (fp.TRADE_MARKET IS NULL OR fp.TRADE_MARKET != #{TRADE_MARKET_01})
+                <!--GLCP-227:过滤银行间数据 modify by fuyongsheng 20220714 end-->
                 <if test="cashTypeSb != null and !cashTypeSb.isEmpty()">
                     AND (instr(#{cashTypeSb}, T2.CASH_TYPE) > 0)
                 </if>
@@ -481,6 +491,9 @@
             LEFT JOIN SYS_INSTITUTION SI ON T1.INSTITUTION_CODE = SI.INSTITUTION_CODE
             <!-- 多级法人改造 add by caiqun 20200615 -->
             WHERE T1.TRADE_STATUS = #{TRADE_STATUS01}
+            <!--GLCP-227:过滤银行间数据 modify by fuyongsheng 20220714 start-->
+            AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
+            <!--GLCP-227:过滤银行间数据 modify by fuyongsheng 20220714 end-->
             AND nvl(T1.IS_OVERDUE_DEAL,#{YESNO_N}) = #{YESNO_N}
             AND wtdta.MP_FINPROD_ID IS NULL
             AND T1.IS_CANCEL = #{YESNO_N}
@@ -572,6 +585,9 @@
             LEFT JOIN SYS_INSTITUTION SI ON T1.INSTITUTION_CODE = SI.INSTITUTION_CODE
             <!-- 多级法人改造 add by caiqun 20200615 -->
             WHERE T1.TRADE_STATUS = #{TRADE_STATUS03}
+            <!--GLCP-227:过滤银行间数据 modify by fuyongsheng 20220714 start-->
+            AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
+            <!--GLCP-227:过滤银行间数据 modify by fuyongsheng 20220714 end-->
             AND nvl(T1.IS_OVERDUE_DEAL,#{YESNO_N}) = #{YESNO_N}
             AND wtdta.MP_FINPROD_ID IS NULL
             AND T1.BUSI_TYPE = #{TRD10}
@@ -661,6 +677,7 @@
             <!-- add by zhangweiqi 2019-10-15 添加通道费 -->
             LEFT JOIN FIN_PRODUCT_ADD FPD ON FP.FINPROD_ID=FPD.FINPROD_ID
             WHERE T4.FINPROD_TYPE2 = #{FINPROD_TYPE_TGF01}
+            AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
             AND ((T1.TOTLE_TRADE_ID = #{busiCode} AND T1.TRADE_STATUS = #{TRADE_STATUS01} AND T1.IS_CANCEL = #{YESNO_N})
             or (T1.P_TRADE_ID = #{busiCode} AND T1.TRADE_STATUS = #{TRADE_STATUS03}))
         </if>
@@ -728,6 +745,7 @@
             <!-- add by zhangweiqi 2019-10-15 添加通道费 -->
             LEFT JOIN FIN_PRODUCT_ADD FPD ON FP.FINPROD_ID=FPD.FINPROD_ID
             WHERE T4.FINPROD_TYPE2 = #{FINPROD_TYPE_TGF01}
+            AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
             <if test="statusValid == PAGE_DATE_STATUS05">
                 AND T1.TOTLE_TRADE_ID = #{busiCode} AND T1.TRADE_STATUS = #{TRADE_STATUS01} AND T1.IS_CANCEL =
                 #{YESNO_N}
@@ -813,6 +831,7 @@
             FROM PTL_SEC_POSITION T1 INNER JOIN FIN_CASH_PLAN T2 ON T1.FINPROD_ID = T2.FINPROD_ID
             AND T2.FINPROD_TYPE2 = #{FINPROD_TYPE_TGF01} AND t1.CDATE &lt; t2.MDATE
             LEFT JOIN PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = T1.PORTFOLIO_ID
+            LEFT JOIN FIN_PRODUCT fp ON fp.FINPROD_ID = T1.FINPROD_ID
             <!-- 多级法人权限处理 -->
             <if test="institutionCode != null and institutionCode != ''">
                 INNER JOIN DATA_AUTH_NOTIFY_INST dani on dani.BUSINESS_ID = T1.PORTFOLIO_ID
@@ -826,6 +845,7 @@
                                 AND T1.HODING_TYPE IN ('03', '05', '06','11')
                                 <!--增加融入券卖空 END  -->
             and nvl(pp.PARENT_PORTFOLIO_ID,'null') = 'null'
+            AND (fp.TRADE_MARKET IS NULL OR fp.TRADE_MARKET != #{TRADE_MARKET_01})
             AND T1.SEC_ACCT_ID = #{secManageAcctId}
             AND T2.FINPROD_ID = #{finprodId} AND T2.MDATE = to_date(#{mDate}, 'yyyy-MM-dd')
             and T2.CASH_TYPE IN (#{CASH_CLASS_TYPE01},#{CASH_CLASS_TYPE02},#{CASH_CLASS_TYPE03},#{CASH_CLASS_TYPE04})
@@ -1328,6 +1348,7 @@
         LEFT JOIN FIN_PRODUCT T4 ON T1.FINPROD_ID = T4.FINPROD_ID
         LEFT JOIN FIN_PRODUCT FP ON T1.CHL_ID = FP.FINPROD_ID
         WHERE T1.TRADE_STATUS = #{TRADE_STATUS01}
+        AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
         AND nvl(T1.IS_OVERDUE_DEAL,#{YESNO_N}) = #{YESNO_N}
         AND wtdta.MP_FINPROD_ID IS NULL
         AND T1.IS_CANCEL = #{YESNO_N}
@@ -1363,6 +1384,7 @@
         from wfl_trd_fin_product_deal_total wtpd
         where wtpd.finprod_id = #{finprodId}
         and wtpd.ps =#{ps}
+        AND (wtpd.TRADE_MARKET IS NULL OR wtpd.TRADE_MARKET != #{TRADE_MARKET_01})
         <if test="chlId != null and !chlId.isEmpty()">
             AND wtpd.chl_id = #{chlId}
         </if>
@@ -1509,6 +1531,7 @@
                 AND A.FINPROD_TYPE2 = #{finprodType}
             </if>
             AND FPA.APPEAR_MARKET_ID IS null
+            AND (A.TRADE_MARKET IS NULL OR A.TRADE_MARKET != #{TRADE_MARKET_01})
         </where>
     </select>
 
@@ -1522,6 +1545,7 @@
         LEFT JOIN WFL_PA_TRD_FIN_DEAL_TOTAL T3 ON T1.TOTLE_TRADE_ID = T3.TOTLE_TRADE_ID
         LEFT JOIN FIN_PRODUCT T4 ON T1.FINPROD_ID = T4.FINPROD_ID
         WHERE T4.FINPROD_TYPE2 = #{FINPROD_TYPE_TGF01}
+        AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
         AND nvl(T1.IS_OVERDUE_DEAL,#{YESNO_N}) = #{YESNO_N}
         AND wtdta.MP_FINPROD_ID IS NULL
         AND T1.P_TRADE_ID IS NULL/*撤销流程中的数据不展示*/
@@ -1548,6 +1572,7 @@
         LEFT JOIN PTL_PORTFOLIO PP ON PT.PORTFOLIO_ID = PP.PORTFOLIO_ID
         WHERE T1.TRADE_STATUS = #{TRADE_STATUS01}
         AND nvl(T1.IS_OVERDUE_DEAL,#{YESNO_N}) = #{YESNO_N}
+        AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
         AND wtdta.MP_FINPROD_ID IS NULL
         AND T1.IS_CANCEL = #{YESNO_N}
         AND T1.FINPROD_TYPE2 = #{FINPROD_TYPE_TGF01}
@@ -1575,6 +1600,7 @@
         WHERE T1.TRADE_STATUS = #{TRADE_STATUS03}
         AND nvl(T1.IS_OVERDUE_DEAL,#{YESNO_N}) = #{YESNO_N}
         AND wtdta.MP_FINPROD_ID IS NULL
+        AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
         AND T1.BUSI_TYPE = #{TRD10}
         AND T1.FINPROD_TYPE2 = #{FINPROD_TYPE_TGF01}
         AND (EXISTS(

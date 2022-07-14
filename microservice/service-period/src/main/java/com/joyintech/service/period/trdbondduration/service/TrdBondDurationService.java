@@ -107,14 +107,17 @@ public class TrdBondDurationService extends BaseService {
     public Page<SelectOptionDto> getBusiCode(int page, int length, Map<String, Object> param) {
         param.put("FINPROD_TYPE_TGF01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         param.put("TRADE_STATUS03", DictCodeListExt1.交易状态_撤销.getValue());
+        param.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
         return queryForPageForSelectReturn(page, length, () -> trdBondDurationMapper.getBusiCode(param));
     }
 
     public Page<SelectOptionDto> getSecManageAcctId(int page, int length, Map<String, Object> param) {
+        param.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
         return queryForPageForSelectReturn(page, length, () -> trdBondDurationMapper.getSecManageAcctId(param));
     }
 
     public Page<SelectOptionDto> getFinprodMarketId(int page, int length, Map<String, Object> param) {
+        param.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
         return queryForPageForSelectReturn(page, length, () -> trdBondDurationMapper.getFinprodMarketId(param));
     }
 
@@ -212,6 +215,7 @@ public class TrdBondDurationService extends BaseService {
             param.put("institutionCode",createInst);
         }
         // 多级法人改造 add by caiqun 20200615
+        param.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
     }
 
     public TrdBondDurationDto findEffectiveData(Map<String, Object> params) {
@@ -598,6 +602,7 @@ public class TrdBondDurationService extends BaseService {
         param.put("YESNO_N", DictCodeList.是否_否.getValue());
         param.put("FINPROD_TYPE_TGF01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         param.put("STATUS_N", DictCodeList.数据状态_新建.getValue());
+        param.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
         return trdBondDurationMapper.findProcessDtos(param);
     }
 
@@ -606,6 +611,7 @@ public class TrdBondDurationService extends BaseService {
     }
 
     public List<String> findWorkflowProcessDtos(Map<String, Object> params) {
+        params.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
         return trdBondDurationMapper.findWorkflowProcessDtos(params);
     }
 
@@ -622,7 +628,7 @@ public class TrdBondDurationService extends BaseService {
         param.put("loginUserName", SecurityUtil.getLoginUser().getUserName());
         param.put("FINPROD_TYPE_TG", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         param.put("isautobond", CacheUtil.getSysParam("IS_AUTOBOND"));
-
+        param.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
         return queryForPageForSelectReturn(page, length, () -> trdBondDurationMapper.getFinprodId(param));
     }
 
@@ -633,6 +639,7 @@ public class TrdBondDurationService extends BaseService {
         param.put("TRADE_STATUS03", DictCodeListExt1.交易状态_撤销.getValue());
         param.put("TRD10", DictCodeList.共通业务类型_债券类资产存续期.getValue());
         param.put("userName", LoginUserUtil.getUserName());
+        param.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
         return queryForPageForSelectReturn(page, length, () -> trdBondDurationMapper.getBusiCodeNew(param));
     }
 
