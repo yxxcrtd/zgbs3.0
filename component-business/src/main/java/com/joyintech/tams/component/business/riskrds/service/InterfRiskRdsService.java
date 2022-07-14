@@ -2473,7 +2473,7 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             infRiskRdsDto.setPs(DictCodeList.交易方向_买入.getValue());
             infRiskRdsDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
             infRiskRdsDto.setAssetType2(finDto.getPs());
-            infRiskRdsDto.setCounterId(infRiskRdsDto.getEventId());
+            infRiskRdsDto.setCounterId(StringUtil.isNotEmpty(CommonUtil.findValue(dataMap, "counterId")) ? CommonUtil.findValue(dataMap, "counterId").toString() : null);
             //添加期限品种 add by wz 20200509
             //infRiskRdsDto.setVarietyCode(StringUtil.equals(finDto.getTradeMarket(),DictCodeListExt1.交易场所_银行间.getValue())?"D"+(String) dataMap.get("termTypeReback"):(String) dataMap.get("termTypeReback"));
             //infRiskRdsDto.setAssetCode(StringUtil.isNotEmpty(CommonUtil.findValue(dataMap, "finprodId")) ? CommonUtil.findValue(dataMap, "finprodId").toString() : null);

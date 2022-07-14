@@ -218,8 +218,7 @@ public class FinNetProductDurationService extends CommonExportService<FinNetProd
 	    }
 	 
 	 private void handleBussFlowData(FinNetProductDurationDto dto) {
-		 if(DictCodeList.收益类型_净值型.getValue().equals(dto.getProfitType())
-					&& (DictCodeList.交易方向_产品赎回.getValue().equals(dto.getDealType()) ||
+		 if( (DictCodeList.交易方向_产品赎回.getValue().equals(dto.getDealType()) ||
 							DictCodeList.交易方向_产品到期.getValue().equals(dto.getDealType())  ||
 							DictCodeList.交易方向_产品提前赎回.getValue().equals(dto.getDealType())  ||		
 					        DictCodeList.交易方向_份额强减.getValue().equals(dto.getDealType())  ||

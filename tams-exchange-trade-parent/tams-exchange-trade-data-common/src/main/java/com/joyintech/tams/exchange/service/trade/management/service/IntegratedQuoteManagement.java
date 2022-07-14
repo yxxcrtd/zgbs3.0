@@ -376,7 +376,7 @@ public class IntegratedQuoteManagement {
         ResultBean resultBean = entrustManagement.queryIntegratedEntrust(request.getUserId(),
                 request.getInstructionId(), request.getAccountId(), request.getOrderId());
         if (ErrorCode.isFail(resultBean.getErrorCode()) || ObjectUtil.isEmpty(resultBean.getData())) {
-            return resultBean;
+            return ResultBean.success(MapUtil.builder().put(ROOT, Collections.emptyList()).build());
         }
 
         List<BaseRepurchaseQuoteSendResponse> retList = Lists.newArrayList();
@@ -427,10 +427,10 @@ public class IntegratedQuoteManagement {
 
     private BaseRepurchaseQuoteSendResponse createSendQuoteByIntegratedEntrust(IntegratedEntrustVo entrust, Instruction instruction) {
 
-        BaseRepurchaseQuoteSendResponse baseRepurchaseQuoteSendResponse ;
+        BaseRepurchaseQuoteSendResponse baseRepurchaseQuoteSendResponse;
         String busiTypeTg = entrust.getBusiTypeTg();
         // 正回购
-        if (RepurchaseTypeEnum.首期.getBusiTypeTgCode().equals(busiTypeTg) ) {
+        if (RepurchaseTypeEnum.首期.getBusiTypeTgCode().equals(busiTypeTg)) {
             baseRepurchaseQuoteSendResponse = new SQRepurchaseQuoteSendResponse();
             baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.首期.getCode());
 

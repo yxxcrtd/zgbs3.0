@@ -91,7 +91,7 @@
             AND T4.FINPROD_MARKET_ID = #{finprodMarketId}
         </if>
         <if test="paBizType != null and !paBizType.isEmpty()">
-            AND T3.PA_BUSS_TYPE = #{paBizType}
+            AND (T3.PA_BUSS_TYPE = #{paBizType} OR T1.TG_BUSI_TYPE = #{paBizType})
         </if>
         <if test="mdateStart != null and !mdateStart.isEmpty()">
             AND T1.MDATE >= to_date(#{mdateStart}, 'yyyy-MM-dd')

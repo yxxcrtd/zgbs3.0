@@ -98,6 +98,7 @@ public class InvestTradeWriteDto extends NeedToWriteEntity {
     	trdBarterTotalList = new ArrayList<TrdFinProductBarterTotal>();
     	trdBarterList = new ArrayList<TrdFinProductBarter>();
     	productDealList = new ArrayList<TrdProductDealDto>();
+        trdProductDealAddList= new ArrayList<TrdProductDealAdd>();
     	ptlTradeList = new ArrayList<PtlTrade>();
     	tradeFeeDetailList = new ArrayList<TrdTradeFeeDetail>();
     	stlPayOrdersList = new ArrayList<StlPayOrders>();

@@ -199,7 +199,7 @@
           	SELECT nvl(t2.mparty_id,t1.party_id) PARTY_ID 
           	from 
           		MST_COUNTER_PARTY t3
-          	inner join 
+          	LEFT join
           		MST_CFETS_CUSTOMER_INFO t1 
           	on T3.COUNTER_NAME = T1.PARTY_NAME
           	LEFT JOIN 
@@ -246,7 +246,7 @@
 			   T2.PARTY_ABBR text,
 			   T2.PARTY_ID object
 		FROM MST_COUNTER_PARTY T1
-		INNER JOIN MST_CFETS_CUSTOMER_INFO T2 ON T1.COUNTER_NAME = T2.PARTY_NAME
+		LEFT JOIN MST_CFETS_CUSTOMER_INFO T2 ON T1.COUNTER_NAME = T2.PARTY_NAME
 		WHERE 1=1
 		<if test="search != null and search != ''">
 			AND	(
