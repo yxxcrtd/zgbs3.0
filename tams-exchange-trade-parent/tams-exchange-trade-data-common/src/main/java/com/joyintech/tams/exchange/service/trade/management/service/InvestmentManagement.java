@@ -118,7 +118,7 @@ public class InvestmentManagement extends BaseService {
      */
     @Value("${application.micorservice.contextpath.single:false}")
     private boolean isSingle;
-    
+
     /**
      * 指令查询带条件
      *
@@ -676,7 +676,7 @@ public class InvestmentManagement extends BaseService {
             } else {
                 minPriceAndMinTrdUnitLimitBean.setMinTrdUnitLimitList(ListUtil.of(minTrdUnitLimit));
             }
-            
+
             minPriceAndMinTrdUnitLimitBean.setSubStockType(instrument.getSubStockType());
 
             logger.info("填充最小价差等交易属性信息 => 【minPriceAndMinTrdUnitLimitBean = {}】", minPriceAndMinTrdUnitLimitBean);
@@ -1852,6 +1852,10 @@ public class InvestmentManagement extends BaseService {
         }
         Set<String> ids = pledges.stream().map(InstructionPledge::getEntrustId).collect(Collectors.toSet());
         instructionPledgeService.deleteInstructionPledgesByInstructionsIds(ids);
+        pledges.forEach(o -> {
+            o.setPledgeRatio(o.getPledgeRatio().multiply(BigDecimal.valueOf(100)));
+            o.setOldPledgeRatio(o.getOldPledgeRatio().multiply(BigDecimal.valueOf(100)));
+        });
         instructionPledgeService.asyncUpdate(pledges);
     }
 
