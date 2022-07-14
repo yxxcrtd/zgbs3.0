@@ -231,7 +231,6 @@ $(function () {
             }
             //债券委托详情 银行间/商业银行柜台
             else if (data.finprodType2 == PINAN_ASSET_TYPE_F01 && (data.tradeMarket == '01' || data.tradeMarket == '02')) {
-                console.log("----------PINAN_ASSET_TYPE_F01-------------");
                 console.log(data.tradeMarket);
                 var param = {
                     "busiCode": tradeId,
@@ -246,18 +245,19 @@ $(function () {
                     param);
             }
             //债券委托详情
-            else if (data.finprodType2 == PINAN_ASSET_TYPE_F01) {
-                label = 'TrdBondInvestTrade002';
-                pagePath = "invest/trade/bond/TrdBondInvestTrade002/init";
-                Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
-                    "95%", "90%", {
-                        pageModel: PAGE_MODEL_REFERENCE,
-                        tradeId: tradeId,
-                        workflowId: workflowId,
-                        workflowStatus: data.validStatus
-                    });
-
-            }
+            // else if (data.finprodType2 == PINAN_ASSET_TYPE_F01) {
+            //     console.log("-----------债券委托详情----------------")
+            //     label = 'TrdBondInvestTrade002';
+            //     pagePath = "invest/trade/bond/TrdBondInvestTrade002/init";
+            //     Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
+            //         "95%", "90%", {
+            //             pageModel: PAGE_MODEL_REFERENCE,
+            //             tradeId: tradeId,
+            //             workflowId: workflowId,
+            //             workflowStatus: data.validStatus
+            //         });
+            //
+            // }
             //基金委托详情
             else if (data.finprodType2 == PINAN_ASSET_TYPE_F02) {
                 label = 'TrdFundInvestTrade002';
