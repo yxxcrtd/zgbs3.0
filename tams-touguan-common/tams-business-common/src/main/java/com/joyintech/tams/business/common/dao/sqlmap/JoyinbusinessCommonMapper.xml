@@ -978,7 +978,7 @@
          left join FIN_PRODUCT_SPECIAL fps on fps.FINPROD_MARKET_ID = fp.FINPROD_MARKET_ID
          <where>
              <if test="finprodIds != null and finprodIds.size()>0">
-                 <foreach collection="finprodIds" item="finprodId" open=" fp.FINPROD_ID in (" close=")">
+                 <foreach collection="finprodIds" item="finprodId" open=" fp.FINPROD_ID in (" close=")"  separator=",">
                      #{finprodId}
                  </foreach>
              </if>
