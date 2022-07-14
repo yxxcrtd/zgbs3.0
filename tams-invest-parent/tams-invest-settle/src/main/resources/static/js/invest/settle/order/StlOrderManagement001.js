@@ -33,7 +33,7 @@ var parenPage = function () {
                     }
                     return "<a class='pro-link' style='cursor: pointer;' " +
                         "href='javascript:openOperateWindow(\"" + STATUS_VALID_05 + "\",\"" + row.paBizType + "\",\"" + row.portfolioId + "\",\""
-                        + row.bizCode + "\", \"" + row.orderId + "\", null, null, null, null, \""+row.profitType+"\",\"" + row.finprodId + "\")'>" + data + "</a>";
+                        + row.bizCode + "\", null, null, null, null, null, \""+row.profitType+"\",\"" + row.finprodId + "\")'>" + data + "</a>";
                 }
             }
             , {field: 'orderId', title: '指令编号', width: 150, sortable: false,visible : false}
