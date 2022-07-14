@@ -395,6 +395,7 @@ public class IbuQuoteBondService extends BaseService {
                 // TISHKS-1393:增加FinprodId赋值 modify by fuyongsheng start
                 calRequest.setFinprodId(cfetsBondDealQuoteCommonDto.getFinprodId());
                 // TISHKS-1393:增加FinprodId赋值 modify by fuyongsheng end
+                calRequest.setTradeMarketMode(DictCodeListExt1.交易市场_二级市场.getValue());
                 List<TrdTradeFeeDetail> trdTradeFeeDetails = ibuQuoteBondCalService.calFee(calRequest);
                 if(CollectionUtils.isNotEmpty(trdTradeFeeDetails)){
                     trdTradeFeeDetails.forEach(item ->{
