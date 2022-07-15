@@ -138,12 +138,6 @@ public class FundBackgroundManagementDto extends BaseEntity {
     * 发送状态
     */
    private String sendStatus;
-
-    /**
-     * 区分费用支付(true 产品费用  false 投资费用支付
-     */
-    private boolean paBussTypeAdd;
-
     /**
      * 获取 statusValid
      *
@@ -536,12 +530,5 @@ public class FundBackgroundManagementDto extends BaseEntity {
 	public void setSendStatus(String sendStatus) {
 		this.sendStatus = sendStatus;
 	}
-
-    public boolean getPaBussTypeAdd() {
-        return paBussTypeAdd;
-    }
-
-    public void setPaBussTypeAdd(boolean paBussTypeAdd) {
-        this.paBussTypeAdd = paBussTypeAdd;
-    }
+    
 }
