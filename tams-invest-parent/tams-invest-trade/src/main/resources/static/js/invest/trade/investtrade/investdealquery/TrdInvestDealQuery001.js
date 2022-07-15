@@ -13,8 +13,12 @@ var showPtlManagement = function (portfolioId) {
 var showDetailByFinprodId = function (finprodId, finprodType2) {
     var label = '';
     var pagePath = '';
+
+    console.log("---------------1-----------------")
+    console.log(finprodType2)
+
     //债券标的信息查看
-    if (finprodType2 == PINAN_ASSET_TYPE_F01) {
+    if (finprodType2 == PINAN_ASSET_TYPE_F01 ) {
         var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a"; // 默认债券标的
         var param = {
             pageModel: PAGE_MODEL_REFERENCE,
@@ -33,7 +37,21 @@ var showDetailByFinprodId = function (finprodId, finprodType2) {
         //         finprodId: finprodId
         //     });
         //基金类标的信息查看
-    } else if (finprodType2 == PINAN_ASSET_TYPE_F02) {
+    } else if(finprodType2 == PINAN_ASSET_TYPE_F17){
+        console.log("---------------PINAN_ASSET_TYPE_F17-----------------")
+        console.log(finprodId)
+        var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/newbonetargets?a=a"; // 新债券标的
+        var param = {
+            pageModel: PAGE_MODEL_REFERENCE,
+            isQuickInput: true,
+            finprodMarketId: finprodId
+        };
+        Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+            basePath + url,
+            "98%", "98%",
+            param);
+    }
+    else if (finprodType2 == PINAN_ASSET_TYPE_F02) {
         label = 'FinFundTarget002.detail';
         pagePath = "invest/asset/fund/FinFundTarget002/init";
         Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
