@@ -48,6 +48,7 @@ $(function () {
                     periodId: data.periodId,
                     branch: data.branch,
                     finprodId: data.finprodId == undefined ? "" : data.finprodId,
+                    effDate: data.effDate == undefined ? "" : (new Date(data.effDate)).format("yyyy-MM-dd"),
                     startDate: data.startDate == undefined ? "" : (new Date(data.startDate)).format("yyyy-MM-dd"),
                     endDate: data.endDate == undefined ? "" : (new Date(data.endDate)).format("yyyy-MM-dd"),
                     investCycle: data.investCycle == undefined ? "" : data.investCycle

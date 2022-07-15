@@ -246,7 +246,8 @@ public class PeriodicManagementService extends BaseService<PeriodicManagement001
         final String endDate = (String) param.get("endDate");
         PeriodicManagement001Dto dto = JsonUtils.json2Object(businessData, PeriodicManagement001Dto.class);
         if (StringUtil.equals(startDate, DateUtil.format(dto.getStartDate(), "yyyy-MM-dd"))
-                && StringUtil.equals(endDate, DateUtil.format(dto.getEndDate(), "yyyy-MM-dd"))) {
+                && StringUtil.equals(endDate, DateUtil.format(dto.getEndDate(), "yyyy-MM-dd"))
+             && StringUtil.equals((String)param.get("workflowId"), dto.getWorkflowId())) {
             return true;
         }
 
