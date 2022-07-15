@@ -638,6 +638,8 @@
                 $("#ps").attr("disabled", false);
             } else if(tradeMarket == '03' || tradeMarket == '04'){
                 if(ps == 'T92' && repPs == BACK_LEND_DIRECTION_03){
+                    //本方交易员
+                    $("#trader_div").hide();
                     //组合名称
                     $("#portfolioId").attr("disabled", false);
                     //资金账号
@@ -781,6 +783,8 @@
                     $("#addCla").attr("disabled", false);
                 }else if(ps == 'T96') {
                     if(repPs == BACK_LEND_DIRECTION_03){
+                        //本方交易员
+                        $("#trader_div").hide();
                         //组合名称
                         $("#portfolioId").attr("disabled", true);
                         //资金账号
@@ -929,6 +933,8 @@
                     }
                 }else if(ps == 'T95') {
                     if(repPs == BACK_LEND_DIRECTION_03){
+                        //本方交易员
+                        $("#trader_div").hide();
                         //组合名称
                         $("#portfolioId").attr("disabled", true);
                         //资金账号
@@ -1078,6 +1084,8 @@
                     }
                 }else if(ps == 'T56') {
                     if(repPs == BACK_LEND_DIRECTION_03){
+                        //本方交易员
+                        $("#trader_div").hide();
                         //组合名称
                         $("#portfolioId").attr("disabled", true);
                         //资金账号
@@ -1230,6 +1238,8 @@
                     }
                 }else if(ps == 'T94') {
                     if(repPs == BACK_LEND_DIRECTION_03){
+                        //本方交易员
+                        $("#trader_div").hide();
                         //组合名称
                         $("#portfolioId").attr("disabled", true);
                         //资金账号
@@ -1397,6 +1407,8 @@
                     }
                 }else if(ps == 'T93') {
                     if(repPs == BACK_LEND_DIRECTION_03){
+                        //本方交易员
+                        $("#trader_div").hide();
                         //组合名称
                         $("#portfolioId").attr("disabled", true);
                         //资金账号

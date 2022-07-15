@@ -486,11 +486,13 @@ public class EtrTradeCommonervice extends BaseService {
                 }else{
                     unit = "张";
                 }
-            }else if (StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())) {
-                unit = "万元";
-                usableAmountText="标准券可用额度（";
-                usableSecText="标准券总额度（";
-            } else if (StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_股票.getValue())) {
+            }
+//            else if (StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())||StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())) {
+//                unit = "万元";
+//                usableAmountText="标准券可用额度（";
+//                usableSecText="标准券总额度（";
+//            }
+            else if (StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_股票.getValue())) {
                 unit = "股";
             } else if (StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_基金.getValue())) {
                 unit = "份";

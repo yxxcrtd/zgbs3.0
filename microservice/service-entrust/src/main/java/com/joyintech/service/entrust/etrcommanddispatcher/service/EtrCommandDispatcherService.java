@@ -8,6 +8,7 @@ import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrCommandDispatch
 import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrCommandDispatcherTotalDto;
 import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrEntrustDetailDto;
 import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrTradePledgeDto;
+import com.joyintech.tams.common.base.pojo.OriPledgeInfo;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
@@ -130,6 +131,25 @@ public class EtrCommandDispatcherService extends BaseService<EtrCommandDispatche
 		    		if(queryEtrPledgeList!=null && !queryEtrPledgeList.isEmpty()) {
 		    			pledgelist.addAll(queryEtrPledgeList);
 		    		}
+					if (com.joyintech.framework.util.StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), dto.getBusiTypeTg())) {
+
+					} else {
+						List<OriPledgeInfo> oriFinDealPledgeList = etrTradeSysInterfMapper.getOriFinDealPledgeList(dto.getFinprodId());
+						for (OriPledgeInfo oriPledgeInfo : oriFinDealPledgeList) {
+							EtrTradePledgeDto pledgeDto = new EtrTradePledgeDto();
+							BeanUtils.copyProperties(dto, pledgeDto);
+							pledgeDto.setFinprodId(oriPledgeInfo.getPledgeFinprodId());
+							pledgeDto.setFinprodAbbr(oriPledgeInfo.getPledgefinprodAbbr());
+							pledgeDto.setTradeMarket(oriPledgeInfo.getPledgeTradeMarket());
+							pledgeDto.setFinprodMarketId(oriPledgeInfo.getPledgeFinprodMarketId());
+							pledgeDto.setPledgeFaceValue(oriPledgeInfo.getPledgeFaceValue());
+							pledgeDto.setPledgeNumber(oriPledgeInfo.getPledgeNumber());
+							pledgeDto.setPledgeRatio(oriPledgeInfo.getPledgeRatio());
+							pledgeDto.setPledgeAmt(oriPledgeInfo.getPledgeTradeAmt());
+							pledgeDto.setDisplaceDir("00");
+							pledgelist.add(pledgeDto);
+						}
+					}
 	    		}
 	    	}
     	}

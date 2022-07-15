@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrEntrustDetailDto;
+import com.joyintech.tams.common.base.pojo.OriPledgeInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -46,6 +47,11 @@ public interface EtrCommandDispatcherMapper {
 
     List<EtrEntrustDetailDto> selectEtrDetailList(Map<String, Object> param);
 
-
+    /**
+     * 原质押品信息查询
+     * @param param
+     * @return
+     */
+    List<OriPledgeInfo> getOriFinDealPledgeList(@Param("tradeId") String tradeId);
    
 }
