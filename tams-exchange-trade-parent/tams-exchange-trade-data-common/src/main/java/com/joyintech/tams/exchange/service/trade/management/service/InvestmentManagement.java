@@ -739,7 +739,7 @@ public class InvestmentManagement extends BaseService {
             pledgeAmt = pledgeAmt.add(pledge.getPledgeAmt());
             pledgeNumber = pledgeNumber.add(pledge.getPledgeNumber());
             //折算率*100
-            pledgeRatioAmt = pledgeRatioAmt.add(pledge.getPledgeNumber().multiply(pledge.getPledgeRatio().multiply(BigDecimal.valueOf(100))));
+            pledgeRatioAmt = pledgeRatioAmt.add(pledge.getPledgeNumber().multiply(pledge.getPledgeRatio()));
         }
         InstructionPledge pledge = pledges.get(0);
         instructionPledge.setEntrustId(pledge.getEntrustId());
@@ -751,7 +751,7 @@ public class InvestmentManagement extends BaseService {
         instructionPledge.setPledgeAmt(pledgeAmt);
         instructionPledge.setPledgeNumber(pledgeNumber);
         // instructionPledge.setPledgeRatio(pledgeRatioAmt.divide(pledgeNumber, 2, RoundingMode.HALF_UP));
-        instructionPledge.setPledgeRatio(ArithmeticUtil.divide(pledgeRatioAmt, pledgeNumber, 2, RoundingMode.HALF_UP));
+        instructionPledge.setPledgeRatio(ArithmeticUtil.divide(pledgeRatioAmt, pledgeNumber, 6, RoundingMode.HALF_UP));
 
         pledges.clear();
         pledges.add(instructionPledge);
