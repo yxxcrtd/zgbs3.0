@@ -1853,8 +1853,12 @@ public class InvestmentManagement extends BaseService {
         Set<String> ids = pledges.stream().map(InstructionPledge::getEntrustId).collect(Collectors.toSet());
         instructionPledgeService.deleteInstructionPledgesByInstructionsIds(ids);
         pledges.forEach(o -> {
-            o.setPledgeRatio(o.getPledgeRatio().multiply(BigDecimal.valueOf(100)));
-            o.setOldPledgeRatio(o.getOldPledgeRatio().multiply(BigDecimal.valueOf(100)));
+            if (o.getPledgeRatio() != null) {
+                o.setPledgeRatio(o.getPledgeRatio().multiply(BigDecimal.valueOf(100)));
+            }
+            if (o.getOldPledgeRatio() != null) {
+                o.setOldPledgeRatio(o.getOldPledgeRatio().multiply(BigDecimal.valueOf(100)));
+            }
         });
         instructionPledgeService.asyncUpdate(pledges);
     }
