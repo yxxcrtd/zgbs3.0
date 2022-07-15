@@ -1205,6 +1205,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     trdProductDeal.setSettleDate(iPlatformDate.getSysDate());
                     trdProductDeal.setSecManageAcctId(deal.getSecAcctId());
                     trdProductDeal.setFpriceAmt(deal.getPayAmt());
+                    trdProductDeal.setTradeMarketMode(DictCodeListExt1.交易市场_一级市场.getValue());
+                    trdProductDeal.setCcy(entity.getCcy());
                     baseTradeProductDealDto.setTrdProductDeal(trdProductDeal);
                     TrdProductDealAdd add = new TrdProductDealAdd();
                     add.setPortfolioId(deal.getPortfolioId());
