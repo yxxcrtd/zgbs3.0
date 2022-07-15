@@ -48,6 +48,7 @@ import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.common.FinAssetIntInfo;
 import com.joyintech.tams.invest.common.dto.period.trdbondduration.TrdBondDurDbInertDto;
 import com.joyintech.tams.invest.common.dto.period.trdbondduration.TrdBondDurationDto;
+import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.systemtools.util.CommonUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -301,10 +302,10 @@ public class CfetsBondAutoDurDealGenerateProcessorService extends BaseService {
 
         TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
         TrdDealTotalAdd trdDealTotalAdd = new TrdDealTotalAdd();
-        List<TrdProductDeal> trdProductDealList = new ArrayList<TrdProductDeal>();
-        List<TrdProductDealAdd> trdProductDealaddList = new ArrayList<TrdProductDealAdd>();
-        List<StlPayOrders> stlPayOrdersList =new ArrayList<StlPayOrders>();
-        List<PtlTrade> ptlTradeList =new ArrayList<PtlTrade>();
+        List<TrdProductDeal> trdProductDealList = new ArrayList<>();
+        List<TrdProductDealAdd> trdProductDealaddList = new ArrayList<>();
+        List<StlPayOrders> stlPayOrdersList = new ArrayList<>();
+        List<PtlTrade> ptlTradeList = new ArrayList<>();
         //净价总额计算,净价总额=账户持仓券面总额（万元）*10000*赎回比例%*行权净价/100
         BigDecimal cpriceAmt = ArithmeticUtil.divide(ArithmeticUtil.multiply(regFinProductDealTotal.getFaceValue(),regFinProductDealTotal.getRedeemRate(),regFinProductDealTotal.getExercisePrice()),new BigDecimal(100),2) ;
         //应计利息计算
@@ -415,31 +416,35 @@ public class CfetsBondAutoDurDealGenerateProcessorService extends BaseService {
             ptlTrade2.setSecManageAcctId(trdProductDeal.getSecManageAcctId());
             ptlTrade2.setSettleDate(trdProductDeal.getTradeDate());
             ptlTradeList.add(ptlTrade2);
+            //组装划款指令表
+            StlPayOrders stlPayOrders = new StlPayOrders();
+            BussinessCodeParameter bussinessCodeParameter = new BussinessCodeParameter();
+            bussinessCodeParameter.setSeqNo("9998");
+            String orderId;
+            if(baseGetBussinessId != null){
+                orderId = baseGetBussinessId.buildBussinessCode(bussinessCodeParameter);
+            }else{
+                orderId = IDGenerator.generate();
+            }
+            stlPayOrders.setOrderId(orderId);
+            stlPayOrders.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
+//            String acctNo = autoPeriodCommonService.selectDealCapacctInfo(regFinProductDealTotal.getSecManageAcctId(), trdFinProductDealTotal.getCcy());
+//            stlPayOrders.setMyAcctNo(acctNo);
+            String acctId = EtrCommonCashPositionDealService.select组合托管户(trdProductDealAdd.getPortfolioId(),
+                    trdProductDeal.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
+            stlPayOrders.setMyAcctNo(acctId);
+            stlPayOrders.setSettleDate(DateUtil.parse(DateUtil.format(batchDate)));
+            stlPayOrders.setPs(DictCodeListExt1.收支方向_收入.getValue());
+            stlPayOrders.setSettleAmt(trdProductDeal.getTradeAmt());
+            stlPayOrders.setCcy(regFinProductDealTotal.getCcy());
+            stlPayOrders.setSettleStatus(DictCodeList.结算状态_已结算.getValue());
+            stlPayOrders.setIsNeedSend(DictCodeListExt1.是否_是.getValue());
+            stlPayOrders.setIsTotalTrade(DictCodeListExt1.是否_是.getValue());
+            stlPayOrders.setTradeId(trdProductDeal.getTradeId());
+            stlPayOrders.setOrderStatus(DictCodeListExt1.指令状态_新建.getValue());
+            stlPayOrders.setPortfolioId(trdProductDealAdd.getPortfolioId());
+            stlPayOrdersList.add(stlPayOrders);
         }
-        //组装划款指令表
-        StlPayOrders stlPayOrders = new StlPayOrders();
-        BussinessCodeParameter bussinessCodeParameter = new BussinessCodeParameter();
-        bussinessCodeParameter.setSeqNo("9998");
-        String orderId;
-        if(baseGetBussinessId != null){
-            orderId = baseGetBussinessId.buildBussinessCode(bussinessCodeParameter);
-        }else{
-            orderId = IDGenerator.generate();
-        }
-        stlPayOrders.setOrderId(orderId);
-        stlPayOrders.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
-        String acctNo = autoPeriodCommonService.selectDealCapacctInfo(regFinProductDealTotal.getSecManageAcctId(), trdFinProductDealTotal.getCcy());
-        stlPayOrders.setMyAcctNo(acctNo);
-        stlPayOrders.setSettleDate(DateUtil.parse(DateUtil.format(batchDate)));
-        stlPayOrders.setPs(DictCodeListExt1.收支方向_收入.getValue());
-        stlPayOrders.setSettleAmt(trdFinProductDealTotal.getTradeAmt());
-        stlPayOrders.setCcy(regFinProductDealTotal.getCcy());
-        stlPayOrders.setSettleStatus(DictCodeList.结算状态_已结算.getValue());
-        stlPayOrders.setIsNeedSend(DictCodeListExt1.是否_是.getValue());
-        stlPayOrders.setIsTotalTrade(DictCodeListExt1.是否_是.getValue());
-        stlPayOrders.setTradeId(trdFinProductDealTotal.getTotleTradeId());
-        stlPayOrders.setOrderStatus(DictCodeListExt1.指令状态_新建.getValue());
-        stlPayOrdersList.add(stlPayOrders);
 
         trdBondDurDbInertDto.setTrdFinProductDealTotal(trdFinProductDealTotal);
         trdBondDurDbInertDto.setTrdDealTotalAdd(trdDealTotalAdd);
@@ -528,7 +533,7 @@ public class CfetsBondAutoDurDealGenerateProcessorService extends BaseService {
         PaTrdFinProductDealTotal paTrdFinProductDealTotal =new PaTrdFinProductDealTotal();
         List<TrdProductDeal> trdProductDealList = new ArrayList<TrdProductDeal>();
         List<TrdProductDealAdd> trdProductDealAddList =new ArrayList<TrdProductDealAdd>();
-        List<StlPayOrders> stlPayOrdersList =new ArrayList<StlPayOrders>();
+        List<StlPayOrders> stlPayOrdersList = new ArrayList<>();
         BeanUtil.copyPropertiesIgnoreNull(trdFinProductDealTotal, trdBondDurDbInertDto.getWflTrdFinProductDealTotal());
         BeanUtil.copyPropertiesIgnoreNull(paTrdFinProductDealTotal, trdBondDurDbInertDto.getWflPaTrdFinDealTotal());
 

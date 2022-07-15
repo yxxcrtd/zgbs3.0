@@ -89,12 +89,6 @@ public class CfetsQuotedCommonService extends BaseService {
      * {@linkplain}
      */
     @Autowired
-    private BusiAutoEtrDispService busiAutoEtrDispService;
-
-    /**
-     * {@linkplain}
-     */
-    @Autowired
     private EtrEntrustMapper etrEntrustMapper;
 
     /**
@@ -102,12 +96,6 @@ public class CfetsQuotedCommonService extends BaseService {
      */
     @Autowired
     private EtrEntrustAddMapper etrEntrustAddMapper;
-
-    /**
-     * {@linkplain}
-     */
-    @Autowired
-    private EtrDistributeMapper etrDistributeMapper;
 
     /**
      * 投资委托信息Mapper
@@ -150,11 +138,8 @@ public class CfetsQuotedCommonService extends BaseService {
      */
     @Autowired
     private BaseEtrInvestInfoServiceImpl etrInvestInfoServiceImpl;
-    
-    
-    @Autowired
-    private EtrDistributeInterfTmpMapper etrDistributeInterfTmpMapper;
-    
+
+
     /**
      * IbuMainService
      */

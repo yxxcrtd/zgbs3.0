@@ -628,7 +628,7 @@ public class CfetsTrdConfirmService extends BaseService {
         String userName = null!= SecurityUtil.getLoginUser()? SecurityUtil.getLoginUser().getUserName():"system";
         //如果是登记数据
         //根据汇总交易编号查询登记数据
-        CfetsTrdConfirmRegInfoListResponse dtoReg=cfetsTrdConfirmMapper.selectRegInfoByKey(totleTradeId);
+        CfetsTrdConfirmRegInfoListResponse dtoReg = cfetsTrdConfirmMapper.selectRegInfoByKey(totleTradeId);
         CfetsTrdBondInvestTradeDto entity=new CfetsTrdBondInvestTradeDto();
         entity.setTradeDate(iPlatformDate.getSysDate());
         entity.setRegIbuId(totleTradeId);
@@ -1197,8 +1197,6 @@ public class CfetsTrdConfirmService extends BaseService {
 //        logger.debug("成交确认生成划款指令结果:" + JsonUtils.object2Json(bussTrdTransferOrder));
 //        // =====================划款指令信息=====================
 
-        entity.getBussTrdTransferOrder().get(0).setTradeId(entity.getTotleTradeId());
-        // 划款指令表Entity 构造结束----------------------------------------------------------
 
         entity.setPaTrdProductDeals(paTrdProductDeals);
         // 金融产品交易扩展Entity 构造结束----------------------------------------------------------
@@ -2298,11 +2296,11 @@ public class CfetsTrdConfirmService extends BaseService {
                         errorRs.setErrorList(Arrays.asList(new ValidMessage("请选择有效状态的数据！")));
                         return errorRs;
                     }
-                    if(StringUtil.equals(item.getDealType(), BussinessDictCodeList.报价方式_对话报价.getValue())
+                    /*if(StringUtil.equals(item.getDealType(), BussinessDictCodeList.报价方式_对话报价.getValue())
                             || StringUtil.equals(item.getDealType(), BussinessDictCodeList.报价方式_请求报价.getValue())){
                         errorRs.setErrorList(Arrays.asList(new ValidMessage("上行报价数据不允许点击成交确认！")));
                         return errorRs;
-                    }
+                    }*/
                 }
             }
         }

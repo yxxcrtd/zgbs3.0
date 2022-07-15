@@ -1116,6 +1116,12 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                     }
                 }
             }
+            // 从实际表中删除划款指令
+            List<TrdProductTempDeal> list = trdProductTempDealMapper.selectByTotalTradeId(entity.getTradeId());
+            if(CollectionUtils.isNotEmpty(list)) {
+                List<String> tradeIds = list.stream().map(TrdProductTempDeal::getTradeId).collect(Collectors.toList());
+                stlPayOrdersMapper.deleteByTradeIds(tradeIds);
+            }
         } catch (PositionException e) {
             logger.error("交收失败-头寸处理异常",e);
             WorkFlowUtil.showMessage("头寸处理异常,请检查头寸日期", MessageType.错误消息);
@@ -1154,12 +1160,6 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
         }
         if(StringUtil.equals(entity.getButtonType(), DictCodeListExt3.交收操作类型_回溯.getValue())) {
             autoPeriodCommonService.updateDealDataCancel(entity.getTradeId(), DictCodeList.是否_是.getValue());
-            // 从实际表中删除划款指令
-            List<TrdProductTempDeal> list = trdProductTempDealMapper.selectByTotalTradeId(entity.getTradeId());
-            if(CollectionUtils.isNotEmpty(list)) {
-                List<String> tradeIds = list.stream().map(TrdProductTempDeal::getTradeId).collect(Collectors.toList());
-                stlPayOrdersMapper.deleteByTradeIds(tradeIds);
-            }
         }
         if(StringUtil.equals(entity.getButtonType(), DictCodeListExt3.交收操作类型_交收失败.getValue())) {
             if(Objects.isNull(total)) {
@@ -1508,8 +1508,6 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
             baseTradeProductDealCommServiceImpl.insertPosition(finProductTradeDto);
         }
-
-
     }
 
 
