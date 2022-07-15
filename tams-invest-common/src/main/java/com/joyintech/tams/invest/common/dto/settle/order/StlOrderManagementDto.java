@@ -124,6 +124,8 @@ public class StlOrderManagementDto extends BaseEntity {
      */
     private String recAcctName;
 
+    private boolean paBizTypeAdd;
+
     /**
      * 获取 purpose
      * 
@@ -568,5 +570,13 @@ public class StlOrderManagementDto extends BaseEntity {
      */
     public void setOrderId(String orderId) {
         this.orderId = orderId;
+    }
+
+    public boolean isPaBizTypeAdd() {
+        return paBizTypeAdd;
+    }
+
+    public void setPaBizTypeAdd(boolean paBizTypeAdd) {
+        this.paBizTypeAdd = paBizTypeAdd;
     }
 }

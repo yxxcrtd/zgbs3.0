@@ -1,7 +1,7 @@
 #头寸引擎地址
-positionUrl: http://192.168.70.146:2667/dsp
+positionUrl: http://192.168.70.146:1667/dsp
 #监听头寸余额地址
-webSocketUrl: ws://192.168.70.146:2667/dsp/positionTopic
+webSocketUrl: ws://192.168.70.146:1667/dsp/positionTopic
 #监听键值
 webSocketKey: "[{\"table\":\"ETR_CASH_POSITION\",\"hodingTypes\":[]}, {\"table\":\"PTL_CASH_POSITION\",\"hodingTypes\":[]}, {\"table\":\"ETR_SEC_POSITION\",\"hodingTypes\":[]}, {\"table\":\"PTL_SEC_POSITION\",\"hodingTypes\":[]}]"
 

@@ -25,7 +25,8 @@
         TT.orderRecStatus,
         TT.orderRetStatus,
         TT.PROFIT_TYPE,
-        'N' isDvp
+        'N' isDvp,
+        TT.paBizTypeAdd
         FROM
         (
         SELECT
@@ -33,11 +34,11 @@
         T10.ORDER_ID orderId,
         nvl(t5.PA_BUSS_TYPE,T4.TG_BUSI_TYPE) paBizType,
         T10.PAY_TYPE,
-        t4.PORTFOLIO_ID,
-        t7.PORTFOLIO_NAME,
+        nvl(t4.PORTFOLIO_ID,pp.PORTFOLIO_ID) PORTFOLIO_ID,
+        nvl(t7.PORTFOLIO_NAME,pp.PORTFOLIO_NAME) PORTFOLIO_NAME,
         t6.FINPROD_ID finprodId,
-        t6.FINPROD_MARKET_ID,
-        nvl(t6.FINPROD_ABBR, t6.FINPROD_NAME) finprodName,
+        nvl(t6.FINPROD_MARKET_ID,pp.PORTFOLIO_ID) FINPROD_MARKET_ID,
+        nvl(nvl(t6.FINPROD_ABBR, t6.FINPROD_NAME),pp.PORTFOLIO_NAME) finprodName,
         to_char(T10.SETTLE_DATE, 'yyyy-MM-dd') SETTLE_DATE,
         T10.SETTLE_AMT,
         T10.CCY,
@@ -53,12 +54,14 @@
         IPO.ORDER_REC_STATUS orderRecStatus,
         IPO.ORDER_RET_STATUS orderRetStatus,
         T6.PROFIT_TYPE,
-        '${NO}' isDvp
+        '${NO}' isDvp,
+        case when T4.PORTFOLIO_ID is not null then 0 else 1 end    paBizTypeAdd
         FROM TRD_FIN_PRODUCT_DEAL_TOTAL T4
         LEFT JOIN PA_TRD_FIN_PRODUCT_DEAL_TOTAL T5 ON T4.TOTLE_TRADE_ID = T5.TOTLE_TRADE_ID
         LEFT JOIN FIN_PRODUCT T6 ON T4.FINPROD_ID = T6.FINPROD_ID
         LEFT JOIN PTL_PORTFOLIO T7 ON T4.PORTFOLIO_ID = T7.PORTFOLIO_ID
         LEFT JOIN STL_PAY_ORDERS T10 ON T10.TRADE_ID = T4.TOTLE_TRADE_ID AND T10.ORDER_STATUS = #{ORDER_STATUS_01}
+        LEFT JOIN PTL_PORTFOLIO pp ON T10.PORTFOLIO_ID = pp.PORTFOLIO_ID
         <!-- 查询列表中增加“付款账户”、“付款账户名称”、“收款账户”、“收款账户名称”、“划款用途”、“币种” 20191030 add by renping start -->
         LEFT JOIN STL_CAPACCT_INFO T02 /*收款方*/ON ((T10.PS = #{PS01} and T10.MY_ACCT_NO = T02.ACCT_NO) OR (T10.PS = #{PS02} and T10.COUNTER_ACCT_NO =
         T02.ACCT_NO))
@@ -117,7 +120,7 @@
         /*金融产品交易汇总扩展.平安业务类型 IN (数据字典.平安业务类型.债券中间收息、债券中间还本、债券到期)*//*通过自营账户买入的债券*/
         AND T4.TRADE_STATUS = #{TRADE_STATUS_01}
         AND (T4.IS_CANCEL IS NULL OR T4.IS_CANCEL = #{NO})
-        AND T4.PORTFOLIO_ID IS NOT NULL
+        AND (T4.PORTFOLIO_ID IS NOT NULL OR ( T4.PORTFOLIO_ID IS  NULL AND ( T5.PA_BUSS_TYPE =#{PA_BUSINESS_TYPE08} OR T4.TG_BUSI_TYPE =#{PA_BUSINESS_TYPE08})))
         AND T10.IS_NEED_SEND = #{YES}
         <if test="portfolioId != null and !portfolioId.isEmpty()">
             <foreach collection="portfolioId" open="AND (T4.PORTFOLIO_ID in (" close=")" item="item" index="index" separator=",">
@@ -183,7 +186,8 @@
         IPO.ORDER_REC_STATUS orderRecStatus,
         IPO.ORDER_RET_STATUS orderRetStatus,
         T6.PROFIT_TYPE,
-        '${NO}' isDvp
+        '${NO}' isDvp,
+        0  paBizTypeAdd
         FROM TRD_PRODUCT_DEAL T4
         LEFT JOIN TRD_PRODUCT_DEAL_ADD T5 ON T4.TRADE_ID = T5.TRADE_ID
         LEFT JOIN PA_TRD_PRODUCT_DEAL T8 ON T4.TRADE_ID = T8.TRADE_ID
@@ -303,7 +307,8 @@
             IPO.ORDER_REC_STATUS orderRecStatus,
             IPO.ORDER_RET_STATUS orderRetStatus,
             null PROFIT_TYPE,
-            '${YES}' isDvp
+            '${YES}' isDvp,
+            0  paBizTypeAdd
             FROM STL_DVP_ORDERS T1
             <!-- 查询列表中增加“付款账户”、“付款账户名称”、“收款账户”、“收款账户名称”、“划款用途”、“币种” 20191030 add by renping start -->
             LEFT JOIN STL_CAPACCT_INFO T02 /*收款方*/ON ((T1.PS = #{PS01} and T1.MY_ACCT_NO = T02.ACCT_NO) OR (T1.PS = #{PS02} and T1.COUNTER_ACCT_NO =
@@ -363,9 +368,9 @@
         inf.ORDER_REC_STATUS orderRecStatus,
         inf.ORDER_RET_STATUS orderRetStatus,
         null PROFIT_TYPE,
-        '${YES}' isDvp
+        '${YES}' isDvp,
         <!-- NULL FINPROD_MARKET_ID, -->
-
+        0  paBizTypeAdd
         FROM STL_ACT_ORDER  stl left join PTL_PORTFOLIO  ptl  on ptl.PORTFOLIO_ID=stl.PORTFOLIO_ID
         left join STL_CAPACCT_INFO  pay on (stl.ps = '02' and stl.MY_ACCT_NO = pay.ACCT_NO)
         or (stl.ps = '01' and stl.COUNTER_ACCT_NO = pay.ACCT_NO)
