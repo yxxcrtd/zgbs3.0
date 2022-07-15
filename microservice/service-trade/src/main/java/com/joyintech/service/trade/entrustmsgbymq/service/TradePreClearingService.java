@@ -894,8 +894,13 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
 //                    && trdTempDto.getFinDealPledge().getPledgeFinprodId() != null) {
 //                finDealPledgeMapper.insertSelective(trdTempDto.getFinDealPledge());
 //            }
-                for (FinDealPledge finDealPledge : trdTempDto.getFinDealPledgeList()) {
-                    finDealPledgeMapper.insertSelective(finDealPledge);
+                if(trdTempDto.getFinDealPledge().getPledgeFinprodId() != null){
+                    finDealPledgeMapper.insertSelective(trdTempDto.getFinDealPledge());
+                }
+                if(!CollectionUtils.isEmpty(trdTempDto.getFinDealPledgeList())){
+                    for (FinDealPledge finDealPledge : trdTempDto.getFinDealPledgeList()) {
+                        finDealPledgeMapper.insertSelective(finDealPledge);
+                    }
                 }
             }
         }
