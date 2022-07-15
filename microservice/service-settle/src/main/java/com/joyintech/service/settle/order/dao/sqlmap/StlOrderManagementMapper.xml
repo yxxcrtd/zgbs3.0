@@ -235,7 +235,7 @@
         OR T4.TG_BUSI_TYPE IN ( #{PA_BUSINESS_TYPE12}, #{PA_BUSINESS_TYPE16},
         #{PA_BUSINESS_TYPE63},  #{PA_BUSINESS_TYPE65}, #{PA_BUSINESS_TYPE86}, #{PA_BUSINESS_TYPE64},
         #{PA_BUSINESS_TYPE21}, #{PA_BUSINESS_TYPE22}, #{PA_BUSINESS_TYPE25}, #{PA_BUSINESS_TYPE97},
-        #{PA_BUSINESS_TYPE29}, #{PA_BUSINESS_TYPE200} ,#{PA_BUSINESS_TYPE151},#{PA_BUSINESS_TYPE212})
+        #{PA_BUSINESS_TYPE29}, #{PA_BUSINESS_TYPE200} ,#{PA_BUSINESS_TYPE151},#{PA_BUSINESS_TYPE212},#{PA_BUSINESS_TYPE202})
         )
         /*金融产品交易扩展.平安业务类型 IN (数据字典.平安业务类型.存款类资产买入、项目类资产买入、普通拆入、普通拆出、普通拆入到期)*/
         /*金融产品交易扩展.平安业务类型 IN (数据字典.平安业务类型.特拆拆入、特拆拆入到期)*/

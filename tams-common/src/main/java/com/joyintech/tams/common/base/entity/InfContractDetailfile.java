@@ -581,13 +581,13 @@ public class InfContractDetailfile extends BaseEntity {
     }
 
 
-    private String tradeId;         //本方交易员
+    private String traderId;         //本方交易员
 
-    public String getTradeId() {
-        return tradeId;
+    public String getTraderId() {
+        return traderId;
     }
 
-    public void setTradeId(String tradeId) {
-        this.tradeId = tradeId;
+    public void setTraderId(String traderId) {
+        this.traderId = traderId;
     }
 }

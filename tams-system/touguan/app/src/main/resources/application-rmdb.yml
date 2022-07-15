@@ -10,14 +10,14 @@ tx-lcn:
     onlyError: true
          
 spring:
-  #============Master Datasource============# BSINV306_GL_TEST  BSINV306_GL_DEV  BSINV306_GL_TEST
+  #============Master Datasource============# BS30INV_V305_01  BS30INV_V305_01  BS303INIT_TEST1008_03
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    username: BSINV306_GL_TEST
-    password: BSINV306_GL_TEST
-    #defaultTransactionIsolation: 
+    url: jdbc:oracle:thin:@//192.168.70.173:1521/orcl
+    username: BS30INV_V305_01
+    password: BS30INV_V305_01
+    #defaultTransactionIsolation:
     name: master                             #数据库名称
     initialSize: 10                          #在连接池中初始化多少个连接
     maxIdle: 10                              #回收空闲连接时，将保证至少有min-idle个连接.
@@ -37,17 +37,17 @@ spring:
     filterSlf4jEnabled: true
     filterSlf4jStatementExecutableSqlLogEnable: true
     statServletLoginUser: joyin
-    statServletLoginKey: joyin  
-    
-#============Base Datasource============# 
+    statServletLoginKey: joyin
+
+#============Base Datasource============#
 base:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    username: BSINV306_GL_TEST
-    password: BSINV306_GL_TEST
-    #defaultTransactionIsolation: 
+    url: jdbc:oracle:thin:@//192.168.70.173:1521/orcl
+    username: BS30INV_V305_01
+    password: BS30INV_V305_01
+    #defaultTransactionIsolation:
     name: base                               #数据库名称
     initialSize: 10                          #在连接池中初始化多少个连接
     maxIdle: 10                              #回收空闲连接时，将保证至少有min-idle个连接.
@@ -71,10 +71,10 @@ chbsend:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    username: BSINV306_GL_TEST
-    password: BSINV306_GL_TEST
-    #defaultTransactionIsolation: 
+    url: jdbc:oracle:thin:@//192.168.70.173:1521/orcl
+    username: BS30INV_V305_01
+    password: BS30INV_V305_01
+    #defaultTransactionIsolation:
     name: chbSend                            #数据库名称
     initialSize: 10                          #在连接池中初始化多少个连接
     maxIdle: 10                              #回收空闲连接时，将保证至少有min-idle个连接.
@@ -93,15 +93,15 @@ chbsend:
     filterStatSlowSqlMillis: 3000            #慢SQL监控
     filterSlf4jEnabled: true
     filterSlf4jStatementExecutableSqlLogEnable: true
-        
+
 interf:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    username: BSINV306_GL_TEST
-    password: BSINV306_GL_TEST
-    #defaultTransactionIsolation: 
+    url: jdbc:oracle:thin:@//192.168.70.173:1521/orcl
+    username: BS30INV_V305_01
+    password: BS30INV_V305_01
+    #defaultTransactionIsolation:
     name: interf                             #数据库名称
     initialSize: 10                          #在连接池中初始化多少个连接
     maxIdle: 10                              #回收空闲连接时，将保证至少有min-idle个连接.
@@ -120,15 +120,15 @@ interf:
     filterStatSlowSqlMillis: 3000            #慢SQL监控
     filterSlf4jEnabled: true
     filterSlf4jStatementExecutableSqlLogEnable: true
-    
+
 stresstest:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    username: BSINV306_GL_TEST
-    password: BSINV306_GL_TEST
-    #defaultTransactionIsolation: 
+    url: jdbc:oracle:thin:@//192.168.70.173:1521/orcl
+    username: BS30INV_V305_01
+    password: BS30INV_V305_01
+    #defaultTransactionIsolation:
     name: stresstest                         #数据库名称
     initialSize: 10                          #在连接池中初始化多少个连接
     maxIdle: 10                              #回收空闲连接时，将保证至少有min-idle个连接.
@@ -147,16 +147,16 @@ stresstest:
     filterStatSlowSqlMillis: 3000            #慢SQL监控
     filterSlf4jEnabled: true
     filterSlf4jStatementExecutableSqlLogEnable: true
-    
+
 #wind数据库配置
 wind:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
-    username: BSINV306_GL_TEST
-    password: BSINV306_GL_TEST
-    #defaultTransactionIsolation: 
+    url: jdbc:oracle:thin:@//192.168.70.173:1521/orcl
+    username: BS30INV_V305_01
+    password: BS30INV_V305_01
+    #defaultTransactionIsolation:
     name: wind                               #数据库名称
     initialSize: 10                          #在连接池中初始化多少个连接
     maxIdle: 10                              #回收空闲连接时，将保证至少有min-idle个连接.
@@ -177,8 +177,8 @@ wind:
     filterSlf4jStatementExecutableSqlLogEnable: true
 
 application:
-  sqldirurl: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+  sqldirurl: jdbc:oracle:thin:@//192.168.70.173:1521/orcl
   driverClassName: oracle.jdbc.driver.OracleDriver
-  sqldiruserName: BSINV306_GL_TEST
-  sqldirpassword: BSINV306_GL_TEST
+  sqldiruserName: BS30INV_V305_01
+  sqldirpassword: BS30INV_V305_01
     
