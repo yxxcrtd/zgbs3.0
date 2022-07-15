@@ -227,8 +227,15 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
     private String firstTradeId;
 
 
+    private String addCla;
 
+    public String getAddCla() {
+        return addCla;
+    }
 
+    public void setAddCla(String addCla) {
+        this.addCla = addCla;
+    }
 
     public String getPortfolioId() {
         return portfolioId;
