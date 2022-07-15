@@ -103,7 +103,7 @@
                 Joyin.dialog(JoyinUtil.getLabel(label),basePath+pagePath,
                     "95%", "90%",data,
                     function(){table.reload();});//交易所指令详情
-                
+
             }*/
             console.log(data, '...data')
             //银行间质押式回购
@@ -407,7 +407,7 @@
                         targetFinprodId:data.finprodId,
                         portfolioId:data.portfolioId
                     });
-                //ADD  BY GAOPENG 20191123 增加可转债转股委托 start 
+                //ADD  BY GAOPENG 20191123 增加可转债转股委托 start
             }else if(data.assetType == F01 && data.ps == PS_T49){
                 Joyin.dialog(JoyinUtil.getLabel("EtrBondToStock002.dblclick"),
                     basePath

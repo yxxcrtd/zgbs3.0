@@ -2262,9 +2262,9 @@
         WHEN bo.IS_CANCEL = 'Y' THEN '03'
         ELSE '02' END AS effectiveStatus/*有效状态*/,
         CASE
-        WHEN brt.IS_WIN = 'Y' THEN '04'
-        WHEN brt.IS_WIN = 'N' THEN '03'
-        WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
+        WHEN brt.IS_WIN = 'Y' AND brt.STATUS = '01' THEN '04'
+        WHEN brt.IS_WIN = 'N' AND brt.STATUS = '01' THEN '03'
+        WHEN brt.TOTAL_WIN_ID IS NULL OR brt.STATUS = '03' THEN '02'
         END           AS firstBidStatus/*中标状态*/,
         bo.BID_ID         AS bidId/*投标编号*/,
         bo.BID_ID AS busiCode/*业务编号*/,
@@ -2397,9 +2397,9 @@
         union all
         SELECT '01'            AS effectiveStatus/*有效状态*/,
         CASE
-        WHEN brt.IS_WIN = 'Y' THEN '04'
-        WHEN brt.IS_WIN = 'N' THEN '03'
-        WHEN brt.TOTAL_WIN_ID IS NULL THEN '02'
+        WHEN brt.IS_WIN = 'Y' AND brt.STATUS = '01' THEN '04'
+        WHEN brt.IS_WIN = 'N' AND brt.STATUS = '01' THEN '03'
+        WHEN brt.TOTAL_WIN_ID IS NULL OR brt.STATUS = '03' THEN '02'
         END         AS firstBidStatus/*中标状态*/,
         bo.BID_ID       AS bidId/*投标编号*/,
         bo.BID_ID AS busiCode/*业务编号*/,

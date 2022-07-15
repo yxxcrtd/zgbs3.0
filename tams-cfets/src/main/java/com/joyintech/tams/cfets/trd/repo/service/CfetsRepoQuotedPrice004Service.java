@@ -32,6 +32,7 @@ import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.business.common.util.ThreadLocalUtil;
+import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsBiddingProductDto;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealRegisterQuoteDto;
@@ -439,6 +440,16 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
                             errorList.add(new ValidMessage("质押券总额不能超过指令【" + pledge.getEntrustId() + "】指定的质押券总额"));
                         }
                     }
+                }
+            }
+            //同一债券不同产品中，需要限制折算比例需一致
+            Map<String,List<RepoEntrustPledgeDto>> finprodIdMap = entity.getRepoEntrustPledgeDtos().stream()
+                    .collect(Collectors.groupingBy(RepoEntrustPledgeDto::getFinprodId));
+            for (Map.Entry<String, List<RepoEntrustPledgeDto>> entry : finprodIdMap.entrySet()) {
+                List<BigDecimal> pledgeRatioList = entry.getValue().stream().
+                        map(RepoEntrustPledgeDto::getPledgeRatio).distinct().collect(Collectors.toList());
+                if (pledgeRatioList.size() > 1) {
+                    errorList.add(new ValidMessage("同一债券不同产品中，折算比例需一致"));
                 }
             }
             // 同个质押券的汇总质押券面总额必须为十万的整数倍，且不超过100亿

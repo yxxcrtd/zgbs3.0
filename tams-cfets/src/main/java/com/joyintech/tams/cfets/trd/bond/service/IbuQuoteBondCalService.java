@@ -138,7 +138,7 @@ public class IbuQuoteBondCalService extends BaseService {
             Map<String, Object> calParam = new HashMap<>();
             calParam.put("finprodId", calRequest.getFinprodId());
             calParam.put("finprodMarketId", finProductMapper.selectByPrimaryKey(calRequest.getFinprodId()).getFinprodMarketId());
-            calParam.put("unitCprice", null != calRequest.getPrice() ? calRequest.getPrice() : calRespone.getPrice());
+            calParam.put("unitCprice", null != calRespone.getPrice() ? calRespone.getPrice() : calRequest.getPrice());
             calRespone.setDeviationDegree(calcDeviationDegree(calParam));
         }
         return calRespone;

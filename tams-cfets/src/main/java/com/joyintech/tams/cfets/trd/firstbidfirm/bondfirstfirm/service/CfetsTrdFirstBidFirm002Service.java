@@ -72,6 +72,7 @@ import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
+import org.activiti.engine.impl.util.CollectionUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -570,7 +571,10 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         // 共通业务规则
         cfetsTrdFirstBidFirmInfoDto.getProductDtos().forEach(item -> entrustIdList.add(item.getEntrustId()));
         param.put("entrustIdList", entrustIdList);
-        cfetsTrdFirstBidFirmInfoDto = this.dealInitData(param, cfetsTrdFirstBidFirmInfoDto.getBiddingMethod(), DictCodeList.是否_否.getValue());
+        if(CollectionUtils.isEmpty(entrustIdList)){
+            return cfetsTrdFirstBidFirmInfoDto;
+        }
+        cfetsTrdFirstBidFirmInfoDto = this.dealInitData(param, cfetsTrdFirstBidFirmInfoDto.getBiddingMethod(),DictCodeList.是否_否.getValue());
         return cfetsTrdFirstBidFirmInfoDto;
     }
 
@@ -700,6 +704,10 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
      * @date 2022/5/18 10:23
      */
     private CfetsTrdFirstBidFirmInfoDto dealInfoDistribution(CfetsTrdFirstBidFirmInfoDto dto) {
+        if(CollectionUtils.isEmpty(dto.getProductDtos())){
+            logger.info("产品列表为空");
+            return dto;
+        }
         // 排序
         List<CfetsTrdFirstBidFirmProductDto> list = this.productDtoSort(dto);
         //缴款方式
@@ -761,7 +769,6 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
      * @date 2022/5/19 11:45
      */
     private List<CfetsTrdFirstBidFirmProductDto> productDtoSort(CfetsTrdFirstBidFirmInfoDto dto) {
-
         List<CfetsTrdFirstBidFirmProductDto> list = dto.getProductDtos();
         // 投标标的升序
         Comparator<CfetsTrdFirstBidFirmProductDto> byBidPrice = null;
@@ -1592,7 +1599,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         FinProductIssue finProductIssue = finProductIssueMapper.selectByPrimaryKey(dto.getFinprodId());
         List<CheckMassgeInfo> checkMassgeInfos = new ArrayList<>();
         boolean flag = false;
-        if (StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), dto.getBiddingMethod())) {
+        if (StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), dto.getBiddingMethod())
+                || StringUtil.isEmpty(dto.getFinprodId())) {
             return ajaxResult;
         }
         if (StringUtil.equals("1", dto.getEditFeild())) {

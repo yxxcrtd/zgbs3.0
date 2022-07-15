@@ -277,7 +277,7 @@
             ,{field:'netPrice', width:150 , title: '净价/单位净值/交易价格',type:'number',
             	render : function(data, type, row, meta) {
                     if(row.netPrice !=undefined){
-                    	if(row.assetTypeVal == '债券'){                   		
+                    	if(row.assetTypeVal == '债券'){
                     		return Number(row.netPrice).toFixed(6);
                     	}else if(row.assetTypeVal == '基金' || row.assetTypeVal == '计划类资产(净值型)'){
                     		return Number(row.netPrice).toFixed(4);
@@ -602,7 +602,14 @@
     //不同资产的查看页面
     var showDetailByFinprodId = function(finprodId,finprodMarketId,assetType){
         //债券标的信息查看
-        if(assetType == PINAN_ASSET_TYPE_F01 || assetType == PINAN_ASSET_TYPE_F10){
+        if(assetType == PINAN_ASSET_TYPE_F01){
+            Joyin.dialog(JoyinUtil.getLabel("FinBondTargetAsset002.title"),
+                basePath +"home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a",
+                "98%", "98%", {pageModel:PAGE_MODEL_REFERENCE,
+                    finprodId:finprodId  //金融产品代码
+                });
+        }
+        else if(assetType == PINAN_ASSET_TYPE_F10){
             Joyin.dialog(JoyinUtil.getLabel("FinBondTargetAsset002.title"),
                 basePath + "invest/asset/bond/FinBondTargetAsset002/init",
                 "98%", "98%", {pageModel:PAGE_MODEL_REFERENCE,

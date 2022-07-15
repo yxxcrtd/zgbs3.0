@@ -86,6 +86,11 @@ public class BidResultTotal extends BaseEntity {
     private String status;
 
     /**
+     * 上市日
+     */
+    private Date listingDate;
+
+    /**
      * 获取 中标编号
      *
      * @return totalWinId 中标编号
@@ -336,5 +341,13 @@ public class BidResultTotal extends BaseEntity {
      */
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Date getListingDate() {
+        return listingDate;
+    }
+
+    public void setListingDate(Date listingDate) {
+        this.listingDate = listingDate;
     }
 }
