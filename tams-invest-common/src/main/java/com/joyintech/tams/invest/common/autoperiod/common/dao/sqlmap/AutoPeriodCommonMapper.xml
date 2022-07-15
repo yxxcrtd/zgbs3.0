@@ -188,9 +188,10 @@
     </select>
 
     <delete id="deleteStlPayOrdersData">
-        delete from STL_PAY_ORDERS tfpft
+        delete from STL_PAY_TEMP_ORDERS tfpft
         where tfpft.settle_date =#{batchDate}
         and tfpft.update_user = #{updateUser}
+        and tfpft.ORDER_ID not in (select stl.ORDER_ID from STL_PAY_ORDERS stl )
     </delete>
 
 </mapper>
