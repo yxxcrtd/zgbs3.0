@@ -738,7 +738,8 @@ public class InvestmentManagement extends BaseService {
             finprodAbbrs.add(pledge.getFinprodAbbr());
             pledgeAmt = pledgeAmt.add(pledge.getPledgeAmt());
             pledgeNumber = pledgeNumber.add(pledge.getPledgeNumber());
-            pledgeRatioAmt = pledgeRatioAmt.add(pledge.getPledgeNumber().multiply(pledge.getPledgeRatio()));
+            //折算率*100
+            pledgeRatioAmt = pledgeRatioAmt.add(pledge.getPledgeNumber().multiply(pledge.getPledgeRatio().multiply(BigDecimal.valueOf(100))));
         }
         InstructionPledge pledge = pledges.get(0);
         instructionPledge.setEntrustId(pledge.getEntrustId());
@@ -1852,14 +1853,6 @@ public class InvestmentManagement extends BaseService {
         }
         Set<String> ids = pledges.stream().map(InstructionPledge::getEntrustId).collect(Collectors.toSet());
         instructionPledgeService.deleteInstructionPledgesByInstructionsIds(ids);
-        pledges.forEach(o -> {
-            if (o.getPledgeRatio() != null) {
-                o.setPledgeRatio(o.getPledgeRatio().multiply(BigDecimal.valueOf(100)));
-            }
-            if (o.getOldPledgeRatio() != null) {
-                o.setOldPledgeRatio(o.getOldPledgeRatio().multiply(BigDecimal.valueOf(100)));
-            }
-        });
         instructionPledgeService.asyncUpdate(pledges);
     }
 
