@@ -197,6 +197,11 @@ $(function () {
             if (data.workflowId) {
                 workflowId = data.workflowId;
             }
+            console.log("----------------dblclick-------------------")
+            console.log(data.finprodType2)
+            console.log(data.tradeMarket)
+            console.log(data.tradeMarketMode)
+
 
             if (data.finprodType2 == PINAN_ASSET_TYPE_F01 && data.ps == PS_T04) {
                 label = 'TrdConBond002';
@@ -451,9 +456,9 @@ $(function () {
                 console.log(data.tradeMarket);
                 var param = {
                     "busiCode": tradeId,
-                    "finprodType2": PINAN_ASSET_TYPE_F17
+                    "finprodType2": FINPROD_TYPE_TG_F32
                 };
-                var url = "home.html?a=a&busiCode=" + tradeId + "&finprodType2=" + PINAN_ASSET_TYPE_F17 +
+                var url = "home.html?a=a&busiCode=" + tradeId + "&finprodType2=" + FINPROD_TYPE_TG_F32 +
                     "&pageModel=1&editable=false&isTodoList=true#/transactionSearch/detail?a=a";
 
                 Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
