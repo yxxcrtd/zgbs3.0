@@ -214,9 +214,9 @@ public class ExchangeRiskInputParamService extends RiskCommonService {
         if (data instanceof EtrCreditProtectionCertificateApplyRequest){
             EtrCreditProtectionCertificateApplyRequest dto = (EtrCreditProtectionCertificateApplyRequest)data;
             inputDto.setCounterId(dto.getCounterId());
-            inputDto.setPrinAmt(dto.getEntrustAmt());
+            inputDto.setPrinAmt(ArithmeticUtil.multiply(dto.getEntrustNum(),new BigDecimal("100")));
             if(Objects.isNull(inputDto.getPrinAmt())) {
-                inputDto.setPrinAmt(dto.getEntrustNum());
+                inputDto.setPrinAmt(dto.getEntrustAmt());
             }
             inputDto.setAssetType(DictCodeList.平安资产类型_信用保护凭证.getValue());
             inputDto.setTradeMarket(dto.getTradeMarket());
