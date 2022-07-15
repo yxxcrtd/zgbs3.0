@@ -81,6 +81,12 @@ public class TrdInvestDealQuery001Dto extends WflTrdProductDeal{
 	 */
 	private BigDecimal rate;
 	// add by caozhenming 20210730 end
+
+	/**
+	 * 申购类型：01-网上申购；02-网下申购
+	 */
+	private String purchModle;
+
 	/**
 	 * 得到有效状态
 	 * @return
@@ -281,5 +287,13 @@ public class TrdInvestDealQuery001Dto extends WflTrdProductDeal{
 
 	public void setRate(BigDecimal rate) {
 		this.rate = rate;
+	}
+
+	public String getPurchModle() {
+		return purchModle;
+	}
+
+	public void setPurchModle(String purchModle) {
+		this.purchModle = purchModle;
 	}
 }

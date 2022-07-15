@@ -131,7 +131,7 @@ var showDetailByFinprodId = function (finprodId, finprodType2) {
             });
     }
     //信用保护凭证
-    else if(finprodType2 == PINAN_ASSET_TYPE_F37){
+    else if (finprodType2 == PINAN_ASSET_TYPE_F37) {
         var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/newCreditProject?a=a";
         var param = {
             pageModel: PAGE_MODEL_REFERENCE,
@@ -200,10 +200,10 @@ $(function () {
             console.log("----------------dblclick-------------------")
             console.log(data.finprodType2)
             console.log(data.tradeMarket)
-            console.log(data.tradeMarketMode)
+            console.log(data.purchModle)
 
-
-            if (data.finprodType2 == PINAN_ASSET_TYPE_F01 && data.ps == PS_T04) {
+            //债券委托详情 网下申购
+            if (data.finprodType2 == PINAN_ASSET_TYPE_F01 && data.ps == PS_T04 && data.purchModle == '02') {
                 label = 'TrdConBond002';
                 pagePath = "invest/trade/conbond/TrdConBond002/init";
                 Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
@@ -213,7 +213,9 @@ $(function () {
                         workflowId: workflowId,
                         workflowStatus: data.validStatus
                     });
-            } else if (data.finprodType2 == PINAN_ASSET_TYPE_F01 && (data.ps == PS_T05 || data.ps == PS_T58)) {
+            }
+            //债券委托详情 网下申购确认
+            else if (data.finprodType2 == PINAN_ASSET_TYPE_F01 && data.ps == PS_T05 && data.purchModle == '02') {
                 label = 'TrdConBond002';
                 pagePath = "invest/trade/conbond/TrdConBond003/init";
                 Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
@@ -223,9 +225,11 @@ $(function () {
                         workflowId: workflowId,
                         workflowStatus: data.validStatus
                     });
-            } else if (data.finprodType2 == PINAN_ASSET_TYPE_F01 && (data.ps == PS_T49)) {
-                label = 'TrdBondToStock001.refrence';
-                pagePath = "/invest/trade/bondtostock/TrdBondToStock002/init";
+            }
+            //债券委托详情 退款到账
+            else if (data.finprodType2 == PINAN_ASSET_TYPE_F01 && data.ps == PS_T58) {
+                label = 'TrdConBond002';
+                pagePath = "invest/trade/conbond/TrdConBond003/init";
                 Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
                     "95%", "90%", {
                         pageModel: PAGE_MODEL_REFERENCE,
@@ -234,6 +238,18 @@ $(function () {
                         workflowStatus: data.validStatus
                     });
             }
+                //债券委托详情 债转股
+                // else if (data.finprodType2 == PINAN_ASSET_TYPE_F01 && (data.ps == PS_T49)) {
+                //     label = 'TrdBondToStock001.refrence';
+                //     pagePath = "/invest/trade/bondtostock/TrdBondToStock002/init";
+                //     Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
+                //         "95%", "90%", {
+                //             pageModel: PAGE_MODEL_REFERENCE,
+                //             busiCode: tradeId,
+                //             workflowId: workflowId,
+                //             workflowStatus: data.validStatus
+                //         });
+                // }
             //债券委托详情 银行间/商业银行柜台
             else if (data.finprodType2 == PINAN_ASSET_TYPE_F01 && (data.tradeMarket == '01' || data.tradeMarket == '02')) {
                 console.log(data.tradeMarket);
@@ -249,22 +265,22 @@ $(function () {
                     "95%", "90%",
                     param);
             }
-            //债券委托详情
-            // else if (data.finprodType2 == PINAN_ASSET_TYPE_F01) {
-            //     console.log("-----------债券委托详情----------------")
-            //     label = 'TrdBondInvestTrade002';
-            //     pagePath = "invest/trade/bond/TrdBondInvestTrade002/init";
-            //     Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
-            //         "95%", "90%", {
-            //             pageModel: PAGE_MODEL_REFERENCE,
-            //             tradeId: tradeId,
-            //             workflowId: workflowId,
-            //             workflowStatus: data.validStatus
-            //         });
-            //
-            // }
-            //基金委托详情
-            else if (data.finprodType2 == PINAN_ASSET_TYPE_F02) {
+                //债券委托详情
+                // else if (data.finprodType2 == PINAN_ASSET_TYPE_F01) {
+                //     console.log("-----------债券委托详情----------------")
+                //     label = 'TrdBondInvestTrade002';
+                //     pagePath = "invest/trade/bond/TrdBondInvestTrade002/init";
+                //     Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
+                //         "95%", "90%", {
+                //             pageModel: PAGE_MODEL_REFERENCE,
+                //             tradeId: tradeId,
+                //             workflowId: workflowId,
+                //             workflowStatus: data.validStatus
+                //         });
+                //
+                // }
+            //基金委托详情 场外
+            else if (data.finprodType2 == PINAN_ASSET_TYPE_F02 && (data.tradeMarket == '05' || data.tradeMarket == '09')) {
                 label = 'TrdFundInvestTrade002';
                 /* update by zhangpuyu 2019/12/10 start */
                 if (data.ps == PS_T01 || data.ps == PS_T02 || data.ps == PS_T04 || data.ps == PS_T06 || data.ps == PS_T52) {
@@ -280,8 +296,29 @@ $(function () {
                         ps: data.ps,
                         workflowId: workflowId,
                         validStatus: data.validStatus
-                    });//计划类利率委托详情
-            } else if (data.finprodType2 == PINAN_ASSET_TYPE_F03) {
+                    });
+            }
+                //基金委托详情
+                // else if (data.finprodType2 == PINAN_ASSET_TYPE_F02) {
+                //     label = 'TrdFundInvestTrade002';
+                //     /* update by zhangpuyu 2019/12/10 start */
+                //     if (data.ps == PS_T01 || data.ps == PS_T02 || data.ps == PS_T04 || data.ps == PS_T06 || data.ps == PS_T52) {
+                //         /* update by zhangpuyu 2019/12/10 end */
+                //         pagePath = "invest/trade/fund/TrdFundInvestTrade002/init";
+                //     } else if (data.ps == PS_T05 || data.ps == PS_T19 || data.ps == PS_T24 || data.ps == PS_T18) {
+                //         pagePath = "invest/trade/fund/TrdFundInvestTrade003/init";
+                //     }
+                //     Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
+                //         "95%", "90%", {
+                //             pageModel: PAGE_MODEL_REFERENCE,
+                //             tradeId: data.tradeId,
+                //             ps: data.ps,
+                //             workflowId: workflowId,
+                //             validStatus: data.validStatus
+                //         });
+                // }
+            //计划类利率委托详情
+            else if (data.finprodType2 == PINAN_ASSET_TYPE_F03) {
                 label = 'TrdPlanRateInvestTrade001';
                 pagePath = "invest/trade/trdplanrateinvesttrade/TrdPlanRateInvestTrade002/init";
                 Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
@@ -289,8 +326,10 @@ $(function () {
                         pageModel: PAGE_MODEL_REFERENCE,
                         totleTradeId: tradeId,
                         portfolioId: data.portfolioId
-                    });//计划类净值委托详情
-            } else if (data.finprodType2 == PINAN_ASSET_TYPE_F04) {
+                    });
+            }
+            //计划类净值委托详情
+            else if (data.finprodType2 == PINAN_ASSET_TYPE_F04) {
                 label = 'TrdPlanNetInvestTrade001';
                 if (data.ps == PS_T04 || data.ps == PS_T06) {
                     pagePath = "invest/trade/plannet/TrdPlanNetInvestTrade002/init";
@@ -305,8 +344,10 @@ $(function () {
                         ps: data.ps,
                         workflowId: workflowId,
                         validStatus: data.validStatus
-                    });//存款委托详情
-            } else if (data.finprodType2 == PINAN_ASSET_TYPE_F05) {
+                    });
+            }
+            //存款委托详情
+            else if (data.finprodType2 == PINAN_ASSET_TYPE_F05) {
                 label = 'TrdDepositInvestTrade001';
                 pagePath = "invest/trade/trddepositinvesttrade/TrdDepositInvestTrade002/init";
                 Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
@@ -314,8 +355,10 @@ $(function () {
                         pageModel: PAGE_MODEL_REFERENCE,
                         tradeId: tradeId,
                         portfolioId: data.portfolioId
-                    });//项目类委托详情
-            } else if (data.finprodType2 == PINAN_ASSET_TYPE_F06) {
+                    });
+            }
+            //项目类委托详情
+            else if (data.finprodType2 == PINAN_ASSET_TYPE_F06) {
                 label = 'TrdProjectInvestTrade002.view';
                 pagePath = "invest/trade/project/TrdProjectInvestTrade002/init";
                 Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
@@ -342,18 +385,20 @@ $(function () {
                     "95%", "90%",
                     param);
             }
-            //回购委托详情
-            else if (data.finprodType2 == PINAN_ASSET_TYPE_F07) {
-                label = 'TrdRepoTrade002';
-                pagePath = "invest/trade/trdrepotrade/TrdRepoTrade002/init";
-                Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
-                    "95%", "90%", {
-                        pageModel: PAGE_MODEL_REFERENCE,
-                        tradeId: tradeId,
-                        workflowId: workflowId,
-                        workflowStatus: data.validStatus
-                    });//拆借查看页面
-            } else if (data.finprodType2 == PINAN_ASSET_TYPE_F08) {
+                //回购委托详情
+                // else if (data.finprodType2 == PINAN_ASSET_TYPE_F07) {
+                //     label = 'TrdRepoTrade002';
+                //     pagePath = "invest/trade/trdrepotrade/TrdRepoTrade002/init";
+                //     Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
+                //         "95%", "90%", {
+                //             pageModel: PAGE_MODEL_REFERENCE,
+                //             tradeId: tradeId,
+                //             workflowId: workflowId,
+                //             workflowStatus: data.validStatus
+                //         });
+                // }
+            //拆借查看页面
+            else if (data.finprodType2 == PINAN_ASSET_TYPE_F08) {
                 label = 'TrdLendInvestTrade002';
                 pagePath = "invest/trade/lend/TrdLendInvestTrade002/init";
                 Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
@@ -363,7 +408,9 @@ $(function () {
                         workflowId: workflowId,
                         workflowStatus: data.validStatus
                     });
-            } else if (data.finprodType2 == PINAN_ASSET_TYPE_F10) {
+            }
+            //买断式回购查看页面
+            else if (data.finprodType2 == PINAN_ASSET_TYPE_F10) {
                 label = 'TrdOutRightRepoTrade002.reference';
                 pagePath = "invest/trade/buyoutrepo/TrdOutRightRepoTrade002/init";
                 Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
@@ -373,7 +420,9 @@ $(function () {
                         workflowId: workflowId,
                         workflowStatus: data.validStatus
                     });
-            } else if (data.finprodType2 == PINAN_ASSET_TYPE_F09) {
+            }
+            //货币型查看页面
+            else if (data.finprodType2 == PINAN_ASSET_TYPE_F09) {
                 label = 'TrdPlanCcyInvestTrade001.reference';
                 if (data.ps == PS_T04 || data.ps == PS_T06) {
                     pagePath = "invest/trade/planccy/TrdPlanCcyInvestTrade002/init";
@@ -388,17 +437,21 @@ $(function () {
                         workflowId: workflowId,
                         validStatus: data.validStatus
                     });
-            } else if (data.finprodType2 == PINAN_ASSET_TYPE_F11) {
-                label = 'TrdStock002.reference';
-                pagePath = "invest/trade/stockdeal/TrdStock002/init";
-                Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
-                    "95%", "90%", {
-                        pageModel: PAGE_MODEL_REFERENCE,
-                        tradeId: tradeId,
-                        workflowId: workflowId,
-                        workflowStatus: data.validStatus
-                    });
-            } else if (data.finprodType2 == PINAN_ASSET_TYPE_F12) {
+            }
+                //股票查看页面
+                // else if (data.finprodType2 == PINAN_ASSET_TYPE_F11) {
+                //     label = 'TrdStock002.reference';
+                //     pagePath = "invest/trade/stockdeal/TrdStock002/init";
+                //     Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
+                //         "95%", "90%", {
+                //             pageModel: PAGE_MODEL_REFERENCE,
+                //             tradeId: tradeId,
+                //             workflowId: workflowId,
+                //             workflowStatus: data.validStatus
+                //         });
+                // }
+            //债券借贷查看页面
+            else if (data.finprodType2 == PINAN_ASSET_TYPE_F12) {
                 label = 'TrdBondLendInvestTrade002.reference';
                 pagePath = "invest/trade/bondlend/TrdBondLendInvestTrade002/init";
                 Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
@@ -408,7 +461,9 @@ $(function () {
                         workflowId: workflowId,
                         workflowStatus: data.validStatus
                     });
-            } else if (data.finprodType2 == PINAN_ASSET_TYPE_F13) {
+            }
+            //外汇即期查看页面
+            else if (data.finprodType2 == PINAN_ASSET_TYPE_F13) {
                 label = 'SysCommon.refrence';
                 pagePath = "invest/trade/spotex/TrdSpotexInvestTrade002/init";
                 Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
@@ -418,7 +473,9 @@ $(function () {
                         workflowId: workflowId,
                         workflowStatus: data.validStatus
                     });
-            } else if (data.finprodType2 == PINAN_ASSET_TYPE_F14) {
+            }
+            //外汇远期查看页面
+            else if (data.finprodType2 == PINAN_ASSET_TYPE_F14) {
                 label = 'TrdForwexInvestTrade002.reference';
                 pagePath = "invest/trade/forwex/TrdForwexInvestTrade002/init";
                 Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
@@ -428,7 +485,9 @@ $(function () {
                         workflowId: workflowId,
                         workflowStatus: data.validStatus
                     });
-            } else if (data.finprodType2 == PINAN_ASSET_TYPE_F15) {
+            }
+            //外汇掉期查看页面
+            else if (data.finprodType2 == PINAN_ASSET_TYPE_F15) {
                 label = 'SysCommon.refrence';
                 pagePath = "invest/trade/trdfxswapinvesttrade/TrdFxswapInvestTrade002/init";
                 Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
@@ -439,7 +498,9 @@ $(function () {
                         workflowStatus: data.validStatus,
                         tradeStatus: data.validStatus
                     });
-            } else if (data.finprodType2 == PINAN_ASSET_TYPE_F16) {
+            }
+            //利率互换查看页面
+            else if (data.finprodType2 == PINAN_ASSET_TYPE_F16) {
                 label = 'TrdIRSTrade002.reference';
                 pagePath = "invest/trade/irs/TrdIRSTrade002/init";
                 Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
@@ -452,8 +513,6 @@ $(function () {
             }
             //一级投标债券 银行间/商业银行柜台
             else if (data.finprodType2 == PINAN_ASSET_TYPE_F17 && (data.tradeMarket == '01' || data.tradeMarket == '02')) {
-                console.log("----------PINAN_ASSET_TYPE_F17-------------");
-                console.log(data.tradeMarket);
                 var param = {
                     "busiCode": tradeId,
                     "finprodType2": FINPROD_TYPE_TG_F32
@@ -466,18 +525,20 @@ $(function () {
                     "95%", "90%",
                     param);
             }
-            //一级投标债券
-            else if (data.finprodType2 == PINAN_ASSET_TYPE_F17) {
-                label = 'SysCommon.refrence';
-                pagePath = "invest/trade/bond/TrdBondInvestTrade002/init";
-                Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
-                    "95%", "90%", {
-                        pageModel: PAGE_MODEL_REFERENCE,
-                        tradeId: tradeId,
-                        workflowId: workflowId,
-                        workflowStatus: data.validStatus
-                    });
-            } else if (data.finprodType2 == PINAN_ASSET_TYPE_F18) {
+                //一级投标债券
+                // else if (data.finprodType2 == PINAN_ASSET_TYPE_F17) {
+                //     label = 'SysCommon.refrence';
+                //     pagePath = "invest/trade/bond/TrdBondInvestTrade002/init";
+                //     Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
+                //         "95%", "90%", {
+                //             pageModel: PAGE_MODEL_REFERENCE,
+                //             tradeId: tradeId,
+                //             workflowId: workflowId,
+                //             workflowStatus: data.validStatus
+                //         });
+                // }
+            //期权
+            else if (data.finprodType2 == PINAN_ASSET_TYPE_F18) {
                 label = 'TrdOptionTrade002';
                 pagePath = "invest/trade/option/TrdOptionTrade002/init";
                 Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
@@ -487,7 +548,9 @@ $(function () {
                         workflowId: workflowId,
                         workflowStatus: data.validStatus
                     });
-            } else if (data.finprodType2 == PINAN_ASSET_TYPE_F19) {
+            }
+            //权益类资产
+            else if (data.finprodType2 == PINAN_ASSET_TYPE_F19) {
                 label = 'TrdProjectNetInvestTrade002.reference';
                 pagePath = "invest/trade/projectnet/TrdProjectNetInvestTrade002/init";
                 Joyin.dialog(JoyinUtil.getLabel(label), basePath + pagePath,
