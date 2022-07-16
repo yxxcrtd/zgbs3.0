@@ -113,322 +113,318 @@
 
     <select id="findPage" resultType="com.joyintech.tams.invest.common.dto.period.trdbondduration.TrdBondDurationDto">
         SELECT * FROM (
-        <if test="statusValid == null or statusValid.isEmpty() or statusValid.contains(PAGE_DATE_STATUS03)">
-            /*流程中*/
-            SELECT * FROM (
-            SELECT
-            '${PAGE_DATE_STATUS03}' statusValid,
-            T1.TOTLE_TRADE_ID busiCode,
-            T1.PS cashType,
-            <!-- 2.0修改 -->
-            <!-- T1.PORTFOLIO_ID,
-            T2.PORTFOLIO_NAME, -->
-            NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) SEC_MANAGE_ACCT_ID,
-            CASE WHEN T1.CHL_ID IS NOT NULL THEN 1 ELSE 0 end channel,
-            <!-- 通道新增 qiangchengxi 2018-03-30 start -->
-            nvl(SAI.SEC_ACCT_NAME, fp.FINPROD_NAME) secAcctName,
-            <!-- 通道新增 qiangchengxi 2018-03-30 end -->
-            T4.FINPROD_MARKET_ID,
-            T4.FINPROD_ABBR finprodAbbr,
-            to_char(T1.VDATE, 'yyyy-MM-dd') vDate/*计息开始日*/,
-            to_char(T1.MDATE, 'yyyy-MM-dd') mDate/*计息结束日*/,
-            to_char(T1.SETTLE_DATE, 'yyyy-MM-dd') TRADE_DATE/*资金到账日*/,
-            T1.SHARE_AMT*100 qty,
-            null PAY_DATE,
-            T3.THEORY_AMT fpriceAmt/*理论本息总额*/,
-            <!-- 存续期增加通道费 modify by renping 20191025 start -->
-            T1.FPRICE_AMT TRADE_AMT/*实收本息总额*/,
-            <!-- 存续期增加通道费 modify by renping 20191025 end -->
-            <!-- 多级法人改造 add by caiqun 20200615 -->
-            SI.INSTITUTION_NAME institutionName, /*所属机构*/
-            T1.INSTITUTION_CODE institutionCode,
-            <!-- 多级法人改造 add by caiqun 20200615 -->
-            t3.PA_BUSS_TYPE,
-            T1.FINPROD_ID,
-            T1.WORKFLOW_ID
-            FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL T1
-            LEFT JOIN WFL_TRD_DEAL_TOTAL_ADD wtdta on t1.totle_trade_ID = WTDTA.TOTLE_TRADE_ID
-            <!-- 2.0修改 -->
-            <!-- LEFT JOIN PTL_PORTFOLIO T2 ON T2.PORTFOLIO_ID = T1.PORTFOLIO_ID -->
-            LEFT JOIN WFL_PA_TRD_FIN_DEAL_TOTAL T3 ON T1.TOTLE_TRADE_ID = T3.TOTLE_TRADE_ID
-            LEFT JOIN FIN_PRODUCT T4 ON T1.FINPROD_ID = T4.FINPROD_ID
-            <!-- 通道新增 qiangchengxi 2018-03-30 start -->
-            LEFT JOIN STL_SEC_ACCT_INFO SAI ON T1.SEC_MANAGE_ACCT_ID = SAI.SEC_ACCT_ID
-            LEFT JOIN FIN_PRODUCT FP ON T1.CHL_ID = FP.FINPROD_ID
-            <!-- 通道新增 qiangchengxi 2018-03-30 end -->
-            <!-- 多级法人改造 add by caiqun 20200615 -->
-            LEFT JOIN SYS_INSTITUTION SI ON T1.INSTITUTION_CODE = SI.INSTITUTION_CODE
-            <!-- 多级法人改造 add by caiqun 20200615 -->
-            WHERE T4.FINPROD_TYPE2 = #{FINPROD_TYPE_TGF01}
-            AND nvl(T1.IS_OVERDUE_DEAL,#{YESNO_N}) = #{YESNO_N}
-            AND wtdta.MP_FINPROD_ID IS NULL
-            AND T1.P_TRADE_ID IS NULL/*撤销流程中的数据不展示*/
-            AND T1.P_TOTLE_TRADE_ID IS NULL <!-- 只展示汇总的汇总交易 -->
-            <!--GLCP-227:过滤银行间数据 modify by fuyongsheng 20220714 start-->
-            AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
-            <!--GLCP-227:过滤银行间数据 modify by fuyongsheng 20220714 end-->
-            <if test="busiCode != null and !busiCode.isEmpty()">
-                AND T1.TOTLE_TRADE_ID = #{busiCode}
-            </if>
-            <if test="chlIdList != null and chlIdList.size() > 0">
-                AND (FP.FINPROD_ID IN
-                <foreach collection="chlIdList" item="item" index="index" open="("
-                         close=")" separator=",">
-                    <if test="(index % 998) == 0">
-                        null) OR FP.FINPROD_ID in (
-                    </if>
-                    #{item}
-                </foreach>
-                )
-            </if>
-            <include refid="where_sql"/>
-            AND (EXISTS(
-            select 1 from WFL_TRD_FIN_PRODUCT_DEAL_TOTAL DEAL
-            where DEAL.P_TOTLE_TRADE_ID = T1.TOTLE_TRADE_ID
-            and DEAL.PORTFOLIO_ID
-            <include refid="portfolioAth"/>
-            ) or T1.PS='T39')
-            ORDER BY T1.MDATE DESC
-            )
-        </if>
-        <if test="(busiCode == null or busiCode.isEmpty()) and (statusValid == null or statusValid.isEmpty() or statusValid.contains(PAGE_DATE_STATUS01))">
-            <if test="statusValid == null or statusValid.isEmpty() or statusValid.contains(PAGE_DATE_STATUS03)">
-                UNION ALL
-            </if>
-            /*待处理*/
-            SELECT * FROM (
-            select
-            '${PAGE_DATE_STATUS01}' statusValid,
-            null busiCode,
-            listagg(t8.CASH_TYPE, ',') within group ( order by t8.CASH_TYPE ) CASH_TYPE,
-            <!--  t8.PORTFOLIO_ID,
-             t12.PORTFOLIO_NAME, -->
-            t8.SEC_ACCT_ID secManageAcctId,
-            CASE WHEN fp.FINPROD_NAME IS NOT NULL THEN 1 ELSE 0 end channel,
-            <!-- 通道新增 qiangchengxi 2018-03-30 start -->
-            nvl(SAI.SEC_ACCT_NAME, fp.FINPROD_NAME) secAcctName,
-            <!-- 通道新增 qiangchengxi 2018-03-30 end -->
-            t10.FINPROD_MARKET_ID,
-            t10.FINPROD_ABBR finprodAbbr,
-            to_char(min(t8.VDATE), 'yyyy-MM-dd') vDate,
-            to_char(t8.MDATE, 'yyyy-MM-dd') mDate,
-            null tradeDate,
-            t8.qty*100 qty,
-            to_char(t8.PAY_DATE, 'yyyy-MM-dd') PAY_DATE,
-            ROUND(SUM(t8.fpriceAmt), 2) fpriceAmt,
-            null TRADE_AMT,
-            <!-- 多级法人改造 add by caiqun 20200615 -->
-            SI.INSTITUTION_NAME institutionName, /*所属机构*/
-            <if test="institutionCode != null and institutionCode != ''">
-                #{institutionCode} institutionCode,
-            </if>
-            <if test="institutionCode == null || institutionCode == ''">
-                '' institutionCode,
-            </if>
-            <!-- 多级法人改造 add by caiqun 20200615 -->
-            null PA_BUSS_TYPE,
-            T8.FINPROD_ID,
-            NULL WORKFLOW_ID
-            from (
-            select T6.FINPROD_ID,
-            SUM(T6.AMOUNT) QTY,/*考虑投资目的数量合并*/
-            T6.CASH_TYPE,
-            T6.CASH_ID,
-            T6.VDATE,
-            T6.MDATE,
-            SUM(T6.CASH_AMT * T6.AMOUNT) fpriceAmt,/*理论本息总额*/
-            case t6.CASH_TYPE
-            when '${CASH_CLASS_TYPE01}' then 0
-            else ROUND(SUM(T6.PRIN_AMT * T6.AMOUNT), 2) end prinAmt,/*还本金额*/
-            T6.SEC_ACCT_ID,
-            ROUND(SUM(t6.INT_AMT * T6.AMOUNT), 2) intAmt,/*理论利息*/
-            t6.PAY_DATE
-            from (
-            select * from (
-            SELECT
-            T1.FINPROD_ID,
-            DECODE(T1.HODING_TYPE, '06', T1.AMOUNT*-1, '11', T1.AMOUNT*-1, T1.AMOUNT) AMOUNT,
-            T1.SEC_ACCT_ID,
-            t2.vdate,
-            t2.mdate,
-            t2.cash_amt,
-            t2.prin_amt,
-            t2.int_amt,
-            t2.cash_id,
-            t2.cash_type,
-            t2.pay_date
-<!--            ,rank() over(partition BY t1.finprod_id ORDER BY t2.mdate) rank-->
-            FROM PTL_SEC_POSITION T1 INNER JOIN FIN_CASH_PLAN T2 ON T1.FINPROD_ID = T2.FINPROD_ID
-            AND T2.FINPROD_TYPE2 = #{FINPROD_TYPE_TGF01} AND t1.CDATE &lt; t2.MDATE
-            LEFT JOIN PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = T1.PORTFOLIO_ID
-            LEFT JOIN FIN_PRODUCT fp ON fp.FINPROD_ID = T1.FINPROD_ID
-            <!-- 多级法人改造 add by caiqun 20200615 -->
-            <if test="institutionCode != null and institutionCode != ''">
-                INNER JOIN DATA_AUTH_NOTIFY_INST dani
-                on dani.BUSINESS_ID = T1.PORTFOLIO_ID
-                AND dani.DATA_TYPE ='PTL01'
-                AND dani.model_type ='02'
-                AND dani.INSTITUTION_CODE=#{institutionCode}
-            </if>
-            <!-- 多级法人改造 add by caiqun 20200615 -->
-            <where>
-                T1.AMOUNT > 0 AND T1.HODING_TYPE IN ('03', '05', '06', '11')
-                and nvl(pp.PARENT_PORTFOLIO_ID, 'null') = 'null'
-                <!--GLCP-227:过滤银行间数据 modify by fuyongsheng 20220714 start-->
-                AND (fp.TRADE_MARKET IS NULL OR fp.TRADE_MARKET != #{TRADE_MARKET_01})
-                <!--GLCP-227:过滤银行间数据 modify by fuyongsheng 20220714 end-->
-                <if test="cashTypeSb != null and !cashTypeSb.isEmpty()">
-                    AND (instr(#{cashTypeSb}, T2.CASH_TYPE) > 0)
-                </if>
-                <if test="finprodId != null and !finprodId.isEmpty()">
-                    AND t1.finprod_id=#{finprodId}
-                </if>
-                <if test="cashTypeSb == null or cashTypeSb.isEmpty()">
-                    and T2.CASH_TYPE IN
-                    (#{CASH_CLASS_TYPE01},#{CASH_CLASS_TYPE02},#{CASH_CLASS_TYPE03},#{CASH_CLASS_TYPE04})
-                </if>
-                and (t2.INT_AMT > 0 or t2.PRIN_AMT > 0)
-                and t2.mdate = (select min(tt.mdate) from FIN_CASH_PLAN tt where tt.finprod_id =t1.finprod_id
-                    and Tt.FINPROD_TYPE2 = 'F01'
-                    AND tt.MDATE > t1.CDATE
-                    AND Tt.PAY_DATE >= #{PLATEFORM_DATE}
-                    and Tt.CASH_TYPE IN ('01', '02', '03', '04')
-                    and (tt.INT_AMT > 0 or t2.PRIN_AMT > 0)
-                )
-                <!-- and t2.MDATE &lt;=#{PLATEFORM_DATE} -->
-                /*不存在生效的交易*/
-                and NOT EXISTS (SELECT 1 FROM TRD_FIN_PRODUCT_DEAL_TOTAL TPDA
-                LEFT JOIN TRD_DEAL_TOTAL_ADD TDTA ON TPDA.TOTLE_TRADE_ID = TDTA.TOTLE_TRADE_ID
-                where TDTA.MP_FINPROD_ID IS NULL
-                AND TPDA.TRADE_STATUS = #{TRADE_STATUS01}
-                AND TPDA.BUSI_TYPE = #{TRD10}
-                AND TPDA.IS_CANCEL = #{YESNO_N} and T2.MDATE = TPDA.MDATE
-                AND TPDA.FINPROD_ID = T1.FINPROD_ID
-                AND T1.PORTFOLIO_ID =TPDA.PORTFOLIO_ID
-                <!-- 多级法人改造 add by caiqun 20200615 -->
-                <if test="institutionCode != null and institutionCode != ''">
-                    AND TPDA.INSTITUTION_CODE = #{institutionCode}
-                </if>
-                <!-- 多级法人改造 add by caiqun 20200615 -->
-                AND (TPDA.SEC_MANAGE_ACCT_ID = T1.SEC_ACCT_ID OR TPDA.CHL_ID = T1.SEC_ACCT_ID))
-                /*不存在流程中的当期或之前的交易*/
-                AND NOT EXISTS (SELECT 1 FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL TPDA
-                LEFT JOIN WFL_TRD_DEAL_TOTAL_ADD TDTA ON TPDA.TOTLE_TRADE_ID = TDTA.TOTLE_TRADE_ID
-                where TDTA.MP_FINPROD_ID IS NULL
-                AND TPDA.TRADE_STATUS = #{TRADE_STATUS01}
-                AND TPDA.BUSI_TYPE = #{TRD10}
-                AND TPDA.IS_CANCEL = #{YESNO_N} and T2.MDATE >= TPDA.MDATE
-                AND TPDA.FINPROD_ID = T1.FINPROD_ID
-                AND T1.PORTFOLIO_ID =TPDA.PORTFOLIO_ID
-                AND (TPDA.SEC_MANAGE_ACCT_ID = T1.SEC_ACCT_ID OR TPDA.CHL_ID = T1.SEC_ACCT_ID))
-                <!--小于计息截止日的最大持仓 丁志鹏 2019/08/28 start-->
-                <!--不存在更大的持仓-->
-                AND NOT EXISTS (
-                SELECT 1 FROM PTL_SEC_POSITION tpsp
-                where tpsp.HODING_TYPE = T1.HODING_TYPE
-                and tpsp.PORTFOLIO_ID = T1.PORTFOLIO_ID
-                and tpsp.SEC_ACCT_ID = T1.SEC_ACCT_ID
-                and tpsp.FINPROD_ID = T1.FINPROD_ID
-                and tpsp.CDATE > T1.CDATE
-                and tpsp.CDATE &lt; t2.MDATE
-                )
-                and T2.PAY_DATE >= #{PLATEFORM_DATE}
-                <!--小于计息截止日的最大持仓 丁志鹏 2019/08/28 end-->
-                <if test="chlIdList != null and chlIdList.size() > 0">
-                    AND (T1.SEC_ACCT_ID IN
-                    <foreach collection="chlIdList" item="item" index="index" open="("
-                             close=")" separator=",">
-                        <if test="(index % 998) == 0">
-                            null) OR T1.SEC_ACCT_ID in (
-                        </if>
-                        #{item}
-                    </foreach>
-                    )
-                </if>
-                and T1.PORTFOLIO_ID
-                <include refid="portfolioAth"/>
-                <if test="portfolioId != null and !portfolioId.isEmpty()">
-                    <foreach collection="portfolioId" index="index" open=" AND (T1.PORTFOLIO_ID IN (" item="item"
-                             close=")" separator=",">
-                        <if test="(index % 998) == 0">
-                            null) OR T1.PORTFOLIO_ID IN (
-                        </if>
-                        #{item}
-                    </foreach>
-                    )
-                </if>
-                <if test="secManageAcctId != null and !secManageAcctId.isEmpty()">
-                    AND T1.SEC_ACCT_ID = #{secManageAcctId}
-                </if>
-            </where>
-            )
-<!--            where rank = 1-->
-            ) T6
-            <where>
-                <if test="mdateStart != null and !mdateStart.isEmpty()">
-                    AND T6.MDATE >= to_date(#{mdateStart}, 'yyyy-MM-dd')
-                </if>
-                <if test="mdateEnd != null and !mdateEnd.isEmpty()">
-                    AND T6.MDATE &lt;= to_date(#{mdateEnd}, 'yyyy-MM-dd')
-                </if>
-            </where>
-            GROUP BY
-            T6.FINPROD_ID,
-            T6.CASH_TYPE,
-            T6.CASH_ID,
-            T6.VDATE,
-            T6.MDATE,
-            T6.CASH_AMT,
-            T6.PRIN_AMT,/*还本金额*/
-            T6.SEC_ACCT_ID,
-            t6.INT_AMT,
-            t6.PAY_DATE
-            ) T8
-            LEFT JOIN FIN_PRODUCT T10 ON T10.FINPROD_ID = T8.FINPROD_ID
-            <!-- 通道新增 qiangchengxi 2018-03-30 start -->
-            LEFT JOIN STL_SEC_ACCT_INFO SAI ON T8.SEC_ACCT_ID = SAI.SEC_ACCT_ID
-            LEFT JOIN FIN_PRODUCT FP ON T8.SEC_ACCT_ID = FP.FINPROD_ID
-            <!-- 通道新增 qiangchengxi 2018-03-30 end -->
-            <!-- 多级法人改造 add by caiqun 20200615 -->
-            <if test="institutionCode != null and institutionCode != ''">
-                LEFT JOIN SYS_INSTITUTION SI ON SI.INSTITUTION_CODE = #{institutionCode}
-            </if>
-            <if test="institutionCode == null || institutionCode == ''">
-                LEFT JOIN SYS_INSTITUTION SI ON SI.INSTITUTION_CODE = ''
-            </if>
-            <!-- 多级法人改造 add by caiqun 20200615 -->
-            where
-            t8.PAY_DATE &gt;= #{PLATEFORM_DATE}
-            GROUP BY
-            t8.SEC_ACCT_ID,SAI.SEC_ACCT_NAME, fp.FINPROD_NAME,
-            t10.FINPROD_MARKET_ID,
-            t10.FINPROD_ABBR,
-            t8.MDATE,
-            t8.qty,
-            t8.PAY_DATE,T8.FINPROD_ID,SI.INSTITUTION_NAME
-            ORDER BY T8.MDATE
-            )
-            <where>
-                <if test="cashType != null and !cashType.isEmpty() and CASH_CLASS_TYPE01 == cashType">
-                    AND CASH_TYPE = #{cashType}
-                </if>
-                <if test="cashType != null and !cashType.isEmpty() and CASH_CLASS_TYPE01 != cashType">
-                    AND (instr(CASH_TYPE, #{cashType}) > 0)
-                </if>
-                <if test="tradeDateStart != null and !tradeDateStart.isEmpty()">
-                    AND tradeDate >= to_date(#{tradeDateStart}, 'yyyy-MM-dd')
-                </if>
-                <if test="tradeDateEnd != null and !tradeDateEnd.isEmpty()">
-                    AND tradeDate &lt;= to_date(#{tradeDateEnd}, 'yyyy-MM-dd')
-                </if>
-            </where>
-        </if>
+<!--        <if test="statusValid == null or statusValid.isEmpty() or statusValid.contains(PAGE_DATE_STATUS03)">-->
+<!--            /*流程中*/-->
+<!--            SELECT * FROM (-->
+<!--            SELECT-->
+<!--            '${PAGE_DATE_STATUS03}' statusValid,-->
+<!--            T1.TOTLE_TRADE_ID busiCode,-->
+<!--            T1.PS cashType,-->
+<!--            &lt;!&ndash; 2.0修改 &ndash;&gt;-->
+<!--            &lt;!&ndash; T1.PORTFOLIO_ID,-->
+<!--            T2.PORTFOLIO_NAME, &ndash;&gt;-->
+<!--            NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) SEC_MANAGE_ACCT_ID,-->
+<!--            CASE WHEN T1.CHL_ID IS NOT NULL THEN 1 ELSE 0 end channel,-->
+<!--            &lt;!&ndash; 通道新增 qiangchengxi 2018-03-30 start &ndash;&gt;-->
+<!--            nvl(SAI.SEC_ACCT_NAME, fp.FINPROD_NAME) secAcctName,-->
+<!--            &lt;!&ndash; 通道新增 qiangchengxi 2018-03-30 end &ndash;&gt;-->
+<!--            T4.FINPROD_MARKET_ID,-->
+<!--            T4.FINPROD_ABBR finprodAbbr,-->
+<!--            to_char(T1.VDATE, 'yyyy-MM-dd') vDate/*计息开始日*/,-->
+<!--            to_char(T1.MDATE, 'yyyy-MM-dd') mDate/*计息结束日*/,-->
+<!--            to_char(T1.SETTLE_DATE, 'yyyy-MM-dd') TRADE_DATE/*资金到账日*/,-->
+<!--            T1.SHARE_AMT*100 qty,-->
+<!--            null PAY_DATE,-->
+<!--            T3.THEORY_AMT fpriceAmt/*理论本息总额*/,-->
+<!--            &lt;!&ndash; 存续期增加通道费 modify by renping 20191025 start &ndash;&gt;-->
+<!--            T1.FPRICE_AMT TRADE_AMT/*实收本息总额*/,-->
+<!--            &lt;!&ndash; 存续期增加通道费 modify by renping 20191025 end &ndash;&gt;-->
+<!--            &lt;!&ndash; 多级法人改造 add by caiqun 20200615 &ndash;&gt;-->
+<!--            SI.INSTITUTION_NAME institutionName, /*所属机构*/-->
+<!--            T1.INSTITUTION_CODE institutionCode,-->
+<!--            &lt;!&ndash; 多级法人改造 add by caiqun 20200615 &ndash;&gt;-->
+<!--            t3.PA_BUSS_TYPE,-->
+<!--            T1.FINPROD_ID,-->
+<!--            T1.WORKFLOW_ID-->
+<!--            FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL T1-->
+<!--            LEFT JOIN WFL_TRD_DEAL_TOTAL_ADD wtdta on t1.totle_trade_ID = WTDTA.TOTLE_TRADE_ID-->
+<!--            &lt;!&ndash; 2.0修改 &ndash;&gt;-->
+<!--            &lt;!&ndash; LEFT JOIN PTL_PORTFOLIO T2 ON T2.PORTFOLIO_ID = T1.PORTFOLIO_ID &ndash;&gt;-->
+<!--            LEFT JOIN WFL_PA_TRD_FIN_DEAL_TOTAL T3 ON T1.TOTLE_TRADE_ID = T3.TOTLE_TRADE_ID-->
+<!--            LEFT JOIN FIN_PRODUCT T4 ON T1.FINPROD_ID = T4.FINPROD_ID-->
+<!--            &lt;!&ndash; 通道新增 qiangchengxi 2018-03-30 start &ndash;&gt;-->
+<!--            LEFT JOIN STL_SEC_ACCT_INFO SAI ON T1.SEC_MANAGE_ACCT_ID = SAI.SEC_ACCT_ID-->
+<!--            LEFT JOIN FIN_PRODUCT FP ON T1.CHL_ID = FP.FINPROD_ID-->
+<!--            &lt;!&ndash; 通道新增 qiangchengxi 2018-03-30 end &ndash;&gt;-->
+<!--            &lt;!&ndash; 多级法人改造 add by caiqun 20200615 &ndash;&gt;-->
+<!--            LEFT JOIN SYS_INSTITUTION SI ON T1.INSTITUTION_CODE = SI.INSTITUTION_CODE-->
+<!--            &lt;!&ndash; 多级法人改造 add by caiqun 20200615 &ndash;&gt;-->
+<!--            WHERE T4.FINPROD_TYPE2 = #{FINPROD_TYPE_TGF01}-->
+<!--            AND nvl(T1.IS_OVERDUE_DEAL,#{YESNO_N}) = #{YESNO_N}-->
+<!--            AND wtdta.MP_FINPROD_ID IS NULL-->
+<!--            AND T1.P_TRADE_ID IS NULL/*撤销流程中的数据不展示*/-->
+<!--            AND T1.P_TOTLE_TRADE_ID IS NULL &lt;!&ndash; 只展示汇总的汇总交易 &ndash;&gt;-->
+<!--            &lt;!&ndash;GLCP-227:过滤银行间数据 modify by fuyongsheng 20220714 start&ndash;&gt;-->
+<!--            AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})-->
+<!--            &lt;!&ndash;GLCP-227:过滤银行间数据 modify by fuyongsheng 20220714 end&ndash;&gt;-->
+<!--            <if test="busiCode != null and !busiCode.isEmpty()">-->
+<!--                AND T1.TOTLE_TRADE_ID = #{busiCode}-->
+<!--            </if>-->
+<!--            <if test="chlIdList != null and chlIdList.size() > 0">-->
+<!--                AND (FP.FINPROD_ID IN-->
+<!--                <foreach collection="chlIdList" item="item" index="index" open="("-->
+<!--                         close=")" separator=",">-->
+<!--                    <if test="(index % 998) == 0">-->
+<!--                        null) OR FP.FINPROD_ID in (-->
+<!--                    </if>-->
+<!--                    #{item}-->
+<!--                </foreach>-->
+<!--                )-->
+<!--            </if>-->
+<!--            <include refid="where_sql"/>-->
+<!--            AND (EXISTS(-->
+<!--            select 1 from WFL_TRD_FIN_PRODUCT_DEAL_TOTAL DEAL-->
+<!--            where DEAL.P_TOTLE_TRADE_ID = T1.TOTLE_TRADE_ID-->
+<!--            and DEAL.PORTFOLIO_ID-->
+<!--            <include refid="portfolioAth"/>-->
+<!--            ) or T1.PS='T39')-->
+<!--            ORDER BY T1.MDATE DESC-->
+<!--            )-->
+<!--        </if>-->
+<!--        <if test="(busiCode == null or busiCode.isEmpty()) and (statusValid == null or statusValid.isEmpty() or statusValid.contains(PAGE_DATE_STATUS01))">-->
+<!--            <if test="statusValid == null or statusValid.isEmpty() or statusValid.contains(PAGE_DATE_STATUS03)">-->
+<!--                UNION ALL-->
+<!--            </if>-->
+<!--            /*待处理*/-->
+<!--            SELECT * FROM (-->
+<!--            select-->
+<!--            '${PAGE_DATE_STATUS01}' statusValid,-->
+<!--            null busiCode,-->
+<!--            listagg(t8.CASH_TYPE, ',') within group ( order by t8.CASH_TYPE ) CASH_TYPE,-->
+<!--            &lt;!&ndash;  t8.PORTFOLIO_ID,-->
+<!--             t12.PORTFOLIO_NAME, &ndash;&gt;-->
+<!--            t8.SEC_ACCT_ID secManageAcctId,-->
+<!--            CASE WHEN fp.FINPROD_NAME IS NOT NULL THEN 1 ELSE 0 end channel,-->
+<!--            &lt;!&ndash; 通道新增 qiangchengxi 2018-03-30 start &ndash;&gt;-->
+<!--            nvl(SAI.SEC_ACCT_NAME, fp.FINPROD_NAME) secAcctName,-->
+<!--            &lt;!&ndash; 通道新增 qiangchengxi 2018-03-30 end &ndash;&gt;-->
+<!--            t10.FINPROD_MARKET_ID,-->
+<!--            t10.FINPROD_ABBR finprodAbbr,-->
+<!--            to_char(min(t8.VDATE), 'yyyy-MM-dd') vDate,-->
+<!--            to_char(t8.MDATE, 'yyyy-MM-dd') mDate,-->
+<!--            null tradeDate,-->
+<!--            t8.qty*100 qty,-->
+<!--            to_char(t8.PAY_DATE, 'yyyy-MM-dd') PAY_DATE,-->
+<!--            ROUND(SUM(t8.fpriceAmt), 2) fpriceAmt,-->
+<!--            null TRADE_AMT,-->
+<!--            &lt;!&ndash; 多级法人改造 add by caiqun 20200615 &ndash;&gt;-->
+<!--            SI.INSTITUTION_NAME institutionName, /*所属机构*/-->
+<!--            <if test="institutionCode != null and institutionCode != ''">-->
+<!--                #{institutionCode} institutionCode,-->
+<!--            </if>-->
+<!--            <if test="institutionCode == null || institutionCode == ''">-->
+<!--                '' institutionCode,-->
+<!--            </if>-->
+<!--            &lt;!&ndash; 多级法人改造 add by caiqun 20200615 &ndash;&gt;-->
+<!--            null PA_BUSS_TYPE,-->
+<!--            T8.FINPROD_ID,-->
+<!--            NULL WORKFLOW_ID-->
+<!--            from (-->
+<!--            select T6.FINPROD_ID,-->
+<!--            SUM(T6.AMOUNT) QTY,/*考虑投资目的数量合并*/-->
+<!--            T6.CASH_TYPE,-->
+<!--            T6.CASH_ID,-->
+<!--            T6.VDATE,-->
+<!--            T6.MDATE,-->
+<!--            SUM(T6.CASH_AMT * T6.AMOUNT) fpriceAmt,/*理论本息总额*/-->
+<!--            case t6.CASH_TYPE-->
+<!--            when '${CASH_CLASS_TYPE01}' then 0-->
+<!--            else ROUND(SUM(T6.PRIN_AMT * T6.AMOUNT), 2) end prinAmt,/*还本金额*/-->
+<!--            T6.SEC_ACCT_ID,-->
+<!--            ROUND(SUM(t6.INT_AMT * T6.AMOUNT), 2) intAmt,/*理论利息*/-->
+<!--            t6.PAY_DATE-->
+<!--            from (-->
+<!--            select * from (-->
+<!--            SELECT-->
+<!--            T1.FINPROD_ID,-->
+<!--            DECODE(T1.HODING_TYPE, '06', T1.AMOUNT*-1, '11', T1.AMOUNT*-1, T1.AMOUNT) AMOUNT,-->
+<!--            T1.SEC_ACCT_ID,-->
+<!--            t2.vdate,-->
+<!--            t2.mdate,-->
+<!--            t2.cash_amt,-->
+<!--            t2.prin_amt,-->
+<!--            t2.int_amt,-->
+<!--            t2.cash_id,-->
+<!--            t2.cash_type,-->
+<!--            t2.pay_date-->
+<!--&lt;!&ndash;            ,rank() over(partition BY t1.finprod_id ORDER BY t2.mdate) rank&ndash;&gt;-->
+<!--            FROM PTL_SEC_POSITION T1 INNER JOIN FIN_CASH_PLAN T2 ON T1.FINPROD_ID = T2.FINPROD_ID-->
+<!--            AND T2.FINPROD_TYPE2 = #{FINPROD_TYPE_TGF01} AND t1.CDATE &lt; t2.MDATE-->
+<!--            LEFT JOIN PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = T1.PORTFOLIO_ID-->
+<!--            LEFT JOIN FIN_PRODUCT fp ON fp.FINPROD_ID = T1.FINPROD_ID-->
+<!--            &lt;!&ndash; 多级法人改造 add by caiqun 20200615 &ndash;&gt;-->
+<!--            <if test="institutionCode != null and institutionCode != ''">-->
+<!--                INNER JOIN DATA_AUTH_NOTIFY_INST dani-->
+<!--                on dani.BUSINESS_ID = T1.PORTFOLIO_ID-->
+<!--                AND dani.DATA_TYPE ='PTL01'-->
+<!--                AND dani.model_type ='02'-->
+<!--                AND dani.INSTITUTION_CODE=#{institutionCode}-->
+<!--            </if>-->
+<!--            &lt;!&ndash; 多级法人改造 add by caiqun 20200615 &ndash;&gt;-->
+<!--            <where>-->
+<!--                T1.AMOUNT > 0 AND T1.HODING_TYPE IN ('03', '05', '06', '11')-->
+<!--                and nvl(pp.PARENT_PORTFOLIO_ID, 'null') = 'null'-->
+<!--                &lt;!&ndash;GLCP-227:过滤银行间数据 modify by fuyongsheng 20220714 start&ndash;&gt;-->
+<!--                AND (fp.TRADE_MARKET IS NULL OR fp.TRADE_MARKET != #{TRADE_MARKET_01})-->
+<!--                &lt;!&ndash;GLCP-227:过滤银行间数据 modify by fuyongsheng 20220714 end&ndash;&gt;-->
+<!--                <if test="cashTypeSb != null and !cashTypeSb.isEmpty()">-->
+<!--                    AND (instr(#{cashTypeSb}, T2.CASH_TYPE) > 0)-->
+<!--                </if>-->
+<!--                <if test="finprodId != null and !finprodId.isEmpty()">-->
+<!--                    AND t1.finprod_id=#{finprodId}-->
+<!--                </if>-->
+<!--                <if test="cashTypeSb == null or cashTypeSb.isEmpty()">-->
+<!--                    and T2.CASH_TYPE IN-->
+<!--                    (#{CASH_CLASS_TYPE01},#{CASH_CLASS_TYPE02},#{CASH_CLASS_TYPE03},#{CASH_CLASS_TYPE04})-->
+<!--                </if>-->
+<!--                and (t2.INT_AMT > 0 or t2.PRIN_AMT > 0)-->
+<!--                and t2.mdate = (select min(tt.mdate) from FIN_CASH_PLAN tt where tt.finprod_id =t1.finprod_id-->
+<!--                    and Tt.FINPROD_TYPE2 = 'F01'-->
+<!--                    AND tt.MDATE > t1.CDATE-->
+<!--                    AND Tt.PAY_DATE >= #{PLATEFORM_DATE}-->
+<!--                    and Tt.CASH_TYPE IN ('01', '02', '03', '04')-->
+<!--                    and (tt.INT_AMT > 0 or t2.PRIN_AMT > 0)-->
+<!--                )-->
+<!--                &lt;!&ndash; and t2.MDATE &lt;=#{PLATEFORM_DATE} &ndash;&gt;-->
+<!--                /*不存在生效的交易*/-->
+<!--                and NOT EXISTS (SELECT 1 FROM TRD_FIN_PRODUCT_DEAL_TOTAL TPDA-->
+<!--                LEFT JOIN TRD_DEAL_TOTAL_ADD TDTA ON TPDA.TOTLE_TRADE_ID = TDTA.TOTLE_TRADE_ID-->
+<!--                where TDTA.MP_FINPROD_ID IS NULL-->
+<!--                AND TPDA.TRADE_STATUS = #{TRADE_STATUS01}-->
+<!--                AND TPDA.BUSI_TYPE = #{TRD10}-->
+<!--                AND TPDA.IS_CANCEL = #{YESNO_N} and T2.MDATE = TPDA.MDATE-->
+<!--                AND TPDA.FINPROD_ID = T1.FINPROD_ID-->
+<!--                AND T1.PORTFOLIO_ID =TPDA.PORTFOLIO_ID-->
+<!--                &lt;!&ndash; 多级法人改造 add by caiqun 20200615 &ndash;&gt;-->
+<!--                <if test="institutionCode != null and institutionCode != ''">-->
+<!--                    AND TPDA.INSTITUTION_CODE = #{institutionCode}-->
+<!--                </if>-->
+<!--                &lt;!&ndash; 多级法人改造 add by caiqun 20200615 &ndash;&gt;-->
+<!--                AND (TPDA.SEC_MANAGE_ACCT_ID = T1.SEC_ACCT_ID OR TPDA.CHL_ID = T1.SEC_ACCT_ID))-->
+<!--                /*不存在流程中的当期或之前的交易*/-->
+<!--                AND NOT EXISTS (SELECT 1 FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL TPDA-->
+<!--                LEFT JOIN WFL_TRD_DEAL_TOTAL_ADD TDTA ON TPDA.TOTLE_TRADE_ID = TDTA.TOTLE_TRADE_ID-->
+<!--                where TDTA.MP_FINPROD_ID IS NULL-->
+<!--                AND TPDA.TRADE_STATUS = #{TRADE_STATUS01}-->
+<!--                AND TPDA.BUSI_TYPE = #{TRD10}-->
+<!--                AND TPDA.IS_CANCEL = #{YESNO_N} and T2.MDATE >= TPDA.MDATE-->
+<!--                AND TPDA.FINPROD_ID = T1.FINPROD_ID-->
+<!--                AND T1.PORTFOLIO_ID =TPDA.PORTFOLIO_ID-->
+<!--                AND (TPDA.SEC_MANAGE_ACCT_ID = T1.SEC_ACCT_ID OR TPDA.CHL_ID = T1.SEC_ACCT_ID))-->
+<!--                &lt;!&ndash;小于计息截止日的最大持仓 丁志鹏 2019/08/28 start&ndash;&gt;-->
+<!--                &lt;!&ndash;不存在更大的持仓&ndash;&gt;-->
+<!--                AND NOT EXISTS (-->
+<!--                SELECT 1 FROM PTL_SEC_POSITION tpsp-->
+<!--                where tpsp.HODING_TYPE = T1.HODING_TYPE-->
+<!--                and tpsp.PORTFOLIO_ID = T1.PORTFOLIO_ID-->
+<!--                and tpsp.SEC_ACCT_ID = T1.SEC_ACCT_ID-->
+<!--                and tpsp.FINPROD_ID = T1.FINPROD_ID-->
+<!--                and tpsp.CDATE > T1.CDATE-->
+<!--                and tpsp.CDATE &lt; t2.MDATE-->
+<!--                )-->
+<!--                and T2.PAY_DATE >= #{PLATEFORM_DATE}-->
+<!--                &lt;!&ndash;小于计息截止日的最大持仓 丁志鹏 2019/08/28 end&ndash;&gt;-->
+<!--                <if test="chlIdList != null and chlIdList.size() > 0">-->
+<!--                    AND (T1.SEC_ACCT_ID IN-->
+<!--                    <foreach collection="chlIdList" item="item" index="index" open="("-->
+<!--                             close=")" separator=",">-->
+<!--                        <if test="(index % 998) == 0">-->
+<!--                            null) OR T1.SEC_ACCT_ID in (-->
+<!--                        </if>-->
+<!--                        #{item}-->
+<!--                    </foreach>-->
+<!--                    )-->
+<!--                </if>-->
+<!--                and T1.PORTFOLIO_ID-->
+<!--                <include refid="portfolioAth"/>-->
+<!--                <if test="portfolioId != null and !portfolioId.isEmpty()">-->
+<!--                    <foreach collection="portfolioId" index="index" open=" AND (T1.PORTFOLIO_ID IN (" item="item"-->
+<!--                             close=")" separator=",">-->
+<!--                        <if test="(index % 998) == 0">-->
+<!--                            null) OR T1.PORTFOLIO_ID IN (-->
+<!--                        </if>-->
+<!--                        #{item}-->
+<!--                    </foreach>-->
+<!--                    )-->
+<!--                </if>-->
+<!--                <if test="secManageAcctId != null and !secManageAcctId.isEmpty()">-->
+<!--                    AND T1.SEC_ACCT_ID = #{secManageAcctId}-->
+<!--                </if>-->
+<!--            </where>-->
+<!--            )-->
+<!--&lt;!&ndash;            where rank = 1&ndash;&gt;-->
+<!--            ) T6-->
+<!--            <where>-->
+<!--                <if test="mdateStart != null and !mdateStart.isEmpty()">-->
+<!--                    AND T6.MDATE >= to_date(#{mdateStart}, 'yyyy-MM-dd')-->
+<!--                </if>-->
+<!--                <if test="mdateEnd != null and !mdateEnd.isEmpty()">-->
+<!--                    AND T6.MDATE &lt;= to_date(#{mdateEnd}, 'yyyy-MM-dd')-->
+<!--                </if>-->
+<!--            </where>-->
+<!--            GROUP BY-->
+<!--            T6.FINPROD_ID,-->
+<!--            T6.CASH_TYPE,-->
+<!--            T6.CASH_ID,-->
+<!--            T6.VDATE,-->
+<!--            T6.MDATE,-->
+<!--            T6.CASH_AMT,-->
+<!--            T6.PRIN_AMT,/*还本金额*/-->
+<!--            T6.SEC_ACCT_ID,-->
+<!--            t6.INT_AMT,-->
+<!--            t6.PAY_DATE-->
+<!--            ) T8-->
+<!--            LEFT JOIN FIN_PRODUCT T10 ON T10.FINPROD_ID = T8.FINPROD_ID-->
+<!--            &lt;!&ndash; 通道新增 qiangchengxi 2018-03-30 start &ndash;&gt;-->
+<!--            LEFT JOIN STL_SEC_ACCT_INFO SAI ON T8.SEC_ACCT_ID = SAI.SEC_ACCT_ID-->
+<!--            LEFT JOIN FIN_PRODUCT FP ON T8.SEC_ACCT_ID = FP.FINPROD_ID-->
+<!--            &lt;!&ndash; 通道新增 qiangchengxi 2018-03-30 end &ndash;&gt;-->
+<!--            &lt;!&ndash; 多级法人改造 add by caiqun 20200615 &ndash;&gt;-->
+<!--            <if test="institutionCode != null and institutionCode != ''">-->
+<!--                LEFT JOIN SYS_INSTITUTION SI ON SI.INSTITUTION_CODE = #{institutionCode}-->
+<!--            </if>-->
+<!--            <if test="institutionCode == null || institutionCode == ''">-->
+<!--                LEFT JOIN SYS_INSTITUTION SI ON SI.INSTITUTION_CODE = ''-->
+<!--            </if>-->
+<!--            &lt;!&ndash; 多级法人改造 add by caiqun 20200615 &ndash;&gt;-->
+<!--            where-->
+<!--            t8.PAY_DATE &gt;= #{PLATEFORM_DATE}-->
+<!--            GROUP BY-->
+<!--            t8.SEC_ACCT_ID,SAI.SEC_ACCT_NAME, fp.FINPROD_NAME,-->
+<!--            t10.FINPROD_MARKET_ID,-->
+<!--            t10.FINPROD_ABBR,-->
+<!--            t8.MDATE,-->
+<!--            t8.qty,-->
+<!--            t8.PAY_DATE,T8.FINPROD_ID,SI.INSTITUTION_NAME-->
+<!--            ORDER BY T8.MDATE-->
+<!--            )-->
+<!--            <where>-->
+<!--                <if test="cashType != null and !cashType.isEmpty() and CASH_CLASS_TYPE01 == cashType">-->
+<!--                    AND CASH_TYPE = #{cashType}-->
+<!--                </if>-->
+<!--                <if test="cashType != null and !cashType.isEmpty() and CASH_CLASS_TYPE01 != cashType">-->
+<!--                    AND (instr(CASH_TYPE, #{cashType}) > 0)-->
+<!--                </if>-->
+<!--                <if test="tradeDateStart != null and !tradeDateStart.isEmpty()">-->
+<!--                    AND tradeDate >= to_date(#{tradeDateStart}, 'yyyy-MM-dd')-->
+<!--                </if>-->
+<!--                <if test="tradeDateEnd != null and !tradeDateEnd.isEmpty()">-->
+<!--                    AND tradeDate &lt;= to_date(#{tradeDateEnd}, 'yyyy-MM-dd')-->
+<!--                </if>-->
+<!--            </where>-->
+<!--        </if>-->
 
         <if test="statusValid == null or statusValid.isEmpty() or statusValid.contains(PAGE_DATE_STATUS05)">
-            <if test="(statusValid == null or statusValid.isEmpty() or statusValid.contains(PAGE_DATE_STATUS03))
-                or ((busiCode == null or busiCode.isEmpty()) and (statusValid == null or statusValid.isEmpty() or statusValid.contains(PAGE_DATE_STATUS01)))">
-                UNION ALL
-            </if>
             /*有效数据*/
             SELECT * FROM (
             SELECT
