@@ -1044,7 +1044,7 @@ public class PtlFundAllocationService extends BaseService<PtlFundAllocationDto> 
 
             //查询新表可用现金
             PtlCashPositionFlowDto dtoNew = new PtlCashPositionFlowDto();
-//            dtoNew.setHodingType(DictCodeListExt3.资产类型_汇总可用现金.getValue());
+            dtoNew.setHodingType(DictCodeListExt3.资产类型_汇总可用现金.getValue());
             dtoNew.setCdate(ptlCashPositionFlowDto.getCdate());
             dtoNew.setPortfolioId(ptlCashPositionFlowDto.getPortfolioId());
             dtoNew.setCcy(ptlCashPositionFlowDto.getCcy());
