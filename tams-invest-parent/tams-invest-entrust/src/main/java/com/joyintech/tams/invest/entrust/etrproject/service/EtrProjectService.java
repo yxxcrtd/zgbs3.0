@@ -485,7 +485,9 @@ public class EtrProjectService extends CommonExportService<EtrProjectDto> implem
             //委托金额
             dto.setEntrustAmt(BigDecimal.valueOf(Double.valueOf(data.get(6).toString().trim())));
             //本金金额
-            dto.setPrinAmt(BigDecimal.valueOf(Double.valueOf(data.get(7).toString())));
+            if (StringUtil.isNotBlank(data.get(7).toString())) {
+                dto.setPrinAmt(BigDecimal.valueOf(Double.valueOf(data.get(7).toString())));
+            }
             //投资目的
             dto.setInvAim(data.get(8).toString().trim().split(":")[0]);
             //交易对手
@@ -502,7 +504,9 @@ public class EtrProjectService extends CommonExportService<EtrProjectDto> implem
             String ss = data.get(10).toString().trim();
             dto.setSettleSpeed(ss.split(":")[1]);
             //净投资收益率
-            dto.setInvestRate(BigDecimal.valueOf(Double.valueOf(data.get(11).toString())));
+            if (StringUtil.isNotBlank(data.get(11).toString())) {
+                dto.setInvestRate(BigDecimal.valueOf(Double.valueOf(data.get(11).toString())));
+            }
             //备注
             dto.setRemark(data.get(12).toString());
             //根据资产代码获取联动信息
@@ -647,7 +651,9 @@ public class EtrProjectService extends CommonExportService<EtrProjectDto> implem
                     confirmMsg= checkIsDouble(confirmMsg,lineNo,rowData.get(6).toString(),"EtrProject002.entrustAmt");
                     // TISHKS-1625 CLONE - 【UAT】项目类指令：导入模板中交易对手和本金金额和净投资收益率字段改成非必填
                     //本金金额
-                    //confirmMsg = checkIsDouble(confirmMsg, lineNo, rowData.get(7).toString(), "EtrProject003.prinAmt");
+                    if (StringUtil.isNotBlank(rowData.get(7))) {
+                        confirmMsg = checkIsDouble(confirmMsg, lineNo, rowData.get(7).toString(), "EtrProject003.prinAmt");
+                    }
                     //投资目的
                     message = etrCommonService.checkIsBlank(rowData.get(8).toString(), "EtrInvestBondInfo002.invAim", lineNo);
                     confirmMsg = etrCommonService.StringAddByBr(confirmMsg, message);
@@ -690,7 +696,9 @@ public class EtrProjectService extends CommonExportService<EtrProjectDto> implem
                     message = etrCommonService.checkIsBlank(rowData.get(10).toString(), "EtrProject003.settleSpeed", lineNo);
                     confirmMsg = etrCommonService.StringAddByBr(confirmMsg, message);
                     //净投资收益率
-                    //confirmMsg = checkIsDouble(confirmMsg, lineNo, rowData.get(11).toString(), "EtrProject003.investRate");
+                    if (StringUtil.isNotBlank(rowData.get(11))) {
+                        confirmMsg = checkIsDouble(confirmMsg, lineNo, rowData.get(11).toString(), "EtrProject003.investRate");
+                    }
                 }
                 if (StringUtil.isBlank(confirmMsg)) {
                     jsonArrays.add(rowData);
