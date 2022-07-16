@@ -58,8 +58,8 @@
         on reg.totle_trade_id=regAdd.totle_trade_id
         inner join
         (
-            select regdeal.totle_trade_id,wm_concat(regdeal.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName,
-            wm_concat(regdeal.sec_manage_acct_id) sec_manage_acct_id,wm_concat(stlinfo.SEC_ACCT_NAME) SEC_ACCT_NAME,
+            select regdeal.totle_trade_id,to_char(wm_concat(regdeal.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName,
+            to_char(wm_concat(regdeal.sec_manage_acct_id)) sec_manage_acct_id,to_char(wm_concat(stlinfo.SEC_ACCT_NAME)) SEC_ACCT_NAME,
             nvl(sum(bb.PTL_BOND_ZHCC),0)/10000 as accountPosition
             from reg_fin_product_deal regdeal
             inner join ptl_portfolio pp
@@ -154,8 +154,8 @@
         on reg.totle_trade_id=regAdd.totle_trade_id
         inner join
         (
-        select regdeal.totle_trade_id,wm_concat(regdeal.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName,
-        wm_concat(regdeal.sec_manage_acct_id) sec_manage_acct_id,wm_concat(stlinfo.SEC_ACCT_NAME) SEC_ACCT_NAME,
+        select regdeal.totle_trade_id,to_char(wm_concat(regdeal.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName,
+        to_char(wm_concat(regdeal.sec_manage_acct_id)) sec_manage_acct_id,to_char(wm_concat(stlinfo.SEC_ACCT_NAME)) SEC_ACCT_NAME,
         nvl(sum(bb.PTL_BOND_ZHCC),0)/10000 as accountPosition
         from wfl_reg_fin_product_deal regdeal
         inner join ptl_portfolio pp

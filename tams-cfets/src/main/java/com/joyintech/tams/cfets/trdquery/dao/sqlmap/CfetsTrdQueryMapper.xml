@@ -100,7 +100,7 @@
         left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = fp.FINPROD_ID
         inner join
         (
-            select regdeal.totle_trade_id,wm_concat(regdeal.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName,
+            select regdeal.totle_trade_id,to_char(wm_concat(regdeal.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName,
             sum(regdeal.face_value)/10000 as faceValue, sum(regdeal.trade_amt) as tradeAmt
             from reg_fin_product_deal regdeal
             inner join ptl_portfolio pp
@@ -266,13 +266,13 @@
              WHEN  BO.IS_CANCEL = 'Y'AND BO.TRADE_STATUS = '01'  THEN '03'end AS regStatus,
             ''   calMode
         FROM BID_ORDER BO
-        LEFT JOIN (SELECT BRBP.BID_ID,wm_concat(NVL(BRBP.SEC_ACCT_ID,EED.SEC_ACCT_ID)) SEC_ACCT_ID,
-                                  wm_concat(NVL(STLINFO.SEC_ACCT_NAME,STLINFO1.SEC_ACCT_NAME)) SEC_ACCT_NAME,
-                                  wm_concat(BRBP.PORTFOLIO_ID) PORTFOLIO_ID,
-                                  wm_concat(PP.PORTFOLIO_NAME) PORTFOLIO_NAME,
-                                  wm_concat(decode(fpi.TENDER_TARGET,#{TENDER_TARGET_01},TO_CHAR(ROUND(BRBP.BID_PRICE*100,4),'FM999999990.9990')
+        LEFT JOIN (SELECT BRBP.BID_ID,to_char(wm_concat(NVL(BRBP.SEC_ACCT_ID,EED.SEC_ACCT_ID))) SEC_ACCT_ID,
+                                  to_char(wm_concat(NVL(STLINFO.SEC_ACCT_NAME,STLINFO1.SEC_ACCT_NAME))) SEC_ACCT_NAME,
+                                  to_char(wm_concat(BRBP.PORTFOLIO_ID)) PORTFOLIO_ID,
+                                  to_char(wm_concat(PP.PORTFOLIO_NAME)) PORTFOLIO_NAME,
+                                  to_char(wm_concat(decode(fpi.TENDER_TARGET,#{TENDER_TARGET_01},TO_CHAR(ROUND(BRBP.BID_PRICE*100,4),'FM999999990.9990')
                                                                     ,#{TENDER_TARGET_02},TO_CHAR(ROUND(BRBP.BID_PRICE,4),'FM999999990.9990')
-                                                                    ,#{TENDER_TARGET_03},TO_CHAR(ROUND(BRBP.BID_PRICE*10000,4),'FM999999990.90'))) BID_PRICE
+                                                                    ,#{TENDER_TARGET_03},TO_CHAR(ROUND(BRBP.BID_PRICE*10000,4),'FM999999990.90')))) BID_PRICE
                    FROM BID_ORDER_BID_PRICE BRBP
                    LEFT JOIN PTL_PORTFOLIO PP
                           ON PP.PORTFOLIO_ID = BRBP.PORTFOLIO_ID
@@ -430,13 +430,13 @@
              ''   calMode
         FROM
             WFL_BID_ORDER WBO
-        LEFT JOIN (SELECT WBRBP.BID_ID,wm_concat(NVL(WBRBP.SEC_ACCT_ID,EED.SEC_ACCT_ID)) SEC_ACCT_ID,
-                    wm_concat(NVL(STLINFO.SEC_ACCT_NAME,STLINFO1.SEC_ACCT_NAME)) SEC_ACCT_NAME,
-                    wm_concat(WBRBP.PORTFOLIO_ID) PORTFOLIO_ID,
-                    wm_concat(PP.PORTFOLIO_NAME) PORTFOLIO_NAME,
-                    wm_concat(decode(fpi.TENDER_TARGET,#{TENDER_TARGET_01},TO_CHAR(ROUND(WBRBP.BID_PRICE*100,4),'FM999999990.9990')
+        LEFT JOIN (SELECT WBRBP.BID_ID,to_char(wm_concat(NVL(WBRBP.SEC_ACCT_ID,EED.SEC_ACCT_ID))) SEC_ACCT_ID,
+                    to_char(wm_concat(NVL(STLINFO.SEC_ACCT_NAME,STLINFO1.SEC_ACCT_NAME))) SEC_ACCT_NAME,
+                    to_char(wm_concat(WBRBP.PORTFOLIO_ID)) PORTFOLIO_ID,
+                    to_char(wm_concat(PP.PORTFOLIO_NAME)) PORTFOLIO_NAME,
+                    to_char(wm_concat(decode(fpi.TENDER_TARGET,#{TENDER_TARGET_01},TO_CHAR(ROUND(WBRBP.BID_PRICE*100,4),'FM999999990.9990')
                             ,#{TENDER_TARGET_02},TO_CHAR(ROUND(WBRBP.BID_PRICE,4),'FM999999990.9990')
-                            ,#{TENDER_TARGET_03},TO_CHAR(ROUND(WBRBP.BID_PRICE*10000,4),'FM999999990.90'))) BID_PRICE
+                            ,#{TENDER_TARGET_03},TO_CHAR(ROUND(WBRBP.BID_PRICE*10000,4),'FM999999990.90')))) BID_PRICE
                 FROM WFL_BID_ORDER_BID_PRICE WBRBP
                 LEFT JOIN PTL_PORTFOLIO PP
                 ON PP.PORTFOLIO_ID = WBRBP.PORTFOLIO_ID
@@ -576,7 +576,7 @@
         left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID=fp.FINPROD_ID
         inner join
         (
-        select regdeal.totle_trade_id,wm_concat(regdeal.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName,
+        select regdeal.totle_trade_id,to_char(wm_concat(regdeal.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName,
         sum(regdeal.face_value)/10000 as faceValue, sum(regdeal.trade_amt) as tradeAmt
         from wfl_reg_fin_product_deal regdeal
         inner join ptl_portfolio pp
@@ -1208,8 +1208,8 @@
 
 
         union all
-            select ibd.quote_id,wm_concat(ibd.cp_party_id) as cp_party_id,wm_concat(mccic.PARTY_ABBR) as PARTY_ABBR,
-            wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader)) cp_trader,
+            select ibd.quote_id,to_char(wm_concat(ibd.cp_party_id)) as cp_party_id,to_char(wm_concat(mccic.PARTY_ABBR)) as PARTY_ABBR,
+            to_char(wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader))) cp_trader,
             ibd.execid,null as tradeYield,null as calMode
             from ibu_quote_bond_det ibd
             inner join ibu_quote_bond t1
@@ -1234,8 +1234,8 @@
         )ibd
         on ib.quote_id=ibd.quote_id
         inner  join(
-        select ir.quote_id,wm_concat(ir.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName,
-        wm_concat(distinct ir.entrust_id) as entrustId
+        select ir.quote_id,to_char(wm_concat(ir.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName,
+        to_char(wm_concat(distinct ir.entrust_id)) as entrustId
         from ibu_quote_etr_re ir
         left join ptl_portfolio pp
         on ir.portfolio_id=pp.portfolio_id
@@ -1347,8 +1347,8 @@
         null as calMode
         from ibu_quote_crep ic
         inner  join(
-        select ir.quote_id,wm_concat(ir.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName,
-        wm_concat(distinct ir.entrust_id) as entrustId
+        select ir.quote_id,to_char(wm_concat(ir.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName,
+        to_char(wm_concat(distinct ir.entrust_id)) as entrustId
         from ibu_quote_etr_re ir
         left join ptl_portfolio pp
         on ir.portfolio_id=pp.portfolio_id
@@ -1476,8 +1476,8 @@
             left join MST_CFETS_CUSTOMER_TRADER su on ibd.cp_trader=su.TRADER_ID
 
             union all
-            select ibd.quote_id,wm_concat(ibd.cp_party_id) as cp_party_id,wm_concat(mccic.PARTY_ABBR) as PARTY_ABBR,
-            wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader)) cp_trader,
+            select ibd.quote_id,to_char(wm_concat(ibd.cp_party_id)) as cp_party_id,to_char(wm_concat(mccic.PARTY_ABBR)) as PARTY_ABBR,
+            to_char(wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader))) cp_trader,
             ibd.execid,null as tradeYield,null as calMode
             from wfl_ibu_quote_bond_det ibd
             inner join wfl_ibu_quote_bond2 t1
@@ -1502,8 +1502,8 @@
         )ibd
         on ib.quote_id=ibd.quote_id
         inner  join(
-        select ir.quote_id,wm_concat(ir.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName,
-        wm_concat(distinct ir.entrust_id) as entrustId
+        select ir.quote_id,to_char(wm_concat(ir.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName,
+        to_char(wm_concat(distinct ir.entrust_id)) as entrustId
         from wfl_ibu_quote_etr_re ir
         left join ptl_portfolio pp
         on ir.portfolio_id=pp.portfolio_id
@@ -1624,8 +1624,8 @@
         null as calMode
         from wfl_ibu_quote_crep ic
         inner  join(
-        select ir.quote_id,wm_concat(ir.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName,
-        wm_concat(distinct ir.entrust_id) as entrustId
+        select ir.quote_id,to_char(wm_concat(ir.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName,
+        to_char(wm_concat(distinct ir.entrust_id)) as entrustId
         from wfl_ibu_quote_etr_re ir
         left join ptl_portfolio pp
         on ir.portfolio_id=pp.portfolio_id
@@ -1794,8 +1794,8 @@
 
             union all
 
-            select ibd.quote_id,wm_concat(ibd.cp_party_id) as cp_party_id,wm_concat(mccic.PARTY_ABBR) as PARTY_ABBR,
-            wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader)) cp_trader,
+            select ibd.quote_id,to_char(wm_concat(ibd.cp_party_id)) as cp_party_id,to_char(wm_concat(mccic.PARTY_ABBR)) as PARTY_ABBR,
+            to_char(wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader))) cp_trader,
             null as yield,
             null as unit_cprice,
             null as exer_yield,
@@ -1832,7 +1832,7 @@
         )ibd
         on ib.quote_id=ibd.quote_id
         left join(
-        select ir.quote_id,wm_concat(ir.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName,
+        select ir.quote_id,to_char(wm_concat(ir.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName,
         sum(ir.share_amt)/100 as faceValue
         from ibu_quote_etr_re ir
         left join ptl_portfolio pp
@@ -1901,8 +1901,8 @@
             left join MST_CFETS_CUSTOMER_TRADER su on ibd.cp_trader=su.TRADER_ID
             where   ibd.quote_id= #{quoteId,jdbcType=VARCHAR}
             union all
-            select ibd.quote_id,wm_concat(ibd.cp_party_id) as cp_party_id,wm_concat(mccic.PARTY_ABBR) as PARTY_ABBR,
-            wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader)) cp_trader,
+            select ibd.quote_id,to_char(wm_concat(ibd.cp_party_id)) as cp_party_id,to_char(wm_concat(mccic.PARTY_ABBR)) as PARTY_ABBR,
+            to_char(wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader))) cp_trader,
             null as yield,
             null as unit_cprice,
             null as exer_yield,
@@ -2108,8 +2108,8 @@
 
             union all
 
-            select ibd.quote_id,wm_concat(ibd.cp_party_id) as cp_party_id,wm_concat(mccic.PARTY_ABBR) as PARTY_ABBR,
-            wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader)) cp_trader,
+            select ibd.quote_id,to_char(wm_concat(ibd.cp_party_id)) as cp_party_id,to_char(wm_concat(mccic.PARTY_ABBR)) as PARTY_ABBR,
+            to_char(wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader))) cp_trader,
             null as yield,
             null as unit_cprice,
             null as exer_yield,
@@ -2202,8 +2202,8 @@
 
             union all
 
-            select ibd.quote_id,wm_concat(ibd.cp_party_id) as cp_party_id,wm_concat(mccic.PARTY_ABBR) as PARTY_ABBR,
-            wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader)) cp_trader,
+            select ibd.quote_id,to_char(wm_concat(ibd.cp_party_id)) as cp_party_id,to_char(wm_concat(mccic.PARTY_ABBR)) as PARTY_ABBR,
+            to_char(wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader))) cp_trader,
             null as yield,
             null as unit_cprice,
             null as exer_yield,

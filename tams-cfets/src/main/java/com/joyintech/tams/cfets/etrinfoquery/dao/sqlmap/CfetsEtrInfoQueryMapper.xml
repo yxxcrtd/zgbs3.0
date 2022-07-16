@@ -536,8 +536,8 @@
         WFL_ETR_ENTRUST.FINPROD_TYPE2 != 'F32' and btm.issueClass is null)
         LEFT JOIN (
             SELECT ENTRUST_ID,
-            wm_concat ( WFL_ETR_ENTRUST_DETAIL.PORTFOLIO_ID ) PORTFOLIO_ID,
-            wm_concat ( PORTFOLIO_NAME ) PORTFOLIO_NAME
+            to_char(wm_concat ( WFL_ETR_ENTRUST_DETAIL.PORTFOLIO_ID )) PORTFOLIO_ID,
+            to_char(wm_concat ( PORTFOLIO_NAME )) PORTFOLIO_NAME
             FROM WFL_ETR_ENTRUST_DETAIL
             LEFT JOIN
             (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)

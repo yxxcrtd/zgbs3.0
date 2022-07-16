@@ -165,11 +165,11 @@
         LEFT JOIN (
             SELECT
                 EED.ENTRUST_ID,
-                wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
-                wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
-                wm_concat (EED.SEC_ACCT_ID) AS SEC_ACCT_ID,
-                wm_concat (sci.ACCT_NO) AS ACCT_NO,
-                wm_concat (sci.ACCT_NAME) AS ACCT_NAME
+                to_char(wm_concat ( FP.PORTFOLIO_ID )) AS PORTFOLIO_ID ,
+                to_char(wm_concat ( FP.PORTFOLIO_NAME )) AS PORTFOLIO_NAME,
+                to_char(wm_concat (EED.SEC_ACCT_ID)) AS SEC_ACCT_ID,
+                to_char(wm_concat (sci.ACCT_NO)) AS ACCT_NO,
+                to_char(wm_concat (sci.ACCT_NAME)) AS ACCT_NAME
             FROM ETR_ENTRUST_DETAIL EED
             left join
             (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)
@@ -487,11 +487,11 @@
         LEFT JOIN (
             SELECT
                 EED.ENTRUST_ID,
-                wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
-                wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
-                wm_concat (EED.SEC_ACCT_ID) AS SEC_ACCT_ID,
-                wm_concat (sci.ACCT_NO) AS ACCT_NO,
-                wm_concat (sci.ACCT_NAME) AS ACCT_NAME
+                to_char(wm_concat ( FP.PORTFOLIO_ID )) AS PORTFOLIO_ID ,
+                to_char(wm_concat ( FP.PORTFOLIO_NAME )) AS PORTFOLIO_NAME,
+                to_char(wm_concat (EED.SEC_ACCT_ID)) AS SEC_ACCT_ID,
+                to_char(wm_concat (sci.ACCT_NO)) AS ACCT_NO,
+                to_char(wm_concat (sci.ACCT_NAME)) AS ACCT_NAME
             FROM WFL_ETR_ENTRUST_DETAIL EED
             left join
             (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)
@@ -1104,12 +1104,12 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
 		LEFT JOIN T_TRADE TT ON (TT.BROKER_TRADE_ID = STD.CJBH AND TT.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TT.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD') AND TT.TRADE_TYPE = '0')
 		LEFT JOIN T_TRADEHISTORY TTH ON (TTH.BROKER_TRADE_ID = STD.CJBH AND TTH.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TTH.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
 		LEFT JOIN FIN_PRODUCT FP ON STD.FINPROD_ID = FP.FINPROD_ID
-        LEFT JOIN ( SELECT te.TRADE_ID, wm_concat ( te.ENTRUST_ID )  ENTRUST_ID
+        LEFT JOIN ( SELECT te.TRADE_ID, to_char(wm_concat ( te.ENTRUST_ID ))  ENTRUST_ID
                       FROM (SELECT A.ENTRUST_ID, sttm.TRADE_ID from SETTLE_TRANS_TG_MAPPING sttm
                               LEFT JOIN TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt ON sttm.TRADE_ID_TG = tfpdt.TOTLE_TRADE_ID
                               LEFT JOIN TRD_DEAL_TOTAL_ADD A ON tfpdt.TOTLE_TRADE_ID = A.TOTLE_TRADE_ID
                             )te group by te.TRADE_ID  ) tdta on STD.TRADE_ID = tdta.TRADE_ID
-        LEFT JOIN ( SELECT te.TRADE_ID, wm_concat ( te.ENTRUST_ID )  ENTRUST_ID
+        LEFT JOIN ( SELECT te.TRADE_ID, to_char(wm_concat ( te.ENTRUST_ID ))  ENTRUST_ID
                       FROM ( SELECT sttm1.TRADE_ID, a.ENTRUST_ID FROM SETTLE_TRANS_TG_MAPPING sttm1
                              LEFT JOIN TRD_PRODUCT_DEAL tpd ON sttm1.TRADE_ID_TG = tpd.TRADE_ID
                              LEFT JOIN TRD_PRODUCT_DEAL_ADD a ON a.TRADE_ID = tpd.TRADE_ID
@@ -1256,11 +1256,11 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         LEFT JOIN (
         SELECT
         EED.ENTRUST_ID,
-        wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
-        wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME,
-        wm_concat (EED.SEC_ACCT_ID) AS SEC_ACCT_ID,
-        wm_concat (sci.ACCT_NO) AS ACCT_NO,
-        wm_concat (sci.ACCT_NAME) AS ACCT_NAME
+        to_char(wm_concat ( FP.PORTFOLIO_ID )) AS PORTFOLIO_ID ,
+        to_char(wm_concat ( FP.PORTFOLIO_NAME )) AS PORTFOLIO_NAME,
+        to_char(wm_concat (EED.SEC_ACCT_ID)) AS SEC_ACCT_ID,
+        to_char(wm_concat (sci.ACCT_NO)) AS ACCT_NO,
+        to_char(wm_concat (sci.ACCT_NAME)) AS ACCT_NAME
         FROM ETR_ENTRUST_DETAIL EED
         left join
         (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)

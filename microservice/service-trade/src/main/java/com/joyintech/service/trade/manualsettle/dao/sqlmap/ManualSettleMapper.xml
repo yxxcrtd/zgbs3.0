@@ -76,7 +76,7 @@
         LEFT JOIN (
             SELECT
                 ENTRUST_ID,
-                wm_concat ( PORTFOLIO_NAME ) PORTFOLIO_NAME
+                to_char(wm_concat ( PORTFOLIO_NAME )) PORTFOLIO_NAME
             FROM
                 ETR_ENTRUST_DETAIL
             LEFT JOIN
@@ -89,8 +89,8 @@
         left join (
         SELECT FDP.FINPROD_ID FINPROD_ID,
         SUM(FDP.PLEDGE_NUMBER) PLEDGE_NUMBER,
-        wm_concat(FP.FINPROD_ID) PLEDGE_FINPROD_ID,
-        wm_concat(FP.FINPROD_ABBR) PLEDGE_FINPROD_ABBR
+        to_char(wm_concat(FP.FINPROD_ID)) PLEDGE_FINPROD_ID,
+        to_char(wm_concat(FP.FINPROD_ABBR)) PLEDGE_FINPROD_ABBR
         FROM FIN_DEAL_PLEDGE FDP
         LEFT JOIN FIN_PRODUCT FP ON FDP.PLEDGE_FINPROD_ID = FP.FINPROD_ID
         WHERE FDP.BRANCH = 0
@@ -291,7 +291,7 @@
         LEFT JOIN (
         SELECT
         ENTRUST_ID,
-        wm_concat ( PORTFOLIO_NAME ) PORTFOLIO_NAME
+        to_char(wm_concat ( PORTFOLIO_NAME )) PORTFOLIO_NAME
         FROM
         ETR_ENTRUST_DETAIL
         LEFT JOIN

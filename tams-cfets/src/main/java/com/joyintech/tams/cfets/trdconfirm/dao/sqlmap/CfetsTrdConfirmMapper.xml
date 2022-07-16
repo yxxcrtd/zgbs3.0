@@ -1546,8 +1546,8 @@
                  left join SYS_DATADICT_LIST sdl on sdl.DICT_CODE = 'CUSTOM_ASSET_TYPE_TWO' and sdl.ITEM_CODE = fpt.TYPE_9
                  inner join(
                         select regdeal.totle_trade_id,
-                               wm_concat(regdeal.portfolio_id) as portfolioId,
-                               wm_concat(pp.portfolio_name)       portfolioName
+                               to_char(wm_concat(regdeal.portfolio_id)) as portfolioId,
+                               to_char(wm_concat(pp.portfolio_name))       portfolioName
                         from reg_fin_product_deal regdeal
                                  left join ptl_portfolio pp
                                            on regdeal.portfolio_id = pp.portfolio_id
@@ -1698,8 +1698,8 @@
         left join SYS_DATADICT_LIST sdl on sdl.DICT_CODE = 'CUSTOM_ASSET_TYPE_TWO' and sdl.ITEM_CODE = fpt.TYPE_9
          inner join(
                     select ir.quote_id,
-                           wm_concat(ir.portfolio_id) as portfolioId,
-                           wm_concat(pp.portfolio_name)  portfolioName,
+                           to_char(wm_concat(ir.portfolio_id)) as portfolioId,
+                           to_char(wm_concat(pp.portfolio_name))  portfolioName,
                            sum(ir.deal_fee_amt)       as trdFeeAmt,
                            sum(ir.sett_fee_amt)       as settleFeeAmt
                     from ibu_quote_etr_re ir
@@ -1833,8 +1833,8 @@
              left join SYS_DATADICT_LIST sdl on sdl.DICT_CODE = 'CUSTOM_ASSET_TYPE_TWO' and sdl.ITEM_CODE = fpt.TYPE_9
              inner join(select bobp.BID_ID,
                                eed.SEC_ACCT_ID,
-                               wm_concat(bobp.portfolio_id) as portfolioId,
-                               wm_concat(pp.portfolio_name)    portfolioName
+                               to_char(wm_concat(bobp.portfolio_id)) as portfolioId,
+                               to_char(wm_concat(pp.portfolio_name))    portfolioName
                         from BID_ORDER_BID_PRICE bobp
                                  left join ptl_portfolio pp on bobp.portfolio_id = pp.portfolio_id
                                  left join ETR_ENTRUST_DETAIL eed on eed.ENTRUST_ID = bobp.ENTRUST_ID and eed.PORTFOLIO_ID = bobp.PORTFOLIO_ID
@@ -1958,7 +1958,7 @@
         ) regfee
         on reg.totle_trade_id=regfee.trade_id
         left join(
-        select regdeal.totle_trade_id,wm_concat(regdeal.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName
+        select regdeal.totle_trade_id,to_char(wm_concat(regdeal.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName
         from reg_fin_product_deal regdeal
         left join ptl_portfolio pp
         on regdeal.portfolio_id=pp.portfolio_id
@@ -2014,7 +2014,7 @@
         and  ibd.trade_status='07'
         and ibd.quote_id=#{busiCode,jdbcType=VARCHAR}
         left join(
-        select ir.quote_id,wm_concat(ir.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName
+        select ir.quote_id,to_char(wm_concat(ir.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName
         from ibu_quote_etr_re ir
         left join ptl_portfolio pp
         on ir.portfolio_id=pp.portfolio_id
@@ -2080,8 +2080,8 @@
              LEFT JOIN SYS_DATADICT_LIST SDL on fpi.INT_RATE_ID = SDL.ITEM_CODE and DICT_CODE='SECRATE_DATA'
              left join (select bobp.BID_ID,
                                eed.SEC_ACCT_ID,
-                               wm_concat(bobp.portfolio_id) as portfolioId,
-                               wm_concat(pp.portfolio_name)    portfolioName
+                               to_char(wm_concat(bobp.portfolio_id)) as portfolioId,
+                               to_char(wm_concat(pp.portfolio_name))    portfolioName
                         from BID_ORDER_BID_PRICE bobp
                                  left join ETR_ENTRUST_DETAIL eed
                                            on eed.ENTRUST_ID = bobp.ENTRUST_ID and bobp.PORTFOLIO_ID = eed.PORTFOLIO_ID
@@ -2142,7 +2142,7 @@
         ) regfee
         on reg.totle_trade_id=regfee.trade_id
         left join(
-        select regdeal.totle_trade_id,wm_concat(regdeal.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName
+        select regdeal.totle_trade_id,to_char(wm_concat(regdeal.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName
         from reg_fin_product_deal regdeal
         left join ptl_portfolio pp
         on regdeal.portfolio_id=pp.portfolio_id
@@ -2188,7 +2188,7 @@
         ic.quote_id totleTradeId
         from  ibu_quote_crep ic
         left join(
-        select ir.quote_id,wm_concat(ir.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName
+        select ir.quote_id,to_char(wm_concat(ir.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName
         from ibu_quote_etr_re ir
         left join ptl_portfolio pp
         on ir.portfolio_id=pp.portfolio_id

@@ -219,7 +219,7 @@
 	<select id="selectAllDatafileAfterYesterday" resultType="com.joyintech.tams.svreport.pbc.classic.data.dto.PbcDatfileDetailRelation">    
     	SELECT
 		    t1.fileid,
-		    wm_concat(t2.detailid) detailid
+		    to_char(wm_concat(t2.detailid)) detailid
 		FROM
 		    pbc_datfile t1
 		    LEFT JOIN pbc_datfile_detail t2 ON t2.fileid=t1.fileid

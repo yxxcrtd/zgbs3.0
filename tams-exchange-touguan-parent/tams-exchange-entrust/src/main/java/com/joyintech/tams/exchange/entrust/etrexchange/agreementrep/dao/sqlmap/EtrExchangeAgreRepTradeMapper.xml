@@ -1074,7 +1074,7 @@
 
     <select id="selectCurrPledgeInfo" resultType="com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepCurrResp">
         SELECT
-        wm_concat(FP.FINPROD_MARKET_ID)  finprodMarketId,
+        to_char(wm_concat(FP.FINPROD_MARKET_ID))  finprodMarketId,
         SUM(B.PLEDGE_NUMBER)/100	 repSecNum,
         SUM(B.PLEDGE_NUMBER*PLEDGE_FACE_VALUE)  pledgeAmt,
         C.TYPE_7								repType,

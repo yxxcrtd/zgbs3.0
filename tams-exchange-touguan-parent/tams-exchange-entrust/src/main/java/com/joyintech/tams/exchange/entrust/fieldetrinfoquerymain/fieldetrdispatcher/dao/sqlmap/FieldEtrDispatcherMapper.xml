@@ -606,8 +606,8 @@
         LEFT JOIN PTL_PORTFOLIO pp ON ete.portfolio_id = pp.portfolio_id
         LEFT JOIN (
             SELECT EED.ENTRUST_ID,
-            wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
-            wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME
+            to_char(wm_concat ( FP.PORTFOLIO_ID )) AS PORTFOLIO_ID ,
+            to_char(wm_concat ( FP.PORTFOLIO_NAME )) AS PORTFOLIO_NAME
             FROM ETR_ENTRUST_DETAIL EED
         left join
         (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)
@@ -755,8 +755,8 @@
         LEFT JOIN PTL_PORTFOLIO pp ON ete.portfolio_id = pp.portfolio_id
         LEFT JOIN (
             SELECT EED.ENTRUST_ID,
-            wm_concat ( FP.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
-            wm_concat ( FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME
+            to_char(wm_concat ( FP.PORTFOLIO_ID )) AS PORTFOLIO_ID ,
+            to_char(wm_concat ( FP.PORTFOLIO_NAME )) AS PORTFOLIO_NAME
             FROM ETR_ENTRUST_DETAIL EED
         left join
         (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)
