@@ -502,15 +502,14 @@
 			select max(t.EFF_DATE) from fin_float_calc_rule_detail t where t.CASH_ID = fin_float_calc_rule_detail.CASH_ID
 			AND T.EFF_DATE &lt;= to_date(#{effDate},'yyyy-MM-dd')
 		)
-		<if test="periodProdId != null and periodProdId != ''">
-			and fin_cash_info.finprod_id = #{periodProdId}
-		</if>
 		<choose>
 			<when test="periodId != null and periodId != ''">
 				and FIN_TRADE_PRODUCT.PERIOD_ID = #{periodId}
 			</when>
 			<otherwise>
-				and fin_cash_info.BRANCH = 0
+				<if test="periodProdId != null and periodProdId != ''">
+					and fin_cash_info.finprod_id = #{periodProdId} and fin_cash_info.BRANCH = 0
+				</if>
 			</otherwise>
 		</choose>
 		and fin_cash_info.finprod_type = #{type01}

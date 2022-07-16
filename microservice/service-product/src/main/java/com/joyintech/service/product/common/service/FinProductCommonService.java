@@ -28,6 +28,7 @@ import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.apache.commons.codec.binary.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -2077,7 +2078,8 @@ public class FinProductCommonService extends BaseService {
 //			                    baseFinProductBaseInfoDto.getFinCashPlanList().add(finCashPlan);
 //
 //			                }
-            if (StringUtil.equals(DictCodeList.处理模式_周期型.getValue(), entity.getDealMode()) && StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), entity.getProfitType())) {
+            if (StringUtil.equals(DictCodeList.处理模式_周期型.getValue(), entity.getDealMode())
+                    && StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), entity.getProfitType())) {
                 // 费用
 //			                    if(entity.getBussFinProductFeeInfoDto() != null && !StringUtil.isEmptyList(entity.getBussFinProductFeeInfoDto().getBussFinProductFeeInfoDtoList())){
 //			                        List<BussFinProductFeeInfoDto> feeInfoList = entity.getBussFinProductFeeInfoDto().getBussFinProductFeeInfoDtoList();
@@ -2097,11 +2099,13 @@ public class FinProductCommonService extends BaseService {
                 //开放计划生成（需要在浮动管理费前生成）
                 this.procFinProductOpenPlan(entity, baseFinProductBaseInfoDto);
             }
+
             String resetType = null;
             // 业绩基准 本身只有净值型产品界面存在 目前只支持净值型分档产品
             if (StringUtil.equals(DictCodeList.处理模式_周期型.getValue(), entity.getDealMode()) &&
                     StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), entity.getProfitType())) {
-                BussBenchMarkInfoDto bussBenchMarkInfoDto = entity.getBussBenchMarkInfoDto();
+                BussBenchMarkInfoDto bussBenchMarkInfoDto = new BussBenchMarkInfoDto();
+                BeanUtils.copyProperties(entity.getBussBenchMarkInfoDto(), bussBenchMarkInfoDto);
                 if (bussBenchMarkInfoDto != null &&
                         (DictCodeListExt1.披露类型_区间披露.getValue().equals(bussBenchMarkInfoDto.getPublishType())
                                 || StringUtil.isNotEmpty(bussBenchMarkInfoDto.getRateType()))) {
@@ -2117,10 +2121,8 @@ public class FinProductCommonService extends BaseService {
                     } else {
                         bussBenchMarkInfoDto.setEffDate(DateUtil.platDateFromCache());
                     }
-                    if (StringUtil.equals(bussBenchMarkInfoDto.getRateType(),
-                            DictCodeList.利率类型_浮动利率.getValue())) {
-                        MstIndexInfo mstIndexInfo = mstIndexInfoMapper.selectByPrimaryKey(
-                                bussBenchMarkInfoDto.getIndexId());
+                    if (StringUtil.equals(bussBenchMarkInfoDto.getRateType(), DictCodeList.利率类型_浮动利率.getValue())) {
+                        MstIndexInfo mstIndexInfo = mstIndexInfoMapper.selectByPrimaryKey(bussBenchMarkInfoDto.getIndexId());
                         if (mstIndexInfo != null) {
                             bussBenchMarkInfoDto.setIndexSource(mstIndexInfo.getIndexType());
                         } else {
@@ -2128,8 +2130,7 @@ public class FinProductCommonService extends BaseService {
                         }
                     }
                     bussBenchMarkInfoDto.setFinprodId(finProduct.getFinprodId());
-                    bussBenchMarkInfoDto.setSpreadRate(
-                            ArithmeticUtil.divide(bussBenchMarkInfoDto.getSpreadRate(), 100, 14));
+                    bussBenchMarkInfoDto.setSpreadRate(ArithmeticUtil.divide(bussBenchMarkInfoDto.getSpreadRate(), 100, 14));
 
                     // 一体化对应etliu start
                     resetType = bussBenchMarkInfoDto.getResetType(); // 业绩基准重置规则
@@ -2148,16 +2149,21 @@ public class FinProductCommonService extends BaseService {
                 }
             }
 
+            // 刪除已存在数据
+            logger.info("刪除【finBaseRuleInfo】已存在数据：finprodId={},branch={}", finTradeProduct.getFinprodId(), finTradeProduct.getBranch());
+            benchMarketInfoMapper.deleteBaseRuleInfoByFinprodIdAndBranch(finTradeProduct.getFinprodId(), finTradeProduct.getBranch());
+
             //  重新生成 第一个期次的数据 branch 为 fintradeProduct的branch  上面的代码 如果 非区间披露 并且bussBenchMarkInfoDto.getRateType()为空
             //  则不生成  finBaseRuleInfo 则 第一个有效期次无法展示在期次管理页面
             if (StringUtil.equals(DictCodeList.处理模式_周期型.getValue(), entity.getDealMode()) &&
                     StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), entity.getProfitType()) && entity.getBussBenchMarkInfoDto() != null) {
                 // 刪除已存在数据
-                logger.info("刪除【BussBenchMarkInfoDto】已存在数据：finprodId={},branch={}", finTradeProduct.getFinprodId(), finTradeProduct.getBranch());
-                benchMarketInfoMapper.deleteBaseRuleInfoByFinprodIdAndBranch(finTradeProduct.getFinprodId(), finTradeProduct.getBranch());
+//                logger.info("刪除【BussBenchMarkInfoDto】已存在数据：finprodId={},branch={}", finTradeProduct.getFinprodId(), finTradeProduct.getBranch());
+                //benchMarketInfoMapper.deleteBaseRuleInfoByFinprodIdAndBranch(finTradeProduct.getFinprodId(), finTradeProduct.getBranch());
 
                 // 重新生成 第一个期次的数据 branch 为 fintradeProduct的branch
                 BussBenchMarkInfoDto bussBenchMarkInfoDto = new BussBenchMarkInfoDto();
+                BeanUtils.copyProperties(entity.getBussBenchMarkInfoDto(), bussBenchMarkInfoDto);
                 bussBenchMarkInfoDto.setBranch(finTradeProduct.getBranch());
                 bussBenchMarkInfoDto.setBaseRuleId(CommonUtil.generateCashFlowCode(finTradeProduct.getPeriodId(), null,
                         Long.valueOf(finTradeProduct.getBranch()), DictCodeListExt1.业绩基准类型_产品披露.getValue()));
@@ -2172,10 +2178,8 @@ public class FinProductCommonService extends BaseService {
                 } else {
                     bussBenchMarkInfoDto.setEffDate(DateUtil.platDateFromCache());
                 }
-                if (StringUtil.equals(bussBenchMarkInfoDto.getRateType(),
-                        DictCodeList.利率类型_浮动利率.getValue())) {
-                    MstIndexInfo mstIndexInfo = mstIndexInfoMapper.selectByPrimaryKey(
-                            bussBenchMarkInfoDto.getIndexId());
+                if (StringUtil.equals(bussBenchMarkInfoDto.getRateType(), DictCodeList.利率类型_浮动利率.getValue())) {
+                    MstIndexInfo mstIndexInfo = mstIndexInfoMapper.selectByPrimaryKey(bussBenchMarkInfoDto.getIndexId());
                     if (mstIndexInfo != null) {
                         bussBenchMarkInfoDto.setIndexSource(mstIndexInfo.getIndexType());
                     } else {
@@ -2183,8 +2187,7 @@ public class FinProductCommonService extends BaseService {
                     }
                 }
                 bussBenchMarkInfoDto.setFinprodId(finProduct.getFinprodId());
-                bussBenchMarkInfoDto.setSpreadRate(
-                        ArithmeticUtil.divide(bussBenchMarkInfoDto.getSpreadRate(), 100, 14));
+                bussBenchMarkInfoDto.setSpreadRate(ArithmeticUtil.divide(bussBenchMarkInfoDto.getSpreadRate(), 100, 14));
 
                 finBaseRuleInfoMapper.insert(bussBenchMarkInfoDto);
 
@@ -2193,10 +2196,11 @@ public class FinProductCommonService extends BaseService {
             FinProductFloatFeeDto finProductFloatFeeDto = entity.getBussFinProductFloatFeeDto();
             if (finProductFloatFeeDto != null && (StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), entity.getProfitType())
                     && StringUtil.equals(DictCodeList.处理模式_周期型.getValue(), entity.getDealMode()))) {
+                BussBenchMarkInfoDto bussBenchMarkInfoDtoTmp = entity.getBussBenchMarkFloatInfoDto();
+
                 //浮动管理费用处理
                 this.procFinProductFloatFeeInfoData(entity, baseFinProductBaseInfoDto, finProductFloatFeeDto, resetType, cashMap);
 
-                BussBenchMarkInfoDto bussBenchMarkInfoDtoTmp = entity.getBussBenchMarkFloatInfoDto();
                 FinBaseRuleInfo finBaseRuleInfo = new FinBaseRuleInfo();
                 //当净值行产品，并且浮动管理费的业绩基准不为空，并且浮动管理费finProductFloatFeeDto无业绩基准信息时，执行以下操作
                 if (bussBenchMarkInfoDtoTmp != null && StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), entity.getProfitType())
@@ -2205,6 +2209,7 @@ public class FinProductCommonService extends BaseService {
                     finBaseRuleInfo.setBaseRuleId(baseRuleId);
                     finBaseRuleInfo.setBaseRuleType(DictCodeListExt1.披露类型_单值披露.getValue());
                     finBaseRuleInfo.setBranch(entity.getBranch());
+                    finBaseRuleInfo.setIndexId(bussBenchMarkInfoDtoTmp.getIndexId());
                     finBaseRuleInfo.setRateType(bussBenchMarkInfoDtoTmp.getRateType());
                     finBaseRuleInfo.setRate(ArithmeticUtil.divide(bussBenchMarkInfoDtoTmp.getRate(), 100, 14));
                     finBaseRuleInfo.setCoefficient(bussBenchMarkInfoDtoTmp.getCoefficient());
@@ -2214,10 +2219,8 @@ public class FinProductCommonService extends BaseService {
                     } else {
                         finBaseRuleInfo.setEffDate(DateUtil.platDateFromCache());
                     }
-                    if (StringUtil.equals(finProductFloatFeeDto.getRateType(),
-                            DictCodeList.利率类型_浮动利率.getValue())) {
-                        MstIndexInfo mstIndexInfo = mstIndexInfoMapper.selectByPrimaryKey(
-                                bussBenchMarkInfoDtoTmp.getIndexId());
+                    if (StringUtil.equals(bussBenchMarkInfoDtoTmp.getRateType(), DictCodeList.利率类型_浮动利率.getValue())) {
+                        MstIndexInfo mstIndexInfo = mstIndexInfoMapper.selectByPrimaryKey(bussBenchMarkInfoDtoTmp.getIndexId());
                         if (mstIndexInfo != null) {
                             finBaseRuleInfo.setIndexSource(mstIndexInfo.getIndexType());
                         } else {
@@ -2225,14 +2228,21 @@ public class FinProductCommonService extends BaseService {
                         }
                     }
                     finBaseRuleInfo.setFinprodId(finProduct.getFinprodId());
-                    finBaseRuleInfo.setSpreadRate(
-                            ArithmeticUtil.divide(bussBenchMarkInfoDtoTmp.getSpreadRate(), 100, 14));
+                    finBaseRuleInfo.setSpreadRate(ArithmeticUtil.divide(bussBenchMarkInfoDtoTmp.getSpreadRate(), 100, 14));
 
                     // 一体化对应etliu start
                     resetType = finProductFloatFeeDto.getResetType(); // 业绩基准重置规则
                     // 一体化对应etliu end
 
                     finBaseRuleInfoMapper.insert(finBaseRuleInfo);
+
+                    finProductFloatFeeDto.setCoefficient(bussBenchMarkInfoDtoTmp.getCoefficient());
+                    finProductFloatFeeDto.setIndexId(bussBenchMarkInfoDtoTmp.getIndexId());
+                    finProductFloatFeeDto.setRateType(bussBenchMarkInfoDtoTmp.getRateType());
+                    finProductFloatFeeDto.setRate(bussBenchMarkInfoDtoTmp.getRate());
+                    finProductFloatFeeDto.setResetType(bussBenchMarkInfoDtoTmp.getResetType());
+                    finProductFloatFeeDto.setSpreadRate(bussBenchMarkInfoDtoTmp.getSpreadRate());
+                    finProductFloatFeeDto.setRemark(bussBenchMarkInfoDtoTmp.getRemark());
 
                     // 重新生成 第一个期次的数据 branch 为 fintradeProduct的branch
                     // 生成并直接入表 fincashinfo fin_cash_pay_rule fin_cash_calc_rule fin_float_calc_rule fin_float_calc_rule_detail finBaseRuleInfo
@@ -2466,7 +2476,8 @@ public class FinProductCommonService extends BaseService {
 //				                    baseFinProductBaseInfoDto.getFinCashPlanList().add(finCashPlan);
                 //
 //				                }
-                if (StringUtil.equals(DictCodeList.处理模式_周期型.getValue(), entity.getDealMode()) && StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), entity.getProfitType())) {
+                if (StringUtil.equals(DictCodeList.处理模式_周期型.getValue(), entity.getDealMode())
+                        && StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), entity.getProfitType())) {
                     // 费用
 //				                    if(entity.getBussFinProductFeeInfoDto() != null && !StringUtil.isEmptyList(entity.getBussFinProductFeeInfoDto().getBussFinProductFeeInfoDtoList())){
 //				                        List<BussFinProductFeeInfoDto> feeInfoList = entity.getBussFinProductFeeInfoDto().getBussFinProductFeeInfoDtoList();
@@ -2486,6 +2497,11 @@ public class FinProductCommonService extends BaseService {
                     //开放计划生成（需要在浮动管理费前生成）
                     this.procFinProductOpenPlan(entity, baseFinProductBaseInfoDto);
                 }
+
+                // 刪除已存在数据
+                logger.info("刪除【finBaseRuleInfo】已存在数据：finprodId={},branch={}", finTradeProduct.getFinprodId(), finTradeProduct.getBranch());
+                benchMarketInfoMapper.deleteBaseRuleInfoByFinprodIdAndBranch(finTradeProduct.getFinprodId(), finTradeProduct.getBranch());
+
                 String resetType = null;
                 // 业绩基准 本身只有净值型产品界面存在 目前只支持净值型分档产品
                 if (StringUtil.equals(DictCodeList.处理模式_周期型.getValue(), entity.getDealMode()) &&
@@ -2909,8 +2925,8 @@ public class FinProductCommonService extends BaseService {
             if (StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), finProductCommonInfoDto.getProfitType())
                     && StringUtil.isNotEmpty(finProductFloatFeeDto.getRateType())) {
                 // 刪除已存在数据
-                logger.info("刪除【finBaseRuleInfo】已存在数据：finprodId={},branch={}", finTradeProduct.getFinprodId(), finTradeProduct.getBranch());
-                benchMarketInfoMapper.deleteBaseRuleInfoByFinprodIdAndBranch(finTradeProduct.getFinprodId(), finTradeProduct.getBranch());
+                //logger.info("刪除【finBaseRuleInfo】已存在数据：finprodId={},branch={}", finTradeProduct.getFinprodId(), finTradeProduct.getBranch());
+                //benchMarketInfoMapper.deleteBaseRuleInfoByFinprodIdAndBranch(finTradeProduct.getFinprodId(), finTradeProduct.getBranch());
 
                 finBaseRuleInfo.setBaseRuleId(baseRuleId);
                 finBaseRuleInfo.setBaseRuleType(DictCodeListExt1.披露类型_单值披露.getValue());
@@ -2926,10 +2942,8 @@ public class FinProductCommonService extends BaseService {
                 } else {
                     finBaseRuleInfo.setEffDate(DateUtil.platDateFromCache());
                 }
-                if (StringUtil.equals(finProductFloatFeeDto.getRateType(),
-                        DictCodeList.利率类型_浮动利率.getValue())) {
-                    MstIndexInfo mstIndexInfo = mstIndexInfoMapper.selectByPrimaryKey(
-                            finProductFloatFeeDto.getIndexId());
+                if (StringUtil.equals(finProductFloatFeeDto.getRateType(), DictCodeList.利率类型_浮动利率.getValue())) {
+                    MstIndexInfo mstIndexInfo = mstIndexInfoMapper.selectByPrimaryKey(finProductFloatFeeDto.getIndexId());
                     if (mstIndexInfo != null) {
                         finBaseRuleInfo.setIndexSource(mstIndexInfo.getIndexType());
                     } else {
@@ -2951,6 +2965,7 @@ public class FinProductCommonService extends BaseService {
                 key.setCashId(cashId);
                 key.setEffDate(effDate);
                 finFloatCalcRuleDetailMapper.deleteByCashIdAndEffDate(key);
+
                 for (FinFloatCalcRuleDetail finFloatCalcRuleDetail : finFloatCalcRuleDetailList) {
                     BeanUtil.copyProperties(finFloatCalcRuleDetail, finProductCommonInfoDto);
                     finFloatCalcRuleDetail.setCashId(cashId);
@@ -3770,7 +3785,8 @@ public class FinProductCommonService extends BaseService {
 
             FinBaseRuleInfo finBaseRuleInfo = new FinBaseRuleInfo();
             String baseRuleId = CommonUtil.generateCashFlowCode(finProduct.getFinprodId(), null, finProductCommonInfoDto.getBranch(), DictCodeListExt1.业绩基准类型_浮动管理费.getValue());
-            if (StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), finProductCommonInfoDto.getProfitType()) && StringUtil.isNotEmpty(finProductFloatFeeDto.getRateType())) {
+            if (StringUtil.equals(DictCodeList.收益类型_净值型.getValue(), finProductCommonInfoDto.getProfitType())
+                    && StringUtil.isNotEmpty(finProductFloatFeeDto.getRateType())) {
                 finBaseRuleInfo.setBaseRuleId(baseRuleId);
                 finBaseRuleInfo.setBaseRuleType(DictCodeListExt1.披露类型_单值披露.getValue());
                 finBaseRuleInfo.setBranch(finProductCommonInfoDto.getBranch());
@@ -3785,10 +3801,8 @@ public class FinProductCommonService extends BaseService {
                 } else {
                     finBaseRuleInfo.setEffDate(DateUtil.platDateFromCache());
                 }
-                if (StringUtil.equals(finProductFloatFeeDto.getRateType(),
-                        DictCodeList.利率类型_浮动利率.getValue())) {
-                    MstIndexInfo mstIndexInfo = mstIndexInfoMapper.selectByPrimaryKey(
-                            finProductFloatFeeDto.getIndexId());
+                if (StringUtil.equals(finProductFloatFeeDto.getRateType(), DictCodeList.利率类型_浮动利率.getValue())) {
+                    MstIndexInfo mstIndexInfo = mstIndexInfoMapper.selectByPrimaryKey(finProductFloatFeeDto.getIndexId());
                     if (mstIndexInfo != null) {
                         finBaseRuleInfo.setIndexSource(mstIndexInfo.getIndexType());
                     } else {
@@ -3796,8 +3810,7 @@ public class FinProductCommonService extends BaseService {
                     }
                 }
                 finBaseRuleInfo.setFinprodId(finProduct.getFinprodId());
-                finBaseRuleInfo.setSpreadRate(
-                        ArithmeticUtil.divide(finProductFloatFeeDto.getSpreadRate(), 100, 14));
+                finBaseRuleInfo.setSpreadRate(ArithmeticUtil.divide(finProductFloatFeeDto.getSpreadRate(), 100, 14));
 
                 // 一体化对应etliu start
                 resetType = finProductFloatFeeDto.getResetType(); // 业绩基准重置规则
