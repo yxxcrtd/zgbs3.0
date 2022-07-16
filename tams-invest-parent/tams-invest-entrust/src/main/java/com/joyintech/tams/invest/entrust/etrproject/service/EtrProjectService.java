@@ -645,16 +645,17 @@ public class EtrProjectService extends CommonExportService<EtrProjectDto> implem
                     confirmMsg = etrCommonService.StringAddByBr(confirmMsg, message);
                     //委托金额
                     confirmMsg= checkIsDouble(confirmMsg,lineNo,rowData.get(6).toString(),"EtrProject002.entrustAmt");
+                    // TISHKS-1625 CLONE - 【UAT】项目类指令：导入模板中交易对手和本金金额和净投资收益率字段改成非必填
                     //本金金额
-                    confirmMsg = checkIsDouble(confirmMsg, lineNo, rowData.get(7).toString(), "EtrProject003.prinAmt");
+                    //confirmMsg = checkIsDouble(confirmMsg, lineNo, rowData.get(7).toString(), "EtrProject003.prinAmt");
                     //投资目的
                     message = etrCommonService.checkIsBlank(rowData.get(8).toString(), "EtrInvestBondInfo002.invAim", lineNo);
                     confirmMsg = etrCommonService.StringAddByBr(confirmMsg, message);
                     //交易对手
-                    message = etrCommonService.checkIsBlank(rowData.get(9).toString(), "EtrProject003.counterId", lineNo);
-                    confirmMsg = etrCommonService.StringAddByBr(confirmMsg, message);
+                    /*message = etrCommonService.checkIsBlank(rowData.get(9).toString(), "EtrProject003.counterId", lineNo);
+                    confirmMsg = etrCommonService.StringAddByBr(confirmMsg, message);*/
                     //交易对手输入格式是否正确check
-                    if (StringUtil.isNotBlank(rowData.get(9).toString())) {
+                    /*if (StringUtil.isNotBlank(rowData.get(9).toString())) {
                         Map<String, Object> map = new HashMap<>();
                         map.put("initValue", rowData.get(9).toString());
                         map.put("page", 1);
@@ -667,7 +668,7 @@ public class EtrProjectService extends CommonExportService<EtrProjectDto> implem
                             confirmMsg = etrCommonService.StringAddByBr(confirmMsg, getMessage(
                                     "ETR_E_0017", getMessage("etrInvestPersonInfo.counterId"), lineNo));
                         }
-                    }
+                    }*/
                     //交易方向为买入的时候对交易对手的check
                     if (StringUtil.isNotBlank(rowData.get(9).toString())) {
                         String[] s2 = rowData.get(5).toString().split(":");
@@ -689,7 +690,7 @@ public class EtrProjectService extends CommonExportService<EtrProjectDto> implem
                     message = etrCommonService.checkIsBlank(rowData.get(10).toString(), "EtrProject003.settleSpeed", lineNo);
                     confirmMsg = etrCommonService.StringAddByBr(confirmMsg, message);
                     //净投资收益率
-                    confirmMsg = checkIsDouble(confirmMsg, lineNo, rowData.get(11).toString(), "EtrProject003.investRate");
+                    //confirmMsg = checkIsDouble(confirmMsg, lineNo, rowData.get(11).toString(), "EtrProject003.investRate");
                 }
                 if (StringUtil.isBlank(confirmMsg)) {
                     jsonArrays.add(rowData);
