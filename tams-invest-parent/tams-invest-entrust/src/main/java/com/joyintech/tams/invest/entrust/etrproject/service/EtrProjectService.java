@@ -655,7 +655,7 @@ public class EtrProjectService extends CommonExportService<EtrProjectDto> implem
                     /*message = etrCommonService.checkIsBlank(rowData.get(9).toString(), "EtrProject003.counterId", lineNo);
                     confirmMsg = etrCommonService.StringAddByBr(confirmMsg, message);*/
                     //交易对手输入格式是否正确check
-                    /*if (StringUtil.isNotBlank(rowData.get(9).toString())) {
+                    if (StringUtil.isNotBlank(rowData.get(9).toString())) {
                         Map<String, Object> map = new HashMap<>();
                         map.put("initValue", rowData.get(9).toString());
                         map.put("page", 1);
@@ -668,7 +668,7 @@ public class EtrProjectService extends CommonExportService<EtrProjectDto> implem
                             confirmMsg = etrCommonService.StringAddByBr(confirmMsg, getMessage(
                                     "ETR_E_0017", getMessage("etrInvestPersonInfo.counterId"), lineNo));
                         }
-                    }*/
+                    }
                     //交易方向为买入的时候对交易对手的check
                     if (StringUtil.isNotBlank(rowData.get(9).toString())) {
                         String[] s2 = rowData.get(5).toString().split(":");

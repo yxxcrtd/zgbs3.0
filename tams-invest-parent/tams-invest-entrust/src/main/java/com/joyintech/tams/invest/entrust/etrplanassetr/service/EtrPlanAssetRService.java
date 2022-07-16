@@ -762,7 +762,7 @@ public class EtrPlanAssetRService extends CommonExportService<EtrPlanAssetRDto> 
                 // 交易对手  TISHKS-1631 无需填写交易对手代码
                 /*confirmMsg = etrCommonService.StringAddByBr(confirmMsg,
                         etrCommonService.checkIsBlank(rowData.get(10).toString(),
-                                "EtrPlanAssetN003.counterId", lineNo));
+                                "EtrPlanAssetN003.counterId", lineNo));*/
                 if (StringUtil.isNotBlank(rowData.get(10).toString())) {
                     if (StringUtil.equals(s2[0], DictCodeList.交易方向_赎回.getValue())
                             || StringUtil.equals(s2[0], DictCodeList.交易方向_买入.getValue())
@@ -781,7 +781,7 @@ public class EtrPlanAssetRService extends CommonExportService<EtrPlanAssetRDto> 
                                             getMessage("EtrInvestPersonInfo002.counterId"), lineNo));
                         }
                     }
-                }*/
+                }
 
                 if (StringUtil.isBlank(confirmMsg)) {
                     jsonArrays.add(rowData);
