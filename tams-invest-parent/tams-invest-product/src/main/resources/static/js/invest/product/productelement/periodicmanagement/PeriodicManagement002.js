@@ -615,6 +615,7 @@ $(function () {
         }
 
         object.pageModel = pageModel;
+        object.workflowId = workflowId;
         object.periodProdId = $('#periodProdId').val();
         if (object.periodProdId == null || object.periodProdId == "") {
             object.periodProdId = $('#periodProdId2').val();

@@ -242,12 +242,15 @@ public class PeriodicManagementService extends BaseService<PeriodicManagement001
     }
 
     private boolean isInWflProcess(Map<String, Object> param, String businessData) {
+        final String periodId = (String) param.get("periodId");
+        PeriodicManagement001Dto dto = JsonUtils.json2Object(businessData, PeriodicManagement001Dto.class);
+        if (StringUtil.isNotEmpty(periodId) && StringUtil.equals(periodId, dto.getPeriodId())) {
+            return true;
+        }
         final String startDate = (String) param.get("startDate");
         final String endDate = (String) param.get("endDate");
-        PeriodicManagement001Dto dto = JsonUtils.json2Object(businessData, PeriodicManagement001Dto.class);
         if (StringUtil.equals(startDate, DateUtil.format(dto.getStartDate(), "yyyy-MM-dd"))
-                && StringUtil.equals(endDate, DateUtil.format(dto.getEndDate(), "yyyy-MM-dd"))
-             && StringUtil.equals((String)param.get("workflowId"), dto.getWorkflowId())) {
+                && StringUtil.equals(endDate, DateUtil.format(dto.getEndDate(), "yyyy-MM-dd"))) {
             return true;
         }
 

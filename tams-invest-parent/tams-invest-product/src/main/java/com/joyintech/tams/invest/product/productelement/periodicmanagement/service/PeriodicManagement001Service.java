@@ -195,6 +195,7 @@ public class PeriodicManagement001Service extends CommonExportService<PeriodicMa
         params.put("pageId", "PeriodicManagement002");
         params.put("seachMode", "01");
         params.put("workflowId", dto.getWorkflowId());
+        params.put("periodId", dto.getPeriodId());
         params.put("businessDataPk1", dto.getPeriodProdId());
         params.put("startDate", DateUtil.format(dto.getStartDate(), "yyyy-MM-dd"));
         params.put("endDate", DateUtil.format(dto.getEndDate(), "yyyy-MM-dd"));
