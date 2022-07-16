@@ -759,8 +759,8 @@ public class EtrPlanAssetRService extends CommonExportService<EtrPlanAssetRDto> 
 //                    }
 //                }
                 // TISHKS-220:导入模板删除通道字段 fuyongsheng 20211105 edit end
-                // 交易对手
-                confirmMsg = etrCommonService.StringAddByBr(confirmMsg,
+                // 交易对手  TISHKS-1631 无需填写交易对手代码
+                /*confirmMsg = etrCommonService.StringAddByBr(confirmMsg,
                         etrCommonService.checkIsBlank(rowData.get(10).toString(),
                                 "EtrPlanAssetN003.counterId", lineNo));
                 if (StringUtil.isNotBlank(rowData.get(10).toString())) {
@@ -781,7 +781,7 @@ public class EtrPlanAssetRService extends CommonExportService<EtrPlanAssetRDto> 
                                             getMessage("EtrInvestPersonInfo002.counterId"), lineNo));
                         }
                     }
-                }
+                }*/
 
                 if (StringUtil.isBlank(confirmMsg)) {
                     jsonArrays.add(rowData);
