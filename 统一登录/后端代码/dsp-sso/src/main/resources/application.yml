@@ -1,7 +1,8 @@
 server:
   port: 1667
   address: 0.0.0.0
-  maxHttpHeaderSize: 102400
+  ssl:
+    enabled: false
   servlet:
     context-path: /joyinsso #兼容SpringBoot2.x
   context-path: /joyinsso   #兼容SpringBoot1.x
@@ -15,12 +16,111 @@ server:
     accept-count: 10
     #     等于max-threads + accept-count
     max-connections: 3000
+
+#============线程池配置============#
+threadpool:
+  corePoolSize: 5 #核心线程数
+  maxPoolSize: 600 #最大线程数
+  queueCapacity: 600 #线程队列大小
+  keepAliveSeconds: 60 #线程池维护线程所允许的空闲时间（秒）
+  namePrefix: async-service- #线程池中的线程的名称前缀
+
+#============pagehelper分页插件配置============#
+pagehelper:
+  helperDialect: oracle
+  autoRuntimeDialect: true
+  rowBoundsWithCount: true
+  pageSizeZero: true
+  reasonable: true
+  supportMethodsArguments: true
+  offsetAsPageNum: true
+  params: count=countSql;pageNum=curPage;pageSize=pageSize;
+
+#============文件上传配置============#
+multipart:
+  enabled: true
+  location: /tmp/file
+  maxFileSize: 2048MB
+  maxRequestSize: 20MB
+
 spring:
   application:
     name: data-service-provider
   profiles:
-    include:
-      - framework
+    active: env
+  
+  main:
+    allow-bean-definition-overriding: true #此处bean可以覆盖
+    allow-circular-references: true #此处设置可以循环依赖
+
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+
+  datasource:
+    #    type: org.apache.commons.dbcp2.BasicDataSource
+    type: com.alibaba.druid.pool.DruidDataSource
+#    driver-class-name: oracle.jdbc.driver.OracleDriver
+#    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+#    username: BS303INIT_TEST1008_03
+#    password: BS303INIT_TEST1008_03
+    #defaultTransactionIsolation:
+    name: master                             #数据库名称
+    initialSize: 10                          #在连接池中初始化多少个连接
+    maxIdle: 10                              #回收空闲连接时，将保证至少有min-idle个连接.
+    maxTotal: 200                            #连接池中最多支持多少个活动会话
+    maxWaitMillis: 10000                     #程序向连接池中请求连接时,超过maxWait的值后认为本次请求失败(不配置或为-1则无限等待)
+    minEvictableIdleTimeMillis: 180000       #池中某个连接的空闲时长达到 N 毫秒后, 连接池在下次检查空闲连接时回收该连接,要小于防火墙超时设置net.netfilter.nf_conntrack_tcp_timeout_established
+    timeBetweenEvictionRunsMillis: 10000     #检查空闲连接的频率，单位毫秒, 非正整数时表示不进行检查
+    #defaultAutoCommit: true                 #是否默认提交
+    #testWhileIdle: true                     #当程序请求连接，池在分配连接时，是否先检查该连接是否有效
+    #testOnBorrow: false                     #程序 申请 连接时,进行连接有效性检查（低效，影响性能）
+    #testOnReturn: false                     #程序 返还 连接时,进行连接有效性检查（低效，影响性能）
+    #validationQuery:                        #检查池中的连接是否仍可用的 SQL 语句,drui会连接到数据库执行该SQL, 如果正常返回，则表示连接可用，否则表示连接不可用
+    filters: stat,slf4j                      #stat:监控统计,slf4j:日志监控
+    filterStatEnabled: true                  #是否启用监控统计
+    filterStatLogSlowSql: true               #日志中显示SQL
+    filterStatSlowSqlMillis: 3000            #慢SQL监控
+    filterSlf4jEnabled: true
+    filterSlf4jStatementExecutableSqlLogEnable: true
+    statServletLoginUser: joyin
+    statServletLoginKey: joyin
+#    reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
+    #  redis:
+    #    database: 15
+    #    password: joyin!234
+    #    host: 192.168.70.204
+    #    port: 6380
+    #    timeout: 20000
+    #  redis:
+    #    cluster:
+    #      nodes: 192.168.70.212:7001,192.168.70.212:7002,192.168.70.212:7003,192.168.70.212:7004,192.168.70.212:7005,192.168.70.212:7006
+    #  redislock:
+    #    redissonEnabled: false
+  http:
+    multipart:
+      maxFileSize: 10Mb
+      maxRequestSize: 100Mb
+  jmx:
+    enabled: false
+  thymeleaf:
+    cache: false
+  activemq:
+    active: false
+    systemId: tams
+    brokerUrl: tcp://localhost:61616
+    user: system
+    password: manager
+    maximumRedeliveries: 10
+    initialRedeliveryDelay: 1
+    backOffMultiplier: 2
+    useExponentialBackOff: true
+    maximumRedeliveryDelay: -1
+  freemarker:
+    enabled: false
+  ## 国际化 ##
+  messages:
+    basename: i18n/message/*messages,i18n/label/*labels
+    encoding: UTF-8
 sso-sync:
   pool-size: 10
   url:
@@ -40,3 +140,78 @@ sso-sync:
       unlock: "/api/user/{userId}/unlock"
       reset: "/api/user/{userId}/reset"
       updatePassword: "/api/user/{userId}/updatePassword"
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml,classpath*:com/joyintech/**/dao/sqlmap/**/*.xml
+
+base:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+#    driver-class-name: oracle.jdbc.driver.OracleDriver
+#    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+#    username: BS303INIT_TEST1008_03
+#    password: BS303INIT_TEST1008_03
+    #defaultTransactionIsolation:
+    name: base                               #数据库名称
+    initialSize: 10                          #在连接池中初始化多少个连接
+    maxIdle: 10                              #回收空闲连接时，将保证至少有min-idle个连接.
+    maxTotal: 200                            #连接池中最多支持多少个活动会话
+    maxWaitMillis: 10000                     #程序向连接池中请求连接时,超过maxWait的值后认为本次请求失败(不配置或为-1则无限等待)
+    minEvictableIdleTimeMillis: 180000       #池中某个连接的空闲时长达到 N 毫秒后, 连接池在下次检查空闲连接时回收该连接,要小于防火墙超时设置net.netfilter.nf_conntrack_tcp_timeout_established
+    timeBetweenEvictionRunsMillis: 10000     #检查空闲连接的频率，单位毫秒, 非正整数时表示不进行检查
+    #defaultAutoCommit: true                 #是否默认提交
+    #testWhileIdle: true                     #当程序请求连接，池在分配连接时，是否先检查该连接是否有效
+    #testOnBorrow: false                     #程序 申请 连接时,进行连接有效性检查（低效，影响性能）
+    #testOnReturn: false                     #程序 返还 连接时,进行连接有效性检查（低效，影响性能）
+    #validationQuery:                        #检查池中的连接是否仍可用的 SQL 语句,drui会连接到数据库执行该SQL, 如果正常返回，则表示连接可用，否则表示连接不可用
+    filters: stat,slf4j                      #stat:监控统计,slf4j:日志监控
+    filterStatEnabled: true                  #是否启用监控统计
+    filterStatLogSlowSql: true               #日志中显示SQL
+    filterStatSlowSqlMillis: 3000            #慢SQL监控
+    filterSlf4jEnabled: true
+    filterSlf4jStatementExecutableSqlLogEnable: true
+#配置特殊参数取值
+specialsyspara:
+  parakey: AUTHORIZE_LIMIT||PRICE_CAL_TYPE||portfolio_handle_userid||settle_acct_name||settle_acct_no||prod_tru_acct_no||prod_tru_acct_name||lending_acct_no||lending_acct_name
+
+shiro:
+  #  sessionId: JSESSIONID
+  enable: true
+  sessionId: JSID
+  casClientName: datarouter
+  # allowUrl: /webjars/**,/swagger/**,/v2/api-docs,/swagger-ui.html,doc.html,/swagger-resources/**,/swagger-resources,/configuration/security,/configuration/ui
+  allowUrl: /sso/auth/**,/joyin-sso-login/**,/login.html
+  ssoEnable: true
+  sessionStorage: cache #session存储位置（database，cache，memory）
+  ihsEnable: false #是否使用IHS负载
+  loginUrl: /auth/login #登录地址，在开启cas后该地址配置不生效
+  logoutUrl: /auth/logout #登出地址
+  loginSuccessUrl: /index.html #登录成功地址
+  unauthorizedUrl: /error/403 #权限认证失败跳转地址
+  casEnable: false
+  allowDuplicateLogin: false #是否允许重复登录
+  redirectToSavedRequest: false #登录成功后是否跳转到之前请求的画面，如果该值设置为false则始终跳转到loginSuccessUrl
+#  casServerUrlPrefix: http://223.240.85.197:8083/cas #cas server地址
+#  casLoginUrl: /login #Cas登录页面地址
+#  casLogoutUrl: /logout #Cas登出页面地址
+#  casFilterUrlPattern: /cas #casFilter UrlPattern
+#  loginSuccessUrl: /index.html
+#  noSessionTouchUrl: /websocket,/main/getMoneyShowType,/activeReminder/getCountForShow
+
+
+application:
+  #  remindPage: invest/remindMain
+  menuType: hover
+  sysCode: TAMS
+  menuPosition: top
+  pageStep: 100
+  logoAbout: /image/logos/logo-about.png
+  logo: /image/logos/logo.png
+  sessionTimeout: 1800000
+  interfMaxCorePoolSize: 20
+  maxDataCountOneTimeForInvestholdInfo: 50
+  cache:
+    file: classpath:ehcache_app.xml
+
+log:
+  path: /home/tams/logs/tams
+  level: debug
