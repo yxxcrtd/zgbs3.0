@@ -90,20 +90,20 @@ var TrdBondDuration001;
             , {field: 'tradeAmt', width:150, title: '实收本息总额', type:'money',sortField:'TRADE_AMT'}
             //多级法人改造 add by caiqun 20200615
             , {field: 'institutionName', width:150, title: '机构名称',sortField:'institutionName',visible:AUTHORITY_TYPE=='02'}
-            //多级法人改造 add by caiqun 20200615
-            , {field: 'operation', title: 'SysCommon.operation', type: 'action', buttons: ['edit']
-                ,
-                render: function (data, type, row, meta) {
-                    if (row.statusValid != '01')
-                        return "";
-                    else
-                    //modifiled by liupengfei for 多级法人改造 确认按钮权限控制 S
-                    if(purviewElements.indexOf('_edit')!=-1){
-                        return '<i class="btn layui-icon edit" title="确认">&#x1005;</i>';
-                    }
-                    //modifiled by liupengfei for 多级法人改造 确认按钮权限控制 E
-                }
-            }
+            // //多级法人改造 add by caiqun 20200615
+            // , {field: 'operation', title: 'SysCommon.operation', type: 'action', buttons: ['edit']
+            //     ,
+            //     render: function (data, type, row, meta) {
+            //         if (row.statusValid != '01')
+            //             return "";
+            //         else
+            //         //modifiled by liupengfei for 多级法人改造 确认按钮权限控制 S
+            //         if(purviewElements.indexOf('_edit')!=-1){
+            //             return '<i class="btn layui-icon edit" title="确认">&#x1005;</i>';
+            //         }
+            //         //modifiled by liupengfei for 多级法人改造 确认按钮权限控制 E
+            //     }
+            // }
         ],
         checkbox: true,
         progressBar: true

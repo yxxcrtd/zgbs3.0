@@ -5,11 +5,11 @@
      */
     var getSearchParams = function () {
         var result = $.serializeToObject('#searchForm');
-        // if ($("#statusValid").val()) {
-        //     result.statusValid = $("#statusValid").val().join(",");
-        // } else {
-        //     result.statusValid = null;
-        // }
+        if ($("#statusValid").val()) {
+            result.statusValid = $("#statusValid").val().join(",");
+        } else {
+            result.statusValid = null;
+        }
         if ($("#portfolioId").val()) {
             result.portfolioId = $("#portfolioId").val().join(",");
         } else {
@@ -21,7 +21,7 @@
             result.ps = null;
         }
         if ($("#chlFinprodId").val()) {
-        	result.chlFinprodId = $("#chlFinprodId").val().join(",");
+            result.chlFinprodId = $("#chlFinprodId").val().join(",");
         }
         if ($("#psType").val()) {
             result.psType = $("#psType").val().join(",");
@@ -77,8 +77,8 @@
             , {field: 'tradeDate', width: 200, sortField:'TRADE_DATE', title: '交易日'}
             , {field: 'vDate', width: 200, sortField:'vDate', title: '起息日'}
             , {field: 'mDate', width: 200, sortField:'mDate', title: '到期日'}
-           /* , {field: 'intRate', width: 200, sortField:'intRate', title: '回购利率%'}
-            , {field: 'counterName', width: 200, sortField:'counterName', title: '交易对手'}*/
+            /* , {field: 'intRate', width: 200, sortField:'intRate', title: '回购利率%'}
+             , {field: 'counterName', width: 200, sortField:'counterName', title: '交易对手'}*/
             , {field: 'theoryPrin', width: 200, sortField:'THEORY_PRIN', title: '本金金额', type: 'money'}
             , {field: 'settleDate', width: 200, sortField:'SETTLE_DATE', title: '资金到账日'}
             , {field: 'theoryInt', width: 200, sortField:'THEORY_INT', title: '回购利息', type: 'money'}
