@@ -72,6 +72,10 @@ public class ManualSettleDto extends TrdManualSettleInfo implements ITableRow, P
 
     private String rownum;
 
+    private String iOrderId;
+
+    private BigDecimal tradedVolume;
+
     public String getRownum() {
         return rownum;
     }
@@ -300,6 +304,22 @@ public class ManualSettleDto extends TrdManualSettleInfo implements ITableRow, P
 
     public void setbPledgeIdAbbr(String bPledgeIdAbbr) {
         this.bPledgeIdAbbr = bPledgeIdAbbr;
+    }
+
+    public String getiOrderId() {
+        return iOrderId;
+    }
+
+    public void setiOrderId(String iOrderId) {
+        this.iOrderId = iOrderId;
+    }
+
+    public BigDecimal getTradedVolume() {
+        return tradedVolume;
+    }
+
+    public void setTradedVolume(BigDecimal tradedVolume) {
+        this.tradedVolume = tradedVolume;
     }
 }
 

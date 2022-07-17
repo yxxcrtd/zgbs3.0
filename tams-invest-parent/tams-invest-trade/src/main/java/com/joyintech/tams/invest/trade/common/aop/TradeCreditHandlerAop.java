@@ -9,8 +9,10 @@ import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.constant.DictCodeListRsk;
+import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.invest.trade.bond.dto.TrdBondInvestTradeDto;
 import com.joyintech.tams.invest.trade.common.service.TradeCommonService;
+import com.joyintech.tams.invest.trade.manualsettle.dto.ManualSettleDto;
 import com.joyintech.workflow.engine.constant.OperationType;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -20,7 +22,11 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.Map;
+
+import static com.joyintech.tams.constant.DictCodeListExt1.金融产品类型_投管用_债券质押式正回购;
+import static com.joyintech.tams.constant.DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购;
 
 @Component
 @Aspect
@@ -250,7 +256,15 @@ public class TradeCreditHandlerAop {
             }
             
             if (operationType.equals(OperationType.REVOKE)||operationType.equals(OperationType.DELETE)) {
-                tradeCommonService.executeOccupyCreditLines(args[0], DictCodeListExt1.交易状态_撤销.getValue(),DictCodeListRsk.授信占用类别_实占.getValue(),"doComplete");
+                ManualSettleDto settleDto = (ManualSettleDto)args[0];
+                if(StringUtil.equals(金融产品类型_投管用_债券质押式正回购.getValue(), CommonUtil.findValue(mapTrd, "finprodType2")) ||
+                   StringUtil.equals(金融产品类型_投管用_债券质押式逆回购.getValue(),CommonUtil.findValue(mapTrd, "finprodType2"))) {//针对协议回购交收失败
+                    settleDto.setSettleAmt(new BigDecimal(CommonUtil.findValue(mapTrd, "tradedVolume").toString()));
+                    settleDto.setOrderId((String)CommonUtil.findValue(mapTrd, "iOrderId"));
+                }
+                tradeCommonService.executeOccupyCreditLines(settleDto, DictCodeListExt1.交易状态_撤销.getValue(),DictCodeListRsk.授信占用类别_实占.getValue(),"doComplete");
+                //TODO 这里需要处理将首期实占重新占回,这个逻辑只在协议回购中存的到期续作中存在
+
             }else {
                 tradeCommonService.executeOccupyCreditLines(args[0], DictCodeListExt1.交易状态_初始.getValue(), DictCodeListRsk.授信占用类别_实占.getValue(),"doComplete");
             }

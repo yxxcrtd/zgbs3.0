@@ -4,6 +4,7 @@ import com.joyintech.framework.export.paginator.domain.ITableRow;
 import com.joyintech.tams.common.base.entity.TrdManualSettleInfo;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -63,6 +64,10 @@ public class ManualSettleDto extends TrdManualSettleInfo implements ITableRow, P
     private String counterName;
 
     private String rownum;
+
+    private String iOrderId;
+
+    private BigDecimal tradedVolume;
 
     public String getRownum() {
         return rownum;
@@ -215,6 +220,22 @@ public class ManualSettleDto extends TrdManualSettleInfo implements ITableRow, P
 
     public void setbPledgeIdAbbr(String bPledgeIdAbbr) {
         this.bPledgeIdAbbr = bPledgeIdAbbr;
+    }
+
+    public String getiOrderId() {
+        return iOrderId;
+    }
+
+    public void setiOrderId(String iOrderId) {
+        this.iOrderId = iOrderId;
+    }
+
+    public BigDecimal getTradedVolume() {
+        return tradedVolume;
+    }
+
+    public void setTradedVolume(BigDecimal tradedVolume) {
+        this.tradedVolume = tradedVolume;
     }
 }
 

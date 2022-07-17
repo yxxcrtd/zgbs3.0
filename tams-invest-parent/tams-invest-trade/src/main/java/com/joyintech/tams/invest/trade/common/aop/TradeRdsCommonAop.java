@@ -51,6 +51,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 
+import static com.joyintech.tams.constant.DictCodeListExt1.金融产品类型_投管用_债券质押式正回购;
+import static com.joyintech.tams.constant.DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购;
+
 /**
  * 交易撤销时调用风险逻辑aop
  *
@@ -314,14 +317,23 @@ public class TradeRdsCommonAop {
                 if (CommonUtil.findValue(mapTrd, "orderId") != null){
                     mapTrd.put(PageFieldToInterfFactory.INF_EVENTID,CommonUtil.findValue(mapTrd, "orderId"));
                     mapTrd.put("tradeId",CommonUtil.findValue(mapTrd, "orderId"));
+                    if(StringUtil.equals(金融产品类型_投管用_债券质押式正回购.getValue(),CommonUtil.findValue(mapTrd, "finprodType2")) ||
+                      StringUtil.equals(金融产品类型_投管用_债券质押式逆回购.getValue(),CommonUtil.findValue(mapTrd, "finprodType2"))) {//针对协议回购交收失败组装实占编号
+                        mapTrd.put("tradeId",String.format("%s-%s-%s",CommonUtil.findValue(mapTrd, "entrustNo"),CommonUtil.findValue(mapTrd,"portfolioId"),CommonUtil.findValue(mapTrd, "iOrderId")));
+                        mapTrd.put("tradeAmt",CommonUtil.findValue(mapTrd, "tradedVolume"));
+                        mapTrd.put("tradeNum",CommonUtil.findValue(mapTrd, "tradedVolume"));
+                    }
                 }
                 // 预占编号
                 if (CommonUtil.findValue(mapTrd, "entrustNo") != null){
                     mapTrd.put(PageFieldToInterfFactory.INF_PREOCCUPYCODE,CommonUtil.findValue(mapTrd, "entrustNo"));
                     mapTrd.put("entrustId",CommonUtil.findValue(mapTrd, "entrustNo"));
                 }
+                mapTrd.put("manualSettle","Y");
                 // 实占释放
                 revokeManualSettle(mapTrd, infCode, BussinessDictCodeListRds.事件类型_投资交易.getValue(),assetType,joinPoint);
+                //TODO 到期续作失败时占回原实占
+
                 // 预占释放
                 Map<String, Object> etrMap = new HashMap<>(mapTrd);
                 // 预占编号
@@ -333,6 +345,11 @@ public class TradeRdsCommonAop {
                 // 交易金额
                 if (CommonUtil.findValue(etrMap, "settleAmt") != null){
                     etrMap.put("entrustNum",CommonUtil.findValue(etrMap, "settleAmt"));
+                }
+                if(StringUtil.equals(金融产品类型_投管用_债券质押式正回购.getValue(),CommonUtil.findValue(mapTrd, "finprodType2")) ||
+                   StringUtil.equals(金融产品类型_投管用_债券质押式逆回购.getValue(),CommonUtil.findValue(mapTrd, "finprodType2"))) {//针对协议回购交收失败
+                    mapTrd.put("tradeAmt",CommonUtil.findValue(mapTrd, "tradedVolume"));
+                    mapTrd.put("entrustNum",CommonUtil.findValue(mapTrd, "tradedVolume"));
                 }
                 etrMap.put("manualSettle","Y");
                 revokeManualSettle(etrMap, BussinessDictCodeListRds.接口系统ID_预占释放接口.getValue(), BussinessDictCodeListRds.事件类型_投资委托.getValue(),assetType,joinPoint);

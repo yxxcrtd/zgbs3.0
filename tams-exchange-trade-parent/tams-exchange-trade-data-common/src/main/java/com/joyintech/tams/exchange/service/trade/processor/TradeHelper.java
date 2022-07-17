@@ -62,14 +62,16 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押券入库;
-import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押券出库;
+import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.exchange.common.constant.BatchPriceMode.*;
 import static com.joyintech.tams.exchange.common.constant.EntrustProp.*;
 import static com.joyintech.tams.exchange.common.constant.ErrorCode.ENTRUST_BSFLAG_PARSE_ERROR;
 import static com.joyintech.tams.exchange.common.constant.ErrorCode.INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR;
 import static com.joyintech.tams.exchange.common.constant.ErrorCode.NOT_FAIR_ORDER_ERROR;
 import static com.joyintech.tams.exchange.common.constant.OthCodeType.*;
+import static com.joyintech.tams.exchange.common.constant.joyin.BussinessDictCodeList.金融产品类型_投管用_债券质押式逆回购;
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeList.平安资产类型_质押式回购;
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1.金融产品类型_投管用_债券质押式正回购;
 import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_现券交易;
 import static com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1.NEGOTIATED_REPO;
 
@@ -1274,7 +1276,9 @@ public class TradeHelper {
         createOrderByInstrument(integratedEntrust, instrument, null);
         String tradingDay = commonManagement.getTradingDay();
         Instruction instruction = instructionService.findById(integratedEntrust.getInstructionId());
-
+        if(StringUtil.equals(instruction.getFinprodType2(),金融产品类型_投管用_债券质押式正回购.getValue()) || StringUtil.equals(instruction.getFinprodType2(),金融产品类型_投管用_债券质押式逆回购.getValue())) {
+            integratedEntrust.setAssetType(平安资产类型_质押式回购.getValue());
+        }
         BigDecimal entrustPrice = integratedEntrust.getEntrustPrice();
         if (InvestAssetTypeEnum.BOND.codeEquals(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {

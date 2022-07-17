@@ -882,7 +882,7 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                 return null;
             }
             // 逆回购首期
-            if (StringUtil.equals(inputDto.getPs(), DictCodeListExt3.交易方向_逆回购.getValue())) {
+            if (StringUtil.equals(inputDto.getRepPs(), DictCodeListExt3.交易方向_逆回购.getValue())) {
                 creditLinesInputDto = new CreditLinesInputDto();
                 creditLinesInputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
                 creditLinesInputDto.setTradeId(inputDto.getEntrustId());
@@ -891,12 +891,15 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                 creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
                 creditLinesInputDto.setTgBusiType(DictCodeList.平安资产类型_质押式回购.getValue());
                 creditLinesInputDto.setPsPayment(DictCodeList.回购类型_质押式协议回购.getValue());
-                creditLinesInputDto.setSaleCode(inputDto.getPs());
+                creditLinesInputDto.setSaleCode(inputDto.getRepPs());
                 creditLinesInputDto.setPs(DictCodeList.交易方向_买入.getValue());
                 creditLinesInputDto.setCounterId(inputDto.getCounterId());
-                if (riskCreditListCommonValidatorService.checkCallCredit(inputDto.getFinprodId())) {
+               // if (riskCreditListCommonValidatorService.checkCallCredit(inputDto.getFinprodId())) {
                     creditLinesInputDto.setTradeAmt(inputDto.getTradeAmt());
                     creditLinesInputDto.setShareAmt(inputDto.getTradeAmt());
+                //}
+                if(StringUtil.isEmpty(creditLinesInputDto.getCounterId()) && "01".equals(status)) {
+                    return null;
                 }
             }
             // 逆回购，到期续做 -> 新的首期
@@ -913,12 +916,17 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                 creditLinesInputDto.setSaleCode(inputDto.getRepPs());
                 creditLinesInputDto.setPs(DictCodeList.交易方向_买入.getValue());
                 creditLinesInputDto.setCounterId(inputDto.getCounterId());
-                if (riskCreditListCommonValidatorService.checkCallCredit(inputDto.getFinprodId())) {
+                //if (riskCreditListCommonValidatorService.checkCallCredit(inputDto.getFinprodId())) {
                     creditLinesInputDto.setTradeAmt(inputDto.getTradeAmt());
                     creditLinesInputDto.setShareAmt(inputDto.getTradeAmt());
+                //}
+                if(StringUtil.isEmpty(creditLinesInputDto.getCounterId())) {
+                    return null;
                 }
             }
-
+            if(Objects.isNull(creditLinesInputDto.getTradeAmt()) && Objects.isNull(creditLinesInputDto.getShareAmt())) {
+                return null;
+            }
         }
         if (object instanceof EtrExchangeTradeSaveSecRepoRequest) {
             EtrExchangeTradeSaveSecRepoRequest inputDto = (EtrExchangeTradeSaveSecRepoRequest) object;

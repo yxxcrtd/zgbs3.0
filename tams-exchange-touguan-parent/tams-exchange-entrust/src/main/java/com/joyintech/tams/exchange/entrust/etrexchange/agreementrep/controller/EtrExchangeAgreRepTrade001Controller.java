@@ -795,11 +795,7 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
         dto.setBusiPs(dto.getRepPs());
         dto.setAssetType2(DictCodeList.回购类型_质押式协议回购.getValue());
         // ----------add by zhangrui1 20200703 预占功能 start----------
-        if (StringUtil.equals(BussinessConstant.SUBMIT, dto.getOperateType())
-                && (DictCodeListExt3.交易方向_到期续做.getValue().equals(dto.getPs())
-                || DictCodeListExt3.交易方向_逆回购.getValue().equals(dto.getPs())
-                || DictCodeListExt3.交易方向_正回购.getValue().equals(dto.getPs())
-                || DictCodeListExt3.交易方向_首期.getValue().equals(dto.getPs()))) {
+        if (StringUtil.equals(BussinessConstant.SUBMIT, dto.getOperateType())) {
             Boolean isShouQi = StringUtil.equals(DictCodeListExt3.交易方向_首期.getValue(), dto.getPs());
             if (isShouQi) {
                 dto.setPs(dto.getRepPs());

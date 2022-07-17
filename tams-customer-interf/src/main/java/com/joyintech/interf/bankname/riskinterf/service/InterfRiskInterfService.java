@@ -836,11 +836,11 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                         continue;
                     }
                     // 深交所到期续做，不涉及授信占用和释放
-                    if (StringUtil.isNotEmpty(firstFinTradeProduct) && StringUtil.equals(finDto.getPs(),DictCodeListExt3.交易方向_到期续做.getValue())
+              /*      if (StringUtil.isNotEmpty(firstFinTradeProduct) && StringUtil.equals(finDto.getPs(),DictCodeListExt3.交易方向_到期续做.getValue())
                         && StringUtil.equals(firstFinTradeProduct.getTradeMarket(),DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
                         continue;
-                    }
-                    //add by zhangnian  平安资产类型_质押式回购  start
+                    }*/
+                    /*//add by zhangnian  平安资产类型_质押式回购  start
                     //质押券为利率债(国债、政策型银行债)不占额度
                     if(DictCodeList.平安资产类型_质押式回购.getValue().equals(assetType)&&temp.containsKey("pledgeAssetCodeList")){
                         if(temp.containsKey("occupySource")&&StringUtil.equals(temp.get("occupySource"),"CFET")){
@@ -865,7 +865,11 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                             }
                         }
                      }
-                    //add by zhangnian  20210823 end
+                    //add by zhangnian  20210823 end*/
+                    finDto.setAmount((BigDecimal) temp.get("tradeAmt"));
+                    if(Objects.isNull(finDto.getAmount()) && Objects.nonNull(temp.get("amount"))) {
+                        finDto.setAmount(new BigDecimal(temp.get("amount").toString()));
+                    }
                     CreditLinesInputDto creditLinesInputDto =new CreditLinesInputDto();
                     creditLinesInputDto.setTradeStatus(tradeStatu);
                     creditLinesInputDto.setCreditCallType(DictCodeListRsk.授信占用类别_实占.getValue());
@@ -910,13 +914,13 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                         creditLinesInputT56.setTradeStatus(tradeStatu);
                         creditLinesInputT56.setCreditCallType(DictCodeListRsk.授信占用类别_实占.getValue());
                         creditLinesInputT56.setCreditCheckType(DictCodeListRsk.授信占用来源_接口.getValue());
-                        creditLinesInputT56.setPs(DictCodeList.交易方向_到期.getValue());
+                        creditLinesInputT56.setPs(DictCodeList.交易方向_买入.getValue());
                         creditLinesInputT56.setTradeDate(DateUtil.parse(finDto.getEventDate()));
                         creditLinesInputT56.setCounterId(finDto.getCounterId());
                         // 首期的交易编号
                         creditLinesInputT56.setTradeId((String)temp.get("tradeId") + finDto.getPs());
-                        creditLinesInputT56.setTradeAmt(firstFinTradeProduct.getPrin());
-                        creditLinesInputT56.setShareAmt(firstFinTradeProduct.getPrin());
+                        creditLinesInputT56.setTradeAmt(finDto.getAmount());
+                        //creditLinesInputT56.setShareAmt(firstFinTradeProduct.getPrin());
                         creditLinesInputT56.setUpdateTime(new Date());
                         creditLinesInputT56.setUpdateUser(LoginUserUtil.getUserName());
                         creditLinesInputT56.setCreateDept(LoginUserUtil.getDeptCode());

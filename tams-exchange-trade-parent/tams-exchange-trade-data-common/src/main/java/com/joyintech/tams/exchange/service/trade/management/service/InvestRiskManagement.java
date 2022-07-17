@@ -9,6 +9,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.investment.*;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.InstructionPs;
@@ -428,7 +429,7 @@ public class InvestRiskManagement extends BaseService {
 
         String instructionId = instruction.getEntrustId();
         String ps = instruction.getPs();
-        String counterId = instruction.getCounterId();
+        String counterId = StringUtil.isNotEmpty(instruction.getCounterId()) ? instruction.getCounterId():((IntegratedEntrust) entrust).getCounterId();
 
         String portfolioId = calculateResponse.getPortfolioId();
         Long entrustNum = calculateResponse.getEntrustNum();
