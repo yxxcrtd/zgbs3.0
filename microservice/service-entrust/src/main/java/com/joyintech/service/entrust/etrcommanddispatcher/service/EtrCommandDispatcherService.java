@@ -131,9 +131,8 @@ public class EtrCommandDispatcherService extends BaseService<EtrCommandDispatche
 		    		if(queryEtrPledgeList!=null && !queryEtrPledgeList.isEmpty()) {
 		    			pledgelist.addAll(queryEtrPledgeList);
 		    		}
-					if (com.joyintech.framework.util.StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), dto.getBusiTypeTg())) {
+					if ((queryEtrPledgeList == null && queryEtrPledgeList.isEmpty()) || !StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), dto.getBusiTypeTg())) {
 
-					} else {
 						List<OriPledgeInfo> oriFinDealPledgeList = etrTradeSysInterfMapper.getOriFinDealPledgeList(dto.getFinprodId());
 						for (OriPledgeInfo oriPledgeInfo : oriFinDealPledgeList) {
 							EtrTradePledgeDto pledgeDto = new EtrTradePledgeDto();
