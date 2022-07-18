@@ -166,6 +166,9 @@ public class CfetsManualSettleQueryService extends BaseService{
         pageParam.put("tradePlat_01", BussinessDictCodeList.交易场所_银行间.getValue());
         pageParam.put("tradePlat_02", BussinessDictCodeList.交易场所_商业银行柜台市场.getValue());
 
+
+        pageParam.put("FINPROD_TYPE_TG_F03", DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
+
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
         int year = c.get(Calendar.YEAR);
