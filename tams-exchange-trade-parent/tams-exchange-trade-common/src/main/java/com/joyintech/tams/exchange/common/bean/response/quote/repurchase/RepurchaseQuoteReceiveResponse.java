@@ -115,6 +115,9 @@ public class RepurchaseQuoteReceiveResponse {
     @ApiModelProperty(name = "backBalance", value = "到期结算金额")
     private BigDecimal backBalance;
 
+    @ApiModelProperty(name = "swapOutBalance", value = "换出质押券孳息")
+    private BigDecimal swapOutBalance;
+
     @ApiModelProperty(name = "traderCode", value = "本方交易员")
     private String traderCode;
     @ApiModelProperty(name = "traderCodeStr", value = "本方交易员名称")
@@ -585,6 +588,14 @@ public class RepurchaseQuoteReceiveResponse {
 
     public void setBrokerName(String brokerName) {
         this.brokerName = brokerName;
+    }
+
+    public BigDecimal getSwapOutBalance() {
+        return swapOutBalance;
+    }
+
+    public void setSwapOutBalance(BigDecimal swapOutBalance) {
+        this.swapOutBalance = swapOutBalance;
     }
 
     public String getRequestTypeStr() {
