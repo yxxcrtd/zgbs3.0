@@ -319,7 +319,7 @@ public class EtrCommonCashPositionDealService extends BaseService {
         SecInfoModelDto secInfoModelDto = getSecInfoModel(finprodId);
         SecInfoModel secInfoModel = this.toSecInfoModel(secInfoModelDto);
         List<SecIntSchedule> invScheduleList = new ArrayList<>();
-        List<FinCashPlanDto> intSchList = new ArrayList<FinCashPlanDto>();
+        List<FinCashPlanDto> intSchList = new ArrayList<>();
         for (FinCashPlanDto item : finCashPlanList) {
             if (StringUtil.equals(item.getCashType1(),
                     DictCodeListExt1.现金流一级类型_利息.getValue())

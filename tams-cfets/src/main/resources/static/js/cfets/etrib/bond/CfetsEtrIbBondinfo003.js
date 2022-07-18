@@ -789,7 +789,6 @@
             Joyin.error(errorMsg);
             return false;
         }
-        debugger;
         if(confirmMsg && confirmMsg.length > 0) {
             return Joyin.confirm(confirmMsg, function (){
                 saveOrSubmit('submit');
