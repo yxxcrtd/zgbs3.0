@@ -7,6 +7,7 @@ import com.joyintech.tams.exchange.common.bean.investment.TradeMessage;
 import com.joyintech.tams.exchange.common.constant.BusinessFlag;
 import com.joyintech.tams.exchange.common.constant.EntrustBs;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
+import com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.instruction.BusinessType;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
@@ -77,7 +78,7 @@ public class MessageSenderHelper {
         if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
             tradeMessage.setValueDate(((IntegratedEntrust) entrust).getFirstSettleDate());
             tradeMessage.setMaturityDate(((IntegratedEntrust) entrust).getBackDate());
-            tradeMessage.setCounterId((((IntegratedEntrust) entrust).getLiaisonName()));
+//            tradeMessage.setCounterId((((IntegratedEntrust) entrust).getLiaisonName()));
             // 确保协议回购，无抵押券时才组装相关的finprodId
             InstructionPledge instructionPledge = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(instruction.getEntrustId(), entrust.getStockCode());
             if (Objects.isNull(instructionPledge) && Strings.isNullOrEmpty(finprodId)) {
@@ -184,8 +185,13 @@ public class MessageSenderHelper {
 
         //协议回购
         if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
-            //到期结算金额
-            tradeMessage.setDealBalance(entrust.getBackBalance());
+            if (BusiTypeTgEnum.首期.codeEquals(trade.getBusiTypeTg())) {
+                //回购金额
+                tradeMessage.setDealBalance(entrust.getTradedBalance());
+            } else {
+                //到期结算金额
+                tradeMessage.setDealBalance(entrust.getBackBalance());
+            }
         } else if (InvestAssetTypeEnum.isBond(trade.getAssetType())
                 && EntrustProp.isTrade(entrust.getEntrustProp())
                 && Objects.nonNull(tradeMessage.getFullPrice())
