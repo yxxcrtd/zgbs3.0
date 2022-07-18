@@ -415,7 +415,7 @@
                 and t.ACCT_NO = #{initValue}
             </if>
             <if test="search != null and !search.equals('')">
-                AND t.ACCT_NO like concat('%',concat(#{search},'%'))
+                AND (t.ACCT_NO like concat('%',concat(#{search},'%')) or R.ACCT_NAME like concat('%',concat(#{search},'%')) )
             </if>
         </where>
         order by t.ACCT_NO
