@@ -19,6 +19,7 @@ import com.joyintech.tams.component.base.core.MstWorkflowCommonService;
 import com.joyintech.tams.component.base.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.*;
+import com.joyintech.tams.exchange.entrust.common.aop.ExchangeEntrustRdsCommonAop;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.*;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.enums.RepurchaseTypeEnum;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.service.EtrExchangeAgreRepTrade001Service;
@@ -111,6 +112,9 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
      */
     @Autowired(required = false)
     private BaseGetBusinessId bussGetBussinessIdService;
+
+    @Autowired
+    private ExchangeEntrustRdsCommonAop exchangeEntrustRdsCommonAop;
 
     public static final String ENTRUST_RECORD_NEW = "new";
 
@@ -854,6 +858,9 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
             return new Message<AjaxResult>().success().setData(m);
         } catch (Exception e) {
             logger.error("场内交易指令新建失败", e);
+            //撤销风险预占
+            Map<String, Object> marTrd = JsonUtils.object2Map(dto);
+            exchangeEntrustRdsCommonAop.revokeBackRiskCommonInteface(marTrd, "EtrExchangeAgreRepTrade001");
             return PositionUtil.ajaxErrorReturn(e);
         }
     }

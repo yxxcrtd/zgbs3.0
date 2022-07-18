@@ -1223,14 +1223,15 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
         if(isNeedDealPosition) {
             String ps = entity.getPs();
             String busiType = StringUtil.EMPTY;
-            if(StringUtil.equals(ps,BussinessDictCodeList.交易方向_行权回售.getValue())){
+            if (StringUtil.equals(ps, BussinessDictCodeList.交易方向_行权回售.getValue())) {
                 busiType = DictCodeListExt3.头寸业务类型_债券行权交易.getValue();
-            }else if(StringUtil.equals(DictCodeListExt3.头寸业务类型_质押式回购首期.getValue(),entity.getTgBusiType()) || StringUtil.equals(DictCodeListExt3.头寸业务类型_质押式回购到期.getValue(),entity.getTgBusiType())){
+            } else if (StringUtil.equals(DictCodeListExt3.头寸业务类型_质押式回购首期.getValue(), entity.getTgBusiType())
+                    || StringUtil.equals(DictCodeListExt3.头寸业务类型_质押式回购到期.getValue(), entity.getTgBusiType())) {
                 busiType = entity.getTgBusiType();
-            }else {
+            } else {
                 busiType = DictCodeListExt3.头寸业务类型_现券交易.getValue();
             }
-            PositionHttpRequest.dorevoke(bizCode,DictCodeListExt1.子系统代码_交易.getValue(),busiType,ps);
+            PositionHttpRequest.dorevoke(bizCode, DictCodeListExt1.子系统代码_交易.getValue(), busiType, ps);
 
             // PositionHttpRequest.deleteMethod(bizCode,DictCodeListExt1.子系统代码_交易.getValue(),"Bond001");
         }else{

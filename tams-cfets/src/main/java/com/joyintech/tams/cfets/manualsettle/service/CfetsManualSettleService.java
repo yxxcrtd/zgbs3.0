@@ -1058,7 +1058,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                         this.insertOldBidPosition(cfetsManualSettleInsertDto, entity.getButtonType(), entity.getSettleAmt(),
                                 entity.getFinprodType2(), false, entity.getTgBusiType(), false);
                     }else {
-                		sendRepoPositionMethod(cfetsManualSettleInsertDto,entity.getButtonType());
+                		this.sendRepoPositionMethod(cfetsManualSettleInsertDto,entity.getButtonType());
                        //对回购数据进行处理
                         if ((StringUtil.equals(entity.getButtonType(), DictCodeListExt3.交收操作类型_交收.getValue())
                                 || StringUtil.equals(entity.getButtonType(), DictCodeListExt3.交收操作类型_回溯.getValue())) ) {

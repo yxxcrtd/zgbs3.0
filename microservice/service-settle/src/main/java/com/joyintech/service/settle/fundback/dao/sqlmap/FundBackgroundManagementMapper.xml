@@ -209,8 +209,8 @@
             <!-- modify by mashukai 20201203 TISHKBS-1209 end -->
             T3.PORTFOLIO_NAME,/*组合.组合名称 组合名称*/
             T1.FINPROD_ID,
-            T2.FINPROD_MARKET_ID,/*金融产品交易汇总业务流程.理财产品代码 产品/资产代码*/
-            NVL(T2.FINPROD_ABBR, T2.FINPROD_NAME) finProdMarketName,
+            nvl(T2.FINPROD_MARKET_ID,T5.PORTFOLIO_ID) FINPROD_MARKET_ID,/*金融产品交易汇总.理财产品代码 产品/资产代码*/
+            nvl(NVL(T2.FINPROD_ABBR, T2.FINPROD_NAME),T3.PORTFOLIO_NAME) finProdMarketName,
             TO_CHAR(T5.SETTLE_DATE,'yyyy-MM-dd') cashDate,/*划款指令业务流程.结算日期 现金流日期*/
             <!-- modify by mashukai 20201203 TISHKBS-1209 start -->
             T5.SETTLE_AMT cashAmt,/*金融产品交易汇总业务流程.交易金额 划款金额*/
@@ -229,8 +229,9 @@
             T5.PURPOSE,/*划款用途*/
             T5.CCY,/*币种*/
             /**add by taoran 20200317 发送状态*/
-            '03' sendStatus
+            '03' sendStatus,
             /**add by taoran 20200317 发送状态*/
+            case when T1.PORTFOLIO_ID is not null then 0 else 1 end  paBussTypeAdd
             FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL T1
             <!-- modify by mashukai 20201203 TISHKBS-1209 start -->
             LEFT JOIN WFL_TRD_FIN_PRODUCT_DEAL_TOTAL TT ON T1.P_TOTLE_TRADE_ID = TT.TOTLE_TRADE_ID
@@ -261,24 +262,24 @@
                 #{PA_BUSINESS_TYPE137},
                 #{PA_BUSINESS_TYPE138},#{PA_BUSINESS_TYPE17},#{PA_BUSINESS_TYPE33},
                 #{PA_BUSINESS_TYPE07},#{PA_BUSINESS_TYPE100},#{PA_BUSINESS_TYPE08},#{PA_BUSINESS_TYPE42},
-                #{PA_BUSINESS_TYPE43}, #{PA_BUSINESS_TYPE76})
+                #{PA_BUSINESS_TYPE43}, #{PA_BUSINESS_TYPE76},#{PA_BUSINESS_TYPE116})
                 OR T1.FINPROD_TYPE2 IN (#{F29}, #{F30}, #{F10}, #{F11}, #{F12}, #{F13}, #{F35} )
                 OR T1.TG_BUSI_TYPE IN (#{PA_BUSINESS_TYPE09},#{PA_BUSINESS_TYPE01},  <!-- modify by swwan TISHKS-1496 #{PA_BUSINESS_TYPE02},--> #{PA_BUSINESS_TYPE03},
                     #{PA_BUSINESS_TYPE04},#{PA_BUSINESS_TYPE05},#{PA_BUSINESS_TYPE117}, #{PA_BUSINESS_TYPE06},
                     #{PA_BUSINESS_TYPE137},
                     #{PA_BUSINESS_TYPE138},#{PA_BUSINESS_TYPE17},#{PA_BUSINESS_TYPE33},
                     #{PA_BUSINESS_TYPE07},#{PA_BUSINESS_TYPE100},#{PA_BUSINESS_TYPE08},#{PA_BUSINESS_TYPE42},
-                    #{PA_BUSINESS_TYPE43}, #{PA_BUSINESS_TYPE76},#{PA_BUSINESS_TYPE180},#{PA_BUSINESS_TYPE202})
+                    #{PA_BUSINESS_TYPE43}, #{PA_BUSINESS_TYPE76},#{PA_BUSINESS_TYPE116},#{PA_BUSINESS_TYPE180},#{PA_BUSINESS_TYPE202})
                 )
-                AND T1.PORTFOLIO_ID IS NOT NULL
+                AND (T1.PORTFOLIO_ID IS NOT NULL OR ( T1.PORTFOLIO_ID IS  NULL AND ( T4.PA_BUSS_TYPE =#{PA_BUSINESS_TYPE08} OR T1.TG_BUSI_TYPE =#{PA_BUSINESS_TYPE08} )))
                 AND T5.IS_NEED_SEND = #{YES}
                 AND NOT EXISTS (SELECT 1 FROM SYS_WFL_BUSINESS_NODE TT WHERE TT.SEQ_NO = T6.SEQ_NO AND TT.HIS_NO > T7.HIS_NO)
                 and (T7.NODE_ID IS NULL OR T7.NODE_ID = #{BACK_OPERATOR} OR T7.NODE_ID = #{BACK_CHECKER})
                 AND (T6.PROCESS_STATE != 'END' or T6.PROCESS_STATE  is null)
                 <if test="portfolioId != null and !portfolioId.isEmpty()">
-                    <foreach collection="portfolioId" index="index" separator="," item="item" open="AND (T1.PORTFOLIO_ID IN (" close=")">
+                    <foreach collection="portfolioId" index="index" separator="," item="item" open="AND (T5.PORTFOLIO_ID IN (" close=")">
                     <if test="(index % 998) == 0">
-                            null) OR T1.PORTFOLIO_ID IN (
+                            null) OR T5.PORTFOLIO_ID IN (
                      </if>
                     #{item}</foreach>)
                 </if>
@@ -315,8 +316,9 @@
             T5.PURPOSE,/*划款用途*/
             T5.CCY,/*币种*/
             /**add by taoran 20200317 发送状态*/
-            '03' sendStatus
+            '03' sendStatus,
             /**add by taoran 20200317 发送状态*/
+            0  paBussTypeAdd
             FROM
             WFL_TRD_PRODUCT_DEAL T1
             LEFT JOIN WFL_TRD_PRODUCT_DEAL_ADD T10 ON T1.TRADE_ID = T10.TRADE_ID
@@ -378,8 +380,8 @@
             <!-- modify by mashukai 20201203 TISHKBS-1209 end -->
             T3.PORTFOLIO_NAME,/*组合.组合名称 组合名称*/
             T1.FINPROD_ID,
-            T2.FINPROD_MARKET_ID,/*金融产品交易汇总.理财产品代码 产品/资产代码*/
-            NVL(T2.FINPROD_ABBR, T2.FINPROD_NAME) finProdMarketName,
+            nvl(T2.FINPROD_MARKET_ID,T5.PORTFOLIO_ID) FINPROD_MARKET_ID,/*金融产品交易汇总.理财产品代码 产品/资产代码*/
+            nvl(NVL(T2.FINPROD_ABBR, T2.FINPROD_NAME),T3.PORTFOLIO_NAME) finProdMarketName,
             TO_CHAR(T5.SETTLE_DATE,'yyyy-MM-dd') cashDate,/*划款指令.结算日期 现金流日期*/
             <!-- modify by mashukai 20201203 TISHKBS-1209 start -->
             T5.SETTLE_AMT cashAmt,/*金融产品交易汇总.交易金额 划款金额*/
@@ -398,8 +400,9 @@
             T5.PURPOSE,/*划款用途*/
             T5.CCY,/*币种*/
             /**add by taoran 20200317 发送状态*/
-            T5.SEND_STATUS sendStatus
+            T5.SEND_STATUS sendStatus,
             /**add by taoran 20200317 发送状态*/
+            case when T1.PORTFOLIO_ID is not null then 0 else 1 end  paBussTypeAdd
             <!-- modify by mashukai 20201203 TISHKBS-1209 start -->
             FROM TRD_FIN_PRODUCT_DEAL_TOTAL T1
             LEFT JOIN PA_TRD_FIN_PRODUCT_DEAL_TOTAL T4 ON T1.TOTLE_TRADE_ID = T4.TOTLE_TRADE_ID
@@ -418,25 +421,25 @@
                 #{PA_BUSINESS_TYPE07}, #{PA_BUSINESS_TYPE100},#{PA_BUSINESS_TYPE08},#{PA_BUSINESS_TYPE42},
                 #{PA_BUSINESS_TYPE137},#{PA_BUSINESS_TYPE09},
                 #{PA_BUSINESS_TYPE138},#{PA_BUSINESS_TYPE17},#{PA_BUSINESS_TYPE33},
-                #{PA_BUSINESS_TYPE43}, #{PA_BUSINESS_TYPE76})
+                #{PA_BUSINESS_TYPE43}, #{PA_BUSINESS_TYPE76},#{PA_BUSINESS_TYPE116})
                 OR T1.FINPROD_TYPE2 IN (#{F29}, #{F30}, #{F10}, #{F11}, #{F12}, #{F13}, #{F35})
                 OR T1.TG_BUSI_TYPE IN (#{PA_BUSINESS_TYPE01}, <!-- modify by swwan TISHKS-1496 #{PA_BUSINESS_TYPE02},--> #{PA_BUSINESS_TYPE03},
                     #{PA_BUSINESS_TYPE04}, #{PA_BUSINESS_TYPE05},#{PA_BUSINESS_TYPE117}, #{PA_BUSINESS_TYPE06},
                     #{PA_BUSINESS_TYPE07}, #{PA_BUSINESS_TYPE100},#{PA_BUSINESS_TYPE08},#{PA_BUSINESS_TYPE42},
                     #{PA_BUSINESS_TYPE137},#{PA_BUSINESS_TYPE09},
                     #{PA_BUSINESS_TYPE138},#{PA_BUSINESS_TYPE17},#{PA_BUSINESS_TYPE33},
-                    #{PA_BUSINESS_TYPE43}, #{PA_BUSINESS_TYPE76},#{PA_BUSINESS_TYPE180},#{PA_BUSINESS_TYPE202})
+                    #{PA_BUSINESS_TYPE43}, #{PA_BUSINESS_TYPE76},#{PA_BUSINESS_TYPE116},#{PA_BUSINESS_TYPE180},#{PA_BUSINESS_TYPE202})
                 )
                 AND T5.IS_NEED_SEND = #{YES}
                 AND NOT EXISTS (SELECT 1 FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL TT WHERE TT.P_TRADE_ID = T1.TOTLE_TRADE_ID)
                 AND NOT EXISTS(SELECT 1 FROM TRD_FIN_PRODUCT_DEAL_TOTAL TT WHERE TT.P_TRADE_ID = T1.TOTLE_TRADE_ID)
                 AND (T1.IS_CANCEL IS NULL OR T1.IS_CANCEL = #{NO}) AND T1.TRADE_STATUS = #{TRADE_STATUS_01}
                 AND (T6.PROCESS_STATE = 'END' or T6.PROCESS_STATE  is null)
-                AND T1.PORTFOLIO_ID IS NOT NULL
+                AND (T1.PORTFOLIO_ID IS NOT NULL OR ( T1.PORTFOLIO_ID IS  NULL AND ( T4.PA_BUSS_TYPE =#{PA_BUSINESS_TYPE08} OR T1.TG_BUSI_TYPE=#{PA_BUSINESS_TYPE08})))
                 <if test="portfolioId != null and !portfolioId.isEmpty()">
-                    <foreach collection="portfolioId" separator="," index="index" item="item" open="AND (T1.PORTFOLIO_ID IN (" close=")">
+                    <foreach collection="portfolioId" separator="," index="index" item="item" open="AND (T5.PORTFOLIO_ID IN (" close=")">
                     <if test="(index % 998) == 0">
-                            null) OR T1.PORTFOLIO_ID IN (
+                            null) OR T5.PORTFOLIO_ID IN (
                      </if>
                     #{item}</foreach>)
                 </if>
@@ -471,8 +474,9 @@
             T5.PURPOSE,/*划款用途*/
             T5.CCY,/*币种*/
             /**add by taoran 20200317 发送状态*/
-            T5.SEND_STATUS sendStatus
+            T5.SEND_STATUS sendStatus,
             /**add by taoran 20200317 发送状态*/
+            0 paBussTypeAdd
             FROM TRD_PRODUCT_DEAL T1
             LEFT JOIN TRD_PRODUCT_DEAL_ADD T10 ON T1.TRADE_ID = T10.TRADE_ID
             LEFT JOIN PA_TRD_PRODUCT_DEAL T4 ON T1.TRADE_ID = T4.TRADE_ID

@@ -116,11 +116,14 @@ public class IbuQuoteBondCalService extends BaseService {
                 calRequest.setUnitInt(null);
             }
         }
-        calRespone = calAmt(calRequest);
+        calRespone = this.calAmt(calRequest);
         if (null != calRespone.getFpriceAmt()) {
+            // XYHGFXSJ-91
+            // 交易金额保留两位小数
+            calRespone.setFpriceAmt(ArithmeticUtil.round(calRespone.getFpriceAmt(), 2, RoundingMode.HALF_UP));
             calRequest.setFpriceAmt(calRespone.getFpriceAmt());
         }
-        List<TrdTradeFeeDetail> trdTradeFeeDetails = calFee(calRequest);
+        List<TrdTradeFeeDetail> trdTradeFeeDetails = this.calFee(calRequest);
         if (CollectionUtils.isNotEmpty(trdTradeFeeDetails)) {
             for (TrdTradeFeeDetail item : trdTradeFeeDetails) {
                 if (StringUtil.equals(item.getFeeType(), BussinessDictCodeList.费用类型_交易手续费.getValue())) {
