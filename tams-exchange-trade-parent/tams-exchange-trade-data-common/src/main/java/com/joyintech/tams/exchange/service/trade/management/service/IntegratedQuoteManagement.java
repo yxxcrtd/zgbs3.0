@@ -8,6 +8,7 @@ import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveQryRequest;
 import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveRequest;
@@ -25,6 +26,7 @@ import com.joyintech.tams.exchange.common.enums.invest.PsEnum;
 import com.joyintech.tams.exchange.common.request.EntrustQueryRequest;
 import com.joyintech.tams.exchange.common.request.RepurchaseQuoteSendRequest;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
+import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.common.utils.TickConverter;
 import com.joyintech.tams.exchange.common.vo.IntegratedEntrustVo;
 import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
@@ -513,6 +515,7 @@ public class IntegratedQuoteManagement {
         baseRepurchaseQuoteSendResponse.setStockName(entrust.getStockName());
         baseRepurchaseQuoteSendResponse.setPledgeNumber(BigDecimal.valueOf(entrust.getEntrustVolume()));
         baseRepurchaseQuoteSendResponse.setCounterId(entrust.getCounterId());
+        baseRepurchaseQuoteSendResponse.setCounterName(entrust.getCounterName());
         baseRepurchaseQuoteSendResponse.setTraderCode(entrust.getTradeId());
         baseRepurchaseQuoteSendResponse.setTraderCodeStr(entrust.getTradeName());
         baseRepurchaseQuoteSendResponse.setMemberId(entrust.getDealerId());
@@ -520,35 +523,43 @@ public class IntegratedQuoteManagement {
         baseRepurchaseQuoteSendResponse.setInvestorId(entrust.getInvestorId());
         baseRepurchaseQuoteSendResponse.setInvestorIdStr(entrust.getInvestorName());
         baseRepurchaseQuoteSendResponse.setInvestorType(entrust.getOwnerType());
-        baseRepurchaseQuoteSendResponse.setInvestorTypeStr(entrust.getOwnerType());
+        baseRepurchaseQuoteSendResponse.setInvestorTypeStr(InvestorType.getInvestorTypeName(entrust.getOwnerType()));
         baseRepurchaseQuoteSendResponse.setCpTraderCode(entrust.getPropTradeId());
         baseRepurchaseQuoteSendResponse.setCpTraderCodeStr(entrust.getPropTradeName());
         baseRepurchaseQuoteSendResponse.setCpMemberId(entrust.getPropDealerId());
         baseRepurchaseQuoteSendResponse.setCpMemberIdStr(entrust.getPropDealerName());
         baseRepurchaseQuoteSendResponse.setCpInvestorId(entrust.getPropInvestorId());
         baseRepurchaseQuoteSendResponse.setCpInvestorIdStr(entrust.getPropInvestorName());
-        baseRepurchaseQuoteSendResponse.setInvestorId(entrust.getInvestorId());
-        baseRepurchaseQuoteSendResponse.setInvestorIdStr(entrust.getInvestorName());
         baseRepurchaseQuoteSendResponse.setCpInvestorType(entrust.getPropOwnerType());
-        baseRepurchaseQuoteSendResponse.setCpInvestorTypeStr(entrust.getPropOwnerType());
+        baseRepurchaseQuoteSendResponse.setCpInvestorTypeStr(InvestorType.getInvestorTypeName(entrust.getPropOwnerType()));
         baseRepurchaseQuoteSendResponse.setCpClientName(entrust.getPortfolioName());
         baseRepurchaseQuoteSendResponse.setRemark(entrust.getRemark());
         baseRepurchaseQuoteSendResponse.setBs(entrust.getPs());
+
+        baseRepurchaseQuoteSendResponse.setBs(entrust.getPs());
+        if (StringUtil.isNotEmpty(entrust.getExtend2())) {
+            Map<String, Object> extend2 = JsonUtils.getObjectFromJson(entrust.getExtend2(), Map.class);
+            Object maturityDate = extend2.get("maturityDate");
+            if(Objects.nonNull(maturityDate)){
+                baseRepurchaseQuoteSendResponse.setMaturityDate(DateUtil.format(DateUtil.parse((String)maturityDate)));
+            }
+        }
 
         return baseRepurchaseQuoteSendResponse;
     }
 
     private void fillSQQuoteSendResponse(IntegratedEntrustVo entrust, SQRepurchaseQuoteSendResponse baseRepurchaseQuoteSendResponse, Instruction instruction) {
         baseRepurchaseQuoteSendResponse.setBackBalance(entrust.getBackBalance());
-        baseRepurchaseQuoteSendResponse.setBackDate(entrust.getBackDate());
         baseRepurchaseQuoteSendResponse.setCapDays(instruction.getCapDays().intValue());
         baseRepurchaseQuoteSendResponse.setDiscount(entrust.getDiscount());
         baseRepurchaseQuoteSendResponse.setmIntAmt(NumberUtil.sub(entrust.getBackBalance(), entrust.getEntrustBalance()));
         baseRepurchaseQuoteSendResponse.setRepoAmount(entrust.getEntrustBalance());
         baseRepurchaseQuoteSendResponse.setRepoRate(entrust.getEntrustPrice());
         baseRepurchaseQuoteSendResponse.setRepoMdate(DateUtil.format(instruction.getRepoMdate()));
-        baseRepurchaseQuoteSendResponse.setFirstSettleDate(entrust.getFirstSettleDate());
-        baseRepurchaseQuoteSendResponse.setBackDate(entrust.getBackDate());
+
+        baseRepurchaseQuoteSendResponse.setFirstSettleDate(DateUtil.format(DateUtil.parse(entrust.getFirstSettleDate())));
+        baseRepurchaseQuoteSendResponse.setBackDate(DateUtil.format(DateUtil.parse(entrust.getBackDate())));
+
     }
 }
 

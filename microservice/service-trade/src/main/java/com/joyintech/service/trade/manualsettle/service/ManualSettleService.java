@@ -14,6 +14,7 @@ import com.joyintech.service.trade.manualsettle.dto.ManualSettleDto;
 import com.joyintech.service.trade.manualsettle.dto.ManualSettleFlowDto;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.common.base.pojo.PledgeListDto;
 import com.joyintech.tams.component.business.common.service.DateCalService;
 import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommService;
 import com.joyintech.tams.constant.DictCodeList;
@@ -204,6 +205,9 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                     infContractDetailfile.setPortfolioId(trdProductTempDealAdd.getPortfolioId());
                     infContractDetailfile.setShareAmt(trdProductTempDeal.getShareAmt());
                     infContractDetailfile.setTradeAmt(trdProductTempDeal.getTradeAmt());
+                    // XYHGFXSJ-8:构建质押品信息list modify by fuyongsheng 20220718 start
+                    infContractDetailfile.setPledgeList(this.genPledgeDtoList(trdProductTempDeal.getTradeId()));
+                    // XYHGFXSJ-8:构建质押品信息list modify by fuyongsheng 20220718 end
                     if (DictCodeList.回购拆借方向_正回购.getValue().equals(infContractDetailfile.getPs())
                             || DictCodeList.回购拆借方向_逆回购.getValue().equals(infContractDetailfile.getPs())) {
                         // 指令信息处理
@@ -340,6 +344,27 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                 }
             }
     }
+
+    // XYHGFXSJ-8:构建质押品信息list modify by fuyongsheng 20220718 start
+    /**
+     * 构建质押品信息list
+     * @param tradeId
+     * @return
+     */
+    private List<PledgeListDto> genPledgeDtoList(String tradeId){
+        List<PledgeListDto> pledgeListDtos = new ArrayList<>();
+        List<FinDealPledge> finDealPledgeList = manualSettleMapper.selectFinDealPledgeByTradeId(tradeId);
+        if(!CollectionUtils.isEmpty(finDealPledgeList)){
+            for(FinDealPledge finDealPledge : finDealPledgeList){
+                PledgeListDto pledgeListDto = new PledgeListDto();
+                pledgeListDto.setFinprodMarketId(finDealPledge.getPledgeFinprodId());
+                pledgeListDto.setPledgeNumber(finDealPledge.getPledgeNumber());
+                pledgeListDtos.add(pledgeListDto);
+            }
+        }
+        return pledgeListDtos;
+    }
+    // XYHGFXSJ-8:构建质押品信息list modify by fuyongsheng 20220718 end
 
     /**
      * 处理交收失败数据

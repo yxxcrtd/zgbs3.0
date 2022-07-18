@@ -255,19 +255,20 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
     @ApiModelProperty(required = true, name = "operateUser", value = "操作人员ID 执行撤销异常委托操作人员ID")
     private String operateUser;
 
-    @ApiModelProperty( name = "origStockCode", value = "换出债券")
+    @ApiModelProperty(name = "origStockCode", value = "换出债券")
     private String origStockCode;
 
-    @ApiModelProperty( name = "origEntrustVolume", value = "换出债券数量")
+    @ApiModelProperty(name = "origEntrustVolume", value = "换出债券数量")
     private long origEntrustVolume;
 
-    @ApiModelProperty( name = "execId", value = "执行编号")
+    @ApiModelProperty(name = "execId", value = "执行编号")
     private String execId;
 
-    @ApiModelProperty( name = "conformOrRefuse", value = "确认或拒绝：conform-确认，refuse-拒绝")
+    @ApiModelProperty(name = "conformOrRefuse", value = "确认或拒绝：conform-确认，refuse-拒绝")
     private String conformOrRefuse;
 
-// 信用保护凭证使用 --start
+
+    // 信用保护凭证使用 --start
     @ApiModelProperty(name = "counterName", value = "交易对手名称")
     private String counterName;
 
@@ -277,6 +278,10 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
     @ApiModelProperty(name = "propAcctName", value = "对手资金账户名称")
     private String propAcctName;
     // 信用保护凭证使用 --end
+
+    @ApiModelProperty(name = "maturityDate", value = "回购到期日")
+    private String maturityDate;
+
     public boolean isNoCancelEntrust() {
         return noCancelEntrust;
     }
@@ -889,7 +894,7 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
         this.origEntrustVolume = origEntrustVolume;
     }
 
- public String getCounterName() {
+    public String getCounterName() {
         return counterName;
     }
 
@@ -911,5 +916,13 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
 
     public void setPropAcctName(String propAcctName) {
         this.propAcctName = propAcctName;
+    }
+
+    public String getMaturityDate() {
+        return maturityDate;
+    }
+
+    public void setMaturityDate(String maturityDate) {
+        this.maturityDate = maturityDate;
     }
 }

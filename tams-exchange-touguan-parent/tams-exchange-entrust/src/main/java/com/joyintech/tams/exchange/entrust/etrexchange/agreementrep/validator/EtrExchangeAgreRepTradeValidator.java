@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.validator;
 
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
@@ -52,6 +53,14 @@ public class EtrExchangeAgreRepTradeValidator implements EtrCommonValidator {
         psMap.put(DictCodeListExt3.交易方向_解除质押.getValue(),DictCodeListExt3.交易方向_解除质押);
         psMap.put(DictCodeListExt3.交易方向_到期续做.getValue(),DictCodeListExt3.交易方向_到期续做);
 
+        if(StringUtil.equals(DictCodeListExt3.交易方向_首期.getValue(), dto.getPs())
+                ||StringUtil.equals(DictCodeListExt3.交易方向_正回购.getValue(), dto.getPs())
+                || StringUtil.equals(DictCodeListExt3.交易方向_逆回购.getValue(), dto.getPs())){
+            if(dto.getTradeAmt() != null && dto.getRepSecNum() != null
+                    && dto.getTradeAmt().compareTo(dto.getRepSecNum().multiply(BigDecimal.valueOf(100)))>0) {
+                errorList.add(new ValidMessage("回购金额不能超过质押券数量！"));
+            }
+        }
 
         FinProduct finProduct = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
         if(StringUtil.isNotEmpty(finProduct) && DateUtil.compareTo(DateUtil.parse(dto.getExpireSettleDate()),finProduct.getMdate())>0) {

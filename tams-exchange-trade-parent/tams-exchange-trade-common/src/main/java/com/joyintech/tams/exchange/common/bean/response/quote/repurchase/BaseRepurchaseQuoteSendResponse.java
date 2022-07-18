@@ -86,6 +86,11 @@ public class BaseRepurchaseQuoteSendResponse {
     @ApiModelProperty(name = "pledgeNumberStr", value = "质押数量（单位：万元，保留两位小数）")
     private String pledgeNumberStr;
 
+    @ApiModelProperty(name = "maturityDate", value = "回购到期日")
+    private String maturityDate;
+    @ApiModelProperty(name = "counterName", value = "交易对手")
+    private String counterName;
+
     public Integer getRequestStatus() {
         return requestStatus;
     }
@@ -284,6 +289,22 @@ public class BaseRepurchaseQuoteSendResponse {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getMaturityDate() {
+        return maturityDate;
+    }
+
+    public void setMaturityDate(String maturityDate) {
+        this.maturityDate = maturityDate;
+    }
+
+    public String getCounterName() {
+        return counterName;
+    }
+
+    public void setCounterName(String counterName) {
+        this.counterName = counterName;
     }
 
     public String getRequestStatusStr() {

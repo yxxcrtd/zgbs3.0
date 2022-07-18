@@ -1728,7 +1728,7 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 if(DictCodeList.交易方向_申购.getValue().equals(deal.getPs())){
                     // 申购登录在途的现金流水
                     PtlCashPositionFlowDto ztFlowDto = this.genZtPtlCashPositionFlow(portfolioId, deal, stlPayOrder, chlId);
-                    result.add(resultDto);
+                    result.add(ztFlowDto);
                 }
                 // 申购确认登录1、一笔冲销原申购的现金流水 2、一笔申购确认的现金流水
                 else if(DictCodeList.交易方向_申购确认.getValue().equals(deal.getPs())){
