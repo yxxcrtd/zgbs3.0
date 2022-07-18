@@ -1,0 +1,3 @@
+delete from CFG_DATATABLE_SHOW where PAGECODE = 'EtrExchangeAgreRepTrade001' and DTCODE = 'UNOPENQUOTA' and SPCDCODE = '999999' and COLCODE = 'repSecNum';
+
+INSERT INTO CFG_DATATABLE_SHOW("PAGECODE", "DTCODE", "SPCDCODE", "COLCODE", "COLNAME", "DICTCODE", "SEQNO", "DISPLAYED", "FROZEN", "SORT", "MAXLEN", "EXTENDCFG", "EFFERANGE", "RANGEID", "STATUS", "REMARK1", "REMARK2", "REMARK3", "ISKEY", "IS_HIDE", "SPCDCODE_DESC") VALUES ('EtrExchangeAgreRepTrade001', 'UNOPENQUOTA', '999999', 'repSecNum', '质押数量(万元)', NULL, '7', '1', '0', '0', '120', '{"colAlign": "right","dataType":"amount","precision":"2","unit":"WanYuan","divisor":"100","supportSearch":"精确"}', '0', 'COMM', '1', '0', NULL, NULL, '0', NULL, '999999');
