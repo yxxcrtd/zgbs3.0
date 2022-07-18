@@ -891,7 +891,8 @@ public class CreditLinesUpdateImpl extends CreditLinesUpdateAbs {
         }
 
         if(StringUtil.equals(oneStepInfo.getDeductObjType(),DictCodeListExt3.扣减对象_发行人.getValue())
-            || StringUtil.equals(oneStepInfo.getDeductObjType(),DictCodeListExt3.扣减对象_存放行.getValue())){
+            || StringUtil.equals(oneStepInfo.getDeductObjType(),DictCodeListExt3.扣减对象_存放行.getValue())
+            || StringUtil.equals(oneStepInfo.getDeductObjType(),DictCodeListExt3.扣减对象_创设机构.getValue())){
             oneStepInfo.setDeductObj(finProduct.getIssuer());
         }
         else if(StringUtil.equals(oneStepInfo.getDeductObjType(),DictCodeListExt3.扣减对象_融资人.getValue())){

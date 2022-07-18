@@ -2,10 +2,7 @@ package com.joyintech.interf.bankname.riskinterf.service;
 
 import com.google.common.collect.Lists;
 import com.joyintech.framework.base.entity.ProcessMark;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.JsonUtils;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.common.base.entity.RiskNodeConfigDtl;
 import com.joyintech.tams.component.business.riskall.constant.NodeConfigConstant;
@@ -16,9 +13,8 @@ import com.joyintech.tams.component.business.riskall.service.RiskNodeConfigServi
 import com.joyintech.tams.component.business.riskall.utils.RiskUtil;
 import com.joyintech.tams.component.business.riskrds.dto.InterfRiskRdsDto;
 import com.joyintech.tams.component.business.riskrds.service.InterfRiskRdsService;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.*;
+import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.invest.common.client.ClientData;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.risk.dto.RiskNameListDto;
@@ -106,8 +102,21 @@ public class ExchangeTrdRiskInputParamService extends RiskCommonService {
             return null;
         }
         RiskNameListDto listDto = new RiskNameListDto();
-        // CDS(信用保护凭证),新建、check、占用、退回、作废
-
+        // CDS(信用保护凭证)交易
+        Map<String,Object> dataMap = JsonUtils.object2Map(data);
+        List<Map<String, Object>> listMap = (List<Map<String, Object>>) dataMap.get("rskList");
+        if (StringUtil.isEmptyList(listMap)){
+            return new ArrayList<>();
+        }
+        String assetType = dataMap.get("assetType") == null ? "" : dataMap.get("assetType").toString();
+        if(StringUtil.equals(assetType, DictCodeList.平安资产类型_信用保护凭证.getValue())){
+            for (Map<String,Object> item : listMap){
+                //定义返回实体
+                InterfRiskRdsDto finDto = JsonUtils.json2Object(JsonUtils.object2Json(item),InterfRiskRdsDto.class);
+                listDto.setCounterId(finDto.getCounterId());
+                listDto.setFinprodId(trdCommonBaseService.queryFinprodIdByFinprodMarketId(finDto.getAssetCode(), assetType));
+            }
+        }
         return Lists.newArrayList(listDto);
     }
 
@@ -139,6 +148,7 @@ public class ExchangeTrdRiskInputParamService extends RiskCommonService {
             listMap.forEach(item -> {
                 try {
                     InterfRiskRdsDto interfRiskRdsDto = interfRiskRdsService.prepareRiskEntity(item,riskRdsDto);
+                    interfRiskRdsDto.setTradeNum(ArithmeticUtil.multiply(interfRiskRdsDto.getTradeNum(),new BigDecimal("100")));
                     interfRiskRdsDto.setPreOccupyCode(interfRiskRdsDto.getEntrustCode());
                     interfRiskRdsDto.setAssetCode(trdCommonBaseService.queryFinprodIdByFinprodMarketId(interfRiskRdsDto.getAssetCode(), assetType));
                     result.add(interfRiskRdsDto);
@@ -164,7 +174,22 @@ public class ExchangeTrdRiskInputParamService extends RiskCommonService {
         }
         List<CreditLinesInputDto> result = new ArrayList<>();
         // CDS(信用保护凭证),新建、check、占用、退回、作废
-        return new ArrayList<>();
+        Map<String,Object> dataMap = JsonUtils.object2Map(data);
+        List<Map<String, Object>> listMap = (List<Map<String, Object>>) dataMap.get("rskList");
+        if (StringUtil.isEmptyList(listMap)){
+            return result;
+        }
+        String assetType = dataMap.get("assetType") == null ? "" : dataMap.get("assetType").toString();
+        if(StringUtil.equals(assetType, DictCodeList.平安资产类型_信用保护凭证.getValue())){
+            for (Map<String,Object> item : listMap){
+                //定义返回实体
+                InterfRiskRdsDto finDto = JsonUtils.json2Object(JsonUtils.object2Json(item),InterfRiskRdsDto.class);
+                CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl, finDto);
+                generateInputDto(inputDto, finDto, finDto);
+                result.add(inputDto);
+            }
+        }
+        return result;
     }
 
 
@@ -175,12 +200,36 @@ public class ExchangeTrdRiskInputParamService extends RiskCommonService {
      * @param dtl
      * @param isCheck
      */
+    @SuppressWarnings("unchecked")
     private void buildAuthorizeParam(RiskCommonInputDto inputDto, Object data, RiskNodeConfigDtl dtl, Boolean isCheck) {
         if (!isCheck) {
             return;
         }
         // CDS(信用保护凭证),新建、check、占用、退回、作废
-
+        Map<String,Object> dataMap = JsonUtils.object2Map(data);
+        List<Map<String, Object>> listMap = (List<Map<String, Object>>) dataMap.get("rskList");
+        if (StringUtil.isEmptyList(listMap)){
+            return;
+        }
+        String assetType = dataMap.get("assetType") == null ? "" : dataMap.get("assetType").toString();
+        if(StringUtil.equals(assetType, DictCodeList.平安资产类型_信用保护凭证.getValue())){
+            BigDecimal tradeNum = BigDecimal.ZERO;
+            for (Map<String,Object> item : listMap){
+                if (item.get("tradeNum") == null){
+                    continue;
+                }
+                //定义返回实体
+                InterfRiskRdsDto finDto = JsonUtils.json2Object(JsonUtils.object2Json(item),InterfRiskRdsDto.class);
+                tradeNum = ArithmeticUtil.doAdd(tradeNum,ArithmeticUtil.multiply(finDto.getTradeNum(),new BigDecimal("100")));
+                inputDto.setFinprodId(trdCommonBaseService.queryFinprodIdByFinprodMarketId(finDto.getAssetCode(), assetType));
+                inputDto.setCounterId(finDto.getCounterId());
+                inputDto.setTradeMarket(finDto.getTradePlace());
+                inputDto.setAssetSecType(finDto.getAssetType2());
+                inputDto.setPs(finDto.getPs());
+            }
+            inputDto.setPrinAmt(tradeNum);
+            inputDto.setAssetType(DictCodeList.平安资产类型_信用保护凭证.getValue());
+        }
 
     }
 
@@ -219,7 +268,22 @@ public class ExchangeTrdRiskInputParamService extends RiskCommonService {
      * @return
      */
     public void generateInputDto(CreditLinesInputDto creditLinesInputDto, Object obj, Object detailObj) {
-        //CDS(信用保护凭证)指令
+        //CDS(信用保护凭证)交易
+        if (obj instanceof InterfRiskRdsDto) {
+            InterfRiskRdsDto inputDto = (InterfRiskRdsDto) obj;
+            InterfRiskRdsDto detail = (InterfRiskRdsDto)detailObj;
+            creditLinesInputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
+            creditLinesInputDto.setTradeId(inputDto.getEventId());
+            creditLinesInputDto.setEntrustId(inputDto.getEntrustCode());
+            creditLinesInputDto.setFinprodId(trdCommonBaseService.queryFinprodIdByFinprodMarketId(inputDto.getAssetCode(), inputDto.getAssetType()));
+            creditLinesInputDto.setTradeDate(DateUtil.parse(inputDto.getEventDate()));
+            creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
+            creditLinesInputDto.setTgBusiType(DictCodeList.平安资产类型_信用保护凭证.getValue());
+            creditLinesInputDto.setPs(inputDto.getPs());
+            creditLinesInputDto.setCounterId(inputDto.getCounterId());
+            creditLinesInputDto.setTradeAmt(ArithmeticUtil.multiply(detail.getTradeNum(),new BigDecimal("100")));
+        }
+
     }
 
 }
