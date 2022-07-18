@@ -157,7 +157,8 @@ select TT.* from (
 			,CASE
 			WHEN T4.ASSET_TYPE = 'F07' AND T1.TRADE_MARKET = '01' AND T1.PS IN ( '03', '04', 'T56', 'T93', 'T94', 'T95', 'T96' )
 			THEN cct.SEC_ACCT_NAME
-			WHEN T4.ASSET_TYPE = 'F07' AND T1.TRADE_MARKET != '01' THEN sci.ACCT_NAME
+			WHEN (T4.ASSET_TYPE = 'F07' AND T1.TRADE_MARKET != '01') or T4.BUSI_TYPE_POSITION = '02' or T4.BUSI_TYPE_POSITION = '03' THEN
+			sci.ACCT_NAME
 			ELSE nvl(detail.ACCT_NAME, nvl( SSAI.SEC_ACCT_NAME, detail.SEC_ACCT_NAME ) )
 			END secAcctName
 			<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 end -->
@@ -335,7 +336,8 @@ select TT.* from (
 				,CASE
 					WHEN T4.ASSET_TYPE = 'F07' AND T1.TRADE_MARKET = '01' AND T1.PS IN ( '03', '04', 'T56', 'T93', 'T94', 'T95', 'T96' )
 					THEN cct.SEC_ACCT_NAME
-					WHEN T4.ASSET_TYPE = 'F07' AND T1.TRADE_MARKET != '01' THEN sci.ACCT_NAME
+					WHEN (T4.ASSET_TYPE = 'F07' AND T1.TRADE_MARKET != '01') or T4.BUSI_TYPE_POSITION = '02' or T4.BUSI_TYPE_POSITION = '03' THEN
+					sci.ACCT_NAME
 					ELSE nvl(detail.ACCT_NAME, nvl( SSAI.SEC_ACCT_NAME, detail.SEC_ACCT_NAME ) )
 					END secAcctName
 				<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 end -->
@@ -535,7 +537,8 @@ select TT.* from (
 			,CASE
 				WHEN T4.ASSET_TYPE = 'F07' AND T1.TRADE_MARKET = '01' AND T1.PS IN ( '03', '04', 'T56', 'T93', 'T94', 'T95', 'T96' )
 				THEN cct.SEC_ACCT_NAME
-				WHEN T4.ASSET_TYPE = 'F07' AND T1.TRADE_MARKET != '01' THEN sci.ACCT_NAME
+				WHEN (T4.ASSET_TYPE = 'F07' AND T1.TRADE_MARKET != '01') or T4.BUSI_TYPE_POSITION = '02' or T4.BUSI_TYPE_POSITION = '03' THEN
+				sci.ACCT_NAME
 				ELSE nvl(detail.ACCT_NAME, nvl( SSAI.SEC_ACCT_NAME, detail.SEC_ACCT_NAME ) )
 				END secAcctName
 			<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 end -->
@@ -708,7 +711,8 @@ select TT.* from (
 				CASE
 					WHEN T4.ASSET_TYPE = 'F07' AND T1.TRADE_MARKET = '01' AND T1.PS IN ( '03', '04', 'T56', 'T93', 'T94', 'T95', 'T96' )
 					THEN cct.SEC_ACCT_NAME
-					WHEN T4.ASSET_TYPE = 'F07' AND T1.TRADE_MARKET != '01' THEN sci.ACCT_NAME
+					WHEN (T4.ASSET_TYPE = 'F07' AND T1.TRADE_MARKET != '01') or T4.BUSI_TYPE_POSITION = '02' or T4.BUSI_TYPE_POSITION = '03' THEN
+					sci.ACCT_NAME
 					ELSE nvl(detail.ACCT_NAME, nvl( SSAI.SEC_ACCT_NAME, detail.SEC_ACCT_NAME ) )
 					END secAcctName
 				,T4.ENTRUST_CREATE_SOURCE AS entrustCreateSource,
