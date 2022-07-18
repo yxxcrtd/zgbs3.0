@@ -539,8 +539,10 @@ public class IntegratedQuoteManagement {
         baseRepurchaseQuoteSendResponse.setBs(entrust.getPs());
         if (StringUtil.isNotEmpty(entrust.getExtend2())) {
             Map<String, Object> extend2 = JsonUtils.getObjectFromJson(entrust.getExtend2(), Map.class);
-            String maturityDate = (String)extend2.get("maturityDate");
-            baseRepurchaseQuoteSendResponse.setMaturityDate(DateUtil.format(DateUtil.parse(maturityDate)));
+            Object maturityDate = extend2.get("maturityDate");
+            if(Objects.nonNull(maturityDate)){
+                baseRepurchaseQuoteSendResponse.setMaturityDate(DateUtil.format(DateUtil.parse((String)maturityDate)));
+            }
         }
 
         return baseRepurchaseQuoteSendResponse;
