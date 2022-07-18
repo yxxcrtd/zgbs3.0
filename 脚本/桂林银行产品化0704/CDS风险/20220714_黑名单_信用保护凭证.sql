@@ -4,10 +4,10 @@ delete from rsk_access_list WHERE LIST_ID = '71';
 
 
 insert into RSK_ACCESS_LIST_TYPE (LIST_ID, RSK_ASSET_TYPE1, RSK_ASSET_TYPE2, RSK_ASSET_TYPE3, RSK_ASSET_TYPE4, RSK_ASSET_TYPE5, LIST_DETAIL_ID_TYPE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-values ('71', 'DD01', '', '', '', '','03', 'admin', '', '03-3月 -20 11.03.45.000000 上午', 'admin', '03-3月 -20 11.03.45.000000 上午');
+values ('71', 'DD01', '', '', '', '','03', 'admin', '', sysdate, 'admin', sysdate);
 
 insert into rsk_access_list (LIST_ID, LIST_NAME, LIST_TYPE, LIST_DETAIL_TYPE, EFFDATE, DELDATE, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, LIST_LEVEL)
-values ('71', '创设机构黑名单', '02', '03', to_date('17-09-2017', 'dd-mm-yyyy'), to_date('20-09-2022', 'dd-mm-yyyy'), '', 'admin', '', sysdate, 'admin', sysdate, '');
+values ('71', '创设机构黑名单', '02', '01', to_date('17-09-2017', 'dd-mm-yyyy'), to_date('20-09-2022', 'dd-mm-yyyy'), '', 'admin', '', sysdate, 'admin', sysdate, '');
 
 DELETE FROM FIN_PRODUCT_TYPE_CONFIG WHERE SEQNO = '111111420032';
-INSERT INTO FIN_PRODUCT_TYPE_CONFIG (SEQNO, CONFIG_TYPE, INPUT_VALUE_1, INPUT_VALUE_2, INPUT_VALUE_3, INPUT_VALUE_4, INPUT_VALUE_5, OUTPUT_VALUE_1, OUTPUT_VALUE_2, OUTPUT_VALUE_3, OUTPUT_VALUE_4, OUTPUT_VALUE_5, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES ('111111420032', 'RISK_TYPE', 'F37', null, null, null, null, 'DD01', null, null, null, null, null, 'system', null, TO_TIMESTAMP('2022-05-07 11:06:51.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'), 'system', TO_TIMESTAMP('2022-05-07 11:06:51.000000', 'YYYY-MM-DD HH24:MI:SS.FF6'));
+INSERT INTO FIN_PRODUCT_TYPE_CONFIG (SEQNO, CONFIG_TYPE, INPUT_VALUE_1, INPUT_VALUE_2, INPUT_VALUE_3, INPUT_VALUE_4, INPUT_VALUE_5, OUTPUT_VALUE_1, OUTPUT_VALUE_2, OUTPUT_VALUE_3, OUTPUT_VALUE_4, OUTPUT_VALUE_5, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME) VALUES ('111111420032', 'RISK_TYPE', 'F37', null, null, null, null, 'DD01', null, null, null, null, null, 'system', null, sysdate, 'system', sysdate);

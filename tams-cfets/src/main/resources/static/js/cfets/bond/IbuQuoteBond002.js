@@ -748,7 +748,7 @@
             $('#CfetsBondDealQuotedPrice004_finprodName').attr('disabled', true);
             $('#CfetsBondDealQuotedPrice004_settleSpreed').attr('disabled', true);
             //add by lijie2
-            if(PRICE_MODEL && PRICE_MODEL == PRICE_MODEL_PRM01){
+            if(PRICEMODEL && PRICEMODEL == PRICE_MODEL_PRM01){
                 $('#CfetsBondDealQuotedPrice004_unitCprice').attr('disabled', true);
                 $('#CfetsBondDealQuotedPrice004_matureYield').attr('disabled', true);
                 $('#CfetsBondDealQuotedPrice004_exerYield').attr('disabled', true);

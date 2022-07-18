@@ -1950,10 +1950,11 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
      *
      * @param totleTradeId
      * @param remark
+     * @param isRevoke 是否撤销,用来区分交收失败还是撤销;交收失败为false 撤销为true
      * @author jiangpeng
      * @date 2022/1/21 17:05
      */
-    public void revokeForOut(String totleTradeId, String remark) {
+    public void revokeForOut(String totleTradeId, String remark,Boolean isRevoke) {
         CfetsRepoDealDbDto result = new CfetsRepoDealDbDto();
         RegFinProductDealTotal total = regFinProductDealTotalMapper.selectByPrimaryKey(totleTradeId);
         total.setRemark(remark);
@@ -1968,9 +1969,11 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
         this.insert(result, OperationType.REVOKE);
         // 履历表
         this.updateCfetsOprHis(totleTradeId, OperationType.REVOKE);
-        // 头寸
-        PositionHttpRequest.dorevoke(totleTradeId, DictCodeListExt1.子系统代码_交易.getValue(),
-                DictCodeListExt3.头寸业务类型_质押式回购首期.getValue(), result.getRegFinProductDealTotal().getPs());
+        if (isRevoke) {
+            // 头寸
+            PositionHttpRequest.dorevoke(totleTradeId, DictCodeListExt1.子系统代码_交易.getValue(),
+                    DictCodeListExt3.头寸业务类型_质押式回购首期.getValue(), result.getRegFinProductDealTotal().getPs());
+        }
         // 处理旧头寸
         this.oldPositionDeal(result, true);
         //处理指令执行进度

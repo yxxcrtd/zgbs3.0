@@ -488,7 +488,7 @@ public class PositionRequestServiceInstructionRequest {
 
         // 质押券数据集	ptlSecList
         // IF 交易方向 = 首期、中途换券换入and 回购类型 = 正回购 THEN 传值 ELSE 空
-        if (交易方向_正回购.getValue().equals(firstRepoPs) || (交易方向_中途换券.getValue().equals(ps) && 交易方向_正回购.getValue().equals(ps))) {
+        if (交易方向_正回购.getValue().equals(firstRepoPs) && (交易方向_中途换券.getValue().equals(ps) || 交易方向_正回购.getValue().equals(ps))) {
             List<Map<String, Object>> list = new ArrayList<>(1);
             // 查询质押券集合
             InstructionPledge instructionPledge = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
@@ -500,7 +500,12 @@ public class PositionRequestServiceInstructionRequest {
                 bean.setSecAcctId(entity.getSecAcctId());
                 bean.setTradeId(entity.getEntrustNo());
                 bean.setEtrId(entity.getEntrustId());
-                BigDecimal secAmount = commonPositionEngineService.multiplyWithOneHundred(instructionPledge.getPledgeNumber());
+                BigDecimal secAmount;
+                if (交易方向_正回购.getValue().equals(ps)) {
+                    secAmount = entity.getEntrustAmt();
+                } else {
+                    secAmount = commonPositionEngineService.multiplyWithOneHundred(instructionPledge.getPledgeNumber());
+                }
                 bean.setSecAmount(secAmount);
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);

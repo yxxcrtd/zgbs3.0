@@ -181,6 +181,13 @@ public class OrderController {
         logger.info("综合业务下单：委托属性（entrustProp）转换：{} ==> {}", integratedEntrust.getEntrustProp(), entrustProp);
         integratedEntrust.setEntrustProp(entrustProp);
 
+        Map<String, Object> extend2 = Maps.newHashMap();
+        if (StringUtil.isNotEmpty(integratedEntrust.getExtend2())) {
+            extend2 = JsonUtils.getObjectFromJson(integratedEntrust.getExtend2(), Map.class);
+        }
+        extend2.put("maturityDate", order.getMaturityDate());
+        integratedEntrust.setExtend2(JsonUtils.getJsonFromObject(extend2));
+
         try {
             return new Message<>(orderManagement.sendIntegratedEntrust(integratedEntrust.getUserId(), integratedEntrust));
         } catch (BusinessResultException e) {

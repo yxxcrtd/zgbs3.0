@@ -396,6 +396,10 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
                         EntrustCommonDto entrustCommonDto = new EntrustCommonDto();
                         entrustCommonDto.setEtrEntrust(base.getEtrEntrust());
                         entrustCommonDto.setEtrEntrustAdd(base.getEtrEntrustAdd());
+                        if (StringUtil.isNotEmpty(base.getEtrEntrustAdd().getSettleSpreed())
+                                && StringUtil.isNotEmpty(base.getEtrEntrust().getVdate())) {
+                            entrustCommonDto.setSettleDate(DateUtil.addDay(base.getEtrEntrust().getVdate(), base.getEtrEntrustAdd().getSettleSpreed().intValue()));
+                        }
                         entrustCommonDto.setIsExistNew(DictCodeList.是否_是.getValue());
                         baseEtrCashPositionCommService.entrustStartExecute(entrustCommonDto);
                     }
@@ -463,6 +467,10 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
             EtrEntrustAdd etrEntrustAdd = new EtrEntrustAdd();
             entrustCommonDto.setEtrEntrust(etrEntrust);
             entrustCommonDto.setEtrEntrustAdd(etrEntrustAdd);
+            if (StringUtil.isNotEmpty(etrEntrustAdd.getSettleSpreed())
+                    && StringUtil.isNotEmpty(etrEntrust.getVdate())) {
+                entrustCommonDto.setSettleDate(DateUtil.addDay(etrEntrust.getVdate(), etrEntrustAdd.getSettleSpreed().intValue()));
+            }
             dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
             dto.setIsOutTrade(DictCodeList.是否_是.getValue());
             dto.setEntrustStatus(DictCodeListExt3.委托状态_流程中.getValue());
@@ -1659,6 +1667,10 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
                     EntrustCommonDto entrustCommonDto = new EntrustCommonDto();
                     entrustCommonDto.setEtrEntrust(dto.getEtrEntrust());
                     entrustCommonDto.setEtrEntrustAdd(dto.getEtrEntrustAdd());
+                    if (StringUtil.isNotEmpty(dto.getEtrEntrustAdd().getSettleSpreed())
+                            && StringUtil.isNotEmpty(dto.getEtrEntrust().getVdate())) {
+                        entrustCommonDto.setSettleDate(DateUtil.addDay(dto.getEtrEntrust().getVdate(), dto.getEtrEntrustAdd().getSettleSpreed().intValue()));
+                    }
                     entrustCommonDto.setIsExistNew(DictCodeList.是否_是.getValue());
                     baseEtrCashPositionCommService.entrustStartExecute(entrustCommonDto);
                 }

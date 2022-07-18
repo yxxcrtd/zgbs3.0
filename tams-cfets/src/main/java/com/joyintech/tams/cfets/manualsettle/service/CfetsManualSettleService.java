@@ -1079,18 +1079,18 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                     if (StringUtil.equals(entity.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
                         CfetsTrdBondInvestTradeDto revokeEntity = this.getTrdBondInvestTradeDto(entity.getTradeId());
                         revokeEntity.setTgBusiType(entity.getTgBusiType());
-                        cfetsTrdBondInvestTrade002Service.doCompleteRevoke(revokeEntity, settleRemark, StringUtil.isNotEmpty(totleTradeId));
+                        cfetsTrdBondInvestTrade002Service.doCompleteRevoke(revokeEntity, settleRemark, StringUtil.isNotEmpty(totleTradeId), false);
                     } else if (StringUtil.equals(entity.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())) {
                         CfetsTrdFirstBondInvestTradeDto revokeEntity = cfetsTrdFirstBondInvestTrade002Service.getTrdFirstBondInvestTradeDto(entity.getTradeId());
                         revokeEntity.setTgBusiType(entity.getTgBusiType());
-                        cfetsTrdFirstBondInvestTrade002Service.doCompleteBidRevoke(revokeEntity, settleRemark, StringUtil.isNotEmpty(totleTradeId));
+                        cfetsTrdFirstBondInvestTrade002Service.doCompleteBidRevoke(revokeEntity, settleRemark, StringUtil.isNotEmpty(totleTradeId), false);
                     }else {
                         CfetsTrdRepoTrade002Dto revokeEntity = new CfetsTrdRepoTrade002Dto();
                         revokeEntity.setTotleTradeId(entity.getTradeId());
                         revokeEntity.setTgBusiType(entity.getTgBusiType());
                         revokeEntity.setPs(entity.getPs());
                         // 登记编号存在时,为登记,反之为报价
-                        cfetsTrdRepoTrade002Service.doRevokeComplete(revokeEntity, settleRemark, StringUtil.isNotEmpty(totleTradeId));
+                        cfetsTrdRepoTrade002Service.doRevokeComplete(revokeEntity, settleRemark, StringUtil.isNotEmpty(totleTradeId), false);
                     }
                     //关闭对应指令
                     List<CfetsManualSettleDealInfo> listTemp = cfetsManualSettleMapper.getDealDetailsByTradeId(entity.getTradeId(), "Y");

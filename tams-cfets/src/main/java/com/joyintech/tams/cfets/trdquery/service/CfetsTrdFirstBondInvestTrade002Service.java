@@ -93,9 +93,10 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      * 一级申购撤销doComplete
      *
      * @param entity 参数
+     * @param isRevoke 是否撤销,用来区分交收失败还是撤销;交收失败为false 撤销为true
      * @since 1.0
      */
-    public CfetsTrdBondFirstSubInfoDto doCompleteBidRevoke(CfetsTrdFirstBondInvestTradeDto entity, String settleRemark, Boolean isNeedDealPosition) {
+    public CfetsTrdBondFirstSubInfoDto doCompleteBidRevoke(CfetsTrdFirstBondInvestTradeDto entity, String settleRemark, Boolean isNeedDealPosition,Boolean isRevoke) {
         logger.info("一级申购撤销doComplete,入参:" + JsonUtils.object2Json(entity));
         CfetsTrdBondFirstSubInfoDto tradeDto = null;
         Map<String, Object> params = new HashMap<>();
@@ -124,7 +125,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
                 remark = (settleRemark == null ? "" : settleRemark) + "交易撤销：" + entity.getRevokeReason();
             }
             regTotal.setRemark(remark);
-            tradeDto = cfetsTrdBondFirstSub002Service.dorevoke(regTotal.getTotleTradeId(), remark, isNeedDealPosition, entity.getTgBusiType());
+            tradeDto = cfetsTrdBondFirstSub002Service.dorevoke(regTotal.getTotleTradeId(), remark, isNeedDealPosition, isRevoke, entity.getTgBusiType());
         }
         // 删除匹配关系表
         cfetsTrdConfirmMapper.deleteByTrdId(bizCode);
@@ -203,7 +204,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
     @Override
     public void doComplete(CfetsTrdFirstBondInvestTradeDto entity, OperationType operationType) {
         if (operationType.equals(OperationType.REVOKE) || operationType.equals(OperationType.DELETE)) {
-            SpringContextUtil.getApplicationContext().getBean(CfetsTrdFirstBondInvestTrade002Service.class).doCompleteBidRevoke(entity,"",true);
+            SpringContextUtil.getApplicationContext().getBean(CfetsTrdFirstBondInvestTrade002Service.class).doCompleteBidRevoke(entity,"",true,true);
         }
     }
 

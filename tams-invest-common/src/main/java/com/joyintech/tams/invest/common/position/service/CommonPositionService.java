@@ -1,5 +1,6 @@
 package com.joyintech.tams.invest.common.position.service;
 
+import com.alibaba.fastjson.JSON;
 import com.greenpineyu.fel.FelEngine;
 import com.greenpineyu.fel.FelEngineImpl;
 import com.greenpineyu.fel.context.FelContext;
@@ -22,6 +23,8 @@ import com.joyintech.tams.invest.common.util.ExpressionUtil;
 import com.joyintech.tools.collectors.JoyinCollectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.ibatis.annotations.Param;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class CommonPositionService {
+	private final static Logger logger = LoggerFactory.getLogger(CommonPositionService.class);
 
 	private static  Map<String,Object> SCENE_CFG ;
 	private static  Map<String,Object> FLOW_CFG ;
@@ -67,6 +71,7 @@ public class CommonPositionService {
 	 */
 	public boolean process(PostionParameter parameter) {
 		if(!SCENE_CFG.containsKey(parameter.toKey())){
+			logger.debug("[没有配置对应场景主键,key={}]", parameter.toKey());
 			return false;//没有配置对应场景主键
 		}
 		List<PtlPositionScene> ptlPositionSceneList = (List<PtlPositionScene>) SCENE_CFG.get(parameter.toKey());
@@ -223,6 +228,7 @@ public class CommonPositionService {
 	}
 
 	private Map<String, Object> getParamMap(Map<String, Object> properties, PtlPositionFlowCfg ptlPositionFlowCfg) {
+		logger.debug("[头寸处理参数,properties:{},ptlPositionFlowCfg:{}]", JSON.toJSONString(properties), JSON.toJSONString(ptlPositionFlowCfg));
 		Map<String,Object> dataMap =ptlPositionFlowCfg.getDataMap();
 		Map<String, Object> param = new HashMap<>();
 		for(String key:dataMap.keySet()){

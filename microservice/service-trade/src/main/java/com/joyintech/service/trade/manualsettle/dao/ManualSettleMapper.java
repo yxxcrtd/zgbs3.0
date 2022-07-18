@@ -95,5 +95,9 @@ public interface ManualSettleMapper {
     int updateEtrSecPosition(EtrSecPosition etrSecPosition);
 
     List<TrdProductTempDeal> selectTrdProductTempDeals(@Param("totleTradeId") String totleTradeId);
+
+    // XYHGFXSJ-8:查询质押品信息list modify by fuyongsheng 20220718 start
+    List<FinDealPledge> selectFinDealPledgeByTradeId(@Param("tradeId") String tradeId);
+    // XYHGFXSJ-8:查询质押品信息list modify by fuyongsheng 20220718 end
 } 
 

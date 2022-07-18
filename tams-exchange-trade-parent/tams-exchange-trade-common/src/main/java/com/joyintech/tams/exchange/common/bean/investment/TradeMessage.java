@@ -2,10 +2,11 @@ package com.joyintech.tams.exchange.common.bean.investment;
 
 import com.joyintech.tams.exchange.common.constant.BusinessFlag;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
-import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
 import com.joyintech.tams.exchange.common.db.domain.Trade;
+import com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 
 import java.math.BigDecimal;
@@ -42,7 +43,7 @@ public class TradeMessage extends BasicMessage {
     private String counterId;     // 交易对手
     private BigDecimal pledgeRatio;     // 折算比例%
     private Double entrustVolume;      // 委托数量
-	private String propAcctNo; //对手资金账户
+    private String propAcctNo; //对手资金账户
     private String tradeId;//	 本方交易员ID
     private String investorId;// 本方交易主体ID
     private String dealerId;//	 本方交易商ID
@@ -275,13 +276,15 @@ public class TradeMessage extends BasicMessage {
         this.entrustVolume = entrustVolume;
     }
 
-public String getPropAcctNo() {
+    public String getPropAcctNo() {
         return propAcctNo;
     }
 
     public void setPropAcctNo(String propAcctNo) {
         this.propAcctNo = propAcctNo;
-    }    public String getTradeId() {
+    }
+
+    public String getTradeId() {
         return tradeId;
     }
 
@@ -361,10 +364,15 @@ public String getPropAcctNo() {
             }
             //协议回购
             if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
-                //到期结算金额
-                tradeMessage.setDealBalance(entrust.getBackBalance());
+                if (BusiTypeTgEnum.首期.codeEquals(trade.getBusiTypeTg())) {
+                    //回购金额
+                    tradeMessage.setDealBalance(entrust.getTradedBalance());
+                } else {
+                    //到期结算金额
+                    tradeMessage.setDealBalance(entrust.getBackBalance());
+                }
 
-                IntegratedEntrust integratedEntrust = (IntegratedEntrust)entrust;
+                IntegratedEntrust integratedEntrust = (IntegratedEntrust) entrust;
                 tradeMessage.setTradeId(integratedEntrust.getTradeId());
                 tradeMessage.setCounterId(integratedEntrust.getCounterId());
                 tradeMessage.setInvestorId(integratedEntrust.getInvestorId());
@@ -377,7 +385,7 @@ public String getPropAcctNo() {
                     && tradeMessage.getFullPrice() != 0) {
                 //成交全价金额
                 tradeMessage.setDealBalance(TradeUtils.multiply(BigDecimal.valueOf(tradeMessage.getFullPrice()), tradeMessage.getDealVolume().longValue(), 2));
-            }else if(InvestAssetTypeEnum.isCreditProtectionCertificate(trade.getAssetType())) { //信用保护凭证
+            } else if (InvestAssetTypeEnum.isCreditProtectionCertificate(trade.getAssetType())) { //信用保护凭证
                 tradeMessage.setCounterId(trade.getCounterId());//交易对手
                 tradeMessage.setPropAcctNo(trade.getPropAcctNo());//对手资金账户
             }

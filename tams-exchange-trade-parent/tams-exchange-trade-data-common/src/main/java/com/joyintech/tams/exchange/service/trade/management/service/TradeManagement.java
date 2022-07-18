@@ -8,12 +8,13 @@ import com.joyintech.tams.exchange.common.bean.HistoryTrade;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.TradeQueryBean;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
-import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.Market;
 import com.joyintech.tams.exchange.common.constant.PresentOrHistoryQryType;
+import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.db.domain.TradeHistory;
 import com.joyintech.tams.exchange.common.domain.Message;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.request.HistoryTradeInfoRequest;
 import com.joyintech.tams.exchange.common.request.PageMode;
 import com.joyintech.tams.exchange.common.request.PageTradeInfoRequest;
@@ -159,7 +160,8 @@ public class TradeManagement {
                 trade.setBondVolume(trade.getTradedPrice().multiply(BigDecimal.valueOf(trade.getTradedVolume())).divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
                 trade.setTradedPrice(trade.getTradedPrice().multiply(BigDecimal.valueOf(100)));
             } else if (投管业务类型_现券交易.getValue().equals(trade.getBusiTypeTg())
-                    || 投管业务类型_信用保护凭证.getValue().equals(trade.getBusiTypeTg())) {
+                    || 投管业务类型_信用保护凭证.getValue().equals(trade.getBusiTypeTg())
+                    || EntrustUtils.isPledgeAgreementRepurchase(trade.getBusiTypeTg())) {
                 trade.setTradedVolumeView(BigDecimal.valueOf(o.getTradedVolume()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
             } else if (投管业务类型_通用式质押回购.getValue().equals(busiTypeTg)) {
                 trade.setTradedBalance(trade.getTradedBalance().divide(BigDecimal.valueOf(10000), 2, RoundingMode.HALF_UP));

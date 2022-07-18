@@ -977,10 +977,11 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      * @param remark             备注
      * @param isNeedDealPosition 是否需要撤销持仓
      * @param tgBusiType         业务类型
+     * @param isRevoke 是否撤销,用来区分交收失败还是撤销;交收失败为false 撤销为true
      * @author jiangpeng
      * @date 2022/5/12 14:53
      */
-    public CfetsTrdBondFirstSubInfoDto dorevoke(String bidId, String remark, Boolean isNeedDealPosition, String tgBusiType) {
+    public CfetsTrdBondFirstSubInfoDto dorevoke(String bidId, String remark, Boolean isNeedDealPosition,Boolean isRevoke, String tgBusiType) {
         CfetsTrdBondFirstSubInfoDto entity = this.prepareDto(bidId);
         entity.setBidId(bidId);
         entity.setRemark(remark);
@@ -988,8 +989,10 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         if (isNeedDealPosition) {
             // 匹配取消
             cfetsTrdBondFirstSub002Mapper.deleteByPreTradeId(entity.getBidId());
-            PositionHttpRequest.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
-                    DictCodeListExt3.头寸业务类型_债券一级申购.getValue(), DictCodeList.交易方向_买入.getValue());
+            if (isRevoke) {
+                PositionHttpRequest.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
+                        DictCodeListExt3.头寸业务类型_债券一级申购.getValue(), DictCodeList.交易方向_买入.getValue());
+            }
         }
         // 老头寸处理
         this.dealOldPosition(entity, true);
