@@ -186,16 +186,13 @@ public class ExchangeRiskInputParamService extends RiskCommonService {
         // CDS(信用保护凭证),新建、check、占用、退回、作废
         if (data instanceof EtrCreditProtectionCertificateApplyRequest){
             EtrCreditProtectionCertificateApplyRequest dto = (EtrCreditProtectionCertificateApplyRequest)data;
-            List<?> list = dto.getPortfolioList();
-            if (CollectionUtils.isEmpty(list)) {
-                list = dto.getSelectedItem();
-            }
-            CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl, dto);
-            generateInputDto(inputDto, dto, dto);
-            result.add(inputDto);
-
+            dto.getPortfolioList().forEach(item -> {
+                CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl, dto);
+                generateInputDto(inputDto, dto, item);
+                result.add(inputDto);
+            });
         }
-        return new ArrayList<>();
+        return result;
     }
 
 
@@ -299,16 +296,16 @@ public class ExchangeRiskInputParamService extends RiskCommonService {
         //CDS(信用保护凭证)指令
         if (obj instanceof EtrCreditProtectionCertificateApplyRequest) {
             EtrCreditProtectionCertificateApplyRequest inputDto = (EtrCreditProtectionCertificateApplyRequest) obj;
+            EtrExchangeTradePortfolioSecRepoRequest detail = (EtrExchangeTradePortfolioSecRepoRequest)detailObj;
             creditLinesInputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
-            creditLinesInputDto.setTradeId(inputDto.getEntrustId());
+            creditLinesInputDto.setTradeId(inputDto.getEntrustId() + "-" + detail.getPortfolioId());
             creditLinesInputDto.setFinprodId(inputDto.getFinprodId());
             creditLinesInputDto.setTradeDate(inputDto.getVdate());
             creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
             creditLinesInputDto.setTgBusiType(DictCodeList.平安资产类型_信用保护凭证.getValue());
             creditLinesInputDto.setPs(inputDto.getPs());
             creditLinesInputDto.setCounterId(inputDto.getCounterId());
-            creditLinesInputDto.setTradeAmt(inputDto.getEntrustAmt());
-
+            creditLinesInputDto.setTradeAmt(ArithmeticUtil.multiply(detail.getEntrustNum(),new BigDecimal("100")));
         }
     }
 

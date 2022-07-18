@@ -3153,6 +3153,11 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             infRiskRdsDto.setAssetCode(null);
             infRiskRdsDto.setMarketCode(null);
         }
+        // 信用保护凭证
+        if (StringUtil.equals(v.getAssetType(),DictCodeList.平安资产类型_信用保护凭证.getValue())){
+            infRiskRdsDto.setTradeNum(dataMap.get("repNomCapi") == null ? BigDecimal.ZERO : new BigDecimal(dataMap.get("repNomCapi").toString()));
+            infRiskRdsDto.setEffectCash(StringUtil.equals(dataMap.get("effectCash"),"Y") ? "Y":"N");
+        }
         return infRiskRdsDto;
     }
 

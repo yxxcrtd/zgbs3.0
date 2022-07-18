@@ -214,7 +214,9 @@ $(function () {
                     if (result.investCycle != null) {
                         $('#investCycle2').val(result.investCycle).prop('disabled', false).trigger('change');
                     } else {
-                        $('#investCycle2').val('').prop('disabled', false).trigger('change');
+                        if(pageModel == PAGE_MODEL_NEW) {
+                            $('#investCycle2').val('').prop('disabled', false).trigger('change');
+                        }
                     }
                 }
                 // $('#investCycle2').val(result.investCycle).prop('disabled', true).trigger('change');

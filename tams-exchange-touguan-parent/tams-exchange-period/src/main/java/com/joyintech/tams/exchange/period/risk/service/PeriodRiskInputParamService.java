@@ -2,6 +2,7 @@ package com.joyintech.tams.exchange.period.risk.service;
 
 import com.google.common.collect.Lists;
 import com.joyintech.framework.base.entity.ProcessMark;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
@@ -18,10 +19,14 @@ import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.constant.DictCodeListRsk;
+import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.BillingDetailsDto;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodSaveDto;
 import com.joyintech.tams.exchange.period.risk.dto.ManualSettleDto;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
+import com.joyintech.tams.invest.common.redisinit.dto.ImplProdAssetAmount;
 import com.joyintech.tams.invest.common.risk.dto.RiskNameListDto;
+import com.joyintech.tams.invest.common.riskinfrds.info.entity.IProdAssetAmount;
+import com.joyintech.tams.invest.common.riskinfrds.info.service.ProdAssetAmountService;
 import com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto;
 import com.joyintech.workflow.engine.WorkflowContext;
 import org.apache.commons.collections.CollectionUtils;
@@ -30,6 +35,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 
@@ -42,6 +49,8 @@ public class PeriodRiskInputParamService extends RiskCommonService {
     private RiskNodeConfigService riskNodeConfigService;
     @Autowired
     private InterfRiskRdsService<InterfRiskRdsDto> interfRiskRdsService;
+    @Autowired
+    private ProdAssetAmountService prodAssetAmtSrc;
 
     /**
      * 指标和授信占用
@@ -130,14 +139,26 @@ public class PeriodRiskInputParamService extends RiskCommonService {
             riskRdsDto.setAssetType(DictCodeList.平安资产类型_信用保护凭证.getValue());
             riskRdsDto.setEventType(BussinessDictCodeListRds.事件类型_投资交易.getValue());
             riskRdsDto.setEventStatus(BussinessDictCodeListRds.事件类型_投资交易_存续期.getValue());
-
+            // 影响信用保护凭证本身相关参数
             list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, dto.getBillingDetails(), map -> {
                 // 处理交易方向、交易金额等
-                map.put("tradeId",dto.getBusiCode() + "-" + map.get("portfolioId"));
+                map.put("tradeId",dto.getBusiCode() + "-" + map.get("portfolioId") + "-" + DictCodeList.交易方向_到期.getValue());
                 map.put("ps",DictCodeList.交易方向_到期.getValue());
-                map.put("tradeAmt",map.get("repNomCapi"));
+                BigDecimal num = map.get("repNomCapi") == null ? BigDecimal.ZERO : new BigDecimal(map.get("repNomCapi").toString());
+                IProdAssetAmount assetAmount = prodAssetAmtSrc.getProdAssetAmount(map.get("portfolioId").toString(),dto.getFinprodId());
+                BigDecimal tradeAmt = ArithmeticUtil.divide(ArithmeticUtil.multiply(num,assetAmount.getAmount()),
+                                            assetAmount.getNum(),2, RoundingMode.HALF_UP);
+                map.put("tradeAmt",tradeAmt);
                 map.put("finprodId",dto.getFinprodId());
             });
+            // 影响现金规模
+            list.addAll(interfRiskRdsService.getRiskRdsListData(riskRdsDto, dto.getBillingDetails(), map -> {
+                // 处理交易方向、交易金额等
+                map.put("tradeId",dto.getBusiCode() + "-" + map.get("portfolioId"));
+                map.put("effectCash","Y");
+                BigDecimal tradeAmt = map.get("deliveryAmount") == null ? BigDecimal.ZERO : new BigDecimal(map.get("deliveryAmount").toString());
+                map.put("tradeAmt",tradeAmt);
+            }));
         }
         // CDS(信用保护凭证),交收失败
         if (data instanceof ManualSettleDto){
@@ -182,11 +203,13 @@ public class PeriodRiskInputParamService extends RiskCommonService {
         // CDS(信用保护凭证),交收失败
         if (data instanceof ManualSettleDto){
             ManualSettleDto dto = (ManualSettleDto)data;
-            CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl, dto);
-            generateInputDto(inputDto, dto, dto);
-            result.add(inputDto);
+            dto.getSelectedItem().forEach(item -> {
+                CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl, dto);
+                generateInputDto(inputDto, dto, item);
+                result.add(inputDto);
+            });
         }
-        return new ArrayList<>();
+        return result;
     }
 
 
@@ -275,12 +298,21 @@ public class PeriodRiskInputParamService extends RiskCommonService {
             creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
             creditLinesInputDto.setTgBusiType(DictCodeList.平安资产类型_信用保护凭证.getValue());
             creditLinesInputDto.setPs(DictCodeList.交易方向_到期.getValue());
+            BigDecimal tradeAmt = BigDecimal.ZERO;
+            for (BillingDetailsDto billingDetailsDto : inputDto.getBillingDetails()) {
+                BigDecimal repNomCapi = billingDetailsDto.getRepNomCapi();
+                if (repNomCapi != null) {
+                    tradeAmt = tradeAmt.add(repNomCapi);
+                }
+            }
+            creditLinesInputDto.setTradeAmt(tradeAmt);
         }
         //CDS(信用保护凭证)交收失败
         if (obj instanceof ManualSettleDto) {
             ManualSettleDto inputDto = (ManualSettleDto) obj;
+            ManualSettleDto detail = (ManualSettleDto) detailObj;
             creditLinesInputDto.setCreditCallType(DictCodeListRsk.授信占用类别_实占.getValue());
-            creditLinesInputDto.setTradeId(inputDto.getTradeId());
+            creditLinesInputDto.setTradeId(inputDto.getEntrustNo() + "-" + detail.getPortfolioId() + "-" + inputDto.getOrderId());
             creditLinesInputDto.setFinprodId(inputDto.getFinprodId());
             creditLinesInputDto.setTradeDate(inputDto.getTradeDate());
             creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
