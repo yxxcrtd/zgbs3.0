@@ -2522,9 +2522,19 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         parameter.setOperationType("NEW");
         parameter.setTradeType("01");
         if(DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getRepPs())){
+            // XYHGFXSJ-124:转换首期交易方向 modify by fuyongsheng 20220718 start
+            if(DictCodeListExt3.交易方向_首期.getValue().equals(dto.getPs())){
+                parameter.setPs(DictCodeList.回购拆借方向_正回购.getValue());
+            }
+            // XYHGFXSJ-124:转换首期交易方向 modify by fuyongsheng 20220718 end
             String businessType = DictCodeList.回购类型_质押式协议回购.getValue().concat(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
             parameter.setBusinessType(businessType);
         }else{
+            // XYHGFXSJ-124:转换首期交易方向 modify by fuyongsheng 20220718 start
+            if(DictCodeListExt3.交易方向_首期.getValue().equals(dto.getPs())){
+                parameter.setPs(DictCodeList.回购拆借方向_逆回购.getValue());
+            }
+            // XYHGFXSJ-124:转换首期交易方向 modify by fuyongsheng 20220718 end
             parameter.setBusinessType(DictCodeList.回购类型_质押式协议回购.getValue().concat(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue()));
         }
         // 查询首期交易类金融产品数据

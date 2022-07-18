@@ -71,6 +71,7 @@ public class CommonPositionService {
 	 */
 	public boolean process(PostionParameter parameter) {
 		if(!SCENE_CFG.containsKey(parameter.toKey())){
+			logger.debug("[没有配置对应场景主键,key={}]", parameter.toKey());
 			return false;//没有配置对应场景主键
 		}
 		List<PtlPositionScene> ptlPositionSceneList = (List<PtlPositionScene>) SCENE_CFG.get(parameter.toKey());
