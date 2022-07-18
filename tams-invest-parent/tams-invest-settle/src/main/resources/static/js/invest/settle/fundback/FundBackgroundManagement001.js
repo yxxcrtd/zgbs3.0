@@ -45,7 +45,8 @@ var table
                     }
                     return "<a class='pro-link' style='cursor: pointer;' " +
                         "href='javascript:openOperateWindow(\"" + row.statusValid + "\",\"" + row.paBussType + "\",\"" + row.portfolioId + "\",\""
-                        + row.bizCode + "\",\"" + row.workflowId + "\",\"" + row.finprodId + "\",\"" + row.ps + "\",\"" + row.wflWorkflowId + "\","+row.todo+ ",\""+ row.profitType + "\",\"" + row.finprodId + "\",\"" + row.operateType + "\")'>" + data + "</a>";
+                        + row.bizCode + "\",\"" + row.workflowId + "\",\"" + row.finprodId + "\",\"" + row.ps + "\",\"" + row.wflWorkflowId + "\","+row.todo+ ",\""
+                        + row.profitType + "\",\"" + row.finprodId + "\",\"" + row.operateType+ "\",null,null,\"" + row.paBussTypeAdd + "\")'>" + data + "</a>";
                 }
             }
             , {field: 'paBussTypeString', width: 200, sortField:'PA_BUSS_TYPE', title: '业务类型'}
