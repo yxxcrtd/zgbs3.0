@@ -400,7 +400,7 @@ public class CfetsTrdRepoTrade002Service extends BaseService<CfetsTrdRepoTrade00
         }
         // 撤销
         else {
-            SpringContextUtil.getApplicationContext().getBean(CfetsTrdRepoTrade002Service.class).doRevokeComplete(entity,"",true);
+            SpringContextUtil.getApplicationContext().getBean(CfetsTrdRepoTrade002Service.class).doRevokeComplete(entity,"",true,true);
             
             // 发送Murex接口处理
 //            this.sendMurex(input, true);
@@ -1003,11 +1003,12 @@ public class CfetsTrdRepoTrade002Service extends BaseService<CfetsTrdRepoTrade00
     /**
      * 撤销doRevokeComplete
      *
-     * @param entity input
+     * @param input
+     * @param isRevoke 是否撤销,用来区分交收失败还是撤销;交收失败为false 撤销为true
      * @see
      * @since 1.0
      */
-    public void doRevokeComplete(CfetsTrdRepoTrade002Dto input, String settleRemark, Boolean isNeedDealPosition) {
+    public void doRevokeComplete(CfetsTrdRepoTrade002Dto input, String settleRemark, Boolean isNeedDealPosition,Boolean isRevoke) {
         // 调用基础组合.【金融产品交易组件.查询金融产品交易信息】获取原交易信息
         if (input.getTotleTradeId().lastIndexOf('R') == input.getTotleTradeId().length() - 1) {
             input.setTotleTradeId(input.getTotleTradeId().substring(0, input.getTotleTradeId().length() - 1));
@@ -1165,15 +1166,16 @@ public class CfetsTrdRepoTrade002Service extends BaseService<CfetsTrdRepoTrade00
             }
             regTotal.setRemark(remark);
             //regTotal.setTradeStatus(DictCodeListExt1.有效状态_撤销.getValue());
-            cfetsRepoQuotedPrice004Service.revokeForOut(regTotal.getTotleTradeId(), remark);
+            cfetsRepoQuotedPrice004Service.revokeForOut(regTotal.getTotleTradeId(), remark, isRevoke);
             cfetsTrdQueryMapper.updateRegTotalByPrimaryKeySelective(regTotal);
         }
         cfetsTrdConfirmMapper.deleteByTrdId(bizCode);
 
         //发送头寸
         if(isNeedDealPosition){
-            PositionHttpRequest.dorevoke(bizCode, DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_质押式回购首期.getValue(), input.getPs());
-
+            if(isRevoke) {
+                PositionHttpRequest.dorevoke(bizCode, DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_质押式回购首期.getValue(), input.getPs());
+            }
             //PositionHttpRequest.deleteMethod(bizCode,DictCodeListExt1.子系统代码_交易.getValue(),"REPO001");
         }else {
             Map<String, Object> paramMap = new HashMap<>();

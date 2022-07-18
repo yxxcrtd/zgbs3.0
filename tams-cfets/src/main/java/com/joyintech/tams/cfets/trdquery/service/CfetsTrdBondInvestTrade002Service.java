@@ -1074,10 +1074,12 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
      * 撤销doComplete
      *
      * @param entity 参数
+     * @param isRevoke 是否撤销,用来区分交收失败还是撤销;交收失败为false 撤销为true
      * @see
      * @since 1.0
      */
-    public TrdBondInvestTradeDto doCompleteRevoke(CfetsTrdBondInvestTradeDto entity,String settleRemark,Boolean isNeedDealPosition) {
+    public TrdBondInvestTradeDto doCompleteRevoke(CfetsTrdBondInvestTradeDto entity, String settleRemark
+            , Boolean isNeedDealPosition , Boolean isRevoke) {
         // 调用基础组合.【金融产品交易组件.查询金融产品交易信息】获取原交易信息
         if (entity.getTotleTradeId().lastIndexOf('R') == entity.getTotleTradeId().length() - 1) {
             entity.setTotleTradeId(entity.getTotleTradeId().substring(0, entity.getTotleTradeId().length() - 1));
@@ -1209,16 +1211,13 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
                 remark = (settleRemark == null ? "" : settleRemark) + "交易撤销：" + entity.getRevokeReason();
             }
             regTotal.setRemark(remark);
-            cfetsBondDealQuotedPrice004Service.dorevoke(regTotal.getTotleTradeId(),remark,isNeedDealPosition,entity.getTgBusiType());
+            cfetsBondDealQuotedPrice004Service.dorevoke(regTotal.getTotleTradeId(), remark, isRevoke, entity.getTgBusiType());
             //若是备注撤销内容不为空，则需要更新原登记数据的备注内容
             cfetsTrdQueryMapper.updateRegTotalByPrimaryKeySelective(regTotal);
         }
         String exeId = cfetsTrdQueryMapper.seleteByTrdId(bizCode);
         cfetsTrdConfirmMapper.deleteByTrdId(bizCode);
 
-        if(StringUtil.equals(entity.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
-            cfetsTrdBondFirstSub002Service.dorevoke(entity.getBidId(), entity.getRemark(), true, DictCodeListExt3.头寸业务类型_债券一级申购.getValue());
-        }
        //发送头寸
         if(isNeedDealPosition) {
             String ps = entity.getPs();
@@ -1231,7 +1230,9 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
             } else {
                 busiType = DictCodeListExt3.头寸业务类型_现券交易.getValue();
             }
-            PositionHttpRequest.dorevoke(bizCode, DictCodeListExt1.子系统代码_交易.getValue(), busiType, ps);
+            if (isRevoke) {
+                PositionHttpRequest.dorevoke(bizCode, DictCodeListExt1.子系统代码_交易.getValue(), busiType, ps);
+            }
 
             // PositionHttpRequest.deleteMethod(bizCode,DictCodeListExt1.子系统代码_交易.getValue(),"Bond001");
         }else{
@@ -1534,7 +1535,7 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
         }
         // 撤销
         else {
-            SpringContextUtil.getApplicationContext().getBean(CfetsTrdBondInvestTrade002Service.class).doCompleteRevoke(entity,"",true);
+            SpringContextUtil.getApplicationContext().getBean(CfetsTrdBondInvestTrade002Service.class).doCompleteRevoke(entity, "", true, true);
 
             //补充  如果是撤销将交易ID赋值为null
             Map<String, Object> map = new HashMap<>();
