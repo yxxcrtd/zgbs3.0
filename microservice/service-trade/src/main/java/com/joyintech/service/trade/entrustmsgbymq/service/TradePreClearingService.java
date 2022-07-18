@@ -1704,6 +1704,12 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                         }
                         finDealPledgeList.add(finDealPledge);
                     }
+                    // XYHGFXSJ-8:深交所协议回购首期,质押券是1个,保持原逻辑,向原质押券对象赋值 modify by fuyongsheng 20220718 start
+                    if(DictCodeList.回购拆借方向_正回购.getValue().equals(infContractDetailfile.getPs())
+                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(infContractDetailfile.getPs())){
+                        dto.setFinDealPledge(finDealPledgeList.get(0));
+                    }
+                    // XYHGFXSJ-8:深交所协议回购首期,质押券是1个,保持原逻辑,向原质押券对象赋值 modify by fuyongsheng 20220718 end
                 }
             }
         }else  if(finTradeProduct.getFinprodId() != null && infContractDetailfile.getFinprodMarketId() != null){
