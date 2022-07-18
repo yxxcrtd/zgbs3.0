@@ -300,7 +300,11 @@ public class PtlCashFlowGapAnalysis001Dto extends BaseEntity {
 	
 	public String getFeetypeStr() {
 		if (StringUtil.isNotEmpty(feetype)) {
-			return SysDataUtil.getNameFromDataDict(DictCode.费用品种类型, feetype);
+			String feetypeStr = SysDataUtil.getNameFromDataDict(DictCode.费用品种类型, feetype);
+			if(feetypeStr.equals(feetype)){
+				return SysDataUtil.getNameFromDataDict(DictCode.金融产品类型_投管用, feetype);
+			}
+			return feetypeStr;
 		}
 		return feetype;
 	}
