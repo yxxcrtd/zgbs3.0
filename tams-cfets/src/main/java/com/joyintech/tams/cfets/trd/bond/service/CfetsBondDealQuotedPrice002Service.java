@@ -10,6 +10,7 @@
 
 package com.joyintech.tams.cfets.trd.bond.service;
 
+import com.joyintech.background.component.uplink.interbank.business.bondreqservice.BondRequestQuoteSubService;
 import com.joyintech.background.component.uplink.interbank.business.dto.BondDialogueQuoteDto;
 import com.joyintech.background.component.uplink.interbank.business.dto.IbuQuoteBondDto;
 import com.joyintech.background.component.uplink.interbank.business.service.IbuMainService;
@@ -103,9 +104,6 @@ public class CfetsBondDealQuotedPrice002Service extends BaseService<CfetsBondDea
     private CfetsBondDealQuotedPriceService cfetsBondDealQuotedPriceService;
 
     @Autowired
-    private IbuQuoteBondService ibuQuoteBondService;
-
-    @Autowired
     private FinProductMapper finProductMapper;
 
     @Autowired
@@ -127,8 +125,12 @@ public class CfetsBondDealQuotedPrice002Service extends BaseService<CfetsBondDea
 
     @Autowired
     private CfetsBondDealQuotedPrice002Service cfetsBondDealQuotedPrice002Service;
+
     @Autowired(required = false)
     private BasRiskMathCommService basRiskMathCommService;
+
+    @Autowired
+    private BondRequestQuoteSubService bondRequestQuoteService;
 
     /**
      * 设置流程业务说明
@@ -1164,6 +1166,8 @@ public class CfetsBondDealQuotedPrice002Service extends BaseService<CfetsBondDea
     public void doBack(CfetsBondDealDialogueQuoteDto entity) {
         String systemAct = handSystemAct(entity);
         sendPosition(entity, DictCodeListExt3.流程节点_流程退回.getValue(), systemAct, systemAct, null);
+        // 删除流程中表数据
+        bondRequestQuoteService.deleteWflBondRequestQuoteByKey(entity.getQuoteId(), true);
 
         //doDeletePtlPositionHold(entity.getWorkflowId());
         if (StringUtil.equals(com.joyintech.tams.constant.DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {

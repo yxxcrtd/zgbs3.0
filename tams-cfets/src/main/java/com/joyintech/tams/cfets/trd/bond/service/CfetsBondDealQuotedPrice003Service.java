@@ -10,6 +10,7 @@
  
 package com.joyintech.tams.cfets.trd.bond.service;
 
+import com.joyintech.background.component.uplink.interbank.business.bondreqservice.BondRequestQuoteSubService;
 import com.joyintech.background.component.uplink.interbank.business.service.IbuMainService;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
@@ -18,13 +19,7 @@ import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.security.LoginUserUtil;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.JsonUtils;
-import com.joyintech.framework.util.RequestUtil;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.service.bankuplink.bond.service.CfetsBondDealQuotedPriceService;
 import com.joyintech.service.bankuplink.ibu.dto.BondQuoteInfoDto;
@@ -73,11 +68,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -147,6 +138,9 @@ public class CfetsBondDealQuotedPrice003Service extends BaseService<CfetsBondDea
     private CfetsRepoQuotedPrice004Service cfetsRepoQuotedPrice004Service;
     @Autowired(required = false)
     private BasRiskMathCommService basRiskMathCommService;
+
+    @Autowired
+    private BondRequestQuoteSubService bondRequestQuoteService;
     /**
      * 设置流程业务说明
      */
@@ -1018,6 +1012,8 @@ public class CfetsBondDealQuotedPrice003Service extends BaseService<CfetsBondDea
     	//doDeletePtlPositionHold(entity.getWorkflowId());
         String systemAct = handSystemAct(entity);
         sendPosition(entity,DictCodeListExt3.流程节点_流程退回.getValue(),systemAct,systemAct,null);
+        // 删除流程中表数据
+        bondRequestQuoteService.deleteWflBondRequestQuoteByKey(entity.getQuoteId(), true);
     }
     
     /**
