@@ -134,6 +134,20 @@
                     "95%", "90%",
                     param);
             }
+            //银行间债回售
+            else if(data.tradeMarket == '01'&& data.assetType == F01 && (data.ps == PS_T03)){
+                var param = {
+                    "busiCode": data.entrustId,
+                    "finprodType2": F01
+                };
+                var url = "home.html?a=a&busiCode=" + data.entrustId + "&finprodType2=" + F11 +
+                    "&pageModel=1&editable=false&isTodoList=true#/instructionSearch/detail?a=a";
+
+                Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+                    basePath + url,
+                    "95%", "90%",
+                    param);
+            }
             //银行间债券买卖
             else if(data.tradeMarket == '01'&& data.assetType == F01 && (data.busiTypePosition == '01' || data.busiTypePosition == '34')){
                 var param = {
