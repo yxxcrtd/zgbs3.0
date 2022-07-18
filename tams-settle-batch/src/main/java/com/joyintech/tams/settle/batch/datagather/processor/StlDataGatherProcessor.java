@@ -271,10 +271,13 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
             this.checkAgreRepEntrustAmt(settleTransDataDto, currEtrEntrust, entrustIds);
         }
         // 协议回购当且仅有一条指令满足条件时,自动匹配
+        // XYHGFXSJ-94:协议回购匹配指令数量大于1时,不能自动匹配，但是可以在页面手动匹配,需要更新指令的状态 modify by fuyongsheng 20220718 start
         if(entrustIds.size() == 1){
             exchangeTransMatchCommonDto.setEntrustIdList(entrustIds);
-            needUpdateStatusEntrustIdList.addAll(entrustIds);
+            // needUpdateStatusEntrustIdList.addAll(entrustIds);
         }
+        needUpdateStatusEntrustIdList.addAll(entrustIds);
+        // XYHGFXSJ-94:协议回购匹配指令数量大于1时,不能自动匹配，但是可以在页面手动匹配,需要更新指令的状态 modify by fuyongsheng 20220718 end
     }
 
     /**
