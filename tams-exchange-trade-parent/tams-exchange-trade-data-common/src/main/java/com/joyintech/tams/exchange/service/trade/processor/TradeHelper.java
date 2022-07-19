@@ -1,10 +1,8 @@
 package com.joyintech.tams.exchange.service.trade.processor;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.joyintech.exchange.service.quote.service.QuoteService;
@@ -19,7 +17,6 @@ import com.joyintech.tams.exchange.common.bean.terminal.RTGSStatusBean;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.instrument.SubStockType;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt2;
-import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.dto.EntrustPriceAndYieldDto;
@@ -62,11 +59,11 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static com.joyintech.tams.constant.DictCodeListExt3.*;
+import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押券入库;
+import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押券出库;
 import static com.joyintech.tams.exchange.common.constant.BatchPriceMode.*;
 import static com.joyintech.tams.exchange.common.constant.EntrustProp.*;
 import static com.joyintech.tams.exchange.common.constant.ErrorCode.ENTRUST_BSFLAG_PARSE_ERROR;
-import static com.joyintech.tams.exchange.common.constant.ErrorCode.INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR;
 import static com.joyintech.tams.exchange.common.constant.ErrorCode.NOT_FAIR_ORDER_ERROR;
 import static com.joyintech.tams.exchange.common.constant.OthCodeType.*;
 import static com.joyintech.tams.exchange.common.constant.joyin.BussinessDictCodeList.金融产品类型_投管用_债券质押式逆回购;
@@ -212,7 +209,7 @@ public class TradeHelper {
         logger.info("准备通过风控：instruction {}  entrust {}", instruction.getEntrustId(), entrust.getId());
         if (checkCommonParam(entrust.getFullPrice(), entrust.getEntrustPrice(), entrust.getEntrustVolume(), entrust, instruction)) {
             //意向单无需进风控
-            if (EntrustUtils.isIntentionEntrust(entrust.getEntrustProp())) {
+            if (!isRiskCheck(entrust, instruction)) {
                 addEntrustToReceiver(entrust, instruction, msgType);
             } else {
                 RiskOccupyBean riskOccupyBean = investRiskManagement.riskCheck(Arrays.asList(entrust));
@@ -233,6 +230,13 @@ public class TradeHelper {
         } else {
             integratedEntrustService.asyncUpdate((IntegratedEntrust) entrust);
         }
+    }
+
+    private boolean isRiskCheck(EntrustInterface entrust, Instruction instruction) {
+        if (EntrustUtils.isIntentionEntrust(entrust.getEntrustProp())) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -1276,7 +1280,7 @@ public class TradeHelper {
         createOrderByInstrument(integratedEntrust, instrument, null);
         String tradingDay = commonManagement.getTradingDay();
         Instruction instruction = instructionService.findById(integratedEntrust.getInstructionId());
-        if(StringUtil.equals(instruction.getFinprodType2(),金融产品类型_投管用_债券质押式正回购.getValue()) || StringUtil.equals(instruction.getFinprodType2(),金融产品类型_投管用_债券质押式逆回购.getValue())) {
+        if (StringUtil.equals(instruction.getFinprodType2(), 金融产品类型_投管用_债券质押式正回购.getValue()) || StringUtil.equals(instruction.getFinprodType2(), 金融产品类型_投管用_债券质押式逆回购.getValue())) {
             integratedEntrust.setAssetType(平安资产类型_质押式回购.getValue());
         }
         BigDecimal entrustPrice = integratedEntrust.getEntrustPrice();
