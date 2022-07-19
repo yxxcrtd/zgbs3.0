@@ -31,6 +31,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Objects;
 
 import static com.joyintech.tams.exchange.common.enums.invest.BussTypeEnum.STANDARD_COUPONS_IN_AND_OUT;
 
@@ -185,7 +186,12 @@ public class OrderController {
         if (StringUtil.isNotEmpty(integratedEntrust.getExtend2())) {
             extend2 = JsonUtils.getObjectFromJson(integratedEntrust.getExtend2(), Map.class);
         }
-        extend2.put("maturityDate", order.getMaturityDate());
+        if (StringUtil.isNotEmpty(instruction.getMaturityDate())) {
+            extend2.put("maturityDate", order.getMaturityDate());
+        }
+        if (Objects.nonNull(instruction.getCapDays())) {
+            extend2.put("capDays", instruction.getCapDays().intValue());
+        }
         integratedEntrust.setExtend2(JsonUtils.getJsonFromObject(extend2));
 
         try {

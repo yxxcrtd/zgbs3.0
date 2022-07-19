@@ -536,7 +536,6 @@ public class IntegratedQuoteManagement {
         baseRepurchaseQuoteSendResponse.setRemark(entrust.getRemark());
         baseRepurchaseQuoteSendResponse.setBs(entrust.getPs());
 
-        baseRepurchaseQuoteSendResponse.setBs(entrust.getPs());
         if (StringUtil.isNotEmpty(entrust.getExtend2())) {
             Map<String, Object> extend2 = JsonUtils.getObjectFromJson(entrust.getExtend2(), Map.class);
             Object maturityDate = extend2.get("maturityDate");
@@ -551,7 +550,9 @@ public class IntegratedQuoteManagement {
     private void fillSQQuoteSendResponse(IntegratedEntrustVo entrust, SQRepurchaseQuoteSendResponse baseRepurchaseQuoteSendResponse, Instruction instruction) {
         baseRepurchaseQuoteSendResponse.setBackBalance(entrust.getBackBalance());
         baseRepurchaseQuoteSendResponse.setCapDays(instruction.getCapDays().intValue());
-        baseRepurchaseQuoteSendResponse.setDiscount(entrust.getDiscount());
+        if(Objects.nonNull(entrust.getDiscount())){
+            baseRepurchaseQuoteSendResponse.setDiscount(entrust.getDiscount().multiply(BigDecimal.valueOf(100)));
+        }
         baseRepurchaseQuoteSendResponse.setmIntAmt(NumberUtil.sub(entrust.getBackBalance(), entrust.getEntrustBalance()));
         baseRepurchaseQuoteSendResponse.setRepoAmount(entrust.getEntrustBalance());
         baseRepurchaseQuoteSendResponse.setRepoRate(entrust.getEntrustPrice());
