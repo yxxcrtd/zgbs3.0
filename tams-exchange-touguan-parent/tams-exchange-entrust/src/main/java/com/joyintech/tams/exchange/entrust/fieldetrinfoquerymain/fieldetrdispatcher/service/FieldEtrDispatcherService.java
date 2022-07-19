@@ -421,8 +421,9 @@ public class FieldEtrDispatcherService extends BaseService {
                     fieldResponseDto.setUnitPrice(null);
                 }
                 if (StringUtil.equals(fieldResponseDto.getAssetType(), 平安资产类型_质押式回购.getValue())
-                        && !StringUtil.equals(fieldResponseDto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())) {
-                    fieldResponseDto.setPledgeNumber(fieldResponseDto.getPledgeNumber().divide(BigDecimal.valueOf(100), 2, BigDecimal.ROUND_HALF_UP));
+                        && !StringUtil.equals(fieldResponseDto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())
+                        && Objects.nonNull(fieldResponseDto.getPledgeNumber())) {
+                    fieldResponseDto.setPledgeNumber(fieldResponseDto.getPledgeNumber().divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
                 }
             }
             return fieldResponseDto;
