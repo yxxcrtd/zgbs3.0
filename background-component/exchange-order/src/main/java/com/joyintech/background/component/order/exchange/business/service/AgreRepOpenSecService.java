@@ -80,10 +80,13 @@ class AgreRepOpenSecService extends EtrSubComponentService<AgreRepOpenSecDto> {
             ));
     	}
     	//质押券
-    	if(dto.getBusiPs()!=null && DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getBusiPs())&& StringUtil.isEmpty(dto.getFinprodId())){
+		// XYHGFXSJ-111:质押券字段用错 modify by fuyongsheng 20220719 start
+		// if(dto.getBusiPs()!=null && DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getBusiPs())&& StringUtil.isEmpty(dto.getFinprodId())){
+		if(dto.getBusiPs()!=null && DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getBusiPs())&& StringUtil.isEmpty(dto.getRepSecId())){
     		result.addError(new FieldError(dto.getClass().getSimpleName(),"repSecId","正回购方质押券不能为空"));
     	}
-    	//质押数量
+		// XYHGFXSJ-111:质押券字段用错 modify by fuyongsheng 20220719 end
+		//质押数量
     	if(dto.getBusiPs()!=null && DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getBusiPs())&& dto.getPledgeNumber() == null){
     		result.addError(new FieldError(dto.getClass().getSimpleName(),"repSecNum","正回购方质押券数量不能为空"));
 
