@@ -1198,6 +1198,9 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                     if (StringUtil.equals(infRiskRdsDto.getTradePlace(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())) {
                         infMap.put(IS_CONV, BaseDictCodeList.是否_是.getValue());
                     }
+                    if(StringUtil.isEmpty(infRiskRdsDto.getAssetType2()) || StringUtil.equals("null",infRiskRdsDto.getAssetType2())) {
+                        infMap.put("assetType2",CommonUtil.findValue(dataMap, "repPs"));
+                    }
 
                     result.add(infMap);
                 }

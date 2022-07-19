@@ -39,6 +39,8 @@ import com.joyintech.tams.invest.common.dto.PtlPositionHoldDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.common.InvestInterfCommDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.position.PositionCashSecDto;
+import com.joyintech.tams.invest.common.entrust.inter.EtrTradeCommonervice;
 import com.joyintech.tams.invest.common.service.InvestInterfCommService;
 import com.joyintech.tams.invest.common.service.MapperDelegateService;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
@@ -51,10 +53,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 资金划拨管理
@@ -111,6 +110,10 @@ public class PtlFundAllocationService extends BaseService<PtlFundAllocationDto> 
      */
     @Autowired(required = false)
     private BasePtlCashPositionInfoService basePtlCashPositionInfoService;
+
+    @Autowired
+    private EtrTradeCommonervice etrTradeCommonervice;
+
     /**
      * 注入划款指令Mapper
      */
@@ -1042,19 +1045,19 @@ public class PtlFundAllocationService extends BaseService<PtlFundAllocationDto> 
             ptlCashPositionFlowDto.setAcctType(acctTypeList);
             amount = basePtlCashPositionInfoService.queryActCashPosition(ptlCashPositionFlowDto);
 
-            //查询新表可用现金
-            PtlCashPositionFlowDto dtoNew = new PtlCashPositionFlowDto();
-            dtoNew.setHodingType(DictCodeListExt3.资产类型_汇总可用现金.getValue());
-            dtoNew.setCdate(ptlCashPositionFlowDto.getCdate());
-            dtoNew.setPortfolioId(ptlCashPositionFlowDto.getPortfolioId());
-            dtoNew.setCcy(ptlCashPositionFlowDto.getCcy());
-            dtoNew.setDateType(0);
-            dtoNew.setAcctId(ptlCashPositionFlowDto.getAcctId());
-            BigDecimal cashT0_new = basePtlCashPositionInfoService.queryTrdAvailableCashNew(dtoNew);
-
-            if(StringUtil.isNotEmpty(cashT0_new)){
-               amount =  ArithmeticUtil.doAdd(amount, cashT0_new);
+            // TISHKS-1560:调用新头寸接口查询持仓 modify by fuyongsheng 20220719 start
+            PositionCashSecDto cashSecDto = new PositionCashSecDto();
+            cashSecDto.setAcctId(ptlCashPositionFlowDto.getAcctId());
+            cashSecDto.setDateType("0");
+            cashSecDto.setCdate(DateUtil.format(ptlCashPositionFlowDto.getCdate()));
+            cashSecDto.setPortfolioId(ptlCashPositionFlowDto.getPortfolioId());
+            cashSecDto.setCcy(ptlCashPositionFlowDto.getCcy());
+            cashSecDto.setHoldingType(String.valueOf(map.get("hodingType")));
+            BigDecimal newCashAmount = etrTradeCommonervice.queryPosition(Arrays.asList(cashSecDto), "01", DictCodeListExt3.资产类型_证券户可用资金.getValue());
+            if(StringUtil.isNotEmpty(newCashAmount)){
+               amount =  ArithmeticUtil.doAdd(amount, newCashAmount);
             }
+            // TISHKS-1560:调用新头寸接口查询持仓 modify by fuyongsheng 20220719 end
         }
         catch (Exception e) {
             logger.error(e.getMessage(),e);

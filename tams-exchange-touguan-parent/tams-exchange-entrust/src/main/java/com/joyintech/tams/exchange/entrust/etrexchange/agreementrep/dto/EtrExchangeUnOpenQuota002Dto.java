@@ -192,6 +192,25 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
     private String cpInvestorId;
     @ApiModelProperty(name = "cpInvestorType", value = "对手方交易主体类型（深交所展示，否则为空）")
     private String cpInvestorType;
+
+    @ApiModelProperty(name = "traderCodeStr", value = "本方交易员")
+    private String traderCodeStr;
+    @ApiModelProperty(name = "memberIdStr", value = "本方交易商")
+    private String memberIdStr;
+    @ApiModelProperty(name = "investorIdStr", value = "本方交易主体（深交所展示，否则为空）")
+    private String investorIdStr;
+    @ApiModelProperty(name = "investorTypeStr", value = "本方交易主体类型（深交所展示，否则为空）")
+    private String investorTypeStr;
+
+    @ApiModelProperty(name = "cpTraderCodeStr", value = "对手方交易员")
+    private String cpTraderCodeStr;
+    @ApiModelProperty(name = "cpMemberIdStr", value = "对手方交易商")
+    private String cpMemberIdStr;
+    @ApiModelProperty(name = "cpInvestorIdStr", value = "对手方交易主体（深交所展示，否则为空）")
+    private String cpInvestorIdStr;
+    @ApiModelProperty(name = "cpInvestorTypeStr", value = "对手方交易主体类型（深交所展示，否则为空）")
+    private String cpInvestorTypeStr;
+
     @ApiModelProperty(name = "cpClientName", value = "对手方客户名称")
     private String cpClientName;
     /**
@@ -631,5 +650,69 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
 
     public void setTransCodeStr(String transCodeStr) {
         this.transCodeStr = transCodeStr;
+    }
+
+    public String getTraderCodeStr() {
+        return traderCodeStr;
+    }
+
+    public void setTraderCodeStr(String traderCodeStr) {
+        this.traderCodeStr = traderCodeStr;
+    }
+
+    public String getMemberIdStr() {
+        return memberIdStr;
+    }
+
+    public void setMemberIdStr(String memberIdStr) {
+        this.memberIdStr = memberIdStr;
+    }
+
+    public String getInvestorIdStr() {
+        return investorIdStr;
+    }
+
+    public void setInvestorIdStr(String investorIdStr) {
+        this.investorIdStr = investorIdStr;
+    }
+
+    public String getInvestorTypeStr() {
+        return investorTypeStr;
+    }
+
+    public void setInvestorTypeStr(String investorTypeStr) {
+        this.investorTypeStr = investorTypeStr;
+    }
+
+    public String getCpTraderCodeStr() {
+        return cpTraderCodeStr;
+    }
+
+    public void setCpTraderCodeStr(String cpTraderCodeStr) {
+        this.cpTraderCodeStr = cpTraderCodeStr;
+    }
+
+    public String getCpMemberIdStr() {
+        return cpMemberIdStr;
+    }
+
+    public void setCpMemberIdStr(String cpMemberIdStr) {
+        this.cpMemberIdStr = cpMemberIdStr;
+    }
+
+    public String getCpInvestorIdStr() {
+        return cpInvestorIdStr;
+    }
+
+    public void setCpInvestorIdStr(String cpInvestorIdStr) {
+        this.cpInvestorIdStr = cpInvestorIdStr;
+    }
+
+    public String getCpInvestorTypeStr() {
+        return cpInvestorTypeStr;
+    }
+
+    public void setCpInvestorTypeStr(String cpInvestorTypeStr) {
+        this.cpInvestorTypeStr = cpInvestorTypeStr;
     }
 }
