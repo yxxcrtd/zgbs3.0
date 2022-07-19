@@ -191,6 +191,9 @@ public class FieldEtrDispatcherInfoResponse extends FieldEtrDispatcherBaseInfo {
 
     private String finprodId;
 
+    @ApiModelProperty(name="advanceRecoveryDate",value="提前购回日")
+    private String advanceRecoveryDate;
+
     public String getFinprodId() {
         return finprodId;
     }
@@ -784,5 +787,13 @@ public class FieldEtrDispatcherInfoResponse extends FieldEtrDispatcherBaseInfo {
 
     public void setBiddingProductDtos(List<FieldEtrBiddingProductDto> biddingProductDtos) {
         this.biddingProductDtos = biddingProductDtos;
+    }
+
+    public String getAdvanceRecoveryDate() {
+        return advanceRecoveryDate;
+    }
+
+    public void setAdvanceRecoveryDate(String advanceRecoveryDate) {
+        this.advanceRecoveryDate = advanceRecoveryDate;
     }
 }

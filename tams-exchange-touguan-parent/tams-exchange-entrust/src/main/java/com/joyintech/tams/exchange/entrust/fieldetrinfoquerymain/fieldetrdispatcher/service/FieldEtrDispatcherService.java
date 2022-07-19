@@ -425,6 +425,8 @@ public class FieldEtrDispatcherService extends BaseService {
                         && Objects.nonNull(fieldResponseDto.getPledgeNumber())) {
                     fieldResponseDto.setPledgeNumber(fieldResponseDto.getPledgeNumber().divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
                 }
+
+                fieldResponseDto.setAdvanceRecoveryDate(fieldResponseDto.getEntrustDate());
             }
             return fieldResponseDto;
         }

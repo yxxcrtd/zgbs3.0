@@ -287,6 +287,9 @@ public class CfetsEtrDispatcherInfoExcResponse extends CfetsEtrDispatcherExcInfo
     @ApiModelProperty(name="oldFinprodMarketId",value="原质押券",example="字符串1")
     private String oldFinprodMarketId;
 
+    @ApiModelProperty(name="advanceRecoveryDate",value="提前购回日",example="字符串1")
+    private String advanceRecoveryDate;
+
     public String getSecType() {
         return SysDataUtil.getNameFromDataDict(DictCode.行内资产四级分类, this.secType);
     }
@@ -635,5 +638,13 @@ public class CfetsEtrDispatcherInfoExcResponse extends CfetsEtrDispatcherExcInfo
 
     public void setStockSecId(String stockSecId) {
         this.stockSecId = stockSecId;
+    }
+
+    public String getAdvanceRecoveryDate() {
+        return advanceRecoveryDate;
+    }
+
+    public void setAdvanceRecoveryDate(String advanceRecoveryDate) {
+        this.advanceRecoveryDate = advanceRecoveryDate;
     }
 }
