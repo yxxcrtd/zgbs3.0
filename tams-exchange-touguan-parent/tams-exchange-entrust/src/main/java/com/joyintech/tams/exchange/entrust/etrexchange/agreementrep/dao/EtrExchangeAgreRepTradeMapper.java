@@ -68,6 +68,14 @@ public interface EtrExchangeAgreRepTradeMapper {
      * @return 联想文本框
      */
     List<EtrExchangeAgreRepTrade001Dto> getEntrustInfoByTradeId(Map<String, Object> map);
+
+    /**
+     * 查询原成交信息
+     *
+     * @param map 检索参数
+     * @return 联想文本框
+     */
+    List<EtrExchangeAgreRepTrade001Dto> getEntrustInfoByIntiTradeId(Map<String, Object> map);
     /**
      * 场内交易委托列表查询
      * @param param

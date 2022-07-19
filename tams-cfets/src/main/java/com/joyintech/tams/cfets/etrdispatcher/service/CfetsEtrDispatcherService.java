@@ -92,12 +92,7 @@ import com.joyintech.tams.common.base.entity.User;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.business.riskrds.constant.InterfUtil;
 import com.joyintech.tams.component.business.riskrds.constant.PageFieldToInterfFactory;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.constant.DictCodeListExt4;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.invest.common.client.ClientData;
 import com.joyintech.tams.invest.common.component.base.entrust.impl.BaseEtrInvestInfoServiceImpl;
@@ -109,9 +104,11 @@ import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dao.BussRepoSecMapper;
+import com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto;
 import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
 import com.joyintech.tams.invest.common.util.DictCodeUtil;
 import com.joyintech.tams.invest.entrust.common.service.EtrCommonService;
+import com.joyintech.tams.invest.entrust.etribbondinfo.dto.EtrIbBondinfo002Dto;
 import com.joyintech.tams.invest.trade.common.aop.TradeRdsCommonAop;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.apache.commons.collections4.CollectionUtils;
@@ -1514,6 +1511,7 @@ public class CfetsEtrDispatcherService extends BaseService {
         Map<String, PtlPortfolio> innerIds = AllTradeCommonUtil.selectPortfolioIds(
                 counterIdList);
         Map<String, String> psMap = splitParams("psList", null);
+        List<CreditLinesInputDto> inputDtoList = new ArrayList<>();
         if (!StringUtil.isEmptyList(enTrustIds)) {
             String ps = BussinessDictCodeList.交易方向_买入.getValue();
             enTrustIds.forEach(id -> {
@@ -1561,6 +1559,10 @@ public class CfetsEtrDispatcherService extends BaseService {
                             BussinessDictCodeListRds.是否_是.getValue());
                     list.add(finDto);
                 }
+                CreditLinesInputDto inputDto = new CreditLinesInputDto();
+                inputDto.setTradeId(id);
+                inputDto.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
+                inputDtoList.add(inputDto);
             });
         }
         try {
@@ -1569,6 +1571,8 @@ public class CfetsEtrDispatcherService extends BaseService {
             if (StringUtil.equals(data.getHead().get(InterfUtil.std400msgt), InterfUtil.E)) {
                 result.setMessage(data.getHead().get(InterfUtil.stdrtninfo).toString());
             }
+            //撤销授信
+            AllTradeCommonUtil.handleBeforeTradeComplete(inputDtoList, DictCodeListRsk.授信占用类别_预占.getValue());
         } catch (Exception e) {
             result.setMessage("指令撤销异常");
         }

@@ -45,6 +45,7 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 	private Integer occupyDays;
 	private BigDecimal intAmt;
 	private BigDecimal expireSettleAmt;
+	private BigDecimal fristExpireSettleAmt;
 	private String counterId;
 	private String counterTrader;
 	private String trader;
@@ -611,5 +612,13 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 
 	public void setOutfinprodId(String outfinprodId) {
 		this.outfinprodId = outfinprodId;
+	}
+
+	public BigDecimal getFristExpireSettleAmt() {
+		return fristExpireSettleAmt;
+	}
+
+	public void setFristExpireSettleAmt(BigDecimal fristExpireSettleAmt) {
+		this.fristExpireSettleAmt = fristExpireSettleAmt;
 	}
 }

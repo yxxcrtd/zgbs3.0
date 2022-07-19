@@ -2278,6 +2278,17 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                     infRiskRdsDto.setIsNullCounter(BaseDictCodeList.是否_否.getValue());
                 }
                 //wangyang1 add by 增加期限金额 2021年9月10日 end
+                //针对提前购回/到期购回/解除质押 三种类型占用金额取到期结算金额
+                Object ps = CommonUtil.findValue(dataMap, "ps");
+                if(协议回购到期交易方向.contains(ps)) {
+                    infRiskRdsDto.setAmount(CommonUtil.getBigDecimal(dataMap, "expireSettleAmt", BigDecimal.ZERO));
+                    infRiskRdsDto.setTradeNum(CommonUtil.getBigDecimal(dataMap, "expireSettleAmt", BigDecimal.ZERO));
+                    infRiskRdsDto.setPs((String)ps);
+                }
+                if(StringUtil.equals(ps,DictCodeListExt3.交易方向_到期续做.getValue())) {//到期续作的时候占用差值
+                    infRiskRdsDto.setAmount(ArithmeticUtil.subtract(CommonUtil.getBigDecimal(dataMap, "tradeAmt", BigDecimal.ZERO),CommonUtil.getBigDecimal(dataMap, "fristExpireSettleAmt", BigDecimal.ZERO)));
+                    infRiskRdsDto.setTradeNum(infRiskRdsDto.getAmount());
+                }
                 return infRiskRdsDto;
             }
             infRiskRdsDto.setPs(DictCodeList.交易方向_买入.getValue());

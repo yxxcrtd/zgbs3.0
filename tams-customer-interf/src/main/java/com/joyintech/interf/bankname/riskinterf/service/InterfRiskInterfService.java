@@ -516,7 +516,7 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                         finDto.setAmount(etrEntrustAdd.getmTradeAmt() == null? BigDecimal.ZERO:etrEntrustAdd.getmTradeAmt());
                     }
                     //协议回购到期交易方向 的指令没有进行预占，不需要处理预占信息，将指令代码置空
-                    finDto.setEntrustCode(null);
+                    //finDto.setEntrustCode(null);
                 }else {
                     finDto.setPs(DictCodeList.交易方向_买入.getValue());
                     finDto.setAmount(CommonUtil.getBigDecimal(dataMap, "amount",BigDecimal.ZERO));
@@ -1020,12 +1020,10 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                 tmp.put("inputValue1",tmp.get("assetType"));
                 tmp.put("inputValue2",tmp.get("assetType2"));
                 if(StringUtil.equals(tmp.get("ps"),DictCodeList.回购拆借方向_正回购.getValue())) {
-                    tmp.put("inputValue3",DictCodeListExt3.行内资产三级分类_正回购.getValue());
+                    tmp.put("inputValue3",DictCodeList.回购拆借方向_正回购.getValue());
+                }else {
+                    tmp.put("inputValue3",DictCodeList.回购拆借方向_逆回购.getValue());
                 }
-                else {
-                    tmp.put("inputValue3",DictCodeListExt3.行内资产三级分类_逆回购.getValue());
-                }
-
                 assetType2 = (String) tmp.get("assetType2");
             }
         }
