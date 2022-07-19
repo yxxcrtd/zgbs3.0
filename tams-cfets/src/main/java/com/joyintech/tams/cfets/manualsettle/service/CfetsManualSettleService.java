@@ -1508,6 +1508,15 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
             baseTradeProductDealCommServiceImpl.insertPosition(finProductTradeDto);
         }
+        if (StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_回溯.getValue()) && !isFlowStart) {
+            List<String> orderIds = new ArrayList<>();
+            for (StlPayOrders order : orderDtoMap.values()) {
+                orderIds.add(order.getOrderId());
+                orderIds.add(order.getOrderId() + "R");
+            }
+            logger.info("债券交收回溯,删除流水:" + JsonUtils.object2Json(orderIds));
+            baseAssetCashPositionCommMapper.deleteCashPosition03ByOrderIds(orderIds);
+        }
     }
 
 
@@ -1755,7 +1764,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 .collect(Collectors.toMap(StlPayOrders::getTradeId, orderDto -> orderDto));
         logger.info("查询出的指令列表:{}", JsonUtils.object2Json(orderDtoMap));
         listTemp = listTemp.stream().sorted((x, y) -> y.getTradeAmt().compareTo(x.getTradeAmt())).collect(Collectors.toList());
-        List<String> orderIds = new ArrayList<>();
+        List<String> orderIdList = new ArrayList<>();
         for (CfetsManualSettleDealInfo item : listTemp) {
             FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
             if (StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_回溯.getValue()) && !isFlowStart) {
@@ -1803,11 +1812,11 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 BeanUtil.copyPropertiesIgnoreNull(stlPayOrder, orderDtoMap.get(item.getTradeId()));
                 String orderId = cfetsManualSettleMapper.selectRegTradeIdBytradeId(item.getTradeId());
                 if (StringUtil.isNotEmpty(orderId)) {
-                    orderIds.add(orderId);
+                    orderIdList.add(orderId);
                 }
                 orderId = cfetsManualSettleMapper.selectQuoteIdBytradeId(item.getTradeId());
                 if (StringUtil.isNotEmpty(orderId)) {
-                    orderIds.add(orderId);
+                    orderIdList.add(orderId);
                 }
                 stlPayOrders.add(stlPayOrder);
                 logger.info("交收处理头寸,首期期划款指令:" + JsonUtils.object2Json(stlPayOrders));
@@ -1841,8 +1850,17 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             // 调用业务组件.【金融产品交易共通.交易产品接口】,写入[实际]的组合持仓流水及现金流水
             baseTradeProductDealCommServiceImpl.insertPosition(finProductTradeDto);
         }
-        if (CollectionUtils.isNotEmpty(orderIds) && !isBack && isFlowStart) {
-            baseAssetCashPositionCommMapper.deleteCashPositionByOrderIds(orderIds);
+        if (CollectionUtils.isNotEmpty(orderIdList) && !isBack && isFlowStart) {
+            baseAssetCashPositionCommMapper.deleteCashPositionByOrderIds(orderIdList);
+        }
+        if (StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_回溯.getValue()) && !isFlowStart) {
+            List<String> orderIds = new ArrayList<>();
+            for (StlPayOrders order : orderDtoMap.values()) {
+                orderIds.add(order.getOrderId());
+                orderIds.add(order.getOrderId() + "R");
+            }
+            logger.info("债券交收回溯,删除流水:" + JsonUtils.object2Json(orderIds));
+            baseAssetCashPositionCommMapper.deleteCashPosition03ByOrderIds(orderIds);
         }
     }
     /**
@@ -1977,6 +1995,15 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 finProductTradeDto.setBaseTradeProductDealDtos(Collections.singletonList(baseTradeProductDealDto));
                 baseTradeProductDealCommService.insertPosition(finProductTradeDto);
             }
+        }
+        if (StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_回溯.getValue()) && !isFlowStart) {
+            List<String> orderIds = new ArrayList<>();
+            for (StlPayOrders order : orderDtoMap.values()) {
+                orderIds.add(order.getOrderId());
+                orderIds.add(order.getOrderId() + "R");
+            }
+            logger.info("债券交收回溯,删除流水:" + JsonUtils.object2Json(orderIds));
+            baseAssetCashPositionCommMapper.deleteCashPosition03ByOrderIds(orderIds);
         }
         // 一级投标 一级申购不可做交收失败
 //        if (StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收失败.getValue())) {

@@ -108,6 +108,12 @@
         where ORDER_ID in (<foreach collection="orderIds" separator="," item="item">#{item}</foreach>) AND HODING_TYPE IN ('01', '02')
     </delete>
 
+    <delete id="deleteCashPosition03ByOrderIds" >
+        DELETE
+        from PTL_CASH_POSITION_FLOW
+        where ORDER_ID in (<foreach collection="orderIds" separator="," item="item">#{item}</foreach>) AND HODING_TYPE IN ('03')
+    </delete>
+
     <update id="updateSecPositionAmt" parameterType="com.joyintech.tams.common.base.entity.PtlSecPositionFlow">
         UPDATE PTL_SEC_POSITION SET AMOUNT = AMOUNT - #{amount}
         WHERE PORTFOLIO_ID = #{portfolioId}
