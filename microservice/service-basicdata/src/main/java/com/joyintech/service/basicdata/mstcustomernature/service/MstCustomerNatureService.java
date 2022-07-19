@@ -164,6 +164,9 @@ public class MstCustomerNatureService extends BaseService<MstCustomerNatureDto> 
                     else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeListExt3.客户性质_原始权益人.getValue())) {
                         dto.setIsOriginalOwner("Y");
                     }
+                    else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeListExt3.客户性质_创设机构.getValue())) {
+                        dto.setCreateInstitutions("Y");
+                    }
                 }
                 dto.setCustomerId(key);
                 mstCustomerNatureMapper.updateByPrimaryKey(dto);
@@ -321,7 +324,7 @@ public class MstCustomerNatureService extends BaseService<MstCustomerNatureDto> 
         param.put("CUSTOMER_CHARATER_10", DictCodeListExt3.客户性质_券商.getValue());
         param.put("CUSTOMER_CHARATER_12", DictCodeListExt3.客户性质_交易对手.getValue());
         param.put("CUSTOMER_CHARATER_13", DictCodeListExt3.客户性质_原始权益人.getValue());
-
+        param.put("CUSTOMER_CHARATER_14", DictCodeListExt3.客户性质_创设机构.getValue());
     }
 
     /**
@@ -348,7 +351,7 @@ public class MstCustomerNatureService extends BaseService<MstCustomerNatureDto> 
         pageParam.put("flag_10", DictCodeListExt3.客户性质_券商.getCodeName());
         pageParam.put("flag_12", DictCodeListExt3.客户性质_交易对手.getCodeName());
         pageParam.put("flag_13", DictCodeListExt3.客户性质_原始权益人.getCodeName());
-
+        pageParam.put("flag_14", DictCodeListExt3.客户性质_创设机构.getCodeName());
         Page<MstCustomerNatureDto> dto = super.queryForPage(page, length,
             () -> mstCustomerNatureMapper.selectCustomerInfo(pageParam));
         List<MstCustomerNatureDto> ldto = dto.getRoot();
