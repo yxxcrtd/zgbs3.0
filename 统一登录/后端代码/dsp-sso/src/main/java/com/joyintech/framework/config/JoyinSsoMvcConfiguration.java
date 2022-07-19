@@ -81,6 +81,18 @@ public class JoyinSsoMvcConfiguration implements WebMvcConfigurer {
                 .resourceChain(false).addResolver(new VersionResourceResolver().addFixedVersionStrategy(version, "/**"));
         registry.addResourceHandler("/joyin-sso-login/css/**").addResourceLocations("classpath:/static/joyin-sso-login/css/")
                 .resourceChain(false).addResolver(new VersionResourceResolver().addFixedVersionStrategy(version, "/**"));
+        registry.addResourceHandler("/joyin-sso-menu/img/**")
+                .addResourceLocations("classpath:/static/joyin-sso-menu/img/").resourceChain(false)
+                .addResolver(new VersionResourceResolver().addFixedVersionStrategy(version, "/**"));
+        registry.addResourceHandler("/joyin-sso-menu/fonts/**")
+                .addResourceLocations("classpath:/static/joyin-sso-menu/fonts/").resourceChain(false)
+                .addResolver(new VersionResourceResolver().addFixedVersionStrategy(version, "/**"));
+        registry.addResourceHandler("/joyin-sso-menu/js/**")
+                .addResourceLocations("classpath:/static/joyin-sso-menu/js/").resourceChain(false)
+                .addResolver(new VersionResourceResolver().addFixedVersionStrategy(version, "/**"));
+        registry.addResourceHandler("/joyin-sso-menu/css/**")
+                .addResourceLocations("classpath:/static/joyin-sso-menu/css/").resourceChain(false)
+                .addResolver(new VersionResourceResolver().addFixedVersionStrategy(version, "/**"));
         //joyin-sso-login静态资源处理结束
 
         registry.addResourceHandler("/vuestatic/**").addResourceLocations("classpath:/static/vuestatic/")
