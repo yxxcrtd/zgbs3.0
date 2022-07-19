@@ -917,16 +917,17 @@ public class CfetsBondDealQuotedPrice003Service extends BaseService<CfetsBondDea
         insertWflBondRequestQuote(entity);
         if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
             //已撤回数据，根据指令重新发起交易。报价状态重置
-            if(StringUtil.equals(entity.getQuotaPageModel(), "new") && BussinessDictCodeList.银行间上行报价状态_已撤回.getValue().equals(entity.getStatus())){
+            if (StringUtil.equals(entity.getQuotaPageModel(), "new")
+                    && BussinessDictCodeList.银行间上行报价状态_已撤回.getValue().equals(entity.getStatus())) {
                 entity.setTradeStatus(StringUtil.EMPTY);
             }
             //插入旧头寸
             entity.setIsExistNew(DictCodeList.是否_是.getValue());
-            doInsetOrUpdateForPtlPositionHold(entity);
+            this.doInsetOrUpdateForPtlPositionHold(entity);
         }
         String systemAct = handSystemAct(entity);
 
-        sendPosition(entity, DictCodeListExt3.流程节点_流程提交.getValue(), systemAct, systemAct,null);
+        this.sendPosition(entity, DictCodeListExt3.流程节点_流程提交.getValue(), systemAct, systemAct,null);
         //doInsetOrUpdateForPtlPositionHold(entity);
 
     }
@@ -1221,7 +1222,11 @@ public class CfetsBondDealQuotedPrice003Service extends BaseService<CfetsBondDea
     }
 
     public void sendPosition(CfetsBondDealRequestQuoteDto entity,String flowStatus,String decisionAct,String systemAct,String confirmOk){
-        Map<String, Object> stringObjectMap = preparePosition(entity, flowStatus,decisionAct,systemAct,confirmOk);
+        if(StringUtil.isNotEmpty(entity.getCfetsBondDealRequestQuoteDtoList())) {
+            EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entity.getCfetsBondDealRequestQuoteDtoList().get(0).getEntrustId());
+            entity.setUnitFprice(etrEntrustAdd.getFullPrice());
+        }
+        Map<String, Object> stringObjectMap = this.preparePosition(entity, flowStatus, decisionAct, systemAct, confirmOk);
         if(StringUtil.equals(flowStatus,DictCodeListExt3.流程节点_流程提交.getValue())||StringUtil.equals(flowStatus,DictCodeListExt3.流程节点_流程退回.getValue())){
             if(StringUtil.equals(systemAct,DictCodeListExt3.系统动作_新建.getValue())||StringUtil.equals(systemAct,DictCodeListExt3.系统动作_修改.getValue())||StringUtil.equals(systemAct,DictCodeListExt3.系统动作_成交.getValue())){
                 PositionHttpRequest.send(stringObjectMap);
@@ -1246,7 +1251,8 @@ public class CfetsBondDealQuotedPrice003Service extends BaseService<CfetsBondDea
      * @return
      */
     public Map<String,Object> preparePosition(CfetsBondDealRequestQuoteDto dto,String flowStatus,String decisionAct,String systemAct,String confirmOk){
-        com.joyintech.service.bankuplink.bond.dto.CfetsBondDealRequestQuoteDto entity = JsonUtils.json2Object(JsonUtils.object2Json(dto),com.joyintech.service.bankuplink.bond.dto.CfetsBondDealRequestQuoteDto.class);
+        com.joyintech.service.bankuplink.bond.dto.CfetsBondDealRequestQuoteDto entity
+                = JsonUtils.json2Object(JsonUtils.object2Json(dto),com.joyintech.service.bankuplink.bond.dto.CfetsBondDealRequestQuoteDto.class);
         return cfetsQuotedCommonServiceMicro.prepareRequestPosition(entity,flowStatus,decisionAct,systemAct,confirmOk);
     }
 }

@@ -13,23 +13,13 @@ package com.joyintech.service.bankuplink.bond.service;
 import com.joyintech.background.component.common.pack.common.security.User;
 import com.joyintech.background.component.common.pack.common.util.DateUtil;
 import com.joyintech.background.component.common.pack.common.util.JsonUtils;
-import com.joyintech.background.component.uplink.interbank.business.dto.BondDialogueQuoteDto;
-import com.joyintech.background.component.uplink.interbank.business.dto.BondQuoteExtDto;
-import com.joyintech.background.component.uplink.interbank.business.dto.BondRequestQuoteDto;
-import com.joyintech.background.component.uplink.interbank.business.dto.IbuQuoteBondDetDto;
-import com.joyintech.background.component.uplink.interbank.business.dto.IbuQuoteEtrReDto;
-import com.joyintech.background.component.uplink.interbank.business.dto.QuoteResultBatDto;
-import com.joyintech.background.component.uplink.interbank.business.dto.QuoteResultDto;
+import com.joyintech.background.component.uplink.interbank.business.dto.*;
 import com.joyintech.background.component.uplink.interbank.business.service.IbuMainService;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.IDGenerator;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.service.bankuplink.bond.dao.CfetsBondDealQuotedPriceMapper;
 import com.joyintech.service.bankuplink.bond.dto.CfetsBondDealDialogueQuoteDto;
 import com.joyintech.service.bankuplink.bond.dto.CfetsBondDealEntrustOrderDto;
@@ -41,14 +31,11 @@ import com.joyintech.service.bankuplink.common.dao.CfetsQuotedCommonMapper;
 import com.joyintech.service.bankuplink.common.service.CfetsQuotedCommonService;
 import com.joyintech.service.bankuplink.cstp.dto.CstpSelectDto;
 import com.joyintech.service.bankuplink.ibu.dto.BondQuoteInfoDto;
-import com.joyintech.service.bankuplink.ibu.service.BankUplinkPublishService;
 import com.joyintech.service.bankuplink.ibu.service.IbuComponentCommonService;
+import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
-import com.joyintech.tams.common.base.entity.FinProduct;
-import com.joyintech.tams.common.base.entity.FinProductType;
-import com.joyintech.tams.common.base.entity.FinProductTypeKey;
-import com.joyintech.tams.common.base.entity.MstBondValuationInfo;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
@@ -64,6 +51,7 @@ import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import org.apache.commons.collections4.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -71,11 +59,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * CFETS现券买卖报价
@@ -139,15 +123,9 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      */
     @Autowired
     private SecCalRequestQuoteService secCalRequestQuoteService;
-    
+
+
     /**
-     * mq信息推送service {@linkplain}
-     */
-    @Autowired(required = false)
-    private BankUplinkPublishService messageSenderService;
-    
-    
-	/**
 	 * 组合可用持仓和实际持仓查询更新
 	 */
 	@Autowired(required = false)
@@ -164,11 +142,17 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      */
     @Autowired
     private IbuMainService ibuMainService;
+
+    /**
+     * {@linkplain}
+     */
+    @Autowired
+    private EtrEntrustAddMapper etrEntrustAddMapper;
     
     /**
      * 委托指令查询
      * 
-     * @param pageParam 入参
+     * @param param 入参
      * @return 委托指令
      * @see
      * @since 1.0
@@ -254,7 +238,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
     /**
      * 根据查询查询符合条件的报价编号
      * 
-     * @param map 入参
+     * @param param 入参
      * @return 报价编号
      * @see
      * @since 1.0
@@ -293,8 +277,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      * 现券对话报价新增发送<br />
      * 根据传入的对话报价新增进行发送，并更新全部报价信息
      * 
-     * @param inputBean BondDialogueQuoteDto 现券对话报价信息
-     * @param userInfo User 登录用户信息
+     * @param cfetsBondDealDialogueQuoteDto 现券对话报价信息
      * @return QuoteResultDto
      */
     @Transactional
@@ -306,8 +289,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      * 现券对话报价更新发送<br />
      * 根据传入的对话报价新增进行发送，并更新全部报价信息
      * 
-     * @param inputBean BondDialogueQuoteDto 现券对话报价信息
-     * @param userInfo User 登录用户信息
+     * @param cfetsBondDealDialogueQuoteDto 现券对话报价信息
      * @return QuoteResultDto
      */
     @Transactional
@@ -319,9 +301,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      * 本方撤销请求回复；<br />
      * 做市方回复非做市方请求报价
      * 操作类型：本方新增请求回复
-     * @param quoteId String 报价编号
-     * @param attrMap Map<String, String>
-     * @param userInfo User 登录用户信息
+     * @param cfetsBondDealDialogueQuoteDto 现券对话报价信息
      * @return QuoteResultDto
      */
     @Transactional
@@ -334,7 +314,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      * 现券对话报价新增<br />
      * 对话报价信息入流程表
      * 
-     * @param cfetsBondDealDialogueQuoteDto 现券对话报价信息
+     * @param cfetsBondDealRequestQuoteDto 现券对话报价信息
      * @return QuoteResultDto
      */
     @Transactional
@@ -405,7 +385,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      * 现券对话报价查询<br />
      * 根据主键查询对话报价信息
      * 
-     * @param quoteId String 报价编号
+     * @param param String 报价编号
      * @return BondDialogueQuoteDto
      */
     public CfetsBondDealDialogueQuoteDto getBondDialogueQuote(Map<String, Object> param){
@@ -455,7 +435,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      * 现券请求报价查询<br />
      * 根据主键查询请求报价信息
      * 
-     * @param quoteId String 报价编号
+     * @param param String 报价编号
      * @return BondRequestQuoteDto
      */
     public CfetsBondDealRequestQuoteDto getBondRequestQuote(Map<String, Object> param){
@@ -584,8 +564,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      * 现券报价查询-指定条件<br />
      * 根据传入的不为空的属性进行查询，需支持数据权限
      * 
-     * @param inputBean BondQuoteSearchDto 现券报价查询条件
-     * @param userInfo User 登录用户信息
+     * @param param BondQuoteSearchDto 现券报价查询条件
      * @return List<BondQuoteExtDto>
      */
     public List<BondQuoteInfoDto> getDayOfferTableList(Map<String, Object> param){
@@ -601,7 +580,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
 
     /**
      * 多机构处理
-     * @param bondQuoteExtDtoList
+     * @param list
      * @return
      */
     public List<BondQuoteExtDto> handleManyCounter(List<BondQuoteExtDto> list){
@@ -717,8 +696,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      * 现券报价查询-指定条件<br />
      * 根据传入的不为空的属性进行查询，需支持数据权限
      * 
-     * @param inputBean BondQuoteSearchDto 现券报价查询条件
-     * @param userInfo User 登录用户信息
+     * @param param BondQuoteSearchDto 现券报价查询条件
      * @return List<BondQuoteExtDto>
      */
     public List<BondQuoteInfoDto> getOrderOfferTableList(Map<String, Object> param){
@@ -736,8 +714,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      * 现券报价查询-指定条件<br />
      * 根据传入的不为空的属性进行查询，需支持数据权限
      * 
-     * @param inputBean BondQuoteSearchDto 现券报价查询条件
-     * @param userInfo User 登录用户信息
+     * @param param BondQuoteSearchDto 现券报价查询条件
      * @return List<BondQuoteExtDto>
      */
     public List<BondQuoteInfoDto> getMarketOfferTableList(Map<String, Object> param){
@@ -820,7 +797,6 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      * 现券对话报价批量新增发送<br />
      * @param inputList List<BondDialogueQuoteDto>
      * @param userInfo User 登录用户信息
-     * @param QuoteResultBatDto
      */
     public QuoteResultBatDto batchNewBondDialogueQuote(List<BondDialogueQuoteDto> inputList, User userInfo) {
         return ibuComponentCommonService.batchNewBondDialogueQuote(inputList, userInfo);
@@ -831,7 +807,6 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      * 操作类型 ：本方新增请求报价发送
      * @param inputList List<BondRequestQuoteDto>
      * @param userInfo User 登录用户信息
-     * @param QuoteResultBatDto
      */
     public QuoteResultBatDto batchNewBondRequestQuote(List<BondRequestQuoteDto> inputList, User userInfo) {
         return ibuComponentCommonService.batchNewBondRequestQuote(inputList, userInfo);
@@ -887,7 +862,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      * 现券请求报价撤回；类似“撤回邮件”<br />
      * 报价撤回发送处理，更新接口返回数据
      * 
-     * @param cfetsBondDealDialogueQuoteDto 对话报价对象
+     * @param cfetsBondDealRequestQuoteDto 对话报价对象
      */
     @Transactional
     public boolean sendBondRequestQuoteRevoke(CfetsBondDealRequestQuoteDto cfetsBondDealRequestQuoteDto){
@@ -899,7 +874,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      * 现券请求报价撤回；类似“撤回邮件”<br />
      * 报价撤回发送处理，更新接口返回数据
      * 
-     * @param cfetsBondDealDialogueQuoteDto 对话报价对象
+     * @param cfetsBondDealRequestQuoteDto 对话报价对象
      */
     @Transactional
     public boolean sendBondRequestQuoteRevokeReply(CfetsBondDealRequestQuoteDto cfetsBondDealRequestQuoteDto){
@@ -911,9 +886,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      * 现券对话报价回退；把失败状态还原成待处理<br />
      * 报价回退发送处理，更新接口返回数据
      * 
-     * @param quoteId String 报价编号
-     * @param attrMap Map<String, String>
-     * @param userInfo User 登录用户信息
+     * @param cfetsBondDealDialogueQuoteDto String 报价编号
      * @return QuoteResultDto
      */
     @Transactional
@@ -928,9 +901,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      * 现券请求报价回退；把失败状态还原成待处理<br />
      * 报价回退发送处理，更新接口返回数据
      * 操作类型：本方报价回退
-     * @param quoteId String 报价编号
-     * @param attrMap Map<String, String>
-     * @param userInfo User 登录用户信息
+     * @param cfetsBondDealRequestQuoteDto String 报价编号
      * @return QuoteResultDto
      */
     @Transactional
@@ -945,9 +916,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      * 现券对话报价回复成交<br />
      * 报价回复成交发送处理，更新接口返回数据
      * 
-     * @param inputBean BondDialogueQuoteDto
-     * @param attrMap Map<String, String>
-     * @param userInfo User 登录用户信息
+     * @param cfetsBondDealDialogueQuoteDto BondDialogueQuoteDto
      * @return QuoteResultDto
      */
     @Transactional
@@ -960,9 +929,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      * 现券对话报价回复拒绝<br />
      * 报价回复拒绝发送处理，更新接口返回数据
      * 
-     * @param inputBean BondDialogueQuoteDto
-     * @param attrMap Map<String, String>
-     * @param userInfo User 登录用户信息
+     * @param cfetsBondDealDialogueQuoteDto BondDialogueQuoteDto
      * @return QuoteResultDto
      */
     @Transactional
@@ -1026,7 +993,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
     /**
      * 查询债券最新估值
      * 
-     * @param map 入参
+     * @param param 入参
      * @return 最新估值
      * @see
      * @since 1.0
@@ -1039,8 +1006,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
     /**
      * 历史报价撤销
      * 
-     * @param quoteId 报价代码
-     * @param quoteType 报价方式
+     * @param bondQuoteInfoDto 报价代码
      * @return 处理结果
      * @see
      * @since 1.0
@@ -1059,7 +1025,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
     /**
      * 获取下一个工作日
      *
-     * @param parameters 画面参数
+     * @param tradeDate 画面参数
      * @return 下一个工作日
      * @see
      * @since 1.0
@@ -1531,7 +1497,17 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
 
 		ptlPositionHoldDto.setPtlCashPositionFlows(ptlCashPositionFlows);
 		ptlPositionHoldDto.setPtlSecPositionFlows(ptlSecPositionFlows);
-		ptlPositionHoldDto.getPtlCashPositionFlows().forEach(etrCashPositionFlowDto -> etrCashPositionFlowDto.setCdate(settleDate));
+		BigDecimal unitFprice = BigDecimal.ONE;
+        if(CollectionUtils.isNotEmpty(ibuQuoteEtrReDtoList)) {
+            EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(ibuQuoteEtrReDtoList.get(0).getEntrustId());
+            unitFprice = unitFprice.multiply(etrEntrustAdd.getFullPrice());
+        }
+        BigDecimal finalUnitFprice = unitFprice;
+        ptlPositionHoldDto.getPtlCashPositionFlows().forEach(etrCashPositionFlowDto -> {
+            etrCashPositionFlowDto.setCdate(settleDate);
+            etrCashPositionFlowDto.setAmount(ArithmeticUtil.divide(
+                    ArithmeticUtil.multiply(etrCashPositionFlowDto.getAmount(), finalUnitFprice), BigDecimal.valueOf(100), 2));
+        });
 		ptlPositionHoldDto.getPtlSecPositionFlows().forEach(etrSecPositionFlowDto -> etrSecPositionFlowDto.setCdate(platDate));
         // 数据是否已入新头寸
         if(StringUtil.isNotEmpty(dto.getIsExistNew())){
