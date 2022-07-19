@@ -2296,6 +2296,7 @@ public class CfetsEtrDispatcherService extends BaseService {
                         fieldResponseDto.setInvManagerId(user1.getRealName());
                     }
                 }
+                fieldResponseDto.setAdvanceRecoveryDate(fieldResponseDto.getEntrustDate());
             }
             return fieldResponseDto;
         }
