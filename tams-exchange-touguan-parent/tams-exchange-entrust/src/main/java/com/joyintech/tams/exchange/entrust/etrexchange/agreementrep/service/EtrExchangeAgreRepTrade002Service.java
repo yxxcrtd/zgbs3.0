@@ -41,6 +41,7 @@ import com.joyintech.tams.invest.common.dto.position.PositionCashSecDto;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeCommonervice;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tools.collectors.JoyinCollectors;
+import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +83,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
     private EtrExchangeTradeCommon002Service etrExchangeTradeCommon002Service;
 
     public static final String ENTRUST_RECORD_MODIFY = "modify";
-    
+
     public static final String ENTRUST_RECORD_NEW = "new";
 
     public static String queryrRepurchaseQuote = "/joyin/entrust/integrated/repurchase_quote";
@@ -91,11 +92,11 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
 
     public static String queryIntegratedTick = "/joyin/quote/tick";
     /**
-     BPB	上海协议回购成交申报		    正回购
-     BPC	上海协议回购到期续做申报		到期续做
-     BPD	上海协议回购解除质押		    接触质押
-     BPE	上海协议回购换券申报		    中途换券
-     BPF	上海协议回购提前终止申报		提前购回
+     * BPB	上海协议回购成交申报		    正回购
+     * BPC	上海协议回购到期续做申报		到期续做
+     * BPD	上海协议回购解除质押		    接触质押
+     * BPE	上海协议回购换券申报		    中途换券
+     * BPF	上海协议回购提前终止申报		提前购回
      */
     private static final String SB_SHXYHGCJ = "BPB";
     private static final String SB_SHXYHGDQXZ = "BPC";
@@ -115,21 +116,21 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
      * @since 1.0
      */
     public Page<EtrExchangeAgreRepTrade002Dto> findPositionsPage(EtrExchangeTradePositionsCommonRequest request) {
-        Map<String,Object> pageParam = new HashMap<>();
+        Map<String, Object> pageParam = new HashMap<>();
         String platDate = iPlatformDate.getSysDateStr();
         if (StringUtil.isNotEmpty(request.getPortfolioIdList())) {
-            pageParam.put("portfolioIdList",request.getPortfolioIdList());
+            pageParam.put("portfolioIdList", request.getPortfolioIdList());
         }
         if (StringUtil.isNotEmpty(request.getFinprodMarketId())) {
-            pageParam.put("finprodMarketId",request.getFinprodMarketId());
+            pageParam.put("finprodMarketId", request.getFinprodMarketId());
         }
-        if(StringUtil.isNotEmpty(request.getFinprodMarketIds())){
-            pageParam.put("finprodMarketIds",StringUtil.splitToList(GlobalConstant.COMMA, request.getFinprodMarketIds()));
-        }else{
+        if (StringUtil.isNotEmpty(request.getFinprodMarketIds())) {
+            pageParam.put("finprodMarketIds", StringUtil.splitToList(GlobalConstant.COMMA, request.getFinprodMarketIds()));
+        } else {
             pageParam.put("finprodMarketIds", null);
         }
         if (StringUtil.isNotEmpty(request.getTradeMarket())) {
-            pageParam.put("tradeMarket",request.getTradeMarket());
+            pageParam.put("tradeMarket", request.getTradeMarket());
         }
         if (request.getPageMode() != null) {
             pageParam.put("pageMode", request.getPageMode());
@@ -137,7 +138,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
 
         pageParam.put("portfolioName", request.getPortfolioName());
         pageParam.put("finprodName", request.getFinprodName());
-        pageParam.put("search",request.getSearch());
+        pageParam.put("search", request.getSearch());
         if (SecurityUtil.getLoginUser() != null) {
             pageParam.put("userId", SecurityUtil.getLoginUser().getUserName());
         }
@@ -165,27 +166,27 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         pageParam.put("TRADE_PLACE_04", BussinessDictCodeList.交易场所_上海证券交易所.getValue());
         pageParam.put("A_001", DictCodeListExt3.资产类型_资产账户持仓.getValue());
         //Page<EtrExchangeAgreRepTrade002Dto> result = super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> etrExchangeAgreRepTradeMapper.findPositionsPage(pageParam));
-        Page<EtrExchangeAgreRepTrade002Dto> result=new Page<>();
-        List<EtrExchangeAgreRepTrade002Dto> list=etrExchangeAgreRepTradeMapper.findPositionsPage(pageParam);
-        List<EtrExchangeAgreRepTrade002Dto> returnList=new ArrayList<>();
-        if(!CollectionUtils.isEmpty(list)){
-            for(EtrExchangeAgreRepTrade002Dto entity : list){
+        Page<EtrExchangeAgreRepTrade002Dto> result = new Page<>();
+        List<EtrExchangeAgreRepTrade002Dto> list = etrExchangeAgreRepTradeMapper.findPositionsPage(pageParam);
+        List<EtrExchangeAgreRepTrade002Dto> returnList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(list)) {
+            for (EtrExchangeAgreRepTrade002Dto entity : list) {
                 //可用数量
-                PositionCashSecDto secDto=new PositionCashSecDto();
-                BeanUtil.copyPropertiesIgnoreNull(secDto,entity);
+                PositionCashSecDto secDto = new PositionCashSecDto();
+                BeanUtil.copyPropertiesIgnoreNull(secDto, entity);
                 secDto.setTradePlat(TempConstant.AGR_EREP_ETR); //临时变量
                 secDto.setHoldingType(DictCodeListExt3.资产类型_质押式协议回购本方券非净额结算可用持仓.getValue());
-                BigDecimal canRepoNum=etrTradeCommonervice.selectAvailableNum(secDto);
-                canRepoNum=canRepoNum==null?BigDecimal.ZERO:ArithmeticUtil.divide(canRepoNum,new BigDecimal(100),2);
+                BigDecimal canRepoNum = etrTradeCommonervice.selectAvailableNum(secDto);
+                canRepoNum = canRepoNum == null ? BigDecimal.ZERO : ArithmeticUtil.divide(canRepoNum, new BigDecimal(100), 2);
                 entity.setSellNum(canRepoNum);
                 //过滤掉实际持仓和可用持仓都等于0
-                if(entity.getPositionsNum().compareTo(BigDecimal.ZERO)==0&&canRepoNum.compareTo(BigDecimal.ZERO)==0){
+                if (entity.getPositionsNum().compareTo(BigDecimal.ZERO) == 0 && canRepoNum.compareTo(BigDecimal.ZERO) == 0) {
                     continue;
                 }
                 //最新价从行情取
-                EtrExchangeTradeQuotationHqResponse hqResponse=exchangeTradeJj001Service.findQuotations(entity.getFinprodMarketId());
-                if(hqResponse!=null){
-                    BigDecimal lastPrice=hqResponse.getLastPrice()!=null?hqResponse.getLastPrice().setScale(2,BigDecimal.ROUND_HALF_UP):BigDecimal.valueOf(0.00);
+                EtrExchangeTradeQuotationHqResponse hqResponse = exchangeTradeJj001Service.findQuotations(entity.getFinprodMarketId());
+                if (hqResponse != null) {
+                    BigDecimal lastPrice = hqResponse.getLastPrice() != null ? hqResponse.getLastPrice().setScale(2, BigDecimal.ROUND_HALF_UP) : BigDecimal.valueOf(0.00);
                     entity.setPrice(lastPrice);
                 }
                 returnList.add(entity);
@@ -195,7 +196,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         // 根据查询结果查询估值、交易数据，用来加工单位成本等字段
         final List pList = new ArrayList<String>();
         final List fList = new ArrayList<String>();
-        if(!StringUtil.isEmptyList(returnList)) {
+        if (!StringUtil.isEmptyList(returnList)) {
             returnList.stream().forEach(c -> {
                 if (!pList.contains(c.getPortfolioId())) {
                     pList.add(c.getPortfolioId());
@@ -207,27 +208,27 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         }
         result.setRoot(returnList);
         //return result;
-         //查询单位成本数据
+        //查询单位成本数据
         Map<String, EtrExchangeUnitCostDto> unitCostMap = etrExchangeTradeCommon002Service.calcEachCostAmtMap(DateUtil.parse(platDate), pList, fList, "");
-         //计算单位成本、计算持仓成本、最新净价、持仓市值、浮动盈亏
+        //计算单位成本、计算持仓成本、最新净价、持仓市值、浮动盈亏
         return calculationAmount(unitCostMap, result, platDate);
     }
 
     public Page<EtrExchangeAgreRepTrade002Dto> calculationAmount(Map<String, EtrExchangeUnitCostDto> unitCostMap, Page<EtrExchangeAgreRepTrade002Dto> pages, String platDate) {
-        if(pages != null && pages.getRoot()!= null && !pages.getRoot().isEmpty()){
-            pages.getRoot().forEach( r->{
-                EtrExchangeUnitCostDto dto = unitCostMap.get(r.getPortfolioId() +r.getSecAcctId()+ r.getFinprodId());
-                if (dto != null){
+        if (pages != null && pages.getRoot() != null && !pages.getRoot().isEmpty()) {
+            pages.getRoot().forEach(r -> {
+                EtrExchangeUnitCostDto dto = unitCostMap.get(r.getPortfolioId() + r.getSecAcctId() + r.getFinprodId());
+                if (dto != null) {
                     // 1.持仓成本（元）
                     r.setPositionsAmt(dto.getBuyCostAmt());
                     // 2.持仓成本价（元） 取单位成本
                     //r.setUnitCost(dto.getUnitCost());
                 }
                 // 最新净价*组合持仓.数量 - 持仓成本 as 浮动盈亏
-                BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(),r.getPositionsNum());
-                floatFd = ArithmeticUtil.subtract(floatFd,r.getPositionsAmt());
+                BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum());
+                floatFd = ArithmeticUtil.subtract(floatFd, r.getPositionsAmt());
                 r.setFloatingPL(floatFd);
-                BigDecimal floatPL =ArithmeticUtil.divide(floatFd,ArithmeticUtil.multiply(r.getPrice(),r.getPositionsNum()),2);
+                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum()), 2);
                 r.setFloatingPLPercent(floatPL);
 
             });
@@ -244,7 +245,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
      * @since 1.0
      */
     public Page<EtrExchangeOnWayRep002Dto> findOnWayRepPage(EtrExchangeOnWayRepRequestDto request) {
-        Map<String,Object> pageParam = new HashMap<>();
+        Map<String, Object> pageParam = new HashMap<>();
         pageParam.put("search", request.getSearch());
         if (SecurityUtil.getLoginUser() != null) {
             pageParam.put("userId", SecurityUtil.getLoginUser().getUserName());
@@ -277,7 +278,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         return result;
     }
 
-    private String mathEntrustProp(String prop){
+    private String mathEntrustProp(String prop) {
         switch (prop) {
             case SB_SHXYHGCJ:
                 return DictCodeListExt3.交易方向_正回购.getValue();
@@ -294,7 +295,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         }
     }
 
-    private String mathEntrustPropName(String prop){
+    private String mathEntrustPropName(String prop) {
         switch (prop) {
             case SB_SHXYHGCJ:
                 return DictCodeListExt3.交易方向_正回购.getCodeName();
@@ -313,6 +314,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
 
     /**
      * 调用非公开行情接口
+     *
      * @param request
      * @return
      */
@@ -334,7 +336,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         //接行情数据 end
 
         //关键字筛选
-        if(StringUtil.isNotEmpty(request.getSearch())){
+        if (StringUtil.isNotEmpty(request.getSearch())) {
             //请求编号
             repurchaseQuotes = repurchaseQuotes
                     .stream()
@@ -359,14 +361,14 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         }
 
         //条件筛选
-        if(StringUtil.isNotEmpty(request.getRequestId())){
+        if (StringUtil.isNotEmpty(request.getRequestId())) {
             repurchaseQuotes = repurchaseQuotes
                     .stream()
                     .filter(item -> StringUtil.contains(item.get("cbpconferId") == null ? null : item.get("cbpconferId").toString(), request.getRequestId()))
                     .collect(Collectors.toList());
         }
-        if(StringUtil.isNotEmpty(request.getBussType())){
-             repurchaseQuotes = repurchaseQuotes
+        if (StringUtil.isNotEmpty(request.getBussType())) {
+            repurchaseQuotes = repurchaseQuotes
                     .stream()
                     .filter(item -> StringUtil.equals(item.get("entrustProp") == null ? null : mathEntrustProp(item.get("entrustProp").toString()), request.getBussType()))
                     .collect(Collectors.toList());
@@ -394,8 +396,8 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         List<Map<String, Object>> newRepurchaseQuotes = new ArrayList<>();
         List<String> stockCodes = new ArrayList<>();
         List<String> origPledgeList = new ArrayList<>();
-        repurchaseQuotes.forEach(temp->{
-            if(StringUtil.isNotEmpty(temp.get("cbpconferId"))&&hSet.add(temp.get("cbpconferId").toString())){
+        repurchaseQuotes.forEach(temp -> {
+            if (StringUtil.isNotEmpty(temp.get("cbpconferId")) && hSet.add(temp.get("cbpconferId").toString())) {
                 newRepurchaseQuotes.add(temp);
                 // 质押券代码
                 if (StringUtil.isNotEmpty(temp.get("stockCode"))) {
@@ -407,13 +409,14 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
                 }
             }
         });
-        hSet.clear();repurchaseQuotes.clear();
-        List<Map<String,Object>> faceValues = new ArrayList<>();
+        hSet.clear();
+        repurchaseQuotes.clear();
+        List<Map<String, Object>> faceValues = new ArrayList<>();
         //封装dto
         //处理标的和面值
-        Map<String,Object> tempPara = new HashMap<String, Object>();
-        tempPara.put("finprodMarketIdList",stockCodes);
-        tempPara.put("tradeDate",DateUtil.getSysDate());
+        Map<String, Object> tempPara = new HashMap<String, Object>();
+        tempPara.put("finprodMarketIdList", stockCodes);
+        tempPara.put("tradeDate", DateUtil.getSysDate());
         if (stockCodes.size() > 0) {
             faceValues.addAll(restTemplate.postForObject(
                     ServiceApplication.BASICDATA_SERVICE_NAME + "/MstSecuritiesAccountInfo/getFaceValueList", tempPara,
@@ -425,7 +428,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         // 原质押券资产信息
         List<FinProduct> origPledgeFinProductList = null;
         if (!StringUtil.isEmptyList(origPledgeList)) {
-            Map<String,Object> paramMap = new HashMap<String, Object>();
+            Map<String, Object> paramMap = new HashMap<String, Object>();
             paramMap.put("finprodMarketIdList", origPledgeList);
             origPledgeFinProductList = etrExchangeAgreRepTradeMapper.selectFinProductData(paramMap);
         }
@@ -494,8 +497,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
                 //BPF	深圳债券质押协议回购到期续做		到期续做
                 else if (StringUtil.equals(SB_SZXYHGDQXZ, entrustProp)) {
                     dto.setReqType(DictCodeListExt3.交易方向_到期续做.getValue());
-                }
-                else{
+                } else {
                     return;
                 }
             }
@@ -543,9 +545,8 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
             // 回购金额 = 质押券面总额合计*折算比例
             if (StringUtil.isNotEmpty(tmp.get("impawnBalance"))) {
                 dto.setTradeAmt(BigDecimal.valueOf(Double.valueOf(tmp.get("impawnBalance").toString())));
-            }
-            else if (StringUtil.isNotEmpty(dto.getPledgeStampBalance()) && StringUtil.isNotEmpty(dto.getConRatio())) {
-                dto.setTradeAmt(dto.getPledgeStampBalance().multiply(dto.getConRatio()).setScale(2,BigDecimal.ROUND_HALF_UP));
+            } else if (StringUtil.isNotEmpty(dto.getPledgeStampBalance()) && StringUtil.isNotEmpty(dto.getConRatio())) {
+                dto.setTradeAmt(dto.getPledgeStampBalance().multiply(dto.getConRatio()).setScale(2, BigDecimal.ROUND_HALF_UP));
             }
             // 回购利率
             if (StringUtil.isNotEmpty(tmp.get("expireYearRate"))) {
@@ -623,12 +624,12 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         return page;
     }
 
-    public Page<EtrExchangeAgreRepTrade003Dto> selectEtrEntrust(EtrExchangeAgreRepTrade003RequestDto request){
-        Map<String,Object> param = new HashMap<>();
+    public Page<EtrExchangeAgreRepTrade003Dto> selectEtrEntrust(EtrExchangeAgreRepTrade003RequestDto request) {
+        Map<String, Object> param = new HashMap<>();
         param.put("entrustStatus", request.getEntrustStatus());
-        param.put("search",request.getKeywords());
+        param.put("search", request.getKeywords());
         param.put("entrustId", request.getEntrustId());
-        param.put("sysDate",iPlatformDate.getSysDateStr());
+        param.put("sysDate", iPlatformDate.getSysDateStr());
         if (SecurityUtil.getLoginUser() != null) {
             param.put("userId", SecurityUtil.getLoginUser().getUserName());
         }
@@ -652,15 +653,15 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         param.put("search_isNumberFlag", BaseMap.isNumeric(request.getKeywords()));
         param.put("DISPLACE DIRECTION_01", DictCodeListExt3.质押券置换_置换方向_换入.getValue());
 
-        Page<EtrExchangeAgreRepTrade003Dto> page =  super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> etrExchangeAgreRepTradeMapper.selectEtrEntrust(param));
+        Page<EtrExchangeAgreRepTrade003Dto> page = super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> etrExchangeAgreRepTradeMapper.selectEtrEntrust(param));
 
         List<SysUser> userList = restTemplate.postForList(ServiceApplication.ENTRUST_SERVICE_NAME + "/EntrustCommon/getAllUserList",
                 param, SysUser.class);
-        for(EtrExchangeAgreRepTrade003Dto dto:page.getRoot()){
-            if(StringUtil.isNotEmpty(dto.getNextUser())&&StringUtil.isNotEmpty(userList)){
-                String sysUsers = userList.stream().filter(x-> Arrays.asList(dto.getNextUser().split(",")).contains(x.getUserName()))
+        for (EtrExchangeAgreRepTrade003Dto dto : page.getRoot()) {
+            if (StringUtil.isNotEmpty(dto.getNextUser()) && StringUtil.isNotEmpty(userList)) {
+                String sysUsers = userList.stream().filter(x -> Arrays.asList(dto.getNextUser().split(",")).contains(x.getUserName()))
                         .map(SysUser::getRealName)
-                        .collect(Collectors.joining(",","",""));
+                        .collect(Collectors.joining(",", "", ""));
                 dto.setNextUser(sysUsers);
             }
         }
@@ -669,6 +670,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
 
     /**
      * 调用非公开行情接口
+     *
      * @param request
      * @return
      */
@@ -680,9 +682,20 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         String param = "?action_in=1";
         //actionIn   0：公开行情查询 1:非公开行情查询
         // entrustProp 非必填
-        Map quoteMap = restTemplate.postForObject(ServiceApplication.EXCHANGE_SERVICE_NAME + queryrRepurchaseQuoteNew,request, Map.class);
+
+        if (!CollectionUtils.isEmpty(request.getZyj())) {
+//            List<String> stockCodes = Lists.newArrayList();
+//            request.getZyj().forEach(o -> {
+//                stockCodes.add(StringUtil.substring(o, 4));
+//            });
+
+            request.setStockCode(String.join(",", request.getZyj()));
+        }
+
+
+        Map quoteMap = restTemplate.postForObject(ServiceApplication.EXCHANGE_SERVICE_NAME + queryrRepurchaseQuoteNew, request, Map.class);
         if (quoteMap != null && quoteMap.get("data") != null) {
-            Map dataMap=(Map)quoteMap.get("data");
+            Map dataMap = (Map) quoteMap.get("data");
             if (dataMap != null && dataMap.get("root") != null) {
                 List<Map<String, Object>> quoteList = (List<Map<String, Object>>) dataMap.get("root");
                 if (!StringUtil.isEmptyList(quoteList)) {
@@ -698,8 +711,8 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         List<Map<String, Object>> newRepurchaseQuotes = new ArrayList<>();
         List<String> stockCodes = new ArrayList<>();
         List<String> origPledgeList = new ArrayList<>();
-        repurchaseQuotes.forEach(temp->{
-            if(StringUtil.isNotEmpty(temp.get("requestNo"))&&hSet.add(temp.get("requestNo").toString())){
+        repurchaseQuotes.forEach(temp -> {
+            if (StringUtil.isNotEmpty(temp.get("requestNo")) && hSet.add(temp.get("requestNo").toString())) {
                 newRepurchaseQuotes.add(temp);
                 // 质押券代码
                 if (StringUtil.isNotEmpty(temp.get("stockCode"))) {
@@ -711,13 +724,14 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
                 }
             }
         });
-        hSet.clear();repurchaseQuotes.clear();
-        List<Map<String,Object>> faceValues = new ArrayList<>();
+        hSet.clear();
+        repurchaseQuotes.clear();
+        List<Map<String, Object>> faceValues = new ArrayList<>();
         //封装dto
         //处理标的和面值
-        Map<String,Object> tempPara = new HashMap<String, Object>();
-        tempPara.put("finprodMarketIdList",stockCodes);
-        tempPara.put("tradeDate",DateUtil.getSysDate());
+        Map<String, Object> tempPara = new HashMap<String, Object>();
+        tempPara.put("finprodMarketIdList", stockCodes);
+        tempPara.put("tradeDate", DateUtil.getSysDate());
         if (stockCodes.size() > 0) {
             faceValues.addAll(restTemplate.postForObject(
                     ServiceApplication.BASICDATA_SERVICE_NAME + "/MstSecuritiesAccountInfo/getFaceValueList", tempPara,
@@ -729,7 +743,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         // 原质押券资产信息
         List<FinProduct> origPledgeFinProductList = null;
         if (!StringUtil.isEmptyList(origPledgeList)) {
-            Map<String,Object> paramMap = new HashMap<String, Object>();
+            Map<String, Object> paramMap = new HashMap<String, Object>();
             paramMap.put("finprodMarketIdList", origPledgeList);
             origPledgeFinProductList = etrExchangeAgreRepTradeMapper.selectFinProductData(paramMap);
         }
@@ -822,15 +836,15 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
                 dto.setOccupyDays(Integer.valueOf(tmp.get("capDays").toString()));
             }
             // 首次结算日
-            if (StringUtil.isNotEmpty(tmp.get("firstSettleDate"))&&DateUtil.isDateStr(tmp.get("firstSettleDate").toString())) {
+            if (StringUtil.isNotEmpty(tmp.get("firstSettleDate")) && DateUtil.isDateStr(tmp.get("firstSettleDate").toString())) {
                 dto.setFristSettleDate(DateUtil.format(DateUtil.parse(tmp.get("firstSettleDate").toString())));
             }
             // 回购到期日
-            if (StringUtil.isNotEmpty(tmp.get("repoMdate"))&&DateUtil.isDateStr(tmp.get("repoMdate").toString())) {
+            if (StringUtil.isNotEmpty(tmp.get("repoMdate")) && DateUtil.isDateStr(tmp.get("repoMdate").toString())) {
                 dto.setBackDate(DateUtil.format(DateUtil.parse(tmp.get("repoMdate").toString())));
             }
             // 到期结算日
-            if (StringUtil.isNotEmpty(tmp.get("backDate"))&&DateUtil.isDateStr(tmp.get("backDate").toString())) {
+            if (StringUtil.isNotEmpty(tmp.get("backDate")) && DateUtil.isDateStr(tmp.get("backDate").toString())) {
                 dto.setExpireSettleDate(DateUtil.format(DateUtil.parse(tmp.get("backDate").toString())));
             }
             // 换入质押券代码
@@ -953,7 +967,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         return page;
     }
 
-    private String mathEntrustPs(String prop){
+    private String mathEntrustPs(String prop) {
         switch (prop) {
             case SB_SHXYHGCJ:
                 return DictCodeListExt3.交易方向_正回购.getCodeName();

@@ -329,7 +329,8 @@ public class IntegratedQuoteManagement {
 
         BigDecimal pledgeNumber = request.getPledgeNumber();
         if (ObjectUtil.isNotEmpty(pledgeNumber)) {
-            stream = stream.filter(item -> NumberUtil.equals(item.getPledgeNumber(), pledgeNumber));
+            BigDecimal pledgeNum = pledgeNumber.multiply(BigDecimal.valueOf(100));
+            stream = stream.filter(item -> NumberUtil.equals(item.getPledgeNumber(), pledgeNum));
         }
 
         BigDecimal repoAmount = request.getRepoAmount();
@@ -539,8 +540,8 @@ public class IntegratedQuoteManagement {
         if (StringUtil.isNotEmpty(entrust.getExtend2())) {
             Map<String, Object> extend2 = JsonUtils.getObjectFromJson(entrust.getExtend2(), Map.class);
             Object maturityDate = extend2.get("maturityDate");
-            if(Objects.nonNull(maturityDate)){
-                baseRepurchaseQuoteSendResponse.setMaturityDate(DateUtil.format(DateUtil.parse((String)maturityDate)));
+            if (Objects.nonNull(maturityDate)) {
+                baseRepurchaseQuoteSendResponse.setMaturityDate(DateUtil.format(DateUtil.parse((String) maturityDate)));
             }
         }
 
@@ -550,7 +551,7 @@ public class IntegratedQuoteManagement {
     private void fillSQQuoteSendResponse(IntegratedEntrustVo entrust, SQRepurchaseQuoteSendResponse baseRepurchaseQuoteSendResponse, Instruction instruction) {
         baseRepurchaseQuoteSendResponse.setBackBalance(entrust.getBackBalance());
         baseRepurchaseQuoteSendResponse.setCapDays(instruction.getCapDays().intValue());
-        if(Objects.nonNull(entrust.getDiscount())){
+        if (Objects.nonNull(entrust.getDiscount())) {
             baseRepurchaseQuoteSendResponse.setDiscount(entrust.getDiscount().multiply(BigDecimal.valueOf(100)));
         }
         baseRepurchaseQuoteSendResponse.setmIntAmt(NumberUtil.sub(entrust.getBackBalance(), entrust.getEntrustBalance()));
