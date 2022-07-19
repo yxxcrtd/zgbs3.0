@@ -60,6 +60,8 @@ public interface BaseAssetCashPositionCommMapper {
 
     int deleteCashPositionByOrderIds(@Param("orderIds") List<String> orderIds);
 
+    int deleteCashPosition03ByOrderIds(@Param("orderIds") List<String> orderIds);
+
     void updateCashPositionAmt(PtlCashPositionFlow ptlCashPositionFlow);
 
     List<PtlSecPositionFlowDto> selectAllPositionByTotle(String tradeId);
