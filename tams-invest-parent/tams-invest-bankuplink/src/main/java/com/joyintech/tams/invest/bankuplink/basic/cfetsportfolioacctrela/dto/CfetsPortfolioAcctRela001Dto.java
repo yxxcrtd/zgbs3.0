@@ -215,6 +215,7 @@ public class CfetsPortfolioAcctRela001Dto extends IbuPortfolioAcctRela implement
      */
     @Override
     @NotEmpty(fieldName = "CfetsPortfolioAcctRela001.portfolioId")
+    @PrimaryKey(value = Field.PK_3)
     public String getPortfolioId() {
         return super.getPortfolioId();
     }
