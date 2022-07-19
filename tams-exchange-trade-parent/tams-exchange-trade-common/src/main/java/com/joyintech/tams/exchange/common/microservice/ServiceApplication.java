@@ -40,6 +40,9 @@ public class ServiceApplication {
      */
     public static String EXCHANGE_SERVICE_NAME = "http://exchangeService";
 
+    public static String EXCHANGE_TRADE_SERVICE_NAME = "http://exchangeTradeService";
+
+
     /**
      * 场内交易行情
      */
@@ -108,6 +111,8 @@ public class ServiceApplication {
 
         private String portfolioService;
 
+        public String exchangeTradeService;
+
         public String getQuoteService() {
             return quoteService;
         }
@@ -170,6 +175,14 @@ public class ServiceApplication {
 
         public void setPortfolioService(String portfolioService) {
             this.portfolioService = portfolioService;
+        }
+
+        public String getExchangeTradeService() {
+            return exchangeTradeService;
+        }
+
+        public void setExchangeTradeService(String exchangeTradeService) {
+            this.exchangeTradeService = exchangeTradeService;
         }
     }
 }

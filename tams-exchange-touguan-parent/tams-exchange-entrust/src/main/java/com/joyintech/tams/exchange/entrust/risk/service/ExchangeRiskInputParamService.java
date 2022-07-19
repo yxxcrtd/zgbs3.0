@@ -155,11 +155,19 @@ public class ExchangeRiskInputParamService extends RiskCommonService {
             InterfRiskRdsDto riskRdsDto = RiskUtil.getInterfRiskRdsDto(dtl, isCheck);
             riskRdsDto.setAssetType(DictCodeList.平安资产类型_信用保护凭证.getValue());
             riskRdsDto.setEventType(BussinessDictCodeListRds.事件类型_投资委托.getValue());
+            if(StringUtil.isEmptyList(dto.getPortfolioList())){
+                return null;
+            }
+            int size = dto.getPortfolioList().size();
             dto.getPortfolioList().forEach(item -> {
                 item.setPs(dto.getPs());
                 item.setFinprodId(dto.getFinprodId());
-                item.setEntrustId(dto.getEntrustId()+"-"+item.getPortfolioId());
-                item.setEntrustNum(ArithmeticUtil.multiply(item.getEntrustNum(),new BigDecimal("100")));
+                if (size > 1){
+                    item.setEntrustId(dto.getEntrustId()+"-"+item.getPortfolioId());
+                }else {
+                    item.setEntrustId(dto.getEntrustId());
+                }
+                item.setEntrustNum(ArithmeticUtil.multiply(item.getEntrustNum(),new BigDecimal("10000")));
             });
             list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, dto.getPortfolioList(), map -> map.put("fromEtrExchange",DictCodeList.是否_是.getValue()));
         }
@@ -186,9 +194,18 @@ public class ExchangeRiskInputParamService extends RiskCommonService {
         // CDS(信用保护凭证),新建、check、占用、退回、作废
         if (data instanceof EtrCreditProtectionCertificateApplyRequest){
             EtrCreditProtectionCertificateApplyRequest dto = (EtrCreditProtectionCertificateApplyRequest)data;
+            if(StringUtil.isEmptyList(dto.getPortfolioList())){
+                return null;
+            }
+            int size = dto.getPortfolioList().size();
             dto.getPortfolioList().forEach(item -> {
                 CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl, dto);
                 generateInputDto(inputDto, dto, item);
+                if (size > 1){
+                    inputDto.setTradeId(dto.getEntrustId()+"-"+item.getPortfolioId());
+                }else {
+                    inputDto.setTradeId(dto.getEntrustId());
+                }
                 result.add(inputDto);
             });
         }
@@ -211,7 +228,7 @@ public class ExchangeRiskInputParamService extends RiskCommonService {
         if (data instanceof EtrCreditProtectionCertificateApplyRequest){
             EtrCreditProtectionCertificateApplyRequest dto = (EtrCreditProtectionCertificateApplyRequest)data;
             inputDto.setCounterId(dto.getCounterId());
-            inputDto.setPrinAmt(ArithmeticUtil.multiply(dto.getEntrustNum(),new BigDecimal("100")));
+            inputDto.setPrinAmt(ArithmeticUtil.multiply(dto.getEntrustNum(),new BigDecimal("10000")));
             if(Objects.isNull(inputDto.getPrinAmt())) {
                 inputDto.setPrinAmt(dto.getEntrustAmt());
             }
@@ -305,7 +322,7 @@ public class ExchangeRiskInputParamService extends RiskCommonService {
             creditLinesInputDto.setTgBusiType(DictCodeList.平安资产类型_信用保护凭证.getValue());
             creditLinesInputDto.setPs(inputDto.getPs());
             creditLinesInputDto.setCounterId(inputDto.getCounterId());
-            creditLinesInputDto.setTradeAmt(ArithmeticUtil.multiply(detail.getEntrustNum(),new BigDecimal("100")));
+            creditLinesInputDto.setTradeAmt(ArithmeticUtil.multiply(detail.getEntrustNum(),new BigDecimal("10000")));
         }
     }
 
