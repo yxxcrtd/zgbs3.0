@@ -108,7 +108,7 @@
         ON t7.ENTRUST_ID = t6.ENTRUST_ID
         LEFT JOIN ETR_ENTRUST_ADD t8
         ON t8.ENTRUST_ID = t7.ENTRUST_ID
-        WHERE  t5.f_trade_id = #{tradeId}
+        WHERE  t5.trade_id = #{tradeId}
         AND t1.BRANCH = 0
     </select>
     <!-- 查询原成交指令信息 -->
@@ -1075,10 +1075,11 @@
     <select id="selectCurrPledgeInfo" resultType="com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepCurrResp">
         SELECT
         to_char(wm_concat(FP.FINPROD_MARKET_ID))  finprodMarketId,
-        SUM(B.PLEDGE_NUMBER)/100	 repSecNum,
+        SUM(B.PLEDGE_NUMBER)	 repSecNum,
         SUM(B.PLEDGE_NUMBER*PLEDGE_FACE_VALUE)  pledgeAmt,
         C.TYPE_7								repType,
-        A.PRIN/SUM(B.PLEDGE_NUMBER*PLEDGE_FACE_VALUE) conRatio,
+        <!-- A.PRIN/SUM(B.PLEDGE_NUMBER*PLEDGE_FACE_VALUE) conRatio,-->
+        A.INT_RATE * 100 conRatio,
         A.PRIN prin,
         A.COUNTER_ID counterId,
         A.TERM term,
