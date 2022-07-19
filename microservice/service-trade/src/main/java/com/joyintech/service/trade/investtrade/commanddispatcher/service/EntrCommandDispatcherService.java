@@ -121,7 +121,9 @@ public class EntrCommandDispatcherService extends BaseService<EntrCommandDispatc
 		    		if(queryEtrPledgeList!=null && !queryEtrPledgeList.isEmpty()) {
 		    			pledgelist.addAll(queryEtrPledgeList);
 		    		}
-					if ((queryEtrPledgeList == null && queryEtrPledgeList.isEmpty()) || !StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), dto.getBusiTypeTg())) {
+					if (StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), dto.getBusiTypeTg())) {
+
+					} else {
 
 						List<OriPledgeInfo> oriFinDealPledgeList = entrTradeSysInterfMapper.getOriFinDealPledgeList(dto.getFinprodId());
 						for (OriPledgeInfo oriPledgeInfo : oriFinDealPledgeList) {

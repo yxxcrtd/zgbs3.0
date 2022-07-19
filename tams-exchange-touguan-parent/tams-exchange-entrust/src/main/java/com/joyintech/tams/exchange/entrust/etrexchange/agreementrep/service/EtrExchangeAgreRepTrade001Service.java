@@ -2734,9 +2734,9 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         String tradeId="";
         TrdProductDeal trdProductDeal=trdCommonBaseService.getFirstRepoTrade(dto.getIntiTradeId(),
                 "", dto.getSecAcctId(),
-                DateUtil.parse(dto.getVdate()));
+                DateUtil.parse(dto.getFristSettleDate()));
         if(trdProductDeal!=null){
-            tradeId=trdProductDeal.getTradeId();
+            tradeId=trdProductDeal.getFinprodId();
         }
         return tradeId;
 
