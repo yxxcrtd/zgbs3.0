@@ -1479,7 +1479,12 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         TrdProductTempDeal trdProductTempDeal = new TrdProductTempDeal();
         BeanUtil.copyPropertiesIgnoreNull(trdProductTempDeal, dto);
         trdProductTempDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
-
+        // XYHGFXSJ-164:日间下单协议回购首期的临时交易 FinprodId 跟首期的临时交易编号一致 modify by fuyongsheng 20220719 start
+        if (DictCodeList.回购拆借方向_逆回购.getValue().equals(infContractDetailfile.getPs())
+                || DictCodeList.回购拆借方向_正回购.getValue().equals(infContractDetailfile.getPs())) {
+            trdProductTempDeal.setFinprodId(trdProductTempDeal.getrTradeId());
+        }
+        // XYHGFXSJ-164:日间下单协议回购首期的临时交易 FinprodId 跟首期的临时交易编号一致 modify by fuyongsheng 20220719 end
         dto.setTrdProductTempDeal(trdProductTempDeal);
         // 金融产品临时交易Entity
         // 构造结束----------------------------------------------------------
@@ -1779,6 +1784,11 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
             }
             trdProductTempDealB.setbTradeId(dto.getTrdProductTempDeal().getTradeId());
             trdProductTempDealB.setFinprodId(vTradeId);
+            // XYHGFXSJ-164:非首期协议回购的临时交易的FinprodId登录首期日终生成的首期交易的交易编号 modify by fuyongsheng 20220719 start
+            if (firstFinTradeProduct != null) {
+                trdProductTempDealB.setFinprodId(firstFinTradeProduct.getFinprodId());
+            }
+            // XYHGFXSJ-164:非首期协议回购的临时交易的FinprodId登录首期日终生成的首期交易的交易编号 modify by fuyongsheng 20220719 end
             trdProductTempDealB.setPs(DictCodeListExt3.交易方向_到期购回.getValue());
             trdProductTempDealB.setShareAmt(firstFinTradeProduct.getPrin());
             trdProductTempDealB.setTradeAmt(firstFinTradeProduct.getmTradeAmt());
@@ -1857,6 +1867,11 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                     }
                     trdProductTempDealB.setbTradeId(dto.getTrdProductTempDeal().getTradeId());
                     trdProductTempDealB.setFinprodId(vTradeId);
+                    // XYHGFXSJ-164:非首期协议回购的临时交易的FinprodId登录首期日终生成的首期交易的交易编号 modify by fuyongsheng 20220719 start
+                    if (firstFinTradeProduct != null) {
+                        trdProductTempDealB.setFinprodId(firstFinTradeProduct.getFinprodId());
+                    }
+                    // XYHGFXSJ-164:非首期协议回购的临时交易的FinprodId登录首期日终生成的首期交易的交易编号 modify by fuyongsheng 20220719 end
                     trdProductTempDealB.setPs(DictCodeListExt3.交易方向_到期购回.getValue());
                     trdProductTempDealB.setShareAmt(firstFinTradeProduct.getPrin());
                     trdProductTempDealB.setTradeAmt(firstFinTradeProduct.getmTradeAmt());
@@ -1992,7 +2007,11 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
 //        String counterTrader = entrustMsgbyMQMapper.queryCounterTradeId(infContractDetailfile.getEntrustId());
         trdProductTempDeal.setCounterTrader(infContractDetailfile.getCounterId());
         trdProductTempDeal.setTrader(infContractDetailfile.getTraderId());
-
+        // XYHGFXSJ-164:非首期协议回购的临时交易的FinprodId登录首期日终生成的首期交易的交易编号 modify by fuyongsheng 20220719 start
+        if (firstFinTradeProduct != null) {
+            trdProductTempDeal.setFinprodId(firstFinTradeProduct.getFinprodId());
+        }
+        // XYHGFXSJ-164:非首期协议回购的临时交易的FinprodId登录首期日终生成的首期交易的交易编号 modify by fuyongsheng 20220719 end
         dto.setTrdProductTempDeal(trdProductTempDeal);
         // 金融产品临时交易Entity
         // 构造结束----------------------------------------------------------
