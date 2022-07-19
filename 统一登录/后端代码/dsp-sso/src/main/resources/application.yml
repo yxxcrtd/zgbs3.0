@@ -179,7 +179,7 @@ shiro:
   sessionId: JSID
   casClientName: datarouter
   # allowUrl: /webjars/**,/swagger/**,/v2/api-docs,/swagger-ui.html,doc.html,/swagger-resources/**,/swagger-resources,/configuration/security,/configuration/ui
-  allowUrl: /sso/auth/**,/joyin-sso-login/**,/login.html
+  allowUrl: /sso/auth/**,/joyin-sso-login/**,/login.html,/joyin-sso-menu.html,/joyin-sso-menu/**,/sso/**,/index.js
   ssoEnable: true
   sessionStorage: cache #session存储位置（database，cache，memory）
   ihsEnable: false #是否使用IHS负载
