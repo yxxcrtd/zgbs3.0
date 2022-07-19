@@ -804,6 +804,14 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
             if (isShouQi) {
                 dto.setPs(dto.getRepPs());
             }
+            if (DictCodeListExt3.交易方向_到期续做.getValue().equals(dto.getPs())) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("tradeId", (dto.getIntiTradeId() == null || dto.getIntiTradeId().equals("")) ? dto.getTradeId() : dto.getIntiTradeId());
+                EtrExchangeAgreRepTrade001Dto result = etrExchangeAgreRepTrade001Service.getEntrustInfoByIntiTradeId(map);
+                if (Objects.nonNull(result)) {
+                    dto.setFristExpireSettleAmt(result.getExpireSettleAmt());
+                }
+            }
             AjaxResult ar = EntrustRdsCommonAop.doPreOccupy(dto,
                     BussinessDictCodeListRds.接口系统ID_预占接口.getValue(), DictCodeList.平安资产类型_质押式回购.getValue());
             if (isShouQi) {

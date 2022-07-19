@@ -165,8 +165,8 @@ public class CfetsPortfolioAcctRela002Controller extends BaseController {
         if(!StringUtil.isNotEmpty(dto.getCfetsAcctTypeOld())){
             dto.setCfetsAcctTypeOld(dto.getCfetsAcctType());
         }
-        ProcessParameter<CfetsPortfolioAcctRela001Dto> processParameter = new ProcessParameter<CfetsPortfolioAcctRela001Dto>();
-        WorkFlowParameter<CfetsPortfolioAcctRela001Dto> params = new WorkFlowParameter<CfetsPortfolioAcctRela001Dto>();
+        ProcessParameter<CfetsPortfolioAcctRela001Dto> processParameter = new ProcessParameter<>();
+        WorkFlowParameter<CfetsPortfolioAcctRela001Dto> params = new WorkFlowParameter<>();
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
         params.setBusinessCode(dto.getPortfolioId()+"-"+ dto.getPartyId()+"-" + dto.getCfetsAcctType());

@@ -296,6 +296,24 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         }
         return result.get(0);
     }
+
+    /**
+     * 查询原成交信息
+     *
+     * @param map 检索参数
+     * @return 联想文本框
+     */
+    public EtrExchangeAgreRepTrade001Dto getEntrustInfoByIntiTradeId(Map<String, Object> map) {
+        map.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
+        map.put("UNIT_01", DictCodeListExt3.交易单位_张.getValue());
+        map.put("UNIT_04", DictCodeListExt3.交易单位_手.getValue());
+        List<EtrExchangeAgreRepTrade001Dto> result = etrExchangeAgreRepTradeMapper.getEntrustInfoByIntiTradeId(map);
+        if(StringUtil.isEmptyList(result)){
+            return null;
+        }
+        return result.get(0);
+    }
+
     /**
      * 获取指令信息
      *
@@ -2635,7 +2653,13 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         dataMap.put("tradeAmt", dto.getTradeAmt());
         dataMap.put("tradeMarket", dto.getTradeMarket());
         dataMap.put("yield", dto.getYield());
-
+        if(StringUtil.isNotEmpty(dto.getPs()) && StringUtil.equals(dto.getPs(), 交易方向_到期续做.getValue()) && StringUtil.equals(dto.getRedoType(),"0")) {
+            //到期续作&未变更交易对手时新回购金额-原回购到期结算金额
+            Map<String, Object> map = new HashMap<>();
+            map.put("tradeId", (dto.getIntiTradeId() == null || dto.getIntiTradeId().equals("")) ? dto.getTradeId() : dto.getIntiTradeId());
+            EtrExchangeAgreRepTrade001Dto  result =  this.getEntrustInfoByIntiTradeId(map);
+            dataMap.put("tradeAmt",ArithmeticUtil.subtract(dto.getTradeAmt(),result.getExpireSettleAmt()));
+        }
         return dataMap;
     }
 

@@ -914,11 +914,11 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                 creditLinesInputDto.setTgBusiType(DictCodeList.平安资产类型_质押式回购.getValue());
                 creditLinesInputDto.setPsPayment(DictCodeList.回购类型_质押式协议回购.getValue());
                 creditLinesInputDto.setSaleCode(inputDto.getRepPs());
-                creditLinesInputDto.setPs(DictCodeList.交易方向_买入.getValue());
+                creditLinesInputDto.setPs(DictCodeList.交易方向_到期.getValue());
                 creditLinesInputDto.setCounterId(inputDto.getCounterId());
                 //if (riskCreditListCommonValidatorService.checkCallCredit(inputDto.getFinprodId())) {
-                    creditLinesInputDto.setTradeAmt(inputDto.getTradeAmt());
-                    creditLinesInputDto.setShareAmt(inputDto.getTradeAmt());
+                    creditLinesInputDto.setTradeAmt(inputDto.getOrigPrintAmt());
+                    creditLinesInputDto.setShareAmt(inputDto.getOrigPrintAmt());
                 //}
                 if(StringUtil.isEmpty(creditLinesInputDto.getCounterId())) {
                     return null;

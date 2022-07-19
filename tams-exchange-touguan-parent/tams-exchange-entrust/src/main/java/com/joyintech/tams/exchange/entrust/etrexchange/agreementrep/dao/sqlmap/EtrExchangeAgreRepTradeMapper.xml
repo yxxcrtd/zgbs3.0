@@ -185,6 +185,61 @@
         ON t4.FINPROD_ID = t2.PLEDGE_FINPROD_ID
         WHERE  t7.ENTRUST_ID = #{entrustId}
     </select>
+
+    <select id="getEntrustInfoByIntiTradeId" resultType="com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepTrade001Dto">
+        SELECT
+            t1.FINPROD_ID tradeId,
+            t1.FINPROD_ID intiTradeId,
+            t4.FINPROD_MARKET_ID origRepSecId,
+            t2.PLEDGE_NUMBER as origRepSecNum,
+            t2.PLEDGE_NUMBER* t2.PLEDGE_FACE_VALUE origPrintAmt,
+            t2.PLEDGE_RATIO * 100 origConRatio,
+            t6.PORTFOLIO_ID portfolioId,
+            t8.SEC_ACCT_ID secAcctId,
+            t8.DEAL_CUR_ACCT acctNo,
+            t1.TRADE_MARKET tradeMarket,
+            t1.TERM term,
+            t1.PRIN tradeAmt,
+            t1.INT_RATE*100 yield,
+            to_char(t1.VPAY_DATE,'yyyy-mm-dd') fristSettleDate,
+            to_char(t1.MPAY_DATE,'yyyy-mm-dd') expireSettleDate,
+            t1.ACT_CAP_DAYS occupyDays,
+            t1.M_INT_AMT intAmt,
+            t1.M_TRADE_AMT expireSettleAmt,
+            t1.COUNTER_ID counterId,
+            t7.COUNTER_TRADER counterTrader,
+            t8.TRADER trader,
+            t8.COUNTER_SEAT seatId,
+            t8.BUSI_PS repPs,
+            t7.REMARK addCla,
+            t3.type_7 ps,
+            '01' as pledgeUnit, /** 质押券单位  **/
+            t8.COUNTER_CON_NO agreeOnId
+        FROM FIN_TRADE_PRODUCT t1
+                 INNER JOIN FIN_PRODUCT_TYPE t3
+                            ON t3.FINPROD_ID = t1.FINPROD_ID
+                                AND t3.BRANCH = t1.BRANCH
+                                AND t3.TYPE_6 = 'H01'
+                                AND t3.TYPE_7 IN('03','04')
+                 LEFT JOIN FIN_DEAL_PLEDGE t2
+                           ON t2.FINPROD_ID = t1.FINPROD_ID
+                               AND t2.BRANCH = t1.BRANCH
+                 LEFT JOIN FIN_PRODUCT t4
+                           ON t4.FINPROD_ID = t2.PLEDGE_FINPROD_ID
+                 INNER JOIN TRD_PRODUCT_DEAL t5
+                            ON t5.FINPROD_ID = t1.FINPROD_ID
+                                AND t5.BRANCH = t1.BRANCH
+                                AND t5.PS in ('T01')
+                 INNER JOIN TRD_PRODUCT_DEAL_ADD t6
+                            ON t5.TRADE_ID = t6.TRADE_ID
+                 LEFT JOIN ETR_ENTRUST t7
+                           ON t7.ENTRUST_ID = t6.ENTRUST_ID
+                 LEFT JOIN ETR_ENTRUST_ADD t8
+                           ON t8.ENTRUST_ID = t7.ENTRUST_ID
+                 LEFT JOIN settle_trans_data t9 on t5.F_TRADE_ID=t9.TRADE_ID
+        WHERE  t9.trade_id = #{tradeId}
+          AND t1.BRANCH = 0
+    </select>
     <!-- 场内交易持仓查询 -->
     <select id="findPositionsPage" parameterType="Map" resultType="com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepTrade002Dto">
         SELECT TEMP.* FROM (

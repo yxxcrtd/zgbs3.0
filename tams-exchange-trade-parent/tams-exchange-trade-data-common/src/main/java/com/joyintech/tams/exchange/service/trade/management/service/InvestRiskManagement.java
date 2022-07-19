@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.bean.investment.*;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.InstructionPs;
@@ -30,6 +31,7 @@ import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
 import com.joyintech.tams.exchange.service.trade.processor.others.SplitOrderHelper;
 import com.joyintech.tams.exchange.service.trade.thead.ThreadPool;
+import com.joyintech.tams.invest.common.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -506,7 +508,13 @@ public class InvestRiskManagement extends BaseService {
                 reqRiskOccupy.setAssetType2(回购类型_质押式协议回购.getValue());
                 reqRiskOccupy.setRepurchaseType(回购类型_质押式协议回购.getValue());
                 reqRiskOccupy.setAmount(((IntegratedEntrust) entrust).getEntrustBalance());
-
+                //backBalance,针对提前购回/到期购回/解除质押 三种类型占用金额取到期结算金额
+                if(StringUtil.isNotEmpty(ps) && (StringUtil.equals(ps, DictCodeListExt3.交易方向_提前购回.getValue())
+                        || StringUtil.equals(ps,DictCodeListExt3.交易方向_到期购回.getValue()) || StringUtil.equals(ps,DictCodeListExt3.交易方向_解除质押.getValue()))) {
+                    reqRiskOccupy.setAmount(((IntegratedEntrust) entrust).getBackBalance());
+                    //reqRiskOccupy.setTradeNum(CommonUtil.getBigDecimal(dataMap, "expireSettleAmt", BigDecimal.ZERO));
+                    //reqRiskOccupy.setPs(com.joyintech.tams.constant.DictCodeList.交易方向_到期.getValue());
+                }
                 //要求填入抵押券代码
                 List<String> pledgeAssetCodeList = new ArrayList<>();
                 pledgeAssetCodeList.add(entrust.getStockCode());

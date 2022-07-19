@@ -516,7 +516,7 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                         finDto.setAmount(etrEntrustAdd.getmTradeAmt() == null? BigDecimal.ZERO:etrEntrustAdd.getmTradeAmt());
                     }
                     //协议回购到期交易方向 的指令没有进行预占，不需要处理预占信息，将指令代码置空
-                    finDto.setEntrustCode(null);
+                    //finDto.setEntrustCode(null);
                 }else {
                     finDto.setPs(DictCodeList.交易方向_买入.getValue());
                     finDto.setAmount(CommonUtil.getBigDecimal(dataMap, "amount",BigDecimal.ZERO));
@@ -1020,12 +1020,10 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                 tmp.put("inputValue1",tmp.get("assetType"));
                 tmp.put("inputValue2",tmp.get("assetType2"));
                 if(StringUtil.equals(tmp.get("ps"),DictCodeList.回购拆借方向_正回购.getValue())) {
-                    tmp.put("inputValue3",DictCodeListExt3.行内资产三级分类_正回购.getValue());
+                    tmp.put("inputValue3",DictCodeList.回购拆借方向_正回购.getValue());
+                }else {
+                    tmp.put("inputValue3",DictCodeList.回购拆借方向_逆回购.getValue());
                 }
-                else {
-                    tmp.put("inputValue3",DictCodeListExt3.行内资产三级分类_逆回购.getValue());
-                }
-
                 assetType2 = (String) tmp.get("assetType2");
             }
         }
@@ -1047,24 +1045,27 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
             Map<String, Object> rskName= this.riskNameBatch(dataMap);
 
             //不通过，返回
-            if(!BussinessDictCodeListRds.指标状态_通过.getValue().equals(rskName.get("rskStatus"))){
+            if(!BussinessDictCodeListRds.指标状态_通过.getValue().equals(rskName.get("rskStatus"))
+                    && StringUtil.equals("false", CacheUtil.getSysParam(BussinessConstant.IS_NAME_SOFTCONTROL))){
                 return rskName;
             }
         }
-
         if (!StringUtil.equals(BussinessDictCodeList.监控授信开关_关.getValue(), CacheUtil.getSysParam(BussinessConstant.ISCREDIT))) {
             //调用授信实占-批量
             Map<String, Object> sxTrade = interfRiskRdsService.sxTradeCompleteBatch(listMap, DictCodeListExt1.交易状态_初始.getValue(), isNeedRiskCheck);
             //不通过，返回
-            if (!BussinessDictCodeListRds.指标状态_通过.getValue().equals(sxTrade.get("rskStatus")) && isNeedRiskCheck) {
+            if (!BussinessDictCodeListRds.指标状态_通过.getValue().equals(sxTrade.get("rskStatus")) && isNeedRiskCheck
+                    && StringUtil.equals( DictCodeList.是否_否.getValue(), CacheUtil.getSysParam(BussinessConstant.CREDIT_SOFT_SKIP_MODE))) {
                 return sxTrade;
             }
         }
         //调用限额实占-批量
         interfRiskRdsDto.setInfCode(BussinessDictCodeListRds.接口系统ID_实占批量接口.getValue());
         ClientData cliendata = interfRiskRdsService.sendRiskRdsDataCommon(listMap, interfRiskRdsDto,RSK_SZ_LIST, isNeedRiskCheck);
+
         //不通过，返回
-        if(!BussinessDictCodeListRds.指标状态_通过.getValue().equals(cliendata.getBody().get("rskStatus")) && isNeedRiskCheck){
+        if(!BussinessDictCodeListRds.指标状态_通过.getValue().equals(cliendata.getBody().get("rskStatus")) && isNeedRiskCheck
+            && StringUtil.equals("02", CacheUtil.getSysParam(BussinessConstant.IS_RISKMATH_SOFTCONTROL))){
             szcliendata.setHead(cliendata.getHead());
             szcliendata.setBody(cliendata.getBody());
             throw new Exception("指标状态_不通过");
