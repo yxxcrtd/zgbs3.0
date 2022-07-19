@@ -1047,24 +1047,27 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
             Map<String, Object> rskName= this.riskNameBatch(dataMap);
 
             //不通过，返回
-            if(!BussinessDictCodeListRds.指标状态_通过.getValue().equals(rskName.get("rskStatus"))){
+            if(!BussinessDictCodeListRds.指标状态_通过.getValue().equals(rskName.get("rskStatus"))
+                    && StringUtil.equals("false", CacheUtil.getSysParam(BussinessConstant.IS_NAME_SOFTCONTROL))){
                 return rskName;
             }
         }
-
         if (!StringUtil.equals(BussinessDictCodeList.监控授信开关_关.getValue(), CacheUtil.getSysParam(BussinessConstant.ISCREDIT))) {
             //调用授信实占-批量
             Map<String, Object> sxTrade = interfRiskRdsService.sxTradeCompleteBatch(listMap, DictCodeListExt1.交易状态_初始.getValue(), isNeedRiskCheck);
             //不通过，返回
-            if (!BussinessDictCodeListRds.指标状态_通过.getValue().equals(sxTrade.get("rskStatus")) && isNeedRiskCheck) {
+            if (!BussinessDictCodeListRds.指标状态_通过.getValue().equals(sxTrade.get("rskStatus")) && isNeedRiskCheck
+                    && StringUtil.equals( DictCodeList.是否_否.getValue(), CacheUtil.getSysParam(BussinessConstant.CREDIT_SOFT_SKIP_MODE))) {
                 return sxTrade;
             }
         }
         //调用限额实占-批量
         interfRiskRdsDto.setInfCode(BussinessDictCodeListRds.接口系统ID_实占批量接口.getValue());
         ClientData cliendata = interfRiskRdsService.sendRiskRdsDataCommon(listMap, interfRiskRdsDto,RSK_SZ_LIST, isNeedRiskCheck);
+
         //不通过，返回
-        if(!BussinessDictCodeListRds.指标状态_通过.getValue().equals(cliendata.getBody().get("rskStatus")) && isNeedRiskCheck){
+        if(!BussinessDictCodeListRds.指标状态_通过.getValue().equals(cliendata.getBody().get("rskStatus")) && isNeedRiskCheck
+            && StringUtil.equals("02", CacheUtil.getSysParam(BussinessConstant.IS_RISKMATH_SOFTCONTROL))){
             szcliendata.setHead(cliendata.getHead());
             szcliendata.setBody(cliendata.getBody());
             throw new Exception("指标状态_不通过");

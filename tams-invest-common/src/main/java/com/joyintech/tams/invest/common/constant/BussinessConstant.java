@@ -202,6 +202,16 @@ public interface BussinessConstant {
     String CREDIT_SOFT_SKIP_MODE = "credit_soft_skip_mode";
 
     /**
+     * 风险试算是否软控(01:是 02:否)
+     */
+    String IS_RISKMATH_SOFTCONTROL = "IS_RISKMATH_SOFTCONTROL";
+
+    /**
+     * 交易(委托)名单是否软控(true:是 false:否)
+     */
+    String IS_NAME_SOFTCONTROL="IS_NAME_SOFTCONTROL";
+
+    /**
      * 计划类净值型、计划类货币性资产额度释放方式，01、先进先出  02、实时净值
      */
     String RELEASE_MODE = "RELEASE_MODE";
