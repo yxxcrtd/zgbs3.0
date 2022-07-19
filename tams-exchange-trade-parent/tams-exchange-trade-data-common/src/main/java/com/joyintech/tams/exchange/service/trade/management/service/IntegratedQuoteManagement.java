@@ -12,12 +12,15 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveQryRequest;
 import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveRequest;
+import com.joyintech.tams.exchange.common.bean.request.TradeInfoProRequest;
+import com.joyintech.tams.exchange.common.bean.response.TradeInfoProResponse;
 import com.joyintech.tams.exchange.common.bean.response.quote.repurchase.*;
 import com.joyintech.tams.exchange.common.cache.QuoteTickService;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.InstructionPledge;
+import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
 import com.joyintech.tams.exchange.common.enums.exchange.QuoteStatusEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.RepoBsEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.RepurchaseTypeEnum;
@@ -77,6 +80,8 @@ public class IntegratedQuoteManagement {
     private InstructionService instructionService;
     @Autowired
     private InstructionPledgeService instructionPledgeService;
+    @Autowired
+    private CommonManagement commonManagement;
 
     public ResultBean getTick(String stockCode) {
         if ("*".equals(stockCode)) {
@@ -240,9 +245,74 @@ public class IntegratedQuoteManagement {
 //            }
             list.addAll(beanList);
             filterRepurchaseQuoteReceive(list, request);
+
+            fillRepurchaseQuoteReceive(list);
         }
 
         return ResultBean.success(MapUtil.builder().put(ROOT, list).build());
+    }
+
+    private void fillRepurchaseQuoteReceive(List<RepurchaseQuoteReceiveResponse> list) {
+        if (CollectionUtils.isEmpty(list)) {
+            return;
+        }
+
+        for (RepurchaseQuoteReceiveResponse response : list) {
+            fillSelfDealerTradeInfo(response);
+
+            fillPropDealerTradeInfo(response);
+        }
+    }
+
+    private void fillSelfDealerTradeInfo(RepurchaseQuoteReceiveResponse response) {
+        response.setMemberIdStr(response.getMemberId());
+        response.setInvestorIdStr(response.getInvestorId());
+        response.setTraderCodeStr(response.getTraderCode());
+        response.setInvestorTypeStr(InvestorType.getInvestorTypeName(response.getInvestorType()));
+
+        TradeInfoProRequest dto = new TradeInfoProRequest();
+        dto.setAcctNo(response.getAccount());
+        dto.setTradePlace(response.getTradeMarket());
+        dto.setIsOur("Y");
+//        dto.setDealerNo(response.getMemberId());
+//        dto.setDealerPartyNo(response.getInvestorId());
+//        dto.setTraderNo(response.getTraderCode());
+        List<TradeInfoProResponse> dealerTraderList = commonManagement.getDealerTraderInfo(dto);
+        if (CollectionUtils.isEmpty(dealerTraderList)) {
+            log.error("fillSelfDealerTradeInfo error: 本方交易商、交易主体、交易员信息不存在");
+            return;
+        }
+        TradeInfoProResponse tradeInfoProResponse = dealerTraderList.get(0);
+        response.setMemberIdStr(tradeInfoProResponse.getDealerName());
+        response.setInvestorIdStr(tradeInfoProResponse.getDealerPartyName());
+        response.setTraderCodeStr(tradeInfoProResponse.getTraderName());
+    }
+
+    private void fillPropDealerTradeInfo(RepurchaseQuoteReceiveResponse response) {
+        response.setCpMemberIdStr(response.getCpMemberId());
+        response.setCpInvestorIdStr(response.getCpInvestorId());
+        response.setCpTraderCodeStr(response.getCpTraderCode());
+        response.setCpInvestorTypeStr(InvestorType.getInvestorTypeName(response.getCpInvestorType()));
+
+        TradeInfoProRequest dto = new TradeInfoProRequest();
+        dto.setTradePlace(response.getTradeMarket());
+        dto.setDealerNo(response.getCpMemberId());
+        List<TradeInfoProResponse> list = commonManagement.getCounterDealerTraderInfo(dto);
+        if (CollectionUtils.isEmpty(list)) {
+            log.error("fillPropDealerTradeInfo error: 对方交易商、交易主体、交易员信息不存在");
+            return;
+        }
+        TradeInfoProResponse proResponse = list.get(0);
+        response.setCpMemberIdStr(proResponse.getDealerName());
+
+        if (StringUtil.isNotEmpty(response.getCpInvestorId())) {
+            Optional<TradeInfoProResponse> infoProResponse = list.stream()
+                    .filter(o -> StringUtil.equals(o.getDealerPartyNo(), response.getCpInvestorId())).findFirst();
+            infoProResponse.ifPresent(tradeInfoProResponse -> response.setCpInvestorIdStr(tradeInfoProResponse.getDealerPartyName()));
+        }
+        Optional<TradeInfoProResponse> propTrade = list.stream()
+                .filter(o -> StringUtil.equals(o.getTraderNo(), response.getCpTraderCode())).findFirst();
+        propTrade.ifPresent(o -> response.setCpTraderCodeStr(o.getTraderName()));
     }
 
     private void filterRepurchaseQuoteReceive(RepurchaseQuoteReceiveResponse response, IntegratedRepurchaseQuoteBean bean) {

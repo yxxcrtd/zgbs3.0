@@ -907,33 +907,57 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
             if (StringUtil.isNotEmpty(tmp.get("traderCode"))) {
                 dto.setTraderCode(tmp.get("traderCode").toString());
             }
+            if (StringUtil.isNotEmpty(tmp.get("traderCodeStr"))) {
+                dto.setTraderCodeStr(tmp.get("traderCodeStr").toString());
+            }
             // 本方交易商代码
             if (StringUtil.isNotEmpty(tmp.get("memberId"))) {
                 dto.setMemberId(tmp.get("memberId").toString());
+            }
+            if (StringUtil.isNotEmpty(tmp.get("memberIdStr"))) {
+                dto.setMemberIdStr(tmp.get("memberIdStr").toString());
             }
             // 本方交易主体（深交所展示，否则为空）
             if (StringUtil.isNotEmpty(tmp.get("investorId"))) {
                 dto.setInvestorId(tmp.get("investorId").toString());
             }
+            if (StringUtil.isNotEmpty(tmp.get("investorIdStr"))) {
+                dto.setInvestorIdStr(tmp.get("investorIdStr").toString());
+            }
             // 本方交易主体类型（深交所展示，否则为空）
             if (StringUtil.isNotEmpty(tmp.get("investorType"))) {
                 dto.setInvestorType(tmp.get("investorType").toString());
+            }
+            if (StringUtil.isNotEmpty(tmp.get("investorTypeStr"))) {
+                dto.setInvestorTypeStr(tmp.get("investorTypeStr").toString());
             }
             //对手方交易员
             if (StringUtil.isNotEmpty(tmp.get("cpTraderCode"))) {
                 dto.setCpTraderCode(tmp.get("cpTraderCode").toString());
             }
+            if (StringUtil.isNotEmpty(tmp.get("cpTraderCodeStr"))) {
+                dto.setCpTraderCodeStr(tmp.get("cpTraderCodeStr").toString());
+            }
             //对手方交易商
             if (StringUtil.isNotEmpty(tmp.get("cpMemberId"))) {
                 dto.setCpMemberId(tmp.get("cpMemberId").toString());
+            }
+            if (StringUtil.isNotEmpty(tmp.get("cpMemberIdStr"))) {
+                dto.setCpMemberIdStr(tmp.get("cpMemberIdStr").toString());
             }
             //对手方主体
             if (StringUtil.isNotEmpty(tmp.get("cpInvestorId"))) {
                 dto.setCpInvestorId(tmp.get("cpInvestorId").toString());
             }
+            if (StringUtil.isNotEmpty(tmp.get("cpInvestorIdStr"))) {
+                dto.setCpInvestorIdStr(tmp.get("cpInvestorIdStr").toString());
+            }
             //对手方主体类型
             if (StringUtil.isNotEmpty(tmp.get("cpInvestorType"))) {
                 dto.setCpInvestorType(tmp.get("cpInvestorType").toString());
+            }
+            if (StringUtil.isNotEmpty(tmp.get("cpInvestorTypeStr"))) {
+                dto.setCpInvestorTypeStr(tmp.get("cpInvestorTypeStr").toString());
             }
             //对手方客户名称
             if (StringUtil.isNotEmpty(tmp.get("cpClientName"))) {
