@@ -237,7 +237,7 @@
                  LEFT JOIN ETR_ENTRUST_ADD t8
                            ON t8.ENTRUST_ID = t7.ENTRUST_ID
                  LEFT JOIN settle_trans_data t9 on t5.F_TRADE_ID=t9.TRADE_ID
-        WHERE  t9.trade_id = #{tradeId}
+        WHERE  t9.CJBH = #{tradeId}
           AND t1.BRANCH = 0
     </select>
     <!-- 场内交易持仓查询 -->
