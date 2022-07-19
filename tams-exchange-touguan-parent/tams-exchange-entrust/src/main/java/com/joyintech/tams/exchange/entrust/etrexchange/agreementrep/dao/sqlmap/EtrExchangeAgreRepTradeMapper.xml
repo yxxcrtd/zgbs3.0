@@ -431,7 +431,7 @@
         nvl(fp.FINPROD_NAME,fp.FINPROD_ABBR) stockName,
         nvl(fp.FINPROD_MARKET_ID,fin_deal_pledge.pledge_finprod_id) stockCode,
         fin_deal_pledge.Pledge_Ratio * 100 discountRate, /** 折算率 **/
-        fin_deal_pledge.Pledge_Number repSecNum, /** 质押券数量 **/
+        fin_deal_pledge.Pledge_Number / 100 repSecNum, /** 质押券数量 **/
         fin_deal_pledge.Pledge_Face_Value pledgeFaceValue,/** 质押券面值**/
         fin_deal_pledge.Pledge_Face_Value * fin_deal_pledge.Pledge_Number pledStrdPrinAmt, /** 质押券面总额 **/
         fin_trade_product.Prin tradeAmt, /** 回购金额 **/
@@ -1087,11 +1087,11 @@
     <select id="selectCurrPledgeInfo" resultType="com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepCurrResp">
         SELECT
         to_char(wm_concat(FP.FINPROD_MARKET_ID))  finprodMarketId,
-        SUM(B.PLEDGE_NUMBER)	 repSecNum,
+        SUM(B.PLEDGE_NUMBER)/100	 repSecNum,
         SUM(B.PLEDGE_NUMBER*PLEDGE_FACE_VALUE)  pledgeAmt,
         C.TYPE_7								repType,
-        <!-- A.PRIN/SUM(B.PLEDGE_NUMBER*PLEDGE_FACE_VALUE) conRatio,-->
-        A.INT_RATE * 100 conRatio,
+        A.PRIN/SUM(B.PLEDGE_NUMBER*PLEDGE_FACE_VALUE) *100 conRatio,
+        <!--  A.INT_RATE * 100 conRatio,-->
         A.PRIN prin,
         A.COUNTER_ID counterId,
         A.TERM term,
