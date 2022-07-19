@@ -72,7 +72,8 @@ public class EtrCommandDispatcherService extends BaseService<EtrCommandDispatche
 			}
 		}
 		dto.setEtr_entrust_list(selectList);
-		dto.setEtr_pledge_list(this.selectPledgeList(selectList));
+		String displaceDir = param.get("displaceDir").toString();
+		dto.setEtr_pledge_list(this.selectPledgeList(selectList, displaceDir));
 		dto.setEtr_entrust_detail_list(selectEtrDetailList(param));
 
 		// ZGCPCN-1650 add 20220623
@@ -121,7 +122,7 @@ public class EtrCommandDispatcherService extends BaseService<EtrCommandDispatche
      * @see
      * @since 1.0
      */
-    public List<EtrTradePledgeDto> selectPledgeList(List<EtrCommandDispatcherDto> list){
+    public List<EtrTradePledgeDto> selectPledgeList(List<EtrCommandDispatcherDto> list , String displaceDir){
     	List<EtrTradePledgeDto> pledgelist = new ArrayList<EtrTradePledgeDto>();
 
     	if(list != null && !list.isEmpty()) {
@@ -131,27 +132,14 @@ public class EtrCommandDispatcherService extends BaseService<EtrCommandDispatche
 		    		if(queryEtrPledgeList!=null && !queryEtrPledgeList.isEmpty()) {
 		    			pledgelist.addAll(queryEtrPledgeList);
 		    		}
-					if ((queryEtrPledgeList == null && queryEtrPledgeList.isEmpty()) || !StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), dto.getBusiTypeTg())) {
-
-						List<OriPledgeInfo> oriFinDealPledgeList = etrTradeSysInterfMapper.getOriFinDealPledgeList(dto.getFinprodId());
-						for (OriPledgeInfo oriPledgeInfo : oriFinDealPledgeList) {
-							EtrTradePledgeDto pledgeDto = new EtrTradePledgeDto();
-							BeanUtils.copyProperties(dto, pledgeDto);
-							pledgeDto.setFinprodId(oriPledgeInfo.getPledgeFinprodId());
-							pledgeDto.setFinprodAbbr(oriPledgeInfo.getPledgefinprodAbbr());
-							pledgeDto.setTradeMarket(oriPledgeInfo.getPledgeTradeMarket());
-							pledgeDto.setFinprodMarketId(oriPledgeInfo.getPledgeFinprodMarketId());
-							pledgeDto.setPledgeFaceValue(oriPledgeInfo.getPledgeFaceValue());
-							pledgeDto.setPledgeNumber(oriPledgeInfo.getPledgeNumber());
-							pledgeDto.setPledgeRatio(oriPledgeInfo.getPledgeRatio());
-							pledgeDto.setPledgeAmt(oriPledgeInfo.getPledgeTradeAmt());
-							pledgeDto.setDisplaceDir("00");
-							pledgelist.add(pledgeDto);
-						}
-					}
 	    		}
 	    	}
     	}
+    	if(pledgelist != null && !pledgelist.isEmpty() ){
+			pledgelist.forEach(v->{
+				v.setDisplaceDir(displaceDir);
+			});
+		}
     	return pledgelist;
     }
 

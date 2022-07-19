@@ -44,6 +44,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 
 import com.joyintech.background.component.common.pack.common.security.User;
@@ -985,7 +986,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
      * @throws InvocationTargetException
      */
     public void doHandleComplete(EtrExchangeAgreRepTrade001Dto entity, String operationType) throws Exception{
-
+        String displaceDir = "";
         EtrEntrust etrEntrust = new EtrEntrust();
         EtrEntrustAdd etrEntrustAdd = new EtrEntrustAdd();
         etrEntrustAdd.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
@@ -1415,6 +1416,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 etrPledge.setPledgeAmt(ArithmeticUtil.multiply(entity.getNewRepSecNum(),entity.getNewpledgeFaceValue()));
                 etrPledge.setFinprodId(entity.getNewfinprodId());
                 etrPledge.setDisplaceDir(DictCodeListExt3.质押券置换_置换方向_换入.getValue());
+                displaceDir = DictCodeListExt3.质押券置换_置换方向_换入.getValue();
                 list.add(etrPledge);
                 //换出券
                 if(entity.getOutRepSecNum()!=null){
@@ -1430,6 +1432,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                     // 质押金额
                     outPledge.setPledgeAmt(ArithmeticUtil.multiply(entity.getOutRepSecNum(),entity.getOutPledgeFaceValue()));
                     outPledge.setDisplaceDir(DictCodeListExt3.质押券置换_置换方向_换出.getValue());
+                    displaceDir = DictCodeListExt3.质押券置换_置换方向_换出.getValue();
                     list.add(outPledge);
                 }
                 agreRepHwayChgSecDto.setList(list);
@@ -1670,8 +1673,10 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         // 自动分发数据入库 add by yufei 20200808 end
         // add by tanxuan on 20200514 指令分发推送信息到交易系统
         if (DictCodeList.是否_是.getValue().equals(isPushMsg)) {
+            displaceDir = StringUtils.isEmpty(displaceDir)  ? "00":displaceDir ;
             Map<String, Object> param = new HashMap<>();
             param.put("entrustId", entity.getEntrustId());
+            param.put("displaceDir", displaceDir);
             etrCommandDispatcherService.pushCommandMsg(param);
         }
 //        // 自动分发自动接收 ，杭银投资poc add by yufei 20200905 start
