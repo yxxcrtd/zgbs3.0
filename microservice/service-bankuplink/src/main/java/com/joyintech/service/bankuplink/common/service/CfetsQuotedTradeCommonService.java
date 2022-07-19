@@ -724,7 +724,7 @@ public class CfetsQuotedTradeCommonService{
         // 本方交易员查询,交易员代码
         String traderId = cstpMapper.selectBuytrader(interfCstpTrade.getOurtraderchinesename());
         InterfTradSecdeal interfCstpSecdeal = cstpMapper.selectTradeSec(interfCstpTrade.getExecid(), getSysDate(),
-                BusinessTypeUtil.BUSINESSTYPE_BOND);
+                BusinessTypeUtil.BUSINESSTYPE_BOND, interfCstpTrade.getSide());
         //interfCstpSecdeal.setProfolioId(selectPortfolioId(interfCstpTrade.getOurcapitalaccountnumber()));
         //投资交易系统  可以通过报价编号查询到组合
         interfCstpSecdeal.setProfolioId(cstpMapper.selectPortfolioIdByQuoteId(interfCstpTrade.getQuoteid(),BusinessTypeUtil.BUSINESSTYPE_BOND));

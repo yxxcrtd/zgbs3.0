@@ -54,7 +54,8 @@ public interface CstpTradeMapper {
      */
     InterfTradSecdealDto selectTradeSec(@Param("execid") String execid,
                                         @Param("sysDate") String sysDate,
-                                        @Param("businesstype") String businesstype);
+                                        @Param("businesstype") String businesstype,
+                                        @Param("side") String side);
 
     /**
      * 根据交易员中文名称，查询本方交易员在投管系统的代码

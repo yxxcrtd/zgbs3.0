@@ -47,9 +47,15 @@
   from interf_cstp_trade t
  where t.execid =  #{execid,jdbcType=VARCHAR}
  and  t.businesstype =  #{businesstype,jdbcType=VARCHAR}
+         <if test="side != null">
+             and t.side= #{side,jdbcType=VARCHAR}
+         </if>
    and t.updatetime = (select max(t.updatetime)
                          from interf_cstp_trade t
                         where  t.execid = #{execid,jdbcType=VARCHAR}
+                         <if test="side != null">
+                             and t.side= #{side,jdbcType=VARCHAR}
+                         </if>
                          and  t.businesstype =  #{businesstype,jdbcType=VARCHAR})
     </select>
     <select id="selectBuytrader" parameterType="String" resultType="String">

@@ -119,7 +119,7 @@ public class CstpSecAutoTradeService extends BaseService<TrdBondInvestTradeDto> 
 		// 判断债券标的是否存在
 		InterfTradSecdealDto interfCstpSecdeal = cstpMapper.selectTradeSec(interfCstpTrade.getExecid(),
 				DateUtil.format(iPlatformDate.getSysDate(), DateUtil.DEFAULT_OTHER_FORMAT),
-				BusinessTypeUtil.BUSINESSTYPE_BOND);
+				BusinessTypeUtil.BUSINESSTYPE_BOND, interfCstpTrade.getSide());
 		FinProduct finProduct = finProductMapper.selectByPrimaryKey(interfCstpSecdeal.getSecid());
 		if (null==finProduct) {
 			// 防止有些标的的finprodId带有前缀，因此这里进行第二次查询
@@ -263,7 +263,7 @@ public class CstpSecAutoTradeService extends BaseService<TrdBondInvestTradeDto> 
 		// 判断债券标的是否存在
 		InterfTradSecdealDto interfCstpSecdeal = cstpMapper.selectTradeSec(interfCstpTrade.getExecid(),
 				DateUtil.format(iPlatformDate.getSysDate(), DateUtil.DEFAULT_OTHER_FORMAT),
-				BusinessTypeUtil.BUSINESSTYPE_BOND);
+				BusinessTypeUtil.BUSINESSTYPE_BOND, interfCstpTrade.getSide());
 		FinProduct finProduct = finProductMapper.selectByPrimaryKey(interfCstpSecdeal.getSecid());
 		if (null==finProduct) {
 			// 防止有些标的的finprodId带有前缀，因此这里进行第二次查询
