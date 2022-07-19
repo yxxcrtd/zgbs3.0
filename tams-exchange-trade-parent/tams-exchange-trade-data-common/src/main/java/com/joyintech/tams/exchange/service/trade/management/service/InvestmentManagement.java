@@ -9,6 +9,7 @@ import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -1038,24 +1039,27 @@ public class InvestmentManagement extends BaseService {
         EntrustInterface entrust = null;
         List<Entrust> entrusts = null;
         int status, type = 0;
-        if (eventId.startsWith(IDPrefix.NORMAL.value)) {
-            entrust = entrustService.findById(eventId);
+        String[] ids = StringUtil.split(eventId, StrUtil.DASHED);
+        String entrustId = ids[ids.length - 1];
+        logger.info("【投管用-风控】审批通过|拒绝接口，handleExamine()：eventId={}，entrustId={}", eventId, entrustId);
+        if (entrustId.startsWith(IDPrefix.NORMAL.value)) {
+            entrust = entrustService.findById(entrustId);
             type = Constants.PROCESS_TYPE_ENTRUST;
-        } else if (eventId.startsWith(IDPrefix.BULK.value)) {
-            entrust = integratedEntrustService.findById(eventId);
+        } else if (entrustId.startsWith(IDPrefix.BULK.value)) {
+            entrust = integratedEntrustService.findById(entrustId);
             type = Constants.PROCESS_TYPE_INTEGRATED;
-        } else if (eventId.startsWith(IDPrefix.ORDER.value)) {//处理公平交易
-            entrusts = entrustService.queryEntrustByOrderId(eventId);
+        } else if (entrustId.startsWith(IDPrefix.ORDER.value)) {//处理公平交易
+            entrusts = entrustService.queryEntrustByOrderId(entrustId);
             type = Constants.PROCESS_TYPE_FIRE_ORDER;
         }
         if (Objects.isNull(entrust)) {
-            if (Objects.isNull(entrusts)) return new ResultBean(ErrorCode.INSTRUCTIONS_NOT_EXIST, eventId);
+            if (Objects.isNull(entrusts)) return new ResultBean(ErrorCode.INSTRUCTIONS_NOT_EXIST, entrustId);
         }
         if (RiskType.EXAMINE_REFUSE.value.equals(instructionsStatus) && Strings.isNullOrEmpty(approveReason)) {
             entrust.setErrorMsg("拒绝原因不可以为空");
             return new ResultBean(ErrorCode.REQ_PARAMETER_ERROR, entrust);
         }
-        if (eventId.startsWith(IDPrefix.ORDER.value)) {
+        if (entrustId.startsWith(IDPrefix.ORDER.value)) {
             List<Entrust> approvalList = new ArrayList();
             entrusts.forEach(entrust1 -> {
                 int entrustStatus = ((EntrustInterface) entrust1).getEntrustStatus();
@@ -1072,7 +1076,7 @@ public class InvestmentManagement extends BaseService {
             });
 
             if (!approvalList.isEmpty()) {
-                Order order = orderService.findById(eventId);
+                Order order = orderService.findById(entrustId);
                 TradeMsgReceiver tradeMsgReceiver = msgReceiverManager.getMsgReceiverByInstruction(order.getInstructionId());
                 tradeMsgReceiver.addMsg(MsgType.EXAMINE_ENTRUST, new ExamineOrder(instructionsStatus, approveReason, order, Constants.PROCESS_TYPE_FIRE_ORDER));
             }
