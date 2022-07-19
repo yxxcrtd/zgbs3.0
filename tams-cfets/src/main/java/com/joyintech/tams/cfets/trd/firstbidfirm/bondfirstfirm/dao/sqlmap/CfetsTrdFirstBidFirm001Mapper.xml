@@ -78,11 +78,10 @@
             END           AS issueDateEnd/*投标日 结束*/,
         ee.ENTRUST_NUM*100                       entrustNum,
         CASE
-            WHEN  fpi.TENDER_TARGET = '01' THEN bobp.BID_PRICE || ' %'
-            WHEN  fpi.TENDER_TARGET = '02' THEN bobp.BID_PRICE || ' 元'
-            WHEN  fpi.TENDER_TARGET = '03' THEN bobp.BID_PRICE || ' BP'
-            ELSE bobp.BID_PRICE
-        END AS bidPrice,
+            WHEN fpi.TENDER_TARGET = '01' THEN to_char(bobp.BID_PRICE , 'FM999,999,999,999,990.9990') || '%'
+            WHEN fpi.TENDER_TARGET = '02' THEN to_char(bobp.BID_PRICE , 'FM999,999,999,999,990.9990') || '元'
+            WHEN fpi.TENDER_TARGET = '03' THEN to_char(bobp.BID_PRICE , 'FM999,999,999,999,990.9990') || 'BP'
+        ELSE bobp.BID_PRICE END                                                       AS bidPrice,
         eed.PORTFOLIO_ID                         portfolioId,
         eed.PORTFOLIO_NAME                       portfolioName,
         ee.TRADE_MARKET                          tradeMarket,
@@ -343,9 +342,9 @@
             eebp.PORTFOLIO_ID portfolioId,
             pp.PORTFOLIO_NAME  portfolioName,
             CASE
-                WHEN  fpi.TENDER_TARGET = '01' THEN to_char(eebp.BID_PRICE * 100, 'FM9999999999999990.9990') || ' %'
-                WHEN  fpi.TENDER_TARGET = '02' THEN to_char(eebp.BID_PRICE, 'FM9999999999999990.9990') || ' 元'
-                WHEN  fpi.TENDER_TARGET = '03' THEN to_char(eebp.BID_PRICE * 10000, 'FM9999999999999990.90') || ' BP'
+                WHEN  fpi.TENDER_TARGET = '01' THEN to_char(eebp.BID_PRICE * 100, 'FM999,999,999,999,990.9990') || ' %'
+                WHEN  fpi.TENDER_TARGET = '02' THEN to_char(eebp.BID_PRICE, 'FM999,999,999,999,990.9990') || ' 元'
+                WHEN  fpi.TENDER_TARGET = '03' THEN to_char(eebp.BID_PRICE * 10000, 'FM999,999,999,999,990.90') || ' BP'
             END AS bidPrice,
             eebp.BID_PRIN_AMT*100  bidPrinAmt,
             eed.INV_AIM  businessModel,
