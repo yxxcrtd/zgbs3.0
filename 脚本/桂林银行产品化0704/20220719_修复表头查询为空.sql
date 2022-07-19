@@ -1,0 +1,1 @@
+delete from CFG_DATATABLE_SHOW_FLAG where PAGECODE = 'EtrExchangeAgreRepTrade001' and DTCODE ='ONWAYREP';
