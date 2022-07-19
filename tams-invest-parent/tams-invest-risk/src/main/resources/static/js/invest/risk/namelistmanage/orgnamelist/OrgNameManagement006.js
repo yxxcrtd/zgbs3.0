@@ -6,6 +6,11 @@
             Joyin.error(msg);
             return;
         }
+        if($('#listDetailId').val()==''||typeof $('#listDetailId').val() == 'undefined'){
+            var msg = JoyinUtil.getMessage('COMMON_E_0057',JoyinUtil.getLabel("OrgNameManagement003.listDetailId"));
+            Joyin.error(msg);
+            return;
+        }
         /**
          * 获取列表参数
          */
