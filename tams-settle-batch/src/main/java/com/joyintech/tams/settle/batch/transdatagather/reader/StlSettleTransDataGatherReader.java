@@ -723,8 +723,10 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                             BigDecimal totalmTradeAmt=BigDecimal.ZERO;
                             //总印花税_原始
                             BigDecimal totalStampFeeRaw=BigDecimal.ZERO;
-                            //总过户费_原始
+                            //总经手费_原始
                             BigDecimal totalJsfAmtRaw=BigDecimal.ZERO;
+                            //总过户费_原始
+                            BigDecimal totalGhfAmtRaw=BigDecimal.ZERO;
                             //总证管费_原始
                             BigDecimal totalZgfAmtRaw=BigDecimal.ZERO;
                             //总经手费_原始
@@ -753,6 +755,7 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                                 totalStampFeeRaw=ArithmeticUtil.doAdd(totalStampFeeRaw, item.getStampFeeRaw());
                                 totalJsfAmtRaw=ArithmeticUtil.doAdd(totalJsfAmtRaw, item.getJsfAmtRaw());
                                 totalZgfAmtRaw=ArithmeticUtil.doAdd(totalZgfAmtRaw, item.getZgfAmtRaw());
+                                totalGhfAmtRaw=ArithmeticUtil.doAdd(totalGhfAmtRaw, item.getGhfAmtRaw());
                                 totalSxfAmtRaw=ArithmeticUtil.doAdd(totalSxfAmtRaw, item.getSxfAmtRaw());
                                 totalSettleFeeRaw=ArithmeticUtil.doAdd(totalSettleFeeRaw, item.getSettleFeeRaw());
                                 totalCommissionAmtRaw=ArithmeticUtil.doAdd(totalCommissionAmtRaw, item.getCommissionAmt());
@@ -793,7 +796,7 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                             //手续费
                             dealTotal.setSxfAmt(totalSxfAmt);
                             //结算费
-                            dealTotal.setJsfAmt(totalJsfAmt);
+                            dealTotal.setSettleFee(totalSettleFee);
                             //佣金
                             dealTotal.setCommissionAmt(BigDecimal.ZERO);
                             //佣金是否随交易支付 空
@@ -825,11 +828,13 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                             dealTotal.setSettleMode(settleTransDataDto.getSettleMode());
                             //印花税_原始
                             dealTotal.setStampFeeRaw(totalStampFeeRaw);
-                            //过户费_原始
+                            //经手费_原始
                             dealTotal.setJsfAmtRaw(totalJsfAmtRaw);
                             //证管费_原始
                             dealTotal.setZgfAmtRaw(totalZgfAmtRaw);
-                            //经手费_原始
+                            //过户费_原始
+                            dealTotal.setGhfAmtRaw(totalGhfAmtRaw);
+                            //手续费_原始
                             dealTotal.setSxfAmtRaw(totalSxfAmtRaw);
                             //结算费_原始
                             dealTotal.setSettleFeeRaw(totalSettleFeeRaw);

@@ -138,13 +138,16 @@ public class InvestDealRevokeService {
         param.put("PURCH_MODLE_02", DictCodeListExt3.申购方式_网下申购.getValue());
         List<String> totalTradeIdTgMs = investDealRevokeMapper.selectTotalTradeIdTgM(param);
 
-
+        // XYHGFXSJ-163:totalTradeIdTgMs不为空时再删除交收结果表 modify by fuyongsheng 20220719 start
         //删除交收结果表（交收成功的交易对应的交收结果删除）
-        param.put("totalTradeIdList", totalTradeIdTgMs);
-        param.put("DELIVERY_STATUS_02",DictCodeListExt3.交收状态_已交收.getValue());
-        List<String>  manualSettleIdTgMs = investDealRevokeMapper.selectManualSettleIdTgM(param);
-        investDealRevokeMapper.deleteManualSetDetailBySettleId(manualSettleIdTgMs);
-        investDealRevokeMapper.deleteManualSettleInfoBySettleId(manualSettleIdTgMs);
+        if(!CollectionUtils.isEmpty(totalTradeIdTgMs)){
+            param.put("totalTradeIdList", totalTradeIdTgMs);
+            param.put("DELIVERY_STATUS_02",DictCodeListExt3.交收状态_已交收.getValue());
+            List<String>  manualSettleIdTgMs = investDealRevokeMapper.selectManualSettleIdTgM(param);
+            investDealRevokeMapper.deleteManualSetDetailBySettleId(manualSettleIdTgMs);
+            investDealRevokeMapper.deleteManualSettleInfoBySettleId(manualSettleIdTgMs);
+        }
+        // XYHGFXSJ-163:totalTradeIdTgMs不为空时再删除交收结果表 modify by fuyongsheng 20220719 end
 
         param.put("psList",  Arrays.asList(DictCodeList.交易方向_上市流通.getValue()));
         param.put("busiType", DictCodeList.共通业务类型_债券类资产交易.getValue());

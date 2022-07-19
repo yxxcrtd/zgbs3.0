@@ -111,7 +111,7 @@ public class TrdExchangeWorkflowDobackAspect extends BaseService {
     }
 
     protected void sendApprovalResultToExchange(String eventId, String rejectReason, String url) {
-        logger.info("通知交易系统审批状态接口URL:[{}{}{}] " , ServiceApplication.EXCHANGE_SERVICE_NAME,
+        logger.info("通知交易系统审批状态接口URL:[{}{}{}] " , ServiceApplication.EXCHANGE_TRADE_SERVICE_NAME,
                 TradeServiceURL.prefix, url);
 
         Map<String, Object> paramMap = new HashMap<String, Object>();
@@ -119,7 +119,7 @@ public class TrdExchangeWorkflowDobackAspect extends BaseService {
         paramMap.put("approveResult", "2");
         logger.info("请求报文:[eventId = {}; approveResult = 2; approveReason = {}]", eventId, rejectReason);
         Map<String, Object> result = restTemplate.postForObject(
-                ServiceApplication.EXCHANGE_SERVICE_NAME + TradeServiceURL.prefix + url + "?eventId=" + eventId
+                ServiceApplication.EXCHANGE_TRADE_SERVICE_NAME + TradeServiceURL.prefix + url + "?eventId=" + eventId
                         +"&approveResult=2&approveReason=" + rejectReason,
                     paramMap,
                     Map.class);

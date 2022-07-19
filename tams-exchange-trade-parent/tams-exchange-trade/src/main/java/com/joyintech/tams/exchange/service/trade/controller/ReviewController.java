@@ -21,7 +21,7 @@ import com.joyintech.tams.exchange.util.MasterUtil;
  **/
 @RestController
 //@PageId("TrdExchange002")
-@RequestMapping("/service/joyin")
+@RequestMapping("/trade/joyin")
 public class ReviewController {
     private static final Logger logger = LoggerFactory.getLogger(ReviewController.class);
 
