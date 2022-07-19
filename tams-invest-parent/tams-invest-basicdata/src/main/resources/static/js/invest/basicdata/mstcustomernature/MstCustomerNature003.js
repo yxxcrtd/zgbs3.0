@@ -144,6 +144,9 @@ $(function() {
     if(entityData.isOriginalOwner=='Y'){
         options.data.push({"customerCharater": CUSTOMER_NATURE_13});
     }
+    if(entityData.createInstitutions =='Y'){
+        options.data.push({"customerCharater": CUSTOMER_NATURE_14});
+    }
     /*
      * 初始化表格
      */
