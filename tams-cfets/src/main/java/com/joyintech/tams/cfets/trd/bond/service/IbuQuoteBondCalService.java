@@ -419,8 +419,8 @@ public class IbuQuoteBondCalService extends BaseService {
         //模式
         //String sellPara = CacheUtil.getSysParam("SHORT_SELLING_SUPPORTED");
         //String ps = request.getPs();
-        BigDecimal tailDifferenceFpriceAmt = request.getFpriceAmt().setScale(2,RoundingMode.HALF_UP);
-        BigDecimal tailDifferenceCpriceAmt = request.getCpriceAmt().setScale(2,RoundingMode.HALF_UP);;
+        BigDecimal tailDifferenceFpriceAmt = ArithmeticUtil.divide(request.getFpriceAmt(), BigDecimal.ONE, 2, RoundingMode.HALF_UP);
+        BigDecimal tailDifferenceCpriceAmt = ArithmeticUtil.divide(request.getCpriceAmt(), BigDecimal.ONE, 2, RoundingMode.HALF_UP);
         for (PtlAllocationDto item : ptlAllocations) {
             BigDecimal shareAmt = ArithmeticUtil.multiply(item.getShareAmt(), new BigDecimal(10000));
             item.setShareAmt(shareAmt);
