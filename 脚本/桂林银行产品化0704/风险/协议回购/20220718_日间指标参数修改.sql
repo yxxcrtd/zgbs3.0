@@ -200,7 +200,7 @@ FROM (
          FROM TRD_PRODUCT_DEAL T
                   INNER JOIN TRD_PRODUCT_DEAL_ADD T1 ON T.trade_id = T1.trade_id
                   INNER JOIN FIN_PRODUCT T2 on T.FINPROD_ID = T2.FINPROD_ID
-                  INNER JOIN RT ON RT.O_CODE = T2.ISSUER
+                  LEFT JOIN RT ON RT.O_CODE = T2.ISSUER
                   LEFT JOIN MST_CUSTOMER_INFO CST ON T2.ISSUER = CST.CUSTOMER_ID
                   INNER JOIN TRD_FIN_PRODUCT_DEAL_TOTAL T3 on T.TOTLE_TRADE_ID = T3.TOTLE_TRADE_ID
          WHERE T1.PORTFOLIO_ID in ${portfolioCode}
@@ -234,7 +234,7 @@ FROM (
          FROM WFL_TRD_PRODUCT_DEAL T
                   INNER JOIN WFL_TRD_PRODUCT_DEAL_ADD T1 ON T.trade_id = T1.trade_id
                   INNER JOIN FIN_PRODUCT T2 on T.FINPROD_ID = T2.FINPROD_ID
-                  INNER JOIN RT ON RT.O_CODE = T2.ISSUER
+                  LEFT JOIN RT ON RT.O_CODE = T2.ISSUER
                   LEFT JOIN MST_CUSTOMER_INFO CST ON T2.ISSUER = CST.CUSTOMER_ID
                   INNER JOIN SYS_WFL_BUSINESS_LIST swbl on T1.WORKFLOW_ID = swbl.SEQ_NO and swbl.PROCESS_STATE != ''BACK''
          WHERE T1.PORTFOLIO_ID in ${portfolioCode}
@@ -249,7 +249,7 @@ FROM (
          FROM TRD_PRODUCT_DEAL T
                   INNER JOIN TRD_PRODUCT_DEAL_ADD T1 ON T.trade_id = T1.trade_id
                   INNER JOIN FIN_PRODUCT T2 on T.FINPROD_ID = T2.FINPROD_ID
-                  INNER JOIN RT ON RT.O_CODE = T2.ISSUER
+                  LEFT JOIN RT ON RT.O_CODE = T2.ISSUER
                   LEFT JOIN MST_CUSTOMER_INFO CST ON T2.ISSUER = CST.CUSTOMER_ID
          WHERE T.TRADE_STATUS = ''01''
            AND T1.PORTFOLIO_ID in ${portfolioCode}
@@ -266,7 +266,7 @@ FROM (
          FROM WFL_TRD_PRODUCT_DEAL T
                   INNER JOIN WFL_TRD_PRODUCT_DEAL_ADD T1 ON T.trade_id = T1.trade_id
                   INNER JOIN FIN_PRODUCT T2 on T.FINPROD_ID = T2.FINPROD_ID
-                  INNER JOIN RT ON RT.O_CODE = T2.ISSUER
+                  LEFT JOIN RT ON RT.O_CODE = T2.ISSUER
                   LEFT JOIN MST_CUSTOMER_INFO CST ON T2.ISSUER = CST.CUSTOMER_ID
                   INNER JOIN SYS_WFL_BUSINESS_LIST swbl on T1.WORKFLOW_ID = swbl.SEQ_NO and swbl.PROCESS_STATE != ''BACK''
          WHERE T1.PORTFOLIO_ID in ${portfolioCode}
@@ -299,7 +299,7 @@ FROM (
                   INNER JOIN TRD_PRODUCT_DEAL n ON m.TRADE_ID = n.TRADE_ID
                   INNER JOIN finTemp t2 ON t2.FINPROD_ID = n.FINPROD_ID
                   INNER JOIN FIN_PRODUCT_TYPE t3 ON n.FINPROD_ID = t3.FINPROD_ID AND t3.BRANCH = 0
-                  INNER JOIN RT ON RT.O_CODE = t2.ISSUER
+                  LEFT JOIN RT ON RT.O_CODE = t2.ISSUER
                   LEFT JOIN MST_CUSTOMER_INFO CST ON t2.ISSUER = CST.CUSTOMER_ID
          WHERE m.PORTFOLIO_ID IN ${portfolioCode} and n.TRADE_STATUS = ''01'' and NVL(n.IS_CANCEL,''N'') =''N''
            AND n.TRADE_DATE = DATE ''${valDate}''
@@ -336,7 +336,7 @@ FROM (
                   INNER JOIN TRD_PRODUCT_TEMP_DEAL n ON m.TRADE_ID = n.TRADE_ID
                   INNER JOIN finTemp t2 ON t2.FINPROD_ID = n.FINPROD_ID
                   INNER JOIN FIN_PRODUCT_TYPE t3 ON n.FINPROD_ID = t3.FINPROD_ID AND t3.BRANCH = 0
-                  INNER JOIN RT ON RT.O_CODE = t2.ISSUER
+                  LEFT JOIN RT ON RT.O_CODE = t2.ISSUER
                   LEFT JOIN MST_CUSTOMER_INFO CST ON t2.ISSUER = CST.CUSTOMER_ID
          WHERE m.PORTFOLIO_ID IN ${portfolioCode} and n.TRADE_STATUS = ''01'' and NVL(n.IS_CANCEL,''N'') =''N''
            AND n.TRADE_DATE = DATE ''${valDate}''
@@ -360,7 +360,7 @@ FROM (
                   INNER JOIN SYS_WFL_BUSINESS_LIST swbl on n.WORKFLOW_ID = swbl.SEQ_NO and swbl.PROCESS_STATE != ''BACK''
                   INNER JOIN finTemp t2 ON t2.FINPROD_ID = n.FINPROD_ID
                   left JOIN FIN_PRODUCT_TYPE t3 ON n.FINPROD_ID = t3.FINPROD_ID AND t3.BRANCH = 0
-                  INNER JOIN RT ON RT.O_CODE = t2.ISSUER
+                  LEFT JOIN RT ON RT.O_CODE = t2.ISSUER
                   LEFT JOIN MST_CUSTOMER_INFO CST ON t2.ISSUER = CST.CUSTOMER_ID
          WHERE m.PORTFOLIO_ID IN ${portfolioCode} and n.TRADE_STATUS = ''01'' and NVL(n.IS_CANCEL,''N'') =''N''
            AND n.TRADE_DATE = DATE ''${valDate}''
@@ -379,7 +379,7 @@ FROM (
                   INNER JOIN SYS_WFL_BUSINESS_LIST swbl on n.WORKFLOW_ID = swbl.SEQ_NO and swbl.PROCESS_STATE != ''BACK''
                   INNER JOIN finTemp t2 ON t2.FINPROD_ID = n.FINPROD_ID
                   INNER JOIN FIN_PRODUCT_TYPE t3 ON n.FINPROD_ID = t3.FINPROD_ID AND t3.BRANCH = 0
-                  INNER JOIN RT ON RT.O_CODE = t2.ISSUER
+                  LEFT JOIN RT ON RT.O_CODE = t2.ISSUER
                   LEFT JOIN MST_CUSTOMER_INFO CST ON t2.ISSUER = CST.CUSTOMER_ID
          WHERE n.counter_id IN ${portfolioCode} and n.TRADE_STATUS = ''01'' and NVL(n.IS_CANCEL,''N'') =''N''
            AND n.TRADE_DATE = DATE ''${valDate}''
