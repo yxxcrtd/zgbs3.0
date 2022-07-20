@@ -1483,6 +1483,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         if (DictCodeList.回购拆借方向_逆回购.getValue().equals(infContractDetailfile.getPs())
                 || DictCodeList.回购拆借方向_正回购.getValue().equals(infContractDetailfile.getPs())) {
             trdProductTempDeal.setFinprodId(trdProductTempDeal.getTradeId());
+            dto.setFinprodId(trdProductTempDeal.getTradeId());
         }
         // XYHGFXSJ-164:日间下单协议回购首期的临时交易 FinprodId 跟首期的临时交易编号一致 modify by fuyongsheng 20220719 end
         dto.setTrdProductTempDeal(trdProductTempDeal);
