@@ -429,7 +429,7 @@ public class TerminalHelper {
             return null;
         }
         RepurchaseQuoteReceiveResponse repurchaseQuoteReceiveResponse = new RepurchaseQuoteReceiveResponse();
-        repurchaseQuoteReceiveResponse.setRequestNo(String.valueOf(source.getEntrustNo()));
+        repurchaseQuoteReceiveResponse.setRequestNo(source.getCbpconferId());
         repurchaseQuoteReceiveResponse.setRequestType(null);
         repurchaseQuoteReceiveResponse.setBs(source.getEntrustBs());
         repurchaseQuoteReceiveResponse.setTradeMarket(null);
@@ -465,7 +465,7 @@ public class TerminalHelper {
         repurchaseQuoteReceiveResponse.setmIntAmt(BigDecimal.valueOf(source.getProfit()));
         repurchaseQuoteReceiveResponse.setBackBalance(BigDecimal.valueOf(source.getSettleBalance()));
         repurchaseQuoteReceiveResponse.setCpClientName(source.getPropAccountName());
-        repurchaseQuoteReceiveResponse.setOrigSerialNo(null);
+        repurchaseQuoteReceiveResponse.setOrigSerialNo(source.getOrigCbpconferId());
         repurchaseQuoteReceiveResponse.setRemark(source.getRemark());
         repurchaseQuoteReceiveResponse.setAccount(source.getFundAccount());
 //        repurchaseQuoteReceiveResponse.setAccountName();
