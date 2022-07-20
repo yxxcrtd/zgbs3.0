@@ -433,7 +433,6 @@
 
         // 初始化对手方列表
         /*if(entity && entity.counterInfoList){
-            debugger;
             table.table ? table.reload() : table.load();
             var counterInfoList = entity.counterInfoList;
             var tempList = [];
@@ -574,7 +573,6 @@
      * 计算金额相关
      */
     var autoAllocation = function () {
-    debugger;
         var finprodId = $('#CfetsBondDealQuotedPrice005_hidden_finprodId').val();
         if (!$("#distribution").val()) {
             Joyin.error("无法自动分配，请先选择分配方式");
