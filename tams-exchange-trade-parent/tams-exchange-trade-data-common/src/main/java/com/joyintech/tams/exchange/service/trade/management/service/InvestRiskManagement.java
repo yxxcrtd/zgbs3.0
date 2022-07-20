@@ -431,7 +431,7 @@ public class InvestRiskManagement extends BaseService {
 
         String instructionId = instruction.getEntrustId();
         String ps = instruction.getPs();
-        String counterId = StringUtil.isNotEmpty(instruction.getCounterId()) ? instruction.getCounterId():((IntegratedEntrust) entrust).getCounterId();
+        String counterId = instruction.getCounterId();
 
         String portfolioId = calculateResponse.getPortfolioId();
         Long entrustNum = calculateResponse.getEntrustNum();
@@ -523,6 +523,9 @@ public class InvestRiskManagement extends BaseService {
                 //投管要求协议回购这里传入起息日,到期日
                 reqRiskOccupy.setVdate(formatter.format(dateFormat.parse(((IntegratedEntrust) entrust).getFirstSettleDate())));
                 reqRiskOccupy.setMdate(formatter.format(dateFormat.parse(((IntegratedEntrust) entrust).getBackDate())));
+                if(StringUtil.isEmpty(reqRiskOccupy.getCounterId())) {
+                    reqRiskOccupy.setCounterId(((IntegratedEntrust) entrust).getCounterId());
+                }
             }
         } catch (Exception e) {
             logger.info("风险三合一调用发生异常，回购日期转换错误: ", e);
