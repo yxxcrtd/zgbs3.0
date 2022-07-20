@@ -20,6 +20,8 @@ import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.invest.common.entrust.dto.EntrustCommonDto;
+import com.joyintech.tams.invest.common.position.dto.PostionParameter;
+import com.joyintech.tams.invest.common.position.service.CommonPositionService;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.dto.EtrSecPositionDto;
 import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
@@ -70,6 +72,13 @@ public class BaseEtrCashPositionCommServiceImpl extends BaseService implements B
 
     @Autowired
     private EtrEntrustAddMapper etrEntrustAddMapper;
+
+    // modify by etliu 20220719 start
+    // 3.0.6协议回购+风险升级 XYHGFXSJ-156
+    //【实时资金头寸查询-协议回购】上交所逆回购指令退回后，资金流水未回冲
+    @Autowired
+    private CommonPositionService commonPositionService;
+    // modify by etliu 20220719 end
 
     @Override
     public CommonResult executeEtrCashPosition(BaseTradeProductDealDto finProductTradeDto, DictCodeList 持仓类型,
@@ -357,6 +366,32 @@ public class BaseEtrCashPositionCommServiceImpl extends BaseService implements B
     public CommonResult entrustCloseExecute(String entrustId, String isExistNew){
         return this.entrustCloseExecute(entrustId, isExistNew,null);
     }
+
+    // modify by etliu 20220719 start
+    // 3.0.6协议回购+风险升级 XYHGFXSJ-156
+    //【实时资金头寸查询-协议回购】上交所逆回购指令退回后，资金流水未回冲
+    @Override
+    public CommonResult entrustCloseExecuteForH01(String entrustId, String isExistNew){
+        // 指令持仓流水、现金流水处理
+        PostionParameter parameter = new PostionParameter();
+        parameter.setPs("ALL");
+        parameter.setTradeMarket("ALL");
+        parameter.setWorkflowStatus(DictCodeListExt1.交易流程状态_有效.getValue());
+        parameter.setOperationType("REVOKE_CLOSE");
+        parameter.setTradeType("01");
+        parameter.setBusinessType(DictCodeList.回购类型_质押式协议回购.getValue());
+        EtrEntrust etrEntrust = new EtrEntrust();
+        etrEntrust.setEntrustId(entrustId);
+        parameter.setCustom(etrEntrust);
+        try {
+            commonPositionService.process(parameter);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new CommonResult(CommonResult.SUCCED, "处理完成");
+    }
+    // modify by etliu 20220719 end
 
     @Override
     public CommonResult entrustCloseExecute(String entrustId, String isExistNew, BigDecimal forcedFinishAmt) {
