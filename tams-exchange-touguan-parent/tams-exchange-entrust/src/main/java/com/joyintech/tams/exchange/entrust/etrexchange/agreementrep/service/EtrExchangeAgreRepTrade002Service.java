@@ -253,9 +253,9 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         if (SecurityUtil.getLoginUser() != null) {
             pageParam.put("userId", SecurityUtil.getLoginUser().getUserName());
         }
-        if(request.getIsDate()){
+        if(!Objects.isNull(request.getIsDate()) && request.getIsDate()){
             pageParam.put("isDate", DictCodeList.是否_是.getValue());
-        } else if (!request.getIsDate()) {
+        } else if (!Objects.isNull(request.getIsDate()) && !request.getIsDate()) {
             pageParam.put("isDate", DictCodeList.是否_否.getValue());
         }
         pageParam.put("origSerialNo", request.getOrigSerialNo());
