@@ -1443,12 +1443,16 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         // 清算速度_T_0
         dto.setSettleSpeed(0L);
         // 金融产品代码
-        dto.setFinprodId(infContractDetailfile.getvTradeId());
-        // 金融产品类型
+        // XYHGFXSJ-226:在buildPositionBaseData方法已经对FinprodId进行赋值,这里不应再覆盖 modify by fuyongsheng 20220720 start
+        // dto.setFinprodId(infContractDetailfile.getvTradeId());
+        // XYHGFXSJ-226:在buildPositionBaseData方法已经对FinprodId进行赋值,这里不应再覆盖 modify by fuyongsheng 20220720 end
+        // 金融产品类型、投管业务类型
         if (DictCodeList.回购拆借方向_逆回购.getValue().equals(infContractDetailfile.getPs())) {
             dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
+            dto.setTgBusiType(DictCodeListExt1.平安业务类型_逆回购.getValue());
         } else if (DictCodeList.回购拆借方向_正回购.getValue().equals(infContractDetailfile.getPs())) {
             dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
+            dto.setTgBusiType(DictCodeListExt1.平安业务类型_正回购.getValue());
         }
         // 本方交易员
 //        String trader = entrustMsgbyMQMapper.queryTradeId(infContractDetailfile.getEntrustId());
@@ -1457,12 +1461,6 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
 
         if (dto.getCcy() == null) {
             dto.setCcy(DictCodeList.币种_人民币_CNY.getValue());
-        }
-        // 投管业务类型
-        if (DictCodeList.回购拆借方向_逆回购.getValue().equals(infContractDetailfile.getPs())) {
-            dto.setTgBusiType(DictCodeListExt1.平安业务类型_逆回购.getValue());
-        } else if (DictCodeList.回购拆借方向_正回购.getValue().equals(infContractDetailfile.getPs())) {
-            dto.setTgBusiType(DictCodeListExt1.平安业务类型_正回购.getValue());
         }
         logger.debug("[到期续作成交数据特殊处理开始],finProductId:{}, ps:{}", dto.getFinprodId(), ps);
         if (
