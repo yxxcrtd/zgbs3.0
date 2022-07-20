@@ -38,6 +38,9 @@ public class RepurchaseQuoteReceiveRequest {
     @ApiModelProperty(name = "remark", value = "补充协议")
     private String remark;
 
+    @ApiModelProperty(name="search",value="关键字")
+    private String search;
+
     public String getInstructionId() {
         return instructionId;
     }
@@ -142,21 +145,31 @@ public class RepurchaseQuoteReceiveRequest {
         this.remark = remark;
     }
 
+    public String getSearch() {
+        return search;
+    }
+
+    public void setSearch(String search) {
+        this.search = search;
+    }
+
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("requestNo", requestNo)
-                .add("origSerialNo", origSerialNo)
-                .add("account", account)
-                .add("requestType", requestType)
-                .add("stockCode", stockCode)
-                .add("pledgeNumber", pledgeNumber)
-                .add("repoAmount", repoAmount)
-                .add("compactTerm", compactTerm)
-                .add("repoRate", repoRate)
-                .add("settleAmount", settleAmount)
-                .add("firstSettleDate", firstSettleDate)
-                .add("remark", remark)
-                .toString();
+        return "RepurchaseQuoteReceiveRequest{" +
+                "instructionId='" + instructionId + '\'' +
+                ", requestNo='" + requestNo + '\'' +
+                ", origSerialNo='" + origSerialNo + '\'' +
+                ", account='" + account + '\'' +
+                ", requestType='" + requestType + '\'' +
+                ", stockCode='" + stockCode + '\'' +
+                ", pledgeNumber=" + pledgeNumber +
+                ", repoAmount=" + repoAmount +
+                ", compactTerm=" + compactTerm +
+                ", repoRate=" + repoRate +
+                ", settleAmount=" + settleAmount +
+                ", firstSettleDate='" + firstSettleDate + '\'' +
+                ", remark='" + remark + '\'' +
+                ", search='" + search + '\'' +
+                '}';
     }
 }

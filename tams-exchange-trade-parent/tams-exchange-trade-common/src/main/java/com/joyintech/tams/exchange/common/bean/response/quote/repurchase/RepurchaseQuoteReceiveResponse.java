@@ -665,62 +665,131 @@ public class RepurchaseQuoteReceiveResponse {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("requestNo", requestNo)
-                .add("requestType", requestType)
-                .add("bs", bs)
-                .add("tradeMarket", tradeMarket)
-                .add("stockCode", stockCode)
-                .add("stockName", stockName)
-                .add("pledgeNumber", pledgeNumber)
-                .add("repoAmount", repoAmount)
-                .add("repoRate", repoRate)
-                .add("discount", discount)
-                .add("firstSettleDate", firstSettleDate)
-                .add("compactTerm", compactTerm)
-                .add("backDate", backDate)
-                .add("repoMdate", repoMdate)
-                .add("capDays", capDays)
-                .add("swapIntoBonds", swapIntoBonds)
-                .add("swapIntoBondsName", swapIntoBondsName)
-                .add("swapIntoBondsVolume", swapIntoBondsVolume)
-                .add("swapOutBonds", swapOutBonds)
-                .add("swapOutBondsName", swapOutBondsName)
-                .add("swapOutBondsVolume", swapOutBondsVolume)
-                .add("origBonds", origBonds)
-                .add("origBondsName", origBondsName)
-                .add("origBondsVolume", origBondsVolume)
-                .add("origRepoAmount", origRepoAmount)
-                .add("transCode", transCode)
-                .add("mIntAmt", mIntAmt)
-                .add("backBalance", backBalance)
-                .add("traderCode", traderCode)
-                .add("traderCodeStr", traderCodeStr)
-                .add("memberId", memberId)
-                .add("memberIdStr", memberIdStr)
-                .add("investorId", investorId)
-                .add("investorIdStr", investorIdStr)
-                .add("investorType", investorType)
-                .add("investorTypeStr", investorTypeStr)
-                .add("cpTraderCode", cpTraderCode)
-                .add("cpTraderCodeStr", cpTraderCodeStr)
-                .add("cpMemberId", cpMemberId)
-                .add("cpMemberIdStr", cpMemberIdStr)
-                .add("cpInvestorId", cpInvestorId)
-                .add("cpInvestorIdStr", cpInvestorIdStr)
-                .add("cpInvestorType", cpInvestorType)
-                .add("cpInvestorTypeStr", cpInvestorTypeStr)
-                .add("cpClientName", cpClientName)
-                .add("origSerialNo", origSerialNo)
-                .add("remark", remark)
-                .add("account", account)
-                .add("accountName", accountName)
-                .add("brokerId", brokerId)
-                .add("brokerName", brokerName)
-                .add("requestTypeStr", requestTypeStr)
-                .add("bsStr", bsStr)
-                .add("tradeMarketStr", tradeMarketStr)
-                .add("pledgeNumberStr", pledgeNumberStr)
-                .toString();
+        return "RepurchaseQuoteReceiveResponse{" +
+                "requestNo='" + requestNo + '\'' +
+                ", requestType='" + requestType + '\'' +
+                ", bs='" + bs + '\'' +
+                ", tradeMarket='" + tradeMarket + '\'' +
+                ", stockCode='" + stockCode + '\'' +
+                ", stockName='" + stockName + '\'' +
+                ", pledgeNumber=" + pledgeNumber +
+                ", repoAmount=" + repoAmount +
+                ", repoRate=" + repoRate +
+                ", discount=" + discount +
+                ", firstSettleDate='" + firstSettleDate + '\'' +
+                ", compactTerm=" + compactTerm +
+                ", backDate='" + backDate + '\'' +
+                ", repoMdate='" + repoMdate + '\'' +
+                ", capDays=" + capDays +
+                ", swapIntoBonds='" + swapIntoBonds + '\'' +
+                ", swapIntoBondsName='" + swapIntoBondsName + '\'' +
+                ", swapIntoBondsVolume=" + swapIntoBondsVolume +
+                ", swapIntoBondsVolumeStr=" + swapIntoBondsVolumeStr +
+                ", swapOutBonds='" + swapOutBonds + '\'' +
+                ", swapOutBondsName='" + swapOutBondsName + '\'' +
+                ", swapOutBondsVolume=" + swapOutBondsVolume +
+                ", swapOutBondsVolumeStr=" + swapOutBondsVolumeStr +
+                ", origBonds='" + origBonds + '\'' +
+                ", origBondsName='" + origBondsName + '\'' +
+                ", origBondsVolume=" + origBondsVolume +
+                ", origBondsVolumeStr=" + origBondsVolumeStr +
+                ", origRepoAmount=" + origRepoAmount +
+                ", transCode='" + transCode + '\'' +
+                ", transCodeStr='" + transCodeStr + '\'' +
+                ", mIntAmt=" + mIntAmt +
+                ", backBalance=" + backBalance +
+                ", swapOutBalance=" + swapOutBalance +
+                ", traderCode='" + traderCode + '\'' +
+                ", traderCodeStr='" + traderCodeStr + '\'' +
+                ", memberId='" + memberId + '\'' +
+                ", memberIdStr='" + memberIdStr + '\'' +
+                ", investorId='" + investorId + '\'' +
+                ", investorIdStr='" + investorIdStr + '\'' +
+                ", investorType='" + investorType + '\'' +
+                ", investorTypeStr='" + investorTypeStr + '\'' +
+                ", cpTraderCode='" + cpTraderCode + '\'' +
+                ", cpTraderCodeStr='" + cpTraderCodeStr + '\'' +
+                ", cpMemberId='" + cpMemberId + '\'' +
+                ", cpMemberIdStr='" + cpMemberIdStr + '\'' +
+                ", cpInvestorId='" + cpInvestorId + '\'' +
+                ", cpInvestorIdStr='" + cpInvestorIdStr + '\'' +
+                ", cpInvestorType='" + cpInvestorType + '\'' +
+                ", cpInvestorTypeStr='" + cpInvestorTypeStr + '\'' +
+                ", cpClientName='" + cpClientName + '\'' +
+                ", origSerialNo='" + origSerialNo + '\'' +
+                ", remark='" + remark + '\'' +
+                ", account='" + account + '\'' +
+                ", accountName='" + accountName + '\'' +
+                ", brokerId='" + brokerId + '\'' +
+                ", brokerName='" + brokerName + '\'' +
+                ", requestTypeStr='" + requestTypeStr + '\'' +
+                ", bsStr='" + bsStr + '\'' +
+                ", tradeMarketStr='" + tradeMarketStr + '\'' +
+                ", pledgeNumberStr='" + pledgeNumberStr + '\'' +
+                '}';
+    }
+
+    public String toValueString() {
+        return "{" +requestNo +
+                "," + requestType +
+                "," + bs +
+                "," + tradeMarket +
+                "," + stockCode +
+                "," + stockName +
+                "," + pledgeNumber +
+                "," + repoAmount +
+                "," + repoRate +
+                "," + discount +
+                "," + firstSettleDate +
+                "," + compactTerm +
+                "," + backDate +
+                "," + repoMdate +
+                "," + capDays +
+                "," + swapIntoBonds +
+                ",'" + swapIntoBondsName +
+                "," + swapIntoBondsVolume +
+                "," + swapIntoBondsVolumeStr +
+                "," + swapOutBonds +
+                "," + swapOutBondsName +
+                "," + swapOutBondsVolume +
+                "," + swapOutBondsVolumeStr +
+                "," + origBonds +
+                "," + origBondsName +
+                "," + origBondsVolume +
+                "," + origBondsVolumeStr +
+                "," + origRepoAmount +
+                "," + transCode +
+                "," + transCodeStr +
+                "," + mIntAmt +
+                "," + backBalance +
+                "," + swapOutBalance +
+                "," + traderCode +
+                "," + traderCodeStr +
+                "," + memberId +
+                "," + memberIdStr +
+                "," + investorId +
+                "," + investorIdStr +
+                "," + investorType +
+                "," + investorTypeStr +
+                ",'" + cpTraderCode +
+                "," + cpTraderCodeStr +
+                "," + cpMemberId +
+                "," + cpMemberIdStr +
+                ",'" + cpInvestorId +
+                "," + cpInvestorIdStr +
+                "," + cpInvestorType +
+                "," + cpInvestorTypeStr +
+                "," + cpClientName +
+                "," + origSerialNo +
+                "," + remark +
+                "," + account +
+                "," + accountName +
+                "," + brokerId +
+                "," + brokerName +
+                "," + requestTypeStr +
+                "," + bsStr +
+                "," + tradeMarketStr +
+                "," + pledgeNumberStr +
+                "}";
     }
 }

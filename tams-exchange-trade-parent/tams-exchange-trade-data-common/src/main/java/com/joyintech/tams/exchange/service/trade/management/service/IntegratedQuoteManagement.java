@@ -437,6 +437,11 @@ public class IntegratedQuoteManagement {
             stream = stream.filter(item -> StrUtil.equals(item.getRemark(), remark));
         }
 
+        String search = request.getSearch();
+        if (ObjectUtil.isNotEmpty(search)) {
+            stream = stream.filter(item -> item.toValueString().contains(search));
+        }
+
         List<RepurchaseQuoteReceiveResponse> filterList = stream.collect(Collectors.toList());
         list.clear();
         list.addAll(filterList);
