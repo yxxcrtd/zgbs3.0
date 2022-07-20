@@ -39,6 +39,7 @@ import com.joyintech.tams.exchange.common.dto.EntrustPriceAndYieldDto;
 import com.joyintech.tams.exchange.common.enums.exchange.GuaranteedEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.NetOrFullPriceEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.TargetTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.InstructionQueryRequest;
@@ -558,6 +559,12 @@ public class InvestmentManagement extends BaseService {
         for (InstructionExportVo instruction : instructions) {
             if (投管业务类型_质押券出入库.getValue().equals(instruction.getBusiTypeTg())) {
                 instruction.setEntrustPrice(NumberUtil.mul(instruction.getEntrustPrice(), 100));
+            }
+            //中途换券、到期购回、解除质押指令价格模式调整为空
+            if (BusiTypeTgEnum.中途换券.codeEquals(instruction.getBusiTypeTg())
+                    || BusiTypeTgEnum.到期购回.codeEquals(instruction.getBusiTypeTg())
+                    || BusiTypeTgEnum.解除质押.codeEquals(instruction.getBusiTypeTg())) {
+                instruction.setPriceMode(null);
             }
 
             fillEntrustNumViewAndLeftVolumeView(instruction);
