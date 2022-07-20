@@ -340,7 +340,7 @@
             sdl2.item_value tgBusiTypeStr,
             T1.PS ps,
             sdl3.item_value psStr,
-            case when T1.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F03} and T1.PS = #{PS_T07} then null else T0.SETTLE_NUM / 100 end settleNum,
+            case when T1.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F03} and T1.PS = #{PS_T07} then null else T0.SETTLE_NUM end settleNum,
             T0.SETTLE_AMT settleAmt,
             LISTAGG(T4.PORTFOLIO_ID,',') WITHIN GROUP (ORDER BY (T1.TOTLE_TRADE_ID))  portfolioId,
             LISTAGG(T5.PORTFOLIO_NAME,',') WITHIN GROUP (ORDER BY (T1.TOTLE_TRADE_ID)) portfolioName,
