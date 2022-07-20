@@ -132,14 +132,14 @@ public class ManualSettleFlowDto extends TrdManualSettleFlow {
     // ZGCPCN-998: 债券的数量单位改为万元,数量*100/10000,其余不变 modify by fuyongsheng 20220601 end
 
 
-    // ZGCPCN-998: 回购金额单位改为万元,金额*100/10000 modify by fuyongsheng 20220601 start
+    // XYHGFXSJ-144: 回购金额单位改为万元,金额/10000 modify by fuyongsheng 20220720 start
     public String getPrinStr() {
         if(null == this.getPrin()){
             return StringUtil.EMPTY;
         }
-        return String.valueOf(ArithmeticUtil.divide(this.getPrin(), new BigDecimal(100), 2, RoundingMode.HALF_UP));
+        return String.valueOf(ArithmeticUtil.divide(this.getPrin(), new BigDecimal(10000), 2, RoundingMode.HALF_UP));
     }
-    // ZGCPCN-998: 回购金额单位改为万元,数量*100/10000 modify by fuyongsheng 20220601 end
+    // XYHGFXSJ-144: 回购金额单位改为万元,金额/10000 modify by fuyongsheng 20220720 end
 
     public String getOperTypeStr() {
         if(StringUtil.isNotEmpty(this.getOperType())){
