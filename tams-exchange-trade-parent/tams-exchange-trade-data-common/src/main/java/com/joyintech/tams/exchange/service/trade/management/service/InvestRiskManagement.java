@@ -72,7 +72,7 @@ public class InvestRiskManagement extends BaseService {
      */
     @Value("${application.micorservice.contextpath.single:false}")
     private boolean isSingle;
-    
+
     public RiskOccupyBean riskCheck(Collection<EntrustInterface> entrusts) {
         return riskCheck(entrusts, null);
     }
@@ -213,7 +213,7 @@ public class InvestRiskManagement extends BaseService {
         long entrustVolume = entrust.getEntrustVolume();
 
         List<PortfolioCalculateResponse> calculateList = portfolioManager.getCalculateList(
-                instructionId, entrust.getEntrustPrice(), entrust.getFullPrice(), entrustVolume,entrust.getEntrustProp());
+                instructionId, entrust.getEntrustPrice(), entrust.getFullPrice(), entrustVolume, entrust.getEntrustProp());
 
         List<ReqRiskTrigger> list = Lists.newArrayList();
         int portfolioNum = calculateList.size();
@@ -411,7 +411,7 @@ public class InvestRiskManagement extends BaseService {
 
         }
         List<PortfolioCalculateResponse> calculateList = portfolioManager.getCalculateList(
-                instructionId, entrust.getEntrustPrice(), entrust.getFullPrice(), entrustVolume,entrust.getEntrustProp());
+                instructionId, entrust.getEntrustPrice(), entrust.getFullPrice(), entrustVolume, entrust.getEntrustProp());
 
         List<ReqRiskOccupy> list = Lists.newArrayList();
         int portfolioNum = calculateList.size();
@@ -431,7 +431,7 @@ public class InvestRiskManagement extends BaseService {
 
         String instructionId = instruction.getEntrustId();
         String ps = instruction.getPs();
-        String counterId = StringUtil.isNotEmpty(instruction.getCounterId()) ? instruction.getCounterId():((IntegratedEntrust) entrust).getCounterId();
+        String counterId = StringUtil.isNotEmpty(instruction.getCounterId()) ? instruction.getCounterId() : entrust.getCounterId();
 
         String portfolioId = calculateResponse.getPortfolioId();
         Long entrustNum = calculateResponse.getEntrustNum();
@@ -497,9 +497,9 @@ public class InvestRiskManagement extends BaseService {
                 reqRiskOccupy.setVdate(DateUtil.getSysDate());
                 //投管要求质押式回购这里传入期限品种
                 reqRiskOccupy.setVarietyCode(entrust.getStockName());
-                if (StrUtil.isEmpty(counterId)) {
-                    reqRiskOccupy.setCounterId(((IntegratedEntrust) entrust).getLiaisonName());
-                }
+//                if (StrUtil.isEmpty(counterId)) {
+//                    reqRiskOccupy.setCounterId(((IntegratedEntrust) entrust).getLiaisonName());
+//                }
             } else if (回购类型_质押式协议回购.getValue().equals(instruction.getAssetType1())) {//协议回购
                 // 非首期填入成交编号
                 if (!EntrustProp.isRepurchase_First(entrustProp)) {
@@ -509,8 +509,8 @@ public class InvestRiskManagement extends BaseService {
                 reqRiskOccupy.setRepurchaseType(回购类型_质押式协议回购.getValue());
                 reqRiskOccupy.setAmount(((IntegratedEntrust) entrust).getEntrustBalance());
                 //backBalance,针对提前购回/到期购回/解除质押 三种类型占用金额取到期结算金额
-                if(StringUtil.isNotEmpty(ps) && (StringUtil.equals(ps, DictCodeListExt3.交易方向_提前购回.getValue())
-                        || StringUtil.equals(ps,DictCodeListExt3.交易方向_到期购回.getValue()) || StringUtil.equals(ps,DictCodeListExt3.交易方向_解除质押.getValue()))) {
+                if (StringUtil.isNotEmpty(ps) && (StringUtil.equals(ps, DictCodeListExt3.交易方向_提前购回.getValue())
+                        || StringUtil.equals(ps, DictCodeListExt3.交易方向_到期购回.getValue()) || StringUtil.equals(ps, DictCodeListExt3.交易方向_解除质押.getValue()))) {
                     reqRiskOccupy.setAmount(((IntegratedEntrust) entrust).getBackBalance());
                     //reqRiskOccupy.setTradeNum(CommonUtil.getBigDecimal(dataMap, "expireSettleAmt", BigDecimal.ZERO));
                     //reqRiskOccupy.setPs(com.joyintech.tams.constant.DictCodeList.交易方向_到期.getValue());
@@ -523,6 +523,9 @@ public class InvestRiskManagement extends BaseService {
                 //投管要求协议回购这里传入起息日,到期日
                 reqRiskOccupy.setVdate(formatter.format(dateFormat.parse(((IntegratedEntrust) entrust).getFirstSettleDate())));
                 reqRiskOccupy.setMdate(formatter.format(dateFormat.parse(((IntegratedEntrust) entrust).getBackDate())));
+                if(StringUtil.isEmpty(reqRiskOccupy.getCounterId())) {
+                    reqRiskOccupy.setCounterId(((IntegratedEntrust) entrust).getCounterId());
+                }
             }
         } catch (Exception e) {
             logger.info("风险三合一调用发生异常，回购日期转换错误: ", e);

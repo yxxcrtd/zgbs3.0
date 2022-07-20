@@ -139,4 +139,8 @@ public interface OrderInterface {
     void setHedgeFlag(String hedgeFlag);
 
     String getBusiTypeTg();
+
+    default String getCounterId() {
+        return null;
+    }
 }

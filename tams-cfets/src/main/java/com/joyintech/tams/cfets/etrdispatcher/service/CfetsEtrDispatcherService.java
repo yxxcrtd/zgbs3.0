@@ -1444,12 +1444,26 @@ public class CfetsEtrDispatcherService extends BaseService {
                     entity.setRecStatus(DictCodeList.委托状态_已退回.getValue());
                     etrDistributeMapper.updateByPrimaryKeySelective(entity);
                 }
+
+                // modify by etliu 20220719 start
+                // 3.0.6协议回购+风险升级 XYHGFXSJ-156
+                //【实时资金头寸查询-协议回购】上交所逆回购指令退回后，资金流水未回冲
+                EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entrustId);
                 if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
-                    //插入旧头寸
-                    if (baseEtrCashPositionCommService != null) {
-                        baseEtrCashPositionCommService.entrustCloseExecute(entrustId, BussinessDictCodeListRds.是否_是.getValue());
+                    if (StringUtil.equals(DictCodeList.平安资产类型_质押式回购.getValue(), etrEntrustAdd.getAssetType())
+                        && StringUtil.equals(DictCodeList.回购类型_质押式协议回购.getValue(), etrEntrustAdd.getAssetType1())) {
+                        //插入旧头寸
+                        if (baseEtrCashPositionCommService != null) {
+                            baseEtrCashPositionCommService.entrustCloseExecuteForH01(entrustId, BussinessDictCodeListRds.是否_是.getValue());
+                        }
+                    } else {
+                        //插入旧头寸
+                        if (baseEtrCashPositionCommService != null) {
+                            baseEtrCashPositionCommService.entrustCloseExecute(entrustId, BussinessDictCodeListRds.是否_是.getValue());
+                        }
                     }
                 }
+                // modify by etliu 20220719 end
 
                 Map<String, Object> param = new HashMap<>();
                 param.put("entrustId", entrustId);
@@ -1475,7 +1489,6 @@ public class CfetsEtrDispatcherService extends BaseService {
                     }
                 }
                 if(b) {
-                    EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entrustId);
                     if(Objects.nonNull(etrEntrustAdd)) {
                         if (StringUtil.equals(etrEntrustAdd.getBusiTypePosition(), 头寸业务类型_债券一级投标.getValue()) || StringUtil.equals(etrEntrustAdd.getBusiTypePosition(), 头寸业务类型_债券一级申购.getValue())) {
                             b = false;
