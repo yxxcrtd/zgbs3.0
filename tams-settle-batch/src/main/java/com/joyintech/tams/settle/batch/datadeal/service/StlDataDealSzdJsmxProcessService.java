@@ -960,7 +960,10 @@ public class StlDataDealSzdJsmxProcessService {
 							//质押率
 //						    settleTransDataPledge.setPledgeRatio(ArithmeticUtil.divide(new BigDecimal(Math.abs(new BigDecimal(szdJsmx.getQsje()).doubleValue())),new BigDecimal(Math.abs(new BigDecimal(szdJsmx.getCjsl()).doubleValue())),2));
 						// 最新面值
-						BigDecimal 券面最新面值 = select券面面值(szdJsmx.getZqdm1());
+						// XYHGFXSJ-208:质押券字段用错 modify by fuyongsheng 20220720 start
+						// BigDecimal 券面最新面值 = select券面面值(szdJsmx.getZqdm1());
+						BigDecimal 券面最新面值 = select券面面值(settleTransDataPledge.getPledgeFinprodId());
+						// XYHGFXSJ-208:质押券字段用错 modify by fuyongsheng 20220720 end
 						settleTransDataPledge.setPledgeFaceValue(券面最新面值);
 						settleTransDataPledge.setPledgeRatio(ArithmeticUtil.multiply(ArithmeticUtil.divide(new BigDecimal(szdJsmx.getQsje()).abs(), settleTransDataPledge.getPledgeNumber(),2), 券面最新面值));
 						// modify by etliu 20211225 end
@@ -1244,7 +1247,10 @@ public class StlDataDealSzdJsmxProcessService {
 									settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(),
 									settleTransData.getVdate());
 							if(!CollectionUtils.isEmpty(sqSettleTransDatas)){
-								BigDecimal 券面最新面值 = select券面面值(szdJsmx.getZqdm1());
+								// XYHGFXSJ-208:质押券字段用错 modify by fuyongsheng 20220720 start
+								// BigDecimal 券面最新面值 = select券面面值(szdJsmx.getZqdm1());
+								BigDecimal 券面最新面值 = select券面面值(settleTransDataPledge.getPledgeFinprodId());
+								// XYHGFXSJ-208:质押券字段用错 modify by fuyongsheng 20220720 end
 								// 金融产品代码
 								settleTransData.setFinprodId(sqSettleTransDatas.get(0).getFinprodId());
 								settleTransDataPledge.setPledgeFaceValue(券面最新面值);
