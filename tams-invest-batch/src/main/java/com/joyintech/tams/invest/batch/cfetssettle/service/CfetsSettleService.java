@@ -911,6 +911,10 @@ public class CfetsSettleService extends BaseService {
             orderDtoMap = list.stream()
                     .collect(Collectors.toMap(StlPayOrders::getTradeId, orderDto -> orderDto));
             logger.info("查询出的划款指令列表:{}", JsonUtils.object2Json(orderDtoMap));
+            if(orderDtoMap.isEmpty()){
+                logger.debug("未查到划款指令,交易数据:{}",JsonUtils.object2Json(listTemp));
+                return;
+            }
         }
         //按照交易金额排序
         listTemp = listTemp.stream().sorted(Comparator.comparing(CfetsSettleDealInfo::getTradeAmt).reversed()).collect(Collectors.toList());
@@ -1221,6 +1225,10 @@ public class CfetsSettleService extends BaseService {
         Map<String, StlPayOrders> orderDtoMap = list.stream()
                 .collect(Collectors.toMap(StlPayOrders::getTradeId, orderDto -> orderDto));
         logger.info("查询出的指令列表:{}", JsonUtils.object2Json(orderDtoMap));
+        if(orderDtoMap.isEmpty()){
+            logger.debug("未查到划款指令,交易数据:{}",JsonUtils.object2Json(listTemp));
+            return;
+        }
         listTemp = listTemp.stream().sorted((x, y) -> y.getTradeAmt().compareTo(x.getTradeAmt())).collect(Collectors.toList());
         List<String> orderIdList = new ArrayList<>();
         for (CfetsSettleDealInfo item : listTemp) {
@@ -1337,6 +1345,10 @@ public class CfetsSettleService extends BaseService {
         Map<String, StlPayOrders> orderDtoMap = list.stream()
                 .collect(Collectors.toMap(StlPayOrders::getTradeId, orderDto -> orderDto));
         logger.info("查询出的划款指令列表:{}", JsonUtils.object2Json(orderDtoMap));
+        if(orderDtoMap.isEmpty()){
+            logger.debug("未查到划款指令,交易数据:{}",JsonUtils.object2Json(listTemp));
+            return;
+        }
         for (CfetsSettleDealInfo deal : listTemp) {
             if (StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收失败.getValue())) {
 //                tradeIdsSet.add(deal.getTradeId());
