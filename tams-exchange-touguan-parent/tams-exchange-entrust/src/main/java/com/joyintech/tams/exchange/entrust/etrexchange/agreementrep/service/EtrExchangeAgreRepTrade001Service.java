@@ -2657,6 +2657,9 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             EtrExchangeAgreRepTrade001Dto  result =  this.getEntrustInfoByIntiTradeId(map);
             dataMap.put("tradeAmt",ArithmeticUtil.subtract(dto.getTradeAmt(),result.getExpireSettleAmt()));
         }
+        if(StringUtil.isNotEmpty(dto.getPs()) && StringUtil.equals(dto.getPs(), 交易方向_解除质押.getValue()) && StringUtil.equals(dto.getTradeMarket(),"03")) {
+            dataMap.put("tradeAmt",0);
+        }
         return dataMap;
     }
 
