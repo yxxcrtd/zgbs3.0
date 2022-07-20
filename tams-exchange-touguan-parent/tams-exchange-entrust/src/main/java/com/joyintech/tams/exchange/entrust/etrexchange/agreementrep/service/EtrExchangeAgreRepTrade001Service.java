@@ -14,12 +14,7 @@ package com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.service;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.joyintech.background.component.order.exchange.common.dto.EtrPledgeDto;
 import com.joyintech.framework.exception.BusinessException;
@@ -2146,8 +2141,10 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         	etrSinglePortfolioDto.setStockId(dto.getRepSecId());// 证券代码
             etrSinglePortfolioDto.setFinprodId(dto.getFinprodId());// 证券代码对应的金融产品代码
         }
-        if (!交易方向_首期.getValue().equals(dto.getPs())){
+        if (!交易方向_首期.getValue().equals(dto.getPs()) && StringUtils.isEmpty(dto.getInitialNum())){
             etrSinglePortfolioDto.setFinprodId(getFinprodIdNoFirst(dto));
+        } else if (!StringUtils.isEmpty(dto.getInitialNum())) {
+            etrSinglePortfolioDto.setFinprodId(dto.getInitialNum());
         }
         etrSinglePortfolioDto.setSecAcctId(dto.getSecAcctId());// 证券账户
         etrSinglePortfolioDto.setDealCurAcct(dto.getAcctNo());// 资金账户
