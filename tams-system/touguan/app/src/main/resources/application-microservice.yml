@@ -66,6 +66,7 @@ application:
       exchangeService: http://127.0.0.1:${server.port}/tams/service
       quoteService: http://127.0.0.1:${server.port}/tams/service
       commonBasicDataService: http://127.0.0.1:${server.port}/tams
+      exchangeTradeService: http://127.0.0.1:${server.port}/tams/trade
 
 # 使用服务注册中心的方式
 #  loadbalance: true
