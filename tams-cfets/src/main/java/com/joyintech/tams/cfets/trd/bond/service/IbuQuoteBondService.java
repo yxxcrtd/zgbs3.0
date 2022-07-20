@@ -1056,7 +1056,7 @@ public class IbuQuoteBondService extends BaseService {
                 //委托已有完成额度，做过交易，走关闭完成的逻辑，更新预占
                 List<String> closeEntrustIdList = new ArrayList<>();
                 for(CfetsEtribBondInfo003Dto etrDto : dtolist) {
-                    if(com.joyintech.background.component.common.pack.common.util.StringUtil.isNotEmpty(etrFinishMap) && com.joyintech.background.component.common.pack.common.util.StringUtil.isNotEmpty(etrFinishMap.get(etrDto.getEntrustId()))
+                    if(StringUtil.isNotEmpty(etrFinishMap) && StringUtil.isNotEmpty(etrFinishMap.get(etrDto.getEntrustId()))
                             && BigDecimal.ZERO.compareTo(etrFinishMap.get(etrDto.getEntrustId()))<0) {
                         closeEntrustIdList.add(etrDto.getEntrustId());
                     }
@@ -1067,10 +1067,11 @@ public class IbuQuoteBondService extends BaseService {
             }
             // ZGZGST-2330:委托关闭判断是否有完成额度，分情况处理 fuyongsheng 20210919 edit end
             // add by zhangrui1 批量委托关闭 end
-            if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
+            // 完整包名不要变更,否则值不同
+            if (StringUtil.equals(com.joyintech.tams.constant.DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
                 //插入旧头寸
                 dtolist.forEach(item ->{
-                    baseEtrCashPositionCommService.entrustCloseExecute(item.getEntrustId(), DictCodeList.是否_是.getValue());
+                    baseEtrCashPositionCommService.entrustCloseExecute(item.getEntrustId(), com.joyintech.tams.constant.DictCodeList.是否_是.getValue());
                 });
             }
 

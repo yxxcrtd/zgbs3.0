@@ -364,7 +364,7 @@ public class BaseEtrCashPositionCommServiceImpl extends BaseService implements B
 
     @Override
     public CommonResult entrustCloseExecute(String entrustId, String isExistNew){
-        return this.entrustCloseExecute(entrustId, isExistNew,null);
+        return this.entrustCloseExecute(entrustId, isExistNew, null);
     }
 
     // modify by etliu 20220719 start
