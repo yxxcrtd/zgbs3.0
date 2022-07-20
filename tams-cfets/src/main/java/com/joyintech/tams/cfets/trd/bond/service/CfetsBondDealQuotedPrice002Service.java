@@ -1164,25 +1164,28 @@ public class CfetsBondDealQuotedPrice002Service extends BaseService<CfetsBondDea
 
     @Override
     public void doBack(CfetsBondDealDialogueQuoteDto entity) {
-        String systemAct = handSystemAct(entity);
-        sendPosition(entity, DictCodeListExt3.流程节点_流程退回.getValue(), systemAct, systemAct, null);
-        // 删除流程中表数据
-        bondRequestQuoteService.deleteWflBondRequestQuoteByKey(entity.getQuoteId(), true);
-
+        try {
+            String systemAct = handSystemAct(entity);
+            this.sendPosition(entity, DictCodeListExt3.流程节点_流程退回.getValue(), systemAct, systemAct, null);
+        } catch (PositionException e) {
+            e.printStackTrace();
+            Message message = PositionUtil.ajaxErrorReturn(e);
+            WorkFlowUtil.showMessage(message.getMessage(), MessageType.错误消息);
+        }
         //doDeletePtlPositionHold(entity.getWorkflowId());
-        if (StringUtil.equals(com.joyintech.tams.constant.DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
-
+        if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
             //回退释放头寸
-            doDeletePtlPositionHold(entity.getWorkflowId());
+//            this.doDeletePtlPositionHold(entity.getWorkflowId());
+            cfetsBondDealQuotedPriceService.doDeletePtlPositionHoldByQuoteId(entity.getQuoteId());
             //插入旧头寸
             if (StringUtil.equals(entity.getQuotaPageModel(), "edit")) {
                 entity.setIsExistNew(DictCodeList.是否_是.getValue());
                 entity.getCfetsBondDealDialogueQuoteDtoList().clear();
-                doInsetOrUpdateForPtlPositionHold(entity);
+                this.doInsetOrUpdateForPtlPositionHold(entity);
             }
-
         }
-
+        // 删除流程中表数据 旧头寸需要流程中数据查询报价编号,移动到处理头寸后
+        bondRequestQuoteService.deleteWflBondRequestQuoteByKey(entity.getQuoteId(), true);
     }
 
     // add by etliu 20210309 银行间上下行多组合 start
@@ -1243,10 +1246,10 @@ public class CfetsBondDealQuotedPrice002Service extends BaseService<CfetsBondDea
         if (StringUtil.equals(com.joyintech.tams.constant.DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
             //插入旧头寸
             entity.setIsExistNew(DictCodeList.是否_是.getValue());
-            doInsetOrUpdateForPtlPositionHold(entity);
+            this.doInsetOrUpdateForPtlPositionHold(entity);
         }
         String systemAct = handSystemAct(entity);
-        sendPosition(entity, DictCodeListExt3.流程节点_流程提交.getValue(), systemAct, systemAct, null);
+        this.sendPosition(entity, DictCodeListExt3.流程节点_流程提交.getValue(), systemAct, systemAct, null);
     }
 
     @Override
@@ -1265,7 +1268,7 @@ public class CfetsBondDealQuotedPrice002Service extends BaseService<CfetsBondDea
             if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
                 //插入旧头寸
                 entity.setIsExistNew(DictCodeList.是否_是.getValue());
-                doInsetOrUpdateForPtlPositionHold(entity);
+                this.doInsetOrUpdateForPtlPositionHold(entity);
             }
             String confirmOk = RequestUtil.getParam("confirmOk");
             try {
@@ -1281,7 +1284,7 @@ public class CfetsBondDealQuotedPrice002Service extends BaseService<CfetsBondDea
                 Message message = PositionUtil.ajaxErrorReturn(e);
                 BaseMap bm = (BaseMap) message.getData();
                 String code = (String) bm.get("code");
-                String messageStr = JsonUtils.json2Object((String) bm.get("message").toString(), String.class);
+                String messageStr = JsonUtils.json2Object(bm.get("message").toString(), String.class);
                 if (StringUtil.isEmpty(confirmOk)
                         && StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
                     WorkFlowUtil.showMessage(messageStr, MessageType.确认消息);
