@@ -175,6 +175,11 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
     private BigDecimal canRepoNum;
 
     /**
+     * 共通业务类型
+     */
+    private String assetType;
+
+    /**
      * 获取 ptlPositionsNum
      * @return ptlPositionsNum
      */
@@ -618,4 +623,16 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
         }
     }
 
+    public String getAssetType() {
+        return assetType;
+    }
+
+
+    public String getAssetTypeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.资产三级分类, getAssetType());
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
+    }
 }

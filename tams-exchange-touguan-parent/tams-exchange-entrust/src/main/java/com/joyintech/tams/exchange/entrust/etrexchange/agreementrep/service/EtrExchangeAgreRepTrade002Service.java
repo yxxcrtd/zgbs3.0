@@ -135,6 +135,9 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         if (request.getPageMode() != null) {
             pageParam.put("pageMode", request.getPageMode());
         }
+        if (StringUtil.isNotEmpty(request.getAssetType())) {
+            pageParam.put("assetType", request.getAssetType());
+        }
 
         pageParam.put("portfolioName", request.getPortfolioName());
         pageParam.put("finprodName", request.getFinprodName());
