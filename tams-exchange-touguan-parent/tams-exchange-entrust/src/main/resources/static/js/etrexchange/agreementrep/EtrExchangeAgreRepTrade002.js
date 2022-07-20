@@ -713,6 +713,8 @@
                     $("#addCla").attr("disabled", false);
 
                 }else if(ps == 'T92' && repPs == BACK_LEND_DIRECTION_04) {
+                    //本方交易员
+                    $("#trader_div").hide();
                     //组合名称
                     $("#portfolioId").attr("disabled", false);
                     //资金账号
@@ -1420,6 +1422,7 @@
                         //回购期限
                         $("#term_div").hide();
                         //回购金额
+                        $("#tradeAmt").hide();
                         $("#tradeAmt").attr("disabled", true);
                         //回购利率
                         $("#yield_div").hide();
@@ -1495,6 +1498,7 @@
                         //回购期限
                         $("#term_div").hide();
                         //回购金额
+                        $("#tradeAmt").hide();
                         $("#tradeAmt").attr("disabled", true);
                         //回购利率
                         $("#yield_div").hide();
