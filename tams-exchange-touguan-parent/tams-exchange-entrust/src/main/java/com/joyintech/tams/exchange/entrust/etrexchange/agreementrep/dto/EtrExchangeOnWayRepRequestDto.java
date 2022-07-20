@@ -61,13 +61,13 @@ public class EtrExchangeOnWayRepRequestDto{
 
     private String origSerialNo;
 
-    private boolean isDate;
+    private Boolean isDate;
 
-    public void setIsDate(boolean isDate) {
+    public void setIsDate(Boolean isDate) {
         this.isDate = isDate;
     }
 
-    public boolean getIsDate() {
+    public Boolean getIsDate() {
         return isDate;
     }
 
