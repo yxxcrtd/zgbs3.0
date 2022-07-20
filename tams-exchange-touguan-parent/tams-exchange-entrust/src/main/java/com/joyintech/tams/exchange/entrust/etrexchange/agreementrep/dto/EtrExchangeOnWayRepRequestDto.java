@@ -59,6 +59,25 @@ public class EtrExchangeOnWayRepRequestDto{
     @ApiModelProperty(name="zyj",value="质押券代码列表",example="A1")
     private List<String> zyj;
 
+    private String origSerialNo;
+
+    private boolean isDate;
+
+    public void setIsDate(boolean isDate) {
+        this.isDate = isDate;
+    }
+
+    public boolean getIsDate() {
+        return isDate;
+    }
+
+    public String getOrigSerialNo() {
+        return origSerialNo;
+    }
+
+    public void setOrigSerialNo(String origSerialNo) {
+        this.origSerialNo = origSerialNo;
+    }
     public String getTradeId() {
         return tradeId;
     }

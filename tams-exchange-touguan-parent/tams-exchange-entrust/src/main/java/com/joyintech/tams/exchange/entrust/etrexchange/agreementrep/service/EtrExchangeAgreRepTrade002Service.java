@@ -253,7 +253,12 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         if (SecurityUtil.getLoginUser() != null) {
             pageParam.put("userId", SecurityUtil.getLoginUser().getUserName());
         }
-
+        if(request.getIsDate()){
+            pageParam.put("isDate", DictCodeList.是否_是.getValue());
+        } else if (!request.getIsDate()) {
+            pageParam.put("isDate", DictCodeList.是否_否.getValue());
+        }
+        pageParam.put("origSerialNo", request.getOrigSerialNo());
         pageParam.put("portfolioIdList", request.getPortfolioIdList());
         pageParam.put("tradeMarket", request.getTradeMarket());
         pageParam.put("tradeId", request.getTradeId());

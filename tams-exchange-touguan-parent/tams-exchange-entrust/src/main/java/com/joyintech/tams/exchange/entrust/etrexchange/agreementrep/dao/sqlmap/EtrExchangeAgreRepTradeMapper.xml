@@ -603,6 +603,12 @@
         LEFT JOIN SYS_DATADICT_LIST SDL1 ON SDL1.DICT_CODE ='PS' AND SDL1.ITEM_CODE = PRODUCT.ps
         LEFT JOIN SYS_DATADICT_LIST SDL2 ON SDL2.DICT_CODE ='TRADE_MARKET' AND SDL2.ITEM_CODE = PRODUCT.market
         WHERE 1=1
+        <if test="isDate != null and isDate != ''">
+            AND isExpire = #{isDate}
+        </if>
+        <if test="origSerialNo != null and origSerialNo != ''">
+            AND intiTradeId  like '%' || #{origSerialNo} || '%'
+        </if>
         <!-- 关键字模糊查询 -->
         <include refid="etrExchangeOnWayRepAnd"/>
         <!--前端传入排序字段-->
