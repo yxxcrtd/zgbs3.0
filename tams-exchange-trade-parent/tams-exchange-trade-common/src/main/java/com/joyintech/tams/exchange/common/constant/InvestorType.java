@@ -6,6 +6,7 @@ import com.joyintech.framework.util.StringUtil;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 交易主体类型
@@ -42,7 +43,10 @@ public enum InvestorType implements IEnum<String> {
         if(StringUtil.isEmpty(value)){
             return value;
         }
-        return REQUEST_STATUS_MAP.get(value).getName();
+        if(Objects.nonNull(REQUEST_STATUS_MAP.get(value))){
+            return REQUEST_STATUS_MAP.get(value).getName();
+        }
+        return value;
     }
 
     public String getName() {

@@ -244,6 +244,7 @@
     <select id="findPositionsPage" parameterType="Map" resultType="com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepTrade002Dto">
         SELECT TEMP.* FROM (
         SELECT
+        FPT.TYPE_10 as assetType,
         TEMP.PORTFOLIO_ID  AS portfolioId,
         PP.PORTFOLIO_NAME  AS portfolioName,
         TEMP.SEC_ACCT_ID   AS secAcctId,

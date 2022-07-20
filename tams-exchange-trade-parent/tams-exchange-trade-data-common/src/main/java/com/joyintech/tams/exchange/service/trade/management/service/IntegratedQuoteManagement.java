@@ -268,7 +268,9 @@ public class IntegratedQuoteManagement {
         response.setMemberIdStr(response.getMemberId());
         response.setInvestorIdStr(response.getInvestorId());
         response.setTraderCodeStr(response.getTraderCode());
-        response.setInvestorTypeStr(InvestorType.getInvestorTypeName(response.getInvestorType()));
+        if (StringUtil.isNotEmpty(response.getInvestorType())) {
+            response.setInvestorTypeStr(InvestorType.getInvestorTypeName(response.getInvestorType()));
+        }
 
         TradeInfoProRequest dto = new TradeInfoProRequest();
         dto.setAcctNo(response.getAccount());
@@ -292,7 +294,9 @@ public class IntegratedQuoteManagement {
         response.setCpMemberIdStr(response.getCpMemberId());
         response.setCpInvestorIdStr(response.getCpInvestorId());
         response.setCpTraderCodeStr(response.getCpTraderCode());
-        response.setCpInvestorTypeStr(InvestorType.getInvestorTypeName(response.getCpInvestorType()));
+        if (StringUtil.isNotEmpty(response.getCpInvestorType())) {
+            response.setCpInvestorTypeStr(InvestorType.getInvestorTypeName(response.getCpInvestorType()));
+        }
 
         TradeInfoProRequest dto = new TradeInfoProRequest();
         dto.setTradePlace(response.getTradeMarket());
