@@ -212,6 +212,13 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                             || DictCodeList.回购拆借方向_逆回购.getValue().equals(infContractDetailfile.getPs())) {
                         // 指令信息处理
                         tradePreClearingService.buildPositionBaseData(trdTempDto, infContractDetailfile);
+                        // modify by etliu 20220720 start
+                        // 3.0.6协议回购+风险升级 XYHGFXSJ-143
+                        //【现金流缺口分析】协议式上交所正回购数据进行手工交收后，现金流缺口分析里没有对应的值，组合资金账户头寸查询的明细里没有值
+                        if (StringUtil.isNotBlank(stlPayOrdersDto.getOrderId())) {
+                            trdTempDto.setOrderId(stlPayOrdersDto.getOrderId());
+                        }
+                        // modify by etliu 20220720 end
                         // 临时交易及其他数据处理
                         tradePreClearingService.trdRepo(trdTempDto, infContractDetailfile, infContractDetailfile.getPs());
                     }
@@ -221,6 +228,13 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                             || DictCodeListExt3.交易方向_中途换券.getValue().equals(infContractDetailfile.getPs())) {
                         // 指令信息处理
                         tradePreClearingService.buildPositionBaseData(trdTempDto, infContractDetailfile);
+                        // modify by etliu 20220720 start
+                        // 3.0.6协议回购+风险升级 XYHGFXSJ-143
+                        //【现金流缺口分析】协议式上交所正回购数据进行手工交收后，现金流缺口分析里没有对应的值，组合资金账户头寸查询的明细里没有值
+                        if (StringUtil.isNotBlank(stlPayOrdersDto.getOrderId())) {
+                            trdTempDto.setOrderId(stlPayOrdersDto.getOrderId());
+                        }
+                        // modify by etliu 20220720 end
                         // 临时交易及其他数据处理
                         tradePreClearingService.trdRepoPeriod(trdTempDto, infContractDetailfile);
                     }

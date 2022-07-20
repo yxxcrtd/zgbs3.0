@@ -2045,6 +2045,8 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
                     stlPayOrders.add(stlPayOrder);
                     baseTradeProductDealDto.setStlPayOrdersList(stlPayOrders);
                     finProductTradeDto.setBaseTradeProductDealDtos(Arrays.asList(baseTradeProductDealDto));
+                    // 登记不处理指令现金
+                    finProductTradeDto.setNeedExecuteEtrPosition(true);
                     baseTradeProductDealCommService.insertPosition(finProductTradeDto);
                 }
             }
