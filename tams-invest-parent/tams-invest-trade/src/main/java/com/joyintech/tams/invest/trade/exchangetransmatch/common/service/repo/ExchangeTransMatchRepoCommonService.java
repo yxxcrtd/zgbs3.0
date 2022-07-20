@@ -158,12 +158,16 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
         trdProductDeal.setTradePlat(settleTransData.getTradePlat());
         // 交易市场
         trdProductDeal.setTradeMarketMode(settleTransData.getTradeMarketMode());
-
-        if(StringUtil.equals(settleTransData.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
-            trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
-        }
-        else if(StringUtil.equals(settleTransData.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
-            trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
+        // 交易对手
+        if(StringUtil.isEmpty(settleTransData.getCounterId())){
+            if(StringUtil.equals(settleTransData.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+                trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
+            }
+            else if(StringUtil.equals(settleTransData.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
+                trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
+            }
+        }else{
+            trdProductDeal.setCounterId(settleTransData.getCounterId());
         }
         // 本方交易员
         trdProductDeal.setTrader(settleTransData.getTrader());

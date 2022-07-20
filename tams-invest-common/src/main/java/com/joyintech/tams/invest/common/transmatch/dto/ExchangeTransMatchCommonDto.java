@@ -93,6 +93,19 @@ public class ExchangeTransMatchCommonDto extends SettleTransDataTotal {
      */
     private String outDealerPartyNo;
 
+    /**
+     * 交易对手
+     */
+    private String counterId;
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+    
     public String getTrader() {
         return trader;
     }

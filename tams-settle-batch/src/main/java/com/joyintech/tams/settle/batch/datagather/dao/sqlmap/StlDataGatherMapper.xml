@@ -460,6 +460,7 @@
 		NVL(tie.PROP_INVESTOR_ID, tieh.PROP_INVESTOR_ID) outDealerPartyNo,
 		NVL(tie.DEALER_ID, tieh.DEALER_ID) dealerNo,
 		NVL(tie.PROP_DEALER_ID, tieh.PROP_DEALER_ID) outDealerNo,
+		NVL(tie.COUNTER_ID, tieh.COUNTER_ID) counterId,
 		<!--<include refid="settleTransDataSql"></include>-->
 		<include refid="settleTransDataTotalSql"></include>
 		LEFT JOIN SETTLE_TRANS_DATA_TOTAL_STATUS stdts ON std.SEQ_ID = stdts.SEQ_NO
