@@ -32,7 +32,9 @@ import com.joyintech.service.bankuplink.common.service.CfetsQuotedCommonService;
 import com.joyintech.service.bankuplink.cstp.dto.CstpSelectDto;
 import com.joyintech.service.bankuplink.ibu.dto.BondQuoteInfoDto;
 import com.joyintech.service.bankuplink.ibu.service.IbuComponentCommonService;
+import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
+import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
 import com.joyintech.tams.common.base.entity.*;
@@ -148,6 +150,12 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      */
     @Autowired
     private EtrEntrustAddMapper etrEntrustAddMapper;
+
+    /**
+     * {@linkplain}
+     */
+    @Autowired
+    private EtrEntrustMapper etrEntrustMapper;
     
     /**
      * 委托指令查询
@@ -1381,7 +1389,7 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
                 ibuQuoteEtrReDto.setShareAmt(ArithmeticUtil.multiply(tempDataDto.getAvaNum(), BigDecimal.valueOf(100))); // 画面上券面总额为万元单位
                 if(StringUtil.equals(dto.getTradeStatus(), BussinessDictCodeList.银行间上行报价状态_成交中.getValue())
                     || "done".equals(dto.getOperateType()) ){
-                    if(StringUtil.equals(dto.getOperateType(), DictCodeListExt3.流程节点_流程退回.getValue())){
+                    if(StringUtil.equals(dto.getOptType(), DictCodeListExt3.流程节点_流程退回.getValue())){
                         ibuQuoteEtrReDto.setFpriceAmt(ArithmeticUtil.multiply(
                                 ibuQuoteEtrReDto.getShareAmt(), BigDecimal.valueOf(100)));
                     }else{
@@ -1497,16 +1505,18 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
 
 		ptlPositionHoldDto.setPtlCashPositionFlows(ptlCashPositionFlows);
 		ptlPositionHoldDto.setPtlSecPositionFlows(ptlSecPositionFlows);
-		BigDecimal unitFprice = BigDecimal.ONE;
-        if(CollectionUtils.isNotEmpty(ibuQuoteEtrReDtoList)) {
-            EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(ibuQuoteEtrReDtoList.get(0).getEntrustId());
-            unitFprice = unitFprice.multiply(etrEntrustAdd.getFullPrice());
-        }
-        BigDecimal finalUnitFprice = unitFprice;
         ptlPositionHoldDto.getPtlCashPositionFlows().forEach(etrCashPositionFlowDto -> {
             etrCashPositionFlowDto.setCdate(settleDate);
-            etrCashPositionFlowDto.setAmount(ArithmeticUtil.divide(
-                    ArithmeticUtil.multiply(etrCashPositionFlowDto.getAmount(), finalUnitFprice), BigDecimal.valueOf(100), 2, RoundingMode.DOWN));
+            BigDecimal unitFprice = BigDecimal.ONE;
+            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(etrCashPositionFlowDto.getEntrustId());
+            // 券面与现金流水金额相同时,根据指令的全价重新计算
+            if (BigDecimalUtil.ACompareToB(
+                    ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), BigDecimal.valueOf(100)), etrCashPositionFlowDto.getAmount().abs(), 4) == 0) {
+                EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(etrCashPositionFlowDto.getEntrustId());
+                unitFprice = unitFprice.multiply(etrEntrustAdd.getFullPrice());
+                etrCashPositionFlowDto.setAmount(ArithmeticUtil.divide(
+                        ArithmeticUtil.multiply(etrCashPositionFlowDto.getAmount(), unitFprice), BigDecimal.valueOf(100), 2, RoundingMode.DOWN));
+            }
         });
 		ptlPositionHoldDto.getPtlSecPositionFlows().forEach(etrSecPositionFlowDto -> etrSecPositionFlowDto.setCdate(platDate));
         // 数据是否已入新头寸

@@ -954,7 +954,7 @@ public class CfetsBondDealQuotedPrice003Service extends BaseService<CfetsBondDea
             String confirmOk = RequestUtil.getParam("confirmOk");
             try{
                 SysWflBusinessList sysWflBusinessList = sysWflBusinessListMapper.selectByPrimaryKey(entity.getWorkflowId());
-                String systemAct = handSystemAct(entity);
+                String systemAct = this.handSystemAct(entity);
                 if(StringUtil.equals(sysWflBusinessList.getProcessState(), ProcessState.BACK.toString())){
                     sendPosition(entity,DictCodeListExt3.流程节点_流程提交.getValue(),DictCodeListExt3.系统动作_修改.getValue(),systemAct,confirmOk);
                 }else{
@@ -998,21 +998,24 @@ public class CfetsBondDealQuotedPrice003Service extends BaseService<CfetsBondDea
      */
     @Override
 	public void doBack(CfetsBondDealRequestQuoteDto entity){
-        entity.setOperatorType(DictCodeListExt3.流程节点_流程退回.getValue());
-        if (StringUtil.equals(com.joyintech.tams.constant.DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
+        entity.setOptType(DictCodeListExt3.流程节点_流程退回.getValue());
+        if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
             //插入旧头寸
             if(BussinessDictCodeList.银行间上行报价状态_成交中.getValue().equals(entity.getTradeStatus())
                 || "成交".equals(entity.getQuoteOperatorType())){
                 doInsetOrUpdateForPtlPositionHold(entity);
             }else{
                 //回退释放头寸
-                doDeletePtlPositionHold(entity.getWorkflowId());
+                cfetsBondDealQuotedPriceService.doDeletePtlPositionHoldByQuoteId(entity.getQuoteId());
             }
         }
 		//回退释放头寸
     	//doDeletePtlPositionHold(entity.getWorkflowId());
-        String systemAct = handSystemAct(entity);
-        sendPosition(entity,DictCodeListExt3.流程节点_流程退回.getValue(),systemAct,systemAct,null);
+        String systemAct = this.handSystemAct(entity);
+        if ("成交".equals(entity.getQuoteOperatorType()) && StringUtil.isEmpty(systemAct)) {
+            systemAct = DictCodeListExt3.系统动作_成交.getValue();
+        }
+        sendPosition(entity, DictCodeListExt3.流程节点_流程退回.getValue(), systemAct, systemAct, null);
         // 删除流程中表数据
         bondRequestQuoteService.deleteWflBondRequestQuoteByKey(entity.getQuoteId(), true);
     }
@@ -1023,7 +1026,7 @@ public class CfetsBondDealQuotedPrice003Service extends BaseService<CfetsBondDea
     @Override
     public void doDelete(String workflowId) {
     	//doDeletePtlPositionHold(workflowId);
-        if (StringUtil.equals(com.joyintech.tams.constant.DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
+        if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
             //插入旧头寸
             //回退释放头寸
             doDeletePtlPositionHold(workflowId);
@@ -1215,7 +1218,8 @@ public class CfetsBondDealQuotedPrice003Service extends BaseService<CfetsBondDea
         if(StringUtil.equals(entity.getQuotaPageModel(), "new")){
             systemAct = DictCodeListExt3.系统动作_新建.getValue();
         }
-        if(StringUtil.equals(entity.getQuotaPageModel(),"response")&&StringUtil.equals(entity.getOperatorType(), "done")){
+        if (StringUtil.equals(entity.getQuotaPageModel(), "response")
+                && StringUtil.equals(entity.getOperatorType(), "done")) {
             systemAct = DictCodeListExt3.系统动作_成交.getValue();
         }
         return systemAct;
@@ -1227,19 +1231,22 @@ public class CfetsBondDealQuotedPrice003Service extends BaseService<CfetsBondDea
             entity.setUnitFprice(etrEntrustAdd.getFullPrice());
         }
         Map<String, Object> stringObjectMap = this.preparePosition(entity, flowStatus, decisionAct, systemAct, confirmOk);
-        if(StringUtil.equals(flowStatus,DictCodeListExt3.流程节点_流程提交.getValue())||StringUtil.equals(flowStatus,DictCodeListExt3.流程节点_流程退回.getValue())){
-            if(StringUtil.equals(systemAct,DictCodeListExt3.系统动作_新建.getValue())||StringUtil.equals(systemAct,DictCodeListExt3.系统动作_修改.getValue())||StringUtil.equals(systemAct,DictCodeListExt3.系统动作_成交.getValue())){
+        if (StringUtil.equals(flowStatus, DictCodeListExt3.流程节点_流程提交.getValue())
+                || StringUtil.equals(flowStatus, DictCodeListExt3.流程节点_流程退回.getValue())) {
+            if (StringUtil.equals(systemAct, DictCodeListExt3.系统动作_新建.getValue())
+                    || StringUtil.equals(systemAct, DictCodeListExt3.系统动作_修改.getValue())
+                    || StringUtil.equals(systemAct, DictCodeListExt3.系统动作_成交.getValue())) {
                 PositionHttpRequest.send(stringObjectMap);
                 return;
             }
         }
-        if(StringUtil.equals(flowStatus,DictCodeListExt3.流程节点_审批生效.getValue())&&(StringUtil.equals(systemAct,DictCodeListExt3.系统动作_撤回.getValue())||StringUtil.equals(systemAct,DictCodeListExt3.系统动作_关闭.getValue()))){
+        if (StringUtil.equals(flowStatus, DictCodeListExt3.流程节点_审批生效.getValue())
+                && (StringUtil.equals(systemAct, DictCodeListExt3.系统动作_撤回.getValue()) || StringUtil.equals(systemAct, DictCodeListExt3.系统动作_关闭.getValue()))) {
             PositionHttpRequest.send(stringObjectMap);
             return;
         }
-        if(StringUtil.equals(flowStatus,DictCodeListExt3.流程节点_流程提交.getValue())&&StringUtil.equals(systemAct,DictCodeListExt3.系统动作_退回.getValue())){
+        if (StringUtil.equals(flowStatus, DictCodeListExt3.流程节点_流程提交.getValue()) && StringUtil.equals(systemAct, DictCodeListExt3.系统动作_退回.getValue())) {
             PositionHttpRequest.send(stringObjectMap);
-            return;
         }
     }
 
