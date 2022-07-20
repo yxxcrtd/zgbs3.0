@@ -78,7 +78,7 @@
           t1.ACT_CAP_DAYS occupyDays,
           t1.M_INT_AMT intAmt,
           t1.M_TRADE_AMT expireSettleAmt,
-          t1.COUNTER_ID counterId,
+          nvl(t7.COUNTER_ID, t1.COUNTER_ID) counterId,
           t7.COUNTER_TRADER counterTrader,
           t8.TRADER trader,
           t8.COUNTER_SEAT seatId,
