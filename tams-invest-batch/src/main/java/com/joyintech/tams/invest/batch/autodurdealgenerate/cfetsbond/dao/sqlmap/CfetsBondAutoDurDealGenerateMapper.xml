@@ -122,6 +122,7 @@
         where
         t8.PAY_DATE >= #{PLATEFORM_DATE}
         AND T8.MDATE = #{PLATEFORM_DATE}
+        and T10.FINPROD_MARKET_ID is not null
         GROUP BY
         t8.SEC_ACCT_ID,SAI.SEC_ACCT_NAME, fp.FINPROD_NAME,
         t10.FINPROD_MARKET_ID,

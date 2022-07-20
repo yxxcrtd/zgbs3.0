@@ -43,7 +43,7 @@ public class CfetsBondAutoDurDealGenerateTask extends BatchBaseService {
     /**
      * 日志
      */
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * PlatformDate

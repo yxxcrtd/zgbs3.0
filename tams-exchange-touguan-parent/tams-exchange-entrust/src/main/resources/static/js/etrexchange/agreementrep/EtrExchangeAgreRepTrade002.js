@@ -1744,14 +1744,13 @@
          */
         function doRiskcal() {
             var object = getSearchParams();
-            if(object.ps == 'T93' || object.ps == 'T94'
-                || object.ps == 'T95' || object.ps == 'T96'){
+            if(object.ps == 'T94'){
                 return;
             }
             if(object) {
                 // 交易所协议回购 指令环节，只有正回购、逆回购、到期续做等交易方向参与风险试算
                 var busiType = $("#ps").val();
-                if((busiType == 'T92' || busiType == 'T56')) {
+                if((busiType == 'T92' || busiType == 'T56' || busiType == 'T93' || busiType == 'T95' || busiType == 'T96')) {
                     // var riskdata = getriskdata(object);
                     // var riskInterfUrl = getRiskInterfUrl();
                     // object.fromEtrExchange = "Y";
@@ -1867,8 +1866,7 @@
                     })
                 });
             } else {
-                if(!(object.ps == 'T93' || object.ps == 'T94'
-                    || object.ps == 'T95' || object.ps == 'T96')) {
+                if(!(object.ps == 'T94')) {
                     if (risk_math_switch == '01' && (!entity_RiskTrialRetList || riskFlag !== 0)) {
                         Joyin.error("请先完成风险试算")
                         return false;
@@ -1929,8 +1927,7 @@
                         $("#outRepSecNum").val(outRepSecNum/100);
                     }
                     var ps =  $("#ps").val();
-                    if(ps == 'T93' || ps == 'T94'
-                        || ps == 'T95' || ps == 'T96'){
+                    if(ps == 'T94'){
                         $("#riskTrialRet_div").hide();
                         $("#EtrAgreRepTrade001_btn_riskcal").hide();
                     }else{
