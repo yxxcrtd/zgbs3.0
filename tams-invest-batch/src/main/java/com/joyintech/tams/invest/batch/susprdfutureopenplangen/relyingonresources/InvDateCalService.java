@@ -27,7 +27,7 @@ import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.invest.batch.susprdfutureopenplangen.dao.DateCalcMapper;
+import com.joyintech.tams.invest.batch.susprdfutureopenplangen.dao.InvDateCalcMapper;
 import com.joyintech.tams.invest.common.calculator.AdjustedTradeDayCal;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.dto.common.DateDivisionDto;
@@ -37,18 +37,18 @@ import com.joyintech.tams.invest.common.dto.common.DateDivisionDto;
  *
  * @author 何阳阳
  * @version 1.0 2018年9月21日
- * @see DateCalService
+ * @see InvDateCalService
  * @since 1.0
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class DateCalService {
+public class InvDateCalService {
 
 	/**
 	 * 付息计划，开放计划，利率重置，申购计划，赎回计划计算用和日期关联的Mapper
 	 */
 	@Autowired(required = false)
-	private DateCalcMapper dateCalcMapper;
+	private InvDateCalcMapper invDateCalcMapper;
 
 	/**
 	 * 交易日历的节假日取得
@@ -67,7 +67,7 @@ public class DateCalService {
 		paraMap.put("startDate", DateUtil.addDay(startDate, -days));
 		paraMap.put("endDate", DateUtil.addDay(endDate, days));
 		paraMap.put("dealCalId", dealCalId);
-		return dateCalcMapper.getDealCalendarHoliday(paraMap);
+		return invDateCalcMapper.getDealCalendarHoliday(paraMap);
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class DateCalService {
 		if (StringUtil.isEmpty(dateStr) || StringUtil.isEmpty(calId)) {
 			return false;
 		}
-		int dataCount = dateCalcMapper.selectDealCalendarHolidayCount(dateStr, calId);
+		int dataCount = invDateCalcMapper.selectDealCalendarHolidayCount(dateStr, calId);
 		if (dataCount > 0) {
 			return true;
 		}

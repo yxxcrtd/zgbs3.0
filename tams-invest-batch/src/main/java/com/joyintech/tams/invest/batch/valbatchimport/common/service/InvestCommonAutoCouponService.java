@@ -25,7 +25,7 @@ import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.DateCalService;
+import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.InvDateCalService;
 import com.joyintech.tams.invest.batch.valbatchimport.common.dao.AssetCommonMapper;
 import com.joyintech.tams.invest.batch.valbatchimport.common.dao.MstCustomerNatureMapper;
 import com.joyintech.tams.invest.batch.valbatchimport.common.dto.*;
@@ -59,12 +59,12 @@ import java.util.*;
  * 〈功能详细描述〉
  * @author zhangnian
  * @version 1.0 2019年1月14日
- * @see CommonAutoCouponService
+ * @see InvestCommonAutoCouponService
  * @since 1.0
  */
 @SuppressWarnings("rawtypes")
 @Service
-public class CommonAutoCouponService extends BaseService{
+public class InvestCommonAutoCouponService extends BaseService{
 
 
     @Autowired(required = false)
@@ -91,7 +91,7 @@ public class CommonAutoCouponService extends BaseService{
      * 付息计划，开放计划，利率重置，申购计划，赎回计划计算用和日期关联的Service
      */
     @Autowired
-    private DateCalService dateCalService;
+    private InvDateCalService invDateCalService;
 
     /**
      * 获取wind资产信息(债券)
@@ -622,11 +622,11 @@ public class CommonAutoCouponService extends BaseService{
                     //根据交易日历推算是否节假日
                     Date optionpayday = payhsrcsecoption.getOptionpayday();//实际行权日
                     Date theoryoptionpayday = payhsrcsecoption.getTheoryoptionpayday();//行权信息表理论行权日
-                    if (dateCalService.isDealCalendarHoliday(theoryoptionpayday, finProduct.getCalendarId())){
+                    if (invDateCalService.isDealCalendarHoliday(theoryoptionpayday, finProduct.getCalendarId())){
                         //如果是节假日朝后推算
                         Date tempDate = DateUtil.parse(DateUtil.plusDays(DateUtil.format(theoryoptionpayday), 15));
                         //获取节假日
-                        List<String> holidayList = dateCalService.getDealCalendarHoliday(theoryoptionpayday, tempDate, finProduct.getCalendarId());
+                        List<String> holidayList = invDateCalService.getDealCalendarHoliday(theoryoptionpayday, tempDate, finProduct.getCalendarId());
                         theoryoptionpayday = DateUtil.parse(AdjustedTradeDayCal.getAdjustedTradeDay(DateUtil.format(theoryoptionpayday),
                                 DictCodeList.营业日准则_向后调整.getValue(), holidayList));
 
@@ -1598,7 +1598,7 @@ public class CommonAutoCouponService extends BaseService{
         //到期日+15天
         Date  mdate = DateUtil.parse(DateUtil.plusDays(DateUtil.format(scai.getMdate()), 15));
         //获取节假日
-        List<String> holidayList = dateCalService.getDealCalendarHoliday(scai.getVdate(),mdate,scai.getCalendarId());
+        List<String> holidayList = invDateCalService.getDealCalendarHoliday(scai.getVdate(),mdate,scai.getCalendarId());
         //如果首次付息日=第一条计划的支付日，推算方式为起息日向后
         finCashPayRule.setCalcRule(DictCodeList.推算方式_起息日向后.getValue());
         List<FinCashPlanDto>  invList = AssetInterestCal.cal(finCashPayRule, scai, holidayList, false,FinCashPlanDto.class);

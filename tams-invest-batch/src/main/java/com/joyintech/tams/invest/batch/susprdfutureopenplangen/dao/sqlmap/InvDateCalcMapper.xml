@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.joyintech.tams.invest.batch.susprdfutureopenplangen.dao.DateCalcMapper">
+<mapper namespace="com.joyintech.tams.invest.batch.susprdfutureopenplangen.dao.InvDateCalcMapper">
     <select id="getDealCalendarHoliday" resultType="java.lang.String">
         select
         	to_char(CDATE, 'yyyy-MM-dd') as HOLIDATE

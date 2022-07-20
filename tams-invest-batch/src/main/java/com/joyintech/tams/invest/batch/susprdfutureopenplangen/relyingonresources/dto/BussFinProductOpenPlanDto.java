@@ -18,7 +18,7 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.annotation.Length;
 import com.joyintech.framework.validation.annotation.ValidLogic;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.BussFinProductOpenPlanValidator;
+import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.InvestBussFinProductOpenPlanValidator;
 
 /**
  * 开放计划信息
@@ -28,7 +28,7 @@ import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresource
  * @see BussFinProductOpenPlanDto
  * @since 1.0
  */
-@ValidLogic(targetClass = BussFinProductOpenPlanValidator.class)
+@ValidLogic(targetClass = InvestBussFinProductOpenPlanValidator.class)
 public class BussFinProductOpenPlanDto extends FinOpenRule {
 
     /**

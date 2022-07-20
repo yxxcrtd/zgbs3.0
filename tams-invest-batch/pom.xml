@@ -81,6 +81,11 @@
             <version>3.0.4</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.joyintech</groupId>
+            <artifactId>component-business</artifactId>
+            <version>0.0.1</version>
+        </dependency>
     </dependencies>
 
     <build>

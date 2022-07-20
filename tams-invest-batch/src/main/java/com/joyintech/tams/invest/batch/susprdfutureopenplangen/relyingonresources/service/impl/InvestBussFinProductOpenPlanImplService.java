@@ -27,7 +27,7 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.FinOpenPlan;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.DateCalService;
+import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.InvDateCalService;
 import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.dto.BussFinProductOpenPlanDto;
 import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.service.BussFinProductOpenPlanService;
 import com.joyintech.tams.invest.common.calculator.AdjustedTradeDayCal;
@@ -39,18 +39,18 @@ import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
  *
  * @author 张亮
  * @version 1.0 2018年9月3日
- * @see BussFinProductOpenPlanImplService
+ * @see InvestBussFinProductOpenPlanImplService
  * @since 1.0
  */
 @Service
-public class BussFinProductOpenPlanImplService extends BaseService<BussFinProductOpenPlanDto>
+public class InvestBussFinProductOpenPlanImplService extends BaseService<BussFinProductOpenPlanDto>
 		implements BussFinProductOpenPlanService {
 
 	/**
 	 * {@linkplain}
 	 */
 	@Autowired
-	private DateCalService dateCalService;
+	private InvDateCalService invDateCalService;
 
 	@Override
 	public List<FinOpenPlan> genOpenPlanList(BussFinProductOpenPlanDto inputDto) {
@@ -78,7 +78,7 @@ public class BussFinProductOpenPlanImplService extends BaseService<BussFinProduc
 		if (StringUtil.equals(DictCodeList.开放模式_定期开放.getValue(), inputDto.getOpenMode())
 				|| StringUtil.equals(DictCodeList.开放模式_周期开放.getValue(), inputDto.getOpenMode())) {
 			// 交易日历取得
-			List<String> dealCalendarHolidayList = dateCalService.getDealCalendarHoliday(startDate,
+			List<String> dealCalendarHolidayList = invDateCalService.getDealCalendarHoliday(startDate,
 					DateUtil.addDay(endDate, 8), inputDto.getTradCalender());
 
 			// 开放计划生成共通调用
@@ -126,7 +126,7 @@ public class BussFinProductOpenPlanImplService extends BaseService<BussFinProduc
 			// 3.1 输入.开放周期单位 = "日" 时
 
 			// 日期区间分割共通调用
-			List<Date> tempDivisionList = dateCalService.dateIntervalNodeList(startDate, endDate,
+			List<Date> tempDivisionList = invDateCalService.dateIntervalNodeList(startDate, endDate,
 					DictCodeList.营业日准则_向后调整.getValue(), String.valueOf(inputDto.getOpenCycle()),
 					DictCodeListExt1.周期单位_日.getValue());
 
@@ -176,7 +176,7 @@ public class BussFinProductOpenPlanImplService extends BaseService<BussFinProduc
 
 				List<Date> tempDivisionList = new ArrayList<>();
 
-				tempDivisionList = dateCalService.dateIntervalNodeList(weekStartDateList, weekEndDate,
+				tempDivisionList = invDateCalService.dateIntervalNodeList(weekStartDateList, weekEndDate,
 						DictCodeList.营业日准则_向后调整.getValue(), String.valueOf(tempOpenCycle), tempOpenCycleUnit);
 
 				// 当开始日和终了日相同的情况，dateCalService.dateIntervalNodeList方法返回的是空
@@ -205,7 +205,7 @@ public class BussFinProductOpenPlanImplService extends BaseService<BussFinProduc
 
 				List<Date> tempDivisionList = new ArrayList<>();
 
-				tempDivisionList = dateCalService.dateIntervalNodeList(startDate, endDate,
+				tempDivisionList = invDateCalService.dateIntervalNodeList(startDate, endDate,
 						DictCodeList.营业日准则_向后调整.getValue(), String.valueOf(tempOpenCycle), tempOpenCycleUnit);
 				if (!StringUtil.isEmptyList(tempDivisionList)) {
 					tempDivisionList.remove(0);
@@ -233,7 +233,7 @@ public class BussFinProductOpenPlanImplService extends BaseService<BussFinProduc
 					// String basicDateStr = DateUtil.format(DateUtil.getFirstDay(nodeEndDate));
 					// 日期计算基准日期: 临时变量.区间节点结束日
 					// 自然日日期计算共通调用
-					Date calcDate = dateCalService.naturalDateCalc(nodeEndDate, DictCodeListExt1.周期单位_月.getValue(),
+					Date calcDate = invDateCalService.naturalDateCalc(nodeEndDate, DictCodeListExt1.周期单位_月.getValue(),
 							inputDto.getOpenCycle().intValue());
 
 					// 临时变量.区间节点结束日 = 上述共通返回.计算后日期.年月 + 输入.固定开放日 ※超过当月最大天数时，按当月月末处理
@@ -259,7 +259,7 @@ public class BussFinProductOpenPlanImplService extends BaseService<BussFinProduc
 					// String basicDateStr = DateUtil.format(DateUtil.getFirstDay(nodeEndDate));
 					// 日期计算基准日期: 临时变量.区间节点结束日
 					// 自然日日期计算共通调用
-					Date calcDate = DateUtil.getDateOfMonthYearByDay(dateCalService.naturalDateCalc(nodeEndDate,
+					Date calcDate = DateUtil.getDateOfMonthYearByDay(invDateCalService.naturalDateCalc(nodeEndDate,
 							DictCodeListExt1.周期单位_月.getValue(), inputDto.getOpenCycle().intValue()), 1);
 					// 3.3.2.2 交易日推算共通调用
 					// 调整天数(输入.固定开放工作日)
@@ -272,7 +272,7 @@ public class BussFinProductOpenPlanImplService extends BaseService<BussFinProduc
 
 						// 调整后日期
 						// 临时变量.区间节点结束日 = 上述3.3.2.2共通返回.调整后日期
-						nodeEndDate = dateCalService.calculationTradingDay(calcDate, adjustDayCount,
+						nodeEndDate = invDateCalService.calculationTradingDay(calcDate, adjustDayCount,
 								dealCalendarHolidayList, DictCodeList.是否_否.getValue());
 						// 临时变量.调整前结束日区间列表.add(临时变量.区间节点结束日)
 						adjustBeforeNodeDateList.add(nodeEndDate);
@@ -297,7 +297,7 @@ public class BussFinProductOpenPlanImplService extends BaseService<BussFinProduc
 				while (DateUtil.compareDate(nodeEndDate, endDate) < 0) {
 					// 日期计算基准日期: 临时变量.区间节点结束日
 					// 自然日日期计算共通调用
-					Date calcDate = DateUtil.getDateOfMonthYearByDay(dateCalService.naturalDateCalc(nodeEndDate,
+					Date calcDate = DateUtil.getDateOfMonthYearByDay(invDateCalService.naturalDateCalc(nodeEndDate,
 							DictCodeListExt1.周期单位_月.getValue(), inputDto.getOpenCycle().intValue()), 1);
 					// 循环 第几周 计算当月每周的星期日历
 					for (String weekOfMonth : weekOfMonthList) {
@@ -357,7 +357,7 @@ public class BussFinProductOpenPlanImplService extends BaseService<BussFinProduc
 				// 当临时变量.区间节点结束日 < 临时变量.区间结束日时，循环以下操作
 				while (DateUtil.compareDate(nodeEndDate, endDate) < 0) {
 					// 自然日日期计算共通调用
-					Date calcDate = dateCalService.naturalDateCalc(nodeEndDate, DictCodeListExt1.周期单位_年.getValue(),
+					Date calcDate = invDateCalService.naturalDateCalc(nodeEndDate, DictCodeListExt1.周期单位_年.getValue(),
 							inputDto.getOpenCycle().intValue());
 					for (String dayOfMonth : dayOfMonthList) {
 						// 临时变量.区间节点结束日 = 上述共通返回.计算后日期.年月 + 输入.固定开放日 ※超过当月最大天数时，按当月月末处理
@@ -379,7 +379,7 @@ public class BussFinProductOpenPlanImplService extends BaseService<BussFinProduc
 				// 当临时变量.区间节点结束日 < 临时变量.区间结束日时，循环以下操作
 				while (DateUtil.compareDate(nodeEndDate, endDate) < 0) {
 					// 3.5.2.1 自然日日期计算共通调用
-					Date calcDate = DateUtil.getDateOfMonthYearByDay(dateCalService.naturalDateCalc(nodeEndDate,
+					Date calcDate = DateUtil.getDateOfMonthYearByDay(invDateCalService.naturalDateCalc(nodeEndDate,
 							DictCodeListExt1.周期单位_年.getValue(), inputDto.getOpenCycle().intValue()), 1);
 
 					// 3.5.2.2 交易日推算共通调用
@@ -391,7 +391,7 @@ public class BussFinProductOpenPlanImplService extends BaseService<BussFinProduc
 							adjustDayCount = adjustDayCount - 1;
 						}
 						// 调整后日期
-						nodeEndDate = dateCalService.calculationTradingDay(calcDate, adjustDayCount,
+						nodeEndDate = invDateCalService.calculationTradingDay(calcDate, adjustDayCount,
 								dealCalendarHolidayList, DictCodeList.是否_否.getValue());
 						// nodeEndDate = DateUtil.parse(AdjustedTradeDayCal.getAdjustedTradeDay(
 						// DateUtil.format(DateUtil.addDay(calcDate,
@@ -703,13 +703,13 @@ public class BussFinProductOpenPlanImplService extends BaseService<BussFinProduc
 				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 String vdateString = simpleDateFormat.format(openVdate);
                 String mdateString = simpleDateFormat.format(openMdate);
-                boolean isHoliday = dateCalService.isDealCalendarHoliday(vdateString, inputDto.getTradCalender()); 
-                boolean isHolidaym = dateCalService.isDealCalendarHoliday(mdateString, inputDto.getTradCalender()); 
+                boolean isHoliday = invDateCalService.isDealCalendarHoliday(vdateString, inputDto.getTradCalender());
+                boolean isHolidaym = invDateCalService.isDealCalendarHoliday(mdateString, inputDto.getTradCalender());
                 if(isHoliday) {
-                openVdate = dateCalService.calculationTradingDay(openVdate, 1, dealCalendarHolidayList, "1");                   
+                openVdate = invDateCalService.calculationTradingDay(openVdate, 1, dealCalendarHolidayList, "1");
                }  
                 if(isHolidaym) {
-                	openMdate = dateCalService.calculationTradingDay(openMdate, 1, dealCalendarHolidayList, "1");                   
+                	openMdate = invDateCalService.calculationTradingDay(openMdate, 1, dealCalendarHolidayList, "1");
                    }  
              // 投资周期开始日
 		    resultDto.setOpenVdate(openVdate);	

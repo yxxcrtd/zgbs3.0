@@ -27,11 +27,11 @@ import com.joyintech.tams.constant.DictCodeList;
  * 
  * @author 张亮
  * @version 1.0 2018年9月21日
- * @see BussFinProductOpenPlanValidator
+ * @see InvestBussFinProductOpenPlanValidator
  * @since 1.0
  */
 @Component
-public class BussFinProductOpenPlanValidator implements BeanValidator {
+public class InvestBussFinProductOpenPlanValidator implements BeanValidator {
     
     /**
      * {@inheritDoc}

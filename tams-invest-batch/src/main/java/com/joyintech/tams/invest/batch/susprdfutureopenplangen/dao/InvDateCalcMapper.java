@@ -21,11 +21,11 @@ import org.springframework.stereotype.Repository;
  * 
  * @author 何阳阳
  * @version 1.0 2018年9月21日
- * @see DateCalcMapper
+ * @see InvDateCalcMapper
  * @since 1.0
  */
 @Repository
-public interface DateCalcMapper {
+public interface InvDateCalcMapper {
 
     /**
      * 交易日历的节假日取得

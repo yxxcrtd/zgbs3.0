@@ -4,7 +4,6 @@ import com.joyintech.batch.batchbase.exception.BatchException;
 import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.util.*;
-import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -15,12 +14,11 @@ import com.joyintech.tams.invest.batch.creditprotectioncertificate.dao.CreditPro
 import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodExpireDataDto;
 import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodSaveDto;
 import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodWriterDto;
-import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.DateCalService;
+import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.InvDateCalService;
 import com.joyintech.tams.invest.common.component.base.core.BaseGetBussinessId;
 import com.joyintech.tams.invest.common.component.base.group.impl.BasePtlCashPositionInfoServiceImpl;
 import com.joyintech.tams.invest.common.component.base.group.impl.BasePtlSecPositionInfoServiceImpl;
 import com.joyintech.tams.invest.common.constant.InterfCommonConstant;
-import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
@@ -84,7 +82,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
     private IPlatformDate iPlatformDate;
 
     @Autowired
-    private DateCalService dateCalService;
+    private InvDateCalService invDateCalService;
 
     @Autowired
     private PtlSecPositionFlowMapper ptlSecPositionFlowMapper;
@@ -283,9 +281,9 @@ public class CreditProtectionCertificatePeriodRunnerService {
      * 获取下一个工作日
      */
     public Date getNextWorkDay(Date tradeDate, String calendarId) {
-        if (dateCalService != null) {
-            List<String> holiday = dateCalService.getDealCalendarHoliday(tradeDate, DateUtil.addDays(tradeDate, 31), calendarId);
-            return dateCalService.calculationTradingDay(tradeDate, 1, holiday, "1");
+        if (invDateCalService != null) {
+            List<String> holiday = invDateCalService.getDealCalendarHoliday(tradeDate, DateUtil.addDays(tradeDate, 31), calendarId);
+            return invDateCalService.calculationTradingDay(tradeDate, 1, holiday, "1");
         }
         return null;
     }
