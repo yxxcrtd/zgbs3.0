@@ -26,6 +26,8 @@ import com.joyintech.tams.invest.common.entrust.dto.EntrustCommonDto;
 import com.joyintech.tams.invest.common.trade.dao.EtrCommonCashPositionMapper;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrSecCashPositionDealService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +47,11 @@ import java.util.Map;
  */
 @Service
 public class EtrCashPosAutoGenerationService {
+
+    /**
+     * 日志
+     */
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * CashPosAutoGenerationMapper
@@ -101,6 +108,7 @@ public class EtrCashPosAutoGenerationService {
                 // 剩余数量
                 BigDecimal 剩余数量 = ArithmeticUtil.subtract(etrEntrust.getEntrustNum(), etrFinish == null ? BigDecimal.ZERO : etrFinish);
                 BigDecimal 最新市价 = etrEntrust.getPrice();
+                logger.info("债券:{}",etrEntrust.getFinprodId());
                 if (etrEntrust.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
                 	//添加新的参数  add by zhangpei 20201119 start
                     //最新市价 = EtrSecCashPositionDealService.gen委托全价(etrEntrust.getEntrustId(), batchDate, etrEntrust.getTradeMarket());

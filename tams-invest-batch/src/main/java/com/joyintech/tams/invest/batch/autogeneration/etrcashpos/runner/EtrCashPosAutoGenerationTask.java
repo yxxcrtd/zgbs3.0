@@ -18,6 +18,7 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.web.PlatformDate;
 import com.joyintech.tams.invest.batch.autogeneration.etrcashpos.service.EtrCashPosAutoGenerationService;
 import com.joyintech.tams.invest.batch.autogeneration.secpos.runner.SecPosAutoGenerationTask;
+import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -43,7 +44,7 @@ public class EtrCashPosAutoGenerationTask extends BatchBaseService {
     /**
      * 日志
      */
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * CashPosAutoGenerationService
@@ -64,7 +65,7 @@ public class EtrCashPosAutoGenerationTask extends BatchBaseService {
     public JobExecution execute()
         throws BatchException {
 
-        JobExecution result = new JobExecution(1l);
+        JobExecution result = new JobExecution(1L);
         result.setStatus(BatchStatus.FAILED);
         SysBatchExecInfo batchExecuteInfo = this.getBatchExecuteInfo();
         if (batchExecuteInfo == null) {
@@ -85,6 +86,8 @@ public class EtrCashPosAutoGenerationTask extends BatchBaseService {
         }
         catch (Exception e) {
             logger.error(e.getMessage());
+            //异常信息记录到批处理的日志详情
+            throw new BatchException(RiskUtil.getLogString(e));
         }
 
         return result;
