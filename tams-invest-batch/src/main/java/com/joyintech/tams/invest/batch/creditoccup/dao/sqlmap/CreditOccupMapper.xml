@@ -301,7 +301,7 @@
             or
             (tpd.FINPROD_TYPE2 in ('F10','F01') and tpd.PS not in ('T05','T11','T12','T13','T39','T22'))
             or
-            (tpd.FINPROD_TYPE2 in ('F02','F03') and tpd.PS = 'T01' and fpt.type_7 = 'H01')
+            (tpd.FINPROD_TYPE2 in ('F02','F03') and tpd.PS = 'T01' and fpt.type_6 = 'H01')
         )
     </select>
 
