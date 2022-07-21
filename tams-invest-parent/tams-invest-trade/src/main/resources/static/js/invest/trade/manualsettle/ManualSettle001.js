@@ -76,6 +76,7 @@
             ,{field:'settleStatusStr', title: '交收状态', width:'100',sortField:'settleStatus'}
             ,{field:'entrustNo', title: '指令序号', width:'200'}
             ,{field:'orderId', title: '指令序号', width:'150', visible:false}
+            ,{field:'entrustOrderId', title: '指令委托Id', width:'150', visible:false}
             // GNS-940:原业务编号场内交易为成交编号 modify by fuyongsheng 20220222 start
             // ,{field:'tradeId', title: '原业务编号', width:'150'}
             ,{field:'dealNo', title: '原业务编号', width:'150'}

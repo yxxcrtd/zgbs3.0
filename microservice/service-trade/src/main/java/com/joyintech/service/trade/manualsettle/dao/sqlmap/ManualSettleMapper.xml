@@ -6,6 +6,7 @@
             T1.SETTLE_SEQ_NO SETTLE_SEQ_NO,
             T1.SETTLE_STATUS settleStatus,
             T1.ORDER_ID orderId,
+            T1.ENTRUST_ORDER_ID entrustOrderId,
             T1.TRADE_ID tradeId,
             T1.TRADE_DATE tradeDate,
             T1.SETTLE_DATE settleDate,

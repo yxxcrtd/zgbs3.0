@@ -75,7 +75,7 @@ public class NegotiatedRepoCheckStrategy extends BaseCheckKit implements IBusine
         String entrustProp = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
 
         //检查对手方信息
-        checkPropDealerTradeInfo(integratedEntrust);
+        checkPropDealerTradeInfo(integratedEntrust,instruction);
 
         // 解除质押和中途换券无需判断
         if (!EntrustProp.isRepurchaseReleaseOrExchange(entrustProp)
@@ -86,7 +86,7 @@ public class NegotiatedRepoCheckStrategy extends BaseCheckKit implements IBusine
         return ResultBean.success();
     }
 
-    private void checkPropDealerTradeInfo(IntegratedEntrust entrust) {
+    private void checkPropDealerTradeInfo(IntegratedEntrust entrust, Instruction instruction) {
         if (StrUtil.isEmpty(entrust.getCounterId()) || StrUtil.isEmpty(entrust.getCounterName())) {
             throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "交易对手代码或名称不能为空");
         }
@@ -97,7 +97,7 @@ public class NegotiatedRepoCheckStrategy extends BaseCheckKit implements IBusine
             throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "对手方交易员代码不能为空");
         }
 
-        if (Market.SZSE.codeNotEquals(entrust.getMarket())) {
+        if (StringUtil.equals(instruction.getTradeMarket(), Market.SZSE.investValue)) {
             if (StrUtil.isEmpty(entrust.getPropInvestorId())) {
                 throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "对手方交易主体代码不能为空");
             }
