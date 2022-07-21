@@ -454,7 +454,7 @@
             var param = {repSecId: object.finprodId, iPlatformDate: iPlatformDate};
             Joyin.ajaxSync(basePath + 'invest/entrust/etragrereptrade/EtrAgreRepTrade001/getFaceValue', param, function (obj) {
                 if (obj && obj != '' && repSecNum) {
-                    $("#printAmt").val(obj * repSecNum).trigger('change');
+                    $("#printAmt").val(Math.round(obj * repSecNum).toFixed(2)).trigger('change');
                     $("#pledgeFaceValue").val(obj).trigger('change');
                 }
             });
@@ -478,7 +478,7 @@
             var param = {repSecId: object.finprodId, iPlatformDate: iPlatformDate};
             Joyin.ajaxSync(basePath + 'invest/entrust/etragrereptrade/EtrAgreRepTrade001/getFaceValue', param, function (obj) {
                 if (obj && obj != '') {
-                    $("#newPrintAmt").val(obj * repSecNum).trigger('change');
+                    $("#newPrintAmt").val(Math.round(obj * repSecNum).toFixed(2)).trigger('change');
                     $("#newpledgeFaceValue").val(obj).trigger('change');
                 }
             });
@@ -519,10 +519,10 @@
                 Joyin.ajaxSync(basePath + 'invest/entrust/etragrereptrade/EtrAgreRepTrade001/getFaceValue', param, function (obj) {
                     if (obj && obj != '') {
                         if (obj == 0) {
-                            $("#repSecNum").val(0);
+                            $("#repSecNum").val(0).toFixed(2);
                             $("#printAmt").val(0);
                         } else {
-                            $("#repSecNum").val(Math.round(tradeAmt * 100 / conRatio / obj));
+                            $("#repSecNum").val(Math.round(tradeAmt * 100 / conRatio / obj).toFixed(2));
                             $("#printAmt").val(Math.round(tradeAmt * 100 / conRatio));
                         }
                         $("#pledgeFaceValue").val(obj).trigger('change');
@@ -640,6 +640,8 @@
                 $("#tradeMarket").attr("disabled", false);
                 //委托方向
                 $("#ps").attr("disabled", false);
+                //委托方向
+                $("#repPs").attr("disabled", false);
                 //回购期限
                 $("#term").attr("disabled", false);
                 //回购金额
@@ -1419,7 +1421,7 @@
                     //回购期限
                     $("#term_div").hide();
                     //回购金额
-                    $("#tradeAmt").hide();
+                    $("#tradeAmt_div").hide();
                     $("#tradeAmt").attr("disabled", true);
                     //回购利率
                     $("#yield_div").hide();
@@ -1685,6 +1687,13 @@
             sortable: false
         }
         , {
+            /*资产名称*/
+            field: 'assetName',
+            width: 150,
+            title: 'BaseRiskMathComm.assetName',
+            sortable: false
+        }
+        , {
             /*预警阈值*/
             field: 'warningLine',
             width: 150,
@@ -1696,6 +1705,13 @@
             field: 'approveLine',
             width: 150,
             title: 'BaseRiskMathComm.approveold',
+            sortable: false
+        }
+        , {
+            /*违规阈值*/
+            field: 'forbiddenLn',
+            width: 200,
+            title: 'BaseRiskMathComm.forbiddenLn',
             sortable: false
         }
         , {
@@ -1853,7 +1869,7 @@
             }
         }
         if (object.repSecNum) {
-            object.repSecNum = object.repSecNum * 100;
+            object.repSecNum = Math.round(object.repSecNum * 100).toFixed(2);
         }
         if (object.newRepSecNum) {
             object.newRepSecNum = object.newRepSecNum * 100;
@@ -1920,7 +1936,7 @@
 //            priceModelChange(true);
                 var repSecNum = $("#repSecNum").val();
                 if (repSecNum) {
-                    $("#repSecNum").val(repSecNum / 100);
+                    $("#repSecNum").val(Math.round(repSecNum / 100).toFixed(2));
                 }
                 var newRepSecNum = $("#newRepSecNum").val();
                 if (newRepSecNum) {
