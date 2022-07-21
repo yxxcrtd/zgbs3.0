@@ -1747,7 +1747,6 @@
         if (object.ps == 'T94') {
             return;
         }
-        debugger;
         if (object) {
             // 交易所协议回购 指令环节，只有正回购、逆回购、到期续做等交易方向参与风险试算
             var busiType = $("#ps").val();
@@ -1947,7 +1946,7 @@
             }
 
             if (riskTrialSpan) {
-                setRiskFlag(0);
+                //setRiskFlag(0);
                 $("#riskTrialSpan").html(riskTrialSpan);
             }
         }
