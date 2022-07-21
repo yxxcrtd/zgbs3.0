@@ -74,6 +74,13 @@ public class EntrustStatusTask extends BatchBaseService {
             result.setStatus(BatchStatus.COMPLETED);
         } catch (Exception e) {
             logger.error(e.getMessage());
+
+            // add by etliu 20220721 start
+            // 3.0.6协议回购+风险升级 XYHGFXSJ-326
+            //【批处理启动】2021-11-01，跑批“关闭委托状态更新”，一直在“执行中”。
+            isRunning = false;
+            // add by etliu 20220721 end
+
             //异常信息记录到批处理的日志详情
             throw new BatchException(RiskUtil.getLogString(e));
         }
