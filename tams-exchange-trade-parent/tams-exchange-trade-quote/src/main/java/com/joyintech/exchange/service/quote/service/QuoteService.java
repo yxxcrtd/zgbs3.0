@@ -1,5 +1,6 @@
 package com.joyintech.exchange.service.quote.service;
 
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -63,6 +64,11 @@ public class QuoteService {
 
     public ResultBean getTick(String stockCode) {
         TickBean tickBean = null;
+        if (StringUtil.equals(com.joyintech.tams.constant.DictCodeList.是否_否.getValue(), CacheUtil.getSysParam("TRD_USE_QUOTE"))) {
+            String quoteJsonStr = "{\"exchange\":\"SZ\",\"instrumentID\":\"100303.SZ\",\"updateTime\":1639379763,\"lastPrice\":0,\"openPrice\":0,\"highPrice\":0,\"lowPrice\":0,\"volume\":0,\"turnover\":0,\"position\":0,\"tradeBalance\":0,\"upperLimitPrice\":0,\"lowerLimitPrice\":0,\"settlePrice\":0,\"preClosePrice\":0,\"askPrice\":[0,0,0,0,0,0,0,0,0,0],\"askVolume\":[0,0,0,0,0,0,0,0,0,0],\"bidPrice\":[0,0,0,0,0,0,0,0,0,0],\"bidVolume\":[0,0,0,0,0,0,0,0,0,0]}";
+            TickBean tick = JSONUtil.toBean(quoteJsonStr, TickBean.class, true);
+            return ResultBean.success(tick);
+        }
 
 //        FuturesInstrument futuresInstrument = futuresInstrumentService.queryByStockCode(stockCode);
 //        if (Objects.nonNull(futuresInstrument)) {
