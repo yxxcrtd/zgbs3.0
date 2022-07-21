@@ -1423,7 +1423,8 @@ public class StlDataDealSzdJsmxProcessService {
 		Map<String, Object> params = new HashMap<>();
 		params.put("finprodId", finprodId);
 		params.put("tradeDate", com.joyintech.framework.util.DateUtil.platDateFromCache());
-		return creditLinesDealsMapper.getFaceValue(params);
+		BigDecimal faceValue = creditLinesDealsMapper.getFaceValue(params);
+		return null == faceValue ? new BigDecimal(100) : faceValue;
 	}
 
 	/**
