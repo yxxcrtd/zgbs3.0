@@ -62,10 +62,20 @@ public class EtrExchangeAgreRepTradeValidator implements EtrCommonValidator {
             }
         }
 
-        FinProduct finProduct = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
-        if(StringUtil.isNotEmpty(finProduct) && DateUtil.compareTo(DateUtil.parse(dto.getExpireSettleDate()),finProduct.getMdate())>0) {
-            errorList.add(new ValidMessage("term", "回购期限不能超过质押债券的存续期限！"));
+        // modify by etliu 20220721 start
+        // 3.0.6协议回购+风险升级 XYHGFXSJ-355
+        //【协议回购】上交所正回购解除质押指令，撤回后，2.撤回后指令修改提交时，提示【 回购期限不能超过质押债券的存续期限！】不应该有此提示
+//        FinProduct finProduct = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
+        FinProduct finProduct;
+        if(StringUtil.equals(DictCodeListExt3.交易方向_首期.getValue(), dto.getPs())
+                ||StringUtil.equals(DictCodeListExt3.交易方向_正回购.getValue(), dto.getPs())
+                || StringUtil.equals(DictCodeListExt3.交易方向_逆回购.getValue(), dto.getPs())){
+            finProduct = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
+            if(StringUtil.isNotEmpty(finProduct) && DateUtil.compareTo(DateUtil.parse(dto.getExpireSettleDate()),finProduct.getMdate())>0) {
+                errorList.add(new ValidMessage("term", "回购期限不能超过质押债券的存续期限！"));
+            }
         }
+        // modify by etliu 20220721 end
 
         if (StringUtil.equals(DictCodeListExt3.交易方向_中途换券.getValue(), dto.getPs())
                 && StringUtil.isNotBlank(dto.getNewfinprodId())
