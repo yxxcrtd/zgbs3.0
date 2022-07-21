@@ -1496,8 +1496,9 @@
                     //回购期限
                     $("#term_div").hide();
                     //回购金额
-                    $("#tradeAmt").hide();
-                    $("#tradeAmt").attr("disabled", true);
+                    $("#tradeAmt_div").hide();
+                    // $("#tradeAmt").hide();
+                    // $("#tradeAmt").attr("disabled", true);
                     //回购利率
                     $("#yield_div").hide();
                     //首期结算日
