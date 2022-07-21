@@ -517,10 +517,11 @@ public class IbuComponentReceiveService extends BaseService{
                     List<IbuQuoteBondDetDto> quoteBondDetList = inputBean.getIbuQuoteBondDetDtoList();
                     IbuQuoteBondDto quoteBond = inputBean.getIbuQuoteBondDto();
                     String cfetsPartyId = cfetsInterfReceiveService.getCfetsPartyID(param, quoteBond.getOuPartyId());
-                    for(IbuQuoteBondDetDto item:quoteBondDetList){
-                        if(null!=quoteBond && StringUtil.equals(quoteBond.getVersion(),item.getVersion())
-                                && StringUtil.equals(cfetsPartyId,item.getCpPartyId())){
-                                fprice=item.getUnitFprice();
+                    for (IbuQuoteBondDetDto item : quoteBondDetList) {
+                        if (null != quoteBond
+                                && quoteBond.getVersion().equals(item.getVersion())
+                                && StringUtil.equals(cfetsPartyId, item.getCpPartyId())) {
+                            fprice = item.getUnitFprice();
                         }
                     }
                 }
