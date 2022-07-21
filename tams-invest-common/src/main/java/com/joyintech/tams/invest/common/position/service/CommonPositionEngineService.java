@@ -379,7 +379,7 @@ public class CommonPositionEngineService {
                 busiType = DictCodeListExt3.头寸业务类型_协议回购提前购回.getValue();
             } else if (DictCodeListExt3.交易方向_到期购回.getValue().equals(ps)) {
                 busiType = DictCodeListExt3.头寸业务类型_协议回购到期购回.getValue();
-            } else if (DictCodeListExt3.交易方向_首期.getValue().equals(ps)) {
+            } else if (DictCodeListExt3.交易方向_正回购.getValue().equals(ps) || DictCodeListExt3.交易方向_逆回购.getValue().equals(ps)) {
                 busiType = DictCodeListExt3.头寸业务类型_协议回购首期.getValue();
             } else if (DictCodeListExt3.交易方向_中途换券.getValue().equals(ps)) {
                 busiType = DictCodeListExt3.头寸业务类型_协议回购中途换券.getValue();
