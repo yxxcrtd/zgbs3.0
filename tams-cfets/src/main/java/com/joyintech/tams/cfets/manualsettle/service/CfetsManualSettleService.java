@@ -1108,12 +1108,14 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                     Map<String,Object> param = new HashMap<>();
                     param.put("entrustIds",entrustIdList);
                     // 行权赎回无指令，此处未考虑出现报错
-                    if(StringUtil.isNotEmpty(entrustIdList.size()) && entrustIdList.size()>0
+                    if(CollectionUtils.isNotEmpty(entrustIdList)
                             && cfetsManualSettleMapper.countWflEtr(param) <= 0){
                         for(CfetsManualSettleDealInfo dealInfo : listTemp){
                             this.closeDelegateMethod(dealInfo.getEntrustId(),"","交收失败");
                         }
                         SpringContextUtil.getApplicationContext().getBean(CfetsManualSettleService.class).closeDelegate(listTemp,entity.getRemark(),entity.getTgBusiType());
+                    }else if(CollectionUtils.isNotEmpty(entrustIdList)){
+                        logger.info("{} 指令存在流程中数据,未关闭", entrustIdList.toString());
                     }
                 }
             }
