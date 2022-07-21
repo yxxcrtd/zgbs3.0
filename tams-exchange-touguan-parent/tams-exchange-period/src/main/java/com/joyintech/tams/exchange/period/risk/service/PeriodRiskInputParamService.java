@@ -168,7 +168,7 @@ public class PeriodRiskInputParamService extends RiskCommonService {
             riskRdsDto.setEventType(BussinessDictCodeListRds.事件类型_投资交易.getValue());
             list = interfRiskRdsService.getRiskRdsListData(riskRdsDto, dto.getSelectedItem(), map -> {
                 // 处理交易方向、交易金额等
-                map.put("tradeId",dto.getEntrustNo() + "-" + map.get("portfolioId") + "-" + dto.getOrderId() );
+                map.put("tradeId",dto.getEntrustNo() + "-" + map.get("portfolioId") + "-" + dto.getEntrustOrderId() );
             });
         }
 
@@ -312,7 +312,7 @@ public class PeriodRiskInputParamService extends RiskCommonService {
             ManualSettleDto inputDto = (ManualSettleDto) obj;
             ManualSettleDto detail = (ManualSettleDto) detailObj;
             creditLinesInputDto.setCreditCallType(DictCodeListRsk.授信占用类别_实占.getValue());
-            creditLinesInputDto.setTradeId(inputDto.getEntrustNo() + "-" + detail.getPortfolioId() + "-" + inputDto.getOrderId());
+            creditLinesInputDto.setTradeId(inputDto.getEntrustNo() + "-" + detail.getPortfolioId() + "-" + inputDto.getEntrustOrderId());
             creditLinesInputDto.setFinprodId(inputDto.getFinprodId());
             creditLinesInputDto.setTradeDate(inputDto.getTradeDate());
             creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
