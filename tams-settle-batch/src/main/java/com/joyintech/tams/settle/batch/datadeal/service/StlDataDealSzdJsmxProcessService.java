@@ -965,7 +965,8 @@ public class StlDataDealSzdJsmxProcessService {
 						BigDecimal 券面最新面值 = select券面面值(settleTransDataPledge.getPledgeFinprodId());
 						// XYHGFXSJ-208:质押券字段用错 modify by fuyongsheng 20220720 end
 						settleTransDataPledge.setPledgeFaceValue(券面最新面值);
-						settleTransDataPledge.setPledgeRatio(ArithmeticUtil.multiply(ArithmeticUtil.divide(new BigDecimal(szdJsmx.getQsje()).abs(), settleTransDataPledge.getPledgeNumber(),2), 券面最新面值));
+						//settleTransDataPledge.setPledgeRatio(ArithmeticUtil.multiply(ArithmeticUtil.divide(new BigDecimal(szdJsmx.getQsje()).abs(), settleTransDataPledge.getPledgeNumber(),2), 券面最新面值));
+						settleTransDataPledge.setPledgeRatio(ArithmeticUtil.divide(new BigDecimal(szdJsmx.getQsje()).abs(),ArithmeticUtil.multiply(settleTransDataPledge.getPledgeNumber(), 券面最新面值), 2));
 						// modify by etliu 20211225 end
 //						}
 					}
@@ -1254,8 +1255,8 @@ public class StlDataDealSzdJsmxProcessService {
 								// 金融产品代码
 								settleTransData.setFinprodId(sqSettleTransDatas.get(0).getFinprodId());
 								settleTransDataPledge.setPledgeFaceValue(券面最新面值);
-								settleTransDataPledge.setPledgeRatio(ArithmeticUtil.multiply(ArithmeticUtil.divide(sqSettleTransDatas.get(0).getPrinAmt().abs(),
-										new BigDecimal(szdJsmx.getCjsl()).abs(),2), 券面最新面值));
+								settleTransDataPledge.setPledgeRatio(ArithmeticUtil.divide(sqSettleTransDatas.get(0).getPrinAmt().abs(),
+										ArithmeticUtil.multiply(settleTransDataPledge.getPledgeNumber(), 券面最新面值), 2));
 							}
 						}
 						// 换出折算率=首期质押券折算率,换入折算率=首期成交明细本金金额/成交数量 modify by fuyongsheng 20220104 end
