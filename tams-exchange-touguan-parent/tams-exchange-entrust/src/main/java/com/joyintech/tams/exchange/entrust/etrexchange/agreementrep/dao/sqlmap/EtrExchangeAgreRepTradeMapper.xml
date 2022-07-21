@@ -693,11 +693,11 @@
         etr_entrust_add.Cap_Days occupyDays,/** 占款天数 **/
         etr_entrust_add.m_Int_Amt intAmt,/** 回购利息 **/
         etr_entrust_add.m_Trade_Amt expireSettleAmt,/** 到期结算金额 **/
-        DECODE(etr_entrust.ps,'T92',pledge.finprod_id,'T96',pledge.finprod_id,'T56',pledge.finprod_id,trdPledge.finprod_id) AS finprodId,
-        DECODE(etr_entrust.ps,'T92',pledge.Finprod_Market_Id,'T96',pledge.Finprod_Market_Id,'T56',pledge.Finprod_Market_Id,trdPledge.Finprod_Market_Id) AS finprodMarketId,/** 质押代码 **/
-        DECODE(etr_entrust.ps,'T92',pledge.finprod_abbr,'T96',pledge.finprod_abbr,'T56',pledge.finprod_abbr,trdPledge.finprod_abbr) AS finprodAbbr, /** 质押券名称 **/
-        DECODE(etr_entrust.ps,'T92',pledge.Pledge_Ratio,'T96',pledge.Pledge_Ratio,'T56',pledge.Pledge_Ratio,trdPledge.Pledge_Ratio) AS conRatio, /** 折算率 **/
-        DECODE(etr_entrust.ps,'T92',pledge.PLEDGE_NUMBER,'T96',pledge.PLEDGE_NUMBER,'T56',pledge.PLEDGE_NUMBER,trdPledge.PLEDGE_NUMBER) AS  repSecNum, /** 质押数量  **/
+        DECODE(etr_entrust.ps,'03',pledge.finprod_id,'04',pledge.finprod_id,'T92',pledge.finprod_id,'T96',pledge.finprod_id,'T56',pledge.finprod_id,trdPledge.finprod_id) AS finprodId,
+        DECODE(etr_entrust.ps,'03',pledge.Finprod_Market_Id,'04',pledge.Finprod_Market_Id,'T92',pledge.Finprod_Market_Id,'T96',pledge.Finprod_Market_Id,'T56',pledge.Finprod_Market_Id,trdPledge.Finprod_Market_Id) AS finprodMarketId,/** 质押代码 **/
+        DECODE(etr_entrust.ps,'03',pledge.finprod_abbr,'04',pledge.finprod_abbr,'T92',pledge.finprod_abbr,'T96',pledge.finprod_abbr,'T56',pledge.finprod_abbr,trdPledge.finprod_abbr) AS finprodAbbr, /** 质押券名称 **/
+        DECODE(etr_entrust.ps,'03',pledge.Pledge_Ratio,'04',pledge.Pledge_Ratio,'T92',pledge.Pledge_Ratio,'T96',pledge.Pledge_Ratio,'T56',pledge.Pledge_Ratio,trdPledge.Pledge_Ratio) AS conRatio, /** 折算率 **/
+        DECODE(etr_entrust.ps,'03',pledge.PLEDGE_NUMBER,'04',pledge.PLEDGE_NUMBER,'T92',pledge.PLEDGE_NUMBER,'T96',pledge.PLEDGE_NUMBER,'T56',pledge.PLEDGE_NUMBER,trdPledge.PLEDGE_NUMBER) AS  repSecNum, /** 质押数量  **/
         case
         when etr_entrust.trade_market = #{TRADE_PLACE_03} then
         #{UNIT_04}
@@ -879,11 +879,11 @@
             wfl_etr_entrust_add.Cap_Days occupyDays,/** 占款天数 **/
             wfl_etr_entrust_add.m_Int_Amt intAmt,/** 回购利息 **/
             wfl_etr_entrust_add.m_Trade_Amt expireSettleAmt,/** 到期结算金额 **/
-            DECODE(wfl_etr_entrust.ps,'T92',pledge.finprod_id,'T96',pledge.finprod_id,'T56',pledge.finprod_id,trdPledge.finprod_id) AS finprodId,
-            DECODE(wfl_etr_entrust.ps,'T92',pledge.Finprod_Market_Id,'T96',pledge.Finprod_Market_Id,'T56',pledge.Finprod_Market_Id,trdPledge.Finprod_Market_Id) AS finprodMarketId,/** 质押代码 **/
-            DECODE(wfl_etr_entrust.ps,'T92',pledge.finprod_abbr,'T96',pledge.finprod_abbr,'T56',pledge.finprod_abbr,trdPledge.finprod_abbr) AS finprodAbbr, /** 质押券名称 **/
-            DECODE(wfl_etr_entrust.ps,'T92',pledge.Pledge_Ratio,'T96',pledge.Pledge_Ratio,'T56',pledge.Pledge_Ratio,trdPledge.Pledge_Ratio) AS conRatio, /** 折算率 **/
-            DECODE(wfl_etr_entrust.ps,'T92',pledge.PLEDGE_NUMBER,'T96',pledge.PLEDGE_NUMBER,'T56',pledge.PLEDGE_NUMBER,trdPledge.PLEDGE_NUMBER) AS  repSecNum, /** 质押数量  **/
+            DECODE(wfl_etr_entrust.ps,'03',pledge.finprod_id,'04',pledge.finprod_id,'T92',pledge.finprod_id,'T96',pledge.finprod_id,'T56',pledge.finprod_id,trdPledge.finprod_id) AS finprodId,
+            DECODE(wfl_etr_entrust.ps,'03',pledge.Finprod_Market_Id,'04',pledge.Finprod_Market_Id,'T92',pledge.Finprod_Market_Id,'T96',pledge.Finprod_Market_Id,'T56',pledge.Finprod_Market_Id,trdPledge.Finprod_Market_Id) AS finprodMarketId,/** 质押代码 **/
+            DECODE(wfl_etr_entrust.ps,'03',pledge.finprod_abbr,'04',pledge.finprod_abbr,'T92',pledge.finprod_abbr,'T96',pledge.finprod_abbr,'T56',pledge.finprod_abbr,trdPledge.finprod_abbr) AS finprodAbbr, /** 质押券名称 **/
+            DECODE(wfl_etr_entrust.ps,'03',pledge.Pledge_Ratio,'04',pledge.Pledge_Ratio,'T92',pledge.Pledge_Ratio,'T96',pledge.Pledge_Ratio,'T56',pledge.Pledge_Ratio,trdPledge.Pledge_Ratio) AS conRatio, /** 折算率 **/
+            DECODE(wfl_etr_entrust.ps,'03',pledge.PLEDGE_NUMBER,'04',pledge.PLEDGE_NUMBER,'T92',pledge.PLEDGE_NUMBER,'T96',pledge.PLEDGE_NUMBER,'T56',pledge.PLEDGE_NUMBER,trdPledge.PLEDGE_NUMBER) AS  repSecNum, /** 质押数量  **/
             case
             when wfl_etr_entrust.trade_market = #{TRADE_PLACE_03} then
             #{UNIT_04}
