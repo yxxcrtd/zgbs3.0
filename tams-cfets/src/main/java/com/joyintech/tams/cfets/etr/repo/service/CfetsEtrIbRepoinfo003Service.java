@@ -476,7 +476,7 @@ public class CfetsEtrIbRepoinfo003Service extends CommonExportService<CfetsEtrib
                     doInsertFlow(dto);
                 }
                 //发送头寸
-                this.sendPositionMethod(entity, StringUtil.equals(entity.getSystemAct(), DictCodeListExt3.系统动作_新建.getValue()) ? true : false, null);
+                this.sendPositionMethod(entity, StringUtil.equals(entity.getSystemAct(), DictCodeListExt3.系统动作_新建.getValue()), true, null);
             }
             this.olePositionDeal(entity);
         }
@@ -584,7 +584,7 @@ public class CfetsEtrIbRepoinfo003Service extends CommonExportService<CfetsEtrib
                     doInsertFlow(dto);
                 }
                 //发送头寸
-                sendPositionMethod(entity, isSubmit, confirmOk);
+                sendPositionMethod(entity, isSubmit, false, confirmOk);
                 olePositionDeal(entity);
             } catch (PositionException e) {
                 Message message = PositionUtil.ajaxErrorReturn(e);
@@ -602,7 +602,15 @@ public class CfetsEtrIbRepoinfo003Service extends CommonExportService<CfetsEtrib
         }
     }
 
-    private  void sendPositionMethod(CfetsEtribRepoInfo003Dto entity,boolean isSubmit,String confirmOk){
+    /**
+     * 发送头寸报文
+     *
+     * @param entity     页面元素
+     * @param isSubmit   是否提交
+     * @param isDoInsert 是否是doInsert调用
+     * @param confirmOk  是否确认
+     */
+    private void sendPositionMethod(CfetsEtribRepoInfo003Dto entity, boolean isSubmit, boolean isDoInsert, String confirmOk) {
         List<CfetsEtrIbRepoPosPortfolioCashRequest> ptlCashList=new ArrayList<>();
         List<CfetsEtrIbRepoPosPortfolioSecRequest> ptlSecList=new ArrayList<>();
         for (CfetsEtribRepoInfo003Dto dto : entity.getEtrInvestRepoInfoDtos()) {
@@ -611,7 +619,7 @@ public class CfetsEtrIbRepoinfo003Service extends CommonExportService<CfetsEtrib
             posport.setPortfolioId(dto.getPortfolioId());
             posport.setEtrId(dto.getEntrustId());
             if(StringUtil.isNotEmpty(dto.getPortfolioId())){
-                Map<String, Object> map = new HashMap<String, Object>();
+                Map<String, Object> map = new HashMap<>();
                 map.put("portfolioId", dto.getPortfolioId());
                 map.put("acctType", BussinessDictCodeList.资金账户类型_托管账户.getValue());
                 String cashAcctId =cfetsEtribBondInfo003Service.qryPortfolioCashAcctId(map);
@@ -627,7 +635,7 @@ public class CfetsEtrIbRepoinfo003Service extends CommonExportService<CfetsEtrib
                     secport.setPortfolioId(dto.getPortfolioId());
                     secport.setEtrId(dto.getEntrustId());
                     secport.setFinprodId( pledgeBondInfoDto.getFinprodId());
-                    Map<String, Object> map = new HashMap<String, Object>();
+                    Map<String, Object> map = new HashMap<>();
                     map.put("portfolioId", dto.getPortfolioId());
                     map.put("finprodId", pledgeBondInfoDto.getFinprodId());
                     String secAcctId = cfetsEtribBondInfo003Service.qryPortfolioSecAcctId(map);
@@ -649,11 +657,11 @@ public class CfetsEtrIbRepoinfo003Service extends CommonExportService<CfetsEtrib
         req.setWorkFlowId(entity.getWorkflowId());
         req.setFlowStatus(DictCodeListExt3.流程节点_流程提交.getValue());
         req.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
-        String balanceCheck="Y";
-        if (isSubmit&&(StringUtil.isNotEmpty(entity.getSoftSkipMode())
+        String balanceCheck = DictCodeList.是否_是.getValue();
+        if (isDoInsert && (StringUtil.isNotEmpty(entity.getSoftSkipMode())
                 && StringUtil.equals(entity.getSoftSkipMode(), DictCodeList.是否_是.getValue()))) {
             balanceCheck = DictCodeList.是否_否.getValue();
-        }else if ( StringUtil.isNotEmpty(confirmOk)) {
+        } else if (StringUtil.isNotEmpty(confirmOk)) {
             balanceCheck = DictCodeList.是否_否.getValue();
         }
         req.setRepoPledgeModel(CacheUtil.getSysParam("repo_pledge_model"));
