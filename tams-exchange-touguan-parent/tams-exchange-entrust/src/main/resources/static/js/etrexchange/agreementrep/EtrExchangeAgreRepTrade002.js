@@ -542,6 +542,9 @@
             var tradeMarket =  $("#tradeMarket").val();
             var ps =  $("#ps").val();
             var repPs =  $("#repPs").val();
+            alert(tradeMarket);
+            alert(ps);
+            alert(repPs);
 
             //回购期限
             $("#term_div").show();
@@ -722,13 +725,15 @@
                     //交易场所
                     $("#tradeMarket").attr("disabled", true);
                     //委托方向
-                    $("#ps").attr("disabled", true);
+                    $("#ps").attr("disabled", false);
+
+                    $("#repPs").attr("disabled", false);
                     //回购期限
-                    $("#term").attr("disabled", true);
+                    $("#term").attr("disabled", false);
                     //回购金额
-                    $("#tradeAmt").attr("disabled", true);
+                    $("#tradeAmt").attr("disabled", false);
                     //回购利率
-                    $("#yield").attr("disabled", true);
+                    $("#yield").attr("disabled", false);
                     //首期结算日
                     $("#fristSettleDate").attr("disabled", true);
                     //到期结算日
@@ -740,11 +745,11 @@
                     //到期结算金额
                     $("#expireSettleAmt").attr("disabled", true);
                     //质押券
-                    $("#repSecId").attr("disabled", true);
+                    $("#repSecId").attr("disabled", false);
                     //折算比例
-                    $("#conRatio").attr("disabled", true);
+                    $("#conRatio").attr("disabled", false);
                     //质押数量
-                    $("#repSecNum").attr("disabled", true);
+                    $("#repSecNum").attr("disabled", false);
                     //券面金额
                     $("#printAmt").attr("disabled", true);
                     //交易对手
@@ -753,6 +758,8 @@
                     $("#trader").attr("disabled", false);
                     //对手交易员
                     // $("#counterTrader").attr("disabled", false);
+                    //券面金额
+                    $("#printAmt_div").hide();
                     //新质押券
                     $("#newRepSecId_div").hide();
                     //新折算比例
