@@ -491,6 +491,7 @@ public class CfetsTrdConfirmService extends BaseService {
             deal.setShareAmt(ArithmeticUtil.divide(regDeal.getFaceValue(), new BigDecimal(100), decimalPlaces_4, RoundingMode.HALF_UP));
             deal.setEntrustId(regDeal.getEntrustId());
             deal.setbTradeId(regDeal.getTradeId());
+            deal.setTradeMarket(dtoReg.getTradeMarket());
             deals.add(deal);
             // =====================划款指令信息=====================
             bussTrdTransferOrderDtoList.addAll(this.dealOrders(deal, dtoReg.getPs()));

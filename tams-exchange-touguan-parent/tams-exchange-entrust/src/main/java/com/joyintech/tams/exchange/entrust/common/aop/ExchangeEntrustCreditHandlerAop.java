@@ -86,6 +86,11 @@ public class ExchangeEntrustCreditHandlerAop {
         if (ajaxResult != null && !StringUtil.isEmptyList(ajaxResult.getErrorList())){
             return;
         }
+        // 信用保护凭证不在这里处理授信
+        String serviceName = joinPoint.getTarget().getClass().getSimpleName();
+        if (StringUtil.equals(serviceName,"EtrExchangeTradeCpc001Service")){
+            return;
+        }
         try {
             if (ajaxResult != null){
                 Object[] args = joinPoint.getArgs();
@@ -141,6 +146,11 @@ public class ExchangeEntrustCreditHandlerAop {
         if(!StringUtil.isNotEmpty(joinPoint.getArgs())){
             return;
         }
+        // 信用保护凭证不在这里处理授信
+        String serviceName = joinPoint.getTarget().getClass().getSimpleName();
+        if (StringUtil.equals(serviceName,"EtrExchangeTradeCpc001Service")){
+            return;
+        }
         try {
             Object[] args = joinPoint.getArgs();
             OperationType operationType = (OperationType) args[1];
@@ -173,6 +183,11 @@ public class ExchangeEntrustCreditHandlerAop {
         if(!StringUtil.isNotEmpty(joinPoint.getArgs())){
             return;
         }
+        // 信用保护凭证不在这里处理授信
+        String serviceName = joinPoint.getTarget().getClass().getSimpleName();
+        if (StringUtil.equals(serviceName,"EtrExchangeTradeCpc001Service")){
+            return;
+        }
         try {
             Object[] args = joinPoint.getArgs();
             Map<String,Object> mapTrd= JsonUtils.object2Map(args[0]);
@@ -198,6 +213,11 @@ public class ExchangeEntrustCreditHandlerAop {
         if(!StringUtil.isNotEmpty(joinPoint.getArgs())){
             return;
         }
+        // 信用保护凭证不在这里处理授信
+        String serviceName = joinPoint.getTarget().getClass().getSimpleName();
+        if (StringUtil.equals(serviceName,"EtrExchangeTradeCpc001Service")){
+            return;
+        }
         try {
             Object[] args = joinPoint.getArgs();
             etrCommonService.executeOccupyCreditLines(args[0], DictCodeListExt1.交易状态_撤销.getValue(),"doBack");
@@ -208,6 +228,11 @@ public class ExchangeEntrustCreditHandlerAop {
     @After("closeDelegatePoint()")
     public void creditReleaseMethodClose(JoinPoint joinPoint) throws BusinessException {
         if(!StringUtil.isNotEmpty(joinPoint.getArgs())){
+            return;
+        }
+        // 信用保护凭证不在这里处理授信
+        String serviceName = joinPoint.getTarget().getClass().getSimpleName();
+        if (StringUtil.equals(serviceName,"EtrExchangeTradeCpc001Service")){
             return;
         }
         try {

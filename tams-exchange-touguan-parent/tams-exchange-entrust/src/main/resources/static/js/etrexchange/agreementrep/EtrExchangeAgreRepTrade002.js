@@ -1419,8 +1419,9 @@
                     //回购期限
                     $("#term_div").hide();
                     //回购金额
-                    $("#tradeAmt").hide();
-                    $("#tradeAmt").attr("disabled", true);
+                    $("#tradeAmt_div").hide();
+                    // $("#tradeAmt").hide();
+                    // $("#tradeAmt").attr("disabled", true);
                     //回购利率
                     $("#yield_div").hide();
                     //首期结算日
@@ -1747,7 +1748,6 @@
         if (object.ps == 'T94') {
             return;
         }
-        debugger;
         if (object) {
             // 交易所协议回购 指令环节，只有正回购、逆回购、到期续做等交易方向参与风险试算
             var busiType = $("#ps").val();
@@ -1947,7 +1947,7 @@
             }
 
             if (riskTrialSpan) {
-                setRiskFlag(0);
+                //setRiskFlag(0);
                 $("#riskTrialSpan").html(riskTrialSpan);
             }
         }
