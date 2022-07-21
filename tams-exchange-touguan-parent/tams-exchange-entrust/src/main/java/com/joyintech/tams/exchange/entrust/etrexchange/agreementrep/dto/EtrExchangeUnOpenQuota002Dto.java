@@ -139,9 +139,9 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
      */
     private String origPledgeStampName;
     /**
-     * 原质押券名称
+     * 原质押券数量
      */
-    private String origPledgeStampNum;
+    private BigDecimal origPledgeStampNum;
     /**
      * 原回购金额
      */
@@ -619,11 +619,11 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
         this.outRepSecNum = outRepSecNum;
     }
 
-    public String getOrigPledgeStampNum() {
+    public BigDecimal getOrigPledgeStampNum() {
         return origPledgeStampNum;
     }
 
-    public void setOrigPledgeStampNum(String origPledgeStampNum) {
+    public void setOrigPledgeStampNum(BigDecimal origPledgeStampNum) {
         this.origPledgeStampNum = origPledgeStampNum;
     }
 
