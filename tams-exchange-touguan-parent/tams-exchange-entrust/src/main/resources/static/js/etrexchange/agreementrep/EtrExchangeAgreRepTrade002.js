@@ -499,7 +499,7 @@
                     $("#conRatio").val(0);
                 }
                 else {
-                    $("#conRatio").val(Math.round(tradeAmt/printAmt*100*100)/100);
+                    $("#conRatio").val(Math.round(tradeAmt / printAmt * 100) / 100);
                 }
 
             }
