@@ -139,13 +139,15 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
             List<Map<String, Object>> list = new ArrayList<>(1);
             bean = new PositionRequestBaseBean();
             bean.setPortfolioId(entity.getPortfolioId());
-            if (交易方向_解除质押.getValue().equals(ps)) {
-                // 解除质押走线下划款，扣托管户现金
-                bean.setCashAcctId(tamsBusinessCommonService.selectProdTghCapacctNo(entity.getPortfolioId()));
-            } else {
+            // XYHGFXSJ-328:解除质押也走券商资金账户 modify by fuyongsheng 20220721 start
+//            if (交易方向_解除质押.getValue().equals(ps)) {
+//                // 解除质押走线下划款，扣托管户现金
+//                bean.setCashAcctId(tamsBusinessCommonService.selectProdTghCapacctNo(entity.getPortfolioId()));
+//            } else {
                 // 其他走券商资金账户
                 bean.setCashAcctId(entity.getAcctNo());
-            }
+//            }
+            // XYHGFXSJ-328:解除质押也走券商资金账户 modify by fuyongsheng 20220721 end
             bean.setTradeId(null);
             bean.setEtrId(entity.getEntrustId());
             // 交易金额
