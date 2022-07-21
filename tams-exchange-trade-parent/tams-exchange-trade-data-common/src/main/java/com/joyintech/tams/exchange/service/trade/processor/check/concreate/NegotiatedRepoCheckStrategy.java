@@ -75,7 +75,7 @@ public class NegotiatedRepoCheckStrategy extends BaseCheckKit implements IBusine
         String entrustProp = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
 
         //检查对手方信息
-        checkPropDealerTradeInfo(integratedEntrust);
+        checkPropDealerTradeInfo(integratedEntrust,instruction);
 
         // 解除质押和中途换券无需判断
         if (!EntrustProp.isRepurchaseReleaseOrExchange(entrustProp)
