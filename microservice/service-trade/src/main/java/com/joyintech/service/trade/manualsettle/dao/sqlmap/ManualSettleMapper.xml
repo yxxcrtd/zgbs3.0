@@ -60,7 +60,7 @@
             T4.COUNTER_NAME counterName,
         T1.DEAL_NO dealNo,
         ICD.ORDER_ID iOrderId,
-        TT.TRADED_VOLUME tradedVolume,
+        TT.TRADED_BALANCE tradedVolume,
         decode( T1.SETTLE_STATUS,'01',1,'02',3,'03',2,'04',4,5) sort
         FROM TRD_MANUAL_SETTLE_INFO T1
         LEFT JOIN  ETR_ENTRUST etr ON T1.ENTRUST_NO = etr.ENTRUST_ID
