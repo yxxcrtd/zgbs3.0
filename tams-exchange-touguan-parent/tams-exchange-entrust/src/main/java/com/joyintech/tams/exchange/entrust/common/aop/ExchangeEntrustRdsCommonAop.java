@@ -404,6 +404,7 @@ public class ExchangeEntrustRdsCommonAop {
         if (CommonUtil.isType((String)finprodType2, DictCodeListExt1.金融产品类型_投管用_债券借贷)
             || CommonUtil.isType((String)finprodType2, DictCodeListExt1.金融产品类型_投管用_债券借贷融入)
             || CommonUtil.isType((String)finprodType2, DictCodeListExt1.金融产品类型_投管用_债券借贷融出)
+            || CommonUtil.isType((String)finprodType2, DictCodeListExt1.金融产品类型_投管用_信用保护凭证)
             //债券一级指令不进行预占
             || CommonUtil.isType(assetType, DictCodeListExt2.平安资产类型_一级市场债)) {
             return;

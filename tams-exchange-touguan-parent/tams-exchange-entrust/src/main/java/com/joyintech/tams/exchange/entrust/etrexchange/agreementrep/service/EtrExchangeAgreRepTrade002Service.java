@@ -895,7 +895,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
             }
             //原质押券数量
             if (StringUtil.isNotEmpty(tmp.get("origBondsVolume"))) {
-                dto.setOrigPledgeStampNum(tmp.get("origBondsVolume").toString());
+                dto.setOrigPledgeStampNum(BigDecimal.valueOf(Double.parseDouble(tmp.get("origBondsVolume").toString())));
             }
             //原质押券金额
             if (StringUtil.isNotEmpty(tmp.get("origRepoAmount"))) {
