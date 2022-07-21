@@ -215,9 +215,9 @@ $(function () {
                 workflowId = data.workflowId;
             }
             console.log("----------------dblclick-------------------")
-            console.log(data.finprodType2)
-            console.log(data.tradeMarket)
-            console.log(data.purchModle)
+            // console.log(data.finprodType2)
+            // console.log(data.tradeMarket)
+            // console.log(data.purchModle)
 
             //债券委托详情 网下申购
             if (data.finprodType2 == PINAN_ASSET_TYPE_F01 && data.ps == PS_T04 && data.purchModle == '02') {
@@ -271,9 +271,15 @@ $(function () {
             else if (data.finprodType2 == PINAN_ASSET_TYPE_F01 && (data.tradeMarket == '01' || data.tradeMarket == '02')) {
                 console.log("----------------PINAN_ASSET_TYPE_F01----------------------")
                 console.log(data.tradeMarket);
+                console.log(tradeId);
 
                 var tradeDateVal = data.tradeDateVal;
                 console.log(tradeDateVal);
+
+                if(data.validStatus=='03'){
+                    tradeId = tradeId.substring(0,tradeId.length-1)
+                }
+                console.log(tradeId);
 
                 var param = {
                     "busiCode": tradeId,
