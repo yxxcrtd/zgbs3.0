@@ -1780,7 +1780,7 @@
         </if>
         union all
         select distinct m.seqno               as seqno,
-                m.match_type          as matchType,
+                m.match_type                    as matchType,
                 bo.BID_ID                       as busiCode,
                 m.exe_id                        as execid,
                 m.CSTP_TRADE_ID                 as cstpTradeId,
@@ -1887,30 +1887,33 @@
         </if>
     </select>
     <sql id="vagueQueryTrdCstpWhere">
-        <if test="search != null and search != '' and search !='有效' ">
-            <where>
-                ((aaa.execid || '|' || aaa.busiCode || '|' || sdl.ITEM_VALUE || '|' || aaa.finprodMarketId
-                || '|' || aaa.finprodAbbr || '|' || dictps.ITEM_VALUE
-                || '|' || aaa.assetTypeName || '|T+' || aaa.settleSpeed
-                || '|' || aaa.secManageAcctIdName || '|' || aaa.portfolioIds  || '|' || aaa.portfolioNames
-                || '|' || aaa.counterIdName || '|' || dictquoteTpe.ITEM_VALUE
-                like '%' || #{search} || '%')
-                or to_char(aaa.printAmt,'FM9999999999999990.90')=#{search} or to_char(aaa.printAmt)=#{search}
-                or aaa.tradeYieldStr=#{search} or  aaa.tradeYieldStr =#{search}||'%'
-                or aaa.termDays||'' =#{search}
-                or to_char(aaa.tradeAmt,'FM9999999999999990.90')=#{search} or to_char(aaa.tradeAmt)=#{search}
-                or to_char(aaa.trdFeeAmt,'FM9999999999999990.90')=#{search} or to_char(aaa.trdFeeAmt)=#{search}
-                or to_char(aaa.settleFeeAmt,'FM9999999999999990.90')=#{search} or to_char(aaa.settleFeeAmt)=#{search}
-                or to_char(aaa.tradeDate,'yyyy-MM-dd')=#{search}
-                or to_char(aaa.tradeDate,'yyyy-MM-dd') =#{year}||'-'||#{search}
-                or to_char(aaa.tradeDate,'yyyy/MM/dd') =#{search}
-                or to_char(aaa.tradeDate,'yyyy/MM/dd') =#{year}||'/'||#{search}
-                )
-                <if test="finprodType2 != null  and finprodType2!=''">
-                    AND aaa.finprodType2 = #{finprodType2}
-                </if>
-            </where>
-        </if>
+        <where>
+            <if test="matchStatus_02 != null and matchStatus_02 != '' ">
+                aaa.matchStatus is not null and aaa.matchStatus != #{matchStatus_02}
+            </if>
+            <if test="search != null and search != '' and search !='有效' ">
+                    AND ((aaa.execid || '|' || aaa.busiCode || '|' || sdl.ITEM_VALUE || '|' || aaa.finprodMarketId
+                    || '|' || aaa.finprodAbbr || '|' || dictps.ITEM_VALUE
+                    || '|' || aaa.assetTypeName || '|T+' || aaa.settleSpeed
+                    || '|' || aaa.secManageAcctIdName || '|' || aaa.portfolioIds  || '|' || aaa.portfolioNames
+                    || '|' || aaa.counterIdName || '|' || dictquoteTpe.ITEM_VALUE
+                    like '%' || #{search} || '%')
+                    or to_char(aaa.printAmt,'FM9999999999999990.90')=#{search} or to_char(aaa.printAmt)=#{search}
+                    or aaa.tradeYieldStr=#{search} or  aaa.tradeYieldStr =#{search}||'%'
+                    or aaa.termDays||'' =#{search}
+                    or to_char(aaa.tradeAmt,'FM9999999999999990.90')=#{search} or to_char(aaa.tradeAmt)=#{search}
+                    or to_char(aaa.trdFeeAmt,'FM9999999999999990.90')=#{search} or to_char(aaa.trdFeeAmt)=#{search}
+                    or to_char(aaa.settleFeeAmt,'FM9999999999999990.90')=#{search} or to_char(aaa.settleFeeAmt)=#{search}
+                    or to_char(aaa.tradeDate,'yyyy-MM-dd')=#{search}
+                    or to_char(aaa.tradeDate,'yyyy-MM-dd') =#{year}||'-'||#{search}
+                    or to_char(aaa.tradeDate,'yyyy/MM/dd') =#{search}
+                    or to_char(aaa.tradeDate,'yyyy/MM/dd') =#{year}||'/'||#{search}
+                    )
+                    <if test="finprodType2 != null  and finprodType2!=''">
+                        AND aaa.finprodType2 = #{finprodType2}
+                    </if>
+            </if>
+        </where>
     </sql>
     <select id="findAllTrdBondList" resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmExecBondInfoResponse">
     select * from (
