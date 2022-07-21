@@ -119,10 +119,11 @@ public class ExchangeEntrustHandlerAop {
                 message += outputDto.getConfirmMsg();
                 result.setMessage(message, MessageType.确认消息);
                 if (StringUtil.equals(outputDto.getRskStatus(), 试算结果_风险审批.getValue())) {
-                    result.setData(是否_是.getValue());
+                    ajaxResultMessage.setMessage(是否_是.getValue());
                 }
                 ajaxResultMessage.setData(result);
             }
+            result.setData(message);
         } catch (Exception e) {
             logger.error("风险校验异常:", e);
             result.setErrorList(Lists.newArrayList(new ValidMessage("风险校验异常")));
