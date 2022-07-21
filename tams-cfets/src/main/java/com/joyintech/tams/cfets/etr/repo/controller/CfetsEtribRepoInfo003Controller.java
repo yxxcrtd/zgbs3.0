@@ -84,6 +84,14 @@ public class CfetsEtribRepoInfo003Controller extends BaseController {
             if(Objects.nonNull(entity.getPrice())) {
                 entity.setPrice(entity.getPrice().multiply(new BigDecimal("100")));
             }
+            if (!StringUtil.equals(CacheUtil.getSysParam(BussinessConstant.REPO_PLEDGE_MODEL), "02")) {
+                entity.getEtrInvestRepoInfoDtos().forEach(cfetsEtribRepoInfo003Dto -> {
+                    if(StringUtil.isNotEmpty(cfetsEtribRepoInfo003Dto.getAvaPledgePrin())){
+                        cfetsEtribRepoInfo003Dto.setAvaPledgePrin(
+                                ArithmeticUtil.divide(cfetsEtribRepoInfo003Dto.getAvaPledgePrin(), BigDecimal.valueOf(10000), 2));
+                    }
+                });
+            }
             model.addAttribute(GlobalConstant.ENTITY, entity);
             model.addAttribute("workflowId", workflowId);
             model.addAttribute("person_entity", JsonUtils.object2Json(entity.getEtrInvestPersonInfo()));
