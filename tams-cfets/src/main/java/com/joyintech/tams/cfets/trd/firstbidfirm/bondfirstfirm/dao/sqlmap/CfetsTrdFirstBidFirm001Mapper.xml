@@ -78,9 +78,9 @@
             END           AS issueDateEnd/*投标日 结束*/,
         ee.ENTRUST_NUM*100                       entrustNum,
         CASE
-            WHEN fpi.TENDER_TARGET = '01' THEN to_char(bobp.BID_PRICE , 'FM999,999,999,999,990.9990') || '%'
-            WHEN fpi.TENDER_TARGET = '02' THEN to_char(bobp.BID_PRICE , 'FM999,999,999,999,990.9990') || '元'
-            WHEN fpi.TENDER_TARGET = '03' THEN to_char(bobp.BID_PRICE , 'FM999,999,999,999,990.9990') || 'BP'
+            WHEN fpi.TENDER_TARGET = '01' THEN bobp.BID_PRICE || '%'
+            WHEN fpi.TENDER_TARGET = '02' THEN bobp.BID_PRICE || '元'
+            WHEN fpi.TENDER_TARGET = '03' THEN bobp.BID_PRICE || 'BP'
         ELSE bobp.BID_PRICE END                                                       AS bidPrice,
         eed.PORTFOLIO_ID                         portfolioId,
         eed.PORTFOLIO_NAME                       portfolioName,
@@ -145,10 +145,10 @@
         LEFT JOIN
         (select listagg(case
         when t3.TENDER_TARGET = '01'
-        then to_char(t0.BID_PRICE * 100, 'FM9999999999999990.9990')
-        when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM9999999999999990.9990')
+        then to_char(t0.BID_PRICE * 100, 'FM999,999,999,999,990.9990')
+        when t3.TENDER_TARGET = '02' then to_char(t0.BID_PRICE, 'FM999,999,999,999,990.9990')
         when t3.TENDER_TARGET = '03'
-        then to_char(t0.BID_PRICE * 10000, 'FM9999999999999990.90')
+        then to_char(t0.BID_PRICE * 10000, 'FM999,999,999,999,990.9990')
         end, ',') within group (order by t0.ENTRUST_ID) AS BID_PRICE,
         t0.ENTRUST_ID
         from ETR_ENTRUST_BID_PRICE t0
