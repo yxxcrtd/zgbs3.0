@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.systemtools.util.SysDatadictUtil;
@@ -200,26 +201,32 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
     /**
      * 本方交易员
      */
+    private String tradeNo;
     private String tradeName;
     /**
      * 本方交易商
      */
+    private String dealerNo;
     private String dealerName;
     /**
      * 本方交易主体
      */
+    private String investorNo;
     private String investorName;
     /**
      * 对手方交易员
      */
+    private String counterTradeNo;
     private String counterTradeName;
     /**
      * 对手方交易商
      */
+    private String counterDealerNo;
     private String counterDealerName;
     /**
      * 对手方交易主体
      */
+    private String counterInvestorNo;
     private String counterInvestorName;
     /**
      * 首期成交编号
@@ -527,6 +534,9 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
 
 
     public String getTradeName() {
+        if(StringUtil.isEmpty(tradeName)){
+            return tradeNo;
+        }
         return tradeName;
     }
 
@@ -535,6 +545,9 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
     }
 
     public String getDealerName() {
+        if(StringUtil.isEmpty(dealerName)){
+            return dealerNo;
+        }
         return dealerName;
     }
 
@@ -543,6 +556,9 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
     }
 
     public String getInvestorName() {
+        if(StringUtil.isEmpty(investorName)){
+            return investorNo;
+        }
         return investorName;
     }
 
@@ -551,6 +567,9 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
     }
 
     public String getCounterTradeName() {
+        if(StringUtil.isEmpty(counterTradeName)){
+            return counterTradeNo;
+        }
         return counterTradeName;
     }
 
@@ -559,6 +578,9 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
     }
 
     public String getCounterDealerName() {
+        if(StringUtil.isEmpty(counterDealerName)){
+            return counterDealerNo;
+        }
         return counterDealerName;
     }
 
@@ -567,6 +589,9 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
     }
 
     public String getCounterInvestorName() {
+        if(StringUtil.isEmpty(counterInvestorName)){
+            return counterInvestorNo;
+        }
         return counterInvestorName;
     }
 
@@ -580,5 +605,53 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
 
     public void setFirstTradeId(String firstTradeId) {
         this.firstTradeId = firstTradeId;
+    }
+
+    public String getTradeNo() {
+        return tradeNo;
+    }
+
+    public void setTradeNo(String tradeNo) {
+        this.tradeNo = tradeNo;
+    }
+
+    public String getDealerNo() {
+        return dealerNo;
+    }
+
+    public void setDealerNo(String dealerNo) {
+        this.dealerNo = dealerNo;
+    }
+
+    public String getInvestorNo() {
+        return investorNo;
+    }
+
+    public void setInvestorNo(String investorNo) {
+        this.investorNo = investorNo;
+    }
+
+    public String getCounterTradeNo() {
+        return counterTradeNo;
+    }
+
+    public void setCounterTradeNo(String counterTradeNo) {
+        this.counterTradeNo = counterTradeNo;
+    }
+
+    public String getCounterDealerNo() {
+        return counterDealerNo;
+    }
+
+    public void setCounterDealerNo(String counterDealerNo) {
+        this.counterDealerNo = counterDealerNo;
+    }
+
+    public String getCounterInvestorNo() {
+        return counterInvestorNo;
+    }
+
+    public void setCounterInvestorNo(String counterInvestorNo) {
+        this.counterInvestorNo = counterInvestorNo;
     }
 }
