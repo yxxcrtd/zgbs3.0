@@ -843,6 +843,12 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
             if (StringUtil.isNotEmpty(tmp.get("capDays"))) {
                 dto.setOccupyDays(Integer.valueOf(tmp.get("capDays").toString()));
             }
+
+            // 首次结算日
+            if (StringUtil.isNotEmpty(tmp.get("origSerialDate")) && DateUtil.isDateStr(tmp.get("origSerialDate").toString())) {
+                dto.setOrigSerialDate(DateUtil.format(DateUtil.parse(tmp.get("origSerialDate").toString())));
+            }
+
             // 首次结算日
             if (StringUtil.isNotEmpty(tmp.get("firstSettleDate")) && DateUtil.isDateStr(tmp.get("firstSettleDate").toString())) {
                 dto.setFristSettleDate(DateUtil.format(DateUtil.parse(tmp.get("firstSettleDate").toString())));

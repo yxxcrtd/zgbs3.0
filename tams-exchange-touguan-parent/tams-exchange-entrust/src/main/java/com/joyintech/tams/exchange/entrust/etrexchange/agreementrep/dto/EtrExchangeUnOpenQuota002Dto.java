@@ -105,6 +105,8 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
      */
     private String backDate;
 
+    private String origSerialDate;
+
     /**
      * 到期结算日
      */
@@ -349,6 +351,14 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
 
     public void setBackDate(String backDate) {
         this.backDate = backDate;
+    }
+
+    public String getOrigSerialDate() {
+        return origSerialDate;
+    }
+
+    public void setOrigSerialDate(String origSerialDate) {
+        this.origSerialDate = origSerialDate;
     }
 
     public String getExpireSettleDate() {
