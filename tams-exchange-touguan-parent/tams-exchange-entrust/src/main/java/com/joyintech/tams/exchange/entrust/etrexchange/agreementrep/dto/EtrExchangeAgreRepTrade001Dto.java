@@ -54,6 +54,7 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 	private String entrustId;
 	private String finprodId;
 	private String initialNum;
+	private String initialSettleDate;
 	private BigDecimal pledgeFaceValue;
 	private String newfinprodId;
 	private BigDecimal newpledgeFaceValue;
@@ -322,6 +323,14 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 
 	public void setInitialNum(String initialNum) {
 		this.initialNum = initialNum;
+	}
+
+	public String getInitialSettleDate() {
+		return initialSettleDate;
+	}
+
+	public void setInitialSettleDate(String initialSettleDate) {
+		this.initialSettleDate = initialSettleDate;
 	}
 
 	public BigDecimal getPledgeFaceValue() {
