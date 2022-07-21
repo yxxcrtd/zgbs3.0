@@ -20,6 +20,7 @@ import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.portfolio.ptlfundacctposi.dto.PtlFundAcctPosiDto;
 import com.joyintech.tams.invest.portfolio.ptlfundacctposi.service.PtlFundAcctPosiService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -28,7 +29,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * 
@@ -80,6 +84,11 @@ public class PtlFundAcctPosi002Controller extends BaseController{
         SelectDto selectDto3 = this.getSelectDataFromDataDic(DictCode.互换方式, null);
         for (SelectOptionDto dto : selectDto3.getOptions()) {
             listFloatRate.add(dto);
+        }
+
+        if(CollectionUtils.isNotEmpty(listFloatRate)){
+            listFloatRate = listFloatRate.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(() ->
+                    new TreeSet<>(Comparator.comparing(o -> o.getId() + ";" + o.getText()))), ArrayList::new));
         }
         return listFloatRate;
     }
