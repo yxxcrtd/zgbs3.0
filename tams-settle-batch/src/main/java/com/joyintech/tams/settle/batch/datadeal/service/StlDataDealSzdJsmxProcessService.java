@@ -1422,7 +1422,7 @@ public class StlDataDealSzdJsmxProcessService {
 	private BigDecimal select券面面值(String finprodId) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("finprodId", finprodId);
-		params.put("tradeDate", DateUtil.format(com.joyintech.framework.util.DateUtil.platDateFromCache()));
+		params.put("tradeDate", com.joyintech.framework.util.DateUtil.platDateFromCache());
 		return creditLinesDealsMapper.getFaceValue(params);
 	}
 
