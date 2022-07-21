@@ -674,11 +674,11 @@
         etr_entrust_add.Cap_Days occupyDays,/** 占款天数 **/
         etr_entrust_add.m_Int_Amt intAmt,/** 回购利息 **/
         etr_entrust_add.m_Trade_Amt expireSettleAmt,/** 到期结算金额 **/
-        etr_pledge.finprod_id finprodId, /** 金融产品代码 **/
-        NVL(fin_product.Finprod_Market_Id, fpsq.Finprod_Market_Id) finprodMarketId, /** 质押代码 **/
-        NVL(fin_product.finprod_abbr, fpsq.finprod_abbr) finprodAbbr, /** 质押券名称 **/
-        etr_pledge.Pledge_Ratio * 100 conRatio, /** 折算率 **/
-        etr_pledge.PLEDGE_NUMBER/100 repSecNum, /** 质押数量  **/
+        DECODE(etr_entrust.ps,'T92',pledge.finprod_id,'T96',pledge.finprod_id,'T56',pledge.finprod_id,trdPledge.finprod_id) AS finprodId,
+        DECODE(etr_entrust.ps,'T92',pledge.Finprod_Market_Id,'T96',pledge.Finprod_Market_Id,'T56',pledge.Finprod_Market_Id,trdPledge.Finprod_Market_Id) AS finprodMarketId,/** 质押代码 **/
+        DECODE(etr_entrust.ps,'T92',pledge.finprod_abbr,'T96',pledge.finprod_abbr,'T56',pledge.finprod_abbr,trdPledge.finprod_abbr) AS finprodAbbr, /** 质押券名称 **/
+        DECODE(etr_entrust.ps,'T92',pledge.Pledge_Ratio,'T96',pledge.Pledge_Ratio,'T56',pledge.Pledge_Ratio,trdPledge.Pledge_Ratio) AS conRatio, /** 折算率 **/
+        DECODE(etr_entrust.ps,'T92',pledge.PLEDGE_NUMBER,'T96',pledge.PLEDGE_NUMBER,'T56',pledge.PLEDGE_NUMBER,trdPledge.PLEDGE_NUMBER) AS  repSecNum, /** 质押数量  **/
         case
         when etr_entrust.trade_market = #{TRADE_PLACE_03} then
         #{UNIT_04}
@@ -731,11 +731,37 @@
         LEFT JOIN fin_product            /** 标的类金融产品 **/
         ON    fin_product.finprod_id = etr_entrust.finprod_id
         <!--XYHGFXSJ-122:非首期指令wfl_etr_entrust的finprod_id存的是首期交易编号,需关联质押品表查询质押券信息 modify by fuyongsheng 20220719 start-->
-        LEFT JOIN fin_deal_PLEDGE  fdp           /** 质押品表 **/
-        ON    fdp.finprod_id = etr_entrust.finprod_id
+        LEFT JOIN (
+        SELECT
+        fdp. ENTRUST_ID,
+        fpsq.finprod_id, /** 金融产品代码 **/
+        fpsq.Finprod_Market_Id, /** 质押代码 **/
+        fpsq.finprod_abbr, /** 质押券名称 **/
+        fdp.Pledge_Ratio * 100 Pledge_Ratio, /** 折算率 **/
+        fdp.PLEDGE_NUMBER/100 PLEDGE_NUMBER, /** 质押数量  **/
+        fdp.Pledge_Face_Value Pledge_Face_Value
+        from wfl_etr_pledge fdp     /** 质押品表 **/
         LEFT JOIN fin_product  fpsq           /** 标的类金融产品 **/
-        ON    fpsq.finprod_id = fdp.PLEDGE_FINPROD_ID
+        ON    fpsq.finprod_id = fdp.finprod_id ) pledge ON etr_entrust.ENTRUST_ID = pledge.ENTRUST_ID
         <!--XYHGFXSJ-122:非首期指令wfl_etr_entrust的finprod_id存的是首期交易编号,需关联质押品表查询质押券信息 modify by fuyongsheng 20220719 end-->
+        LEFT JOIN (
+        SELECT
+        A.FINPROD_ID tradeId,
+        FP.FINPROD_ID,
+        FP.FINPROD_MARKET_ID  FINPROD_MARKET_ID,
+        FP.finprod_abbr as finprod_abbr,
+        B.PLEDGE_NUMBER	 PLEDGE_NUMBER,
+        B.Pledge_Ratio	 Pledge_Ratio,
+        B.Pledge_Face_Value printAmt
+        FROM
+        FIN_TRADE_PRODUCT A
+        INNER JOIN FIN_DEAL_PLEDGE B ON B.FINPROD_ID = A.FINPROD_ID AND B.BRANCH = A.BRANCH
+        INNER JOIN FIN_PRODUCT_TYPE C ON B.FINPROD_ID=C.FINPROD_ID
+        AND C.BRANCH = A.BRANCH
+        and C.TYPE_6 = #{TARGET_BACK_TYPE_H01}
+        AND C.TYPE_7 in (#{BACK_LEND_DIRECTION_03},#{BACK_LEND_DIRECTION_04})
+        INNER JOIN FIN_PRODUCT FP ON FP.FINPROD_ID=B.PLEDGE_FINPROD_ID
+        WHERE  A.BRANCH=0) trdPledge on trdPledge.tradeId=etr_entrust.FINPROD_ID
         LEFT JOIN  mst_counter_party      /** 交易对手 **/
         ON    etr_entrust.counter_id = mst_counter_party.counter_id
         LEFT JOIN STL_CAPACCT_INFO SCI
@@ -834,11 +860,11 @@
             wfl_etr_entrust_add.Cap_Days occupyDays,/** 占款天数 **/
             wfl_etr_entrust_add.m_Int_Amt intAmt,/** 回购利息 **/
             wfl_etr_entrust_add.m_Trade_Amt expireSettleAmt,/** 到期结算金额 **/
-            wfl_etr_pledge.finprod_id finprodId, /** 金融产品代码 **/
-            NVL(fin_product.Finprod_Market_Id, fpsq.Finprod_Market_Id) finprodMarketId, /** 质押代码 **/
-            NVL(fin_product.finprod_abbr, fpsq.finprod_abbr) finprodAbbr, /** 质押券名称 **/
-            wfl_etr_pledge.Pledge_Ratio * 100 conRatio, /** 折算率 **/
-            wfl_etr_pledge.PLEDGE_NUMBER/100 repSecNum, /** 质押数量  **/
+            DECODE(wfl_etr_entrust.ps,'T92',pledge.finprod_id,'T96',pledge.finprod_id,'T56',pledge.finprod_id,trdPledge.finprod_id) AS finprodId,
+            DECODE(wfl_etr_entrust.ps,'T92',pledge.Finprod_Market_Id,'T96',pledge.Finprod_Market_Id,'T56',pledge.Finprod_Market_Id,trdPledge.Finprod_Market_Id) AS finprodMarketId,/** 质押代码 **/
+            DECODE(wfl_etr_entrust.ps,'T92',pledge.finprod_abbr,'T96',pledge.finprod_abbr,'T56',pledge.finprod_abbr,trdPledge.finprod_abbr) AS finprodAbbr, /** 质押券名称 **/
+            DECODE(wfl_etr_entrust.ps,'T92',pledge.Pledge_Ratio,'T96',pledge.Pledge_Ratio,'T56',pledge.Pledge_Ratio,trdPledge.Pledge_Ratio) AS conRatio, /** 折算率 **/
+            DECODE(wfl_etr_entrust.ps,'T92',pledge.PLEDGE_NUMBER,'T96',pledge.PLEDGE_NUMBER,'T56',pledge.PLEDGE_NUMBER,trdPledge.PLEDGE_NUMBER) AS  repSecNum, /** 质押数量  **/
             case
             when wfl_etr_entrust.trade_market = #{TRADE_PLACE_03} then
             #{UNIT_04}
@@ -891,11 +917,37 @@
             LEFT JOIN fin_product            /** 标的类金融产品 **/
             ON    fin_product.finprod_id = wfl_etr_entrust.finprod_id
             <!--XYHGFXSJ-122:非首期指令wfl_etr_entrust的finprod_id存的是首期交易编号,需关联质押品表查询质押券信息 modify by fuyongsheng 20220719 start-->
-            LEFT JOIN fin_deal_PLEDGE  fdp           /** 质押品表 **/
-            ON    fdp.finprod_id = wfl_etr_entrust.finprod_id
+            LEFT JOIN (
+            SELECT
+            fdp. ENTRUST_ID,
+            fpsq.finprod_id, /** 金融产品代码 **/
+            fpsq.Finprod_Market_Id, /** 质押代码 **/
+            fpsq.finprod_abbr, /** 质押券名称 **/
+            fdp.Pledge_Ratio * 100 Pledge_Ratio, /** 折算率 **/
+            fdp.PLEDGE_NUMBER/100 PLEDGE_NUMBER, /** 质押数量  **/
+            fdp.Pledge_Face_Value Pledge_Face_Value
+            from wfl_etr_pledge fdp     /** 质押品表 **/
             LEFT JOIN fin_product  fpsq           /** 标的类金融产品 **/
-            ON    fpsq.finprod_id = fdp.PLEDGE_FINPROD_ID
+            ON    fpsq.finprod_id = fdp.finprod_id ) pledge ON wfl_etr_entrust.ENTRUST_ID = pledge.ENTRUST_ID
             <!--XYHGFXSJ-122:非首期指令wfl_etr_entrust的finprod_id存的是首期交易编号,需关联质押品表查询质押券信息 modify by fuyongsheng 20220719 end-->
+            LEFT JOIN (
+            SELECT
+            A.FINPROD_ID tradeId,
+            FP.FINPROD_ID,
+            FP.FINPROD_MARKET_ID  FINPROD_MARKET_ID,
+            FP.finprod_abbr as finprod_abbr,
+            B.PLEDGE_NUMBER	 PLEDGE_NUMBER,
+            B.Pledge_Ratio	 Pledge_Ratio,
+            B.Pledge_Face_Value printAmt
+            FROM
+            FIN_TRADE_PRODUCT A
+            INNER JOIN FIN_DEAL_PLEDGE B ON B.FINPROD_ID = A.FINPROD_ID AND B.BRANCH = A.BRANCH
+            INNER JOIN FIN_PRODUCT_TYPE C ON B.FINPROD_ID=C.FINPROD_ID
+            AND C.BRANCH = A.BRANCH
+            and C.TYPE_6 = #{TARGET_BACK_TYPE_H01}
+            AND C.TYPE_7 in (#{BACK_LEND_DIRECTION_03},#{BACK_LEND_DIRECTION_04})
+            INNER JOIN FIN_PRODUCT FP ON FP.FINPROD_ID=B.PLEDGE_FINPROD_ID
+            WHERE  A.BRANCH=0) trdPledge on trdPledge.tradeId=wfl_etr_entrust.FINPROD_ID
             LEFT JOIN  mst_counter_party      /** 交易对手 **/
             ON    wfl_etr_entrust.counter_id = mst_counter_party.counter_id
             LEFT JOIN STL_CAPACCT_INFO SCI
