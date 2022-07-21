@@ -1490,6 +1490,7 @@
         <if test="vdate != null">
             AND STD.VDATE = #{vdate, jdbcType=DATE}
         </if>
+        order by STD.VDATE desc
     </select>
 
     <select id="getFirstRepoTrade" resultType="com.joyintech.tams.common.base.entity.TrdProductDeal">

@@ -2734,10 +2734,11 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         String tradeId="";
         //wsz 修改行情到期续作 首次结算时间传值
         String date = "";
-        if(StringUtils.isEmpty(dto.getInitialSettleDate())){
-            date = dto.getFristSettleDate();
+        if(!StringUtils.isEmpty(dto.getOrigSerialDate())
+                ||DictCodeListExt3.上农商_指令业务类型_协议回购到期续做指令.getValue().equals(dto.getEntrustBussType())){
+            date = dto.getOrigSerialDate();
         } else {
-            date = dto.getInitialSettleDate();
+            date = dto.getFristSettleDate();
         }
         TrdProductDeal trdProductDeal=trdCommonBaseService.getFirstRepoTrade(dto.getIntiTradeId(),
                 "", dto.getSecAcctId(),
@@ -2766,7 +2767,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
     /**
      * 质押券下拉框
-     * @param dto
+     * @param tradeId
      * @return
      */
     public EtrExchangeAgreRepCurrResp selectCurrPledgeInfo(String tradeId) {
