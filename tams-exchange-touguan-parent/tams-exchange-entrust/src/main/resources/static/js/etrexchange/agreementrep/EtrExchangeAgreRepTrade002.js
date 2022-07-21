@@ -806,11 +806,17 @@
                         $("#fristSettleDate").attr("disabled", true);
                         //到期结算日
                         $("#expireSettleDate").attr("disabled", true);
+                        //提前购回日
+                        $("#advanceRecoveryDate_div").show();
+                        $("#advanceRecoveryDate").val(iPlatformDate).attr("disabled", true).trigger('change');
                     } else {
                         //首期结算日
                         $("#fristSettleDate").val(etrData.fristSettleDate).attr("disabled", true).trigger('change');
                         //到期结算日
                         $("#expireSettleDate").val(iPlatformDate).attr("disabled", true).trigger('change');
+                        //提前购回日
+                        $("#advanceRecoveryDate_div").show();
+                        $("#advanceRecoveryDate").val(iPlatformDate).attr("disabled", true).trigger('change');
                     }
                     //占款天数
                     $("#occupyDays").attr("disabled", true);
@@ -881,6 +887,9 @@
                     $("#fristSettleDate").attr("disabled", true);
                     //到期结算日
                     $("#expireSettleDate").attr("disabled", true);
+                    //提前购回日
+                    $("#advanceRecoveryDate_div").show();
+                    $("#advanceRecoveryDate").val(iPlatformDate).attr("disabled", true).trigger('change');
                     //占款天数
                     $("#occupyDays").attr("disabled", true);
                     //回购利息
@@ -1422,7 +1431,8 @@
                     $("#term_div").hide();
                     //回购金额
                     $("#tradeAmt_div").hide();
-                    $("#tradeAmt").attr("disabled", true);
+                    // $("#tradeAmt").hide();
+                    // $("#tradeAmt").attr("disabled", true);
                     //回购利率
                     $("#yield_div").hide();
                     //首期结算日
@@ -1497,8 +1507,9 @@
                     //回购期限
                     $("#term_div").hide();
                     //回购金额
-                    $("#tradeAmt").hide();
-                    $("#tradeAmt").attr("disabled", true);
+                    $("#tradeAmt_div").hide();
+                    // $("#tradeAmt").hide();
+                    // $("#tradeAmt").attr("disabled", true);
                     //回购利率
                     $("#yield_div").hide();
                     //首期结算日

@@ -808,7 +808,7 @@ public class CfetsInterfReceiveService {
             msgType = (String)param.get("msgType");
         }
         IbuQuoteBondDto ibuQuoteBondDto = new IbuQuoteBondDto();
-        List<IbuQuoteBondDetDto> ibuQuoteBondDetDtoList = new ArrayList<IbuQuoteBondDetDto>();
+        List<IbuQuoteBondDetDto> ibuQuoteBondDetDtoList = new ArrayList<>();
         /* add by lidong 20220628 TISHKS-184同步补充 start */
         param.put("clOrdID",quoteIdConverService.getQuoteIdByQuoteIdConver(param));
         /* add by lidong 20220628 TISHKS-184同步补充 end */

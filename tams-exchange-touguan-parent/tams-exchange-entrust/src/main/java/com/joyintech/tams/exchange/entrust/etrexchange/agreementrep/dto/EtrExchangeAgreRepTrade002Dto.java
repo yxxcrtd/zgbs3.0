@@ -136,6 +136,12 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
     private BigDecimal positionsAmt;
 
     /**
+     * 单位成本
+     */
+    @JsonSerialize(using = BigDecimalSerializer.class)
+    private BigDecimal positionUnitCost;
+
+    /**
      * 最新价
      */
     @JsonSerialize(using = BigDecimalSerializer.class)
@@ -634,5 +640,13 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     public void setAssetType(String assetType) {
         this.assetType = assetType;
+    }
+
+    public BigDecimal getPositionUnitCost() {
+        return positionUnitCost;
+    }
+
+    public void setPositionUnitCost(BigDecimal positionUnitCost) {
+        this.positionUnitCost = positionUnitCost;
     }
 }

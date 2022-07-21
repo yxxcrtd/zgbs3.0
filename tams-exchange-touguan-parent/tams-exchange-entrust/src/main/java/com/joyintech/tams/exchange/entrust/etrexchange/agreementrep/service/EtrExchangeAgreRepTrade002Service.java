@@ -41,7 +41,6 @@ import com.joyintech.tams.invest.common.dto.position.PositionCashSecDto;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeCommonervice;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tools.collectors.JoyinCollectors;
-import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -223,9 +222,12 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
                 EtrExchangeUnitCostDto dto = unitCostMap.get(r.getPortfolioId() + r.getSecAcctId() + r.getFinprodId());
                 if (dto != null) {
                     // 1.持仓成本（元）
-                    r.setPositionsAmt(dto.getBuyCostAmt());
+                    r.setPositionsAmt(Objects.isNull(dto.getBuyCostAmt()) ? new BigDecimal(0) : dto.getBuyCostAmt());
                     // 2.持仓成本价（元） 取单位成本
-                    //r.setUnitCost(dto.getUnitCost());
+                    r.setPositionUnitCost(Objects.isNull(dto.getUnitCost()) ? new BigDecimal(0) : dto.getUnitCost());
+                } else {
+                    r.setPositionsAmt(new BigDecimal(0));
+                    r.setPositionUnitCost(new BigDecimal(0));
                 }
                 // 最新净价*组合持仓.数量 - 持仓成本 as 浮动盈亏
                 BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum());
@@ -253,7 +255,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         if (SecurityUtil.getLoginUser() != null) {
             pageParam.put("userId", SecurityUtil.getLoginUser().getUserName());
         }
-        if(!Objects.isNull(request.getIsDate()) && request.getIsDate()){
+        if (!Objects.isNull(request.getIsDate()) && request.getIsDate()) {
             pageParam.put("isDate", DictCodeList.是否_是.getValue());
         } else if (!Objects.isNull(request.getIsDate()) && !request.getIsDate()) {
             pageParam.put("isDate", DictCodeList.是否_否.getValue());
@@ -660,7 +662,9 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         param.put("zyj", request.getZyj());
         param.put("search_isNumberFlag", BaseMap.isNumeric(request.getKeywords()));
         param.put("DISPLACE DIRECTION_01", DictCodeListExt3.质押券置换_置换方向_换入.getValue());
-
+        param.put("TARGET_BACK_TYPE_H01", DictCodeList.回购类型_质押式协议回购.getValue());
+        param.put("BACK_LEND_DIRECTION_03", DictCodeList.回购拆借方向_正回购.getValue());
+        param.put("BACK_LEND_DIRECTION_04", DictCodeList.回购拆借方向_逆回购.getValue());
         Page<EtrExchangeAgreRepTrade003Dto> page = super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(), () -> etrExchangeAgreRepTradeMapper.selectEtrEntrust(param));
 
         List<SysUser> userList = restTemplate.postForList(ServiceApplication.ENTRUST_SERVICE_NAME + "/EntrustCommon/getAllUserList",

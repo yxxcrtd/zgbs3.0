@@ -155,6 +155,7 @@ public class PeriodRiskInputParamService extends RiskCommonService {
             list.addAll(interfRiskRdsService.getRiskRdsListData(riskRdsDto, dto.getBillingDetails(), map -> {
                 // 处理交易方向、交易金额等
                 map.put("tradeId",dto.getBusiCode() + "-" + map.get("portfolioId"));
+                map.put("ps",DictCodeList.交易方向_收取.getValue());
                 map.put("effectCash","Y");
                 BigDecimal tradeAmt = map.get("deliveryAmount") == null ? BigDecimal.ZERO : new BigDecimal(map.get("deliveryAmount").toString());
                 map.put("tradeAmt",tradeAmt);
