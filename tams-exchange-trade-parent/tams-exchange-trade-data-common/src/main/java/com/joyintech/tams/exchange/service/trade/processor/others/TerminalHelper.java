@@ -5,6 +5,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
+import com.joyintech.background.component.common.pack.common.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondBean;
@@ -466,6 +467,7 @@ public class TerminalHelper {
         repurchaseQuoteReceiveResponse.setBackBalance(BigDecimal.valueOf(source.getSettleBalance()));
         repurchaseQuoteReceiveResponse.setCpClientName(source.getPropAccountName());
         repurchaseQuoteReceiveResponse.setOrigSerialNo(source.getOrigCbpconferId());
+        repurchaseQuoteReceiveResponse.setOrigSerialDate(DateUtil.format(DateUtil.parse(String.valueOf(source.getOrigEntrustDate()))));
         repurchaseQuoteReceiveResponse.setRemark(source.getRemark());
         repurchaseQuoteReceiveResponse.setAccount(source.getFundAccount());
 //        repurchaseQuoteReceiveResponse.setAccountName();
