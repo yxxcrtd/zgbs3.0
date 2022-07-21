@@ -282,6 +282,9 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
     @ApiModelProperty(name = "maturityDate", value = "回购到期日")
     private String maturityDate;
 
+    @ApiModelProperty(name = "requestNo", value = "行情编号")
+    private String requestNo;
+
     public boolean isNoCancelEntrust() {
         return noCancelEntrust;
     }
@@ -924,5 +927,13 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
 
     public void setMaturityDate(String maturityDate) {
         this.maturityDate = maturityDate;
+    }
+
+    public String getRequestNo() {
+        return requestNo;
+    }
+
+    public void setRequestNo(String requestNo) {
+        this.requestNo = requestNo;
     }
 }
