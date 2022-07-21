@@ -921,12 +921,12 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
      * @return
      */
     private List<FinDealPledge> getSqFinDealPledges(TrdProductDealAdd trdProductDealAdd){
-        EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(trdProductDealAdd.getEntrustId());
-        String hgsqFinprodId = trdCommonBaseService.selectHgsqFinprodId(trdProductDealAdd.getPortfolioId(), etrEntrustAdd.getTradeId());
-        if (StringUtil.isNotBlank(hgsqFinprodId)) {
+        // 协议回购非首期的指令的finProdId存的是首期交易编号
+        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(trdProductDealAdd.getEntrustId());
+        if (null != etrEntrust) {
             // 质押券信息
             FinDealPledgeKey finDealPledgeKey = new FinDealPledgeKey();
-            finDealPledgeKey.setFinprodId(hgsqFinprodId);
+            finDealPledgeKey.setFinprodId(etrEntrust.getFinprodId());
             finDealPledgeKey.setBranch(0L);
             return exchangeTransMatchCommonMapper.selectFinDealPledges(finDealPledgeKey);
         }
