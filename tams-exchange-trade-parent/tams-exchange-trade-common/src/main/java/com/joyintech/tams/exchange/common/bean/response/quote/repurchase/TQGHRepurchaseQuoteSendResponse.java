@@ -13,6 +13,12 @@ public class TQGHRepurchaseQuoteSendResponse extends SQRepurchaseQuoteSendRespon
     @ApiModelProperty(name = "repoAdvanceDate", value = "提前购回日")
     private String repoAdvanceDate;
 
+    @ApiModelProperty(name = "compactTerm", value = "回购期限")
+    private Integer compactTerm;
+
+    @ApiModelProperty(name = "compactTermStr", value = "回购期限（单位：天）")
+    private String compactTermStr;
+
     public String getOrigSerialNo() {
         return origSerialNo;
     }
@@ -27,5 +33,21 @@ public class TQGHRepurchaseQuoteSendResponse extends SQRepurchaseQuoteSendRespon
 
     public void setRepoAdvanceDate(String repoAdvanceDate) {
         this.repoAdvanceDate = repoAdvanceDate;
+    }
+
+    public Integer getCompactTerm() {
+        return compactTerm;
+    }
+
+    public void setCompactTerm(Integer compactTerm) {
+        this.compactTerm = compactTerm;
+    }
+
+    public String getCompactTermStr() {
+        return compactTermStr;
+    }
+
+    public void setCompactTermStr(String compactTermStr) {
+        this.compactTermStr = compactTermStr;
     }
 }

@@ -556,15 +556,16 @@ public class IntegratedQuoteManagement {
         }
 
         // 到期购回
-/*        else if (RepurchaseTypeEnum.首期.getBusiTypeTgCode().equals(busiTypeTg)) {
-            baseRepurchaseQuoteSendResponse.setRequestType(RepoTypeEnum.REPO_MATURITY.getCode());
+        else if (RepurchaseTypeEnum.到期购回.getBusiTypeTgCode().equals(busiTypeTg)) {
+            baseRepurchaseQuoteSendResponse = new TQGHRepurchaseQuoteSendResponse();
+            baseRepurchaseQuoteSendResponse.setRequestType(RepurchaseTypeEnum.到期购回.getCode());
 
-            fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse);
+            fillSQQuoteSendResponse(entrust, (SQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse, instruction);
 
-            DQGHRepurchaseQuoteSendResponse sendResponse = (DQGHRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
-
+            TQGHRepurchaseQuoteSendResponse sendResponse = (TQGHRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
             sendResponse.setCompactTerm(entrust.getCompactTerm());
-        }*/
+            sendResponse.setOrigSerialNo(entrust.getOrigSerialNo());
+        }
 
         // 到期续做
         else if (RepurchaseTypeEnum.到期续做.getBusiTypeTgCode().equals(busiTypeTg)) {
@@ -640,6 +641,14 @@ public class IntegratedQuoteManagement {
 
         baseRepurchaseQuoteSendResponse.setFirstSettleDate(DateUtil.format(DateUtil.parse(entrust.getFirstSettleDate())));
         baseRepurchaseQuoteSendResponse.setBackDate(DateUtil.format(DateUtil.parse(entrust.getBackDate())));
+
+        if (StringUtil.isNotEmpty(entrust.getExtend2())) {
+            Map<String, Object> extend2 = JsonUtils.getObjectFromJson(entrust.getExtend2(), Map.class);
+            Object capDays = extend2.get("capDays");
+            if (Objects.nonNull(capDays)) {
+                baseRepurchaseQuoteSendResponse.setCapDays((int) capDays);
+            }
+        }
 
     }
 }
