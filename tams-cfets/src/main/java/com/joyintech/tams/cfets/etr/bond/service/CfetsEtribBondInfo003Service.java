@@ -1744,7 +1744,7 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
             posport.setPortfolioId(dto.getPortfolioId());
             posport.setEtrId(dto.getEntrustId());
             if(StringUtil.isNotEmpty(dto.getPortfolioId())){
-                Map<String, Object> map = new HashMap<String, Object>();
+                Map<String, Object> map = new HashMap<>();
                 map.put("portfolioId", dto.getPortfolioId());
                 map.put("acctType", BussinessDictCodeList.资金账户类型_托管账户.getValue());
                 String cashAcctId = this.qryPortfolioCashAcctId(map);
@@ -1753,7 +1753,7 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
                 }
             }
             if (StringUtil.isNotEmpty(dto.getPortfolioId()) && StringUtil.isNotEmpty(entity.getFinprodId())) {
-                Map<String, Object> map = new HashMap<String, Object>();
+                Map<String, Object> map = new HashMap<>();
                 map.put("portfolioId", dto.getPortfolioId());
                 map.put("finprodId", entity.getFinprodId());
                 String secAcctId = this.qryPortfolioSecAcctId(map);

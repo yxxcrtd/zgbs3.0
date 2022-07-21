@@ -49,6 +49,7 @@ import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.PtlPositionHoldDto;
 import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
@@ -62,6 +63,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * CFETS现券买卖报价
@@ -1503,15 +1505,18 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
 //			ptlCashPositionFlows.add(ptlCashPositionFlowDtoUnit);
 		}
 
+        Map<String, IbuQuoteEtrReDto> ibuQuoteEtrReDtoMap = ibuQuoteEtrReDtoList.stream()
+                .collect(Collectors.toMap(IbuQuoteEtrReDto::getEntrustId, ibuQuoteEtrReDto -> ibuQuoteEtrReDto));
+
 		ptlPositionHoldDto.setPtlCashPositionFlows(ptlCashPositionFlows);
 		ptlPositionHoldDto.setPtlSecPositionFlows(ptlSecPositionFlows);
         ptlPositionHoldDto.getPtlCashPositionFlows().forEach(etrCashPositionFlowDto -> {
             etrCashPositionFlowDto.setCdate(settleDate);
             BigDecimal unitFprice = BigDecimal.ONE;
-            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(etrCashPositionFlowDto.getEntrustId());
             // 券面与现金流水金额相同时,根据指令的全价重新计算
             if (BigDecimalUtil.ACompareToB(
-                    ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), BigDecimal.valueOf(100)), etrCashPositionFlowDto.getAmount().abs(), 4) == 0) {
+                    ArithmeticUtil.multiply(ibuQuoteEtrReDtoMap.get(etrCashPositionFlowDto.getEntrustId()).getShareAmt(), BigDecimal.valueOf(100)),
+                    etrCashPositionFlowDto.getAmount().abs(), 4) == 0) {
                 EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(etrCashPositionFlowDto.getEntrustId());
                 unitFprice = unitFprice.multiply(etrEntrustAdd.getFullPrice());
                 etrCashPositionFlowDto.setAmount(ArithmeticUtil.divide(

@@ -158,6 +158,12 @@ public class RepurchaseQuoteReceiveResponse {
     @ApiModelProperty(name = "origSerialNo", value = "初始交易编号")
     private String origSerialNo;
 
+    /**
+     * 上海证券交易所时有值，深圳证券交易所为空
+     */
+    @ApiModelProperty(name = "origSerialDate", value = "初始交易日期")
+    private String origSerialDate;
+
     @ApiModelProperty(name = "remark", value = "补充协议")
     private String remark;
 
@@ -550,6 +556,14 @@ public class RepurchaseQuoteReceiveResponse {
         this.origSerialNo = origSerialNo;
     }
 
+    public String getOrigSerialDate() {
+        return origSerialDate;
+    }
+
+    public void setOrigSerialDate(String origSerialDate) {
+        this.origSerialDate = origSerialDate;
+    }
+
     public String getRemark() {
         return remark;
     }
@@ -717,6 +731,7 @@ public class RepurchaseQuoteReceiveResponse {
                 ", cpInvestorTypeStr='" + cpInvestorTypeStr + '\'' +
                 ", cpClientName='" + cpClientName + '\'' +
                 ", origSerialNo='" + origSerialNo + '\'' +
+                ", origSerialDate='" + origSerialDate + '\'' +
                 ", remark='" + remark + '\'' +
                 ", account='" + account + '\'' +
                 ", accountName='" + accountName + '\'' +
@@ -781,6 +796,7 @@ public class RepurchaseQuoteReceiveResponse {
                 "," + cpInvestorTypeStr +
                 "," + cpClientName +
                 "," + origSerialNo +
+                "," + origSerialDate +
                 "," + remark +
                 "," + account +
                 "," + accountName +
