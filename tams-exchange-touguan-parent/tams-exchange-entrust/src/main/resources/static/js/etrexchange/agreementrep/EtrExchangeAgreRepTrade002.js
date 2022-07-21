@@ -1751,6 +1751,7 @@
             if(object.ps == 'T94'){
                 return;
             }
+            debugger;
             if(object) {
                 // 交易所协议回购 指令环节，只有正回购、逆回购、到期续做等交易方向参与风险试算
                 var busiType = $("#ps").val();
@@ -1782,6 +1783,9 @@
                     Joyin.ajaxJson(basePath + '/etrexchange/agreementrep/etrExchangeAgreRepTradeRiskCal/doRiskcal', riskParams, function (data) {
                         $("#riskTrialSpan").html("&nbsp;&nbsp;" + data.data.data.riskTrialSpan);
                         entity_RiskTrialRetList = data.data.data.riskcalReturnList;
+                        if(!entity_RiskTrialRetList) {
+                            entity_RiskTrialRetList = []
+                        }
                         $.each(entity_RiskTrialRetList, function (index, item) {
                             item.conclusion = data.data.data.riskTrialSpan;
                         })
