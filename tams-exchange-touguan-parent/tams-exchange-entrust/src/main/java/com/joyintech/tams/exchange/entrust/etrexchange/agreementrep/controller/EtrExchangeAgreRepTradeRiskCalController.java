@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_解除质押;
+
 /**
  * 协议回购指令风险试算
  * @author etliu
@@ -79,6 +81,14 @@ public class EtrExchangeAgreRepTradeRiskCalController extends BaseController {
 //                return new Message<AjaxResult>().fail().setMessage(message);
 //            }
             EtrExchangeTradeCommonRiskcalResponse result = new EtrExchangeTradeCommonRiskcalResponse();
+            if(StringUtil.isNotEmpty(dto.getPs()) && StringUtil.equals(dto.getPs(), 交易方向_解除质押.getValue()) && StringUtil.equals(dto.getTradeMarket(),"03")) {//上交所
+                AjaxResult m =new AjaxResult();
+                result.setRiskMathFlag("02");
+                result.setRskStatus("0");
+                result.setRiskTrialSpan("试算通过");
+                m.setData(result);
+                return new Message<AjaxResult>().success().setData(m);
+            }
             //风险试算组装dto
             Map<String, Object> dataMap = etrExchangeAgreRepTrade001Service.doRiskcalPackageEquity(dto);
             List<String> resultArrList = new ArrayList<>();
