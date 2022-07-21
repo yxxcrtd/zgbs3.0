@@ -804,11 +804,17 @@
                         $("#fristSettleDate").attr("disabled", true);
                         //到期结算日
                         $("#expireSettleDate").attr("disabled", true);
+                        //提前购回日
+                        $("#advanceRecoveryDate_div").show();
+                        $("#advanceRecoveryDate").val(iPlatformDate).attr("disabled", true).trigger('change');
                     } else {
                         //首期结算日
                         $("#fristSettleDate").val(etrData.fristSettleDate).attr("disabled", true).trigger('change');
                         //到期结算日
                         $("#expireSettleDate").val(iPlatformDate).attr("disabled", true).trigger('change');
+                        //提前购回日
+                        $("#advanceRecoveryDate_div").show();
+                        $("#advanceRecoveryDate").val(iPlatformDate).attr("disabled", true).trigger('change');
                     }
                     //占款天数
                     $("#occupyDays").attr("disabled", true);
@@ -879,6 +885,9 @@
                     $("#fristSettleDate").attr("disabled", true);
                     //到期结算日
                     $("#expireSettleDate").attr("disabled", true);
+                    //提前购回日
+                    $("#advanceRecoveryDate_div").show();
+                    $("#advanceRecoveryDate").val(iPlatformDate).attr("disabled", true).trigger('change');
                     //占款天数
                     $("#occupyDays").attr("disabled", true);
                     //回购利息
