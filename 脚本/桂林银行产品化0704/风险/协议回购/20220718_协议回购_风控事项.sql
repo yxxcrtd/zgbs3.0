@@ -1,4 +1,4 @@
-select * from RSK_EVENT_ITEM_RULE where EVENT_CODE='EVENT_ID_XJGMCTH_06' and ITEM_CODE='ps' and GROUP_ID='2166aeb2feb240af9598b33b7ba3157e';
+--select * from RSK_EVENT_ITEM_RULE where EVENT_CODE='EVENT_ID_XJGMCTH_06' and ITEM_CODE='ps' and GROUP_ID='2166aeb2feb240af9598b33b7ba3157e';
 
 -- 产品总资产
 delete from RSK_EVENT_ITEM_RULE where EVENT_CODE='EVENT_ID_CPZZC_06' and ITEM_CODE='ps' and GROUP_ID='7e014d7da34d4c29b0ceb8508adbeea0';
