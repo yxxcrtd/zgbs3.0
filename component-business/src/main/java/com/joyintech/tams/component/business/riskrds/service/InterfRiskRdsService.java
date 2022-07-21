@@ -85,6 +85,8 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_解除质押;
+
 /**
  * 接口组件Service
  *
@@ -2290,6 +2292,10 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                 }
                 if(StringUtil.equals(ps,DictCodeListExt3.交易方向_到期续做.getValue())) {//到期续作的时候占用差值
                     infRiskRdsDto.setAmount(ArithmeticUtil.subtract(CommonUtil.getBigDecimal(dataMap, "tradeAmt", BigDecimal.ZERO),CommonUtil.getBigDecimal(dataMap, "fristExpireSettleAmt", BigDecimal.ZERO)));
+                    infRiskRdsDto.setTradeNum(infRiskRdsDto.getAmount());
+                }
+                if(StringUtil.isNotEmpty(ps) && StringUtil.equals(ps, 交易方向_解除质押.getValue()) && StringUtil.equals(infRiskRdsDto.getTradePlace(),DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+                    infRiskRdsDto.setAmount( BigDecimal.ZERO);
                     infRiskRdsDto.setTradeNum(infRiskRdsDto.getAmount());
                 }
                 return infRiskRdsDto;

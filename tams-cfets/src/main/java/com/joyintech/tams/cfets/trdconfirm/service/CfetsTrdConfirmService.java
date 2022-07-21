@@ -2798,6 +2798,8 @@ public class CfetsTrdConfirmService extends BaseService {
                 pageParam.put("userId", SecurityUtil.getLoginUser().getUserName());
             }
         }
+        // 未匹配
+        pageParam.put("matchStatus_02", "02");
         return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> cfetsTrdConfirmMapper.findAllTrdCstpInfoList(pageParam));
 
     }

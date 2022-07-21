@@ -186,11 +186,15 @@ public class OrderController {
         if (StringUtil.isNotEmpty(integratedEntrust.getExtend2())) {
             extend2 = JsonUtils.getObjectFromJson(integratedEntrust.getExtend2(), Map.class);
         }
-        if (StringUtil.isNotEmpty(instruction.getMaturityDate())) {
+        if (StringUtil.isNotEmpty(order.getMaturityDate())) {
             extend2.put("maturityDate", order.getMaturityDate());
         }
         if (Objects.nonNull(instruction.getCapDays())) {
             extend2.put("capDays", instruction.getCapDays().intValue());
+        }
+        if (Objects.nonNull(order.getRequestNo())) {
+            //行情编号 借用字段 sellerNo
+            integratedEntrust.setSellerNo(order.getRequestNo());
         }
         integratedEntrust.setExtend2(JsonUtils.getJsonFromObject(extend2));
 

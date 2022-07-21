@@ -187,6 +187,8 @@ public class RepurchaseQuoteReceiveResponse {
     private String tradeMarketStr;
     @ApiModelProperty(name = "pledgeNumberStr", value = "质押数量（单位：万元，保留两位小数）")
     private String pledgeNumberStr;
+    @ApiModelProperty(name = "discountStr", value = "折算率(%)")
+    private String discountStr;
 
     public String getRequestNo() {
         return requestNo;
@@ -633,7 +635,7 @@ public class RepurchaseQuoteReceiveResponse {
         if (StrUtil.isEmpty(this.getTradeMarket())) {
             return null;
         }
-        String description =  cn.hutool.core.util.EnumUtil.getFieldBy(Market::getDescription, Market::getInvestValue, this.getTradeMarket());
+        String description = cn.hutool.core.util.EnumUtil.getFieldBy(Market::getDescription, Market::getInvestValue, this.getTradeMarket());
         return description == null ? this.getTradeMarket() : description;
     }
 
@@ -642,7 +644,15 @@ public class RepurchaseQuoteReceiveResponse {
             return null;
         }
 
-        return NumberUtil.div(this.getPledgeNumber(), 100,2).toString();
+        return NumberUtil.div(this.getPledgeNumber(), 100, 2).toString();
+    }
+
+    public String getDiscountStr() {
+        if (ObjectUtil.isEmpty(this.getDiscount())) {
+            return null;
+        }
+
+        return NumberUtil.mul(this.getDiscount(), 100).toString();
     }
 
     public String getSwapIntoBondsVolumeStr() {
@@ -650,7 +660,7 @@ public class RepurchaseQuoteReceiveResponse {
             return null;
         }
 
-        return NumberUtil.div(this.getSwapIntoBondsVolume(), 100,2).toString();
+        return NumberUtil.div(this.getSwapIntoBondsVolume(), 100, 2).toString();
     }
 
     public String getSwapOutBondsVolumeStr() {
@@ -658,7 +668,7 @@ public class RepurchaseQuoteReceiveResponse {
             return null;
         }
 
-        return NumberUtil.div(this.getSwapOutBondsVolume(), 100,2).toString();
+        return NumberUtil.div(this.getSwapOutBondsVolume(), 100, 2).toString();
     }
 
     public String getOrigBondsVolumeStr() {
@@ -666,14 +676,14 @@ public class RepurchaseQuoteReceiveResponse {
             return null;
         }
 
-        return NumberUtil.div(this.getOrigBondsVolume(), 100,2).toString();
+        return NumberUtil.div(this.getOrigBondsVolume(), 100, 2).toString();
     }
 
     public String getTransCodeStr() {
         if (StrUtil.isEmpty(this.getTransCode())) {
             return null;
         }
-        String description =  EnumUtil.getDescriptionByCode(RepurchaseDQXZTypeEnum.class, this.getTransCode());
+        String description = EnumUtil.getDescriptionByCode(RepurchaseDQXZTypeEnum.class, this.getTransCode());
         return description == null ? this.getTransCode() : description;
     }
 
@@ -745,7 +755,7 @@ public class RepurchaseQuoteReceiveResponse {
     }
 
     public String toValueString() {
-        return "{" +requestNo +
+        return "{" + requestNo +
                 "," + requestType +
                 "," + bs +
                 "," + tradeMarket +
@@ -806,6 +816,7 @@ public class RepurchaseQuoteReceiveResponse {
                 "," + bsStr +
                 "," + tradeMarketStr +
                 "," + pledgeNumberStr +
+                "," + discountStr +
                 "}";
     }
 }

@@ -346,12 +346,13 @@ public class TradeRdsCommonAop {
                 if (CommonUtil.findValue(etrMap, "settleAmt") != null){
                     etrMap.put("entrustNum",CommonUtil.findValue(etrMap, "settleAmt"));
                 }
+                etrMap.put("manualSettle","Y");
                 if(StringUtil.equals(金融产品类型_投管用_债券质押式正回购.getValue(),CommonUtil.findValue(mapTrd, "finprodType2")) ||
                    StringUtil.equals(金融产品类型_投管用_债券质押式逆回购.getValue(),CommonUtil.findValue(mapTrd, "finprodType2"))) {//针对协议回购交收失败
                     mapTrd.put("tradeAmt",CommonUtil.findValue(mapTrd, "tradedVolume"));
                     mapTrd.put("entrustNum",CommonUtil.findValue(mapTrd, "tradedVolume"));
+                    etrMap.put("manualSettle","N");
                 }
-                etrMap.put("manualSettle","Y");
                 revokeManualSettle(etrMap, BussinessDictCodeListRds.接口系统ID_预占释放接口.getValue(), BussinessDictCodeListRds.事件类型_投资委托.getValue(),assetType,joinPoint);
             }else {
                 revokeBackRiskCommon(mapTrd, infCode, joinPoint);
