@@ -48,7 +48,8 @@ public class NegotiatedRepoCheckStrategy extends BaseCheckKit implements IBusine
         }
         String entrustProp = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
 
-        checkSpecilParamInShMarket(integratedEntrust);
+        //检查对手方信息
+        checkPropDealerTradeInfo(integratedEntrust);
 
         // 解除质押和中途换券无需判断
         if (!EntrustProp.isRepurchaseReleaseOrExchange(entrustProp)
@@ -57,6 +58,27 @@ public class NegotiatedRepoCheckStrategy extends BaseCheckKit implements IBusine
             throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "回购金额或到期结算金额不能为0");
         }
         return ResultBean.success();
+    }
+
+    private void checkPropDealerTradeInfo(IntegratedEntrust entrust) {
+        if (StrUtil.isEmpty(entrust.getCounterId()) || StrUtil.isEmpty(entrust.getCounterName())) {
+            throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "交易对手代码或名称不能为空");
+        }
+        if (StrUtil.isEmpty(entrust.getPropDealerId())) {
+            throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "对手方交易商代码不能为空");
+        }
+        if (StrUtil.isEmpty(entrust.getPropTradeId())) {
+            throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "对手方交易员代码不能为空");
+        }
+
+        if (Market.SZSE.codeNotEquals(entrust.getMarket())) {
+            if (StrUtil.isEmpty(entrust.getPropInvestorId())) {
+                throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "对手方交易主体代码不能为空");
+            }
+            if (StrUtil.isEmpty(entrust.getPropOwnerType())) {
+                throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "对手方交易主体类型不能为空");
+            }
+        }
     }
 
     private void checkSpecilParamInShMarket(IntegratedEntrust integratedEntrust) {
@@ -77,4 +99,6 @@ public class NegotiatedRepoCheckStrategy extends BaseCheckKit implements IBusine
             integratedEntrust.setPropSeatName(integratedEntrust.getPropSeatNo());
         }
     }
+
+
 }
