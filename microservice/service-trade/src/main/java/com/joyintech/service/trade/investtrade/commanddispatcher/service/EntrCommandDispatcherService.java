@@ -123,7 +123,8 @@ public class EntrCommandDispatcherService extends BaseService<EntrCommandDispatc
     	if(list != null && !list.isEmpty()) {
 	    	for(EntrCommandDispatcherDto dto : list) {
 	    		if("F02".equals(dto.getFinprodType2()) || "F03".equals(dto.getFinprodType2()) ) {
-					if (StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), dto.getBusiTypeTg())) {
+					if (StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), dto.getBusiTypeTg()) ||
+							StringUtil.equals(DictCodeListExt3.投管业务类型_中途换券.getValue(), dto.getBusiTypeTg())) {
 						List<EntrTradePledgeDto> queryEtrPledgeList = entrTradeSysInterfMapper.queryEtrPledgeListByEtrId(dto.getEntrustId());
 						if(queryEtrPledgeList!=null && !queryEtrPledgeList.isEmpty()) {
 							pledgelist.addAll(queryEtrPledgeList);
