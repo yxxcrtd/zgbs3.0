@@ -2849,6 +2849,8 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         settleInfo.setEntrustNo(infContractDetailfile.getEntrustId());
         // 指令序号
         settleInfo.setOrderId(infContractDetailfile.getOrderNo());
+        // 指令委托ID
+        settleInfo.setEntrustOrderId(infContractDetailfile.getOrderId());
         // SETTLE_DATE	交收日期
         settleInfo.setSettleDate(infContractDetailfile.getSettleDay());
         // SEC_ACCT_ID	证券账户

@@ -30,6 +30,11 @@ public class TrdManualSettleInfo extends BaseEntity {
     private String orderId;
 
     /**
+     * 指令委托Id
+     */
+    private String entrustOrderId;
+
+    /**
      * 原业务编号
      */
     private String tradeId;
@@ -152,6 +157,13 @@ public class TrdManualSettleInfo extends BaseEntity {
 
     private String counterName;
 
+    public String getEntrustOrderId() {
+        return entrustOrderId;
+    }
+
+    public void setEntrustOrderId(String entrustOrderId) {
+        this.entrustOrderId = entrustOrderId;
+    }
 
     /**
      * 取得 待交割序号
