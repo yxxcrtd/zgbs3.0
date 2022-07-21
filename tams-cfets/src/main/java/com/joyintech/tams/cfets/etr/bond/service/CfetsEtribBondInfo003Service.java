@@ -333,7 +333,7 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
                 }
                 //发送头寸
                 //sendPositionMethod(entity,entity.getSubmitFlag());
-                this.sendPositionMethod(entity, StringUtil.equals(entity.getSystemAct(), DictCodeListExt3.系统动作_新建.getValue()),null);
+                this.sendPositionMethod(entity, StringUtil.equals(entity.getSystemAct(), DictCodeListExt3.系统动作_新建.getValue()), true, null);
 
             }
         }
@@ -408,7 +408,7 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
             //发送头寸
             //entity.setSoftSkipMode("Y");
             try {
-                this.sendPositionMethod(entity, isSubmit, confirmOk);
+                this.sendPositionMethod(entity, isSubmit, false, confirmOk);
             } catch (Exception e) {
                 Message message = PositionUtil.ajaxErrorReturn(e);
                 BaseMap bm = (BaseMap) message.getData();
@@ -1736,7 +1736,16 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
         }
         return result;
     }
-    private  void sendPositionMethod(CfetsEtribBondInfo003Dto entity,boolean isSubmit,String confirmOk){
+
+    /**
+     * 发送头寸报文
+     *
+     * @param entity     页面元素
+     * @param isSubmit   是否提交
+     * @param isDoInsert 是否是doInsert调用
+     * @param confirmOk  是否确认
+     */
+    private void sendPositionMethod(CfetsEtribBondInfo003Dto entity, boolean isSubmit, boolean isDoInsert, String confirmOk) {
         List<CfetsEtrIbPosPortfolioRequest> ptlList=new ArrayList<>();
         for (CfetsEtribBondInfo003Dto dto : entity.getEtrInvestBondInfoDtos()) {
             //调用头寸
@@ -1779,11 +1788,11 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
         req.setWorkFlowId(entity.getWorkflowId());
         req.setFlowStatus(DictCodeListExt3.流程节点_流程提交.getValue());
         req.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
-        String balanceCheck="Y";
-        if (isSubmit&&(StringUtil.isNotEmpty(entity.getSoftSkipMode())
+        String balanceCheck = DictCodeList.是否_是.getValue();
+        if (isDoInsert && (StringUtil.isNotEmpty(entity.getSoftSkipMode())
                 && StringUtil.equals(entity.getSoftSkipMode(), DictCodeList.是否_是.getValue()))) {
             balanceCheck = DictCodeList.是否_否.getValue();
-        }else if ( StringUtil.isNotEmpty(confirmOk)) {
+        } else if (StringUtil.isNotEmpty(confirmOk)) {
             balanceCheck = DictCodeList.是否_否.getValue();
         }
         req.setBalanceCheck(balanceCheck);

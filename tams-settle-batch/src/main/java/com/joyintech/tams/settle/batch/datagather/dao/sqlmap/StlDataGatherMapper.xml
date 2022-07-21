@@ -471,28 +471,28 @@
 		OR
 		std.APPLY_TRADE_ID = teh.BROKER_ENTRUST_ID
 		)
-		and teh.ENTRUST_STATUS IN ('2', '5', '6', '8') AND to_char(DEAL_DATE, 'yyyyMMdd') = teh.TRADING_DAY AND (std.TRADE_PLAT = '02' or std.TRADE_PLAT IS NULL)
+		and teh.ENTRUST_STATUS IN ('2', '5', '6', '8') AND to_char(DEAL_DATE, 'yyyyMMdd') = teh.TRADING_DAY <!--XYHGFXSJ-247:AND (std.TRADE_PLAT = '02' or std.TRADE_PLAT IS NULL)-->
 		LEFT JOIN T_ENTRUST te
 		ON (
 		LTRIM(substr(std.APPLY_TRADE_ID, 5, length(std.APPLY_TRADE_ID)), '0') = te.BROKER_ENTRUST_ID
 		OR
 		std.APPLY_TRADE_ID = te.BROKER_ENTRUST_ID
 		)
-		and te.ENTRUST_STATUS IN ('2', '5', '6', '8') AND to_char(DEAL_DATE, 'yyyyMMdd') = te.TRADING_DAY AND (std.TRADE_PLAT = '02' or std.TRADE_PLAT IS NULL)
+		and te.ENTRUST_STATUS IN ('2', '5', '6', '8') AND to_char(DEAL_DATE, 'yyyyMMdd') = te.TRADING_DAY <!--XYHGFXSJ-247:AND (std.TRADE_PLAT = '02' or std.TRADE_PLAT IS NULL)-->
 		LEFT JOIN T_INTEGRATED_ENTRUSTHISTORY tieh
 		ON (
 		LTRIM(substr(std.APPLY_TRADE_ID, 5, length(std.APPLY_TRADE_ID)), '0') = tieh.BROKER_ENTRUST_ID
 		OR
 		std.APPLY_TRADE_ID = tieh.BROKER_ENTRUST_ID
 		)
-		and tieh.ENTRUST_STATUS IN ('2', '5', '6', '8') AND to_char(DEAL_DATE, 'yyyyMMdd') = tieh.TRADING_DAY AND std.TRADE_PLAT IN ('03', '04', '05')
+		and tieh.ENTRUST_STATUS IN ('2', '5', '6', '8') AND to_char(DEAL_DATE, 'yyyyMMdd') = tieh.TRADING_DAY <!--XYHGFXSJ-247:AND std.TRADE_PLAT IN ('03', '04', '05')-->
 		LEFT JOIN T_INTEGRATED_ENTRUST tie
 		ON (
 		LTRIM(substr(std.APPLY_TRADE_ID, 5, length(std.APPLY_TRADE_ID)), '0') = tie.BROKER_ENTRUST_ID
 		OR
 		std.APPLY_TRADE_ID = tie.BROKER_ENTRUST_ID
 		)
-		and tie.ENTRUST_STATUS IN ('2', '5', '6', '8') AND to_char(DEAL_DATE, 'yyyyMMdd') = tie.TRADING_DAY AND std.TRADE_PLAT IN ('03', '04', '05')
+		and tie.ENTRUST_STATUS IN ('2', '5', '6', '8') AND to_char(DEAL_DATE, 'yyyyMMdd') = tie.TRADING_DAY <!--XYHGFXSJ-247:AND std.TRADE_PLAT IN ('03', '04', '05')-->
 		LEFT JOIN ETR_ENTRUST ee ON (ee.ENTRUST_ID = NVL(te.INSTRUCTION_ID, teh.INSTRUCTION_ID) OR ee.ENTRUST_ID = NVL(tie.INSTRUCTION_ID, tieh.INSTRUCTION_ID))
 		LEFT JOIN PTL_PORTFOLIO ptl ON (ptl.PORTFOLIO_ID = std.PORTFOLIO_ID)
 		<where>
