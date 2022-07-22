@@ -4,11 +4,12 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.instrument.MinPriceAndMinTrdUnitLimitBean;
-import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.TradePlat;
 import com.joyintech.tams.exchange.common.constant.instrument.SecondAssetType;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import io.swagger.annotations.ApiModel;
@@ -425,6 +426,12 @@ public class InstructionExportVo {
 
     @ApiModelProperty(name = "pledges", value = "质押券信息")
     public List<InstructionPledge> pledges;
+
+    @ApiModelProperty(name = "finprodMarketIdStr", value = "金融产品代码（展示）")
+    private String finprodMarketIdStr = "";
+
+    @ApiModelProperty(name = "finprodAbbrStr", value = "金融产品简称（展示）")
+    private String finprodAbbrStr = "";
 
     @Id
     public String getEntrustId() {
@@ -1185,6 +1192,28 @@ public class InstructionExportVo {
 
     public void setMinPriceAndMinTrdUnitLimitBean(MinPriceAndMinTrdUnitLimitBean minPriceAndMinTrdUnitLimitBean) {
         this.minPriceAndMinTrdUnitLimitBean = minPriceAndMinTrdUnitLimitBean;
+    }
+
+    public String getFinprodMarketIdStr() {
+        if (StringUtil.isEmpty(finprodMarketIdStr)) {
+            return finprodMarketId;
+        }
+        return finprodMarketIdStr;
+    }
+
+    public void setFinprodMarketIdStr(String finprodMarketIdStr) {
+        this.finprodMarketIdStr = finprodMarketIdStr;
+    }
+
+    public String getFinprodAbbrStr() {
+        if (StringUtil.isEmpty(finprodAbbrStr)) {
+            return finprodAbbr;
+        }
+        return finprodAbbrStr;
+    }
+
+    public void setFinprodAbbrStr(String finprodAbbrStr) {
+        this.finprodAbbrStr = finprodAbbrStr;
     }
 
     /**
