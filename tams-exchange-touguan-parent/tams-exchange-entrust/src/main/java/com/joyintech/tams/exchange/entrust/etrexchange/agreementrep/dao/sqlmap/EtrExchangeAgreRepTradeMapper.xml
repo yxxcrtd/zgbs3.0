@@ -759,7 +759,7 @@
         fdp.Pledge_Ratio * 100 Pledge_Ratio, /** 折算率 **/
         fdp.PLEDGE_NUMBER/100 PLEDGE_NUMBER, /** 质押数量  **/
         fdp.Pledge_Face_Value Pledge_Face_Value
-        from wfl_etr_pledge fdp     /** 质押品表 **/
+        from etr_pledge fdp     /** 质押品表 **/
         LEFT JOIN fin_product  fpsq           /** 标的类金融产品 **/
         ON    fpsq.finprod_id = fdp.finprod_id ) pledge ON etr_entrust.ENTRUST_ID = pledge.ENTRUST_ID
         <!--XYHGFXSJ-122:非首期指令wfl_etr_entrust的finprod_id存的是首期交易编号,需关联质押品表查询质押券信息 modify by fuyongsheng 20220719 end-->
