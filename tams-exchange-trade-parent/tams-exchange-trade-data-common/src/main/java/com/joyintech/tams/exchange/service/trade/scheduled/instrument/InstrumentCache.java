@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @EnableScheduling
@@ -35,4 +36,12 @@ public class InstrumentCache {
         logger.info("flushInstrument begin...");
         instrumentManagement.flushInstrumentData(new HashMap<String, Object>());
     }
+
+    @Scheduled(initialDelay = 2 * 60, fixedDelay = 1 * 60 * 60, timeUnit = TimeUnit.SECONDS)
+    public void flushInstrumentCache() {
+        logger.info("从投管调同步基础数据到交易端 开始...");
+        instrumentManagement.flushInstrumentData(new HashMap<String, Object>());
+        logger.info("从投管调同步基础数据到交易端 结束...");
+    }
+
 }
