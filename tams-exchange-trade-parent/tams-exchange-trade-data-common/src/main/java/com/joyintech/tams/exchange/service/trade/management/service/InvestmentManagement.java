@@ -485,18 +485,16 @@ public class InvestmentManagement extends BaseService {
                         .filter(o -> StringUtil.equals(o.getDisplaceDir(), "01")).findFirst();
                 if (pledgeOptional.isPresent()) {
                     InstructionPledge pledge = pledgeOptional.get();
-                    instruction.setFinprodId(pledge.getFinprodId());
-                    instruction.setFinprodMarketId(pledge.getFinprodMarketId());
-                    instruction.setFinprodAbbr(pledge.getFinprodAbbr());
+                    instruction.setFinprodMarketIdStr(pledge.getFinprodMarketId());
+                    instruction.setFinprodAbbrStr(pledge.getFinprodAbbr());
                 }
             } else if (EntrustUtils.isPledgeAgreementRepurchase(busiTypeTg)) {
                 Optional<InstructionPledge> pledgeOptional = pledgeList.stream()
                         .filter(o -> StringUtil.equals(o.getDisplaceDir(), "00")).findFirst();
                 if (pledgeOptional.isPresent()) {
                     InstructionPledge pledge = pledgeOptional.get();
-                    instruction.setFinprodId(pledge.getFinprodId());
-                    instruction.setFinprodMarketId(pledge.getFinprodMarketId());
-                    instruction.setFinprodAbbr(pledge.getFinprodAbbr());
+                    instruction.setFinprodMarketIdStr(pledge.getFinprodMarketId());
+                    instruction.setFinprodAbbrStr(pledge.getFinprodAbbr());
                 }
             }
         }

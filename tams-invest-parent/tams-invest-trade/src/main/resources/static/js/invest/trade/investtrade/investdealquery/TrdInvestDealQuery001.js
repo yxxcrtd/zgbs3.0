@@ -215,9 +215,9 @@ $(function () {
                 workflowId = data.workflowId;
             }
             console.log("----------------dblclick-------------------")
-            console.log(data.finprodType2)
-            console.log(data.tradeMarket)
-            console.log(data.purchModle)
+            // console.log(data.finprodType2)
+            // console.log(data.tradeMarket)
+            // console.log(data.purchModle)
 
             //债券委托详情 网下申购
             if (data.finprodType2 == PINAN_ASSET_TYPE_F01 && data.ps == PS_T04 && data.purchModle == '02') {
@@ -271,9 +271,15 @@ $(function () {
             else if (data.finprodType2 == PINAN_ASSET_TYPE_F01 && (data.tradeMarket == '01' || data.tradeMarket == '02')) {
                 console.log("----------------PINAN_ASSET_TYPE_F01----------------------")
                 console.log(data.tradeMarket);
+                console.log(tradeId);
 
                 var tradeDateVal = data.tradeDateVal;
                 console.log(tradeDateVal);
+
+                if(data.validStatus=='03'){
+                    tradeId = tradeId.substring(0,tradeId.length-1)
+                }
+                console.log(tradeId);
 
                 var param = {
                     "busiCode": tradeId,
@@ -400,8 +406,16 @@ $(function () {
             else if (data.finprodType2 == PINAN_ASSET_TYPE_F07 && (data.tradeMarket == '01' || data.tradeMarket == '02')) {
                 console.log("----------PINAN_ASSET_TYPE_F07-------------");
                 console.log(data.tradeMarket);
+                console.log(tradeId);
+
                 var tradeDateVal = data.tradeDateVal;
                 console.log(tradeDateVal);
+
+                if(data.validStatus=='03'){
+                    tradeId = tradeId.substring(0,tradeId.length-1)
+                }
+                console.log(tradeId);
+
 
                 var param = {
                     "busiCode": tradeId,
@@ -548,12 +562,29 @@ $(function () {
             }
             //一级投标债券 银行间/商业银行柜台
             else if (data.finprodType2 == PINAN_ASSET_TYPE_F17 && (data.tradeMarket == '01' || data.tradeMarket == '02')) {
+                console.log("----------PINAN_ASSET_TYPE_F17-------------");
+                console.log(data.tradeMarket);
+                console.log(tradeId);
+
+                var tradeDateVal = data.tradeDateVal;
+                console.log(tradeDateVal);
+
+                if(data.validStatus=='03'){
+                    tradeId = tradeId.substring(0,tradeId.length-1)
+                }
+                console.log(tradeId);
+
                 var param = {
                     "busiCode": tradeId,
+                    "startDate": tradeDateVal,
+                    "endDate": tradeDateVal,
                     "finprodType2": FINPROD_TYPE_TG_F32
                 };
-                var url = "home.html?a=a&busiCode=" + tradeId + "&finprodType2=" + FINPROD_TYPE_TG_F32 +
-                    "&pageModel=1&editable=false&isTodoList=true#/transactionSearch/detail?a=a";
+                var url = "home.html?a=a&busiCode=" + tradeId
+                    + "&finprodType2=" + FINPROD_TYPE_TG_F32
+                    + "&startDate=" + tradeDateVal
+                    + "&endDate=" + tradeDateVal
+                    +"&pageModel=1&editable=false&isTodoList=true#/transactionSearch/detail?a=a";
 
                 Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                     basePath + url,

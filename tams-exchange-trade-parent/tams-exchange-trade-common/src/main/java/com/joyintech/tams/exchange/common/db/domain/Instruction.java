@@ -434,6 +434,12 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
     @ApiModelProperty(name = "pledges", value = "质押券信息")
     public List<InstructionPledge> pledges;
 
+    @ApiModelProperty( name = "finprodMarketIdStr", value = "金融产品代码（展示）")
+    private String finprodMarketIdStr;
+
+    @ApiModelProperty(name = "finprodAbbrStr", value = "金融产品简称（展示）")
+    private String finprodAbbrStr;
+
     @Id
     public String getEntrustId() {
         return entrustId;
@@ -1185,6 +1191,22 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
 
     public void setLeftVolume(long leftVolume) {
         this.leftVolume = leftVolume;
+    }
+
+    public String getFinprodMarketIdStr() {
+        return finprodMarketIdStr;
+    }
+
+    public void setFinprodMarketIdStr(String finprodMarketIdStr) {
+        this.finprodMarketIdStr = finprodMarketIdStr;
+    }
+
+    public String getFinprodAbbrStr() {
+        return finprodAbbrStr;
+    }
+
+    public void setFinprodAbbrStr(String finprodAbbrStr) {
+        this.finprodAbbrStr = finprodAbbrStr;
     }
 
     public String getTradeSide() {
