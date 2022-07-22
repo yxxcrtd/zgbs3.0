@@ -1487,6 +1487,10 @@ public class CfetsEtrDispatcherService extends BaseService {
                         ) {
                         b = false;
                     }
+                    // 信用保护凭证在指令分发退回时，不处理风险
+                    if(StringUtil.equals(entrust.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())){
+                        b = false;
+                    }
                 }
                 if(b) {
                     if(Objects.nonNull(etrEntrustAdd)) {
