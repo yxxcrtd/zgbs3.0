@@ -2247,26 +2247,25 @@ SELECT
     <!--获取指令流程中占用券面总额，不包含当前流程-->
     <select id="getWflShareAmtByEntrustIdAndWorkFlowId" resultType="java.math.BigDecimal">
         select sum(nvl(nvl(ee.ENTRUST_NUM*100,0) - nvl(rfpd.ENTRUST_AMT, 0) - nvl(wrfpd.SHARE_AMT*100, 0) - nvl(IBQER.ENTRUST_AMT, 0) -
-        nvl(wiqer.SHARE_AMT*100, 0),0)) avaNum
+                    nvl(wiqer.SHARE_AMT*100, 0),0)) avaNum
         from ETR_ENTRUST ee
-        left join ETR_ENTRUST_ADD eea on ee.ENTRUST_ID = eea.ENTRUST_ID
-        left join (select t.SHARE_AMT*100 ENTRUST_AMT, t.ENTRUST_ID
-        from REG_FIN_PRODUCT_DEAL t
-        left join reg_FIN_PRODUCT_DEAL_TOTAL rfpdt on rfpdt.TOTLE_TRADE_ID = t.TOTLE_TRADE_ID
-        where rfpdt.IS_CANCEL = 'N'
-        and rfpdt.TRADE_STATUS = '01'
-        ) rfpd on rfpd.ENTRUST_ID = ee.ENTRUST_ID
-        left join WFL_REG_FIN_PRODUCT_DEAL wrfpd on wrfpd.ENTRUST_ID = ee.ENTRUST_ID
-        <if test="totleTradeId != null and totleTradeId != ''">
-            and wrfpd.TOTLE_TRADE_ID != #{totleTradeId}
-        </if>
-        left join (
-        select t.SHARE_AMT*100 ENTRUST_AMT, t.ENTRUST_ID
-        from IBU_QUOTE_ETR_RE t
-        left join IBU_QUOTE_BOND IQB on t.QUOTE_ID = IQB.QUOTE_ID
-        where IQB.SEND_STATUS = '01'
-        ) IBQER on IBQER.ENTRUST_ID = ee.ENTRUST_ID
-        left join WFL_IBU_QUOTE_ETR_RE wiqer on wiqer.ENTRUST_ID = ee.ENTRUST_ID
+            left join ETR_ENTRUST_ADD eea on ee.ENTRUST_ID = eea.ENTRUST_ID
+            left join (select t.SHARE_AMT*100 ENTRUST_AMT, t.ENTRUST_ID
+                            from REG_FIN_PRODUCT_DEAL t
+                            left join reg_FIN_PRODUCT_DEAL_TOTAL rfpdt on rfpdt.TOTLE_TRADE_ID = t.TOTLE_TRADE_ID
+                            where rfpdt.IS_CANCEL = 'N'
+                            and rfpdt.TRADE_STATUS = '01'
+                    ) rfpd on rfpd.ENTRUST_ID = ee.ENTRUST_ID
+            left join WFL_REG_FIN_PRODUCT_DEAL wrfpd on wrfpd.ENTRUST_ID = ee.ENTRUST_ID
+                <if test="totleTradeId != null and totleTradeId != ''">
+                    and wrfpd.TOTLE_TRADE_ID != #{totleTradeId}
+                </if>
+            left join ( select t.SHARE_AMT*100 ENTRUST_AMT, t.ENTRUST_ID
+                        from IBU_QUOTE_ETR_RE t
+                        left join IBU_QUOTE_BOND IQB on t.QUOTE_ID = IQB.QUOTE_ID
+                        where IQB.SEND_STATUS = '01'
+                    ) IBQER on IBQER.ENTRUST_ID = ee.ENTRUST_ID
+            left join WFL_IBU_QUOTE_ETR_RE wiqer on wiqer.ENTRUST_ID = ee.ENTRUST_ID
         <if test="totleTradeId != null and totleTradeId != ''">
             and wiqer.QUOTE_ID != #{totleTradeId}
         </if>

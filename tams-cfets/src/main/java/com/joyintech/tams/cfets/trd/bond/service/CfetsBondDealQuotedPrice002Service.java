@@ -268,7 +268,8 @@ public class CfetsBondDealQuotedPrice002Service extends BaseService<CfetsBondDea
                 }
                 if (null != ptlAllocatio.getShareAmt()) {
                     BigDecimal wflShareAmtByEntrustId = cfetsQuotedCommonServicevue.getWflShareAmtByEntrustId(ptlAllocatio.getEntrustId());
-                    if (null != wflShareAmtByEntrustId && wflShareAmtByEntrustId.compareTo(BigDecimal.ZERO) > 0 && ArithmeticUtil.doAdd(ptlAllocatio.getShareAmt(), wflShareAmtByEntrustId).compareTo(ptlAllocatio.getAvaNum()) > 0) {
+                    if (null != wflShareAmtByEntrustId && wflShareAmtByEntrustId.compareTo(BigDecimal.ZERO) > 0
+                            && ArithmeticUtil.doAdd(ptlAllocatio.getShareAmt(), wflShareAmtByEntrustId).compareTo(ptlAllocatio.getAvaNum()) > 0) {
                         errorList.add(new ValidMessage(StringUtil.join("组合分配券面总额不能超过指令剩余额度!流程中占用额度:", wflShareAmtByEntrustId.toString(), "元,指令代码:", ptlAllocatio.getEntrustId())));
                     }
                 }
