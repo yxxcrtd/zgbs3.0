@@ -1431,10 +1431,10 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                 amount = ArithmeticUtil.subtract(amount, EtrCommonCashPositionDealService.getEtrExchangeFinishAmtMuilt(map));
                 //amount = ArithmeticUtil.subtract(amount, EtrCommonCashPositionDealService.getEtrExchangeFinishAmt(map));
             }
-            if (StringUtil.equals(etrEntrust.getTradeMarket(), DictCodeListExt1.交易场所_银行间.getValue())) {
+            /*if (StringUtil.equals(etrEntrust.getTradeMarket(), DictCodeListExt1.交易场所_银行间.getValue())) {
                 map.put("sumTradeFlag", "01");
                 amount = ArithmeticUtil.subtract(amount, EtrCommonCashPositionDealService.getEtrExchangeFinishAmtMuilt(map));
-            }
+            }*/
 
             etrCashPositionFlowDto.setAmount(amount);
             etrCashPositionFlowDto.setAcctId(acctId);
