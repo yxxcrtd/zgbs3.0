@@ -1290,6 +1290,8 @@ public class CfetsSettleService extends BaseService {
             if (StringUtil.isEmpty(baseTradeProductDealDto.getEntrustId())) {
                 baseTradeProductDealDto.setEntrustId(cfetsSettleMapper.qryEntrustId(item.getFinprodId()));
             }
+            // shareAmt中为质押券面总额,换为交易金额
+            trdProductDeal.setShareAmt(trdProductDeal.getPrinAmt());
             if (isBack) {
                 trdProductDeal.setPrinAmt(trdProductDeal.getPrinAmt() == null ? null : trdProductDeal.getPrinAmt().negate());
                 trdProductDeal.setShareAmt(trdProductDeal.getShareAmt() == null ? null : trdProductDeal.getShareAmt().negate());
