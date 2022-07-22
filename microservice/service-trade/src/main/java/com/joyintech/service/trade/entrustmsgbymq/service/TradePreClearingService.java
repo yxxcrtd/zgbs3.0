@@ -348,10 +348,15 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                 else if (DictCodeListExt3.交易方向_提前购回.getValue().equals(infContractDetailfile.getPs())
                         || DictCodeListExt3.交易方向_到期购回.getValue().equals(infContractDetailfile.getPs())
                         || DictCodeListExt3.交易方向_解除质押.getValue().equals(infContractDetailfile.getPs())
-                        || (DictCodeListExt3.交易方向_中途换券.getValue().equals(infContractDetailfile.getPs())
-                        && DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(etrEntrust.getEntrustType()))
-                        || (DictCodeListStl.交易方向_换券.getValue().equals(infContractDetailfile.getPs())
-                        && DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue().equals(etrEntrust.getEntrustType()))) {
+                        || DictCodeListExt3.交易方向_中途换券.getValue().equals(infContractDetailfile.getPs())
+                )
+                    //XYHGFXSJ-417:中途换券条件判断有误 modify by fuyongsheng 20220722 start
+//                        || (DictCodeListExt3.交易方向_中途换券.getValue().equals(infContractDetailfile.getPs())
+//                        && DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(etrEntrust.getEntrustType()))
+//                        || (DictCodeListStl.交易方向_换券.getValue().equals(infContractDetailfile.getPs())
+//                        && DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue().equals(etrEntrust.getEntrustType())))
+                    //XYHGFXSJ-417:中途换券条件判断有误 modify by fuyongsheng 20220722 end
+                {
                     logger.info("【成交数据预清算dto拼装-协议回购开始】tradePreClearing entrustId: {}, seqno: {}",
                             infContractDetailfile.getEntrustId(), infContractDetailfile.getSeqno());
                     //todo 1
@@ -1975,17 +1980,6 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         } else {
             param.setCommonBusinessType(DictCodeList.共通业务类型_正回购录入);
         }
-//        if(DictCodeListExt3.交易方向_提前购回.getValue().equals(infContractDetailfile.getPs())){
-//            param.setCommonBusinessType(DictCodeList.共通业务类型_协议回购提前购回指令);
-//        } else if(DictCodeListExt3.交易方向_到期购回.getValue().equals(infContractDetailfile.getPs())){
-//            param.setCommonBusinessType(DictCodeList.共通业务类型_协议回购到期购回指令);
-//        } else if(DictCodeListExt3.交易方向_到期续做.getValue().equals(infContractDetailfile.getPs())){
-//            param.setCommonBusinessType(DictCodeList.共通业务类型_协议回购到期续做指令);
-//        } else if(DictCodeListExt3.交易方向_解除质押.getValue().equals(infContractDetailfile.getPs())){
-//            param.setCommonBusinessType(DictCodeList.共通业务类型_协议回购解除质押指令);
-//        } else if(DictCodeListExt3.交易方向_中途换券.getValue().equals(infContractDetailfile.getPs())){
-//            param.setCommonBusinessType(DictCodeList.共通业务类型_协议回购中途换券指令);
-//        }
         // GNS-955:修改采番业务类型 modify by fuyongsheng 20220224 end
         if (StringUtil.isBlank(dto.getTradeId())) {
             dto.setTradeId(autoPeriodCommonService.buildBussinessCode(param));
@@ -2064,7 +2058,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(infContractDetailfile.getEntrustId());
         if(StringUtil.equals(infContractDetailfile.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())
 //                || StringUtil.equals(infContractDetailfile.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())
-                || (DictCodeListStl.交易方向_换券.getValue().equals(infContractDetailfile.getPs())
+                || (DictCodeListExt3.交易方向_中途换券.getValue().equals(infContractDetailfile.getPs())
                 && DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue().equals(etrEntrust.getEntrustType()))) {
             //生成质押券置换业务编号
             BussinessCodeParameter parameter = new BussinessCodeParameter();
