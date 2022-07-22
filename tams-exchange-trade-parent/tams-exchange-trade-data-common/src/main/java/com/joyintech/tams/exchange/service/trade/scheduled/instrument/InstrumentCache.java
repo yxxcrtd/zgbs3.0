@@ -35,4 +35,12 @@ public class InstrumentCache {
         logger.info("flushInstrument begin...");
         instrumentManagement.flushInstrumentData(new HashMap<String, Object>());
     }
+
+    @Scheduled(cron = "${scheduled.instrument.flushCache:0 0 */1 * * ?}")
+    public void flushInstrumentCache() {
+        logger.info("从投管调同步基础数据到交易端 开始...");
+        instrumentManagement.flushInstrumentData(new HashMap<String, Object>());
+        logger.info("从投管调同步基础数据到交易端 结束...");
+    }
+
 }

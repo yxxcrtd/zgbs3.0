@@ -1,16 +1,20 @@
 package com.joyintech.tams;
 
+import com.joyintech.framework.JoyinApplication;
+import com.joyintech.framework.config.WebApplication;
+import com.joyintech.tams.common.ErrorPageFilter;
+import com.joyintech.tams.exchange.common.utils.SpringContextUtils;
+import com.joyintech.tams.exchange.service.trade.management.service.InstrumentManagement;
 import org.activiti.spring.boot.SecurityAutoConfiguration;
-import org.mybatis.spring.annotation.MapperScan;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.stereotype.Repository;
 
-import com.joyintech.framework.JoyinApplication;
-import com.joyintech.framework.config.WebApplication;
-import com.joyintech.tams.common.ErrorPageFilter;
+import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * @author 王波
@@ -20,8 +24,9 @@ import com.joyintech.tams.common.ErrorPageFilter;
  */
 //@MapperScan(value = "com.joyintech.**.dao", annotationClass = Repository.class)
 @ComponentScan(basePackages = "com.joyintech")
-@SpringBootApplication(exclude = { SecurityAutoConfiguration.class, DataSourceAutoConfiguration.class })
+@SpringBootApplication(exclude = {SecurityAutoConfiguration.class, DataSourceAutoConfiguration.class})
 public class TamsApplication extends WebApplication {
+    private static final Logger logger = LoggerFactory.getLogger(TamsApplication.class);
 
    /* @PostConstruct
     void started() {
@@ -54,7 +59,20 @@ public class TamsApplication extends WebApplication {
     public ErrorPageFilter errorPageFilter() {
         return new ErrorPageFilter();
     }
-    public static void main(String [] args) {
+
+    public static void main(String[] args) {
         JoyinApplication.run(TamsApplication.class, args);
+
+        InstrumentManagement bean = SpringContextUtils.getBean(InstrumentManagement.class);
+        if (Objects.nonNull(bean)) {
+            try {
+                logger.info("从投管调同步基础数据到交易端 开始...");
+                bean.flushInstrumentData(new HashMap<>());
+                logger.info("从投管调同步基础数据到交易端 结束...");
+            } catch (Exception e) {
+                logger.error("从投管调同步基础数据到交易端 失败：{}", e.getMessage(), e);
+            }
+        }
+
     }
 }
