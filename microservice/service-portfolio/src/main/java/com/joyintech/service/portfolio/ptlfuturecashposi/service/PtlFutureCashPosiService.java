@@ -194,8 +194,8 @@ public class PtlFutureCashPosiService extends BaseService<PtlFutureCashPosiDto> 
             if (periodMap.containsKey(lastDto.getPortfolioId())) {
                 // 组合可用现金 = 上个区间的组合可用现金+ 上个区间的 资产存续期（资金流出）+ 资产存续期（资金流入）
                 periodMap.get(lastDto.getPortfolioId()).setUsableAmt(
-                    ArithmeticUtil.doAdd(lastDto.getUsableAmt(), lastDto.getAssetPeriodInAmt(),
-                        lastDto.getAssetPeriodOutAmt()));
+                        ArithmeticUtil.subtract(ArithmeticUtil.doAdd(lastDto.getUsableAmt(), lastDto.getAssetPeriodInAmt()
+                        ),lastDto.getAssetPeriodOutAmt()));
             }
             else if (DateUtil.parse(arrayLastEndDate).compareTo(lastDto.getMdate()) < 0) {
                 PtlFutureCashPosiDto newDto = new PtlFutureCashPosiDto();
@@ -207,8 +207,8 @@ public class PtlFutureCashPosiService extends BaseService<PtlFutureCashPosiDto> 
                 newDto.setCashAmt(BigDecimal.ZERO);
                 newDto.setPrdEndAmt(BigDecimal.ZERO);
                 // 组合可用现金 = 上个区间的组合可用现金+ 上个区间的 资产存续期（资金流出）+ 资产存续期（资金流入）
-                newDto.setUsableAmt(ArithmeticUtil.doAdd(lastDto.getUsableAmt(),
-                    lastDto.getAssetPeriodInAmt(), lastDto.getAssetPeriodOutAmt()));
+                newDto.setUsableAmt(ArithmeticUtil.subtract(ArithmeticUtil.doAdd(lastDto.getUsableAmt(),
+                    lastDto.getAssetPeriodInAmt()), lastDto.getAssetPeriodOutAmt()));
                 periodMap.put(newDto.getPortfolioId(), newDto);
             }
         }
