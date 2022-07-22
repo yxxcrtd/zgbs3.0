@@ -7,11 +7,12 @@ import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.joyintech.tams.exchange.common.bean.MinPrice;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.cache.MinTrdUnitLimitService;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
+import com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum;
+import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.common.utils.TradePlatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,12 +81,16 @@ public class MinTrdUnitLimitServiceImpl implements MinTrdUnitLimitService {
         String tradePlat = TradePlatUtils.trd2EtrTradePlat(instruction);
         String assetType = instrument.getAssetType();
         String assetType1 = instrument.getAssetType1();
-        if(PLEDGE_REPURCHASE.codeEquals(instruction.getAssetType()) ){
+        if (PLEDGE_REPURCHASE.codeEquals(instruction.getAssetType())) {
             assetType = instruction.getAssetType();
             assetType1 = instruction.getAssetType1();
         }
         String subStockType = instrument.getSubStockType();
         String ps = instruction.getPs();
+        if (EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg())
+                && !BusiTypeTgEnum.首期.codeEquals(instruction.getBusiTypeTg())) {
+            ps = instruction.getFirstRepoPs();
+        }
 
         MinTrdUnitLimit minTrdUnitLimit = getMinTrdUnitLimit(tradeMarket, tradePlat, assetType, assetType1, subStockType, ps);
         if (ObjectUtil.isNull(minTrdUnitLimit)) {
