@@ -1310,6 +1310,7 @@ public class CfetsSettleService extends BaseService {
             baseTradeProductDealDto.setTrdProductDealAdd(trdProductDealAdd);
 
             baseTradeProductDealDto.setEntrustId(item.getEntrustId());
+            baseTradeProductDealDto.setStage("03");
 
             finProductTradeDto.setBaseTradeProductDealDtos(Collections.singletonList(baseTradeProductDealDto));
             finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());

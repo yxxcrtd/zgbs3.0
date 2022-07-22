@@ -507,14 +507,23 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                     etrCashPositionFlowDto1.setSeqno(getSeqNo());
                     // 添加现金流水到目标dto
                     etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto1);
-
-                    // 预增现金 资金到账日增加到账金额
-                    EtrCashPositionFlowDto etrCashPositionFlowDto2 = new EtrCashPositionFlowDto();
-                    BeanUtil.copyPropertiesIgnoreNull(etrCashPositionFlowDto2, etrCashPositionFlowDto1);
-                    etrCashPositionFlowDto2.setAmount(stlPayOrdersDto.getSettleAmt().negate());
-                    etrCashPositionFlowDto2.setHodingType(DictCodeListExt1.持仓类型_委托指令预增.getValue());
-                    etrCashPositionFlowDto2.setSeqno(getSeqNo());
-                    etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto2);
+                    if (!StringUtil.equals(finProductTradeDto.getStage(), "03")) {
+                        // 预增现金 资金到账日增加到账金额
+                        EtrCashPositionFlowDto etrCashPositionFlowDto2 = new EtrCashPositionFlowDto();
+                        BeanUtil.copyPropertiesIgnoreNull(etrCashPositionFlowDto2, etrCashPositionFlowDto1);
+                        etrCashPositionFlowDto2.setAmount(stlPayOrdersDto.getSettleAmt().negate());
+                        etrCashPositionFlowDto2.setHodingType(DictCodeListExt1.持仓类型_委托指令预增.getValue());
+                        etrCashPositionFlowDto2.setSeqno(getSeqNo());
+                        etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto2);
+                    }else{
+                        // 本币业务首期登录了,批处理没有流程直接处理
+                        if(StringUtil.equals(finProductTradeDto.getIsExistNew(), DictCodeList.是否_是.getValue())) {
+                            //资产持仓流水减少券面总额
+                            etrSecPositionFlowDto.setAmount(prinAmt.negate());
+                            // 添加现金流水到目标dto
+                            etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
+                        }
+                    }
                 });
             }
         }
