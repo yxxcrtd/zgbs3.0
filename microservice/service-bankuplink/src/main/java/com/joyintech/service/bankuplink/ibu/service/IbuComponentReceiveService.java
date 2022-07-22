@@ -530,6 +530,7 @@ public class IbuComponentReceiveService extends BaseService{
                         fprice = item.getUnitFprice();
                         fpriceAmtTotalFP = item.getFpriceAmt();
                         intAmtTotalBW = item.getIntAmt();
+                        全价总额尾差 = fpriceAmtTotalFP;
                     }
                 }
             }
