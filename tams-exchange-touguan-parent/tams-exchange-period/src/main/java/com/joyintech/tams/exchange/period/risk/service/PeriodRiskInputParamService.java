@@ -319,6 +319,8 @@ public class PeriodRiskInputParamService extends RiskCommonService {
             creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
             creditLinesInputDto.setTgBusiType(DictCodeList.平安资产类型_信用保护凭证.getValue());
             creditLinesInputDto.setPs(inputDto.getPs());
+            // 交收失败不回冲预占
+            creditLinesInputDto.setFinprodType2("ManualSettle");
         }
 
     }
