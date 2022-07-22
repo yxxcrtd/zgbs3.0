@@ -70,6 +70,11 @@
             digit: 2
         }
         , {
+            /*结算金额*/
+            field: 'unitFpriceAmt',
+            visible: false
+        }
+        , {
             /*本方券券面总额（万元）*/
             field: 'entrustOwnNum',
             width: 180,

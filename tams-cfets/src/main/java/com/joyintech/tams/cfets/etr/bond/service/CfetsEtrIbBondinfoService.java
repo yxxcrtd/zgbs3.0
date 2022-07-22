@@ -34,6 +34,7 @@ import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
+import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrIbBondinfoMapper;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsBussCombDistribtBaseDto;
@@ -91,6 +92,7 @@ import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto;
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.common.PtlAllocationDto;
 import com.joyintech.tams.invest.common.entrust.dto.EntrustCommonDto;
 import com.joyintech.tams.invest.common.riskinfrds.util.EntrustCompleteUtil;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
@@ -110,17 +112,11 @@ import org.springframework.web.client.RestTemplate;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -1392,6 +1388,8 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         BigDecimal bfqtrkyccSAmt=BigDecimal.ZERO;
         //融入券卖空待购回持仓
         BigDecimal rrqmkdghSAmt=BigDecimal.ZERO;
+        // 全价总额
+        BigDecimal unitFpriceAmtTailDifference = dto.getUnitFpriceAmt();
         for(CfetsBussCombDistribtDto item:bussCombDistribtList){
             CfetsEtribBondInfo003Dto dd=new CfetsEtribBondInfo003Dto();
             BeanUtil.copyPropertiesIgnoreNull(dd,dto);
@@ -1581,6 +1579,14 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                 dto.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
             }
             etrInvestBondInfoDtosList.add(dd);
+            // 结算金额
+            dd.setUnitFpriceAmt(ArithmeticUtil.divide(
+                    ArithmeticUtil.multiply(dto.getUnitFpriceAmt(), dd.getEntrustNum()), dto.getPriceAmt(), 2, RoundingMode.HALF_DOWN));
+            unitFpriceAmtTailDifference = ArithmeticUtil.subtract(unitFpriceAmtTailDifference, dd.getUnitFpriceAmt());
+        }
+        CfetsEtribBondInfo003Dto cfetsEtribBond = etrInvestBondInfoDtosList.stream().max(Comparator.comparing(CfetsEtribBondInfo003Dto::getEntrustNum)).get();
+            if (!BigDecimalUtil.isZeroOrNull(unitFpriceAmtTailDifference)) {
+            cfetsEtribBond.setUnitFpriceAmt(ArithmeticUtil.doAdd(unitFpriceAmtTailDifference, cfetsEtribBond.getUnitFpriceAmt()));
         }
         dto.setEntrustOwnNum(bfqtrkyccSAmt);
         dto.setEntrustIntegrateNum(rrqmkdghSAmt);
@@ -1653,6 +1659,8 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         BigDecimal bfqtrkyccSAmt=BigDecimal.ZERO;
         //融入券卖空待购回持仓
         BigDecimal rrqmkdghSAmt=BigDecimal.ZERO;
+        // 全价总额
+        BigDecimal unitFpriceAmtTailDifference = dto.getUnitFpriceAmt();
         for(CfetsBussCombDistribtDto item:bussCombDistribtList){
             if(Objects.isNull(item.getEntrustNum())) {
                 item.setEntrustNum(BigDecimal.ZERO);
@@ -1846,7 +1854,15 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                 dd.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
                 dto.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
             }
+            // 结算金额
+            dd.setUnitFpriceAmt(ArithmeticUtil.divide(
+                    ArithmeticUtil.multiply(dto.getUnitFpriceAmt(), dd.getEntrustNum()), dto.getPriceAmt(), 2, RoundingMode.HALF_DOWN));
+            unitFpriceAmtTailDifference = ArithmeticUtil.subtract(unitFpriceAmtTailDifference, dd.getUnitFpriceAmt());
             etrInvestBondInfoDtosList.add(dd);
+        }
+        CfetsEtribBondInfo003Dto cfetsEtribBond = etrInvestBondInfoDtosList.stream().max(Comparator.comparing(CfetsEtribBondInfo003Dto::getEntrustNum)).get();
+        if (!BigDecimalUtil.isZeroOrNull(unitFpriceAmtTailDifference)) {
+            cfetsEtribBond.setUnitFpriceAmt(ArithmeticUtil.doAdd(unitFpriceAmtTailDifference, cfetsEtribBond.getUnitFpriceAmt()));
         }
         dto.setEntrustOwnNum(bfqtrkyccSAmt);
         dto.setEntrustIntegrateNum(rrqmkdghSAmt);
