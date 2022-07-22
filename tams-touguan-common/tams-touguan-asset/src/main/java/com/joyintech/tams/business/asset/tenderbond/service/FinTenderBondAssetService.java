@@ -314,6 +314,9 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         FinProductAdd productAdd = new FinProductAdd();
         BeanUtil.copyPropertiesIgnoreNull(productAdd, dto.getProductAddDto());
         productAdd.setFinprodId(dto.getFinprodId());
+        //----add by daizhiwei 20220722 添加投资性质----start----
+        productAdd.setInvestNature(DictCodeList.投资性质_固定收益类.getValue());
+        //----add by daizhiwei 20220722 添加投资性质----end----
         if (StringUtil.isNotEmpty(dto.getCalModel())) {
             if (StringUtil.equals("rate", dto.getCalModel())) {
                 productAdd.setDealMode("01");
