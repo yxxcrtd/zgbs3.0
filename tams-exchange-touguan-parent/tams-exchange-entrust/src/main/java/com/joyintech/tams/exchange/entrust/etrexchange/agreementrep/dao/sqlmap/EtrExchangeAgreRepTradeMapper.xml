@@ -785,7 +785,7 @@
             listagg(FP.FINPROD_ID, ',') within GROUP ( ORDER BY FP.FINPROD_ID )   FINPROD_ID,
             listagg(FP.FINPROD_MARKET_ID, ',') within GROUP ( ORDER BY FP.FINPROD_MARKET_ID )   FINPROD_MARKET_ID,
             listagg(FP.finprod_abbr, ',') within GROUP ( ORDER BY FP.finprod_abbr ) finprod_abbr,
-            SUM(B.PLEDGE_NUMBER)*100/1000 PLEDGE_NUMBER,
+            SUM(B.PLEDGE_NUMBER)*100/10000 PLEDGE_NUMBER,
             MAX(B.Pledge_Ratio)*100 Pledge_Ratio,
             SUM(B.Pledge_Face_Value) printAmt
         FROM FIN_TRADE_PRODUCT A
@@ -983,7 +983,7 @@
                 listagg(FP.FINPROD_ID, ',') within GROUP ( ORDER BY FP.FINPROD_ID )   FINPROD_ID,
                 listagg(FP.FINPROD_MARKET_ID, ',') within GROUP ( ORDER BY FP.FINPROD_MARKET_ID )   FINPROD_MARKET_ID,
                 listagg(FP.finprod_abbr, ',') within GROUP ( ORDER BY FP.finprod_abbr ) finprod_abbr,
-                SUM(B.PLEDGE_NUMBER)*100/1000 PLEDGE_NUMBER,
+                SUM(B.PLEDGE_NUMBER)*100/10000 PLEDGE_NUMBER,
                 MAX(B.Pledge_Ratio)*100 Pledge_Ratio,
                 SUM(B.Pledge_Face_Value) printAmt
             FROM FIN_TRADE_PRODUCT A

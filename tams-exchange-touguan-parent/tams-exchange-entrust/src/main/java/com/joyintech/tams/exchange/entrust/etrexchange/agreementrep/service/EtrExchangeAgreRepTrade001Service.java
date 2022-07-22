@@ -275,6 +275,26 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         return resultList;
     }
 
+
+    /**
+     * 根据初始成交编号（JY开头的）查询首期成交信息
+     *
+     * @param tradeId 初始成交编号
+     * @return 首期成交信息
+     */
+    public EtrExchangeAgreRepTrade001Dto getOrigTradeByTradeId(String tradeId) {
+        Map<String, Object> map = new HashMap<>(4);
+        map.put("tradeId", tradeId);
+        map.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
+        map.put("UNIT_01", DictCodeListExt3.交易单位_张.getValue());
+        map.put("UNIT_04", DictCodeListExt3.交易单位_手.getValue());
+        List<EtrExchangeAgreRepTrade001Dto> result = etrExchangeAgreRepTradeMapper.getEntrustInfoByTradeId(map);
+        if(StringUtil.isEmptyList(result)){
+            return null;
+        }
+        return result.get(0);
+    }
+
     /**
      * 查询原成交信息
      *
@@ -755,7 +775,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
             //无法从页面带回购首期的部分数据，需要重新查一次
             Map<String, Object> queryMap = new HashMap<>();
-            queryMap.put("tradeId",agreRepHwayChgSecDto.getTradeId());
+            queryMap.put("tradeId",agreRepHwayChgSecDto.getFinprodId());
             List<EtrExchangeAgreRepTrade001Dto> repFristList = etrExchangeAgreRepTradeMapper.getEntrustInfoByTradeId(queryMap);
             if(!StringUtil.isEmptyList(repFristList)) {
                 repFristList.forEach(item->{
@@ -840,7 +860,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
             //无法从页面带回购首期的部分数据，需要重新查一次
             Map<String, Object> queryMap = new HashMap<>();
-            queryMap.put("tradeId",agreRepHwayChgSecDto.getTradeId());
+            queryMap.put("tradeId",agreRepHwayChgSecDto.getFinprodId());
             List<EtrExchangeAgreRepTrade001Dto> repFristList = etrExchangeAgreRepTradeMapper.getEntrustInfoByTradeId(queryMap);
             if(!StringUtil.isEmptyList(repFristList)) {
                 repFristList.forEach(item->{
@@ -927,7 +947,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
             //无法从页面带回购首期的部分数据，需要重新查一次
             Map<String, Object> queryMap = new HashMap<>();
-            queryMap.put("tradeId",agreRepOpenSecDto.getTradeId());
+            queryMap.put("tradeId",agreRepOpenSecDto.getFinprodId());
             List<EtrExchangeAgreRepTrade001Dto> repFristList = etrExchangeAgreRepTradeMapper.getEntrustInfoByTradeId(queryMap);
             if(!StringUtil.isEmptyList(repFristList)) {
                 repFristList.forEach(item->{
@@ -1385,7 +1405,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
             //无法从页面带回购首期的部分数据，需要重新查一次
             Map<String, Object> queryMap = new HashMap<>();
-            queryMap.put("tradeId",agreRepHwayChgSecDto.getTradeId());
+            queryMap.put("tradeId",agreRepHwayChgSecDto.getFinprodId());
             List<EtrExchangeAgreRepTrade001Dto> repFristList = etrExchangeAgreRepTradeMapper.getEntrustInfoByTradeId(queryMap);
             if(!StringUtil.isEmptyList(repFristList)) {
                 repFristList.forEach(item->{
@@ -1502,7 +1522,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
             //无法从页面带回购首期的部分数据，需要重新查一次
             Map<String, Object> queryMap = new HashMap<>();
-            queryMap.put("tradeId",agreRepOpenSecDto.getTradeId());
+            queryMap.put("tradeId",agreRepOpenSecDto.getFinprodId());
             List<EtrExchangeAgreRepTrade001Dto> repFristList = etrExchangeAgreRepTradeMapper.getEntrustInfoByTradeId(queryMap);
             if(!StringUtil.isEmptyList(repFristList)) {
                 repFristList.forEach(item->{
