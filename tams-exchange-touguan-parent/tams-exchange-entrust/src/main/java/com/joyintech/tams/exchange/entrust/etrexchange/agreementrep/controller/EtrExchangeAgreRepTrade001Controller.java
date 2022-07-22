@@ -734,39 +734,39 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
             dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购提前购回指令.getValue());
             dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购提前购回指令.getValue());
             businessType = DictCodeListExt3.共通业务类型_协议回购提前购回指令.getValue();
-            busiTypePosition=DictCodeListExt3.投管业务类型_提前购回.getValue();
+            busiTypePosition = DictCodeListExt3.投管业务类型_提前购回.getValue();
         } else if (DictCodeListExt3.交易方向_到期购回.getValue().equals(dto.getPs())) {
             dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购到期购回指令.getValue());
             dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购到期购回指令.getValue());
             businessType = DictCodeListExt3.共通业务类型_协议回购到期购回指令.getValue();
-            busiTypePosition=DictCodeListExt3.投管业务类型_到期购回.getValue();
+            busiTypePosition = DictCodeListExt3.投管业务类型_到期购回.getValue();
         } else if (DictCodeListExt3.交易方向_中途换券.getValue().equals(dto.getPs())) {
-            if(null!=dto.getOutAmt()&&dto.getOutAmt().compareTo(BigDecimal.ZERO)==1){
+            if (null != dto.getOutAmt() && dto.getOutAmt().compareTo(BigDecimal.ZERO) == 1) {
                 dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令_换钱.getValue());
                 dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令_换钱.getValue());
                 businessType = DictCodeListExt3.共通业务类型_协议回购中途换券指令.getValue();
-                busiTypePosition=DictCodeListExt3.投管业务类型_中途换券.getValue();
-            }else{
+                busiTypePosition = DictCodeListExt3.投管业务类型_中途换券.getValue();
+            } else {
                 dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue());
                 dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue());
                 businessType = DictCodeListExt3.共通业务类型_协议回购中途换券指令.getValue();
-                busiTypePosition=DictCodeListExt3.投管业务类型_中途换券.getValue();
+                busiTypePosition = DictCodeListExt3.投管业务类型_中途换券.getValue();
             }
         } else if (DictCodeListExt3.交易方向_解除质押.getValue().equals(dto.getPs())) {
             dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购解除质押指令.getValue());
             dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购解除质押指令.getValue());
             businessType = DictCodeListExt3.共通业务类型_协议回购解除质押指令.getValue();
-            busiTypePosition=DictCodeListExt3.投管业务类型_解除质押.getValue();
+            busiTypePosition = DictCodeListExt3.投管业务类型_解除质押.getValue();
         } else if (DictCodeListExt3.交易方向_到期续做.getValue().equals(dto.getPs())) {
             dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购到期续做指令.getValue());
             dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购到期续做指令.getValue());
             businessType = DictCodeListExt3.共通业务类型_协议回购到期续做指令.getValue();
-            busiTypePosition=DictCodeListExt3.投管业务类型_到期续做.getValue();
+            busiTypePosition = DictCodeListExt3.投管业务类型_到期续做.getValue();
         } else {
             dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购首期指令.getValue());
             dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购首期指令.getValue());
             businessType = DictCodeListExt3.共通业务类型_协议回购首期指令.getValue();
-            busiTypePosition=DictCodeListExt3.投管业务类型_首期.getValue();
+            busiTypePosition = DictCodeListExt3.投管业务类型_首期.getValue();
         }
         dto.setBusiTypePosition(busiTypePosition);
         //add end
@@ -802,7 +802,7 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
         dto.setAssetType2(DictCodeList.回购类型_质押式协议回购.getValue());
         // ----------add by zhangrui1 20200703 预占功能 start----------
         if (StringUtil.equals(BussinessConstant.SUBMIT, dto.getOperateType()) && !DictCodeListExt3.交易方向_中途换券.getValue().equals(dto.getPs())
-                && !( StringUtil.equals(dto.getPs(), 交易方向_解除质押.getValue()) && StringUtil.equals(dto.getTradeMarket(),"03"))) {
+                && !(StringUtil.equals(dto.getPs(), 交易方向_解除质押.getValue()) && StringUtil.equals(dto.getTradeMarket(), "03"))) {
             Boolean isShouQi = StringUtil.equals(DictCodeListExt3.交易方向_首期.getValue(), dto.getPs());
             if (isShouQi) {
                 dto.setPs(dto.getRepPs());
@@ -1012,6 +1012,10 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
                     && !StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已退回.getValue())
                     && !StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已撤回.getValue())) {
                 errList.add(new ValidMessage("该委托状态不是已退回/已接收/已撤回，无法关闭!"));
+            }
+            else if ((Objects.nonNull(item.getDealPercent()) && item.getDealPercent().compareTo(BigDecimal.ZERO) > 0)
+                    || (Objects.nonNull(item.getImplementPercent()) && item.getImplementPercent().compareTo(BigDecimal.ZERO) > 0)) {
+                errList.add(new ValidMessage("该委托执行进度和成交进度不为0，无法关闭!"));
             }
 
             wflValidInputParameter.setBusinessDataPk1(item.getEntrustId());
@@ -1308,7 +1312,7 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
     @ApiOperation(value = "当前质押信息查询", notes = "当前质押信息查询")
     @ResponseBody
     @PostMapping("selectCurrPledgeInfo/{tradeId}")
-    public Message<EtrExchangeAgreRepCurrResp> selectCurrPledgeInfo(@ApiParam(value = "委托编号", required = false) @PathVariable String   tradeId) {
+    public Message<EtrExchangeAgreRepCurrResp> selectCurrPledgeInfo(@ApiParam(value = "委托编号", required = false) @PathVariable String tradeId) {
         return new Message<EtrExchangeAgreRepCurrResp>().success().setData(etrExchangeAgreRepTrade001Service.selectCurrPledgeInfo(tradeId));
     }
 
@@ -1321,7 +1325,7 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
     @ApiOperation(value = "当前质押信息查询列表", notes = "当前质押信息查询列表")
     @ResponseBody
     @PostMapping("selectCurrPledgeList/{tradeId}")
-    public Message<List<EtrExchangeAgreOutRepResp>> selectCurrPledgeList(@ApiParam(value = "委托编号", required = false) @PathVariable String   tradeId) {
+    public Message<List<EtrExchangeAgreOutRepResp>> selectCurrPledgeList(@ApiParam(value = "委托编号", required = false) @PathVariable String tradeId) {
         return new Message<List<EtrExchangeAgreOutRepResp>>().success().setData(etrExchangeAgreRepTrade001Service.selectCurrPledgeList(tradeId));
     }
 }
