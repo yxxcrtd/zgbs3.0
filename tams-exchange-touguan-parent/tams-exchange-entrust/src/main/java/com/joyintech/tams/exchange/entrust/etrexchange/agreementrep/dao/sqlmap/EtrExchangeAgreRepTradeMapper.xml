@@ -511,7 +511,7 @@
         std.cjbh intiTradeId,
         SCI.ACCT_NAME AS acctName,
         fin_trade_product.term as term,
-        mcp.counter_name counterName, /**交易对手名称**/
+        nvl(mcp.counter_name, mcp1.COUNTER_NAME) as counterName, /**交易对手名称**/
         case when trd_product_deal_2.FINPROD_TYPE2 = 'F02' then eea.TRADER
             else ee.COUNTER_TRADER end as repurTraderId, /**正回购方交易员代码**/
         case when trd_product_deal_2.FINPROD_TYPE2 = 'F02' then ''
@@ -557,6 +557,7 @@
             on fin_trade_product.finprod_id = trd_product_deal_2.Finprod_Id
             and fin_trade_product.branch = trd_product_deal_2.branch
             and trd_product_deal_2.ps in ('T01')
+        LEFT JOIN mst_counter_party mcp1 ON trd_product_deal_2.counter_id = mcp1.counter_id
         LEFT JOIN trd_product_deal_add /** 金融产品临时交易附属表 **/
             on trd_product_deal_2.trade_id = trd_product_deal_add.trade_id
         left join fin_deal_pledge /** 回购质押品 **/
