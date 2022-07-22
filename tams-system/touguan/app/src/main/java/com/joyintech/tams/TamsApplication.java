@@ -62,17 +62,5 @@ public class TamsApplication extends WebApplication {
 
     public static void main(String[] args) {
         JoyinApplication.run(TamsApplication.class, args);
-
-        InstrumentManagement bean = SpringContextUtils.getBean(InstrumentManagement.class);
-        if (Objects.nonNull(bean)) {
-            try {
-                logger.info("从投管调同步基础数据到交易端 开始...");
-                bean.flushInstrumentData(new HashMap<>());
-                logger.info("从投管调同步基础数据到交易端 结束...");
-            } catch (Exception e) {
-                logger.error("从投管调同步基础数据到交易端 失败：{}", e.getMessage(), e);
-            }
-        }
-
     }
 }

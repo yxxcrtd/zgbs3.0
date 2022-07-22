@@ -686,8 +686,10 @@ public class InvestmentManagement extends BaseService {
             minPriceAndMinTrdUnitLimitBean.setSubStockType(instrument.getSubStockType());
 
             logger.info("填充最小价差等交易属性信息 => 【minPriceAndMinTrdUnitLimitBean = {}】", minPriceAndMinTrdUnitLimitBean);
-            instruction.setMinPriceAndMinTrdUnitLimitBean(minPriceAndMinTrdUnitLimitBean);
-
+            if (CollectionUtils.isNotEmpty(minPriceAndMinTrdUnitLimitBean.getMinPriceList())
+                    && CollectionUtils.isNotEmpty(minPriceAndMinTrdUnitLimitBean.getMinTrdUnitLimitList())) {
+                instruction.setMinPriceAndMinTrdUnitLimitBean(minPriceAndMinTrdUnitLimitBean);
+            }
         }
     }
 
