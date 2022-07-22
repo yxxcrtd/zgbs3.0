@@ -1099,7 +1099,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                         listTemp = cfetsManualSettleMapper.getTempDealDetailsByTradeId(entity.getTradeId());
                     }
                     List<String> entrustIdList = new ArrayList<>();
-                    for(CfetsManualSettleDealInfo info:listTemp){
+                    for (CfetsManualSettleDealInfo info : listTemp) {
                         if(StringUtil.isNotEmpty(info.getEntrustId())){
                             entrustIdList.add(info.getEntrustId());
                         }
@@ -1275,17 +1275,12 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
         // ZGZGST-2330:委托关闭判断是否有完成额度，分情况处理 fuyongsheng 20210919 edit start
         if(CollectionUtils.isNotEmpty(entrustIdList)){
             Map<String, BigDecimal> etrFinishMap = EntrustCompleteUtil.getEtrFinishAmtList(entrustIdList);
-            //委托没有做过交易的，和撤销相同逻辑，删除预占
-            List<CfetsManualSettleDealInfo> recallEntrustIdList = new ArrayList<>();
             //委托已有完成额度，做过交易，走关闭完成的逻辑，更新预占
             List<String> closeEntrustIdList = new ArrayList<>();
             for(CfetsManualSettleDealInfo etrDto : listTemp) {
                 if(StringUtil.isNotEmpty(etrFinishMap) && StringUtil.isNotEmpty(etrFinishMap.get(etrDto.getEntrustId()))
                         && BigDecimal.ZERO.compareTo(etrFinishMap.get(etrDto.getEntrustId()))<0) {
                     closeEntrustIdList.add(etrDto.getEntrustId());
-                }
-                else if(entrustIdList.contains(etrDto.getEntrustId())){
-                    recallEntrustIdList.add(etrDto);
                 }
                 CfetsEtribBondInfo003Dto tradeDto = new CfetsEtribBondInfo003Dto();
                 BeanUtil.copyPropertiesIgnoreNull(tradeDto,etrDto);
@@ -1826,6 +1821,8 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             if (StringUtil.isEmpty(baseTradeProductDealDto.getEntrustId())) {
                 baseTradeProductDealDto.setEntrustId(cfetsManualSettleMapper.qryEntrustId(item.getFinprodId()));
             }
+            // shareAmt中为质押券面总额,换为交易金额
+            trdProductDeal.setShareAmt(trdProductDeal.getPrinAmt());
             if (isBack) {
                 trdProductDeal.setPrinAmt(trdProductDeal.getPrinAmt() == null ? null : trdProductDeal.getPrinAmt().negate());
                 trdProductDeal.setShareAmt(trdProductDeal.getShareAmt() == null ? null : trdProductDeal.getShareAmt().negate());
