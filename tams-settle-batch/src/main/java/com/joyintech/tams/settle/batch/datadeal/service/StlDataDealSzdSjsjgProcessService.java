@@ -1175,6 +1175,9 @@ public class StlDataDealSzdSjsjgProcessService {
         }
         if ("Y".equals(szdSjsjg.getJgjsbz())) {
             deliveryResult = DictCodeListExt4.交收结果_正常交收.getValue();
+            if (null == szdSjsjg.getJgjssl() || null == szdSjsjg.getJgcjsl()) {
+                return deliveryResult;
+            }
             if (0 != szdSjsjg.getJgjssl().compareTo(szdSjsjg.getJgcjsl())) {
                 deliveryResult = DictCodeListExt4.交收结果_部分交收.getValue();
             }
