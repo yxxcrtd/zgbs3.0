@@ -342,8 +342,16 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
         config.setInputValue4(dto.getType11());
         FinProductTypeConfig resultType = finTenderBondAssetMapper.getWindType(config);
         if (Objects.nonNull(resultType)) {
-            finProductType.setType6(resultType.getOutputValue1());
-            finProductType.setType7(resultType.getOutputValue2());
+            FinProductTypeConfig config1 = new FinProductTypeConfig();
+            config1.setConfigType(DictCodeListExt2.配置类型_投管分类.getValue());
+            config1.setInputValue2(dto.getType9());
+            config1.setInputValue3(dto.getType10());
+            config1.setInputValue4(dto.getType11());
+            FinProductTypeConfig resultType2 = finTenderBondAssetMapper.getWindType(config1);
+            if(Objects.nonNull(resultType2)) {
+                finProductType.setType6(resultType2.getOutputValue1());
+                finProductType.setType7(resultType2.getOutputValue2());
+            }
             finProductType.setType4(resultType.getOutputValue1());
             finProductType.setType5(resultType.getOutputValue2());
         }
