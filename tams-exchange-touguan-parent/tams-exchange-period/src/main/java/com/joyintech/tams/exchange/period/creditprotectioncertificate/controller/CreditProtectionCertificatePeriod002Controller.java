@@ -198,6 +198,10 @@ public class CreditProtectionCertificatePeriod002Controller extends BaseControll
             String busiCode = creditProtectionCertificatePeriod002Service.generateBusiCode(dto);
             dto.setBusiCode(busiCode);
 //            }
+            // 明细的交易编号提前
+            if(!StringUtil.isEmptyList(dto.getBillingDetails())){
+                dto.getBillingDetails().forEach(item -> item.setBusiCode(creditProtectionCertificatePeriod002Service.generateBusiCode(dto)));
+            }
             params.setBusinessCode(dto.getBusiCode());
             params.setBusinessType(DictCodeList.共通业务类型_信用保护凭证存续期.getValue());
             params.setComment(creditProtectionCertificatePeriod002Service.generateComment(dto));
