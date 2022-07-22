@@ -209,7 +209,8 @@ public class InstrumentManagement extends BaseService {
         List<MinPrice> minPriceList = queryMinPrices();
         minPriceService.saveInCache(minPriceList);
         List<MinTrdUnitLimit> minTrdUnitLimitList = queryMinTrdUnitLimits();
-        instrumentService.saveTrdUnitLimit(minTrdUnitLimitList);
+        minTrdUnitLimitService.saveInCache(minTrdUnitLimitList);
+//        instrumentService.saveTrdUnitLimit(minTrdUnitLimitList);
 
         // 实际不建议使用合约中的这些信息，而是使用在查询指令列表时匹配生成到指令上的信息
         /*instruments.forEach(instrument -> {

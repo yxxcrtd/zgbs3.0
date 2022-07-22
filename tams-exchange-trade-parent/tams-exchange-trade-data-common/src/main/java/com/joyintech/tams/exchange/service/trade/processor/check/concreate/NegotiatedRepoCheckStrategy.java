@@ -16,6 +16,7 @@ import com.joyintech.tams.exchange.common.constant.Market;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
+import com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum;
 import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.IntegratedEntrustService;
@@ -50,7 +51,8 @@ public class NegotiatedRepoCheckStrategy extends BaseCheckKit implements IBusine
     @Override
     public ResultBean check(BaseOrderRequest order, Instruction instruction, Instrument instrument, TickBean tickBean) {
         IntegratedOrderPlaceBean bean = (IntegratedOrderPlaceBean) order;
-        if (InstructionPs.REVERSEDREPO.codeEquals(instruction.getFirstRepoPs()) && StringUtil.isEmpty(bean.getRequestNo())) {
+        if (InstructionPs.REVERSEDREPO.codeEquals(instruction.getFirstRepoPs()) && StringUtil.isEmpty(bean.getRequestNo())
+                && !BusiTypeTgEnum.提前购回.codeEquals(instruction.getBusiTypeTg())) {
             throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "逆回购行情编号不能为空");
         }
         if (InstructionPs.REVERSEDREPO.codeEquals(instruction.getFirstRepoPs()) && StringUtil.isNotEmpty(bean.getRequestNo())) {
@@ -75,7 +77,7 @@ public class NegotiatedRepoCheckStrategy extends BaseCheckKit implements IBusine
         String entrustProp = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
 
         //检查对手方信息
-        checkPropDealerTradeInfo(integratedEntrust,instruction);
+        checkPropDealerTradeInfo(integratedEntrust, instruction);
 
         // 解除质押和中途换券无需判断
         if (!EntrustProp.isRepurchaseReleaseOrExchange(entrustProp)
