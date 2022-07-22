@@ -248,7 +248,7 @@ public class CfetsTrdConfirmService extends BaseService {
                         || StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.CSTP资产类型_债券.getValue())
                         ){
                             //对dto进行封装
-                            CfetsTrdBondInvestTradeDto entity=packageEquity(item, DictCodeListExt1.生成方式_画面录入.getValue());
+                            CfetsTrdBondInvestTradeDto entity = packageEquity(item, DictCodeListExt1.生成方式_画面录入.getValue());
                             //成交确认提交方法
                             // ((CfetsTrdConfirmService) AopContext.currentProxy()).doCompleteMethod(entity,OperationType.NEW);
                             cfetsTrdConfirm001Service.doCompleteMethod(entity, OperationType.NEW);
@@ -1045,7 +1045,7 @@ public class CfetsTrdConfirmService extends BaseService {
             if(!StringUtil.isNotEmpty(regDeal.getIntAmt())){
                 deal.setIntAmt(ArithmeticUtil.multiply(dtoReg.getUnitInt(), regDeal.getShareAmt()));
             }else{
-                deal.setCpriceAmt(regDeal.getIntAmt());
+                deal.setIntAmt(regDeal.getIntAmt());
             }
             deal.setFpriceAmt(regDeal.getFpriceAmt());
             deal.setTradeAmt(regDeal.getFpriceAmt());
