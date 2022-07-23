@@ -108,7 +108,7 @@
         ON t7.ENTRUST_ID = t6.ENTRUST_ID
         LEFT JOIN ETR_ENTRUST_ADD t8
         ON t8.ENTRUST_ID = t7.ENTRUST_ID
-        WHERE  t5.trade_id = #{tradeId}
+        WHERE  t5.trade_id = #{tradeId,jdbcType=VARCHAR}
         AND t1.BRANCH = 0
     </select>
     <!-- 查询原成交指令信息 -->
