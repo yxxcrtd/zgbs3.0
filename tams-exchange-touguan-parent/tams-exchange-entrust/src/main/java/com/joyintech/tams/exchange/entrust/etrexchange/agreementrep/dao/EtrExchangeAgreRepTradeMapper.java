@@ -7,13 +7,14 @@
  * 修改内容：新建
  * 系统名称：理财资管管理系统V2.0
  */
- 
+
 package com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dao;
 
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.tams.common.base.entity.FinProduct;
+import com.joyintech.tams.common.base.entity.PtlPortfolio;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.*;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -22,8 +23,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  场内交易委托
+ * 场内交易委托
  * 〈功能详细描述〉
+ *
  * @author zhangnian
  * @version 1.0 2019年11月14日
  * @see EtrExchangeAgreRepTradeMapper
@@ -33,10 +35,9 @@ import java.util.Map;
 public interface EtrExchangeAgreRepTradeMapper {
 
 
-
     /**
      * 对手方交易员联想文本框初始化。
-     * 
+     *
      * @param map 检索参数
      * @return 联想文本框
      */
@@ -44,7 +45,7 @@ public interface EtrExchangeAgreRepTradeMapper {
 
     /**
      * 本方交易员联想文本框初始化。
-     * 
+     *
      * @param map 检索参数
      * @return 联想文本框
      */
@@ -61,6 +62,7 @@ public interface EtrExchangeAgreRepTradeMapper {
      * @return 联想文本框
      */
     List<EtrExchangeAgreRepTrade001Dto> getEntrustInfoByEntrustId(Map<String, Object> map);
+
     /**
      * 查询原成交信息
      *
@@ -76,8 +78,10 @@ public interface EtrExchangeAgreRepTradeMapper {
      * @return 联想文本框
      */
     List<EtrExchangeAgreRepTrade001Dto> getEntrustInfoByIntiTradeId(Map<String, Object> map);
+
     /**
      * 场内交易委托列表查询
+     *
      * @param param
      * @return
      */
@@ -91,6 +95,7 @@ public interface EtrExchangeAgreRepTradeMapper {
 
     /**
      * 质押券查询下拉框
+     *
      * @param map
      * @return
      */
@@ -98,6 +103,7 @@ public interface EtrExchangeAgreRepTradeMapper {
 
     /**
      * 交易编号下拉框
+     *
      * @param map
      * @return
      */
@@ -105,6 +111,7 @@ public interface EtrExchangeAgreRepTradeMapper {
 
     /**
      * 查询资产信息
+     *
      * @param map 参数
      * @return 资产信息
      */
@@ -112,6 +119,7 @@ public interface EtrExchangeAgreRepTradeMapper {
 
     /**
      * 查询已经做了的提前购回、到期购回、到期续作、解除质押指令条数
+     *
      * @param map 参数
      * @return 指令条数
      */
@@ -119,6 +127,7 @@ public interface EtrExchangeAgreRepTradeMapper {
 
     /**
      * 查询市场代码信息
+     *
      * @param map 参数
      * @return 市场代码信息
      */
@@ -126,14 +135,24 @@ public interface EtrExchangeAgreRepTradeMapper {
 
     /**
      * 质押券查询下拉框
+     *
      * @param map
      * @return
      */
     EtrExchangeAgreRepCurrResp selectCurrPledgeInfo(Map<String, Object> map);
+
     /**
      * 质押券查询列表
+     *
      * @param map
      * @return
      */
     List<EtrExchangeAgreOutRepResp> selectCurrPledgeList(Map<String, Object> map);
+
+    /**
+     * 根据资金账号查询组合列表
+     *
+     * @param acctNo 资金账号
+     */
+    List<SelectOptionDto> selectPortfolioList(@Param("acctNo") String acctNo);
 }

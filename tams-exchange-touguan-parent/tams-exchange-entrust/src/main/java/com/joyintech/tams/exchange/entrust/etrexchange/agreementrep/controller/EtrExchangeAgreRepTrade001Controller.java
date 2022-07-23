@@ -15,6 +15,7 @@ import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.entity.EtrDistribute;
+import com.joyintech.tams.common.base.entity.PtlPortfolio;
 import com.joyintech.tams.component.base.core.MstWorkflowCommonService;
 import com.joyintech.tams.component.base.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
@@ -24,7 +25,10 @@ import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.*;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.enums.RepurchaseTypeEnum;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.service.EtrExchangeAgreRepTrade001Service;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.service.EtrExchangeAgreRepTrade002Service;
-import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.*;
+import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeTradeExportCommonRequest;
+import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeTradeOperateRequest;
+import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeTradePositionsCommonRequest;
+import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.SelectOptionRequestDto;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.service.EtrExchangeTradeCommon001Service;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.service.EtrExchangeTradeCommon002Service;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.service.EtrExchangeTradeCommonValidatorService;
@@ -1012,8 +1016,7 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
                     && !StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已退回.getValue())
                     && !StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已撤回.getValue())) {
                 errList.add(new ValidMessage("该委托状态不是已退回/已接收/已撤回，无法关闭!"));
-            }
-            else if ((Objects.nonNull(item.getDealPercent()) && item.getDealPercent().compareTo(BigDecimal.ZERO) > 0)
+            } else if ((Objects.nonNull(item.getDealPercent()) && item.getDealPercent().compareTo(BigDecimal.ZERO) > 0)
                     || (Objects.nonNull(item.getImplementPercent()) && item.getImplementPercent().compareTo(BigDecimal.ZERO) > 0)) {
                 errList.add(new ValidMessage("该委托执行进度和成交进度不为0，无法关闭!"));
             }
@@ -1327,5 +1330,17 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
     @PostMapping("selectCurrPledgeList/{tradeId}")
     public Message<List<EtrExchangeAgreOutRepResp>> selectCurrPledgeList(@ApiParam(value = "委托编号", required = false) @PathVariable String tradeId) {
         return new Message<List<EtrExchangeAgreOutRepResp>>().success().setData(etrExchangeAgreRepTrade001Service.selectCurrPledgeList(tradeId));
+    }
+
+    /**
+     * 根据资金账号查询组合列表
+     *
+     * @param acctNo 资金账号
+     */
+    @ApiOperation(value = "根据资金账号查询组合列表", notes = "根据资金账号查询组合列表")
+    @ResponseBody
+    @PostMapping("selectPortfolioList/{acctNo}")
+    public Message<List<SelectOptionDto>> selectPortfolioList(@ApiParam(value = "资金账号", required = true) @PathVariable String acctNo) {
+        return new Message<List<SelectOptionDto>>().success().setData(etrExchangeAgreRepTrade001Service.selectPortfolioList(acctNo));
     }
 }

@@ -1305,4 +1305,12 @@
         WHERE A.FINPROD_ID = #{tradeId}  and A.BRANCH=0
 
     </select>
+
+    <select id="selectPortfolioList" parameterType="java.lang.String"
+            resultType="com.joyintech.framework.select.SelectOptionDto">
+        SELECT DISTINCT PP.PORTFOLIO_ID id,PP.PORTFOLIO_NAME text
+        FROM  PTL_PORTFOLIO PP
+        LEFT JOIN PTL_CAPACCT_INFO PCI ON PP.PORTFOLIO_ID = PCI.PORTFOLIO_ID
+        WHERE PCI.ACCT_NO  = #{acctNo}
+    </select>
 </mapper>
