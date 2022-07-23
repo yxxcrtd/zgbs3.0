@@ -846,6 +846,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         a.ENTRUST_PROP, a.BS_FLAG,
         /*a.ENTRUST_VOLUME, */
         case
+            when a.ASSET_TYPE = 'F07'
+			then nvl( a.ENTRUST_VOLUME, 0 ) / 100
             when #{busiTypePosition} in ('EX017','EX005') then round(nvl(a.ENTRUST_VOLUME/100,0),3)
             when #{busiTypePosition} = 'EX018' then 0
             else a.ENTRUST_VOLUME
@@ -858,6 +860,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         a.FROZEN_VOLUME, a.TRADED_BALANCE,
 /*a.TRADED_VOLUME, */
         case
+        when a.ASSET_TYPE = 'F07'
+			then nvl( a.TRADED_VOLUME, 0 ) / 100
         when #{busiTypePosition} in ('EX017','EX005') then round(nvl(a.TRADED_VOLUME/100,0),3)
         when #{busiTypePosition} = 'EX018' then 0
         else a.TRADED_VOLUME
@@ -878,6 +882,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         a.BS_FLAG,
         /*a.ENTRUST_VOLUME, */
         case
+        when a.ASSET_TYPE = 'F07'
+			then nvl( a.ENTRUST_VOLUME, 0 ) / 100
             when #{busiTypePosition} in ('EX017','EX005') then round(nvl(a.ENTRUST_VOLUME/100,0),3)
             when #{busiTypePosition} = 'EX018' then 0
             else a.ENTRUST_VOLUME
@@ -889,6 +895,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         NULL AS ORIG_SERIAL_NO, NULL AS REDUCTION_TYPE, a.FROZEN_BALANCE,a.FROZEN_VOLUME, a.TRADED_BALANCE,
         /*a.TRADED_VOLUME, */
         case
+        when a.ASSET_TYPE = 'F07'
+			then nvl( a.TRADED_VOLUME, 0 ) / 100
         when #{busiTypePosition} in ('EX017','EX005') then round(nvl(a.TRADED_VOLUME/100,0),3)
         when #{busiTypePosition} = 'EX018' then 0
         else a.TRADED_VOLUME
@@ -909,6 +917,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME,a. REPORT_TIME,
     a.ENTRUST_PROP, a.BS_FLAG,
     /*a.ENTRUST_VOLUME, */
     case
+    when a.ASSET_TYPE = 'F07'
+			then nvl( a.ENTRUST_VOLUME, 0 ) / 100
         when #{busiTypePosition} in ('EX017','EX005') then round(nvl(a.ENTRUST_VOLUME/100,0),3)
         when #{busiTypePosition} = 'EX018' then 0
         else a.ENTRUST_VOLUME
@@ -920,6 +930,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME,a. REPORT_TIME,
     a.TRADED_BALANCE,
 /*a.TRADED_VOLUME, */
         case
+          when a.ASSET_TYPE = 'F07'
+			then nvl( a.TRADED_VOLUME, 0 ) / 100
         when #{busiTypePosition} in ('EX017','EX005') then round(nvl(a.TRADED_VOLUME/100,0),3)
         when #{busiTypePosition} = 'EX018' then 0
         else a.TRADED_VOLUME
@@ -1081,7 +1093,9 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
 			 FP.FINPROD_MARKET_ID                                  STOCK_CODE,
 			 FP.FINPROD_ABBR                                       STOCK_NAME,
 			 DECODE(TT.PS, NULL, DECODE(TTH.PS,NULL,std.ps,TTH.ps), TT.PS) ENTRUST_BS,
-			 DECODE(TT.TRADED_VOLUME, NULL, DECODE(TTH.TRADED_VOLUME,NULL,std.SHARE_AMT,TTH.TRADED_VOLUME), TT.TRADED_VOLUME)     TRADED_VOLUME,
+            case when TT.ASSET_TYPE = 'F07' then  nvl(TT.TRADED_VOLUME,0)/100
+            else
+			 DECODE(TT.TRADED_VOLUME, NULL, DECODE(TTH.TRADED_VOLUME,NULL,std.SHARE_AMT,TTH.TRADED_VOLUME), TT.TRADED_VOLUME)   end  TRADED_VOLUME,
 			 DECODE(TT.TRADED_PRICE, NULL, DECODE(TTH.TRADED_PRICE,NULL,std.UNIT_FPRICE,TTH.TRADED_PRICE), TT.TRADED_PRICE)       TRADED_PRICE,
 			 DECODE(TT.TRADED_BALANCE, NULL, DECODE(TTH.TRADED_BALANCE,NULL,std.TRADE_AMT,TTH.TRADED_BALANCE),TT.TRADED_BALANCE)   TRADED_BALANCE,
 			 DECODE(TT.TRADING_DAY, NULL, DECODE(TTH.TRADING_DAY,NULL,TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'),TTH.TRADING_DAY), TT.TRADING_DAY)         TRADING_DAY,
@@ -1133,7 +1147,10 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
 			 TT.STOCK_CODE                                         STOCK_CODE,
 			 TT.STOCK_NAME                                         STOCK_NAME,
 			 TT.PS                                                 ENTRUST_BS,
-			 TT.TRADED_VOLUME                                      TRADED_VOLUME,
+            case when TT.ASSET_TYPE = 'F07'
+            then nvl(TT.TRADED_VOLUME,0)/100
+            else
+            TT.TRADED_VOLUME end TRADED_VOLUME,
 			 TT.TRADED_PRICE                                       TRADED_PRICE,
 			 TT.TRADED_BALANCE                                     TRADED_BALANCE,
 			 TT.TRADING_DAY                                        TRADING_DAY,
@@ -1180,7 +1197,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
             fp.FINPROD_MARKET_ID STOCK_CODE,
             fp.FINPROD_ABBR STOCK_NAME,
             tpd.PS ENTRUST_BS,
-            tpd.SHARE_AMT TRADED_VOLUME,
+            case when tpd.FINPROD_TYPE2 = 'F07' then nvl(tpd.SHARE_AMT,0)/100 else
+            tpd.SHARE_AMT end TRADED_VOLUME,
             tpd.CPRICE_AMT TRADED_PRICE,
             tpd.FPRICE_AMT TRADED_BALANCE,
             TO_CHAR( tpd.TRADE_DATE, 'YYYY-MM-DD' ) TRADING_DAY,
@@ -1216,7 +1234,8 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
             fp.FINPROD_MARKET_ID STOCK_CODE,
             fp.FINPROD_ABBR STOCK_NAME,
             std1.PS ENTRUST_BS,
-            std1.SHARE_AMT TRADED_VOLUME,
+            case when std1.FINPROD_TYPE2 = 'F07' then nvl(std1.SHARE_AMT,0)/100 else
+            std1.SHARE_AMT end TRADED_VOLUME,
             std1.CPRICE_AMT TRADED_PRICE,
             std1.FPRICE_AMT TRADED_BALANCE,
             TO_CHAR(std1.TRADE_DATE, 'YYYY-MM-DD' ) TRADING_DAY,
