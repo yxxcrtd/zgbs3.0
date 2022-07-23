@@ -74,13 +74,14 @@ public class NegotiatedRepoCheckStrategy extends BaseCheckKit implements IBusine
         } catch (Exception e) {
             throw new BusinessResultException(ErrorCode.SYSTEM_ERROR);
         }
-        String entrustProp = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
+//        String entrustProp = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
 
         //检查对手方信息
         checkPropDealerTradeInfo(integratedEntrust, instruction);
 
         // 解除质押和中途换券无需判断
-        if (!EntrustProp.isRepurchaseReleaseOrExchange(entrustProp)
+        if (!BusiTypeTgEnum.解除质押.codeEquals(instruction.getBusiTypeTg())
+                && !BusiTypeTgEnum.中途换券.codeEquals(instruction.getBusiTypeTg())
                 && (TradeUtils.equals(integratedEntrust.getEntrustBalance(), BigDecimal.ZERO)
                 || TradeUtils.equals(integratedEntrust.getBackBalance(), BigDecimal.ZERO))) {
             throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "回购金额或到期结算金额不能为0");
