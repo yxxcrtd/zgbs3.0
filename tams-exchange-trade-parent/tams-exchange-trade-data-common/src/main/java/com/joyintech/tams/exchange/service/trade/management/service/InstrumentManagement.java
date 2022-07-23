@@ -199,10 +199,10 @@ public class InstrumentManagement extends BaseService {
     public ResultBean updateInstrument2Cache(Map<String, Object> params) {
 //        List<Instrument> instruments = Lists.newArrayList();
 
-        List<MinPrice> minPriceList = queryMinPrices();
-        minPriceService.saveInCache(minPriceList);
-        List<MinTrdUnitLimit> minTrdUnitLimitList = queryMinTrdUnitLimits();
-        minTrdUnitLimitService.saveInCache(minTrdUnitLimitList);
+//        List<MinPrice> minPriceList = queryMinPrices();
+//        minPriceService.saveInCache(minPriceList);
+//        List<MinTrdUnitLimit> minTrdUnitLimitList = queryMinTrdUnitLimits();
+//        minTrdUnitLimitService.saveInCache(minTrdUnitLimitList);
 
         ResultBean result = ResultBean.success();
         List<Instrument> instruments = queryInstruments(params);
