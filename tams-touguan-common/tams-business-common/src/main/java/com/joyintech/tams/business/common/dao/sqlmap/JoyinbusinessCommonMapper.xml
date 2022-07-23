@@ -554,6 +554,24 @@
             </if>
         </where>
     </select>
+    <select id="queryAcctNo" resultType="com.joyintech.framework.select.SelectOptionDto">
+        SELECT DISTINCT
+        sci.BUSI_ACCT_NO id,
+        sci.ACCT_NAME text,
+        pci.ACCT_TYPE as object
+        FROM
+        STL_CAPACCT_INFO sci
+            left join PTL_CAPACCT_INFO pci on sci.ACCT_NO = pci.ACCT_NO
+        <where>
+            <if test="search != null and !search.equals('')">
+                AND	(sci.BUSI_ACCT_NO like concat('%',concat(#{search},'%'))
+                or sci.ACCT_NAME like concat('%',concat(#{search},'%')))
+            </if>
+            <if test="acctType != null and !acctType.equals('')">
+                AND	pci.ACCT_TYPE = #{acctType}
+            </if>
+        </where>
+    </select>
     <select id="queryMySideAndPartyList" resultType="com.joyintech.framework.select.SelectOptionDto">
         SELECT DISTINCT
         MST_CFETS_CUSTOMER_INFO.PARTY_ID id,
