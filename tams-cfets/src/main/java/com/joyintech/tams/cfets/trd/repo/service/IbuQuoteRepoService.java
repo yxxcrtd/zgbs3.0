@@ -2105,7 +2105,7 @@ public class IbuQuoteRepoService extends BaseService {
         //尾差
         BigDecimal tailDifference = tradeAmt;
         for (RepoPtlAllocationDto ptlAllocation : ptlAllocations) {
-            ptlAllocation.setTradeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(tradeAmt, ptlAllocation.getTradeAmt()), avaNumTotal, 4));
+            ptlAllocation.setTradeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(tradeAmt, ptlAllocation.getAvaNum()), avaNumTotal, 4));
             tailDifference = ArithmeticUtil.subtract(tailDifference, ptlAllocation.getTradeAmt());
         }
         handleTailDifference(ptlAllocations, tailDifference);
