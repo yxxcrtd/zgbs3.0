@@ -142,7 +142,17 @@ public class EtrExchangeAgreRepTrade002Controller extends BaseController {
 
             if (entity != null && entity.getHgMDate() == null
                     && entity.getTerm() != null && StringUtil.isNotBlank(entity.getFristSettleDate())) {
-                entity.setHgMDate(DateUtil.addDay(entity.getFristSettleDate(), entity.getTerm().intValue()));
+                if (!StringUtil.equals(entity.getPs(), DictCodeListExt3.交易方向_提前购回.getValue())) {
+                    entity.setHgMDate(DateUtil.addDay(entity.getFristSettleDate(), entity.getTerm().intValue()));
+                } else {
+                    // 提前购回，需要查询首期，获取首期时的回购期限
+                    Map<String, Object> queryMap = new HashMap<>();
+                    queryMap.put("tradeId",entity.getIntiTradeId());
+                    EtrExchangeAgreRepTrade001Dto repFristList = etrExchangeAgreRepTrade001Service.getEntrustInfoByIntiTradeId(queryMap);
+                    if (!Objects.isNull(repFristList)) {
+                        entity.setHgMDate(DateUtil.addDay(entity.getFristSettleDate(), repFristList.getTerm()));
+                    }
+                }
             }
             if(entity != null){
                 model.addAttribute(GlobalConstant.ENTITY, entity);
@@ -174,7 +184,6 @@ public class EtrExchangeAgreRepTrade002Controller extends BaseController {
         model.addAttribute("PS_T94", DictCodeListExt3.交易方向_中途换券.getValue());
         return super.init(model);
     }
-
 
     @ApiOperation(value = "下单查询页面初始化参数", notes = "下单查询页面初始化参数")
     @PostMapping("/getPageParams001")

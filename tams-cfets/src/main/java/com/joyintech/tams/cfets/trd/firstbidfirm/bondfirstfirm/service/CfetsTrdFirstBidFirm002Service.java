@@ -2630,6 +2630,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             for (TrdProductDeal deal : deals) {
                 TrdProductDealAdd dealAdd = new TrdProductDealAdd();
                 dealAdd = trdProductDealAddMapper.selectByPrimaryKey(deal.getTradeId());
+                deal.setPortfolioId(dealAdd.getPortfolioId());
                 dealAdds.add(dealAdd);
                 // 费用
                 TrdTradeFeeDetail feeDetail = new TrdTradeFeeDetail();
