@@ -1145,7 +1145,7 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                     if (finTradeProduct != null) {
                         infRiskRdsDto.setPs(DictCodeList.交易方向_到期.getValue());
                         infRiskRdsDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
-                        infRiskRdsDto.setAssetType2(String.valueOf(CommonUtil.findValue(dataMap, "busiPs")));
+                        infRiskRdsDto.setAssetType2(String.valueOf(CommonUtil.findValue(dataMap, "repPs")));
                         infRiskRdsDto.setAmount(finTradeProduct.getmTradeAmt());
                         infRiskRdsDto.setTradeNum(finTradeProduct.getPrin());
                         infRiskRdsDto.setAssetRate(finTradeProduct.getIntRate());

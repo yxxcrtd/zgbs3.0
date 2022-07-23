@@ -2671,13 +2671,13 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         dataMap.put("tradeAmt", dto.getTradeAmt());
         dataMap.put("tradeMarket", dto.getTradeMarket());
         dataMap.put("yield", dto.getYield());
-        if(StringUtil.isNotEmpty(dto.getPs()) && StringUtil.equals(dto.getPs(), 交易方向_到期续做.getValue()) && StringUtil.equals(dto.getRedoType(),"0")) {
+       /* if(StringUtil.isNotEmpty(dto.getPs()) && StringUtil.equals(dto.getPs(), 交易方向_到期续做.getValue()) && StringUtil.equals(dto.getRedoType(),"0")) {
             //到期续作&未变更交易对手时新回购金额-原回购到期结算金额
             Map<String, Object> map = new HashMap<>();
             map.put("tradeId", (dto.getIntiTradeId() == null || dto.getIntiTradeId().equals("")) ? dto.getTradeId() : dto.getIntiTradeId());
             EtrExchangeAgreRepTrade001Dto  result =  this.getEntrustInfoByIntiTradeId(map);
             dataMap.put("tradeAmt",ArithmeticUtil.subtract(dto.getTradeAmt(),result.getExpireSettleAmt()));
-        }
+        }*/
         if(StringUtil.isNotEmpty(dto.getPs()) && StringUtil.equals(dto.getPs(), 交易方向_解除质押.getValue()) && StringUtil.equals(dto.getTradeMarket(),"03")) {
             dataMap.put("tradeAmt",0);
         }
