@@ -135,6 +135,15 @@ public interface JoyinbusinessCommonMapper {
      */
     List<SelectOptionDto> queryMySideList(Map<String, Object> param);
     /**
+     * 查询资金账户
+     * <功能详细描述>
+     * @param param
+     * @return
+     * @see
+     * @since 1.0
+     */
+    List<SelectOptionDto> queryAcctNo(Map<String, Object> param);
+    /**
      * 查询本方机构列表,且关联交易对手-银行间
      * <功能详细描述>
      * @param param

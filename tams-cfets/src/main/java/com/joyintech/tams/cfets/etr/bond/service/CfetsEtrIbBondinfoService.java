@@ -1613,7 +1613,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         BigDecimal unitFpriceAmtTailDifference = ArithmeticUtil.round(dto.getUnitFpriceAmt(), 2, RoundingMode.HALF_UP);
         for (CfetsEtribBondInfo003Dto dd : etrInvestBondInfoDtosList) {// 结算金额
             dd.setUnitFpriceAmt(ArithmeticUtil.divide(
-                    ArithmeticUtil.multiply(dto.getUnitFpriceAmt(), dd.getEntrustNum()), dto.getPriceAmt(), 2, RoundingMode.HALF_DOWN));
+                    ArithmeticUtil.multiply(dto.getUnitFpriceAmt(), dd.getEntrustNum()), dto.getTradeAmt(), 2, RoundingMode.HALF_DOWN));
             unitFpriceAmtTailDifference = ArithmeticUtil.subtract(unitFpriceAmtTailDifference, dd.getUnitFpriceAmt());
         }
         CfetsEtribBondInfo003Dto cfetsEtribBond = etrInvestBondInfoDtosList.stream().max(Comparator.comparing(CfetsEtribBondInfo003Dto::getEntrustNum)).get();
@@ -1877,7 +1877,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         BigDecimal unitFpriceAmtTailDifference = ArithmeticUtil.round(dto.getUnitFpriceAmt(), 2, RoundingMode.HALF_UP);
         for (CfetsEtribBondInfo003Dto dd : etrInvestBondInfoDtosList) {// 结算金额
             dd.setUnitFpriceAmt(ArithmeticUtil.divide(
-                    ArithmeticUtil.multiply(dto.getUnitFpriceAmt(), dd.getEntrustNum()), dto.getPriceAmt(), 2, RoundingMode.HALF_DOWN));
+                    ArithmeticUtil.multiply(dto.getUnitFpriceAmt(), dd.getEntrustNum()), dto.getTradeAmt(), 2, RoundingMode.HALF_DOWN));
             unitFpriceAmtTailDifference = ArithmeticUtil.subtract(unitFpriceAmtTailDifference, dd.getUnitFpriceAmt());
         }
         CfetsEtribBondInfo003Dto cfetsEtribBond = etrInvestBondInfoDtosList.stream().max(Comparator.comparing(CfetsEtribBondInfo003Dto::getEntrustNum)).get();

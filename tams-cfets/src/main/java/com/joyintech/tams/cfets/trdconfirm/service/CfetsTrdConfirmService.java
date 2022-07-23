@@ -2310,9 +2310,14 @@ public class CfetsTrdConfirmService extends BaseService {
         if(StringUtil.isNotEmpty(finprodId)){
             pageParam.put("finprodIdList", StringUtil.splitToList(GlobalConstant.COMMA,finprodId));
         }
-        String acctNo=(String)pageParam.get("acctNo");
-        if(StringUtil.isNotEmpty(acctNo)){
-            pageParam.put("acctNoList", StringUtil.splitToList(GlobalConstant.COMMA,acctNo));
+        String acctNo = (String) pageParam.get("acctNo");
+        if (StringUtil.isNotEmpty(acctNo)) {
+            pageParam.put("acctNoList", StringUtil.splitToList(GlobalConstant.COMMA, acctNo));
+        } else {
+            String secAcctId = (String) pageParam.get("secAcctId");
+            if (StringUtil.isNotEmpty(secAcctId)) {
+                pageParam.put("acctNoList", StringUtil.splitToList(GlobalConstant.COMMA, secAcctId));
+            }
         }
         String traderid=(String)pageParam.get("traderid");
         if(StringUtil.isNotEmpty(traderid)){
