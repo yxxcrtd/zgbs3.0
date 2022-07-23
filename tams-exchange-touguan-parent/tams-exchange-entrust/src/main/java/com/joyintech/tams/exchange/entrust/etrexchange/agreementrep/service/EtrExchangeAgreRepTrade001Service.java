@@ -1610,10 +1610,11 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 		}
         if (StringUtil.equals(optType,ENTRUST_RECORD_NEW)
                 && null != entity.getEntrustId() &&  null != etrEntrustBackupMapper.selectByPrimaryKey(entity.getEntrustId())) {
-            EtrPledgeKey key = new EtrPledgeKey();
-            key.setEntrustId(entity.getEntrustId());
-            key.setFinprodId(entity.getFinprodId());
-            etrPledgeMapper.deleteByPrimaryKey(key);
+//            EtrPledgeKey key = new EtrPledgeKey();
+//            key.setEntrustId(entity.getEntrustId());
+//            key.setFinprodId(entity.getFinprodId());
+//            etrPledgeMapper.deleteByPrimaryKey(key);
+            etrPledgeMapper.deleteByEntrustId(entity.getEntrustId());
         }
 		EtrParameterDto paraDto = new EtrParameterDto();
         setUser(paraDto);
