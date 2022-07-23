@@ -522,27 +522,27 @@
         else eea.COUNTER_ORG end as revRepurOrgId, /**逆回购方交易商代码**/
 
         trd_product_deal_2.TRADER tradeNo,
-        (select mddi.TRADER_NAME from  MST_DEALER_DETAIL_INFO mddi
+        (select distinct mddi.TRADER_NAME from  MST_DEALER_DETAIL_INFO mddi
         where mddi.DEALER_NO = trd_product_deal_add.DEALER_NO and mddi.TRADE_MARKET = fin_trade_product.Trade_Market and mddi.TRADER_NO =trd_product_deal_2.TRADER) as tradeName,
 
         trd_product_deal_add.DEALER_NO dealerNo,
-        (select mci.CUSTOMER_NAME from MST_CUSTOMER_INFO mci ,MST_DEALER_INFO mdi
+        (select distinct mci.CUSTOMER_NAME from MST_CUSTOMER_INFO mci ,MST_DEALER_INFO mdi
         where mci.CUSTOMER_ID = mdi.CUSTOMER_ID and mdi.DEALER_NO = trd_product_deal_add.DEALER_NO and mdi.TRADE_MARKET = fin_trade_product.Trade_Market) as dealerName,
 
         trd_product_deal_add.DEALER_PARTY_NO AS investorNo,
-        (select mddi.DEALER_PARTY_NAME from MST_DEALER_DETAIL_INFO mddi
+        (select distinct mddi.DEALER_PARTY_NAME from MST_DEALER_DETAIL_INFO mddi
         where mddi.DEALER_NO = trd_product_deal_add.DEALER_NO and mddi.TRADE_MARKET = fin_trade_product.Trade_Market and mddi.DEALER_PARTY_NO =trd_product_deal_add.DEALER_PARTY_NO) as investorName,
 
         trd_product_deal_2.COUNTER_TRADER  	counterTradeNo,
-        (select mddi.TRADER_NAME from  MST_DEALER_DETAIL_INFO mddi
+        (select distinct mddi.TRADER_NAME from  MST_DEALER_DETAIL_INFO mddi
         where mddi.DEALER_NO = trd_product_deal_add.OUT_DEALER_NO and mddi.TRADE_MARKET = fin_trade_product.Trade_Market and mddi.TRADER_NO =trd_product_deal_2.COUNTER_TRADER) as counterTradeName,
 
         trd_product_deal_add.OUT_DEALER_NO counterDealerNo,
-        (select mci.CUSTOMER_NAME from  MST_CUSTOMER_INFO mci ,MST_DEALER_INFO mdi
+        (select distinct mci.CUSTOMER_NAME from  MST_CUSTOMER_INFO mci ,MST_DEALER_INFO mdi
         where mci.CUSTOMER_ID = mdi.CUSTOMER_ID and mdi.DEALER_NO = trd_product_deal_add.OUT_DEALER_NO and mdi.TRADE_MARKET = fin_trade_product.Trade_Market) as counterDealerName,
 
         trd_product_deal_add.OUT_DEALER_PARTY_NO as counterInvestorNo,
-        (select mddi.DEALER_PARTY_NAME from  MST_DEALER_DETAIL_INFO mddi
+        (select distinct mddi.DEALER_PARTY_NAME from  MST_DEALER_DETAIL_INFO mddi
         where mddi.DEALER_NO = trd_product_deal_add.OUT_DEALER_NO and mddi.TRADE_MARKET = fin_trade_product.Trade_Market and mddi.DEALER_PARTY_NO =trd_product_deal_add.OUT_DEALER_PARTY_NO) as counterInvestorName,
 
         trd_product_deal_2.trade_id firstTradeId,
