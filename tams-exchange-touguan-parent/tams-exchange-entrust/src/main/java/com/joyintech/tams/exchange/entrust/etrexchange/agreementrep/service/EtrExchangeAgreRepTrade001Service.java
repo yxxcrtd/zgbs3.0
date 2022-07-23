@@ -2741,6 +2741,30 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
     }
 
     //获取首期交易编号
+    public EtrExchangeAgreRepCurrResp getFinprodIdNoFirsts(EtrExchangeAgreRepTrade001Dto dto) {
+        String tradeId = "";
+        //wsz 修改行情到期续作 首次结算时间传值
+        String date = "";
+        if (!StringUtils.isEmpty(dto.getOrigSerialDate())
+                || DictCodeListExt3.上农商_指令业务类型_协议回购到期续做指令.getValue().equals(dto.getEntrustBussType())) {
+            date = dto.getOrigSerialDate();
+        } else {
+            date = dto.getFristSettleDate();
+        }
+        TrdProductDeal trdProductDeal = trdCommonBaseService.getFirstRepoTrade(dto.getIntiTradeId(),
+                "", dto.getSecAcctId(),
+                DateUtil.parse(date));
+        //wsz 修改行情到期续作 首次结算时间传值
+        if (trdProductDeal != null) {
+            tradeId = trdProductDeal.getFinprodId();
+        }
+
+        return this.selectCurrPledgeInfo(tradeId);
+
+    }
+
+
+    //获取首期交易编号
     private String getFinprodIdNoFirst(EtrExchangeAgreRepTrade001Dto dto) {
         String tradeId = "";
         //wsz 修改行情到期续作 首次结算时间传值

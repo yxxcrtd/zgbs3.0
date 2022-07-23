@@ -1343,4 +1343,15 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
     public Message<List<SelectOptionDto>> selectPortfolioList(@ApiParam(value = "资金账号", required = true) @PathVariable String acctNo) {
         return new Message<List<SelectOptionDto>>().success().setData(etrExchangeAgreRepTrade001Service.selectPortfolioList(acctNo));
     }
+    /**
+     * 根据资金账号查询组合列表
+     *
+     * @param acctNo 资金账号
+     */
+    @ApiOperation(value = "根据资金账号查询组合列表", notes = "根据资金账号查询组合列表")
+    @ResponseBody
+    @PostMapping("getFinprodIdNoFirst")
+    public Message<EtrExchangeAgreRepCurrResp> getFinprodIdNoFirsts(@RequestBody EtrExchangeAgreRepTrade001Dto dto) {
+        return new Message<EtrExchangeAgreRepCurrResp>().success().setData(etrExchangeAgreRepTrade001Service.getFinprodIdNoFirsts(dto));
+    }
 }
