@@ -1575,6 +1575,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
 
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, agreRepOpenSecDto);
+            etrEntrust.setEntrustAmt(entity.getExpireSettleAmt());
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, agreRepOpenSecDto);
         }
 
