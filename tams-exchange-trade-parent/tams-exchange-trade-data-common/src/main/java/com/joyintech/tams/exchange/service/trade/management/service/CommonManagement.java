@@ -476,6 +476,12 @@ public class CommonManagement extends BaseService {
         }*/
     }
 
+    public void flushCommonCache(){
+        minPriceInCache();
+        minTrdUnitLimitInCache();
+        tradeTimeInCache();
+    }
+
     public ResultBean tradeTimeInCache() {
         logger.info("开始缓存-交易时间段信息");
         try {
