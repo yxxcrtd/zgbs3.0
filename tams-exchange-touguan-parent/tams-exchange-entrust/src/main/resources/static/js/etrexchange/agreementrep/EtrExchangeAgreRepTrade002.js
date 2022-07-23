@@ -535,6 +535,7 @@
         var tradeMarket = $("#tradeMarket").val();
         var ps = $("#ps").val();
         var repPs = $("#repPs").val();
+        $("#entrustAmt_div").hide();
         //回购期限
         $("#term_div").show();
         //回购利率
@@ -1421,6 +1422,7 @@
                 }
             } else if (ps == 'T93') {
                 if (repPs == BACK_LEND_DIRECTION_03) {
+                    $("#entrustAmt_div").show();
                     //本方交易员
                     $("#trader_div").hide();
                     //组合名称
@@ -1500,6 +1502,7 @@
                     $("#addCla_div").show();
                     $("#addCla").attr("disabled", false);
                 } else if (repPs == BACK_LEND_DIRECTION_04) {
+                    $("#entrustAmt_div").show();
                     //组合名称
                     $("#portfolioId").attr("disabled", false);
                     //资金账号
