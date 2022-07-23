@@ -504,6 +504,9 @@ public class InvestRiskManagement extends BaseService {
                 // 非首期填入成交编号
                 if (!EntrustProp.isRepurchase_First(entrustProp)) {
                     reqRiskOccupy.setFirstIssueDealNo(((IntegratedEntrust) entrust).getOrigSerialNo());
+                    if(StringUtil.isEmpty(reqRiskOccupy.getFirstIssueDealNo())) {
+                        reqRiskOccupy.setFirstIssueDealNo(instruction.getFinprodId());
+                    }
                 }
                 reqRiskOccupy.setAssetType2(回购类型_质押式协议回购.getValue());
                 reqRiskOccupy.setRepurchaseType(回购类型_质押式协议回购.getValue());

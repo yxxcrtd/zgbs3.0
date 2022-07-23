@@ -304,7 +304,7 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
             }else if (StringUtil.equals(CommonUtil.findValue(entity,"ps"),DictCodeList.交易方向_到期续做.getValue())){
                 InterfRiskRdsDto secdto = new InterfRiskRdsDto();
                 BeanUtil.copyPropertiesIgnoreNull(secdto, interfRiskRdsDto);
-                interfRiskRdsDto.setPreOccupyCode(interfRiskRdsDto.getPreOccupyCode() + interfRiskRdsDto.getPs());
+                interfRiskRdsDto.setPreOccupyCode(interfRiskRdsDto.getEntrustCode() + DictCodeList.交易方向_买入.getValue());
                 interfRiskRdsDto.setEventId(interfRiskRdsDto.getEventId() + interfRiskRdsDto.getPs());
                 secdto.setPs(DictCodeList.交易方向_到期.getValue());
                 // 原回购到期
@@ -327,7 +327,7 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                     // 交易编号 = 原交易编号 + PS
                     secdto.setEventId(secdto.getEventId() + secdto.getPs());
                     // 预占编号 = 预占编号 + PS
-                    secdto.setPreOccupyCode(secdto.getPreOccupyCode() + secdto.getPs());
+                    secdto.setPreOccupyCode(secdto.getEntrustCode() + DictCodeList.交易方向_到期.getValue());
                     secdto.setAmount(finTradeProduct.getmTradeAmt());
                     secdto.setTradeNum(finTradeProduct.getPrin());
                     secdto.setAssetRate(finTradeProduct.getIntRate());
@@ -1063,6 +1063,7 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
         interfRiskRdsDto.setInfCode(BussinessDictCodeListRds.接口系统ID_实占批量接口.getValue());
         ClientData cliendata = interfRiskRdsService.sendRiskRdsDataCommon(listMap, interfRiskRdsDto,RSK_SZ_LIST, isNeedRiskCheck);
 
+        //if(true) throw new Exception("指标状态_不通过");
         //参数硬控，不通过，返回
         if(StringUtil.equals("02", CacheUtil.getSysParam(BussinessConstant.IS_RISKMATH_SOFTCONTROL))){
             if(!BussinessDictCodeListRds.指标状态_通过.getValue().equals(cliendata.getBody().get("rskStatus")) && isNeedRiskCheck){

@@ -320,13 +320,15 @@ public class TradeRdsCommonAop {
                     mapTrd.put("allPrice",price);
                     mapTrd.put("price",price);
                 }
+                String tradeId = null;
                 // 实际编号
                 if (CommonUtil.findValue(mapTrd, "orderId") != null){
                     mapTrd.put(PageFieldToInterfFactory.INF_EVENTID,CommonUtil.findValue(mapTrd, "orderId"));
                     mapTrd.put("tradeId",CommonUtil.findValue(mapTrd, "orderId"));
                     if(StringUtil.equals(金融产品类型_投管用_债券质押式正回购.getValue(),CommonUtil.findValue(mapTrd, "finprodType2")) ||
                       StringUtil.equals(金融产品类型_投管用_债券质押式逆回购.getValue(),CommonUtil.findValue(mapTrd, "finprodType2"))) {//针对协议回购交收失败组装实占编号
-                        mapTrd.put("tradeId",String.format("%s-%s-%s",CommonUtil.findValue(mapTrd, "entrustNo"),CommonUtil.findValue(mapTrd,"portfolioId"),CommonUtil.findValue(mapTrd, "iOrderId")));
+                        tradeId = String.format("%s-%s-%s",CommonUtil.findValue(mapTrd, "entrustNo"),CommonUtil.findValue(mapTrd,"portfolioId"),CommonUtil.findValue(mapTrd, "iOrderId"));
+                        mapTrd.put("tradeId",isDqxz(mapTrd)? tradeId + "T01" : tradeId);
                         mapTrd.put("tradeAmt",CommonUtil.findValue(mapTrd, "tradedVolume"));
                         mapTrd.put("tradeNum",CommonUtil.findValue(mapTrd, "tradedVolume"));
                     }
@@ -340,19 +342,9 @@ public class TradeRdsCommonAop {
                 // 实占释放
                 revokeManualSettle(mapTrd, infCode, BussinessDictCodeListRds.事件类型_投资交易.getValue(),assetType,joinPoint);
                 //TODO 到期续作失败时占回原实占
-                if(StringUtil.equals(mapTrd.get("busiType"),"09") || StringUtil.equals(mapTrd.get("busiType"),"15") ||
-                        StringUtil.equals(mapTrd.get("busiType"),"20") || StringUtil.equals(mapTrd.get("busiType"),"24")) {
-                    FinTradeProductKey finTradeProductKey = new FinTradeProductKey();
-                    finTradeProductKey.setBranch(0L);
-                    if(StringUtil.isNotEmpty(mapTrd.get("finprodId"))) {
-                        finTradeProductKey.setFinprodId(String.valueOf(mapTrd.get("finprodId")));
-                        FinTradeProduct finTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
-                        if(Objects.nonNull(finTradeProduct)) {
-                            mapTrd.put("tradeAmt",finTradeProduct.getmTradeAmt());
-                            mapTrd.put("tradeNum",finTradeProduct.getPrin());
-                            revokeManualSettle(mapTrd, BussinessDictCodeListRds.接口系统ID_实占接口.getValue(), BussinessDictCodeListRds.事件类型_投资交易.getValue(),assetType,joinPoint);
-                        }
-                    }
+                if(isDqxz(mapTrd) && StringUtil.isNotEmpty(tradeId)) {
+                    mapTrd.put("tradeId",tradeId + "T07");
+                    revokeManualSettle(mapTrd, BussinessDictCodeListRds.接口系统ID_实占释放接口.getValue(), BussinessDictCodeListRds.事件类型_投资交易.getValue(),assetType,joinPoint);
                 }
                 // 预占释放
                 Map<String, Object> etrMap = new HashMap<>(mapTrd);
@@ -437,6 +429,7 @@ public class TradeRdsCommonAop {
                 }
             }
         } catch (Exception e) {
+            //e.printStackTrace();
             throw new BusinessException(e);
         }
     }
@@ -887,4 +880,14 @@ public class TradeRdsCommonAop {
         return true;
     }
     // add by zhangrui1 一级市场债分销缴款特殊处理 end
+
+    /**
+     * 是否时到期续作
+     * @param mapTrd
+     * @return
+     */
+    private boolean isDqxz(Map<String,Object> mapTrd) {
+        return StringUtil.equals(mapTrd.get("busiType"),"09") || StringUtil.equals(mapTrd.get("busiType"),"15") ||
+                StringUtil.equals(mapTrd.get("busiType"),"20") || StringUtil.equals(mapTrd.get("busiType"),"24");
+    }
 }

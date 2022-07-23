@@ -830,6 +830,8 @@
                     $("#conRatio").attr("disabled", true);
                     //质押数量
                     $("#repSecNum").attr("disabled", true);
+                    //券面总额
+                    $("#printAmt_div").hide();
                     //券面金额
                     $("#printAmt").attr("disabled", true);
                     //交易对手
@@ -902,6 +904,8 @@
                     $("#conRatio").attr("disabled", true);
                     //质押数量
                     $("#repSecNum").attr("disabled", true);
+                    //券面总额
+                    $("#printAmt_div").hide();
                     //券面金额
                     $("#printAmt").attr("disabled", true);
                     //交易对手
