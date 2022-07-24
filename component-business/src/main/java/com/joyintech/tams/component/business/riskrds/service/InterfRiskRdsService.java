@@ -248,6 +248,32 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                 }
             } else {
                 list = prepareRiskListEntity(dataMap, v);
+                if(StringUtil.equals(CommonUtil.findValue(dataMap, "ps"), DictCodeList.交易方向_到期续做.getValue())
+                        && StringUtil.equals(v.getInfCode(),BussinessDictCodeListRds.接口系统ID_预占释放批量接口.getValue())
+                        && CollectionUtils.isEmpty(list)) {
+                    String eventDate = null;
+                    if (StringUtil.isNotEmpty(dataMap.get("entrustDate"))) {
+                        Object entrustDate = dataMap.get("entrustDate");
+                        String type = entrustDate.getClass().toString();
+                        if ("Long".equals(type.substring(type.lastIndexOf('.') + 1, type.length()))) {
+                            eventDate = DateUtil.format(new Date((long) entrustDate));
+                        } else {
+                            eventDate = DateUtil.format(DateUtil.parse(entrustDate.toString()));
+                        }
+                    }
+                    InterfRiskRdsDto infRiskRdsDto = new InterfRiskRdsDto();
+                    infRiskRdsDto.setEventType(v.getEventType());
+                    infRiskRdsDto.setInfCode(infCode);
+                    infRiskRdsDto.setEventDate(eventDate);
+                    infRiskRdsDto.setEventId((String) dataMap.get("entrustId") +"T01");
+                    list.add(BeanUtil.object2Map(infRiskRdsDto));
+                    InterfRiskRdsDto infRiskRdsDto1 = new InterfRiskRdsDto();
+                    infRiskRdsDto1.setEventType(v.getEventType());
+                    infRiskRdsDto1.setInfCode(infCode);
+                    infRiskRdsDto1.setEventDate(eventDate);
+                    infRiskRdsDto1.setEventId((String) dataMap.get("entrustId") +"T07");
+                    list.add(BeanUtil.object2Map(infRiskRdsDto1));
+                }
             }
             // add by zhangrui1 根据资产类型设置开关 start
             if (isRskOpened(v.getAssetType())) {
