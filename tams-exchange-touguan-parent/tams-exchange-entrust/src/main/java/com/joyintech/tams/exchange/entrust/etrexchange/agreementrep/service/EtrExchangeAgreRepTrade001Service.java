@@ -2593,7 +2593,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
         parameter.setCustom(postionFlowDto);
         try {
-            logger.info("持仓请求报文:" + JsonUtils.object2Json(parameter));
+            logger.info("新建指令持仓请求报文:" + JsonUtils.object2Json(parameter));
             commonPositionService.process(parameter);
         } catch (Exception e) {
             e.printStackTrace();
