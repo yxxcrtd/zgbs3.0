@@ -915,8 +915,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         //协议回购中途换券/解除质押
         if ((DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(trdTempDto.getFinprodType2()) || DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(trdTempDto.getFinprodType2()))
                 && (StringUtil.equals(trdTempDto.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())
-//                || StringUtil.equals(trdTempDto.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())
-                || DictCodeListStl.交易方向_换券.getValue().equals(infContractDetailfile.getPs()))) {
+                || StringUtil.equals(trdTempDto.getPs(), DictCodeListExt3.交易方向_中途换券.getValue()))) {
             //写入质押券置换临时表
             if (StringUtil.isNotEmpty(trdTempDto.getFinPledgeDispTemp())) {
                 finPledgeDispTempMapper.insertSelective(trdTempDto.getFinPledgeDispTemp());
@@ -2066,48 +2065,22 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
             String bussinessCode = baseGetBusinessIdImpl.buildBussinessCode(parameter);
             //构造质押券置换DTO
             FinPledgeDispTemp finPledgeDispTemp = new FinPledgeDispTemp();
-            TrdProductDeal firstRepoTrade = trdCommonBaseService.getFirstRepoTrade(infContractDetailfile.getvTradeId(), null, secAcctId, infContractDetailfile.getVdate());
+            // XYHGFXSJ-427:修改查询首期方法 modify by fuyongsheng 20220724 start
+            // TrdProductDeal firstRepoTrade = trdCommonBaseService.getFirstRepoTrade(infContractDetailfile.getvTradeId(), null, secAcctId, infContractDetailfile.getVdate());
+            // 协议回购非首期 infContractDetailfile 的finProdId存的是首期交易编号
+            TrdProductDeal firstRepoTrade = trdProductDealMapper.selectByPrimaryKey(infContractDetailfile.getFinprodId());
+            // XYHGFXSJ-427:修改查询首期方法 modify by fuyongsheng 20220724 end
             finPledgeDispTemp.setTradeId(bussinessCode);
             finPledgeDispTemp.setfTradeId(firstRepoTrade == null ? "" : firstRepoTrade.getFinprodId());
             finPledgeDispTemp.setTradeDate(infContractDetailfile.getTradeDate());
             dto.setFinPledgeDispTemp(finPledgeDispTemp);
 
             //构造质押券置换DTO
-            //查询已存在的回购质押品信息
-            Map<String, Object> keyMap = new HashMap<String, Object>();
-            keyMap.put("vTradeId", infContractDetailfile.getvTradeId());
-            keyMap.put("branch", 0L);
-            List<FinDealPledge> finDealPledgeList = entrustMsgbyMQMapper.getFinDealPledgeList(keyMap);
-            // ZGTFCP-1882: 质押品表的tradeId有时登录的是交易编号 modify by fuyongsheng 20220325 start
-            if (CollectionUtils.isEmpty(finDealPledgeList)) {
-                // 修改查询首期交易逻辑 modify by fuyongsheng 20220426 start
-                // List<TrdProductDeal> trdProductDeals = entrustMsgbyMQMapper.getTrdProductDealByFTradeId(infContractDetailfile.getvTradeId());
-//                if(!CollectionUtils.isEmpty(trdProductDeals)){
-//                    keyMap.put("vTradeId",trdProductDeals.get(0).getTradeId());
-//                    finDealPledgeList = entrustMsgbyMQMapper.getFinDealPledgeList(keyMap);
-//                }
-                if (null != firstFinTradeProduct) {
-                    TrdProductDeal trdProductDeal = trdProductDealMapper.selectByPrimaryKey(firstFinTradeProduct.getFinprodId());
-                    if (null != trdProductDeal) {
-                        keyMap.put("vTradeId", trdProductDeal.getTradeId());
-                        finDealPledgeList = entrustMsgbyMQMapper.getFinDealPledgeList(keyMap);
-                    }
-                }
-                // 修改查询首期交易逻辑 modify by fuyongsheng 20220426 end
-            }
-            // ZGTFCP-1882: 质押品表的tradeId有时登录的是交易编号 modify by fuyongsheng 20220325 end
             List<FinPledgeDispDetailTemp> finPledgeDispDetailTempList = new ArrayList<>();
             dto.setFinPledgeDispDetailTempList(finPledgeDispDetailTempList);
 
             //如果是中途换券，需要设置换入券
-            if(StringUtil.equals(infContractDetailfile.getPs(), DictCodeListStl.交易方向_换券.getValue())) {
-                BigDecimal faceValue = trdCommonBaseService.getFaceValue(infContractDetailfile.getFinprodId(), infContractDetailfile.getTradeDate());
-                //如果成交信息中存在折算比例取成交信息中的，如果不存在就计算
-                BigDecimal scale = infContractDetailfile.getScale();
-                if (!StringUtil.isNotEmpty(scale) && infContractDetailfile.getShareAmt() != null && faceValue != null && infContractDetailfile.getTradeAmt() != null) {
-                    scale = ArithmeticUtil.divide(infContractDetailfile.getTradeAmt(), ArithmeticUtil.multiply(faceValue, infContractDetailfile.getShareAmt()), 4);
-                }
-
+            if(StringUtil.equals(infContractDetailfile.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())) {
                 if(!CollectionUtils.isEmpty(infContractDetailfile.getPledgeList())) {
                     //首期质押品列表
                     List<OriPledgeInfo> oriFinDealPledgeList = entrustMsgbyMQMapper.getOriFinDealPledgeList(finPledgeDispTemp.getfTradeId());
@@ -2154,35 +2127,10 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                     BigDecimal pledgeRatio = ArithmeticUtil.divide(oriFinDealPledgeList.get(0).getPrin(),pledgeFaceAmt,4);
                     finDealPledgeList2.forEach(finDealPledge -> finDealPledge.setPledgeRatio(pledgeRatio));
                 }
-
-                //构造回购质押品dto
-//                FinDealPledge finDealPledge = new FinDealPledge();
-//                finDealPledge.setFinprodId(infContractDetailfile.getvTradeId());
-//                finDealPledge.setBranch(0L);
-//                finDealPledge.setPledgeFinprodId(infContractDetailfile.getFinprodId());
-//                finDealPledge.setPledgeNumber(infContractDetailfile.getShareAmt());
-//                finDealPledge.setPledgeRatio(scale);
-//                finDealPledge.setPledgeFaceValue(faceValue);
-//                finDealPledge.setPledgeAmt(infContractDetailfile.getTradeAmt());
-//
-//                dto.setFinDealPledge(finDealPledge);
             }
 
             //解除质押券
             if(StringUtil.equals(infContractDetailfile.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())) {
-//                if (!StringUtil.isEmptyList(finDealPledgeList)) {
-//                    for (FinDealPledge pledge : finDealPledgeList) {
-//                        FinPledgeDispDetailTemp outputFinPledgeDispDetailTemp = new FinPledgeDispDetailTemp();
-//                        outputFinPledgeDispDetailTemp.setSeqNo(IDGenerator.generate());
-//                        outputFinPledgeDispDetailTemp.setTradeId(finPledgeDispTemp.getTradeId());
-//                        outputFinPledgeDispDetailTemp.setBranch(new BigDecimal(pledge.getBranch()));
-//                        outputFinPledgeDispDetailTemp.setFinprodId(pledge.getPledgeFinprodId());
-//                        outputFinPledgeDispDetailTemp.setTradeType(DictCodeListExt3.质押券置换_置换方向_换出.getValue());
-//                        outputFinPledgeDispDetailTemp.setPledgeDisplaceAmt(pledge.getPledgeNumber());
-//                        outputFinPledgeDispDetailTemp.setScale(pledge.getPledgeRatio());
-//                        finPledgeDispDetailTempList.add(outputFinPledgeDispDetailTemp);
-//                    }
-//                }
                 //首期质押品列表
                 List<OriPledgeInfo> oriFinDealPledgeList = entrustMsgbyMQMapper.getOriFinDealPledgeList(finPledgeDispTemp.getfTradeId());
                 for (OriPledgeInfo oriPledgeInfo : oriFinDealPledgeList) {
