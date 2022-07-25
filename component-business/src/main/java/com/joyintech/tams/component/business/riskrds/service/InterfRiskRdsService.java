@@ -215,13 +215,13 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             //判断是否来自场内交易指令
             if (StringUtil.equals(dataMap.get("fromEtrExchange"), DictCodeList.是否_是.getValue())) {
                 list = prepareEtrExchangeRiskListEntity(dataMap, v);
-                if(StringUtil.equals(CommonUtil.findValue(dataMap, "ps"), DictCodeList.交易方向_到期续做.getValue())
+                /*if(StringUtil.equals(CommonUtil.findValue(dataMap, "ps"), DictCodeList.交易方向_到期续做.getValue())
                         && StringUtil.equals(v.getInfCode(),BussinessDictCodeListRds.接口系统ID_风险试算批量接口.getValue()) && list.size() > 1) {
                    Map<String, Object> map = list.get(1);
                    map.put("amount",ArithmeticUtil.subtract(new BigDecimal(list.get(1).get("amount").toString()),new BigDecimal(list.get(0).get("amount").toString())));
                    list.clear();
                    list.add(map);
-                }
+                }*/
             } else {
                 list = prepareRiskListEntity(dataMap, v);
                 if(StringUtil.equals(CommonUtil.findValue(dataMap, "ps"), DictCodeList.交易方向_到期续做.getValue())

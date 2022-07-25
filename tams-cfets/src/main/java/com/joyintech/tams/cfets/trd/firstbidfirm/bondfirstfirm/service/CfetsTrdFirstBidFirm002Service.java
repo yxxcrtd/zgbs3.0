@@ -2203,7 +2203,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             // 结算服务费(元)
             wflBidOrder.setSettFeeAmt(entity.getSettFeeAmt());
             // 债权债务登记日
-            wflBidOrder.setAssignRegdate(entity.getAssignRegdate());
+            wflBidOrder.setAssignRegdate(StringUtil.isNotEmpty(entity.getAssignRegdate()) ? entity.getAssignRegdate() : iPlatformDate.getSysDate());
             // 上市日
             wflBidOrder.setOnmarketDate(entity.getListingDate());
             for (CfetsTrdFirstBidFirmProductDto item : entity.getProductDtos()) {
@@ -2276,7 +2276,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         // 交易日期 = 平台日
         trdFinProductDealTotal.setTradeDate(iPlatformDate.getSysDate());
         // 交割日期 = 画面.债权债务登记日
-        trdFinProductDealTotal.setSettleDate(dto.getAssignRegdate());
+        trdFinProductDealTotal.setSettleDate(StringUtil.isNotEmpty(dto.getAssignRegdate()) ? dto.getAssignRegdate() : iPlatformDate.getSysDate());
         // 交易币种 = 画面.币种
         trdFinProductDealTotal.setCcy(dto.getCcy());
         // 单位净价 = 画面.净价
