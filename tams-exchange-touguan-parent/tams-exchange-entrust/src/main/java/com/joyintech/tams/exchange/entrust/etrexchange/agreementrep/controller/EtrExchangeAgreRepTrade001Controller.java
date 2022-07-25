@@ -1344,11 +1344,11 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
         return new Message<List<SelectOptionDto>>().success().setData(etrExchangeAgreRepTrade001Service.selectPortfolioList(acctNo));
     }
     /**
-     * 根据资金账号查询组合列表
+     * 根据首期结算日期、交易编号查询交易对手
      *
-     * @param acctNo 资金账号
+     * @param dto 行情信息
      */
-    @ApiOperation(value = "根据资金账号查询组合列表", notes = "根据资金账号查询组合列表")
+    @ApiOperation(value = "", notes = "根据首期结算日期、交易编号查询交易对手")
     @ResponseBody
     @PostMapping("getFinprodIdNoFirst")
     public Message<EtrExchangeAgreRepCurrResp> getFinprodIdNoFirsts(@RequestBody EtrExchangeAgreRepTrade001Dto dto) {
