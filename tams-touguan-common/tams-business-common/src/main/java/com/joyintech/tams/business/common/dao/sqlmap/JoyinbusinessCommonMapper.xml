@@ -359,6 +359,7 @@
             (SELECT DISTINCT TFP.PORTFOLIO_ID PORTFOLIO_ID FROM TRD_FIN_PRODUCT_DEAL_TOTAL TFP
             WHERE (TFP.PS = 'C5' OR TFP.PS = 'C20')
             AND (TFP.IS_CANCEL !='Y' OR TFP.IS_CANCEL IS NULL)
+            and TFP.TRADE_MARKET in ('01')
             )
             <if test="search != null and search != ''">
                 AND (A.PORTFOLIO_ID LIKE CONCAT('%', CONCAT(#{search}, '%'))
