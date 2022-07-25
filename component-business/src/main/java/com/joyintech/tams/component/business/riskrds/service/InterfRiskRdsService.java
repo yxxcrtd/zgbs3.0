@@ -2301,6 +2301,8 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                     infRiskRdsDto.setAmount(CommonUtil.getBigDecimal(dataMap, "expireSettleAmt", BigDecimal.ZERO));
                     infRiskRdsDto.setTradeNum(CommonUtil.getBigDecimal(dataMap, "expireSettleAmt", BigDecimal.ZERO));
                     infRiskRdsDto.setPs((String)ps);
+
+
                 }
                 if(StringUtil.equals(ps,DictCodeListExt3.交易方向_到期续做.getValue())) {//到期续作的时候占用差值
                     infRiskRdsDto.setAmount(ArithmeticUtil.subtract(CommonUtil.getBigDecimal(dataMap, "tradeAmt", BigDecimal.ZERO),CommonUtil.getBigDecimal(dataMap, "fristExpireSettleAmt", BigDecimal.ZERO)));
@@ -2308,6 +2310,9 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                 }
                 if(StringUtil.isNotEmpty(ps) && StringUtil.equals(ps, 交易方向_解除质押.getValue()) && StringUtil.equals(infRiskRdsDto.getTradePlace(),DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
                     infRiskRdsDto.setAmount( BigDecimal.ZERO);
+                    infRiskRdsDto.setTradeNum(infRiskRdsDto.getAmount());
+                }else if(StringUtil.isNotEmpty(ps) && StringUtil.equals(ps, 交易方向_解除质押.getValue())) {
+                    infRiskRdsDto.setAmount(CommonUtil.getBigDecimal(dataMap, "tradeAmt", BigDecimal.ZERO));
                     infRiskRdsDto.setTradeNum(infRiskRdsDto.getAmount());
                 }
                 return infRiskRdsDto;
