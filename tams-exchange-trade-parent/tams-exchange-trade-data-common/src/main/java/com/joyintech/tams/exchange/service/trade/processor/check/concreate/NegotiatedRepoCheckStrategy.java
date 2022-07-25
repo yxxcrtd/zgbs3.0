@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.service.trade.processor.check.concreate;
 
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
 import com.joyintech.background.component.common.pack.common.util.BeanUtil;
@@ -13,12 +14,14 @@ import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.constant.InstructionPs;
 import com.joyintech.tams.exchange.common.constant.Market;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
+import com.joyintech.tams.exchange.common.db.domain.InstructionPledge;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
 import com.joyintech.tams.exchange.common.enums.exchange.RepoBsEnum;
 import com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
+import com.joyintech.tams.exchange.datacommon.db.service.InstructionPledgeService;
 import com.joyintech.tams.exchange.datacommon.db.service.IntegratedEntrustService;
 import com.joyintech.tams.exchange.service.trade.processor.check.BaseCheckKit;
 import com.joyintech.tams.exchange.service.trade.processor.check.IBusinessCheckStrategy;
@@ -44,6 +47,8 @@ import static com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum.解
 public class NegotiatedRepoCheckStrategy extends BaseCheckKit implements IBusinessCheckStrategy {
     @Autowired
     private IntegratedEntrustService integratedEntrustService;
+    @Autowired
+    private InstructionPledgeService instructionPledgeService;
 
     @Override
     public boolean support(Instruction instruction) {
@@ -54,11 +59,12 @@ public class NegotiatedRepoCheckStrategy extends BaseCheckKit implements IBusine
     public ResultBean check(BaseOrderRequest order, Instruction instruction, Instrument instrument, TickBean tickBean) {
         IntegratedOrderPlaceBean bean = (IntegratedOrderPlaceBean) order;
         IntegratedEntrust integratedEntrust = buildIntegratedEntrust(instruction, order);
+        List<InstructionPledge> instructionPledges = instructionPledgeService.queryInstructionPledgesByInstructionId(instruction.getEntrustId());
 
         checkQuote(instruction, bean);
         checkPropDealerTradeInfo(integratedEntrust, instruction);
         checkPrice(instruction, order);
-//        checkNum(instruction, order);
+        checkNum(instruction, order, instructionPledges);
         checkAmt(instruction, order);
 
         // 解除质押和中途换券无需判断
@@ -157,16 +163,19 @@ public class NegotiatedRepoCheckStrategy extends BaseCheckKit implements IBusine
     /**
      * 校验质押券数量
      */
-    private void checkNum(Instruction instruction, BaseOrderRequest bean) {
+    private void checkNum(Instruction instruction, BaseOrderRequest bean, List<InstructionPledge> instructionPledges) {
         String firstRepoPs = instruction.getFirstRepoPs();
-        Long instructionVolume = instruction.getEntrustNum();
+//        Long instructionVolume = instruction.getEntrustNum();
         Long orderVolume = bean.getEntrustVolume();
 
-        // 正回购首期指令，下单时委托质押券数量不允许超过指令剩余质押券数量，委托回购金额不允许超过指令剩余回购金额
+        // 正回购首期指令，下单时委托质押券数量不允许超过指令剩余质押券数量
         if (RepoBsEnum.正回购.codeEquals(instruction.getPs())) {
-            if (orderVolume > instructionVolume) {
+            InstructionPledge instructionPledge = instructionPledges.get(0);
+            BigDecimal pledgeNumber = instructionPledge.getPledgeNumber();
+            // TODO 万元？张？剩余质押券数量？
+            /*if (orderVolume > instructionVolume) {
                 throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "正回购首期时，下单质押券数量不允许超过指令剩余质押券数量！");
-            }
+            }*/
         }
     }
 
@@ -175,7 +184,14 @@ public class NegotiatedRepoCheckStrategy extends BaseCheckKit implements IBusine
      */
     private void checkAmt(Instruction instruction, BaseOrderRequest bean) {
         BigDecimal entrustBalance = bean.getEntrustBalance();
+        BigDecimal instructionLeftAmt = NumberUtil.sub(instruction.getEntrustAmt(), instruction.getEntrustLeftAmt(), instruction.getFrozenQuantity());
 
+        // 正回购首期指令，委托回购金额不允许超过指令剩余回购金额
+        if (RepoBsEnum.正回购.codeEquals(instruction.getPs())) {
+            if (TradeUtils.bigThan(entrustBalance, instructionLeftAmt)) {
+                throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "正回购首期时，下单回购金额不允许超过指令剩余回购金额！");
+            }
+        }
     }
 
     private void checkSpecilParamInShMarket(IntegratedEntrust integratedEntrust) {
