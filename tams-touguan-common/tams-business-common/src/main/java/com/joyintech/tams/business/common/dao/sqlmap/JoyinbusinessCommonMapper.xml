@@ -352,6 +352,9 @@
         </if>
         <where>
             A.VDATE <![CDATA[<=]]> #{platDate,jdbcType=DATE}
+            <!--modify by etliu 20220723 组合下拉列表没有按照组合类型过滤 start -->
+            AND A.PORTFOLIO_TYPE = '01'
+            <!--modify by etliu 20220723 end -->
             AND A.PORTFOLIO_ID NOT IN
             (SELECT DISTINCT TFP.PORTFOLIO_ID PORTFOLIO_ID FROM TRD_FIN_PRODUCT_DEAL_TOTAL TFP
             WHERE (TFP.PS = 'C5' OR TFP.PS = 'C20')
