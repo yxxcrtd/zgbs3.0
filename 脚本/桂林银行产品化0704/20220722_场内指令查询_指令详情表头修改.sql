@@ -1,5 +1,5 @@
 
-SELECT * from CFG_READONLY_FORM_SHOW where PAGECODE = 'FieldEtrDispatcher' and DTCODE = 'FieldEtrDispatcherInfo' and SPCDCODE = 'EX014';
+DELETE from CFG_READONLY_FORM_SHOW where PAGECODE = 'FieldEtrDispatcher' and DTCODE = 'FieldEtrDispatcherInfo' and SPCDCODE = 'EX014';
 INSERT INTO CFG_READONLY_FORM_SHOW ("PAGECODE", "DTCODE", "SPCDCODE", "COLCODE", "COLNAME", "DICTCODE", "SEQNO", "EXTENDCFG", "STATUS", "REMARK1", "REMARK2", "REMARK3", "SPCDCODE_DESC") VALUES ('FieldEtrDispatcher', 'FieldEtrDispatcherInfo', 'EX014', 'entrustDate', '指令日期', NULL, '1', '{"colAlign": "left"}', '1', '0', NULL, NULL, '999999');
 INSERT INTO CFG_READONLY_FORM_SHOW ("PAGECODE", "DTCODE", "SPCDCODE", "COLCODE", "COLNAME", "DICTCODE", "SEQNO", "EXTENDCFG", "STATUS", "REMARK1", "REMARK2", "REMARK3", "SPCDCODE_DESC") VALUES ('FieldEtrDispatcher', 'FieldEtrDispatcherInfo', 'EX014', 'portfolioId', '组合代码', NULL, '2', '{"colAlign": "left"}', '1', '0', NULL, NULL, '999999');
 INSERT INTO CFG_READONLY_FORM_SHOW ("PAGECODE", "DTCODE", "SPCDCODE", "COLCODE", "COLNAME", "DICTCODE", "SEQNO", "EXTENDCFG", "STATUS", "REMARK1", "REMARK2", "REMARK3", "SPCDCODE_DESC") VALUES ('FieldEtrDispatcher', 'FieldEtrDispatcherInfo', 'EX014', 'portfolioName', '组合名称', NULL, '3', '{"colAlign": "left"}', '1', '0', NULL, NULL, '999999');

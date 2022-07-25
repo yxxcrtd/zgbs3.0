@@ -456,6 +456,8 @@
         trd_product_deal_add.portfolio_id portfolioId, /** 组合代码 **/
         PTL_PORTFOLIO.PORTFOLIO_NAME portfolioName, /** 组合名称 **/
         FIN_PRODUCT_TYPE.Type_7 as ps, /** 交易方向 **/
+        trd_fin_product_deal_total.totle_trade_id,
+        fin_trade_product.Mdate,
         case
         when trd_fin_product_deal_total.totle_trade_id is not null then
         '已购回'
@@ -625,6 +627,9 @@
         WHERE 1=1
         <if test="isDate != null and isDate != ''">
             AND isExpire = #{isDate}
+        </if>
+        <if test="sysdate != null">
+            AND ((Mdate <![CDATA[<=]]> #{sysdate,jdbcType=DATE} and totle_trade_id is null) or Mdate <![CDATA[>]]> #{sysdate,jdbcType=DATE} )
         </if>
         <if test="origSerialNo != null and origSerialNo != ''">
             AND intiTradeId  like '%' || #{origSerialNo} || '%'

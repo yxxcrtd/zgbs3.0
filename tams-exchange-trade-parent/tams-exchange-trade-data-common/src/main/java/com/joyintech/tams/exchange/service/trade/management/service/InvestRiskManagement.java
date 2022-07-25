@@ -10,11 +10,12 @@ import com.google.common.collect.Lists;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
+import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.common.bean.investment.*;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.InstructionPs;
-import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.joyin.BussinessDictCodeList;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1;
@@ -23,6 +24,7 @@ import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
 import com.joyintech.tams.exchange.common.db.domain.OrderInterface;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.response.PortfolioCalculateResponse;
@@ -31,7 +33,6 @@ import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
 import com.joyintech.tams.exchange.service.trade.processor.others.SplitOrderHelper;
 import com.joyintech.tams.exchange.service.trade.thead.ThreadPool;
-import com.joyintech.tams.invest.common.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,9 @@ public class InvestRiskManagement extends BaseService {
     private SplitOrderHelper splitOrderHelper;
     @Autowired
     private PortfolioManager portfolioManager;
+
+    @Autowired
+    private EtrEntrustMapper etrEntrustMapper;
 
     /**
      * 是否单体服务
@@ -506,6 +510,12 @@ public class InvestRiskManagement extends BaseService {
                     reqRiskOccupy.setFirstIssueDealNo(((IntegratedEntrust) entrust).getOrigSerialNo());
                     if(StringUtil.isEmpty(reqRiskOccupy.getFirstIssueDealNo())) {
                         reqRiskOccupy.setFirstIssueDealNo(instruction.getFinprodId());
+                    }
+                    if(StringUtil.isNotEmpty(ps) && StringUtil.equals(ps, DictCodeListExt3.交易方向_解除质押.getValue())) {
+                        EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(instruction.getEntrustId());
+                        if(Objects.nonNull(etrEntrust)) {
+                            reqRiskOccupy.setFirstIssueDealNo(etrEntrust.getFinprodId());
+                        }
                     }
                 }
                 reqRiskOccupy.setAssetType2(回购类型_质押式协议回购.getValue());
