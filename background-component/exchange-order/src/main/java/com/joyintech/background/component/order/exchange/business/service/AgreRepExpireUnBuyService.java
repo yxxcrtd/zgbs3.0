@@ -12,6 +12,7 @@ package com.joyintech.background.component.order.exchange.business.service;
 
 import java.math.BigDecimal;
 
+import com.google.common.base.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -156,7 +157,7 @@ class AgreRepExpireUnBuyService extends EtrSubComponentService<AgreRepExpireUnBu
 
     	}
     	//成交编号
-    	if(dto.getTradeId() == null){
+    	if(dto.getTradeId() == null && !Objects.equal(dto.getTransCode(), "T")){
     		if("03".equals(dto.getTradeMarket())){
     			result.addError(error(dto.getClass().getSimpleName(), "tradeId",
                         "ETR_COMPONENT_ERR_012","成交编号"

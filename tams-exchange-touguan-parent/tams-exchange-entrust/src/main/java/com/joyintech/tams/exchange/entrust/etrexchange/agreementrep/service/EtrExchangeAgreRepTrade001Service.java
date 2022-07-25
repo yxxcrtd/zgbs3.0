@@ -2021,6 +2021,9 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             agreRepExpireUnBuyDto.setBusiPs(entity.getRepPs());
             // 质押券代码
             agreRepExpireUnBuyDto.setRepSecId(entity.getRepSecId());
+            if(!StringUtils.isEmpty(entity.getTransCode())&&Objects.equals(entity.getTransCode(), "T")){
+                agreRepExpireUnBuyDto.setTransCode("T");
+            }
             if (DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(entity.getTradeMarket())) {
                 //成交编号/初始交易编号
                 agreRepExpireUnBuyDto.setTradeId(entity.getIntiTradeId());
