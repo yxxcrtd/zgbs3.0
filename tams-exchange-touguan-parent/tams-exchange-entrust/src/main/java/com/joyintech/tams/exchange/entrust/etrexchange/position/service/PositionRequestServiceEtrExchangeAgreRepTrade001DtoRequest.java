@@ -187,23 +187,20 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
             String tradeId = StringUtil.isEmpty(entity.getIntiTradeId()) ? entity.getTradeId() : entity.getIntiTradeId();
             // XYHGFXSJ-425:修改取首期的到期结算金额逻辑 modify by fuyongsheng 20220724 start
             //取首期的到期结算金额
-            EtrEntrust entrust = etrEntrustMapper.selectByPrimaryKey(entity.getEntrustId());
-            if(null != entrust){
-                // 协议回购非首期指令的finProdId存的是首期交易编号
-                String sqTradeID = entrust.getFinprodId();
-                FinTradeProductKey key = new FinTradeProductKey();
-                key.setBranch(0L);
-                key.setFinprodId(sqTradeID);
-                FinTradeProduct finTradeProduct = finTradeProductMapper.selectByPrimaryKey(key);
-                BigDecimal firstTradeAmt = BigDecimal.ZERO;
-                if(finTradeProduct != null){
-                    firstTradeAmt = finTradeProduct.getmTradeAmt();
-                }
-                BigDecimal tradeAmt = entity.getTradeAmt();
-                log.info("轧差组合现金数据集:到期续作金额 tradeAmt={}，首期的到期结算金额 firstTradeAmt={}", tradeAmt, firstTradeAmt);
-                // 指令.到期续作金额 - 指令.首期的到期结算金额
-                bean.setCashAmount(tradeAmt.subtract(firstTradeAmt));
+           // 协议回购非首期指令的initialNum存的是首期交易编号
+            String sqTradeID = entity.getInitialNum();
+            FinTradeProductKey key = new FinTradeProductKey();
+            key.setBranch(0L);
+            key.setFinprodId(sqTradeID);
+            FinTradeProduct finTradeProduct = finTradeProductMapper.selectByPrimaryKey(key);
+            BigDecimal firstTradeAmt = BigDecimal.ZERO;
+            if(finTradeProduct != null){
+                firstTradeAmt = finTradeProduct.getmTradeAmt();
             }
+            BigDecimal tradeAmt = entity.getTradeAmt();
+            log.info("轧差组合现金数据集:到期续作金额 tradeAmt={}，首期的到期结算金额 firstTradeAmt={}", tradeAmt, firstTradeAmt);
+            // 指令.到期续作金额 - 指令.首期的到期结算金额
+            bean.setCashAmount(tradeAmt.subtract(firstTradeAmt));
             // XYHGFXSJ-425:修改取首期的到期结算金额逻辑 modify by fuyongsheng 20220724 end
 
             Map<String, Object> map = BeanUtil.object2Map(bean);
