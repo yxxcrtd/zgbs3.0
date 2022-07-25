@@ -9,15 +9,15 @@ import com.joyintech.tams.exchange.common.bean.IntegratedOrderPlaceBean;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.TickBean;
 import com.joyintech.tams.exchange.common.bean.request.BaseOrderRequest;
-import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.constant.InstructionPs;
 import com.joyintech.tams.exchange.common.constant.Market;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
+import com.joyintech.tams.exchange.common.enums.exchange.RepoBsEnum;
 import com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum;
-import com.joyintech.tams.exchange.common.utils.EntrustPropUtils;
+import com.joyintech.tams.exchange.common.utils.EnumUtil;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.IntegratedEntrustService;
 import com.joyintech.tams.exchange.service.trade.processor.check.BaseCheckKit;
@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1.NEGOTIATED_REPO;
+import static com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum.中途换券;
+import static com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum.解除质押;
 
 /**
  * 校验质押式协议回购
@@ -51,37 +53,16 @@ public class NegotiatedRepoCheckStrategy extends BaseCheckKit implements IBusine
     @Override
     public ResultBean check(BaseOrderRequest order, Instruction instruction, Instrument instrument, TickBean tickBean) {
         IntegratedOrderPlaceBean bean = (IntegratedOrderPlaceBean) order;
-        if (InstructionPs.REVERSEDREPO.codeEquals(instruction.getFirstRepoPs()) && StringUtil.isEmpty(bean.getRequestNo())
-                && !BusiTypeTgEnum.提前购回.codeEquals(instruction.getBusiTypeTg())) {
-            throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "逆回购行情编号不能为空");
-        }
-        if (InstructionPs.REVERSEDREPO.codeEquals(instruction.getFirstRepoPs()) && StringUtil.isNotEmpty(bean.getRequestNo())) {
-            List<IntegratedEntrust> entrustList = integratedEntrustService.queryIntegratedEntrustByAccountId(bean.getAccountId());
-            if (CollectionUtils.isNotEmpty(entrustList)) {
-                Optional<IntegratedEntrust> optional = entrustList.stream()
-                        .filter(entrust -> StringUtil.equals(entrust.getSellerNo(), bean.getRequestNo())
-                                && (entrust.getEntrustStatus() < 9 && entrust.getEntrustStatus() != 7)).findFirst();
-                if (optional.isPresent()) {
-                    throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "行情已委托，不能重复下单");
-                }
-            }
-        }
+        IntegratedEntrust integratedEntrust = buildIntegratedEntrust(instruction, order);
 
-        IntegratedEntrust integratedEntrust = new IntegratedEntrust();
-        try {
-            BeanUtil.copyProperties(integratedEntrust, instruction);
-            BeanUtil.copyProperties(integratedEntrust, order);
-        } catch (Exception e) {
-            throw new BusinessResultException(ErrorCode.SYSTEM_ERROR);
-        }
-//        String entrustProp = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
-
-        //检查对手方信息
+        checkQuote(instruction, bean);
         checkPropDealerTradeInfo(integratedEntrust, instruction);
+        checkPrice(instruction, order);
+        checkNum(instruction, order);
+        checkAmt(instruction, order);
 
         // 解除质押和中途换券无需判断
-        if (!BusiTypeTgEnum.解除质押.codeEquals(instruction.getBusiTypeTg())
-                && !BusiTypeTgEnum.中途换券.codeEquals(instruction.getBusiTypeTg())
+        if (EnumUtil.notIn(instruction.getBusiTypeTg(), 解除质押, 中途换券)
                 && (TradeUtils.equals(integratedEntrust.getEntrustBalance(), BigDecimal.ZERO)
                 || TradeUtils.equals(integratedEntrust.getBackBalance(), BigDecimal.ZERO))) {
             throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "回购金额或到期结算金额不能为0");
@@ -89,6 +70,20 @@ public class NegotiatedRepoCheckStrategy extends BaseCheckKit implements IBusine
         return ResultBean.success();
     }
 
+    private IntegratedEntrust buildIntegratedEntrust(Instruction instruction, BaseOrderRequest order) {
+        IntegratedEntrust integratedEntrust = new IntegratedEntrust();
+        try {
+            BeanUtil.copyProperties(integratedEntrust, instruction);
+            BeanUtil.copyProperties(integratedEntrust, order);
+            return integratedEntrust;
+        } catch (Exception e) {
+            throw new BusinessResultException(ErrorCode.SYSTEM_ERROR);
+        }
+    }
+
+    /**
+     * 校验对手方信息
+     */
     private void checkPropDealerTradeInfo(IntegratedEntrust entrust, Instruction instruction) {
         if (StrUtil.isEmpty(entrust.getCounterId()) || StrUtil.isEmpty(entrust.getCounterName())) {
             throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "交易对手代码或名称不能为空");
@@ -108,6 +103,79 @@ public class NegotiatedRepoCheckStrategy extends BaseCheckKit implements IBusine
                 throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "对手方交易主体类型不能为空");
             }
         }
+    }
+
+    /**
+     * 校验行情
+     */
+    private void checkQuote(Instruction instruction, IntegratedOrderPlaceBean bean) {
+        String requestNo = bean.getRequestNo();
+        String firstRepoPs = instruction.getFirstRepoPs();
+
+        if (
+                StringUtil.isEmpty(requestNo)
+                        && RepoBsEnum.逆回购.codeEquals(firstRepoPs)
+                        && !BusiTypeTgEnum.提前购回.codeEquals(instruction.getBusiTypeTg())
+        ) {
+            throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "逆回购行情编号不能为空");
+        }
+
+        if (RepoBsEnum.逆回购.codeEquals(firstRepoPs) && StringUtil.isNotEmpty(requestNo)) {
+            List<IntegratedEntrust> entrustList = integratedEntrustService.queryIntegratedEntrustByAccountId(bean.getAccountId());
+            if (CollectionUtils.isNotEmpty(entrustList)) {
+                Optional<IntegratedEntrust> optional = entrustList.stream()
+                        .filter(entrust -> StringUtil.equals(entrust.getSellerNo(), requestNo)
+                                && (entrust.getEntrustStatus() < 9 && entrust.getEntrustStatus() != 7)).findFirst();
+                if (optional.isPresent()) {
+                    throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "行情已委托，不能重复下单");
+                }
+            }
+        }
+    }
+
+    /**
+     * 校验回购利率
+     */
+    private void checkPrice(Instruction instruction, BaseOrderRequest bean) {
+        String firstRepoPs = instruction.getFirstRepoPs();
+        BigDecimal instructionPrice = instruction.getEntrustPrice();
+        BigDecimal orderPrice = bean.getEntrustPrice();
+
+        if (RepoBsEnum.正回购.codeEquals(firstRepoPs) || RepoBsEnum.正回购.codeEquals(instruction.getPs())) {
+            if (TradeUtils.lessThan(instructionPrice, orderPrice)) {
+                throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "正回购时，下单回购利率不允许超过指令回购利率！");
+            }
+        }
+
+        if (RepoBsEnum.逆回购.codeEquals(firstRepoPs) || RepoBsEnum.逆回购.codeEquals(instruction.getPs())) {
+            if (TradeUtils.bigThan(instructionPrice, orderPrice)) {
+                throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "逆回购时，下单回购利率不允许低于指令回购利率！");
+            }
+        }
+    }
+
+    /**
+     * 校验质押券数量
+     */
+    private void checkNum(Instruction instruction, BaseOrderRequest bean) {
+        String firstRepoPs = instruction.getFirstRepoPs();
+        Long instructionVolume = instruction.getEntrustNum();
+        Long orderVolume = bean.getEntrustVolume();
+
+        // 正回购首期指令，下单时委托质押券数量不允许超过指令剩余质押券数量，委托回购金额不允许超过指令剩余回购金额
+        if (RepoBsEnum.正回购.codeEquals(instruction.getPs())) {
+            if (orderVolume > instructionVolume) {
+                throw new BusinessResultException(ErrorCode.REQ_PARAMETER_ERROR, "正回购首期时，下单质押券数量不允许超过指令剩余质押券数量！");
+            }
+        }
+    }
+
+    /**
+     * 校验回购金额
+     */
+    private void checkAmt(Instruction instruction, BaseOrderRequest bean) {
+        BigDecimal entrustBalance = bean.getEntrustBalance();
+
     }
 
     private void checkSpecilParamInShMarket(IntegratedEntrust integratedEntrust) {

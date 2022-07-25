@@ -13,6 +13,7 @@ package com.joyintech.tams.invest.batch.cfetssettle.service;
 import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.dto.CfetsBondPortfolioCashRequest;
 import com.joyintech.tams.business.common.dto.CfetsBondPositionRequest;
@@ -1185,8 +1186,8 @@ public class CfetsSettleService extends BaseService {
             logger.info("是否处理旧头寸标识为[否]不处理旧头寸");
             return;
         }
-        if (!StringUtil.equals(busiType, DictCodeListExt3.头寸业务类型_质押式回购到期.getValue()) && isFlowStart) {
-            logger.info("首期流程发起时不处理头寸");
+        if (isFlowStart) {
+            logger.info("批处理不处理流程发起时的头寸");
             return;
         }
         logger.info("cfetsManualSettleRequest.getTradeId():" + cfetsManualSettleRequest.getTradeId());
@@ -1195,15 +1196,8 @@ public class CfetsSettleService extends BaseService {
         if (CollectionUtils.isEmpty(listTemp)) {
             listTemp = cfetsSettleMapper.getTempDealDetailsByTradeId(cfetsManualSettleRequest.getTradeId());
         }
-        // 正回购 交收失败 指令质押券可用持仓增加 组合质押券质押持仓减少
-        // 正回购到期 交收 指令质押券可用持仓增加 组合质押券质押持仓减少 回溯反向处理
-        if (StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())
-                && !isFlowStart && !isBack
-                && ((StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收失败.getValue())
-                && StringUtil.equals(busiType, DictCodeListExt3.头寸业务类型_质押式回购首期.getValue()))
-                || ((StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收.getValue())
-                || StringUtil.equals(DictCodeListExt3.交收操作类型_回溯.getValue(), buttonType))
-                && StringUtil.equals(busiType, DictCodeListExt3.头寸业务类型_质押式回购到期.getValue())))) {
+        // 持仓回溯
+        if (this.isNeedRevokePosition(finprodType2, isFlowStart, isBack, buttonType, busiType)) {
             this.settleFailPosition(listTemp, busiType, StringUtil.equals(DictCodeListExt3.交收操作类型_回溯.getValue(), buttonType));
         }
         if (StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())
@@ -1225,8 +1219,8 @@ public class CfetsSettleService extends BaseService {
         Map<String, StlPayOrders> orderDtoMap = list.stream()
                 .collect(Collectors.toMap(StlPayOrders::getTradeId, orderDto -> orderDto));
         logger.info("查询出的指令列表:{}", JsonUtils.object2Json(orderDtoMap));
-        if(orderDtoMap.isEmpty()){
-            logger.debug("未查到划款指令,交易数据:{}",JsonUtils.object2Json(listTemp));
+        if (orderDtoMap.isEmpty()) {
+            logger.debug("未查到划款指令,交易数据:{}", JsonUtils.object2Json(listTemp));
             return;
         }
         listTemp = listTemp.stream().sorted((x, y) -> y.getTradeAmt().compareTo(x.getTradeAmt())).collect(Collectors.toList());
@@ -1267,7 +1261,8 @@ public class CfetsSettleService extends BaseService {
             //划款指令
             baseTradeProductDealDto.setBussRepoSec(bussRepoSecDto);
             List<StlPayOrdersDto> stlPayOrders = new ArrayList<>();
-            if (StringUtil.equals(busiType, DictCodeListExt3.头寸业务类型_质押式回购到期.getValue())) {
+            if (StringUtil.equals(busiType, DictCodeListExt1.平安业务类型_逆回购到期.getValue())
+                    || StringUtil.equals(busiType, DictCodeListExt1.平安业务类型_正回购到期.getValue())) {
                 // 到期会按交易编号生成单独的划款指令
                 StlPayOrdersDto stlPayOrder = new StlPayOrdersDto();
                 BeanUtil.copyPropertiesIgnoreNull(stlPayOrder, orderDtoMap.get(item.getTradeId()));
@@ -1287,6 +1282,7 @@ public class CfetsSettleService extends BaseService {
                 stlPayOrders.add(stlPayOrder);
                 logger.info("交收处理头寸,首期期划款指令:" + JsonUtils.object2Json(stlPayOrders));
             }
+            baseTradeProductDealDto.setEntrustId(item.getEntrustId());
             if (StringUtil.isEmpty(baseTradeProductDealDto.getEntrustId())) {
                 baseTradeProductDealDto.setEntrustId(cfetsSettleMapper.qryEntrustId(item.getFinprodId()));
             }
@@ -1309,7 +1305,6 @@ public class CfetsSettleService extends BaseService {
             BeanUtil.copyPropertiesIgnoreNull(trdProductDealAdd, item);
             baseTradeProductDealDto.setTrdProductDealAdd(trdProductDealAdd);
 
-            baseTradeProductDealDto.setEntrustId(item.getEntrustId());
             baseTradeProductDealDto.setStage("03");
 
             finProductTradeDto.setBaseTradeProductDealDtos(Collections.singletonList(baseTradeProductDealDto));
@@ -1414,10 +1409,13 @@ public class CfetsSettleService extends BaseService {
      */
     private void settleFailPosition(List<CfetsSettleDealInfo> listTemp, String busiType, boolean isRevoke) {
         listTemp.forEach(deal -> {
+                    // 登记编号查询
                     String regId = cfetsSettleMapper.selectRegTradeIdBytradeId(deal.getFinprodId());
                     if (StringUtil.isEmpty(regId)) {
+                        // 报价编号查询
                         regId = cfetsSettleMapper.selectQuoteIdBytradeId(deal.getFinprodId());
                     }
+                    //更新质押position持仓
                     this.updatePledgeBondForRevoke(regId, DictCodeList.持仓类型_质押.getValue(), deal.getTradeId(), isRevoke, deal.getSettleDate());
                 }
         );
@@ -1468,9 +1466,51 @@ public class CfetsSettleService extends BaseService {
             flow.setSeqno(IDGenerator.generate());
             flow.setTradeId(tradeId);
             position.setAmount(flow.getAmount().negate());
+            flow.setCreateTime(new Date());
+            flow.setUpdateTime(new Date());
+            flow.setCreateUser(LoginUserUtil.getUserName());
+            flow.setUpdateUser(LoginUserUtil.getUserName());
             ptlSecPositionFlowMapper.insert(flow);
             cfetsSettleMapper.updatePosition(position);
         }
         return ptlSecPositionFlows;
+    }
+
+    /**
+     * 判断是否需要撤回质押持仓
+     * <p>正回购 交收失败 指令质押券可用持仓增加 组合质押券质押持仓减少
+     * <p>正回购到期 交收 指令质押券可用持仓增加 组合质押券质押持仓减少 回溯反向处理
+     *
+     * @param finprodType2 业务类型
+     * @param isFlowStart  是否流程发起
+     * @param isBack       是否退回
+     * @param buttonType   提交类型 交收/回溯/交收失败
+     * @param busiType     业务类型
+     * @return boolean 返回结果
+     * @author jiangpeng
+     * @date 2022/7/25 11:37
+     */
+    private boolean isNeedRevokePosition(String finprodType2, boolean isFlowStart, boolean isBack, String buttonType, String busiType) {
+        boolean resultFlag = false;
+        // 非流程生效
+        if (isFlowStart || isBack) {
+            return resultFlag;
+        }
+        // 非正回购
+        if (!StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())) {
+            return resultFlag;
+        }
+        // 正回购 交收失败
+        if ((StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收失败.getValue())
+                && StringUtil.equals(busiType, DictCodeListExt1.平安业务类型_正回购.getValue()))) {
+            resultFlag = true;
+        }
+        // 正回购到期 交收
+        if ((StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收.getValue())
+                || StringUtil.equals(DictCodeListExt3.交收操作类型_回溯.getValue(), buttonType))
+                && StringUtil.equals(busiType, DictCodeListExt1.平安业务类型_正回购到期.getValue())) {
+            resultFlag = true;
+        }
+        return resultFlag;
     }
 }

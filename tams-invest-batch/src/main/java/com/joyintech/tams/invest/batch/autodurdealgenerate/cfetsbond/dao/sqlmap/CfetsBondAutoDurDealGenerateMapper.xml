@@ -742,7 +742,9 @@
             ,T1.UNIT_INT
             ,T1.SETTLE_SPEED
             ,T7.SHARE_AMT SHARE_AMT
+            ,tpda.ENTRUST_ID
             FROM TRD_PRODUCT_DEAL T1
+            left join TRD_PRODUCT_DEAL_ADD tpda on t1.TRADE_ID = tpda.TRADE_ID
             <!--  一体化对应etliu start -->
             LEFT JOIN PTL_TRADE T3 ON T1.TRADE_ID = T3.BUSI_NO <!-- AND T1.BUSI_TYPE = T3.BUSI_TYPE -->
             <!--  一体化对应etliu end -->

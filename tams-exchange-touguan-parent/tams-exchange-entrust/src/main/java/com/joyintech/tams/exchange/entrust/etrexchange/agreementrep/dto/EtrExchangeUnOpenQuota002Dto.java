@@ -653,7 +653,7 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
 
     public String getTransCodeStr() {
         if(StringUtil.isNotEmpty(this.transCode)){
-            return "0".equals(this.transCode)?"非第三方":"第三方";
+            return "0".equals(this.transCode)?"不变更对手方":"变更对手方";
         }
         return "";
     }

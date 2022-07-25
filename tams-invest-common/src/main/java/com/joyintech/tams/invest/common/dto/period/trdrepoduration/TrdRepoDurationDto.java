@@ -333,6 +333,11 @@ public class TrdRepoDurationDto extends BaseEntity {
      */
     private Long settleSpeed;
 
+    /**
+     * 委托代码
+     */
+    private String entrustId;
+
 
     public Long getSettleSpeed() {
         return settleSpeed;
@@ -1481,5 +1486,13 @@ public class TrdRepoDurationDto extends BaseEntity {
 
     public void setActAmtDays(String actAmtDays) {
         this.actAmtDays = actAmtDays;
+    }
+
+    public String getEntrustId() {
+        return entrustId;
+    }
+
+    public void setEntrustId(String entrustId) {
+        this.entrustId = entrustId;
     }
 }

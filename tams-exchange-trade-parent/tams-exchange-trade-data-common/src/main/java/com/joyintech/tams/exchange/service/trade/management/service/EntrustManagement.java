@@ -3,6 +3,7 @@ package com.joyintech.tams.exchange.service.trade.management.service;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
@@ -17,6 +18,7 @@ import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.domain.Message;
+import com.joyintech.tams.exchange.common.enums.exchange.RepurchaseDQXZTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
@@ -288,7 +290,8 @@ public class EntrustManagement extends BaseService {
                     entrust.setCapDays(map.get("capDays").toString());
                 }
                 if (StringUtil.equals(投管业务类型_到期续做.getValue(), busiTypeTg)) {
-                    entrust.setTransCode(StringUtil.equals("0", o.getTransCode()) ? "非第三方" : "第三方");
+                    String transCodeStr = EnumUtil.getDescriptionByCode(RepurchaseDQXZTypeEnum.class, o.getTransCode());
+                    entrust.setTransCode(StrUtil.isEmpty(transCodeStr) ? o.getTransCode() : transCodeStr);
                 }
                 entrust.setOwnerTypeStr(EnumUtil.getDescriptionByCode(InvestorType.class, o.getOwnerType()));
                 entrust.setPropOwnerTypeStr(EnumUtil.getDescriptionByCode(InvestorType.class, o.getPropOwnerType()));

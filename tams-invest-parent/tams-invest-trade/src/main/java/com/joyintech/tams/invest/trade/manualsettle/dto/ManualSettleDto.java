@@ -168,7 +168,9 @@ public class ManualSettleDto extends TrdManualSettleInfo implements ITableRow, P
         if(this.getPledgeNumber() == null){
             return StringUtil.EMPTY;
         }
-        if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(this.getFinprodType2())){
+        if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(this.getFinprodType2())
+                || DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(this.getFinprodType2())
+                ||DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(this.getFinprodType2())){
             return String.valueOf(ArithmeticUtil.divide(this.getPledgeNumber(), new BigDecimal(100), 2, RoundingMode.HALF_UP));
         }else{
             return String.valueOf(this.getPledgeNumber());
