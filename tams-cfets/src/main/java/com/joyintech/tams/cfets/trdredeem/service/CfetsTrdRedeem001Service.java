@@ -144,6 +144,7 @@ public class CfetsTrdRedeem001Service extends BaseService<CfetsTrdRedeemDealRegi
             Map<String,Object> map = new HashMap<>();
             map.put("finprodId",entity.getFinprodId());
             map.put("settleDate",entity.getTheoreticalExerciseDate());
+            map.put("totleTradeId",entity.getTotleTradeId());
             List<CfetsTrdRedeemRegInfoListResponse> regList=cfetsTrdRedeemMapper.isExistRegInfo(map);
             if(!StringUtil.isEmptyList(regList) && regList.size()>0){
                 errorList.add(new ValidMessage("该资产在该行权区间内存在流程中或有效数据，不允许重复提交！"));
