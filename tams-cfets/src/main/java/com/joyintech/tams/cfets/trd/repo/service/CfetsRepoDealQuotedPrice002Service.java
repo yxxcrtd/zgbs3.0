@@ -557,6 +557,9 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
         if (CollectionUtils.isEmpty(entity.getPtlAllocations())) {
             errorList.add(new ValidMessage("组合分配不可为空"));
         } else {
+            if (StringUtils.isEmpty(entity.getDistribution())) {
+                errorList.add(new ValidMessage("分配方式不可为空"));
+            }
             // 校验质押券总额(该笔交易,流程中及已生效交易)不能超过指令的质押券总额
             // 交易金额汇总
             BigDecimal tradeAmtTotal = BigDecimal.ZERO;
@@ -2191,7 +2194,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
                     posport.setCashAcctId(cashAcctId); // 托管户
                 }
             }
-            posport.setCashAmount(ptlDto.getFpriceAmt());
+            posport.setCashAmount(ptlDto.getFpriceAmt().setScale(2,RoundingMode.HALF_UP));
             ptlCashList.add(posport);
         }
         List<com.joyintech.service.bankuplink.repo.dto.CfetsRepoDealQuotedPrice003Dto> pledgeBondList = this.质押券拆分(this.investDto2ServiceDto(entity));

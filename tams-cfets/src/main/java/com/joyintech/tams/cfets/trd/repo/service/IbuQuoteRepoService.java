@@ -25,6 +25,7 @@ import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbClosePosEtrRequest;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbClosePositionRequest;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
+import com.joyintech.tams.cfets.etr.bond.service.CfetsEtrIbBondinfo002Service;
 import com.joyintech.tams.cfets.etr.bond.service.CfetsEtrIbBondinfoService;
 import com.joyintech.tams.cfets.etr.repo.service.CfetsEtrIbRepoinfoService;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
@@ -179,6 +180,10 @@ public class IbuQuoteRepoService extends BaseService {
 
     @Autowired(required = false)
     private DateCalService dateCalService;
+
+    @Autowired
+    private CfetsEtrIbBondinfo002Service cfetsEtrIbBondinfo002Service;
+
     /**
      * 利率保留位数
      */
@@ -1336,7 +1341,22 @@ public class IbuQuoteRepoService extends BaseService {
         calRequest.setTermType(request.getTermType());//期限品种
         calRequest.setPledgeNum(request.getRepoEntrustPledgeDtos().size());//质押券数量
         calRequest.setTradeDate(iPlatformDate.getSysDate());//交易日期
+        //质押券信息获取证券账户
+        if(StringUtil.isEmpty(calRequest.getSecManageAcctId()) && CollectionUtils.isNotEmpty(request.getRepoEntrustPledgeDtos())) {
+            RepoEntrustPledgeDto pledgeDto = request.getRepoEntrustPledgeDtos().get(0);
+            if (pledgeDto != null) {
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put("portfolioId", pledgeDto.getPortfolioId());
+                map.put("finprodId", pledgeDto.getFinprodId());
+                String secAcctId = cfetsEtrIbBondinfo002Service.qryPortfolioSecAcctId(map);
+                if (StringUtil.isNotEmpty(secAcctId)) {
+                    calRequest.setSecManageAcctId(secAcctId);
+                }
+            }
+        }
+
         temp = this.calFee(calRequest);//计算费用
+
         // 交易手续费
         resultDto.setDealFeeAmt(temp.getDealFeeAmt());
         // 结算手续费
@@ -2105,7 +2125,7 @@ public class IbuQuoteRepoService extends BaseService {
         //尾差
         BigDecimal tailDifference = tradeAmt;
         for (RepoPtlAllocationDto ptlAllocation : ptlAllocations) {
-            ptlAllocation.setTradeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(tradeAmt, ptlAllocation.getTradeAmt()), avaNumTotal, 4));
+            ptlAllocation.setTradeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(tradeAmt, ptlAllocation.getAvaNum()), avaNumTotal, 4));
             tailDifference = ArithmeticUtil.subtract(tailDifference, ptlAllocation.getTradeAmt());
         }
         handleTailDifference(ptlAllocations, tailDifference);
@@ -2166,10 +2186,10 @@ public class IbuQuoteRepoService extends BaseService {
             settFeeAmtTailDifference = ArithmeticUtil.subtract(settFeeAmtTailDifference, item.getSettFeeAmt());
             //组合分配中交易金额/基本信息中总的折算券面*基本信息中交易手续费
             if (convertAmt != null) {
-                BigDecimal convertAmtTemp = ArithmeticUtil.round(
-                        ArithmeticUtil.multiply(
-                                ArithmeticUtil.divide(item.getTradeAmt(), tradeAmt, 12, RoundingMode.HALF_UP), convertAmt), 2, RoundingMode.HALF_UP);
-                item.setConvertAmt(convertAmtTemp);
+//                BigDecimal convertAmtTemp = ArithmeticUtil.round(
+//                        ArithmeticUtil.multiply(
+//                                ArithmeticUtil.divide(item.getTradeAmt(), tradeAmt, 12, RoundingMode.HALF_UP), convertAmt), 2, RoundingMode.HALF_UP);
+//                item.setConvertAmt(convertAmtTemp);
                 convertAmtTailDifference = ArithmeticUtil.subtract(convertAmtTailDifference, item.getConvertAmt());
             }
             if (shareAmt != null) {
