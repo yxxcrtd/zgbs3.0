@@ -989,6 +989,8 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 BeanUtil.copyPropertiesIgnoreNull(etrPledge, agreRepOpenSecDto);
                 list.add(etrPledge);
             }
+            //接触质押设置结算金额
+            etrEntrust.setEntrustAmt(entity.getExpireSettleAmt());
         }
         dto.setEtrEntrust(etrEntrust);
         if (etrEntrustAdd.getVpayDate() != null && etrEntrustAdd.getTermDays() != null) {
@@ -1559,7 +1561,10 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
 
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, agreRepOpenSecDto);
-            etrEntrust.setEntrustAmt(entity.getExpireSettleAmt());
+            if(!StringUtils.isEmpty(entity.getExpireSettleAmt())){
+                etrEntrust.setEntrustAmt(entity.getExpireSettleAmt());
+                agreRepOpenSecDto.setEntrustAmt(entity.getExpireSettleAmt());
+            }
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, agreRepOpenSecDto);
         }
 
@@ -2820,7 +2825,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
     /**
      * 质押券下拉框列表
      *
-     * @param dto
+     * @param tradeId
      * @return
      */
     public List<EtrExchangeAgreOutRepResp> selectCurrPledgeList(String tradeId) {

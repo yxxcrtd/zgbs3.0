@@ -25,7 +25,6 @@ import com.joyintech.tams.exchange.entrust.common.dto.EtrExchangePortfolioAlloca
 import com.joyintech.tams.exchange.entrust.common.dto.EtrExchangeProtfolioDetailRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepTrade001Dto;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeSaveSecRepoRequest;
-import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.invest.common.component.base.group.BasePtlSecPositionInfoService;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
@@ -927,7 +926,7 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                     FinTradeProduct finTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
                     if(Objects.nonNull(finTradeProduct)) {
                         creditLinesInputDto1.setTradeAmt(finTradeProduct.getmTradeAmt());
-                        creditLinesInputDto1.setShareAmt(finTradeProduct.getPrin());
+                        //creditLinesInputDto1.setShareAmt(finTradeProduct.getPrin());
                     }
                 }
                 //}
