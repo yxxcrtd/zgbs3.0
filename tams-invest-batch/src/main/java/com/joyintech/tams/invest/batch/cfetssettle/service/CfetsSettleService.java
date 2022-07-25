@@ -254,10 +254,6 @@ public class CfetsSettleService extends BaseService {
             }
             //处理交易数据从temp表转移到交易表
             TrdFinProductDealTotal productDealTotalTemp = trdProductTempDealTotalMapper.selectByPrimaryKey(cfetsManualSettleInsertDto.getTotalTradeId());
-            if (productDealTotalTemp == null
-                    || !"00000000000000006655".equals(productDealTotalTemp.getTotleTradeId())) {
-                continue;
-            }
             if (Objects.nonNull(productDealTotalTemp)) {
                 TrdFinProductDealTotal productDealTotal = trdFinProductDealTotalMapper.selectByPrimaryKey(cfetsManualSettleInsertDto.getTotalTradeId());
                 if (Objects.isNull(productDealTotal)) {//没有回溯过的记录直接copy
