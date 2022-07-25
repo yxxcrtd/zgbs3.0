@@ -1,5 +1,7 @@
 package com.joyintech.tams.cfets.etrdispatcher.dto;
 
+import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.tams.constant.DictCode;
 import io.swagger.annotations.ApiModelProperty;
 
 public class CfetsEtrDispatcherBaseInfo {
@@ -75,6 +77,10 @@ public class CfetsEtrDispatcherBaseInfo {
 
     public void setBusiModel(String busiModel) {
         this.busiModel = busiModel;
+    }
+
+    public String getBusiModelStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.业务模式, this.getBusiModel());
     }
 
     public String getFinprodMarketId() {
