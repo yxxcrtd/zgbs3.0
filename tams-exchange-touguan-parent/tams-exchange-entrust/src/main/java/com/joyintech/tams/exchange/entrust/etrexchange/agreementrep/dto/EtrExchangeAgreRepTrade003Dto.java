@@ -197,6 +197,8 @@ public class EtrExchangeAgreRepTrade003Dto extends EtrEntrust{
     @ApiModelProperty(name="requestId",value="请求编号")
     private String requestId;
 
+    private String initialNum;
+
     public String getFinishAmt() {
         return finishAmt;
     }
@@ -705,5 +707,13 @@ public class EtrExchangeAgreRepTrade003Dto extends EtrEntrust{
 
     public void setRequestId(String requestId) {
         this.requestId = requestId;
+    }
+
+    public String getInitialNum() {
+        return initialNum;
+    }
+
+    public void setInitialNum(String initialNum) {
+        this.initialNum = initialNum;
     }
 }

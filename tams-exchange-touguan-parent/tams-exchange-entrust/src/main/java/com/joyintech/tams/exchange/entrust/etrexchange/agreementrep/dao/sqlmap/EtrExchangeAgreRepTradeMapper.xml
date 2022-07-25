@@ -658,7 +658,7 @@
         select
         etr_entrust.entrust_id entrustId, /** 指令编号 **/
         etr_entrust.entrust_status entrustStatus, /** 指令状态 **/
-
+        etr_entrust.FINPROD_ID initialNum,
         CASE
         WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
         ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_NUM, 1 ), 4 ) ELSE ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )
@@ -860,6 +860,7 @@
             select
             wfl_etr_entrust.entrust_id entrustId, /** 指令编号 **/
             '08' entrustStatus, /** 指令状态 **/
+            wfl_etr_entrust.FINPROD_ID initialNum,
             CASE
             WHEN wfl_etr_entrust_add.TARGET_TYPE = '01' THEN
             ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( wfl_etr_entrust.ENTRUST_NUM, 1 ), 4 ) ELSE ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( wfl_etr_entrust.ENTRUST_AMT, 1 ), 4 )
