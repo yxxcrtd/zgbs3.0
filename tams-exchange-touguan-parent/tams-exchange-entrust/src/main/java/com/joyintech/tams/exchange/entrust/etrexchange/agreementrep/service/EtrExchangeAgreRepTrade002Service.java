@@ -233,8 +233,8 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
                 BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum());
                 floatFd = ArithmeticUtil.subtract(floatFd, r.getPositionsAmt());
                 r.setFloatingPL(floatFd);
-                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum()), 2);
-                r.setFloatingPLPercent(floatPL);
+                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, r.getPositionsAmt(), 2);
+                r.setFloatingPLPercent(ArithmeticUtil.multiply(floatPL, new BigDecimal(100)));
 
             });
         }
