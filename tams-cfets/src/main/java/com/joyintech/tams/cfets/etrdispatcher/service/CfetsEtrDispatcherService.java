@@ -21,14 +21,7 @@ import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.IDGenerator;
-import com.joyintech.framework.util.RequestUtil;
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.service.entrust.etrbondfirstlbidding.dao.EtrBondFirstLBiddingMapper;
 import com.joyintech.service.entrust.etrbondfirstlbidding.service.EtrBondFirstLBiddingService;
@@ -53,42 +46,9 @@ import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtribRepoInfo003Dto;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsPledgeBondInfoDto;
 import com.joyintech.tams.cfets.etr.repo.service.CfetsEtrIbRepoinfoService;
 import com.joyintech.tams.cfets.etrdispatcher.dao.CfetsEtrDispatcherMapper;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrBondFirstExeListInfoResponse;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherAutoRequest;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealListInfoResponse;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherDealRequest;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherExeListInfoResponse;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherInfoExcResponse;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherInfoOtcResponse;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherInfoResponse;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherInvResponse;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherResponse;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTradeListRequest;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTradeListResponse;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTraderAuthListResponse;
-import com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherTraderListRequest;
-import com.joyintech.tams.common.base.dao.AutoDispenseRightMapper;
-import com.joyintech.tams.common.base.dao.EtrAutoDispenseRuleDetailMapper;
-import com.joyintech.tams.common.base.dao.EtrAutoDispenseRuleMapper;
-import com.joyintech.tams.common.base.dao.EtrDistributeMapper;
-import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
-import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
-import com.joyintech.tams.common.base.dao.FinProductMapper;
-import com.joyintech.tams.common.base.dao.PtlPortfolioMapper;
-import com.joyintech.tams.common.base.dao.StlSecAcctInfoMapper;
-import com.joyintech.tams.common.base.entity.AutoDispenseRight;
-import com.joyintech.tams.common.base.entity.EtrAutoDispenseRule;
-import com.joyintech.tams.common.base.entity.EtrAutoDispenseRuleDetail;
-import com.joyintech.tams.common.base.entity.EtrDistribute;
-import com.joyintech.tams.common.base.entity.EtrDistributeKey;
-import com.joyintech.tams.common.base.entity.EtrEntrust;
-import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
-import com.joyintech.tams.common.base.entity.EtrEntrustBidPrice;
-import com.joyintech.tams.common.base.entity.EtrEntrustDetail;
-import com.joyintech.tams.common.base.entity.FinProduct;
-import com.joyintech.tams.common.base.entity.PtlPortfolio;
-import com.joyintech.tams.common.base.entity.StlSecAcctInfo;
-import com.joyintech.tams.common.base.entity.User;
+import com.joyintech.tams.cfets.etrdispatcher.dto.*;
+import com.joyintech.tams.common.base.dao.*;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.business.riskrds.constant.InterfUtil;
 import com.joyintech.tams.component.business.riskrds.constant.PageFieldToInterfFactory;
@@ -108,7 +68,6 @@ import com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto;
 import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
 import com.joyintech.tams.invest.common.util.DictCodeUtil;
 import com.joyintech.tams.invest.entrust.common.service.EtrCommonService;
-import com.joyintech.tams.invest.entrust.etribbondinfo.dto.EtrIbBondinfo002Dto;
 import com.joyintech.tams.invest.trade.common.aop.TradeRdsCommonAop;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.apache.commons.collections4.CollectionUtils;
@@ -124,23 +83,11 @@ import org.springframework.validation.BindingResult;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static com.joyintech.tams.constant.DictCodeListExt3.头寸业务类型_债券一级投标;
-import static com.joyintech.tams.constant.DictCodeListExt3.头寸业务类型_债券一级申购;
-import static com.joyintech.tams.constant.DictCodeListExt3.头寸业务类型_质押式回购到期;
+import static com.joyintech.tams.constant.DictCodeListExt3.*;
 
 
 /**
@@ -1575,6 +1522,32 @@ public class CfetsEtrDispatcherService extends BaseService {
                     finDto.put(PageFieldToInterfFactory.INF_ISINNERTRD,
                             BussinessDictCodeListRds.是否_是.getValue());
                     list.add(finDto);
+                }
+                EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(id);
+                if (Objects.nonNull(etrEntrust)) {
+                    if (StringUtil.equals(etrEntrust.getPs(),交易方向_到期续做.getValue())) {
+                        list.clear();
+                        finDto = new HashMap<>();
+                        finDto.put(PageFieldToInterfFactory.INF_EVENTID, id + "T07");
+                        finDto.put(PageFieldToInterfFactory.INF_EVENTDATE, DateUtil.format(
+                                DateUtil.platDateFromCache(), DateUtil.DEFAULT_DATE_FORMAT_EN));
+                        finDto.put(PageFieldToInterfFactory.INF_PS, "T07");
+                        finDto.put(PageFieldToInterfFactory.INF_REVOKEFLG,
+                                BussinessDictCodeListRds.是否_是.getValue());
+                        finDto.put(PageFieldToInterfFactory.INF_ISINNERTRD,
+                                BussinessDictCodeListRds.是否_是.getValue());
+                        list.add(finDto);
+                        Map<String,Object> finDto1 = new HashMap<>();
+                        finDto1.put(PageFieldToInterfFactory.INF_EVENTID, id + "T01");
+                        finDto1.put(PageFieldToInterfFactory.INF_EVENTDATE, DateUtil.format(
+                                DateUtil.platDateFromCache(), DateUtil.DEFAULT_DATE_FORMAT_EN));
+                        finDto1.put(PageFieldToInterfFactory.INF_PS, ps);
+                        finDto1.put(PageFieldToInterfFactory.INF_REVOKEFLG,
+                                BussinessDictCodeListRds.是否_是.getValue());
+                        finDto1.put(PageFieldToInterfFactory.INF_ISINNERTRD,
+                                BussinessDictCodeListRds.是否_是.getValue());
+                        list.add(finDto1);
+                    }
                 }
                 CreditLinesInputDto inputDto = new CreditLinesInputDto();
                 inputDto.setTradeId(id);
