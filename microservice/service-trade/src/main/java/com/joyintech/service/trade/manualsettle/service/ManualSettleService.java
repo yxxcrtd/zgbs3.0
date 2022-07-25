@@ -291,8 +291,12 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                     // add by etliu 20220116 end
 
                     parameter.setCustom(trdTempDto);
-                    commonPositionService.process(parameter);
-
+                    try {
+                        logger.info("手工交收处理请求报文:" + JsonUtils.object2Json(parameter));
+                        commonPositionService.process(parameter);
+                    } catch (Exception e) {
+                        logger.error("手工交收处理请求失败:", e);
+                    }
 //                    // 3.调用基础组件.【投资委托组件.完成委托】，写入委托完成状况信息(投资委托场合才执行此步)
 //                    if (!finProductTradeDto.isNeedHandleFinishEntrust()) {
 //                        baseTradeProductDealCommService.finishEntrust(finProductTradeDto.getBaseTradeProductDealDtos(), false);

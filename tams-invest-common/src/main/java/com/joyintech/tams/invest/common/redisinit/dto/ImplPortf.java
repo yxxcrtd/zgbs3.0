@@ -24,6 +24,11 @@ import java.math.BigDecimal;
  */
 public class ImplPortf extends PtlPortfolio implements IProdInfo {
 
+    // modify by etliu 20220725 start
+    // 【org.springframework.core.serializer.support.SerializationFailedException: Failed to deserialize payload.】问题解决
+    private static final long serialVersionUID = -3725748813972551941L;
+    // modify by etliu 20220725 end
+    
     private String openMode;//开放频率，高频
 
     private BigDecimal pcbAmout;//业绩比较基准

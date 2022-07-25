@@ -870,4 +870,11 @@ public class FieldEtrDispatcherInfoResponse extends FieldEtrDispatcherBaseInfo {
     public void setNewDiscount(BigDecimal newDiscount) {
         this.newDiscount = newDiscount;
     }
+
+    public String getRepoMdate() {
+        if (StringUtil.isBlank(getRepoTerm()) || StringUtil.isBlank(getVpayDate())) {
+            return null;
+        }
+        return DateUtil.addDay(getVpayDate(), Integer.parseInt(getRepoTerm()));
+    }
 }
