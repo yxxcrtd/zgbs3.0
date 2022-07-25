@@ -91,7 +91,9 @@ class AgreRepHwayChgSecService extends EtrSubComponentService<AgreRepHwayChgSecD
     		result.addError(new FieldError(dto.getClass().getSimpleName(),"repSecId","正回购方质押券不能为空"));
     	}
     	//质押数量
-    	if(dto.getBusiPs()!=null && DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getBusiPs())&& dto.getPledgeNumber() == null){
+    	if(dto.getBusiPs()!=null && DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getBusiPs())&& dto.getPledgeNumber() == null
+		&&!"21".equals(dto.getEntrustType())
+		){
     		result.addError(new FieldError(dto.getClass().getSimpleName(),"repSecNum","正回购方质押券数量不能为空"));
 
     	}
