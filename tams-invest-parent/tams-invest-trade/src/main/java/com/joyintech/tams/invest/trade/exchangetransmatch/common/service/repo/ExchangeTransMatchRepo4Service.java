@@ -107,9 +107,11 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
             exchangeTransMatchBaseTradeDtoList.add(exchangeTransMatchBaseTradeDto);
         }
 
+        // XYHGFXSJ-481:修改筛选条件逻辑 modify by fuyongsheng 20220725 start
         ExchangeTransMatchBaseTradeDto tradeDtoT01 = exchangeTransMatchBaseTradeDtoList.stream()
-                .filter(item->DictCodeList.交易方向_买入.getValue().equals(item.getTrdProductDeal()))
+                .filter(item->DictCodeList.交易方向_买入.getValue().equals(item.getTrdProductDeal().getPs()))
                 .findFirst().get();
+        // XYHGFXSJ-481:修改筛选条件逻辑 modify by fuyongsheng 20220725 end
         for(ExchangeTransMatchBaseTradeDto exchangeTransMatchBaseTradeDto : exchangeTransMatchBaseTradeDtoList){
             if(DictCodeList.交易方向_收息到账.getValue().equals(exchangeTransMatchBaseTradeDto.getTrdProductDeal().getPs())){
                 FinCashInfo finCashInfoInt = tradeDtoT01.getFinCashInfos().stream()
@@ -627,7 +629,7 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
 
                     //到期->拆成收息到账，还本到账
                     //收息到账
-                    if(BigDecimal.ZERO.compareTo(item.getmIntAmt())<0) {
+                    if(null != item.getmIntAmt() && BigDecimal.ZERO.compareTo(item.getmIntAmt())<0) {
                         SettleTransData IntSettleTransData = new SettleTransData();
                         BeanUtil.copyPropertiesIgnoreNull(IntSettleTransData,item);
 
@@ -663,7 +665,7 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
                     }
 
                     //还本到账
-                    if(BigDecimal.ZERO.compareTo(item.getmPrinAmt())<0) {
+                    if(null != item.getmPrinAmt() && BigDecimal.ZERO.compareTo(item.getmPrinAmt())<0) {
                         SettleTransData prinSettleTransData = new SettleTransData();
                         BeanUtil.copyPropertiesIgnoreNull(prinSettleTransData,item);
 
