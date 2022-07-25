@@ -277,6 +277,7 @@
         where t.finprod_id=#{finprodId,jdbcType=VARCHAR}
         and t.settle_date=#{settleDate,jdbcType=DATE}
         and  t.is_cancel='N' and t.trade_status='01' and t.ps='T39'
+        and t.TOTLE_TRADE_ID != #{totleTradeId,jdbcType=VARCHAR}
     </select>
 
 </mapper>
