@@ -414,6 +414,11 @@
             <if test="initValue != null and initValue != ''">
                 and t.ACCT_NO = #{initValue}
             </if>
+            <if test="userName != null and userName != ''">
+                and t.PORTFOLIO_ID in (
+                    SELECT PORTFOLIO_ID FROM PTL_PORTFOLIO_AUTHORITY where USER_ID = #{userName}
+                )
+            </if>
             <if test="search != null and !search.equals('')">
                 AND (t.ACCT_NO like concat('%',concat(#{search},'%')) or R.ACCT_NAME like concat('%',concat(#{search},'%')) )
             </if>

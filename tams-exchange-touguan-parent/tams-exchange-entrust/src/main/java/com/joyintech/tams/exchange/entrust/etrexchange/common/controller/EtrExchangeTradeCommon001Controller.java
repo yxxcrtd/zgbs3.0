@@ -798,6 +798,23 @@ public class EtrExchangeTradeCommon001Controller extends BaseController {
         }
     }
 
+
+    @ApiOperation(value = "获取用户分配组合资产账户列表", notes = "获取用户分配组合资产账户列表")
+    @ResponseBody
+    @PostMapping("/getPtlSecAcctInfoByUser")
+    public Message<List<SelectOptionDto>> getPtlSecAcctInfoByUser(@RequestBody PtlSecAcctInfoRequest dto) {
+        try {
+            Map<String, Object> map = BeanUtil.object2Map(dto);
+            String userName = LoginUserUtil.getUserName();
+            map.put("userName", userName);
+            List<SelectOptionDto> tempList = etrExchangeTrade001CommonService.getPtlSecAcctInfo(map);
+            return new Message<List<SelectOptionDto>>().success().setData(tempList);
+        } catch (Exception e) {
+            logger.error("查询功能异常", e);
+            return new Message<List<SelectOptionDto>>().fail().setMessage("查询异常");
+        }
+    }
+
     /**
      * 对手方交易商联想文本框初始化。
      *
@@ -1290,8 +1307,8 @@ public class EtrExchangeTradeCommon001Controller extends BaseController {
                 return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
             }
             // GLCP-192:组合维度需要传ps,风险是从组合维度取ps modify by fuyongsheng 20220713 start
-            if(!CollectionUtils.isEmpty(dto.getPortfolioList())){
-                for(EtrExchangeTradePortfolioRequest portfolio : dto.getPortfolioList()){
+            if (!CollectionUtils.isEmpty(dto.getPortfolioList())) {
+                for (EtrExchangeTradePortfolioRequest portfolio : dto.getPortfolioList()) {
                     portfolio.setPs(dto.getPs());
                 }
             }
