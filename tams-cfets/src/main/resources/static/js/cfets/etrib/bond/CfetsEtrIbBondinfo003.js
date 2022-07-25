@@ -1059,6 +1059,11 @@
             calData('price');
         }
     })
+    query('#settleSpeed').change(function () {
+        setRiskFlag(1);
+        var calflag = query("input[name=calculateField]:checked").val();
+        calData(calflag);
+    })
 
     if (ps == 'T03') {//回售时特殊处理
         query("#calculateField_price").attr("title", "行权净价");
