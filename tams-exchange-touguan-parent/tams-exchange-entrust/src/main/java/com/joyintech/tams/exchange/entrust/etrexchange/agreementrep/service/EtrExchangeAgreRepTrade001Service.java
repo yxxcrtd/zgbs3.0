@@ -1563,6 +1563,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, agreRepOpenSecDto);
             if(!StringUtils.isEmpty(entity.getExpireSettleAmt())){
                 etrEntrust.setEntrustAmt(entity.getExpireSettleAmt());
+                agreRepOpenSecDto.setEntrustAmt(entity.getExpireSettleAmt());
             }
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, agreRepOpenSecDto);
         }
@@ -2824,7 +2825,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
     /**
      * 质押券下拉框列表
      *
-     * @param dto
+     * @param tradeId
      * @return
      */
     public List<EtrExchangeAgreOutRepResp> selectCurrPledgeList(String tradeId) {
