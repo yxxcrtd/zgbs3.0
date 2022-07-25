@@ -10,8 +10,14 @@ import com.joyintech.tams.exchange.common.enums.IEnum;
  */
 public enum RepurchaseDQXZTypeEnum implements IEnum<String> {
 
-    变更对手方("0", "变更对手方"),
-    不变更对手方("1", "不变更对手方"),
+    /**
+     * 0 非第三方 => 不变更对手方
+     */
+    不变更对手方("0", "不变更对手方"),
+    /**
+     * 1 第三方 => 变更对手方
+     */
+    变更对手方("1", "变更对手方"),
     ;
 
     private final String code;
