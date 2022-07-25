@@ -83,6 +83,11 @@
 		decode(SUM(quotaOut),null,0,SUM(quotaOut)) quotaOut,
 		'01' isSummary
 		from temp
+		<where>
+			<if test='quota != null and quota == "Y"'>
+				temp.AMOUNT1 != 0
+			</if>
+		</where>
 		group by ccy
 	</if>
 	)T1
