@@ -1344,7 +1344,7 @@ public class IbuQuoteRepoService extends BaseService {
         //质押券信息获取证券账户
         if(StringUtil.isEmpty(calRequest.getSecManageAcctId()) && CollectionUtils.isNotEmpty(request.getRepoEntrustPledgeDtos())) {
             RepoEntrustPledgeDto pledgeDto = request.getRepoEntrustPledgeDtos().get(0);
-            if (pledgeDto != null) {
+            if (pledgeDto != null && StringUtil.isNotEmpty(pledgeDto.getPortfolioId()) && StringUtil.isNotEmpty(pledgeDto.getFinprodId())) {
                 Map<String, Object> map = new HashMap<String, Object>();
                 map.put("portfolioId", pledgeDto.getPortfolioId());
                 map.put("finprodId", pledgeDto.getFinprodId());
