@@ -2319,7 +2319,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 if (StringUtil.isNotBlank(entity.getWorkflowId())) {
                     doDeleteWflEntity(entity.getWorkflowId());
                 }
-                //doInsertWflEntity(entity);
+                doInsertWflEntity(entity);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new BusinessException("MSG:指令提交发生异常，异常信息：" + e.getMessage());
@@ -2596,6 +2596,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             logger.info("新建指令持仓请求报文:" + JsonUtils.object2Json(parameter));
             commonPositionService.process(parameter);
         } catch (Exception e) {
+            logger.error("新建指令持仓请求失败:", e);
             e.printStackTrace();
         }
     }
