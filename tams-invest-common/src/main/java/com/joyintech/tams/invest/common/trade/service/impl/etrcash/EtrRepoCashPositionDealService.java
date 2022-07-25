@@ -1,6 +1,7 @@
 package com.joyintech.tams.invest.common.trade.service.impl.etrcash;
 
 import com.google.common.collect.Lists;
+import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
@@ -389,7 +390,9 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
         // 通道性质
         String chlType = StringUtil.isEmpty(chlId) ? null : EtrCommonCashPositionDealService.queryChlType(chlId);
         // 交易提交
-        if (DictCodeList.持仓类型_可用.equals(持仓类型) || etrPositionHoldDto.isNeedNegative() || finProductTradeDto.isBatch()) {
+        if (DictCodeList.持仓类型_可用.equals(持仓类型) || etrPositionHoldDto.isNeedNegative() || finProductTradeDto.isBatch()
+                // 自动交收批处理没有发起流程
+                || StringUtil.equals("03", finProductTradeDto.getStage())) {
 //            if (StringUtil.isEmpty(entrustId)) { // 无委托
                 // 持仓流水dto处理 交割日增加交易券面总额/债券面值
 //                etrSecPositionFlowDto.setAmount(ArithmeticUtil.divide(交易券面总额, 债券面值, 2));
@@ -669,6 +672,10 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                     etrSecPositionFlowDto.setTradeId(finProductTradeDto.getTrdProductDeal().getTradeId());
                     etrSecPositionFlowDto.setPortfolioId(finProductTradeDto.getTrdProductDealAdd().getPortfolioId());
                     etrSecPositionFlowDto.setBranch(0l);
+                    etrSecPositionFlowDto.setCreateTime(new Date());
+                    etrSecPositionFlowDto.setUpdateTime(new Date());
+                    etrSecPositionFlowDto.setCreateUser(LoginUserUtil.getUserName());
+                    etrSecPositionFlowDto.setUpdateUser(LoginUserUtil.getUserName());
                     // 金额取反
                     etrSecPositionFlowDto.setAmount(etrSecPositionFlowDto.getAmount().negate());
                 }

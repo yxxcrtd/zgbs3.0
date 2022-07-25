@@ -101,8 +101,7 @@
             ,{field:'settleNumStr',title: '交收数量', width:'150', type:'money', sortField:'settleNum'}
             ,{field:'settleAmt', title: '交收金额', width:'150', type:'money'}
             // GNS-940:修改字段展示名称 modify by fuyongsheng 20220222 end
-            ,{field:'prin', title: '回购金额', width:'150', type:'money', visible:false}
-            ,{field:'prinStr', title: '回购金额', width:'150', type:'money', sortField:'prin'}
+            ,{field:'prin', title: '回购金额', width:'150', type:'money'}
             ,{field:'mTradeAmt', title: '到期结算金额', width:'150', type:'money'}
             // ,{field:'pledgeId', title: '质押券代码', width:'150'}
             ,{field:'pledgeId', title: '质押券代码', width:'150', visible:false}
@@ -149,8 +148,7 @@
             ,{field:'settleNum',title: '交收数量', width:'150', type:'money', visible:false}
             ,{field:'settleNumStr',title: '交收数量', width:'150', type:'money', sortField:'settleNum'}
             ,{field:'settleAmt',title:'交收金额', width:'150', type:'money'}
-            ,{field:'prin', title: '回购金额', width:'150', type:'money', visible:false}
-            ,{field:'prinStr', title: '回购金额', width:'150', type:'money', sortField:'prin'}
+            ,{field:'prin', title: '回购金额', width:'150', type:'money'}
             ,{field:'mTradeAmt', title: '到期结算金额', width:'150', type:'money'}
             ,{field:'pledgeId', title: '质押券代码', width:'150', visible:false}
             ,{field:'pledgeIdAbbr', title: '质押券代码', width:'150'}
