@@ -2749,6 +2749,9 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
     //获取首期交易编号
     public EtrExchangeAgreRepCurrResp getFinprodIdNoFirsts(EtrExchangeAgreRepTrade001Dto dto) {
         String tradeId = "";
+        if(StringUtils.isEmpty(dto.getIntiTradeId())){
+            return null;
+        }
         //wsz 修改行情到期续作 首次结算时间传值
         String date = "";
         if (!StringUtils.isEmpty(dto.getOrigSerialDate())
