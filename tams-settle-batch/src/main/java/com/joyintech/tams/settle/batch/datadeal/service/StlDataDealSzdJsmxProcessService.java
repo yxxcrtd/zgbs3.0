@@ -1232,6 +1232,17 @@ public class StlDataDealSzdJsmxProcessService {
 //						settleTransDataPledge.setPledgeNumber(new BigDecimal(Math.abs(new BigDecimal(szdJsmx.getSl()).doubleValue())));
 					    // settleTransDataPledge.setPledgeNumber(ArithmeticUtil.divide(settleTransData.getShareAmt(),BigDecimal.valueOf(100),2));
 						settleTransDataPledge.setPledgeNumber(settleTransData.getShareAmt());
+
+						// XYHGFXSJ-506:修改金融产品代码赋值 modify by fuyongsheng 20220725 start
+						// 查询首期清算数据
+						List<SettleTransData> sqSettleTransDatas = trdCommonBaseService.selectSqSettleTransDatas(
+							settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(),
+							settleTransData.getVdate());
+						// 金融产品代码
+						if(!CollectionUtils.isEmpty(sqSettleTransDatas)){
+							settleTransData.setFinprodId(sqSettleTransDatas.get(0).getFinprodId());
+						}
+						// XYHGFXSJ-506:修改金融产品代码赋值 modify by fuyongsheng 20220725 end
 						// 换出折算率=首期质押券折算率,换入折算率=首期成交明细本金金额/成交数量 modify by fuyongsheng 20220104 start
 						if(DictCodeListExt3.质押券置换_置换方向_换出.getValue().equals(settleTransData.getTradeType())){
 							// 查询首期质押券信息
@@ -1243,17 +1254,11 @@ public class StlDataDealSzdJsmxProcessService {
 								settleTransDataPledge.setPledgeRatio(sqSettleTransDataPledges.get(0).getPledgeRatio());
 							}
 						}else if(DictCodeListExt3.质押券置换_置换方向_换入.getValue().equals(settleTransData.getTradeType())){
-							// 查询首期清算数据
-							List<SettleTransData> sqSettleTransDatas = trdCommonBaseService.selectSqSettleTransDatas(
-									settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(),
-									settleTransData.getVdate());
 							if(!CollectionUtils.isEmpty(sqSettleTransDatas)){
 								// XYHGFXSJ-208:质押券字段用错 modify by fuyongsheng 20220720 start
 								// BigDecimal 券面最新面值 = select券面面值(szdJsmx.getZqdm1());
 								BigDecimal 券面最新面值 = select券面面值(settleTransDataPledge.getPledgeFinprodId());
 								// XYHGFXSJ-208:质押券字段用错 modify by fuyongsheng 20220720 end
-								// 金融产品代码
-								settleTransData.setFinprodId(sqSettleTransDatas.get(0).getFinprodId());
 								settleTransDataPledge.setPledgeFaceValue(券面最新面值);
 								settleTransDataPledge.setPledgeRatio(ArithmeticUtil.divide(sqSettleTransDatas.get(0).getPrinAmt().abs(),
 										ArithmeticUtil.multiply(settleTransDataPledge.getPledgeNumber(), 券面最新面值), 2));
