@@ -673,7 +673,7 @@ public class StlDataDealSzdSjsjgProcessService {
                 // 交易方向
                 settleTransData.setPs(DictCodeList.交易方向_到期.getValue());
                 if (StringUtil.equals(ywlb, StlDataDealProcessConstant.SJSJG_YWLB_XYTG)) {
-                    settleTransData.setPs(DictCodeList.交易方向_提前终止.getValue());
+                    settleTransData.setPs(DictCodeListExt3.交易方向_投资端_提前终止.getValue());
                 }
                 // 交易份额
                 // settleTransData.setShareAmt(abs(szdSjsjg.getJgjssl()));

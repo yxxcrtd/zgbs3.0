@@ -517,6 +517,7 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                     }
                     //协议回购到期交易方向 的指令没有进行预占，不需要处理预占信息，将指令代码置空
                     //finDto.setEntrustCode(null);
+
                 }else {
                     finDto.setPs(DictCodeList.交易方向_买入.getValue());
                     finDto.setAmount(CommonUtil.getBigDecimal(dataMap, "amount",BigDecimal.ZERO));
@@ -568,6 +569,18 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                     finDto.setIsNullCounter(BaseDictCodeList.是否_否.getValue());
                 }
                 //wangyang1 add by 增加期限金额 2021年9月10日 end
+                if(StringUtil.equals(DictCodeListExt3.交易方向_解除质押.getValue(),finDto.getPs()) && finDto.getAmount().compareTo(BigDecimal.ZERO) == 0){
+                    finDto.setPreOccupyCode(null);
+                    finDto.setEntrustCode(null);
+                    FinTradeProductKey finTradeProductKey = new FinTradeProductKey();
+                    finTradeProductKey.setFinprodId((String)dataMap.get("firstIssueDealNo"));
+                    finTradeProductKey.setBranch(0L);
+                    FinTradeProduct firstFinTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
+                    if(Objects.nonNull(firstFinTradeProduct)) {
+                        finDto.setAmount(firstFinTradeProduct.getPrin());
+                        finDto.setTradeNum(firstFinTradeProduct.getPrin());
+                    }
+                }
                 return finDto;
             }
 

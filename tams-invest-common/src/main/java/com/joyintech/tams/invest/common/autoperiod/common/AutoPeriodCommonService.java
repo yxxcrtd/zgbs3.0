@@ -610,6 +610,13 @@ public class AutoPeriodCommonService extends BaseService {
             for (TrdProductDeal trdProductDeal : trdBondDurDbInertDto.getTrdProductDealList()) {
                 TrdProductTempDeal tempDeal = new TrdProductTempDeal();
                 BeanUtil.copyPropertiesIgnoreNull(tempDeal,trdProductDeal);
+                if(StringUtil.isNotEmpty(tempDeal.getFinprodType2())) {
+                    if (StringUtil.equals(tempDeal.getFinprodType2(), "F01")) {
+                        tempDeal.setBusiType("TRD10");
+                    } else if (StringUtil.equals(tempDeal.getFinprodType2(), "F02") || StringUtil.equals(tempDeal.getFinprodType2(), "F03")) {
+                        tempDeal.setBusiType("TRD16");
+                    }
+                }
                 trdProductTempDealMapper.insert(tempDeal);
             }
         }
@@ -717,6 +724,7 @@ public class AutoPeriodCommonService extends BaseService {
             for (TrdProductDeal trdProductDeal : trdBondDurDbInertDto.getTrdProductDealList()) {
                 TrdProductTempDeal tempDeal = new TrdProductTempDeal();
                 BeanUtil.copyPropertiesIgnoreNull(tempDeal,trdProductDeal);
+                tempDeal.setBusiType("TRD16");
                 trdProductTempDealMapper.insert(tempDeal);
             }
         }

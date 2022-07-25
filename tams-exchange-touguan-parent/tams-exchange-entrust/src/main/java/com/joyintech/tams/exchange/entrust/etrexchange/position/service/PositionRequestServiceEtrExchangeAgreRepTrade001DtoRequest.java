@@ -7,6 +7,11 @@ import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.service.TamsBusinessCommonService;
+import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
+import com.joyintech.tams.common.base.dao.FinTradeProductMapper;
+import com.joyintech.tams.common.base.entity.EtrEntrust;
+import com.joyintech.tams.common.base.entity.FinTradeProduct;
+import com.joyintech.tams.common.base.entity.FinTradeProductKey;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -47,13 +52,19 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
     @Autowired
     private EtrTradeCommonervice etrTradeCommonervice;
 
+    @Autowired
+    private EtrEntrustMapper etrEntrustMapper;
+
+    @Autowired
+    private FinTradeProductMapper finTradeProductMapper;
+
     /**
      * EtrExchangeAgreRepTrade001Dto 请求对象使用
      *
      * @param entity
      */
     public void send(EtrExchangeAgreRepTrade001Dto entity, String decisionAct, String systemAct) {
-        log.debug("send() called with parameters => 【entity = {}】, 【decisionAct = {}】, 【systemAct = {}】", JsonUtils.object2Json(entity), decisionAct, systemAct);
+        log.debug("发送指令新建新头寸报文:send() called with parameters => 【entity = {}】, 【decisionAct = {}】, 【systemAct = {}】", JsonUtils.object2Json(entity), decisionAct, systemAct);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("decisionAct", decisionAct);
         resultMap.put("systemAct", systemAct);
@@ -174,14 +185,26 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
             bean.setEtrId(entity.getEntrustId());
 
             String tradeId = StringUtil.isEmpty(entity.getIntiTradeId()) ? entity.getTradeId() : entity.getIntiTradeId();
-            //首期的到期结算金额
-            BigDecimal firstTradeAmt = etrTradeCommonervice.getFirstTradeAmt(tradeId);
-            BigDecimal tradeAmt = entity.getTradeAmt();
-            log.info("轧差组合现金数据集:到期续作金额 tradeAmt={}，首期的到期结算金额 firstTradeAmt={}", tradeAmt, firstTradeAmt);
-            //IF 回购类型 = 正回购 THEN 指令.到期续作金额 - 指令.首期的到期结算金额
-            //IF 回购类型 = 逆回购  and 成交编号找不到对应的首期 THEN 指令.到期续作金额
-            //IF 回购类型 = 逆回购  and 成交编号找到对应的首期 THEN  指令.到期续作金额 - 指令.首期的到期结算金额
-            bean.setCashAmount(tradeAmt.subtract(firstTradeAmt));
+            // XYHGFXSJ-425:修改取首期的到期结算金额逻辑 modify by fuyongsheng 20220724 start
+            //取首期的到期结算金额
+            EtrEntrust entrust = etrEntrustMapper.selectByPrimaryKey(entity.getEntrustId());
+            if(null != entrust){
+                // 协议回购非首期指令的finProdId存的是首期交易编号
+                String sqTradeID = entrust.getFinprodId();
+                FinTradeProductKey key = new FinTradeProductKey();
+                key.setBranch(0L);
+                key.setFinprodId(sqTradeID);
+                FinTradeProduct finTradeProduct = finTradeProductMapper.selectByPrimaryKey(key);
+                BigDecimal firstTradeAmt = BigDecimal.ZERO;
+                if(finTradeProduct != null){
+                    firstTradeAmt = finTradeProduct.getmTradeAmt();
+                }
+                BigDecimal tradeAmt = entity.getTradeAmt();
+                log.info("轧差组合现金数据集:到期续作金额 tradeAmt={}，首期的到期结算金额 firstTradeAmt={}", tradeAmt, firstTradeAmt);
+                // 指令.到期续作金额 - 指令.首期的到期结算金额
+                bean.setCashAmount(tradeAmt.subtract(firstTradeAmt));
+            }
+            // XYHGFXSJ-425:修改取首期的到期结算金额逻辑 modify by fuyongsheng 20220724 end
 
             Map<String, Object> map = BeanUtil.object2Map(bean);
             list.add(map);

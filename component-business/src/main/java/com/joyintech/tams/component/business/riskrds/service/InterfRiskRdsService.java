@@ -29,6 +29,7 @@ import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.risktrialrds.util.Const;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.util.CollectionUtils;
 import org.slf4j.Logger;
@@ -238,8 +239,41 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             //判断是否来自场内交易指令
             if (StringUtil.equals(dataMap.get("fromEtrExchange"), DictCodeList.是否_是.getValue())) {
                 list = prepareEtrExchangeRiskListEntity(dataMap, v);
+                if(StringUtil.equals(CommonUtil.findValue(dataMap, "ps"), DictCodeList.交易方向_到期续做.getValue())
+                        && StringUtil.equals(v.getInfCode(),BussinessDictCodeListRds.接口系统ID_风险试算批量接口.getValue()) && list.size() > 1) {
+                   Map<String, Object> map = list.get(1);
+                   map.put("amount",ArithmeticUtil.subtract(new BigDecimal(list.get(1).get("amount").toString()),new BigDecimal(list.get(0).get("amount").toString())));
+                   list.clear();
+                   list.add(map);
+                }
             } else {
                 list = prepareRiskListEntity(dataMap, v);
+                if(StringUtil.equals(CommonUtil.findValue(dataMap, "ps"), DictCodeList.交易方向_到期续做.getValue())
+                        && StringUtil.equals(v.getInfCode(),BussinessDictCodeListRds.接口系统ID_预占释放批量接口.getValue())
+                        && CollectionUtils.isEmpty(list)) {
+                    String eventDate = null;
+                    if (StringUtil.isNotEmpty(dataMap.get("entrustDate"))) {
+                        Object entrustDate = dataMap.get("entrustDate");
+                        String type = entrustDate.getClass().toString();
+                        if ("Long".equals(type.substring(type.lastIndexOf('.') + 1, type.length()))) {
+                            eventDate = DateUtil.format(new Date((long) entrustDate));
+                        } else {
+                            eventDate = DateUtil.format(DateUtil.parse(entrustDate.toString()));
+                        }
+                    }
+                    InterfRiskRdsDto infRiskRdsDto = new InterfRiskRdsDto();
+                    infRiskRdsDto.setEventType(v.getEventType());
+                    infRiskRdsDto.setInfCode(infCode);
+                    infRiskRdsDto.setEventDate(eventDate);
+                    infRiskRdsDto.setEventId((String) dataMap.get("entrustId") +"T01");
+                    list.add(BeanUtil.object2Map(infRiskRdsDto));
+                    InterfRiskRdsDto infRiskRdsDto1 = new InterfRiskRdsDto();
+                    infRiskRdsDto1.setEventType(v.getEventType());
+                    infRiskRdsDto1.setInfCode(infCode);
+                    infRiskRdsDto1.setEventDate(eventDate);
+                    infRiskRdsDto1.setEventId((String) dataMap.get("entrustId") +"T07");
+                    list.add(BeanUtil.object2Map(infRiskRdsDto1));
+                }
             }
             // add by zhangrui1 根据资产类型设置开关 start
             if (isRskOpened(v.getAssetType())) {
