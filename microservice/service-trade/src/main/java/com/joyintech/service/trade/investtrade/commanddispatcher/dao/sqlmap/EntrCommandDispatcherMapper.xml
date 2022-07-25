@@ -242,7 +242,9 @@
 			   F2.PLEDGE_NUMBER                        pledgeNumber,
 			   F2.PLEDGE_NUMBER * 100                  pledgeTradeAmt,
 			   F2.PLEDGE_RATIO                         pledgeRatio,
-			   F2.PLEDGE_NUMBER * F2.PLEDGE_FACE_VALUE pledgeFaceValue,
+		       <!--XYHGFXSJ-489:修改面值获取方法 modify by fuyongsheng 20220725 start-->
+			   F2.PLEDGE_FACE_VALUE 				   pledgeFaceValue,
+		       <!--XYHGFXSJ-489:修改面值获取方法 modify by fuyongsheng 20220725 end-->
 			   F.PRIN                                  prin,
 			   F.FINPROD_ID                            finprodId,
 			   FP.FINPROD_ABBR                         pledgefinprodAbbr,

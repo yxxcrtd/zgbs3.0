@@ -58,7 +58,7 @@ public class NegotiatedRepoCheckStrategy extends BaseCheckKit implements IBusine
         checkQuote(instruction, bean);
         checkPropDealerTradeInfo(integratedEntrust, instruction);
         checkPrice(instruction, order);
-        checkNum(instruction, order);
+//        checkNum(instruction, order);
         checkAmt(instruction, order);
 
         // 解除质押和中途换券无需判断

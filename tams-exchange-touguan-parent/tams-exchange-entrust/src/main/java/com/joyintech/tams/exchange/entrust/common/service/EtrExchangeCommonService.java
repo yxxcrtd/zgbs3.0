@@ -768,6 +768,7 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                 creditLinesInputDto.setRownum(rownum);
                 if (!StringUtil.isEmptyList(creditLinesInputDto.getInputDtoList())) {
                     inputDtoList.addAll(creditLinesInputDto.getInputDtoList());
+                    inputDtoList.add(creditLinesInputDto);
                 } else {
                     creditLinesInputDto.setRownum(rownum);
                     inputDtoList.add(creditLinesInputDto);
@@ -888,7 +889,7 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
             if (StringUtil.equals(inputDto.getRepPs(), DictCodeListExt3.交易方向_逆回购.getValue())) {
                 creditLinesInputDto = new CreditLinesInputDto();
                 creditLinesInputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
-                creditLinesInputDto.setTradeId(inputDto.getEntrustId());
+                creditLinesInputDto.setTradeId(inputDto.getEntrustId()+"T07");
                 creditLinesInputDto.setTradeDate(DateUtil.parse(inputDto.getVdate()));
                 creditLinesInputDto.setTradeStatus(status);
                 creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
@@ -909,7 +910,7 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
             if (StringUtil.equals(inputDto.getPs(), DictCodeListExt3.交易方向_到期续做.getValue())) {
                 CreditLinesInputDto creditLinesInputDto1 = new CreditLinesInputDto();
                 creditLinesInputDto1.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
-                creditLinesInputDto1.setTradeId(inputDto.getEntrustId());
+                creditLinesInputDto1.setTradeId(inputDto.getEntrustId()+"T01");
                 creditLinesInputDto1.setTradeDate(DateUtil.parse(inputDto.getVdate()));
                 creditLinesInputDto1.setTradeStatus(status);
                 creditLinesInputDto1.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
@@ -919,15 +920,16 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                 creditLinesInputDto1.setPs(DictCodeList.交易方向_到期.getValue());
                 creditLinesInputDto1.setCounterId(inputDto.getCounterId());
                 //if (riskCreditListCommonValidatorService.checkCallCredit(inputDto.getFinprodId())) {
-                if(StringUtil.isNotEmpty(inputDto.getInitialNum())) {
-                    FinTradeProductKey finTradeProductKey = new FinTradeProductKey();
-                    finTradeProductKey.setBranch(0L);
-                    finTradeProductKey.setFinprodId(inputDto.getInitialNum());
-                    FinTradeProduct finTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
-                    if(Objects.nonNull(finTradeProduct)) {
-                        creditLinesInputDto1.setTradeAmt(finTradeProduct.getmTradeAmt());
-                        //creditLinesInputDto1.setShareAmt(finTradeProduct.getPrin());
-                    }
+                FinTradeProductKey finTradeProductKey = new FinTradeProductKey();
+                finTradeProductKey.setBranch(0L);
+                finTradeProductKey.setFinprodId(inputDto.getInitialNum());
+                FinTradeProduct finTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
+                if(Objects.isNull(finTradeProduct) && StringUtil.isNotEmpty(inputDto.getIntiTradeId())) {
+                    finTradeProduct = finTradeProductMapper.selectByTradeId(inputDto.getIntiTradeId());
+                }
+                if(Objects.nonNull(finTradeProduct)) {
+                    creditLinesInputDto1.setTradeAmt(finTradeProduct.getmTradeAmt());
+                    //creditLinesInputDto1.setShareAmt(finTradeProduct.getPrin());
                 }
                 //}
                 if(StringUtil.isEmpty(creditLinesInputDto1.getCounterId())) {

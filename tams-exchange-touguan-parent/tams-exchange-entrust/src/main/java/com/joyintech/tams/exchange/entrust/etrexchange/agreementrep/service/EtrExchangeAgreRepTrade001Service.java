@@ -809,7 +809,8 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                     outPledge.setEntrustId(entity.getEntrustId());
                     outPledge.setFinprodId(entity.getOutfinprodId());
                     // 质押面值
-                    outPledge.setPledgeFaceValue(entity.getOutPledgeFaceValue());
+                    // XYHGFXSJ-489:修改质押面值方法 modify by fuyongsheng 
+                    outPledge.setPledgeFaceValue(trdCommonBaseService.getFaceValue(entity.getOutfinprodId(), iPlatformDate.getSysDate()));
                     //质押率
                     outPledge.setPledgeRatio(ArithmeticUtil.divide(entity.getConRatio(), new BigDecimal(100), 2));
                     // 质押数量
@@ -1444,7 +1445,9 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                     outPledge.setEntrustId(entity.getEntrustId());
                     outPledge.setFinprodId(entity.getOutfinprodId());
                     // 质押面值
-                    outPledge.setPledgeFaceValue(entity.getOutPledgeFaceValue());
+                    // XYHGFXSJ-489:修改质押面值方法 modify by fuyongsheng 20220725 start
+                    outPledge.setPledgeFaceValue(trdCommonBaseService.getFaceValue(entity.getOutfinprodId(), iPlatformDate.getSysDate()));
+                    // XYHGFXSJ-489:修改质押面值方法 modify by fuyongsheng 20220725 end
                     //质押率
                     outPledge.setPledgeRatio(ArithmeticUtil.divide(entity.getConRatio(), new BigDecimal(100), 2));
                     // 质押数量
@@ -2021,9 +2024,6 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             agreRepExpireUnBuyDto.setBusiPs(entity.getRepPs());
             // 质押券代码
             agreRepExpireUnBuyDto.setRepSecId(entity.getRepSecId());
-            if(!StringUtils.isEmpty(entity.getTransCode())&&Objects.equals(entity.getTransCode(), "T")){
-                agreRepExpireUnBuyDto.setTransCode("T");
-            }
             if (DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(entity.getTradeMarket())) {
                 //成交编号/初始交易编号
                 agreRepExpireUnBuyDto.setTradeId(entity.getIntiTradeId());

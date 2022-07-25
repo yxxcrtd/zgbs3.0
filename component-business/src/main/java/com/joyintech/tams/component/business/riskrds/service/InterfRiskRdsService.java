@@ -1131,12 +1131,6 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                     String portfolioId = String.valueOf(CommonUtil.findValue(dataMap, "portfolioId"));
                     infRiskRdsDto.setPortfolioCode(AllTradeCommonUtil.exchangePortfolio(portfolioId));
                     // 原回购到期
-                    String preTradeId = "";
-                    if (CommonUtil.findValue(dataMap, "tradeId") != null) {
-                        preTradeId = String.valueOf(CommonUtil.findValue(dataMap, "tradeId"));
-                    } else {
-                        preTradeId = String.valueOf(CommonUtil.findValue(dataMap, "intiTradeId"));
-                    }
                     FinTradeProductKey finTradeProductKey = new FinTradeProductKey();
                     finTradeProductKey.setBranch(0L);
                     finTradeProductKey.setFinprodId(String.valueOf(CommonUtil.findValue(dataMap, "initialNum")));
@@ -1145,8 +1139,7 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                     // GZYHTZJY-1081:【场内对账清结算1231】深交所协议回购，到期续作指令 提交后，缺少T07到期的那笔预占【解决日期：2022-01-11】
                     if (finTradeProduct == null) {
                         if (CommonUtil.findValue(dataMap, "intiTradeId") != null) {
-                            finTradeProductKey.setFinprodId(String.valueOf(CommonUtil.findValue(dataMap, "intiTradeId")));
-                            finTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
+                            finTradeProduct = finTradeProductMapper.selectByTradeId(String.valueOf(CommonUtil.findValue(dataMap, "intiTradeId")));
                         }
                     }
                     // add by etliu 20220111 end
@@ -2312,7 +2305,7 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                     infRiskRdsDto.setAmount( BigDecimal.ZERO);
                     infRiskRdsDto.setTradeNum(infRiskRdsDto.getAmount());
                 }else if(StringUtil.isNotEmpty(ps) && StringUtil.equals(ps, 交易方向_解除质押.getValue())) {
-                    infRiskRdsDto.setAmount(CommonUtil.getBigDecimal(dataMap, "tradeAmt", BigDecimal.ZERO));
+                    infRiskRdsDto.setAmount(CommonUtil.getBigDecimal(dataMap, "expireSettleAmt", BigDecimal.ZERO));
                     infRiskRdsDto.setTradeNum(infRiskRdsDto.getAmount());
                 }
                 return infRiskRdsDto;
