@@ -799,12 +799,18 @@ public class FinBondAsset002Controller extends BaseController {
                 });
                 finPayInterestStdInfoDto.setInvRepayList(invRepayList);
             }
+            finPayInterestStdInfoDto.setIsSubAmtCal("true");
+            finPayInterestStdInfoDto.setIsAgainCalInt("true");
+//            finPayInterestStdInfoDto.setEndTdayRule("04");
+            finPayInterestStdInfoDto.setFinprodId(finprodId);
             List<FinCashPlanDto> finCashPlanList = finPayInterestStdInfoService.createAssetPayInteresPlan(finPayInterestStdInfoDto);
             for (FinCashPlanDto finCashPlan : finCashPlanList) {
                 BondFinCashPlanDto bondFinCashPlanDto = new BondFinCashPlanDto();
                 BeanUtil.copyPropertiesIgnoreNull(bondFinCashPlanDto, finCashPlan);
                 bondFinCashPlanDto.setRangeYield(dto.getInvScheduleList().get(0).getRangeYield());
                 bondFinCashPlanDto.setLirs(null);
+                bondFinCashPlanDto.setCashAmt(finCashPlan.getIntAmt());
+                bondFinCashPlanDto.setBasis(dto.getFinInterestFactorDto().getBasis());
                 invList.add(bondFinCashPlanDto);
             }
             return new Message<List<BondFinCashPlanDto>>().success().setData(invList);
