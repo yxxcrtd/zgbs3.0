@@ -490,7 +490,7 @@ public class MockTradeClient implements ITradeRequest {
     }
 
     private boolean mockIntegratedEntrustFailByEntrustVolume(IntegratedEntrust integratedEntrust) {
-        if (integratedEntrust.getEntrustVolume() % 9 == 0) {
+        if (integratedEntrust.getEntrustVolume() != 0 && integratedEntrust.getEntrustVolume() % 9 == 0) {
             logger.info("integratedEntrust数量为9的倍数,模拟下单失败,废单");
             integratedEntrust.setEntrustStatus(EntrustStatus.INVALID.value);
             integratedEntrust.setErrorMsg("integratedEntrust数量为9的倍数,模拟下单失败,废单");
