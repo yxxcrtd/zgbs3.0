@@ -8,6 +8,7 @@ import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.thymeleaf.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -651,7 +652,20 @@ public class CfetsEtrDispatcherInfoExcResponse extends CfetsEtrDispatcherExcInfo
         this.advanceRecoveryDate = advanceRecoveryDate;
     }
 
+    private String backDate;
+
+    public String getBackDate() {
+        return backDate;
+    }
+
+    public void setBackDate(String backDate) {
+        this.backDate = backDate;
+    }
+
     public String getRepoMdate() {
+        if(!StringUtils.isEmpty(this.getBackDate())){
+            return DateUtil.formatDateAddSplit(this.getBackDate());
+        }
         if (StringUtil.isBlank(getRepoTerm()) || StringUtil.isBlank(getVpayDate())) {
             return null;
         }

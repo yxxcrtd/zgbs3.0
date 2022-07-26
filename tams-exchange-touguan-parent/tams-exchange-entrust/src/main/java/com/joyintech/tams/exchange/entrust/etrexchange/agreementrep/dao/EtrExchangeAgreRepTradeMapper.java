@@ -152,7 +152,8 @@ public interface EtrExchangeAgreRepTradeMapper {
     /**
      * 根据资金账号查询组合列表
      *
-     * @param acctNo 资金账号
+     * @param map
+     * @return
      */
     List<SelectOptionDto> selectPortfolioList(Map<String, Object> map);
 }
