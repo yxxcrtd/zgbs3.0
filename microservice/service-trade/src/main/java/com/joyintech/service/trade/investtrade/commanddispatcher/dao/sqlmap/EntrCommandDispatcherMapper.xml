@@ -4,7 +4,7 @@
     namespace="com.joyintech.service.trade.investtrade.commanddispatcher.dao.EntrCommandDispatcherMapper">
 
     <select id="selectList" resultType="com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrCommandDispatcherDto">
-        SELECT
+        SELECT DISTINCT
           A.REMARK remark, /** 补充协议 **/
 		  A.Entrust_Id entrustId,/*委托代码*/
 		  A.PORTFOLIO_ID portfolioId,/*组合代码*/
@@ -74,7 +74,14 @@
 		  CASE WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_AMT
 			WHEN F.ASSET_TYPE = 'F07' and A.PS in ('T93') then A.ENTRUST_AMT
 		  ELSE DECODE(F.TARGET_TYPE, '02', A.ENTRUST_AMT, 0) END entrustAmt, /**委托额度*/
-          CASE WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_NUM ELSE DECODE(F.TARGET_TYPE, '01',case when A.PS in ('T93', 'T94') THEN FDP.PLEDGE_NUMBER ELSE A.ENTRUST_NUM END, 0) END entrustNum, /**委托数量*/
+          CASE
+          WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_NUM
+          ELSE
+          DECODE(F.TARGET_TYPE, '01',
+          case when A.PS in ('T94') THEN FDP.PLEDGE_NUMBER
+		  when A.PS in ('T93') THEN null
+          ELSE A.ENTRUST_NUM END, 0)
+          END entrustNum, /**委托数量*/
 		  A.ENTRUST_STATUS entrustStatus,/**委托状态*/
 			<!--CASE WHEN A.PS IN ('03','04','T68','T69', 'T93', 'T94', 'T95', 'T96', 'T56')
 			  THEN nvl(A.PRICE,FTP.INT_RATE)*100

@@ -233,6 +233,20 @@
                     "95%", "90%",
                     param);
             }
+            //场内指令 一级投标
+            else if(data.assetType == F01 && data.busiTypePosition == '01' && (data.ps == PS_T01 || data.ps == PS_T02 ) ){
+                var param = {
+                    "busiCode": data.entrustId,
+                    "finprodType2": F01
+                };
+                var url = "home.html?a=a&busiCode=" + data.entrustId + "&finprodType2=" + F01 +
+                    "&pageModel=1&editable=false&isTodoList=true#/instructionsSearch/detail?a=a";
+
+                Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+                    basePath + url,
+                    "95%", "90%",
+                    param);
+            }
             //基金买卖
             else if(data.assetType == F02 && data.busiTypePosition == 'EX001' && (data.ps == PS_T01 || data.ps == PS_T02) ){
                 var param = {

@@ -251,6 +251,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
 
     private CreditProtectionCertificatePeriodSaveDto getEntityByBusinessCode(String businessCode) {
         CreditProtectionCertificatePeriodSaveDto entity = creditProtectionCertificatePeriodRunnerMapper.getEntityByBusinessCode(businessCode);
+        entity.setCreditEvent(DictCodeListExt1.平安业务类型_到期.getValue());
         entity.setBillingDetails(creditProtectionCertificatePeriodRunnerMapper.getBillingDetailByBusinessCode(businessCode));
         return entity;
     }
