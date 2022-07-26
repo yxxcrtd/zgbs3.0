@@ -96,6 +96,12 @@ public class InfContractDetailfile extends BaseEntity {
     private BigDecimal unitFprice;
 
     /**
+     * 回购金额
+     */
+    @JsonSerialize(using=BigDecimalSerializer.class)
+    private BigDecimal prinAmt;
+
+    /**
      * 交易金额
      */
     @JsonSerialize(using=BigDecimalSerializer.class)
@@ -589,5 +595,13 @@ public class InfContractDetailfile extends BaseEntity {
 
     public void setTraderId(String traderId) {
         this.traderId = traderId;
+    }
+
+    public BigDecimal getPrinAmt() {
+        return prinAmt;
+    }
+
+    public void setPrinAmt(BigDecimal prinAmt) {
+        this.prinAmt = prinAmt;
     }
 }

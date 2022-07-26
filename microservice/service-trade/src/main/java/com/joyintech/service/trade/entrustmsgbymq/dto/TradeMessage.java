@@ -23,6 +23,7 @@ public class TradeMessage implements Cloneable, Serializable {
     private Double dealPrice;       // 成交价格
     private Double fullPrice;       // 全价价格
     private Double dealBalance;     // 成交金额
+    private Double entrustBalance;  // 回购金额
     private String trdMatchID;      // 首期交易编号
     private String tradingDay;      // 交易日
     private String valueDate;       // 首期结算日
@@ -275,5 +276,13 @@ public class TradeMessage implements Cloneable, Serializable {
 
     public void setTradeId(String tradeId) {
         this.tradeId = tradeId;
+    }
+
+    public Double getEntrustBalance() {
+        return entrustBalance;
+    }
+
+    public void setEntrustBalance(Double entrustBalance) {
+        this.entrustBalance = entrustBalance;
     }
 }
