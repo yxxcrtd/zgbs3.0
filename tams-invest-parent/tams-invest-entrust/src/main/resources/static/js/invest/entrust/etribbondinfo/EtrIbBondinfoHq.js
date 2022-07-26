@@ -202,6 +202,8 @@
                     result.issuer=result.issuerName;
                     result.xqFlg=result.xqFlgName;
                     result.sponsor=result.sponsorName;
+                    result.priceXq=result.priceXq;
+                    result.priceTj=result.priceTj;
                     dynview.resultToView(result);
                     //
                     // if (result.secName != null && result.secName != '') {
@@ -261,7 +263,7 @@
             // add by caiqun 20211220 调用接口平台外汇cmds行情 start
 			//queryJJHQXX(secId);
             var secIdStr = secId.split(".");
-            sendBond(websocket,secIdStr[0]);
+            //sendBond(websocket,secIdStr[0]);
             // add by caiqun 20211220 调用接口平台外汇cmds行情 end
             if(window.EtrInitAmount)
             window.EtrInitAmount.queryAmountInfo(secId,finprodAbbr,finprodId,portfolioId,chlFinprodId,ccy,sysDateT1,calId);
@@ -285,7 +287,7 @@
     }
 
 
-    var websocket = cmds(cmdsWebSocketUrl,
+    /*var websocket = cmds(cmdsWebSocketUrl,
         function (data) {
             if(data != null && data != "" && "没有数据" != data){
                 var objs = eval('('+data+')');
@@ -313,7 +315,7 @@
         function (event) {
             console.log("连接发生错误:" + event);
         }
-    );
+    );*/
 
     /**
      * 对外公开的接口
