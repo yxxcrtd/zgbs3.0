@@ -1902,6 +1902,16 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
             if (cfetsIbuQuoteBondMapper.countMatchInfo(item.getQuoteId(), DictCodeList.确认状态_已确认.getValue()) > 0) {
                 errorList.add(new ValidMessage("当日登记所选登记数据已成交确认不支持撤销!业务编号:" + item.getQuoteId()));
             }
+            //是否已强制完成
+            Map<String,Object> map = new HashMap<>();
+            map.put("trdIds",Arrays.asList(item.getQuoteId()));
+            map.put("YN_N", DictCodeList.是否_否.getValue());
+            map.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
+            map.put("ENTRUST_STATUS_04", com.joyintech.tams.constant.DictCodeList.委托状态_已完成.getValue());
+            map.put("TRD", "REPO");
+            if (cfetsIbuQuoteBondMapper.selectEntruIdIsFinsh(map) > 0) {
+                errorList.add(new ValidMessage("当日登记所选登记数据存在强制完成指令不支持撤销!业务编号:" + item.getQuoteId()));
+            }
             if (CollectionUtils.isNotEmpty(errorList)) {
                 return;
             }

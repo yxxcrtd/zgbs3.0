@@ -2299,4 +2299,49 @@ SELECT
             PORTFOLIO_ID  = #{portfolioId}
             AND CFETS_ACCT_TYPE = '01'
     </select>
+
+    <!--查询指令是否强制完成-->
+    <select id="selectEntruIdIsFinsh" resultType="java.lang.Integer">
+        select count(*)
+        from (
+                 select ee.ENTRUST_ID,
+                        ee.ENTRUST_STATUS,
+                        nvl(ee.ENTRUST_NUM,0) ENTRUST_NUM,
+                        nvl(ee.ENTRUST_AMT,0) ENTRUST_AMT,
+                        nvl(t.SHARE_AMT,0) finshNum,
+                        nvl(t.TRADE_AMT,0) finshAmt
+                 from ETR_ENTRUST ee
+                          left join (select tpda.ENTRUST_ID, sum(tpd.SHARE_AMT) SHARE_AMT, sum(tpd.TRADE_AMT) TRADE_AMT
+                                     from TRD_PRODUCT_DEAL_ADD tpda
+                                              left join TRD_PRODUCT_DEAL tpd on tpd.TRADE_ID = tpda.TRADE_ID
+                                              left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt
+                                                        on tfpdt.TOTLE_TRADE_ID = tpd.TOTLE_TRADE_ID
+                                     where tfpdt.IS_CANCEL = #{YN_N}
+                                       and tfpdt.TRADE_STATUS = #{TRADE_STATUS_01}
+                                       and tpda.ENTRUST_ID is not null
+                                     group by tpda.ENTRUST_ID) t on t.ENTRUST_ID = ee.ENTRUST_ID
+                          left join REG_FIN_PRODUCT_DEAL rffd on rffd.ENTRUST_ID = ee.ENTRUST_ID
+                          left join IBU_QUOTE_ETR_RE iqer on iqer.ENTRUST_ID = ee.ENTRUST_ID
+                 where ee.ENTRUST_STATUS = #{ENTRUST_STATUS_04}
+                 <if test="trdIds != null and trdIds.size() > 0">
+                    AND( rffd.TOTLE_TRADE_ID IN
+                        <foreach collection="trdIds" item="item" open="(" close=")" separator=",">
+                            #{item}
+                        </foreach>
+                        or iqer.QUOTE_ID IN
+                        <foreach collection="trdIds" item="item" open="(" close=")" separator=",">
+                            #{item}
+                        </foreach>
+                    )
+                </if>
+             )
+        <where>
+            <if test="TRD !=null and TRD !='' and TRD eq 'BOND'">
+                AND ENTRUST_NUM != finshNum
+            </if>
+            <if test="TRD !=null and TRD !='' and TRD eq 'REPO'">
+                AND ENTRUST_AMT!=finshAmt
+            </if>
+        </where>
+    </select>
 </mapper>

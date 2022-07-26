@@ -258,6 +258,17 @@ public class CfetsQuotedCommonService extends BaseService {
             }
         }
         if (StringUtil.equals(bondQuoteInfoDto.getOperationType(), "recall")) {
+            //是否已强制完成
+            Map<String, Object> map = new HashMap<>();
+            map.put("trdIds", Collections.singletonList(bondQuoteInfoDto.getQuoteId()));
+            map.put("YN_N", DictCodeList.是否_否.getValue());
+            map.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
+            map.put("ENTRUST_STATUS_04", com.joyintech.tams.constant.DictCodeList.委托状态_已完成.getValue());
+            map.put("TRD", "BOND");
+            if (cfetsIbuQuoteBondMapper.selectEntruIdIsFinsh(map) > 0) {
+                ar.appendMessage(new ValidMessage("当日报价所选报价数据存在强制完成指令不支持撤回,报价编号:" + bondQuoteInfoDto.getQuoteId()));
+                return ar;
+            }
             if (StringUtil.equals(bondQuoteInfoDto.getQuoteRoleType(),
                 BussinessDictCodeList.银行间上行本方角色_询价方.getValue())) {
                 CfetsBondDealDialogueQuoteDto cetsBondDealDialogueQuoteDto = cfetsBondDealQuotedPrice002Service.getBondDialogueQuote(

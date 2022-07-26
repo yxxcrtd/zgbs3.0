@@ -103,4 +103,9 @@ public interface CfetsIbuQuoteBondMapper {
     String  getIssuserName(@Param("finprodId") String finprodId);
 
     String  getPartyIdByPtl(@Param("portfolioId") String portfolioId);
+
+    /**
+     * 查询指令是否强制完成
+     */
+    int selectEntruIdIsFinsh(Map<String, Object> param);
 }

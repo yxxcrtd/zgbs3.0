@@ -46,6 +46,7 @@ import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtribRepoInfo003Dto;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
+import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
 import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepo003Mapper;
 import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepoMapper;
 import com.joyintech.tams.cfets.trd.repo.dto.*;
@@ -191,6 +192,9 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
 
     @Autowired
     private com.joyintech.tams.cfets.trd.bond.service.CfetsQuotedCommonService cfetsQuotedCommonServicevue;
+
+    @Autowired
+    private CfetsIbuQuoteBondMapper cfetsIbuQuoteBondMapper;
 
     /**
      * 报价初始化校验
@@ -343,6 +347,17 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
             }
         } else if (StringUtil.isNotEmpty(quoteId) && StringUtil.isNotEmpty(operation)
                 && StringUtil.equals(operation, "revert")) {//撤回
+            //是否已强制完成
+            Map<String, Object> map = new HashMap<>();
+            map.put("trdIds", Collections.singletonList(quoteId));
+            map.put("YN_N", DictCodeList.是否_否.getValue());
+            map.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
+            map.put("ENTRUST_STATUS_04", com.joyintech.tams.constant.DictCodeList.委托状态_已完成.getValue());
+            map.put("TRD", "REPO");
+            if (cfetsIbuQuoteBondMapper.selectEntruIdIsFinsh(map) > 0) {
+                ar.appendMessage(new ValidMessage("当日报价所选报价数据存在强制完成指令不支持撤回,报价编号:" + quoteId));
+                return ar;
+            }
             // 校验撤回
             CfetsRepoDealQuotedPrice001Dto dayOffer = this.queryEntrustInfoByQuoteId(quoteId);
             if (dayOffer == null) {
