@@ -216,8 +216,7 @@ public class MockTradeClient implements ITradeRequest {
             logger.info("entrustVolume:{}", entrustVolume);
             if (entrustVolume <= 200
                     || IntegratedEntrustUtils.isFixedIncome(entrust.getEntrustProp())
-                    || IntegratedEntrustUtils.isProtocolBack_SH(entrust.getEntrustProp())
-                    || IntegratedEntrustUtils.isProtocolBack_SZ(entrust.getEntrustProp())) {//不分笔成交
+                    || EntrustUtils.isPledgeAgreementRepurchase(entrust.getBusiTypeTg())) {//不分笔成交
                 trade.setTradedVolume(entrustVolume);
                 if (tradeBalance != 0) {
                     trade.setTradedBalance(BigDecimal.valueOf(tradeBalance));

@@ -66,8 +66,9 @@
      * 绑定删除事件
      */
     table.bind('click', '.delt', function(data, index) {
-        var object = data;
-        object.operateType = "delete";
+        // var object = data;
+        // object.operateType = "delete";
+        var object = {selectedItem: [data], operateType:"delete"};
         Joyin.ajaxJson(basePath + 'invest/bankuplink/basic/cfetsportfolioacctrela/CfetsPortfolioAcctRela002/check', object, function(result) {//数据验证
             Joyin.confirm(JoyinUtil.getMessage("COMMON_C_0001",JoyinUtil.getLabel("SysCommon.delete")), function(){
                 WorkFlow.doDeleteList(basePath + 'invest/bankuplink/basic/cfetsportfolioacctrela/CfetsPortfolioAcctRela002/delete', object, "CfetsPortfolioAcctRela001_btn_delete", "CfetsPortfolioAcctRela002");//删除

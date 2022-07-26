@@ -16,6 +16,7 @@ import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.annotation.NotEmpty;
 import com.joyintech.framework.validation.annotation.ValidLogic;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.common.base.entity.IbuPortfolioAcctRela;
 import com.joyintech.tams.invest.bankuplink.basic.cfetsportfolioacctrela.validator.CfetsPortfolioAcctRela001DtoValidator;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
@@ -25,7 +26,7 @@ import com.joyintech.workflow.engine.dto.ProcessEntity;
 
 /**
  * CFETS账户关联 〈功能详细描述〉
- * 
+ *
  * @author yufei
  * @version 1.0 2020年5月12日
  * @see CfetsPortfolioAcctRela001Dto
@@ -87,7 +88,7 @@ public class CfetsPortfolioAcctRela001Dto extends IbuPortfolioAcctRela implement
 
     /**
      * 获取 selectedItem
-     * 
+     *
      * @return selectedItem.
      */
     public List<CfetsPortfolioAcctRela001Dto> getSelectedItem() {
@@ -96,7 +97,7 @@ public class CfetsPortfolioAcctRela001Dto extends IbuPortfolioAcctRela implement
 
     /**
      * 设置 selectedItem
-     * 
+     *
      * @param selectedItem selectedItem
      */
     public void setSelectedItem(List<CfetsPortfolioAcctRela001Dto> selectedItem) {
@@ -105,7 +106,7 @@ public class CfetsPortfolioAcctRela001Dto extends IbuPortfolioAcctRela implement
 
     /**
      * 获取 cfetsAcctTypeStr
-     * 
+     *
      * @return cfetsAcctTypeStr.
      */
     public String getCfetsAcctTypeStr() {
@@ -120,7 +121,7 @@ public class CfetsPortfolioAcctRela001Dto extends IbuPortfolioAcctRela implement
 
     /**
      * 获取 elementId
-     * 
+     *
      * @return elementId.
      */
     public String getElementId() {
@@ -129,7 +130,7 @@ public class CfetsPortfolioAcctRela001Dto extends IbuPortfolioAcctRela implement
 
     /**
      * 设置 elementId
-     * 
+     *
      * @param elementId elementId
      */
     public void setElementId(String elementId) {
@@ -138,7 +139,7 @@ public class CfetsPortfolioAcctRela001Dto extends IbuPortfolioAcctRela implement
 
     /**
      * 获取 operateType
-     * 
+     *
      * @return operateType.
      */
     public String getOperateType() {
@@ -147,7 +148,7 @@ public class CfetsPortfolioAcctRela001Dto extends IbuPortfolioAcctRela implement
 
     /**
      * 设置 operateType
-     * 
+     *
      * @param operateType operateType
      */
     public void setOperateType(String operateType) {
@@ -156,17 +157,17 @@ public class CfetsPortfolioAcctRela001Dto extends IbuPortfolioAcctRela implement
 
     /**
      * 获取 partyCustomerId
-     * 
+     *
      * @return partyCustomerId.
      */
-    @NotEmpty(fieldName = "CfetsPortfolioAcctRela002.partyCustomerId")
+    @NotEmpty(fieldName = "CfetsPortfolioAcctRela002.partyCustomerId", groups = {ValidateGroupEdit.class})
     public String getPartyCustomerId() {
         return partyCustomerId;
     }
 
     /**
      * 设置 partyCustomerId
-     * 
+     *
      * @param partyCustomerId partyCustomerId
      */
     public void setPartyCustomerId(String partyCustomerId) {
@@ -175,17 +176,17 @@ public class CfetsPortfolioAcctRela001Dto extends IbuPortfolioAcctRela implement
 
     /**
      * 获取 partyName
-     * 
+     *
      * @return partyName.
      */
-    @NotEmpty(fieldName = "CfetsPortfolioAcctRela001.partyName")
+    @NotEmpty(fieldName = "CfetsPortfolioAcctRela001.partyName", groups = {ValidateGroupEdit.class})
     public String getPartyName() {
         return partyName;
     }
 
     /**
      * 设置 partyName
-     * 
+     *
      * @param partyName partyName
      */
     public void setPartyName(String partyName) {
@@ -194,7 +195,7 @@ public class CfetsPortfolioAcctRela001Dto extends IbuPortfolioAcctRela implement
 
     /**
      * 获取 portfolioName
-     * 
+     *
      * @return portfolioName.
      */
     public String getPortfolioName() {
@@ -203,7 +204,7 @@ public class CfetsPortfolioAcctRela001Dto extends IbuPortfolioAcctRela implement
 
     /**
      * 设置 portfolioName
-     * 
+     *
      * @param portfolioName portfolioName
      */
     public void setPortfolioName(String portfolioName) {
@@ -214,7 +215,7 @@ public class CfetsPortfolioAcctRela001Dto extends IbuPortfolioAcctRela implement
      * {@inheritDoc}
      */
     @Override
-    @NotEmpty(fieldName = "CfetsPortfolioAcctRela001.portfolioId")
+    @NotEmpty(fieldName = "CfetsPortfolioAcctRela001.portfolioId", groups = {ValidateGroupEdit.class})
     @PrimaryKey(value = Field.PK_3)
     public String getPortfolioId() {
         return super.getPortfolioId();
@@ -224,7 +225,7 @@ public class CfetsPortfolioAcctRela001Dto extends IbuPortfolioAcctRela implement
      * {@inheritDoc}
      */
     @Override
-    @NotEmpty(fieldName = "CfetsPortfolioAcctRela002.partyId")
+    @NotEmpty(fieldName = "CfetsPortfolioAcctRela002.partyId", groups = {ValidateGroupEdit.class})
     public String getPartyId() {
         return super.getPartyId();
     }
@@ -233,7 +234,7 @@ public class CfetsPortfolioAcctRela001Dto extends IbuPortfolioAcctRela implement
      * {@inheritDoc}
      */
     @Override
-    @NotEmpty(fieldName = "CfetsPortfolioAcctRela001.cfetsAcctType")
+    @NotEmpty(fieldName = "CfetsPortfolioAcctRela001.cfetsAcctType", groups = {ValidateGroupEdit.class})
     public String getCfetsAcctType() {
         return super.getCfetsAcctType();
     }
