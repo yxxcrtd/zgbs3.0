@@ -3007,7 +3007,7 @@
 			)
 		)
 
-		SELECT * FROM(
+		SELECT distinct * FROM(
 		( <include refid="BASE_COLUMNS"></include>
 		<where>
 		 	WFL_TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null
