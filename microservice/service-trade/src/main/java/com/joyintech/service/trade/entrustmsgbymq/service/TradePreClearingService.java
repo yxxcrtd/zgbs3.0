@@ -2368,7 +2368,10 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                         FinPledgeDispDetailTemp inputFinPledgeDispDetailTemp = new FinPledgeDispDetailTemp();
                         inputFinPledgeDispDetailTemp.setSeqNo(IDGenerator.generate());
                         inputFinPledgeDispDetailTemp.setTradeId(finPledgeDispTemp.getTradeId());
-                        inputFinPledgeDispDetailTemp.setFinprodId(infContractDetailfile.getFinprodId());
+                        // XYHGFXSJ-560:修改质押券代码 modify by fuyongsheng 20220726 start
+                        // inputFinPledgeDispDetailTemp.setFinprodId(infContractDetailfile.getFinprodId());
+                        inputFinPledgeDispDetailTemp.setFinprodId(pledgeListDto.getFinprodMarketId());
+                        // XYHGFXSJ-560:修改质押券代码 modify by fuyongsheng 20220726 end
                         inputFinPledgeDispDetailTemp.setBranch(BigDecimal.ZERO);
                         inputFinPledgeDispDetailTemp.setTradeType(pledgeListDto.getDisplaceDir());
                         inputFinPledgeDispDetailTemp.setPledgeDisplaceAmt(pledgeListDto.getPledgeNumber());
@@ -2394,7 +2397,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                         pledgeFaceAmt = pledgeFaceAmt.add(oriPledgeInfo.getPledgeNumber());
                         //构造回购质押品dto
                         FinDealPledge finDealPledge = new FinDealPledge();
-                        finDealPledge.setFinprodId(infContractDetailfile.getvTradeId());
+                        finDealPledge.setFinprodId(infContractDetailfile.getFinprodId());
                         finDealPledge.setBranch(0L);
                         finDealPledge.setPledgeFinprodId(oriPledgeInfo.getPledgeFinprodId());
                         finDealPledge.setPledgeNumber(oriPledgeInfo.getPledgeNumber());
