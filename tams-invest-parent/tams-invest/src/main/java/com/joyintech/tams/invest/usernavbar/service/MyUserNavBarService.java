@@ -13,8 +13,7 @@ import org.springframework.stereotype.Component;
 import com.joyintech.framework.navbar.UserNavBarService;
 import com.joyintech.framework.navbar.UserNavbar;
 /**
- * @author 何阳阳
- * @version 1.0 2018年10月15日
+ * @version 1.0 2022年7月21日
  * @see MyUserNavBarService
  * @since 1.0
  */
@@ -29,7 +28,8 @@ public class MyUserNavBarService implements UserNavBarService {
         UserNavbar bar = new UserNavbar();
         bar.setId("helpdoc");
         bar.setName("帮助手册");
-        bar.setAction("this.target='_blank';this.href='http://192.168.70.190:8181/docs/mindoc/mindoc-1d1a2d81h288r'");
+        bar.setUrl("http://192.168.70.190:8181/docs/mindoc/mindoc-1d1a2d81h288r");
+        bar.setTarget("_blank");
         list.add(bar);
         return list;
     }
