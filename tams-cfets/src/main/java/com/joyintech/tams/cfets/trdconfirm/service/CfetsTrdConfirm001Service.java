@@ -16,6 +16,8 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
+import com.joyintech.tams.business.common.dto.CfetsBondPortfolioCashRequest;
+import com.joyintech.tams.business.common.dto.CfetsBondPositionRequest;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
@@ -27,6 +29,8 @@ import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPosPortfolioCashReque
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPosPortfolioSecRequest;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPositionRequest;
 import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
+import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleDealInfo;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubProductDto;
 import com.joyintech.tams.cfets.trd.repo.service.CfetsRepoQuotedPrice004Service;
 import com.joyintech.tams.cfets.trdconfirm.dao.CfetsTrdConfirmMapper;
 import com.joyintech.tams.cfets.trdconfirm.dto.*;
@@ -54,16 +58,21 @@ import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.common.BussRepoSecDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
+import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
+import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.dto.trade.entrust.EtrFinishStatusDto;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
 import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
+import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.invest.interf.service.InterfComponentService;
 import com.joyintech.tams.invest.trade.lend.dto.FinTradeProductDto;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.systemtools.util.CommonUtil;
 import com.joyintech.workflow.engine.constant.OperationType;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1950,6 +1959,8 @@ public class CfetsTrdConfirm001Service extends BaseService {
         // 查询指令 entrustAmt字段存已完成额度
         List<EtrEntrust> etrEntrusts = cfetsTrdConfirmMapper.selectEtrEntrustEByFinprodId(finprodIds);
         logger.debug("发行失败,更新指令状态:" + JsonUtils.object2Json(etrEntrusts));
+        // 指令代码列表,关闭指令头寸用
+        List<String> entrustIds = new ArrayList<>();
         etrEntrusts.forEach(etrEntrust -> {
             // 指令完成额度为0 则关闭指令
             if (BigDecimalUtil.isZero(etrEntrust.getEntrustAmt())) {
@@ -1960,12 +1971,6 @@ public class CfetsTrdConfirm001Service extends BaseService {
                 // 调用投资委托组件的更新委托状态接口，将委托状态设置为“已关闭”
                 String tempEntrustStatu = record.getEntrustStatus();// 获取该委托原始状态，防止后续更改成关闭
                 record.setEntrustStatus(DictCodeList.委托状态_已关闭.getValue());
-                if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
-                    //插入旧头寸
-                    if (baseEtrCashPositionCommService != null && DictCodeList.委托状态_已接收.getValue().equals(tempEntrustStatu)) {
-                        baseEtrCashPositionCommService.entrustCloseExecute(record.getEntrustId(), DictCodeList.是否_是.getValue());
-                    }
-                }
                 String remark = record.getRemark() == null ? "指令关闭原因：发行失败" : record.getRemark().concat("指令关闭原因：发行失败");
                 record.setRemark(remark);
                 logger.debug("发行失败,关闭指令状态:" + JsonUtils.object2Json(record));
@@ -1979,14 +1984,18 @@ public class CfetsTrdConfirm001Service extends BaseService {
                 record.setEntrustStatus(etrEntrust.getEntrustStatus());
                 record.setRemark(etrEntrust.getRemark());
                 // 调用投资委托组件的更新委托状态接口，将委托状态设置为“已完成”
-                String tempEntrustStatu = record.getEntrustStatus();// 获取该委托原始状态，防止后续更改成关闭
                 record.setEntrustStatus(DictCodeList.委托状态_已完成.getValue());
                 logger.debug("发行失败,完成指令状态:" + JsonUtils.object2Json(record));
                 etrEntrustMapper.updateByPrimaryKeySelective(record);
                 // 修改委托指令分发表中值 add by yangwenjun 20201209
                 baseEtrInvestInfoMapper.updatEetrDistribute(etrEntrust);
             }
+            if (CollectionUtils.isEmpty(entrustIds)
+                    || !entrustIds.contains(etrEntrust.getEntrustId())) {
+                entrustIds.add(etrEntrust.getEntrustId());
+            }
         });
+        this.dealIssuingFailPosition(finprodIds, entrustIds);
     }
     private  void sendBidPositionMethod(CfetsTrdFirstBondInvestTradeDto entity) {
         List<CfetsEtrIbPosPortfolioRequest> ptlList = new ArrayList<>();
@@ -2102,4 +2111,175 @@ public class CfetsTrdConfirm001Service extends BaseService {
             baseTradeProductDealCommService.insertPosition(finProductTradeDto);
         }
     }
+
+    /**
+     * 发行失败处理持仓
+     *
+     * @param finprodIds 资产代码
+     * @author jiangpeng
+     * @date 2022/7/26 9:45
+     */
+    private void dealIssuingFailPosition(List<String> finprodIds, List<String> entrustIds) {
+        // 0. 查询一级申购数据
+        List<BidOrder> bidOrders = cfetsTrdConfirmMapper.selectBidOrderByFinprodIds(finprodIds);
+        List<String> bidIds = bidOrders.stream().map(BidOrder::getBidId).collect(Collectors.toList());
+        // 一次性取出明细数据 减少数据库交互
+        List<BidOrderBidPrice> bidOrderBidPrices = cfetsTrdConfirmMapper.selectBidOrderBidPriceByBidIds(bidIds);
+        // 明细数据存放map中 方便取用
+        Map<String, List<BidOrderBidPrice>> bidMap = new HashMap<>();
+        bidOrderBidPrices.forEach(bidOrderBidPrice -> {
+            List<BidOrderBidPrice> bidOrderBidPriceList = new ArrayList<>();
+            if (bidMap.get(bidOrderBidPrice.getBidId()) == null) {
+                bidOrderBidPriceList.add(bidOrderBidPrice);
+                bidMap.put(bidOrderBidPrice.getBidId(), bidOrderBidPriceList);
+            } else {
+                bidOrderBidPriceList = bidMap.get(bidOrderBidPrice.getBidId());
+                bidOrderBidPriceList.add(bidOrderBidPrice);
+                bidMap.put(bidOrderBidPrice.getBidId(), bidOrderBidPriceList);
+            }
+        });
+        // 1.新头寸处理
+        // 1.1 撤销一级申购数据
+        for (BidOrder bidOrder : bidOrders) {
+            this.sendBidPositionMethod(bidOrder, bidMap.get(bidOrder.getBidId()));
+        }
+        // 1.2 关闭指令
+        this.closeDelegatePositionMethod(entrustIds);
+
+        // 2.老头寸处理
+        if (StringUtil.equals(DictCodeList.是否_否.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
+            return;
+        }
+        // 2.1 回冲一级申购组合现金可用流水
+        // 一级申购登记时可用现金流水 需要冲销
+        List<PtlCashPositionFlow> list = baseAssetCashPositionCommMapper.selectAllCashPosition(bidIds);
+        logger.info("处理一级申购发行失败老头寸,一级申购登记时可用现金流水 需要冲销:{}", JsonUtils.object2Json(list));
+        list.forEach(flow -> {
+            PtlCashPositionFlowDto flowDto = new PtlCashPositionFlowDto();
+            BeanUtil.copyPropertiesIgnoreNull(flowDto, flow);
+            flowDto.setAmount(flow.getAmount().negate());
+            flowDto.setOffsetId(flow.getOrderId());
+            flowDto.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
+            flowDto.setOrderId(flowDto.getOrderId());
+            flowDto.setCreateTime(new Date());
+            flowDto.setUpdateTime(new Date());
+            flowDto.setCreateUser(LoginUserUtil.getUserName());
+            flowDto.setUpdateUser(LoginUserUtil.getUserName());
+            basePtlCashPositionInfoService.insertCashPositionFlow(flowDto);
+        });
+        // 2.2 回冲一级投标指令的指令现金流水
+        // 指令持仓流水 、现金流水处理
+        EtrPositionHoldDto etrPositionHoldDto = new EtrPositionHoldDto();
+        // 现金流水
+        List<EtrCashPositionFlowDto> etrCashPositionFlows = new ArrayList<>();
+        // 持仓流水
+        List<EtrSecPositionFlowDto> etrSecPositionFlows = new ArrayList<>();
+        List<EtrCashPositionFlowDto> etrCashPositions = baseAssetCashPositionCommMapper.selectAllEtrCashPosition(entrustIds);
+        etrCashPositions.forEach(flow -> {
+            EtrCashPositionFlowDto flowDto = new EtrCashPositionFlowDto();
+            BeanUtil.copyPropertiesIgnoreNull(flowDto, flow);
+            flowDto.setSeqno(IDGenerator.generate());
+            flowDto.setOffsetId(flow.getOrderId());
+            flowDto.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
+            flowDto.setOrderId(flowDto.getOrderId());
+            flowDto.setCreateTime(new Date());
+            flowDto.setUpdateTime(new Date());
+            flowDto.setCreateUser(LoginUserUtil.getUserName());
+            flowDto.setUpdateUser(LoginUserUtil.getUserName());
+            etrCashPositionFlows.add(flowDto);
+        });
+        etrPositionHoldDto.setPtlCashPositionFlows(etrCashPositionFlows);
+        etrPositionHoldDto.setPtlSecPositionFlows(etrSecPositionFlows);
+        etrPositionHoldDto.setDealEtr(true);
+        EtrCommonCashPositionDealService.持久化流水Dto(etrPositionHoldDto);
+    }
+
+    /**
+     * 处理头寸报文
+     *
+     * @param bidOrder          一级申购数据
+     * @param bidOrderBidPrices 明细数据
+     * @author jiangpeng
+     * @date 2022/7/26 10:37
+     */
+    private void sendBidPositionMethod(BidOrder bidOrder, List<BidOrderBidPrice> bidOrderBidPrices) {
+        List<CfetsBondPortfolioCashRequest> ptlList = new ArrayList<>();
+        for (BidOrderBidPrice bidOrderBidPrice : bidOrderBidPrices) {
+            //调用头寸
+            CfetsBondPortfolioCashRequest posport = new CfetsBondPortfolioCashRequest();
+            posport.setPortfolioId(bidOrderBidPrice.getPortfolioId());
+            posport.setEtrId(bidOrderBidPrice.getEntrustId());
+            posport.setTradeId(bidOrderBidPrice.getBidId());
+            if (StringUtil.isNotEmpty(bidOrderBidPrice.getPortfolioId())
+                    && StringUtil.isNotEmpty(bidOrder.getFinprodId())) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("portfolioId", bidOrderBidPrice.getPortfolioId());
+                map.put("finprodId", bidOrder.getFinprodId());
+                String secAcctId = joyinbusinessCommonService.qryPortfolioSecAcctId(map);
+                if (StringUtil.isNotEmpty(secAcctId)) {
+                    posport.setSecAcctId(secAcctId); // 证券账户
+                }
+            }
+            if (StringUtil.isNotEmpty(bidOrderBidPrice.getPortfolioId())) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("portfolioId", bidOrderBidPrice.getPortfolioId());
+                map.put("acctType", BussinessDictCodeList.资金账户类型_托管账户.getValue());
+                String cashAcctId = joyinbusinessCommonService.qryPortfolioCashAcctId(map);
+                if (StringUtil.isNotEmpty(cashAcctId)) {
+                    posport.setCashAcctId(cashAcctId); // 托管户
+                }
+            }
+            posport.setCashAmount(bidOrderBidPrice.getPayableAmount());
+            posport.setSecAmount(bidOrderBidPrice.getSubscriptionAmount());
+            ptlList.add(posport);
+        }
+        //调用头寸
+        CfetsBondPositionRequest req = new CfetsBondPositionRequest();
+        req.setInterfaceType("Bond001");
+        req.setUserId(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
+        req.setTotalTradeId(bidOrder.getBidId());
+        req.setWorkFlowId(null);
+        req.setFlowStatus(DictCodeListExt3.流程节点_审批生效.getValue());
+        req.setModelType(DictCodeListExt1.子系统代码_交易.getValue());
+        req.setBusiType(DictCodeListExt3.头寸业务类型_债券一级申购.getValue());
+        req.setCdate(bidOrder.getBidDate());
+        req.setTradePlace(BussinessDictCodeList.交易场所_银行间.getValue());
+        req.setBalanceCheck("N");
+        req.setBusiAct(DictCodeListExt3.业务动作_发行失败.getValue());
+        req.setPs(bidOrder.getBidId());
+        req.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
+        req.setDecisionAct(DictCodeListExt3.系统动作_新建.getValue());
+        req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+        req.setFinprodId(bidOrder.getFinprodId());
+        req.setPtlList(ptlList);
+        req.setbTotalTradeId(bidOrder.getBidId());
+        Map<String, Object> param = PositionHttpRequest.send(req);
+        ThreadLocalUtil.setLocalCache(param);
+    }
+
+    /**
+     * 指令关闭 批量处理
+     * @author jiangpeng
+     * @date 2022/7/26 11:15
+     * @param entrustIds 委托代码
+     */
+    public void closeDelegatePositionMethod(List<String> entrustIds) {
+        CfetsEtrIbClosePositionRequest req = new CfetsEtrIbClosePositionRequest();
+        List<CfetsEtrIbClosePosEtrRequest> etrList = new ArrayList<>();
+        for (String entrustId : entrustIds) {
+            CfetsEtrIbClosePosEtrRequest closeItem = new CfetsEtrIbClosePosEtrRequest();
+            closeItem.setBusiType(DictCodeListExt3.头寸业务类型_债券一级申购.getValue());
+            closeItem.setPs(DictCodeList.交易方向_买入.getValue());
+            closeItem.setCloseId(entrustId);
+            closeItem.setSystemAct(DictCodeListExt3.系统动作_关闭.getValue());
+            closeItem.setBusiAct(DictCodeListExt3.业务动作_指令手动关闭.getValue());
+            etrList.add(closeItem);
+        }
+        req.setData(etrList);
+        req.setUserId(SecurityUtil.getLoginUser().getUserName());
+        req.setTotalTradeId(IDGenerator.generate());
+        req.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
+        PositionHttpRequest.batchClose(req);
+    }
+
 }

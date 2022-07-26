@@ -309,4 +309,14 @@ public interface JoyinbusinessCommonMapper {
      * @date 2022/6/21 10:40
      */
     String qryCashAcctIdBySecAcctId(Map<String, Object> param);
+
+    /**
+     * 根据组合 资产 查询证券账户
+     *
+     * @param param
+     * @return java.lang.String
+     * @author jiangpeng
+     * @date 2021/12/13 16:13
+     */
+    String qryPortfolioSecAcctId(Map<String, Object> param);
 }
