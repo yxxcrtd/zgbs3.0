@@ -202,7 +202,7 @@
 			   F2.PLEDGE_NUMBER                        pledgeNumber,
 			   F2.PLEDGE_NUMBER * 100                  pledgeTradeAmt,
 			   F2.PLEDGE_RATIO                         pledgeRatio,
-			   F2.PLEDGE_NUMBER * F2.PLEDGE_FACE_VALUE pledgeFaceValue,
+			   F2.PLEDGE_FACE_VALUE                    pledgeFaceValue,
 			   F.PRIN                                  prin,
 			   F.FINPROD_ID                            finprodId
 		FROM FIN_TRADE_PRODUCT F

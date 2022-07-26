@@ -2421,7 +2421,10 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                     inputFinPledgeDispDetailTemp.setFinprodId(oriPledgeInfo.getPledgeFinprodId());
                     inputFinPledgeDispDetailTemp.setBranch(BigDecimal.ZERO);
                     inputFinPledgeDispDetailTemp.setTradeType(DictCodeListExt3.质押券置换_置换方向_换出.getValue());
-                    inputFinPledgeDispDetailTemp.setPledgeDisplaceAmt(oriPledgeInfo.getPledgeTradeAmt());
+                    // XYHGFXSJ-568:修改质押券面额赋值 modify by fuyongsheng 20220726 start
+                    // inputFinPledgeDispDetailTemp.setPledgeDisplaceAmt(oriPledgeInfo.getPledgeTradeAmt());
+                    inputFinPledgeDispDetailTemp.setPledgeDisplaceAmt(oriPledgeInfo.getPledgeNumber());
+                    // XYHGFXSJ-568:修改质押券面额赋值 modify by fuyongsheng 20220726 end
                     inputFinPledgeDispDetailTemp.setScale(oriPledgeInfo.getPledgeRatio());
                     finPledgeDispDetailTempList.add(inputFinPledgeDispDetailTemp);
                 }
