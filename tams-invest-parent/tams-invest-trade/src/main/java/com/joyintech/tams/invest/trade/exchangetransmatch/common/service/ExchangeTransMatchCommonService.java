@@ -1211,6 +1211,9 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 for(FinDealPledge finDealPledge : finDealPledgeList){
                     finDealPledge.setPledgeRatio(pledgeRatio);
                 }
+                for(FinDealPledge finDealPledge : finDealPledgeList){
+                    finDealPledgeMapper.insertSelective(finDealPledge);
+                }
             }
         }
         // 解除质押需要删除首期的质押品信息
