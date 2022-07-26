@@ -374,7 +374,10 @@ public class PositionRequestTradeReportService {
                     if(StringUtil.equals(entity.getTradeMarket(),交易场所_上海证券交易所.getValue())){
                         ptlCash.put("cashAmount", BigDecimal.ZERO);
                     }else {
-                        ptlCash.put("cashAmount", entity.getPositionBaseData().getFinTradeProductDto().getmTradeAmt());
+                        // XYHGFXSJ-524:解除质押应该使用结算金额字段 modify by ufyongsheng 20220726 start
+                        // ptlCash.put("cashAmount", entity.getPositionBaseData().getFinTradeProductDto().getmTradeAmt());
+                        ptlCash.put("cashAmount", dto.getCashAmount());
+                        // XYHGFXSJ-524:解除质押应该使用结算金额字段 modify by ufyongsheng 20220726 end
                     }
                 }
                 // ZGTFCP-2114:到期购回、提前购回登录当前交易的到期结算金额 modify by fuyongsheng 20220327 start

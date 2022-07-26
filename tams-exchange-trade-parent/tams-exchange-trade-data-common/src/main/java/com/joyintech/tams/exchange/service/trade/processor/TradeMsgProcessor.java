@@ -524,7 +524,8 @@ public class TradeMsgProcessor {
                         return false;
                     } else {
                         transactionHelper.setInstructionPledge(instructionPledge);
-                        logger.info("占用抵押券数量 PledgeNumber {} UsedPledgeNumber {} EntrustVolume {}", instructionPledge.getPledgeNumber(), instructionPledge.getUsedPledgeNumber(), orderInterface.getEntrustVolume());
+                        logger.info("{}占用抵押券数量 PledgeNumber {} UsedPledgeNumber {} EntrustVolume {}", instructionPledge.getEntrustId(),
+                                instructionPledge.getPledgeNumber(), instructionPledge.getUsedPledgeNumber(), orderInterface.getEntrustVolume());
                         instructionPledge.setUsedPledgeNumber(usedPledgeNumber);
                     }
                 }
@@ -532,7 +533,7 @@ public class TradeMsgProcessor {
             // 可用数量
             if (instruction.volumeInstruction()) {
                 long leftNum = instruction.getEntrustNum() - instruction.getEntrustLeftAmt().longValue() - instruction.getFrozenQuantity().longValue();
-                if (leftNum < entrustVolume) {
+                if (leftNum < entrustVolume && !BusiTypeTgEnum.中途换券.codeEquals(instruction.getBusiTypeTg())) {
                     orderInterface.setErrorCode(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.value);
 //                    orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_NUMBER_ERROR.errorMsg);
                     String errorMsg;

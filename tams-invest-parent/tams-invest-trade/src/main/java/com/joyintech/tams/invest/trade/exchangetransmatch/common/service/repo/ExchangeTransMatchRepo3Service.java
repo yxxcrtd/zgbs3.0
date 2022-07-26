@@ -61,7 +61,11 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
             baseTradeProductDealDto.setStlPayOrdersList(this.generateStlPayOrdersList(dealDto, entrustDto, trdProductDeal));
             //质押品信息表
             if(!DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换钱.getValue().equals(dealDto.getBusiSceneCalss())){
-                baseTradeProductDealDto.setFinDealPledgeList(this.genFinDealPledgeList(dealDto,trdFinProductDealTotal));
+                // 解除质押到期交易无需登录质押品表
+                if(!(DictCodeListExt3.交易方向_解除质押.getValue().equals(entrustDto.getPs())
+                        && DictCodeList.交易方向_到期.getValue().equals(trdProductDeal.getPs()))){
+                    baseTradeProductDealDto.setFinDealPledgeList(this.genFinDealPledgeList(dealDto,trdFinProductDealTotal));
+                }
             }
             baseTradeProductDealDtoList.add(baseTradeProductDealDto);
         }
@@ -237,7 +241,8 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
             }
             trdProductDealList.add(trdProductDeal);
         }
-        if(DictCodeListExt3.交易方向_解除质押.getValue().equals(entrustDto.getPs())){
+        if(DictCodeListExt3.交易方向_解除质押.getValue().equals(entrustDto.getPs())
+                && null != trdFinProductDealTotal.getTradeAmt()){
             TrdProductDealDto trdProductDeal = createTrdProductDealCommon(dealDto, entrustDto, trdFinProductDealTotal);
             //交易方向
             trdProductDeal.setPs(DictCodeList.交易方向_到期.getValue());

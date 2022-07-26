@@ -2648,10 +2648,41 @@
         from ETR_ENTRUST ee
         left join (select ENTRUST_ID, sum(ENT_FINISH_AMT) finishAmt from ETR_FINISH_STATUS group by ENTRUST_ID) efs
         on ee.ENTRUST_ID = efs.ENTRUST_ID
-        where ee.ENTRUST_STATUS in ('03','02')
+        where ee.ENTRUST_STATUS in ('03','02','09')
         <if test="finprodIds != null and finprodIds.size() > 0">
             AND ee.FINPROD_ID in
             <foreach collection="finprodIds" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="selectBidOrderByFinprodIds" resultType="com.joyintech.tams.common.base.entity.BidOrder">
+        select bid_id, finprod_id, bid_date, pay_type, pay_date, is_win,
+        win_prin_amt, win_price, win_type, remark, create_user, create_dept, create_time,
+        update_user, update_time, ou_party_id, our_trader, subscription_amount, payable_amount,
+        sett_fee_amt, p_bid_id, is_cancel, trade_status, dip_type, counter_id, bid_modle,
+        unit_cprice, unit_int, trade_amt, int_amt, assign_regdate, onmarket_date
+        from BID_ORDER
+        where IS_CANCEL = 'N' and TRADE_STATUS = '01'
+        <if test="finprodIds != null and finprodIds.size() > 0">
+            AND FINPROD_ID in
+            <foreach collection="finprodIds" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="selectBidOrderBidPriceByBidIds" resultType="com.joyintech.tams.common.base.entity.BidOrderBidPrice">
+        select bid_id, entrust_id, bid_price, is_win, win_price, win_cprice, the_win_prin_amt,
+        win_prin_amt, trade_id, create_user, create_dept, create_time, update_user, update_time,
+        is_frozen_position, subscription_amount, payable_amount, sett_fee_amt, p_bid_id, is_cancel,
+        trade_status, portfolio_id, inv_aim, sec_acct_id, acct_no, trade_amt, int_amt
+        from BID_ORDER_BID_PRICE
+        where IS_CANCEL = 'N' and TRADE_STATUS = '01'
+        <if test="bidIds != null and bidIds.size() > 0">
+            AND BID_ID in
+            <foreach collection="bidIds" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
         </if>

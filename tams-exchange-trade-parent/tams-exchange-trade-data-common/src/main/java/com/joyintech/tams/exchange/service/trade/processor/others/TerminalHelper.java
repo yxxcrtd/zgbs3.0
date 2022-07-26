@@ -452,6 +452,7 @@ public class TerminalHelper {
         repurchaseQuoteReceiveResponse.setBackDate(String.valueOf(source.getSettleEndDate()));
         repurchaseQuoteReceiveResponse.setRepoMdate(String.valueOf(source.getRepurchaseDate()));
         repurchaseQuoteReceiveResponse.setCapDays(source.getFundUsedDays());
+        repurchaseQuoteReceiveResponse.setSwapOutBalance(BigDecimal.valueOf(source.getSwapOutBalance()));
         repurchaseQuoteReceiveResponse.setSwapIntoBonds(source.getSwapIntoBonds());
         Instrument swapIntoBondInstrument = instrumentService.queryByInnerCode(source.getSwapIntoBonds());
         repurchaseQuoteReceiveResponse.setSwapIntoBondsName(ObjectUtil.isNotNull(swapIntoBondInstrument) ? swapIntoBondInstrument.getStockName() : source.getSwapIntoBonds());

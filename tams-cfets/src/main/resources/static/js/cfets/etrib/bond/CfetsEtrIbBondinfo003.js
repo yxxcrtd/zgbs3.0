@@ -529,7 +529,7 @@
             if (result && result.data) {
                 var data = result.data.data;
                 if (data.price) {
-                    query("#price").val(data.price)
+                    query("#price").val(data.price);
                     query("#priceShow").val(JoyinMath.doDiv(data.price, 1, 4));
                     query("#unitFpriceShow").val(JoyinMath.doDiv(data.unitFprice, 1, 4));
                     query("#unitFprice").val(data.unitFprice);
@@ -573,17 +573,17 @@
                 //给一大串字段赋值
                 query("#priceShow").val(JoyinMath.doDiv(data.price, 1, 4));
                 query("#price").val(data.price);
-                query("#priceAmt").val(JoyinMath.doDiv(data.priceAmt, 1, 2));
-                query("#unitInt").val(JoyinMath.doDiv(data.unitInt, 1, 4));
-                query("#unitIntShow").val(JoyinMath.doDiv(data.unitInt, 1, 4));
-                query("#unitIntAmt").val(JoyinMath.doDiv(data.unitIntAmt, 1, 2));
+                query("#priceAmt").val(JoyinMath.doDiv(data.priceAmt, 1, 2)).trigger("blur");
+                query("#unitInt").val(JoyinMath.doDiv(data.unitInt, 1, 4)).trigger("blur");
+                query("#unitIntShow").val(JoyinMath.doDiv(data.unitInt, 1, 4)).trigger("blur");
+                query("#unitIntAmt").val(JoyinMath.doDiv(data.unitIntAmt, 1, 2)).trigger("blur");
                 query("#unitFpriceShow").val(JoyinMath.doDiv(data.unitFprice, 1, 4));
-                query("#unitFprice").val(data.unitFprice);
-                query("#unitFpriceAmt").val(JoyinMath.doDiv(data.unitFpriceAmt, 1, 2));
-                query("#entrustOwnInt").val(JoyinMath.doDiv(data.entrustOwnInt, 1, 2));
-                query("#entrustIntegrateInt").val(JoyinMath.doDiv(data.entrustIntegrateInt, 1, 2));
-                query("#entrustOwnUnitFpriceAmt").val(JoyinMath.doDiv(data.entrustOwnUnitFpriceAmt, 1, 2));
-                query("#entrustIntegrateUnitFpriceAmt").val(JoyinMath.doDiv(data.entrustIntegrateUnitFpriceAmt, 1, 2));
+                query("#unitFprice").val(data.unitFprice).trigger("blur");
+                query("#unitFpriceAmt").val(JoyinMath.doDiv(data.unitFpriceAmt, 1, 2)).trigger("blur");
+                query("#entrustOwnInt").val(JoyinMath.doDiv(data.entrustOwnInt, 1, 2)).trigger("blur");
+                query("#entrustIntegrateInt").val(JoyinMath.doDiv(data.entrustIntegrateInt, 1, 2)).trigger("blur");
+                query("#entrustOwnUnitFpriceAmt").val(JoyinMath.doDiv(data.entrustOwnUnitFpriceAmt, 1, 2).trigger("blur"));
+                query("#entrustIntegrateUnitFpriceAmt").val(JoyinMath.doDiv(data.entrustIntegrateUnitFpriceAmt, 1, 2)).trigger("blur");
             }
         });
     }

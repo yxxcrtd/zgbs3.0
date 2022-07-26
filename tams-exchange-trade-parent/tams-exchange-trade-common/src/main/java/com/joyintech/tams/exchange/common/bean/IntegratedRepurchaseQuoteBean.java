@@ -107,7 +107,10 @@ public class IntegratedRepurchaseQuoteBean {
     private String deliverySide;
     @ApiModelProperty(name = "stkprop", value = "股份性质")
     private String stkprop;
-    
+
+    @ApiModelProperty(name = "swapOutBalance", value = "换出金额")
+    private double swapOutBalance;
+
     @ApiModelProperty(name = "swapIntoBonds", value = "换入质押券代码")
     private String swapIntoBonds;
 
@@ -566,4 +569,11 @@ public class IntegratedRepurchaseQuoteBean {
         this.pledgeeName = pledgeeName;
     }
 
+    public double getSwapOutBalance() {
+        return swapOutBalance;
+    }
+
+    public void setSwapOutBalance(double swapOutBalance) {
+        this.swapOutBalance = swapOutBalance;
+    }
 }
