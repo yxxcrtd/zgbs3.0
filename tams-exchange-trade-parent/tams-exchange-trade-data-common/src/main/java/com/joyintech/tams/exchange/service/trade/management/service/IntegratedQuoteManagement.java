@@ -20,12 +20,9 @@ import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.FuturesInstrument;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.InstructionPledge;
-import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
 import com.joyintech.tams.exchange.common.enums.exchange.QuoteStatusEnum;
-import com.joyintech.tams.exchange.common.enums.exchange.RepoBsEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.RepurchaseTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.PledgeDisPlaceDirEnum;
-import com.joyintech.tams.exchange.common.enums.invest.PsEnum;
 import com.joyintech.tams.exchange.common.request.EntrustQueryRequest;
 import com.joyintech.tams.exchange.common.request.RepurchaseQuoteSendRequest;
 import com.joyintech.tams.exchange.common.utils.EnumUtil;
@@ -35,7 +32,6 @@ import com.joyintech.tams.exchange.common.vo.IntegratedEntrustVo;
 import com.joyintech.tams.exchange.datacommon.db.service.FuturesInstrumentService;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionPledgeService;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
-import com.joyintech.tams.exchange.service.trade.processor.invest.InvestInterfaceHelper;
 import com.joyintech.tams.exchange.service.trade.processor.others.TerminalHelper;
 import com.joyintech.tams.exchange.service.trade.scheduled.quote.QuoteJob;
 import org.apache.commons.collections4.CollectionUtils;
@@ -527,12 +523,16 @@ public class IntegratedQuoteManagement {
 
             ZTHQRepurchaseQuoteSendResponse sendResponse = (ZTHQRepurchaseQuoteSendResponse) baseRepurchaseQuoteSendResponse;
 
-            sendResponse.setDiscount(entrust.getDiscount());
+            if (Objects.nonNull(entrust.getDiscount())) {
+                sendResponse.setDiscount(entrust.getDiscount().multiply(BigDecimal.valueOf(100)));
+            }
             sendResponse.setExchangeAmount(instruction.getEntrustAmt());
             List<InstructionPledge> pledges = instructionPledgeService.queryInstructionPledgesByInstructionId(instruction.getEntrustId());
             InstructionPledge swapInPledge = pledges.stream().filter(item -> PledgeDisPlaceDirEnum.SWAP_IN.codeEquals(item.getDisplaceDir())).findFirst().orElse(null);
             if (ObjectUtil.isNotNull(swapInPledge)) {
-                sendResponse.setNewDiscount(swapInPledge.getPledgeRatio());
+                if (Objects.nonNull(swapInPledge.getPledgeRatio())) {
+                    sendResponse.setNewDiscount(swapInPledge.getPledgeRatio().multiply(BigDecimal.valueOf(100)));
+                }
                 sendResponse.setSwapIntoBonds(swapInPledge.getFinprodMarketId());
                 sendResponse.setSwapIntoBondsVolume(swapInPledge.getPledgeNumber());
             }

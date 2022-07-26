@@ -49,6 +49,7 @@ public class TradeMessage extends BasicMessage {
     private String dealerId;//	 本方交易商ID
     private String propDealerId;// 对手方交易商ID
     private String propInvestorId;//对手方交易主体ID
+    private BigDecimal entrustBalance;     // 回购金额
 
     /**
      * 下单组合明细数据消息
@@ -324,6 +325,14 @@ public class TradeMessage extends BasicMessage {
         this.propInvestorId = propInvestorId;
     }
 
+    public BigDecimal getEntrustBalance() {
+        return entrustBalance;
+    }
+
+    public void setEntrustBalance(BigDecimal entrustBalance) {
+        this.entrustBalance = entrustBalance;
+    }
+
     public List<PortfolioTradeMessage> getPortfolioTradeMessages() {
         return portfolioTradeMessages;
     }
@@ -356,6 +365,8 @@ public class TradeMessage extends BasicMessage {
             tradeMessage.setDealVolume((double) trade.getTradedVolume());
             tradeMessage.setDealPrice(trade.getTradedPrice());
             tradeMessage.setDealBalance(trade.getTradedBalance());
+            //成交金额
+            tradeMessage.setEntrustBalance(trade.getTradedBalance());
             if (!BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
                 tradeMessage.setFullPrice(trade.getTradedVolume() > 0 ? TradeUtils.divide(trade.getTradedBalance(), trade.getTradedVolume(), 4).doubleValue() : 0);
             }

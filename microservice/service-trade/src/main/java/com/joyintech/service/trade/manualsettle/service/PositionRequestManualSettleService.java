@@ -333,7 +333,15 @@ public class PositionRequestManualSettleService {
         resultMap.put("workFlowId", null);
         resultMap.put("cdate", entity.getSettleDate());
         resultMap.put("ccy", infContractDetailfile.getCcy());
-
+        // XYHGFXSJ-555:中途换券设置换券方式 modify by fuyongsheng 20220726 start
+        if (交易方向_中途换券.getValue().equals(infContractDetailfile.getPs())) {
+            if (上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(etrEntrust.getEntrustType())) {
+                resultMap.put(BOND_EXCHANGE_TYPE, "02");
+            } else {
+                resultMap.put(BOND_EXCHANGE_TYPE, "01");
+            }
+        }
+        // XYHGFXSJ-555:中途换券设置换券方式 modify by fuyongsheng 20220726 end
         // 首期组合现金数据集
         if (DictCodeListExt3.交易方向_正回购.getValue().equals(infContractDetailfile.getPs())
                 // ZGTFCP-1417:添加逆回购方向 modify by fuyongsheng 20220321 start
@@ -615,26 +623,28 @@ public class PositionRequestManualSettleService {
      * @return
      */
     private FinTradeProduct getSqFinTradeProduct(InfContractDetailfile infContractDetailfile){
+        // XYHGFXSJ-535:修改查询首期方法 modify by fuyongsheng 20220726 start
         // 首期成交编号
-        String finprodId = infContractDetailfile.getvTradeId();
-        String entrustId = infContractDetailfile.getEntrustId();
-        // 指令附属信息
-        EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entrustId);
-        EtrEntrustAddDto etrEntrustAddDto = new EtrEntrustAddDto();
-        if (etrEntrustAdd != null){
-            BeanUtil.copyPropertiesIgnoreNull(etrEntrustAddDto,etrEntrustAdd);
-            if (etrEntrustAdd.getTradeId() != null) {
-                finprodId = etrEntrustAdd.getTradeId();
-            }
-        }
-        String hgsqFinprodId = trdCommonBaseService.selectHgsqFinprodId(infContractDetailfile.getPortfolioId(), finprodId);
-        if (StringUtil.isNotBlank(hgsqFinprodId)) {
-            finprodId = hgsqFinprodId;
-        }
+//        String finprodId = infContractDetailfile.getvTradeId();
+//        String entrustId = infContractDetailfile.getEntrustId();
+//        // 指令附属信息
+//        EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entrustId);
+//        EtrEntrustAddDto etrEntrustAddDto = new EtrEntrustAddDto();
+//        if (etrEntrustAdd != null){
+//            BeanUtil.copyPropertiesIgnoreNull(etrEntrustAddDto,etrEntrustAdd);
+//            if (etrEntrustAdd.getTradeId() != null) {
+//                finprodId = etrEntrustAdd.getTradeId();
+//            }
+//        }
+//        String hgsqFinprodId = trdCommonBaseService.selectHgsqFinprodId(infContractDetailfile.getPortfolioId(), finprodId);
+//        if (StringUtil.isNotBlank(hgsqFinprodId)) {
+//            finprodId = hgsqFinprodId;
+//        }
         FinTradeProductKey finTradeProductKey = new FinTradeProductKey();
-        finTradeProductKey.setFinprodId(finprodId);
+        finTradeProductKey.setFinprodId(infContractDetailfile.getFinprodId());
         finTradeProductKey.setBranch(0L);
         return finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
+        // XYHGFXSJ-535:修改查询首期方法 modify by fuyongsheng 20220726 end
     }
 
     /**

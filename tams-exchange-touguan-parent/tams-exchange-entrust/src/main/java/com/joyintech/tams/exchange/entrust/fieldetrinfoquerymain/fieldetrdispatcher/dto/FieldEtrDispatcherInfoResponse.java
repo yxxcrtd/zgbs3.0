@@ -871,7 +871,20 @@ public class FieldEtrDispatcherInfoResponse extends FieldEtrDispatcherBaseInfo {
         this.newDiscount = newDiscount;
     }
 
+    private String backDate;
+
+    public String getBackDate() {
+        return backDate;
+    }
+
+    public void setBackDate(String backDate) {
+        this.backDate = backDate;
+    }
+
     public String getRepoMdate() {
+        if(!StringUtils.isEmpty(this.getBackDate())){
+            return DateUtil.formatDateAddSplit(this.getBackDate());
+        }
         if (StringUtil.isBlank(getRepoTerm()) || StringUtil.isBlank(getVpayDate())) {
             return null;
         }

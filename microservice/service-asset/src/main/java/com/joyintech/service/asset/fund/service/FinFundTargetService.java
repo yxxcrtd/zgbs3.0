@@ -46,6 +46,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -564,6 +565,8 @@ public class FinFundTargetService extends BaseService<FinFundTargetDto> {
         param.put("CASH_TYPE_2", DictCodeListExt1.现金流二级类型_利息.getValue());
         param.put("FIN_CASH_BUSINESS_TYPE", DictCodeListExt1.金融产品类型_理财产品.getValue());
         param.put("FINPROD_TYPE_TG_F06", DictCodeListExt1.金融产品类型_投管用_基金.getValue());
+        //平台日
+        param.put("platDate", DateUtil.platDateFromCache());
         return finFundTargetMapper.selectByFinprodId(param);
     }
 
