@@ -21,6 +21,9 @@ public class CfetsTrdBondFirstSubEntrustRequest {
     @ApiModelProperty(name = "finprodMarketIds", value = "市场代码,列表 etrAddSearch接口必传", example = "[A,B]")
     private List<String> finprodMarketIds;
 
+    @ApiModelProperty(name = "finprodIds", value = "市场代码,列表 etrAddSearch接口必传", example = "[A,B]")
+    private List<String> finprodIds;
+
     @ApiModelProperty(name = "secManageAcctIds ", value = "证券账户,列表 etrAddSearch接口必传", example = "[A,B]")
     private List<String> secManageAcctIds;
 
@@ -101,6 +104,13 @@ public class CfetsTrdBondFirstSubEntrustRequest {
         this.finprodMarketIds = finprodMarketIds;
     }
 
+    public List<String> getFinprodIds() {
+        return finprodIds;
+    }
+
+    public void setFinprodIds(List<String> finprodIds) {
+        this.finprodIds = finprodIds;
+    }
 
     public String getEntrustDateStart() {
         return entrustDateStart;

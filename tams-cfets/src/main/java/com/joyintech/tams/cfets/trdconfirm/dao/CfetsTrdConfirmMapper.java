@@ -4,6 +4,7 @@ package com.joyintech.tams.cfets.trdconfirm.dao;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbBondinfoDto;
 import com.joyintech.tams.cfets.trdconfirm.dto.*;
 import com.joyintech.tams.common.base.entity.BidOrder;
+import com.joyintech.tams.common.base.entity.BidOrderBidPrice;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.common.base.entity.FinProductAdd;
 import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
@@ -280,6 +281,24 @@ public interface CfetsTrdConfirmMapper {
      * @return int
      */
     List<EtrEntrust> selectEtrEntrustEByFinprodId(@Param("finprodIds") List<String> finprodIds);
+
+    /**
+     * 根据资产代码查询一级申购数据
+     * @author jiangpeng
+     * @date 2022/5/7 19:52
+     * @param finprodIds 资产代码列表
+     * @return int
+     */
+    List<BidOrder> selectBidOrderByFinprodIds(@Param("finprodIds") List<String> finprodIds);
+
+    /**
+     * 根据投标编号查询一级申购明细数据
+     * @author jiangpeng
+     * @date 2022/5/7 19:52
+     * @param bidIds 投标编号列表
+     * @return int
+     */
+    List<BidOrderBidPrice> selectBidOrderBidPriceByBidIds(@Param("bidIds") List<String> bidIds);
 
 
     BigDecimal selectEtrNum(@Param("portfolioId") String finprodId,@Param("entrustId") String entrustId);
