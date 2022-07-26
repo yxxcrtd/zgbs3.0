@@ -2311,6 +2311,9 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                 }else if(StringUtil.isNotEmpty(ps) && StringUtil.equals(ps, 交易方向_解除质押.getValue())) {
                     infRiskRdsDto.setAmount(CommonUtil.getBigDecimal(dataMap, "expireSettleAmt", BigDecimal.ZERO));
                     infRiskRdsDto.setTradeNum(infRiskRdsDto.getAmount());
+                    if(infRiskRdsDto.getAmount().compareTo(BigDecimal.ZERO) == 0) {
+                        return null;
+                    }
                 }
                 return infRiskRdsDto;
             }
