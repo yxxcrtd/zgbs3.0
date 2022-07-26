@@ -23,7 +23,10 @@
         var yield = $("#yield").val();
         object.yield = yield;
         //根据指令方向设置质押式回购的金融产品类型
-
+        console.log($("#ps").val()," ____  ",$("#entrustAmt").val())
+        if($("#ps").val() == 'T93'){
+            object.expireSettleAmt = $("#entrustAmt").val();
+        }
         object.mdate = object.vdate;
         object.entrustDate = object.vdate;
 
@@ -1807,6 +1810,7 @@
                 }
                 riskParams.finprodId = $("#repSecId").val();
                 riskParams.repoAmt = $("#tradeAmt").val();
+                riskParams.expireSettleAmt = $("#entrustAmt").val();
                 riskParams.entrustDate = $("#vdate").val();
                 riskParams.vdate = $("#vdate").val();
                 riskParams.mdate = $("#vdate").val();
