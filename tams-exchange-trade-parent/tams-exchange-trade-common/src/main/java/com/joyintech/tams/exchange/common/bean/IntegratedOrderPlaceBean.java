@@ -59,7 +59,7 @@ public class IntegratedOrderPlaceBean extends BaseOrderRequest implements Serial
     private String market;
 
     @ApiModelProperty(required = true, name = "stockCode", value = "证券代码")
-    @NotBlank(message = "证券代码不能为空")
+//    @NotBlank(message = "证券代码不能为空")
     private String stockCode;
 
     @ApiModelProperty(required = true, name = "stockName", value = "证券名称")

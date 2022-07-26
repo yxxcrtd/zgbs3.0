@@ -2,6 +2,7 @@ package com.joyintech.tams.exchange.service.trade.processor.business.common;
 
 import cn.hutool.core.collection.ListUtil;
 import com.google.common.base.Strings;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.investment.PledgeTradeMessage;
 import com.joyintech.tams.exchange.common.bean.investment.PortfolioTradeMessage;
 import com.joyintech.tams.exchange.common.constant.*;
@@ -227,8 +228,9 @@ public class TradeCallbackHelper {
         if (Strings.isNullOrEmpty(market)) {
             market = StockCodeUtils.getMarket(entrust.getStockCode());
         }
-        tradeRecord.setStockCode(StockCodeUtils.formatStockCode(tradeRecord.getStockCode(), market));
-        logger.info("=======InstructionId：{}，BrokerEntrustId：{}，BrokerTradeId：{}，Market：{}，StockCode：{}", entrust.getInstructionId(), tradeRecord.getBrokerEntrustId(), tradeRecord.getBrokerTradeId(), market, tradeRecord.getStockCode());
+        if(StringUtil.isNotEmpty(tradeRecord.getStockCode())){
+            tradeRecord.setStockCode(StockCodeUtils.formatStockCode(tradeRecord.getStockCode(), market));
+        }
         if (Strings.isNullOrEmpty(tradeRecord.getStockName())) {
             tradeRecord.setStockName(entrust.getStockName());
         }
