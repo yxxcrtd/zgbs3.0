@@ -511,9 +511,7 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                 if (协议回购到期交易方向.contains(finDto.getPs())){
                     finDto.setPs(DictCodeList.交易方向_到期.getValue());
                     //协议回购到期交易方向 需要使用到期结算金额实占
-                    if(StringUtil.isNotEmpty(etrEntrustAdd)) {
-                        finDto.setAmount(etrEntrustAdd.getmTradeAmt() == null? BigDecimal.ZERO:etrEntrustAdd.getmTradeAmt());
-                    }
+                    finDto.setAmount(CommonUtil.getBigDecimal(dataMap,"amount",BigDecimal.ZERO));
                     //协议回购到期交易方向 的指令没有进行预占，不需要处理预占信息，将指令代码置空
                     //finDto.setEntrustCode(null);
 
