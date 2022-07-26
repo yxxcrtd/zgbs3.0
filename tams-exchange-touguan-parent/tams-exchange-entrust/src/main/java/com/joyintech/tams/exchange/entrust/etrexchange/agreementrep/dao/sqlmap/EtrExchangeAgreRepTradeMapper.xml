@@ -710,6 +710,7 @@
         DECODE(etr_entrust.ps, 'T94', trdPledge.finprod_id, null)                                      AS swapOrigFinprodId, /**中途换券当前质押券**/
         DECODE(etr_entrust.ps, 'T94', trdPledge.Finprod_Market_Id, null)                                      AS swapOrigFinprodMarketId, /**中途换券当前质押代码**/
         DECODE(etr_entrust.ps, 'T94', trdPledge.finprod_abbr, null)                                      AS swapOrigFinprodAbbr, /**中途换券当前质押券名称**/
+        DECODE(etr_entrust.ps, 'T94', trdPledge.PLEDGE_NUMBER, null)                                      AS swapOrigRepSecNum, /**中途换券当前质押券数量**/
         DECODE(etr_entrust.ps, 'T94', swapPledge.finprod_id, null)                                      AS swapOutFinprodId, /**中途换券换出质押券**/
         DECODE(etr_entrust.ps, 'T94', swapPledge.Finprod_Market_Id, null)                                      AS swapOutFinprodMarketId, /**中途换券换出质押代码**/
         DECODE(etr_entrust.ps, 'T94', swapPledge.finprod_abbr, null)                                      AS swapOutFinprodAbbr, /**中途换券换出质押券名称**/
@@ -936,6 +937,7 @@
             DECODE(wfl_etr_entrust.ps, 'T94', trdPledge.finprod_id, null)                                      AS swapOrigFinprodId, /**中途换券当前质押券**/
             DECODE(wfl_etr_entrust.ps, 'T94', trdPledge.Finprod_Market_Id, null)                                      AS swapOrigFinprodMarketId, /**中途换券当前质押代码**/
             DECODE(wfl_etr_entrust.ps, 'T94', trdPledge.finprod_abbr, null)                                      AS swapOrigFinprodAbbr, /**中途换券当前质押券名称**/
+            DECODE(wfl_etr_entrust.ps, 'T94', trdPledge.PLEDGE_NUMBER, null)                                      AS swapOrigRepSecNum, /**中途换券当前质押券数量**/
             DECODE(wfl_etr_entrust.ps, 'T94', swapPledge.finprod_id, null)                                      AS swapOutFinprodId, /**中途换券换出质押券**/
             DECODE(wfl_etr_entrust.ps, 'T94', swapPledge.Finprod_Market_Id, null)                                      AS swapOutFinprodMarketId, /**中途换券换出质押代码**/
             DECODE(wfl_etr_entrust.ps, 'T94', swapPledge.finprod_abbr, null)                                      AS swapOutFinprodAbbr, /**中途换券换出质押券名称**/

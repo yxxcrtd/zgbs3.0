@@ -208,6 +208,9 @@ public class EtrExchangeAgreRepTrade003Dto extends EtrEntrust{
     @ApiModelProperty(name="swapOrigFinprodAbbr",value="中途换券当前质押券名称")
     private String swapOrigFinprodAbbr;
 
+    @ApiModelProperty(name="swapOrigRepSecNum",value="中途换券当前质押数量")
+    private BigDecimal swapOrigRepSecNum;
+
     @ApiModelProperty(name="swapOutFinprodId",value="中途换券换出质押券")
     private String swapOutFinprodId;
 
