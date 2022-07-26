@@ -2758,13 +2758,19 @@
         nvl(nvl(fscr.SCALE * ete.ENTRUST_NUM,ee.PLEDGE_NUMBER * ee.PLEDGE_RATIO), ete.ENTRUST_NUM) pledgeStandardNumber, /** 标准券额度 **/
         fp.Is_Right isRight,sci.ACCT_NAME trdAcctId,
         fp.FINPROD_TYPE2 finprodTypeTg,
-        eted.DEAL_MODE declaType,T7.FINPROD_ID stockSecId
+        eted.DEAL_MODE declaType,T7.FINPROD_ID stockSecId,
+        case when ete.ps = 'T96' then
+        fin_trade_product.Mdate else null end backDate
         FROM ETR_ENTRUST ete
         INNER JOIN ETR_ENTRUST_ADD eted ON ete.entrust_id = eted.entrust_id
         LEFT JOIN FIN_PRODUCT_CONVERTIBLE FPC ON ete.FINPROD_ID = FPC.FINPROD_ID
         LEFT JOIN FIN_PRODUCT T5 ON FPC.CON_FINPROD_ID = T5.FINPROD_ID
         LEFT JOIN PTL_PORTFOLIO pp ON ete.portfolio_id = pp.portfolio_id
         LEFT JOIN FIN_PRODUCT_TYPE fpt ON fpt.FINPROD_ID = ete.FINPROD_ID
+        LEFT JOIN fin_trade_product ON fin_trade_product.finprod_id = fpt.Finprod_Id
+        AND fin_trade_product.BRANCH = fpt.Branch
+        AND fpt.Type_6 = 'H01'
+        AND fpt.TYPE_7 IN ( '03', '04' )
         LEFT JOIN FIN_PRODUCT fp ON ete.finprod_id = fp.finprod_id
         <!--        LEFT JOIN ETR_ENTRUST_PLEDGE eep ON ete.portfolio_id = eep.portfolio_id-->
         LEFT JOIN PTL_SEC_STOCK pss ON pss.pledge_stock_id = eted.pledge_stock_id AND ete.portfolio_id = pss.portfolio_id
@@ -2866,13 +2872,20 @@
         nvl(ee.PLEDGE_NUMBER * ee.PLEDGE_RATIO , ete.ENTRUST_NUM) pledgeStandardNumber, /** 标准券额度 **/
         fp.Is_Right isRight,sci.ACCT_NAME trdAcctId,
         fp.FINPROD_TYPE2 finprodTypeTg,
-        eted.DEAL_MODE declaType,T7.FINPROD_ID stockSecId
+        eted.DEAL_MODE declaType,T7.FINPROD_ID stockSecId,
+        case when ete.ps = 'T96' then
+        fin_trade_product.Mdate else null end backDate
         FROM WFL_ETR_ENTRUST ete
         INNER JOIN WFL_ETR_ENTRUST_ADD eted ON ete.entrust_id = eted.entrust_id
         LEFT JOIN FIN_PRODUCT_CONVERTIBLE FPC ON ete.FINPROD_ID = FPC.FINPROD_ID
         LEFT JOIN FIN_PRODUCT T5 ON FPC.CON_FINPROD_ID = T5.FINPROD_ID
         LEFT JOIN PTL_PORTFOLIO pp ON ete.portfolio_id = pp.portfolio_id
         LEFT JOIN FIN_PRODUCT_TYPE fpt ON fpt.FINPROD_ID = ete.FINPROD_ID
+        LEFT JOIN fin_trade_product ON fin_trade_product.finprod_id = fpt.Finprod_Id
+        AND fin_trade_product.BRANCH = fpt.Branch
+        AND fpt.Type_6 = 'H01'
+        AND fpt.TYPE_7 IN ( '03', '04' )
+
         LEFT JOIN FIN_PRODUCT fp ON ete.finprod_id = fp.finprod_id
         <!--        LEFT JOIN WFL_ETR_ENTRUST_PLEDGE eep ON ete.portfolio_id = eep.portfolio_id-->
         LEFT JOIN PTL_SEC_STOCK pss ON pss.pledge_stock_id = eted.pledge_stock_id AND ete.portfolio_id = pss.portfolio_id
