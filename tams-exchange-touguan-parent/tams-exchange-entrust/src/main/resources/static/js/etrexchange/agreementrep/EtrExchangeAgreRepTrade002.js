@@ -348,6 +348,11 @@
      */
     var tradeMarketChange = function () {
         var tradeMarket = $("#tradeMarket").val();
+        if(tradeMarket == TRADE_MARKET_03){
+            $("#yield").attr("data-textrange", 3);
+        }else {
+            $("#yield").attr("data-textrange", 2);
+        }
         var attr = $("#tradeMarket").attr("disabled");
         if (tradeMarket && !attr && tradeMarket == '03') {
             $("#psList").val('03');
@@ -362,6 +367,7 @@
             $("#ps").val('').trigger('change');
             $("#repSecId").val('').trigger('change');
         }
+
         // GZYHTZJY-143:修改查询证券账户传参 fuyongsheng 20211101 edit start
         linkSecAcctId();
         // GZYHTZJY-143:修改查询证券账户传参 fuyongsheng 20211101 edit end
@@ -2107,6 +2113,15 @@
         $('#EtrAgreRepTrade001_btn_riskcal').click(function () {
             doRiskcal();
         });
+        console.log("------------init-------------------------------")
+        console.log(TRADE_MARKET_CURRENT)
+        if(TRADE_MARKET_CURRENT == TRADE_MARKET_03){
+            $("#yield").attr("data-textrange", 3);
+        }else {
+            $("#yield").attr("data-textrange", 2);
+        }
+        console.log($("#yield").attr("data-textrange"))
+
 
         if (entityStr) {
             var etrData = JSON.parse(entityStr);
