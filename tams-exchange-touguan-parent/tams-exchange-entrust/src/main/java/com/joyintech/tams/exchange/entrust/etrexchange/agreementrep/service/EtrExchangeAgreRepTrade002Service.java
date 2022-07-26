@@ -865,6 +865,10 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
             if (StringUtil.isNotEmpty(tmp.get("backDate")) && DateUtil.isDateStr(tmp.get("backDate").toString())) {
                 dto.setExpireSettleDate(DateUtil.format(DateUtil.parse(tmp.get("backDate").toString())));
             }
+            // 换出金额
+            if (StringUtil.isNotEmpty(tmp.get("swapOutBalance"))) {
+                dto.setOutRepAmt(new BigDecimal(tmp.get("swapOutBalance").toString()));
+            }
             // 换入质押券代码
             if (StringUtil.isNotEmpty(tmp.get("swapIntoBonds"))) {
                 dto.setNewRepSecId(tmp.get("swapIntoBonds").toString());
