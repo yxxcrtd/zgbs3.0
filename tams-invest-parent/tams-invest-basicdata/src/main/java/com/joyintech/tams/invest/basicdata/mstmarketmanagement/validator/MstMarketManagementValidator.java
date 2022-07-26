@@ -70,7 +70,7 @@ public class MstMarketManagementValidator implements BeanValidator {
                 if (mstMarketManagement001Service.checkBusinessDataInFlow(dto)) {
                     errorList.add(new ValidMessage("存在流程中重复数据,评级类型:" + dto.getoTypeName() + ",评级对象:" + dto.getoCodeName() +
                             ",评级机构:" + dto.getGradeOrgIdName() + ",评级日期:" + dto.getGradeDate() + ",请重新填写！"));
-                } else if (mstMarketManagement001Service.checkBusinessDataByKey(dto)) {
+                } else if (mstMarketManagement001Service.checkBusinessDataByKey(dto) && StringUtil.equals(dto.getPageModel(), "0")) {
                     errorList.add(new ValidMessage("评级信息已存在,评级类型:" + dto.getoTypeName() + ",评级对象:" + dto.getoCodeName() +
                             ",评级机构:" + dto.getGradeOrgIdName() + ",评级日期:" + dto.getGradeDate() + ",请重新填写！"));
                 }
