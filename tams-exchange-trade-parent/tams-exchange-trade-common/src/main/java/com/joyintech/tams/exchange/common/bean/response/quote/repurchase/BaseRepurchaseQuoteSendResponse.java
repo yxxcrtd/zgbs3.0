@@ -16,6 +16,8 @@ import java.math.BigDecimal;
 
 @ApiModel(value = "我发起的协议回购行情返回报文", description = "我发起的协议回购行情返回报文")
 public class BaseRepurchaseQuoteSendResponse {
+    @ApiModelProperty(name = "id", value = "委托ID")
+    private String id;
 
     @ApiModelProperty(name = "requestStatus", value = "请求状态")
     private Integer requestStatus;
@@ -90,6 +92,14 @@ public class BaseRepurchaseQuoteSendResponse {
     private String maturityDate;
     @ApiModelProperty(name = "counterName", value = "交易对手")
     private String counterName;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public Integer getRequestStatus() {
         return requestStatus;
