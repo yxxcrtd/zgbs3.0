@@ -496,11 +496,11 @@ public class PositionRequestServiceInstructionRequest {
 //            InstructionPledge instructionPledge = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
 
             InstructionPledge instructionPledge = null;
-            if (交易方向_正回购.getValue().equals(ps)) {
-                instructionPledge = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
-            } else {
+            if (交易方向_中途换券.getValue().equals(ps)) {
                 List<InstructionPledge> pledgeList = instructionPledgeService.queryInstructionPledgesByInstructionId(entity.getEntrustId());
                 instructionPledge = pledgeList.stream().filter(item -> PledgeDisPlaceDirEnum.SWAP_IN.codeEquals(item.getDisplaceDir())).findFirst().orElse(null);
+            } else {
+                instructionPledge = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
             }
             if (Objects.nonNull(instructionPledge)) {
                 bean = new PositionRequestBaseBean();
@@ -511,10 +511,10 @@ public class PositionRequestServiceInstructionRequest {
                 bean.setTradeId(entity.getEntrustNo());
                 bean.setEtrId(entity.getEntrustId());
                 BigDecimal secAmount;
-                if (交易方向_正回购.getValue().equals(ps)) {
-                    secAmount = commonPositionEngineService.multiplyWithOneHundred(entity.getEntrustNum());
-                } else {
+                if (交易方向_中途换券.getValue().equals(ps)) {
                     secAmount = commonPositionEngineService.multiplyWithOneHundred(instructionPledge.getPledgeNumber());
+                } else {
+                    secAmount = commonPositionEngineService.multiplyWithOneHundred(entity.getEntrustNum());
                 }
                 bean.setSecAmount(secAmount);
 
