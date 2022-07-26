@@ -2509,9 +2509,15 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             infRiskRdsDto.setAssetType2(finDto.getPs());
             infRiskRdsDto.setCounterId(StringUtil.isNotEmpty(CommonUtil.findValue(dataMap, "counterId")) ? CommonUtil.findValue(dataMap, "counterId").toString() : null);
             //添加期限品种 add by wz 20200509
-            //infRiskRdsDto.setVarietyCode(StringUtil.equals(finDto.getTradeMarket(),DictCodeListExt1.交易场所_银行间.getValue())?"D"+(String) dataMap.get("termTypeReback"):(String) dataMap.get("termTypeReback"));
+
+            // modify by etliu 20220726 start
+            // 广州银行投资交易系统UAT GZYHTZUAT-865
+            //【风险】财汇的利率行情接口 是直接把F列当code 入到我们库里不会去掉.IB这种后缀，风险指标：“异常交易-回购交易利率偏离”取值时，是去掉后缀取的，但不确定标的和批处理里面取数时，是否会去掉后缀，请确认：是修改界面入库及接口入库逻辑，还是修改风险指标取数逻辑
+            infRiskRdsDto.setVarietyCode(StringUtil.equals(finDto.getTradeMarket(),DictCodeListExt1.交易场所_银行间.getValue())?"D"+(String) dataMap.get("termTypeReback"):(String) dataMap.get("termTypeReback"));
             //infRiskRdsDto.setAssetCode(StringUtil.isNotEmpty(CommonUtil.findValue(dataMap, "finprodId")) ? CommonUtil.findValue(dataMap, "finprodId").toString() : null);
-            infRiskRdsDto.setVarietyCode((String) dataMap.get("termTypeReback"));
+//            infRiskRdsDto.setVarietyCode((String) dataMap.get("termTypeReback"));
+            // modify by etliu 20220726 end
+
             if (StringUtil.isNotEmpty(infRiskRdsDto.getCounterId())) {
                 MstCounterParty mstCounterParty = mstCounterPartyMapper.selectByPrimaryKey(infRiskRdsDto.getCounterId());
                 if (StringUtil.isNotEmpty(mstCounterParty)) {
@@ -2600,8 +2606,13 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             infRiskRdsDto.setAssetCode(null);
             infRiskRdsDto.setMarketCode(null);
             //添加期限品种 add by wz 20200509
-            //infRiskRdsDto.setVarietyCode(StringUtil.equals(finDto.getTradeMarket(),DictCodeListExt1.交易场所_银行间.getValue())?"D"+(String) dataMap.get("termTypeReback"):(String) dataMap.get("termTypeReback"));
-            infRiskRdsDto.setVarietyCode((String) dataMap.get("termTypeReback"));
+
+            // modify by etliu 20220726 start
+            // 广州银行投资交易系统UAT GZYHTZUAT-865
+            //【风险】财汇的利率行情接口 是直接把F列当code 入到我们库里不会去掉.IB这种后缀，风险指标：“异常交易-回购交易利率偏离”取值时，是去掉后缀取的，但不确定标的和批处理里面取数时，是否会去掉后缀，请确认：是修改界面入库及接口入库逻辑，还是修改风险指标取数逻辑
+            infRiskRdsDto.setVarietyCode(StringUtil.equals(finDto.getTradeMarket(),DictCodeListExt1.交易场所_银行间.getValue())?"D"+(String) dataMap.get("termTypeReback"):(String) dataMap.get("termTypeReback"));
+//            infRiskRdsDto.setVarietyCode((String) dataMap.get("termTypeReback"));
+            // modify by etliu 20220726 end
 
             infRiskRdsDto.setCalendarCode((String) CommonUtil.findValue(dataMap, "dealCalId"));
             if (StringUtil.isNotEmpty(finDto.getMdate())) {
