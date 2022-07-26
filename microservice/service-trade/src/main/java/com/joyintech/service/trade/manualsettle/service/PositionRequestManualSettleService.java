@@ -615,26 +615,28 @@ public class PositionRequestManualSettleService {
      * @return
      */
     private FinTradeProduct getSqFinTradeProduct(InfContractDetailfile infContractDetailfile){
+        // XYHGFXSJ-535:修改查询首期方法 modify by fuyongsheng 20220726 start
         // 首期成交编号
-        String finprodId = infContractDetailfile.getvTradeId();
-        String entrustId = infContractDetailfile.getEntrustId();
-        // 指令附属信息
-        EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entrustId);
-        EtrEntrustAddDto etrEntrustAddDto = new EtrEntrustAddDto();
-        if (etrEntrustAdd != null){
-            BeanUtil.copyPropertiesIgnoreNull(etrEntrustAddDto,etrEntrustAdd);
-            if (etrEntrustAdd.getTradeId() != null) {
-                finprodId = etrEntrustAdd.getTradeId();
-            }
-        }
-        String hgsqFinprodId = trdCommonBaseService.selectHgsqFinprodId(infContractDetailfile.getPortfolioId(), finprodId);
-        if (StringUtil.isNotBlank(hgsqFinprodId)) {
-            finprodId = hgsqFinprodId;
-        }
+//        String finprodId = infContractDetailfile.getvTradeId();
+//        String entrustId = infContractDetailfile.getEntrustId();
+//        // 指令附属信息
+//        EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entrustId);
+//        EtrEntrustAddDto etrEntrustAddDto = new EtrEntrustAddDto();
+//        if (etrEntrustAdd != null){
+//            BeanUtil.copyPropertiesIgnoreNull(etrEntrustAddDto,etrEntrustAdd);
+//            if (etrEntrustAdd.getTradeId() != null) {
+//                finprodId = etrEntrustAdd.getTradeId();
+//            }
+//        }
+//        String hgsqFinprodId = trdCommonBaseService.selectHgsqFinprodId(infContractDetailfile.getPortfolioId(), finprodId);
+//        if (StringUtil.isNotBlank(hgsqFinprodId)) {
+//            finprodId = hgsqFinprodId;
+//        }
         FinTradeProductKey finTradeProductKey = new FinTradeProductKey();
-        finTradeProductKey.setFinprodId(finprodId);
+        finTradeProductKey.setFinprodId(infContractDetailfile.getFinprodId());
         finTradeProductKey.setBranch(0L);
         return finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
+        // XYHGFXSJ-535:修改查询首期方法 modify by fuyongsheng 20220726 end
     }
 
     /**
