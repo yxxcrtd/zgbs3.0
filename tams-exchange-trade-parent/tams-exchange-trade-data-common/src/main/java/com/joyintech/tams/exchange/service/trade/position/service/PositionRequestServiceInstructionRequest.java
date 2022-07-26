@@ -535,8 +535,8 @@ public class PositionRequestServiceInstructionRequest {
             /*&& 交易方向_正回购.getValue().equals(firstRepoPs)*/) {
             List<Map<String, Object>> list = new ArrayList<>(4);
             // 查询质押券集合
-            InstructionPledge item = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
-            InstructionPledge instructionPledge = null;
+//            InstructionPledge item = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
+            InstructionPledge item = null;
             if (交易方向_中途换券.getValue().equals(ps)) {
                 List<InstructionPledge> pledgeList = instructionPledgeService.queryInstructionPledgesByInstructionId(entity.getEntrustId());
                 item = pledgeList.stream().filter(o -> PledgeDisPlaceDirEnum.SWAP_OUT.codeEquals(o.getDisplaceDir())).findFirst().orElse(null);
