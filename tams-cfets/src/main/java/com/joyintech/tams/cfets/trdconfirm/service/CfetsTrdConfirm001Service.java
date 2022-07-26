@@ -1976,7 +1976,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
                 logger.debug("发行失败,关闭指令状态:" + JsonUtils.object2Json(record));
                 etrEntrustMapper.updateByPrimaryKeySelective(record);
                 // 修改委托指令分发表中值 add by yangwenjun 20201209
-                baseEtrInvestInfoMapper.updatEetrDistribute(etrEntrust);
+                baseEtrInvestInfoMapper.updatEetrDistribute(record);
             } else {
                 //指令完成额度不为0 完成指令
                 EtrEntrust record = new EtrEntrust();
@@ -1988,7 +1988,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
                 logger.debug("发行失败,完成指令状态:" + JsonUtils.object2Json(record));
                 etrEntrustMapper.updateByPrimaryKeySelective(record);
                 // 修改委托指令分发表中值 add by yangwenjun 20201209
-                baseEtrInvestInfoMapper.updatEetrDistribute(etrEntrust);
+                baseEtrInvestInfoMapper.updatEetrDistribute(record);
             }
             if (CollectionUtils.isEmpty(entrustIds)
                     || !entrustIds.contains(etrEntrust.getEntrustId())) {
