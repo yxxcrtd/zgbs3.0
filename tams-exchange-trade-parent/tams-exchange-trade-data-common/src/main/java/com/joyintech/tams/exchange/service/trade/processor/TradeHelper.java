@@ -395,7 +395,11 @@ public class TradeHelper {
     }
 
     private boolean createOrderByInstrument(OrderInterface order, Instrument instrument, FuturesInstrument futuresInstrument) {
-        if (Market.isFutures(StockCodeUtils.getMarket(order.getStockCode()))) {
+        String stockCode = order.getStockCode();
+        if (StringUtil.isEmpty(stockCode)) {
+            return true;
+        }
+        if (Market.isFutures(StockCodeUtils.getMarket(stockCode))) {
             //期货合约
             if (Objects.nonNull(futuresInstrument)) {
                 logger.info("futuresInstrument {} is futures contract", futuresInstrument.getInnerCode());
@@ -403,7 +407,7 @@ public class TradeHelper {
                 order.setStockName(futuresInstrument.getInstrumentName());
             } else {
                 order.setAssetType(InvestAssetTypeEnum.FUTURES.value);
-                order.setStockName(order.getStockCode());
+                order.setStockName(stockCode);
                 order.setErrorCode(ErrorCode.DERIVATIVE_INSTRUMENT_ERROR.value);
                 order.setErrorMsg(ErrorCode.DERIVATIVE_INSTRUMENT_ERROR.msg());
                 return false;
@@ -414,9 +418,9 @@ public class TradeHelper {
                 order.setAssetType(instrument.getAssetType());
                 order.setStockName(instrument.getStockName());
             } else {
-                order.setStockName(order.getStockCode());
+                order.setStockName(stockCode);
                 order.setAssetType(InvestAssetTypeEnum.STOCK.value);
-                logger.warn("未找到相关合约信息 {}", order.getStockCode());
+                logger.warn("未找到相关合约信息 {}", stockCode);
             }
         }
         return true;
@@ -1285,7 +1289,12 @@ public class TradeHelper {
                 || StringUtil.equals(instruction.getFinprodType2(), 金融产品类型_投管用_债券质押式逆回购.getValue())) {
             integratedEntrust.setAssetType(平安资产类型_质押式回购.getValue());
         }
-        if(StringUtil.isEmpty(stockCode)){
+        if (StringUtil.isEmpty(stockCode)) {
+            if(Market.isShMarket(instruction.getTradeMarket())){
+                integratedEntrust.setMarket(Market.SHSE.value);
+            }else if(Market.isSzMarket(instruction.getTradeMarket())){
+                integratedEntrust.setMarket(Market.SZSE.value);
+            }
             integratedEntrust.setAssetType(instruction.getAssetType());
         }
 
@@ -1321,7 +1330,7 @@ public class TradeHelper {
             }
 
             integratedEntrust.setReductionType("0");
-            if (Objects.nonNull(stockCode)) {
+            if (StringUtil.isNotEmpty(stockCode)) {
                 integratedEntrust.setMarket(StockCodeUtils.getMarket(stockCode));
                 integratedEntrust.setStockCode(integratedEntrust.getStockCode());
             }
@@ -1347,7 +1356,6 @@ public class TradeHelper {
             integratedEntrust.setFinprodType2(instruction.getFinprodType2());
             integratedEntrust.setInvManagerId(instruction.getInvManagerId());
             integratedEntrust.setPs(instruction.getTradeSide());
-            integratedEntrust.setBusiTypeTg(busiTypeTg);
             integratedEntrust.setEntrustClass(instruction.getEntrustClass());
             integratedEntrust.setAccountName(instruction.getAcctName());
 
