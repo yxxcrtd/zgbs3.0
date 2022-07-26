@@ -1611,14 +1611,23 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         dto.setRiskTrialRetDto(riskTrialRetDto);*/
         // 全价总额
         BigDecimal unitFpriceAmtTailDifference = ArithmeticUtil.round(dto.getUnitFpriceAmt(), 2, RoundingMode.HALF_UP);
+        boolean flag = true;
         for (CfetsEtribBondInfo003Dto dd : etrInvestBondInfoDtosList) {// 结算金额
+            if (!StringUtil.isNotEmpty(dd.getEntrustNum())
+                    || !StringUtil.isNotEmpty(dto.getUnitFpriceAmt())
+                    || !StringUtil.isNotEmpty(dto.getTradeAmt())) {
+                flag = false;
+                continue;
+            }
             dd.setUnitFpriceAmt(ArithmeticUtil.divide(
                     ArithmeticUtil.multiply(dto.getUnitFpriceAmt(), dd.getEntrustNum()), dto.getTradeAmt(), 2, RoundingMode.HALF_DOWN));
             unitFpriceAmtTailDifference = ArithmeticUtil.subtract(unitFpriceAmtTailDifference, dd.getUnitFpriceAmt());
         }
-        CfetsEtribBondInfo003Dto cfetsEtribBond = etrInvestBondInfoDtosList.stream().max(Comparator.comparing(CfetsEtribBondInfo003Dto::getEntrustNum)).get();
-        if (!BigDecimalUtil.isZeroOrNull(unitFpriceAmtTailDifference)) {
-            cfetsEtribBond.setUnitFpriceAmt(ArithmeticUtil.doAdd(unitFpriceAmtTailDifference, cfetsEtribBond.getUnitFpriceAmt()));
+        if (CollectionUtils.isNotEmpty(etrInvestBondInfoDtosList) && flag) {
+            CfetsEtribBondInfo003Dto cfetsEtribBond = etrInvestBondInfoDtosList.stream().max(Comparator.comparing(CfetsEtribBondInfo003Dto::getEntrustNum)).get();
+            if (!BigDecimalUtil.isZeroOrNull(unitFpriceAmtTailDifference)) {
+                cfetsEtribBond.setUnitFpriceAmt(ArithmeticUtil.doAdd(unitFpriceAmtTailDifference, cfetsEtribBond.getUnitFpriceAmt()));
+            }
         }
         dto.setEtrInvestBondInfoDtos(etrInvestBondInfoDtosList);
         return dto;
@@ -1875,14 +1884,23 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         dto.setEntrustIntegrateUnitFpriceAmt(calcAmtRes.getEntrustIntegrateUnitFpriceAmt());
         // 全价总额
         BigDecimal unitFpriceAmtTailDifference = ArithmeticUtil.round(dto.getUnitFpriceAmt(), 2, RoundingMode.HALF_UP);
+        boolean flag = true;
         for (CfetsEtribBondInfo003Dto dd : etrInvestBondInfoDtosList) {// 结算金额
+            if (!StringUtil.isNotEmpty(dd.getEntrustNum())
+                    || !StringUtil.isNotEmpty(dto.getUnitFpriceAmt())
+                    || !StringUtil.isNotEmpty(dto.getTradeAmt())) {
+                flag = false;
+                continue;
+            }
             dd.setUnitFpriceAmt(ArithmeticUtil.divide(
                     ArithmeticUtil.multiply(dto.getUnitFpriceAmt(), dd.getEntrustNum()), dto.getTradeAmt(), 2, RoundingMode.HALF_DOWN));
             unitFpriceAmtTailDifference = ArithmeticUtil.subtract(unitFpriceAmtTailDifference, dd.getUnitFpriceAmt());
         }
-        CfetsEtribBondInfo003Dto cfetsEtribBond = etrInvestBondInfoDtosList.stream().max(Comparator.comparing(CfetsEtribBondInfo003Dto::getEntrustNum)).get();
-        if (!BigDecimalUtil.isZeroOrNull(unitFpriceAmtTailDifference)) {
-            cfetsEtribBond.setUnitFpriceAmt(ArithmeticUtil.doAdd(unitFpriceAmtTailDifference, cfetsEtribBond.getUnitFpriceAmt()));
+        if (CollectionUtils.isNotEmpty(etrInvestBondInfoDtosList) && flag) {
+            CfetsEtribBondInfo003Dto cfetsEtribBond = etrInvestBondInfoDtosList.stream().max(Comparator.comparing(CfetsEtribBondInfo003Dto::getEntrustNum)).get();
+            if (!BigDecimalUtil.isZeroOrNull(unitFpriceAmtTailDifference)) {
+                cfetsEtribBond.setUnitFpriceAmt(ArithmeticUtil.doAdd(unitFpriceAmtTailDifference, cfetsEtribBond.getUnitFpriceAmt()));
+            }
         }
         //风险
         CfetsEtribdoRiskcalResponse riskDto=cfetsDto.getCfetsEtribdoRiskcalReturn();
