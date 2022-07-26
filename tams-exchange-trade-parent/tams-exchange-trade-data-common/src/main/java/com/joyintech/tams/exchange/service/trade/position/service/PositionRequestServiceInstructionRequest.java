@@ -13,6 +13,7 @@ import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.InstructionPledge;
+import com.joyintech.tams.exchange.common.enums.invest.PledgeDisPlaceDirEnum;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
 import com.joyintech.tams.exchange.common.response.PortfolioCalculateResponse;
 import com.joyintech.tams.exchange.common.utils.TradePlatUtils;
@@ -492,7 +493,15 @@ public class PositionRequestServiceInstructionRequest {
                 && (交易方向_中途换券.getValue().equals(ps) || 交易方向_正回购.getValue().equals(ps))) {
             List<Map<String, Object>> list = new ArrayList<>(1);
             // 查询质押券集合
-            InstructionPledge instructionPledge = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
+//            InstructionPledge instructionPledge = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
+
+            InstructionPledge instructionPledge = null;
+            if (交易方向_正回购.getValue().equals(ps)) {
+                instructionPledge = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
+            } else {
+                List<InstructionPledge> pledgeList = instructionPledgeService.queryInstructionPledgesByInstructionId(entity.getEntrustId());
+                instructionPledge = pledgeList.stream().filter(item -> PledgeDisPlaceDirEnum.SWAP_OUT.codeEquals(item.getDisplaceDir())).findFirst().orElse(null);
+            }
             if (Objects.nonNull(instructionPledge)) {
                 bean = new PositionRequestBaseBean();
                 bean.setPortfolioId(entity.getPortfolioId());
