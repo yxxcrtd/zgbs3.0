@@ -514,7 +514,8 @@ public class TradeMsgProcessor {
                 orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_STATUS_ERROR.errorMsg);
                 return false;
             }
-            if (InvestmentAssetType1.NEGOTIATED_REPO.value.equals(instruction.getAssetType1())) {
+            if (InvestmentAssetType1.NEGOTIATED_REPO.value.equals(instruction.getAssetType1())
+                    && StringUtil.isNotEmpty(orderInterface.getStockCode())) {
                 InstructionPledge instructionPledge = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(instruction.getEntrustId(), orderInterface.getStockCode());
                 if (Objects.nonNull(instructionPledge)) {
                     BigDecimal usedPledgeNumber = TradeUtils.add(instructionPledge.getUsedPledgeNumber(), orderInterface.getEntrustVolume(), 0);
