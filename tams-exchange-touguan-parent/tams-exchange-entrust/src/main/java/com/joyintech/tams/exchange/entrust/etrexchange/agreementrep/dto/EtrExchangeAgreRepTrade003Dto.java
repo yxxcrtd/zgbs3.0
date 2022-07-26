@@ -796,4 +796,12 @@ public class EtrExchangeAgreRepTrade003Dto extends EtrEntrust{
     public void setSwapOutRepSecNum(BigDecimal swapOutRepSecNum) {
         this.swapOutRepSecNum = swapOutRepSecNum;
     }
+
+    public BigDecimal getSwapOrigRepSecNum() {
+        return swapOrigRepSecNum;
+    }
+
+    public void setSwapOrigRepSecNum(BigDecimal swapOrigRepSecNum) {
+        this.swapOrigRepSecNum = swapOrigRepSecNum;
+    }
 }
