@@ -809,7 +809,8 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                     outPledge.setEntrustId(entity.getEntrustId());
                     outPledge.setFinprodId(entity.getOutfinprodId());
                     // 质押面值
-                    outPledge.setPledgeFaceValue(entity.getOutPledgeFaceValue());
+                    // XYHGFXSJ-489:修改质押面值方法 modify by fuyongsheng 
+                    outPledge.setPledgeFaceValue(trdCommonBaseService.getFaceValue(entity.getOutfinprodId(), iPlatformDate.getSysDate()));
                     //质押率
                     outPledge.setPledgeRatio(ArithmeticUtil.divide(entity.getConRatio(), new BigDecimal(100), 2));
                     // 质押数量
@@ -1444,7 +1445,9 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                     outPledge.setEntrustId(entity.getEntrustId());
                     outPledge.setFinprodId(entity.getOutfinprodId());
                     // 质押面值
-                    outPledge.setPledgeFaceValue(entity.getOutPledgeFaceValue());
+                    // XYHGFXSJ-489:修改质押面值方法 modify by fuyongsheng 20220725 start
+                    outPledge.setPledgeFaceValue(trdCommonBaseService.getFaceValue(entity.getOutfinprodId(), iPlatformDate.getSysDate()));
+                    // XYHGFXSJ-489:修改质押面值方法 modify by fuyongsheng 20220725 end
                     //质押率
                     outPledge.setPledgeRatio(ArithmeticUtil.divide(entity.getConRatio(), new BigDecimal(100), 2));
                     // 质押数量

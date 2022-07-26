@@ -189,6 +189,27 @@ public class FinBondAsset001Controller extends BaseController {
 
 
     /**
+     * 发行人的联想下拉框事件
+     *
+     * @return 查询结果
+     * @see
+     * @since 1.0
+     */
+    @ApiOperation(value = "客户联想下拉框", notes = "发行人的联想下拉框")
+    @ResponseBody
+    @PostMapping("getCustomer")
+    public Message<Page<SelectOptionDto>> getCustomer(@RequestBody SelectOptionCommonRequest request) {
+        try {
+            Page<SelectOptionDto> page = finBondAsset001Service.getCustomer(request);
+            return new Message<Page<SelectOptionDto>>().success().setData(page);
+        } catch (Exception e) {
+            logger.error("查询发行人的联想下拉框数据异常", e);
+            return new Message<Page<SelectOptionDto>>().fail().setMessage("发行人的联想下拉框异常");
+        }
+    }
+
+
+    /**
      * 跨市场代码的联想下拉框事件
      *
      * @return 查询结果

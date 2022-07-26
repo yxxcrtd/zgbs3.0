@@ -582,6 +582,11 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                         }
                     }
                 }
+                if (StringUtil.equals(DictCodeListExt3.交易方向_中途换券.getValue(),CommonUtil.findValue(dataMap,"ps"))){
+                    finDto.setPreOccupyCode(null);
+                    finDto.setEntrustCode(null);
+                    finDto.setPs(String.valueOf(CommonUtil.findValue(dataMap,"ps")));
+                }
                 return finDto;
             }
 

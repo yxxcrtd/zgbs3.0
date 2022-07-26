@@ -202,9 +202,15 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                     if (stlPayOrdersDto != null) {
                         trdTempDto.setOrderId(stlPayOrdersDto.getOrderId());
                     }
-                    infContractDetailfile.setPortfolioId(trdProductTempDealAdd.getPortfolioId());
-                    infContractDetailfile.setShareAmt(trdProductTempDeal.getShareAmt());
-                    infContractDetailfile.setTradeAmt(trdProductTempDeal.getTradeAmt());
+
+                    // modify by etliu 20220725 start
+                    // 3.0.6协议回购+风险升级 XYHGFXSJ-368
+                    //【实时资产头寸查询】协议回购上交所正回购数据日间交收后，质押券的指令可用持仓、交易可用持仓、质押持仓显示错误
+//                    infContractDetailfile.setPortfolioId(trdProductTempDealAdd.getPortfolioId());
+//                    infContractDetailfile.setShareAmt(trdProductTempDeal.getShareAmt());
+//                    infContractDetailfile.setTradeAmt(trdProductTempDeal.getTradeAmt());
+                    // modify by etliu 20220725 end
+
                     // XYHGFXSJ-8:构建质押品信息list modify by fuyongsheng 20220718 start
                     infContractDetailfile.setPledgeList(this.genPledgeDtoList(trdProductTempDeal.getTradeId()));
                     // XYHGFXSJ-8:构建质押品信息list modify by fuyongsheng 20220718 end

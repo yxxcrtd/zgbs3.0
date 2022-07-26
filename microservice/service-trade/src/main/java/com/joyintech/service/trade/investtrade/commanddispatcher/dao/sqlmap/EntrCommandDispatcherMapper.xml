@@ -71,7 +71,9 @@
 		  A.ENTRUST_DATE tradeDate,/**委托日期*/
 		  A.VDATE VDATE,/**委托开始日*/
 		  A.Mdate MDATE,/**委托结束日*/
-		  CASE WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_AMT ELSE DECODE(F.TARGET_TYPE, '02', A.ENTRUST_AMT, 0) END entrustAmt, /**委托额度*/
+		  CASE WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_AMT
+			WHEN F.ASSET_TYPE = 'F07' and A.PS in ('T93') then A.ENTRUST_AMT
+		  ELSE DECODE(F.TARGET_TYPE, '02', A.ENTRUST_AMT, 0) END entrustAmt, /**委托额度*/
           CASE WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_NUM ELSE DECODE(F.TARGET_TYPE, '01',case when A.PS in ('T93', 'T94') THEN FDP.PLEDGE_NUMBER ELSE A.ENTRUST_NUM END, 0) END entrustNum, /**委托数量*/
 		  A.ENTRUST_STATUS entrustStatus,/**委托状态*/
 			<!--CASE WHEN A.PS IN ('03','04','T68','T69', 'T93', 'T94', 'T95', 'T96', 'T56')
@@ -240,7 +242,9 @@
 			   F2.PLEDGE_NUMBER                        pledgeNumber,
 			   F2.PLEDGE_NUMBER * 100                  pledgeTradeAmt,
 			   F2.PLEDGE_RATIO                         pledgeRatio,
-			   F2.PLEDGE_NUMBER * F2.PLEDGE_FACE_VALUE pledgeFaceValue,
+		       <!--XYHGFXSJ-489:修改面值获取方法 modify by fuyongsheng 20220725 start-->
+			   F2.PLEDGE_FACE_VALUE 				   pledgeFaceValue,
+		       <!--XYHGFXSJ-489:修改面值获取方法 modify by fuyongsheng 20220725 end-->
 			   F.PRIN                                  prin,
 			   F.FINPROD_ID                            finprodId,
 			   FP.FINPROD_ABBR                         pledgefinprodAbbr,
