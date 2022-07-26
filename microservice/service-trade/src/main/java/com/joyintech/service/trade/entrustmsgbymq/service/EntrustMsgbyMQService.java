@@ -134,6 +134,9 @@ public class EntrustMsgbyMQService extends BaseService<InfContractDetailfile>{
     	if(tradeMessage.getDealBalance() != null){
     		infContractDetailfile.setTradeAmt(BigDecimal.valueOf(tradeMessage.getDealBalance()));
     	}
+    	if(tradeMessage.getEntrustBalance() != null){
+			infContractDetailfile.setPrinAmt(BigDecimal.valueOf(tradeMessage.getEntrustBalance()));
+		}
     	infContractDetailfile.setTradeDate(DateUtil.parse(tradeMessage.getTradingDay()));
     	infContractDetailfile.setVdate(DateUtil.parse(tradeMessage.getValueDate()));
     	infContractDetailfile.setMdate(DateUtil.parse(tradeMessage.getMaturityDate()));

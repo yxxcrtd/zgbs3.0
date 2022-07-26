@@ -1761,13 +1761,13 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         String secAcctId = entrustMsgbyMQMapper.queryByAcctNo(secMap);
         dto.setSecManageAcctId(secAcctId);
         // 交易金额
-        dto.setTradeAmt(ArithmeticUtil.multiply(infContractDetailfile.getShareAmt(), new BigDecimal(100)));
+        dto.setTradeAmt(infContractDetailfile.getPrinAmt());
         // 交易本金 = 交易金额
-        dto.setPrinAmt(ArithmeticUtil.multiply(infContractDetailfile.getShareAmt(), new BigDecimal(100)));
+        dto.setPrinAmt(infContractDetailfile.getPrinAmt());
         // 交易份额
         dto.setShareAmt(infContractDetailfile.getShareAmt());
         // 全价总额
-        dto.setFpriceAmt(ArithmeticUtil.multiply(infContractDetailfile.getShareAmt(), new BigDecimal(100)));
+        dto.setFpriceAmt(infContractDetailfile.getPrinAmt());
         // 清算速度_T_0
         dto.setSettleSpeed(0L);
         // 交易编号
@@ -1884,7 +1884,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         // add by etliu 20210827 end
 
         // 名义本金
-        finTradeProduct.setPrin(ArithmeticUtil.multiply(infContractDetailfile.getShareAmt(), new BigDecimal(100)));
+        finTradeProduct.setPrin(infContractDetailfile.getPrinAmt());
         // 利率类型
         finTradeProduct.setIntType(DictCodeList.利率类型_固定利率.getValue());
 
@@ -1933,8 +1933,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
             mIntAmt = ArithmeticUtil.divide(mIntAmt, 365, 2);
             finTradeProduct.setmIntAmt(mIntAmt);
             // 到期金额
-            BigDecimal mTradeAmt = ArithmeticUtil.doAdd(finTradeProduct.getPrin(), finTradeProduct.getmIntAmt());
-            finTradeProduct.setmTradeAmt(mTradeAmt);
+            finTradeProduct.setmTradeAmt(infContractDetailfile.getTradeAmt());
         }
         dto.setFinTradeProduct(finTradeProduct);
         // 交易类金融产品Entity

@@ -33,6 +33,7 @@
         <result column="COUNTER_ID" property="counterId" jdbcType="VARCHAR" />
         <result column="SETTLE_DAY" property="settleDay" jdbcType="DATE" />
         <result column="BUSI_TYPE" property="busiType" jdbcType="VARCHAR" />
+        <result column="PRIN_AMT" property="prinAmt" jdbcType="DECIMAL" />
     </resultMap>
     <sql id="Base_Column_List" >
         SEQNO SEQNO, ENTRUST_ID ENTRUST_ID, ORDER_ID ORDER_ID, ORDER_NO ORDER_NO, DEAL_NO DEAL_NO, 
@@ -42,7 +43,7 @@
         TRADE_DATE TRADE_DATE, VDATE VDATE, MDATE MDATE, V_TRADE_ID V_TRADE_ID, CCY CCY, 
         CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, 
         UPDATE_TIME UPDATE_TIME, SCALE SCALE, COUNTER_ID COUNTER_ID, SETTLE_DAY SETTLE_DAY, 
-        BUSI_TYPE BUSI_TYPE
+        BUSI_TYPE BUSI_TYPE,PRIN_AMT PRIN_AMT
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -75,7 +76,7 @@
             CCY, CREATE_USER, CREATE_DEPT, 
             CREATE_TIME, UPDATE_USER, UPDATE_TIME, 
             SCALE, COUNTER_ID, SETTLE_DAY, 
-            BUSI_TYPE)
+            BUSI_TYPE, PRIN_AMT)
         values (#{seqno,jdbcType=VARCHAR}, #{entrustId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, 
             #{orderNo,jdbcType=VARCHAR}, #{dealNo,jdbcType=VARCHAR}, #{portfolioId,jdbcType=VARCHAR}, 
             #{acctNo,jdbcType=VARCHAR}, #{bondId,jdbcType=VARCHAR}, #{finprodId,jdbcType=VARCHAR}, 
@@ -86,7 +87,7 @@
             #{ccy,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, 
             #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
             #{scale,jdbcType=DECIMAL}, #{counterId,jdbcType=VARCHAR}, #{settleDay,jdbcType=DATE}, 
-            #{busiType,jdbcType=VARCHAR})
+            #{busiType,jdbcType=VARCHAR}, #{prinAmt,jdbcType=DECIMAL})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.InfContractDetailfile" >
         insert into INF_CONTRACT_DETAILFILE
@@ -184,6 +185,9 @@
             <if test="busiType != null" >
                 BUSI_TYPE,
             </if>
+            <if test="prinAmt != null" >
+                PRIN_AMT,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="seqno != null" >
@@ -279,6 +283,9 @@
             <if test="busiType != null" >
                 #{busiType,jdbcType=VARCHAR},
             </if>
+            <if test="prinAmt != null" >
+                #{prinAmt,jdbcType=DECIMAL},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.InfContractDetailfile" >
@@ -286,12 +293,12 @@
         PORTFOLIO_ID, ACCT_NO, BOND_ID, FINPROD_ID, PS, TRADE_MARKET, TRADE_PLAT, FINPROD_MARKET_ID, 
         SHARE_AMT, UNIT_CPRICE, UNIT_FPRICE, TRADE_AMT, TRADE_DATE, VDATE, MDATE, V_TRADE_ID, 
         CCY, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, SCALE, COUNTER_ID, 
-        SETTLE_DAY, BUSI_TYPE)
+        SETTLE_DAY, BUSI_TYPE, PRIN_AMT)
         select SEQNO, ENTRUST_ID, ORDER_ID, ORDER_NO, DEAL_NO, 
             PORTFOLIO_ID, ACCT_NO, BOND_ID, FINPROD_ID, PS, TRADE_MARKET, TRADE_PLAT, FINPROD_MARKET_ID, 
             SHARE_AMT, UNIT_CPRICE, UNIT_FPRICE, TRADE_AMT, TRADE_DATE, VDATE, MDATE, V_TRADE_ID, 
             CCY, CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, SCALE, COUNTER_ID, 
-            SETTLE_DAY, BUSI_TYPE
+            SETTLE_DAY, BUSI_TYPE, PRIN_AMT
              from INF_CONTRACT_DETAILFILE
              where 1 = 1 and SEQNO = #{seqno,jdbcType=VARCHAR}
     </insert>
@@ -379,6 +386,9 @@
             <if test="busiType != null" >
                 BUSI_TYPE = #{busiType,jdbcType=VARCHAR},
             </if>
+            <if test="prinAmt != null" >
+                PRIN_AMT = #{prinAmt,jdbcType=DECIMAL},
+            </if>
         </set>
         where SEQNO = #{seqno,jdbcType=VARCHAR}
     </update>
@@ -410,7 +420,8 @@
             SCALE = #{scale,jdbcType=DECIMAL},
             COUNTER_ID = #{counterId,jdbcType=VARCHAR},
             SETTLE_DAY = #{settleDay,jdbcType=DATE},
-            BUSI_TYPE = #{busiType,jdbcType=VARCHAR}
+            BUSI_TYPE = #{busiType,jdbcType=VARCHAR},
+            PRIN_AMT = #{prinAmt,jdbcType=DECIMAL}
         where SEQNO = #{seqno,jdbcType=VARCHAR}
     </update>
 </mapper>
