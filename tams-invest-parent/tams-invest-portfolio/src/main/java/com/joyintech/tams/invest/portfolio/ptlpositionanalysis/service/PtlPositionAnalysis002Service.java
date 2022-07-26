@@ -740,10 +740,14 @@ public class PtlPositionAnalysis002Service extends CommonExportService<PtlPositi
                                                     if (!StringUtil.isEmptyList(fiveTypeList) && fiveTypeList.size() > 0) {
                                                         for (PtlPositionAnalysis003Dto fiveEntity : fiveTypeList) {
                                                             PtlPositionAnalysis003Dto fiveType = new PtlPositionAnalysis003Dto();
-                                                            fiveType.setPortfolioId(SysDataUtil.getNameFromDataDict(DictCode.资产五级分类,
-                                                                    fiveEntity.getCustomAssetTypeFive()));
-                                                            fiveType.setTypeName(SysDataUtil.getNameFromDataDict(DictCode.资产五级分类,
-                                                                    fiveEntity.getCustomAssetTypeFive()));
+                                                            //edit by yangxin at 20220725 start 查询条件/查询结果，对应的资产一级、二级、三级、四级分类，对应债券需要按照现有分类调整，一级默认债券，二级取前台一级分类，三级取前台二级分类，四级取前台三级分类，五级分类默认为空
+                                                            if (!StringUtil.equals(entity.getPinanAssetType(),DictCodeList.平安资产类型_债券.getValue())) {
+                                                                fiveType.setPortfolioId(SysDataUtil.getNameFromDataDict(DictCode.资产五级分类,
+                                                                        fiveEntity.getCustomAssetTypeFive()));
+                                                                fiveType.setTypeName(SysDataUtil.getNameFromDataDict(DictCode.资产五级分类,
+                                                                        fiveEntity.getCustomAssetTypeFive()));
+                                                            }
+                                                            //edit by yangxin at 20220725 end 查询条件/查询结果，对应的资产一级、二级、三级、四级分类，对应债券需要按照现有分类调整，一级默认债券，二级取前台一级分类，三级取前台二级分类，四级取前台三级分类，五级分类默认为空
                                                             fiveType.setParentInfo(fiveEntity.getPinanAssetType() + fiveEntity.getCustomAssetTypeTwo() + fiveEntity.getCustomAssetTypeThree() + fiveEntity.getCustomAssetTypeFour());
                                                             fiveType.setChildInfo(fiveEntity.getPinanAssetType() + fiveEntity.getCustomAssetTypeTwo() + fiveEntity.getCustomAssetTypeThree() + fiveEntity.getCustomAssetTypeFour() + fiveEntity.getCustomAssetTypeFive());
                                                             fiveType.setHasChildren("01");
@@ -861,10 +865,14 @@ public class PtlPositionAnalysis002Service extends CommonExportService<PtlPositi
                                                             if (!StringUtil.isEmptyList(fiveTypeList) && fiveTypeList.size() > 0) {
                                                                 for (PtlPositionAnalysis003Dto fiveEntity : fiveTypeList) {
                                                                     PtlPositionAnalysis003Dto fiveType = new PtlPositionAnalysis003Dto();
-                                                                    fiveType.setPortfolioId(SysDataUtil.getNameFromDataDict(DictCode.资产五级分类,
-                                                                            fourEntity.getCustomAssetTypeFive()));
-                                                                    fiveType.setTypeName(SysDataUtil.getNameFromDataDict(DictCode.资产五级分类,
-                                                                            fourEntity.getCustomAssetTypeFive()));
+                                                                    //edit by yangxin at 20220725 start 查询条件/查询结果，对应的资产一级、二级、三级、四级分类，对应债券需要按照现有分类调整，一级默认债券，二级取前台一级分类，三级取前台二级分类，四级取前台三级分类，五级分类默认为空
+                                                                    if (!StringUtil.equals(entity.getPinanAssetType(),DictCodeList.平安资产类型_债券.getValue())) {
+                                                                        fiveType.setPortfolioId(SysDataUtil.getNameFromDataDict(DictCode.资产五级分类,
+                                                                                fourEntity.getCustomAssetTypeFive()));
+                                                                        fiveType.setTypeName(SysDataUtil.getNameFromDataDict(DictCode.资产五级分类,
+                                                                                fourEntity.getCustomAssetTypeFive()));
+                                                                    }
+                                                                    //edit by yangxin at 20220725 end 查询条件/查询结果，对应的资产一级、二级、三级、四级分类，对应债券需要按照现有分类调整，一级默认债券，二级取前台一级分类，三级取前台二级分类，四级取前台三级分类，五级分类默认为空
                                                                     fiveType.setParentInfo(v.get(0).getPortfolioId() + fiveEntity.getPinanAssetType() + fiveEntity.getCustomAssetTypeTwo() + fiveEntity.getCustomAssetTypeThree() + fiveEntity.getCustomAssetTypeFour());
                                                                     fiveType.setChildInfo(v.get(0).getPortfolioId() + fiveEntity.getPinanAssetType() + fiveEntity.getCustomAssetTypeTwo() + fiveEntity.getCustomAssetTypeThree() + fiveEntity.getCustomAssetTypeFour() + fiveEntity.getCustomAssetTypeFive());
                                                                     fiveType.setHasChildren("02");
