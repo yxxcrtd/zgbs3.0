@@ -848,6 +848,9 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                     finTradeProductKey.setFinprodId((String)temp.get("firstIssueDealNo"));
                     finTradeProductKey.setBranch(0L);
                     FinTradeProduct firstFinTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
+                    if (firstFinTradeProduct == null) {
+                        firstFinTradeProduct = finTradeProductMapper.selectByTradeId((String)temp.get("firstIssueDealNo"));
+                    }
 
                     // 正回购 不占授信
                     if (StringUtil.equals(temp.get("ps"),DictCodeList.回购拆借方向_正回购.getValue()) || (StringUtil.isNotEmpty(firstFinTradeProduct)
