@@ -885,6 +885,10 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
             if (StringUtil.equals(DictCodeList.回购拆借方向_正回购.getValue(), inputDto.getRepPs())) {
                 return null;
             }
+            if (StringUtil.equals(inputDto.getPs(),DictCodeListExt3.交易方向_提前购回.getValue())
+                    || StringUtil.equals(inputDto.getPs(),DictCodeListExt3.交易方向_解除质押.getValue())) {
+                return null;
+            }
             // 逆回购首期
             if (StringUtil.equals(inputDto.getRepPs(), DictCodeListExt3.交易方向_逆回购.getValue())) {
                 creditLinesInputDto = new CreditLinesInputDto();

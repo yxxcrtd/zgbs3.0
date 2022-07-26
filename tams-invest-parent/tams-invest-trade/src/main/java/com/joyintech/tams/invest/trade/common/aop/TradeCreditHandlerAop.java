@@ -278,6 +278,7 @@ public class TradeCreditHandlerAop {
                     FinTradeProduct finTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
                     if(Objects.nonNull(finTradeProduct)) {
                         settleDto.setSettleAmt(finTradeProduct.getmPrinAmt());
+                        settleDto.setCounterId(finTradeProduct.getCounterId());
                     }
                     tradeCommonService.executeOccupyCreditLines(settleDto, DictCodeListExt1.交易状态_初始.getValue(),DictCodeListRsk.授信占用类别_实占.getValue(),"doComplete");
                 }
