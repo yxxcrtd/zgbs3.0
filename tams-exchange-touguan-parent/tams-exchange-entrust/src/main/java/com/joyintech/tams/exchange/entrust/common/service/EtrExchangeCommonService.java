@@ -889,7 +889,7 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
             if (StringUtil.equals(inputDto.getRepPs(), DictCodeListExt3.交易方向_逆回购.getValue())) {
                 creditLinesInputDto = new CreditLinesInputDto();
                 creditLinesInputDto.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
-                creditLinesInputDto.setTradeId(inputDto.getEntrustId()+"T07");
+                creditLinesInputDto.setTradeId(inputDto.getEntrustId());
                 creditLinesInputDto.setTradeDate(DateUtil.parse(inputDto.getVdate()));
                 creditLinesInputDto.setTradeStatus(status);
                 creditLinesInputDto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
@@ -910,7 +910,7 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
             if (StringUtil.equals(inputDto.getPs(), DictCodeListExt3.交易方向_到期续做.getValue())) {
                 CreditLinesInputDto creditLinesInputDto1 = new CreditLinesInputDto();
                 creditLinesInputDto1.setCreditCallType(DictCodeListRsk.授信占用类别_预占.getValue());
-                creditLinesInputDto1.setTradeId(inputDto.getEntrustId()+"T01");
+                creditLinesInputDto1.setTradeId(inputDto.getEntrustId());
                 creditLinesInputDto1.setTradeDate(DateUtil.parse(inputDto.getVdate()));
                 creditLinesInputDto1.setTradeStatus(status);
                 creditLinesInputDto1.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
@@ -929,6 +929,7 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                 }
                 if(Objects.nonNull(finTradeProduct)) {
                     creditLinesInputDto1.setTradeAmt(finTradeProduct.getmTradeAmt());
+                    creditLinesInputDto1.setCounterId(finTradeProduct.getCounterId());
                     //creditLinesInputDto1.setShareAmt(finTradeProduct.getPrin());
                 }
                 //}

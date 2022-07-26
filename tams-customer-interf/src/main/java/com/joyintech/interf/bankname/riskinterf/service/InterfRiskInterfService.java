@@ -933,12 +933,13 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                         creditLinesInputT56.setTradeStatus(tradeStatu);
                         creditLinesInputT56.setCreditCallType(DictCodeListRsk.授信占用类别_实占.getValue());
                         creditLinesInputT56.setCreditCheckType(DictCodeListRsk.授信占用来源_接口.getValue());
-                        creditLinesInputT56.setPs(DictCodeList.交易方向_买入.getValue());
+                        creditLinesInputT56.setPs(DictCodeList.交易方向_到期.getValue());
                         creditLinesInputT56.setTradeDate(DateUtil.parse(finDto.getEventDate()));
-                        creditLinesInputT56.setCounterId(finDto.getCounterId());
+                        creditLinesInputT56.setCounterId(firstFinTradeProduct.getCounterId());
+                        creditLinesInputT56.setEntrustId((String)temp.get("entrustCode"));
                         // 首期的交易编号
-                        creditLinesInputT56.setTradeId((String)temp.get("tradeId") + finDto.getPs());
-                        creditLinesInputT56.setTradeAmt(finDto.getAmount());
+                        creditLinesInputT56.setTradeId((String)temp.get("tradeId"));
+                        creditLinesInputT56.setTradeAmt(firstFinTradeProduct.getPrin());
                         //creditLinesInputT56.setShareAmt(firstFinTradeProduct.getPrin());
                         creditLinesInputT56.setUpdateTime(new Date());
                         creditLinesInputT56.setUpdateUser(LoginUserUtil.getUserName());
