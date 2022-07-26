@@ -1183,15 +1183,15 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         etrCashPositionFlowDto.setCdate(finProductTradeDto.getTrdProductDeal().getSettleDate());
         // 有委托
         if (StringUtil.isNotEmpty(entrustId)) {
-            // 持仓流水dto处理
-            etrCashPositionFlowDto.setAmount(交易日减少金额);
-            // 添加现金流水到目标dto
-            etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
-            // 交收时交割日减少(交易金额-交易券面总额*委托全价/债券面值）
             if (StringUtil.equals(finProductTradeDto.getStage(), "03")) {
+                // 交收时交割日减少(交易金额-交易券面总额*委托全价/债券面值）
                 etrPositionHoldDto.getPtlCashPositionFlows().add(gen冲销现金流水生成(etrCashPositionFlowDto, entrustId,
                         交易日数量, finProductTradeDto.getTrdProductDeal().getSettleDate(),
                         finProductTradeDto.getTrdProductDeal().getTradeMarket(), finProductTradeDto.getBondFirstSign()));
+            } else if (StringUtil.equals(finProductTradeDto.getStage(), "02")) {
+                // 中标结果维护提交（自主投标） 减少委托组合应缴款金额
+                etrCashPositionFlowDto.setAmount(交易日减少金额);
+                etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
             }
         }
     }
