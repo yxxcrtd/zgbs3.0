@@ -1375,8 +1375,8 @@
         WHERE PCI.ACCT_NO  = #{acctNo}
         <if test="search != null and search != ''">
             and (
-            PP.PORTFOLIO_ID like concat('%',#{search},'%')
-            or PP.PORTFOLIO_NAME like concat('%',#{search},'%')
+            PP.PORTFOLIO_ID like concat('%',concat(#{search},'%'))
+            or PP.PORTFOLIO_NAME like concat('%',concat(#{search},'%'))
             )
         </if>
     </select>
