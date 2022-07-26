@@ -592,6 +592,7 @@ public class IntegratedQuoteManagement {
             baseRepurchaseQuoteSendResponse = new BaseRepurchaseQuoteSendResponse();
         }
 
+        baseRepurchaseQuoteSendResponse.setId(entrust.getId());
         baseRepurchaseQuoteSendResponse.setStockCode(entrust.getStockCode());
         baseRepurchaseQuoteSendResponse.setStockName(entrust.getStockName());
         baseRepurchaseQuoteSendResponse.setPledgeNumber(BigDecimal.valueOf(entrust.getEntrustVolume()));

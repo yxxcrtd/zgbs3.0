@@ -2918,10 +2918,14 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
     /**
      * 根据资金账号查询组合列表
-     *
-     * @param acctNo 资金账号
+     * @param acctNo
+     * @param search
+     * @return
      */
-    public List<SelectOptionDto> selectPortfolioList(String acctNo) {
-        return etrExchangeAgreRepTradeMapper.selectPortfolioList(acctNo);
+    public List<SelectOptionDto> selectPortfolioList(String acctNo, String search) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("acctNo", acctNo);
+        map.put("search", search);
+        return etrExchangeAgreRepTradeMapper.selectPortfolioList(map);
     }
 }

@@ -1170,6 +1170,11 @@ public class KCBPConverter {
                             integratedRepurchaseQuoteBean.setSettleBalance(Double.parseDouble(value));
                         break;
                     }
+                    case "Cashorderqty": {//金额
+                        if (!Strings.isNullOrEmpty(value))
+                            integratedRepurchaseQuoteBean.setSwapOutBalance(Double.parseDouble(value));
+                        break;
+                    }
                     case "LastQty": {//质押券面总额合计
                         integratedRepurchaseQuoteBean.setAssetNetValue(Double.parseDouble(value));
                         break;

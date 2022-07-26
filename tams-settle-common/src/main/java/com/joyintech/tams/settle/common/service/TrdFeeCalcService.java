@@ -957,8 +957,11 @@ public class TrdFeeCalcService {
         if (DictCodeListExt1.计费类型_固定金额.getValue().equals(calcParam.getChargeKind())) {
             return calcParam.getExpenseAmount();
         }
-        BigDecimal res = calcParam.getJsje().multiply(calcParam.getCalcRate()).setScale(calcParam.getRetentionBit(), RoundingMode.HALF_UP);
-        return res;
+		BigDecimal temp = ArithmeticUtil.multiply(calcParam.getJsje(), calcParam.getCalcRate());
+        if(null != temp){
+			return temp.setScale(calcParam.getRetentionBit(), RoundingMode.HALF_UP);
+		}
+        return new BigDecimal(0);
     }
 
     /**

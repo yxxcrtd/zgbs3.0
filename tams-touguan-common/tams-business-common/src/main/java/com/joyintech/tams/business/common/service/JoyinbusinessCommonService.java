@@ -592,6 +592,18 @@ public class JoyinbusinessCommonService extends BaseService {
     }
 
     /**
+     * 根据组合 资产 查询证券账户
+     *
+     * @param map
+     * @return java.lang.String
+     * @author jiangpeng
+     * @date 2021/12/13 16:09
+     */
+    public String qryPortfolioSecAcctId(Map<String, Object> map) {
+        return joyinbusinessCommonMapper.qryPortfolioSecAcctId(map);
+    }
+
+    /**
      * 查询资金账户
      *
      * @param dto dealType 表示账户类型 A01 为托管账户
