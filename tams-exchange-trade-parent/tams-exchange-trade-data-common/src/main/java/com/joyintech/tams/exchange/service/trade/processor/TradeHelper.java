@@ -1276,13 +1276,19 @@ public class TradeHelper {
 
     public IntegratedEntrust handleIntegratedEntrustWithReview(IntegratedEntrust integratedEntrust, WorkflowBean workflow) {
         logger.info("开始处理综合业务委托信息：{}", JsonUtils.getJsonFromObject(integratedEntrust));
+        String stockCode = integratedEntrust.getStockCode();
         Instrument instrument = instrumentService.queryByInnerCode(integratedEntrust.getStockCode());
         createOrderByInstrument(integratedEntrust, instrument, null);
         String tradingDay = commonManagement.getTradingDay();
         Instruction instruction = instructionService.findById(integratedEntrust.getInstructionId());
-        if (StringUtil.equals(instruction.getFinprodType2(), 金融产品类型_投管用_债券质押式正回购.getValue()) || StringUtil.equals(instruction.getFinprodType2(), 金融产品类型_投管用_债券质押式逆回购.getValue())) {
+        if (StringUtil.equals(instruction.getFinprodType2(), 金融产品类型_投管用_债券质押式正回购.getValue())
+                || StringUtil.equals(instruction.getFinprodType2(), 金融产品类型_投管用_债券质押式逆回购.getValue())) {
             integratedEntrust.setAssetType(平安资产类型_质押式回购.getValue());
         }
+        if(StringUtil.isEmpty(stockCode)){
+            integratedEntrust.setAssetType(instruction.getAssetType());
+        }
+
         BigDecimal entrustPrice = integratedEntrust.getEntrustPrice();
         if (InvestAssetTypeEnum.BOND.codeEquals(instruction.getAssetType())
                 && EnumUtil.in(instruction.getPs(), InstructionPs.BUY, InstructionPs.SELL)) {
@@ -1315,8 +1321,8 @@ public class TradeHelper {
             }
 
             integratedEntrust.setReductionType("0");
-            if (Objects.nonNull(integratedEntrust.getStockCode())) {
-                integratedEntrust.setMarket(StockCodeUtils.getMarket(integratedEntrust.getStockCode()));
+            if (Objects.nonNull(stockCode)) {
+                integratedEntrust.setMarket(StockCodeUtils.getMarket(stockCode));
                 integratedEntrust.setStockCode(integratedEntrust.getStockCode());
             }
             integratedEntrust.setBusiTypeTg(instruction.getBusiTypeTg());
@@ -1326,7 +1332,7 @@ public class TradeHelper {
             if (createOrderByAccount(integratedEntrust, tradingDay, now)) {
                 return integratedEntrust;
             }
-            FuturesInstrument futuresInstrument = futuresInstrumentService.queryByInnerCode(integratedEntrust.getStockCode());
+            FuturesInstrument futuresInstrument = futuresInstrumentService.queryByInnerCode(stockCode);
             // 债券质押式协议回购，entrustBalance为入参，不计算覆盖
             if (!NEGOTIATED_REPO.equals(instruction.getAssetType1())) {
                 // 计算委托金额

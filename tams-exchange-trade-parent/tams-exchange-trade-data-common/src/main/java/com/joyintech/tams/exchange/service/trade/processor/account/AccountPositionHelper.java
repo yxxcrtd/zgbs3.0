@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.service.trade.processor.account;
 
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.PositionQueryBean;
 import com.joyintech.tams.exchange.common.constant.EntrustBs;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
@@ -83,10 +84,11 @@ public class AccountPositionHelper {
 
     /**
      * 持仓检查
-     * @param orderInterface    订单对象
-     * @param entrustVolume 委托数量
-     * @param buyUnit   交易最小单位
-     * @return  检查结果
+     *
+     * @param orderInterface 订单对象
+     * @param entrustVolume  委托数量
+     * @param buyUnit        交易最小单位
+     * @return 检查结果
      */
     public boolean checkLooseStocksByPosition(OrderInterface orderInterface, long entrustVolume, int buyUnit) {
         if (positionCheckFlag && EntrustBs.SELL.value.equals(orderInterface.getEntrustBs())
@@ -136,6 +138,10 @@ public class AccountPositionHelper {
     }
 
     public void unFrozenPositionEnable(OrderInterface orderInterface, long frozenVolume) {
+        if (StringUtil.isNotEmpty(orderInterface.getStockCode())) {
+            logger.info("unFrozenPositionEnable：债券代码为空，不处理持仓");
+            return;
+        }
         if (positionCheckFlag && EntrustBs.SELL.value.equals(orderInterface.getEntrustBs())
                 && EntrustUtils.needPositionCheck(orderInterface.getEntrustProp(), orderInterface.getAssetType())) {
             PositionBean positionBean = positionBeanService.getPositionBean(orderInterface.getAccountId(), orderInterface.getStockCode());
@@ -147,6 +153,10 @@ public class AccountPositionHelper {
     }
 
     public void handlePositionByTrade(EntrustInterface entrustInterface, int tradeType, long tradeVolume) {
+        if (StringUtil.isNotEmpty(entrustInterface.getStockCode())) {
+            logger.info("handlePositionByTrade：债券代码为空，不处理持仓");
+            return;
+        }
         if (positionCheckFlag
                 && EntrustUtils.needPositionCheck(entrustInterface.getEntrustProp(), entrustInterface.getAssetType()) && TradeType.NORMAL.value == tradeType) {
             PositionBean positionBean = positionBeanService.getPositionBean(entrustInterface.getAccountId(), entrustInterface.getStockCode());

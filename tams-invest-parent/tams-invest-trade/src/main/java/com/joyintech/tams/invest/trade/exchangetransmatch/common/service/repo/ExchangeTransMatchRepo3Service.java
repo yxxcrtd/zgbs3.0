@@ -59,14 +59,6 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
             baseTradeProductDealDto.setPaTrdProductDeal(this.genPaTrdProductDeal(dealDto, entrustDto, trdProductDeal));
             //生成划款指令表
             baseTradeProductDealDto.setStlPayOrdersList(this.generateStlPayOrdersList(dealDto, entrustDto, trdProductDeal));
-            //质押品信息表
-            if(!DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换钱.getValue().equals(dealDto.getBusiSceneCalss())){
-                // 解除质押到期交易无需登录质押品表
-                if(!(DictCodeListExt3.交易方向_解除质押.getValue().equals(entrustDto.getPs())
-                        && DictCodeList.交易方向_到期.getValue().equals(trdProductDeal.getPs()))){
-                    baseTradeProductDealDto.setFinDealPledgeList(this.genFinDealPledgeList(dealDto,trdFinProductDealTotal));
-                }
-            }
             baseTradeProductDealDtoList.add(baseTradeProductDealDto);
         }
         return baseTradeProductDealDtoList;

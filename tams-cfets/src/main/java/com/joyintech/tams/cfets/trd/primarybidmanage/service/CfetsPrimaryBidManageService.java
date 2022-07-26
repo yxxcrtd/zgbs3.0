@@ -1052,6 +1052,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         BeanUtil.copyPropertiesIgnoreNull(bidResultTotal,request);
         wflBidResultTotalMapper.deleteByPrimaryKey(bidResultTotal.getTotalWinId());
         wflBidResultDetailMapper.deleteByTotalWinId(bidResultTotal.getTotalWinId());
+        if(StringUtil.equals(request.getIsWin(),DictCodeList.是否_是.getValue())) {
+            // 老头寸处理
+            this.dealOldPosition(request, true);
+        }
     }
 
     /**
@@ -1180,60 +1184,66 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
      * @date 2022/4/28 10:37
      */
     public void dealOldPosition(CfetsPrimaryBidManageSaveRequest entity, boolean isRevokeOrBack) {
-        if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
-            // 撤销或退回
-            if (isRevokeOrBack) {
-                baseAssetCashPositionCommMapper.deleteCashPositionByOrderIds(Arrays.asList(entity.getBidId()));
-            } else {
-                for (CfetsPrimaryBidManageSaveDetailDto deal : entity.getAllocationDetails()) {
-                    if(!StringUtil.isNotEmpty(deal.getWinCprice())){
-                        continue;
-                    }
-                    FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
-                    finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
-                    finProductTradeDto.setAssetType2("ISSUE_CLASS_02");
-                    finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
-                    BaseTradeProductDealDto baseTradeProductDealDto = new BaseTradeProductDealDto();
-                    baseTradeProductDealDto.setEntrustId(deal.getEntrustId());
-                    baseTradeProductDealDto.setStage("01");
-                    TrdProductDeal trdProductDeal = new TrdProductDeal();
-                    BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, deal);
-                    trdProductDeal.setFinprodId(entity.getFinprodId());
-                    trdProductDeal.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
-                    trdProductDeal.setPs(DictCodeList.交易方向_买入.getValue());
-                    trdProductDeal.setSettleDate(iPlatformDate.getSysDate());
-                    trdProductDeal.setPrinAmt(deal.getActWinPrinamt());
-                    trdProductDeal.setTradeDate(iPlatformDate.getSysDate());
-                    trdProductDeal.setSettleDate(iPlatformDate.getSysDate());
-                    trdProductDeal.setSecManageAcctId(deal.getSecAcctId());
-                    trdProductDeal.setFpriceAmt(deal.getPayAmt());
-                    trdProductDeal.setTradeMarketMode(DictCodeListExt1.交易市场_一级市场.getValue());
-                    trdProductDeal.setCcy(entity.getCcy());
-                    baseTradeProductDealDto.setTrdProductDeal(trdProductDeal);
-                    TrdProductDealAdd add = new TrdProductDealAdd();
-                    add.setPortfolioId(deal.getPortfolioId());
-                    add.setTradeId(entity.getBidId());
-                    add.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
-                    add.setEntrustId(deal.getEntrustId());
-                    baseTradeProductDealDto.setTrdProductDealAdd(add);
-                    //处理指令完成情况
-                    List<StlPayOrdersDto> stlPayOrders = new ArrayList<>();
-                    StlPayOrdersDto stlPayOrder = new StlPayOrdersDto();
-                    FinProduct finProduct = finProductMapper.selectByPrimaryKey(entity.getFinprodId());
-                    String acctId = EtrCommonCashPositionDealService.select组合托管户(deal.getPortfolioId(), finProduct.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
-                    stlPayOrder.setMyAcctNo(acctId);
-                    stlPayOrder.setOrderId(entity.getBidId());
-                    stlPayOrder.setCcy(finProduct.getCcy());
-                    stlPayOrder.setSettleAmt(deal.getPayAmt());
-                    stlPayOrder.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
-                    stlPayOrder.setPs(DictCodeListExt1.收支方向_支出.getValue());
-                    stlPayOrder.setSettleDate(iPlatformDate.getSysDate());
-                    stlPayOrders.add(stlPayOrder);
-                    baseTradeProductDealDto.setStlPayOrdersList(stlPayOrders);
-                    finProductTradeDto.setBaseTradeProductDealDtos(Arrays.asList(baseTradeProductDealDto));
-                    baseTradeProductDealCommService.insertPosition(finProductTradeDto);
-                }
+        if (!StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
+            return;
+        }
+        for (CfetsPrimaryBidManageSaveDetailDto deal : entity.getAllocationDetails()) {
+            if (!StringUtil.isNotEmpty(deal.getWinCprice())) {
+                continue;
             }
+            FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
+            finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
+            finProductTradeDto.setAssetType2("ISSUE_CLASS_02");
+            finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
+            BaseTradeProductDealDto baseTradeProductDealDto = new BaseTradeProductDealDto();
+            baseTradeProductDealDto.setEntrustId(deal.getEntrustId());
+            baseTradeProductDealDto.setStage("02");
+            TrdProductDeal trdProductDeal = new TrdProductDeal();
+            BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, deal);
+            trdProductDeal.setFinprodId(entity.getFinprodId());
+            trdProductDeal.setFinprodType2(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+            trdProductDeal.setPs(DictCodeList.交易方向_买入.getValue());
+            trdProductDeal.setSettleDate(iPlatformDate.getSysDate());
+            trdProductDeal.setPrinAmt(deal.getActWinPrinamt());
+            trdProductDeal.setShareAmt(deal.getActWinPrinamt());
+            trdProductDeal.setTradeDate(iPlatformDate.getSysDate());
+            trdProductDeal.setSettleDate(iPlatformDate.getSysDate());
+            trdProductDeal.setSecManageAcctId(deal.getSecAcctId());
+            trdProductDeal.setFpriceAmt(deal.getPayAmt());
+            trdProductDeal.setTradeId(entity.getBidId());
+            trdProductDeal.setTradeMarketMode(DictCodeListExt1.交易市场_一级市场.getValue());
+            trdProductDeal.setCcy(entity.getCcy());
+            if (isRevokeOrBack) {
+                trdProductDeal.setPrinAmt(trdProductDeal.getPrinAmt().negate());
+                trdProductDeal.setFpriceAmt(trdProductDeal.getFpriceAmt().negate());
+                trdProductDeal.setShareAmt(trdProductDeal.getShareAmt().negate());
+            }
+            baseTradeProductDealDto.setTrdProductDeal(trdProductDeal);
+            TrdProductDealAdd add = new TrdProductDealAdd();
+            add.setPortfolioId(deal.getPortfolioId());
+            add.setTradeId(entity.getBidId());
+            add.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
+            add.setEntrustId(deal.getEntrustId());
+            baseTradeProductDealDto.setTrdProductDealAdd(add);
+            //处理指令完成情况
+            List<StlPayOrdersDto> stlPayOrders = new ArrayList<>();
+            StlPayOrdersDto stlPayOrder = new StlPayOrdersDto();
+            FinProduct finProduct = finProductMapper.selectByPrimaryKey(entity.getFinprodId());
+            String acctId = EtrCommonCashPositionDealService.select组合托管户(deal.getPortfolioId(), finProduct.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
+            stlPayOrder.setMyAcctNo(acctId);
+            stlPayOrder.setOrderId(entity.getBidId());
+            stlPayOrder.setCcy(finProduct.getCcy());
+            stlPayOrder.setSettleAmt(deal.getPayAmt());
+            if (isRevokeOrBack) {
+                stlPayOrder.setSettleAmt(stlPayOrder.getSettleAmt().negate());
+            }
+            stlPayOrder.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
+            stlPayOrder.setPs(DictCodeListExt1.收支方向_支出.getValue());
+            stlPayOrder.setSettleDate(iPlatformDate.getSysDate());
+            stlPayOrders.add(stlPayOrder);
+            baseTradeProductDealDto.setStlPayOrdersList(stlPayOrders);
+            finProductTradeDto.setBaseTradeProductDealDtos(Arrays.asList(baseTradeProductDealDto));
+            baseTradeProductDealCommService.insertPosition(finProductTradeDto);
         }
     }
 

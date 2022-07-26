@@ -177,6 +177,7 @@ public class EtrExchangeAgreRepTrade002Controller extends BaseController {
         model.addAttribute("ENTRUST_RECORD_MODIFY", ENTRUST_RECORD_MODIFY);
         model.addAttribute("TRADE_MARKET_04", DictCodeList.交易流通场所_深圳证券交易所.getValue());
         model.addAttribute("TRADE_MARKET_03", DictCodeList.交易流通场所_上海证券交易所.getValue());
+        model.addAttribute("TRADE_MARKET_CURRENT", entity.getTradeMarket());
 
         model.addAttribute("UNIT_01", DictCodeListExt3.交易单位_张.getValue());
         model.addAttribute("UNIT_04", DictCodeListExt3.交易单位_手.getValue());

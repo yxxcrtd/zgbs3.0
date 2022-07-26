@@ -111,6 +111,9 @@ public class MstCustomerNatureService extends BaseService<MstCustomerNatureDto> 
             // }
         	//先更新交易对手，再更新客户性质
         	updateCounter(entity);
+            Map<String, List<MstCustomerNatureDto>> dtoMap = entity.getSelectedItem().stream().collect(
+                    JoyinCollectors.groupingBy(x -> x.getCustomerId()));
+            setElement(entity,dtoMap,entity.getCustomerId());
             mstCustomerNatureMapper.updateByPrimaryKey(entity);
             // 调用投管接口 add by renping 20200409 start
             setInterf(entity.getCustomerId());
@@ -124,50 +127,7 @@ public class MstCustomerNatureService extends BaseService<MstCustomerNatureDto> 
                 JoyinCollectors.groupingBy(x -> x.getCustomerId()));
             for (String key : dtoMap.keySet()) {
                 MstCustomerNatureDto dto = new MstCustomerNatureDto();
-                for (MstCustomerNatureDto temp : dtoMap.get(key)) {
-                    if (StringUtil.equals(temp.getCustomerCharater(), DictCodeList.客户性质_发行人.getValue())) {
-                        dto.setIsIssuer("Y");
-                    }
-                    else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeList.客户性质_管理人.getValue())) {
-                        dto.setIsAssteManager("Y");
-                    }
-                    else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeList.客户性质_托管人.getValue())) {
-                        dto.setIsTruster("Y");
-                    }
-                    else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeList.客户性质_融资人.getValue())) {
-                        dto.setIsFinancier("Y");
-                    }
-                    else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeList.客户性质_担保人.getValue())) {
-                        dto.setIsGuarantee("Y");
-                    }
-                    else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeList.客户性质_承销商.getValue())) {
-                        dto.setIsSaler("Y");;
-                    }
-                    else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeList.客户性质_存放行.getValue())) {
-                        dto.setIsDepositBank("Y");
-                    }
-                    else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeList.客户性质_投资顾问.getValue())) {
-                        dto.setIsInvestAdviser("Y");
-                    }
-                    else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeList.客户性质_出质人.getValue())) {
-                        dto.setIsPledgor("Y");
-                    }
-                    else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeListExt3.客户性质_券商.getValue())) {
-                        dto.setIsBroker("Y");
-                    }
-                    else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeListExt3.客户性质_交易对手.getValue())) {
-						dto.setIsCounter("Y");
-						/****** 生成交易对手 ****/
-						createCounter(temp);
-						/*******************/
-					}
-                    else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeListExt3.客户性质_原始权益人.getValue())) {
-                        dto.setIsOriginalOwner("Y");
-                    }
-                    else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeListExt3.客户性质_创设机构.getValue())) {
-                        dto.setCreateInstitutions("Y");
-                    }
-                }
+                setElement(dto,dtoMap,key);
                 dto.setCustomerId(key);
                 mstCustomerNatureMapper.updateByPrimaryKey(dto);
                 // 调用投管接口 add by renping 20200409 start
@@ -177,6 +137,63 @@ public class MstCustomerNatureService extends BaseService<MstCustomerNatureDto> 
             // }
         }
 
+    }
+
+    /**
+     * 字段赋值
+     * @param dto
+     * @param dtoMap
+     * @param key
+     * @param <T>
+     */
+    private <T extends MstCustomerNatureDto> void setElement(T dto,Map<String, List<T>> dtoMap,String key){
+        if (null == dtoMap) {
+            return;
+        }
+        for (T temp : dtoMap.get(key)) {
+            if (StringUtil.equals(temp.getCustomerCharater(), DictCodeList.客户性质_发行人.getValue())) {
+                dto.setIsIssuer("Y");
+            }
+            else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeList.客户性质_管理人.getValue())) {
+                dto.setIsAssteManager("Y");
+            }
+            else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeList.客户性质_托管人.getValue())) {
+                dto.setIsTruster("Y");
+            }
+            else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeList.客户性质_融资人.getValue())) {
+                dto.setIsFinancier("Y");
+            }
+            else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeList.客户性质_担保人.getValue())) {
+                dto.setIsGuarantee("Y");
+            }
+            else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeList.客户性质_承销商.getValue())) {
+                dto.setIsSaler("Y");;
+            }
+            else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeList.客户性质_存放行.getValue())) {
+                dto.setIsDepositBank("Y");
+            }
+            else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeList.客户性质_投资顾问.getValue())) {
+                dto.setIsInvestAdviser("Y");
+            }
+            else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeList.客户性质_出质人.getValue())) {
+                dto.setIsPledgor("Y");
+            }
+            else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeListExt3.客户性质_券商.getValue())) {
+                dto.setIsBroker("Y");
+            }
+            else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeListExt3.客户性质_交易对手.getValue())) {
+                dto.setIsCounter("Y");
+                /****** 生成交易对手 ****/
+                createCounter(temp);
+                /*******************/
+            }
+            else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeListExt3.客户性质_原始权益人.getValue())) {
+                dto.setIsOriginalOwner("Y");
+            }
+            else if (StringUtil.equals(temp.getCustomerCharater(), DictCodeListExt3.客户性质_创设机构.getValue())) {
+                dto.setCreateInstitutions("Y");
+            }
+        }
     }
     /**
 	 * 创建机构交易对手记录
