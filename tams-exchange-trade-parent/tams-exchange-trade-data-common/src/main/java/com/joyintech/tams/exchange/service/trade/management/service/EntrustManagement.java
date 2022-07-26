@@ -19,6 +19,7 @@ import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.domain.Message;
 import com.joyintech.tams.exchange.common.enums.exchange.RepurchaseDQXZTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
@@ -292,9 +293,21 @@ public class EntrustManagement extends BaseService {
                 if (StringUtil.equals(投管业务类型_到期续做.getValue(), busiTypeTg)) {
                     String transCodeStr = EnumUtil.getDescriptionByCode(RepurchaseDQXZTypeEnum.class, o.getTransCode());
                     entrust.setTransCode(StrUtil.isEmpty(transCodeStr) ? o.getTransCode() : transCodeStr);
+                }else{
+                    entrust.setTransCode("--");
                 }
                 entrust.setOwnerTypeStr(EnumUtil.getDescriptionByCode(InvestorType.class, o.getOwnerType()));
                 entrust.setPropOwnerTypeStr(EnumUtil.getDescriptionByCode(InvestorType.class, o.getPropOwnerType()));
+
+                if(Market.isShMarket(entrust.getMarket())){
+                    entrust.setInvestorName("--");
+                    entrust.setOwnerTypeStr("--");
+                    entrust.setPropInvestorName("--");
+                    entrust.setPropOwnerTypeStr("--");
+                }
+                if(BusiTypeTgEnum.首期.codeEquals(busiTypeTg)){
+                    entrust.setOrigSerialNo("--");
+                }
             }
 
             entrust.setMarket(Market.getMarketName(o.getMarket()));
