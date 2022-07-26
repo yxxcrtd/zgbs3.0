@@ -815,6 +815,7 @@
     a.ENTRUST_PROP, a.BS_FLAG,
     /*a.ENTRUST_VOLUME, */
     case
+        when a.ASSET_TYPE = 'F07' then nvl( a.ENTRUST_VOLUME, 0 ) / 100
         when #{busiTypePosition} in ('EX017','EX005') then round(nvl(a.ENTRUST_VOLUME/100,0),3)
         when #{busiTypePosition} = 'EX018' then 0
         else a.ENTRUST_VOLUME
@@ -826,11 +827,15 @@
     a.TRADED_BALANCE,
 /*a.TRADED_VOLUME, */
         case
+        when a.ASSET_TYPE = 'F07' then nvl( a.TRADED_VOLUME, 0 ) / 100
         when #{busiTypePosition} in ('EX017','EX005') then round(nvl(a.TRADED_VOLUME/100,0),3)
         when #{busiTypePosition} = 'EX018' then 0
         else a.TRADED_VOLUME
         end as TRADED_VOLUME,
-a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
+        CASE
+			WHEN a.ASSET_TYPE = 'F07' THEN null
+		 else a.TRADED_PRICE end TRADED_PRICE,
+    a.CANCEL_VOLUME, a.REPORT_TIME,
     TO_CHAR(a.CREATE_TIME,'HH24:MI:SS') AS TRADE_TIME,
     a.CANCEL_TIME, a.ERROR_CODE, a.ERROR_MSG,
     TO_CHAR(a.CREATE_TIME,'yyyy-MM-dd' ) AS TRADING_DAY,
@@ -866,7 +871,10 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         when #{busiTypePosition} = 'EX018' then 0
         else a.TRADED_VOLUME
         end as TRADED_VOLUME,
-a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
+        CASE
+			WHEN a.ASSET_TYPE = 'F07' THEN null
+		 else a.TRADED_PRICE end TRADED_PRICE,
+        a.CANCEL_VOLUME, a.REPORT_TIME,
         TO_CHAR(a.CREATE_TIME,'HH24:MI:SS') AS TRADE_TIME,
         a.CANCEL_TIME, a.ERROR_CODE, a.ERROR_MSG,
         TO_CHAR(a.CREATE_TIME,'yyyy-MM-dd' ) AS TRADING_DAY,
@@ -901,7 +909,10 @@ a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
         when #{busiTypePosition} = 'EX018' then 0
         else a.TRADED_VOLUME
         end as TRADED_VOLUME,
-a.TRADED_PRICE, a.CANCEL_VOLUME,a. REPORT_TIME,
+        CASE
+			WHEN a.ASSET_TYPE = 'F07' THEN null
+		 else a.TRADED_PRICE end TRADED_PRICE,
+        a.CANCEL_VOLUME,a. REPORT_TIME,
         TO_CHAR(a.CREATE_TIME,'HH24:MI:SS') AS TRADE_TIME,
         a.CANCEL_TIME, a.ERROR_CODE, a.ERROR_MSG,
         TO_CHAR(a.CREATE_TIME,'yyyy-MM-dd' ) AS TRADING_DAY,
@@ -936,7 +947,10 @@ a.TRADED_PRICE, a.CANCEL_VOLUME,a. REPORT_TIME,
         when #{busiTypePosition} = 'EX018' then 0
         else a.TRADED_VOLUME
         end as TRADED_VOLUME,
-a.TRADED_PRICE, a.CANCEL_VOLUME, a.REPORT_TIME,
+        CASE
+			WHEN a.ASSET_TYPE = 'F07' THEN null
+		 else a.TRADED_PRICE end TRADED_PRICE,
+    a.CANCEL_VOLUME, a.REPORT_TIME,
     TO_CHAR(a.CREATE_TIME,'HH24:MI:SS') AS TRADE_TIME,
     a.CANCEL_TIME, a.ERROR_CODE, a.ERROR_MSG,
     TO_CHAR(a.CREATE_TIME,'yyyy-MM-dd' ) AS TRADING_DAY,
