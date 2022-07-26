@@ -15,7 +15,6 @@ import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.entity.EtrDistribute;
-import com.joyintech.tams.common.base.entity.PtlPortfolio;
 import com.joyintech.tams.component.base.core.MstWorkflowCommonService;
 import com.joyintech.tams.component.base.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
@@ -1340,15 +1339,16 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
     @ApiOperation(value = "根据资金账号查询组合列表", notes = "根据资金账号查询组合列表")
     @ResponseBody
     @PostMapping("selectPortfolioList/{acctNo}")
-    public Message<List<SelectOptionDto>> selectPortfolioList(@ApiParam(value = "资金账号", required = true) @PathVariable String acctNo) {
-        return new Message<List<SelectOptionDto>>().success().setData(etrExchangeAgreRepTrade001Service.selectPortfolioList(acctNo));
+    public Message<List<SelectOptionDto>> selectPortfolioList(@ApiParam(value = "资金账号", required = true) @PathVariable String acctNo, @RequestBody SelectOptionRequestDto dto) {
+        return new Message<List<SelectOptionDto>>().success().setData(etrExchangeAgreRepTrade001Service.selectPortfolioList(acctNo, dto.getSearch()));
     }
+
     /**
-     * 根据资金账号查询组合列表
+     * 根据首期结算日期、交易编号查询交易对手
      *
-     * @param acctNo 资金账号
+     * @param dto 行情信息
      */
-    @ApiOperation(value = "根据资金账号查询组合列表", notes = "根据资金账号查询组合列表")
+    @ApiOperation(value = "", notes = "根据首期结算日期、交易编号查询交易对手")
     @ResponseBody
     @PostMapping("getFinprodIdNoFirst")
     public Message<EtrExchangeAgreRepCurrResp> getFinprodIdNoFirsts(@RequestBody EtrExchangeAgreRepTrade001Dto dto) {

@@ -837,7 +837,7 @@ public class StlDataDealSzdSjsjgProcessService {
             String fFinprodId = "";
             BigDecimal fMPrinAmt = new BigDecimal(0);
             Date fVDate = new Date();
-            if (CollectionUtils.isEmpty(sqSettleTransDatas)) {
+            if (CollectionUtils.isNotEmpty(sqSettleTransDatas)) {
                 // 金融产品代码
                 fFinprodId = sqSettleTransDatas.get(0).getFinprodId();
                 // 首期回购金额

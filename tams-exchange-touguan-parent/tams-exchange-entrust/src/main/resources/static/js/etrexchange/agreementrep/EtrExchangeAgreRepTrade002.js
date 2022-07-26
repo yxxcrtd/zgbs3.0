@@ -23,7 +23,10 @@
         var yield = $("#yield").val();
         object.yield = yield;
         //根据指令方向设置质押式回购的金融产品类型
-
+        console.log($("#ps").val()," ____  ",$("#entrustAmt").val())
+        if($("#ps").val() == 'T93'){
+            object.expireSettleAmt = $("#entrustAmt").val();
+        }
         object.mdate = object.vdate;
         object.entrustDate = object.vdate;
 
@@ -1326,7 +1329,9 @@
                     $("#tradeId_div").show();
                     $("#tradeId").attr("disabled", true);
                     //请求号
-                    $("#reqOnId_div").hide();
+                    $("#reqOnId_div").show();
+                    //回购金额
+                    $("#tradeAmt_div").hide();
                     //对手席位
                     $("#seatId_div").hide();
                     //约定号
@@ -1805,6 +1810,7 @@
                 }
                 riskParams.finprodId = $("#repSecId").val();
                 riskParams.repoAmt = $("#tradeAmt").val();
+                riskParams.expireSettleAmt = $("#entrustAmt").val();
                 riskParams.entrustDate = $("#vdate").val();
                 riskParams.vdate = $("#vdate").val();
                 riskParams.mdate = $("#vdate").val();
@@ -1958,11 +1964,11 @@
                 }
                 var newRepSecNum = $("#newRepSecNum").val();
                 if (newRepSecNum) {
-                    $("#newRepSecNum").val(newRepSecNum / 100);
+                    $("#newRepSecNum").val(Number(newRepSecNum / 100).toFixed(2));
                 }
                 var outRepSecNum = $("#outRepSecNum").val();
                 if (outRepSecNum) {
-                    $("#outRepSecNum").val(outRepSecNum / 100);
+                    $("#outRepSecNum").val(Number(outRepSecNum / 100).toFixed(2));
                 }
                 var ps = $("#ps").val();
                 if (ps == 'T94') {

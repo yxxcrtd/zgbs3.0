@@ -112,6 +112,9 @@ public class IbuMainServiceImpl extends BaseService<IbuQuoteBond> implements Ibu
     @Autowired
     private WflIbuQuoteEtrReMapper wflIbuQuoteEtrReMapper;
 
+    @Autowired
+    private WflIbuQuoteEntCrepPledgeMapper wflIbuQuoteEntCrepPledgeMapper;
+
     //region 对话报价和请求报价综合查询
 
     /**
@@ -2923,6 +2926,7 @@ public class IbuMainServiceImpl extends BaseService<IbuQuoteBond> implements Ibu
             wflIbuQuoteCrepMapper.deleteByWorkflowId(workflowId);
             wflIbuQuoteCrepPledgeMapper.deleteByWorkflowId(workflowId);
             wflIbuQuoteEtrReMapper.deleteByWorkflowId(workflowId);
+            wflIbuQuoteEntCrepPledgeMapper.deleteByWorkflowId(workflowId);
         }
         return true;
     }

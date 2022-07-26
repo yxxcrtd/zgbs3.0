@@ -144,7 +144,7 @@ select TT.* from (
 		nvl( T1.STOCK_ID, T4.TERM_TYPE ) ELSE ( CASE WHEN T3.FINPROD_NAME IS NOT NULL THEN T3.FINPROD_NAME ELSE T4.ASSET_TYPE_10 END )
 		END finprodName,-->
 		CASE WHEN T4.ASSET_TYPE = 'F07' AND T1.PS IN('03','04') AND T1.TRADE_MARKET NOT IN ('03','04')  AND T4.ASSET_TYPE1 = 'H01' THEN T1.FINPROD_ID
-		ELSE T3.FINPROD_NAME
+		ELSE nvl(T3.FINPROD_NAME, fpt.FINPROD_NAME)
 		end finprodName,
 			T1.PS ps,
 			CASE WHEN T4.ASSET_TYPE IN (#{ASSET_TYPE_16}) THEN (SELECT ITEM_VALUE FROM sys_datadict_list WHERE DICT_CODE = 'IRS_TYPE' AND ITEM_CODE = T4.BUSI_PS)
@@ -216,6 +216,7 @@ select TT.* from (
 		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 start -->
 		LEFT JOIN STL_SEC_ACCT_INFO SSAI ON T4.SEC_ACCT_ID = SSAI.SEC_ACCT_ID
 		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 end -->
+		left join FIN_PRODUCT fpt on T1.STOCK_ID = fpt.FINPROD_MARKET_ID
 		LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
 		LEFT JOIN (select ENTRUST_ID ,PORTFOLIO_ID
 					 from (select ol.ENTRUST_ID,ol.PORTFOLIO_ID, row_number() OVER(PARTITION BY ol.ENTRUST_ID ORDER BY ol.ENTRUST_ID) ds
@@ -319,7 +320,7 @@ select TT.* from (
 				END finprodMarketId,
 				T3.FINPROD_TYPE2 finprodType2,
 		CASE WHEN T4.ASSET_TYPE = 'F07' AND T1.PS IN('03','04') AND T1.TRADE_MARKET NOT IN ('03','04')  AND T4.ASSET_TYPE1 = 'H01' THEN T1.FINPROD_ID
-		ELSE T3.FINPROD_NAME
+		ELSE nvl(T3.FINPROD_NAME, fpt.FINPROD_NAME)
 		end finprodName,
 				T1.PS ps,
 				CASE WHEN T4.ASSET_TYPE IN (#{ASSET_TYPE_16})
@@ -393,6 +394,7 @@ select TT.* from (
 		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 start -->
 		LEFT JOIN STL_SEC_ACCT_INFO SSAI ON T4.SEC_ACCT_ID = SSAI.SEC_ACCT_ID
 		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 end -->
+		left join FIN_PRODUCT fpt on T1.STOCK_ID = fpt.FINPROD_MARKET_ID
 		LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
 		LEFT JOIN (select ENTRUST_ID ,PORTFOLIO_ID
 					 from (select ol.ENTRUST_ID,ol.PORTFOLIO_ID, row_number() OVER(PARTITION BY ol.ENTRUST_ID ORDER BY ol.ENTRUST_ID) ds
@@ -505,7 +507,7 @@ select TT.* from (
 			END finprodMarketId,
 			T1.FINPROD_TYPE2 finprodType2,
 		CASE WHEN T4.ASSET_TYPE = 'F07' AND T1.PS IN('03','04') AND T1.TRADE_MARKET NOT IN ('03','04')  AND T4.ASSET_TYPE1 = 'H01' THEN T1.FINPROD_ID
-		ELSE T3.FINPROD_NAME
+		ELSE nvl(T3.FINPROD_NAME, fpt.FINPROD_NAME)
 		end finprodName,
 			T1.PS ps,
 			CASE
@@ -595,6 +597,7 @@ select TT.* from (
 		LEFT JOIN ETR_ENTRUST_ADD T4 ON T4.ENTRUST_ID = T1.ENTRUST_ID
 		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 start -->
 		LEFT JOIN STL_SEC_ACCT_INFO SSAI ON T4.SEC_ACCT_ID = SSAI.SEC_ACCT_ID
+		left join FIN_PRODUCT fpt on T1.STOCK_ID = fpt.FINPROD_MARKET_ID
 		LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
 		<!-- add by dubaojun 2020-08-12 上农商个性化-增加证券账户名称的显示 end -->
 		<where>
@@ -689,7 +692,7 @@ select TT.* from (
 				END finprodMarketId,
 				T1.FINPROD_TYPE2 finprodType2,
 		CASE WHEN T4.ASSET_TYPE = 'F07' AND T1.PS IN('03','04') AND T1.TRADE_MARKET NOT IN ('03','04')  AND T4.ASSET_TYPE1 = 'H01' THEN T1.FINPROD_ID
-		ELSE T3.FINPROD_NAME
+		ELSE nvl(T3.FINPROD_NAME, fpt.FINPROD_NAME)
 		end finprodName,
 				T1.PS ps,
 				CASE WHEN T4.ASSET_TYPE IN (#{ASSET_TYPE_16})
@@ -756,6 +759,7 @@ select TT.* from (
 					  LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
 					  GROUP BY EED.ENTRUST_ID ) detail ON T1.ENTRUST_ID = detail.ENTRUST_ID
 		LEFT JOIN WFL_ETR_ENTRUST_ADD T4 ON T4.ENTRUST_ID = T1.ENTRUST_ID
+		left join FIN_PRODUCT fpt on T1.STOCK_ID = fpt.FINPROD_MARKET_ID
 		LEFT JOIN STL_SEC_ACCT_INFO SSAI ON T4.SEC_ACCT_ID = SSAI.SEC_ACCT_ID
 		LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
 		<where>

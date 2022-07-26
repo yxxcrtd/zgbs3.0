@@ -742,7 +742,9 @@
             ,T1.UNIT_INT
             ,T1.SETTLE_SPEED
             ,T7.SHARE_AMT SHARE_AMT
+            ,tpda.ENTRUST_ID
             FROM TRD_PRODUCT_DEAL T1
+            left join TRD_PRODUCT_DEAL_ADD tpda on t1.TRADE_ID = tpda.TRADE_ID
             <!--  一体化对应etliu start -->
             LEFT JOIN PTL_TRADE T3 ON T1.TRADE_ID = T3.BUSI_NO <!-- AND T1.BUSI_TYPE = T3.BUSI_TYPE -->
             <!--  一体化对应etliu end -->
@@ -783,11 +785,14 @@
     </select>
 
     <select id="findCashIdByFinprodId" resultType="java.lang.String">
-        select CASH_ID
-        from FIN_CASH_INFO
-        where FINPROD_ID = #{finprodId}
-          and CASH_TYPE_1 = #{CASH_TYPE_1}
-          and CASH_TYPE_2 = #{CASH_TYPE_2}
-          and ROWNUM = 1
+        select nvl(fcpbj.CASH_ID,fcplx.CASH_ID)
+        from FIN_CASH_INFO fci
+                 LEFT JOIN FIN_CASH_PLAN fcpbj ON fci.CASH_ID =fcpbj.CASH_ID AND fci.CASH_TYPE_1 =#{CASH_TYPE_1} AND fci.CASH_TYPE_2=#{CASH_TYPE_2}
+                 LEFT JOIN FIN_CASH_PLAN fcplx ON fci.CASH_ID =fcplx.CASH_ID AND fci.CASH_TYPE_1 ='02' AND fci.CASH_TYPE_2='C02'
+        where fci.FINPROD_ID = #{finprodId}
+          AND (fcpbj.MDATE =#{adjustMDate} OR fcplx.MDATE =#{adjustMDate})
+          AND NOT EXISTS (
+                SELECT  1 FROM FIN_CASH_PLAN fcp WHERE fcp.FINPROD_ID =fcplx.FINPROD_ID AND fcp.MDATE =fcplx.MDATE AND fcp.CASH_TYPE IN ('02','03')
+            )
     </select>
 </mapper>

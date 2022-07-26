@@ -202,9 +202,15 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                     if (stlPayOrdersDto != null) {
                         trdTempDto.setOrderId(stlPayOrdersDto.getOrderId());
                     }
-                    infContractDetailfile.setPortfolioId(trdProductTempDealAdd.getPortfolioId());
-                    infContractDetailfile.setShareAmt(trdProductTempDeal.getShareAmt());
-                    infContractDetailfile.setTradeAmt(trdProductTempDeal.getTradeAmt());
+
+                    // modify by etliu 20220725 start
+                    // 3.0.6协议回购+风险升级 XYHGFXSJ-368
+                    //【实时资产头寸查询】协议回购上交所正回购数据日间交收后，质押券的指令可用持仓、交易可用持仓、质押持仓显示错误
+//                    infContractDetailfile.setPortfolioId(trdProductTempDealAdd.getPortfolioId());
+//                    infContractDetailfile.setShareAmt(trdProductTempDeal.getShareAmt());
+//                    infContractDetailfile.setTradeAmt(trdProductTempDeal.getTradeAmt());
+                    // modify by etliu 20220725 end
+
                     // XYHGFXSJ-8:构建质押品信息list modify by fuyongsheng 20220718 start
                     infContractDetailfile.setPledgeList(this.genPledgeDtoList(trdProductTempDeal.getTradeId()));
                     // XYHGFXSJ-8:构建质押品信息list modify by fuyongsheng 20220718 end
@@ -291,8 +297,12 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                     // add by etliu 20220116 end
 
                     parameter.setCustom(trdTempDto);
-                    commonPositionService.process(parameter);
-
+                    try {
+                        logger.info("手工交收处理请求报文:" + JsonUtils.object2Json(parameter));
+                        commonPositionService.process(parameter);
+                    } catch (Exception e) {
+                        logger.error("手工交收处理请求失败:", e);
+                    }
 //                    // 3.调用基础组件.【投资委托组件.完成委托】，写入委托完成状况信息(投资委托场合才执行此步)
 //                    if (!finProductTradeDto.isNeedHandleFinishEntrust()) {
 //                        baseTradeProductDealCommService.finishEntrust(finProductTradeDto.getBaseTradeProductDealDtos(), false);

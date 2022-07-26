@@ -25,7 +25,6 @@ import com.joyintech.tams.exchange.entrust.common.dto.EtrExchangePortfolioAlloca
 import com.joyintech.tams.exchange.entrust.common.dto.EtrExchangeProtfolioDetailRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepTrade001Dto;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeSaveSecRepoRequest;
-import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.invest.common.component.base.group.BasePtlSecPositionInfoService;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
@@ -769,6 +768,7 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                 creditLinesInputDto.setRownum(rownum);
                 if (!StringUtil.isEmptyList(creditLinesInputDto.getInputDtoList())) {
                     inputDtoList.addAll(creditLinesInputDto.getInputDtoList());
+                    inputDtoList.add(creditLinesInputDto);
                 } else {
                     creditLinesInputDto.setRownum(rownum);
                     inputDtoList.add(creditLinesInputDto);
@@ -885,6 +885,10 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
             if (StringUtil.equals(DictCodeList.回购拆借方向_正回购.getValue(), inputDto.getRepPs())) {
                 return null;
             }
+            if (StringUtil.equals(inputDto.getPs(),DictCodeListExt3.交易方向_提前购回.getValue())
+                    || StringUtil.equals(inputDto.getPs(),DictCodeListExt3.交易方向_解除质押.getValue())) {
+                return null;
+            }
             // 逆回购首期
             if (StringUtil.equals(inputDto.getRepPs(), DictCodeListExt3.交易方向_逆回购.getValue())) {
                 creditLinesInputDto = new CreditLinesInputDto();
@@ -920,15 +924,17 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                 creditLinesInputDto1.setPs(DictCodeList.交易方向_到期.getValue());
                 creditLinesInputDto1.setCounterId(inputDto.getCounterId());
                 //if (riskCreditListCommonValidatorService.checkCallCredit(inputDto.getFinprodId())) {
-                if(StringUtil.isNotEmpty(inputDto.getInitialNum())) {
-                    FinTradeProductKey finTradeProductKey = new FinTradeProductKey();
-                    finTradeProductKey.setBranch(0L);
-                    finTradeProductKey.setFinprodId(inputDto.getInitialNum());
-                    FinTradeProduct finTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
-                    if(Objects.nonNull(finTradeProduct)) {
-                        creditLinesInputDto1.setTradeAmt(finTradeProduct.getmTradeAmt());
-                        creditLinesInputDto1.setShareAmt(finTradeProduct.getPrin());
-                    }
+                FinTradeProductKey finTradeProductKey = new FinTradeProductKey();
+                finTradeProductKey.setBranch(0L);
+                finTradeProductKey.setFinprodId(inputDto.getInitialNum());
+                FinTradeProduct finTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
+                if(Objects.isNull(finTradeProduct) && StringUtil.isNotEmpty(inputDto.getIntiTradeId())) {
+                    finTradeProduct = finTradeProductMapper.selectByTradeId(inputDto.getIntiTradeId());
+                }
+                if(Objects.nonNull(finTradeProduct)) {
+                    creditLinesInputDto1.setTradeAmt(finTradeProduct.getmTradeAmt());
+                    creditLinesInputDto1.setCounterId(finTradeProduct.getCounterId());
+                    //creditLinesInputDto1.setShareAmt(finTradeProduct.getPrin());
                 }
                 //}
                 if(StringUtil.isEmpty(creditLinesInputDto1.getCounterId())) {

@@ -169,16 +169,18 @@ public class CfetsPortfolioAcctRela002Controller extends BaseController {
         WorkFlowParameter<CfetsPortfolioAcctRela001Dto> params = new WorkFlowParameter<>();
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
-        params.setBusinessCode(dto.getPortfolioId()+"-"+ dto.getPartyId()+"-" + dto.getCfetsAcctType());
+        params.setBusinessCode(item ->item.getPortfolioId()+"-"+ item.getPartyId()+"-" + item.getCfetsAcctType());
+       // params.setBusinessCode(dto.getPortfolioId()+"-"+ dto.getPartyId()+"-" + dto.getCfetsAcctType());
         params.setBusinessType(DictCodeListExt3.共通业务类型_CFETS账户关联.getValue());
-        params.setComment(entity -> this.getMessage("CfetsPortfolioAcctRela001.portfolioId") + "("
-                                    + entity.getPortfolioId() + ")"
+        params.setComment(item -> this.getMessage("CfetsPortfolioAcctRela001.portfolioId") + "("
+                                    + item.getPortfolioId() + ")"
                                     + this.getMessage("CfetsPortfolioAcctRela001.partyId") + "("
-                                    + entity.getPartyId() + ")"
+                                    + item.getPartyId() + ")"
                                     + this.getMessage("CfetsPortfolioAcctRela001.cfetsAcctType")
-                                    + "(" + SysDataUtil.getNameFromDataDict(BussinessDictCode.账户来源,entity.getCfetsAcctType())+ ")");
+                                    + "(" + SysDataUtil.getNameFromDataDict(BussinessDictCode.账户来源,item.getCfetsAcctType())+ ")");
         processParameter.setWorkFlowParameter(params);
-        String msg = cfetsPortfolioAcctRelaService.start(processParameter, dto);
+        //String msg = cfetsPortfolioAcctRelaService.start(processParameter, dto);
+        String msg = cfetsPortfolioAcctRelaService.start(processParameter, dto.getSelectedItem().toArray(new CfetsPortfolioAcctRela001Dto[dto.getSelectedItem().size()]));
         return new AjaxResult(msg);
     }
 

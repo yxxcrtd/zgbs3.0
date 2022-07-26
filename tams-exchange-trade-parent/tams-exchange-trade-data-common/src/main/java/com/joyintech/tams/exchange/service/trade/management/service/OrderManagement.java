@@ -13,6 +13,7 @@ import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.constant.InstructionPs;
+import com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.db.domain.Algorithm;
@@ -202,6 +203,9 @@ public class OrderManagement extends BaseService {
             if (InvestmentAssetType1.NEGOTIATED_REPO.value.equals(instruction.getAssetType1())) {
                 logger.info("场内协议回购交易下单头寸检查，指令编号：{}，回购金额：{}", instructionId, integratedEntrust.getEntrustBalance());
                 instructionClone.setEntrustAmt(integratedEntrust.getEntrustBalance());
+                if (BusiTypeTgEnum.解除质押.codeEquals(instruction.getBusiTypeTg())) {
+                    instructionClone.setmTradeAmt(integratedEntrust.getEntrustBalance());
+                }
             } else {
                 // 计算委托金额
                 BigDecimal entrustBalance = TradeUtils.calculateBalance(integratedEntrust.getEntrustPrice(), integratedEntrust.getEntrustVolume(), integratedEntrust.getAssetType(), integratedEntrust);

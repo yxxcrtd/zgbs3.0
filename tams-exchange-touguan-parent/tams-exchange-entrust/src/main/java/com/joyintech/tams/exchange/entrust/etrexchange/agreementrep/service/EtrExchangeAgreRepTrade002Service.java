@@ -233,8 +233,8 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
                 BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum());
                 floatFd = ArithmeticUtil.subtract(floatFd, r.getPositionsAmt());
                 r.setFloatingPL(floatFd);
-                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum()), 2);
-                r.setFloatingPLPercent(floatPL);
+                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, r.getPositionsAmt(), 2);
+                r.setFloatingPLPercent(ArithmeticUtil.multiply(floatPL, new BigDecimal(100)));
 
             });
         }
@@ -864,6 +864,10 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
             // 到期结算日
             if (StringUtil.isNotEmpty(tmp.get("backDate")) && DateUtil.isDateStr(tmp.get("backDate").toString())) {
                 dto.setExpireSettleDate(DateUtil.format(DateUtil.parse(tmp.get("backDate").toString())));
+            }
+            // 换出金额
+            if (StringUtil.isNotEmpty(tmp.get("swapOutBalance"))) {
+                dto.setOutRepAmt(new BigDecimal(tmp.get("swapOutBalance").toString()));
             }
             // 换入质押券代码
             if (StringUtil.isNotEmpty(tmp.get("swapIntoBonds"))) {

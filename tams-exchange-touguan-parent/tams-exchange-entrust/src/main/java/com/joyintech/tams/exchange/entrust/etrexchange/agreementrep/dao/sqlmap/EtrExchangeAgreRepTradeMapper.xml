@@ -658,7 +658,7 @@
         select
         etr_entrust.entrust_id entrustId, /** 指令编号 **/
         etr_entrust.entrust_status entrustStatus, /** 指令状态 **/
-
+        etr_entrust.FINPROD_ID initialNum,
         CASE
         WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
         ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_NUM, 1 ), 4 ) ELSE ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )
@@ -860,6 +860,7 @@
             select
             wfl_etr_entrust.entrust_id entrustId, /** 指令编号 **/
             '08' entrustStatus, /** 指令状态 **/
+            wfl_etr_entrust.FINPROD_ID initialNum,
             CASE
             WHEN wfl_etr_entrust_add.TARGET_TYPE = '01' THEN
             ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( wfl_etr_entrust.ENTRUST_NUM, 1 ), 4 ) ELSE ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( wfl_etr_entrust.ENTRUST_AMT, 1 ), 4 )
@@ -1312,11 +1313,17 @@
 
     </select>
 
-    <select id="selectPortfolioList" parameterType="java.lang.String"
+    <select id="selectPortfolioList"
             resultType="com.joyintech.framework.select.SelectOptionDto">
         SELECT DISTINCT PP.PORTFOLIO_ID id,PP.PORTFOLIO_NAME text
         FROM  PTL_PORTFOLIO PP
         LEFT JOIN PTL_CAPACCT_INFO PCI ON PP.PORTFOLIO_ID = PCI.PORTFOLIO_ID
         WHERE PCI.ACCT_NO  = #{acctNo}
+        <if test="search != null and search != ''">
+            and (
+            PP.PORTFOLIO_ID like concat('%',#{search},'%')
+            or PP.PORTFOLIO_NAME like concat('%',#{search},'%')
+            )
+        </if>
     </select>
 </mapper>

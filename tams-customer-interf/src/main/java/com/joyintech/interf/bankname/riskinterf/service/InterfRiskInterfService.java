@@ -568,18 +568,24 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                     finDto.setIsNullCounter(BaseDictCodeList.是否_否.getValue());
                 }
                 //wangyang1 add by 增加期限金额 2021年9月10日 end
-                if(StringUtil.equals(DictCodeListExt3.交易方向_解除质押.getValue(),CommonUtil.findValue(dataMap,"ps"))
-                        && finDto.getAmount().compareTo(BigDecimal.ZERO) == 0){
+                if(StringUtil.equals(DictCodeListExt3.交易方向_解除质押.getValue(),CommonUtil.findValue(dataMap,"ps"))){
                     finDto.setPreOccupyCode(null);
                     finDto.setEntrustCode(null);
-                    FinTradeProductKey finTradeProductKey = new FinTradeProductKey();
-                    finTradeProductKey.setFinprodId((String)dataMap.get("firstIssueDealNo"));
-                    finTradeProductKey.setBranch(0L);
-                    FinTradeProduct firstFinTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
-                    if(Objects.nonNull(firstFinTradeProduct)) {
-                        finDto.setAmount(firstFinTradeProduct.getPrin());
-                        finDto.setTradeNum(firstFinTradeProduct.getPrin());
+                    if(finDto.getAmount().compareTo(BigDecimal.ZERO) == 0) {
+                        FinTradeProductKey finTradeProductKey = new FinTradeProductKey();
+                        finTradeProductKey.setFinprodId((String) dataMap.get("firstIssueDealNo"));
+                        finTradeProductKey.setBranch(0L);
+                        FinTradeProduct firstFinTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
+                        if (Objects.nonNull(firstFinTradeProduct)) {
+                            finDto.setAmount(firstFinTradeProduct.getPrin());
+                            finDto.setTradeNum(firstFinTradeProduct.getPrin());
+                        }
                     }
+                }
+                if (StringUtil.equals(DictCodeListExt3.交易方向_中途换券.getValue(),CommonUtil.findValue(dataMap,"ps"))){
+                    finDto.setPreOccupyCode(null);
+                    finDto.setEntrustCode(null);
+                    finDto.setPs(String.valueOf(CommonUtil.findValue(dataMap,"ps")));
                 }
                 return finDto;
             }
@@ -927,12 +933,13 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                         creditLinesInputT56.setTradeStatus(tradeStatu);
                         creditLinesInputT56.setCreditCallType(DictCodeListRsk.授信占用类别_实占.getValue());
                         creditLinesInputT56.setCreditCheckType(DictCodeListRsk.授信占用来源_接口.getValue());
-                        creditLinesInputT56.setPs(DictCodeList.交易方向_买入.getValue());
+                        creditLinesInputT56.setPs(DictCodeList.交易方向_到期.getValue());
                         creditLinesInputT56.setTradeDate(DateUtil.parse(finDto.getEventDate()));
-                        creditLinesInputT56.setCounterId(finDto.getCounterId());
+                        creditLinesInputT56.setCounterId(firstFinTradeProduct.getCounterId());
+                        creditLinesInputT56.setEntrustId((String)temp.get("entrustCode"));
                         // 首期的交易编号
-                        creditLinesInputT56.setTradeId((String)temp.get("tradeId") + finDto.getPs());
-                        creditLinesInputT56.setTradeAmt(finDto.getAmount());
+                        creditLinesInputT56.setTradeId((String)temp.get("tradeId"));
+                        creditLinesInputT56.setTradeAmt(firstFinTradeProduct.getPrin());
                         //creditLinesInputT56.setShareAmt(firstFinTradeProduct.getPrin());
                         creditLinesInputT56.setUpdateTime(new Date());
                         creditLinesInputT56.setUpdateUser(LoginUserUtil.getUserName());

@@ -42,4 +42,11 @@ public interface FinTradeProductMapper {
      * 原质押品信息查询
      */
     List<OriPledgeInfo> getOriFinDealPledgeList(@Param("finprodId") String finprodId);
+
+    /**
+     * 根据原交易编号查询
+     * @param tradeId
+     * @return
+     */
+    FinTradeProduct selectByTradeId(@Param("tradeId") String tradeId);
 }

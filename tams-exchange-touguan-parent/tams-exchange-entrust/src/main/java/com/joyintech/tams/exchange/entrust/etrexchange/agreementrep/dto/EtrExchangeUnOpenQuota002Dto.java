@@ -111,6 +111,10 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
      * 到期结算日
      */
     private String expireSettleDate;
+
+    @ApiModelProperty(name = "outRepAmt", value = "换出质押券孳息")
+    private BigDecimal outRepAmt;
+
     @ApiModelProperty(name = "newRepSecId", value = "换入质押券代码")
     private String newRepSecId;
 
@@ -653,7 +657,7 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
 
     public String getTransCodeStr() {
         if(StringUtil.isNotEmpty(this.transCode)){
-            return "0".equals(this.transCode)?"非第三方":"第三方";
+            return "0".equals(this.transCode)?"不变更对手方":"变更对手方";
         }
         return "";
     }
@@ -724,5 +728,13 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
 
     public void setCpInvestorTypeStr(String cpInvestorTypeStr) {
         this.cpInvestorTypeStr = cpInvestorTypeStr;
+    }
+
+    public BigDecimal getOutRepAmt() {
+        return outRepAmt;
+    }
+
+    public void setOutRepAmt(BigDecimal outRepAmt) {
+        this.outRepAmt = outRepAmt;
     }
 }

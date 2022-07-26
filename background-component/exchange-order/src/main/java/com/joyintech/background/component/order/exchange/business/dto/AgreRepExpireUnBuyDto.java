@@ -132,6 +132,7 @@ public class AgreRepExpireUnBuyDto extends EtrSinglePortfolioDto {
 	 * 续做类型
 	 */
 	private String redoType;
+	private String transCode;
 	/**
 	 * 个性分类三
      */
@@ -270,5 +271,12 @@ public class AgreRepExpireUnBuyDto extends EtrSinglePortfolioDto {
 
 	public void setRedoType(String redoType) {
 		this.redoType = redoType;
+	}
+	public String getTransCode() {
+		return transCode;
+	}
+
+	public void setTransCode(String transCode) {
+		this.transCode = transCode;
 	}
 }

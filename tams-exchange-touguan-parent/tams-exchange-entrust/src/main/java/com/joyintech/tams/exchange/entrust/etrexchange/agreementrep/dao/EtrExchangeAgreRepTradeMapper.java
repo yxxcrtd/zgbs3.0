@@ -154,5 +154,5 @@ public interface EtrExchangeAgreRepTradeMapper {
      *
      * @param acctNo 资金账号
      */
-    List<SelectOptionDto> selectPortfolioList(@Param("acctNo") String acctNo);
+    List<SelectOptionDto> selectPortfolioList(Map<String, Object> map);
 }

@@ -25,10 +25,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.*;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_解除质押;
 
@@ -81,7 +79,9 @@ public class EtrExchangeAgreRepTradeRiskCalController extends BaseController {
 //                return new Message<AjaxResult>().fail().setMessage(message);
 //            }
             EtrExchangeTradeCommonRiskcalResponse result = new EtrExchangeTradeCommonRiskcalResponse();
-            if(StringUtil.isNotEmpty(dto.getPs()) && StringUtil.equals(dto.getPs(), 交易方向_解除质押.getValue()) && StringUtil.equals(dto.getTradeMarket(),"03")) {//上交所
+            dto.setExpireSettleAmt(Objects.isNull(dto.getExpireSettleAmt())?BigDecimal.ZERO:dto.getExpireSettleAmt());
+            if(StringUtil.isNotEmpty(dto.getPs()) && StringUtil.equals(dto.getPs(), 交易方向_解除质押.getValue())
+                    && (StringUtil.equals(dto.getTradeMarket(),"03") || (StringUtil.equals(dto.getTradeMarket(),"04") && dto.getExpireSettleAmt().compareTo(BigDecimal.ZERO) == 0))) {
                 AjaxResult m =new AjaxResult();
                 result.setRiskMathFlag("02");
                 result.setRskStatus("0");

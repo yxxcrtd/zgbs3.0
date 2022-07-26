@@ -2771,6 +2771,7 @@ public class IbuComponentCommonService extends BaseService {
                     WflIbuQuoteEntCrepPledgeDto wflIbuQuoteEntCrepPledge = new WflIbuQuoteEntCrepPledgeDto();
                     BeanUtil.copyPropertiesIgnoreNull(wflIbuQuoteEntCrepPledge,item);
                     wflIbuQuoteEntCrepPledge.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
+                    wflIbuQuoteEntCrepPledge.setWorkflowId(cfetsRepoDealQuotedPrice001Dto.getWorkflowId());
                     wflIbuQuoteEntCrepPledges.add(wflIbuQuoteEntCrepPledge);
                 });
             }

@@ -93,6 +93,8 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 	private String fromEtrExchange;
 	private String busiPs;
 	private String assetType2;
+	
+	private String transCode;
 
 	/**
 	 * 质押券单位
@@ -559,6 +561,14 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 
 	public void setAssetType2(String assetType2) {
 		this.assetType2 = assetType2;
+	}
+
+	public String getTransCode() {
+		return transCode;
+	}
+
+	public void setTransCode(String transCode) {
+		this.transCode = transCode;
 	}
 
 	public String getPledgeUnit() {

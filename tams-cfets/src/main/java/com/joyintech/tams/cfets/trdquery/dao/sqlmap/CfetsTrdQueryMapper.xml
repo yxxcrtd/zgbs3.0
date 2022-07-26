@@ -151,12 +151,18 @@
         <if test="ps != null and !ps.equals('')">
             AND reg.ps=#{ps}
         </if>
-        <if test="finprodType2List != null and finprodType2List.size() > 0">
-            AND decode(reg.finprod_type2,'F01',decode(FPT.TYPE_9,'01','04','02','01'),'F02','02','F03','02') in
-            <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">
+        <if test="portfolioIdList != null and portfolioIdList.size() > 0">
+            AND deal.portfolioId in
+            <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
         </if>
+<!--        <if test="finprodType2List != null and finprodType2List.size() > 0">-->
+<!--            AND decode(reg.finprod_type2,'F01',decode(FPT.TYPE_9,'01','04','02','01'),'F02','02','F03','02') in-->
+<!--            <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">-->
+<!--                #{item}-->
+<!--            </foreach>-->
+<!--        </if>-->
         <if test="finprodIdList != null and finprodIdList.size() > 0">
             AND nvl(reg.finprod_id,reg.term_type) in
             <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
@@ -203,6 +209,9 @@
         </if>
         <if test="counterId != null and counterId != ''">
             AND reg.counter_id= #{counterId,jdbcType=VARCHAR}
+        </if>
+        <if test="regAssetType != null">
+            AND decode(reg.finprod_type2,'F01',decode(FPT.TYPE_9,'01','04','02','01'),'F02','02','F03','02') = #{regAssetType}
         </if>
         <if test="regStatusList != null and regStatusList.size() > 0">
             AND (case when  match.trd_conf_status is null and reg.is_cancel='N'  then '01'
@@ -330,12 +339,24 @@
             <if test="ps != null and !ps.equals('')">
                 AND #{PS_T01} =#{ps}
             </if>
-            <if test="finprodType2List != null and finprodType2List.size() > 0">
-                AND decode(FPT.TYPE_9,'01','04','02','01') in
-                <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">
+            <if test="secAcctIdList != null and secAcctIdList.size() > 0">
+                AND BRBP.SEC_ACCT_ID in
+                <foreach collection="secAcctIdList" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
+            <if test="portfolioIdList != null and portfolioIdList.size() > 0">
+                AND BRBP.PORTFOLIO_ID in
+                <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+<!--            <if test="finprodType2List != null and finprodType2List.size() > 0">-->
+<!--                AND decode(FPT.TYPE_9,'01','04','02','01') in-->
+<!--                <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">-->
+<!--                    #{item}-->
+<!--                </foreach>-->
+<!--            </if>-->
             <if test="finprodIdList != null and finprodIdList.size() > 0">
                 AND BO.FINPROD_ID IN
                 <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
@@ -351,6 +372,9 @@
             </if>
             <if test="tradeMarket != null and !tradeMarket.equals('')">
                 AND FP.TRADE_MARKET=#{tradeMarket,jdbcType=VARCHAR}
+            </if>
+            <if test="regAssetType != null">
+                AND decode(FPT.TYPE_9,'01','04','02','01') = #{regAssetType}
             </if>
             <if test="settleSpeed != null and settleSpeed != ''">
                 AND 1 != 1
@@ -451,7 +475,7 @@
                        ON EED.SEC_ACCT_ID=STLINFO1.SEC_ACCT_ID
                 where 1=1
                 <if test="secAcctIdList != null and secAcctIdList.size() > 0">
-                    AND BRBP.SEC_ACCT_ID in
+                    AND WBRBP.SEC_ACCT_ID in
                     <foreach collection="secAcctIdList" item="item" open="(" close=")" separator=",">
                         #{item}
                     </foreach>
@@ -476,6 +500,15 @@
         </if>
         <if test="startDate != null and !startDate.equals('')">
             AND  WBO.BID_DATE>= #{startDate,jdbcType=DATE}
+        </if>
+        <if test="portfolioIdList != null and portfolioIdList.size() > 0">
+            AND WBRBP.PORTFOLIO_ID in
+            <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="regAssetType != null">
+            and decode(FPT.TYPE_9,'01','04','02','01') = #{regAssetType}
         </if>
         <if test="endDate != null and !endDate.equals('')">
             AND  WBO.BID_DATE<![CDATA[<=]]>#{endDate,jdbcType=DATE}
@@ -624,12 +657,21 @@
         <if test="ps != null and !ps.equals('')">
             AND reg.ps=#{ps}
         </if>
-        <if test="finprodType2List != null and finprodType2List.size() > 0">
-            AND decode(reg.finprod_type2,'F01',decode(FPT.TYPE_9,'01','04','02','01'),'F02','02','F03','02') in
-            <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">
+        <if test="regAssetType != null">
+            AND decode(reg.finprod_type2,'F01',decode(FPT.TYPE_9,'01','04','02','01'),'F02','02','F03','02') = #{regAssetType}
+        </if>
+        <if test="portfolioIdList != null and portfolioIdList.size() > 0">
+            AND deal.portfolioId in
+            <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
         </if>
+<!--        <if test="finprodType2List != null and finprodType2List.size() > 0">-->
+<!--            AND decode(reg.finprod_type2,'F01',decode(FPT.TYPE_9,'01','04','02','01'),'F02','02','F03','02') in-->
+<!--            <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">-->
+<!--                #{item}-->
+<!--            </foreach>-->
+<!--        </if>-->
         <if test="finprodIdList != null and finprodIdList.size() > 0">
             AND nvl(reg.finprod_id,reg.term_type) in
             <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">

@@ -326,7 +326,7 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
         TrdProductDealAdd trdProductDealAdd = new TrdProductDealAdd();
         trdProductDealAdd.setTradeId(trdProductDeal.getTradeId());
         trdProductDealAdd.setPortfolioId(entity.getPortfolioId());
-        trdProductDealAdd.setEntrustId(entity.getPortfolioId());
+        trdProductDealAdd.setEntrustId(entity.getEntrustId());
         trdProductDealAdds.add(trdProductDealAdd);
         BatchBussSettleOrderParameterDto parameterDto = new BatchBussSettleOrderParameterDto();
         parameterDto.setIsTotalTrade(DictCodeList.是否_是.getValue());

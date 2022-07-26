@@ -809,7 +809,8 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                     outPledge.setEntrustId(entity.getEntrustId());
                     outPledge.setFinprodId(entity.getOutfinprodId());
                     // 质押面值
-                    outPledge.setPledgeFaceValue(entity.getOutPledgeFaceValue());
+                    // XYHGFXSJ-489:修改质押面值方法 modify by fuyongsheng 
+                    outPledge.setPledgeFaceValue(trdCommonBaseService.getFaceValue(entity.getOutfinprodId(), iPlatformDate.getSysDate()));
                     //质押率
                     outPledge.setPledgeRatio(ArithmeticUtil.divide(entity.getConRatio(), new BigDecimal(100), 2));
                     // 质押数量
@@ -989,6 +990,8 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 BeanUtil.copyPropertiesIgnoreNull(etrPledge, agreRepOpenSecDto);
                 list.add(etrPledge);
             }
+            //接触质押设置结算金额
+            etrEntrust.setEntrustAmt(entity.getExpireSettleAmt());
         }
         dto.setEtrEntrust(etrEntrust);
         if (etrEntrustAdd.getVpayDate() != null && etrEntrustAdd.getTermDays() != null) {
@@ -1442,7 +1445,9 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                     outPledge.setEntrustId(entity.getEntrustId());
                     outPledge.setFinprodId(entity.getOutfinprodId());
                     // 质押面值
-                    outPledge.setPledgeFaceValue(entity.getOutPledgeFaceValue());
+                    // XYHGFXSJ-489:修改质押面值方法 modify by fuyongsheng 20220725 start
+                    outPledge.setPledgeFaceValue(trdCommonBaseService.getFaceValue(entity.getOutfinprodId(), iPlatformDate.getSysDate()));
+                    // XYHGFXSJ-489:修改质押面值方法 modify by fuyongsheng 20220725 end
                     //质押率
                     outPledge.setPledgeRatio(ArithmeticUtil.divide(entity.getConRatio(), new BigDecimal(100), 2));
                     // 质押数量
@@ -1455,6 +1460,68 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 }
                 agreRepHwayChgSecDto.setList(list);
             }
+        } else if (上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
+
+            BeanUtil.copyProperties(agreRepHwayChgSecDto, etrSinglePortfolioDto);
+
+            // 请求号
+            agreRepHwayChgSecDto.setRequestId(entity.getReqOnId());
+
+            // 交易对手
+            agreRepHwayChgSecDto.setCounterId(entity.getCounterId());
+            //备注
+            agreRepHwayChgSecDto.setRemark(entity.getAddCla());
+            //回购方向
+            agreRepHwayChgSecDto.setBusiPs(entity.getRepPs());
+            // 质押券代码
+            agreRepHwayChgSecDto.setRepSecId(entity.getNewRepSecId());
+            // 目标类型
+            agreRepHwayChgSecDto.setTargetType(DictCodeListExt3.目标类型_金额.getValue());
+            agreRepHwayChgSecDto.setTradeId(entity.getIntiTradeId());
+
+            if (DictCodeList.回购拆借方向_正回购.getValue().equals(entity.getRepPs())) {
+                agreRepHwayChgSecDto.setAssetType10("H03");
+            } else if (DictCodeList.回购拆借方向_逆回购.getValue().equals(entity.getRepPs())) {
+                agreRepHwayChgSecDto.setAssetType10("H04");
+            }
+            agreRepHwayChgSecDto.setEntrustAmt(entity.getOutAmt());
+            agreRepHwayChgSecDto.setEntrustNum(entity.getOutAmt());
+
+            //无法从页面带回购首期的部分数据，需要重新查一次
+            Map<String, Object> queryMap = new HashMap<>();
+            queryMap.put("tradeId", agreRepHwayChgSecDto.getFinprodId());
+            List<EtrExchangeAgreRepTrade001Dto> repFristList = etrExchangeAgreRepTradeMapper.getEntrustInfoByTradeId(queryMap);
+            if (!StringUtil.isEmptyList(repFristList)) {
+                repFristList.forEach(item -> {
+                    // 到期应计利息
+                    agreRepHwayChgSecDto.setmIntAmt(item.getIntAmt());
+
+                    //到期结算金额
+                    agreRepHwayChgSecDto.setmTradeAmt(item.getExpireSettleAmt());
+
+                    // 首次交收日
+                    if (StringUtil.isNotEmpty(item.getFristSettleDate())) {
+                        agreRepHwayChgSecDto.setVpayDate(DateUtil.parse(item.getFristSettleDate()));
+                    }
+                    if (StringUtil.isNotEmpty(item.getExpireSettleDate())) {
+                        // 到期交收日
+                        agreRepHwayChgSecDto.setMpayDate(DateUtil.parse(item.getExpireSettleDate()));
+                    }
+
+                    //占款天数
+                    if (item.getOccupyDays() != null) {
+                        agreRepHwayChgSecDto.setCapDays(BigDecimal.valueOf(item.getOccupyDays()));
+                    }
+
+                    // 期限天数，到期日-起息日
+                    if (item.getTerm() != null) {
+                        agreRepHwayChgSecDto.setTermDays(Long.valueOf(item.getTerm()));
+                    }
+                });
+            }
+
+            BeanUtil.copyPropertiesIgnoreNull(etrEntrust, agreRepHwayChgSecDto);
+            BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, agreRepHwayChgSecDto);
         } else if (DictCodeListExt3.上农商_指令业务类型_协议回购解除质押指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
 
             BeanUtil.copyProperties(agreRepOpenSecDto, etrSinglePortfolioDto);
@@ -1559,7 +1626,10 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
 
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, agreRepOpenSecDto);
-            etrEntrust.setEntrustAmt(entity.getExpireSettleAmt());
+            if(!StringUtils.isEmpty(entity.getExpireSettleAmt())){
+                etrEntrust.setEntrustAmt(entity.getExpireSettleAmt());
+                agreRepOpenSecDto.setEntrustAmt(entity.getExpireSettleAmt());
+            }
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, agreRepOpenSecDto);
         }
 
@@ -2319,7 +2389,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 if (StringUtil.isNotBlank(entity.getWorkflowId())) {
                     doDeleteWflEntity(entity.getWorkflowId());
                 }
-                //doInsertWflEntity(entity);
+                doInsertWflEntity(entity);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new BusinessException("MSG:指令提交发生异常，异常信息：" + e.getMessage());
@@ -2596,6 +2666,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             logger.info("新建指令持仓请求报文:" + JsonUtils.object2Json(parameter));
             commonPositionService.process(parameter);
         } catch (Exception e) {
+            logger.error("新建指令持仓请求失败:", e);
             e.printStackTrace();
         }
     }
@@ -2743,6 +2814,9 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
     //获取首期交易编号
     public EtrExchangeAgreRepCurrResp getFinprodIdNoFirsts(EtrExchangeAgreRepTrade001Dto dto) {
         String tradeId = "";
+        if(StringUtils.isEmpty(dto.getIntiTradeId())){
+            return null;
+        }
         //wsz 修改行情到期续作 首次结算时间传值
         String date = "";
         if (!StringUtils.isEmpty(dto.getOrigSerialDate())
@@ -2819,7 +2893,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
     /**
      * 质押券下拉框列表
      *
-     * @param dto
+     * @param tradeId
      * @return
      */
     public List<EtrExchangeAgreOutRepResp> selectCurrPledgeList(String tradeId) {
@@ -2834,10 +2908,14 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
     /**
      * 根据资金账号查询组合列表
-     *
-     * @param acctNo 资金账号
+     * @param acctNo
+     * @param search
+     * @return
      */
-    public List<SelectOptionDto> selectPortfolioList(String acctNo) {
-        return etrExchangeAgreRepTradeMapper.selectPortfolioList(acctNo);
+    public List<SelectOptionDto> selectPortfolioList(String acctNo, String search) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("acctNo", acctNo);
+        map.put("search", search);
+        return etrExchangeAgreRepTradeMapper.selectPortfolioList(map);
     }
 }

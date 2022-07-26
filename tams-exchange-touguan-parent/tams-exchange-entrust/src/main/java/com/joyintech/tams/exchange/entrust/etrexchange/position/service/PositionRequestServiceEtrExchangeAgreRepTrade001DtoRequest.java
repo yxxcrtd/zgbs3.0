@@ -3,6 +3,7 @@ package com.joyintech.tams.exchange.entrust.etrexchange.position.service;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
@@ -12,6 +13,7 @@ import com.joyintech.tams.common.base.dao.FinTradeProductMapper;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.common.base.entity.FinTradeProduct;
 import com.joyintech.tams.common.base.entity.FinTradeProductKey;
+import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -22,17 +24,16 @@ import com.joyintech.tams.exchange.entrust.etrexchange.position.constant.Positio
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeCommonervice;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
+import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import com.joyintech.tams.invest.entrust.etragrereptrade.dto.EtrAgreRepTradeDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.B_TOTAL_TRADE_ID;
@@ -50,7 +51,7 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
     @Autowired
     private TamsBusinessCommonService tamsBusinessCommonService;
     @Autowired
-    private EtrTradeCommonervice etrTradeCommonervice;
+    private TrdCommonBaseService trdCommonBaseService;
 
     @Autowired
     private EtrEntrustMapper etrEntrustMapper;
@@ -184,11 +185,19 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
             bean.setTradeId(null);
             bean.setEtrId(entity.getEntrustId());
 
-            String tradeId = StringUtil.isEmpty(entity.getIntiTradeId()) ? entity.getTradeId() : entity.getIntiTradeId();
+            // 在途回购里的 协议回购非首期指令的initialNum存的是首期交易编号,可直接取
+            String sqTradeID = entity.getInitialNum();
+            if(StringUtil.isEmpty(sqTradeID)){// 如果为空,说明是从协议回购行情新建的指令,须通过首期成交编号进行查询
+                String tradeId = StringUtil.isEmpty(entity.getIntiTradeId()) ? entity.getTradeId() : entity.getIntiTradeId();
+                Date vDate = DateUtil.parse(entity.getOrigSerialDate());
+                TrdProductDeal trdProductDeal = trdCommonBaseService.getFirstRepoTrade(tradeId,
+                        "", entity.getSecAcctId(), vDate);
+                if (trdProductDeal != null) {
+                    sqTradeID = trdProductDeal.getFinprodId();
+                }
+            }
             // XYHGFXSJ-425:修改取首期的到期结算金额逻辑 modify by fuyongsheng 20220724 start
             //取首期的到期结算金额
-           // 协议回购非首期指令的initialNum存的是首期交易编号
-            String sqTradeID = entity.getInitialNum();
             FinTradeProductKey key = new FinTradeProductKey();
             key.setBranch(0L);
             key.setFinprodId(sqTradeID);
