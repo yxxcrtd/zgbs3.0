@@ -123,6 +123,8 @@ public class MessageSenderHelper {
         tradeMessage.setFinprodId(instruction.getFinprodId());
         //委托数量
         tradeMessage.setEntrustVolume((double) entrust.getEntrustVolume());
+        //成交金额
+        tradeMessage.setEntrustBalance(trade.getTradedBalance());
 
 //        if (EntrustUtils.isCreditProtectionCertificate(instruction.getBusiTypeTg())) {
 //            tradeMessage.setDealVolume((double) trade.getTradedVolume() * 100);
