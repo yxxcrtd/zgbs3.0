@@ -411,6 +411,7 @@ public class PositionRequestTradeReportService {
             }
             if (DictCodeListExt3.交易方向_正回购.getValue().equals(entity.getPs())
                     || DictCodeListExt3.交易方向_中途换券.getValue().equals(entity.getPs())
+                    || DictCodeListExt3.交易方向_到期续做.getValue().equals(entity.getPs())
                     || DictCodeListExt3.交易方向_解除质押.getValue().equals(entity.getPs())) {
                 Map<String, Object> ptlSec = new HashMap<>();
                 ptlSec.put("portfolioId", dto.getPortfolioId());

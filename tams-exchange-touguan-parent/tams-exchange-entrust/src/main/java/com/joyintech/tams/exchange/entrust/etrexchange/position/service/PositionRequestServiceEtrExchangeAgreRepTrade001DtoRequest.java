@@ -223,6 +223,7 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
                  (交易方向_首期.getValue().equals(ps)
                          || 交易方向_正回购.getValue().equals(ps)
                          || 交易方向_逆回购.getValue().equals(ps)
+                         || 交易方向_到期续做.getValue().equals(ps)
                          || 交易方向_中途换券.getValue().equals(ps))) {
             List<Map<String, Object>> list = new ArrayList<>(1);
             bean = new PositionRequestBaseBean();

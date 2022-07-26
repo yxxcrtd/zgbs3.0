@@ -417,6 +417,7 @@ public class PositionRequestManualSettleService {
         // if (DictCodeListExt3.交易方向_解除质押.getValue().equals(infContractDetailfile.getPs())) {
         if (DictCodeListExt3.交易方向_正回购.getValue().equals(infContractDetailfile.getPs())
             || DictCodeListExt3.交易方向_中途换券.getValue().equals(infContractDetailfile.getPs())
+            || DictCodeListExt3.交易方向_到期续做.getValue().equals(infContractDetailfile.getPs())
             || DictCodeListExt3.交易方向_解除质押.getValue().equals(infContractDetailfile.getPs())) {
             List<Map<String, Object>> list = new ArrayList<>(4);
             Map<String, Object> map = new HashMap<>();
