@@ -168,6 +168,12 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
      */
     private String acctName;
 
+    private String acctNo;
+
+    private String secAcctId;
+
+    private String finprodId;
+
     /**
      * 回购期限
      */
@@ -301,6 +307,10 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
     }
 
     public String getMarket() {
+        return market;
+    }
+
+    public String getTradeMarket() {
         return market;
     }
 
@@ -653,5 +663,29 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
 
     public void setCounterInvestorNo(String counterInvestorNo) {
         this.counterInvestorNo = counterInvestorNo;
+    }
+
+    public String getAcctNo() {
+        return acctNo;
+    }
+
+    public void setAcctNo(String acctNo) {
+        this.acctNo = acctNo;
+    }
+
+    public String getSecAcctId() {
+        return secAcctId;
+    }
+
+    public void setSecAcctId(String secAcctId) {
+        this.secAcctId = secAcctId;
+    }
+
+    public String getFinprodId() {
+        return finprodId;
+    }
+
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
     }
 }
