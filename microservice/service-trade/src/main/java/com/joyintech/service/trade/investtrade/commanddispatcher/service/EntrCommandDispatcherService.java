@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.joyintech.tams.constant.DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令_换钱;
+
 /**
  *
  * 指令分发接口Service
@@ -124,7 +126,10 @@ public class EntrCommandDispatcherService extends BaseService<EntrCommandDispatc
 	    	for(EntrCommandDispatcherDto dto : list) {
 	    		if("F02".equals(dto.getFinprodType2()) || "F03".equals(dto.getFinprodType2()) ) {
 					if (StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), dto.getBusiTypeTg()) ||
-							StringUtil.equals(DictCodeListExt3.投管业务类型_中途换券.getValue(), dto.getBusiTypeTg())) {
+							(StringUtil.equals(DictCodeListExt3.投管业务类型_中途换券.getValue(), dto.getBusiTypeTg()) &&
+									!上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(dto.getEntrustBussType())
+									)
+					) {
 						List<EntrTradePledgeDto> queryEtrPledgeList = entrTradeSysInterfMapper.queryEtrPledgeListByEtrId(dto.getEntrustId());
 						if(queryEtrPledgeList!=null && !queryEtrPledgeList.isEmpty()) {
 							pledgelist.addAll(queryEtrPledgeList);
