@@ -486,7 +486,7 @@
         fin_trade_product.Mdate backDate, /** 回购到期日 **/
         fin_trade_product.Trade_Market market, /** 市场 **/
         /*fin_deal_pledge.pledge_finprod_id stockCode,*/ /** 质押券代码 **/
-        nvl(fp.FINPROD_NAME,fp.FINPROD_ABBR) stockName,
+        nvl(fp.FINPROD_ABBR ,fp.FINPROD_NAME) stockName,
         nvl(fp.FINPROD_MARKET_ID,fin_deal_pledge.pledge_finprod_id) stockCode,
         fin_deal_pledge.Pledge_Ratio * 100 discountRate, /** 折算率 **/
         fin_deal_pledge.Pledge_Number / 100 repSecNum, /** 质押券数量 **/
