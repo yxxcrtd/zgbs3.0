@@ -225,10 +225,10 @@ public class TradeCallbackHelper {
         tradeRecord.setTradingDay(entrust.getTradingDay());
         //质押入库的三条成交合约代码可能不一致，需要保留
         String market = entrust.getMarket();
-        if (Strings.isNullOrEmpty(market)) {
+        if (Strings.isNullOrEmpty(market) && StringUtil.isNotEmpty(entrust.getStockCode())) {
             market = StockCodeUtils.getMarket(entrust.getStockCode());
         }
-        if(StringUtil.isNotEmpty(tradeRecord.getStockCode())){
+        if (StringUtil.isNotEmpty(tradeRecord.getStockCode())) {
             tradeRecord.setStockCode(StockCodeUtils.formatStockCode(tradeRecord.getStockCode(), market));
         }
         if (Strings.isNullOrEmpty(tradeRecord.getStockName())) {
@@ -336,8 +336,8 @@ public class TradeCallbackHelper {
 //                    }
 //                }
                 //信用证保护凭证买入、卖出推手动交收 申购推成交回报
-            }else if(InvestAssetTypeEnum.isCreditProtectionCertificate(instruction.getAssetType()) && (DictCodeList.交易方向_买入.getValue().equals(instruction.getPs()) || DictCodeList.交易方向_卖出.getValue().equals(instruction.getPs()))){
-                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages,pledgeTradeMessages);
+            } else if (InvestAssetTypeEnum.isCreditProtectionCertificate(instruction.getAssetType()) && (DictCodeList.交易方向_买入.getValue().equals(instruction.getPs()) || DictCodeList.交易方向_卖出.getValue().equals(instruction.getPs()))) {
+                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages, pledgeTradeMessages);
                 return;
             }
 //            messageSenderService.pushTradeToMQ(tradeRecord, instruction, entrust);

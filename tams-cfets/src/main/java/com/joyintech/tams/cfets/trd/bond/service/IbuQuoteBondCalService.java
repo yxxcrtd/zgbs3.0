@@ -206,12 +206,12 @@ public class IbuQuoteBondCalService extends BaseService {
         String sellPara = CacheUtil.getSysParam("SHORT_SELLING_SUPPORTED");
         String ps = autoAllocationRequest.getPs();
         //全价总额和净价总额为空  处理(请求报价)
-        if (null == autoAllocationRequest.getCpriceAmt() || BigDecimal.ZERO.compareTo(autoAllocationRequest.getCpriceAmt()) == 0) {
+//        if (null == autoAllocationRequest.getCpriceAmt() || BigDecimal.ZERO.compareTo(autoAllocationRequest.getCpriceAmt()) == 0) {
             autoAllocationRequest.setCpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(autoAllocationRequest.getShareAmt(), autoAllocationRequest.getPrice()), new BigDecimal(100), 2));
-        }
-        if (null == autoAllocationRequest.getFpriceAmt() || BigDecimal.ZERO.compareTo(autoAllocationRequest.getFpriceAmt()) == 0) {
+//        }
+//        if (null == autoAllocationRequest.getFpriceAmt() || BigDecimal.ZERO.compareTo(autoAllocationRequest.getFpriceAmt()) == 0) {
             autoAllocationRequest.setFpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(autoAllocationRequest.getShareAmt(), autoAllocationRequest.getUnitFprice()), new BigDecimal(100), 2));
-        }
+//        }
         //备份剩余额度
         List<PtlAllocationDto> ptlAllocations = autoAllocationRequest.getPtlAllocations();
         try {

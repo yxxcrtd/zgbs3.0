@@ -9,6 +9,7 @@ import com.joyintech.tams.exchange.common.constant.Market;
 import com.joyintech.tams.exchange.common.db.domain.BatchInfo;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
 import com.joyintech.tams.exchange.common.db.domain.OrderInterface;
+import com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum;
 
 import java.util.Objects;
 
@@ -20,6 +21,9 @@ public class CheckParamUtils {
     public static ErrorCode checkIntegratedEntrustParam(IntegratedEntrust integratedEntrust) {
         if (EntrustUtils.isNewBond(integratedEntrust.getBusiTypeTg())) {
             return getErrorCode(integratedEntrust);
+        }
+        if (EntrustUtils.isPledgeAgreementRepurchase(integratedEntrust.getBusiTypeTg())) {
+            return getErrorCode(integratedEntrust.getBusiTypeTg(), integratedEntrust.getInstructionId(), integratedEntrust.getEntrustBs(), integratedEntrust.getStockCode(), integratedEntrust.getEntrustProp());
         }
 
         return getErrorCode(integratedEntrust.getUserId(), integratedEntrust.getInstructionId(), integratedEntrust.getEntrustBs(), integratedEntrust.getStockCode(), integratedEntrust.getEntrustProp(), null, integratedEntrust.getLiaisonName(), integratedEntrust.getContractId(), null, null);
@@ -112,6 +116,23 @@ public class CheckParamUtils {
         }
 
         return getErrorCode(integratedEntrust.getUserId(), integratedEntrust.getInstructionId(), integratedEntrust.getEntrustBs(), stockCode, integratedEntrust.getEntrustProp(), null, integratedEntrust.getLiaisonName(), integratedEntrust.getContractId(), null, null);
+    }
+
+    public static ErrorCode getErrorCode(String busiTypeTg,String instructionId, String entrustBs, String stockCode, String entrustProp) {
+        if (Strings.isNullOrEmpty(instructionId))
+            return ErrorCode.REQ_PARAMETER_INSTRUCTION_ID_ERROR;
+        if (Strings.isNullOrEmpty(entrustBs))
+            return ErrorCode.REQ_PARAMETER_ENTRUST_BS_ERROR;
+        if(!BusiTypeTgEnum.中途换券.codeEquals(busiTypeTg)){
+            if (Strings.isNullOrEmpty(stockCode) || StockCodeUtils.getMarketAndStockCode(stockCode).length != 2)
+                return ErrorCode.REQ_PARAMETER_STOCK_CODE_ERROR;
+        }
+//        if (IntegratedEntrustUtils.isProtocolBack_SZ(entrustProp) && Market.SHSE.value.equals(market))
+//            return ErrorCode.SH_UN_SUPPORT_PROTOCOL_BACK_INSTRUMENT;
+//        if (IntegratedEntrustUtils.isProtocolBack_SH(entrustProp) && Market.SZSE.value.equals(market))
+//            return ErrorCode.SZ_UN_SUPPORT_PROTOCOL_BACK_INSTRUMENT;
+
+        return ErrorCode.SUCCESS;
     }
 
     public static boolean checkBuyUnit(OrderInterface orderInterface, long entrustVolume, int buyUnit) {

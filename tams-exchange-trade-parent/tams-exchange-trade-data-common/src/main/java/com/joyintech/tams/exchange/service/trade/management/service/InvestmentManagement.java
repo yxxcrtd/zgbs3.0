@@ -742,8 +742,12 @@ public class InvestmentManagement extends BaseService {
         BigDecimal pledgeRatioAmt = BigDecimal.ZERO;
         for (InstructionPledge pledge : pledges) {
             finprodIds.add(pledge.getFinprodId());
-            finprodMarketIds.add(pledge.getFinprodMarketId());
-            finprodAbbrs.add(pledge.getFinprodAbbr());
+            if(StringUtil.isNotEmpty(pledge.getFinprodMarketId())){
+                finprodMarketIds.add(pledge.getFinprodMarketId());
+            }
+            if(StringUtil.isNotEmpty(pledge.getFinprodAbbr())){
+                finprodAbbrs.add(pledge.getFinprodAbbr());
+            }
             pledgeAmt = pledgeAmt.add(pledge.getPledgeAmt());
             pledgeNumber = pledgeNumber.add(pledge.getPledgeNumber());
             //折算率*100
@@ -753,9 +757,9 @@ public class InvestmentManagement extends BaseService {
         instructionPledge.setEntrustId(pledge.getEntrustId());
         instructionPledge.setTradeMarket(pledge.getTradeMarket());
         instructionPledge.setDisplaceDir(pledge.getDisplaceDir());
-        instructionPledge.setFinprodId(String.join(",", finprodIds));
-        instructionPledge.setFinprodMarketId(String.join(",", finprodMarketIds));
-        instructionPledge.setFinprodAbbr(String.join(",", finprodAbbrs));
+        instructionPledge.setFinprodId(StrUtil.join(",", finprodIds));
+        instructionPledge.setFinprodMarketId(StrUtil.join(",", finprodMarketIds));
+        instructionPledge.setFinprodAbbr(StrUtil.join(",", finprodAbbrs));
         instructionPledge.setPledgeAmt(pledgeAmt);
         instructionPledge.setPledgeNumber(pledgeNumber);
         // instructionPledge.setPledgeRatio(pledgeRatioAmt.divide(pledgeNumber, 2, RoundingMode.HALF_UP));

@@ -236,6 +236,8 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         if(DictCodeListExt3.交易方向_解除质押.getValue().equals(entrustDto.getPs())
                 && null != trdFinProductDealTotal.getTradeAmt()){
             TrdProductDealDto trdProductDeal = createTrdProductDealCommon(dealDto, entrustDto, trdFinProductDealTotal);
+            // 金融产品ID
+            trdProductDeal.setFinprodId(trdFinProductDealTotal.getFinprodId());
             //交易方向
             trdProductDeal.setPs(DictCodeList.交易方向_到期.getValue());
             //全价总额
@@ -244,6 +246,8 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
             trdProductDeal.setTradeAmt(trdFinProductDealTotal.getTradeAmt());
             // 金融产品类型
             trdProductDeal.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+            // 金融产品类型
+            trdProductDeal.setFinprodType(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
             trdProductDealList.add(trdProductDeal);
         }
         return trdProductDealList;

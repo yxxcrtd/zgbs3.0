@@ -197,6 +197,7 @@ public class OrderController {
             integratedEntrust.setSellerNo(order.getRequestNo());
         }
         integratedEntrust.setExtend2(JsonUtils.getJsonFromObject(extend2));
+        integratedEntrust.setBusiTypeTg(instruction.getBusiTypeTg());
 
         try {
             return new Message<>(orderManagement.sendIntegratedEntrust(integratedEntrust.getUserId(), integratedEntrust));
