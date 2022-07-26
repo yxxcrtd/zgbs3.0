@@ -1699,6 +1699,11 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
                 EtrComponentFactory.getComponentService(AgreRepHwayChgSecDto.class).updateSettings(paraDto);
                 EtrComponentFactory.getComponentService(AgreRepHwayChgSecDto.class).entrustNew(agreRepHwayChgSecDto);
+            } else if (上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
+                agreRepHwayChgSecDto.setEntrustStatus(etrSinglePortfolioDto.getEntrustStatus());
+
+                EtrComponentFactory.getComponentService(AgreRepHwayChgSecDto.class).updateSettings(paraDto);
+                EtrComponentFactory.getComponentService(AgreRepHwayChgSecDto.class).entrustNew(agreRepHwayChgSecDto);
             } else if (DictCodeListExt3.上农商_指令业务类型_协议回购解除质押指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
                 agreRepOpenSecDto.setEntrustStatus(etrSinglePortfolioDto.getEntrustStatus());
 
@@ -1740,6 +1745,11 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 if (StringUtil.isNotEmpty(oldEtrEntrust)) {
                     agreRepHwayChgSecDto.setOldFinprodId(oldEtrEntrust.getFinprodId());
                 }
+                EtrComponentFactory.getComponentService(AgreRepHwayChgSecDto.class).updateSettings(paraDto);
+                EtrComponentFactory.getComponentService(AgreRepHwayChgSecDto.class).entrustEdit(agreRepHwayChgSecDto);
+            } else if (上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
+                agreRepHwayChgSecDto.setEntrustStatus(etrSinglePortfolioDto.getEntrustStatus());
+
                 EtrComponentFactory.getComponentService(AgreRepHwayChgSecDto.class).updateSettings(paraDto);
                 EtrComponentFactory.getComponentService(AgreRepHwayChgSecDto.class).entrustEdit(agreRepHwayChgSecDto);
             } else if (DictCodeListExt3.上农商_指令业务类型_协议回购解除质押指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
