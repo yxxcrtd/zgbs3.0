@@ -199,6 +199,27 @@ public class EtrExchangeAgreRepTrade003Dto extends EtrEntrust{
 
     private String initialNum;
 
+    @ApiModelProperty(name="swapOrigFinprodId",value="中途换券当前质押券")
+    private String swapOrigFinprodId;
+    
+    @ApiModelProperty(name="swapOrigFinprodMarketId",value="中途换券当前质押代码")
+    private String swapOrigFinprodMarketId;
+
+    @ApiModelProperty(name="swapOrigFinprodAbbr",value="中途换券当前质押券名称")
+    private String swapOrigFinprodAbbr;
+
+    @ApiModelProperty(name="swapOutFinprodId",value="中途换券换出质押券")
+    private String swapOutFinprodId;
+
+    @ApiModelProperty(name="swapOutFinprodMarketId",value="中途换券换出质押代码")
+    private String swapOutFinprodMarketId;
+
+    @ApiModelProperty(name="swapOutFinprodAbbr",value="中途换券换出质押券名称")
+    private String swapOutFinprodAbbr;
+
+    @ApiModelProperty(name="swapOutRepSecNum",value="中途换券换出质押数量")
+    private BigDecimal swapOutRepSecNum;
+
     public String getFinishAmt() {
         return finishAmt;
     }
@@ -715,5 +736,61 @@ public class EtrExchangeAgreRepTrade003Dto extends EtrEntrust{
 
     public void setInitialNum(String initialNum) {
         this.initialNum = initialNum;
+    }
+
+    public String getSwapOrigFinprodId() {
+        return swapOrigFinprodId;
+    }
+
+    public void setSwapOrigFinprodId(String swapOrigFinprodId) {
+        this.swapOrigFinprodId = swapOrigFinprodId;
+    }
+
+    public String getSwapOrigFinprodMarketId() {
+        return swapOrigFinprodMarketId;
+    }
+
+    public void setSwapOrigFinprodMarketId(String swapOrigFinprodMarketId) {
+        this.swapOrigFinprodMarketId = swapOrigFinprodMarketId;
+    }
+
+    public String getSwapOrigFinprodAbbr() {
+        return swapOrigFinprodAbbr;
+    }
+
+    public void setSwapOrigFinprodAbbr(String swapOrigFinprodAbbr) {
+        this.swapOrigFinprodAbbr = swapOrigFinprodAbbr;
+    }
+
+    public String getSwapOutFinprodId() {
+        return swapOutFinprodId;
+    }
+
+    public void setSwapOutFinprodId(String swapOutFinprodId) {
+        this.swapOutFinprodId = swapOutFinprodId;
+    }
+
+    public String getSwapOutFinprodMarketId() {
+        return swapOutFinprodMarketId;
+    }
+
+    public void setSwapOutFinprodMarketId(String swapOutFinprodMarketId) {
+        this.swapOutFinprodMarketId = swapOutFinprodMarketId;
+    }
+
+    public String getSwapOutFinprodAbbr() {
+        return swapOutFinprodAbbr;
+    }
+
+    public void setSwapOutFinprodAbbr(String swapOutFinprodAbbr) {
+        this.swapOutFinprodAbbr = swapOutFinprodAbbr;
+    }
+
+    public BigDecimal getSwapOutRepSecNum() {
+        return swapOutRepSecNum;
+    }
+
+    public void setSwapOutRepSecNum(BigDecimal swapOutRepSecNum) {
+        this.swapOutRepSecNum = swapOutRepSecNum;
     }
 }
