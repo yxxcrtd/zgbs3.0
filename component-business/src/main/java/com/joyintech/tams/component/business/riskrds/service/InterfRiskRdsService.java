@@ -1208,7 +1208,11 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                     if(StringUtil.isEmpty(infRiskRdsDto.getAssetType2()) || StringUtil.equals("null",infRiskRdsDto.getAssetType2())) {
                         infMap.put("assetType2",CommonUtil.findValue(dataMap, "repPs"));
                     }
-
+                    if (StringUtil.isNotEmpty(CommonUtil.findValue(dataMap, "counterId"))) {
+                        infMap.put("isNullCounter",BaseDictCodeList.是否_是.getValue());
+                    } else {
+                        infMap.put("isNullCounter",BaseDictCodeList.是否_否.getValue());
+                    }
                     result.add(infMap);
                 }
             }
