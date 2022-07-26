@@ -714,7 +714,8 @@
         DECODE(etr_entrust.ps, 'T94', swapPledge.finprod_id, null)                                      AS swapOutFinprodId, /**中途换券换出质押券**/
         DECODE(etr_entrust.ps, 'T94', swapPledge.Finprod_Market_Id, null)                                      AS swapOutFinprodMarketId, /**中途换券换出质押代码**/
         DECODE(etr_entrust.ps, 'T94', swapPledge.finprod_abbr, null)                                      AS swapOutFinprodAbbr, /**中途换券换出质押券名称**/
-        DECODE(etr_entrust.ps, 'T94', swapPledge.PLEDGE_NUMBER, null)                                       AS swapOutRepSecNum, /** 质押数量 **/
+        DECODE(etr_entrust.ps, 'T94', swapPledge.PLEDGE_NUMBER, null)                                       AS swapOutRepSecNum, /** 中途换券换出质押数量 **/
+        DECODE(etr_entrust.ps, 'T94', swapPledge.Pledge_Ratio, null)                                       AS swapOutConRatio, /** 中途换券换出折算率 **/
         case
         when etr_entrust.trade_market = #{TRADE_PLACE_03} then
         #{UNIT_04}
@@ -942,6 +943,7 @@
             DECODE(wfl_etr_entrust.ps, 'T94', swapPledge.Finprod_Market_Id, null)                                      AS swapOutFinprodMarketId, /**中途换券换出质押代码**/
             DECODE(wfl_etr_entrust.ps, 'T94', swapPledge.finprod_abbr, null)                                      AS swapOutFinprodAbbr, /**中途换券换出质押券名称**/
             DECODE(wfl_etr_entrust.ps, 'T94', swapPledge.PLEDGE_NUMBER, null)                                       AS swapOutRepSecNum, /** 质押数量 **/
+            DECODE(wfl_etr_entrust.ps, 'T94', swapPledge.Pledge_Ratio, null)                                       AS swapOutConRatio, /** 中途换券换出折算率 **/
             case
             when wfl_etr_entrust.trade_market = #{TRADE_PLACE_03} then
             #{UNIT_04}

@@ -223,6 +223,9 @@ public class EtrExchangeAgreRepTrade003Dto extends EtrEntrust{
     @ApiModelProperty(name="swapOutRepSecNum",value="中途换券换出质押数量")
     private BigDecimal swapOutRepSecNum;
 
+    @ApiModelProperty(name="swapOutConRatio",value="中途换券换出折算率")
+    private BigDecimal swapOutConRatio;
+
     public String getFinishAmt() {
         return finishAmt;
     }
@@ -803,5 +806,13 @@ public class EtrExchangeAgreRepTrade003Dto extends EtrEntrust{
 
     public void setSwapOrigRepSecNum(BigDecimal swapOrigRepSecNum) {
         this.swapOrigRepSecNum = swapOrigRepSecNum;
+    }
+
+    public BigDecimal getSwapOutConRatio() {
+        return swapOutConRatio;
+    }
+
+    public void setSwapOutConRatio(BigDecimal swapOutConRatio) {
+        this.swapOutConRatio = swapOutConRatio;
     }
 }
