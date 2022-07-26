@@ -683,4 +683,14 @@
 		WHERE F.FINPROD_ID = #{finprodId, jdbcType=VARCHAR}
 		  AND F.BRANCH = 0
     </select>
+
+    <select id="selectByTradeId" resultMap="BaseResultMap">
+        select
+        <include refid="com.joyintech.tams.common.base.dao.FinTradeProductMapper.Base_Column_List" />
+        from FIN_TRADE_PRODUCT
+        where FINPROD_ID = (select FINPROD_ID from TRD_PRODUCT_TEMP_DEAL where F_TRADE_ID=#{tradeId} and ROWNUM=1)
+    </select>
+
+
+
 </mapper>
