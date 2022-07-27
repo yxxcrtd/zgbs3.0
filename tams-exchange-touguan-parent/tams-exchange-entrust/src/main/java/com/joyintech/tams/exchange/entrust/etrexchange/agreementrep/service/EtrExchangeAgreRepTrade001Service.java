@@ -807,6 +807,8 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 etrPledge.setFinprodId(entity.getNewfinprodId());
                 etrPledge.setDisplaceDir(DictCodeListExt3.质押券置换_置换方向_换入.getValue());
                 list.add(etrPledge);
+                etrEntrust.setEntrustAmt(etrPledge.getPledgeAmt());
+                etrEntrust.setEntrustNum(etrPledge.getPledgeNumber());
                 //换出券
                 if (entity.getOutRepSecNum() != null) {
                     EtrPledge outPledge = new EtrPledge();
@@ -1339,6 +1341,8 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             }
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, agreRepExpireUnBuyDto);
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, agreRepExpireUnBuyDto);
+            etrEntrust.setEntrustAmt(agreRepExpireUnBuyDto.getPledgeAmt());
+            etrEntrust.setEntrustNum(agreRepExpireUnBuyDto.getPledgeNumber());
             etrEntrustAdd.setRedoType(entity.getRedoType());
             agreRepExpireUnBuyDto.setRedoType(entity.getRedoType());
         } else if (DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
@@ -1443,6 +1447,8 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 etrPledge.setDisplaceDir(DictCodeListExt3.质押券置换_置换方向_换入.getValue());
                 displaceDir = DictCodeListExt3.质押券置换_置换方向_换入.getValue();
                 list.add(etrPledge);
+                agreRepHwayChgSecDto.setEntrustNum(etrPledge.getPledgeNumber());
+                agreRepHwayChgSecDto.setEntrustAmt(etrPledge.getPledgeAmt());
                 //换出券
                 if (entity.getOutRepSecNum() != null) {
                     EtrPledgeDto outPledge = new EtrPledgeDto();
