@@ -922,6 +922,10 @@ public class StlDataDealSzdSjsjgProcessService {
             // 查询首期
             SettleTransData sqSettleTransData = trdCommonBaseService.selectSqSettleTransDatas(settleTransData.getfCjbh(),
                     settleTransData.getSeatNumber(), settleTransData.getSecAcctId(), settleTransData.getVdate()).get(0);
+            // 金融产品类型
+            settleTransData.setFinprodType(sqSettleTransData.getFinprodType());
+            // 金融产品类型
+            settleTransData.setFinprodType2(sqSettleTransData.getFinprodType2());
             // 金融产品代码
             settleTransData.setFinprodId(sqSettleTransData.getFinprodId());
             // 交易份额
