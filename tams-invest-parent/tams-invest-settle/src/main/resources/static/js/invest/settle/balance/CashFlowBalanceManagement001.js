@@ -45,6 +45,9 @@
                 {field: 'groupId', title: '匹配状态',width:100, sortable: false}
                 , {
                     field: 'sysTradeId', title: '业务编号', sortable: false, width:200, render: function (data, type, row, meta) {
+                        if(row.sysBussType=='10'||row.sysBussType=='35'||row.sysBussType=='36'||row.sysBussType=='37'){
+                            return data;
+                        }
                         return "<a class='pro-link' style='cursor: pointer;' " +
                             "href='javascript:openOperateWindow(\""+STATUS_VALID_05+"\",\"" + row.sysBussType + "\",\"" + row.sysPortfolioId + "\",\""
                             + row.sysTradeId + "\",null,\"" + row.sysFinprodId + "\",\"" + row.ps + "\",null,null,\""+row.profitType+"\",\"" + row.finprodId+ "\",null,null,\"" +row.mdateStr+"\")'>" + data + "</a>";
