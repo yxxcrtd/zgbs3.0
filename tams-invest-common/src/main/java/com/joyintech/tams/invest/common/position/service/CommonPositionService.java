@@ -591,6 +591,7 @@ public class CommonPositionService {
 			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 start
 //			ptlCashPosition.setAmount(ArithmeticUtil.doAdd(ptlCashPosition.getAmount(),ptlCashPositionFlow.getAmount()));
 //			commonPtlPositionMapper.updatePtlCashPosition(ptlCashPosition);
+			BeanUtil.copyPropertiesIgnoreNull(ptlCashPosition, ptlCashPositionFlow);
 			basePtlCashPositionInfoMapper.updateByPrimaryKeySelectiveForFlow(ptlCashPosition);
 			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 end
 		}else{
@@ -626,6 +627,7 @@ public class CommonPositionService {
 			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 start
 //			ptlSecPosition.setAmount(ArithmeticUtil.doAdd(ptlSecPosition.getAmount(),ptlSecPositionFlow.getAmount()));
 //			commonPtlPositionMapper.updatePtlSecPosition(ptlSecPosition);
+			BeanUtil.copyPropertiesIgnoreNull(ptlSecPosition, ptlSecPositionFlow);
 			basePtlSecPositionInfoMapper.updateByPrimaryKeySelectiveForFlow(ptlSecPosition);
 			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 end
 		}else{
