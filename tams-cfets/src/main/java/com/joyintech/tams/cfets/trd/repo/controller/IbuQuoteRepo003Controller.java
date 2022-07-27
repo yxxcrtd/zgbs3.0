@@ -219,6 +219,7 @@ public class IbuQuoteRepo003Controller extends BaseController {
                 //多组合
                 Map<String, Object> map = new HashMap<>();
                 map.put("quoteId", quoteId);
+                map.put("quotaPageModel", quotaPageModel);
                 //组合分配列表初始化
                 cfetsRepoDealQuotedPrice001Dto.setPtlAllocationList(cfetsRepoDealQuotedPrice002Service.selectPortfolioInit(map));
             }
