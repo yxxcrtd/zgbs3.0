@@ -932,7 +932,7 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                     finTradeProduct = finTradeProductMapper.selectByTradeId(inputDto.getIntiTradeId());
                 }
                 if(Objects.nonNull(finTradeProduct)) {
-                    creditLinesInputDto1.setTradeAmt(finTradeProduct.getmTradeAmt());
+                    creditLinesInputDto1.setTradeAmt(finTradeProduct.getPrin());
                     creditLinesInputDto1.setCounterId(finTradeProduct.getCounterId());
                     //creditLinesInputDto1.setShareAmt(finTradeProduct.getPrin());
                 }
@@ -940,8 +940,12 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                 if(StringUtil.isEmpty(creditLinesInputDto1.getCounterId())) {
                     return null;
                 }
-                if(Objects.nonNull(creditLinesInputDto)) {
-                    creditLinesInputDto.setInputDtoList(Lists.newArrayList(creditLinesInputDto1));
+                if(Objects.nonNull(creditLinesInputDto)) {//大于0时才需要差额预占
+                    if(creditLinesInputDto.getTradeAmt().compareTo(creditLinesInputDto1.getTradeAmt()) > 0) {
+                        creditLinesInputDto.setInputDtoList(Lists.newArrayList(creditLinesInputDto1));
+                    }else {
+                        return null;
+                    }
                 }
             }
 
