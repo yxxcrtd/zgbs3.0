@@ -1103,7 +1103,12 @@
 	  SELECT decode(TT.INSTRUCTION_ID, NULL, DECODE(TTH.INSTRUCTION_ID,NULL,DECODE(tdta.ENTRUST_ID,NULL,tpda.ENTRUST_ID,tdta.ENTRUST_ID),TTH.INSTRUCTION_ID), TT.INSTRUCTION_ID)   INSTRUCTION_ID,
 			 STD.APPLY_TRADE_ID                                    ENTRUST_ID,
 			 STD.CJBH                                              BROKER_TRADE_ID,
-			 STD.TRADE_MARKET                                      MARKET,
+            CASE
+                WHEN STD.TRADE_MARKET = '03' THEN '上海证券交易所'
+                WHEN STD.TRADE_MARKET = '04' THEN '深圳证券交易所'
+            ELSE NULL
+            END                                                    MARKET,
+			 <!--STD.TRADE_MARKET                                      MARKET,-->
 			 FP.FINPROD_MARKET_ID                                  STOCK_CODE,
 			 FP.FINPROD_ABBR                                       STOCK_NAME,
 			 DECODE(TT.PS, NULL, DECODE(TTH.PS,NULL,std.ps,TTH.ps), TT.PS) ENTRUST_BS,
@@ -1128,9 +1133,12 @@
 			   WHEN STD.DELIVERY_RESULT = '04' THEN  '0'
 			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME * 100 || ''
 			 END                                                   DELIVERY_SCHEDULE,
-			 TTH.ACCOUNT_ID                                        ACCT_ACCOUNT,
-			 TT.PROP_ACCT_NO                                        PROP_ACCT_NO,
-             TT.COUNTER_NAME COUNTER_NAME
+<!--			 TTH.ACCOUNT_ID                                        ACCT_ACCOUNT,-->
+<!--			 TT.PROP_ACCT_NO                                        PROP_ACCT_NO,-->
+<!--             TT.COUNTER_NAME COUNTER_NAME-->
+             DECODE(TT.ACCOUNT_ID, NULL, DECODE(TTH.ACCOUNT_ID,NULL,std.ACCT_NO,TTH.ACCOUNT_ID), TT.ACCOUNT_ID)       ACCT_ACCOUNT,
+             DECODE(TT.PROP_ACCT_NO, NULL, DECODE(TTH.PROP_ACCT_NO,NULL,null,TTH.PROP_ACCT_NO), TT.PROP_ACCT_NO)       PROP_ACCT_NO,
+             DECODE(TT.COUNTER_NAME, NULL, DECODE(TTH.COUNTER_NAME,NULL,null,TTH.COUNTER_NAME), TT.COUNTER_NAME)       COUNTER_NAME
 		FROM SETTLE_TRANS_DATA STD
 		LEFT JOIN T_TRADE TT ON (TT.BROKER_TRADE_ID = STD.CJBH AND TT.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TT.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD') AND TT.TRADE_TYPE = '0')
 		LEFT JOIN T_TRADEHISTORY TTH ON (TTH.BROKER_TRADE_ID = STD.CJBH AND TTH.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TTH.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))

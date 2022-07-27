@@ -1292,10 +1292,15 @@ public class TradeHelper {
                 integratedEntrust.setMarket(Market.SZSE.value);
             }
             //填充资产信息
-            fillStockInfo(integratedEntrust,instruction);
+            fillStockInfo(integratedEntrust, instruction);
         } else {
             Instrument instrument = instrumentService.queryByInnerCode(integratedEntrust.getStockCode());
             createOrderByInstrument(integratedEntrust, instrument, null);
+
+            if (StringUtil.isNotEmpty(stockCode)) {
+                integratedEntrust.setMarket(StockCodeUtils.getMarket(stockCode));
+                integratedEntrust.setStockCode(integratedEntrust.getStockCode());
+            }
         }
         if (StringUtil.equals(instruction.getFinprodType2(), 金融产品类型_投管用_债券质押式正回购.getValue())
                 || StringUtil.equals(instruction.getFinprodType2(), 金融产品类型_投管用_债券质押式逆回购.getValue())) {
@@ -1334,10 +1339,7 @@ public class TradeHelper {
             }
 
             integratedEntrust.setReductionType("0");
-//            if (StringUtil.isNotEmpty(stockCode)) {
-//                integratedEntrust.setMarket(StockCodeUtils.getMarket(stockCode));
-//                integratedEntrust.setStockCode(integratedEntrust.getStockCode());
-//            }
+
             integratedEntrust.setBusiTypeTg(instruction.getBusiTypeTg());
             integratedEntrust.setFinanceAccount(instruction.getBusiAcctNo());
             integratedEntrust.setAccountName(instruction.getAcctName());
@@ -1386,7 +1388,7 @@ public class TradeHelper {
             InstructionPledge pledge = pledgeOptional.get();
             integratedEntrust.setStockCode(pledge.getFinprodMarketId());
             integratedEntrust.setStockName(pledge.getFinprodAbbr());
-            if(Objects.nonNull(pledge.getPledgeNumber())){
+            if (Objects.nonNull(pledge.getPledgeNumber())) {
                 integratedEntrust.setEntrustVolume(pledge.getPledgeNumber().longValue());
             }
         }
