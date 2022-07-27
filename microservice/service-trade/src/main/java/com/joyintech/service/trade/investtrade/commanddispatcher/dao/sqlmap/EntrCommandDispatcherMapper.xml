@@ -79,7 +79,7 @@
           ELSE
           DECODE(F.TARGET_TYPE, '01',
           case when A.PS in ('T94') THEN FDP.PLEDGE_NUMBER
-		  when A.PS in ('T93') THEN null
+		  when A.PS in ('T93') AND A.TRADE_MARKET = '04' THEN null
           ELSE A.ENTRUST_NUM END, 0)
           END entrustNum, /**委托数量*/
 		  A.ENTRUST_STATUS entrustStatus,/**委托状态*/
