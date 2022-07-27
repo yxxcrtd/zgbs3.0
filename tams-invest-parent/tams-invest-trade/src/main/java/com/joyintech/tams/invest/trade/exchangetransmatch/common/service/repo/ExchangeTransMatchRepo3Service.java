@@ -176,10 +176,16 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         // 投资组合代码
         dealTotal.setPortfolioId(entrustDto.getPortfolioId());
         // 投管业务类型
-        if(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(dealTotal.getFinprodType2())){
-            dealTotal.setTgBusiType(DictCodeListExt3.平安业务类型_债券质押式正回购.getValue());
-        }else{
-            dealTotal.setTgBusiType(DictCodeListExt3.平安业务类型_债券质押式逆回购.getValue());
+//        if(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(dealTotal.getFinprodType2())){
+//            dealTotal.setTgBusiType(DictCodeListExt3.平安业务类型_债券质押式正回购.getValue());
+//        }else{
+//            dealTotal.setTgBusiType(DictCodeListExt3.平安业务类型_债券质押式逆回购.getValue());
+//        }
+        if(DictCodeListExt3.交易方向_中途换券.getValue().equals(entrustDto.getPs())){
+            dealTotal.setTgBusiType(DictCodeListExt3.投管业务类型_中途换券.getValue());
+        }
+        else if(DictCodeListExt3.交易方向_解除质押.getValue().equals(entrustDto.getPs())){
+            dealTotal.setTgBusiType(DictCodeListExt3.投管业务类型_解除质押.getValue());
         }
         // dealTotal.setTgBusiType(DictCodeListExt3.共通业务类型_质押券置换.getValue());
 
@@ -370,6 +376,8 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         trdProductDeal.setPortfolioId(entrustDto.getPortfolioId());
 
         trdProductDeal.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
+        // 投管业务类型
+        trdProductDeal.setTgBusiType(trdFinProductDealTotal.getTgBusiType());
         return trdProductDeal;
     }
 
