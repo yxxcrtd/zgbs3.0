@@ -297,6 +297,11 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
             // 券面总额 指令.质押券数量*100
             bean.setSecAmount(entity.getRepSecNum().multiply(BigDecimal.valueOf(100L)));
 
+            if (交易方向_中途换券.getValue().equals(ps)) {
+                bean.setFinprodId(entity.getOutfinprodId());
+                bean.setSecAmount(entity.getOutRepSecNum().multiply(BigDecimal.valueOf(100L)));
+            }
+
             Map<String, Object> map = BeanUtil.object2Map(bean);
             //融入券券面总额
             map.put("integrateSecAmount", null);
