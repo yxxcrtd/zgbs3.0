@@ -20,6 +20,7 @@ import com.joyintech.tams.invest.common.position.dao.CommonPtlPositionMapper;
 import com.joyintech.tams.invest.common.position.dto.PostionParameter;
 import com.joyintech.tams.invest.common.position.dto.PtlPositionFlowCfg;
 import com.joyintech.tams.invest.common.position.dto.PtlPositionScene;
+import com.joyintech.tams.invest.common.trade.dao.EtrCommonCashPositionMapper;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.invest.common.util.ExpressionUtil;
 import com.joyintech.tools.collectors.JoyinCollectors;
@@ -67,6 +68,8 @@ public class CommonPositionService {
 	private EtrEntrustMapper etrEntrustMapper;
 	@Autowired
 	private EtrEntrustAddMapper etrEntrustAddMapper;
+
+	private static EtrCommonCashPositionMapper etrCommonCashPositionMapper;
 
 	@Autowired
 	private BasePtlCashPositionInfoMapper basePtlCashPositionInfoMapper;
@@ -537,13 +540,23 @@ public class CommonPositionService {
 		}
 		EtrCashPosition etrCashPosition = commonPtlPositionMapper.selectEtrCashPosition(etrCashPositionFlow);
 		if(StringUtil.isNotEmpty(etrCashPosition)){
-			etrCashPosition.setAmount(ArithmeticUtil.doAdd(etrCashPosition.getAmount(),etrCashPositionFlow.getAmount()));
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 start
+//			etrCashPosition.setAmount(ArithmeticUtil.doAdd(etrCashPosition.getAmount(),etrCashPositionFlow.getAmount()));
 //			etrCashPositionMapper.updateByPrimaryKeySelective(etrCashPosition);
-			commonPtlPositionMapper.updateEtrCashPosition(etrCashPosition);
+//			commonPtlPositionMapper.updateEtrCashPosition(etrCashPosition);
+			BeanUtil.copyPropertiesIgnoreNull(etrCashPosition, etrCashPositionFlow);
+			etrCommonCashPositionMapper.updateByPrimaryKeySelectiveForFlow(etrCashPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 end
 		}else{
 			etrCashPosition = new EtrCashPosition();
 			BeanUtil.copyPropertiesIgnoreNull(etrCashPosition, etrCashPositionFlow);
-			etrCashPositionMapper.insertSelective(etrCashPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 start
+			try {
+				etrCashPositionMapper.insertSelective(etrCashPosition);
+			} catch (Exception e) {
+				etrCommonCashPositionMapper.updateByPrimaryKeySelectiveForFlow(etrCashPosition);
+			}
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 end
 		}
 	}
 	
@@ -563,12 +576,22 @@ public class CommonPositionService {
 		}
 		EtrSecPosition etrSecPosition = commonPtlPositionMapper.selectEtrSecPosition(etrSecPositionFlow);
 		if(StringUtil.isNotEmpty(etrSecPosition)){
-			etrSecPosition.setAmount(ArithmeticUtil.doAdd(etrSecPosition.getAmount(),etrSecPositionFlow.getAmount()));
-			commonPtlPositionMapper.updateEtrSecPosition(etrSecPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 start
+			// etrSecPosition.setAmount(ArithmeticUtil.doAdd(etrSecPosition.getAmount(),etrSecPositionFlow.getAmount()));
+			// commonPtlPositionMapper.updateEtrSecPosition(etrSecPosition);
+			BeanUtil.copyPropertiesIgnoreNull(etrSecPosition, etrSecPositionFlow);
+			etrCommonCashPositionMapper.updateByPrimaryKeySelectiveForSecFlow(etrSecPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 end
 		}else{
 			etrSecPosition = new EtrSecPosition();
 			BeanUtil.copyPropertiesIgnoreNull(etrSecPosition, etrSecPositionFlow);
-			etrSecPositionMapper.insertSelective(etrSecPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 start
+			try {
+				etrSecPositionMapper.insertSelective(etrSecPosition);
+			} catch (Exception e) {
+				etrCommonCashPositionMapper.updateByPrimaryKeySelectiveForSecFlow(etrSecPosition);
+			}
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 end
 		}
 	}
 	
