@@ -8,6 +8,7 @@ import com.joyintech.tams.exchange.common.bean.investment.PortfolioTradeMessage;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.enums.EntrustBussTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.PsEnum;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.utils.*;
@@ -223,17 +224,25 @@ public class TradeCallbackHelper {
         }
         tradeRecord.setLocalEntrustId(entrust.getLocalEntrustId());
         tradeRecord.setTradingDay(entrust.getTradingDay());
-        //质押入库的三条成交合约代码可能不一致，需要保留
-        String market = entrust.getMarket();
-        if (Strings.isNullOrEmpty(market) && StringUtil.isNotEmpty(entrust.getStockCode())) {
-            market = StockCodeUtils.getMarket(entrust.getStockCode());
-        }
-        if (StringUtil.isNotEmpty(tradeRecord.getStockCode())) {
-            tradeRecord.setStockCode(StockCodeUtils.formatStockCode(tradeRecord.getStockCode(), market));
-        }
-        if (Strings.isNullOrEmpty(tradeRecord.getStockName())) {
+
+        if (StringUtil.equals(EntrustBussTypeEnum.中途换券指令_换钱.value, instruction.getEntrustBussType())) {
+            tradeRecord.setMarket(entrust.getMarket());
+            tradeRecord.setStockCode(entrust.getStockCode());
             tradeRecord.setStockName(entrust.getStockName());
+        } else {
+            //质押入库的三条成交合约代码可能不一致，需要保留
+            String market = entrust.getMarket();
+            if (Strings.isNullOrEmpty(market) && StringUtil.isNotEmpty(entrust.getStockCode())) {
+                market = StockCodeUtils.getMarket(entrust.getStockCode());
+            }
+            if (StringUtil.isNotEmpty(tradeRecord.getStockCode())) {
+                tradeRecord.setStockCode(StockCodeUtils.formatStockCode(tradeRecord.getStockCode(), market));
+            }
+            if (Strings.isNullOrEmpty(tradeRecord.getStockName())) {
+                tradeRecord.setStockName(entrust.getStockName());
+            }
         }
+
         tradeRecord.setInstructionId(entrust.getInstructionId());
         tradeRecord.setParentOrderId(entrust.getParentOrderId());
         tradeRecord.setBsFlag(entrust.getBsFlag());
