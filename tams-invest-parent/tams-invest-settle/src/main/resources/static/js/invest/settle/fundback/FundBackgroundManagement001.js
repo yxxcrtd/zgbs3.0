@@ -40,7 +40,7 @@ var table
             {field: 'statusValidString', width: 200, sortField:'statusValid', title: '有效状态'}
             , {
                 field: 'bizCode', width: 200, title: '业务编号', render: function (data, type, row, meta) {
-                    if(row.paBussType==='212'||row.paBussType==='180'||row.paBussType==='151'||row.paBussType==='202'){
+                    if(row.paBussType==='212'||row.paBussType==='180'||row.paBussType==='151'||row.paBussType==='202'||row.paBussType==='09'||row.paBussType==='10'){
                         return  data ;
                     }
                     return "<a class='pro-link' style='cursor: pointer;' " +
