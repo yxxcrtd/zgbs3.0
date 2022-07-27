@@ -979,7 +979,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             /*融入券卖空待购回持仓*/
             resp.add(BaseMap.newMap()
                     .put("field", "RRQMKDGHCC")
-                    .put("name", "卖空待回购持仓（元）")
+                    .put("name", "卖空待购回持仓（元）")
                     .put("amount", "--")
                     .put("type", "cc"));
         }
@@ -1134,7 +1134,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             /*融入券卖空待购回持仓*/
             resp.add(BaseMap.newMap()
                     .put("field", RRQMKDGHCC)
-                    .put("name", "卖空待回购持仓（元）")
+                    .put("name", "卖空待购回持仓（元）")
                     .put("amount", decimalToStr(bm.getBigDecimal(RRQMKDGHCC), "0.00"))
                     .put("type", "cc"));
         }
