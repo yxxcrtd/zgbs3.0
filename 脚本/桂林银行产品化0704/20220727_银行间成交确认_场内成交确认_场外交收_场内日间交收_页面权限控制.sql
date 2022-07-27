@@ -1,8 +1,11 @@
 delete from SYS_PAGE_ELEMENT where page_id in('CfetsTrdConfirm','ManualSettleQuery','ExchangeTransMatch001','ManualSettle001');
 
+update SYS_PAGE set REMARK = '银行间成交确认' where PAGE_ID = 'CfetsTrdConfirm';
+update SYS_PAGE set REMARK = '场内成交确认' where PAGE_ID = 'ExchangeTransMatch001';
+update SYS_PAGE set REMARK = '场外交收' where PAGE_ID = 'ManualSettleQuery';
+update SYS_PAGE set REMARK = '场内日间交收' where PAGE_ID = 'ManualSettle001';
+
 -- 银行间成交确认
-
-
 insert into SYS_PAGE_ELEMENT (PAGE_ID, ELEMENT_ID,ELEMENT_TYPE, IS_CONTROL, TRANSFER_PAGE_ID, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, ADMIN_FLAG,PARENT_ELEMENT_ID)
 values('CfetsTrdConfirm', 'CfetsTrdConfirmDealTab','01', '01','', '成交匹配', 'system', '', sysdate, 'system', sysdate, 'C', '');
 insert into SYS_PAGE_ELEMENT (PAGE_ID, ELEMENT_ID,ELEMENT_TYPE, IS_CONTROL, TRANSFER_PAGE_ID, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, ADMIN_FLAG,PARENT_ELEMENT_ID)
@@ -11,6 +14,10 @@ insert into SYS_PAGE_ELEMENT (PAGE_ID, ELEMENT_ID,ELEMENT_TYPE, IS_CONTROL, TRAN
 values('CfetsTrdConfirm', 'CfetsTrdConfirmDeal_btn_confirm','01', '01','', '成交确认', 'system', '', sysdate, 'system', sysdate, 'C', 'CfetsTrdConfirmDealTab');
 insert into SYS_PAGE_ELEMENT (PAGE_ID, ELEMENT_ID,ELEMENT_TYPE, IS_CONTROL, TRANSFER_PAGE_ID, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, ADMIN_FLAG,PARENT_ELEMENT_ID)
 values('CfetsTrdConfirm', 'CfetsTrdConfirmDeal_btn_select','01', '01','', '查询可匹配成交回报', 'system', '', sysdate, 'system', sysdate, 'C', 'CfetsTrdConfirmDealTab');
+insert into SYS_PAGE_ELEMENT (PAGE_ID, ELEMENT_ID,ELEMENT_TYPE, IS_CONTROL, TRANSFER_PAGE_ID, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, ADMIN_FLAG,PARENT_ELEMENT_ID)
+values('CfetsTrdConfirm', 'CfetsTrdConfirmDeal_btn_manual','01', '01','', '手工匹配', 'system', '', sysdate, 'system', sysdate, 'C', 'CfetsTrdConfirmDealTab');
+insert into SYS_PAGE_ELEMENT (PAGE_ID, ELEMENT_ID,ELEMENT_TYPE, IS_CONTROL, TRANSFER_PAGE_ID, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, ADMIN_FLAG,PARENT_ELEMENT_ID)
+values('CfetsTrdConfirm', 'CfetsTrdConfirmDeal_btn_done','01', '01','', '查询可匹配交易执行', 'system', '', sysdate, 'system', sysdate, 'C', 'CfetsTrdConfirmDealTab');
 
 insert into SYS_PAGE_ELEMENT (PAGE_ID, ELEMENT_ID,ELEMENT_TYPE, IS_CONTROL, TRANSFER_PAGE_ID, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, ADMIN_FLAG,PARENT_ELEMENT_ID)
 values('CfetsTrdConfirm', 'CfetsTrdConfirmConfirmTab','01', '01','', '匹配确认', 'system', '', sysdate, 'system', sysdate, 'C', '');
@@ -25,7 +32,7 @@ values('ExchangeTransMatch001', 'ExchangeTransMatch001DealTab','01', '01','', '�
 insert into SYS_PAGE_ELEMENT (PAGE_ID, ELEMENT_ID,ELEMENT_TYPE, IS_CONTROL, TRANSFER_PAGE_ID, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, ADMIN_FLAG,PARENT_ELEMENT_ID)
 values('ExchangeTransMatch001', 'ExchangeTransMatch001_deal_btn_match_search','01', '01','', '匹配查询', 'system', '', sysdate, 'system', sysdate, 'C', 'ExchangeTransMatch001DealTab');
 insert into SYS_PAGE_ELEMENT (PAGE_ID, ELEMENT_ID,ELEMENT_TYPE, IS_CONTROL, TRANSFER_PAGE_ID, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, ADMIN_FLAG,PARENT_ELEMENT_ID)
-values('ExchangeTransMatch001', 'ExchangeTransMatch001_deal_btn_transaction_macth','01', '01','', '匹配查询', 'system', '', sysdate, 'system', sysdate, 'C', 'ExchangeTransMatch001DealTab');
+values('ExchangeTransMatch001', 'ExchangeTransMatch001_deal_btn_transaction_macth','01', '01','', '成交匹配', 'system', '', sysdate, 'system', sysdate, 'C', 'ExchangeTransMatch001DealTab');
 
 insert into SYS_PAGE_ELEMENT (PAGE_ID, ELEMENT_ID,ELEMENT_TYPE, IS_CONTROL, TRANSFER_PAGE_ID, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, ADMIN_FLAG,PARENT_ELEMENT_ID)
 values('ExchangeTransMatch001', 'ExchangeTransMatch001SelectTab','01', '01','', '匹配查询', 'system', '', sysdate, 'system', sysdate, 'C', '');
