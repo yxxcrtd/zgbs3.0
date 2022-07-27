@@ -128,11 +128,12 @@ public class IntegratedEntrustUtils {
         return false;
     }
 
-    // 上交所固收平台业务
+    // 沪深交易所固收平台业务
     //委托买卖业务
     public static boolean isFixedIncome_BS(String entrustProp) {
         if (!Strings.isNullOrEmpty(entrustProp)) {
-            if (entrustProp.equals(EntrustProp.SH_FIXEDINCOME_BAOJIA_OPPOSITE.value))
+            if (entrustProp.equals(EntrustProp.SH_FIXEDINCOME_BAOJIA_OPPOSITE.value)
+                    ||entrustProp.equals(EntrustProp.SH_FIXEDINCOME_BAOJIA_OPPOSITE_SZ.value))
                 return true;
         }
         return false;
@@ -169,7 +170,7 @@ public class IntegratedEntrustUtils {
     public static boolean isFixedIncome(String entrustProp) {
         return isFixedIncome_BS(entrustProp) || isFixedIncome_BaoJia(entrustProp) || isFixedIncome_ChenJiao(entrustProp);
     }
-    
+
     /***
      * @Description: 是CDS
      * @Param: [bsFlag]
@@ -391,7 +392,7 @@ public class IntegratedEntrustUtils {
                 || StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_JS.value)
                 || StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_JJ.value);
     }
-    
+
     /***
      * 新债 深交所 协商成交下单
      * @param entrustProp
@@ -415,27 +416,6 @@ public class IntegratedEntrustUtils {
             if (EntrustProp.SZ_XSCJ_JS.value.equals(entrustProp)
                     || EntrustProp.SZ_XSCJ_JJ.value.equals(entrustProp)) {
                 return true;
-            }
-        }
-        return false;
-    }
-	
-	 /***
-     * @Description: 332742   上海-固收债券回售申报
-     * @Param: [entrustProp, entrustBs, market]
-     * @return: boolean
-     * @Author: xiazelei
-     * @Date: 2022/5/25 14:55
-     */
-    public static boolean isBindSellBackSH(String entrustProp, String entrustBs, String market) {
-        //上交所
-        if (Market.SHSE.value.equals(market)) {
-            // 卖出
-            if (EntrustBs.SELL.value.equals(entrustBs)) {
-                // 上海-固收债券回售申报
-                if (EntrustProp.HS.value.equals(entrustProp)) {
-                    return true;
-                }
             }
         }
         return false;

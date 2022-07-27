@@ -81,6 +81,10 @@ public class TradeCallbackHelper {
                     logger.info("tradeRecord has not found businessFlag brokerEntrustId is {}", tradeRecord.getBrokerEntrustId());
                 }
                 if (Objects.nonNull(entrust)) {
+                    if(tradeRecord.getFinanceAccount()==null){
+                        tradeRecord.setAccountName(entrust.getAccountName());
+                        tradeRecord.setFinanceAccount(entrust.getFinanceAccount());
+                    }
                     tradeRecord.setPortfolioId(entrust.getPortfolioId());
                     tradeRecord.setEntrustProp(entrust.getEntrustProp());
                     if (IntegratedEntrustUtils.isFixedIncome(tradeRecord.getEntrustProp())) {
@@ -132,6 +136,7 @@ public class TradeCallbackHelper {
                             }
                             entrustCancelProcessor.processCancelEntrustTrade(cancelEntrust, tradeRecord, now, entrust, instruction);
                         } else {
+                            // 根据撤销记录查询被撤销的记录
                             IntegratedEntrust origEntrust = integratedEntrustService.findById(entrust.getOrigEntrustId());
                             if (Objects.nonNull(origEntrust)) {
                                 transactionHelper.addIntegratedEntrust(origEntrust);
@@ -153,6 +158,10 @@ public class TradeCallbackHelper {
                     logger.info("onTrade tradeRecord has no entrust localEntrustId and brokerEntrustId -- {}", tradeRecord.getBrokerTradeId());
                 }
                 if (Objects.nonNull(entrust)) {
+                    if(tradeRecord.getFinanceAccount()==null){
+                        tradeRecord.setAccountName(entrust.getAccountName());
+                        tradeRecord.setFinanceAccount(entrust.getFinanceAccount());
+                    }
                     tradeRecord.setPortfolioId(entrust.getPortfolioId());
                     //期货计算成交金额
                     if (InvestAssetTypeEnum.FUTURES.value.equals(tradeRecord.getAssetType())) {
@@ -184,6 +193,7 @@ public class TradeCallbackHelper {
                             }
                             entrustCancelProcessor.processCancelEntrustTrade(cancelEntrust, tradeRecord, now, entrust, instruction);
                         } else {
+                            // 根据撤销记录查询被撤销的记录
                             Entrust origEntrust = entrustService.findById(entrust.getOrigEntrustId());
                             if (Objects.nonNull(origEntrust)) {
                                 transactionHelper.addEntrust(origEntrust);

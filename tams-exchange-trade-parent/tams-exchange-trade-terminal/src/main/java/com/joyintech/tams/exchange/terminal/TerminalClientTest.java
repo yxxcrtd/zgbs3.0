@@ -498,7 +498,7 @@ public class TerminalClientTest {
             long l = terminalAgentTest.generateReqId();
             if (IntegratedEntrustUtils.isBulk(integratedEntrust.getEntrustProp())) {
                 integratedEntrust.setContractId((111 + l) + "");
-                if (agentType.equals(AgentType.KINGDOM_KCBP.value)) {
+                if (agentType.equals(AgentType.KINGDOM_KCBPW.value)) {
                     integratedEntrust.setPropSeatNo(propSeatNos.get(0));
                 } else if (agentType.equals(AgentType.UFX.value)) {
                     integratedEntrust.setPropSeatNo(propSeatNos.get(1));
@@ -511,7 +511,7 @@ public class TerminalClientTest {
                 integratedEntrust.setLiaisonName("mock");
             } else if (IntegratedEntrustUtils.isFixedIncome(integratedEntrust.getEntrustProp())) {
                 integratedEntrust.setContractId((222 + l) + "");
-                if (agentType.equals(AgentType.KINGDOM_KCBP.value)) {
+                if (agentType.equals(AgentType.KINGDOM_KCBPW.value)) {
                     integratedEntrust.setLiaisonName(traders.get(0));//对手方交易员
                     integratedEntrust.setLiaisonTel(traders.get(0));//发起方交易员
                     integratedEntrust.setPropSeatNo(traders.get(0).substring(1, 4));//对手方交易商
@@ -534,7 +534,7 @@ public class TerminalClientTest {
                 integratedEntrust.setFirstSettleDate(firstSettleDate);//初始交易日期
                 integratedEntrust.setOrigSerialNo((333 + l) + "");//成交编号
                 integratedEntrust.setRemark("mock");//补充条款
-                if (agentType.equals(AgentType.KINGDOM_KCBP.value)) {
+                if (agentType.equals(AgentType.KINGDOM_KCBPW.value)) {
                     integratedEntrust.setSellerNo(traders.get(0));//本方交易员代码
                     integratedEntrust.setLiaisonTel(traders.get(0));//对手方交易员代码
                     integratedEntrust.setPropSeatNo(traders.get(0).substring(1, 4));//对手方交易商
@@ -560,7 +560,7 @@ public class TerminalClientTest {
                 integratedEntrust.setEntrustBalance(BigDecimal.valueOf(100 * integratedEntrust.getEntrustVolume()));
                 integratedEntrust.setCompactTerm(compactTerm);
                 integratedEntrust.setRemark("mock");//补充条款
-                if (agentType.equals(AgentType.KINGDOM_KCBP.value)) {
+                if (agentType.equals(AgentType.KINGDOM_KCBPW.value)) {
                     integratedEntrust.setPropSeatNo(propSeatNos.get(0));//对手方交易单元
                 } else if (agentType.equals(AgentType.UFX.value)) {
                     integratedEntrust.setPropSeatNo(propSeatNos.get(0));

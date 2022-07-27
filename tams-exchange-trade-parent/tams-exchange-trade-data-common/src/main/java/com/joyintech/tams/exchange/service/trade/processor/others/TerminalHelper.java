@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.service.trade.processor.others;
 
 import com.google.common.base.Strings;
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondBean;
@@ -8,10 +9,7 @@ import com.joyintech.tams.exchange.common.bean.bond.StandardBondQryBean;
 import com.joyintech.tams.exchange.common.bean.investment.CapitalAccountBean;
 import com.joyintech.tams.exchange.common.bean.request.TradeInfoProRequest;
 import com.joyintech.tams.exchange.common.bean.response.TradeInfoProResponse;
-import com.joyintech.tams.exchange.common.constant.AgentType;
-import com.joyintech.tams.exchange.common.constant.EntrustSide;
-import com.joyintech.tams.exchange.common.constant.ErrorCode;
-import com.joyintech.tams.exchange.common.constant.Market;
+import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.utils.ConvertListUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
@@ -116,6 +114,7 @@ public class TerminalHelper {
         } else throw new Exception(ErrorCode.TERMINAL_NOT_ONLINE.errorMsg);
     }
 
+    //指令页面大宗的交易行情和和盘后调用该方法。固收没调用。
     public List<IntegratedQuote> queryIntegratedQuote(int quoteType, String stockCode, String accountId, String oppositeLiaisonTel, String liaisonTel, int pageSize, String posStr) {
         QuoteQryBean quoteQryBean = new QuoteQryBean();
         // 投管没有账号入参，需要单独处理
@@ -142,23 +141,47 @@ public class TerminalHelper {
         }
         if (!Strings.isNullOrEmpty(posStr)) quoteQryBean.setPostStr(posStr);
         quoteQryBean.setQuoteType(quoteType);
+
+        if (Strings.isNullOrEmpty(accountId)) {
+            Map<String, TradeAgent> accountAgentsCopy = tradeAgentManager.getAccountAgents();
+            if (accountAgentsCopy != null && !accountAgentsCopy.isEmpty()) {
+                accountId = accountAgentsCopy.keySet().iterator().next();
+            }
+        }
         if (Objects.nonNull(tradeAgent)) {
             try {
-                List<IntegratedQuote> integratedQuotes = tradeAgent.reqIntegratedQuotes(quoteQryBean);
-                if (Objects.nonNull(integratedQuotes)) {
-                    integratedQuotes.forEach(integratedQuote -> {
-                        if (Strings.isNullOrEmpty(integratedQuote.getStockName())) {
-                            integratedQuote.setStockCode(StockCodeUtils.formatStockCode(integratedQuote.getStockCode(), integratedQuote.getMarket()));
-                            Instrument instrument = instrumentService.findById(integratedQuote.getStockCode());
-                            if (Objects.nonNull(instrument)) {
-                                integratedQuote.setStockName(instrument.getStockName());
-                            } else {
-                                logger.info("未找到匹配的合约代码信息！！ {}", integratedQuote.getStockCode());
+                String market = quoteQryBean.getMarket();
+                // yanjianhui 2022/7/15 :如果是查上海的盘后就用364上海盘后查询（科创板以外无盘后行情）的过滤
+                if (quoteType == 2 && "SH".equals(market)) {
+                    IntegratedBulkCloseQuoteQryBean integratedBulkCloseQuoteQryBean = new IntegratedBulkCloseQuoteQryBean(stockCode, ExchangeType.SH.value, accountId, pageSize);
+                    List<IntegratedQuote> integratedQuotesCopy = new ArrayList<>();
+                    List<IntegratedBulkCloseQuoteBean> beanList = tradeAgent.reqIntegratedBulkCloseQuote(integratedBulkCloseQuoteQryBean);
+                    //将List<IntegratedBulkCloseQuoteBean> 转换成List<IntegratedQuote>才能返回。
+                    for (IntegratedBulkCloseQuoteBean bean : beanList) {
+                        IntegratedQuote integratedQuote = new IntegratedQuote();
+                        BeanUtil.copyPropertiesIgnoreNull(bean, integratedQuote);
+                        integratedQuote.setStockCode(bean.getStockCode());
+                        integratedQuote.setStockName(bean.getStockName());
+                        integratedQuotesCopy.add(integratedQuote);
+                    }
+                    return integratedQuotesCopy;
+                } else {
+                    //大宗：上海和深圳的交易行情和深圳的盘后行情都是这一分支
+                    List<IntegratedQuote> integratedQuotes = tradeAgent.reqIntegratedQuotes(quoteQryBean);
+                    if (Objects.nonNull(integratedQuotes)) {
+                        integratedQuotes.forEach(integratedQuote -> {
+                            if (Strings.isNullOrEmpty(integratedQuote.getStockName())) {
+                                Instrument instrument = instrumentService.findById(integratedQuote.getStockCode());
+                                if (Objects.nonNull(instrument)) {
+                                    integratedQuote.setStockName(instrument.getStockName());
+                                } else {
+                                    logger.info("未找到匹配的合约代码信息！！ {}", integratedQuote.getStockCode());
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
+                    return integratedQuotes;
                 }
-                return integratedQuotes;
             } catch (Exception e) {
                 logger.error("queryIntegratedQuote error {}", "\r\n" + e);
                 return null;
@@ -284,6 +307,14 @@ public class TerminalHelper {
         if (pageSize > 1000) {
             integratedBulkQuoteQryBean.setPageSize(1000);
         }
+        // yanjianhui 2022/7/19 :entrustProp和entrustBs传入的可能是字符串的null，要改成真正的null
+        if(integratedBulkQuoteQryBean.getEntrustProp()== "null"){
+            integratedBulkQuoteQryBean.setEntrustProp(null);
+        }
+        if(integratedBulkQuoteQryBean.getEntrustBs()== "null"){
+            integratedBulkQuoteQryBean.setEntrustBs(null);
+        }
+        // yanjianhui 2022/7/19 :end
 
         List<IntegratedBulkQuoteBean> list = new ArrayList<>();
         TradeAgent tradeAgent = getAgent(integratedBulkQuoteQryBean.getAccountId());
@@ -609,7 +640,7 @@ public class TerminalHelper {
 
     public List<NegotiateQuoteReceiveBean> queryNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean) {
         List<NegotiateQuoteReceiveBean> list = new ArrayList<>();
-        if(StringUtil.isEmpty(negotiateQuoteQueryBean.getConfirmId())){
+        if (StringUtil.isEmpty(negotiateQuoteQueryBean.getConfirmId())) {
             return list;
         }
         int pageSize = negotiateQuoteQueryBean.getPageSize();

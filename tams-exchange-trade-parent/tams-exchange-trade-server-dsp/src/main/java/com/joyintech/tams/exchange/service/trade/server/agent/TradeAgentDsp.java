@@ -148,13 +148,14 @@ public abstract class TradeAgentDsp implements TradeAgent {
      * 获取公共自定义参数
      * 返回公共参数map之后可以按照各自业务编码增加新的自定义参数
      *
-     * @param params
+     * @param params 第一个参数是账户，顺序不可变
      * @return
      */
     public Map<String, Object> getCustomParam(Object... params) {
         Map<String, Object> customParam = Maps.newHashMap();
-        // 设置密码配置
-        customParam.put("password", getAccount(params[0].toString()).getTradePwd());
+        // 设置密码配置  第一个参数是账户，顺序不可变
+        if (params[0]!=null&&!Strings.isNullOrEmpty(params[0].toString()))
+            customParam.put("password", getAccount(params[0].toString()).getTradePwd());
         return customParam;
     }
 
@@ -163,12 +164,12 @@ public abstract class TradeAgentDsp implements TradeAgent {
      * 接口交易码通用适配器，只适用于functionCode和 entrustProp 的t_terminal_agent_info表配置
      * 通过functionCode和entrustProp  定位唯一的柜台接口码
      * 此逻辑将字段转换工作转移到DSP接口平台的路由中配置映射关系，不再投管系统中编码处理映射关系。
+     *
      * @param functionCode
      * @param entrustProp
      * @param param
      * @param customParam
      * @return
-     *
      */
     public synchronized ResultBean triggerCodeAdapter(int functionCode, String entrustProp, Object param, Map<String, Object> customParam) {
         // 定位DSP接口平台交易码【触发器编码】
@@ -181,14 +182,16 @@ public abstract class TradeAgentDsp implements TradeAgent {
         Map<String, Object> paramMap = BeanUtil.beanToMap(param);
         // 合并自定义参数
         paramMap.putAll(customParam);
-        agentInfo.setAccountId(String.valueOf(paramMap.get("accountId") ));
+        agentInfo.setAccountId(String.valueOf(paramMap.get("accountId")));
         return tradeAgentHelper.doRequest(agentInfo, paramMap);
     }
+
     /**
      * xiazelei 修改于 2022/5/26 10:31
      * 接口交易码通用适配器，只适用于functionCode和 entrustProp 的t_terminal_agent_info表配置
      * 通过functionCode和entrustProp  定位唯一的柜台接口码
      * 此逻辑将字段转换工作转移到DSP接口平台的路由中配置映射关系，不再投管系统中编码处理映射关系。
+     *
      * @param functionCode
      * @param entrustProp
      * @param param
@@ -204,7 +207,7 @@ public abstract class TradeAgentDsp implements TradeAgent {
         }
         // 合并自定义参数
         param.putAll(customParam);
-        agentInfo.setAccountId(String.valueOf(param.get("accountId") ));
+        agentInfo.setAccountId(String.valueOf(param.get("accountId")));
         return tradeAgentHelper.doRequest(agentInfo, param);
     }
 
@@ -665,5 +668,4 @@ public abstract class TradeAgentDsp implements TradeAgent {
         logger.info("成交对比：更新状态");
         updateTradeStatus(accountId, reissueEntrustSuccess ? AccountLoginStatus.TRADE_REISSUING : AccountLoginStatus.ENTRUST_REISSUING_SUCCESS, AccountLoginStatus.TRADE_REISSUING_SUCCESS);
     }
-
 }

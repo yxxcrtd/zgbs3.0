@@ -4,6 +4,7 @@ import com.joyintech.tams.exchange.common.enums.IEnum;
 
 public enum ErrorCode implements IEnum<Integer> {
 
+    INVALID(-1, "柜台废单"),
     SUCCESS(0, "success"),
     /**
      * 1 —— 1000系统错误号

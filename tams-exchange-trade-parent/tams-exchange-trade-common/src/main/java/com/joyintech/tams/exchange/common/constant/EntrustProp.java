@@ -85,6 +85,7 @@ public enum EntrustProp implements IEnum<String> {
     SH_FIXEDINCOME_BAOJIA_CONFIRM("确定报价", "FI1"),
     SH_FIXEDINCOME_TRADE_CLICK("点击成交", "FI3"),
     SH_FIXEDINCOME_BAOJIA_OPPOSITE("指定对手方报价", "FI9"),
+    SH_FIXEDINCOME_BAOJIA_OPPOSITE_SZ("指定对手方报价", "BTA"),
     SH_FIXEDINCOME_KZHCJSB("可转换成交申报", "FI100JY"),
     SH_FIXEDINCOME_ZYJCJSB("最优价成交申报", "FI101JY"),
 

@@ -1,4 +1,15 @@
-package com.joyintech.tams.exchange.service.trade.server.agent.kcbp;
+package com.joyintech.tams.exchange.service.trade.server.agent.kcbpw;
+
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.joyintech.tams.exchange.common.bean.*;
+import com.joyintech.tams.exchange.common.bean.terminal.RTGSStatusBean;
+import com.joyintech.tams.exchange.common.constant.*;
+import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.utils.EntrustUtils;
+import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
+import com.joyintech.tams.exchange.service.trade.server.agent.EntrustIdManager;
+import org.springframework.beans.BeanUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -6,54 +17,40 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.springframework.beans.BeanUtils;
-
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.joyintech.tams.exchange.common.bean.AccountFinance;
-import com.joyintech.tams.exchange.common.bean.HistoryTrade;
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkCloseQuoteBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkQuoteBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedFixedIncomeQuoteBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedQuote;
-import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteBean;
-import com.joyintech.tams.exchange.common.bean.NegotiateQuoteReceiveBean;
-import com.joyintech.tams.exchange.common.bean.PledgeDiscount;
-import com.joyintech.tams.exchange.common.bean.QuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.ResultBean;
-import com.joyintech.tams.exchange.common.bean.StandardBonds;
-import com.joyintech.tams.exchange.common.bean.terminal.RTGSStatusBean;
-import com.joyintech.tams.exchange.common.constant.AssetType;
-import com.joyintech.tams.exchange.common.constant.EntrustBs;
-import com.joyintech.tams.exchange.common.constant.EntrustProp;
-import com.joyintech.tams.exchange.common.constant.EntrustStatus;
-import com.joyintech.tams.exchange.common.constant.Market;
-import com.joyintech.tams.exchange.common.constant.QuoteType;
-import com.joyintech.tams.exchange.common.constant.TradeType;
-import com.joyintech.tams.exchange.common.db.domain.Entrust;
-import com.joyintech.tams.exchange.common.db.domain.Instrument;
-import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
-import com.joyintech.tams.exchange.common.db.domain.PositionBean;
-import com.joyintech.tams.exchange.common.db.domain.Trade;
-import com.joyintech.tams.exchange.common.utils.EntrustUtils;
-import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
-import com.joyintech.tams.exchange.service.trade.server.agent.EntrustIdManager;
-
 /**
  * @author lifangpeng
  * @date 2021/10/12
  */
-public class KCBPMsgParseHelper {
+public class KCBPWMsgParseHelper {
 
-    public static List<Entrust> parseEntrusts(ResultBean resultBean, String accountId, EntrustIdManager entrustIdMap) {
-        List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
+    /**
+     * 460001	固收平台交易委托明细查询
+     * 411006	上海债券协议回购委托流水查询
+     * 410510    当日委托明细查询
+     * 411006	上海债券协议回购委托流水查询
+     * 410680	深圳现券协商成交、竞买发起、竞买应价委托查询
+     * 411002	深圳债券协议回购委托流水查询
+     *
+     * @param resList
+     * @param accountId
+     * @param entrustIdManager
+     * @param tradeCode
+     * @return
+     */
+    public static List<Entrust> parseEntrusts(List<Map<String, String>> resList, String accountId, EntrustIdManager entrustIdManager, String tradeCode) {
         List<Entrust> entrusts = Lists.newArrayListWithExpectedSize(resList.size());
         for (Map<String, String> resMap : resList) {
             Entrust entrust = new Entrust();
             entrust.setAccountId(accountId);
-            entrust.setId(entrustIdMap.getIdByLocalEntrustId(accountId, resMap.get("ordergroup")));
+            // entrust.setId(entrustIdManager.getIdByLocalEntrustId(accountId, resMap.get("ordergroup")));
             entrust.setReportNo(resMap.get("orderid"));
             entrust.setBrokerEntrustId(resMap.get("ordersno"));
+            if ("410510".equals(tradeCode)) {
+                entrust.setId(entrustIdManager.getIdByLocalEntrustId(accountId, resMap.get("ordergroup")));
+            } else {
+                String brokeEntrustId = entrust.getBrokerEntrustId() + "|" + entrust.getReportNo();
+                entrust.setId(entrustIdManager.getKcbpwZHEntrustId(accountId, brokeEntrustId));
+            }
             entrust.setFinanceAccount(resMap.get("fundid"));
             entrust.setBsFlag(resMap.get("bsflag"));
             entrust.setReportTime(resMap.get("reporttime"));
@@ -79,19 +76,24 @@ public class KCBPMsgParseHelper {
             if (!Strings.isNullOrEmpty(resMap.get("orderstatus"))) {
                 entrust.setEntrustStatus(convertToEntrustStatus(resMap.get("orderstatus")));
             }
-
             entrust.setErrorMsg(resMap.get("remark"));
+//            entrust.setErrorMsg(ErrorMsgUtils.subErrorMsg(resMap.get("remark")));
+//            String remark = (String) ds.get("remark");
+//            if (!Strings.isNullOrEmpty(cancelInfo)) {
+//                entrust.setErrorMsg(ErrorMsgUtils.subErrorMsg(cancelInfo));
+//            } else if (!Strings.isNullOrEmpty(remark)) {
+//                entrust.setErrorMsg(ErrorMsgUtils.subErrorMsg(remark));
+//            }
             entrust.setEntrustProp(EntrustUtils.getEntrustProp(entrust.getBsFlag(), entrust.getMarket()));
             entrust.setEntrustBs(EntrustUtils.getEntrustBs(entrust.getBsFlag()));
             entrusts.add(entrust);
         }
-
         return entrusts;
     }
 
-    public static List<IntegratedEntrust> parseIntegratedEntrusts(ResultBean resultBean, String accountId, EntrustIdManager entrustIdMap) {
+    public static List<IntegratedEntrust> parseIntegratedEntrusts(List<Map<String, String>> resList, String accountId, EntrustIdManager entrustIdManager, String tradeCode) {
         List<IntegratedEntrust> integratedEntrusts = new ArrayList<>();
-        List<Entrust> entrustList = parseEntrusts(resultBean, accountId, entrustIdMap);
+        List<Entrust> entrustList = parseEntrusts(resList, accountId, entrustIdManager, tradeCode);
         entrustList.forEach(entrust -> {
             IntegratedEntrust integratedEntrust = new IntegratedEntrust();
             BeanUtils.copyProperties(entrust, integratedEntrust);
@@ -100,9 +102,19 @@ public class KCBPMsgParseHelper {
         return integratedEntrusts;
     }
 
-
-    public static List<Trade> parseTrades(List<Map<String, String>> resList, String accountId,
-                                          EntrustIdManager entrustIdManager) {
+    /**
+     * 410681	深圳现券协商成交、竞买发起、竞买应价成交查询
+     * 410436	当日成交明细查询	用于竞价平台所有当日成交信息查询
+     * 460003	固收平台交易成交查询	上交所固收平台现券交易成交信息查询
+     * 411007	上海债券协议回购成交查询	上交所质押式协议回购成交信息查询
+     * 410681	深圳现券协商成交、竞买发起、竞买应价成交查询
+     *
+     * @param resList
+     * @param accountId
+     * @param entrustIdManager
+     * @return
+     */
+    public static List<Trade> parseTrades(List<Map<String, String>> resList, String accountId, EntrustIdManager entrustIdManager, String tradeCode) {
         List<Trade> trades = Lists.newArrayListWithExpectedSize(resList.size());
         for (Map<String, String> resMap : resList) {
             Trade trade = new Trade();
@@ -110,14 +122,18 @@ public class KCBPMsgParseHelper {
             trade.setReportNo(resMap.get("orderid"));
             trade.setBrokerEntrustId(resMap.get("ordersno"));
             trade.setLocalEntrustId(resMap.get("ordergroup"));
-            trade.setEntrustId(entrustIdManager.getIdByLocalEntrustId(accountId, resMap.get("ordergroup")));
-            trade.setFinanceAccount(resMap.get("fundid"));
+            if ("410436".equals(tradeCode)) {
+                // trade.setEntrustId(entrustIdManager.getIdByLocalEntrustId(accountId, resMap.get("ordergroup")));
+            } else {
+                String brokeEntrustId = trade.getBrokerEntrustId() + "|" + trade.getReportNo();
+                //trade.setEntrustId(entrustIdManager.getKcbpwZHEntrustId(accountId, brokeEntrustId));
+            }
+            // trade.setFinanceAccount(resMap.get("fundid"));
             trade.setBsFlag(resMap.get("bsflag"));
             trade.setMarket(getMarket(resMap.get("market")));
             trade.setStockCode(resMap.get("stkcode"));
             trade.setStockName(resMap.get("stkname"));
             trade.setTradeTime(resMap.get("matchtime"));
-            trade.setBrokerTradeId(resMap.get("matchcode"));
             if (!Strings.isNullOrEmpty(resMap.get("matchprice"))) {
                 trade.setTradedPrice(BigDecimal.valueOf(Double.parseDouble(resMap.get("matchprice"))));
             }
@@ -127,9 +143,30 @@ public class KCBPMsgParseHelper {
             if (!Strings.isNullOrEmpty(resMap.get("matchamt"))) {
                 trade.setTradedBalance(BigDecimal.valueOf(Double.parseDouble(resMap.get("matchamt"))));
             }
-            if (!Strings.isNullOrEmpty(resMap.get("matchtype"))) {
-                trade.setTradeType(Integer.parseInt(resMap.get("matchtype")));
+            int realStatus = Integer.parseInt((String) resMap.get("matchtype"));
+            // 成交类型0:普通成交1:撤单成交2:废单3:内部撤单4:撤单废单
+            trade.setTradeType(realStatus);
+//            trade.setBrokerTradeId(resMap.get("matchcode"));
+            if (realStatus != 0 && realStatus != 1) {
+                //  废单 有正常的委托，也有撤销的委托
+                trade.setBrokerTradeId((String) resMap.get("ordersno"));
+//                trade.setBrokerTradeId((String) resMap.get("orderid"));
+            } else {
+                trade.setBrokerTradeId(resMap.get("matchcode"));
+                // 成交 有正常的委托，也有撤销的委托
+//                if (realStatus == 0)
+//                    trade.setBrokerTradeId((String) resMap.get("orderid"));
+//                else
+//                    trade.setBrokerTradeId((String) resMap.get("ordersno"));
             }
+//            if (realStatus == 1) {
+//                String ordersNoAndorderId = entrustIdManager.getKcbpwXSEntrustId(accountId, trade.getBrokerEntrustId());
+//                if (!Strings.isNullOrEmpty(ordersNoAndorderId)) {
+//                    String[] OAO = ordersNoAndorderId.split("|");
+//                    trade.setBrokerEntrustId(OAO[0]);
+//                    trade.setReportNo(OAO[1]);
+//                }
+//            }
             if (!Strings.isNullOrEmpty(resMap.get("sysdate"))) {
                 trade.setTradingDay(resMap.get("sysdate"));
             } else if (!Strings.isNullOrEmpty(resMap.get("trddate"))) {
@@ -148,8 +185,7 @@ public class KCBPMsgParseHelper {
         return trades;
     }
 
-    public static List<IntegratedQuote> parseIntegratedQuotes(ResultBean resultBean, QuoteQryBean quoteQryBean) {
-        List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
+    public static List<IntegratedQuote> parseIntegratedQuotes(List<Map<String, String>> resList, QuoteQryBean quoteQryBean) {
         List<IntegratedQuote> quotes = Lists.newArrayListWithExpectedSize(resList.size());
         for (Map<String, String> resMap : resList) {
             IntegratedQuote integratedQuote = new IntegratedQuote();
@@ -361,8 +397,7 @@ public class KCBPMsgParseHelper {
         return quotes;
     }
 
-    public static List<HistoryTrade> parseHistoryTrade(ResultBean resultBean, String accountId) {
-        List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
+    public static List<HistoryTrade> parseHistoryTrade(List<Map<String, String>> resList, String accountId) {
         List<HistoryTrade> historyTradeList = Lists.newArrayListWithExpectedSize(resList.size());
         for (Map<String, String> resMap : resList) {
             HistoryTrade historyTrade = new HistoryTrade();
@@ -447,8 +482,7 @@ public class KCBPMsgParseHelper {
         return historyTradeList;
     }
 
-    public static List<AccountFinance> parseCustomerFinance(ResultBean resultBean, String accountId) {
-        List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
+    public static List<AccountFinance> parseCustomerFinance(List<Map<String, String>> resList, String accountId) {
         List<AccountFinance> list = Lists.newArrayListWithExpectedSize(resList.size());
         for (Map<String, String> resMap : resList) {
             AccountFinance accountFinance = new AccountFinance();
@@ -489,8 +523,7 @@ public class KCBPMsgParseHelper {
         return list;
     }
 
-    public static List<PositionBean> parseAccountPosition(ResultBean resultBean, String accountId) {
-        List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
+    public static List<PositionBean> parseAccountPosition(List<Map<String, String>> resList, String accountId) {
         List<PositionBean> list = Lists.newArrayListWithExpectedSize(resList.size());
         for (Map<String, String> resMap : resList) {
             PositionBean positionBean = new PositionBean();
@@ -519,8 +552,7 @@ public class KCBPMsgParseHelper {
         return list;
     }
 
-    public static List<Instrument> parseInstrumentInfo(ResultBean resultBean) {
-        List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
+    public static List<Instrument> parseInstrumentInfo(List<Map<String, String>> resList) {
         List<Instrument> list = Lists.newArrayListWithExpectedSize(resList.size());
         for (Map<String, String> resMap : resList) {
             Instrument instrument = new Instrument();
@@ -567,8 +599,7 @@ public class KCBPMsgParseHelper {
         return list;
     }
 
-    public static List<PledgeDiscount> parsePledgeDiscount(ResultBean resultBean, String accountId) {
-        List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
+    public static List<PledgeDiscount> parsePledgeDiscount(List<Map<String, String>> resList, String accountId) {
         List<PledgeDiscount> list = Lists.newArrayListWithExpectedSize(resList.size());
         for (Map<String, String> resMap : resList) {
             PledgeDiscount pledgeDiscount = new PledgeDiscount();
@@ -597,8 +628,7 @@ public class KCBPMsgParseHelper {
         return list;
     }
 
-    public static List<StandardBonds> parseStandardBonds(ResultBean resultBean, String accountId) {
-        List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
+    public static List<StandardBonds> parseStandardBonds(List<Map<String, String>> resList, String accountId) {
         List<StandardBonds> list = Lists.newArrayListWithExpectedSize(resList.size());
         for (Map<String, String> resMap : resList) {
             StandardBonds standardBonds = new StandardBonds();
@@ -626,8 +656,7 @@ public class KCBPMsgParseHelper {
         return list;
     }
 
-    public static List<IntegratedBulkQuoteBean> parseIntegratedBulkQuote(ResultBean resultBean, String market) {
-        List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
+    public static List<IntegratedBulkQuoteBean> parseIntegratedBulkQuote(List<Map<String, String>> resList, String market) {
         List<IntegratedBulkQuoteBean> list = Lists.newArrayListWithExpectedSize(resList.size());
         for (Map<String, String> resMap : resList) {
             IntegratedBulkQuoteBean integratedBulkQuoteBean = new IntegratedBulkQuoteBean();
@@ -645,6 +674,35 @@ public class KCBPMsgParseHelper {
             if (!Strings.isNullOrEmpty(resMap.get("HQYWLB"))) {
                 integratedBulkQuoteBean.setEntrustProp(EntrustUtils.getEntrustProp(resMap.get("HQYWLB"), "SZ"));
                 integratedBulkQuoteBean.setEntrustBs(EntrustUtils.getEntrustBs(resMap.get("HQYWLB")));
+            } else if(!Strings.isNullOrEmpty(resMap.get("HQZLLB"))){
+                // yanjianhui 2022/7/19 :金证那边的HQYWLB字段返回空因此无法对行情类型、方向进行操作。
+                String flag = resMap.get("HQZLLB");
+                // yanjianhui 2022/7/19 :字段逻辑错误修改
+                switch (flag) {
+                    case "1E":
+                        // 1E:意向买
+                        integratedBulkQuoteBean.setEntrustProp("意向申报");
+                        integratedBulkQuoteBean.setEntrustBs(EntrustBs.BUY.value);
+                        break;
+                    case "1F":
+                        //1F:意向卖
+                        integratedBulkQuoteBean.setEntrustProp("意向申报");
+                        integratedBulkQuoteBean.setEntrustBs(EntrustBs.SELL.value);
+                        break;
+                    case "1G":
+                        //1G:定价买
+                        integratedBulkQuoteBean.setEntrustProp("定价申报");
+                        integratedBulkQuoteBean.setEntrustBs(EntrustBs.BUY.value);
+                        break;
+                    case "1H":
+                        //1H:定价卖
+                        integratedBulkQuoteBean.setEntrustProp("定价申报");
+                        integratedBulkQuoteBean.setEntrustBs(EntrustBs.SELL.value);
+                        break;
+                    default:
+                        integratedBulkQuoteBean.setEntrustProp("无定价或意向申报判断依据");
+                        break;
+                }
             }
             //上海报单类型 "N"为意向买
             if ("N".equals(resMap.get("HQBDLX"))) {
@@ -697,37 +755,41 @@ public class KCBPMsgParseHelper {
 
         return list;
     }
-    
-    public static List<NegotiateQuoteReceiveBean> parseNegotiateQuoteReceive(ResultBean resultBean, String market) {
-        List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
+
+    public static List<NegotiateQuoteReceiveBean> parseNegotiateQuoteReceive(List<Map<String, String>> resList) {
         List<NegotiateQuoteReceiveBean> list = Lists.newArrayListWithExpectedSize(resList.size());
         for (Map<String, String> resMap : resList) {
-        	NegotiateQuoteReceiveBean negotiateQuoteReceiveBean = new NegotiateQuoteReceiveBean();
-        	negotiateQuoteReceiveBean.setRequestTime(resMap.get("transacttime"));//申报时间
-        	negotiateQuoteReceiveBean.setRequestStatus(Integer.parseInt(resMap.get("reportstatus"))); //成交申报请求状态
-        	negotiateQuoteReceiveBean.setStockCode(StockCodeUtils.formatStockCode(resMap.get("stkcode"), "SZ"));//证券代码
-        	negotiateQuoteReceiveBean.setStockName(resMap.get("stkname"));//证券名称
-        	negotiateQuoteReceiveBean.setBs(resMap.get("side"));//买卖方向
-        	negotiateQuoteReceiveBean.setAmount(Integer.parseInt(resMap.get("orderqty")));//数量
-        	negotiateQuoteReceiveBean.setEntrustPrice(BigDecimal.valueOf(Double.parseDouble(resMap.get("orderprice"))));//价格（净价） 
-        	negotiateQuoteReceiveBean.setMemberId(resMap.get("cpmemberid"));//接收方交易商代码 --> 本方交易商
-        	negotiateQuoteReceiveBean.setTraderCode(resMap.get("cptradercode"));//接收方交易员代码 --> 本方交易员
-        	negotiateQuoteReceiveBean.setInvestorId(resMap.get("cpinvestorid"));//接收方交易主体代码 --> 本方交易主体
-        	negotiateQuoteReceiveBean.setInvestorType(resMap.get("cpinvestortype"));//接收方交易主体类型 --> 本方交易主体类型
-        	negotiateQuoteReceiveBean.setCpInvestorType(resMap.get("memberid"));//申报方交易商 --> 对手方交易商
-        	negotiateQuoteReceiveBean.setCpTraderCode(resMap.get("tradercode"));//申报方交易员代码 --> 对手方交易员
-        	negotiateQuoteReceiveBean.setCpInvestorId(resMap.get("investorid"));//申报方交易主体代码 --> 对手方交易主体
-        	negotiateQuoteReceiveBean.setCpInvestorType(resMap.get("investortype"));//申报方交易主体类型 --> 对手方交易主体类型
-        	negotiateQuoteReceiveBean.setConfirmId(resMap.get("confirmid"));//约定号
-        	negotiateQuoteReceiveBean.setPositionStr(resMap.get("posstr"));//定位串
-        	negotiateQuoteReceiveBean.setRemark(resMap.get("memo"));//备注
-            list.add(negotiateQuoteReceiveBean);
+            NegotiateQuoteReceiveBean receiveBean = new NegotiateQuoteReceiveBean();
+            receiveBean.setRequestTime(resMap.get("transacttime"));//申报时间
+            int status = Integer.parseInt((String) (resMap.get("reportstatus")));
+            receiveBean.setRequestStatus(status);
+            receiveBean.setRequestStatusStr(RequestStatus.getRequestStatusName(status));
+            receiveBean.setStockCode(StockCodeUtils.formatStockCode(resMap.get("stkcode"), "SZ"));//证券代码
+            receiveBean.setStockName(resMap.get("stkname"));//证券名称
+            receiveBean.setBs(resMap.get("side"));//买卖方向
+            receiveBean.setAmount(Integer.parseInt(resMap.get("orderqty")));//数量
+            receiveBean.setEntrustPrice(BigDecimal.valueOf(Double.parseDouble(resMap.get("orderprice"))));//价格（净价）
+            receiveBean.setExecId((String) (resMap.get("trdreportid")));
+
+            receiveBean.setMemberId(resMap.get("cpmemberid"));//接收方交易商代码 --> 本方交易商
+            receiveBean.setTraderCode(resMap.get("cptradercode"));//接收方交易员代码 --> 本方交易员
+            receiveBean.setInvestorId(resMap.get("cpinvestorid"));//接收方交易主体代码 --> 本方交易主体
+            receiveBean.setInvestorType(resMap.get("cpinvestortype"));//接收方交易主体类型 --> 本方交易主体类型
+
+            receiveBean.setCpMemberId(resMap.get("memberid"));//申报方交易商 --> 对手方交易商
+            receiveBean.setCpTraderCode(resMap.get("tradercode"));//申报方交易员代码 --> 对手方交易员
+            receiveBean.setCpInvestorId(resMap.get("investorid"));//申报方交易主体代码 --> 对手方交易主体
+            receiveBean.setCpInvestorType(resMap.get("investortype"));//申报方交易主体类型 --> 对手方交易主体类型
+
+            receiveBean.setConfirmId(resMap.get("confirmid"));//约定号
+            receiveBean.setPositionStr(resMap.get("posstr"));//定位串
+            receiveBean.setRemark(resMap.get("memo"));//备注
+            list.add(receiveBean);
         }
         return list;
     }
 
-    public static List<IntegratedBulkCloseQuoteBean> parseIntegratedBulkCloseQuote(ResultBean resultBean, String market) {
-        List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
+    public static List<IntegratedBulkCloseQuoteBean> parseIntegratedBulkCloseQuote(List<Map<String, String>> resList, String market) {
         List<IntegratedBulkCloseQuoteBean> list = Lists.newArrayListWithExpectedSize(resList.size());
         if (Market.SHSE.value.equals(market)) {
             for (Map<String, String> resMap : resList) {
@@ -754,9 +816,35 @@ public class KCBPMsgParseHelper {
             }
         } else if (Market.SZSE.value.equals(market)) {
             for (Map<String, String> resMap : resList) {
+                //yanjianhui  22-7-14数据对接错误对此修改（下面对已修改的代码进行了注释）
+                IntegratedBulkCloseQuoteBean integratedBulkCloseQuoteBean = new IntegratedBulkCloseQuoteBean();
+                integratedBulkCloseQuoteBean.setStockCode(StockCodeUtils.formatStockCode(resMap.get("stkcode"), "SZ"));
+                integratedBulkCloseQuoteBean.setStockName(resMap.get("stkname"));
+                if (!Strings.isNullOrEmpty(resMap.get("tradevolume"))) {
+                    integratedBulkCloseQuoteBean.setBusinessAmount(Integer.parseInt(resMap.get("tradevolume")));
+                }
+                if (!Strings.isNullOrEmpty(resMap.get("totalvaluetraded"))) {
+                    integratedBulkCloseQuoteBean.setBusinessBalance(Double.parseDouble(resMap.get("totalvaluetraded")));
+                }
+                if (!Strings.isNullOrEmpty(resMap.get("closeprice"))) {
+                    integratedBulkCloseQuoteBean.setClosingPrice(Double.parseDouble(resMap.get("closeprice")));
+                }
+                if (!Strings.isNullOrEmpty(resMap.get("buyvolume"))) {
+                    integratedBulkCloseQuoteBean.setBuyAmount1(Integer.parseInt(resMap.get("buyvolume")));
+                }
+                if (!Strings.isNullOrEmpty(resMap.get("sellvolume"))) {
+                    integratedBulkCloseQuoteBean.setSaleAmount1(Integer.parseInt(resMap.get("sellvolume")));
+                }
+
+                list.add(integratedBulkCloseQuoteBean);
+            }
+        }
+        return list;
+        //yanjianhui  22-7-14数据对接错误对此修改
+            /*for (Map<String, String> resMap : resList) {
                 IntegratedBulkCloseQuoteBean integratedBulkCloseQuoteBean = new IntegratedBulkCloseQuoteBean();
                 //证券代码
-                integratedBulkCloseQuoteBean.setStockCode(StockCodeUtils.formatStockCode(resMap.get("HQZQDM"), "SZ"));
+                integratedBulkCloseQuoteBean.setStockCode(StockCodeUtils.formatStockCode(resMap.get("stkcode"), "SZ"));
                 //申报价格
                 if (!Strings.isNullOrEmpty(resMap.get("HQSBJG"))) {
                     integratedBulkCloseQuoteBean.setClosingPrice(Double.parseDouble(resMap.get("HQSBJG")));
@@ -774,15 +862,10 @@ public class KCBPMsgParseHelper {
                 //1m：盘后定价大宗买，1n：盘后定价大宗卖
                 if (!Strings.isNullOrEmpty(bsFlag) && ("1m".equals(bsFlag) || "1n".equals(bsFlag))) {
                     list.add(integratedBulkCloseQuoteBean);
-                }
-            }
-        }
-
-        return list;
+                }*/
     }
 
-    public static List<IntegratedRepurchaseQuoteBean> parseIntegratedRepurchaseQuote(ResultBean resultBean) {
-        List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
+    public static List<IntegratedRepurchaseQuoteBean> parseIntegratedRepurchaseQuote(List<Map<String, String>> resList) {
         List<IntegratedRepurchaseQuoteBean> list = Lists.newArrayListWithExpectedSize(resList.size());
         for (Map<String, String> resMap : resList) {
             IntegratedRepurchaseQuoteBean integratedRepurchaseQuoteBean = new IntegratedRepurchaseQuoteBean();
@@ -863,8 +946,7 @@ public class KCBPMsgParseHelper {
         return list;
     }
 
-    public static List<IntegratedFixedIncomeQuoteBean> parseIntegratedFixedIncomeQuote(ResultBean resultBean) {
-        List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
+    public static List<IntegratedFixedIncomeQuoteBean> parseIntegratedFixedIncomeQuote(List<Map<String, String>> resList) {
         List<IntegratedFixedIncomeQuoteBean> list = Lists.newArrayListWithExpectedSize(resList.size());
         for (Map<String, String> resMap : resList) {
             IntegratedFixedIncomeQuoteBean integratedFixedIncomeQuoteBean = new IntegratedFixedIncomeQuoteBean();
@@ -877,7 +959,7 @@ public class KCBPMsgParseHelper {
             integratedFixedIncomeQuoteBean.setStockName(resMap.get("stkname"));
             integratedFixedIncomeQuoteBean.setEntrustBs(EntrustUtils.getEntrustBs(resMap.get("bsflag")));
             integratedFixedIncomeQuoteBean.setOrderNo(resMap.get("orderid"));
-            integratedFixedIncomeQuoteBean.setReportTime(Integer.parseInt(resMap.get("ordertime")));
+            integratedFixedIncomeQuoteBean.setReportTime(Long.parseLong(resMap.get("ordertime")));
             integratedFixedIncomeQuoteBean.setAgencyName(resMap.get("company"));
             if (!Strings.isNullOrEmpty(resMap.get("orderprice"))) {
                 integratedFixedIncomeQuoteBean.setEntrustPrice(Double.parseDouble(resMap.get("orderprice")));
@@ -1108,6 +1190,4 @@ public class KCBPMsgParseHelper {
         }
         return stkType;
     }
-
-
 }
