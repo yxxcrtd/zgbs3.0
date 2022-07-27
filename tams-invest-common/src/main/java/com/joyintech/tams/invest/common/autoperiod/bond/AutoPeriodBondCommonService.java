@@ -1169,7 +1169,7 @@ public class AutoPeriodBondCommonService {
         wflstlPayOrders.setCcy(trdProductDeal.getCcy());
         wflstlPayOrders.setSettleStatus(DictCodeList.结算状态_已结算.getValue());
         wflstlPayOrders.setIsNeedSend(DictCodeListExt1.是否_是.getValue());
-        wflstlPayOrders.setIsTotalTrade(DictCodeListExt1.是否_是.getValue());
+        wflstlPayOrders.setIsTotalTrade(DictCodeListExt1.是否_否.getValue());
         wflstlPayOrders.setTradeId(trdProductDeal.getTradeId());
         wflstlPayOrders.setOrderStatus(DictCodeListExt1.指令状态_新建.getValue());
         wflstlPayOrders.setPortfolioId(trdProductDealAdd.getPortfolioId());

@@ -3424,7 +3424,7 @@ public class CfetsTrdConfirmService extends BaseService {
         // =====================划款指令信息=====================
         List<BussTrdTransferOrderDto> bussTrdTransferOrder = new ArrayList<>();
         BussSettleOrderParameterDto bussSettleOrderParameterDto = new BussSettleOrderParameterDto();
-        bussSettleOrderParameterDto.setIsTotalTrade(BussinessDictCodeList.是否_是.getValue());
+        bussSettleOrderParameterDto.setIsTotalTrade(BussinessDictCodeList.是否_否.getValue());
         bussSettleOrderParameterDto.setBankLendingType(null);
         TrdProductDeal deal = new TrdProductDeal();
         BeanUtil.copyPropertiesIgnoreNull(deal, temp);
@@ -3446,7 +3446,7 @@ public class CfetsTrdConfirmService extends BaseService {
             bussTrdTransferOrderDto.setPayAcctNo(null);
         }
         bussTrdTransferOrderDto.setPs(ps);
-        bussTrdTransferOrderDto.setIsTotalTrade(BussinessDictCodeList.是否_是.getValue());
+        bussTrdTransferOrderDto.setIsTotalTrade(BussinessDictCodeList.是否_否.getValue());
         bussTrdTransferOrderDto.setOrderRetStatus(DictCodeList.指令处理状态_处理成功.getValue());
         bussTrdTransferOrderDto.setTradeId(deal.getTradeId());
         bussTrdTransferOrderDto.setPortfolioId(deal.getPortfolioId());
