@@ -907,11 +907,12 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
             // GZYHTZJY-1100:深交所的到期续作到期交付日特殊处理 modify fuyongsheng 20220113 end
             //  汇总交易编号
             dealTotal.setSeqId(IDGenerator.generate());
-            if(DictCodeList.交易方向_买入.getValue().equals(dealTotal.getPs())){
-                // modify by fuyongsheng 协议回购首期的FCjbh存明细表的主键 start
+            if(DictCodeList.交易方向_买入.getValue().equals(dealTotal.getPs())
+                    || DictCodeList.交易方向_到期续做.getValue().equals(dealTotal.getPs())){
+                // XYHGFXSJ-619 :modify by fuyongsheng 协议回购首期和到期续作的FCjbh存明细表的主键 start
                 // dealTotal.setfCjbh(settleTransDataDto.getCjbh());
                 dealTotal.setfCjbh(settleTransDataDto.getTradeId());
-                // modify by fuyongsheng 协议回购首期的FCjbh存明细表的主键 end
+                // XYHGFXSJ-619 :modify by fuyongsheng 协议回购首期和到期续作的FCjbh存明细表的主键 end
             }
             settleTransDataList.add(dealTotal);
             //当笔成交数据明细.附属表流水号 非空
