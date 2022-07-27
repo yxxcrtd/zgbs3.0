@@ -449,7 +449,9 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
             trdProductDeal.setSecManageAcctId(settleTransData.getSecAcctId());
             // 关联系统交易编号
             // trdProductDeal.setfTradeId(settleTransData.getCjbh());
-            trdProductDeal.setfTradeId(dealDto.getSeqId());
+            // XYHGFXSJ-590:关联系统交易编号赋值 modify by fuyongsheng 20220727 start
+            trdProductDeal.setfTradeId(settleTransData.getfCjbh());
+            // XYHGFXSJ-590:关联系统交易编号赋值 modify by fuyongsheng 20220727 end
             // 现金流代码
             trdProductDeal.setCashId(null);
             // 登记托管机构

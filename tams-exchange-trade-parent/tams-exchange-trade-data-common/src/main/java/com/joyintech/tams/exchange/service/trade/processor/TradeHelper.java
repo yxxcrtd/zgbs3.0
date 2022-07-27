@@ -20,6 +20,7 @@ import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt2;
 import com.joyintech.tams.exchange.common.constant.joyin.InstructionPriceMode;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.dto.EntrustPriceAndYieldDto;
+import com.joyintech.tams.exchange.common.enums.EntrustBussTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.BussTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
@@ -1281,21 +1282,24 @@ public class TradeHelper {
     public IntegratedEntrust handleIntegratedEntrustWithReview(IntegratedEntrust integratedEntrust, WorkflowBean workflow) {
         logger.info("开始处理综合业务委托信息：{}", JsonUtils.getJsonFromObject(integratedEntrust));
         String stockCode = integratedEntrust.getStockCode();
-        Instrument instrument = instrumentService.queryByInnerCode(integratedEntrust.getStockCode());
-        createOrderByInstrument(integratedEntrust, instrument, null);
         String tradingDay = commonManagement.getTradingDay();
         Instruction instruction = instructionService.findById(integratedEntrust.getInstructionId());
+        //中途换券-换钱
+        if (StringUtil.equals(EntrustBussTypeEnum.中途换券指令_换钱.value, instruction.getEntrustBussType())) {
+            if (Market.isShMarket(instruction.getTradeMarket())) {
+                integratedEntrust.setMarket(Market.SHSE.value);
+            } else if (Market.isSzMarket(instruction.getTradeMarket())) {
+                integratedEntrust.setMarket(Market.SZSE.value);
+            }
+            //填充资产信息
+            fillStockInfo(integratedEntrust,instruction);
+        } else {
+            Instrument instrument = instrumentService.queryByInnerCode(integratedEntrust.getStockCode());
+            createOrderByInstrument(integratedEntrust, instrument, null);
+        }
         if (StringUtil.equals(instruction.getFinprodType2(), 金融产品类型_投管用_债券质押式正回购.getValue())
                 || StringUtil.equals(instruction.getFinprodType2(), 金融产品类型_投管用_债券质押式逆回购.getValue())) {
             integratedEntrust.setAssetType(平安资产类型_质押式回购.getValue());
-        }
-        if (StringUtil.isEmpty(stockCode)) {
-            if(Market.isShMarket(instruction.getTradeMarket())){
-                integratedEntrust.setMarket(Market.SHSE.value);
-            }else if(Market.isSzMarket(instruction.getTradeMarket())){
-                integratedEntrust.setMarket(Market.SZSE.value);
-            }
-            integratedEntrust.setAssetType(instruction.getAssetType());
         }
 
         BigDecimal entrustPrice = integratedEntrust.getEntrustPrice();
@@ -1330,10 +1334,10 @@ public class TradeHelper {
             }
 
             integratedEntrust.setReductionType("0");
-            if (StringUtil.isNotEmpty(stockCode)) {
-                integratedEntrust.setMarket(StockCodeUtils.getMarket(stockCode));
-                integratedEntrust.setStockCode(integratedEntrust.getStockCode());
-            }
+//            if (StringUtil.isNotEmpty(stockCode)) {
+//                integratedEntrust.setMarket(StockCodeUtils.getMarket(stockCode));
+//                integratedEntrust.setStockCode(integratedEntrust.getStockCode());
+//            }
             integratedEntrust.setBusiTypeTg(instruction.getBusiTypeTg());
             integratedEntrust.setFinanceAccount(instruction.getBusiAcctNo());
             integratedEntrust.setAccountName(instruction.getAcctName());
@@ -1341,9 +1345,9 @@ public class TradeHelper {
             if (createOrderByAccount(integratedEntrust, tradingDay, now)) {
                 return integratedEntrust;
             }
-            FuturesInstrument futuresInstrument = futuresInstrumentService.queryByInnerCode(stockCode);
             // 债券质押式协议回购，entrustBalance为入参，不计算覆盖
             if (!NEGOTIATED_REPO.equals(instruction.getAssetType1())) {
+                FuturesInstrument futuresInstrument = futuresInstrumentService.queryByInnerCode(stockCode);
                 // 计算委托金额
                 BigDecimal entrustBalance = TradeUtils.calculateBalance(integratedEntrust.getEntrustBs(), integratedEntrust.getEntrustPrice(), integratedEntrust.getEntrustVolume(), integratedEntrust.getAssetType(), integratedEntrust, futuresInstrument);
                 integratedEntrust.setEntrustBalance(entrustBalance);
@@ -1372,6 +1376,20 @@ public class TradeHelper {
             integratedEntrust.setErrorMsg(errorCode.errorMsg);
         }
         return integratedEntrust;
+    }
+
+    private void fillStockInfo(IntegratedEntrust integratedEntrust, Instruction instruction) {
+        List<InstructionPledge> pledges = instruction.getPledges();
+        Optional<InstructionPledge> pledgeOptional = pledges.stream()
+                .filter(o -> StringUtil.equals(o.getDisplaceDir(), "00")).findFirst();
+        if (pledgeOptional.isPresent()) {
+            InstructionPledge pledge = pledgeOptional.get();
+            integratedEntrust.setStockCode(pledge.getFinprodMarketId());
+            integratedEntrust.setStockName(pledge.getFinprodAbbr());
+            if(Objects.nonNull(pledge.getPledgeNumber())){
+                integratedEntrust.setEntrustVolume(pledge.getPledgeNumber().longValue());
+            }
+        }
     }
 
     private void fillSelfDealerTradeInfo(IntegratedEntrust integratedEntrust) {

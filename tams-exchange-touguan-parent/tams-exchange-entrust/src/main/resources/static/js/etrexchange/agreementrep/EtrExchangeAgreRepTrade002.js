@@ -2041,58 +2041,78 @@
         // 组合名称
         $("#portfolioId").change(function () {
             portfolioIdChange(false);
+            setRiskFlag(1)
         });
         // 交易场所
         $("#tradeMarket").change(function () {
-            tradeMarketChange();
+            tradeMarketChange()
+            setRiskFlag(1)
         });
         $("#ps").change(function () {
             psChange();
+            setRiskFlag(1)
         });
         // 资金账户
         $("#acctNo").change(function () {
             acctNoChange(false);
+            setRiskFlag(1)
         });
         $("#fristSettleDate").change(function () {
             settleDateChange();
+            setRiskFlag(1)
         });
         $("#expireSettleDate").change(function () {
             settleDateChange();
+            setRiskFlag(1)
         });
         $("#term").change(function () {
             termChange();
+            setRiskFlag(1)
         });
         $("#occupyDays").change(function () {
             amtCal();
+            setRiskFlag(1)
         });
         $("#tradeAmt").change(function () {
             amtCal();
             conRatioCal();
             // repSecNumCal();
+            setRiskFlag(1)
         });
         $("#yield").change(function () {
             amtCal();
+            setRiskFlag(1)
         });
         $("#repSecId").change(function () {
             printAmtCal();
+            setRiskFlag(1)
         });
         $("#repSecNum").change(function () {
             printAmtCal();
+            setRiskFlag(1)
         });
         $("#newRepSecId").change(function () {
             newprintAmtCal();
+            setRiskFlag(1)
         });
         $("#newRepSecNum").change(function () {
             newprintAmtCal();
+            setRiskFlag(1)
         });
         $("#printAmt").change(function () {
             conRatioCal();
+            setRiskFlag(1)
         });
         $("#newPrintAmt").change(function () {
             conRatioCal();
+            setRiskFlag(1)
         });
         $("#conRatio").change(function () {
             repSecNumCal();
+            setRiskFlag(1)
+        });
+        $("#entrustAmt").change(function () {
+            setRiskFlag(1)
         });
         // 绑定提交按钮
         $('#EtrAgreRepTrade001_btn_submit').click(function () {
@@ -2113,15 +2133,14 @@
         $('#EtrAgreRepTrade001_btn_riskcal').click(function () {
             doRiskcal();
         });
-        console.log("------------init-------------------------------")
-        console.log(TRADE_MARKET_CURRENT)
         if(TRADE_MARKET_CURRENT == TRADE_MARKET_03){
             $("#yield").attr("data-textrange", 3);
         }else {
             $("#yield").attr("data-textrange", 2);
         }
-        console.log($("#yield").attr("data-textrange"))
-
+        if (entity && entity.yield) {
+            $("#yield").val(entity.yield).trigger('change');
+        }
 
         if (entityStr) {
             var etrData = JSON.parse(entityStr);
