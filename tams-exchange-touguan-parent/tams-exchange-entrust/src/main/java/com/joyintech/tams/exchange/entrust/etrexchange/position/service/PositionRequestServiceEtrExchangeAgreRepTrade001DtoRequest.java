@@ -162,15 +162,38 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
             // XYHGFXSJ-328:解除质押也走券商资金账户 modify by fuyongsheng 20220721 end
             bean.setTradeId(null);
             bean.setEtrId(entity.getEntrustId());
+            // XYHGFXSJ-589:上交所解除质押指令头寸里交易金额应为0 modify by swwan 20220727 start
             // 交易金额
-            // 交易方向= 首期 取回购金额，其他取到期结算金额
+            /*// 交易方向= 首期 取回购金额，其他取到期结算金额
             if (交易方向_提前购回.getValue().equals(ps)
                     || 交易方向_到期购回.getValue().equals(ps)
                     || 交易方向_解除质押.getValue().equals(ps)) {
                 bean.setCashAmount(entity.getExpireSettleAmt());
             } else {
                 bean.setCashAmount(entity.getTradeAmt());
+            }*/
+            /**
+             * if 交易方向= 首期 then 回购金额
+             * else if 交易方向=解除质押 and 交易场所 = 深交所 then 指令.委托金额
+             * else if 交易方向=解除质押 and 交易场所 = 上交所 then 0
+             * else if 交易方向=中途换券 and and 指令业务类型 = 数据字典.指令业务类型.协议回购中途换券指令-换钱  then 指令.委托金额
+             * else 到期结算金额
+             * end if
+             */
+            if (交易方向_正回购.getValue().equals(ps) || 交易方向_逆回购.getValue().equals(ps) || 交易方向_首期.getValue().equals(ps)) {
+                bean.setCashAmount(entity.getTradeAmt());
+            } else if (交易方向_解除质押.getValue().equals(ps) && 交易场所_上海证券交易所.getValue().equals(entity.getTradeMarket())) {
+                bean.setCashAmount(BigDecimal.ZERO);
+            } else if (
+                    (交易方向_解除质押.getValue().equals(ps) && 交易场所_深圳证券交易所.getValue().equals(entity.getTradeMarket()))
+                    || (交易方向_中途换券.getValue().equals(ps) && 上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(entity.getEntrustBussType()))
+                    ) {
+                // 当前 委托金额放在到期结算金额字段中
+                bean.setCashAmount(entity.getExpireSettleAmt());
+            } else {
+                bean.setCashAmount(entity.getExpireSettleAmt());
             }
+            // XYHGFXSJ-589:上交所解除质押指令头寸里交易金额应为0 modify by swwan 20220727 end
             Map<String, Object> map = BeanUtil.object2Map(bean);
             list.add(map);
             resultMap.put("ptlCashList", list);
