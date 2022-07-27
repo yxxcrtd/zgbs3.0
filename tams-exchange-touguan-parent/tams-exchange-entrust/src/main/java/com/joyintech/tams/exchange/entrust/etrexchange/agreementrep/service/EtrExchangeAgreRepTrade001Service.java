@@ -2690,6 +2690,16 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             postionFlowDto.setRepSecNum(ArithmeticUtil.multiply(postionFlowDto.getRepSecNum(), new BigDecimal(10)));
         }
 
+        // modify by etliu 20220727 start
+        // 3.0.6协议回购+风险升级 XYHGFXSJ-461
+        //【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误
+        if (StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_提前购回.getValue())
+            || StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_到期购回.getValue())
+                || StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())) {
+            postionFlowDto.setTradeId(entity.getEtrEntrust().getFinprodId());
+        }
+        // modify by etliu 20220727 end
+
         parameter.setCustom(postionFlowDto);
         try {
             logger.info("新建指令持仓请求报文:" + JsonUtils.object2Json(parameter));
