@@ -147,6 +147,9 @@
         <if test="dealType != null and dealType != ''">
             AND '04'= #{dealType,jdbcType=VARCHAR}
         </if>
+        <if test="BID != null and BID != ''">
+            AND 1 = 2
+        </if>
         <if test="counterIdList!=null  and counterIdList.size() > 0 ">
             AND reg.counter_id IN
             <foreach collection="counterIdList" item="item" separator="," open="(" close=")">
@@ -245,7 +248,14 @@
             <if test="userId != null and userId != ''">
                 and bo.OUR_TRADER = #{userId}
             </if>
-            <if test="userId != null and userId != ''">
+            <if test="rate != null ">
+                and (case
+                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' then nvl(fpi.BP*10000, 0)
+                    when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD*100
+                    when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
+                    then fpi.REFER_YIELD*100 end) = #{rate}
+            </if>
+            <if test="ISSUE_STATUS_01 != null and ISSUE_STATUS_01 != ''">
                 and ( fpa.ISSUE_STATUS != #{ISSUE_STATUS_01} or fpa.ISSUE_STATUS is null )
             </if>
             <if test="finprodIdList != null and finprodIdList.size() > 0">
@@ -271,6 +281,9 @@
             </if>
             <if test="assetType != null and !assetType.equals('')">
                 AND fpt.TYPE_9=#{assetType,jdbcType=VARCHAR}
+            </if>
+            <if test="subscriptionAmount != null ">
+                AND bo.SUBSCRIPTION_AMOUNT=#{subscriptionAmount,jdbcType=DECIMAL}
             </if>
             <if test="counterIdList!=null  and counterIdList.size() > 0 ">
                 AND bo.OU_PARTY_ID IN
