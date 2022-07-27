@@ -2854,6 +2854,23 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
     }
 
+    //获取首期交易编号
+    public String isCanGetOrNull(EtrExchangeAgreRepTrade001Dto dto) {
+        String tradeId = "";
+        if(StringUtils.isEmpty(dto.getIntiTradeId())){
+            return null;
+        }
+        TrdProductDeal trdProductDeal = trdCommonBaseService.getFirstRepoTrade(dto.getIntiTradeId(),
+                "", dto.getSecAcctId(),
+                null);
+        //wsz 修改行情到期续作 首次结算时间传值
+        if (trdProductDeal != null) {
+            tradeId = trdProductDeal.getFinprodId();
+        }
+        return tradeId;
+
+    }
+
 
     //获取首期交易编号
     private String getFinprodIdNoFirst(EtrExchangeAgreRepTrade001Dto dto) {

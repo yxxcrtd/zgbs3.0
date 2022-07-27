@@ -1354,4 +1354,17 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
     public Message<EtrExchangeAgreRepCurrResp> getFinprodIdNoFirsts(@RequestBody EtrExchangeAgreRepTrade001Dto dto) {
         return new Message<EtrExchangeAgreRepCurrResp>().success().setData(etrExchangeAgreRepTrade001Service.getFinprodIdNoFirsts(dto));
     }
+
+
+    /**
+     * 判断到期续作是否存在首期
+     *
+     * @param dto 行情信息
+     */
+    @ApiOperation(value = "", notes = "判断到期续作是否存在首期")
+    @ResponseBody
+    @PostMapping("getWhetherExists")
+    public Message<String> isCanGetOrNull(@RequestBody EtrExchangeAgreRepTrade001Dto dto) {
+        return new Message<String>().success().setData(etrExchangeAgreRepTrade001Service.isCanGetOrNull(dto));
+    }
 }
