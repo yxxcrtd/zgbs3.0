@@ -601,7 +601,13 @@
 	            }
                 //校验转仓投资目的 add by yeming 20210823 start
                 var counterId = $('#trdInvestPersonInfo_counterId');
-                if(counterId.select2('data')[0].object == 'N' && $('#ps').val() == T01){
+
+                // modify by etliu 20220727 start
+                // 3.0.6协议回购+风险升级 XYHGFXSJ-576
+                // 【交易管理】【场外固收交易】【项目类资产交易】新建页面做内部转仓，交易对手选择内部交易对手时，转仓投资目的字段置灰不可填，提交时有必填校验
+                // if(counterId.select2('data')[0].object == 'N' && $('#ps').val() == T01){
+                if(counterId.select2('data')[0].object == 'N'){
+                    // modify by etliu 20220727 end
                     if (!$("#turnInvAim").val()) {
                         Joyin.error("请选择转仓投资目的")
                         return;
