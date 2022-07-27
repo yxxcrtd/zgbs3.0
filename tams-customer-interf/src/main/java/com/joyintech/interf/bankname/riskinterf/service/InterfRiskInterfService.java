@@ -846,7 +846,7 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                     finTradeProductKey.setFinprodId((String)temp.get("firstIssueDealNo"));
                     finTradeProductKey.setBranch(0L);
                     FinTradeProduct firstFinTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
-                    if (firstFinTradeProduct == null) {
+                    if (firstFinTradeProduct == null && StringUtil.isNotEmpty(temp.get("firstIssueDealNo"))) {
                         firstFinTradeProduct = finTradeProductMapper.selectByTradeId((String)temp.get("firstIssueDealNo"));
                     }
 
