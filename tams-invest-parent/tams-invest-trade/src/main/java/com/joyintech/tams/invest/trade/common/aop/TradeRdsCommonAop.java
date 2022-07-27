@@ -337,6 +337,10 @@ public class TradeRdsCommonAop {
                         mapTrd.put(PageFieldToInterfFactory.INF_PREOCCUPYCODE, CommonUtil.findValue(mapTrd, "entrustNo"));
                         mapTrd.put("entrustId", CommonUtil.findValue(mapTrd, "entrustNo"));
                     }
+                    if(CommonUtil.findValue(mapTrd, "settleDateStr") != null) {
+                        mapTrd.put("mdate", CommonUtil.findValue(mapTrd, "settleDateStr"));
+                        mapTrd.put("entrustDate", CommonUtil.findValue(mapTrd, "settleDateStr"));
+                    }
                     mapTrd.put("manualSettle", "Y");
                     // 实占释放
                     revokeManualSettle(mapTrd, infCode, BussinessDictCodeListRds.事件类型_投资交易.getValue(), assetType, joinPoint);
@@ -360,11 +364,15 @@ public class TradeRdsCommonAop {
                     etrMap.put("manualSettle", "Y");
                     if (StringUtil.equals(金融产品类型_投管用_债券质押式正回购.getValue(), CommonUtil.findValue(mapTrd, "finprodType2")) ||
                             StringUtil.equals(金融产品类型_投管用_债券质押式逆回购.getValue(), CommonUtil.findValue(mapTrd, "finprodType2"))) {//针对协议回购交收失败
-                        mapTrd.put("tradeAmt", CommonUtil.findValue(mapTrd, "tradedVolume"));
-                        mapTrd.put("entrustNum", CommonUtil.findValue(mapTrd, "tradedVolume"));
+                        etrMap.put("tradeAmt", CommonUtil.findValue(mapTrd, "tradedVolume"));
+                        etrMap.put("entrustNum", CommonUtil.findValue(mapTrd, "tradedVolume"));
                         etrMap.put("manualSettle", "N");
                     }
+                    if (isDqxz(mapTrd)) {
+                        etrMap.put("ps", DictCodeList.交易方向_到期续做.getValue());
+                    }
                     revokeManualSettle(etrMap, BussinessDictCodeListRds.接口系统ID_预占释放接口.getValue(), BussinessDictCodeListRds.事件类型_投资委托.getValue(), assetType, joinPoint);
+                    //throw new BusinessException("aaa");
                 }
             }else {
                 revokeBackRiskCommon(mapTrd, infCode, joinPoint);
