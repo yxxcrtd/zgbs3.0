@@ -9,6 +9,7 @@ import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.enums.EntrustBussTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum;
 import com.joyintech.tams.exchange.common.enums.invest.PsEnum;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.utils.*;
@@ -398,6 +399,13 @@ public class TradeCallbackHelper {
         if (Objects.isNull(instruction)) {
             return;
         }
+        //协议回购 非首期
+        if(EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg())
+                && !BusiTypeTgEnum.首期.codeEquals(instruction.getBusiTypeTg())){
+            instruction.setEntrustStatus(InstructionStatus.COMPLETE.value);
+            return;
+        }
+
         //数量单比较数量，金额单比较金额
         if ((instruction.getEntrustNum() > 0 && instruction.getEntrustLeftAmt().longValue() == instruction.getEntrustNum())
                 || (instruction.getEntrustAmt().doubleValue() > 0 && instruction.getEntrustLeftAmt().doubleValue() == instruction.getEntrustAmt().doubleValue())
