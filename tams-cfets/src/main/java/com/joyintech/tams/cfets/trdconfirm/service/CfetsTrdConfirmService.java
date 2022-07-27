@@ -184,7 +184,7 @@ public class CfetsTrdConfirmService extends BaseService {
             List<String> roleList=cfetsTrdQueryMapper.selectSysRoleById(userId);
             if(roleList.contains(DictCodeList.角色岗位_交易员.getValue())){
                 //交易员
-                pageParam.put("userId", SecurityUtil.getLoginUser().getUserName());
+                pageParam.put("userId", userId);
             }
         }
         //根据有无下行查询不同
@@ -226,6 +226,12 @@ public class CfetsTrdConfirmService extends BaseService {
                     pageParam.put("pledgeFinprodIds",serchExecDto.getPledgeFinprodIds());
                     pageParam.put("pledgeRatios",serchExecDto.getPledgeRatios());
                     pageParam.put("pledgeFaceValues",serchExecDto.getPledgeFaceValues());
+                } else if (StringUtil.equals(serchExecDto.getBusinesstype(), "BID")) {
+                    // 基础要素：成交日期、资产代码、交易场所、本方、认购量、成交价
+                    pageParam.put("tradeDate", serchExecDto.getTradeDate());
+                    pageParam.put("rate", serchExecDto.getTradeYield());
+                    pageParam.put("subscriptionAmount", ArithmeticUtil.multiply(serchExecDto.getLastqty(), BigDecimal.valueOf(10000)));
+                    pageParam.put("BID", serchExecDto.getBusinesstype());
                 }
             }
             //登记以及报价

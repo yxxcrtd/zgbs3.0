@@ -912,10 +912,10 @@ public class StlDataDealSzdSjsjgProcessService {
             }
         }
         /**
-         * XYBG 变更质押券   XYZJ 解除质押
+         * XYBG 变更质押券   XYJZ 解除质押
          */
         else if ((StringUtil.equals(ywlb, StlDataDealProcessConstant.SJSJG_YWLB_XYBG) && qsbj.compareTo(new BigDecimal(0)) > 0)
-                    || StringUtil.equals(ywlb, StlDataDealProcessConstant.SJSJG_YWLB_XYZJ)) {
+                    || StringUtil.equals(ywlb, StlDataDealProcessConstant.SJSJG_YWLB_XYJZ)) {
             // 首期成交编号
             settleTransData.setfCjbh(szdSjsjg.getJgfjsm());
             // 查询首期
@@ -1154,7 +1154,7 @@ public class StlDataDealSzdSjsjgProcessService {
                 }
             }
         }
-        if (StringUtil.equals(szdSjsjg.getJgywlb(), StlDataDealProcessConstant.SJSJG_YWLB_XYZJ)) {
+        if (StringUtil.equals(szdSjsjg.getJgywlb(), StlDataDealProcessConstant.SJSJG_YWLB_XYJZ)) {
             // 交易方向
             settleTransData.setPs(DictCodeListExt3.交易方向_解除质押.getValue());
             if (DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(sqSettleTransData.getFinprodType2())) {
@@ -1475,7 +1475,7 @@ public class StlDataDealSzdSjsjgProcessService {
                     settleTransDataPledge.setPledgeAmt(settleTransData.getPrinAmt());
                     stlDownDataDealWriteBaseDto.getSettleTransDataPledgeList().add(settleTransDataPledge);
                 } else if (StringUtil.equals(szdSjsjg.getJgywlb(), StlDataDealProcessConstant.SJSJG_YWLB_XYBG)
-                        || StringUtil.equals(szdSjsjg.getJgywlb(), StlDataDealProcessConstant.SJSJG_YWLB_XYZJ)) {
+                        || StringUtil.equals(szdSjsjg.getJgywlb(), StlDataDealProcessConstant.SJSJG_YWLB_XYJZ)) {
                     if(!DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换钱.getValue().equals(settleTransData.getBusiSceneCalss())){
                         // 数据明细质押品信息DTO
                         SettleTransDataPledge settleTransDataPledge = new SettleTransDataPledge();

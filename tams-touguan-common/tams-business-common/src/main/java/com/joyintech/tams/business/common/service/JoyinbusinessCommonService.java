@@ -615,6 +615,7 @@ public class JoyinbusinessCommonService extends BaseService {
         Map<String, Object> param = new HashMap<String, Object>();
         param.put("search", dto.getSearch());
         param.put("acctType", dto.getDealType());
+        param.put("sysdate", iPlatformDate.getSysDate());
         // 查询资金账户
         return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.queryAcctNo(param));
     }

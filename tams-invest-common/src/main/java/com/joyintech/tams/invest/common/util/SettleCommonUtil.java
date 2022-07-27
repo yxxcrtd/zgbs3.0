@@ -42,6 +42,7 @@ public class SettleCommonUtil {
         params.put("STM_01", DictCodeListExt1.交易市场_一级市场.getValue());
 
         params.put("TP01", DictCodeListExt1.交易场所_银行间.getValue());
+        params.put("TP02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
         params.put("TP03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
         params.put("TP04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
 

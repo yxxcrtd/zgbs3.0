@@ -559,22 +559,21 @@
         </where>
     </select>
     <select id="queryAcctNo" resultType="com.joyintech.framework.select.SelectOptionDto">
-        SELECT DISTINCT
-        sci.BUSI_ACCT_NO id,
-        sci.ACCT_NAME text,
-        pci.ACCT_TYPE as object
-        FROM
-        STL_CAPACCT_INFO sci
-            left join PTL_CAPACCT_INFO pci on sci.ACCT_NO = pci.ACCT_NO
-        <where>
+        select distinct nvl(ts.OURDEPOSITACCOUNTNUMBER, tr.OURDEPOSITACCOUNTNUMBER) as id,
+                    stlinfo.sec_acct_name                                       as text
+        from INTERF_CSTP_TRADE I
+        left join INTERF_OPICS_TRAD_REPO tr on tr.oritradeid = I.EXECID
+        left join INTERF_TRAD_SECDEAL ts on ts.FEDEALNO = I.EXECID
+        left join stl_sec_acct_info stlinfo
+        on nvl(ts.OURDEPOSITACCOUNTNUMBER, tr.OURDEPOSITACCOUNTNUMBER) = stlinfo.sec_acct_id
+        where nvl(ts.OURDEPOSITACCOUNTNUMBER, tr.OURDEPOSITACCOUNTNUMBER) is not null and stlinfo.sec_acct_name  is not null
             <if test="search != null and !search.equals('')">
-                AND	(sci.BUSI_ACCT_NO like concat('%',concat(#{search},'%'))
-                or sci.ACCT_NAME like concat('%',concat(#{search},'%')))
+                AND	(nvl(ts.OURDEPOSITACCOUNTNUMBER, tr.OURDEPOSITACCOUNTNUMBER) like concat('%',concat(#{search},'%'))
+                or stlinfo.sec_acct_name like concat('%',concat(#{search},'%')))
             </if>
-            <if test="acctType != null and !acctType.equals('')">
-                AND	pci.ACCT_TYPE = #{acctType}
+            <if test="sysdate != null ">
+                AND	nvl(ts.dealdate, tr.dealdate) = #{sysdate}
             </if>
-        </where>
     </select>
     <select id="queryMySideAndPartyList" resultType="com.joyintech.framework.select.SelectOptionDto">
         SELECT DISTINCT
