@@ -2,13 +2,14 @@ package com.joyintech.tams.invest.batch.creditoccup.processor;
 
 import com.joyintech.batch.batchbase.baseclass.BaseProcessor;
 import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
-import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.constant.DictCodeListRsk;
 import com.joyintech.tams.invest.batch.creditoccup.dto.CreditOccupReaderResult;
 import com.joyintech.tams.invest.batch.creditoccup.dto.CreditOccupResult;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto;
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -27,8 +29,9 @@ import java.util.List;
 @Service
 @Scope("prototype")
 public class CreditOccupSzProcessor extends BaseProcessor<NeedOperateEntity, CreditOccupResult> {
-
     private Logger logger = LoggerFactory.getLogger(getClass());
+    private static List<String> psList = Arrays.asList(DictCodeListExt3.交易方向_解除质押.getValue(), BussinessDictCodeList.交易方向_收息到账.getValue(),BussinessDictCodeList.交易方向_还本到账.getValue());
+
     @Override
     public CreditOccupResult process(NeedOperateEntity needOperateEntity) throws Exception {
         // 获取reader方法的返回值
@@ -49,6 +52,9 @@ public class CreditOccupSzProcessor extends BaseProcessor<NeedOperateEntity, Cre
                     dto.setPsPayment(DictCodeList.回购类型_质押式回购.getValue());
                     dto.setSaleCode(DictCodeList.回购拆借方向_逆回购.getValue());
                     dto.setFinprodId(null);
+                    if (psList.contains(dto.getPs())) {
+                        dto.setPs(DictCodeList.交易方向_到期.getValue());
+                    }
                 }
             }
             try {
