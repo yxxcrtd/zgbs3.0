@@ -914,7 +914,8 @@ public class StlDataDealSzdSjsjgProcessService {
         /**
          * XYBG 变更质押券   XYJZ 解除质押
          */
-        else if ((StringUtil.equals(ywlb, StlDataDealProcessConstant.SJSJG_YWLB_XYBG) && qsbj.compareTo(new BigDecimal(0)) > 0)
+        else if ((StringUtil.equals(ywlb, StlDataDealProcessConstant.SJSJG_YWLB_XYBG) &&
+                    qsbj != null && qsbj.compareTo(new BigDecimal(0)) > 0)
                     || StringUtil.equals(ywlb, StlDataDealProcessConstant.SJSJG_YWLB_XYJZ)) {
             // 首期成交编号
             settleTransData.setfCjbh(szdSjsjg.getJgfjsm());
