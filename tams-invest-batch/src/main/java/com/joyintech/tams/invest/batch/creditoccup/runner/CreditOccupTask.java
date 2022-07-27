@@ -26,6 +26,7 @@ import com.joyintech.tams.invest.batch.creditoccup.reader.CreditOccupSzReader;
 import com.joyintech.tams.invest.batch.creditoccup.writer.CreditOccupFirstWriter;
 import com.joyintech.tams.invest.batch.creditoccup.writer.CreditOccupSzWriter;
 import com.joyintech.tams.invest.batch.creditoccup.writer.CreditOccupWriter;
+import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
@@ -89,19 +90,15 @@ public class CreditOccupTask extends BatchBaseService {
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
-    public JobExecution execute()
-        throws BatchException {
-
+    public JobExecution execute() throws BatchException {
         SysBatchExecInfo batchExecuteInfo = this.getBatchExecuteInfo();
         if (batchExecuteInfo == null) {
             logger.info("无启动参数，批处理退出。");
             return null;
         }
-
         Map<String, Object> params = new HashMap<>();
         params.put(BatchConstant.BATCH_INFO, batchExecuteInfo);
         params.put("executeDate", DateUtil.format(batchExecuteInfo.getExecuteDate()));
-
         // 各步骤设置参数
         step1Reader.setParams(params);
         step1Processor.setParams(params);
@@ -110,15 +107,19 @@ public class CreditOccupTask extends BatchBaseService {
         step2Processor.setParams(params);
         step3Reader.setParams(params);
         step3Processor.setParams(params);
-
-        return batchBuilder.init(this).batch("step1", (BaseReader)step1Reader,
-            (BaseProcessor)step1Processor, (BaseWriter)step1Writer)
-                .batch("step2",(BaseReader)step2Reader,
-                        (BaseProcessor)step2Processor,step2Writer)
-                .batch("step3",(BaseReader)step3Reader,
-                        (BaseProcessor)step3Processor,step3Writer)
-                .builder(
-                    this.getBatchTask().getBeanName() + this.getBatchTask().getTaskId()).run();
+        try {
+            return batchBuilder.init(this).batch("step1", (BaseReader) step1Reader,
+                    (BaseProcessor) step1Processor, (BaseWriter) step1Writer)
+                    .batch("step2", (BaseReader) step2Reader,
+                            (BaseProcessor) step2Processor, step2Writer)
+                    .batch("step3", (BaseReader) step3Reader,
+                            (BaseProcessor) step3Processor, step3Writer)
+                    .builder(
+                            this.getBatchTask().getBeanName() + this.getBatchTask().getTaskId()).run();
+        }catch (Exception e) {
+            logger.error("日终授信更新异常",e);
+            throw new BatchException(RiskUtil.getLogString(e));
+        }
     }
 
 }

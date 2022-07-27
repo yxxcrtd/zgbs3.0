@@ -12,6 +12,8 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.CommonUtil;
+import com.joyintech.tams.invest.common.component.base.group.impl.dao.BasePtlCashPositionInfoMapper;
+import com.joyintech.tams.invest.common.component.base.group.impl.dao.BasePtlSecPositionInfoMapper;
 import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.invest.common.position.dao.CommonPtlPositionMapper;
@@ -65,7 +67,12 @@ public class CommonPositionService {
 	private EtrEntrustMapper etrEntrustMapper;
 	@Autowired
 	private EtrEntrustAddMapper etrEntrustAddMapper;
-	
+
+	@Autowired
+	private BasePtlCashPositionInfoMapper basePtlCashPositionInfoMapper;
+
+	@Autowired
+	private BasePtlSecPositionInfoMapper basePtlSecPositionInfoMapper;
 	/**
 	 * 头寸处理入口
 	 */
@@ -581,12 +588,21 @@ public class CommonPositionService {
 		}
 		PtlCashPosition ptlCashPosition = commonPtlPositionMapper.selectPtlCashPosition(ptlCashPositionFlow);
 		if(StringUtil.isNotEmpty(ptlCashPosition)){
-			ptlCashPosition.setAmount(ArithmeticUtil.doAdd(ptlCashPosition.getAmount(),ptlCashPositionFlow.getAmount()));
-			commonPtlPositionMapper.updatePtlCashPosition(ptlCashPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 start
+//			ptlCashPosition.setAmount(ArithmeticUtil.doAdd(ptlCashPosition.getAmount(),ptlCashPositionFlow.getAmount()));
+//			commonPtlPositionMapper.updatePtlCashPosition(ptlCashPosition);
+			basePtlCashPositionInfoMapper.updateByPrimaryKeySelectiveForFlow(ptlCashPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 end
 		}else{
 			ptlCashPosition = new PtlCashPosition();
 			BeanUtil.copyPropertiesIgnoreNull(ptlCashPosition, ptlCashPositionFlow);
-			ptlCashPositionMapper.insertSelective(ptlCashPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 start
+			try {
+				ptlCashPositionMapper.insertSelective(ptlCashPosition);
+			} catch (Exception e) {
+				basePtlCashPositionInfoMapper.updateByPrimaryKeySelectiveForFlow(ptlCashPosition);
+			}
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 end
 		}
 
 	}
@@ -607,12 +623,21 @@ public class CommonPositionService {
 		}
 		PtlSecPosition ptlSecPosition = commonPtlPositionMapper.selectPtlSecPosition(ptlSecPositionFlow);
 		if(StringUtil.isNotEmpty(ptlSecPosition)){
-			ptlSecPosition.setAmount(ArithmeticUtil.doAdd(ptlSecPosition.getAmount(),ptlSecPositionFlow.getAmount()));
-			commonPtlPositionMapper.updatePtlSecPosition(ptlSecPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 start
+//			ptlSecPosition.setAmount(ArithmeticUtil.doAdd(ptlSecPosition.getAmount(),ptlSecPositionFlow.getAmount()));
+//			commonPtlPositionMapper.updatePtlSecPosition(ptlSecPosition);
+			basePtlSecPositionInfoMapper.updateByPrimaryKeySelectiveForFlow(ptlSecPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 end
 		}else{
 			ptlSecPosition = new PtlSecPosition();
 			BeanUtil.copyPropertiesIgnoreNull(ptlSecPosition, ptlSecPositionFlow);
-			ptlSecPositionMapper.insertSelective(ptlSecPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 start
+			try {
+				ptlSecPositionMapper.insertSelective(ptlSecPosition);
+			} catch (Exception e) {
+				basePtlSecPositionInfoMapper.updateByPrimaryKeySelectiveForFlow(ptlSecPosition);
+			}
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 end
 		}
 
 	}

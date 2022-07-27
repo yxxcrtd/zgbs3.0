@@ -344,7 +344,7 @@
         where tpd.TRADE_MARKET in (#{TRADE_PLACE_03},#{TRADE_PLACE_04})
           and  tpd.TRADE_DATE = to_date(#{executeDate},'yyyy-MM-dd')
           and  tpd.TRADE_STATUS = #{status} and tpd.IS_CANCEL = #{YES_OR_NO_N}
-          and  tpd.FINPROD_TYPE2 ='F03' and tpd.PS in ('T01','T07','T22','T23') and fpt.type_6 = 'H01'
+          and  tpd.FINPROD_TYPE2 ='F03' and tpd.PS in ('T01','T07','T23') and fpt.type_6 = 'H01'
     </select>
 
 

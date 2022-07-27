@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.joyintech.tams.constant.DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令_换钱;
+
 @Service
 public class ExchangeTransMatchService extends BaseService {
 
@@ -116,6 +118,9 @@ public class ExchangeTransMatchService extends BaseService {
         // 是否中标
         map.put("IS_WIN_Y", DictCodeList.是否_是.getValue());
         map.put("IS_CANCEL_N", DictCodeList.是否_否.getValue());
+        map.put("DISPLACE_DIRECTION_01",  DictCodeListExt3.质押券置换_置换方向_换入.getValue());
+        map.put("ENTRUST_TYPE_31",  上农商_指令业务类型_协议回购中途换券指令_换钱.getValue());
+        map.put("ENTRUST_TYPE_21",  DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue());
         // GNS-956:特殊场景不加日期条件查询指令 modify by fuyongsheng 20220224 start
         String ps = String.valueOf(map.get("ps"));
         String finprodType = String.valueOf(map.get("finprodType1"));

@@ -2463,6 +2463,12 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
             EtrExchangeAgreRepTrade001Dto entity = getBussinessEntityByWorkflowId(workflowId);
             positionRequestService.sendDelete(entity);
+
+            // 删除废弃表
+            String entrustId = entity.getEntrustId();
+            etrEntrustBackupMapper.deleteByPrimaryKey(entrustId);
+            etrEntrustBackupMapper.deleteAddByPrimaryKey(entrustId);
+            etrEntrustBackupMapper.deleteDetailByPrimaryKey(entrustId);
         }
         //增加调用头寸引擎代码end
     }
@@ -2880,6 +2886,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
     //获取首期交易编号
     private String getFinprodIdNoFirst(EtrExchangeAgreRepTrade001Dto dto) {
+        logger.debug("getFinprodIdNoFirst() called with parameters => 【dto = {}】",JsonUtils.object2Json(dto));
         String tradeId = "";
         //wsz 修改行情到期续作 首次结算时间传值
         String date = "";
@@ -2889,13 +2896,15 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         } else {
             date = dto.getFristSettleDate();
         }
+        // 当一个资金账号下挂多个证券账号时，传入的证券帐号可能不同，导致查询失败，因此不传secAcctId
         TrdProductDeal trdProductDeal = trdCommonBaseService.getFirstRepoTrade(dto.getIntiTradeId(),
-                "", dto.getSecAcctId(),
+                "", "",
                 DateUtil.parse(date));
         //wsz 修改行情到期续作 首次结算时间传值
         if (trdProductDeal != null) {
             tradeId = trdProductDeal.getFinprodId();
         }
+        logger.debug("getFinprodIdNoFirst() return with result => 【tradeId = {}】",tradeId);
         return tradeId;
 
     }

@@ -36,6 +36,7 @@ import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.*;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.dto.EntrustPriceAndYieldDto;
+import com.joyintech.tams.exchange.common.enums.EntrustBussTypeEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.GuaranteedEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.NetOrFullPriceEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.TargetTypeEnum;
@@ -480,7 +481,8 @@ public class InvestmentManagement extends BaseService {
                 continue;
             }
 
-            if (StringUtil.equals(投管业务类型_中途换券.getValue(), busiTypeTg)) {
+            if (StringUtil.equals(投管业务类型_中途换券.getValue(), busiTypeTg)
+                    && !StringUtil.equals(中途换券指令_换钱.value, instruction.getEntrustBussType())) {
                 Optional<InstructionPledge> pledgeOptional = pledgeList.stream()
                         .filter(o -> StringUtil.equals(o.getDisplaceDir(), "01")).findFirst();
                 if (pledgeOptional.isPresent()) {

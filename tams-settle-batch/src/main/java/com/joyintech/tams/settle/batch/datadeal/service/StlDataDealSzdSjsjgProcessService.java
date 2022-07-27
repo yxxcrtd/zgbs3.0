@@ -914,9 +914,8 @@ public class StlDataDealSzdSjsjgProcessService {
         /**
          * XYBG 变更质押券   XYJZ 解除质押
          */
-        else if ((StringUtil.equals(ywlb, StlDataDealProcessConstant.SJSJG_YWLB_XYBG) &&
-                    qsbj != null && qsbj.compareTo(new BigDecimal(0)) > 0)
-                    || StringUtil.equals(ywlb, StlDataDealProcessConstant.SJSJG_YWLB_XYJZ)) {
+        else if ((StringUtil.equals(ywlb, StlDataDealProcessConstant.SJSJG_YWLB_XYBG)
+                || StringUtil.equals(ywlb, StlDataDealProcessConstant.SJSJG_YWLB_XYJZ))) {
             // 首期成交编号
             settleTransData.setfCjbh(szdSjsjg.getJgfjsm());
             // 查询首期
@@ -940,7 +939,6 @@ public class StlDataDealSzdSjsjgProcessService {
             settleTransData.setFpriceAmt(abs(qsbj));
             // 首期本金
             settleTransData.setPrinAmt(sqSettleTransData.getPrinAmt());
-            settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换钱.getValue());
         }
         // 报价回购
         else if(StringUtil.equals(ywlb, StlDataDealProcessConstant.SJSJG_YWLB_BJCS) || StringUtil.equals(ywlb, StlDataDealProcessConstant.SJSJG_YWLB_BJDQ)) {

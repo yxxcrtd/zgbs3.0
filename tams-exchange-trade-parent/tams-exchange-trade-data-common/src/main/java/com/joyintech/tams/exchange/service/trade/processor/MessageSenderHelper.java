@@ -7,13 +7,17 @@ import com.joyintech.tams.exchange.common.bean.investment.TradeMessage;
 import com.joyintech.tams.exchange.common.constant.BusinessFlag;
 import com.joyintech.tams.exchange.common.constant.EntrustBs;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
-import com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum;
-import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.instruction.BusinessType;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.db.domain.*;
-import com.joyintech.tams.exchange.common.utils.*;
+import com.joyintech.tams.exchange.common.enums.EntrustBussTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
+import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
+import com.joyintech.tams.exchange.common.utils.JsonUtils;
+import com.joyintech.tams.exchange.common.utils.TradePlatUtils;
+import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionPledgeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -187,7 +191,8 @@ public class MessageSenderHelper {
 
         //协议回购
         if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
-            if (BusiTypeTgEnum.首期.codeEquals(trade.getBusiTypeTg())) {
+            if (BusiTypeTgEnum.首期.codeEquals(trade.getBusiTypeTg())
+                    || StringUtil.equals(EntrustBussTypeEnum.中途换券指令_换钱.value, instruction.getEntrustBussType())) {
                 //回购金额
                 tradeMessage.setDealBalance(entrust.getTradedBalance());
             } else {
