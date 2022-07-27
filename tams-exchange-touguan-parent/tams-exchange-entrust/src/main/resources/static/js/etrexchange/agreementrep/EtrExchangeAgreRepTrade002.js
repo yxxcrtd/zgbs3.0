@@ -2133,15 +2133,14 @@
         $('#EtrAgreRepTrade001_btn_riskcal').click(function () {
             doRiskcal();
         });
-        console.log("------------init-------------------------------")
-        console.log(TRADE_MARKET_CURRENT)
         if(TRADE_MARKET_CURRENT == TRADE_MARKET_03){
             $("#yield").attr("data-textrange", 3);
         }else {
             $("#yield").attr("data-textrange", 2);
         }
-        console.log($("#yield").attr("data-textrange"))
-
+        if (entity && entity.yield) {
+            $("#yield").val(entity.yield).trigger('change');
+        }
 
         if (entityStr) {
             var etrData = JSON.parse(entityStr);

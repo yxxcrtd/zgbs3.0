@@ -344,7 +344,7 @@
                 <div class="form-inline-wrap" style="width: 50%; padding-top:6px;" id="yield_div">
                     <label class="layui-form-label" style="width: 150px;" data-th-text="#{EtrExchangeAgreRepTrade001.yield}">回购利率</label>
                     <div class="layui-input-inline input-inline" style=" margin: 0px; margin-left: auto;">
-                        <input type="text" id="yield" name="yield" placeholder="请输入内容" data-pattern="" data-fixtype="2" data-textrange='2' class="layui-input form-input text-number"
+                        <input type="text" id="yield" name="yield" placeholder="请输入内容" data-pattern="" data-fixtype="2" data-textrange='3' class="layui-input form-input text-number"
                                data-th-value="${entity?.yield}" required="required" autocomplete="off" maxlength=9>
                         <span class="input-right-show">%</span>
                     </div>
@@ -710,6 +710,7 @@
         var UNIT_01 =  /*[[${UNIT_01}]]*/'';
         var UNIT_04 = /*[[${UNIT_04}]]*/'';
         var entityStr = /*[[${entityStr}]]*/'';
+        var entity = /*[[${entity}]]*/'';
         var entity_RiskTrialRetList = eval(/*[[${entity_RiskTrialRetList}]]*/'');
         var riskTrialSpan = /*[[${riskTrialSpan}]]*/'';
         var risk_math_switch = /*[[${risk_math_switch}]]*/'';
