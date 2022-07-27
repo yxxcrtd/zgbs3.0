@@ -498,7 +498,6 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
             String assetType2 = String.valueOf(CommonUtil.findValue(dataMap,"assetType2"));
             if (StringUtil.equals(assetType2,DictCodeList.回购类型_质押式协议回购.getValue())){
                 // 查询指令信息，取得正、逆回购信息
-
                 if (StringUtil.isNotEmpty(etrEntrust) && StringUtil.equals(etrEntrust.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())){
                     finDto.setAssetType2(DictCodeList.回购拆借方向_正回购.getValue());
                 }else {
@@ -510,11 +509,9 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                 EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entrustCode);
                 if (协议回购到期交易方向.contains(finDto.getPs())){
                     finDto.setPs(DictCodeList.交易方向_到期.getValue());
+                    //finDto.setPs(finDto.getPs());
                     //协议回购到期交易方向 需要使用到期结算金额实占
                     finDto.setAmount(CommonUtil.getBigDecimal(dataMap,"amount",BigDecimal.ZERO));
-                    //协议回购到期交易方向 的指令没有进行预占，不需要处理预占信息，将指令代码置空
-                    //finDto.setEntrustCode(null);
-
                 }else {
                     finDto.setPs(DictCodeList.交易方向_买入.getValue());
                     finDto.setAmount(CommonUtil.getBigDecimal(dataMap, "amount",BigDecimal.ZERO));
@@ -567,9 +564,11 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                 }
                 //wangyang1 add by 增加期限金额 2021年9月10日 end
                 if(StringUtil.equals(DictCodeListExt3.交易方向_解除质押.getValue(),CommonUtil.findValue(dataMap,"ps"))){
-                    finDto.setPreOccupyCode(null);
-                    finDto.setEntrustCode(null);
+                    finDto.setPreOccupyCode(finDto.getEntrustCode());
+                    //finDto.setEntrustCode(null);
                     if(finDto.getAmount().compareTo(BigDecimal.ZERO) == 0) {
+                        finDto.setPreOccupyCode(null);
+                        finDto.setEntrustCode(null);
                         FinTradeProductKey finTradeProductKey = new FinTradeProductKey();
                         finTradeProductKey.setFinprodId((String) dataMap.get("firstIssueDealNo"));
                         finTradeProductKey.setBranch(0L);
@@ -579,6 +578,9 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                             finDto.setTradeNum(firstFinTradeProduct.getPrin());
                         }
                     }
+                    /*else {
+                        finDto.setTradeNum(BigDecimal.ZERO);
+                    }*/
                 }
                 if (StringUtil.equals(DictCodeListExt3.交易方向_中途换券.getValue(),CommonUtil.findValue(dataMap,"ps"))){
                     finDto.setPreOccupyCode(null);
