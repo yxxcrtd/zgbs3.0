@@ -247,6 +247,8 @@ public class Rsk003Service extends EventBaseService<Rsk003InEntity> {
 
         // 从风险事件列表中取出相关的参数列表
         Set<String> paraIdList = getParamIdList(eveList);
+        log("风控触发指标参数有：【{}】", paraIdList, en->en != null ? en : "");
+        setRemark(response,"风控触发指标参数有：", paraIdList, en->en != null ? en : "",getParam(paraIdList));
         // 对于批量交易出现两笔正反同步交易时，排除影响的同一参数
         removeSameParam(paraIdList, mapData, eveList);
         // 将风险事件关联的指标参数挂到组合（包）
@@ -284,8 +286,6 @@ public class Rsk003Service extends EventBaseService<Rsk003InEntity> {
         setServiceInfo("paramMap", paramMap);
         // add by zhangrui1 end
 
-        log("涉及的指标参数有：【{}】", paramMap.entrySet(), en->en != null ? en.getKey() : "");
-        setRemark(response,"涉及的指标参数有：", paramMap.entrySet(), en->en != null ? en.getKey() : "",paramMap);
         RskIsupTrialCls isupTrialCls = new RskIsupTrialCls();
         // 业务类型
         isupTrialCls.setTradeType((String)request.getBodyField(EVENT_TYPE));
@@ -549,6 +549,8 @@ public class Rsk003Service extends EventBaseService<Rsk003InEntity> {
         removeSameParam(paraIdList, mapData, eveList);
         // 取得所有指标参数信息
         Map<String, IParam> paramMap = getParam(paraIdList);
+        log("风控触发指标参数有：【{}】", paraIdList, en->en != null ? en : "");
+        setRemark(response,"风控触发指标参数有：", paraIdList, en->en != null ? en : "",paramMap);
         // 若指标参数不存在则抛出异常
         if (CollectionUtils.isEmpty(paramMap)) {
             throw new InterfException("指标参数信息不存在，实占失败");
@@ -583,8 +585,6 @@ public class Rsk003Service extends EventBaseService<Rsk003InEntity> {
         }
         final Map<String, Map<String, IValue<Object>>> paraList = paraCond;
 
-        log("涉及的指标参数有：【{}】", paraCond.entrySet(), en->en != null ? en.getKey() : "");
-        setRemark(response,"涉及的指标参数有：", paramMap.entrySet(), en->en != null ? en.getKey() : "",paramMap);
         // 预占编号
         String preCode = (String)mapData.get("preOccupyCode");
         // 执行事务处理（Redis操作）
