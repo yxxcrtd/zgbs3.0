@@ -704,11 +704,12 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             }
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, agreRepExpireUnBuyDto);
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, agreRepExpireUnBuyDto);
-            if(StringUtils.isEmpty(agreRepExpireUnBuyDto.getFinprodId())){
-                agreRepExpireUnBuyDto.setFinprodId(getFinprodIdNoFirst(entity));
-            }
             if (StringUtil.isNotEmpty(agreRepExpireUnBuyDto.getFinprodId())) {
                 BeanUtil.copyPropertiesIgnoreNull(etrPledge, agreRepExpireUnBuyDto);
+                list.add(etrPledge);
+            } else if( StringUtil.isEmpty(agreRepExpireUnBuyDto.getFinprodId()) && Objects.equals("T", entity.getTransCode())) {
+                BeanUtil.copyPropertiesIgnoreNull(etrPledge, agreRepExpireUnBuyDto);
+                etrPledge.setFinprodId(entity.getFinprodId());
                 list.add(etrPledge);
             }
             etrEntrustAdd.setRedoType(entity.getRedoType());
