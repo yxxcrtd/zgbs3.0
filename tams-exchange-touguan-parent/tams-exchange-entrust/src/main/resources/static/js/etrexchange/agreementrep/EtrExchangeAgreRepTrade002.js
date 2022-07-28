@@ -447,6 +447,7 @@
         var occupyDays = $("#occupyDays").val();
         var tradeAmt = $("#tradeAmt").val();
         var y = $("#yield").val();
+        $("#yield").val(Number(y).toFixed(2)).trigger('change');
         if (occupyDays && tradeAmt && y) {
             var intamt = Math.round(tradeAmt * y / 100 * occupyDays / 365 * 100) / 100;
             var expireSettleAmt = parseFloat(intamt) + parseFloat(tradeAmt);
