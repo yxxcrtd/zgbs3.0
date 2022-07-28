@@ -263,6 +263,16 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                         tradePreClearingService.buildPositionBaseData(trdTempDto, infContractDetailfile);
                         // 临时交易及其他数据处理
                         tradePreClearingService.trdRepoPeriodT56(trdTempDto, infContractDetailfile, true);
+
+                        // modify by etliu 20220727 start
+                        // 3.0.6协议回购+风险升级 XYHGFXSJ-461
+                        //【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误
+                        List<ManualSettleDto> tepmPledgeInfoList = manualSettleMapper.selectPledgeInfo(infContractDetailfile.getFinprodId());
+                        if (!StringUtil.isEmptyList(tepmPledgeInfoList)) {
+                            ((InfContractDetailfile) trdTempDto.getData()).setFinprodId(tepmPledgeInfoList.get(0).getPledgeId());
+                            trdTempDto.setTradeAmt(tepmPledgeInfoList.get(0).getPrin());
+                        }
+                        // modify by etliu 20220727 end
                     }
 
                     // modify by etliu 20220227 start

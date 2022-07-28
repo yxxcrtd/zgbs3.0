@@ -548,7 +548,12 @@ public class TradeMsgProcessor {
                     orderInterface.setErrorMsg(errorMsg);
                     return false;
                 }
-                instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() + entrustVolume));
+                if(EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg())
+                        && !BusiTypeTgEnum.首期.codeEquals(instruction.getBusiTypeTg())){
+                    instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() + instruction.getEntrustNum()));
+                }else  {
+                    instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() + entrustVolume));
+                }
 //                messageSenderService.pushProgressToMQ(instruction);
                 messageSenderManagement.pushProgress(instruction);
                 logger.info("frozen instruction EntrustNum {} FrozenQuantity {} EntrustLeftAmt {}", instruction.getEntrustNum(), instruction.getFrozenQuantity(), instruction.getEntrustLeftAmt());
@@ -589,7 +594,12 @@ public class TradeMsgProcessor {
                     orderInterface.setErrorMsg(errorMsg);
                     return false;
                 }
-                instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() + entrustVolume));
+                if(EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg())
+                        && !BusiTypeTgEnum.首期.codeEquals(instruction.getBusiTypeTg())){
+                    instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() + instruction.getEntrustNum()));
+                }else  {
+                    instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() + entrustVolume));
+                }
 //                messageSenderService.pushProgressToMQ(instruction);
                 messageSenderManagement.pushProgress(instruction);
                 logger.info("frozen instruction EntrustNum {} FrozenQuantity {} EntrustLeftAmt {}", instruction.getEntrustNum(), instruction.getFrozenQuantity(), instruction.getEntrustLeftAmt());

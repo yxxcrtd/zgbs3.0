@@ -67,7 +67,11 @@
         NVL(TRD.FINPROD_TYPE2, TFPDT.FINPROD_TYPE2))),
         PTPD1.PA_BUSS_TYPE) END CASHFLOWTYPE,*/
         NVL(NVL(NVL(TRD.FINPROD_TYPE2, TFPDT.FINPROD_TYPE2), TRD1.FINPROD_TYPE2),PTPD.PA_BUSS_TYPE)   AS CASHFLOWTYPE,
-        case when FPT.TYPE_8 in ('F07','F10','F12') then FPT.type_7 else NVL(NVL(TRD.PS, TFPDT.PS), TRD1.PS) end as  cashType,
+        <!-- modify by etliu 20220728 start 3.0.6协议回购+风险升级 XYHGFXSJ-640【实时资产头寸查询】【现金流缺口分析】协议回购深交所正回购提起购回，手工交收确认后，1、现金流缺口分析的现金流明细中，交易方向 显示错误，应显示提前购回。 2、实时资产头寸查询，债券质押式回购 债券， 持仓展示错误 start -->
+        case
+            when FPT.TYPE_8 = 'F07' and FPT.TYPE_6 = 'H01' and NVL(NVL(TRD.PS, TFPDT.PS), TRD1.PS) != 'T01' then NVL(NVL(TRD.PS, TFPDT.PS), TRD1.PS)
+            when FPT.TYPE_8 in ('F07','F10','F12') then FPT.type_7 else NVL(NVL(TRD.PS, TFPDT.PS), TRD1.PS) end as  cashType,
+        <!-- modify by etliu 20220728 start 3.0.6协议回购+风险升级 XYHGFXSJ-640【实时资产头寸查询】【现金流缺口分析】协议回购深交所正回购提起购回，手工交收确认后，1、现金流缺口分析的现金流明细中，交易方向 显示错误，应显示提前购回。 2、实时资产头寸查询，债券质押式回购 债券， 持仓展示错误 end -->
         CASE
         WHEN tfpdt.ps = 'C11' AND tfpdt.finprod_type2!='03'
         THEN tfpdt.finprod_type2
@@ -298,6 +302,10 @@
         /*平台日当天是付息截止日，用前一天的持仓来预测，当天增加或减少的持仓不影响利息预测*/
         and ((fcp.MDATE = to_date(#{sysDate},'YYYY-MM-DD') AND psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD') - 1)
         OR (fcp.MDATE != to_date(#{sysDate},'YYYY-MM-DD') AND psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD')))
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 start -->
+        and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 end -->
         and (fp.IS_RIGHT = 'N' or fp.IS_RIGHT is null)
         and (fp.FINPROD_TYPE2 not in ('F18','F17','F07') or fp.FINPROD_TYPE2 is null)
         and pa.USER_ID = #{userId}
@@ -427,6 +435,10 @@
         /*平台日当天是付息截止日，用前一天的持仓来预测，当天增加或减少的持仓不影响利息预测*/
         and ((fcp.MDATE = to_date(#{sysDate},'YYYY-MM-DD') AND psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD') - 1)
         OR (fcp.MDATE != to_date(#{sysDate},'YYYY-MM-DD') AND psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD')))
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 start -->
+        and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 end -->
         and (fp.IS_RIGHT = 'N' or fp.IS_RIGHT is null)
         and fp.FINPROD_TYPE2  in ('F18','F17','F07')
         and pa.USER_ID = #{userId}
@@ -548,6 +560,10 @@
         /*平台日当天是付息截止日，用前一天的持仓来预测，当天增加或减少的持仓不影响利息预测*/
         and ((fcp.MDATE = to_date(#{sysDate},'YYYY-MM-DD') AND psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD') - 1)
         OR (fcp.MDATE != to_date(#{sysDate},'YYYY-MM-DD') AND psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD')))
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 start -->
+        and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 end -->
         and fp.IS_RIGHT = 'Y'
         and (
         NOT EXISTS (
@@ -961,6 +977,10 @@
         and tpd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR}
         AND TPD.IS_CANCEL='N'
         )
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 start -->
+        and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 end -->
         and psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD')
         and fp.FINPROD_TYPE2  in ('F18','F17','F07')
         and psp.ccy = #{ccy1,jdbcType=VARCHAR}
@@ -1041,6 +1061,10 @@
         and tpd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR}
         AND TPD.IS_CANCEL='N'
         )
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 start -->
+        and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 end -->
         and psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD')
         and fp.IS_RIGHT = 'Y'
         and (
