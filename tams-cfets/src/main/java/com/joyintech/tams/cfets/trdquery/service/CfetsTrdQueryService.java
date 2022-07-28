@@ -709,6 +709,16 @@ public class CfetsTrdQueryService extends BaseService {
         //表单data
         CfetsTrdQueryIbuInfoListResponse dataform = new CfetsTrdQueryIbuInfoListResponse();
         pageParam.put("effectiveStatus", dto.getEffectiveStatus() == null ? dto.getEffectFlag() : dto.getEffectiveStatus());
+        // 指令查询页面和报价页面使用参数字典不同
+        if("有效".equals(dto.getEffectiveStatusStr())){
+            pageParam.put("effectiveStatus", DictCodeListExt1.交易流程状态_有效.getValue());
+        }
+        if("流程中".equals(dto.getEffectiveStatusStr())){
+            pageParam.put("effectiveStatus", DictCodeListExt1.交易流程状态_流程中.getValue());
+        }
+        if("撤销".equals(dto.getEffectiveStatusStr())){
+            pageParam.put("effectiveStatus", DictCodeListExt1.交易流程状态_撤销.getValue());
+        }
         //有效状态
         pageParam.put("STATUS_VALID_01", DictCodeListExt1.有效状态_有效.getValue());
         pageParam.put("STATUS_VALID_03", DictCodeListExt1.有效状态_撤销.getValue());

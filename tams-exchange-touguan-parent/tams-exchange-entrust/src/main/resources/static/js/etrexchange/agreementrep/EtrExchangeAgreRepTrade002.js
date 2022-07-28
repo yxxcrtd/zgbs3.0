@@ -2145,13 +2145,23 @@
         } else {
             $("#yield").attr("data-textrange", 2);
         }
+
         console.log("--------pageModel-------------")
         console.log(pageModel)
         console.log(PAGE_MODEL_EDIT)
         if (pageModel == PAGE_MODEL_EDIT) {
-            if (entity && entity.yield) {
-                $("#yield").val(entity.yield).trigger('change');
+            var repPs = $("#repPs").val();
+            if (entity && entity.yield && entity.ps != PS_T93 && entity.ps != PS_T94
+                && (repPs == BACK_LEND_DIRECTION_03 || repPs == BACK_LEND_DIRECTION_04)) {
+                if (TRADE_MARKET_CURRENT == TRADE_MARKET_03) {
+                    $("#yield").attr("data-textrange", 3);
+                    $("#yield").val(Number(entity.yield).toFixed(3));
+                } else {
+                    $("#yield").attr("data-textrange", 2);
+                    $("#yield").val(Number(entity.yield).toFixed(2));
+                }
             }
+
             //上交所 解除质押 隐藏结算金额
             if (entity && entity.ps == PS_T93 && TRADE_MARKET_CURRENT == TRADE_MARKET_03) {
                 $("#entrustAmt_div").hide();
