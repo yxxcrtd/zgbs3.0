@@ -2,6 +2,8 @@ package com.joyintech.tams.invest.batch.creditoccup.processor;
 
 import com.joyintech.batch.batchbase.baseclass.BaseProcessor;
 import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
+import com.joyintech.batch.batchbase.exception.BatchException;
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -10,6 +12,7 @@ import com.joyintech.tams.constant.DictCodeListRsk;
 import com.joyintech.tams.invest.batch.creditoccup.dto.CreditOccupReaderResult;
 import com.joyintech.tams.invest.batch.creditoccup.dto.CreditOccupResult;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto;
 import org.slf4j.Logger;
@@ -39,10 +42,14 @@ public class CreditOccupSzProcessor extends BaseProcessor<NeedOperateEntity, Cre
         List<CreditLinesInputDto> creditLinesInputs = readerResult.getCreditLinesInputs();
         if(!StringUtil.isEmptyList(creditLinesInputs)){
             List<CreditLinesInputDto> creditLinesInputsObj = new ArrayList<>();
-            for(CreditLinesInputDto dto:creditLinesInputs){
+            List<CreditLinesInputDto> creditLinesInputzy = new ArrayList<>();
+            for(CreditLinesInputDto dto : creditLinesInputs){
+                if(StringUtil.isEmpty(dto.getTradeId())) continue;
                 CreditLinesInputDto dto1 = new CreditLinesInputDto();
+                BeanUtil.copyPropertiesIgnoreNull(dto1,dto);
                 dto1.setTradeId(dto.getTradeId());
                 dto1.setTradeStatus("03");
+                dto1.setTradeAmt(dto1.getTradeAmt());
                 creditLinesInputsObj.add(dto1);
                 dto.setTradeStatus("01");
                 dto.setCreditCallType(DictCodeListRsk.授信占用类别_实占.getValue());
@@ -56,13 +63,15 @@ public class CreditOccupSzProcessor extends BaseProcessor<NeedOperateEntity, Cre
                         dto.setPs(DictCodeList.交易方向_到期.getValue());
                     }
                 }
+                creditLinesInputzy.add(dto);
             }
             try {
                 AllTradeCommonUtil.handleBeforeTradeComplete(creditLinesInputsObj, DictCodeListRsk.授信占用类别_实占.getValue());
-                AllTradeCommonUtil.handleBeforeTradeComplete(creditLinesInputs, DictCodeListRsk.授信占用类别_实占.getValue());
-            }
-            catch (Exception e){
-                logger.error("授信日终实占批处理异常:"+e.getMessage());
+                AllTradeCommonUtil.handleBeforeTradeComplete(creditLinesInputzy, DictCodeListRsk.授信占用类别_实占.getValue());
+            } catch (Exception e){
+                //e.printStackTrace();
+                logger.error("授信日终实占批处理异常:",e);
+                throw new BatchException(RiskUtil.getLogString(e));
             }
         }
         return null;

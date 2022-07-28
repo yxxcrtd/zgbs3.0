@@ -79,21 +79,26 @@ public class EtrExchangeAgreRepTradeValidator implements EtrCommonValidator {
             }
         }
 
-        Date sysDate = iPlatformDate.getSysDate();
-        Map<String, Object> params = new HashMap<>();
-        params.put("finprodId", dto.getFinprodId());
-        params.put("sysDate", sysDate);
-        FinExercisePlanDto finExercisePlanDto = finExercisePlanMapper.selectDateByFinprodId(params);
-        if (Objects.nonNull(finExercisePlanDto) && Objects.nonNull(finExercisePlanDto.getExerciseDate())) {
-            Date exerciseDate = finExercisePlanDto.getExerciseDate();
-            if (DateUtil.compareTo(exerciseDate, DateUtil.parse(dto.getVdate())) <= 0) {
-                errorList.add(new ValidMessage("", "行权计划中的赎回日期必须大于协议回购到期结算日！"));
-            }
-        }
 
-        if (StringUtil.isNotBlank(dto.getVdate())) {
-            if (DateUtil.compareTo(DateUtil.parse(dto.getExpireSettleDate()), DateUtil.parse(dto.getVdate())) <= 0) {
-                errorList.add(new ValidMessage("", "质押券的到期日必须大于协议回购到期结算日！"));
+        if (StringUtil.equals(DictCodeListExt3.交易方向_首期.getValue(), dto.getPs())
+                || StringUtil.equals(DictCodeListExt3.交易方向_到期续做.getValue(), dto.getPs())) {
+            Date sysDate = iPlatformDate.getSysDate();
+            Map<String, Object> params = new HashMap<>();
+            params.put("finprodId", dto.getFinprodId());
+            params.put("sysDate", sysDate);
+            FinExercisePlanDto finExercisePlanDto = finExercisePlanMapper.selectDateByFinprodId(params);
+            if (Objects.nonNull(finExercisePlanDto) && Objects.nonNull(finExercisePlanDto.getExerciseDate())) {
+                Date exerciseDate = finExercisePlanDto.getExerciseDate();
+                if (DateUtil.compareTo(exerciseDate, DateUtil.parse(dto.getVdate())) <= 0) {
+                    errorList.add(new ValidMessage("", "行权计划中的赎回日期必须大于协议回购到期结算日！"));
+                }
+            }
+
+            finProduct = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
+            if(Objects.nonNull(finProduct) && Objects.nonNull(finProduct.getMdate())){
+                if (DateUtil.compareTo(DateUtil.parse(dto.getExpireSettleDate()), DateUtil.parse(dto.getMdate())) <= 0) {
+                    errorList.add(new ValidMessage("", "质押券的到期日必须大于协议回购到期结算日！"));
+                }
             }
         }
 

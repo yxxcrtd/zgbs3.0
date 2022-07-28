@@ -174,6 +174,8 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
 
     private String finprodId;
 
+    private String vdate;
+
     /**
      * 回购期限
      */
@@ -687,5 +689,13 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
 
     public void setFinprodId(String finprodId) {
         this.finprodId = finprodId;
+    }
+
+    public String getVdate() {
+        return vdate;
+    }
+
+    public void setVdate(String vdate) {
+        this.vdate = vdate;
     }
 }

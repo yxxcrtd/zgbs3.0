@@ -458,29 +458,22 @@
         FIN_PRODUCT_TYPE.Type_7 as ps, /** 交易方向 **/
         trd_fin_product_deal_total.totle_trade_id,
         fin_trade_product.Mdate,
+        fin_trade_product.Vdate,
         case
-        when trd_fin_product_deal_total.totle_trade_id is not null then
-        '已购回'
-        else
-        '未购回'
+            when trd_fin_product_deal_total.totle_trade_id is not null then '已购回'
+            else '未购回'
         end as purStatus, /** 购回状态 **/
         case
-        when fin_trade_product.Mdate <![CDATA[<=]]> #{sysdate,jdbcType=DATE} then
-        #{YES_OR_NO_Y}
-        else
-        #{YES_OR_NO_N}
+            when fin_trade_product.Mdate <![CDATA[<=]]> #{sysdate,jdbcType=DATE} then #{YES_OR_NO_Y}
+            else #{YES_OR_NO_N}
         end as isExpire,
         CASE
-        WHEN fin_trade_product.Mdate <![CDATA[<=]]> #{sysdate,jdbcType=DATE} THEN
-        '是'
-        ELSE
-        '否'
+            WHEN fin_trade_product.Mdate <![CDATA[<=]]> #{sysdate,jdbcType=DATE} THEN '是'
+            ELSE '否'
         END AS isExpireStr, /** 是否到期 **/
         case
-        when trd_product_deal_2.trade_id is not null then
-        '已交收'
-        else
-        '未交收'
+            when trd_product_deal_2.trade_id is not null then '已交收'
+            else '未交收'
         end as settleStatus, /** 交收状态 **/
         fin_trade_product.TERM repDays, /** 回购天数 **/
         fin_trade_product.Mdate backDate, /** 回购到期日 **/
@@ -497,10 +490,8 @@
         fin_trade_product.vpay_date fristSettleDate, /** 首次结算日 **/
         fin_trade_product.mpay_date expireSettleDate, /** 到期结算日 **/
         case
-        when fin_trade_product.mpay_date <![CDATA[<=]]> #{sysdate,jdbcType=DATE} then
-        0
-        else
-        TO_NUMBER(fin_trade_product.mpay_date - #{sysdate,jdbcType=DATE})
+            when fin_trade_product.mpay_date <![CDATA[<=]]> #{sysdate,jdbcType=DATE} then 0
+            else TO_NUMBER(fin_trade_product.mpay_date - #{sysdate,jdbcType=DATE})
         end as remainDays, /** 剩余日期 **/
         fin_trade_product.act_cap_days occupyDays, /** 实际占款天数 **/
         fin_trade_product.m_int_amt mIntAmt, /** 回购利息 **/
@@ -551,7 +542,11 @@
         ee.REMARK as addCla,
         SSAI.SEC_ACCT_ID secAcctId,
         fp.FINPROD_ID finprodId,
-        SCI.ACCT_NO acctNo
+        SCI.ACCT_NO acctNo,
+        CASE
+        WHEN eea.BUSI_TYPE_POSITION = 'EX015' THEN ee.ENTRUST_DATE
+        WHEN eea.BUSI_TYPE_POSITION = 'EX011' THEN fin_trade_product.Vdate
+        ELSE fin_trade_product.Mdate end as sysDate1
         from fin_trade_product /** 交易类金融产品 **/
         inner join FIN_PRODUCT_TYPE /** 金融产品分类表 **/
             on fin_trade_product.finprod_id = FIN_PRODUCT_TYPE.Finprod_Id
@@ -632,7 +627,7 @@
             AND isExpire = #{isDate}
         </if>
         <if test="sysdate != null">
-            AND ((Mdate <![CDATA[<=]]> #{sysdate,jdbcType=DATE} and totle_trade_id is null) or Mdate <![CDATA[>]]> #{sysdate,jdbcType=DATE} )
+            and ((sysDate1 <![CDATA[<=]]> #{sysdate,jdbcType=DATE} and totle_trade_id is null) or sysDate1 <![CDATA[>]]> #{sysdate,jdbcType=DATE} )
         </if>
         <if test="origSerialNo != null and origSerialNo != ''">
             AND intiTradeId  like '%' || #{origSerialNo} || '%'

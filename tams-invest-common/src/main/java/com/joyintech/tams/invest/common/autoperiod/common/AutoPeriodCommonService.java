@@ -29,7 +29,6 @@ import com.joyintech.tams.invest.common.dto.period.trdbondduration.TrdBondDurDbI
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dto.AllTradeCommonInputDto;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
-import com.joyintech.tams.systemtools.util.CommonUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -612,7 +611,7 @@ public class AutoPeriodCommonService extends BaseService {
                 BeanUtil.copyPropertiesIgnoreNull(tempDeal,trdProductDeal);
                 if(StringUtil.isNotEmpty(tempDeal.getFinprodType2())) {
                     if (StringUtil.equals(tempDeal.getFinprodType2(), "F01")) {
-                        tempDeal.setBusiType("TRD10");
+                        tempDeal.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
                     } else if (StringUtil.equals(tempDeal.getFinprodType2(), "F02") || StringUtil.equals(tempDeal.getFinprodType2(), "F03")) {
                         tempDeal.setBusiType("TRD16");
                     }
