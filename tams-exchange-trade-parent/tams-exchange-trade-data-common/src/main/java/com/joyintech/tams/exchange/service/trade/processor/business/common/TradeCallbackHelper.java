@@ -400,8 +400,8 @@ public class TradeCallbackHelper {
             return;
         }
         //协议回购 非首期
-        if(EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg())
-                && !BusiTypeTgEnum.首期.codeEquals(instruction.getBusiTypeTg())){
+        if (EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg())
+                && !BusiTypeTgEnum.首期.codeEquals(instruction.getBusiTypeTg())) {
             instruction.setEntrustStatus(InstructionStatus.COMPLETE.value);
             return;
         }
@@ -442,7 +442,13 @@ public class TradeCallbackHelper {
         BigDecimal unFrozenBalanceInstruction = null;
         if (Objects.nonNull(instruction)) {
             if (instruction.volumeInstruction()) {
-                instruction.setEntrustLeftAmt(BigDecimal.valueOf(instruction.getEntrustLeftAmt().longValue() + tradeRecord.getTradedVolume()));
+                if (EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg())
+                        && !BusiTypeTgEnum.首期.codeEquals(instruction.getBusiTypeTg())) {
+                    //协议回购非首期：指令成交数量 = 指令数量
+                    instruction.setEntrustLeftAmt(BigDecimal.valueOf(instruction.getEntrustLeftAmt().longValue() + instruction.getEntrustNum()));
+                } else {
+                    instruction.setEntrustLeftAmt(BigDecimal.valueOf(instruction.getEntrustLeftAmt().longValue() + tradeRecord.getTradedVolume()));
+                }
             } else {
                 ////可能存在金额指令的委托不是冻结金额的，传入成交金额  ----  对于债券， 现在指令为净价，需要单独处理
                 //取成交金额（对于债券取全价金额）
