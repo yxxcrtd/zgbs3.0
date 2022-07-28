@@ -1171,7 +1171,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     }else if(null != outPledge){
                         // 如果出的质押券跟首期一致,则券面总额、质押券数量相减
                         firstFinDealPledge.setPledgeAmt(ArithmeticUtil.subtract(firstFinDealPledge.getPledgeAmt(), outPledge.getPledgeAmt()));
-                        firstFinDealPledge.setPledgeNumber(ArithmeticUtil.subtract(firstFinDealPledge.getPledgeNumber(), inPledge.getPledgeNumber()));
+                        firstFinDealPledge.setPledgeNumber(ArithmeticUtil.subtract(firstFinDealPledge.getPledgeNumber(), outPledge.getPledgeNumber()));
                     }
                     // 如果质押券面额为0,则忽略
                     if(BigDecimal.ZERO.compareTo(firstFinDealPledge.getPledgeAmt()) >= 0){
@@ -1192,6 +1192,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     for(SettleTransDataTotalPledge inpledge : inpledges){
                         FinDealPledge finDealPledge = new FinDealPledge();
                         finDealPledge.setFinprodId(dealTotal.getFinprodId());
+                        finDealPledge.setBranch(0L);
                         finDealPledge.setPledgeFinprodId(inpledge.getPledgeFinprodId());
                         finDealPledge.setPledgeNumber(inpledge.getPledgeNumber());
                         finDealPledge.setPledgeAmt(inpledge.getPledgeAmt());

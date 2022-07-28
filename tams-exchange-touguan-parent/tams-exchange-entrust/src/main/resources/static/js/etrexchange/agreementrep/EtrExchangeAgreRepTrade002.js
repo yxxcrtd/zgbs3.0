@@ -447,6 +447,7 @@
         var occupyDays = $("#occupyDays").val();
         var tradeAmt = $("#tradeAmt").val();
         var y = $("#yield").val();
+        $("#yield").val(Number(y).toFixed(2)).trigger('change');
         if (occupyDays && tradeAmt && y) {
             var intamt = Math.round(tradeAmt * y / 100 * occupyDays / 365 * 100) / 100;
             var expireSettleAmt = parseFloat(intamt) + parseFloat(tradeAmt);
@@ -2153,6 +2154,13 @@
         //解除质押、到期购回、提前购回、中途换券 交易对手不可编辑
         if (entity && (entity.ps == PS_T93 || entity.ps == PS_T94 || entity.ps == PS_T95 || entity.ps == PS_T96)) {
             $("#counterId").attr('disabled', true);
+        }
+        //中途换券 换出债券、换出债券数量、换出金额、请求编号 不可编辑
+        if (entity && entity.ps == PS_T94) {
+            $("#outRepSecId").attr('disabled', true);
+            $("#outRepSecNum").attr('disabled', true);
+            $("#outAmt").attr('disabled', true);
+            $("#reqOnId").attr('disabled', true);
         }
 
         if (entityStr) {
