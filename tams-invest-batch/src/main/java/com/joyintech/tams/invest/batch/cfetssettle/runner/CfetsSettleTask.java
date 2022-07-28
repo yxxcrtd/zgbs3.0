@@ -79,7 +79,7 @@ public class CfetsSettleTask extends BatchBaseService {
         } catch (Exception e) {
            logger.error(e.getMessage());
             //异常信息记录到批处理的日志详情
-            throw new BatchException(RiskUtil.getLogString(e));
+            RiskUtil.getLogString(e);
         }
         return result;
     }

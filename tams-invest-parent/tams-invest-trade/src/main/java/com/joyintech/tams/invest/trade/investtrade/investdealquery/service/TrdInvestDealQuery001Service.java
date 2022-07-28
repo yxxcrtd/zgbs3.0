@@ -354,6 +354,11 @@ public class TrdInvestDealQuery001Service extends CommonExportService<TrdInvestD
                     dto.setfTradeId(null);
                 }
 
+                if (StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())
+                        && Objects.nonNull(dto.getTradeAmt())) {
+                    dto.setTradeAmt(dto.getTradeAmt().multiply(BigDecimal.valueOf(100)));
+                }
+
             }
         }
         return returnList;

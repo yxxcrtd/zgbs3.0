@@ -845,6 +845,12 @@
                         #{item}
                     </foreach>
                 </if>
+                <if test="portfolioId != null and portfolioId.size() > 0">
+                    and ETR_ENTRUST.portfolio_Id in
+                    <foreach collection="portfolioId" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
                 <if test="notentrustIdList != null and notentrustIdList.size() > 0">
                     and ETR_ENTRUST.ENTRUST_ID not in
                     <foreach collection="notentrustIdList" item="item" open="(" close=")" separator=",">

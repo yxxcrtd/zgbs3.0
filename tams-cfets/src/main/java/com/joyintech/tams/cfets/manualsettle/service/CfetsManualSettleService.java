@@ -1458,6 +1458,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             // 金融产品附属
             TrdProductDealAdd trdProductDealAdd = new TrdProductDealAdd();
             BeanUtil.copyPropertiesIgnoreNull(trdProductDealAdd, item);
+            trdProductDeal.setPayDate(item.getSettleDate());
             baseTradeProductDealDto.setTrdProductDealAdd(trdProductDealAdd);
             baseTradeProductDealDto.setEntrustId(item.getEntrustId());
             //划款指令

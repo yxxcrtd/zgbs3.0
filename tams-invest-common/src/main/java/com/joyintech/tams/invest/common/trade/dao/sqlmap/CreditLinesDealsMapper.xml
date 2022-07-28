@@ -1078,24 +1078,10 @@
 	</select>
 
 	<select id="selectLoopAmt" resultType="java.lang.String">
-		select IS_LOOP_AMT
-		from (
-			 select *
-			 from CREDIT_LINES
-			 where SEQNO in (
-				 select CREDIT_LINES_ID
-				 from CREDIT_USING_CUSTOMER
-				 where STATUS = '01'
-				   and TRADE_ID in (
-					 select a.ENTRUST_ID
-					 from TRD_PRODUCT_TEMP_DEAL d
-							  inner join TRD_PRODUCT_TEMP_DEAL_ADD a on d.TRADE_ID = a.TRADE_ID
-					 where F_TRADE_ID = #{tradeId}
-				 )
-			 )
+		select IS_LOOP_AMT from ( select * from CREDIT_LINES where SEQNO in ( select CREDIT_LINES_ID from CREDIT_USING_CUSTOMER where TRADE_ID in (
+		select TRADE_ID from TRD_PRODUCT_DEAL where F_TRADE_ID in (
+		select TRADE_ID from SETTLE_TRANS_DATA where CJBH= #{tradeId}) ) )
 		) where ROWNUM=1
 	</select>
-
-
 
 </mapper>

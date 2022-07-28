@@ -166,7 +166,7 @@
         var rows = projectListInfoList.getAllRows();
         var portfolioId = $("#portfolioId").val();
         var finprodId= "F18_"+$("#finprodMarketId").val();
-        var portfolioName = $("#portfolioId").find("option:selected").text().split(':')[1];
+        var portfolioName = $("#portfolioId").find("option:selected").text();
         object.portfolioName = portfolioName;
         object.finprodId=finprodId;
         $.each(rows,function (index,data) {
