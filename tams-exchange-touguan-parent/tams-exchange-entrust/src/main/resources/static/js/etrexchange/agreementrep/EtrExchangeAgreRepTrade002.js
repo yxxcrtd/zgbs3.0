@@ -2142,6 +2142,12 @@
             $("#yield").val(entity.yield).trigger('change');
         }
 
+        if (entity && entity.ps== PS_T93  && TRADE_MARKET_CURRENT==TRADE_MARKET_03) {
+            console.log("-----------PS_T93-------------")
+            $("#entrustAmt_div").css('display','none');
+            $("#counterId").attr('disabled',true);
+        }
+
         if (entityStr) {
             var etrData = JSON.parse(entityStr);
             setPageItem(etrData);
