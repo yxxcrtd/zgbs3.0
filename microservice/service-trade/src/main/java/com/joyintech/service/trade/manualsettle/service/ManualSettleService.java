@@ -212,7 +212,7 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                     // modify by etliu 20220725 end
 
                     // XYHGFXSJ-8:构建质押品信息list modify by fuyongsheng 20220718 start
-                    infContractDetailfile.setPledgeList(this.genPledgeDtoList(trdProductTempDeal.getTradeId()));
+                    infContractDetailfile.setPledgeList(this.genPledgeDtoList(trdProductTempDeal.getFinprodId()));
                     // XYHGFXSJ-8:构建质押品信息list modify by fuyongsheng 20220718 end
                     if (DictCodeList.回购拆借方向_正回购.getValue().equals(infContractDetailfile.getPs())
                             || DictCodeList.回购拆借方向_逆回购.getValue().equals(infContractDetailfile.getPs())) {
@@ -576,5 +576,5 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
         return null;
     }
 
-} 
+}
 
