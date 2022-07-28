@@ -978,6 +978,7 @@ public class IbuComponentReceiveService extends BaseService{
      * @return
      */
     private boolean updateRepoRequestPositionRule(QuoteResultDto quoteResultDto) {
+        logger.info("updateRepoRequestPositionRule[头寸引擎处理头寸]:{}",JsonUtils.object2Json(quoteResultDto));
         if (null != quoteResultDto && null != quoteResultDto.getRepoDialogueQuote()) {
             List<IbuQuoteCrepPledgeDto> ibuQuoteCrepPledgeDtoList = null;
             if (null != quoteResultDto.getRepoDialogueQuote().getIbuQuoteCrepPledgeDtoList()) {
@@ -986,6 +987,14 @@ public class IbuComponentReceiveService extends BaseService{
             IbuQuoteCrepDto ibuQuoteCrepDto = quoteResultDto.getRepoDialogueQuote().getIbuQuoteCrepDto();
             CfetsRepoDealQuotedPrice001Dto dto = new CfetsRepoDealQuotedPrice001Dto();
             BeanUtil.copyPropertiesIgnoreNull(dto, ibuQuoteCrepDto);
+            // 清算速度
+            if (ibuQuoteCrepDto.getSettleSpeed().compareTo(0L) == 0) {
+                dto.setSettleSpreed("01");
+            } else if (ibuQuoteCrepDto.getSettleSpeed().compareTo(1L) == 0) {
+                dto.setSettleSpreed("02");
+            } else if (ibuQuoteCrepDto.getSettleSpeed().compareTo(2L) == 0) {
+                dto.setSettleSpreed("03");
+            }
             dto.setQuoteId(ibuQuoteCrepDto.getQuoteId());
             dto.setPortfolioId(ibuQuoteCrepDto.getTradeStatus());
             dto.setTradeStatus(dto.getTradeStatus());
