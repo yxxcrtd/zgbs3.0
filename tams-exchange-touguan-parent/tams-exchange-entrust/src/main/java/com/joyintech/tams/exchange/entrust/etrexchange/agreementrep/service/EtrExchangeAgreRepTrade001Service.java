@@ -2356,6 +2356,12 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             throw new BusinessException("MSG:指令审批发生异常，异常信息：" + e.getMessage());
         }
         doDeleteWflEntity(etrExchangeAgreRepTrade001Dto.getWorkflowId());
+
+        // 删除废弃表
+        String entrustId = etrExchangeAgreRepTrade001Dto.getEntrustId();
+        etrEntrustBackupMapper.deleteByPrimaryKey(entrustId);
+        etrEntrustBackupMapper.deleteAddByPrimaryKey(entrustId);
+        etrEntrustBackupMapper.deleteDetailByPrimaryKey(entrustId);
     }
 
     @Override
@@ -2463,12 +2469,6 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
             EtrExchangeAgreRepTrade001Dto entity = getBussinessEntityByWorkflowId(workflowId);
             positionRequestService.sendDelete(entity);
-
-            // 删除废弃表
-            String entrustId = entity.getEntrustId();
-            etrEntrustBackupMapper.deleteByPrimaryKey(entrustId);
-            etrEntrustBackupMapper.deleteAddByPrimaryKey(entrustId);
-            etrEntrustBackupMapper.deleteDetailByPrimaryKey(entrustId);
         }
         //增加调用头寸引擎代码end
     }
