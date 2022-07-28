@@ -233,7 +233,7 @@
                             ) TEMP
                        where 1 = 1
             <if test="portfolioIdList != null and portfolioIdList.size() > 0">
-                AND bobp.portfolio_id in
+                AND TEMP.portfolio_id in
                 <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
