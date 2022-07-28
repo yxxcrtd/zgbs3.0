@@ -615,7 +615,7 @@
             AND fin_deal_pledge.pledge_finprod_id = #{pledgeFinprodId}
         </if>
         <if test="zyqList != null and zyqList.size()>0">
-            <foreach collection="zyqList" open="AND fin_deal_pledge.pledge_finprod_id in(" close=")" separator="," item="item">
+            <foreach collection="zyqList" open="AND SUBSTR(fin_deal_pledge.pledge_finprod_id, 5) in(" close=")" separator="," item="item">
                 #{item}
             </foreach>
         </if>
@@ -630,7 +630,7 @@
             and ((sysDate1 <![CDATA[<=]]> #{sysdate,jdbcType=DATE} and totle_trade_id is null) or sysDate1 <![CDATA[>]]> #{sysdate,jdbcType=DATE} )
         </if>
         <if test="origSerialNo != null and origSerialNo != ''">
-            AND intiTradeId  like '%' || #{origSerialNo} || '%'
+            AND (intiTradeId  like '%' || #{origSerialNo} || '%' OR firstTradeId like '%' || #{origSerialNo} )
         </if>
         <!-- 关键字模糊查询 -->
         <include refid="etrExchangeOnWayRepAnd"/>
@@ -646,7 +646,7 @@
             purStatus|| '|' ||  settleStatus|| '|' ||  isExpire || '|' || isExpireStr|| '|' ||
             repDays|| '|' ||  backDate|| '|' ||  market || '|' || SDL2.ITEM_VALUE || '|' ||
             stockName|| '|' ||  stockCode|| '|' ||  fristSettleDate || '|' || expireSettleDate|| '|' ||
-            tradeId|| '|' ||  intiTradeId
+            tradeId|| '|' ||  intiTradeId || '|' || firstTradeId
             like '%' || #{search} || '%'
             )
         </if>
