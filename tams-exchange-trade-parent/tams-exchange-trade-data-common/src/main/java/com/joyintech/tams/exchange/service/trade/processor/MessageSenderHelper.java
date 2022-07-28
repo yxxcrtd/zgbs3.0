@@ -40,7 +40,7 @@ public class MessageSenderHelper {
     private InstructionPledgeService instructionPledgeService;
 
     public TradeMessage createTradeMessage(Trade trade, Instruction instruction, EntrustInterface entrust) {
-        TradeMessage tradeMessage = TradeMessage.createTradeMessage(trade, entrust);
+        TradeMessage tradeMessage = TradeMessage.createTradeMessage(trade, entrust,instruction);
         //委托数量
         tradeMessage.setEntrustVolume((double) entrust.getEntrustVolume());
         if (Objects.nonNull(instruction) && Objects.nonNull(tradeMessage)) {
