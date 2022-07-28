@@ -1521,6 +1521,7 @@ public class CfetsQuotedCommonService extends BaseService {
             posport.setCashAmount(ptlDto.getFpriceAmt());
             ptlCashList.add(posport);
         }
+        entity.setIsDzh(DictCodeList.是否_是.getValue());
         List<CfetsRepoDealQuotedPrice003Dto> pledgeBondList = this.质押券拆分(entity);
         if (StringUtil.isNotEmpty(pledgeBondList)) {
             for (CfetsRepoDealQuotedPrice003Dto pledgeDto : pledgeBondList) {

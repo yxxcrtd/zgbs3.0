@@ -88,7 +88,7 @@
 			}
             ,{field:'portfolioLevelStr', sortField:'portfolioLevel',width:"100" , title: 'RskSupervisionPortfPointInd001.portfolioLevel'}
             ,{field:'portfolioName', width:"200", title: 'RskSupervisionPortfPointInd001.portfolioOrBagName'}
-			,{field:'effDateRange',  width:"250" ,title: 'RskSupervisionPortfPoint001.effDate'}
+			,{field:'effDateRange',sortField:'startDate,endDate',  width:"250" ,title: 'RskSupervisionPortfPoint001.effDate'}
 			,{field:'set', width:"100" , sortable:false, title: 'RskSupervisionPortfPoint001.supervisionindividuation',
 				render : function(data, type, row, meta) {
 					return '<i style="color:#0078F0;font-style: normal;cursor: pointer;" class="set">'+'设置'+'</i>';

@@ -91,8 +91,9 @@ public class EtrExchangeAgreRepTradeValidator implements EtrCommonValidator {
             }
         }
 
-        if (StringUtil.isNotBlank(dto.getVdate())) {
-            if (DateUtil.compareTo(DateUtil.parse(dto.getExpireSettleDate()), DateUtil.parse(dto.getVdate())) <= 0) {
+        finProduct = finProductMapper.selectByPrimaryKey(dto.getFinprodId());
+        if(Objects.nonNull(finProduct) && Objects.nonNull(finProduct.getMdate())){
+            if (DateUtil.compareTo(DateUtil.parse(dto.getExpireSettleDate()), DateUtil.parse(dto.getMdate())) <= 0) {
                 errorList.add(new ValidMessage("", "质押券的到期日必须大于协议回购到期结算日！"));
             }
         }
