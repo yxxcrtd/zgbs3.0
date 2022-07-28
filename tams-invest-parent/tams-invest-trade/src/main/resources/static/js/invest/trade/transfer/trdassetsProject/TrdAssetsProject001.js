@@ -322,6 +322,9 @@
                 	bussTrdTransfenpeiDto[i].counterId=bussTrdTransfenpeiDto[i].portfolioId;
                 	delete bussTrdTransfenpeiDto[i].portfolioId;
                 	bussTrdTransfenpeiDto[i].ps = T02;
+                    if (bussTrdTransfenpeiDto[i].splitTradeAmt) {
+                        bussTrdTransfenpeiDto[i].tradeAmt=bussTrdTransfenpeiDto[i].splitTradeAmt;
+                    }
                 }
                 object.bussTrdTransfenpeiDto = bussTrdTransfenpeiDto;
                 window.BaseRiskMathComm.initBaseRiskMathRedis(basePath + 'riskrds/interf/doInfBatchData/1/RSK002/F06',object,getriskdata());
