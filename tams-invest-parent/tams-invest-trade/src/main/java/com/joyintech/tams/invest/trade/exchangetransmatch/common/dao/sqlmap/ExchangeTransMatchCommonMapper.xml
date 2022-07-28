@@ -62,9 +62,9 @@
                 GROUP BY
                     ENTRUNST_TRADE_ID
             ) ST94 ON ST94.ENTRUNST_TRADE_ID = T1.ENTRUST_ID
-            LEFT JOIN ETR_PLEDGE T3
+            LEFT JOIN ETR_PLEDGE T3<!--换券-->
                 ON T3.ENTRUST_ID = T1.ENTRUST_ID
-                AND T3.FINPROD_ID = T1.FINPROD_ID
+                AND T3.DISPLACE_DIR = #{DISPLACE_DIRECTION_01}
             <where>
                 <if test="entrustIdList!=null and entrustIdList.size()>0 ">
                     AND (T1.ENTRUST_ID IN
