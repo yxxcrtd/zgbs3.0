@@ -2783,10 +2783,14 @@
         ee.PLEDGE_NUMBER/100 pledgeNumber,
         ee.PLEDGE_NUMBER * ee.Pledge_Face_Value pledStrdPrinAmt,
         eted.TRADE_ID tradeId,
-        oee.Pledge_Ratio * 100 oldPledgeRatio, /** 折算率 **/
-        oee.PLEDGE_NUMBER oldPledgeNumber,
-        oee.PLEDGE_NUMBER * oee.Pledge_Face_Value oldPledStrdPrinAmt,
-        T6.finprod_market_id oldFinprodMarketId,
+<!--        oee.Pledge_Ratio * 100 oldPledgeRatio, /** 折算率 **/-->
+<!--        oee.PLEDGE_NUMBER oldPledgeNumber,-->
+<!--        oee.PLEDGE_NUMBER * oee.Pledge_Face_Value oldPledStrdPrinAmt,-->
+<!--        T6.finprod_market_id oldFinprodMarketId,-->
+        trdPledge.Pledge_Ratio                                               oldPledgeRatio, /** 折算率 **/
+        trdPledge.PLEDGE_NUMBER                                              oldPledgeNumber,
+        trdPledge.printAmt                                                   oldPledStrdPrinAmt,
+        trdPledge.finprod_market_id                                          oldFinprodMarketId,
         eted.DEAL_MODE dealMode,  /** 申报类型 **/
         nvl(nvl(fscr.SCALE * ete.ENTRUST_NUM,ee.PLEDGE_NUMBER * ee.PLEDGE_RATIO), ete.ENTRUST_NUM) pledgeStandardNumber, /** 标准券额度 **/
         fp.Is_Right isRight,sci.ACCT_NAME trdAcctId,
@@ -2811,9 +2815,23 @@
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON eted.SEC_ACCT_ID = ssai.SEC_ACCT_ID
         LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
         LEFT JOIN etr_pledge ee ON ete.entrust_id = ee.entrust_id /** 委托指令回购质押品 **/
-        LEFT JOIN ETR_ENTRUST oete ON  oete.entrust_id = eted.TRADE_ID
-        LEFT JOIN etr_pledge oee ON oete.entrust_id = oee.entrust_id
-        LEFT JOIN FIN_PRODUCT T6 ON oete.FINPROD_ID = T6.FINPROD_ID
+<!--        LEFT JOIN ETR_ENTRUST oete ON  oete.entrust_id = eted.TRADE_ID-->
+<!--        LEFT JOIN etr_pledge oee ON oete.entrust_id = oee.entrust_id-->
+<!--        LEFT JOIN FIN_PRODUCT T6 ON oete.FINPROD_ID = T6.FINPROD_ID-->
+        LEFT JOIN (
+            SELECT
+                A.FINPROD_ID                                                            tradeId,
+                listagg(FP.FINPROD_ID, ',') within GROUP ( ORDER BY FP.FINPROD_ID )     FINPROD_ID,
+                listagg(FP.FINPROD_MARKET_ID, ',') within GROUP ( ORDER BY FP.FINPROD_MARKET_ID )                  FINPROD_MARKET_ID,
+                listagg(FP.finprod_abbr, ',') within GROUP ( ORDER BY FP.finprod_abbr ) finprod_abbr,
+                SUM(B.PLEDGE_NUMBER) * 100 / 10000                                      PLEDGE_NUMBER,
+                MAX(B.Pledge_Ratio) * 100                                               Pledge_Ratio,
+                SUM(B.PLEDGE_AMT)                                                       printAmt
+            FROM FIN_TRADE_PRODUCT A
+            INNER JOIN FIN_DEAL_PLEDGE B ON B.FINPROD_ID = A.FINPROD_ID AND B.BRANCH = A.BRANCH
+            LEFT JOIN FIN_PRODUCT FP ON FP.FINPROD_ID = B.PLEDGE_FINPROD_ID
+            group by A.FINPROD_ID
+        ) trdPledge on trdPledge.tradeId = ete.finprod_id
         <!--         LEFT JOIN FIN_STDSEC_CONVERSE_RADIO fscr ON ete.FINPROD_ID = fscr.FINPROD_ID
                        AND fscr.VDATE &lt;= to_date(#{sysDateStr},'yyyy-mm-dd') AND fscr.MDATE >= to_date(#{sysDateStr},'yyyy-mm-dd') -->
         LEFT JOIN (SELECT * FROM FIN_STDSEC_CONVERSE_RADIO FSCR2 WHERE FSCR2.VDATE = (( select max(fscr3.VDATE) from FIN_STDSEC_CONVERSE_RADIO fscr3
@@ -2897,17 +2915,20 @@
         ee.PLEDGE_NUMBER pledgeNumber,
         ee.PLEDGE_NUMBER * ee.Pledge_Face_Value pledStrdPrinAmt,
         eted.TRADE_ID tradeId,
-        oee.Pledge_Ratio * 100 oldPledgeRatio, /** 折算率 **/
-        oee.PLEDGE_NUMBER oldPledgeNumber,
-        oee.PLEDGE_NUMBER * oee.Pledge_Face_Value oldPledStrdPrinAmt,
-        T6.finprod_market_id oldFinprodMarketId,
-        eted.DEAL_MODE dealMode,  /** 申报类型 **/
-        nvl(ee.PLEDGE_NUMBER * ee.PLEDGE_RATIO , ete.ENTRUST_NUM) pledgeStandardNumber, /** 标准券额度 **/
-        fp.Is_Right isRight,sci.ACCT_NAME trdAcctId,
-        fp.FINPROD_TYPE2 finprodTypeTg,
-        eted.DEAL_MODE declaType,T7.FINPROD_ID stockSecId,
-        case when ete.ps = 'T96' then
-        fin_trade_product.Mdate else null end backDate
+<!--        oee.Pledge_Ratio * 100 oldPledgeRatio, /** 折算率 **/-->
+<!--        oee.PLEDGE_NUMBER oldPledgeNumber,-->
+<!--        oee.PLEDGE_NUMBER * oee.Pledge_Face_Value oldPledStrdPrinAmt,-->
+<!--        T6.finprod_market_id oldFinprodMarketId,-->
+        trdPledge.Pledge_Ratio                                                                oldPledgeRatio, /** 折算率 **/
+        trdPledge.PLEDGE_NUMBER                                                               oldPledgeNumber,
+        trdPledge.printAmt                                                                    oldPledStrdPrinAmt,
+        trdPledge.finprod_market_id                                                           oldFinprodMarketId,
+        eted.DEAL_MODE                                                                        dealMode,  /** 申报类型 **/
+        nvl(ee.PLEDGE_NUMBER * ee.PLEDGE_RATIO , ete.ENTRUST_NUM)                             pledgeStandardNumber, /** 标准券额度 **/
+        fp.Is_Right isRight,sci.ACCT_NAME                                                     trdAcctId,
+        fp.FINPROD_TYPE2                                                                      finprodTypeTg,
+        eted.DEAL_MODE declaType,T7.FINPROD_ID                                                stockSecId,
+        case when ete.ps = 'T96' then fin_trade_product.Mdate else null end                   backDate
         FROM WFL_ETR_ENTRUST ete
         INNER JOIN WFL_ETR_ENTRUST_ADD eted ON ete.entrust_id = eted.entrust_id
         LEFT JOIN FIN_PRODUCT_CONVERTIBLE FPC ON ete.FINPROD_ID = FPC.FINPROD_ID
@@ -2926,9 +2947,23 @@
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON eted.SEC_ACCT_ID = ssai.SEC_ACCT_ID
         LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
         LEFT JOIN wfl_etr_pledge ee ON ete.entrust_id = ee.entrust_id /** 委托指令回购质押品 **/
-        LEFT JOIN ETR_ENTRUST oete ON  oete.entrust_id = eted.TRADE_ID
-        LEFT JOIN etr_pledge oee ON oete.entrust_id = oee.entrust_id
-        LEFT JOIN FIN_PRODUCT T6 ON oete.FINPROD_ID = T6.FINPROD_ID
+<!--        LEFT JOIN ETR_ENTRUST oete ON  oete.entrust_id = eted.TRADE_ID-->
+<!--        LEFT JOIN etr_pledge oee ON oete.entrust_id = oee.entrust_id-->
+<!--        LEFT JOIN FIN_PRODUCT T6 ON oete.FINPROD_ID = T6.FINPROD_ID-->
+        LEFT JOIN (
+            SELECT
+                A.FINPROD_ID                                                            tradeId,
+                listagg(FP.FINPROD_ID, ',') within GROUP ( ORDER BY FP.FINPROD_ID )     FINPROD_ID,
+                listagg(FP.FINPROD_MARKET_ID, ',') within GROUP ( ORDER BY FP.FINPROD_MARKET_ID )                  FINPROD_MARKET_ID,
+                listagg(FP.finprod_abbr, ',') within GROUP ( ORDER BY FP.finprod_abbr ) finprod_abbr,
+                SUM(B.PLEDGE_NUMBER) * 100 / 10000                                      PLEDGE_NUMBER,
+                MAX(B.Pledge_Ratio) * 100                                               Pledge_Ratio,
+                SUM(B.PLEDGE_AMT)                                                       printAmt
+                FROM FIN_TRADE_PRODUCT A
+                INNER JOIN FIN_DEAL_PLEDGE B ON B.FINPROD_ID = A.FINPROD_ID AND B.BRANCH = A.BRANCH
+                LEFT JOIN FIN_PRODUCT FP ON FP.FINPROD_ID = B.PLEDGE_FINPROD_ID
+                group by A.FINPROD_ID
+        ) trdPledge on trdPledge.tradeId = ete.finprod_id
         LEFT JOIN FIN_STDSEC_CONVERSE_RADIO fscr ON ete.FINPROD_ID = fscr.FINPROD_ID
               AND fscr.VDATE &lt;= to_date(#{sysDateStr},'yyyy-mm-dd') AND fscr.MDATE >= to_date(#{sysDateStr},'yyyy-mm-dd')
         LEFT JOIN ( SELECT ENTRUST_ID, to_char(wm_concat ( PORTFOLIO_ID )) PORTFOLIO_ID FROM WFL_ETR_ENTRUST_DETAIL GROUP BY ENTRUST_ID ) det ON det.ENTRUST_ID = ete.ENTRUST_ID
