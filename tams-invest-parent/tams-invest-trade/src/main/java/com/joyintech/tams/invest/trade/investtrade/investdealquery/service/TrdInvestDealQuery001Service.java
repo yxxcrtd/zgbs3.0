@@ -260,6 +260,19 @@ public class TrdInvestDealQuery001Service extends CommonExportService<TrdInvestD
         }
         pageParam.put("prodPs", prodPs);
 
+        String ps = (String) pageParam.get("ps");
+        if (StringUtil.isNotEmpty(ps)) {
+            //提前购回
+            if (StringUtil.equals(ps, DictCodeListExt3.交易方向_提前购回.getValue())) {
+                ps = DictCodeListExt3.交易方向_投资端_提前终止.getValue();
+            }
+            //到期购回
+            if (StringUtil.equals(ps, DictCodeListExt3.交易方向_到期购回.getValue())) {
+                ps = DictCodeList.交易方向_到期.getValue();
+            }
+        }
+        pageParam.put("ps", ps);
+
         //判断状态
         Page<TrdInvestDealQuery001Dto> returnList = new Page<TrdInvestDealQuery001Dto>();
         if (StringUtil.isNotEmpty(validStatus)) {
