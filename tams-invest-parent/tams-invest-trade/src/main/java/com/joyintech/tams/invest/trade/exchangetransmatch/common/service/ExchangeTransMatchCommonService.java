@@ -1166,15 +1166,13 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     SettleTransDataTotalPledge outPledge = table.get(firstFinDealPledge.getPledgeFinprodId(), DictCodeListExt3.质押券置换_置换方向_换出.getValue());
                     if(null != inPledge){
                         // 如果换入的质押券跟首期一致,则券面总额、质押券数量相加
-                        firstFinDealPledge.setPledgeAmt(ArithmeticUtil.doAdd(firstFinDealPledge.getPledgeAmt(), inPledge.getPledgeAmt()));
                         firstFinDealPledge.setPledgeNumber(ArithmeticUtil.doAdd(firstFinDealPledge.getPledgeNumber(), inPledge.getPledgeNumber()));
                     }else if(null != outPledge){
                         // 如果出的质押券跟首期一致,则券面总额、质押券数量相减
-                        firstFinDealPledge.setPledgeAmt(ArithmeticUtil.subtract(firstFinDealPledge.getPledgeAmt(), outPledge.getPledgeAmt()));
                         firstFinDealPledge.setPledgeNumber(ArithmeticUtil.subtract(firstFinDealPledge.getPledgeNumber(), outPledge.getPledgeNumber()));
                     }
                     // 如果质押券面额为0,则忽略
-                    if(BigDecimal.ZERO.compareTo(firstFinDealPledge.getPledgeAmt()) >= 0){
+                    if(BigDecimal.ZERO.compareTo(firstFinDealPledge.getPledgeNumber()) >= 0){
                         continue;
                     }
                     finDealPledgeList.add(firstFinDealPledge);
