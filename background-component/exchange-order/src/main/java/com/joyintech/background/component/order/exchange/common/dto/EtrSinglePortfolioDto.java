@@ -263,7 +263,7 @@ public class EtrSinglePortfolioDto extends EtrBaseDto {
      * 
      * @return 指令金额
      */
-    @NotEmpty(fieldName = "EtrComponent.entrustAmt")
+//    @NotEmpty(fieldName = "EtrComponent.entrustAmt")
     public BigDecimal getEntrustAmt() {
         return this.entrustAmt;
     }
@@ -282,7 +282,7 @@ public class EtrSinglePortfolioDto extends EtrBaseDto {
      * 
      * @return 指令数量
      */
-    @NotEmpty(fieldName = "EtrComponent.entrustNum")
+//    @NotEmpty(fieldName = "EtrComponent.entrustNum")
     public BigDecimal getEntrustNum() {
         return this.entrustNum;
     }
