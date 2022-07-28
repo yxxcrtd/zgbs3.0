@@ -119,7 +119,7 @@ public class CstpSecAutoTradeService extends BaseService<TrdBondInvestTradeDto> 
 		// 判断债券标的是否存在
 		InterfTradSecdealDto interfCstpSecdeal = cstpMapper.selectTradeSec(interfCstpTrade.getExecid(),
 				DateUtil.format(iPlatformDate.getSysDate(), DateUtil.DEFAULT_OTHER_FORMAT),
-				BusinessTypeUtil.BUSINESSTYPE_BOND);
+				BusinessTypeUtil.BUSINESSTYPE_BOND, interfCstpTrade.getSide());
 		FinProduct finProduct = finProductMapper.selectByPrimaryKey(interfCstpSecdeal.getSecid());
 		if (null==finProduct) {
 			// 防止有些标的的finprodId带有前缀，因此这里进行第二次查询
@@ -237,7 +237,10 @@ public class CstpSecAutoTradeService extends BaseService<TrdBondInvestTradeDto> 
 	 * @param resultBaseDto
 	 */
 	public void secAutoTrade2(InterfCstpTrade interfCstpTrade,InterfTradSecdeal interfTradSecdeal, ResultBaseDto resultBaseDto) {
+		//成交编号
 		String oritradeId = interfCstpTrade.getExecid();
+		//交易号
+		String dealNo = interfCstpTrade.getDealNo();
 		int QueryCount = 1;
 		EtrEntrustExt entrustInfo = null;
 		while (QueryCount <= 10 && entrustInfo == null) {
@@ -263,7 +266,7 @@ public class CstpSecAutoTradeService extends BaseService<TrdBondInvestTradeDto> 
 		// 判断债券标的是否存在
 		InterfTradSecdealDto interfCstpSecdeal = cstpMapper.selectTradeSec(interfCstpTrade.getExecid(),
 				DateUtil.format(iPlatformDate.getSysDate(), DateUtil.DEFAULT_OTHER_FORMAT),
-				BusinessTypeUtil.BUSINESSTYPE_BOND);
+				BusinessTypeUtil.BUSINESSTYPE_BOND, interfCstpTrade.getSide());
 		FinProduct finProduct = finProductMapper.selectByPrimaryKey(interfCstpSecdeal.getSecid());
 		if (null==finProduct) {
 			// 防止有些标的的finprodId带有前缀，因此这里进行第二次查询
@@ -275,7 +278,8 @@ public class CstpSecAutoTradeService extends BaseService<TrdBondInvestTradeDto> 
 			// 判断是否已经生成了交易
 			TrdProductDeal deal = autoTradeMapper.isExistsTrade(oritradeId);
 			//判断该下行数据，是否已经匹配成功了。
-			TrdConfirmMatchDto matchDto=cstpMapper.selectMatchDtoByExecId(oritradeId);
+			//TrdConfirmMatchDto matchDto=cstpMapper.selectMatchDtoByExecId(oritradeId);
+			TrdConfirmMatchDto matchDto = cstpMapper.selectMatchDtoByDealNo(dealNo);
 			if (!StringUtil.isNotEmpty(deal) && !StringUtil.isNotEmpty(matchDto)) {
 				try{
 					Map<String,Object> param = new HashMap<>();
