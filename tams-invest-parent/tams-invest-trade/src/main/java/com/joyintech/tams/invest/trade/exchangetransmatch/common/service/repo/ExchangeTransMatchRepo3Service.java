@@ -225,7 +225,7 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         for(SettleTransDataTotalPledge settleTransDataTotalPledge:dealDto.getSettleTransDataTotalPledgeList()) {
             TrdProductDealDto trdProductDeal = this.createTrdProductDealCommon(dealDto, entrustDto, trdFinProductDealTotal);
             //金融产品ID
-            trdProductDeal.setFinprodId(settleTransDataTotalPledge.getPledgeFinprodId());
+            trdProductDeal.setFinprodId(trdFinProductDealTotal.getFinprodId());
             //单位净价
             trdProductDeal.setUnitCprice(settleTransDataTotalPledge.getPledgeRatio());
             //交易方向
