@@ -7,6 +7,7 @@ import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.dao.FinDealPledgeMapper;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
@@ -35,6 +36,9 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
     private static Logger logger = LoggerFactory.getLogger(StlDataGatherProcessor.class);
     @Autowired
     protected StlDataGatherMapper stlDataGatherMapper;
+
+    @Autowired
+    protected FinDealPledgeMapper finDealPledgeMapper;
 
     @Autowired
     private StlDataGatherService stlDataGatherService;
@@ -594,7 +598,7 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
                             .collect(Collectors.toList());
                 }
                 if(settlePs.equals(etrEntrustDto.getPs()) && CollectionUtils.isNotEmpty(pledges)
-                    && pledges.get(0).getPledgeFinprodId().equals(etrEntrustDto.getFinprodId())
+                    // && pledges.get(0).getPledgeFinprodId().equals(etrEntrustDto.getFinprodId())
                     && etrEntrustDto.getTradeId().equals(settleTransDataDto.getfCjbh())
                     && etrEntrustDto.getVpayDate().equals(settleTransDataDto.getVdate())){
                     matchEtrEntrustList.add(etrEntrustDto);
