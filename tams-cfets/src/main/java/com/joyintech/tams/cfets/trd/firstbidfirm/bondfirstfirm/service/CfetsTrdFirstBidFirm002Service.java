@@ -4104,7 +4104,14 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         }
         List<TrdProductDeal> deals = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(entity.getTrdProductDeals())) {
-            deals.addAll(entity.getTrdProductDeals());
+            Map<String, TrdProductDealAdd> dealAddMap = entity.getTrdProductDealAdds().stream()
+                    .collect(Collectors.toMap(TrdProductDealAdd::getTradeId, dealAdd -> dealAdd));
+            entity.getTrdProductDeals().forEach(deal -> {
+                TrdProductDealAdd dealAdd = dealAddMap.get(deal.getTradeId());
+                deal.setEntrustId(dealAdd.getEntrustId());
+                deal.setPortfolioId(dealAdd.getPortfolioId());
+                deals.add(deal);
+            });
         } else {
             Map<String, WflTrdProductDealAdd> dealAddMap = entity.getWflTrdProductDealAdds().stream()
                     .collect(Collectors.toMap(WflTrdProductDealAdd::getTradeId, dealAdd -> dealAdd));
