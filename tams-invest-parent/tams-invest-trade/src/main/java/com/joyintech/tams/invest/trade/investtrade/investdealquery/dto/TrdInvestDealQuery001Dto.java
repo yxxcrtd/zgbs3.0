@@ -250,7 +250,8 @@ public class TrdInvestDealQuery001Dto extends WflTrdProductDeal {
                 bizType = SysDataUtil.getNameFromDataDict(DictCode.交易方向, DictCodeListExt3.交易方向_提前购回.getValue());
             } else if (StringUtil.equals(super.getPs(), DictCodeList.交易方向_到期.getValue())) {
                 bizType = SysDataUtil.getNameFromDataDict(DictCode.交易方向, DictCodeListExt3.交易方向_到期购回.getValue());
-            } else if (StringUtil.equals(super.getPs(), "T01") || StringUtil.equals(super.getPs(), "T02")) {
+            } else if (StringUtil.equals(super.getPs(), "T01") || StringUtil.equals(super.getPs(), "T02")
+                    || StringUtil.equals(super.getPs(), "03")|| StringUtil.equals(super.getPs(), "04")) {
                 bizType = "首期";
             } else {
                 bizType = SysDataUtil.getNameFromDataDict(DictCode.交易方向, super.getPs());

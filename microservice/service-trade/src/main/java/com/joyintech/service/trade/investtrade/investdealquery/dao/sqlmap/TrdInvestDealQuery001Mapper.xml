@@ -558,6 +558,15 @@
             AND NOT EXISTS (
 				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_PRODUCT_DEAL.TRADE_ID = WFL_TEMP.TRADE_ID
             )
+			<!--排除交易所协议回购 非首期-->
+			AND NOT EXISTS (
+			SELECT 1 FROM FIN_PRODUCT_TYPE fpt
+			WHERE WFL_TRD_PRODUCT_DEAL.FINPROD_ID = fpt.FINPROD_ID
+			and WFL_TRD_PRODUCT_DEAL.TRADE_MARKET in ('03','04')
+			and WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 in ('F02','F03')
+			and WFL_TRD_PRODUCT_DEAL.PS not in ('03','04','T01','T02')
+			and fpt.TYPE_6='H01'
+			)
 
 			<if test="portfolioId != null and !portfolioId.isEmpty() ">
 				AND (
@@ -912,11 +921,11 @@
         <where>
 <!--            WFL_TRD_PRODUCT_DEAL.TOTLE_TRADE_ID is null-->
 
-            <!--包含新UI业务，排除协议回购 -->
-            EXISTS (
-				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_PRODUCT_DEAL.TRADE_ID = WFL_TEMP.TRADE_ID
-            )
-			AND WFL_TRD_PRODUCT_DEAL.TRADE_STATUS = '01' AND WFL_TRD_PRODUCT_DEAL.IS_CANCEL ='N'
+			WFL_TRD_PRODUCT_DEAL.TRADE_STATUS = '01' AND WFL_TRD_PRODUCT_DEAL.IS_CANCEL ='N'
+			<!--包含新UI业务，排除协议回购 -->
+			AND EXISTS (
+			SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_PRODUCT_DEAL.TRADE_ID = WFL_TEMP.TRADE_ID
+			)
 
             <if test="portfolioId != null and !portfolioId.isEmpty() ">
                 AND (
@@ -1376,12 +1385,13 @@
 			AND NOT EXISTS (
 			   SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
 			)
-			<!--排除交易所协议回购-->
+			<!--排除交易所协议回购 非首期-->
 			AND NOT EXISTS (
 			SELECT 1 FROM FIN_PRODUCT_TYPE fpt
 			WHERE  TRD_PRODUCT_DEAL.FINPROD_ID = fpt.FINPROD_ID
 			and TRD_PRODUCT_DEAL.TRADE_MARKET in ('03','04')
 			and TRD_PRODUCT_DEAL.FINPROD_TYPE2 in ('F02','F03')
+			and TRD_PRODUCT_DEAL.PS not in ('03','04','T01','T02')
 			and fpt.TYPE_6='H01'
 			)
 
@@ -1736,15 +1746,6 @@
 			<!--包含新UI业务，排除协议回购 -->
 			AND EXISTS (
 			    SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
-			)
-			<!--排除交易所协议回购 非首期-->
-			AND NOT EXISTS (
-			SELECT 1 FROM FIN_PRODUCT_TYPE fpt
-			WHERE  TRD_PRODUCT_DEAL.FINPROD_ID = fpt.FINPROD_ID
-			and TRD_PRODUCT_DEAL.TRADE_MARKET in ('03','04')
-			and TRD_PRODUCT_DEAL.FINPROD_TYPE2 in ('F02','F03')
-			and TRD_PRODUCT_DEAL.PS not in ('03','04')
-			and fpt.TYPE_6='H01'
 			)
 
 			<if test="etridList != null and !etridList.isEmpty() ">
@@ -2198,12 +2199,13 @@
 			AND NOT EXISTS (
 			SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
 			)
-			<!--排除交易所协议回购-->
+			<!--排除交易所协议回购 非首期-->
 			AND NOT EXISTS (
 			SELECT 1 FROM FIN_PRODUCT_TYPE fpt
 			WHERE  TRD_PRODUCT_DEAL.FINPROD_ID = fpt.FINPROD_ID
 			and TRD_PRODUCT_DEAL.TRADE_MARKET in ('03','04')
 			and TRD_PRODUCT_DEAL.FINPROD_TYPE2 in ('F02','F03')
+			and TRD_PRODUCT_DEAL.PS not in ('03','04','T01','T02')
 			and fpt.TYPE_6='H01'
 			)
 
@@ -2552,15 +2554,6 @@
             <!--包含新UI业务，排除协议回购 -->
 			AND EXISTS (
 				SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
-			)
-			<!--排除交易所协议回购 非首期-->
-			AND NOT EXISTS (
-			SELECT 1 FROM FIN_PRODUCT_TYPE fpt
-			WHERE  TRD_PRODUCT_DEAL.FINPROD_ID = fpt.FINPROD_ID
-			and TRD_PRODUCT_DEAL.TRADE_MARKET in ('03','04')
-			and TRD_PRODUCT_DEAL.FINPROD_TYPE2 in ('F02','F03')
-			and TRD_PRODUCT_DEAL.PS not in ('03','04')
-			and fpt.TYPE_6='H01'
 			)
 
             <if test="portfolioId != null and !portfolioId.isEmpty()">
@@ -3091,6 +3084,15 @@
 			AND NOT EXISTS (
 				SELECT 1 FROM WFL_TEMP WHERE WFL_TRD_PRODUCT_DEAL.TRADE_ID = WFL_TEMP.TRADE_ID
 			)
+			<!--排除交易所协议回购 非首期-->
+			AND NOT EXISTS (
+			SELECT 1 FROM FIN_PRODUCT_TYPE fpt
+			WHERE WFL_TRD_PRODUCT_DEAL.FINPROD_ID = fpt.FINPROD_ID
+			and WFL_TRD_PRODUCT_DEAL.TRADE_MARKET in ('03','04')
+			and WFL_TRD_PRODUCT_DEAL.FINPROD_TYPE2 in ('F02','F03')
+			and WFL_TRD_PRODUCT_DEAL.PS not in ('03','04','T01','T02')
+			and fpt.TYPE_6='H01'
+			)
 
 			<if test="portfolioId != null and !portfolioId.isEmpty()">
 				AND (
@@ -3279,12 +3281,13 @@
 			AND NOT EXISTS (
 				SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
 			)
-			<!--排除交易所协议回购 -->
+			<!--排除交易所协议回购 非首期-->
 			AND NOT EXISTS (
 			SELECT 1 FROM FIN_PRODUCT_TYPE fpt
 			WHERE  TRD_PRODUCT_DEAL.FINPROD_ID = fpt.FINPROD_ID
 			and TRD_PRODUCT_DEAL.TRADE_MARKET in ('03','04')
 			and TRD_PRODUCT_DEAL.FINPROD_TYPE2 in ('F02','F03')
+			and TRD_PRODUCT_DEAL.PS not in ('03','04','T01','T02')
 			and fpt.TYPE_6='H01'
 			)
 
@@ -3497,12 +3500,13 @@
 			AND NOT EXISTS (
 				SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
 			)
-			<!--排除交易所协议回购-->
+			<!--排除交易所协议回购 非首期-->
 			AND NOT EXISTS (
 			SELECT 1 FROM FIN_PRODUCT_TYPE fpt
 			WHERE  TRD_PRODUCT_DEAL.FINPROD_ID = fpt.FINPROD_ID
 			and TRD_PRODUCT_DEAL.TRADE_MARKET in ('03','04')
 			and TRD_PRODUCT_DEAL.FINPROD_TYPE2 in ('F02','F03')
+			and TRD_PRODUCT_DEAL.PS not in ('03','04','T01','T02')
 			and fpt.TYPE_6='H01'
 			)
 
@@ -4358,15 +4362,6 @@
 			AND EXISTS (
 				SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
 			)
-			<!--排除交易所协议回购 非首期-->
-			AND NOT EXISTS (
-			SELECT 1 FROM FIN_PRODUCT_TYPE fpt
-			WHERE  TRD_PRODUCT_DEAL.FINPROD_ID = fpt.FINPROD_ID
-			and TRD_PRODUCT_DEAL.TRADE_MARKET in ('03','04')
-			and TRD_PRODUCT_DEAL.FINPROD_TYPE2 in ('F02','F03')
-			and TRD_PRODUCT_DEAL.PS not in ('03','04')
-			and fpt.TYPE_6='H01'
-			)
 
 			<if test="etridList != null and !etridList.isEmpty() ">
 				and TRD_PRODUCT_DEAL.TRADE_ID in
@@ -4577,15 +4572,6 @@
 			<!--包含新UI业务，排除协议回购 -->
 			AND EXISTS (
 				SELECT 1 FROM VALID_TEMP WHERE TRD_PRODUCT_DEAL.TRADE_ID = VALID_TEMP.TRADE_ID
-			)
-			<!--排除交易所协议回购 非首期-->
-			AND NOT EXISTS (
-			SELECT 1 FROM FIN_PRODUCT_TYPE fpt
-			WHERE  TRD_PRODUCT_DEAL.FINPROD_ID = fpt.FINPROD_ID
-			and TRD_PRODUCT_DEAL.TRADE_MARKET in ('03','04')
-			and TRD_PRODUCT_DEAL.FINPROD_TYPE2 in ('F02','F03')
-			and TRD_PRODUCT_DEAL.PS not in ('03','04')
-			and fpt.TYPE_6='H01'
 			)
 
 			<if test="etridList != null and !etridList.isEmpty() ">
