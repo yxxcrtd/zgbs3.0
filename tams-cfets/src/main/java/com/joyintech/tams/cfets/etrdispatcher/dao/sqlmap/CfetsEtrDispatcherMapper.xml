@@ -115,8 +115,8 @@
         else TO_CHAR( ETR_ENTRUST.PRICE, 'FM9999999999999990.9000')
         END AS etrPrice,
         CASE
---         WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04'
---         THEN ROUND(decode(nvl(T9.ORDER_FINISH_AMT, 0) , 0, 0,nvl(T9.ORDER_FINISH_AMT, 0) / nvl(etr_entrust.ENTRUST_AMT, 1)), 4)
+        WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04'
+        THEN ROUND(decode(nvl(T9.ORDER_FINISH_AMT, 0) , 0, 0,nvl(T9.ORDER_FINISH_AMT, 0) / nvl(decode(ETR_ENTRUST.ENTRUST_AMT, 0, 1,ETR_ENTRUST.ENTRUST_AMT), 1)), 4)
         WHEN ETR_ENTRUST.TRADE_MARKET = '03' OR ETR_ENTRUST.TRADE_MARKET = '04' THEN
         (
             CASE
@@ -144,8 +144,8 @@
         )
         END AS exeProgress,
         CASE
---         WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04'
---         THEN ROUND(decode(nvl(T9.ENT_FINISH_AMT, 0),0,0,nvl(T9.ENT_FINISH_AMT, 0) / nvl(etr_entrust.ENTRUST_AMT, 1)), 4)
+        WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04'
+        THEN ROUND(decode(nvl(T9.ENT_FINISH_AMT, 0),0,0,nvl(T9.ENT_FINISH_AMT, 0) / nvl(decode(ETR_ENTRUST.ENTRUST_AMT, 0, 1,ETR_ENTRUST.ENTRUST_AMT), 1)), 4)
         WHEN ETR_ENTRUST.TRADE_MARKET = '03' OR ETR_ENTRUST.TRADE_MARKET = '04' THEN
         (
             CASE
