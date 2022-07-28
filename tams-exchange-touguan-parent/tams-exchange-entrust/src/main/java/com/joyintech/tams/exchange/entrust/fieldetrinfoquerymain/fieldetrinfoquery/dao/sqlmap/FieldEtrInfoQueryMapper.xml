@@ -95,8 +95,8 @@
             end as etrPrice,
         <!-- wsz修改协议回购指令执行，成交进度 -->
         CASE
-            WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' then
-                ROUND( decode(nvl( T5.ORDER_FINISH_AMT, 0 ),0,0,nvl( T5.ORDER_FINISH_AMT, 0 ) / nvl( ETR_ENTRUST.ENTRUST_AMT, 1 )), 4 )*100
+--             WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' then
+--                 ROUND( decode(nvl( T5.ORDER_FINISH_AMT, 0 ),0,0,nvl( T5.ORDER_FINISH_AMT, 0 ) / nvl( ETR_ENTRUST.ENTRUST_AMT, 1 )), 4 )*100
             WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
                 ROUND( nvl( T5.ORDER_FINISH_AMT * 100, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )* 100
             WHEN ETR_ENTRUST_ADD.TARGET_TYPE = '01' THEN
@@ -104,8 +104,8 @@
             ELSE ROUND( nvl( T5.ORDER_FINISH_AMT, 0 ) / nvl( ETR_ENTRUST.ENTRUST_AMT, 1 ), 4 )*100
         END AS exeProgress,
         CASE
-            WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' then
-                ROUND( decode(nvl( T5.ENT_FINISH_AMT, 0 ),0,0,nvl( T5.ENT_FINISH_AMT, 0 ) / nvl( ETR_ENTRUST.ENTRUST_AMT, 1 )), 4 ) *100
+--             WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' then
+--                 ROUND( decode(nvl( T5.ENT_FINISH_AMT, 0 ),0,0,nvl( T5.ENT_FINISH_AMT, 0 ) / nvl( ETR_ENTRUST.ENTRUST_AMT, 1 )), 4 ) *100
             WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
                 ROUND( nvl( T5.ENT_FINISH_AMT * 100, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )* 100
             WHEN ETR_ENTRUST_ADD.TARGET_TYPE = '01' THEN

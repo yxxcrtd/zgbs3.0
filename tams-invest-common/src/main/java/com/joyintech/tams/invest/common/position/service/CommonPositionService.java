@@ -1,6 +1,7 @@
 package com.joyintech.tams.invest.common.position.service;
 
 import com.alibaba.fastjson.JSON;
+import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -235,6 +236,7 @@ public class CommonPositionService {
 		Map<String,Object> dataMap =ptlPositionFlowCfg.getDataMap();
 		Map<String, Object> param = new HashMap<>();
 		for(String key:dataMap.keySet()){
+			logger.debug("参数 {}，{}",key,dataMap.get(key));
 			if (StringUtil.isNotEmpty(dataMap.get(key)) && dataMap.get(key).toString().startsWith("custom")){
 				Object o = ExpressionUtil.eval((String)dataMap.get(key), properties);
 				param.put(key, o);
@@ -358,6 +360,49 @@ public class CommonPositionService {
 			etrSecPositionFlow.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());
 			insertEtrSecPositionFlow(etrSecPositionFlow);
 		});
+		return true;
+	}
+
+	/**
+	 * 中途换券流水处理
+	 */
+	public boolean dealPositionForZTHQRLS(Map<String, Object> properties) {
+		String flowType = String.valueOf(properties.get("flowType"));
+		String processConfig = String.valueOf(properties.get("processConfig"));
+		List<FinPledgeDispDetailTemp> finPledgeDispDetailTempList = (List<FinPledgeDispDetailTemp>) properties.get("finPledgeDispDetailTempList");
+		if (StringUtil.equals(flowType, "02")) {//指令持仓
+			for (FinPledgeDispDetailTemp finPledgeDispDetailTemp : finPledgeDispDetailTempList) {
+				EtrSecPositionFlow etrSecPositionFlow = BeanUtil.mapToObject(properties, EtrSecPositionFlow.class);
+				etrSecPositionFlow.setInvAim(selectHoldInvAim(etrSecPositionFlow.getPortfolioId(), finPledgeDispDetailTemp.getFinprodId()));
+				etrSecPositionFlow.setFinprodId(finPledgeDispDetailTemp.getFinprodId());
+				etrSecPositionFlow.setAmount(finPledgeDispDetailTemp.getPledgeDisplaceAmt());
+				if (!StringUtil.equals(processConfig, "01")) {
+					etrSecPositionFlow.setAmount(etrSecPositionFlow.getAmount().negate());
+				}
+				if (etrSecPositionFlow.getCdate() == null) {
+					etrSecPositionFlow.setCdate(getSysDate());
+				}
+				etrSecPositionFlow.setSeqno(getUuid());//设置主键
+				insertEtrSecPositionFlow(etrSecPositionFlow);//入库
+			}
+		} else if (StringUtil.equals(flowType, "04")) {//交易持仓
+			for (FinPledgeDispDetailTemp finPledgeDispDetailTemp : finPledgeDispDetailTempList) {
+				PtlSecPositionFlow ptlSecPositionFlow = BeanUtil.mapToObject(properties, PtlSecPositionFlow.class);
+				ptlSecPositionFlow.setFinprodId(finPledgeDispDetailTemp.getFinprodId());
+				ptlSecPositionFlow.setInvAim(selectHoldInvAim(ptlSecPositionFlow.getPortfolioId(), finPledgeDispDetailTemp.getFinprodId()));
+				ptlSecPositionFlow.setAmount(finPledgeDispDetailTemp.getPledgeDisplaceAmt());
+				if (!StringUtil.equals(processConfig, "01")) {
+					ptlSecPositionFlow.setAmount(ptlSecPositionFlow.getAmount().negate());
+				}
+				if (ptlSecPositionFlow.getCdate() == null) {
+					ptlSecPositionFlow.setCdate(getSysDate());
+				}
+				ptlSecPositionFlow.setSeqno(getUuid());//设置主键
+				insertPtlSecPositionFlow(ptlSecPositionFlow);//入库
+			}
+		} else {
+			throw new BusinessException("中途换券日间成交流水处理,配置无效");
+		}
 		return true;
 	}
 

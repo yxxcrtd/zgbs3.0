@@ -668,8 +668,8 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
                     bean.setTradeId(dealEntity.getTotleTradeId());
                     bean.setEtrId(trdProductDealAdd.getEntrustId());
                     bean.setFinprodId(finPledgeDisplaceResult.getFinprodId());
-                    bean.setSecAmount(finPledgeDisplaceResult.getPledgeAmt());
-                    bean.setOwnSecAmount(finPledgeDisplaceResult.getPledgeAmt());
+                    bean.setSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
+                    bean.setOwnSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
                     bean.setIntegrateSecAmount(BigDecimal.ZERO);
                     Map<String, Object> map = BeanUtil.object2Map(bean);
                     list.add(map);
@@ -684,8 +684,8 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
                     bean.setTradeId(dealEntity.getTradeId());
                     bean.setEtrId(trdProductDealAdd.getEntrustId());
                     bean.setFinprodId(finPledgeDisplaceResult.getFinprodId());
-                    bean.setSecAmount(finPledgeDisplaceResult.getPledgeAmt());
-                    bean.setOwnSecAmount(finPledgeDisplaceResult.getPledgeAmt());
+                    bean.setSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
+                    bean.setOwnSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
                     bean.setIntegrateSecAmount(BigDecimal.ZERO);
                     Map<String, Object> map = BeanUtil.object2Map(bean);
                     list.add(map);
