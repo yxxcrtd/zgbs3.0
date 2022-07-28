@@ -82,18 +82,18 @@ public class CheckParamUtils {
             return ErrorCode.UN_SUPPORT_ENTRUST_PROP;
         }
         final String market = StockCodeUtils.getMarket(stockCode);
-        //检查本方交易员
-        if (Strings.isNullOrEmpty(integratedEntrust.getTradeId())) {
-            return ErrorCode.TRADE_NOT_EMPTY;
-        }
-        //检查本方交易商
-        if (Strings.isNullOrEmpty(integratedEntrust.getDealerId()) || Strings.isNullOrEmpty(integratedEntrust.getDealerName())) {
-            return ErrorCode.DEALER_NOT_EMPTY;
-        }
-        //检查本方交易主体
-        if (Strings.isNullOrEmpty(integratedEntrust.getInvestorId()) || Strings.isNullOrEmpty(integratedEntrust.getInvestorName())) {
-            return ErrorCode.INVESTOR_NOT_EMPTY;
-        }
+//        //检查本方交易员
+//        if (Strings.isNullOrEmpty(integratedEntrust.getTradeId())) {
+//            return ErrorCode.TRADE_NOT_EMPTY;
+//        }
+//        //检查本方交易商
+//        if (Strings.isNullOrEmpty(integratedEntrust.getDealerId()) || Strings.isNullOrEmpty(integratedEntrust.getDealerName())) {
+//            return ErrorCode.DEALER_NOT_EMPTY;
+//        }
+//        //检查本方交易主体
+//        if (Strings.isNullOrEmpty(integratedEntrust.getInvestorId()) || Strings.isNullOrEmpty(integratedEntrust.getInvestorName())) {
+//            return ErrorCode.INVESTOR_NOT_EMPTY;
+//        }
         //检查交易对手
         if (Strings.isNullOrEmpty(integratedEntrust.getCounterId())) {
             return ErrorCode.COUNTER_NOT_EMPTY;
