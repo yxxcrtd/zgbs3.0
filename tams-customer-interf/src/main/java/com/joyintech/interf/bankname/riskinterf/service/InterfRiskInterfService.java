@@ -952,11 +952,7 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                         creditLinesInputT56.setTgBusiType(DictCodeList.平安资产类型_质押式回购.getValue());
                         creditLinesInputT56.setPsPayment(finDto.getAssetType2());
                         creditLinesInputT56.setSaleCode(DictCodeList.回购拆借方向_逆回购.getValue());
-                        if(creditLinesInputDto.getTradeAmt().compareTo(creditLinesInputT56.getTradeAmt()) > 0) {
-                            trdlist.add(creditLinesInputT56);
-                        }else {
-                            trdlist.clear();
-                        }
+                        trdlist.add(creditLinesInputT56);
                     }
                     continue;
                 }
