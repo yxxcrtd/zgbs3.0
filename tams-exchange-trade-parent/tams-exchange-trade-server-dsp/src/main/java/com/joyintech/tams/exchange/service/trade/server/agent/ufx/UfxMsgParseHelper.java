@@ -820,7 +820,7 @@ public class UfxMsgParseHelper {
                 fixedIncomeQuoteBuyBean.setEntrustPrice(Double.parseDouble((String) ds.get("buy_price")));
                 fixedIncomeQuoteBuyBean.setEntrustVolume(Integer.parseInt((String) ds.get("buy_quote_amount")));
                 fixedIncomeQuoteBuyBean.setFullPrice(Double.parseDouble((String) ds.get("buy_quote_price")));
-                fixedIncomeQuoteBuyBean.setExpireIncomeRate(Double.parseDouble((String) ds.get("buy_exchange_rate")) / 100);
+                fixedIncomeQuoteBuyBean.setExpireIncomeRate(Double.parseDouble((String) ds.get("buy_exchange_rate")));
                 fixedIncomeQuoteBuyBean.setInterest(Double.parseDouble((String) ds.get("stock_interest")));
                 fixedIncomeQuoteBuyBean.setEntrustBs(EntrustBs.BUY.value);
                 list.add(fixedIncomeQuoteBuyBean);
@@ -845,7 +845,7 @@ public class UfxMsgParseHelper {
                     fixedIncomeQuoteSellBean.setEntrustPrice(Double.parseDouble((String) ds.get("sell_price")));
                     fixedIncomeQuoteSellBean.setEntrustVolume(Integer.parseInt((String) ds.get("sell_quote_amount")));
                     fixedIncomeQuoteSellBean.setFullPrice(Double.parseDouble((String) ds.get("sell_quote_price")));
-                    fixedIncomeQuoteSellBean.setExpireIncomeRate(Double.parseDouble((String) ds.get("sell_exchange_rate")) / 100);
+                    fixedIncomeQuoteSellBean.setExpireIncomeRate(Double.parseDouble((String) ds.get("sell_exchange_rate")));
                     fixedIncomeQuoteSellBean.setInterest(Double.parseDouble((String) ds.get("stock_interest")));
                     fixedIncomeQuoteSellBean.setEntrustBs(EntrustBs.SELL.value);
                     list.add(fixedIncomeQuoteSellBean);

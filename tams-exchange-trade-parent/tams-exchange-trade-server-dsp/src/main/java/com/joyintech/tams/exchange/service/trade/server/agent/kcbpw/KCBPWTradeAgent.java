@@ -1148,8 +1148,14 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
             }
         } else {
             if (trade.getTradeType() == 1) {
+                String ordersNoAndorderId = null;
                 // 撤单成功
-                String ordersNoAndorderId = entrustIdManager.getKcbpwZHCancelEntrustId(kcbpAccount.getAccountId(), trade.getBrokerEntrustId());
+                if (flag) {
+                    ordersNoAndorderId = entrustIdManager.getKcbpwPTCancelEntrustId(kcbpAccount.getAccountId(), trade.getBrokerEntrustId());
+                } else {
+                    ordersNoAndorderId = entrustIdManager.getKcbpwZHCancelEntrustId(kcbpAccount.getAccountId(), trade.getBrokerEntrustId());
+                }
+
                 if (!Strings.isNullOrEmpty(ordersNoAndorderId)) {
                     String[] OAO = ordersNoAndorderId.split("\\|");
                     trade.setBrokerEntrustId(OAO[0]);

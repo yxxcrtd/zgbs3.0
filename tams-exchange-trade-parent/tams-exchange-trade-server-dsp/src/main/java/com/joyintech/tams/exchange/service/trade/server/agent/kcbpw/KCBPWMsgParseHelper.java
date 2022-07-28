@@ -12,10 +12,7 @@ import com.joyintech.tams.exchange.service.trade.server.agent.EntrustIdManager;
 import org.springframework.beans.BeanUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author lifangpeng
@@ -959,7 +956,14 @@ public class KCBPWMsgParseHelper {
             integratedFixedIncomeQuoteBean.setStockName(resMap.get("stkname"));
             integratedFixedIncomeQuoteBean.setEntrustBs(EntrustUtils.getEntrustBs(resMap.get("bsflag")));
             integratedFixedIncomeQuoteBean.setOrderNo(resMap.get("orderid"));
-            integratedFixedIncomeQuoteBean.setReportTime(Long.parseLong(resMap.get("ordertime")));
+            String reportTime = (String) resMap.get("ordertime");
+            if (Strings.isNullOrEmpty(reportTime))
+                reportTime = "000000";
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(reportTime.substring(0, 2)));
+            cal.set(Calendar.MINUTE, Integer.parseInt(reportTime.substring(2, 4)));
+            cal.set(Calendar.SECOND, Integer.parseInt(reportTime.substring(4, 6)));
+            integratedFixedIncomeQuoteBean.setReportTime(cal.getTime().getTime());
             integratedFixedIncomeQuoteBean.setAgencyName(resMap.get("company"));
             if (!Strings.isNullOrEmpty(resMap.get("orderprice"))) {
                 integratedFixedIncomeQuoteBean.setEntrustPrice(Double.parseDouble(resMap.get("orderprice")));
