@@ -1261,6 +1261,11 @@
                     $("#addCla").attr("disabled", false);
                 }
             } else if (ps == 'T94') {
+                let outAmtValue = $("#outAmt").val()
+                if(outAmtValue != null && outAmtValue != "" && outAmtValue != undefined){
+                    $("#outRepSecNum").val("")
+                    $("#newRepSecNum").val("")
+                }
                 if (repPs == BACK_LEND_DIRECTION_03) {
                     //本方交易员
                     $("#trader_div").hide();
