@@ -153,9 +153,6 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
     private WflRegTradeFeeMapper wflRegTradeFeeMapper;
 
     @Autowired
-    private EtrEntrustAddMapper etrEntrustAddMapper;
-
-    @Autowired
     private CfetsIbuQuoteBondEtrMapper cfetsIbuQuoteBondEtrMapper;
 
     @Autowired
@@ -172,15 +169,6 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
 
     @Autowired
     private IPlatformDate iPlatformDate;
-
-    @Autowired
-    private FinTradeProductMapper finTradeProductMapper;
-
-    @Autowired
-    private FinTradeProductAddMapper finTradeProductAddMapper;
-
-    @Autowired
-    private FinProductTypeMapper finProductTypeMapper;
 
     @Autowired
     private EtrSecPositionFlowMapper etrSecPositionFlowMapper;
@@ -202,9 +190,6 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
 
     @Autowired
     private MstWorkflowCommonServiceMapperImpl mstWorkflowCommonServiceMapperImpl;
-
-    @Autowired
-    private PreTrdCommonBaseService preTrdCommonBaseService;
 
     @Autowired
     private TrdOutRightRepoTradeService trdOutRightRepoTradeService;
@@ -821,17 +806,43 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
             EtrPositionHoldDto etrPositionHoldDto = new EtrPositionHoldDto();
             // 持仓流水
             List<EtrSecPositionFlowDto> etrSecPositionFlows = new ArrayList<>();
+            List<EtrSecPositionFlowDto> etrSecPositionFlows1 = new ArrayList<>();
             // 现金流水
             List<EtrCashPositionFlowDto> etrCashPositionFlows = new ArrayList<>();
             //插入旧头寸
             List<WflRegFinProductDeal> wfldeals = cfetsIbuQuoteBondMapper.listWflRegFinProductDeal(entity.getTotleTradeId());
+            List<WflRegFinPledge> wflRegFinPledges = cfetsIbuQuoteRepo004Mapper.listWflRegFinPledge(entity.getTotleTradeId());
             for (WflRegFinProductDeal deal : wfldeals) {
                 AllTradeCommonUtil.deletePosition(null, deal.getTradeId());
                 // 撤销时直接冲销
-                etrSecPositionFlows.addAll(
+                etrSecPositionFlows1.addAll(
                         EtrCommonCashPositionDealService.findNegateSecFlowByEntrustId(
                                 deal.getEntrustId(), deal.getTradeId()));
             }
+            Map<String, String> map = new HashMap<>();
+            for (EtrSecPositionFlowDto dto : etrSecPositionFlows1) {
+                map.put(dto.getFinprodId() + dto.getPortfolioId(), dto.getInvAim());
+                map.put(dto.getFinprodId() + dto.getPortfolioId() + dto.getInvAim(), dto.getSecAcctId());
+            }
+            wflRegFinPledges.forEach(pledge -> {
+                        // 退回时直接冲销
+                        EtrSecPositionFlowDto etrSecPositionFlowDto = new EtrSecPositionFlowDto();
+                        etrSecPositionFlowDto.setSeqno(IDGenerator.generate());
+                        etrSecPositionFlowDto.setPortfolioId(pledge.getPortfolioId());
+                        etrSecPositionFlowDto.setFinprodId(pledge.getPledgeFinprodId());
+                        etrSecPositionFlowDto.setBranch(0L);
+                        etrSecPositionFlowDto.setInvAim(map.get(pledge.getPledgeFinprodId() + pledge.getPortfolioId()));
+                        etrSecPositionFlowDto.setSecAcctId(
+                                map.get(etrSecPositionFlowDto.getFinprodId() + etrSecPositionFlowDto.getPortfolioId() + etrSecPositionFlowDto.getInvAim()));
+                        etrSecPositionFlowDto.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());
+                        etrSecPositionFlowDto.setCdate(entity.getTradeDate());
+                        etrSecPositionFlowDto.setCcy(entity.getCcy());
+                        etrSecPositionFlowDto.setAmount(pledge.getPledgeNumber());
+                        etrSecPositionFlowDto.setTradeId(pledge.getTradeId());
+                        etrSecPositionFlowDto.setIsExistNew(DictCodeList.是否_是.getValue());
+                        etrSecPositionFlows.add(etrSecPositionFlowDto);
+                    }
+            );
             etrPositionHoldDto.setPtlCashPositionFlows(etrCashPositionFlows);
             etrPositionHoldDto.setPtlSecPositionFlows(etrSecPositionFlows);
             EtrCommonCashPositionDealService.持久化流水Dto(etrPositionHoldDto);
@@ -1079,7 +1090,7 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
     /**
      * 组装金融产品分类信息
      *
-     * @param entity 页面数据
+     * @param deal 页面数据
      * @return com.joyintech.tams.common.base.entity.FinProductType
      * @author jiangpeng
      * @date 2021/12/29 11:04
