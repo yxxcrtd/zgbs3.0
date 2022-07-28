@@ -542,7 +542,11 @@
         ee.REMARK as addCla,
         SSAI.SEC_ACCT_ID secAcctId,
         fp.FINPROD_ID finprodId,
-        SCI.ACCT_NO acctNo
+        SCI.ACCT_NO acctNo,
+        CASE
+        WHEN eea.BUSI_TYPE_POSITION = 'EX015' THEN ee.ENTRUST_DATE
+        WHEN eea.BUSI_TYPE_POSITION = 'EX011' THEN fin_trade_product.Vdate
+        ELSE fin_trade_product.Mdate end as sysDate1
         from fin_trade_product /** 交易类金融产品 **/
         inner join FIN_PRODUCT_TYPE /** 金融产品分类表 **/
             on fin_trade_product.finprod_id = FIN_PRODUCT_TYPE.Finprod_Id
@@ -623,7 +627,7 @@
             AND isExpire = #{isDate}
         </if>
         <if test="sysdate != null">
-            AND ((Mdate <![CDATA[<=]]> #{sysdate,jdbcType=DATE} and totle_trade_id is null) or Mdate <![CDATA[>]]> #{sysdate,jdbcType=DATE} )
+            and ((sysDate1 <![CDATA[<=]]> #{sysdate,jdbcType=DATE} and totle_trade_id is null) or sysDate1 <![CDATA[>]]> #{sysdate,jdbcType=DATE} )
         </if>
         <if test="origSerialNo != null and origSerialNo != ''">
             AND intiTradeId  like '%' || #{origSerialNo} || '%'
