@@ -2497,6 +2497,7 @@
         reg.settle_speed as settleSpeed,
         reg.sec_manage_acct_id as secManageAcctId,
         reg.yield as tradeYield,
+        reg.UNIT_CPRICE as unitCprice,
         reg.yield as yield,
         reg.face_value as faceValue,
         reg.settle_date as settleDate,
@@ -2535,8 +2536,11 @@
         <if test="secManageAcctId != null and secManageAcctId != ''">
             and reg.sec_manage_acct_id = #{secManageAcctId,jdbcType=VARCHAR}
         </if>
-        <if test="yield != null">
-            and to_char(reg.yield,'FM990.9999')=to_char(#{yield},'FM990.9999')
+        <!--        <if test="yield != null">-->
+        <!--            and to_char(reg.yield,'FM990.9999')=to_char(#{yield},'FM990.9999')-->
+        <!--        </if>-->
+        <if test="price != null">
+            and to_char(reg.UNIT_CPRICE,'FM990.9999')=to_char(#{price},'FM990.9999')
         </if>
         <if test="faceValue != null">
             and reg.face_value=#{faceValue}
