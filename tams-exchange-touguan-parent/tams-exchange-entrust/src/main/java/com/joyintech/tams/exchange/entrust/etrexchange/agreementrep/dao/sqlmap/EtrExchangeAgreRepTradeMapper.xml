@@ -458,29 +458,22 @@
         FIN_PRODUCT_TYPE.Type_7 as ps, /** 交易方向 **/
         trd_fin_product_deal_total.totle_trade_id,
         fin_trade_product.Mdate,
+        fin_trade_product.Vdate,
         case
-        when trd_fin_product_deal_total.totle_trade_id is not null then
-        '已购回'
-        else
-        '未购回'
+            when trd_fin_product_deal_total.totle_trade_id is not null then '已购回'
+            else '未购回'
         end as purStatus, /** 购回状态 **/
         case
-        when fin_trade_product.Mdate <![CDATA[<=]]> #{sysdate,jdbcType=DATE} then
-        #{YES_OR_NO_Y}
-        else
-        #{YES_OR_NO_N}
+            when fin_trade_product.Mdate <![CDATA[<=]]> #{sysdate,jdbcType=DATE} then #{YES_OR_NO_Y}
+            else #{YES_OR_NO_N}
         end as isExpire,
         CASE
-        WHEN fin_trade_product.Mdate <![CDATA[<=]]> #{sysdate,jdbcType=DATE} THEN
-        '是'
-        ELSE
-        '否'
+            WHEN fin_trade_product.Mdate <![CDATA[<=]]> #{sysdate,jdbcType=DATE} THEN '是'
+            ELSE '否'
         END AS isExpireStr, /** 是否到期 **/
         case
-        when trd_product_deal_2.trade_id is not null then
-        '已交收'
-        else
-        '未交收'
+            when trd_product_deal_2.trade_id is not null then '已交收'
+            else '未交收'
         end as settleStatus, /** 交收状态 **/
         fin_trade_product.TERM repDays, /** 回购天数 **/
         fin_trade_product.Mdate backDate, /** 回购到期日 **/
@@ -497,10 +490,8 @@
         fin_trade_product.vpay_date fristSettleDate, /** 首次结算日 **/
         fin_trade_product.mpay_date expireSettleDate, /** 到期结算日 **/
         case
-        when fin_trade_product.mpay_date <![CDATA[<=]]> #{sysdate,jdbcType=DATE} then
-        0
-        else
-        TO_NUMBER(fin_trade_product.mpay_date - #{sysdate,jdbcType=DATE})
+            when fin_trade_product.mpay_date <![CDATA[<=]]> #{sysdate,jdbcType=DATE} then 0
+            else TO_NUMBER(fin_trade_product.mpay_date - #{sysdate,jdbcType=DATE})
         end as remainDays, /** 剩余日期 **/
         fin_trade_product.act_cap_days occupyDays, /** 实际占款天数 **/
         fin_trade_product.m_int_amt mIntAmt, /** 回购利息 **/
@@ -551,7 +542,11 @@
         ee.REMARK as addCla,
         SSAI.SEC_ACCT_ID secAcctId,
         fp.FINPROD_ID finprodId,
-        SCI.ACCT_NO acctNo
+        SCI.ACCT_NO acctNo,
+        CASE
+        WHEN eea.BUSI_TYPE_POSITION = 'EX015' THEN ee.ENTRUST_DATE
+        WHEN eea.BUSI_TYPE_POSITION = 'EX011' THEN fin_trade_product.Vdate
+        ELSE fin_trade_product.Mdate end as sysDate1
         from fin_trade_product /** 交易类金融产品 **/
         inner join FIN_PRODUCT_TYPE /** 金融产品分类表 **/
             on fin_trade_product.finprod_id = FIN_PRODUCT_TYPE.Finprod_Id
@@ -577,7 +572,7 @@
         LEFT JOIN trd_fin_product_deal_total trd_fin_product_deal_total /** 金融产品临时交易1 **/
             on fin_trade_product.finprod_id = trd_fin_product_deal_total.finprod_id
             AND fin_trade_product.branch = trd_fin_product_deal_total.branch
-            AND trd_fin_product_deal_total.ps in ('T96', 'T95', 'T93', 'T56', 'T07', 'T54')
+            AND trd_fin_product_deal_total.ps in ('T96', 'T95', 'T94', 'T93', 'T56', 'T07', 'T54')
             AND trd_fin_product_deal_total.trade_status = '01'
             AND trd_fin_product_deal_total.is_cancel = 'N'
         LEFT JOIN PTL_PORTFOLIO_AUTHORITY /** 组合权限表 **/
@@ -620,7 +615,7 @@
             AND fin_deal_pledge.pledge_finprod_id = #{pledgeFinprodId}
         </if>
         <if test="zyqList != null and zyqList.size()>0">
-            <foreach collection="zyqList" open="AND fin_deal_pledge.pledge_finprod_id in(" close=")" separator="," item="item">
+            <foreach collection="zyqList" open="AND SUBSTR(fin_deal_pledge.pledge_finprod_id, 5) in(" close=")" separator="," item="item">
                 #{item}
             </foreach>
         </if>
@@ -632,10 +627,10 @@
             AND isExpire = #{isDate}
         </if>
         <if test="sysdate != null">
-            AND ((Mdate <![CDATA[<=]]> #{sysdate,jdbcType=DATE} and totle_trade_id is null) or Mdate <![CDATA[>]]> #{sysdate,jdbcType=DATE} )
+            and ((sysDate1 <![CDATA[<=]]> #{sysdate,jdbcType=DATE} and totle_trade_id is null) or sysDate1 <![CDATA[>]]> #{sysdate,jdbcType=DATE} )
         </if>
         <if test="origSerialNo != null and origSerialNo != ''">
-            AND intiTradeId  like '%' || #{origSerialNo} || '%'
+            AND (intiTradeId  like '%' || #{origSerialNo} || '%' OR firstTradeId like '%' || #{origSerialNo} )
         </if>
         <!-- 关键字模糊查询 -->
         <include refid="etrExchangeOnWayRepAnd"/>
@@ -651,431 +646,279 @@
             purStatus|| '|' ||  settleStatus|| '|' ||  isExpire || '|' || isExpireStr|| '|' ||
             repDays|| '|' ||  backDate|| '|' ||  market || '|' || SDL2.ITEM_VALUE || '|' ||
             stockName|| '|' ||  stockCode|| '|' ||  fristSettleDate || '|' || expireSettleDate|| '|' ||
-            tradeId|| '|' ||  intiTradeId
+            tradeId|| '|' ||  intiTradeId || '|' || firstTradeId
             like '%' || #{search} || '%'
             )
         </if>
     </sql>
     <select id="selectEtrEntrust" parameterType="Map" resultType="com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepTrade003Dto">
         select distinct * from (
-        select
-        etr_entrust.entrust_id entrustId, /** 指令编号 **/
-        etr_entrust.entrust_status entrustStatus, /** 指令状态 **/
-        etr_entrust.FINPROD_ID initialNum,
-        CASE
-        WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_NUM, 1 ), 4 ) ELSE ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )
-        END AS implementPercent,
-        CASE
-        WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_NUM, 1 ), 4 ) ELSE ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )
-        END AS dealPercent,
-        CASE
-        WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
-        END AS finishAmt,
-        CASE
-        WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
-        END AS avaNum,
-        CASE
-        WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
-        END AS finishDealAmt,
-        CASE
-        WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
-        END AS avaDealAmt,
-        nvl(detail.PORTFOLIO_ID,PTL_PORTFOLIO.PORTFOLIO_ID) portfolioId,
-        nvl(detail.PORTFOLIO_NAME,PTL_PORTFOLIO.PORTFOLIO_NAME) portfolioName,
-        SCI.ACCT_NAME dealCurAcct, /** 资金账户 **/
-
-        etr_entrust.trade_market tradeMarket, /** 市场 **/
-        etr_entrust.Trade_Plat tradePlat, /** 交易平台 **/
-        etr_entrust.Ps ps, /** 交易方向 **/
-        etr_entrust_add.BUSI_PS busiPs,/**委托方向**/
-        etr_entrust_add.Term_Days term,/** 回购期限 **/
-        etr_entrust.entrust_amt entrustAmt, /** 回购金额 **/
-        etr_entrust.Price * 100 price, /** 回购利率 **/
-        etr_entrust_add.vpay_date fristSettleDate,/** 首期结算日 **/
-        etr_entrust_add.mpay_date expireSettleDate,/** 到期结算日 **/
-        etr_entrust_add.Cap_Days occupyDays,/** 占款天数 **/
-        etr_entrust_add.m_Int_Amt intAmt,/** 回购利息 **/
-        etr_entrust_add.m_Trade_Amt expireSettleAmt,/** 到期结算金额 **/
-        DECODE(etr_entrust.ps,'03',pledge.finprod_id,'04',pledge.finprod_id,'T92',pledge.finprod_id,'T94',pledge.finprod_id,'T56',pledge.finprod_id,trdPledge.finprod_id) AS finprodId,
-        DECODE(etr_entrust.ps,'03',pledge.Finprod_Market_Id,'04',pledge.Finprod_Market_Id,'T92',pledge.Finprod_Market_Id,'T94',pledge.Finprod_Market_Id,'T56',pledge.Finprod_Market_Id,trdPledge.Finprod_Market_Id) AS finprodMarketId,/** 质押代码 **/
-        DECODE(etr_entrust.ps,'03',pledge.finprod_abbr,'04',pledge.finprod_abbr,'T92',pledge.finprod_abbr,'T94',pledge.finprod_abbr,'T56',pledge.finprod_abbr,trdPledge.finprod_abbr) AS finprodAbbr, /** 质押券名称 **/
-        DECODE(etr_entrust.ps,'03',pledge.Pledge_Ratio,'04',pledge.Pledge_Ratio,'T92',pledge.Pledge_Ratio,'T94',pledge.Pledge_Ratio,'T56',pledge.Pledge_Ratio,trdPledge.Pledge_Ratio) AS conRatio, /** 折算率 **/
-        DECODE(etr_entrust.ps,'03',pledge.PLEDGE_NUMBER,'04',pledge.PLEDGE_NUMBER,'T92',pledge.PLEDGE_NUMBER,'T94',pledge.PLEDGE_NUMBER,'T56',pledge.PLEDGE_NUMBER,trdPledge.PLEDGE_NUMBER) AS  repSecNum, /** 质押数量  **/
-        DECODE(etr_entrust.ps, 'T94', trdPledge.finprod_id, null)                                      AS swapOrigFinprodId, /**中途换券当前质押券**/
-        DECODE(etr_entrust.ps, 'T94', trdPledge.Finprod_Market_Id, null)                                      AS swapOrigFinprodMarketId, /**中途换券当前质押代码**/
-        DECODE(etr_entrust.ps, 'T94', trdPledge.finprod_abbr, null)                                      AS swapOrigFinprodAbbr, /**中途换券当前质押券名称**/
-        DECODE(etr_entrust.ps, 'T94', trdPledge.PLEDGE_NUMBER, null)                                      AS swapOrigRepSecNum, /**中途换券当前质押券数量**/
-        DECODE(etr_entrust.ps, 'T94', swapPledge.finprod_id, null)                                      AS swapOutFinprodId, /**中途换券换出质押券**/
-        DECODE(etr_entrust.ps, 'T94', swapPledge.Finprod_Market_Id, null)                                      AS swapOutFinprodMarketId, /**中途换券换出质押代码**/
-        DECODE(etr_entrust.ps, 'T94', swapPledge.finprod_abbr, null)                                      AS swapOutFinprodAbbr, /**中途换券换出质押券名称**/
-        DECODE(etr_entrust.ps, 'T94', swapPledge.PLEDGE_NUMBER, null)                                       AS swapOutRepSecNum, /** 中途换券换出质押数量 **/
-        DECODE(etr_entrust.ps, 'T94', swapPledge.Pledge_Ratio, null)                                       AS swapOutConRatio, /** 中途换券换出折算率 **/
-        case
-        when etr_entrust.trade_market = #{TRADE_PLACE_03} then
-        #{UNIT_04}
-        else
-        #{UNIT_01}
-        end as pledgeUnit, /** 质押券单位  **/
-        etr_pledge.DISPLACE_DIR                                                                                DISPLACE_DIR,/** 置换方向 **/
-        etr_pledge.PLEDGE_NUMBER * nvl(etr_pledge.Pledge_Face_Value, 100) printAmt, /** 质押面额 **/
-        etr_entrust_add.Sec_Acct_Id secAcctId, /** 证券账户 ※隐藏 **/
-        etr_entrust.counter_id counterId, /** 交易对手 **/
-        mst_counter_party.counter_name counterName, /**交易对手名称**/
-        etr_entrust.counter_trader counterTrader,/** 对手方交易员 **/
-        etr_entrust.vdate vdate,/** 开始日期 **/
-        etr_entrust.mdate mdate,/** 结束日期 **/
-        etr_entrust.CREATE_TIME,
-        '' nextUser,
-        etr_entrust.INV_MANAGER_ID invManagerId,
-        etr_entrust.ENTRUST_DATE entrustDate,
-        SDL1.ITEM_VALUE entrustStatusString,
-        SDL2.ITEM_VALUE tradeMarketString,
-        SDL3.ITEM_VALUE tradePlatString,
-        SDL4.ITEM_VALUE psStr,
-        SDL5.ITEM_VALUE busiTypeTgString,
-        etr_entrust_add.BUSI_TYPE_POSITION busiTypeTg,
-        SYS_USER.REAL_NAME invManagerName,
-        etr_entrust_add.TRADER as homeTrader,
-        etr_entrust.REMARK as addCla,
-        etr_entrust_add.REQUEST_ID as requestId,
-        etr_entrust_add.TRADE_ID as intiTradeId
-        from etr_entrust                            /** 委托指令 **/
-        inner JOIN etr_entrust_add                  /** 委托指令附属 **/
-        ON    etr_entrust.entrust_id = etr_entrust_add.entrust_id
-        LEFT JOIN etr_pledge                     /** 委托指令回购质押品 **/
-        ON    etr_entrust.entrust_id = etr_pledge.entrust_id
-        LEFT JOIN etr_finish_status /** 委托完成状况表 **/
-        ON    etr_entrust.entrust_id = etr_finish_status.entrust_id
-        and etr_entrust.entrust_id = etr_finish_status.trade_id
-        LEFT JOIN PTL_PORTFOLIO         /** 组合 **/
-        ON    etr_entrust.portfolio_id = PTL_PORTFOLIO.Portfolio_Id
-
-        LEFT JOIN (
-        SELECT EED.ENTRUST_ID,
-        listagg ( EED.PORTFOLIO_ID, ',' ) within GROUP ( ORDER BY EED.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
-        listagg ( FP.PORTFOLIO_NAME, ',' ) within GROUP ( ORDER BY FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME
-        FROM ETR_ENTRUST_DETAIL EED
-        left join PTL_PORTFOLIO FP on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
-        GROUP BY EED.ENTRUST_ID ) detail ON etr_entrust.ENTRUST_ID = detail.ENTRUST_ID
-
-        LEFT JOIN PTL_PORTFOLIO_AUTHORITY      /** 组合权限表 **/
-        ON    PTL_PORTFOLIO.Portfolio_Id = PTL_PORTFOLIO_AUTHORITY.Portfolio_Id
-        LEFT JOIN fin_product            /** 标的类金融产品 **/
-        ON    fin_product.finprod_id = etr_entrust.finprod_id
-        <!--XYHGFXSJ-122:非首期指令wfl_etr_entrust的finprod_id存的是首期交易编号,需关联质押品表查询质押券信息 modify by fuyongsheng 20220719 start-->
-        LEFT JOIN (
-            SELECT
-                fdp.ENTRUST_ID,
-                nvl(fpsq.finprod_id, fpsq1.finprod_id) finprod_id, /** 金融产品代码 **/
-                nvl(fpsq.Finprod_Market_Id,fpsq1.Finprod_Market_Id) Finprod_Market_Id, /** 质押代码 **/
-                nvl(fpsq.finprod_abbr,fpsq1.finprod_abbr) finprod_abbr, /** 质押券名称 **/
-                fdp.Pledge_Ratio * 100  Pledge_Ratio, /** 折算率 **/
-                fdp.PLEDGE_NUMBER / 100 PLEDGE_NUMBER, /** 质押数量 **/
-                fdp.Pledge_Face_Value   Pledge_Face_Value
-            from etr_pledge fdp /** 质押品表 **/
-            LEFT JOIN fin_product  fpsq /** 标的类金融产品 **/   ON    fpsq.finprod_id = fdp.finprod_id
-            LEFT JOIN FIN_DEAL_PLEDGE fdp1 ON fdp1.finprod_id = fdp.finprod_id
-            LEFT JOIN fin_product fpsq1 /** 标的类金融产品 **/   ON fpsq1.finprod_id = fdp1.PLEDGE_FINPROD_ID
-            WHERE fdp.DISPLACE_DIR = '01' OR fdp.DISPLACE_DIR IS NULL <!--不展示换出券-->
-            ) pledge
-        ON etr_entrust.ENTRUST_ID = pledge.ENTRUST_ID
-        LEFT JOIN (
-            SELECT fdp.ENTRUST_ID,
-                nvl(fpsq.finprod_id, fpsq1.finprod_id)               finprod_id, /** 金融产品代码 **/
-                nvl(fpsq.Finprod_Market_Id, fpsq1.Finprod_Market_Id) Finprod_Market_Id, /** 质押代码 **/
-                nvl(fpsq.finprod_abbr, fpsq1.finprod_abbr)           finprod_abbr, /** 质押券名称 **/
-                fdp.Pledge_Ratio * 100                               Pledge_Ratio, /** 折算率 **/
-                fdp.PLEDGE_NUMBER / 100                              PLEDGE_NUMBER, /** 质押数量 **/
-                fdp.Pledge_Face_Value                                Pledge_Face_Value
-            from etr_pledge fdp /** 质押品表 **/
-            LEFT JOIN fin_product fpsq /** 标的类金融产品 **/ ON fpsq.finprod_id = fdp.finprod_id
-            LEFT JOIN FIN_DEAL_PLEDGE fdp1 ON fdp1.finprod_id = fdp.finprod_id
-            LEFT JOIN fin_product fpsq1 /** 标的类金融产品 **/ ON fpsq1.finprod_id = fdp1.PLEDGE_FINPROD_ID
-            WHERE fdp.DISPLACE_DIR = '02'
-            ) swapPledge
-        ON etr_entrust.ENTRUST_ID = swapPledge.ENTRUST_ID
-        <!--XYHGFXSJ-122:非首期指令wfl_etr_entrust的finprod_id存的是首期交易编号,需关联质押品表查询质押券信息 modify by fuyongsheng 20220719 end-->
-        LEFT JOIN (
-<!--        SELECT-->
-<!--        A.FINPROD_ID tradeId,-->
-<!--        FP.FINPROD_ID,-->
-<!--        FP.FINPROD_MARKET_ID  FINPROD_MARKET_ID,-->
-<!--        FP.finprod_abbr as finprod_abbr,-->
-<!--        B.PLEDGE_NUMBER	 PLEDGE_NUMBER,-->
-<!--        B.Pledge_Ratio	 Pledge_Ratio,-->
-<!--        B.Pledge_Face_Value printAmt-->
-<!--        FROM-->
-<!--        FIN_TRADE_PRODUCT A-->
-<!--        INNER JOIN FIN_DEAL_PLEDGE B ON B.FINPROD_ID = A.FINPROD_ID AND B.BRANCH = A.BRANCH-->
-<!--&lt;!&ndash;        INNER JOIN FIN_PRODUCT_TYPE C ON B.FINPROD_ID=C.FINPROD_ID&ndash;&gt;-->
-<!--&lt;!&ndash;        AND C.BRANCH = A.BRANCH&ndash;&gt;-->
-<!--&lt;!&ndash;        and C.TYPE_6 = #{TARGET_BACK_TYPE_H01}&ndash;&gt;-->
-<!--&lt;!&ndash;        AND C.TYPE_7 in (#{BACK_LEND_DIRECTION_03},#{BACK_LEND_DIRECTION_04})&ndash;&gt;-->
-<!--        LEFT JOIN FIN_PRODUCT FP ON FP.FINPROD_ID=B.PLEDGE_FINPROD_ID-->
-<!--        WHERE  A.BRANCH=0-->
-        SELECT A.FINPROD_ID         tradeId,
-            listagg(FP.FINPROD_ID, ',') within GROUP ( ORDER BY FP.FINPROD_ID )   FINPROD_ID,
-            listagg(FP.FINPROD_MARKET_ID, ',') within GROUP ( ORDER BY FP.FINPROD_MARKET_ID )   FINPROD_MARKET_ID,
-            listagg(FP.finprod_abbr, ',') within GROUP ( ORDER BY FP.finprod_abbr ) finprod_abbr,
-            SUM(B.PLEDGE_NUMBER)*100/10000 PLEDGE_NUMBER,
-            MAX(B.Pledge_Ratio)*100 Pledge_Ratio,
-            SUM(B.Pledge_Face_Value) printAmt
-        FROM FIN_TRADE_PRODUCT A
-        INNER JOIN FIN_DEAL_PLEDGE B ON B.FINPROD_ID = A.FINPROD_ID AND B.BRANCH = A.BRANCH
-        LEFT JOIN FIN_PRODUCT FP ON FP.FINPROD_ID = B.PLEDGE_FINPROD_ID
-        group by A.FINPROD_ID
-        ) trdPledge on trdPledge.tradeId=etr_entrust.FINPROD_ID
-        LEFT JOIN  mst_counter_party      /** 交易对手 **/
-        ON    etr_entrust.counter_id = mst_counter_party.counter_id
-        LEFT JOIN STL_CAPACCT_INFO SCI
-        ON etr_entrust_add.Deal_Cur_Acct = SCI.ACCT_NO
-        LEFT JOIN SYS_DATADICT_LIST SDL1 ON SDL1.DICT_CODE ='ENTRUST_STATUS' AND SDL1.ITEM_CODE = etr_entrust.entrust_status
-        LEFT JOIN SYS_DATADICT_LIST SDL2 ON SDL2.DICT_CODE ='TRADE_PLACE' AND SDL2.ITEM_CODE = etr_entrust.trade_market
-        LEFT JOIN SYS_DATADICT_LIST SDL3 ON SDL3.DICT_CODE ='SHARES_TRADE_PLATFORM' AND SDL3.ITEM_CODE = etr_entrust.Trade_Plat
-        LEFT JOIN SYS_DATADICT_LIST SDL4 ON SDL4.DICT_CODE ='PS' AND SDL4.ITEM_CODE = etr_entrust_add.BUSI_PS
-        LEFT JOIN SYS_USER ON ETR_ENTRUST.INV_MANAGER_ID = SYS_USER.USER_NAME
-        LEFT JOIN SYS_DATADICT_LIST SDL5 ON SDL5.DICT_CODE ='BUSI_TYPE_TG' AND SDL5.ITEM_CODE = etr_entrust_add.BUSI_TYPE_POSITION
-        where etr_entrust.TRADE_MARKET IN ('03','04')
-        and etr_entrust_add.ASSET_TYPE1 = 'H01'
-        <if test="entrustStatus != null and entrustStatus != ''">
-            AND etr_entrust.ENTRUST_STATUS = #{entrustStatus}
-        </if>
-        <if test="entrustId !=null and !entrustId.equals('')">
-            AND etr_entrust.ENTRUST_ID = #{entrustId}
-        </if>
-        <if test="userId != null and userId != ''">
-            AND PTL_PORTFOLIO_AUTHORITY.USER_ID = #{userId}
-        </if>
-        <if test="portfolioName != null and portfolioName != ''">
-            AND PTL_PORTFOLIO.Portfolio_Id = #{portfolioName}
-        </if>
-        <if test="portfolioIdList != null and portfolioIdList.size()>0">
-            <foreach collection="portfolioIdList" open="AND PTL_PORTFOLIO.Portfolio_Id in(" close=")" separator="," item="item">
-                #{item}
-            </foreach>
-        </if>
-        <if test="tradeMarket != null and tradeMarket != ''">
-            AND etr_entrust.trade_market = #{tradeMarket}
-        </if>
-        <if test="finprodId != null and finprodId != ''">
-            AND etr_pledge.finprod_id = #{finprodId}
-        </if>
-        <if test="zyj != null and zyj.size()>0">
-            <foreach collection="zyj" open="AND etr_pledge.finprod_id in(" close=")" separator="," item="item">
-                #{item}
-            </foreach>
-        </if>
-        <if test="bussType != null and bussType != '' and bussType == 'T92'">
-            AND etr_entrust.Ps in ('03', '04')
-        </if>
-        <if test="bussType != null and bussType != '' and bussType != 'T92'">
-            AND etr_entrust.Ps = #{bussType}
-        </if>
-        <if test="manager != null and manager != ''">
-            AND etr_entrust.INV_MANAGER_ID = #{manager}
-        </if>
-        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
-            <![CDATA[ AND etr_entrust.ENTRUST_DATE >= to_date(#{startDate},'yyyy-mm-dd') ]]>
-            <![CDATA[ AND etr_entrust.ENTRUST_DATE <= to_date(#{endDate},'yyyy-mm-dd') ]]>
-        </if>
-        <if test="entrustStatus ==null or ''.equals(entrustStatus) or '08'.equals(entrustStatus)">
-            union all
             select
-            wfl_etr_entrust.entrust_id entrustId, /** 指令编号 **/
-            '08' entrustStatus, /** 指令状态 **/
-            wfl_etr_entrust.FINPROD_ID initialNum,
-            CASE
-            WHEN wfl_etr_entrust_add.TARGET_TYPE = '01' THEN
-            ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( wfl_etr_entrust.ENTRUST_NUM, 1 ), 4 ) ELSE ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( wfl_etr_entrust.ENTRUST_AMT, 1 ), 4 )
-            END AS implementPercent,
-            CASE
-            WHEN wfl_etr_entrust_add.TARGET_TYPE = '01' THEN
-            ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) / nvl( wfl_etr_entrust.ENTRUST_NUM, 1 ), 4 ) ELSE ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) / nvl( wfl_etr_entrust.ENTRUST_AMT, 1 ), 4 )
-            END AS dealPercent,
-            CASE
-            WHEN wfl_etr_entrust_add.TARGET_TYPE = '01' THEN
-            ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
-            END AS finishAmt,
-            CASE
-            WHEN wfl_etr_entrust_add.TARGET_TYPE = '01' THEN
-            ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
-            END AS avaNum,
-            CASE
-            WHEN wfl_etr_entrust_add.TARGET_TYPE = '01' THEN
-            ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
-            END AS finishDealAmt,
-            CASE
-            WHEN wfl_etr_entrust_add.TARGET_TYPE = '01' THEN
-            ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
-            END AS avaDealAmt,
-            nvl(detail.PORTFOLIO_ID,PTL_PORTFOLIO.PORTFOLIO_ID) portfolioId,
-            nvl(detail.PORTFOLIO_NAME,PTL_PORTFOLIO.PORTFOLIO_NAME) portfolioName,
-            SCI.ACCT_NAME dealCurAcct, /** 资金账户 **/
-
-            wfl_etr_entrust.trade_market tradeMarket, /** 市场 **/
-            wfl_etr_entrust.Trade_Plat tradePlat, /** 交易平台 **/
-            wfl_etr_entrust.Ps ps, /** 交易方向 **/
-            wfl_etr_entrust_add.BUSI_PS busiPs,/**委托方向**/
-            wfl_etr_entrust_add.Term_Days term,/** 回购期限 **/
-            wfl_etr_entrust.entrust_amt entrustAmt, /** 回购金额 **/
-            wfl_etr_entrust.Price * 100 price, /** 回购利率 **/
-            wfl_etr_entrust_add.vpay_date fristSettleDate,/** 首期结算日 **/
-            wfl_etr_entrust_add.mpay_date expireSettleDate,/** 到期结算日 **/
-            wfl_etr_entrust_add.Cap_Days occupyDays,/** 占款天数 **/
-            wfl_etr_entrust_add.m_Int_Amt intAmt,/** 回购利息 **/
-            wfl_etr_entrust_add.m_Trade_Amt expireSettleAmt,/** 到期结算金额 **/
-            DECODE(wfl_etr_entrust.ps,'03',pledge.finprod_id,'04',pledge.finprod_id,'T92',pledge.finprod_id,'T94',pledge.finprod_id,'T56',pledge.finprod_id,trdPledge.finprod_id) AS finprodId,
-            DECODE(wfl_etr_entrust.ps,'03',pledge.Finprod_Market_Id,'04',pledge.Finprod_Market_Id,'T92',pledge.Finprod_Market_Id,'T94',pledge.Finprod_Market_Id,'T56',pledge.Finprod_Market_Id,trdPledge.Finprod_Market_Id) AS finprodMarketId,/** 质押代码 **/
-            DECODE(wfl_etr_entrust.ps,'03',pledge.finprod_abbr,'04',pledge.finprod_abbr,'T92',pledge.finprod_abbr,'T94',pledge.finprod_abbr,'T56',pledge.finprod_abbr,trdPledge.finprod_abbr) AS finprodAbbr, /** 质押券名称 **/
-            DECODE(wfl_etr_entrust.ps,'03',pledge.Pledge_Ratio,'04',pledge.Pledge_Ratio,'T92',pledge.Pledge_Ratio,'T94',pledge.Pledge_Ratio,'T56',pledge.Pledge_Ratio,trdPledge.Pledge_Ratio) AS conRatio, /** 折算率 **/
-            DECODE(wfl_etr_entrust.ps,'03',pledge.PLEDGE_NUMBER,'04',pledge.PLEDGE_NUMBER,'T92',pledge.PLEDGE_NUMBER,'T94',pledge.PLEDGE_NUMBER,'T56',pledge.PLEDGE_NUMBER,trdPledge.PLEDGE_NUMBER) AS  repSecNum, /** 质押数量  **/
-            DECODE(wfl_etr_entrust.ps, 'T94', trdPledge.finprod_id, null)                                      AS swapOrigFinprodId, /**中途换券当前质押券**/
-            DECODE(wfl_etr_entrust.ps, 'T94', trdPledge.Finprod_Market_Id, null)                                      AS swapOrigFinprodMarketId, /**中途换券当前质押代码**/
-            DECODE(wfl_etr_entrust.ps, 'T94', trdPledge.finprod_abbr, null)                                      AS swapOrigFinprodAbbr, /**中途换券当前质押券名称**/
-            DECODE(wfl_etr_entrust.ps, 'T94', trdPledge.PLEDGE_NUMBER, null)                                      AS swapOrigRepSecNum, /**中途换券当前质押券数量**/
-            DECODE(wfl_etr_entrust.ps, 'T94', swapPledge.finprod_id, null)                                      AS swapOutFinprodId, /**中途换券换出质押券**/
-            DECODE(wfl_etr_entrust.ps, 'T94', swapPledge.Finprod_Market_Id, null)                                      AS swapOutFinprodMarketId, /**中途换券换出质押代码**/
-            DECODE(wfl_etr_entrust.ps, 'T94', swapPledge.finprod_abbr, null)                                      AS swapOutFinprodAbbr, /**中途换券换出质押券名称**/
-            DECODE(wfl_etr_entrust.ps, 'T94', swapPledge.PLEDGE_NUMBER, null)                                       AS swapOutRepSecNum, /** 质押数量 **/
-            DECODE(wfl_etr_entrust.ps, 'T94', swapPledge.Pledge_Ratio, null)                                       AS swapOutConRatio, /** 中途换券换出折算率 **/
-            case
-            when wfl_etr_entrust.trade_market = #{TRADE_PLACE_03} then
-            #{UNIT_04}
-            else
-            #{UNIT_01}
-            end as pledgeUnit, /** 质押券单位  **/
-            wfl_etr_pledge.DISPLACE_DIR                                                                                DISPLACE_DIR,/** 置换方向 **/
-            wfl_etr_pledge.PLEDGE_NUMBER * nvl(wfl_etr_pledge.Pledge_Face_Value, 100) printAmt, /** 质押面额 **/
-            wfl_etr_entrust_add.Sec_Acct_Id secAcctId, /** 证券账户 ※隐藏 **/
-            wfl_etr_entrust.counter_id counterId, /** 交易对手 **/
-            mst_counter_party.counter_name counterName, /**交易对手名称**/
-            wfl_etr_entrust.counter_trader counterTrader,/** 对手方交易员 **/
-            wfl_etr_entrust.vdate vdate,/** 开始日期 **/
-            wfl_etr_entrust.mdate mdate/** 结束日期 **/
-            ,wfl_etr_entrust.CREATE_TIME
-            ,SWBL.NEXT_USER nextUser,
-            wfl_etr_entrust.INV_MANAGER_ID invManagerId,
-            wfl_etr_entrust.ENTRUST_DATE entrustDate,
-            '流程中' entrustStatusString,
-            SDL2.ITEM_VALUE tradeMarketString,
-            SDL3.ITEM_VALUE tradePlatString,
-            SDL4.ITEM_VALUE psStr,
-            SDL5.ITEM_VALUE busiTypeTgString,
-            wfl_etr_entrust_add.BUSI_TYPE_POSITION busiTypeTg,
-            SYS_USER.REAL_NAME invManagerName,
-            wfl_etr_entrust_add.TRADER as homeTrader,
-            wfl_etr_entrust.REMARK as addCla,
-            wfl_etr_entrust_add.REQUEST_ID as requestId,
-            wfl_etr_entrust_add.TRADE_ID as intiTradeId
-            from wfl_etr_entrust
-            inner JOIN wfl_etr_entrust_add
-            ON    wfl_etr_entrust.entrust_id = wfl_etr_entrust_add.entrust_id
-            LEFT JOIN wfl_etr_pledge                     /** 委托指令回购质押品 **/
-            ON    wfl_etr_entrust.entrust_id = wfl_etr_pledge.entrust_id
-            LEFT JOIN etr_finish_status /** 委托完成状况表 **/
-            ON    wfl_etr_entrust.entrust_id = etr_finish_status.entrust_id
-            and wfl_etr_entrust.entrust_id = etr_finish_status.trade_id
-            LEFT JOIN PTL_PORTFOLIO         /** 组合 **/
-            ON    wfl_etr_entrust.portfolio_id = PTL_PORTFOLIO.Portfolio_Id
-
+                etr_entrust.entrust_id                                                  AS entrustId,              /** 指令编号 **/
+                etr_entrust.entrust_status                                              AS entrustStatus,          /** 指令状态 **/
+                etr_entrust.FINPROD_ID                                                  AS initialNum,
+                <!-- wsz 20220728 修改中途换券、到其续作进度查询 金额单时处理 -->
+                CASE
+                    when etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' then
+                        ROUND( decode(nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ),0,0, nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( decode(ETR_ENTRUST.ENTRUST_AMT, 0, 1,ETR_ENTRUST.ENTRUST_AMT), 1 )), 4 )
+                    WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
+                        ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT * 100, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )
+                    WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
+                        ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_NUM, 1 ), 4 )
+                    ELSE ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )
+                END AS implementPercent,
+                CASE
+                    when etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' then
+                        ROUND( decode(nvl( etr_finish_status.ENT_FINISH_AMT, 0 ),0,0,nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) / nvl( decode(ETR_ENTRUST.ENTRUST_AMT, 0, 1,ETR_ENTRUST.ENTRUST_AMT), 1 )), 4 )
+                    WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
+                        ROUND( nvl( etr_finish_status.ENT_FINISH_AMT * 100, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )
+                    WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
+                        ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_NUM, 1 ), 4 )
+                    ELSE ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )
+                END AS dealPercent,
+                CASE
+                WHEN etr_entrust.PS = 'T94' THEN
+                        ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 ) * 100
+                    ELSE ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
+                END finishAmt,
+                CASE
+                    when etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' then
+                        ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
+                    WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
+                        ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) * 100, 4 )
+                    WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
+                        ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
+                    ELSE ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
+                END AS avaNum,
+                CASE
+                    WHEN etr_entrust.PS = 'T94' THEN
+                        ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 ) * 100
+                    ELSE ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
+                END finishDealAmt,
+                CASE
+                    when etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' then
+                        ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
+                    WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
+                        ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) * 100, 4 )
+                    WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
+                        ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
+                    ELSE ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
+                END AS avaDealAmt,
+                nvl(detail.PORTFOLIO_ID,PTL_PORTFOLIO.PORTFOLIO_ID)                     AS portfolioId,
+                nvl(detail.PORTFOLIO_NAME,PTL_PORTFOLIO.PORTFOLIO_NAME)                 AS portfolioName,
+                SCI.ACCT_NAME                                                           AS dealCurAcct,             /** 资金账户 **/
+                etr_entrust.trade_market                                                AS tradeMarket,             /** 市场 **/
+                etr_entrust.Trade_Plat                                                  AS tradePlat,               /** 交易平台 **/
+                etr_entrust.Ps                                                          AS ps,                      /** 交易方向 **/
+                etr_entrust_add.BUSI_PS                                                 AS busiPs,                  /**委托方向**/
+                etr_entrust_add.Term_Days                                               AS term,                    /** 回购期限 **/
+                etr_entrust.entrust_amt                                                 AS entrustAmt,              /** 回购金额 **/
+                etr_entrust.Price * 100                                                 AS price,                   /** 回购利率 **/
+                etr_entrust_add.vpay_date                                               AS fristSettleDate,         /** 首期结算日 **/
+                etr_entrust_add.mpay_date                                               AS expireSettleDate,        /** 到期结算日 **/
+                etr_entrust_add.Cap_Days                                                AS occupyDays,              /** 占款天数 **/
+                etr_entrust_add.m_Int_Amt                                               AS intAmt,                  /** 回购利息 **/
+                etr_entrust_add.m_Trade_Amt                                             AS expireSettleAmt,         /** 到期结算金额 **/
+                DECODE(etr_entrust.ps,
+                    '03', pledge.finprod_id,
+                    '04', pledge.finprod_id,
+                    'T92', pledge.finprod_id,
+                    'T94', DECODE(pledge.DISPLACE_DIR,
+                            '01',pledge.finprod_id,
+                            null),
+                    'T56', pledge.finprod_id,
+                    trdPledge.finprod_id
+                )                                                                       AS finprodId,
+                DECODE(etr_entrust.ps,
+                    '03', pledge.Finprod_Market_Id,
+                    '04', pledge.Finprod_Market_Id,
+                    'T92',pledge.Finprod_Market_Id,
+                    'T94', DECODE(pledge.DISPLACE_DIR,
+                            '01',pledge.Finprod_Market_Id,
+                            null),
+                    'T56', pledge.Finprod_Market_Id,
+                    trdPledge.Finprod_Market_Id
+            )                                                                           AS finprodMarketId,         /** 质押代码 **/
+                DECODE(etr_entrust.ps,
+                    '03', pledge.finprod_abbr,
+                    '04', pledge.finprod_abbr,
+                    'T92', pledge.finprod_abbr,
+                    'T94', DECODE(pledge.DISPLACE_DIR,
+                            '01',pledge.finprod_abbr,
+                            null),
+                    'T56', pledge.finprod_abbr,
+                    trdPledge.finprod_abbr
+                )                                                                        AS finprodAbbr,            /** 质押券名称 **/
+                DECODE(etr_entrust.ps,
+                    '03', pledge.Pledge_Ratio,
+                    '04', pledge.Pledge_Ratio,
+                    'T92', pledge.Pledge_Ratio,
+                    'T94', DECODE(pledge.DISPLACE_DIR,
+                            '01',pledge.Pledge_Ratio,
+                            null),
+                    'T56', pledge.Pledge_Ratio,
+                    trdPledge.Pledge_Ratio
+                )                                                                        AS conRatio,               /** 折算率 **/
+                DECODE(etr_entrust.ps,
+                    '03', pledge.PLEDGE_NUMBER,
+                    '04', pledge.PLEDGE_NUMBER,
+                    'T92', pledge.PLEDGE_NUMBER,
+                    'T94', DECODE(pledge.DISPLACE_DIR,
+                            '01',pledge.PLEDGE_NUMBER,
+                            null),
+                    'T56', pledge.PLEDGE_NUMBER,
+                    trdPledge.PLEDGE_NUMBER
+                )                                                                        AS repSecNum,              /** 质押数量 **/
+                DECODE(etr_entrust.ps, 'T94', trdPledge.finprod_id, null)                AS swapOrigFinprodId,      /** 中途换券当前质押券**/
+                DECODE(etr_entrust.ps, 'T94', trdPledge.Finprod_Market_Id, null)         AS swapOrigFinprodMarketId,/** 中途换券当前质押代码**/
+                DECODE(etr_entrust.ps, 'T94', trdPledge.finprod_abbr, null)              AS swapOrigFinprodAbbr,    /** 中途换券当前质押券名称**/
+                DECODE(etr_entrust.ps, 'T94', trdPledge.PLEDGE_NUMBER, null)             AS swapOrigRepSecNum,      /** 中途换券当前质押券数量**/
+                DECODE(etr_entrust.ps, 'T94', trdPledge.Pledge_Ratio, null)              AS swapOrigConRatio,       /** 中途换券当前折算率**/
+                DECODE(etr_entrust.ps, 'T94', swapPledge.finprod_id, null)               AS swapOutFinprodId,       /** 中途换券换出质押券**/
+                DECODE(etr_entrust.ps, 'T94', swapPledge.Finprod_Market_Id, null)        AS swapOutFinprodMarketId, /** 中途换券换出质押代码**/
+                DECODE(etr_entrust.ps, 'T94', swapPledge.finprod_abbr, null)             AS swapOutFinprodAbbr,     /** 中途换券换出质押券名称**/
+                DECODE(etr_entrust.ps, 'T94', swapPledge.PLEDGE_NUMBER, null)            AS swapOutRepSecNum,       /** 中途换券换出质押数量 **/
+                DECODE(etr_entrust.ps, 'T94', swapPledge.Pledge_Ratio, null)             AS swapOutConRatio,        /** 中途换券换出折算率 **/
+                DECODE(etr_entrust.ps,
+                    'T94', DECODE(swapPledge.finprod_id, null, etr_entrust.entrust_amt, null),
+                    null
+                )                                                                        AS swapOutAmt,             /** 中途换券换出金额 **/
+                case
+                    when etr_entrust.trade_market = #{TRADE_PLACE_03} then #{UNIT_04}
+                    else #{UNIT_01}
+                end                                                                      AS pledgeUnit,             /** 质押券单位  **/
+                etr_pledge.DISPLACE_DIR                                                  AS DISPLACE_DIR,           /** 置换方向 **/
+                etr_pledge.PLEDGE_NUMBER * nvl(etr_pledge.Pledge_Face_Value, 100)        AS printAmt,               /** 质押面额 **/
+                etr_entrust_add.Sec_Acct_Id                                              AS secAcctId,              /** 证券账户 ※隐藏 **/
+                etr_entrust.counter_id                                                   AS counterId,              /** 交易对手 **/
+                mst_counter_party.counter_name                                           AS counterName,            /** 交易对手名称**/
+                etr_entrust.counter_trader                                               AS counterTrader,          /** 对手方交易员 **/
+                etr_entrust.vdate                                                        AS vdate,                  /** 开始日期 **/
+                etr_entrust.mdate                                                        AS mdate,                  /** 结束日期 **/
+                etr_entrust.CREATE_TIME                                                  AS CREATE_TIME,
+                ''                                                                       AS nextUser,
+                etr_entrust.INV_MANAGER_ID                                               AS invManagerId,
+                etr_entrust.ENTRUST_DATE                                                 AS entrustDate,
+                SDL1.ITEM_VALUE                                                          AS entrustStatusString,
+                SDL2.ITEM_VALUE                                                          AS tradeMarketString,
+                SDL3.ITEM_VALUE                                                          AS tradePlatString,
+                SDL4.ITEM_VALUE                                                          AS psStr,
+                SDL5.ITEM_VALUE                                                          AS busiTypeTgString,
+                etr_entrust_add.BUSI_TYPE_POSITION                                       AS busiTypeTg,
+                SYS_USER.REAL_NAME                                                       AS invManagerName,
+                etr_entrust_add.TRADER                                                   AS homeTrader,
+                etr_entrust.REMARK                                                       AS addCla,
+                etr_entrust_add.REQUEST_ID                                               AS requestId,
+                etr_entrust_add.TRADE_ID                                                 AS intiTradeId
+            from etr_entrust                         /** 委托指令 **/
+            inner JOIN etr_entrust_add               /** 委托指令附属 **/
+                ON etr_entrust.entrust_id = etr_entrust_add.entrust_id
+            LEFT JOIN etr_pledge                     /** 委托指令回购质押品 **/
+                ON etr_entrust.entrust_id = etr_pledge.entrust_id
+            LEFT JOIN etr_finish_status              /** 委托完成状况表 **/
+                ON etr_entrust.entrust_id = etr_finish_status.entrust_id
+                    and etr_entrust.entrust_id = etr_finish_status.trade_id
+            LEFT JOIN PTL_PORTFOLIO                  /** 组合 **/
+                ON etr_entrust.portfolio_id = PTL_PORTFOLIO.Portfolio_Id
             LEFT JOIN (
-            SELECT EED.ENTRUST_ID,
-            listagg ( EED.PORTFOLIO_ID, ',' ) within GROUP ( ORDER BY EED.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
-            listagg ( FP.PORTFOLIO_NAME, ',' ) within GROUP ( ORDER BY FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME
-            FROM ETR_ENTRUST_DETAIL EED
-            left join PTL_PORTFOLIO FP on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
-            GROUP BY EED.ENTRUST_ID ) detail ON wfl_etr_entrust.ENTRUST_ID = detail.ENTRUST_ID
-
-            LEFT JOIN PTL_PORTFOLIO_AUTHORITY      /** 组合权限表 **/
-            ON    PTL_PORTFOLIO.Portfolio_Id = PTL_PORTFOLIO_AUTHORITY.Portfolio_Id
-            LEFT JOIN fin_product            /** 标的类金融产品 **/
-            ON    fin_product.finprod_id = wfl_etr_entrust.finprod_id
+                        SELECT EED.ENTRUST_ID,
+                            listagg ( EED.PORTFOLIO_ID, ',' ) within GROUP ( ORDER BY EED.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
+                            listagg ( FP.PORTFOLIO_NAME, ',' ) within GROUP ( ORDER BY FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME
+                        FROM ETR_ENTRUST_DETAIL EED
+                        left join PTL_PORTFOLIO FP
+                            on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
+                        GROUP BY EED.ENTRUST_ID
+                    ) detail
+                ON etr_entrust.ENTRUST_ID = detail.ENTRUST_ID
+            LEFT JOIN PTL_PORTFOLIO_AUTHORITY        /** 组合权限表 **/
+                ON PTL_PORTFOLIO.Portfolio_Id = PTL_PORTFOLIO_AUTHORITY.Portfolio_Id
+            LEFT JOIN fin_product                    /** 标的类金融产品 **/
+                ON fin_product.finprod_id = etr_entrust.finprod_id
             <!--XYHGFXSJ-122:非首期指令wfl_etr_entrust的finprod_id存的是首期交易编号,需关联质押品表查询质押券信息 modify by fuyongsheng 20220719 start-->
             LEFT JOIN (
-                SELECT
-                    fdp.ENTRUST_ID,
-                    nvl(fpsq.finprod_id, fpsq1.finprod_id) finprod_id, /** 金融产品代码 **/
-                    nvl(fpsq.Finprod_Market_Id,fpsq1.Finprod_Market_Id) Finprod_Market_Id, /** 质押代码 **/
-                    nvl(fpsq.finprod_abbr,fpsq1.finprod_abbr) finprod_abbr, /** 质押券名称 **/
-                    fdp.Pledge_Ratio * 100  Pledge_Ratio, /** 折算率 **/
-                    fdp.PLEDGE_NUMBER / 100 PLEDGE_NUMBER, /** 质押数量 **/
-                    fdp.Pledge_Face_Value   Pledge_Face_Value
-                from wfl_etr_pledge fdp /** 质押品表 **/
-                LEFT JOIN fin_product  fpsq /** 标的类金融产品 **/   ON    fpsq.finprod_id = fdp.finprod_id
-                LEFT JOIN FIN_DEAL_PLEDGE fdp1 ON fdp1.finprod_id = fdp.finprod_id
-                LEFT JOIN fin_product fpsq1 /** 标的类金融产品 **/  ON fpsq1.finprod_id = fdp1.PLEDGE_FINPROD_ID
-                WHERE fdp.DISPLACE_DIR = '01' OR fdp.DISPLACE_DIR IS NULL <!--不展示换出券-->
+                        SELECT
+                            fdp.ENTRUST_ID,
+                            nvl(fpsq.finprod_id, fpsq1.finprod_id)                  finprod_id, /** 金融产品代码 **/
+                            nvl(fpsq.Finprod_Market_Id,fpsq1.Finprod_Market_Id)     Finprod_Market_Id, /** 质押代码 **/
+                            nvl(fpsq.finprod_abbr,fpsq1.finprod_abbr)               finprod_abbr, /** 质押券名称 **/
+                            fdp.Pledge_Ratio * 100                                  Pledge_Ratio, /** 折算率 **/
+                            fdp.PLEDGE_NUMBER / 100                                 PLEDGE_NUMBER, /** 质押数量 **/
+                            fdp.Pledge_Face_Value                                   Pledge_Face_Value,
+                            fdp.DISPLACE_DIR                                        DISPLACE_DIR
+                        from etr_pledge fdp         /** 质押品表 **/
+                        LEFT JOIN fin_product  fpsq /** 标的类金融产品 **/
+                            ON fpsq.finprod_id = fdp.finprod_id
+                        LEFT JOIN FIN_DEAL_PLEDGE fdp1
+                            ON fdp1.finprod_id = fdp.finprod_id
+                        LEFT JOIN fin_product fpsq1 /** 标的类金融产品 **/
+                            ON fpsq1.finprod_id = fdp1.PLEDGE_FINPROD_ID
+                        WHERE fdp.DISPLACE_DIR = '01' OR fdp.DISPLACE_DIR IS NULL <!--不展示换出券-->
                 ) pledge
-            ON wfl_etr_entrust.ENTRUST_ID = pledge.ENTRUST_ID
+                ON etr_entrust.ENTRUST_ID = pledge.ENTRUST_ID
             LEFT JOIN (
-                SELECT fdp.ENTRUST_ID,
-                    nvl(fpsq.finprod_id, fpsq1.finprod_id)               finprod_id, /** 金融产品代码 **/
-                    nvl(fpsq.Finprod_Market_Id, fpsq1.Finprod_Market_Id) Finprod_Market_Id, /** 质押代码 **/
-                    nvl(fpsq.finprod_abbr, fpsq1.finprod_abbr)           finprod_abbr, /** 质押券名称 **/
-                    fdp.Pledge_Ratio * 100                               Pledge_Ratio, /** 折算率 **/
-                    fdp.PLEDGE_NUMBER / 100                              PLEDGE_NUMBER, /** 质押数量 **/
-                    fdp.Pledge_Face_Value                                Pledge_Face_Value
-                from wfl_etr_pledge fdp /** 质押品表 **/
-                LEFT JOIN fin_product fpsq /** 标的类金融产品 **/ ON fpsq.finprod_id = fdp.finprod_id
-                LEFT JOIN FIN_DEAL_PLEDGE fdp1 ON fdp1.finprod_id = fdp.finprod_id
-                LEFT JOIN fin_product fpsq1 /** 标的类金融产品 **/ ON fpsq1.finprod_id = fdp1.PLEDGE_FINPROD_ID
-                WHERE fdp.DISPLACE_DIR = '02'
+                    SELECT fdp.ENTRUST_ID,
+                        nvl(fpsq.finprod_id, fpsq1.finprod_id)               finprod_id, /** 金融产品代码 **/
+                        nvl(fpsq.Finprod_Market_Id, fpsq1.Finprod_Market_Id) Finprod_Market_Id, /** 质押代码 **/
+                        nvl(fpsq.finprod_abbr, fpsq1.finprod_abbr)           finprod_abbr, /** 质押券名称 **/
+                        fdp.Pledge_Ratio * 100                               Pledge_Ratio, /** 折算率 **/
+                        fdp.PLEDGE_NUMBER / 100                              PLEDGE_NUMBER, /** 质押数量 **/
+                        fdp.Pledge_Face_Value                                Pledge_Face_Value
+                    from etr_pledge fdp             /** 质押品表 **/
+                    LEFT JOIN fin_product fpsq      /** 标的类金融产品 **/
+                        ON fpsq.finprod_id = fdp.finprod_id
+                    LEFT JOIN FIN_DEAL_PLEDGE fdp1
+                        ON fdp1.finprod_id = fdp.finprod_id
+                    LEFT JOIN fin_product fpsq1     /** 标的类金融产品 **/
+                        ON fpsq1.finprod_id = fdp1.PLEDGE_FINPROD_ID
+                    WHERE fdp.DISPLACE_DIR = '02'
                 ) swapPledge
-            ON wfl_etr_entrust.ENTRUST_ID = swapPledge.ENTRUST_ID
+                ON etr_entrust.ENTRUST_ID = swapPledge.ENTRUST_ID
             <!--XYHGFXSJ-122:非首期指令wfl_etr_entrust的finprod_id存的是首期交易编号,需关联质押品表查询质押券信息 modify by fuyongsheng 20220719 end-->
             LEFT JOIN (
-<!--            SELECT-->
-<!--            A.FINPROD_ID tradeId,-->
-<!--            FP.FINPROD_ID,-->
-<!--            FP.FINPROD_MARKET_ID  FINPROD_MARKET_ID,-->
-<!--            FP.finprod_abbr as finprod_abbr,-->
-<!--            B.PLEDGE_NUMBER	 PLEDGE_NUMBER,-->
-<!--            B.Pledge_Ratio	 Pledge_Ratio,-->
-<!--            B.Pledge_Face_Value printAmt-->
-<!--            FROM-->
-<!--            FIN_TRADE_PRODUCT A-->
-<!--            INNER JOIN FIN_DEAL_PLEDGE B ON B.FINPROD_ID = A.FINPROD_ID AND B.BRANCH = A.BRANCH-->
-<!--&lt;!&ndash;            INNER JOIN FIN_PRODUCT_TYPE C ON B.FINPROD_ID=C.FINPROD_ID&ndash;&gt;-->
-<!--&lt;!&ndash;            AND C.BRANCH = A.BRANCH&ndash;&gt;-->
-<!--&lt;!&ndash;            and C.TYPE_6 = #{TARGET_BACK_TYPE_H01}&ndash;&gt;-->
-<!--&lt;!&ndash;            AND C.TYPE_7 in (#{BACK_LEND_DIRECTION_03},#{BACK_LEND_DIRECTION_04})&ndash;&gt;-->
-<!--            LEFT JOIN FIN_PRODUCT FP ON FP.FINPROD_ID=B.PLEDGE_FINPROD_ID-->
-<!--            WHERE  A.BRANCH=0-->
-            SELECT A.FINPROD_ID         tradeId,
-                listagg(FP.FINPROD_ID, ',') within GROUP ( ORDER BY FP.FINPROD_ID )   FINPROD_ID,
-                listagg(FP.FINPROD_MARKET_ID, ',') within GROUP ( ORDER BY FP.FINPROD_MARKET_ID )   FINPROD_MARKET_ID,
-                listagg(FP.finprod_abbr, ',') within GROUP ( ORDER BY FP.finprod_abbr ) finprod_abbr,
-                SUM(B.PLEDGE_NUMBER)*100/10000 PLEDGE_NUMBER,
-                MAX(B.Pledge_Ratio)*100 Pledge_Ratio,
-                SUM(B.Pledge_Face_Value) printAmt
-            FROM FIN_TRADE_PRODUCT A
-            INNER JOIN FIN_DEAL_PLEDGE B ON B.FINPROD_ID = A.FINPROD_ID AND B.BRANCH = A.BRANCH
-            LEFT JOIN FIN_PRODUCT FP ON FP.FINPROD_ID = B.PLEDGE_FINPROD_ID
-            group by A.FINPROD_ID
-            ) trdPledge on trdPledge.tradeId=wfl_etr_entrust.FINPROD_ID
+                    SELECT A.FINPROD_ID         tradeId,
+                        listagg(FP.FINPROD_ID, ',') within GROUP ( ORDER BY FP.FINPROD_ID )   FINPROD_ID,
+                        listagg(FP.FINPROD_MARKET_ID, ',') within GROUP ( ORDER BY FP.FINPROD_MARKET_ID )   FINPROD_MARKET_ID,
+                        listagg(FP.finprod_abbr, ',') within GROUP ( ORDER BY FP.finprod_abbr ) finprod_abbr,
+                        SUM(B.PLEDGE_NUMBER)*100/10000 PLEDGE_NUMBER,
+                        MAX(B.Pledge_Ratio)*100 Pledge_Ratio,
+                        SUM(B.Pledge_Face_Value) printAmt
+                    FROM FIN_TRADE_PRODUCT A
+                    INNER JOIN FIN_DEAL_PLEDGE B
+                        ON B.FINPROD_ID = A.FINPROD_ID AND B.BRANCH = A.BRANCH
+                    LEFT JOIN FIN_PRODUCT FP
+                        ON FP.FINPROD_ID = B.PLEDGE_FINPROD_ID
+                    group by A.FINPROD_ID
+                ) trdPledge
+                ON trdPledge.tradeId=etr_entrust.FINPROD_ID
             LEFT JOIN  mst_counter_party      /** 交易对手 **/
-            ON    wfl_etr_entrust.counter_id = mst_counter_party.counter_id
+                ON etr_entrust.counter_id = mst_counter_party.counter_id
             LEFT JOIN STL_CAPACCT_INFO SCI
-            ON wfl_etr_entrust_add.Deal_Cur_Acct = SCI.ACCT_NO
-            LEFT JOIN SYS_WFL_BUSINESS_LIST SWBL ON SWBL.SEQ_NO = wfl_etr_entrust.WORKFLOW_ID and SWBL.PROCESS_STATE != 'END'
-            LEFT JOIN SYS_DATADICT_LIST SDL2 ON SDL2.DICT_CODE ='TRADE_PLACE' AND SDL2.ITEM_CODE = wfl_etr_entrust.trade_market
-            LEFT JOIN SYS_DATADICT_LIST SDL3 ON SDL3.DICT_CODE ='SHARES_TRADE_PLATFORM' AND SDL3.ITEM_CODE = wfl_etr_entrust.Trade_Plat
-            LEFT JOIN SYS_DATADICT_LIST SDL4 ON SDL4.DICT_CODE ='PS' AND SDL4.ITEM_CODE = wfl_etr_entrust_add.BUSI_PS
-            LEFT JOIN SYS_USER ON wfl_etr_entrust.INV_MANAGER_ID = SYS_USER.USER_NAME
-            LEFT JOIN SYS_DATADICT_LIST SDL5 ON SDL5.DICT_CODE ='BUSI_TYPE_TG' AND SDL5.ITEM_CODE = wfl_etr_entrust_add.BUSI_TYPE_POSITION
-            where wfl_etr_entrust.TRADE_MARKET IN ('03','04')
-            and wfl_etr_entrust_add.ASSET_TYPE1 = 'H01'
+                ON etr_entrust_add.Deal_Cur_Acct = SCI.ACCT_NO
+            LEFT JOIN SYS_DATADICT_LIST SDL1
+                ON SDL1.DICT_CODE ='ENTRUST_STATUS'
+                    AND SDL1.ITEM_CODE = etr_entrust.entrust_status
+            LEFT JOIN SYS_DATADICT_LIST SDL2
+                ON SDL2.DICT_CODE ='TRADE_PLACE'
+                    AND SDL2.ITEM_CODE = etr_entrust.trade_market
+            LEFT JOIN SYS_DATADICT_LIST SDL3
+                ON SDL3.DICT_CODE ='SHARES_TRADE_PLATFORM'
+                    AND SDL3.ITEM_CODE = etr_entrust.Trade_Plat
+            LEFT JOIN SYS_DATADICT_LIST SDL4
+                ON SDL4.DICT_CODE ='PS'
+                    AND SDL4.ITEM_CODE = etr_entrust_add.BUSI_PS
+            LEFT JOIN SYS_USER
+                ON ETR_ENTRUST.INV_MANAGER_ID = SYS_USER.USER_NAME
+            LEFT JOIN SYS_DATADICT_LIST SDL5
+                ON SDL5.DICT_CODE ='BUSI_TYPE_TG'
+                    AND SDL5.ITEM_CODE = etr_entrust_add.BUSI_TYPE_POSITION
+            where
+                etr_entrust.TRADE_MARKET IN ('03','04')
+                and etr_entrust_add.ASSET_TYPE1 = 'H01'
             <if test="entrustStatus != null and entrustStatus != ''">
-                AND wfl_etr_entrust.ENTRUST_STATUS = #{entrustStatus}
+                AND etr_entrust.ENTRUST_STATUS = #{entrustStatus}
             </if>
             <if test="entrustId !=null and !entrustId.equals('')">
-                AND wfl_etr_entrust.ENTRUST_ID = #{entrustId}
+                AND etr_entrust.ENTRUST_ID = #{entrustId}
             </if>
             <if test="userId != null and userId != ''">
                 AND PTL_PORTFOLIO_AUTHORITY.USER_ID = #{userId}
@@ -1089,30 +932,297 @@
                 </foreach>
             </if>
             <if test="tradeMarket != null and tradeMarket != ''">
-                AND wfl_etr_entrust.trade_market = #{tradeMarket}
+                AND etr_entrust.trade_market = #{tradeMarket}
             </if>
             <if test="finprodId != null and finprodId != ''">
-                AND wfl_etr_pledge.finprod_id = #{finprodId}
+                AND etr_pledge.finprod_id = #{finprodId}
             </if>
             <if test="zyj != null and zyj.size()>0">
-                <foreach collection="zyj" open="AND wfl_etr_pledge.finprod_id in(" close=")" separator="," item="item">
+                <foreach collection="zyj" open="AND etr_pledge.finprod_id in(" close=")" separator="," item="item">
                     #{item}
                 </foreach>
             </if>
             <if test="bussType != null and bussType != '' and bussType == 'T92'">
-                AND wfl_etr_entrust.Ps in ('03', '04')
+                AND etr_entrust.Ps in ('03', '04')
             </if>
-            <if test="bussType != null and bussType != ''and bussType != 'T92'">
-                AND wfl_etr_entrust.Ps = #{bussType}
+            <if test="bussType != null and bussType != '' and bussType != 'T92'">
+                AND etr_entrust.Ps = #{bussType}
             </if>
             <if test="manager != null and manager != ''">
-                AND wfl_etr_entrust.INV_MANAGER_ID = #{manager}
+                AND etr_entrust.INV_MANAGER_ID = #{manager}
             </if>
             <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
-                <![CDATA[ AND wfl_etr_entrust.ENTRUST_DATE >= to_date(#{startDate},'yyyy-mm-dd') ]]>
-                <![CDATA[ AND wfl_etr_entrust.ENTRUST_DATE <= to_date(#{endDate},'yyyy-mm-dd') ]]>
+                <![CDATA[ AND etr_entrust.ENTRUST_DATE >= to_date(#{startDate},'yyyy-mm-dd') ]]>
+                <![CDATA[ AND etr_entrust.ENTRUST_DATE <= to_date(#{endDate},'yyyy-mm-dd') ]]>
             </if>
-        </if>
+            <if test="entrustStatus ==null or ''.equals(entrustStatus) or '08'.equals(entrustStatus)">
+                union all
+                select
+                wfl_etr_entrust.entrust_id entrustId, /** 指令编号 **/
+                '08' entrustStatus, /** 指令状态 **/
+                wfl_etr_entrust.FINPROD_ID initialNum,
+                0 implementPercent,
+                0 dealPercent,
+                0 finishAmt,
+                CASE
+                WHEN wfl_etr_entrust_add.TARGET_TYPE = '01' THEN
+                ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
+                END AS avaNum,
+                0 finishDealAmt,
+                CASE
+                WHEN wfl_etr_entrust_add.TARGET_TYPE = '01' THEN
+                ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
+                END AS avaDealAmt,
+                nvl(detail.PORTFOLIO_ID,PTL_PORTFOLIO.PORTFOLIO_ID) portfolioId,
+                nvl(detail.PORTFOLIO_NAME,PTL_PORTFOLIO.PORTFOLIO_NAME) portfolioName,
+                SCI.ACCT_NAME dealCurAcct, /** 资金账户 **/
+
+                wfl_etr_entrust.trade_market tradeMarket, /** 市场 **/
+                wfl_etr_entrust.Trade_Plat tradePlat, /** 交易平台 **/
+                wfl_etr_entrust.Ps ps, /** 交易方向 **/
+                wfl_etr_entrust_add.BUSI_PS busiPs,/**委托方向**/
+                wfl_etr_entrust_add.Term_Days term,/** 回购期限 **/
+                wfl_etr_entrust.entrust_amt entrustAmt, /** 回购金额 **/
+                wfl_etr_entrust.Price * 100 price, /** 回购利率 **/
+                wfl_etr_entrust_add.vpay_date fristSettleDate,/** 首期结算日 **/
+                wfl_etr_entrust_add.mpay_date expireSettleDate,/** 到期结算日 **/
+                wfl_etr_entrust_add.Cap_Days occupyDays,/** 占款天数 **/
+                wfl_etr_entrust_add.m_Int_Amt intAmt,/** 回购利息 **/
+                wfl_etr_entrust_add.m_Trade_Amt expireSettleAmt,/** 到期结算金额 **/
+                DECODE(wfl_etr_entrust.ps,
+                    '03', pledge.finprod_id,
+                    '04', pledge.finprod_id,
+                    'T92', pledge.finprod_id,
+                    'T94', DECODE(pledge.DISPLACE_DIR,
+                            '01',pledge.finprod_id,
+                            null),
+                    'T56', pledge.finprod_id,
+                    trdPledge.finprod_id
+                ) AS finprodId,
+                DECODE(wfl_etr_entrust.ps,
+                    '03', pledge.Finprod_Market_Id,
+                    '04', pledge.Finprod_Market_Id,
+                    'T92',pledge.Finprod_Market_Id,
+                    'T94', DECODE(pledge.DISPLACE_DIR,
+                            '01',pledge.Finprod_Market_Id,
+                            null),
+                    'T56', pledge.Finprod_Market_Id,
+                    trdPledge.Finprod_Market_Id
+                ) AS finprodMarketId,/** 质押代码 **/
+                DECODE(wfl_etr_entrust.ps,
+                    '03', pledge.finprod_abbr,
+                    '04', pledge.finprod_abbr,
+                    'T92', pledge.finprod_abbr,
+                    'T94', DECODE(pledge.DISPLACE_DIR,
+                            '01',pledge.finprod_abbr,
+                            null),
+                    'T56', pledge.finprod_abbr,
+                    trdPledge.finprod_abbr
+                ) AS finprodAbbr, /** 质押券名称 **/
+                DECODE(wfl_etr_entrust.ps,
+                    '03', pledge.Pledge_Ratio,
+                    '04', pledge.Pledge_Ratio,
+                    'T92', pledge.Pledge_Ratio,
+                    'T94', DECODE(pledge.DISPLACE_DIR,
+                            '01',pledge.Pledge_Ratio,
+                            null),
+                    'T56', pledge.Pledge_Ratio,
+                    trdPledge.Pledge_Ratio
+                ) AS conRatio, /** 折算率 **/
+                DECODE(wfl_etr_entrust.ps,
+                    '03', pledge.PLEDGE_NUMBER,
+                    '04', pledge.PLEDGE_NUMBER,
+                    'T92', pledge.PLEDGE_NUMBER,
+                    'T94', DECODE(pledge.DISPLACE_DIR,
+                            '01',pledge.PLEDGE_NUMBER,
+                            null),
+                    'T56', pledge.PLEDGE_NUMBER,
+                    trdPledge.PLEDGE_NUMBER
+                ) AS repSecNum, /** 质押数量 **/
+                DECODE(wfl_etr_entrust.ps, 'T94', trdPledge.finprod_id, null)                                      AS swapOrigFinprodId, /**中途换券当前质押券**/
+                DECODE(wfl_etr_entrust.ps, 'T94', trdPledge.Finprod_Market_Id, null)                                      AS swapOrigFinprodMarketId, /**中途换券当前质押代码**/
+                DECODE(wfl_etr_entrust.ps, 'T94', trdPledge.finprod_abbr, null)                                      AS swapOrigFinprodAbbr, /**中途换券当前质押券名称**/
+                DECODE(wfl_etr_entrust.ps, 'T94', trdPledge.PLEDGE_NUMBER, null)                                      AS swapOrigRepSecNum, /**中途换券当前质押券数量**/
+                DECODE(wfl_etr_entrust.ps, 'T94', trdPledge.Pledge_Ratio, null)                                        AS swapOrigConRatio, /**中途换券当前折算率**/
+                DECODE(wfl_etr_entrust.ps, 'T94', swapPledge.finprod_id, null)                                      AS swapOutFinprodId, /**中途换券换出质押券**/
+                DECODE(wfl_etr_entrust.ps, 'T94', swapPledge.Finprod_Market_Id, null)                                      AS swapOutFinprodMarketId, /**中途换券换出质押代码**/
+                DECODE(wfl_etr_entrust.ps, 'T94', swapPledge.finprod_abbr, null)                                      AS swapOutFinprodAbbr, /**中途换券换出质押券名称**/
+                DECODE(wfl_etr_entrust.ps, 'T94', swapPledge.PLEDGE_NUMBER, null)                                       AS swapOutRepSecNum, /** 质押数量 **/
+                DECODE(wfl_etr_entrust.ps, 'T94', swapPledge.Pledge_Ratio, null)                                       AS swapOutConRatio, /** 中途换券换出折算率 **/
+                DECODE(wfl_etr_entrust.ps,
+                    'T94', DECODE(swapPledge.finprod_id, null, wfl_etr_entrust.entrust_amt, null),
+                    null
+                )                                                                        AS swapOutAmt,             /** 中途换券换出金额 **/
+                case
+                when wfl_etr_entrust.trade_market = #{TRADE_PLACE_03} then
+                #{UNIT_04}
+                else
+                #{UNIT_01}
+                end as pledgeUnit, /** 质押券单位  **/
+                wfl_etr_pledge.DISPLACE_DIR                                                                                DISPLACE_DIR,/** 置换方向 **/
+                wfl_etr_pledge.PLEDGE_NUMBER * nvl(wfl_etr_pledge.Pledge_Face_Value, 100) printAmt, /** 质押面额 **/
+                wfl_etr_entrust_add.Sec_Acct_Id secAcctId, /** 证券账户 ※隐藏 **/
+                wfl_etr_entrust.counter_id counterId, /** 交易对手 **/
+                mst_counter_party.counter_name counterName, /**交易对手名称**/
+                wfl_etr_entrust.counter_trader counterTrader,/** 对手方交易员 **/
+                wfl_etr_entrust.vdate vdate,/** 开始日期 **/
+                wfl_etr_entrust.mdate mdate/** 结束日期 **/
+                ,wfl_etr_entrust.CREATE_TIME
+                ,SWBL.NEXT_USER nextUser,
+                wfl_etr_entrust.INV_MANAGER_ID invManagerId,
+                wfl_etr_entrust.ENTRUST_DATE entrustDate,
+                '流程中' entrustStatusString,
+                SDL2.ITEM_VALUE tradeMarketString,
+                SDL3.ITEM_VALUE tradePlatString,
+                SDL4.ITEM_VALUE psStr,
+                SDL5.ITEM_VALUE busiTypeTgString,
+                wfl_etr_entrust_add.BUSI_TYPE_POSITION busiTypeTg,
+                SYS_USER.REAL_NAME invManagerName,
+                wfl_etr_entrust_add.TRADER as homeTrader,
+                wfl_etr_entrust.REMARK as addCla,
+                wfl_etr_entrust_add.REQUEST_ID as requestId,
+                wfl_etr_entrust_add.TRADE_ID as intiTradeId
+                from wfl_etr_entrust
+                inner JOIN wfl_etr_entrust_add
+                ON    wfl_etr_entrust.entrust_id = wfl_etr_entrust_add.entrust_id
+                LEFT JOIN wfl_etr_pledge                     /** 委托指令回购质押品 **/
+                ON    wfl_etr_entrust.entrust_id = wfl_etr_pledge.entrust_id
+                LEFT JOIN etr_finish_status /** 委托完成状况表 **/
+                ON    wfl_etr_entrust.entrust_id = etr_finish_status.entrust_id
+                and wfl_etr_entrust.entrust_id = etr_finish_status.trade_id
+                LEFT JOIN PTL_PORTFOLIO         /** 组合 **/
+                ON    wfl_etr_entrust.portfolio_id = PTL_PORTFOLIO.Portfolio_Id
+
+                LEFT JOIN (
+                SELECT EED.ENTRUST_ID,
+                listagg ( EED.PORTFOLIO_ID, ',' ) within GROUP ( ORDER BY EED.PORTFOLIO_ID ) AS PORTFOLIO_ID ,
+                listagg ( FP.PORTFOLIO_NAME, ',' ) within GROUP ( ORDER BY FP.PORTFOLIO_NAME ) AS PORTFOLIO_NAME
+                FROM ETR_ENTRUST_DETAIL EED
+                left join PTL_PORTFOLIO FP on EED.PORTFOLIO_ID = FP.PORTFOLIO_ID
+                GROUP BY EED.ENTRUST_ID ) detail ON wfl_etr_entrust.ENTRUST_ID = detail.ENTRUST_ID
+
+                LEFT JOIN PTL_PORTFOLIO_AUTHORITY      /** 组合权限表 **/
+                ON    PTL_PORTFOLIO.Portfolio_Id = PTL_PORTFOLIO_AUTHORITY.Portfolio_Id
+                LEFT JOIN fin_product            /** 标的类金融产品 **/
+                ON    fin_product.finprod_id = wfl_etr_entrust.finprod_id
+                <!--XYHGFXSJ-122:非首期指令wfl_etr_entrust的finprod_id存的是首期交易编号,需关联质押品表查询质押券信息 modify by fuyongsheng 20220719 start-->
+                LEFT JOIN (
+                    SELECT
+                        fdp.ENTRUST_ID,
+                        nvl(fpsq.finprod_id, fpsq1.finprod_id)                  finprod_id, /** 金融产品代码 **/
+                        nvl(fpsq.Finprod_Market_Id,fpsq1.Finprod_Market_Id)     Finprod_Market_Id, /** 质押代码 **/
+                        nvl(fpsq.finprod_abbr,fpsq1.finprod_abbr)               finprod_abbr, /** 质押券名称 **/
+                        fdp.Pledge_Ratio * 100                                  Pledge_Ratio, /** 折算率 **/
+                        fdp.PLEDGE_NUMBER / 100                                 PLEDGE_NUMBER, /** 质押数量 **/
+                        fdp.Pledge_Face_Value                                   Pledge_Face_Value,
+                        fdp.DISPLACE_DIR                                        DISPLACE_DIR
+                    from wfl_etr_pledge fdp /** 质押品表 **/
+                    LEFT JOIN fin_product  fpsq /** 标的类金融产品 **/   ON    fpsq.finprod_id = fdp.finprod_id
+                    LEFT JOIN FIN_DEAL_PLEDGE fdp1 ON fdp1.finprod_id = fdp.finprod_id
+                    LEFT JOIN fin_product fpsq1 /** 标的类金融产品 **/  ON fpsq1.finprod_id = fdp1.PLEDGE_FINPROD_ID
+                    WHERE fdp.DISPLACE_DIR = '01' OR fdp.DISPLACE_DIR IS NULL <!--不展示换出券-->
+                    ) pledge
+                ON wfl_etr_entrust.ENTRUST_ID = pledge.ENTRUST_ID
+                LEFT JOIN (
+                    SELECT fdp.ENTRUST_ID,
+                        nvl(fpsq.finprod_id, fpsq1.finprod_id)               finprod_id, /** 金融产品代码 **/
+                        nvl(fpsq.Finprod_Market_Id, fpsq1.Finprod_Market_Id) Finprod_Market_Id, /** 质押代码 **/
+                        nvl(fpsq.finprod_abbr, fpsq1.finprod_abbr)           finprod_abbr, /** 质押券名称 **/
+                        fdp.Pledge_Ratio * 100                               Pledge_Ratio, /** 折算率 **/
+                        fdp.PLEDGE_NUMBER / 100                              PLEDGE_NUMBER, /** 质押数量 **/
+                        fdp.Pledge_Face_Value                                Pledge_Face_Value
+                    from wfl_etr_pledge fdp /** 质押品表 **/
+                    LEFT JOIN fin_product fpsq /** 标的类金融产品 **/ ON fpsq.finprod_id = fdp.finprod_id
+                    LEFT JOIN FIN_DEAL_PLEDGE fdp1 ON fdp1.finprod_id = fdp.finprod_id
+                    LEFT JOIN fin_product fpsq1 /** 标的类金融产品 **/ ON fpsq1.finprod_id = fdp1.PLEDGE_FINPROD_ID
+                    WHERE fdp.DISPLACE_DIR = '02'
+                    ) swapPledge
+                ON wfl_etr_entrust.ENTRUST_ID = swapPledge.ENTRUST_ID
+                <!--XYHGFXSJ-122:非首期指令wfl_etr_entrust的finprod_id存的是首期交易编号,需关联质押品表查询质押券信息 modify by fuyongsheng 20220719 end-->
+                LEFT JOIN (
+    <!--            SELECT-->
+    <!--            A.FINPROD_ID tradeId,-->
+    <!--            FP.FINPROD_ID,-->
+    <!--            FP.FINPROD_MARKET_ID  FINPROD_MARKET_ID,-->
+    <!--            FP.finprod_abbr as finprod_abbr,-->
+    <!--            B.PLEDGE_NUMBER	 PLEDGE_NUMBER,-->
+    <!--            B.Pledge_Ratio	 Pledge_Ratio,-->
+    <!--            B.Pledge_Face_Value printAmt-->
+    <!--            FROM-->
+    <!--            FIN_TRADE_PRODUCT A-->
+    <!--            INNER JOIN FIN_DEAL_PLEDGE B ON B.FINPROD_ID = A.FINPROD_ID AND B.BRANCH = A.BRANCH-->
+    <!--&lt;!&ndash;            INNER JOIN FIN_PRODUCT_TYPE C ON B.FINPROD_ID=C.FINPROD_ID&ndash;&gt;-->
+    <!--&lt;!&ndash;            AND C.BRANCH = A.BRANCH&ndash;&gt;-->
+    <!--&lt;!&ndash;            and C.TYPE_6 = #{TARGET_BACK_TYPE_H01}&ndash;&gt;-->
+    <!--&lt;!&ndash;            AND C.TYPE_7 in (#{BACK_LEND_DIRECTION_03},#{BACK_LEND_DIRECTION_04})&ndash;&gt;-->
+    <!--            LEFT JOIN FIN_PRODUCT FP ON FP.FINPROD_ID=B.PLEDGE_FINPROD_ID-->
+    <!--            WHERE  A.BRANCH=0-->
+                SELECT A.FINPROD_ID         tradeId,
+                    listagg(FP.FINPROD_ID, ',') within GROUP ( ORDER BY FP.FINPROD_ID )   FINPROD_ID,
+                    listagg(FP.FINPROD_MARKET_ID, ',') within GROUP ( ORDER BY FP.FINPROD_MARKET_ID )   FINPROD_MARKET_ID,
+                    listagg(FP.finprod_abbr, ',') within GROUP ( ORDER BY FP.finprod_abbr ) finprod_abbr,
+                    SUM(B.PLEDGE_NUMBER)*100/10000 PLEDGE_NUMBER,
+                    MAX(B.Pledge_Ratio)*100 Pledge_Ratio,
+                    SUM(B.Pledge_Face_Value) printAmt
+                FROM FIN_TRADE_PRODUCT A
+                INNER JOIN FIN_DEAL_PLEDGE B ON B.FINPROD_ID = A.FINPROD_ID AND B.BRANCH = A.BRANCH
+                LEFT JOIN FIN_PRODUCT FP ON FP.FINPROD_ID = B.PLEDGE_FINPROD_ID
+                group by A.FINPROD_ID
+                ) trdPledge on trdPledge.tradeId=wfl_etr_entrust.FINPROD_ID
+                LEFT JOIN  mst_counter_party      /** 交易对手 **/
+                ON    wfl_etr_entrust.counter_id = mst_counter_party.counter_id
+                LEFT JOIN STL_CAPACCT_INFO SCI
+                ON wfl_etr_entrust_add.Deal_Cur_Acct = SCI.ACCT_NO
+                LEFT JOIN SYS_WFL_BUSINESS_LIST SWBL ON SWBL.SEQ_NO = wfl_etr_entrust.WORKFLOW_ID and SWBL.PROCESS_STATE != 'END'
+                LEFT JOIN SYS_DATADICT_LIST SDL2 ON SDL2.DICT_CODE ='TRADE_PLACE' AND SDL2.ITEM_CODE = wfl_etr_entrust.trade_market
+                LEFT JOIN SYS_DATADICT_LIST SDL3 ON SDL3.DICT_CODE ='SHARES_TRADE_PLATFORM' AND SDL3.ITEM_CODE = wfl_etr_entrust.Trade_Plat
+                LEFT JOIN SYS_DATADICT_LIST SDL4 ON SDL4.DICT_CODE ='PS' AND SDL4.ITEM_CODE = wfl_etr_entrust_add.BUSI_PS
+                LEFT JOIN SYS_USER ON wfl_etr_entrust.INV_MANAGER_ID = SYS_USER.USER_NAME
+                LEFT JOIN SYS_DATADICT_LIST SDL5 ON SDL5.DICT_CODE ='BUSI_TYPE_TG' AND SDL5.ITEM_CODE = wfl_etr_entrust_add.BUSI_TYPE_POSITION
+                where wfl_etr_entrust.TRADE_MARKET IN ('03','04')
+                and wfl_etr_entrust_add.ASSET_TYPE1 = 'H01'
+                <if test="entrustStatus != null and entrustStatus != ''">
+                    AND wfl_etr_entrust.ENTRUST_STATUS = #{entrustStatus}
+                </if>
+                <if test="entrustId !=null and !entrustId.equals('')">
+                    AND wfl_etr_entrust.ENTRUST_ID = #{entrustId}
+                </if>
+                <if test="userId != null and userId != ''">
+                    AND PTL_PORTFOLIO_AUTHORITY.USER_ID = #{userId}
+                </if>
+                <if test="portfolioName != null and portfolioName != ''">
+                    AND PTL_PORTFOLIO.Portfolio_Id = #{portfolioName}
+                </if>
+                <if test="portfolioIdList != null and portfolioIdList.size()>0">
+                    <foreach collection="portfolioIdList" open="AND PTL_PORTFOLIO.Portfolio_Id in(" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="tradeMarket != null and tradeMarket != ''">
+                    AND wfl_etr_entrust.trade_market = #{tradeMarket}
+                </if>
+                <if test="finprodId != null and finprodId != ''">
+                    AND wfl_etr_pledge.finprod_id = #{finprodId}
+                </if>
+                <if test="zyj != null and zyj.size()>0">
+                    <foreach collection="zyj" open="AND wfl_etr_pledge.finprod_id in(" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="bussType != null and bussType != '' and bussType == 'T92'">
+                    AND wfl_etr_entrust.Ps in ('03', '04')
+                </if>
+                <if test="bussType != null and bussType != ''and bussType != 'T92'">
+                    AND wfl_etr_entrust.Ps = #{bussType}
+                </if>
+                <if test="manager != null and manager != ''">
+                    AND wfl_etr_entrust.INV_MANAGER_ID = #{manager}
+                </if>
+                <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+                    <![CDATA[ AND wfl_etr_entrust.ENTRUST_DATE >= to_date(#{startDate},'yyyy-mm-dd') ]]>
+                    <![CDATA[ AND wfl_etr_entrust.ENTRUST_DATE <= to_date(#{endDate},'yyyy-mm-dd') ]]>
+                </if>
+            </if>
         ) T1 WHERE 1=1
         and (DISPLACE_DIR is null or DISPLACE_DIR = '01')
         <!-- 关键字模糊查询 -->

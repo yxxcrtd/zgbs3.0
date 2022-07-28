@@ -277,10 +277,11 @@ public class TradeCreditHandlerAop {
                     finTradeProductKey.setFinprodId(settleDto.getFinprodId());
                     FinTradeProduct finTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
                     if(Objects.nonNull(finTradeProduct)) {
-                        settleDto.setSettleAmt(finTradeProduct.getmPrinAmt());
+                        settleDto.setSettleAmt(finTradeProduct.getPrin());
                         settleDto.setCounterId(finTradeProduct.getCounterId());
                     }
-                    tradeCommonService.executeOccupyCreditLines(settleDto, DictCodeListExt1.交易状态_初始.getValue(),DictCodeListRsk.授信占用类别_实占.getValue(),"doComplete");
+                    settleDto.setOrderId((String)CommonUtil.findValue(mapTrd, "entrustNo"));
+                    tradeCommonService.executeOccupyCreditLines(settleDto, DictCodeListExt1.交易状态_初始.getValue(),DictCodeListRsk.授信占用类别_预占.getValue(),"doComplete");
                 }
             }else {
                 tradeCommonService.executeOccupyCreditLines(args[0], DictCodeListExt1.交易状态_初始.getValue(), DictCodeListRsk.授信占用类别_实占.getValue(),"doComplete");

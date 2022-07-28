@@ -202,8 +202,10 @@ public class InvestDealRevokeService {
         param.put("psDurList", Arrays.asList(DictCodeList.交易方向_到期续做.getValue(), DictCodeList.交易方向_到期.getValue()
                 , DictCodeListExt3.交易方向_投资端_提前终止.getValue(),DictCodeListExt3.交易方向_中途换券.getValue(),DictCodeListExt3.交易方向_解除质押.getValue()
                 ,DictCodeList.交易方向_收息到账.getValue(),DictCodeList.交易方向_还本到账.getValue()));
-        param.put("tgBusiTypeList",Arrays.asList(DictCodeListExt3.平安业务类型_债券质押式逆回购.getValue(),DictCodeListExt3.平安业务类型_债券质押式正回购.getValue()
-                ,DictCodeListExt1.平安业务类型_正回购到期.getValue(),DictCodeListExt1.平安业务类型_逆回购到期.getValue()));
+//        param.put("tgBusiTypeList",Arrays.asList(DictCodeListExt3.平安业务类型_债券质押式逆回购.getValue(),DictCodeListExt3.平安业务类型_债券质押式正回购.getValue()
+//                ,DictCodeListExt1.平安业务类型_正回购到期.getValue(),DictCodeListExt1.平安业务类型_逆回购到期.getValue()));
+        param.put("finprodType2List", Arrays.asList(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue()
+                ,DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue()));
         param.put("isRepoFund",DictCodeList.是否_是.getValue());
         param.put("tradeMarketList",Arrays.asList(DictCodeListExt1.交易场所_上海证券交易所.getValue(),DictCodeListExt1.交易场所_深圳证券交易所.getValue()));
         return investDealRevokeMapper.selectTotalTradeIdTgM(param);

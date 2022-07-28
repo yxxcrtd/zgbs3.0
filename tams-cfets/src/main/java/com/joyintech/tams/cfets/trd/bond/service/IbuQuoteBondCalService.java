@@ -16,8 +16,10 @@ import com.joyintech.framework.util.*;
 import com.joyintech.service.bankuplink.bond.service.CfetsBondDealQuotedPriceService;
 import com.joyintech.service.bankuplink.calc.service.SecCalRequestQuoteService;
 import com.joyintech.service.bankuplink.calc.service.SecCalUtil;
+import com.joyintech.service.bankuplink.repo.dto.CfetsRepoDealQuotedPrice003Dto;
 import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
 import com.joyintech.tams.business.common.dto.FinProductSpecialDto;
+import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
 import com.joyintech.tams.cfets.trd.bond.dto.AutoAllocationRequest;
 import com.joyintech.tams.cfets.trd.bond.dto.CalRequest;
@@ -205,15 +207,24 @@ public class IbuQuoteBondCalService extends BaseService {
     public List<PtlAllocationDto> autoAllocation(AutoAllocationRequest autoAllocationRequest) {
         String sellPara = CacheUtil.getSysParam("SHORT_SELLING_SUPPORTED");
         String ps = autoAllocationRequest.getPs();
-        //全价总额和净价总额为空  处理(请求报价)
-//        if (null == autoAllocationRequest.getCpriceAmt() || BigDecimal.ZERO.compareTo(autoAllocationRequest.getCpriceAmt()) == 0) {
-            autoAllocationRequest.setCpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(autoAllocationRequest.getShareAmt(), autoAllocationRequest.getPrice()), new BigDecimal(100), 2));
-//        }
-//        if (null == autoAllocationRequest.getFpriceAmt() || BigDecimal.ZERO.compareTo(autoAllocationRequest.getFpriceAmt()) == 0) {
-            autoAllocationRequest.setFpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(autoAllocationRequest.getShareAmt(), autoAllocationRequest.getUnitFprice()), new BigDecimal(100), 2));
-//        }
         //备份剩余额度
         List<PtlAllocationDto> ptlAllocations = autoAllocationRequest.getPtlAllocations();
+        BigDecimal shareAmt = null;
+        if(CollectionUtils.isNotEmpty(ptlAllocations)) {
+            shareAmt = ptlAllocations.stream().filter(t -> StringUtil.isNotEmpty(t.getShareAmt()))
+                    .map(PtlAllocationDto::getShareAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+        //全价总额和净价总额为空 请求报价修改时  处理(请求报价)
+        if (null == autoAllocationRequest.getCpriceAmt() || BigDecimal.ZERO.compareTo(autoAllocationRequest.getCpriceAmt()) == 0
+                || (StringUtil.isNotEmpty(shareAmt)
+                && BigDecimalUtil.ACompareToB(shareAmt, autoAllocationRequest.getShareAmt(), 4) != 0)) {
+            autoAllocationRequest.setCpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(autoAllocationRequest.getShareAmt(), autoAllocationRequest.getPrice()), new BigDecimal(100), 2));
+        }
+        if (null == autoAllocationRequest.getFpriceAmt() || BigDecimal.ZERO.compareTo(autoAllocationRequest.getFpriceAmt()) == 0
+                || (StringUtil.isNotEmpty(shareAmt)
+                && BigDecimalUtil.ACompareToB(shareAmt, autoAllocationRequest.getShareAmt(), 4) != 0)) {
+            autoAllocationRequest.setFpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(autoAllocationRequest.getShareAmt(), autoAllocationRequest.getUnitFprice()), new BigDecimal(100), 2));
+        }
         try {
             //无分配模式
             if (StringUtil.isEmpty(autoAllocationRequest.getDistribution())) {

@@ -76,9 +76,9 @@ class AgreRepHwayChgSecService extends EtrSubComponentService<AgreRepHwayChgSecD
     	
     	//回购金额
     	if(dto.getEntrustAmt() == null){
-    		result.addError(error(dto.getClass().getSimpleName(), LocalConstant.TRADEAMT,
-                    "ETR_COMPONENT_ERR_012","回购金额"
-            ));
+//    		result.addError(error(dto.getClass().getSimpleName(), LocalConstant.TRADEAMT,
+//                    "ETR_COMPONENT_ERR_012","回购金额"
+//            ));
     	}
     	//回购方向
     	if(dto.getBusiPs() == null){

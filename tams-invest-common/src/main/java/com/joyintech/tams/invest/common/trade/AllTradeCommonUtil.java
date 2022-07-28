@@ -1695,10 +1695,10 @@ public class AllTradeCommonUtil {
         }
 
         List<String> orderIds = baseAssetCashPositionCommMapper.selectOrderIdsByTradeId(tradeId);
-        orderIds.add(tradeId);
         if (orderIds.isEmpty()) {
             orderIds = baseAssetCashPositionCommMapper.selectOrderIdsByPTotalTradeId(tradeId);
         }
+        orderIds.add(tradeId);
 
         if (!orderIds.isEmpty()) {
             List<PtlCashPositionFlow> cashFlows = baseAssetCashPositionCommMapper.selectAllCashPosition(orderIds);

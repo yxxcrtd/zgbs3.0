@@ -147,6 +147,9 @@ public class Rsk002Service extends OccupyReleasService<Rsk002InEntity> {
         }
         // 从风险事件列表中取出相关的参数列表
         Set<String> paraIdList = getParamIdList(eveList);
+        log("风控触发指标参数有：【{}】", paraIdList, en->en != null ? en : "");
+        // 输出.head.返回备注信息
+        setRemark(response,"风控触发指标参数有：", paraIdList, en->en != null ? en : "",getParam(paraIdList));
         // 取得组合关联指标信息
         IPtlIndicator ptlInd = getPtlIndicator(mapData);
         // 若无 组合关联指标信息，则试算通过
@@ -205,9 +208,7 @@ public class Rsk002Service extends OccupyReleasService<Rsk002InEntity> {
         Map<String, Map<String, String>> ptlParamMap = getPtlParamMap(ptlInd, indMap);
 
         Map<String, Map<String, IValue<Object>>> paraList = createCondition(paramMap, mapData, ptlParamMap);
-        log("涉及的指标参数有：【{}】", paraList.entrySet(), en->en != null ? en.getKey() : "");
-        // 输出.head.返回备注信息
-        setRemark(response,"涉及的指标参数有：", paraList.entrySet(), en->en != null ? en.getKey() : "",paramMap);
+
         // 预占/实占编号
         String eventId = (String)request.getBodyField(EVENT_ID);
         // 预占实占参数信息

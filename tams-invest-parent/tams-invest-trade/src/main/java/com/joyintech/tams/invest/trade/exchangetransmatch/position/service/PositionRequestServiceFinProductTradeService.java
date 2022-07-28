@@ -668,9 +668,11 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
                     bean.setTradeId(dealEntity.getTotleTradeId());
                     bean.setEtrId(trdProductDealAdd.getEntrustId());
                     bean.setFinprodId(finPledgeDisplaceResult.getFinprodId());
-                    bean.setSecAmount(finPledgeDisplaceResult.getPledgeAmt());
-                    bean.setOwnSecAmount(finPledgeDisplaceResult.getPledgeAmt());
+                    bean.setSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
+                    bean.setOwnSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
                     bean.setIntegrateSecAmount(BigDecimal.ZERO);
+                    Map<String, Object> map = BeanUtil.object2Map(bean);
+                    list.add(map);
                 }
                 // ZGTFCP-1805:修改中途换券字段赋值 modify by fuyongsheng 20220324 end
             }
@@ -682,8 +684,8 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
                     bean.setTradeId(dealEntity.getTradeId());
                     bean.setEtrId(trdProductDealAdd.getEntrustId());
                     bean.setFinprodId(finPledgeDisplaceResult.getFinprodId());
-                    bean.setSecAmount(finPledgeDisplaceResult.getPledgeAmt());
-                    bean.setOwnSecAmount(finPledgeDisplaceResult.getPledgeAmt());
+                    bean.setSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
+                    bean.setOwnSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
                     bean.setIntegrateSecAmount(BigDecimal.ZERO);
                     Map<String, Object> map = BeanUtil.object2Map(bean);
                     list.add(map);
@@ -723,8 +725,8 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
                     bean.setSecAcctId(dealEntity.getSecManageAcctId());
                     bean.setTradeId(dealEntity.getTotleTradeId());
                     bean.setFinprodId(finPledgeDisplaceResult.getFinprodId());
-                    bean.setSecAmount(finPledgeDisplaceResult.getPledgeAmt());
-                    bean.setOwnSecAmount(finPledgeDisplaceResult.getPledgeAmt());
+                    bean.setSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(),new BigDecimal(100)));
+                    bean.setOwnSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(),new BigDecimal(100)));
                     bean.setEtrId(trdProductDealAdd.getEntrustId());
                     bean.setIntegrateSecAmount(BigDecimal.ZERO);
                     Map<String, Object> map = BeanUtil.object2Map(bean);

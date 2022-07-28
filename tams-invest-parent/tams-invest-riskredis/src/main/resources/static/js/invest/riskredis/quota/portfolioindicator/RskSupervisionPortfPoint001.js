@@ -196,7 +196,7 @@
             }
             ,{field:'portfolioName', width:"30%" , title: 'RskSupervisionPortfPointInd001.portfolioOrBagName'}
             ,{field:'portfolioMix', width:"20%" , title: 'RskSupervisionPortfPoint001.portfolioMix',visible: false}
-            ,{field:'effDateRange',  width:"20%" ,title: 'RskSupervisionPortfPoint001.effDate'}
+			,{field:'effDateRange', sortField:'startDate,endDate', width:"20%" ,title: 'RskSupervisionPortfPoint001.effDate'}
             ,{field:'set', sortable:false, title: 'RskSupervisionPortfPoint001.supervisionindividuation',
             	render : function(data, type, row, meta) {
                     return '<i style="color:#0078F0;font-style: normal;cursor: pointer;" class="set">'+'设置'+'</a>';

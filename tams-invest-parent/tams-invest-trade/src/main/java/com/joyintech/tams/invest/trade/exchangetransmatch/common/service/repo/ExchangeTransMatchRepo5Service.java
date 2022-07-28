@@ -416,7 +416,7 @@ public class ExchangeTransMatchRepo5Service extends ExchangeTransMatchRepoCommon
         List<SettleTransData> list = exchangeTransMatchCommonMapper.getSettleTransDataList(map);
         for(SettleTransData item:list) {
             //收息到账
-            if(BigDecimal.ZERO.compareTo(item.getmIntAmt())<0) {
+            if(null != item.getmIntAmt() && BigDecimal.ZERO.compareTo(item.getmIntAmt())<0) {
                 SettleTransData IntSettleTransData = new SettleTransData();
                 BeanUtil.copyPropertiesIgnoreNull(IntSettleTransData,item);
 
@@ -450,7 +450,7 @@ public class ExchangeTransMatchRepo5Service extends ExchangeTransMatchRepoCommon
             }
 
             //还本到账
-            if(BigDecimal.ZERO.compareTo(item.getmPrinAmt())<0) {
+            if(null != item.getmPrinAmt() && BigDecimal.ZERO.compareTo(item.getmPrinAmt())<0) {
                 SettleTransData prinSettleTransData = new SettleTransData();
                 BeanUtil.copyPropertiesIgnoreNull(prinSettleTransData,item);
 

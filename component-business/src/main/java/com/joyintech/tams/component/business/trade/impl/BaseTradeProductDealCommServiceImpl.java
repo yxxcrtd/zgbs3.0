@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
 import com.joyintech.tams.invest.common.component.base.trade.BaseTradeProductDealService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -902,6 +903,9 @@ public class BaseTradeProductDealCommServiceImpl extends BaseService implements 
         if(!(StringUtil.isNotEmpty(finProductTradeDto.getIsOverdueDeal())&&StringUtil.equals(DictCodeList.是否_是.getValue(), finProductTradeDto.getIsOverdueDeal()))){
         	if (ptlPositionHoldDto.getPtlSecPositionFlows() != null && !ptlPositionHoldDto.getPtlSecPositionFlows().isEmpty()) {
                 for (PtlSecPositionFlowDto ptlSecPositionFlow : ptlPositionHoldDto.getPtlSecPositionFlows()) {
+                    if(null == ptlSecPositionFlow.getAmount()){
+                        continue;
+                    }
                     basePtlSecPositionInfoService.inertSecPositionFlow(ptlSecPositionFlow);
                 }
             }

@@ -790,7 +790,9 @@
                  LEFT JOIN FIN_CASH_PLAN fcpbj ON fci.CASH_ID =fcpbj.CASH_ID AND fci.CASH_TYPE_1 =#{CASH_TYPE_1} AND fci.CASH_TYPE_2=#{CASH_TYPE_2}
                  LEFT JOIN FIN_CASH_PLAN fcplx ON fci.CASH_ID =fcplx.CASH_ID AND fci.CASH_TYPE_1 ='02' AND fci.CASH_TYPE_2='C02'
         where fci.FINPROD_ID = #{finprodId}
-          AND (fcpbj.MDATE =#{adjustMDate} OR fcplx.MDATE =#{adjustMDate})
+            <if test="adjustMDate != null">
+                AND (fcpbj.MDATE =#{adjustMDate} OR fcplx.MDATE =#{adjustMDate})
+            </if>
           AND NOT EXISTS (
                 SELECT  1 FROM FIN_CASH_PLAN fcp WHERE fcp.FINPROD_ID =fcplx.FINPROD_ID AND fcp.MDATE =fcplx.MDATE AND fcp.CASH_TYPE IN ('02','03')
             )

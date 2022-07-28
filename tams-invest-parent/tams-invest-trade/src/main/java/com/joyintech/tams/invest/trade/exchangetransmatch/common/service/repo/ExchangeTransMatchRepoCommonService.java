@@ -547,7 +547,7 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
             // 结果类型 = 置换前
             finPledgeDisplaceResult.setResultType(DictCodeListExt3.质押券置换_置换结果_置换前.getValue());
             // 质押券面总额 = 首期.质押券面总额
-            finPledgeDisplaceResult.setPledgeAmt(finDealPledge.getPledgeAmt());
+            finPledgeDisplaceResult.setPledgeAmt(finDealPledge.getPledgeNumber());
             // 折算比例 = 首期.质押率
             finPledgeDisplaceResult.setScale(finDealPledge.getPledgeRatio());
             beforeDisplaceResult.add(finPledgeDisplaceResult);
@@ -576,7 +576,7 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
             // 结果类型 = 置换后
             finPledgeDisplaceResult.setResultType(DictCodeListExt3.质押券置换_置换结果_置换后.getValue());
             // 质押券面总额 = 更新后质押品.质押券面总额
-            finPledgeDisplaceResult.setPledgeAmt(finDealPledge.getPledgeAmt());
+            finPledgeDisplaceResult.setPledgeAmt(finDealPledge.getPledgeNumber());
             // 质押率 = 更新后质押品.质押率
             finPledgeDisplaceResult.setScale(finDealPledge.getPledgeRatio());
             afterDisplaceResult.add(finPledgeDisplaceResult);

@@ -257,4 +257,16 @@
           and EXERCISE_TYPE = #{exerciseType,jdbcType=VARCHAR}
           and EXERCISE_DATE = #{exerciseDate,jdbcType=DATE}
     </update>
+
+    <select id="selectDateByFinprodId" resultType="com.joyintech.tams.common.base.entity.FinExercisePlanDto">
+        SELECT
+        EXERCISE_DATE,
+        Row_number ( ) OVER ( ORDER BY EXERCISE_DATE DESC ) as sn
+        FROM
+        FIN_EXERCISE_PLAN
+        WHERE
+        FINPROD_ID = #{finprodId}
+        AND to_char( EXERCISE_DATE, 'yyyy-mm-dd' ) &gt; to_char( #{sysDate}, 'yyyy-mm-dd' )
+        AND ROWNUM &lt;= 1
+    </select>
 </mapper>

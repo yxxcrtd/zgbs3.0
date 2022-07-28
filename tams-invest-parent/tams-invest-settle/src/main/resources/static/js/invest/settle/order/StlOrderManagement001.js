@@ -28,7 +28,7 @@ var parenPage = function () {
     
     var tabcols = [
             {field: 'bizCode', title: '业务编号', width: 200, sortable: false, render: function (data, type, row, meta) {
-                    if(row.paBizType=='151'||row.paBizType=='180'||row.paBizType=='202'||row.paBizType=='212'){
+                    if(row.paBizType=='151'||row.paBizType=='180'||row.paBizType=='202'||row.paBizType=='212'||row.paBizType=='09'){
                         return data;
                     }
                     return "<a class='pro-link' style='cursor: pointer;' " +

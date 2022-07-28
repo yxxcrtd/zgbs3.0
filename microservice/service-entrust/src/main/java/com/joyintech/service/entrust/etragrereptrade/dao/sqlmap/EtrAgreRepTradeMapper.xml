@@ -756,4 +756,8 @@
         and t.hoding_type = #{hodingType,jdbcType=VARCHAR}
         and t.cdate = #{cdate,jdbcType=DATE}
     </select>
+
+    <select id="getFirstTradeAmtByTradeId" resultType="java.math.BigDecimal">
+        select ftp.M_TRADE_AMT from FIN_TRADE_PRODUCT ftp where ftp.FINPROD_ID = #{tradeId,jdbcType=VARCHAR}
+    </select>
 </mapper>

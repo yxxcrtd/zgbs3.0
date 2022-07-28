@@ -212,7 +212,7 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                     // modify by etliu 20220725 end
 
                     // XYHGFXSJ-8:构建质押品信息list modify by fuyongsheng 20220718 start
-                    infContractDetailfile.setPledgeList(this.genPledgeDtoList(trdProductTempDeal.getTradeId()));
+                    infContractDetailfile.setPledgeList(this.genPledgeDtoList(trdProductTempDeal.getFinprodId()));
                     // XYHGFXSJ-8:构建质押品信息list modify by fuyongsheng 20220718 end
                     if (DictCodeList.回购拆借方向_正回购.getValue().equals(infContractDetailfile.getPs())
                             || DictCodeList.回购拆借方向_逆回购.getValue().equals(infContractDetailfile.getPs())) {
@@ -243,12 +243,36 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                         // modify by etliu 20220720 end
                         // 临时交易及其他数据处理
                         tradePreClearingService.trdRepoPeriod(trdTempDto, infContractDetailfile);
+
+                        // modify by etliu 20220727 start
+                        // 3.0.6协议回购+风险升级 XYHGFXSJ-461
+                        //【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误
+                        if (DictCodeListExt3.交易方向_提前购回.getValue().equals(infContractDetailfile.getPs())
+                                || DictCodeListExt3.交易方向_到期购回.getValue().equals(infContractDetailfile.getPs())
+                                || DictCodeListExt3.交易方向_解除质押.getValue().equals(infContractDetailfile.getPs())) {
+                            List<ManualSettleDto> tepmPledgeInfoList = manualSettleMapper.selectPledgeInfo(infContractDetailfile.getFinprodId());
+                            if (!StringUtil.isEmptyList(tepmPledgeInfoList)) {
+                                ((InfContractDetailfile) trdTempDto.getData()).setFinprodId(tepmPledgeInfoList.get(0).getPledgeId());
+                                trdTempDto.setTradeAmt(tepmPledgeInfoList.get(0).getPrin());
+                            }
+                        }
+                        // modify by etliu 20220727 end
                     }
                     else if (DictCodeListExt3.交易方向_到期续做.getValue().equals(infContractDetailfile.getPs())){
                         // 指令信息处理
                         tradePreClearingService.buildPositionBaseData(trdTempDto, infContractDetailfile);
                         // 临时交易及其他数据处理
                         tradePreClearingService.trdRepoPeriodT56(trdTempDto, infContractDetailfile, true);
+
+                        // modify by etliu 20220727 start
+                        // 3.0.6协议回购+风险升级 XYHGFXSJ-461
+                        //【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误
+                        List<ManualSettleDto> tepmPledgeInfoList = manualSettleMapper.selectPledgeInfo(infContractDetailfile.getFinprodId());
+                        if (!StringUtil.isEmptyList(tepmPledgeInfoList)) {
+                            ((InfContractDetailfile) trdTempDto.getData()).setFinprodId(tepmPledgeInfoList.get(0).getPledgeId());
+                            trdTempDto.setTradeAmt(tepmPledgeInfoList.get(0).getPrin());
+                        }
+                        // modify by etliu 20220727 end
                     }
 
                     // modify by etliu 20220227 start
@@ -297,12 +321,13 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                     // add by etliu 20220116 end
 
                     parameter.setCustom(trdTempDto);
-                    try {
+//                    try {
                         logger.info("手工交收处理请求报文:" + JsonUtils.object2Json(parameter));
                         commonPositionService.process(parameter);
-                    } catch (Exception e) {
-                        logger.error("手工交收处理请求失败:", e);
-                    }
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                        logger.error("手工交收处理请求失败:", e);
+//                    }
 //                    // 3.调用基础组件.【投资委托组件.完成委托】，写入委托完成状况信息(投资委托场合才执行此步)
 //                    if (!finProductTradeDto.isNeedHandleFinishEntrust()) {
 //                        baseTradeProductDealCommService.finishEntrust(finProductTradeDto.getBaseTradeProductDealDtos(), false);
@@ -551,5 +576,5 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
         return null;
     }
 
-} 
+}
 

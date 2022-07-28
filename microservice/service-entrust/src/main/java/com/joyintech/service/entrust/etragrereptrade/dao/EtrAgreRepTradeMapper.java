@@ -84,4 +84,12 @@ public interface EtrAgreRepTradeMapper {
     Date selectSecPositionMaxCdate(Map<String, Object> map);
 
     BigDecimal selectAvailablePositionAmount(Map<String, Object> param);
+
+    /**
+     * 查询首期的到期结算金额
+     *
+     * @param map 检索参数
+     * @return 到期结算金额
+     */
+    BigDecimal getFirstTradeAmtByTradeId(Map<String, String> map);
 }
