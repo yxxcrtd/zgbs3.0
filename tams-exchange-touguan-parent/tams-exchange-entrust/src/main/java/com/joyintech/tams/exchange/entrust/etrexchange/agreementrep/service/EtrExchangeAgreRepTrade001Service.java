@@ -2701,13 +2701,13 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         // modify by etliu 20220727 end
 
         parameter.setCustom(postionFlowDto);
-        try {
+//        try {
             logger.info("新建指令持仓请求报文:" + JsonUtils.object2Json(parameter));
             commonPositionService.process(parameter);
-        } catch (Exception e) {
-            logger.error("新建指令持仓请求失败:", e);
-            e.printStackTrace();
-        }
+//        } catch (Exception e) {
+//            logger.error("新建指令持仓请求失败:", e);
+//            e.printStackTrace();
+//        }
     }
 
     private void doDeleteWflEntity(String workflowId) {

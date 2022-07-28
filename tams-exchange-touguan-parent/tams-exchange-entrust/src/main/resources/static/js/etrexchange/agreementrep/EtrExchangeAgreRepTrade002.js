@@ -1263,7 +1263,7 @@
                 }
             } else if (ps == 'T94') {
                 let outAmtValue = $("#outAmt").val()
-                if(outAmtValue != null && outAmtValue != "" && outAmtValue != undefined){
+                if (outAmtValue != null && outAmtValue != "" && outAmtValue != undefined) {
                     $("#outRepSecNum").val("")
                     $("#newRepSecNum").val("")
                 }
@@ -2139,30 +2139,35 @@
         $('#EtrAgreRepTrade001_btn_riskcal').click(function () {
             doRiskcal();
         });
+
         if (TRADE_MARKET_CURRENT == TRADE_MARKET_03) {
             $("#yield").attr("data-textrange", 3);
         } else {
             $("#yield").attr("data-textrange", 2);
         }
-        if (entity && entity.yield) {
-            $("#yield").val(entity.yield).trigger('change');
+        console.log("--------pageModel-------------")
+        console.log(pageModel)
+        console.log(PAGE_MODEL_EDIT)
+        if (pageModel == PAGE_MODEL_EDIT) {
+            if (entity && entity.yield) {
+                $("#yield").val(entity.yield).trigger('change');
+            }
+            //上交所 解除质押 隐藏结算金额
+            if (entity && entity.ps == PS_T93 && TRADE_MARKET_CURRENT == TRADE_MARKET_03) {
+                $("#entrustAmt_div").hide();
+            }
+            //解除质押、到期购回、提前购回、中途换券 交易对手不可编辑
+            if (entity && (entity.ps == PS_T93 || entity.ps == PS_T94 || entity.ps == PS_T95 || entity.ps == PS_T96)) {
+                $("#counterId").attr('disabled', true);
+            }
+            //中途换券 换出债券、换出债券数量、换出金额、请求编号 不可编辑
+            if (entity && entity.ps == PS_T94) {
+                $("#outRepSecId").attr('disabled', true);
+                $("#outRepSecNum").attr('disabled', true);
+                $("#outAmt").attr('disabled', true);
+                $("#reqOnId").attr('disabled', true);
+            }
         }
-        //上交所 解除质押 隐藏结算金额
-        if (entity && entity.ps == PS_T93 && TRADE_MARKET_CURRENT == TRADE_MARKET_03) {
-            $("#entrustAmt_div").css('display', 'none');
-        }
-        //解除质押、到期购回、提前购回、中途换券 交易对手不可编辑
-        if (entity && (entity.ps == PS_T93 || entity.ps == PS_T94 || entity.ps == PS_T95 || entity.ps == PS_T96)) {
-            $("#counterId").attr('disabled', true);
-        }
-        //中途换券 换出债券、换出债券数量、换出金额、请求编号 不可编辑
-        if (entity && entity.ps == PS_T94) {
-            $("#outRepSecId").attr('disabled', true);
-            $("#outRepSecNum").attr('disabled', true);
-            $("#outAmt").attr('disabled', true);
-            $("#reqOnId").attr('disabled', true);
-        }
-
         if (entityStr) {
             var etrData = JSON.parse(entityStr);
             setPageItem(etrData);

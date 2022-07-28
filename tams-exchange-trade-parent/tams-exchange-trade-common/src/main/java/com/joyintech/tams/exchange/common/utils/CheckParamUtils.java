@@ -78,7 +78,7 @@ public class CheckParamUtils {
             return ErrorCode.REQ_PARAMETER_STOCK_CODE_ERROR;
         }
         // 检查委托属性
-        if (IntegratedEntrustUtils.isNegotiatedTrade(integratedEntrust.getEntrustProp())) {
+        if (!IntegratedEntrustUtils.isNegotiatedTrade(integratedEntrust.getEntrustProp())) {
             return ErrorCode.UN_SUPPORT_ENTRUST_PROP;
         }
         final String market = StockCodeUtils.getMarket(stockCode);
