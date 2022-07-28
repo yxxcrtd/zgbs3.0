@@ -1357,7 +1357,7 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
 
 
     /**
-     * 判断到期续作是否存在首期
+     * 判断到期续作是否存在首期getFirstRepEntrustInfo
      *
      * @param dto 行情信息
      */
@@ -1366,5 +1366,17 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
     @PostMapping("getWhetherExists")
     public Message<String> isCanGetOrNull(@RequestBody EtrExchangeAgreRepTrade001Dto dto) {
         return new Message<String>().success().setData(etrExchangeAgreRepTrade001Service.isCanGetOrNull(dto));
+    }
+
+    /**
+     * 判断到期续作是否存在首期
+     *
+     * @param dto 行情信息
+     */
+    @ApiOperation(value = "", notes = "判断到期续作是否存在首期")
+    @ResponseBody
+    @PostMapping("getFirstDetailRepEntrustInfo")
+    public Message<EtrExchangeAgreRepTrade001Dto> getFirstDetailRepEntrustInfo(@RequestBody EtrExchangeAgreRepTrade001Dto dto) {
+        return new Message<EtrExchangeAgreRepTrade001Dto>().success().setData(etrExchangeAgreRepTrade001Service.getFirstDetailRepEntrustInfo(dto));
     }
 }
