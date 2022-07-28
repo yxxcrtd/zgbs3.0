@@ -4,7 +4,7 @@
     <select id="selectSecByExecid" parameterType="String"  resultType="String">
     select t.dealno from 
     INTERF_TRAD_SECDEAL t 
-    where t.FEDEALNO = #{execid,jdbcType=VARCHAR}
+    where t.FEDEALNO = #{execid,jdbcType=VARCHAR} and t.PS = #{ps,jdbcType=VARCHAR}
     </select>
      <select id="selectRepoByExecid" parameterType="String"  resultType="String">
     select t.TRADEID from 
@@ -47,9 +47,15 @@
   from interf_cstp_trade t
  where t.execid =  #{execid,jdbcType=VARCHAR}
  and  t.businesstype =  #{businesstype,jdbcType=VARCHAR}
+         <if test="side != null">
+             and t.side= #{side,jdbcType=VARCHAR}
+         </if>
    and t.updatetime = (select max(t.updatetime)
                          from interf_cstp_trade t
                         where  t.execid = #{execid,jdbcType=VARCHAR}
+                             <if test="side != null">
+                                 and t.side= #{side,jdbcType=VARCHAR}
+                             </if>
                          and  t.businesstype =  #{businesstype,jdbcType=VARCHAR})
     </select>
     <select id="selectBuytrader" parameterType="String" resultType="String">
@@ -208,6 +214,12 @@
         select t.pre_trade_id as preTradeId
         from trdquto_match_info t
         where t.exe_id=#{execid,jdbcType=VARCHAR} and  t.match_status ='01' and rownum=1
+    </select>
+
+    <select id="selectMatchDtoByDealNo" parameterType="String"  resultType="com.joyintech.service.bankuplink.common.dto.TrdConfirmMatchDto">
+        select t.pre_trade_id as preTradeId
+        from trdquto_match_info t
+        where t.CSTP_TRADE_ID=#{dealNo,jdbcType=VARCHAR} and  t.match_status ='01' and rownum=1
     </select>
 
     <select id="selectMatchDtoByCstpTradeId" parameterType="String"  resultType="com.joyintech.service.bankuplink.common.dto.TrdConfirmMatchDto">

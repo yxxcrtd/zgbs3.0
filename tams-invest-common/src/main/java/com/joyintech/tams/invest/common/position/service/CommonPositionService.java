@@ -1,9 +1,6 @@
 package com.joyintech.tams.invest.common.position.service;
 
 import com.alibaba.fastjson.JSON;
-import com.greenpineyu.fel.FelEngine;
-import com.greenpineyu.fel.FelEngineImpl;
-import com.greenpineyu.fel.context.FelContext;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -14,18 +11,13 @@ import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.invest.common.component.base.group.impl.dao.BasePtlCashPositionInfoMapper;
 import com.joyintech.tams.invest.common.component.base.group.impl.dao.BasePtlSecPositionInfoMapper;
-import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
-import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.invest.common.position.dao.CommonPtlPositionMapper;
 import com.joyintech.tams.invest.common.position.dto.PostionParameter;
 import com.joyintech.tams.invest.common.position.dto.PtlPositionFlowCfg;
 import com.joyintech.tams.invest.common.position.dto.PtlPositionScene;
 import com.joyintech.tams.invest.common.trade.dao.EtrCommonCashPositionMapper;
-import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.invest.common.util.ExpressionUtil;
-import com.joyintech.tools.collectors.JoyinCollectors;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -131,7 +123,7 @@ public class CommonPositionService {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * 公共流水处理方式
 	 * @param parameter
@@ -160,7 +152,7 @@ public class CommonPositionService {
 				etrCashPositionFlow.setAcctId(acctId);
 			}
 			insertEtrCashPositionFlow(etrCashPositionFlow);//入库
-			
+
 		}else if(StringUtil.equals(ptlPositionFlowCfg.getFlowType(), "02")){//指令持仓
 			EtrSecPositionFlow etrSecPositionFlow = BeanUtil.mapToObject(properties, EtrSecPositionFlow.class);
 			if(!StringUtil.equals(ptlPositionFlowCfg.getProcessConfig(), "01")){
@@ -204,7 +196,7 @@ public class CommonPositionService {
 			insertPtlSecPositionFlow(ptlSecPositionFlow);//入库
 		}
 	}
-	
+
 	/**
 	 * 公共撤销、退回流水处理方式
 	 * @param
@@ -252,14 +244,14 @@ public class CommonPositionService {
 		}
 		return param;
 	}
-	
+
 
 	/**
 	 * 启动时调此方法,加载2个配置表的数据
 	 */
 	public Map<String,Object> init() {
 		initSceneConfig();//初始化场景配置
-		
+
 		initFlowCfgConfig();//初始化
 		Map<String,Object> result =new HashMap<>();
 		result.put("status", "success");
@@ -284,7 +276,7 @@ public class CommonPositionService {
 					try{
 						dataMap = JsonUtils.json2Object(ptlPositionFlowCfg2.getParameterConfig(), Map.class);
 					}catch (Exception e) {
-						
+
 					}
 					ptlPositionFlowCfg2.setDataMap(dataMap);
 					scenePtlPositionFlowCfg.add(ptlPositionFlowCfg2);
@@ -293,7 +285,7 @@ public class CommonPositionService {
 			ptlPositionFlowCfgMap.put(ptlPositionFlowCfg.getSceneId(), scenePtlPositionFlowCfg);
 		}
 		FLOW_CFG = ptlPositionFlowCfgMap;
-		
+
 	}
 
 
@@ -317,7 +309,7 @@ public class CommonPositionService {
 		}
 		SCENE_CFG =ptlPositionSceneMap;
 	}
-	
+
 	/**
 	 * 生成uuid
 	 * @return
@@ -560,7 +552,7 @@ public class CommonPositionService {
 			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 end
 		}
 	}
-	
+
 	/**
 	 * 入库委托持仓流水信息
 	 * @param etrSecPositionFlow
@@ -595,7 +587,7 @@ public class CommonPositionService {
 			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 end
 		}
 	}
-	
+
 	/**
 	 * 入库交易现金流水信息
 	 * @param ptlCashPositionFlow
@@ -631,7 +623,7 @@ public class CommonPositionService {
 		}
 
 	}
-	
+
 	/**
 	 * 入库交易持仓流水信息
 	 * @param ptlSecPositionFlow
@@ -667,8 +659,8 @@ public class CommonPositionService {
 		}
 
 	}
-	
-	
+
+
 	/**
 	 * 获取平台日
 	 * @return
@@ -676,8 +668,8 @@ public class CommonPositionService {
 	public Date getSysDate(){
 		return commonPtlPositionMapper.getSysDate();
 	}
-	
-	
+
+
 	private BigDecimal object2BigDecimal(Object object){
 		if(!StringUtil.isNotEmpty(object)){
 			return BigDecimal.ZERO;
@@ -687,7 +679,7 @@ public class CommonPositionService {
 		}
 		return BigDecimal.ZERO;
 	}
-	
+
 	private Date object2Date(Object object){
 		if(!StringUtil.isNotEmpty(object)){
 			return null;

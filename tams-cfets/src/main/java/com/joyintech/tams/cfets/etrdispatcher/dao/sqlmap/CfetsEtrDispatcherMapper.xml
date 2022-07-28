@@ -950,7 +950,7 @@
     <sql id="etrDispatcherDealListInfo">
         #{busiTypePosition} busiTypePosition,
         tpda.entrust_id entrustId,
-        FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID pledgeFinprodId,
+        FDP.PLEDGE_FINPROD_ID pledgeFinprodId,
         NVL( fp2.FINPROD_ABBR, fp2.FINPROD_NAME ) chlIdName,
         tpd.trade_market tradeMarket,
         tpd.UNIT_CPRICE fCprice,
@@ -967,8 +967,8 @@
         tpd.trade_id tradeId,
         tpda.portfolio_id portfolioId,
         pp.portfolio_name portfolioName,
-        case when tpd.FINPROD_TYPE2 in ('F04','F05') then fp3.finprod_market_id else fp.finprod_market_id end finprodMarketId,
-        case when tpd.FINPROD_TYPE2 in ('F04','F05') then fp3.finprod_abbr else fp.finprod_abbr  end finprodAbbr,
+        case when tpd.FINPROD_TYPE2 in ('F04','F05') then FDP.finprod_market_id else fp.finprod_market_id end finprodMarketId,
+        case when tpd.FINPROD_TYPE2 in ('F04','F05') then FDP.finprod_abbr else fp.finprod_abbr  end finprodAbbr,
         nvl(tpdt.ps, tpd.PS) ps,
         ssai.sec_acct_name secAcctId,
         to_char(tpd.trade_date,'yyyy-MM-dd') tradeDate,
@@ -1000,7 +1000,7 @@
         FTP.M_TRADE_AMT mTradeAmt,/* 到期金额*/
         FTP.M_UNIT_CPRICE mCprice,
         FTP.M_YIELD * 100 mYield,
-        FIN_DEAL_PLEDGE.PLEDGE_NUMBER * 100 secTotalPrin,
+        FDP.PLEDGE_NUMBER * 100 secTotalPrin,
         tpd.TRADE_AMT actPayAmt,
         tpd.PRIN_AMT prinAmt,
         sdl_registOrg.ITEM_VALUE registOrgStr
@@ -1024,9 +1024,17 @@
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON tpd.sec_manage_acct_id = ssai.SEC_ACCT_ID
         LEFT JOIN FIN_PRODUCT_TYPE fpt ON tpd.FINPROD_ID  = fpt.FINPROD_ID
         left join FIN_TRADE_PRODUCT FTP on tpd.FINPROD_ID = FTP.FINPROD_ID
-        left join FIN_DEAL_PLEDGE on tpd.FINPROD_ID = FIN_DEAL_PLEDGE.FINPROD_ID
+        left join (SELECT F.FINPROD_ID,
+        WM_CONCAT(F.PLEDGE_FINPROD_ID)  PLEDGE_FINPROD_ID,
+        WM_CONCAT(F2.FINPROD_MARKET_ID) FINPROD_MARKET_ID,
+        WM_CONCAT(F2.FINPROD_ABBR)      FINPROD_ABBR,
+        SUM(F.PLEDGE_NUMBER)            PLEDGE_NUMBER
+        from FIN_DEAL_PLEDGE F
+        left join FIN_PRODUCT F2 on F2.FINPROD_ID = F.PLEDGE_FINPROD_ID
+        GROUP BY F.FINPROD_ID) FDP ON FDP.FINPROD_ID = tpd.FINPROD_ID
+        <!-- left join FIN_DEAL_PLEDGE on tpd.FINPROD_ID = FIN_DEAL_PLEDGE.FINPROD_ID-->
+        <!-- LEFT JOIN FIN_PRODUCT fp3 ON fp3.FINPROD_ID = FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID-->
         LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID  = tpd.CHL_ID
-        LEFT JOIN FIN_PRODUCT fp3 ON fp3.FINPROD_ID = FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID
         WHERE tpd.TRADE_ID  in (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
         OR tpd.B_TRADE_ID in (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
         union all
@@ -1046,9 +1054,17 @@
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON tpd.sec_manage_acct_id = ssai.SEC_ACCT_ID
         LEFT JOIN FIN_PRODUCT_TYPE fpt  ON tpd.FINPROD_ID = fpt.FINPROD_ID
         left join FIN_TRADE_PRODUCT FTP on tpd.FINPROD_ID = FTP.FINPROD_ID
-        left join FIN_DEAL_PLEDGE on tpd.FINPROD_ID = FIN_DEAL_PLEDGE.FINPROD_ID
+        left join (SELECT F.FINPROD_ID,
+        WM_CONCAT(F.PLEDGE_FINPROD_ID)  PLEDGE_FINPROD_ID,
+        WM_CONCAT(F2.FINPROD_MARKET_ID) FINPROD_MARKET_ID,
+        WM_CONCAT(F2.FINPROD_ABBR)      FINPROD_ABBR,
+        SUM(F.PLEDGE_NUMBER)            PLEDGE_NUMBER
+        from FIN_DEAL_PLEDGE F
+        left join FIN_PRODUCT F2 on F2.FINPROD_ID = F.PLEDGE_FINPROD_ID
+        GROUP BY F.FINPROD_ID) FDP ON FDP.FINPROD_ID = tpd.FINPROD_ID
+        <!-- left join FIN_DEAL_PLEDGE on tpd.FINPROD_ID = FIN_DEAL_PLEDGE.FINPROD_ID-->
+        <!-- LEFT JOIN FIN_PRODUCT fp3 ON fp3.FINPROD_ID = FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID-->
         LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID  = tpd.CHL_ID
-        LEFT JOIN FIN_PRODUCT fp3 ON fp3.FINPROD_ID = FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID
         WHERE tpd.TRADE_ID  in (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
         OR tpd.B_TRADE_ID in (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
     </select>

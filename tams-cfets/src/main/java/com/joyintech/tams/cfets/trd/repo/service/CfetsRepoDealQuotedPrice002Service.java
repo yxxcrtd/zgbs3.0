@@ -572,7 +572,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
         if (CollectionUtils.isEmpty(entity.getPtlAllocations())) {
             errorList.add(new ValidMessage("组合分配不可为空"));
         } else {
-            if (StringUtils.isEmpty(entity.getDistribution())) {
+            if (StringUtil.equals(ps,DictCodeList.回购拆借方向_逆回购.getValue())&&StringUtils.isEmpty(entity.getDistribution())) {
                 errorList.add(new ValidMessage("分配方式不可为空"));
             }
             // 校验质押券总额(该笔交易,流程中及已生效交易)不能超过指令的质押券总额
