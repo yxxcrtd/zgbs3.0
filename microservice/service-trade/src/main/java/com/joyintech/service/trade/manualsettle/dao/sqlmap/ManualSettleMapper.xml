@@ -42,11 +42,23 @@
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN F1.FINPROD_ABBR ELSE NULL END pledgeName,
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN F1.FINPROD_MARKET_ID ELSE NULL END pledgeIdAbbr,
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN F2.FINPROD_MARKET_ID ELSE NULL END bPledgeIdAbbr,-->
-            CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN  PN.PLEDGE_NUMBER ELSE NULL END pledgeNumber,
-            CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN PN.PLEDGE_FINPROD_ID ELSE NULL END pledgeId,
+            CASE
+                WHEN etr.ps= 'T94' THEN epe.PLEDGE_NUMBER
+                WHEN etr.FINPROD_TYPE2 != 'F01' THEN  PN.PLEDGE_NUMBER
+            ELSE NULL END pledgeNumber,
+            CASE
+                WHEN etr.ps= 'T94' THEN epe.FINPROD_ID
+                WHEN etr.FINPROD_TYPE2 != 'F01' THEN PN.PLEDGE_FINPROD_ID
+            ELSE NULL END pledgeId,
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN T1.B_PLEDGE_ID ELSE NULL END bPledgeId,
-            CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN PN.PLEDGE_FINPROD_ABBR ELSE NULL END pledgeName,
-            CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN PN.FINPROD_MARKET_ID ELSE NULL END pledgeIdAbbr,
+            CASE
+                WHEN etr.ps= 'T94' THEN TP.FINPROD_ABBR
+                WHEN etr.FINPROD_TYPE2 != 'F01' THEN PN.PLEDGE_FINPROD_ABBR
+            ELSE NULL END pledgeName,
+            CASE
+                WHEN etr.ps= 'T94' THEN TP.FINPROD_MARKET_ID
+                WHEN etr.FINPROD_TYPE2 != 'F01' THEN PN.FINPROD_MARKET_ID
+            ELSE NULL END pledgeIdAbbr,
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN F2.FINPROD_MARKET_ID ELSE NULL END bPledgeIdAbbr,
             <!--T1.PRIN prin,
             T1.M_TRADE_AMT mTradeAmt,
@@ -65,6 +77,8 @@
         decode( T1.SETTLE_STATUS,'01',1,'02',3,'03',2,'04',4,5) sort
         FROM TRD_MANUAL_SETTLE_INFO T1
         LEFT JOIN  ETR_ENTRUST etr ON T1.ENTRUST_NO = etr.ENTRUST_ID
+        LEFT JOIN ETR_PLEDGE epe on etr.ENTRUST_ID = epe.ENTRUST_ID and epe.DISPLACE_DIR = '01'
+        LEFT JOIN FIN_PRODUCT TP ON epe.FINPROD_ID = TP.FINPROD_ID
         LEFT JOIN  FIN_PRODUCT  T2 ON T1.FINPROD_ID = T2.FINPROD_ID
         LEFT JOIN PTL_PORTFOLIO T3 ON T1.PORTFOLIO_ID = T3.PORTFOLIO_ID
         Left join MST_COUNTER_PARTY T4 ON T4.COUNTER_ID = T1.COUNTER_ID

@@ -572,7 +572,7 @@
         LEFT JOIN trd_fin_product_deal_total trd_fin_product_deal_total /** 金融产品临时交易1 **/
             on fin_trade_product.finprod_id = trd_fin_product_deal_total.finprod_id
             AND fin_trade_product.branch = trd_fin_product_deal_total.branch
-            AND trd_fin_product_deal_total.ps in ('T96', 'T95', 'T93', 'T56', 'T07', 'T54')
+            AND trd_fin_product_deal_total.ps in ('T96', 'T95', 'T94', 'T93', 'T56', 'T07', 'T54')
             AND trd_fin_product_deal_total.trade_status = '01'
             AND trd_fin_product_deal_total.is_cancel = 'N'
         LEFT JOIN PTL_PORTFOLIO_AUTHORITY /** 组合权限表 **/
@@ -657,41 +657,53 @@
                 etr_entrust.entrust_id                                                  AS entrustId,              /** 指令编号 **/
                 etr_entrust.entrust_status                                              AS entrustStatus,          /** 指令状态 **/
                 etr_entrust.FINPROD_ID                                                  AS initialNum,
-        CASE
-        WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
-        ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT * 100, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )
-        WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_NUM, 1 ), 4 ) ELSE ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )
-        END AS implementPercent,
-        CASE
-
-        WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
-        ROUND( nvl( etr_finish_status.ENT_FINISH_AMT * 100, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )
-        WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_NUM, 1 ), 4 ) ELSE ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )
-        END AS dealPercent,
-        CASE
-
-        WHEN etr_entrust.PS = 'T94' THEN
-        ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 ) * 100 ELSE ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
-        END finishAmt,
-        CASE
-        WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
-        ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) * 100, 4 )
-        WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
-        END AS avaNum,
-        CASE
-
-        WHEN etr_entrust.PS = 'T94' THEN
-        ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 ) * 100 ELSE ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
-        END finishDealAmt,
-        CASE
-        WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
-        ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) * 100, 4 )
-        WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-        ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
-        END AS avaDealAmt,
+                <!-- wsz 20220728 修改中途换券、到其续作进度查询 金额单时处理 -->
+                CASE
+                    when etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' then
+                        ROUND( decode(nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ),0,0, nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 )), 4 )
+                    WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
+                        ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT * 100, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )
+                    WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
+                        ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_NUM, 1 ), 4 )
+                    ELSE ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )
+                END AS implementPercent,
+                CASE
+                    when etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' then
+                        ROUND( decode(nvl( etr_finish_status.ENT_FINISH_AMT, 0 ),0,0,nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 )), 4 )
+                    WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
+                        ROUND( nvl( etr_finish_status.ENT_FINISH_AMT * 100, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )
+                    WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
+                        ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_NUM, 1 ), 4 )
+                    ELSE ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )
+                END AS dealPercent,
+                CASE
+                WHEN etr_entrust.PS = 'T94' THEN
+                        ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 ) * 100
+                    ELSE ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
+                END finishAmt,
+                CASE
+                    when etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' then
+                        ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
+                    WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
+                        ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) * 100, 4 )
+                    WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
+                        ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
+                    ELSE ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
+                END AS avaNum,
+                CASE
+                    WHEN etr_entrust.PS = 'T94' THEN
+                        ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 ) * 100
+                    ELSE ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
+                END finishDealAmt,
+                CASE
+                    when etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' then
+                        ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
+                    WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
+                        ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) * 100, 4 )
+                    WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
+                        ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
+                    ELSE ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
+                END AS avaDealAmt,
                 nvl(detail.PORTFOLIO_ID,PTL_PORTFOLIO.PORTFOLIO_ID)                     AS portfolioId,
                 nvl(detail.PORTFOLIO_NAME,PTL_PORTFOLIO.PORTFOLIO_NAME)                 AS portfolioName,
                 SCI.ACCT_NAME                                                           AS dealCurAcct,             /** 资金账户 **/
