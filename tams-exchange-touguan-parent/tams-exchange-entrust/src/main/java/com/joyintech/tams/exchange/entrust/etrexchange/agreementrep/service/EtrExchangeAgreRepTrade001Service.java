@@ -2670,6 +2670,10 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         finTradeProductKey.setFinprodId(dto.getTradeId());
         finTradeProductKey.setBranch(0L);
         FinTradeProduct firstFinTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
+        if(null == firstFinTradeProduct && StringUtil.isNotEmpty(dto.getInitialNum())){
+            finTradeProductKey.setFinprodId(dto.getInitialNum());
+            firstFinTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
+        }
         if (firstFinTradeProduct != null) {
             dto.setFirstFinTradeProduct(firstFinTradeProduct);
         }
