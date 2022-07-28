@@ -948,11 +948,13 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                     return null;
                 }
                 if(Objects.nonNull(creditLinesInputDto)) {//大于0时才需要差额预占
-                    if (loop) {
-                        if(creditLinesInputDto.getTradeAmt().compareTo(creditLinesInputDto1.getTradeAmt()) > 0) {
-                            creditLinesInputDto.setInputDtoList(Lists.newArrayList(creditLinesInputDto1));
-                        }else {
-                            return null;
+                    if(Objects.nonNull(finTradeProduct)) {
+                        if (loop) {
+                            if (creditLinesInputDto.getTradeAmt().compareTo(creditLinesInputDto1.getTradeAmt()) > 0 ) {
+                                creditLinesInputDto.setInputDtoList(Lists.newArrayList(creditLinesInputDto1));
+                            } else {
+                                return null;
+                            }
                         }
                     }
                    /* if(creditLinesInputDto.getTradeAmt().compareTo(creditLinesInputDto1.getTradeAmt()) > 0) {
