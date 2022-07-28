@@ -702,6 +702,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             } else if (DictCodeList.回购拆借方向_逆回购.getValue().equals(entity.getRepPs())) {
                 agreRepExpireUnBuyDto.setAssetType10("H04");
             }
+            agreRepExpireUnBuyDto.setBusiTypePosition(DictCodeListExt3.投管业务类型_到期续做.getValue());
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, agreRepExpireUnBuyDto);
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, agreRepExpireUnBuyDto);
             if (StringUtil.isNotEmpty(agreRepExpireUnBuyDto.getFinprodId())) {
@@ -815,7 +816,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                     outPledge.setEntrustId(entity.getEntrustId());
                     outPledge.setFinprodId(entity.getOutfinprodId());
                     // 质押面值
-                    // XYHGFXSJ-489:修改质押面值方法 modify by fuyongsheng 
+                    // XYHGFXSJ-489:修改质押面值方法 modify by fuyongsheng
                     outPledge.setPledgeFaceValue(trdCommonBaseService.getFaceValue(entity.getOutfinprodId(), iPlatformDate.getSysDate()));
                     //质押率
                     outPledge.setPledgeRatio(ArithmeticUtil.divide(entity.getConRatio(), new BigDecimal(100), 2));
@@ -1701,7 +1702,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 EtrComponentFactory.getComponentService(AgreRepExpireDto.class).entrustNew(agreRepExpireDto);
             } else if (DictCodeListExt3.上农商_指令业务类型_协议回购到期续做指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
                 agreRepExpireUnBuyDto.setEntrustStatus(etrSinglePortfolioDto.getEntrustStatus());
-
+                agreRepExpireUnBuyDto.setBusiTypePosition(DictCodeListExt3.投管业务类型_到期续做.getValue());
                 EtrComponentFactory.getComponentService(AgreRepExpireUnBuyDto.class).updateSettings(paraDto);
                 EtrComponentFactory.getComponentService(AgreRepExpireUnBuyDto.class).entrustNew(agreRepExpireUnBuyDto);
             } else if (DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
