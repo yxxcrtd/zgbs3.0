@@ -69,7 +69,8 @@ public class CommonPositionService {
 	@Autowired
 	private EtrEntrustAddMapper etrEntrustAddMapper;
 
-	private static EtrCommonCashPositionMapper etrCommonCashPositionMapper;
+	@Autowired
+	private EtrCommonCashPositionMapper etrCommonCashPositionMapper;
 
 	@Autowired
 	private BasePtlCashPositionInfoMapper basePtlCashPositionInfoMapper;
