@@ -2149,6 +2149,13 @@
         if (entity && (entity.ps == PS_T93 || entity.ps == PS_T94 || entity.ps == PS_T95 || entity.ps == PS_T96)) {
             $("#counterId").attr('disabled', true);
         }
+        //中途换券 换出债券、换出债券数量、换出金额、请求编号 不可编辑
+        if (entity && entity.ps == PS_T94) {
+            $("#outRepSecId").attr('disabled', true);
+            $("#outRepSecNum").attr('disabled', true);
+            $("#outAmt").attr('disabled', true);
+            $("#reqOnId").attr('disabled', true);
+        }
 
         if (entityStr) {
             var etrData = JSON.parse(entityStr);
