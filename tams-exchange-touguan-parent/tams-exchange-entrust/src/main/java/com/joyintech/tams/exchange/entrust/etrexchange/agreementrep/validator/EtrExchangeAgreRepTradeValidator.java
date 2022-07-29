@@ -80,7 +80,8 @@ public class EtrExchangeAgreRepTradeValidator implements EtrCommonValidator {
         }
 
 
-        if (StringUtil.equals(DictCodeListExt3.交易方向_首期.getValue(), dto.getPs())
+        if (StringUtil.equals(DictCodeListExt3.交易方向_正回购.getValue(), dto.getPs())
+                || StringUtil.equals(DictCodeListExt3.交易方向_逆回购.getValue(), dto.getPs())
                 || StringUtil.equals(DictCodeListExt3.交易方向_到期续做.getValue(), dto.getPs())) {
             Date sysDate = iPlatformDate.getSysDate();
             Map<String, Object> params = new HashMap<>();
