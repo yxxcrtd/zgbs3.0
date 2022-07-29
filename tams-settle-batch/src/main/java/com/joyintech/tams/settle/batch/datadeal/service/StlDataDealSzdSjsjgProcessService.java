@@ -266,6 +266,9 @@ public class StlDataDealSzdSjsjgProcessService {
 
             // 回购交易
             setRepoDeal(szdSjsjg, settleTransData, settleTransDataAdd);
+            if(StringUtil.isEmpty(settleTransData.getTradeId())){
+                return false;
+            }
             return true;
         }));
     }
@@ -1156,6 +1159,10 @@ public class StlDataDealSzdSjsjgProcessService {
                 if (BigDecimal.ZERO.compareTo(szdSjsjg.getJgjssl()) < 0) {
                     settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券协议逆回购_换券_换入.getValue());
                     settleTransData.setTradeType(DictCodeListExt3.质押券置换_置换方向_换入.getValue());
+                }
+                // 逆回购换钱不处理,这里将tradeId置空,在后面过滤掉tradeId为空的数据
+                if (BigDecimal.ZERO.compareTo(szdSjsjg.getJgjssl()) == 0) {
+                    settleTransData.setTradeId(null);
                 }
             }
         }
