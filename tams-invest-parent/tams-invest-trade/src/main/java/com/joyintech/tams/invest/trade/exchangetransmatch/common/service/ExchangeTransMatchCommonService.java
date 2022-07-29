@@ -65,6 +65,9 @@ import com.joyintech.tams.invest.trade.exchangetransmatch.position.service.Posit
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 
+import static com.joyintech.tams.constant.DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令;
+import static com.joyintech.tams.constant.DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令_换钱;
+
 /**
  * 场内成交管理共通service
  */
@@ -345,6 +348,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
             entrustMap.put("SEC_ACCT_ID", dto.getSecAcctId());
             commonEntrustDtoList = exchangeTransMatchCommonMapper.getFirstBondEtrEntrustByIdList(entrustMap);
         }else{
+            entrustMap.put("ENTRUST_TYPE_21", 上农商_指令业务类型_协议回购中途换券指令.getValue());
             commonEntrustDtoList = exchangeTransMatchCommonMapper.getEtrEntrustByIdList(entrustMap);
         }
         if(!StringUtil.isEmptyList(commonEntrustDtoList)) {
