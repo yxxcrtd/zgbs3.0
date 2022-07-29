@@ -369,9 +369,14 @@ public class CommonPositionService {
 	public boolean dealPositionForZTHQRLS(Map<String, Object> properties) {
 		String flowType = String.valueOf(properties.get("flowType"));
 		String processConfig = String.valueOf(properties.get("processConfig"));
+		// 置换方向
+		String tradeType = String.valueOf(properties.get("tradeType"));
 		List<FinPledgeDispDetailTemp> finPledgeDispDetailTempList = (List<FinPledgeDispDetailTemp>) properties.get("finPledgeDispDetailTempList");
 		if (StringUtil.equals(flowType, "02")) {//指令持仓
 			for (FinPledgeDispDetailTemp finPledgeDispDetailTemp : finPledgeDispDetailTempList) {
+				if(!StringUtil.equals(finPledgeDispDetailTemp.getTradeType(),tradeType)){
+					continue;
+				}
 				EtrSecPositionFlow etrSecPositionFlow = BeanUtil.mapToObject(properties, EtrSecPositionFlow.class);
 				etrSecPositionFlow.setInvAim(selectHoldInvAim(etrSecPositionFlow.getPortfolioId(), finPledgeDispDetailTemp.getFinprodId()));
 				etrSecPositionFlow.setFinprodId(finPledgeDispDetailTemp.getFinprodId());
@@ -387,6 +392,9 @@ public class CommonPositionService {
 			}
 		} else if (StringUtil.equals(flowType, "04")) {//交易持仓
 			for (FinPledgeDispDetailTemp finPledgeDispDetailTemp : finPledgeDispDetailTempList) {
+				if(!StringUtil.equals(finPledgeDispDetailTemp.getTradeType(),tradeType)){
+					continue;
+				}
 				PtlSecPositionFlow ptlSecPositionFlow = BeanUtil.mapToObject(properties, PtlSecPositionFlow.class);
 				ptlSecPositionFlow.setFinprodId(finPledgeDispDetailTemp.getFinprodId());
 				ptlSecPositionFlow.setInvAim(selectHoldInvAim(ptlSecPositionFlow.getPortfolioId(), finPledgeDispDetailTemp.getFinprodId()));
