@@ -701,7 +701,7 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
                     bean.setTradeId(dealEntity.getTradeId());
                     bean.setEtrId(trdProductDealAdd.getEntrustId());
                     bean.setFinprodId(finDealPledge.getPledgeFinprodId());
-                    bean.setSecAmount(ArithmeticUtil.multiply(finDealPledge.getPledgeAmt(), new BigDecimal(100)));
+                    bean.setSecAmount(ArithmeticUtil.multiply(finDealPledge.getPledgeNumber(), new BigDecimal(100)));
                     bean.setOwnSecAmount(ArithmeticUtil.multiply(finDealPledge.getPledgeNumber(), new BigDecimal(100)));
                     bean.setIntegrateSecAmount(BigDecimal.ZERO);
                     Map<String, Object> map = BeanUtil.object2Map(bean);

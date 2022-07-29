@@ -48,6 +48,8 @@ public interface BaseAssetCashPositionCommMapper {
 
     int deletePositionByTradeId(String tradeId);
 
+    int deletePositionByTradeIdNotPledge(String tradeId);
+
     int deleteEtrPositionByTradeId(String tradeId);
 
     void updateSecPositionAmt(PtlSecPositionFlow ptlSecPositionFlow);
@@ -65,6 +67,8 @@ public interface BaseAssetCashPositionCommMapper {
     void updateCashPositionAmt(PtlCashPositionFlow ptlCashPositionFlow);
 
     List<PtlSecPositionFlowDto> selectAllPositionByTotle(String tradeId);
+
+    List<PtlSecPositionFlowDto> selectAllPositionByIdAndType(@Param("tradeId") String tradeId, @Param("hodingType") String hodingType);
 
     List<PtlCashPositionFlowDto> selectAllCashPositionByTotle(String tradeId);
 
