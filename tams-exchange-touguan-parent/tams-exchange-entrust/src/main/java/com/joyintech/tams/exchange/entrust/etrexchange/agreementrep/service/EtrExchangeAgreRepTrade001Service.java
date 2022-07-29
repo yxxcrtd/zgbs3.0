@@ -2687,6 +2687,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         }
         //XYHGFXSJ-726 上交所逆回购解除质押指令提交报错
         if (firstFinTradeProduct != null) {
+            dto.setPledgeInvAim(commonPositionService.selectHoldInvAim(dto.getPortfolioId(), firstFinTradeProduct.getFinprodId()));
             dto.setFirstFinTradeProduct(firstFinTradeProduct);
         }
         if (StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_到期续做.getValue()) && DictCodeList.回购拆借方向_逆回购.getValue().equals(dto.getRepPs())) {
@@ -2714,6 +2715,8 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             || StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_到期购回.getValue())
                 || StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())) {
             postionFlowDto.setTradeId(entity.getEtrEntrust().getFinprodId());
+            //XYHGFXSJ-723
+            postionFlowDto.setIntiTradeId(entity.getEtrEntrust().getFinprodId());
         }
         // modify by etliu 20220727 end
 
