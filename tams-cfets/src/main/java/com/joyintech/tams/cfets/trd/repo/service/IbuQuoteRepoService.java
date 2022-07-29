@@ -1179,10 +1179,18 @@ public class IbuQuoteRepoService extends BaseService {
         CfetsRepoDealQuoteCommonDto cfetsRepoDealQuoteCommonDto = new CfetsRepoDealQuoteCommonDto();
         // 组合分配信息
         if (CollectionUtils.isEmpty(autoAllocationRequest.getPtlAllocations())) {
+            // 质押券数据
+            cfetsRepoDealQuoteCommonDto.setRepoEntrustPledgeDtos(autoAllocationRequest.getRepoEntrustPledgeDtos());
+            // 组合分配数据
+            cfetsRepoDealQuoteCommonDto.setPtlAllocations(autoAllocationRequest.getPtlAllocations());
             return cfetsRepoDealQuoteCommonDto;
         }
         // 质押债券信息
         if (CollectionUtils.isEmpty(autoAllocationRequest.getRepoEntrustPledgeDtos())) {
+            // 质押券数据
+            cfetsRepoDealQuoteCommonDto.setRepoEntrustPledgeDtos(autoAllocationRequest.getRepoEntrustPledgeDtos());
+            // 组合分配数据
+            cfetsRepoDealQuoteCommonDto.setPtlAllocations(autoAllocationRequest.getPtlAllocations());
             return cfetsRepoDealQuoteCommonDto;
         }
         // 质押券折算总额 按组合维度汇总
