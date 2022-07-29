@@ -668,6 +668,8 @@ public class StlDataDealSzdSjsjgProcessService {
                 settleTransData.setFpriceAmt(abs(szdSjsjg.getJgqsbj()));
                 // 期限品种
                 settleTransData.setTermType(getTermType(settleTransData.getVdate(),settleTransData.getMdate()));
+                // 首期成交编号
+                settleTransData.setfCjbh(szdSjsjg.getJgfjsm());
             } else if (StringUtil.equals(ywlb, StlDataDealProcessConstant.SJSJG_YWLB_XYDQ)
                     || StringUtil.equals(ywlb, StlDataDealProcessConstant.SJSJG_YWLB_XYTG)) {
                 // 交易方向
