@@ -574,23 +574,30 @@
             on fp.finprod_id = fin_deal_pledge.pledge_finprod_id
             20220729 wsz 修改多质押券-->
         left join
+            <!-- modify by etliu 20220729 start -->
+            <!--3.0.6协议回购+风险升级 XYHGFXSJ-745-->
+            <!--【协议回购指令】深交所正回购部分换券，存在多个质押券。日终结算后，在途回购列表显示了两条相同初始交易编号、不同质押券的数据，且状态为已购回-->
             (SELECT
-                fdp.pledge_finprod_id,
+                <!-- fdp.pledge_finprod_id, -->
                 fdp.finprod_id,
                 fdp.branch,
                 to_char( wm_concat ( nvl(fp.FINPROD_ABBR ,fp.FINPROD_NAME)  )) stockName,
                 to_char( wm_concat ( nvl(fp.FINPROD_MARKET_ID,fdp.pledge_finprod_id ) )) stockCode ,
-                nvl(fdp.Pledge_Ratio,0) Pledge_Ratio,
-                sum(nvl(fdp.Pledge_Number,0))Pledge_Number,
-                sum(nvl(fdp.Pledge_Face_Value,0)) Pledge_Face_Value
+                <!-- nvl(fdp.Pledge_Ratio,0) Pledge_Ratio, -->
+                NVL(max(fdp.Pledge_Ratio),0) Pledge_Ratio,
+                sum(nvl(fdp.Pledge_Number,0)) Pledge_Number,
+                <!--sum(nvl(fdp.Pledge_Face_Value,0)) Pledge_Face_Value-->
+                max(fdp.Pledge_Face_Value) Pledge_Face_Value
             FROM
                 fin_deal_pledge fdp
                 LEFT JOIN FIN_PRODUCT fp on fp.finprod_id = fdp.pledge_finprod_id
+                LEFT JOIN FIN_TRADE_PRODUCT ftp on fdp.FINPROD_ID = ftp.FINPROD_ID
             GROUP BY
-            fdp.pledge_finprod_id,
+            <!-- fdp.pledge_finprod_id,-->
             fdp.finprod_id,
-            fdp.branch,
-            Pledge_Ratio
+            fdp.branch
+            <!-- ,Pledge_Ratio-->
+        <!-- modify by etliu 20220729 end -->
         ) detail on fin_trade_product.finprod_id = detail.finprod_id
         AND fin_trade_product.branch = detail.branch
         LEFT JOIN settle_trans_data std
