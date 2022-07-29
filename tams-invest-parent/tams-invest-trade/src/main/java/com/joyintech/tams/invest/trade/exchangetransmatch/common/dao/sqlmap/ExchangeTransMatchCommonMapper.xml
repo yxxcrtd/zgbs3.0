@@ -65,8 +65,9 @@
             LEFT JOIN ETR_PLEDGE T3<!--换券-->
                 ON T3.ENTRUST_ID = T1.ENTRUST_ID
                 AND T3.DISPLACE_DIR = #{DISPLACE_DIRECTION_01}
+                AND T1.PS =#{PS_T94}
             LEFT JOIN ETR_PLEDGE T4<!--解除质押-->
-                ON T4.ENTRUST_ID = T1.ENTRUST_ID
+                ON T4.ENTRUST_ID = T1.ENTRUST_ID AND T1.PS =#{PS_T93}
             <where>
                 <if test="entrustIdList!=null and entrustIdList.size()>0 ">
                     AND (T1.ENTRUST_ID IN
