@@ -608,6 +608,12 @@ public class PositionRequestManualSettleService {
         map.put("fTradeId", entity.getvTradeId());
         // ZGTFCP-1988:修改查询换入换出质押券方法 modify by fuyongsheng 20220328 end
         List<FinPledgeDispDetailTemp> finPledgeDispDetailTemps = trdCommonBaseService.getFinPledgeDispDetailTemps(map);
+        //XYHGFXSJ-605
+        if(StringUtil.isEmptyList(finPledgeDispDetailTemps) && StringUtil.isNotEmpty(entity.getFinprodId())){
+            map.put("fTradeId", entity.getFinprodId());
+            finPledgeDispDetailTemps = trdCommonBaseService.getFinPledgeDispDetailTemps(map);
+        }
+        //XYHGFXSJ-605
         if(!StringUtil.isEmptyList(finPledgeDispDetailTemps)){
             for(FinPledgeDispDetailTemp finPledgeDispDetailTemp : finPledgeDispDetailTemps){
                 if(tradeType.equals(finPledgeDispDetailTemp.getTradeType())){
