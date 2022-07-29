@@ -1093,7 +1093,8 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
         //if(true) throw new Exception("指标状态_不通过");
         //参数硬控，不通过，返回
         if(StringUtil.equals("02", CacheUtil.getSysParam(BussinessConstant.IS_RISKMATH_SOFTCONTROL))){
-            if(!BussinessDictCodeListRds.指标状态_通过.getValue().equals(cliendata.getBody().get("rskStatus")) && isNeedRiskCheck){
+            if(!BussinessDictCodeListRds.指标状态_通过.getValue().equals(cliendata.getBody().get("rskStatus"))
+                    && !BussinessDictCodeListRds.指标状态_审批.getValue().equals(cliendata.getBody().get("rskStatus")) && isNeedRiskCheck){
                 szcliendata.setHead(cliendata.getHead());
                 szcliendata.setBody(cliendata.getBody());
                 throw new Exception("指标状态_不通过");
