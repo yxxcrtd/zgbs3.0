@@ -2743,11 +2743,12 @@
         when eted.BUSI_TYPE_POSITION in ('EX019') THEN round(ete.entrust_num/100,4)
         else ete.entrust_num end entrustNum,
         case
-        when #{busiTypePosition} = 'EX018' then round(nvl(ete.ENTRUST_AMT,0)/10000,3)
-        /*when eted.ASSET_TYPE = 'F01' then decode(eted.BUSI_TYPE_POSITION,'EX017',ete.ENTRUST_AMT,NVL( ete.ENTRUST_NUM * eted.FULL_PRICE, 0 ))*/
-        when eted.ASSET_TYPE = 'F01' then NVL( ete.ENTRUST_AMT, 0 )
-        when eted.ASSET_TYPE = 'F10' then NVL( ete.ENTRUST_NUM * 100, 0 )
-        else NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
+            when #{busiTypePosition} = 'EX018' then round(nvl(ete.ENTRUST_AMT,0)/10000,3)
+            when ete.ps = 'T93' and ete.TRADE_MARKET = '03' then 0 <!--上海解除质押时结算金额置为0-->
+            /*when eted.ASSET_TYPE = 'F01' then decode(eted.BUSI_TYPE_POSITION,'EX017',ete.ENTRUST_AMT,NVL( ete.ENTRUST_NUM * eted.FULL_PRICE, 0 ))*/
+            when eted.ASSET_TYPE = 'F01' then NVL( ete.ENTRUST_AMT, 0 )
+            when eted.ASSET_TYPE = 'F10' then NVL( ete.ENTRUST_NUM * 100, 0 )
+            else NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
         end as entrustAmt,
         eted.deal_mode dealMode,
         eted.term_type termType,
