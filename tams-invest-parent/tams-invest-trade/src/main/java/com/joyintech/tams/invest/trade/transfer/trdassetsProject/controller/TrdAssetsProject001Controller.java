@@ -11,14 +11,20 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
+import com.joyintech.tams.component.business.riskrds.dto.InterfRiskRdsDto;
+import com.joyintech.tams.component.business.riskrds.service.InterfRiskRdsService;
 import com.joyintech.tams.component.business.trade.dto.BussTrdAvailableCashQuery;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
+import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
+import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
 import com.joyintech.tams.invest.trade.bond.service.TrdBondInvestTrade002Service;
+import com.joyintech.tams.invest.trade.common.aop.TradeRdsCommonAop;
 import com.joyintech.tams.invest.trade.transfer.assign.dto.TrdAssetAssignDto;
 import com.joyintech.tams.invest.trade.transfer.assign.service.TrdAssetAssignService;
 import com.joyintech.tams.invest.trade.transfer.trdassetsProject.dto.TrdAssetsProject001Dto;
@@ -46,6 +52,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 //import com.joyintech.framework.grid.Page;
 /*import com.joyintech.tams.invest.period.trdprojduration.dto.TrdProjectDurationProcessDto;
@@ -78,7 +85,7 @@ public class TrdAssetsProject001Controller extends BaseController {
      */
     /*@Autowired
     private TrdProjectDuration001Service trdProjectDuration001Service;*/
-    
+
     @Autowired
     private TrdAssetAssignService trdAssetAssignService;
 
@@ -347,7 +354,7 @@ public class TrdAssetsProject001Controller extends BaseController {
      */
     @RequestMapping("save")
     @ResponseBody
-    public AjaxResult save(@RequestBody TrdAssetsProject001Dto dto) throws WorkFlowException {
+    public AjaxResult save(@RequestBody TrdAssetsProject001Dto dto) throws Exception {
         ProcessParameter<TrdAssetsProject001Dto> processParameter = new ProcessParameter<>();
         WorkFlowParameter<TrdAssetsProject001Dto> params = new WorkFlowParameter<>();
         params.setPageId(this.getPageId());
@@ -388,6 +395,26 @@ public class TrdAssetsProject001Controller extends BaseController {
         else {
             dto.setZcId(IDGenerator.generate());
         }
+
+        // ----------add by 裴家俊 20220729 批量实占功能 start----------
+        if (StringUtil.equals(BussinessConstant.SUBMIT, dto.getOperateType())) {
+            List<TrdAssetsProject001Dto> project001DtoList=dto.getProjectListInfoList().stream().map(item->{
+                TrdAssetsProject001Dto trdAssetsProject001Risk=new TrdAssetsProject001Dto();
+                BeanUtil.copyPropertiesIgnoreNull(trdAssetsProject001Risk,item);
+                trdAssetsProject001Risk.setPortfolioId(item.getInvTransPortf());
+                trdAssetsProject001Risk.setCounterId(item.getPortfolioId());
+                trdAssetsProject001Risk.setPs(DictCodeList.交易方向_卖出.getValue());
+                trdAssetsProject001Risk.setTradeAmt(StringUtil.isNotEmpty(item.getSplitTradeAmt())?item.getSplitTradeAmt():item.getPrinAmt());
+                return trdAssetsProject001Risk;
+            }).collect(Collectors.toList());
+            AjaxResult ar = TradeRdsCommonAop.doListOccupy(project001DtoList,
+                    DictCodeList.平安资产类型_项目类资产.getValue(), true, null);
+            if (StringUtil.isNotEmpty(ar)) {
+                return ar;
+            }
+        }
+        // ----------add by 裴家俊 20220729 批量实占功能 end----------
+
         params.setBusinessCode(dto.getZcId());
         // 设置流程业务说明, entity即传入的dto
         params.setComment(entity -> WorkFlowUtil.concatComment("交易编号：" + dto.getZcId(), "资产名称：" + dto.getFinprodName(),
