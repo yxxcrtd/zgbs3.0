@@ -15,7 +15,6 @@ import com.joyintech.background.component.uplink.interbank.business.dto.*;
 import com.joyintech.background.component.uplink.interbank.business.repodlgservice.RepoDialogueQuoteSubService;
 import com.joyintech.background.component.uplink.interbank.business.routeconfigservice.RouteConfigSubService;
 import com.joyintech.background.component.uplink.interbank.business.routeintfservice.RouteIntfSubService;
-import com.joyintech.background.component.uplink.interbank.business.service.IbuMainService;
 import com.joyintech.background.component.uplink.interbank.database.dao.IbuQuoteMapper;
 import com.joyintech.background.component.uplink.interbank.database.entity.IbuIntfScheme;
 import com.joyintech.framework.ajax.AjaxResult;
@@ -44,7 +43,6 @@ import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.business.common.util.ThreadLocalUtil;
-import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtribRepoInfo003Dto;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
 import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepo003Mapper;
@@ -67,19 +65,22 @@ import com.joyintech.tams.invest.bankuplink.repo.dto.CfetsRepoDealQuotedPrice001
 import com.joyintech.tams.invest.bankuplink.repo.dto.CfetsRepoDealQuotedPrice003Dto;
 import com.joyintech.tams.invest.bankuplink.repo.service.CfetsRepoDealQuotedPrice003Service;
 import com.joyintech.tams.invest.common.component.base.entrust.BaseEtrInvestInfoService;
-import com.joyintech.tams.invest.common.component.base.group.BasePtlCashPositionInfoService;
 import com.joyintech.tams.invest.common.component.base.group.BasePtlSecPositionInfoService;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.cstp.service.CstpCommonService;
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.common.BussRepoSecDto;
 import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
 import com.joyintech.tams.invest.common.dto.common.PtlAllocationDto;
 import com.joyintech.tams.invest.common.dto.cstp.CfetsRepoDealQuotedPriceDto;
 import com.joyintech.tams.invest.common.dto.cstp.CfetsRepoPledgeBondDto;
 import com.joyintech.tams.invest.common.dto.cstp.IbuQuoteEntCrepPledgeCommonDto;
+import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
+import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.trade.entrust.EtrFinishStatusDto;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
@@ -101,7 +102,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -162,6 +162,12 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
 
     @Autowired
     BaseAssetCashPositionCommMapper baseAssetCashPositionCommMapper;
+
+    /**
+     * 组合可用持仓和实际持仓查询更新
+     */
+    @Autowired(required = false)
+    private BasePtlSecPositionInfoService basePtlSecPositionInfoService;
 
     @Autowired
     private CfetsRepoDealQuotedPrice001Mapper cfetsRepoDealQuotedPrice001Mapper;
@@ -1172,26 +1178,89 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
      */
     @Override
     public void doBack(CfetsRepoDealQuotedPrice001Dto entity) {
-        if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
-            //回退释放头寸
-            Map<String, Object> param = new HashMap<>();
-            param.put("workflowId", entity.getWorkflowId());
-            param.put("pageWflType", "REPO");
-            cfetsBondDealQuotedPriceService.doDeletePtlPositionHold(param);
-            //退回操作重新占用该条报价单之前的
-            if (StringUtil.isNotEmpty(entity.getQuoteId())
-                    && this.isUpdatePosition(entity)) {
-                CfetsRepoDealQuotedPrice001Dto cfetsRepoDealQuotedPrice001Dto = new CfetsRepoDealQuotedPrice001Dto();
-                cfetsRepoDealQuotedPrice001Dto.setQuoteId(entity.getQuoteId());
-                cfetsRepoDealQuotedPrice001Dto.setIsDzh(DictCodeList.是否_是.getValue());
-                cfetsRepoDealQuotedPrice001Dto.setIsKtg(DictCodeList.是否_否.getValue());
-                com.joyintech.service.bankuplink.repo.dto.CfetsRepoDealQuotedPrice001Dto dto
-                        = this.investDto2ServiceDto(cfetsRepoDealQuotedPrice001Dto);
-                dto.setIsExistNew(DictCodeList.是否_是.getValue());
-                oldCfetsRepoDealQuotedPrice001Service.doInsetOrUpdateForPtlPositionHold(dto);
-            }
+        if (!StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
+            return;
+        }
+        //回退释放头寸
+        Map<String, Object> param = new HashMap<>();
+        param.put("workflowId", entity.getWorkflowId());
+        param.put("pageWflType", "REPO");
+        param.put("ps", entity.getPs());
+        boolean flag = this.doBackPtlPositionHold(param);
+        if (!flag && StringUtil.isNotEmpty(entity.getWorkflowId())) {
+            logger.error("流程中数据删除头寸失败!");
+        }
+        //退回操作重新占用该条报价单之前的
+        if (StringUtil.isNotEmpty(entity.getQuoteId())
+                && this.isUpdatePosition(entity)) {
+            CfetsRepoDealQuotedPrice001Dto cfetsRepoDealQuotedPrice001Dto = new CfetsRepoDealQuotedPrice001Dto();
+            cfetsRepoDealQuotedPrice001Dto.setQuoteId(entity.getQuoteId());
+            cfetsRepoDealQuotedPrice001Dto.setIsDzh(DictCodeList.是否_是.getValue());
+            cfetsRepoDealQuotedPrice001Dto.setIsKtg(DictCodeList.是否_否.getValue());
+            com.joyintech.service.bankuplink.repo.dto.CfetsRepoDealQuotedPrice001Dto dto
+                    = this.investDto2ServiceDto(cfetsRepoDealQuotedPrice001Dto);
+            dto.setIsExistNew(DictCodeList.是否_是.getValue());
+            oldCfetsRepoDealQuotedPrice001Service.doInsetOrUpdateForPtlPositionHold(dto);
         }
     }
+
+    public boolean doBackPtlPositionHold(Map<String, Object> param) {
+        String workflowId = (String) param.get("workflowId");
+        String pageWflType = (String) param.get("pageWflType");
+        String ps = (String) param.get("ps");
+        if (StringUtil.isEmpty(workflowId) || StringUtil.isEmpty(pageWflType)) {
+            return false;
+        }
+        String quoteId = ibuComponentCommonService.selectWflQuoteIdByWorkflowId(pageWflType, workflowId);
+        if (StringUtil.isEmpty(quoteId)) {
+            return false;
+        }
+        // 指令持仓流水
+        List<EtrSecPositionFlowDto> etrSecPositionFlows = new ArrayList<>();
+        // 指令现金流水
+        List<EtrCashPositionFlowDto> etrCashPositionFlowDtos = new ArrayList<>();
+        if (DictCodeListExt3.交易方向_逆回购.getValue().equals(ps)) {
+            baseAssetCashPositionCommMapper.deleteCashPositionByOrderIds(Collections.singletonList(quoteId));
+            baseAssetCashPositionCommMapper.deletePositionByTradeIdNotPledge(quoteId);
+            return true;
+        }
+        logger.info("正回购处理质押券持仓");
+        // 查询正常流水,生成冲销流水,为了余额更新正确
+        List<EtrSecPositionFlowDto> etrSecPositionFlowDtos =
+                baseAssetCashPositionCommMapper.selectAllEtrPositionByOffsetFlag(quoteId, DictCodeList.冲正标识_正常交易.getValue());
+        for (EtrSecPositionFlowDto flowDto : etrSecPositionFlowDtos) {
+            EtrSecPositionFlowDto temp = new EtrSecPositionFlowDto();
+            BeanUtil.copyPropertiesIgnoreNull(temp, flowDto);
+            temp.setSeqno(IDGenerator.generate());
+            temp.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
+            temp.setOffsetId(flowDto.getTradeId());
+            etrSecPositionFlows.add(temp);
+        }
+        logger.info("指令持仓:{}", JsonUtils.object2Json(etrSecPositionFlows));
+
+        EtrPositionHoldDto etrPositionHoldDto = new EtrPositionHoldDto();
+        etrPositionHoldDto.setPtlSecPositionFlows(etrSecPositionFlows);
+        etrPositionHoldDto.setPtlCashPositionFlows(etrCashPositionFlowDtos);
+        // 插入新流水,并更新余额
+        EtrCommonCashPositionDealService.持久化流水Dto(etrPositionHoldDto);
+        // 持仓流水
+        List<PtlSecPositionFlowDto> ptlSecPositionFlows =
+                baseAssetCashPositionCommMapper.selectAllPositionByIdAndType(quoteId, DictCodeList.持仓类型_质押.getValue());
+        logger.info("交易持仓:{}", JsonUtils.object2Json(ptlSecPositionFlows));
+        for (PtlSecPositionFlowDto ptlSecPositionFlow : ptlSecPositionFlows) {
+            PtlSecPositionFlowDto flowDto = new PtlSecPositionFlowDto();
+            BeanUtil.copyPropertiesIgnoreNull(flowDto, ptlSecPositionFlow);
+            flowDto.setSeqno(IDGenerator.generate());
+            flowDto.setAmount(flowDto.getAmount().negate());
+            flowDto.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
+            flowDto.setOffsetId(ptlSecPositionFlow.getTradeId());
+            basePtlSecPositionInfoService.inertSecPositionFlow(flowDto);
+        }
+        baseAssetCashPositionCommMapper.deleteCashPositionByOrderIds(Collections.singletonList(quoteId));
+        baseAssetCashPositionCommMapper.deletePositionByTradeIdNotPledge(quoteId);
+        return true;
+    }
+
 
     /**
      * 处理系统动作

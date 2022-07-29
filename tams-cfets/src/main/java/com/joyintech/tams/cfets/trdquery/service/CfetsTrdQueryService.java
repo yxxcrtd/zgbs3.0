@@ -668,7 +668,6 @@ public class CfetsTrdQueryService extends BaseService {
             infoTableP = cfgDataTableMapper.getByPageCode(pageCode, dtCodeTemp, spcdCodeTemp, EFFERANGE_NO, USER_ID);
         } else {
             infoTableP = cfgDataTableMapper.getByPageCode(pageCode, dtCodeTemp, spcdCodeTemp, EFFERANGE_IS, userId);
-            ;
         }
         //质押券表格
         dtCodeTemp = "CfetsTrdQueryIbuPledgeInfo";
@@ -679,7 +678,6 @@ public class CfetsTrdQueryService extends BaseService {
             infoTablePledge = cfgDataTableMapper.getByPageCode(pageCode, dtCodeTemp, spcdCodeTemp, EFFERANGE_NO, USER_ID);
         } else {
             infoTablePledge = cfgDataTableMapper.getByPageCode(pageCode, dtCodeTemp, spcdCodeTemp, EFFERANGE_IS, userId);
-            ;
         }
         resultData.put(dtCode + "_formt", infoFormt);
         resultData.put(dtCode + "_formb", infoFormb);
@@ -687,7 +685,6 @@ public class CfetsTrdQueryService extends BaseService {
         resultData.put(dtCode + "_formp", infoFormp);
         resultData.put(dtCode + "_formo", infoFormo);
         resultData.put(dtCode + "_tablep", infoTableP);
-        resultData.put(dtCode + "_tablepledge", infoTablePledge);
 
         Map<String, Object> pageParam = new HashMap<>();
         pageParam.put("quoteId", dto.getQuoteId());
@@ -710,13 +707,13 @@ public class CfetsTrdQueryService extends BaseService {
         CfetsTrdQueryIbuInfoListResponse dataform = new CfetsTrdQueryIbuInfoListResponse();
         pageParam.put("effectiveStatus", dto.getEffectiveStatus() == null ? dto.getEffectFlag() : dto.getEffectiveStatus());
         // 指令查询页面和报价页面使用参数字典不同
-        if("有效".equals(dto.getEffectiveStatusStr())){
+        if ("有效".equals(dto.getEffectiveStatusStr())) {
             pageParam.put("effectiveStatus", DictCodeListExt1.交易流程状态_有效.getValue());
         }
-        if("流程中".equals(dto.getEffectiveStatusStr())){
+        if ("流程中".equals(dto.getEffectiveStatusStr())) {
             pageParam.put("effectiveStatus", DictCodeListExt1.交易流程状态_流程中.getValue());
         }
-        if("撤销".equals(dto.getEffectiveStatusStr())){
+        if ("撤销".equals(dto.getEffectiveStatusStr())) {
             pageParam.put("effectiveStatus", DictCodeListExt1.交易流程状态_撤销.getValue());
         }
         //有效状态
@@ -749,6 +746,27 @@ public class CfetsTrdQueryService extends BaseService {
 
         resultData.put(dtCode + "_dataform", dataform);
         resultData.put(dtCode + "_datatablep", portIntFenPeiInfoDtoList);
+        if (StringUtil.isNotEmpty(dataform) && CollectionUtils.isNotEmpty(infoTablePledge)
+                && StringUtil.equals(dataform.getPs(), DictCodeList.回购拆借方向_逆回购.getValue())) {
+            List<CfgDataTableShow> tempList = new ArrayList<>();
+            for (CfgDataTableShow show : infoTablePledge) {
+                if (!StringUtil.equals(show.getColCode(), "portfolioName")
+                        && !StringUtil.equals(show.getColCode(), "portfolioId")) {
+                    tempList.add(show);
+                }
+            }
+            infoTablePledge = tempList;
+            Map<String,CfetsPledgeInfoResponse> responseMap = new HashMap<>();
+            for (CfetsPledgeInfoResponse pledgeInfoResponse : pledgeInfoDtoList) {
+                CfetsPledgeInfoResponse temp = responseMap.get(pledgeInfoResponse.getFinprodId());
+                if (StringUtil.isNotEmpty(temp)) {
+                    pledgeInfoResponse.setPledgePrin(ArithmeticUtil.doAdd(pledgeInfoResponse.getPledgePrin(), temp.getPledgePrin()));
+                }
+                responseMap.put(pledgeInfoResponse.getFinprodId(), pledgeInfoResponse);
+            }
+            pledgeInfoDtoList = new ArrayList(responseMap.values());
+        }
+        resultData.put(dtCode + "_tablepledge", infoTablePledge);
         resultData.put(dtCode + "_datatablepledge", pledgeInfoDtoList);
 
         return resultData;

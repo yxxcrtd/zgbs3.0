@@ -116,7 +116,7 @@
         END AS etrPrice,
         CASE
         WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04'
-        THEN ROUND(decode(nvl(T9.ORDER_FINISH_AMT, 0) , 0, 0,nvl(T9.ORDER_FINISH_AMT, 0) / nvl(decode(ETR_ENTRUST.ENTRUST_AMT, 0, 1,ETR_ENTRUST.ENTRUST_AMT), 1)), 4)
+        THEN ROUND(decode(nvl(T9.ORDER_FINISH_AMT, 0) , 0, 0,nvl(T9.ORDER_FINISH_AMT, 0) / nvl(decode(ETR_ENTRUST.ENTRUST_AMT, 0, 1,ETR_ENTRUST.ENTRUST_AMT), 1)), 4)* 100
         WHEN ETR_ENTRUST.TRADE_MARKET = '03' OR ETR_ENTRUST.TRADE_MARKET = '04' THEN
         (
             CASE
@@ -145,7 +145,7 @@
         END AS exeProgress,
         CASE
         WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04'
-        THEN ROUND(decode(nvl(T9.ENT_FINISH_AMT, 0),0,0,nvl(T9.ENT_FINISH_AMT, 0) / nvl(decode(ETR_ENTRUST.ENTRUST_AMT, 0, 1,ETR_ENTRUST.ENTRUST_AMT), 1)), 4)
+        THEN ROUND(decode(nvl(T9.ENT_FINISH_AMT, 0),0,0,nvl(T9.ENT_FINISH_AMT, 0) / nvl(decode(ETR_ENTRUST.ENTRUST_AMT, 0, 1,ETR_ENTRUST.ENTRUST_AMT), 1)), 4)* 100
         WHEN ETR_ENTRUST.TRADE_MARKET = '03' OR ETR_ENTRUST.TRADE_MARKET = '04' THEN
         (
             CASE
@@ -519,9 +519,9 @@
                 </foreach>
 
             </if>
+            <!-- 关键字模糊查询 -->
+            <include refid="vagueQueryWhere"/>
         </where>
-        <!-- 关键字模糊查询 -->
-        <include refid="vagueQueryWhere"/>
         <choose>
             <when test="sort != null and sort != '' and direction != null and direction != ''">
                 order by t.${sort} ${direction})
@@ -534,8 +534,7 @@
 
     <sql id="vagueQueryWhere">
         <if test="search != null and search != '' and search !='有效' ">
-            <where>
-                    (sdl.ITEM_VALUE like '%' || #{search} || '%'
+              and  (sdl.ITEM_VALUE like '%' || #{search} || '%'
                     OR sdl1.ITEM_VALUE like '%' || #{search} || '%'
                     OR sdl2.ITEM_VALUE like '%' || #{search} || '%'
                     OR sdl3.ITEM_VALUE like '%' || #{search} || '%'
@@ -569,7 +568,6 @@
                     OR t.transmitTime = #{search}
                     OR t.transmitTimeSer = #{search}
                     )
-            </where>
         </if>
     </sql>
 
@@ -2743,11 +2741,12 @@
         when eted.BUSI_TYPE_POSITION in ('EX019') THEN round(ete.entrust_num/100,4)
         else ete.entrust_num end entrustNum,
         case
-        when #{busiTypePosition} = 'EX018' then round(nvl(ete.ENTRUST_AMT,0)/10000,3)
-        /*when eted.ASSET_TYPE = 'F01' then decode(eted.BUSI_TYPE_POSITION,'EX017',ete.ENTRUST_AMT,NVL( ete.ENTRUST_NUM * eted.FULL_PRICE, 0 ))*/
-        when eted.ASSET_TYPE = 'F01' then NVL( ete.ENTRUST_AMT, 0 )
-        when eted.ASSET_TYPE = 'F10' then NVL( ete.ENTRUST_NUM * 100, 0 )
-        else NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
+            when #{busiTypePosition} = 'EX018' then round(nvl(ete.ENTRUST_AMT,0)/10000,3)
+            when ete.ps = 'T93' and ete.TRADE_MARKET = '03' then 0 <!--上海解除质押时结算金额置为0-->
+            /*when eted.ASSET_TYPE = 'F01' then decode(eted.BUSI_TYPE_POSITION,'EX017',ete.ENTRUST_AMT,NVL( ete.ENTRUST_NUM * eted.FULL_PRICE, 0 ))*/
+            when eted.ASSET_TYPE = 'F01' then NVL( ete.ENTRUST_AMT, 0 )
+            when eted.ASSET_TYPE = 'F10' then NVL( ete.ENTRUST_NUM * 100, 0 )
+            else NVL( ete.ENTRUST_AMT, ete.ENTRUST_NUM )
         end as entrustAmt,
         eted.deal_mode dealMode,
         eted.term_type termType,

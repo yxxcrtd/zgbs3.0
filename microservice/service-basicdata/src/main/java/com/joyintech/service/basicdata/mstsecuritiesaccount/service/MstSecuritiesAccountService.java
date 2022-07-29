@@ -402,7 +402,7 @@ public class MstSecuritiesAccountService extends BaseService<MstSecuritiesAccoun
 //            map.put("tradePlat", DictCodeList.交易平台_竞价撮合平台.getValue());
 //            map.remove("SHARES_TRADE_PLATFORM_02");
 //        }
-        if(!Objects.isNull(map.get("searchList"))){
+        if(!Objects.isNull(map.get("searchList"))&&StringUtils.isNotEmpty(map.get("searchList").toString())){
             List<String> list = Arrays.asList(map.get("searchList").toString().split(","));
             map.put("finprodMarketIdList",list );
         }

@@ -1133,10 +1133,12 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                     t07.put("eventId",eventId.replace(ps,"T07"));
                     t07.put("tradeId",orderId);
                     t07.put("ps","T07");
+                    t07.put("revokeFlg","Y");
                     Map<String,Object> t01 = new HashMap<>(tmp);
                     t01.put("eventId",eventId.replace(ps,"T01"));
                     t01.put("tradeId",orderId);
                     t01.put("ps","T01");
+                    t01.put("revokeFlg","Y");
                     newListMap.add(t07);
                     newListMap.add(t01);
                     CreditLinesInputDto inputDto = new CreditLinesInputDto();
@@ -1145,6 +1147,7 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                     inputDto.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
                     list.add(inputDto);
                 }else {
+                    tmp.put("revokeFlg","Y");
                     newListMap.add(tmp);
                     CreditLinesInputDto inputDto = new CreditLinesInputDto();
                     inputDto.setTradeDate(DateUtil.parse(String.valueOf(tmp.get("eventDate"))));

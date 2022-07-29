@@ -2145,13 +2145,24 @@
         } else {
             $("#yield").attr("data-textrange", 2);
         }
+        //上交所 解除质押 隐藏结算金额
+        if (entity && entity.ps == PS_T93 && TRADE_MARKET_CURRENT == TRADE_MARKET_03) {
+            $("#entrustAmt_div").hide();
+            // $("#entrustAmt_div").css('display', 'none');
+        }
+        var repPs = $("#repPs").val();
+        if (repPs == BACK_LEND_DIRECTION_04 && entity) {
+            if (entity.ps == PS_T93 || entity.ps == PS_T94 || entity.ps == PS_T95 || entity.ps == PS_T96 || entity.ps == PS_T56) {
+                //本方交易员 隐藏
+                $("#trader_div").hide();
+            }
+        }
 
         console.log("--------pageModel-------------")
         console.log(pageModel)
         console.log(PAGE_MODEL_EDIT)
-        if (pageModel == PAGE_MODEL_EDIT) {
-            var repPs = $("#repPs").val();
-            if (entity && entity.yield && entity.ps != PS_T93 && entity.ps != PS_T94
+        if (pageModel == PAGE_MODEL_EDIT && entity) {
+            if (entity.yield && entity.ps != PS_T93 && entity.ps != PS_T94
                 && (repPs == BACK_LEND_DIRECTION_03 || repPs == BACK_LEND_DIRECTION_04)) {
                 if (TRADE_MARKET_CURRENT == TRADE_MARKET_03) {
                     $("#yield").attr("data-textrange", 3);
@@ -2162,16 +2173,23 @@
                 }
             }
 
-            //上交所 解除质押 隐藏结算金额
-            if (entity && entity.ps == PS_T93 && TRADE_MARKET_CURRENT == TRADE_MARKET_03) {
-                $("#entrustAmt_div").hide();
+            if (repPs == BACK_LEND_DIRECTION_04) {
+                if (entity.ps == PS_T93 || entity.ps == PS_T94 || entity.ps == PS_T95 || entity.ps == PS_T96 || entity.ps == PS_T56) {
+                    //补充协议 不可编辑
+                    $("#addCla").attr('disabled', true);
+                }
+                if (entity.ps == PS_T93) {
+                    //结算金额 不可编辑
+                    $("#entrustAmt").attr('disabled', true);
+                }
             }
+
             //解除质押、到期购回、提前购回、中途换券 交易对手不可编辑
-            if (entity && (entity.ps == PS_T93 || entity.ps == PS_T94 || entity.ps == PS_T95 || entity.ps == PS_T96)) {
+            if (entity.ps == PS_T93 || entity.ps == PS_T94 || entity.ps == PS_T95 || entity.ps == PS_T96) {
                 $("#counterId").attr('disabled', true);
             }
             //中途换券 换出债券、换出债券数量、换出金额、请求编号 不可编辑
-            if (entity && entity.ps == PS_T94) {
+            if (entity.ps == PS_T94) {
                 $("#outRepSecId").attr('disabled', true);
                 $("#outRepSecNum").attr('disabled', true);
                 $("#outAmt").attr('disabled', true);

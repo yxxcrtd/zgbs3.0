@@ -1,6 +1,7 @@
 package com.joyintech.tams.invest.trade.exchangetransmatch.common.service.repo;
 
 import com.joyintech.framework.util.*;
+import com.joyintech.tams.common.base.dao.SettleTransDataMapper;
 import com.joyintech.tams.common.base.dao.TrdProductDealAddMapper;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
@@ -41,6 +42,9 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
     @Autowired
     private TrdProductDealAddMapper trdProductDealAddMapper;
 
+    @Autowired
+    private SettleTransDataMapper settleTransDataMapper;
+
     /**
      * 生成金融产品交易信息实体
      * @param dealDto
@@ -57,8 +61,11 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
         // 首期成交交易信息---处理汇总表的金融产品代码，如果是存在首期则用首期的金融产品代码，如果不存在则使用买入那笔的交易编号
 //        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(),dealDto.getMpayDate(),DictCodeList.交易方向_买入.getValue()
 //                ,entrustDto.getPortfolioId());
-        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(), dealDto.getMpayDate(), dealDto.getSeatNumber(),
+        // XYHGFXSJ-710:修改到期续做查询首期成交编号 modify by fuyongsheng 20220729 start
+        SettleTransData dqxzSettleTransData = settleTransDataMapper.selectByPrimaryKey(dealDto.getfCjbh());
+        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dqxzSettleTransData.getfCjbh(), dealDto.getMpayDate(), dealDto.getSeatNumber(),
                 dealDto.getSecAcctId());
+        // XYHGFXSJ-710:修改到期续做查询首期成交编号 modify by fuyongsheng 20220729 end
         TrdProductDealAdd  firstRepoTradeAdd = trdProductDealAddMapper.selectByPrimaryKey(firstRepoTrade.getTradeId());
 
         List<SettleTransData> settleTransDataList = this.handleSettleTransData(dealDto,entrustDto);
@@ -266,12 +273,20 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
         // 交易场所
         dealTotal.setTradeMarket(dealDto.getTradeMarket());
 
-        if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
-            dealTotal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
+        // 交易对手
+        if(!StringUtil.isEmpty(dealDto.getCounterId())){
+            dealTotal.setCounterId(dealDto.getCounterId());
+        }else if(!StringUtil.isEmpty(entrustDto.getCounterId())){
+            dealTotal.setCounterId(entrustDto.getCounterId());
+        }else{
+            if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+                dealTotal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
+            }
+            else if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
+                dealTotal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
+            }
         }
-        else if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
-            dealTotal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
-        }
+
         // 交易平台
         dealTotal.setTradePlat(dealDto.getTradePlat());
 
@@ -414,15 +429,17 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
             // 通道代码
             trdProductDeal.setChlId(null);
             // 交易对手
-            if(StringUtil.isEmpty(dealDto.getCounterId())){
-                if(StringUtil.equals(settleTransData.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+            if(!StringUtil.isEmpty(dealDto.getCounterId())){
+                trdProductDeal.setCounterId(dealDto.getCounterId());
+            }else if(!StringUtil.isEmpty(entrustDto.getCounterId())){
+                trdProductDeal.setCounterId(entrustDto.getCounterId());
+            }else{
+                if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
                     trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
                 }
-                else if(StringUtil.equals(settleTransData.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
+                else if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
                     trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
                 }
-            }else{
-                trdProductDeal.setCounterId(dealDto.getCounterId());
             }
             // 是否外部交易
             trdProductDeal.setIsOutTrade(DictCodeList.是否_是.getValue());

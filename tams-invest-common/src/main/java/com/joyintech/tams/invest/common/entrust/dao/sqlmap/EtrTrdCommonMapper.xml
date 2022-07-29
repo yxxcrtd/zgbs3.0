@@ -39,4 +39,7 @@
           AND #{sysDate} >= MDATE
     </select>
 
+    <select id="getFirstTradeAmtByTradeId" resultType="java.math.BigDecimal">
+        select ftp.M_TRADE_AMT from FIN_TRADE_PRODUCT ftp where ftp.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+    </select>
 </mapper>

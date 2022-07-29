@@ -702,6 +702,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             } else if (DictCodeList.回购拆借方向_逆回购.getValue().equals(entity.getRepPs())) {
                 agreRepExpireUnBuyDto.setAssetType10("H04");
             }
+            agreRepExpireUnBuyDto.setBusiTypePosition(DictCodeListExt3.投管业务类型_到期续做.getValue());
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, agreRepExpireUnBuyDto);
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, agreRepExpireUnBuyDto);
             if (StringUtil.isNotEmpty(agreRepExpireUnBuyDto.getFinprodId())) {
@@ -815,7 +816,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                     outPledge.setEntrustId(entity.getEntrustId());
                     outPledge.setFinprodId(entity.getOutfinprodId());
                     // 质押面值
-                    // XYHGFXSJ-489:修改质押面值方法 modify by fuyongsheng 
+                    // XYHGFXSJ-489:修改质押面值方法 modify by fuyongsheng
                     outPledge.setPledgeFaceValue(trdCommonBaseService.getFaceValue(entity.getOutfinprodId(), iPlatformDate.getSysDate()));
                     //质押率
                     outPledge.setPledgeRatio(ArithmeticUtil.divide(entity.getConRatio(), new BigDecimal(100), 2));
@@ -997,7 +998,11 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 list.add(etrPledge);
             }
             //接触质押设置结算金额
-            etrEntrust.setEntrustAmt(entity.getExpireSettleAmt());
+            if (StringUtil.equals(entity.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+                etrEntrust.setEntrustAmt(BigDecimal.ZERO);
+            } else{
+                etrEntrust.setEntrustAmt(entity.getExpireSettleAmt());
+            }
         }
         dto.setEtrEntrust(etrEntrust);
         if (etrEntrustAdd.getVpayDate() != null && etrEntrustAdd.getTermDays() != null) {
@@ -1637,8 +1642,13 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, agreRepOpenSecDto);
             if(!StringUtils.isEmpty(entity.getExpireSettleAmt())){
-                etrEntrust.setEntrustAmt(entity.getExpireSettleAmt());
-                agreRepOpenSecDto.setEntrustAmt(entity.getExpireSettleAmt());
+                if (StringUtil.equals(entity.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+                    etrEntrust.setEntrustAmt(BigDecimal.ZERO);
+                    agreRepOpenSecDto.setEntrustAmt(BigDecimal.ZERO);
+                } else{
+                    etrEntrust.setEntrustAmt(entity.getExpireSettleAmt());
+                    agreRepOpenSecDto.setEntrustAmt(entity.getExpireSettleAmt());
+                }
             }
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, agreRepOpenSecDto);
         }
@@ -1701,7 +1711,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 EtrComponentFactory.getComponentService(AgreRepExpireDto.class).entrustNew(agreRepExpireDto);
             } else if (DictCodeListExt3.上农商_指令业务类型_协议回购到期续做指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
                 agreRepExpireUnBuyDto.setEntrustStatus(etrSinglePortfolioDto.getEntrustStatus());
-
+                agreRepExpireUnBuyDto.setBusiTypePosition(DictCodeListExt3.投管业务类型_到期续做.getValue());
                 EtrComponentFactory.getComponentService(AgreRepExpireUnBuyDto.class).updateSettings(paraDto);
                 EtrComponentFactory.getComponentService(AgreRepExpireUnBuyDto.class).entrustNew(agreRepExpireUnBuyDto);
             } else if (DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
@@ -2270,6 +2280,12 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         }
         etrSinglePortfolioDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
         etrSinglePortfolioDto.setAssetType1("H01");
+
+        if (!交易方向_首期.getValue().equals(dto.getPs()) && StringUtils.isEmpty(dto.getInitialNum())) {
+            etrSinglePortfolioDto.setFinprodId(getFinprodIdNoFirst(dto));
+        } else if (!StringUtils.isEmpty(dto.getInitialNum())) {
+            etrSinglePortfolioDto.setFinprodId(dto.getInitialNum());
+        }
 //        etrSinglePortfolioDto.setDealCurAcct(dto.getAcctNo());// 资金账户
 //        /***********************************************************************/
 //        etrSinglePortfolioDto.setDealMode(dto.getDeclaType());//申报类型-db 交易方式
@@ -2669,7 +2685,18 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         finTradeProductKey.setFinprodId(dto.getTradeId());
         finTradeProductKey.setBranch(0L);
         FinTradeProduct firstFinTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
+        if(null == firstFinTradeProduct && StringUtil.isNotEmpty(dto.getInitialNum())){
+            finTradeProductKey.setFinprodId(dto.getInitialNum());
+            firstFinTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
+        }
+        //XYHGFXSJ-726 上交所逆回购解除质押指令提交报错
+        if(null == firstFinTradeProduct && StringUtil.isNotEmpty(entity.getEtrEntrust().getFinprodId())){
+            finTradeProductKey.setFinprodId(entity.getEtrEntrust().getFinprodId());
+            firstFinTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
+        }
+        //XYHGFXSJ-726 上交所逆回购解除质押指令提交报错
         if (firstFinTradeProduct != null) {
+            dto.setPledgeInvAim(commonPositionService.selectHoldInvAim(dto.getPortfolioId(), firstFinTradeProduct.getFinprodId()));
             dto.setFirstFinTradeProduct(firstFinTradeProduct);
         }
         if (StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_到期续做.getValue()) && DictCodeList.回购拆借方向_逆回购.getValue().equals(dto.getRepPs())) {
@@ -2697,6 +2724,8 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             || StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_到期购回.getValue())
                 || StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())) {
             postionFlowDto.setTradeId(entity.getEtrEntrust().getFinprodId());
+            //XYHGFXSJ-723
+            postionFlowDto.setIntiTradeId(entity.getEtrEntrust().getFinprodId());
         }
         // modify by etliu 20220727 end
 

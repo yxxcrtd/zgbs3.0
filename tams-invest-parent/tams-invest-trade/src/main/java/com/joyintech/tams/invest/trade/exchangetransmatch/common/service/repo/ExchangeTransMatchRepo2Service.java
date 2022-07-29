@@ -317,6 +317,19 @@ public class ExchangeTransMatchRepo2Service extends ExchangeTransMatchRepoCommon
             trdProductDeal.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
             trdFinProductDealTotal.setTgBusiType(trdProductDeal.getTgBusiType());
         }
+        // 交易对手
+        if(!StringUtil.isEmpty(dealDto.getCounterId())){
+            trdProductDeal.setCounterId(dealDto.getCounterId());
+        }else if(!StringUtil.isEmpty(entrustDto.getCounterId())){
+            trdProductDeal.setCounterId(entrustDto.getCounterId());
+        }else{
+            if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+                trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
+            }
+            else if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
+                trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
+            }
+        }
         return trdProductDeal;
     }
 

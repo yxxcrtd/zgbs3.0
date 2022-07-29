@@ -82,18 +82,18 @@ public class CheckParamUtils {
             return ErrorCode.UN_SUPPORT_ENTRUST_PROP;
         }
         final String market = StockCodeUtils.getMarket(stockCode);
-        //检查本方交易员
-        if (Strings.isNullOrEmpty(integratedEntrust.getTradeId())) {
-            return ErrorCode.TRADE_NOT_EMPTY;
-        }
-        //检查本方交易商
-        if (Strings.isNullOrEmpty(integratedEntrust.getDealerId()) || Strings.isNullOrEmpty(integratedEntrust.getDealerName())) {
-            return ErrorCode.DEALER_NOT_EMPTY;
-        }
-        //检查本方交易主体
-        if (Strings.isNullOrEmpty(integratedEntrust.getInvestorId()) || Strings.isNullOrEmpty(integratedEntrust.getInvestorName())) {
-            return ErrorCode.INVESTOR_NOT_EMPTY;
-        }
+//        //检查本方交易员
+//        if (Strings.isNullOrEmpty(integratedEntrust.getTradeId())) {
+//            return ErrorCode.TRADE_NOT_EMPTY;
+//        }
+//        //检查本方交易商
+//        if (Strings.isNullOrEmpty(integratedEntrust.getDealerId()) || Strings.isNullOrEmpty(integratedEntrust.getDealerName())) {
+//            return ErrorCode.DEALER_NOT_EMPTY;
+//        }
+//        //检查本方交易主体
+//        if (Strings.isNullOrEmpty(integratedEntrust.getInvestorId()) || Strings.isNullOrEmpty(integratedEntrust.getInvestorName())) {
+//            return ErrorCode.INVESTOR_NOT_EMPTY;
+//        }
         //检查交易对手
         if (Strings.isNullOrEmpty(integratedEntrust.getCounterId())) {
             return ErrorCode.COUNTER_NOT_EMPTY;
@@ -103,12 +103,18 @@ public class CheckParamUtils {
             return ErrorCode.PROP_TRADE_NOT_EMPTY;
         }
         //检查对手方交易商
-        if (Strings.isNullOrEmpty(integratedEntrust.getPropDealerId()) || Strings.isNullOrEmpty(integratedEntrust.getPropDealerName())) {
+        if (Strings.isNullOrEmpty(integratedEntrust.getPropDealerId())) {
             return ErrorCode.PROP_DEALER_NOT_EMPTY;
         }
-        //检查对手方交易主体
-        if (Strings.isNullOrEmpty(integratedEntrust.getPropInvestorId()) || Strings.isNullOrEmpty(integratedEntrust.getPropInvestorName())) {
-            return ErrorCode.PROP_INVESTOR_NOT_EMPTY;
+        if(Market.isSzMarket(market)){
+            //检查对手方交易主体
+            if (Strings.isNullOrEmpty(integratedEntrust.getPropInvestorId())) {
+                return ErrorCode.PROP_INVESTOR_NOT_EMPTY;
+            }
+            //检查对手方交易主体类型
+            if (Strings.isNullOrEmpty(integratedEntrust.getPropOwnerType())) {
+                return ErrorCode.PROP_INVESTOR_TYPE_NOT_EMPTY;
+            }
         }
         //检查约定号
         if (Strings.isNullOrEmpty(integratedEntrust.getContractId())) {
@@ -118,12 +124,12 @@ public class CheckParamUtils {
         return getErrorCode(integratedEntrust.getUserId(), integratedEntrust.getInstructionId(), integratedEntrust.getEntrustBs(), stockCode, integratedEntrust.getEntrustProp(), null, integratedEntrust.getLiaisonName(), integratedEntrust.getContractId(), null, null);
     }
 
-    public static ErrorCode getErrorCode(String busiTypeTg,String instructionId, String entrustBs, String stockCode, String entrustProp) {
+    public static ErrorCode getErrorCode(String busiTypeTg, String instructionId, String entrustBs, String stockCode, String entrustProp) {
         if (Strings.isNullOrEmpty(instructionId))
             return ErrorCode.REQ_PARAMETER_INSTRUCTION_ID_ERROR;
         if (Strings.isNullOrEmpty(entrustBs))
             return ErrorCode.REQ_PARAMETER_ENTRUST_BS_ERROR;
-        if(!BusiTypeTgEnum.中途换券.codeEquals(busiTypeTg)){
+        if (!BusiTypeTgEnum.中途换券.codeEquals(busiTypeTg)) {
             if (Strings.isNullOrEmpty(stockCode) || StockCodeUtils.getMarketAndStockCode(stockCode).length != 2)
                 return ErrorCode.REQ_PARAMETER_STOCK_CODE_ERROR;
         }
