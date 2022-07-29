@@ -5,22 +5,18 @@ import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.FinProductAddMapper;
-import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.entity.FinProductAdd;
 import com.joyintech.tams.common.base.entity.PtlCapacctInfo;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.component.base.group.BasePtlCashPositionInfoService;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
-import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.constant.TempConstant;
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.position.*;
 import com.joyintech.tams.invest.common.entrust.dao.EtrTrdCommonMapper;
-import com.joyintech.tams.invest.common.entrust.dto.EtrAgreRepTradeCommonDto;
 import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.slf4j.Logger;
@@ -29,13 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.*;
-
-import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_逆回购;
 
 /**
  * 公共方法service
@@ -921,13 +913,10 @@ public class EtrTradeCommonervice extends BaseService {
      * 查询首期的到期结算金额
      */
     public BigDecimal getFirstTradeAmt(String tradeId) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("tradeId", tradeId);
-        String url = ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrAgreRepTrade/getFirstTradeAmtByTradeId";
-        BigDecimal result = restTemplate.postForObject(url, map, BigDecimal.class);
-        log.debug("调用接口查询首期回购 url = [{}], request = [{}], response = [{}]", url, JsonUtils.object2Json(map), result);
-        if (Objects.nonNull(result)) {
-            return result;
+        BigDecimal mTradeAmt = etrTrdCommonMapper.getFirstTradeAmtByTradeId(tradeId);
+        log.debug("【调用接口查询首期结算金额】：tradeId = [{}], mTradeAmt = [{}]", tradeId, mTradeAmt);
+        if (Objects.nonNull(mTradeAmt)) {
+            return mTradeAmt;
         }
         return BigDecimal.ZERO;
     }

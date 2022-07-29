@@ -118,6 +118,7 @@ public enum ErrorCode implements IEnum<Integer> {
     PROP_DEALER_NOT_EMPTY(1027, "对手方交易商ID或名称不能为空"),
     PROP_INVESTOR_NOT_EMPTY(1028, "对手方交易主体ID或名称不能为空"),
     CONTRACT_ID_NOT_EMPTY(1029, "协商成交约定号不能为空"),
+    PROP_INVESTOR_TYPE_NOT_EMPTY(1030, "对手方交易主体类型不能为空"),
 
 
     /**
