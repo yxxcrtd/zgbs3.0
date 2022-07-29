@@ -998,7 +998,11 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 list.add(etrPledge);
             }
             //接触质押设置结算金额
-            etrEntrust.setEntrustAmt(entity.getExpireSettleAmt());
+            if (StringUtil.equals(entity.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+                etrEntrust.setEntrustAmt(BigDecimal.ZERO);
+            } else{
+                etrEntrust.setEntrustAmt(entity.getExpireSettleAmt());
+            }
         }
         dto.setEtrEntrust(etrEntrust);
         if (etrEntrustAdd.getVpayDate() != null && etrEntrustAdd.getTermDays() != null) {
@@ -1638,8 +1642,13 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, agreRepOpenSecDto);
             if(!StringUtils.isEmpty(entity.getExpireSettleAmt())){
-                etrEntrust.setEntrustAmt(entity.getExpireSettleAmt());
-                agreRepOpenSecDto.setEntrustAmt(entity.getExpireSettleAmt());
+                if (StringUtil.equals(entity.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+                    etrEntrust.setEntrustAmt(BigDecimal.ZERO);
+                    agreRepOpenSecDto.setEntrustAmt(BigDecimal.ZERO);
+                } else{
+                    etrEntrust.setEntrustAmt(entity.getExpireSettleAmt());
+                    agreRepOpenSecDto.setEntrustAmt(entity.getExpireSettleAmt());
+                }
             }
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, agreRepOpenSecDto);
         }

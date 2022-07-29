@@ -1013,6 +1013,8 @@ public class CfetsRepoDealQuotedPrice001Service extends BaseService {
             etrSecPositionFlowDto.setIsExistNew(dto.getIsExistNew());
             EtrSecPositionFlowDto secPositionFlowDto = new EtrSecPositionFlowDto();
             BeanUtil.copyPropertiesIgnoreNull(secPositionFlowDto, etrSecPositionFlowDto);
+            secPositionFlowDto.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());
+            secPositionFlowDto.setAmount(secPositionFlowDto.getAmount().negate());
             etrSecPositionFlows.add(secPositionFlowDto);
         });
 
@@ -1060,7 +1062,6 @@ public class CfetsRepoDealQuotedPrice001Service extends BaseService {
                     EtrSecPositionFlowDto temp = new EtrSecPositionFlowDto();
                     BeanUtil.copyPropertiesIgnoreNull(temp, flowDto);
                     temp.setSeqno(IDGenerator.generate());
-                    temp.setAmount(flowDto.getAmount().negate());
                     temp.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
                     temp.setOffsetId(flowDto.getTradeId());
                     etrSecPositionFlows.add(temp);
