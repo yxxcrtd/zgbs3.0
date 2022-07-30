@@ -297,7 +297,7 @@
         union
         SELECT
             tpd.TOTLE_TRADE_ID TRADE_ID,
-            tpda.ENTRUST_ID ENTRUST_ID,
+            d.ENTRUST_ID ENTRUST_ID,
             tpd.FINPROD_TYPE2 FINPROD_TYPE2,
             tpd.PS PS,
             tpd.FINPROD_ID FINPROD_ID,
@@ -312,8 +312,8 @@
             null zhaiZhuanGuNum,
             null zhaiZhuanGuDanJia
         FROM TRD_FIN_PRODUCT_DEAL_TOTAL tpd
-        LEFT JOIN TRD_PRODUCT_DEAL d ON  d.TOTLE_TRADE_ID = d.TOTLE_TRADE_ID
-        LEFT JOIN TRD_PRODUCT_DEAL_ADD tpda ON  tpda.TRADE_ID = d.TRADE_ID
+        LEFT JOIN (select d.TOTLE_TRADE_ID,a.ENTRUST_ID from TRD_PRODUCT_DEAL d inner join TRD_PRODUCT_DEAL_ADD a on d.TRADE_ID=a.TRADE_ID group by d.TOTLE_TRADE_ID,a.ENTRUST_ID) d
+        on tpd.TOTLE_TRADE_ID=d.TOTLE_TRADE_ID
         left join FIN_TRADE_PRODUCT ftp on ftp.FINPROD_ID = tpd.FINPROD_ID and ftp.BRANCH= '0'
         left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID=ftp.FINPROD_ID and fpt.BRANCH=ftp.BRANCH
         where tpd.TRADE_MARKET in (#{TRADE_PLACE_03},#{TRADE_PLACE_04})
