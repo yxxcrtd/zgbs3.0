@@ -1535,6 +1535,7 @@ public class StlDataDealSzdSjsjgProcessService {
                                 ArithmeticUtil.multiply(settleTransDataPledge.getPledgeNumber(), settleTransDataPledge.getPledgeFaceValue()), 2));
                         // 质押金额
                         settleTransDataPledge.setPledgeAmt(null);
+                        stlDownDataDealWriteBaseDto.getSettleTransDataPledgeList().add(settleTransDataPledge);
                     }
                 } else if ((StringUtil.equals(szdSjsjg.getJgywlb(), StlDataDealProcessConstant.SJSJG_YWLB_XYXB) && DictCodeListExt3.交易方向_到期续做.getValue().equals(settleTransData.getPs())
                         && DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(settleTransData.getFinprodType2()))
@@ -1552,6 +1553,7 @@ public class StlDataDealSzdSjsjgProcessService {
                                 ArithmeticUtil.multiply(settleTransDataPledge.getPledgeNumber(), settleTransDataPledge.getPledgeFaceValue()), 2));
                         // 质押金额
                         settleTransDataPledge.setPledgeAmt(null);
+                        stlDownDataDealWriteBaseDto.getSettleTransDataPledgeList().add(settleTransDataPledge);
                     }
                 }
             }
