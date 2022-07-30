@@ -52,6 +52,7 @@ import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.component.base.entrust.BaseEtrInvestInfoService;
 import com.joyintech.tams.invest.common.component.base.entrust.dto.BaseEtrFinishAmtDto;
 import com.joyintech.tams.invest.common.component.base.entrust.impl.BaseEtrInvestInfoServiceImpl;
+import com.joyintech.tams.invest.common.component.base.entrust.impl.dao.BaseEtrInvestInfoMapper;
 import com.joyintech.tams.invest.common.component.business.basicdata.BaseTradeFeeCommService;
 import com.joyintech.tams.invest.common.component.business.basicdata.dto.BasicTradeFeeInputDto;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
@@ -254,6 +255,12 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
 
     @Autowired(required = false)
     private BussTrdTransferOrderService bussTrdTransferOrderService;
+
+    /**
+     * 投资委托信息Mapper
+     */
+    @Autowired
+    private BaseEtrInvestInfoMapper etrInvestInfoMapper;
 
     /**
      * <投标确认>界面初始化检查
@@ -2880,6 +2887,25 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             this.insertEtrFinishStatus(entity, type);
             //处理指令完成进度
             finishEtrList.forEach(this::closeDelegatePositionMethod);
+            if (StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), entity.getBiddingMethod())) {
+                if (OperationType.REVOKE.equals(type) || OperationType.DELETE.equals(type)) {
+                    entity.getProductDtos().forEach(productDto -> {
+                        // 委托完成状况表查询
+                        EtrFinishStatusKey etrFinishStatusKey = new EtrFinishStatusKey();
+                        etrFinishStatusKey.setEntrustId(productDto.getEntrustId());
+                        List<EtrFinishStatus> etrFinishStatusList = etrInvestInfoMapper.selectEtrFinishStatusByPrimaryKey(etrFinishStatusKey);
+                        if(CollectionUtils.isEmpty(etrFinishStatusList)) {
+                            // 如果满足，则调用投资委托组件的更新委托状态接口，将委托状态设置为“委托状态_已接收”
+                            etrInvestInfoServiceImpl.updateDelegateStatus(productDto.getEntrustId(), DictCodeList.委托状态_已接收.getValue());
+                        }
+                    });
+                } else {
+                    entity.getProductDtos().forEach(productDto -> {
+                        // 如果满足，则调用投资委托组件的更新委托状态接口，将委托状态设置为“委托状态_已完成”
+                        etrInvestInfoServiceImpl.updateDelegateStatus(productDto.getEntrustId(), DictCodeList.委托状态_已完成.getValue());
+                    });
+                }
+            }
         } catch (Exception e) {
             logger.error("处理异常", e);
             throw new BusinessException("MSG:" + e.getMessage());
