@@ -412,9 +412,12 @@
 			AND std.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})
 			<if test="checkResultList != null and checkResultList.size() > 0">
 			    AND NOT EXISTS (SELECT 1 FROM SETTLE_TRANS_TG_MAPPING temp where temp.TRADE_ID = std.TRADE_ID)
-				<foreach collection="checkResultList" item="result" open="AND stds.CHECK_RESULT IN (" close=")" separator=",">
+			    AND (stds.CHECK_RESULT IS NULL
+				<foreach collection="checkResultList" item="result" open="OR stds.CHECK_RESULT IN (" close=")"
+						 separator=",">
 					#{result,jdbcType=VARCHAR}
 				</foreach>
+			    )
 			</if>
 			<if test="dealDate != null">
 				AND std.DEAL_DATE = #{dealDate,jdbcType=DATE}

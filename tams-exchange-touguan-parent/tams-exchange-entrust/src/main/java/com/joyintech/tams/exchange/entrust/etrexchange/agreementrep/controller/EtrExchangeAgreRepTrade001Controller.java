@@ -620,6 +620,13 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
         AjaxResult ajax = etrExchangeAgreRepTrade001Service.checkSave(dto, result);
         //共通check
         List<ValidMessage> valid = etrExchangeTradeCommonValidatorService.valid(dto);
+
+        //检查行情编号是否重复下指令
+        if (StringUtil.isNotEmpty(dto.getReqOnId())) {
+            if (etrExchangeAgreRepTrade001Service.isAlreadyDoEntrustByRequestId(dto.getReqOnId())) {
+                valid.add(new ValidMessage("行情编号[" + dto.getReqOnId() + "]不能重复下指令！"));
+            }
+        }
         if (StringUtil.isNotEmpty(ajax) && !CollectionUtils.isEmpty(valid)) {
             valid.addAll(ajax.getErrorList());
             ajax.setErrorList(valid);

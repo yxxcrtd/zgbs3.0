@@ -74,7 +74,14 @@ public class EtrCommandDispatcherService extends BaseService<EtrCommandDispatche
 			}
 		}
 		dto.setEtr_entrust_list(selectList);
-		String displaceDir = param.get("displaceDir").toString();
+		// modify by etliu 20220730 start
+		// 3.0.6协议回购+风险升级 XYHGFXSJ-758
+		//【信用保护凭证指令】信用保护凭证指令审批报错，请定位修改
+		String displaceDir = null;
+		if (param.get("displaceDir") != null) {
+			displaceDir = param.get("displaceDir").toString();
+		}
+		// modify by etliu 20220730 end
 		dto.setEtr_pledge_list(this.selectPledgeList(selectList, displaceDir));
 		dto.setEtr_entrust_detail_list(selectEtrDetailList(param));
 

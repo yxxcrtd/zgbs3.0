@@ -803,8 +803,7 @@ public class StlDataDealSzdSjsjgProcessService {
             settleTransData.setmTradeAmt(abs(szdSjsjg.getJgzjje()));
             // 查询首期清算数据
             List<SettleTransData> sqSettleTransDatas = trdCommonBaseService.selectSqSettleTransDatas(
-                    settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(),
-                    settleTransData.getVdate());
+                    settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(), null);
             if(CollectionUtils.isNotEmpty(sqSettleTransDatas)){
                 // 到期本金
                 settleTransData.setmPrinAmt(sqSettleTransDatas.get(0).getPrinAmt());
