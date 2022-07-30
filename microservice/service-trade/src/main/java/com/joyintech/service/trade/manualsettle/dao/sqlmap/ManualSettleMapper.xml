@@ -553,4 +553,11 @@
           and t1.BRANCH = 0
     </select>
     <!--// modify by etliu 20220727 end-->
+    <!-- XYHGFXSJ-724 【实时资产头寸查询】协议回购上交所正回购中途换券数据日间交收后，实时资产里的质押券没有变更-->
+    <select id="selectFinDealPledgeByTradeId2" resultType="com.joyintech.tams.common.base.pojo.PledgeListDto">
+        select distinct FINPROD_ID finprodMarketId, PLEDGE_DISPLACE_AMT pledgeNumber, TRADE_TYPE displaceDir
+        from FIN_PLEDGE_DISP_DETAIL_TEMP
+        where TRADE_ID = (select TRADE_ID from FIN_PLEDGE_DISP_TEMP where F_TRADE_ID = #{tradeId,jdbcType=VARCHAR})
+    </select>
+    <!-- XYHGFXSJ-724 【实时资产头寸查询】协议回购上交所正回购中途换券数据日间交收后，实时资产里的质押券没有变更-->
 </mapper>

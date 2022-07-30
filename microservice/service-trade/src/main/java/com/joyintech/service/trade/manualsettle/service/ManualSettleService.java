@@ -212,7 +212,13 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                     // modify by etliu 20220725 end
 
                     // XYHGFXSJ-8:构建质押品信息list modify by fuyongsheng 20220718 start
-                    infContractDetailfile.setPledgeList(this.genPledgeDtoList(trdProductTempDeal.getFinprodId()));
+                    if(DictCodeListExt3.交易方向_中途换券.getValue().equals(infContractDetailfile.getPs())){
+                        // XYHGFXSJ-724 【实时资产头寸查询】协议回购上交所正回购中途换券数据日间交收后，实时资产里的质押券没有变更
+                        infContractDetailfile.setPledgeList(manualSettleMapper.selectFinDealPledgeByTradeId2(trdProductTempDeal.getFinprodId()));
+                        // XYHGFXSJ-724 【实时资产头寸查询】协议回购上交所正回购中途换券数据日间交收后，实时资产里的质押券没有变更
+                    }else {
+                        infContractDetailfile.setPledgeList(this.genPledgeDtoList(trdProductTempDeal.getFinprodId()));
+                    }
                     // XYHGFXSJ-8:构建质押品信息list modify by fuyongsheng 20220718 end
                     if (DictCodeList.回购拆借方向_正回购.getValue().equals(infContractDetailfile.getPs())
                             || DictCodeList.回购拆借方向_逆回购.getValue().equals(infContractDetailfile.getPs())) {

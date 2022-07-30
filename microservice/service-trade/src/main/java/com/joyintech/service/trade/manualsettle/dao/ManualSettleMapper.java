@@ -3,6 +3,7 @@ package com.joyintech.service.trade.manualsettle.dao;
 import com.joyintech.service.trade.manualsettle.dto.ManualSettleDto;
 import com.joyintech.service.trade.manualsettle.dto.ManualSettleFlowDto;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.common.base.pojo.PledgeListDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import org.apache.ibatis.annotations.Param;
@@ -110,5 +111,9 @@ public interface ManualSettleMapper {
      */
     List<ManualSettleDto> selectPledgeInfo(@Param("finprodId") String finprodId);
     // modify by etliu 20220727 end
-} 
+
+    // XYHGFXSJ-724 【实时资产头寸查询】协议回购上交所正回购中途换券数据日间交收后，实时资产里的质押券没有变更
+    List<PledgeListDto> selectFinDealPledgeByTradeId2(@Param("tradeId") String tradeId);
+    // XYHGFXSJ-724 【实时资产头寸查询】协议回购上交所正回购中途换券数据日间交收后，实时资产里的质押券没有变更
+}
 
