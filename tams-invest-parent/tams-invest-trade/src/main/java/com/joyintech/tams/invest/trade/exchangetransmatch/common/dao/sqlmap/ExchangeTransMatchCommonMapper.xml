@@ -604,4 +604,10 @@
             FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
         </where>
     </select>
+
+    <select id="selectFinDealPledgeByEntrust" resultType="com.joyintech.tams.common.base.pojo.PledgeListDto">
+        select distinct FINPROD_ID finprodMarketId, PLEDGE_DISPLACE_AMT pledgeNumber, TRADE_TYPE displaceDir
+        from FIN_PLEDGE_DISP_DETAIL_TEMP
+        where TRADE_ID = (select TRADE_ID from FIN_PLEDGE_DISP_TEMP where F_TRADE_ID = (select FINPROD_ID from ETR_ENTRUST where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}))
+    </select>
 </mapper>

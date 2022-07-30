@@ -1,6 +1,7 @@
 package com.joyintech.tams.invest.trade.exchangetransmatch.common.dao;
 
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.common.base.pojo.PledgeListDto;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonEntrustDetailDto;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonEntrustDto;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonRevokeDto;
@@ -212,4 +213,8 @@ public interface ExchangeTransMatchCommonMapper {
      * @return
      */
     List<FinCashInfo> getFinCashInfosByFinprodId(@Param("finprodId") String finprodId);
+
+    // XYHGFXSJ-767 【实时资产头寸查询】协议回购上交所正回购中途换券日终清结算后，实时资产报表里数据错误
+    List<PledgeListDto> selectFinDealPledgeByEntrust(@Param("entrustId") String entrustId);
+    // XYHGFXSJ-767 【实时资产头寸查询】协议回购上交所正回购中途换券日终清结算后，实时资产报表里数据错误
 }

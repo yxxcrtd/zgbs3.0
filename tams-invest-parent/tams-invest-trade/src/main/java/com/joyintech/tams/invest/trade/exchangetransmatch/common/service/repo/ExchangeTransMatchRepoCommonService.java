@@ -6,6 +6,7 @@ import com.joyintech.background.component.common.pack.common.base.BaseService;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.common.base.pojo.PledgeListDto;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -808,6 +809,21 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
                     new BigDecimal(100), 2, RoundingMode.HALF_UP));
             trdTempDto.setFinDealPledge(finDealPledge);
         }
+
+        // XYHGFXSJ-767 【实时资产头寸查询】协议回购上交所正回购中途换券日终清结算后，实时资产报表里数据错误
+        if (StringUtil.equals(trdTempDto.getPs(),DictCodeListExt3.交易方向_中途换券.getValue())){
+            List<PledgeListDto> pledgeListDtos = exchangeTransMatchCommonMapper.selectFinDealPledgeByEntrust(entrustDto.getEntrustId());
+            List<FinPledgeDispDetailTemp> finPledgeDispDetailTempList = new ArrayList<>();
+            for(PledgeListDto pledgeListDto: pledgeListDtos){
+                FinPledgeDispDetailTemp finPledgeDispDetailTemp = new FinPledgeDispDetailTemp();
+                finPledgeDispDetailTemp.setTradeType(pledgeListDto.getDisplaceDir());
+                finPledgeDispDetailTemp.setFinprodId(pledgeListDto.getFinprodMarketId());
+                finPledgeDispDetailTemp.setPledgeDisplaceAmt(pledgeListDto.getPledgeNumber());
+                finPledgeDispDetailTempList.add(finPledgeDispDetailTemp);
+            }
+            trdTempDto.setFinPledgeDispDetailTempList(finPledgeDispDetailTempList);
+        }
+        // XYHGFXSJ-767 【实时资产头寸查询】协议回购上交所正回购中途换券日终清结算后，实时资产报表里数据错误
 
         // 场景参数设置
         PostionParameter parameter = new PostionParameter();
