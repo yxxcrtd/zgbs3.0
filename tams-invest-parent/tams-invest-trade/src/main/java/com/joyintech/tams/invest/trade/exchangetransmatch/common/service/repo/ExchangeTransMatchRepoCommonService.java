@@ -761,6 +761,7 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
             infContractDetailfile.setTradeAmt(baseTradeProductDealDtos.get(0).getTrdProductDeal().getTradeAmt());
             infContractDetailfile.setDealNo(baseTradeProductDealDtos.get(0).getTrdProductDeal().getFinprodId());
             infContractDetailfile.setvTradeId(baseTradeProductDealDtos.get(0).getTrdProductDeal().getFinprodId());
+            infContractDetailfile.setFinprodId(baseTradeProductDealDtos.get(0).getTrdProductDeal().getFinprodId());
         }
         else {
             if (baseTradeProductDealDtos.get(0).getTrdFinProductDealTotal() != null) {
@@ -772,6 +773,7 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
                 infContractDetailfile.setTradeAmt(baseTradeProductDealDtos.get(0).getTrdFinProductDealTotal().getTradeAmt());
                 infContractDetailfile.setDealNo(baseTradeProductDealDtos.get(0).getTrdFinProductDealTotal().getFinprodId());
                 infContractDetailfile.setvTradeId(baseTradeProductDealDtos.get(0).getTrdFinProductDealTotal().getFinprodId());
+                infContractDetailfile.setFinprodId(baseTradeProductDealDtos.get(0).getTrdProductDeal().getFinprodId());
             }
         }
 
