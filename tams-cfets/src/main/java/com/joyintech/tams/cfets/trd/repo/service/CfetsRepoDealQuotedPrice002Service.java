@@ -45,6 +45,7 @@ import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto;
 import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepo003Mapper;
 import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepoMapper;
 import com.joyintech.tams.cfets.trd.repo.dto.*;
@@ -2772,9 +2773,25 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
         if (CollectionUtils.isEmpty(list)) {
             list = ibuQuoteRepo003Mapper.selectWflQuoteCrepPledgeForDzh(map);
         }
+        //逆回购将质押券按照资产维度汇总展示
+        List<com.joyintech.service.bankuplink.repo.dto.CfetsRepoDealQuotedPrice003Dto> repoList = new ArrayList<>();
+        if (StringUtils.equals((String)map.get("ps"), DictCodeList.回购拆借方向_逆回购.getValue())) {
+
+            Map<String,List<com.joyintech.service.bankuplink.repo.dto.CfetsRepoDealQuotedPrice003Dto>> finprodIdMap = list.stream()
+                    .collect(Collectors.groupingBy(item -> item.getFinprodId()));
+            for (Map.Entry<String, List<com.joyintech.service.bankuplink.repo.dto.CfetsRepoDealQuotedPrice003Dto>> entry : finprodIdMap.entrySet()) {
+                com.joyintech.service.bankuplink.repo.dto.CfetsRepoDealQuotedPrice003Dto dto = new com.joyintech.service.bankuplink.repo.dto.CfetsRepoDealQuotedPrice003Dto();
+                BeanUtil.copyPropertiesIgnoreNull(dto, entry.getValue().get(0));
+                BigDecimal sumPledgePrin = entry.getValue().stream().map(com.joyintech.service.bankuplink.repo.dto.CfetsRepoDealQuotedPrice003Dto::getPledgePrin).reduce(BigDecimal.ZERO, BigDecimal::add);
+                dto.setPledgePrin(sumPledgePrin);
+            }
+        }else {
+            repoList.addAll(list);
+        }
+
         List<CfetsRepoDealQuotedPrice003Dto> results = null;
         try {
-            results = JsonUtils.json2List(JsonUtils.object2Json(list), CfetsRepoDealQuotedPrice003Dto.class);
+            results = JsonUtils.json2List(JsonUtils.object2Json(repoList), CfetsRepoDealQuotedPrice003Dto.class);
         } catch (IOException e) {
             e.printStackTrace();
             logger.error("委托指令查询时,转换dto错误");
