@@ -353,7 +353,7 @@ public class IbuQuoteRepoService extends BaseService {
      */
     public List<RepoEntrustPledgeDto> selectRepoEntrustPledges(CfetsRepoDealQuoteRequest request) {
         Map<String, Object> pageParam = BeanUtil.object2Map(request);
-        setParam(pageParam, 2);
+        this.setParam(pageParam, 2);
         return cfetsIbuQuoteRepoMapper.selectRepoEntrustPledges(pageParam);
     }
 
@@ -1618,9 +1618,6 @@ public class IbuQuoteRepoService extends BaseService {
      */
     private void setParam(Map<String, Object> param, int type) {
         String loginUserId = LoginUserUtil.getUserName();
-        if ("admin".equals(loginUserId)) {
-//            loginUserId = "jp";//TODO 测试写死登录用户 提交代码时修改
-        }
         param.put("platDate", iPlatformDate.getSysDateStr());
         param.put("loginUserId", loginUserId);
         param.put("rolePos03", DictCodeListExt2.角色岗位_投资处长.getValue());
@@ -2533,6 +2530,7 @@ public class IbuQuoteRepoService extends BaseService {
             } else {
                 infoForm1 = cfgDataTableMapper.getBySpcdCodes(pageCode, dtCode, spcdCodeList, EFFERANGE_IS, userId);
             }
+            dto.setIsEtrInfo(DictCodeList.是否_是.getValue());
             List<RepoEntrustPledgeDto> list = this.selectRepoEntrustPledges(dto);
             BigDecimal shareAmt = BigDecimal.ZERO;
             for (RepoEntrustPledgeDto temp : list) {
