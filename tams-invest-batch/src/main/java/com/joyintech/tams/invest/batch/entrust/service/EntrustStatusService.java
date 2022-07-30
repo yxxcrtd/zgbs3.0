@@ -97,6 +97,7 @@ public class EntrustStatusService {
 
             // 处理对接了头寸引擎的指令关闭 start
             List<EntrustClosePosEtrReqDto> etrReqDtoList = entrustStatusMapper.selectEntrustList(params);
+            logger.info("待关闭指令:{}",JsonUtils.object2Json(etrReqDtoList));
             // List<String> entrustIds = entrustStatusMapper.selectEntrustIds(params);
             List<String> entrustIds = new ArrayList<>();
             List<String> entrustIdsCredit = new ArrayList<>();

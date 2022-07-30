@@ -449,13 +449,6 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
             trdProductDeal.setTradePlat(settleTransData.getTradePlat());
             // 交易市场
             trdProductDeal.setTradeMarketMode(settleTransData.getTradeMarketMode());
-
-            if(StringUtil.equals(settleTransData.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
-                trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
-            }
-            else if(StringUtil.equals(settleTransData.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
-                trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
-            }
             // 本方交易员
             trdProductDeal.setTrader(dealDto.getTrader());
             // 对手方交易员

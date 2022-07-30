@@ -1,0 +1,6 @@
+UPDATE CFG_DATATABLE_SHOW SET SORT = 0 WHERE PAGECODE = 'cfetsManualSettleQuery' AND DTCODE = 'CfetsManualSettleInfo' AND SPCDCODE = '05' AND COLCODE = 'finprodAbbr' ;
+UPDATE CFG_DATATABLE_SHOW SET SORT = 0 WHERE PAGECODE = 'cfetsManualSettleQuery' AND DTCODE = 'CfetsManualSettleInfo' AND SPCDCODE = '05' AND COLCODE = 'finprodMarketId' ;
+UPDATE CFG_DATATABLE_SHOW SET SORT = 0 WHERE PAGECODE = 'cfetsManualSettleQuery' AND DTCODE = 'CfetsManualSettleInfo' AND SPCDCODE = '05' AND COLCODE = 'firstNetPrice' ;
+UPDATE CFG_DATATABLE_SHOW SET SORT = 0 WHERE PAGECODE = 'cfetsManualSettleQuery' AND DTCODE = 'CfetsManualSettleInfo' AND SPCDCODE = '05' AND COLCODE = 'pledgePrin' ;
+UPDATE CFG_DATATABLE_SHOW SET SORT = 0 WHERE PAGECODE = 'cfetsManualSettleQuery' AND DTCODE = 'CfetsManualSettleInfo' AND SPCDCODE = '05' AND COLCODE = 'pledgeRate' ;
+UPDATE CFG_DATATABLE_SHOW SET SORT = 0 WHERE PAGECODE = 'cfetsManualSettleQuery' AND DTCODE = 'CfetsManualSettleInfo' AND SPCDCODE = '05' AND COLCODE = 'repRegistOrgStr' ;
