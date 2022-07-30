@@ -82,7 +82,8 @@ public class EntrustStatusTask extends BatchBaseService {
             // add by etliu 20220721 end
 
             //异常信息记录到批处理的日志详情
-            throw new BatchException(RiskUtil.getLogString(e));
+            // 抛出异常会导致事务无法控制
+           logger.error(RiskUtil.getLogString(e));
         }
         isRunning = false;
         return result;
