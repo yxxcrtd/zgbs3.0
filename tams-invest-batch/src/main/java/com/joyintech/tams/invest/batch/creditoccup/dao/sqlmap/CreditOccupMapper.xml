@@ -14,22 +14,8 @@
                     UNION ALL SELECT id FROM T_ENTRUSTHISTORY
                     UNION ALL
                     SELECT id FROM T_INTEGRATED_ENTRUSTHISTORY) T
-                WHERE
-                    T.id = temp.TRADE_ID)
-        AND EXISTS (
-                SELECT
-                    *
-                FROM
-                    SETTLE_TRANS_DATA a
-				left join T_ENTRUST b on LTRIM(substr(a.APPLY_TRADE_ID, 5, length(a.APPLY_TRADE_ID)), '0') = b.broker_ENTRUST_ID OR a.APPLY_TRADE_ID = b.BROKER_ENTRUST_ID
-				left join T_INTEGRATED_ENTRUST c on LTRIM(substr(a.APPLY_TRADE_ID, 5, length(a.APPLY_TRADE_ID)), '0') = c.broker_ENTRUST_ID OR a.APPLY_TRADE_ID = c.BROKER_ENTRUST_ID
-				left join T_ENTRUSTHISTORY d on LTRIM(substr(a.APPLY_TRADE_ID, 5, length(a.APPLY_TRADE_ID)), '0') = d.broker_ENTRUST_ID OR a.APPLY_TRADE_ID = d.BROKER_ENTRUST_ID
-				left join T_INTEGRATED_ENTRUSTHISTORY e on LTRIM(substr(a.APPLY_TRADE_ID, 5, length(a.APPLY_TRADE_ID)), '0') = e.broker_ENTRUST_ID OR a.APPLY_TRADE_ID = e.BROKER_ENTRUST_ID
-                WHERE
-                    b.id is not null or c.ID is not null or d.ID is not null or e.ID is not NULL
-                and (b.id = TEMP.TRADE_ID or c.id = TEMP.TRADE_ID or d.id = TEMP.TRADE_ID or e.id = TEMP.TRADE_ID))
+                WHERE Temp.TRADE_ID LIKE '%'|| T.ID||'%')
     </sql>
-
     <sql id="delCommonSql">
         <where>
             <if test="executeDate != null and executeDate != ''">
@@ -62,6 +48,9 @@
         <where>
             <if test="executeDate != null and executeDate != ''">
                 and temp.CDATE  = to_date(#{executeDate},'yyyy-MM-dd')
+            </if>
+            <if test="creditOccureType != null and creditOccureType != ''">
+                and temp.CREDIT_OCCURE_TYPE  = #{creditOccureType}
             </if>
             <if test="status != null and status != ''">
                 and temp.STATUS  = #{status}
@@ -149,6 +138,9 @@
         <where>
             <if test="executeDate != null and executeDate != ''">
                 and temp.CDATE  = to_date(#{executeDate},'yyyy-MM-dd')
+            </if>
+            <if test="creditOccureType != null and creditOccureType != ''">
+                and temp.CREDIT_OCCURE_TYPE  = #{creditOccureType}
             </if>
             <if test="status != null and status != ''">
                 and temp.STATUS  = #{status}

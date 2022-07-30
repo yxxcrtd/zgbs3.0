@@ -48,6 +48,8 @@ public class CreditOccupSzProcessor extends BaseProcessor<NeedOperateEntity, Cre
                 if(StringUtil.isEmpty(dto.getTradeId())) continue;
                 dto.setUpdateTime(new Date());
                 dto.setUpdateUser("system");
+                // 不处理预占编号,对于那些已完成的指令，占用记录是有效的，如果实占数据存了预占编号，重复跑授信占用批会回冲预占额度
+                dto.setEntrustId(null);
                 CreditLinesInputDto dto1 = new CreditLinesInputDto();
                 BeanUtil.copyPropertiesIgnoreNull(dto1,dto);
                 dto1.setTradeId(dto.getTradeId());
