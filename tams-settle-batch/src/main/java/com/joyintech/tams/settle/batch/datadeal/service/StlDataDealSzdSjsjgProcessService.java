@@ -6,10 +6,7 @@ import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.dao.FinCashPlanMapper;
-import com.joyintech.tams.common.base.dao.FinProductMapper;
-import com.joyintech.tams.common.base.dao.FinTradeProductMapper;
-import com.joyintech.tams.common.base.dao.SzdSjsfwMapper;
+import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.common.base.pojo.OriPledgeInfo;
 import com.joyintech.tams.constant.*;
@@ -103,6 +100,9 @@ public class StlDataDealSzdSjsjgProcessService {
 
     @Autowired
     protected TrdCommonBaseService trdCommonBaseService;
+
+    @Autowired
+    protected FinDealPledgeMapper finDealPledgeMapper;
 
   /*  @Autowired
     protected ICalendar iCalendar;*/
@@ -931,8 +931,18 @@ public class StlDataDealSzdSjsjgProcessService {
             settleTransData.setFinprodType2(sqSettleTransData.getFinprodType2());
             // 金融产品代码
             settleTransData.setFinprodId(sqSettleTransData.getFinprodId());
-            // 交易份额
-            settleTransData.setShareAmt(abs(szdSjsjg.getJgjssl()));
+            // XYHGFXSJ-716:modify by fuyongsheng 20220730 start
+            if(StringUtil.equals(ywlb, StlDataDealProcessConstant.SJSJG_YWLB_XYJZ)){
+                FinDealPledgeKey key = new FinDealPledgeKey();
+                key.setFinprodId(sqSettleTransData.getFinprodId());
+                key.setBranch(0L);
+                List<FinDealPledge> finDealPledges = finDealPledgeMapper.selectByFinprodId(key);
+                sqSettleTransData.setShareAmt(finDealPledges.stream().map(FinDealPledge::getPledgeNumber).reduce(BigDecimal::add).get());
+            }else{
+                // 交易份额
+                settleTransData.setShareAmt(abs(szdSjsjg.getJgjssl()));
+            }
+            // XYHGFXSJ-716:modify by fuyongsheng 20220730 end
             // 期限品种
             settleTransData.setTermType(sqSettleTransData.getTermType());
             // 起息日
