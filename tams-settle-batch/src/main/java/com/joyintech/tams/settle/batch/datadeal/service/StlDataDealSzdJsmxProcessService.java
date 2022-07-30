@@ -1012,7 +1012,7 @@ public class StlDataDealSzdJsmxProcessService {
 						}
 						if (StringUtil.equals(StlDataDealProcessConstant.YWLX_614, szdJsmx.getYwlx()) && StringUtil.equals(StlDataDealProcessConstant.MMBS_S, szdJsmx.getMmbz())) {
 							boolean ywlx615ExistFlag = ywlx615ExistFlag(szdJsmx, stlDownDataDealOperatorDto.getStlDownDataDealOperatorBaseDto().getJsmxList());
-							if (ywlx615ExistFlag) {
+							if (!ywlx615ExistFlag) {
 								settleTransData.setPs(DictCodeList.交易方向_到期.getValue());
 							} else {
 								settleTransData.setPs(DictCodeList.交易方向_到期续做.getValue());

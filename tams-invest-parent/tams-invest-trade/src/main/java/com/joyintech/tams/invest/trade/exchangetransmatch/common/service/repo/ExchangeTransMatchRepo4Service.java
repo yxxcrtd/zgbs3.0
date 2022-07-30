@@ -68,7 +68,7 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
         // XYHGFXSJ-710:修改到期续做查询首期成交编号 modify by fuyongsheng 20220729 end
         TrdProductDealAdd  firstRepoTradeAdd = trdProductDealAddMapper.selectByPrimaryKey(firstRepoTrade.getTradeId());
 
-        List<SettleTransData> settleTransDataList = this.handleSettleTransData(dealDto,entrustDto);
+        List<SettleTransData> settleTransDataList = this.handleSettleTransData(dealDto,entrustDto,firstRepoTrade);
 
         for(SettleTransData settleTransData:settleTransDataList) {
             ExchangeTransMatchBaseTradeDto exchangeTransMatchBaseTradeDto = new ExchangeTransMatchBaseTradeDto();
@@ -509,7 +509,8 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
      * @param entrustDto
      * @return
      */
-    private List<SettleTransData> handleSettleTransData(ExchangeTransMatchCommonDto dealDto, ExchangeTransMatchCommonEntrustDto entrustDto) {
+    private List<SettleTransData> handleSettleTransData(ExchangeTransMatchCommonDto dealDto, ExchangeTransMatchCommonEntrustDto entrustDto,
+                                                        TrdProductDeal firstRepoTrade) {
         List<SettleTransData> settleTransDataList = new ArrayList<>();
         Map<String,Object> map = new HashMap<>();
         map.put("seqId",dealDto.getSeqId());
@@ -569,8 +570,8 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
                         IntSettleTransData.setPs(DictCodeList.交易方向_收息到账.getValue());
 //                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(),dealDto.getMpayDate(),
 //                                DictCodeList.交易方向_买入.getValue(),entrustDto.getPortfolioId());
-                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(), dealDto.getMpayDate(),
-                                dealDto.getSeatNumber(), dealDto.getSecAcctId());
+//                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(), dealDto.getMpayDate(),
+//                                dealDto.getSeatNumber(), dealDto.getSecAcctId());
                         if(StringUtil.isNotEmpty(firstRepoTrade)) {
                             IntSettleTransData.setFinprodId(firstRepoTrade.getFinprodId());
                         }
@@ -600,8 +601,8 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
 
 //                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(),dealDto.getMpayDate(),
 //                                DictCodeList.交易方向_买入.getValue(),entrustDto.getPortfolioId());
-                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(), dealDto.getMpayDate(),
-                                dealDto.getSeatNumber(), dealDto.getSecAcctId());
+//                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(), dealDto.getMpayDate(),
+//                                dealDto.getSeatNumber(), dealDto.getSecAcctId());
                         if(StringUtil.isNotEmpty(firstRepoTrade)) {
                             prinSettleTransData.setFinprodId(firstRepoTrade.getFinprodId());
                         }
@@ -665,8 +666,8 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
                         IntSettleTransData.setPs(DictCodeList.交易方向_收息到账.getValue());
 //                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(),dealDto.getMpayDate(),
 //                                DictCodeList.交易方向_买入.getValue(),entrustDto.getPortfolioId());
-                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(), dealDto.getMpayDate(),
-                                dealDto.getSeatNumber(), dealDto.getSecAcctId());
+//                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(), dealDto.getMpayDate(),
+//                                dealDto.getSeatNumber(), dealDto.getSecAcctId());
                         if(StringUtil.isNotEmpty(firstRepoTrade)) {
                             IntSettleTransData.setFinprodId(firstRepoTrade.getFinprodId());
                             IntSettleTransData.setVdate(firstRepoTrade.getVdate());
@@ -698,8 +699,8 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
 
 //                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(),dealDto.getMpayDate(),
 //                                DictCodeList.交易方向_买入.getValue(),entrustDto.getPortfolioId());
-                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(), dealDto.getMpayDate(),
-                                dealDto.getSeatNumber(), dealDto.getSecAcctId());
+//                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(), dealDto.getMpayDate(),
+//                                dealDto.getSeatNumber(), dealDto.getSecAcctId());
                         if(StringUtil.isNotEmpty(firstRepoTrade)) {
                             prinSettleTransData.setFinprodId(firstRepoTrade.getFinprodId());
                             prinSettleTransData.setVdate(firstRepoTrade.getVdate());
