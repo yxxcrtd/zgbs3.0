@@ -3,6 +3,7 @@ package com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.controller;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
@@ -1386,4 +1387,20 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
     public Message<EtrExchangeAgreRepTrade001Dto> getFirstDetailRepEntrustInfo(@RequestBody EtrExchangeAgreRepTrade001Dto dto) {
         return new Message<EtrExchangeAgreRepTrade001Dto>().success().setData(etrExchangeAgreRepTrade001Service.getFirstDetailRepEntrustInfo(dto));
     }
+
+
+    //  XYHGFXSJ-600 - 【协议回购指令】解除质押指令WTREPO202112214291查看数据丢失
+    /**
+     * 通过指令编号查询留痕数据用来展示
+     */
+    @ApiOperation(value = "", notes = "通过指令编号查询留痕数据用来展示")
+    @ResponseBody
+    @PostMapping("getProcessDataForShow")
+    public Message<EtrExchangeAgreRepTrade001Dto> getWorkflowDataForShow(@RequestBody EtrExchangeAgreRepTrade001Dto dto) {
+        ProcessMark processMark = new ProcessMark();
+        processMark.setPageId("EtrExchangeAgreRepTrade002");
+        processMark.setBusinessDataPk1(dto.getEntrustId());
+        return new Message<EtrExchangeAgreRepTrade001Dto>().success().setData(etrExchangeAgreRepTrade001Service.getBussinessEntityByPk(processMark));
+    }
+    //  XYHGFXSJ-600 - 【协议回购指令】解除质押指令WTREPO202112214291查看数据丢失
 }
