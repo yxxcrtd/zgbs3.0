@@ -38,6 +38,7 @@ import com.joyintech.tams.business.common.entity.CfgDataTableShow;
 import com.joyintech.tams.business.common.entity.CfgReadonlyFormShow;
 import com.joyintech.tams.business.common.service.EtrCommonFinProductInfoService;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
+import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dao.CfetsEtrBondFirstBid001Mapper;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsBiddingProductDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
@@ -1772,6 +1773,9 @@ public class CfetsEtrDispatcherService extends BaseService {
                         infoDto.setPledStrdPrinAmt(ArithmeticUtil.divide(infoDto.getPledStrdPrinAmt(), new BigDecimal("10000"), 2));
                         if (StringUtil.isNoneBlank(infoDto.getRegistOrg())) {
                             infoDto.setRepRegistOrg(SysDataUtil.getNameFromDataDict(DictCode.登记托管机构_中债, infoDto.getRegistOrg()));
+                        }
+                        if(BigDecimalUtil.isZeroOrNull(infoDto.getPledStrdPrinAmt())){
+                            infoDto.setPledStrdPrinAmt(null);
                         }
                     }
                     CfetsEtrDispatcherInfoResponse totalResult = new CfetsEtrDispatcherInfoResponse();
