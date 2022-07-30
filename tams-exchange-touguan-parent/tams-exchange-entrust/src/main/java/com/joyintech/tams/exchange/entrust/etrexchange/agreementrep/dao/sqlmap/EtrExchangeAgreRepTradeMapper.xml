@@ -717,7 +717,7 @@
                 END AS dealPercent,
                 CASE
                 WHEN etr_entrust.PS = 'T94' THEN
-                        ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 ) * 100
+                        ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
                     ELSE ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
                 END finishAmt,
                 CASE
@@ -731,7 +731,7 @@
                 END AS avaNum,
                 CASE
                     WHEN etr_entrust.PS = 'T94' THEN
-                        ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 ) * 100
+                        ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
                     ELSE ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
                 END finishDealAmt,
                 CASE
