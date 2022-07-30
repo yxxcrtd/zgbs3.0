@@ -1441,7 +1441,8 @@ public class CfetsEtrDispatcherService extends BaseService {
                 }
                 if(b) {
                     if(Objects.nonNull(etrEntrustAdd)) {
-                        if (StringUtil.equals(etrEntrustAdd.getBusiTypePosition(), 头寸业务类型_债券一级投标.getValue()) || StringUtil.equals(etrEntrustAdd.getBusiTypePosition(), 头寸业务类型_债券一级申购.getValue())) {
+                        if (StringUtil.equals(etrEntrustAdd.getBusiTypePosition(), 头寸业务类型_债券一级投标.getValue())
+                                || StringUtil.equals(etrEntrustAdd.getBusiTypePosition(), 头寸业务类型_债券一级申购.getValue())) {
                             b = false;
                         }
                     }

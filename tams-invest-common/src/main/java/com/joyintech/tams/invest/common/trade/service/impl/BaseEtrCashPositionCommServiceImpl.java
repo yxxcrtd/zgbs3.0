@@ -359,12 +359,17 @@ public class BaseEtrCashPositionCommServiceImpl extends BaseService implements B
     }
     @Override
     public CommonResult entrustCloseExecute(String entrustId){
-        return this.entrustCloseExecute(entrustId, null,null);
+        return this.entrustCloseExecute(entrustId, null,null, null);
     }
 
     @Override
     public CommonResult entrustCloseExecute(String entrustId, String isExistNew){
-        return this.entrustCloseExecute(entrustId, isExistNew, null);
+        return this.entrustCloseExecute(entrustId, isExistNew, null, null);
+    }
+
+    @Override
+    public CommonResult entrustCloseExecute(String entrustId, String isExistNew, String isSettleFail) {
+        return this.entrustCloseExecute(entrustId, isExistNew, null, isSettleFail);
     }
 
     // modify by etliu 20220719 start
@@ -394,7 +399,7 @@ public class BaseEtrCashPositionCommServiceImpl extends BaseService implements B
     // modify by etliu 20220719 end
 
     @Override
-    public CommonResult entrustCloseExecute(String entrustId, String isExistNew, BigDecimal forcedFinishAmt) {
+    public CommonResult entrustCloseExecute(String entrustId, String isExistNew, BigDecimal forcedFinishAmt, String isSettleFail) {
         if (StringUtil.isNotEmpty(entrustId)) {
             EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(entrustId);
             if (etrEntrust != null && ((etrEntrust.getEntrustClass() != null
@@ -415,6 +420,7 @@ public class BaseEtrCashPositionCommServiceImpl extends BaseService implements B
                     entrustCommonDto.setForcedFinishAmt(forcedFinishAmt);//强制完成额度
                 }
                 entrustCommonDto.setIsExistNew(isExistNew);
+                entrustCommonDto.setIsSettleFail(isSettleFail);
                 entrustCloseExecuteSinglePortfolio(entrustCommonDto);
             }
 

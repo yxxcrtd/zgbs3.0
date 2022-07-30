@@ -1056,17 +1056,17 @@ public class CfetsRepoDealQuotedPrice001Service extends BaseService {
 		}
         if (DictCodeListExt3.交易方向_正回购.getValue().equals(ps)) {
             // 查询正常流水,生成冲销流水,为了余额更新正确
-            if (etrSecPositionFlows.size() > 0) {
-                List<EtrSecPositionFlowDto> etrSecPositionFlowDtos = baseAssetCashPositionCommMapper.selectAllEtrPositionByOffsetFlag(dto.getQuoteId(), DictCodeList.冲正标识_正常交易.getValue());
-                for (EtrSecPositionFlowDto flowDto : etrSecPositionFlowDtos) {
-                    EtrSecPositionFlowDto temp = new EtrSecPositionFlowDto();
-                    BeanUtil.copyPropertiesIgnoreNull(temp, flowDto);
-                    temp.setSeqno(IDGenerator.generate());
-                    temp.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
-                    temp.setOffsetId(flowDto.getTradeId());
-                    etrSecPositionFlows.add(temp);
-                }
-            }
+//            if (etrSecPositionFlows.size() > 0) {
+//                List<EtrSecPositionFlowDto> etrSecPositionFlowDtos = baseAssetCashPositionCommMapper.selectAllEtrPositionByOffsetFlag(dto.getQuoteId(), DictCodeList.冲正标识_正常交易.getValue());
+//                for (EtrSecPositionFlowDto flowDto : etrSecPositionFlowDtos) {
+//                    EtrSecPositionFlowDto temp = new EtrSecPositionFlowDto();
+//                    BeanUtil.copyPropertiesIgnoreNull(temp, flowDto);
+//                    temp.setSeqno(IDGenerator.generate());
+//                    temp.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
+//                    temp.setOffsetId(flowDto.getTradeId());
+//                    etrSecPositionFlows.add(temp);
+//                }
+//            }
             //删除历史流水
             baseAssetCashPositionCommMapper.deleteEtrPositionByTradeId(dto.getQuoteId());
 
