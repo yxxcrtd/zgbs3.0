@@ -33,7 +33,7 @@
     <select id="selectPledgeSjsfw" resultType="com.joyintech.tams.common.base.entity.SzdSjsfw">
 		SELECT SFW.FWZQDM, SFW.FWZJYE
 		  FROM SZD_SJSFW SFW
-		 WHERE SUBSTR(SFW.FWZYSM, 22, 6) = #{fCjbh, jdbcType=VARCHAR}
+		 WHERE SUBSTR(SFW.FWZYSM, 23, 6) = #{fCjbh, jdbcType=VARCHAR}
 		   AND SFW.FWFSRQ = #{jgcjrq, jdbcType=VARCHAR}
 		   AND SFW.FWTGDY = #{jgtgdy, jdbcType=VARCHAR}
 		   AND SFW.FWSJLB = '11'

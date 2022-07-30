@@ -1542,7 +1542,7 @@ public class StlDataDealSzdSjsjgProcessService {
                         SettleTransDataPledge settleTransDataPledge = new SettleTransDataPledge();
                         settleTransDataPledge.setTradeId(settleTransData.getTradeId());
                         settleTransDataPledge.setBranch(0L);
-                        settleTransDataPledge.setPledgeFinprodId(info.getFwzqdm());
+                        settleTransDataPledge.setPledgeFinprodId("F01_" + info.getFwzqdm() + ".SZ");
                         settleTransDataPledge.setPledgeFaceValue(finCashPlanMapper.selectFaceValue(settleTransData.getFinprodId(), DateUtil.format(DateUtil.platDateFromCache())));
                         settleTransDataPledge.setPledgeNumber(info.getFwzjye());
                         // 质押率
