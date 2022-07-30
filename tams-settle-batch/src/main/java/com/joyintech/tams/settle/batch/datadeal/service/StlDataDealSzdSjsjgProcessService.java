@@ -937,7 +937,9 @@ public class StlDataDealSzdSjsjgProcessService {
                 key.setFinprodId(sqSettleTransData.getFinprodId());
                 key.setBranch(0L);
                 List<FinDealPledge> finDealPledges = finDealPledgeMapper.selectByFinprodId(key);
-                sqSettleTransData.setShareAmt(finDealPledges.stream().map(FinDealPledge::getPledgeNumber).reduce(BigDecimal::add).get());
+                if(CollectionUtils.isNotEmpty(finDealPledges)){
+                    settleTransData.setShareAmt(finDealPledges.stream().map(FinDealPledge::getPledgeNumber).reduce(BigDecimal::add).get());
+                }
             }else{
                 // 交易份额
                 settleTransData.setShareAmt(abs(szdSjsjg.getJgjssl()));
