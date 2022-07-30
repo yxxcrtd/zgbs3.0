@@ -2872,7 +2872,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
      * @param requestId          交易方向
      * @return 是否已经存在该行情编号的指令
      */
-    public boolean isAlreadyDoEntrust(String requestId) {
+    public boolean isAlreadyDoEntrustByRequestId(String requestId) {
         int count = etrExchangeAgreRepTradeMapper.selectEtrEntrustCountByRequestId(requestId);
         if (count > 0) {
             return true;
