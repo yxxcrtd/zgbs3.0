@@ -2724,7 +2724,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
      * @date 2021/12/28 20:51
      */
     public CfetsRepoDealQuotedPrice001Dto queryEntrustInfoByQuoteId(String quoteId) {
-        Map<String, Object> param = new HashMap<String, Object>();
+        Map<String, Object> param = new HashMap<>();
         param.put("quoteId", quoteId);
         param.put("platDate", iPlatformDate.getSysDateStr());
         CfetsRepoDealQuotedPrice001Dto dto = this.queryEntrustInfoByQuoteId(param);
@@ -2741,11 +2741,15 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
      */
     public List<PtlAllocationDto> selectPortfolioInit(Map<String, Object> map) {
         if (map.containsKey("quoteId") && StringUtil.isNotEmpty(map.get("quoteId"))) {
-            if (this.isInWflProcess((String) map.get("quoteId"))) {
-                return cfetsRepoDealQuotedPrice001Mapper.selectWflPortfolioByQuoteIdInit(map);
-            } else {
-                return cfetsRepoDealQuotedPrice001Mapper.selectPortfolioByQuoteIdInit(map);
+            boolean flag = this.isInWflProcess((String) map.get("quoteId"));
+            List<PtlAllocationDto> list = new ArrayList<>();
+            if (flag) {
+                list = cfetsRepoDealQuotedPrice001Mapper.selectWflPortfolioByQuoteIdInit(map);
             }
+            if (!flag || CollectionUtils.isEmpty(list)) {
+                list = cfetsRepoDealQuotedPrice001Mapper.selectPortfolioByQuoteIdInit(map);
+            }
+            return list;
         }
         return cfetsRepoDealQuotedPrice001Mapper.selectPortfolioInit(map);
     }
@@ -2790,9 +2794,11 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
         String quoteId = (String) param.get("quoteId");
         com.joyintech.service.bankuplink.repo.dto.CfetsRepoDealQuotedPrice001Dto dto = null;
         if (StringUtil.isNotEmpty(quoteId)) {
-            if (this.isInWflProcess(quoteId)) {
+            boolean flag = this.isInWflProcess(quoteId);
+            if (flag) {
                 dto = this.queryRepoDialogueQuoteByQuoteId(quoteId);
-            } else {
+            }
+            if (!flag || dto == null) {
                 dto = ibuComponentCommonService.queryRepoDialogueQuoteByQuoteId(quoteId);
             }
             //质押式回购报价历史
