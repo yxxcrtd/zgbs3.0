@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +46,8 @@ public class CreditOccupWriter extends BaseWriter<NeedToWriteEntity> {
         if (!StringUtil.isEmptyList(resultList)) {
             resultList.forEach(item ->{
                 if(!StringUtil.isEmptyList(item.getCreditUsings())){
+                    item.setUpdateTime(new Date());
+                    item.setUpdateUser("system");
                     item.getCreditUsings().forEach(item2 ->{
                         if(StringUtil.equals(item2.getCreditUsingType(),"01")){
                             creditOccupMapper.updateCreditUsingCustomer(item2);

@@ -26,7 +26,6 @@ import com.joyintech.tams.invest.batch.creditoccup.reader.CreditOccupSzReader;
 import com.joyintech.tams.invest.batch.creditoccup.writer.CreditOccupFirstWriter;
 import com.joyintech.tams.invest.batch.creditoccup.writer.CreditOccupSzWriter;
 import com.joyintech.tams.invest.batch.creditoccup.writer.CreditOccupWriter;
-import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
@@ -107,19 +106,15 @@ public class CreditOccupTask extends BatchBaseService {
         step2Processor.setParams(params);
         step3Reader.setParams(params);
         step3Processor.setParams(params);
-        try {
-            return batchBuilder.init(this).batch("step1", (BaseReader) step1Reader,
-                    (BaseProcessor) step1Processor, (BaseWriter) step1Writer)
-                    .batch("step2", (BaseReader) step2Reader,
-                            (BaseProcessor) step2Processor, step2Writer)
-                    .batch("step3", (BaseReader) step3Reader,
-                            (BaseProcessor) step3Processor, step3Writer)
-                    .builder(
-                            this.getBatchTask().getBeanName() + this.getBatchTask().getTaskId()).run();
-        }catch (Exception e) {
-            logger.error("日终授信更新异常",e);
-            throw new BatchException(RiskUtil.getLogString(e));
-        }
+        return batchBuilder.init(this).batch("step1", (BaseReader) step1Reader,
+                (BaseProcessor) step1Processor, (BaseWriter) step1Writer)
+                .batch("step2", (BaseReader) step2Reader,
+                        (BaseProcessor) step2Processor, step2Writer)
+                .batch("step3", (BaseReader) step3Reader,
+                        (BaseProcessor) step3Processor, step3Writer)
+                .builder(
+                        this.getBatchTask().getBeanName() + this.getBatchTask().getTaskId()).run();
+
     }
 
 }

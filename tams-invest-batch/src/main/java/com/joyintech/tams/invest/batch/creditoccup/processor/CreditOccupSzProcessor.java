@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -45,6 +46,8 @@ public class CreditOccupSzProcessor extends BaseProcessor<NeedOperateEntity, Cre
             List<CreditLinesInputDto> creditLinesInputzy = new ArrayList<>();
             for(CreditLinesInputDto dto : creditLinesInputs){
                 if(StringUtil.isEmpty(dto.getTradeId())) continue;
+                dto.setUpdateTime(new Date());
+                dto.setUpdateUser("system");
                 CreditLinesInputDto dto1 = new CreditLinesInputDto();
                 BeanUtil.copyPropertiesIgnoreNull(dto1,dto);
                 dto1.setTradeId(dto.getTradeId());
