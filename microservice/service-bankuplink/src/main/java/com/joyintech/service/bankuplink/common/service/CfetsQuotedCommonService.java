@@ -1530,7 +1530,7 @@ public class CfetsQuotedCommonService extends BaseService {
                 secport.setEtrId(pledgeDto.getEntrustId());
                 secport.setFinprodId(pledgeDto.getFinprodId());
                 secport.setTradeId(entity.getQuoteId());
-                Map<String, Object> map = new HashMap<String, Object>();
+                Map<String, Object> map = new HashMap<>();
                 map.put("portfolioId", pledgeDto.getPortfolioId());
                 map.put("finprodId", pledgeDto.getFinprodId());
                 String secAcctId = this.qryPortfolioSecAcctId(map);

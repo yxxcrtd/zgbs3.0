@@ -1097,7 +1097,6 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
         if (StringUtil.equals("save", entity.getOperatorType())){
             return;
         }
-        Map<String, Object> map = new HashMap<>();
         if (!StringUtil.equals("revoke", entity.getOperatorType())
                 && !StringUtil.equals("delete", entity.getOperatorType())) {
             // 重新insert
@@ -1137,6 +1136,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
                 com.joyintech.service.bankuplink.repo.dto.CfetsRepoDealQuotedPrice001Dto dto
                         = this.investDto2ServiceDto(entity);
                 dto.setIsExistNew(DictCodeList.是否_是.getValue());
+                logger.info("doInsetOrUpdateForPtlPositionHold -> {}", JsonUtils.object2Json(dto));
                 oldCfetsRepoDealQuotedPrice001Service.doInsetOrUpdateForPtlPositionHold(dto);
             }
             ProcessMark newEntity;
@@ -1182,18 +1182,19 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
         if (!StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
             return;
         }
-        //回退释放头寸
-        Map<String, Object> param = new HashMap<>();
-        param.put("workflowId", entity.getWorkflowId());
-        param.put("pageWflType", "REPO");
-        param.put("ps", entity.getPs());
-        boolean flag = this.doBackPtlPositionHold(param);
-        if (!flag && StringUtil.isNotEmpty(entity.getWorkflowId())) {
-            logger.error("流程中数据删除头寸失败!");
-        }
-        //退回操作重新占用该条报价单之前的
-        if (StringUtil.isNotEmpty(entity.getQuoteId())
+        if (StringUtil.equals(entity.getQuotaPageModel(), "new")) {
+            //回退释放头寸
+            Map<String, Object> param = new HashMap<>();
+            param.put("workflowId", entity.getWorkflowId());
+            param.put("pageWflType", "REPO");
+            param.put("ps", entity.getPs());
+            boolean flag = this.doBackPtlPositionHold(param);
+            if (!flag && StringUtil.isNotEmpty(entity.getWorkflowId())) {
+                logger.error("流程中数据删除头寸失败!");
+            }
+        } else if (StringUtil.isNotEmpty(entity.getQuoteId())
                 && this.isUpdatePosition(entity)) {
+            //退回操作重新占用该条报价单之前的
             CfetsRepoDealQuotedPrice001Dto cfetsRepoDealQuotedPrice001Dto = new CfetsRepoDealQuotedPrice001Dto();
             cfetsRepoDealQuotedPrice001Dto.setQuoteId(entity.getQuoteId());
             cfetsRepoDealQuotedPrice001Dto.setIsDzh(DictCodeList.是否_是.getValue());
@@ -1235,9 +1236,15 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
             temp.setSeqno(IDGenerator.generate());
             temp.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
             temp.setOffsetId(flowDto.getTradeId());
+            temp.setCreateTime(new Date());
+            temp.setUpdateTime(new Date());
+            temp.setCreateUser(LoginUserUtil.getUserName());
+            temp.setUpdateUser(LoginUserUtil.getUserName());
             etrSecPositionFlows.add(temp);
         }
         logger.info("指令持仓:{}", JsonUtils.object2Json(etrSecPositionFlows));
+        // 删除历史流水 避免历史流水影响下次提交
+        baseAssetCashPositionCommMapper.deleteEtrPositionByTradeId(quoteId);
 
         EtrPositionHoldDto etrPositionHoldDto = new EtrPositionHoldDto();
         etrPositionHoldDto.setPtlSecPositionFlows(etrSecPositionFlows);
@@ -1255,8 +1262,13 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
             flowDto.setAmount(flowDto.getAmount().negate());
             flowDto.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
             flowDto.setOffsetId(ptlSecPositionFlow.getTradeId());
+            flowDto.setCreateTime(new Date());
+            flowDto.setUpdateTime(new Date());
+            flowDto.setCreateUser(LoginUserUtil.getUserName());
+            flowDto.setUpdateUser(LoginUserUtil.getUserName());
             basePtlSecPositionInfoService.inertSecPositionFlow(flowDto);
         }
+        // 删除历史流水 避免历史流水影响下次提交
         baseAssetCashPositionCommMapper.deleteCashPositionByOrderIds(Collections.singletonList(quoteId));
         baseAssetCashPositionCommMapper.deletePositionByTradeIdNotPledge(quoteId);
         return true;

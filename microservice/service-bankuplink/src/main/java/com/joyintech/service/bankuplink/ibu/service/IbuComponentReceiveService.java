@@ -1003,7 +1003,7 @@ public class IbuComponentReceiveService extends BaseService{
             dto.setIsMq("Y"); //mq推送标识
             dto.setIsDzh(quoteResultDto.getRepoDialogueQuote().getIsDzh());
             if (null != ibuQuoteCrepPledgeDtoList && ibuQuoteCrepPledgeDtoList.size() > 0) {
-                List<CfetsRepoDealQuotedPrice003Dto> pledgeBondList = new ArrayList<CfetsRepoDealQuotedPrice003Dto>();
+                List<CfetsRepoDealQuotedPrice003Dto> pledgeBondList = new ArrayList<>();
                 if (StringUtil.equals(quoteResultDto.getRepoDialogueQuote().getIsDzh(), "Y")) {
                     //多组合 处理持仓 传入拆分后质押券
                     List<IbuQuoteEntCrepPledgeDto> ibuQuoteEntCrepPledges = quoteResultDto.getRepoDialogueQuote().getIbuQuoteEntCrepPledgeDtoList();
