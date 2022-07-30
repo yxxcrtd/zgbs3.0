@@ -662,7 +662,11 @@
             AND isExpire = #{isDate}
         </if>
         <if test="sysdate != null">
-            and ((sysDate1 <![CDATA[<=]]> #{sysdate,jdbcType=DATE} and totle_trade_id is null) or sysDate1 <![CDATA[>]]> #{sysdate,jdbcType=DATE} )
+            and (
+            (sysDate1 <![CDATA[<=]]> #{sysdate,jdbcType=DATE} and totle_trade_id is null)
+            or (sysDate1 = #{sysdate,jdbcType=DATE} and totle_trade_id is not null)
+            or sysDate1 <![CDATA[>=]]> #{sysdate,jdbcType=DATE}
+            )
         </if>
         <if test="origSerialNo != null and origSerialNo != ''">
             AND (intiTradeId  like '%' || #{origSerialNo} || '%' OR firstTradeId like '%' || #{origSerialNo} )
