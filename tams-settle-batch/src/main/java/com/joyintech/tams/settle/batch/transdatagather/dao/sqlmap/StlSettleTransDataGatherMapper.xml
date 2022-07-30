@@ -58,7 +58,8 @@
                     tmp1.TRADE_ID = A.TRADE_ID
                     AND (
                         <!--剔除竞价回购存续期、协议回购逆回购到期数据-->
-                        tmp1.BUSI_SCENE_CALSS IN (#{BUSI_SCENE_CLASS_0902RB02},#{BUSI_SCENE_CLASS_0901RB02},#{BUSI_SCENE_CLASS_0901RS04})
+                        tmp1.BUSI_SCENE_CALSS IN (#{BUSI_SCENE_CLASS_0901RB02},#{BUSI_SCENE_CLASS_0901RS04})
+                        OR (tmp1.ps = 'T07' AND tmp1.BUSI_SCENE_CALSS = #{BUSI_SCENE_CLASS_0902RB02})
                         <!--剔除债券存续期数据-->
                         OR (tmp1.FINPROD_TYPE = #{FINPROD_TYPE_TG_F01} AND tmp1.PS IN(#{PS_T39},#{PS_T07},#{PS_T08},#{PS_T09}))
                         <!--剔除申购确认、现金分红、红利再投、除权登记数据-->

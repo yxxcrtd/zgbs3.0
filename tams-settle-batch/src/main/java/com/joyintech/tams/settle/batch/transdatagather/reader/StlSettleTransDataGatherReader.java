@@ -582,7 +582,11 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                                 //到期金额
                                 dealTotal.setmTradeAmt(item.getmTradeAmt());
                                 //首期成交编号
-                                dealTotal.setfCjbh(item.getfCjbh());
+                                if(DictCodeList.交易方向_到期续做.getValue().equals(item.getPs())){
+                                    dealTotal.setfCjbh(item.getTradeId());
+                                }else{
+                                    dealTotal.setfCjbh(item.getfCjbh());
+                                }
                             }
                             //当笔成交数据明细.质押品信息流水号 非空
                             if(StringUtil.isNotEmpty(item.getPledgeTradeId())){
