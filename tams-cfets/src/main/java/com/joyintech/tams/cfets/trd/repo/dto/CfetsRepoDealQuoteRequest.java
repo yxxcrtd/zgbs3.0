@@ -26,6 +26,9 @@ public class CfetsRepoDealQuoteRequest {
     @ApiModelProperty(required = false, name = "workflowId", value = "工作流代码")
     private String workflowId;
 
+    @ApiModelProperty(required = false, name = "isEtrInfo", value = "是否指令详情查询")
+    private String isEtrInfo;
+
     public String getQuoteId() {
         return quoteId;
     }
@@ -56,6 +59,14 @@ public class CfetsRepoDealQuoteRequest {
 
     public void setQuoteType(String quoteType) {
         this.quoteType = quoteType;
+    }
+
+    public String getIsEtrInfo() {
+        return isEtrInfo;
+    }
+
+    public void setIsEtrInfo(String isEtrInfo) {
+        this.isEtrInfo = isEtrInfo;
     }
 }
 
