@@ -1,20 +1,7 @@
 package com.joyintech.tams.invest.common.trade;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import com.joyintech.framework.exception.BusinessException;
-import com.joyintech.tams.systemtools.interf.IPlatformDate;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import com.alibaba.fastjson.JSONObject;
+import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.common.base.dao.*;
@@ -26,6 +13,18 @@ import com.joyintech.tams.invest.common.trade.dao.CreditLinesUpdateMapper;
 import com.joyintech.tams.invest.common.trade.dto.CreditComInfoOneStepDto;
 import com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto;
 import com.joyintech.tams.invest.common.trade.dto.CreditLinesOutputDto;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 @Scope("prototype")
@@ -1795,6 +1794,10 @@ public class CreditLinesUpdateImpl extends CreditLinesUpdateAbs {
             inputDto.setFinprodId(null);
         }
         if (creditLinesAst == null && (oneStepInfo != null && oneStepInfo.getDeductObj() == null || creditLinesOrg == null && creditLinesOrgItem == null)){
+            return outputDto;
+        }
+        //add by gwl ，处理找到了机构但没有找到分项授信导致空指针的问题 at 20220730
+        if(creditLinesOrg !=null  && creditLinesOrgItem == null) {
             return outputDto;
         }
         //处理 当授信对象为金额时 申购/认购 的待释放份额为0
