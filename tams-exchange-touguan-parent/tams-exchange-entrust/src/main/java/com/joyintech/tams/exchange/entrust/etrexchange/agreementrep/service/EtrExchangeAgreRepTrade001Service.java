@@ -2867,6 +2867,21 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
     }
 
     /**
+     * 判断是否已经存在该行情编号的指令
+     *
+     * @param requestId          交易方向
+     * @return 是否已经存在该行情编号的指令
+     */
+    public boolean isAlreadyDoEntrust(String requestId) {
+        int count = etrExchangeAgreRepTradeMapper.selectEtrEntrustCountByRequestId(requestId);
+        if (count > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * 处理履历
      */
     public void updateCfetsOprHis(String entrustId, String optType) {
