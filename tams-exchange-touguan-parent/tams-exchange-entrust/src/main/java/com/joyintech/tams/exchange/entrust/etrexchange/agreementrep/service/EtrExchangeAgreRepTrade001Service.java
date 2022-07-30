@@ -2722,12 +2722,19 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         //【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误
         if (StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_提前购回.getValue())
             || StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_到期购回.getValue())
-                || StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())) {
+                || StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())
+                || StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_到期续做.getValue())) {
             postionFlowDto.setTradeId(entity.getEtrEntrust().getFinprodId());
             //XYHGFXSJ-723
             postionFlowDto.setIntiTradeId(entity.getEtrEntrust().getFinprodId());
         }
         // modify by etliu 20220727 end
+
+        //实时资产头寸查询】协议回购上交所正回购到期续做数据日间交收后，对应报表里数值错误
+        if(StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_首期.getValue()) && StringUtil.isEmpty(postionFlowDto.getPledgeInvAim())){
+            postionFlowDto.setPledgeInvAim(commonPositionService.selectHoldInvAim(postionFlowDto.getPortfolioId(), postionFlowDto.getFinprodId()));
+        }
+        //实时资产头寸查询】协议回购上交所正回购到期续做数据日间交收后，对应报表里数值错误
 
         parameter.setCustom(postionFlowDto);
 //        try {
@@ -2852,6 +2859,21 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         paramMap.put("initTradeId", initTradeId);
 
         int count = etrExchangeAgreRepTradeMapper.selectDoneEtrEntrustCount(paramMap);
+        if (count > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * 判断是否已经存在该行情编号的指令
+     *
+     * @param requestId          交易方向
+     * @return 是否已经存在该行情编号的指令
+     */
+    public boolean isAlreadyDoEntrustByRequestId(String requestId) {
+        int count = etrExchangeAgreRepTradeMapper.selectEtrEntrustCountByRequestId(requestId);
         if (count > 0) {
             return true;
         }

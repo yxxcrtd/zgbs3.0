@@ -113,6 +113,14 @@ public class EtrExchangeAgreRepTradeValidator implements EtrCommonValidator {
                 }
             }
         }
+
+        //检查行情编号是否重复下指令
+        if (StringUtil.isNotEmpty(dto.getReqOnId())) {
+            if (etrExchangeAgreRepTrade001Service.isAlreadyDoEntrustByRequestId(dto.getReqOnId())) {
+                errorList.add(new ValidMessage("行情编号[" + dto.getReqOnId() + "]不能重复下指令！"));
+            }
+        }
+
         return errorList;
     }
 }

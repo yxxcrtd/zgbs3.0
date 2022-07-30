@@ -616,6 +616,10 @@ public class CommonPositionService {
 		etrSecPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
 		// modify by etliu 20220308 end
 
+		if(StringUtil.isBlank(etrSecPositionFlow.getInvAim())){
+			etrSecPositionFlow.setInvAim("999999");
+		}
+
 		etrSecPositionFlowMapper.insertSelective(etrSecPositionFlow);
 		if(getSysDate().compareTo(etrSecPositionFlow.getCdate()) != 0){//非T+0流水不需要更新余额
 			return;
@@ -686,6 +690,10 @@ public class CommonPositionService {
 		// 场内的头寸处理，全部已经对接了头寸引擎，需要标记下
 		ptlSecPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
 		// modify by etliu 20220308 end
+
+		if(StringUtil.isBlank(ptlSecPositionFlow.getInvAim())){
+			ptlSecPositionFlow.setInvAim("999999");
+		}
 
 		ptlSecPositionFlowMapper.insertSelective(ptlSecPositionFlow);
 		if(getSysDate().compareTo(ptlSecPositionFlow.getCdate()) != 0){//非T+0流水不需要更新余额

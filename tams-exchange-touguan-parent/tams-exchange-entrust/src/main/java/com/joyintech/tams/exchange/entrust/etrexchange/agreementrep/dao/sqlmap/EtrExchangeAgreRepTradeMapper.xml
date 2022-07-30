@@ -1527,4 +1527,20 @@
             )
         </if>
     </select>
+
+    <select id="selectEtrEntrustCountByRequestId" parameterType="java.lang.String" resultType="int">
+        select count(1) from (
+            SELECT ee.ENTRUST_ID
+            FROM ETR_ENTRUST ee INNER JOIN ETR_ENTRUST_ADD eea on ee.ENTRUST_ID = eea.ENTRUST_ID
+            WHERE eea.REQUEST_ID = #{requestId,jdbcType=VARCHAR} and ee.ENTRUST_STATUS != '06'
+            UNION
+            SELECT eeab.ENTRUST_ID
+            FROM ETR_ENTRUST_ADD_BACKUP eeab
+            WHERE eeab.REQUEST_ID = #{requestId,jdbcType=VARCHAR}
+            UNION
+            SELECT weea.ENTRUST_ID
+            FROM WFL_ETR_ENTRUST_ADD weea
+            WHERE weea.REQUEST_ID = #{requestId,jdbcType=VARCHAR}
+        )
+    </select>
 </mapper>
