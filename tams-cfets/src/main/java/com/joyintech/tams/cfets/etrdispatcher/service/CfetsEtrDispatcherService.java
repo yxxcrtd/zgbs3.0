@@ -424,7 +424,8 @@ public class CfetsEtrDispatcherService extends BaseService {
                     response.setExecFinishAmt(ArithmeticUtil.divide(response.getExecFinishAmt(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                     response.setExecRemainderAmt(ArithmeticUtil.divide(response.getExecRemainderAmt(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                     response.setDealProgress(ArithmeticUtil.divide(response.getTransFinishAmt(),ArithmeticUtil.doAdd(response.getTransFinishAmt(),response.getTransRemainderAmt()),4, RoundingMode.HALF_UP).multiply(new BigDecimal("100")));
-                //add wsz 20220621 3.0.6场内 ZGCPCN-1511 【信用保护凭证指令分发】执行进度和成交进度显示有问题 start
+                    response.setEntrustAmt(ArithmeticUtil.multiply(response.getEntrustAmt(),BigDecimal.valueOf(100)));
+                    //add wsz 20220621 3.0.6场内 ZGCPCN-1511 【信用保护凭证指令分发】执行进度和成交进度显示有问题 start
                 } else if (StringUtil.equals(response.getFinprodType2(), DictCodeListExt2.平安资产类型_信用保护凭证.getValue())) {
                     response.setExecFinishAmt(ArithmeticUtil.divide(response.getExecFinishAmt(), new BigDecimal(100),4, RoundingMode.HALF_UP));
                     response.setExecRemainderAmt(ArithmeticUtil.divide(response.getExecRemainderAmt(), new BigDecimal(100),4, RoundingMode.HALF_UP));
