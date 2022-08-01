@@ -164,14 +164,30 @@
                   INV_AIM,
                   </if>
 <!--                 PSV.END_DAYS_1, -->
-                SUM(DECODE(PSP.HODING_TYPE,#{POSITION_TYPE_06},-PSP.AMOUNT,'11',-PSP.AMOUNT,PSP.AMOUNT)) AMOUNT, psp.SEC_ACCT_ID
+
+               <choose>
+                   <when test="ps!=null and ps=='05' ">
+                       SUM(DECODE(PSP.HODING_TYPE,#{POSITION_TYPE_06},-PSP.AMOUNT,'11',-PSP.AMOUNT,PSP.AMOUNT)) AMOUNT
+                   </when>
+                   <otherwise>
+                       SUM(DECODE(PSP.HODING_TYPE,#{POSITION_TYPE_06},-PSP.AMOUNT,'11',-PSP.AMOUNT,PSP.AMOUNT)) AMOUNT
+                   </otherwise>
+               </choose>
+                    , psp.SEC_ACCT_ID
             	from PTL_SEC_POSITION PSP
   				LEFT JOIN FIN_PRODUCT T ON PSP.FINPROD_ID = T.FINPROD_ID
   				LEFT JOIN FIN_PRODUCT FPSAI ON PSP.SEC_ACCT_ID = FPSAI.FINPROD_ID
  				WHERE T.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01}
    				and psp.PORTFOLIO_ID = #{portfolioId, jdbcType=VARCHAR}
    				AND psp.CDATE &lt;= TO_DATE(#{plateDate, jdbcType=VARCHAR}, 'yyyy-MM-dd')
-   				and PSP.HODING_TYPE IN (#{POSITION_TYPE_01}, #{POSITION_TYPE_03},#{POSITION_TYPE_05},#{POSITION_TYPE_06}, '11', '08')
+               <choose>
+                   <when test="ps!=null and ps=='05' ">
+                       and PSP.HODING_TYPE IN (#{POSITION_TYPE_01}, #{POSITION_TYPE_03},#{POSITION_TYPE_06}, '11', '08')
+                   </when>
+                   <otherwise>
+                       and PSP.HODING_TYPE IN (#{POSITION_TYPE_01}, #{POSITION_TYPE_03},#{POSITION_TYPE_05},#{POSITION_TYPE_06}, '11', '08')
+                   </otherwise>
+               </choose>
    				<if test="secAcctId != null and secAcctId != '' and secAcctId !='undefined'">
                       AND PSP.SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
                 </if>

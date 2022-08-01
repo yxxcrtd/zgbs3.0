@@ -14,6 +14,7 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.exception.MessageException;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
@@ -514,12 +515,19 @@ public class TrdBondLendInvestTrade002Controller extends BaseController {
             getMessage("TrdBondLendInvestTrade002.tradeId") + GlobalConstant.COLON + entity.getTradeId(),
             getMessage("TrdBondLendInvestTrade002.finprodName") + GlobalConstant.COLON + entity.getFinprodName(),
             getMessage("TrdBondLendInvestTrade002.tradeDate") + GlobalConstant.COLON + DateUtil.format(entity.getTradeDate())));
-
+//        try{
+//            String msg = trdBondLendInvestTrade002Service.start(processParameter, dto);
+//            return new AjaxResult(msg);
+//        }catch (MessageException e){
+//            AjaxResult m =new AjaxResult(e.getMessage(),e.getMessageType());
+//            return m ;
+//        }
         String msg = trdBondLendInvestTrade002Service.start(processParameter, dto);
+        return new AjaxResult(msg);
         
         //授信占用额度
 //        trdCommonController.delLinesDeal(dto.getRiskCreditListCommonDto(),dto.getTradeId());
-        return new AjaxResult(msg);
+
     }
     
     //组合代码

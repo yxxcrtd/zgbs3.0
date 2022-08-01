@@ -90,17 +90,23 @@ public class EtrSecLendValidator implements EtrCommonValidator {
             }
             BigDecimal objectAvailablePosition = dto.getObjectAvailablePosition();
             // 交易方向为融出时，显示可用持仓，券面总额不可大于可用持仓；
-            if (StringUtil.equals(DictCodeList.回购拆借方向_融出.getValue(), dto.getBusiPs())) {
-                if (totalAmt != null && objectAvailablePosition != null
-                    && totalAmt.compareTo(objectAvailablePosition) > 0) {
-                        errorList.add(new ValidMessage("totalAmt",
-                            getMessage("BUSS_COM_E_0003",
-                                getMessage("EtrSecLend.totalAmt"),
-                                getMessage("EtrSecLend.objectAvailablePosition"))));
-                }
-                
-                if(StringUtil.isEmpty(dto.getSecAcctId())){
-                    errorList.add(new ValidMessage("secAcctId", this.getMessage("ETR_X_012",this.getMessage("EtrSecLend.secAcctId"))));
+//            if (StringUtil.equals(DictCodeList.回购拆借方向_融出.getValue(), dto.getBusiPs())) {
+//                if (totalAmt != null && objectAvailablePosition != null
+//                    && totalAmt.compareTo(objectAvailablePosition) > 0) {
+//                        errorList.add(new ValidMessage("totalAmt",
+//                            getMessage("BUSS_COM_E_0003",
+//                                getMessage("EtrSecLend.totalAmt"),
+//                                getMessage("EtrSecLend.objectAvailablePosition"))));
+//                }
+//
+//                if(StringUtil.isEmpty(dto.getSecAcctId())){
+//                    errorList.add(new ValidMessage("secAcctId", this.getMessage("ETR_X_012",this.getMessage("EtrSecLend.secAcctId"))));
+//                }
+//            }
+            // 交易方向为入时，需指定质押券
+            if (StringUtil.equals(DictCodeList.回购拆借方向_融入.getValue(), dto.getBusiPs())) {
+                if(!StringUtil.isNotEmpty(dto.getBussRepoSec())||StringUtil.isEmptyList(dto.getBussRepoSec().getPledgeBondList())){
+                    errorList.add(new ValidMessage("交易方向为融入时，需指定质押券!"));
                 }
             }
         }

@@ -12,6 +12,7 @@ package com.joyintech.tams.invest.trade.bondlend.service;
 
 import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.dto.UploadFile;
@@ -21,14 +22,20 @@ import com.joyintech.framework.jdbc.datasource.DataSource;
 import com.joyintech.framework.jdbc.enums.DataSourceType;
 import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.security.LoginUserUtil;
+import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
+import com.joyintech.system.base.dao.SysWflBusinessListMapper;
+import com.joyintech.system.base.entity.SysWflBusinessList;
+import com.joyintech.tams.business.common.exception.PositionException;
+import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.service.PositionHttpRequest;
+import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
 import com.joyintech.tams.component.business.common.service.BussCommonMapperDelegateService;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
@@ -38,9 +45,10 @@ import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommServi
 import com.joyintech.tams.component.business.trade.BussRepoSecService;
 import com.joyintech.tams.component.business.trade.BussTrdAvailableCashQueryService;
 import com.joyintech.tams.component.business.trade.dto.TrdInvestPersonInfo002Dto;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.*;
+import com.joyintech.tams.invest.trade.bondlend.dto.TrdSecLendCashPositionDto;
+import com.joyintech.tams.invest.trade.bondlend.dto.TrdSecLendPositionDto;
+import com.joyintech.tams.invest.trade.bondlend.dto.TrdSecLendSecPositionDto;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.invest.common.component.base.group.BasePtlCashPositionInfoService;
 import com.joyintech.tams.invest.common.component.base.group.BasePtlSecPositionInfoService;
@@ -66,6 +74,7 @@ import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.entity.FlowEntity;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -200,6 +209,12 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
     @Autowired
     private TrdCommonBaseService trdCommonBaseService;
 
+    @Autowired(required=false)
+    private SysWflBusinessListMapper sysWflBusinessListMapper;
+
+    @Autowired
+    private MstWorkflowCommonServiceMapperImpl mstWorkflowCommonServiceMapperImpl;
+
     /**
      * 交易及存续期交易，保存进待办，点批量审批时候需要报错。
      * {@inheritDoc}
@@ -220,6 +235,9 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
 
     @Override
     public void doInsert(TrdBondLendInvestTradeDto entity, OperationType operationType) {
+        if ("save".equals(entity.getOperateType())) {
+            return;
+        }
         // 新建交易
         if (!operationType.equals(OperationType.REVOKE) && !operationType.equals(OperationType.DELETE)) {
             this.handleBussFlowData(entity,false);
@@ -231,11 +249,101 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
                 ptlOutSecPositionFlowLogic(entity, false, false, false);
             }
             // add by jiangpeng on 20210428 end
+            try{
+                String confirmOk = RequestUtil.getParam("confirmOk");
+                if(StringUtil.isNotEmpty(confirmOk)){
+                    entity.setBalanceCheck("N");
+                }
+                sendNewPosition(entity,DictCodeListExt3.系统动作_新建.getValue(),DictCodeListExt3.流程节点_流程提交.getValue());
+            }catch (PositionException e){
+                Message message = PositionUtil.ajaxErrorReturn(e);
+                BaseMap bm = (BaseMap) message.getData();
+                if(bm==null){
+                    WorkFlowUtil.showMessage( message.getMessage(), MessageType.错误消息);
+                }
+                String code = (String) bm.get("code");
+                StringBuffer messageStr = (StringBuffer) bm.get("message");
+                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                    WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
+                }
+                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+                    WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
+                }
+            }
         }
         // 撤销交易
         else {
             this.doRevokeInsert(entity);
         }
+    }
+
+    private void sendNewPosition (TrdBondLendInvestTradeDto dto,String decisionAct,String flowStatus){
+        TrdSecLendPositionDto position = new TrdSecLendPositionDto();
+        position.setWorkFlowId(dto.getWorkflowId());
+        position.setBusiType(DictCodeListExt4.头寸业务类型_银行间债券借贷首期.getValue());
+        position.setBusiAct(DictCodeListExt3.业务动作_交易登记.getValue());
+        position.setPs(dto.getPs());
+        position.setTradePlace(dto.getTradeMarket());
+        position.setSettleSpeed(dto.getSettleSpeedStr());
+        position.setDecisionAct(decisionAct);
+        position.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
+        position.setCdate(dto.getTradeDate());
+        position.setCcy(dto.getCcy());
+        position.setTotalTradeId(dto.getTradeId());
+        position.setFlowStatus(flowStatus);
+        position.setModelType(DictCodeListExt1.子系统代码_交易.getValue());
+        position.setBalanceCheck(dto.getBalanceCheck());
+        position.setInterfaceType("Bond008");
+        position.setUserId(SecurityUtil.getLoginUser().getUserName());
+        if(StringUtil.equals(DictCodeListExt3.系统动作_修改.getValue(),decisionAct)){
+            position.setbTotalTradeId(dto.getTradeId());
+        }
+
+        List<TrdSecLendCashPositionDto> cashList = new ArrayList<>();
+        List<TrdSecLendSecPositionDto> targetList = new ArrayList<>();
+        List<TrdSecLendSecPositionDto> secList = new ArrayList<>();
+
+//        TrdSecLendCashPositionDto  cash = new TrdSecLendCashPositionDto();
+//        cash.setPortfolioId(dto.getPortfolioId());
+//        cash.setEtrId(dto.getEntrustId());
+//        String acct =EtrCommonCashPositionDealService.select组合托管户(dto.getPortfolioId(), dto.getCcy(), DictCodeListExt2.资金账户类型_托管户.getValue());
+//        cash.setCashAcctId(acct);
+//        cash.setCashAmount(dto.getTotalAmt());
+//        cashList.add(cash);
+        TrdSecLendSecPositionDto target=new TrdSecLendSecPositionDto();
+        target.setPortfolioId(dto.getPortfolioId());
+        target.setEtrId(dto.getEntrustId());
+        target.setTradeId(dto.getTradeId());
+        target.setFinprodId( dto.getFinprodId());
+        target.setSecAcctId(dto.getSecManageAcctId()); // 证券账户
+        target.setSecAmount(dto.getShareAmt());
+        if(StringUtil.equals(dto.getPs(),DictCodeList.回购拆借方向_融入.getValue())) {
+            target.setIntegrateSecAmount(dto.getShareAmt());
+            target.setOwnSecAmount(BigDecimal.ZERO);
+        }else{
+            target.setOwnSecAmount(dto.getShareAmt());
+            target.setIntegrateSecAmount(BigDecimal.ZERO);
+        }
+        targetList.add(target);
+        position.setPtlTargetList(targetList);
+        if(StringUtil.equals(dto.getPs(),DictCodeList.回购拆借方向_融入.getValue())) {
+            if (StringUtil.isNotEmpty(dto.getBussRepoSec()) && !StringUtil.isEmptyList(dto.getBussRepoSec().getPledgeBondList())) {
+                for (PledgeBondInfoDto pledgeBondInfoDto : dto.getBussRepoSec().getPledgeBondList()) {
+                    TrdSecLendSecPositionDto secport = new TrdSecLendSecPositionDto();
+                    secport.setPortfolioId(dto.getPortfolioId());
+                    secport.setEtrId(dto.getEntrustId());
+                    secport.setTradeId(dto.getTradeId());
+                    secport.setFinprodId(pledgeBondInfoDto.getFinprodId());
+                    secport.setSecAcctId(dto.getSecManageAcctId()); // 证券账户
+                    secport.setSecAmount(pledgeBondInfoDto.getPledgePrin());
+                    secport.setOwnSecAmount(pledgeBondInfoDto.getPledgePrin());
+                    secport.setIntegrateSecAmount(BigDecimal.ZERO);
+                    secList.add(secport);
+                }
+                position.setPtlSecList(secList);
+            }
+        }
+        PositionHttpRequest.send(position);
     }
 
     /**
@@ -258,6 +366,32 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
                 ptlOutSecPositionFlowLogic(entity, false, false, false);
             }
             // add by jiangpeng on 20210428 end
+            String act = DictCodeListExt3.系统动作_新建.getValue();
+            SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey(entity.getWorkflowId());
+            if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
+                act = DictCodeListExt3.系统动作_修改.getValue();
+            }
+            String confirmOk = RequestUtil.getParam("confirmOk");
+            if(StringUtil.isNotEmpty(confirmOk)){
+                entity.setBalanceCheck("N");
+            }
+            try{
+                sendNewPosition(entity,act,DictCodeListExt3.流程节点_流程提交.getValue());
+            }catch (PositionException e){
+                Message message = PositionUtil.ajaxErrorReturn(e);
+                BaseMap bm = (BaseMap) message.getData();
+                if(bm==null){
+                    WorkFlowUtil.showMessage( message.getMessage(), MessageType.错误消息);
+                }
+                String code = (String) bm.get("code");
+                StringBuffer messageStr = (StringBuffer) bm.get("message");
+                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                    WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
+                }
+                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+                    WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
+                }
+            }
         }
     }
 
@@ -277,6 +411,13 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
 //        if (null != wflTrdProductDealAdd && null != wflTrdProductDealAdd.getTradeId()){
 //            riskCreditListCommonValidatorService.deleteCredit(wflTrdProductDealAdd.getTradeId());
 //        }
+        ProcessMark processMark = mstWorkflowCommonServiceMapperImpl.getBusinessInfo(workflowId);
+        TrdBondLendInvestTradeDto entity = getBussinessEntityByWorkflowId(workflowId);
+        if (StringUtil.isNotEmpty(processMark)
+                && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
+            //发送头寸
+            PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt4.头寸业务类型_银行间债券借贷首期.getValue(),entity.getPs());
+        }
     }
 
     @Override
@@ -451,10 +592,28 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
                 ptlOutSecPositionFlowLogic(entity, false, false, true);
             }*/
             // add by jiangpeng on 20210428 end
+            try{
+                sendNewPosition(entity,DictCodeListExt3.系统动作_新建.getValue(),DictCodeListExt3.流程节点_审批生效.getValue());
+            }catch (PositionException e){
+                Message message = PositionUtil.ajaxErrorReturn(e);
+                BaseMap bm = (BaseMap) message.getData();
+                if(bm==null){
+                    WorkFlowUtil.showMessage( message.getMessage(), MessageType.错误消息);
+                }
+                String code = (String) bm.get("code");
+                StringBuffer messageStr = (StringBuffer) bm.get("message");
+                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                    WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
+                }
+                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+                    WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
+                }
+            }
         }
         // 撤销
         else {
             this.doCompleteRevoke(entity);
+            PositionHttpRequest.dorevoke(entity.getTradeId(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt4.头寸业务类型_银行间债券借贷首期.getValue(),entity.getPs());
         }
 //        调用接口  add by zhuyongkang 20191127 start
         List<String> tradeIds = new ArrayList<>();

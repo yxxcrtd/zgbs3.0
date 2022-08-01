@@ -73,6 +73,10 @@
             <if test="invAim!=null and invAim!='' ">
                 and t.INV_AIM = #{invAim}
             </if>
+            <!-- 是否算上融入券-->
+            <if test="isContain9!=null and isContain9=='N'.toString() ">
+                and t.INV_AIM != '999999'
+            </if>
         	and t.hoding_type = #{hodingType,jdbcType=VARCHAR}
         	and t.cdate = #{cdate,jdbcType=DATE}
      </select>

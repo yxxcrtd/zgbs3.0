@@ -85,6 +85,7 @@ var table;
 //            	Joyin.ajaxJson(basePath + 'invest/trade/TrdCommonController/delLinesDeal',result1.data,function(result2) {}); 
             	object.riskCreditListCommonDto = result1.data;
             	Joyin.confirm(result.data, function() {
+                    object.balanceCheck ='Y';
                     if(operateType === 'save') {
                         WorkFlow.doSaveList(basePath + 'invest/trade/bondlend/TrdBondLendInvestTrade002/save', object, "TrdBondLendInvestTrade002_btn_save");
                     }

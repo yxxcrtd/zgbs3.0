@@ -280,6 +280,8 @@ public class BussRepoSecService extends BaseService<PledgeBondInfoDto>{
                     params.put("portfolioIds", Arrays.asList(portfolioId.split(",")));
                     resultList = this.queryForPage(page, length,() -> bussRepoSecMapper.selectAvaPledgeBondDetailListSellRepoForBankDzh(params));
                 }
+            }else if(DictCodeList.回购拆借方向_融入.getValue().equals(ps)&&StringUtil.equals(params.get("pageFromTz"), "TrdRepoTrade002")){
+                resultList = this.queryForPage(page, length,() ->bussRepoSecMapper.selectBussRepoSecSellRepo(params));
             }
             else{
             	resultList = this.queryForPage(page, length,() -> bussRepoSecMapper.selectAvaPledgeBondDetailListSellRepo(params));

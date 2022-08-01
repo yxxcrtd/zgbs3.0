@@ -100,6 +100,7 @@
 
     function save(object, operateType) {
         object.operateType = operateType;
+        object.balanceCheck ='Y';
         Joyin.ajaxJson(basePath + 'invest/period/trdseclendduration/TrdSecLendDuration002/check', object, function (result) {
             Joyin.confirm(result.data, function () {
                 if (operateType === 'save') {

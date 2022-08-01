@@ -9,12 +9,14 @@ import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
+import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.trade.impl.BussTrdTransferOrderImplService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.autoperiod.common.AutoPeriodCommonService;
 import com.joyintech.tams.invest.common.component.base.group.BasePtlCashPositionInfoService;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
@@ -22,6 +24,7 @@ import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.PtlPositionHoldDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
+import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.dto.period.trdbondlendtargetduration.InvestTradeInfoDto;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
@@ -29,6 +32,9 @@ import com.joyintech.tams.invest.common.trade.dto.AllTradeCommonInputDto;
 import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
 import com.joyintech.tams.invest.common.trade.service.TradeProductDealCommService;
 import com.joyintech.tams.invest.period.trdbondlendtargetduration.dto.TrdBondLendTargetDuration002ProcessDto;
+import com.joyintech.tams.invest.period.trdbondlendtargetduration.dto.TrdSecLendCashPositionDto;
+import com.joyintech.tams.invest.period.trdbondlendtargetduration.dto.TrdSecLendPositionDto;
+import com.joyintech.tams.invest.period.trdbondlendtargetduration.dto.TrdSecLendSecPositionDto;
 import com.joyintech.tools.collectors.JoyinCollectors;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -334,6 +340,8 @@ public class TrdBondLendTargetDuration002Service extends BaseService<TrdBondLend
         saveDataWhenStartWorkflow(entity, type);
         保存持仓(entity, type, true);
     }
+
+
 
     private void setWorkflowId(InvestTradeInfoDto tradeInfoDto, String workflowId) {
         tradeInfoDto.getTrdFinProductDealTotal().setWorkflowId(workflowId);

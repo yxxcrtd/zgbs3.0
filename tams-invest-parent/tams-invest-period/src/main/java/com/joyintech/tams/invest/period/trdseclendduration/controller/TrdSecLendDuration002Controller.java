@@ -1,5 +1,6 @@
 package com.joyintech.tams.invest.period.trdseclendduration.controller;
 
+import com.joyintech.framework.exception.MessageException;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -171,6 +172,13 @@ public class TrdSecLendDuration002Controller extends BaseController {
         trdSecLendDuration002Service.prepareEntity(dto);
         String msg = trdSecLendDuration002Service.start(processParameter, dto);
         return new AjaxResult(msg);
+//        try{
+//            String msg = trdSecLendDuration002Service.start(processParameter, dto);
+//            return new AjaxResult(msg);
+//        }catch (MessageException e){
+//            AjaxResult m =new AjaxResult(e.getMessage(),e.getMessageType());
+//            return m ;
+//        }
     }
 
 }

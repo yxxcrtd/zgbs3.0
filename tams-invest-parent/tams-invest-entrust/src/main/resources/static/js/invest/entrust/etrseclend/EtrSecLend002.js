@@ -90,7 +90,18 @@
                                 // if (operateType === 'save') {
                                 //     WorkFlow.doSaveList(basePath+'invest/entrust/etrseclend/EtrSecLend002/save',object,"EtrSecLend002_btn_save");
                                 // } else {
-                                    WorkFlow.doSubmitList(basePath+'invest/entrust/etrseclend/EtrSecLend002/save',object,"EtrSecLend002_btn_submit");
+                                object.balanceCheck ='Y';
+                                    // WorkFlow.doSubmitList(basePath+'invest/entrust/etrseclend/EtrSecLend002/save',object,"EtrSecLend002_btn_submit",null,function (result){
+                                    //     // console.log(result);
+                                    //     if(result.messageType=="confirm"){
+                                    //     //     Joyin.confirm(result.message,function() {
+                                    //             // object;
+                                    //         object.balanceCheck ='N';
+                                    //         WorkFlow.doSubmitList(basePath+'invest/entrust/etrseclend/EtrSecLend002/save',object,"EtrSecLend002_btn_submit")
+                                    //         // })
+                                    //     }
+                                    // });
+                                WorkFlow.doSubmitList(basePath+'invest/entrust/etrseclend/EtrSecLend002/save',object,"EtrSecLend002_btn_submit")
                                 // }
                             });
                         });
@@ -111,6 +122,7 @@
       params.tradeDate = sysDate;
       params.finprodId = $("#finprodId").val();
       params.secAcctId = $("#secAcctId").val();
+      params.isContain9 ='N';
 
       // modify by etliu 20211129 start
       // TISHKS-465: 组合T日可用现金、组合T+1日可用现金为交易可用，应为指令可用
@@ -133,7 +145,7 @@
 
         Joyin.ajaxJson(basePath + 'invest/entrust/etrinvestbondinfo/EtrInvestBondInfo002/getAssetAvailablePosition', params,
             function (result) {
-                $('#assetAvailablePosition').val(result.position).trigger('blur');
+                $('#bussTrdAvailableCashQuery_assetPosition').val(result.position*100).trigger('blur');
             });
         // modify by etliu 20211129 end
     }

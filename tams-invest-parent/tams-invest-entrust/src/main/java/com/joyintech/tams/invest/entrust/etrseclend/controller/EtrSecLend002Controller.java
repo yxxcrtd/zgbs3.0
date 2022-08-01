@@ -14,8 +14,15 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
+
+import com.joyintech.framework.ajax.MessageType;
+import com.joyintech.framework.exception.MessageException;
+import com.joyintech.framework.exception.RestTemplateException;
+import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.service.PositionHttpRequest;
+import com.joyintech.tams.common.base.entity.PtlPortfolio;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.entrust.common.aop.EntrustRdsCommonAop;
 import com.joyintech.tams.invest.entrust.common.controller.EtrCommonController;
@@ -48,8 +55,6 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -272,13 +277,16 @@ public class EtrSecLend002Controller extends BaseController {
     @RequestMapping("save")
     public AjaxResult save(@RequestBody EtrSecLendDto dto, BindingResult br) throws Exception {
         if (br.hasErrors()) {
+//            return new Message<AjaxResult>().fail().setData(new AjaxResult(br));
             return new AjaxResult(br);
         }
+        dto.setDecisionAct(DictCodeListExt3.系统动作_修改.getValue());
         if(!StringUtil.isNotEmpty(dto.getEntrustId())){
             BussinessCodeParameter param = new BussinessCodeParameter();
             param.setCommonBusinessExtType(DictCodeListExt2.fromDictCodeList(DictCodeListExt2.共通业务类型_债券借贷投资委托));
             String code = bussGetBussinessIdService !=null ? bussGetBussinessIdService.buildBussinessCode(param):IDGenerator.generate();
             dto.setEntrustId(code);
+            dto.setDecisionAct(DictCodeListExt3.系统动作_新建.getValue());
         }
         // GLCP-34:债券借贷指令不需要预占 modify by fuyongsehng 20220707 start
 //        if (StringUtil.equals(BussinessConstant.SUBMIT, dto.getOperateType())) {
@@ -308,5 +316,18 @@ public class EtrSecLend002Controller extends BaseController {
         processParameter.setWorkFlowParameter(params);
         String msg = etrSecLendService.start(processParameter, dto);
         return new AjaxResult(msg);
+//        String msg ="";
+//        try {
+//            msg = etrSecLendService.start(processParameter, dto);
+//            AjaxResult m =new AjaxResult(msg);
+//            return new AjaxResult(msg);
+//        }catch (MessageException e){
+//            AjaxResult m =new AjaxResult(e.getMessage(),e.getMessageType());
+//            return m ;
+////            return etrSecLendService.ajaxErrorReturn(e);
+////            //throw new MessageException(e.getMessage(),MessageType.错误消息);
+//        }
     }
+
+
 }

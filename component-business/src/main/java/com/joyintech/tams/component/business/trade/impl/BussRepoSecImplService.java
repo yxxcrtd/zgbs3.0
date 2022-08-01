@@ -167,7 +167,7 @@ public class BussRepoSecImplService implements BussRepoSecService {
                             PledgeBondInfoDto avaPledgeDto = list.getRoot().get(j) ;
                             if(StringUtil.isNotEmpty(avaPledgeDto.getAvaPledgePrin())){
                                 if(StringUtil.equals(avaPledgeDto.getBondCode(), pledgeDto.getBondCode())
-                                    &&avaPledgeDto.getAvaPledgePrin().compareTo(pledgeDto.getPledgePrin())==0){
+                                    &&avaPledgeDto.getAvaPledgePrin().compareTo(pledgeDto.getAvaPledgePrin().multiply(new BigDecimal(10000)))==0){
                                     list.getRoot().remove(avaPledgeDto) ;
                                 }
                             }

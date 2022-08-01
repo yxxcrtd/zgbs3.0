@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.joyintech.calculation.util.ArithmeticUtil;
 import com.joyintech.framework.annotation.PageId;
+import com.joyintech.tams.invest.common.dto.period.trdrepoduration.RepoInfo;
 import com.joyintech.tams.invest.common.dto.period.trdseclendduration.TrdSecLendDurationDto;
 import com.joyintech.tams.invest.period.trdseclendduration.validator.TrdSecLendDuration002DtoValidator;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
@@ -51,11 +52,21 @@ public class TrdSecLendDuration002Dto extends TrdSecLendDurationDto implements P
      */
     private List<BussTrdTransferOrderDto> bussTrdTransferOrder;
 
+    /**
+     * 质押券信息
+     */
+    private List<RepoInfo> secLendInfo;
+
+
+
     private String workflowId;
 
     private String elementId;
 
     private String deliveryTypeString;
+
+
+    private String balanceCheck;//是否校验余额
     /**
      * 获取 elementId
      *
@@ -155,5 +166,21 @@ public class TrdSecLendDuration002Dto extends TrdSecLendDurationDto implements P
             return result;
         }
         return null;
+    }
+
+    public List<RepoInfo> getSecLendInfo() {
+        return secLendInfo;
+    }
+
+    public void setSecLendInfo(List<RepoInfo> secLendInfo) {
+        this.secLendInfo = secLendInfo;
+    }
+
+    public String getBalanceCheck() {
+        return balanceCheck;
+    }
+
+    public void setBalanceCheck(String balanceCheck) {
+        this.balanceCheck = balanceCheck;
     }
 }

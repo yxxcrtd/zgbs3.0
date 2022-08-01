@@ -1,33 +1,43 @@
 package com.joyintech.tams.invest.period.trdseclendduration.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.framework.ajax.MessageType;
+import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.util.*;
+import com.joyintech.system.base.dao.SysWflBusinessListMapper;
+import com.joyintech.system.base.entity.SysWflBusinessList;
+import com.joyintech.tams.business.common.exception.PositionException;
+import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.service.PositionHttpRequest;
+import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.dto.common.InvestInterfCommDto;
+import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.invest.common.service.InvestInterfCommService;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
+import com.joyintech.tams.invest.period.trdseclendduration.dto.TrdSecLendCashPositionDto;
+import com.joyintech.tams.invest.period.trdseclendduration.dto.TrdSecLendPositionDto;
+import com.joyintech.tams.invest.period.trdseclendduration.dto.TrdSecLendSecPositionDto;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.RequestUtil;
-import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.common.service.BussCommonMapperDelegateService;
 import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommService;
 import com.joyintech.tams.component.business.trade.BussTrdTransferOrderService;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.invest.common.autoperiod.seclend.AutoPeriodSeclendCommonService;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
@@ -88,6 +98,10 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
     @Autowired
     private AutoPeriodSeclendCommonService autoPeriodSeclendCommonService;
 
+
+    @Autowired(required=false)
+    private SysWflBusinessListMapper sysWflBusinessListMapper;
+
     public TrdSecLendDuration002Dto findEffectiveData(Map<String, Object> pageParam) {
         pageParam.put("userName", LoginUserUtil.getUserName());
         return restTemplate.postForObject(ServiceApplication.PERIOD_SERVICE_NAME + "/TrdSecLendDuration/findEffectiveData",
@@ -146,6 +160,28 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
         // 写入融入券组合持仓流水
         this.ptlBlendSecPositionFlowLogic(entity,  OperationType.REVOKE == operationType?true:false);
 
+        if (OperationType.REVOKE == operationType) {
+            PositionHttpRequest.dorevoke(entity.getBusiCode(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt4.头寸业务类型_银行间债券借贷到期.getValue(),entity.getPs());
+        }else{
+            try{
+                sendNewPosition(entity,DictCodeListExt3.系统动作_新建.getValue(),DictCodeListExt3.流程节点_审批生效.getValue());
+            }catch (PositionException e){
+                Message message = PositionUtil.ajaxErrorReturn(e);
+                BaseMap bm = (BaseMap) message.getData();
+                if(bm==null){
+                    WorkFlowUtil.showMessage( message.getMessage(), MessageType.错误消息);
+                }
+                String code = (String) bm.get("code");
+                StringBuffer messageStr = (StringBuffer) bm.get("message");
+                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                    WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
+                }
+                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+                    WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
+                }
+            }
+        }
+
         // 新建交易撤销数据 或 插入Entity到对应的业务DB中, 并删除流程表中的数据
         entity.setIssuePartyId(CacheUtil.getSysParam("issue_party_id"));//为了登陆交易报送表中登记产品机构用，取系统参数
         restTemplate.postForObject(ServiceApplication.PERIOD_SERVICE_NAME + "/TrdSecLendDuration/doComplete", entity, String.class);
@@ -184,7 +220,33 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
 
     @Override
     public void doInsert(TrdSecLendDuration002Dto entity, OperationType type) {
+        if ("save".equals(entity.getOperateType())) {
+            return;
+        }
         saveDataWhenStartWorkflow(entity, type);
+        if (type != OperationType.REVOKE){
+            try{
+                String confirmOk = RequestUtil.getParam("confirmOk");
+                if(StringUtil.isNotEmpty(confirmOk)){
+                    entity.setBalanceCheck("N");
+                }
+                sendNewPosition(entity,DictCodeListExt3.系统动作_新建.getValue(),DictCodeListExt3.流程节点_流程提交.getValue());
+            }catch (PositionException e){
+                Message message = PositionUtil.ajaxErrorReturn(e);
+                BaseMap bm = (BaseMap) message.getData();
+                if(bm==null){
+                    WorkFlowUtil.showMessage( message.getMessage(), MessageType.错误消息);
+                }
+                String code = (String) bm.get("code");
+                StringBuffer messageStr = (StringBuffer) bm.get("message");
+                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                    WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
+                }
+                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+                    WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
+                }
+            }
+        }
     }
 
     private void saveDataWhenStartWorkflow(TrdSecLendDuration002Dto entity, OperationType type) {
@@ -277,6 +339,78 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
         }
     }
 
+    private void sendNewPosition (TrdSecLendDuration002Dto dto, String decisionAct, String flowStatus){
+        TrdSecLendPositionDto position = new TrdSecLendPositionDto();
+        position.setWorkFlowId(dto.getWorkflowId());
+        position.setBusiType(DictCodeListExt4.头寸业务类型_银行间债券借贷到期.getValue());
+        position.setBusiAct(DictCodeListExt3.业务动作_交易登记.getValue());
+        position.setPs(dto.getPs());
+        position.setTradePlace(dto.getTradeMarket());
+//        position.setSettleSpeed(dto.getSettleSpeed());
+        position.setDecisionAct(decisionAct);
+        position.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
+        position.setCdate(dto.getTradeDate());
+        position.setCcy(dto.getCcy());
+        position.setTotalTradeId(dto.getBusiCode());
+        position.setFlowStatus(flowStatus);
+        position.setModelType(DictCodeListExt1.子系统代码_交易.getValue());
+        position.setBalanceCheck(dto.getBalanceCheck());
+        position.setInterfaceType("Bond008");
+        position.setUserId(SecurityUtil.getLoginUser().getUserName());
+        if(StringUtil.equals(DictCodeListExt3.系统动作_修改.getValue(),decisionAct)){
+            position.setbTotalTradeId(dto.getBusiCode());
+        }
+        position.setIsCashSettle(dto.getIsCashPay());
+
+        List<TrdSecLendCashPositionDto> cashList = new ArrayList<>();
+        List<TrdSecLendSecPositionDto> targetList = new ArrayList<>();
+        List<TrdSecLendSecPositionDto> secList = new ArrayList<>();
+
+//        List<WflStlPayOrders> stlPayOrdersDtos = dto.getStlPayOrdersDtos();
+
+        TrdSecLendCashPositionDto  cash = new TrdSecLendCashPositionDto();
+        cash.setPortfolioId(dto.getPortfolioId());
+        String acct =EtrCommonCashPositionDealService.select组合托管户(dto.getPortfolioId(), dto.getCcy(), DictCodeListExt2.资金账户类型_托管户.getValue());
+        cash.setCashAcctId(acct);
+        cash.setTradeId(dto.getBusiCode());
+        cash.setCashAmount(dto.getTradeAmt());
+        cashList.add(cash);
+        position.setPtlCashList(cashList);
+
+        TrdSecLendSecPositionDto target=new TrdSecLendSecPositionDto();
+        target.setPortfolioId(dto.getPortfolioId());
+        target.setTradeId(dto.getBusiCode());
+        target.setFinprodId( dto.getPledgeFinprodId());
+        target.setSecAcctId(dto.getSecManageAcctId()); // 证券账户
+        target.setSecAmount(dto.getShareAmt());
+        if(StringUtil.equals(dto.getPs(),DictCodeList.回购拆借方向_融入.getValue())) {
+            target.setIntegrateSecAmount(dto.getShareAmt());
+            target.setOwnSecAmount(BigDecimal.ZERO);
+        }else{
+            target.setOwnSecAmount(dto.getShareAmt());
+            target.setIntegrateSecAmount(BigDecimal.ZERO);
+        }
+        targetList.add(target);
+        position.setPtlTargetList(targetList);
+        if(StringUtil.equals(dto.getPs(),DictCodeList.回购拆借方向_融入.getValue())){
+            if(StringUtil.isNotEmpty(dto.getSecLendInfo())){
+                for(RepoInfo pledgeBondInfoDto:dto.getSecLendInfo()){
+                    TrdSecLendSecPositionDto secport=new TrdSecLendSecPositionDto();
+                    secport.setPortfolioId(dto.getPortfolioId());
+                    secport.setFinprodId( pledgeBondInfoDto.getPledgeFinprodId());
+                    secport.setSecAcctId(dto.getSecManageAcctId()); // 证券账户
+                    secport.setSecAmount(pledgeBondInfoDto.getQty());
+                    secport.setOwnSecAmount(pledgeBondInfoDto.getQty());
+                    secport.setIntegrateSecAmount(BigDecimal.ZERO);
+                    secport.setTradeId(dto.getBusiCode());
+                    secList.add(secport);
+                }
+            }
+            position.setPtlRelieveSecList(secList);
+        }
+        PositionHttpRequest.send(position);
+    }
+
     private WflTrdDealTotalAdd gen汇总附属业务流程(TrdSecLendDuration002Dto entity, WflTrdFinProductDealTotal trdFinProductDealTotal) {
         return autoPeriodSeclendCommonService.gen汇总附属业务流程(entity, trdFinProductDealTotal);
     }
@@ -286,6 +420,33 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
         baseTradeProductDealCommServiceImpl.delete(entity.getWorkflowId());
         prepareEntity(entity);
         saveDataWhenStartWorkflow(entity, OperationType.NEW);
+
+        String act = DictCodeListExt3.系统动作_新建.getValue();
+        SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey(entity.getWorkflowId());
+        if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
+            act = DictCodeListExt3.系统动作_修改.getValue();
+        }
+        String confirmOk = RequestUtil.getParam("confirmOk");
+        if(StringUtil.isNotEmpty(confirmOk)){
+            entity.setBalanceCheck("N");
+        }
+        try{
+            sendNewPosition(entity,act,DictCodeListExt3.流程节点_流程提交.getValue());
+        }catch (PositionException e){
+            Message message = PositionUtil.ajaxErrorReturn(e);
+            BaseMap bm = (BaseMap) message.getData();
+            if(bm==null){
+                WorkFlowUtil.showMessage( message.getMessage(), MessageType.错误消息);
+            }
+            String code = (String) bm.get("code");
+            StringBuffer messageStr = (StringBuffer) bm.get("message");
+            if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
+            }
+            if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+                WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
+            }
+        }
     }
 
     private List<WflTrdProductDeal> gen交易业务流程(TrdSecLendDuration002Dto entity) {

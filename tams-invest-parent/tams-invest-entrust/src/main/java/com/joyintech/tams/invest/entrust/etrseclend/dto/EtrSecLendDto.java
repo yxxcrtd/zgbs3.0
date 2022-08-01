@@ -155,6 +155,18 @@ public class EtrSecLendDto extends EtrEntrust implements ProcessEntity {
      */
     private Date settleDate;
 
+    private String decisionAct;//决策动作
+
+    private String balanceCheck;//是否校验余额
+
+    public String getDecisionAct() {
+        return decisionAct;
+    }
+
+    public void setDecisionAct(String decisionAct) {
+        this.decisionAct = decisionAct;
+    }
+
     /**
      * 获取 settleDate
      * @return settleDate.
@@ -713,4 +725,11 @@ public class EtrSecLendDto extends EtrEntrust implements ProcessEntity {
         return DateUtil.format(super.getVdate());
     }
 
+    public String getBalanceCheck() {
+        return balanceCheck;
+    }
+
+    public void setBalanceCheck(String balanceCheck) {
+        this.balanceCheck = balanceCheck;
+    }
 }
