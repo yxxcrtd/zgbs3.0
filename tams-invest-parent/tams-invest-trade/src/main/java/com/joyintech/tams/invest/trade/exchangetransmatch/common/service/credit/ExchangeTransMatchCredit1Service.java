@@ -2,6 +2,8 @@ package com.joyintech.tams.invest.trade.exchangetransmatch.common.service.credit
 
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
@@ -285,6 +287,12 @@ public class ExchangeTransMatchCredit1Service extends BaseService {
         trdProductDeal.setPs(entrustDto.getPs());
         trdProductDeal.setTgBusiType(getTgBusiType(entrustDto.getPs()));
 
+        //add by lpf GLTZJY-1667【信用保护凭证】交易信息登记——交易员及交易审批人取值错误。start
+        if(StringUtil.equals(trdProductDeal.getCreateUser(), GlobalConstant.SYSTEM_USER)){
+            trdProductDeal.setCreateUser(trdFinProductDealTotal.getCreateUser());
+            trdProductDeal.setUpdateUser(trdFinProductDealTotal.getUpdateUser());
+        }
+        //add by lpf GLTZJY-1667【信用保护凭证】交易信息登记——交易员及交易审批人取值错误。end
         return trdProductDeal;
     }
 
@@ -541,6 +549,12 @@ public class ExchangeTransMatchCredit1Service extends BaseService {
         // 首期结算方式
         trdFinProductDealTotal.setDeliveryType("券款兑付");
         // TODO 交收方式  席位号  委托代码
+        //add by lpf GLTZJY-1667【信用保护凭证】交易信息登记——交易员及交易审批人取值错误。start
+        if(StringUtil.equals(trdFinProductDealTotal.getCreateUser(), GlobalConstant.SYSTEM_USER)){
+            trdFinProductDealTotal.setCreateUser(StringUtil.isNotEmpty(entrustDto.getTradeId())?entrustDto.getTradeId():entrustDto.getCreateUser());
+            trdFinProductDealTotal.setUpdateUser(StringUtil.isNotEmpty(entrustDto.getTradeId())?entrustDto.getTradeId():entrustDto.getUpdateUser());
+        }
+        //add by lpf GLTZJY-1667【信用保护凭证】交易信息登记——交易员及交易审批人取值错误。end
 
         return trdFinProductDealTotal;
     }
@@ -553,6 +567,12 @@ public class ExchangeTransMatchCredit1Service extends BaseService {
         BeanUtil.copyPropertiesIgnoreNull(trdProductDealAdd, trdProductDeal);
         trdProductDealAdd.setEntrustId(entrustDto.getEntrustId());
         trdProductDealAdd.setPortfolioId(entrustDto.getPortfolioId());
+        //add by lpf GLTZJY-1667【信用保护凭证】交易信息登记——交易员及交易审批人取值错误。start
+        if(StringUtil.equals(trdProductDealAdd.getCreateUser(), GlobalConstant.SYSTEM_USER)){
+            trdProductDealAdd.setCreateUser(trdProductDeal.getCreateUser());
+            trdProductDealAdd.setUpdateUser(trdProductDeal.getUpdateUser());
+        }
+        //add by lpf GLTZJY-1667【信用保护凭证】交易信息登记——交易员及交易审批人取值错误。end
         return trdProductDealAdd;
     }
 }
