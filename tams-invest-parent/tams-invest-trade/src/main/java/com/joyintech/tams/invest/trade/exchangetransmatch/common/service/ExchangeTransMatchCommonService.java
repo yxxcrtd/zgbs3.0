@@ -1221,12 +1221,12 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 }
             }
         }
-        // 解除质押需要删除首期的质押品信息
-        else if(StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())){
-            for(FinDealPledge finDealPledge:firstFinDealPledgeList) {
-                finDealPledgeMapper.deleteByPrimaryKey(finDealPledge);
-            }
-        }
+        // 解除质押需要删除首期的质押品信息 解除质押原先删除是为了防止再次操作,但实际也不会再次操作,所以可以不用删除
+//        else if(StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())){
+//            for(FinDealPledge finDealPledge:firstFinDealPledgeList) {
+//                finDealPledgeMapper.deleteByPrimaryKey(finDealPledge);
+//            }
+//        }
         return finDealPledgeList;
     }
 
