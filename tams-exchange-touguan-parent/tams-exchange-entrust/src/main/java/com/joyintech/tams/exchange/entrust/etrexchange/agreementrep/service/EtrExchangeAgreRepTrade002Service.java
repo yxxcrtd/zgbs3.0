@@ -11,6 +11,7 @@
 package com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.service;
 
 
+import com.alibaba.fastjson.JSON;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
@@ -236,7 +237,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
                     r.setPositionUnitCost(Objects.isNull(dto.getUnitCost()) ? new BigDecimal(0) : dto.getUnitCost());
                 }
                 // 最新净价*组合持仓.数量 - 持仓成本 as 浮动盈亏
-                BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(), ArithmeticUtil.multiply(r.getPositionsNum(), new BigDecimal("10000")));
+                BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(), ArithmeticUtil.multiply(r.getPositionsNum(), new BigDecimal("100")));
                 floatFd = ArithmeticUtil.subtract(floatFd, r.getPositionsAmt());
                 r.setFloatingPL(floatFd);
                 BigDecimal floatPL = ArithmeticUtil.divide(floatFd, r.getPositionsAmt(), 4).multiply(new BigDecimal("100"));
