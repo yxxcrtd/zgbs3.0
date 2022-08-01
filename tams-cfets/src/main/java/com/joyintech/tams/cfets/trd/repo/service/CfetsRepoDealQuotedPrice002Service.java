@@ -15,6 +15,7 @@ import com.joyintech.background.component.uplink.interbank.business.dto.*;
 import com.joyintech.background.component.uplink.interbank.business.repodlgservice.RepoDialogueQuoteSubService;
 import com.joyintech.background.component.uplink.interbank.business.routeconfigservice.RouteConfigSubService;
 import com.joyintech.background.component.uplink.interbank.business.routeintfservice.RouteIntfSubService;
+import com.joyintech.background.component.uplink.interbank.business.service.IbuMainService;
 import com.joyintech.background.component.uplink.interbank.database.dao.IbuQuoteMapper;
 import com.joyintech.background.component.uplink.interbank.database.entity.IbuIntfScheme;
 import com.joyintech.framework.ajax.AjaxResult;
@@ -27,7 +28,6 @@ import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.security.User;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
-import com.joyintech.service.bankuplink.bond.service.CfetsBondDealQuotedPriceService;
 import com.joyintech.service.bankuplink.ibu.dto.RepoQuoteInfoDto;
 import com.joyintech.service.bankuplink.ibu.service.IbuComponentCommonService;
 import com.joyintech.service.bankuplink.repo.dao.CfetsRepoDealQuotedPrice001Mapper;
@@ -43,15 +43,15 @@ import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.business.common.util.ThreadLocalUtil;
-import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
-import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto;
-import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepo003Mapper;
-import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepoMapper;
-import com.joyintech.tams.cfets.trd.repo.dto.*;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPosPortfolioCashRequest;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPosPortfolioSecRequest;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPositionRequest;
+import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
+import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
+import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepo003Mapper;
+import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepoMapper;
+import com.joyintech.tams.cfets.trd.repo.dto.*;
+import com.joyintech.tams.common.base.entity.PtlSecPositionFlow;
 import com.joyintech.tams.common.base.entity.RegFinPledge;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
@@ -192,9 +192,6 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
     private CfetsRepoDealQuotedPrice001Service oldCfetsRepoDealQuotedPrice001Service;
 
     @Autowired
-    private CfetsBondDealQuotedPriceService cfetsBondDealQuotedPriceService;
-
-    @Autowired
     IbuQuoteMapper ibuQuoteMapper;
 
     @Autowired
@@ -202,6 +199,12 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
 
     @Autowired
     private CfetsIbuQuoteBondMapper cfetsIbuQuoteBondMapper;
+
+    /**
+     * {@linkplain}
+     */
+    @Autowired
+    private IbuMainService ibuMainService;
 
     /**
      * 报价初始化校验
@@ -593,7 +596,6 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
             BigDecimal dealFeeAmtTotal = BigDecimal.ZERO;
             // 结算手续费汇总
             BigDecimal settFeeamtTotal = BigDecimal.ZERO;
-            List<RegFinPledge> list = new ArrayList<>();
             // 所有限价指令的回购利率中的最小值或最大值
             BigDecimal minOrMaxYield = null;
             // 指定价格的回购利率
@@ -1204,6 +1206,21 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
             dto.setIsExistNew(DictCodeList.是否_是.getValue());
             oldCfetsRepoDealQuotedPrice001Service.doInsetOrUpdateForPtlPositionHold(dto);
         }
+        RepoDialogueQuoteDto repoDialogueQuoteDto = ibuMainService.getRepoDialogueQuote(entity.getQuoteId());
+        // 组合数据为空默认为  回退到回复方初始化数据
+        if (repoDialogueQuoteDto != null
+                && repoDialogueQuoteDto.getIbuQuoteCrepDto() != null
+                && CollectionUtils.isEmpty(repoDialogueQuoteDto.getIbuQuoteEtrReDtoList())) {
+            //回退释放头寸
+            Map<String, Object> param = new HashMap<>();
+            param.put("workflowId", entity.getWorkflowId());
+            param.put("pageWflType", "REPO");
+            param.put("ps", entity.getPs());
+            boolean flag = this.doBackPtlPositionHold(param);
+            if (!flag && StringUtil.isNotEmpty(entity.getWorkflowId())) {
+                logger.error("回复方流程中数据删除头寸失败!");
+            }
+        }
     }
 
     public boolean doBackPtlPositionHold(Map<String, Object> param) {
@@ -1252,10 +1269,12 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
         // 插入新流水,并更新余额
         EtrCommonCashPositionDealService.持久化流水Dto(etrPositionHoldDto);
         // 持仓流水
-        List<PtlSecPositionFlowDto> ptlSecPositionFlows =
-                baseAssetCashPositionCommMapper.selectAllPositionByIdAndType(quoteId, DictCodeList.持仓类型_质押.getValue());
+        List<PtlSecPositionFlow> ptlSecPositionFlows = baseAssetCashPositionCommMapper.selectAllPositionByOffsetFlag(quoteId, DictCodeList.冲正标识_正常交易.getValue());
         logger.info("交易持仓:{}", JsonUtils.object2Json(ptlSecPositionFlows));
-        for (PtlSecPositionFlowDto ptlSecPositionFlow : ptlSecPositionFlows) {
+        for (PtlSecPositionFlow ptlSecPositionFlow : ptlSecPositionFlows) {
+            if (!StringUtil.equals(ptlSecPositionFlow.getHodingType(), DictCodeList.持仓类型_质押.getValue())) {
+                continue;
+            }
             PtlSecPositionFlowDto flowDto = new PtlSecPositionFlowDto();
             BeanUtil.copyPropertiesIgnoreNull(flowDto, ptlSecPositionFlow);
             flowDto.setSeqno(IDGenerator.generate());
