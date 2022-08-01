@@ -933,13 +933,7 @@ public class StlDataDealSzdSjsjgProcessService {
             settleTransData.setFinprodId(sqSettleTransData.getFinprodId());
             // XYHGFXSJ-716:modify by fuyongsheng 20220730 start
             if(StringUtil.equals(ywlb, StlDataDealProcessConstant.SJSJG_YWLB_XYJZ)){
-                FinDealPledgeKey key = new FinDealPledgeKey();
-                key.setFinprodId(sqSettleTransData.getFinprodId());
-                key.setBranch(0L);
-                List<FinDealPledge> finDealPledges = finDealPledgeMapper.selectByFinprodId(key);
-                if(CollectionUtils.isNotEmpty(finDealPledges)){
-                    settleTransData.setShareAmt(finDealPledges.stream().map(FinDealPledge::getPledgeNumber).reduce(BigDecimal::add).get());
-                }
+                settleTransData.setShareAmt(sqSettleTransData.getShareAmt());
             }else{
                 // 交易份额
                 settleTransData.setShareAmt(abs(szdSjsjg.getJgjssl()));

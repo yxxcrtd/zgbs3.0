@@ -1137,55 +1137,56 @@ public class StlDataDealSzdJsmxProcessService {
 							// 金融产品类型(投管分类)
 							settleTransData.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
 						}
+						// XYHGFXSJ-506:修改金融产品代码赋值 modify by fuyongsheng 20220725 start
+						// 查询首期清算数据
+						List<SettleTransData> sqSettleTransDatas = trdCommonBaseService.selectSqSettleTransDatas(
+								settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(),
+								settleTransData.getVdate());
+						// 金融产品代码
+						if(!CollectionUtils.isEmpty(sqSettleTransDatas)){
+							settleTransData.setFinprodId(sqSettleTransDatas.get(0).getFinprodId());
+						}
+						// XYHGFXSJ-506:修改金融产品代码赋值 modify by fuyongsheng 20220725 end
 						// 业务场景分类和交易方向
-						if (StringUtil.equals(StlDataDealProcessConstant.YWLX_616, szdJsmx.getYwlx())
-								&& StringUtil.equals(StlDataDealProcessConstant.MMBS_B, szdJsmx.getMmbz())
-						) {
-							settleTransData.setPs(DictCodeListExt3.交易方向_中途换券.getValue());
-							if (StringUtil.equals(StlDataDealProcessConstant.GHLX_00C, szdJsmx.getGhlx())){
-								 settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换入.getValue());
-								 settleTransData.setTradeType(DictCodeListExt3.质押券置换_置换方向_换入.getValue());
-							}else if (StringUtil.equals(StlDataDealProcessConstant.GHLX_00D, szdJsmx.getGhlx())){
-								 settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换出.getValue());
-								 settleTransData.setTradeType(DictCodeListExt3.质押券置换_置换方向_换出.getValue());
+						if (StringUtil.equals(StlDataDealProcessConstant.YWLX_616, szdJsmx.getYwlx())){
+							if(StringUtil.equals(StlDataDealProcessConstant.MMBS_B, szdJsmx.getMmbz())){
+								settleTransData.setPs(DictCodeListExt3.交易方向_中途换券.getValue());
+								if (StringUtil.equals(StlDataDealProcessConstant.GHLX_00C, szdJsmx.getGhlx())){
+									settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换入.getValue());
+									settleTransData.setTradeType(DictCodeListExt3.质押券置换_置换方向_换入.getValue());
+								}else if (StringUtil.equals(StlDataDealProcessConstant.GHLX_00D, szdJsmx.getGhlx())){
+									settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换出.getValue());
+									settleTransData.setTradeType(DictCodeListExt3.质押券置换_置换方向_换出.getValue());
+								}
+							}else if(StringUtil.equals(StlDataDealProcessConstant.MMBS_S, szdJsmx.getMmbz())){
+								settleTransData.setPs(DictCodeListExt3.交易方向_中途换券.getValue());
+								if (StringUtil.equals(StlDataDealProcessConstant.GHLX_00C, szdJsmx.getGhlx())){
+									settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券协议逆回购_换券_换入.getValue());
+									settleTransData.setTradeType(DictCodeListExt3.质押券置换_置换方向_换入.getValue());
+								}else if (StringUtil.equals(StlDataDealProcessConstant.GHLX_00D, szdJsmx.getGhlx())){
+									settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券协议逆回购_换券_换出.getValue());
+									settleTransData.setTradeType(DictCodeListExt3.质押券置换_置换方向_换出.getValue());
+								}
 							}
+							settleTransData.setShareAmt(ArithmeticUtil.divide(new BigDecimal(szdJsmx.getCjsl()).abs(), BigDecimal.valueOf(100),2));
 						}
-						if (StringUtil.equals(StlDataDealProcessConstant.YWLX_616, szdJsmx.getYwlx())
-								&& StringUtil.equals(StlDataDealProcessConstant.MMBS_S, szdJsmx.getMmbz())) {
-//							settleTransData.setPs(DictCodeListStl.交易方向_换券.getValue());
-							settleTransData.setPs(DictCodeListExt3.交易方向_中途换券.getValue());
-                            if (StringUtil.equals(StlDataDealProcessConstant.GHLX_00C, szdJsmx.getGhlx())){
-								settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券协议逆回购_换券_换入.getValue());
-								settleTransData.setTradeType(DictCodeListExt3.质押券置换_置换方向_换入.getValue());
-							}else if (StringUtil.equals(StlDataDealProcessConstant.GHLX_00D, szdJsmx.getGhlx())){
-								settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券协议逆回购_换券_换出.getValue());
-								settleTransData.setTradeType(DictCodeListExt3.质押券置换_置换方向_换出.getValue());
+						if (StringUtil.equals(StlDataDealProcessConstant.YWLX_618, szdJsmx.getYwlx())) {
+							if(StringUtil.equals(StlDataDealProcessConstant.MMBS_B, szdJsmx.getMmbz())){
+								settleTransData.setPs(DictCodeListExt3.交易方向_解除质押.getValue());
+								if (StringUtil.equals(StlDataDealProcessConstant.GHLX_00D, szdJsmx.getGhlx())){
+									settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券协议正回购_解除质押.getValue());
+									settleTransData.setTradeType(DictCodeListExt3.质押券置换_置换方向_换出.getValue());
+								}
+							}else if(StringUtil.equals(StlDataDealProcessConstant.MMBS_S, szdJsmx.getMmbz())){
+								settleTransData.setPs(DictCodeListExt3.交易方向_解除质押.getValue());
+								if (StringUtil.equals(StlDataDealProcessConstant.GHLX_00D, szdJsmx.getGhlx())){
+									settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券协议逆回购_解除质押.getValue());
+									settleTransData.setTradeType(DictCodeListExt3.质押券置换_置换方向_换出.getValue());
+								}
 							}
-						}
-						if (StringUtil.equals(StlDataDealProcessConstant.YWLX_618, szdJsmx.getYwlx())
-								&& StringUtil.equals(StlDataDealProcessConstant.MMBS_B, szdJsmx.getMmbz())) {
-							// GZYHTZJY-1008:交易方向应为解除质押 fuyongsheng 20211230 modify start
-							// settleTransData.setPs(DictCodeListExt3.交易方向_中途换券.getValue());
-							settleTransData.setPs(DictCodeListExt3.交易方向_解除质押.getValue());
-							// GZYHTZJY-1008:交易方向应为解除质押 fuyongsheng 20211230 modify end
-							if (StringUtil.equals(StlDataDealProcessConstant.GHLX_00D, szdJsmx.getGhlx())){
-								settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券协议正回购_解除质押.getValue());
-								settleTransData.setTradeType(DictCodeListExt3.质押券置换_置换方向_换出.getValue());
+							if(!CollectionUtils.isEmpty(sqSettleTransDatas)){
+								settleTransData.setShareAmt(sqSettleTransDatas.get(0).getShareAmt());
 							}
-//							settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券协议正回购_逾期返售解除质押.getValue());
-						}
-						if (StringUtil.equals(StlDataDealProcessConstant.YWLX_618, szdJsmx.getYwlx())
-								&& StringUtil.equals(StlDataDealProcessConstant.MMBS_S, szdJsmx.getMmbz())) {
-//							settleTransData.setPs(DictCodeList.交易方向_到期.getValue());
-							// GZYHTZJY-1008:交易方向应为解除质押 fuyongsheng 20211230 modify start
-							// settleTransData.setPs(DictCodeListExt3.交易方向_中途换券.getValue());
-							settleTransData.setPs(DictCodeListExt3.交易方向_解除质押.getValue());
-							// GZYHTZJY-1008:交易方向应为解除质押 fuyongsheng 20211230 modify end
-							if (StringUtil.equals(StlDataDealProcessConstant.GHLX_00D, szdJsmx.getGhlx())){
-								settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券协议逆回购_解除质押.getValue());
-								settleTransData.setTradeType(DictCodeListExt3.质押券置换_置换方向_换出.getValue());
-							}
-//							settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券协议逆回购_逾期返售解除质押.getValue());
 						}
 						// 金融产品代码
 						// settleTransData.setFinprodId(szdJsmx.getZqdm1());
@@ -1195,7 +1196,7 @@ public class StlDataDealSzdJsmxProcessService {
 						// modify by etliu 20211225 start
 						// 光大反馈问题修复：产品的这种写法统一改下吧，精度缺失，会导致我们对不上资金余额；
 						// settleTransData.setShareAmt(ArithmeticUtil.divide(new BigDecimal(Math.abs(new BigDecimal(szdJsmx.getCjsl()).doubleValue())),BigDecimal.valueOf(100),2));
-					 	settleTransData.setShareAmt(ArithmeticUtil.divide(new BigDecimal(szdJsmx.getCjsl()).abs(), BigDecimal.valueOf(100),2));
+					 	// settleTransData.setShareAmt(ArithmeticUtil.divide(new BigDecimal(szdJsmx.getCjsl()).abs(), BigDecimal.valueOf(100),2));
 						// settleTransData.setShareAmt(new BigDecimal(szdJsmx.getCjsl()).abs());
 						// modify by etliu 20211225 end
 						// GZYHTZJY-1008:modify by fuyongsheng 20211230 end
@@ -1232,17 +1233,6 @@ public class StlDataDealSzdJsmxProcessService {
 //						settleTransDataPledge.setPledgeNumber(new BigDecimal(Math.abs(new BigDecimal(szdJsmx.getSl()).doubleValue())));
 					    // settleTransDataPledge.setPledgeNumber(ArithmeticUtil.divide(settleTransData.getShareAmt(),BigDecimal.valueOf(100),2));
 						settleTransDataPledge.setPledgeNumber(settleTransData.getShareAmt());
-
-						// XYHGFXSJ-506:修改金融产品代码赋值 modify by fuyongsheng 20220725 start
-						// 查询首期清算数据
-						List<SettleTransData> sqSettleTransDatas = trdCommonBaseService.selectSqSettleTransDatas(
-							settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(),
-							settleTransData.getVdate());
-						// 金融产品代码
-						if(!CollectionUtils.isEmpty(sqSettleTransDatas)){
-							settleTransData.setFinprodId(sqSettleTransDatas.get(0).getFinprodId());
-						}
-						// XYHGFXSJ-506:修改金融产品代码赋值 modify by fuyongsheng 20220725 end
 						// 换出折算率=首期质押券折算率,换入折算率=首期成交明细本金金额/成交数量 modify by fuyongsheng 20220104 start
 						if(DictCodeListExt3.质押券置换_置换方向_换出.getValue().equals(settleTransData.getTradeType())){
 							// 查询首期质押券信息
