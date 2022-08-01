@@ -957,6 +957,9 @@ public class CfetsRepoDealQuotedPrice001Service extends BaseService {
                             ptlSecPositionFlowDtoUnit.setOffsetFlag(DictCodeList.冲正标识_正常交易.getValue());
                             
                             ptlSecPositionFlowDtoUnit.setAmount(ArithmeticUtil.divide(prin,new BigDecimal(100),2));// 数量
+                            if (StringUtil.equals(dto.getTradeStatus(), BussinessDictCodeList.银行间上行报价状态_已撤回.getValue())) {
+                                ptlSecPositionFlowDtoUnit.setAmount(ptlSecPositionFlowDtoUnit.getAmount().negate());
+                            }
                             ptlSecPositionFlowDtoUnit.setpFinprodId(null);// 母金融产品代码
                             ptlSecPositionFlowDtoUnit.setTradeId(dto.getQuoteId());// 成交编号
                             if (StringUtils.isNotEmpty(dto.getPortfolioId()) && StringUtils.isNotEmpty(cfetsRepoDealQuotedPrice003Dto.getFinprodId())) {
@@ -1017,6 +1020,9 @@ public class CfetsRepoDealQuotedPrice001Service extends BaseService {
             BeanUtil.copyPropertiesIgnoreNull(secPositionFlowDto, etrSecPositionFlowDto);
             secPositionFlowDto.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());
             secPositionFlowDto.setAmount(secPositionFlowDto.getAmount().negate());
+            if (StringUtil.equals(dto.getTradeStatus(), BussinessDictCodeList.银行间上行报价状态_已撤回.getValue())) {
+                secPositionFlowDto.setAmount(secPositionFlowDto.getAmount().negate());
+            }
             etrSecPositionFlows.add(secPositionFlowDto);
         });
 
@@ -1061,11 +1067,12 @@ public class CfetsRepoDealQuotedPrice001Service extends BaseService {
 				basePtlCashPositionInfoService.insertCashPositionFlow(ptlCashPositionFlow);
 			}
 		}
-        if (DictCodeListExt3.交易方向_正回购.getValue().equals(ps)
-                && !StringUtil.equals(dto.getTradeStatus(), BussinessDictCodeList.银行间上行报价状态_已撤回.getValue())) {
+        if (etrSecPositionFlows.size() > 0
+                && DictCodeListExt3.交易方向_正回购.getValue().equals(ps)) {
             // 查询正常流水,生成冲销流水 即将流水更新为本次提交的流水
-            if (etrSecPositionFlows.size() > 0) {
-                List<EtrSecPositionFlowDto> etrSecPositionFlowDtos = baseAssetCashPositionCommMapper.selectAllEtrPositionByOffsetFlag(dto.getQuoteId(), DictCodeList.冲正标识_正常交易.getValue());
+            if (!StringUtil.equals(dto.getTradeStatus(), BussinessDictCodeList.银行间上行报价状态_已撤回.getValue())) {
+                List<EtrSecPositionFlowDto> etrSecPositionFlowDtos
+                        = baseAssetCashPositionCommMapper.selectAllEtrPositionByOffsetFlag(dto.getQuoteId(), DictCodeList.冲正标识_正常交易.getValue());
                 for (EtrSecPositionFlowDto flowDto : etrSecPositionFlowDtos) {
                     EtrSecPositionFlowDto temp = new EtrSecPositionFlowDto();
                     BeanUtil.copyPropertiesIgnoreNull(temp, flowDto);
@@ -1078,9 +1085,9 @@ public class CfetsRepoDealQuotedPrice001Service extends BaseService {
                     temp.setUpdateUser(LoginUserUtil.getUserName());
                     etrSecPositionFlows.add(temp);
                 }
+                // 删除历史流水 避免历史流水影响下次提交
+                baseAssetCashPositionCommMapper.deleteEtrPositionByTradeId(dto.getQuoteId());
             }
-            // 删除历史流水 避免历史流水影响下次提交
-            baseAssetCashPositionCommMapper.deleteEtrPositionByTradeId(dto.getQuoteId());
 
             EtrPositionHoldDto etrPositionHoldDto = new EtrPositionHoldDto();
             etrPositionHoldDto.setPtlSecPositionFlows(etrSecPositionFlows);
