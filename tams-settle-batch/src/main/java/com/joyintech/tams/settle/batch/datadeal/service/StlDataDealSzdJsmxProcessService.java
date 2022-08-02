@@ -1138,6 +1138,9 @@ public class StlDataDealSzdJsmxProcessService {
 							settleTransData.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
 						}
 						// XYHGFXSJ-506:修改金融产品代码赋值 modify by fuyongsheng 20220725 start
+						//变量.首期_成交编号 = 清算数据Entity.申请编号
+						settleTransData.setfCjbh(szdJsmx.getSqbh());
+						//清算数据Entity.申请编号 = 清算数据Entity.成交编号
 						// 查询首期清算数据
 						List<SettleTransData> sqSettleTransDatas = trdCommonBaseService.selectSqSettleTransDatas(
 								settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(),
@@ -1217,9 +1220,6 @@ public class StlDataDealSzdJsmxProcessService {
 //						settleTransData.setMpayDate(DateUtil.parse(szdJsmx.getJsrq()));
 						// 到期金额
 //						settleTransData.setmTradeAmt(new BigDecimal(Math.abs(new BigDecimal(szdJsmx.getQsje()).doubleValue())));
-						//变量.首期_成交编号 = 清算数据Entity.申请编号
-						settleTransData.setfCjbh(szdJsmx.getSqbh());
-				        //清算数据Entity.申请编号 = 清算数据Entity.成交编号
 					    szdJsmx.setSqbh(szdJsmx.getCjbh());
 						//清算数据Entity.交易日期 = 清算数据Entity.清算日期
 					    szdJsmx.setJyrq(szdJsmx.getQsrq());
