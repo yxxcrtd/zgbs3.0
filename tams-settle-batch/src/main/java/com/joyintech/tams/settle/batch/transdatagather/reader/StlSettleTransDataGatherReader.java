@@ -252,7 +252,7 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                             dealTotal.setFpriceAmt(totalFpriceamt);
                             dealTotal.setUnitFprice(settleTransDataDto.getUnitFprice());
                         } else{
-                            unitCprice = ArithmeticUtil.divide(totalCpriceAmt, totalShareAmt, 8);
+                            unitCprice = ArithmeticUtil.divide(totalCpriceAmt, totalShareAmt, 4);
                             dealTotal.setCpriceAmt(totalCpriceAmt);
                             dealTotal.setUnitCprice(unitCprice);
                             unitInt=settleTransDataDto.getUnitInt();
