@@ -683,7 +683,7 @@
                 //质押券
                 $("#repSecId").attr("disabled", false);
                 //折算比例
-                $("#conRatio").attr("disabled", false);
+                $("#conRatio").attr("disabled", true);
                 //质押数量
                 $("#repSecNum").attr("disabled", false);
                 //券面金额
@@ -758,7 +758,7 @@
                 //质押券
                 $("#repSecId").attr("disabled", false);
                 //折算比例
-                $("#conRatio").attr("disabled", false);
+                $("#conRatio").attr("disabled", true);
                 //质押数量
                 $("#repSecNum").attr("disabled", false);
                 //券面金额
