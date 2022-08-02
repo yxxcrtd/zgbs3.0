@@ -1,18 +1,21 @@
 package com.joyintech.tams.exchange.service.trade.server.agent.jsd;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.PostConstruct;
-
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.joyintech.tams.exchange.common.bean.*;
+import com.joyintech.tams.exchange.common.bean.bond.StandardBondQryBean;
+import com.joyintech.tams.exchange.common.constant.*;
+import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.net.protocol.FunctionCode;
+import com.joyintech.tams.exchange.common.utils.CbptransTypeUtils;
+import com.joyintech.tams.exchange.common.utils.EntrustUtils;
+import com.joyintech.tams.exchange.common.utils.JsonUtils;
+import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
+import com.joyintech.tams.exchange.service.trade.dao.domain.TerminalAgentInfo;
+import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgentDsp;
+import com.joyintech.tams.exchange.service.trade.server.agent.jsd.resp.header.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -22,64 +25,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.joyintech.tams.exchange.common.bean.AccountFinance;
-import com.joyintech.tams.exchange.common.bean.AccountLoginReqBean;
-import com.joyintech.tams.exchange.common.bean.EnableQryBean;
-import com.joyintech.tams.exchange.common.bean.HistoryQryBean;
-import com.joyintech.tams.exchange.common.bean.HistoryTrade;
-import com.joyintech.tams.exchange.common.bean.InstrumentQryBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkCloseQuoteBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkCloseQuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkQuoteBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkQuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedFixedIncomeQuoteBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedFixedIncomeQuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedQuote;
-import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.NegotiateQuoteQueryBean;
-import com.joyintech.tams.exchange.common.bean.NegotiateQuoteReceiveBean;
-import com.joyintech.tams.exchange.common.bean.PledgeDiscount;
-import com.joyintech.tams.exchange.common.bean.PositionQueryBean;
-import com.joyintech.tams.exchange.common.bean.QuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.ResultBean;
-import com.joyintech.tams.exchange.common.bean.StandardBonds;
-import com.joyintech.tams.exchange.common.bean.TerminalId;
-import com.joyintech.tams.exchange.common.bean.bond.StandardBondQryBean;
-import com.joyintech.tams.exchange.common.constant.AgentType;
-import com.joyintech.tams.exchange.common.constant.EntrustBs;
-import com.joyintech.tams.exchange.common.constant.EntrustChildBusiness;
-import com.joyintech.tams.exchange.common.constant.EntrustProp;
-import com.joyintech.tams.exchange.common.constant.EntrustStatus;
-import com.joyintech.tams.exchange.common.constant.ErrorCode;
-import com.joyintech.tams.exchange.common.constant.Market;
-import com.joyintech.tams.exchange.common.constant.QuoteType;
-import com.joyintech.tams.exchange.common.db.domain.Account;
-import com.joyintech.tams.exchange.common.db.domain.CancelEntrustBean;
-import com.joyintech.tams.exchange.common.db.domain.Entrust;
-import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
-import com.joyintech.tams.exchange.common.db.domain.Instrument;
-import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
-import com.joyintech.tams.exchange.common.db.domain.PositionBean;
-import com.joyintech.tams.exchange.common.db.domain.PositionStr;
-import com.joyintech.tams.exchange.common.db.domain.Trade;
-import com.joyintech.tams.exchange.common.net.protocol.FunctionCode;
-import com.joyintech.tams.exchange.common.utils.CbptransTypeUtils;
-import com.joyintech.tams.exchange.common.utils.EntrustUtils;
-import com.joyintech.tams.exchange.common.utils.JsonUtils;
-import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
-import com.joyintech.tams.exchange.service.trade.dao.domain.TerminalAgentInfo;
-import com.joyintech.tams.exchange.common.constant.AccountLoginStatus;
-import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgentDsp;
-import com.joyintech.tams.exchange.service.trade.server.agent.jsd.resp.header.RespCancelEntrustHeader;
-import com.joyintech.tams.exchange.service.trade.server.agent.jsd.resp.header.RespEntrustHeader;
-import com.joyintech.tams.exchange.service.trade.server.agent.jsd.resp.header.RespEtfEntrustHeader;
-import com.joyintech.tams.exchange.service.trade.server.agent.jsd.resp.header.RespIntegratedEntrustHeader;
-import com.joyintech.tams.exchange.service.trade.server.agent.jsd.resp.header.RespQryEnableHeader;
+import javax.annotation.PostConstruct;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author lifangpeng
@@ -111,7 +62,7 @@ public class JsdTradeAgent extends TradeAgentDsp {
             parameters.put("accountId", accountId);
             parameters.put("financeAccount", account.getFinanceAccount());
             parameters.put("password", account.getPwd());
-
+            parameters.put("AgentCode", account.getBrokerId());
             ResultBean resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
             // 账户登录成功，记录下登录成功的账户
             if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
@@ -859,7 +810,9 @@ public class JsdTradeAgent extends TradeAgentDsp {
         String accountId = account.getId();
         try {
             List<Trade> trades = qryTrade(accountId);
-            trades.forEach(this::onTrade);
+            trades.forEach(trade -> {
+                onTrade(trade, true);
+            });
         } catch (Exception e) {
             logger.error("qryTrade: {} error:{}", accountId, e);
         }
@@ -879,17 +832,30 @@ public class JsdTradeAgent extends TradeAgentDsp {
         String accountId = account.getId();
         try {
             List<Trade> trades = qryProtocolBackTrade(accountId);
-            trades.forEach(this::onTrade);
+            trades.forEach(trade -> {
+                onTrade(trade, false);
+            });
         } catch (Exception e) {
             logger.error("qryIntegratedTrade: {} error:{}", accountId, e);
         }
     }
 
-    private void onTrade(Trade trade) {
+    /**
+     * 成交处理
+     *
+     * @param trade
+     * @param flag  true 普通委托， false 综合委托
+     */
+    private void onTrade(Trade trade, Boolean flag) {
         if (Strings.isNullOrEmpty(trade.getBrokerTradeId())) {
             trade.setBrokerTradeId(trade.getEntrustId());
         }
         trade.setNoCancelEntrust(true);
+        if (flag) {
+            trade.KeyType = "E";
+        } else {
+            trade.KeyType = "I";
+        }
         onRtnTrade(trade);
     }
 
@@ -1024,10 +990,10 @@ public class JsdTradeAgent extends TradeAgentDsp {
         return Market.SHSE.value.equals(market) ? "1" : "2";
     }
 
-	@Override
-	public List<NegotiateQuoteReceiveBean> reqNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean)
-			throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public List<NegotiateQuoteReceiveBean> reqNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean)
+            throws Exception {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

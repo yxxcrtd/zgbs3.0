@@ -1,4 +1,4 @@
-package com.joyintech.tams.exchange.service.trade.server.agent;
+package com.joyintech.tams.exchange.service.trade.util;
 
 import com.alibaba.fastjson.JSONArray;
 import com.google.common.base.Strings;
@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 public class AgentUtil {
-
 
     /**
      * 统一处理有空格的key

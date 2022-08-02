@@ -859,9 +859,12 @@ public class UfxMsgParseHelper {
     }
 
 
-    public static List<NegotiateQuoteReceiveBean> parseNegotiateQuoteReceiveBean(String accountId, List<Map<String, Object>> resList) {
+    public static List<NegotiateQuoteReceiveBean> parseNegotiateQuoteReceiveBean(String accountId, String side, List<Map<String, Object>> resList) {
         List<NegotiateQuoteReceiveBean> list = new ArrayList<>();
         for (Map<String, Object> ds : resList) {
+            // 只要方向相反的记录
+            if (!side.equals(ds.get("entrust_bs")))
+                continue;
             NegotiateQuoteReceiveBean receiveBean = new NegotiateQuoteReceiveBean();
 
             receiveBean.setRequestTime((String) (ds.get("init_date")));

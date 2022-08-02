@@ -1,10 +1,8 @@
 package com.joyintech.tams.exchange.service.trade.processor;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.joyintech.exchange.service.quote.service.QuoteService;
@@ -66,7 +64,6 @@ import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押�
 import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_质押券出库;
 import static com.joyintech.tams.exchange.common.constant.BatchPriceMode.*;
 import static com.joyintech.tams.exchange.common.constant.EntrustProp.*;
-import static com.joyintech.tams.exchange.common.constant.ErrorCode.INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR;
 import static com.joyintech.tams.exchange.common.constant.ErrorCode.NOT_FAIR_ORDER_ERROR;
 import static com.joyintech.tams.exchange.common.constant.OthCodeType.*;
 import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_现券交易;
@@ -176,18 +173,17 @@ public class TradeHelper {
             entrustList.forEach(entrust -> {
                 if (EntrustStatus.isUnCompleteCancelEntrust(entrust.getEntrustStatus())
                         || entrust.getEntrustStatus() == EntrustStatus.SUCCEEDED.value) {
-                    String key = entrust.getAccountId() + "_" + entrust.getBrokerEntrustId();
+                    String key = AgentServerUtil.GetTradeCacheKey("E", entrust.getAccountId(), entrust.getBrokerEntrustId());
                     entrustMap.put(key, entrust.getId());
                 }
             });
         }
         List<IntegratedEntrust> integratedEntrustList = integratedEntrustService.findAll();
         if (Objects.nonNull(integratedEntrustList)) {
-            integratedEntrustList.forEach(integratedEntrust -> {
-                if (EntrustStatus.isUnCompleteCancelEntrust(integratedEntrust.getEntrustStatus())
-                        || integratedEntrust.getEntrustStatus() == EntrustStatus.SUCCEEDED.value) {
-                    String key = integratedEntrust.getAccountId() + "_" + integratedEntrust.getBrokerEntrustId();
-                    entrustMap.put(key, integratedEntrust.getId());
+            integratedEntrustList.forEach(iEntrust -> {
+                if (EntrustStatus.isUnCompleteCancelEntrust(iEntrust.getEntrustStatus())) {
+                    String key = AgentServerUtil.GetTradeCacheKey("I", iEntrust.getAccountId(), iEntrust.getBrokerEntrustId());
+                    entrustMap.put(key, iEntrust.getId());
                 }
             });
         }

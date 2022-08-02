@@ -15,6 +15,7 @@ import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.db.domain.TradeExample;
 import com.joyintech.tams.exchange.common.request.PageMode;
 import com.joyintech.tams.exchange.common.request.PageTradeInfoRequest;
+import com.joyintech.tams.exchange.common.utils.AgentServerUtil;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.datacommon.cache.impl.AsyncServiceImpl;
 import com.joyintech.tams.exchange.datacommon.db.dao.IMybatisMapper;
@@ -121,10 +122,10 @@ public class TradeServiceImpl extends AsyncServiceImpl<String, Trade> implements
     }
 
     @Override
-    public Trade queryTradeByAccountIdAndBrokerTradeId(String accountId, String brokerTradeId) {
+    public Trade queryTradeByAccountIdAndBrokerTradeId(String accountId, String key) {
         Map<String, Trade> map = accountIdMap.get(accountId);
         if (Objects.nonNull(map)) {
-            return map.get(DateUtil.getSysDate().replace("-", "") + "_" + brokerTradeId);
+            return map.get(DateUtil.getSysDate().replace("-", "") + "_" + key);
         }
         return null;
     }
@@ -230,7 +231,9 @@ public class TradeServiceImpl extends AsyncServiceImpl<String, Trade> implements
             accountMap = new ConcurrentHashMap<>();
             accountIdMap.put(trade.getAccountId(), accountMap);
         }
-        accountMap.put(trade.getTradingDay() + "_" + trade.getBrokerTradeId(), trade);
+        //撤单、废单成交无需去重。 支持重复处理
+        String key = AgentServerUtil.GetTradeCacheKey(trade.KeyType, trade.getAccountId(), trade.getBrokerEntrustId());
+        accountMap.put(key, trade);
     }
 
     @Override

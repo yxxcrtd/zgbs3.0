@@ -16,8 +16,8 @@ import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
 import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.service.trade.dao.domain.TerminalAgentInfo;
-import com.joyintech.tams.exchange.service.trade.server.agent.AgentUtil;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgentDsp;
+import com.joyintech.tams.exchange.service.trade.util.AgentUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -98,7 +98,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
             parameters.put("accountId", accountId);
             parameters.put("financeAccount", account.getFinanceAccount());
             parameters.put("tradePwd", account.getTradePwd());
-
+            parameters.put("AgentCode", account.getBrokerId());
             ResultBean resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
             // 账户登录成功，记录下登录成功的账户
             if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
@@ -1164,6 +1164,11 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
             }
             if (Strings.isNullOrEmpty(trade.getBrokerTradeId())) {
                 trade.setBrokerTradeId(trade.getEntrustId());
+            }
+            if (flag) {
+                trade.KeyType = "E";
+            } else {
+                trade.KeyType = "I";
             }
             onRtnTrade(trade);
         }

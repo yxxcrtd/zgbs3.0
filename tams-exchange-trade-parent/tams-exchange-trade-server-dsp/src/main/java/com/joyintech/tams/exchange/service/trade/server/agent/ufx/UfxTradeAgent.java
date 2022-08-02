@@ -11,8 +11,8 @@ import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.net.protocol.FunctionCode;
 import com.joyintech.tams.exchange.common.utils.*;
 import com.joyintech.tams.exchange.service.trade.dao.domain.TerminalAgentInfo;
-import com.joyintech.tams.exchange.service.trade.server.agent.AgentUtil;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgentDsp;
+import com.joyintech.tams.exchange.service.trade.util.AgentUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -84,6 +84,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
         parameters.put("financeAccount", account.getFinanceAccount());
         parameters.put("pwd", account.getTradePwd());
         parameters.put("password", account.getTradePwd());
+        parameters.put("AgentCode", account.getBrokerId());
         ResultBean resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
         // 账户登录成功，记录下登录成功的账户
         if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
@@ -1254,6 +1255,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
                 logger.info("废单成交转换为委托通知  trade：[{}]  entrust: [{}]", JsonUtils.getJsonFromObject(trade), JsonUtils.getJsonFromObject(entrust));
                 onRtnEntrust(entrust);
             } else {
+                trade.KeyType = "E";
                 onRtnTrade(trade);
             }
         });
@@ -1306,6 +1308,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
                 logger.info("废单成交转换为委托通知  trade：[{}]  IntegratedEntrust: [{}]", JsonUtils.getJsonFromObject(trade), JsonUtils.getJsonFromObject(entrust));
                 onRtnIntegratedEntrust(entrust);
             } else {
+                trade.KeyType = "I";
                 onRtnTrade(trade);
             }
         });
@@ -1340,6 +1343,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
                 logger.info("废单成交转换为委托通知  trade：[{}]  IntegratedEntrust: [{}]", JsonUtils.getJsonFromObject(trade), JsonUtils.getJsonFromObject(entrust));
                 onRtnIntegratedEntrust(entrust);
             } else {
+                trade.KeyType = "I";
                 onRtnTrade(trade);
             }
         });
@@ -1545,7 +1549,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
     }
 
     @Override
-    public List<NegotiateQuoteReceiveBean> reqNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean)
+    public List<NegotiateQuoteReceiveBean> reqNegotiateQuoteReceive(NegotiateQuoteQueryBean queryBean)
             throws Exception {
         List<NegotiateQuoteReceiveBean> list;
         // 332653   债券现券转发申报信息查询 深圳协商成交 接收对方发起的报文
@@ -1555,12 +1559,12 @@ public class UfxTradeAgent extends TradeAgentDsp {
         String entrustProp = "BondConsultQuerySZ";
         // region 参数组装
         // 自定义参数
-        Map<String, Object> customParam = getCustomParam(negotiateQuoteQueryBean.getAccountId());
+        Map<String, Object> customParam = getCustomParam(queryBean.getAccountId());
         // endregion
         // 332653   债券现券转发申报信息查询
-        ResultBean resultBean = triggerCodeAdapter(functionCode, entrustProp, negotiateQuoteQueryBean, customParam);
+        ResultBean resultBean = triggerCodeAdapter(functionCode, entrustProp, queryBean, customParam);
         // region 返回结果处理
-        list = UfxMsgParseHelper.parseNegotiateQuoteReceiveBean(negotiateQuoteQueryBean.getAccountId(), AgentUtil.getQueryListUFX(resultBean));
+        list = UfxMsgParseHelper.parseNegotiateQuoteReceiveBean(queryBean.getAccountId(), queryBean.getSide(), AgentUtil.getQueryListUFX(resultBean));
         // endregion
         return list;
     }
