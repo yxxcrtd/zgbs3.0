@@ -1147,6 +1147,7 @@ public class StlDataDealSzdJsmxProcessService {
 							settleTransData.setFinprodId(sqSettleTransDatas.get(0).getFinprodId());
 						}
 						// XYHGFXSJ-506:修改金融产品代码赋值 modify by fuyongsheng 20220725 end
+						// XYHGFXSJ-716:modify by fuyongsheng 20220730 start
 						// 业务场景分类和交易方向
 						if (StringUtil.equals(StlDataDealProcessConstant.YWLX_616, szdJsmx.getYwlx())){
 							if(StringUtil.equals(StlDataDealProcessConstant.MMBS_B, szdJsmx.getMmbz())){
@@ -1188,6 +1189,7 @@ public class StlDataDealSzdJsmxProcessService {
 								settleTransData.setShareAmt(sqSettleTransDatas.get(0).getShareAmt());
 							}
 						}
+						// XYHGFXSJ-716:modify by fuyongsheng 20220730 end
 						// 金融产品代码
 						// settleTransData.setFinprodId(szdJsmx.getZqdm1());
 						// 交易份额
