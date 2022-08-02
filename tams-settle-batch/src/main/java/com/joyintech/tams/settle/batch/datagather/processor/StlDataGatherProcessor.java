@@ -325,7 +325,7 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
         ){
             // 查询指令换入质押券信息
             List<EtrPledge> etrPledges = stlDataGatherMapper.selectEtrPledges(currEtrEntrust.getEntrustId(),
-                    currEtrEntrust.getFinprodId(), DictCodeListExt3.质押券置换_置换方向_换入.getValue());
+                    DictCodeListExt3.质押券置换_置换方向_换入.getValue());
             // 查询清算数据换入质押券信息
             List<SettleTransDataTotalPledge> settlePledges = stlDataGatherMapper.selectSettleTransDataTotalPledge(
                     settleTransDataDto.getTradeId(), DictCodeListExt3.质押券置换_置换方向_换入.getValue());

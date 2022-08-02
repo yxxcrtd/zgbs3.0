@@ -1587,6 +1587,7 @@
 		SELECT
 			TRADE_ID,
 			PLEDGE_FINPROD_ID,
+			PLEDGE_NUMBER,
 			DISPLACE_DIRECTION
 		FROM
 			SETTLE_TRANS_DATA_TOTAL_PLEDGE
@@ -1756,7 +1757,6 @@
 			ETR_PLEDGE
 		WHERE
 			ENTRUST_ID = #{entrustId, jdbcType=VARCHAR}
-		  	AND FINPROD_ID = #{finProdId, jdbcType=VARCHAR}
 			<if test="displaceDir != null and displaceDir != ''">
 				AND DISPLACE_DIR = #{displaceDir,jdbcType=VARCHAR}
 			</if>

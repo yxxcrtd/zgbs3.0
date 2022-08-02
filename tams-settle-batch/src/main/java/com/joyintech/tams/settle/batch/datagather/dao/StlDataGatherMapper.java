@@ -271,12 +271,10 @@ public interface StlDataGatherMapper {
     /**
      * 查询指令质押券信息
      * @param entrustId
-     * @param finProdId
      * @param displaceDir 置换方向
      * @return
      */
-    List<EtrPledge> selectEtrPledges(@Param("entrustId")String entrustId, @Param("finProdId")String finProdId,
-                                     @Param("displaceDir") String displaceDir);
+    List<EtrPledge> selectEtrPledges(@Param("entrustId")String entrustId, @Param("displaceDir") String displaceDir);
 
     /**
      * 查询清算质押券信息
