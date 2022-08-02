@@ -1537,7 +1537,7 @@
         select count(1) from (
             SELECT ee.ENTRUST_ID
             FROM ETR_ENTRUST ee INNER JOIN ETR_ENTRUST_ADD eea on ee.ENTRUST_ID = eea.ENTRUST_ID
-            WHERE eea.REQUEST_ID = #{requestId,jdbcType=VARCHAR} and ee.ENTRUST_STATUS not in ('06','07')
+            WHERE eea.REQUEST_ID = #{requestId,jdbcType=VARCHAR} and ee.ENTRUST_STATUS not in ('06','07','05')
             UNION
             SELECT eeab.ENTRUST_ID
             FROM ETR_ENTRUST_ADD_BACKUP eeab
