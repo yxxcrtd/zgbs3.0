@@ -1163,6 +1163,15 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
         if(StringUtil.equals(entity.getButtonType(), DictCodeListExt3.交收操作类型_交收.getValue())) {
             if(Objects.nonNull(total)) {
                 autoPeriodCommonService.updateDealDataCancel(entity.getTradeId(), DictCodeList.是否_否.getValue());
+                // 划款指令从temp转到实际表
+                List<TrdProductTempDeal> list = trdProductTempDealMapper.selectByTotalTradeId(entity.getTradeId());
+                if(CollectionUtils.isNotEmpty(list)) {
+                    List<String> tradeIds = list.stream().map(TrdProductTempDeal::getTradeId).collect(Collectors.toList());
+                    // 先删后插
+                    stlPayOrdersMapper.deleteByTradeIds(tradeIds);
+                    stlPayTempOrdersMapper.insertStlPayOrders(tradeIds);
+                    logger.info("修改:划款指令从temp转到实际表 tradeIds:{}",tradeIds);
+                }
             }else {
                 autoPeriodCommonService.insertDealDataFromTemp(entity.getTradeId());
                 // 划款指令从temp转到实际表
@@ -1170,6 +1179,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 if(CollectionUtils.isNotEmpty(list)) {
                     List<String> tradeIds = list.stream().map(TrdProductTempDeal::getTradeId).collect(Collectors.toList());
                     stlPayTempOrdersMapper.insertStlPayOrders(tradeIds);
+                    logger.info("新增:划款指令从temp转到实际表 tradeIds:{}",tradeIds);
                 }
             }
         }
@@ -1467,13 +1477,13 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 StlPayOrdersDto stlPayOrder = new StlPayOrdersDto();
                 BeanUtil.copyPropertiesIgnoreNull(stlPayOrder, orderDtoMap.get(item.getTradeId()));
                 stlPayOrders.add(stlPayOrder);
-                logger.info("债券交收处理头寸,首期划款指令:" + JsonUtils.object2Json(stlPayOrders));
+                logger.info("债券交收处理头寸,划款指令:" + JsonUtils.object2Json(stlPayOrders));
             } else {
                 // 到期会按交易编号生成单独的划款指令
                 StlPayOrdersDto stlPayOrder = new StlPayOrdersDto();
                 BeanUtil.copyPropertiesIgnoreNull(stlPayOrder, orderDtoMap.get(item.getTradeId()));
                 stlPayOrders.add(stlPayOrder);
-                logger.info("债券交收处理头寸,到期划款指令:" + JsonUtils.object2Json(stlPayOrders));
+                logger.info("债券交收处理头寸,划款指令:" + JsonUtils.object2Json(stlPayOrders));
             }
             if (CollectionUtils.isNotEmpty(stlPayOrders)
                     && !DictCodeListExt1.投资目的_卖空.getValue().equals(trdProductDeal.getInvAim())) {

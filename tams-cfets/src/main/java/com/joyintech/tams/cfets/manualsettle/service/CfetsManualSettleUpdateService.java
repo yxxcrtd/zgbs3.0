@@ -287,10 +287,9 @@ public class CfetsManualSettleUpdateService extends BaseService<CfetsManualSettl
                             //3.更新划款指令表
                             StlPayTempOrders record = new StlPayTempOrders();
                             record.setTradeId(trdProductDealAdd.getTradeId());
-                            record.setSettleAmt(trdProductDealAdd.getSettleAmt());
+                            record.setSettleAmt(trdBankManualSetDetail.getSettleAmt());
                             stlPayTempOrdersMapper.updateByTradeId(record);
                         }
-                        continue;
                     }
                 }
             }
