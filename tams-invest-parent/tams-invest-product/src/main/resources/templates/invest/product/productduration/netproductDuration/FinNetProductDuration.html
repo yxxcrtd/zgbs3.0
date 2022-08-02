@@ -47,7 +47,7 @@
                                 </div>
                                 <div class=" form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
-                                           data-th-text="#{FinNetProductDuration.dealType}">交易类型</label>                                    
+                                           data-th-text="#{FinNetProductDuration.dealType}">交易类型</label>
                                     <div class="layui-input-inline input-inline">
                                         <select name="dealType" id="dealType"
                                             class="layui-input form-input input-select"
@@ -55,11 +55,11 @@
                                             data-th-data-result="${PS}" required>
                                         </select>
                                     </div>
-                                    
+
                                 </div>
                                 <div class=" form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
-                                           data-th-text="#{FinNetProductDuration.ccy}">币种</label>                                    
+                                           data-th-text="#{FinNetProductDuration.ccy}">币种</label>
                                     <div class="layui-input-inline input-inline">
                                         <select name="ccy" id="finccy"
                                             class="layui-input form-input input-select"
@@ -67,7 +67,7 @@
                                             data-th-data-result="${CCY}" required disabled>
                                         </select>
                                     </div>
-                                    
+
                                 </div>
                             </div>
                             <div class="layui-form-item">
@@ -145,7 +145,7 @@
                                            data-th-text="#{FinNetProductDuration.dealNum}">交易份额</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" data-fixtype="2" unit="1" data-th-data-textrange="2"
-                                               class="layui-input form-input text-number" required="required" 
+                                               class="layui-input form-input text-number" required="required"
                                                id="subDealNum" name="subDealNum" data-th-value="${entity?.subDealNum}" disabled/>
                                         <span class="input-right-show">份</span>
                                     </div>
@@ -172,7 +172,7 @@
 	                                    <select id="subPeriodId" name="subPeriodId" disabled="disabled"
                                                 class="layui-input form-input input-select"
                                                 required="required" allowClear="true" placeholder="请输入内容"
-                                                data-th-placeholder="#{SysCommon.placeholder}" 
+                                                data-th-placeholder="#{SysCommon.placeholder}"
                                                 data-th-initValue='${entity?.subPeriodId}'
                                                 data-th-data-result="${subPeriodsSelect}">
                                         </select>
@@ -182,7 +182,7 @@
 	                                <label class="layui-form-label form-label-wrap"
 	                                       data-th-text="#{FinNetProductDuration.periodId}">期次分支序号</label>
 	                                <div class="layui-input-inline input-inline">
-	                                	<input type="text" class="layui-input form-input" 
+	                                	<input type="text" class="layui-input form-input"
                                           		id="subPeriodBranch" name="subPeriodBranch" data-th-value="${entity?.subPeriodBranch}"/>
 	                                </div>
 	                            </div>
@@ -227,16 +227,16 @@
                                         <input type="text" data-fixtype="2" unit="1" data-th-data-textrange="0"
                                                class="layui-input form-input text-number"
                                                id="customersBeginNum" name="customersBeginNum" data-th-value="${entity?.customersBeginNum}"/>
-                                    </div>                           	
+                                    </div>
                             	</div>
                             </div>-->
-                            
+
                             <div class="layui-form-item">
                                 <div class=" form-inline-wrap" style="width:100%">
                                     <label class="layui-form-label form-label-wrap" style="width:12%"
                                            data-th-text="#{FinNetProductDuration.remark}">交易备注</label>
                                     <div class="layui-input-inline input-inline" style="width:87%">
-                                    	<textarea id="subRemark" name="subRemark" placeholder="请输入内容" data-data-ignore="false"                                        
+                                    	<textarea id="subRemark" name="subRemark" placeholder="请输入内容" data-data-ignore="false"
                                                   class="layui-textarea" data-th-placeholder="#{SysCommon.placeholder}"
                                                   data-th-text ="${entity?.subRemark}" maxlength="500">
                                         </textarea>
@@ -256,9 +256,9 @@
                             	</div>
                         	</div>
                     	</div>
-                	</div> 
-                </div>                
-                
+                	</div>
+                </div>
+
                 <div id="purModel" class="pro-module-wrap">
                     <div class="pro-module">
                         <h3 class="pro-module-title">
@@ -285,7 +285,7 @@
                                                data-th-placeholder="#{SysCommon.placeholder}">
                                     </div>
                                 </div>
-                                
+
                                 <div class=" form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.unitNetValue}">单位净值</label>
@@ -293,9 +293,9 @@
                                         <input type="text" class="layui-input form-input" required="required"
                                                id="purUnitNetValue" name="purUnitNetValue" disabled data-th-value="${entity?.purUnitNetValue}"/>
                                     </div>
-                                </div>                                
+                                </div>
                             </div>
-                            <div class="layui-form-item">                                
+                            <div class="layui-form-item">
                                 <div class=" form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.dealAmt}">交易金额</label>
@@ -358,7 +358,7 @@
 	                                <label class="layui-form-label form-label-wrap"
 	                                       data-th-text="#{FinNetProductDuration.periodId}">期次分支序号</label>
 	                                <div class="layui-input-inline input-inline">
-	                                	<input type="text" class="layui-input form-input" 
+	                                	<input type="text" class="layui-input form-input"
                                           		id="purPeriodBranch" name="purPeriodBranch" data-th-value="${entity?.purPeriodBranch}"/>
 	                                </div>
 	                            </div>
@@ -385,8 +385,8 @@
                                 <div class=" form-inline-wrap" style="width:100%">
                                     <label class="layui-form-label form-label-wrap" style="width:12%"
                                            data-th-text="#{FinNetProductDuration.remark}">交易备注</label>
-                                    <div class="layui-input-inline input-inline" style="width:87%">            
-                                    	<textarea id="purRemark" name="purRemark" placeholder="请输入内容" data-data-ignore="false"                            
+                                    <div class="layui-input-inline input-inline" style="width:87%">
+                                    	<textarea id="purRemark" name="purRemark" placeholder="请输入内容" data-data-ignore="false"
                                                   class="layui-textarea" data-th-placeholder="#{SysCommon.placeholder}"
                                                   data-th-text ="${entity?.purRemark}" maxlength="500">
                                         </textarea>
@@ -406,10 +406,10 @@
                             	</div>
                         	</div>
                     	</div>
-                	</div> 
-                </div> 
-                
-                
+                	</div>
+                </div>
+
+
                 <div id="redModel" class="pro-module-wrap">
                     <div class="pro-module">
                         <h3 class="pro-module-title">
@@ -440,12 +440,12 @@
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.netValueDate}">净值日</label>
                                     <div class="layui-input-inline input-inline">
-                                        <input id="redNetValueDate" name="redNetValueDate" class="layui-input form-input input-dateSelect" 
+                                        <input id="redNetValueDate" name="redNetValueDate" class="layui-input form-input input-dateSelect"
                                         	data-th-value="${#dates.format(entity?.redNetValueDate,'yyyy-MM-dd')}" required="required">
                                     </div>
-                                </div>                       
+                                </div>
                             </div>
-                            <div class="layui-form-item">  
+                            <div class="layui-form-item">
                                 <div class=" form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.unitNetValue}">单位净值</label>
@@ -453,7 +453,7 @@
                                         <input type="text" class="layui-input form-input" required="required"
                                                id="redUnitNetValue" name="redUnitNetValue" disabled data-th-value="${entity?.redUnitNetValue}"/>
                                     </div>
-                                </div> 
+                                </div>
                                 <div class=" form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.dealNum}">交易份额</label>
@@ -463,7 +463,7 @@
                                                id="redDealNum" name="redDealNum" disabled data-th-value="${entity?.redDealNum}"/>
                                         <span class="input-right-show">份</span>
                                     </div>
-                                </div>                                
+                                </div>
                                 <div class=" form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.dealAmt}">交易金额</label>
@@ -473,7 +473,7 @@
                                                id="redDealAmt" name="redDealAmt" data-th-value="${entity?.redDealAmt}"/>
                                         <span class="input-right-show">元</span>
                                     </div>
-                                </div>                                                                
+                                </div>
                             </div>
                             <div class="layui-form-item">
                                 <div class=" form-inline-wrap">
@@ -558,7 +558,7 @@
                                         <input type="text" data-fixtype="2" unit="1" data-th-data-textrange="0"
                                                class="layui-input form-input text-number"
                                                id="customersReduceNum" name="customersReduceNum" data-th-value="${entity?.customersReduceNum}"/>
-                                    </div>                           	
+                                    </div>
                             	</div> -->
                             </div>
                             <div id="divLiquidatedDamages" class="layui-form-item">
@@ -577,7 +577,7 @@
                                 <div class=" form-inline-wrap" style="width:100%">
                                     <label class="layui-form-label form-label-wrap" style="width:12%"
                                            data-th-text="#{FinNetProductDuration.remark}">交易备注</label>
-                                    <div class="layui-input-inline input-inline" style="width:87%">                                        
+                                    <div class="layui-input-inline input-inline" style="width:87%">
                                         <textarea id="redRemark" name="redRemark" placeholder="请输入内容"
                                                   class="layui-textarea" data-th-placeholder="#{SysCommon.placeholder}"
                                                   data-th-text ="${entity?.redRemark}" maxlength="500">
@@ -586,8 +586,8 @@
                                 </div>
                             </div>
                         </div>
-                    </div>                 
-                </div> 
+                    </div>
+                </div>
                 <div class="pro-module-wrap" id="FinNetProductDuration_div_red_layering" hidden=true>
                     	<div class="pro-module">
                         	<h3 class="pro-module-title">
@@ -599,8 +599,8 @@
                             	</div>
                         	</div>
                     	</div>
-                </div>   
-                
+                </div>
+
                 <div id="redCycleModel" class="pro-module-wrap">
                     <div class="pro-module">
                         <h3 class="pro-module-title">
@@ -612,7 +612,7 @@
                         <table class="layui-table" id="redCycleDataTable"></table>
                     </div>
                 </div>
-                
+
                 <div id="expireModel" class="pro-module-wrap">
                     <div class="pro-module">
                         <h3 class="pro-module-title">
@@ -647,9 +647,9 @@
                                                placeholder="请选择时间" data-th-value="${#dates.format(entity?.expireNetValueDate,'yyyy-MM-dd')}" required="required"
                                                data-th-placeholder="#{SysCommon.placeholder}">
                                     </div>
-                                </div>                       
+                                </div>
                             </div>
-                            <div class="layui-form-item">  
+                            <div class="layui-form-item">
                                 <div class=" form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.unitNetValue}">单位净值</label>
@@ -657,7 +657,7 @@
                                         <input type="text" class="layui-input form-input" required="required"
                                                id="expireUnitNetValue" name="expireUnitNetValue" disabled data-th-value="${entity?.expireUnitNetValue}"/>
                                     </div>
-                                </div>                                 
+                                </div>
                                 <div class=" form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.dealAmt}">交易金额</label>
@@ -673,11 +673,11 @@
                                            data-th-text="#{FinNetProductDuration.dealNum}">交易份额</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" data-fixtype="2" unit="1" data-th-data-textrange="2"
-                                               class="layui-input form-input text-number" required="required" 
+                                               class="layui-input form-input text-number" required="required"
                                                id="expireDealNum" name="expireDealNum" disabled data-th-value="${entity?.expireDealNum}"/>
                                         <span class="input-right-show">份</span>
                                     </div>
-                                </div>                                
+                                </div>
                             </div>
                             <div class="layui-form-item">
                             	<div class=" form-inline-wrap">
@@ -715,7 +715,7 @@
                                 <div class=" form-inline-wrap" style="width:100%">
                                     <label class="layui-form-label form-label-wrap" style="width:12%"
                                            data-th-text="#{FinNetProductDuration.remark}">交易备注</label>
-                                    <div class="layui-input-inline input-inline" style="width:87%">                                        
+                                    <div class="layui-input-inline input-inline" style="width:87%">
                                         <textarea id="expireRemark" name="expireRemark" placeholder="请输入内容"
                                                   class="layui-textarea" data-th-placeholder="#{SysCommon.placeholder}"
                                                   data-th-text ="${entity?.expireRemark}" maxlength="500">
@@ -724,8 +724,8 @@
                                 </div>
                             </div>
                         </div>
-                    </div>                    
-                </div> 
+                    </div>
+                </div>
                 <div class="pro-module-wrap" id="FinNetProductDuration_div_expire_layering" hidden=true>
                     	<div class="pro-module">
                         	<h3 class="pro-module-title">
@@ -749,7 +749,7 @@
                         <table class="layui-table" id="expireCycleDataTable"></table>
                     </div>
                 </div>
-                
+
                 <div id="addReduceModel" class="pro-module-wrap">
                     <div class="pro-module">
                         <h3 class="pro-module-title">
@@ -775,7 +775,7 @@
                                                placeholder="请选择时间" data-th-value="${#dates.format(entity?.addReduceNetValueDate,'yyyy-MM-dd')}" required="required"
                                                data-th-placeholder="#{SysCommon.placeholder}">
                                     </div>
-                                </div> 
+                                </div>
                                 <div class=" form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.unitNetValue}">单位净值</label>
@@ -783,10 +783,10 @@
                                         <input type="text" class="layui-input form-input" required="required"
                                                id="addReduceUnitNetValue" name="addReduceUnitNetValue" disabled data-th-value="${entity?.addReduceUnitNetValue}"/>
                                     </div>
-                                </div>                          
+                                </div>
                             </div>
-                            <div class="layui-form-item"> 
-                                                             
+                            <div class="layui-form-item">
+
                                 <div class=" form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.dealAmt}">交易金额</label>
@@ -806,13 +806,13 @@
                                                id="addReduceDealNum" name="addReduceDealNum" disabled data-th-value="${entity?.addReduceDealNum}"/>
                                         <span class="input-right-show">份</span>
                                     </div>
-                                </div>                                
+                                </div>
                             </div>
                             <div class="layui-form-item">
                                 <div class=" form-inline-wrap" style="width:100%">
                                     <label class="layui-form-label form-label-wrap" style="width:12%"
                                            data-th-text="#{FinNetProductDuration.remark}">交易备注</label>
-                                    <div class="layui-input-inline input-inline" style="width:87%">                                        
+                                    <div class="layui-input-inline input-inline" style="width:87%">
                                         <textarea id="addReduceRemark" name="addReduceRemark" placeholder="请输入内容"
                                                   class="layui-textarea" data-th-placeholder="#{SysCommon.placeholder}"
                                                   data-th-text ="${entity?.addReduceRemark}" maxlength="500">
@@ -821,8 +821,8 @@
                                 </div>
                             </div>
                         </div>
-                    </div>                    
-                </div> 
+                    </div>
+                </div>
                 <div class="pro-module-wrap" id="FinNetProductDuration_div_reduce_layering" hidden=true>
                     	<div class="pro-module">
                         	<h3 class="pro-module-title">
@@ -846,7 +846,7 @@
                         <table class="layui-table" id="addReduceCycleDataTable"></table>
                     </div>
                 </div>
-                
+
                 <div id="subModel03" class="pro-module-wrap">
                     <div class="pro-module">
                         <h3 class="pro-module-title">
@@ -885,13 +885,13 @@
                                     </div>
                                 </div>
                             </div>
-                           
-                            
+
+
                             <div class="layui-form-item">
                                 <div class=" form-inline-wrap" style="width:100%">
                                     <label class="layui-form-label form-label-wrap" style="width:12%"
                                            data-th-text="#{FinNetProductDuration.remark}">交易备注</label>
-                                    <div class="layui-input-inline input-inline" style="width:87%">                                        
+                                    <div class="layui-input-inline input-inline" style="width:87%">
                                         <textarea id="subRemark03" name="subRemark03" placeholder="请输入内容"
                                                   class="layui-textarea" data-th-placeholder="#{SysCommon.placeholder}"
                                                   data-th-text ="${entity?.subRemark03}" maxlength="500">
@@ -902,7 +902,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div id="purModel03" class="pro-module-wrap">
                     <div class="pro-module">
                         <h3 class="pro-module-title">
@@ -919,7 +919,7 @@
                                                placeholder="请选择时间" data-th-value="${#dates.format(entity?.purConfirmDate03,'yyyy-MM-dd')}" required="required"
                                                data-th-placeholder="#{SysCommon.placeholder}">
                                     </div>
-                                </div>                              
+                                </div>
                                 <div class=" form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.dealAmt}">交易金额</label>
@@ -945,7 +945,7 @@
                                 <div class=" form-inline-wrap" style="width:100%">
                                     <label class="layui-form-label form-label-wrap" style="width:12%"
                                            data-th-text="#{FinNetProductDuration.remark}">交易备注</label>
-                                    <div class="layui-input-inline input-inline" style="width:87%">                                        
+                                    <div class="layui-input-inline input-inline" style="width:87%">
                                         <textarea id="purRemark03" name="purRemark03" placeholder="请输入内容"
                                                   class="layui-textarea" data-th-placeholder="#{SysCommon.placeholder}"
                                                   data-th-text ="${entity?.purRemark03}" maxlength="500">
@@ -955,8 +955,8 @@
                             </div>
                         </div>
                     </div>
-                </div> 
-                
+                </div>
+
                 <div id="redModel03" class="pro-module-wrap">
                     <div class="pro-module">
                         <h3 class="pro-module-title">
@@ -991,22 +991,22 @@
                                                placeholder="请选择时间" data-th-value="${#dates.format(entity?.redProfitPayDate03,'yyyy-MM-dd')}" required="required"
                                                data-th-placeholder="#{SysCommon.placeholder}">
                                     </div>
-                                </div>                       
+                                </div>
                             </div>
-                            <div class="layui-form-item">                    
+                            <div class="layui-form-item">
                                 <div class=" form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.dealPrinAmt}">交易本金</label>
-                                    <div class="layui-input-inline input-inline">                                    	
+                                    <div class="layui-input-inline input-inline">
                                         <input type="text" data-fixtype="2" unit="1" data-th-data-textrange="2"
                                                class="layui-input form-input text-number" required="required"
                                                id="redPrinAmt03" name="redPrinAmt03" data-th-value="${entity?.redPrinAmt03}"/>
                                         <span class="input-right-show">元</span>
-                                        
+
                                         <input type="text" id="totalRedPrinAmt03" style = "display: none">
                                     	<input type="text" id="totalRedProfit03" style = "display: none">
                                     </div>
-                                </div>  
+                                </div>
                                 <div class=" form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.profitAmt}">收益金额</label>
@@ -1026,7 +1026,7 @@
                                                id="redDealAmt03" name="redDealAmt03" data-th-value="${entity?.redDealAmt03}"/>
                                         <span class="input-right-show">元</span>
                                     </div>
-                                </div>                          
+                                </div>
                             </div>
                             <div class="layui-form-item">
                                 <div class=" form-inline-wrap">
@@ -1058,7 +1058,7 @@
                                                id="redTotalNetValue03" name="redTotalNetValue03" disabled data-th-value="${entity?.redTotalNetValue03}"/>
                                         <span class="input-right-show">元</span>
                                     </div>
-                                </div>                                
+                                </div>
                             </div>
                             <div class="layui-form-item">
                                 <div class=" form-inline-wrap">
@@ -1086,7 +1086,7 @@
                                 <div class=" form-inline-wrap" style="width:100%">
                                     <label class="layui-form-label form-label-wrap" style="width:12%"
                                            data-th-text="#{FinNetProductDuration.remark}">交易备注</label>
-                                    <div class="layui-input-inline input-inline" style="width:87%">                                        
+                                    <div class="layui-input-inline input-inline" style="width:87%">
                                         <textarea id="redRemark03" name="redRemark03" placeholder="请输入内容"
                                                   class="layui-textarea" data-th-placeholder="#{SysCommon.placeholder}"
                                                   data-th-text ="${entity?.redRemark03}" maxlength="500">
@@ -1095,9 +1095,9 @@
                                 </div>
                             </div>
                         </div>
-                    </div>                    
+                    </div>
                 </div>
-                
+
                 <div id="expireModel03" class="pro-module-wrap">
                     <div class="pro-module">
                         <h3 class="pro-module-title">
@@ -1123,7 +1123,7 @@
                                                placeholder="请选择时间" data-th-value="${#dates.format(entity?.expirePrinPayDate03,'yyyy-MM-dd')}" required="required"
                                                data-th-placeholder="#{SysCommon.placeholder}">
                                     </div>
-                                </div> 
+                                </div>
                                 <div class="form-inline-wrap layui-col-xs4">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.profitPayDate}">收益支付日</label>
@@ -1132,9 +1132,9 @@
                                                placeholder="请选择时间" data-th-value="${#dates.format(entity?.expireProfitPayDate03,'yyyy-MM-dd')}" required="required"
                                                data-th-placeholder="#{SysCommon.placeholder}">
                                     </div>
-                                </div>                  
+                                </div>
                             </div>
-                            <div class="layui-form-item">    
+                            <div class="layui-form-item">
                                 <div class=" form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.dealPrinAmt}">交易本金</label>
@@ -1144,7 +1144,7 @@
                                                id="expirePrinAmt03" name="expirePrinAmt03" data-th-value="${entity?.expirePrinAmt03}"/>
                                         <span class="input-right-show">元</span>
                                     </div>
-                                </div> 
+                                </div>
                                 <div class=" form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.profitAmt}">收益金额</label>
@@ -1164,14 +1164,14 @@
                                                id="expireDealAmt03" name="expireDealAmt03" data-th-value="${entity?.expireDealAmt03}"/>
                                         <span class="input-right-show">元</span>
                                     </div>
-                                </div>                         
+                                </div>
                             </div>
                             <div class="layui-form-item">
                                 <div class=" form-inline-wrap" style="width:100%">
                                     <label class="layui-form-label form-label-wrap" style="width:12%"
                                            data-th-text="#{FinNetProductDuration.remark}">交易备注</label>
-                                    <div class="layui-input-inline input-inline" style="width:87%">                                        
-                                        <textarea id="expireRemark03" name="expireRemark03" placeholder="请输入内容" 
+                                    <div class="layui-input-inline input-inline" style="width:87%">
+                                        <textarea id="expireRemark03" name="expireRemark03" placeholder="请输入内容"
                                                   class="layui-textarea" data-th-placeholder="#{SysCommon.placeholder}"
                                                   data-th-text ="${entity?.expireRemark03}" maxlength="500">
                                         </textarea>
@@ -1179,9 +1179,9 @@
                                 </div>
                             </div>
                         </div>
-                    </div>                    
-                </div> 
-                
+                    </div>
+                </div>
+
                 <div id="addReduceModel03" class="pro-module-wrap">
                     <div class="pro-module">
                         <h3 class="pro-module-title">
@@ -1198,14 +1198,14 @@
                                                placeholder="请选择时间" data-th-value="${#dates.format(entity?.addReduceConfirmDate03,'yyyy-MM-dd')}" required="required"
                                                data-th-placeholder="#{SysCommon.placeholder}">
                                     </div>
-                                </div>                      
+                                </div>
                                 <div class=" form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.dealAmt}">交易金额</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" data-fixtype="2" unit="1" data-th-data-textrange="2"
                                                class="layui-input form-input text-number" required="required"
-                                               id="addReduceDealAmt03" name="addReduceDealAmt03" 
+                                               id="addReduceDealAmt03" name="addReduceDealAmt03"
                                                data-th-value="${entity?.addReduceDealAmt03}"/>
                                         <span class="input-right-show">元</span>
                                     </div>
@@ -1215,18 +1215,18 @@
                                            data-th-text="#{FinNetProductDuration.dealNum}">交易份额</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" data-fixtype="2" unit="1" data-th-data-textrange="2"
-                                               class="layui-input form-input text-number" required="required" 
+                                               class="layui-input form-input text-number" required="required"
                                                id="addReduceDealNum03" name="addReduceDealNum03" data-th-value="${entity?.addReduceDealNum03}"/>
                                         <span class="input-right-show">份</span>
                                     </div>
-                                </div>                                
+                                </div>
                             </div>
                             <div class="layui-form-item">
                                 <div class=" form-inline-wrap" style="width:100%">
                                     <label class="layui-form-label form-label-wrap" style="width:12%"
                                            data-th-text="#{FinNetProductDuration.remark}">交易备注</label>
-                                    <div class="layui-input-inline input-inline" style="width:87%">                                        
-                                        <textarea id="addReduceRemark03" name="addReduceRemark03" placeholder="请输入内容" 
+                                    <div class="layui-input-inline input-inline" style="width:87%">
+                                        <textarea id="addReduceRemark03" name="addReduceRemark03" placeholder="请输入内容"
                                                   class="layui-textarea" data-th-placeholder="#{SysCommon.placeholder}"
                                                   data-th-text ="${entity?.addReduceRemark03}" maxlength="500">
                                         </textarea>
@@ -1234,9 +1234,9 @@
                                 </div>
                             </div>
                         </div>
-                    </div>                    
+                    </div>
                 </div>
-                
+
                 <div id="bonusCashModel03" class="pro-module-wrap">
                     <div class="pro-module">
                         <h3 class="pro-module-title">
@@ -1250,39 +1250,39 @@
                                            data-th-text="#{FinNetProductDuration.endDate}">计息结束日</label>
                                     <div class="layui-input-inline input-inline">
                                         <input id="bonusCashEndDate03" name="bonusCashEndDate03" class="layui-input form-input input-dateSelect"
-                                               placeholder="请选择时间" data-th-value="${#dates.format(entity?.bonusCashEndDate03,'yyyy-MM-dd')}" 
+                                               placeholder="请选择时间" data-th-value="${#dates.format(entity?.bonusCashEndDate03,'yyyy-MM-dd')}"
                                                required="required" disabled
                                                data-th-placeholder="#{SysCommon.placeholder}">
                                     </div>
-                                </div>    
+                                </div>
                                 <div class="form-inline-wrap layui-col-xs4">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.bonusDate}">红利下发日</label>
                                     <div class="layui-input-inline input-inline">
                                         <input id="bonusCashBonusDate03" name="bonusCashBonusDate03" class="layui-input form-input input-dateSelect"
                                                placeholder="请选择时间" data-th-value="${#dates.format(entity?.bonusCashBonusDate03,'yyyy-MM-dd')}"
-                                               required="required" 
+                                               required="required"
                                                data-th-placeholder="#{SysCommon.placeholder}">
                                     </div>
-                                </div>                  
+                                </div>
                                 <div class=" form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.bonusAmt}">分红金额</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" data-fixtype="2" unit="1" data-th-data-textrange="2"
                                                class="layui-input form-input text-number" required="required"
-                                               id="bonusCashBonusAmt03" name="bonusCashBonusAmt03" 
+                                               id="bonusCashBonusAmt03" name="bonusCashBonusAmt03"
                                                data-th-value="${entity?.bonusCashBonusAmt03}"/>
                                         <span class="input-right-show">元</span>
                                     </div>
-                                </div>                          
+                                </div>
                             </div>
                             <div class="layui-form-item">
                                 <div class=" form-inline-wrap" style="width:100%">
                                     <label class="layui-form-label form-label-wrap" style="width:12%"
                                            data-th-text="#{FinNetProductDuration.remark}">交易备注</label>
-                                    <div class="layui-input-inline input-inline" style="width:87%">                                        
-                                        <textarea id="bonusCashRemark03" name="bonusCashRemark03" placeholder="请输入内容" 
+                                    <div class="layui-input-inline input-inline" style="width:87%">
+                                        <textarea id="bonusCashRemark03" name="bonusCashRemark03" placeholder="请输入内容"
                                                   class="layui-textarea" data-th-placeholder="#{SysCommon.placeholder}"
                                                   data-th-text ="${entity?.bonusCashRemark03}" maxlength="500">
                                         </textarea>
@@ -1290,9 +1290,9 @@
                                 </div>
                             </div>
                         </div>
-                    </div>                    
+                    </div>
                 </div>
-                
+
                 <div id="bonusShareModel03" class="pro-module-wrap">
                     <div class="pro-module">
                         <h3 class="pro-module-title">
@@ -1306,32 +1306,32 @@
                                            data-th-text="#{FinNetProductDuration.endDate}">计息结束日</label>
                                     <div class="layui-input-inline input-inline">
                                         <input id="bonusShareEndDate03" name="bonusShareEndDate03" class="layui-input form-input input-dateSelect"
-                                               placeholder="请选择时间" data-th-value="${#dates.format(entity?.bonusShareEndDate03,'yyyy-MM-dd')}" 
+                                               placeholder="请选择时间" data-th-value="${#dates.format(entity?.bonusShareEndDate03,'yyyy-MM-dd')}"
                                                required="required" disabled
                                                data-th-placeholder="#{SysCommon.placeholder}">
                                     </div>
-                                </div>    
+                                </div>
                                 <div class="form-inline-wrap layui-col-xs4">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.shareConfirmDate}">再投确认日</label>
                                     <div class="layui-input-inline input-inline">
                                         <input id="bonusShareConfirmDate03" name="bonusShareConfirmDate03" class="layui-input form-input input-dateSelect"
-                                               placeholder="请选择时间" data-th-value="${#dates.format(entity?.bonusShareConfirmDate03,'yyyy-MM-dd')}" 
-                                               required="required" 
+                                               placeholder="请选择时间" data-th-value="${#dates.format(entity?.bonusShareConfirmDate03,'yyyy-MM-dd')}"
+                                               required="required"
                                                data-th-placeholder="#{SysCommon.placeholder}">
                                     </div>
-                                </div>                  
+                                </div>
                                 <div class=" form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap"
                                            data-th-text="#{FinNetProductDuration.hlztAmt}">红利再投金额</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" data-fixtype="2" unit="1" data-th-data-textrange="2"
                                                class="layui-input form-input text-number" required="required"
-                                               id="bonusShareAmt03" name="bonusShareAmt03" 
+                                               id="bonusShareAmt03" name="bonusShareAmt03"
                                                data-th-value="${entity?.bonusShareAmt03}"/>
                                         <span class="input-right-show">元</span>
                                     </div>
-                                </div>                          
+                                </div>
                             </div>
                             <div class="layui-form-item space">
                             	<div class=" form-inline-wrap">
@@ -1341,18 +1341,18 @@
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" data-fixtype="2" unit="1" data-th-data-textrange="2"
                                                class="layui-input form-input text-number" required="required" disabled
-                                               id="bonusShareAfterShareNum03" name="bonusShareAfterShareNum03" 
+                                               id="bonusShareAfterShareNum03" name="bonusShareAfterShareNum03"
                                                data-th-value="${entity?.bonusShareAfterShareNum03}"/>
                                         <span class="input-right-show">元</span>
                                     </div>
-                                </div>                          
+                                </div>
                             </div>
                             <div class="layui-form-item">
                                 <div class=" form-inline-wrap" style="width:100%">
                                     <label class="layui-form-label form-label-wrap" style="width:12%"
                                            data-th-text="#{FinNetProductDuration.remark}">交易备注</label>
-                                    <div class="layui-input-inline input-inline" style="width:87%">                                        
-                                        <textarea id="bonusShareRemark03" name="bonusShareRemark03" placeholder="请输入内容" 
+                                    <div class="layui-input-inline input-inline" style="width:87%">
+                                        <textarea id="bonusShareRemark03" name="bonusShareRemark03" placeholder="请输入内容"
                                                   class="layui-textarea" data-th-placeholder="#{SysCommon.placeholder}"
                                                   data-th-text ="${entity?.bonusShareRemark03}" maxlength="500">
                                         </textarea>
@@ -1360,13 +1360,13 @@
                                 </div>
                             </div>
                         </div>
-                    </div>                    
+                    </div>
                 </div>
-                
+
                 <!-- 划款信息 -->
                 <div class="page-component hkxx" th:data-path="@{/component/trade/BussTrdTransferOrder/init}"
                      th:data-params="|{entityName: 'bussTrdTransferOrder', pageFrom: 'submitForm', entity:'${entity_bussRepFinProductInfoDto}', bizCode:'${entity?.tradeId}'}|"></div>
-                
+
                 <div class="layui-col-md11" style="margin: 50px;">
                     <div class="text-center">
                         <a id="FinNetProductDuration_btn_save"
@@ -1379,7 +1379,7 @@
                            class="layui-btn layui-btn-sm btn-revoke" data-ignore=true
                            data-th-text="#{SysCommon.revoke}">撤销</a>
                         <a id="FinNetProductDuration_btn_cancel"
-                           class="layui-btn layui-btn-sm btn-cancel"
+                           class="layui-btn layui-btn-sm jyicon-btn-cancel"
                            data-th-text="#{SysCommon.cancel}">取消</a>
                     </div>
                 </div>
@@ -1401,10 +1401,10 @@
         	var n1=n.replace(/^(\d+)((\.\d+)?)$/,function(s,s1,s2){return s1.replace(re,"$&,")+s2;});
         	return n1;
         }
-        
+
         function zd(){
         	jylx = $('#dealType').val();
-        	
+
         	if(jylx == 'C1' && jylx != undefined && jylx != null){ //产品认购
         		cpdm = $('#finprodMarketId').val();//产品代码
         		cpmc = $('#FinNetProductDuration_prodName').val();  //产品名称
@@ -1412,7 +1412,7 @@
         		var c1 = cpdm+cpmc+ '起息' +cpjc+ '产品募集本金';
         		$("#subRemark").val(c1);
         	}
-        	
+
         	if(jylx == 'C2' && jylx != undefined && jylx != null ){ //产品申购
         		cpdm = $('#finprodMarketId').val();//产品代码
         		cpmc = $('#FinNetProductDuration_prodName').val();  //产品名称
@@ -1421,7 +1421,7 @@
         		var c2 = cpdm+cpmc+ '申购'+cpjc + '申购' + comdify(sgje) + '元';
         		$("#purRemark").val(c2);
         	}
-        	
+
         	if(jylx == 'C4' && jylx != undefined && jylx != null ){ //产品赎回
         		cpdm = $('#finprodMarketId').val();//产品代码
         		cpmc = $('#FinNetProductDuration_prodName').val();  //产品名称
@@ -1431,7 +1431,7 @@
         		var c4 = cpdm+cpmc+ '赎回 正常赎回:客户赎回确认日' + zfr + '，份额' + comdify(jyfe) + '元，兑付客户清算金额' + comdify(jje) + '元。' ;
         		$("#redRemark").val(c4);
         	}
-        	
+
         	if(jylx == 'C17' && jylx != undefined && jylx != null ){ //提前赎回
         		cpdm = $('#finprodMarketId').val();//产品代码
         		cpmc = $('#FinNetProductDuration_prodName').val();  //产品名称
@@ -1441,7 +1441,7 @@
         		var c17 = cpdm+cpmc + '赎回 正常赎回:客户赎回确认日' + zfr + '，份额' + comdify(jyfe) + '元，兑付客户清算金额' + comdify(jje) + '元。' ;
         		$("#redRemark").val(c17);
         	}
-        	
+
         	if(jylx == 'C18' && jylx != undefined && jylx != null ){ //违约赎回
         		cpdm = $('#finprodMarketId').val();//产品代码
         		cpmc = $('#FinNetProductDuration_prodName').val();  //产品名称
@@ -1450,12 +1450,12 @@
         		jje = $('#redTotalNetValue').val();//净金额
         		wyj = $('#redLiquidatedDamages').val(); //违约金
         		var cha = JoyinMath.doMinus(parseFloat(jje),parseFloat(wyj),2);
-        		var c18 = cpdm +cpmc+ '赎回'  + 
-        		'违约赎回:客户违约赎回确认日' + zfr + '，份额' + comdify(jyfe) + '元，兑付客户清算金额' + comdify(jje) + 
+        		var c18 = cpdm +cpmc+ '赎回'  +
+        		'违约赎回:客户违约赎回确认日' + zfr + '，份额' + comdify(jyfe) + '元，兑付客户清算金额' + comdify(jje) +
         		'元。客户违约赎回违约金' + comdify(cha) + '元,违约赎回金入投资管理费。';
         		$("#redRemark").val(c18);
         	}
-        	
+
         	if(jylx == 'C5' && jylx != undefined && jylx != null ){ //产品到期
         		cpdm = $('#finprodMarketId').val();
         		cpmc = $('#FinNetProductDuration_prodName').val();  //产品名称
@@ -1466,7 +1466,7 @@
         		var c5 = cpdm +cpmc+ '到期清算' + cpdqr + '产品到期,客户份额' + comdify(jyfe) + '元,兑付客户清算金额' + comdify(jje) + '元。';
         		$("#expireRemark").val(c5);
         	}
-        	
+
         	if(jylx == 'C16' && jylx != undefined && jylx != null ){ //产品提前终止
         		cpdm = $('#finprodMarketId').val();
         		cpmc = $('#FinNetProductDuration_prodName').val();  //产品名称
@@ -1475,9 +1475,9 @@
         		jje = $('#expireDealAmt').val(); //净金额 取交易金额
         		//mbkhyjfl = $('#').val(); //目标客户一级分类
         		var c16 = cpdm +cpmc+ '到期清算' + cpdqr + '产品到期,客户份额' + comdify(jyfe) + '元,兑付客户清算金额' + comdify(jje) + '元。';
-        		$("#expireRemark").val(c16); 
-        	}  
-        	
+        		$("#expireRemark").val(c16);
+        	}
+
         	if(jylx == 'C3' && jylx != undefined && jylx != null ){ //产品强增
         		cpdm = $('#finprodMarketId').val();//产品代码
         		cpmc = $('#FinNetProductDuration_prodName').val();  //产品名称
@@ -1486,7 +1486,7 @@
         		var c3 = cpdm+cpmc + '强增'+ cpjc+ '强增' + comdify(sgje) + '元';
         		$("#addReduceRemark").val(c3);
         	}
-        	
+
         	if(jylx == 'C6' && jylx != undefined && jylx != null ){ //产品强减
         		cpdm = $('#finprodMarketId').val();//产品代码
         		cpmc = $('#FinNetProductDuration_prodName').val();  //产品名称
@@ -1495,14 +1495,14 @@
         		var c6 = cpdm+cpmc+ '强减 客户强减确认日' + zfr + '，兑付客户清算金额' + comdify(jyje) + '元';
         		$("#addReduceRemark").val(c6);
         	}
-       } 
+       }
         $(function(){
         	$('.pro-module-base').css({maxHeight: window.innerHeight - 30, overflow:'auto'});
         });
-        
+
     </script>
-    <script data-th-src="@{/js/invest/product/productduration/netproductDuration/FinNetProductDuration.js}"></script>   
-    
+    <script data-th-src="@{/js/invest/product/productduration/netproductDuration/FinNetProductDuration.js}"></script>
+
 </div>
 </body>
 </html>
