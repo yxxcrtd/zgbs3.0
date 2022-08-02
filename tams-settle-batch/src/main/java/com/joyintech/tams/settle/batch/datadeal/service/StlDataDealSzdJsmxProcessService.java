@@ -1138,6 +1138,9 @@ public class StlDataDealSzdJsmxProcessService {
 							settleTransData.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
 						}
 						// XYHGFXSJ-506:修改金融产品代码赋值 modify by fuyongsheng 20220725 start
+						//变量.首期_成交编号 = 清算数据Entity.申请编号
+						settleTransData.setfCjbh(szdJsmx.getSqbh());
+						//清算数据Entity.申请编号 = 清算数据Entity.成交编号
 						// 查询首期清算数据
 						List<SettleTransData> sqSettleTransDatas = trdCommonBaseService.selectSqSettleTransDatas(
 								settleTransData.getfCjbh(), settleTransData.getSeatNumber(), settleTransData.getSecAcctId(),
@@ -1147,6 +1150,7 @@ public class StlDataDealSzdJsmxProcessService {
 							settleTransData.setFinprodId(sqSettleTransDatas.get(0).getFinprodId());
 						}
 						// XYHGFXSJ-506:修改金融产品代码赋值 modify by fuyongsheng 20220725 end
+						// XYHGFXSJ-716:modify by fuyongsheng 20220730 start
 						// 业务场景分类和交易方向
 						if (StringUtil.equals(StlDataDealProcessConstant.YWLX_616, szdJsmx.getYwlx())){
 							if(StringUtil.equals(StlDataDealProcessConstant.MMBS_B, szdJsmx.getMmbz())){
@@ -1188,6 +1192,7 @@ public class StlDataDealSzdJsmxProcessService {
 								settleTransData.setShareAmt(sqSettleTransDatas.get(0).getShareAmt());
 							}
 						}
+						// XYHGFXSJ-716:modify by fuyongsheng 20220730 end
 						// 金融产品代码
 						// settleTransData.setFinprodId(szdJsmx.getZqdm1());
 						// 交易份额
@@ -1215,9 +1220,6 @@ public class StlDataDealSzdJsmxProcessService {
 //						settleTransData.setMpayDate(DateUtil.parse(szdJsmx.getJsrq()));
 						// 到期金额
 //						settleTransData.setmTradeAmt(new BigDecimal(Math.abs(new BigDecimal(szdJsmx.getQsje()).doubleValue())));
-						//变量.首期_成交编号 = 清算数据Entity.申请编号
-						settleTransData.setfCjbh(szdJsmx.getSqbh());
-				        //清算数据Entity.申请编号 = 清算数据Entity.成交编号
 					    szdJsmx.setSqbh(szdJsmx.getCjbh());
 						//清算数据Entity.交易日期 = 清算数据Entity.清算日期
 					    szdJsmx.setJyrq(szdJsmx.getQsrq());
