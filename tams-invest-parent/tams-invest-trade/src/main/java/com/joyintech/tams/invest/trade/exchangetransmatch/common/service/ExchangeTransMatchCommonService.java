@@ -1593,29 +1593,31 @@ public class ExchangeTransMatchCommonService extends BaseService {
                                 }
                             }
                         }
-                        else {
-                            //查询首期交易
-                            // GZYHTZJY-1160:查询首期交易方向是T01 modify fuyongsheng 20220119 start
-//                            TrdProductDeal trdProductDeal = exchangeTransMatchRepo3Service.getFirstRepoTrade(
-//                                    settleTransDataTotal.getfCjbh(),settleTransDataTotal.getVdate(),
-//                                    //settleTransDataTotal.getPs(),
-//                                    DictCodeList.交易方向_买入.getValue(),
-//                                    itemList.get(0).getPortfolioId());
-                            TrdProductDeal trdProductDeal = trdCommonBaseService.getFirstRepoTrade(settleTransDataTotal.getfCjbh(),
-                                    settleTransDataTotal.getSeatNumber(), settleTransDataTotal.getSecAcctId(),
-                                    settleTransDataTotal.getVdate());
-                            // GZYHTZJY-1160:查询首期交易方向是T01 modify fuyongsheng 20220119 end
-                            if(StringUtil.isNotEmpty(trdProductDeal)) {
-                                FinDealPledge finDealPledge = new FinDealPledge();
-                                finDealPledge.setFinprodId(trdProductDeal.getTradeId());
-                                finDealPledge.setBranch(0L);
-                                finDealPledge.setPledgeFinprodId(finPledgeDisplaceResult.getFinprodId());
-                                finDealPledge.setPledgeRatio(finPledgeDisplaceResult.getScale());
-                                finDealPledge.setPledgeNumber(ArithmeticUtil.divide( finPledgeDisplaceResult.getPledgeAmt(),new BigDecimal(100),2));
-                                finDealPledgeMapper.insertSelective(finDealPledge);
-                            }
-
-                        }
+                        // 解除质押不删除首期质押品表,所以撤销解除质押时也不还原质押品表  modify by fuyongsheng start
+//                        else {
+//                            //查询首期交易
+//                            // GZYHTZJY-1160:查询首期交易方向是T01 modify fuyongsheng 20220119 start
+////                            TrdProductDeal trdProductDeal = exchangeTransMatchRepo3Service.getFirstRepoTrade(
+////                                    settleTransDataTotal.getfCjbh(),settleTransDataTotal.getVdate(),
+////                                    //settleTransDataTotal.getPs(),
+////                                    DictCodeList.交易方向_买入.getValue(),
+////                                    itemList.get(0).getPortfolioId());
+//                            TrdProductDeal trdProductDeal = trdCommonBaseService.getFirstRepoTrade(settleTransDataTotal.getfCjbh(),
+//                                    settleTransDataTotal.getSeatNumber(), settleTransDataTotal.getSecAcctId(),
+//                                    settleTransDataTotal.getVdate());
+//                            // GZYHTZJY-1160:查询首期交易方向是T01 modify fuyongsheng 20220119 end
+//                            if(StringUtil.isNotEmpty(trdProductDeal)) {
+//                                FinDealPledge finDealPledge = new FinDealPledge();
+//                                finDealPledge.setFinprodId(trdProductDeal.getTradeId());
+//                                finDealPledge.setBranch(0L);
+//                                finDealPledge.setPledgeFinprodId(finPledgeDisplaceResult.getFinprodId());
+//                                finDealPledge.setPledgeRatio(finPledgeDisplaceResult.getScale());
+//                                finDealPledge.setPledgeNumber(ArithmeticUtil.divide( finPledgeDisplaceResult.getPledgeAmt(),new BigDecimal(100),2));
+//                                finDealPledgeMapper.insertSelective(finDealPledge);
+//                            }
+//
+//                        }
+                        // 解除质押不删除首期质押品表,所以撤销解除质押时也不还原质押品表  modify by fuyongsheng end
 
                         for (FinPledgeDisplaceResult result:finPledgeDisplaceResultList) {
                             finPledgeDisplaceResultMapper.deleteByPrimaryKey(result);
