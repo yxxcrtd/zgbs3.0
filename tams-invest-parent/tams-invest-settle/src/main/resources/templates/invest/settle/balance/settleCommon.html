@@ -151,6 +151,7 @@
         var 净值型产品存续期URL = /*[[@{/invest/product/productduration/netproductDuration/FinNetProductDuration/init}]]*/'';
         var 收益型产品赎回URL = /*[[@{/invest/product/productelement/build/FinProductBuild002/init}]]*/'';
         var 产品费用支付URL = /*[[@{/invest/product/feepay/FinProductFeePay002/init}]]*/'';
+        var 投资费用支付URL = /*[[@{/invest/portfolio/feepay/InvestFeePay002/init}]]*/'';
         var 通道资金划拨URL = /*[[@{/invest/portfolio/ptlchlfundallocation/PtlChlFundAllocation002/init}]]*/'';
         var 债券交易URL = /*[[@{/invest/trade/bond/TrdBondInvestTrade002/init}]]*/'';
         var 回购交易URL = /*[[@{/invest/trade/trdrepotrade/TrdRepoTrade002/init}]]*/'';
@@ -174,7 +175,7 @@
 
 
         var openOperateWindow = function (statusValid, paBussType, portfolioId, bizCode, workflowId, finprodMarketId, ps, wflWorkflowId,
-                                          isTodo, profitType, finprodId, operateType, finprodType2) {
+                                          isTodo, profitType, finprodId, operateType, finprodType2,mdateStr,paBussTypeAdd) {
             if (paBussType == 平安业务类型_DVP划款) {
                 //在新建界面进行显示单行的详细信息
                 var params = {}
@@ -207,7 +208,8 @@
                 finprodId: finprodId,
                 ps: ps && ps != 'null' && ps != 'undefined' ? ps : '',
                 workflowId: workflowId && workflowId != 'null' && workflowId != 'undefined' ? workflowId : '',
-                isFromCheck: true
+                isFromCheck: true,
+                mDate:mdateStr
             };
             if(workflowId == 'OrderNewBuild001')// 指令新建特殊处理
             {
@@ -328,7 +330,13 @@
             	url = 存款存续期交易URLTQZQ;
             }
             else if (paBussType == 平安业务类型_费用支付) {
-                url = 产品费用支付URL;
+                console.log(paBussTypeAdd);
+                if(paBussTypeAdd){
+                    url =投资费用支付URL;
+                    data.effectStatus = statusValid;
+                }else{
+                    url = 产品费用支付URL;
+                }
             }
             else if (paBussType == 平安业务类型_正回购 || paBussType == 平安业务类型_逆回购) {
                 url = 回购交易URL;

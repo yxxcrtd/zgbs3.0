@@ -17,7 +17,10 @@ spring:
     active: joyin-210
   application:
     name: terminal
-
+  cloud:
+    nacos:
+      discovery:
+        enabled: false
 trade:
   serverName: exchangeService # 交易核心的注册服务名 微服务版本时启用
   server:

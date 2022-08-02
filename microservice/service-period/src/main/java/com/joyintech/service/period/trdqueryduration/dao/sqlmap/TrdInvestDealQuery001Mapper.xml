@@ -82,8 +82,14 @@
 		<include refid="where_sql" />
 		AND (EXISTS(
 		select 1 from TRD_FIN_PRODUCT_DEAL_TOTAL DEAL
-		where DEAL.P_TOTLE_TRADE_ID = T1.TOTLE_TRADE_ID
-		and DEAL.PORTFOLIO_ID <include refid="portfolioAth"/>
+		<!--GLCP-227:增加银行间债券存续期查询 modify by fuyongsheng 20220715 start-->
+		LEFT JOIN TRD_PRODUCT_DEAL tpd ON tpd.TOTLE_TRADE_ID = DEAL.TOTLE_TRADE_ID
+		LEFT JOIN TRD_PRODUCT_DEAL_ADD tpda ON tpd.TRADE_ID = tpda.TRADE_ID
+		<!--where DEAL.P_TOTLE_TRADE_ID = T1.TOTLE_TRADE_ID-->
+		where
+			(DEAL.P_TOTLE_TRADE_ID = T1.TOTLE_TRADE_ID OR (DEAL.PS IN (#{PS_T07},#{PS_T08},#{PS_T09},#{PST22},#{PST23},#{PST24}) AND DEAL.TOTLE_TRADE_ID = T1.TOTLE_TRADE_ID AND tpd.TRADE_MARKET = #{TRADE_PLACE_01}))
+			<!--GLCP-227:增加银行间债券存续期查询 modify by fuyongsheng 20220715 end-->
+			and (DEAL.PORTFOLIO_ID <include refid="portfolioAth"/> OR tpda.PORTFOLIO_ID <include refid="portfolioAth"/>)
 		) or T1.PS='T39')
 		ORDER BY T1.MDATE DESC)
 		union all
@@ -859,9 +865,16 @@
 			AND T1.P_TOTLE_TRADE_ID IS NULL <!-- 只展示汇总的汇总交易 -->
 			<include refid="where_sql" />
 			AND (EXISTS(
-			select 1 from TRD_FIN_PRODUCT_DEAL_TOTAL DEAL
-			where DEAL.P_TOTLE_TRADE_ID = T1.TOTLE_TRADE_ID
-			and DEAL.PORTFOLIO_ID <include refid="portfolioAth"/>
+				select 1 from TRD_FIN_PRODUCT_DEAL_TOTAL DEAL
+				<!--GLCP-227:增加银行间债券存续期查询 modify by fuyongsheng 20220715 start-->
+				LEFT JOIN TRD_PRODUCT_DEAL tpd ON tpd.TOTLE_TRADE_ID = DEAL.TOTLE_TRADE_ID
+				LEFT JOIN TRD_PRODUCT_DEAL_ADD tpda ON tpd.TRADE_ID = tpda.TRADE_ID
+				<!--where DEAL.P_TOTLE_TRADE_ID = T1.TOTLE_TRADE_ID-->
+				WHERE
+				(DEAL.P_TOTLE_TRADE_ID = T1.TOTLE_TRADE_ID OR (DEAL.PS IN (#{PS_T07},#{PS_T08},#{PS_T09},#{PST22},#{PST23},#{PST24}) AND DEAL.TOTLE_TRADE_ID = T1.TOTLE_TRADE_ID AND tpd.TRADE_MARKET = #{TRADE_PLACE_01}))
+				<!--GLCP-227:增加银行间债券存续期查询 modify by fuyongsheng 20220715 end-->
+				and (DEAL.PORTFOLIO_ID <include refid="portfolioAth"/> OR tpda.PORTFOLIO_ID <include refid="portfolioAth"/>)
+				<!--GLCP-227:增加银行间债券存续期查询 modify by fuyongsheng 20220715 end-->
 			) or T1.PS='T39')
 			ORDER BY T1.MDATE DESC)
 		union all

@@ -142,4 +142,6 @@ public interface CreditLinesDealsMapper {
 	List<BidOrder> selectBidOrderByFinprodIds(Map<String, Object> param);
 
 	List<BidOrderBidPrice> selectBidOrderBidPriceByFinprodIds(Map<String, Object> param);
+
+	String selectLoopAmt(@Param("tradeId") String tradeId);
 }

@@ -149,11 +149,29 @@ public class TradeRestApi {
                 finProductTradeDto.setBaseTradeProductDealDtos(baseTradeProductDealDtos);
                 
                 if (finProductTradeDto.getBaseTradeProductDealDtos() != null && finProductTradeDto.getBaseTradeProductDealDtos().size() > 0) {
+                    // XYHGFXSJ-641:解决存续期重复划款 modify by fuyongsheng 20220728 start
+                    Set<String> stlPayOrderIds = new HashSet<>();
                 	for (int index = 0; index < finProductTradeDto.getBaseTradeProductDealDtos().size(); index++) {
-                        TrdProductDeal trdProductDeal = finProductTradeDto.getBaseTradeProductDealDtos().get(index).getTrdProductDeal();
+                        BaseTradeProductDealDto baseTradeProductDealDto = finProductTradeDto.getBaseTradeProductDealDtos().get(index);
+                        TrdProductDeal trdProductDeal = baseTradeProductDealDto.getTrdProductDeal();
                         if(null == trdProductDeal){
                             continue;
                         }
+                        boolean stlPayOrderExistsFlag = false;//划款指令是否已存在标识
+                        if(CollectionUtils.isNotEmpty(baseTradeProductDealDto.getStlPayOrdersList())){
+                            for(StlPayOrdersDto stlPayOrdersDto : baseTradeProductDealDto.getStlPayOrdersList()){
+                                if(stlPayOrderIds.contains(stlPayOrdersDto.getOrderId())){
+                                    stlPayOrderExistsFlag = true;
+                                }else{
+                                    stlPayOrderIds.add(stlPayOrdersDto.getOrderId());
+                                }
+                            }
+                        }
+                        // 如划款指令已存在,无需重复划款,将此交易的划款指令置空(针对存续期的划款指令是total维度,各交易维度数据,只需划款一次)
+                        if(stlPayOrderExistsFlag){
+                            baseTradeProductDealDto.setStlPayOrdersList(new ArrayList<>());
+                        }
+                        // XYHGFXSJ-641:解决存续期重复划款 modify by fuyongsheng 20220728 end
                         // 可转债申购确认需要设置申购类型为普通申购
                         if (StringUtil.equals(trdProductDeal.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())
                 			&& StringUtil.equals(trdProductDeal.getPs(), DictCodeList.交易方向_申购确认.getValue())) {
@@ -167,6 +185,7 @@ public class TradeRestApi {
                 						ArithmeticUtil.doSub(bTradeIdTradeProductDealDtos.get(0).getTrdProductDeal().getShareAmt(), finProductTradeDto.getBaseTradeProductDealDtos().get(index).getTrdProductDeal().getShareAmt()), new BigDecimal(100)));
                 			}
                 		}
+                        // XYHGFXSJ-641:存续期划款指令登录是total维度,只需执行一次
                     }
                 }
 

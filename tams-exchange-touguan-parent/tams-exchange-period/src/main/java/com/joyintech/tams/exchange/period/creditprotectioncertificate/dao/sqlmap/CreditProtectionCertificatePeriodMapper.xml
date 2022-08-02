@@ -221,7 +221,8 @@
     </select>
     <select id="getBillingDetailByBusinessCode"
             resultType="com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.BillingDetailsDto">
-        select TPDA.PORTFOLIO_ID           portfolioId,
+        select tfpdl.TRADE_ID              busiCode,
+               TPDA.PORTFOLIO_ID           portfolioId,
                pp.PORTFOLIO_NAME           portfolioName,
                sci.BUSI_ACCT_NO            acctNo,
                tfpdl.SEC_MANAGE_ACCT_ID    secManageAcctId,
@@ -251,7 +252,8 @@
         where tfpdl.TOTLE_TRADE_ID = #{businessCode,jdbcType=VARCHAR}
           and tfpdl.FINPROD_TYPE2 = 'F37'
         union all
-        select TPDA.PORTFOLIO_ID           portfolioId,
+        select tfpdl.TRADE_ID              busiCode,
+               TPDA.PORTFOLIO_ID           portfolioId,
                pp.PORTFOLIO_NAME           portfolioName,
                sci.BUSI_ACCT_NO            acctNo,
                tfpdl.SEC_MANAGE_ACCT_ID    secManageAcctId,

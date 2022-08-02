@@ -39,6 +39,9 @@ public class CommonPlatformDateService implements IPlatformDate {
      */
     @Autowired
     private CommonPlatformDateMapper commonPlatformDateMapper;
+
+    @Autowired
+    private SysDateRefreshPositionCache sysDateRefreshPositionCache;
     /**
      * 获取平台日期
      * <功能详细描述>
@@ -65,6 +68,7 @@ public class CommonPlatformDateService implements IPlatformDate {
                 CacheUtil.clearAppCache(GlobalConstant.NOW_SYS_DATE);
                 CacheUtil.putAppCache(GlobalConstant.NOW_SYS_DATE, newDate);
             }
+            sysDateRefreshPositionCache.updateBalance(newDate);
         }
         return result;
     }

@@ -206,4 +206,9 @@
           and EFF_DATE = #{effDate,jdbcType=DATE}
           and LEV = #{lev,jdbcType=DECIMAL}
     </update>
+
+    <delete id="deleteByCashIdAndEffDate" parameterType="com.joyintech.tams.common.base.entity.FinFloatCalcRuleDetailKey" >
+        delete from FIN_FLOAT_CALC_RULE_DETAIL
+        where CASH_ID = #{cashId,jdbcType=VARCHAR} and EFF_DATE = #{effDate,jdbcType=DATE}
+    </delete>
 </mapper>

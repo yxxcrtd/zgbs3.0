@@ -103,6 +103,13 @@
         from TRD_PRODUCT_TEMP_DEAL
         where TRADE_ID = #{tradeId,jdbcType=VARCHAR}
     </select>
+
+    <select id="selectByTotalTradeId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="com.joyintech.tams.common.base.dao.TrdProductTempDealMapper.Base_Column_List" />
+        from TRD_PRODUCT_TEMP_DEAL
+        where TOTLE_TRADE_ID = #{totalTradeId,jdbcType=VARCHAR}
+    </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
         delete from TRD_PRODUCT_TEMP_DEAL
         where TRADE_ID = #{tradeId,jdbcType=VARCHAR}

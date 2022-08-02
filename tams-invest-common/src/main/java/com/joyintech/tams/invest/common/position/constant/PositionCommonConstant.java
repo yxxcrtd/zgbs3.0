@@ -231,5 +231,9 @@ public class PositionCommonConstant {
      */
     public static final String ETR_SEC_AMOUNT="etrSecAmount";
 
+    /**
+     * 换券方式
+     */
+    public static final String BOND_EXCHANGE_TYPE = "bondExchangeType";
 
 }

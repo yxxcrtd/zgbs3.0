@@ -663,7 +663,11 @@ public class EtrPlanAssetRService extends CommonExportService<EtrPlanAssetRDto> 
                 String indexId = rowData.get(0).toString();
                 if (StringUtil.isBlank(indexId)) {
                     confirmMsg = "第" + (i + 1) + "行序号不能为空";
-                    break;
+                    //TISHKS-1390:导入模板中“序号”为空，为提示导入失败 start
+                    confirmMsg1 = etrCommonService.StringAddByBr(confirmMsg1, confirmMsg);
+                    errorNum++ ;
+                    continue;
+                    //TISHKS-1390:导入模板中“序号”为空，为提示导入失败 end
                 }
                 // 委托开始日非空
                 confirmMsg = etrCommonService.StringAddByBr(confirmMsg,
@@ -755,10 +759,10 @@ public class EtrPlanAssetRService extends CommonExportService<EtrPlanAssetRDto> 
 //                    }
 //                }
                 // TISHKS-220:导入模板删除通道字段 fuyongsheng 20211105 edit end
-                // 交易对手
-                confirmMsg = etrCommonService.StringAddByBr(confirmMsg,
+                // 交易对手  TISHKS-1631 无需填写交易对手代码
+                /*confirmMsg = etrCommonService.StringAddByBr(confirmMsg,
                         etrCommonService.checkIsBlank(rowData.get(10).toString(),
-                                "EtrPlanAssetN003.counterId", lineNo));
+                                "EtrPlanAssetN003.counterId", lineNo));*/
                 if (StringUtil.isNotBlank(rowData.get(10).toString())) {
                     if (StringUtil.equals(s2[0], DictCodeList.交易方向_赎回.getValue())
                             || StringUtil.equals(s2[0], DictCodeList.交易方向_买入.getValue())

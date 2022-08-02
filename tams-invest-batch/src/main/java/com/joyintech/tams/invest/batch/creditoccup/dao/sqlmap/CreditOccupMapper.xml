@@ -14,22 +14,8 @@
                     UNION ALL SELECT id FROM T_ENTRUSTHISTORY
                     UNION ALL
                     SELECT id FROM T_INTEGRATED_ENTRUSTHISTORY) T
-                WHERE
-                    T.id = temp.TRADE_ID)
-        AND EXISTS (
-                SELECT
-                    *
-                FROM
-                    SETTLE_TRANS_DATA a
-				left join T_ENTRUST b on LTRIM(substr(a.APPLY_TRADE_ID, 5, length(a.APPLY_TRADE_ID)), '0') = b.broker_ENTRUST_ID OR a.APPLY_TRADE_ID = b.BROKER_ENTRUST_ID
-				left join T_INTEGRATED_ENTRUST c on LTRIM(substr(a.APPLY_TRADE_ID, 5, length(a.APPLY_TRADE_ID)), '0') = c.broker_ENTRUST_ID OR a.APPLY_TRADE_ID = c.BROKER_ENTRUST_ID
-				left join T_ENTRUSTHISTORY d on LTRIM(substr(a.APPLY_TRADE_ID, 5, length(a.APPLY_TRADE_ID)), '0') = d.broker_ENTRUST_ID OR a.APPLY_TRADE_ID = d.BROKER_ENTRUST_ID
-				left join T_INTEGRATED_ENTRUSTHISTORY e on LTRIM(substr(a.APPLY_TRADE_ID, 5, length(a.APPLY_TRADE_ID)), '0') = e.broker_ENTRUST_ID OR a.APPLY_TRADE_ID = e.BROKER_ENTRUST_ID
-                WHERE
-                    b.id is not null or c.ID is not null or d.ID is not null or e.ID is not NULL
-                and (b.id = TEMP.TRADE_ID or c.id = TEMP.TRADE_ID or d.id = TEMP.TRADE_ID or e.id = TEMP.TRADE_ID))
+                WHERE Temp.TRADE_ID LIKE '%'|| T.ID||'%')
     </sql>
-
     <sql id="delCommonSql">
         <where>
             <if test="executeDate != null and executeDate != ''">
@@ -62,6 +48,9 @@
         <where>
             <if test="executeDate != null and executeDate != ''">
                 and temp.CDATE  = to_date(#{executeDate},'yyyy-MM-dd')
+            </if>
+            <if test="creditOccureType != null and creditOccureType != ''">
+                and temp.CREDIT_OCCURE_TYPE  = #{creditOccureType}
             </if>
             <if test="status != null and status != ''">
                 and temp.STATUS  = #{status}
@@ -150,6 +139,9 @@
             <if test="executeDate != null and executeDate != ''">
                 and temp.CDATE  = to_date(#{executeDate},'yyyy-MM-dd')
             </if>
+            <if test="creditOccureType != null and creditOccureType != ''">
+                and temp.CREDIT_OCCURE_TYPE  = #{creditOccureType}
+            </if>
             <if test="status != null and status != ''">
                 and temp.STATUS  = #{status}
             </if>
@@ -189,6 +181,12 @@
             <if test="status != null" >
                 STATUS = #{status,jdbcType=VARCHAR},
             </if>
+            <if test="updateUser != null" >
+                UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
         </set>
         where SEQNO = #{seqno,jdbcType=VARCHAR}
     </update>
@@ -201,6 +199,12 @@
             </if>
             <if test="status != null" >
                 STATUS = #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             </if>
         </set>
         where SEQNO = #{seqno,jdbcType=VARCHAR}
@@ -215,6 +219,12 @@
             <if test="status != null" >
                 STATUS = #{status,jdbcType=VARCHAR},
             </if>
+            <if test="updateUser != null" >
+                UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
         </set>
         where SEQNO = #{seqno,jdbcType=VARCHAR}
     </update>
@@ -226,6 +236,12 @@
             </if>
             <if test="status != null" >
                 STATUS = #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             </if>
         </set>
         where SEQNO = #{seqno,jdbcType=VARCHAR}
@@ -281,18 +297,11 @@
             tfpb.FINPROD_ID zhaiZhuanGuId,
             tfpb.SHARE_AMT zhaiZhuanGuNum,
             tfpb.UNIT_CPRICE zhaiZhuanGuDanJia
-        FROM
-            TRD_PRODUCT_DEAL tpd
-        LEFT JOIN TRD_PRODUCT_DEAL_ADD tpda ON
-            tpda.TRADE_ID = tpd.TRADE_ID
-        left join FIN_TRADE_PRODUCT ftp
-                  on ftp.FINPROD_ID = tpd.FINPROD_ID
-                      and ftp.BRANCH= '0'
-        left join FIN_PRODUCT_TYPE fpt
-                  on fpt.FINPROD_ID=ftp.FINPROD_ID
-                      and fpt.BRANCH=ftp.BRANCH
-        left join trd_fin_product_barter tfpb
-                  on tfpb.TRADE_ID = tpd.TRADE_ID
+        FROM TRD_PRODUCT_DEAL tpd
+        LEFT JOIN TRD_PRODUCT_DEAL_ADD tpda ON tpda.TRADE_ID = tpd.TRADE_ID
+        left join FIN_TRADE_PRODUCT ftp on ftp.FINPROD_ID = tpd.FINPROD_ID and ftp.BRANCH= '0'
+        left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID=ftp.FINPROD_ID and fpt.BRANCH=ftp.BRANCH
+        left join trd_fin_product_barter tfpb on tfpb.TRADE_ID = tpd.TRADE_ID
         where tpd.TRADE_MARKET in (#{TRADE_PLACE_03},#{TRADE_PLACE_04})
         and  tpd.TRADE_DATE = to_date(#{executeDate},'yyyy-MM-dd')
         and  tpd.TRADE_STATUS = #{status} and tpd.IS_CANCEL = #{YES_OR_NO_N}
@@ -300,9 +309,58 @@
             (tpd.PS not in ('T11','T12','T13','T09','T08','T07','T39') and tpd.FINPROD_TYPE2 not in ('F10','F01','F02','F03'))
             or
             (tpd.FINPROD_TYPE2 in ('F10','F01') and tpd.PS not in ('T05','T11','T12','T13','T39','T22'))
-            or
-            (tpd.FINPROD_TYPE2 in ('F02','F03') and tpd.PS = 'T01' and fpt.type_7 = 'H01')
         )
+        union
+        SELECT
+            tpd.TOTLE_TRADE_ID TRADE_ID,
+            d.ENTRUST_ID ENTRUST_ID,
+            tpd.FINPROD_TYPE2 FINPROD_TYPE2,
+            tpd.PS PS,
+            tpd.FINPROD_ID FINPROD_ID,
+            tpd.COUNTER_ID COUNTER_ID,
+            tpd.CCY CCY,
+            ftp.PRIN TRADE_AMT,
+            ftp.PRIN SHARE_AMT,
+            tpd.UNIT_CPRICE UNIT_CPRICE,
+            tpd.TRADE_DATE TRADE_DATE,
+            #{YES_OR_NO_N} isBottom,
+            null zhaiZhuanGuId,
+            null zhaiZhuanGuNum,
+            null zhaiZhuanGuDanJia
+        FROM TRD_FIN_PRODUCT_DEAL_TOTAL tpd
+        LEFT JOIN (select d.TOTLE_TRADE_ID,a.ENTRUST_ID from TRD_PRODUCT_DEAL d inner join TRD_PRODUCT_DEAL_ADD a on d.TRADE_ID=a.TRADE_ID group by d.TOTLE_TRADE_ID,a.ENTRUST_ID) d
+        on tpd.TOTLE_TRADE_ID=d.TOTLE_TRADE_ID
+        left join FIN_TRADE_PRODUCT ftp on ftp.FINPROD_ID = tpd.FINPROD_ID and ftp.BRANCH= '0'
+        left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID=ftp.FINPROD_ID and fpt.BRANCH=ftp.BRANCH
+        where tpd.TRADE_MARKET in (#{TRADE_PLACE_03},#{TRADE_PLACE_04})
+          and  tpd.TRADE_DATE = to_date(#{executeDate},'yyyy-MM-dd')
+          and  tpd.TRADE_STATUS = #{status} and tpd.IS_CANCEL = #{YES_OR_NO_N}
+          and  tpd.FINPROD_TYPE2 ='F03' and tpd.PS in ('T93') and fpt.type_6 = 'H01'
+        union
+        SELECT
+            tpd.TRADE_ID TRADE_ID,
+            tpda.ENTRUST_ID ENTRUST_ID,
+            tpd.FINPROD_TYPE2 FINPROD_TYPE2,
+            tpd.PS PS,
+            tpd.FINPROD_ID FINPROD_ID,
+            tpd.COUNTER_ID COUNTER_ID,
+            tpd.CCY CCY,
+            tpd.TRADE_AMT TRADE_AMT,
+            tpd.SHARE_AMT SHARE_AMT,
+            tpd.UNIT_CPRICE UNIT_CPRICE,
+            tpd.TRADE_DATE TRADE_DATE,
+            #{YES_OR_NO_N} isBottom,
+            null zhaiZhuanGuId,
+            null zhaiZhuanGuNum,
+            null zhaiZhuanGuDanJia
+        FROM TRD_PRODUCT_DEAL tpd
+        LEFT JOIN TRD_PRODUCT_DEAL_ADD tpda ON  tpda.TRADE_ID = tpd.TRADE_ID
+        left join FIN_TRADE_PRODUCT ftp on ftp.FINPROD_ID = tpd.FINPROD_ID and ftp.BRANCH= '0'
+        left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID=ftp.FINPROD_ID and fpt.BRANCH=ftp.BRANCH
+        where tpd.TRADE_MARKET in (#{TRADE_PLACE_03},#{TRADE_PLACE_04})
+          and  tpd.TRADE_DATE = to_date(#{executeDate},'yyyy-MM-dd')
+          and  tpd.TRADE_STATUS = #{status} and tpd.IS_CANCEL = #{YES_OR_NO_N}
+          and  tpd.FINPROD_TYPE2 ='F03' and tpd.PS in ('T01','T07','T23') and fpt.type_6 = 'H01'
     </select>
 
 

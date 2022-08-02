@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
+import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -133,6 +137,10 @@ public class PeriodicManagement001Validator implements BeanValidator {
                 errorList.add(new ValidMessage(getMessage("期次结束日应小于等于产品到期日")));
             }
 
+            //检查流程中是否已存在：资产代码、开始日、结束日
+            if (StringUtil.equals(dto.getSaveOrSubmit(),"submit") && periodicManagement001Service.isInWflProcess(dto)) {
+                errorList.add(new ValidMessage(getMessage("已存在流程中数据，不能重复提交")));
+            }
         }
 
         return errorList;

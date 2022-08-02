@@ -32,6 +32,9 @@ import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.business.common.util.ThreadLocalUtil;
+import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPosPortfolioCashRequest;
+import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPosPortfolioSecRequest;
+import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPositionRequest;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealRegisterQuoteDto;
@@ -40,9 +43,6 @@ import com.joyintech.tams.cfets.trd.bond.service.IbuQuoteBondService;
 import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepo004Mapper;
 import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepoMapper;
 import com.joyintech.tams.cfets.trd.repo.dto.*;
-import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPosPortfolioCashRequest;
-import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPosPortfolioSecRequest;
-import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPositionRequest;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
@@ -153,9 +153,6 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
     private WflRegTradeFeeMapper wflRegTradeFeeMapper;
 
     @Autowired
-    private EtrEntrustAddMapper etrEntrustAddMapper;
-
-    @Autowired
     private CfetsIbuQuoteBondEtrMapper cfetsIbuQuoteBondEtrMapper;
 
     @Autowired
@@ -172,15 +169,6 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
 
     @Autowired
     private IPlatformDate iPlatformDate;
-
-    @Autowired
-    private FinTradeProductMapper finTradeProductMapper;
-
-    @Autowired
-    private FinTradeProductAddMapper finTradeProductAddMapper;
-
-    @Autowired
-    private FinProductTypeMapper finProductTypeMapper;
 
     @Autowired
     private EtrSecPositionFlowMapper etrSecPositionFlowMapper;
@@ -202,9 +190,6 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
 
     @Autowired
     private MstWorkflowCommonServiceMapperImpl mstWorkflowCommonServiceMapperImpl;
-
-    @Autowired
-    private PreTrdCommonBaseService preTrdCommonBaseService;
 
     @Autowired
     private TrdOutRightRepoTradeService trdOutRightRepoTradeService;
@@ -439,6 +424,16 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
                             errorList.add(new ValidMessage("质押券总额不能超过指令【" + pledge.getEntrustId() + "】指定的质押券总额"));
                         }
                     }
+                }
+            }
+            //同一债券不同产品中，需要限制折算比例需一致
+            Map<String,List<RepoEntrustPledgeDto>> finprodIdMap = entity.getRepoEntrustPledgeDtos().stream()
+                    .collect(Collectors.groupingBy(RepoEntrustPledgeDto::getFinprodId));
+            for (Map.Entry<String, List<RepoEntrustPledgeDto>> entry : finprodIdMap.entrySet()) {
+                List<BigDecimal> pledgeRatioList = entry.getValue().stream().
+                        map(RepoEntrustPledgeDto::getPledgeRatio).distinct().collect(Collectors.toList());
+                if (pledgeRatioList.size() > 1) {
+                    errorList.add(new ValidMessage("同一债券不同产品中，折算比例需一致"));
                 }
             }
             // 同个质押券的汇总质押券面总额必须为十万的整数倍，且不超过100亿
@@ -807,11 +802,50 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
     @Override
     public void doBack(CfetsRepoDealRegisterQuoteDto entity) {
         if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
+            // 处理结果
+            EtrPositionHoldDto etrPositionHoldDto = new EtrPositionHoldDto();
+            // 持仓流水
+            List<EtrSecPositionFlowDto> etrSecPositionFlows = new ArrayList<>();
+            List<EtrSecPositionFlowDto> etrSecPositionFlows1 = new ArrayList<>();
+            // 现金流水
+            List<EtrCashPositionFlowDto> etrCashPositionFlows = new ArrayList<>();
             //插入旧头寸
             List<WflRegFinProductDeal> wfldeals = cfetsIbuQuoteBondMapper.listWflRegFinProductDeal(entity.getTotleTradeId());
+            List<WflRegFinPledge> wflRegFinPledges = cfetsIbuQuoteRepo004Mapper.listWflRegFinPledge(entity.getTotleTradeId());
             for (WflRegFinProductDeal deal : wfldeals) {
                 AllTradeCommonUtil.deletePosition(null, deal.getTradeId());
+                // 撤销时直接冲销
+                etrSecPositionFlows1.addAll(
+                        EtrCommonCashPositionDealService.findNegateSecFlowByEntrustId(
+                                deal.getEntrustId(), deal.getTradeId()));
             }
+            Map<String, String> map = new HashMap<>();
+            for (EtrSecPositionFlowDto dto : etrSecPositionFlows1) {
+                map.put(dto.getFinprodId() + dto.getPortfolioId(), dto.getInvAim());
+                map.put(dto.getFinprodId() + dto.getPortfolioId() + dto.getInvAim(), dto.getSecAcctId());
+            }
+            wflRegFinPledges.forEach(pledge -> {
+                        // 退回时直接冲销
+                        EtrSecPositionFlowDto etrSecPositionFlowDto = new EtrSecPositionFlowDto();
+                        etrSecPositionFlowDto.setSeqno(IDGenerator.generate());
+                        etrSecPositionFlowDto.setPortfolioId(pledge.getPortfolioId());
+                        etrSecPositionFlowDto.setFinprodId(pledge.getPledgeFinprodId());
+                        etrSecPositionFlowDto.setBranch(0L);
+                        etrSecPositionFlowDto.setInvAim(map.get(pledge.getPledgeFinprodId() + pledge.getPortfolioId()));
+                        etrSecPositionFlowDto.setSecAcctId(
+                                map.get(etrSecPositionFlowDto.getFinprodId() + etrSecPositionFlowDto.getPortfolioId() + etrSecPositionFlowDto.getInvAim()));
+                        etrSecPositionFlowDto.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());
+                        etrSecPositionFlowDto.setCdate(entity.getTradeDate());
+                        etrSecPositionFlowDto.setCcy(entity.getCcy());
+                        etrSecPositionFlowDto.setAmount(pledge.getPledgeNumber());
+                        etrSecPositionFlowDto.setTradeId(pledge.getTradeId());
+                        etrSecPositionFlowDto.setIsExistNew(DictCodeList.是否_是.getValue());
+                        etrSecPositionFlows.add(etrSecPositionFlowDto);
+                    }
+            );
+            etrPositionHoldDto.setPtlCashPositionFlows(etrCashPositionFlows);
+            etrPositionHoldDto.setPtlSecPositionFlows(etrSecPositionFlows);
+            EtrCommonCashPositionDealService.持久化流水Dto(etrPositionHoldDto);
         }
     }
 
@@ -1056,7 +1090,7 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
     /**
      * 组装金融产品分类信息
      *
-     * @param entity 页面数据
+     * @param deal 页面数据
      * @return com.joyintech.tams.common.base.entity.FinProductType
      * @author jiangpeng
      * @date 2021/12/29 11:04
@@ -1879,6 +1913,16 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
             if (cfetsIbuQuoteBondMapper.countMatchInfo(item.getQuoteId(), DictCodeList.确认状态_已确认.getValue()) > 0) {
                 errorList.add(new ValidMessage("当日登记所选登记数据已成交确认不支持撤销!业务编号:" + item.getQuoteId()));
             }
+            //是否已强制完成
+            Map<String,Object> map = new HashMap<>();
+            map.put("trdIds",Arrays.asList(item.getQuoteId()));
+            map.put("YN_N", DictCodeList.是否_否.getValue());
+            map.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
+            map.put("ENTRUST_STATUS_04", com.joyintech.tams.constant.DictCodeList.委托状态_已完成.getValue());
+            map.put("TRD", "REPO");
+            if (cfetsIbuQuoteBondMapper.selectEntruIdIsFinsh(map) > 0) {
+                errorList.add(new ValidMessage("当日登记所选登记数据存在强制完成指令不支持撤销!业务编号:" + item.getQuoteId()));
+            }
             if (CollectionUtils.isNotEmpty(errorList)) {
                 return;
             }
@@ -1939,10 +1983,11 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
      *
      * @param totleTradeId
      * @param remark
+     * @param isRevoke 是否撤销,用来区分交收失败还是撤销;交收失败为false 撤销为true
      * @author jiangpeng
      * @date 2022/1/21 17:05
      */
-    public void revokeForOut(String totleTradeId, String remark) {
+    public void revokeForOut(String totleTradeId, String remark,Boolean isRevoke) {
         CfetsRepoDealDbDto result = new CfetsRepoDealDbDto();
         RegFinProductDealTotal total = regFinProductDealTotalMapper.selectByPrimaryKey(totleTradeId);
         total.setRemark(remark);
@@ -1957,9 +2002,11 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
         this.insert(result, OperationType.REVOKE);
         // 履历表
         this.updateCfetsOprHis(totleTradeId, OperationType.REVOKE);
-        // 头寸
-        PositionHttpRequest.dorevoke(totleTradeId, DictCodeListExt1.子系统代码_交易.getValue(),
-                DictCodeListExt3.头寸业务类型_质押式回购首期.getValue(), result.getRegFinProductDealTotal().getPs());
+        if (isRevoke) {
+            // 头寸
+            PositionHttpRequest.dorevoke(totleTradeId, DictCodeListExt1.子系统代码_交易.getValue(),
+                    DictCodeListExt3.头寸业务类型_质押式回购首期.getValue(), result.getRegFinProductDealTotal().getPs());
+        }
         // 处理旧头寸
         this.oldPositionDeal(result, true);
         //处理指令执行进度
@@ -2031,6 +2078,8 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
                     stlPayOrders.add(stlPayOrder);
                     baseTradeProductDealDto.setStlPayOrdersList(stlPayOrders);
                     finProductTradeDto.setBaseTradeProductDealDtos(Arrays.asList(baseTradeProductDealDto));
+                    // 登记不处理指令现金
+                    finProductTradeDto.setNeedExecuteEtrPosition(true);
                     baseTradeProductDealCommService.insertPosition(finProductTradeDto);
                 }
             }

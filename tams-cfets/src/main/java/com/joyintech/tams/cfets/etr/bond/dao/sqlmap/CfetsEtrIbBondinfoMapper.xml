@@ -1070,11 +1070,11 @@ from
         null as approver,
         T1.REMARK as remark,
         trunc((NVL(T6.FINISH_AMT,0)+NVL(T5.ENT_FINISH_AMT*100,0))/(T1.ENTRUST_NUM*100),4)*100 execProcess,
-        trunc((NVL(C.totalShareAmt,nvl(C2.totalShareAmt,0))+NVL(C3.FINISH_AMT*100,0))/(T1.ENTRUST_NUM*100),4)*100 transProcess,
+        trunc(NVL(T9.totalShareAmt*100, 0)/(T1.ENTRUST_NUM*100),4)*100 transProcess,
         NVL(T6.FINISH_AMT,0)/10000+NVL(T5.ENT_FINISH_AMT,0)/100  as execFinishAmt,
         (NVL(T1.ENTRUST_NUM,0)/100 - NVL(T5.ENT_FINISH_AMT,0)/100-NVL(T6.FINISH_AMT,0)/10000) as execRemainderAmt,
-        NVL(C.totalShareAmt,nvl(C2.totalShareAmt,0))/10000+NVL(C3.FINISH_AMT/100,0)  as transFinishAmt,
-        NVL(T1.ENTRUST_NUM,0)/100 - NVL(C.totalShareAmt,nvl(C2.totalShareAmt,0))/10000-NVL(C3.FINISH_AMT/100,0) as transRemainderAmt,
+        NVL(T9.totalShareAmt, 0)/100  as transFinishAmt,
+        NVL(T1.ENTRUST_NUM,0)/100 - NVL(T9.totalShareAmt, 0)/100 as transRemainderAmt,
         NVL(T7.OUR_ENT_NUM,0)/100  as entrustOwnNum,
         NVL(T7.LENDIN_ENT_NUM,0)/100  as entrustIntegrateNum,
         T7.calculate_field as calculateField,
@@ -1114,22 +1114,12 @@ from
         LEFT JOIN ETR_ENTRUST_ADD T7 ON T1.ENTRUST_ID = T7.ENTRUST_ID
         LEFT JOIN SYS_USER T8 ON T1.INV_MANAGER_ID = T8.USER_NAME
         LEFT JOIN FIN_PRODUCT_TYPE T4 ON T4.FINPROD_ID = T1.FINPROD_ID
-        LEFT JOIN
-        (SELECT C.ENTRUST_ID,
-        SUM(nvl(C.SHARE_AMT, 0)) * 100 totalShareAmt
-        FROM IBU_QUOTE_BOND A
-        LEFT JOIN IBU_QUOTE_BOND_DET B ON A.QUOTE_ID = B.QUOTE_ID
-        LEFT JOIN IBU_QUOTE_ETR_RE C ON A.QUOTE_ID = C.QUOTE_ID
-        WHERE B.TRADE_STATUS = '07'
-        GROUP BY C.ENTRUST_ID) C
-        ON C.ENTRUST_ID = T1.ENTRUST_ID
-        LEFT JOIN
-        (SELECT A.ENTRUST_ID,
-        nvl(A.SHARE_AMT, 0) * 100 totalShareAmt
-        FROM IBU_QUOTE_BOND A
-        LEFT JOIN IBU_QUOTE_BOND_DET B ON A.QUOTE_ID = B.QUOTE_ID
-        WHERE B.TRADE_STATUS = '07') C2
-        ON C2.ENTRUST_ID = T1.ENTRUST_ID
+        LEFT JOIN (select sum(SHARE_AMT) totalShareAmt, tpda.ENTRUST_ID
+        from TRD_PRODUCT_DEAL tpd
+        left join TRD_PRODUCT_DEAL_ADD tpda on tpd.TRADE_ID = tpda.TRADE_ID
+        where tpd.IS_CANCEL = 'N'
+        and tpd.TRADE_STATUS = '01'
+        group by tpda.ENTRUST_ID) T9 ON T9.ENTRUST_ID = T1.ENTRUST_ID
         LEFT JOIN(
         SELECT
         ENTRUST_ID,

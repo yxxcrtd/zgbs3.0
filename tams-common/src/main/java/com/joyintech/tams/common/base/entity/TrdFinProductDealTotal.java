@@ -26,6 +26,8 @@ public class TrdFinProductDealTotal extends BaseEntity {
      */
     private String finprodId;
 
+    private String finprodMarketId;
+
     /**
      * 金融产品类型（估值核算），债券、理财产品、基金、理财产品模板、理财产品分层
      */
@@ -550,6 +552,14 @@ public class TrdFinProductDealTotal extends BaseEntity {
      */
     public void setFinprodId(String finprodId) {
         this.finprodId = finprodId == null ? null : finprodId.trim();
+    }
+
+    public String getFinprodMarketId() {
+        return finprodMarketId;
+    }
+
+    public void setFinprodMarketId(String finprodMarketId) {
+        this.finprodMarketId = finprodMarketId;
     }
 
     /**

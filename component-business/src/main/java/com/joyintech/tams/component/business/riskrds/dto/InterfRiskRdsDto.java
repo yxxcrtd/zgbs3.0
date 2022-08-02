@@ -334,6 +334,11 @@ public class InterfRiskRdsDto implements IRiskRds {
      */
     private String isShareHolder;
 
+    /**
+     * 是否影响现金规模
+     */
+    private String effectCash;
+
     public BigDecimal getTdyAssetValue() {
         return tdyAssetValue;
     }
@@ -1323,5 +1328,13 @@ public class InterfRiskRdsDto implements IRiskRds {
 
     public void setWithLockPeriod(String withLockPeriod) {
         this.withLockPeriod = withLockPeriod;
+    }
+
+    public String getEffectCash() {
+        return effectCash;
+    }
+
+    public void setEffectCash(String effectCash) {
+        this.effectCash = effectCash;
     }
 }

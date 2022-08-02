@@ -100,4 +100,11 @@ public interface CfetsPrimaryBidManageMapper {
 	List<String> selectEntrustIdByBidId(@Param("bidId") String bidId);
 
 	List<String>  selectManualSettleInfo(@Param("totalWinId") String totalWinId);
+
+	/**
+	 * 查询中标结果汇总表
+	 * @param bidId
+	 * @return
+	 */
+	BidResultTotal selectBidResultTotalByBidId(@Param("bidId") String bidId);
 }

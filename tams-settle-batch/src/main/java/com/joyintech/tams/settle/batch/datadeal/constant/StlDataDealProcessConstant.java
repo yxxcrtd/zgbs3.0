@@ -448,7 +448,7 @@ public class StlDataDealProcessConstant {
 	// 业务类别：变更质押券
 	public static final String SJSJG_YWLB_XYBG = "XYBG";
 	// 业务类别：解除质押
-	public static final String SJSJG_YWLB_XYZJ = "XYZJ";
+	public static final String SJSJG_YWLB_XYJZ = "XYJZ";
 	// 业务类别：报价回购初始交易
 	public static final String SJSJG_YWLB_BJCS = "BJCS";
 	// 业务类别：报价回购购回交易

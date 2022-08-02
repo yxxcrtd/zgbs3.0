@@ -280,14 +280,16 @@ public class EtrSecLend002Controller extends BaseController {
             String code = bussGetBussinessIdService !=null ? bussGetBussinessIdService.buildBussinessCode(param):IDGenerator.generate();
             dto.setEntrustId(code);
         }
-        if (StringUtil.equals(BussinessConstant.SUBMIT, dto.getOperateType())) {
-            AjaxResult ar = EntrustRdsCommonAop.doPreOccupy(dto,
-                    BussinessDictCodeListRds.接口系统ID_预占接口.getValue(),
-                    DictCodeListExt2.平安资产类型_债券借贷.getValue());
-            if (StringUtil.isNotEmpty(ar)) {
-                return ar;
-            }
-        }
+        // GLCP-34:债券借贷指令不需要预占 modify by fuyongsehng 20220707 start
+//        if (StringUtil.equals(BussinessConstant.SUBMIT, dto.getOperateType())) {
+//            AjaxResult ar = EntrustRdsCommonAop.doPreOccupy(dto,
+//                    BussinessDictCodeListRds.接口系统ID_预占接口.getValue(),
+//                    DictCodeListExt2.平安资产类型_债券借贷.getValue());
+//            if (StringUtil.isNotEmpty(ar)) {
+//                return ar;
+//            }
+//        }
+        // GLCP-34:债券借贷指令不需要预占 modify by fuyongsehng 20220707 end
         ProcessParameter<EtrSecLendDto> processParameter = new ProcessParameter<EtrSecLendDto>();
         WorkFlowParameter<EtrSecLendDto> params = new WorkFlowParameter<EtrSecLendDto>();
         params.setPageId(this.getPageId());

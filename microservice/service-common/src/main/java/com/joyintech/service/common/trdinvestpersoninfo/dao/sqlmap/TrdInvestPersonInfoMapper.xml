@@ -23,9 +23,7 @@
 					FROM
 						MST_COUNTER_PARTY T1
 					LEFT JOIN MST_CUSTOMER_INFO T2 ON T1.LINK_ID = T2.CUSTOMER_ID
-					left join mst_cfets_customer_info T3 on T1.counter_name = T3.party_name 
 					<where>
-						AND T3.party_id IS NULL
 						<if test="innerTrade != null and !innerTrade">
 			                AND not exists (select 1 from PTL_PORTFOLIO p where p.PORTFOLIO_ID = T1.COUNTER_ID)
 			                and NOT EXISTS (SELECT 1 FROM fin_product p WHERE p.FINPROD_MARKET_ID = T1.COUNTER_ID)
@@ -64,9 +62,8 @@
 				FROM
 					MST_COUNTER_PARTY T1
 				LEFT JOIN MST_CUSTOMER_INFO T2 ON T1.LINK_ID = T2.CUSTOMER_ID
-				left join mst_cfets_customer_info T3 on T1.counter_name = T3.party_name 
-				WHERE T3.party_id IS NULL
-					AND T1.COUNTER_ID IN (
+				WHERE
+					T1.COUNTER_ID IN (
 					SELECT
 						P .FINPROD_MARKET_ID
 					FROM
@@ -115,9 +112,7 @@
 	        MST_CUSTOMER_INFO T2
 	        ON
 	        T1.LINK_ID = T2.CUSTOMER_ID
-	        left join mst_cfets_customer_info T3 on T1.counter_name = T3.party_name 
 	        <where>
-	        	AND T3.PARTY_ID IS NULL
 	            <if test="innerTrade != null and !innerTrade">
 	                AND not exists (select 1 from PTL_PORTFOLIO p where p.PORTFOLIO_ID = T1.COUNTER_ID)
 	                and NOT EXISTS (SELECT 1 FROM fin_product p WHERE p.FINPROD_MARKET_ID = T1.COUNTER_ID)
@@ -153,9 +148,7 @@
 	        MST_CUSTOMER_INFO T2
 	        ON
 	        T1.LINK_ID = T2.CUSTOMER_ID
-	        left join mst_cfets_customer_info T3 on T1.counter_name = T3.party_name 
 	        <where>
-	        	AND T3.PARTY_ID IS NULL
 	            <if test="search != null and search != ''">
 	                AND (
 	                T1.COUNTER_ID LIKE CONCAT('%', CONCAT(#{search}, '%'))
@@ -187,7 +180,6 @@
     		MST_CUSTOMER_INFO T2
     	ON
     		T1.LINK_ID = T2.CUSTOMER_ID
-    	left join mst_cfets_customer_info T3 on T1.counter_name = T3.party_name AND T3.PARTY_ID IS NULL
         <where>
             <if test="search != null and search != ''">
                AND (

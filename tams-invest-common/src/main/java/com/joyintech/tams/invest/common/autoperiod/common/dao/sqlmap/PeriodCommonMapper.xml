@@ -1133,4 +1133,21 @@
         AND PSP.CDATE &lt; #{mDate, jdbcType=DATE}
         AND PSP.CDATE > T1.CDATE )
     </select>
+
+    <select id="getFinCashInfosByFinprodId" resultType = "com.joyintech.tams.common.base.entity.FinCashInfo">
+        SELECT
+        <include refid="com.joyintech.tams.common.base.dao.FinCashInfoMapper.Base_Column_List" />
+        FROM
+        FIN_CASH_INFO
+        <where>
+            FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+        </where>
+    </select>
+
+    <delete id="deleteFinCashPlanByCashId">
+        DELETE FROM FIN_CASH_PLAN
+        <where>
+            CASH_ID = #{cashId,jdbcType=VARCHAR}
+        </where>
+    </delete>
 </mapper>

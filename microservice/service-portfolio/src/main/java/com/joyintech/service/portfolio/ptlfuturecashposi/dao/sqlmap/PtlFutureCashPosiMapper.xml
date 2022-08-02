@@ -346,14 +346,14 @@
 		AND PTL_SEC_POSITION.AMOUNT != 0
     </sql>
 
-    <!-- 计划计算未来现金（质押式回购+拆借） -->
+    <!-- 计划计算未来现金（质押式回购+拆借+债券借贷） -->
     <sql id="planFutureCashRepoLendSql">
         SELECT
 		    PTL_SEC_POSITION.FINPROD_ID                                finprodId,
 		    FIN_CASH_PLAN.PAY_DATE                                     payDate,
 		    PTL_PORTFOLIO.PORTFOLIO_ID                                 portfolioId,
 		    FIN_TRADE_PRODUCT.CCY                                            ccy,
-		    case when FIN_TRADE_PRODUCT.FINPROD_TYPE2 IN ('${FINPROD_TYPE_TG_F03}', '${FINPROD_TYPE_TG_F09}') then '01' else '02' end cashType,
+		    case when FIN_TRADE_PRODUCT.FINPROD_TYPE2 IN ('${FINPROD_TYPE_TG_F03}', '${FINPROD_TYPE_TG_F09}', '${FINPROD_TYPE_TG_F30}') then '01' else '02' end cashType,
 		    ROUND(PTL_SEC_POSITION.AMOUNT * FIN_CASH_PLAN.CASH_AMT/FIN_TRADE_PRODUCT.PRIN, 2) cashAmt
 		FROM
 		    PTL_PORTFOLIO
@@ -385,7 +385,7 @@
 		    PTL_PORTFOLIO.PORTFOLIO_TYPE = #{PORTFOLIO_TYPE_01}
 		AND FIN_CASH_PLAN.PAY_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
 		AND TO_DATE(#{endDate}, 'YYYY-MM-DD') >= FIN_CASH_PLAN.PAY_DATE
-		AND FIN_TRADE_PRODUCT.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}, #{FINPROD_TYPE_TG_F08}, #{FINPROD_TYPE_TG_F09})
+		AND FIN_TRADE_PRODUCT.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}, #{FINPROD_TYPE_TG_F08}, #{FINPROD_TYPE_TG_F09}, #{FINPROD_TYPE_TG_F29}, #{FINPROD_TYPE_TG_F30})
 		<if test = "finprodTypeTgList != null and !finprodTypeTgList.isEmpty()">
 		  AND FIN_TRADE_PRODUCT.FINPROD_TYPE2 IN 
 		  <foreach collection="finprodTypeTgList" open="(" item="item" close=")"  separator=",">

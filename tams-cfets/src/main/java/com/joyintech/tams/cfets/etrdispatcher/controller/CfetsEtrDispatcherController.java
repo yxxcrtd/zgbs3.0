@@ -351,7 +351,7 @@ public class CfetsEtrDispatcherController extends BaseController {
      * @author sjj
      */
     @ResponseBody
-    @ApiOperation(value = "分发", notes = "分发")
+    @ApiOperation(value = "交易管理指令分发", notes = "分发")
     @PostMapping("doDispatcher")
     public Message<AjaxResult> doDispatcher(@RequestBody CfetsEtrDispatcherDealRequest cfetsDto, BindingResult br)
             throws Exception {

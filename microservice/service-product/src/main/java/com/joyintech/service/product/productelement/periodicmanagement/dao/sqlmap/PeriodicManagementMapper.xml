@@ -502,18 +502,18 @@
 			select max(t.EFF_DATE) from fin_float_calc_rule_detail t where t.CASH_ID = fin_float_calc_rule_detail.CASH_ID
 			AND T.EFF_DATE &lt;= to_date(#{effDate},'yyyy-MM-dd')
 		)
-		<if test="periodProdId != null and periodProdId != ''">
-			and fin_cash_info.finprod_id = #{periodProdId}
-		</if>
 		<choose>
 			<when test="periodId != null and periodId != ''">
 				and FIN_TRADE_PRODUCT.PERIOD_ID = #{periodId}
 			</when>
 			<otherwise>
-				and fin_cash_info.BRANCH = 0
+				<if test="periodProdId != null and periodProdId != ''">
+					and fin_cash_info.finprod_id = #{periodProdId} and fin_cash_info.BRANCH = 0
+				</if>
 			</otherwise>
 		</choose>
 		and fin_cash_info.finprod_type = #{type01}
+		order by lev
 	</select>
 
 	<select id="selectCashPayRule" resultType="com.joyintech.tams.common.base.entity.FinCashPayRule">
@@ -687,5 +687,40 @@
 		where t.finprod_id = #{finprodId,jdbcType=VARCHAR}
 			and t.vdate = to_date(#{startDate,jdbcType=VARCHAR},'yyyy-MM-dd')
 			and t.mdate = to_date(#{endDate,jdbcType=VARCHAR},'yyyy-MM-dd')
+	</select>
+
+	<select id="selectProcessingFinTradeProduct" resultType="java.lang.String">
+		select pm.BUSINESS_DATA businessData
+		from SYS_DATA_PROCESS_MARK pm
+		inner join (
+		select
+		max(HIS_NO)	       HIS_NO,
+		WORKFLOW_ID
+		from SYS_DATA_PROCESS_MARK
+		<where>
+			<if test="pageId != null and pageId !=''">
+				PAGE_ID = #{pageId}
+			</if>
+		</where>
+		group by  WORKFLOW_ID
+		) tempHis on  pm.HIS_NO = tempHis.HIS_NO and pm.WORKFLOW_ID = tempHis.WORKFLOW_ID
+		<where>
+			<if test="seachMode != null and seachMode !='' and seachMode == '01'.toString()">
+				pm.status in ('A','U','P')
+			</if>
+			<if test="pageId != null and pageId !=''">
+				and pm.PAGE_ID = #{pageId}
+			</if>
+			<if test="businessDataPk1 != null and businessDataPk1 !=''">
+				and pm.BUSINESS_DATA_PK1 = #{businessDataPk1}
+			</if>
+			<if test="businessDataPk2 != null and businessDataPk2 !=''">
+				and pm.BUSINESS_DATA_PK2 = #{businessDataPk2}
+			</if>
+			<if test="workflowId != null and workflowId !=''">
+				and pm.WORKFLOW_ID != #{workflowId}
+			</if>
+		</where>
+		order by pm.create_time desc
 	</select>
 </mapper>

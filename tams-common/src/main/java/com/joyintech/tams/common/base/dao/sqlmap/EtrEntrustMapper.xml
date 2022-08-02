@@ -53,7 +53,8 @@
         PRICE PRICE, IS_ACCURATE IS_ACCURATE, INV_MANAGER_ID INV_MANAGER_ID, CALENDAR_ID CALENDAR_ID, 
         REMARK REMARK, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, 
         UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, CHL_ID CHL_ID, SALE_CODE SALE_CODE, 
-        PRICE_MODEL PRICE_MODEL, ENTRUST_TYPE ENTRUST_TYPE, STOCK_ID STOCK_ID, ENTRUST_CLASS ENTRUST_CLASS ,BUSINESS_MODEL BUSINESS_MODEL
+        PRICE_MODEL PRICE_MODEL, ENTRUST_TYPE ENTRUST_TYPE, STOCK_ID STOCK_ID, ENTRUST_CLASS ENTRUST_CLASS ,BUSINESS_MODEL BUSINESS_MODEL,
+        UNIT_FPRICE_AMT UNIT_FPRICE_AMT
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -88,7 +89,7 @@
             REMARK, CREATE_USER, CREATE_DEPT, 
             CREATE_TIME, UPDATE_USER, UPDATE_TIME, 
             CHL_ID, SALE_CODE, PRICE_MODEL, 
-            ENTRUST_TYPE, STOCK_ID, ENTRUST_CLASS
+            ENTRUST_TYPE, STOCK_ID, ENTRUST_CLASS,UNIT_FPRICE_AMT
             )
         values (#{entrustId,jdbcType=VARCHAR}, #{portfolioId,jdbcType=VARCHAR}, #{finprodId,jdbcType=VARCHAR}, 
             #{finprodType2,jdbcType=VARCHAR}, #{tradeMarket,jdbcType=VARCHAR}, #{tradePlat,jdbcType=VARCHAR}, 
@@ -102,7 +103,8 @@
             #{remark,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, 
             #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
             #{chlId,jdbcType=VARCHAR}, #{saleCode,jdbcType=VARCHAR}, #{priceModel,jdbcType=VARCHAR}, 
-            #{entrustType,jdbcType=VARCHAR}, #{stockId,jdbcType=VARCHAR}, #{entrustClass,jdbcType=VARCHAR}
+            #{entrustType,jdbcType=VARCHAR}, #{stockId,jdbcType=VARCHAR}, #{entrustClass,jdbcType=VARCHAR},
+            #{unitFpriceAmt,jdbcType=DECIMAL}
             )
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.EtrEntrust" >
@@ -228,6 +230,9 @@
             <if test="entrustClass != null" >
                 ENTRUST_CLASS,
             </if>
+            <if test="unitFpriceAmt != null" >
+                UNIT_FPRICE_AMT,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="entrustId != null" >
@@ -350,6 +355,9 @@
             <if test="entrustClass != null" >
                 #{entrustClass,jdbcType=VARCHAR},
             </if>
+            <if test="unitFpriceAmt != null" >
+                #{unitFpriceAmt,jdbcType=DECIMAL},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.EtrEntrust" >
@@ -358,13 +366,13 @@
         CONTACT_INFO, ENTRUST_DATE, VDATE, MDATE, ENTRUST_AMT, ENTRUST_NUM, AVAILABLE_NUM, 
         PRO_AVAILABLE_CASH, ACC_AVAILABLE_CASH, ENTRUST_STATUS, PRICE, IS_ACCURATE, INV_MANAGER_ID, 
         CALENDAR_ID, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, 
-        CHL_ID, SALE_CODE, PRICE_MODEL, ENTRUST_TYPE, STOCK_ID, ENTRUST_CLASS)
+        CHL_ID, SALE_CODE, PRICE_MODEL, ENTRUST_TYPE, STOCK_ID, ENTRUST_CLASS,UNIT_FPRICE_AMT)
         select ENTRUST_ID, PORTFOLIO_ID, FINPROD_ID, FINPROD_TYPE2, TRADE_MARKET, 
             TRADE_PLAT, TRADE_MARKET_MODE, PS, CCY, INV_AIM, COUNTER_ID, IS_OUT_TRADE, COUNTER_TRADER, 
             CONTACT_INFO, ENTRUST_DATE, VDATE, MDATE, ENTRUST_AMT, ENTRUST_NUM, AVAILABLE_NUM, 
             PRO_AVAILABLE_CASH, ACC_AVAILABLE_CASH, ENTRUST_STATUS, PRICE, IS_ACCURATE, INV_MANAGER_ID, 
             CALENDAR_ID, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, 
-            CHL_ID, SALE_CODE, PRICE_MODEL, ENTRUST_TYPE, STOCK_ID, ENTRUST_CLASS
+            CHL_ID, SALE_CODE, PRICE_MODEL, ENTRUST_TYPE, STOCK_ID, ENTRUST_CLASS,UNIT_FPRICE_AMT
              from ETR_ENTRUST
              where 1 = 1 and ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
     </insert>
@@ -476,6 +484,9 @@
             <if test="entrustClass != null" >
                 ENTRUST_CLASS = #{entrustClass,jdbcType=VARCHAR},
             </if>
+            <if test="unitFpriceAmt != null" >
+                UNIT_FPRICE_AMT = #{unitFpriceAmt,jdbcType=DECIMAL},
+            </if>
         </set>
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
     </update>
@@ -515,7 +526,8 @@
             PRICE_MODEL = #{priceModel,jdbcType=VARCHAR},
             ENTRUST_TYPE = #{entrustType,jdbcType=VARCHAR},
             STOCK_ID = #{stockId,jdbcType=VARCHAR},
-            ENTRUST_CLASS = #{entrustClass,jdbcType=VARCHAR}
+            ENTRUST_CLASS = #{entrustClass,jdbcType=VARCHAR},
+            UNIT_FPRICE_AMT = #{unitFpriceAmt,jdbcType=DECIMAL}
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
     </update>
 </mapper>

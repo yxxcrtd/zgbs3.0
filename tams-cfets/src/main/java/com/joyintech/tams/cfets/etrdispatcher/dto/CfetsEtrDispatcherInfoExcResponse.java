@@ -1,12 +1,14 @@
 package com.joyintech.tams.cfets.etrdispatcher.dto;
 
-import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.common.base.entity.EtrEntrustBidPrice;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.thymeleaf.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -15,140 +17,141 @@ import java.util.List;
 /**
  * 场外指令分发
  * 指令明细返回数据
+ *
  * @author wangyang1
  * @version 1.0 2022年2月25日
  * @see CfetsEtrDispatcherInfoExcResponse
  * @since 1.0
  */
-@ApiModel(value="指令明细返回数据",description="指令明细数据")
+@ApiModel(value = "指令明细返回数据", description = "指令明细数据")
 public class CfetsEtrDispatcherInfoExcResponse extends CfetsEtrDispatcherExcInfo {
 
-    @ApiModelProperty(name="busiTypePositionStr",value="业务类型",example="债券一级投标/现券买卖CODE",required = true)
+    @ApiModelProperty(name = "busiTypePositionStr", value = "业务类型", example = "债券一级投标/现券买卖CODE", required = true)
     private String busiTypePositionStr;
 
     //债券一级投标 start
-    @ApiModelProperty(name="mainConsignee",value="主承销商",example="字符串1")
+    @ApiModelProperty(name = "mainConsignee", value = "主承销商", example = "字符串1")
     private String mainConsignee;
 
-    @ApiModelProperty(name="paymentDate",value="缴款日",example="date'2021-01-01'")
+    @ApiModelProperty(name = "paymentDate", value = "缴款日", example = "date'2021-01-01'")
     private Date paymentDate;
 
-    @ApiModelProperty(name="listingDate",value="上市日",example="date'2021-01-01'")
+    @ApiModelProperty(name = "listingDate", value = "上市日", example = "date'2021-01-01'")
     private Date listingDate;
 
-    @ApiModelProperty(name="entrustNum",value="投标券面总额汇总",example="字符串1")
+    @ApiModelProperty(name = "entrustNum", value = "投标券面总额汇总", example = "字符串1")
     private BigDecimal entrustNum;
 
-    @ApiModelProperty(name="etrBidDate",value="投标日期",example="2021-01-01")
+    @ApiModelProperty(name = "etrBidDate", value = "投标日期", example = "2021-01-01")
     private String etrBidDate;
 
-    @ApiModelProperty(name="bidPriceList",value="投标标位",example="List<EtrEntrustBidPrice>")
+    @ApiModelProperty(name = "bidPriceList", value = "投标标位", example = "List<EtrEntrustBidPrice>")
     private List<EtrEntrustBidPrice> bidPriceList;
     //债券一级投标 end
 
     //债券交易 start
-    @ApiModelProperty(name="settleSpeed",value="清算速度CODE",example="T+0")
+    @ApiModelProperty(name = "settleSpeed", value = "清算速度CODE", example = "T+0")
     private String settleSpeed;
 
-    @ApiModelProperty(name="otherSettleSpeed",value="清算速度",example="字符串1")
+    @ApiModelProperty(name = "otherSettleSpeed", value = "清算速度", example = "字符串1")
     private String otherSettleSpeed;
 
-    @ApiModelProperty(name="priceModel",value="价格模式Code",example="01")
+    @ApiModelProperty(name = "priceModel", value = "价格模式Code", example = "01")
     private String priceModel;
 
-    @ApiModelProperty(name="otherPriceModel",value="价格模式",example="A1")
+    @ApiModelProperty(name = "otherPriceModel", value = "价格模式", example = "A1")
     private String otherPriceModel;
 
-    @ApiModelProperty(name="secAcctId",value="证券账户",example="XXX证券账户")
+    @ApiModelProperty(name = "secAcctId", value = "证券账户", example = "XXX证券账户")
     private String secAcctId;
 
-    @ApiModelProperty(name="trdAcctId",value="资金账户",example="XXX证券账户")
+    @ApiModelProperty(name = "trdAcctId", value = "资金账户", example = "XXX证券账户")
     private String trdAcctId;
 
-    @ApiModelProperty(name="shareNum",value="券面总额",example="1000000")
+    @ApiModelProperty(name = "shareNum", value = "券面总额", example = "1000000")
     private BigDecimal shareNum;
 
-    @ApiModelProperty(name="entrustOwnNum",value="本方券券面总额",example="1000000")
+    @ApiModelProperty(name = "entrustOwnNum", value = "本方券券面总额", example = "1000000")
     private BigDecimal entrustOwnNum;
 
-    @ApiModelProperty(name="integrateSecAmount",value="融入券券面总额",example="1000000")
+    @ApiModelProperty(name = "integrateSecAmount", value = "融入券券面总额", example = "1000000")
     private BigDecimal integrateSecAmount;
 
-    @ApiModelProperty(name="unitPrice",value="净价",example="100")
+    @ApiModelProperty(name = "unitPrice", value = "净价", example = "100")
     private BigDecimal unitPrice;
 
-    @ApiModelProperty(name="allPrice",value="全价",example="100")
+    @ApiModelProperty(name = "allPrice", value = "全价", example = "100")
     private BigDecimal allPrice;
 
-    @ApiModelProperty(name="matureYield",value="到期收益率",example="1.11")
+    @ApiModelProperty(name = "matureYield", value = "到期收益率", example = "1.11")
     private BigDecimal matureYield;
 
-    @ApiModelProperty(name="exerYield",value="行权收益率",example="1.11")
+    @ApiModelProperty(name = "exerYield", value = "行权收益率", example = "1.11")
     private BigDecimal exerYield;
 
-    @ApiModelProperty(name="fpriceAmt",value="全价总额",example="1000000")
+    @ApiModelProperty(name = "fpriceAmt", value = "全价总额", example = "1000000")
     private BigDecimal fpriceAmt;
 
-    @ApiModelProperty(name="remark",value="备注",example="A1")
+    @ApiModelProperty(name = "remark", value = "备注", example = "A1")
     private String remark;
     //债券交易 end
 
-    @ApiModelProperty(name="pledgeBondList",value="质押券信息",example="pledgeBondList")
+    @ApiModelProperty(name = "pledgeBondList", value = "质押券信息", example = "pledgeBondList")
     private List<PledgeBondInfoDto> pledgeBondList;
 
     //回购 start
-    @ApiModelProperty(name="repoTerm",value="回购期限",example="A1")
+    @ApiModelProperty(name = "repoTerm", value = "回购期限", example = "A1")
     private String repoTerm;
 
-    @ApiModelProperty(name="pledgeStockName",value="质押券库",example="A1")
+    @ApiModelProperty(name = "pledgeStockName", value = "质押券库", example = "A1")
     private String pledgeStockName;
 
-    @ApiModelProperty(name="firstprice",value="首次净价",example="A1")
+    @ApiModelProperty(name = "firstprice", value = "首次净价", example = "A1")
     private String firstprice;
 
-    @ApiModelProperty(name="totalPrinAmt",value="汇总券面总额",example="10000")
+    @ApiModelProperty(name = "totalPrinAmt", value = "汇总券面总额", example = "10000")
     private BigDecimal totalPrinAmt;
 
-    @ApiModelProperty(name="pledgeStandardNumber",value="标准券数量",example="10000")
+    @ApiModelProperty(name = "pledgeStandardNumber", value = "标准券数量", example = "10000")
     private BigDecimal pledgeStandardNumber;
 
-    @ApiModelProperty(name="pledgeRatio",value="折算率",example="10000")
+    @ApiModelProperty(name = "pledgeRatio", value = "折算率", example = "10000")
     private BigDecimal pledgeRatio;
 
-    @ApiModelProperty(name="pledgeNumber",value="质押数量",example="10000")
+    @ApiModelProperty(name = "pledgeNumber", value = "质押数量", example = "10000")
     private BigDecimal pledgeNumber;
 
-    @ApiModelProperty(name="mIntAmt",value="回购利息",example="10000")
+    @ApiModelProperty(name = "mIntAmt", value = "回购利息", example = "10000")
     private BigDecimal mIntAmt;
 
-    @ApiModelProperty(name="mTradeAmt",value="到期结算金额",example="10000")
+    @ApiModelProperty(name = "mTradeAmt", value = "到期结算金额", example = "10000")
     private BigDecimal mTradeAmt;
 
-    @ApiModelProperty(name="vpayDate",value="首期结算日",example="2021-01-01")
+    @ApiModelProperty(name = "vpayDate", value = "首期结算日", example = "2021-01-01")
     private String vpayDate;
 
-    @ApiModelProperty(name="vpayDate",value="到期结算日",example="2021-01-01")
+    @ApiModelProperty(name = "vpayDate", value = "到期结算日", example = "2021-01-01")
     private String mpayDate;
 
-    @ApiModelProperty(name="pledStrdPrinAmt",value="券面金额",example="10000")
+    @ApiModelProperty(name = "pledStrdPrinAmt", value = "券面金额", example = "10000")
     private BigDecimal pledStrdPrinAmt;
 
-    @ApiModelProperty(name="tradeId",value="初始交易编号",example="字符串1")
+    @ApiModelProperty(name = "tradeId", value = "初始交易编号", example = "字符串1")
     private String tradeId;
 
-    @ApiModelProperty(name="oldPledgeRatio",value="原折算率",example="10000")
+    @ApiModelProperty(name = "oldPledgeRatio", value = "原折算率", example = "10000")
     private BigDecimal oldPledgeRatio;
 
-    @ApiModelProperty(name="oldPledgeNumber",value="原质押数量",example="10000")
+    @ApiModelProperty(name = "oldPledgeNumber", value = "原质押数量", example = "10000")
     private BigDecimal oldPledgeNumber;
 
-    @ApiModelProperty(name="oldPledStrdPrinAmt",value="原券面金额",example="10000")
+    @ApiModelProperty(name = "oldPledStrdPrinAmt", value = "原券面金额", example = "10000")
     private BigDecimal oldPledStrdPrinAmt;
 
-    @ApiModelProperty(name="finprodTypeTg",value="资产类型")
+    @ApiModelProperty(name = "finprodTypeTg", value = "资产类型")
     private String finprodTypeTg;
 
-    @ApiModelProperty(name="declaType",value="申报类型")
+    @ApiModelProperty(name = "declaType", value = "申报类型")
     private String declaType;
 
     private String declaTypeStr;
@@ -160,7 +163,7 @@ public class CfetsEtrDispatcherInfoExcResponse extends CfetsEtrDispatcherExcInfo
     public void setPledgeStandardNumber(BigDecimal pledgeStandardNumber) {
         this.pledgeStandardNumber = pledgeStandardNumber;
     }
-    
+
     public BigDecimal getOldPledgeRatio() {
         return oldPledgeRatio;
     }
@@ -216,7 +219,7 @@ public class CfetsEtrDispatcherInfoExcResponse extends CfetsEtrDispatcherExcInfo
     public void setPledgeNumber(BigDecimal pledgeNumber) {
         this.pledgeNumber = pledgeNumber;
     }
-    
+
     public String getVpayDate() {
         return vpayDate;
     }
@@ -232,7 +235,7 @@ public class CfetsEtrDispatcherInfoExcResponse extends CfetsEtrDispatcherExcInfo
     public void setMpayDate(String mpayDate) {
         this.mpayDate = mpayDate;
     }
-    
+
     public BigDecimal getmIntAmt() {
         return mIntAmt;
     }
@@ -248,7 +251,7 @@ public class CfetsEtrDispatcherInfoExcResponse extends CfetsEtrDispatcherExcInfo
     public void setmTradeAmt(BigDecimal mTradeAmt) {
         this.mTradeAmt = mTradeAmt;
     }
-    
+
     public BigDecimal getPledgeRatio() {
         return pledgeRatio;
     }
@@ -257,35 +260,38 @@ public class CfetsEtrDispatcherInfoExcResponse extends CfetsEtrDispatcherExcInfo
         this.pledgeRatio = pledgeRatio;
     }
 
-    @ApiModelProperty(name="repoPledgeModel",value="场内质押式回购质押券模式",example="01无质押券库，02单个质押库，03多个质押券库")
+    @ApiModelProperty(name = "repoPledgeModel", value = "场内质押式回购质押券模式", example = "01无质押券库，02单个质押库，03多个质押券库")
     private String repoPledgeModel;
     //回购 end
 
     //利率互换 start
-    @ApiModelProperty(name="busiPs",value="互换方式",example="收取固定/收取浮动")
+    @ApiModelProperty(name = "busiPs", value = "互换方式", example = "收取固定/收取浮动")
     private String busiPs;
 
-    @ApiModelProperty(name="entrustAmt",value="名义本金",example="1000")
+    @ApiModelProperty(name = "entrustAmt", value = "名义本金", example = "1000")
     private BigDecimal entrustAmt;
 
-    @ApiModelProperty(name="dealMode",value="挂钩利率",example="个人定期(整存整取)一年")
+    @ApiModelProperty(name = "dealMode", value = "挂钩利率", example = "个人定期(整存整取)一年")
     private String dealMode;
 
-    @ApiModelProperty(name="termType",value="期限",example="1Y/1M")
+    @ApiModelProperty(name = "termType", value = "期限", example = "1Y/1M")
     private String termType;
 
-    @ApiModelProperty(name="dueDate",value="到期日",example="[2017-01-01 - 2017-02-01]")
+    @ApiModelProperty(name = "dueDate", value = "到期日", example = "[2017-01-01 - 2017-02-01]")
     private String dueDate;
     //利率互换 end
 
-    @ApiModelProperty(name="isRight",value="是否含权",example="A1")
+    @ApiModelProperty(name = "isRight", value = "是否含权", example = "A1")
     private String isRight;
 
-    @ApiModelProperty(name="secType",value="债券分类",example="字符串1")
+    @ApiModelProperty(name = "secType", value = "债券分类", example = "字符串1")
     private String secType;
 
-    @ApiModelProperty(name="oldFinprodMarketId",value="原质押券",example="字符串1")
+    @ApiModelProperty(name = "oldFinprodMarketId", value = "原质押券", example = "字符串1")
     private String oldFinprodMarketId;
+
+    @ApiModelProperty(name = "advanceRecoveryDate", value = "提前购回日", example = "字符串1")
+    private String advanceRecoveryDate;
 
     public String getSecType() {
         return SysDataUtil.getNameFromDataDict(DictCode.行内资产四级分类, this.secType);
@@ -294,7 +300,7 @@ public class CfetsEtrDispatcherInfoExcResponse extends CfetsEtrDispatcherExcInfo
     public void setSecType(String secType) {
         this.secType = secType;
     }
-    
+
     public String getBusiPs() {
         return busiPs;
     }
@@ -522,13 +528,14 @@ public class CfetsEtrDispatcherInfoExcResponse extends CfetsEtrDispatcherExcInfo
     public String getOtherBusiModel() {
 //        String flag = CacheUtil.getSysParam("SHOW_INVAIM_OR_BUSSINSSMODEL");
 //        if("02".equals(flag)){
-            return SysDataUtil.getNameFromDataDict(DictCode.业务模式, super.getBusiModel());
+        return SysDataUtil.getNameFromDataDict(DictCode.业务模式, super.getBusiModel());
 //        }
 //        return SysDataUtil.getNameFromDataDict(DictCode.投资目的, super.getBusiModel());
     }
 
     /**
      * 获取 otherTradeMarket
+     *
      * @return otherTradeMarket.
      */
     public String getOtherTradeMarket() {
@@ -566,7 +573,7 @@ public class CfetsEtrDispatcherInfoExcResponse extends CfetsEtrDispatcherExcInfo
     public void setIsRight(String isRight) {
         this.isRight = isRight;
     }
-    
+
     public String getBusiTypePositionStr() {
         return SysDataUtil.getNameFromDataDict(DictCode.投管业务类型, this.getBusiTypePosition());
     }
@@ -615,7 +622,7 @@ public class CfetsEtrDispatcherInfoExcResponse extends CfetsEtrDispatcherExcInfo
         this.declaTypeStr = declaTypeStr;
     }
 
-    @ApiModelProperty(name="addCla",value="补充协议")
+    @ApiModelProperty(name = "addCla", value = "补充协议")
     private String addCla;
 
     public String getAddCla() {
@@ -626,7 +633,7 @@ public class CfetsEtrDispatcherInfoExcResponse extends CfetsEtrDispatcherExcInfo
         this.addCla = addCla;
     }
 
-    @ApiModelProperty(name="faceValue",value="债券面值")
+    @ApiModelProperty(name = "faceValue", value = "债券面值")
     private String stockSecId;
 
     public String getStockSecId() {
@@ -635,5 +642,33 @@ public class CfetsEtrDispatcherInfoExcResponse extends CfetsEtrDispatcherExcInfo
 
     public void setStockSecId(String stockSecId) {
         this.stockSecId = stockSecId;
+    }
+
+    public String getAdvanceRecoveryDate() {
+        return advanceRecoveryDate;
+    }
+
+    public void setAdvanceRecoveryDate(String advanceRecoveryDate) {
+        this.advanceRecoveryDate = advanceRecoveryDate;
+    }
+
+    private String backDate;
+
+    public String getBackDate() {
+        return backDate;
+    }
+
+    public void setBackDate(String backDate) {
+        this.backDate = backDate;
+    }
+
+    public String getRepoMdate() {
+        if(!StringUtils.isEmpty(this.getBackDate())){
+            return DateUtil.formatDateAddSplit(this.getBackDate());
+        }
+        if (StringUtil.isBlank(getRepoTerm()) || StringUtil.isBlank(getVpayDate())) {
+            return null;
+        }
+        return DateUtil.addDay(getVpayDate(), Integer.parseInt(getRepoTerm()));
     }
 }

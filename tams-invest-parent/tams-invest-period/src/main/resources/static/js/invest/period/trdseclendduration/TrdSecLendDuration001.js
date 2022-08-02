@@ -49,9 +49,14 @@
             ,{field:'psText', sortField:'ps',width:100, title: 'TrdSecLendDuration001.ps'}
         	,{field:'finprodId',sortField:'FINPROD_ID', width:180, title: 'TrdSecLendDuration001.finprodId',
                 render : function(data, type, row, meta) {
-                    return "<a class='finprodId-link' style='cursor: pointer;'>" + row.finprodId + "</a>";
+                    return "<a class='finprodId-link' style='cursor: pointer;'>" + row.finprodMarketId + "</a>";
                 }
         	}
+            // ,{field:'finprodMarketId',sortField:'FINPROD_MARKET_ID', width:180, title: 'TrdSecLendDuration001.finprodId',
+            //     render : function(data, type, row, meta) {
+            //         return "<a class='finprodId-link' style='cursor: pointer;'>" + row.finprodMarketId + "</a>";
+            //     }
+            // }
         	,{field:'finprodName', sortField:'finprodName',width:180, title: 'TrdSecLendDuration001.finprodName'}
         	,{field:'shareAmt',sortField:'shareAmt', width:180, title: 'TrdSecLendDuration001.tradeAmt', type: 'money'}
             ,{field:'vdate',sortField:'VDATE', width:140, title: 'TrdSecLendDuration001.vdate', type: 'date'}
@@ -113,12 +118,23 @@
      * 点击资产代码链接跳转到该资产标的信息查看页面；
      */
     table.bind('click','.finprodId-link', function(row) {
-        Joyin.dialog(JoyinUtil.getLabel("FinBondTargetAsset002"),
-                basePath + "invest/asset/bond/FinBondTargetAsset002/init",
-                "95%", "90%",
-                { pageModel:PAGE_MODEL_REFERENCE,
-                finprodId: row.finprodId,
-                finprodName: row.finprodName });
+        let finprodId = row.finprodId
+        var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a"; // 默认债券标的
+        var param = {
+            pageModel: PAGE_MODEL_REFERENCE,
+            isQuickInput: true,
+            finprodId: finprodId
+        };
+        Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+            basePath + url,
+            "95%", "90%",
+            param);
+        // Joyin.dialog(JoyinUtil.getLabel("FinBondTargetAsset002"),
+        //         basePath + "invest/asset/bond/FinBondTargetAsset002/init",
+        //         "95%", "90%",
+        //         { pageModel:PAGE_MODEL_REFERENCE,
+        //         finprodId: row.finprodId,
+        //         finprodName: row.finprodName });
     });
     
     $(function () {

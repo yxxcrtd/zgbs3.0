@@ -287,4 +287,7 @@
 		AND T1.INV_AIM  = 'FVTPL'
 		)
 	</update>
+	<select id="findPortfolioIdList" resultType="string">
+		SELECT PORTFOLIO_ID FROM ETR_ENTRUST_DETAIL WHERE ENTRUST_ID = #{entrustId}
+	</select>
 </mapper>

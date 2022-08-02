@@ -102,6 +102,122 @@ public class SettleTransDataDto extends SettleTransData {
         this.isHuobi = isHuobi;
     }
 
+    /**
+     * 本金现金流代码
+     */
+    private String prinCashId;
+
+    public String getPrinCashId() {
+        return prinCashId;
+    }
+
+    public void setPrinCashId(String prinCashId) {
+        this.prinCashId = prinCashId;
+    }
+
+    /**
+     * 付息现金流代码
+     */
+    private String intPayCashId;
+
+    public String getIntPayCashId() {
+        return intPayCashId;
+    }
+
+    public void setIntPayCashId(String intPayCashId) {
+        this.intPayCashId = intPayCashId;
+    }
+
+    /**
+     * 本方交易员
+     */
+    private String trader;
+
+    /**
+     * 对手方交易员
+     */
+    private String counterTrader;
+
+    /**
+     * 本方交易商
+     */
+    private String dealerNo;
+
+    /**
+     * 对手方交易商
+     */
+    private String outDealerNo;
+
+    /**
+     * 本方交易主体
+     */
+    private String dealerPartyNo;
+
+    /**
+     * 对手方交易主体
+     */
+    private String outDealerPartyNo;
+
+    /**
+     * 交易对手
+     */
+    private String counterId;
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    public String getTrader() {
+        return trader;
+    }
+
+    public void setTrader(String trader) {
+        this.trader = trader;
+    }
+
+    public String getCounterTrader() {
+        return counterTrader;
+    }
+
+    public void setCounterTrader(String counterTrader) {
+        this.counterTrader = counterTrader;
+    }
+
+    public String getDealerNo() {
+        return dealerNo;
+    }
+
+    public void setDealerNo(String dealerNo) {
+        this.dealerNo = dealerNo;
+    }
+
+    public String getOutDealerNo() {
+        return outDealerNo;
+    }
+
+    public void setOutDealerNo(String outDealerNo) {
+        this.outDealerNo = outDealerNo;
+    }
+
+    public String getDealerPartyNo() {
+        return dealerPartyNo;
+    }
+
+    public void setDealerPartyNo(String dealerPartyNo) {
+        this.dealerPartyNo = dealerPartyNo;
+    }
+
+    public String getOutDealerPartyNo() {
+        return outDealerPartyNo;
+    }
+
+    public void setOutDealerPartyNo(String outDealerPartyNo) {
+        this.outDealerPartyNo = outDealerPartyNo;
+    }
 
     public BigDecimal getShareAmtSg() {
         return shareAmtSg;

@@ -283,6 +283,11 @@ public class CfetsRepoDealQuotedPrice001Dto extends EtrEntrust {
      */
     private String quotaPageModel;
 
+
+    /**
+     * 操作
+     */
+    private String operatorType;
     /**
      * 版本号
      */
@@ -1170,6 +1175,14 @@ public class CfetsRepoDealQuotedPrice001Dto extends EtrEntrust {
 
     public void setQuotaPageModel(String quotaPageModel) {
         this.quotaPageModel = quotaPageModel;
+    }
+
+    public String getOperatorType() {
+        return operatorType;
+    }
+
+    public void setOperatorType(String operatorType) {
+        this.operatorType = operatorType;
     }
 
     public Long getbVersion() {

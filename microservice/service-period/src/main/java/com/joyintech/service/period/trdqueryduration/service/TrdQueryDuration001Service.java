@@ -124,6 +124,7 @@ public class TrdQueryDuration001Service extends BaseService<TrdQueryDurationDto>
 		param.put("PS_YQFS", DictCodeListExt3.交易方向_投资端_逾期返售.getValue());
 		param.put("PST22", DictCodeList.交易方向_收息到账.getValue());
 		param.put("PST23", DictCodeList.交易方向_还本到账.getValue());
+		param.put("PST24", DictCodeList.交易方向_赎回到账.getValue());
 		param.put("FEE_TYPE_JSF", DictCodeListExt1.一次性费用类型_结算费.getValue());
 		param.put("SysDate", platformDateImpl.getSysDate());
 		param.put("TRADE_PLACE_01",DictCodeListExt1.交易场所_银行间.getValue());
@@ -182,6 +183,7 @@ public class TrdQueryDuration001Service extends BaseService<TrdQueryDurationDto>
 		param.put("CASH_CLASS_TYPE03", DictCodeList.现金流类型_到期还本.getValue());
 		param.put("CASH_CLASS_TYPE04", DictCodeList.现金流类型_到期收息.getValue());
 		param.put("PS_T07", DictCodeList.交易方向_到期.getValue());
+		param.put("PS_T08", DictCodeList.交易方向_还本.getValue());
 		param.put("PS_T09", DictCodeList.交易方向_收息.getValue());
 		param.put("CASH_TYPE_1_02", DictCodeListExt1.现金流一级类型_利息.getValue());
 		param.put("CASH_TYPE_2_C02", DictCodeListExt1.现金流二级类型_利息.getValue());

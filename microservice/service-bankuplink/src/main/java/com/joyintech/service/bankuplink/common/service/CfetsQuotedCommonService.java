@@ -89,12 +89,6 @@ public class CfetsQuotedCommonService extends BaseService {
      * {@linkplain}
      */
     @Autowired
-    private BusiAutoEtrDispService busiAutoEtrDispService;
-
-    /**
-     * {@linkplain}
-     */
-    @Autowired
     private EtrEntrustMapper etrEntrustMapper;
 
     /**
@@ -102,12 +96,6 @@ public class CfetsQuotedCommonService extends BaseService {
      */
     @Autowired
     private EtrEntrustAddMapper etrEntrustAddMapper;
-
-    /**
-     * {@linkplain}
-     */
-    @Autowired
-    private EtrDistributeMapper etrDistributeMapper;
 
     /**
      * 投资委托信息Mapper
@@ -150,11 +138,8 @@ public class CfetsQuotedCommonService extends BaseService {
      */
     @Autowired
     private BaseEtrInvestInfoServiceImpl etrInvestInfoServiceImpl;
-    
-    
-    @Autowired
-    private EtrDistributeInterfTmpMapper etrDistributeInterfTmpMapper;
-    
+
+
     /**
      * IbuMainService
      */
@@ -1431,9 +1416,9 @@ public class CfetsQuotedCommonService extends BaseService {
                 entity.setTradeMarket(BussinessDictCodeList.交易场所_银行间.getValue());
             }
             //成交按回复方的价格计算现金
-            if(CollectionUtils.isNotEmpty(entity.getCounterInfoList())){
+            if(CollectionUtils.isNotEmpty(entity.getCounterInfoList())) {
                 com.joyintech.service.bankuplink.bond.dto.CounterInfoDto counterInfoDto = entity.getCounterInfoList().get(0);
-                if(null!=counterInfoDto.getUnitFprice()&&counterInfoDto.getUnitFprice().compareTo(BigDecimal.ZERO)!=0){
+                if (null != counterInfoDto.getUnitFprice() && counterInfoDto.getUnitFprice().compareTo(BigDecimal.ZERO) != 0) {
                     entity.setUnitFprice(counterInfoDto.getUnitFprice());
                 }
             }
@@ -1447,13 +1432,13 @@ public class CfetsQuotedCommonService extends BaseService {
                 pltMap.put("cashAcctId",cfetsQuotedCommonMapper.getACCTNO(portfolioId,BussinessDictCodeList.资金账户类型_托管账户.getValue()));
                 pltMap.put("secAcctId",cfetsQuotedCommonMapper.getSecAcctId(portfolioId,entity.getFinprodId(),entity.getTradeMarket()));
                 pltMap.put("secAmount",ArithmeticUtil.multiply(cfetsBondDealDialogueQuoteDto.getAvaNum(),new BigDecimal(10000))); //券面总额
-                if(null!=cfetsBondDealDialogueQuoteDto.getFpriceAmt()&&BigDecimal.ZERO.compareTo(cfetsBondDealDialogueQuoteDto.getFpriceAmt())!=0){
+                if (null != cfetsBondDealDialogueQuoteDto.getFpriceAmt() && BigDecimal.ZERO.compareTo(cfetsBondDealDialogueQuoteDto.getFpriceAmt()) != 0) {
                     pltMap.put("cashAmount",cfetsBondDealDialogueQuoteDto.getFpriceAmt().setScale(2,RoundingMode.DOWN));//全价总额
                 }else{
-                    if(null!=entity.getUnitFprice()&&BigDecimal.ZERO.compareTo(entity.getUnitFprice())!=0){
-                        pltMap.put("cashAmount",ArithmeticUtil.multiply(cfetsBondDealDialogueQuoteDto.getAvaNum(),entity.getUnitFprice(),new BigDecimal(100)).setScale(2,RoundingMode.DOWN));
+                    if (null != entity.getUnitFprice() && BigDecimal.ZERO.compareTo(entity.getUnitFprice()) != 0) {
+                        pltMap.put("cashAmount", ArithmeticUtil.multiply(cfetsBondDealDialogueQuoteDto.getAvaNum(), entity.getUnitFprice(), new BigDecimal(100)).setScale(2, RoundingMode.DOWN));
                     }else{
-                        pltMap.put("cashAmount",ArithmeticUtil.multiply(cfetsBondDealDialogueQuoteDto.getAvaNum(),new BigDecimal(10000)).setScale(2,RoundingMode.DOWN));
+                        pltMap.put("cashAmount", ArithmeticUtil.multiply(cfetsBondDealDialogueQuoteDto.getAvaNum(), new BigDecimal(10000)).setScale(2, RoundingMode.DOWN));
                     }
                 }
                 if(StringUtil.equals(ps,BussinessDictCodeList.交易方向_卖出.getValue())||StringUtil.equals(ps,BussinessDictCodeList.交易方向_行权回售.getValue())){
@@ -1536,6 +1521,7 @@ public class CfetsQuotedCommonService extends BaseService {
             posport.setCashAmount(ptlDto.getFpriceAmt());
             ptlCashList.add(posport);
         }
+        entity.setIsDzh(DictCodeList.是否_是.getValue());
         List<CfetsRepoDealQuotedPrice003Dto> pledgeBondList = this.质押券拆分(entity);
         if (StringUtil.isNotEmpty(pledgeBondList)) {
             for (CfetsRepoDealQuotedPrice003Dto pledgeDto : pledgeBondList) {
@@ -1544,7 +1530,7 @@ public class CfetsQuotedCommonService extends BaseService {
                 secport.setEtrId(pledgeDto.getEntrustId());
                 secport.setFinprodId(pledgeDto.getFinprodId());
                 secport.setTradeId(entity.getQuoteId());
-                Map<String, Object> map = new HashMap<String, Object>();
+                Map<String, Object> map = new HashMap<>();
                 map.put("portfolioId", pledgeDto.getPortfolioId());
                 map.put("finprodId", pledgeDto.getFinprodId());
                 String secAcctId = this.qryPortfolioSecAcctId(map);

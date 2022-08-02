@@ -1,5 +1,6 @@
 package com.joyintech.tams.invest.product.productelement.periodicmanagement.service;
 
+import com.google.common.collect.Maps;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.export.ExportParam;
 import com.joyintech.framework.grid.Page;
@@ -7,9 +8,11 @@ import com.joyintech.framework.jdbc.enums.DataSourceType;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.FinBaseRuleInfo;
 import com.joyintech.tams.common.base.entity.FinFloatCalcRuleDetail;
+import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.prod.dto.BussBenchMarkInfoDto;
 import com.joyintech.tams.component.business.prod.dto.BussFinProductFloatFeeDto;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -18,6 +21,7 @@ import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.product.productelement.periodicmanagement.dto.PeriodicManagement001Dto;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,6 +182,26 @@ public class PeriodicManagement001Service extends CommonExportService<PeriodicMa
         Integer num = restTemplate.postForObject(
                 ServiceApplication.PRODUCT_SERVICE_NAME + "/PeriodicManagement/getTrdProductDealByPeriodId", params,
                 Integer.class);
+        if (num > 0) {
+            flag = true;
+        }
+        return flag;
+    }
+
+    public boolean isInWflProcess(PeriodicManagement001Dto dto) {
+        boolean flag = false;
+
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("pageId", "PeriodicManagement002");
+        params.put("seachMode", "01");
+        params.put("workflowId", dto.getWorkflowId());
+        params.put("periodId", dto.getPeriodId());
+        params.put("businessDataPk1", dto.getPeriodProdId());
+        params.put("startDate", DateUtil.format(dto.getStartDate(), "yyyy-MM-dd"));
+        params.put("endDate", DateUtil.format(dto.getEndDate(), "yyyy-MM-dd"));
+        Long num = restTemplate.postForObject(
+                ServiceApplication.PRODUCT_SERVICE_NAME + "/PeriodicManagement/getInWflProcessCount", params,
+                Long.class);
         if (num > 0) {
             flag = true;
         }

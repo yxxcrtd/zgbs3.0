@@ -89,19 +89,15 @@ public class CreditOccupTask extends BatchBaseService {
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
-    public JobExecution execute()
-        throws BatchException {
-
+    public JobExecution execute() throws BatchException {
         SysBatchExecInfo batchExecuteInfo = this.getBatchExecuteInfo();
         if (batchExecuteInfo == null) {
             logger.info("无启动参数，批处理退出。");
             return null;
         }
-
         Map<String, Object> params = new HashMap<>();
         params.put(BatchConstant.BATCH_INFO, batchExecuteInfo);
         params.put("executeDate", DateUtil.format(batchExecuteInfo.getExecuteDate()));
-
         // 各步骤设置参数
         step1Reader.setParams(params);
         step1Processor.setParams(params);
@@ -110,15 +106,15 @@ public class CreditOccupTask extends BatchBaseService {
         step2Processor.setParams(params);
         step3Reader.setParams(params);
         step3Processor.setParams(params);
-
-        return batchBuilder.init(this).batch("step1", (BaseReader)step1Reader,
-            (BaseProcessor)step1Processor, (BaseWriter)step1Writer)
-                .batch("step2",(BaseReader)step2Reader,
-                        (BaseProcessor)step2Processor,step2Writer)
-                .batch("step3",(BaseReader)step3Reader,
-                        (BaseProcessor)step3Processor,step3Writer)
+        return batchBuilder.init(this).batch("step1", (BaseReader) step1Reader,
+                (BaseProcessor) step1Processor, (BaseWriter) step1Writer)
+                .batch("step2", (BaseReader) step2Reader,
+                        (BaseProcessor) step2Processor, step2Writer)
+                .batch("step3", (BaseReader) step3Reader,
+                        (BaseProcessor) step3Processor, step3Writer)
                 .builder(
-                    this.getBatchTask().getBeanName() + this.getBatchTask().getTaskId()).run();
+                        this.getBatchTask().getBeanName() + this.getBatchTask().getTaskId()).run();
+
     }
 
 }

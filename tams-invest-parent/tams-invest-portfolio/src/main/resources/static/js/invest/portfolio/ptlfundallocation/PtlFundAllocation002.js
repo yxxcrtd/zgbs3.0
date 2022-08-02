@@ -146,11 +146,30 @@
         if ($('#' + acctNoId).val() && $('#' + acctNoId).val() != ''
             && $('#settleDate').val() && $('#settleDate').val() != ''
             && $('#ccy').val() && $('#ccy').val() != ''){
+            // TISHKS-1560:调用新头寸接口查询持仓 modify by fuyongsheng 20220719 start
+            // 获取转账方式
+            var payType = $("#payType").val();
+            var hodingType = "";
+            if(payType == "1001"){// 银证转账
+                if(acctNoId == "myAcctNo"){ // 付款账户
+                    hodingType = "C_02";
+                }else{
+                    hodingType = "C_03";
+                }
+            }else{//证银转账
+                if(acctNoId == "myAcctNo"){ // 付款账户
+                    hodingType = "C_03";
+                }else{
+                    hodingType = "C_02";
+                }
+            }
+            // TISHKS-1560:调用新头寸接口查询持仓 modify by fuyongsheng 20220719 end
             var data = {
                     acctId:$('#' + acctNoId).val(),
                     cdate:$('#settleDate').val(),
                     portfolioId:$('#portfolioId').val(),
-                    ccy:$('#ccy').val()
+                    ccy:$('#ccy').val(),
+                    hodingType: hodingType
             };
             Joyin.ajax(basePath + 'invest/portfolio/ptlfundallocation/PtlFundAllocation002/getActAmount', data, function(result) {//数据验证
                 if (result && result != ''){

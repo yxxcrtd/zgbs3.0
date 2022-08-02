@@ -698,7 +698,7 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
             paTrdProductDeal.setPaBussType(DictCodeListExt2.平安业务类型_债券借贷融出.getValue());
         }
         paTrdProductDeal.setBackLendDirection(dto.getPs());//交易方向
-        paTrdProductDeal.setDeptCode(personInfo.getTraderDept()); // 交易所属部门
+        paTrdProductDeal.setDeptCode(null != personInfo ? personInfo.getTraderDept() : StringUtil.EMPTY); // 交易所属部门
         paTrdProductDeal.setWorkflowId(dto.getWorkflowId()); // 工作流代码
         dto.setPaTrdProductDeal(paTrdProductDeal);
         // 金融产品交易扩展Entity 构造结束----------------------------------------------------------

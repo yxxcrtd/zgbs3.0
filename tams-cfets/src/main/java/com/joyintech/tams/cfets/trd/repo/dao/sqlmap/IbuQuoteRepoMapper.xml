@@ -585,7 +585,14 @@
                        ,espr.FINPROD_ID
                        ,CASE WHEN ppc.S_HOLDINGTYPE = #{S_002} THEN espr.AMOUNT*nvl(ppc.CAL_FLAG,1)  ELSE 0 END AS pledStrdPrinAmt /*可质押券面总额*/
                        ,CASE WHEN espr.HODING_TYPE=#{A_012} THEN espr.AMOUNT*nvl(ppc.CAL_FLAG,1)  ELSE 0 END    AS pledgeAmount /*已质押质押券面总额*/
-                FROM PTL_SEC_POSITION_RULE espr
+               <choose>
+                   <when test="isEtrInfo != null ">
+                       FROM ETR_SEC_POSITION_RULE espr
+                   </when>
+                   <otherwise>
+                       FROM PTL_SEC_POSITION_RULE espr
+                   </otherwise>
+               </choose>
                 INNER JOIN PTL_PORTFOLIO pp
                 ON espr.PORTFOLIO_ID = pp.PORTFOLIO_ID
                 LEFT JOIN PTL_POSITION_CFG ppc
@@ -2716,6 +2723,83 @@
                         </foreach>
                     </if>
                 </where>
+            UNION ALL
+            SELECT
+                ENTRUST_ID
+            FROM
+                WFL_IBU_QUOTE_ETR_RE
+                <where>
+                    <if test="entrustIdList != null and entrustIdList.size() > 0">
+                        and ENTRUST_ID  in
+                        <foreach collection="entrustIdList" item="item" open="(" close=")" separator=",">
+                            #{item}
+                        </foreach>
+                    </if>
+                    <if test="entrustIds != null and entrustIds.size() > 0">
+                        and ENTRUST_ID  in
+                        <foreach collection="entrustIds" item="item" open="(" close=")" separator=",">
+                            #{item}
+                        </foreach>
+                    </if>
+                </where>UNION ALL
+            SELECT
+                T2.ENTRUST_ID
+            FROM
+                REG_FIN_PRODUCT_DEAL_TOTAL T1
+            INNER JOIN REG_FIN_PRODUCT_DEAL T2 ON
+                T1.TOTLE_TRADE_ID = T2.TOTLE_TRADE_ID
+                <if test="entrustIdList != null and entrustIdList.size() > 0">
+                    and T2.ENTRUST_ID  in
+                    <foreach collection="entrustIdList" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="entrustIds != null and entrustIds.size() > 0">
+                    and T2.ENTRUST_ID  in
+                    <foreach collection="entrustIds" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+            WHERE T1.TRADE_STATUS = '01' AND (T1.IS_CANCEL IS NULL OR T1.IS_CANCEL = 'N')
+                and NOT EXISTS (
+                SELECT
+                    1
+                FROM
+                    TRDQUTO_MATCH_INFO T3
+                WHERE
+                    T3.PRE_TRADE_ID = T1.TOTLE_TRADE_ID)
+            UNION ALL
+            SELECT
+                T2.ENTRUST_ID
+            FROM
+                IBU_QUOTE_CREP T1
+            INNER JOIN IBU_QUOTE_ETR_RE T2 ON
+                T1.QUOTE_ID = T2.QUOTE_ID
+                <if test="entrustIdList != null and entrustIdList.size() > 0">
+                    and T2.ENTRUST_ID  in
+                    <foreach collection="entrustIdList" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="entrustIds != null and entrustIds.size() > 0">
+                    and T2.ENTRUST_ID  in
+                    <foreach collection="entrustIds" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+                WHERE EXISTS (
+                SELECT
+                    1
+                FROM
+                    TRDQUTO_MATCH_INFO T3
+                WHERE
+                    T3.PRE_TRADE_ID = T1.QUOTE_ID)
+                <if test="tradeStatusList != null and tradeStatusList.size() > 0">
+                    and T1.TRADE_STATUS not in
+                    <foreach collection="tradeStatusList" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
                 )
     </select>
     <select id="selectAllCustomer"  resultType="java.util.Map">

@@ -126,6 +126,10 @@ private RepAssetOther repAssetOther;
      * 组合entity
      */
     private PtlPortfolio ptlPortfolio;
+    /**
+     * pa组合entity
+     */
+    private PaPtlPortfolio paPtlPortfolio;
 
     // add end
     /**
@@ -1436,5 +1440,13 @@ private RepAssetOther repAssetOther;
 
     public void setBussFinProductOpenPlanRedDto(BussFinProductOpenPlanDto bussFinProductOpenPlanRedDto) {
         this.bussFinProductOpenPlanRedDto = bussFinProductOpenPlanRedDto;
+    }
+
+    public PaPtlPortfolio getPaPtlPortfolio() {
+        return paPtlPortfolio;
+    }
+
+    public void setPaPtlPortfolio(PaPtlPortfolio paPtlPortfolio) {
+        this.paPtlPortfolio = paPtlPortfolio;
     }
 }

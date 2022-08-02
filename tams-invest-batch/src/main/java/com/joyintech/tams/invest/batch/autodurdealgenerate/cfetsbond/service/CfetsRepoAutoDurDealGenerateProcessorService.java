@@ -82,7 +82,7 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
                 }
             }
             //入库并处理头寸
-            insertAndSendPosition(trdBondDurDbInserts);
+            this.insertAndSendPosition(trdBondDurDbInserts);
         }
     }
 
@@ -91,7 +91,7 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
      * @param batchDate
      */
     public  List<TrdRepoDurationDto> listTrdRepoDuration(Date batchDate){
-        Map<String, Object> paramMap = new HashMap<String, Object>();
+        Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("statusValid", Arrays.asList(DictCodeListExt1.画面数据状态_待处理.getValue()));
         paramMap.put("ps", Arrays.asList(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue()));
         paramMap.put("notChannelFlag", "1");
@@ -312,13 +312,21 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
         trdProductDeal.setSettleDate(DateUtil.parse(entity.getSettleDate()));
         trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
         trdProductDeal.setIsCancel(DictCodeList.是否_否.getValue());
+
+        // 查找cashId
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("CASH_TYPE_1", DictCodeListExt1.现金流一级类型_本金.getValue());
+        paramMap.put("CASH_TYPE_2", DictCodeListExt1.现金流二级类型_本金.getValue());
+        paramMap.put("finprodId", trdProductDeal.getFinprodId());
+        String cashId = cfetsBondAutoDurDealGenerateMapper.findCashIdByFinprodId(paramMap);
+        trdProductDeal.setCashId(cashId);
         trdProductDeals.add(trdProductDeal);
         //交易明细附属表
         List<TrdProductDealAdd> trdProductDealAdds = new ArrayList<>();
         TrdProductDealAdd trdProductDealAdd = new TrdProductDealAdd();
         trdProductDealAdd.setTradeId(trdProductDeal.getTradeId());
         trdProductDealAdd.setPortfolioId(entity.getPortfolioId());
-        trdProductDealAdd.setEntrustId(entity.getPortfolioId());
+        trdProductDealAdd.setEntrustId(entity.getEntrustId());
         trdProductDealAdds.add(trdProductDealAdd);
         BatchBussSettleOrderParameterDto parameterDto = new BatchBussSettleOrderParameterDto();
         parameterDto.setIsTotalTrade(DictCodeList.是否_是.getValue());
@@ -350,7 +358,7 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
     public void insertAndSendPosition(List<TrdBondDurDbInertDto> trdBondDurDbInserts){
         for(TrdBondDurDbInertDto trdBondDurDbInertDto : trdBondDurDbInserts){
             autoPeriodCommonService.insertCfetsTempDealData(trdBondDurDbInertDto);
-            sendPositionMethod(trdBondDurDbInertDto);
+            this.sendPositionMethod(trdBondDurDbInertDto);
         }
     }
 

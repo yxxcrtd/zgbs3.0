@@ -236,15 +236,12 @@ public class EtrInstructionService extends BaseService<EtrInstructionDto> {
      *
      * <一句话功能简述>
      * <功能详细描述>
-     * @param entity EtrFundDto
      * @throws IllegalAccessException IllegalAccessException
      * @throws InvocationTargetException InvocationTargetException
      * @see
      * @since 1.0
      */
-    public void doInsert(EtrInstructionDto dto)
-        throws IllegalAccessException,
-        InvocationTargetException {
+    public void doInsert(EtrInstructionDto dto) throws IllegalAccessException, InvocationTargetException {
         //文件
         MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
         mstFileInputParameter.setFileList(dto.getFileArray());
@@ -253,8 +250,7 @@ public class EtrInstructionService extends BaseService<EtrInstructionDto> {
             mstFileCommonService.updateBusinessId(mstFileInputParameter);
         }
 
-        if (!StringUtil.equals("HTQS", dto.getOperateType()) 
-                && "submit".equals(dto.getOperateType())) {
+        if (!StringUtil.equals("HTQS", dto.getOperateType()) && "submit".equals(dto.getOperateType())) {
             BaseEtrInvestInfoDto entity = initBaseDto(dto);
             if(StringUtil.isEmpty(entity.getWorkFlowId())){
                 throw new RuntimeException("WorkFlowId初始化不能为空!");
@@ -437,7 +433,7 @@ public class EtrInstructionService extends BaseService<EtrInstructionDto> {
             BeanUtil.copyProperties(etrEntrust, dto.getBussEtrInvestPersonInfoDto());
             //设置委托状态
             etrEntrust.setEntrustStatus(DictCodeListExt3.委托状态_流程中.getValue());
-            etrEntrust.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_基金.getValue());
+            etrEntrust.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_立项指令.getValue());
             etrEntrust.setIsOutTrade(DictCodeList.是否_是.getValue());
             if(platformDateImpl != null){
                 etrEntrust.setEntrustDate(platformDateImpl.getSysDate());
@@ -446,7 +442,7 @@ public class EtrInstructionService extends BaseService<EtrInstructionDto> {
 
             // etrEntrustAdd
             EtrEntrustAdd etrEntrustAdd = new EtrEntrustAdd();
-            etrEntrustAdd.setAssetType(DictCodeList.平安资产类型_基金.getValue());
+            etrEntrustAdd.setAssetType(DictCodeListExt3.共通业务类型_立项指令.getValue());
             BeanUtil.copyProperties(etrEntrustAdd, dto);
             //设置起息日到期日
             etrEntrustAdd.setVdate(null);

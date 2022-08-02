@@ -308,7 +308,7 @@ public class EtrFundService extends BaseService<EtrFundDto> {
         // add by etliu 20210501 银行间场内场外拆分 start
         param.put("defaultTradeMarketList", PageMenuSplitUtil.getTradeMarketList((String) param.get("parentPageId")));
         // add by etliu 20210501 银行间场内场外拆分 end
-
+        param.put("sysdate", platformDateImpl.getSysDate());
         Page<SelectOptionDto> pagelist = this.queryForPageForSelectReturn(page, length,() -> etrFundMapper.getSelectFinprodMarketId(param));
         List<SelectOptionDto> list = pagelist.getRoot();
         for(SelectOptionDto dto :list){

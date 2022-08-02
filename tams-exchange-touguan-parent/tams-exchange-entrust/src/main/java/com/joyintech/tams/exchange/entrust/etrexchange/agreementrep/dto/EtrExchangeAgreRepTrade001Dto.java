@@ -23,10 +23,10 @@ import java.util.List;
 public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements ProcessEntity{
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 3436776283481983592L;
-	
+
 	private String tradeId;
 	private String intiTradeId;
 	private String origRepSecId;
@@ -45,6 +45,7 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 	private Integer occupyDays;
 	private BigDecimal intAmt;
 	private BigDecimal expireSettleAmt;
+	private BigDecimal fristExpireSettleAmt;
 	private String counterId;
 	private String counterTrader;
 	private String trader;
@@ -52,6 +53,8 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 	private String addCla;
 	private String entrustId;
 	private String finprodId;
+	private String initialNum;
+	private String origSerialDate;
 	private BigDecimal pledgeFaceValue;
 	private String newfinprodId;
 	private BigDecimal newpledgeFaceValue;
@@ -63,6 +66,11 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 	private BigDecimal newConRatio;
 	private BigDecimal newRepSecNum;
 	private BigDecimal newPrintAmt;
+	private String outfinprodId;
+	private BigDecimal outRepSecNum;
+	private String outRepSecId;
+	private BigDecimal outAmt;  //换出金额
+	private BigDecimal outPledgeFaceValue;
 	private String reqOnId;
 	private String vdate;
 	private String mdate;
@@ -85,6 +93,8 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 	private String fromEtrExchange;
 	private String busiPs;
 	private String assetType2;
+
+	private String transCode;
 
 	/**
 	 * 质押券单位
@@ -308,6 +318,23 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 	public void setFinprodId(String finprodId) {
 		this.finprodId = finprodId;
 	}
+
+	public String getInitialNum() {
+		return initialNum;
+	}
+
+	public void setInitialNum(String initialNum) {
+		this.initialNum = initialNum;
+	}
+
+	public String getOrigSerialDate() {
+		return origSerialDate;
+	}
+
+	public void setOrigSerialDate(String origSerialDate) {
+		this.origSerialDate = origSerialDate;
+	}
+
 	public BigDecimal getPledgeFaceValue() {
 		return pledgeFaceValue;
 	}
@@ -536,6 +563,14 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 		this.assetType2 = assetType2;
 	}
 
+	public String getTransCode() {
+		return transCode;
+	}
+
+	public void setTransCode(String transCode) {
+		this.transCode = transCode;
+	}
+
 	public String getPledgeUnit() {
 		return pledgeUnit;
 	}
@@ -566,5 +601,64 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 
 	public void setBusiTypePosition(String busiTypePosition) {
 		this.busiTypePosition = busiTypePosition;
+	}
+
+	public BigDecimal getOutRepSecNum() {
+		return outRepSecNum;
+	}
+
+	public void setOutRepSecNum(BigDecimal outRepSecNum) {
+		this.outRepSecNum = outRepSecNum;
+	}
+
+	public String getOutRepSecId() {
+		return outRepSecId;
+	}
+
+	public void setOutRepSecId(String outRepSecId) {
+		this.outRepSecId = outRepSecId;
+	}
+
+	public BigDecimal getOutAmt() {
+		return outAmt;
+	}
+
+	public void setOutAmt(BigDecimal outAmt) {
+		this.outAmt = outAmt;
+	}
+
+	public BigDecimal getOutPledgeFaceValue() {
+		return outPledgeFaceValue;
+	}
+
+	public void setOutPledgeFaceValue(BigDecimal outPledgeFaceValue) {
+		this.outPledgeFaceValue = outPledgeFaceValue;
+	}
+
+	public String getOutfinprodId() {
+		return outfinprodId;
+	}
+
+	public void setOutfinprodId(String outfinprodId) {
+		this.outfinprodId = outfinprodId;
+	}
+
+	public BigDecimal getFristExpireSettleAmt() {
+		return fristExpireSettleAmt;
+	}
+
+	public void setFristExpireSettleAmt(BigDecimal fristExpireSettleAmt) {
+		this.fristExpireSettleAmt = fristExpireSettleAmt;
+	}
+
+
+	private String pledgeInvAim;
+
+	public String getPledgeInvAim() {
+		return pledgeInvAim;
+	}
+
+	public void setPledgeInvAim(String pledgeInvAim) {
+		this.pledgeInvAim = pledgeInvAim;
 	}
 }

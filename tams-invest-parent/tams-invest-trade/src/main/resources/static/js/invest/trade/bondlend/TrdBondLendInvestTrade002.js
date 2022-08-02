@@ -10,7 +10,7 @@ var table;
         checkbox:false,
         cols:[
             {field:'payDateUnadjust',title:'TrdBondLendInvestTrade002.initPayDate',width:400,type: 'date',sortable:false}
-            ,{field:'intAmt',title:'TrdBondLendInvestTrade002.intAmt',width:400,sortable:false}
+            ,{field:'intAmt',type:'number',title:'TrdBondLendInvestTrade002.intAmt',type:'money',width:400,sortable:false}
             ,{field:'intAmtInit',visible:false}
             ,{field:'newRate',width:400,title:'TrdBondLendInvestTrade002.rate',sortable:false}
         ],
@@ -486,13 +486,23 @@ var table;
      * 若点击资产代码后面的【查看】按钮跳转到本资产的详情画面
      */
     $('#TrdBondLendInvestTrade002_btn_viewAsset').click(function(){
-        if ($('#finprodId').val()) {
-            Joyin.dialog(JoyinUtil.getLabel("FinBondTargetAsset002.title"), basePath
-                    + "invest/asset/bond/FinBondTargetAsset002/init", "95%", "90%", {
-                pageModel : PAGE_MODEL_REFERENCE,
-                finprodId : $('#finprodId').val()
-            });
-        }
+        var url = "home.html?a=a&finprodMarketId=" + $('#finprodId').val() + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a"; // 默认债券标的
+        var param = {
+            pageModel: PAGE_MODEL_REFERENCE,
+            isQuickInput: true,
+            finprodId: $('#finprodId').val()
+        };
+        Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+            basePath + url,
+            "98%", "98%",
+            param);
+        // if ($('#finprodId').val()) {
+        //     Joyin.dialog(JoyinUtil.getLabel("FinBondTargetAsset002.title"), basePath
+        //             + "invest/asset/bond/FinBondTargetAsset002/init", "95%", "90%", {
+        //         pageModel : PAGE_MODEL_REFERENCE,
+        //         finprodId : $('#finprodId').val()
+        //     });
+        // }
     });
 
     /**

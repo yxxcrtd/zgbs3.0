@@ -173,6 +173,11 @@ public class PeriodicManagement001Dto extends BaseEntity implements ProcessEntit
 	 * 业绩报酬计算规则明细List
 	 */
 	private List<FinFloatCalcRuleDetail> finFloatCalcRuleDetailList;
+
+	/**
+	 * 保存/提交
+	 */
+	private String saveOrSubmit;
 	 
     /**
      * 获取 effDate
@@ -468,4 +473,12 @@ public class PeriodicManagement001Dto extends BaseEntity implements ProcessEntit
     public String getEndDateStr() {
         return DateUtil.format(this.getEndDate());
     }
+
+	public String getSaveOrSubmit() {
+		return saveOrSubmit;
+	}
+
+	public void setSaveOrSubmit(String saveOrSubmit) {
+		this.saveOrSubmit = saveOrSubmit;
+	}
 }

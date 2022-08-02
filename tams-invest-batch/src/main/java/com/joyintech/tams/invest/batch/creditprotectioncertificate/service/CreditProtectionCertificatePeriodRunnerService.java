@@ -2,6 +2,7 @@ package com.joyintech.tams.invest.batch.creditprotectioncertificate.service;
 
 import com.joyintech.batch.batchbase.exception.BatchException;
 import com.joyintech.framework.JoyinRestTemplate;
+import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.*;
@@ -11,13 +12,13 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.batch.creditprotectioncertificate.dao.CreditProtectionCertificatePeriodRunnerMapper;
 import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodExpireDataDto;
+import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodSaveDto;
 import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodWriterDto;
-import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.DateCalService;
+import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.InvDateCalService;
 import com.joyintech.tams.invest.common.component.base.core.BaseGetBussinessId;
 import com.joyintech.tams.invest.common.component.base.group.impl.BasePtlCashPositionInfoServiceImpl;
 import com.joyintech.tams.invest.common.component.base.group.impl.BasePtlSecPositionInfoServiceImpl;
 import com.joyintech.tams.invest.common.constant.InterfCommonConstant;
-import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
@@ -31,12 +32,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;
 
+import static com.joyintech.tams.constant.DictCodeListExt3.流程节点_审批生效;
 import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_新建;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.*;
 
@@ -78,7 +82,7 @@ public class CreditProtectionCertificatePeriodRunnerService {
     private IPlatformDate iPlatformDate;
 
     @Autowired
-    private DateCalService dateCalService;
+    private InvDateCalService invDateCalService;
 
     @Autowired
     private PtlSecPositionFlowMapper ptlSecPositionFlowMapper;
@@ -98,7 +102,16 @@ public class CreditProtectionCertificatePeriodRunnerService {
     @Autowired
     private BasePtlCashPositionInfoServiceImpl basePtlCashPositionInfoServiceImpl;
 
-
+    /**
+     * 是否单体服务
+     */
+    @Value("${application.micorservice.contextPath.single:false}")
+    private boolean isSingle;
+    @Autowired(required = false)
+    @Qualifier("simpleRestTemplate")
+    protected JoyinRestTemplate simpleRestTemplate;
+    @Value("${application.micorservice.contextPath.tamsServer:http://127.0.0.1:8080/tams}")
+    private String tamsServer;
 
     public void dealExpireData(CreditProtectionCertificatePeriodWriterDto writerDto) throws BatchException {
         try {
@@ -222,10 +235,25 @@ public class CreditProtectionCertificatePeriodRunnerService {
 
             sendNewPosition(writerDto);
             dealOldPosition(writerDto, nextWorkDate, false);
+            //信用保护凭证到期风险调用共通处理
+            CreditProtectionCertificatePeriodSaveDto dto = getEntityByBusinessCode(businessCode);
+            String url = String.format("/interf/risk/riskTrial/doOccupy/exchangeTrd/%s/%s/%s", "CreditProtectionCertificatePeriod002", 系统动作_新建.getValue(), 流程节点_审批生效.getValue());
+            if (isSingle) {
+                simpleRestTemplate.postForObject(tamsServer + url, dto, AjaxResult.class);
+            } else {
+                restTemplate.postForObject(tamsServer + url, dto, AjaxResult.class);
+            }
         } catch (Exception e) {
             logger.error("信用保护凭证自动生成错误", e);
             throw new BatchException(RiskUtil.getLogString(e));
         }
+    }
+
+    private CreditProtectionCertificatePeriodSaveDto getEntityByBusinessCode(String businessCode) {
+        CreditProtectionCertificatePeriodSaveDto entity = creditProtectionCertificatePeriodRunnerMapper.getEntityByBusinessCode(businessCode);
+        entity.setCreditEvent(DictCodeListExt1.平安业务类型_到期.getValue());
+        entity.setBillingDetails(creditProtectionCertificatePeriodRunnerMapper.getBillingDetailByBusinessCode(businessCode));
+        return entity;
     }
 
     private String generateBusinessCode() {
@@ -254,9 +282,9 @@ public class CreditProtectionCertificatePeriodRunnerService {
      * 获取下一个工作日
      */
     public Date getNextWorkDay(Date tradeDate, String calendarId) {
-        if (dateCalService != null) {
-            List<String> holiday = dateCalService.getDealCalendarHoliday(tradeDate, DateUtil.addDays(tradeDate, 31), calendarId);
-            return dateCalService.calculationTradingDay(tradeDate, 1, holiday, "1");
+        if (invDateCalService != null) {
+            List<String> holiday = invDateCalService.getDealCalendarHoliday(tradeDate, DateUtil.addDays(tradeDate, 31), calendarId);
+            return invDateCalService.calculationTradingDay(tradeDate, 1, holiday, "1");
         }
         return null;
     }

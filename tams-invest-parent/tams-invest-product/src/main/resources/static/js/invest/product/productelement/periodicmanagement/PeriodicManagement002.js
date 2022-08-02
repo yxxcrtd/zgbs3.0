@@ -214,7 +214,9 @@ $(function () {
                     if (result.investCycle != null) {
                         $('#investCycle2').val(result.investCycle).prop('disabled', false).trigger('change');
                     } else {
-                        $('#investCycle2').val('').prop('disabled', false).trigger('change');
+                        if(pageModel == PAGE_MODEL_NEW) {
+                            $('#investCycle2').val('').prop('disabled', false).trigger('change');
+                        }
                     }
                 }
                 // $('#investCycle2').val(result.investCycle).prop('disabled', true).trigger('change');
@@ -607,11 +609,15 @@ $(function () {
     var getSaveObject = function () {
         var object = $.serializeToObject('#PeriodicManagement002_Form');
 
+        console.log("-----------operateType-------------");
+        console.log(object.operateType);
+
         if ("edit" != object.operateType) {
             object.operateType = "new";
         }
 
         object.pageModel = pageModel;
+        object.workflowId = workflowId;
         object.periodProdId = $('#periodProdId').val();
         if (object.periodProdId == null || object.periodProdId == "") {
             object.periodProdId = $('#periodProdId2').val();
@@ -623,13 +629,16 @@ $(function () {
 
     function saveOrSubmit(operateType) {
         var object = getSaveObject();
-        console.log("-----------object-------------");
-        console.log(object);
+        object.saveOrSubmit = operateType;
+        console.log("-----------object.saveOrSubmit-------------");
+        console.log(object.saveOrSubmit);
 
         Joyin.ajaxJson(basePath + 'invest/product/productelement/periodicmanagement/PeriodicManagement002/check', object, function (result) {
             Joyin.confirm(result.data, function () {
                 clearPublishTypeChange();
                 object = getSaveObject();
+                console.log("-----------object-------------");
+                console.log(object);
 
                 if (operateType == 'save') {
                     WorkFlow.doSaveList(basePath + 'invest/product/productelement/periodicmanagement/PeriodicManagement002/save', object, "PeriodicManagement002_btn_save");

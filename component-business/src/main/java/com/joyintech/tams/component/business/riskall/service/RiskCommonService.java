@@ -35,7 +35,7 @@ import com.joyintech.tams.invest.common.trade.CreditLinesUpdateImpl;
 import com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto;
 import com.joyintech.tams.invest.common.trade.dto.CreditLinesOutputDto;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
-import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +86,8 @@ public class RiskCommonService {
      * 风险占用
      * @param riskCommonInputDto
      */
-    protected void doOccupy(RiskCommonInputDto riskCommonInputDto){
+    protected ClientData doOccupy(RiskCommonInputDto riskCommonInputDto){
+        ClientData resp = new ClientData();
         // 判断授信是否控制
         // 入参不为空、授信控制类别为软控、硬控
         if (!StringUtil.equals(BussinessDictCodeList.监控授信开关_关.getValue(), CacheUtil.getSysParam(BussinessConstant.ISCREDIT)) &&
@@ -152,6 +153,7 @@ public class RiskCommonService {
         }
         // 入参不为空、指标控制类别为软控、硬控
         if (!StringUtil.equals(riskCommonInputDto.getIndicatorOccupy(), DictCodeListRsk.风险占用类型_不占.getValue())
+            && StringUtil.equals(DictCodeList.是否_是.getValue(),CacheUtil.getSysParam("pageRedisFlag"))
             && !StringUtil.isEmptyList(riskCommonInputDto.getRiskRdsDtoList())) {
             InterfRiskRdsDto interfRiskRdsDto = new InterfRiskRdsDto();
             interfRiskRdsDto.setAssetType(riskCommonInputDto.getAssetType());
@@ -212,7 +214,7 @@ public class RiskCommonService {
                 });
             }
             List<Map<String, Object>> sourceList = riskCommonInputDto.getRiskRdsDtoList().stream().map(JsonUtils::object2Map).collect(Collectors.toList());
-            ClientData resp = interfRiskRdsService.sendListDataCommon(sourceList, interfRiskRdsDto.getInfCode());
+            resp = interfRiskRdsService.sendListDataCommon(sourceList, interfRiskRdsDto.getInfCode());
             // 调用接口返回错误信息时抛出异常
             if (resp != null && StringUtil.equals(resp.getHeadField(InterfUtil.std400msgt), InterfUtil.E)
                 && StringUtil.isNotEmpty(resp.getHeadField(InterfUtil.stdrtninfo))) {
@@ -220,6 +222,7 @@ public class RiskCommonService {
             }
 
         }
+        return resp;
     }
 
     /**
@@ -658,5 +661,16 @@ public class RiskCommonService {
             return CollectionUtils.isNotEmpty(dtos);
         }
         return false;
+    }
+
+    /**
+     * 为空或者不控返回true
+     *
+     * @param control
+     * @return
+     */
+    protected boolean isControl(String control) {
+        return StringUtil.isEmpty(control) || StringUtil.equals(control, DictCodeListRsk.风险控制类别_不控.getValue());
+        //return false;
     }
 }

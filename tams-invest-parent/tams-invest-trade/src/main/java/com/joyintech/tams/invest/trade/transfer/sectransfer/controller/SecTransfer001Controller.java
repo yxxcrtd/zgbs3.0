@@ -17,11 +17,13 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.trade.bond.service.TrdBondInvestTrade002Service;
+import com.joyintech.tams.invest.trade.common.aop.TradeRdsCommonAop;
 import com.joyintech.tams.invest.trade.transfer.assign.dto.TrdAssetAssignDto;
 import com.joyintech.tams.invest.trade.transfer.assign.service.TrdAssetAssignService;
 import com.joyintech.tams.invest.trade.transfer.sectransfer.dto.*;
 import com.joyintech.tams.invest.trade.transfer.sectransfer.service.SecTransfer001Service;
 import com.joyintech.tams.invest.trade.transfer.sectransfer.service.TrdBondDuration001Service;
+import com.joyintech.tams.invest.trade.transfer.trdassetsProject.dto.TrdAssetsProject001Dto;
 import com.joyintech.tams.invest.trade.transfer.trdassetsProject.service.TrdAssetsProject001Service;
 import com.joyintech.tams.systemtools.dto.PageElementConfigDto;
 import com.joyintech.tams.systemtools.util.PageElementUtil;
@@ -43,6 +45,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 债券交易转仓
@@ -478,7 +481,7 @@ public class SecTransfer001Controller extends BaseController {
      */
     @RequestMapping("save")
     @ResponseBody
-    AjaxResult save(@RequestBody SecTransfer001Dto dto) throws WorkFlowException {
+    AjaxResult save(@RequestBody SecTransfer001Dto dto) throws Exception {
         ProcessParameter<SecTransfer001Dto> processParameter = new ProcessParameter<>();
         WorkFlowParameter<SecTransfer001Dto> workFlowParameter = new WorkFlowParameter<>();
         workFlowParameter.setPageId(this.getPageId());
@@ -518,6 +521,24 @@ public class SecTransfer001Controller extends BaseController {
                 });
             }
         }
+        // ----------add by 裴家俊 20220704 批量实占功能 start----------
+        if (StringUtil.equals(BussinessConstant.SUBMIT, dto.getOperateType())) {
+            List<SecTransferDto> sec001DtoList=dto.getSecResoluteDtoList().stream().map(item->{
+                SecTransferDto secTransferRisk=new SecTransferDto();
+                BeanUtil.copyPropertiesIgnoreNull(secTransferRisk,item);
+                secTransferRisk.setPortfolioId(dto.getInvestPortfolioId());
+                secTransferRisk.setCounterId(item.getPortfolioId());
+                secTransferRisk.setPs(DictCodeList.交易方向_卖出.getValue());
+                secTransferRisk.setTradeAmtAndFee(StringUtil.isNotEmpty(item.getTradeRepAmt())?item.getTradeRepAmt():item.getFpriceAmt());
+                return secTransferRisk;
+            }).collect(Collectors.toList());
+            AjaxResult ar = TradeRdsCommonAop.doListOccupy(sec001DtoList,
+                    DictCodeList.平安资产类型_债券.getValue(), true, null);
+            if (StringUtil.isNotEmpty(ar)) {
+                return ar;
+            }
+        }
+        // ----------add by 裴家俊 20220704 批量实占功能 end----------
         String msg = secTransfer001Service.start(processParameter, dto);
         return new AjaxResult(msg);
     }

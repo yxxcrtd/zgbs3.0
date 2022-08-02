@@ -16,11 +16,15 @@ import java.util.Date;
 import java.util.List;
 
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.constant.*;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -91,10 +95,14 @@ public class EtrInvestAllInfo001Controller extends BaseController {
         model.addAttribute("F16", DictCodeListExt2.平安资产类型_利率互换.getValue());
         model.addAttribute("F17", DictCodeListExt2.平安资产类型_一级市场债.getValue());
         model.addAttribute("F36", DictCodeListExt1.金融产品类型_投管用_立项指令.getValue());
+        model.addAttribute("F37", DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue());
         model.addAttribute("IRS_TYPE", DictCode.互换方式.getValue());
         model.addAttribute("PS_T04", DictCodeList.交易方向_申购.getValue());
         model.addAttribute("PS_T49", DictCodeListExt3.交易方向_债转股.getValue());
-        
+        model.addAttribute("PS_T01", DictCodeList.交易方向_买入.getValue());
+        model.addAttribute("PS_T02", DictCodeList.交易方向_卖出.getValue());
+        model.addAttribute("PS_T03", DictCodeList.交易方向_行权_回售.getValue());
+
         model.addAttribute("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
         model.addAttribute("TRADE_PLACE_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
         model.addAttribute("F19", DictCodeListExt3.平安资产类型_权益类资产.getValue());
@@ -110,6 +118,7 @@ public class EtrInvestAllInfo001Controller extends BaseController {
         model.addAttribute("ENTRUST_CREATE_SOURCE_02", DictCodeListExt3.指令创建来源_场内实时.getValue());
         model.addAttribute("ENTRUST_CLASS_01", DictCodeListExt3.投资指令类型_单组合单资产指令.getValue());
         model.addAttribute("ENTRUST_CLASS_02", DictCodeListExt3.投资指令类型_多组合单资产指令.getValue());
+        model.addAttribute("TRD75", DictCodeListExt3.共通业务类型_立项指令.getValue());
 
         return super.init(model);
     }
@@ -184,6 +193,16 @@ public class EtrInvestAllInfo001Controller extends BaseController {
             RequestUtil.getPageParam());
         return page;
     }
+
+    @ApiOperation(value = "获取债券基本信息", notes = "获取债券基本信息")
+    @ResponseBody
+    @PostMapping("/getBasicInfo")
+    public Message<EtrInvestAllInfoDto> getBasicInfo(@RequestBody EtrInvestAllInfoDto request){
+        String entrustId = request.getEntrustId();
+        EtrInvestAllInfoDto resultDto = etrInvestAllInfoService.getById(entrustId);
+        return new Message<EtrInvestAllInfoDto>().success().setData(resultDto);
+    }
+
     /**
      * 文件导出 <功能详细描述>
      * 

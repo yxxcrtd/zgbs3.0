@@ -25,6 +25,8 @@ import com.joyintech.tams.invest.common.riskinfrds.info.service.AssetInfoRedisSe
 import com.joyintech.tams.invest.common.risktrialrds.util.Const;
 import com.joyintech.workflow.engine.constant.OperationType;
 import org.aspectj.lang.JoinPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -41,6 +43,8 @@ import java.util.function.Consumer;
  * @since 1.0
  */
 public abstract class AopBaseService<V extends IRiskRds>  {
+
+    private Logger logger = LoggerFactory.getLogger(AopBaseService.class);
 
     /**
      * 资产基本信息更新Redis服务
@@ -97,6 +101,7 @@ public abstract class AopBaseService<V extends IRiskRds>  {
                     }
                 }
             } catch (Exception e) {
+                logger.error("===completePeriodCommon error===", e);
                 throw new BusinessException(e);
             }
         });

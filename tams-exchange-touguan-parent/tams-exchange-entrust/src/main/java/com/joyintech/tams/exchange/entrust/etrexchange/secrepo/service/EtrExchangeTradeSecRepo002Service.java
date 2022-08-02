@@ -42,7 +42,7 @@ import com.joyintech.tams.invest.common.dto.position.PositionCashSecDto;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeCommonervice;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.systemtools.util.CommonUtil;
-import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,6 +130,7 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                 param.put("TRADE_PLACE_03", BussinessDictCodeList.交易场所_深圳证券交易所.getValue());
                 param.put("TRADE_PLACE_04", BussinessDictCodeList.交易场所_上海证券交易所.getValue());
                 param.put("type6_B14",DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue());
+                param.put("type6_B16",DictCodeList.WIND一级分类_含债券一级分类等_可分离转债存债.getValue());
 //                param.put("CUSTOM_ASSET_TYPE_FOUR_013", DictCodeListExt3.行内资产四级分类_可转债.getValue()); // 可转债
                 param.put("search_isNumberFlag", CommonUtil.isNumeric(dto.getSearch()));
                 if (StringUtil.isNotEmpty((String) param.get("finprodMarketIds"))) {
@@ -458,13 +459,13 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
     }
 
     public static String getKey(BaseMap bm) {
-        return bm.getString("PORTFOLIO_ID") + bm.get("FINPROD_ID");
+        return bm.getString("PORTFOLIO_ID") + bm.get("SECACCTID") + bm.get("FINPROD_ID");
     }
 
     private Page<EtrExchangeTradePositionsSecRepoResponse> calculationAmount(Map<String, EtrExchangeUnitCostDto> unitCostMap, Page<EtrExchangeTradePositionsSecRepoResponse> pages, String platDate) {
         if (pages != null && pages.getRoot() != null && !pages.getRoot().isEmpty()) {
             pages.getRoot().forEach(r -> {
-                EtrExchangeUnitCostDto dto = unitCostMap.get(r.getPortfolioId() + r.getFinprodId());
+                EtrExchangeUnitCostDto dto = unitCostMap.get(r.getPortfolioId() +r.getSecAcctId()+ r.getFinprodId());
                 if (dto != null) {
                     // 1.持仓成本（元）
                     r.setPositionsAmt(dto.getBuyCostAmt());

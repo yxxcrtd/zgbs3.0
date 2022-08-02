@@ -17,7 +17,6 @@ import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.invest.batch.mproddivreindealgen.dao.MProdDivReinDealGenMapper;
-import com.joyintech.tams.invest.batch.susprdfutureopenplangen.dao.DateCalcMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;

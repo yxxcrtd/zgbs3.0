@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
@@ -221,7 +222,12 @@ public class EntrustCancelProcessor {
             //非大宗意向申报
             if (!EntrustUtils.isIntentionEntrust(entrust.getEntrustProp())) {
                 if (instruction.volumeInstruction()) {
-                    instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() - unFrozenVolume));
+                    if (EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg())
+                            && !BusiTypeTgEnum.首期.codeEquals(instruction.getBusiTypeTg())) {
+                        instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() - instruction.getEntrustNum()));
+                    } else {
+                        instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() - unFrozenVolume));
+                    }
                 } else if (instruction.getEntrustAmt().doubleValue() > 0) {
                     if (instruction.getFrozenQuantity().doubleValue() > 0) {
                         // 金额指令全部以净价处理， 需要重新计算指令金额冻结

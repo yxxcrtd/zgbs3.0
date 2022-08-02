@@ -1,6 +1,9 @@
 package com.joyintech.tams.invest.common.dto.settle.balance;
 
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.common.base.entity.LqdPipelineMatch;
+
+import java.util.Date;
 
 /**
  * @program: tams-invest-parent
@@ -39,6 +42,11 @@ public class BaseCashFlowBalanceManagementDto extends LqdPipelineMatch {
     }
 
     /**
+     * 交易到期日
+     */
+    private Date mdate;
+
+    /**
      * 设置 ps
      *
      * @param ps ps
@@ -73,5 +81,15 @@ public class BaseCashFlowBalanceManagementDto extends LqdPipelineMatch {
         this.finprodId = finprodId;
     }
 
+    public Date getMdate() {
+        return mdate;
+    }
 
+    public void setMdate(Date mdate) {
+        this.mdate = mdate;
+    }
+
+    public String getMdateStr() {
+        return DateUtil.format(mdate);
+    }
 }

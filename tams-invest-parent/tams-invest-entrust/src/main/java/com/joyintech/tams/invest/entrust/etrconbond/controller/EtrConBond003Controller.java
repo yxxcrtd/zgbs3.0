@@ -16,6 +16,7 @@ import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
@@ -162,12 +163,14 @@ public class EtrConBond003Controller extends BaseController {
             return ajaxResult;
         }
         List<EtrConBondDto> dtoList = allDto.getSelectedItem();
+        allDto.setBusiTypePosition(DictCodeListExt3.投管业务类型_可转债申购.getValue());
         for(EtrConBondDto dto: dtoList) {
             if(!StringUtil.isNotEmpty(dto.getEntrustId())){
                 BussinessCodeParameter param = new BussinessCodeParameter();
                 param.setCommonBusinessExtType(DictCodeListExt2.fromDictCodeList(DictCodeListExt2.共通业务类型_可转债申购委托));
                 String code = bussGetBussinessIdService !=null ? bussGetBussinessIdService.buildBussinessCode(param):IDGenerator.generate();
                 dto.setEntrustId(code);
+                dto.setBusiTypePosition(DictCodeListExt3.投管业务类型_可转债申购.getValue());
             }
             dto.getEtrInvestPersonInfo().setInvManagerId(dto.getCreateUser());
             dto.getEtrInvestPersonInfo().setRoom(dto.getCreateDept());

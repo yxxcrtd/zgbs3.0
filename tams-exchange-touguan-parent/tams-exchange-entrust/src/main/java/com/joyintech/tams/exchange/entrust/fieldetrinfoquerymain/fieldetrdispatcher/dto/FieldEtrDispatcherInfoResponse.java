@@ -191,6 +191,27 @@ public class FieldEtrDispatcherInfoResponse extends FieldEtrDispatcherBaseInfo {
 
     private String finprodId;
 
+    @ApiModelProperty(name="advanceRecoveryDate",value="提前购回日")
+    private String advanceRecoveryDate;
+
+    @ApiModelProperty(name = "exchangeAmount", value = "换出金额")
+    private BigDecimal exchangeAmount;
+
+    @ApiModelProperty(name = "swapIntoBonds", value = "换入债券")
+    private String swapIntoBonds;
+
+    @ApiModelProperty(name = "swapIntoBondsVolume", value = "换入债券数量")
+    private BigDecimal swapIntoBondsVolume;
+
+    @ApiModelProperty(name = "swapOutBonds", value = "换出债券")
+    private String swapOutBonds;
+
+    @ApiModelProperty(name = "swapOutBondsVolume", value = "换出债券数量")
+    private BigDecimal swapOutBondsVolume;
+
+    @ApiModelProperty(name = "newDiscount", value = "新折算率")
+    private BigDecimal newDiscount;
+
     public String getFinprodId() {
         return finprodId;
     }
@@ -784,5 +805,89 @@ public class FieldEtrDispatcherInfoResponse extends FieldEtrDispatcherBaseInfo {
 
     public void setBiddingProductDtos(List<FieldEtrBiddingProductDto> biddingProductDtos) {
         this.biddingProductDtos = biddingProductDtos;
+    }
+
+    public String getAdvanceRecoveryDate() {
+        return advanceRecoveryDate;
+    }
+
+    public void setAdvanceRecoveryDate(String advanceRecoveryDate) {
+        this.advanceRecoveryDate = advanceRecoveryDate;
+    }
+
+    public void setOtherSettleSpeed(String otherSettleSpeed) {
+        this.otherSettleSpeed = otherSettleSpeed;
+    }
+
+    public void setOtherPriceModel(String otherPriceModel) {
+        this.otherPriceModel = otherPriceModel;
+    }
+
+    public BigDecimal getExchangeAmount() {
+        return exchangeAmount;
+    }
+
+    public void setExchangeAmount(BigDecimal exchangeAmount) {
+        this.exchangeAmount = exchangeAmount;
+    }
+
+    public String getSwapIntoBonds() {
+        return swapIntoBonds;
+    }
+
+    public void setSwapIntoBonds(String swapIntoBonds) {
+        this.swapIntoBonds = swapIntoBonds;
+    }
+
+    public BigDecimal getSwapIntoBondsVolume() {
+        return swapIntoBondsVolume;
+    }
+
+    public void setSwapIntoBondsVolume(BigDecimal swapIntoBondsVolume) {
+        this.swapIntoBondsVolume = swapIntoBondsVolume;
+    }
+
+    public String getSwapOutBonds() {
+        return swapOutBonds;
+    }
+
+    public void setSwapOutBonds(String swapOutBonds) {
+        this.swapOutBonds = swapOutBonds;
+    }
+
+    public BigDecimal getSwapOutBondsVolume() {
+        return swapOutBondsVolume;
+    }
+
+    public void setSwapOutBondsVolume(BigDecimal swapOutBondsVolume) {
+        this.swapOutBondsVolume = swapOutBondsVolume;
+    }
+
+    public BigDecimal getNewDiscount() {
+        return newDiscount;
+    }
+
+    public void setNewDiscount(BigDecimal newDiscount) {
+        this.newDiscount = newDiscount;
+    }
+
+    private String backDate;
+
+    public String getBackDate() {
+        return backDate;
+    }
+
+    public void setBackDate(String backDate) {
+        this.backDate = backDate;
+    }
+
+    public String getRepoMdate() {
+        if(!StringUtils.isEmpty(this.getBackDate())){
+            return DateUtil.formatDateAddSplit(this.getBackDate());
+        }
+        if (StringUtil.isBlank(getRepoTerm()) || StringUtil.isBlank(getVpayDate())) {
+            return null;
+        }
+        return DateUtil.addDay(getVpayDate(), Integer.parseInt(getRepoTerm()));
     }
 }

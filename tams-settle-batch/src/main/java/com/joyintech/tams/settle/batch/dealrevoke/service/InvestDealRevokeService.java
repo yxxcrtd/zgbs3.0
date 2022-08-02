@@ -138,13 +138,16 @@ public class InvestDealRevokeService {
         param.put("PURCH_MODLE_02", DictCodeListExt3.申购方式_网下申购.getValue());
         List<String> totalTradeIdTgMs = investDealRevokeMapper.selectTotalTradeIdTgM(param);
 
-
+        // XYHGFXSJ-163:totalTradeIdTgMs不为空时再删除交收结果表 modify by fuyongsheng 20220719 start
         //删除交收结果表（交收成功的交易对应的交收结果删除）
-        param.put("totalTradeIdList", totalTradeIdTgMs);
-        param.put("DELIVERY_STATUS_02",DictCodeListExt3.交收状态_已交收.getValue());
-        List<String>  manualSettleIdTgMs = investDealRevokeMapper.selectManualSettleIdTgM(param);
-        investDealRevokeMapper.deleteManualSetDetailBySettleId(manualSettleIdTgMs);
-        investDealRevokeMapper.deleteManualSettleInfoBySettleId(manualSettleIdTgMs);
+        if(!CollectionUtils.isEmpty(totalTradeIdTgMs)){
+            param.put("totalTradeIdList", totalTradeIdTgMs);
+            param.put("DELIVERY_STATUS_02",DictCodeListExt3.交收状态_已交收.getValue());
+            List<String>  manualSettleIdTgMs = investDealRevokeMapper.selectManualSettleIdTgM(param);
+            investDealRevokeMapper.deleteManualSetDetailBySettleId(manualSettleIdTgMs);
+            investDealRevokeMapper.deleteManualSettleInfoBySettleId(manualSettleIdTgMs);
+        }
+        // XYHGFXSJ-163:totalTradeIdTgMs不为空时再删除交收结果表 modify by fuyongsheng 20220719 end
 
         param.put("psList",  Arrays.asList(DictCodeList.交易方向_上市流通.getValue()));
         param.put("busiType", DictCodeList.共通业务类型_债券类资产交易.getValue());
@@ -199,8 +202,10 @@ public class InvestDealRevokeService {
         param.put("psDurList", Arrays.asList(DictCodeList.交易方向_到期续做.getValue(), DictCodeList.交易方向_到期.getValue()
                 , DictCodeListExt3.交易方向_投资端_提前终止.getValue(),DictCodeListExt3.交易方向_中途换券.getValue(),DictCodeListExt3.交易方向_解除质押.getValue()
                 ,DictCodeList.交易方向_收息到账.getValue(),DictCodeList.交易方向_还本到账.getValue()));
-        param.put("tgBusiTypeList",Arrays.asList(DictCodeListExt3.平安业务类型_债券质押式逆回购.getValue(),DictCodeListExt3.平安业务类型_债券质押式正回购.getValue()
-                ,DictCodeListExt1.平安业务类型_正回购到期.getValue(),DictCodeListExt1.平安业务类型_逆回购到期.getValue()));
+//        param.put("tgBusiTypeList",Arrays.asList(DictCodeListExt3.平安业务类型_债券质押式逆回购.getValue(),DictCodeListExt3.平安业务类型_债券质押式正回购.getValue()
+//                ,DictCodeListExt1.平安业务类型_正回购到期.getValue(),DictCodeListExt1.平安业务类型_逆回购到期.getValue()));
+        param.put("finprodType2List", Arrays.asList(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue()
+                ,DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue()));
         param.put("isRepoFund",DictCodeList.是否_是.getValue());
         param.put("tradeMarketList",Arrays.asList(DictCodeListExt1.交易场所_上海证券交易所.getValue(),DictCodeListExt1.交易场所_深圳证券交易所.getValue()));
         return investDealRevokeMapper.selectTotalTradeIdTgM(param);

@@ -55,6 +55,10 @@
         <result column="IS_CASHSET" property="isCashset" jdbcType="VARCHAR" />
         <result column="IS_MANUAL_RELEASE" property="isManualRelease" jdbcType="VARCHAR" />
         <result column="R_FINPROD_ID" property="rFinprodId" jdbcType="VARCHAR" />
+        <result column="DEALER_NO" property="dealerNo" jdbcType="VARCHAR" />
+        <result column="OUT_DEALER_NO" property="outDealerNo" jdbcType="VARCHAR" />
+        <result column="DEALER_PARTY_NO" property="dealerPartyNo" jdbcType="VARCHAR" />
+        <result column="OUT_DEALER_PARTY_NO" property="outDealerPartyNo" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
         TRADE_ID TRADE_ID, PORTFOLIO_ID PORTFOLIO_ID, CUSTOM_CASH_TYPE CUSTOM_CASH_TYPE, 
@@ -71,7 +75,8 @@
         TERMINATE_RATE TERMINATE_RATE, PENALTY_INTAMT PENALTY_INTAMT, EXP_CON_VALUE EXP_CON_VALUE,
         SPO_SHARE_NUM SPO_SHARE_NUM, FIRST_UNIT_CPRICE3 FIRST_UNIT_CPRICE3, PREB PREB, PREC PREC, 
         RELEASE_STATUS RELEASE_STATUS, IS_CASHSET IS_CASHSET, IS_MANUAL_RELEASE IS_MANUAL_RELEASE,
-        R_FINPROD_ID R_FINPROD_ID
+        R_FINPROD_ID R_FINPROD_ID, DEALER_NO DEALER_NO, OUT_DEALER_NO OUT_DEALER_NO, DEALER_PARTY_NO DEALER_PARTY_NO,
+        OUT_DEALER_PARTY_NO OUT_DEALER_PARTY_NO
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -111,7 +116,8 @@
             TERMINATE_RATE, PENALTY_INTAMT, EXP_CON_VALUE,
             SPO_SHARE_NUM, FIRST_UNIT_CPRICE3, PREB, 
             PREC, RELEASE_STATUS, IS_CASHSET,
-            IS_MANUAL_RELEASE, R_FINPROD_ID)
+            IS_MANUAL_RELEASE, R_FINPROD_ID,
+            DEALER_NO, OUT_DEALER_NO, DEALER_PARTY_NO, OUT_DEALER_PARTY_NO)
         values (#{tradeId,jdbcType=VARCHAR}, #{portfolioId,jdbcType=VARCHAR}, #{customCashType,jdbcType=VARCHAR}, 
             #{genType,jdbcType=VARCHAR}, #{purCfmDate,jdbcType=DATE}, #{redCfmDate,jdbcType=DATE}, 
             #{regDate,jdbcType=DATE}, #{bonusCfmDate,jdbcType=DATE}, #{entrustId,jdbcType=VARCHAR}, 
@@ -129,7 +135,8 @@
             #{terminateRate,jdbcType=DECIMAL}, #{penaltyIntamt,jdbcType=DECIMAL}, #{expConValue,jdbcType=DECIMAL},
             #{spoShareNum,jdbcType=DECIMAL}, #{firstUnitCprice3,jdbcType=DECIMAL}, #{preb,jdbcType=DECIMAL}, 
             #{prec,jdbcType=DECIMAL}, #{releaseStatus,jdbcType=VARCHAR}, #{isCashset,jdbcType=VARCHAR},
-            #{isManualRelease,jdbcType=VARCHAR}, #{rFinprodId,jdbcType=VARCHAR})
+            #{isManualRelease,jdbcType=VARCHAR}, #{rFinprodId,jdbcType=VARCHAR}, #{dealerNo,jdbcType=VARCHAR},
+            #{outDealerNo,jdbcType=VARCHAR}, #{dealerPartyNo,jdbcType=VARCHAR}, #{outDealerPartyNo,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.TrdProductDealAdd" >
         insert into TRD_PRODUCT_DEAL_ADD
@@ -293,6 +300,18 @@
             <if test="rFinprodId != null" >
                 R_FINPROD_ID,
             </if>
+            <if test="dealerNo != null" >
+                DEALER_NO,
+            </if>
+            <if test="outDealerNo != null" >
+                OUT_DEALER_NO,
+            </if>
+            <if test="dealerPartyNo != null" >
+                DEALER_PARTY_NO,
+            </if>
+            <if test="outDealerPartyNo != null" >
+                OUT_DEALER_PARTY_NO,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="tradeId != null" >
@@ -454,6 +473,18 @@
             <if test="rFinprodId != null" >
                 #{rFinprodId,jdbcType=VARCHAR},
             </if>
+            <if test="dealerNo != null" >
+                #{dealerNo,jdbcType=VARCHAR},
+            </if>
+            <if test="outDealerNo != null" >
+                #{outDealerNo,jdbcType=VARCHAR},
+            </if>
+            <if test="dealerPartyNo != null" >
+                #{dealerPartyNo,jdbcType=VARCHAR},
+            </if>
+            <if test="outDealerPartyNo != null" >
+                #{outDealerPartyNo,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.TrdProductDealAdd" >
@@ -465,7 +496,7 @@
         LOCK_MDATE, WITH_LOCK_PERIOD, REF_RATE, DEVIATION, ASSET_RECOMMAND_ORG, PURCH_MODLE,
         PURCH_TYPE, PURCH_DATE, PUR_PAY_DATE, DEPOSIT_AMT, TERMINATE_RATE, PENALTY_INTAMT,
         EXP_CON_VALUE, SPO_SHARE_NUM, FIRST_UNIT_CPRICE3, PREB, PREC, RELEASE_STATUS, IS_CASHSET,
-        IS_MANUAL_RELEASE, R_FINPROD_ID)
+        IS_MANUAL_RELEASE, R_FINPROD_ID, DEALER_NO, OUT_DEALER_NO, DEALER_PARTY_NO, OUT_DEALER_PARTY_NO)
         select TRADE_ID, PORTFOLIO_ID, CUSTOM_CASH_TYPE, GEN_TYPE, 
             PUR_CFM_DATE, RED_CFM_DATE, REG_DATE, BONUS_CFM_DATE, ENTRUST_ID, PAY_TYPE, CREATE_USER, 
             CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, RED_PROFIT, RED_COST, REG_DATE_AMT, 
@@ -474,7 +505,7 @@
             LOCK_MDATE, WITH_LOCK_PERIOD, REF_RATE, DEVIATION, ASSET_RECOMMAND_ORG, PURCH_MODLE,
             PURCH_TYPE, PURCH_DATE, PUR_PAY_DATE, DEPOSIT_AMT, TERMINATE_RATE, PENALTY_INTAMT,
             EXP_CON_VALUE, SPO_SHARE_NUM, FIRST_UNIT_CPRICE3, PREB, PREC, RELEASE_STATUS, IS_CASHSET,
-            IS_MANUAL_RELEASE, R_FINPROD_ID
+            IS_MANUAL_RELEASE, R_FINPROD_ID, DEALER_NO, OUT_DEALER_NO, DEALER_PARTY_NO, OUT_DEALER_PARTY_NO
              from TRD_PRODUCT_DEAL_ADD
              where 1 = 1 and TRADE_ID = #{tradeId,jdbcType=VARCHAR}
     </insert>
@@ -628,6 +659,18 @@
             <if test="rFinprodId != null" >
                 R_FINPROD_ID = #{rFinprodId,jdbcType=VARCHAR},
             </if>
+            <if test="dealerNo != null" >
+                DEALER_NO = #{dealerNo,jdbcType=VARCHAR},
+            </if>
+            <if test="outDealerNo != null" >
+                OUT_DEALER_NO = #{outDealerNo,jdbcType=VARCHAR},
+            </if>
+            <if test="dealerPartyNo != null" >
+                DEALER_PARTY_NO = #{dealerPartyNo,jdbcType=VARCHAR},
+            </if>
+            <if test="outDealerPartyNo != null" >
+                OUT_DEALER_PARTY_NO = #{outDealerPartyNo,jdbcType=VARCHAR},
+            </if>
         </set>
         where TRADE_ID = #{tradeId,jdbcType=VARCHAR}
     </update>
@@ -681,7 +724,11 @@
             RELEASE_STATUS = #{releaseStatus,jdbcType=VARCHAR},
             IS_CASHSET = #{isCashset,jdbcType=VARCHAR},
             IS_MANUAL_RELEASE = #{isManualRelease,jdbcType=VARCHAR},
-            R_FINPROD_ID = #{rFinprodId,jdbcType=VARCHAR}
+            R_FINPROD_ID = #{rFinprodId,jdbcType=VARCHAR},
+            DEALER_NO = #{dealerNo,jdbcType=VARCHAR},
+            OUT_DEALER_NO = #{outDealerNo,jdbcType=VARCHAR},
+            DEALER_PARTY_NO = #{dealerPartyNo,jdbcType=VARCHAR},
+            OUT_DEALER_PARTY_NO = #{outDealerPartyNo,jdbcType=VARCHAR}
         where TRADE_ID = #{tradeId,jdbcType=VARCHAR}
     </update>
 </mapper>

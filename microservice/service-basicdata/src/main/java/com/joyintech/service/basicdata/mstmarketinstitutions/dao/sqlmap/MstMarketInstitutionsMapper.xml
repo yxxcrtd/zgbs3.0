@@ -254,6 +254,13 @@
 		from
 			MST_CUSTOMER_INFO where CUSTOMER_NAME = #{customerName,jdbcType=VARCHAR} and CUSTOMER_TYPE = #{customerType,jdbcType=VARCHAR}
 	</select>
+
+	<select id="insitituteCodeCheck" parameterType="Map" resultType="java.lang.Integer">
+		select
+			count(1)
+		from
+			MST_CUSTOMER_INFO_ADD where INSITITUTE_CODE = #{insitituteCode,jdbcType=VARCHAR}
+	</select>
 	
 	<resultMap id="BaseResultMap1" type="com.joyintech.tams.common.base.entity.InterfCmsInstitution" >
         <result column="CUSTOMER_ID" property="customerId" jdbcType="VARCHAR" />

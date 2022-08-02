@@ -219,7 +219,7 @@ public class EtrConBondDto extends EtrEntrust implements ProcessEntity {
      */
     private String assetType1;
 
-
+    private String busiTypePosition;
 
 
     /**
@@ -735,6 +735,14 @@ public class EtrConBondDto extends EtrEntrust implements ProcessEntity {
 
     public void setAssetType1(String assetType1) {
         this.assetType1 = assetType1;
+    }
+
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
     }
 
     public BigDecimal getWinlotteryAmt() {

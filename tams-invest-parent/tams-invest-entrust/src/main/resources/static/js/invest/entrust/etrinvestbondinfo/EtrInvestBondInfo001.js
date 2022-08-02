@@ -5,7 +5,7 @@
     /**
      * 获取查询参数
      */
-    var searchform =function(){ 
+    var searchform =function(){
         var object = {
             portfolioId: $('#portfolioId').val()
             ,type9: $('#type9').val()
@@ -17,11 +17,11 @@
             ,tradeMarketMode: $('#tradeMarketMode').val()
             ,tradePlat: $('#tradePlat').val()
             ,ps: $('#ps').val()
-            ,entrustStatus: $('#entrustStatus').val()            
+            ,entrustStatus: $('#entrustStatus').val()
             ,startDate: $('#startDate').val()
             ,endDate: $('#endDate').val()
             ,priceModel: $('#priceModel').val()
-        };         
+        };
 //        object.finprodId = $('#finprodId_hidden').val();
 //        if(object.bondType){
 //            object.bondType = object.bondType.join(',');
@@ -45,7 +45,7 @@
         }
         return object;
     };
-    /** 
+    /**
      * 多组合指令
      */
     function showCmdDialog() {
@@ -76,8 +76,8 @@
             table.reload();
         });
     });
-    
-    /** 
+
+    /**
      * 新建
      */
     function showDialog() {
@@ -154,7 +154,7 @@
     /**
      * 导出
      */
-    var exportExcel = function(){       
+    var exportExcel = function(){
         Joyin.exportExcel(basePath+"invest/entrust/etrinvestbondinfo/EtrInvestBondInfo001/export", searchform());
     };
 
@@ -199,10 +199,10 @@
      * 资产代码链接
      */
     table.bind('click','.finprodIdLink', function(row) {
-        //在新建界面进行显示单行的详细信息
+        //在新建界面进行显示单行的详细信息                 // + "invest/asset/bond/FinBondTargetAsset002/init",
         Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
                  basePath
-                + "invest/asset/bond/FinBondTargetAsset002/init",
+                + "home.html?a=a&finprodMarketId=" + row.finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a",
                 "95%", "80%", {pageModel:PAGE_MODEL_REFERENCE,
                                 finprodId:row.finprodId,  //金融产品代码
                                 //valDate:data.valDate,//估值日
@@ -292,7 +292,7 @@
                 $('#tradePlat').val('').trigger('change').attr('disabled',false);
             }
         });
-        
+
       //是否展示资产四五级分类
         if(IS_SHOW_TYPE == '01'){
         	$('#type11Div').show();

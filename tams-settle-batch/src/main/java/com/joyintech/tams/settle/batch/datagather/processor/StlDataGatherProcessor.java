@@ -7,6 +7,7 @@ import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.dao.FinDealPledgeMapper;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
@@ -35,6 +36,9 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
     private static Logger logger = LoggerFactory.getLogger(StlDataGatherProcessor.class);
     @Autowired
     protected StlDataGatherMapper stlDataGatherMapper;
+
+    @Autowired
+    protected FinDealPledgeMapper finDealPledgeMapper;
 
     @Autowired
     private StlDataGatherService stlDataGatherService;
@@ -271,10 +275,13 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
             this.checkAgreRepEntrustAmt(settleTransDataDto, currEtrEntrust, entrustIds);
         }
         // 协议回购当且仅有一条指令满足条件时,自动匹配
+        // XYHGFXSJ-94:协议回购匹配指令数量大于1时,不能自动匹配，但是可以在页面手动匹配,需要更新指令的状态 modify by fuyongsheng 20220718 start
         if(entrustIds.size() == 1){
             exchangeTransMatchCommonDto.setEntrustIdList(entrustIds);
-            needUpdateStatusEntrustIdList.addAll(entrustIds);
+            // needUpdateStatusEntrustIdList.addAll(entrustIds);
         }
+        needUpdateStatusEntrustIdList.addAll(entrustIds);
+        // XYHGFXSJ-94:协议回购匹配指令数量大于1时,不能自动匹配，但是可以在页面手动匹配,需要更新指令的状态 modify by fuyongsheng 20220718 end
     }
 
     /**
@@ -567,8 +574,11 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
                     ||
                     (DictCodeList.交易方向_到期.getValue().equals(settlePs))
                     && DictCodeListExt3.交易方向_到期购回.getValue().equals(etrEntrustDto.getPs())){ // 清算的到期 = 指令的到期购回
-                if(etrEntrustDto.getTradeId().equals(settleTransDataDto.getfCjbh())
-                    && etrEntrustDto.getVpayDate().equals(settleTransDataDto.getVdate())){
+                if(
+//                        etrEntrustDto.getTradeId().equals(settleTransDataDto.getfCjbh())
+//                    && etrEntrustDto.getVpayDate().equals(settleTransDataDto.getVdate())
+                        settleTransDataDto.getFinprodId().equals(etrEntrustDto.getFinprodId())
+                ){
                     matchEtrEntrustList.add(etrEntrustDto);
                 }
             }else if(DictCodeList.交易方向_到期续做.getValue().equals(settlePs)){
@@ -584,15 +594,17 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
                 }
             }else if(DictCodeListExt3.交易方向_中途换券.getValue().equals(settlePs)
                     || DictCodeListExt3.交易方向_解除质押.getValue().equals(settlePs)){
-                if(DictCodeListExt3.交易方向_中途换券.getValue().equals(settlePs)){
-                    pledges = pledges.stream().filter(pledge ->
-                            DictCodeListExt3.质押券置换_置换方向_换入.getValue().equals(pledge.getDisplaceDirection()))
-                            .collect(Collectors.toList());
-                }
-                if(settlePs.equals(etrEntrustDto.getPs()) && CollectionUtils.isNotEmpty(pledges)
-                    && pledges.get(0).getPledgeFinprodId().equals(etrEntrustDto.getFinprodId())
-                    && etrEntrustDto.getTradeId().equals(settleTransDataDto.getfCjbh())
-                    && etrEntrustDto.getVpayDate().equals(settleTransDataDto.getVdate())){
+//                if(DictCodeListExt3.交易方向_中途换券.getValue().equals(settlePs)){
+//                    pledges = pledges.stream().filter(pledge ->
+//                            DictCodeListExt3.质押券置换_置换方向_换入.getValue().equals(pledge.getDisplaceDirection()))
+//                            .collect(Collectors.toList());
+//                }
+                if(settlePs.equals(etrEntrustDto.getPs()) && settleTransDataDto.getFinprodId().equals(etrEntrustDto.getFinprodId())
+                    // && CollectionUtils.isNotEmpty(pledges)
+                    // && pledges.get(0).getPledgeFinprodId().equals(etrEntrustDto.getFinprodId())
+//                    && etrEntrustDto.getTradeId().equals(settleTransDataDto.getfCjbh())
+//                    && etrEntrustDto.getVpayDate().equals(settleTransDataDto.getVdate())
+                ){
                     matchEtrEntrustList.add(etrEntrustDto);
                 }
             }

@@ -21,6 +21,7 @@ import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.system.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.common.base.entity.FinProductAdd;
+import com.joyintech.tams.common.base.entity.PaPtlPortfolio;
 import com.joyintech.tams.common.base.entity.PtlPortfolio;
 import com.joyintech.tams.component.business.asset.dto.BussFinIntPayDto;
 import com.joyintech.tams.component.business.prod.dto.BussFinProductOpenPlanDto;
@@ -241,6 +242,12 @@ public class FinPlanAssetCDto extends FinProduct implements ProcessEntity{
      */
     private PtlPortfolio ptlPortfolio;
     //add end
+    // add by swwan TISHKS-1483 start
+    /**
+     * pa组合entity
+     */
+    private PaPtlPortfolio paPtlPortfolio;
+    // add by swwan TISHKS-1483 end
     /**
      * 交易方式
      *//*
@@ -1235,5 +1242,13 @@ public class FinPlanAssetCDto extends FinProduct implements ProcessEntity{
 
     public void setBussFinProductOpenPlanRedDto(BussFinProductOpenPlanDto bussFinProductOpenPlanRedDto) {
         this.bussFinProductOpenPlanRedDto = bussFinProductOpenPlanRedDto;
+    }
+
+    public PaPtlPortfolio getPaPtlPortfolio() {
+        return paPtlPortfolio;
+    }
+
+    public void setPaPtlPortfolio(PaPtlPortfolio paPtlPortfolio) {
+        this.paPtlPortfolio = paPtlPortfolio;
     }
 }

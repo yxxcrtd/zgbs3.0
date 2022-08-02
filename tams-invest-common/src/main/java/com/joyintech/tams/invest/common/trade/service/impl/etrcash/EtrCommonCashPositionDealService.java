@@ -319,7 +319,7 @@ public class EtrCommonCashPositionDealService extends BaseService {
         SecInfoModelDto secInfoModelDto = getSecInfoModel(finprodId);
         SecInfoModel secInfoModel = this.toSecInfoModel(secInfoModelDto);
         List<SecIntSchedule> invScheduleList = new ArrayList<>();
-        List<FinCashPlanDto> intSchList = new ArrayList<FinCashPlanDto>();
+        List<FinCashPlanDto> intSchList = new ArrayList<>();
         for (FinCashPlanDto item : finCashPlanList) {
             if (StringUtil.equals(item.getCashType1(),
                     DictCodeListExt1.现金流一级类型_利息.getValue())
@@ -1636,7 +1636,8 @@ public class EtrCommonCashPositionDealService extends BaseService {
         if(null != etrEntrust){
             if((StringUtil.equals(DictCodeListExt3.投资指令类型_多组合单资产指令.getValue(),etrEntrust.getEntrustClass())&&
                     CollectionUtils.isEmpty(etrEntrustDetailList))
-            || StringUtils.equals(etrEntrust.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())) {
+            || (StringUtils.equals(etrEntrust.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue()) &&
+                    CollectionUtils.isEmpty(etrEntrustDetailList))) {
                 WflEtrEntrustDetailKey wflEtrEntrustDetailKey = new WflEtrEntrustDetailKey();
                 wflEtrEntrustDetailKey.setEntrustId(entrustId);
                 wflEtrEntrustDetailKey.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());

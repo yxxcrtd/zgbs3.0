@@ -29,7 +29,6 @@ import com.joyintech.tams.invest.common.dto.period.trdbondduration.TrdBondDurDbI
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dto.AllTradeCommonInputDto;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
-import com.joyintech.tams.systemtools.util.CommonUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -88,6 +87,12 @@ public class AutoPeriodCommonService extends BaseService {
      */
     @Autowired
     private StlPayOrdersMapper stlPayOrdersMapper;
+
+    /**
+     * StlPayOrdersMapper
+     */
+    @Autowired
+    private StlPayTempOrdersMapper stlPayTempOrdersMapper;
     
     /**
      * PaTrdFinProductDealTotalMapper
@@ -582,9 +587,18 @@ public class AutoPeriodCommonService extends BaseService {
         }
 
         if (!StringUtil.isEmptyList(trdBondDurDbInertDto.getStlPayOrdersList())) {
-            for (StlPayOrders StlPayOrders : trdBondDurDbInertDto.getStlPayOrdersList()) {
-                stlPayOrdersMapper.insert(StlPayOrders);
-            }
+//            for (StlPayOrders StlPayOrders : trdBondDurDbInertDto.getStlPayOrdersList()) {
+//                stlPayOrdersMapper.insert(StlPayOrders);
+//            }
+            List<StlPayTempOrders> stlPayTempOrders = new ArrayList<>();
+            trdBondDurDbInertDto.getStlPayOrdersList().forEach(
+                    stlPayOrders -> {
+                        StlPayTempOrders tempOrders = new StlPayTempOrders();
+                        BeanUtil.copyPropertiesIgnoreNull(tempOrders,stlPayOrders);
+                        stlPayTempOrders.add(tempOrders);
+                    }
+            );
+            stlPayTempOrdersMapper.insertBatch(stlPayTempOrders);
         }
 
         if (trdBondDurDbInertDto.getPaTrdFinProductDealTotal() != null) {
@@ -595,6 +609,13 @@ public class AutoPeriodCommonService extends BaseService {
             for (TrdProductDeal trdProductDeal : trdBondDurDbInertDto.getTrdProductDealList()) {
                 TrdProductTempDeal tempDeal = new TrdProductTempDeal();
                 BeanUtil.copyPropertiesIgnoreNull(tempDeal,trdProductDeal);
+                if(StringUtil.isNotEmpty(tempDeal.getFinprodType2())) {
+                    if (StringUtil.equals(tempDeal.getFinprodType2(), "F01")) {
+                        tempDeal.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+                    } else if (StringUtil.equals(tempDeal.getFinprodType2(), "F02") || StringUtil.equals(tempDeal.getFinprodType2(), "F03")) {
+                        tempDeal.setBusiType("TRD16");
+                    }
+                }
                 trdProductTempDealMapper.insert(tempDeal);
             }
         }
@@ -682,9 +703,18 @@ public class AutoPeriodCommonService extends BaseService {
            trdDealTotalAddMapper.insert(trdBondDurDbInertDto.getTrdDealTotalAdd());
         }
         if (!StringUtil.isEmptyList(trdBondDurDbInertDto.getStlPayOrdersList())) {
-            for (StlPayOrders StlPayOrders : trdBondDurDbInertDto.getStlPayOrdersList()) {
-                stlPayOrdersMapper.insert(StlPayOrders);
-            }
+//            for (StlPayOrders StlPayOrders : trdBondDurDbInertDto.getStlPayOrdersList()) {
+//                stlPayOrdersMapper.insert(StlPayOrders);
+//            }
+            List<StlPayTempOrders> stlPayTempOrders = new ArrayList<>();
+            trdBondDurDbInertDto.getStlPayOrdersList().forEach(
+                    stlPayOrders -> {
+                        StlPayTempOrders tempOrders = new StlPayTempOrders();
+                        BeanUtil.copyPropertiesIgnoreNull(tempOrders,stlPayOrders);
+                        stlPayTempOrders.add(tempOrders);
+                    }
+            );
+            stlPayTempOrdersMapper.insertBatch(stlPayTempOrders);
         }
         if (trdBondDurDbInertDto.getPaTrdFinProductDealTotal() != null) {
             paTrdProdTempDealTotalMapper.insert(trdBondDurDbInertDto.getPaTrdFinProductDealTotal());
@@ -693,6 +723,7 @@ public class AutoPeriodCommonService extends BaseService {
             for (TrdProductDeal trdProductDeal : trdBondDurDbInertDto.getTrdProductDealList()) {
                 TrdProductTempDeal tempDeal = new TrdProductTempDeal();
                 BeanUtil.copyPropertiesIgnoreNull(tempDeal,trdProductDeal);
+                tempDeal.setBusiType("TRD16");
                 trdProductTempDealMapper.insert(tempDeal);
             }
         }

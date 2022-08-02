@@ -10,13 +10,10 @@
 
 package com.joyintech.tams.invest.batch.riskparamcalc.runner;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.joyintech.batch.batchbase.baseclass.*;
 import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
 import com.joyintech.batch.batchbase.baseclass.entity.NeedToWriteEntity;
+import com.joyintech.batch.batchbase.exception.BatchException;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
 import com.joyintech.framework.constant.BatchDictCodeList;
 import com.joyintech.framework.util.StringUtil;
@@ -29,7 +26,7 @@ import com.joyintech.tams.invest.batch.riskparamcalc.reader.RskParamCalcReader;
 import com.joyintech.tams.invest.batch.riskparamcalc.reader.RskParamReCalcReader;
 import com.joyintech.tams.invest.batch.riskparamcalc.writer.RskParamCalcWriter;
 import com.joyintech.tams.invest.batch.riskparamcalc.writer.RskParamReCalcWriter;
-import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
@@ -37,7 +34,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.joyintech.batch.batchbase.exception.BatchException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -137,11 +136,16 @@ public class RskParamReCalcTask extends BatchBaseService {
         step2Reader.setParams(params);
         step2Processor.setParams(params);
         step2Writer.setParams(params);
-        return batchBuilder.init(this)
-            .batch("step1", (BaseReader)step1Reader, (BaseProcessor)step1Processor, step1Writer)
-            .batch("step2",step2Reader,step2Processor,step2Writer)
-            .builder(this.getBatchTask().getBeanName() + this.getBatchTask().getTaskId())
-            .run();
+        try {
+            return batchBuilder.init(this)
+                    .batch("step1", (BaseReader) step1Reader, (BaseProcessor) step1Processor, step1Writer)
+                    .batch("step2", step2Reader, step2Processor, step2Writer)
+                    .builder(this.getBatchTask().getBeanName() + this.getBatchTask().getTaskId())
+                    .run();
+        }catch (Exception e) {
+            logger.error("预占重计算异常",e);
+            throw new BatchException(RiskUtil.getLogString(e));
+        }
     }
 
 }

@@ -132,4 +132,8 @@ public interface PeriodCommonMapper {
     void inertRevokeFeeTotalByTradeId(@Param("bizCode")String tradeId, @Param("updateUser") String updateUser);
 
     int countAccNoNum(Map<String, Object> paraMap);
+
+    List<FinCashInfo> getFinCashInfosByFinprodId(@Param("finprodId")String finprodId);
+
+    void deleteFinCashPlanByCashId(@Param("cashId")String cashId);
 }

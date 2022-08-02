@@ -70,7 +70,7 @@
         CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME,is_Exist_New is_Exist_New
         from ETR_SEC_POSITION_FLOW
         where TRADE_ID = #{tradeId,jdbcType=VARCHAR}
-                AND OFFSET_FLAG = #{tradeId,jdbcType=VARCHAR}
+                AND OFFSET_FLAG = #{offsetFlag,jdbcType=VARCHAR}
     </select>
 
     <select id="selectAllCashPosition" resultMap="com.joyintech.tams.common.base.dao.PtlCashPositionFlowMapper.BaseResultMap">
@@ -96,6 +96,12 @@
         where TRADE_ID = #{tradeId,jdbcType=VARCHAR} AND HODING_TYPE IN ('01', '02', '04', '05', '06', '12')
     </delete>
 
+    <delete id="deletePositionByTradeIdNotPledge" parameterType="java.lang.String" >
+        DELETE
+        from PTL_SEC_POSITION_FLOW
+        where TRADE_ID = #{tradeId,jdbcType=VARCHAR} AND HODING_TYPE IN ('01', '02', '05', '06', '12')
+    </delete>
+
     <delete id="deleteEtrPositionByTradeId" parameterType="java.lang.String" >
         DELETE
         from ETR_SEC_POSITION_FLOW
@@ -106,6 +112,12 @@
         DELETE
         from PTL_CASH_POSITION_FLOW
         where ORDER_ID in (<foreach collection="orderIds" separator="," item="item">#{item}</foreach>) AND HODING_TYPE IN ('01', '02')
+    </delete>
+
+    <delete id="deleteCashPosition03ByOrderIds" >
+        DELETE
+        from PTL_CASH_POSITION_FLOW
+        where ORDER_ID in (<foreach collection="orderIds" separator="," item="item">#{item}</foreach>) AND HODING_TYPE IN ('03')
     </delete>
 
     <update id="updateSecPositionAmt" parameterType="com.joyintech.tams.common.base.entity.PtlSecPositionFlow">
@@ -138,6 +150,10 @@
 
     <select id="selectAllPositionByTotle" resultType="com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto">
         SELECT * FROM PTL_SEC_POSITION_FLOW WHERE TRADE_ID = #{totleId}
+    </select>
+
+    <select id="selectAllPositionByIdAndType" resultType="com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto">
+        SELECT * FROM PTL_SEC_POSITION_FLOW WHERE TRADE_ID = #{tradeId} AND Hoding_Type = #{hodingType}
     </select>
 
     <select id="selectAllCashPositionByTotle" resultType="com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto">

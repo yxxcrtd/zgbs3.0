@@ -905,6 +905,11 @@
         SUM(FINISH_AMT) AS FINISH_AMT
         FROM
         ETR_QUOTE_FINISH_STATUS
+        <where>
+            <if test="quoteId !=null and quoteId != '' and quotaPageModel !=null and quotaPageModel != '' and quotaPageModel eq 'edit' ">
+                QUOTE_ID != #{quoteId}
+            </if>
+        </where>
         GROUP BY
         ENTRUST_ID) T5 ON
         A.ENTRUST_ID = T5.ENTRUST_ID

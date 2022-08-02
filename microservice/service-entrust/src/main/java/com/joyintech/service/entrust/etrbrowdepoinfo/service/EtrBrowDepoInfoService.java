@@ -46,7 +46,7 @@ import java.util.*;
 
 /**
  * 存款委托
- * 
+ *
  * @author huwenbin
  * @version 1.0 2018年9月19日
  * @see EtrBrowDepoInfoService
@@ -60,17 +60,17 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
      */
     @Autowired
     private EtrBrowDepoInfoMapper etrBrowDepoInfoMapper;
-    
+
     /**
      * 委托人员信息
      */
     @Autowired
     private EntrustCommonPersonSelectMapper entrustCommonPersonSelectMapper;
-    
+
     /**
      * 附件信息共通Service
      */
-    @Autowired(required=false)
+    @Autowired(required = false)
     private MstFileCommonService mstFileCommonService;
 
     /**
@@ -78,32 +78,32 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
      */
     @Autowired(required = false)
     private BaseEtrInvestInfoService baseEtrInvestInfoService;
-    
+
     /**
      * 平台日期获取
      */
-    @Autowired(required=false)
+    @Autowired(required = false)
     private IPlatformDate platformDateImpl;
-    
+
     /**
      * 组合可用持仓和实际持仓查询更新组件接口
      */
-    @Autowired(required=false)
+    @Autowired(required = false)
     private BasePtlSecPositionInfoService basePtlSecPositionInfoService;
-    
+
     /**
      * 组合可用现金和实际现金查询更新组件
      */
-    @Autowired(required=false)
+    @Autowired(required = false)
     private BasePtlCashPositionInfoService basePtlCashPositionInfoService;
-    
+
     /**
      * 委托自动分发
      */
-    @Autowired(required=false)
+    @Autowired(required = false)
     private BusiAutoEtrDispService busiAutoEtrDispService;
 
-    @Autowired(required=false)
+    @Autowired(required = false)
     private BaseEtrCashPositionCommService baseEtrCashPositionCommService;
 
     @Autowired(required = false)
@@ -111,29 +111,28 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
 
     /**
      * 使用给定的检索分页数据。返回类型是Service的泛型。
-     * 
-     * @param length int
-     * @param page int
+     *
+     * @param length    int
+     * @param page      int
      * @param pageParam 查询方法
      * @return Page类
      * @throws Exception 异常信息
      */
     public Page<EtrBrowDepoInfoDto> selectForPage(int page, int length,
-                                                  Map<String, Object> pageParam)
-    {
-        String finprodType2 = (String)pageParam.get("finprodType2");
-        if(StringUtil.isNotEmpty(finprodType2)){
-            pageParam.put("finprodType2List", StringUtil.splitToList(GlobalConstant.COMMA,finprodType2));
+                                                  Map<String, Object> pageParam) {
+        String finprodType2 = (String) pageParam.get("finprodType2");
+        if (StringUtil.isNotEmpty(finprodType2)) {
+            pageParam.put("finprodType2List", StringUtil.splitToList(GlobalConstant.COMMA, finprodType2));
         }
         //子组合查询改造 王贵奇 2019/8/21
         pageParam.put("portfolioType", DictCodeListExt1.组合类型_子组合.getValue());
         pageParam.put("portfolioType1", DictCodeListExt1.组合类型_投资类组合.getValue());
         pageParam.put("finprodType2", DictCodeListExt1.金融产品类型_投管用_存款.getValue());
-        pageParam.put("endDate", DateUtil.parse((String)pageParam.get("endDate")));
-        pageParam.put("startDate", DateUtil.parse((String)pageParam.get("startDate")));
-        String portfolioId = (String)pageParam.get("portfolioId");
-        if(StringUtil.isNotEmpty(portfolioId)){
-            pageParam.put("portfolioIdList", StringUtil.splitToList(GlobalConstant.COMMA,portfolioId));
+        pageParam.put("endDate", DateUtil.parse((String) pageParam.get("endDate")));
+        pageParam.put("startDate", DateUtil.parse((String) pageParam.get("startDate")));
+        String portfolioId = (String) pageParam.get("portfolioId");
+        if (StringUtil.isNotEmpty(portfolioId)) {
+            pageParam.put("portfolioIdList", StringUtil.splitToList(GlobalConstant.COMMA, portfolioId));
         }
         pageParam.put("ENTRUST_STATUS_08", DictCodeListExt3.委托状态_流程中.getValue());
         return super.queryForPage(page, length, () -> etrBrowDepoInfoMapper.select(pageParam));
@@ -141,7 +140,7 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
 
     /**
      * 组合代码联想下拉框 <功能详细描述>
-     * 
+     *
      * @param param 组合代码 用户Id
      * @return List<SuggestDto>
      * @see
@@ -155,7 +154,7 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
 
     /**
      * 资产代码联想下拉框 <功能详细描述>
-     * 
+     *
      * @param finprodId 资产代码
      * @return List<SuggestDto>
      * @see
@@ -170,30 +169,30 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
 
     /**
      * 新建页面资产代码联想 <功能详细描述>
-     * 
+     *
      * @param map 用户输入值
      * @return List<SelectOptionDto>
      * @see
      * @since 1.0
      */
-    public Page<SelectOptionDto> getSelectFinprodMarketId(int page,int length,Map<String, Object> map) {
+    public Page<SelectOptionDto> getSelectFinprodMarketId(int page, int length, Map<String, Object> map) {
         map.put("finprodType2", DictCodeListExt1.金融产品类型_投管用_存款.getValue());
         map.put("cashType1", DictCodeListExt1.现金流一级类型_利息.getValue());
-        return this.queryForPageForSelectReturn(page, length,() -> etrBrowDepoInfoMapper.getSelectFinprodMarketId(map));
+        return this.queryForPageForSelectReturn(page, length, () -> etrBrowDepoInfoMapper.getSelectFinprodMarketId(map));
     }
 
     /**
      * 新建页面组合代码联想下拉框 <功能详细描述>
-     * 
+     *
      * @param map Map<String, Object>
      * @return List<SelectOptionDto>
      * @see
      * @since 1.0
      */
-    public Page<SelectOptionDto> getSelectPortfolioId(int page,int length,Map<String, Object> map) {
-    	String types = DictCodeListExt1.组合类型_子组合.getValue()+","+DictCodeListExt1.组合类型_投资类组合.getValue();
-    	map.put("portTypes", StringUtil.splitToList(GlobalConstant.COMMA,types));
-        return this.queryForPageForSelectReturn(page, length,() -> etrBrowDepoInfoMapper.getSelectPortfolioId(map));
+    public Page<SelectOptionDto> getSelectPortfolioId(int page, int length, Map<String, Object> map) {
+        String types = DictCodeListExt1.组合类型_子组合.getValue() + "," + DictCodeListExt1.组合类型_投资类组合.getValue();
+        map.put("portTypes", StringUtil.splitToList(GlobalConstant.COMMA, types));
+        return this.queryForPageForSelectReturn(page, length, () -> etrBrowDepoInfoMapper.getSelectPortfolioId(map));
     }
 
     /**
@@ -204,8 +203,8 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
      * @see
      * @since 1.0
      */
-    public Page<SelectOptionDto> getChannelId(int page,int length,Map<String, Object> map) {
-        return this.queryForPageForSelectReturn(page, length,() -> etrBrowDepoInfoMapper.getChannelId(map));
+    public Page<SelectOptionDto> getChannelId(int page, int length, Map<String, Object> map) {
+        return this.queryForPageForSelectReturn(page, length, () -> etrBrowDepoInfoMapper.getChannelId(map));
     }
 
     /**
@@ -216,14 +215,14 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
      * @see
      * @since 1.0
      */
-    public BigDecimal getChannelAvailableCash(int page,int length,Map<String, Object> map) {
-        map.put("platDate",platformDateImpl.getSysDate());
+    public BigDecimal getChannelAvailableCash(int page, int length, Map<String, Object> map) {
+        map.put("platDate", platformDateImpl.getSysDate());
         return etrBrowDepoInfoMapper.getChannelAvailableCash(map);
     }
 
     /**
      * 关闭、撤销、删除画面校验 <功能详细描述>
-     * 
+     *
      * @param dto EtrBrowDepoInfoDto
      * @return List<ValidMessage>
      * @see
@@ -236,22 +235,22 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
         List<String> traderList = new ArrayList<>();
         traderList.add(dto.getTrader());
         return baseEtrInvestInfoService.checkDelegateOperation(entrustId, delegateOperationType,
-            traderList, delegateCloseWay);
+                traderList, delegateCloseWay);
     }
 
     /**
      * 撤回委托
-     * 
+     *
      * @param entity 实体类
      * @return boolean
      * @throws InvocationTargetException IllegalAccessException
-     * @throws IllegalAccessException InvocationTargetException
-     * @see 
+     * @throws IllegalAccessException    InvocationTargetException
+     * @see
      * @since 1.0
      */
     public boolean recallDelegate(EtrBrowDepoInfoDto entity)
-        throws IllegalAccessException,
-        InvocationTargetException {
+            throws IllegalAccessException,
+            InvocationTargetException {
         // 投资委托信息dto
         BaseEtrInvestInfoDto baseEtrInvestInfoDto = new BaseEtrInvestInfoDto();
         // 委托指令Entity
@@ -280,17 +279,16 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
         // 撤回委托
         if (baseEtrInvestInfoService != null) {
             return baseEtrInvestInfoService.recallDelegate(baseEtrInvestInfoDto);
-        }
-        else {
+        } else {
             return false;
         }
     }
 
     /**
      * 关闭委托 <一句话功能简述> <功能详细描述>
-     * 
+     *
      * @param entrustId String
-     * @param closeWay String
+     * @param closeWay  String
      * @return boolean
      * @see
      * @since 1.0
@@ -298,15 +296,14 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
     public boolean closeDelegate(String entrustId, String closeWay) {
         if (baseEtrInvestInfoService != null) {
             return baseEtrInvestInfoService.closeDelegate(entrustId, closeWay);
-        }
-        else {
+        } else {
             return false;
         }
     }
 
     /**
      * 删除存款委托 <功能详细描述>
-     * 
+     *
      * @param entrustId String
      * @return boolean
      * @see
@@ -315,15 +312,14 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
     public boolean deleteDelegate(String entrustId) {
         if (baseEtrInvestInfoService != null) {
             return baseEtrInvestInfoService.deleteDelegate(entrustId);
-        }
-        else {
+        } else {
             return false;
         }
     }
 
     /**
      * 根据金融产品代码获取委托金额 <功能详细描述>
-     * 
+     *
      * @param finprodId 金融产品代码
      * @return long
      * @see
@@ -345,7 +341,7 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
 
     /**
      * 根据金融产品代码获取发行规模 <功能详细描述>
-     * 
+     *
      * @param finprodId String
      * @return long
      * @see
@@ -357,61 +353,62 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
         return etrBrowDepoInfoMapper.selectIssueAmt(map);
 
     }
-    
+
     /**
-     * 
      * <一句话功能简述>
      * <功能详细描述>
+     *
      * @param entity EtrBrowDepoInfoDto
-     * @throws IllegalAccessException IllegalAccessException
+     * @throws IllegalAccessException    IllegalAccessException
      * @throws InvocationTargetException InvocationTargetException
      * @see
      * @since 1.0
      */
     public void doInsert(EtrBrowDepoInfoDto entity)
-        throws IllegalAccessException,
-        InvocationTargetException {
+            throws IllegalAccessException,
+            InvocationTargetException {
         //文件
         MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
         mstFileInputParameter.setFileList(entity.getFileArray());
         mstFileInputParameter.setBussinessId(entity.getWorkflowId());
-        if(mstFileCommonService != null){
+        if (mstFileCommonService != null) {
             mstFileCommonService.updateBusinessId(mstFileInputParameter);
         }
     }
-    
+
     /**
-     * 
      * <一句话功能简述>
      * <功能详细描述>
+     *
      * @param entity EtrBrowDepoInfoDto
-     * @throws IllegalAccessException IllegalAccessException
+     * @throws IllegalAccessException    IllegalAccessException
      * @throws InvocationTargetException InvocationTargetException
      * @see
      * @since 1.0
      */
     public void doDelete(EtrBrowDepoInfoDto entity)
-        throws IllegalAccessException,
-        InvocationTargetException {
+            throws IllegalAccessException,
+            InvocationTargetException {
         //文件
         MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
         mstFileInputParameter.setFileList(entity.getFileArray());
         mstFileInputParameter.setBussinessId(entity.getEntrustId());
-        if(mstFileCommonService != null){
+        if (mstFileCommonService != null) {
             mstFileCommonService.updateBusinessId(mstFileInputParameter);
         }
     }
-    
-    
+
+
     /**
      * 实现docomplement方法
+     *
      * @param entity EtrBrowDepoInfoDto
      * @throws InvocationTargetException IllegalAccessException
-     * @throws IllegalAccessException InvocationTargetException
+     * @throws IllegalAccessException    InvocationTargetException
      */
     public void doComplete(EtrBrowDepoInfoDto entity)
-        throws IllegalAccessException,
-        InvocationTargetException {
+            throws IllegalAccessException,
+            InvocationTargetException {
         // 投资委托信息dto
         BaseEtrInvestInfoDto baseEtrInvestInfoDto = new BaseEtrInvestInfoDto();
         EntrustCommonDto entrustCommonDto = new EntrustCommonDto();
@@ -419,8 +416,7 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
         String isPushMsg = DictCodeList.是否_否.getValue();
         if (StringUtil.equals(type, "DELETE")) {
             // 删除委托
-        }
-        else if (StringUtil.equals(type, "NEW")) {
+        } else if (StringUtil.equals(type, "NEW")) {
             // 委托指令Entity
             EtrEntrust etrEntrust = new EtrEntrust();
             BeanUtil.copyProperties(etrEntrust, entity);
@@ -445,39 +441,38 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
 
             // List<委托指令分发Entity>
             List<EtrDistribute> etrDistributeList = new ArrayList<>();
-          /*  if(StringUtil.isNotEmpty(entity.getBussEtrInvestPersonInfoDto().getTrader())){
-                List<String> traderList = StringUtil.splitToList(GlobalConstant.COMMA,entity.getBussEtrInvestPersonInfoDto().getTrader());
-                for(String trader:traderList){
+            if (StringUtil.isNotEmpty(entity.getBussEtrInvestPersonInfoDto().getTrader())) {
+                List<String> traderList = StringUtil.splitToList(GlobalConstant.COMMA, entity.getBussEtrInvestPersonInfoDto().getTrader());
+                for (String trader : traderList) {
                     EtrDistribute etrDistribute = new EtrDistribute();
                     //设置接收状态
                     etrDistribute.setRecStatus(DictCodeList.委托状态_待接收.getValue());
-                    //设置指定交易员指定交易员 = 指定交易员       
+                    //设置指定交易员指定交易员 = 指定交易员
                     etrDistribute.setTrader(trader);
                     //设置委托代码
                     etrDistribute.setEntrustId(entity.getEntrustId());
                     //
                     etrDistributeList.add(etrDistribute);
                 }
-            }*/
+            }
             // List<委托完成状况表Entity>
             List<EtrFinishStatus> etrFinishStatusList = new ArrayList<>();
             /* EtrFinishStatus etrFinishStatus = new EtrFinishStatus();
             BeanUtil.copyProperties(etrFinishStatus, entity);
             etrFinishStatusList.add(etrFinishStatus);*/
-            
+
             baseEtrInvestInfoDto.setEtrEntrust(etrEntrust);
             baseEtrInvestInfoDto.setEtrEntrustAdd(etrEntrustAdd);
-            
-            if(busiAutoEtrDispService != null){
+
+            if (busiAutoEtrDispService != null) {
                 //检测是否设置交易员
-                if(!busiAutoEtrDispService.checkHaveTrader(etrDistributeList)){
+                if (!busiAutoEtrDispService.checkHaveTrader(etrDistributeList)) {
                     //跳出自动分发
                     baseEtrInvestInfoDto.setEtrDistributeList(etrDistributeList);
                     isPushMsg = DictCodeList.是否_是.getValue();
-                }
-                else{
+                } else {
                     //查询委托指令下达日期，如果在自动分发区间内则改指令需自动分发
-                    if(busiAutoEtrDispService.checkEntrustTime(etrEntrust)){
+                    if (busiAutoEtrDispService.checkEntrustTime(etrEntrust)) {
                         //自动分发
                         baseEtrInvestInfoDto.setEtrDistributeList(busiAutoEtrDispService.selectTrader(etrEntrust, etrEntrustAdd));
                         isPushMsg = DictCodeList.是否_是.getValue();
@@ -494,13 +489,12 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
             MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
             mstFileInputParameter.setFileList(entity.getFileArray());
             mstFileInputParameter.setBussinessId(entity.getEntrustId());
-            if(mstFileCommonService != null){
+            if (mstFileCommonService != null) {
                 mstFileCommonService.updateBusinessId(mstFileInputParameter);
             }
             entrustCommonDto.setEtrEntrust(etrEntrust);
             entrustCommonDto.setEtrEntrustAdd(etrEntrustAdd);
-        }
-        else {
+        } else {
             // 委托指令Entity
             EtrEntrust etrEntrust = new EtrEntrust();
             BeanUtil.copyProperties(etrEntrust, entity);
@@ -525,9 +519,9 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
 
             // List<委托指令分发Entity>
             List<EtrDistribute> etrDistributeList = new ArrayList<>();
-            if(StringUtil.isNotEmpty(entity.getBussEtrInvestPersonInfoDto().getTrader())){
-                List<String> traderList = StringUtil.splitToList(GlobalConstant.COMMA,entity.getBussEtrInvestPersonInfoDto().getTrader());
-                for(String trader:traderList){
+            if (StringUtil.isNotEmpty(entity.getBussEtrInvestPersonInfoDto().getTrader())) {
+                List<String> traderList = StringUtil.splitToList(GlobalConstant.COMMA, entity.getBussEtrInvestPersonInfoDto().getTrader());
+                for (String trader : traderList) {
                     EtrDistribute etrDistribute = new EtrDistribute();
                     //设置接收状态
                     etrDistribute.setRecStatus(DictCodeList.委托状态_待接收.getValue());
@@ -547,16 +541,15 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
 
             baseEtrInvestInfoDto.setEtrEntrust(etrEntrust);
             baseEtrInvestInfoDto.setEtrEntrustAdd(etrEntrustAdd);
-            if(busiAutoEtrDispService != null){
+            if (busiAutoEtrDispService != null) {
                 //检测是否设置交易员
-                if(!busiAutoEtrDispService.checkHaveTrader(etrDistributeList)){
+                if (!busiAutoEtrDispService.checkHaveTrader(etrDistributeList)) {
                     //跳出自动分发
                     baseEtrInvestInfoDto.setEtrDistributeList(etrDistributeList);
                     isPushMsg = DictCodeList.是否_是.getValue();
-                }
-                else{
+                } else {
                     //查询委托指令下达日期，如果在自动分发区间内则改指令需自动分发
-                    if(busiAutoEtrDispService.checkEntrustTime(etrEntrust)){
+                    if (busiAutoEtrDispService.checkEntrustTime(etrEntrust)) {
                         //自动分发
                         baseEtrInvestInfoDto.setEtrDistributeList(busiAutoEtrDispService.selectTrader(etrEntrust, etrEntrustAdd));
                         isPushMsg = DictCodeList.是否_是.getValue();
@@ -573,7 +566,7 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
             MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
             mstFileInputParameter.setBussinessId(entity.getEntrustId());
             mstFileInputParameter.setFileList(entity.getFileArray());
-            if(mstFileCommonService != null){
+            if (mstFileCommonService != null) {
                 mstFileCommonService.updateBusinessId(mstFileInputParameter);
             }
 
@@ -592,58 +585,59 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
 
     /**
      * 编辑、双击查看页面详情 <功能详细描述>
-     * 
-     * @param entrustId String
-     * @param finprodId String
+     *
+     * @param entrustId   String
+     * @param finprodId   String
      * @param portfolioId String
      * @return EtrBrowDepoInfoDto
      * @see
      * @since 1.0
      */
     public EtrBrowDepoInfoDto selectByKey(String entrustId, String finprodId, String portfolioId) {
-        Map<String,Object> map = new HashMap<String,Object>();
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("entrustId", entrustId);
         List<String> traderList = entrustCommonPersonSelectMapper.getTraderList(map);
         List<EtrBrowDepoInfoDto> list = etrBrowDepoInfoMapper.selectByKey(entrustId);
         EtrBrowDepoInfoDto etrBrowDepoInfoDto = list.get(0);
         String trader = "";
-        for(int i=0; i<traderList.size(); i++){
-            trader = trader +","+ traderList.get(i);
+        for (int i = 0; i < traderList.size(); i++) {
+            trader = trader + "," + traderList.get(i);
         }
-        etrBrowDepoInfoDto.getBussEtrInvestPersonInfoDto().setTrader(trader);;
+        etrBrowDepoInfoDto.getBussEtrInvestPersonInfoDto().setTrader(trader);
+        ;
         return etrBrowDepoInfoDto;
     }
-    
+
     /**
-     * 
      * 查询上传文件
      * <功能详细描述>
+     *
      * @param businessId businessId
      * @return List<FileArray>
      * @see
      * @since 1.0
      */
-    public List<SysUploadFileInfo> selectFileByBusinessId(String businessId){
+    public List<SysUploadFileInfo> selectFileByBusinessId(String businessId) {
         MstFileInputParameter mstFileInputParameter = new MstFileInputParameter();
         mstFileInputParameter.setBussinessId(businessId);
-        if(mstFileCommonService != null){
+        if (mstFileCommonService != null) {
             MstFileOutputParameter output = mstFileCommonService.getFileInfoByBusiId(businessId);
             return output.getUploadFileList();
-        }
-        else{
+        } else {
             return null;
         }
     }
-    
+
     /**
      * 组合可用现金查询
      * <功能详细描述>
+     *
      * @param param PtlCashPositionFlowDto
-     * @return Map<String,Object>
+     * @return Map<String, Object>
      * @see
      * @since 1.0
      */
-    public Map<String,Object> getProAvailableCash(Map<String,Object> param) {
+    public Map<String, Object> getProAvailableCash(Map<String, Object> param) {
         /*BigDecimal result=null;
         if(basePtlCashPositionInfoService!=null){
             result = basePtlCashPositionInfoService.queryUsableCashPosition(dto);
@@ -651,13 +645,13 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
         return result;*/
         if (basePtlCashPositionInfoService != null) {
             PtlCashPositionFlowDto dto = new PtlCashPositionFlowDto();
-            Date vdate = DateUtil.parse((String)param.get("vdate"));
+            Date vdate = DateUtil.parse((String) param.get("vdate"));
             dto.setCdate(vdate);
             List<String> acctTypeList = new ArrayList<>();
             acctTypeList.add(DictCodeListExt1.资金账户类型_产品托管户.getValue());
             dto.setAcctType(acctTypeList);
-            dto.setPortfolioId((String)param.get("portfolioId"));
-            dto.setCcy((String)param.get("ccy"));
+            dto.setPortfolioId((String) param.get("portfolioId"));
+            dto.setCcy((String) param.get("ccy"));
             BigDecimal cashTG = basePtlCashPositionInfoService.queryUsableCashPosition(dto);
             Map<String, Object> result = new HashMap<>();
             result.put("cashTG", cashTG);
@@ -666,17 +660,16 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
             result.put("cashT", cashT);
             if (StringUtil.isNotEmpty(param.get("vdate1"))) {
                 PtlCashPositionFlowDto dto2 = new PtlCashPositionFlowDto();
-                Date vdate1 = DateUtil.parse((String)param.get("vdate1"));
+                Date vdate1 = DateUtil.parse((String) param.get("vdate1"));
                 dto2.setCdate(vdate1);
                 dto2.setAcctType(acctTypeList);
-                dto2.setPortfolioId((String)param.get("portfolioId"));
-                dto2.setCcy((String)param.get("ccy"));
+                dto2.setPortfolioId((String) param.get("portfolioId"));
+                dto2.setCcy((String) param.get("ccy"));
                 BigDecimal cashT1 = basePtlCashPositionInfoService.queryUsableCashPosition(dto2);
                 result.put("cashT1", cashT1);
             }
             return result;
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -684,6 +677,7 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
     /**
      * 组合可用持仓查询
      * <功能详细描述>
+     *
      * @param dto PtlSecPositionFlowDto
      * @return BigDecimal
      * @see
@@ -691,13 +685,13 @@ public class EtrBrowDepoInfoService extends BaseService<EtrBrowDepoInfoDto> {
      */
     public BigDecimal getAssetAvailablePosition(PtlSecPositionFlowDto dto) {
         BigDecimal result = null;
-        if(basePtlSecPositionInfoService!=null){
+        if (basePtlSecPositionInfoService != null) {
             result = basePtlSecPositionInfoService.queryUsableSecPosition(dto);
         }
         return result;
     }
 
-    public BaseEtrInvestInfoDto initBaseDto(EtrBrowDepoInfoDto dto){
+    public BaseEtrInvestInfoDto initBaseDto(EtrBrowDepoInfoDto dto) {
         BaseEtrInvestInfoDto entity = new BaseEtrInvestInfoDto();
 
         try {

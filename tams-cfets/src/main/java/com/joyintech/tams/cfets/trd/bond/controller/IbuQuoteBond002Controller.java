@@ -284,7 +284,7 @@ public class IbuQuoteBond002Controller extends BaseController {
         }
         model.addAttribute("assetTypeOne",cfetsBondDealDialogueQuoteDto.getAssetTypeOne());
 
-        model.addAttribute("PRICE_MODEL",cfetsBondDealDialogueQuoteDto.getPriceModel());
+        model.addAttribute("PRICEMODEL",cfetsBondDealDialogueQuoteDto.getPriceModel());
         model.addAttribute("PRICE_MODEL_PRM01", DictCodeListExt2.价格模式_指定价格.getValue());
         model.addAttribute(GlobalConstant.ENTITY, cfetsBondDealDialogueQuoteDto);
         model.addAttribute("cfetsBondDealDialogueQuoteDtoList", JsonUtils.object2Json(cfetsBondDealDialogueQuoteDto.getCfetsBondDealDialogueQuoteDtoList()));

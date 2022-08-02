@@ -3,7 +3,7 @@
 <mapper namespace="com.joyintech.tams.invest.common.component.base.core.impl.dao.MstFileCommonServiceMapperImpl">
 	<update id ="updateFileBusinessId">
 		update SYS_UPLOAD_FILE_INFO
-		SET BUSINESS_ID = #{item.businessId,jdbcType=VARCHAR}
+		SET BUSINESS_ID = #{businessId,jdbcType=VARCHAR}
 		<foreach collection="uploadFileList" item = "item" open="where SEQ_NO in(" close=")" separator="," >
 			#{item.seqNo,jdbcType=VARCHAR}
 		</foreach>

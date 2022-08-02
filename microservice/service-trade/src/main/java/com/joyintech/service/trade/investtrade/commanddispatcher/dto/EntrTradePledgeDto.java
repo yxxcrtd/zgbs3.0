@@ -109,6 +109,19 @@ public class EntrTradePledgeDto  extends BaseEntity {
 	@JsonSerialize(using=BigDecimalSerializer.class)
 	private BigDecimal oldPledgeAmt;
 
+	/**
+	 * 置换方向
+	 */
+	private String displaceDir;
+
+	public String getDisplaceDir() {
+		return displaceDir;
+	}
+
+	public void setDisplaceDir(String displaceDir) {
+		this.displaceDir = displaceDir;
+	}
+
 	public String getEntrustId() {
 		return entrustId;
 	}

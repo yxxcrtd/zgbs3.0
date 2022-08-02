@@ -196,7 +196,7 @@ public class NetPlanTransfer001Service extends CommonExportService<NetPlanTransf
         finProductTradeDto.setBaseTradeProductDealDtos(baseTradeProductDealDtos);
         dto.setFinProductTradeDto(finProductTradeDto);
         //风险试算
-        if(!StringUtil.isEmptyList(entity.getRiskTrialRetDto())){
+        if(!StringUtil.isEmptyList(entity.getRiskTrialRetDto()) && !StringUtil.isEmptyList(dto.getRiskTrialRetDto())){
             for (RiskTrialRetDto riskTrialRetDto:dto.getRiskTrialRetDto()) {
                 if(StringUtil.equals(riskTrialRetDto.getPortfolioId(),dto.getPortfolioId())){
                     dto.setRiskTrialRetDto(null);

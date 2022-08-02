@@ -115,6 +115,11 @@ public class FinPlanProfitAssetDto extends FinProduct implements ProcessEntity {
      * 组合entity
      */
     private PtlPortfolio ptlPortfolio;
+
+    /**
+     * 组合entity
+     */
+    private PaPtlPortfolio paPtlPortfolio;
     //add end
 
     /**
@@ -1961,5 +1966,13 @@ public class FinPlanProfitAssetDto extends FinProduct implements ProcessEntity {
 
     public void setBussFinProductOpenPlanRedDto(BussFinProductOpenPlanDto bussFinProductOpenPlanRedDto) {
         this.bussFinProductOpenPlanRedDto = bussFinProductOpenPlanRedDto;
+    }
+
+    public PaPtlPortfolio getPaPtlPortfolio() {
+        return paPtlPortfolio;
+    }
+
+    public void setPaPtlPortfolio(PaPtlPortfolio paPtlPortfolio) {
+        this.paPtlPortfolio = paPtlPortfolio;
     }
 }

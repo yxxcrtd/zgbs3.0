@@ -220,6 +220,9 @@ public class Rsk011Service extends OccupyReleasService<Rsk002InEntity> {
 
             // 从风险事件列表中取出相关的参数列表
             Set<String> paraIdList = getParamIdList(eveList);
+            log("风控触发指标参数有：【{}】", paraIdList, en->en != null ? en : "");
+            // 输出.head.返回备注信息
+            setRemark(response,"风控触发指标参数有：", paraIdList, en->en != null ? en : "",getParam(paraIdList));
             // 对于批量交易出现两笔正反同步交易时，排除影响的同一参数
             removeSameParam(paraIdList, mapData, eveList);
             // 取得组合关联指标信息

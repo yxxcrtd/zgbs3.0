@@ -370,10 +370,10 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             wflStlPayOrders.setWorkflowId(entity.getWorkflowId());
             wflStlPayOrdersMapper.insertSelective(wflStlPayOrders);
             //组合交易表
-            if (baseBussinessDto1.getPtlTrade() != null) {
+            /*if (baseBussinessDto1.getPtlTrade() != null) {
                 PtlTrade ptlTrade = baseBussinessDto1.getPtlTrade();
                 ptlTradeMapper.insertSelective(ptlTrade);
-            }
+            }*/
         }
     }
 
@@ -418,6 +418,7 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
         String totleTradeId;
         if (StringUtil.isEmpty(billingDetail.getBusiCode())) {
             totleTradeId = generateBusiCode(dto);
+            billingDetail.setBusiCode(totleTradeId);
         } else {
             totleTradeId = billingDetail.getBusiCode();
         }
@@ -765,8 +766,10 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 etrSecPositionFlow.setAmount(ArithmeticUtil.divide(etrSecPositionFlow.getAmount(), 100, 4));
 
                 etrSecPositionFlow.setpFinprodId(null);
-                etrSecPositionFlow.setTradeId(entity.getBusiCode());
-                etrSecPositionFlow.setOffsetId(entity.getBusiCode());
+//                etrSecPositionFlow.setTradeId(entity.getBusiCode());
+//                etrSecPositionFlow.setOffsetId(entity.getBusiCode());
+                etrSecPositionFlow.setTradeId(billingDetail.getBusiCode());
+                etrSecPositionFlow.setOffsetId(billingDetail.getBusiCode());
                 etrSecPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
                 etrSecPositionFlow.setCreateUser(LoginUserUtil.getUserName());
                 etrSecPositionFlow.setCreateDept(LoginUserUtil.getDeptCode());
@@ -789,8 +792,10 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 ptlSecPositionFlow.setAmount(isRevoke ? billingDetail.getRepNomCapi() : billingDetail.getRepNomCapi().negate());
                 ptlSecPositionFlow.setAmount(ArithmeticUtil.divide(ptlSecPositionFlow.getAmount(), 100, 4));
                 ptlSecPositionFlow.setpFinprodId(null);
-                ptlSecPositionFlow.setTradeId(entity.getBusiCode());
-                ptlSecPositionFlow.setOffsetId(entity.getBusiCode());
+//                ptlSecPositionFlow.setTradeId(entity.getBusiCode());
+//                ptlSecPositionFlow.setOffsetId(entity.getBusiCode());
+                ptlSecPositionFlow.setTradeId(billingDetail.getBusiCode());
+                ptlSecPositionFlow.setOffsetId(billingDetail.getBusiCode());
                 ptlSecPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
                 ptlSecPositionFlow.setCreateUser(LoginUserUtil.getUserName());
                 ptlSecPositionFlow.setCreateDept(LoginUserUtil.getDeptCode());
@@ -809,8 +814,10 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 etrCashPositionFlow.setCdate(nextWorkDate);
                 etrCashPositionFlow.setCcy(DictCodeList.币种_人民币_CNY.getValue());
                 etrCashPositionFlow.setAmount(isRevoke ? billingDetail.getDeliveryAmount().negate() : billingDetail.getDeliveryAmount());
-                etrCashPositionFlow.setOrderId(entity.getBusiCode());
-                etrCashPositionFlow.setOffsetId(entity.getBusiCode());
+//                etrCashPositionFlow.setOrderId(entity.getBusiCode());
+//                etrCashPositionFlow.setOffsetId(entity.getBusiCode());
+                etrCashPositionFlow.setOrderId(billingDetail.getBusiCode());
+                etrCashPositionFlow.setOffsetId(billingDetail.getBusiCode());
                 etrCashPositionFlow.setOffsetFlag(DictCodeList.冲正标识_正常交易.getValue());
                 etrCashPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
                 etrCashPositionFlow.setCreateUser(LoginUserUtil.getUserName());
@@ -835,8 +842,10 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 etrSecPositionFlow.setAmount(isRevoke ? billingDetail.getRepNomCapi() : billingDetail.getRepNomCapi().negate());
                 etrSecPositionFlow.setAmount(ArithmeticUtil.divide(etrSecPositionFlow.getAmount(), 100, 4));
                 etrSecPositionFlow.setpFinprodId(null);
-                etrSecPositionFlow.setTradeId(entity.getBusiCode());
-                etrSecPositionFlow.setOffsetId(entity.getBusiCode());
+//                etrSecPositionFlow.setTradeId(entity.getBusiCode());
+//                etrSecPositionFlow.setOffsetId(entity.getBusiCode());
+                etrSecPositionFlow.setTradeId(billingDetail.getBusiCode());
+                etrSecPositionFlow.setOffsetId(billingDetail.getBusiCode());
                 etrSecPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
                 etrSecPositionFlow.setCreateUser(LoginUserUtil.getUserName());
                 etrSecPositionFlow.setCreateDept(LoginUserUtil.getDeptCode());
@@ -868,8 +877,10 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 ptlSecPositionFlow.setAmount(isRevoke ? billingDetail.getRepNomCapi() : billingDetail.getRepNomCapi().negate());
                 ptlSecPositionFlow.setAmount(ArithmeticUtil.divide(ptlSecPositionFlow.getAmount(), 100, 4));
                 ptlSecPositionFlow.setpFinprodId(null);
-                ptlSecPositionFlow.setTradeId(entity.getBusiCode());
-                ptlSecPositionFlow.setOffsetId(entity.getBusiCode());
+//                ptlSecPositionFlow.setTradeId(entity.getBusiCode());
+//                ptlSecPositionFlow.setOffsetId(entity.getBusiCode());
+                ptlSecPositionFlow.setTradeId(billingDetail.getBusiCode());
+                ptlSecPositionFlow.setOffsetId(billingDetail.getBusiCode());
                 ptlSecPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
                 ptlSecPositionFlow.setCreateUser(LoginUserUtil.getUserName());
                 ptlSecPositionFlow.setCreateDept(LoginUserUtil.getDeptCode());
@@ -897,8 +908,10 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
                 etrCashPositionFlow.setCdate(nextWorkDate);
                 etrCashPositionFlow.setCcy(DictCodeList.币种_人民币_CNY.getValue());
                 etrCashPositionFlow.setAmount(isRevoke ? billingDetail.getDeliveryAmount().negate() : billingDetail.getDeliveryAmount());
-                etrCashPositionFlow.setOrderId(entity.getBusiCode());
-                etrCashPositionFlow.setOffsetId(entity.getBusiCode());
+//                etrCashPositionFlow.setOrderId(entity.getBusiCode());
+//                etrCashPositionFlow.setOffsetId(entity.getBusiCode());
+                etrCashPositionFlow.setOrderId(billingDetail.getBusiCode());
+                etrCashPositionFlow.setOffsetId(billingDetail.getBusiCode());
                 etrCashPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
                 etrCashPositionFlow.setCreateUser(LoginUserUtil.getUserName());
                 etrCashPositionFlow.setCreateDept(LoginUserUtil.getDeptCode());
@@ -972,8 +985,11 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             ptlSecPositionFlow.setAmount(isRevoke ? billingDetail.getRepNomCapi().negate() : billingDetail.getRepNomCapi());
             ptlSecPositionFlow.setAmount(ArithmeticUtil.divide(ptlSecPositionFlow.getAmount(), 100, 4));
             ptlSecPositionFlow.setpFinprodId(null);
-            ptlSecPositionFlow.setTradeId(entity.getBusiCode());
-            ptlSecPositionFlow.setOffsetId(entity.getBusiCode());
+
+            // ptlSecPositionFlow.setTradeId(entity.getBusiCode());
+            // ptlSecPositionFlow.setOffsetId(entity.getBusiCode());
+            ptlSecPositionFlow.setTradeId(billingDetail.getBusiCode());
+            ptlSecPositionFlow.setOffsetId(billingDetail.getBusiCode());
             ptlSecPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
             ptlSecPositionFlow.setCreateUser(LoginUserUtil.getUserName());
             ptlSecPositionFlow.setCreateDept(LoginUserUtil.getDeptCode());
@@ -1019,8 +1035,10 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             etrCashPositionFlow.setCdate(nextWorkDate);
             etrCashPositionFlow.setCcy(DictCodeList.币种_人民币_CNY.getValue());
             etrCashPositionFlow.setAmount(isRevoke ? billingDetail.getDeliveryAmount() : billingDetail.getDeliveryAmount().negate());
-            etrCashPositionFlow.setOrderId(entity.getBusiCode());
-            etrCashPositionFlow.setOffsetId(entity.getBusiCode());
+//            etrCashPositionFlow.setOrderId(entity.getBusiCode());
+//            etrCashPositionFlow.setOffsetId(entity.getBusiCode());
+            etrCashPositionFlow.setOrderId(billingDetail.getBusiCode());
+            etrCashPositionFlow.setOffsetId(billingDetail.getBusiCode());
             etrCashPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
             etrCashPositionFlow.setCreateUser(LoginUserUtil.getUserName());
             etrCashPositionFlow.setCreateDept(LoginUserUtil.getDeptCode());
@@ -1044,8 +1062,10 @@ public class CreditProtectionCertificatePeriod002Service extends BaseService<Cre
             ptlCashPositionFlow.setCdate(nextWorkDate);
             ptlCashPositionFlow.setCcy(DictCodeList.币种_人民币_CNY.getValue());
             ptlCashPositionFlow.setAmount(isRevoke ? billingDetail.getDeliveryAmount().negate() : billingDetail.getDeliveryAmount());
-            ptlCashPositionFlow.setOrderId(entity.getBusiCode());
-            ptlCashPositionFlow.setOffsetId(entity.getBusiCode());
+//            ptlCashPositionFlow.setOrderId(entity.getBusiCode());
+//            ptlCashPositionFlow.setOffsetId(entity.getBusiCode());
+            ptlCashPositionFlow.setOrderId(billingDetail.getBusiCode());
+            ptlCashPositionFlow.setOffsetId(billingDetail.getBusiCode());
             ptlCashPositionFlow.setEntrustId(entity.getBusiCode());
             ptlCashPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
             ptlCashPositionFlow.setCreateUser(LoginUserUtil.getUserName());

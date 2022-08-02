@@ -1,0 +1,1 @@
+delete from CFG_READONLY_FORM_SHOW where PAGECODE = 'CfetsEtrDispatcher' and DTCODE='CfetsEtrDispatcherInfo' and COLCODE in ('counterTrader','trader') and SPCDCODE in ('EX010','EX011','EX012','EX013','EX014','EX015');

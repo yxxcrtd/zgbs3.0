@@ -75,6 +75,7 @@
             T1.TRADER,
             T1.PORTFOLIO_ID,
             T2.PORTFOLIO_NAME,
+            T6.FINPROD_MARKET_ID finprodMarketId,
             T6.FINPROD_ID, /*标的金融产品代码*/
             nvl(T6.FINPROD_NAME,T6.FINPROD_ABBR) finprodName, /*标的金融产品名称*/
             T3.BACK_LEND_DIRECTION ps,
@@ -134,6 +135,7 @@
                 T1.TRADER,
                 PP.PORTFOLIO_ID,
                 PP.PORTFOLIO_NAME,
+                T6.FINPROD_MARKET_ID finprodMarketId,
                 T6.FINPROD_ID,   /*标的金融产品代码*/
                 nvl(T6.FINPROD_NAME,T6.FINPROD_ABBR) finprodName, /*标的金融产品名称*/
                 T3.BACK_LEND_DIRECTION ps,
@@ -204,6 +206,7 @@
                 T1.TRADER,
                 PP.PORTFOLIO_ID,
                 PP.PORTFOLIO_NAME,
+                T6.FINPROD_MARKET_ID finprodMarketId,
                 T6.FINPROD_ID,   /*标的金融产品代码*/
                 nvl(T6.FINPROD_NAME,T6.FINPROD_ABBR) finprodName, /*标的金融产品名称*/
                 T3.BACK_LEND_DIRECTION ps,
@@ -256,6 +259,7 @@
                 T1.TRADER,
                 PP.PORTFOLIO_ID,
                 PP.PORTFOLIO_NAME,
+                T6.FINPROD_MARKET_ID finprodMarketId,
                 T6.FINPROD_ID,   /*标的金融产品代码*/
                 nvl(T6.FINPROD_NAME,T6.FINPROD_ABBR) finprodName, /*标的金融产品名称*/
                 T3.BACK_LEND_DIRECTION ps,

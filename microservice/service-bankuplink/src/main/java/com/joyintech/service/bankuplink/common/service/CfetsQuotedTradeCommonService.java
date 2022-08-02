@@ -2,21 +2,37 @@ package com.joyintech.service.bankuplink.common.service;
 
 import com.joyintech.background.component.uplink.interbank.business.dto.ResultBaseDto;
 import com.joyintech.framework.annotation.DTXTransaction;
-import com.joyintech.framework.security.SecurityUtil;
-import com.joyintech.framework.util.*;
+import com.joyintech.framework.util.ArithmeticUtil;
+import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.JsonUtils;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.bankuplink.common.dao.CstpTradeMapper;
-import com.joyintech.service.bankuplink.common.dto.*;
+import com.joyintech.service.bankuplink.common.dto.CfetsQuotedTradeCommonDto;
+import com.joyintech.service.bankuplink.common.dto.CfetsQuotedTradeFirstBondDto;
+import com.joyintech.service.bankuplink.common.dto.NoPartyID;
+import com.joyintech.service.bankuplink.common.dto.NoRelatedPartydDetail;
+import com.joyintech.service.bankuplink.common.dto.NoRelatedPartydDetailSubID;
+import com.joyintech.service.bankuplink.common.dto.NoUnderlyings;
 import com.joyintech.service.bankuplink.common.util.BusinessTypeUtil;
 import com.joyintech.service.bankuplink.common.util.MarketIndicatorUtil;
 import com.joyintech.service.bankuplink.common.util.OrgTypeUtil;
 import com.joyintech.service.bankuplink.common.util.ProdTypeUtil;
-import com.joyintech.tams.common.base.dao.*;
-import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.common.base.dao.InterfCstpBjfxjgMapper;
+import com.joyintech.tams.common.base.dao.InterfCstpTradeMapper;
+import com.joyintech.tams.common.base.dao.InterfOpicsTradRepoMapper;
+import com.joyintech.tams.common.base.dao.InterfTradRepoasstMapper;
+import com.joyintech.tams.common.base.dao.InterfTradSecdealMapper;
+import com.joyintech.tams.common.base.entity.InterfCstpBjfxjg;
+import com.joyintech.tams.common.base.entity.InterfCstpTrade;
+import com.joyintech.tams.common.base.entity.InterfOpicsTradRepo;
+import com.joyintech.tams.common.base.entity.InterfTradRepoasst;
+import com.joyintech.tams.common.base.entity.InterfTradSecdeal;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
-import com.joyintech.tams.systemtools.util.CommonUtil;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -118,6 +134,18 @@ public class CfetsQuotedTradeCommonService{
     // 异步方法检查数据库中外部报价编号的最大等待时间（毫秒）
     @Value("${application.quote.resp.maxWaitTime:3000}")
     private int maxWaitTime;
+
+    /**
+     * 外汇交易中心 交易方向 1 买入
+     * 现券买卖、质押式回购
+     */
+    private static final String SIDE_BUY = "1";
+
+    /**
+     * 外汇交易中心 交易方向 1 卖出
+     * 现券买卖、质押式回购
+     */
+    private static final String SIDE_SELL = "4";
 
     /**
      * cstp交易入库
@@ -719,12 +747,20 @@ public class CfetsQuotedTradeCommonService{
      * @since 1.0
      */
     private InterfTradSecdeal insertOrUpdateSec(InterfCstpTrade interfCstpTrade) {
+        //交易方向转换
+        String ps = StringUtils.EMPTY;
+        if (StringUtils.equals(interfCstpTrade.getSide(), this.SIDE_BUY)) {
+            ps = DictCodeList.交易方向_买入.getValue();
+        }else {
+            ps =  DictCodeList.交易方向_卖出.getValue();
+        }
+
         // 交易编号
-        String dealno = cstpMapper.selectSecByExecid(interfCstpTrade.getExecid());
+        String dealno = cstpMapper.selectSecByExecid(interfCstpTrade.getExecid(), ps);
         // 本方交易员查询,交易员代码
         String traderId = cstpMapper.selectBuytrader(interfCstpTrade.getOurtraderchinesename());
         InterfTradSecdeal interfCstpSecdeal = cstpMapper.selectTradeSec(interfCstpTrade.getExecid(), getSysDate(),
-                BusinessTypeUtil.BUSINESSTYPE_BOND);
+                BusinessTypeUtil.BUSINESSTYPE_BOND, interfCstpTrade.getSide());
         //interfCstpSecdeal.setProfolioId(selectPortfolioId(interfCstpTrade.getOurcapitalaccountnumber()));
         //投资交易系统  可以通过报价编号查询到组合
         interfCstpSecdeal.setProfolioId(cstpMapper.selectPortfolioIdByQuoteId(interfCstpTrade.getQuoteid(),BusinessTypeUtil.BUSINESSTYPE_BOND));
@@ -748,11 +784,7 @@ public class CfetsQuotedTradeCommonService{
                 interfCstpSecdeal.setTrad(interfCstpTrade.getCountertradername());
                 interfCstpSecdeal.setCno(interfCstpTrade.getOurinstitutioncode());
                 interfCstpSecdeal.setClienttrader(interfCstpTrade.getOurtradername());
-                if(StringUtil.equals(interfCstpSecdeal.getPs(),"P")){
-                    interfCstpSecdeal.setPs(DictCodeList.交易方向_卖出.getValue());
-                }else{
-                    interfCstpSecdeal.setPs(DictCodeList.交易方向_买入.getValue());
-                }
+
             }
         }
         // 根据原始交易编号，判断数据是否已经存在，如果已存在则更新，否则进入插入操作
@@ -766,6 +798,8 @@ public class CfetsQuotedTradeCommonService{
             // 插入
             secMapper.insertSelective(interfCstpSecdeal);
         }
+        interfCstpTrade.setDealNo(dealno);
+
         return interfCstpSecdeal;
     }
 

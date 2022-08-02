@@ -1,5 +1,7 @@
 package com.joyintech.service.trade.entrustmsgbymq.dto;
 
+import com.joyintech.tams.common.base.pojo.PledgeListDto;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,21 +23,36 @@ public class TradeMessage implements Cloneable, Serializable {
     private Double dealPrice;       // 成交价格
     private Double fullPrice;       // 全价价格
     private Double dealBalance;     // 成交金额
+    private Double entrustBalance;  // 回购金额
     private String trdMatchID;      // 首期交易编号
     private String tradingDay;      // 交易日
     private String valueDate;       // 首期结算日
     private String maturityDate;    // 到期结算日
-	private String ccy;             //币种
+    private String ccy;             //币种
     private String settleDay; //交收日
     private String busiType; //业务类别
     private BigDecimal dealMargin;      //交易保证金
     private BigDecimal pledgeRatio;      //折算比例
     private String counterId;       //交易对手
+    private String tradeId;         //本方交易员
 
     /**
      * 下单组合明细数据消息
      */
     private List<PortfolioTradeMessage> portfolioTradeMessages;
+
+    /**
+     * 质押券列表
+     */
+    private List<PledgeListDto> pledgeTradeMessages;
+
+    public List<PledgeListDto> getPledgeTradeMessages() {
+        return pledgeTradeMessages;
+    }
+
+    public void setPledgeTradeMessages(List<PledgeListDto> pledgeTradeMessages) {
+        this.pledgeTradeMessages = pledgeTradeMessages;
+    }
 
     public List<PortfolioTradeMessage> getPortfolioTradeMessages() {
         return portfolioTradeMessages;
@@ -204,7 +221,7 @@ public class TradeMessage implements Cloneable, Serializable {
     public void setMaturityDate(String maturityDate) {
         this.maturityDate = maturityDate;
     }
-	
+
     public String getCcy() {
         return ccy;
     }
@@ -228,14 +245,14 @@ public class TradeMessage implements Cloneable, Serializable {
     public void setBusiType(String busiType) {
         this.busiType = busiType;
     }
-    
-    public BigDecimal getDealMargin() {
-		return dealMargin;
-	}
 
-	public void setDealMargin(BigDecimal dealMargin) {
-		this.dealMargin = dealMargin;
-	}
+    public BigDecimal getDealMargin() {
+        return dealMargin;
+    }
+
+    public void setDealMargin(BigDecimal dealMargin) {
+        this.dealMargin = dealMargin;
+    }
 
     public BigDecimal getPledgeRatio() {
         return pledgeRatio;
@@ -251,5 +268,21 @@ public class TradeMessage implements Cloneable, Serializable {
 
     public void setCounterId(String counterId) {
         this.counterId = counterId;
+    }
+
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
+
+    public Double getEntrustBalance() {
+        return entrustBalance;
+    }
+
+    public void setEntrustBalance(Double entrustBalance) {
+        this.entrustBalance = entrustBalance;
     }
 }

@@ -197,19 +197,21 @@ public class InstrumentManagement extends BaseService {
     }
 
     public ResultBean updateInstrument2Cache(Map<String, Object> params) {
-        ResultBean result = ResultBean.success();
 //        List<Instrument> instruments = Lists.newArrayList();
 
+//        List<MinPrice> minPriceList = queryMinPrices();
+//        minPriceService.saveInCache(minPriceList);
+//        List<MinTrdUnitLimit> minTrdUnitLimitList = queryMinTrdUnitLimits();
+//        minTrdUnitLimitService.saveInCache(minTrdUnitLimitList);
+
+        ResultBean result = ResultBean.success();
         List<Instrument> instruments = queryInstruments(params);
         if (instruments.isEmpty()) {
             logger.warn("调用投管接口查询合约信息为空！");
             return result;
         }
 
-        List<MinPrice> minPriceList = queryMinPrices();
-        minPriceService.saveInCache(minPriceList);
-        List<MinTrdUnitLimit> minTrdUnitLimitList = queryMinTrdUnitLimits();
-        instrumentService.saveTrdUnitLimit(minTrdUnitLimitList);
+//        instrumentService.saveTrdUnitLimit(minTrdUnitLimitList);
 
         // 实际不建议使用合约中的这些信息，而是使用在查询指令列表时匹配生成到指令上的信息
         /*instruments.forEach(instrument -> {

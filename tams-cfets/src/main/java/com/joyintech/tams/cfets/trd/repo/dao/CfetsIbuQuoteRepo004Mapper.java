@@ -31,4 +31,6 @@ public interface CfetsIbuQuoteRepo004Mapper {
     int updatePtlCashPosition(PtlCashPosition ptlCashPosition);
 
     List<String> selectOldTradeId(@Param("entrustIdList") List<String> entrustIdList);
+
+    List<WflRegFinPledge> listWflRegFinPledge(@Param("totleTradeId") String totleTradeId);
 }

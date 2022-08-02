@@ -79,6 +79,8 @@ public class EtrInvestAllInfoDto extends EtrEntrust {
 	 */
 	private String entrustCreateSource;
 
+	private String busiTypePosition;
+
 	/**
 	 * 获取 settleSpreed
 	 *
@@ -276,6 +278,14 @@ public class EtrInvestAllInfoDto extends EtrEntrust {
 	 */
 	public void setEntrustCreateSource(String entrustCreateSource) {
 		this.entrustCreateSource = entrustCreateSource == null ? null : entrustCreateSource.trim();
+	}
+
+	public String getBusiTypePosition() {
+		return busiTypePosition;
+	}
+
+	public void setBusiTypePosition(String busiTypePosition) {
+		this.busiTypePosition = busiTypePosition;
 	}
 
 	/**

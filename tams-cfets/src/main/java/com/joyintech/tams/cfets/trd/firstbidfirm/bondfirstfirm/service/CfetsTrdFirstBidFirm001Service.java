@@ -452,7 +452,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
     @Transactional(rollbackFor = Exception.class)
     @DTXTransaction
     public AjaxResult entrustRefuce(Map<String, Object> param) {
-        param.put("rekReason", (String) param.get("remark"));
+        param.put("rekReason", param.get("remark"));
         return cfetsEtrDispatcherService.refuseEntrust(param);
     }
 

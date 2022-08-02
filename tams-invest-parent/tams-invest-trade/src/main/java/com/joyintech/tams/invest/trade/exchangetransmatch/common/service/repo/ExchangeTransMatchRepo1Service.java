@@ -3,9 +3,7 @@ package com.joyintech.tams.invest.trade.exchangetransmatch.common.service.repo;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.entity.StlPayOrders;
-import com.joyintech.tams.common.base.entity.TrdFinProductDealTotal;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -64,6 +62,23 @@ public class ExchangeTransMatchRepo1Service extends ExchangeTransMatchRepoCommon
 				baseTradeProductDealDto.setTrdFinProductDealTotal(trdFinProductDealTotal);
 				//生成金融产品交易信息
 				baseTradeProductDealDto.setTrdProductDeal(this.genTrdProductDeal(dealDto,entrustDtoTmp,baseTradeProductDealDto.getTrdFinProductDealTotal()));
+
+				SettleTransData settleTransData = new SettleTransData();
+				BeanUtil.copyPropertiesIgnoreNull(settleTransData,dealDto);
+				FinTradeProduct finTradeProduct = this.genFinTradeProduct(settleTransData, baseTradeProductDealDto.getTrdProductDeal());
+				baseTradeProductDealDto.setFinTradeProduct(finTradeProduct);
+
+				// 生成现金流信息
+				List<FinCashInfo> finCashInfos = this.genFinCashInfos(baseTradeProductDealDto.getTrdProductDeal());
+				baseTradeProductDealDto.setFinCashInfos(finCashInfos);
+
+				// 生成现金流计划
+				List<FinCashPlan> finCashPlans = this.genFinCashPlans(finCashInfos, finTradeProduct);
+				baseTradeProductDealDto.setFinCashPlans(finCashPlans);
+
+				FinProductType finProductType = this.genFinProductType(dealDto,baseTradeProductDealDto.getTrdProductDeal());
+				baseTradeProductDealDto.setFinProductType(finProductType);
+
 				//生成金融产品交易附属表信息
 				baseTradeProductDealDto.setTrdProductDealAdd(this.genTrdProductDealAdd(dealDto,entrustDtoTmp,baseTradeProductDealDto.getTrdProductDeal()));
 				//生成组合交易表数据
@@ -96,6 +111,22 @@ public class ExchangeTransMatchRepo1Service extends ExchangeTransMatchRepoCommon
 			baseTradeProductDealDto.setStlPayOrdersList(this.generateStlPayOrdersList(dealDto,entrustDto,baseTradeProductDealDto.getTrdProductDeal()));
 			//生成金融产品交易扩展
 			baseTradeProductDealDto.setPaTrdProductDeal(this.genPaTrdProductDeal(dealDto,entrustDto,baseTradeProductDealDto.getTrdProductDeal()));
+
+			SettleTransData settleTransData = new SettleTransData();
+			BeanUtil.copyPropertiesIgnoreNull(settleTransData,dealDto);
+			FinTradeProduct finTradeProduct = this.genFinTradeProduct(settleTransData, baseTradeProductDealDto.getTrdProductDeal());
+			baseTradeProductDealDto.setFinTradeProduct(finTradeProduct);
+
+			// 生成现金流信息
+			List<FinCashInfo> finCashInfos = this.genFinCashInfos(baseTradeProductDealDto.getTrdProductDeal());
+			baseTradeProductDealDto.setFinCashInfos(finCashInfos);
+
+			// 生成现金流计划
+			List<FinCashPlan> finCashPlans = this.genFinCashPlans(finCashInfos, finTradeProduct);
+			baseTradeProductDealDto.setFinCashPlans(finCashPlans);
+
+			FinProductType finProductType = this.genFinProductType(dealDto,baseTradeProductDealDto.getTrdProductDeal());
+			baseTradeProductDealDto.setFinProductType(finProductType);
 			baseTradeProductDealDtoList.add(baseTradeProductDealDto);
 		}
 

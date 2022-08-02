@@ -188,9 +188,29 @@
     </select>
 
     <delete id="deleteStlPayOrdersData">
-        delete from STL_PAY_ORDERS tfpft
-        where tfpft.settle_date =#{batchDate}
-        and tfpft.update_user = #{updateUser}
+        <!--XYHGFXSJ-148:这里应该只删除银行间数据,不加tradeMarket条件会将场内数据删除 modify by fuyongsheng 20220722 start-->
+        delete from
+            STL_PAY_TEMP_ORDERS
+        where
+            ORDER_ID IN (
+                SELECT
+                    tfpft.ORDER_ID
+                FROM
+                    STL_PAY_TEMP_ORDERS tfpft
+                LEFT JOIN
+                    TRD_PRODUCT_TEMP_DEAL tptd ON tfpft.TRADE_ID = tptd.TRADE_ID
+                where
+                    tfpft.settle_date =#{batchDate}
+                    and tfpft.update_user = #{updateUser}
+                    <if test="tradeMarket != null and tradeMarket != ''">
+                        and tptd.TRADE_MARKET = #{tradeMarket}
+                    </if>
+                    <if test="finProdType2 != null and finProdType2 != ''">
+                        and tptd.FINPROD_TYPE2 = #{finProdType2}
+                    </if>
+                    and tfpft.ORDER_ID not in (select stl.ORDER_ID from STL_PAY_ORDERS stl )
+            )
+        <!--XYHGFXSJ-148:这里应该只删除银行间数据,不加tradeMarket条件会将场内数据删除 modify by fuyongsheng 20220722 end-->
     </delete>
 
 </mapper>

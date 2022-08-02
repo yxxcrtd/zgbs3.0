@@ -187,14 +187,6 @@ public class EtrCreditProtectionCertificate003Controller extends BaseController 
         }
         for (EtrExchangeTradeOperateSecRepoRequest item : dto.getSelectedItem()) {
             etrExchangeTradeCpc001Service.recallDelegate(item);
-            // 释放风险接口释放
-
-            if(StringUtil.equals(item.getPs(),DictCodeListExt3.交易方向_债转股.getValue())) {
-                EntrustRdsCommonAop.doPreOccupy(item, BussinessDictCodeListRds.接口系统ID_预占释放批量接口.getValue(),item.getPaAssetType()
-                );
-            } else {
-                EntrustRdsCommonAop.doPreOccupy(item, BussinessDictCodeListRds.接口系统ID_预占释放接口.getValue(),item.getPaAssetType());
-            }
 
         }
         return new Message<AjaxResult>().success().setData(new AjaxResult(this.getMessage("撤回成功")));

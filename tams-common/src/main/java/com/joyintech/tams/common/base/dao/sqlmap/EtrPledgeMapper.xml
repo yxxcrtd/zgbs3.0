@@ -170,4 +170,8 @@
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
           and FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </update>
+
+    <delete id="deleteByEntrustId" parameterType="java.lang.String" >
+        delete from ETR_PLEDGE where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+    </delete>
 </mapper>

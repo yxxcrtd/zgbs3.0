@@ -24,7 +24,7 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.invest.batch.prdopenplanupdate.relyingonresources.dto.BussFinProductPayPlanDto;
 import com.joyintech.tams.invest.batch.prdopenplanupdate.relyingonresources.service.BussFinProductPayPlanService;
-import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.DateCalService;
+import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.InvDateCalService;
 import com.joyintech.tams.invest.common.calculator.AdjustedTradeDayCal;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 
@@ -43,7 +43,7 @@ public class BussFinProductPayPlanImplService extends BaseService<BussFinProduct
      * 付息计划，开放计划，利率重置，申购计划，赎回计划计算用和日期关联的Service
      */
     @Autowired
-    private DateCalService dateCalService;
+    private InvDateCalService invDateCalService;
 
     /**
      * {@inheritDoc}
@@ -94,7 +94,7 @@ public class BussFinProductPayPlanImplService extends BaseService<BussFinProduct
             }
 
         // 交易日历取得
-        List<String> dealCalendarHolidayList = dateCalService.getDealCalendarHoliday(startDate,
+        List<String> dealCalendarHolidayList = invDateCalService.getDealCalendarHoliday(startDate,
             DateUtil.addDay(endDate, 8), inputDto.getCalendarId());
 
         // 付息计划区间生成
@@ -184,7 +184,7 @@ public class BussFinProductPayPlanImplService extends BaseService<BussFinProduct
 
             // 付息区间算出
             // 日期区间分割
-            List<Date> tempDivisionList = dateCalService.dateIntervalNodeList(startDate,
+            List<Date> tempDivisionList = invDateCalService.dateIntervalNodeList(startDate,
                 inputDto.getMdate(), calcMethod, String.valueOf(inputDto.getPayCycleVal()),
                 inputDto.getPayCycleUnit());
 

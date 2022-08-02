@@ -644,7 +644,13 @@
         }
         //分层列表
         object.bussFinProductLayeredInfoDto = BussFinProductLayered.getAllRows();
-        
+
+		console.log("----------------object-------------------------")
+		console.log(object)
+		console.log(object.bussBenchMarkInfoDto)
+		console.log(object.bussFinProductFloatFeeDto)
+		console.log(object.bussBenchMarkFloatInfoDto)
+
         Joyin.ajaxJson(basePath + 'invest/product/productelement/netvalueproduct/FinNetValueProductBuild002/check',object, function(result) {
     		Joyin.confirm(result.data, function() {
                 	if(operateType === 'save') {

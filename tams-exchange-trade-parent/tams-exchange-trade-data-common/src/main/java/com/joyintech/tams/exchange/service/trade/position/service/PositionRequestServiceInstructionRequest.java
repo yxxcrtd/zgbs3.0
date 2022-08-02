@@ -13,6 +13,7 @@ import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt1;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.InstructionPledge;
+import com.joyintech.tams.exchange.common.enums.invest.PledgeDisPlaceDirEnum;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
 import com.joyintech.tams.exchange.common.response.PortfolioCalculateResponse;
 import com.joyintech.tams.exchange.common.utils.TradePlatUtils;
@@ -398,28 +399,68 @@ public class PositionRequestServiceInstructionRequest {
         String ps = entity.getPs();
         String firstRepoPs = entity.getFirstRepoPs();
         resultMap.put(PS, firstRepoPs);
+
+        //IF 下单.交易方向 = 中途换券
+        //IF 下单对应的指令.指令业务类型 = 数据字典.指令业务类型.协议回购中途换券指令-换钱 THEN 数据字典.换券方式.02 换钱 ELSE 数据字典.换券方式.01 换券
+        if (交易方向_中途换券.getValue().equals(ps)) {
+            if (上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(entity.getEntrustBussType())) {
+                resultMap.put(BOND_EXCHANGE_TYPE, "02");
+            } else {
+                resultMap.put(BOND_EXCHANGE_TYPE, "01");
+            }
+        } else {
+            resultMap.put(BOND_EXCHANGE_TYPE, null);
+        }
+
         // 首期组合现金数据集，IF 交易方向 = 正回购、逆回购、提前购回、到期购回、解除质押 传值 否则为空
-        if (交易方向_正回购.getValue().equals(ps) || 交易方向_逆回购.getValue().equals(ps) || 交易方向_提前购回.getValue().equals(ps) || 交易方向_到期购回.getValue().equals(ps) || 交易方向_解除质押.getValue().equals(ps)) {
+        if (交易方向_正回购.getValue().equals(ps)
+                || 交易方向_逆回购.getValue().equals(ps)
+                || 交易方向_提前购回.getValue().equals(ps)
+                || 交易方向_到期购回.getValue().equals(ps)
+                || 交易方向_解除质押.getValue().equals(ps)
+                || (交易方向_中途换券.getValue().equals(ps) && 上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(entity.getEntrustBussType()))) {
             List<Map<String, Object>> list = new ArrayList<>(1);
             bean = new PositionRequestBaseBean(entity);
 //            bean.setCashAmount(NumberUtil.sub(entity.getmTradeAmt(), entity.getmIntAmt()));
             bean.setSecAmount(BigDecimal.ZERO);
 
-            if (交易方向_解除质押.getValue().equals(ps)) {
+            /*if (交易方向_解除质押.getValue().equals(ps)) {
                 // 解除质押走线下划款，扣托管户现金
                 bean.setCashAcctId(tamsBusinessCommonService.selectProdTghCapacctNo(entity.getPortfolioId()));
             } else {
                 // 其他走券商资金账户
                 bean.setCashAcctId(entity.getAcctNo());
-            }
+            }*/
+            bean.setCashAcctId(entity.getAcctNo());
 
             // 交易金额
             // 交易方向= 首期 取回购金额，其他取到期结算金额
-            if (交易方向_提前购回.getValue().equals(ps) || 交易方向_到期购回.getValue().equals(ps) || 交易方向_解除质押.getValue().equals(ps)) {
+            /*if (交易方向_提前购回.getValue().equals(ps)
+                    || 交易方向_到期购回.getValue().equals(ps)
+                    || 交易方向_解除质押.getValue().equals(ps)) {
                 bean.setCashAmount(entity.getmTradeAmt());
             } else {
                 bean.setCashAmount(entity.getEntrustAmt());
+            }*/
+
+            //if 交易方向= 首期 then 回购金额
+            //else if 交易方向=解除质押 and 交易场所 = 深交所 then 下单.结算金额
+            //else if 交易方向=解除质押 and 交易场所 = 上交所 then 0
+            //else if 交易方向=中途换券 and and 指令业务类型 = 数据字典.指令业务类型.协议回购中途换券指令-换钱
+            //else 到期结算金额
+            //end if
+            if (交易方向_提前购回.getValue().equals(ps)
+                    || 交易方向_到期购回.getValue().equals(ps)
+                    || 交易方向_解除质押.getValue().equals(ps)) {
+                if (交易方向_解除质押.getValue().equals(ps) && 交易场所_上海证券交易所.getValue().equals(entity.getTradeMarket())) {
+                    bean.setCashAmount(BigDecimal.ZERO);
+                } else {
+                    bean.setCashAmount(entity.getmTradeAmt());
+                }
+            } else {
+                bean.setCashAmount(entity.getEntrustAmt());
             }
+
 
             Map<String, Object> map = BeanUtil.object2Map(bean);
             list.add(map);
@@ -436,7 +477,7 @@ public class PositionRequestServiceInstructionRequest {
             // IF 回购类型 = 正回购 THEN 指令.到期续作金额 - 指令.首期的到期结算金额
             // IF 回购类型 = 逆回购  and 成交编号找不到对应的首期 THEN 指令.到期续作金额
             // IF 回购类型 = 逆回购  and 成交编号找到对应的首期 THEN  指令.到期续作金额 - 指令.首期的到期结算金额"
-            BigDecimal firstTradeAmt = etrTradeCommonervice.getFirstTradeAmt(entity.getTrdMatchId());
+            BigDecimal firstTradeAmt = etrTradeCommonervice.getFirstTradeAmt(entity.getFinprodId());
             BigDecimal tradeAmt = entity.getEntrustAmt();
             log.info("轧差组合现金数据集:到期续作金额 tradeAmt={}，首期的到期结算金额 firstTradeAmt={}", tradeAmt, firstTradeAmt);
             bean.setCashAmount(tradeAmt.subtract(firstTradeAmt));
@@ -448,10 +489,19 @@ public class PositionRequestServiceInstructionRequest {
 
         // 质押券数据集	ptlSecList
         // IF 交易方向 = 首期、中途换券换入and 回购类型 = 正回购 THEN 传值 ELSE 空
-        if (交易方向_正回购.getValue().equals(firstRepoPs) || (交易方向_中途换券.getValue().equals(ps) && 交易方向_正回购.getValue().equals(ps))) {
+        if (交易方向_正回购.getValue().equals(firstRepoPs)
+                && (交易方向_中途换券.getValue().equals(ps) || 交易方向_到期续做.getValue().equals(ps) || 交易方向_正回购.getValue().equals(ps))) {
             List<Map<String, Object>> list = new ArrayList<>(1);
             // 查询质押券集合
-            InstructionPledge instructionPledge = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
+//            InstructionPledge instructionPledge = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
+
+            InstructionPledge instructionPledge = null;
+            if (交易方向_中途换券.getValue().equals(ps)) {
+                List<InstructionPledge> pledgeList = instructionPledgeService.queryInstructionPledgesByInstructionId(entity.getEntrustId());
+                instructionPledge = pledgeList.stream().filter(item -> PledgeDisPlaceDirEnum.SWAP_IN.codeEquals(item.getDisplaceDir())).findFirst().orElse(null);
+            } else {
+                instructionPledge = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
+            }
             if (Objects.nonNull(instructionPledge)) {
                 bean = new PositionRequestBaseBean();
                 bean.setPortfolioId(entity.getPortfolioId());
@@ -460,7 +510,12 @@ public class PositionRequestServiceInstructionRequest {
                 bean.setSecAcctId(entity.getSecAcctId());
                 bean.setTradeId(entity.getEntrustNo());
                 bean.setEtrId(entity.getEntrustId());
-                BigDecimal secAmount = commonPositionEngineService.multiplyWithOneHundred(instructionPledge.getPledgeNumber());
+                BigDecimal secAmount;
+                if (交易方向_中途换券.getValue().equals(ps)) {
+                    secAmount = commonPositionEngineService.multiplyWithOneHundred(instructionPledge.getPledgeNumber());
+                } else {
+                    secAmount = commonPositionEngineService.multiplyWithOneHundred(entity.getEntrustNum());
+                }
                 bean.setSecAmount(secAmount);
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);
@@ -480,7 +535,14 @@ public class PositionRequestServiceInstructionRequest {
             /*&& 交易方向_正回购.getValue().equals(firstRepoPs)*/) {
             List<Map<String, Object>> list = new ArrayList<>(4);
             // 查询质押券集合
-            InstructionPledge item = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
+//            InstructionPledge item = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
+            InstructionPledge item = null;
+            if (交易方向_中途换券.getValue().equals(ps)) {
+                List<InstructionPledge> pledgeList = instructionPledgeService.queryInstructionPledgesByInstructionId(entity.getEntrustId());
+                item = pledgeList.stream().filter(o -> PledgeDisPlaceDirEnum.SWAP_OUT.codeEquals(o.getDisplaceDir())).findFirst().orElse(null);
+            } else {
+                item = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
+            }
             //取单个质押券
             if (Objects.nonNull(item)) {
                 bean = new PositionRequestBaseBean();
@@ -492,14 +554,15 @@ public class PositionRequestServiceInstructionRequest {
                 bean.setEtrId(entity.getEntrustId());
 
                 //券面总额 IF 交易方向 = 解除质押 THEN 下单.质押券数量*100 ELSE 下单到期续作对应首期的成交回报.质押券数量
-                if (交易方向_中途换券.getValue().equals(ps)) {
-                    BigDecimal secAmount = commonPositionEngineService.multiplyWithOneHundred(item.getOldPledgeNumber());
-                    bean.setSecAmount(secAmount);
-                } else {
-                    BigDecimal secAmount = commonPositionEngineService.multiplyWithOneHundred(item.getPledgeNumber());
-                    bean.setSecAmount(secAmount);
-                }
-
+//                if (交易方向_中途换券.getValue().equals(ps)) {
+//                    BigDecimal secAmount = commonPositionEngineService.multiplyWithOneHundred(item.getPledgeNumber());
+//                    bean.setSecAmount(secAmount);
+//                } else {
+//                    BigDecimal secAmount = commonPositionEngineService.multiplyWithOneHundred(item.getPledgeNumber());
+//                    bean.setSecAmount(secAmount);
+//                }
+                BigDecimal secAmount = commonPositionEngineService.multiplyWithOneHundred(item.getPledgeNumber());
+                bean.setSecAmount(secAmount);
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);
                 //融入券券面总额

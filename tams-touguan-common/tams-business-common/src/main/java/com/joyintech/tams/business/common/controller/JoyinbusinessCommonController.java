@@ -388,4 +388,16 @@ public class JoyinbusinessCommonController extends BaseController {
         }
     }
 
+    @PostMapping("/queryAcctNo")
+    @ApiOperation(value = "查询账户", notes = "查询账户 根据dealType查询账户类型")
+    @ResponseBody
+    public Message<Page<SelectOptionDto>> queryAcctNo(@RequestBody CfetsSearchInfoRequest item) {
+        try {
+            Page<SelectOptionDto> list = joyinbusinessCommonService.queryAcctNo(item);
+            return new Message<Page<SelectOptionDto>>().success().setData(list);
+        } catch (Exception e) {
+            logger.error("查询功能异常", e);
+            return new Message<Page<SelectOptionDto>>().fail().setMessage("查询异常");
+        }
+    }
 }

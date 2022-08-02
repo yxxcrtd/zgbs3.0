@@ -31,6 +31,9 @@ public class CfetsTrdConfirmCstpInfoListRequest {
     @ApiModelProperty(name="acctNo",value="托管账户",example="字符串1,字符串2,...")
     private String acctNo;
 
+    @ApiModelProperty(name="secAcctId",value="托管账户",example="字符串1,字符串2,...")
+    private String secAcctId;
+
     @ApiModelProperty(name="execid",value="成交编号",example="A1")
     private String execid;
 
@@ -90,6 +93,14 @@ public class CfetsTrdConfirmCstpInfoListRequest {
 
     public void setAcctNo(String acctNo) {
         this.acctNo = acctNo;
+    }
+
+    public String getSecAcctId() {
+        return secAcctId;
+    }
+
+    public void setSecAcctId(String secAcctId) {
+        this.secAcctId = secAcctId;
     }
 
     public String getExecid() {

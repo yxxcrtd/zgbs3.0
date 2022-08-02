@@ -247,7 +247,7 @@
         on fp.finprod_id=reg.finprod_id
         inner join
         (
-        select regdeal.totle_trade_id,wm_concat(regdeal.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName,
+        select regdeal.totle_trade_id,to_char(wm_concat(regdeal.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName,
         sum(regdeal.face_value)/10000 as faceValue, sum(regdeal.trade_amt) as tradeAmt
         from wfl_reg_fin_product_deal regdeal
         inner join ptl_portfolio pp
@@ -909,7 +909,7 @@
 
 
         union all
-            select ibd.quote_id,wm_concat(ibd.cp_party_id) as cp_party_id,wm_concat(mccic.PARTY_ABBR) as PARTY_ABBR,
+            select ibd.quote_id,to_char(wm_concat(ibd.cp_party_id)) as cp_party_id,to_char(wm_concat(mccic.PARTY_ABBR)) as PARTY_ABBR,
            /* wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader)) cp_trader,*/
             group_concat(nvl(su.TRADER_NAME,ibd.cp_trader)) cp_trader,
             ibd.execid,null as tradeYield,null as calMode
@@ -936,7 +936,7 @@
         )ibd
         on ib.quote_id=ibd.quote_id
         inner  join(
-        select ir.quote_id,wm_concat(ir.portfolio_id) as portfolioId,/*wm_concat(pp.portfolio_name) portfolioName,*/group_concat(pp.portfolio_name) portfolioName,
+        select ir.quote_id,to_char(wm_concat(ir.portfolio_id)) as portfolioId,/*wm_concat(pp.portfolio_name) portfolioName,*/group_concat(pp.portfolio_name) portfolioName,
         /*wm_concat(distinct ir.entrust_id) as entrustId*/
         group_concat(distinct ir.entrust_id) as entrustId
         from ibu_quote_etr_re ir

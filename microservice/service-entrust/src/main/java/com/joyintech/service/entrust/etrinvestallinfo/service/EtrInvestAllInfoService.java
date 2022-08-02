@@ -10,11 +10,14 @@
  
 package com.joyintech.service.entrust.etrinvestallinfo.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.joyintech.service.entrust.etrinvestallinfo.dto.EtrInvestAllInfoExportPdfDto;
 import com.joyintech.tams.constant.*;
+import com.joyintech.tams.invest.common.constant.ServiceApplication;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -122,6 +125,12 @@ public class EtrInvestAllInfoService extends BaseService<EtrInvestAllInfoDto> {
         pageDto.setRoot(dtoList);
         return pageDto;
     }
+
+    public EtrInvestAllInfoDto getById(Map<String, Object> map){
+        EtrInvestAllInfoDto dto = etrInvestAllInfoMapper.getById(map);
+        return dto;
+    }
+
     /**
      * 
      * 查询PB导出信息 add by caoxue 2019-12-31

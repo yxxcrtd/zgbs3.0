@@ -1,10 +1,10 @@
 package com.joyintech.tams.cfets.trdquery.dao;
 
 
-
-
 import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleInfoOtherListRespond;
 import com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto;
+import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveDetailDto;
+import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmExecFirstBondInfoResponse;
 import com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdFirstBondInvestTradeDto;
 import com.joyintech.tams.cfets.trdquery.dto.*;
@@ -19,6 +19,7 @@ import java.util.Map;
 
 /**
  * 银行间交易成交确认
+ *
  * @author
  * @version 1.0 2021年10月26日
  * @see CfetsTrdQueryMapper
@@ -28,24 +29,31 @@ import java.util.Map;
 public interface CfetsTrdQueryMapper {
     /**
      * 查询用户所有权限
+     *
      * @param userName
      * @return
      */
-    List<String>  selectSysRoleById(String userName);
+    List<String> selectSysRoleById(String userName);
+
     /**
      * 查询所有登记信息
+     *
      * @param pageParam
      * @return
      */
     List<CfetsTrdQueryRegInfoListResponse> queryAllRegInfoList(Map<String, Object> pageParam);
+
     /**
      * 根据主键查询登记信息
+     *
      * @param pageParam
      * @return
      */
     CfetsTrdQueryRegInfoListResponse selectRegFormDataByKey(Map<String, Object> pageParam);
+
     /**
      * 根据主键查询一级申购登记信息
+     *
      * @param pageParam
      * @return
      */
@@ -58,6 +66,7 @@ public interface CfetsTrdQueryMapper {
      * @return List<PortIntFenPeiInfoDto>
      */
     List<CfetsPortfolioIdFenPeiInfoResponse> selectRegTableFenPeiInfoList(Map<String, Object> pageParam);
+
     /**
      * 质押券信息List
      *
@@ -65,24 +74,31 @@ public interface CfetsTrdQueryMapper {
      * @return List<PortIntFenPeiInfoDto>
      */
     List<CfetsPledgeInfoResponse> selectRegTablePledgeInfoList(Map<String, Object> pageParam);
+
     /**
      * 查询所有报价信息
+     *
      * @param pageParam
      * @return
      */
     List<CfetsTrdQueryIbuInfoListResponse> queryAllIbuInfoList(Map<String, Object> pageParam);
+
     /**
      * 根据主键查询债券报价信息
+     *
      * @param pageParam
      * @return
      */
     CfetsTrdQueryIbuInfoListResponse selectIbuBondFormDataByKey(Map<String, Object> pageParam);
+
     /**
      * 根据主键查询回购报价信息
+     *
      * @param pageParam
      * @return
      */
     CfetsTrdQueryIbuInfoListResponse selectIbuRepoFormDataByKey(Map<String, Object> pageParam);
+
     /**
      * 债券报价组合分配信息List
      *
@@ -90,6 +106,7 @@ public interface CfetsTrdQueryMapper {
      * @return List<PortIntFenPeiInfoDto>
      */
     List<CfetsPortfolioIdFenPeiInfoResponse> selectIbuBondTableFenPeiInfoList(Map<String, Object> pageParam);
+
     /**
      * 回购报价组合分配信息List
      *
@@ -97,6 +114,7 @@ public interface CfetsTrdQueryMapper {
      * @return List<PortIntFenPeiInfoDto>
      */
     List<CfetsPortfolioIdFenPeiInfoResponse> selectIbuRepoTableFenPeiInfoList(Map<String, Object> pageParam);
+
     /**
      * 报价质押券信息List
      *
@@ -104,24 +122,31 @@ public interface CfetsTrdQueryMapper {
      * @return List<PortIntFenPeiInfoDto>
      */
     List<CfetsPledgeInfoResponse> selectIbuTablePledgeInfoList(Map<String, Object> pageParam);
+
     /**
      * 查询所有成交信息
+     *
      * @param pageParam
      * @return
      */
     List<CfetsTrdQueryCstpInfoListResponse> queryAllCstpInfoList(Map<String, Object> pageParam);
+
     /**
      * 根据主键查询债券成交信息
+     *
      * @param pageParam
      * @return
      */
     CfetsTrdQueryCstpInfoListResponse selectCstpBondFormDataByKey(Map<String, Object> pageParam);
+
     /**
      * 根据主键查询回购成交信息
+     *
      * @param pageParam
      * @return
      */
     CfetsTrdQueryCstpInfoListResponse selectCstpRepoFormDataByKey(Map<String, Object> pageParam);
+
     /**
      * 成交数据中质押券信息List
      *
@@ -129,18 +154,23 @@ public interface CfetsTrdQueryMapper {
      * @return List<PortIntFenPeiInfoDto>
      */
     List<CfetsPledgeInfoResponse> selectCstpTablePledgeInfoList(Map<String, Object> pageParam);
+
     /**
      * 交易列表分页查询
+     *
      * @param pageParam 参数
      * @return List<CfetsManualSettleTraderListRespond>
      */
     List<CfetsTrdQueryTradeInfoListResponse> queryAllTradeInfoList(Map<String, Object> pageParam);
+
     /**
      * 交易明细列表分页查询
+     *
      * @param pageParam 参数
      * @return List<CfetsManualSettleTraderListRespond>
      */
     List<CfetsTrdQueryTradeInfoListResponse> queryAllTradeDetailInfoList(Map<String, Object> pageParam);
+
     /**
      * 交易明细表单内容
      *
@@ -148,6 +178,7 @@ public interface CfetsTrdQueryMapper {
      * @return CfetsManualSettleInfoF32Respond
      */
     CfetsManualSettleInfoOtherListRespond findManualSettleInfoOther(Map<String, Object> pageParam);
+
     /**
      * 组合分配信息List,针对交易明细
      *
@@ -158,6 +189,7 @@ public interface CfetsTrdQueryMapper {
 
     /**
      * 查询债券交易基本信息
+     *
      * @param params
      * @return
      */
@@ -165,24 +197,31 @@ public interface CfetsTrdQueryMapper {
 
     /**
      * 查询债券交易基本信息
+     *
      * @param params
      * @return
      */
     CfetsTrdFirstBondInvestTradeDto getTrdFirstBondInvestTradeDto(Map<String, Object> params);
+
     /**
      * 根据主键查询登记信息
+     *
      * @param pageParam
      * @return
      */
     RegFinProductDealTotal selectRegTotalInfoById(String bizCode);
+
     /**
      * 根据主键查询一级申购登记信息
+     *
      * @param bizCode
      * @return
      */
     RegFinProductDealTotal selectBidOrderById(String bizCode);
+
     /**
      * 根据主键更新登记数据
+     *
      * @param pageParam
      * @return
      */
@@ -190,6 +229,7 @@ public interface CfetsTrdQueryMapper {
 
     /**
      * 根据主键更新一级申购登记数据
+     *
      * @param bidId
      * @return
      */
@@ -197,6 +237,7 @@ public interface CfetsTrdQueryMapper {
 
     /**
      * 根据更新报价数据
+     *
      * @param paramMap
      * @return
      */
@@ -204,6 +245,7 @@ public interface CfetsTrdQueryMapper {
 
     /**
      * 根据更新报价数据
+     *
      * @param paramMap
      * @return
      */
@@ -212,28 +254,32 @@ public interface CfetsTrdQueryMapper {
     /**
      * 获取交易id
      *
-     * @date 2022/1/19
      * @param tradeId
      * @return java.lang.String
+     * @date 2022/1/19
      */
     String getTradeId(@Param("tradeId") String tradeId);
 
     String getTotalTradeId(@Param("tradeId") String tradeId);
 
     Integer getCountByReg(@Param("tradeId") String tradeId);
+
     /**
      * 查询汇总编号下的所有交易编号
+     *
      * @param userName
      * @return
      */
-    List<String>  selectAllTrdDetailListById(String totleTradeId);
+    List<String> selectAllTrdDetailListById(String totleTradeId);
 
     /**
      * 查询回购交易基本信息
+     *
      * @param params
      * @return
      */
     CfetsTrdRepoTrade002Dto getTrdRepoInvestTradeDto(Map<String, Object> params);
+
     /**
      * 查询交易质押券
      *
@@ -245,6 +291,7 @@ public interface CfetsTrdQueryMapper {
 
     /**
      * 根据
+     *
      * @param bizCode
      * @return
      */
@@ -256,6 +303,7 @@ public interface CfetsTrdQueryMapper {
      * @param paramMap 参数
      */
     void updateInterfTradSecdealByTradeId(Map<String, Object> paramMap);
+
     /**
      * 交易明细回购表单内容
      *
@@ -271,7 +319,9 @@ public interface CfetsTrdQueryMapper {
      * @return List<PortIntFenPeiInfoDto>
      */
     List<PortIntFenPeiInfoDto> findRepoPortIntFenPeiInfoList(Map<String, Object> pageParam);
+
     List<PortIntFenPeiInfoDto> findRepoPortIntFenPeiInfoList2(Map<String, Object> pageParam);
+
     /**
      * 查询交易质押券,针对交易明细回购
      *
@@ -315,4 +365,20 @@ public interface CfetsTrdQueryMapper {
 
 
     List<TrdProductDeal> selectTrdProductDealsByTotleTradeId(@Param("totleTradeId") String totleTradeId);
+
+    /**
+     * 自主投标未中标 分配明细
+     *
+     * @param pageParam
+     * @return
+     */
+    List<BidPortIntFenPeiInfoDto> findZztbZbjgFenPeiInfoList(Map<String, Object> pageParam);
+
+    /**
+     * 自主投标未中标 基本信息
+     *
+     * @param pageParam
+     * @return
+     */
+    CfetsTrdBidInfoResponse findZztbZbjgManualSettleInfo(Map<String, Object> pageParam);
 }

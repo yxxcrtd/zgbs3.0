@@ -1024,7 +1024,13 @@ public class InvestFeePay002Service extends BaseService<InvestFeePay002Dto> impl
                                                                              InvestFeePay003Dto.class);
 
         if (StringUtil.isNotEmpty(positionDetailList)) {
-            return positionDetailList;
+            // TISHKS-1521:过滤理论费用金额为0的 modify by fuyongsheng 20220704 start
+            // return positionDetailList;
+            List<InvestFeePay003Dto> result = positionDetailList.stream()
+                    .filter(item-> item.getPayAmt() != null && item.getPayAmt().compareTo(BigDecimal.ZERO) > 0)
+                    .collect(Collectors.toList());
+            return CollectionUtils.isNotEmpty(result) ? result : Collections.emptyList();
+            // TISHKS-1521:过滤理论费用金额为0的 modify by fuyongsheng 20220704 end
         }
 
         return Collections.emptyList();

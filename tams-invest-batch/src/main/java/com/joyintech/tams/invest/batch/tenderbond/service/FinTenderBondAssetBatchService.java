@@ -21,7 +21,6 @@ import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.batch.tenderbond.dao.FinTenderBondAssetBatchMapper;
 import com.joyintech.tams.invest.batch.tenderbond.dto.FinTenderBondAssetBatchDto;
 import com.joyintech.tams.invest.batch.valbatchimport.common.dto.InterfPayhsrcsecinfoDto;
-import com.joyintech.tams.invest.batch.valbatchimport.common.service.CommonAutoCouponService;
 import com.joyintech.tams.invest.common.autoperiod.common.AutoPeriodCommonService;
 import com.joyintech.tams.invest.common.component.base.group.BasePtlSecPositionInfoService;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;

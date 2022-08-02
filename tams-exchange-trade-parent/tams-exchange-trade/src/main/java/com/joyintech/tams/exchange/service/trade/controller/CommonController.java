@@ -4,6 +4,7 @@ import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.security.User;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.exchange.common.ResponseResultBody;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.SysParamBean;
@@ -271,4 +272,9 @@ public class CommonController {
         return commonManagement.selectCounterAcctNoInfo(dto);
     }
 
+    @ApiOperation(value = "查询交易数据", notes = "查询交易数据")
+    @PostMapping("/common/findTrdProductDeal")
+    public TrdProductDeal findTrdProductDeal(@RequestBody TrdProductDeal dto) {
+        return commonManagement.findTrdProductDeal(dto);
+    }
 }

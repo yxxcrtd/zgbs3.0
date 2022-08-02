@@ -588,8 +588,8 @@ public interface EtrExchangeCommonValidator extends BeanValidator {
                     //回购金额和方向判断 add by yzg 20210325 start
                     EtrExchangeAgreRepTrade001Service etrAgreRepTrade001Service = SpringContextUtil.getBean(EtrExchangeAgreRepTrade001Service.class);
                     //逆回购和正回购按正常交易金额和交易方向授权
-                    if (StringUtil.equals(inputDto.getPs(), DictCodeListExt3.交易方向_正回购.getValue())
-                            || StringUtil.equals(inputDto.getPs(), DictCodeListExt3.交易方向_逆回购.getValue())) {
+                    if (StringUtil.equals(inputDto.getRepPs(), DictCodeListExt3.交易方向_正回购.getValue())
+                            || StringUtil.equals(inputDto.getRepPs(), DictCodeListExt3.交易方向_逆回购.getValue())) {
                         ps = inputDto.getPs();
                         prinAmt = inputDto.getTradeAmt();
                     }
@@ -632,17 +632,18 @@ public interface EtrExchangeCommonValidator extends BeanValidator {
                     inputValue2 = repType;
                     if (StringUtil.equals(inputDto.getRepPs(), DictCodeList.回购拆借方向_正回购.getValue())) {
                         windtypeone = DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue();
-                        inputValue3 = DictCodeListExt3.行内资产三级分类_正回购.getValue();
+                        inputValue3 = DictCodeList.回购拆借方向_正回购.getValue();
+                        counterId = null;
                     } else {
                         windtypeone = DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue();
-                        inputValue3 = DictCodeListExt3.行内资产三级分类_逆回购.getValue();
+                        inputValue3 = DictCodeList.回购拆借方向_逆回购.getValue();
                     }
                     tradeMarket = inputDto.getTradeMarket();
                     //ps = inputDto.getPs();
                     //finprodId = inputDto.getFinprodId();
                     trdProductDeal = new TrdProductDeal();
                     trdProductDeal.setTradeDate(DateUtil.parse(inputDto.getVdate()));
-                    trdProductDeal.setFinprodId(inputDto.getFinprodId());
+                    //trdProductDeal.setFinprodId(inputDto.getFinprodId());
                 }
 
 
@@ -696,9 +697,11 @@ public interface EtrExchangeCommonValidator extends BeanValidator {
                 if (trdProductDeal != null) {
                     // TISHKBS-411
                     if (!isNameSoftControl) {
+                        Map<String, Object> param = new HashMap<>();
+                        if(StringUtil.isNotEmpty(counterId)) {
+                            param.put("counterId", counterId);
+                        }
                         if (StringUtil.isNotEmpty(trdProductDeal.getFinprodId())) {
-                            Map<String, Object> param = new HashMap<>();
-                            if (StringUtil.isNotEmpty(trdProductDeal.getFinprodId())) {
                                 param.put("finprodId", trdProductDeal.getFinprodId());
                             } else {
                                 param.put("inputValue1", inputValue1);
@@ -729,7 +732,6 @@ public interface EtrExchangeCommonValidator extends BeanValidator {
                                 return validMessageList;
                             }
                         }
-                    }
                 }
                 //add by 张年  2019/08.02 end
             } catch (Exception e) {

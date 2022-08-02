@@ -70,11 +70,17 @@
             digit: 2
         }
         , {
+            /*结算金额*/
+            field: 'unitFpriceAmt',
+            visible: false
+        }
+        , {
             /*本方券券面总额（万元）*/
             field: 'entrustOwnNum',
             width: 180,
             title: 'CfetsEtribBondInfo003.entrustOwnNum',
             sortable: false,
+            edit: false,
             visible: SHORT_SELLING_SUPPORTED == '02' ? (ps != 'T03' ? true : false) : false,
             type: 'number',
             digit: 2
@@ -299,6 +305,18 @@
                         table.renderRow(data.LAY_TABLE_INDEX, data);
                     })
                 }
+                if(ps == 'T01') {//获取模式
+                    if($("#finprodIdhid").val()){
+                        Joyin.ajax(basePath + 'cfets/etrib/cfetsEtrIbBondinfo/queryInvaimBySecIdAndPrd/'+value+'/'+$("#finprodIdhid").val(), {}, function (result) {
+                            console.log(result);
+                            if(result.data) {
+                                data.businessModel = result.data;
+                                table.renderRow(data.LAY_TABLE_INDEX, data);
+                            }
+                        },false)
+                    }
+
+                }
                 if(ps == 'T02' || ps == 'T03') {//获取数量和模式
                     Joyin.ajax(basePath + 'cfets/etrib/cfetsEtrIbBondinfo/selectPortfolioIdForSelect?ps='+ps+'&finprodId='+$("#finprodIdhid").val() +"&initValue="+value, {}, function (result) {
                         console.log(result);
@@ -328,7 +346,12 @@
                 }
             }
             if (field == 'entrustNum') {
-                data.entrustOwnNum = value;
+                if(!data.entrustIntegrateNum){
+                    data.entrustIntegrateNum ="0";
+                    data.entrustOwnNum = value;
+                }else{
+                    data.entrustOwnNum = JoyinMath.doMinus(data.entrustNum,data.entrustIntegrateNum,2);
+                }
                 table.renderRow(data.LAY_TABLE_INDEX, data);
             }
             if(field == 'entrustIntegrateNum') {
@@ -365,6 +388,20 @@
             field: 'warningLine',
             width: 150,
             title: 'BaseRiskMathComm.wthreshold',
+            sortable: false
+        }
+        , {
+            /*资产名称*/
+            field: 'assetName',
+            width: 150,
+            title: 'BaseRiskMathComm.assetName',
+            sortable: false
+        }
+        , {
+            /*违规阈值*/
+            field: 'forbiddenLn',
+            width: 150,
+            title: 'BaseRiskMathComm.forbiddenLn',
             sortable: false
         }
         , {
@@ -510,7 +547,7 @@
             if (result && result.data) {
                 var data = result.data.data;
                 if (data.price) {
-                    query("#price").val(data.price)
+                    query("#price").val(data.price);
                     query("#priceShow").val(JoyinMath.doDiv(data.price, 1, 4));
                     query("#unitFpriceShow").val(JoyinMath.doDiv(data.unitFprice, 1, 4));
                     query("#unitFprice").val(data.unitFprice);
@@ -554,17 +591,17 @@
                 //给一大串字段赋值
                 query("#priceShow").val(JoyinMath.doDiv(data.price, 1, 4));
                 query("#price").val(data.price);
-                query("#priceAmt").val(JoyinMath.doDiv(data.priceAmt, 1, 2));
-                query("#unitInt").val(JoyinMath.doDiv(data.unitInt, 1, 4));
-                query("#unitIntShow").val(JoyinMath.doDiv(data.unitInt, 1, 4));
-                query("#unitIntAmt").val(JoyinMath.doDiv(data.unitIntAmt, 1, 2));
+                query("#priceAmt").val(JoyinMath.doDiv(data.priceAmt, 1, 2)).trigger("blur");
+                query("#unitInt").val(JoyinMath.doDiv(data.unitInt, 1, 4)).trigger("blur");
+                query("#unitIntShow").val(JoyinMath.doDiv(data.unitInt, 1, 4)).trigger("blur");
+                query("#unitIntAmt").val(JoyinMath.doDiv(data.unitIntAmt, 1, 2)).trigger("blur");
                 query("#unitFpriceShow").val(JoyinMath.doDiv(data.unitFprice, 1, 4));
-                query("#unitFprice").val(data.unitFprice);
-                query("#unitFpriceAmt").val(JoyinMath.doDiv(data.unitFpriceAmt, 1, 2));
-                query("#entrustOwnInt").val(JoyinMath.doDiv(data.entrustOwnInt, 1, 2));
-                query("#entrustIntegrateInt").val(JoyinMath.doDiv(data.entrustIntegrateInt, 1, 2));
-                query("#entrustOwnUnitFpriceAmt").val(JoyinMath.doDiv(data.entrustOwnUnitFpriceAmt, 1, 2));
-                query("#entrustIntegrateUnitFpriceAmt").val(JoyinMath.doDiv(data.entrustIntegrateUnitFpriceAmt, 1, 2));
+                query("#unitFprice").val(data.unitFprice).trigger("blur");
+                query("#unitFpriceAmt").val(JoyinMath.doDiv(data.unitFpriceAmt, 1, 2)).trigger("blur");
+                query("#entrustOwnInt").val(JoyinMath.doDiv(data.entrustOwnInt, 1, 2)).trigger("blur");
+                query("#entrustIntegrateInt").val(JoyinMath.doDiv(data.entrustIntegrateInt, 1, 2)).trigger("blur");
+                query("#entrustOwnUnitFpriceAmt").val(JoyinMath.doDiv(data.entrustOwnUnitFpriceAmt, 1, 2).trigger("blur"));
+                query("#entrustIntegrateUnitFpriceAmt").val(JoyinMath.doDiv(data.entrustIntegrateUnitFpriceAmt, 1, 2)).trigger("blur");
             }
         });
     }
@@ -775,7 +812,6 @@
             Joyin.error(errorMsg);
             return false;
         }
-        debugger;
         if(confirmMsg && confirmMsg.length > 0) {
             return Joyin.confirm(confirmMsg, function (){
                 saveOrSubmit('submit');
@@ -1040,6 +1076,11 @@
         if (ps != 'T03') {
             calData('price');
         }
+    })
+    query('#settleSpeed').change(function () {
+        setRiskFlag(1);
+        var calflag = query("input[name=calculateField]:checked").val();
+        calData(calflag);
     })
 
     if (ps == 'T03') {//回售时特殊处理

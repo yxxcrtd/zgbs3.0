@@ -256,7 +256,7 @@
 												WHEN fpt.TYPE_8 = 'F02' and fp.TRADE_MARKET in ('03','04') THEN mfmi.VALUE_DATE
 												WHEN fpt.TYPE_8 = 'F04' THEN frv.VAL_DATE
 												WHEN fpt.TYPE_8 = 'F11' THEN msp.DEAL_DATE
-												WHEN fpt.TYPE_8 = 'F37' THEN to_date(mcmi.CDATE,'yyyy-MM-dd')
+												WHEN fpt.TYPE_8 = 'F37' THEN mcmi.CDATE
 											END AS valueDate
 										FROM
 										FIN_PRODUCT fp

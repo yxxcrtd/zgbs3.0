@@ -40,9 +40,13 @@ var table
             {field: 'statusValidString', width: 200, sortField:'statusValid', title: '有效状态'}
             , {
                 field: 'bizCode', width: 200, title: '业务编号', render: function (data, type, row, meta) {
+                    if(row.paBussType==='212'||row.paBussType==='180'||row.paBussType==='151'||row.paBussType==='202'||row.paBussType==='09'){
+                        return  data ;
+                    }
                     return "<a class='pro-link' style='cursor: pointer;' " +
                         "href='javascript:openOperateWindow(\"" + row.statusValid + "\",\"" + row.paBussType + "\",\"" + row.portfolioId + "\",\""
-                        + row.bizCode + "\",\"" + row.workflowId + "\",\"" + row.finprodId + "\",\"" + row.ps + "\",\"" + row.wflWorkflowId + "\","+row.todo+ ",\""+ row.profitType + "\",\"" + row.finprodId + "\",\"" + row.operateType + "\")'>" + data + "</a>";
+                        + row.bizCode + "\",\"" + row.workflowId + "\",\"" + row.finprodId + "\",\"" + row.ps + "\",\"" + row.wflWorkflowId + "\","+row.todo+ ",\""
+                        + row.profitType + "\",\"" + row.finprodId + "\",\"" + row.operateType+ "\",null,null,\"" + row.paBussTypeAdd + "\")'>" + data + "</a>";
                 }
             }
             , {field: 'paBussTypeString', width: 200, sortField:'PA_BUSS_TYPE', title: '业务类型'}
@@ -117,14 +121,18 @@ var table
             printPayOrders();
         })
         $("#FundBackgroundManagement001_btn_export").click(exportExcel)
-        $(document).on("click", "div.laytable-cell-checkbox div.layui-form-checkbox", function (e) {
-        	refreshTotalPrinAmt();
-        	});
-        $("#FundBackgroundManagement001_btn_calculate").click(function(){
-        	refreshTotalPrinAmt();
+        // $(document).on("click", "div.laytable-cell-checkbox div.layui-form-checkbox", function (e) {
+        // 	refreshTotalPrinAmt();
+        // 	});
+        // $("#FundBackgroundManagement001_btn_calculate").click(function(){
+        // 	refreshTotalPrinAmt();
+        // });
+        // $(".layTableCheckbox").on("click", function () {
+        // 	refreshTotalPrinAmt();
+        // });
+        $("#dataTableDiv").on("click", function () {
+            refreshTotalPrinAmt();
         });
-        $(".layTableCheckbox").on("click", function () {
-        	refreshTotalPrinAmt();
-        });
+
     });
 }());

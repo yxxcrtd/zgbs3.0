@@ -58,6 +58,11 @@ public class BaseTradeFeeCommServiceImpl implements BaseTradeFeeCommService {
     			if(StringUtil.equals(BussinessDictCodeList.费用类型_交易手续费.getValue(), feeType)){
     				searchDto.setRegistOrg(null);
     			}
+				//结算手续费登记托管机构必传
+				if (StringUtil.equals(BussinessDictCodeList.费用类型_结算手续费.getValue(), feeType) &&
+						StringUtil.isEmpty(searchDto.getRegistOrg())) {
+					continue;
+				}
     			searchDto.setFeeType(feeType);
     			searchDto.setSecAcctId(null);
                 if (StringUtil.equals(searchDto.getIsGrade(), "0")) {
@@ -67,6 +72,7 @@ public class BaseTradeFeeCommServiceImpl implements BaseTradeFeeCommService {
     			if(feeDetailList.size()<=0){
     				continue;
     			}
+
     			MstCommissionSetDto retFeeDetailDto=feeDetailList.get(0);
     			
     			//调用费用计算

@@ -1,6 +1,7 @@
 package com.joyintech.tams.invest.trade.exchangetransmatch.common.dao;
 
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.common.base.pojo.PledgeListDto;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonEntrustDetailDto;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonEntrustDto;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonRevokeDto;
@@ -142,6 +143,13 @@ public interface ExchangeTransMatchCommonMapper {
     // GZYHTZJY-1032: 协议回购的头寸处理，需要走PTL_POSITION_FLOW_CFG配置
     FinDealPledge selectFinDealPledgeByPrimaryKey(FinDealPledgeKey finDealPledgeKey);
 
+    /**
+     * 查询首期质押券信息
+     * @param finDealPledgeKey
+     * @return
+     */
+    List<FinDealPledge> selectFinDealPledges(FinDealPledgeKey finDealPledgeKey);
+
 //    /**
 //     * 根据首期成交编号查询协议回购首期的交易编号
 //     * @param paraMap 参数
@@ -198,4 +206,15 @@ public interface ExchangeTransMatchCommonMapper {
      * @return
      */
     List<TrdProductDeal> getFirstBondTrdProductDeals(@Param("entrustId") String entrustId, @Param("secAcctId") String secAcctId);
+
+    /**
+     * 根据金融产品代码查询现金流信息
+     * @param finprodId
+     * @return
+     */
+    List<FinCashInfo> getFinCashInfosByFinprodId(@Param("finprodId") String finprodId);
+
+    // XYHGFXSJ-767 【实时资产头寸查询】协议回购上交所正回购中途换券日终清结算后，实时资产报表里数据错误
+    List<PledgeListDto> selectFinDealPledgeByEntrust(@Param("entrustId") String entrustId);
+    // XYHGFXSJ-767 【实时资产头寸查询】协议回购上交所正回购中途换券日终清结算后，实时资产报表里数据错误
 }

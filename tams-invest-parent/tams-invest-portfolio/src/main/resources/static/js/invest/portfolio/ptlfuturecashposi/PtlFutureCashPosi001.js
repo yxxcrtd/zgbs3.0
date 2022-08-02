@@ -26,8 +26,9 @@ $(function() {
         },
         tree:true,
         checkbox:false,
-        lazyload:true,
+        // lazyloadWithWhere:true,
         loadonce:true,
+        searchOnInit: false,
         page:false,
         treeId:'portfolioId',//树形id字段名称
         treeUpId:'upperPortfolioCode',//树形父id字段名称
@@ -36,14 +37,17 @@ $(function() {
          * 定义表格名称
          */
         cols:[
-            {field:'portfolioId', edit:false, title: 'PtlFutureCashPosi001.datePortfolioId', width:260}
-            ,{field:'usableAmt', edit:false, title: 'PtlFutureCashPosi001.usableAmt', width:200,type:'money'}
-            ,{field:'prdEndAmt', edit:false, title: 'PtlFutureCashPosi001.prdEndAmt', width:200,type:'money'}
-            ,{field:'assetPeriodInAmt', edit:false, title: 'PtlFutureCashPosi001.assetPeriodInAmt', width:240,type:'money'}
-            ,{field:'assetPeriodOutAmt', edit:false, title: 'PtlFutureCashPosi001.assetPeriodOutAmt', width:240,type:'money'}
-            ,{field:'cashGapAmt', edit:false, title: 'PtlFutureCashPosi001.cashGapAmt', width:200,type:'money'}
-            ,{field:'mDateStr', edit:false, title: 'PtlFutureCashPosi001.mDate', width:150,sortField: 'mdate'}
-        ]
+            {field:'portfolioId',  title: 'PtlFutureCashPosi001.datePortfolioId', width:260}
+            ,{field:'usableAmt',  title: 'PtlFutureCashPosi001.usableAmt', width:200,type:'money'}
+            ,{field:'prdEndAmt',  title: 'PtlFutureCashPosi001.prdEndAmt', width:200,type:'money'}
+            ,{field:'assetPeriodInAmt',  title: 'PtlFutureCashPosi001.assetPeriodInAmt', width:240,type:'money'}
+            ,{field:'assetPeriodOutAmt',  title: 'PtlFutureCashPosi001.assetPeriodOutAmt', width:240,type:'money'}
+            ,{field:'cashGapAmt',  title: 'PtlFutureCashPosi001.cashGapAmt', width:200,type:'money'}
+            ,{field:'mDateStr',  title: 'PtlFutureCashPosi001.mDate', width:150,sortField: 'mdate'}
+        ],
+        done: function() {
+
+        }
     });
     
     /**

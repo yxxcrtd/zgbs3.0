@@ -193,6 +193,9 @@ public enum DictCodeListExt4 implements BaseDictCodeList {
     股票交易发行方式_红利补税(DictCode.股票交易发行方式,"04","未上市-新股"),
     股票交易发行方式零碎股转现金(DictCode.股票交易发行方式,"05","已上市"),
     /** add by zhangzewei on 20220428：股票相关变更 end **/
+    平安业务类型_信用保护凭证_买入(DictCode.平安业务类型,"210","信用保护凭证买入"),
+    平安业务类型_信用保护凭证_卖出(DictCode.平安业务类型,"211","信用保护凭证卖出"),
+    平安业务类型_信用保护凭证_申购(DictCode.平安业务类型,"212","信用保护凭证申购"),
     ;
     /**
      * 对应于数据字典code

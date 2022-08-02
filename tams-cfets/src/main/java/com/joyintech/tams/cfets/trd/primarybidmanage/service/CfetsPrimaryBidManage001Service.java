@@ -101,6 +101,8 @@ public class CfetsPrimaryBidManage001Service extends BaseService{
         }
         pageParam.put("direction",request.getPageMode().getDirection());
         pageParam.put("userId",SecurityUtil.getLoginUser().getUserName());
+        pageParam.put("YN_N",DictCodeList.是否_否.getValue());
+        pageParam.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
         Page<CfetsPrimaryBidManageCfmResponse> page
                 =  super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),
                 () -> cfetsPrimaryBidManageMapper.selectCfmForPage(pageParam));
@@ -189,7 +191,7 @@ public class CfetsPrimaryBidManage001Service extends BaseService{
             }
         }
         pageParam.put("userId",SecurityUtil.getLoginUser().getUserName());
-        pageParam.put("finprodIdList", StringUtil.splitToList(null, request.getFinprodMarketId()));
+        pageParam.put("finprodIdList", StringUtil.splitToList(null, request.getFinprodId()));
         pageParam.put("tradeMarketList", StringUtil.splitToList(null, request.getTradeMarket()));
         pageParam.put("tenderTargetList", StringUtil.splitToList(null, request.getTenderTarget()));
         pageParam.put("winTypeList", StringUtil.splitToList(null, request.getWinType()));

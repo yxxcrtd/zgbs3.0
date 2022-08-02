@@ -42,6 +42,8 @@ public class EntrustCommonDto {
 
     private BigDecimal forcedFinishAmt;
 
+    private String isSettleFail;
+
     public BussRepoSecDto getBussRepoSecDto() {
         return bussRepoSecDto;
     }
@@ -120,5 +122,19 @@ public class EntrustCommonDto {
 
     public void setForcedFinishAmt(BigDecimal forcedFinishAmt) {
         this.forcedFinishAmt = forcedFinishAmt;
+    }
+
+    /**
+     * 是否交收失败
+     */
+    public String getIsSettleFail() {
+        return isSettleFail;
+    }
+
+    /**
+     * 是否交收失败
+     */
+    public void setIsSettleFail(String isSettleFail) {
+        this.isSettleFail = isSettleFail;
     }
 }

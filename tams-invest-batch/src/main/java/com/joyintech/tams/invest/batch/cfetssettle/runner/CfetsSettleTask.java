@@ -44,7 +44,7 @@ public class CfetsSettleTask extends BatchBaseService {
     /**
      * 日志
      */
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * PlatformDate
@@ -60,7 +60,7 @@ public class CfetsSettleTask extends BatchBaseService {
      */
     @Override
     public JobExecution execute() throws BatchException {
-        JobExecution result = new JobExecution(1l);
+        JobExecution result = new JobExecution(1L);
         result.setStatus(BatchStatus.FAILED);
         SysBatchExecInfo batchExecuteInfo = this.getBatchExecuteInfo();
         if (batchExecuteInfo == null) {
@@ -79,7 +79,7 @@ public class CfetsSettleTask extends BatchBaseService {
         } catch (Exception e) {
            logger.error(e.getMessage());
             //异常信息记录到批处理的日志详情
-            throw new BatchException(RiskUtil.getLogString(e));
+            RiskUtil.getLogString(e);
         }
         return result;
     }

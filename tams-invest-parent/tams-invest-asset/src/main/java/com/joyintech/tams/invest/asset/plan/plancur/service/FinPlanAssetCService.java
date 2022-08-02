@@ -141,7 +141,16 @@ public class FinPlanAssetCService extends CommonExportService<FinPlanAssetCDto>
         ptlPortfolio.setMdate(finProduct.getMdate());
         ptlPortfolio.setProfitType(DictCodeListExt2.收益类型_货币.getValue());
         entity.setPtlPortfolio(ptlPortfolio);
-        //add end
+
+        // add by swwan TISHKS-1483 start
+        PaPtlPortfolio paPtlPortfolio = new PaPtlPortfolio();
+        paPtlPortfolio.setPortfolioId(ptlPortfolio.getPortfolioId());
+        paPtlPortfolio.setInvestNature(entity.getInvestmentAttributes());
+        /*paPtlPortfolio.setOpenType("02");
+        paPtlPortfolio.setRaiseType("2");*/
+        entity.setPaPtlPortfolio(paPtlPortfolio);
+        // add by swwan TISHKS-1483 end
+
         if (OperationType.DELETE.equals(type)) {
             action = "delete";
         }

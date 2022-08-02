@@ -36,4 +36,6 @@ public interface EntrustStatusMapper {
     List<EntrustClosePosEtrReqDto> selectEntrustList(Map<String, String> sysDate);
 
     void updateBusModel(Map<String,Object> param);
+
+    List<String> findPortfolioIdList(Map<String, Object> param);
 }

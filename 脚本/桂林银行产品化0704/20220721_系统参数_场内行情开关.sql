@@ -1,0 +1,4 @@
+/*新增 系统参数：是否使用行情(Y：是 N：否)*/
+delete from SYS_PARA  where SYSTEM_CODE='TRD' and PARA_CODE ='TRD_USE_QUOTE';
+INSERT INTO SYS_PARA (SYSTEM_CODE, PARA_CODE, PARAM_VALUE, DATA_TYPE, DATA_SCOPE, REMARK, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE, UPDATE_FLG)
+VALUES ('TRD', 'TRD_USE_QUOTE', 'Y', null, null, '是否使用行情(Y：是 N：否)', 'system', null, sysdate, 'w01', sysdate, null, '01');

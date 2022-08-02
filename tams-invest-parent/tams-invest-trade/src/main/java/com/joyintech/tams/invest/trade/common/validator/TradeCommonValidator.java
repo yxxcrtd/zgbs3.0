@@ -14,6 +14,8 @@ import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.BeanValidator;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.common.base.dao.PtlPortfolioMapper;
+import com.joyintech.tams.common.base.entity.PtlPortfolio;
 import com.joyintech.tams.common.base.entity.TrdFinProductDealTotal;
 import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.component.business.common.dao.CommonBusinessMapper;
@@ -74,10 +76,7 @@ import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 交易共通Validator
@@ -171,6 +170,30 @@ public interface TradeCommonValidator extends BeanValidator {
         isAuthorizationSoftcontrol = StringUtil.isNotEmpty(isAuthorizationSoftcontrol)&&isAuthorizationSoftcontrol;
         RiskNamListCommonValidatorService riskNamListCommonValidatorService = SpringContextUtil.getBean(
                 RiskNamListCommonValidatorService.class);
+        //add by lpf 产品到期不能做交易 start 20220712
+        Field portfolioIdField1 = ReflectionUtils.findField(value.getClass(), "portfolioId");//交易对手类型
+        Field tradeDateField = ReflectionUtils.findField(value.getClass(), "tradeDate");//交易方向
+        if (portfolioIdField1 != null && tradeDateField != null) {
+            ReflectionUtils.makeAccessible(portfolioIdField1);
+            ReflectionUtils.makeAccessible(tradeDateField);
+            Object portfolioId = ReflectionUtils.getField(portfolioIdField1, value);
+            Object tradeDate = ReflectionUtils.getField(tradeDateField, value);
+            if (portfolioId != null && tradeDate != null) {
+                PtlPortfolioMapper ptlPortfolioMapper = SpringContextUtil.getBean(PtlPortfolioMapper.class);
+                PtlPortfolio portfolio = ptlPortfolioMapper.selectByPrimaryKey((String) portfolioId);
+                String tradeDateStr = "";
+                if(tradeDate instanceof java.util.Date){
+                    tradeDateStr = DateUtil.format((Date)tradeDate);
+                }
+                else if(tradeDate instanceof java.lang.String){
+                    tradeDateStr = (String) tradeDate;
+                }
+                if(StringUtil.isNotEmpty(portfolio) && StringUtil.isNotEmpty(tradeDateStr) &&DateUtil.compareDate(DateUtil.format(portfolio.getMdate()), tradeDateStr)<0){
+                    validMessageList.add(new ValidMessage("portfolioId", "产品已到期，不可做交易！"));
+                }
+            }
+        }
+        //add by lpf 产品到期不能做交易 end
         // 当业务check没有问题，则执行风险相关交易共通check
         if (StringUtil.isEmptyList(validMessageList)) {
             try {

@@ -40,6 +40,16 @@ public class FinprodMarketInfoRequest {
     @ApiModelProperty(name="pageMode",value="分页对象")
     private PageMode pageMode;
 
+    private String searchList;
+
+    public String getSearchList() {
+        return searchList;
+    }
+
+    public void setSearchList(String searchList) {
+        this.searchList = searchList;
+    }
+
     public String getSearch() {
         return search;
     }

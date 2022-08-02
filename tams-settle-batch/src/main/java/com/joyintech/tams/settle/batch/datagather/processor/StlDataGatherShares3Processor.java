@@ -2,13 +2,11 @@ package com.joyintech.tams.settle.batch.datagather.processor;
 
 import com.joyintech.batch.batchbase.baseclass.entity.NeedOperateEntity;
 import com.joyintech.framework.base.entity.SysBatchExecInfo;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.IDGenerator;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.entity.PtlTrade;
 import com.joyintech.tams.common.base.entity.SettleTransTgMapping;
 import com.joyintech.tams.common.base.entity.StlPayOrders;
+import com.joyintech.tams.common.base.entity.TrdProductDealAdd;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
@@ -98,8 +96,16 @@ public class StlDataGatherShares3Processor extends StlDataGatherProcessor {
 
 					PtlTrade ptlTrade = setPtlTrade(dealDto);
 					ptlTrade.setSettleDate(dealDto.getSettleDate());
+
+					StlPayOrders stlPayOrders = this.genStlPayOrders(dealDto, settleTransDataDto);
+
+					TrdProductDealAdd trdProductDealAdd = new TrdProductDealAdd();
+					BeanUtil.copyPropertiesIgnoreNull(trdProductDealAdd, dealDto);
+
 					investTradeWriteDto.getPtlTradeList().add(ptlTrade);
 					investTradeWriteDto.getProductDealList().add(dealDto);
+					investTradeWriteDto.getStlPayOrdersList().add(stlPayOrders);
+					investTradeWriteDto.getTrdProductDealAddList().add(trdProductDealAdd);
 				}
 			}
 		}
@@ -116,6 +122,24 @@ public class StlDataGatherShares3Processor extends StlDataGatherProcessor {
 
 	@Override
 	protected List<String> getFinprodType() {return Arrays.asList(DictCodeListExt1.金融产品类型_投管用_股票.getValue());}
+
+	private StlPayOrders genStlPayOrders(TrdProductDealDto dealDto, SettleTransDataDto settleTransDataDto){
+		// 构造划款指令表
+		StlPayOrders stlPayOrders = new StlPayOrders();
+		stlPayOrders.setOrderId(settleCommonService.buildBussinessIdBySeqno("9998"));
+		stlPayOrders.setOrderType(DictCodeListExt1.交易状态_初始.getValue());
+		stlPayOrders.setPayType(DictCodeListExt1.平安划款类型_清算划款.getValue());
+		stlPayOrders.setMyAcctNo(settleTransDataDto.getAcctNo());
+		stlPayOrders.setSettleAmt(dealDto.getTradeAmt());
+		stlPayOrders.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+		stlPayOrders.setIsNeedSend(DictCodeList.是否_否.getValue());
+		stlPayOrders.setIsTotalTrade(DictCodeList.是否_是.getValue());
+		stlPayOrders.setTradeId(dealDto.getTradeId());
+		stlPayOrders.setPortfolioId(settleTransDataDto.getPortfolioId());
+		stlPayOrders.setSettleDate(dealDto.getSettleDate());
+		stlPayOrders.setPs(DictCodeListExt1.收付方向_支出.getValue());
+		return stlPayOrders;
+	}
 
 	/**
 	 * 生成投资组合交易

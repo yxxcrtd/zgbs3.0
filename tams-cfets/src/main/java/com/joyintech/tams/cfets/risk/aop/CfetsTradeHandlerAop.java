@@ -399,8 +399,12 @@ public class CfetsTradeHandlerAop {
      * @param joinPoint
      * @throws BusinessException
      */
-    @AfterReturning("issuingFail()")
-    public void occupyOnIssuingFail(JoinPoint joinPoint) throws BusinessException {
+    @AfterReturning(pointcut = "issuingFail()", returning = "ajaxResultMessage")
+    public void occupyOnIssuingFail(JoinPoint joinPoint, Message<AjaxResult> ajaxResultMessage) throws BusinessException {
+        AjaxResult ajaxResult = ajaxResultMessage.getData();
+        if (ajaxResult != null && !StringUtil.isEmptyList(ajaxResult.getErrorList())) {
+            return;
+        }
         Object[] args = joinPoint.getArgs();
         try {
             inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);

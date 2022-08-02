@@ -2771,6 +2771,7 @@ public class IbuComponentCommonService extends BaseService {
                     WflIbuQuoteEntCrepPledgeDto wflIbuQuoteEntCrepPledge = new WflIbuQuoteEntCrepPledgeDto();
                     BeanUtil.copyPropertiesIgnoreNull(wflIbuQuoteEntCrepPledge,item);
                     wflIbuQuoteEntCrepPledge.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
+                    wflIbuQuoteEntCrepPledge.setWorkflowId(cfetsRepoDealQuotedPrice001Dto.getWorkflowId());
                     wflIbuQuoteEntCrepPledges.add(wflIbuQuoteEntCrepPledge);
                 });
             }
@@ -2868,6 +2869,10 @@ public class IbuComponentCommonService extends BaseService {
         // region 银行间报价主信息
         IbuQuoteCrepDto ibuQuoteCrepDto = repoDialogueQuoteDto.getIbuQuoteCrepDto();
         // 报价编号（内部代码）
+        if (ibuQuoteCrepDto == null
+                || StringUtil.isEmpty(ibuQuoteCrepDto.getQuoteId())) {
+            return null;
+        }
         dto.setQuoteId(ibuQuoteCrepDto.getQuoteId());
         dto.setPortfolioId(ibuQuoteCrepDto.getPortfolioId());// 组合代码
         dto.setEntrustId(ibuQuoteCrepDto.getEntrustId());// 委托代码

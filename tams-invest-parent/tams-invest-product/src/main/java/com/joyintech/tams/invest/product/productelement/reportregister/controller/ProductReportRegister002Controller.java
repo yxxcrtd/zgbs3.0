@@ -113,9 +113,9 @@ public class ProductReportRegister002Controller extends BaseController {
 		model.addAttribute("repOpenMode", this.getParam("repOpenMode"));
 		model.addAttribute("repManageMode", this.getParam("repManageMode"));
 		// 发行机构代码
-//		model.addAttribute("SVR_ISSUE_PARTY_ID", CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID"));
+		model.addAttribute("SVR_ISSUE_PARTY_ID", CacheUtil.getSysParam("SVR_ISSUE_PARTY_ID"));
 		//update by leipeng 【 产品申报登记要素管理】新建 发行机构代码默认值显示有误
-		model.addAttribute("SVR_ISSUE_PARTY_ID", CommonUtil.selectBankCode());
+//		model.addAttribute("SVR_ISSUE_PARTY_ID", CommonUtil.selectBankCode());
 		 //是否子公司
         model.addAttribute("svrIsSubsidiary", CacheUtil.getSysParam("SVR_IS_SUBSIDIARY"));
 		// 流程
