@@ -1,5 +1,6 @@
 package com.joyintech.tams.invest.common.trade.service.impl.etrcash;
 
+import com.alibaba.fastjson.JSON;
 import com.joyintech.calculation.CalculatorFactory;
 import com.joyintech.calculation.bonds.PaperIrReset;
 import com.joyintech.calculation.bonds.SecIntSchedule;
@@ -362,12 +363,18 @@ public class EtrCommonCashPositionDealService extends BaseService {
         accurIntCalInParameter.setPaperIrResetList(paperIrResetList);
         // 从计算工厂中创建应计利息计算器
         AccurIntCalculator calc = CalculatorFactory.createAccurIntCalculator();
-        // 计算利息
-        AccurIntCalOutParameter accurIntCalOutParameter = calc.calculate(accurIntCalInParameter);
+        // XYHGFXSJ-815:跑批因为垃圾数据会导致计算利息异常 modify by fuyongsheng 20220802 start
         // 百元面值应计利息
         BigDecimal accurInt = BigDecimal.ZERO;
         final int SCALE = 12;
-        accurInt = ArithmeticUtil.round(accurIntCalOutParameter.getInterest(), SCALE, RoundingMode.HALF_UP);
+        // 计算利息
+        try{
+            AccurIntCalOutParameter accurIntCalOutParameter = calc.calculate(accurIntCalInParameter);
+            accurInt = ArithmeticUtil.round(accurIntCalOutParameter.getInterest(), SCALE, RoundingMode.HALF_UP);
+        }catch (Exception ex){
+            logger.error("计算利息异常,参数:" + JSON.toJSONString(accurIntCalInParameter), ex);
+        }
+        // XYHGFXSJ-815:跑批因为垃圾数据会导致计算利息异常 modify by fuyongsheng 20220802 end
         // a.当前债券面额取得（根据还本计划计算）
         Map<String, Object> paraMap = new HashMap<String, Object>();
         paraMap.put("finprodId", finprodId);
