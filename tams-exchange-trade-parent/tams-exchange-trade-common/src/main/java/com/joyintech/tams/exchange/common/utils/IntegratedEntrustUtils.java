@@ -133,7 +133,7 @@ public class IntegratedEntrustUtils {
     public static boolean isFixedIncome_BS(String entrustProp) {
         if (!Strings.isNullOrEmpty(entrustProp)) {
             if (entrustProp.equals(EntrustProp.SH_FIXEDINCOME_BAOJIA_OPPOSITE.value)
-                    ||entrustProp.equals(EntrustProp.SH_FIXEDINCOME_BAOJIA_OPPOSITE_SZ.value))
+                    || entrustProp.equals(EntrustProp.SH_FIXEDINCOME_BAOJIA_OPPOSITE_SZ.value))
                 return true;
         }
         return false;
@@ -179,7 +179,7 @@ public class IntegratedEntrustUtils {
      * @Date: 2020/3/31
      */
     public static boolean isCDS(String entrustProp) {
-    	if (!Strings.isNullOrEmpty(entrustProp)) {
+        if (!Strings.isNullOrEmpty(entrustProp)) {
             if (entrustProp.equals(EntrustProp.CREDIT_PROTECTION_CERTIFICATE.value))
                 return true;
         }
@@ -388,7 +388,8 @@ public class IntegratedEntrustUtils {
         if (Strings.isNullOrEmpty(entrustProp)) {
             return false;
         }
-        return StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_XD.value)
+        return StringUtil.equals(entrustProp, EntrustProp.SH_FIXEDINCOME_BAOJIA_OPPOSITE.value)
+                || StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_XD.value)
                 || StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_JS.value)
                 || StringUtil.equals(entrustProp, EntrustProp.SZ_XSCJ_JJ.value);
     }
@@ -406,11 +407,13 @@ public class IntegratedEntrustUtils {
         }
         return false;
     }
- 	/**
- 	 * 新债 深交所 协商成交回复
- 	 * @param entrustProp
- 	 * @return
- 	 */
+
+    /**
+     * 新债 深交所 协商成交回复
+     *
+     * @param entrustProp
+     * @return
+     */
     public static boolean isNegotiateHF_SZ(String entrustProp) {
         if (!Strings.isNullOrEmpty(entrustProp)) {
             if (EntrustProp.SZ_XSCJ_JS.value.equals(entrustProp)
