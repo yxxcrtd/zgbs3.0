@@ -447,7 +447,12 @@
         var occupyDays = $("#occupyDays").val();
         var tradeAmt = $("#tradeAmt").val();
         var y = $("#yield").val();
-        $("#yield").val(Number(y).toFixed(2));
+        var fixedNum = 2;
+        var tradeMarket = $("#tradeMarket").val();
+        if (tradeMarket === TRADE_MARKET_03){
+            fixedNum = 3;
+        }
+        $("#yield").val(Number(y).toFixed(fixedNum));
         if (occupyDays && tradeAmt && y) {
             var intamt = Math.round(tradeAmt * y / 100 * occupyDays / 365 * 100) / 100;
             var expireSettleAmt = parseFloat(intamt) + parseFloat(tradeAmt);
