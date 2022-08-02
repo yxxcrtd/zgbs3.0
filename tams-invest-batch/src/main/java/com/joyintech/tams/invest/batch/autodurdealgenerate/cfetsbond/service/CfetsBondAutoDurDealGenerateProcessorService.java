@@ -100,7 +100,7 @@ public class CfetsBondAutoDurDealGenerateProcessorService extends BaseService {
      * @since 1.0
      */
     public void execute(Date batchDate) {
-        Map<String, Object> paramMap1 = new HashMap<String, Object>();
+        Map<String, Object> paramMap1 = new HashMap<>();
         paramMap1.put("busiType", DictCodeList.共通业务类型_债券类资产存续期.getValue());
         paramMap1.put("finProdType2", Collections.singletonList(DictCodeListExt1.金融产品类型_投管用_债券.getValue()));
         paramMap1.put("updateUser", "system");
