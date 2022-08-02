@@ -2796,7 +2796,7 @@ $(function() {
         });
 
         $('#FinNetProductDuration_btn_cancel').click(function() {
-			Joyin.confirm("是否关闭？", function() {
+			Joyin.confirm("请确认是否要关闭？", function() {
 				window.top.layui.tab.tabDelete('PRODUCT_SIDE_001_003_008','FinNetProductDuration');
 			});
 		});
