@@ -1656,11 +1656,17 @@ public class ExchangeTransMatchCommonService extends BaseService {
 
             //更新汇总成交数据状态表
             SettleTransDataTotalStatus settleTransDataTotalStatus = settleTransDataTotalStatusMapper.selectByPrimaryKey(dto.getSeqNo());
+            // XYHGFXSJ-782:协议回购没有部分匹配,所以撤销肯定是未匹配 modify by fuyongsheng 20220802 start
+            SettleTransDataTotalAdd settleTransDataTotalAdd = settleTransDataTotalAddMapper.selectByPrimaryKey(dto.getSeqNo());
             if(StringUtil.isNotEmpty(settleTransDataTotalStatus)) {
                 //取得剩余匹配份额
                 BigDecimal remainNum = exchangeTransMatchCommonMapper.getRemainNum(dto.getSeqNo());
-                settleTransDataTotalStatus.setMatchStatus(BigDecimal.ZERO.compareTo(remainNum) >=0
-                        ?DictCodeListExt3.下行交易匹配状态_未匹配.getValue():DictCodeListExt3.下行交易匹配状态_部分匹配.getValue());
+                if(DictCodeList.回购类型_质押式协议回购.getValue().equals(settleTransDataTotalAdd.getRepoType())){
+                    settleTransDataTotalStatus.setMatchStatus(DictCodeListExt3.下行交易匹配状态_未匹配.getValue());
+                }else{
+                    settleTransDataTotalStatus.setMatchStatus(BigDecimal.ZERO.compareTo(remainNum) >=0
+                            ?DictCodeListExt3.下行交易匹配状态_未匹配.getValue():DictCodeListExt3.下行交易匹配状态_部分匹配.getValue());
+                }
                 settleTransDataTotalStatus.setUpdateTime(new Date());
                 settleTransDataTotalStatus.setUpdateUser(StringUtil.isNotEmpty(LoginUserUtil.getUserName())?LoginUserUtil.getUserName():"system");
                 settleTransDataTotalStatusMapper.updateByPrimaryKey(settleTransDataTotalStatus);
@@ -1669,8 +1675,13 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 settleTransDataTotalStatus.setSeqNo(dto.getSeqNo());
                 //取得剩余匹配份额
                 BigDecimal remainNum = exchangeTransMatchCommonMapper.getRemainNum(dto.getSeqNo());
-                settleTransDataTotalStatus.setMatchStatus(BigDecimal.ZERO.compareTo(remainNum) >=0
-                        ?DictCodeListExt3.下行交易匹配状态_未匹配.getValue():DictCodeListExt3.下行交易匹配状态_部分匹配.getValue());
+                if(DictCodeList.回购类型_质押式协议回购.getValue().equals(settleTransDataTotalAdd.getRepoType())){
+                    settleTransDataTotalStatus.setMatchStatus(DictCodeListExt3.下行交易匹配状态_未匹配.getValue());
+                }else{
+                    settleTransDataTotalStatus.setMatchStatus(BigDecimal.ZERO.compareTo(remainNum) >=0
+                            ?DictCodeListExt3.下行交易匹配状态_未匹配.getValue():DictCodeListExt3.下行交易匹配状态_部分匹配.getValue());
+                }
+                // XYHGFXSJ-782:协议回购没有部分匹配,所以撤销肯定是未匹配 modify by fuyongsheng 20220802 end
                 settleTransDataTotalStatus.setUpdateTime(new Date());
                 settleTransDataTotalStatus.setUpdateUser(StringUtil.isNotEmpty(LoginUserUtil.getUserName())?LoginUserUtil.getUserName():"system");
                 settleTransDataTotalStatusMapper.insert(settleTransDataTotalStatus);
