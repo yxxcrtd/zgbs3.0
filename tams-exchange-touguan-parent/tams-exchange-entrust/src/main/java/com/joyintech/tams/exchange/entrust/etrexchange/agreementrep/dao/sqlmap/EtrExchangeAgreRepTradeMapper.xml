@@ -718,7 +718,7 @@
                 END AS dealPercent,
                 CASE
                 WHEN etr_entrust.PS = 'T94' THEN
-                        ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
+                        decode(etr_entrust.ENTRUST_TYPE,'21',ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )*100,ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 ))
                     ELSE ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
                 END finishAmt,
                 CASE
@@ -726,13 +726,15 @@
                         ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
                     WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
                         ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
+                    WHEN etr_entrust.ENTRUST_TYPE = '21' THEN
+                        ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )*100
                     WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
                         ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
                     ELSE ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
                 END AS avaNum,
                 CASE
                     WHEN etr_entrust.PS = 'T94' THEN
-                        ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
+                        decode(etr_entrust.ENTRUST_TYPE,'21',ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )*100,ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 ))
                     ELSE ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
                 END finishDealAmt,
                 CASE
@@ -740,6 +742,8 @@
                         ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
                     WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
                         ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
+                    WHEN etr_entrust.ENTRUST_TYPE = '21' THEN
+                        ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )*100
                     WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
                         ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
                     ELSE ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
