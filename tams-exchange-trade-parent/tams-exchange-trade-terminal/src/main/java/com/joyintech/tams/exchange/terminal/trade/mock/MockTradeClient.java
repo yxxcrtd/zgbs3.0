@@ -7,6 +7,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondQryBean;
 import com.joyintech.tams.exchange.common.constant.*;
@@ -216,8 +217,7 @@ public class MockTradeClient implements ITradeRequest {
             logger.info("entrustVolume:{}", entrustVolume);
             if (entrustVolume <= 200
                     || IntegratedEntrustUtils.isFixedIncome(entrust.getEntrustProp())
-                    || IntegratedEntrustUtils.isProtocolBack_SH(entrust.getEntrustProp())
-                    || IntegratedEntrustUtils.isProtocolBack_SZ(entrust.getEntrustProp())) {//不分笔成交
+                    || EntrustUtils.isPledgeAgreementRepurchase(entrust.getBusiTypeTg())) {//不分笔成交
                 trade.setTradedVolume(entrustVolume);
                 if (tradeBalance != 0) {
                     trade.setTradedBalance(BigDecimal.valueOf(tradeBalance));
@@ -242,7 +242,9 @@ public class MockTradeClient implements ITradeRequest {
         trade.setTradingDay(entrust.getTradingDay());
         trade.setMarket(entrust.getMarket());
         trade.setFinanceAccount(entrust.getFinanceAccount());
-        trade.setStockCode(StockCodeUtils.getStockCode(entrust.getStockCode()));
+        if (StringUtil.isNotEmpty(entrust.getStockCode())) {
+            trade.setStockCode(StockCodeUtils.getStockCode(entrust.getStockCode()));
+        }
         trade.setEntrustBs(entrust.getEntrustBs());
         trade.setIsFullPrice(entrust.getIsFullPrice());
         //全价
@@ -458,8 +460,10 @@ public class MockTradeClient implements ITradeRequest {
         double tradeBalance = 0;
         if (integratedEntrust.getEntrustVolume() % 300 == 0
                 || IntegratedEntrustUtils.isFixedIncome(integratedEntrust.getEntrustProp())
-                || IntegratedEntrustUtils.isProtocolBack_SZ(integratedEntrust.getEntrustProp())
-                || IntegratedEntrustUtils.isProtocolBack_SH(integratedEntrust.getEntrustProp())) {//全部成交 数量是300的倍数全部成交
+                || EntrustUtils.isPledgeAgreementRepurchase(integratedEntrust.getBusiTypeTg())
+//                || IntegratedEntrustUtils.isProtocolBack_SZ(integratedEntrust.getEntrustProp())
+//                || IntegratedEntrustUtils.isProtocolBack_SH(integratedEntrust.getEntrustProp())
+        ) {//全部成交 数量是300的倍数全部成交
             integratedEntrust.setEntrustStatus(EntrustStatus.SUCCEEDED.value);
             tradeVolume = integratedEntrust.getEntrustVolume();
             if (integratedEntrust.getCompactTerm() != 0) {
@@ -478,7 +482,7 @@ public class MockTradeClient implements ITradeRequest {
     }
 
     private boolean mockNoTradeByEntrustVolume(IntegratedEntrust integratedEntrust) {
-        if (integratedEntrust.getEntrustVolume() % 7 == 0) {
+        if (integratedEntrust.getEntrustVolume() != 0 && integratedEntrust.getEntrustVolume() % 7 == 0) {
             logger.info("数量是7的倍数，模拟没有成交");
             integratedEntrust.setEntrustStatus(EntrustStatus.REPORTED.value);
             entrustMap.put(integratedEntrust.getId(), integratedEntrust);
@@ -489,7 +493,7 @@ public class MockTradeClient implements ITradeRequest {
     }
 
     private boolean mockIntegratedEntrustFailByEntrustVolume(IntegratedEntrust integratedEntrust) {
-        if (integratedEntrust.getEntrustVolume() % 9 == 0) {
+        if (integratedEntrust.getEntrustVolume() != 0 && integratedEntrust.getEntrustVolume() % 9 == 0) {
             logger.info("integratedEntrust数量为9的倍数,模拟下单失败,废单");
             integratedEntrust.setEntrustStatus(EntrustStatus.INVALID.value);
             integratedEntrust.setErrorMsg("integratedEntrust数量为9的倍数,模拟下单失败,废单");

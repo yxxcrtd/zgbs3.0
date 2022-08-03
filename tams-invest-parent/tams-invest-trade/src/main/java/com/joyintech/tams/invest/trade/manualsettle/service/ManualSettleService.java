@@ -1,30 +1,29 @@
 package com.joyintech.tams.invest.trade.manualsettle.service;
 
+import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.export.ExportParam;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.jdbc.enums.DataSourceType;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.component.business.riskrds.dto.InterfRiskRdsDto;
-import com.joyintech.tams.component.business.riskrds.service.InterfRiskRdsService;
-import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
-import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.trade.manualsettle.dto.ManualSettleDto;
 import com.joyintech.tams.invest.trade.manualsettle.dto.ManualSettleFlowDto;
-import com.joyintech.tams.invest.trade.project.dto.TrdProjectInvestTrade001Dto;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.poi.ss.usermodel.Cell;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import static com.joyintech.tams.constant.DictCodeListExt3.流程节点_审批生效;
+import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_新建;
 
 /**
  * @author zhangnian
@@ -36,6 +35,8 @@ import java.util.Map;
 public class ManualSettleService extends CommonExportService<ManualSettleDto>
         implements BaseProcessService<ManualSettleDto> {
 
+    @Value("${application.micorservice.contextPath.tamsServer:http://127.0.0.1:8080/tams}")
+    private String tamsServer;
 
 
     @Override
@@ -49,6 +50,12 @@ public class ManualSettleService extends CommonExportService<ManualSettleDto>
                     ||StringUtil.equals(dto.getPageModel(),DictCodeListExt3.交收操作类型_交收失败.getValue())){
                   settleCash(dto);
             }
+        //信用保护凭证买入、信用保护凭证卖出的交收失败风险调用共通处理
+        if(StringUtil.equals(dto.getPageModel(), DictCodeListExt3.交收操作类型_交收失败.getValue())
+            &&(StringUtil.equals(dto.getBusiType(),"27") || StringUtil.equals(dto.getBusiType(),"28"))){
+            String url = String.format("/interf/risk/riskTrial/doOccupy/exchangeTrd/%s/%s/%s", "ManualSettle001", 系统动作_新建.getValue(), 流程节点_审批生效.getValue());
+            restTemplate.postForObject(tamsServer + url, dto, AjaxResult.class);
+        }
     }
 
     /**

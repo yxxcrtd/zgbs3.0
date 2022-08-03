@@ -78,7 +78,11 @@ public class ComCoinFundQuotationInfoValidator implements BeanValidator {
             else if (StringUtil.equals(dto.getPageModel(), GlobalConstant.DETAIL_PAGE_MODEL_NEW)) {
                 // 判断是否存在空值，直接返回交给注解处理
             if (dto.getFinprodId() == null || dto.getFinprodId().isEmpty()
-                || dto.getValDate() == null || dto.getValuation() == null || dto.getcShares() == null) {
+                || dto.getValDate() == null || dto.getValuation() == null
+                    // TISHKS-1503:cshares字段不是必填项,无需校验 modify by fuyongsheng 20220630 start
+                    // || dto.getcShares() == null
+                    // TISHKS-1503:cshares字段不是必填项,无需校验 modify by fuyongsheng 20220630 end
+            ) {
 
                 }
                 else if (dto.getFinprodType().isEmpty()) {
@@ -87,17 +91,25 @@ public class ComCoinFundQuotationInfoValidator implements BeanValidator {
                 }
                 else if (comCoinFundQuotationInfo001Service.selectByIdAndValDate(dto.getFinprodId(),
                 DateUtil.format(dto.getValDate())) != null
-                     && !comCoinFundQuotationInfo001Service.selectByIdAndValDate(
-                         dto.getFinprodId(), DateUtil.format(dto.getValDate())).isEmpty()) {
+                    && !comCoinFundQuotationInfo001Service.selectByIdAndValDate(
+                        dto.getFinprodId(), DateUtil.format(dto.getValDate())).isEmpty()) {
+                    // TISHKS-1503:修改拼接信息 modify by fuyongsheng 20220630 start
                     // 拼接错误信息
-                    StringBuffer sb = new StringBuffer();
-                    sb.append(getMessage("ComCoinFundQuotationInfo001.finprodId")).append(
-                        GlobalConstant.COLON).append(dto.getFinprodMarketId()).append(
-                            GlobalConstant.COMMA).append(
-                                getMessage("ComCoinFundQuotationInfo002.valuationTime")).append(
+//                   StringBuffer sb = new StringBuffer();
+//                   sb.append(getMessage("ComCoinFundQuotationInfo001.finprodId")).append(
+//                        GlobalConstant.COLON).append(dto.getFinprodMarketId()).append(
+//                            GlobalConstant.COMMA).append(
+//                                getMessage("ComCoinFundQuotationInfo002.valuationTime")).append(
+//                                GlobalConstant.COLON).append(DateUtil.format(dto.getValDate()));
+                    StringBuffer sb1 = new StringBuffer();
+                    sb1.append(getMessage("ComCoinFundQuotationInfo001.finprodId")).append(
+                            GlobalConstant.COLON).append(dto.getFinprodMarketId()).append(GlobalConstant.COMMA);
+                    StringBuffer sb2 = new StringBuffer();
+                    sb2.append(getMessage("ComCoinFundQuotationInfo002.valuationTime")).append(
                                 GlobalConstant.COLON).append(DateUtil.format(dto.getValDate()));
                     // 添加错误信息
-                    errorList.add(new ValidMessage(getMessage("BUSS_COM_E_0006", sb.toString())));
+                    errorList.add(new ValidMessage(getMessage("BUSS_COM_E_0006", sb1.toString(), sb2.toString())));
+                    // TISHKS-1503:修改拼接信息 modify by fuyongsheng 20220630 end
                 }
                 else {
                     // 判断估值时间是否小于平台时间

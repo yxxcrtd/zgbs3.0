@@ -38,6 +38,7 @@ import com.joyintech.tams.component.base.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.base.entrust.BusiAutoEtrDispService;
 import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
+import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -54,6 +55,8 @@ import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTr
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.service.EtrExchangeTradeSecRepo001Service;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.service.EtrExchangeTradeSecRepo002Service;
 import com.joyintech.tams.invest.common.component.base.entrust.BaseEtrInvestInfoService;
+import com.joyintech.tams.invest.common.constant.BussinessConstant;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
@@ -71,6 +74,7 @@ import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
+import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -322,7 +326,7 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
         if (!StringUtil.equals("revoke", entity.getOperateType()) && !StringUtil.equals("delete", entity.getOperateType())) {
             //退回的移到备份表
             //根据投资目的与业务模式的对应关系入库时赋值
-            entity.setInvAim("FVTPL");
+//            entity.setInvAim("FVTPL");
             doInsertBackupQuery(entity);
             // 先删除流程中数据
             doDeleteFlow(entity.getWorkflowId());
@@ -427,8 +431,8 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
 
         etrEntrust.setBusinessModel(dto.getBusinessModel());
         //根据投资目的与业务模式的对应关系入库时赋值
-        dto.setInvAim("FVTPL");
-        etrEntrust.setInvAim("FVTPL");
+//        dto.setInvAim("FVTPL");
+//        etrEntrust.setInvAim("FVTPL");
         etrEntrust.setEntrustNum(cash);
         etrEntrust.setTradePlat(DictCodeList.交易平台_其它.getValue());
 
@@ -520,6 +524,55 @@ public class EtrExchangeTradeCpc001Service extends CommonExportService<EtrCredit
 
     }
 
+    @Override
+    public Map<String, Object> getRuntimeVariables(ProcessMark entity, String taskId) throws WorkFlowException {
+        EtrCreditProtectionCertificateApplyRequest dto = this.getBussinessEntity(entity);
+        CommonBusinessService commonBusinessService = SpringContextUtil.getBean(CommonBusinessService.class);
+        if (taskId != null) {
+            try {
+                if(StringUtil.equals(CacheUtil.getSysParam(BussinessConstant.ETRLIMIT_SWITCH_IS_TOTAL), "Y")){
+                    BigDecimal amount = dto.getEntrustNum();
+                    if (amount == null) {
+                        amount = dto.getEntrustAmt();
+                    }
+                    return getEtrLimitSwitch(entity.getWorkflowId(), amount, dto.getCounterId(),
+                            dto.getTradeMarket(),dto.getFinprodId(),dto.getPs(),commonBusinessService);
+                }else{
+//           		BussinessConstant.是否需要上级审批
+                    List<EtrExchangeTradePortfolioSecRepoRequest> portfolioList =dto.getPortfolioList();
+                    Map<String, Object> result = new HashMap<>();
+                    for(EtrExchangeTradePortfolioSecRepoRequest etrExchangeTradePortfolioSecRepoRequest : portfolioList){
+                        BigDecimal amount = etrExchangeTradePortfolioSecRepoRequest.getEntrustNum();
+                        if (amount == null) {
+                            amount = etrExchangeTradePortfolioSecRepoRequest.getEntrustAmt();
+                        }
+                        result=getEtrLimitSwitch(entity.getWorkflowId(), amount, dto.getCounterId(),
+                                dto.getTradeMarket(),dto.getFinprodId(),dto.getPs(),commonBusinessService);
+                        if((boolean) result.get(BussinessConstant.是否需要上级审批)){
+                            return result;
+                        }
+                    }
+                    return result;
+                }
+            }
+            catch (WorkFlowException e) {
+                // 未设置授权或设置成不授权时，抛出异常，当前用户只能退回
+                throw new WorkFlowException(e);
+            }
+        }
+        else {
+            return null;
+        }
+    }
+
+    private Map<String, Object> getEtrLimitSwitch(String workflowId, BigDecimal amount,String counterId,String tradeMarket,
+                                                 String assetCode ,String ps,CommonBusinessService commonBusinessService) throws WorkFlowException {
+
+        Map<String, Object> params = CommonBusinessService.setParams(counterId, amount, LoginUserUtil.getUserName(),
+                DictCodeList.平安资产类型_信用保护凭证.getValue(), null, tradeMarket, ps
+                , assetCode, workflowId);
+        return commonBusinessService.是否需要上级审批_委托用(params);
+    }
 
     /**
      * 构造投资指令DTO

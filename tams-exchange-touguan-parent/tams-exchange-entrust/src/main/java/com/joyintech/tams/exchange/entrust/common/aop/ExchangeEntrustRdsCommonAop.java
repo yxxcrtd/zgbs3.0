@@ -393,9 +393,6 @@ public class ExchangeEntrustRdsCommonAop {
         Object finprodId = mapTrd.get(InterfUtil.finprodId);
         Object finprodType2 = mapTrd.get(InterfUtil.finprodType2);
         // 取得资产类型
-        if(StringUtils.equals(finprodType2, "F37")){
-            return ;
-        }
         if (StringUtil.isNotEmpty(finprodId)) {
             IAssetInfo assetInfo = assetInfoSrc.getInfoFromRedis(RedisKeyEnum.资产基本信息.key(),
                 finprodId.toString());
@@ -407,6 +404,7 @@ public class ExchangeEntrustRdsCommonAop {
         if (CommonUtil.isType((String)finprodType2, DictCodeListExt1.金融产品类型_投管用_债券借贷)
             || CommonUtil.isType((String)finprodType2, DictCodeListExt1.金融产品类型_投管用_债券借贷融入)
             || CommonUtil.isType((String)finprodType2, DictCodeListExt1.金融产品类型_投管用_债券借贷融出)
+            || CommonUtil.isType((String)finprodType2, DictCodeListExt1.金融产品类型_投管用_信用保护凭证)
             //债券一级指令不进行预占
             || CommonUtil.isType(assetType, DictCodeListExt2.平安资产类型_一级市场债)) {
             return;
@@ -419,8 +417,9 @@ public class ExchangeEntrustRdsCommonAop {
         // 资产类型
         interfRiskRdsDto.setAssetType(initRepoLendCommon((String)finprodType2, assetType));
         // 金融产品类型
-        interfRiskRdsDto.setFinType(
-            finprodType2 != null ? finprodType2.toString() : StringUtil.EMPTY);
+        interfRiskRdsDto.setFinType(finprodType2 != null ? finprodType2.toString() : StringUtil.EMPTY);
+        //交易方向
+        interfRiskRdsDto.setPs(mapTrd.get("ps").toString());
         try {
             ClientData result = getInterfRiskRdsService().sendRiskRdsData(mapTrd,
                 interfRiskRdsDto);

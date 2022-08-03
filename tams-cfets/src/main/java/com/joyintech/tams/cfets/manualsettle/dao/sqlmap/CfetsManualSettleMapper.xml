@@ -21,7 +21,7 @@
             sdl2.item_value tgBusiTypeStr,
             T1.PS ps,
             sdl3.item_value psStr,
-            T1.SHARE_AMT/100 settleNum,
+            case when T1.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F03} and T1.PS = #{PS_T07} then null else T1.SHARE_AMT / 100 end settleNum,
             T1.TRADE_AMT settleAmt,
             LISTAGG(T4.PORTFOLIO_ID,',') WITHIN GROUP (ORDER BY (T1.TOTLE_TRADE_ID))  portfolioId,
             LISTAGG(T5.PORTFOLIO_NAME,',') WITHIN GROUP (ORDER BY (T1.TOTLE_TRADE_ID)) portfolioName,
@@ -65,7 +65,7 @@
         LEFT JOIN MST_CUSTOMER_INFO T611 ON T2.ISSUER = T611.CUSTOMER_ID
         LEFT JOIN STL_SEC_ACCT_INFO T7 ON T1.SEC_MANAGE_ACCT_ID = T7.SEC_ACCT_ID
         LEFT JOIN TRD_BANK_MANUAL_SETTLE_INFO T8 ON T1.TOTLE_TRADE_ID = T8.TRADE_ID
-        LEFT JOIN STL_PAY_ORDERS T9 ON T1.TOTLE_TRADE_ID = T9.TRADE_ID
+        LEFT JOIN STL_PAY_ORDERS T9 ON T3.TRADE_ID = T9.TRADE_ID
         LEFT JOIN INF_PAY_ORDERS_STATUS T10 ON T9.ORDER_ID = T10.ORDER_ID
         LEFT JOIN SYS_DATADICT_LIST sdl on sdl.dict_code ='DELIVERY_STATUS' and sdl.item_code = T8.Settle_Status
         LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='PINAN_ASSET_TYPE' and sdl1.item_code = FIN_PRODUCT_TYPE.TYPE_8
@@ -182,14 +182,11 @@
             sdl2.item_value tgBusiTypeStr,
             T1.PS ps,
             sdl3.item_value psStr,
-            T1.SHARE_AMT/100 settleNum,
+            case when T1.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F03} and T1.PS = #{PS_T07} then null else T1.SHARE_AMT / 100 end settleNum,
             T1.TRADE_AMT settleAmt,
             LISTAGG(T4.PORTFOLIO_ID,',') WITHIN GROUP (ORDER BY (T1.TOTLE_TRADE_ID))  portfolioId,
             LISTAGG(T5.PORTFOLIO_NAME,',') WITHIN GROUP (ORDER BY (T1.TOTLE_TRADE_ID)) portfolioName,
-            case when T9.PS = #{feePs02} and T9.SETTLE_STATUS = #{settlementStatus01} and T9.ORDER_RET_STATUS = #{commandDealStatus01} THEN #{cleanStatus01}
-            when T9.PS = #{feePs02} and T9.SETTLE_STATUS = #{settlementStatus01} and T9.ORDER_RET_STATUS = #{commandDealStatus02} THEN #{cleanStatus02}
-            when T9.PS = #{feePs02} and (T9.SETTLE_STATUS is null or T9.SETTLE_STATUS = #{settlementStatus02}) and T9.ORDER_RET_STATUS = '03' THEN #{cleanStatus03}
-            ELSE case when btm.busi_type='06' then #{cleanStatus01} else null end END cleanStatus,
+            case when btm.busi_type='06' and T1.FINPROD_TYPE2 = 'F02' then #{cleanStatus01} else null end cleanStatus,
             T1.TRADE_MARKET tradeMarket,
             sdl4.item_value tradeMarketStr,
             T1.TRADE_PLAT tradePlat,
@@ -226,7 +223,7 @@
         LEFT JOIN MST_CUSTOMER_INFO T611 ON T2.ISSUER = T611.CUSTOMER_ID
         LEFT JOIN STL_SEC_ACCT_INFO T7 ON T1.SEC_MANAGE_ACCT_ID = T7.SEC_ACCT_ID
         LEFT JOIN TRD_BANK_MANUAL_SETTLE_INFO T8 ON T1.TOTLE_TRADE_ID = T8.TRADE_ID
-        LEFT JOIN STL_PAY_ORDERS T9 ON T1.TOTLE_TRADE_ID = T9.TRADE_ID
+        LEFT JOIN STL_PAY_TEMP_ORDERS T9 ON T3.TRADE_ID = T9.TRADE_ID
         LEFT JOIN INF_PAY_ORDERS_STATUS T10 ON T9.ORDER_ID = T10.ORDER_ID
         LEFT JOIN SYS_DATADICT_LIST sdl on sdl.dict_code ='DELIVERY_STATUS' and sdl.item_code = T8.Settle_Status
         LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='PINAN_ASSET_TYPE' and sdl1.item_code = FIN_PRODUCT_TYPE.TYPE_8
@@ -312,7 +309,6 @@
         T1.TRADE_AMT,
         T9.PS,
         T9.SETTLE_STATUS,
-        T9.ORDER_RET_STATUS,
         T1.TRADE_MARKET,
         sdl4.item_value,
         T1.TRADE_PLAT,
@@ -344,14 +340,14 @@
             sdl2.item_value tgBusiTypeStr,
             T1.PS ps,
             sdl3.item_value psStr,
-            T0.SETTLE_NUM settleNum,
+            case when T1.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F03} and T1.PS = #{PS_T07} then null else T0.SETTLE_NUM end settleNum,
             T0.SETTLE_AMT settleAmt,
             LISTAGG(T4.PORTFOLIO_ID,',') WITHIN GROUP (ORDER BY (T1.TOTLE_TRADE_ID))  portfolioId,
             LISTAGG(T5.PORTFOLIO_NAME,',') WITHIN GROUP (ORDER BY (T1.TOTLE_TRADE_ID)) portfolioName,
             case when T9.PS = #{feePs02} and T9.SETTLE_STATUS = #{settlementStatus01} and T9.ORDER_RET_STATUS = #{commandDealStatus01} THEN #{cleanStatus01}
                  when T9.PS = #{feePs02} and T9.SETTLE_STATUS = #{settlementStatus01} and T9.ORDER_RET_STATUS = #{commandDealStatus02} THEN #{cleanStatus02}
                  when T9.PS = #{feePs02} and (T9.SETTLE_STATUS is null or T9.SETTLE_STATUS = #{settlementStatus02}) and T9.ORDER_RET_STATUS = '03' THEN #{cleanStatus03}
-            ELSE case when btm.busi_type='06' and T1.PS='03' then #{cleanStatus01} else null end END cleanStatus,
+            ELSE case when btm.busi_type='06' and T1.FINPROD_TYPE2 = 'F02' then #{cleanStatus01} else null end END cleanStatus,
             T1.TRADE_MARKET tradeMarket,
             sdl4.item_value tradeMarketStr,
             T1.TRADE_PLAT tradePlat,
@@ -388,7 +384,7 @@
         LEFT JOIN MST_COUNTER_PARTY T61 ON T2.ISSUER = T61.LINK_ID AND T61.P_TYPE_ONE IS NOT NULL
         LEFT JOIN MST_CUSTOMER_INFO T611 ON T2.ISSUER = T611.CUSTOMER_ID
         LEFT JOIN STL_SEC_ACCT_INFO T7 ON T1.SEC_MANAGE_ACCT_ID = T7.SEC_ACCT_ID
-        LEFT JOIN STL_PAY_ORDERS T9 ON T1.TOTLE_TRADE_ID = T9.TRADE_ID
+        LEFT JOIN STL_PAY_ORDERS T9 ON T3.TRADE_ID = T9.TRADE_ID
         LEFT JOIN INF_PAY_ORDERS_STATUS T10 ON T9.ORDER_ID = T10.ORDER_ID
         LEFT JOIN SYS_DATADICT_LIST sdl on sdl.dict_code ='DELIVERY_STATUS' and sdl.item_code = T0.Settle_Status
         LEFT JOIN SYS_DATADICT_LIST sdl1 on sdl1.dict_code ='PINAN_ASSET_TYPE' and sdl1.item_code = FIN_PRODUCT_TYPE.TYPE_8
@@ -1561,9 +1557,9 @@
                     OR fpi.ISSUE_CLASS = #{ISSUE_CLASS_03}
                     THEN fpi.TENDER_EDATE
                 END                       AS bidDateEnd/*投标日 结束*/,
-                case when tfpdt.BUSI_TYPE = 'TRD61' then brt.PAY_DATE else bo.PAY_DATE end                 payDate,
+                case when tfpdt.BUSI_TYPE = 'TRD61' then brt.PAY_DATE else bo.PAY_DATE end           payDate,
                 case when tfpdt.BUSI_TYPE = 'TRD61' then brt.CREDITOR_DEBT_DATE else bo.ASSIGN_REGDATE end assignRegdate,
-                case when tfpdt.BUSI_TYPE = 'TRD97' then bo.ONMARKET_DATE else decode(bo.IS_WIN,'Y',FPA.LISTING_DATE) end  listingDate,
+                case when tfpdt.BUSI_TYPE = 'TRD97' then bo.ONMARKET_DATE else brt.LISTING_DATE end  listingDate,
                 bo.BID_MODLE                                                                         bidModle,
                 bo.PAY_TYPE                                                                          payType,
                 null                                                                                 etrBidPriceTotal,
@@ -1573,7 +1569,7 @@
                 tfpdt.FEE_AMT_UNPAY                                                                  jsFeeAmt,
                 bo.BID_ID                                                                            tradeId,
                 tfpdt.UNIT_FPRICE      allPrice,
-                tfpdt.FPRICE_AMT                                                                     tradeAmt,
+                case when tfpdt.BUSI_TYPE = 'TRD61' then nvl(tfpdt.UNIT_CPRICE*brt.WIN_PRINAMT,0)/100 else tfpdt.FPRICE_AMT  end                 tradeAmt,
                 tfpdt.INT_AMT                                                                        intAmt,
                 tfpdt.TRADE_AMT                                                                      payAmt,
                 case when tfpdt.BUSI_TYPE = 'TRD61' then brt.WIN_TYPE else bo.DIP_TYPE end           spanTextOne,

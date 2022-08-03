@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.service.trade.scheduled.instrument;
 
 import com.joyintech.tams.exchange.common.cache.impl.QuoteTickServiceImpl;
+import com.joyintech.tams.exchange.service.trade.management.service.CommonManagement;
 import com.joyintech.tams.exchange.service.trade.management.service.InstrumentManagement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @EnableScheduling
@@ -21,6 +23,8 @@ public class InstrumentCache {
     private QuoteTickServiceImpl quoteTickService;
     @Autowired
     private InstrumentManagement instrumentManagement;
+    @Autowired
+    private CommonManagement commonManagement;
 
     @Scheduled(cron = "${scheduled.instrument.price}")
     public void updateInstrumentLimitPrice() {
@@ -35,4 +39,13 @@ public class InstrumentCache {
         logger.info("flushInstrument begin...");
         instrumentManagement.flushInstrumentData(new HashMap<String, Object>());
     }
+
+    @Scheduled(initialDelay = 2 * 60, fixedDelay = 1 * 60 * 60, timeUnit = TimeUnit.SECONDS)
+    public void flushCommonCache() {
+        logger.info("从投管调同步基础数据到交易端 开始...");
+        commonManagement.flushCommonCache();
+        instrumentManagement.flushInstrumentData(new HashMap<String, Object>());
+        logger.info("从投管调同步基础数据到交易端 结束...");
+    }
+
 }

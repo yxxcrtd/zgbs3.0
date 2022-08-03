@@ -1,10 +1,16 @@
 package com.joyintech.tams.exchange.service.trade.processor.business.common;
 
+import cn.hutool.core.collection.ListUtil;
 import com.google.common.base.Strings;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.exchange.common.bean.investment.PledgeTradeMessage;
 import com.joyintech.tams.exchange.common.bean.investment.PortfolioTradeMessage;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.enums.EntrustBussTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum;
+import com.joyintech.tams.exchange.common.enums.invest.PsEnum;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.utils.*;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
@@ -45,6 +51,8 @@ public class TradeCallbackHelper {
     private OrderService orderService;
     @Autowired
     private InstructionService instructionService;
+    @Autowired
+    private InstructionPledgeService instructionPledgeService;
     //    @Autowired
 //    private MessageSenderService messageSenderService;
     @Autowired
@@ -217,16 +225,25 @@ public class TradeCallbackHelper {
         }
         tradeRecord.setLocalEntrustId(entrust.getLocalEntrustId());
         tradeRecord.setTradingDay(entrust.getTradingDay());
-        //质押入库的三条成交合约代码可能不一致，需要保留
-        String market = entrust.getMarket();
-        if (Strings.isNullOrEmpty(market)) {
-            market = StockCodeUtils.getMarket(entrust.getStockCode());
-        }
-        tradeRecord.setStockCode(StockCodeUtils.formatStockCode(tradeRecord.getStockCode(), market));
-        logger.info("=======InstructionId：{}，BrokerEntrustId：{}，BrokerTradeId：{}，Market：{}，StockCode：{}", entrust.getInstructionId(), tradeRecord.getBrokerEntrustId(), tradeRecord.getBrokerTradeId(), market, tradeRecord.getStockCode());
-        if (Strings.isNullOrEmpty(tradeRecord.getStockName())) {
+
+        if (StringUtil.equals(EntrustBussTypeEnum.中途换券指令_换钱.value, instruction.getEntrustBussType())) {
+            tradeRecord.setMarket(entrust.getMarket());
+            tradeRecord.setStockCode(entrust.getStockCode());
             tradeRecord.setStockName(entrust.getStockName());
+        } else {
+            //质押入库的三条成交合约代码可能不一致，需要保留
+            String market = entrust.getMarket();
+            if (Strings.isNullOrEmpty(market) && StringUtil.isNotEmpty(entrust.getStockCode())) {
+                market = StockCodeUtils.getMarket(entrust.getStockCode());
+            }
+            if (StringUtil.isNotEmpty(tradeRecord.getStockCode())) {
+                tradeRecord.setStockCode(StockCodeUtils.formatStockCode(tradeRecord.getStockCode(), market));
+            }
+            if (Strings.isNullOrEmpty(tradeRecord.getStockName())) {
+                tradeRecord.setStockName(entrust.getStockName());
+            }
         }
+
         tradeRecord.setInstructionId(entrust.getInstructionId());
         tradeRecord.setParentOrderId(entrust.getParentOrderId());
         tradeRecord.setBsFlag(entrust.getBsFlag());
@@ -283,13 +300,16 @@ public class TradeCallbackHelper {
         Order order = null;
         if (Objects.nonNull(entrust.getParentOrderId())) {
             order = orderService.findById(entrust.getParentOrderId());
-            if (Objects.nonNull(order)) transactionHelper.addOrder(order);
+            if (Objects.nonNull(order)) {
+                transactionHelper.addOrder(order);
+            }
         }
         //确保成交记录的成交金额、数量、价格在terminal端已经处理
         if (tradeRecord.getTradeType() == TradeType.NORMAL.value) {
             transactionHelper.setTradeRecord(tradeRecord);
             //质押出入库，返回的标准券代码不用再次处理，只需要处理原始合约代码成交
-            if (entrust.getStockCode().equals(tradeRecord.getStockCode())) {
+            if (EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg())
+                    || entrust.getStockCode().equals(tradeRecord.getStockCode())) {
                 processNormalTrade(entrust, tradeRecord, order, instruction);
             } else {
                 logger.info("成交 [{}] 中合约代码  [{}] 和委托 [{}] 中合约代码 [{}] 不一致 entrustProp [{}], 无需处理该笔成交", tradeRecord.getBrokerTradeId(), tradeRecord.getStockCode(), entrust.getId(), entrust.getStockCode(), entrust.getEntrustProp());
@@ -305,10 +325,14 @@ public class TradeCallbackHelper {
                 return;
             }
 
+            // TODO 调用终端接口，查询成交质押数据
+            // 组装质押品列表
+            List<PledgeTradeMessage> pledgeTradeMessages = assemblePledgeList(instruction.getEntrustId());
+
             // 是否需要手工交收
-            if (IntegratedEntrustUtils.isProtocolBack(tradeRecord.getEntrustProp())) {//协议回购
+            if (needSGJSWithRepurchase(instruction, tradeRecord)) {//协议回购
 //                messageSenderService.pushTradeToMQForFixedIncome(tradeRecord, instruction, entrust);
-                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages);
+                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages, pledgeTradeMessages);
                 return;
 //            } else if (InvestAssetTypeEnum.isBond(instruction.getAssetType()) && TradePlat.needSettleTrade(instruction.getTradePlat())) {
                 //新债需求：判断债券哪些走手工交收，用标的是否非担保 =是 则走手工交收
@@ -317,17 +341,17 @@ public class TradeCallbackHelper {
 //                if (Objects.nonNull(instrument)) {
 //                    if (EntrustUtils.isSettleTrade(instrument.getTradePlat(), entrust.getEntrustProp())) {
 //                        messageSenderService.pushTradeToMQForFixedIncome(tradeRecord, instruction, entrust);
-                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages);
+                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages, pledgeTradeMessages);
                 return;
 //                    }
 //                }
                 //信用证保护凭证买入、卖出推手动交收 申购推成交回报
-            }else if(InvestAssetTypeEnum.isCreditProtectionCertificate(instruction.getAssetType()) && (DictCodeList.交易方向_买入.getValue().equals(instruction.getPs()) || DictCodeList.交易方向_卖出.getValue().equals(instruction.getPs()))){
-                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages);
+            } else if (InvestAssetTypeEnum.isCreditProtectionCertificate(instruction.getAssetType()) && (DictCodeList.交易方向_买入.getValue().equals(instruction.getPs()) || DictCodeList.交易方向_卖出.getValue().equals(instruction.getPs()))) {
+                messageSenderManagement.pushTradeForFixedIncome(tradeRecord, instruction, entrust, portfolioTradeMessages, pledgeTradeMessages);
                 return;
             }
 //            messageSenderService.pushTradeToMQ(tradeRecord, instruction, entrust);
-            messageSenderManagement.pushTrade(tradeRecord, instruction, entrust, portfolioTradeMessages);
+            messageSenderManagement.pushTrade(tradeRecord, instruction, entrust, portfolioTradeMessages, pledgeTradeMessages);
         } else if (tradeRecord.getTradeType() == TradeType.INVALID.value) {
             if (entrust.getEntrustStatus() == EntrustStatus.INVALID.value) {
                 logger.info("委托已通过委托回报废单处理，忽略废单成交");
@@ -338,10 +362,50 @@ public class TradeCallbackHelper {
         }
     }
 
+    private List<PledgeTradeMessage> assemblePledgeList(String instructionId) {
+        List<PledgeTradeMessage> pledgeTradeMessages = ListUtil.list(false);
+        PledgeTradeMessage message;
+        List<InstructionPledge> instructionPledges = instructionPledgeService.queryInstructionPledgesByInstructionId(instructionId);
+        for (InstructionPledge pledge : instructionPledges) {
+            message = new PledgeTradeMessage();
+            message.setFinprodMarketId(pledge.getFinprodId());
+            message.setPledgeNumber(pledge.getPledgeNumber());
+            message.setDisplaceDir(pledge.getDisplaceDir());
+            pledgeTradeMessages.add(message);
+        }
+        return pledgeTradeMessages;
+    }
+
+    /**
+     * 判断协议回购是否需要手工交收
+     * 除 深圳的中途换券和解除质押，其余的协议回购需要进行手工交收
+     *
+     * @param instruction 指令对象
+     * @param trade       成交对象
+     * @return 是否进行手工交收
+     */
+    private boolean needSGJSWithRepurchase(Instruction instruction, Trade trade) {
+        if (Market.isSzMarket(trade.getMarket())
+                && EnumUtil.in(instruction.getPs(), PsEnum.REPO_EXCHANGE, PsEnum.REPO_UNSTAKE)) {
+            return false;
+        }
+        if (IntegratedEntrustUtils.isProtocolBack(trade.getEntrustProp())) {
+            return true;
+        }
+        return false;
+    }
+
     private void updateInstructionStatus(Instruction instruction) {
         if (Objects.isNull(instruction)) {
             return;
         }
+        //协议回购 非首期
+        if (EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg())
+                && !BusiTypeTgEnum.首期.codeEquals(instruction.getBusiTypeTg())) {
+            instruction.setEntrustStatus(InstructionStatus.COMPLETE.value);
+            return;
+        }
+
         //数量单比较数量，金额单比较金额
         if ((instruction.getEntrustNum() > 0 && instruction.getEntrustLeftAmt().longValue() == instruction.getEntrustNum())
                 || (instruction.getEntrustAmt().doubleValue() > 0 && instruction.getEntrustLeftAmt().doubleValue() == instruction.getEntrustAmt().doubleValue())
@@ -378,7 +442,13 @@ public class TradeCallbackHelper {
         BigDecimal unFrozenBalanceInstruction = null;
         if (Objects.nonNull(instruction)) {
             if (instruction.volumeInstruction()) {
-                instruction.setEntrustLeftAmt(BigDecimal.valueOf(instruction.getEntrustLeftAmt().longValue() + tradeRecord.getTradedVolume()));
+                if (EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg())
+                        && !BusiTypeTgEnum.首期.codeEquals(instruction.getBusiTypeTg())) {
+                    //协议回购非首期：指令成交数量 = 指令数量
+                    instruction.setEntrustLeftAmt(BigDecimal.valueOf(instruction.getEntrustLeftAmt().longValue() + instruction.getEntrustNum()));
+                } else {
+                    instruction.setEntrustLeftAmt(BigDecimal.valueOf(instruction.getEntrustLeftAmt().longValue() + tradeRecord.getTradedVolume()));
+                }
             } else {
                 ////可能存在金额指令的委托不是冻结金额的，传入成交金额  ----  对于债券， 现在指令为净价，需要单独处理
                 //取成交金额（对于债券取全价金额）

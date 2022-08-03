@@ -2,6 +2,7 @@ package com.joyintech.tams.exchange.common.constant;
 
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.enums.IEnum;
+import com.joyintech.tams.exchange.common.utils.EnumUtil;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -80,6 +81,10 @@ public enum EntrustProp implements IEnum<String> {
     SZ_REPURCHASE_BEGIN("深圳债券质押协议回购初始交易", "BPN"),
     SZ_REPURCHASE_BUYBACK("深圳债券质押协议回购购回交易", "BPR"),
     SZ_REPURCHASE_RENEWAL("深圳债券质押协议回购到期续做", "BPT"),
+
+    //深圳 协议回购 增加 解除质押、换券申报
+    SZ_REPURCHASE_RELEASE("深圳债券质押协议回购解除质押", "BPD1"),
+    SZ_REPURCHASE_EXCHANGE("深圳债券质押协议回购换券申报", "BPE1"),
 
     // 上海固收平台
     SH_FIXEDINCOME_BAOJIA_CONFIRM("确定报价", "FI1"),
@@ -200,13 +205,20 @@ public enum EntrustProp implements IEnum<String> {
     }
 
     // 是否为解除质押和中途换券
+//    public static boolean isRepurchaseReleaseOrExchange(String entrustProp) {
+//        return EntrustProp.SH_REPURCHASE_RELEASE.value.equals(entrustProp)
+//                || EntrustProp.SH_REPURCHASE_RELEASE_CONFIRM.value.equals(entrustProp)
+//                || EntrustProp.SH_REPURCHASE_RELEASE_REFUSE.value.equals(entrustProp)
+//                || EntrustProp.SH_REPURCHASE_EXCHANGE.value.equals(entrustProp)
+//                || EntrustProp.SH_REPURCHASE_EXCHANGE_CONFIRM.value.equals(entrustProp)
+//                || EntrustProp.SH_REPURCHASE_EXCHANGE_REFUSE.value.equals(entrustProp);
+//    }
+
     public static boolean isRepurchaseReleaseOrExchange(String entrustProp) {
-        return EntrustProp.SH_REPURCHASE_RELEASE.value.equals(entrustProp)
-                || EntrustProp.SH_REPURCHASE_RELEASE_CONFIRM.value.equals(entrustProp)
-                || EntrustProp.SH_REPURCHASE_RELEASE_REFUSE.value.equals(entrustProp)
-                || EntrustProp.SH_REPURCHASE_EXCHANGE.value.equals(entrustProp)
-                || EntrustProp.SH_REPURCHASE_EXCHANGE_CONFIRM.value.equals(entrustProp)
-                || EntrustProp.SH_REPURCHASE_EXCHANGE_REFUSE.value.equals(entrustProp);
+        return EnumUtil.in(entrustProp, SH_REPURCHASE_RELEASE, SH_REPURCHASE_RELEASE_CONFIRM,
+                SH_REPURCHASE_RELEASE_REFUSE, SH_REPURCHASE_EXCHANGE,
+                SH_REPURCHASE_EXCHANGE_CONFIRM, SH_REPURCHASE_EXCHANGE_REFUSE,
+                SZ_REPURCHASE_RELEASE, SZ_REPURCHASE_EXCHANGE);
     }
 
     // 中途换券

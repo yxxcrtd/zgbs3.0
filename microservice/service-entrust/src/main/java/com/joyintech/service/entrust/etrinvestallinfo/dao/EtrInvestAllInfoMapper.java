@@ -93,6 +93,8 @@ public interface EtrInvestAllInfoMapper {
      */
     int updateExportPB(Map<String, Object> param);
 
+    EtrInvestAllInfoDto getById(Map<String, Object> param);
+
     /**
      * 查询导出pdf数据 add by zengchengfa
      * @param param

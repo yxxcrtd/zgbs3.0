@@ -63,7 +63,7 @@ $(function() {
                         }
                     },
                     dblclick: function (table, data) {
-                        Joyin.ajax(basePath + 'invest/trade/investtrade/commandscollection/TrdCommandsCollection002/selectEntrustList', 
+                        Joyin.ajax(basePath + 'invest/trade/investtrade/commandscollection/TrdCommandsCollection002/selectEntrustList',
                                 {assetType: assetType, entity: JSON.stringify(data)}, function(result) {
                             entrustTableCon1.reload({data: result});
                         });
@@ -86,7 +86,7 @@ $(function() {
                         ,{field:'chlName', width:'10%', title: 'invest.channelId', visible:false,sortField:"chlId"}
                     ],
                 });
-                
+
                 /**
                  * 可转债申购资产代码链接跳转
                  */
@@ -98,7 +98,7 @@ $(function() {
                             finprodId: row.finprodId,
                             finprodName: row.finprodName });
                 });
-                
+
                 entrustTableCon1 =$("#entrustTableCon1").joyintable({
                     checkbox: false,
                     contextmenu: false,
@@ -138,7 +138,7 @@ $(function() {
                         }
                     ]
                 });
-                
+
                 /**
                  * 绑定可转债委托明细交易录单事件
                  */
@@ -160,9 +160,9 @@ $(function() {
                                         "99%", "99%", data);
                     });
                 });
-                
+
             }
-            
+
             break;
         case "Con2":
             if(Con2flag){
@@ -176,7 +176,7 @@ $(function() {
                         }
                     },
                     dblclick: function (table, data) {
-                        Joyin.ajax(basePath + 'invest/trade/investtrade/commandscollection/TrdCommandsCollection002/selectEntrustList', 
+                        Joyin.ajax(basePath + 'invest/trade/investtrade/commandscollection/TrdCommandsCollection002/selectEntrustList',
                                 {assetType: assetType, entity: JSON.stringify(data)}, function(result) {
                             entrustTableCon2.reload({data: result});
                         });
@@ -202,7 +202,7 @@ $(function() {
                         ,{field:'chlName', width:'10%', title: 'invest.channelId', visible:false,sortField:"chlId"}
                     ],
                 });
-                
+
                 /**
                  * 可转债转股资产代码链接跳转
                  */
@@ -214,7 +214,7 @@ $(function() {
                             finprodId: row.finprodId,
                             finprodName: row.finprodName });
                 });
-                
+
                 entrustTableCon2 =$("#entrustTableCon2").joyintable({
                     checkbox: false,
                     contextmenu: false,
@@ -254,7 +254,7 @@ $(function() {
                         }
                     ]
                 });
-                
+
                 /**
                  * 绑定债转股委托明细交易录单事件
                  */
@@ -277,7 +277,7 @@ $(function() {
                     });
                 });
             }
-            
+
             break;
         case PINAN_ASSET_TYPE_F02:
             if(F02flag){
@@ -1158,12 +1158,22 @@ $(function() {
                  * 买断式回购质押标的代码链接跳转
                  */
                 tableF10.bind('click','.finprodId-link', function(row) {
-                    Joyin.dialog(JoyinUtil.getLabel("FinBondTargetAsset002.title"),
-                            basePath + "invest/asset/bond/FinBondTargetAsset002/init",
-                            "95%", "90%",
-                            { pageModel:PAGE_MODEL_REFERENCE,
-                            finprodId: row.finprodId,
-                            finprodName: row.finprodName });
+                    var url = "home.html?a=a&finprodMarketId=" + row.finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a"; // 默认债券标的
+                    var param = {
+                        pageModel: PAGE_MODEL_REFERENCE,
+                        isQuickInput: true,
+                        finprodId: row.finprodId
+                    };
+                    Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+                        basePath + url,
+                        "98%", "98%",
+                        param);
+                    // Joyin.dialog(JoyinUtil.getLabel("FinBondTargetAsset002.title"),
+                    //         basePath + "invest/asset/bond/FinBondTargetAsset002/init",
+                    //         "95%", "90%",
+                    //         { pageModel:PAGE_MODEL_REFERENCE,
+                    //         finprodId: row.finprodId,
+                    //         finprodName: row.finprodName });
                 });
                 
                 entrustTableF10 = $("#entrustTableF10").joyintable({
@@ -1669,9 +1679,11 @@ $(function() {
         // psF11Selections.push(PS_SELECTIONS[104].id);
         tradeMarket12Selections.push(TRADE_PLACE_SELECTIONS[2].id);
         tradeMarket12Selections.push(TRADE_PLACE_SELECTIONS[1].id);
-        tradeMarket124Selections.push(TRADE_PLACE_SELECTIONS[1].id);
-        tradeMarket124Selections.push(TRADE_PLACE_SELECTIONS[2].id);
+        // 修改屏蔽 基金为（上交所、深交所） add wsz 20220704  3.0.7 7.13版本
+        // tradeMarket124Selections.push(TRADE_PLACE_SELECTIONS[1].id);
+        // tradeMarket124Selections.push(TRADE_PLACE_SELECTIONS[2].id);
         tradeMarket124Selections.push(TRADE_PLACE_SELECTIONS[4].id);
+        // 修改屏蔽 基金为（上交所、深交所） add wsz 20220704  3.0.7 7.13版本
         tradeMarket012Selections.push(TRADE_PLACE_SELECTIONS[0].id);
         tradeMarket012Selections.push(TRADE_PLACE_SELECTIONS[2].id);
         tradeMarket012Selections.push(TRADE_PLACE_SELECTIONS[1].id);
@@ -1738,8 +1750,9 @@ $(function() {
         $('#dealModeF11').updateChosenArr({
             item: dealMode0123Selections
         });
-    }
 
+        $("#F02_CLICK").click()
+    }
     /**
      * 自动刷新开关控制
      * */
@@ -2281,7 +2294,7 @@ $(function() {
             switch(assetType){
             case PINAN_ASSET_TYPE_F01:
                 if(tableF01.table){
-                    tableF01.reload(); 
+                    tableF01.reload();
                 }
                 else {
                     tableF01.load();
@@ -2290,7 +2303,7 @@ $(function() {
                 break;
             case "Con1":
                 if(tableCon1.table){
-                    tableCon1.reload(); 
+                    tableCon1.reload();
                 }
                 else {
                     tableCon1.load();
@@ -2299,7 +2312,7 @@ $(function() {
                 break;
             case "Con2":
                 if(tableCon2.table){
-                    tableCon2.reload(); 
+                    tableCon2.reload();
                 }
                 else {
                     tableCon2.load();
@@ -2448,7 +2461,7 @@ $(function() {
                     Joyin.error(JoyinUtil.getMessage("COMMON_E_0058"));
                     return;
                 }
-                Joyin.ajax(basePath + 'invest/trade/investtrade/commandscollection/TrdCommandsCollection002/selectEntrustList', 
+                Joyin.ajax(basePath + 'invest/trade/investtrade/commandscollection/TrdCommandsCollection002/selectEntrustList',
                         {assetType: assetType, entity: JSON.stringify(selArr[0])}, function(result) {
                     entrustTableF01.reload({data: result});
                 });
@@ -2466,7 +2479,7 @@ $(function() {
                     Joyin.error(JoyinUtil.getMessage("COMMON_E_0058"));
                     return;
                 }
-                Joyin.ajax(basePath + 'invest/trade/investtrade/commandscollection/TrdCommandsCollection002/selectEntrustList', 
+                Joyin.ajax(basePath + 'invest/trade/investtrade/commandscollection/TrdCommandsCollection002/selectEntrustList',
                         {assetType: assetType, entity: JSON.stringify(selArr[0])}, function(result) {
                     entrustTableCon1.reload({data: result});
                 });
@@ -2484,7 +2497,7 @@ $(function() {
                     Joyin.error(JoyinUtil.getMessage("COMMON_E_0058"));
                     return;
                 }
-                Joyin.ajax(basePath + 'invest/trade/investtrade/commandscollection/TrdCommandsCollection002/selectEntrustList', 
+                Joyin.ajax(basePath + 'invest/trade/investtrade/commandscollection/TrdCommandsCollection002/selectEntrustList',
                         {assetType: assetType, entity: JSON.stringify(selArr[0])}, function(result) {
                     entrustTableCon2.reload({data: result});
                 });

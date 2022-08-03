@@ -1,0 +1,7 @@
+--修改外汇交易中心_客户信息_银行交易员 主键信息
+alter table INTERF_CFETS_TRADER_TMP drop constraint PK_INTERF_CFETS_TRADER_TMP;
+alter table INTERF_CFETS_TRADER_TMP add constraint PK_INTERF_CFETS_TRADER_TMP primary key (TRADER_ID,PARTY_CUSTOMER_ID);
+
+
+alter table MST_CFETS_CUSTOMER_TRADER drop constraint PK_MST_CFETS_CUSTOMER_TRADER;
+alter table MST_CFETS_CUSTOMER_TRADER add constraint PK_MST_CFETS_CUSTOMER_TRADER primary key (TRADER_ID, PARTY_ID);

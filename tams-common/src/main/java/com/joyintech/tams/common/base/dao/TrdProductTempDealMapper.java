@@ -4,6 +4,8 @@ import com.joyintech.tams.common.base.entity.TrdProductTempDeal;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface TrdProductTempDealMapper {
     int deleteByPrimaryKey(String tradeId);
@@ -17,6 +19,8 @@ public interface TrdProductTempDealMapper {
     int insertToDeal(@Param("totalTradeId") String totalTradeId);
 
     TrdProductTempDeal selectByPrimaryKey(String tradeId);
+
+    List<TrdProductTempDeal> selectByTotalTradeId(@Param("totalTradeId") String totalTradeId);
 
     int updateByPrimaryKeySelective(TrdProductTempDeal record);
 

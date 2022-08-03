@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.systemtools.util.SysDatadictUtil;
@@ -167,6 +168,14 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
      */
     private String acctName;
 
+    private String acctNo;
+
+    private String secAcctId;
+
+    private String finprodId;
+
+    private String vdate;
+
     /**
      * 回购期限
      */
@@ -197,6 +206,51 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
      * 逆回购方交易商代码
      */
     private String revRepurOrgId;
+    /**
+     * 本方交易员
+     */
+    private String tradeNo;
+    private String tradeName;
+    /**
+     * 本方交易商
+     */
+    private String dealerNo;
+    private String dealerName;
+    /**
+     * 本方交易主体
+     */
+    private String investorNo;
+    private String investorName;
+    /**
+     * 对手方交易员
+     */
+    private String counterTradeNo;
+    private String counterTradeName;
+    /**
+     * 对手方交易商
+     */
+    private String counterDealerNo;
+    private String counterDealerName;
+    /**
+     * 对手方交易主体
+     */
+    private String counterInvestorNo;
+    private String counterInvestorName;
+    /**
+     * 首期成交编号
+     */
+    private String firstTradeId;
+
+
+    private String addCla;
+
+    public String getAddCla() {
+        return addCla;
+    }
+
+    public void setAddCla(String addCla) {
+        this.addCla = addCla;
+    }
 
     public String getPortfolioId() {
         return portfolioId;
@@ -255,6 +309,10 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
     }
 
     public String getMarket() {
+        return market;
+    }
+
+    public String getTradeMarket() {
         return market;
     }
 
@@ -484,5 +542,160 @@ public class EtrExchangeOnWayRep002Dto extends BaseEntity {
 
     public void setCounterName(String counterName) {
         this.counterName = counterName;
+    }
+
+
+    public String getTradeName() {
+        if(StringUtil.isEmpty(tradeName)){
+            return tradeNo;
+        }
+        return tradeName;
+    }
+
+    public void setTradeName(String tradeName) {
+        this.tradeName = tradeName;
+    }
+
+    public String getDealerName() {
+        if(StringUtil.isEmpty(dealerName)){
+            return dealerNo;
+        }
+        return dealerName;
+    }
+
+    public void setDealerName(String dealerName) {
+        this.dealerName = dealerName;
+    }
+
+    public String getInvestorName() {
+        if(StringUtil.isEmpty(investorName)){
+            return investorNo;
+        }
+        return investorName;
+    }
+
+    public void setInvestorName(String investorName) {
+        this.investorName = investorName;
+    }
+
+    public String getCounterTradeName() {
+        if(StringUtil.isEmpty(counterTradeName)){
+            return counterTradeNo;
+        }
+        return counterTradeName;
+    }
+
+    public void setCounterTradeName(String counterTradeName) {
+        this.counterTradeName = counterTradeName;
+    }
+
+    public String getCounterDealerName() {
+        if(StringUtil.isEmpty(counterDealerName)){
+            return counterDealerNo;
+        }
+        return counterDealerName;
+    }
+
+    public void setCounterDealerName(String counterDealerName) {
+        this.counterDealerName = counterDealerName;
+    }
+
+    public String getCounterInvestorName() {
+        if(StringUtil.isEmpty(counterInvestorName)){
+            return counterInvestorNo;
+        }
+        return counterInvestorName;
+    }
+
+    public void setCounterInvestorName(String counterInvestorName) {
+        this.counterInvestorName = counterInvestorName;
+    }
+
+    public String getFirstTradeId() {
+        return firstTradeId;
+    }
+
+    public void setFirstTradeId(String firstTradeId) {
+        this.firstTradeId = firstTradeId;
+    }
+
+    public String getTradeNo() {
+        return tradeNo;
+    }
+
+    public void setTradeNo(String tradeNo) {
+        this.tradeNo = tradeNo;
+    }
+
+    public String getDealerNo() {
+        return dealerNo;
+    }
+
+    public void setDealerNo(String dealerNo) {
+        this.dealerNo = dealerNo;
+    }
+
+    public String getInvestorNo() {
+        return investorNo;
+    }
+
+    public void setInvestorNo(String investorNo) {
+        this.investorNo = investorNo;
+    }
+
+    public String getCounterTradeNo() {
+        return counterTradeNo;
+    }
+
+    public void setCounterTradeNo(String counterTradeNo) {
+        this.counterTradeNo = counterTradeNo;
+    }
+
+    public String getCounterDealerNo() {
+        return counterDealerNo;
+    }
+
+    public void setCounterDealerNo(String counterDealerNo) {
+        this.counterDealerNo = counterDealerNo;
+    }
+
+    public String getCounterInvestorNo() {
+        return counterInvestorNo;
+    }
+
+    public void setCounterInvestorNo(String counterInvestorNo) {
+        this.counterInvestorNo = counterInvestorNo;
+    }
+
+    public String getAcctNo() {
+        return acctNo;
+    }
+
+    public void setAcctNo(String acctNo) {
+        this.acctNo = acctNo;
+    }
+
+    public String getSecAcctId() {
+        return secAcctId;
+    }
+
+    public void setSecAcctId(String secAcctId) {
+        this.secAcctId = secAcctId;
+    }
+
+    public String getFinprodId() {
+        return finprodId;
+    }
+
+    public void setFinprodId(String finprodId) {
+        this.finprodId = finprodId;
+    }
+
+    public String getVdate() {
+        return vdate;
+    }
+
+    public void setVdate(String vdate) {
+        this.vdate = vdate;
     }
 }

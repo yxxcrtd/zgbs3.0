@@ -53,6 +53,19 @@ public class TrdInvestDealQuery001Dto extends WflTrdProductDeal{
 	 */
 	private String counterName;
 	//add by 张年  2019/8/07 end
+
+	/**
+	 * 申购类型：01-网上申购；02-网下申购
+	 */
+	private String purchModle;
+
+	/**
+	 * 类型：H01-协议回购；H02-质押式回购
+	 */
+	private String type6;
+
+	private String finType2;
+
 	/**
 	 * 得到有效状态
 	 * @return
@@ -158,5 +171,29 @@ public class TrdInvestDealQuery001Dto extends WflTrdProductDeal{
 
 	public void setCounterName(String counterName) {
 		this.counterName = counterName;
+	}
+
+	public String getPurchModle() {
+		return purchModle;
+	}
+
+	public void setPurchModle(String purchModle) {
+		this.purchModle = purchModle;
+	}
+
+	public String getType6() {
+		return type6;
+	}
+
+	public void setType6(String type6) {
+		this.type6 = type6;
+	}
+
+	public String getFinType2() {
+		return finType2;
+	}
+
+	public void setFinType2(String finType2) {
+		this.finType2 = finType2;
 	}
 }

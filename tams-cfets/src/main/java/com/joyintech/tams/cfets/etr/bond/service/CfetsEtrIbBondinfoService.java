@@ -34,6 +34,7 @@ import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
+import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrIbBondinfoMapper;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsBussCombDistribtBaseDto;
@@ -91,6 +92,7 @@ import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto;
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.common.PtlAllocationDto;
 import com.joyintech.tams.invest.common.entrust.dto.EntrustCommonDto;
 import com.joyintech.tams.invest.common.riskinfrds.util.EntrustCompleteUtil;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
@@ -110,17 +112,11 @@ import org.springframework.web.client.RestTemplate;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -983,7 +979,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             /*融入券卖空待购回持仓*/
             resp.add(BaseMap.newMap()
                     .put("field", "RRQMKDGHCC")
-                    .put("name", "卖空待回购持仓（元）")
+                    .put("name", "卖空待购回持仓（元）")
                     .put("amount", "--")
                     .put("type", "cc"));
         }
@@ -1138,7 +1134,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             /*融入券卖空待购回持仓*/
             resp.add(BaseMap.newMap()
                     .put("field", RRQMKDGHCC)
-                    .put("name", "卖空待回购持仓（元）")
+                    .put("name", "卖空待购回持仓（元）")
                     .put("amount", decimalToStr(bm.getBigDecimal(RRQMKDGHCC), "0.00"))
                     .put("type", "cc"));
         }
@@ -1365,7 +1361,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
 
     /**
      * 保存提交时，后台数据转换
-     * @param cfetsDto
+     * @param dto
      * @return
      */
     public CfetsEtribBondInfo003Dto packageEquityForSubmit(CfetsEtribBondInfo003Dto dto) {
@@ -1613,6 +1609,26 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             }
         }
         dto.setRiskTrialRetDto(riskTrialRetDto);*/
+        // 全价总额
+        BigDecimal unitFpriceAmtTailDifference = ArithmeticUtil.round(dto.getUnitFpriceAmt(), 2, RoundingMode.HALF_UP);
+        boolean flag = true;
+        for (CfetsEtribBondInfo003Dto dd : etrInvestBondInfoDtosList) {// 结算金额
+            if (!StringUtil.isNotEmpty(dd.getEntrustNum())
+                    || !StringUtil.isNotEmpty(dto.getUnitFpriceAmt())
+                    || !StringUtil.isNotEmpty(dto.getTradeAmt())) {
+                flag = false;
+                continue;
+            }
+            dd.setUnitFpriceAmt(ArithmeticUtil.divide(
+                    ArithmeticUtil.multiply(dto.getUnitFpriceAmt(), dd.getEntrustNum()), dto.getTradeAmt(), 2, RoundingMode.HALF_DOWN));
+            unitFpriceAmtTailDifference = ArithmeticUtil.subtract(unitFpriceAmtTailDifference, dd.getUnitFpriceAmt());
+        }
+        if (CollectionUtils.isNotEmpty(etrInvestBondInfoDtosList) && flag) {
+            CfetsEtribBondInfo003Dto cfetsEtribBond = etrInvestBondInfoDtosList.stream().max(Comparator.comparing(CfetsEtribBondInfo003Dto::getEntrustNum)).get();
+            if (!BigDecimalUtil.isZeroOrNull(unitFpriceAmtTailDifference)) {
+                cfetsEtribBond.setUnitFpriceAmt(ArithmeticUtil.doAdd(unitFpriceAmtTailDifference, cfetsEtribBond.getUnitFpriceAmt()));
+            }
+        }
         dto.setEtrInvestBondInfoDtos(etrInvestBondInfoDtosList);
         return dto;
     }
@@ -1866,6 +1882,26 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         dto.setEntrustIntegrateInt(calcAmtRes.getEntrustIntegrateInt());
         dto.setEntrustOwnUnitFpriceAmt(calcAmtRes.getEntrustOwnUnitFpriceAmt());
         dto.setEntrustIntegrateUnitFpriceAmt(calcAmtRes.getEntrustIntegrateUnitFpriceAmt());
+        // 全价总额
+        BigDecimal unitFpriceAmtTailDifference = ArithmeticUtil.round(dto.getUnitFpriceAmt(), 2, RoundingMode.HALF_UP);
+        boolean flag = true;
+        for (CfetsEtribBondInfo003Dto dd : etrInvestBondInfoDtosList) {// 结算金额
+            if (!StringUtil.isNotEmpty(dd.getEntrustNum())
+                    || !StringUtil.isNotEmpty(dto.getUnitFpriceAmt())
+                    || !StringUtil.isNotEmpty(dto.getTradeAmt())) {
+                flag = false;
+                continue;
+            }
+            dd.setUnitFpriceAmt(ArithmeticUtil.divide(
+                    ArithmeticUtil.multiply(dto.getUnitFpriceAmt(), dd.getEntrustNum()), dto.getTradeAmt(), 2, RoundingMode.HALF_DOWN));
+            unitFpriceAmtTailDifference = ArithmeticUtil.subtract(unitFpriceAmtTailDifference, dd.getUnitFpriceAmt());
+        }
+        if (CollectionUtils.isNotEmpty(etrInvestBondInfoDtosList) && flag) {
+            CfetsEtribBondInfo003Dto cfetsEtribBond = etrInvestBondInfoDtosList.stream().max(Comparator.comparing(CfetsEtribBondInfo003Dto::getEntrustNum)).get();
+            if (!BigDecimalUtil.isZeroOrNull(unitFpriceAmtTailDifference)) {
+                cfetsEtribBond.setUnitFpriceAmt(ArithmeticUtil.doAdd(unitFpriceAmtTailDifference, cfetsEtribBond.getUnitFpriceAmt()));
+            }
+        }
         //风险
         CfetsEtribdoRiskcalResponse riskDto=cfetsDto.getCfetsEtribdoRiskcalReturn();
         List<RiskTrialRetDto> riskTrialRetDto=new ArrayList<>();

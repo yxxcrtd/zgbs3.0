@@ -3,12 +3,20 @@ package com.joyintech.tams.exchange.entrust.etrexchange.position.service;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.service.TamsBusinessCommonService;
+import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
+import com.joyintech.tams.common.base.dao.FinTradeProductMapper;
+import com.joyintech.tams.common.base.entity.EtrEntrust;
+import com.joyintech.tams.common.base.entity.FinTradeProduct;
+import com.joyintech.tams.common.base.entity.FinTradeProductKey;
+import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepTrade001Dto;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepTrade003Dto;
 import com.joyintech.tams.exchange.entrust.etrexchange.position.bean.PositionRequestBaseBean;
@@ -16,17 +24,16 @@ import com.joyintech.tams.exchange.entrust.etrexchange.position.constant.Positio
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeCommonervice;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
+import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import com.joyintech.tams.invest.entrust.etragrereptrade.dto.EtrAgreRepTradeDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.B_TOTAL_TRADE_ID;
@@ -44,7 +51,13 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
     @Autowired
     private TamsBusinessCommonService tamsBusinessCommonService;
     @Autowired
-    private EtrTradeCommonervice etrTradeCommonervice;
+    private TrdCommonBaseService trdCommonBaseService;
+
+    @Autowired
+    private EtrEntrustMapper etrEntrustMapper;
+
+    @Autowired
+    private FinTradeProductMapper finTradeProductMapper;
 
     /**
      * EtrExchangeAgreRepTrade001Dto 请求对象使用
@@ -52,7 +65,7 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
      * @param entity
      */
     public void send(EtrExchangeAgreRepTrade001Dto entity, String decisionAct, String systemAct) {
-        log.debug("send() called with parameters => 【entity = {}】, 【decisionAct = {}】, 【systemAct = {}】", JsonUtils.object2Json(entity), decisionAct, systemAct);
+        log.debug("发送指令新建新头寸报文:send() called with parameters => 【entity = {}】, 【decisionAct = {}】, 【systemAct = {}】", JsonUtils.object2Json(entity), decisionAct, systemAct);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("decisionAct", decisionAct);
         resultMap.put("systemAct", systemAct);
@@ -138,24 +151,49 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
             List<Map<String, Object>> list = new ArrayList<>(1);
             bean = new PositionRequestBaseBean();
             bean.setPortfolioId(entity.getPortfolioId());
-            if (交易方向_解除质押.getValue().equals(ps)) {
-                // 解除质押走线下划款，扣托管户现金
-                bean.setCashAcctId(tamsBusinessCommonService.selectProdTghCapacctNo(entity.getPortfolioId()));
-            } else {
+            // XYHGFXSJ-328:解除质押也走券商资金账户 modify by fuyongsheng 20220721 start
+//            if (交易方向_解除质押.getValue().equals(ps)) {
+//                // 解除质押走线下划款，扣托管户现金
+//                bean.setCashAcctId(tamsBusinessCommonService.selectProdTghCapacctNo(entity.getPortfolioId()));
+//            } else {
                 // 其他走券商资金账户
                 bean.setCashAcctId(entity.getAcctNo());
-            }
+//            }
+            // XYHGFXSJ-328:解除质押也走券商资金账户 modify by fuyongsheng 20220721 end
             bean.setTradeId(null);
             bean.setEtrId(entity.getEntrustId());
+            // XYHGFXSJ-589:上交所解除质押指令头寸里交易金额应为0 modify by swwan 20220727 start
             // 交易金额
-            // 交易方向= 首期 取回购金额，其他取到期结算金额
+            /*// 交易方向= 首期 取回购金额，其他取到期结算金额
             if (交易方向_提前购回.getValue().equals(ps)
                     || 交易方向_到期购回.getValue().equals(ps)
                     || 交易方向_解除质押.getValue().equals(ps)) {
                 bean.setCashAmount(entity.getExpireSettleAmt());
             } else {
                 bean.setCashAmount(entity.getTradeAmt());
+            }*/
+            /**
+             * if 交易方向= 首期 then 回购金额
+             * else if 交易方向=解除质押 and 交易场所 = 深交所 then 指令.委托金额
+             * else if 交易方向=解除质押 and 交易场所 = 上交所 then 0
+             * else if 交易方向=中途换券 and and 指令业务类型 = 数据字典.指令业务类型.协议回购中途换券指令-换钱  then 指令.委托金额
+             * else 到期结算金额
+             * end if
+             */
+            if (交易方向_正回购.getValue().equals(ps) || 交易方向_逆回购.getValue().equals(ps) || 交易方向_首期.getValue().equals(ps)) {
+                bean.setCashAmount(entity.getTradeAmt());
+            } else if (交易方向_解除质押.getValue().equals(ps) && 交易场所_上海证券交易所.getValue().equals(entity.getTradeMarket())) {
+                bean.setCashAmount(BigDecimal.ZERO);
+            } else if (
+                    (交易方向_解除质押.getValue().equals(ps) && 交易场所_深圳证券交易所.getValue().equals(entity.getTradeMarket()))
+                    || (交易方向_中途换券.getValue().equals(ps) && 上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(entity.getEntrustBussType()))
+                    ) {
+                // 当前 委托金额放在到期结算金额字段中
+                bean.setCashAmount(entity.getExpireSettleAmt());
+            } else {
+                bean.setCashAmount(entity.getExpireSettleAmt());
             }
+            // XYHGFXSJ-589:上交所解除质押指令头寸里交易金额应为0 modify by swwan 20220727 end
             Map<String, Object> map = BeanUtil.object2Map(bean);
             list.add(map);
             resultMap.put("ptlCashList", list);
@@ -170,15 +208,32 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
             bean.setTradeId(null);
             bean.setEtrId(entity.getEntrustId());
 
-            String tradeId = StringUtil.isEmpty(entity.getIntiTradeId()) ? entity.getTradeId() : entity.getIntiTradeId();
-            //首期的到期结算金额
-            BigDecimal firstTradeAmt = etrTradeCommonervice.getFirstTradeAmt(tradeId);
+            // 在途回购里的 协议回购非首期指令的initialNum存的是首期交易编号,可直接取
+            String sqTradeID = entity.getInitialNum();
+            if(StringUtil.isEmpty(sqTradeID)){// 如果为空,说明是从协议回购行情新建的指令,须通过首期成交编号进行查询
+                String tradeId = StringUtil.isEmpty(entity.getIntiTradeId()) ? entity.getTradeId() : entity.getIntiTradeId();
+                Date vDate = DateUtil.parse(entity.getOrigSerialDate());
+                TrdProductDeal trdProductDeal = trdCommonBaseService.getFirstRepoTrade(tradeId,
+                        "", entity.getSecAcctId(), vDate);
+                if (trdProductDeal != null) {
+                    sqTradeID = trdProductDeal.getFinprodId();
+                }
+            }
+            // XYHGFXSJ-425:修改取首期的到期结算金额逻辑 modify by fuyongsheng 20220724 start
+            //取首期的到期结算金额
+            FinTradeProductKey key = new FinTradeProductKey();
+            key.setBranch(0L);
+            key.setFinprodId(sqTradeID);
+            FinTradeProduct finTradeProduct = finTradeProductMapper.selectByPrimaryKey(key);
+            BigDecimal firstTradeAmt = BigDecimal.ZERO;
+            if(finTradeProduct != null){
+                firstTradeAmt = finTradeProduct.getmTradeAmt();
+            }
             BigDecimal tradeAmt = entity.getTradeAmt();
             log.info("轧差组合现金数据集:到期续作金额 tradeAmt={}，首期的到期结算金额 firstTradeAmt={}", tradeAmt, firstTradeAmt);
-            //IF 回购类型 = 正回购 THEN 指令.到期续作金额 - 指令.首期的到期结算金额
-            //IF 回购类型 = 逆回购  and 成交编号找不到对应的首期 THEN 指令.到期续作金额
-            //IF 回购类型 = 逆回购  and 成交编号找到对应的首期 THEN  指令.到期续作金额 - 指令.首期的到期结算金额
+            // 指令.到期续作金额 - 指令.首期的到期结算金额
             bean.setCashAmount(tradeAmt.subtract(firstTradeAmt));
+            // XYHGFXSJ-425:修改取首期的到期结算金额逻辑 modify by fuyongsheng 20220724 end
 
             Map<String, Object> map = BeanUtil.object2Map(bean);
             list.add(map);
@@ -191,6 +246,7 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
                  (交易方向_首期.getValue().equals(ps)
                          || 交易方向_正回购.getValue().equals(ps)
                          || 交易方向_逆回购.getValue().equals(ps)
+                         || 交易方向_到期续做.getValue().equals(ps)
                          || 交易方向_中途换券.getValue().equals(ps))) {
             List<Map<String, Object>> list = new ArrayList<>(1);
             bean = new PositionRequestBaseBean();
@@ -205,6 +261,12 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
             if (/*交易方向_正回购.getValue().equals(repPs) && */交易方向_中途换券.getValue().equals(ps)) {
                 bean.setFinprodId(entity.getNewfinprodId());
                 bean.setSecAmount(entity.getNewRepSecNum().multiply(BigDecimal.valueOf(100L)));
+            }
+            // 换券方式
+            if(DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(entity.getEntrustBussType())){
+                resultMap.put("bondExchangeType", "02");
+            }else{
+                resultMap.put("bondExchangeType", "01");
             }
 
             Map<String, Object> map = BeanUtil.object2Map(bean);
@@ -234,6 +296,11 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
             bean.setEtrId(entity.getEntrustId());
             // 券面总额 指令.质押券数量*100
             bean.setSecAmount(entity.getRepSecNum().multiply(BigDecimal.valueOf(100L)));
+
+            if (交易方向_中途换券.getValue().equals(ps)) {
+                bean.setFinprodId(entity.getOutfinprodId());
+                bean.setSecAmount(entity.getOutRepSecNum().multiply(BigDecimal.valueOf(100L)));
+            }
 
             Map<String, Object> map = BeanUtil.object2Map(bean);
             //融入券券面总额

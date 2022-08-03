@@ -156,6 +156,14 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
     @Size(max = 32)
     private String counterDealerId = "";
 
+    @ApiModelProperty(name = "counterInvestorId", value = "对手方交易主体代码")
+    @Size(max = 32)
+    private String counterInvestorId = "";
+
+    @ApiModelProperty(name = "counterInvestorType", value = "对手方交易主体类型")
+    @Size(max = 32)
+    private String counterInvestorType = "";
+
     @ApiModelProperty(required = false, name = "appointmentNumber", value = "约定号")
     @Size(max = 10)
     private String appointmentNumber = "";
@@ -329,6 +337,9 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
     @ApiModelProperty(required = false, name = "mPayDate", value = "到期结算日")
     private Date mPayDate;
 
+    @ApiModelProperty(required = false, name = "repoMdate", value = "回购到期日")
+    private Date repoMdate;
+
     @ApiModelProperty(required = false, name = "capDays", value = "占款天数")
     @NotNull
     @Digits(integer = 10, fraction = 0)
@@ -416,6 +427,18 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
     private String isNoGuard;
     @ApiModelProperty(name = "isNetPrice", value = "是否净价交易")
     private String isNetPrice;
+
+    @ApiModelProperty(name = "quoteRequestId", value = "行情请求编号")
+    private String quoteRequestId;
+
+    @ApiModelProperty(name = "pledges", value = "质押券信息")
+    public List<InstructionPledge> pledges;
+
+    @ApiModelProperty( name = "finprodMarketIdStr", value = "金融产品代码（展示）")
+    private String finprodMarketIdStr;
+
+    @ApiModelProperty(name = "finprodAbbrStr", value = "金融产品简称（展示）")
+    private String finprodAbbrStr;
 
     @Id
     public String getEntrustId() {
@@ -616,6 +639,22 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
 
     public void setCounterDealerId(String counterDealerId) {
         this.counterDealerId = counterDealerId;
+    }
+
+    public String getCounterInvestorId() {
+        return counterInvestorId;
+    }
+
+    public void setCounterInvestorId(String counterInvestorId) {
+        this.counterInvestorId = counterInvestorId;
+    }
+
+    public String getCounterInvestorType() {
+        return counterInvestorType;
+    }
+
+    public void setCounterInvestorType(String counterInvestorType) {
+        this.counterInvestorType = counterInvestorType;
     }
 
     public String getAppointmentNumber() {
@@ -986,6 +1025,14 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
         this.mPayDate = mPayDate;
     }
 
+    public Date getRepoMdate() {
+        return repoMdate;
+    }
+
+    public void setRepoMdate(Date repoMdate) {
+        this.repoMdate = repoMdate;
+    }
+
     public BigDecimal getCapDays() {
         return capDays;
     }
@@ -1130,12 +1177,36 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
         this.isNetPrice = isNetPrice;
     }
 
+    public String getQuoteRequestId() {
+        return quoteRequestId;
+    }
+
+    public void setQuoteRequestId(String quoteRequestId) {
+        this.quoteRequestId = quoteRequestId;
+    }
+
     public long getLeftVolume() {
         return leftVolume;
     }
 
     public void setLeftVolume(long leftVolume) {
         this.leftVolume = leftVolume;
+    }
+
+    public String getFinprodMarketIdStr() {
+        return finprodMarketIdStr;
+    }
+
+    public void setFinprodMarketIdStr(String finprodMarketIdStr) {
+        this.finprodMarketIdStr = finprodMarketIdStr;
+    }
+
+    public String getFinprodAbbrStr() {
+        return finprodAbbrStr;
+    }
+
+    public void setFinprodAbbrStr(String finprodAbbrStr) {
+        this.finprodAbbrStr = finprodAbbrStr;
     }
 
     public String getTradeSide() {
@@ -1415,5 +1486,13 @@ public class Instruction implements Serializable, KeyMethodInterface<String>, Cl
                 InstructionPs.PZ, InstructionPs.RESALE,
                 InstructionPs.SEAL, InstructionPs.UNSEAL);
 //        return EntrustUtils.isNotTrade(this.getBusiTypeTg());
+    }
+
+    public List<InstructionPledge> getPledges() {
+        return pledges;
+    }
+
+    public void setPledges(List<InstructionPledge> pledges) {
+        this.pledges = pledges;
     }
 }

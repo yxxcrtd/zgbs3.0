@@ -267,7 +267,7 @@ public class CfetsEtrIbBondinfoController  extends BaseController{
                 return PositionUtil.ajaxErrorReturn(e);
             }
         }catch (Exception e) {
-            e.printStackTrace();
+            logger.error("保存银行间多组合指令新建失败", e);
             return PositionUtil.ajaxErrorReturn(e);
         }
     }

@@ -149,6 +149,12 @@
                     #{item}
                 </foreach>
             </if>
+            <if test="finprodIds != null and finprodIds.size()>0">
+                AND
+                <foreach collection="finprodIds" open=" T.finprodId in(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
             <if test="secManageAcctIds != null and secManageAcctIds.size()>0">
                 AND
                 <foreach collection="secManageAcctIds" open=" T.secManageAcctId in(" close=")" separator="," item="item">

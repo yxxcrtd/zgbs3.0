@@ -19,6 +19,7 @@
         T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TGF02}, #{FINPROD_TYPE_TGF03})
         and t1.TRADE_STATUS = #{TRADE_STATUS01}
         and t1.IS_CANCEL = #{YES_OR_NO_N}
+        AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
         AND T1.P_TRADE_ID IS NULL/*撤销流程中的数据不展示*/
         and T1.PORTFOLIO_ID <include refid="com.joyintech.service.period.trdbondduration.dao.TrdBondDurationMapper.portfolioAth"/>
         <if test="search != null and search != ''">
@@ -44,6 +45,7 @@
         and t1.TRADE_STATUS = #{TRADE_STATUS01}
         and t1.IS_CANCEL = #{YES_OR_NO_N}
         and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS})
+        AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
         <if test="search != null and search != ''">
             and (instr(T1.TOTLE_TRADE_ID, #{search}) > 0)
         </if>
@@ -64,6 +66,7 @@
         WHERE PP.INVEST_YESORNO = 'Y' AND T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TGF02}, #{FINPROD_TYPE_TGF03})
         and T1.PORTFOLIO_ID <include refid="com.joyintech.service.period.trdbondduration.dao.TrdBondDurationMapper.portfolioAth"/>
         and t1.TRADE_STATUS = #{TRADE_STATUS03}
+        AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
         and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS})
         <if test="search != null and search != ''">
             and (instr(T1.P_TRADE_ID, #{search}) > 0)
@@ -121,14 +124,16 @@
             FROM
             TRD_BANK_MANUAL_SETTLE_INFO
             WHERE
-            SETTLE_STATUS = '02') AND FINPROD_ID = T1.TRADE_ID
+            <!-- TISHKS-1570 【批处理启动】：存续期自动生成，跑批报错；-->
+            SETTLE_STATUS = '02') AND FINPROD_ID = T1.FINPROD_ID
+            <!-- TISHKS-1570 【批处理启动】：存续期自动生成，跑批报错；-->
             )
         </if>
         <!-- add by wangcheng 需求增加到期日筛选条件 2019-09-30 end -->
     </sql>
 
 
-    <select id="findPage" resultType="com.joyintech.tams.invest.common.dto.period.trdrepoduration.TrdRepoDurationDto">
+    <select id="selectAllData" resultType="com.joyintech.tams.invest.common.dto.period.trdrepoduration.TrdRepoDurationDto">
         SELECT * FROM (
         <if test="statusValid == null or statusValid.isEmpty() or statusValid.contains(PAGE_DATE_STATUS03)">
             /*流程中*/
@@ -246,7 +251,7 @@
             LEFT JOIN PTL_PORTFOLIO SUBT2 ON SUBT2.PORTFOLIO_ID = T31.PORTFOLIO_ID
             LEFT JOIN FIN_CASH_INFO FCI ON T1.FINPROD_ID = FCI.FINPROD_ID AND T1.CCY = FCI.CCY AND FCI.CASH_TYPE_2 = #{C02}
             LEFT JOIN FIN_CASH_PLAN FCP ON FCI.CASH_ID = FCP.CASH_ID
-            /*LEFT JOIN PTL_SEC_VALUTION PSV ON T1.MDATE = PSV.CDATE + 1 AND T3.PORTFOLIO_ID = PSV.PORTFOLIO_ID AND T1.FINPROD_ID = 
+            /*LEFT JOIN PTL_SEC_VALUTION PSV ON T1.MDATE = PSV.CDATE + 1 AND T3.PORTFOLIO_ID = PSV.PORTFOLIO_ID AND T1.FINPROD_ID =
             PSV.FINPROD_ID AND PSV.INV_AIM = '999999'  估值推送的利息扣除了费用，不从估值取*/
             LEFT JOIN FIN_TRADE_PRODUCT T4 ON T1.FINPROD_ID = T4.FINPROD_ID
             LEFT JOIN FIN_PRODUCT_TYPE T5 ON T4.FINPROD_ID = T5.FINPROD_ID
@@ -461,6 +466,148 @@
         </if>
         )P  ORDER BY  P.mDate DESC
     </select>
+
+
+    <select id="findPage" resultType="com.joyintech.tams.invest.common.dto.period.trdrepoduration.TrdRepoDurationDto">
+        SELECT * FROM (
+        <if test="statusValid == null or statusValid.isEmpty() or statusValid.contains(PAGE_DATE_STATUS05)">
+        /*有效数据*/
+        SELECT * FROM (
+                SELECT
+                '${PAGE_DATE_STATUS05}' statusValid,
+                fp1.FINPROD_NAME chlFinprodId,
+                T1.TOTLE_TRADE_ID busiCode,
+                T1.CCY,
+                T4.BASIS,
+                T4.INT_RATE,
+                T1.COUNTER_ID,
+                T1.TRADER,
+                T4.FINPROD_ID,
+                PP.PORTFOLIO_ID,
+                PP.PORTFOLIO_NAME,
+                T5.TYPE_6 type_6,
+                <!-- 通道交易 新增 强成西 2019/03/26 start -->
+                T1.CHL_ID chlId,
+                <!-- 通道交易 新增 强成西 2019/03/26 end -->
+                T1.FINPROD_TYPE2 ,
+                T1.SEC_MANAGE_ACCT_ID,
+                <!--modify by fuyongsheng 数据的交易日期是到期数据的交易日期 start-->
+                <!--to_char(ptpd.TRADE_DATE, 'yyyy-MM-dd') TRADE_DATE,-->
+                to_char(T1.TRADE_DATE, 'yyyy-MM-dd') TRADE_DATE,
+                <!--modify by fuyongsheng 数据的交易日期是到期数据的交易日期 end-->
+                to_char(T4.VDATE, 'yyyy-MM-dd') vDate/*计息开始日*/,
+                to_char(T4.MDATE, 'yyyy-MM-dd') mDate/*计息结束日*/,
+                NULL TERM,
+                T3.THEORY_PRIN/*理论本金*/,
+                T1.TRADE_MARKET TRADE_MARKET,
+                to_char(T1.SETTLE_DATE, 'yyyy-MM-dd') SETTLE_DATE,
+                T3.THEORY_INT/*理论利息*/,
+                T3.THEORY_AMT/*理论本息总额*/,
+                <!-- 存续期增加通道费 modify by renping 20191028 start -->
+                T1.FPRICE_AMT,/*实收本息总额*/
+                T1.TRADE_AMT,
+                <!-- 存续期增加通道费 modify by renping 20191028 end -->
+                T1.PS/*交易方向*/
+                ,null workflow_id
+                FROM TRD_FIN_PRODUCT_DEAL_TOTAL T1
+                LEFT JOIN FIN_PRODUCT fp1 on fp1.FINPROD_ID = T1.CHL_ID
+                LEFT JOIN PA_TRD_FIN_PRODUCT_DEAL_TOTAL T3 ON T1.TOTLE_TRADE_ID = T3.TOTLE_TRADE_ID
+                LEFT JOIN FIN_TRADE_PRODUCT T4 ON T1.FINPROD_ID = T4.FINPROD_ID
+                LEFT JOIN FIN_PRODUCT_TYPE T5 ON T4.FINPROD_ID = T5.FINPROD_ID
+                LEFT JOIN PTL_TRADE PT ON T1.FINPROD_ID = PT.BUSI_NO
+                LEFT JOIN PTL_PORTFOLIO PP ON PT.PORTFOLIO_ID = PP.PORTFOLIO_ID
+                LEFT JOIN TRD_PRODUCT_DEAL ptpd on ptpd.TRADE_ID =  T4.FINPROD_ID
+                WHERE T5.TYPE_6 in('H01','H02') <!-- 只查询场内通用质押式回购和 modify by lifangpeng 20220630 -->
+                and PP.INVEST_YESORNO = 'Y' AND T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TGF02}, #{FINPROD_TYPE_TGF03})
+                and T1.PORTFOLIO_ID <include refid="com.joyintech.service.period.trdbondduration.dao.TrdBondDurationMapper.portfolioAth"/>
+                and t1.TRADE_STATUS = #{TRADE_STATUS01}
+                and t1.IS_CANCEL = #{YES_OR_NO_N}
+                AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
+                and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS})
+                <if test="portfolioId != null and !portfolioId.isEmpty()">
+                    AND (PP.PORTFOLIO_ID IN (<foreach collection="portfolioId" index= "index" item="item" separator=",">#{item}</foreach> )
+                    or
+                    PP.PARENT_PORTFOLIO_ID IN (<foreach collection="portfolioId" index= "index"  item="item" separator=",">#{item}</foreach> )
+                    )
+                </if>
+                <include refid="where_sql" />
+                ORDER BY T1.TRADE_DATE DESC
+            )
+        </if>
+        /*撤销数据*/
+        <if test="statusValid == null or statusValid.isEmpty() or statusValid.contains(PAGE_DATE_STATUS06)">
+            <if test="statusValid == null or statusValid.isEmpty() or statusValid.contains(PAGE_DATE_STATUS05)">
+                UNION ALL
+            </if>
+            SELECT * FROM (
+            SELECT
+            '${PAGE_DATE_STATUS06}' statusValid,
+            fp1.FINPROD_NAME chlFinprodId,
+            T1.P_TRADE_ID busiCode,
+            T1.CCY,
+            T4.BASIS,
+            T4.INT_RATE,
+            T1.COUNTER_ID,
+            T1.TRADER,
+            T4.FINPROD_ID,
+            PP.PORTFOLIO_ID,
+            PP.PORTFOLIO_NAME,
+            <!--  BS-1144银行间:回购类型为质押式回购  modify by yujiaping 2020-11-25 start -->
+            <!--  decode(ptpd.trade_market,#{TRADE_PLACE_01},null,T5.TYPE_6) type_6, -->
+            T5.TYPE_6 type_6,
+            <!--  BS-1144银行间:回购类型为质押式回购  modify by yujiaping 2020-11-25 end -->
+            <!-- 通道交易 新增 强成西 2019/03/26 start -->
+            T1.CHL_ID chlId,
+            <!-- 通道交易 新增 强成西 2019/03/26 end -->
+            T1.FINPROD_TYPE2 ,
+            T1.SEC_MANAGE_ACCT_ID,
+            <!--modify by fuyongsheng 交易日期应该取到期数据交易日期 start-->
+            <!--to_char(ptpd.TRADE_DATE, 'yyyy-MM-dd') TRADE_DATE,-->
+            to_char(T1.TRADE_DATE, 'yyyy-MM-dd') TRADE_DATE,
+            <!--modify by fuyongsheng 交易日期应该取到期数据交易日期 end-->
+            to_char(T4.VDATE, 'yyyy-MM-dd') vDate/*计息开始日*/,
+            to_char(T4.MDATE, 'yyyy-MM-dd') mDate/*计息结束日*/,
+            NULL TERM,
+            T3.THEORY_PRIN/*理论本金*/,
+            T1.TRADE_MARKET TRADE_MARKET,
+            to_char(T1.SETTLE_DATE, 'yyyy-MM-dd') SETTLE_DATE,
+            T3.THEORY_INT/*理论利息*/,
+            T3.THEORY_AMT/*理论本息总额*/,
+            <!-- 存续期增加通道费 modify by renping 20191028 start -->
+            T1.FPRICE_AMT ,/*实收本息总额*/
+            T1.TRADE_AMT,
+            <!-- 存续期增加通道费 modify by renping 20191028 end -->
+            T1.PS/*交易方向*/
+            ,null workflow_id
+            FROM TRD_FIN_PRODUCT_DEAL_TOTAL T1
+            LEFT JOIN FIN_PRODUCT fp1 on fp1.FINPROD_ID = T1.CHL_ID
+            LEFT JOIN PA_TRD_FIN_PRODUCT_DEAL_TOTAL T3 ON T1.TOTLE_TRADE_ID = T3.TOTLE_TRADE_ID
+            LEFT JOIN FIN_TRADE_PRODUCT T4 ON T1.FINPROD_ID = T4.FINPROD_ID
+            LEFT JOIN FIN_PRODUCT_TYPE T5 ON T4.FINPROD_ID = T5.FINPROD_ID
+            LEFT JOIN PTL_TRADE PT ON T1.FINPROD_ID = PT.BUSI_NO
+            LEFT JOIN PTL_PORTFOLIO PP ON PT.PORTFOLIO_ID = PP.PORTFOLIO_ID
+            LEFT JOIN TRD_PRODUCT_DEAL ptpd on ptpd.TRADE_ID =  T4.FINPROD_ID
+            WHERE PP.INVEST_YESORNO = 'Y' AND T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TGF02}, #{FINPROD_TYPE_TGF03})
+            and T1.PORTFOLIO_ID <include refid="com.joyintech.service.period.trdbondduration.dao.TrdBondDurationMapper.portfolioAth"/>
+            and t1.TRADE_STATUS = #{TRADE_STATUS03}
+            AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
+            and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS})
+            <if test="portfolioId != null and !portfolioId.isEmpty()">
+                AND (PP.PORTFOLIO_ID IN (<foreach collection="portfolioId" index= "index" item="item" separator=",">#{item}</foreach> )
+                or
+                PP.PARENT_PORTFOLIO_ID IN (<foreach collection="portfolioId" index= "index" item="item" separator=",">#{item}</foreach> )
+                )
+            </if>
+            <include refid="where_sql" />
+            <!-- <if test="type6 != null and !type6.isEmpty()">
+                and ptpd.trade_market !=#{TRADE_PLACE_01}
+            </if> -->
+            ORDER BY T1.TRADE_DATE DESC
+            )
+        </if>
+        )P  ORDER BY  P.mDate DESC
+    </select>
+
 
     <select id="findEffectiveData" resultType="com.joyintech.tams.invest.common.dto.period.trdrepoduration.TrdRepoDurationDto">
         <if test="statusValid == PAGE_DATE_STATUS05 or statusValid == PAGE_DATE_STATUS06">
@@ -731,9 +878,9 @@
         INSERT INTO PTL_SEC_POSITION_FLOW
         (SEQNO, PORTFOLIO_ID, SEC_ACCT_ID, FINPROD_ID, BRANCH, HODING_TYPE, CDATE, CCY, AMOUNT,
         P_FINPROD_ID, TRADE_ID, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INV_AIM)
-        select '${seqNo}', PORTFOLIO_ID, SEC_ACCT_ID, FINPROD_ID, BRANCH, HODING_TYPE, #{mDate, jdbcType=DATE}, CCY, 
+        select '${seqNo}', PORTFOLIO_ID, SEC_ACCT_ID, FINPROD_ID, BRANCH, HODING_TYPE, #{mDate, jdbcType=DATE}, CCY,
             <if test="isRevoke == null or isRevoke == ''">
-                AMOUNT*-1,    
+                AMOUNT*-1,
             </if>
             <if test="isRevoke != null and isRevoke != ''">
                 AMOUNT,
@@ -756,8 +903,8 @@
         </if>
         P_FINPROD_ID, '${newTradeId}', CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INV_AIM
         from PTL_SEC_POSITION_FLOW
-        where 
-            TRADE_ID = #{tradeId,jdbcType=VARCHAR} 
+        where
+            TRADE_ID = #{tradeId,jdbcType=VARCHAR}
             AND HODING_TYPE = #{holdingType}
             AND CDATE = #{vDate, jdbcType=DATE}
             AND FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
@@ -826,24 +973,24 @@
 	    SELECT  T1.RELEASE_STATUS ,T1.IS_MANUAL_RELEASE
         FROM TRD_PRODUCT_DEAL_ADD T1
         LEFT JOIN TRD_PRODUCT_DEAL T2 on T2.TRADE_ID = T1.TRADE_ID
-        LEFT JOIN FIN_PRODUCT_TYPE FPT ON FPT.FINPROD_ID = T2.TRADE_ID AND FPT.BRANCH = '0'       
+        LEFT JOIN FIN_PRODUCT_TYPE FPT ON FPT.FINPROD_ID = T2.TRADE_ID AND FPT.BRANCH = '0'
         WHERE T1.TRADE_ID = #{tradeid,jdbcType=VARCHAR}
-        AND FPT.TYPE_6 = 'H01'    
-        
+        AND FPT.TYPE_6 = 'H01'
+
 </select>
-	
+
 <update id="updateReleaseStatus">
-	   update 
+	   update
 	      TRD_PRODUCT_DEAL_ADD  T1
 	      set T1.RELEASE_STATUS='1',T1.IS_MANUAL_RELEASE='N'
 	      where T1.TRADE_ID= #{tradeid,jdbcType=VARCHAR}
-</update> 
+</update>
 <update id="updateReleaseStatusRevoke">
-	   update 
+	   update
 	      TRD_PRODUCT_DEAL_ADD  T1
 	      set T1.RELEASE_STATUS='0',T1.IS_MANUAL_RELEASE=''
 	      where T1.TRADE_ID= #{tradeid,jdbcType=VARCHAR}
-</update> 	 
+</update>
 
 <select id="findCeTradeIdByTotleTradeId" resultType="java.lang.String">
     select TRD_PRODUCT_DEAL.TRADE_ID tradeId from TRD_PRODUCT_DEAL

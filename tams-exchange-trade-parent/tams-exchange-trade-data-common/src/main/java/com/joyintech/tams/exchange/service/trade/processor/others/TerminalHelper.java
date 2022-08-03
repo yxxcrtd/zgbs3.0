@@ -1,23 +1,29 @@
 package com.joyintech.tams.exchange.service.trade.processor.others;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
+import com.joyintech.background.component.common.pack.common.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondBean;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondQryBean;
 import com.joyintech.tams.exchange.common.bean.investment.CapitalAccountBean;
+import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveQryRequest;
 import com.joyintech.tams.exchange.common.bean.request.TradeInfoProRequest;
 import com.joyintech.tams.exchange.common.bean.response.TradeInfoProResponse;
-import com.joyintech.tams.exchange.common.constant.AgentType;
-import com.joyintech.tams.exchange.common.constant.EntrustSide;
-import com.joyintech.tams.exchange.common.constant.ErrorCode;
-import com.joyintech.tams.exchange.common.constant.Market;
+import com.joyintech.tams.exchange.common.bean.response.quote.repurchase.RepurchaseQuoteReceiveResponse;
+import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.enums.exchange.RepurchaseTypeEnum;
 import com.joyintech.tams.exchange.common.utils.ConvertListUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
 import com.joyintech.tams.exchange.service.trade.management.service.CommonManagement;
 import com.joyintech.tams.exchange.service.trade.management.service.InvestmentManagement;
+import com.joyintech.tams.exchange.service.trade.processor.invest.InvestInterfaceHelper;
 import com.joyintech.tams.exchange.service.trade.scheduled.LoginJob;
 import com.joyintech.tams.exchange.service.trade.scheduled.quote.QuoteJob;
 import com.joyintech.tams.exchange.service.trade.server.agent.AccountManager;
@@ -29,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +68,8 @@ public class TerminalHelper {
     private TerminalMappingService terminalMappingService;
     @Autowired
     private CommonManagement commonManagement;
+    @Autowired
+    private InvestInterfaceHelper investInterfaceHelper;
 
     private final int batchSize = 1000; // 委托成交比对时，分页发送数据大小
 
@@ -106,14 +115,18 @@ public class TerminalHelper {
         TradeAgent tradeAgent = tradeAgentManager.findAgentByAccountId(accountId);
         if (Objects.nonNull(tradeAgent)) {
             return tradeAgent.reqEntrusts(accountId);
-        } else throw new Exception(ErrorCode.TERMINAL_NOT_ONLINE.errorMsg);
+        } else {
+            throw new Exception(ErrorCode.TERMINAL_NOT_ONLINE.errorMsg);
+        }
     }
 
     public List<Trade> queryTradeFromTerminal(String accountId) throws Exception {
         TradeAgent tradeAgent = tradeAgentManager.findAgentByAccountId(accountId);
         if (Objects.nonNull(tradeAgent)) {
             return tradeAgent.reqTrades(accountId);
-        } else throw new Exception(ErrorCode.TERMINAL_NOT_ONLINE.errorMsg);
+        } else {
+            throw new Exception(ErrorCode.TERMINAL_NOT_ONLINE.errorMsg);
+        }
     }
 
     public List<IntegratedQuote> queryIntegratedQuote(int quoteType, String stockCode, String accountId, String oppositeLiaisonTel, String liaisonTel, int pageSize, String posStr) {
@@ -133,14 +146,24 @@ public class TerminalHelper {
                 logger.warn("not found agent from accountAgents because no terminal login with trade !!!");
             }
         }
-        if (!Strings.isNullOrEmpty(stockCode)) quoteQryBean.setStockCode(stockCode);
-        if (!Strings.isNullOrEmpty(oppositeLiaisonTel)) quoteQryBean.setOppositeLiaisonTel(oppositeLiaisonTel);
-        if (!Strings.isNullOrEmpty(liaisonTel)) quoteQryBean.setOppositeLiaisonTel(liaisonTel);
+        if (!Strings.isNullOrEmpty(stockCode)) {
+            quoteQryBean.setStockCode(stockCode);
+        }
+        if (!Strings.isNullOrEmpty(oppositeLiaisonTel)) {
+            quoteQryBean.setOppositeLiaisonTel(oppositeLiaisonTel);
+        }
+        if (!Strings.isNullOrEmpty(liaisonTel)) {
+            quoteQryBean.setOppositeLiaisonTel(liaisonTel);
+        }
         if (pageSize > 0) {
-            if (pageSize > 1000) pageSize = 1000;
+            if (pageSize > 1000) {
+                pageSize = 1000;
+            }
             quoteQryBean.setPageSize(pageSize);
         }
-        if (!Strings.isNullOrEmpty(posStr)) quoteQryBean.setPostStr(posStr);
+        if (!Strings.isNullOrEmpty(posStr)) {
+            quoteQryBean.setPostStr(posStr);
+        }
         quoteQryBean.setQuoteType(quoteType);
         if (Objects.nonNull(tradeAgent)) {
             try {
@@ -258,8 +281,11 @@ public class TerminalHelper {
             TradeAgent agent = tradeAgentManager.findAgentByAccountId(accountId);
             if (Objects.nonNull(agent)) {
                 String agentType = agent.getAccountMap().get(accountId).getAgentType();
-                if (AgentType.UFX.value.equals(agentType)) rowCount = 1000;
-                else rowCount = 100;
+                if (AgentType.UFX.value.equals(agentType)) {
+                    rowCount = 1000;
+                } else {
+                    rowCount = 100;
+                }
                 List<Instrument> instrumentList;
                 for (Market market : Market.values()) {
                     do {
@@ -353,6 +379,146 @@ public class TerminalHelper {
         } else {
             return sendIntegratedRepurchaseQuote(actionIn, entrustProp, accountId, pageSize);
         }
+    }
+
+    public List<RepurchaseQuoteReceiveResponse> queryRepurchaseQuoteReceive(RepurchaseQuoteReceiveQryRequest request) {
+        int pageSize = request.getPageSize();
+        if (pageSize > 1000) {
+            pageSize = 1000;
+        }
+        String accountId = request.getAccountId();
+//        String entrustProp = request.getEntrustProp();
+        String orderType = request.getOrderType();
+        // 投管查询行情时，不会传入账户信息，需要查询到所有券商的行情信息， 故选择当前已连接券商，并选择其中一个账户进行查询
+        // TODO  暂时都走模拟行情
+//        if (StrUtil.isEmpty(accountId)) {
+            return quoteJob.getRepurchaseQuoteReceiveList(orderType);
+//        }
+//        return sendRepurchaseQuoteReceive(request);
+    }
+
+    @SuppressWarnings("all")
+    public List<RepurchaseQuoteReceiveResponse> sendRepurchaseQuoteReceive(RepurchaseQuoteReceiveQryRequest request) {
+
+        List<RepurchaseQuoteReceiveResponse> list = ListUtil.list(false);
+
+        String accountId = request.getAccountId();
+        TradeAgent tradeAgent = getAgent(accountId);
+        if (ObjectUtil.isNull(tradeAgent)) {
+            logger.warn("未获取到资金账号对应的终端 => 【account = {}】", accountId);
+            return list;
+        }
+
+        try {
+            List<IntegratedRepurchaseQuoteBean> beanList = tradeAgent.reqIntegratedRepurchaseQuote(request);
+
+            RepurchaseQuoteReceiveResponse dest;
+            if (CollUtil.isNotEmpty(beanList)) {
+                for (IntegratedRepurchaseQuoteBean item : beanList) {
+                    dest = convertIntegratedRepurchaseQuoteBean2RepurchaseQuoteReceiveResponse(item);
+                    list.add(dest);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("reqIntegratedRepurchaseQuote error {}", "\r\n" + e);
+        }
+        return list;
+    }
+
+    public RepurchaseQuoteReceiveResponse convertIntegratedRepurchaseQuoteBean2RepurchaseQuoteReceiveResponse(IntegratedRepurchaseQuoteBean source) {
+        if (source == null) {
+            return null;
+        }
+        RepurchaseQuoteReceiveResponse repurchaseQuoteReceiveResponse = new RepurchaseQuoteReceiveResponse();
+        repurchaseQuoteReceiveResponse.setRequestNo(source.getCbpconferId());
+        repurchaseQuoteReceiveResponse.setRequestType(null);
+        repurchaseQuoteReceiveResponse.setBs(source.getEntrustBs());
+        repurchaseQuoteReceiveResponse.setTradeMarket(null);
+        if (RepurchaseTypeEnum.中途换券.codeEquals(repurchaseQuoteReceiveResponse.getRequestType())) {
+            repurchaseQuoteReceiveResponse.setOrigBonds(source.getStockCode());
+            repurchaseQuoteReceiveResponse.setOrigBondsName(source.getStockName());
+//        repurchaseQuoteReceiveResponse.setOrigBondsVolume();
+//        repurchaseQuoteReceiveResponse.setOrigRepoAmount();
+        } else {
+            repurchaseQuoteReceiveResponse.setStockCode(source.getStockCode());
+            repurchaseQuoteReceiveResponse.setStockName(source.getStockName());
+        }
+        repurchaseQuoteReceiveResponse.setPledgeNumber(BigDecimal.valueOf(source.getImpawnAmount()));
+        repurchaseQuoteReceiveResponse.setRepoAmount(BigDecimal.valueOf(source.getImpawnBalance()));
+        repurchaseQuoteReceiveResponse.setRepoRate(BigDecimal.valueOf(source.getExpireYearRate()));
+        repurchaseQuoteReceiveResponse.setDiscount(BigDecimal.valueOf(source.getFunderRatio()));
+        repurchaseQuoteReceiveResponse.setFirstSettleDate(String.valueOf(source.getFirstExchdate()));
+        repurchaseQuoteReceiveResponse.setCompactTerm(source.getRepoTerm());
+        repurchaseQuoteReceiveResponse.setBackDate(String.valueOf(source.getSettleEndDate()));
+        repurchaseQuoteReceiveResponse.setRepoMdate(String.valueOf(source.getRepurchaseDate()));
+        repurchaseQuoteReceiveResponse.setCapDays(source.getFundUsedDays());
+        repurchaseQuoteReceiveResponse.setSwapOutBalance(BigDecimal.valueOf(source.getSwapOutBalance()));
+        repurchaseQuoteReceiveResponse.setSwapIntoBonds(source.getSwapIntoBonds());
+        Instrument swapIntoBondInstrument = instrumentService.queryByInnerCode(source.getSwapIntoBonds());
+        repurchaseQuoteReceiveResponse.setSwapIntoBondsName(ObjectUtil.isNotNull(swapIntoBondInstrument) ? swapIntoBondInstrument.getStockName() : source.getSwapIntoBonds());
+        repurchaseQuoteReceiveResponse.setSwapIntoBondsVolume(source.getSwapIntoBondsVolume());
+        repurchaseQuoteReceiveResponse.setSwapOutBonds(source.getSwapOutBonds());
+        Instrument swapOutBondInstrument = instrumentService.queryByInnerCode(source.getSwapOutBonds());
+        repurchaseQuoteReceiveResponse.setSwapOutBondsName(ObjectUtil.isNotNull(swapOutBondInstrument) ? swapOutBondInstrument.getStockName() : source.getSwapOutBonds());
+        repurchaseQuoteReceiveResponse.setSwapOutBondsVolume(source.getSwapOutBondsVolume());
+        if (RepurchaseTypeEnum.到期续做.codeEquals(repurchaseQuoteReceiveResponse.getRequestType())) {
+             repurchaseQuoteReceiveResponse.setTransCode(null);
+        }
+        repurchaseQuoteReceiveResponse.setmIntAmt(BigDecimal.valueOf(source.getProfit()));
+        repurchaseQuoteReceiveResponse.setBackBalance(BigDecimal.valueOf(source.getSettleBalance()));
+        repurchaseQuoteReceiveResponse.setCpClientName(source.getPropAccountName());
+        repurchaseQuoteReceiveResponse.setOrigSerialNo(source.getOrigCbpconferId());
+        repurchaseQuoteReceiveResponse.setOrigSerialDate(DateUtil.format(DateUtil.parse(String.valueOf(source.getOrigEntrustDate()))));
+        repurchaseQuoteReceiveResponse.setRemark(source.getRemark());
+        repurchaseQuoteReceiveResponse.setAccount(source.getFundAccount());
+//        repurchaseQuoteReceiveResponse.setAccountName();
+        repurchaseQuoteReceiveResponse.setBrokerId(source.getBrokerId());
+        repurchaseQuoteReceiveResponse.setBrokerName(source.getBrokerName());
+
+        repurchaseQuoteReceiveResponse.setCpTraderCode(source.getOppoTraderId());
+        fillDealerInfo(source, repurchaseQuoteReceiveResponse);
+        return repurchaseQuoteReceiveResponse;
+    }
+
+    private void fillDealerInfo(IntegratedRepurchaseQuoteBean source, RepurchaseQuoteReceiveResponse repurchaseQuoteReceiveResponse) {
+        TradeInfoProRequest dto = new TradeInfoProRequest();
+        dto.setTradePlace(Market.getInvestValue(source.getStockCode().split(StrUtil.DOT)[1]));
+
+        String oppoTraderId = source.getOppoTraderId();
+        if (StrUtil.isNotEmpty(oppoTraderId)) {
+            dto.setDealerNo(oppoTraderId);
+            List<TradeInfoProResponse> counterList = investInterfaceHelper.getCounterDealerTraderInfo(dto);
+            if (CollUtil.isEmpty(counterList)) {
+                repurchaseQuoteReceiveResponse.setCpTraderCodeStr(oppoTraderId);
+                logger.error("对方交易商、交易主体、交易员信息不存在 => 【dealerNo = {}】，【market = {}】", oppoTraderId, dto.getTradePlace());
+                return;
+            }
+            TradeInfoProResponse proResponse = counterList.get(0);
+            repurchaseQuoteReceiveResponse.setCpTraderCodeStr(proResponse.getTraderName());
+            repurchaseQuoteReceiveResponse.setCpMemberId(proResponse.getDealerNo());
+            repurchaseQuoteReceiveResponse.setCpMemberIdStr(proResponse.getDealerName());
+            repurchaseQuoteReceiveResponse.setCpInvestorId(proResponse.getDealerPartyNo());
+            repurchaseQuoteReceiveResponse.setCpInvestorIdStr(proResponse.getDealerPartyName());
+            repurchaseQuoteReceiveResponse.setCpInvestorType(proResponse.getDealerPartyType());
+        }
+
+        dto.setDealerNo(null);
+        dto.setAcctNo(source.getFundAccount());
+        dto.setIsOur("Y");
+        List<TradeInfoProResponse> list = investInterfaceHelper.getDealerTraderInfo(dto);
+        if (CollUtil.isEmpty(list)) {
+            logger.error("本方交易商、交易主体、交易员信息不存在 => 【accountId = {}】，【market = {}】", source.getFundAccount(), dto.getTradePlace());
+            return;
+        }
+        TradeInfoProResponse proResponse = list.get(0);
+        repurchaseQuoteReceiveResponse.setTraderCode(proResponse.getTraderNo());
+        repurchaseQuoteReceiveResponse.setTraderCodeStr(proResponse.getTraderName());
+        repurchaseQuoteReceiveResponse.setMemberId(proResponse.getDealerNo());
+        repurchaseQuoteReceiveResponse.setMemberIdStr(proResponse.getDealerName());
+        repurchaseQuoteReceiveResponse.setInvestorId(proResponse.getDealerPartyNo());
+        repurchaseQuoteReceiveResponse.setInvestorIdStr(proResponse.getDealerPartyName());
+        repurchaseQuoteReceiveResponse.setInvestorType(proResponse.getDealerPartyType());
+
     }
 
     public List<IntegratedRepurchaseQuoteBean> sendIntegratedRepurchaseQuote(int actionIn, String entrustProp, String accountId, int pageSize) {

@@ -33,7 +33,7 @@ import com.joyintech.tams.invest.common.dto.position.PositionCashSecDto;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeCommonervice;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.systemtools.util.CommonUtil;
-import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,7 +142,8 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
                 param.put("A_001", DictCodeListExt3.资产类型_资产账户持仓.getValue());
                 param.put("NO_TRADE_BUSINESS_ETR", TempConstant.NO_TRADE_BUSINESS_ETR);
                 param.put("SHARES_TRADE_PLATFORM_03", DictCodeList.交易平台_固定收益平台.getValue());
-                param.put("TYPE_6", DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue());
+                param.put("B14", DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue());
+                param.put("B16", DictCodeList.WIND一级分类_含债券一级分类等_可分离转债存债.getValue());
                 // 浮动盈亏计算修改 modify by yufei 20200806 start
                 //Page<EtrExchangeTradePositionsCommonResponse> result = super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> etrExchangeTradeCommonMapper.findPositionsPage(param));
                 Page<EtrExchangeTradePositionsCommonResponse> result = new Page<>();
@@ -559,15 +560,24 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
                     dto.setShareAmt(dto.getShareAmt().add(i.getBigDecimal("AMT")));
                     // 单位成本 = 成本/数量
                     dto.setUnitCost(ArithmeticUtil.divide(dto.getBuyCostAmt(), dto.getShareAmt(), 4));
-                } else { // 卖出或行权回售
+                }
+
+                resultMap.put(key, dto);
+            });
+
+            currTrdData.forEach(i -> {
+                String key = getKey(i);
+                EtrExchangeUnitCostDto dto = resultMap.get(key);
+                if (dto == null) {
+                    dto = new EtrExchangeUnitCostDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+                    resultMap.put(key, dto);
+                }
+                if (!StringUtil.equals(i.getString("PS"), DictCodeList.交易方向_买入.getValue()) &&
+                        !StringUtil.equals(i.getString("PS"), DictCodeList.交易方向_申购.getValue())) { // 卖出或行权回售
                     // 成本
                     BigDecimal thisBuyCostAmt = dto.getBuyCostAmt()
-                            .subtract(ArithmeticUtil.multiply(i.getBigDecimal("PRICE"), i.getBigDecimal("AMT")));
+                            .subtract(ArithmeticUtil.multiply(dto.getUnitCost(), i.getBigDecimal("AMT")));
                     dto.setBuyCostAmt(thisBuyCostAmt);
-                    // 数量
-                    dto.setShareAmt(dto.getShareAmt().subtract(i.getBigDecimal("AMT")));
-                    // 单位成本 = 成本/数量
-                    dto.setUnitCost(ArithmeticUtil.divide(dto.getBuyCostAmt(), dto.getShareAmt(), 2));
                 }
 
                 resultMap.put(key, dto);
@@ -577,13 +587,13 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
     }
 
     public static String getKey(BaseMap bm) {
-        return bm.getString("PORTFOLIO_ID") + bm.get("FINPROD_ID");
+        return bm.getString("PORTFOLIO_ID") + bm.get("SECACCTID") + bm.get("FINPROD_ID");
     }
 
     private Page<EtrExchangeTradePositionsCommonResponse> calculationAmount(Map<String, EtrExchangeUnitCostDto> unitCostMap, Page<EtrExchangeTradePositionsCommonResponse> pages, String platDate) {
         if (pages != null && pages.getRoot() != null && !pages.getRoot().isEmpty()) {
             pages.getRoot().forEach(r -> {
-                EtrExchangeUnitCostDto dto = unitCostMap.get(r.getPortfolioId() + r.getFinprodId());
+                EtrExchangeUnitCostDto dto = unitCostMap.get(r.getPortfolioId()+r.getSecAcctId() + r.getFinprodId());
                 if (dto != null) {
                     // 1.持仓成本（元）
                     r.setPositionsAmt(dto.getBuyCostAmt());

@@ -84,7 +84,7 @@
         left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = fp.FINPROD_ID
         inner join
         (
-        select regdeal.totle_trade_id,wm_concat(regdeal.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName
+        select regdeal.totle_trade_id,to_char(wm_concat(regdeal.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName
         from reg_fin_product_deal regdeal
         left join ptl_portfolio pp
         on regdeal.portfolio_id=pp.portfolio_id
@@ -146,6 +146,9 @@
         </if>
         <if test="dealType != null and dealType != ''">
             AND '04'= #{dealType,jdbcType=VARCHAR}
+        </if>
+        <if test="BID != null and BID != ''">
+            AND 1 = 2
         </if>
         <if test="counterIdList!=null  and counterIdList.size() > 0 ">
             AND reg.counter_id IN
@@ -230,7 +233,7 @@
                             ) TEMP
                        where 1 = 1
             <if test="portfolioIdList != null and portfolioIdList.size() > 0">
-                AND bobp.portfolio_id in
+                AND TEMP.portfolio_id in
                 <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
@@ -245,7 +248,14 @@
             <if test="userId != null and userId != ''">
                 and bo.OUR_TRADER = #{userId}
             </if>
-            <if test="userId != null and userId != ''">
+            <if test="rate != null ">
+                and (case
+                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' then nvl(fpi.BP*10000, 0)
+                    when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD*100
+                    when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
+                    then fpi.REFER_YIELD*100 end) = #{rate}
+            </if>
+            <if test="ISSUE_STATUS_01 != null and ISSUE_STATUS_01 != ''">
                 and ( fpa.ISSUE_STATUS != #{ISSUE_STATUS_01} or fpa.ISSUE_STATUS is null )
             </if>
             <if test="finprodIdList != null and finprodIdList.size() > 0">
@@ -271,6 +281,9 @@
             </if>
             <if test="assetType != null and !assetType.equals('')">
                 AND fpt.TYPE_9=#{assetType,jdbcType=VARCHAR}
+            </if>
+            <if test="subscriptionAmount != null ">
+                AND bo.SUBSCRIPTION_AMOUNT=#{subscriptionAmount,jdbcType=DECIMAL}
             </if>
             <if test="counterIdList!=null  and counterIdList.size() > 0 ">
                 AND bo.OU_PARTY_ID IN
@@ -449,7 +462,7 @@
         on ib.finprod_id=fp.finprod_id
         left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = fp.FINPROD_ID
         inner join(
-        select ir.quote_id,wm_concat(ir.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName
+        select ir.quote_id,to_char(wm_concat(ir.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName
         from ibu_quote_etr_re ir
         left join ptl_portfolio pp
         on ir.portfolio_id=pp.portfolio_id
@@ -576,7 +589,7 @@
         )icpledge
         on  ic.quote_id=icpledge.quote_id
         inner join(
-        select ir.quote_id,wm_concat(ir.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName
+        select ir.quote_id,to_char(wm_concat(ir.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName
         from ibu_quote_etr_re ir
         left join ptl_portfolio pp
         on ir.portfolio_id=pp.portfolio_id
@@ -1546,8 +1559,8 @@
                  left join SYS_DATADICT_LIST sdl on sdl.DICT_CODE = 'CUSTOM_ASSET_TYPE_TWO' and sdl.ITEM_CODE = fpt.TYPE_9
                  inner join(
                         select regdeal.totle_trade_id,
-                               wm_concat(regdeal.portfolio_id) as portfolioId,
-                               wm_concat(pp.portfolio_name)       portfolioName
+                               to_char(wm_concat(regdeal.portfolio_id)) as portfolioId,
+                               to_char(wm_concat(pp.portfolio_name))       portfolioName
                         from reg_fin_product_deal regdeal
                                  left join ptl_portfolio pp
                                            on regdeal.portfolio_id = pp.portfolio_id
@@ -1698,8 +1711,8 @@
         left join SYS_DATADICT_LIST sdl on sdl.DICT_CODE = 'CUSTOM_ASSET_TYPE_TWO' and sdl.ITEM_CODE = fpt.TYPE_9
          inner join(
                     select ir.quote_id,
-                           wm_concat(ir.portfolio_id) as portfolioId,
-                           wm_concat(pp.portfolio_name)  portfolioName,
+                           to_char(wm_concat(ir.portfolio_id)) as portfolioId,
+                           to_char(wm_concat(pp.portfolio_name))  portfolioName,
                            sum(ir.deal_fee_amt)       as trdFeeAmt,
                            sum(ir.sett_fee_amt)       as settleFeeAmt
                     from ibu_quote_etr_re ir
@@ -1780,7 +1793,7 @@
         </if>
         union all
         select distinct m.seqno               as seqno,
-                m.match_type          as matchType,
+                m.match_type                    as matchType,
                 bo.BID_ID                       as busiCode,
                 m.exe_id                        as execid,
                 m.CSTP_TRADE_ID                 as cstpTradeId,
@@ -1833,8 +1846,8 @@
              left join SYS_DATADICT_LIST sdl on sdl.DICT_CODE = 'CUSTOM_ASSET_TYPE_TWO' and sdl.ITEM_CODE = fpt.TYPE_9
              inner join(select bobp.BID_ID,
                                eed.SEC_ACCT_ID,
-                               wm_concat(bobp.portfolio_id) as portfolioId,
-                               wm_concat(pp.portfolio_name)    portfolioName
+                               to_char(wm_concat(bobp.portfolio_id)) as portfolioId,
+                               to_char(wm_concat(pp.portfolio_name))    portfolioName
                         from BID_ORDER_BID_PRICE bobp
                                  left join ptl_portfolio pp on bobp.portfolio_id = pp.portfolio_id
                                  left join ETR_ENTRUST_DETAIL eed on eed.ENTRUST_ID = bobp.ENTRUST_ID and eed.PORTFOLIO_ID = bobp.PORTFOLIO_ID
@@ -1887,30 +1900,33 @@
         </if>
     </select>
     <sql id="vagueQueryTrdCstpWhere">
-        <if test="search != null and search != '' and search !='有效' ">
-            <where>
-                ((aaa.execid || '|' || aaa.busiCode || '|' || sdl.ITEM_VALUE || '|' || aaa.finprodMarketId
-                || '|' || aaa.finprodAbbr || '|' || dictps.ITEM_VALUE
-                || '|' || aaa.assetTypeName || '|T+' || aaa.settleSpeed
-                || '|' || aaa.secManageAcctIdName || '|' || aaa.portfolioIds  || '|' || aaa.portfolioNames
-                || '|' || aaa.counterIdName || '|' || dictquoteTpe.ITEM_VALUE
-                like '%' || #{search} || '%')
-                or to_char(aaa.printAmt,'FM9999999999999990.90')=#{search} or to_char(aaa.printAmt)=#{search}
-                or aaa.tradeYieldStr=#{search} or  aaa.tradeYieldStr =#{search}||'%'
-                or aaa.termDays||'' =#{search}
-                or to_char(aaa.tradeAmt,'FM9999999999999990.90')=#{search} or to_char(aaa.tradeAmt)=#{search}
-                or to_char(aaa.trdFeeAmt,'FM9999999999999990.90')=#{search} or to_char(aaa.trdFeeAmt)=#{search}
-                or to_char(aaa.settleFeeAmt,'FM9999999999999990.90')=#{search} or to_char(aaa.settleFeeAmt)=#{search}
-                or to_char(aaa.tradeDate,'yyyy-MM-dd')=#{search}
-                or to_char(aaa.tradeDate,'yyyy-MM-dd') =#{year}||'-'||#{search}
-                or to_char(aaa.tradeDate,'yyyy/MM/dd') =#{search}
-                or to_char(aaa.tradeDate,'yyyy/MM/dd') =#{year}||'/'||#{search}
-                )
-                <if test="finprodType2 != null  and finprodType2!=''">
-                    AND aaa.finprodType2 = #{finprodType2}
-                </if>
-            </where>
-        </if>
+        <where>
+            <if test="matchStatus_02 != null and matchStatus_02 != '' ">
+                aaa.matchStatus is not null and aaa.matchStatus != #{matchStatus_02}
+            </if>
+            <if test="search != null and search != '' and search !='有效' ">
+                    AND ((aaa.execid || '|' || aaa.busiCode || '|' || sdl.ITEM_VALUE || '|' || aaa.finprodMarketId
+                    || '|' || aaa.finprodAbbr || '|' || dictps.ITEM_VALUE
+                    || '|' || aaa.assetTypeName || '|T+' || aaa.settleSpeed
+                    || '|' || aaa.secManageAcctIdName || '|' || aaa.portfolioIds  || '|' || aaa.portfolioNames
+                    || '|' || aaa.counterIdName || '|' || dictquoteTpe.ITEM_VALUE
+                    like '%' || #{search} || '%')
+                    or to_char(aaa.printAmt,'FM9999999999999990.90')=#{search} or to_char(aaa.printAmt)=#{search}
+                    or aaa.tradeYieldStr=#{search} or  aaa.tradeYieldStr =#{search}||'%'
+                    or aaa.termDays||'' =#{search}
+                    or to_char(aaa.tradeAmt,'FM9999999999999990.90')=#{search} or to_char(aaa.tradeAmt)=#{search}
+                    or to_char(aaa.trdFeeAmt,'FM9999999999999990.90')=#{search} or to_char(aaa.trdFeeAmt)=#{search}
+                    or to_char(aaa.settleFeeAmt,'FM9999999999999990.90')=#{search} or to_char(aaa.settleFeeAmt)=#{search}
+                    or to_char(aaa.tradeDate,'yyyy-MM-dd')=#{search}
+                    or to_char(aaa.tradeDate,'yyyy-MM-dd') =#{year}||'-'||#{search}
+                    or to_char(aaa.tradeDate,'yyyy/MM/dd') =#{search}
+                    or to_char(aaa.tradeDate,'yyyy/MM/dd') =#{year}||'/'||#{search}
+                    )
+                    <if test="finprodType2 != null  and finprodType2!=''">
+                        AND aaa.finprodType2 = #{finprodType2}
+                    </if>
+            </if>
+        </where>
     </sql>
     <select id="findAllTrdBondList" resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmExecBondInfoResponse">
     select * from (
@@ -1958,7 +1974,7 @@
         ) regfee
         on reg.totle_trade_id=regfee.trade_id
         left join(
-        select regdeal.totle_trade_id,wm_concat(regdeal.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName
+        select regdeal.totle_trade_id,to_char(wm_concat(regdeal.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName
         from reg_fin_product_deal regdeal
         left join ptl_portfolio pp
         on regdeal.portfolio_id=pp.portfolio_id
@@ -2014,7 +2030,7 @@
         and  ibd.trade_status='07'
         and ibd.quote_id=#{busiCode,jdbcType=VARCHAR}
         left join(
-        select ir.quote_id,wm_concat(ir.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName
+        select ir.quote_id,to_char(wm_concat(ir.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName
         from ibu_quote_etr_re ir
         left join ptl_portfolio pp
         on ir.portfolio_id=pp.portfolio_id
@@ -2080,8 +2096,8 @@
              LEFT JOIN SYS_DATADICT_LIST SDL on fpi.INT_RATE_ID = SDL.ITEM_CODE and DICT_CODE='SECRATE_DATA'
              left join (select bobp.BID_ID,
                                eed.SEC_ACCT_ID,
-                               wm_concat(bobp.portfolio_id) as portfolioId,
-                               wm_concat(pp.portfolio_name)    portfolioName
+                               to_char(wm_concat(bobp.portfolio_id)) as portfolioId,
+                               to_char(wm_concat(pp.portfolio_name))    portfolioName
                         from BID_ORDER_BID_PRICE bobp
                                  left join ETR_ENTRUST_DETAIL eed
                                            on eed.ENTRUST_ID = bobp.ENTRUST_ID and bobp.PORTFOLIO_ID = eed.PORTFOLIO_ID
@@ -2142,7 +2158,7 @@
         ) regfee
         on reg.totle_trade_id=regfee.trade_id
         left join(
-        select regdeal.totle_trade_id,wm_concat(regdeal.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName
+        select regdeal.totle_trade_id,to_char(wm_concat(regdeal.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName
         from reg_fin_product_deal regdeal
         left join ptl_portfolio pp
         on regdeal.portfolio_id=pp.portfolio_id
@@ -2188,7 +2204,7 @@
         ic.quote_id totleTradeId
         from  ibu_quote_crep ic
         left join(
-        select ir.quote_id,wm_concat(ir.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName
+        select ir.quote_id,to_char(wm_concat(ir.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName
         from ibu_quote_etr_re ir
         left join ptl_portfolio pp
         on ir.portfolio_id=pp.portfolio_id
@@ -2481,6 +2497,7 @@
         reg.settle_speed as settleSpeed,
         reg.sec_manage_acct_id as secManageAcctId,
         reg.yield as tradeYield,
+        reg.UNIT_CPRICE as unitCprice,
         reg.yield as yield,
         reg.face_value as faceValue,
         reg.settle_date as settleDate,
@@ -2519,8 +2536,11 @@
         <if test="secManageAcctId != null and secManageAcctId != ''">
             and reg.sec_manage_acct_id = #{secManageAcctId,jdbcType=VARCHAR}
         </if>
-        <if test="yield != null">
-            and to_char(reg.yield,'FM990.9999')=to_char(#{yield},'FM990.9999')
+        <!--        <if test="yield != null">-->
+        <!--            and to_char(reg.yield,'FM990.9999')=to_char(#{yield},'FM990.9999')-->
+        <!--        </if>-->
+        <if test="price != null">
+            and to_char(reg.UNIT_CPRICE,'FM990.9999')=to_char(#{price},'FM990.9999')
         </if>
         <if test="faceValue != null">
             and reg.face_value=#{faceValue}
@@ -2645,10 +2665,41 @@
         from ETR_ENTRUST ee
         left join (select ENTRUST_ID, sum(ENT_FINISH_AMT) finishAmt from ETR_FINISH_STATUS group by ENTRUST_ID) efs
         on ee.ENTRUST_ID = efs.ENTRUST_ID
-        where ee.ENTRUST_STATUS in ('03','02')
+        where ee.ENTRUST_STATUS in ('03','02','09')
         <if test="finprodIds != null and finprodIds.size() > 0">
             AND ee.FINPROD_ID in
             <foreach collection="finprodIds" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="selectBidOrderByFinprodIds" resultType="com.joyintech.tams.common.base.entity.BidOrder">
+        select bid_id, finprod_id, bid_date, pay_type, pay_date, is_win,
+        win_prin_amt, win_price, win_type, remark, create_user, create_dept, create_time,
+        update_user, update_time, ou_party_id, our_trader, subscription_amount, payable_amount,
+        sett_fee_amt, p_bid_id, is_cancel, trade_status, dip_type, counter_id, bid_modle,
+        unit_cprice, unit_int, trade_amt, int_amt, assign_regdate, onmarket_date
+        from BID_ORDER
+        where IS_CANCEL = 'N' and TRADE_STATUS = '01'
+        <if test="finprodIds != null and finprodIds.size() > 0">
+            AND FINPROD_ID in
+            <foreach collection="finprodIds" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="selectBidOrderBidPriceByBidIds" resultType="com.joyintech.tams.common.base.entity.BidOrderBidPrice">
+        select bid_id, entrust_id, bid_price, is_win, win_price, win_cprice, the_win_prin_amt,
+        win_prin_amt, trade_id, create_user, create_dept, create_time, update_user, update_time,
+        is_frozen_position, subscription_amount, payable_amount, sett_fee_amt, p_bid_id, is_cancel,
+        trade_status, portfolio_id, inv_aim, sec_acct_id, acct_no, trade_amt, int_amt
+        from BID_ORDER_BID_PRICE
+        where IS_CANCEL = 'N' and TRADE_STATUS = '01'
+        <if test="bidIds != null and bidIds.size() > 0">
+            AND BID_ID in
+            <foreach collection="bidIds" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
         </if>

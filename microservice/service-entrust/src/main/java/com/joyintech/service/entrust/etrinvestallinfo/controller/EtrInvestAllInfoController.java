@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.joyintech.service.entrust.etrinvestallinfo.dto.EtrInvestAllInfoExportPdfDto;
+import com.joyintech.tams.business.common.pojo.Message;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,7 +63,15 @@ public class EtrInvestAllInfoController {
             page, length, param);
         return result;
     }
-    
+
+    @ApiOperation(value = "获取债券基本信息", notes = "获取债券基本信息")
+    @ResponseBody
+    @PostMapping("/getById")
+    public EtrInvestAllInfoDto getById(@RequestBody Map<String, Object> param){
+        EtrInvestAllInfoDto resultDto = etrInvestAllInfoService.getById(param);
+        return resultDto;
+    }
+
     /**
      * 
      * 获取组合代码联想文本框信息

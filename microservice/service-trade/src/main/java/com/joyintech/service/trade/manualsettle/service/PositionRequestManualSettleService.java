@@ -30,6 +30,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.joyintech.tams.constant.DictCodeList.是否_否;
+import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.*;
 
 @Service
@@ -332,7 +333,15 @@ public class PositionRequestManualSettleService {
         resultMap.put("workFlowId", null);
         resultMap.put("cdate", entity.getSettleDate());
         resultMap.put("ccy", infContractDetailfile.getCcy());
-
+        // XYHGFXSJ-555:中途换券设置换券方式 modify by fuyongsheng 20220726 start
+        if (交易方向_中途换券.getValue().equals(infContractDetailfile.getPs())) {
+            if (上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(etrEntrust.getEntrustType())) {
+                resultMap.put(BOND_EXCHANGE_TYPE, "02");
+            } else {
+                resultMap.put(BOND_EXCHANGE_TYPE, "01");
+            }
+        }
+        // XYHGFXSJ-555:中途换券设置换券方式 modify by fuyongsheng 20220726 end
         // 首期组合现金数据集
         if (DictCodeListExt3.交易方向_正回购.getValue().equals(infContractDetailfile.getPs())
                 // ZGTFCP-1417:添加逆回购方向 modify by fuyongsheng 20220321 start
@@ -341,17 +350,23 @@ public class PositionRequestManualSettleService {
                 || DictCodeListExt3.交易方向_首期.getValue().equals(infContractDetailfile.getPs())
                 || DictCodeListExt3.交易方向_提前购回.getValue().equals(infContractDetailfile.getPs())
                 || (DictCodeListExt3.交易方向_到期购回.getValue().equals(infContractDetailfile.getPs()))
-                || (DictCodeListExt3.交易方向_解除质押.getValue().equals(infContractDetailfile.getPs()))) {
+                || (DictCodeListExt3.交易方向_解除质押.getValue().equals(infContractDetailfile.getPs()))
+                || (交易方向_中途换券.getValue().equals(infContractDetailfile.getPs()) && 上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(etrEntrust.getEntrustType()))) {
             List<Map<String, Object>> list = new ArrayList<>(4);
             Map<String, Object> map = new HashMap<>();
             map.put("portfolioId", entity.getPortfolioId());
             if(DictCodeListExt3.交易方向_解除质押.getValue().equals(infContractDetailfile.getPs())){
-                map.put("cashAcctId", getPtlCapAcctNo(infContractDetailfile));
+//                map.put("cashAcctId", getPtlCapAcctNo(infContractDetailfile));
+                map.put("cashAcctId", infContractDetailfile.getAcctNo());
                 // 查询首期交易信息
                 // ZGTFCP-2097:需要查询首期 modif by fuyongsheng 20220329 start
                 FinTradeProduct finTradeProduct = getSqFinTradeProduct(infContractDetailfile);
                 // ZGTFCP-2097:需要查询首期 modif by fuyongsheng 20220329 end
-                map.put("cashAmount", finTradeProduct != null ? finTradeProduct.getmTradeAmt() : new BigDecimal(0));
+                if(StringUtil.equals(entity.getTradeMarket(),交易场所_上海证券交易所.getValue())){
+                    map.put("cashAmount", BigDecimal.ZERO);
+                }else {
+                    map.put("cashAmount", finTradeProduct != null ? finTradeProduct.getmTradeAmt() : new BigDecimal(0));
+                }
             }
             // ZGTFCP-2045:到期购回需要登录首期的到期结算金额 modify by fuyongsheng 20220327 start
             else if(DictCodeListExt3.交易方向_到期购回.getValue().equals(infContractDetailfile.getPs())
@@ -402,6 +417,7 @@ public class PositionRequestManualSettleService {
         // if (DictCodeListExt3.交易方向_解除质押.getValue().equals(infContractDetailfile.getPs())) {
         if (DictCodeListExt3.交易方向_正回购.getValue().equals(infContractDetailfile.getPs())
             || DictCodeListExt3.交易方向_中途换券.getValue().equals(infContractDetailfile.getPs())
+            || DictCodeListExt3.交易方向_到期续做.getValue().equals(infContractDetailfile.getPs())
             || DictCodeListExt3.交易方向_解除质押.getValue().equals(infContractDetailfile.getPs())) {
             List<Map<String, Object>> list = new ArrayList<>(4);
             Map<String, Object> map = new HashMap<>();
@@ -592,6 +608,12 @@ public class PositionRequestManualSettleService {
         map.put("fTradeId", entity.getvTradeId());
         // ZGTFCP-1988:修改查询换入换出质押券方法 modify by fuyongsheng 20220328 end
         List<FinPledgeDispDetailTemp> finPledgeDispDetailTemps = trdCommonBaseService.getFinPledgeDispDetailTemps(map);
+        //XYHGFXSJ-605
+        if(StringUtil.isEmptyList(finPledgeDispDetailTemps) && StringUtil.isNotEmpty(entity.getFinprodId())){
+            map.put("fTradeId", entity.getFinprodId());
+            finPledgeDispDetailTemps = trdCommonBaseService.getFinPledgeDispDetailTemps(map);
+        }
+        //XYHGFXSJ-605
         if(!StringUtil.isEmptyList(finPledgeDispDetailTemps)){
             for(FinPledgeDispDetailTemp finPledgeDispDetailTemp : finPledgeDispDetailTemps){
                 if(tradeType.equals(finPledgeDispDetailTemp.getTradeType())){
@@ -608,26 +630,28 @@ public class PositionRequestManualSettleService {
      * @return
      */
     private FinTradeProduct getSqFinTradeProduct(InfContractDetailfile infContractDetailfile){
+        // XYHGFXSJ-535:修改查询首期方法 modify by fuyongsheng 20220726 start
         // 首期成交编号
-        String finprodId = infContractDetailfile.getvTradeId();
-        String entrustId = infContractDetailfile.getEntrustId();
-        // 指令附属信息
-        EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entrustId);
-        EtrEntrustAddDto etrEntrustAddDto = new EtrEntrustAddDto();
-        if (etrEntrustAdd != null){
-            BeanUtil.copyPropertiesIgnoreNull(etrEntrustAddDto,etrEntrustAdd);
-            if (etrEntrustAdd.getTradeId() != null) {
-                finprodId = etrEntrustAdd.getTradeId();
-            }
-        }
-        String hgsqFinprodId = trdCommonBaseService.selectHgsqFinprodId(infContractDetailfile.getPortfolioId(), finprodId);
-        if (StringUtil.isNotBlank(hgsqFinprodId)) {
-            finprodId = hgsqFinprodId;
-        }
+//        String finprodId = infContractDetailfile.getvTradeId();
+//        String entrustId = infContractDetailfile.getEntrustId();
+//        // 指令附属信息
+//        EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entrustId);
+//        EtrEntrustAddDto etrEntrustAddDto = new EtrEntrustAddDto();
+//        if (etrEntrustAdd != null){
+//            BeanUtil.copyPropertiesIgnoreNull(etrEntrustAddDto,etrEntrustAdd);
+//            if (etrEntrustAdd.getTradeId() != null) {
+//                finprodId = etrEntrustAdd.getTradeId();
+//            }
+//        }
+//        String hgsqFinprodId = trdCommonBaseService.selectHgsqFinprodId(infContractDetailfile.getPortfolioId(), finprodId);
+//        if (StringUtil.isNotBlank(hgsqFinprodId)) {
+//            finprodId = hgsqFinprodId;
+//        }
         FinTradeProductKey finTradeProductKey = new FinTradeProductKey();
-        finTradeProductKey.setFinprodId(finprodId);
+        finTradeProductKey.setFinprodId(infContractDetailfile.getFinprodId());
         finTradeProductKey.setBranch(0L);
         return finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
+        // XYHGFXSJ-535:修改查询首期方法 modify by fuyongsheng 20220726 end
     }
 
     /**

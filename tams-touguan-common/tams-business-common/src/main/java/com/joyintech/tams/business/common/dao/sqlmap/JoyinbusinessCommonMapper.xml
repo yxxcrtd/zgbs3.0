@@ -352,10 +352,14 @@
         </if>
         <where>
             A.VDATE <![CDATA[<=]]> #{platDate,jdbcType=DATE}
+            <!--modify by etliu 20220723 组合下拉列表没有按照组合类型过滤 start -->
+            AND A.PORTFOLIO_TYPE = '01'
+            <!--modify by etliu 20220723 end -->
             AND A.PORTFOLIO_ID NOT IN
             (SELECT DISTINCT TFP.PORTFOLIO_ID PORTFOLIO_ID FROM TRD_FIN_PRODUCT_DEAL_TOTAL TFP
             WHERE (TFP.PS = 'C5' OR TFP.PS = 'C20')
             AND (TFP.IS_CANCEL !='Y' OR TFP.IS_CANCEL IS NULL)
+            and TFP.TRADE_MARKET in ('01')
             )
             <if test="search != null and search != ''">
                 AND (A.PORTFOLIO_ID LIKE CONCAT('%', CONCAT(#{search}, '%'))
@@ -553,6 +557,23 @@
                 or MST_CFETS_CUSTOMER_INFO.PARTY_ABBR like concat('%',concat(#{search},'%')))
             </if>
         </where>
+    </select>
+    <select id="queryAcctNo" resultType="com.joyintech.framework.select.SelectOptionDto">
+        select distinct nvl(ts.OURDEPOSITACCOUNTNUMBER, tr.OURDEPOSITACCOUNTNUMBER) as id,
+                    stlinfo.sec_acct_name                                       as text
+        from INTERF_CSTP_TRADE I
+        left join INTERF_OPICS_TRAD_REPO tr on tr.oritradeid = I.EXECID
+        left join INTERF_TRAD_SECDEAL ts on ts.FEDEALNO = I.EXECID
+        left join stl_sec_acct_info stlinfo
+        on nvl(ts.OURDEPOSITACCOUNTNUMBER, tr.OURDEPOSITACCOUNTNUMBER) = stlinfo.sec_acct_id
+        where nvl(ts.OURDEPOSITACCOUNTNUMBER, tr.OURDEPOSITACCOUNTNUMBER) is not null and stlinfo.sec_acct_name  is not null
+            <if test="search != null and !search.equals('')">
+                AND	(nvl(ts.OURDEPOSITACCOUNTNUMBER, tr.OURDEPOSITACCOUNTNUMBER) like concat('%',concat(#{search},'%'))
+                or stlinfo.sec_acct_name like concat('%',concat(#{search},'%')))
+            </if>
+            <if test="sysdate != null ">
+                AND	nvl(ts.dealdate, tr.dealdate) = #{sysdate}
+            </if>
     </select>
     <select id="queryMySideAndPartyList" resultType="com.joyintech.framework.select.SelectOptionDto">
         SELECT DISTINCT
@@ -978,7 +999,8 @@
          left join FIN_PRODUCT_SPECIAL fps on fps.FINPROD_MARKET_ID = fp.FINPROD_MARKET_ID
          <where>
              <if test="finprodIds != null and finprodIds.size()>0">
-                 <foreach collection="finprodIds" item="finprodId" open=" fp.FINPROD_ID in (" close=")">
+                 AND fp.FINPROD_ID in
+                 <foreach collection="finprodIds" item="finprodId" open="(" close=")" separator=",">
                      #{finprodId}
                  </foreach>
              </if>
@@ -1008,5 +1030,30 @@
     <select id="qryCashAcctIdBySecAcctId" resultType="java.lang.String">
 		select TRD_ACCT_ID from STL_SEC_ACCT_INFO where SEC_ACCT_ID = #{secAcctId}
             and rownum=1
+    </select>
+
+    <!--根据组合 资产 查询证券账户-->
+    <select id="qryPortfolioSecAcctId" resultType="java.lang.String">
+        SELECT V.SEC_ACCT_ID AS SECACCTID
+        FROM PTL_SEC_ACCT PSA,
+             STL_SEC_ACCT_INFO V
+        LEFT JOIN FIN_PRODUCT R
+              ON R.REGIST_ORG = V.REGIST_ORG and V.TRADE_PLACE = R.trade_market
+        WHERE PSA.ACCT_NO = V.SEC_ACCT_ID
+          AND V.SEC_ACCT_TYPE = 'SEC'
+          AND PSA.PORTFOLIO_ID = #{portfolioId}
+          AND R.FINPROD_ID = #{finprodId}
+        AND ROWNUM = 1
+        union all
+        SELECT V.SEC_ACCT_ID AS SECACCTID
+        FROM PTL_SEC_ACCT PSA,
+             STL_SEC_ACCT_INFO V
+        LEFT JOIN INTERF_PAYHSRCSECINFO R
+              ON R.INSTITUTION = V.REGIST_ORG and V.TRADE_PLACE = R.MARKET2
+        WHERE PSA.ACCT_NO = V.SEC_ACCT_ID
+          AND V.SEC_ACCT_TYPE = 'SEC'
+          AND PSA.PORTFOLIO_ID = #{portfolioId}
+          AND R.SECID = #{finprodId}
+        AND ROWNUM = 1
     </select>
 </mapper>

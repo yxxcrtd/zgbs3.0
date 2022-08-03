@@ -28,9 +28,12 @@ var parenPage = function () {
     
     var tabcols = [
             {field: 'bizCode', title: '业务编号', width: 200, sortable: false, render: function (data, type, row, meta) {
+                    if(row.paBizType=='151'||row.paBizType=='180'||row.paBizType=='202'||row.paBizType=='212'||row.paBizType=='09'){
+                        return data;
+                    }
                     return "<a class='pro-link' style='cursor: pointer;' " +
                         "href='javascript:openOperateWindow(\"" + STATUS_VALID_05 + "\",\"" + row.paBizType + "\",\"" + row.portfolioId + "\",\""
-                        + row.bizCode + "\", \"" + row.orderId + "\", null, null, null, null, \""+row.profitType+"\",\"" + row.finprodId + "\")'>" + data + "</a>";
+                        + row.bizCode + "\", null, null, null, null, null, \""+row.profitType+"\",\"" + row.finprodId + "\",\"" + row.operateType+ "\",null,null,\"" + row.paBizTypeAdd+ "\")'>" + data + "</a>";
                 }
             }
             , {field: 'orderId', title: '指令编号', width: 150, sortable: false,visible : false}

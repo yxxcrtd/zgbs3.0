@@ -6,65 +6,65 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "terminalTest")
+@ConfigurationProperties(prefix = "terminaltest")
 @PropertySource(value = {"classpath:accountConf.properties"})
 public class AccountConfig {
-    @Value("${terminalTest.broker.serverInfo}")
-    private String serverInfo;
-    @Value("${terminalTest.account}")
+    @Value("${terminaltest.broker.serverinfo}")
+    private String serverinfo;
+    @Value("${terminaltest.account}")
     private String accounts;
-    @Value("${terminalTest.interface.name}")
+    @Value("${terminaltest.interface.name}")
     private String testInterfaceName;
-    @Value("${terminalTest.order.fixedRate}")
+    @Value("${terminaltest.order.fixedRate}")
     private int delay;
-    @Value("${terminalTest.instrument.stockCodes}")
+    @Value("${terminaltest.instrument.stockCodes}")
     private String stockCodes;
-    @Value("${terminalTest.instrument.entrustPrice}")
+    @Value("${terminaltest.instrument.entrustPrice}")
     private String entrustPrice;
-    @Value("${terminalTest.instrument.entrustVolume}")
+    @Value("${terminaltest.instrument.entrustVolume}")
     private String entrustVolume;
-    @Value("${terminalTest.instrument.stockCode_Stocks}")
+    @Value("${terminaltest.instrument.stockCode_Stocks}")
     private String stockCode_Stocks;
-    @Value("${terminalTest.instrument.stockCode_Bonds}")
+    @Value("${terminaltest.instrument.stockCode_Bonds}")
     private String stockCode_Bonds;
-    @Value("${terminalTest.instrument.stockCode_Funds}")
+    @Value("${terminaltest.instrument.stockCode_Funds}")
     private String stockCode_Funds;
-    @Value("${terminalTest.instrument.stockCode_ChangeBonds}")
+    @Value("${terminaltest.instrument.stockCode_ChangeBonds}")
     private String stockCode_ChangeBonds;
-    @Value("${terminalTest.instrument.entrustPrice_ChangeBonds}")
+    @Value("${terminaltest.instrument.entrustPrice_ChangeBonds}")
     private String entrustPrice_ChangeBonds;
-    @Value("${terminalTest.testType}")
+    @Value("${terminaltest.testType}")
     private String testType;
-    @Value("${terminalTest.propSeatNo}")
+    @Value("${terminaltest.propSeatNo}")
     private String propSeatNo;
-    @Value("${terminalTest.entrustBs}")
+    @Value("${terminaltest.entrustBs}")
     private String entrustBs;
-    @Value("${terminalTest.compactTerm}")
+    @Value("${terminaltest.compactTerm}")
     private int compactTerm;
-    @Value("${terminalTest.firstSettleDate}")
+    @Value("${terminaltest.firstSettleDate}")
     private String firstSettleDate;
-    @Value("${terminalTest.trader}")
+    @Value("${terminaltest.trader}")
     private String trader;
-    @Value("${terminalTest.stockCode_Funds_FixedIncome}")
+    @Value("${terminaltest.stockCode_Funds_FixedIncome}")
     private String stockCode_Funds_FixedIncome;
-    @Value("${terminalTest.entrustPrice_FixedIncome}")
+    @Value("${terminaltest.entrustPrice_FixedIncome}")
     private String entrustPrice_FixedIncome;
-    @Value("${terminalTest.stockCode_Funds_ProtocolBack_SH}")
+    @Value("${terminaltest.stockCode_Funds_ProtocolBack_SH}")
     private String stockCode_Funds_ProtocolBack_SH;
-    @Value("${terminalTest.entrustPrice_ProtocolBack_SH}")
+    @Value("${terminaltest.entrustPrice_ProtocolBack_SH}")
     private String entrustPrice_ProtocolBack_SH;
-    @Value("${terminalTest.stockCode_Funds_ProtocolBack_SZ}")
+    @Value("${terminaltest.stockCode_Funds_ProtocolBack_SZ}")
     private String stockCode_Funds_ProtocolBack_SZ;
-    @Value("${terminalTest.entrustPrice_ProtocolBack_SZ}")
+    @Value("${terminaltest.entrustPrice_ProtocolBack_SZ}")
     private String entrustPrice_ProtocolBack_SZ;
 
 
-    public String getServerInfo() {
-        return serverInfo;
+    public String getServerinfo() {
+        return serverinfo;
     }
 
-    public void setServerInfo(String serverInfo) {
-        this.serverInfo = serverInfo;
+    public void setServerinfo(String serverinfo) {
+        this.serverinfo = serverinfo;
     }
 
     public String getAccounts() {

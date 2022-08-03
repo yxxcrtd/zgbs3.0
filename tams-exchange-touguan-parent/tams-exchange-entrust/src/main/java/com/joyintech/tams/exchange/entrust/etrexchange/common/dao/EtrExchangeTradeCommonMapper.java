@@ -385,4 +385,7 @@ public interface EtrExchangeTradeCommonMapper {
 	int countBondHasEexrPlan(Map<String, Object> param);
 	//组合持有资产业务模式查询
 	List<BaseMap> selectAllBusModelList(Map<String, Object> param);
+
+	//组合持有资产业务模式查询
+	List<BaseMap> selectAllBusModels(Map<String, Object> param);
 }

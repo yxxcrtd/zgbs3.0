@@ -52,10 +52,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -134,7 +131,7 @@ public class FinBondTargetAsset002Controller extends BaseController{
             //commonBusinessService.setTradeMarketId(finBondTargetAssetDto,model);
             //点击修改保存提交会校验实际授信主体必填问题
             String a = CacheUtil.getSysParam(BussinessConstant.CEMODEL);
-            if(StringUtil.equals("01", a)){
+            if(StringUtil.equals("01", a)&&!Objects.isNull(finBondTargetAssetDto)){
             	finBondTargetAssetDto.setCreditFlag("");
             }
             model.addAttribute("entity", finBondTargetAssetDto);

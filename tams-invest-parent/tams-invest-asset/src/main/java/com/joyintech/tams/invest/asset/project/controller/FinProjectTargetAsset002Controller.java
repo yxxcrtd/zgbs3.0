@@ -10,25 +10,6 @@
  
 package com.joyintech.tams.invest.asset.project.controller;
 
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.invest.asset.depo.dto.FinDepositTargetDto;
-import com.joyintech.workflow.engine.exception.WorkFlowException;
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
@@ -44,17 +25,34 @@ import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
+import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.invest.asset.bond.dto.FinBondTargetAssetDto;
 import com.joyintech.tams.invest.asset.project.dto.FinProjectTargetAssetDto;
 import com.joyintech.tams.invest.asset.project.service.FinProjectTargetAssetService;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
+import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 项目类资产标的信息
@@ -185,7 +183,10 @@ public class FinProjectTargetAsset002Controller extends BaseController{
             }*/
             if(isQuickInput){
                 // 快录时，不默认带出附件信息
-                finProjectTargetAssetDto.setFinprodId("");
+                //edit by yangxin at 20220728 start GLTZJY-1625 【项目类标的】：快录，计息要素、付息信息模块信息未带过来；
+//                finProjectTargetAssetDto.setFinprodId("");
+                finProjectTargetAssetDto.setFjId(finProjectTargetAssetDto.getFinprodId());
+                //edit by yangxin at 20220728 end GLTZJY-1625 【项目类标的】：快录，计息要素、付息信息模块信息未带过来；
             }
             model.addAttribute("entity", finProjectTargetAssetDto);
         }//来自于代办

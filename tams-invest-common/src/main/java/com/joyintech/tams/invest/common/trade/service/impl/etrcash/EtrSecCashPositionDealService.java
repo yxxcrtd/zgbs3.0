@@ -1166,6 +1166,8 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         // 交易生成的现金流水
         EtrCashPositionFlowDto etrCashPositionFlowDto = EtrCommonCashPositionDealService.getEtrCashPositionFlowDto(
                 finProductTradeDto);
+        EtrSecPositionFlowDto etrSecPositionFlowDto = EtrCommonCashPositionDealService.getEtrSecPositionFlowDto(
+                finProductTradeDto);
         etrCashPositionFlowDto.setOrderId(finProductTradeDto.getEntrustId());
         // 交易场所为一级市场且是交易所的交易，付款账户为托管户 add by 马数凯 20210430
         String 账号;
@@ -1183,15 +1185,23 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         etrCashPositionFlowDto.setCdate(finProductTradeDto.getTrdProductDeal().getSettleDate());
         // 有委托
         if (StringUtil.isNotEmpty(entrustId)) {
-            // 持仓流水dto处理
-            etrCashPositionFlowDto.setAmount(交易日减少金额);
-            // 添加现金流水到目标dto
-            etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
-            // 交收时交割日减少(交易金额-交易券面总额*委托全价/债券面值）
             if (StringUtil.equals(finProductTradeDto.getStage(), "03")) {
-                etrPositionHoldDto.getPtlCashPositionFlows().add(gen冲销现金流水生成(etrCashPositionFlowDto, entrustId,
+                etrSecPositionFlowDto.setCdate(finProductTradeDto.getTrdProductDeal().getSettleDate());
+                // 交割日增加交易券面总额/债券面值
+                etrSecPositionFlowDto.setAmount(交易日数量);
+                // 添加持仓流水到目标dto
+                etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
+                // 交收时交割日减少(交易金额-交易券面总额*委托全价/债券面值）
+                EtrCashPositionFlowDto flowDto = gen冲销现金流水生成(etrCashPositionFlowDto, entrustId,
                         交易日数量, finProductTradeDto.getTrdProductDeal().getSettleDate(),
-                        finProductTradeDto.getTrdProductDeal().getTradeMarket(), finProductTradeDto.getBondFirstSign()));
+                        finProductTradeDto.getTrdProductDeal().getTradeMarket(), finProductTradeDto.getBondFirstSign());
+                flowDto.setAmount(ArithmeticUtil.doAdd(交易日减少金额, flowDto.getAmount()));
+                etrPositionHoldDto.getPtlCashPositionFlows().add(flowDto);
+
+            } else if (StringUtil.equals(finProductTradeDto.getStage(), "02")) {
+                // 中标结果维护提交（自主投标） 减少委托组合应缴款金额
+                etrCashPositionFlowDto.setAmount(交易日减少金额);
+                etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
             }
         }
     }
@@ -1334,11 +1344,11 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
             String ps = etrEntrust.getPs();
             Date settledate = etrEntrust.getVdate();
             if(StringUtil.isNotEmpty(entrustCommonDto.getSettleDate())){//清算速度对应的交割日期
-                settledate =entrustCommonDto.getSettleDate();
+                settledate = entrustCommonDto.getSettleDate();
             }
             //添加新的参数 add by zhangpei 20201119 start
             //BigDecimal 委托全价 = gen委托全价(etrEntrust.getEntrustId(), settledate, etrEntrust.getTradeMarket());
-            BigDecimal 委托全价 = gen委托全价(etrEntrust.getEntrustId(), etrEntrust.getVdate(), etrEntrust.getTradeMarket(),entrustCommonDto);
+            BigDecimal 委托全价 = gen委托全价(etrEntrust.getEntrustId(), settledate, etrEntrust.getTradeMarket(),entrustCommonDto);
             //添加新的参数 add by zhangpei 20201119 end
             if (DictCodeList.交易方向_买入.getValue().equals(ps)
                     // add by dubaojun 2020-08-14 场内交易增加配债逻辑 start
@@ -1360,8 +1370,12 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                 acctId = gen账号(etrEntrust.getTradeMarket(), etrEntrust.getChlId(), etrEntrust.getPortfolioId(), etrEntrust.getCcy(),
                     entrustCommonDto.getEtrEntrustAdd().getSecAcctId(),
                         entrustCommonDto.getEtrEntrust().getCounterId(), etrCashPositionFlowDto);
-                // 减少委托券面总额*委托全价/100
-                etrCashPositionFlowDto.setAmount(etrEntrust.getEntrustNum().negate().multiply(委托全价));
+                if(StringUtil.isNotEmpty(etrEntrust.getUnitFpriceAmt())){
+                    etrCashPositionFlowDto.setAmount(etrEntrust.getUnitFpriceAmt().negate());
+                }else{
+                    // 减少委托券面总额*委托全价/100
+                    etrCashPositionFlowDto.setAmount(etrEntrust.getEntrustNum().negate().multiply(委托全价));
+                }
                 etrCashPositionFlowDto.setAcctId(acctId);
                 etrCashPositionFlowDto.setOffsetId(entrustCommonDto.getEtrEntrust().getEntrustId());
                 etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
@@ -1427,10 +1441,10 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                 amount = ArithmeticUtil.subtract(amount, EtrCommonCashPositionDealService.getEtrExchangeFinishAmtMuilt(map));
                 //amount = ArithmeticUtil.subtract(amount, EtrCommonCashPositionDealService.getEtrExchangeFinishAmt(map));
             }
-            if (StringUtil.equals(etrEntrust.getTradeMarket(), DictCodeListExt1.交易场所_银行间.getValue())) {
+            /*if (StringUtil.equals(etrEntrust.getTradeMarket(), DictCodeListExt1.交易场所_银行间.getValue())) {
                 map.put("sumTradeFlag", "01");
                 amount = ArithmeticUtil.subtract(amount, EtrCommonCashPositionDealService.getEtrExchangeFinishAmtMuilt(map));
-            }
+            }*/
 
             etrCashPositionFlowDto.setAmount(amount);
             etrCashPositionFlowDto.setAcctId(acctId);
@@ -1484,7 +1498,8 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         //产品化_债券二级指令 如果entrustCommonDto为空，则赋值为流程中的数据  add by zhangpei 20201119 start
         if(StringUtil.isNotEmpty(entrustCommonDto)){
             //信用保护凭证直接取指令表价格
-            if(StringUtil.isNotEmpty(entrustCommonDto.getEtrEntrust()) && StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue(),entrustCommonDto.getEtrEntrust().getFinprodType2())){
+            if(StringUtil.isNotEmpty(entrustCommonDto.getEtrEntrust())
+                    && StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue(),entrustCommonDto.getEtrEntrust().getFinprodType2())){
                 return entrustCommonDto.getEtrEntrust().getPrice();
             }
         	 if(!StringUtil.isNotEmpty(entrustCommonDto.getEtrEntrust())||!StringUtil.isNotEmpty(entrustCommonDto.getEtrEntrustAdd())){
@@ -1493,7 +1508,8 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                  }
              }
         }
-        if (!StringUtil.isNotEmpty(entrustCommonDto.getEtrEntrust()) || !StringUtil.isNotEmpty(entrustCommonDto.getEtrEntrustAdd())) {
+        if (!StringUtil.isNotEmpty(entrustCommonDto.getEtrEntrust())
+                || !StringUtil.isNotEmpty(entrustCommonDto.getEtrEntrustAdd())) {
             return new BigDecimal(0);
         }
         //产品化_债券二级指令 如果entrustCommonDto为空，则赋值为流程中的数据  add by zhangpei 20201119 end
@@ -1557,7 +1573,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                     }
                 }
                 EtrCommonCashPositionDealService etrCommonCashPositionDealService = SpringContextUtil.getBean(EtrCommonCashPositionDealService.class);
-                BigDecimal 单位应计利息 = etrCommonCashPositionDealService.gen应计利息(entrustCommonDto.getEtrEntrust().getFinprodId(),dealDate);
+                BigDecimal 单位应计利息 = etrCommonCashPositionDealService.gen应计利息(entrustCommonDto.getEtrEntrust().getFinprodId(), dealDate);
                 委托全价 = ArithmeticUtil.doAdd(单位应计利息,委托净价);
             }
             return 委托全价;

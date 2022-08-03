@@ -12,8 +12,10 @@ package com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto;
 
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.systemtools.util.SysDatadictUtil;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 
@@ -41,7 +43,17 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
      * 请求类型
      */
     private String reqType;
+
     private String reqTypeStr;
+
+    /**
+     * 交易方向
+     */
+    private String ps;
+    /**
+     * 交易方向
+     */
+    private String psStr;
     /**
      * 质押券代码
      */
@@ -93,10 +105,33 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
      */
     private String backDate;
 
+    private String origSerialDate;
+
     /**
      * 到期结算日
      */
     private String expireSettleDate;
+
+    @ApiModelProperty(name = "outRepAmt", value = "换出质押券孳息")
+    private BigDecimal outRepAmt;
+
+    @ApiModelProperty(name = "newRepSecId", value = "换入质押券代码")
+    private String newRepSecId;
+
+    @ApiModelProperty(name = "swapIntoBondsName", value = "换入质押券名称")
+    private String newRepSecName;
+
+    @ApiModelProperty(name = "swapIntoBondsVolume", value = "换入质押券数量")
+    private BigDecimal newRepSecNum;
+
+    @ApiModelProperty(name = "outRepSecId", value = "换出质押券代码")
+    private String outRepSecId;
+
+    @ApiModelProperty(name = "outRepSecName", value = "换出质押券名称")
+    private String outRepSecName;
+
+    @ApiModelProperty(name = "outRepSecNum", value = "换出质押券数量")
+    private BigDecimal outRepSecNum;
 
     /**
      * 原质押券代码
@@ -107,6 +142,22 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
      * 原质押券名称
      */
     private String origPledgeStampName;
+    /**
+     * 原质押券数量
+     */
+    private BigDecimal origPledgeStampNum;
+    /**
+     * 原回购金额
+     */
+    private BigDecimal origTradeAmt;
+    /**
+     * 到期续作类型（0-非第三方，1-第三方）
+     */
+    private String  transCode;
+    /**
+     * 到期续作类型（0-非第三方，1-第三方）
+     */
+    private String  transCodeStr;
 
     /**
      * 回购利息
@@ -122,18 +173,52 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
      */
     private String tradeId;
     /**
-     * 发起方交易员代码
+     * 本方交易员代码
      */
     private String sponsorTraderCode;
 
     /**
-     * 发起方交易商代码
+     * 本方方交易商代码
      */
     private String sponsorDealerCode;
-    /**
-     * 本方交易员
-     */
+    @ApiModelProperty(name = "traderCode", value = "本方交易员")
     private String traderCode;
+    @ApiModelProperty(name = "memberId", value = "本方交易商")
+    private String memberId;
+    @ApiModelProperty(name = "investorId", value = "本方交易主体（深交所展示，否则为空）")
+    private String investorId;
+    @ApiModelProperty(name = "investorType", value = "本方交易主体类型（深交所展示，否则为空）")
+    private String investorType;
+
+    @ApiModelProperty(name = "cpTraderCode", value = "对手方交易员")
+    private String cpTraderCode;
+    @ApiModelProperty(name = "cpMemberId", value = "对手方交易商")
+    private String cpMemberId;
+    @ApiModelProperty(name = "cpInvestorId", value = "对手方交易主体（深交所展示，否则为空）")
+    private String cpInvestorId;
+    @ApiModelProperty(name = "cpInvestorType", value = "对手方交易主体类型（深交所展示，否则为空）")
+    private String cpInvestorType;
+
+    @ApiModelProperty(name = "traderCodeStr", value = "本方交易员")
+    private String traderCodeStr;
+    @ApiModelProperty(name = "memberIdStr", value = "本方交易商")
+    private String memberIdStr;
+    @ApiModelProperty(name = "investorIdStr", value = "本方交易主体（深交所展示，否则为空）")
+    private String investorIdStr;
+    @ApiModelProperty(name = "investorTypeStr", value = "本方交易主体类型（深交所展示，否则为空）")
+    private String investorTypeStr;
+
+    @ApiModelProperty(name = "cpTraderCodeStr", value = "对手方交易员")
+    private String cpTraderCodeStr;
+    @ApiModelProperty(name = "cpMemberIdStr", value = "对手方交易商")
+    private String cpMemberIdStr;
+    @ApiModelProperty(name = "cpInvestorIdStr", value = "对手方交易主体（深交所展示，否则为空）")
+    private String cpInvestorIdStr;
+    @ApiModelProperty(name = "cpInvestorTypeStr", value = "对手方交易主体类型（深交所展示，否则为空）")
+    private String cpInvestorTypeStr;
+
+    @ApiModelProperty(name = "cpClientName", value = "对手方客户名称")
+    private String cpClientName;
     /**
      * 补充协议
      */
@@ -143,6 +228,10 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
      * 资金账号
      */
     private String acctNo;
+    /**
+     * 资金账号名称
+     */
+    private String acctName;
 
     private String redoType;
 
@@ -268,6 +357,14 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
         this.backDate = backDate;
     }
 
+    public String getOrigSerialDate() {
+        return origSerialDate;
+    }
+
+    public void setOrigSerialDate(String origSerialDate) {
+        this.origSerialDate = origSerialDate;
+    }
+
     public String getExpireSettleDate() {
         return expireSettleDate;
     }
@@ -341,7 +438,7 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
     }
 
     public String getReqTypeStr() {
-        return SysDatadictUtil.getNameFromDataDict(DictCode.交易方向,this.reqType);
+        return this.reqTypeStr;
     }
 
     public String getAcctNo() {
@@ -379,7 +476,7 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
     }
 
     public String getTradeMarketStr() {
-        return SysDatadictUtil.getNameFromDataDict(DictCode.交易场所, this.tradeMarket);
+        return this.tradeMarketStr;
     }
 
     public String getOrigPledgeStampName() {
@@ -388,5 +485,256 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
 
     public void setOrigPledgeStampName(String origPledgeStampName) {
         this.origPledgeStampName = origPledgeStampName;
+    }
+
+    public String getMemberId() {
+        return memberId;
+    }
+
+    public void setMemberId(String memberId) {
+        this.memberId = memberId;
+    }
+
+    public String getInvestorId() {
+        return investorId;
+    }
+
+    public void setInvestorId(String investorId) {
+        this.investorId = investorId;
+    }
+
+    public String getInvestorType() {
+        return investorType;
+    }
+
+    public void setInvestorType(String investorType) {
+        this.investorType = investorType;
+    }
+
+    public String getCpTraderCode() {
+        return cpTraderCode;
+    }
+
+    public void setCpTraderCode(String cpTraderCode) {
+        this.cpTraderCode = cpTraderCode;
+    }
+
+    public String getCpMemberId() {
+        return cpMemberId;
+    }
+
+    public void setCpMemberId(String cpMemberId) {
+        this.cpMemberId = cpMemberId;
+    }
+
+    public String getCpInvestorId() {
+        return cpInvestorId;
+    }
+
+    public void setCpInvestorId(String cpInvestorId) {
+        this.cpInvestorId = cpInvestorId;
+    }
+
+    public String getCpInvestorType() {
+        return cpInvestorType;
+    }
+
+    public void setCpInvestorType(String cpInvestorType) {
+        this.cpInvestorType = cpInvestorType;
+    }
+
+    public String getCpClientName() {
+        return cpClientName;
+    }
+
+    public void setCpClientName(String cpClientName) {
+        this.cpClientName = cpClientName;
+    }
+
+    public void setReqTypeStr(String reqTypeStr) {
+        this.reqTypeStr = reqTypeStr;
+    }
+
+    public void setTradeMarketStr(String tradeMarketStr) {
+        this.tradeMarketStr = tradeMarketStr;
+    }
+
+    public String getPs() {
+        return ps;
+    }
+
+    public void setPs(String ps) {
+        this.ps = ps;
+    }
+
+    public String getPsStr() {
+        return psStr;
+    }
+
+    public void setPsStr(String psStr) {
+        this.psStr = psStr;
+    }
+
+    public String getNewRepSecId() {
+        return newRepSecId;
+    }
+
+    public void setNewRepSecId(String newRepSecId) {
+        this.newRepSecId = newRepSecId;
+    }
+
+    public String getNewRepSecName() {
+        return newRepSecName;
+    }
+
+    public void setNewRepSecName(String newRepSecName) {
+        this.newRepSecName = newRepSecName;
+    }
+
+    public BigDecimal getNewRepSecNum() {
+        return newRepSecNum;
+    }
+
+    public void setNewRepSecNum(BigDecimal newRepSecNum) {
+        this.newRepSecNum = newRepSecNum;
+    }
+
+    public String getOutRepSecId() {
+        return outRepSecId;
+    }
+
+    public void setOutRepSecId(String outRepSecId) {
+        this.outRepSecId = outRepSecId;
+    }
+
+    public String getOutRepSecName() {
+        return outRepSecName;
+    }
+
+    public void setOutRepSecName(String outRepSecName) {
+        this.outRepSecName = outRepSecName;
+    }
+
+    public BigDecimal getOutRepSecNum() {
+        return outRepSecNum;
+    }
+
+    public void setOutRepSecNum(BigDecimal outRepSecNum) {
+        this.outRepSecNum = outRepSecNum;
+    }
+
+    public BigDecimal getOrigPledgeStampNum() {
+        return origPledgeStampNum;
+    }
+
+    public void setOrigPledgeStampNum(BigDecimal origPledgeStampNum) {
+        this.origPledgeStampNum = origPledgeStampNum;
+    }
+
+    public BigDecimal getOrigTradeAmt() {
+        return origTradeAmt;
+    }
+
+    public void setOrigTradeAmt(BigDecimal origTradeAmt) {
+        this.origTradeAmt = origTradeAmt;
+    }
+
+    public String getAcctName() {
+        return acctName;
+    }
+
+    public void setAcctName(String acctName) {
+        this.acctName = acctName;
+    }
+
+    public String getTransCode() {
+        return transCode;
+    }
+
+    public void setTransCode(String transCode) {
+        this.transCode = transCode;
+    }
+
+    public String getTransCodeStr() {
+        if(StringUtil.isNotEmpty(this.transCode)){
+            return "0".equals(this.transCode)?"不变更对手方":"变更对手方";
+        }
+        return "";
+    }
+
+    public void setTransCodeStr(String transCodeStr) {
+        this.transCodeStr = transCodeStr;
+    }
+
+    public String getTraderCodeStr() {
+        return traderCodeStr;
+    }
+
+    public void setTraderCodeStr(String traderCodeStr) {
+        this.traderCodeStr = traderCodeStr;
+    }
+
+    public String getMemberIdStr() {
+        return memberIdStr;
+    }
+
+    public void setMemberIdStr(String memberIdStr) {
+        this.memberIdStr = memberIdStr;
+    }
+
+    public String getInvestorIdStr() {
+        return investorIdStr;
+    }
+
+    public void setInvestorIdStr(String investorIdStr) {
+        this.investorIdStr = investorIdStr;
+    }
+
+    public String getInvestorTypeStr() {
+        return investorTypeStr;
+    }
+
+    public void setInvestorTypeStr(String investorTypeStr) {
+        this.investorTypeStr = investorTypeStr;
+    }
+
+    public String getCpTraderCodeStr() {
+        return cpTraderCodeStr;
+    }
+
+    public void setCpTraderCodeStr(String cpTraderCodeStr) {
+        this.cpTraderCodeStr = cpTraderCodeStr;
+    }
+
+    public String getCpMemberIdStr() {
+        return cpMemberIdStr;
+    }
+
+    public void setCpMemberIdStr(String cpMemberIdStr) {
+        this.cpMemberIdStr = cpMemberIdStr;
+    }
+
+    public String getCpInvestorIdStr() {
+        return cpInvestorIdStr;
+    }
+
+    public void setCpInvestorIdStr(String cpInvestorIdStr) {
+        this.cpInvestorIdStr = cpInvestorIdStr;
+    }
+
+    public String getCpInvestorTypeStr() {
+        return cpInvestorTypeStr;
+    }
+
+    public void setCpInvestorTypeStr(String cpInvestorTypeStr) {
+        this.cpInvestorTypeStr = cpInvestorTypeStr;
+    }
+
+    public BigDecimal getOutRepAmt() {
+        return outRepAmt;
+    }
+
+    public void setOutRepAmt(BigDecimal outRepAmt) {
+        this.outRepAmt = outRepAmt;
     }
 }

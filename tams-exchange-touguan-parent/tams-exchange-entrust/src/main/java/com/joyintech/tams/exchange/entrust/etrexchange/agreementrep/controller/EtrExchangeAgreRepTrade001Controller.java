@@ -3,6 +3,7 @@ package com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.controller;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
@@ -19,15 +20,21 @@ import com.joyintech.tams.component.base.core.MstWorkflowCommonService;
 import com.joyintech.tams.component.base.core.dto.WflValidInputParameter;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.*;
+import com.joyintech.tams.exchange.entrust.common.aop.ExchangeEntrustRdsCommonAop;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.*;
+import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.enums.RepurchaseTypeEnum;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.service.EtrExchangeAgreRepTrade001Service;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.service.EtrExchangeAgreRepTrade002Service;
-import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.*;
+import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeTradeExportCommonRequest;
+import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeTradeOperateRequest;
+import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeTradePositionsCommonRequest;
+import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.SelectOptionRequestDto;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.service.EtrExchangeTradeCommon001Service;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.service.EtrExchangeTradeCommon002Service;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.service.EtrExchangeTradeCommonValidatorService;
 import com.joyintech.tams.invest.common.component.base.group.BasePtlSecPositionInfoService;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.riskinfrds.util.EntrustCompleteUtil;
@@ -58,6 +65,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.joyintech.tams.constant.DictCodeListExt3.交易方向_解除质押;
 
 @Controller
 @PageId("EtrExchangeAgreRepTrade001")
@@ -109,6 +118,9 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
      */
     @Autowired(required = false)
     private BaseGetBusinessId bussGetBussinessIdService;
+
+    @Autowired
+    private ExchangeEntrustRdsCommonAop exchangeEntrustRdsCommonAop;
 
     public static final String ENTRUST_RECORD_NEW = "new";
 
@@ -220,8 +232,72 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
         select.setName("请求类型");
         select.setOptions(options);
         initPageParams.put("REQUEST_TYPE", select);
+        setAssetTypeSelectOptions(initPageParams);
+
+        setHqQuestTypeSelectOptions(initPageParams);
 
         return new Message<Map<String, Object>>(initPageParams).success();
+    }
+
+    private void setHqQuestTypeSelectOptions(Map<String, Object> initPageParams) {
+        // 非公开行情请求类型下拉列表数据
+        List<SelectOptionDto> options = new ArrayList();
+        SelectOptionDto option = new SelectOptionDto();
+        option.setId(RepurchaseTypeEnum.首期.getCode());
+        option.setText(RepurchaseTypeEnum.首期.getDescription());
+        options.add(option);
+
+        option = new SelectOptionDto();
+        option.setId(RepurchaseTypeEnum.提前购回.getCode());
+        option.setText(RepurchaseTypeEnum.提前购回.getDescription());
+        options.add(option);
+
+        option = new SelectOptionDto();
+        option.setId(RepurchaseTypeEnum.中途换券.getCode());
+        option.setText(RepurchaseTypeEnum.中途换券.getDescription());
+        options.add(option);
+
+        option = new SelectOptionDto();
+        option.setId(RepurchaseTypeEnum.到期续做.getCode());
+        option.setText(RepurchaseTypeEnum.到期续做.getDescription());
+        options.add(option);
+
+        option = new SelectOptionDto();
+        option.setId(RepurchaseTypeEnum.解除质押.getCode());
+        option.setText(RepurchaseTypeEnum.解除质押.getDescription());
+        options.add(option);
+
+        SelectDto select = new SelectDto();
+        select.setCode("HQ_REQUEST_TYPE");
+        select.setName("请求类型");
+        select.setOptions(options);
+        initPageParams.put("HQ_REQUEST_TYPE", select);
+        setAssetTypeSelectOptions(initPageParams);
+
+    }
+
+    private void setAssetTypeSelectOptions(Map<String, Object> initPageParams) {
+        SelectDto selectDto = this.getSelectDataFromDataDic(DictCode.资产三级分类, null);
+        List<SelectOptionDto> assetType = selectDto.getOptions().stream().filter(option -> {
+            return StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_本行发行的同业存单.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_他行发行的同业存单.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_国债.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_地方政府债.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_央票.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_政策性金融债.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_政府支持机构债券.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_商业性金融债.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_企业债券.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_公司债券.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_企业债务融资工具.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_资产支持证券.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_外国债券.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_金融债.getValue())
+                    || StringUtil.equals(option.getId(), BussinessDictCodeList.行内资产三级分类_可交换债.getValue());
+        }).collect(Collectors.toList());
+        selectDto.setOptions(assetType);
+        initPageParams.put("ASSET_TYPE", selectDto);
+
     }
 
     @ApiOperation(value = "持仓页面初始化参数", notes = "持仓页面初始化参数")
@@ -545,6 +621,13 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
         AjaxResult ajax = etrExchangeAgreRepTrade001Service.checkSave(dto, result);
         //共通check
         List<ValidMessage> valid = etrExchangeTradeCommonValidatorService.valid(dto);
+
+        //检查行情编号是否重复下指令
+        if (StringUtil.isNotEmpty(dto.getReqOnId())) {
+            if (etrExchangeAgreRepTrade001Service.isAlreadyDoEntrustByRequestId(dto.getReqOnId())) {
+                valid.add(new ValidMessage("行情编号[" + dto.getReqOnId() + "]不能重复下指令！"));
+            }
+        }
         if (StringUtil.isNotEmpty(ajax) && !CollectionUtils.isEmpty(valid)) {
             valid.addAll(ajax.getErrorList());
             ajax.setErrorList(valid);
@@ -662,32 +745,39 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
             dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购提前购回指令.getValue());
             dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购提前购回指令.getValue());
             businessType = DictCodeListExt3.共通业务类型_协议回购提前购回指令.getValue();
-            busiTypePosition=DictCodeListExt3.投管业务类型_提前购回.getValue();
+            busiTypePosition = DictCodeListExt3.投管业务类型_提前购回.getValue();
         } else if (DictCodeListExt3.交易方向_到期购回.getValue().equals(dto.getPs())) {
             dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购到期购回指令.getValue());
             dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购到期购回指令.getValue());
             businessType = DictCodeListExt3.共通业务类型_协议回购到期购回指令.getValue();
-            busiTypePosition=DictCodeListExt3.投管业务类型_到期购回.getValue();
+            busiTypePosition = DictCodeListExt3.投管业务类型_到期购回.getValue();
         } else if (DictCodeListExt3.交易方向_中途换券.getValue().equals(dto.getPs())) {
-            dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue());
-            dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue());
-            businessType = DictCodeListExt3.共通业务类型_协议回购中途换券指令.getValue();
-            busiTypePosition=DictCodeListExt3.投管业务类型_中途换券.getValue();
+            if (null != dto.getOutAmt() && dto.getOutAmt().compareTo(BigDecimal.ZERO) == 1) {
+                dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令_换钱.getValue());
+                dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令_换钱.getValue());
+                businessType = DictCodeListExt3.共通业务类型_协议回购中途换券指令.getValue();
+                busiTypePosition = DictCodeListExt3.投管业务类型_中途换券.getValue();
+            } else {
+                dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue());
+                dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue());
+                businessType = DictCodeListExt3.共通业务类型_协议回购中途换券指令.getValue();
+                busiTypePosition = DictCodeListExt3.投管业务类型_中途换券.getValue();
+            }
         } else if (DictCodeListExt3.交易方向_解除质押.getValue().equals(dto.getPs())) {
             dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购解除质押指令.getValue());
             dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购解除质押指令.getValue());
             businessType = DictCodeListExt3.共通业务类型_协议回购解除质押指令.getValue();
-            busiTypePosition=DictCodeListExt3.投管业务类型_解除质押.getValue();
+            busiTypePosition = DictCodeListExt3.投管业务类型_解除质押.getValue();
         } else if (DictCodeListExt3.交易方向_到期续做.getValue().equals(dto.getPs())) {
             dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购到期续做指令.getValue());
             dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购到期续做指令.getValue());
             businessType = DictCodeListExt3.共通业务类型_协议回购到期续做指令.getValue();
-            busiTypePosition=DictCodeListExt3.投管业务类型_到期续做.getValue();
+            busiTypePosition = DictCodeListExt3.投管业务类型_到期续做.getValue();
         } else {
             dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购首期指令.getValue());
             dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购首期指令.getValue());
             businessType = DictCodeListExt3.共通业务类型_协议回购首期指令.getValue();
-            busiTypePosition=DictCodeListExt3.投管业务类型_首期.getValue();
+            busiTypePosition = DictCodeListExt3.投管业务类型_首期.getValue();
         }
         dto.setBusiTypePosition(busiTypePosition);
         //add end
@@ -722,14 +812,19 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
         dto.setBusiPs(dto.getRepPs());
         dto.setAssetType2(DictCodeList.回购类型_质押式协议回购.getValue());
         // ----------add by zhangrui1 20200703 预占功能 start----------
-        if (StringUtil.equals(BussinessConstant.SUBMIT, dto.getOperateType())
-                && (DictCodeListExt3.交易方向_到期续做.getValue().equals(dto.getPs())
-                || DictCodeListExt3.交易方向_逆回购.getValue().equals(dto.getPs())
-                || DictCodeListExt3.交易方向_正回购.getValue().equals(dto.getPs())
-                || DictCodeListExt3.交易方向_首期.getValue().equals(dto.getPs()))) {
+        if (StringUtil.equals(BussinessConstant.SUBMIT, dto.getOperateType()) && !DictCodeListExt3.交易方向_中途换券.getValue().equals(dto.getPs())
+                && !(StringUtil.equals(dto.getPs(), 交易方向_解除质押.getValue()) && StringUtil.equals(dto.getTradeMarket(), "03"))) {
             Boolean isShouQi = StringUtil.equals(DictCodeListExt3.交易方向_首期.getValue(), dto.getPs());
             if (isShouQi) {
                 dto.setPs(dto.getRepPs());
+            }
+            if (DictCodeListExt3.交易方向_到期续做.getValue().equals(dto.getPs())) {
+               /* Map<String, Object> map = new HashMap<>();
+                map.put("tradeId", (dto.getIntiTradeId() == null || dto.getIntiTradeId().equals("")) ? dto.getTradeId() : dto.getIntiTradeId());
+                EtrExchangeAgreRepTrade001Dto result = etrExchangeAgreRepTrade001Service.getEntrustInfoByIntiTradeId(map);
+                if (Objects.nonNull(result)) {
+                    dto.setFristExpireSettleAmt(result.getExpireSettleAmt());
+                }*/
             }
             AjaxResult ar = EntrustRdsCommonAop.doPreOccupy(dto,
                     BussinessDictCodeListRds.接口系统ID_预占接口.getValue(), DictCodeList.平安资产类型_质押式回购.getValue());
@@ -785,6 +880,9 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
             return new Message<AjaxResult>().success().setData(m);
         } catch (Exception e) {
             logger.error("场内交易指令新建失败", e);
+            //撤销风险预占
+            Map<String, Object> marTrd = JsonUtils.object2Map(dto);
+            exchangeEntrustRdsCommonAop.revokeBackRiskCommonInteface(marTrd, "EtrExchangeAgreRepTrade001");
             return PositionUtil.ajaxErrorReturn(e);
         }
     }
@@ -882,7 +980,7 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
     @PostMapping("findUnOpenQuotaPage")
     public Message<Page<EtrExchangeUnOpenQuota002Dto>> findUnOpenQuotaPage(@RequestBody EtrExchangeUnOpenQuotaRequestDto request) {
 
-        return new Message<Page<EtrExchangeUnOpenQuota002Dto>>(etrExchangeAgreRepTrade002Service.findUnOpenQuotaPage(request));
+        return new Message<Page<EtrExchangeUnOpenQuota002Dto>>(etrExchangeAgreRepTrade002Service.findUnOpenQuotaPageNew(request));
     }
 
     /**
@@ -925,6 +1023,9 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
                     && !StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已退回.getValue())
                     && !StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已撤回.getValue())) {
                 errList.add(new ValidMessage("该委托状态不是已退回/已接收/已撤回，无法关闭!"));
+            } else if ((Objects.nonNull(item.getDealPercent()) && item.getDealPercent().compareTo(BigDecimal.ZERO) > 0)
+                    || (Objects.nonNull(item.getImplementPercent()) && item.getImplementPercent().compareTo(BigDecimal.ZERO) > 0)) {
+                errList.add(new ValidMessage("该委托执行进度和成交进度不为0，无法关闭!"));
             }
 
             wflValidInputParameter.setBusinessDataPk1(item.getEntrustId());
@@ -1211,4 +1312,95 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
         Page<SelectOptionDto> tempList = etrExchangeTradeCommon002Service.getId(request);
         return new Message<Page<SelectOptionDto>>().success().setData(tempList);
     }
+
+    /**
+     * 质押券查询下拉框
+     *
+     * @param tradeId
+     * @return
+     */
+    @ApiOperation(value = "当前质押信息查询", notes = "当前质押信息查询")
+    @ResponseBody
+    @PostMapping("selectCurrPledgeInfo/{tradeId}")
+    public Message<EtrExchangeAgreRepCurrResp> selectCurrPledgeInfo(@ApiParam(value = "委托编号", required = false) @PathVariable String tradeId) {
+        return new Message<EtrExchangeAgreRepCurrResp>().success().setData(etrExchangeAgreRepTrade001Service.selectCurrPledgeInfo(tradeId));
+    }
+
+    /**
+     * 质押券查询下拉框
+     *
+     * @param tradeId
+     * @return
+     */
+    @ApiOperation(value = "当前质押信息查询列表", notes = "当前质押信息查询列表")
+    @ResponseBody
+    @PostMapping("selectCurrPledgeList/{tradeId}")
+    public Message<List<EtrExchangeAgreOutRepResp>> selectCurrPledgeList(@ApiParam(value = "委托编号", required = false) @PathVariable String tradeId) {
+        return new Message<List<EtrExchangeAgreOutRepResp>>().success().setData(etrExchangeAgreRepTrade001Service.selectCurrPledgeList(tradeId));
+    }
+
+    /**
+     * 根据资金账号查询组合列表
+     *
+     * @param acctNo 资金账号
+     */
+    @ApiOperation(value = "根据资金账号查询组合列表", notes = "根据资金账号查询组合列表")
+    @ResponseBody
+    @PostMapping("selectPortfolioList/{acctNo}")
+    public Message<List<SelectOptionDto>> selectPortfolioList(@ApiParam(value = "资金账号", required = true) @PathVariable String acctNo, @RequestBody SelectOptionRequestDto dto) {
+        return new Message<List<SelectOptionDto>>().success().setData(etrExchangeAgreRepTrade001Service.selectPortfolioList(acctNo, dto.getSearch()));
+    }
+
+    /**
+     * 根据首期结算日期、交易编号查询交易对手
+     *
+     * @param dto 行情信息
+     */
+    @ApiOperation(value = "", notes = "根据首期结算日期、交易编号查询交易对手")
+    @ResponseBody
+    @PostMapping("getFinprodIdNoFirst")
+    public Message<EtrExchangeAgreRepCurrResp> getFinprodIdNoFirsts(@RequestBody EtrExchangeAgreRepTrade001Dto dto) {
+        return new Message<EtrExchangeAgreRepCurrResp>().success().setData(etrExchangeAgreRepTrade001Service.getFinprodIdNoFirsts(dto));
+    }
+
+
+    /**
+     * 判断到期续作是否存在首期getFirstRepEntrustInfo
+     *
+     * @param dto 行情信息
+     */
+    @ApiOperation(value = "", notes = "判断到期续作是否存在首期")
+    @ResponseBody
+    @PostMapping("getWhetherExists")
+    public Message<String> isCanGetOrNull(@RequestBody EtrExchangeAgreRepTrade001Dto dto) {
+        return new Message<String>().success().setData(etrExchangeAgreRepTrade001Service.isCanGetOrNull(dto));
+    }
+
+    /**
+     * 判断到期续作是否存在首期
+     *
+     * @param dto 行情信息
+     */
+    @ApiOperation(value = "", notes = "判断到期续作是否存在首期")
+    @ResponseBody
+    @PostMapping("getFirstDetailRepEntrustInfo")
+    public Message<EtrExchangeAgreRepTrade001Dto> getFirstDetailRepEntrustInfo(@RequestBody EtrExchangeAgreRepTrade001Dto dto) {
+        return new Message<EtrExchangeAgreRepTrade001Dto>().success().setData(etrExchangeAgreRepTrade001Service.getFirstDetailRepEntrustInfo(dto));
+    }
+
+
+    //  XYHGFXSJ-600 - 【协议回购指令】解除质押指令WTREPO202112214291查看数据丢失
+    /**
+     * 通过指令编号查询留痕数据用来展示
+     */
+    @ApiOperation(value = "", notes = "通过指令编号查询留痕数据用来展示")
+    @ResponseBody
+    @PostMapping("getProcessDataForShow")
+    public Message<EtrExchangeAgreRepTrade001Dto> getWorkflowDataForShow(@RequestBody EtrExchangeAgreRepTrade001Dto dto) {
+        ProcessMark processMark = new ProcessMark();
+        processMark.setPageId("EtrExchangeAgreRepTrade002");
+        processMark.setBusinessDataPk1(dto.getEntrustId());
+        return new Message<EtrExchangeAgreRepTrade001Dto>().success().setData(etrExchangeAgreRepTrade001Service.getBussinessEntityByPk(processMark));
+    }
+    //  XYHGFXSJ-600 - 【协议回购指令】解除质押指令WTREPO202112214291查看数据丢失
 }

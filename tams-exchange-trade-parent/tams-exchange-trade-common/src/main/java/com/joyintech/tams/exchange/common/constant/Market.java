@@ -58,14 +58,14 @@ public enum Market implements IEnum<String> {
      * 判断是否深交所
      */
     public static boolean isSzMarket(String market) {
-        return StringUtil.equals(Market.SZSE.value, market);
+        return StringUtil.equals(Market.SZSE.value, market) || StringUtil.equals(Market.SZSE.investValue, market);
     }
 
     /**
      * 判断是否上交所
      */
     public static boolean isShMarket(String market) {
-        return StringUtil.equals(Market.SHSE.value, market);
+        return StringUtil.equals(Market.SHSE.value, market) || StringUtil.equals(Market.SHSE.investValue, market);
     }
 
     public static String getMarketName(String value) {
@@ -76,6 +76,10 @@ public enum Market implements IEnum<String> {
     public static String getInvestValue(String value) {
         Market market = marketMap.get(value);
         return Objects.nonNull(market) ? market.investValue : value;
+    }
+
+    public String getInvestValue() {
+        return investValue;
     }
 
     @Override

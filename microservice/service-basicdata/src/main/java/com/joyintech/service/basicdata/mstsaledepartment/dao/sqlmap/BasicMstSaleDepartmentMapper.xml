@@ -60,7 +60,7 @@
 	<select id="selectForInterf" parameterType="Map" resultType="com.joyintech.service.basicdata.mstsaledepartment.dto.MstSaleDepartmentDto2">
 		 select
 			msd.broker_id brockerId, /*所属券商ID */
-			(select wm_concat(secinfo.broker_name) from  mst_sale_department sale
+			(select to_char(wm_concat(secinfo.broker_name)) from  mst_sale_department sale
     		left join stl_capacct_info capacct on capacct.own_dept=sale.sale_depid
     		left join stl_sec_acct_info  secinfo on capacct.acct_no=secinfo.trd_acct_id 
     		where sale.sale_depid=msd.sale_depid) as brockername, /* 所属券商名称 */

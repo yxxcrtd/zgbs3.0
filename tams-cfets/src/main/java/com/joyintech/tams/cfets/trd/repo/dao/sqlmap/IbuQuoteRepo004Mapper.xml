@@ -97,4 +97,23 @@
         </where>
     </select>
 
+    <select id="listWflRegFinPledge" resultType="com.joyintech.tams.common.base.entity.WflRegFinPledge">
+        select wrfp.trade_id,
+               wrfp.entrust_id,
+               wrfp.portfolio_id,
+               wrfp.pledge_finprod_id,
+               wrfp.pledge_face_value,
+               wrfp.pledge_number,
+               wrfp.pledge_ratio,
+               wrfp.workflow_id,
+               wrfp.create_user,
+               wrfp.create_dept,
+               wrfp.create_time,
+               wrfp.update_user,
+               wrfp.update_time
+        from WFL_REG_FIN_PLEDGE wrfp
+                 left join WFL_REG_FIN_PRODUCT_DEAL wrfpd on wrfp.TRADE_ID = wrfpd.TRADE_ID
+        where wrfpd.TOTLE_TRADE_ID = #{totleTradeId}
+    </select>
+
 </mapper>

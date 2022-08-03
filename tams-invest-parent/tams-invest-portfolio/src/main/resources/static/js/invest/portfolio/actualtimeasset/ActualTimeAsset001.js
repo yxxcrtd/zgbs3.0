@@ -45,7 +45,7 @@ $(function() {
              {field:'portfolioName', title: 'ActualTimeAsset001.portfolioName', width : 200}//组合名称
             ,{field:'secAcctInfo', title: 'ActualTimeAsset001.secAcctInfo', sortField:'secAcctId',width : 220}//证券账户
             ,{field:'type8Name', title: 'ActualTimeAsset001.type8',sortField:'type8', width : 150}//资产类型
-            ,{field:'type7Name', title: 'ActualTimeAsset001.type7',sortField:'type7', width : 150}//资产二级类型
+            ,{field:'type9Str', title: 'ActualTimeAsset001.type7',sortField:'type9', width : 150}//资产二级类型
             ,{field:'finprodMarketId', title: 'ActualTimeAsset001.finprodMarketId', width : 150}//资产编码
             ,{field:'finprodAbbr', title: 'ActualTimeAsset001.finprodAbbr', width : 150}//资产名称
             ,{field:'actualPositionAmount', title: 'ActualTimeAsset001.actualPositionAmount',type:'number', width : 200}//实际持仓

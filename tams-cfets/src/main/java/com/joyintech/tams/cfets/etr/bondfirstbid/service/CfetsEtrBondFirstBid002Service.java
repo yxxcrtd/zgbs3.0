@@ -430,6 +430,9 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
             } catch (Exception e) {
                 Message message = PositionUtil.ajaxErrorReturn(e);
                 BaseMap bm = (BaseMap) message.getData();
+                if (bm == null) {
+                    WorkFlowUtil.showMessage(message.getMessage(), MessageType.错误消息);
+                }
                 String code = (String) bm.get("code");
                 StringBuffer messageStr = (StringBuffer) bm.get("message");
                 if (StringUtil.isEmpty(confirmOk) && StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {

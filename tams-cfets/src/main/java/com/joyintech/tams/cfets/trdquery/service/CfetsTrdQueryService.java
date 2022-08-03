@@ -29,9 +29,14 @@ import com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto;
 import com.joyintech.tams.cfets.manualsettle.service.CfetsManualSettleQueryService;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dao.CfetsTrdBondFirstSub002Mapper;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
+import com.joyintech.tams.cfets.trd.primarybidmanage.dao.CfetsPrimaryBidManageMapper;
+import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveDetailDto;
+import com.joyintech.tams.cfets.trd.primarybidmanage.dto.CfetsPrimaryBidManageSaveRequest;
 import com.joyintech.tams.cfets.trdquery.dao.CfetsTrdQueryMapper;
 import com.joyintech.tams.cfets.trdquery.dto.*;
+import com.joyintech.tams.common.base.dao.BidResultTotalMapper;
 import com.joyintech.tams.common.base.dao.FinProductIssueMapper;
+import com.joyintech.tams.common.base.entity.BidResultTotal;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
@@ -87,6 +92,12 @@ public class CfetsTrdQueryService extends BaseService {
 
     @Autowired(required = false)
     private IPlatformDate iPlatformDate;
+
+    @Autowired
+    private CfetsPrimaryBidManageMapper cfetsPrimaryBidManageMapper;
+
+    @Autowired
+    private BidResultTotalMapper bidResultTotalMapper;
     /**
      * 默认设置
      */
@@ -657,7 +668,6 @@ public class CfetsTrdQueryService extends BaseService {
             infoTableP = cfgDataTableMapper.getByPageCode(pageCode, dtCodeTemp, spcdCodeTemp, EFFERANGE_NO, USER_ID);
         } else {
             infoTableP = cfgDataTableMapper.getByPageCode(pageCode, dtCodeTemp, spcdCodeTemp, EFFERANGE_IS, userId);
-            ;
         }
         //质押券表格
         dtCodeTemp = "CfetsTrdQueryIbuPledgeInfo";
@@ -668,7 +678,6 @@ public class CfetsTrdQueryService extends BaseService {
             infoTablePledge = cfgDataTableMapper.getByPageCode(pageCode, dtCodeTemp, spcdCodeTemp, EFFERANGE_NO, USER_ID);
         } else {
             infoTablePledge = cfgDataTableMapper.getByPageCode(pageCode, dtCodeTemp, spcdCodeTemp, EFFERANGE_IS, userId);
-            ;
         }
         resultData.put(dtCode + "_formt", infoFormt);
         resultData.put(dtCode + "_formb", infoFormb);
@@ -676,7 +685,6 @@ public class CfetsTrdQueryService extends BaseService {
         resultData.put(dtCode + "_formp", infoFormp);
         resultData.put(dtCode + "_formo", infoFormo);
         resultData.put(dtCode + "_tablep", infoTableP);
-        resultData.put(dtCode + "_tablepledge", infoTablePledge);
 
         Map<String, Object> pageParam = new HashMap<>();
         pageParam.put("quoteId", dto.getQuoteId());
@@ -698,6 +706,16 @@ public class CfetsTrdQueryService extends BaseService {
         //表单data
         CfetsTrdQueryIbuInfoListResponse dataform = new CfetsTrdQueryIbuInfoListResponse();
         pageParam.put("effectiveStatus", dto.getEffectiveStatus() == null ? dto.getEffectFlag() : dto.getEffectiveStatus());
+        // 指令查询页面和报价页面使用参数字典不同
+        if ("有效".equals(dto.getEffectiveStatusStr())) {
+            pageParam.put("effectiveStatus", DictCodeListExt1.交易流程状态_有效.getValue());
+        }
+        if ("流程中".equals(dto.getEffectiveStatusStr())) {
+            pageParam.put("effectiveStatus", DictCodeListExt1.交易流程状态_流程中.getValue());
+        }
+        if ("撤销".equals(dto.getEffectiveStatusStr())) {
+            pageParam.put("effectiveStatus", DictCodeListExt1.交易流程状态_撤销.getValue());
+        }
         //有效状态
         pageParam.put("STATUS_VALID_01", DictCodeListExt1.有效状态_有效.getValue());
         pageParam.put("STATUS_VALID_03", DictCodeListExt1.有效状态_撤销.getValue());
@@ -728,6 +746,27 @@ public class CfetsTrdQueryService extends BaseService {
 
         resultData.put(dtCode + "_dataform", dataform);
         resultData.put(dtCode + "_datatablep", portIntFenPeiInfoDtoList);
+        if (StringUtil.isNotEmpty(dataform) && CollectionUtils.isNotEmpty(infoTablePledge)
+                && StringUtil.equals(dataform.getPs(), DictCodeList.回购拆借方向_逆回购.getValue())) {
+            List<CfgDataTableShow> tempList = new ArrayList<>();
+            for (CfgDataTableShow show : infoTablePledge) {
+                if (!StringUtil.equals(show.getColCode(), "portfolioName")
+                        && !StringUtil.equals(show.getColCode(), "portfolioId")) {
+                    tempList.add(show);
+                }
+            }
+            infoTablePledge = tempList;
+            Map<String,CfetsPledgeInfoResponse> responseMap = new HashMap<>();
+            for (CfetsPledgeInfoResponse pledgeInfoResponse : pledgeInfoDtoList) {
+                CfetsPledgeInfoResponse temp = responseMap.get(pledgeInfoResponse.getFinprodId());
+                if (StringUtil.isNotEmpty(temp)) {
+                    pledgeInfoResponse.setPledgePrin(ArithmeticUtil.doAdd(pledgeInfoResponse.getPledgePrin(), temp.getPledgePrin()));
+                }
+                responseMap.put(pledgeInfoResponse.getFinprodId(), pledgeInfoResponse);
+            }
+            pledgeInfoDtoList = new ArrayList(responseMap.values());
+        }
+        resultData.put(dtCode + "_tablepledge", infoTablePledge);
         resultData.put(dtCode + "_datatablepledge", pledgeInfoDtoList);
 
         return resultData;
@@ -1662,6 +1701,41 @@ public class CfetsTrdQueryService extends BaseService {
             resultData.put("CfetsTrdQueryBidInfo_datatablep", portIntFenPeiInfoDtoList);
             resultData.put("CfetsTrdQueryBidInfo_dipTypeForm", dipTypeForm);
             return resultData;
+        } else if (DictCodeListExt4.投标方式_自主投标.getValue().equals(settleDto.getBidModle()) &&
+                StringUtils.equals(DictCodeList.一级投标中标状态_未中标.getValue(), settleDto.getFirstBidStatus())) {
+            //基础信息
+            List<CfgReadonlyFormShow> baseForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, "0103W");
+            //备注05,O
+            List<CfgReadonlyFormShow> infoFormo = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, "0103W,O");
+            //组合信息05,M,P
+            CfgDataTableShowFlag flag = cfgDataTableFlagMapper.getByPageCodeAndDtCode(pageCode, dtCode, "0103W,M,P", userId);
+            List<CfgDataTableShow> zhTable = null;
+            if (null == flag) {
+                zhTable = cfgDataTableMapper.getByPageCode(pageCode, dtCode, "0103W,M,P", EFFERANGE_NO, USER_ID);
+            } else {
+                zhTable = cfgDataTableMapper.getByPageCode(pageCode, dtCode, "0103W,M,P", EFFERANGE_IS, userId);
+            }
+            resultData.put("CfetsTrdQueryBidInfo_formb", baseForm);
+            resultData.put("CfetsTrdQueryBidInfo_formo", infoFormo);
+            resultData.put("CfetsTrdQueryBidInfo_tablep", zhTable);
+
+            BidResultTotal bidResultTotal  = cfetsPrimaryBidManageMapper.selectBidResultTotalByBidId(settleDto.getBusiCode());
+            Map<String, Object> pageParam = new HashMap<>();
+            pageParam.put("totalWinId", bidResultTotal.getTotalWinId());
+            //表单data
+            CfetsTrdBidInfoResponse dataform = cfetsTrdQueryMapper.findZztbZbjgManualSettleInfo(pageParam);
+            List<BidPortIntFenPeiInfoDto> detailDtos = cfetsTrdQueryMapper.findZztbZbjgFenPeiInfoList(pageParam);
+            // 交易所 应计利息取值
+            if (CollectionUtils.isNotEmpty(detailDtos)
+                    && !(StringUtil.equals(dataform.getTradeMarket(), DictCodeListExt3.交易场所_银行间.getValue())
+                    || StringUtil.equals(dataform.getTradeMarket(), DictCodeListExt3.交易场所_商业银行柜台.getValue()))
+                    && StringUtil.isNotEmpty(detailDtos.get(0).getIntAmt())) {
+                dataform.setIntAmt(detailDtos.get(0).getIntAmt());
+            }
+            // 分配方式
+            resultData.put("CfetsTrdQueryBidInfo_dataform", dataform);
+            resultData.put("CfetsTrdQueryBidInfo_datatablep", detailDtos);
+
         } else if (DictCodeListExt4.投标方式_自主投标.getValue().equals(settleDto.getBidModle())) {
             //基础信息
             List<CfgReadonlyFormShow> baseForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, "01W");

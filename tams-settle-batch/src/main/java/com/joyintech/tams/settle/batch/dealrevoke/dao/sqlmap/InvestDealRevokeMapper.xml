@@ -79,6 +79,11 @@
                     #{tgBusiType,jdbcType=VARCHAR}
                 </foreach>
             </if>
+            <if test="finprodType2List != null and finprodType2List.size() > 0">
+                <foreach collection="finprodType2List" item="finprodType2" open="AND C.FINPROD_TYPE2 IN (" close=")" separator=",">
+                    #{finprodType2,jdbcType=VARCHAR}
+                </foreach>
+            </if>
         </where>
         UNION
         SELECT
@@ -107,6 +112,11 @@
             <if test="busiTypeList != null and busiTypeList.size() > 0">
                 <foreach collection="busiTypeList" item="busiTypeItem" open="AND C.BUSI_TYPE IN (" close=")" separator=",">
                     #{busiTypeItem,jdbcType=VARCHAR}
+                </foreach>
+            </if>
+            <if test="finprodType2List != null and finprodType2List.size() > 0">
+                <foreach collection="finprodType2List" item="finprodType2" open="AND C.FINPROD_TYPE2 IN (" close=")" separator=",">
+                    #{finprodType2,jdbcType=VARCHAR}
                 </foreach>
             </if>
             <choose>

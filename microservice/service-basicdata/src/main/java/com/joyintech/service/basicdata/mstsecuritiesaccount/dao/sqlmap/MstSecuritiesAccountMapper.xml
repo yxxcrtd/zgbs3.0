@@ -414,8 +414,13 @@
             <if test="initValue != null and initValue != ''">
                 and t.ACCT_NO = #{initValue}
             </if>
+            <if test="userName != null and userName != ''">
+                and t.PORTFOLIO_ID in (
+                    SELECT PORTFOLIO_ID FROM PTL_PORTFOLIO_AUTHORITY where USER_ID = #{userName}
+                )
+            </if>
             <if test="search != null and !search.equals('')">
-                AND t.ACCT_NO like concat('%',concat(#{search},'%'))
+                AND (t.ACCT_NO like concat('%',concat(#{search},'%')) or R.ACCT_NAME like concat('%',concat(#{search},'%')) )
             </if>
         </where>
         order by t.ACCT_NO
@@ -604,13 +609,13 @@
         </if>
         <choose>
             <when test="tradePlat != null and tradePlat != '' and tradePlat == '04'.toString()">
-                and ((a.finprod_type2='F01' and r.type_6='B14') or (a.finprod_type2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 债券 、股票 、基金 -->
+                and ((a.finprod_type2='F01' and r.type_6 in (#{FINPROD_TYPE_TG_F01_B14}, #{FINPROD_TYPE_TG_F01_B16})) or (a.finprod_type2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 债券 、股票 、基金 -->
             </when>
             <when test="tradePlat != null and tradePlat != '' and tradePlat == '02'.toString()">
-                and ((a.finprod_type2='F01' and r.type_6='B14') or (a.finprod_type2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 债券 、股票 、基金 -->
+                and ((a.finprod_type2='F01' and r.type_6 in (#{FINPROD_TYPE_TG_F01_B14}, #{FINPROD_TYPE_TG_F01_B16})) or (a.finprod_type2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 债券 、股票 、基金 -->
             </when>
             <when test="tradePlat != null and tradePlat != '' and tradePlat == '03'.toString()">
-                and a.finprod_type2='F01' and r.type_6='B14'
+                and a.finprod_type2='F01' and r.type_6 in (#{FINPROD_TYPE_TG_F01_B14}, #{FINPROD_TYPE_TG_F01_B16})
             </when>
             <otherwise>
                 and a.finprod_type2 in (#{FINPROD_TYPE_TG_F01})<!--  债券 -->
@@ -640,7 +645,14 @@
                 and t.FINPROD_MARKET_ID = #{initValue}
             </if>
             <if test="search != null and !search.equals('')">
-                AND (t.finprod_market_id like concat('%',concat(#{search},'%')) OR t.finprod_name like concat('%',concat(#{search},'%')))
+                AND (t.finprod_market_id like concat('%',concat(#{search},'%')) OR t.finprod_name like concat('%',concat(#{search},'%'))
+                    or t.finprod_id like concat('%',concat(#{search},'%')))
+            </if>
+            <if test="finprodMarketIdList != null and finprodMarketIdList.size()>0 ">
+                AND t.finprod_market_id IN
+                <foreach collection="finprodMarketIdList" item="item" index="index" open="( " close=" )" separator=",">
+                    #{item}
+                </foreach>
             </if>
         </where>
     </select>
@@ -694,7 +706,7 @@
             and a.trade_market = #{acctTradeMarket}
         </if>
         and a.finprod_type2 in (#{FINPROD_TYPE_TG_F01})<!--  债券 -->
-        and r.type_6 != #{type6_B14}
+        and r.type_6 not in (#{type6_B14}, #{type6_B16})
         union
         select distinct a.MARKET_ID as finprod_market_id,
         concat(concat(a.MARKET_ID,'|'),a.TERM_TYPE) as finprod_name,
@@ -784,7 +796,7 @@
             and a.trade_market = #{acctTradeMarket}
         </if>
         and a.finprod_type2 in (#{FINPROD_TYPE_TG_F01})<!--  债券 -->
-        and r.type_6 != #{type6_B14}
+        and r.type_6 not in (#{type6_B14}, #{type6_B16})
         union
         select distinct a.MARKET_ID as finprod_market_id,
         concat(concat(a.MARKET_ID,'|'),a.TERM_TYPE) as finprod_name,

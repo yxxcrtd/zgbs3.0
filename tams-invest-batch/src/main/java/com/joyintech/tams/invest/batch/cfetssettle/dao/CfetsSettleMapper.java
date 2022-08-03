@@ -13,9 +13,14 @@ package com.joyintech.tams.invest.batch.cfetssettle.dao;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.tams.common.base.entity.PtlSecPosition;
+import com.joyintech.tams.common.base.entity.PtlSecPositionFlow;
+import com.joyintech.tams.common.base.entity.RegFinProductDeal;
 import com.joyintech.tams.common.base.entity.TrdBankManualSettleInfo;
+import com.joyintech.tams.invest.batch.cfetssettle.dto.CfetsPledgeInfoResponse;
 import com.joyintech.tams.invest.batch.cfetssettle.dto.CfetsSettleDealInfo;
 import com.joyintech.tams.invest.batch.cfetssettle.dto.CfetsSettleAllInfoDto;
+import com.joyintech.tams.invest.batch.cfetssettle.dto.PtlFlowsDto;
 import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -87,6 +92,49 @@ public interface CfetsSettleMapper {
     List<CfetsSettleDealInfo> getDealDetailsByTradeId(@Param("tradeId") String tradeId);
 
     /**
+     * 成交确认明细查询(临时表查询)
+     *
+     * @param tradeId 参数
+     * @return List<CfetsManualSettleDealInfo>
+     */
+    List<CfetsSettleDealInfo> getTempDealDetailsByTradeId(@Param("tradeId") String tradeId);
+
+    /**
+     * 登记编号查询
+     *
+     * @param tradeId 参数
+     * @return String
+     */
+    String selectRegTradeIdBytradeId(@Param("tradeId") String tradeId);
+
+    /**
+     * 报价编号查询
+     * @param tradeId1
+     * @return
+     */
+    String selectIbTradeIdBytradeId(@Param("tradeId1") String tradeId1);
+
+    /**
+     * 报价编号查询
+     *
+     * @param tradeId 参数
+     * @return String
+     */
+    String selectQuoteIdBytradeId(@Param("tradeId") String tradeId);
+
+    /**
+     * 根据交易编号检索组合持仓流水（持仓类型为实际）
+     *
+     * @param param param
+     * @return List<PtlSecPositionFlowDto>
+     * @see
+     * @since 1.0
+     */
+    List<PtlSecPositionFlow> selectPtlSecPositionFlow(Map<String, Object> param);
+
+    void updatePosition(PtlSecPosition position);
+
+    /**
      * 查询证券账户
      * @param param
      * @return
@@ -105,5 +153,30 @@ public interface CfetsSettleMapper {
      * @return
      */
     List<PledgeBondInfoDto> getPledgeListByTradeId(@Param("tradeId") String tradeId);
+
+    /**
+     * 报价编号查询报价信息
+     *
+     * @param tradeId
+     * @return
+     */
+    List<PtlFlowsDto> selectIbQuoteBytradeId(@Param("tradeId") String tradeId);
+
+    RegFinProductDeal selectRegFinProductDealByPrimaryKey(String tradeId);
+    /**
+     * 查询交易质押券,针对交易明细回购
+     *
+     * @param pageParam 参数
+     * @return List<CfetsPledgeInfoResponse>
+     */
+    List<CfetsPledgeInfoResponse> findRepoPledgeInfoList(Map<String, Object> pageParam);
+
+    /**
+     * 成交确认明细查询
+     *
+     * @param tradeId 参数
+     * @return String
+     */
+    String qryEntrustId(@Param("tradeId") String tradeId);
 
 }

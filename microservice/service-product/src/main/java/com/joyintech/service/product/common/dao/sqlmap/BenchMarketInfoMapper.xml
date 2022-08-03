@@ -154,4 +154,8 @@
       <delete id="deleteBaseRuleInfoByFinprodId" parameterType="java.lang.String" >
       		delete from FIN_BASE_RULE_INFO where FINPROD_ID = #{finprodId} and BRANCH = 0
       </delete>
+
+    <delete id="deleteBaseRuleInfoByFinprodIdAndBranch">
+        delete from FIN_BASE_RULE_INFO where FINPROD_ID = #{finprodId,jdbcType=VARCHAR} and BRANCH = #{branch}
+    </delete>
 </mapper>

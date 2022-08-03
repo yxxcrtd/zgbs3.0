@@ -31,6 +31,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Objects;
 
 import static com.joyintech.tams.exchange.common.enums.invest.BussTypeEnum.STANDARD_COUPONS_IN_AND_OUT;
 
@@ -180,6 +181,23 @@ public class OrderController {
         String entrustProp = EntrustPropUtils.getEntrustProp(instruction, integratedEntrust.getEntrustProp());
         logger.info("综合业务下单：委托属性（entrustProp）转换：{} ==> {}", integratedEntrust.getEntrustProp(), entrustProp);
         integratedEntrust.setEntrustProp(entrustProp);
+
+        Map<String, Object> extend2 = Maps.newHashMap();
+        if (StringUtil.isNotEmpty(integratedEntrust.getExtend2())) {
+            extend2 = JsonUtils.getObjectFromJson(integratedEntrust.getExtend2(), Map.class);
+        }
+        if (StringUtil.isNotEmpty(order.getMaturityDate())) {
+            extend2.put("maturityDate", order.getMaturityDate());
+        }
+        if (Objects.nonNull(instruction.getCapDays())) {
+            extend2.put("capDays", instruction.getCapDays().intValue());
+        }
+        if (Objects.nonNull(order.getRequestNo())) {
+            //行情编号 借用字段 sellerNo
+            integratedEntrust.setSellerNo(order.getRequestNo());
+        }
+        integratedEntrust.setExtend2(JsonUtils.getJsonFromObject(extend2));
+        integratedEntrust.setBusiTypeTg(instruction.getBusiTypeTg());
 
         try {
             return new Message<>(orderManagement.sendIntegratedEntrust(integratedEntrust.getUserId(), integratedEntrust));

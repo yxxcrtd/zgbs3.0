@@ -14,6 +14,8 @@ public class PtlSecAcctInfoRequest {
     @ApiModelProperty(required = true,name="tradeMarket",value="交易场所",example="A1")
     private String tradeMarket;
 
+    private String search;
+
     public String getPortfolioId() {
         return portfolioId;
     }
@@ -36,5 +38,13 @@ public class PtlSecAcctInfoRequest {
 
     public void setTradeMarket(String tradeMarket) {
         this.tradeMarket = tradeMarket;
+    }
+
+    public String getSearch() {
+        return search;
+    }
+
+    public void setSearch(String search) {
+        this.search = search;
     }
 }

@@ -152,6 +152,8 @@ public class EtrConBondDto extends EtrEntrust {
      */
     private Long positionSeqno;
 
+    private String busiTypePosition;
+
     /**
      * 获取 fileArray
      * @return fileArray.
@@ -465,5 +467,13 @@ public class EtrConBondDto extends EtrEntrust {
 
     public void setPositionSeqno(Long positionSeqno) {
         this.positionSeqno = positionSeqno;
+    }
+
+    public String getBusiTypePosition() {
+        return busiTypePosition;
+    }
+
+    public void setBusiTypePosition(String busiTypePosition) {
+        this.busiTypePosition = busiTypePosition;
     }
 }

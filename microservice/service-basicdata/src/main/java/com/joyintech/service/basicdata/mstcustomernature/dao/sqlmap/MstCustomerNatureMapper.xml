@@ -92,7 +92,8 @@
 		decode(IS_INVEST_ADVISER,'Y',#{flag_09},'') ||',' ||
 		decode(IS_BROKER,'Y',#{flag_10},'') || ',' ||
 		decode(IS_COUNTER,'Y',#{flag_12},'') || ',' ||
-		decode(IS_ORIGINAL_OWNER,'Y',#{flag_13},'') customerCharater
+		decode(IS_ORIGINAL_OWNER,'Y',#{flag_13},'')||
+		decode(CREATE_INSTITUTIONS,'Y',#{flag_14},'') customerCharater
 		FROM
 		MST_CUSTOMER_INFO
 		<trim prefix="where" prefixOverrides="AND |OR">
@@ -147,6 +148,9 @@
 					</if>
 					<if test="customerCharater.contains(CUSTOMER_CHARATER_13)">
 						OR IS_ORIGINAL_OWNER = 'Y'
+					</if>
+					<if test="customerCharater.contains(CUSTOMER_CHARATER_14)">
+						OR CREATE_INSTITUTIONS = 'Y'
 					</if>
 				</trim>
 			</if>
@@ -264,6 +268,9 @@
 			<if test="isOriginalOwner != null">
 				IS_ORIGINAL_OWNER = 'Y',
 			</if>
+			<if test="createInstitutions != null">
+				CREATE_INSTITUTIONS = 'Y',
+			</if>
 			<if test="updateUser != null" >
 				UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
 			</if>
@@ -354,7 +361,8 @@
 		IS_PLEDGOR isPledgor,
 		IS_BROKER isBroker,
 		IS_COUNTER isCounter,
-		IS_ORIGINAL_OWNER isOriginalOwner
+		IS_ORIGINAL_OWNER isOriginalOwner,
+		CREATE_INSTITUTIONS createInstitutions
 		FROM MST_CUSTOMER_INFO
 		WHERE
 		CUSTOMER_ID =#{customerId,jdbcType=VARCHAR}

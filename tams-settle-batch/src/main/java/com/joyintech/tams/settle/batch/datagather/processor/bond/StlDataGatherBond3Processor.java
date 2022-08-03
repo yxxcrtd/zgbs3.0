@@ -145,6 +145,22 @@ public class StlDataGatherBond3Processor extends StlDataGatherProcessor {
                 settleTransTgMapping.setTgDataStatus("02");
                 settleTransTgMapping.setDealDate(getBatchExecuteInfo().getExecuteDate());
                 settleTransTgMappingList.add(settleTransTgMapping);
+
+                // 构造划款指令表
+                StlPayOrders stlPayOrders = new StlPayOrders();
+                stlPayOrders.setOrderId(settleCommonService.buildBussinessIdBySeqno("9998"));
+                stlPayOrders.setOrderType(DictCodeListExt1.交易状态_初始.getValue());
+                stlPayOrders.setPayType(DictCodeListExt1.平安划款类型_清算划款.getValue());
+                stlPayOrders.setMyAcctNo(settleTransData.getAcctNo());
+                stlPayOrders.setSettleAmt(trdProductDeal.getTradeAmt());
+                stlPayOrders.setCcy(DictCodeList.币种_人民币_CNY.getValue());
+                stlPayOrders.setIsNeedSend(DictCodeList.是否_否.getValue());
+                stlPayOrders.setIsTotalTrade(DictCodeList.是否_是.getValue());
+                stlPayOrders.setTradeId(totalTradeId);
+                stlPayOrders.setPortfolioId(settleTransData.getPortfolioId());
+                stlPayOrders.setSettleDate(trdProductDeal.getSettleDate());
+                stlPayOrders.setPs(DictCodeListExt1.收付方向_支出.getValue());
+                stlPayOrdersList.add(stlPayOrders);
             }
             investTradeWriteDto.setPtlTradeList(ptlTradeList);
             investTradeWriteDto.setStlPayOrdersList(stlPayOrdersList);

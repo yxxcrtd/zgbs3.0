@@ -3,6 +3,7 @@ package com.joyintech.service.trade.manualsettle.dao;
 import com.joyintech.service.trade.manualsettle.dto.ManualSettleDto;
 import com.joyintech.service.trade.manualsettle.dto.ManualSettleFlowDto;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.common.base.pojo.PledgeListDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import org.apache.ibatis.annotations.Param;
@@ -95,5 +96,24 @@ public interface ManualSettleMapper {
     int updateEtrSecPosition(EtrSecPosition etrSecPosition);
 
     List<TrdProductTempDeal> selectTrdProductTempDeals(@Param("totleTradeId") String totleTradeId);
-} 
+
+    // XYHGFXSJ-8:查询质押品信息list modify by fuyongsheng 20220718 start
+    List<FinDealPledge> selectFinDealPledgeByTradeId(@Param("tradeId") String tradeId);
+    // XYHGFXSJ-8:查询质押品信息list modify by fuyongsheng 20220718 end
+
+    // modify by etliu 20220727 start
+    // 3.0.6协议回购+风险升级 XYHGFXSJ-461
+    //【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误
+    /**
+     * 根据首期成交编号查询首期信息
+     * @param finprodId 首期成交编号
+     * @return 首期信息
+     */
+    List<ManualSettleDto> selectPledgeInfo(@Param("finprodId") String finprodId);
+    // modify by etliu 20220727 end
+
+    // XYHGFXSJ-724 【实时资产头寸查询】协议回购上交所正回购中途换券数据日间交收后，实时资产里的质押券没有变更
+    List<PledgeListDto> selectFinDealPledgeByTradeId2(@Param("tradeId") String tradeId);
+    // XYHGFXSJ-724 【实时资产头寸查询】协议回购上交所正回购中途换券数据日间交收后，实时资产里的质押券没有变更
+}
 

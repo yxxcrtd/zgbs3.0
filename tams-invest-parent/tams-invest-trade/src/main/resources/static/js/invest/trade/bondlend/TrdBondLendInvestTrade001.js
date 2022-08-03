@@ -102,12 +102,23 @@
      * 点击资产代码链接跳转到该资产标的信息查看页面；
      */
     table.bind('click','.finprodId-link', function(row) {
-        Joyin.dialog(JoyinUtil.getLabel("FinBondTargetAsset002"),
-                basePath + "invest/asset/bond/FinBondTargetAsset002/init",
-                "95%", "90%",
-                { pageModel:PAGE_MODEL_REFERENCE,
-                finprodId: row.systemFinprodId,
-                finprodName: row.finprodName });
+        let finprodId = row.finprodId
+        var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a"; // 默认债券标的
+        var param = {
+            pageModel: PAGE_MODEL_REFERENCE,
+            isQuickInput: true,
+            finprodId: finprodId
+        };
+        Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+            basePath + url,
+            "98%", "98%",
+            param);
+        // Joyin.dialog(JoyinUtil.getLabel("FinBondTargetAsset002"),
+        //         basePath + "invest/asset/bond/FinBondTargetAsset002/init",
+        //         "95%", "90%",
+        //         { pageModel:PAGE_MODEL_REFERENCE,
+        //         finprodId: row.systemFinprodId,
+        //         finprodName: row.finprodName });
     });
 
     $(function () {

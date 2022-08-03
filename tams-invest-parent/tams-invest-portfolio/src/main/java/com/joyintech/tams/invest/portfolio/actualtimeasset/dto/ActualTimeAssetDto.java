@@ -79,6 +79,12 @@ public class ActualTimeAssetDto extends BaseEntity {
      * 资产二级类型
      */
     private String type7;
+
+
+    /**
+     * 行内二级类型
+     */
+    private String type9;
     
     /**
      * 资产二级类型名称
@@ -166,6 +172,16 @@ public class ActualTimeAssetDto extends BaseEntity {
         }
 
         return "";
+    }
+
+
+    public String getType9Str() {
+        if(DictCodeList.平安资产类型_质押式回购.getValue().equals(this.getType8())
+                || DictCodeList.平安资产类型_买断式回购.getValue().equals(this.getType8())
+                || DictCodeList.平安资产类型_拆借.getValue().equals(this.getType8())) {
+            return SysDataUtil.getNameFromDataDict(DictCode.回购拆借方向, this.getType7());
+        }
+        return SysDataUtil.getNameFromDataDict(DictCode.行内资产二级分类, this.getType9());
     }
     
     
@@ -362,4 +378,11 @@ public class ActualTimeAssetDto extends BaseEntity {
         this.marketValue = marketValue;
     }
 
+    public String getType9() {
+        return type9;
+    }
+
+    public void setType9(String type9) {
+        this.type9 = type9;
+    }
 }

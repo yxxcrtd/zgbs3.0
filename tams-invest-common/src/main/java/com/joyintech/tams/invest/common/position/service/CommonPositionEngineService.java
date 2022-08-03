@@ -1,19 +1,22 @@
 package com.joyintech.tams.invest.common.position.service;
 
-import static com.joyintech.tams.constant.DictCodeList.交易平台_大宗交易平台;
-import static com.joyintech.tams.constant.DictCodeList.交易平台_竞价撮合平台;
-import static com.joyintech.tams.constant.DictCodeList.交易平台_综合协议交易平台;
-import static com.joyintech.tams.constant.DictCodeList.交易方向_买入;
-import static com.joyintech.tams.constant.DictCodeList.交易方向_卖出;
-import static com.joyintech.tams.constant.DictCodeListExt3.申报类型_不指定;
-import static com.joyintech.tams.constant.DictCodeListExt3.申报类型_定价申报;
-import static com.joyintech.tams.constant.DictCodeListExt3.申报类型_意向申报;
-import static com.joyintech.tams.constant.DictCodeListExt3.申报类型_成交申报;
-import static com.joyintech.tams.constant.DictCodeListExt3.申报类型_收盘价固定价格申报;
-import static com.joyintech.tams.constant.DictCodeListExt3.申报类型_日均价固定价格申报;
-import static com.joyintech.tams.constant.DictCodeListExt3.申报类型_点击成交申报;
-import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.INTERF_TYPE_BOND002;
-import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.INTERF_TYPE_BOND003;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
+import com.joyintech.tams.common.base.dao.FinProductAddMapper;
+import com.joyintech.tams.common.base.dao.FinProductMapper;
+import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
+import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.invest.common.position.dao.InterfPositionConfigMapper;
+import com.joyintech.tams.invest.common.position.dto.InterfPositionConfigDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -22,24 +25,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
-import com.joyintech.tams.common.base.dao.FinProductMapper;
-import com.joyintech.tams.common.base.entity.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.dao.FinProductAddMapper;
-import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
-import com.joyintech.tams.invest.common.position.dao.InterfPositionConfigMapper;
-import com.joyintech.tams.invest.common.position.dto.InterfPositionConfigDto;
+import static com.joyintech.tams.constant.DictCodeList.*;
+import static com.joyintech.tams.constant.DictCodeListExt3.*;
+import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.INTERF_TYPE_BOND002;
+import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.INTERF_TYPE_BOND003;
 
 @Service
 public class CommonPositionEngineService {
@@ -63,6 +52,7 @@ public class CommonPositionEngineService {
 
     @Autowired
     private EtrEntrustAddMapper etrEntrustAddMapper;
+
     /**
      * 获取结算方式
      *
@@ -73,24 +63,24 @@ public class CommonPositionEngineService {
         String deliveryType = StringUtil.EMPTY;
         FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
         // ZGCPCN-1580:一级投标债结算方式赋值 modify by fuyongsheng 20220621 start
-        if(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(finProduct.getFinprodType2())){
+        if (DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(finProduct.getFinprodType2())) {
             FinProductTypeKey key = new FinProductTypeKey();
             key.setFinprodId(finprodId);
             key.setBranch(0L);
             FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(key);
-            if(null != finProductType){
-                if(DictCodeList.WIND一级分类_含债券中债_国债.getValue().equals(finProductType.getType6())
-                    || DictCodeList.WIND一级分类_含债券中债_地方政府债.getValue().equals(finProductType.getType6())
-                    || DictCodeList.WIND一级分类_含债券中债_政策性金融债.getValue().equals(finProductType.getType6())){
+            if (null != finProductType) {
+                if (DictCodeList.WIND一级分类_含债券中债_国债.getValue().equals(finProductType.getType6())
+                        || DictCodeList.WIND一级分类_含债券中债_地方政府债.getValue().equals(finProductType.getType6())
+                        || DictCodeList.WIND一级分类_含债券中债_政策性金融债.getValue().equals(finProductType.getType6())) {
                     deliveryType = DictCodeListExt3.结算方式_头寸引擎_净额结算.getValue();
-                }else{
+                } else {
                     deliveryType = DictCodeListExt3.结算方式_头寸引擎_逐笔全额结算.getValue();
                 }
             }
             // ZGCPCN-1580:一级投标债结算方式赋值 modify by fuyongsheng 20220621 end
-        } else{
+        } else {
             FinProductAdd finProductAdd = finProductAddMapper.selectByPrimaryKey(finprodId);
-            if(finProductAdd!=null){
+            if (finProductAdd != null) {
                 String isNoGuard = finProductAdd.getIsNoGuard();
                 if (StringUtil.isNotEmpty(isNoGuard) && isNoGuard.contains(DictCodeList.是否_否.getValue())) {
                     deliveryType = DictCodeListExt3.结算方式_头寸引擎_净额结算.getValue();
@@ -227,13 +217,14 @@ public class CommonPositionEngineService {
 
     /**
      * 获取场内交易平台
+     *
      * @param entrustId
      * @param tradePlat
      * @param ps
      * @param interfaceType
      * @return
      */
-    public String getExchangeTradePlatform(String entrustId, String tradePlat, String ps, String finprodId, String interfaceType){
+    public String getExchangeTradePlatform(String entrustId, String tradePlat, String ps, String finprodId, String interfaceType) {
         // 债券接口调用头寸引擎对应场景的交易平台
         if (INTERF_TYPE_BOND003.equals(interfaceType)) {
             if (DictCodeList.交易平台_大宗交易平台.getValue().equals(tradePlat)
@@ -241,26 +232,26 @@ public class CommonPositionEngineService {
                 return tradePlat;
             }
             return null;
-        } else if(INTERF_TYPE_BOND002.equals(interfaceType)) {
+        } else if (INTERF_TYPE_BOND002.equals(interfaceType)) {
             return tradePlat;
         } else {
-            if(StringUtil.isEmpty(entrustId)){ // 存续期无指令
+            if (StringUtil.isEmpty(entrustId)) { // 存续期无指令
                 return tradePlat;
-            }else{
+            } else {
                 EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entrustId);
-                if((DictCodeList.交易平台_大宗交易平台.getValue().equals(tradePlat)
-                        ||DictCodeList.交易平台_综合协议交易平台.getValue().equals(tradePlat))
-                        &&(DictCodeList.交易方向_买入.getValue().equals(ps)
-                        ||DictCodeList.交易方向_卖出.getValue().equals(ps))
-                        &&(DictCodeListExt3.申报类型_意向申报.getValue().equals(etrEntrustAdd.getDealMode())
-                        ||DictCodeListExt3.申报类型_定价申报.getValue().equals(etrEntrustAdd.getDealMode())
-                        ||DictCodeListExt3.申报类型_点击成交申报.getValue().equals(etrEntrustAdd.getDealMode())
-                        ||DictCodeListExt3.申报类型_成交申报.getValue().equals(etrEntrustAdd.getDealMode())
-                        ||DictCodeListExt3.申报类型_日均价固定价格申报.getValue().equals(etrEntrustAdd.getDealMode())
-                        ||DictCodeListExt3.申报类型_收盘价固定价格申报.getValue().equals(etrEntrustAdd.getDealMode())
-                        ||DictCodeListExt3.申报类型_不指定.getValue().equals(etrEntrustAdd.getDealMode()))){
+                if ((DictCodeList.交易平台_大宗交易平台.getValue().equals(tradePlat)
+                        || DictCodeList.交易平台_综合协议交易平台.getValue().equals(tradePlat))
+                        && (DictCodeList.交易方向_买入.getValue().equals(ps)
+                        || DictCodeList.交易方向_卖出.getValue().equals(ps))
+                        && (DictCodeListExt3.申报类型_意向申报.getValue().equals(etrEntrustAdd.getDealMode())
+                        || DictCodeListExt3.申报类型_定价申报.getValue().equals(etrEntrustAdd.getDealMode())
+                        || DictCodeListExt3.申报类型_点击成交申报.getValue().equals(etrEntrustAdd.getDealMode())
+                        || DictCodeListExt3.申报类型_成交申报.getValue().equals(etrEntrustAdd.getDealMode())
+                        || DictCodeListExt3.申报类型_日均价固定价格申报.getValue().equals(etrEntrustAdd.getDealMode())
+                        || DictCodeListExt3.申报类型_收盘价固定价格申报.getValue().equals(etrEntrustAdd.getDealMode())
+                        || DictCodeListExt3.申报类型_不指定.getValue().equals(etrEntrustAdd.getDealMode()))) {
                     return DictCodeList.交易平台_大宗交易平台.getValue();
-                }else {
+                } else {
                     return DictCodeList.交易平台_竞价撮合平台.getValue();
                 }
             }
@@ -300,7 +291,7 @@ public class CommonPositionEngineService {
                 || 申报类型_日均价固定价格申报.getValue().equals(declaType)
                 ;
     }
-    
+
     private boolean isBulkEntrustProp(String entrustProp) {
         return "a".equals(entrustProp)
                 || "b".equals(entrustProp)
@@ -381,6 +372,21 @@ public class CommonPositionEngineService {
         if (DictCodeListExt1.金融产品类型_信用保护凭证.getValue().equals(finprodType2)) {
             busiType = DictCodeListExt3.头寸业务类型_信用保护凭证交易.getValue();
         }
+        if (Objects.isNull(finprodType2)) {
+            if (DictCodeListExt3.交易方向_到期续做.getValue().equals(ps)) {
+                busiType = DictCodeListExt3.头寸业务类型_协议回购到期续作.getValue();
+            } else if (DictCodeListExt3.交易方向_提前购回.getValue().equals(ps)) {
+                busiType = DictCodeListExt3.头寸业务类型_协议回购提前购回.getValue();
+            } else if (DictCodeListExt3.交易方向_到期购回.getValue().equals(ps)) {
+                busiType = DictCodeListExt3.头寸业务类型_协议回购到期购回.getValue();
+            } else if (DictCodeListExt3.交易方向_正回购.getValue().equals(ps) || DictCodeListExt3.交易方向_逆回购.getValue().equals(ps)) {
+                busiType = DictCodeListExt3.头寸业务类型_协议回购首期.getValue();
+            } else if (DictCodeListExt3.交易方向_中途换券.getValue().equals(ps)) {
+                busiType = DictCodeListExt3.头寸业务类型_协议回购中途换券.getValue();
+            } else if (DictCodeListExt3.交易方向_解除质押.getValue().equals(ps)) {
+                busiType = DictCodeListExt3.头寸业务类型_协议回购解除质押.getValue();
+            }
+        }
         return busiType;
     }
 
@@ -395,13 +401,13 @@ public class CommonPositionEngineService {
         log.debug("getPositionBusiType() called with parameters => 【finprodType2 = {}】, 【ps = {}】, 【assetType2 = {}】", finprodType2, ps, assetType2);
         String busiType = "";
         if (DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(finprodType2)) {
-            if(DictCodeList.交易方向_申购确认.getValue().equals(ps)){
+            if (DictCodeList.交易方向_申购确认.getValue().equals(ps)) {
                 busiType = DictCodeListExt3.头寸业务类型_网上申购.getValue();
-            }else if(DictCodeList.交易方向_行权_赎回.getValue().equals(ps)){
+            } else if (DictCodeList.交易方向_行权_赎回.getValue().equals(ps)) {
                 busiType = DictCodeListExt3.头寸业务类型_债券行权交易.getValue();
-            }else if(DictCodeList.交易方向_上市流通.getValue().equals(ps)){
+            } else if (DictCodeList.交易方向_上市流通.getValue().equals(ps)) {
                 busiType = DictCodeListExt3.头寸业务类型_上市流通.getValue();
-            }else{
+            } else {
                 busiType = DictCodeListExt3.头寸业务类型_债券存续期交易.getValue();
             }
         }
@@ -409,13 +415,13 @@ public class CommonPositionEngineService {
             busiType = DictCodeListExt3.头寸业务类型_债券一级投标.getValue();
         }
         if (DictCodeListExt1.金融产品类型_投管用_股票.getValue().equals(finprodType2)) {
-            if(DictCodeList.交易方向_现金分红.getValue().equals(ps)){
+            if (DictCodeList.交易方向_现金分红.getValue().equals(ps)) {
                 busiType = DictCodeListExt3.头寸业务类型_股票分红.getValue();
-            }else if(DictCodeList.交易方向_红利再投.getValue().equals(ps)){
+            } else if (DictCodeList.交易方向_红利再投.getValue().equals(ps)) {
                 busiType = DictCodeListExt3.头寸业务类型_股票送股.getValue();
-            }else if(DictCodeList.交易方向_上市流通.getValue().equals(ps)){
+            } else if (DictCodeList.交易方向_上市流通.getValue().equals(ps)) {
                 busiType = DictCodeListExt3.头寸业务类型_上市流通.getValue();
-            }else if(DictCodeList.交易方向_申购确认.getValue().equals(ps)){
+            } else if (DictCodeList.交易方向_申购确认.getValue().equals(ps)) {
                 busiType = DictCodeListExt3.头寸业务类型_网上申购.getValue();
             }
         }
@@ -424,9 +430,9 @@ public class CommonPositionEngineService {
         }
         if ((DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(finprodType2)
                 || DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(finprodType2))) {
-            if(DictCodeList.回购类型_质押式协议回购.getValue().equals(assetType2)){
+            if (DictCodeList.回购类型_质押式协议回购.getValue().equals(assetType2)) {
                 busiType = DictCodeListExt3.头寸业务类型_协议回购到期购回.getValue();
-            }else{
+            } else {
                 busiType = DictCodeListExt3.头寸业务类型_通用回购到期.getValue();
             }
         }

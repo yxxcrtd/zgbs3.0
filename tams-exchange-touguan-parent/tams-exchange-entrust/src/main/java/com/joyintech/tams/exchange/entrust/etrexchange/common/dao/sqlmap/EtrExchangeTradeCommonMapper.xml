@@ -487,13 +487,13 @@
         FP.TRADE_MARKET IN (#{TRADE_PLACE_03}, #{TRADE_PLACE_04})
         <choose>
             <when test="tradePlat != null and tradePlat !='' and tradePlat== '03'.toString()">
-                AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR} AND  FPT.TYPE_6=#{TYPE_6,jdbcType=VARCHAR}  AND FP.TRADE_MARKET=#{TRADE_PLACE_03}   <!-- 可债券、上交所 -->
+                AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR} AND  FPT.TYPE_6 IN (#{B14}, #{B16})  AND FP.TRADE_MARKET=#{TRADE_PLACE_03}   <!-- 可债券、上交所 -->
             </when>
             <when test="tradePlat != null and tradePlat != '' and tradePlat == '02'.toString()">
-                AND ( (FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR} AND  FPT.TYPE_6=#{TYPE_6,jdbcType=VARCHAR}) or (FP.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 可债券 、股票 、基金 -->
+                AND ( (FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR} AND  FPT.TYPE_6 IN (#{B14}, #{B16}) ) or (FP.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 可债券 、股票 、基金 -->
             </when>
             <when test="tradePlat != null and tradePlat != '' and tradePlat == '04'.toString()">
-                AND ( (FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR} AND  FPT.TYPE_6=#{TYPE_6,jdbcType=VARCHAR}) or (FP.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 可债券 、股票 、基金 -->
+                AND ( (FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR} AND  FPT.TYPE_6 IN (#{B14}, #{B16}) ) or (FP.FINPROD_TYPE2 in (#{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}))) <!-- 可债券 、股票 、基金 -->
             </when>
             <otherwise>
                 AND FP.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01,jdbcType=VARCHAR}  <!--  债券 -->
@@ -1562,7 +1562,8 @@
         a.INV_AIM ,
         a.PS ,
         nvl(a.UNIT_CPRICE,0) AS PRICE,
-        a.SHARE_AMT AS AMT
+        a.SHARE_AMT AS AMT,
+        a.SEC_MANAGE_ACCT_ID AS secAcctId
         from TRD_PRODUCT_DEAL a
         LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
         LEFT JOIN FIN_PRODUCT c ON a.FINPROD_ID =c.FINPROD_ID
@@ -1592,7 +1593,8 @@
         a.INV_AIM ,
         a.PS ,
         nvl(a.UNIT_CPRICE,0) AS PRICE,
-        a.SHARE_AMT AS AMT
+        a.SHARE_AMT AS AMT,
+        a.SEC_MANAGE_ACCT_ID AS secAcctId
         from TRD_PRODUCT_TEMP_DEAL a
         LEFT JOIN TRD_PRODUCT_TEMP_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
         LEFT JOIN FIN_PRODUCT c ON a.FINPROD_ID =c.FINPROD_ID
@@ -1923,5 +1925,54 @@
         delete from RSK_ISUP_TRIAL
         where TRADE_ID = #{entrustId, jdbcType=VARCHAR}
     </delete>
+
+    <!--组合持有资产业务模式查询 -->
+    <select id="selectAllBusModels" parameterType="Map" resultType="com.joyintech.tams.business.common.pojo.BaseMap">
+        SELECT DISTINCT
+                BUSINESS_MODEL AS businessModel,
+                FINPROD_ID finprodId
+        FROM
+        (
+                SELECT
+                        PORTFOLIO_ID,
+                        FINPROD_ID,
+                        BUSINESS_MODEL
+                FROM (
+                        SELECT
+                                b.PORTFOLIO_ID,
+                                a.FINPROD_ID,
+                                a.BUSINESS_MODEL,
+                                ROW_NUMBER ( ) OVER ( PARTITION BY a.TRADE_ID ORDER BY a.TRADE_DATE DESC ) rn
+                        FROM TRD_PRODUCT_DEAL a
+                        LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON a.TRADE_ID = b.TRADE_ID
+                        WHERE a.FINPROD_ID =#{ finprodId,jdbcType = VARCHAR }
+                            AND a.TRADE_DATE <![CDATA[<=]]> to_date( #{ cdate, jdbcType = VARCHAR }, 'yyyy-MM-dd' )
+                        )
+                WHERE rn = 1
+                UNION ALL
+                SELECT
+                        PORTFOLIO_ID,
+                        FINPROD_ID,
+                        BUSINESS_MODEL
+                FROM
+                    (
+                        SELECT
+                            b.PORTFOLIO_ID,
+                            a.FINPROD_ID,
+                            a.BUSINESS_MODEL,
+                            ROW_NUMBER ( ) OVER ( PARTITION BY a.TRADE_ID ORDER BY a.TRADE_DATE DESC ) rn
+                        FROM TRD_PRODUCT_TEMP_DEAL a
+                        LEFT JOIN TRD_PRODUCT_TEMP_DEAL_ADD b ON a.TRADE_ID = b.TRADE_ID
+                        WHERE a.FINPROD_ID =#{ finprodId,jdbcType = VARCHAR }
+                        AND a.TRADE_DATE = to_date( #{ cdate, jdbcType = VARCHAR }, 'yyyy-MM-dd' )
+                    )
+                WHERE rn = 1
+         ) TMP
+        WHERE TMP.BUSINESS_MODEL  is not  null
+          AND TMP.PORTFOLIO_ID in
+          <foreach collection="portfolioIds" item="item" open="(" separator="," close=")">
+              #{ item }
+          </foreach>
+    </select>
 
 </mapper>

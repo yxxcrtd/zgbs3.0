@@ -410,7 +410,17 @@
      * @returns
      */
     function showSecCreateDialog() {
-        Joyin.dialog(JoyinUtil.getLabel('FinBondTargetAsset002.newTitle'), '/invest/asset/bond/FinBondTargetAsset002/init', '98%', '98%');
+        var url = "home.html?a=a&openFromOldPage=Y&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a";
+        var param = {
+            pageModel: PAGE_MODEL_REFERENCE,
+            isQuickInput: true,
+        };
+        Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+            basePath + url,
+            "98%", "98%",
+            param);
+
+        // Joyin.dialog(JoyinUtil.getLabel('FinBondTargetAsset002.newTitle'), '/invest/asset/bond/FinBondTargetAsset002/init', '98%', '98%');
     }
 
     /**

@@ -395,6 +395,7 @@ public class IbuQuoteBondService extends BaseService {
                 // TISHKS-1393:增加FinprodId赋值 modify by fuyongsheng start
                 calRequest.setFinprodId(cfetsBondDealQuoteCommonDto.getFinprodId());
                 // TISHKS-1393:增加FinprodId赋值 modify by fuyongsheng end
+                calRequest.setTradeMarketMode(DictCodeListExt1.交易市场_二级市场.getValue());
                 List<TrdTradeFeeDetail> trdTradeFeeDetails = ibuQuoteBondCalService.calFee(calRequest);
                 if(CollectionUtils.isNotEmpty(trdTradeFeeDetails)){
                     trdTradeFeeDetails.forEach(item ->{
@@ -1055,7 +1056,7 @@ public class IbuQuoteBondService extends BaseService {
                 //委托已有完成额度，做过交易，走关闭完成的逻辑，更新预占
                 List<String> closeEntrustIdList = new ArrayList<>();
                 for(CfetsEtribBondInfo003Dto etrDto : dtolist) {
-                    if(com.joyintech.background.component.common.pack.common.util.StringUtil.isNotEmpty(etrFinishMap) && com.joyintech.background.component.common.pack.common.util.StringUtil.isNotEmpty(etrFinishMap.get(etrDto.getEntrustId()))
+                    if(StringUtil.isNotEmpty(etrFinishMap) && StringUtil.isNotEmpty(etrFinishMap.get(etrDto.getEntrustId()))
                             && BigDecimal.ZERO.compareTo(etrFinishMap.get(etrDto.getEntrustId()))<0) {
                         closeEntrustIdList.add(etrDto.getEntrustId());
                     }
@@ -1066,10 +1067,11 @@ public class IbuQuoteBondService extends BaseService {
             }
             // ZGZGST-2330:委托关闭判断是否有完成额度，分情况处理 fuyongsheng 20210919 edit end
             // add by zhangrui1 批量委托关闭 end
-            if (StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
+            // 完整包名不要变更,否则值不同
+            if (StringUtil.equals(com.joyintech.tams.constant.DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
                 //插入旧头寸
                 dtolist.forEach(item ->{
-                    baseEtrCashPositionCommService.entrustCloseExecute(item.getEntrustId(), DictCodeList.是否_是.getValue());
+                    baseEtrCashPositionCommService.entrustCloseExecute(item.getEntrustId(), com.joyintech.tams.constant.DictCodeList.是否_是.getValue());
                 });
             }
 
@@ -1400,6 +1402,16 @@ public class IbuQuoteBondService extends BaseService {
             //是否已确认成交
             if(cfetsIbuQuoteBondMapper.countMatchInfo(item.getQuoteId(),com.joyintech.tams.constant.DictCodeList.确认状态_已确认.getValue())>0){
                 errorList.add(new ValidMessage("当日登记所选登记数据已成交确认不支持撤销!业务编号:"+item.getQuoteId()));
+            }
+            //是否已强制完成
+            Map<String,Object> map = new HashMap<>();
+            map.put("trdIds", Collections.singletonList(item.getQuoteId()));
+            map.put("YN_N", com.joyintech.tams.constant.DictCodeList.是否_否.getValue());
+            map.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
+            map.put("ENTRUST_STATUS_04", com.joyintech.tams.constant.DictCodeList.委托状态_已完成.getValue());
+            map.put("TRD", "BOND");
+            if (cfetsIbuQuoteBondMapper.selectEntruIdIsFinsh(map) > 0) {
+                errorList.add(new ValidMessage("当日登记所选登记数据存在强制完成指令不支持撤销!业务编号:" + item.getQuoteId()));
             }
             //回售登记数据，在理论行权日前一交易日（包含前一交易日）之前均支持回售登记撤销操作，支持隔夜撤销。理论行权日之后（包含理论行权日）回售登记不支持手动撤销
             if(StringUtil.equals(item.getPs(), com.joyintech.tams.constant.DictCodeList.交易方向_行权_回售.getValue())){

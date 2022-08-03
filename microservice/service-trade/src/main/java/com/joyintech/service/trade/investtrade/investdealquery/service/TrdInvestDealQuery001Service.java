@@ -165,6 +165,7 @@ public class TrdInvestDealQuery001Service extends BaseService<TrdInvestDealQuery
 	    if(!list.isEmpty()){
             for(TrdInvestDealQuery001Dto dto:list){
                 String finType2=dto.getFinprodType2();
+				dto.setFinType2(finType2);
 				dto.setFinprodType2(transferFinprodType2(finType2, dto.getFinprodId()));
             }    
         }
@@ -243,6 +244,10 @@ public class TrdInvestDealQuery001Service extends BaseService<TrdInvestDealQuery
 			return DictCodeListExt3.平安资产类型_权益类资产.getValue();
 		}
 		// add by etliu 20210421 权益类资产相关代码合并 end
+		else if (StringUtil.equals(finType2, DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())){
+			return DictCodeList.平安资产类型_信用保护凭证.getValue();
+		}
+
 		return StringUtil.EMPTY;
 	}
 

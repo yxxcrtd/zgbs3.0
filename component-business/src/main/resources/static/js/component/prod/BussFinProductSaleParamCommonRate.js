@@ -73,7 +73,7 @@
 	};
     //控件加载完成后
     window.componentLoadCallback = function(isDone, pagePath, params){
-        if(isDone){debugger
+        if(isDone){
             initisFaceSingleInvestorDiv();
         }
     }

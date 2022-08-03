@@ -1076,4 +1076,12 @@
 							</if>
 						and IS_CANCEL = #{isCancel,jdbcType=VARCHAR} and TRADE_STATUS = #{tradeStatus,jdbcType=VARCHAR})
 	</select>
+
+	<select id="selectLoopAmt" resultType="java.lang.String">
+		select IS_LOOP_AMT from ( select * from CREDIT_LINES where SEQNO in ( select CREDIT_LINES_ID from CREDIT_USING_CUSTOMER where TRADE_ID in (
+		select TRADE_ID from TRD_PRODUCT_DEAL where F_TRADE_ID in (
+		select TRADE_ID from SETTLE_TRANS_DATA where CJBH= #{tradeId}) ) )
+		) where ROWNUM=1
+	</select>
+
 </mapper>

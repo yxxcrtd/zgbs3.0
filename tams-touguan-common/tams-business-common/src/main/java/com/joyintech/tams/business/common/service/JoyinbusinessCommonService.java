@@ -590,4 +590,33 @@ public class JoyinbusinessCommonService extends BaseService {
     public String qryCashAcctIdBySecAcctId(Map<String, Object> map) {
         return joyinbusinessCommonMapper.qryCashAcctIdBySecAcctId(map);
     }
+
+    /**
+     * 根据组合 资产 查询证券账户
+     *
+     * @param map
+     * @return java.lang.String
+     * @author jiangpeng
+     * @date 2021/12/13 16:09
+     */
+    public String qryPortfolioSecAcctId(Map<String, Object> map) {
+        return joyinbusinessCommonMapper.qryPortfolioSecAcctId(map);
+    }
+
+    /**
+     * 查询资金账户
+     *
+     * @param dto dealType 表示账户类型 A01 为托管账户
+     * @return com.joyintech.framework.grid.Page<com.joyintech.framework.select.SelectOptionDto>
+     * @author jiangpeng
+     * @date 2022/7/23 17:14
+     */
+    public Page<SelectOptionDto> queryAcctNo(CfetsSearchInfoRequest dto) {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("search", dto.getSearch());
+        param.put("acctType", dto.getDealType());
+        param.put("sysdate", iPlatformDate.getSysDate());
+        // 查询资金账户
+        return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.queryAcctNo(param));
+    }
 }

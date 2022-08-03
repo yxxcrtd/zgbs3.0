@@ -1,0 +1,1 @@
+delete from SYS_PARA where SYSTEM_CODE = 'CFETS' and PARA_CODE = 'IbuFlag_secondaryMarketTrade';

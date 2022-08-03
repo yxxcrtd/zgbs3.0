@@ -165,7 +165,7 @@ public class Rsk001Service extends EventBaseService<Rsk001InEntity> {
                 getLogger().info("触发的风控事项不计算指标");
                 // 取得组合关联指标信息
                 IPtlIndicator ptlInd = getPtlIndicator(mapData);
-                occupyWithoutCalc(occupyCode, eveList, ocpRelParam, mapData, ptlInd);
+                occupyWithoutCalc(response,occupyCode, eveList, ocpRelParam, mapData, ptlInd);
                 // 状态
                 response.setBodyField(RSKSTATUS, BussinessDictCodeListRds.指标状态_通过.getValue());
                 // 试算结果
@@ -177,7 +177,7 @@ public class Rsk001Service extends EventBaseService<Rsk001InEntity> {
             // 若无 组合关联指标信息，则试算通过，直接进行预占
             if (ptlInd == null) {
                 getLogger().info(LOG_INFO_PASS);
-                occupyWithoutCalc(occupyCode, eveList, ocpRelParam, mapData, null);
+                occupyWithoutCalc(response,occupyCode, eveList, ocpRelParam, mapData, null);
                 // 状态
                 response.setBodyField(RSKSTATUS, BussinessDictCodeListRds.指标状态_通过.getValue());
                 // 试算结果
@@ -226,7 +226,7 @@ public class Rsk001Service extends EventBaseService<Rsk001InEntity> {
         // 若组合未关联指标信息，则试算通过，直接进行预占
         if (CollectionUtils.isEmpty(indIdList)) {
             getLogger().info(LOG_INFO_PASS);
-            occupyWithoutCalc(occupyCode, eveList, ocpRelParam, mapData, ptlInd);
+            occupyWithoutCalc(response,occupyCode, eveList, ocpRelParam, mapData, ptlInd);
             // 状态
             response.setBodyField(RSKSTATUS, BussinessDictCodeListRds.指标状态_通过.getValue());
             // 试算结果
@@ -241,7 +241,7 @@ public class Rsk001Service extends EventBaseService<Rsk001InEntity> {
         // 若指标信息不存在，则抛出异常，不进行预占处理
         if (CollectionUtils.isEmpty(indMap)) {
             getLogger().info("指标信息不存在，试算通过");
-            occupyWithoutCalc(occupyCode, eveList, ocpRelParam, mapData, ptlInd);
+            occupyWithoutCalc(response,occupyCode, eveList, ocpRelParam, mapData, ptlInd);
             // 状态
             response.setBodyField(RSKSTATUS, BussinessDictCodeListRds.指标状态_通过.getValue());
             // 试算结果
@@ -254,6 +254,8 @@ public class Rsk001Service extends EventBaseService<Rsk001InEntity> {
         Map<String, Set<String>> ptlIndMap = ptlInd.getPtlIndicator();
         // 从风险事件列表中取出相关的参数列表
         Set<String> paraIdList = getParamIdList(eveList);
+        log("风控触发指标参数有：【{}】", paraIdList, en->en != null ? en : "");
+        setRemark(response,"风控触发指标参数有：", paraIdList, en->en != null ? en : "",getParam(paraIdList));
         // 对于批量交易出现两笔正反同步交易时，排除影响的同一参数
         removeSameParam(paraIdList, mapData, eveList);
         // 将风险事件关联的指标参数挂到组合（包）
@@ -262,7 +264,7 @@ public class Rsk001Service extends EventBaseService<Rsk001InEntity> {
         unionParamId(indMap, paraIdList, ptlIndMap);
         // 一条指标都没有的时候
         if (CollectionUtils.isEmpty(indMap) || CollectionUtils.isEmpty(indMap.values())) {
-            occupyWithoutCalc(occupyCode, eveList, ocpRelParam, mapData, ptlInd);
+            occupyWithoutCalc(response,occupyCode, eveList, ocpRelParam, mapData, ptlInd);
             // 状态
             response.setBodyField(RSKSTATUS, BussinessDictCodeListRds.指标状态_通过.getValue());
             // 试算结果
@@ -288,8 +290,7 @@ public class Rsk001Service extends EventBaseService<Rsk001InEntity> {
             throw new InterfException("指标参数信息不存在");
         }
         setServiceInfo("paramMap", paramMap);
-        log("涉及的指标参数有：【{}】", paramMap.entrySet(), en->en != null ? en.getKey() : "");
-        setRemark(response,"涉及的指标参数有：", paramMap.entrySet(), en->en != null ? en.getKey() : "",paramMap);
+
         RskIsupTrialCls isupTrialCls = new RskIsupTrialCls();
         // 业务类型
         isupTrialCls.setTradeType((String)request.getBodyField(EVENT_TYPE));
@@ -301,7 +302,7 @@ public class Rsk001Service extends EventBaseService<Rsk001InEntity> {
         // 当指标都被剔除时，试算通过，直接进行预占
         if (CollectionUtils.isEmpty(ptlIndMap) || CollectionUtils.isEmpty(ptlIndMap.values())) {
             getLogger().info("无指标需要计算，试算通过");
-            occupyWithoutCalc(occupyCode, eveList, ocpRelParam, mapData, ptlInd);
+            occupyWithoutCalc(response,occupyCode, eveList, ocpRelParam, mapData, ptlInd);
             // 状态
             response.setBodyField(RSKSTATUS, BussinessDictCodeListRds.指标状态_通过.getValue());
             // 试算结果
@@ -489,7 +490,7 @@ public class Rsk001Service extends EventBaseService<Rsk001InEntity> {
      * @see
      * @since 1.0
      */
-    private void occupyWithoutCalc(String occupyCode, List<IEvent> eveList,
+    private void occupyWithoutCalc(ClientData response,String occupyCode, List<IEvent> eveList,
                                    // add by zhangrui1 差分预占 start
                                    IOccupyRelParam ocpRelParam,
                                    // add by zhangrui1 差分预占 end
@@ -503,6 +504,8 @@ public class Rsk001Service extends EventBaseService<Rsk001InEntity> {
         removeSameParam(paraIdList, mapData, eveList);
         // 取得所有指标参数信息
         Map<String, IParam> paramMap = getParam(paraIdList);
+        log("风控触发指标参数有：【{}】", paraIdList, en->en != null ? en : "");
+        setRemark(response,"风控触发指标参数有：", paraIdList, en->en != null ? en : "",paramMap);
         // 若指标参数不存在则抛出异常
         if (CollectionUtils.isEmpty(paramMap)) {
             throw new InterfException("指标参数信息不存在，预占失败");
@@ -534,8 +537,6 @@ public class Rsk001Service extends EventBaseService<Rsk001InEntity> {
             }
         }
         final Map<String, Map<String, IValue<Object>>> paraList = paraCond;
-
-        log("涉及的指标参数有：【{}】", paraCond.entrySet(), en->en != null ? en.getKey() : "");
 
         // 执行事务处理（Redis操作）
         int type = handleByLock(() -> {

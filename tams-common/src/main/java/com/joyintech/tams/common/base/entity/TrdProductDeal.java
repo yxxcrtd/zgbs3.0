@@ -276,7 +276,7 @@ public class TrdProductDeal extends BaseEntity {
     private String tradeMarketMode;
 
     /**
-     * 交易员
+     * 本方交易员
      */
     private String trader;
 

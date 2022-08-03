@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.service.trade.server.agent.kcbp;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
@@ -7,6 +8,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondQryBean;
+import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveQryRequest;
+import com.joyintech.tams.exchange.common.bean.response.quote.repurchase.RepurchaseQuoteReceiveResponse;
 import com.joyintech.tams.exchange.common.bean.terminal.RTGSStatusBean;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.*;
@@ -810,6 +813,12 @@ public class KCBPTradeAgent extends TradeAgentDsp {
         }
 
         return KCBPMsgParseHelper.parseIntegratedRepurchaseQuote(resultBean);
+    }
+
+    @Override
+    public List<RepurchaseQuoteReceiveResponse> reqIntegratedRepurchaseQuoteReceive(RepurchaseQuoteReceiveQryRequest bean) throws Exception {
+        //待处理
+        return ListUtil.list(false);
     }
 
     /**

@@ -31,6 +31,8 @@ public enum EntrustBussTypeEnum {
     FUTURES("期货指令", "23"),
     ETF_PURCHASE_AND_RANSOM("ETF申购赎回指令", "24"),
     CREDIT_PROTECTION_CERTIFICATE("信用保护凭证指令", "30"),
+    中途换券指令_换钱("协议回购中途换券指令-换钱", "31"),
+    解除质押指令_线上("协议回购解除质押指令-线上", "32"),
     ;
 
     public final String name;

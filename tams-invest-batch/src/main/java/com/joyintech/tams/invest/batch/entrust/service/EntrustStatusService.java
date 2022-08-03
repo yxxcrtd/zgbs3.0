@@ -78,7 +78,7 @@ public class EntrustStatusService {
     @Qualifier("simpleRestTemplate")
     protected JoyinRestTemplate simpleRestTemplate;
 
-    @Value("${application.micorservice.contextpath.tamsServer:http://tams-server}")
+    @Value("${application.micorservice.contextpath.tamsServer:http://127.0.0.1:8080/tams}")
     private String tamsSerever;
 
     public void run(SysBatchExecInfo batchExecuteInfo) {
@@ -97,8 +97,10 @@ public class EntrustStatusService {
 
             // 处理对接了头寸引擎的指令关闭 start
             List<EntrustClosePosEtrReqDto> etrReqDtoList = entrustStatusMapper.selectEntrustList(params);
+            logger.info("待关闭指令:{}",JsonUtils.object2Json(etrReqDtoList));
             // List<String> entrustIds = entrustStatusMapper.selectEntrustIds(params);
             List<String> entrustIds = new ArrayList<>();
+            List<String> entrustIdsCredit = new ArrayList<>();
             List<String> entrustIdsNotNeedUpdateOldPosition = new ArrayList<>();
             if (CollectionUtils.isNotEmpty(etrReqDtoList)) {
 //                entrustIds = etrReqDtoList.stream().map(EntrustClosePosEtrReqDto::getCloseId).collect(Collectors.toList());
@@ -109,6 +111,10 @@ public class EntrustStatusService {
                             || StringUtil.equals(DictCodeList.委托状态_已撤回.getValue(), etr.getEntrustStatus())) {
                         entrustIdsNotNeedUpdateOldPosition.add(etr.getCloseId());
                     }
+                    if(StringUtil.equals(etr.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())){
+                       return;
+                    }
+                    entrustIdsCredit.add(etr.getCloseId());
                 });
             }
             List<EntrustClosePosEtrReqDto> entrustIdList = etrReqDtoList.stream().filter(item ->
@@ -123,7 +129,7 @@ public class EntrustStatusService {
             //entrustStatusMapper.updateDistributeStatus(params);//add by yangwenjun 20201211 更新委托指令分发表中的接收状态
            // entrustStatusMapper.updateEntrustStatus(params);
             // 日终关闭委托时，同步释放授信预占
-            closeDelegateDealCredit(entrustIds);
+            closeDelegateDealCredit(entrustIdsCredit);
             //更新指令业务模式(本币交易涉及资产重分类)
             updateBusModel(sysDate);
             //操作记录表
@@ -301,6 +307,12 @@ public class EntrustStatusService {
             param1.put("finprodId",cfetsEntrustClosePosEtrReqDto.getFinprodId());
             list.add(param1);
             param.put("selectedItem",list);
+            if (StringUtil.equals(cfetsEntrustClosePosEtrReqDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())) {
+                pageId = "etrCreditProtectionCertificate003";
+                url = tamsSerever + String.format("/interf/risk/riskTrial/doOccupy/exchangeEtr/%s/%s/%s", pageId, 系统动作_关闭.getValue(), 流程节点_流程提交.getValue());
+                List<String> portfolioIdList = entrustStatusMapper.findPortfolioIdList(param);
+                param.put("portfolioId",StringUtil.joinString(portfolioIdList,","));
+            }
             if (isSingle) {
                 message = simpleRestTemplate.postForObject(url, param, Message.class);
             } else {

@@ -4,10 +4,7 @@ import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.entity.SettleTransData;
-import com.joyintech.tams.common.base.entity.TrdDealTotalAdd;
-import com.joyintech.tams.common.base.entity.TrdFinProductDealTotal;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -21,6 +18,7 @@ import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonD
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonEntrustDto;
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.dao.ExchangeTransMatchCommonMapper;
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.dto.ExchangeTransMatchBaseTradeDto;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -181,14 +179,20 @@ public class ExchangeTransMatchRepo5Service extends ExchangeTransMatchRepoCommon
         //是否逾期
         dealTotal.setIsOverdueDeal(DictCodeList.是否_否.getValue());
 
-        // GZYHTZJY-1039:交易对手应为空 fuyongsheng modify 20220106 start
-//        if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
-//            dealTotal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
-//        }
-//        else if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
-//            dealTotal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
-//        }
-        // GZYHTZJY-1039:交易对手应为空 fuyongsheng modify 20220106 end
+        // 交易对手
+        if(!StringUtil.isEmpty(dealDto.getCounterId())){
+            dealTotal.setCounterId(dealDto.getCounterId());
+        }else if(!StringUtil.isEmpty(entrustDto.getCounterId())){
+            dealTotal.setCounterId(entrustDto.getCounterId());
+        }else{
+            if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+                dealTotal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
+            }
+            else if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
+                dealTotal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
+            }
+        }
+
         // 交易平台
         dealTotal.setTradePlat(dealDto.getTradePlat());
 
@@ -216,13 +220,23 @@ public class ExchangeTransMatchRepo5Service extends ExchangeTransMatchRepoCommon
         dealTotal.setmDeliveryType(DictCodeListExt1.结算方式_券款对付.getValue());
         // 备注
         dealTotal.setRemark("数据清算自动处理");
-
+        // 本方交易员
+        dealTotal.setTrader(dealDto.getTrader());
+        // 对手方交易员
+        dealTotal.setCounterTrader(dealDto.getCounterTrader());
         return dealTotal;
     }
 
     public List<TrdProductDeal> genTrdProductDealList(ExchangeTransMatchCommonDto dealDto, ExchangeTransMatchCommonEntrustDto entrustDto, TrdFinProductDealTotal trdFinProductDealTotal) {
         List<TrdProductDeal> trdProductDealList = new ArrayList<>();
         List<SettleTransData> settleTransDataList = this.handleSettleTransData(dealDto,entrustDto);
+        if(CollectionUtils.isEmpty(settleTransDataList)){
+            return trdProductDealList;
+        }
+        // 首期交易编号
+        String sqTradeId = settleTransDataList.get(0).getFinprodId();
+        // 查询首期的现金流计划信息
+        List<FinCashInfo> finCashInfos = exchangeTransMatchCommonMapper.getFinCashInfosByFinprodId(sqTradeId);
         for(SettleTransData settleTransData:settleTransDataList) {
             TrdProductDealDto trdProductDeal = new TrdProductDealDto();
             // 交易编号，按现有的交易编号生成规则，自动生成
@@ -321,7 +335,18 @@ public class ExchangeTransMatchRepo5Service extends ExchangeTransMatchRepoCommon
             // 通道代码
             trdProductDeal.setChlId(null);
             // 交易对手
-            trdProductDeal.setCounterId(null);
+            if(!StringUtil.isEmpty(dealDto.getCounterId())){
+                trdProductDeal.setCounterId(dealDto.getCounterId());
+            }else if(!StringUtil.isEmpty(entrustDto.getCounterId())){
+                trdProductDeal.setCounterId(entrustDto.getCounterId());
+            }else{
+                if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+                    trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
+                }
+                else if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
+                    trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
+                }
+            }
             // 是否外部交易
             trdProductDeal.setIsOutTrade(DictCodeList.是否_是.getValue());
             // 交易场所
@@ -330,26 +355,27 @@ public class ExchangeTransMatchRepo5Service extends ExchangeTransMatchRepoCommon
             trdProductDeal.setTradePlat(settleTransData.getTradePlat());
             // 交易市场
             trdProductDeal.setTradeMarketMode(settleTransData.getTradeMarketMode());
-            // GZYHTZJY-1039:交易对手应为空 fuyongsheng modify 20220106 start
-//            if(StringUtil.equals(settleTransData.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
-//                trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
-//            }
-//            else if(StringUtil.equals(settleTransData.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
-//                trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
-//            }
-            // GZYHTZJY-1039:交易对手应为空 fuyongsheng modify 20220106 end
-            // 本方交易员
-            trdProductDeal.setTrader(null);
-            // 对手方交易员
-            trdProductDeal.setCounterTrader(null);
-            // 对手方联系方式
-            trdProductDeal.setCounterContact(null);
             // 证券管理户代码
             trdProductDeal.setSecManageAcctId(settleTransData.getSecAcctId());
             // 关联系统交易编号
-            trdProductDeal.setfTradeId(null);
+            trdProductDeal.setfTradeId(dealDto.getSeqId());
             // 现金流代码
-            trdProductDeal.setCashId(null);
+            if(StringUtil.equals(settleTransData.getPs(),DictCodeList.交易方向_还本到账.getValue())) {
+                if(CollectionUtils.isNotEmpty(finCashInfos)){
+                    FinCashInfo finCashInfoPrin = finCashInfos.stream()
+                            .filter(item->DictCodeListExt1.现金流一级类型_本金.getValue().equals(item.getCashType1()))
+                            .findFirst().get();
+                    trdProductDeal.setCashId(finCashInfoPrin.getCashId());
+                }
+            }
+            else if(StringUtil.equals(settleTransData.getPs(),DictCodeList.交易方向_收息到账.getValue())){
+                if(CollectionUtils.isNotEmpty(finCashInfos)){
+                    FinCashInfo finCashInfoInt = finCashInfos.stream()
+                            .filter(item->DictCodeListExt1.现金流一级类型_利息.getValue().equals(item.getCashType1()))
+                            .findFirst().get();
+                    trdProductDeal.setCashId(finCashInfoInt.getCashId());
+                }
+            }
             // 登记托管机构
             trdProductDeal.setRegistOrg(DictCodeList.登记托管机构_中债_中国证券登记结算有限责任公司.getValue());
             // 备注
@@ -398,7 +424,7 @@ public class ExchangeTransMatchRepo5Service extends ExchangeTransMatchRepoCommon
         List<SettleTransData> list = exchangeTransMatchCommonMapper.getSettleTransDataList(map);
         for(SettleTransData item:list) {
             //收息到账
-            if(BigDecimal.ZERO.compareTo(item.getmIntAmt())<0) {
+            if(null != item.getmIntAmt() && BigDecimal.ZERO.compareTo(item.getmIntAmt())<0) {
                 SettleTransData IntSettleTransData = new SettleTransData();
                 BeanUtil.copyPropertiesIgnoreNull(IntSettleTransData,item);
 
@@ -432,7 +458,7 @@ public class ExchangeTransMatchRepo5Service extends ExchangeTransMatchRepoCommon
             }
 
             //还本到账
-            if(BigDecimal.ZERO.compareTo(item.getmPrinAmt())<0) {
+            if(null != item.getmPrinAmt() && BigDecimal.ZERO.compareTo(item.getmPrinAmt())<0) {
                 SettleTransData prinSettleTransData = new SettleTransData();
                 BeanUtil.copyPropertiesIgnoreNull(prinSettleTransData,item);
 

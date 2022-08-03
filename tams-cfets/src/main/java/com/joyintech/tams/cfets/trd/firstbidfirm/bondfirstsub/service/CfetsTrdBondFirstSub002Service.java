@@ -28,7 +28,6 @@ import com.joyintech.tams.cfets.trd.bond.dto.CalRequest;
 import com.joyintech.tams.cfets.trd.bond.dto.PtlAllocationDto;
 import com.joyintech.tams.cfets.trd.bond.dto.RiskCalRequest;
 import com.joyintech.tams.cfets.trd.bond.service.IbuQuoteBondCalService;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dao.CfetsTrdBondFirstSub001Mapper;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dao.CfetsTrdBondFirstSub002Mapper;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.*;
 import com.joyintech.tams.common.base.dao.*;
@@ -49,7 +48,6 @@ import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.trade.entrust.EtrFinishStatusDto;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
-import com.joyintech.tams.invest.common.trade.dto.AllTradeCommonInputDto;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
@@ -87,8 +85,6 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     @Autowired
     private IbuQuoteBondCalService ibuQuoteBondCalService;
 
-    @Autowired
-    private CfetsTrdBondFirstSub001Service cfetsTrdBondFirstSub001Service;
     /**
      * 公共方法service
      */
@@ -106,9 +102,6 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
 
     @Autowired(required = false)
     private BaseTradeProductDealCommService baseTradeProductDealCommService;
-
-    @Autowired
-    private CfetsTrdBondFirstSub001Mapper cfetsTrdBondFirstSub001Mapper;
 
     @Autowired
     private CfetsTrdBondFirstSub002Mapper cfetsTrdBondFirstSub002Mapper;
@@ -937,7 +930,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         if (!StringUtil.isNotEmpty(entity.getTradeDate())) {
             entity.setTradeDate(DateUtil.parse(iPlatformDate.getSysDateStr()));
         }
-        logger.debug("处理生效逻辑,入参:" + JsonUtils.object2Json(entity));
+        logger.info("处理生效逻辑,入参:" + JsonUtils.object2Json(entity));
         this.deleteWflData(entity.getBidId());
         this.insertData(entity, type);
         //头寸
@@ -984,10 +977,11 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      * @param remark             备注
      * @param isNeedDealPosition 是否需要撤销持仓
      * @param tgBusiType         业务类型
+     * @param isRevoke 是否撤销,用来区分交收失败还是撤销;交收失败为false 撤销为true
      * @author jiangpeng
      * @date 2022/5/12 14:53
      */
-    public CfetsTrdBondFirstSubInfoDto dorevoke(String bidId, String remark, Boolean isNeedDealPosition, String tgBusiType) {
+    public CfetsTrdBondFirstSubInfoDto dorevoke(String bidId, String remark, Boolean isNeedDealPosition,Boolean isRevoke, String tgBusiType) {
         CfetsTrdBondFirstSubInfoDto entity = this.prepareDto(bidId);
         entity.setBidId(bidId);
         entity.setRemark(remark);
@@ -995,11 +989,13 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         if (isNeedDealPosition) {
             // 匹配取消
             cfetsTrdBondFirstSub002Mapper.deleteByPreTradeId(entity.getBidId());
-            PositionHttpRequest.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
-                    DictCodeListExt3.头寸业务类型_债券一级申购.getValue(), DictCodeList.交易方向_买入.getValue());
+            if (isRevoke) {
+                PositionHttpRequest.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
+                        DictCodeListExt3.头寸业务类型_债券一级申购.getValue(), DictCodeList.交易方向_买入.getValue());
+            }
         }
         // 老头寸处理
-//            this.dealOldPosition(entity, true);
+        this.dealOldPosition(entity, true);
         //处理指令执行进度
         this.insertEtrFinishStatus(entity, OperationType.REVOKE);
 
@@ -1466,7 +1462,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      * @date 2022/4/25 10:40
      */
     private List<ValidMessage> checkCalAmt(CfetsTrdBondFirstSubInfoDto dto) {
-        logger.debug("数值校验,入参:" + JsonUtils.object2Json(dto));
+        logger.info("数值校验,入参:" + JsonUtils.object2Json(dto));
         List<ValidMessage> errorList = new ArrayList<>();
         BigDecimal avaNum = BigDecimal.ZERO;
         BigDecimal payableAmount = BigDecimal.ZERO;
@@ -1675,10 +1671,9 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             // 撤销或退回
             entity.setTradeDate(iPlatformDate.getSysDate());
             if (isRevokeOrBack) {
-                baseAssetCashPositionCommMapper.deleteCashPositionByOrderIds(Arrays.asList(entity.getBidId()));
+                baseAssetCashPositionCommMapper.deleteCashPositionByOrderIds(Collections.singletonList(entity.getBidId()));
             } else {
                 for (CfetsTrdBondFirstSubProductDto deal : entity.getProductDtos()) {
-                    AllTradeCommonInputDto inputDto = new AllTradeCommonInputDto();
                     FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
                     finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
                     finProductTradeDto.setAssetType2("ISSUE_CLASS_01");
@@ -1718,7 +1713,8 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                     stlPayOrder.setSettleDate(entity.getTradeDate());
                     stlPayOrders.add(stlPayOrder);
                     baseTradeProductDealDto.setStlPayOrdersList(stlPayOrders);
-                    finProductTradeDto.setBaseTradeProductDealDtos(Arrays.asList(baseTradeProductDealDto));
+                    finProductTradeDto.setBaseTradeProductDealDtos(Collections.singletonList(baseTradeProductDealDto));
+                    logger.info("一级申购处理头寸数据,入参:" + JsonUtils.object2Json(finProductTradeDto));
                     baseTradeProductDealCommService.insertPosition(finProductTradeDto);
                 }
             }

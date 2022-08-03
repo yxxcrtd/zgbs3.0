@@ -77,6 +77,11 @@ public class ActualTimeAssetDto extends BaseEntity {
     private  String type6;
 
     /**
+     * 行内二级分类
+     */
+    private  String type9;
+
+    /**
      * 获得 资产一级分类
      * @return
      */
@@ -283,5 +288,13 @@ public class ActualTimeAssetDto extends BaseEntity {
 
     public void setMarketValue(BigDecimal marketValue) {
         this.marketValue = marketValue;
+    }
+
+    public String getType9() {
+        return type9;
+    }
+
+    public void setType9(String type9) {
+        this.type9 = type9;
     }
 }

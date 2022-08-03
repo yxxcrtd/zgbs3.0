@@ -22,10 +22,7 @@ import com.joyintech.service.asset.plan.plancur.dao.FinPlanAssetCMapper;
 import com.joyintech.service.asset.plan.plancur.dto.BussParticipantInfoDto;
 import com.joyintech.service.asset.plan.plancur.dto.BussRepAssetMngProdInfoDto;
 import com.joyintech.service.asset.plan.plancur.dto.FinPlanAssetCDto;
-import com.joyintech.tams.common.base.dao.AssetTypeConfigMapper;
-import com.joyintech.tams.common.base.dao.PaFinProductMapper;
-import com.joyintech.tams.common.base.dao.PtlPortfolioMapper;
-import com.joyintech.tams.common.base.dao.RepAssetOtherMapper;
+import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.base.core.BaseFinProductBaseInfoService;
 import com.joyintech.tams.component.base.core.dto.BaseFinProductBaseInfoDto;
@@ -75,7 +72,13 @@ public class FinPlanAssetCService extends BaseService<FinPlanAssetCDto> {
      */
     @Autowired
     private PtlPortfolioMapper ptlPortfolioMapper;
-    
+    // add by swwan TISHKS-1483 start
+    /**
+     * Pa组合表mapper
+     */
+    @Autowired
+    private PaPtlPortfolioMapper paPtlPortfolioMapper;
+    // add by swwan TISHKS-1483 end
     /**
      * 查询是否自动创建组合AssetTypeConfigMapper
      */
@@ -252,6 +255,9 @@ public class FinPlanAssetCService extends BaseService<FinPlanAssetCDto> {
         	 //组合表插入
             ptlPortfolioMapper.deleteByPrimaryKey(dto.getPtlPortfolio().getPortfolioId());
             ptlPortfolioMapper.insert(dto.getPtlPortfolio());
+            // add by swwan TISHKS-1483 start
+            paPtlPortfolioMapper.insert(dto.getPaPtlPortfolio());
+            // add by swwan TISHKS-1483 end
         }
         //end
         //插入标的类金融产品扩展表

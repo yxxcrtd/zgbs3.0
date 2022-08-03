@@ -57,7 +57,13 @@
     B.realName realName,
     ETR_ENTRUST.REMARK remark,
     btm.busi_type busiTypePosition,
-    nvl(ssa.sec_acct_name,ssall.secAcctName) secAcctId,
+<!--     nvl(ssa.sec_acct_name,ssall.secAcctName) secAcctId,-->
+        CASE
+        WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F07'
+        AND ETR_ENTRUST.PS IN ( '03', '04', 'T56', 'T93', 'T94', 'T95', 'T96' ) THEN
+        cct.SEC_ACCT_NAME  ELSE nvl( ssa.sec_acct_name, ssall.secAcctName )
+        END secAcctId,
+
     DECODE(ETR_ENTRUST_ADD.SETTLE_SPREED,0,'01',1,'02','2','03') settleSpeed,
     decode(ETR_ENTRUST_ADD.ASSET_TYPE,'F01','','F07',ETR_ENTRUST_ADD.TERM_DAYS,'F10',ETR_ENTRUST_ADD.TERM_DAYS,'F12',ETR_ENTRUST_ADD.TERM_DAYS,'F16',ETR_ENTRUST_ADD.TERM_DAYS,'') termDays,
     CASE WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' AND FIN_PRODUCT_ISSUE.ISSUE_CLASS = '01' THEN
@@ -113,11 +119,20 @@
     PTL_PORTFOLIO
     ON
     PTL_PORTFOLIO.PORTFOLIO_ID = ETR_ENTRUST.PORTFOLIO_ID
-    LEFT JOIN
-    FIN_PRODUCT
-    ON
-    FIN_PRODUCT.FINPROD_ID = ETR_ENTRUST.FINPROD_ID
-    LEFT JOIN
+        LEFT JOIN FIN_PRODUCT ON ETR_ENTRUST.FINPROD_ID = FIN_PRODUCT.FINPROD_ID
+        LEFT JOIN WFL_ETR_PLEDGE ep ON ETR_ENTRUST.ENTRUST_ID = ep.ENTRUST_ID
+        LEFT JOIN FIN_PRODUCT fp ON ep.FINPROD_ID = fp.FINPROD_ID
+        LEFT JOIN (
+        SELECT
+        ssai.SEC_ACCT_NAME,
+        psa.PORTFOLIO_ID,
+        ssai.REGIST_ORG,ssai.TRADE_PLACE
+        FROM
+        PTL_SEC_ACCT psa
+        LEFT JOIN STL_SEC_ACCT_INFO ssai ON psa.ACCT_NO = ssai.SEC_ACCT_ID
+        ) cct ON fp.regist_Org = cct.REGIST_ORG and cct.TRADE_PLACE = '01'
+        AND ETR_ENTRUST.PORTFOLIO_ID = cct.PORTFOLIO_ID
+        LEFT JOIN
     (SELECT
     listagg(TRADER, ',')  within group ( order by TRADER ) TRADER,
     listagg(REAL_NAME, ',') within group(order by TRADER) realName,
@@ -153,8 +168,8 @@
     LEFT JOIN OPT_TARGET_INFO ON ETR_ENTRUST_ADD.ASSET_TYPE_10 = OPT_TARGET_INFO.TARGET_ID
     LEFT JOIN (
         SELECT ENTRUST_ID,
-        wm_concat ( ETR_ENTRUST_DETAIL.PORTFOLIO_ID ) PORTFOLIO_ID,
-        wm_concat ( PORTFOLIO_NAME ) PORTFOLIO_NAME
+        to_char(wm_concat ( ETR_ENTRUST_DETAIL.PORTFOLIO_ID )) PORTFOLIO_ID,
+        to_char(wm_concat ( PORTFOLIO_NAME )) PORTFOLIO_NAME
         FROM ETR_ENTRUST_DETAIL
         LEFT JOIN
         (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)
@@ -255,6 +270,7 @@
             LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
             LEFT JOIN (
             SELECT brt1.BID_ID , brt1.STATUS , brt1.FINPROD_ID, brt1.IS_WIN FROM BID_RESULT_TOTAL brt1
+            WHERE brt1.STATUS = '01'
             UNION ALL
             SELECT brt2.BID_ID , brt2.STATUS , brt2.FINPROD_ID, brt2.IS_WIN FROM WFL_BID_RESULT_TOTAL brt2
             ) brt  ON   brt.BID_ID = bo.BID_ID
@@ -401,7 +417,14 @@
         B.realName realName,
         WFL_ETR_ENTRUST.REMARK remark,
         btm.busi_type busiTypePosition,
-        nvl(ssa.sec_acct_name,ssall.secAcctName) secAcctId,
+
+        CASE
+
+        WHEN WFL_ETR_ENTRUST_ADD.ASSET_TYPE = 'F07'
+        AND WFL_ETR_ENTRUST.PS IN ( '03', '04', 'T56', 'T93', 'T94', 'T95', 'T96' ) THEN
+        cct.SEC_ACCT_NAME  ELSE nvl( ssa.sec_acct_name, ssall.secAcctName )
+        END secAcctId,
+
         DECODE(WFL_ETR_ENTRUST_ADD.SETTLE_SPREED,0,'01',1,'02','2','03') settleSpeed,
         decode(WFL_ETR_ENTRUST_ADD.ASSET_TYPE,'F01','','F07',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'F10',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'F12',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'F16',WFL_ETR_ENTRUST_ADD.TERM_DAYS,'') termDays,
         CASE WHEN WFL_ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' AND FIN_PRODUCT_ISSUE.ISSUE_CLASS = '01' THEN
@@ -457,10 +480,20 @@
         PTL_PORTFOLIO
         ON
         PTL_PORTFOLIO.PORTFOLIO_ID = WFL_ETR_ENTRUST.PORTFOLIO_ID
-        LEFT JOIN
-        FIN_PRODUCT
-        ON
-        FIN_PRODUCT.FINPROD_ID = WFL_ETR_ENTRUST.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT ON WFL_ETR_ENTRUST.FINPROD_ID = FIN_PRODUCT.FINPROD_ID
+        LEFT JOIN WFL_ETR_PLEDGE ep ON WFL_ETR_ENTRUST.ENTRUST_ID = ep.ENTRUST_ID
+        LEFT JOIN FIN_PRODUCT fp ON ep.FINPROD_ID = fp.FINPROD_ID
+        LEFT JOIN (
+        SELECT
+        ssai.SEC_ACCT_NAME,
+        psa.PORTFOLIO_ID,
+        ssai.REGIST_ORG,ssai.TRADE_PLACE
+        FROM
+        PTL_SEC_ACCT psa
+        LEFT JOIN STL_SEC_ACCT_INFO ssai ON psa.ACCT_NO = ssai.SEC_ACCT_ID
+        ) cct ON fp.regist_Org = cct.REGIST_ORG and cct.TRADE_PLACE = '01'
+        AND WFL_ETR_ENTRUST.PORTFOLIO_ID = cct.PORTFOLIO_ID
+
         LEFT JOIN
         (SELECT
         listagg(TRADER, ',')  within group ( order by TRADER ) TRADER,
@@ -503,8 +536,8 @@
         WFL_ETR_ENTRUST.FINPROD_TYPE2 != 'F32' and btm.issueClass is null)
         LEFT JOIN (
             SELECT ENTRUST_ID,
-            wm_concat ( WFL_ETR_ENTRUST_DETAIL.PORTFOLIO_ID ) PORTFOLIO_ID,
-            wm_concat ( PORTFOLIO_NAME ) PORTFOLIO_NAME
+            to_char(wm_concat ( WFL_ETR_ENTRUST_DETAIL.PORTFOLIO_ID )) PORTFOLIO_ID,
+            to_char(wm_concat ( PORTFOLIO_NAME )) PORTFOLIO_NAME
             FROM WFL_ETR_ENTRUST_DETAIL
             LEFT JOIN
             (select PORTFOLIO_ID,PORTFOLIO_NAME from PTL_PORTFOLIO order by PORTFOLIO_ID, PORTFOLIO_NAME)

@@ -17,7 +17,7 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.invest.batch.prdopenplanupdate.relyingonresources.dto.BussFinProductFeePlanDto;
 import com.joyintech.tams.invest.batch.prdopenplanupdate.relyingonresources.dto.DateDiviDto;
 import com.joyintech.tams.invest.batch.prdopenplanupdate.relyingonresources.service.BussFinProductFeePlanService;
-import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.DateCalService;
+import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.InvDateCalService;
 import com.joyintech.tams.invest.common.calculator.AdjustedTradeDayCal;
 
 
@@ -27,7 +27,7 @@ public class BussFinProductFeePlanImplService extends BaseService<BussFinProduct
      * 付息计划，开放计划，利率重置，申购计划，赎回计划计算用和日期关联的Service
      */
     @Autowired
-    private DateCalService dateCalService;
+    private InvDateCalService invDateCalService;
     
     @Override
     public List<FinCashPlan> getProductFeePlanData(BussFinProductFeePlanDto finProductFeePlanDto) {
@@ -97,7 +97,7 @@ public class BussFinProductFeePlanImplService extends BaseService<BussFinProduct
      // 一体化对应etliu end
 
         // 获取节假日 到期日前后顺延30天
-        List<String> dealCalendarHolidayList = dateCalService.getDealCalendarHoliday(
+        List<String> dealCalendarHolidayList = invDateCalService.getDealCalendarHoliday(
             DateUtil.addDay(finProductFeePlanDto.getVdate(), -30),
             DateUtil.addDay(finProductFeePlanDto.getMdate(), 30),
             finProductFeePlanDto.getDealCalId());
@@ -240,7 +240,7 @@ public class BussFinProductFeePlanImplService extends BaseService<BussFinProduct
             int count = 1;
             while (true) {
                 if (DateUtil.compareDate(startDateTemp, endDate) < 0) {
-                    Date calcDate = dateCalService.naturalDateCalc(startDate, cycleUnit,
+                    Date calcDate = invDateCalService.naturalDateCalc(startDate, cycleUnit,
                         Integer.parseInt(cycle) * count);
                     if (DateUtil.compareDate(calcDate, endDate) < 0) {
                         DateDiviDto dto = new DateDiviDto();

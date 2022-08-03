@@ -66,8 +66,12 @@
         NVL(PTFPDT.PA_BUSS_TYPE,
         NVL(TRD.FINPROD_TYPE2, TFPDT.FINPROD_TYPE2))),
         PTPD1.PA_BUSS_TYPE) END CASHFLOWTYPE,*/
-        NVL(NVL(NVL(TRD.FINPROD_TYPE2, TFPDT.FINPROD_TYPE2), TRD1.FINPROD_TYPE2),PTPD.PA_BUSS_TYPE) AS CASHFLOWTYPE,
-        NVL(NVL(TRD.PS, TFPDT.PS), TRD1.PS) cashType,
+        NVL(NVL(NVL(TRD.FINPROD_TYPE2, TFPDT.FINPROD_TYPE2), TRD1.FINPROD_TYPE2),PTPD.PA_BUSS_TYPE)   AS CASHFLOWTYPE,
+        <!-- modify by etliu 20220728 start 3.0.6协议回购+风险升级 XYHGFXSJ-640【实时资产头寸查询】【现金流缺口分析】协议回购深交所正回购提起购回，手工交收确认后，1、现金流缺口分析的现金流明细中，交易方向 显示错误，应显示提前购回。 2、实时资产头寸查询，债券质押式回购 债券， 持仓展示错误 start -->
+        case
+            when FPT.TYPE_8 = 'F07' and FPT.TYPE_6 = 'H01' and NVL(NVL(TRD.PS, TFPDT.PS), TRD1.PS) != 'T01' then NVL(NVL(TRD.PS, TFPDT.PS), TRD1.PS)
+            when FPT.TYPE_8 in ('F07','F10','F12') then FPT.type_7 else NVL(NVL(TRD.PS, TFPDT.PS), TRD1.PS) end as  cashType,
+        <!-- modify by etliu 20220728 start 3.0.6协议回购+风险升级 XYHGFXSJ-640【实时资产头寸查询】【现金流缺口分析】协议回购深交所正回购提起购回，手工交收确认后，1、现金流缺口分析的现金流明细中，交易方向 显示错误，应显示提前购回。 2、实时资产头寸查询，债券质押式回购 债券， 持仓展示错误 end -->
         CASE
         WHEN tfpdt.ps = 'C11' AND tfpdt.finprod_type2!='03'
         THEN tfpdt.finprod_type2
@@ -75,7 +79,7 @@
         THEN 'C03'
         ELSE NULL
         END                                                       FEETYPE,
-        nvl(nvl(fp.FINPROD_ABBR, ftp.finprod_id),fp.FINPROD_NAME) as ASSETSIGN,
+        case when FPT.TYPE_8 in ('F07','F10','F12') then null else nvl(nvl(fp.FINPROD_ABBR, ftp.finprod_id),fp.FINPROD_NAME) end  as ASSETSIGN,
         ROUND(nvl(pcpf.AMOUNT,0)/#{displayAccuracy},2) as CASHFLOW,
         pcpf.CCY ccy,
         <!--多级法人改造 add by jingqiongqiong 20200615-->
@@ -88,8 +92,10 @@
         from
         PTL_CASH_POSITION_FLOW pcpf
         left join PTL_PORTFOLIO pp on pcpf.PORTFOLIO_ID = pp.PORTFOLIO_ID
-        left join STL_PAY_ORDERS spo on pcpf.ORDER_ID = spo.ORDER_ID
-        left join TRD_PRODUCT_DEAL trd on spo.TRADE_ID = trd.TRADE_ID
+        left join (SELECT ORDER_ID,TRADE_ID,ORDER_STATUS FROM STL_PAY_ORDERS UNION ALL SELECT ORDER_ID,TRADE_ID,ORDER_STATUS FROM STL_PAY_TEMP_ORDERS ) spo on pcpf.ORDER_ID = spo.ORDER_ID
+        left join (SELECT TRADE_ID,TRADE_STATUS,IS_CANCEL,FINPROD_ID,PS,FINPROD_TYPE2 FROM TRD_PRODUCT_DEAL UNION ALL SELECT TRADE_ID,TRADE_STATUS,IS_CANCEL,FINPROD_ID,PS,FINPROD_TYPE2 FROM TRD_PRODUCT_TEMP_DEAL a
+            WHERE NOT EXISTS (SELECT 1 FROM TRD_PRODUCT_DEAL b WHERE a.TRADE_ID =b.TRADE_ID )
+            ) trd on spo.TRADE_ID = trd.TRADE_ID
         left join PA_TRD_PRODUCT_DEAL ptpd on ptpd.TRADE_ID = trd.TRADE_ID
         LEFT JOIN TRD_PRODUCT_DEAL TRD1 ON TRD1.TRADE_ID = PCPF.ORDER_ID<!-- 子组合资金调配，用交易编号关联指令编号 -->
         LEFT JOIN PA_TRD_PRODUCT_DEAL PTPD1 ON PTPD1.TRADE_ID = TRD1.TRADE_ID
@@ -99,6 +105,7 @@
         left join FIN_PRODUCT fp1 on fp1.FINPROD_MARKET_ID=pcpf.PORTFOLIO_ID
         left join FIN_PRODUCT_ADD fpa on fpa.FINPROD_ID=fp1.FINPROD_ID
         left join FIN_TRADE_PRODUCT FTP on FTP.FINPROD_ID = nvl(trd.FINPROD_ID,tfpdt.FINPROD_ID)
+        left join FIN_PRODUCT_TYPE FPT on FTP.FINPROD_ID =FPT.FINPROD_ID
         left join FIN_PRODUCT_ADD on fp.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
         left join PTL_PORTFOLIO_AUTHORITY pa on pa.portfolio_id = pp.portfolio_id
         left join STL_CAPACCT_INFO sci on sci.ACCT_NO = pcpf.acct_id
@@ -198,18 +205,19 @@
         '0' paType,
         fcp.PAY_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
-        sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as FUNDACCOUNT,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
         <!-- fp.FINPROD_TYPE2 || fcp.CASH_TYPE || '预测'  as CASHFLOWTYPE,   -->
         nvl(ftp.FINPROD_TYPE2,fp.FINPROD_TYPE2) CASHFLOWTYPE,
         fcp.CASH_TYPE,
         NULL FEETYPE,
-        nvl(nvl(ftp.finprod_id, fp.FINPROD_ABBR),fp.finprod_name) as ASSETSIGN,
+        case  WHEN FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29','F03', 'F05', 'F09', 'F30') then null
+        else nvl(nvl(ftp.finprod_id, fp.FINPROD_ABBR),fp.finprod_name) end  as ASSETSIGN,
         case
         WHEN FP.FINPROD_TYPE2 = #{F01}/*到期还本*100*/ THEN ROUND(psp.AMOUNT*fcp.CASH_AMT/#{displayAccuracy},2)
         WHEN FP.FINPROD_TYPE2 = 'F16' and fcp.CASH_TYPE = '05' /*产品费用支付*/ THEN ROUND(BPP.TDY_UNPAID_INTINCEXP,2)
         WHEN FP.FINPROD_TYPE2 = 'F16' and fcp.CASH_TYPE = '01' /*产品中间收息*/ THEN ROUND(BPP1.TDY_UNPAID_INTINCEXP,2)
-        when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F30') then -1 * ROUND(fcp.CASH_AMT/#{displayAccuracy},2)
-        when FTP.FINPROD_TYPE2 IN ('F03', 'F05', 'F09', 'F29') then ROUND(fcp.CASH_AMT/#{displayAccuracy},2)
+        when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29') then -1 * ROUND(fcp.CASH_AMT/#{displayAccuracy},2)
+        when FTP.FINPROD_TYPE2 IN ('F03', 'F05', 'F09', 'F30') then ROUND(fcp.CASH_AMT/#{displayAccuracy},2)
         else ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1)/#{displayAccuracy},2)
         end as CASHFLOW,
         psp.ccy,
@@ -224,6 +232,8 @@
         left join PTL_PORTFOLIO pp on psp.PORTFOLIO_ID = pp.PORTFOLIO_ID
         left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
         left join STL_CAPACCT_INFO sci on pci.ACCT_NO = sci.ACCT_NO
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
         left join FIN_CASH_PLAN fcp on fcp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_TRADE_PRODUCT FTP on FTP.FINPROD_ID = psp.FINPROD_ID
@@ -236,7 +246,8 @@
         LEFT JOIN FIN_PRODUCT_ADD PRODADD ON (PSP.PORTFOLIO_ID = PRODADD.PORTFOLIO_ID or pp.PARENT_PORTFOLIO_ID = PRODADD.PORTFOLIO_ID)
         LEFT JOIN FIN_PRODUCT PROD ON PRODADD.FINPROD_ID = PROD.FINPROD_ID
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
-        where PROD.VDATE &lt;= FCP.VDATE /*过滤掉产品陈立日之前的计划*/
+        where 1=1/*PROD.VDATE &lt;= FCP.VDATE*/ /*过滤掉产品陈立日之前的计划*/
+        and psp.HODING_TYPE = '03'
         <if test="portfolioIdList != null and portfolioIdList.size()>0 ">
             and psp.PORTFOLIO_ID in
             <foreach collection="portfolioIdList" item="item" separator="," open="(" close=")">
@@ -278,6 +289,7 @@
         where 1=1
         /*and tpd.CASH_ID = fcp.CASH_ID  */
         and( (tpd.CASH_ID is not null and tpd.CASH_ID    = fcp.CASH_ID)
+        or (tpd.cash_id is not null and tpd.cash_id = (select cash_id from FIN_CASH_PLAN fcp1 where fcp1.mdate=fcp.mdate and fcp1.FINPROD_ID=fcp.FINPROD_ID and fcp1.cash_type in('02','03') ))
         or(tpd.CASH_ID is null and tpd.FINPROD_ID = fcp.FINPROD_ID
         and tpd.FINPROD_TYPE2 = 'F16' and tpd.ps = decode(fcp.CASH_TYPE,'01','C7')))
         /* TISHKBS-632  产品端中间付息交易TRD_PRODUCT_DEAL.CASH_ID 为空 ，故不能过滤产品中间付息交易 modify by caojin 2020/6/7 end */
@@ -290,8 +302,14 @@
         /*平台日当天是付息截止日，用前一天的持仓来预测，当天增加或减少的持仓不影响利息预测*/
         and ((fcp.MDATE = to_date(#{sysDate},'YYYY-MM-DD') AND psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD') - 1)
         OR (fcp.MDATE != to_date(#{sysDate},'YYYY-MM-DD') AND psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD')))
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 start -->
+        and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 end -->
         and (fp.IS_RIGHT = 'N' or fp.IS_RIGHT is null)
+        and (fp.FINPROD_TYPE2 not in ('F18','F17','F07') or fp.FINPROD_TYPE2 is null)
         and pa.USER_ID = #{userId}
+        and psp.AMOUNT > 0
         <if test="ccy != null and ccy != ''">
             and (fp.CCY = #{ccy,jdbcType=VARCHAR} or FTP.CCY = #{ccy,jdbcType=VARCHAR})
         </if>
@@ -309,48 +327,78 @@
             </foreach>
 
         </if>
-        and not exists (
-        SELECT 1
-        FROM
-        PTL_CASH_POSITION_FLOW pcpf
-        left join PTL_PORTFOLIO pp on pcpf.PORTFOLIO_ID = pp.PORTFOLIO_ID
-        left join STL_PAY_ORDERS spo on pcpf.ORDER_ID = spo.ORDER_ID
-        left join TRD_PRODUCT_DEAL trd on spo.TRADE_ID = trd.TRADE_ID
-        left join PA_TRD_PRODUCT_DEAL ptpd on ptpd.TRADE_ID = trd.TRADE_ID
-        LEFT JOIN TRD_PRODUCT_DEAL TRD1 ON TRD1.TRADE_ID = PCPF.ORDER_ID
-        LEFT JOIN PA_TRD_PRODUCT_DEAL PTPD1 ON PTPD1.TRADE_ID = TRD1.TRADE_ID
-        left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on spo.TRADE_ID = tfpdt.TOTLE_TRADE_ID
-        left join PA_TRD_FIN_PRODUCT_DEAL_TOTAL ptfpdt on ptfpdt.TOTLE_TRADE_ID = tfpdt.TOTLE_TRADE_ID
-        left join FIN_PRODUCT fp on fp.FINPROD_ID = nvl(trd.FINPROD_ID,tfpdt.FINPROD_ID)
-        left join FIN_TRADE_PRODUCT FTP on FTP.FINPROD_ID = nvl(trd.FINPROD_ID,tfpdt.FINPROD_ID)
+        union all
+
+        <!-- 3、查询非含权资产未来现金流(存款+项目类+计划类利率)。（资产收息预测、资产还本预测、资产到期预测） -->
+
+        select distinct
+        '' seqno,
+        '0' paType,
+        fcp.PAY_DATE as CDATE,
+        pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
+        nvl(ftp.FINPROD_TYPE2,fp.FINPROD_TYPE2) CASHFLOWTYPE,
+        fcp.CASH_TYPE,
+        NULL FEETYPE,
+        nvl(nvl(ftp.finprod_id, fp.FINPROD_ABBR),fp.finprod_name) as ASSETSIGN,
+        ROUND((case when fp.ISSUE_AMT - NVL(REPAY_PRIN_INFO.PRIN_AMT, 0) = 0 then psp.AMOUNT else
+        ROUND(psp.AMOUNT * fcp.CASH_AMT/(fp.ISSUE_AMT - NVL(REPAY_PRIN_INFO.PRIN_AMT, 0)), 2) end )/#{displayAccuracy},2) as CASHFLOW,
+        psp.ccy,
+        <!--多级法人改造 add by jingqiongqiong 20200615-->
+        pp.PORTFOLIO_ID portfolioId1
+        <!--多级法人改造 add by jingqiongqiong 20200615-->
+        <!--add by swwan [重庆银行] 组合系列 20210722 start-->
+        ,ppp.PORTFOLIO_SERIES portfolioSeries
+        <!--add by swwan [重庆银行] 组合系列 20210722 end-->
+        ,psp.update_time update_time
+        from PTL_SEC_POSITION psp
+        left join PTL_PORTFOLIO pp on psp.PORTFOLIO_ID = pp.PORTFOLIO_ID
+        left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
+        left join STL_CAPACCT_INFO sci on pci.ACCT_NO = sci.ACCT_NO
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
+        left join FIN_CASH_PLAN fcp on fcp.FINPROD_ID = psp.FINPROD_ID
+        left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
+        left join FIN_TRADE_PRODUCT FTP on FTP.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT_ADD on fp.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
         left join PTL_PORTFOLIO_AUTHORITY pa on pa.portfolio_id = pp.portfolio_id
-        left join STL_CAPACCT_INFO sci on sci.ACCT_NO = pcpf.acct_id
+        left join FIN_CASH_INFO fci on fcp.FINPROD_ID = fci.FINPROD_ID and fci.cash_id = fcp.cash_id
+        left JOIN BOK_POSITION_PRDFEE BPP ON fcp.FINPROD_ID = BPP.FINPROD_ID AND fcp.BRANCH = BPP.BRANCH AND BPP.CDATE = fcp.MDATE -1 and
+        fci.CASH_TYPE_2 = BPP.FEE_TYPE
+        left JOIN BOK_POSITION_PRD BPP1 ON fcp.FINPROD_ID = BPP1.FINPROD_ID AND fcp.BRANCH = BPP1.BRANCH AND BPP1.CDATE = fcp.MDATE -1
+        LEFT JOIN FIN_PRODUCT_ADD PRODADD ON (PSP.PORTFOLIO_ID = PRODADD.PORTFOLIO_ID or pp.PARENT_PORTFOLIO_ID = PRODADD.PORTFOLIO_ID)
+        LEFT JOIN FIN_PRODUCT PROD ON PRODADD.FINPROD_ID = PROD.FINPROD_ID
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
-        where (
-        (trd.TRADE_ID is not null and trd.TRADE_STATUS = '01' AND trd.IS_CANCEL='N')
-        or (TRD1.TRADE_ID is not null and TRD1.TRADE_STATUS = '01' AND TRD1.IS_CANCEL='N')
-        or (tfpdt.TOTLE_TRADE_ID is not null and tfpdt.TRADE_STATUS = '01' AND tfpdt.IS_CANCEL='N')
-        )
+        LEFT JOIN
+            (SELECT FINPROD_ID, SUM(PRIN_AMT) PRIN_AMT
+            FROM
+            FIN_CASH_PLAN
+            WHERE TO_DATE(#{sysDate}, 'YYYY-MM-DD') >= MDATE
+            AND CASH_TYPE IN ('02', '03')
+            GROUP BY FINPROD_ID
+            ) REPAY_PRIN_INFO
+            ON
+            REPAY_PRIN_INFO.FINPROD_ID = psp.FINPROD_ID
+        where 1=1/*PROD.VDATE &lt;= FCP.VDATE*/ /*过滤掉产品陈立日之前的计划*/
+        and psp.HODING_TYPE = '03'
         <if test="portfolioIdList != null and portfolioIdList.size()>0 ">
-            and (pcpf.PORTFOLIO_ID in
-            <foreach collection="portfolioIdList" index="index" item="item" separator="," open="(" close=")">
-                <if test="(index % 998) == 0">
-                    null) OR pcpf.PORTFOLIO_ID in (
-                </if>
+            and psp.PORTFOLIO_ID in
+            <foreach collection="portfolioIdList" item="item" separator="," open="(" close=")">
                 #{item}
-            </foreach>)
+            </foreach>
+        </if>
+        <if test="fundAccountList != null and fundAccountList.size()>0 ">
+            and pci.ACCT_NO in
+            <foreach collection="fundAccountList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
         </if>
         <!--  add by wangyang1 【吉林银行】 增加 产品经理  2019年9月29日 start -->
         <if test=" prodManager !=null and prodManager.size()>0" >
-            AND (FIN_PRODUCT_ADD.PROD_MANAGER IN
-            <foreach collection="prodManager" item="item" index="index" open="(" close=")" separator=",">
-                <if test="(index % 998) == 0">
-                    null) OR FIN_PRODUCT_ADD.PROD_MANAGER IN (
-                </if>
+            AND FIN_PRODUCT_ADD.PROD_MANAGER IN
+            <foreach collection="prodManager" item="item" open="(" close=")" separator=",">
                 #{item}
-            </foreach>)
-
+            </foreach>
         </if>
         <!--  add by wangyang1 【吉林银行】 增加 产品经理end -->
         <!--  add by swwan [重庆银行] 组合系列 20210722 start -->
@@ -364,65 +412,63 @@
             </foreach>)
         </if>
         <!--  add by swwan [重庆银行] 组合系列 20210722 end -->
-        <if test="fundAccountList != null and fundAccountList.size()>0 ">
-            and (pcpf.ACCT_ID in
-            <foreach collection="fundAccountList" item="item" index= "index" open="(" close=")" separator="," >
-                <if test="(index % 998) == 0">
-                    null) or pcpf.ACCT_ID in (
-                </if>
-                #{item}
-            </foreach>)
-        </if>
-
         <if test="searchDateStart != null and searchDateStart != ''">
-            AND (pcpf.CDATE BETWEEN TO_DATE(#{searchDateStart},'YYYY-MM-DD')
+            AND (fcp.PAY_DATE BETWEEN TO_DATE(#{searchDateStart},'YYYY-MM-DD')
             AND TO_DATE(#{searchDateEnd},'YYYY-MM-DD'))
         </if>
-        and pcpf.HODING_TYPE = '03'
+        and not exists (
+        select 1 from TRD_PRODUCT_DEAL tpd
+        /* TISHKBS-632  产品端中间付息交易TRD_PRODUCT_DEAL.CASH_ID 为空 ，故不能过滤产品中间付息交易 modify by caojin 2020/6/7 start */
+        where 1=1
+        /*and tpd.CASH_ID = fcp.CASH_ID  */
+        and( (tpd.CASH_ID is not null and tpd.CASH_ID    = fcp.CASH_ID)
+        or (tpd.cash_id is not null and tpd.cash_id = (select cash_id from FIN_CASH_PLAN fcp1 where fcp1.mdate=fcp.mdate and fcp1.FINPROD_ID=fcp.FINPROD_ID and fcp1.cash_type in('02','03') ))
+        or(tpd.CASH_ID is null and tpd.FINPROD_ID = fcp.FINPROD_ID
+        and tpd.FINPROD_TYPE2 = 'F16' and tpd.ps = decode(fcp.CASH_TYPE,'01','C7')))
+        /* TISHKBS-632  产品端中间付息交易TRD_PRODUCT_DEAL.CASH_ID 为空 ，故不能过滤产品中间付息交易 modify by caojin 2020/6/7 end */
+        and TPD.MDATE >= FCP.VDATE
+        AND FCP.MDATE >= TPD.MDATE
+        and tpd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR}
+        AND TPD.IS_CANCEL='N'
+        <!-- 产品中间付息时，没有存cash_id，用本次付息截止日是否在一个区间来判断这个区间是否已经付过息     -->
+        )
+        /*平台日当天是付息截止日，用前一天的持仓来预测，当天增加或减少的持仓不影响利息预测*/
+        and ((fcp.MDATE = to_date(#{sysDate},'YYYY-MM-DD') AND psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD') - 1)
+        OR (fcp.MDATE != to_date(#{sysDate},'YYYY-MM-DD') AND psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD')))
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 start -->
+        and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 end -->
+        and (fp.IS_RIGHT = 'N' or fp.IS_RIGHT is null)
+        and fp.FINPROD_TYPE2  in ('F18','F17','F07')
         and pa.USER_ID = #{userId}
+        and psp.AMOUNT > 0
         <if test="ccy != null and ccy != ''">
-            and pcpf.CCY = #{ccy,jdbcType=VARCHAR}
+            and (fp.CCY = #{ccy,jdbcType=VARCHAR} or FTP.CCY = #{ccy,jdbcType=VARCHAR})
         </if>
-        AND (SPO.ORDER_STATUS = #{ORDER_STATUS_01} OR SPO.ORDER_STATUS IS NULL)
-        AND PCPF.ORDER_ID NOT IN
-        (SELECT RTRIM(SPO1.ORDER_ID, 'R')
-        FROM STL_PAY_ORDERS SPO1
-        WHERE SPO1.ORDER_STATUS = #{ORDER_STATUS_02}
-        <if test="searchDateStart != null and searchDateStart != ''">
-            AND (SPO1.SETTLE_DATE BETWEEN TO_DATE(#{searchDateStart},'YYYY-MM-DD')
-            AND TO_DATE(#{searchDateEnd},'YYYY-MM-DD'))
-        </if>
-        <if test="portfolioIdList1 != null and portfolioIdList1.size()>0 ">
-            and SPO1.PORTFOLIO_ID in
-            <foreach collection="portfolioIdList1" item="item" separator="," open="(" close=")">
-                #{item}
-            </foreach>
-        </if>)
         <if test="cashTypeList != null and cashTypeList.size()>0 ">
-            and ( NVL(NVL(NVL(TRD.FINPROD_TYPE2, TFPDT.FINPROD_TYPE2), TRD1.FINPROD_TYPE2),PTPD.PA_BUSS_TYPE) in
+            and nvl(ftp.FINPROD_TYPE2,fp.FINPROD_TYPE2)  in
             <foreach collection="cashTypeList" item="item" separator="," open="(" close=")">
                 #{item}
             </foreach>
-            )
+
         </if>
         <if test="psList != null and psList.size()>0 ">
-            and ( NVL(NVL(TRD.PS, TFPDT.PS), TRD1.PS) in
+            and fcp.CASH_TYPE  in
             <foreach collection="psList" item="item" separator="," open="(" close=")">
                 #{item}
             </foreach>
-            )
+
         </if>
-        )
-        and psp.AMOUNT > 0
         union all
 
-        <!-- 3、查询含权资产未来现金流。（含权债收息、还本预测） -->
+        <!-- 4、查询含权资产未来现金流。（含权债收息、还本预测） -->
         select distinct
         '' seqno,
         '0' paType,
         fcp.PAY_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
-        sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as FUNDACCOUNT,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
         <!--  fp.FINPROD_TYPE2 || fcp.CASH_TYPE || '预测'  as CASHFLOWTYPE,   -->
         fp.FINPROD_TYPE2 as CASHFLOWTYPE,
         fcp.CASH_TYPE,
@@ -441,6 +487,8 @@
         left join PTL_PORTFOLIO pp on psp.PORTFOLIO_ID = pp.PORTFOLIO_ID
         left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
         left join STL_CAPACCT_INFO sci on pci.ACCT_NO = sci.ACCT_NO
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
         left join FIN_CASH_PLAN fcp on fcp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT_ADD on fp.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
@@ -448,7 +496,8 @@
         LEFT JOIN FIN_PRODUCT_ADD PRODADD ON (PSP.PORTFOLIO_ID = PRODADD.PORTFOLIO_ID or pp.PARENT_PORTFOLIO_ID = PRODADD.PORTFOLIO_ID)
         LEFT JOIN FIN_PRODUCT PROD ON PRODADD.FINPROD_ID = PROD.FINPROD_ID
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
-        where PROD.VDATE &lt;= FCP.VDATE /*过滤掉产品陈立日之前的计划*/
+        where 1=1/*PROD.VDATE &lt;= FCP.VDATE*/ /*过滤掉产品陈立日之前的计划*/
+        and psp.HODING_TYPE = '03'
         <if test="portfolioIdList != null and portfolioIdList.size()>0 ">
             and psp.PORTFOLIO_ID in
             <foreach collection="portfolioIdList" item="item" separator="," open="(" close=")">
@@ -500,7 +549,9 @@
         </if>
         and not exists (
         select 1 from TRD_PRODUCT_DEAL tpd
-        where tpd.CASH_ID = fcp.CASH_ID
+        where (tpd.CASH_ID = fcp.CASH_ID
+            or ( tpd.cash_id = (select cash_id from FIN_CASH_PLAN fcp1 where fcp1.mdate=fcp.mdate and fcp1.FINPROD_ID=fcp.FINPROD_ID and fcp1.cash_type in('02','03') ))
+            )
         and tpd.MDATE >= fcp.VDATE
         and fcp.MDATE >= tpd.MDATE
         and tpd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR}
@@ -509,6 +560,10 @@
         /*平台日当天是付息截止日，用前一天的持仓来预测，当天增加或减少的持仓不影响利息预测*/
         and ((fcp.MDATE = to_date(#{sysDate},'YYYY-MM-DD') AND psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD') - 1)
         OR (fcp.MDATE != to_date(#{sysDate},'YYYY-MM-DD') AND psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD')))
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 start -->
+        and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 end -->
         and fp.IS_RIGHT = 'Y'
         and (
         NOT EXISTS (
@@ -531,14 +586,14 @@
 
         union all
 
-        <!-- 4、查询含权资产未来现金流。（含权债行权预测） -->
+        <!-- 5、查询含权资产未来现金流。（含权债行权预测） -->
 
         select distinct
         '' seqno,
         '0' paType,
         fep1.EXERCISE_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
-        sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as FUNDACCOUNT,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
         <!--  fp.FINPROD_TYPE2 || fcp.CASH_TYPE || '预测' as CASHFLOWTYPE,   -->
         fp.FINPROD_TYPE2 as CASHFLOWTYPE,
         '行权' CASH_TYPE,
@@ -558,6 +613,8 @@
         left join PTL_PORTFOLIO_AUTHORITY pa on pa.portfolio_id = pp.portfolio_id
         left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
         left join STL_CAPACCT_INFO sci on pci.ACCT_NO = sci.ACCT_NO
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT_ADD on fp.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
         left join FIN_EXERCISE_PLAN fep1 on fep1.FINPROD_ID = psp.FINPROD_ID
@@ -565,8 +622,9 @@
         LEFT JOIN FIN_PRODUCT PROD ON PRODADD.FINPROD_ID = PROD.FINPROD_ID
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
         <where>
-            PROD.VDATE &lt;= fep1.VDATE /*过滤掉产品陈立日之前的计划*/
+            1=1 /*PROD.VDATE &lt;= fep1.VDATE*/ /*过滤掉产品陈立日之前的计划*/
             AND psp.AMOUNT > 0
+            and psp.HODING_TYPE = '03'
             AND NOT EXISTS (SELECT 1 FROM FIN_EXERCISE_PLAN FEP WHERE FEP.CASH_ID = FEP1.CASH_ID AND FEP.EXERCISE_DATE &lt; FEP1.EXERCISE_DATE
             AND FEP.FINPROD_ID = FEP1.FINPROD_ID)
             <if test="portfolioIdList != null and portfolioIdList.size()>0 ">
@@ -677,8 +735,10 @@
         left join PTL_PORTFOLIO pp on pcpf.PORTFOLIO_ID = pp.PORTFOLIO_ID
         left join FIN_PRODUCT on pcpf.PORTFOLIO_ID = FIN_PRODUCT.FINPROD_MARKET_ID
         left join FIN_PRODUCT_ADD on FIN_PRODUCT.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
-        left join STL_PAY_ORDERS spo on pcpf.ORDER_ID = spo.ORDER_ID
-        left join TRD_PRODUCT_DEAL trd on spo.TRADE_ID = trd.TRADE_ID
+        left join (SELECT ORDER_ID,TRADE_ID,ORDER_STATUS FROM STL_PAY_ORDERS UNION ALL SELECT ORDER_ID,TRADE_ID,ORDER_STATUS FROM STL_PAY_TEMP_ORDERS ) spo on pcpf.ORDER_ID = spo.ORDER_ID
+        left join (SELECT TRADE_ID,TRADE_STATUS,IS_CANCEL,FINPROD_ID,PS,FINPROD_TYPE2 FROM TRD_PRODUCT_DEAL UNION ALL SELECT TRADE_ID,TRADE_STATUS,IS_CANCEL,FINPROD_ID,PS,FINPROD_TYPE2 FROM TRD_PRODUCT_TEMP_DEAL a
+            WHERE NOT EXISTS (SELECT 1 FROM TRD_PRODUCT_DEAL b WHERE a.TRADE_ID =b.TRADE_ID )
+            ) trd on spo.TRADE_ID = trd.TRADE_ID
         left join TRD_PRODUCT_DEAL trd1 on pcpf.ORDER_ID = trd1.TRADE_ID<!-- 子组合资金调配，用交易编号关联指令编号 -->
         left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on spo.TRADE_ID = tfpdt.TOTLE_TRADE_ID
         left join STL_CAPACCT_INFO sci on sci.ACCT_NO = pcpf.ACCT_ID
@@ -749,19 +809,15 @@
         '' seqno,
         fcp.PAY_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
-        fp.ccy CCY,
-        sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as fundAccount,
-        case when fp.FINPROD_TYPE2 = 'F02' and -1*psp.AMOUNT*fcp.CASH_AMT &lt; 0
-        then -1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2)
-        when fp.FINPROD_TYPE2 != 'F02' and psp.AMOUNT*fcp.CASH_AMT &gt; 0
-        then ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2) else 0 end as INCASHFLOW,
-        case when fp.FINPROD_TYPE2 = 'F02' and psp.AMOUNT*fcp.CASH_AMT &gt; 0
-        then -1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2)
-        when fp.FINPROD_TYPE2 != 'F02' and psp.AMOUNT*fcp.CASH_AMT &lt; 0
-        then ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2) else 0 end as OUTCASHFLOW,
-        case when fp.FINPROD_TYPE2 != 'F02'
-        then -1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2)
-        else ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2)
+        psp.ccy CCY,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29') then 0
+             when FTP.FINPROD_TYPE2 IN ('F03', 'F05', 'F09', 'F30') then nvl(ROUND(fcp.CASH_AMT,2),0)
+            else  nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0) end as INCASHFLOW,
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29') then nvl(-1 * ROUND(fcp.CASH_AMT,2),0) else 0 end as OUTCASHFLOW,
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29') then nvl(-1 * ROUND(fcp.CASH_AMT,2),0)
+                when FTP.FINPROD_TYPE2 IN ('F03', 'F05', 'F09', 'F30') then nvl(ROUND(fcp.CASH_AMT,2),0)
+            else nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0)
         end as NETCASHFLOW,
         <!--多级法人改造 add by jingqiongqiong 20200615-->
         pp.PORTFOLIO_ID as portfolioId1
@@ -773,14 +829,18 @@
         left join PTL_PORTFOLIO pp on psp.PORTFOLIO_ID = pp.PORTFOLIO_ID
         left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID
         and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
         left join FIN_CASH_PLAN fcp on fcp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT_ADD on fp.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
         left join STL_CAPACCT_INFO sci on sci.ACCT_NO = pci.ACCT_NO
         left join PTL_PORTFOLIO_AUTHORITY pa on pa.portfolio_id = pp.portfolio_id
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
+        left join FIN_TRADE_PRODUCT FTP on FTP.FINPROD_ID = psp.FINPROD_ID
 
         where 1 = 1
+        and psp.HODING_TYPE = '03'
         <if test="portfolioIdList1 != null and portfolioIdList1.size()>0 ">
             and psp.PORTFOLIO_ID in
             <foreach collection="portfolioIdList1" item="item" separator="," open="(" close=")">
@@ -815,25 +875,125 @@
         </if>
         and not exists (
         select 1 from TRD_PRODUCT_DEAL tpd
-        where tpd.CASH_ID = fcp.CASH_ID
+        where (tpd.CASH_ID = fcp.CASH_ID
+        or (tpd.cash_id is not null and tpd.cash_id = (select cash_id from FIN_CASH_PLAN fcp1 where fcp1.mdate=fcp.mdate and fcp1.FINPROD_ID=fcp.FINPROD_ID and fcp1.cash_type in('02','03') )))
         and tpd.MDATE >= FCP.VDATE
         AND FCP.MDATE >= TPD.MDATE
         and tpd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR}
         AND TPD.IS_CANCEL='N'
         )
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 start -->
+        and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 end -->
         and psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD')
         and (fp.IS_RIGHT = 'N' or fp.IS_RIGHT is null)
-        and fp.CCY = #{ccy1,jdbcType=VARCHAR}
+        and (fp.FINPROD_TYPE2 not in ('F18','F17','F07') or fp.FINPROD_TYPE2 is null)
+        and psp.ccy = #{ccy1,jdbcType=VARCHAR}
         and pa.USER_ID = #{userId}
         union all
 
-        <!-- 3、查询含权资产未来现金流。（含权债收息、还本预测） -->
+        <!-- 3、查询非含权资产未来现金流(存款+项目类+计划类利率)。（资产收息预测、资产还本预测、资产到期预测） -->
+
+        select DISTINCT
+        '' seqno,
+        fcp.PAY_DATE as CDATE,
+        pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
+        psp.ccy CCY,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
+        case when fp.ISSUE_AMT - NVL(REPAY_PRIN_INFO.PRIN_AMT, 0) = 0 then psp.AMOUNT else
+        ROUND(psp.AMOUNT * fcp.CASH_AMT/(fp.ISSUE_AMT - NVL(REPAY_PRIN_INFO.PRIN_AMT, 0)), 2) end as INCASHFLOW,
+        0 OUTCASHFLOW,
+        case when fp.ISSUE_AMT - NVL(REPAY_PRIN_INFO.PRIN_AMT, 0) = 0 then psp.AMOUNT else
+        ROUND(psp.AMOUNT * fcp.CASH_AMT/(fp.ISSUE_AMT - NVL(REPAY_PRIN_INFO.PRIN_AMT, 0)), 2) end as NETCASHFLOW,
+        <!--多级法人改造 add by jingqiongqiong 20200615-->
+        pp.PORTFOLIO_ID as portfolioId1
+        <!--多级法人改造 add by jingqiongqiong 20200615-->
+        <!--add by swwan [重庆银行] 组合系列 20210722 start-->
+        ,ppp.PORTFOLIO_SERIES portfolioSeries
+        <!--add by swwan [重庆银行] 组合系列 20210722 end-->
+        from PTL_SEC_POSITION psp
+        left join PTL_PORTFOLIO pp on psp.PORTFOLIO_ID = pp.PORTFOLIO_ID
+        left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID
+        and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
+        left join FIN_CASH_PLAN fcp on fcp.FINPROD_ID = psp.FINPROD_ID
+        left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
+        left join FIN_PRODUCT_ADD on fp.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
+        left join STL_CAPACCT_INFO sci on sci.ACCT_NO = pci.ACCT_NO
+        left join PTL_PORTFOLIO_AUTHORITY pa on pa.portfolio_id = pp.portfolio_id
+        left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
+        LEFT JOIN
+            (SELECT FINPROD_ID, SUM(PRIN_AMT) PRIN_AMT
+            FROM
+            FIN_CASH_PLAN
+            WHERE TO_DATE(#{sysDate}, 'YYYY-MM-DD') >= MDATE
+            AND CASH_TYPE IN ('02', '03')
+            GROUP BY FINPROD_ID
+            ) REPAY_PRIN_INFO
+            ON
+            REPAY_PRIN_INFO.FINPROD_ID = psp.FINPROD_ID
+        where 1 = 1
+        and psp.HODING_TYPE = '03'
+        <if test="portfolioIdList1 != null and portfolioIdList1.size()>0 ">
+            and psp.PORTFOLIO_ID in
+            <foreach collection="portfolioIdList1" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <!--  add by wangyang1 【吉林银行】 增加 产品经理  2019年9月29日 start -->
+        <if test=" prodManager1 !=null and !prodManager1.isEmpty()" >
+            AND FIN_PRODUCT_ADD.PROD_MANAGER IN
+            <foreach collection="prodManager1" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <!--  add by wangyang1 【吉林银行】 增加 产品经理end -->
+        <!--  add by swwan [重庆银行] 组合系列 20210722 start -->
+        <if test="portfolioSeriesList1 !=null and portfolioSeriesList1.size()>0" >
+            AND (ppp.PORTFOLIO_SERIES IN
+            <foreach collection="portfolioSeriesList1" item="item" index="index" open="(" close=")" separator=",">
+                <if test="(index % 998) == 0">
+                    null) OR ppp.PORTFOLIO_SERIES IN (
+                </if>
+                #{item}
+            </foreach>)
+        </if>
+        <!--  add by swwan [重庆银行] 组合系列 20210722 end -->
+        <if test="fundAccount1 != null and fundAccount1 != '' ">
+            and pci.ACCT_NO = #{fundAccount1}
+        </if>
+        <if test="searchDateStart1 != null and searchDateStart1 != ''">
+            AND (fcp.PAY_DATE BETWEEN TO_DATE(#{searchDateStart1},'YYYY-MM-DD')
+            AND TO_DATE(#{searchDateEnd1},'YYYY-MM-DD'))
+        </if>
+        and not exists (
+        select 1 from TRD_PRODUCT_DEAL tpd
+        where (tpd.CASH_ID = fcp.CASH_ID
+        or (tpd.cash_id is not null and tpd.cash_id = (select cash_id from FIN_CASH_PLAN fcp1 where fcp1.mdate=fcp.mdate and fcp1.FINPROD_ID=fcp.FINPROD_ID and fcp1.cash_type in('02','03') )))
+        and tpd.MDATE >= FCP.VDATE
+        AND FCP.MDATE >= TPD.MDATE
+        and tpd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR}
+        AND TPD.IS_CANCEL='N'
+        )
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 start -->
+        and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 end -->
+        and psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD')
+        and fp.FINPROD_TYPE2  in ('F18','F17','F07')
+        and psp.ccy = #{ccy1,jdbcType=VARCHAR}
+        and pa.USER_ID = #{userId}
+        union all
+
+        <!-- 4、查询含权资产未来现金流。（含权债收息、还本预测） -->
         select DISTINCT
         '' seqno,
         fcp.PAY_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
         fp.ccy CCY,
-        sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as fundAccount,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
         case when psp.AMOUNT*fcp.CASH_AMT &gt; 0
         then ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2) else 0 end as INCASHFLOW,
         case when psp.AMOUNT*fcp.CASH_AMT &lt; 0
@@ -849,6 +1009,8 @@
         left join PTL_PORTFOLIO pp on psp.PORTFOLIO_ID = pp.PORTFOLIO_ID
         left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID
         and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
         left join FIN_CASH_PLAN fcp on fcp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT_ADD on fp.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
@@ -857,6 +1019,7 @@
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
 
         where 1 = 1
+        and psp.HODING_TYPE = '03'
         <if test="portfolioIdList1 != null and portfolioIdList1.size()>0 ">
             and psp.PORTFOLIO_ID in
             <foreach collection="portfolioIdList1" item="item" separator="," open="(" close=")">
@@ -891,12 +1054,17 @@
         </if>
         and not exists (
         select 1 from TRD_PRODUCT_DEAL tpd
-        where tpd.CASH_ID = fcp.CASH_ID
+        where (tpd.CASH_ID = fcp.CASH_ID
+        or (tpd.cash_id is not null and tpd.cash_id = (select cash_id from FIN_CASH_PLAN fcp1 where fcp1.mdate=fcp.mdate and fcp1.FINPROD_ID=fcp.FINPROD_ID and fcp1.cash_type in('02','03') )))
         and tpd.MDATE >= FCP.VDATE
         AND FCP.MDATE >= TPD.MDATE
         and tpd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR}
         AND TPD.IS_CANCEL='N'
         )
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 start -->
+        and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 end -->
         and psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD')
         and fp.IS_RIGHT = 'Y'
         and (
@@ -917,14 +1085,14 @@
         and pa.USER_ID = #{userId}
         union all
 
-        <!-- 4、查询含权资产未来现金流。（含权债行权预测） -->
+        <!-- 5、查询含权资产未来现金流。（含权债行权预测） -->
 
         select DISTINCT
         '' seqno,
         fep1.EXERCISE_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
         fp.ccy CCY,
-        sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as fundAccount,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
         case when psp.AMOUNT*fep1.EXERCISE_PRICE &gt; 0
         then ROUND(psp.AMOUNT*fep1.EXERCISE_PRICE/100,2) else 0 end as INCASHFLOW,
         case when psp.AMOUNT*fep1.EXERCISE_PRICE &lt; 0
@@ -941,6 +1109,8 @@
         left join PTL_PORTFOLIO_AUTHORITY pa on pa.portfolio_id = pp.portfolio_id
         left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID
         and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT_ADD on fp.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
         left join (select fep.FINPROD_ID,fep.EXERCISE_DATE,fep.EXERCISE_PRICE
@@ -955,7 +1125,7 @@
         left join STL_CAPACCT_INFO sci on sci.ACCT_NO = pci.ACCT_NO
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
         where 1 = 1
-
+        and psp.HODING_TYPE = '03'
         <if test="portfolioIdList1 != null and portfolioIdList1.size()>0 ">
             and psp.PORTFOLIO_ID in
             <foreach collection="portfolioIdList1" item="item" separator="," open="(" close=")">
@@ -1061,12 +1231,22 @@
         left join PTL_PORTFOLIO pp on pcpf.PORTFOLIO_ID = pp.PORTFOLIO_ID
         left join FIN_PRODUCT on pcpf.PORTFOLIO_ID = FIN_PRODUCT.FINPROD_MARKET_ID
         left join FIN_PRODUCT_ADD on FIN_PRODUCT.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
-        left join STL_PAY_ORDERS spo on pcpf.ORDER_ID = spo.ORDER_ID
+        left join (SELECT ORDER_ID,TRADE_ID,ORDER_STATUS FROM STL_PAY_ORDERS UNION ALL SELECT ORDER_ID,TRADE_ID,ORDER_STATUS FROM STL_PAY_TEMP_ORDERS ) spo on pcpf.ORDER_ID = spo.ORDER_ID
         left join STL_CAPACCT_INFO sci on sci.ACCT_NO = pcpf.ACCT_ID
         left join PTL_PORTFOLIO_AUTHORITY pa on pa.portfolio_id = pp.portfolio_id
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
+        left join (SELECT TRADE_ID,TRADE_STATUS,IS_CANCEL,FINPROD_ID,PS,FINPROD_TYPE2 FROM TRD_PRODUCT_DEAL UNION ALL SELECT TRADE_ID,TRADE_STATUS,IS_CANCEL,FINPROD_ID,PS,FINPROD_TYPE2 FROM TRD_PRODUCT_TEMP_DEAL a
+            WHERE NOT EXISTS (SELECT 1 FROM TRD_PRODUCT_DEAL b WHERE a.TRADE_ID =b.TRADE_ID )
+            ) trd on spo.TRADE_ID = trd.TRADE_ID
+        LEFT JOIN TRD_PRODUCT_DEAL TRD1 ON TRD1.TRADE_ID = PCPF.ORDER_ID<!-- 子组合资金调配，用交易编号关联指令编号 -->
+        left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on spo.TRADE_ID = tfpdt.TOTLE_TRADE_ID
 
         where 1 = 1
+        AND (
+        (trd.TRADE_ID is not null and trd.TRADE_STATUS = '01' AND trd.IS_CANCEL='N')
+        or (TRD1.TRADE_ID is not null and TRD1.TRADE_STATUS = '01' AND TRD1.IS_CANCEL='N')
+        or (tfpdt.TOTLE_TRADE_ID is not null and tfpdt.TRADE_STATUS = '01' AND tfpdt.IS_CANCEL='N')
+        )
         <if test="portfolioIdList1 != null and portfolioIdList1.size()>0 ">
             and (pcpf.PORTFOLIO_ID in
             <foreach collection="portfolioIdList1" index="index" item="item" separator="," open="(" close=")">
@@ -1111,6 +1291,11 @@
         and pcpf.HODING_TYPE = '03'
         and pcpf.CCY = #{ccy1,jdbcType=VARCHAR}
         and pa.USER_ID = #{userId}
+        AND (SPO.ORDER_STATUS = #{ORDER_STATUS_01} OR SPO.ORDER_STATUS IS NULL)
+        AND PCPF.ORDER_ID NOT IN
+            (SELECT RTRIM(SPO1.ORDER_ID, 'R')
+                FROM STL_PAY_ORDERS SPO1
+                WHERE SPO1.ORDER_STATUS = #{ORDER_STATUS_02})
         union all
 
         <!-- 2、查询非含权资产未来现金流。（资产收息预测、资产还本预测、资产到期预测） -->
@@ -1119,19 +1304,15 @@
         '' seqno,
         fcp.PAY_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
-        fp.ccy CCY ,
-        sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as fundAccount,
-        case when fp.FINPROD_TYPE2 = 'F02' and -1*psp.AMOUNT*fcp.CASH_AMT &lt; 0
-        then -1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2)
-        when fp.FINPROD_TYPE2 != 'F02' and psp.AMOUNT*fcp.CASH_AMT &gt; 0
-        then ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2) else 0 end as INCASHFLOW,
-        case when fp.FINPROD_TYPE2 = 'F02' and psp.AMOUNT*fcp.CASH_AMT &gt; 0
-        then -1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2)
-        when fp.FINPROD_TYPE2 != 'F02' and psp.AMOUNT*fcp.CASH_AMT &lt; 0
-        then ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2) else 0 end as OUTCASHFLOW,
-        case when fp.FINPROD_TYPE2 != 'F02'
-        then -1 * ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2)
-        else ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2)
+        psp.ccy CCY ,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29') then 0
+        when FTP.FINPROD_TYPE2 IN ('F03', 'F05', 'F09', 'F30') then nvl(ROUND(fcp.CASH_AMT,2),0)
+        else  nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0) end as INCASHFLOW,
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29') then nvl(-1 * ROUND(fcp.CASH_AMT,2),0) else 0 end as OUTCASHFLOW,
+        case when FTP.FINPROD_TYPE2 IN ('F02', 'F04', 'F08', 'F29') then nvl(-1 * ROUND(fcp.CASH_AMT,2),0)
+        when FTP.FINPROD_TYPE2 IN ('F03', 'F05', 'F09', 'F30') then nvl(ROUND(fcp.CASH_AMT,2),0)
+        else nvl(ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2),0)
         end as NETCASHFLOW,
         <!--多级法人改造 add by jingqiongqiong 20200615-->
         pp.PORTFOLIO_ID portfolioId1
@@ -1144,6 +1325,8 @@
         left join PTL_PORTFOLIO_AUTHORITY pa on pa.portfolio_id = pp.portfolio_id
         left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID
         and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
         left join FIN_CASH_PLAN fcp on fcp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_TRADE_PRODUCT FTP on FTP.FINPROD_ID = psp.FINPROD_ID
@@ -1152,6 +1335,7 @@
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
 
         where 1 = 1
+        and psp.HODING_TYPE = '03'
         <if test="portfolioIdList1 != null and portfolioIdList1.size()>0 ">
             and psp.PORTFOLIO_ID in
             <foreach collection="portfolioIdList1" item="item" separator="," open="(" close=")">
@@ -1183,7 +1367,8 @@
         and fcp.PAY_DATE &gt;= to_date(#{sysDate},'YYYY-MM-DD')
         and not exists (
         select 1 from TRD_PRODUCT_DEAL tpd
-        where tpd.CASH_ID = fcp.CASH_ID
+        where (tpd.CASH_ID = fcp.CASH_ID
+        or (tpd.cash_id is not null and tpd.cash_id = (select cash_id from FIN_CASH_PLAN fcp1 where fcp1.mdate=fcp.mdate and fcp1.FINPROD_ID=fcp.FINPROD_ID and fcp1.cash_type in('02','03') )))
         and tpd.MDATE > FCP.VDATE
         AND FCP.MDATE >= TPD.MDATE
         and tpd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR}
@@ -1196,15 +1381,108 @@
         and (fp.IS_RIGHT = 'N' or fp.IS_RIGHT is null)
         and (fp.CCY = #{ccy1,jdbcType=VARCHAR} OR FTP.CCY = #{ccy1,jdbcType=VARCHAR})
         and pa.USER_ID = #{userId}
+        and (fp.FINPROD_TYPE2 not in ('F18','F17','F07') or fp.FINPROD_TYPE2 is null)
         union all
 
-        <!-- 3、查询含权资产未来现金流。（含权债收息、还本预测） -->
+        <!-- 3、查询非含权资产未来现金流（存款+项目类+计划类利率）。（资产收息预测、资产还本预测、资产到期预测） -->
+
         select DISTINCT
         '' seqno,
         fcp.PAY_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
-        fp.ccy CCY ,
-        sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as fundAccount,
+        psp.ccy CCY ,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
+        case when fp.ISSUE_AMT - NVL(REPAY_PRIN_INFO.PRIN_AMT, 0) = 0 then psp.AMOUNT else
+        ROUND(psp.AMOUNT * fcp.CASH_AMT/(fp.ISSUE_AMT - NVL(REPAY_PRIN_INFO.PRIN_AMT, 0)), 2) end as INCASHFLOW,
+        0  OUTCASHFLOW,
+        case when fp.ISSUE_AMT - NVL(REPAY_PRIN_INFO.PRIN_AMT, 0) = 0 then psp.AMOUNT else
+        ROUND(psp.AMOUNT * fcp.CASH_AMT/(fp.ISSUE_AMT - NVL(REPAY_PRIN_INFO.PRIN_AMT, 0)), 2) end as NETCASHFLOW,
+        <!--多级法人改造 add by jingqiongqiong 20200615-->
+        pp.PORTFOLIO_ID portfolioId1
+        <!--多级法人改造 add by jingqiongqiong 20200615-->
+        <!--add by swwan [重庆银行] 组合系列 20210722 start-->
+        ,ppp.PORTFOLIO_SERIES portfolioSeries
+        <!--add by swwan [重庆银行] 组合系列 20210722 end-->
+        from PTL_SEC_POSITION psp
+        left join PTL_PORTFOLIO pp on psp.PORTFOLIO_ID = pp.PORTFOLIO_ID
+        left join PTL_PORTFOLIO_AUTHORITY pa on pa.portfolio_id = pp.portfolio_id
+        left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID
+        and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
+        left join FIN_CASH_PLAN fcp on fcp.FINPROD_ID = psp.FINPROD_ID
+        left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
+        left join FIN_TRADE_PRODUCT FTP on FTP.FINPROD_ID = psp.FINPROD_ID
+        left join FIN_PRODUCT_ADD on fp.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
+        left join STL_CAPACCT_INFO sci on sci.ACCT_NO = pci.ACCT_NO
+        left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
+        LEFT JOIN
+            (SELECT FINPROD_ID, SUM(PRIN_AMT) PRIN_AMT
+            FROM
+            FIN_CASH_PLAN
+            WHERE TO_DATE(#{sysDate}, 'YYYY-MM-DD') >= MDATE
+            AND CASH_TYPE IN ('02', '03')
+            GROUP BY FINPROD_ID
+            ) REPAY_PRIN_INFO
+            ON
+            REPAY_PRIN_INFO.FINPROD_ID = psp.FINPROD_ID
+        where 1 = 1
+        and psp.HODING_TYPE = '03'
+        <if test="portfolioIdList1 != null and portfolioIdList1.size()>0 ">
+            and psp.PORTFOLIO_ID in
+            <foreach collection="portfolioIdList1" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="fundAccount1 != null and fundAccount1 != '' ">
+            and pci.ACCT_NO = #{fundAccount1}
+        </if>
+        <!--  add by wangyang1 【吉林银行】 增加 产品经理  2019年9月29日 start -->
+        <if test=" prodManager1 !=null and !prodManager1.isEmpty()" >
+            AND FIN_PRODUCT_ADD.PROD_MANAGER IN
+            <foreach collection="prodManager1" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <!--  add by wangyang1 【吉林银行】 增加 产品经理end -->
+        <!--  add by swwan [重庆银行] 组合系列 20210722 start -->
+        <if test="portfolioSeriesList1 !=null and portfolioSeriesList1.size()>0" >
+            AND (ppp.PORTFOLIO_SERIES IN
+            <foreach collection="portfolioSeriesList1" item="item" index="index" open="(" close=")" separator=",">
+                <if test="(index % 998) == 0">
+                    null) OR ppp.PORTFOLIO_SERIES IN (
+                </if>
+                #{item}
+            </foreach>)
+        </if>
+        <!--  add by swwan [重庆银行] 组合系列 20210722 end -->
+        and fcp.PAY_DATE &gt;= to_date(#{sysDate},'YYYY-MM-DD')
+        and not exists (
+        select 1 from TRD_PRODUCT_DEAL tpd
+        where (tpd.CASH_ID = fcp.CASH_ID
+        or (tpd.cash_id is not null and tpd.cash_id = (select cash_id from FIN_CASH_PLAN fcp1 where fcp1.mdate=fcp.mdate and fcp1.FINPROD_ID=fcp.FINPROD_ID and fcp1.cash_type in('02','03') )))
+        and tpd.MDATE > FCP.VDATE
+        AND FCP.MDATE >= TPD.MDATE
+        and tpd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR}
+        AND TPD.IS_CANCEL='N'
+        )
+
+        <if test="searchDateStart1 != null and searchDateStart1 != ''">
+            and psp.CDATE = TO_DATE(#{searchDateStart1},'YYYY-MM-DD')
+        </if>
+        and (fp.IS_RIGHT = 'N' or fp.IS_RIGHT is null)
+        and (fp.CCY = #{ccy1,jdbcType=VARCHAR} OR FTP.CCY = #{ccy1,jdbcType=VARCHAR})
+        and pa.USER_ID = #{userId}
+        and fp.FINPROD_TYPE2  in ('F18','F17','F07')
+        union all
+
+        <!-- 4、查询含权资产未来现金流。（含权债收息、还本预测） -->
+        select DISTINCT
+        '' seqno,
+        fcp.PAY_DATE as CDATE,
+        pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
+        psp.ccy CCY ,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
         case when psp.AMOUNT*fcp.CASH_AMT &gt; 0
         then ROUND(psp.AMOUNT*fcp.CASH_AMT/nvl(fcp.CASH_BASEAMT,1),2) else 0 end as INCASHFLOW,
         case when psp.AMOUNT*fcp.CASH_AMT &lt; 0
@@ -1220,6 +1498,8 @@
         left join PTL_PORTFOLIO pp on psp.PORTFOLIO_ID = pp.PORTFOLIO_ID
         left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID
         and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
         left join FIN_CASH_PLAN fcp on fcp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT_ADD on fp.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
@@ -1228,6 +1508,7 @@
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
 
         where 1 = 1
+        and psp.HODING_TYPE = '03'
         <if test="portfolioIdList1 != null and portfolioIdList1.size()>0 ">
             and psp.PORTFOLIO_ID in
             <foreach collection="portfolioIdList1" item="item" separator="," open="(" close=")">
@@ -1260,7 +1541,8 @@
 
         and not exists (
         select 1 from TRD_PRODUCT_DEAL tpd
-        where tpd.CASH_ID = fcp.CASH_ID
+        where (tpd.CASH_ID = fcp.CASH_ID
+        or (tpd.cash_id is not null and tpd.cash_id = (select cash_id from FIN_CASH_PLAN fcp1 where fcp1.mdate=fcp.mdate and fcp1.FINPROD_ID=fcp.FINPROD_ID and fcp1.cash_type in('02','03') )))
         and tpd.MDATE > FCP.VDATE
         AND FCP.MDATE >= TPD.MDATE
         and tpd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR}
@@ -1289,14 +1571,14 @@
         and pa.USER_ID = #{userId}
         union all
 
-        <!-- 4、查询含权资产未来现金流。（含权债行权预测） -->
+        <!-- 5、查询含权资产未来现金流。（含权债行权预测） -->
 
         select DISTINCT
         '' seqno,
         fep1.EXERCISE_DATE as CDATE,
         pp.PORTFOLIO_ID || '(' || pp.PORTFOLIO_NAME || ')' as portfolioId,
-        fp.ccy CCY ,
-        sci.ACCT_NAME || '(' || sci.ACCT_NO || ')' as fundAccount,
+        psp.ccy CCY ,
+        nvl(sci1.ACCT_NAME,sci.ACCT_NAME) || '(' || nvl(sci1.ACCT_NO,sci.ACCT_NO) || ')' as FUNDACCOUNT,
         case when psp.AMOUNT*fep1.EXERCISE_PRICE &gt; 0
         then ROUND(psp.AMOUNT*fep1.EXERCISE_PRICE/100,2) else 0 end as INCASHFLOW,
         case when psp.AMOUNT*fep1.EXERCISE_PRICE &lt; 0
@@ -1313,21 +1595,23 @@
         left join PTL_PORTFOLIO_AUTHORITY pa on pa.portfolio_id = pp.portfolio_id
         left join PTL_CAPACCT_INFO pci on psp.PORTFOLIO_ID = pci.PORTFOLIO_ID
         and pci.ACCT_TYPE = 'A01' and pci.ccy=psp.ccy
+        left join STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID=psp.SEC_ACCT_ID and ssai.TRADE_PLACE IN ('03','04')
+        left join STL_CAPACCT_INFO sci1 on sci1.ACCT_NO = ssai.TRD_ACCT_ID
         left join FIN_PRODUCT fp on fp.FINPROD_ID = psp.FINPROD_ID
         left join FIN_PRODUCT_ADD on fp.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
         left join (select fep.FINPROD_ID,fep.EXERCISE_DATE,fep.EXERCISE_PRICE
-        from FIN_EXERCISE_PLAN fep
-        where fep.EXERCISE_DATE = (
-        select min(fep.EXERCISE_DATE)
-        from FIN_EXERCISE_PLAN fep
-        where 1 = 1
-        and fep.EXERCISE_DATE &gt;= to_date(#{sysDate},'YYYY-MM-DD')
-        )
+            from FIN_EXERCISE_PLAN fep
+            where fep.EXERCISE_DATE = (
+            select min(fep.EXERCISE_DATE)
+            from FIN_EXERCISE_PLAN fep
+            where 1 = 1
+            and fep.EXERCISE_DATE &gt;= to_date(#{sysDate},'YYYY-MM-DD')
+            )
         ) fep1 on fep1.FINPROD_ID = psp.FINPROD_ID
         left join STL_CAPACCT_INFO sci on sci.ACCT_NO = pci.ACCT_NO
         left join PA_PTL_PORTFOLIO ppp on pp.portfolio_id = ppp.portfolio_id
         where 1 = 1
-
+        and psp.HODING_TYPE = '03'
         <if test="portfolioIdList1 != null and portfolioIdList1.size()>0 ">
             and psp.PORTFOLIO_ID in
             <foreach collection="portfolioIdList1" item="item" separator="," open="(" close=")">

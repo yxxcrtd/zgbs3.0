@@ -642,6 +642,8 @@ public class TrdBondInvestTradeService extends BaseService {
             if (trdTradeFeeTotal != null) {
                 resultDto.setChannelFee(trdTradeFeeTotal.getFeeAmt());
             }
+        } else {
+            return new TrdBondInvestTradeDto();
         }
         return resultDto;
     }

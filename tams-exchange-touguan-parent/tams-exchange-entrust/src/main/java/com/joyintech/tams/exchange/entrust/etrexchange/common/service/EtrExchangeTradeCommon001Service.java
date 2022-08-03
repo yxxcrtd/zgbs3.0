@@ -538,7 +538,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
                 etrStandardBondInOutDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());// 资产大类
             } else if (etrStandardBondInOutDto.getPs().equals(DictCodeListExt3.交易方向_质押券出库.getValue())) {
 //                etrStandardBondInOutDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());// 资产大类
-                etrStandardBondInOutDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
+                etrStandardBondInOutDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());
             }
         }
 
@@ -731,6 +731,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         etrSinglePortfolioDto.setTradePlat(dto.getTradePlat());// 交易平台
         etrSinglePortfolioDto.setBusinessModel(dto.getBusinessModel());
         etrSinglePortfolioDto.setBusiTypePosition(dto.getBusiTypePosition());
+        etrSinglePortfolioDto.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         /*
          * if 画面.交易平台 = 数据字典.交易平台.大宗交易平台 and 画面.交易场所 = 数据字典.交易场所.深圳证券交易所
          * 交易平台 = 数据字典.交易平台.综合协议平台
@@ -767,6 +768,13 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
 
     @Override
     public void doUpdate(EtrExchangeTradeSaveRequest entity) {
+        // GLCP-192:组合维度需要传ps,风险是从组合维度取ps modify by fuyongsheng 20220713 start
+        if(!CollectionUtils.isEmpty(entity.getPortfolioList())){
+            for(EtrExchangeTradePortfolioRequest portfolio : entity.getPortfolioList()){
+                portfolio.setPs(entity.getPs());
+            }
+        }
+        // GLCP-192:组合维度需要传ps,风险是从组合维度取ps modify by fuyongsheng 20220713 end
         // nothing to do just for aspect
         Map<String, Object> map = new HashMap<>();
         // 新增交易对手席位
@@ -2843,6 +2851,10 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
                 tradePlat = DictCodeList.交易平台_大宗交易平台.getValue();
             } else if ("gd".equals(currentTab) || currentTab.equals(DictCodeList.交易平台_固定收益平台.getValue())) {
                 tradePlat = DictCodeList.交易平台_固定收益平台.getValue();
+            //add wsz 3.0.6桂林产品化 GLCP-115 修改提交验证异常 start
+            } else if ("99".equals(currentTab) ) {
+                return currentTab;
+            //add wsz 3.0.6桂林产品化 GLCP-115 修改提交验证异常 end
             }
         }
         return tradePlat;
@@ -5678,7 +5690,7 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
             if (etrStandardBondInOutDto.getPs().equals(DictCodeListExt3.交易方向_质押券入库.getValue())) {
                 etrStandardBondInOutDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());// 资产大类
             } else if (etrStandardBondInOutDto.getPs().equals(DictCodeListExt3.交易方向_质押券出库.getValue())) {
-                etrStandardBondInOutDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());// 资产大类
+                etrStandardBondInOutDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());// 资产大类
             }
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, etrStandardBondInOutDto);
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, etrStandardBondInOutDto);
@@ -6201,6 +6213,10 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
         // 初始化返回集合
         return  etrExchangeTradeCommonMapper.selectAllBusModelList(param);
     }
-
+    //组合持有资产业务模式查询
+    public List<BaseMap> selectAllBusModels(Map<String, Object> param) {
+        // 初始化返回集合
+        return  etrExchangeTradeCommonMapper.selectAllBusModels(param);
+    }
 
 }

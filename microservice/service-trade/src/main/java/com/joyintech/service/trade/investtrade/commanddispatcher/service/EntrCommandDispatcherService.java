@@ -1,22 +1,29 @@
 package com.joyintech.service.trade.investtrade.commanddispatcher.service;
 
+import com.alibaba.fastjson.JSONObject;
+import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.service.trade.investtrade.commanddispatcher.dao.EntrCommandDispatcherMapper;
+import com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrCommandDispatcherDto;
+import com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrCommandDispatcherTotalDto;
+import com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrTradePledgeDto;
+import com.joyintech.service.trade.investtrade.commanddispatcher.dto.EtrEntrustDetailDto;
+import com.joyintech.tams.common.base.pojo.OriPledgeInfo;
+import com.joyintech.tams.constant.DictCodeListExt3;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.joyintech.service.trade.investtrade.commanddispatcher.dto.EtrEntrustDetailDto;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.joyintech.framework.base.BaseService;
-import com.joyintech.service.trade.investtrade.commanddispatcher.dao.EntrCommandDispatcherMapper;
-import com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrCommandDispatcherDto;
-import com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrCommandDispatcherTotalDto;
-import com.joyintech.service.trade.investtrade.commanddispatcher.dto.EntrTradePledgeDto;
+import static com.joyintech.tams.constant.DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令_换钱;
 
 /**
  *
@@ -34,11 +41,16 @@ public class EntrCommandDispatcherService extends BaseService<EntrCommandDispatc
 	private EntrCommandDispatcherMapper entrTradeSysInterfMapper;
 
 	/**
+	 * 日志
+	 */
+	private Logger logger = LoggerFactory.getLogger(EntrCommandDispatcherService.class);
+
+	/**
 	 * 指令分发 <功能详细描述>
 	 *
 	 * @param param
 	 * @return
-	 * @see
+	 * @see/EtrCommandDispatcher
 	 * @since 1.0
 	 */
 	public EntrCommandDispatcherTotalDto pushCommandMsg(Map<String, Object> param) {
@@ -113,13 +125,37 @@ public class EntrCommandDispatcherService extends BaseService<EntrCommandDispatc
     	if(list != null && !list.isEmpty()) {
 	    	for(EntrCommandDispatcherDto dto : list) {
 	    		if("F02".equals(dto.getFinprodType2()) || "F03".equals(dto.getFinprodType2()) ) {
-		    		List<EntrTradePledgeDto> queryEtrPledgeList = entrTradeSysInterfMapper.queryEtrPledgeListByEtrId(dto.getEntrustId());
-		    		if(queryEtrPledgeList!=null && !queryEtrPledgeList.isEmpty()) {
-		    			pledgelist.addAll(queryEtrPledgeList);
-		    		}
+					if (StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), dto.getBusiTypeTg()) ||
+							(StringUtil.equals(DictCodeListExt3.投管业务类型_中途换券.getValue(), dto.getBusiTypeTg()) &&
+									!上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(dto.getEntrustBussType())
+									)
+					) {
+						List<EntrTradePledgeDto> queryEtrPledgeList = entrTradeSysInterfMapper.queryEtrPledgeListByEtrId(dto.getEntrustId());
+						if(queryEtrPledgeList!=null && !queryEtrPledgeList.isEmpty()) {
+							pledgelist.addAll(queryEtrPledgeList);
+						}
+					}
+					if(!StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), dto.getBusiTypeTg())){
+						List<OriPledgeInfo> oriFinDealPledgeList = entrTradeSysInterfMapper.getOriFinDealPledgeList(dto.getFinprodId());
+						for (OriPledgeInfo oriPledgeInfo : oriFinDealPledgeList) {
+							EntrTradePledgeDto pledgeDto = new EntrTradePledgeDto();
+							BeanUtils.copyProperties(dto, pledgeDto);
+							pledgeDto.setFinprodId(oriPledgeInfo.getPledgeFinprodId());
+							pledgeDto.setFinprodAbbr(oriPledgeInfo.getPledgefinprodAbbr());
+							pledgeDto.setTradeMarket(oriPledgeInfo.getPledgeTradeMarket());
+							pledgeDto.setFinprodMarketId(oriPledgeInfo.getPledgeFinprodMarketId());
+							pledgeDto.setPledgeFaceValue(oriPledgeInfo.getPledgeFaceValue());
+							pledgeDto.setPledgeNumber(oriPledgeInfo.getPledgeNumber());
+							pledgeDto.setPledgeRatio(oriPledgeInfo.getPledgeRatio());
+							pledgeDto.setPledgeAmt(oriPledgeInfo.getPledgeTradeAmt());
+							pledgeDto.setDisplaceDir("00");
+							pledgelist.add(pledgeDto);
+						}
+					}
 	    		}
 	    	}
     	}
+		logger.error("指令分发质押券详情：{}",JSONObject.toJSONString(pledgelist));
     	return pledgelist;
     }
 	/**

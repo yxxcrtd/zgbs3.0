@@ -7,12 +7,17 @@ import com.joyintech.tams.exchange.common.bean.investment.TradeMessage;
 import com.joyintech.tams.exchange.common.constant.BusinessFlag;
 import com.joyintech.tams.exchange.common.constant.EntrustBs;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
-import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.constant.instruction.BusinessType;
 import com.joyintech.tams.exchange.common.constant.joyin.DictCodeList;
 import com.joyintech.tams.exchange.common.constant.joyin.InvestmentAssetType1;
 import com.joyintech.tams.exchange.common.db.domain.*;
-import com.joyintech.tams.exchange.common.utils.*;
+import com.joyintech.tams.exchange.common.enums.EntrustBussTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum;
+import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
+import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
+import com.joyintech.tams.exchange.common.utils.JsonUtils;
+import com.joyintech.tams.exchange.common.utils.TradePlatUtils;
+import com.joyintech.tams.exchange.common.utils.TradeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionPledgeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +40,7 @@ public class MessageSenderHelper {
     private InstructionPledgeService instructionPledgeService;
 
     public TradeMessage createTradeMessage(Trade trade, Instruction instruction, EntrustInterface entrust) {
-        TradeMessage tradeMessage = TradeMessage.createTradeMessage(trade, entrust);
+        TradeMessage tradeMessage = TradeMessage.createTradeMessage(trade, entrust,instruction);
         //委托数量
         tradeMessage.setEntrustVolume((double) entrust.getEntrustVolume());
         if (Objects.nonNull(instruction) && Objects.nonNull(tradeMessage)) {
@@ -77,7 +82,7 @@ public class MessageSenderHelper {
         if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
             tradeMessage.setValueDate(((IntegratedEntrust) entrust).getFirstSettleDate());
             tradeMessage.setMaturityDate(((IntegratedEntrust) entrust).getBackDate());
-            tradeMessage.setCounterId((((IntegratedEntrust) entrust).getLiaisonName()));
+//            tradeMessage.setCounterId((((IntegratedEntrust) entrust).getLiaisonName()));
             // 确保协议回购，无抵押券时才组装相关的finprodId
             InstructionPledge instructionPledge = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(instruction.getEntrustId(), entrust.getStockCode());
             if (Objects.isNull(instructionPledge) && Strings.isNullOrEmpty(finprodId)) {
@@ -122,6 +127,8 @@ public class MessageSenderHelper {
         tradeMessage.setFinprodId(instruction.getFinprodId());
         //委托数量
         tradeMessage.setEntrustVolume((double) entrust.getEntrustVolume());
+        //成交金额
+        tradeMessage.setEntrustBalance(trade.getTradedBalance());
 
 //        if (EntrustUtils.isCreditProtectionCertificate(instruction.getBusiTypeTg())) {
 //            tradeMessage.setDealVolume((double) trade.getTradedVolume() * 100);
@@ -142,9 +149,15 @@ public class MessageSenderHelper {
         }
         // 协议回购的特殊处理
         if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
-            tradeMessage.setValueDate(((IntegratedEntrust) entrust).getFirstSettleDate());
-            tradeMessage.setMaturityDate(((IntegratedEntrust) entrust).getBackDate());
-            tradeMessage.setCounterId((((IntegratedEntrust) entrust).getLiaisonName()));
+            IntegratedEntrust entrust1 = (IntegratedEntrust) entrust;
+            tradeMessage.setValueDate(entrust1.getFirstSettleDate());
+            tradeMessage.setMaturityDate(entrust1.getBackDate());
+            tradeMessage.setCounterId((entrust1.getCounterId()));
+            tradeMessage.setTradeId((entrust1.getTradeId()));
+            tradeMessage.setInvestorId(entrust1.getInvestorId());
+            tradeMessage.setDealerId(entrust1.getDealerId());
+            tradeMessage.setPropDealerId(entrust1.getPropDealerId());
+            tradeMessage.setPropInvestorId(entrust1.getPropInvestorId());
 
             // 金融产品代码
             // 确保协议回购，无抵押券时才组装相关的finprodId
@@ -160,7 +173,7 @@ public class MessageSenderHelper {
             if (EntrustProp.isRepurchase_First(entrust.getEntrustProp())) {
                 tradeMessage.setTrdMatchID(trade.getBrokerTradeId());
             } else {
-                tradeMessage.setTrdMatchID(((IntegratedEntrust) entrust).getOrigSerialNo());
+                tradeMessage.setTrdMatchID(entrust1.getOrigSerialNo());
             }
 
             // 折算比例
@@ -178,8 +191,14 @@ public class MessageSenderHelper {
 
         //协议回购
         if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
-            //到期结算金额
-            tradeMessage.setDealBalance(entrust.getBackBalance());
+            if (BusiTypeTgEnum.首期.codeEquals(trade.getBusiTypeTg())
+                    || StringUtil.equals(EntrustBussTypeEnum.中途换券指令_换钱.value, instruction.getEntrustBussType())) {
+                //回购金额
+                tradeMessage.setDealBalance(entrust.getTradedBalance());
+            } else {
+                //到期结算金额
+                tradeMessage.setDealBalance(entrust.getBackBalance());
+            }
         } else if (InvestAssetTypeEnum.isBond(trade.getAssetType())
                 && EntrustProp.isTrade(entrust.getEntrustProp())
                 && Objects.nonNull(tradeMessage.getFullPrice())

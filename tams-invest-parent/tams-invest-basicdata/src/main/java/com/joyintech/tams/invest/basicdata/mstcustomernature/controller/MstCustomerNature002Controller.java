@@ -106,6 +106,7 @@ public class MstCustomerNature002Controller extends BaseController {
         model.addAttribute("typeValue_10", DictCodeListExt3.客户性质_券商.getValue());
         model.addAttribute("typeValue_12", DictCodeListExt3.客户性质_交易对手.getValue());
         model.addAttribute("typeValue_13", DictCodeListExt3.客户性质_原始权益人.getValue());
+        model.addAttribute("typeValue_14", DictCodeListExt3.客户性质_创设机构.getValue());
         model.addAttribute("typeName_01", DictCodeList.客户性质_发行人.getCodeName());
         model.addAttribute("typeName_02", DictCodeList.客户性质_融资人.getCodeName());
         model.addAttribute("typeName_03", DictCodeList.客户性质_管理人.getCodeName());
@@ -118,6 +119,7 @@ public class MstCustomerNature002Controller extends BaseController {
         model.addAttribute("typeName_10", DictCodeListExt3.客户性质_券商.getCodeName());
         model.addAttribute("typeName_12", DictCodeListExt3.客户性质_交易对手.getCodeName());
         model.addAttribute("typeName_13", DictCodeListExt3.客户性质_原始权益人.getCodeName());
+        model.addAttribute("typeName_14", DictCodeListExt3.客户性质_创设机构.getCodeName());
 
 
         model.addAttribute("CUSTOMER_TYPE_01", DictCodeList.客户类型_法人.getValue());
@@ -230,7 +232,7 @@ public class MstCustomerNature002Controller extends BaseController {
             map.put("flag_10", DictCodeListExt3.客户性质_券商.getCodeName());
             map.put("flag_12", DictCodeListExt3.客户性质_交易对手.getCodeName());
             map.put("flag_13", DictCodeListExt3.客户性质_原始权益人.getCodeName());
-
+            map.put("flag_14", DictCodeListExt3.客户性质_创设机构.getCodeName());
             map.put("index", DictCodeList.客户类型_法人.getCodeName());
             map.put("count", DictCodeList.客户类型_自然人.getCodeName());
             //将客户性质的code改成name值放入map中
@@ -277,6 +279,10 @@ public class MstCustomerNature002Controller extends BaseController {
             if (DictCodeListExt3.客户性质_原始权益人.getValue().equals(
                     mstCustomerNatureDto.getCustomerCharater())) {
                 listCustomerCharater.add((String)map.get("flag_13"));
+            }
+            if (DictCodeListExt3.客户性质_创设机构.getValue().equals(
+                    mstCustomerNatureDto.getCustomerCharater())) {
+                listCustomerCharater.add((String)map.get("flag_14"));
             }
             if (DictCodeListExt3.客户性质_交易对手.getValue().equals(
                     mstCustomerNatureDto.getCustomerCharater())) {

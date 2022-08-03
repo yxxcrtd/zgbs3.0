@@ -74,6 +74,16 @@ public class MstCustomerInfo extends BaseEntity {
     private String isInvestAdviser;
 
     /**
+     * 是否期货公司
+     */
+    private String isFutureCom;
+
+    /**
+     * 是否银行
+     */
+    private String isBank;
+
+    /**
      * 是否券商
      */
     private String isBroker;
@@ -84,19 +94,14 @@ public class MstCustomerInfo extends BaseEntity {
     private String isCounter;
 
     /**
-     * 是否银行
-     */
-    private String isBank;
-
-    /**
-     * 是否期货公司
-     */
-    private String isFutureCom;
-
-    /**
      * 是否原始权益人
      */
     private String isOriginalOwner;
+
+    /**
+     * 是否是创设机构
+     */
+    private String createInstitutions;
 
     /**
      * 取得 客户代码
@@ -323,6 +328,38 @@ public class MstCustomerInfo extends BaseEntity {
     }
 
     /**
+     * 取得 是否期货公司
+     * @return 是否期货公司
+     */
+    public String getIsFutureCom() {
+        return isFutureCom;
+    }
+
+    /**
+     * 设置 是否期货公司
+     * @param isFutureCom 是否期货公司
+     */
+    public void setIsFutureCom(String isFutureCom) {
+        this.isFutureCom = isFutureCom == null ? null : isFutureCom.trim();
+    }
+
+    /**
+     * 取得 是否银行
+     * @return 是否银行
+     */
+    public String getIsBank() {
+        return isBank;
+    }
+
+    /**
+     * 设置 是否银行
+     * @param isBank 是否银行
+     */
+    public void setIsBank(String isBank) {
+        this.isBank = isBank == null ? null : isBank.trim();
+    }
+
+    /**
      * 取得 是否券商
      * @return 是否券商
      */
@@ -355,38 +392,6 @@ public class MstCustomerInfo extends BaseEntity {
     }
 
     /**
-     * 取得 是否银行
-     * @return 是否银行
-     */
-    public String getIsBank() {
-        return isBank;
-    }
-
-    /**
-     * 设置 是否银行
-     * @param isBank 是否银行
-     */
-    public void setIsBank(String isBank) {
-        this.isBank = isBank == null ? null : isBank.trim();
-    }
-
-    /**
-     * 取得 是否期货公司
-     * @return 是否期货公司
-     */
-    public String getIsFutureCom() {
-        return isFutureCom;
-    }
-
-    /**
-     * 设置 是否期货公司
-     * @param isFutureCom 是否期货公司
-     */
-    public void setIsFutureCom(String isFutureCom) {
-        this.isFutureCom = isFutureCom == null ? null : isFutureCom.trim();
-    }
-
-    /**
      * 取得 是否原始权益人
      * @return 是否原始权益人
      */
@@ -399,6 +404,22 @@ public class MstCustomerInfo extends BaseEntity {
      * @param isOriginalOwner 是否原始权益人
      */
     public void setIsOriginalOwner(String isOriginalOwner) {
-        this.isOriginalOwner = isOriginalOwner;
+        this.isOriginalOwner = isOriginalOwner == null ? null : isOriginalOwner.trim();
+    }
+
+    /**
+     * 取得 是否是创设机构
+     * @return 是否是创设机构
+     */
+    public String getCreateInstitutions() {
+        return createInstitutions;
+    }
+
+    /**
+     * 设置 是否是创设机构
+     * @param createInstitutions 是否是创设机构
+     */
+    public void setCreateInstitutions(String createInstitutions) {
+        this.createInstitutions = createInstitutions == null ? null : createInstitutions.trim();
     }
 }

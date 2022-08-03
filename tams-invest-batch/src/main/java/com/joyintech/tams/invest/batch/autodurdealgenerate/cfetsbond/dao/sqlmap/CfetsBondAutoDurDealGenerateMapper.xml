@@ -52,7 +52,7 @@
         <where>
             T1.AMOUNT > 0
             <!--AND T1.HODING_TYPE IN ('03', '05', '06', '11')-->
-            AND T1.HODING_TYPE = 'A_004'
+            AND T1.HODING_TYPE = 'A_001'
             and nvl(pp.PARENT_PORTFOLIO_ID, 'null') = 'null'
             and T2.CASH_TYPE IN
             (#{CASH_CLASS_TYPE01},#{CASH_CLASS_TYPE02},#{CASH_CLASS_TYPE03},#{CASH_CLASS_TYPE04})
@@ -122,6 +122,7 @@
         where
         t8.PAY_DATE >= #{PLATEFORM_DATE}
         AND T8.MDATE = #{PLATEFORM_DATE}
+        and T10.FINPROD_MARKET_ID is not null
         GROUP BY
         t8.SEC_ACCT_ID,SAI.SEC_ACCT_NAME, fp.FINPROD_NAME,
         t10.FINPROD_MARKET_ID,
@@ -203,7 +204,7 @@
         WHERE
         T1.AMOUNT > 0
         <!--AND T1.HODING_TYPE IN ('03', '05', '06','11')-->
-        AND T1.HODING_TYPE = 'A_004'
+        AND T1.HODING_TYPE = 'A_001'
         AND T1.DATE_TYPE = 0
         and nvl(pp.PARENT_PORTFOLIO_ID,'null') = 'null'
         AND T1.SEC_ACCT_ID = #{secAcctId}
@@ -363,7 +364,7 @@
             /*检索条件 金融产品代码 = 传参.金融产品代码*/ where T1.FINPROD_ID = #{finprodId}
             /*and 持仓类型 = 数据字典缓存.持仓类型.实际*/
             <!--AND T1.HODING_TYPE IN ('03', '05', '06','11')-->
-             AND T1.HODING_TYPE = 'A_004'
+             AND T1.HODING_TYPE = 'A_001'
             /*and 组合持仓.日期 = 平台日*/ AND t1.CDATE &lt; #{adjustMDate}
             AND T1.SEC_ACCT_ID = #{secAcctId}
             and T1.AMOUNT > 0
@@ -741,7 +742,9 @@
             ,T1.UNIT_INT
             ,T1.SETTLE_SPEED
             ,T7.SHARE_AMT SHARE_AMT
+            ,tpda.ENTRUST_ID
             FROM TRD_PRODUCT_DEAL T1
+            left join TRD_PRODUCT_DEAL_ADD tpda on t1.TRADE_ID = tpda.TRADE_ID
             <!--  一体化对应etliu start -->
             LEFT JOIN PTL_TRADE T3 ON T1.TRADE_ID = T3.BUSI_NO <!-- AND T1.BUSI_TYPE = T3.BUSI_TYPE -->
             <!--  一体化对应etliu end -->
@@ -779,5 +782,19 @@
             where TPD.FINPROD_ID = T1.FINPROD_ID
             )
             AND T1.TRADE_ID = #{finprodId}
+    </select>
+
+    <select id="findCashIdByFinprodId" resultType="java.lang.String">
+        select nvl(fcpbj.CASH_ID,fcplx.CASH_ID)
+        from FIN_CASH_INFO fci
+                 LEFT JOIN FIN_CASH_PLAN fcpbj ON fci.CASH_ID =fcpbj.CASH_ID AND fci.CASH_TYPE_1 =#{CASH_TYPE_1} AND fci.CASH_TYPE_2=#{CASH_TYPE_2}
+                 LEFT JOIN FIN_CASH_PLAN fcplx ON fci.CASH_ID =fcplx.CASH_ID AND fci.CASH_TYPE_1 ='02' AND fci.CASH_TYPE_2='C02'
+        where fci.FINPROD_ID = #{finprodId}
+            <if test="adjustMDate != null">
+                AND (fcpbj.MDATE =#{adjustMDate} OR fcplx.MDATE =#{adjustMDate})
+            </if>
+          AND NOT EXISTS (
+                SELECT  1 FROM FIN_CASH_PLAN fcp WHERE fcp.FINPROD_ID =fcplx.FINPROD_ID AND fcp.MDATE =fcplx.MDATE AND fcp.CASH_TYPE IN ('02','03')
+            )
     </select>
 </mapper>

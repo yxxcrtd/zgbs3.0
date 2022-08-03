@@ -7,7 +7,7 @@
  * 修改内容：新建
  * 系统名称：理财资管管理系统V2.0
  */
- 
+
 package com.joyintech.tams.invest.common.dto;
 
 import java.util.List;
@@ -23,12 +23,24 @@ import com.joyintech.tams.common.base.entity.SysUploadFileInfo;
  * @since 1.0
  */
 public class MstFileOutputParameter {
+
+    /**
+     * 业务代码
+     */
+    private String businessId;
     /**
      * 文件列表
      */
     private List<SysUploadFileInfo> uploadFileList;
 
-    
+    public String getBusinessId() {
+        return businessId;
+    }
+
+    public void setBusinessId(String businessId) {
+        this.businessId = businessId;
+    }
+
     /**
      * 获取 uploadFileList
      * @return uploadFileList.
@@ -37,7 +49,7 @@ public class MstFileOutputParameter {
         return uploadFileList;
     }
 
-    
+
     /**
      * 设置 uploadFileList
      * @param uploadFileList uploadFileList

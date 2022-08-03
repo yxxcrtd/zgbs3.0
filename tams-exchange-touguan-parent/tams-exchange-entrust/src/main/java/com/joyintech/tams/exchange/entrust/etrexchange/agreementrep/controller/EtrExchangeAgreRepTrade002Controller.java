@@ -137,12 +137,21 @@ public class EtrExchangeAgreRepTrade002Controller extends BaseController {
         EtrExchangeAgreRepTrade001Dto entity = new EtrExchangeAgreRepTrade001Dto();
         if (!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotEmpty(workflowId)) {
             //流程代办
-            entity = etrExchangeAgreRepTrade001Service.getBussinessEntityByWorkflowId(
-                    workflowId);
+            entity = etrExchangeAgreRepTrade001Service.getBussinessEntityByWorkflowId(workflowId);
 
             if (entity != null && entity.getHgMDate() == null
                     && entity.getTerm() != null && StringUtil.isNotBlank(entity.getFristSettleDate())) {
-                entity.setHgMDate(DateUtil.addDay(entity.getFristSettleDate(), entity.getTerm().intValue()));
+                if (!StringUtil.equals(entity.getPs(), DictCodeListExt3.交易方向_提前购回.getValue())) {
+                    entity.setHgMDate(DateUtil.addDay(entity.getFristSettleDate(), entity.getTerm().intValue()));
+                } else {
+                    // 提前购回，需要查询首期，获取首期时的回购期限
+                    Map<String, Object> queryMap = new HashMap<>();
+                    queryMap.put("tradeId",entity.getIntiTradeId());
+                    EtrExchangeAgreRepTrade001Dto repFristList = etrExchangeAgreRepTrade001Service.getEntrustInfoByIntiTradeId(queryMap);
+                    if (!Objects.isNull(repFristList)) {
+                        entity.setHgMDate(DateUtil.addDay(entity.getFristSettleDate(), repFristList.getTerm()));
+                    }
+                }
             }
             if(entity != null){
                 model.addAttribute(GlobalConstant.ENTITY, entity);
@@ -167,12 +176,18 @@ public class EtrExchangeAgreRepTrade002Controller extends BaseController {
         model.addAttribute("ENTRUST_RECORD_MODIFY", ENTRUST_RECORD_MODIFY);
         model.addAttribute("TRADE_MARKET_04", DictCodeList.交易流通场所_深圳证券交易所.getValue());
         model.addAttribute("TRADE_MARKET_03", DictCodeList.交易流通场所_上海证券交易所.getValue());
+        model.addAttribute("TRADE_MARKET_CURRENT", entity.getTradeMarket());
 
         model.addAttribute("UNIT_01", DictCodeListExt3.交易单位_张.getValue());
         model.addAttribute("UNIT_04", DictCodeListExt3.交易单位_手.getValue());
+
+        model.addAttribute("PS_T94", DictCodeListExt3.交易方向_中途换券.getValue());
+        model.addAttribute("PS_T93", DictCodeListExt3.交易方向_解除质押.getValue());
+        model.addAttribute("PS_T95", DictCodeListExt3.交易方向_到期购回.getValue());
+        model.addAttribute("PS_T96", DictCodeListExt3.交易方向_提前购回.getValue());
+        model.addAttribute("PS_T56", DictCodeListExt3.交易方向_到期续做.getValue());
         return super.init(model);
     }
-
 
     @ApiOperation(value = "下单查询页面初始化参数", notes = "下单查询页面初始化参数")
     @PostMapping("/getPageParams001")

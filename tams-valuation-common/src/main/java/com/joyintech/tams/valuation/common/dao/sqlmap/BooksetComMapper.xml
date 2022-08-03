@@ -65,7 +65,7 @@
 		and rownum=1
     </select>
     <select id="selectAssociationModeOrgGrpName" resultType="java.lang.String">
-        select to_char(wm_concat(distinct sysi.institution_name))　as institutionName
+        select to_char(wm_concat(distinct sysi.institution_name)) as institutionName
 	    from  sys_batch_prd_grp sbpg
 	    inner join data_auth_notify_inst dani
 	    on sbpg.seq_no=dani.business_id

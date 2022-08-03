@@ -1,6 +1,8 @@
 package com.joyintech.tams.exchange.common.bean;
 
 
+import java.math.BigDecimal;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -99,8 +101,107 @@ public class IntegratedRepurchaseQuoteBean {
     private int realDateBack;
     @ApiModelProperty(name = "pledgeeName", value = "质权人")
     private String pledgeeName;
+    @ApiModelProperty(name = "execid", value = "执行编号")
+    private String execid;
+    @ApiModelProperty(name = "deliverySide", value = "质押方向")
+    private String deliverySide;
+    @ApiModelProperty(name = "stkprop", value = "股份性质")
+    private String stkprop;
 
-    public String getBrokerId() {
+    @ApiModelProperty(name = "swapOutBalance", value = "换出金额")
+    private double swapOutBalance;
+
+    @ApiModelProperty(name = "swapIntoBonds", value = "换入质押券代码")
+    private String swapIntoBonds;
+
+    @ApiModelProperty(name = "swapIntoBondsName", value = "换入质押券名称")
+    private String swapIntoBondsName;
+
+    @ApiModelProperty(name = "swapIntoBondsVolume", value = "换入质押券数量")
+    private BigDecimal swapIntoBondsVolume;
+
+    @ApiModelProperty(name = "swapOutBonds", value = "换出质押券代码")
+    private String swapOutBonds;
+
+    @ApiModelProperty(name = "swapOutBondsName", value = "换出质押券名称")
+    private String swapOutBondsName;
+
+    @ApiModelProperty(name = "swapOutBondsVolume", value = "换出质押券数量")
+    private BigDecimal swapOutBondsVolume;
+
+    public String getSwapIntoBonds() {
+		return swapIntoBonds;
+	}
+
+	public void setSwapIntoBonds(String swapIntoBonds) {
+		this.swapIntoBonds = swapIntoBonds;
+	}
+
+	public String getSwapIntoBondsName() {
+		return swapIntoBondsName;
+	}
+
+	public void setSwapIntoBondsName(String swapIntoBondsName) {
+		this.swapIntoBondsName = swapIntoBondsName;
+	}
+
+	public BigDecimal getSwapIntoBondsVolume() {
+		return swapIntoBondsVolume;
+	}
+
+	public void setSwapIntoBondsVolume(BigDecimal swapIntoBondsVolume) {
+		this.swapIntoBondsVolume = swapIntoBondsVolume;
+	}
+
+	public String getSwapOutBonds() {
+		return swapOutBonds;
+	}
+
+	public void setSwapOutBonds(String swapOutBonds) {
+		this.swapOutBonds = swapOutBonds;
+	}
+
+	public String getSwapOutBondsName() {
+		return swapOutBondsName;
+	}
+
+	public void setSwapOutBondsName(String swapOutBondsName) {
+		this.swapOutBondsName = swapOutBondsName;
+	}
+
+	public BigDecimal getSwapOutBondsVolume() {
+		return swapOutBondsVolume;
+	}
+
+	public void setSwapOutBondsVolume(BigDecimal swapOutBondsVolume) {
+		this.swapOutBondsVolume = swapOutBondsVolume;
+	}
+
+	public String getStkprop() {
+		return stkprop;
+	}
+
+	public void setStkprop(String stkprop) {
+		this.stkprop = stkprop;
+	}
+
+	public String getDeliverySide() {
+		return deliverySide;
+	}
+
+	public void setDeliverySide(String deliverySide) {
+		this.deliverySide = deliverySide;
+	}
+
+	public String getExecid() {
+		return execid;
+	}
+
+	public void setExecid(String execid) {
+		this.execid = execid;
+	}
+
+	public String getBrokerId() {
         return brokerId;
     }
 
@@ -468,4 +569,11 @@ public class IntegratedRepurchaseQuoteBean {
         this.pledgeeName = pledgeeName;
     }
 
+    public double getSwapOutBalance() {
+        return swapOutBalance;
+    }
+
+    public void setSwapOutBalance(double swapOutBalance) {
+        this.swapOutBalance = swapOutBalance;
+    }
 }

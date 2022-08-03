@@ -51,9 +51,10 @@
         group by BOBP.BID_ID
         ) BOBP ON BO.BID_ID = BOBP.BID_ID
         LEFT JOIN MST_COUNTER_PARTY MCP ON MCP.COUNTER_ID = BO.COUNTER_ID
-        WHERE FPI.ISSUE_CLASS IN ('02','03') AND BO.BID_MODLE !='03'  AND BO.IS_CANCEL = 'N' AND
+        WHERE FPI.ISSUE_CLASS IN ('02','03') AND BO.BID_MODLE !='03'  AND BO.IS_CANCEL = #{YN_N}
+        AND BO.TRADE_STATUS = #{TRADE_STATUS_01} AND
         BO.BID_ID not in (select B_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL where TG_BUSI_TYPE =#{COMMON_BUSINESS_TYPE_TRD97} and
-        TRADE_STATUS=#{TRADE_STATUS_01} and IS_CANCEL='N')
+        TRADE_STATUS=#{TRADE_STATUS_01} and IS_CANCEL=#{YN_N})
         <if test="userId != null and userId != ''">
             AND BO.OUR_TRADER = #{userId}
         </if>
@@ -77,7 +78,7 @@
                 </foreach>
             </if>
             <if test="winTypeList != null and winTypeList.size() > 0">
-                AND BO.WIN_TYPE in
+                AND BO.BID_MODLE in
                 <foreach collection="winTypeList" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
@@ -339,7 +340,7 @@
             BRT.SETT_FEE_AMT        settFeeAmt,
             decode(BRT.IS_WIN,'Y',BRT.PAY_DATE)            payDate,
             case when FP.TRADE_MARKET in ('01','02') then decode(BRT.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE) end creditorDebtDate,
-            decode(BRT.IS_WIN,'Y',FPA.LISTING_DATE)        listingDate,
+            decode(BRT.IS_WIN,'Y',BRT.LISTING_DATE)        listingDate,
             decode(BRT.IS_WIN,'Y', BRT.WIN_DATE )           winDate,
             TFPDT.TRADE_DATE        tradeDate,
             FP.TRADE_MARKET         tradeMarket,
@@ -418,10 +419,10 @@
             <![CDATA[AND  BRT.PAY_DATE  <= TO_DATE(#{payDateEnd},'YYYY-MM-DD')]]>
         </if>
         <if test="listingDateStart != null and listingDateStart != ''">
-            <![CDATA[AND  FPA.LISTING_DATE  >= TO_DATE(#{listingDateStart},'YYYY-MM-DD') ]]>
+            <![CDATA[AND  BRT.LISTING_DATE  >= TO_DATE(#{listingDateStart},'YYYY-MM-DD') ]]>
         </if>
         <if test="listingDateEnd != null and listingDateEnd != ''">
-            <![CDATA[AND  FPA.LISTING_DATE  <= TO_DATE(#{listingDateEnd},'YYYY-MM-DD')]]>
+            <![CDATA[AND  BRT.LISTING_DATE  <= TO_DATE(#{listingDateEnd},'YYYY-MM-DD')]]>
         </if>
         <if test="payTypeList != null and payTypeList.size() > 0">
             AND BO.PAY_TYPE in
@@ -483,7 +484,7 @@
         BRT.SETT_FEE_AMT        settFeeAmt,
         decode(BRT.IS_WIN,'Y',BRT.PAY_DATE)            payDate,
         case when FP.TRADE_MARKET in ('01','02') then decode(BRT.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE) end creditorDebtDate,
-        decode(BRT.IS_WIN,'Y',FPA.LISTING_DATE)        listingDate,
+        decode(BRT.IS_WIN,'Y',BRT.LISTING_DATE)        listingDate,
         decode(BRT.IS_WIN,'Y', BRT.WIN_DATE )           winDate,
         TFPDT.TRADE_DATE        tradeDate,
         FP.TRADE_MARKET         tradeMarket,
@@ -566,10 +567,10 @@
             <![CDATA[AND  BRT.PAY_DATE  <= TO_DATE(#{payDateEnd},'YYYY-MM-DD')]]>
         </if>
         <if test="listingDateStart != null and listingDateStart != ''">
-            <![CDATA[AND  FPA.LISTING_DATE  >= TO_DATE(#{listingDateStart},'YYYY-MM-DD') ]]>
+            <![CDATA[AND  BRT.LISTING_DATE  >= TO_DATE(#{listingDateStart},'YYYY-MM-DD') ]]>
         </if>
         <if test="listingDateEnd != null and listingDateEnd != ''">
-            <![CDATA[AND  FPA.LISTING_DATE  <= TO_DATE(#{listingDateEnd},'YYYY-MM-DD')]]>
+            <![CDATA[AND  BRT.LISTING_DATE  <= TO_DATE(#{listingDateEnd},'YYYY-MM-DD')]]>
         </if>
         <if test="payTypeList != null and payTypeList.size() > 0">
             AND BO.PAY_TYPE in
@@ -845,7 +846,7 @@
             FPI.ISSUE_DATE   issueDate,
             FPI.ISSUE_CLASS  issueClass,
             case when FP.TRADE_MARKET in ('01','02') then decode(BRT.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE) end creditorDebtDate,
-            decode(BRT.IS_WIN,'Y',FPA.LISTING_DATE)  listingDate,
+            decode(BRT.IS_WIN,'Y',BRT.LISTING_DATE)  listingDate,
             decode(BRT.IS_WIN,'Y',BRT.WIN_TYPE)   winType,
             BO.BID_MODLE     bidModle,
             BO.WIN_PRIN_AMT totalBiddingNum,
@@ -879,7 +880,7 @@
             FPI.ISSUE_DATE   issueDate,
             FPI.ISSUE_CLASS  issueClass,
             case when FP.TRADE_MARKET in ('01','02') then decode(BRT.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE) end creditorDebtDate,
-            decode(BRT.IS_WIN,'Y',FPA.LISTING_DATE) listingDate,
+            decode(BRT.IS_WIN,'Y',BRT.LISTING_DATE) listingDate,
             decode(BRT.IS_WIN,'Y',BRT.WIN_TYPE)   winType,
             BO.BID_MODLE     bidModle,
             BO.WIN_PRIN_AMT totalBiddingNum,
@@ -1213,6 +1214,24 @@
                 ON SETTLE.TRADE_ID = TOTAl.TOTLE_TRADE_ID
                AND SETTLE.SETTLE_STATUS = '02'
           WHERE TOTAl.B_TRADE_ID = #{totalWinId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectBidResultTotalByBidId" resultType="com.joyintech.tams.common.base.entity.BidResultTotal" >
+        select
+            TOTAL_WIN_ID TOTAL_WIN_ID, BID_ID BID_ID, WIN_DATE WIN_DATE, FINPROD_ID FINPROD_ID, IS_WIN IS_WIN,
+            WIN_TYPE WIN_TYPE, WIN_PRINAMT WIN_PRINAMT, WIN_PRICE WIN_PRICE, SETT_FEE_AMT SETT_FEE_AMT, PAY_DATE PAY_DATE,
+            CREDITOR_DEBT_DATE CREDITOR_DEBT_DATE, COUNTER_ID COUNTER_ID, REMARK REMARK,STATUS STATUS,
+            CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME
+        from BID_RESULT_TOTAL
+        where BID_ID = #{bidId,jdbcType=VARCHAR}
+        UNION ALL
+        select
+            TOTAL_WIN_ID TOTAL_WIN_ID, BID_ID BID_ID, WIN_DATE WIN_DATE, FINPROD_ID FINPROD_ID, IS_WIN IS_WIN,
+            WIN_TYPE WIN_TYPE, WIN_PRINAMT WIN_PRINAMT, WIN_PRICE WIN_PRICE, SETT_FEE_AMT SETT_FEE_AMT, PAY_DATE PAY_DATE,
+            CREDITOR_DEBT_DATE CREDITOR_DEBT_DATE, COUNTER_ID COUNTER_ID, REMARK REMARK,STATUS STATUS,
+            CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME
+        from WFL_BID_RESULT_TOTAL
+        where BID_ID = #{bidId,jdbcType=VARCHAR}
     </select>
 
 </mapper>

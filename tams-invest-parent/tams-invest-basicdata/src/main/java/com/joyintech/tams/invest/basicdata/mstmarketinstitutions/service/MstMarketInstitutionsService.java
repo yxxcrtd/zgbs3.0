@@ -286,6 +286,18 @@ public class MstMarketInstitutionsService extends CommonExportService<MstMarketI
     }
 
     /**
+     * 查询组织机构代码/统一社会信用代码是否已存在
+     *
+     * @return integer
+     * @since 1.0
+     */
+    public Integer insitituteCodeCheck(String insitituteCode) {
+        return restTemplate.getForObject(
+                ServiceApplication.BASICDATA_SERVICE_NAME + "/MstMarketInstitutions/insitituteCodeCheck?insitituteCode=" + insitituteCode,
+                Integer.class);
+    }
+
+    /**
      * 根据becif查询CMS_机构信息
      * <功能详细描述>
      *

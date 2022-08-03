@@ -199,7 +199,7 @@
           	SELECT nvl(t2.mparty_id,t1.party_id) PARTY_ID 
           	from 
           		MST_COUNTER_PARTY t3
-          	inner join 
+          	inner join
           		MST_CFETS_CUSTOMER_INFO t1 
           	on T3.COUNTER_NAME = T1.PARTY_NAME
           	LEFT JOIN 

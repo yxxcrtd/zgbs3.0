@@ -102,6 +102,11 @@ $(function() {
             "customerCharaterStr":typeName_13,
             "customerCharater":typeValue_13
         }
+        ,
+        {
+            "customerCharaterStr":typeName_14,
+            "customerCharater":typeValue_14
+        }
        ];
     var customerCharaterTable=$("#customerCharaterTable").joyintable({
     /*

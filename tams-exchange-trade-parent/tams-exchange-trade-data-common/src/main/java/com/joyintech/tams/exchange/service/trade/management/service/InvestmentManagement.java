@@ -9,6 +9,7 @@ import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -16,8 +17,10 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
@@ -33,16 +36,18 @@ import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.*;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.dto.EntrustPriceAndYieldDto;
+import com.joyintech.tams.exchange.common.enums.EntrustBussTypeEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.GuaranteedEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.NetOrFullPriceEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.TargetTypeEnum;
+import com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum;
 import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
 import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.request.InstructionQueryRequest;
 import com.joyintech.tams.exchange.common.utils.*;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
 import com.joyintech.tams.exchange.service.trade.check.AppointInstructionCheck;
-import com.joyintech.tams.exchange.service.trade.check.CheckResult;
+import com.joyintech.tams.exchange.service.trade.check.business.CheckResult;
 import com.joyintech.tams.exchange.service.trade.processor.MessageConsumerService;
 import com.joyintech.tams.exchange.service.trade.processor.constants.Constants;
 import com.joyintech.tams.exchange.service.trade.processor.msg.MsgReceiverManager;
@@ -52,6 +57,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -62,6 +68,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_中途换券;
+import static com.joyintech.tams.exchange.common.constant.joyin.DictCodeListExt3.投管业务类型_首期;
 import static com.joyintech.tams.exchange.common.enums.EntrustBussTypeEnum.*;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -113,7 +121,7 @@ public class InvestmentManagement extends BaseService {
      */
     @Value("${application.micorservice.contextpath.single:false}")
     private boolean isSingle;
-    
+
     /**
      * 指令查询带条件
      *
@@ -391,12 +399,17 @@ public class InvestmentManagement extends BaseService {
         List<Instruction> instructions = ListConvertUtils.convertList(bean.getEtr_entrust_list(), Instruction.class);
         fillMinPriceAndTrdUnitLimit(instructions);
 
+        List<InstructionPledge> pledges = ListConvertUtils.convertList(bean.getEtr_pledge_list(), InstructionPledge.class);
+        List<InstructionPledge> pledgeList = dealInstructionPledge(pledges);
+        fillInstructionPledgeInfo(instructions, pledgeList);
+
+        updateInstructions(instructions);
+
         List<InstructionExportVo> instructionCloneList = cloneInstructions(instructions);
         handlePriceWithZYCRK(instructionCloneList);
         bean.setEtr_entrust_list(sortInstructionsByCreateTime(instructionCloneList));
 
-        List<InstructionPledge> instructionPledges = ListConvertUtils.convertList(bean.getEtr_pledge_list(), InstructionPledge.class);
-        bean.setEtr_pledge_list(instructionPledges);
+        bean.setEtr_pledge_list(pledgeList);
 
         List<InstructionDetail> instructionDetails = ListConvertUtils.convertList(bean.getEtr_entrust_detail_list(), InstructionDetail.class);
         bean.setEtr_entrust_detail_list(instructionDetails);
@@ -427,16 +440,120 @@ public class InvestmentManagement extends BaseService {
 
         fillMinPriceAndTrdUnitLimit(instructionList);
 
+        List<String> ids = instructionList.stream().map(Instruction::getEntrustId).collect(Collectors.toList());
+        List<InstructionPledge> pledges = getPledgesByIds(ids);
+        List<InstructionPledge> pledgeList = dealInstructionPledge(pledges);
+
+        fillInstructionPledgeInfo(instructionList, pledgeList);
+
+        updateInstructions(instructionList);
+
         // 价格修改仅限于前端展示，故使用拷贝的数据，而不使用内存数据
         List<InstructionExportVo> instructionCloneList = cloneInstructions(instructionList);
         handlePriceWithZYCRK(instructionCloneList);
         bean.setEtr_entrust_list(sortInstructionsByCreateTime(instructionCloneList));
-
-        List<String> ids = instructionList.stream().map(Instruction::getEntrustId).collect(Collectors.toList());
-        bean.setEtr_pledge_list(getPledgesByIds(ids));
+        bean.setEtr_pledge_list(pledgeList);
         bean.setEtr_entrust_detail_list(getDetailsByIds(ids));
 
         return bean;
+    }
+
+    private void updateInstructions(List<Instruction> instructionList) {
+        for (Instruction instruction : instructionList) {
+            instructionService.asyncUpdate(instruction);
+        }
+    }
+
+    private void fillInstructionPledgeInfo(List<Instruction> instructionList, List<InstructionPledge> pledges) {
+        Map<String, List<InstructionPledge>> listMap = pledges.stream().collect(groupingBy(InstructionPledge::getEntrustId));
+        for (Instruction instruction : instructionList) {
+            String busiTypeTg = instruction.getBusiTypeTg();
+            if (!EntrustUtils.isPledgeAgreementRepurchase(busiTypeTg)) {
+                continue;
+            }
+            List<InstructionPledge> pledgeList = listMap.get(instruction.getEntrustId());
+            if (CollectionUtils.isEmpty(pledgeList)) {
+                continue;
+            }
+            instruction.setPledges(pledgeList);
+
+            if (StringUtil.equals(投管业务类型_首期.getValue(), busiTypeTg)) {
+                continue;
+            }
+
+            if (StringUtil.equals(投管业务类型_中途换券.getValue(), busiTypeTg)
+                    && !StringUtil.equals(中途换券指令_换钱.value, instruction.getEntrustBussType())) {
+                Optional<InstructionPledge> pledgeOptional = pledgeList.stream()
+                        .filter(o -> StringUtil.equals(o.getDisplaceDir(), "01")).findFirst();
+                if (pledgeOptional.isPresent()) {
+                    InstructionPledge pledge = pledgeOptional.get();
+                    instruction.setFinprodMarketIdStr(pledge.getFinprodMarketId());
+                    instruction.setFinprodAbbrStr(pledge.getFinprodAbbr());
+                    if(StringUtil.isEmpty(instruction.getFinprodMarketId())){
+                        instruction.setFinprodMarketId(pledge.getFinprodMarketId());
+                    }
+                    if(StringUtil.isEmpty(instruction.getFinprodAbbr())){
+                        instruction.setFinprodAbbr(pledge.getFinprodAbbr());
+                    }
+                }
+            } else if (EntrustUtils.isPledgeAgreementRepurchase(busiTypeTg)) {
+                Optional<InstructionPledge> pledgeOptional = pledgeList.stream()
+                        .filter(o -> StringUtil.equals(o.getDisplaceDir(), "00")).findFirst();
+                if (pledgeOptional.isPresent()) {
+                    InstructionPledge pledge = pledgeOptional.get();
+                    instruction.setFinprodMarketIdStr(pledge.getFinprodMarketId());
+                    instruction.setFinprodAbbrStr(pledge.getFinprodAbbr());
+                    if(StringUtil.isEmpty(instruction.getFinprodMarketId())){
+                        instruction.setFinprodMarketId(pledge.getFinprodMarketId());
+                    }
+                    if(StringUtil.isEmpty(instruction.getFinprodAbbr())){
+                        instruction.setFinprodAbbr(pledge.getFinprodAbbr());
+                    }
+                }
+            }
+        }
+    }
+
+
+    private List<InstructionPledge> dealInstructionPledge(List<InstructionPledge> instructionPledges) {
+        List<InstructionPledge> pledges = Lists.newArrayList();
+        if (CollUtil.isEmpty(instructionPledges)) {
+            return pledges;
+        }
+
+        Map<String, List<InstructionPledge>> listMap = instructionPledges.stream().collect(groupingBy(InstructionPledge::getEntrustId));
+        for (Map.Entry<String, List<InstructionPledge>> entry : listMap.entrySet()) {
+            List<InstructionPledge> instructionPledgeList = entry.getValue();
+
+            //当前债券
+            List<InstructionPledge> pledgeList = instructionPledgeList.stream().filter(o -> StringUtil.equals(o.getDisplaceDir(), "00")).collect(Collectors.toList());
+            pledges.addAll(getInstructionPledges(pledgeList));
+
+            //换入债券
+            Optional<InstructionPledge> pledgeOptional = instructionPledgeList.stream().filter(o -> StringUtil.equals(o.getDisplaceDir(), "01")).findFirst();
+            //换出债券
+            Optional<InstructionPledge> oldPledgeOptional = instructionPledgeList.stream().filter(o -> StringUtil.equals(o.getDisplaceDir(), "02")).findFirst();
+            if (pledgeOptional.isPresent()) {
+                InstructionPledge pledge = new InstructionPledge();
+                BeanUtils.copyProperties(pledgeOptional.get(), pledge);
+
+                if (oldPledgeOptional.isPresent()) {
+                    InstructionPledge oldPledge = oldPledgeOptional.get();
+                    pledge.setOldFinprodId(oldPledge.getFinprodId());
+                    pledge.setOldFinprodAbbr(oldPledge.getFinprodAbbr());
+                    pledge.setOldFinprodMarketId(oldPledge.getFinprodMarketId());
+                    pledge.setOldTradeMarket(oldPledge.getTradeMarket());
+                    pledge.setOldPledgeFaceValue(oldPledge.getPledgeFaceValue());
+                    pledge.setOldPledgeAmt(oldPledge.getPledgeAmt());
+                    pledge.setOldPledgeNumber(oldPledge.getPledgeNumber());
+                    pledge.setOldPledgeRatio(oldPledge.getPledgeRatio());
+                }
+
+                pledges.add(pledge);
+            }
+        }
+
+        return pledges;
     }
 
     private List<InstructionExportVo> sortInstructionsByCreateTime(List<InstructionExportVo> instructions) {
@@ -454,6 +571,12 @@ public class InvestmentManagement extends BaseService {
         for (InstructionExportVo instruction : instructions) {
             if (投管业务类型_质押券出入库.getValue().equals(instruction.getBusiTypeTg())) {
                 instruction.setEntrustPrice(NumberUtil.mul(instruction.getEntrustPrice(), 100));
+            }
+            //中途换券、到期购回、解除质押指令价格模式调整为空
+            if (BusiTypeTgEnum.中途换券.codeEquals(instruction.getBusiTypeTg())
+                    || BusiTypeTgEnum.到期购回.codeEquals(instruction.getBusiTypeTg())
+                    || BusiTypeTgEnum.解除质押.codeEquals(instruction.getBusiTypeTg())) {
+                instruction.setPriceMode(null);
             }
 
             fillEntrustNumViewAndLeftVolumeView(instruction);
@@ -474,7 +597,9 @@ public class InvestmentManagement extends BaseService {
             long leftVolume = entrustNum - frozenQuantity - entrustLeftAmt;
             if (投管业务类型_质押券出入库.getValue().equals(instruction.getBusiTypeTg())
                     || 投管业务类型_现券交易.getValue().equals(instruction.getBusiTypeTg())
-                    || 投管业务类型_信用保护凭证.getValue().equals(instruction.getBusiTypeTg())) {
+                    || 投管业务类型_信用保护凭证.getValue().equals(instruction.getBusiTypeTg())
+                    || EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg())
+             ) {
                 //计算指令数量（展示）
                 instruction.setEntrustNumView(BigDecimal.valueOf(entrustNum).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
                 instruction.setLeftVolume(leftVolume);
@@ -573,12 +698,14 @@ public class InvestmentManagement extends BaseService {
             } else {
                 minPriceAndMinTrdUnitLimitBean.setMinTrdUnitLimitList(ListUtil.of(minTrdUnitLimit));
             }
-            
+
             minPriceAndMinTrdUnitLimitBean.setSubStockType(instrument.getSubStockType());
 
             logger.info("填充最小价差等交易属性信息 => 【minPriceAndMinTrdUnitLimitBean = {}】", minPriceAndMinTrdUnitLimitBean);
-            instruction.setMinPriceAndMinTrdUnitLimitBean(minPriceAndMinTrdUnitLimitBean);
-            instructionService.asyncUpdate(instruction);
+            if (CollectionUtils.isNotEmpty(minPriceAndMinTrdUnitLimitBean.getMinPriceList())
+                    && CollectionUtils.isNotEmpty(minPriceAndMinTrdUnitLimitBean.getMinTrdUnitLimitList())) {
+                instruction.setMinPriceAndMinTrdUnitLimitBean(minPriceAndMinTrdUnitLimitBean);
+            }
         }
     }
 
@@ -610,6 +737,54 @@ public class InvestmentManagement extends BaseService {
         return pledges;
     }
 
+    private List<InstructionPledge> getInstructionPledges(List<InstructionPledge> pledgeList) {
+        List<InstructionPledge> pledges = Lists.newArrayList();
+        //去除重复债券
+        Set<String> set = Sets.newHashSet();
+        for (InstructionPledge pledge : pledgeList) {
+            if (set.add(pledge.getFinprodMarketId())) {
+                pledges.add(pledge);
+            }
+        }
+        if (CollectionUtils.isEmpty(pledges)) {
+            return pledges;
+        }
+        InstructionPledge instructionPledge = new InstructionPledge();
+        List<String> finprodIds = Lists.newArrayList();
+        List<String> finprodMarketIds = Lists.newArrayList();
+        List<String> finprodAbbrs = Lists.newArrayList();
+        BigDecimal pledgeAmt = BigDecimal.ZERO;
+        BigDecimal pledgeNumber = BigDecimal.ZERO;
+        BigDecimal pledgeRatioAmt = BigDecimal.ZERO;
+        for (InstructionPledge pledge : pledges) {
+            finprodIds.add(pledge.getFinprodId());
+            if(StringUtil.isNotEmpty(pledge.getFinprodMarketId())){
+                finprodMarketIds.add(pledge.getFinprodMarketId());
+            }
+            if(StringUtil.isNotEmpty(pledge.getFinprodAbbr())){
+                finprodAbbrs.add(pledge.getFinprodAbbr());
+            }
+            pledgeAmt = pledgeAmt.add(pledge.getPledgeAmt());
+            pledgeNumber = pledgeNumber.add(pledge.getPledgeNumber());
+            //折算率*100
+            pledgeRatioAmt = pledgeRatioAmt.add(pledge.getPledgeNumber().multiply(pledge.getPledgeRatio()));
+        }
+        InstructionPledge pledge = pledges.get(0);
+        instructionPledge.setEntrustId(pledge.getEntrustId());
+        instructionPledge.setTradeMarket(pledge.getTradeMarket());
+        instructionPledge.setDisplaceDir(pledge.getDisplaceDir());
+        instructionPledge.setFinprodId(StrUtil.join(",", finprodIds));
+        instructionPledge.setFinprodMarketId(StrUtil.join(",", finprodMarketIds));
+        instructionPledge.setFinprodAbbr(StrUtil.join(",", finprodAbbrs));
+        instructionPledge.setPledgeAmt(pledgeAmt);
+        instructionPledge.setPledgeNumber(pledgeNumber);
+        // instructionPledge.setPledgeRatio(pledgeRatioAmt.divide(pledgeNumber, 2, RoundingMode.HALF_UP));
+        instructionPledge.setPledgeRatio(ArithmeticUtil.divide(pledgeRatioAmt, pledgeNumber, 6, RoundingMode.HALF_UP));
+
+        pledges.clear();
+        pledges.add(instructionPledge);
+        return pledges;
+    }
 
     /**
      * 查询指令列表
@@ -759,7 +934,8 @@ public class InvestmentManagement extends BaseService {
      * @param busiAcctNo
      * @param acctType
      */
-    public List<CapitalAccountBean> queryCapitalAccount(String portfolioId, String acctNo, String busiAcctNo, String acctType) {
+    public List<CapitalAccountBean> queryCapitalAccount(String portfolioId, String acctNo, String
+            busiAcctNo, String acctType) {
         Map<String, String> paramMap = new HashMap<>();
         paramMap.put("Content-Type", "application/json");
         paramMap.put("portfolioId", portfolioId);
@@ -868,14 +1044,12 @@ public class InvestmentManagement extends BaseService {
      */
     public List<AccountRiskControlBean> queryAccountRiskControl(String brockerId, String busiAcctNo) {
         String param = null;
-        if (Objects.nonNull(brockerId))
-            param = "?brockerId=" + brockerId;
-        if (Objects.nonNull(busiAcctNo))
-            if (Objects.nonNull(param)) {
-                param += "&busiAcctNo=" + busiAcctNo;
-            } else {
-                param = "?busiAcctNo=" + busiAcctNo;
-            }
+        if (Objects.nonNull(brockerId)) param = "?brockerId=" + brockerId;
+        if (Objects.nonNull(busiAcctNo)) if (Objects.nonNull(param)) {
+            param += "&busiAcctNo=" + busiAcctNo;
+        } else {
+            param = "?busiAcctNo=" + busiAcctNo;
+        }
         if (!Strings.isNullOrEmpty(ServiceApplication.INVESTMENT_MANAGEMENT_SERVICE)) {
             AccountRiskControlBean[] accountRiskControlBeans = null;
             if (isSingle) {
@@ -892,25 +1066,27 @@ public class InvestmentManagement extends BaseService {
         EntrustInterface entrust = null;
         List<Entrust> entrusts = null;
         int status, type = 0;
-        if (eventId.startsWith(IDPrefix.NORMAL.value)) {
-            entrust = entrustService.findById(eventId);
+        String[] ids = StringUtil.split(eventId, StrUtil.DASHED);
+        String entrustId = ids[ids.length - 1];
+        logger.info("【投管用-风控】审批通过|拒绝接口，handleExamine()：eventId={}，entrustId={}", eventId, entrustId);
+        if (entrustId.startsWith(IDPrefix.NORMAL.value)) {
+            entrust = entrustService.findById(entrustId);
             type = Constants.PROCESS_TYPE_ENTRUST;
-        } else if (eventId.startsWith(IDPrefix.BULK.value)) {
-            entrust = integratedEntrustService.findById(eventId);
+        } else if (entrustId.startsWith(IDPrefix.BULK.value)) {
+            entrust = integratedEntrustService.findById(entrustId);
             type = Constants.PROCESS_TYPE_INTEGRATED;
-        } else if (eventId.startsWith(IDPrefix.ORDER.value)) {//处理公平交易
-            entrusts = entrustService.queryEntrustByOrderId(eventId);
+        } else if (entrustId.startsWith(IDPrefix.ORDER.value)) {//处理公平交易
+            entrusts = entrustService.queryEntrustByOrderId(entrustId);
             type = Constants.PROCESS_TYPE_FIRE_ORDER;
         }
         if (Objects.isNull(entrust)) {
-            if (Objects.isNull(entrusts))
-                return new ResultBean(ErrorCode.INSTRUCTIONS_NOT_EXIST, eventId);
+            if (Objects.isNull(entrusts)) return new ResultBean(ErrorCode.INSTRUCTIONS_NOT_EXIST, entrustId);
         }
         if (RiskType.EXAMINE_REFUSE.value.equals(instructionsStatus) && Strings.isNullOrEmpty(approveReason)) {
             entrust.setErrorMsg("拒绝原因不可以为空");
             return new ResultBean(ErrorCode.REQ_PARAMETER_ERROR, entrust);
         }
-        if (eventId.startsWith(IDPrefix.ORDER.value)) {
+        if (entrustId.startsWith(IDPrefix.ORDER.value)) {
             List<Entrust> approvalList = new ArrayList();
             entrusts.forEach(entrust1 -> {
                 int entrustStatus = ((EntrustInterface) entrust1).getEntrustStatus();
@@ -927,7 +1103,7 @@ public class InvestmentManagement extends BaseService {
             });
 
             if (!approvalList.isEmpty()) {
-                Order order = orderService.findById(eventId);
+                Order order = orderService.findById(entrustId);
                 TradeMsgReceiver tradeMsgReceiver = msgReceiverManager.getMsgReceiverByInstruction(order.getInstructionId());
                 tradeMsgReceiver.addMsg(MsgType.EXAMINE_ENTRUST, new ExamineOrder(instructionsStatus, approveReason, order, Constants.PROCESS_TYPE_FIRE_ORDER));
             }
@@ -943,8 +1119,7 @@ public class InvestmentManagement extends BaseService {
                 List<OrderInterface> orderInterfaces = new ArrayList<>();
                 orderInterfaces.add(entrust);
                 // 撤单时，意向单，审批拒绝不需要调用风控
-                if (!(RiskType.EXAMINE_REFUSE.value.equals(instructionsStatus)
-                        || EntrustUtils.isIntentionEntrust(entrust.getEntrustProp()))) {
+                if (!(RiskType.EXAMINE_REFUSE.value.equals(instructionsStatus) || EntrustUtils.isIntentionEntrust(entrust.getEntrustProp()))) {
                     investRiskManagement.riskRelease(orderInterfaces, instructionService.findById(entrust.getInstructionId()));
                 }
                 return new ResultBean(ErrorCode.SUCCESS, entrust);
@@ -1035,7 +1210,8 @@ public class InvestmentManagement extends BaseService {
      * @param instruction 指令
      * @return entrustPrice
      */
-    public BigDecimal queryEntrustPriceByFullPriceFromInvest(BigDecimal fullPrice, long volume, Instruction instruction, int round) {
+    public BigDecimal queryEntrustPriceByFullPriceFromInvest(BigDecimal fullPrice, long volume, Instruction
+            instruction, int round) {
         Map<String, Object> pageParam = getExpireOrFullPriceOrEntrustPriceParam(volume, instruction);
         pageParam.put("fpriceAmt", TradeUtils.multiply(fullPrice, volume, 2));
         String url = ServiceApplication.TRADE_SERVICE_NAME + TradeServiceURL.fpriceAmt;
@@ -1067,7 +1243,8 @@ public class InvestmentManagement extends BaseService {
      * @param instruction  指令
      * @return entrustPrice
      */
-    public BigDecimal queryFullPriceByEntrustPriceFromInvest(BigDecimal entrustPrice, long volume, Instruction instruction, int round) {
+    public BigDecimal queryFullPriceByEntrustPriceFromInvest(BigDecimal entrustPrice, long volume, Instruction
+            instruction, int round) {
         try {
             Map<String, Object> pageParam = getExpireOrFullPriceOrEntrustPriceParam(volume, instruction);
             pageParam.put("unitCprice", entrustPrice);
@@ -1227,7 +1404,8 @@ public class InvestmentManagement extends BaseService {
      * @return
      * @throws Exception
      */
-    public ResultBean appointInstruction(InstructionPage<Instruction, InstructionPledge, InstructionDetail> instructionPage) throws Exception {
+    public ResultBean appointInstruction
+    (InstructionPage<Instruction, InstructionPledge, InstructionDetail> instructionPage) throws Exception {
         logger.info("接收指令分发数据信息：{}", JsonUtils.getJsonFromObject(instructionPage));
 
         //指令信息
@@ -1289,9 +1467,8 @@ public class InvestmentManagement extends BaseService {
         }
     }
 
-    private List<RecordLog> saveAppointInstruction(List<Instruction> instructionList,
-                                                   Map<String, List<InstructionDetail>> detailMap,
-                                                   Map<String, List<InstructionPledge>> pledgeMap) {
+    private List<RecordLog> saveAppointInstruction
+            (List<Instruction> instructionList, Map<String, List<InstructionDetail>> detailMap, Map<String, List<InstructionPledge>> pledgeMap) {
         logger.info("保存分发指令数据开始...");
         if (CollectionUtils.isEmpty(instructionList)) {
             logger.error("分发指令数据为空");
@@ -1359,8 +1536,8 @@ public class InvestmentManagement extends BaseService {
         }
     }
 
-    private void updateAppointInstruction(List<RecordLog> records, List<String> entrustIds, List<String> errorIds,
-                                          Map<String, Object> data) {
+    private void updateAppointInstruction
+            (List<RecordLog> records, List<String> entrustIds, List<String> errorIds, Map<String, Object> data) {
         logger.info("指令分发检查[不通过]：{}", errorIds);
         logger.info("指令分发检查[通过]：{}", ListUtils.subtract(entrustIds, errorIds));
         records.forEach(record -> {
@@ -1388,7 +1565,8 @@ public class InvestmentManagement extends BaseService {
         recordLogService.updateBatch(records);
     }
 
-    private void dealAppointInstruction(List<Instruction> instructions, List<InstructionDetail> details, List<InstructionPledge> pledges) {
+    private void dealAppointInstruction
+            (List<Instruction> instructions, List<InstructionDetail> details, List<InstructionPledge> pledges) {
 
         /* 已在前面校验中被过滤，无须考虑
         // 过滤掉指令中平台日小于当前平台日的指令
@@ -1578,8 +1756,7 @@ public class InvestmentManagement extends BaseService {
         // 处理指令状态
         String entrustStatusFromCache = instructionFromCache.getEntrustStatus();
         String entrustStatusFromAppoint = instruction.getEntrustStatus();
-        if (!CharSequenceUtil.equals(entrustStatusFromCache, entrustStatusFromAppoint)
-                && !InstructionStatus.TOBE_CANCELED.value.equals(entrustStatusFromCache)) {
+        if (!CharSequenceUtil.equals(entrustStatusFromCache, entrustStatusFromAppoint) && !InstructionStatus.TOBE_CANCELED.value.equals(entrustStatusFromCache)) {
             logger.info("instruction [{}] status changed {}", instructionId, entrustStatusFromAppoint);
             tradersFromCache.forEach(trader -> instructionService.deleteTraderCache(trader, instructionFromCache.getFinprodMarketId(), instructionId));
         }
@@ -1596,17 +1773,12 @@ public class InvestmentManagement extends BaseService {
             instructionService.asyncUpdate(instruction);
 
             String isAutoReceive = instruction.getIsAutoReceive();
-            if (CharSequenceUtil.isEmpty(isAutoReceive)
-                    || AutoReceiveFlag.MANUAL.value.equals(isAutoReceive)) {
+            if (CharSequenceUtil.isEmpty(isAutoReceive) || AutoReceiveFlag.MANUAL.value.equals(isAutoReceive)) {
                 return;
             }
 
             logger.info("自动接收指令开始：[{}]", instructionId);
-            EntrustOpeBean entrustOpeBean = GenericBuilder.of(EntrustOpeBean::new)
-                    .with(EntrustOpeBean::setTrader, instruction.getTradeId())
-                    .with(EntrustOpeBean::setRecStatus, InstructionFlag.ACCEPT.value)
-                    .with(EntrustOpeBean::setEntrustId, instructionId)
-                    .build();
+            EntrustOpeBean entrustOpeBean = GenericBuilder.of(EntrustOpeBean::new).with(EntrustOpeBean::setTrader, instruction.getTradeId()).with(EntrustOpeBean::setRecStatus, InstructionFlag.ACCEPT.value).with(EntrustOpeBean::setEntrustId, instructionId).build();
             doAcceptOrRefuse(ListUtil.toList(entrustOpeBean));
             logger.info("自动接收指令完成: [{}]", instructionId);
         }
@@ -1622,12 +1794,7 @@ public class InvestmentManagement extends BaseService {
     private boolean isPledge(Instruction instruction) {
         String busiTypeTg = instruction.getBusiTypeTg();
 
-        if (投管业务类型_首期.getValue().equals(busiTypeTg)
-                || 投管业务类型_提前购回.getValue().equals(busiTypeTg)
-                || 投管业务类型_到期购回.getValue().equals(busiTypeTg)
-                || 投管业务类型_到期续做.getValue().equals(busiTypeTg)
-                || 投管业务类型_中途换券.getValue().equals(busiTypeTg)
-                || 投管业务类型_解除质押.getValue().equals(busiTypeTg)) {
+        if (投管业务类型_首期.getValue().equals(busiTypeTg) || 投管业务类型_提前购回.getValue().equals(busiTypeTg) || 投管业务类型_到期购回.getValue().equals(busiTypeTg) || 投管业务类型_到期续做.getValue().equals(busiTypeTg) || 投管业务类型_中途换券.getValue().equals(busiTypeTg) || 投管业务类型_解除质押.getValue().equals(busiTypeTg)) {
             return true;
         }
 
@@ -1637,11 +1804,7 @@ public class InvestmentManagement extends BaseService {
     private void handleInstructionSetTradePlat(Instruction instruction) {
         String entrustBussType = instruction.getEntrustBussType();
         //非交易业务指令，设置交易平台为 沪深竞价撮合平台
-        if (BOND_REPURCHASE.value.equals(entrustBussType)
-                || ALLOTMENT_DEBT.value.equals(entrustBussType)
-                || CONVERTIBLE_BOND_SUBSCRIPTION.value.equals(entrustBussType)
-                || STANDARD_COUPONS_IN_AND_OUT.value.equals(entrustBussType)
-                || DEBT_TO_EQUITY.value.equals(entrustBussType)) {
+        if (BOND_REPURCHASE.value.equals(entrustBussType) || ALLOTMENT_DEBT.value.equals(entrustBussType) || CONVERTIBLE_BOND_SUBSCRIPTION.value.equals(entrustBussType) || STANDARD_COUPONS_IN_AND_OUT.value.equals(entrustBussType) || DEBT_TO_EQUITY.value.equals(entrustBussType)) {
             instruction.setTradePlat(TradePlat.NORMAL.value);
         }
         //深圳大宗交易，设置交易平台为 深圳综合协议平台
@@ -1652,10 +1815,7 @@ public class InvestmentManagement extends BaseService {
     }
 
     private void handleInstructionSetTradersInfo(Instruction instruction, List<Instruction> instructions) {
-        List<String> traders = instructions.stream()
-                .filter(item -> instruction.getEntrustId().equals(item.getEntrustId()))
-                .map(Instruction::getTradeId)
-                .collect(Collectors.toList());
+        List<String> traders = instructions.stream().filter(item -> instruction.getEntrustId().equals(item.getEntrustId())).map(Instruction::getTradeId).collect(Collectors.toList());
         instruction.setTradersInfo(JSONUtil.toJsonStr(traders));
     }
 
@@ -1664,11 +1824,10 @@ public class InvestmentManagement extends BaseService {
         instruction.setUpdateTime(now);
     }
 
-    private void handleInstructionFilterMdateBeforPlatDate(List<Instruction> instructions, List<InstructionDetail> details, List<InstructionPledge> pledges) {
+    private void handleInstructionFilterMdateBeforPlatDate
+            (List<Instruction> instructions, List<InstructionDetail> details, List<InstructionPledge> pledges) {
         Date platDate = DateUtil.platDateFromCache();
-        Set<Instruction> mdateBeforPlatDateInstructionSet = instructions.stream()
-                .filter(instruction -> DateUtil.compareDate(platDate, instruction.getMdate()) > 0)
-                .collect(Collectors.toSet());
+        Set<Instruction> mdateBeforPlatDateInstructionSet = instructions.stream().filter(instruction -> DateUtil.compareDate(platDate, instruction.getMdate()) > 0).collect(Collectors.toSet());
         instructionService.asyncDel(mdateBeforPlatDateInstructionSet);
 
         Set<String> mdateBeforPlatDateInstructionIdSet = mdateBeforPlatDateInstructionSet.stream().map(Instruction::getEntrustId).collect(Collectors.toSet());
@@ -1677,10 +1836,9 @@ public class InvestmentManagement extends BaseService {
 
     }
 
-    private void handleInstructionFilterNoTrader(List<Instruction> instructions, List<InstructionDetail> details, List<InstructionPledge> pledges) {
-        Set<Instruction> noTraderInstructionSet = instructions.stream()
-                .filter(instruction -> CharSequenceUtil.isEmpty(instruction.getTradeId()))
-                .collect(Collectors.toSet());
+    private void handleInstructionFilterNoTrader
+            (List<Instruction> instructions, List<InstructionDetail> details, List<InstructionPledge> pledges) {
+        Set<Instruction> noTraderInstructionSet = instructions.stream().filter(instruction -> CharSequenceUtil.isEmpty(instruction.getTradeId())).collect(Collectors.toSet());
         instructionService.asyncDel(noTraderInstructionSet);
 
         Set<String> noTraderInstructionIdSet = noTraderInstructionSet.stream().map(Instruction::getEntrustId).collect(Collectors.toSet());
@@ -1703,20 +1861,14 @@ public class InvestmentManagement extends BaseService {
         }
         for (Instruction instruction : instructions) {
             if (投资指令类型_多组合单资产指令.getValue().equals(instruction.getEntrustClass())) {
-                List<String> portfolioIds = details.stream()
-                        .filter(detail -> instruction.getEntrustId().equals(detail.getEntrustId()))
-                        .map(InstructionDetail::getPortfolioId)
-                        .collect(Collectors.toList());
+                List<String> portfolioIds = details.stream().filter(detail -> instruction.getEntrustId().equals(detail.getEntrustId())).map(InstructionDetail::getPortfolioId).collect(Collectors.toList());
                 if (CollUtil.isEmpty(portfolioIds)) {
                     logger.warn("多组合指令[{}]的组合明细为空", instruction.getEntrustId());
                 } else {
                     instruction.setPortfolioId(Joiner.on(GlobalConstant.COMMA).join(portfolioIds));
                 }
 
-                List<String> portfolioNames = details.stream()
-                        .filter(detail -> instruction.getEntrustId().equals(detail.getEntrustId()))
-                        .map(InstructionDetail::getPortfolioName)
-                        .collect(Collectors.toList());
+                List<String> portfolioNames = details.stream().filter(detail -> instruction.getEntrustId().equals(detail.getEntrustId())).map(InstructionDetail::getPortfolioName).collect(Collectors.toList());
                 if (CollUtil.isEmpty(portfolioIds)) {
                     logger.warn("多组合指令[{}]的组合明细为空", instruction.getEntrustId());
                 } else {

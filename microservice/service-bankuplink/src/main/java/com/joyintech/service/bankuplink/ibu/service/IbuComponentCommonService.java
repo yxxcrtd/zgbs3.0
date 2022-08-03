@@ -498,6 +498,7 @@ public class IbuComponentCommonService extends BaseService {
         if(StringUtil.equals(DictCodeList.是否_否.getValue(),isUpLinkSend)){
             return false;
         }
+        logger.info("调用上行接口:{}", JsonUtils.object2Json(quoteResultDto));
 
         // 1、判断组件返回结果
         // 需要平安现场判断是否支持微服务MSG：异常抛出，如果不支持此处要改成返回值给前台 判断 TODO
@@ -565,15 +566,6 @@ public class IbuComponentCommonService extends BaseService {
                 cfetsQuotedCommonService.updateQuoteCompletion(quoteResultDtoN);
             }
         }
-        long endTime = System.currentTimeMillis();
-        Date startDate = new Date();
-        startDate.setTime(startTime);
-        Date endDate = new Date();
-        endDate.setTime(endTime);
-        logger.info("resCommonHandle程序运行开始时间：" + new SimpleDateFormat().format(startDate));
-        logger.info("resCommonHandle程序运行结束时间：" + new SimpleDateFormat().format(endDate)); //程序运行结束时间
-        logger.info("resCommonHandle程序运行时间：" + (endTime - startTime) + "ms");    //输出程序运行时间
-
         return true;
     }
 
@@ -2779,6 +2771,7 @@ public class IbuComponentCommonService extends BaseService {
                     WflIbuQuoteEntCrepPledgeDto wflIbuQuoteEntCrepPledge = new WflIbuQuoteEntCrepPledgeDto();
                     BeanUtil.copyPropertiesIgnoreNull(wflIbuQuoteEntCrepPledge,item);
                     wflIbuQuoteEntCrepPledge.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
+                    wflIbuQuoteEntCrepPledge.setWorkflowId(cfetsRepoDealQuotedPrice001Dto.getWorkflowId());
                     wflIbuQuoteEntCrepPledges.add(wflIbuQuoteEntCrepPledge);
                 });
             }
@@ -2876,6 +2869,10 @@ public class IbuComponentCommonService extends BaseService {
         // region 银行间报价主信息
         IbuQuoteCrepDto ibuQuoteCrepDto = repoDialogueQuoteDto.getIbuQuoteCrepDto();
         // 报价编号（内部代码）
+        if (ibuQuoteCrepDto == null
+                || StringUtil.isEmpty(ibuQuoteCrepDto.getQuoteId())) {
+            return null;
+        }
         dto.setQuoteId(ibuQuoteCrepDto.getQuoteId());
         dto.setPortfolioId(ibuQuoteCrepDto.getPortfolioId());// 组合代码
         dto.setEntrustId(ibuQuoteCrepDto.getEntrustId());// 委托代码

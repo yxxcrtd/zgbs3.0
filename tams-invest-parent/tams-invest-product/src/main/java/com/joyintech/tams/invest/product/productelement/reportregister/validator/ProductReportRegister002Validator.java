@@ -274,7 +274,7 @@ public class ProductReportRegister002Validator implements BeanValidator {
 			}
 			// “当境内托管机构名称为其他时,备注要素不可为空”
 			else if (StringUtil.equals(entity.getRepInDepName(), "99") && StringUtil.isEmpty(entity.getRepRemark())) {
-				validList.add(new ValidMessage("repInDepName", getMessage("BussRepFinProductInfo.repInDepNamAndRepRemark")));
+				validList.add(new ValidMessage("repInDepName", this.getMessage("BussRepFinProductInfo.repInDepNamAndRemark")));
 			}
 		}
 //		if (StringUtil.isNotEmpty(entity.getRepCoopName())) {

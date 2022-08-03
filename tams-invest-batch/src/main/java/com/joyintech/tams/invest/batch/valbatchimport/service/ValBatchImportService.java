@@ -25,9 +25,8 @@ import com.joyintech.tams.invest.batch.valbatchimport.common.dto.BaseFinProductB
 import com.joyintech.tams.invest.batch.valbatchimport.common.dto.InfChinamutualfunddescriptionDto;
 import com.joyintech.tams.invest.batch.valbatchimport.common.dto.InterfPayhsrcsecinfoDto;
 import com.joyintech.tams.invest.batch.valbatchimport.common.dto.InterfStockInfoDto;
-import com.joyintech.tams.invest.batch.valbatchimport.common.service.CommonAutoCouponService;
+import com.joyintech.tams.invest.batch.valbatchimport.common.service.InvestCommonAutoCouponService;
 import com.joyintech.tams.invest.batch.valbatchimport.constant.ValtbImportConstant;
-import com.joyintech.tams.invest.batch.valbatchimport.dao.RskValtblPrtBotassetMapper;
 import com.joyintech.tams.invest.batch.valbatchimport.dao.ValBatchImportMapper;
 import com.joyintech.tams.invest.batch.valbatchimport.dto.*;
 import com.joyintech.tams.invest.batch.valbatchimport.filter.Filter;
@@ -72,7 +71,7 @@ public class ValBatchImportService {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private CommonAutoCouponService commonAutoCouponService;
+    private InvestCommonAutoCouponService investCommonAutoCouponService;
 
     // 平台日期
     @Autowired(required = false)
@@ -813,11 +812,11 @@ public class ValBatchImportService {
         });
         paramMap.put("windNameList",subNameList);
         //查找wind债券信息
-        List<InterfPayhsrcsecinfoDto>  interfPayhsrcsecinfoList  = commonAutoCouponService.selectWindBondAsset(paramMap);
+        List<InterfPayhsrcsecinfoDto>  interfPayhsrcsecinfoList  = investCommonAutoCouponService.selectWindBondAsset(paramMap);
         //查找wind基金信息
-        List<InfChinamutualfunddescriptionDto> infChinamutualfunddescriptionList = commonAutoCouponService.selectWindFundAsset(paramMap);
+        List<InfChinamutualfunddescriptionDto> infChinamutualfunddescriptionList = investCommonAutoCouponService.selectWindFundAsset(paramMap);
         //查找wind股票信息--徽商代码移植0602
-        List<InterfStockInfoDto> interfStockInfoList=commonAutoCouponService.selectWindStockAsset(paramMap);
+        List<InterfStockInfoDto> interfStockInfoList= investCommonAutoCouponService.selectWindStockAsset(paramMap);
 
 
         Map<String,String> paraMap =new HashMap<String,String>();
@@ -1029,19 +1028,19 @@ public class ValBatchImportService {
         //自动加券
         if(isAutoCoupon){
             //调用债券自动加券方法
-            interfPayhsrcsecinfoDto = commonAutoCouponService.autoBondCoupon(interfPayhsrcsecinfoDto);
+            interfPayhsrcsecinfoDto = investCommonAutoCouponService.autoBondCoupon(interfPayhsrcsecinfoDto);
             if(null != interfPayhsrcsecinfoDto  && null != interfPayhsrcsecinfoDto.getErrorBondList()) {
                 errorInfoList.addAll(interfPayhsrcsecinfoDto.getErrorBondList());
             }
 
             //调用基金自动加券方法
-            infChinamutualfunddescriptionDto = commonAutoCouponService.autoFundCoupon(infChinamutualfunddescriptionDto);
+            infChinamutualfunddescriptionDto = investCommonAutoCouponService.autoFundCoupon(infChinamutualfunddescriptionDto);
             if(null != infChinamutualfunddescriptionDto  && null != infChinamutualfunddescriptionDto.getErrorFundList()) {
                 errorInfoList.addAll(infChinamutualfunddescriptionDto.getErrorFundList());
             }
 
             //调用股票自动加券方法
-            interfStockInfoDto=commonAutoCouponService.autoStockCoupon(interfStockInfoDto);
+            interfStockInfoDto= investCommonAutoCouponService.autoStockCoupon(interfStockInfoDto);
             if(null != interfStockInfoDto  && null != interfStockInfoDto.getErrorStockList()) {
                 errorInfoList.addAll(interfStockInfoDto.getErrorStockList());
             }
@@ -1087,7 +1086,7 @@ public class ValBatchImportService {
                                 entity2.setFinprodId(finprodType.concat(GlobalConstant.UNDER_LINE).concat(entity2.getSubCode().substring(8, entity2.getSubCode().length())));
                             }
                             //在fin_trade_product、fin_product_type生成相关数据，风险需要用到
-                            commonAutoCouponService.createRepoInfo(entity2);
+                            investCommonAutoCouponService.createRepoInfo(entity2);
                         } else if (StringUtil.equals(entity2.getSubCode().substring(0, 4),KEY_ZHGB_STR)){
                             rskValtblPrtBotassetMapDto2.setSubClass(DictCodeListExt1.资产科目类型_正回购.getValue());
                             String code=entity2.getSubCode().substring(0, 8);
@@ -1105,7 +1104,7 @@ public class ValBatchImportService {
                                 entity2.setFinprodId(finprodType.concat(GlobalConstant.UNDER_LINE).concat(entity2.getSubCode().substring(8, entity2.getSubCode().length())));
                             }
                             //在fin_trade_product、fin_product_type生成相关数据，风险需要用到
-                            commonAutoCouponService.createRepoInfo(entity2);
+                            investCommonAutoCouponService.createRepoInfo(entity2);
                         } else if (StringUtil.equals(entity2.getSubCode().substring(0, 4),KEY_ZHGI_STR)){
                             rskValtblPrtBotassetMapDto2.setSubClass(DictCodeListExt1.资产科目类型_正回购.getValue());
                         } else if (StringUtil.equals(entity2.getSubCode().substring(0, 6),KEY_NHGI_STR)){

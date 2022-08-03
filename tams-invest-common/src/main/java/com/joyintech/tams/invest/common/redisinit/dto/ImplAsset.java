@@ -25,6 +25,11 @@ import com.joyintech.tams.invest.common.riskinfrds.info.entity.IAssetInfo;
  */
 public class ImplAsset extends FinProduct implements IAssetInfo {
 
+    // modify by etliu 20220725 start
+    // 【org.springframework.core.serializer.support.SerializationFailedException: Failed to deserialize payload.】问题解决
+    private static final long serialVersionUID = 1470750054260691400L;
+    // modify by etliu 20220725 end
+
     /**
      * 投资性质
      */

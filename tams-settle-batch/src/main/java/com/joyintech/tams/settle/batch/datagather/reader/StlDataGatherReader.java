@@ -178,6 +178,8 @@ public abstract class StlDataGatherReader extends BaseReader<InvestTradeReaderDt
                     ,DictCodeListStl.业务场景分类明细_债券质押式竞价正回购_到期.getValue()));
             // ZGZGST-4214:增加业务场景类型条件 fuyongsheng 20211214 add end
             // 查询竞价回购存续期成交明细数据
+            searchParam.put("CASH_TYPE_1_01", DictCodeListExt1.现金流一级类型_本金.getValue());
+            searchParam.put("CASH_TYPE_1_02", DictCodeListExt1.现金流一级类型_利息.getValue());
             List<SettleTransDataDto> settleTransDataDtos = stlDataGatherService.listRepoSettleTransData(searchParam);
             // 按照交易编号分组
             Map<String, List<SettleTransDataDto>> settleTransDataMap = new HashMap<>();

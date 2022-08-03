@@ -502,9 +502,9 @@ public class CfetsBondDealQuotedPrice004Service extends BaseService<CfetsBondDea
     private void oldPositionDeal(CfetsBondDealDbDto cfetsBondDealDbDto, boolean navigate) {
 
         if (navigate) {
-            cfetsBondDealDbDto.getRegFinProductDeals().stream().forEach(item -> {
+            for (RegFinProductDeal item : cfetsBondDealDbDto.getRegFinProductDeals()) {
                 AllTradeCommonUtil.deleteRegPosition(item.getRemark() == null ? "登记撤销" : item.getRemark(), item.getTradeId());
-            });
+            }
 
         } else {
             // 调用业务组件.【金融产品交易共通.交易产品接口】,写入[可用]的组合持仓流水及现金流水
@@ -548,7 +548,7 @@ public class CfetsBondDealQuotedPrice004Service extends BaseService<CfetsBondDea
                     baseTradeProductDealDto.setEntrustId(item.getEntrustId());
                 }
 
-                finProductTradeDto.setBaseTradeProductDealDtos(Arrays.asList(baseTradeProductDealDto));
+                finProductTradeDto.setBaseTradeProductDealDtos(Collections.singletonList(baseTradeProductDealDto));
                 baseTradeProductDealCommService.insertPosition(finProductTradeDto);
             }
         }

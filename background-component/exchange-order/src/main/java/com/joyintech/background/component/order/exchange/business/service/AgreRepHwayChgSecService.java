@@ -12,10 +12,12 @@ package com.joyintech.background.component.order.exchange.business.service;
 
 import java.math.BigDecimal;
 
+import com.joyintech.background.component.order.exchange.common.dto.EtrPledgeDto;
 import com.joyintech.background.component.order.exchange.database.dao.EntrustComponentMapper;
 import com.joyintech.background.component.order.exchange.database.entity.EntrustComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
@@ -74,9 +76,9 @@ class AgreRepHwayChgSecService extends EtrSubComponentService<AgreRepHwayChgSecD
     	
     	//回购金额
     	if(dto.getEntrustAmt() == null){
-    		result.addError(error(dto.getClass().getSimpleName(), LocalConstant.TRADEAMT,
-                    "ETR_COMPONENT_ERR_012","回购金额"
-            ));
+//    		result.addError(error(dto.getClass().getSimpleName(), LocalConstant.TRADEAMT,
+//                    "ETR_COMPONENT_ERR_012","回购金额"
+//            ));
     	}
     	//回购方向
     	if(dto.getBusiPs() == null){
@@ -89,7 +91,9 @@ class AgreRepHwayChgSecService extends EtrSubComponentService<AgreRepHwayChgSecD
     		result.addError(new FieldError(dto.getClass().getSimpleName(),"repSecId","正回购方质押券不能为空"));
     	}
     	//质押数量
-    	if(dto.getBusiPs()!=null && DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getBusiPs())&& dto.getPledgeNumber() == null){
+    	if(dto.getBusiPs()!=null && DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getBusiPs())&& dto.getPledgeNumber() == null
+		&&!"21".equals(dto.getEntrustType())
+		){
     		result.addError(new FieldError(dto.getClass().getSimpleName(),"repSecNum","正回购方质押券数量不能为空"));
 
     	}
@@ -130,10 +134,19 @@ class AgreRepHwayChgSecService extends EtrSubComponentService<AgreRepHwayChgSecD
 
 	       // 先根据指令编号删除所有该指令下的质押券数据，再插入新的质押券数据
 			etrPledgeComponentMapper.deleteByEntrustId(etrPledgeEntity);
+			if(!CollectionUtils.isEmpty(dto.getList())){
+				for(EtrPledgeDto etrPledgeDto:dto.getList()){
+					EtrPledgeComponent etrPledgeEntityDto = new EtrPledgeComponent();
+					BeanUtil.copyPropertiesIgnoreNull(etrPledgeEntityDto, etrPledgeDto);
+					etrPledgeComponentMapper.insertSelective(etrPledgeEntityDto);
+				}
+			}else{
+				if(StringUtil.isNotEmpty(dto.getFinprodId())) {
+					etrPledgeComponentMapper.insertSelective(etrPledgeEntity);
+				}
+			}
 
-	       if(StringUtil.isNotEmpty(dto.getFinprodId())) {
-			   etrPledgeComponentMapper.insertSelective(etrPledgeEntity);
-		   }
+
 
 	   }
 		

@@ -660,6 +660,11 @@ public class InterfCstpTrade extends BaseEntity {
     private String fltlegcouponpaymentdate;
 
     /**
+     * 交易号
+     */
+    private String dealNo;
+
+    /**
      * 交易本金(中债登)
      */
     @JsonSerialize(using=BigDecimalSerializer.class)
@@ -2702,5 +2707,13 @@ public class InterfCstpTrade extends BaseEntity {
      */
     public void setScFpriceAmt(BigDecimal scFpriceAmt) {
         this.scFpriceAmt = scFpriceAmt;
+    }
+
+    public String getDealNo() {
+        return dealNo;
+    }
+
+    public void setDealNo(String dealNo) {
+        this.dealNo = dealNo;
     }
 }

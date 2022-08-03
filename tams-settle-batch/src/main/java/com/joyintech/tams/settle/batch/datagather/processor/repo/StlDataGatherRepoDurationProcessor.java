@@ -6,6 +6,7 @@ import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.dao.TrdProductDealMapper;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -34,6 +35,9 @@ public class StlDataGatherRepoDurationProcessor extends BaseProcessor<NeedOperat
     @Autowired
     private SettleCommonService settleCommonService;
 
+    @Autowired
+    private TrdProductDealMapper trdProductDealMapper;
+
     @Override
     public InvestTradeWriteDto process(NeedOperateEntity operateEntity) throws Exception {
         InvestTradeWriteDto investTradeWriteDto = new InvestTradeWriteDto();
@@ -60,6 +64,7 @@ public class StlDataGatherRepoDurationProcessor extends BaseProcessor<NeedOperat
             //add by wujie on 20220301 end remark:调用估值交易入账参数对象
             
             for (SettleTransDataDto settleTransData : settleTransDataDtos) {
+                TrdProductDeal sqTrdProductDeal = trdProductDealMapper.selectByPrimaryKey(settleTransData.getFinprodId());
                 //汇总交(资产维度)
                 TotalTrdProductDealDto totalTrdProductDealDto = new TotalTrdProductDealDto();
                 // GNS-925:竞价回购到期生成存续期交易有误 modify by fuyongsheng 20220220 start
@@ -101,6 +106,7 @@ public class StlDataGatherRepoDurationProcessor extends BaseProcessor<NeedOperat
                 totalTrdProductDealDto.setDqprinAmt(settleTransData.getmPrinAmt());
                 totalTrdProductDealDto.setDeliveryType("03");
                 totalTrdProductDealDto.setmDeliveryType("03");
+                totalTrdProductDealDto.setCounterId(null != sqTrdProductDeal ? sqTrdProductDeal.getCounterId() : null);
                 //wangyang1 20220114 end
                 finProductDealTotalList.add(totalTrdProductDealDto);
 
@@ -126,6 +132,11 @@ public class StlDataGatherRepoDurationProcessor extends BaseProcessor<NeedOperat
                 for (TrdProductDealDto  trdProductDealDto: settleTransData.getTrdProductDealList()) {
                     TrdProductDealDto trdProductDeal = new TrdProductDealDto();
                     trdProductDeal.setPs(trdProductDealDto.getPs());
+                    if(DictCodeList.交易方向_还本到账.getValue().equals(trdProductDeal.getPs())){
+                        trdProductDeal.setCashId(trdProductDealDto.getPrinCashId());
+                    }else{
+                        trdProductDeal.setCashId(trdProductDealDto.getIntPayCashId());
+                    }
                     //交易份额
                     trdProductDeal.setShareAmt(trdProductDealDto.getShareAmt());
                     //交易本金
@@ -140,6 +151,7 @@ public class StlDataGatherRepoDurationProcessor extends BaseProcessor<NeedOperat
                     createDeal(trdProductDeal,settleTransData);
                     //wangyang1 20220114 start
                     trdProductDeal.setTradeId(settleCommonService.buildBussinessCodeExt(DictCodeList.共通业务类型_逆回购录入));
+                    trdProductDeal.setCounterId(totalTrdProductDealDto.getCounterId());
                     trdProductDeal.setPayDate(trdProductDealDto.getSettleDate());
                     //wangyang1 20220114 end
                     trdProductDeal.setPortfolioId(settleTransData.getPortfolioId());
@@ -547,6 +559,7 @@ public class StlDataGatherRepoDurationProcessor extends BaseProcessor<NeedOperat
                     intAmtMap.put(key, ArithmeticUtil.subtract(bigDecimal,settleTransDataDto.getIntAmt()));
                 }
                 trdProductDealDto.setPrinAmt(BigDecimal.ZERO);
+                trdProductDealDto.setIntPayCashId(settleTransDataDto.getIntPayCashId());
                 trdProductDeals.add(trdProductDealDto);
             }
             if(null!=settleTransDataDto.getShareAmt()&&settleTransDataDto.getShareAmt().compareTo(BigDecimal.ZERO)!=0){
@@ -558,6 +571,7 @@ public class StlDataGatherRepoDurationProcessor extends BaseProcessor<NeedOperat
                 trdProductDealDto.setIntAmt(BigDecimal.ZERO);
                 trdProductDealDto.setFpriceAmt(shareNum);
                 trdProductDealDto.setTradeAmt(shareNum);
+                trdProductDealDto.setPrinCashId(settleTransDataDto.getPrinCashId());
                 trdProductDeals.add(trdProductDealDto);
             }
             settleTransDataDto.setTrdProductDealList(trdProductDeals);

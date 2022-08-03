@@ -52,12 +52,31 @@ public interface BaseEtrCashPositionCommService {
      * @return 执行结果
      */
     CommonResult entrustCloseExecute(String entrustId, String isExistNew);
+
+    // modify by etliu 20220719 start
+    // 3.0.6协议回购+风险升级 XYHGFXSJ-156
+    //【实时资金头寸查询-协议回购】上交所逆回购指令退回后，资金流水未回冲
+    /**
+     * 委托关闭执行共通,主要是向旧表插入头寸(协议回购专用)
+     * @param entrustId 委托编号 isExistNew 是否已经向新表插入数据，Y：已入
+     * @return 执行结果
+     */
+    CommonResult entrustCloseExecuteForH01(String entrustId, String isExistNew);
+    // modify by etliu 20220719 end
+
     /**
      * 委托关闭执行共通,主要是向旧表插入头寸
      * @param entrustId 委托编号 isExistNew 是否已经向新表插入数据，Y：已入 forcedFinishAmt 强制完成额度
      * @return 执行结果
      */
-    CommonResult entrustCloseExecute(String entrustId, String isExistNew, BigDecimal forcedFinishAmt);
+    CommonResult entrustCloseExecute(String entrustId, String isExistNew, BigDecimal forcedFinishAmt, String isSettleFail);
+
+    /**
+     * 委托关闭执行共通,主要是向旧表插入头寸
+     * @param entrustId 委托编号 isExistNew 是否已经向新表插入数据，Y：已入 forcedFinishAmt 强制完成额度 isSettleFail 是否交收失败
+     * @return 执行结果
+     */
+    CommonResult entrustCloseExecute(String entrustId, String isExistNew, String isSettleFail);
     /**
      * 标准券管理出入库共通
      * @param list 出入库质押券列表

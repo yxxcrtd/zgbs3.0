@@ -53,6 +53,11 @@
           and VERSION = #{version,jdbcType=DECIMAL}
           and ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
     </select>
+
+    <select id="selectByQuoteId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        <include refid="com.joyintech.background.component.uplink.interbank.database.dao.IbuQuoteEtrReMapper.Sql_All_Data" />
+        where QUOTE_ID = #{quoteId,jdbcType=VARCHAR}
+    </select>
     <delete id="deleteByPrimaryKey" parameterType="com.joyintech.background.component.uplink.interbank.database.entity.IbuQuoteEtrReKey" >
         delete from IBU_QUOTE_ETR_RE
         where QUOTE_ID = #{quoteId,jdbcType=VARCHAR}

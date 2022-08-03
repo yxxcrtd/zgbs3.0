@@ -196,7 +196,7 @@ public class EtrWtSpotexService extends CommonExportService<EtrWtSpotexDto> impl
      */
     @Override
     public void doInsert(EtrWtSpotexDto dto, OperationType type) {
-        dto.setOperateType(type.toString());
+//        dto.setOperateType(type.toString());
         restTemplate.postForObject(
             ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrWtSpotex/doInsert", dto, Integer.class);
         

@@ -16,10 +16,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.joyintech.tams.common.base.entity.FinProduct;
-import com.joyintech.tams.common.base.entity.PtlPortfolio;
-import com.joyintech.tams.common.base.entity.RepAssetOther;
-import com.joyintech.tams.common.base.entity.SysUploadFileInfo;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.service.product.common.dto.BussFinProductOpenPlanDto;
 
@@ -235,7 +232,12 @@ public class FinPlanAssetCDto extends FinProduct {
      */
     private PtlPortfolio ptlPortfolio;
     //add end
-
+    // add by swwan TISHKS-1483 start
+    /**
+     * pa组合entity
+     */
+    private PaPtlPortfolio paPtlPortfolio;
+    // add by swwan TISHKS-1483 end
     /**
      * 授信客户编号（机构授信）/金融产品代码（资产授信）/资产系列代码（资产系列授信）
      */
@@ -983,5 +985,13 @@ public class FinPlanAssetCDto extends FinProduct {
 
     public void setBussFinProductOpenPlanRedDto(BussFinProductOpenPlanDto bussFinProductOpenPlanRedDto) {
         this.bussFinProductOpenPlanRedDto = bussFinProductOpenPlanRedDto;
+    }
+
+    public PaPtlPortfolio getPaPtlPortfolio() {
+        return paPtlPortfolio;
+    }
+
+    public void setPaPtlPortfolio(PaPtlPortfolio paPtlPortfolio) {
+        this.paPtlPortfolio = paPtlPortfolio;
     }
 }

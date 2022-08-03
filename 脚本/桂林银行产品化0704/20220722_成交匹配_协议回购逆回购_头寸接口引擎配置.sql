@@ -1,0 +1,3 @@
+DELETE FROM INTERF_POSITION_CONFIG WHERE TRADE_PLAT = 'TRANS_MATCH' AND FINPROD_TYPE = 'F03-H01' AND PS = 'T07' AND BUSI_ACT = '19' AND ENTITY = 'com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto'; 
+--协议回购逆回购到期
+INSERT INTO INTERF_POSITION_CONFIG (TRADE_PLAT, FINPROD_TYPE, PS, BUSI_ACT, POSITION_TYPE, ENTITY, INTERF_TYPE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, REMARK, ENABLE) VALUES ('TRANS_MATCH', 'F03-H01', 'T07', '19', 'TRD', 'com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto', 'REPO002', 'system', null, sysdate, 'system', sysdate, '场内协议回购成交匹配-逆回购-到期', 'Y');

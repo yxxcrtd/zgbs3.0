@@ -238,7 +238,7 @@ public class FieldEtrBondFirstExeListInfoResponse {
     }
 
     public String getIssueDateStr() {
-        if (null != this.getIssueDateEnd()) {
+        if (null == this.getIssueDateEnd()) {
             return DateUtil.format(this.getIssueDateStart());
         }
         if (null != this.getIssueDateStart() && null != this.getIssueDateEnd()) {

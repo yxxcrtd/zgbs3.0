@@ -1,0 +1,1 @@
+UPDATE SYS_BATCH_TASK SET TASK_NAME = '存续期自动生成',TASK_PRI= '24' WHERE BEAN_NAME = 'cfetsbondAutoDurDealGenerateTask';

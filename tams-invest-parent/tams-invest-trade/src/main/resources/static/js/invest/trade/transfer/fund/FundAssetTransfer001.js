@@ -185,7 +185,7 @@ $(function() {
         var flag = false;
         var rows = funAssetTransferDtoListTable.getAllRows();
         var portfolioId = $("#fundAssetTransfer001_portfolioId").val();
-        var portfolioName = $("#fundAssetTransfer001_portfolioId").find("option:selected").text().split(':')[1];
+        var portfolioName = $("#fundAssetTransfer001_portfolioId").find("option:selected").text();
         object.portfolioName = portfolioName;
         $.each(rows,function (index,data) {
             if(portfolioId == data.portfolioId){

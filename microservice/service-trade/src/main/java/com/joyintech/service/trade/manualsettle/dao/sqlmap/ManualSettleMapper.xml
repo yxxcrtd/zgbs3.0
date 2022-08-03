@@ -6,6 +6,7 @@
             T1.SETTLE_SEQ_NO SETTLE_SEQ_NO,
             T1.SETTLE_STATUS settleStatus,
             T1.ORDER_ID orderId,
+            T1.ENTRUST_ORDER_ID entrustOrderId,
             T1.TRADE_ID tradeId,
             T1.TRADE_DATE tradeDate,
             T1.SETTLE_DATE settleDate,
@@ -34,11 +35,30 @@
             T1.SETTLE_AMT settleAmt,-->
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN T1.PRIN ELSE NULL END prin,
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN T1.M_TRADE_AMT ELSE NULL END mTradeAmt,
+            <!--
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN T1.PLEDGE_NUMBER ELSE NULL END pledgeNumber,
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN T1.PLEDGE_ID ELSE NULL END pledgeId,
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN T1.B_PLEDGE_ID ELSE NULL END bPledgeId,
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN F1.FINPROD_ABBR ELSE NULL END pledgeName,
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN F1.FINPROD_MARKET_ID ELSE NULL END pledgeIdAbbr,
+            CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN F2.FINPROD_MARKET_ID ELSE NULL END bPledgeIdAbbr,-->
+            CASE
+                WHEN etr.ps= 'T94' THEN epe.PLEDGE_NUMBER
+                WHEN etr.FINPROD_TYPE2 != 'F01' THEN  PN.PLEDGE_NUMBER
+            ELSE NULL END pledgeNumber,
+            CASE
+                WHEN etr.ps= 'T94' THEN epe.FINPROD_ID
+                WHEN etr.FINPROD_TYPE2 != 'F01' THEN PN.PLEDGE_FINPROD_ID
+            ELSE NULL END pledgeId,
+            CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN T1.B_PLEDGE_ID ELSE NULL END bPledgeId,
+            CASE
+                WHEN etr.ps= 'T94' THEN TP.FINPROD_ABBR
+                WHEN etr.FINPROD_TYPE2 != 'F01' THEN PN.PLEDGE_FINPROD_ABBR
+            ELSE NULL END pledgeName,
+            CASE
+                WHEN etr.ps= 'T94' THEN TP.FINPROD_MARKET_ID
+                WHEN etr.FINPROD_TYPE2 != 'F01' THEN PN.FINPROD_MARKET_ID
+            ELSE NULL END pledgeIdAbbr,
             CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN F2.FINPROD_MARKET_ID ELSE NULL END bPledgeIdAbbr,
             <!--T1.PRIN prin,
             T1.M_TRADE_AMT mTradeAmt,
@@ -52,22 +72,29 @@
             T1.ENTRUST_NO entrustNo,
             T4.COUNTER_NAME counterName,
         T1.DEAL_NO dealNo,
+        ICD.ORDER_ID iOrderId,
+        TT.TRADED_BALANCE tradedVolume,
         decode( T1.SETTLE_STATUS,'01',1,'02',3,'03',2,'04',4,5) sort
         FROM TRD_MANUAL_SETTLE_INFO T1
         LEFT JOIN  ETR_ENTRUST etr ON T1.ENTRUST_NO = etr.ENTRUST_ID
+        LEFT JOIN ETR_PLEDGE epe on etr.ENTRUST_ID = epe.ENTRUST_ID and epe.DISPLACE_DIR = '01'
+        LEFT JOIN FIN_PRODUCT TP ON epe.FINPROD_ID = TP.FINPROD_ID
         LEFT JOIN  FIN_PRODUCT  T2 ON T1.FINPROD_ID = T2.FINPROD_ID
         LEFT JOIN PTL_PORTFOLIO T3 ON T1.PORTFOLIO_ID = T3.PORTFOLIO_ID
         Left join MST_COUNTER_PARTY T4 ON T4.COUNTER_ID = T1.COUNTER_ID
-
+        LEFT JOIN INF_CONTRACT_DETAILFILE ICD on T1.ORDER_ID=ICD.ORDER_NO and ICD.DEAL_NO = T1.DEAL_NO
+        LEFT JOIN T_TRADE TT on TT.ENTRUST_ID=ICD.ORDER_ID  and TT.BROKER_TRADE_ID = T1.DEAL_NO
         LEFT JOIN  STL_CAPACCT_INFO  sci ON T1.ACCT_NO = sci.ACCT_NO
         LEFT JOIN  STL_SEC_ACCT_INFO ssai ON T1.SEC_ACCT_ID = ssai.SEC_ACCT_ID
+        <!-- modify by yangxunpeng 协议回购手工交收处理 start
         LEFT JOIN  FIN_PRODUCT  F1 ON T1.PLEDGE_ID = F1.FINPROD_ID
+        modify by yangxunpeng 协议回购手工交收处理 end -->
         LEFT JOIN  FIN_PRODUCT  F2 ON T1.B_PLEDGE_ID = F2.FINPROD_ID
         <!--ZGCPCN-156:手工交收页面支持多组合指令 modify by fuyongsheng 20220422 start-->
         LEFT JOIN (
             SELECT
                 ENTRUST_ID,
-                wm_concat ( PORTFOLIO_NAME ) PORTFOLIO_NAME
+                to_char(wm_concat ( PORTFOLIO_NAME )) PORTFOLIO_NAME
             FROM
                 ETR_ENTRUST_DETAIL
             LEFT JOIN
@@ -77,6 +104,17 @@
             GROUP BY
             ENTRUST_ID
         ) detail ON T1.ENTRUST_NO = detail.ENTRUST_ID
+        left join (
+        SELECT FDP.FINPROD_ID FINPROD_ID,
+        SUM(FDP.PLEDGE_NUMBER) PLEDGE_NUMBER,
+        to_char(wm_concat(FP.FINPROD_ID)) PLEDGE_FINPROD_ID,
+        to_char(wm_concat(FP.FINPROD_MARKET_ID)) FINPROD_MARKET_ID,
+        to_char(wm_concat(FP.FINPROD_ABBR)) PLEDGE_FINPROD_ABBR
+        FROM FIN_DEAL_PLEDGE FDP
+        LEFT JOIN FIN_PRODUCT FP ON FDP.PLEDGE_FINPROD_ID = FP.FINPROD_ID
+        WHERE FDP.BRANCH = 0
+        GROUP BY FDP.FINPROD_ID
+        ) PN on PN.FINPROD_ID = T1.FINPROD_ID or (PN.FINPROD_ID = T1.TRADE_ID and etr.PS in('03','04'))
         <!--ZGCPCN-156:手工交收页面支持多组合指令 modify by fuyongsheng 20220422 end-->
         <where>
             <!--ZGCPCN-156:手工交收页面支持多组合指令 modify by fuyongsheng 20220422 start-->
@@ -133,11 +171,14 @@
         T4.PRIN prin,
         T4.M_TRADE_AMT mTradeAmt,
         T4.PLEDGE_NUMBER pledgeNumber,
-        T4.PLEDGE_ID pledgeId,
-        F1.FINPROD_MARKET_ID pledgeIdAbbr,
+<!--        T4.PLEDGE_ID pledgeId,-->
+<!--        F1.FINPROD_MARKET_ID pledgeIdAbbr,-->
         T4.B_PLEDGE_ID bPledgeId,
         F2.FINPROD_MARKET_ID bPledgeIdAbbr,
-        F1.FINPROD_ABBR pledgeName,
+<!--        F1.FINPROD_ABBR pledgeName,-->
+        CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN PN.PLEDGE_FINPROD_ID ELSE T4.PLEDGE_ID END pledgeId,
+        CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN PN.PLEDGE_FINPROD_ABBR ELSE F1.FINPROD_ABBR END pledgeName,
+        CASE WHEN etr.FINPROD_TYPE2 != 'F01' THEN PN.FINPROD_MARKET_ID ELSE F1.FINPROD_MARKET_ID END pledgeIdAbbr,
         T1.OPER_TYPE OPER_TYPE,
         T1.CREATE_USER CREATE_USER,
         T1.CREATE_DEPT CREATE_DEPT,
@@ -156,6 +197,17 @@
         LEFT JOIN  ETR_ENTRUST etr ON T4.ENTRUST_NO = etr.ENTRUST_ID
         LEFT JOIN  STL_CAPACCT_INFO  T3 ON T4.ACCT_NO = T3.ACCT_NO
         LEFT JOIN SYS_USER T5 ON T1.UPDATE_USER = T5.USER_NAME
+        left join (
+        SELECT FDP.FINPROD_ID FINPROD_ID,
+        SUM(FDP.PLEDGE_NUMBER) PLEDGE_NUMBER,
+        to_char(wm_concat(FP.FINPROD_ID)) PLEDGE_FINPROD_ID,
+        to_char(wm_concat(FP.FINPROD_MARKET_ID)) FINPROD_MARKET_ID,
+        to_char(wm_concat(FP.FINPROD_ABBR)) PLEDGE_FINPROD_ABBR
+        FROM FIN_DEAL_PLEDGE FDP
+        LEFT JOIN FIN_PRODUCT FP ON FDP.PLEDGE_FINPROD_ID = FP.FINPROD_ID
+        WHERE FDP.BRANCH = 0
+        GROUP BY FDP.FINPROD_ID
+        ) PN on PN.FINPROD_ID = T4.FINPROD_ID or (PN.FINPROD_ID = T4.TRADE_ID and etr.PS in('03','04'))
      LEFT JOIN  FIN_PRODUCT  F1 ON T4.PLEDGE_ID = F1.FINPROD_ID
         LEFT JOIN  FIN_PRODUCT F2 ON T4.B_PLEDGE_ID = F2.FINPROD_ID
         where T1.SETTLE_SEQ_NO = #{settleSeqNo}
@@ -272,7 +324,7 @@
         LEFT JOIN (
         SELECT
         ENTRUST_ID,
-        wm_concat ( PORTFOLIO_NAME ) PORTFOLIO_NAME
+        to_char(wm_concat ( PORTFOLIO_NAME )) PORTFOLIO_NAME
         FROM
         ETR_ENTRUST_DETAIL
         LEFT JOIN
@@ -475,4 +527,37 @@
         from TRD_PRODUCT_TEMP_DEAL
         where TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
     </select>
+
+    <!--XYHGFXSJ-8:查询质押品信息list modify by fuyongsheng 20220718 start-->
+    <select id="selectFinDealPledgeByTradeId" resultType="com.joyintech.tams.common.base.entity.FinDealPledge" >
+        select
+        <include refid="com.joyintech.tams.common.base.dao.FinDealPledgeMapper.Base_Column_List" />
+        from FIN_DEAL_PLEDGE
+        where FINPROD_ID = #{tradeId,jdbcType=VARCHAR}
+    </select>
+    <!--XYHGFXSJ-8:查询质押品信息list modify by fuyongsheng 20220718 end-->
+
+    <!--// modify by etliu 20220727 start
+    // 3.0.6协议回购+风险升级 XYHGFXSJ-461
+    //【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误-->
+    <select id="selectPledgeInfo" resultType="com.joyintech.service.trade.manualsettle.dto.ManualSettleDto" >
+        select
+            t1.PRIN as prin,
+            t2.PLEDGE_FINPROD_ID as pledgeId
+        FROM
+            FIN_TRADE_PRODUCT t1
+                LEFT JOIN FIN_DEAL_PLEDGE t2
+                          ON t1.FINPROD_ID = t2.FINPROD_ID and t2.BRANCH = 0
+        WHERE
+            t1.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+          and t1.BRANCH = 0
+    </select>
+    <!--// modify by etliu 20220727 end-->
+    <!-- XYHGFXSJ-724 【实时资产头寸查询】协议回购上交所正回购中途换券数据日间交收后，实时资产里的质押券没有变更-->
+    <select id="selectFinDealPledgeByTradeId2" resultType="com.joyintech.tams.common.base.pojo.PledgeListDto">
+        select distinct FINPROD_ID finprodMarketId, PLEDGE_DISPLACE_AMT pledgeNumber, TRADE_TYPE displaceDir
+        from FIN_PLEDGE_DISP_DETAIL_TEMP
+        where TRADE_ID = (select TRADE_ID from FIN_PLEDGE_DISP_TEMP where F_TRADE_ID = #{tradeId,jdbcType=VARCHAR})
+    </select>
+    <!-- XYHGFXSJ-724 【实时资产头寸查询】协议回购上交所正回购中途换券数据日间交收后，实时资产里的质押券没有变更-->
 </mapper>

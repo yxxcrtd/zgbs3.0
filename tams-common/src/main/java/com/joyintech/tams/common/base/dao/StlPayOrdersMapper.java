@@ -15,9 +15,21 @@ public interface StlPayOrdersMapper {
 
     int insertSelective(StlPayOrders record);
 
+    /**
+     * 批量入库
+     */
+    int insertBatch(List<StlPayOrders> list);
+
     int insertBasicByBasicInfo(StlPayOrders record);
 
     StlPayOrders selectByPrimaryKey(String orderId);
+
+    List<StlPayOrders> selectByTradeIds(@Param("list") List<String> list);
+
+    /**
+     * 批量删除
+     */
+    int deleteByTradeIds(@Param("list") List<String> tradeIds);
 
     int updateByPrimaryKeySelective(StlPayOrders record);
 

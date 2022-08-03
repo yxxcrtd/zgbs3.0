@@ -1,9 +1,7 @@
 package com.joyintech.tams.invest.common.transmatch.dto;
 
-import com.joyintech.background.component.common.pack.common.base.BaseEntity;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.entity.SettleTransDataAdd;
 import com.joyintech.tams.common.base.entity.SettleTransDataTotal;
 import com.joyintech.tams.common.base.entity.SettleTransDataTotalAdd;
 import com.joyintech.tams.common.base.entity.SettleTransDataTotalPledge;
@@ -64,6 +62,97 @@ public class ExchangeTransMatchCommonDto extends SettleTransDataTotal {
      *  转换资产代码/债转股代码（基金转换/债转股）
      */
     private String rFinprodType;
+
+    /**
+     * 本方交易员
+     */
+    private String trader;
+
+    /**
+     * 对手方交易员
+     */
+    private String counterTrader;
+
+    /**
+     * 本方交易商
+     */
+    private String dealerNo;
+
+    /**
+     * 对手方交易商
+     */
+    private String outDealerNo;
+
+    /**
+     * 本方交易主体
+     */
+    private String dealerPartyNo;
+
+    /**
+     * 对手方交易主体
+     */
+    private String outDealerPartyNo;
+
+    /**
+     * 交易对手
+     */
+    private String counterId;
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+    
+    public String getTrader() {
+        return trader;
+    }
+
+    public void setTrader(String trader) {
+        this.trader = trader;
+    }
+
+    public String getCounterTrader() {
+        return counterTrader;
+    }
+
+    public void setCounterTrader(String counterTrader) {
+        this.counterTrader = counterTrader;
+    }
+
+    public String getDealerNo() {
+        return dealerNo;
+    }
+
+    public void setDealerNo(String dealerNo) {
+        this.dealerNo = dealerNo;
+    }
+
+    public String getOutDealerNo() {
+        return outDealerNo;
+    }
+
+    public void setOutDealerNo(String outDealerNo) {
+        this.outDealerNo = outDealerNo;
+    }
+
+    public String getDealerPartyNo() {
+        return dealerPartyNo;
+    }
+
+    public void setDealerPartyNo(String dealerPartyNo) {
+        this.dealerPartyNo = dealerPartyNo;
+    }
+
+    public String getOutDealerPartyNo() {
+        return outDealerPartyNo;
+    }
+
+    public void setOutDealerPartyNo(String outDealerPartyNo) {
+        this.outDealerPartyNo = outDealerPartyNo;
+    }
 
     public String getMatchType() {
         return matchType;

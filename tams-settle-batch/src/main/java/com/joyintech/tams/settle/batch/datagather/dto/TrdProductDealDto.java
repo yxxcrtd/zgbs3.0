@@ -191,6 +191,32 @@ public class TrdProductDealDto extends TrdProductDeal {
     //预计分红日
     private Date bonusCfmDate;
 
+    /**
+     * 本金现金流代码
+     */
+    private String prinCashId;
+
+    public String getPrinCashId() {
+        return prinCashId;
+    }
+
+    public void setPrinCashId(String prinCashId) {
+        this.prinCashId = prinCashId;
+    }
+
+    /**
+     * 付息现金流代码
+     */
+    private String intPayCashId;
+
+    public String getIntPayCashId() {
+        return intPayCashId;
+    }
+
+    public void setIntPayCashId(String intPayCashId) {
+        this.intPayCashId = intPayCashId;
+    }
+
     public Date getBonusCfmDate() {
         return bonusCfmDate;
     }

@@ -166,6 +166,9 @@ public class CfetsManualSettleQueryService extends BaseService{
         pageParam.put("tradePlat_01", BussinessDictCodeList.交易场所_银行间.getValue());
         pageParam.put("tradePlat_02", BussinessDictCodeList.交易场所_商业银行柜台市场.getValue());
 
+
+        pageParam.put("FINPROD_TYPE_TG_F03", DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
+
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
         int year = c.get(Calendar.YEAR);
@@ -355,8 +358,10 @@ public class CfetsManualSettleQueryService extends BaseService{
             // 查看页面表格不可编辑,不会有个性化配置
             List<CfgDataTableShow> infoForm4 = cfgDataTableMapper.getByPageCode(pageCode, dtCode, spcdCodeTemp + "ZBP", EFFERANGE_NO, USER_ID);
             List<PortIntFenPeiInfoDto> portIntFenPeiInfoDtoList = cfetsManualSettleMapper.findBidFirmPortIntFenPeiInfoList(pageParam);
-            respond.setWinPrinamt(portIntFenPeiInfoDtoList.stream().map(PortIntFenPeiInfoDto::getTheWinPrinamt).reduce(BigDecimal::add).get());
-            respond.setTotalBidPrinamt(portIntFenPeiInfoDtoList.stream().map(PortIntFenPeiInfoDto::getTotalBiddingNum).reduce(BigDecimal::add).get());
+            respond.setWinPrinamt(portIntFenPeiInfoDtoList.stream().filter(item -> StringUtil.isNotEmpty(item.getTheWinPrinamt()))
+                    .map(PortIntFenPeiInfoDto::getTheWinPrinamt).reduce(BigDecimal::add).get());
+            respond.setTotalBidPrinamt(portIntFenPeiInfoDtoList.stream().filter(item -> StringUtil.isNotEmpty(item.getTotalBiddingNum()))
+                    .map(PortIntFenPeiInfoDto::getTotalBiddingNum).reduce(BigDecimal::add).get());
             BigDecimal etrBidPriceTotal = BigDecimal.ZERO;
             for (PortIntFenPeiInfoDto item : portIntFenPeiInfoDtoList) {
                 etrBidPriceTotal = ArithmeticUtil.doAdd(etrBidPriceTotal, item.getUnFinshAmt());

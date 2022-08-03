@@ -582,7 +582,11 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                                 //到期金额
                                 dealTotal.setmTradeAmt(item.getmTradeAmt());
                                 //首期成交编号
-                                dealTotal.setfCjbh(item.getfCjbh());
+                                if(DictCodeList.交易方向_到期续做.getValue().equals(item.getPs())){
+                                    dealTotal.setfCjbh(item.getTradeId());
+                                }else{
+                                    dealTotal.setfCjbh(item.getfCjbh());
+                                }
                             }
                             //当笔成交数据明细.质押品信息流水号 非空
                             if(StringUtil.isNotEmpty(item.getPledgeTradeId())){
@@ -723,8 +727,10 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                             BigDecimal totalmTradeAmt=BigDecimal.ZERO;
                             //总印花税_原始
                             BigDecimal totalStampFeeRaw=BigDecimal.ZERO;
-                            //总过户费_原始
+                            //总经手费_原始
                             BigDecimal totalJsfAmtRaw=BigDecimal.ZERO;
+                            //总过户费_原始
+                            BigDecimal totalGhfAmtRaw=BigDecimal.ZERO;
                             //总证管费_原始
                             BigDecimal totalZgfAmtRaw=BigDecimal.ZERO;
                             //总经手费_原始
@@ -753,6 +759,7 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                                 totalStampFeeRaw=ArithmeticUtil.doAdd(totalStampFeeRaw, item.getStampFeeRaw());
                                 totalJsfAmtRaw=ArithmeticUtil.doAdd(totalJsfAmtRaw, item.getJsfAmtRaw());
                                 totalZgfAmtRaw=ArithmeticUtil.doAdd(totalZgfAmtRaw, item.getZgfAmtRaw());
+                                totalGhfAmtRaw=ArithmeticUtil.doAdd(totalGhfAmtRaw, item.getGhfAmtRaw());
                                 totalSxfAmtRaw=ArithmeticUtil.doAdd(totalSxfAmtRaw, item.getSxfAmtRaw());
                                 totalSettleFeeRaw=ArithmeticUtil.doAdd(totalSettleFeeRaw, item.getSettleFeeRaw());
                                 totalCommissionAmtRaw=ArithmeticUtil.doAdd(totalCommissionAmtRaw, item.getCommissionAmt());
@@ -793,7 +800,7 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                             //手续费
                             dealTotal.setSxfAmt(totalSxfAmt);
                             //结算费
-                            dealTotal.setJsfAmt(totalJsfAmt);
+                            dealTotal.setSettleFee(totalSettleFee);
                             //佣金
                             dealTotal.setCommissionAmt(BigDecimal.ZERO);
                             //佣金是否随交易支付 空
@@ -825,11 +832,13 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                             dealTotal.setSettleMode(settleTransDataDto.getSettleMode());
                             //印花税_原始
                             dealTotal.setStampFeeRaw(totalStampFeeRaw);
-                            //过户费_原始
+                            //经手费_原始
                             dealTotal.setJsfAmtRaw(totalJsfAmtRaw);
                             //证管费_原始
                             dealTotal.setZgfAmtRaw(totalZgfAmtRaw);
-                            //经手费_原始
+                            //过户费_原始
+                            dealTotal.setGhfAmtRaw(totalGhfAmtRaw);
+                            //手续费_原始
                             dealTotal.setSxfAmtRaw(totalSxfAmtRaw);
                             //结算费_原始
                             dealTotal.setSettleFeeRaw(totalSettleFeeRaw);
@@ -902,11 +911,12 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
             // GZYHTZJY-1100:深交所的到期续作到期交付日特殊处理 modify fuyongsheng 20220113 end
             //  汇总交易编号
             dealTotal.setSeqId(IDGenerator.generate());
-            if(DictCodeList.交易方向_买入.getValue().equals(dealTotal.getPs())){
-                // modify by fuyongsheng 协议回购首期的FCjbh存明细表的主键 start
+            if(DictCodeList.交易方向_买入.getValue().equals(dealTotal.getPs())
+                    || DictCodeList.交易方向_到期续做.getValue().equals(dealTotal.getPs())){
+                // XYHGFXSJ-619 :modify by fuyongsheng 协议回购首期和到期续作的FCjbh存明细表的主键 start
                 // dealTotal.setfCjbh(settleTransDataDto.getCjbh());
                 dealTotal.setfCjbh(settleTransDataDto.getTradeId());
-                // modify by fuyongsheng 协议回购首期的FCjbh存明细表的主键 end
+                // XYHGFXSJ-619 :modify by fuyongsheng 协议回购首期和到期续作的FCjbh存明细表的主键 end
             }
             settleTransDataList.add(dealTotal);
             //当笔成交数据明细.附属表流水号 非空

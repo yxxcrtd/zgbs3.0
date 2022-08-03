@@ -1831,4 +1831,14 @@ public class EtrAgreRepTradeService extends BaseService{
         }
         return etrAgreRepTradeMapper.selectAvailablePositionAmount(param);
     }
+
+    /**
+     * 查询首期的到期结算金额
+     *
+     * @param map 检索参数
+     * @return 到期结算金额
+     */
+    public BigDecimal getFirstTradeAmtByTradeId(Map<String, String> map) {
+        return etrAgreRepTradeMapper.getFirstTradeAmtByTradeId(map);
+    }
 }

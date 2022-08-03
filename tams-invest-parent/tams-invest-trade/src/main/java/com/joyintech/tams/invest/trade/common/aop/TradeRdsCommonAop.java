@@ -13,6 +13,7 @@ package com.joyintech.tams.invest.trade.common.aop;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.util.*;
+import com.joyintech.tams.common.base.dao.FinTradeProductMapper;
 import com.joyintech.tams.component.business.riskrds.constant.InterfUtil;
 import com.joyintech.tams.component.business.riskrds.constant.PageFieldToInterfFactory;
 import com.joyintech.tams.component.business.riskrds.dto.InterfRiskRdsDto;
@@ -50,6 +51,9 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+
+import static com.joyintech.tams.constant.DictCodeListExt1.金融产品类型_投管用_债券质押式正回购;
+import static com.joyintech.tams.constant.DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购;
 
 /**
  * 交易撤销时调用风险逻辑aop
@@ -93,6 +97,10 @@ public class TradeRdsCommonAop {
  // add by etliu 20210129 end
 
     // add by zhangrui1 start
+    @Autowired
+    private FinTradeProductMapper finTradeProductMapper;
+
+
     /**
      * 线程缓存
      */
@@ -182,7 +190,7 @@ public class TradeRdsCommonAop {
      * modify by jiangpeng on 20210511 ZGBSSE-351
      * 【标准券管理】标准券入库交易审核报错,标准券出库交易审核报错
      */
-    private List<String> ignoreList=Arrays.asList("ChannelFeePay002Service","TrdStandardBond002Service","TrdStandardBond003Service");
+    private List<String> ignoreList=Arrays.asList("ChannelFeePay002Service","TrdStandardBond002Service","TrdStandardBond003Service","NetPlanTransfer001Service","TrdFundInvestTrade001Service");
     /*@Pointcut("execution(* com.joyintech.workflow.engine.service.ProcessStartService.start(..))")
     protected void startPoint() {
 
@@ -234,7 +242,11 @@ public class TradeRdsCommonAop {
                 }
             }
             // add by etliu 20210129 end
-            
+            //信用保护凭证买入、信用保护凭证卖出的交收失败风险不在这里处理
+            if(StringUtil.equals(mapTrd.get("pageModel"), DictCodeListExt3.交收操作类型_交收失败.getValue())
+                    &&(StringUtil.equals(mapTrd.get("busiType"),"27") || StringUtil.equals(mapTrd.get("busiType"),"28"))){
+                return;
+            }
             // modify by zhangrui1 20200509 批量接口逻辑 start
 //            revokeBackRiskCommon(mapTrd,BussinessDictCodeListRds.接口系统ID_实占接口.getValue(),joinPoint);
             String infCode = BussinessDictCodeListRds.接口系统ID_实占接口.getValue();
@@ -266,7 +278,11 @@ public class TradeRdsCommonAop {
                 }
             }
             // add by etliu 20210129 end
-            
+            //信用保护凭证买入、信用保护凭证卖出的交收失败风险不在这里处理
+            if(StringUtil.equals(mapTrd.get("pageModel"), DictCodeListExt3.交收操作类型_交收失败.getValue())
+                    &&(StringUtil.equals(mapTrd.get("busiType"),"27") || StringUtil.equals(mapTrd.get("busiType"),"28"))){
+                return;
+            }
             // modify by zhangrui1 20200509 批量接口逻辑 start
 //            revokeBackRiskCommon(mapTrd,BussinessDictCodeListRds.接口系统ID_实占释放接口.getValue(),joinPoint);
             String infCode = BussinessDictCodeListRds.接口系统ID_实占释放接口.getValue();
@@ -276,58 +292,88 @@ public class TradeRdsCommonAop {
             }
             mapTrd.put("operateType", "revoke");
             // 手工交收 -> 交收失败
-            if (args[0] instanceof ManualSettleDto && DictCodeListExt3.交收状态_交收失败.getValue().equals(mapTrd.get("pageModel"))){
-                // 资产类型
-                String assetType= StringUtil.EMPTY;
-                String assetCode = (String) CommonUtil.findValue(mapTrd, InterfUtil.finprodId);
-                if(StringUtil.isNotEmpty(assetCode)){
-                    AssetInfoRedisService assetInfoSrc = SpringContextUtil.getBean(AssetInfoRedisService.class);
-                    if (assetInfoSrc != null){
-                        Map<String, IAssetInfo> mapAsset = assetInfoSrc.getMapFromRedis(RedisKeyEnum.资产基本信息.key(), Arrays.asList(assetCode));
-                        if(StringUtil.isNotEmpty(mapAsset)&&StringUtil.isNotEmpty(mapAsset.values())) {
-                            for (IAssetInfo iAst : mapAsset.values()) {
-                                assetType = StringUtil.isNotEmpty(iAst)?iAst.getAssetType():assetType;
+            if (args[0] instanceof ManualSettleDto ){
+                if(DictCodeListExt3.交收状态_交收失败.getValue().equals(mapTrd.get("pageModel"))) {
+                    // 资产类型
+                    String assetType = StringUtil.EMPTY;
+                    String assetCode = (String) CommonUtil.findValue(mapTrd, InterfUtil.finprodId);
+                    if (StringUtil.isNotEmpty(assetCode)) {
+                        AssetInfoRedisService assetInfoSrc = SpringContextUtil.getBean(AssetInfoRedisService.class);
+                        if (assetInfoSrc != null) {
+                            Map<String, IAssetInfo> mapAsset = assetInfoSrc.getMapFromRedis(RedisKeyEnum.资产基本信息.key(), Arrays.asList(assetCode));
+                            if (StringUtil.isNotEmpty(mapAsset) && StringUtil.isNotEmpty(mapAsset.values())) {
+                                for (IAssetInfo iAst : mapAsset.values()) {
+                                    assetType = StringUtil.isNotEmpty(iAst) ? iAst.getAssetType() : assetType;
+                                }
                             }
                         }
+                        mapTrd.put(PageFieldToInterfFactory.INF_ASSETTYPE, assetType);
                     }
-                    mapTrd.put(PageFieldToInterfFactory.INF_ASSETTYPE,assetType);
-                }
-                // 交易金额
-                if (CommonUtil.findValue(mapTrd, "settleAmt") != null && CommonUtil.findValue(mapTrd, "settleNum") != null){
                     // 交易金额
-                    BigDecimal price = new BigDecimal(mapTrd.get("settleAmt").toString()).divide(new BigDecimal(mapTrd.get("settleNum").toString()),4, RoundingMode.HALF_UP);
-                    mapTrd.put("tradeAmt",CommonUtil.findValue(mapTrd, "settleAmt"));
-                    mapTrd.put("tradeNum",CommonUtil.findValue(mapTrd, "settleNum"));
-                    mapTrd.put("netPrice",price);
-                    mapTrd.put("allPrice",price);
-                    mapTrd.put("price",price);
+                    if (CommonUtil.findValue(mapTrd, "settleAmt") != null && CommonUtil.findValue(mapTrd, "settleNum") != null) {
+                        // 交易金额
+                        BigDecimal price = new BigDecimal(mapTrd.get("settleAmt").toString()).divide(new BigDecimal(mapTrd.get("settleNum").toString()), 4, RoundingMode.HALF_UP);
+                        mapTrd.put("tradeAmt", CommonUtil.findValue(mapTrd, "settleAmt"));
+                        mapTrd.put("tradeNum", CommonUtil.findValue(mapTrd, "settleNum"));
+                        mapTrd.put("netPrice", price);
+                        mapTrd.put("allPrice", price);
+                        mapTrd.put("price", price);
+                    }
+                    String tradeId = null;
+                    // 实际编号
+                    if (CommonUtil.findValue(mapTrd, "orderId") != null) {
+                        mapTrd.put(PageFieldToInterfFactory.INF_EVENTID, CommonUtil.findValue(mapTrd, "orderId"));
+                        mapTrd.put("tradeId", CommonUtil.findValue(mapTrd, "orderId"));
+                        if (StringUtil.equals(金融产品类型_投管用_债券质押式正回购.getValue(), CommonUtil.findValue(mapTrd, "finprodType2")) ||
+                                StringUtil.equals(金融产品类型_投管用_债券质押式逆回购.getValue(), CommonUtil.findValue(mapTrd, "finprodType2"))) {//针对协议回购交收失败组装实占编号
+                            tradeId = String.format("%s-%s-%s", CommonUtil.findValue(mapTrd, "entrustNo"), CommonUtil.findValue(mapTrd, "portfolioId"), CommonUtil.findValue(mapTrd, "iOrderId"));
+                            mapTrd.put("tradeId", isDqxz(mapTrd) ? tradeId + "T01" : tradeId);
+                            mapTrd.put("tradeAmt", CommonUtil.findValue(mapTrd, "tradedVolume"));
+                            mapTrd.put("tradeNum", CommonUtil.findValue(mapTrd, "tradedVolume"));
+                        }
+                    }
+                    // 预占编号
+                    if (CommonUtil.findValue(mapTrd, "entrustNo") != null) {
+                        mapTrd.put(PageFieldToInterfFactory.INF_PREOCCUPYCODE, CommonUtil.findValue(mapTrd, "entrustNo"));
+                        mapTrd.put("entrustId", CommonUtil.findValue(mapTrd, "entrustNo"));
+                    }
+                    if(CommonUtil.findValue(mapTrd, "settleDateStr") != null) {
+                        mapTrd.put("mdate", CommonUtil.findValue(mapTrd, "settleDateStr"));
+                        mapTrd.put("entrustDate", CommonUtil.findValue(mapTrd, "settleDateStr"));
+                    }
+                    mapTrd.put("manualSettle", "Y");
+                    // 实占释放
+                    revokeManualSettle(mapTrd, infCode, BussinessDictCodeListRds.事件类型_投资交易.getValue(), assetType, joinPoint);
+                    //TODO 到期续作失败时占回原实占
+                    if (isDqxz(mapTrd) && StringUtil.isNotEmpty(tradeId)) {
+                        mapTrd.put("tradeId", tradeId + "T07");
+                        revokeManualSettle(mapTrd, BussinessDictCodeListRds.接口系统ID_实占释放接口.getValue(), BussinessDictCodeListRds.事件类型_投资交易.getValue(), assetType, joinPoint);
+                    }
+                    // 预占释放
+                    Map<String, Object> etrMap = new HashMap<>(mapTrd);
+                    // 预占编号
+                    if (CommonUtil.findValue(etrMap, "entrustNo") != null) {
+                        etrMap.put(PageFieldToInterfFactory.INF_PREOCCUPYCODE, CommonUtil.findValue(etrMap, "entrustNo"));
+                        etrMap.put("tradeId", CommonUtil.findValue(etrMap, "entrustNo"));
+                        etrMap.put("entrustId", CommonUtil.findValue(etrMap, "entrustNo"));
+                    }
+                    // 交易金额
+                    if (CommonUtil.findValue(etrMap, "settleAmt") != null) {
+                        etrMap.put("entrustNum", CommonUtil.findValue(etrMap, "settleAmt"));
+                    }
+                    etrMap.put("manualSettle", "Y");
+                    if (StringUtil.equals(金融产品类型_投管用_债券质押式正回购.getValue(), CommonUtil.findValue(mapTrd, "finprodType2")) ||
+                            StringUtil.equals(金融产品类型_投管用_债券质押式逆回购.getValue(), CommonUtil.findValue(mapTrd, "finprodType2"))) {//针对协议回购交收失败
+                        etrMap.put("tradeAmt", CommonUtil.findValue(mapTrd, "tradedVolume"));
+                        etrMap.put("entrustNum", CommonUtil.findValue(mapTrd, "tradedVolume"));
+                        etrMap.put("manualSettle", "N");
+                    }
+                    if (isDqxz(mapTrd)) {
+                        etrMap.put("ps", DictCodeList.交易方向_到期续做.getValue());
+                    }
+                    revokeManualSettle(etrMap, BussinessDictCodeListRds.接口系统ID_预占释放接口.getValue(), BussinessDictCodeListRds.事件类型_投资委托.getValue(), assetType, joinPoint);
+                    //throw new BusinessException("aaa");
                 }
-                // 实际编号
-                if (CommonUtil.findValue(mapTrd, "orderId") != null){
-                    mapTrd.put(PageFieldToInterfFactory.INF_EVENTID,CommonUtil.findValue(mapTrd, "orderId"));
-                    mapTrd.put("tradeId",CommonUtil.findValue(mapTrd, "orderId"));
-                }
-                // 预占编号
-                if (CommonUtil.findValue(mapTrd, "entrustNo") != null){
-                    mapTrd.put(PageFieldToInterfFactory.INF_PREOCCUPYCODE,CommonUtil.findValue(mapTrd, "entrustNo"));
-                    mapTrd.put("entrustId",CommonUtil.findValue(mapTrd, "entrustNo"));
-                }
-                // 实占释放
-                revokeManualSettle(mapTrd, infCode, BussinessDictCodeListRds.事件类型_投资交易.getValue(),assetType,joinPoint);
-                // 预占释放
-                Map<String, Object> etrMap = new HashMap<>(mapTrd);
-                // 预占编号
-                if (CommonUtil.findValue(etrMap, "entrustNo") != null){
-                    etrMap.put(PageFieldToInterfFactory.INF_PREOCCUPYCODE,CommonUtil.findValue(etrMap, "entrustNo"));
-                    etrMap.put("tradeId",CommonUtil.findValue(etrMap, "entrustNo"));
-                    etrMap.put("entrustId",CommonUtil.findValue(etrMap, "entrustNo"));
-                }
-                // 交易金额
-                if (CommonUtil.findValue(etrMap, "settleAmt") != null){
-                    etrMap.put("entrustNum",CommonUtil.findValue(etrMap, "settleAmt"));
-                }
-                etrMap.put("manualSettle","Y");
-                revokeManualSettle(etrMap, BussinessDictCodeListRds.接口系统ID_预占释放接口.getValue(), BussinessDictCodeListRds.事件类型_投资委托.getValue(),assetType,joinPoint);
             }else {
                 revokeBackRiskCommon(mapTrd, infCode, joinPoint);
             }
@@ -361,7 +407,11 @@ public class TradeRdsCommonAop {
             }
         }
         // add by etliu 20210129 end
-        
+        //信用保护凭证买入、信用保护凭证卖出的交收失败风险不在这里处理
+        if(StringUtil.equals(mapTrd.get("pageModel"), DictCodeListExt3.交收操作类型_交收失败.getValue())
+                &&(StringUtil.equals(mapTrd.get("busiType"),"27") || StringUtil.equals(mapTrd.get("busiType"),"28"))){
+            return;
+        }
         // modify by zhangrui1 20200509 批量接口逻辑 start
 //        revokeBackRiskCommon(mapTrd,BussinessDictCodeListRds.接口系统ID_实占释放接口.getValue(),joinPoint);
         String infCode = BussinessDictCodeListRds.接口系统ID_实占释放接口.getValue();
@@ -387,6 +437,7 @@ public class TradeRdsCommonAop {
                 }
             }
         } catch (Exception e) {
+            logger.error("风险处理异常",e);
             throw new BusinessException(e);
         }
     }
@@ -439,6 +490,7 @@ public class TradeRdsCommonAop {
             }
             // add by zhangrui1 一级投标维护 end
         } catch (Exception e) {
+            logger.error("风险处理异常",e);
             throw new BusinessException(e);
         }
     }
@@ -837,4 +889,14 @@ public class TradeRdsCommonAop {
         return true;
     }
     // add by zhangrui1 一级市场债分销缴款特殊处理 end
+
+    /**
+     * 是否时到期续作
+     * @param mapTrd
+     * @return
+     */
+    private boolean isDqxz(Map<String,Object> mapTrd) {
+        return StringUtil.equals(mapTrd.get("busiType"),"09") || StringUtil.equals(mapTrd.get("busiType"),"15") ||
+                StringUtil.equals(mapTrd.get("busiType"),"20") || StringUtil.equals(mapTrd.get("busiType"),"24");
+    }
 }

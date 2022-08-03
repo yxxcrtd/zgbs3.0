@@ -191,6 +191,11 @@ public class EtrEntrust extends BaseEntity {
     private String businessModel;
 
     /**
+     * 结算金额
+     */
+    private BigDecimal unitFpriceAmt;
+
+    /**
      * 取得 委托代码
      * @return 委托代码
      */
@@ -743,5 +748,13 @@ public class EtrEntrust extends BaseEntity {
 
     public void setBusinessModel(String businessModel) {
         this.businessModel = businessModel;
+    }
+
+    public BigDecimal getUnitFpriceAmt() {
+        return unitFpriceAmt;
+    }
+
+    public void setUnitFpriceAmt(BigDecimal unitFpriceAmt) {
+        this.unitFpriceAmt = unitFpriceAmt;
     }
 }

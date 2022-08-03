@@ -118,6 +118,7 @@ public enum ErrorCode implements IEnum<Integer> {
     PROP_DEALER_NOT_EMPTY(1027, "对手方交易商ID或名称不能为空"),
     PROP_INVESTOR_NOT_EMPTY(1028, "对手方交易主体ID或名称不能为空"),
     CONTRACT_ID_NOT_EMPTY(1029, "协商成交约定号不能为空"),
+    PROP_INVESTOR_TYPE_NOT_EMPTY(1030, "对手方交易主体类型不能为空"),
 
 
     /**
@@ -207,7 +208,8 @@ public enum ErrorCode implements IEnum<Integer> {
 
     INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR(4058, "公平交易卖出或逆回购委托价格不得低于最优价"),
 
-    INSTRUCTIONS_NO_GUARD_BOND_ERROR(4059, "非担保债券不支持公平交易"),
+    ENTRUST_BSFLAG_PARSE_ERROR(4996, "委托买卖类别解析异常"),
+INSTRUCTIONS_NO_GUARD_BOND_ERROR(4059, "非担保债券不支持公平交易"),
 
     APPOINT_INSTRUCTION_EXIST_PARAMETER_ERROR(4997, "分发指令数据存在不合法"),
 

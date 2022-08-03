@@ -1,0 +1,1 @@
+UPDATE SYS_PAGE SET REMARK = '竞价交易指令' where PAGE_ID = 'EtrExchangeTradeJj';

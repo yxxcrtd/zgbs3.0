@@ -100,7 +100,7 @@
         left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = fp.FINPROD_ID
         inner join
         (
-            select regdeal.totle_trade_id,wm_concat(regdeal.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName,
+            select regdeal.totle_trade_id,to_char(wm_concat(regdeal.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName,
             sum(regdeal.face_value)/10000 as faceValue, sum(regdeal.trade_amt) as tradeAmt
             from reg_fin_product_deal regdeal
             inner join ptl_portfolio pp
@@ -151,12 +151,18 @@
         <if test="ps != null and !ps.equals('')">
             AND reg.ps=#{ps}
         </if>
-        <if test="finprodType2List != null and finprodType2List.size() > 0">
-            AND decode(reg.finprod_type2,'F01',decode(FPT.TYPE_9,'01','04','02','01'),'F02','02','F03','02') in
-            <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">
+        <if test="portfolioIdList != null and portfolioIdList.size() > 0">
+            AND deal.portfolioId in
+            <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
         </if>
+<!--        <if test="finprodType2List != null and finprodType2List.size() > 0">-->
+<!--            AND decode(reg.finprod_type2,'F01',decode(FPT.TYPE_9,'01','04','02','01'),'F02','02','F03','02') in-->
+<!--            <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">-->
+<!--                #{item}-->
+<!--            </foreach>-->
+<!--        </if>-->
         <if test="finprodIdList != null and finprodIdList.size() > 0">
             AND nvl(reg.finprod_id,reg.term_type) in
             <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
@@ -203,6 +209,9 @@
         </if>
         <if test="counterId != null and counterId != ''">
             AND reg.counter_id= #{counterId,jdbcType=VARCHAR}
+        </if>
+        <if test="regAssetType != null">
+            AND decode(reg.finprod_type2,'F01',decode(FPT.TYPE_9,'01','04','02','01'),'F02','02','F03','02') = #{regAssetType}
         </if>
         <if test="regStatusList != null and regStatusList.size() > 0">
             AND (case when  match.trd_conf_status is null and reg.is_cancel='N'  then '01'
@@ -266,13 +275,13 @@
              WHEN  BO.IS_CANCEL = 'Y'AND BO.TRADE_STATUS = '01'  THEN '03'end AS regStatus,
             ''   calMode
         FROM BID_ORDER BO
-        LEFT JOIN (SELECT BRBP.BID_ID,wm_concat(NVL(BRBP.SEC_ACCT_ID,EED.SEC_ACCT_ID)) SEC_ACCT_ID,
-                                  wm_concat(NVL(STLINFO.SEC_ACCT_NAME,STLINFO1.SEC_ACCT_NAME)) SEC_ACCT_NAME,
-                                  wm_concat(BRBP.PORTFOLIO_ID) PORTFOLIO_ID,
-                                  wm_concat(PP.PORTFOLIO_NAME) PORTFOLIO_NAME,
-                                  wm_concat(decode(fpi.TENDER_TARGET,#{TENDER_TARGET_01},TO_CHAR(ROUND(BRBP.BID_PRICE*100,4),'FM999999990.9990')
+        LEFT JOIN (SELECT BRBP.BID_ID,to_char(wm_concat(NVL(BRBP.SEC_ACCT_ID,EED.SEC_ACCT_ID))) SEC_ACCT_ID,
+                                  to_char(wm_concat(NVL(STLINFO.SEC_ACCT_NAME,STLINFO1.SEC_ACCT_NAME))) SEC_ACCT_NAME,
+                                  to_char(wm_concat(BRBP.PORTFOLIO_ID)) PORTFOLIO_ID,
+                                  to_char(wm_concat(PP.PORTFOLIO_NAME)) PORTFOLIO_NAME,
+                                  to_char(wm_concat(decode(fpi.TENDER_TARGET,#{TENDER_TARGET_01},TO_CHAR(ROUND(BRBP.BID_PRICE*100,4),'FM999999990.9990')
                                                                     ,#{TENDER_TARGET_02},TO_CHAR(ROUND(BRBP.BID_PRICE,4),'FM999999990.9990')
-                                                                    ,#{TENDER_TARGET_03},TO_CHAR(ROUND(BRBP.BID_PRICE*10000,4),'FM999999990.90'))) BID_PRICE
+                                                                    ,#{TENDER_TARGET_03},TO_CHAR(ROUND(BRBP.BID_PRICE*10000,4),'FM999999990.90')))) BID_PRICE
                    FROM BID_ORDER_BID_PRICE BRBP
                    LEFT JOIN PTL_PORTFOLIO PP
                           ON PP.PORTFOLIO_ID = BRBP.PORTFOLIO_ID
@@ -330,12 +339,24 @@
             <if test="ps != null and !ps.equals('')">
                 AND #{PS_T01} =#{ps}
             </if>
-            <if test="finprodType2List != null and finprodType2List.size() > 0">
-                AND decode(FPT.TYPE_9,'01','04','02','01') in
-                <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">
+            <if test="secAcctIdList != null and secAcctIdList.size() > 0">
+                AND BRBP.SEC_ACCT_ID in
+                <foreach collection="secAcctIdList" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
+            <if test="portfolioIdList != null and portfolioIdList.size() > 0">
+                AND BRBP.PORTFOLIO_ID in
+                <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+<!--            <if test="finprodType2List != null and finprodType2List.size() > 0">-->
+<!--                AND decode(FPT.TYPE_9,'01','04','02','01') in-->
+<!--                <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">-->
+<!--                    #{item}-->
+<!--                </foreach>-->
+<!--            </if>-->
             <if test="finprodIdList != null and finprodIdList.size() > 0">
                 AND BO.FINPROD_ID IN
                 <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
@@ -351,6 +372,9 @@
             </if>
             <if test="tradeMarket != null and !tradeMarket.equals('')">
                 AND FP.TRADE_MARKET=#{tradeMarket,jdbcType=VARCHAR}
+            </if>
+            <if test="regAssetType != null">
+                AND decode(FPT.TYPE_9,'01','04','02','01') = #{regAssetType}
             </if>
             <if test="settleSpeed != null and settleSpeed != ''">
                 AND 1 != 1
@@ -430,13 +454,13 @@
              ''   calMode
         FROM
             WFL_BID_ORDER WBO
-        LEFT JOIN (SELECT WBRBP.BID_ID,wm_concat(NVL(WBRBP.SEC_ACCT_ID,EED.SEC_ACCT_ID)) SEC_ACCT_ID,
-                    wm_concat(NVL(STLINFO.SEC_ACCT_NAME,STLINFO1.SEC_ACCT_NAME)) SEC_ACCT_NAME,
-                    wm_concat(WBRBP.PORTFOLIO_ID) PORTFOLIO_ID,
-                    wm_concat(PP.PORTFOLIO_NAME) PORTFOLIO_NAME,
-                    wm_concat(decode(fpi.TENDER_TARGET,#{TENDER_TARGET_01},TO_CHAR(ROUND(WBRBP.BID_PRICE*100,4),'FM999999990.9990')
+        LEFT JOIN (SELECT WBRBP.BID_ID,to_char(wm_concat(NVL(WBRBP.SEC_ACCT_ID,EED.SEC_ACCT_ID))) SEC_ACCT_ID,
+                    to_char(wm_concat(NVL(STLINFO.SEC_ACCT_NAME,STLINFO1.SEC_ACCT_NAME))) SEC_ACCT_NAME,
+                    to_char(wm_concat(WBRBP.PORTFOLIO_ID)) PORTFOLIO_ID,
+                    to_char(wm_concat(PP.PORTFOLIO_NAME)) PORTFOLIO_NAME,
+                    to_char(wm_concat(decode(fpi.TENDER_TARGET,#{TENDER_TARGET_01},TO_CHAR(ROUND(WBRBP.BID_PRICE*100,4),'FM999999990.9990')
                             ,#{TENDER_TARGET_02},TO_CHAR(ROUND(WBRBP.BID_PRICE,4),'FM999999990.9990')
-                            ,#{TENDER_TARGET_03},TO_CHAR(ROUND(WBRBP.BID_PRICE*10000,4),'FM999999990.90'))) BID_PRICE
+                            ,#{TENDER_TARGET_03},TO_CHAR(ROUND(WBRBP.BID_PRICE*10000,4),'FM999999990.90')))) BID_PRICE
                 FROM WFL_BID_ORDER_BID_PRICE WBRBP
                 LEFT JOIN PTL_PORTFOLIO PP
                 ON PP.PORTFOLIO_ID = WBRBP.PORTFOLIO_ID
@@ -451,7 +475,7 @@
                        ON EED.SEC_ACCT_ID=STLINFO1.SEC_ACCT_ID
                 where 1=1
                 <if test="secAcctIdList != null and secAcctIdList.size() > 0">
-                    AND BRBP.SEC_ACCT_ID in
+                    AND WBRBP.SEC_ACCT_ID in
                     <foreach collection="secAcctIdList" item="item" open="(" close=")" separator=",">
                         #{item}
                     </foreach>
@@ -476,6 +500,15 @@
         </if>
         <if test="startDate != null and !startDate.equals('')">
             AND  WBO.BID_DATE>= #{startDate,jdbcType=DATE}
+        </if>
+        <if test="portfolioIdList != null and portfolioIdList.size() > 0">
+            AND WBRBP.PORTFOLIO_ID in
+            <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="regAssetType != null">
+            and decode(FPT.TYPE_9,'01','04','02','01') = #{regAssetType}
         </if>
         <if test="endDate != null and !endDate.equals('')">
             AND  WBO.BID_DATE<![CDATA[<=]]>#{endDate,jdbcType=DATE}
@@ -576,7 +609,7 @@
         left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID=fp.FINPROD_ID
         inner join
         (
-        select regdeal.totle_trade_id,wm_concat(regdeal.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName,
+        select regdeal.totle_trade_id,to_char(wm_concat(regdeal.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName,
         sum(regdeal.face_value)/10000 as faceValue, sum(regdeal.trade_amt) as tradeAmt
         from wfl_reg_fin_product_deal regdeal
         inner join ptl_portfolio pp
@@ -624,12 +657,21 @@
         <if test="ps != null and !ps.equals('')">
             AND reg.ps=#{ps}
         </if>
-        <if test="finprodType2List != null and finprodType2List.size() > 0">
-            AND decode(reg.finprod_type2,'F01',decode(FPT.TYPE_9,'01','04','02','01'),'F02','02','F03','02') in
-            <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">
+        <if test="regAssetType != null">
+            AND decode(reg.finprod_type2,'F01',decode(FPT.TYPE_9,'01','04','02','01'),'F02','02','F03','02') = #{regAssetType}
+        </if>
+        <if test="portfolioIdList != null and portfolioIdList.size() > 0">
+            AND deal.portfolioId in
+            <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
         </if>
+<!--        <if test="finprodType2List != null and finprodType2List.size() > 0">-->
+<!--            AND decode(reg.finprod_type2,'F01',decode(FPT.TYPE_9,'01','04','02','01'),'F02','02','F03','02') in-->
+<!--            <foreach collection="finprodType2List" item="item" open="(" close=")" separator=",">-->
+<!--                #{item}-->
+<!--            </foreach>-->
+<!--        </if>-->
         <if test="finprodIdList != null and finprodIdList.size() > 0">
             AND nvl(reg.finprod_id,reg.term_type) in
             <foreach collection="finprodIdList" item="item" open="(" close=")" separator=",">
@@ -1208,8 +1250,8 @@
 
 
         union all
-            select ibd.quote_id,wm_concat(ibd.cp_party_id) as cp_party_id,wm_concat(mccic.PARTY_ABBR) as PARTY_ABBR,
-            wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader)) cp_trader,
+            select ibd.quote_id,to_char(wm_concat(ibd.cp_party_id)) as cp_party_id,to_char(wm_concat(mccic.PARTY_ABBR)) as PARTY_ABBR,
+            to_char(wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader))) cp_trader,
             ibd.execid,null as tradeYield,null as calMode
             from ibu_quote_bond_det ibd
             inner join ibu_quote_bond t1
@@ -1234,8 +1276,8 @@
         )ibd
         on ib.quote_id=ibd.quote_id
         inner  join(
-        select ir.quote_id,wm_concat(ir.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName,
-        wm_concat(distinct ir.entrust_id) as entrustId
+        select ir.quote_id,to_char(wm_concat(ir.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName,
+        to_char(wm_concat(distinct ir.entrust_id)) as entrustId
         from ibu_quote_etr_re ir
         left join ptl_portfolio pp
         on ir.portfolio_id=pp.portfolio_id
@@ -1347,8 +1389,8 @@
         null as calMode
         from ibu_quote_crep ic
         inner  join(
-        select ir.quote_id,wm_concat(ir.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName,
-        wm_concat(distinct ir.entrust_id) as entrustId
+        select ir.quote_id,to_char(wm_concat(ir.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName,
+        to_char(wm_concat(distinct ir.entrust_id)) as entrustId
         from ibu_quote_etr_re ir
         left join ptl_portfolio pp
         on ir.portfolio_id=pp.portfolio_id
@@ -1476,8 +1518,8 @@
             left join MST_CFETS_CUSTOMER_TRADER su on ibd.cp_trader=su.TRADER_ID
 
             union all
-            select ibd.quote_id,wm_concat(ibd.cp_party_id) as cp_party_id,wm_concat(mccic.PARTY_ABBR) as PARTY_ABBR,
-            wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader)) cp_trader,
+            select ibd.quote_id,to_char(wm_concat(ibd.cp_party_id)) as cp_party_id,to_char(wm_concat(mccic.PARTY_ABBR)) as PARTY_ABBR,
+            to_char(wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader))) cp_trader,
             ibd.execid,null as tradeYield,null as calMode
             from wfl_ibu_quote_bond_det ibd
             inner join wfl_ibu_quote_bond2 t1
@@ -1502,8 +1544,8 @@
         )ibd
         on ib.quote_id=ibd.quote_id
         inner  join(
-        select ir.quote_id,wm_concat(ir.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName,
-        wm_concat(distinct ir.entrust_id) as entrustId
+        select ir.quote_id,to_char(wm_concat(ir.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName,
+        to_char(wm_concat(distinct ir.entrust_id)) as entrustId
         from wfl_ibu_quote_etr_re ir
         left join ptl_portfolio pp
         on ir.portfolio_id=pp.portfolio_id
@@ -1624,8 +1666,8 @@
         null as calMode
         from wfl_ibu_quote_crep ic
         inner  join(
-        select ir.quote_id,wm_concat(ir.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName,
-        wm_concat(distinct ir.entrust_id) as entrustId
+        select ir.quote_id,to_char(wm_concat(ir.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName,
+        to_char(wm_concat(distinct ir.entrust_id)) as entrustId
         from wfl_ibu_quote_etr_re ir
         left join ptl_portfolio pp
         on ir.portfolio_id=pp.portfolio_id
@@ -1794,8 +1836,8 @@
 
             union all
 
-            select ibd.quote_id,wm_concat(ibd.cp_party_id) as cp_party_id,wm_concat(mccic.PARTY_ABBR) as PARTY_ABBR,
-            wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader)) cp_trader,
+            select ibd.quote_id,to_char(wm_concat(ibd.cp_party_id)) as cp_party_id,to_char(wm_concat(mccic.PARTY_ABBR)) as PARTY_ABBR,
+            to_char(wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader))) cp_trader,
             null as yield,
             null as unit_cprice,
             null as exer_yield,
@@ -1832,7 +1874,7 @@
         )ibd
         on ib.quote_id=ibd.quote_id
         left join(
-        select ir.quote_id,wm_concat(ir.portfolio_id) as portfolioId,wm_concat(pp.portfolio_name) portfolioName,
+        select ir.quote_id,to_char(wm_concat(ir.portfolio_id)) as portfolioId,to_char(wm_concat(pp.portfolio_name)) portfolioName,
         sum(ir.share_amt)/100 as faceValue
         from ibu_quote_etr_re ir
         left join ptl_portfolio pp
@@ -1901,8 +1943,8 @@
             left join MST_CFETS_CUSTOMER_TRADER su on ibd.cp_trader=su.TRADER_ID
             where   ibd.quote_id= #{quoteId,jdbcType=VARCHAR}
             union all
-            select ibd.quote_id,wm_concat(ibd.cp_party_id) as cp_party_id,wm_concat(mccic.PARTY_ABBR) as PARTY_ABBR,
-            wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader)) cp_trader,
+            select ibd.quote_id,to_char(wm_concat(ibd.cp_party_id)) as cp_party_id,to_char(wm_concat(mccic.PARTY_ABBR)) as PARTY_ABBR,
+            to_char(wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader))) cp_trader,
             null as yield,
             null as unit_cprice,
             null as exer_yield,
@@ -2108,8 +2150,8 @@
 
             union all
 
-            select ibd.quote_id,wm_concat(ibd.cp_party_id) as cp_party_id,wm_concat(mccic.PARTY_ABBR) as PARTY_ABBR,
-            wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader)) cp_trader,
+            select ibd.quote_id,to_char(wm_concat(ibd.cp_party_id)) as cp_party_id,to_char(wm_concat(mccic.PARTY_ABBR)) as PARTY_ABBR,
+            to_char(wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader))) cp_trader,
             null as yield,
             null as unit_cprice,
             null as exer_yield,
@@ -2202,8 +2244,8 @@
 
             union all
 
-            select ibd.quote_id,wm_concat(ibd.cp_party_id) as cp_party_id,wm_concat(mccic.PARTY_ABBR) as PARTY_ABBR,
-            wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader)) cp_trader,
+            select ibd.quote_id,to_char(wm_concat(ibd.cp_party_id)) as cp_party_id,to_char(wm_concat(mccic.PARTY_ABBR)) as PARTY_ABBR,
+            to_char(wm_concat(nvl(su.TRADER_NAME,ibd.cp_trader))) cp_trader,
             null as yield,
             null as unit_cprice,
             null as exer_yield,
@@ -2862,7 +2904,7 @@
             <![CDATA[ AND T1.trade_date >= #{startDate}]]>
             <![CDATA[ AND T1.trade_date <= #{endDate}]]>
             <if test="submitUserId != null and submitUserId != ''">
-                and (T1.create_user= #{submitUserId} or T1.update_user= #{submitUserId})
+                and (T1.create_user= #{submitUserId} or T1.update_user= #{submitUserId} or t1.TRADER= #{submitUserId})
             </if>
             <if test="finprodIdList != null and finprodIdList.size() > 0">
                 AND nvl(T3.TERM_TYPE,T1.FINPROD_ID) in
@@ -3007,7 +3049,7 @@
             <![CDATA[ AND T1.trade_date >= #{startDate}]]>
             <![CDATA[ AND T1.trade_date <= #{endDate}]]>
             <if test="submitUserId != null and submitUserId != ''">
-                and (T1.create_user= #{submitUserId} or T1.update_user= #{submitUserId})
+                and (T1.create_user= #{submitUserId} or T1.update_user= #{submitUserId} or t1.TRADER= #{submitUserId})
             </if>
             <if test="finprodIdList != null and finprodIdList.size() > 0">
                 AND nvl(T3.TERM_TYPE,T1.FINPROD_ID) in
@@ -3151,7 +3193,7 @@
             <![CDATA[ AND T1.trade_date >= #{startDate}]]>
             <![CDATA[ AND T1.trade_date <= #{endDate}]]>
             <if test="submitUserId != null and submitUserId != ''">
-                and (T1.create_user= #{submitUserId} or T1.update_user= #{submitUserId})
+                and (T1.create_user= #{submitUserId} or T1.update_user= #{submitUserId} or t1.TRADER= #{submitUserId})
             </if>
             <if test="finprodIdList != null and finprodIdList.size() > 0">
                 AND nvl(T3.TERM_TYPE,T1.FINPROD_ID) in
@@ -3291,7 +3333,7 @@
             <![CDATA[ AND TFPDT.TRADE_DATE >= #{startDate}]]>
             <![CDATA[ AND TFPDT.TRADE_DATE <= #{endDate}]]>
             <if test="submitUserId != null and submitUserId != ''">
-                and (TFPDT.create_user= #{submitUserId} or TFPDT.update_user= #{submitUserId})
+                and (TFPDT.create_user= #{submitUserId} or TFPDT.update_user= #{submitUserId} or TFPDT.TRADER= #{submitUserId})
             </if>
             <if test="finprodIdList != null and finprodIdList.size() > 0">
                 AND FP.FINPROD_ID in
@@ -3471,7 +3513,7 @@
         <![CDATA[ AND T1.trade_date >= #{startDate}]]>
         <![CDATA[ AND T1.trade_date <= #{endDate}]]>
         <if test="submitUserId != null and submitUserId != ''">
-            and (t1.create_user= #{submitUserId} or t1.update_user= #{submitUserId})
+            and (t1.create_user= #{submitUserId} or t1.update_user= #{submitUserId} or T1.TRADER= #{submitUserId})
         </if>
         <if test="portfolioIdList != null and portfolioIdList.size() > 0">
             AND t2.portfolio_id in
@@ -3624,7 +3666,7 @@
         <![CDATA[ AND T1.trade_date >= #{startDate}]]>
         <![CDATA[ AND T1.trade_date <= #{endDate}]]>
         <if test="submitUserId != null and submitUserId != ''">
-            and (t1.create_user= #{submitUserId} or t1.update_user= #{submitUserId})
+            and (t1.create_user= #{submitUserId} or t1.update_user= #{submitUserId} or T1.TRADER= #{submitUserId})
         </if>
         <if test="portfolioIdList != null and portfolioIdList.size() > 0">
             AND t2.portfolio_id in
@@ -3774,7 +3816,7 @@
         <![CDATA[ AND T1.trade_date >= #{startDate}]]>
         <![CDATA[ AND T1.trade_date <= #{endDate}]]>
         <if test="submitUserId != null and submitUserId != ''">
-            and (t1.create_user= #{submitUserId} or t1.update_user= #{submitUserId})
+            and (t1.create_user= #{submitUserId} or t1.update_user= #{submitUserId} or T1.TRADER= #{submitUserId})
         </if>
         <if test="portfolioIdList != null and portfolioIdList.size() > 0">
             AND t2.portfolio_id in
@@ -3932,7 +3974,7 @@
         <![CDATA[ AND TPD.trade_date >= #{startDate}]]>
         <![CDATA[ AND TPD.trade_date <= #{endDate}]]>
         <if test="submitUserId != null and submitUserId != ''">
-            and (TPD.create_user= #{submitUserId} or TPD.update_user= #{submitUserId})
+            and (TPD.create_user= #{submitUserId} or TPD.update_user= #{submitUserId} or TPD.TRADER= #{submitUserId})
         </if>
         <if test="portfolioIdList != null and portfolioIdList.size() > 0">
             AND TPDA.PORTFOLIO_ID in
@@ -5447,7 +5489,7 @@
                 EEBP.BID_PRIN_AMT/100 prinAmt,
                 nvl(EEBP.BID_PRIN_AMT*100,0)-nvl(BRBP.THE_WIN_PRIN_AMT,0) avaNum,
                 nvl(brd.SETT_FEE_AMT, BRBP.SETT_FEE_AMT) settleFeeAmt,
-                nvl(brd.ACT_WIN_PRINAMT, BRBP.TRADE_AMT)tradeAmt,
+                nvl(brd.ACT_WIN_PRINAMT*brd.WIN_CPRICE/100, BRBP.TRADE_AMT)tradeAmt,
                 nvl(brd.INT_AMT*brd.ACT_WIN_PRINAMT/100 , BRBP.INT_AMT) intAmt,
                 nvl(brd.PAY_AMT, BRBP.PAYABLE_AMOUNT) payAmt,
                 decode(FPI.TENDER_TARGET,'01',to_char(BRBP.BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(BRBP.BID_PRICE,'fm999999990.9990')||'元','03',to_char(BRBP.BID_PRICE*10000,'fm999999990.90')||'BP') bidPrice,
@@ -5490,7 +5532,7 @@
                 EEBP.BID_PRIN_AMT/100 prinAmt,
                 nvl(EEBP.BID_PRIN_AMT*100,0)-nvl(WBRBP.THE_WIN_PRIN_AMT,0) avaNum,
                 nvl(brd.SETT_FEE_AMT, WBRBP.SETT_FEE_AMT) settleFeeAmt,
-                nvl(brd.ACT_WIN_PRINAMT, WBRBP.TRADE_AMT)tradeAmt,
+                nvl(brd.ACT_WIN_PRINAMT*brd.WIN_CPRICE/100, WBRBP.TRADE_AMT)tradeAmt,
                 nvl(brd.INT_AMT*EE.ENTRUST_NUM , WBRBP.INT_AMT) intAmt,
                 nvl(brd.PAY_AMT, WBRBP.PAYABLE_AMOUNT) payAmt,
                 decode(FPI.TENDER_TARGET,'01',to_char(WBRBP.BID_PRICE*100,'fm999999990.9990')||'%','02',to_char(WBRBP.BID_PRICE,'fm999999990.9990')||'元','03',to_char(WBRBP.BID_PRICE*10000,'fm999999990.90')||'BP') bidPrice,
@@ -5720,6 +5762,168 @@
         from TRD_PRODUCT_DEAL tpd
                  left join TRD_PRODUCT_DEAL_ADD tpda on tpd.TRADE_ID = tpda.TRADE_ID
         where tpd.TOTLE_TRADE_ID = #{totleTradeId}
+    </select>
+
+    <select id="findZztbZbjgFenPeiInfoList" resultType="com.joyintech.tams.cfets.trdquery.dto.BidPortIntFenPeiInfoDto" parameterType="Map">
+        SELECT
+            BRD.TOTAL_WIN_ID totalWinId,
+            BRD.ENTRUST_ID  entrustId,
+            BRD.PORTFOLIO_ID portfolioId,
+            PP.PORTFOLIO_NAME portfolioName,
+            BRD.TOTAL_BID_PRINAMT/10000 winPrinAmt,
+            BRD.THE_WIN_PRINAMT theWinPrinAmt,
+            BRD.ACT_WIN_PRINAMT actWinPrinamt,
+            CASE
+                WHEN  BRD.BID_PRICE IS  NULL THEN null
+                WHEN fpi.TENDER_TARGET = '01'  THEN to_char(BRD.BID_PRICE*100,'fm999,999,999,990.9990')||'%'
+                WHEN fpi.TENDER_TARGET = '02'  THEN to_char(BRD.BID_PRICE,'fm999,999,999,990.9990')||'元'
+                WHEN fpi.TENDER_TARGET = '03'  THEN to_char(BRD.BID_PRICE*10000,'fm999,999,999,990.90')||'BP'
+                END bidPrice /*投标标位, 多个逗号分隔展示*/,
+            BRD.WIN_PRICE   winPrice,
+            BRD.WIN_CPRICE   winCprice,
+            decode(BRT.IS_WIN,'Y',BRD.INT_AMT)   intAmt,
+            BRD.PAY_AMT   payAmt,
+            BRD.SETT_FEE_AMT     settFeeAmt,
+            BRD.INV_AIM   invAim,
+            BRD.SEC_ACCT_ID secAcctId,
+            stlinfo.sec_acct_name secManageAcctIdStr,
+            EE.INV_MANAGER_ID invManagerId,
+            SU.REAL_NAME invManagerName,
+            sci.ACCT_NAME acctNoStr,
+            BOBR.ACCT_NO   acctNo
+        FROM BID_RESULT_DETAIL BRD
+                 LEFT JOIN BID_RESULT_TOTAL BRT ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+                 LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
+                 LEFT JOIN BID_ORDER_BID_PRICE BOBR ON BOBR.BID_ID = BRT.BID_ID
+            AND BOBR.ENTRUST_ID = BRD.ENTRUST_ID
+            AND BOBR.PORTFOLIO_ID = BRD.PORTFOLIO_ID
+            AND BOBR.BID_PRICE = BRD.BID_PRICE
+                 LEFT JOIN ETR_ENTRUST EE ON EE.ENTRUST_ID = BRD.ENTRUST_ID
+                 LEFT JOIN PTL_PORTFOLIO PP ON BRD.PORTFOLIO_ID = PP.PORTFOLIO_ID
+                 left join stl_sec_acct_info stlinfo on BRD.SEC_ACCT_ID = stlinfo.sec_acct_id
+                 LEFT JOIN SYS_USER SU ON EE.INV_MANAGER_ID = SU.USER_NAME
+                 left join STL_CAPACCT_INFO sci on sci.ACCT_NO = BOBR.ACCT_NO
+                 LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = EE.FINPROD_ID
+        WHERE BRT.TOTAL_WIN_ID = #{totalWinId}
+        UNION ALL
+        SELECT
+            BRD.TOTAL_WIN_ID totalWinId,
+            BRD.ENTRUST_ID  entrustId,
+            BRD.PORTFOLIO_ID portfolioId,
+            PP.PORTFOLIO_NAME portfolioName,
+            BRD.TOTAL_BID_PRINAMT/10000 winPrinAmt,
+            BRD.THE_WIN_PRINAMT theWinPrinAmt,
+            BRD.ACT_WIN_PRINAMT actWinPrinamt,
+            CASE
+                WHEN  BRD.BID_PRICE IS  NULL THEN null
+                WHEN fpi.TENDER_TARGET = '01'  THEN to_char(BRD.BID_PRICE*100,'fm999,999,999,990.9990')||'%'
+                WHEN fpi.TENDER_TARGET = '02'  THEN to_char(BRD.BID_PRICE,'fm999,999,999,990.9990')||'元'
+                WHEN fpi.TENDER_TARGET = '03'  THEN to_char(BRD.BID_PRICE*10000,'fm999,999,999,990.90')||'BP'
+                END bidPrice /*投标标位, 多个逗号分隔展示*/,
+            BRD.WIN_PRICE   winPrice,
+            BRD.WIN_CPRICE   winCprice,
+            decode(BRT.IS_WIN,'Y',BRD.INT_AMT)   intAmt,
+            BRD.PAY_AMT   payAmt,
+            BRD.SETT_FEE_AMT     settFeeAmt,
+            BRD.INV_AIM   invAim,
+            BRD.SEC_ACCT_ID secAcctId,
+            stlinfo.sec_acct_name secManageAcctIdStr,
+            EE.INV_MANAGER_ID invManagerId,
+            SU.REAL_NAME invManagerName,
+            sci.ACCT_NAME acctNoStr,
+            BOBR.ACCT_NO   acctNo
+        FROM WFL_BID_RESULT_DETAIL BRD
+                 LEFT JOIN WFL_BID_RESULT_TOTAL BRT ON BRD.TOTAL_WIN_ID = BRT.TOTAL_WIN_ID
+                 LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
+                 LEFT JOIN ETR_ENTRUST EE ON EE.ENTRUST_ID = BRD.ENTRUST_ID
+                 LEFT JOIN BID_ORDER_BID_PRICE BOBR ON BOBR.BID_ID = BRT.BID_ID
+                 LEFT JOIN FIN_PRODUCT_ISSUE fpi ON fpi.FINPROD_ID = EE.FINPROD_ID
+            AND BOBR.ENTRUST_ID = BRD.ENTRUST_ID
+            AND BOBR.PORTFOLIO_ID = BRD.PORTFOLIO_ID
+            AND BOBR.BID_PRICE = BRD.BID_PRICE
+                 LEFT JOIN PTL_PORTFOLIO PP ON BRD.PORTFOLIO_ID = PP.PORTFOLIO_ID
+                 left join stl_sec_acct_info stlinfo on BRD.SEC_ACCT_ID = stlinfo.sec_acct_id
+                 LEFT JOIN SYS_USER SU ON EE.INV_MANAGER_ID = SU.USER_NAME
+                 left join STL_CAPACCT_INFO sci on sci.ACCT_NO = BOBR.ACCT_NO
+        WHERE BRT.TOTAL_WIN_ID = #{totalWinId}
+    </select>
+
+    <select id="findZztbZbjgManualSettleInfo" resultType="com.joyintech.tams.cfets.trdquery.dto.CfetsTrdBidInfoResponse" parameterType="Map">
+        SELECT
+            BRT.TOTAL_WIN_ID totalWinId,
+            BRT.FINPROD_ID finprodId,
+            FP.FINPROD_MARKET_ID finprodMarketId,
+            FP.FINPROD_ABBR finprodAbbr,
+            BO.OUR_TRADER   ouTraderId,
+            su.REAL_NAME as traderidStr,
+            BO.COUNTER_ID   counterId,
+            mcci.counter_name as counterIdStr,
+            FPI.TENDER_TARGET tenderTarget,
+            FP.CCY                   ccy,
+            FPI.TENDER_SDATE   bidDateStart,
+            FPI.TENDER_EDATE   bidDateEnd,
+            FPI.ISSUE_DATE   issueDate,
+            FPI.ISSUE_CLASS  issueClass,
+            case when FP.TRADE_MARKET in ('01','02') then decode(BRT.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE) end creditorDebtDate,
+            decode(BRT.IS_WIN,'Y',FPA.LISTING_DATE)  listingDate,
+            decode(BRT.IS_WIN,'Y',BRT.WIN_TYPE)   winType,
+            BO.BID_MODLE     bidModle,
+            BO.WIN_PRIN_AMT/10000 bidPrinAmt,
+            decode(BRT.IS_WIN,'Y',BRT.WIN_PRINAMT)  winPrinAmt,
+            BRT.WIN_PRICE       winPrice,
+            BRT.SETT_FEE_AMT     settFeeAmt,
+            decode(BRT.IS_WIN,'Y',BRT.REMARK,'未中标')  remark,
+            FP.TRADE_MARKET  tradeMarket,
+            BO.BID_ID  bidId,
+            decode(BRT.IS_WIN,'Y',BRT.PAY_DATE)   payDate,
+            BO.PAY_TYPE  payType,
+            BRT.IS_WIN  isWin
+        FROM BID_RESULT_TOTAL BRT
+                 LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
+                 LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
+                 LEFT JOIN FIN_PRODUCT_ADD FPA ON FPA.FINPROD_ID = FP.FINPROD_ID
+                 LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
+                 LEFT JOIN SYS_USER su ON su.USER_NAME = BO.OUR_TRADER
+                 LEFT JOIN MST_COUNTER_PARTY mcci ON BO.COUNTER_ID = mcci.counter_id
+        WHERE BRT.TOTAL_WIN_ID = #{totalWinId}
+        UNION ALL
+        SELECT
+            BRT.TOTAL_WIN_ID totalWinId,
+            BRT.FINPROD_ID finprodId,
+            FP.FINPROD_MARKET_ID finprodMarketId,
+            FP.FINPROD_ABBR finprodAbbr,
+            BO.OUR_TRADER   ouTraderId,
+            su.REAL_NAME as traderidStr,
+            BO.COUNTER_ID   counterId,
+            mcci.counter_name as counterIdStr,
+            FPI.TENDER_TARGET tenderTarget,
+            FP.CCY                   ccy,
+            FPI.TENDER_SDATE   bidDateStart,
+            FPI.TENDER_EDATE   bidDateEnd,
+            FPI.ISSUE_DATE   issueDate,
+            FPI.ISSUE_CLASS  issueClass,
+            case when FP.TRADE_MARKET in ('01','02') then decode(BRT.IS_WIN,'Y',BRT.CREDITOR_DEBT_DATE) end creditorDebtDate,
+            decode(BRT.IS_WIN,'Y',FPA.LISTING_DATE) listingDate,
+            decode(BRT.IS_WIN,'Y',BRT.WIN_TYPE)   winType,
+            BO.BID_MODLE     bidModle,
+            BO.WIN_PRIN_AMT/10000 bidPrinAmt,
+            decode(BRT.IS_WIN,'Y',BRT.WIN_PRINAMT)   winPrinAmt,
+            BRT.WIN_PRICE       winPrice,
+            BRT.SETT_FEE_AMT     settFeeAmt,
+            decode(BRT.IS_WIN,'Y',BRT.REMARK,'未中标') remark,
+            FP.TRADE_MARKET  tradeMarket,
+            BO.BID_ID  bidId,
+            decode(BRT.IS_WIN,'Y',BRT.PAY_DATE)  payDate,
+            BO.PAY_TYPE  payType,
+            BRT.IS_WIN  isWin
+        FROM WFL_BID_RESULT_TOTAL BRT
+                 LEFT JOIN BID_ORDER	BO ON BO.BID_ID = BRT.BID_ID
+                 LEFT JOIN FIN_PRODUCT FP ON BO.FINPROD_ID = FP.FINPROD_ID
+                 LEFT JOIN FIN_PRODUCT_ADD FPA ON FPA.FINPROD_ID = FP.FINPROD_ID
+                 LEFT JOIN FIN_PRODUCT_ISSUE FPI ON FPI.FINPROD_ID = FP.FINPROD_ID
+                 LEFT JOIN SYS_USER su ON su.USER_NAME = BO.OUR_TRADER
+                 LEFT JOIN MST_COUNTER_PARTY mcci ON BO.COUNTER_ID = mcci.counter_id
+        WHERE BRT.TOTAL_WIN_ID = #{totalWinId}
     </select>
 </mapper>
 

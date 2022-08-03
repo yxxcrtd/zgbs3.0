@@ -21,7 +21,7 @@
             result.ps = null;
         }
         if ($("#chlFinprodId").val()) {
-        	result.chlFinprodId = $("#chlFinprodId").val().join(",");
+            result.chlFinprodId = $("#chlFinprodId").val().join(",");
         }
         if ($("#psType").val()) {
             result.psType = $("#psType").val().join(",");
@@ -77,8 +77,8 @@
             , {field: 'tradeDate', width: 200, sortField:'TRADE_DATE', title: '交易日'}
             , {field: 'vDate', width: 200, sortField:'vDate', title: '起息日'}
             , {field: 'mDate', width: 200, sortField:'mDate', title: '到期日'}
-           /* , {field: 'intRate', width: 200, sortField:'intRate', title: '回购利率%'}
-            , {field: 'counterName', width: 200, sortField:'counterName', title: '交易对手'}*/
+            /* , {field: 'intRate', width: 200, sortField:'intRate', title: '回购利率%'}
+             , {field: 'counterName', width: 200, sortField:'counterName', title: '交易对手'}*/
             , {field: 'theoryPrin', width: 200, sortField:'THEORY_PRIN', title: '本金金额', type: 'money'}
             , {field: 'settleDate', width: 200, sortField:'SETTLE_DATE', title: '资金到账日'}
             , {field: 'theoryInt', width: 200, sortField:'THEORY_INT', title: '回购利息', type: 'money'}
@@ -95,20 +95,20 @@
             , {field: 'type6', visible: false}
             , {field: 'workflowId', visible: false}
             , {field: 'finprodType2', visible: false}
-            , {
-                field: 'operation', title: 'SysCommon.operation', type: 'action', buttons: ['edit']
-                ,
-                render: function (data, type, row, meta) {
-                    if (row.statusValid != '01')
-                        return "";
-                    else
-                        //modifiled by liupengfei for 多级法人改造 确认按钮权限控制 S
-                        if(purviewElements.indexOf('_edit')!=-1){
-                            return '<i class="btn layui-icon edit" title="确认">&#x1005;</i>';
-                        }
-                        //modifiled by liupengfei for 多级法人改造 确认按钮权限控制 E
-                }
-            }
+            // , {
+            //     field: 'operation', title: 'SysCommon.operation', type: 'action', buttons: ['edit']
+            //     ,
+            //     render: function (data, type, row, meta) {
+            //         if (row.statusValid != '01')
+            //             return "";
+            //         else
+            //             //modifiled by liupengfei for 多级法人改造 确认按钮权限控制 S
+            //             if(purviewElements.indexOf('_edit')!=-1){
+            //                 return '<i class="btn layui-icon edit" title="确认">&#x1005;</i>';
+            //             }
+            //             //modifiled by liupengfei for 多级法人改造 确认按钮权限控制 E
+            //     }
+            // }
         ],
         checkbox: true,
         progressBar: true

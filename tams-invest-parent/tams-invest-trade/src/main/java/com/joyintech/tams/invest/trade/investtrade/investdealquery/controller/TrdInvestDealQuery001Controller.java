@@ -94,11 +94,14 @@ public class TrdInvestDealQuery001Controller extends BaseController{
 		model.addAttribute("PINAN_ASSET_TYPE_F15", DictCodeListExt2.平安资产类型_外汇掉期.getValue());
 		model.addAttribute("PINAN_ASSET_TYPE_F12", DictCodeListExt2.平安资产类型_债券借贷.getValue());
 		model.addAttribute("PINAN_ASSET_TYPE_F16", DictCodeListExt2.平安资产类型_利率互换.getValue());
-		model.addAttribute("PINAN_ASSET_TYPE_F17", BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
+		model.addAttribute("PINAN_ASSET_TYPE_F17", DictCodeListExt2.平安资产类型_一级市场债.getValue());
+		model.addAttribute("FINPROD_TYPE_TG_F32", BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
 		model.addAttribute("PINAN_ASSET_TYPE_F18", DictCodeListExt3.平安资产类型_期权.getValue());
 		// add by etliu 20210421 权益类资产相关代码合并 start
 		model.addAttribute("PINAN_ASSET_TYPE_F19", DictCodeListExt3.平安资产类型_权益类资产.getValue());
 		// add by etliu 20210421 权益类资产相关代码合并 end
+		model.addAttribute("PINAN_ASSET_TYPE_F37", DictCodeList.平安资产类型_信用保护凭证.getValue());
+
 		List<SelectOptionDto> psList = makeAllFloatRate();
         model.addAttribute("psList", JsonUtils.objectArray2Json(psList.toArray()));
 

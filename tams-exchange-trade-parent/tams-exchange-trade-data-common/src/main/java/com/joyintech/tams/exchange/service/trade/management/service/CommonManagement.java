@@ -22,6 +22,7 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.system.syspara.dto.SysParaSet001Dto;
 import com.joyintech.system.syspara.service.SysParaSet001Service;
 import com.joyintech.tams.common.base.entity.TrdPriceTimeConfig;
+import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.exchange.common.bean.MinPrice;
 import com.joyintech.tams.exchange.common.bean.MinTrdUnitLimit;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
@@ -476,6 +477,12 @@ public class CommonManagement extends BaseService {
         }*/
     }
 
+    public void flushCommonCache(){
+        minPriceInCache();
+        minTrdUnitLimitInCache();
+        tradeTimeInCache();
+    }
+
     public ResultBean tradeTimeInCache() {
         logger.info("开始缓存-交易时间段信息");
         try {
@@ -698,5 +705,9 @@ public class CommonManagement extends BaseService {
             logger.error("doPost() called with exception => 【url = {}】, 【params = {}】", url, params, e);
         }
         return JsonUtils.getObjectListFromJson(JsonUtils.getJsonFromObject(list), CounterAcctResponse.class);
+    }
+
+    public TrdProductDeal findTrdProductDeal(TrdProductDeal dto) {
+        return etrTradeOtherCommonService.findTrdProductDealbyId(dto.getTradeId());
     }
 }

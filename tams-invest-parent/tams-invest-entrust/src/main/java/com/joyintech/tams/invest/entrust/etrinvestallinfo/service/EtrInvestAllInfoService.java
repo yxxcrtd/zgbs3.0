@@ -13,19 +13,18 @@ package com.joyintech.tams.invest.entrust.etrinvestallinfo.service;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.system.base.entity.SysUser;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.exportpdf.service.CommonExportPdfService;
 import com.joyintech.tams.invest.entrust.etrbrowdepoinfo.dto.EtrBrowDepoInfoDto;
 import com.joyintech.tams.invest.entrust.etrinvestallinfo.dto.EtrAllInfoExportPdfDto;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -140,8 +139,37 @@ public class EtrInvestAllInfoService extends CommonExportService<EtrInvestAllInf
                         .collect(Collectors.joining(",","",""));
                 dto.setNextUser(sysUsers);
             }
+            if(StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_竞价交易.getValue())
+            ||StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_大宗交易.getValue())
+                    ||StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_协议现券.getValue())
+                    ||StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_债转股.getValue())
+                    ||StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_质押券出入库.getValue())
+                    ||StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_配债.getValue())
+                    ||StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_可转债申购.getValue())
+                    ||StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_新股申购.getValue())
+                    ||StringUtils.equals(dto.getFinprodType2(), DictCodeListExt2.平安资产类型_信用保护凭证.getValue())
+                    ||StringUtils.equals(dto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())
+                    ||(StringUtils.equals(dto.getTradeMarket(),"01") &&  StringUtils.equals(dto.getFinprodType2(),DictCodeListExt2.平安资产类型_债券.getValue()) &&
+                    StringUtils.equals(dto.getPs(),DictCodeList.交易方向_行权_回售.getValue())
+                    )
+            ){
+                dto.setSettleSpreed(null);
+            }
+
+
         }
         return page;
+    }
+
+    public EtrInvestAllInfoDto getById(String entrustId){
+        if(StringUtils.isEmpty(entrustId)){
+            return null;
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("entrustId", entrustId);
+        return restTemplate.postForObject(
+                ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrInvestAllInfo/getById", map,
+                EtrInvestAllInfoDto.class);
     }
 
     /**

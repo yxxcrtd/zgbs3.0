@@ -11,6 +11,7 @@ import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.Instrument;
 import com.joyintech.tams.exchange.common.enums.invest.BussTypeEnum;
+import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
 import com.joyintech.tams.exchange.datacommon.db.service.InstrumentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +96,8 @@ public abstract class BaseCheckKit {
 
     private boolean isCheckTick(Instruction instruction) {
         //信用保护凭证不需要检查行情
-        if (BussTypeEnum.CREDIT_PROTECTION_CERTIFICATE.codeEquals(instruction.getBusiTypeTg())) {
+        if (BussTypeEnum.CREDIT_PROTECTION_CERTIFICATE.codeEquals(instruction.getBusiTypeTg())
+                || EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg())) {
             return false;
         }
 

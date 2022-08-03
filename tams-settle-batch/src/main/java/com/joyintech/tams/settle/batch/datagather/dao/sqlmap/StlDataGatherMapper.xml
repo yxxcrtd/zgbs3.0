@@ -146,7 +146,8 @@
 	<select id="listBondSettleTransData" parameterType="java.util.Map"
 			resultType="com.joyintech.tams.settle.batch.datagather.dto.SettleTransDataDto">
 		SELECT
-			TMIN.CASH_ID CASH_ID,
+			TMIN.CASH_ID intPayCashId,
+			TMINPRIN.CASH_ID prinCashId,
 			TMAX.MDATE VDATE,
 			TMIN.MDATE MDATE2,
 			fp.MDATE MDATE,
@@ -217,6 +218,38 @@
 						AND T2.MDATE = T1.MDATE
 			    )
 		) TMAX ON TMAX.FINPROD_ID = std.FINPROD_ID
+		LEFT JOIN (
+			SELECT
+				T1.CASH_ID,
+				T1.MDATE ,
+				T1.FINPROD_ID
+			FROM
+				FIN_CASH_PLAN T1
+			WHERE
+				EXISTS(
+					SELECT
+						1
+					FROM
+						(
+							SELECT
+								CASH_ID,
+								FINPROD_ID ,
+								MIN(MDATE) MDATE
+							FROM
+								FIN_CASH_PLAN fcp2
+							WHERE
+								fcp2.CASH_TYPE IN('02','03')
+								AND  <![CDATA[fcp2.MDATE > #{dealDate,jdbcType=DATE}]]>
+							GROUP BY
+								CASH_ID,
+								FINPROD_ID
+						)T2
+					WHERE
+						T2.CASH_ID = T1.CASH_ID
+						AND T2.FINPROD_ID = T1.FINPROD_ID
+						AND T2.MDATE = T1.MDATE
+				)
+		) TMINPRIN ON TMINPRIN.FINPROD_ID = std.FINPROD_ID
 		<where>
 			std.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})
 			<if test="dealDate != null">
@@ -264,6 +297,8 @@
 		T2.VDATE ,
 		T2.MDATE,
 		T2.M_PRIN_AMT,
+		fciPrin.CASH_ID prinCashId,
+		fciInt.CASH_ID intPayCashId,
 		<include refid="settleTransDataSql"></include>
 		<!--首期-->
 		INNER JOIN
@@ -285,10 +320,18 @@
 		<!-- ON T1.F_TRADE_ID = std.CJBH
 		AND T1.SEAT_ID = std.SEAT_NUMBER
 		AND T1.VDATE = STD .TRADE_DATE -->
-		LEFT JOIN TRD_PRODUCT_DEAL_ADD T3 ON
-		T3.TRADE_ID = T1.TRADE_ID
-		LEFT JOIN FIN_TRADE_PRODUCT T2 ON
-		T2.FINPROD_ID = T1.FINPROD_ID
+		LEFT JOIN
+		    TRD_PRODUCT_DEAL_ADD T3 ON T3.TRADE_ID = T1.TRADE_ID
+		LEFT JOIN
+		    FIN_TRADE_PRODUCT T2 ON T2.FINPROD_ID = T1.FINPROD_ID
+		LEFT JOIN
+			FIN_CASH_INFO fciPrin ON fciPrin.FINPROD_ID = T2.FINPROD_ID
+		    AND fciPrin.CASH_TYPE_1 = #{CASH_TYPE_1_01}
+		    AND fciPrin.BRANCH = 0
+		LEFT JOIN
+			FIN_CASH_INFO fciInt ON fciInt.FINPROD_ID = T2.FINPROD_ID
+			AND fciInt.CASH_TYPE_1 = #{CASH_TYPE_1_02}
+			AND fciInt.BRANCH = 0
 		<where>
 		    std.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})
 			<if test="dealDate != null">
@@ -368,10 +411,12 @@
 			1 = 1
 			AND std.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})
 			<if test="checkResultList != null and checkResultList.size() > 0">
-			    AND NOT EXISTS (SELECT 1 FROM SETTLE_TRANS_TG_MAPPING temp where temp.TRADE_ID = std.TRADE_ID)
-				<foreach collection="checkResultList" item="result" open="AND stds.CHECK_RESULT IN (" close=")" separator=",">
+			    AND (stds.CHECK_RESULT IS NULL
+				<foreach collection="checkResultList" item="result" open="OR stds.CHECK_RESULT IN (" close=")"
+						 separator=",">
 					#{result,jdbcType=VARCHAR}
 				</foreach>
+			    )
 			</if>
 			<if test="dealDate != null">
 				AND std.DEAL_DATE = #{dealDate,jdbcType=DATE}
@@ -411,6 +456,13 @@
 		NVL(NVL(te.INSTRUCTION_ID, teh.INSTRUCTION_ID), NVL(tie.INSTRUCTION_ID, tieh.INSTRUCTION_ID)) ORDER_ID,
 		case when ptl.PROFIT_TYPE = '01' then 'FVTPL' else 'AC' end as invAim,ee.ENTRUST_ID,
 		stdta.REPO_TYPE,
+		NVL(tie.TRADE_ID, tieh.TRADE_ID) trader,
+		NVL(tie.PROP_TRADE_ID, tieh.PROP_TRADE_ID) counterTrader,
+		NVL(tie.INVESTOR_ID, tieh.INVESTOR_ID) dealerPartyNo,
+		NVL(tie.PROP_INVESTOR_ID, tieh.PROP_INVESTOR_ID) outDealerPartyNo,
+		NVL(tie.DEALER_ID, tieh.DEALER_ID) dealerNo,
+		NVL(tie.PROP_DEALER_ID, tieh.PROP_DEALER_ID) outDealerNo,
+		NVL(tie.COUNTER_ID, tieh.COUNTER_ID) counterId,
 		<!--<include refid="settleTransDataSql"></include>-->
 		<include refid="settleTransDataTotalSql"></include>
 		LEFT JOIN SETTLE_TRANS_DATA_TOTAL_STATUS stdts ON std.SEQ_ID = stdts.SEQ_NO
@@ -421,28 +473,28 @@
 		OR
 		std.APPLY_TRADE_ID = teh.BROKER_ENTRUST_ID
 		)
-		and teh.ENTRUST_STATUS IN ('2', '5', '6', '8') AND to_char(DEAL_DATE, 'yyyyMMdd') = teh.TRADING_DAY AND (std.TRADE_PLAT = '02' or std.TRADE_PLAT IS NULL)
+		and teh.ENTRUST_STATUS IN ('2', '5', '6', '8') AND to_char(DEAL_DATE, 'yyyyMMdd') = teh.TRADING_DAY <!--XYHGFXSJ-247:AND (std.TRADE_PLAT = '02' or std.TRADE_PLAT IS NULL)-->
 		LEFT JOIN T_ENTRUST te
 		ON (
 		LTRIM(substr(std.APPLY_TRADE_ID, 5, length(std.APPLY_TRADE_ID)), '0') = te.BROKER_ENTRUST_ID
 		OR
 		std.APPLY_TRADE_ID = te.BROKER_ENTRUST_ID
 		)
-		and te.ENTRUST_STATUS IN ('2', '5', '6', '8') AND to_char(DEAL_DATE, 'yyyyMMdd') = te.TRADING_DAY AND (std.TRADE_PLAT = '02' or std.TRADE_PLAT IS NULL)
+		and te.ENTRUST_STATUS IN ('2', '5', '6', '8') AND to_char(DEAL_DATE, 'yyyyMMdd') = te.TRADING_DAY <!--XYHGFXSJ-247:AND (std.TRADE_PLAT = '02' or std.TRADE_PLAT IS NULL)-->
 		LEFT JOIN T_INTEGRATED_ENTRUSTHISTORY tieh
 		ON (
 		LTRIM(substr(std.APPLY_TRADE_ID, 5, length(std.APPLY_TRADE_ID)), '0') = tieh.BROKER_ENTRUST_ID
 		OR
 		std.APPLY_TRADE_ID = tieh.BROKER_ENTRUST_ID
 		)
-		and tieh.ENTRUST_STATUS IN ('2', '5', '6', '8') AND to_char(DEAL_DATE, 'yyyyMMdd') = tieh.TRADING_DAY AND std.TRADE_PLAT IN ('03', '04', '05')
+		and tieh.ENTRUST_STATUS IN ('2', '5', '6', '8') AND to_char(DEAL_DATE, 'yyyyMMdd') = tieh.TRADING_DAY <!--XYHGFXSJ-247:AND std.TRADE_PLAT IN ('03', '04', '05')-->
 		LEFT JOIN T_INTEGRATED_ENTRUST tie
 		ON (
 		LTRIM(substr(std.APPLY_TRADE_ID, 5, length(std.APPLY_TRADE_ID)), '0') = tie.BROKER_ENTRUST_ID
 		OR
 		std.APPLY_TRADE_ID = tie.BROKER_ENTRUST_ID
 		)
-		and tie.ENTRUST_STATUS IN ('2', '5', '6', '8') AND to_char(DEAL_DATE, 'yyyyMMdd') = tie.TRADING_DAY AND std.TRADE_PLAT IN ('03', '04', '05')
+		and tie.ENTRUST_STATUS IN ('2', '5', '6', '8') AND to_char(DEAL_DATE, 'yyyyMMdd') = tie.TRADING_DAY <!--XYHGFXSJ-247:AND std.TRADE_PLAT IN ('03', '04', '05')-->
 		LEFT JOIN ETR_ENTRUST ee ON (ee.ENTRUST_ID = NVL(te.INSTRUCTION_ID, teh.INSTRUCTION_ID) OR ee.ENTRUST_ID = NVL(tie.INSTRUCTION_ID, tieh.INSTRUCTION_ID))
 		LEFT JOIN PTL_PORTFOLIO ptl ON (ptl.PORTFOLIO_ID = std.PORTFOLIO_ID)
 		<where>

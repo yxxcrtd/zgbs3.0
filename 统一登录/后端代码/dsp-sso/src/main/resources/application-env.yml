@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.60.43:3306/gd_dev_hzq_02
+    username: hzq
+    password: hzq
+
+base:
+  datasource:
+    #driverClassName: oracle.jdbc.driver.OracleDriver
+    #url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+    #username: BS30INIT_DEV
+    #password: BS30INIT_DEV
+    #url: jdbc:oracle:thin:@//192.168.60.142:1521/orcl
+    #driverClassName: oracle.jdbc.driver.OracleDriver
+    #username: CVR303INIT_TEST1209
+    #password: CVR303INIT_TEST1209
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.60.43:3306/gd_dev_hzq_02
+    username: hzq
+    password: hzq
+        
+
+
+#application:
+#  sysCode: SYS
+#  menuType: hover # 配置菜单为hover形式
+#  runOptimize: Y #Y表示业务代码做过启动优化，N表示业务代码没有做过启动优化
+
+#配置特殊参数取值
+specialsyspara:
+  parakey: AUTHORIZE_LIMIT||PRICE_CAL_TYPE||portfolio_handle_userid||settle_acct_name||settle_acct_no||prod_tru_acct_no||prod_tru_acct_name||lending_acct_no||lending_acct_name
+

@@ -70,7 +70,7 @@ public class CfetsManualSettleUpdateService extends BaseService<CfetsManualSettl
     private JoyinbusinessCommonService joyinbusinessCommonService;
 
     @Autowired
-    private StlPayOrdersMapper stlPayOrdersMapper;
+    private StlPayTempOrdersMapper stlPayTempOrdersMapper;
 
 
     /**
@@ -139,10 +139,10 @@ public class CfetsManualSettleUpdateService extends BaseService<CfetsManualSettl
         if(Objects.isNull(tempTotal)) return;
         TrdFinProductDealTotal total = trdFinProductDealTotalMapper.selectByPrimaryKey(tradeId);
         if(Objects.nonNull(total)) {
-            autoPeriodCommonService.updateDealDataCancel(tradeId,DictCodeList.是否_是.getValue());
+            autoPeriodCommonService.updateDealDataCancel(tradeId, DictCodeList.是否_是.getValue());
         }else {
             autoPeriodCommonService.insertDealDataFromTemp(tradeId);
-            autoPeriodCommonService.updateDealDataCancel(tradeId,DictCodeList.是否_是.getValue());
+            autoPeriodCommonService.updateDealDataCancel(tradeId, DictCodeList.是否_是.getValue());
         }
     }
 
@@ -153,12 +153,12 @@ public class CfetsManualSettleUpdateService extends BaseService<CfetsManualSettl
             pageParam.put("tradeId",request.getTradeId());
             List<PortSettleinfoDto> list = cfetsManualSettleMapper.queryTempPortSettleinfo(pageParam);
             //重新分配temp表利息
-            calTempIntAmt(request,list);
+            this.calTempIntAmt(request,list);
             //更新交易表,将临时表数据复制到交易表,状态是撤销
             this.updateDealData(request.getTradeId());
             //重新分配deal利息
             list = cfetsManualSettleMapper.queryPortSettleinfo(pageParam);
-            calIntAmt(request,list);
+            this.calIntAmt(request,list);
             //处理业务数据
             TrdBankManualSettleInfo trdBankManualSettleInfo = new TrdBankManualSettleInfo();
             BussinessCodeParameter parameter = new BussinessCodeParameter();
@@ -175,7 +175,8 @@ public class CfetsManualSettleUpdateService extends BaseService<CfetsManualSettl
             //交收数量
             trdBankManualSettleInfo.setSettleNum(request.getSettleNumT());
             //交收金额
-            if(StringUtil.equals(request.getTgBusiType(),DictCodeListExt3.头寸业务类型_现券交易.getValue()) && StringUtil.equals(request.getPs(),DictCodeList.交易方向_买入.getValue())){
+            if(StringUtil.equals(request.getTgBusiType(),DictCodeListExt3.头寸业务类型_现券交易.getValue())
+                    && StringUtil.equals(request.getPs(),DictCodeList.交易方向_买入.getValue())){
             }else{
                 trdBankManualSettleInfo.setSettleAmt(request.getSettleAmtT());
             }
@@ -194,7 +195,8 @@ public class CfetsManualSettleUpdateService extends BaseService<CfetsManualSettl
             //交收数量=画面.交收数量
             trdBankManualSettleFlow.setSettleNum(request.getSettleNumT());
             //交收金额=画面.交收金额
-            if(StringUtil.equals(request.getTgBusiType(),DictCodeListExt3.头寸业务类型_现券交易.getValue()) && StringUtil.equals(request.getPs(),DictCodeList.交易方向_买入.getValue())){
+            if(StringUtil.equals(request.getTgBusiType(),DictCodeListExt3.头寸业务类型_现券交易.getValue())
+                    && StringUtil.equals(request.getPs(),DictCodeList.交易方向_买入.getValue())){
             }else{
                 trdBankManualSettleFlow.setSettleAmt(request.getSettleAmtT());
             }
@@ -210,7 +212,7 @@ public class CfetsManualSettleUpdateService extends BaseService<CfetsManualSettl
             trdBankManualSettleFlowMapper.insertSelective(trdBankManualSettleFlow);
 
             //头寸
-            sendPositionMethod(request,trdBankManualSettleInfo);
+            this.sendPositionMethod(request,trdBankManualSettleInfo);
         }
         catch (Exception e) {
             logger.error("交收修改失败",e);
@@ -289,10 +291,10 @@ public class CfetsManualSettleUpdateService extends BaseService<CfetsManualSettl
             }
         }
         //3.更新划款指令表
-        StlPayOrders record = new StlPayOrders();
+        StlPayTempOrders record = new StlPayTempOrders();
         record.setTradeId(request.getTradeId());
         record.setSettleAmt(request.getSettleAmtT());
-        stlPayOrdersMapper.updateByTradeId(record);
+        stlPayTempOrdersMapper.updateByTradeId(record);
     }
 
 

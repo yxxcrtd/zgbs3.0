@@ -176,4 +176,15 @@ public class EtrAgreRepTradeController {
     public BigDecimal queryOtherSecPosition(@RequestBody Map<String, Object> map) {
         return etrAgreRepTradeService.queryOtherSecPosition(map);
     }
+
+    /**
+     *  查询首期的到期结算金额
+     *
+     * @param map 检索参数
+     * @return 到期结算金额
+     */
+    @PostMapping("/getFirstTradeAmtByTradeId")
+    public BigDecimal getFirstTradeAmtByTradeId(@RequestBody Map<String, String> map) {
+        return etrAgreRepTradeService.getFirstTradeAmtByTradeId(map);
+    }
 }
