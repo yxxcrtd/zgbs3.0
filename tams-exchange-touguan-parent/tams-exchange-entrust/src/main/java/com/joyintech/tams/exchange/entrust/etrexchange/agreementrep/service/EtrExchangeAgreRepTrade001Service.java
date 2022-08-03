@@ -1956,6 +1956,11 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
                 EtrComponentFactory.getComponentService(AgreRepOpenSecDto.class).updateSettings(paraDto);
                 EtrComponentFactory.getComponentService(AgreRepOpenSecDto.class).entrustNew(agreRepOpenSecDto);
+            } else if (DictCodeListExt3.上农商_指令业务类型_协议回购解除质押指令_线上.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
+                agreRepOpenSecDto.setEntrustStatus(etrSinglePortfolioDto.getEntrustStatus());
+
+                EtrComponentFactory.getComponentService(AgreRepOpenSecDto.class).updateSettings(paraDto);
+                EtrComponentFactory.getComponentService(AgreRepOpenSecDto.class).entrustNew(agreRepOpenSecDto);
             }
         } else {
             if (DictCodeListExt3.上农商_指令业务类型_协议回购首期指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
@@ -2000,6 +2005,11 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 EtrComponentFactory.getComponentService(AgreRepHwayChgSecDto.class).updateSettings(paraDto);
                 EtrComponentFactory.getComponentService(AgreRepHwayChgSecDto.class).entrustEdit(agreRepHwayChgSecDto);
             } else if (DictCodeListExt3.上农商_指令业务类型_协议回购解除质押指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
+                agreRepOpenSecDto.setEntrustStatus(etrSinglePortfolioDto.getEntrustStatus());
+
+                EtrComponentFactory.getComponentService(AgreRepOpenSecDto.class).updateSettings(paraDto);
+                EtrComponentFactory.getComponentService(AgreRepOpenSecDto.class).entrustEdit(agreRepOpenSecDto);
+            } else if (DictCodeListExt3.上农商_指令业务类型_协议回购解除质押指令_线上.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
                 agreRepOpenSecDto.setEntrustStatus(etrSinglePortfolioDto.getEntrustStatus());
 
                 EtrComponentFactory.getComponentService(AgreRepOpenSecDto.class).updateSettings(paraDto);
