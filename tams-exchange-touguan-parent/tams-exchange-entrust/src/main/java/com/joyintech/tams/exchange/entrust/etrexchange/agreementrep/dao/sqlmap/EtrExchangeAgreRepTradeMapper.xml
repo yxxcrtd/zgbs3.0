@@ -807,6 +807,7 @@
                             '01',pledge.PLEDGE_NUMBER,
                             null),
                     'T56', pledge.PLEDGE_NUMBER,
+                    'T96',pledge.PLEDGE_NUMBER,
                     trdPledge.PLEDGE_NUMBER
                 )                                                                        AS repSecNum,              /** 质押数量 **/
                 DECODE(etr_entrust.ps, 'T94', trdPledge.finprod_id, null)                AS swapOrigFinprodId,      /** 中途换券当前质押券**/
@@ -1077,6 +1078,7 @@
                             '01',pledge.PLEDGE_NUMBER,
                             null),
                     'T56', pledge.PLEDGE_NUMBER,
+                    'T96',pledge.PLEDGE_NUMBER,
                     trdPledge.PLEDGE_NUMBER
                 ) AS repSecNum, /** 质押数量 **/
                 DECODE(wfl_etr_entrust.ps, 'T94', trdPledge.finprod_id, null)                                      AS swapOrigFinprodId, /**中途换券当前质押券**/
