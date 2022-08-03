@@ -182,7 +182,22 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
             exchangeTransMatchCommonDto.setMatchType(DictCodeListExt3.下行交易匹配类型_自动匹配.getValue());
 
             exchangeTransMatchCommonDto.setRemainNum(settleTransDataDto.getShareAmt());
-            exchangeTransMatchCommonDto.setRemainAmount(settleTransDataDto.getFpriceAmt());
+            if(DictCodeList.回购类型_质押式协议回购.getValue().equals(settleTransDataDto.getRepoType())){
+                if(DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换钱.getValue().equals(settleTransDataDto.getBusiSceneCalss()) ||
+                    (DictCodeListExt3.交易方向_解除质押.getValue().equals(settleTransDataDto.getPs())
+                        && DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(settleTransDataDto.getTradeMarket())
+                        && null != settleTransDataDto.getFpriceAmt() && settleTransDataDto.getFpriceAmt().compareTo(BigDecimal.ZERO) > 0
+                    )
+                ){
+                    exchangeTransMatchCommonDto.setRemainAmount(settleTransDataDto.getFpriceAmt());
+                    exchangeTransMatchCommonDto.setRemainNum(BigDecimal.ZERO);
+                }else{
+                    exchangeTransMatchCommonDto.setRemainNum(settleTransDataDto.getShareAmt());
+                    exchangeTransMatchCommonDto.setRemainAmount(settleTransDataDto.getShareAmt());
+                }
+            }else{
+                exchangeTransMatchCommonDto.setRemainAmount(settleTransDataDto.getFpriceAmt());
+            }
             exchangeTransMatchCommonDto.setSeqId(settleTransDataDto.getTradeId());
 
             if(StringUtil.isNotEmpty(settleTransDataDto.getEntrustId())){
@@ -320,22 +335,27 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
      */
     private void checkAgreRepEntrustAmt(SettleTransDataDto settleTransDataDto, EtrEntrustDto currEtrEntrust,
                                         List<String> entrustIds){
-        if(DictCodeListExt3.交易方向_中途换券.getValue().equals(settleTransDataDto.getPs())
-//                || DictCodeListExt3.交易方向_解除质押.getValue().equals(settleTransDataDto.getPs())
-        ){
-            // 查询指令换入质押券信息
-            List<EtrPledge> etrPledges = stlDataGatherMapper.selectEtrPledges(currEtrEntrust.getEntrustId(),
-                    DictCodeListExt3.质押券置换_置换方向_换入.getValue());
-            // 查询清算数据换入质押券信息
-            List<SettleTransDataTotalPledge> settlePledges = stlDataGatherMapper.selectSettleTransDataTotalPledge(
-                    settleTransDataDto.getTradeId(), DictCodeListExt3.质押券置换_置换方向_换入.getValue());
-            if(CollectionUtils.isNotEmpty(etrPledges) && CollectionUtils.isNotEmpty(settlePledges)){
-                if(settlePledges.get(0).getPledgeNumber().compareTo(etrPledges.get(0).getPledgeNumber())<=0){
+        if(DictCodeListExt3.交易方向_中途换券.getValue().equals(settleTransDataDto.getPs())){
+            if(DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue().equals(currEtrEntrust.getEntrustType())){
+                // 查询指令换入质押券信息
+                List<EtrPledge> etrPledges = stlDataGatherMapper.selectEtrPledges(currEtrEntrust.getEntrustId(),
+                        DictCodeListExt3.质押券置换_置换方向_换入.getValue());
+                // 查询清算数据换入质押券信息
+                List<SettleTransDataTotalPledge> settlePledges = stlDataGatherMapper.selectSettleTransDataTotalPledge(
+                        settleTransDataDto.getTradeId(), DictCodeListExt3.质押券置换_置换方向_换入.getValue());
+                if(CollectionUtils.isNotEmpty(etrPledges) && CollectionUtils.isNotEmpty(settlePledges)){
+                    if(settlePledges.get(0).getPledgeNumber().compareTo(etrPledges.get(0).getPledgeNumber())<=0){
+                        entrustIds.add(currEtrEntrust.getEntrustId());
+                    }
+                }
+            }
+            else if(DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令_换钱.getValue().equals(currEtrEntrust.getEntrustType())){
+                if(settleTransDataDto.getFpriceAmt().compareTo(currEtrEntrust.getEntrustAmt()) <= 0){
                     entrustIds.add(currEtrEntrust.getEntrustId());
                 }
             }
         }else{
-            if(null!=settleTransDataDto.getShareAmt()&&settleTransDataDto.getShareAmt().compareTo(currEtrEntrust.getEntrustAmt())<=0){
+            if(null != settleTransDataDto.getShareAmt() && settleTransDataDto.getShareAmt().compareTo(currEtrEntrust.getEntrustAmt())<=0){
                 entrustIds.add(currEtrEntrust.getEntrustId());
             }
         }
@@ -595,16 +615,16 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
 //                        && pledges.get(0).getPledgeFinprodId().equals(etrEntrustDto.getFinprodId())){
 //                    matchEtrEntrustList.add(etrEntrustDto);
 //                }
-                // 到期续作分两种情况:1、只有新开的数据:通过质押券进行匹配指令 2、新开和续作的数据都有:通过首期交易编号进行匹配指令
+                // 到期续作分两种情况:1、只有新开的数据:通过质押券进行匹配指令
                 if(DictCodeListStl.业务场景分类明细_债券协议逆回购_首期_买入.getValue().equals(settleTransDataDto.getBusiSceneCalss())){
                     if(settlePs.equals(etrEntrustDto.getPs())
                             && StringUtil.equals(settleTransDataDto.getFinprodType2(), etrEntrustDto.getFinprodType2())
                             && CollectionUtils.isNotEmpty(pledges)
-                            && pledges.get(0).getPledgeFinprodId().equals(etrEntrustDto.getFinprodId())
-                            && etrEntrustDto.getTradeId().equals(settleTransDataDto.getfCjbh())){
+                            // todo 跟指令质押品全部比
+                            && pledges.get(0).getPledgeFinprodId().equals(etrEntrustDto.getFinprodId())){
                         matchEtrEntrustList.add(etrEntrustDto);
                     }
-                }else{
+                }else{ //2、新开和续作的数据都有:通过首期交易编号进行匹配指令
                     // finprodId存的是首期交易编号
                     if(settleTransDataDto.getFinprodId().equals(etrEntrustDto.getFinprodId())){
                         matchEtrEntrustList.add(etrEntrustDto);

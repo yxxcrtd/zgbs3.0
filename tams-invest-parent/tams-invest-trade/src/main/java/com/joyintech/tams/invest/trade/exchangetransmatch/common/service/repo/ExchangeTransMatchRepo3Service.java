@@ -113,7 +113,7 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         // 清算速度
         dealTotal.setSettleSpeed(StringUtil.isNotEmpty(dealDto.getSettleSpeed())?dealDto.getSettleSpeed():0L);
         // 交易币种
-        dealTotal.setCcy(null);
+        dealTotal.setCcy(entrustDto.getCcy());
 
         // 单位净价
         dealTotal.setUnitCprice(null);
