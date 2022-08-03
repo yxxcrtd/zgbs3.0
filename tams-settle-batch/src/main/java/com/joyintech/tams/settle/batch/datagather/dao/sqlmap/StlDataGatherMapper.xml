@@ -1123,6 +1123,7 @@
 		<!-- add by etlliu 20220220 end -->
 		T1.PS,
 		T1.ENTRUST_DATE,
+		T1.ENTRUST_TYPE,
 		T2.SEC_ACCT_ID,
 		T2.DEAL_CUR_ACCT,
 		<!--GNS-946:关联交易表查询首期成交编号 modify by fuyongsheng 20220223 start-->
