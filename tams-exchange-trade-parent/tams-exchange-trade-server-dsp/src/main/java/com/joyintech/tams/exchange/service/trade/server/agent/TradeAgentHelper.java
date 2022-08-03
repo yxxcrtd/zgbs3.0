@@ -66,9 +66,11 @@ public class TradeAgentHelper {
             if (tradeAgent != null) {
                 Map<String, Account> accountMap = ((Map<String, Account>) tradeAgent.getAccountMap());
                 if (accountMap != null) {
-                    Account account = (Account) (accountMap.values().toArray())[0];
+                    Account account = accountMap.get(accountId);
                     // 柜台代码 关联DSP动态数据源
-                    map.put("AgentCode", account.getBrokerId());
+                    if (account != null){
+                        map.put("AgentCode", account.getBrokerId());
+                    }
                 }
             }
         }
