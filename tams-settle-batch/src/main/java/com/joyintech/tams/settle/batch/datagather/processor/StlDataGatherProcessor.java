@@ -7,6 +7,7 @@ import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.dao.EtrPledgeMapper;
 import com.joyintech.tams.common.base.dao.FinDealPledgeMapper;
 import com.joyintech.tams.common.base.dao.SettleTransDataTotalPledgeMapper;
 import com.joyintech.tams.common.base.entity.*;
@@ -38,7 +39,10 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
     @Autowired
     protected StlDataGatherMapper stlDataGatherMapper;
 
+    @Autowired
     protected SettleTransDataTotalPledgeMapper settleTransDataTotalPledgeMapper;
+    @Autowired
+    protected EtrPledgeMapper etrPledgeMapper;
 
     @Autowired
     protected FinDealPledgeMapper finDealPledgeMapper;
@@ -618,11 +622,24 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
                 // 到期续作分两种情况:1、只有新开的数据:通过质押券进行匹配指令
                 if(DictCodeListStl.业务场景分类明细_债券协议逆回购_首期_买入.getValue().equals(settleTransDataDto.getBusiSceneCalss())){
                     if(settlePs.equals(etrEntrustDto.getPs())
-                            && StringUtil.equals(settleTransDataDto.getFinprodType2(), etrEntrustDto.getFinprodType2())
-                            && CollectionUtils.isNotEmpty(pledges)
-                            // todo 跟指令质押品全部比
-                            && pledges.get(0).getPledgeFinprodId().equals(etrEntrustDto.getFinprodId())){
-                        matchEtrEntrustList.add(etrEntrustDto);
+                            && StringUtil.equals(settleTransDataDto.getFinprodType2(), etrEntrustDto.getFinprodType2())){
+                        Set<String> settlePledges = new HashSet<>();
+                        if(CollectionUtils.isNotEmpty(pledges)){
+                            for(SettleTransDataTotalPledge pledge : pledges){
+                                settlePledges.add(pledge.getPledgeFinprodId());
+                            }
+                        }
+                        Set<String> etrPledges = new HashSet<>();
+                        List<EtrPledge> etrPledgeList = stlDataGatherMapper.selectEtrPledges(etrEntrustDto.getEntrustId(), null);
+                        if(CollectionUtils.isNotEmpty(etrPledgeList)){
+                            for(EtrPledge etrPledge : etrPledgeList){
+                                etrPledges.add(etrPledge.getFinprodId());
+                            }
+                        }
+                        // 清算质押品跟指令质押品全部一致,则匹配成功
+                        if(this.checkSame(settlePledges, etrPledges)){
+                            matchEtrEntrustList.add(etrEntrustDto);
+                        }
                     }
                 }else{ //2、新开和续作的数据都有:通过首期交易编号进行匹配指令
                     // finprodId存的是首期交易编号
@@ -638,6 +655,27 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
             }
         }
         return matchEtrEntrustList;
+    }
+
+    /**
+     * 哦安短两个集合是否一致
+     * @param list
+     * @param list1
+     * @return
+     */
+    private boolean checkSame(Set<String> list, Set<String> list1) {
+        if(CollectionUtils.isEmpty(list) || CollectionUtils.isEmpty(list1)){
+            return false;
+        }
+        if(list.size() != list1.size()) {
+            return false;
+        }
+        for(String str : list) {
+            if(!list1.contains(str)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

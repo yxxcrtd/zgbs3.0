@@ -313,5 +313,4 @@ public interface StlDataGatherMapper {
      */
     List<SettleTransDataDto> selectBondFirstBiddingData(Map<String, Object> searchParam);
 
-    List<String> selectBidEntrustIds(Map<String, Object> searchParam);
 }

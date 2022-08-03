@@ -1855,7 +1855,4 @@
 		</where>
 	</select>
 
-	<select id="selectBidEntrustIds" resultType="java.lang.String">
-
-	</select>
 </mapper>
