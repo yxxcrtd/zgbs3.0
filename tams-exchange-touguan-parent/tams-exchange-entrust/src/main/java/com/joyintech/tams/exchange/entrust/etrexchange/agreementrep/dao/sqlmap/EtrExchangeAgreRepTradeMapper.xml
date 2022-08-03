@@ -702,19 +702,19 @@
                     when etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' then
                         ROUND( decode(nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ),0,0, nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( decode(ETR_ENTRUST.ENTRUST_AMT, 0, 1,ETR_ENTRUST.ENTRUST_AMT), 1 )), 4 )
                     WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
-                        ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )
+                        ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nullif( etr_entrust.ENTRUST_AMT, 0 ), 4 )
                     WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-                        ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_NUM, 1 ), 4 )
-                    ELSE ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )
+                        ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nullif( etr_entrust.ENTRUST_NUM, 0 ), 4 )
+                    ELSE ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ) / nullif( etr_entrust.ENTRUST_AMT, 0 ), 4 )
                 END AS implementPercent,
                 CASE
                     when etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' then
                         ROUND( decode(nvl( etr_finish_status.ENT_FINISH_AMT, 0 ),0,0,nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) / nvl( decode(ETR_ENTRUST.ENTRUST_AMT, 0, 1,ETR_ENTRUST.ENTRUST_AMT), 1 )), 4 )
                     WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
-                        ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )
+                        ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) / nullif( etr_entrust.ENTRUST_AMT, 0 ), 4 )
                     WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-                        ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_NUM, 1 ), 4 )
-                    ELSE ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )
+                        ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) / nullif( etr_entrust.ENTRUST_NUM, 0 ), 4 )
+                    ELSE ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ) / nullif( etr_entrust.ENTRUST_AMT, 0 ), 4 )
                 END AS dealPercent,
                 CASE
                 WHEN etr_entrust.PS = 'T94' THEN
