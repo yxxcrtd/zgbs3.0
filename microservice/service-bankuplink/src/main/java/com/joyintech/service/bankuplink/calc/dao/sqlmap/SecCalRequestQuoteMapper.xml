@@ -20,7 +20,7 @@
 	        H.EXERCISE_DATE nextExeDate,
 	        H.EXERCISE_PRICE nextExercisePrice,
 	        J.FACE_VALUE faceValue,
-	        F.RATE paperir
+			nvl(F.RATE,E.YIELD) paperir
 	      FROM FIN_PRODUCT A
 	      LEFT JOIN FIN_CASH_INFO B
 	        ON A.FINPROD_ID = B.FINPROD_ID
