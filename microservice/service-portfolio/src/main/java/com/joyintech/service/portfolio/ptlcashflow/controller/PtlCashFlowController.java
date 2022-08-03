@@ -215,7 +215,6 @@ public class PtlCashFlowController {
     @DTXTransaction
     @PostMapping("insert")
     public int insert(@RequestBody PtlCashFlowDto dto) {
-        ptlCashFlowService.deleteWflData(dto.getWorkflowId());
         return ptlCashFlowService.insert(dto);
     }
     
