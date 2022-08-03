@@ -16,6 +16,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.joyintech.framework.ajax.MessageType;
+import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.exception.MessageException;
 import com.joyintech.framework.security.LoginUserUtil;
@@ -30,6 +31,7 @@ import com.joyintech.tams.common.base.entity.PtlPortfolio;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.constant.*;
+import com.joyintech.tams.invest.common.component.base.entrust.BaseEtrInvestInfoService;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
@@ -60,6 +62,7 @@ import com.joyintech.tams.component.business.trade.BussRepoSecService;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 债券投资委托画面端service 〈功能详细描述〉
@@ -92,6 +95,12 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
 
     @Autowired
     private MstWorkflowCommonServiceMapperImpl mstWorkflowCommonServiceMapperImpl;
+
+    /**
+     * 投资委托基础组件
+     */
+    @Autowired(required = false)
+    private BaseEtrInvestInfoService baseEtrInvestInfoService;
 
     /**
      * 债券投资委托查询 <功能详细描述>
@@ -300,8 +309,17 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
      * 删除流程中数据和流水
      * @param dto
      */
-    public void deleteWflEntity(EtrSecLendDto dto) {
+    public void deleteWflEntityAndFlow(EtrSecLendDto dto) {
         restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME+"/EtrSecLend/doDeleteFlow",
+                dto, Void.class);
+    }
+
+    /**
+     * 删除流程中数据和流水
+     * @param dto
+     */
+    public void deleteWflEntity(EtrSecLendDto dto) {
+        restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME+"/EtrSecLend/doDeleteWfl",
                 dto, Void.class);
     }
 
@@ -316,7 +334,7 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
             dto.setBalanceCheck("N");
         }
         dto.setDecisionAct(DictCodeListExt3.系统动作_修改.getValue());
-        deleteWflEntity(dto);
+        deleteWflEntityAndFlow(dto);
         restTemplate.postForObject(
                 ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrSecLend/doInsert",dto,
                 Integer.class);
@@ -469,10 +487,34 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
      * @see
      * @since 1.0
      */
-    public boolean closeDelegate(String entrustId,String closeWay) {
-        return restTemplate.getForObject(
-                ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrSecLend/close?entrustId="+entrustId+"&closeWay="+closeWay,
-                boolean.class);
+    @Transactional
+    @DTXTransaction
+    public boolean closeDelegate(EtrSecLendDto dto,String closeWay) {
+//        boolean b = restTemplate.getForObject(
+//                ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrSecLend/close?entrustId="+dto.getEntrustId()+"&closeWay="+closeWay,
+//                boolean.class);
+        boolean b = baseEtrInvestInfoService.closeDelegate(dto.getEntrustId(), closeWay);
+        closeDelegate(Arrays.asList(dto));
+        return b;
+    }
+
+    public void closeDelegate(List<EtrSecLendDto> dtolist) {
+        Map<String,Object> req=new HashMap<>();
+        List<Map<String,Object>> etrList=new ArrayList<>();
+        for(EtrSecLendDto dto: dtolist){
+            Map<String,Object> closeItem= new HashMap<>();
+            closeItem.put("busiType",DictCodeListExt4.头寸业务类型_银行间债券借贷首期.getValue());
+            closeItem.put("ps",dto.getBusiPs());
+            closeItem.put("closeId",dto.getEntrustId());
+            closeItem.put("systemAct",DictCodeListExt3.系统动作_关闭.getValue());
+            closeItem.put("busiAct",DictCodeListExt3.业务动作_指令手动关闭.getValue());
+            etrList.add(closeItem);
+        }
+        req.put("data",etrList);
+        req.put("userId",SecurityUtil.getLoginUser().getUserName());
+        req.put("totalTradeId",IDGenerator.generate());
+        req.put("modelType",DictCodeListExt1.子系统代码_委托.getValue());
+        PositionHttpRequest.batchClose(req);
     }
 
     /**

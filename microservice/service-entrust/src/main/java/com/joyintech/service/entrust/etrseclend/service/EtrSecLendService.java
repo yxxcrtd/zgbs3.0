@@ -634,6 +634,22 @@ public class EtrSecLendService extends BaseService {
     	etrSecLendMapper.deleteWflwflEtrTarget(dto.getWorkflowId());
     	baseEtrInvestInfoService.deleteDelegateFlow(param);
     }
+
+    /**
+     * 删除流程中数据和流水
+     * @param dto
+     */
+    public void doDeleteWfl(EtrSecLendDto dto) {
+        //删除流水
+//        baseEtrCashPositionCommService.entrustCloseExecute(dto.getEntrustId());
+        //删除流程中数据
+        Map<String, Object> param = new HashMap<>();
+        param.put("workflowId", dto.getWorkflowId());
+        etrSecLendMapper.deleteWflwflEtrTarget(dto.getWorkflowId());
+        baseEtrInvestInfoService.deleteDelegateFlow(param);
+    }
+
+
     /**
      * 组合可用持仓查询 <功能详细描述>
      * 

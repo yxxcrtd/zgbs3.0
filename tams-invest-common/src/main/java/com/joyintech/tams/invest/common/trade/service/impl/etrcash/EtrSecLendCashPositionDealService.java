@@ -305,6 +305,10 @@ public class EtrSecLendCashPositionDealService  {
                         // 减少委托本金金额
                         etrSecPositionFlowDto1.setAmount(ArithmeticUtil.divide(pledgeBondInfoDto.getPledgePrin().negate(),100,2));
                         etrSecPositionFlowDto1.setFinprodId(DictCodeListExt1.金融产品类型_投管用_债券.getValue()+"_"+pledgeBondInfoDto.getBondCode());
+                        String invAim =etrCommonCashPositionMapper.selectInvAim(etrSecPositionFlowDto1);
+                        if(StringUtil.isNotEmpty(invAim)){
+                            etrSecPositionFlowDto1.setInvAim(invAim);
+                        }
                         etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto1);
                     }
                 }
@@ -312,6 +316,10 @@ public class EtrSecLendCashPositionDealService  {
             else {
                 // 减少委托本金金额
                 etrSecPositionFlowDto.setAmount(ArithmeticUtil.divide(etrEntrust.getEntrustAmt().negate(),100,2));
+                String invAim =etrCommonCashPositionMapper.selectInvAim(etrSecPositionFlowDto);
+                if(StringUtil.isNotEmpty(invAim)){
+                    etrSecPositionFlowDto.setInvAim(invAim);
+                }
                 etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
             }
         }

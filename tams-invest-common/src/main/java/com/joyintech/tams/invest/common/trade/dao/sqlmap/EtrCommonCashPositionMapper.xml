@@ -1128,4 +1128,18 @@
         WHERE
             TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
     </select>
+
+
+    <select id="selectInvAim" resultType="java.lang.String" parameterType="com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto">
+        SELECT
+        INV_AIM
+        FROM
+        ETR_SEC_POSITION
+        WHERE PORTFOLIO_ID = #{portfolioId} and cdate=#{cdate} and SEC_ACCT_ID =#{secAcctId}
+            and HODING_TYPE=#{hodingType} and FINPROD_ID =#{finprodId}
+        and INV_AIM !='999999' and  ROWNUM = 1
+        group by INV_AIM
+    </select>
+
+
 </mapper>
