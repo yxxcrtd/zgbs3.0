@@ -517,9 +517,9 @@
         <where>
             <if test="search != null and search != ''">
                 and (
-                SEC_ACCT_ID like concat(concat('%',#{search}),'%')
+                A.SEC_ACCT_ID like concat(concat('%',#{search}),'%')
                 or
-                SEC_ACCT_NAME like concat(concat('%',#{search}),'%')
+                B.SEC_ACCT_NAME like concat(concat('%',#{search}),'%')
                 )
             </if>
         </where>
