@@ -25,9 +25,15 @@ public class AgentServerUtil {
      */
     public static String GetTradeCacheKey(String keyType, String accountId, String brokerEntrustId) {
         String format = "%s_%s_%s_%s";
-        return String.format(format, keyType, accountId, AgentServerUtil.GetPlatDate(), brokerEntrustId);
+        return String.format(format, keyType, accountId, AgentServerUtil.GetSysDate(), brokerEntrustId);
     }
 
+    /**
+     * 获取当日日期 yyyyMMdd
+     */
+    public static String GetSysDate() {
+        return DateUtil.format(DateUtil.now(), DateUtil.DEFAULT_OTHER_FORMAT);
+    }
     /**
      * 获取当日日期 yyyyMMdd
      */

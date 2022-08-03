@@ -93,7 +93,7 @@ public class TradeServiceImpl extends AsyncServiceImpl<String, Trade> implements
                 tradeQueryBean.setEntrustBs(entrust.getEntrustBs());
                 tradeQueryBean.setStockName(entrust.getStockName());
             }
-            if("EX005".equals(tradeQueryBean.getBusiTypeTg())){
+            if ("EX005".equals(tradeQueryBean.getBusiTypeTg())) {
                 tradeQueryBean.setTradedPrice(tradeQueryBean.getTradedPrice().multiply(BigDecimal.valueOf(100)));
             }
 
@@ -169,7 +169,7 @@ public class TradeServiceImpl extends AsyncServiceImpl<String, Trade> implements
             if (InvestAssetTypeEnum.isFutures(tradeHistory.getAssetType())) {
                 tradeHistory.setStockCode(StockCodeUtils.getStockCode(tradeHistory.getStockCode()));
             }
-            if("EX005".equals(tradeHistory.getBusiTypeTg())){
+            if ("EX005".equals(tradeHistory.getBusiTypeTg())) {
                 tradeHistory.setTradedPrice(tradeHistory.getTradedPrice().multiply(BigDecimal.valueOf(100)));
             }
         });
@@ -261,7 +261,8 @@ public class TradeServiceImpl extends AsyncServiceImpl<String, Trade> implements
             Map<String, Trade> map1 = instructionIdMap.get(trade.getInstructionId());
             if (Objects.nonNull(map1)) map1.remove(trade.getId());
         }
-        accountIdMap.get(trade.getAccountId()).remove(trade.getTradingDay() + "_" + trade.getBrokerTradeId());
+        String key = AgentServerUtil.GetTradeCacheKey(trade.KeyType, trade.getAccountId(), trade.getBrokerEntrustId());
+        accountIdMap.get(trade.getAccountId()).remove(key);
     }
 
     @Override
