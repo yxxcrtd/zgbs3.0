@@ -764,7 +764,7 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
                 busiTypePosition = DictCodeListExt3.投管业务类型_中途换券.getValue();
             }
         } else if (DictCodeListExt3.交易方向_解除质押.getValue().equals(dto.getPs())) {
-            if (null == dto.getExpireSettleAmt() || dto.getExpireSettleAmt().compareTo(BigDecimal.ZERO) == 0) {
+            if (null == dto.getExpireSettleAmt() || dto.getExpireSettleAmt().compareTo(BigDecimal.ZERO) == 0 || DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(dto.getTradeMarket())) {
                 dto.setEntrustBussType(DictCodeListExt3.上农商_指令业务类型_协议回购解除质押指令.getValue());
                 dto.setBusinessTypeName(DictCodeListExt3.上农商_指令业务类型_协议回购解除质押指令.getValue());
                 businessType = DictCodeListExt3.共通业务类型_协议回购解除质押指令.getValue();
