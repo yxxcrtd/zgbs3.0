@@ -1269,11 +1269,6 @@
                     $("#addCla").attr("disabled", false);
                 }
             } else if (ps == 'T94') {
-                let outAmtValue = $("#outAmt").val()
-                if (outAmtValue != null && outAmtValue != "" && outAmtValue != undefined) {
-                    $("#outRepSecNum").val("")
-                    $("#newRepSecNum").val("")
-                }
                 if (repPs == BACK_LEND_DIRECTION_03) {
                     //本方交易员
                     $("#trader_div").hide();
@@ -1443,6 +1438,16 @@
                     //补充协议
                     $("#addCla_div").show();
                     $("#addCla").attr("disabled", false);
+                }
+                debugger;
+                let outAmtValue = $("#outAmt").val();
+                console.log("outAmtValue " + outAmtValue);
+                if (outAmtValue != null && outAmtValue != "" && outAmtValue != undefined) {
+                    $("#outRepSecNum").val("");
+                    $("#newRepSecNum").val("");
+                    $("#newRepSecId").val("");
+                    $("#newRepSecId").attr("disabled", true);
+                    $("#newRepSecNum").attr("disabled", true);
                 }
             } else if (ps == 'T93') {
                 if (repPs == BACK_LEND_DIRECTION_03) {
