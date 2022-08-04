@@ -41,6 +41,7 @@ import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
+import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPosPortfolioCashRequest;
@@ -578,7 +579,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
                 entrustIdList.add(item.getEntrustId()));
         String partyId = null;
         /*************************************************************组合分配********************************************/
-        String repo_pledge_model = CacheUtil.getSysParam(BussinessConstant.REPO_PLEDGE_MODEL);
+//        String repo_pledge_model = CacheUtil.getSysParam(BussinessConstant.REPO_PLEDGE_MODEL);
         if (CollectionUtils.isEmpty(entity.getPtlAllocations())) {
             errorList.add(new ValidMessage("组合分配不可为空"));
         } else {
@@ -601,7 +602,6 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
             // 指定价格的回购利率
             BigDecimal yieldPRM01 = null;
             // 回购利率是否相等
-            boolean yieldFlag = true;
             for (RepoPtlAllocationDto ptlAllocatio : entity.getPtlAllocations()) {
                 List<ValidMessage> validMessageList = this.checkPtlEmpty(ptlAllocatio, ps);
                 if (validMessageList != null && !validMessageList.isEmpty()) {
@@ -639,7 +639,6 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
                 }
                 if (yieldPRM01 != null && StringUtil.equals(ptlAllocatio.getPriceModel(), DictCodeListExt2.价格模式_指定价格.getValue())
                         && yieldPRM01.compareTo(ptlAllocatio.getPrice()) != 0) {
-                    yieldFlag = false;
                 }
 
                 tradeAmtTotal = ArithmeticUtil.doAdd(tradeAmtTotal, ptlAllocatio.getTradeAmt());
@@ -650,7 +649,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
                 // 组合分配中交易金额要小于等于（剩余指令额度-已成功发出的未收到外汇交易中心成功反馈报价和流程中的报价-流程中交易登记额度）
                 // 已实现: 剩余指令额度 = 指令额度-生效的交易登记额度-流程中交易登记额度-已成功发出的未收到外汇交易中心成功反馈报价和流程中的报价
                 CfetsRepoDealEntrustOrderDto dto = cfetsIbuQuoteRepoMapper.findEtrLastNumByEtrId(ptlAllocatio.getEntrustId(), entity.getQuoteId());
-                if (cfetsRepoQuotedPrice004Service.ACompareToB(ptlAllocatio.getTradeAmt(), dto.getAvaNum(), 12) > 0) {
+                if (BigDecimalUtil.ACompareToB(ptlAllocatio.getTradeAmt(), dto.getAvaNum(), 12) > 0) {
                     errorList.add(new ValidMessage("组合分配中交易金额要小于等于[" + ptlAllocatio.getEntrustId() + "]剩余的指令额度"));
                     break;
                 }
@@ -704,14 +703,16 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
             //勾选指令的价格模式只存在限价指令时，回购利率默认为空，
             // 填入值后需不大于限价指令中回购利率的最小值，不满足时提交弹出提示“价格模式为限价指令，交易回购利率不能大于指令指定的回购利率进行交易”
             if (!StringUtil.isNotEmpty(yieldPRM01) && StringUtil.isNotEmpty(minOrMaxYield)
-                    && cfetsRepoQuotedPrice004Service.ACompareToB(minOrMaxYield, entity.getPrice(), yieldScale) < 0 && StringUtil.equals(ps, DictCodeListExt3.交易方向_正回购.getValue())) {
+                    && cfetsRepoQuotedPrice004Service.ACompareToB(minOrMaxYield, entity.getPrice(), yieldScale) < 0
+                    && StringUtil.equals(ps, DictCodeListExt3.交易方向_正回购.getValue())) {
                 errorList.add(new ValidMessage("价格模式为限价指令，交易回购利率不能大于指令指定的回购利率进行交易！"));
             }
             //交易方向为逆回购
             //勾选指令的价格模式只存在限价指令时，回购利率默认为空，填入值后需不小于限价指令中回购利率的最大值，
             // 不满足时提交弹出提示“价格模式为限价指令，交易回购利率不能小于指令指定的回购利率进行交易”
             if (!StringUtil.isNotEmpty(yieldPRM01) && StringUtil.isNotEmpty(minOrMaxYield)
-                    && cfetsRepoQuotedPrice004Service.ACompareToB(minOrMaxYield, entity.getPrice(), yieldScale) > 0 && StringUtil.equals(ps, DictCodeListExt3.交易方向_逆回购.getValue())) {
+                    && cfetsRepoQuotedPrice004Service.ACompareToB(minOrMaxYield, entity.getPrice(), yieldScale) > 0
+                    && StringUtil.equals(ps, DictCodeListExt3.交易方向_逆回购.getValue())) {
                 errorList.add(new ValidMessage("价格模式为限价指令，交易回购利率不能小于指令指定的回购利率进行交易！"));
             }
             //勾选指令的价格模式同时存在指定价格和限价指令时，回购利率默认为空，填入值后需判断回购利率是否等于指定价格中的回购利率，
@@ -1096,7 +1097,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
      */
     @Override
     public void doUpdate(CfetsRepoDealQuotedPrice001Dto entity) {
-        if (StringUtil.equals("save", entity.getOperatorType())){
+        if (StringUtil.equals("save", entity.getOperateType())){
             return;
         }
         if (!StringUtil.equals("revoke", entity.getOperatorType())

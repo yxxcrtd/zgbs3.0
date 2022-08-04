@@ -900,7 +900,7 @@
                     //回购金额
                     $("#tradeAmt").attr("disabled", true);
                     //回购利率
-                    $("#yield").attr("disabled", true);
+                    $("#yield").attr("disabled", false);
                     //首期结算日
                     $("#fristSettleDate").attr("disabled", true);
                     //到期结算日
@@ -1224,11 +1224,12 @@
                     //券面金额
                     $("#printAmt").attr("disabled", true);
                     //交易对手
-                    if ($("#redoType").val() == '1') {
+                    // if ($("#redoType").val() == '1') {
                         $("#counterId").attr("disabled", false);
-                    } else {
-                        $("#counterId").attr("disabled", true);
-                    }
+                    // }
+                    // else {
+                    //     $("#counterId").attr("disabled", true);
+                    // }
 
                     //本方交易员
                     $("#trader").attr("disabled", false);

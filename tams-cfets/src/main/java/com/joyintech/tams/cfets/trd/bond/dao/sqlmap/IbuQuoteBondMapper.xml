@@ -24,8 +24,8 @@
         ETR_ENTRUST.PS ps,
         ETR_ENTRUST.ENTRUST_NUM/100 entrustNum,
         (NVL(T5.FINISH_AMT,0)+NVL(T7.ENT_FINISH_AMT*100,0))/10000 finishAmt,
-        NVL(ETR_ENTRUST.ENTRUST_NUM, 0)/100 - NVL(T5.FINISH_AMT,0)/10000 - NVL(T7.ENT_FINISH_AMT,0)/100 avaNum,
-        (NVL(ETR_ENTRUST.ENTRUST_NUM,0) /100 -NVL(T5.FINISH_AMT, 0)/10000 ) - NVL(T7.ENT_FINISH_AMT,0)/100 AS entrustAvaNum,
+        NVL(ETR_ENTRUST.ENTRUST_NUM, 0)/100 - NVL(T5.FINISH_AMT,0)/10000 - NVL(T7.ENT_FINISH_AMT,0)/100 - NVL(ETR_ENTRUST_ADD.CLOSE_AMT,0)/100 avaNum,
+        NVL(ETR_ENTRUST.ENTRUST_NUM,0) /100 -NVL(T5.FINISH_AMT, 0)/10000 - NVL(T7.ENT_FINISH_AMT,0)/100 - NVL(ETR_ENTRUST_ADD.CLOSE_AMT,0)/100 AS entrustAvaNum,
         ETR_ENTRUST.PRICE price,
         ETR_ENTRUST_ADD.MATURE_YIELD * 100 matureYield,
         ETR_ENTRUST.VDATE vdate,
@@ -2109,7 +2109,7 @@
                 (select sec_acct_name from stl_sec_acct_info where stl_sec_acct_info.sec_acct_id = T1.SEC_MANAGE_ACCT_ID)
                 as secAcctName,
                 T8.PORTFOLIO_NAME,
-                NVL(T6.ENTRUST_NUM, 0)*100 - NVL(T9.FINISH_AMT,0) - NVL(T10.ENT_FINISH_AMT,0)*100 avaNum,
+                NVL(T6.ENTRUST_NUM, 0)*100 - NVL(T9.FINISH_AMT,0) - NVL(T10.ENT_FINISH_AMT,0)*100 - NVL(T7.CLOSE_AMT,0)*100 avaNum,
                 T1.CPRICE_AMT ,
                 T1.FPRICE_AMT ,
                 T1.INT_AMT
@@ -2177,7 +2177,7 @@ SELECT
                 (select sec_acct_name from stl_sec_acct_info where stl_sec_acct_info.sec_acct_id = T1.SEC_MANAGE_ACCT_ID)
                 as secAcctName,
                 T8.PORTFOLIO_NAME,
-                NVL(T6.ENTRUST_NUM, 0)*100 - NVL(T9.FINISH_AMT,0) - NVL(T10.ENT_FINISH_AMT,0)*100 avaNum,
+                NVL(T6.ENTRUST_NUM, 0)*100 - NVL(T9.FINISH_AMT,0) - NVL(T10.ENT_FINISH_AMT,0)*100 - NVL(T7.CLOSE_AMT,0)*100 avaNum,
                 T1.CPRICE_AMT ,
                 T1.FPRICE_AMT ,
                 T1.INT_AMT
@@ -2247,7 +2247,7 @@ SELECT
     <!--获取指令流程中占用券面总额，不包含当前流程-->
     <select id="getWflShareAmtByEntrustIdAndWorkFlowId" resultType="java.math.BigDecimal">
         select sum(nvl(nvl(ee.ENTRUST_NUM*100,0) - nvl(rfpd.ENTRUST_AMT, 0) - nvl(wrfpd.SHARE_AMT*100, 0) - nvl(IBQER.ENTRUST_AMT, 0) -
-                    nvl(wiqer.SHARE_AMT*100, 0),0)) avaNum
+                    nvl(wiqer.SHARE_AMT*100, 0) - NVL(eea.CLOSE_AMT,0)/100,0)) avaNum
         from ETR_ENTRUST ee
             left join ETR_ENTRUST_ADD eea on ee.ENTRUST_ID = eea.ENTRUST_ID
             left join (select t.SHARE_AMT*100 ENTRUST_AMT, t.ENTRUST_ID

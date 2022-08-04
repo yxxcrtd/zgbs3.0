@@ -44,10 +44,7 @@ import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceM
 import com.joyintech.tams.component.base.entrust.BusiAutoEtrDispService;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.common.service.DateCalService;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dao.EtrExchangeAgreRepTradeMapper;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreOutRepResp;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepCurrResp;
@@ -2961,6 +2958,11 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 // 非三方续做
                 parameter.setPs(dto.getPs() + "_0");
             }
+        }
+        if (StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())
+                && StringUtil.equals(dto.getEntrustBussType(), DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令_换钱.getValue())
+                && StringUtil.equals(dto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())) {
+            parameter.setPs(parameter.getPs() + "_" + DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换钱.getValue());
         }
         dto.setTradeDate(DateUtil.parse(dto.getVdate()));
 

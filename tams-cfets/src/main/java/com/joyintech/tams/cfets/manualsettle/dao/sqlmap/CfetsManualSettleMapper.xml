@@ -1932,10 +1932,29 @@
     <!--指令是否在流程中-->
     <select id="countWflEtr" resultType="java.lang.Integer">
         SELECT COUNT(1) FROM (
+            SELECT
+            ENTRUST_ID
+            FROM
+            WFL_REG_FIN_PRODUCT_DEAL
+            <where>
+                <if test="entrustIdList != null and entrustIdList.size() > 0">
+                    and ENTRUST_ID  in
+                    <foreach collection="entrustIdList" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="entrustIds != null and entrustIds.size() > 0">
+                    and ENTRUST_ID  in
+                    <foreach collection="entrustIds" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+            </where>
+        UNION ALL
         SELECT
-        ENTRUST_ID
+            ENTRUST_ID
         FROM
-        WFL_REG_FIN_PRODUCT_DEAL
+            WFL_IBU_QUOTE_ETR_RE
         <where>
             <if test="entrustIdList != null and entrustIdList.size() > 0">
                 and ENTRUST_ID  in
@@ -1952,110 +1971,93 @@
         </where>
         UNION ALL
         SELECT
-        ENTRUST_ID
-        FROM
-        WFL_IBU_QUOTE_ETR_RE
-        <where>
+            T2.ENTRUST_ID
+        FROM REG_FIN_PRODUCT_DEAL_TOTAL T1
+        INNER JOIN REG_FIN_PRODUCT_DEAL T2 ON T1.TOTLE_TRADE_ID = T2.TOTLE_TRADE_ID
             <if test="entrustIdList != null and entrustIdList.size() > 0">
-                and ENTRUST_ID  in
+                and T2.ENTRUST_ID  in
                 <foreach collection="entrustIdList" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
             <if test="entrustIds != null and entrustIds.size() > 0">
-                and ENTRUST_ID  in
+                and T2.ENTRUST_ID  in
                 <foreach collection="entrustIds" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
+        WHERE T1.TRADE_STATUS = '01' AND (T1.IS_CANCEL IS NULL OR T1.IS_CANCEL = 'N')
+                and NOT EXISTS (
+                SELECT
+                1
+                FROM
+                TRDQUTO_MATCH_INFO T3
+                WHERE
+                T3.PRE_TRADE_ID = T1.TOTLE_TRADE_ID)
+        UNION ALL
+        SELECT
+            T2.ENTRUST_ID
+        FROM
+            BID_ORDER T1
+        INNER JOIN BID_ORDER_BID_PRICE T2 ON T1.BID_ID = T2.BID_ID
+        <if test="entrustIdList != null and entrustIdList.size() > 0">
+            and T2.ENTRUST_ID  in
+            <foreach collection="entrustIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="entrustIds != null and entrustIds.size() > 0">
+            and T2.ENTRUST_ID  in
+            <foreach collection="entrustIds" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        WHERE T1.TRADE_STATUS = '01' AND (T1.IS_CANCEL IS NULL OR T1.IS_CANCEL = 'N')
+            and NOT EXISTS (
+            SELECT
+            1
+            FROM
+            TRDQUTO_MATCH_INFO T3
+            WHERE
+            T3.PRE_TRADE_ID = T1.BID_ID)
+        UNION ALL
+        SELECT
+            T2.ENTRUST_ID
+        FROM
+            IBU_QUOTE_BOND T1
+            INNER JOIN IBU_QUOTE_ETR_RE T2 ON T1.QUOTE_ID = T2.QUOTE_ID
+        <if test="entrustIdList != null and entrustIdList.size() > 0">
+            and T2.ENTRUST_ID  in
+            <foreach collection="entrustIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="entrustIds != null and entrustIds.size() > 0">
+            and T2.ENTRUST_ID  in
+            <foreach collection="entrustIds" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <where>
+            <if test="tradeStatusList != null and tradeStatusList.size() > 0">
+                and T1.TRADE_STATUS  not in
+                <foreach collection="tradeStatusList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            and NOT EXISTS (
+            SELECT
+            1
+            FROM
+            TRDQUTO_MATCH_INFO T3
+            WHERE
+            T3.PRE_TRADE_ID = T1.QUOTE_ID)
         </where>
-        UNION ALL
-        SELECT
-        T2.ENTRUST_ID
-        FROM
-        REG_FIN_PRODUCT_DEAL_TOTAL T1
-        INNER JOIN REG_FIN_PRODUCT_DEAL T2 ON
-        T1.TOTLE_TRADE_ID = T2.TOTLE_TRADE_ID
-        <if test="entrustIdList != null and entrustIdList.size() > 0">
-            and T2.ENTRUST_ID  in
-            <foreach collection="entrustIdList" item="item" open="(" close=")" separator=",">
-                #{item}
-            </foreach>
-        </if>
-        <if test="entrustIds != null and entrustIds.size() > 0">
-            and T2.ENTRUST_ID  in
-            <foreach collection="entrustIds" item="item" open="(" close=")" separator=",">
-                #{item}
-            </foreach>
-        </if>
-        WHERE T1.TRADE_STATUS = '01' AND (T1.IS_CANCEL IS NULL OR T1.IS_CANCEL = 'N')
-        and NOT EXISTS (
-        SELECT
-        1
-        FROM
-        TRDQUTO_MATCH_INFO T3
-        WHERE
-        T3.PRE_TRADE_ID = T1.TOTLE_TRADE_ID)
-        UNION ALL
-        SELECT
-        T2.ENTRUST_ID
-        FROM
-        BID_ORDER T1
-        INNER JOIN BID_ORDER_BID_PRICE T2 ON
-        T1.BID_ID = T2.BID_ID
-        <if test="entrustIdList != null and entrustIdList.size() > 0">
-            and T2.ENTRUST_ID  in
-            <foreach collection="entrustIdList" item="item" open="(" close=")" separator=",">
-                #{item}
-            </foreach>
-        </if>
-        <if test="entrustIds != null and entrustIds.size() > 0">
-            and T2.ENTRUST_ID  in
-            <foreach collection="entrustIds" item="item" open="(" close=")" separator=",">
-                #{item}
-            </foreach>
-        </if>
-        WHERE T1.TRADE_STATUS = '01' AND (T1.IS_CANCEL IS NULL OR T1.IS_CANCEL = 'N')
-        and NOT EXISTS (
-        SELECT
-        1
-        FROM
-        TRDQUTO_MATCH_INFO T3
-        WHERE
-        T3.PRE_TRADE_ID = T1.BID_ID)
-        UNION ALL
-        SELECT
-        T2.ENTRUST_ID
-        FROM
-        IBU_QUOTE_BOND T1
-        INNER JOIN IBU_QUOTE_ETR_RE T2 ON
-        T1.QUOTE_ID = T2.QUOTE_ID
-        <if test="entrustIdList != null and entrustIdList.size() > 0">
-            and T2.ENTRUST_ID  in
-            <foreach collection="entrustIdList" item="item" open="(" close=")" separator=",">
-                #{item}
-            </foreach>
-        </if>
-        <if test="entrustIds != null and entrustIds.size() > 0">
-            and T2.ENTRUST_ID  in
-            <foreach collection="entrustIds" item="item" open="(" close=")" separator=",">
-                #{item}
-            </foreach>
-        </if>
-        WHERE
-        T1.TRADE_STATUS not in ('08','14','15') and
-        NOT EXISTS (
-        SELECT
-        1
-        FROM
-        TRDQUTO_MATCH_INFO T3
-        WHERE
-        T3.PRE_TRADE_ID = T1.QUOTE_ID)
         union all
         SELECT
-        T2.ENTRUST_ID
+            T2.ENTRUST_ID
         FROM
-        IBU_QUOTE_CREP T1
+            IBU_QUOTE_CREP T1
         INNER JOIN IBU_QUOTE_ETR_RE T2 ON
         T1.QUOTE_ID = T2.QUOTE_ID
         <if test="entrustIdList != null and entrustIdList.size() > 0">
@@ -2070,14 +2072,20 @@
                 #{item}
             </foreach>
         </if>
-        WHERE
-        T1.TRADE_STATUS not in ('08','14','15') and
-        NOT EXISTS (
-        SELECT
-        1
-        FROM
-        TRDQUTO_MATCH_INFO T3
-        WHERE
-        T3.PRE_TRADE_ID = T1.QUOTE_ID))
+        <where>
+            <if test="tradeStatusList != null and tradeStatusList.size() > 0">
+                and T1.TRADE_STATUS  not in
+                <foreach collection="tradeStatusList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            and NOT EXISTS (
+            SELECT
+            1
+            FROM
+            TRDQUTO_MATCH_INFO T3
+            WHERE
+            T3.PRE_TRADE_ID = T1.QUOTE_ID)
+        </where>)
     </select>
 </mapper>

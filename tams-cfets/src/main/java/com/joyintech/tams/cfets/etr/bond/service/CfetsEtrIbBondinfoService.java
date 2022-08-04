@@ -2300,6 +2300,16 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                     res.setErrorList(Arrays.asList(validMessage));
                     return res;
                 }
+                Map<String, Object> pageParam = new HashMap<>();
+                pageParam.put("entrustId", Item.getEntrustId());
+                List<String> entrustIds = cfetsetrIbBondinfoMapper.findEtrEntrustIsSettleFail(pageParam);
+                if(CollectionUtils.isNotEmpty(entrustIds)){
+                    AjaxResult res=new AjaxResult();
+                    ValidMessage  validMessage= new ValidMessage();
+                    validMessage.setMessage("指令存在交收失败的数据，不允许修改");
+                    res.setErrorList(Arrays.asList(validMessage));
+                    return res;
+                }
             };
         }
         return new AjaxResult();

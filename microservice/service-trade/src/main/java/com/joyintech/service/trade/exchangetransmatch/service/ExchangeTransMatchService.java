@@ -58,6 +58,10 @@ public class ExchangeTransMatchService extends BaseService {
         map.put("ENTRUST_CLASS_02",DictCodeListExt3.投资指令类型_多组合单资产指令.getValue());
         map.put("SEC_TYPE_09", DictCodeListExt1.证券品种_回购.getValue());
         map.put("FINPROD_TYPE_TG_F10", DictCodeListExt1.金融产品类型_投管用_股票.getValue());
+        map.put("TARGET_BACK_TYPE_H01", DictCodeList.回购类型_质押式协议回购.getValue());
+        map.put("TARGET_CLASS_01", DictCodeListExt3.目标类型_数量.getValue());
+        map.put("TARGET_CLASS_02", DictCodeListExt3.目标类型_金额.getValue());
+
         if(StringUtil.isNotEmpty(map.get("finprodType2"))) {
             if(StringUtil.equals((String)map.get("finprodType2"),DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
                 map.put("secType", DictCodeListExt1.证券品种_债券.getValue());

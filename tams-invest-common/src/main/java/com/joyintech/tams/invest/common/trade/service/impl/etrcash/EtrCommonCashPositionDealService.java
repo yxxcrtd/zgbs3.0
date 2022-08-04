@@ -1698,6 +1698,20 @@ public class EtrCommonCashPositionDealService extends BaseService {
         }
         return bigDecimal;
     }
+
+
+    /**
+     * 指令已完成金额或者额度(成交)
+     * @param sumTradeFlag 01 交易金额 or 交易份额
+     * @return
+     * @see
+     * @since 1.0
+     */
+    public static BigDecimal getEtrFinishAmtMuilt(Map<String, Object> map) {
+        map.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
+        map.put("YES_OR_NO_N", DictCodeList.是否_否.getValue());
+        return etrCommonCashPositionMapper.getAllEtrFinishAmt(map);
+    }
     /**
      * 查询指令可用现金(新表)
      *

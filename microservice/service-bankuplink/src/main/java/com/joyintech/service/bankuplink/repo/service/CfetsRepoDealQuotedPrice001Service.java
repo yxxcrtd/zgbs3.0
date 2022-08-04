@@ -1028,10 +1028,7 @@ public class CfetsRepoDealQuotedPrice001Service extends BaseService {
             BeanUtil.copyPropertiesIgnoreNull(secPositionFlowDto, etrSecPositionFlowDto);
             secPositionFlowDto.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());
             secPositionFlowDto.setAmount(secPositionFlowDto.getAmount().negate());
-            // 撤回生成一笔反向的流水
-            if (StringUtil.equals(dto.getTradeStatus(), BussinessDictCodeList.银行间上行报价状态_已撤回.getValue())) {
-                secPositionFlowDto.setAmount(secPositionFlowDto.getAmount().negate());
-            }
+            secPositionFlowDto.setAmount(secPositionFlowDto.getAmount().negate());
             etrSecPositionFlows.add(secPositionFlowDto);
         });
 
