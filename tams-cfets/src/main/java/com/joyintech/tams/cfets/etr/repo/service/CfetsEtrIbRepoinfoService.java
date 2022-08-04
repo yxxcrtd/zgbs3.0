@@ -619,17 +619,16 @@ public class CfetsEtrIbRepoinfoService extends BaseService{
             AjaxResult res=new AjaxResult();
             ValidMessage validMessage= new ValidMessage();
             validMessage.setMessage(getMessage("COMMON_E_0002"));
-            res.setErrorList(Arrays.asList(validMessage));
+            res.setErrorList(Collections.singletonList(validMessage));
             return res;
         }
         List<CfetsEtribRepoInfo003Dto> selectedItem = dto.getSelectedItem();
-        AjaxResult ajaxResult=new AjaxResult();
         if(StringUtil.isNotEmpty(selectedItem)){
             if(selectedItem.size()>1){
                 AjaxResult res=new AjaxResult();
                 ValidMessage  validMessage= new ValidMessage();
                 validMessage.setMessage("委托指令修改仅允许一条数据");
-                res.setErrorList(Arrays.asList(validMessage));
+                res.setErrorList(Collections.singletonList(validMessage));
                 return res;
             }
             for(CfetsEtribRepoInfo003Dto Item:selectedItem){
@@ -639,7 +638,7 @@ public class CfetsEtrIbRepoinfoService extends BaseService{
                     AjaxResult res=new AjaxResult();
                     ValidMessage  validMessage= new ValidMessage();
                     validMessage.setMessage("只有指令状态为已撤回、已退回的指令允许修改");
-                    res.setErrorList(Arrays.asList(validMessage));
+                    res.setErrorList(Collections.singletonList(validMessage));
                     return res;
                 }
 
@@ -653,9 +652,19 @@ public class CfetsEtrIbRepoinfoService extends BaseService{
                         AjaxResult res=new AjaxResult();
                         ValidMessage  validMessage= new ValidMessage();
                         validMessage.setMessage("存在流程中数据，无法修改。");
-                        res.setErrorList(Arrays.asList(validMessage));
+                        res.setErrorList(Collections.singletonList(validMessage));
                         return res;
                     }
+                }
+                Map<String, Object> pageParam = new HashMap<>();
+                pageParam.put("entrustId", Item.getEntrustId());
+                List<String> entrustIds = cfetsetrIbBondinfoMapper.findEtrEntrustIsSettleFail(pageParam);
+                if(CollectionUtils.isNotEmpty(entrustIds)){
+                    AjaxResult res=new AjaxResult();
+                    ValidMessage  validMessage= new ValidMessage();
+                    validMessage.setMessage("指令存在交收失败的数据，不允许修改");
+                    res.setErrorList(Collections.singletonList(validMessage));
+                    return res;
                 }
             };
         }

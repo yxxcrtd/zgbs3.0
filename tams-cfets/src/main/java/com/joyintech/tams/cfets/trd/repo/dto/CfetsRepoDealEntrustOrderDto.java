@@ -223,6 +223,11 @@ public class CfetsRepoDealEntrustOrderDto extends EtrEntrust {
      */
     private BigDecimal sumShareAmt;
 
+    /**
+     * 指令关闭额度
+     */
+    private BigDecimal closeAmt;
+
     //质押券信息
     private List<RepoEntrustPledgeDto> repoEntrustPledgeDtos;
 
@@ -975,5 +980,13 @@ public class CfetsRepoDealEntrustOrderDto extends EtrEntrust {
 
     public void setSumShareAmt(BigDecimal sumShareAmt) {
         this.sumShareAmt = sumShareAmt;
+    }
+
+    public BigDecimal getCloseAmt() {
+        return closeAmt;
+    }
+
+    public void setCloseAmt(BigDecimal closeAmt) {
+        this.closeAmt = closeAmt;
     }
 }

@@ -225,6 +225,11 @@ public class BaseTradeProductDealDto {
      */
     private String stage;
 
+    /**
+     * 清算速度是否为T+0
+     */
+    private boolean isSpeed0;
+
     public Date getExRightsDate() {
         return exRightsDate;
     }
@@ -719,5 +724,13 @@ public class BaseTradeProductDealDto {
 
     public void setStage(String stage) {
         this.stage = stage;
+    }
+
+    public boolean isSpeed0() {
+        return isSpeed0;
+    }
+
+    public void setSpeed0(boolean speed0) {
+        isSpeed0 = speed0;
     }
 }

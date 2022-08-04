@@ -931,7 +931,9 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                 etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
 
                 //场内交易下单成交交易日间不产生流水影响指令现金 add by chendijun
-                if (!StringUtil.equals(finProductTradeDto.getIsFromExchange(), DictCodeList.是否_是.getValue())) {
+                // 场外T+1的指令在T日已关闭,差额在T日处理过了,此时交收不处理差额
+                if (!StringUtil.equals(finProductTradeDto.getIsFromExchange(), DictCodeList.是否_是.getValue())
+                        && !finProductTradeDto.isSpeed0()) {
                     // 交割日减少(交易金额-交易券面总额*委托全价/债券面值）
                     etrCashPositionFlowDto.setAmount(交易日减少金额);
                     // 添加现金流水到目标dto
@@ -1411,7 +1413,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
             // 可用现金 关闭日增加剩余委托券面总额*委托全价/100
             EtrCashPositionFlowDto etrCashPositionFlowDto = EtrCommonCashPositionDealService.getEtrCashPositionFlowDtoFromEtr(
                 entrustCommonDto);
-            String acctId = null;
+            String acctId;
             // if (StringUtil.isNotEmpty(etrEntrust.getChlId()) && DictCodeListExt2.划款方式_一次性划款.getValue().equals(
             //                // etrCommonCashPositionDealService.queryChlType(etrEntrust.getChlId()))) {
             // acctId = EtrCommonCashPositionDealService.select通道资金账户(etrEntrust.getChlId());
@@ -1478,6 +1480,9 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
 					etrSecPositionFlowDto.setAmount(ArithmeticUtil.subtract(etrEntrust.getEntrustNum(), etrFinish));
 				}
 			} else {
+			    // 已完成额度 = 指令完成表中额度 + 交收失败关闭的额度
+                etrFinish = ArithmeticUtil.doAdd(etrFinish, etrEntrustAdd.getCloseAmt());
+                // 指令关闭冲销的额度 = 指令额度 - 已完成额度
 				etrSecPositionFlowDto.setAmount(ArithmeticUtil.subtract(etrEntrust.getEntrustNum(), etrFinish));
 			}
 			etrSecPositionFlowDto.setCloseFlag("01"); // 委托关闭特殊处理, 委托关闭后,再撤销交易时, 委托状态会变成已接收,这时应该要把这笔数据删除
