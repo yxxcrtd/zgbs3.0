@@ -179,14 +179,20 @@ public class ExchangeTransMatchRepo5Service extends ExchangeTransMatchRepoCommon
         //是否逾期
         dealTotal.setIsOverdueDeal(DictCodeList.是否_否.getValue());
 
-        // GZYHTZJY-1039:交易对手应为空 fuyongsheng modify 20220106 start
-//        if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
-//            dealTotal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
-//        }
-//        else if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
-//            dealTotal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
-//        }
-        // GZYHTZJY-1039:交易对手应为空 fuyongsheng modify 20220106 end
+        // 交易对手
+        if(!StringUtil.isEmpty(dealDto.getCounterId())){
+            dealTotal.setCounterId(dealDto.getCounterId());
+        }else if(!StringUtil.isEmpty(entrustDto.getCounterId())){
+            dealTotal.setCounterId(entrustDto.getCounterId());
+        }else{
+            if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+                dealTotal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
+            }
+            else if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
+                dealTotal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
+            }
+        }
+
         // 交易平台
         dealTotal.setTradePlat(dealDto.getTradePlat());
 
@@ -329,15 +335,17 @@ public class ExchangeTransMatchRepo5Service extends ExchangeTransMatchRepoCommon
             // 通道代码
             trdProductDeal.setChlId(null);
             // 交易对手
-            if(StringUtil.isEmpty(dealDto.getCounterId())){
-                if(StringUtil.equals(settleTransData.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+            if(!StringUtil.isEmpty(dealDto.getCounterId())){
+                trdProductDeal.setCounterId(dealDto.getCounterId());
+            }else if(!StringUtil.isEmpty(entrustDto.getCounterId())){
+                trdProductDeal.setCounterId(entrustDto.getCounterId());
+            }else{
+                if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
                     trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
                 }
-                else if(StringUtil.equals(settleTransData.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
+                else if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
                     trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
                 }
-            }else{
-                trdProductDeal.setCounterId(dealDto.getCounterId());
             }
             // 是否外部交易
             trdProductDeal.setIsOutTrade(DictCodeList.是否_是.getValue());
@@ -416,7 +424,7 @@ public class ExchangeTransMatchRepo5Service extends ExchangeTransMatchRepoCommon
         List<SettleTransData> list = exchangeTransMatchCommonMapper.getSettleTransDataList(map);
         for(SettleTransData item:list) {
             //收息到账
-            if(BigDecimal.ZERO.compareTo(item.getmIntAmt())<0) {
+            if(null != item.getmIntAmt() && BigDecimal.ZERO.compareTo(item.getmIntAmt())<0) {
                 SettleTransData IntSettleTransData = new SettleTransData();
                 BeanUtil.copyPropertiesIgnoreNull(IntSettleTransData,item);
 
@@ -450,7 +458,7 @@ public class ExchangeTransMatchRepo5Service extends ExchangeTransMatchRepoCommon
             }
 
             //还本到账
-            if(BigDecimal.ZERO.compareTo(item.getmPrinAmt())<0) {
+            if(null != item.getmPrinAmt() && BigDecimal.ZERO.compareTo(item.getmPrinAmt())<0) {
                 SettleTransData prinSettleTransData = new SettleTransData();
                 BeanUtil.copyPropertiesIgnoreNull(prinSettleTransData,item);
 

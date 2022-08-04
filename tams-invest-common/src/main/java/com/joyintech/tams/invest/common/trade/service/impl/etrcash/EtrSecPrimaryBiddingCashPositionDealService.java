@@ -4,6 +4,7 @@ import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.dao.PtlCashPositionFlowMapper;
 import com.joyintech.tams.common.base.entity.BidOrderBidPrice;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
+import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+
+import static com.joyintech.tams.constant.DictCodeListExt3.头寸业务类型_债券一级投标;
 
 /**
  * @program: 2.1.0
@@ -46,7 +49,12 @@ public class EtrSecPrimaryBiddingCashPositionDealService extends EtrCashPosition
 	}
 	
 	public static void deal债券一级投标EntrustEnd(EntrustCommonDto entrustCommonDto, EtrPositionHoldDto etrPositionHoldDto) {
-		EtrEntrust etrEntrust = entrustCommonDto.getEtrEntrust();   
+		// 一级投标指令 退回时不处理
+		EtrEntrustAdd etrEntrustAdd = entrustCommonDto.getEtrEntrustAdd();
+		if (StringUtil.equals(etrEntrustAdd.getBusiTypePosition(), 头寸业务类型_债券一级投标.getValue())) {
+			return;
+		}
+		EtrEntrust etrEntrust = entrustCommonDto.getEtrEntrust();
 		// 委托生成的现金流水
         EtrCashPositionFlowDto etrCashPositionFlowDto = EtrCommonCashPositionDealService.getEtrCashPositionFlowDtoFromEtr(
             entrustCommonDto);

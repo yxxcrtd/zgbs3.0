@@ -9,15 +9,15 @@
                 T2.DEAL_MODE,
                 CASE
                     WHEN (T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND T1.PS IN (#{PS_T93})) THEN
-                        NVL(T3.PLEDGE_NUMBER,0) - NVL(ST93.MARCH_QTY_EN,0)
-                    WHEN (T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND T1.PS IN (#{PS_T94})) THEN
+                        NVL(T4.PLEDGE_NUMBER,0) - NVL(ST93.MARCH_QTY_EN,0)
+                    WHEN (T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND T1.PS IN (#{PS_T94}) AND T1.ENTRUST_TYPE = #{ENTRUST_TYPE_21}) THEN
                         NVL(T3.PLEDGE_NUMBER,0) - NVL(ST94.MARCH_QTY_EN,0)
                 ELSE
                     NVL(T1.ENTRUST_NUM,0) - NVL(S.MARCH_QTY_EN,0) END remainEntrustNum,
                 CASE
                     WHEN (T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND T1.PS IN (#{PS_T93})) THEN
-                        NVL(T3.PLEDGE_NUMBER,0) - NVL(ST93.MARCH_QTY_EN,0)
-                    WHEN (T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND T1.PS IN (#{PS_T94})) THEN
+                        NVL(T4.PLEDGE_NUMBER,0) - NVL(ST93.MARCH_QTY_EN,0)
+                    WHEN (T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND T1.PS IN (#{PS_T94}) AND T1.ENTRUST_TYPE = #{ENTRUST_TYPE_21}) THEN
                     NVL(T3.PLEDGE_NUMBER,0) - NVL(ST94.MARCH_QTY_EN,0)
                 ELSE
                     NVL(T1.ENTRUST_AMT,0) - NVL(S.MARCH_AMT_EN,0)
@@ -62,9 +62,12 @@
                 GROUP BY
                     ENTRUNST_TRADE_ID
             ) ST94 ON ST94.ENTRUNST_TRADE_ID = T1.ENTRUST_ID
-            LEFT JOIN ETR_PLEDGE T3
+            LEFT JOIN ETR_PLEDGE T3<!--换券-->
                 ON T3.ENTRUST_ID = T1.ENTRUST_ID
-                AND T3.FINPROD_ID = T1.FINPROD_ID
+                AND T3.DISPLACE_DIR = #{DISPLACE_DIRECTION_01}
+                AND T1.PS =#{PS_T94}
+            LEFT JOIN ETR_PLEDGE T4<!--解除质押-->
+                ON T4.ENTRUST_ID = T1.ENTRUST_ID AND T1.PS =#{PS_T93}
             <where>
                 <if test="entrustIdList!=null and entrustIdList.size()>0 ">
                     AND (T1.ENTRUST_ID IN
@@ -600,5 +603,11 @@
         <where>
             FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
         </where>
+    </select>
+
+    <select id="selectFinDealPledgeByEntrust" resultType="com.joyintech.tams.common.base.pojo.PledgeListDto">
+        select distinct FINPROD_ID finprodMarketId, PLEDGE_DISPLACE_AMT pledgeNumber, TRADE_TYPE displaceDir
+        from FIN_PLEDGE_DISP_DETAIL_TEMP
+        where TRADE_ID = (select TRADE_ID from FIN_PLEDGE_DISP_TEMP where F_TRADE_ID = (select FINPROD_ID from ETR_ENTRUST where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}))
     </select>
 </mapper>

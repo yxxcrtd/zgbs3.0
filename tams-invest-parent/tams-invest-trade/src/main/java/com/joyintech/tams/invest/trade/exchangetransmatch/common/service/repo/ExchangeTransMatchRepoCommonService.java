@@ -6,6 +6,7 @@ import com.joyintech.background.component.common.pack.common.base.BaseService;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.common.base.pojo.PledgeListDto;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -547,7 +548,7 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
             // 结果类型 = 置换前
             finPledgeDisplaceResult.setResultType(DictCodeListExt3.质押券置换_置换结果_置换前.getValue());
             // 质押券面总额 = 首期.质押券面总额
-            finPledgeDisplaceResult.setPledgeAmt(finDealPledge.getPledgeAmt());
+            finPledgeDisplaceResult.setPledgeAmt(finDealPledge.getPledgeNumber());
             // 折算比例 = 首期.质押率
             finPledgeDisplaceResult.setScale(finDealPledge.getPledgeRatio());
             beforeDisplaceResult.add(finPledgeDisplaceResult);
@@ -576,7 +577,7 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
             // 结果类型 = 置换后
             finPledgeDisplaceResult.setResultType(DictCodeListExt3.质押券置换_置换结果_置换后.getValue());
             // 质押券面总额 = 更新后质押品.质押券面总额
-            finPledgeDisplaceResult.setPledgeAmt(finDealPledge.getPledgeAmt());
+            finPledgeDisplaceResult.setPledgeAmt(finDealPledge.getPledgeNumber());
             // 质押率 = 更新后质押品.质押率
             finPledgeDisplaceResult.setScale(finDealPledge.getPledgeRatio());
             afterDisplaceResult.add(finPledgeDisplaceResult);
@@ -761,6 +762,7 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
             infContractDetailfile.setTradeAmt(baseTradeProductDealDtos.get(0).getTrdProductDeal().getTradeAmt());
             infContractDetailfile.setDealNo(baseTradeProductDealDtos.get(0).getTrdProductDeal().getFinprodId());
             infContractDetailfile.setvTradeId(baseTradeProductDealDtos.get(0).getTrdProductDeal().getFinprodId());
+            infContractDetailfile.setFinprodId(baseTradeProductDealDtos.get(0).getTrdProductDeal().getFinprodId());
         }
         else {
             if (baseTradeProductDealDtos.get(0).getTrdFinProductDealTotal() != null) {
@@ -772,6 +774,7 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
                 infContractDetailfile.setTradeAmt(baseTradeProductDealDtos.get(0).getTrdFinProductDealTotal().getTradeAmt());
                 infContractDetailfile.setDealNo(baseTradeProductDealDtos.get(0).getTrdFinProductDealTotal().getFinprodId());
                 infContractDetailfile.setvTradeId(baseTradeProductDealDtos.get(0).getTrdFinProductDealTotal().getFinprodId());
+                infContractDetailfile.setFinprodId(baseTradeProductDealDtos.get(0).getTrdProductDeal().getFinprodId());
             }
         }
 
@@ -806,6 +809,21 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
                     new BigDecimal(100), 2, RoundingMode.HALF_UP));
             trdTempDto.setFinDealPledge(finDealPledge);
         }
+
+        // XYHGFXSJ-767 【实时资产头寸查询】协议回购上交所正回购中途换券日终清结算后，实时资产报表里数据错误
+        if (StringUtil.equals(trdTempDto.getPs(),DictCodeListExt3.交易方向_中途换券.getValue())){
+            List<PledgeListDto> pledgeListDtos = exchangeTransMatchCommonMapper.selectFinDealPledgeByEntrust(entrustDto.getEntrustId());
+            List<FinPledgeDispDetailTemp> finPledgeDispDetailTempList = new ArrayList<>();
+            for(PledgeListDto pledgeListDto: pledgeListDtos){
+                FinPledgeDispDetailTemp finPledgeDispDetailTemp = new FinPledgeDispDetailTemp();
+                finPledgeDispDetailTemp.setTradeType(pledgeListDto.getDisplaceDir());
+                finPledgeDispDetailTemp.setFinprodId(pledgeListDto.getFinprodMarketId());
+                finPledgeDispDetailTemp.setPledgeDisplaceAmt(pledgeListDto.getPledgeNumber());
+                finPledgeDispDetailTempList.add(finPledgeDispDetailTemp);
+            }
+            trdTempDto.setFinPledgeDispDetailTempList(finPledgeDispDetailTempList);
+        }
+        // XYHGFXSJ-767 【实时资产头寸查询】协议回购上交所正回购中途换券日终清结算后，实时资产报表里数据错误
 
         // 场景参数设置
         PostionParameter parameter = new PostionParameter();

@@ -936,6 +936,7 @@ public class CfetsSettleService extends BaseService {
             // 金融产品交易
             TrdProductDeal trdProductDeal = new TrdProductDeal();
             BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, item);
+            trdProductDeal.setPayDate(item.getSettleDate());
             if (StringUtil.isNotBlank(trdProductDeal.getfTradeId())) {
                 baseTradeProductDealDto.setfTradeId(trdProductDeal.getfTradeId());
             }

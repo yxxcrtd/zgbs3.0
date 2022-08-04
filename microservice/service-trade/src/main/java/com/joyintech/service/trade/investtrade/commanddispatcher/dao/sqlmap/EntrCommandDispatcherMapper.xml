@@ -62,8 +62,6 @@
 		  <!--F.counter_org counterDealerId,/**对手方交易商代码*/-->
 		  F.COUNTER_CON_NO appointmentNumber,/**约定号*/
 		  <!--modify by etliu 20220324 start-->
-		<!--DECODE(A.TRADE_MARKET,'03',F.trade_id,'') dealNo,/**成交编号*/
-        DECODE(A.TRADE_MARKET,'04',F.trade_id,'')  trdMatchId,/**初始交易编号*/-->
 		  F.trade_id dealNo,/**成交编号*/
 		  F.trade_id trdMatchId,/**初始交易编号*/
 		  <!--modify by etliu 20220324 end-->
@@ -71,22 +69,20 @@
 		  A.ENTRUST_DATE tradeDate,/**委托日期*/
 		  A.VDATE VDATE,/**委托开始日*/
 		  A.Mdate MDATE,/**委托结束日*/
-		  CASE WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_AMT
-			WHEN F.ASSET_TYPE = 'F07' and A.PS in ('T93') then A.ENTRUST_AMT
-		  ELSE DECODE(F.TARGET_TYPE, '02', A.ENTRUST_AMT, 0) END entrustAmt, /**委托额度*/
+		  CASE
+		  	WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_AMT
+			WHEN F.ASSET_TYPE = 'F07' and A.PS in ('T93') and A.TRADE_MARKET = '04' then A.ENTRUST_AMT <!--深圳解除质押-->
+		  ELSE DECODE(F.TARGET_TYPE, '02', A.ENTRUST_AMT, 0)
+		  END entrustAmt, /**委托额度*/
           CASE
-          WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_NUM
+          	WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_NUM
           ELSE
-          DECODE(F.TARGET_TYPE, '01',
-          case when A.PS in ('T94') THEN FDP.PLEDGE_NUMBER
-		  when A.PS in ('T93') THEN null
-          ELSE A.ENTRUST_NUM END, 0)
+          	DECODE(F.TARGET_TYPE, '01',
+          		case
+		  		when A.PS in ('T93') AND A.TRADE_MARKET = '04' THEN null
+          		ELSE A.ENTRUST_NUM END, 0)
           END entrustNum, /**委托数量*/
 		  A.ENTRUST_STATUS entrustStatus,/**委托状态*/
-			<!--CASE WHEN A.PS IN ('03','04','T68','T69', 'T93', 'T94', 'T95', 'T96', 'T56')
-			  THEN nvl(A.PRICE,FTP.INT_RATE)*100
-			  ELSE A.PRICE END
-			entrustPrice,/**委托单价*/ -->
 		  nvl(A.PRICE,FTP.INT_RATE) as entrustPrice,/**委托单价*/
 		  nvl(A.BUSINESS_MODEL,A.INV_AIM) invAim,/**投资目的*/
 		  F.FULL_PRICE fullPrice,/**全价*/
@@ -116,7 +112,6 @@
 		  T4.CON_PRICE conPrice,/*转股价格*/
 		  F.EXP_CON_NUM conNum,/*转股数量*/
 		  DECODE(H.IS_APPROVAL,'Y','1','N','0','') approverFlage,/*审批标志*/
-		  --'0' approverFlage,
 		  <!-- F.TRADER  ourTrader, /*本方交易员*/ -->
 		  nvl(F.vpay_DATE,FTP.VPAY_DATE) vPayDate,
           NVL(F.mpay_date,FTP.mpay_date) mPayDate,
@@ -147,10 +142,18 @@
 		F.REQUEST_ID quoteRequestId,
 		tpda.OUT_DEALER_PARTY_NO counterInvestorId,
 		mddi.DEALER_PARTY_TYPE counterInvestorType,
-		tpda.OUT_DEALER_NO counterDealerId,/**对手方交易商代码*/
-		tpd.COUNTER_TRADER counterTrader,/**对手方交易员*/
+		CASE
+			WHEN A.PS IN ( 'T56' ) and A.counter_id is null THEN null
+			else tpda.OUT_DEALER_NO
+		end  counterDealerId,/**对手方交易商代码*/
+		CASE
+			WHEN A.PS IN ( 'T56' ) and A.counter_id is null THEN null
+			else tpd.COUNTER_TRADER
+		end counterTrader,/**对手方交易员*/
 		tpd.TRADER  ourTrader, /*本方交易员*/
-		nvl(A.counter_id, tpd.COUNTER_ID ) counterId,/*交易对手*/
+		<!-- 交易对手到期续作保持原有交易对手没有就传空-->
+		case when A.PS in ('T56') then  A.counter_id else
+		nvl( A.counter_id, tpd.COUNTER_ID ) end counterId, /*交易对手*/
 		FTP.MDATE repoMdate /*回购到期日*/
 		FROM ETR_ENTRUST A
 		LEFT JOIN PTL_PORTFOLIO B ON A.PORTFOLIO_ID=B.PORTFOLIO_ID
@@ -174,10 +177,6 @@
 		LEFT JOIN FIN_PRODUCT_CONVERTIBLE T4 ON A.FINPROD_ID = T4.FINPROD_ID
 		LEFT JOIN FIN_PRODUCT T5 ON T4.CON_FINPROD_ID = T5.FINPROD_ID
 		LEFT JOIN MST_COUNTER_PARTY T6 ON A.COUNTER_ID = T6.COUNTER_ID
--- 		LEFT JOIN FIN_PRODUCT_TYPE_CONFIG btm
--- 		     ON ( A.FINPROD_TYPE2 = btm.INPUT_VALUE_2 OR  btm.INPUT_VALUE_2 IS NULL)
--- 			AND ( A.Ps = btm.INPUT_VALUE_3 OR  btm.INPUT_VALUE_3 IS NULL)
--- 			AND ( A.TRADE_PLAT = btm.INPUT_VALUE_1 OR  btm.INPUT_VALUE_1 IS NULL)
 		LEFT JOIN (
 		     select
 		          entrust_id,

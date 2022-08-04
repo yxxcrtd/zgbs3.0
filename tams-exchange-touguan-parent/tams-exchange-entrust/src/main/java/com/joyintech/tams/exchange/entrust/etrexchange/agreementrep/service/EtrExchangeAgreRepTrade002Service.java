@@ -11,6 +11,7 @@
 package com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.service;
 
 
+import com.alibaba.fastjson.JSON;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.grid.Page;
@@ -216,6 +217,15 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
         return calculationAmount(unitCostMap, result, platDate);
     }
 
+
+    /**
+     * 计算
+     *
+     * @param unitCostMap
+     * @param pages
+     * @param platDate
+     * @return
+     */
     public Page<EtrExchangeAgreRepTrade002Dto> calculationAmount(Map<String, EtrExchangeUnitCostDto> unitCostMap, Page<EtrExchangeAgreRepTrade002Dto> pages, String platDate) {
         if (pages != null && pages.getRoot() != null && !pages.getRoot().isEmpty()) {
             pages.getRoot().forEach(r -> {
@@ -225,17 +235,13 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
                     r.setPositionsAmt(Objects.isNull(dto.getBuyCostAmt()) ? new BigDecimal(0) : dto.getBuyCostAmt());
                     // 2.持仓成本价（元） 取单位成本
                     r.setPositionUnitCost(Objects.isNull(dto.getUnitCost()) ? new BigDecimal(0) : dto.getUnitCost());
-                } else {
-                    r.setPositionsAmt(new BigDecimal(0));
-                    r.setPositionUnitCost(new BigDecimal(0));
                 }
                 // 最新净价*组合持仓.数量 - 持仓成本 as 浮动盈亏
-                BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(), r.getPositionsNum());
+                BigDecimal floatFd = ArithmeticUtil.multiply(r.getPrice(), ArithmeticUtil.multiply(r.getPositionsNum(), new BigDecimal("100")));
                 floatFd = ArithmeticUtil.subtract(floatFd, r.getPositionsAmt());
                 r.setFloatingPL(floatFd);
-                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, r.getPositionsAmt(), 2);
-                r.setFloatingPLPercent(ArithmeticUtil.multiply(floatPL, new BigDecimal(100)));
-
+                BigDecimal floatPL = ArithmeticUtil.divide(floatFd, r.getPositionsAmt(), 4).multiply(new BigDecimal("100"));
+                r.setFloatingPLPercent(floatPL);
             });
         }
         return pages;

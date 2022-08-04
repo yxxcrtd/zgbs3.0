@@ -36,6 +36,7 @@ import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.constant.joyin.*;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.dto.EntrustPriceAndYieldDto;
+import com.joyintech.tams.exchange.common.enums.EntrustBussTypeEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.GuaranteedEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.NetOrFullPriceEnum;
 import com.joyintech.tams.exchange.common.enums.exchange.TargetTypeEnum;
@@ -480,13 +481,20 @@ public class InvestmentManagement extends BaseService {
                 continue;
             }
 
-            if (StringUtil.equals(投管业务类型_中途换券.getValue(), busiTypeTg)) {
+            if (StringUtil.equals(投管业务类型_中途换券.getValue(), busiTypeTg)
+                    && !StringUtil.equals(中途换券指令_换钱.value, instruction.getEntrustBussType())) {
                 Optional<InstructionPledge> pledgeOptional = pledgeList.stream()
                         .filter(o -> StringUtil.equals(o.getDisplaceDir(), "01")).findFirst();
                 if (pledgeOptional.isPresent()) {
                     InstructionPledge pledge = pledgeOptional.get();
                     instruction.setFinprodMarketIdStr(pledge.getFinprodMarketId());
                     instruction.setFinprodAbbrStr(pledge.getFinprodAbbr());
+                    if(StringUtil.isEmpty(instruction.getFinprodMarketId())){
+                        instruction.setFinprodMarketId(pledge.getFinprodMarketId());
+                    }
+                    if(StringUtil.isEmpty(instruction.getFinprodAbbr())){
+                        instruction.setFinprodAbbr(pledge.getFinprodAbbr());
+                    }
                 }
             } else if (EntrustUtils.isPledgeAgreementRepurchase(busiTypeTg)) {
                 Optional<InstructionPledge> pledgeOptional = pledgeList.stream()
@@ -495,6 +503,12 @@ public class InvestmentManagement extends BaseService {
                     InstructionPledge pledge = pledgeOptional.get();
                     instruction.setFinprodMarketIdStr(pledge.getFinprodMarketId());
                     instruction.setFinprodAbbrStr(pledge.getFinprodAbbr());
+                    if(StringUtil.isEmpty(instruction.getFinprodMarketId())){
+                        instruction.setFinprodMarketId(pledge.getFinprodMarketId());
+                    }
+                    if(StringUtil.isEmpty(instruction.getFinprodAbbr())){
+                        instruction.setFinprodAbbr(pledge.getFinprodAbbr());
+                    }
                 }
             }
         }
@@ -583,7 +597,9 @@ public class InvestmentManagement extends BaseService {
             long leftVolume = entrustNum - frozenQuantity - entrustLeftAmt;
             if (投管业务类型_质押券出入库.getValue().equals(instruction.getBusiTypeTg())
                     || 投管业务类型_现券交易.getValue().equals(instruction.getBusiTypeTg())
-                    || 投管业务类型_信用保护凭证.getValue().equals(instruction.getBusiTypeTg())) {
+                    || 投管业务类型_信用保护凭证.getValue().equals(instruction.getBusiTypeTg())
+                    || EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg())
+             ) {
                 //计算指令数量（展示）
                 instruction.setEntrustNumView(BigDecimal.valueOf(entrustNum).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
                 instruction.setLeftVolume(leftVolume);

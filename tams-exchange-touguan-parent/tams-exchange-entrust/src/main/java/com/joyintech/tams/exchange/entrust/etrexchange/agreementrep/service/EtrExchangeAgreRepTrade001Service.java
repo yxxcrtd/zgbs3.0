@@ -702,6 +702,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             } else if (DictCodeList.回购拆借方向_逆回购.getValue().equals(entity.getRepPs())) {
                 agreRepExpireUnBuyDto.setAssetType10("H04");
             }
+            agreRepExpireUnBuyDto.setBusiTypePosition(DictCodeListExt3.投管业务类型_到期续做.getValue());
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, agreRepExpireUnBuyDto);
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, agreRepExpireUnBuyDto);
             if (StringUtil.isNotEmpty(agreRepExpireUnBuyDto.getFinprodId())) {
@@ -807,13 +808,15 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 etrPledge.setFinprodId(entity.getNewfinprodId());
                 etrPledge.setDisplaceDir(DictCodeListExt3.质押券置换_置换方向_换入.getValue());
                 list.add(etrPledge);
+                etrEntrust.setEntrustAmt(etrPledge.getPledgeAmt());
+                etrEntrust.setEntrustNum(etrPledge.getPledgeNumber());
                 //换出券
                 if (entity.getOutRepSecNum() != null) {
                     EtrPledge outPledge = new EtrPledge();
                     outPledge.setEntrustId(entity.getEntrustId());
                     outPledge.setFinprodId(entity.getOutfinprodId());
                     // 质押面值
-                    // XYHGFXSJ-489:修改质押面值方法 modify by fuyongsheng 
+                    // XYHGFXSJ-489:修改质押面值方法 modify by fuyongsheng
                     outPledge.setPledgeFaceValue(trdCommonBaseService.getFaceValue(entity.getOutfinprodId(), iPlatformDate.getSysDate()));
                     //质押率
                     outPledge.setPledgeRatio(ArithmeticUtil.divide(entity.getConRatio(), new BigDecimal(100), 2));
@@ -995,7 +998,11 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 list.add(etrPledge);
             }
             //接触质押设置结算金额
-            etrEntrust.setEntrustAmt(entity.getExpireSettleAmt());
+            if (StringUtil.equals(entity.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+                etrEntrust.setEntrustAmt(BigDecimal.ZERO);
+            } else{
+                etrEntrust.setEntrustAmt(entity.getExpireSettleAmt());
+            }
         }
         dto.setEtrEntrust(etrEntrust);
         if (etrEntrustAdd.getVpayDate() != null && etrEntrustAdd.getTermDays() != null) {
@@ -1339,6 +1346,8 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             }
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, agreRepExpireUnBuyDto);
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, agreRepExpireUnBuyDto);
+            etrEntrust.setEntrustAmt(agreRepExpireUnBuyDto.getPledgeAmt());
+            etrEntrust.setEntrustNum(agreRepExpireUnBuyDto.getPledgeNumber());
             etrEntrustAdd.setRedoType(entity.getRedoType());
             agreRepExpireUnBuyDto.setRedoType(entity.getRedoType());
         } else if (DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
@@ -1443,6 +1452,8 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 etrPledge.setDisplaceDir(DictCodeListExt3.质押券置换_置换方向_换入.getValue());
                 displaceDir = DictCodeListExt3.质押券置换_置换方向_换入.getValue();
                 list.add(etrPledge);
+                agreRepHwayChgSecDto.setEntrustNum(etrPledge.getPledgeNumber());
+                agreRepHwayChgSecDto.setEntrustAmt(etrPledge.getPledgeAmt());
                 //换出券
                 if (entity.getOutRepSecNum() != null) {
                     EtrPledgeDto outPledge = new EtrPledgeDto();
@@ -1631,8 +1642,13 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, agreRepOpenSecDto);
             if(!StringUtils.isEmpty(entity.getExpireSettleAmt())){
-                etrEntrust.setEntrustAmt(entity.getExpireSettleAmt());
-                agreRepOpenSecDto.setEntrustAmt(entity.getExpireSettleAmt());
+                if (StringUtil.equals(entity.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+                    etrEntrust.setEntrustAmt(BigDecimal.ZERO);
+                    agreRepOpenSecDto.setEntrustAmt(BigDecimal.ZERO);
+                } else{
+                    etrEntrust.setEntrustAmt(entity.getExpireSettleAmt());
+                    agreRepOpenSecDto.setEntrustAmt(entity.getExpireSettleAmt());
+                }
             }
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, agreRepOpenSecDto);
         }
@@ -1695,7 +1711,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
                 EtrComponentFactory.getComponentService(AgreRepExpireDto.class).entrustNew(agreRepExpireDto);
             } else if (DictCodeListExt3.上农商_指令业务类型_协议回购到期续做指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
                 agreRepExpireUnBuyDto.setEntrustStatus(etrSinglePortfolioDto.getEntrustStatus());
-
+                agreRepExpireUnBuyDto.setBusiTypePosition(DictCodeListExt3.投管业务类型_到期续做.getValue());
                 EtrComponentFactory.getComponentService(AgreRepExpireUnBuyDto.class).updateSettings(paraDto);
                 EtrComponentFactory.getComponentService(AgreRepExpireUnBuyDto.class).entrustNew(agreRepExpireUnBuyDto);
             } else if (DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())) {
@@ -2264,6 +2280,12 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         }
         etrSinglePortfolioDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
         etrSinglePortfolioDto.setAssetType1("H01");
+
+        if (!交易方向_首期.getValue().equals(dto.getPs()) && StringUtils.isEmpty(dto.getInitialNum())) {
+            etrSinglePortfolioDto.setFinprodId(getFinprodIdNoFirst(dto));
+        } else if (!StringUtils.isEmpty(dto.getInitialNum())) {
+            etrSinglePortfolioDto.setFinprodId(dto.getInitialNum());
+        }
 //        etrSinglePortfolioDto.setDealCurAcct(dto.getAcctNo());// 资金账户
 //        /***********************************************************************/
 //        etrSinglePortfolioDto.setDealMode(dto.getDeclaType());//申报类型-db 交易方式
@@ -2350,6 +2372,12 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             throw new BusinessException("MSG:指令审批发生异常，异常信息：" + e.getMessage());
         }
         doDeleteWflEntity(etrExchangeAgreRepTrade001Dto.getWorkflowId());
+
+        // 删除废弃表
+        String entrustId = etrExchangeAgreRepTrade001Dto.getEntrustId();
+        etrEntrustBackupMapper.deleteByPrimaryKey(entrustId);
+        etrEntrustBackupMapper.deleteAddByPrimaryKey(entrustId);
+        etrEntrustBackupMapper.deleteDetailByPrimaryKey(entrustId);
     }
 
     @Override
@@ -2657,7 +2685,18 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         finTradeProductKey.setFinprodId(dto.getTradeId());
         finTradeProductKey.setBranch(0L);
         FinTradeProduct firstFinTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
+        if(null == firstFinTradeProduct && StringUtil.isNotEmpty(dto.getInitialNum())){
+            finTradeProductKey.setFinprodId(dto.getInitialNum());
+            firstFinTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
+        }
+        //XYHGFXSJ-726 上交所逆回购解除质押指令提交报错
+        if(null == firstFinTradeProduct && StringUtil.isNotEmpty(entity.getEtrEntrust().getFinprodId())){
+            finTradeProductKey.setFinprodId(entity.getEtrEntrust().getFinprodId());
+            firstFinTradeProduct = finTradeProductMapper.selectByPrimaryKey(finTradeProductKey);
+        }
+        //XYHGFXSJ-726 上交所逆回购解除质押指令提交报错
         if (firstFinTradeProduct != null) {
+            dto.setPledgeInvAim(commonPositionService.selectHoldInvAim(dto.getPortfolioId(), firstFinTradeProduct.getFinprodId()));
             dto.setFirstFinTradeProduct(firstFinTradeProduct);
         }
         if (StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_到期续做.getValue()) && DictCodeList.回购拆借方向_逆回购.getValue().equals(dto.getRepPs())) {
@@ -2678,14 +2717,33 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             postionFlowDto.setRepSecNum(ArithmeticUtil.multiply(postionFlowDto.getRepSecNum(), new BigDecimal(10)));
         }
 
+        // modify by etliu 20220727 start
+        // 3.0.6协议回购+风险升级 XYHGFXSJ-461
+        //【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误
+        if (StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_提前购回.getValue())
+            || StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_到期购回.getValue())
+                || StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())
+                || StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_到期续做.getValue())) {
+            postionFlowDto.setTradeId(entity.getEtrEntrust().getFinprodId());
+            //XYHGFXSJ-723
+            postionFlowDto.setIntiTradeId(entity.getEtrEntrust().getFinprodId());
+        }
+        // modify by etliu 20220727 end
+
+        //实时资产头寸查询】协议回购上交所正回购到期续做数据日间交收后，对应报表里数值错误
+        if(StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_首期.getValue()) && StringUtil.isEmpty(postionFlowDto.getPledgeInvAim())){
+            postionFlowDto.setPledgeInvAim(commonPositionService.selectHoldInvAim(postionFlowDto.getPortfolioId(), postionFlowDto.getFinprodId()));
+        }
+        //实时资产头寸查询】协议回购上交所正回购到期续做数据日间交收后，对应报表里数值错误
+
         parameter.setCustom(postionFlowDto);
-        try {
+//        try {
             logger.info("新建指令持仓请求报文:" + JsonUtils.object2Json(parameter));
             commonPositionService.process(parameter);
-        } catch (Exception e) {
-            logger.error("新建指令持仓请求失败:", e);
-            e.printStackTrace();
-        }
+//        } catch (Exception e) {
+//            logger.error("新建指令持仓请求失败:", e);
+//            e.printStackTrace();
+//        }
     }
 
     private void doDeleteWflEntity(String workflowId) {
@@ -2809,6 +2867,21 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
     }
 
     /**
+     * 判断是否已经存在该行情编号的指令
+     *
+     * @param requestId          交易方向
+     * @return 是否已经存在该行情编号的指令
+     */
+    public boolean isAlreadyDoEntrustByRequestId(String requestId) {
+        int count = etrExchangeAgreRepTradeMapper.selectEtrEntrustCountByRequestId(requestId);
+        if (count > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * 处理履历
      */
     public void updateCfetsOprHis(String entrustId, String optType) {
@@ -2854,9 +2927,44 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
     }
 
+    //获取首期交易编号
+    public String isCanGetOrNull(EtrExchangeAgreRepTrade001Dto dto) {
+        String tradeId = "";
+        if(StringUtils.isEmpty(dto.getIntiTradeId())){
+            return null;
+        }
+        TrdProductDeal trdProductDeal = trdCommonBaseService.getFirstRepoTrade(dto.getIntiTradeId(),
+                "", dto.getSecAcctId(),
+                null);
+        //wsz 修改行情到期续作 首次结算时间传值
+        if (trdProductDeal != null) {
+            tradeId = trdProductDeal.getFinprodId();
+        }
+        return tradeId;
+
+    }
+
+    public EtrExchangeAgreRepTrade001Dto getFirstDetailRepEntrustInfo(EtrExchangeAgreRepTrade001Dto dto){
+        String tradeId = "";
+        if(StringUtils.isEmpty(dto.getIntiTradeId())){
+            return null;
+        }
+        TrdProductDeal trdProductDeal = trdCommonBaseService.getFirstRepoTrade(dto.getIntiTradeId(),
+                "", dto.getSecAcctId(),
+                null);
+        //wsz 修改行情到期续作 首次结算时间传值
+        if (trdProductDeal != null) {
+            tradeId = trdProductDeal.getFinprodId();
+        }
+        Map<String, Object> pageParam = new HashMap<>();
+        pageParam.put("tradeId", tradeId);
+        return this.getEntrustInfoByTradeId(pageParam);
+    }
+
 
     //获取首期交易编号
     private String getFinprodIdNoFirst(EtrExchangeAgreRepTrade001Dto dto) {
+        logger.debug("getFinprodIdNoFirst() called with parameters => 【dto = {}】",JsonUtils.object2Json(dto));
         String tradeId = "";
         //wsz 修改行情到期续作 首次结算时间传值
         String date = "";
@@ -2866,13 +2974,15 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         } else {
             date = dto.getFristSettleDate();
         }
+        // 当一个资金账号下挂多个证券账号时，传入的证券帐号可能不同，导致查询失败，因此不传secAcctId
         TrdProductDeal trdProductDeal = trdCommonBaseService.getFirstRepoTrade(dto.getIntiTradeId(),
-                "", dto.getSecAcctId(),
+                "", "",
                 DateUtil.parse(date));
         //wsz 修改行情到期续作 首次结算时间传值
         if (trdProductDeal != null) {
             tradeId = trdProductDeal.getFinprodId();
         }
+        logger.debug("getFinprodIdNoFirst() return with result => 【tradeId = {}】",tradeId);
         return tradeId;
 
     }

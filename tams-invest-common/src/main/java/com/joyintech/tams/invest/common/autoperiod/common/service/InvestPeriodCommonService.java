@@ -494,7 +494,13 @@ public class InvestPeriodCommonService {
                     order.setTradeId(order.getTradeId() + "R");
                     order.setOrderId(order.getOrderId() + "R");
                     order.setUpdateTime(DateUtil.now());
-                    stlPayOrdersMapper.insertSelective(order);
+                    StlPayOrders stlPayOrders = stlPayOrdersMapper.selectByPrimaryKey(order.getOrderId());
+                    if(stlPayOrders == null){
+                        stlPayOrdersMapper.insertSelective(order);
+                    }else{
+                        stlPayOrdersMapper.deleteByPrimaryKey(order.getOrderId());
+                        stlPayOrdersMapper.insertSelective(order);
+                    }
                 }
             );
         }

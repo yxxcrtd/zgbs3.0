@@ -699,6 +699,9 @@ public class RiskInputParamSerivce extends RiskCommonService {
             if (CollectionUtils.isEmpty(list)) {
                 list = ((CfetsEtribBondInfo003Dto) data).getSelectedItem();
             }
+            if (CollectionUtils.isEmpty(list)) {
+                return null;
+            }
             //这里处理授信
             list.forEach(e -> {
                 CreditLinesInputDto inputDto = RiskUtil.getCreditLinesInputDto(dtl, e);

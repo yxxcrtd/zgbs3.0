@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
 import com.joyintech.tams.invest.common.component.base.trade.BaseTradeProductDealService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -537,7 +538,8 @@ public class BaseTradeProductDealCommServiceImpl extends BaseService implements 
             }else if(StringUtil.equals(baseTradeProductDealDto.getTrdProductDeal().getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_股票.getValue())||
                      StringUtil.equals(baseTradeProductDealDto.getTrdProductDeal().getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue())||
                     StringUtil.equals(baseTradeProductDealDto.getTrdProductDeal().getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_基金.getValue())
-            ||StringUtil.equals(baseTradeProductDealDto.getTrdProductDeal().getFinprodType2(), DictCodeListExt3.金融产品类型_投管用_权益类资产.getValue())){
+            ||StringUtil.equals(baseTradeProductDealDto.getTrdProductDeal().getFinprodType2(), DictCodeListExt3.金融产品类型_投管用_权益类资产.getValue())
+                    ||StringUtil.equals(baseTradeProductDealDto.getTrdProductDeal().getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())){
                 // 完成额度取值判断修改 add by yufei 20200807 start
                 EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(baseTradeProductDealDto.getTrdProductDealAdd().getEntrustId());
                 if(etrEntrustAdd != null && StringUtil.isNotEmpty(etrEntrustAdd.getTargetType()) ){
@@ -902,6 +904,9 @@ public class BaseTradeProductDealCommServiceImpl extends BaseService implements 
         if(!(StringUtil.isNotEmpty(finProductTradeDto.getIsOverdueDeal())&&StringUtil.equals(DictCodeList.是否_是.getValue(), finProductTradeDto.getIsOverdueDeal()))){
         	if (ptlPositionHoldDto.getPtlSecPositionFlows() != null && !ptlPositionHoldDto.getPtlSecPositionFlows().isEmpty()) {
                 for (PtlSecPositionFlowDto ptlSecPositionFlow : ptlPositionHoldDto.getPtlSecPositionFlows()) {
+                    if(null == ptlSecPositionFlow.getAmount()){
+                        continue;
+                    }
                     basePtlSecPositionInfoService.inertSecPositionFlow(ptlSecPositionFlow);
                 }
             }

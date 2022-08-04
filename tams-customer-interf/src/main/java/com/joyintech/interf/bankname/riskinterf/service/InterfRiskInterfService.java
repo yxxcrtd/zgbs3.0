@@ -47,6 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
@@ -498,7 +499,6 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
             String assetType2 = String.valueOf(CommonUtil.findValue(dataMap,"assetType2"));
             if (StringUtil.equals(assetType2,DictCodeList.回购类型_质押式协议回购.getValue())){
                 // 查询指令信息，取得正、逆回购信息
-
                 if (StringUtil.isNotEmpty(etrEntrust) && StringUtil.equals(etrEntrust.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())){
                     finDto.setAssetType2(DictCodeList.回购拆借方向_正回购.getValue());
                 }else {
@@ -510,11 +510,9 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                 EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entrustCode);
                 if (协议回购到期交易方向.contains(finDto.getPs())){
                     finDto.setPs(DictCodeList.交易方向_到期.getValue());
+                    //finDto.setPs(finDto.getPs());
                     //协议回购到期交易方向 需要使用到期结算金额实占
                     finDto.setAmount(CommonUtil.getBigDecimal(dataMap,"amount",BigDecimal.ZERO));
-                    //协议回购到期交易方向 的指令没有进行预占，不需要处理预占信息，将指令代码置空
-                    //finDto.setEntrustCode(null);
-
                 }else {
                     finDto.setPs(DictCodeList.交易方向_买入.getValue());
                     finDto.setAmount(CommonUtil.getBigDecimal(dataMap, "amount",BigDecimal.ZERO));
@@ -567,9 +565,11 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                 }
                 //wangyang1 add by 增加期限金额 2021年9月10日 end
                 if(StringUtil.equals(DictCodeListExt3.交易方向_解除质押.getValue(),CommonUtil.findValue(dataMap,"ps"))){
-                    finDto.setPreOccupyCode(null);
-                    finDto.setEntrustCode(null);
+                    finDto.setPreOccupyCode(finDto.getEntrustCode());
+                    //finDto.setEntrustCode(null);
                     if(finDto.getAmount().compareTo(BigDecimal.ZERO) == 0) {
+                        finDto.setPreOccupyCode(null);
+                        finDto.setEntrustCode(null);
                         FinTradeProductKey finTradeProductKey = new FinTradeProductKey();
                         finTradeProductKey.setFinprodId((String) dataMap.get("firstIssueDealNo"));
                         finTradeProductKey.setBranch(0L);
@@ -579,6 +579,9 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
                             finDto.setTradeNum(firstFinTradeProduct.getPrin());
                         }
                     }
+                    /*else {
+                        finDto.setTradeNum(BigDecimal.ZERO);
+                    }*/
                 }
                 if (StringUtil.equals(DictCodeListExt3.交易方向_中途换券.getValue(),CommonUtil.findValue(dataMap,"ps"))){
                     finDto.setPreOccupyCode(null);
@@ -729,10 +732,13 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
      * 授信占用批量接口
      * @param list
      */
-    public Map<String, Object>  sxTradeCompleteBatch(List<Map<String, Object>> list,String tradeStatu, boolean isNeedRiskCheck) throws Exception{
+    public Map<String, Object>  sxTradeCompleteBatch(List<Map<String, Object>> list,String tradeStatu, boolean isNeedRiskCheck,List<CreditLinesInputDto> inputDtoList) throws Exception{
         logger.info("==========授信占用/释放批量接口 start==========");
         //1、封装授信接口的参数
-        List<CreditLinesInputDto> trdProductDeals = packageParams(list,tradeStatu);
+        List<CreditLinesInputDto> trdProductDeals = inputDtoList;
+        if(CollectionUtils.isEmpty(trdProductDeals)) {
+            trdProductDeals = packageParams(list,tradeStatu);
+        }
 
         //2、授信接口check
         Map<String, Object> resultMap = new HashMap<>();
@@ -1073,7 +1079,7 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
         }
         if (!StringUtil.equals(BussinessDictCodeList.监控授信开关_关.getValue(), CacheUtil.getSysParam(BussinessConstant.ISCREDIT))) {
             //调用授信实占-批量
-            Map<String, Object> sxTrade = interfRiskRdsService.sxTradeCompleteBatch(listMap, DictCodeListExt1.交易状态_初始.getValue(), isNeedRiskCheck);
+            Map<String, Object> sxTrade = interfRiskRdsService.sxTradeCompleteBatch(listMap, DictCodeListExt1.交易状态_初始.getValue(), isNeedRiskCheck,null);
             //不通过，返回
             if (!BussinessDictCodeListRds.指标状态_通过.getValue().equals(sxTrade.get("rskStatus")) && isNeedRiskCheck
                     && StringUtil.equals( DictCodeList.是否_否.getValue(), CacheUtil.getSysParam(BussinessConstant.CREDIT_SOFT_SKIP_MODE))) {
@@ -1087,7 +1093,8 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
         //if(true) throw new Exception("指标状态_不通过");
         //参数硬控，不通过，返回
         if(StringUtil.equals("02", CacheUtil.getSysParam(BussinessConstant.IS_RISKMATH_SOFTCONTROL))){
-            if(!BussinessDictCodeListRds.指标状态_通过.getValue().equals(cliendata.getBody().get("rskStatus")) && isNeedRiskCheck){
+            if(!BussinessDictCodeListRds.指标状态_通过.getValue().equals(cliendata.getBody().get("rskStatus"))
+                    && !BussinessDictCodeListRds.指标状态_审批.getValue().equals(cliendata.getBody().get("rskStatus")) && isNeedRiskCheck){
                 szcliendata.setHead(cliendata.getHead());
                 szcliendata.setBody(cliendata.getBody());
                 throw new Exception("指标状态_不通过");
@@ -1097,7 +1104,7 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
         else{
             cliendata.setBodyField("rskStatus",BussinessDictCodeListRds.指标状态_通过.getValue());
         }
-
+       // cliendata.setBodyField("rskStatus",BussinessDictCodeListRds.指标状态_审批.getValue());
         //返回结果集
         return cliendata.getBody();
     }
@@ -1108,24 +1115,53 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
         InterfRiskRdsDto interfRiskRdsDto = new InterfRiskRdsDto();
         String assetType = (String) dataMap.get("assetType");
         String eventType = (String) dataMap.get("eventType");
+
         interfRiskRdsDto.setAssetType(assetType);
         interfRiskRdsDto.setEventType(eventType);
         List<String> retList = new ArrayList<>();
 
         //List<Map<String, Object>> listMap=interfRiskRdsService.getBatchAllocation(dataMap);
         List<Map<String, Object>> listMap = (List<Map<String, Object>>) dataMap.get("rskList");
-
+        List<Map<String, Object>> newListMap = new ArrayList<>();
+        List<CreditLinesInputDto> list = new ArrayList<>();
         if("F07".equals(assetType)) {
-            for(Map<String, Object> tmp : listMap) {
-                tmp.put("inputValue1",tmp.get("assetType"));
-                tmp.put("inputValue2",tmp.get("assetType2"));
-                tmp.put("inputValue3",tmp.get("ps"));
+            for(Map<String, Object> tmp : listMap) {//处理协议回购
+                String eventId = (String)tmp.get("eventId");
+                String ps = (String) tmp.get("ps");
+                if(StringUtil.equals(ps,DictCodeList.交易方向_到期续做.getValue())) {
+                    String orderId = eventId.split("-")[2].replace(ps,"");
+                    Map<String,Object> t07 = new HashMap<>(tmp);
+                    t07.put("eventId",eventId.replace(ps,"T07"));
+                    t07.put("tradeId",orderId);
+                    t07.put("ps","T07");
+                    t07.put("revokeFlg","Y");
+                    Map<String,Object> t01 = new HashMap<>(tmp);
+                    t01.put("eventId",eventId.replace(ps,"T01"));
+                    t01.put("tradeId",orderId);
+                    t01.put("ps","T01");
+                    t01.put("revokeFlg","Y");
+                    newListMap.add(t07);
+                    newListMap.add(t01);
+                    CreditLinesInputDto inputDto = new CreditLinesInputDto();
+                    inputDto.setTradeDate(DateUtil.parse(String.valueOf(tmp.get("eventDate"))));
+                    inputDto.setTradeId(orderId);
+                    inputDto.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
+                    list.add(inputDto);
+                }else {
+                    tmp.put("revokeFlg","Y");
+                    newListMap.add(tmp);
+                    CreditLinesInputDto inputDto = new CreditLinesInputDto();
+                    inputDto.setTradeDate(DateUtil.parse(String.valueOf(tmp.get("eventDate"))));
+                    inputDto.setTradeId(eventId.split("-")[2]);
+                    inputDto.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
+                    list.add(inputDto);
+                }
             }
         }
 
         if (!StringUtil.equals(BussinessDictCodeList.监控授信开关_关.getValue(), CacheUtil.getSysParam(BussinessConstant.ISCREDIT))) {
             //调用授信释放-批量
-            Map<String, Object> sxTrade = interfRiskRdsService.sxTradeCompleteBatch(listMap, DictCodeListExt1.交易状态_撤销.getValue(), true);
+            Map<String, Object> sxTrade = interfRiskRdsService.sxTradeCompleteBatch(listMap, DictCodeListExt1.交易状态_撤销.getValue(), false,list);
             //不通过，返回
             if (!BussinessDictCodeListRds.指标状态_通过.getValue().equals(sxTrade.get("rskStatus"))) {
                 return sxTrade;
@@ -1133,7 +1169,7 @@ public class InterfRiskInterfService<V extends IRiskRds> extends BaseRiskRdsServ
         }
         //调用合规实占释放/撤销
         interfRiskRdsDto.setInfCode(BussinessDictCodeListRds.接口系统ID_实占释放批量接口.getValue());
-        ClientData clientData = interfRiskRdsService.sendRiskRdsDataCommon(listMap, interfRiskRdsDto,RSK_SZ_LIST, true);
+        ClientData clientData = interfRiskRdsService.sendRiskRdsDataCommon(newListMap, interfRiskRdsDto,RSK_SZ_LIST, true);
         String statu = (String)clientData.getHead().get("std400msgt");
         //不通过，返回
         Map<String, Object> resultMap = new HashMap<>();

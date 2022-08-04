@@ -20,6 +20,8 @@ import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.service.riskrdsinf.event.rsk007.service.Rsk007Service;
+import com.joyintech.tams.invest.common.redisinit.dto.ImplCond;
+import com.joyintech.tams.invest.common.redisinit.service.RiskRedisInitService;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -174,6 +176,12 @@ public abstract class EventBaseService<V> extends InfBaseService<V> {
      */
     @Autowired
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+
+    /**
+     * redis数据初始化
+     */
+    @Autowired
+    private RiskRedisInitService<ImplCond> redisWriter;
 
     @Autowired(required = false)
     public IPlatformDate platformDate;
@@ -2367,7 +2375,17 @@ public abstract class EventBaseService<V> extends InfBaseService<V> {
         		assetCode = assetIndex.getAssetCode();
         	}
         }
-        return assetInfoSrc.getAssetInfoAsMap(assetCode);
+        Map<String, Object> assetInfo = assetInfoSrc.getAssetInfoAsMap(assetCode);
+        if (CollectionUtils.isEmpty(assetInfo)&&StringUtil.isNotEmpty(assetCode)) {
+            //若redis取不到从数据库取
+            ImplCond cond = new ImplCond();
+            cond.setDel(false);
+            cond.setPlateDate(DateUtil.parse(DateUtil.getSysDate()));
+            cond.setAssetIdArray(assetCode);
+            redisWriter.dealAssetData(cond);
+            assetInfo = assetInfoSrc.getAssetInfoAsMap(assetCode);
+        }
+        return assetInfo;
     }
 
     /**
@@ -2382,6 +2400,20 @@ public abstract class EventBaseService<V> extends InfBaseService<V> {
         IProdInfo prod = prodInfoSrc.getProdInfo(prodId);
         if (prod != null) {
             setServiceInfo(getInfId() + "_PROD", prod);
+        }
+        else{
+            if(StringUtil.isNotEmpty(prodId)) {
+                //若redis取不到从数据库取
+                ImplCond cond = new ImplCond();
+                cond.setDel(false);
+                cond.setPlateDate(DateUtil.parse(DateUtil.getSysDate()));
+                cond.setPortfIdArray(prodId);
+                redisWriter.dealPortData(cond);
+                prod = prodInfoSrc.getProdInfo(prodId);
+                if (prod != null) {
+                    setServiceInfo(getInfId() + "_PROD", prod);
+                }
+            }
         }
         return prod;
     }

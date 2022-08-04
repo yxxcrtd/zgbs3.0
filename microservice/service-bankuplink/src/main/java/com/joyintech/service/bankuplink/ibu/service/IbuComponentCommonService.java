@@ -2869,6 +2869,10 @@ public class IbuComponentCommonService extends BaseService {
         // region 银行间报价主信息
         IbuQuoteCrepDto ibuQuoteCrepDto = repoDialogueQuoteDto.getIbuQuoteCrepDto();
         // 报价编号（内部代码）
+        if (ibuQuoteCrepDto == null
+                || StringUtil.isEmpty(ibuQuoteCrepDto.getQuoteId())) {
+            return null;
+        }
         dto.setQuoteId(ibuQuoteCrepDto.getQuoteId());
         dto.setPortfolioId(ibuQuoteCrepDto.getPortfolioId());// 组合代码
         dto.setEntrustId(ibuQuoteCrepDto.getEntrustId());// 委托代码

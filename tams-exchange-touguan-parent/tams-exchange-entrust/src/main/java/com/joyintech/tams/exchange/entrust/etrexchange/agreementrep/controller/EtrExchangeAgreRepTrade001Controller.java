@@ -3,6 +3,7 @@ package com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.controller;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
@@ -620,6 +621,13 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
         AjaxResult ajax = etrExchangeAgreRepTrade001Service.checkSave(dto, result);
         //共通check
         List<ValidMessage> valid = etrExchangeTradeCommonValidatorService.valid(dto);
+
+        //检查行情编号是否重复下指令
+        if (StringUtil.isNotEmpty(dto.getReqOnId())) {
+            if (etrExchangeAgreRepTrade001Service.isAlreadyDoEntrustByRequestId(dto.getReqOnId())) {
+                valid.add(new ValidMessage("行情编号[" + dto.getReqOnId() + "]不能重复下指令！"));
+            }
+        }
         if (StringUtil.isNotEmpty(ajax) && !CollectionUtils.isEmpty(valid)) {
             valid.addAll(ajax.getErrorList());
             ajax.setErrorList(valid);
@@ -1354,4 +1362,45 @@ public class EtrExchangeAgreRepTrade001Controller extends BaseController {
     public Message<EtrExchangeAgreRepCurrResp> getFinprodIdNoFirsts(@RequestBody EtrExchangeAgreRepTrade001Dto dto) {
         return new Message<EtrExchangeAgreRepCurrResp>().success().setData(etrExchangeAgreRepTrade001Service.getFinprodIdNoFirsts(dto));
     }
+
+
+    /**
+     * 判断到期续作是否存在首期getFirstRepEntrustInfo
+     *
+     * @param dto 行情信息
+     */
+    @ApiOperation(value = "", notes = "判断到期续作是否存在首期")
+    @ResponseBody
+    @PostMapping("getWhetherExists")
+    public Message<String> isCanGetOrNull(@RequestBody EtrExchangeAgreRepTrade001Dto dto) {
+        return new Message<String>().success().setData(etrExchangeAgreRepTrade001Service.isCanGetOrNull(dto));
+    }
+
+    /**
+     * 判断到期续作是否存在首期
+     *
+     * @param dto 行情信息
+     */
+    @ApiOperation(value = "", notes = "判断到期续作是否存在首期")
+    @ResponseBody
+    @PostMapping("getFirstDetailRepEntrustInfo")
+    public Message<EtrExchangeAgreRepTrade001Dto> getFirstDetailRepEntrustInfo(@RequestBody EtrExchangeAgreRepTrade001Dto dto) {
+        return new Message<EtrExchangeAgreRepTrade001Dto>().success().setData(etrExchangeAgreRepTrade001Service.getFirstDetailRepEntrustInfo(dto));
+    }
+
+
+    //  XYHGFXSJ-600 - 【协议回购指令】解除质押指令WTREPO202112214291查看数据丢失
+    /**
+     * 通过指令编号查询留痕数据用来展示
+     */
+    @ApiOperation(value = "", notes = "通过指令编号查询留痕数据用来展示")
+    @ResponseBody
+    @PostMapping("getProcessDataForShow")
+    public Message<EtrExchangeAgreRepTrade001Dto> getWorkflowDataForShow(@RequestBody EtrExchangeAgreRepTrade001Dto dto) {
+        ProcessMark processMark = new ProcessMark();
+        processMark.setPageId("EtrExchangeAgreRepTrade002");
+        processMark.setBusinessDataPk1(dto.getEntrustId());
+        return new Message<EtrExchangeAgreRepTrade001Dto>().success().setData(etrExchangeAgreRepTrade001Service.getBussinessEntityByPk(processMark));
+    }
+    //  XYHGFXSJ-600 - 【协议回购指令】解除质押指令WTREPO202112214291查看数据丢失
 }

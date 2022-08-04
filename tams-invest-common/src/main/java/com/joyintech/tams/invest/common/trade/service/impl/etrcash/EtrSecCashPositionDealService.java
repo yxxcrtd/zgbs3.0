@@ -1166,6 +1166,8 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         // 交易生成的现金流水
         EtrCashPositionFlowDto etrCashPositionFlowDto = EtrCommonCashPositionDealService.getEtrCashPositionFlowDto(
                 finProductTradeDto);
+        EtrSecPositionFlowDto etrSecPositionFlowDto = EtrCommonCashPositionDealService.getEtrSecPositionFlowDto(
+                finProductTradeDto);
         etrCashPositionFlowDto.setOrderId(finProductTradeDto.getEntrustId());
         // 交易场所为一级市场且是交易所的交易，付款账户为托管户 add by 马数凯 20210430
         String 账号;
@@ -1184,10 +1186,18 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         // 有委托
         if (StringUtil.isNotEmpty(entrustId)) {
             if (StringUtil.equals(finProductTradeDto.getStage(), "03")) {
+                etrSecPositionFlowDto.setCdate(finProductTradeDto.getTrdProductDeal().getSettleDate());
+                // 交割日增加交易券面总额/债券面值
+                etrSecPositionFlowDto.setAmount(交易日数量);
+                // 添加持仓流水到目标dto
+                etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
                 // 交收时交割日减少(交易金额-交易券面总额*委托全价/债券面值）
-                etrPositionHoldDto.getPtlCashPositionFlows().add(gen冲销现金流水生成(etrCashPositionFlowDto, entrustId,
+                EtrCashPositionFlowDto flowDto = gen冲销现金流水生成(etrCashPositionFlowDto, entrustId,
                         交易日数量, finProductTradeDto.getTrdProductDeal().getSettleDate(),
-                        finProductTradeDto.getTrdProductDeal().getTradeMarket(), finProductTradeDto.getBondFirstSign()));
+                        finProductTradeDto.getTrdProductDeal().getTradeMarket(), finProductTradeDto.getBondFirstSign());
+                flowDto.setAmount(ArithmeticUtil.doAdd(交易日减少金额, flowDto.getAmount()));
+                etrPositionHoldDto.getPtlCashPositionFlows().add(flowDto);
+
             } else if (StringUtil.equals(finProductTradeDto.getStage(), "02")) {
                 // 中标结果维护提交（自主投标） 减少委托组合应缴款金额
                 etrCashPositionFlowDto.setAmount(交易日减少金额);

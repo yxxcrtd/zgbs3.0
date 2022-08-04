@@ -52,6 +52,7 @@ import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.component.base.entrust.BaseEtrInvestInfoService;
 import com.joyintech.tams.invest.common.component.base.entrust.dto.BaseEtrFinishAmtDto;
 import com.joyintech.tams.invest.common.component.base.entrust.impl.BaseEtrInvestInfoServiceImpl;
+import com.joyintech.tams.invest.common.component.base.entrust.impl.dao.BaseEtrInvestInfoMapper;
 import com.joyintech.tams.invest.common.component.business.basicdata.BaseTradeFeeCommService;
 import com.joyintech.tams.invest.common.component.business.basicdata.dto.BasicTradeFeeInputDto;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
@@ -254,6 +255,12 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
 
     @Autowired(required = false)
     private BussTrdTransferOrderService bussTrdTransferOrderService;
+
+    /**
+     * 投资委托信息Mapper
+     */
+    @Autowired
+    private BaseEtrInvestInfoMapper etrInvestInfoMapper;
 
     /**
      * <投标确认>界面初始化检查
@@ -2540,7 +2547,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         // =====================划款指令信息=====================
         List<BussTrdTransferOrderDto> bussTrdTransferOrder = new ArrayList<>();
         BussSettleOrderParameterDto bussSettleOrderParameterDto = new BussSettleOrderParameterDto();
-        bussSettleOrderParameterDto.setIsTotalTrade(BussinessDictCodeList.是否_是.getValue());
+        bussSettleOrderParameterDto.setIsTotalTrade(BussinessDictCodeList.是否_否.getValue());
         bussSettleOrderParameterDto.setBankLendingType(null);
         TrdProductDeal deal = new TrdProductDeal();
         BeanUtil.copyPropertiesIgnoreNull(deal, temp);
@@ -2561,7 +2568,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             bussTrdTransferOrderDto.setPayAcctNo(null);
         }
         bussTrdTransferOrderDto.setPs(ps);
-        bussTrdTransferOrderDto.setIsTotalTrade(BussinessDictCodeList.是否_是.getValue());
+        bussTrdTransferOrderDto.setIsTotalTrade(BussinessDictCodeList.是否_否.getValue());
         bussTrdTransferOrderDto.setOrderRetStatus(DictCodeList.指令处理状态_处理成功.getValue());
         bussTrdTransferOrderDto.setTradeId(deal.getTradeId());
         bussTrdTransferOrderDto.setPortfolioId(deal.getPortfolioId());
@@ -2880,6 +2887,25 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             this.insertEtrFinishStatus(entity, type);
             //处理指令完成进度
             finishEtrList.forEach(this::closeDelegatePositionMethod);
+            if (StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), entity.getBiddingMethod())) {
+                if (OperationType.REVOKE.equals(type) || OperationType.DELETE.equals(type)) {
+                    entity.getProductDtos().forEach(productDto -> {
+                        // 委托完成状况表查询
+                        EtrFinishStatusKey etrFinishStatusKey = new EtrFinishStatusKey();
+                        etrFinishStatusKey.setEntrustId(productDto.getEntrustId());
+                        List<EtrFinishStatus> etrFinishStatusList = etrInvestInfoMapper.selectEtrFinishStatusByPrimaryKey(etrFinishStatusKey);
+                        if(CollectionUtils.isEmpty(etrFinishStatusList)) {
+                            // 如果满足，则调用投资委托组件的更新委托状态接口，将委托状态设置为“委托状态_已接收”
+                            etrInvestInfoServiceImpl.updateDelegateStatus(productDto.getEntrustId(), DictCodeList.委托状态_已接收.getValue());
+                        }
+                    });
+                } else {
+                    entity.getProductDtos().forEach(productDto -> {
+                        // 如果满足，则调用投资委托组件的更新委托状态接口，将委托状态设置为“委托状态_已完成”
+                        etrInvestInfoServiceImpl.updateDelegateStatus(productDto.getEntrustId(), DictCodeList.委托状态_已完成.getValue());
+                    });
+                }
+            }
         } catch (Exception e) {
             logger.error("处理异常", e);
             throw new BusinessException("MSG:" + e.getMessage());
@@ -4104,7 +4130,14 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         }
         List<TrdProductDeal> deals = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(entity.getTrdProductDeals())) {
-            deals.addAll(entity.getTrdProductDeals());
+            Map<String, TrdProductDealAdd> dealAddMap = entity.getTrdProductDealAdds().stream()
+                    .collect(Collectors.toMap(TrdProductDealAdd::getTradeId, dealAdd -> dealAdd));
+            entity.getTrdProductDeals().forEach(deal -> {
+                TrdProductDealAdd dealAdd = dealAddMap.get(deal.getTradeId());
+                deal.setEntrustId(dealAdd.getEntrustId());
+                deal.setPortfolioId(dealAdd.getPortfolioId());
+                deals.add(deal);
+            });
         } else {
             Map<String, WflTrdProductDealAdd> dealAddMap = entity.getWflTrdProductDealAdds().stream()
                     .collect(Collectors.toMap(WflTrdProductDealAdd::getTradeId, dealAdd -> dealAdd));

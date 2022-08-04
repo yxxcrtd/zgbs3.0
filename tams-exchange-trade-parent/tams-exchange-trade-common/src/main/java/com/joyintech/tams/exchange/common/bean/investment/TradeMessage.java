@@ -1,10 +1,13 @@
 package com.joyintech.tams.exchange.common.bean.investment;
 
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.constant.BusinessFlag;
 import com.joyintech.tams.exchange.common.constant.EntrustProp;
 import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
+import com.joyintech.tams.exchange.common.db.domain.Instruction;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
 import com.joyintech.tams.exchange.common.db.domain.Trade;
+import com.joyintech.tams.exchange.common.enums.EntrustBussTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
@@ -351,7 +354,7 @@ public class TradeMessage extends BasicMessage {
 
     private static TradeMessage templateMessage = new TradeMessage();
 
-    public static TradeMessage createTradeMessage(Trade trade, EntrustInterface entrust) {
+    public static TradeMessage createTradeMessage(Trade trade, EntrustInterface entrust, Instruction instruction) {
         TradeMessage tradeMessage;
         try {
             tradeMessage = (TradeMessage) templateMessage.clone();
@@ -375,7 +378,8 @@ public class TradeMessage extends BasicMessage {
             }
             //协议回购
             if (BusinessFlag.PROTOCOL_BACK.value.equals(trade.getBusinessFlag())) {
-                if (BusiTypeTgEnum.首期.codeEquals(trade.getBusiTypeTg())) {
+                if (BusiTypeTgEnum.首期.codeEquals(trade.getBusiTypeTg())
+                        || StringUtil.equals(EntrustBussTypeEnum.中途换券指令_换钱.value, instruction.getEntrustBussType())) {
                     //回购金额
                     tradeMessage.setDealBalance(entrust.getTradedBalance());
                 } else {

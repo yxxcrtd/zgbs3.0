@@ -65,6 +65,9 @@ import com.joyintech.tams.invest.trade.exchangetransmatch.position.service.Posit
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 
+import static com.joyintech.tams.constant.DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令;
+import static com.joyintech.tams.constant.DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令_换钱;
+
 /**
  * 场内成交管理共通service
  */
@@ -345,6 +348,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
             entrustMap.put("SEC_ACCT_ID", dto.getSecAcctId());
             commonEntrustDtoList = exchangeTransMatchCommonMapper.getFirstBondEtrEntrustByIdList(entrustMap);
         }else{
+            entrustMap.put("ENTRUST_TYPE_21", 上农商_指令业务类型_协议回购中途换券指令.getValue());
             commonEntrustDtoList = exchangeTransMatchCommonMapper.getEtrEntrustByIdList(entrustMap);
         }
         if(!StringUtil.isEmptyList(commonEntrustDtoList)) {
@@ -1158,26 +1162,26 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     table.put(pledge.getPledgeFinprodId(), pledge.getDisplaceDirection(), pledge);
                 }
                 for(FinDealPledge firstFinDealPledge : firstFinDealPledgeList) {
+                    FinDealPledge newFinDealPledge = new FinDealPledge();
+                    BeanUtil.copyPropertiesIgnoreNull(newFinDealPledge, firstFinDealPledge);
                     // 金融产品代码
-                    firstFinDealPledge.setFinprodId(dealTotal.getFinprodId());
+                    newFinDealPledge.setFinprodId(dealTotal.getFinprodId());
                     // 换入质押券
-                    SettleTransDataTotalPledge inPledge = table.get(firstFinDealPledge.getPledgeFinprodId(), DictCodeListExt3.质押券置换_置换方向_换入.getValue());
+                    SettleTransDataTotalPledge inPledge = table.get(newFinDealPledge.getPledgeFinprodId(), DictCodeListExt3.质押券置换_置换方向_换入.getValue());
                     // 换出质押券
-                    SettleTransDataTotalPledge outPledge = table.get(firstFinDealPledge.getPledgeFinprodId(), DictCodeListExt3.质押券置换_置换方向_换出.getValue());
+                    SettleTransDataTotalPledge outPledge = table.get(newFinDealPledge.getPledgeFinprodId(), DictCodeListExt3.质押券置换_置换方向_换出.getValue());
                     if(null != inPledge){
                         // 如果换入的质押券跟首期一致,则券面总额、质押券数量相加
-                        firstFinDealPledge.setPledgeAmt(ArithmeticUtil.doAdd(firstFinDealPledge.getPledgeAmt(), inPledge.getPledgeAmt()));
-                        firstFinDealPledge.setPledgeNumber(ArithmeticUtil.doAdd(firstFinDealPledge.getPledgeNumber(), inPledge.getPledgeNumber()));
+                        newFinDealPledge.setPledgeNumber(ArithmeticUtil.doAdd(newFinDealPledge.getPledgeNumber(), inPledge.getPledgeNumber()));
                     }else if(null != outPledge){
                         // 如果出的质押券跟首期一致,则券面总额、质押券数量相减
-                        firstFinDealPledge.setPledgeAmt(ArithmeticUtil.subtract(firstFinDealPledge.getPledgeAmt(), outPledge.getPledgeAmt()));
-                        firstFinDealPledge.setPledgeNumber(ArithmeticUtil.subtract(firstFinDealPledge.getPledgeNumber(), inPledge.getPledgeNumber()));
+                        newFinDealPledge.setPledgeNumber(ArithmeticUtil.subtract(newFinDealPledge.getPledgeNumber(), outPledge.getPledgeNumber()));
                     }
                     // 如果质押券面额为0,则忽略
-                    if(BigDecimal.ZERO.compareTo(firstFinDealPledge.getPledgeAmt()) >= 0){
+                    if(BigDecimal.ZERO.compareTo(newFinDealPledge.getPledgeNumber()) >= 0){
                         continue;
                     }
-                    finDealPledgeList.add(firstFinDealPledge);
+                    finDealPledgeList.add(newFinDealPledge);
                 }
                 // 首期质押券金融代码
                 List<String> firstPladgeFinprodIds = firstFinDealPledgeList.stream()
@@ -1192,6 +1196,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     for(SettleTransDataTotalPledge inpledge : inpledges){
                         FinDealPledge finDealPledge = new FinDealPledge();
                         finDealPledge.setFinprodId(dealTotal.getFinprodId());
+                        finDealPledge.setBranch(0L);
                         finDealPledge.setPledgeFinprodId(inpledge.getPledgeFinprodId());
                         finDealPledge.setPledgeNumber(inpledge.getPledgeNumber());
                         finDealPledge.setPledgeAmt(inpledge.getPledgeAmt());

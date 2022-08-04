@@ -7,7 +7,7 @@
  * 修改内容：新建
  * 系统名称：理财资管管理系统V2.0
  */
- 
+
 package com.joyintech.tams.invest.common.entrust.dao;
 
 import com.joyintech.tams.common.base.entity.PtlCapacctInfo;
@@ -20,6 +20,7 @@ import java.util.Map;
 
 /**
  * 场内指令查询
+ *
  * @author msk
  * @version 1.0 2021年12月22日
  * @see EtrTrdCommonMapper
@@ -29,7 +30,8 @@ import java.util.Map;
 public interface EtrTrdCommonMapper {
 
 
-    List<PtlCapacctInfo> getPtlAcctInfo(@Param("portfolioId") String portfolioId,@Param("acctTypeList")  List<String> acctTypeList);
+    List<PtlCapacctInfo> getPtlAcctInfo(@Param("portfolioId") String portfolioId, @Param("acctTypeList") List<String> acctTypeList);
+
     /**
      * 交易日历的节假日取得
      *
@@ -39,4 +41,12 @@ public interface EtrTrdCommonMapper {
     List<String> getDealCalendarHoliday(Map<String, Object> paraMap);
 
     BigDecimal selectFaceValue(Map<String, Object> params);
+
+    /**
+     * 查询首期的到期结算金额
+     *
+     * @param finprodId 资产代码
+     * @return 到期结算金额
+     */
+    BigDecimal getFirstTradeAmtByTradeId(@Param("finprodId") String finprodId);
 }

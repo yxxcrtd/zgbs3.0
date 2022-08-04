@@ -312,6 +312,9 @@
             <if test="isOriginalOwner != null" >
                 IS_ORIGINAL_OWNER = #{isOriginalOwner,jdbcType=VARCHAR},
             </if>
+            <if test="createInstitutions != null" >
+                CREATE_INSTITUTIONS = #{createInstitutions,jdbcType=VARCHAR},
+            </if>
         </set>
         where CUSTOMER_ID = #{customerId,jdbcType=VARCHAR}
     </update>
@@ -337,6 +340,7 @@
             IS_BROKER = #{isBroker,jdbcType=VARCHAR},
             IS_COUNTER = #{isCounter,jdbcType=VARCHAR},
             IS_ORIGINAL_OWNER = #{isOriginalOwner,jdbcType=VARCHAR},
+            CREATE_INSTITUTIONS = #{createInstitutions,jdbcType=VARCHAR}
         where CUSTOMER_ID = #{customerId,jdbcType=VARCHAR}
     </update>
 </mapper>

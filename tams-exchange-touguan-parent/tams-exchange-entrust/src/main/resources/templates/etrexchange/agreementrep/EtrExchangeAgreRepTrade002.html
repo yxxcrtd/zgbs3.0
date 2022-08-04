@@ -238,6 +238,7 @@
             <input type="hidden" id="invManagerId" name="invManagerId" data-th-value="${entity?.invManagerId}" >
             <input type="hidden" id="pledgeUnit" name="pledgeUnit" data-th-value="${entity?.pledgeUnit}" >
             <input type="hidden" id="initialNum" name="initialNum" data-th-value="${entity?.initialNum}" >
+            <input type="hidden" id="busiTypePosition" name="busiTypePosition" data-th-value="${entity?.busiTypePosition}" >
 
             <div class="layui-form-item">
                 <div class="form-inline-wrap" style="width: 50%; padding-top:6px;display: none" id="cashUse_div">
@@ -344,7 +345,7 @@
                 <div class="form-inline-wrap" style="width: 50%; padding-top:6px;" id="yield_div">
                     <label class="layui-form-label" style="width: 150px;" data-th-text="#{EtrExchangeAgreRepTrade001.yield}">回购利率</label>
                     <div class="layui-input-inline input-inline" style=" margin: 0px; margin-left: auto;">
-                        <input type="text" id="yield" name="yield" placeholder="请输入内容" data-pattern="" data-fixtype="2" data-textrange='2' class="layui-input form-input text-number"
+                        <input type="text" id="yield" name="yield" placeholder="请输入内容" data-pattern="" data-fixtype="2" data-textrange='3' class="layui-input form-input text-number"
                                data-th-value="${entity?.yield}" required="required" autocomplete="off" maxlength=9>
                         <span class="input-right-show">%</span>
                     </div>
@@ -655,6 +656,11 @@
         var PS_T68 = /*[[${PS_T68}]]*/'';
         var PS_T69 = /*[[${PS_T69}]]*/'';
         var PS_T92 = /*[[${PS_T92}]]*/'';
+        var PS_T93 = /*[[${PS_T93}]]*/'';
+        var PS_T94 = /*[[${PS_T94}]]*/'';
+        var PS_T95 = /*[[${PS_T95}]]*/'';
+        var PS_T96 = /*[[${PS_T96}]]*/'';
+        var PS_T56 = /*[[${PS_T56}]]*/'';
         var PRICE_MODEL_PRM01 = /*[[${PRICE_MODEL_PRM01}]]*/'';
         var PRICE_MODEL_PRM02 = /*[[${PRICE_MODEL_PRM02}]]*/'';
         var PRICE_MODEL_PRM03 = /*[[${PRICE_MODEL_PRM03}]]*/'';
@@ -710,6 +716,7 @@
         var UNIT_01 =  /*[[${UNIT_01}]]*/'';
         var UNIT_04 = /*[[${UNIT_04}]]*/'';
         var entityStr = /*[[${entityStr}]]*/'';
+        var entity = /*[[${entity}]]*/'';
         var entity_RiskTrialRetList = eval(/*[[${entity_RiskTrialRetList}]]*/'');
         var riskTrialSpan = /*[[${riskTrialSpan}]]*/'';
         var risk_math_switch = /*[[${risk_math_switch}]]*/'';

@@ -3056,7 +3056,8 @@ public class CfetsTrdConfirmService extends BaseService {
                 param.put("settleSpeed","03");
             }
             param.put("secManageAcctId",interfTradSecdeal.getOurdepositaccountnumber());
-            param.put("yield",interfTradSecdeal.getYield8());
+            // param.put("yield",interfTradSecdeal.getYield8());
+            param.put("price",interfTradSecdeal.getPrice8());
             param.put("faceValue",interfTradSecdeal.getPrinamt());
             param.put("settleDate", DateUtil.format(interfTradSecdeal.getSettdate(),"yyyy-MM-dd"));
             if(StringUtil.equals(iCstpTrade.getDeliverytype(),"0")){
@@ -3113,7 +3114,8 @@ public class CfetsTrdConfirmService extends BaseService {
                 && StringUtil.equals(confirmDto.getPs(), interfTradSecdeal.getPs())
                 && StringUtil.equals(confirmDto.getSettleSpeed(), interfTradSecdeal.getSettleSpeed())
                 && StringUtil.equals(confirmDto.getSecManageAcctId(), interfTradSecdeal.getOurdepositaccountnumber())
-                && cfetsRepoQuotedPrice004Service.ACompareToB(confirmDto.getYield(),interfTradSecdeal.getYield8(),4)==0
+                && (cfetsRepoQuotedPrice004Service.ACompareToB(confirmDto.getYield(),interfTradSecdeal.getYield8(),4)==0 ||
+                cfetsRepoQuotedPrice004Service.ACompareToB(confirmDto.getUnitCprice(),interfTradSecdeal.getPrice8(),4)==0 )
                 && cfetsRepoQuotedPrice004Service.ACompareToB(confirmDto.getFaceValue(),interfTradSecdeal.getPrinamt(),2)==0
                 && confirmDto.getSettleDate().compareTo(interfTradSecdeal.getSettdate())==0
                 && StringUtil.equals(confirmDto.getDeliveryType(), iCstpTrade.getDeliverytype())
@@ -3446,7 +3448,7 @@ public class CfetsTrdConfirmService extends BaseService {
             bussTrdTransferOrderDto.setPayAcctNo(null);
         }
         bussTrdTransferOrderDto.setPs(ps);
-        bussTrdTransferOrderDto.setIsTotalTrade(BussinessDictCodeList.是否_是.getValue());
+        bussTrdTransferOrderDto.setIsTotalTrade(BussinessDictCodeList.是否_否.getValue());
         bussTrdTransferOrderDto.setOrderRetStatus(DictCodeList.指令处理状态_处理成功.getValue());
         bussTrdTransferOrderDto.setTradeId(deal.getTradeId());
         bussTrdTransferOrderDto.setPortfolioId(deal.getPortfolioId());

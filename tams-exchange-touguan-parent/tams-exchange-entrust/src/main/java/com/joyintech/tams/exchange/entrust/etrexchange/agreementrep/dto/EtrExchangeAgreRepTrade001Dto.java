@@ -23,10 +23,10 @@ import java.util.List;
 public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements ProcessEntity{
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 3436776283481983592L;
-	
+
 	private String tradeId;
 	private String intiTradeId;
 	private String origRepSecId;
@@ -93,7 +93,7 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 	private String fromEtrExchange;
 	private String busiPs;
 	private String assetType2;
-	
+
 	private String transCode;
 
 	/**
@@ -649,5 +649,16 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 
 	public void setFristExpireSettleAmt(BigDecimal fristExpireSettleAmt) {
 		this.fristExpireSettleAmt = fristExpireSettleAmt;
+	}
+
+
+	private String pledgeInvAim;
+
+	public String getPledgeInvAim() {
+		return pledgeInvAim;
+	}
+
+	public void setPledgeInvAim(String pledgeInvAim) {
+		this.pledgeInvAim = pledgeInvAim;
 	}
 }
