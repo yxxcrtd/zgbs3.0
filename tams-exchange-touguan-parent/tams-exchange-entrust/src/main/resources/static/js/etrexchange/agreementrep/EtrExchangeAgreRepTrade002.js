@@ -900,7 +900,7 @@
                     //回购金额
                     $("#tradeAmt").attr("disabled", true);
                     //回购利率
-                    $("#yield").attr("disabled", true);
+                    $("#yield").attr("disabled", false);
                     //首期结算日
                     $("#fristSettleDate").attr("disabled", true);
                     //到期结算日
