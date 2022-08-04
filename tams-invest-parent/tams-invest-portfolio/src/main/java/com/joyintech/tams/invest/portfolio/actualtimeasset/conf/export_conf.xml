@@ -3,7 +3,7 @@
     <Worksheet javaBean="com.joyintech.tams.invest.portfolio.actualtimeasset.dto.ActualTimeAssetDto">
         <Row>
             <Cell order="1" name="组合名称">portfolioName</Cell>
-            <Cell order="2" name="证券账户/通道代码">secAcctInfo</Cell>
+            <Cell order="2" name="证券账户">secAcctInfo</Cell>
             <Cell order="3" name="资产类型">type8Name</Cell>
             <Cell order="4" name="资产二级类型">type7Name</Cell>
             <Cell order="5" name="资产代码">finprodMarketId</Cell>
@@ -11,9 +11,8 @@
             <Cell order="7" name="实际持仓">actualPositionAmount</Cell>
             <Cell order="8" name="指令可用持仓">instructionsAmount</Cell>
             <Cell order="9" name="交易可用持仓">tradePositionAmount</Cell>
-            <Cell order="10" name="预减持仓">pledgeAmount</Cell>
-            <Cell order="11" name="质押持仓">preReductionAmount</Cell>
-            <Cell order="12" name="市值">marketValue</Cell>
+            <Cell order="10" name="质押持仓">preReductionAmount</Cell>
+            <Cell order="11" name="市值">marketValue</Cell>
         </Row>
     </Worksheet>
 </Workbook>
