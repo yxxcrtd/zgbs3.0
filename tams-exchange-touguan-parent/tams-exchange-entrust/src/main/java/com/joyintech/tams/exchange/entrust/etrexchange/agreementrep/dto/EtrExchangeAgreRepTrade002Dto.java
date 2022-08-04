@@ -21,10 +21,12 @@ import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 〈一句话功能简述〉 〈功能详细描述〉
- * 
+ *
  * @author chendijun
  * @version 1.0 2020年7月2日
  * @see EtrExchangeAgreRepTrade002Dto
@@ -204,7 +206,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 获取 portfolioId
-     * 
+     *
      * @return portfolioId.
      */
     public String getPortfolioId() {
@@ -213,7 +215,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 设置 portfolioId
-     * 
+     *
      * @param portfolioId portfolioId
      */
     public void setPortfolioId(String portfolioId) {
@@ -222,7 +224,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 获取 portfolioName
-     * 
+     *
      * @return portfolioName.
      */
     public String getPortfolioName() {
@@ -231,7 +233,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 设置 portfolioName
-     * 
+     *
      * @param portfolioName portfolioName
      */
     public void setPortfolioName(String portfolioName) {
@@ -240,7 +242,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 获取 secAcctId
-     * 
+     *
      * @return secAcctId.
      */
     public String getSecAcctId() {
@@ -249,7 +251,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 设置 secAcctId
-     * 
+     *
      * @param secAcctId secAcctId
      */
     public void setSecAcctId(String secAcctId) {
@@ -258,7 +260,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 获取 secAcctName
-     * 
+     *
      * @return secAcctName.
      */
     public String getSecAcctName() {
@@ -267,7 +269,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 设置 secAcctName
-     * 
+     *
      * @param secAcctName secAcctName
      */
     public void setSecAcctName(String secAcctName) {
@@ -276,7 +278,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 获取 tradeMarket
-     * 
+     *
      * @return tradeMarket.
      */
     public String getTradeMarket() {
@@ -285,7 +287,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 设置 tradeMarket
-     * 
+     *
      * @param tradeMarket tradeMarket
      */
     public void setTradeMarket(String tradeMarket) {
@@ -294,7 +296,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 获取 finprodId
-     * 
+     *
      * @return finprodId.
      */
     public String getFinprodId() {
@@ -303,7 +305,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 设置 finprodId
-     * 
+     *
      * @param finprodId finprodId
      */
     public void setFinprodId(String finprodId) {
@@ -312,7 +314,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 获取 finpordName
-     * 
+     *
      * @return finpordName.
      */
     public String getFinpordName() {
@@ -321,7 +323,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 设置 finpordName
-     * 
+     *
      * @param finpordName finpordName
      */
     public void setFinpordName(String finpordName) {
@@ -330,7 +332,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 获取 invAim
-     * 
+     *
      * @return invAim.
      */
     public String getInvAim() {
@@ -339,7 +341,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 设置 invAim
-     * 
+     *
      * @param invAim invAim
      */
     public void setInvAim(String invAim) {
@@ -348,7 +350,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 获取 positionsNum
-     * 
+     *
      * @return positionsNum.
      */
     public BigDecimal getPositionsNum() {
@@ -357,7 +359,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 设置 positionsNum
-     * 
+     *
      * @param positionsNum positionsNum
      */
     public void setPositionsNum(BigDecimal positionsNum) {
@@ -366,7 +368,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 获取 sellNum
-     * 
+     *
      * @return sellNum.
      */
     public BigDecimal getSellNum() {
@@ -375,7 +377,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 设置 sellNum
-     * 
+     *
      * @param sellNum sellNum
      */
     public void setSellNum(BigDecimal sellNum) {
@@ -384,7 +386,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 获取 positionsAmt
-     * 
+     *
      * @return positionsAmt.
      */
     public BigDecimal getPositionsAmt() {
@@ -393,7 +395,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 设置 positionsAmt
-     * 
+     *
      * @param positionsAmt positionsAmt
      */
     public void setPositionsAmt(BigDecimal positionsAmt) {
@@ -402,7 +404,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 获取 price
-     * 
+     *
      * @return price.
      */
     public BigDecimal getPrice() {
@@ -411,7 +413,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 设置 price
-     * 
+     *
      * @param price price
      */
     public void setPrice(BigDecimal price) {
@@ -420,7 +422,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 获取 floatingPL
-     * 
+     *
      * @return floatingPL.
      */
     public BigDecimal getFloatingPL() {
@@ -429,7 +431,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 设置 floatingPL
-     * 
+     *
      * @param floatingPL floatingPL
      */
     public void setFloatingPL(BigDecimal floatingPL) {
@@ -438,7 +440,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 获取 acctNo
-     * 
+     *
      * @return acctNo.
      */
     public String getAcctNo() {
@@ -447,7 +449,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 设置 acctNo
-     * 
+     *
      * @param acctNo acctNo
      */
     public void setAcctNo(String acctNo) {
@@ -456,7 +458,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 获取 secId
-     * 
+     *
      * @return secId.
      */
     public String getSecId() {
@@ -465,7 +467,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 设置 secId
-     * 
+     *
      * @param secId secId
      */
     public void setSecId(String secId) {
@@ -474,7 +476,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 获取 secName
-     * 
+     *
      * @return secName.
      */
     public String getSecName() {
@@ -483,7 +485,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 设置 secName
-     * 
+     *
      * @param secName secName
      */
     public void setSecName(String secName) {
@@ -528,7 +530,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 获取 repoNum
-     * 
+     *
      * @return repoNum
      */
     public BigDecimal getRepoNum() {
@@ -537,7 +539,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 设置 repoNum
-     * 
+     *
      * @param repoNum BigDecimal
      */
     public void setRepoNum(BigDecimal repoNum) {
@@ -546,7 +548,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 获取 secNum
-     * 
+     *
      * @return secNum
      */
     public BigDecimal getSecNum() {
@@ -555,7 +557,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 设置 secNum
-     * 
+     *
      * @param secNum BigDecimal
      */
     public void setSecNum(BigDecimal secNum) {
@@ -564,7 +566,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 获取 canRepoNum
-     * 
+     *
      * @return canRepoNum
      */
     public BigDecimal getCanRepoNum() {
@@ -573,7 +575,7 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
 
     /**
      * 设置 canRepoNum
-     * 
+     *
      * @param canRepoNum BigDecimal
      */
     public void setCanRepoNum(BigDecimal canRepoNum) {
@@ -622,7 +624,15 @@ public class EtrExchangeAgreRepTrade002Dto extends BaseEntity {
      */
     public String getBusinessModelStr(){
         if(StringUtil.isNotEmpty(getBusinessModel())){
-            return SysDataUtil.getNameFromDataDict(DictCode.业务模式,getBusinessModel());
+            Set<String> resList = new HashSet<>();
+            String[] values = getBusinessModel().split(",");
+            for (String value : values) {
+                String nameFromDataDict = SysDataUtil.getNameFromDataDict(DictCode.业务模式, value);
+                if(null != nameFromDataDict){
+                    resList.add(nameFromDataDict);
+                }
+            }
+            return resList.isEmpty() ? "" : String.join(",",resList);
         }
         else {
             return "";
