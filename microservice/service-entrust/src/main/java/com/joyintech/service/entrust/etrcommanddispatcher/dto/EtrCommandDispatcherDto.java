@@ -9,11 +9,11 @@ import com.joyintech.framework.json.BigDecimalSerializer;
 
 public class EtrCommandDispatcherDto extends BaseEntity{
     /**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	/**
+    /**
      * 委托代码
      */
     private String entrustId;
@@ -22,7 +22,7 @@ public class EtrCommandDispatcherDto extends BaseEntity{
      * 组合代码
      */
     private String portfolioId;
-    
+
     /**
      * 组合名称
      */
@@ -32,12 +32,12 @@ public class EtrCommandDispatcherDto extends BaseEntity{
      * 金融产品代码
      */
     private String finprodId;
-    
+
     /**
      * 金融产品简称
      */
     private String finprodAbbr;
-    
+
     /**
      * 金融产品全称
      */
@@ -47,42 +47,42 @@ public class EtrCommandDispatcherDto extends BaseEntity{
      * 金融产品类型（投管分类），债券、理财产品、基金、理财产品模板、理财产品分层
      */
     private String finprodType2;
-    
+
     /**
      * 网点账号
      */
     private String acctNo;
-    
+
     /**
      * 币种
      */
     private String CCY;
-    
+
     /**
      * 资金账号
      */
     private String busiAcctNo;
-    
+
     /***
      * 户名
      */
     private String acctName;
-    
+
     /**
      * 证券账户代码
      */
     private String secAcctId;
-    
+
     /**
      * 证券账户名称
      */
     private String secAcctName;
-    
+
     /**
      * 股东代码
      */
     private String stockHolderNo;
-    
+
 
     /**
      * 交易场所，银行间、上交所、深交所、柜面等
@@ -93,23 +93,23 @@ public class EtrCommandDispatcherDto extends BaseEntity{
      * 交易平台，银行间、上交所固定收益平台、上交所大宗交易平台、深交所大宗平台、深交所综合协议交易平台、其他等
      */
     private String tradePlat;
-    
+
     /**
      * 市场代码
      */
     private String finprodMarketId;
-    
+
     /**
      * 证券账户代码
      */
     private String PS;
-    
+
 
     /**
      * 交易方式，竞价交易/大宗交易/盘后定价交易/大宗交易专场
      */
     private String dealMode;
-    
+
     /**
      * 交易对手
      */
@@ -119,11 +119,12 @@ public class EtrCommandDispatcherDto extends BaseEntity{
      * 交易对手名称
      */
     private String counterName;
+
     /**
      * 深交所成交申报需要带对手方席位
      */
     private String counterSeat;
-    
+
     /**
      * 对手方交易员
      */
@@ -139,16 +140,6 @@ public class EtrCommandDispatcherDto extends BaseEntity{
      */
     private String counterDealerId;
 
-    /**
-     * 对手方交易主体代码
-     */
-    private String counterInvestorId;
-
-    /**
-     * 对手方交易主体类型
-     */
-    private String counterInvestorType;
-    
 
     /**
      *约定号
@@ -167,7 +158,7 @@ public class EtrCommandDispatcherDto extends BaseEntity{
      *交易所请求号
      */
     private String quoterefId;
-   
+
     /**
      * 委托日期
      */
@@ -182,62 +173,43 @@ public class EtrCommandDispatcherDto extends BaseEntity{
      * 委托结束日
      */
     private Date MDATE;
-    
-    /**
-     * 是否自动分发
-     */
 
-   private String isAutoReceive; 
-   
-   /**
-    * 衍生品买卖方向
-    */
-   private String derivativeBsDir;
-   
-   /**
-    * 衍生品开平仓标志
-    */
-   private String derivativeOcFlag;
-   
-    /**
-     * 补充协议
-     */
-    private String remark;
+
     /**
      * 委托额度，交易金额
      */
     @JsonSerialize(using=BigDecimalSerializer.class)
     private BigDecimal entrustAmt;
-    
+
     /**
      * 委托数量，数量或者券面总额/100
      */
     @JsonSerialize(using=BigDecimalSerializer.class)
     private BigDecimal entrustNum;
-  
+
 
     /**
      * 委托状态
      */
     private String entrustStatus;
-    
+
     /**
      * 委托价格，净价、利率等
      */
     @JsonSerialize(using=BigDecimalSerializer.class)
     private BigDecimal entrustPrice;
-    
+
     /**
      * 全价
      */
     @JsonSerialize(using=BigDecimalSerializer.class)
     private BigDecimal fullPrice;
-    
+
     /**
      * 价格模式
      */
     private String priceMode;
-    
+
     /**
      * 已完成数量
      */
@@ -249,8 +221,8 @@ public class EtrCommandDispatcherDto extends BaseEntity{
      */
     @JsonSerialize(using=BigDecimalSerializer.class)
     private BigDecimal settleSpeed;
-    
-    
+
+
     /**
      * 起息日
      */
@@ -265,13 +237,13 @@ public class EtrCommandDispatcherDto extends BaseEntity{
      * 到期日
      */
     private Date maturityDate;
-    
+
 
     /**
      * 到期日2
      */
     private Date maturityDate2;
-    
+
     /**
      * 期限天数
      */
@@ -288,7 +260,7 @@ public class EtrCommandDispatcherDto extends BaseEntity{
      * 申购类型
      */
     private String purchType;
-    
+
     /**
      * 最低成交金额
      */
@@ -319,7 +291,7 @@ public class EtrCommandDispatcherDto extends BaseEntity{
      * 交易员姓名
      */
     private String traderName;
-    
+
 
     /**
      * 投资经理
@@ -330,7 +302,7 @@ public class EtrCommandDispatcherDto extends BaseEntity{
      * 资产类型
      */
     private String assetType;
-    
+
     /**
      * 资产二级分类
      */
@@ -340,22 +312,22 @@ public class EtrCommandDispatcherDto extends BaseEntity{
      * 资产三级分类
      */
     private String assetType10;
-    
+
     /**
      * 资产四级分类
      */
     private String assetType11;
-    
+
     /**
      * 配售代码
      */
     private String saleCode;
-    
+
     /**
      * 投资目的
      */
     private String invAim;
-    
+
     /**
      * 转股代码
      */
@@ -378,6 +350,12 @@ public class EtrCommandDispatcherDto extends BaseEntity{
 
     /**本方交易员*/
     private String ourTrader;
+
+    /**
+     * 交易端接收到分发的指令后，是否要自动接收 1.不传该字段，不自动接收 2.Y-自动接收 3.N-不自动接收
+     */
+    private String isAutoReceive;
+
     /**
      * 首次交收日
      */
@@ -385,7 +363,7 @@ public class EtrCommandDispatcherDto extends BaseEntity{
     /**
      * 到期交收日
      */
-    private Date mPayDate; 
+    private Date mPayDate;
     /**
      * 占款天数
      */
@@ -397,11 +375,27 @@ public class EtrCommandDispatcherDto extends BaseEntity{
     /**
      * 到期结算金额
      */
-    private BigDecimal mTradeAmt; 
+    private BigDecimal mTradeAmt;
     /**
      * 首期回购方向
      */
     private String firstRepoPs;
+    /**
+     * 补充协议
+     */
+    private String remark;
+
+    /**
+     * 衍生品买卖方向
+     */
+    private String derivativeBsDir;
+
+    /**
+     * 衍生品开平仓标志
+     */
+    private String derivativeOcFlag;
+
+
 
     /**
      * 协议回购到期续作指令必填
@@ -413,7 +407,6 @@ public class EtrCommandDispatcherDto extends BaseEntity{
      * 指令类型
      */
     private String entrustClass;
-
     /**
      *业务模式
      */
@@ -444,16 +437,16 @@ public class EtrCommandDispatcherDto extends BaseEntity{
     private String isNetPrice;
 
     /**
-     * 回购到期日
+     * 行情请求编号
      */
-    private Date repoMdate;
+    private String quoteRequestId;
 
-    public Date getRepoMdate() {
-        return repoMdate;
+    public String getQuoteRequestId() {
+        return quoteRequestId;
     }
 
-    public void setRepoMdate(Date repoMdate) {
-        this.repoMdate = repoMdate;
+    public void setQuoteRequestId(String quoteRequestId) {
+        this.quoteRequestId = quoteRequestId;
     }
 
     public String getIsNetPrice() {
@@ -488,8 +481,6 @@ public class EtrCommandDispatcherDto extends BaseEntity{
         this.targetType = targetType;
     }
 
-    
-
     public String getPledgeeType() {
         return pledgeeType;
     }
@@ -497,31 +488,7 @@ public class EtrCommandDispatcherDto extends BaseEntity{
     public void setPledgeeType(String pledgeeType) {
         this.pledgeeType = pledgeeType;
     }
-    
-    public String getConShareId() {
-        return conShareId;
-    }
 
-    public void setConShareId(String conShareId) {
-        this.conShareId = conShareId;
-    }
-
-    public BigDecimal getConPrice() {
-        return conPrice;
-    }
-
-    public void setConPrice(BigDecimal conPrice) {
-        this.conPrice = conPrice;
-    }
-
-    public BigDecimal getConNum() {
-        return conNum;
-    }
-
-    public void setConNum(BigDecimal conNum) {
-        this.conNum = conNum;
-    }
-    
     /**
      * 取得 投资目的
      * @return 投资目的
@@ -737,7 +704,7 @@ public class EtrCommandDispatcherDto extends BaseEntity{
         this.entrustNum = entrustNum;
     }
 
-   
+
 
 
 
@@ -774,7 +741,7 @@ public class EtrCommandDispatcherDto extends BaseEntity{
         this.invManagerId = invManagerId == null ? null : invManagerId.trim();
     }
 
-    
+
     /**
      * 上市板
      * @return
@@ -785,19 +752,19 @@ public class EtrCommandDispatcherDto extends BaseEntity{
      * 获取上市板
      * @return
      */
-	public String getBoard() {
-		return board;
-	}
-	/**
-	 * 设置上市板
-	 * @param board
-	 */
+    public String getBoard() {
+        return board;
+    }
+    /**
+     * 设置上市板
+     * @param board
+     */
 
-	public void setBoard(String board) {
-		this.board = board;
-	}
+    public void setBoard(String board) {
+        this.board = board;
+    }
 
-    
+
     /**
      * 获取价格模式
      * @return
@@ -814,349 +781,373 @@ public class EtrCommandDispatcherDto extends BaseEntity{
         this.priceMode = priceMode;
     }
 
-	public String getPortfolioName() {
-		return portfolioName;
-	}
-
-	public void setPortfolioName(String portfolioName) {
-		this.portfolioName = portfolioName;
-	}
-
-	public String getFinprodAbbr() {
-		return finprodAbbr;
-	}
-
-	public void setFinprodAbbr(String finprodAbbr) {
-		this.finprodAbbr = finprodAbbr;
-	}
-
-	public String getFinprodName() {
-		return finprodName;
-	}
-
-	public void setFinprodName(String finprodName) {
-		this.finprodName = finprodName;
-	}
-
-	public String getAcctNo() {
-		return acctNo;
-	}
-
-	public void setAcctNo(String acctNo) {
-		this.acctNo = acctNo;
-	}
-
-	public String getCCY() {
-		return CCY;
-	}
-
-	public void setCCY(String cCY) {
-		CCY = cCY;
-	}
-
-	public String getBusiAcctNo() {
-		return busiAcctNo;
-	}
-
-	public void setBusiAcctNo(String busiAcctNo) {
-		this.busiAcctNo = busiAcctNo;
-	}
-
-	public String getAcctName() {
-		return acctName;
-	}
-
-	public void setAcctName(String acctName) {
-		this.acctName = acctName;
-	}
-
-	public String getSecAcctId() {
-		return secAcctId;
-	}
-
-	public void setSecAcctId(String secAcctId) {
-		this.secAcctId = secAcctId;
-	}
-
-	public String getSecAcctName() {
-		return secAcctName;
-	}
-
-	public void setSecAcctName(String secAcctName) {
-		this.secAcctName = secAcctName;
-	}
-
-	public String getStockHolderNo() {
-		return stockHolderNo;
-	}
-
-	public void setStockHolderNo(String stockHolderNo) {
-		this.stockHolderNo = stockHolderNo;
-	}
-
-	public String getFinprodMarketId() {
-		return finprodMarketId;
-	}
-
-	public void setFinprodMarketId(String finprodMarketId) {
-		this.finprodMarketId = finprodMarketId;
-	}
-
-	public String getPS() {
-		return PS;
-	}
-
-	public void setPS(String pS) {
-		PS = pS;
-	}
-
-	public String getCounterSeat() {
-		return counterSeat;
-	}
-
-	public void setCounterSeat(String counterSeat) {
-		this.counterSeat = counterSeat;
-	}
-
-	public String getCounterDealerId() {
-		return counterDealerId;
-	}
-
-	public void setCounterDealerId(String counterDealerId) {
-		this.counterDealerId = counterDealerId;
-	}
-
-	public String getAppointmentNumber() {
-		return appointmentNumber;
-	}
-
-	public void setAppointmentNumber(String appointmentNumber) {
-		this.appointmentNumber = appointmentNumber;
-	}
-
-	public String getDealNo() {
-		return dealNo;
-	}
-
-	public void setDealNo(String dealNo) {
-		this.dealNo = dealNo;
-	}
-
-	public String getTrdMatchId() {
-		return trdMatchId;
-	}
-
-	public void setTrdMatchId(String trdMatchId) {
-		this.trdMatchId = trdMatchId;
-	}
-
-	public String getQuoterefId() {
-		return quoterefId;
-	}
-
-	public void setQuoterefId(String quoterefId) {
-		this.quoterefId = quoterefId;
-	}
-
-	public Date getTradeDate() {
-		return tradeDate;
-	}
-
-	public void setTradeDate(Date tradeDate) {
-		this.tradeDate = tradeDate;
-	}
-
-	public Date getVDATE() {
-		return VDATE;
-	}
-
-	public void setVDATE(Date vDATE) {
-		VDATE = vDATE;
-	}
-
-	public Date getMDATE() {
-		return MDATE;
-	}
-
-	public void setMDATE(Date mDATE) {
-		MDATE = mDATE;
-	}
-
-	public BigDecimal getEntrustPrice() {
-		return entrustPrice;
-	}
-
-	public void setEntrustPrice(BigDecimal entrustPrice) {
-		this.entrustPrice = entrustPrice;
-	}
-
-	public BigDecimal getFullPrice() {
-		return fullPrice;
-	}
-
-	public void setFullPrice(BigDecimal fullPrice) {
-		this.fullPrice = fullPrice;
-	}
-
-	public BigDecimal getEntrustLeftAmt() {
-		return entrustLeftAmt;
-	}
-
-	public void setEntrustLeftAmt(BigDecimal entrustLeftAmt) {
-		this.entrustLeftAmt = entrustLeftAmt;
-	}
-
-	public BigDecimal getSettleSpeed() {
-		return settleSpeed;
-	}
-
-	public void setSettleSpeed(BigDecimal settleSpeed) {
-		this.settleSpeed = settleSpeed;
-	}
-
-	public Date getValueDate() {
-		return valueDate;
-	}
-
-	public void setValueDate(Date valueDate) {
-		this.valueDate = valueDate;
-	}
-
-	public Date getValueDate2() {
-		return valueDate2;
-	}
-
-	public void setValueDate2(Date valueDate2) {
-		this.valueDate2 = valueDate2;
-	}
-
-	public Date getMaturityDate() {
-		return maturityDate;
-	}
-
-	public void setMaturityDate(Date maturityDate) {
-		this.maturityDate = maturityDate;
-	}
-
-	public Date getMaturityDate2() {
-		return maturityDate2;
-	}
-
-	public void setMaturityDate2(Date maturityDate2) {
-		this.maturityDate2 = maturityDate2;
-	}
-
-	public BigDecimal getTermDays() {
-		return termDays;
-	}
-
-	public void setTermDays(BigDecimal termDays) {
-		this.termDays = termDays;
-	}
-
-	public BigDecimal getTermDays2() {
-		return termDays2;
-	}
-
-	public void setTermDays2(BigDecimal termDays2) {
-		this.termDays2 = termDays2;
-	}
-
-	public String getPurchType() {
-		return purchType;
-	}
-
-	public void setPurchType(String purchType) {
-		this.purchType = purchType;
-	}
-
-	public BigDecimal getMinAmt() {
-		return minAmt;
-	}
-
-	public void setMinAmt(BigDecimal minAmt) {
-		this.minAmt = minAmt;
-	}
-
-	public String getTarFinprodId() {
-		return tarFinprodId;
-	}
-
-	public void setTarFinprodId(String tarFinprodId) {
-		this.tarFinprodId = tarFinprodId;
-	}
-
-	public String getTarinprodAbbr() {
-		return tarinprodAbbr;
-	}
-
-	public void setTarinprodAbbr(String tarinprodAbbr) {
-		this.tarinprodAbbr = tarinprodAbbr;
-	}
-
-	public String getTarinprodMarketId() {
-		return tarinprodMarketId;
-	}
-
-	public void setTarinprodMarketId(String tarinprodMarketId) {
-		this.tarinprodMarketId = tarinprodMarketId;
-	}
-
-	public String getTradeId() {
-		return tradeId;
-	}
-
-	public void setTradeId(String tradeId) {
-		this.tradeId = tradeId;
-	}
-
-	public String getTraderName() {
-		return traderName;
-	}
-
-	public void setTraderName(String traderName) {
-		this.traderName = traderName;
-	}
-
-	public String getAssetType() {
-		return assetType;
-	}
-
-	public void setAssetType(String assetType) {
-		this.assetType = assetType;
-	}
-
-	public String getAssetType1() {
-		return assetType1;
-	}
-
-	public void setAssetType1(String assetType1) {
-		this.assetType1 = assetType1;
-	}
-
-	public String getAssetType10() {
-		return assetType10;
-	}
-
-	public void setAssetType10(String assetType10) {
-		this.assetType10 = assetType10;
-	}
-
-	public String getAssetType11() {
-		return assetType11;
-	}
-
-	public void setAssetType11(String assetType11) {
-		this.assetType11 = assetType11;
-	}
-
-	public String getSaleCode() {
-		return saleCode;
-	}
-
-	public void setSaleCode(String saleCode) {
-		this.saleCode = saleCode;
-	}
+    public String getPortfolioName() {
+        return portfolioName;
+    }
+
+    public void setPortfolioName(String portfolioName) {
+        this.portfolioName = portfolioName;
+    }
+
+    public String getFinprodAbbr() {
+        return finprodAbbr;
+    }
+
+    public void setFinprodAbbr(String finprodAbbr) {
+        this.finprodAbbr = finprodAbbr;
+    }
+
+    public String getFinprodName() {
+        return finprodName;
+    }
+
+    public void setFinprodName(String finprodName) {
+        this.finprodName = finprodName;
+    }
+
+    public String getAcctNo() {
+        return acctNo;
+    }
+
+    public void setAcctNo(String acctNo) {
+        this.acctNo = acctNo;
+    }
+
+    public String getCCY() {
+        return CCY;
+    }
+
+    public void setCCY(String cCY) {
+        CCY = cCY;
+    }
+
+    public String getBusiAcctNo() {
+        return busiAcctNo;
+    }
+
+    public void setBusiAcctNo(String busiAcctNo) {
+        this.busiAcctNo = busiAcctNo;
+    }
+
+    public String getAcctName() {
+        return acctName;
+    }
+
+    public void setAcctName(String acctName) {
+        this.acctName = acctName;
+    }
+
+    public String getSecAcctId() {
+        return secAcctId;
+    }
+
+    public void setSecAcctId(String secAcctId) {
+        this.secAcctId = secAcctId;
+    }
+
+    public String getSecAcctName() {
+        return secAcctName;
+    }
+
+    public void setSecAcctName(String secAcctName) {
+        this.secAcctName = secAcctName;
+    }
+
+    public String getStockHolderNo() {
+        return stockHolderNo;
+    }
+
+    public void setStockHolderNo(String stockHolderNo) {
+        this.stockHolderNo = stockHolderNo;
+    }
+
+    public String getFinprodMarketId() {
+        return finprodMarketId;
+    }
+
+    public void setFinprodMarketId(String finprodMarketId) {
+        this.finprodMarketId = finprodMarketId;
+    }
+
+    public String getPS() {
+        return PS;
+    }
+
+    public void setPS(String pS) {
+        PS = pS;
+    }
+
+    public String getCounterSeat() {
+        return counterSeat;
+    }
+
+    public void setCounterSeat(String counterSeat) {
+        this.counterSeat = counterSeat;
+    }
+
+    public String getCounterDealerId() {
+        return counterDealerId;
+    }
+
+    public void setCounterDealerId(String counterDealerId) {
+        this.counterDealerId = counterDealerId;
+    }
+
+    public String getAppointmentNumber() {
+        return appointmentNumber;
+    }
+
+    public void setAppointmentNumber(String appointmentNumber) {
+        this.appointmentNumber = appointmentNumber;
+    }
+
+    public String getDealNo() {
+        return dealNo;
+    }
+
+    public void setDealNo(String dealNo) {
+        this.dealNo = dealNo;
+    }
+
+    public String getTrdMatchId() {
+        return trdMatchId;
+    }
+
+    public void setTrdMatchId(String trdMatchId) {
+        this.trdMatchId = trdMatchId;
+    }
+
+    public String getQuoterefId() {
+        return quoterefId;
+    }
+
+    public void setQuoterefId(String quoterefId) {
+        this.quoterefId = quoterefId;
+    }
+
+    public Date getTradeDate() {
+        return tradeDate;
+    }
+
+    public void setTradeDate(Date tradeDate) {
+        this.tradeDate = tradeDate;
+    }
+
+    public Date getVDATE() {
+        return VDATE;
+    }
+
+    public void setVDATE(Date vDATE) {
+        VDATE = vDATE;
+    }
+
+    public Date getMDATE() {
+        return MDATE;
+    }
+
+    public void setMDATE(Date mDATE) {
+        MDATE = mDATE;
+    }
+
+    public BigDecimal getEntrustPrice() {
+        return entrustPrice;
+    }
+
+    public void setEntrustPrice(BigDecimal entrustPrice) {
+        this.entrustPrice = entrustPrice;
+    }
+
+    public BigDecimal getFullPrice() {
+        return fullPrice;
+    }
+
+    public void setFullPrice(BigDecimal fullPrice) {
+        this.fullPrice = fullPrice;
+    }
+
+    public BigDecimal getEntrustLeftAmt() {
+        return entrustLeftAmt;
+    }
+
+    public void setEntrustLeftAmt(BigDecimal entrustLeftAmt) {
+        this.entrustLeftAmt = entrustLeftAmt;
+    }
+
+    public BigDecimal getSettleSpeed() {
+        return settleSpeed;
+    }
+
+    public void setSettleSpeed(BigDecimal settleSpeed) {
+        this.settleSpeed = settleSpeed;
+    }
+
+    public Date getValueDate() {
+        return valueDate;
+    }
+
+    public void setValueDate(Date valueDate) {
+        this.valueDate = valueDate;
+    }
+
+    public Date getValueDate2() {
+        return valueDate2;
+    }
+
+    public void setValueDate2(Date valueDate2) {
+        this.valueDate2 = valueDate2;
+    }
+
+    public Date getMaturityDate() {
+        return maturityDate;
+    }
+
+    public void setMaturityDate(Date maturityDate) {
+        this.maturityDate = maturityDate;
+    }
+
+    public Date getMaturityDate2() {
+        return maturityDate2;
+    }
+
+    public void setMaturityDate2(Date maturityDate2) {
+        this.maturityDate2 = maturityDate2;
+    }
+
+    public BigDecimal getTermDays() {
+        return termDays;
+    }
+
+    public void setTermDays(BigDecimal termDays) {
+        this.termDays = termDays;
+    }
+
+    public BigDecimal getTermDays2() {
+        return termDays2;
+    }
+
+    public void setTermDays2(BigDecimal termDays2) {
+        this.termDays2 = termDays2;
+    }
+
+    public String getPurchType() {
+        return purchType;
+    }
+
+    public void setPurchType(String purchType) {
+        this.purchType = purchType;
+    }
+
+    public BigDecimal getMinAmt() {
+        return minAmt;
+    }
+
+    public void setMinAmt(BigDecimal minAmt) {
+        this.minAmt = minAmt;
+    }
+
+    public String getTarFinprodId() {
+        return tarFinprodId;
+    }
+
+    public void setTarFinprodId(String tarFinprodId) {
+        this.tarFinprodId = tarFinprodId;
+    }
+
+    public String getTarinprodAbbr() {
+        return tarinprodAbbr;
+    }
+
+    public void setTarinprodAbbr(String tarinprodAbbr) {
+        this.tarinprodAbbr = tarinprodAbbr;
+    }
+
+    public String getTarinprodMarketId() {
+        return tarinprodMarketId;
+    }
+
+    public void setTarinprodMarketId(String tarinprodMarketId) {
+        this.tarinprodMarketId = tarinprodMarketId;
+    }
+
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
+
+    public String getTraderName() {
+        return traderName;
+    }
+
+    public void setTraderName(String traderName) {
+        this.traderName = traderName;
+    }
+
+    public String getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(String assetType) {
+        this.assetType = assetType;
+    }
+
+    public String getAssetType1() {
+        return assetType1;
+    }
+
+    public void setAssetType1(String assetType1) {
+        this.assetType1 = assetType1;
+    }
+
+    public String getAssetType10() {
+        return assetType10;
+    }
+
+    public void setAssetType10(String assetType10) {
+        this.assetType10 = assetType10;
+    }
+
+    public String getAssetType11() {
+        return assetType11;
+    }
+
+    public void setAssetType11(String assetType11) {
+        this.assetType11 = assetType11;
+    }
+
+    public String getSaleCode() {
+        return saleCode;
+    }
+
+    public void setSaleCode(String saleCode) {
+        this.saleCode = saleCode;
+    }
+
+    public String getConShareId() {
+        return conShareId;
+    }
+
+    public void setConShareId(String conShareId) {
+        this.conShareId = conShareId;
+    }
+
+    public BigDecimal getConPrice() {
+        return conPrice;
+    }
+
+    public void setConPrice(BigDecimal conPrice) {
+        this.conPrice = conPrice;
+    }
+
+    public BigDecimal getConNum() {
+        return conNum;
+    }
+
+    public void setConNum(BigDecimal conNum) {
+        this.conNum = conNum;
+    }
 
     public String getApproverFlage() {
         return approverFlage;
@@ -1174,20 +1165,12 @@ public class EtrCommandDispatcherDto extends BaseEntity{
         this.ourTrader = ourTrader;
     }
 
-	public String getIsAutoReceive() {
-		return isAutoReceive;
-	}
-
-	public void setIsAutoReceive(String isAutoReceive) {
-		this.isAutoReceive = isAutoReceive;
-	}
-
-    public String getRemark() {
-        return remark;
+    public String getIsAutoReceive() {
+        return isAutoReceive;
     }
 
-    public void setRemark(String remark) {
-        this.remark = remark;
+    public void setIsAutoReceive(String isAutoReceive) {
+        this.isAutoReceive = isAutoReceive;
     }
 
     public Date getvPayDate() {
@@ -1238,21 +1221,37 @@ public class EtrCommandDispatcherDto extends BaseEntity{
         this.firstRepoPs = firstRepoPs;
     }
 
-	public String getDerivativeBsDir() {
-		return derivativeBsDir;
-	}
+    public String getRemark() {
+        return remark;
+    }
 
-	public void setDerivativeBsDir(String derivativeBsDir) {
-		this.derivativeBsDir = derivativeBsDir;
-	}
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
 
-	public String getDerivativeOcFlag() {
-		return derivativeOcFlag;
-	}
+    public String getDerivativeBsDir() {
+        return derivativeBsDir;
+    }
 
-	public void setDerivativeOcFlag(String derivativeOcFlag) {
-		this.derivativeOcFlag = derivativeOcFlag;
-	}
+    public void setDerivativeBsDir(String derivativeBsDir) {
+        this.derivativeBsDir = derivativeBsDir;
+    }
+
+    public String getEntrustClass() {
+        return entrustClass;
+    }
+
+    public void setEntrustClass(String entrustClass) {
+        this.entrustClass = entrustClass;
+    }
+
+    public String getDerivativeOcFlag() {
+        return derivativeOcFlag;
+    }
+
+    public void setDerivativeOcFlag(String derivativeOcFlag) {
+        this.derivativeOcFlag = derivativeOcFlag;
+    }
 
     private String busiTypeTg;
 
@@ -1280,26 +1279,15 @@ public class EtrCommandDispatcherDto extends BaseEntity{
         this.entrustBussType = entrustBussType;
     }
 
-    public String getEntrustClass() {
-        return entrustClass;
-    }
-
-    public void setEntrustClass(String entrustClass) {
-        this.entrustClass = entrustClass;
-    }
+    /**
+     * 对手方交易主体代码
+     */
+    private String counterInvestorId;
 
     /**
-     * 行情请求编号
+     * 对手方交易主体类型
      */
-    private String quoteRequestId;
-
-    public String getQuoteRequestId() {
-        return quoteRequestId;
-    }
-
-    public void setQuoteRequestId(String quoteRequestId) {
-        this.quoteRequestId = quoteRequestId;
-    }
+    private String counterInvestorType;
 
     public String getCounterInvestorId() {
         return counterInvestorId;
@@ -1315,5 +1303,18 @@ public class EtrCommandDispatcherDto extends BaseEntity{
 
     public void setCounterInvestorType(String counterInvestorType) {
         this.counterInvestorType = counterInvestorType;
+    }
+
+    /**
+     * 回购到期日
+     */
+    private Date repoMdate;
+
+    public Date getRepoMdate() {
+        return repoMdate;
+    }
+
+    public void setRepoMdate(Date repoMdate) {
+        this.repoMdate = repoMdate;
     }
 }

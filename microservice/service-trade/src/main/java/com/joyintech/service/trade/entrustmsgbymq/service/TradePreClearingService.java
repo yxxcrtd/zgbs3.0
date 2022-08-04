@@ -307,6 +307,15 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         if(etrEntrust != null){
             trdTempDto.setEntrustBussType(etrEntrust.getEntrustType());
         }
+        //add by lpf 取交易员作为createuser 和 updateuser 运营作为审批人 20220730 start
+        Map<String,Object> param =new HashMap<>();
+        param.put("entrustId",infContractDetailfile.getEntrustId());
+        String tradeId = entrustMsgbyMQMapper.queryTradeIdForTInstruction(param);
+        if(StringUtil.isNotEmpty(tradeId)){
+            infContractDetailfile.setCreateUser(tradeId);
+            infContractDetailfile.setUpdateUser(tradeId);
+        }
+        //add by lpf 取交易员作为createuser 和 updateuser 运营作为审批人 20220730 end
         // modify by etliu 20220601 end
         if (DictCodeListExt3.交易方向_质押券入库.getValue().equals(infContractDetailfile.getPs())
                 || DictCodeListExt3.交易方向_质押券出库.getValue().equals(infContractDetailfile.getPs())) {
@@ -2540,6 +2549,10 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         trdProductTempDealAdd.setDealMode(dto.getDealMode());
         // 是否有锁定期
         trdProductTempDealAdd.setWithLockPeriod(dto.getWithLockPeriod());
+        //add by lpf 取交易员作为createuser 和 updateuser 运营作为审批人 20220730 start
+        trdProductTempDealAdd.setCreateUser(infContractDetailfile.getCreateUser());
+        trdProductTempDealAdd.setUpdateUser(infContractDetailfile.getUpdateUser());
+        //add by lpf 取交易员作为createuser 和 updateuser 运营作为审批人 20220730 end
         dto.setTrdProductTempDealAdd(trdProductTempDealAdd);
         // 金融产品临时交易附属表Entity
         // 构造结束----------------------------------------------------------

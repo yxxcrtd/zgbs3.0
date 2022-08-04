@@ -248,6 +248,11 @@ public class CfetsManualSettleUpdateService extends BaseService<CfetsManualSettl
                             trdProductDeal.setCpriceAmt(trdBankManualSetDetail.getSettleAmt());
                             trdProductDeal.setTradeAmt(trdBankManualSetDetail.getSettleAmt());
                             trdProductTempDealMapper.updateByPrimaryKeySelective(trdProductDeal);
+                            //3.更新划款指令表
+                            StlPayTempOrders record = new StlPayTempOrders();
+                            record.setTradeId(trdProductDealAdd.getTradeId());
+                            record.setSettleAmt(trdBankManualSetDetail.getSettleAmt());
+                            stlPayTempOrdersMapper.updateByTradeId(record);
                         }
                         continue;
                     }
@@ -276,7 +281,7 @@ public class CfetsManualSettleUpdateService extends BaseService<CfetsManualSettl
         if(!CollectionUtils.isEmpty(list)) {
             for(PortSettleinfoDto trdBankManualSetDetail : request.getPortSettleinfoDtoList()){
                 for(PortSettleinfoDto trdProductDealAdd : list){
-                    if(StringUtil.equals(trdProductDealAdd.getPortfolioId(),trdBankManualSetDetail.getPortfolioId())){
+                    if (StringUtil.equals(trdProductDealAdd.getPortfolioId(), trdBankManualSetDetail.getPortfolioId())) {
                         TrdProductDeal trdProductDeal = trdProductDealMapper.selectByPrimaryKey(trdProductDealAdd.getTradeId());
                         if(trdBankManualSetDetail.getSettleAmt().compareTo(trdProductDealAdd.getSettleAmt()) != 0) {
                             trdProductDeal.setIntAmt(ArithmeticUtil.subtract(trdBankManualSetDetail.getSettleAmt(), trdProductDealAdd.getSettleAmt()));
@@ -285,16 +290,10 @@ public class CfetsManualSettleUpdateService extends BaseService<CfetsManualSettl
                             trdProductDeal.setTradeAmt(trdBankManualSetDetail.getSettleAmt());
                             trdProductDealMapper.updateByPrimaryKeySelective(trdProductDeal);
                         }
-                        continue;
                     }
                 }
             }
         }
-        //3.更新划款指令表
-        StlPayTempOrders record = new StlPayTempOrders();
-        record.setTradeId(request.getTradeId());
-        record.setSettleAmt(request.getSettleAmtT());
-        stlPayTempOrdersMapper.updateByTradeId(record);
     }
 
 

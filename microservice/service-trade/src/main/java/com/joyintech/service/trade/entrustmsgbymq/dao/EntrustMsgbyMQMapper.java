@@ -180,4 +180,14 @@ public interface EntrustMsgbyMQMapper {
      */
     List<OriPledgeInfo> getOriFinDealPledgeList(@Param("tradeId") String tradeId);
 
+    /**
+     * 根据委托代码查询交易员
+     *
+     * @param entrustId 委托代码
+     * @return 交易员
+     * @see
+     * @since 1.0
+     */
+    String queryTradeIdForTInstruction(Map<String,Object>param);
+
 }

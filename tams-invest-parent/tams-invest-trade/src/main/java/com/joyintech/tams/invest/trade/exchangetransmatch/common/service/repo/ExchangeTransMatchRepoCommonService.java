@@ -842,7 +842,8 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
         // 中途换券换钱特殊处理
         if (StringUtil.equals(trdTempDto.getPs(),DictCodeListExt3.交易方向_中途换券.getValue())
         // 中途换券的换钱tradeAmt不为空
-                && StringUtil.isNotEmpty(baseTradeProductDealDtos.get(0).getTrdProductDeal().getTradeAmt())){
+                && StringUtil.isNotEmpty(baseTradeProductDealDtos.get(0).getTrdProductDeal().getTradeAmt()) &&
+                StringUtil.equals(baseTradeProductDealDtos.get(0).getTrdProductDeal().getTradeMarket(),DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
             parameter.setPs(parameter.getPs() + "_" + DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换钱.getValue());
         }
 

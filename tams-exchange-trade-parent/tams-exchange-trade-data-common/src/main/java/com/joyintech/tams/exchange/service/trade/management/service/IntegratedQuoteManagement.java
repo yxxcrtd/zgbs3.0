@@ -174,6 +174,7 @@ public class IntegratedQuoteManagement {
     }
 
     private void setNegotiateQuoteSendBean(NegotiateQuoteSendBean negotiateQuoteSendBean, IntegratedEntrustVo integratedEntrust) {
+        negotiateQuoteSendBean.setId(integratedEntrust.getId());
         negotiateQuoteSendBean.setRequestNo(integratedEntrust.getId());
         negotiateQuoteSendBean.setRequestTime(DateUtil.formatDateTime(integratedEntrust.getCreateTime()));
         negotiateQuoteSendBean.setStockCode(integratedEntrust.getStockCode());

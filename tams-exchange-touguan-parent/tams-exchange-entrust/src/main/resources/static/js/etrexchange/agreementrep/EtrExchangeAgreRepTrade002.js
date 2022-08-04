@@ -355,15 +355,15 @@
         }
         var attr = $("#tradeMarket").attr("disabled");
         if (tradeMarket && !attr && tradeMarket == '03') {
-            $("#psList").val('03');
+            $("#psList").val('03,T92');
             $("#ps").val('').trigger('change');
             $("#repSecId").val('').trigger('change');
         } else if (tradeMarket && !attr && tradeMarket == '04') {
-            $("#psList").val('03,04');
+            $("#psList").val('03,04,T92');
             $("#ps").val('').trigger('change');
             $("#repSecId").val('').trigger('change');
         } else if (!tradeMarket && !attr) {
-            $("#psList").val('03,04');
+            $("#psList").val('03,04,T92');
             $("#ps").val('').trigger('change');
             $("#repSecId").val('').trigger('change');
         }
@@ -374,7 +374,7 @@
         linkAcctNo(false);
         pageShowEdit(false);
         $("#acctTradeMarket").val(tradeMarket);
-        linkPledgeUnit();
+        // linkPledgeUnit();
         removeMustOfRepSecId();
     };
     var settleDateChange = function () {
@@ -447,7 +447,12 @@
         var occupyDays = $("#occupyDays").val();
         var tradeAmt = $("#tradeAmt").val();
         var y = $("#yield").val();
-        $("#yield").val(Number(y).toFixed(2)).trigger('change');
+        var fixedNum = 2;
+        var tradeMarket = $("#tradeMarket").val();
+        if (tradeMarket === TRADE_MARKET_03){
+            fixedNum = 3;
+        }
+        $("#yield").val(Number(y).toFixed(fixedNum));
         if (occupyDays && tradeAmt && y) {
             var intamt = Math.round(tradeAmt * y / 100 * occupyDays / 365 * 100) / 100;
             var expireSettleAmt = parseFloat(intamt) + parseFloat(tradeAmt);
@@ -529,11 +534,11 @@
                 Joyin.ajaxSync(basePath + 'invest/entrust/etragrereptrade/EtrAgreRepTrade001/getFaceValue', param, function (obj) {
                     if (obj && obj != '') {
                         if (obj == 0) {
-                            $("#repSecNum").val(0).toFixed(2);
+                            $("#repSecNum").val(0);
                             $("#printAmt").val(0);
                         } else {
-                            $("#repSecNum").val(Math.round(tradeAmt * 100 / conRatio / obj).toFixed(2));
-                            $("#printAmt").val(Math.round(tradeAmt * 100 / conRatio));
+                            $("#repSecNum").val(Math.round(tradeAmt * 100 / conRatio / obj/100).toFixed(2));
+                            $("#printAmt").val(Math.round(tradeAmt * 100 / conRatio/100));
                         }
                         $("#pledgeFaceValue").val(obj).trigger('change');
                     }
@@ -663,7 +668,7 @@
                 if (init) {
                     $("#fristSettleDate").attr("disabled", true);
                 } else {
-                    $("#fristSettleDate").val(iPlatformDate).attr("disabled", true).trigger('change');
+                    $("#fristSettleDate").val(iPlatformDate).attr("disabled", true);
                 }
                 //到期结算日
                 $("#expireSettleDate").attr("disabled", true);
@@ -676,7 +681,7 @@
                 //质押券
                 $("#repSecId").attr("disabled", false);
                 //折算比例
-                $("#conRatio").attr("disabled", false);
+                $("#conRatio").attr("disabled", true);
                 //质押数量
                 $("#repSecNum").attr("disabled", false);
                 //券面金额
@@ -718,7 +723,7 @@
                 //补充协议
                 $("#addCla_div").show();
                 $("#addCla").attr("disabled", false);
-
+                $("#fristSettleDate").trigger('change');
             } else if (ps == 'T92' && repPs == BACK_LEND_DIRECTION_04) {
                 //本方交易员
                 $("#trader_div").hide();
@@ -751,7 +756,7 @@
                 //质押券
                 $("#repSecId").attr("disabled", false);
                 //折算比例
-                $("#conRatio").attr("disabled", false);
+                $("#conRatio").attr("disabled", true);
                 //质押数量
                 $("#repSecNum").attr("disabled", false);
                 //券面金额
@@ -1262,11 +1267,6 @@
                     $("#addCla").attr("disabled", false);
                 }
             } else if (ps == 'T94') {
-                let outAmtValue = $("#outAmt").val()
-                if (outAmtValue != null && outAmtValue != "" && outAmtValue != undefined) {
-                    $("#outRepSecNum").val("")
-                    $("#newRepSecNum").val("")
-                }
                 if (repPs == BACK_LEND_DIRECTION_03) {
                     //本方交易员
                     $("#trader_div").hide();
@@ -1436,6 +1436,15 @@
                     //补充协议
                     $("#addCla_div").show();
                     $("#addCla").attr("disabled", false);
+                }
+                let outAmtValue = $("#outAmt").val();
+                console.log("outAmtValue " + outAmtValue);
+                if (outAmtValue != null && outAmtValue != "" && outAmtValue != undefined) {
+                    $("#outRepSecNum").val("");
+                    $("#newRepSecNum").val("");
+                    $("#newRepSecId").val("");
+                    $("#newRepSecId").attr("disabled", true);
+                    $("#newRepSecNum").attr("disabled", true);
                 }
             } else if (ps == 'T93') {
                 if (repPs == BACK_LEND_DIRECTION_03) {
@@ -2194,6 +2203,15 @@
                 $("#outRepSecNum").attr('disabled', true);
                 $("#outAmt").attr('disabled', true);
                 $("#reqOnId").attr('disabled', true);
+            }
+            //中途换券 换钱
+            if(entity.entrustBussType === '31'){
+                $("#outAmt").attr('disabled', false);
+            }
+            //中途换券 换券
+            if(entity.entrustBussType === '21'){
+                $("#outRepSecId").attr('disabled', false);
+                $("#outRepSecNum").attr('disabled', false);
             }
         }
         if (entityStr) {

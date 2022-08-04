@@ -286,6 +286,7 @@
                 object.secAccount = item.secAcctId;
                 object.repoType = item.repoType;
                 object.remainNum = item.remainNum;
+                object.remainAmount = item.remainAmount;
                 // GNS-847:增加期限品种条件 modify by fuyongsheng 20220215 start
                 object.termType = item.termType;
                 // GNS-847:增加期限品种条件 modify by fuyongsheng 20220215 end

@@ -221,4 +221,11 @@
 	<!--		where F_TRADE_ID = #{fTradeId,jdbcType=VARCHAR}-->
 	<!--	</select>-->
 
+	<select id="queryTradeIdForTInstruction" resultType="java.lang.String">
+		select
+			ti.TRADE_ID as tradeId   /*交易员*/
+		from T_INSTRUCTION ti
+		where ti.ENTRUST_ID = #{entrustId}
+	</select>
+
 </mapper>

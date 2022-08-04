@@ -8,7 +8,14 @@
                 ELSE
                     B.MATCH_STATUS
                 END matchStatus,
-                ROUND(F.MARCH_QTY / A.SHARE_AMT,4) matchProgress,
+                <!-- ROUND(F.MARCH_QTY / A.SHARE_AMT,4) matchProgress,-->
+                CASE
+                    <!--协议回购换钱-->
+                    WHEN A1.REPO_TYPE = #{TARGET_BACK_TYPE_H01} AND A.BUSI_SCENE_CALSS = #{BUSI_SCENE_CALSS_0902RS0103} THEN ROUND(F.MARCH_AMT/A.FPRICE_AMT,4)
+                    <!--协议回购深交所解除质押有钱-->
+                    WHEN A1.REPO_TYPE = #{TARGET_BACK_TYPE_H01} AND A.PS = #{PS_T93} AND A.TRADE_MARKET = #{TRADE_MARKET_04} AND NVL(A.FPRICE_AMT, 0) > 0 THEN ROUND(F.MARCH_AMT/A.FPRICE_AMT,4)
+                    ELSE ROUND(F.MARCH_QTY/A.SHARE_AMT,4)
+                END matchProgress,
                 A.TRADE_MARKET tradeMarket,
                 A.TRADE_MARKET_MODE tradeMarketMode,
                 A.APPLY_TRADE_ID applyTradeId,
@@ -34,17 +41,33 @@
                 A.SEAT_NUMBER seatNumber,
                 A.TRADE_PLAT tradePlat,
                 A.PS ps,
-                NVL(A.SHARE_AMT,0) - NVL(F.MARCH_QTY,0) remainNum,
+                <!--NVL(A.SHARE_AMT,0) - NVL(F.MARCH_QTY,0) remainNum,-->
                 CASE
+                    <!--协议回购换钱-->
+                    WHEN A1.REPO_TYPE = #{TARGET_BACK_TYPE_H01} AND A.BUSI_SCENE_CALSS = #{BUSI_SCENE_CALSS_0902RS0103} THEN 0
+                    <!--协议回购深交所解除质押有钱-->
+                    WHEN A1.REPO_TYPE = #{TARGET_BACK_TYPE_H01} AND A.PS = #{PS_T93} AND A.TRADE_MARKET = #{TRADE_MARKET_04} AND NVL(A.FPRICE_AMT, 0) > 0 THEN 0
+                    ELSE NVL(A.SHARE_AMT,0) - NVL(F.MARCH_QTY,0)
+                END remainNum,
+                <!--CASE
                 WHEN A.SEC_TYPE = #{SEC_TYPE_09} THEN
-                    NVL(A.SHARE_AMT,0) - NVL(F.MARCH_AMT,0)
+                NVL(A.SHARE_AMT,0) - NVL(F.MARCH_AMT,0)
                 ELSE
-                    NVL(A.FPRICE_AMT,0) - NVL(F.MARCH_AMT,0)
+                NVL(A.FPRICE_AMT,0) - NVL(F.MARCH_AMT,0)
+                END remainAmount,-->
+                CASE
+                    <!--协议回购换钱-->
+                    WHEN A1.REPO_TYPE = #{TARGET_BACK_TYPE_H01} AND A.BUSI_SCENE_CALSS = #{BUSI_SCENE_CALSS_0902RS0103} THEN NVL(A.FPRICE_AMT,0) - NVL(F.MARCH_AMT,0)
+                    <!--协议回购深交所解除质押有钱-->
+                    WHEN A1.REPO_TYPE = #{TARGET_BACK_TYPE_H01} AND A.PS = #{PS_T93} AND A.TRADE_MARKET = #{TRADE_MARKET_04} AND NVL(A.FPRICE_AMT, 0) > 0 THEN NVL(A.FPRICE_AMT,0) - NVL(F.MARCH_AMT,0)
+                    <!--其余回购-->
+                    WHEN A.SEC_TYPE = #{SEC_TYPE_09} THEN NVL(A.SHARE_AMT,0) - NVL(F.MARCH_AMT,0)
+                    ELSE NVL(A.FPRICE_AMT,0) - NVL(F.MARCH_AMT,0)
                 END remainAmount,
                 CASE
-                WHEN A.SEC_TYPE = #{SEC_TYPE_09} THEN A.UNIT_CPRICE
-                ELSE
-                A.UNIT_FPRICE END unitFprice,
+                    WHEN A.SEC_TYPE = #{SEC_TYPE_09} THEN A.UNIT_CPRICE
+                    ELSE A.UNIT_FPRICE
+                END unitFprice,
                 A.UNIT_CPRICE unitCprice,
                 A.UNIT_INT unitInt,
                 A.CCY ccy,
@@ -165,162 +188,141 @@
         </where>
     </select>
 
-    <select id="findEntrustPage" resultType="com.joyintech.service.trade.exchangetransmatch.dto.ExchangeTransMatch003Dto">
-        SELECT
-                DISTINCT
-                A1.ENTRUST_ID entrustId,
-                D1.TARGET_TYPE targetType,
-                A1.UPDATE_TIME updateTime,
-                #{TRADE_TYPE_02} tradeType,
-                CASE
-                WHEN A1.ENTRUST_CLASS = #{ENTRUST_CLASS_02} THEN
-                det.PORTFOLIO_ID
-                ELSE
-                A1.PORTFOLIO_ID
-                END portfolioId,
-                CASE
-                WHEN A1.ENTRUST_CLASS = #{ENTRUST_CLASS_02} THEN
-                    det.PORTFOLIO_NAME
-                ELSE
-                    B1.PORTFOLIO_NAME
-                END portfolioName,
-                CASE
-                    WHEN A1.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01} THEN #{SEC_TYPE_01}
-                    WHEN A1.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F10} THEN #{SEC_TYPE_06}
-                    WHEN A1.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F06} THEN #{SEC_TYPE_02}
-                    WHEN A1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) THEN #{SEC_TYPE_09}
-                    WHEN A1.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F37} THEN #{SEC_TYPE_14}
-                END secType,
-                CASE
-                    WHEN A1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) THEN NULL
-                    ELSE A1.FINPROD_ID
-                END finprodId,
-                A1.FINPROD_TYPE2 finprodType2,
-                CASE
-                    WHEN A1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) THEN
-                    NULL
-                ELSE
-                    C1.FINPROD_MARKET_ID
-                END finprodMarketId,
-                A1.ENTRUST_DATE entrustDate,
-                A1.PS ps,
-                A1.TRADE_MARKET tradeMarket,
-                A1.TRADE_PLAT tradePlat,
-                CASE
-                    WHEN (A1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND A1.PS IN (#{PS_T93})) THEN
-                        NVL(G2.PLEDGE_NUMBER,0)-NVL(S.MARCH_QTY_EN,0)
-                    WHEN (A1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND A1.PS IN (#{PS_T94}) AND A1.ENTRUST_TYPE = #{ENTRUST_TYPE_21}) THEN
-                        NVL(G1.PLEDGE_NUMBER,0)-NVL(S.MARCH_QTY_EN,0)
-                    ELSE
-                        NVL(A1.ENTRUST_AMT,0)-NVL(S.MARCH_AMT_EN,0) END entrustAmt,
-                A1.PRICE price,
-                CASE
-                WHEN
-                    (A1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND A1.PS NOT IN (#{PS_T93},#{PS_T94})) THEN
-                    NVL(A1.ENTRUST_AMT,0)-NVL(S.MARCH_AMT_EN,0)
-                WHEN
-                    (A1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND A1.PS IN (#{PS_T93})) THEN
-                    NVL(G2.PLEDGE_NUMBER,0)-NVL(S.MARCH_QTY_EN,0)
-                WHEN
-                    (A1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND A1.PS IN (#{PS_T94}) AND A1.ENTRUST_TYPE = #{ENTRUST_TYPE_21}) THEN
-                    NVL(G1.PLEDGE_NUMBER,0)-NVL(S.MARCH_QTY_EN,0)
-                ELSE
-                    NVL(A1.ENTRUST_NUM,0) - NVL(S.MARCH_QTY_EN,0)
-                END
-                    entrustNum,
-                E1.SEC_ACCT_ID secAcctId,
-                E1.SEC_ACCT_NAME secAcctName,
-                F1.ACCT_NO acctNo,
-                F1.ACCT_NAME acctName,
-                A1.ENTRUST_CLASS entrustClass
-        FROM ETR_ENTRUST A1
-            LEFT JOIN PTL_PORTFOLIO B1
-                ON A1.PORTFOLIO_ID = B1.PORTFOLIO_ID
-            LEFT JOIN (SELECT ENTRUST_ID,to_char(wm_concat ( ETR_ENTRUST_DETAIL.PORTFOLIO_ID )) PORTFOLIO_ID,  to_char(wm_concat ( PORTFOLIO_NAME )) PORTFOLIO_NAME FROM ETR_ENTRUST_DETAIL LEFT JOIN PTL_PORTFOLIO
-                ON ETR_ENTRUST_DETAIL.portfolio_id = PTL_PORTFOLIO.portfolio_id GROUP BY ENTRUST_ID ) det on det.ENTRUST_ID = A1.ENTRUST_ID
-            LEFT JOIN FIN_PRODUCT C1
-                ON A1.FINPROD_ID = C1.FINPROD_ID
-            LEFT JOIN ETR_ENTRUST_ADD D1
-                ON D1.ENTRUST_ID = A1.ENTRUST_ID
-            LEFT JOIN (SELECT ENTRUNST_TRADE_ID,
-                            NVL(SUM(MARCH_QTY_EN), 0) MARCH_QTY_EN,
-                            NVL(SUM(MARCH_AMT_EN), 0) MARCH_AMT_EN
-                        FROM SETTLE_TRANS_DATA_TOTAL_MATCH
-                        GROUP BY ENTRUNST_TRADE_ID) S
-            ON S.ENTRUNST_TRADE_ID = A1.ENTRUST_ID
-            LEFT JOIN STL_SEC_ACCT_INFO E1
-                ON E1.SEC_ACCT_ID = D1.SEC_ACCT_ID
-            LEFT JOIN STL_CAPACCT_INFO F1
-                ON F1.ACCT_NO = E1.TRD_ACCT_ID
-            LEFT JOIN ETR_PLEDGE G1 <!--换券-->
-                ON G1.ENTRUST_ID = A1.ENTRUST_ID
-                AND G1.DISPLACE_DIR = #{DISPLACE_DIRECTION_01}
-                AND A1.PS = #{PS_T94}
-            LEFT JOIN ETR_PLEDGE G2 <!--解除质押-->
-                ON G2.ENTRUST_ID = A1.ENTRUST_ID AND A1.PS = #{PS_T93}
-        WHERE A1.ENTRUST_STATUS = #{ENTRUST_STATUS_03}
+    <sql id="findEntrustPageCommon">
+        SELECT DISTINCT
+            A1.ENTRUST_ID entrustId,
+            D1.TARGET_TYPE targetType,
+            A1.UPDATE_TIME updateTime,
+            #{TRADE_TYPE_02} tradeType,
+            CASE
+                WHEN A1.ENTRUST_CLASS = #{ENTRUST_CLASS_02} THEN det.PORTFOLIO_ID
+                ELSE A1.PORTFOLIO_ID
+            END portfolioId,
+            CASE
+                WHEN A1.ENTRUST_CLASS = #{ENTRUST_CLASS_02} THEN det.PORTFOLIO_NAME
+                ELSE B1.PORTFOLIO_NAME
+            END portfolioName,
+            CASE
+                WHEN A1.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01} THEN #{SEC_TYPE_01}
+                WHEN A1.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F10} THEN #{SEC_TYPE_06}
+                WHEN A1.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F06} THEN #{SEC_TYPE_02}
+                WHEN A1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) THEN #{SEC_TYPE_09}
+                WHEN A1.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F37} THEN #{SEC_TYPE_14}
+            END secType,
+            CASE
+                WHEN A1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) THEN NULL
+                ELSE A1.FINPROD_ID
+            END finprodId,
+            A1.FINPROD_TYPE2 finprodType2,
+            CASE
+                WHEN A1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) THEN NULL
+                ELSE C1.FINPROD_MARKET_ID
+            END finprodMarketId,
+            A1.ENTRUST_DATE entrustDate,
+            A1.PS ps,
+            A1.TRADE_MARKET tradeMarket,
+            A1.TRADE_PLAT tradePlat,
+            NVL(A1.ENTRUST_AMT,0) - NVL(S.MARCH_AMT_EN,0) entrustAmt,
+            A1.PRICE price,
+            NVL(A1.ENTRUST_NUM,0) - NVL(S.MARCH_QTY_EN,0) entrustNum,
+            E1.SEC_ACCT_ID secAcctId,
+            E1.SEC_ACCT_NAME secAcctName,
+            F1.ACCT_NO acctNo,
+            F1.ACCT_NAME acctName,
+            A1.ENTRUST_CLASS entrustClass
+        FROM
+            ETR_ENTRUST A1
+        LEFT JOIN
+            PTL_PORTFOLIO B1 ON A1.PORTFOLIO_ID = B1.PORTFOLIO_ID
+        LEFT JOIN
+            (SELECT ENTRUST_ID,to_char(wm_concat ( ETR_ENTRUST_DETAIL.PORTFOLIO_ID )) PORTFOLIO_ID,  to_char(wm_concat ( PORTFOLIO_NAME )) PORTFOLIO_NAME FROM ETR_ENTRUST_DETAIL LEFT JOIN PTL_PORTFOLIO
+                ON ETR_ENTRUST_DETAIL.portfolio_id = PTL_PORTFOLIO.portfolio_id GROUP BY ENTRUST_ID
+            ) det on det.ENTRUST_ID = A1.ENTRUST_ID
+        LEFT JOIN
+            FIN_PRODUCT C1 ON A1.FINPROD_ID = C1.FINPROD_ID
+        LEFT JOIN
+            ETR_ENTRUST_ADD D1 ON D1.ENTRUST_ID = A1.ENTRUST_ID
+        LEFT JOIN
+            (SELECT ENTRUNST_TRADE_ID,
+                NVL(SUM(MARCH_QTY_EN), 0) MARCH_QTY_EN,
+                NVL(SUM(MARCH_AMT_EN), 0) MARCH_AMT_EN
+                FROM SETTLE_TRANS_DATA_TOTAL_MATCH
+                GROUP BY ENTRUNST_TRADE_ID
+            ) S ON S.ENTRUNST_TRADE_ID = A1.ENTRUST_ID
+        LEFT JOIN
+            STL_SEC_ACCT_INFO E1 ON E1.SEC_ACCT_ID = D1.SEC_ACCT_ID
+        LEFT JOIN
+            STL_CAPACCT_INFO F1 ON F1.ACCT_NO = E1.TRD_ACCT_ID
+        WHERE
+            A1.ENTRUST_STATUS = #{ENTRUST_STATUS_03}
             AND A1.TRADE_MARKET IN (#{TRADE_PLACE_03},#{TRADE_PLACE_04})
             AND A1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F01}, #{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}, #{FINPROD_TYPE_TG_F06}, #{FINPROD_TYPE_TG_F10}, #{FINPROD_TYPE_TG_F37})
-            <if test="portfolioIdList!=null and portfolioIdList.size()>0 ">
-                AND (A1.PORTFOLIO_ID IN
-                <foreach item="item" index="index" collection="portfolioIdList" open="(" close=")" separator=",">
-                    <if test="(index % 998) == 0">
-                        null) or A1.PORTFOLIO_ID in (
-                    </if>
-                    #{item}
-                </foreach>)
-            </if>
-            <if test="finprodType2List!=null and finprodType2List.size()>0 ">
-                AND (A1.FINPROD_TYPE2 IN
-                <foreach item="item" index="index" collection="finprodType2List" open="(" close=")" separator=",">
-                    <if test="(index % 998) == 0">
-                        null) or A1.FINPROD_TYPE2 in (
-                    </if>
-                    #{item}
-                </foreach>)
-            </if>
-            <if test="finprodId!=null and finprodId!='' ">
-                AND C1.FINPROD_MARKET_ID = #{finprodId}
-            </if>
-            <if test="finprodType1!=null and finprodType1!='' ">
-                AND A1.FINPROD_TYPE2 = #{finprodType1}
-            </if>
-            <if test="ps!=null and ps!='' ">
-                AND A1.PS = #{ps}
-            </if>
-            <if test="tradeDateBegin!=null and tradeDateBegin!='' ">
-                AND <![CDATA[ A1.ENTRUST_DATE >= TO_DATE(#{tradeDateBegin}, 'yyyy-mm-dd') ]]>
-            </if>
-            <if test="tradeDateEnd!=null and tradeDateEnd!='' ">
-                AND <![CDATA[ A1.ENTRUST_DATE <= TO_DATE(#{tradeDateEnd}, 'yyyy-mm-dd') ]]>
-            </if>
-            <if test="tradeMarket!=null and tradeMarket!='' ">
-                AND A1.TRADE_MARKET = #{tradeMarket}
-            </if>
-<!--            <if test="tradePlat!=null and tradePlat!='' ">-->
-<!--                AND A1.TRADE_PLAT = #{tradePlat}-->
-<!--            </if>-->
-            <if test="dealDate!=null and dealDate!='' ">
-                AND A1.ENTRUST_DATE = TO_DATE(#{dealDate}, 'yyyy-mm-dd')
-            </if>
-            <if test="secAccount!=null and secAccount!='' ">
-                AND D1.SEC_ACCT_ID = #{secAccount}
-            </if>
-
-            <if test="repoType!=null and repoType!='' and repoType == 'H01'.toString()">
-                <if test="ps!=null and ps!='' and (ps == 'T93'.toString() or ps == 'T94'.toString())">
-                    AND NVL(G1.PLEDGE_NUMBER,0)-NVL(S.MARCH_AMT_EN,0) >=  #{remainNum}
+        <if test="portfolioIdList!=null and portfolioIdList.size()>0 ">
+            AND (A1.PORTFOLIO_ID IN
+            <foreach item="item" index="index" collection="portfolioIdList" open="(" close=")" separator=",">
+                <if test="(index % 998) == 0">
+                    null) or A1.PORTFOLIO_ID in (
                 </if>
-                <if test="ps!=null and ps!='' and (ps != 'T93'.toString() and ps != 'T94'.toString())">
-                    AND NVL(A1.ENTRUST_AMT,0)-NVL(S.MARCH_AMT_EN,0) >=  #{remainNum}
+                #{item}
+            </foreach>)
+        </if>
+        <if test="finprodType2List!=null and finprodType2List.size()>0 ">
+            AND (A1.FINPROD_TYPE2 IN
+            <foreach item="item" index="index" collection="finprodType2List" open="(" close=")" separator=",">
+                <if test="(index % 998) == 0">
+                    null) or A1.FINPROD_TYPE2 in (
                 </if>
+                #{item}
+            </foreach>)
+        </if>
+        <if test="finprodId!=null and finprodId!='' ">
+            AND C1.FINPROD_MARKET_ID = #{finprodId}
+        </if>
+        <if test="finprodType1!=null and finprodType1!='' ">
+            AND A1.FINPROD_TYPE2 = #{finprodType1}
+        </if>
+        <if test="ps!=null and ps!='' ">
+            AND A1.PS = #{ps}
+        </if>
+        <if test="tradeDateBegin!=null and tradeDateBegin!='' ">
+            AND <![CDATA[ A1.ENTRUST_DATE >= TO_DATE(#{tradeDateBegin}, 'yyyy-mm-dd') ]]>
+        </if>
+        <if test="tradeDateEnd!=null and tradeDateEnd!='' ">
+            AND <![CDATA[ A1.ENTRUST_DATE <= TO_DATE(#{tradeDateEnd}, 'yyyy-mm-dd') ]]>
+        </if>
+        <if test="tradeMarket!=null and tradeMarket!='' ">
+            AND A1.TRADE_MARKET = #{tradeMarket}
+        </if>
+        <!--            <if test="tradePlat!=null and tradePlat!='' ">-->
+        <!--                AND A1.TRADE_PLAT = #{tradePlat}-->
+        <!--            </if>-->
+        <if test="dealDate!=null and dealDate!='' ">
+            AND A1.ENTRUST_DATE = TO_DATE(#{dealDate}, 'yyyy-mm-dd')
+        </if>
+        <if test="secAccount!=null and secAccount!='' ">
+            AND D1.SEC_ACCT_ID = #{secAccount}
+        </if>
+        <!--GNS-847:竞价回购增加期限品种查询条件 modify by fuyongsheng 20220215 start-->
+        <if test="termType !=null and termType!='' and repoType!=null and repoType!='' and repoType == 'H02'.toString()">
+            AND A1.FINPROD_ID = #{termType}
+        </if>
+    </sql>
 
-            </if>
-            <!--GNS-847:竞价回购增加期限品种查询条件 modify by fuyongsheng 20220215 start-->
-            <if test="termType !=null and termType!='' and repoType!=null and repoType!='' and repoType == 'H02'.toString()">
-                AND A1.FINPROD_ID = #{termType}
-            </if>
-            <!--GNS-847:竞价回购增加期限品种查询条件 modify by fuyongsheng 20220215 end-->
+    <select id="findEntrustPage" resultType="com.joyintech.service.trade.exchangetransmatch.dto.ExchangeTransMatch003Dto">
+        <!--将指令拆分成金额指令和数量指令分别处理 modify by fuyongsheng 20220804 start-->
+        <include refid="findEntrustPageCommon"></include>
+        <if test="repoType!=null and repoType!='' and repoType == 'H01'.toString()">
+            AND NVL(A1.ENTRUST_NUM,0)-NVL(S.MARCH_QTY_EN,0) >= #{remainNum}
+        </if>
+        AND D1.TARGET_TYPE = #{TARGET_TYPE_01}
+        UNION
+        <include refid="findEntrustPageCommon"></include>
+        <if test="repoType!=null and repoType!='' and repoType == 'H01'.toString()">
+            AND NVL(A1.ENTRUST_AMT,0)-NVL(S.MARCH_AMT_EN,0) >= #{remainAmount}
+        </if>
+        AND D1.TARGET_TYPE = #{TARGET_TYPE_02}
+        <!--将指令拆分成金额指令和数量指令分别处理 modify by fuyongsheng 20220804 end-->
+        <!--GNS-847:竞价回购增加期限品种查询条件 modify by fuyongsheng 20220215 end-->
         <!--一级投标债指令特殊处理,故分开查询-->
         UNION
         SELECT
@@ -524,9 +526,9 @@
         <where>
             <if test="search != null and search != ''">
                 and (
-                SEC_ACCT_ID like concat(concat('%',#{search}),'%')
+                A.SEC_ACCT_ID like concat(concat('%',#{search}),'%')
                 or
-                SEC_ACCT_NAME like concat(concat('%',#{search}),'%')
+                B.SEC_ACCT_NAME like concat(concat('%',#{search}),'%')
                 )
             </if>
         </where>
