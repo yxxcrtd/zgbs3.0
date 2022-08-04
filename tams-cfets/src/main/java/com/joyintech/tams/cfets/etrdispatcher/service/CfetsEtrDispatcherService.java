@@ -38,6 +38,7 @@ import com.joyintech.tams.business.common.entity.CfgDataTableShow;
 import com.joyintech.tams.business.common.entity.CfgReadonlyFormShow;
 import com.joyintech.tams.business.common.service.EtrCommonFinProductInfoService;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
+import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dao.CfetsEtrBondFirstBid001Mapper;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsBiddingProductDto;
 import com.joyintech.tams.cfets.etr.bondfirstbid.dto.CfetsEtrBondFirstBid002Dto;
@@ -424,7 +425,8 @@ public class CfetsEtrDispatcherService extends BaseService {
                     response.setExecFinishAmt(ArithmeticUtil.divide(response.getExecFinishAmt(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                     response.setExecRemainderAmt(ArithmeticUtil.divide(response.getExecRemainderAmt(), new BigDecimal("100"), 2, RoundingMode.HALF_UP));
                     response.setDealProgress(ArithmeticUtil.divide(response.getTransFinishAmt(),ArithmeticUtil.doAdd(response.getTransFinishAmt(),response.getTransRemainderAmt()),4, RoundingMode.HALF_UP).multiply(new BigDecimal("100")));
-                //add wsz 20220621 3.0.6场内 ZGCPCN-1511 【信用保护凭证指令分发】执行进度和成交进度显示有问题 start
+                    response.setEntrustAmt(ArithmeticUtil.multiply(response.getEntrustAmt(),BigDecimal.valueOf(100)));
+                    //add wsz 20220621 3.0.6场内 ZGCPCN-1511 【信用保护凭证指令分发】执行进度和成交进度显示有问题 start
                 } else if (StringUtil.equals(response.getFinprodType2(), DictCodeListExt2.平安资产类型_信用保护凭证.getValue())) {
                     response.setExecFinishAmt(ArithmeticUtil.divide(response.getExecFinishAmt(), new BigDecimal(100),4, RoundingMode.HALF_UP));
                     response.setExecRemainderAmt(ArithmeticUtil.divide(response.getExecRemainderAmt(), new BigDecimal(100),4, RoundingMode.HALF_UP));
@@ -1441,7 +1443,8 @@ public class CfetsEtrDispatcherService extends BaseService {
                 }
                 if(b) {
                     if(Objects.nonNull(etrEntrustAdd)) {
-                        if (StringUtil.equals(etrEntrustAdd.getBusiTypePosition(), 头寸业务类型_债券一级投标.getValue()) || StringUtil.equals(etrEntrustAdd.getBusiTypePosition(), 头寸业务类型_债券一级申购.getValue())) {
+                        if (StringUtil.equals(etrEntrustAdd.getBusiTypePosition(), 头寸业务类型_债券一级投标.getValue())
+                                || StringUtil.equals(etrEntrustAdd.getBusiTypePosition(), 头寸业务类型_债券一级申购.getValue())) {
                             b = false;
                         }
                     }
@@ -1770,6 +1773,9 @@ public class CfetsEtrDispatcherService extends BaseService {
                         infoDto.setPledStrdPrinAmt(ArithmeticUtil.divide(infoDto.getPledStrdPrinAmt(), new BigDecimal("10000"), 2));
                         if (StringUtil.isNoneBlank(infoDto.getRegistOrg())) {
                             infoDto.setRepRegistOrg(SysDataUtil.getNameFromDataDict(DictCode.登记托管机构_中债, infoDto.getRegistOrg()));
+                        }
+                        if(BigDecimalUtil.isZeroOrNull(infoDto.getPledStrdPrinAmt())){
+                            infoDto.setPledStrdPrinAmt(null);
                         }
                     }
                     CfetsEtrDispatcherInfoResponse totalResult = new CfetsEtrDispatcherInfoResponse();

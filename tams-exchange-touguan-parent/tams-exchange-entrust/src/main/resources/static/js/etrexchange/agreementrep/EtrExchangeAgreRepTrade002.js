@@ -23,8 +23,8 @@
         var yield = $("#yield").val();
         object.yield = yield;
         //根据指令方向设置质押式回购的金融产品类型
-        console.log($("#ps").val()," ____  ",$("#entrustAmt").val())
-        if($("#ps").val() == 'T93'){
+        console.log($("#ps").val(), " ____  ", $("#entrustAmt").val())
+        if ($("#ps").val() == 'T93') {
             object.expireSettleAmt = $("#entrustAmt").val();
         }
         object.mdate = object.vdate;
@@ -348,22 +348,22 @@
      */
     var tradeMarketChange = function () {
         var tradeMarket = $("#tradeMarket").val();
-        if(tradeMarket == TRADE_MARKET_03){
+        if (tradeMarket == TRADE_MARKET_03) {
             $("#yield").attr("data-textrange", 3);
-        }else {
+        } else {
             $("#yield").attr("data-textrange", 2);
         }
         var attr = $("#tradeMarket").attr("disabled");
         if (tradeMarket && !attr && tradeMarket == '03') {
-            $("#psList").val('03');
+            $("#psList").val('03,T92');
             $("#ps").val('').trigger('change');
             $("#repSecId").val('').trigger('change');
         } else if (tradeMarket && !attr && tradeMarket == '04') {
-            $("#psList").val('03,04');
+            $("#psList").val('03,04,T92');
             $("#ps").val('').trigger('change');
             $("#repSecId").val('').trigger('change');
         } else if (!tradeMarket && !attr) {
-            $("#psList").val('03,04');
+            $("#psList").val('03,04,T92');
             $("#ps").val('').trigger('change');
             $("#repSecId").val('').trigger('change');
         }
@@ -374,7 +374,7 @@
         linkAcctNo(false);
         pageShowEdit(false);
         $("#acctTradeMarket").val(tradeMarket);
-        linkPledgeUnit();
+        // linkPledgeUnit();
         removeMustOfRepSecId();
     };
     var settleDateChange = function () {
@@ -447,6 +447,12 @@
         var occupyDays = $("#occupyDays").val();
         var tradeAmt = $("#tradeAmt").val();
         var y = $("#yield").val();
+        var fixedNum = 2;
+        var tradeMarket = $("#tradeMarket").val();
+        if (tradeMarket === TRADE_MARKET_03){
+            fixedNum = 3;
+        }
+        $("#yield").val(Number(y).toFixed(fixedNum));
         if (occupyDays && tradeAmt && y) {
             var intamt = Math.round(tradeAmt * y / 100 * occupyDays / 365 * 100) / 100;
             var expireSettleAmt = parseFloat(intamt) + parseFloat(tradeAmt);
@@ -528,11 +534,11 @@
                 Joyin.ajaxSync(basePath + 'invest/entrust/etragrereptrade/EtrAgreRepTrade001/getFaceValue', param, function (obj) {
                     if (obj && obj != '') {
                         if (obj == 0) {
-                            $("#repSecNum").val(0).toFixed(2);
+                            $("#repSecNum").val(0);
                             $("#printAmt").val(0);
                         } else {
-                            $("#repSecNum").val(Math.round(tradeAmt * 100 / conRatio / obj).toFixed(2));
-                            $("#printAmt").val(Math.round(tradeAmt * 100 / conRatio));
+                            $("#repSecNum").val(Math.round(tradeAmt * 100 / conRatio / obj/100).toFixed(2));
+                            $("#printAmt").val(Math.round(tradeAmt * 100 / conRatio/100));
                         }
                         $("#pledgeFaceValue").val(obj).trigger('change');
                     }
@@ -662,7 +668,7 @@
                 if (init) {
                     $("#fristSettleDate").attr("disabled", true);
                 } else {
-                    $("#fristSettleDate").val(iPlatformDate).attr("disabled", true).trigger('change');
+                    $("#fristSettleDate").val(iPlatformDate).attr("disabled", true);
                 }
                 //到期结算日
                 $("#expireSettleDate").attr("disabled", true);
@@ -675,7 +681,7 @@
                 //质押券
                 $("#repSecId").attr("disabled", false);
                 //折算比例
-                $("#conRatio").attr("disabled", false);
+                $("#conRatio").attr("disabled", true);
                 //质押数量
                 $("#repSecNum").attr("disabled", false);
                 //券面金额
@@ -717,7 +723,7 @@
                 //补充协议
                 $("#addCla_div").show();
                 $("#addCla").attr("disabled", false);
-
+                $("#fristSettleDate").trigger('change');
             } else if (ps == 'T92' && repPs == BACK_LEND_DIRECTION_04) {
                 //本方交易员
                 $("#trader_div").hide();
@@ -750,7 +756,7 @@
                 //质押券
                 $("#repSecId").attr("disabled", false);
                 //折算比例
-                $("#conRatio").attr("disabled", false);
+                $("#conRatio").attr("disabled", true);
                 //质押数量
                 $("#repSecNum").attr("disabled", false);
                 //券面金额
@@ -894,7 +900,7 @@
                     //回购金额
                     $("#tradeAmt").attr("disabled", true);
                     //回购利率
-                    $("#yield").attr("disabled", true);
+                    $("#yield").attr("disabled", false);
                     //首期结算日
                     $("#fristSettleDate").attr("disabled", true);
                     //到期结算日
@@ -1218,11 +1224,12 @@
                     //券面金额
                     $("#printAmt").attr("disabled", true);
                     //交易对手
-                    if ($("#redoType").val() == '1') {
+                    // if ($("#redoType").val() == '1') {
                         $("#counterId").attr("disabled", false);
-                    } else {
-                        $("#counterId").attr("disabled", true);
-                    }
+                    // }
+                    // else {
+                    //     $("#counterId").attr("disabled", true);
+                    // }
 
                     //本方交易员
                     $("#trader").attr("disabled", false);
@@ -1430,6 +1437,15 @@
                     //补充协议
                     $("#addCla_div").show();
                     $("#addCla").attr("disabled", false);
+                }
+                let outAmtValue = $("#outAmt").val();
+                console.log("outAmtValue " + outAmtValue);
+                if (outAmtValue != null && outAmtValue != "" && outAmtValue != undefined) {
+                    $("#outRepSecNum").val("");
+                    $("#newRepSecNum").val("");
+                    $("#newRepSecId").val("");
+                    $("#newRepSecId").attr("disabled", true);
+                    $("#newRepSecNum").attr("disabled", true);
                 }
             } else if (ps == 'T93') {
                 if (repPs == BACK_LEND_DIRECTION_03) {
@@ -2041,58 +2057,78 @@
         // 组合名称
         $("#portfolioId").change(function () {
             portfolioIdChange(false);
+            setRiskFlag(1)
         });
         // 交易场所
         $("#tradeMarket").change(function () {
-            tradeMarketChange();
+            tradeMarketChange()
+            setRiskFlag(1)
         });
         $("#ps").change(function () {
             psChange();
+            setRiskFlag(1)
         });
         // 资金账户
         $("#acctNo").change(function () {
             acctNoChange(false);
+            setRiskFlag(1)
         });
         $("#fristSettleDate").change(function () {
             settleDateChange();
+            setRiskFlag(1)
         });
         $("#expireSettleDate").change(function () {
             settleDateChange();
+            setRiskFlag(1)
         });
         $("#term").change(function () {
             termChange();
+            setRiskFlag(1)
         });
         $("#occupyDays").change(function () {
             amtCal();
+            setRiskFlag(1)
         });
         $("#tradeAmt").change(function () {
             amtCal();
             conRatioCal();
             // repSecNumCal();
+            setRiskFlag(1)
         });
         $("#yield").change(function () {
             amtCal();
+            setRiskFlag(1)
         });
         $("#repSecId").change(function () {
             printAmtCal();
+            setRiskFlag(1)
         });
         $("#repSecNum").change(function () {
             printAmtCal();
+            setRiskFlag(1)
         });
         $("#newRepSecId").change(function () {
             newprintAmtCal();
+            setRiskFlag(1)
         });
         $("#newRepSecNum").change(function () {
             newprintAmtCal();
+            setRiskFlag(1)
         });
         $("#printAmt").change(function () {
             conRatioCal();
+            setRiskFlag(1)
         });
         $("#newPrintAmt").change(function () {
             conRatioCal();
+            setRiskFlag(1)
         });
         $("#conRatio").change(function () {
             repSecNumCal();
+            setRiskFlag(1)
+        });
+        $("#entrustAmt").change(function () {
+            setRiskFlag(1)
         });
         // 绑定提交按钮
         $('#EtrAgreRepTrade001_btn_submit').click(function () {
@@ -2113,16 +2149,72 @@
         $('#EtrAgreRepTrade001_btn_riskcal').click(function () {
             doRiskcal();
         });
-        console.log("------------init-------------------------------")
-        console.log(TRADE_MARKET_CURRENT)
-        if(TRADE_MARKET_CURRENT == TRADE_MARKET_03){
+
+        if (TRADE_MARKET_CURRENT == TRADE_MARKET_03) {
             $("#yield").attr("data-textrange", 3);
-        }else {
+        } else {
             $("#yield").attr("data-textrange", 2);
         }
-        console.log($("#yield").attr("data-textrange"))
+        //上交所 解除质押 隐藏结算金额
+        if (entity && entity.ps == PS_T93 && TRADE_MARKET_CURRENT == TRADE_MARKET_03) {
+            $("#entrustAmt_div").hide();
+            // $("#entrustAmt_div").css('display', 'none');
+        }
+        var repPs = $("#repPs").val();
+        if (repPs == BACK_LEND_DIRECTION_04 && entity) {
+            if (entity.ps == PS_T93 || entity.ps == PS_T94 || entity.ps == PS_T95 || entity.ps == PS_T96 || entity.ps == PS_T56) {
+                //本方交易员 隐藏
+                $("#trader_div").hide();
+            }
+        }
 
+        console.log("--------pageModel-------------")
+        console.log(pageModel)
+        console.log(PAGE_MODEL_EDIT)
+        if (pageModel == PAGE_MODEL_EDIT && entity) {
+            if (entity.yield && entity.ps != PS_T93 && entity.ps != PS_T94
+                && (repPs == BACK_LEND_DIRECTION_03 || repPs == BACK_LEND_DIRECTION_04)) {
+                if (TRADE_MARKET_CURRENT == TRADE_MARKET_03) {
+                    $("#yield").attr("data-textrange", 3);
+                    $("#yield").val(Number(entity.yield).toFixed(3));
+                } else {
+                    $("#yield").attr("data-textrange", 2);
+                    $("#yield").val(Number(entity.yield).toFixed(2));
+                }
+            }
 
+            if (repPs == BACK_LEND_DIRECTION_04) {
+                if (entity.ps == PS_T93 || entity.ps == PS_T94 || entity.ps == PS_T95 || entity.ps == PS_T96 || entity.ps == PS_T56) {
+                    //补充协议 不可编辑
+                    $("#addCla").attr('disabled', true);
+                }
+                if (entity.ps == PS_T93) {
+                    //结算金额 不可编辑
+                    $("#entrustAmt").attr('disabled', true);
+                }
+            }
+
+            //解除质押、到期购回、提前购回、中途换券 交易对手不可编辑
+            if (entity.ps == PS_T93 || entity.ps == PS_T94 || entity.ps == PS_T95 || entity.ps == PS_T96) {
+                $("#counterId").attr('disabled', true);
+            }
+            //中途换券 换出债券、换出债券数量、换出金额、请求编号 不可编辑
+            if (entity.ps == PS_T94) {
+                $("#outRepSecId").attr('disabled', true);
+                $("#outRepSecNum").attr('disabled', true);
+                $("#outAmt").attr('disabled', true);
+                $("#reqOnId").attr('disabled', true);
+            }
+            //中途换券 换钱
+            if(entity.entrustBussType === '31'){
+                $("#outAmt").attr('disabled', false);
+            }
+            //中途换券 换券
+            if(entity.entrustBussType === '21'){
+                $("#outRepSecId").attr('disabled', false);
+                $("#outRepSecNum").attr('disabled', false);
+            }
+        }
         if (entityStr) {
             var etrData = JSON.parse(entityStr);
             setPageItem(etrData);

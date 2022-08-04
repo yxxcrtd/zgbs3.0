@@ -69,7 +69,14 @@ public interface BaseEtrCashPositionCommService {
      * @param entrustId 委托编号 isExistNew 是否已经向新表插入数据，Y：已入 forcedFinishAmt 强制完成额度
      * @return 执行结果
      */
-    CommonResult entrustCloseExecute(String entrustId, String isExistNew, BigDecimal forcedFinishAmt);
+    CommonResult entrustCloseExecute(String entrustId, String isExistNew, BigDecimal forcedFinishAmt, String isSettleFail);
+
+    /**
+     * 委托关闭执行共通,主要是向旧表插入头寸
+     * @param entrustId 委托编号 isExistNew 是否已经向新表插入数据，Y：已入 forcedFinishAmt 强制完成额度 isSettleFail 是否交收失败
+     * @return 执行结果
+     */
+    CommonResult entrustCloseExecute(String entrustId, String isExistNew, String isSettleFail);
     /**
      * 标准券管理出入库共通
      * @param list 出入库质押券列表
@@ -141,4 +148,12 @@ public interface BaseEtrCashPositionCommService {
      * @since 1.0
      */
     BigDecimal queryEtrAvailableCashNew(PtlCashPositionFlowDto ptlCashPositionFlowDto);
+
+    /**
+     * 指令回冲部分
+     *
+     * @param entrustCommonDto
+     * @return 执行结果
+     */
+    CommonResult entrustCloseSectionExecute(EntrustCommonDto entrustCommonDto);
 }

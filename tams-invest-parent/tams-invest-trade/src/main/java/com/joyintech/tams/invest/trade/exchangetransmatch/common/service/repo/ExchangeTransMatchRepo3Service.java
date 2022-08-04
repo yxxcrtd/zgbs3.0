@@ -113,7 +113,7 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         // 清算速度
         dealTotal.setSettleSpeed(StringUtil.isNotEmpty(dealDto.getSettleSpeed())?dealDto.getSettleSpeed():0L);
         // 交易币种
-        dealTotal.setCcy(null);
+        dealTotal.setCcy(entrustDto.getCcy());
 
         // 单位净价
         dealTotal.setUnitCprice(null);
@@ -164,22 +164,36 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         // 交易场所
         dealTotal.setTradeMarket(dealDto.getTradeMarket());
 
-        if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
-            dealTotal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
+        // 交易对手
+        if(!StringUtil.isEmpty(dealDto.getCounterId())){
+            dealTotal.setCounterId(dealDto.getCounterId());
+        }else if(!StringUtil.isEmpty(entrustDto.getCounterId())){
+            dealTotal.setCounterId(entrustDto.getCounterId());
+        }else{
+            if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+                dealTotal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
+            }
+            else if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
+                dealTotal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
+            }
         }
-        else if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
-            dealTotal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
-        }
+
         // 交易平台
         dealTotal.setTradePlat(dealDto.getTradePlat());
 
         // 投资组合代码
         dealTotal.setPortfolioId(entrustDto.getPortfolioId());
         // 投管业务类型
-        if(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(dealTotal.getFinprodType2())){
-            dealTotal.setTgBusiType(DictCodeListExt3.平安业务类型_债券质押式正回购.getValue());
-        }else{
-            dealTotal.setTgBusiType(DictCodeListExt3.平安业务类型_债券质押式逆回购.getValue());
+//        if(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(dealTotal.getFinprodType2())){
+//            dealTotal.setTgBusiType(DictCodeListExt3.平安业务类型_债券质押式正回购.getValue());
+//        }else{
+//            dealTotal.setTgBusiType(DictCodeListExt3.平安业务类型_债券质押式逆回购.getValue());
+//        }
+        if(DictCodeListExt3.交易方向_中途换券.getValue().equals(entrustDto.getPs())){
+            dealTotal.setTgBusiType(DictCodeListExt3.投管业务类型_中途换券.getValue());
+        }
+        else if(DictCodeListExt3.交易方向_解除质押.getValue().equals(entrustDto.getPs())){
+            dealTotal.setTgBusiType(DictCodeListExt3.投管业务类型_解除质押.getValue());
         }
         // dealTotal.setTgBusiType(DictCodeListExt3.共通业务类型_质押券置换.getValue());
 
@@ -219,7 +233,7 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         for(SettleTransDataTotalPledge settleTransDataTotalPledge:dealDto.getSettleTransDataTotalPledgeList()) {
             TrdProductDealDto trdProductDeal = this.createTrdProductDealCommon(dealDto, entrustDto, trdFinProductDealTotal);
             //金融产品ID
-            trdProductDeal.setFinprodId(settleTransDataTotalPledge.getPledgeFinprodId());
+            trdProductDeal.setFinprodId(trdFinProductDealTotal.getFinprodId());
             //单位净价
             trdProductDeal.setUnitCprice(settleTransDataTotalPledge.getPledgeRatio());
             //交易方向
@@ -315,15 +329,17 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         // 通道代码
         trdProductDeal.setChlId(null);
         // 交易对手
-        if(StringUtil.isEmpty(dealDto.getCounterId())){
+        if(!StringUtil.isEmpty(dealDto.getCounterId())){
+            trdProductDeal.setCounterId(dealDto.getCounterId());
+        }else if(!StringUtil.isEmpty(entrustDto.getCounterId())){
+            trdProductDeal.setCounterId(entrustDto.getCounterId());
+        }else{
             if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
                 trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
             }
             else if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
                 trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
             }
-        }else{
-            trdProductDeal.setCounterId(dealDto.getCounterId());
         }
         // 是否外部交易
         trdProductDeal.setIsOutTrade(DictCodeList.是否_是.getValue());
@@ -333,13 +349,6 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         trdProductDeal.setTradePlat(dealDto.getTradePlat());
         // 交易市场
         trdProductDeal.setTradeMarketMode(dealDto.getTradeMarketMode());
-
-        if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
-            trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
-        }
-        else if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
-            trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
-        }
         // 本方交易员
         trdProductDeal.setTrader(dealDto.getTrader());
         // 对手方交易员
@@ -370,6 +379,8 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         trdProductDeal.setPortfolioId(entrustDto.getPortfolioId());
 
         trdProductDeal.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
+        // 投管业务类型
+        trdProductDeal.setTgBusiType(trdFinProductDealTotal.getTgBusiType());
         return trdProductDeal;
     }
 

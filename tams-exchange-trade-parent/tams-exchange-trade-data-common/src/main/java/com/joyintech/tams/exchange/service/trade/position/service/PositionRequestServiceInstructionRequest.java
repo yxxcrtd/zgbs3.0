@@ -477,7 +477,7 @@ public class PositionRequestServiceInstructionRequest {
             // IF 回购类型 = 正回购 THEN 指令.到期续作金额 - 指令.首期的到期结算金额
             // IF 回购类型 = 逆回购  and 成交编号找不到对应的首期 THEN 指令.到期续作金额
             // IF 回购类型 = 逆回购  and 成交编号找到对应的首期 THEN  指令.到期续作金额 - 指令.首期的到期结算金额"
-            BigDecimal firstTradeAmt = etrTradeCommonervice.getFirstTradeAmt(entity.getTrdMatchId());
+            BigDecimal firstTradeAmt = etrTradeCommonervice.getFirstTradeAmt(entity.getFinprodId());
             BigDecimal tradeAmt = entity.getEntrustAmt();
             log.info("轧差组合现金数据集:到期续作金额 tradeAmt={}，首期的到期结算金额 firstTradeAmt={}", tradeAmt, firstTradeAmt);
             bean.setCashAmount(tradeAmt.subtract(firstTradeAmt));

@@ -40,9 +40,6 @@ public class CfetsManualSettleController extends BaseController {
     @Autowired
     private CfetsManualSettleService cfetsManualSettleService;
 
-    @Autowired
-    private IPlatformDate platformDateImpl;
-
     @Override
     public String init(Model model) {
 
@@ -71,7 +68,7 @@ public class CfetsManualSettleController extends BaseController {
      * @author sjj
      */
     @ResponseBody
-    @ApiOperation(value = "交收", notes = "交收")
+    @ApiOperation(value = "交收校验", notes = "交收校验")
     @PostMapping("doManualSettleCheck")
     public Message<AjaxResult> doManualSettleCheck(@RequestBody CfetsManualSettleRequest cfetsRequest, BindingResult br) {
         //画面Check
@@ -92,11 +89,11 @@ public class CfetsManualSettleController extends BaseController {
 
         List<CfetsManualSettleDto> dtoList = cfetsRequest.getSelectedItem();
         //保存
-        ProcessParameter<CfetsManualSettleDto> processParameter = new ProcessParameter<CfetsManualSettleDto>();
-        WorkFlowParameter<CfetsManualSettleDto> params = new WorkFlowParameter<CfetsManualSettleDto>();
+        ProcessParameter<CfetsManualSettleDto> processParameter = new ProcessParameter<>();
+        WorkFlowParameter<CfetsManualSettleDto> params = new WorkFlowParameter<>();
         params.setPageId("CfetsManualSettle");
         params.setElementId(dtoList.get(0).getElementId());
-        params.setBusinessCode(item -> item.getTradeId());
+        params.setBusinessCode(CfetsManualSettleDto::getTradeId);
         params.setBusinessType(DictCodeListExt3.共通业务类型_交收管理.getValue());
 
         String finalOpertType;
@@ -140,7 +137,7 @@ public class CfetsManualSettleController extends BaseController {
                     dtoList.toArray(new CfetsManualSettleDto[dtoList.size()]));
             return new Message<AjaxResult>().success().setMessage("处理完成");
         }catch (Exception e) {
-            logger.error("交收失败",e);
+            logger.error("交收错误",e);
             //return new Message<AjaxResult>().fail().setMessage("交收失败");
             return PositionUtil.ajaxErrorReturn(e);
         }

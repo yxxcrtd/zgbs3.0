@@ -78,7 +78,7 @@
                 </foreach>
             </if>
             <if test="winTypeList != null and winTypeList.size() > 0">
-                AND BO.WIN_TYPE in
+                AND BO.BID_MODLE in
                 <foreach collection="winTypeList" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>

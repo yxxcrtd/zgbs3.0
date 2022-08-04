@@ -84,7 +84,7 @@
     </sql>
 
     <!-- 质押式回购报价Begin -->
-    <resultMap id="IqcBaseResultMap" type="com.joyintech.background.component.uplink.interbank.database.entity.IbuQuoteCrep" >
+    <resultMap id="IqcBaseResultMap" type="com.joyintech.background.component.uplink.interbank.business.dto.IbuQuoteCrepDto" >
         <id column="I_Q_C_QUOTE_ID" property="quoteId" jdbcType="VARCHAR" />
         <result column="I_Q_C_QUOTE_TYPE" property="quoteType" jdbcType="VARCHAR" />
         <result column="I_Q_C_P_QUOTE_ID" property="pQuoteId" jdbcType="VARCHAR" />
@@ -842,6 +842,12 @@
                 <if test="entrustIdList != null and entrustIdList.size() > 0">
                     and ETR_ENTRUST.ENTRUST_ID in
                     <foreach collection="entrustIdList" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="portfolioId != null and portfolioId.size() > 0">
+                    and ETR_ENTRUST.portfolio_Id in
+                    <foreach collection="portfolioId" item="item" open="(" close=")" separator=",">
                         #{item}
                     </foreach>
                 </if>

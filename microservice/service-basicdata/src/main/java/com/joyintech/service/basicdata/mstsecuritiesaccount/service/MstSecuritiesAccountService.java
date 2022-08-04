@@ -11,6 +11,7 @@
 package com.joyintech.service.basicdata.mstsecuritiesaccount.service;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -32,6 +33,8 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.service.basicdata.mstsecuritiesaccount.dao.MstSecuritiesAccountMapper;
 import com.joyintech.service.basicdata.mstsecuritiesaccount.dto.MstSecuritiesAccountDto;
+
+import static io.protostuff.CollectionSchema.MessageFactories.ArrayList;
 
 /**
  * 〈一句话功能简述〉
@@ -399,6 +402,10 @@ public class MstSecuritiesAccountService extends BaseService<MstSecuritiesAccoun
 //            map.put("tradePlat", DictCodeList.交易平台_竞价撮合平台.getValue());
 //            map.remove("SHARES_TRADE_PLATFORM_02");
 //        }
+        if(!Objects.isNull(map.get("searchList"))&&StringUtils.isNotEmpty(map.get("searchList").toString())){
+            List<String> list = Arrays.asList(map.get("searchList").toString().split(","));
+            map.put("finprodMarketIdList",list );
+        }
         String entrustBussType=StringUtil.isNotEmpty(map.get("entrustBussType"))?map.get("entrustBussType").toString():"";
         if(StringUtil.isNotEmpty(entrustBussType)&&
                 (DictCodeListExt3.上农商_指令业务类型_债券回售指令.getValue().equals(entrustBussType)

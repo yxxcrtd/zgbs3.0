@@ -245,6 +245,34 @@ public class TrdInvestDealQuery001Service extends CommonExportService<TrdInvestD
         pageParam.put("finType_F01", DictCodeListExt1.金融产品类型_债券.getValue());
         //add by wangpeng end
         pageParam.put("PS_T75", DictCodeListExt3.交易方向_清理核销.getValue());
+
+        //交易方向处理
+        String prodPs = (String) pageParam.get("prodPs");
+        if (StringUtil.isNotEmpty(prodPs)) {
+            //提前购回
+            if (StringUtil.contains(prodPs, DictCodeListExt3.交易方向_提前购回.getValue())) {
+                prodPs = prodPs + DictCodeListExt3.交易方向_投资端_提前终止.getValue();
+            }
+            //到期购回
+            if (StringUtil.contains(prodPs, DictCodeListExt3.交易方向_到期购回.getValue())) {
+                prodPs = prodPs + DictCodeList.交易方向_到期.getValue();
+            }
+        }
+        pageParam.put("prodPs", prodPs);
+
+        String ps = (String) pageParam.get("ps");
+        if (StringUtil.isNotEmpty(ps)) {
+            //提前购回
+            if (StringUtil.equals(ps, DictCodeListExt3.交易方向_提前购回.getValue())) {
+                ps = DictCodeListExt3.交易方向_投资端_提前终止.getValue();
+            }
+            //到期购回
+            if (StringUtil.equals(ps, DictCodeListExt3.交易方向_到期购回.getValue())) {
+                ps = DictCodeList.交易方向_到期.getValue();
+            }
+        }
+        pageParam.put("ps", ps);
+
         //判断状态
         Page<TrdInvestDealQuery001Dto> returnList = new Page<TrdInvestDealQuery001Dto>();
         if (StringUtil.isNotEmpty(validStatus)) {
@@ -324,6 +352,11 @@ public class TrdInvestDealQuery001Service extends CommonExportService<TrdInvestD
                 if (!StringUtil.equals(dto.getTradeMarket(), 交易场所_银行间.getValue()) &&
                         !StringUtil.equals(dto.getTradeMarket(), 交易场所_商业银行柜台.getValue())) {
                     dto.setfTradeId(null);
+                }
+
+                if (StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())
+                        && Objects.nonNull(dto.getTradeAmt())) {
+                    dto.setTradeAmt(dto.getTradeAmt().multiply(BigDecimal.valueOf(100)));
                 }
 
             }

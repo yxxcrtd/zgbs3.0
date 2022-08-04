@@ -40,7 +40,7 @@ public interface CstpTradeMapper {
      * @see
      * @since 1.0
      */
-    String selectSecByExecid(@Param("execid") String execid);
+    String selectSecByExecid(@Param("execid") String execid, @Param("ps") String ps);
 
     /**
      * 查询债券交易信息
@@ -54,7 +54,8 @@ public interface CstpTradeMapper {
      */
     InterfTradSecdealDto selectTradeSec(@Param("execid") String execid,
                                         @Param("sysDate") String sysDate,
-                                        @Param("businesstype") String businesstype);
+                                        @Param("businesstype") String businesstype,
+                                        @Param("side") String side);
 
     /**
      * 根据交易员中文名称，查询本方交易员在投管系统的代码
@@ -154,6 +155,11 @@ public interface CstpTradeMapper {
      * 根据成交编号，查询下行成交匹配关系
      */
     TrdConfirmMatchDto selectMatchDtoByExecId(@Param("execid") String execid);
+
+    /**
+     * 根据交易号，查询下行成交匹配关系
+     */
+    TrdConfirmMatchDto selectMatchDtoByDealNo(@Param("dealNo") String dealNo);
 
     /**
      * 根据下行交易编号，查询下行成交匹配关系

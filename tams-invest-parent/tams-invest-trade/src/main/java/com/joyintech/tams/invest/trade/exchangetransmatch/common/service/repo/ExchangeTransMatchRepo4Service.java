@@ -1,6 +1,7 @@
 package com.joyintech.tams.invest.trade.exchangetransmatch.common.service.repo;
 
 import com.joyintech.framework.util.*;
+import com.joyintech.tams.common.base.dao.SettleTransDataMapper;
 import com.joyintech.tams.common.base.dao.TrdProductDealAddMapper;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
@@ -41,6 +42,9 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
     @Autowired
     private TrdProductDealAddMapper trdProductDealAddMapper;
 
+    @Autowired
+    private SettleTransDataMapper settleTransDataMapper;
+
     /**
      * 生成金融产品交易信息实体
      * @param dealDto
@@ -57,11 +61,14 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
         // 首期成交交易信息---处理汇总表的金融产品代码，如果是存在首期则用首期的金融产品代码，如果不存在则使用买入那笔的交易编号
 //        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(),dealDto.getMpayDate(),DictCodeList.交易方向_买入.getValue()
 //                ,entrustDto.getPortfolioId());
-        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(), dealDto.getMpayDate(), dealDto.getSeatNumber(),
+        // XYHGFXSJ-710:修改到期续做查询首期成交编号 modify by fuyongsheng 20220729 start
+        SettleTransData dqxzSettleTransData = settleTransDataMapper.selectByPrimaryKey(dealDto.getfCjbh());
+        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dqxzSettleTransData.getfCjbh(), dealDto.getMpayDate(), dealDto.getSeatNumber(),
                 dealDto.getSecAcctId());
+        // XYHGFXSJ-710:修改到期续做查询首期成交编号 modify by fuyongsheng 20220729 end
         TrdProductDealAdd  firstRepoTradeAdd = trdProductDealAddMapper.selectByPrimaryKey(firstRepoTrade.getTradeId());
 
-        List<SettleTransData> settleTransDataList = this.handleSettleTransData(dealDto,entrustDto);
+        List<SettleTransData> settleTransDataList = this.handleSettleTransData(dealDto,entrustDto,firstRepoTrade);
 
         for(SettleTransData settleTransData:settleTransDataList) {
             ExchangeTransMatchBaseTradeDto exchangeTransMatchBaseTradeDto = new ExchangeTransMatchBaseTradeDto();
@@ -228,8 +235,10 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
         // 净价总额
         dealTotal.setCpriceAmt(null);
         // 交易份额
-        dealTotal.setShareAmt(entrustDto.getMarchQty());
-        BigDecimal proportion = ArithmeticUtil.divide(entrustDto.getMarchQty(),dealDto.getShareAmt(),2);
+//        dealTotal.setShareAmt(entrustDto.getMarchQty());
+//        BigDecimal proportion = ArithmeticUtil.divide(entrustDto.getMarchQty(),dealDto.getShareAmt(),2);
+        dealTotal.setShareAmt(entrustDto.getMarchAmt());
+        BigDecimal proportion = ArithmeticUtil.divide(entrustDto.getMarchAmt(),dealDto.getShareAmt(),2);
         // 交易本金
         dealTotal.setPrinAmt(ArithmeticUtil.multiply(proportion,dealDto.getPrinAmt()));
         // 利息总额
@@ -266,12 +275,20 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
         // 交易场所
         dealTotal.setTradeMarket(dealDto.getTradeMarket());
 
-        if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
-            dealTotal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
+        // 交易对手
+        if(!StringUtil.isEmpty(dealDto.getCounterId())){
+            dealTotal.setCounterId(dealDto.getCounterId());
+        }else if(!StringUtil.isEmpty(entrustDto.getCounterId())){
+            dealTotal.setCounterId(entrustDto.getCounterId());
+        }else{
+            if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+                dealTotal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
+            }
+            else if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
+                dealTotal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
+            }
         }
-        else if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
-            dealTotal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
-        }
+
         // 交易平台
         dealTotal.setTradePlat(dealDto.getTradePlat());
 
@@ -279,7 +296,8 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
         dealTotal.setPortfolioId(entrustDto.getPortfolioId());
 
         //到期本金
-        dealTotal.setDqprinAmt(entrustDto.getMarchQty());
+        // dealTotal.setDqprinAmt(entrustDto.getMarchQty());
+        dealTotal.setDqprinAmt(entrustDto.getMarchAmt());
 
         // 投管业务类型 : 如果交易方向 = ‘到期续作’，并且汇总成交.金融产品类型（投管） = 债券质押式正回购，则为‘债券质押式正回购’。
         //如果交易方向 = ‘到期续作’，并且汇总成交.金融产品类型（投管） = 债券质押式逆回购，则为‘债券质押式逆回购’。
@@ -414,15 +432,17 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
             // 通道代码
             trdProductDeal.setChlId(null);
             // 交易对手
-            if(StringUtil.isEmpty(dealDto.getCounterId())){
-                if(StringUtil.equals(settleTransData.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+            if(!StringUtil.isEmpty(dealDto.getCounterId())){
+                trdProductDeal.setCounterId(dealDto.getCounterId());
+            }else if(!StringUtil.isEmpty(entrustDto.getCounterId())){
+                trdProductDeal.setCounterId(entrustDto.getCounterId());
+            }else{
+                if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
                     trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
                 }
-                else if(StringUtil.equals(settleTransData.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
+                else if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
                     trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
                 }
-            }else{
-                trdProductDeal.setCounterId(dealDto.getCounterId());
             }
             // 是否外部交易
             trdProductDeal.setIsOutTrade(DictCodeList.是否_是.getValue());
@@ -432,13 +452,6 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
             trdProductDeal.setTradePlat(settleTransData.getTradePlat());
             // 交易市场
             trdProductDeal.setTradeMarketMode(settleTransData.getTradeMarketMode());
-
-            if(StringUtil.equals(settleTransData.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
-                trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
-            }
-            else if(StringUtil.equals(settleTransData.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
-                trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
-            }
             // 本方交易员
             trdProductDeal.setTrader(dealDto.getTrader());
             // 对手方交易员
@@ -449,7 +462,9 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
             trdProductDeal.setSecManageAcctId(settleTransData.getSecAcctId());
             // 关联系统交易编号
             // trdProductDeal.setfTradeId(settleTransData.getCjbh());
-            trdProductDeal.setfTradeId(dealDto.getSeqId());
+            // XYHGFXSJ-590:关联系统交易编号赋值 modify by fuyongsheng 20220727 start
+            trdProductDeal.setfTradeId(dealDto.getfCjbh());
+            // XYHGFXSJ-590:关联系统交易编号赋值 modify by fuyongsheng 20220727 end
             // 现金流代码
             trdProductDeal.setCashId(null);
             // 登记托管机构
@@ -497,7 +512,8 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
      * @param entrustDto
      * @return
      */
-    private List<SettleTransData> handleSettleTransData(ExchangeTransMatchCommonDto dealDto, ExchangeTransMatchCommonEntrustDto entrustDto) {
+    private List<SettleTransData> handleSettleTransData(ExchangeTransMatchCommonDto dealDto, ExchangeTransMatchCommonEntrustDto entrustDto,
+                                                        TrdProductDeal firstRepoTrade) {
         List<SettleTransData> settleTransDataList = new ArrayList<>();
         Map<String,Object> map = new HashMap<>();
         map.put("seqId",dealDto.getSeqId());
@@ -511,7 +527,8 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
                     BeanUtil.copyPropertiesIgnoreNull(settleTransData,item);
                     settleTransData.setPs(DictCodeList.交易方向_买入.getValue());
                     //占比份额比例
-                    BigDecimal shareRate = ArithmeticUtil.divide(entrustDto.getMarchQty(),item.getShareAmt(),2);
+                    // BigDecimal shareRate = ArithmeticUtil.divide(entrustDto.getMarchQty(),item.getShareAmt(),2);
+                    BigDecimal shareRate = ArithmeticUtil.divide(entrustDto.getMarchAmt(),item.getShareAmt(),2);
                     settleTransData.setStampFee(ArithmeticUtil.multiply(shareRate,item.getStampFee()));
                     settleTransData.setJsfAmt(ArithmeticUtil.multiply(shareRate,item.getJsfAmt()));
                     settleTransData.setGhfAmt(ArithmeticUtil.multiply(shareRate,item.getGhfAmt()));
@@ -520,12 +537,15 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
                     settleTransData.setSettleFee(ArithmeticUtil.multiply(shareRate,item.getSettleFee()));
                     settleTransData.setCommissionAmt(ArithmeticUtil.multiply(shareRate,item.getCommissionAmt()));
 
-                    settleTransData.setShareAmt(entrustDto.getMarchQty());
-                    settleTransData.setPrinAmt(entrustDto.getMarchQty());
+//                    settleTransData.setShareAmt(entrustDto.getMarchQty());
+//                    settleTransData.setPrinAmt(entrustDto.getMarchQty());
+                    settleTransData.setShareAmt(entrustDto.getMarchAmt());
+                    settleTransData.setPrinAmt(entrustDto.getMarchAmt());
                     settleTransData.setFpriceAmt(ArithmeticUtil.multiply(shareRate,item.getFpriceAmt()));
                     settleTransData.setTradeAmt(ArithmeticUtil.multiply(shareRate,item.getTradeAmt()));
                     //交易数据明细.到期利息 =  汇总成交匹配结果表.匹配份额*成交数据明细.交易净价/成交数据明细.计息基础*（成交数据明细.到期交收日 - 成交数据明细.首期交收日）
-                    BigDecimal mIntAmt = ArithmeticUtil.multiply(ArithmeticUtil.divide(ArithmeticUtil.multiply(entrustDto.getMarchQty(),item.getUnitCprice()),new BigDecimal(365),2), new BigDecimal(DateUtil.getBetweenDayNumber(item.getMpayDate(),item.getVpayDate())));
+                    // BigDecimal mIntAmt = ArithmeticUtil.multiply(ArithmeticUtil.divide(ArithmeticUtil.multiply(entrustDto.getMarchQty(),item.getUnitCprice()),new BigDecimal(365),2), new BigDecimal(DateUtil.getBetweenDayNumber(item.getMpayDate(),item.getVpayDate())));
+                    BigDecimal mIntAmt = ArithmeticUtil.multiply(ArithmeticUtil.divide(ArithmeticUtil.multiply(entrustDto.getMarchAmt(),item.getUnitCprice()),new BigDecimal(365),2), new BigDecimal(DateUtil.getBetweenDayNumber(item.getMpayDate(),item.getVpayDate())));
                     settleTransData.setmIntAmt(mIntAmt);
                     settleTransData.setmTradeAmt(ArithmeticUtil.doAdd(settleTransData.getShareAmt(),settleTransData.getmIntAmt()));
 
@@ -557,8 +577,8 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
                         IntSettleTransData.setPs(DictCodeList.交易方向_收息到账.getValue());
 //                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(),dealDto.getMpayDate(),
 //                                DictCodeList.交易方向_买入.getValue(),entrustDto.getPortfolioId());
-                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(), dealDto.getMpayDate(),
-                                dealDto.getSeatNumber(), dealDto.getSecAcctId());
+//                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(), dealDto.getMpayDate(),
+//                                dealDto.getSeatNumber(), dealDto.getSecAcctId());
                         if(StringUtil.isNotEmpty(firstRepoTrade)) {
                             IntSettleTransData.setFinprodId(firstRepoTrade.getFinprodId());
                         }
@@ -588,8 +608,8 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
 
 //                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(),dealDto.getMpayDate(),
 //                                DictCodeList.交易方向_买入.getValue(),entrustDto.getPortfolioId());
-                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(), dealDto.getMpayDate(),
-                                dealDto.getSeatNumber(), dealDto.getSecAcctId());
+//                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(), dealDto.getMpayDate(),
+//                                dealDto.getSeatNumber(), dealDto.getSecAcctId());
                         if(StringUtil.isNotEmpty(firstRepoTrade)) {
                             prinSettleTransData.setFinprodId(firstRepoTrade.getFinprodId());
                         }
@@ -606,7 +626,8 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
                     BeanUtil.copyPropertiesIgnoreNull(firstSettleTransData,item);
                     firstSettleTransData.setPs(DictCodeList.交易方向_买入.getValue());
                     //占比份额比例
-                    BigDecimal shareRate = ArithmeticUtil.divide(entrustDto.getMarchQty(),item.getShareAmt(),2);
+                    // BigDecimal shareRate = ArithmeticUtil.divide(entrustDto.getMarchQty(),item.getShareAmt(),2);
+                    BigDecimal shareRate = ArithmeticUtil.divide(entrustDto.getMarchAmt(),item.getShareAmt(),2);
                     firstSettleTransData.setStampFee(ArithmeticUtil.multiply(shareRate,item.getStampFee()));
                     firstSettleTransData.setJsfAmt(ArithmeticUtil.multiply(shareRate,item.getJsfAmt()));
                     firstSettleTransData.setGhfAmt(ArithmeticUtil.multiply(shareRate,item.getGhfAmt()));
@@ -615,13 +636,18 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
                     firstSettleTransData.setSettleFee(ArithmeticUtil.multiply(shareRate,item.getSettleFee()));
                     firstSettleTransData.setCommissionAmt(ArithmeticUtil.multiply(shareRate,item.getCommissionAmt()));
 
-                    firstSettleTransData.setShareAmt(entrustDto.getMarchQty());
-                    firstSettleTransData.setPrinAmt(entrustDto.getMarchQty());
-                    firstSettleTransData.setFpriceAmt(entrustDto.getMarchQty());
-                    firstSettleTransData.setTradeAmt(entrustDto.getMarchQty());
+//                    firstSettleTransData.setShareAmt(entrustDto.getMarchQty());
+//                    firstSettleTransData.setPrinAmt(entrustDto.getMarchQty());
+//                    firstSettleTransData.setFpriceAmt(entrustDto.getMarchQty());
+//                    firstSettleTransData.setTradeAmt(entrustDto.getMarchQty());
+                    firstSettleTransData.setShareAmt(entrustDto.getMarchAmt());
+                    firstSettleTransData.setPrinAmt(entrustDto.getMarchAmt());
+                    firstSettleTransData.setFpriceAmt(entrustDto.getMarchAmt());
+                    firstSettleTransData.setTradeAmt(entrustDto.getMarchAmt());
 
                     //交易数据明细.到期利息 =  汇总成交匹配结果表.匹配份额*成交数据明细.交易净价/成交数据明细.计息基础*（成交数据明细.到期交收日 - 成交数据明细.首期交收日）
-                    BigDecimal mIntAmt = ArithmeticUtil.multiply(ArithmeticUtil.divide(ArithmeticUtil.multiply(entrustDto.getMarchQty(),item.getUnitCprice()),new BigDecimal(365),2), new BigDecimal(DateUtil.getBetweenDayNumber(item.getMpayDate(),item.getVpayDate())));
+                    // BigDecimal mIntAmt = ArithmeticUtil.multiply(ArithmeticUtil.divide(ArithmeticUtil.multiply(entrustDto.getMarchQty(),item.getUnitCprice()),new BigDecimal(365),2), new BigDecimal(DateUtil.getBetweenDayNumber(item.getMpayDate(),item.getVpayDate())));
+                    BigDecimal mIntAmt = ArithmeticUtil.multiply(ArithmeticUtil.divide(ArithmeticUtil.multiply(entrustDto.getMarchAmt(),item.getUnitCprice()),new BigDecimal(365),2), new BigDecimal(DateUtil.getBetweenDayNumber(item.getMpayDate(),item.getVpayDate())));
                     firstSettleTransData.setmIntAmt(mIntAmt);
                     firstSettleTransData.setmTradeAmt(ArithmeticUtil.doAdd(firstSettleTransData.getShareAmt(),firstSettleTransData.getmIntAmt()));
 
@@ -653,8 +679,8 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
                         IntSettleTransData.setPs(DictCodeList.交易方向_收息到账.getValue());
 //                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(),dealDto.getMpayDate(),
 //                                DictCodeList.交易方向_买入.getValue(),entrustDto.getPortfolioId());
-                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(), dealDto.getMpayDate(),
-                                dealDto.getSeatNumber(), dealDto.getSecAcctId());
+//                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(), dealDto.getMpayDate(),
+//                                dealDto.getSeatNumber(), dealDto.getSecAcctId());
                         if(StringUtil.isNotEmpty(firstRepoTrade)) {
                             IntSettleTransData.setFinprodId(firstRepoTrade.getFinprodId());
                             IntSettleTransData.setVdate(firstRepoTrade.getVdate());
@@ -686,8 +712,8 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
 
 //                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(),dealDto.getMpayDate(),
 //                                DictCodeList.交易方向_买入.getValue(),entrustDto.getPortfolioId());
-                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(), dealDto.getMpayDate(),
-                                dealDto.getSeatNumber(), dealDto.getSecAcctId());
+//                        TrdProductDeal firstRepoTrade = this.getFirstRepoTrade(dealDto.getfCjbh(), dealDto.getMpayDate(),
+//                                dealDto.getSeatNumber(), dealDto.getSecAcctId());
                         if(StringUtil.isNotEmpty(firstRepoTrade)) {
                             prinSettleTransData.setFinprodId(firstRepoTrade.getFinprodId());
                             prinSettleTransData.setVdate(firstRepoTrade.getVdate());

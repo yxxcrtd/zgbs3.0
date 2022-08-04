@@ -42,6 +42,18 @@ public class EntrustCommonDto {
 
     private BigDecimal forcedFinishAmt;
 
+    /**
+     * 是否交收失败
+     */
+    private String isSettleFail;
+
+    private TrdProductDeal deal;
+
+    /**
+     * 是否关闭指令
+     */
+    private boolean isCloseEtr;
+
     public BussRepoSecDto getBussRepoSecDto() {
         return bussRepoSecDto;
     }
@@ -120,5 +132,41 @@ public class EntrustCommonDto {
 
     public void setForcedFinishAmt(BigDecimal forcedFinishAmt) {
         this.forcedFinishAmt = forcedFinishAmt;
+    }
+
+    /**
+     * 是否交收失败
+     */
+    public String getIsSettleFail() {
+        return isSettleFail;
+    }
+
+    /**
+     * 是否交收失败
+     */
+    public void setIsSettleFail(String isSettleFail) {
+        this.isSettleFail = isSettleFail;
+    }
+
+    public TrdProductDeal getDeal() {
+        return deal;
+    }
+
+    public void setDeal(TrdProductDeal deal) {
+        this.deal = deal;
+    }
+
+    /**
+     * 是否关闭指令
+     */
+    public boolean isCloseEtr() {
+        return isCloseEtr;
+    }
+
+    /**
+     * 是否关闭指令
+     */
+    public void setCloseEtr(boolean closeEtr) {
+        isCloseEtr = closeEtr;
     }
 }

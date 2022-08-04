@@ -889,6 +889,7 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                     || StringUtil.equals(inputDto.getPs(),DictCodeListExt3.交易方向_解除质押.getValue())) {
                 return null;
             }
+            boolean loop = true;
             // 逆回购首期
             if (StringUtil.equals(inputDto.getRepPs(), DictCodeListExt3.交易方向_逆回购.getValue())) {
                 creditLinesInputDto = new CreditLinesInputDto();
@@ -931,8 +932,14 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                 if(Objects.isNull(finTradeProduct) && StringUtil.isNotEmpty(inputDto.getIntiTradeId())) {
                     finTradeProduct = finTradeProductMapper.selectByTradeId(inputDto.getIntiTradeId());
                 }
+                if (StringUtil.isNotEmpty(inputDto.getIntiTradeId())) {
+                    String isLoop = creditLinesDealsMapper.selectLoopAmt(inputDto.getIntiTradeId());
+                    if(StringUtil.isNotEmpty(isLoop) && StringUtil.equals("N",isLoop)) {
+                        loop = false;
+                    }
+                }
                 if(Objects.nonNull(finTradeProduct)) {
-                    creditLinesInputDto1.setTradeAmt(finTradeProduct.getmTradeAmt());
+                    creditLinesInputDto1.setTradeAmt(finTradeProduct.getPrin());
                     creditLinesInputDto1.setCounterId(finTradeProduct.getCounterId());
                     //creditLinesInputDto1.setShareAmt(finTradeProduct.getPrin());
                 }
@@ -940,8 +947,21 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
                 if(StringUtil.isEmpty(creditLinesInputDto1.getCounterId())) {
                     return null;
                 }
-                if(Objects.nonNull(creditLinesInputDto)) {
-                    creditLinesInputDto.setInputDtoList(Lists.newArrayList(creditLinesInputDto1));
+                if(Objects.nonNull(creditLinesInputDto)) {//大于0时才需要差额预占
+                    if(Objects.nonNull(finTradeProduct)) {
+                        if (loop) {
+                            if (creditLinesInputDto.getTradeAmt().compareTo(creditLinesInputDto1.getTradeAmt()) > 0 ) {
+                                creditLinesInputDto.setInputDtoList(Lists.newArrayList(creditLinesInputDto1));
+                            } else {
+                                return null;
+                            }
+                        }
+                    }
+                   /* if(creditLinesInputDto.getTradeAmt().compareTo(creditLinesInputDto1.getTradeAmt()) > 0) {
+                        creditLinesInputDto.setInputDtoList(Lists.newArrayList(creditLinesInputDto1));
+                    }else {
+                        return null;
+                    }*/
                 }
             }
 

@@ -430,6 +430,11 @@ public class FinProjectTargetAssetDto extends FinProduct implements ITableRow,Pr
      */
     private String calRateType;
 
+    /**
+     * 附件临时Id
+     */
+    private String fjId;
+
 
     /**
      * 取得 推荐方
@@ -1891,4 +1896,12 @@ public class FinProjectTargetAssetDto extends FinProduct implements ITableRow,Pr
 	public void setFinancierIsHid(boolean financierIsHid) {
 		this.financierIsHid = financierIsHid;
 	}
+
+    public String getFjId() {
+        return fjId;
+    }
+
+    public void setFjId(String fjId) {
+        this.fjId = fjId;
+    }
 }

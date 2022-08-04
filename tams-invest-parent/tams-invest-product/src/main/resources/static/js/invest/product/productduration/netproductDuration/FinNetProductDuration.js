@@ -11,9 +11,9 @@ $(function() {
 		}
         var str = $('#finprodMarketId').select2('data')[0].object.split(',');
     	if(str != null && str.length==17){
-    		$('#finprodId').val(str[2]); 
+    		$('#finprodId').val(str[2]);
     		$('#finccy').textSelect('setValue', str[5]); // 币种
-               
+
             if(str[6]){
             	var vDate = Date.ofDate(str[6]).format('yyyy-MM-dd');
             	$('#vDate').val(vDate);
@@ -23,33 +23,33 @@ $(function() {
             	$('#mDate').val(mDate);
             }
             $('#isCycle').val(str[8]);	//
-            
+
             $('#FinNetProductDuration_prodAbbr').val(str[0]);
             $('#FinNetProductDuration_prodName').val(str[1]);
             if(str[9]){
-            	$('#operationType').val(str[9]);            	
+            	$('#operationType').val(str[9]);
             }
             if(str[10]){
-            	$('#profitType').val(str[10]);            	
+            	$('#profitType').val(str[10]);
             }
             if(str[11]){
-            	$('#portfolioId').val(str[11]);            	
+            	$('#portfolioId').val(str[11]);
             }
             //modify by wm 增加处理模式 2019-06-26 start
             if(str[12]){
-            	$('#dealMode').val(str[12]);            	
+            	$('#dealMode').val(str[12]);
             }
             //modify by wm 增加处理模式 2019-06-26 end
             if(str[13]){
-            	$('#calendarId').val(str[13]);            	
+            	$('#calendarId').val(str[13]);
             }
             //新增期限类型     周期型 净值型新增      2019-09-24
             if(str[14]){
-            	$('#termType').val(str[14]);            	
+            	$('#termType').val(str[14]);
             }
             //新增是否续投     周期型 净值型赎回新增      20191019
             if(str[15]){
-            	$('#continueFlag').val(str[15]);            	
+            	$('#continueFlag').val(str[15]);
             }
     	}
     	//交易类型 下拉枚举值联动
@@ -68,8 +68,8 @@ $(function() {
         		if($("#termType").val()=="01" || $("#termType").val()=="02"){
         			//新建
         	        if($("#pageModel").val() == PAGE_MODEL_NEW){
-        	        	Joyin.ajaxJson(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/getTermDaysList', 
-	        	        	{'finprodId':$('#finprodId').val()}, 
+        	        	Joyin.ajaxJson(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/getTermDaysList',
+	        	        	{'finprodId':$('#finprodId').val()},
 	        	        	function(result) {
 	        	        		$('#subTermDays').empty();
 	        	        		$('#purTermDays').empty();
@@ -87,7 +87,7 @@ $(function() {
         	        }
             		$("#subTermDaysDiv").show();
             		$("#purTermDaysDiv").show();
-            		
+
         		}
         		//无固定期限
         		else{
@@ -97,14 +97,14 @@ $(function() {
             		$("#subPeriodId").removeAttr("disabled");
             		$("#purPeriodId").removeAttr("disabled");
         		}
-        		
+
         	}
         	else{
         		$("#subTermDaysDiv").hide();
         		$("#purTermDaysDiv").hide();
         	}
-        	
-        	//周期型且期次管理方式为“显性管理”		期次代码展示	
+
+        	//周期型且期次管理方式为“显性管理”		期次代码展示
         	if($("#profitType").val()=="01" && $("#isCycle").val()=="Y" && $("#maneWay").val()=="01"){
         		//新建
     	        if($("#pageModel").val() == PAGE_MODEL_NEW){
@@ -116,8 +116,8 @@ $(function() {
 	        			vDate = $('#purConfirmDate').val();
 	    			}
     	        	//获取期限信息
-                	Joyin.ajaxJson(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/getPeriodsList', 
-        	        	{'finprodId':$('#finprodId').val(), "vDate":vDate}, 
+                	Joyin.ajaxJson(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/getPeriodsList',
+        	        	{'finprodId':$('#finprodId').val(), "vDate":vDate},
         	        	function(result) {
         	        		$('#subPeriodId').empty();
         	        		$('#purPeriodId').empty();
@@ -151,7 +151,7 @@ $(function() {
         		$("#subPeriodIdDiv").hide();
         		$("#purPeriodIdDiv").hide();
         	}
-        	
+
         	//净值型周期型
         	if($("#profitType").val()=="01" && $("#isCycle").val()=="Y"){
         		//期次结束日可见必填	期次结束日
@@ -169,7 +169,7 @@ $(function() {
         	}
     	}
     	//--------------------认申购      end----------------------
-    	
+
     	//期次管理方式“显性管理”		期次代码展示	----------赎回部分------------
     	if($("#maneWay").val()=="01"){
     		$("#redPeriodIdDiv").show();	//期次代码
@@ -266,9 +266,9 @@ $(function() {
     		//认购结束日下一天
     		var endDate = new Date($('#subCycleEndDate').val());
     		var payDateString = +endDate + 1000*60*60*24;
-    		var payDateMonth = new Date(payDateString).getMonth()+1 < 10 ? 
+    		var payDateMonth = new Date(payDateString).getMonth()+1 < 10 ?
     				"0" + (new Date(payDateString).getMonth()+1) : (new Date(payDateString).getMonth()+1);
-    		var payDateDate = new Date(payDateString).getDate() < 10 ? 
+    		var payDateDate = new Date(payDateString).getDate() < 10 ?
     				"0" + (new Date(payDateString).getDate()) : (new Date(payDateString).getDate());
     		$("#subCyclePayDate").val(new Date(payDateString).getFullYear() +"-"+payDateMonth +"-"+payDateDate);
     	}
@@ -285,9 +285,9 @@ $(function() {
                 payDateString = +endDate + 1000*60*60*24;
              }
             //支付日和期次结束日相等 modify by liupeilin 2020-01-15 end
-    		var payDateMonth = new Date(payDateString).getMonth()+1 < 10 ? 
+    		var payDateMonth = new Date(payDateString).getMonth()+1 < 10 ?
     				"0" + (new Date(payDateString).getMonth()+1) : (new Date(payDateString).getMonth()+1);
-    		var payDateDate = new Date(payDateString).getDate() < 10 ? 
+    		var payDateDate = new Date(payDateString).getDate() < 10 ?
     				"0" + (new Date(payDateString).getDate()) : (new Date(payDateString).getDate());
     		$("#purCyclePayDate").val(new Date(payDateString).getFullYear() +"-"+payDateMonth +"-"+payDateDate);
     	}
@@ -300,18 +300,18 @@ $(function() {
     	if($("#dealType").val()=="C1"){
     		var confirmDate = new Date($('#subConfirmDate').val());
     		var endDateString = +confirmDate + 1000*60*60*24*($("#subTermDays").val());
-    		var endDateMonth = new Date(endDateString).getMonth()+1 < 10 ? 
+    		var endDateMonth = new Date(endDateString).getMonth()+1 < 10 ?
     				"0" + (new Date(endDateString).getMonth()+1) : (new Date(endDateString).getMonth()+1);
-    		var endDateDate = new Date(endDateString).getDate() < 10 ? 
+    		var endDateDate = new Date(endDateString).getDate() < 10 ?
     				"0" + (new Date(endDateString).getDate()) : (new Date(endDateString).getDate());
     		$("#subCycleEndDate").val(new Date(endDateString).getFullYear() +"-"+endDateMonth +"-"+endDateDate);
     		cycleEndDateChange();
     	}else{
     		var confirmDate = new Date($('#purConfirmDate').val());
     		var endDateString = +confirmDate + 1000*60*60*24*($("#purTermDays").val());
-    		var endDateMonth = new Date(endDateString).getMonth()+1 < 10 ? 
+    		var endDateMonth = new Date(endDateString).getMonth()+1 < 10 ?
     				"0" + (new Date(endDateString).getMonth()+1) : (new Date(endDateString).getMonth()+1);
-    		var endDateDate = new Date(endDateString).getDate() < 10 ? 
+    		var endDateDate = new Date(endDateString).getDate() < 10 ?
     				"0" + (new Date(endDateString).getDate()) : (new Date(endDateString).getDate());
     		$("#purCycleEndDate").val(new Date(endDateString).getFullYear() +"-"+endDateMonth +"-"+endDateDate);
     		cycleEndDateChange();
@@ -321,13 +321,13 @@ $(function() {
      * 申购确认日修改联动    重新获取期次代码
      */
     var purConfirmDateChange = function(){
-    	//周期型且期次管理方式为“显性管理”		期次代码展示	
+    	//周期型且期次管理方式为“显性管理”		期次代码展示
     	if($("#profitType").val()=="01" && $("#isCycle").val()=="Y" && $("#maneWay").val()=="01"){
     		//新建
 	        if($("#pageModel").val() == PAGE_MODEL_NEW){
 	        	//获取期限信息
-            	Joyin.ajaxJson(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/getPeriodsList', 
-    	        	{'finprodId':$('#finprodId').val(), "vDate":$('#purConfirmDate').val()}, 
+            	Joyin.ajaxJson(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/getPeriodsList',
+    	        	{'finprodId':$('#finprodId').val(), "vDate":$('#purConfirmDate').val()},
     	        	function(result) {
     	        		$('#purPeriodId').empty();
     	        		periodInfoList = result;
@@ -346,23 +346,23 @@ $(function() {
     	$('#redModel').hide();
     	$('#redCycleModel').hide();
     	$('#expireModel').hide();
-    	$('#expireCycleModel').hide();    	
+    	$('#expireCycleModel').hide();
     	$('#addReduceModel').hide();
     	$('#addReduceCycleModel').hide();
     	$('#subModel03').hide();
     	$('#purModel03').hide();
     	$('#redModel03').hide();
-    	$('#expireModel03').hide();  	
+    	$('#expireModel03').hide();
     	$('#addReduceModel03').hide();
     	$('#bonusCashModel03').hide();
     	$('#bonusShareModel03').hide();
-    	
+
     	$('#FinNetProductDuration_div_red_layering').prop('hidden', true);
     	$('#FinNetProductDuration_div_expire_layering').prop('hidden', true);
     	$('#FinNetProductDuration_div_reduce_layering').prop('hidden', true);
 		$('#FinNetProductDuration_div_layering').prop('hidden', true);
 		$('#FinNetProductDuration_div_pur_layering').prop('hidden', true);
-    	
+
     	$(".hkxx").find(".layui-table-view .layui-table-box .layui-table-body table tbody tr td").html("");
     	$(".hkxx").prop('hidden', false);
     	if(typeof pageModel !== 'undefined'
@@ -372,13 +372,13 @@ $(function() {
         	$('#redModel').find(".pro-module-item .layui-form-item .form-inline-wrap .input-inline input").val("");
         	$('#redCycleModel').find(".pro-module-item .layui-form-item .form-inline-wrap .input-inline input").val("");
         	$('#expireModel').find(".pro-module-item .layui-form-item .form-inline-wrap .input-inline input").val("");
-        	$('#expireCycleModel').find(".pro-module-item .layui-form-item .form-inline-wrap .input-inline input").val("");    	
+        	$('#expireCycleModel').find(".pro-module-item .layui-form-item .form-inline-wrap .input-inline input").val("");
         	$('#addReduceModel').find(".pro-module-item .layui-form-item .form-inline-wrap .input-inline input").val("");
         	$('#addReduceCycleModel').find(".pro-module-item .layui-form-item .form-inline-wrap .input-inline input").val("");
         	$('#subModel03').find(".pro-module-item .layui-form-item .form-inline-wrap .input-inline input").val("");
         	$('#purModel03').find(".pro-module-item .layui-form-item .form-inline-wrap .input-inline input").val("");
         	$('#redModel03').find(".pro-module-item .layui-form-item .form-inline-wrap .input-inline input").val("");
-        	$('#expireModel03').find(".pro-module-item .layui-form-item .form-inline-wrap .input-inline input").val(""); 	
+        	$('#expireModel03').find(".pro-module-item .layui-form-item .form-inline-wrap .input-inline input").val("");
         	$('#addReduceModel03').find(".pro-module-item .layui-form-item .form-inline-wrap .input-inline input").val("");
         	$('#bonusCashModel03').find(".pro-module-item .layui-form-item .form-inline-wrap .input-inline input").val("");
         	$('#bonusShareModel03').find(".pro-module-item .layui-form-item .form-inline-wrap .input-inline input").val("");
@@ -389,13 +389,13 @@ $(function() {
     	//是否周期产品
     	var isCycle = $('#isCycle').val();
     	//运作方式，开放式01、封闭式02
-    	var operationType = $('#operationType').val(); 
+    	var operationType = $('#operationType').val();
     	//净值产品还是货币产品
-    	var profitType = $('#profitType').val(); 
-    	var finprodId = $('#finprodId').val(); 
+    	var profitType = $('#profitType').val();
+    	var finprodId = $('#finprodId').val();
     	$('#dealType').empty();
-    	Joyin.ajaxJson(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/getDealTypeList', 
-        	{'isCycle':isCycle,'operationType':operationType,'profitType':profitType,'finprodId':finprodId}, 
+    	Joyin.ajaxJson(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/getDealTypeList',
+        	{'isCycle':isCycle,'operationType':operationType,'profitType':profitType,'finprodId':finprodId},
         	function(result) {
                 $('#dealType').append("<option value=''>请选择...</option>");
                 $(result).each(function (i, n) {
@@ -404,12 +404,12 @@ $(function() {
         	}
         );
     };
-    
+
     /**
 	 * 分层金额明细-认购
 	 */
-	
-	var layAmtNetTable = $('#FinNetProductDuration_layAmtNetTable').joyintable({ 
+
+	var layAmtNetTable = $('#FinNetProductDuration_layAmtNetTable').joyintable({
     	ajax: {
             url: JoyinUtil.getRealPath('invest/product/productduration/netproductDuration/FinNetProductDuration/queryLayAmtDetailByFinprodId'),
             type: 'POST',
@@ -455,20 +455,20 @@ $(function() {
 	   		 if(arr[i].subLayerFee==""||arr[i].subLayerFee==null){
 	   			 arr[i].subLayerFee = 0;
 	   		 }
-	   		 
+
 	   		 subDealLayerAmtSum = JoyinMath.doAdd(subDealLayerAmtSum, arr[i].subDealLayerAmt, 2, JoyinMath.ROUND_HALF_UP);//上期余额累计
 	   		 subLayerFeeSum = JoyinMath.doAdd(subLayerFeeSum, arr[i].subLayerFee, 2, JoyinMath.ROUND_HALF_UP);//本期认购累计
 	   		}
 		   	 $('#subDealAmt').val(subDealLayerAmtSum).trigger("change");
 //		   	 $('#subDealNum').val(subDealLayerAmtSum);
 		   	 $('#subFee').val(subLayerFeeSum);
-	    }    
+	    }
     });
 	/**
 	 * 分层金额明细-申购
 	 */
-	
-	var layAmtPurNetTable = $('#FinNetProductDuration_layAmtPurNetTable').joyintable({ 
+
+	var layAmtPurNetTable = $('#FinNetProductDuration_layAmtPurNetTable').joyintable({
     	ajax: {
             url: JoyinUtil.getRealPath('invest/product/productduration/netproductDuration/FinNetProductDuration/queryLayAmtDetailByFinprodId'),
             type: 'POST',
@@ -497,11 +497,11 @@ $(function() {
 				,{field:'tradeId', visible: false}
 	        ],
 	    beforeEditCell : function(preVal, field, rowData){
-	   
+
 	      return true;
 	    },
 	    editCell: function(value, data, field, cell, column){
-	    	
+
 	    	var rowData = {};
 //	    	var lastAmt = 0;
 //	    	var currentSub = 0;
@@ -511,15 +511,15 @@ $(function() {
 	    	var purDealLayerAmtSum = 0;
 	    	var purDealLayerNumSum = 0;
 	    	var purLayerFeeSum = 0;
-	   		
+
 	    	if(data.purNetValueLayerDate&&field == 'purNetValueLayerDate'){
 	    		data.purUnitNetLayerValue = '';
 	    		getLayerNetValueInfo(data);
 	    		rowData.purUnitNetLayerValue = data.purUnitNetLayerValue;
 	    	}
-	   		if(data.purUnitNetLayerValue && data.purDealLayerAmt && field == 'purDealLayerAmt'){        		
+	   		if(data.purUnitNetLayerValue && data.purDealLayerAmt && field == 'purDealLayerAmt'){
 	   			rowData.purDealLayerNum = Number(JoyinMath.doDiv(data.purDealLayerAmt,data.purUnitNetLayerValue,2));
-        	} 
+        	}
 	    	layAmtPurNetTable.renderRow(data.LAY_TABLE_INDEX, rowData);
 	    	var arr = layAmtPurNetTable.getAllRows();
 	    	 for ( var i = 0; i <arr.length; i++){
@@ -540,13 +540,13 @@ $(function() {
 		   	 $('#purDealNum').val(purDealLayerNumSum);
 		   	 $('#purFee').val(purLayerFeeSum);
 	         reloadSettle();
-	    }    
+	    }
     });
 	/**
 	 * 分层金额明细-赎回
 	 */
-	
-	var layAmtRedNetTable = $('#FinNetProductDuration_layAmtRedNetTable').joyintable({ 
+
+	var layAmtRedNetTable = $('#FinNetProductDuration_layAmtRedNetTable').joyintable({
     	ajax: {
             url: JoyinUtil.getRealPath('invest/product/productduration/netproductDuration/FinNetProductDuration/queryLayAmtDetailByFinprodId'),
             type: 'POST',
@@ -591,16 +591,16 @@ $(function() {
 	    	var redPurLayerFeeHdSum = 0;
 	    	var redLayerProfitSum = 0;
 	    	var redLayerCostSum = 0;
-	    	
+
 	    	if(data.redNetValueLayerDate&&field == 'redNetValueLayerDate'){
 	    		data.redUnitNetLayerValue =  '';
 	    		getLayerNetValueInfo(data);
 	    		rowData.redUnitNetLayerValue = data.redUnitNetLayerValue;
 	    	}
-	    	
-	    	if(data.redUnitNetLayerValue && data.redDealLayerNum){        		
+
+	    	if(data.redUnitNetLayerValue && data.redDealLayerNum){
 	   			rowData.redDealLayerAmt = Number(JoyinMath.doMul(data.redUnitNetLayerValue,data.redDealLayerNum,2));
-        	} 
+        	}
 	    	rowData.redTotalNetLayerValue = JoyinMath.doMinus(rowData.redDealLayerAmt,data.redFeeLcLayer,2);
 	    	layAmtRedNetTable.renderRow(data.LAY_TABLE_INDEX, rowData);
 	    	var arr = layAmtRedNetTable.getAllRows();
@@ -637,7 +637,7 @@ $(function() {
 	    	 redPurLayerFeeHdSum = JoyinMath.doAdd(redPurLayerFeeHdSum, arr[i].redPurLayerFeeHd, 2, JoyinMath.ROUND_HALF_UP);
 	    	 redLayerProfitSum = JoyinMath.doAdd(redLayerProfitSum, arr[i].redLayerProfit, 2, JoyinMath.ROUND_HALF_UP);
 	    	 redLayerCostSum = JoyinMath.doAdd(redLayerCostSum, arr[i].redLayerCost, 2, JoyinMath.ROUND_HALF_UP);
-	   		
+
 	    	}
 		   	$('#redDealNum').val(redDealLayerNumSum);
 		   	$('#redFeeLc').val(redFeeLcLayerSum);
@@ -647,13 +647,13 @@ $(function() {
 		   	$('#redPurFeeHd').val(redPurLayerFeeHdSum);
 		   	$('#redProfit').val(redLayerProfitSum);
 		   	$('#redCost').val(redLayerCostSum);
-	    }    
+	    }
     });
 	/**
 	 * 分层金额明细-到期
 	 */
-	
-	var layAmtExpireNetTable = $('#FinNetProductDuration_layAmtExpireNetTable').joyintable({ 
+
+	var layAmtExpireNetTable = $('#FinNetProductDuration_layAmtExpireNetTable').joyintable({
     	ajax: {
             url: JoyinUtil.getRealPath('invest/product/productduration/netproductDuration/FinNetProductDuration/queryLayAmtDetailByFinprodId'),
             type: 'POST',
@@ -690,7 +690,7 @@ $(function() {
 	    	var expireDealLayerNumSum = 0;
 	    	var expireLayerProfitSum = 0;
 	    	var expireLayerCostValueSum = 0;
-	    	
+
 	    	if(data.expireNetValueLayerDate&&field == 'expireNetValueLayerDate'){
 	    		data.expireUnitNetLayerValue =  '';
 	    		getLayerNetValueInfo(data);
@@ -705,9 +705,9 @@ $(function() {
 	    		}
 	    	}
 	    	layAmtExpireNetTable.renderRow(data.LAY_TABLE_INDEX, rowData);
-	    	
+
 	    	var arr = layAmtExpireNetTable.getAllRows();
-	    	
+
 	    	for ( var i = 0; i <arr.length; i++){
 	   		 if(arr[i].expireDealLayerAmt==""||arr[i].expireDealLayerAmt==null){
 	   			 arr[i].expireDealLayerAmt = 0;
@@ -733,7 +733,7 @@ $(function() {
 		   	$('#expireCost').val(expireLayerCostValueSum);
 		   	$('#expireProfit').val(expireLayerProfitSum);
 	    },
-	    done: function(table, allData){   
+	    done: function(table, allData){
 	    	var expireDealLayerAmtSum = 0;
 	    	var expireDealLayerNumSum = 0;
 	    	var expireLayerProfitSum = 0;
@@ -764,12 +764,12 @@ $(function() {
 			   	$('#expireProfit').val(expireLayerProfitSum);
 	    }
     });
-	
+
 	/**
 	 * 分层金额明细-强增/强减
 	 */
-	
-	var layAmtReduceNetTable = $('#FinNetProductDuration_layAmtReduceNetTable').joyintable({ 
+
+	var layAmtReduceNetTable = $('#FinNetProductDuration_layAmtReduceNetTable').joyintable({
     	ajax: {
             url: JoyinUtil.getRealPath('invest/product/productduration/netproductDuration/FinNetProductDuration/queryLayAmtDetailByFinprodId'),
             type: 'POST',
@@ -802,16 +802,16 @@ $(function() {
 	    	var rowData = {};
 	    	var addReduceDealLayerAmtSum = 0;
 	    	var addReduceDealLayerNumSum = 0;
-	    	
+
 	    	if(data.addReduceNetValueLayerDate&&field == 'addReduceNetValueLayerDate'){
 	    		data.addReduceUnitNetLayerValue =  '';
 	    		getLayerNetValueInfo(data);
 	    		rowData.addReduceUnitNetLayerValue = data.addReduceUnitNetLayerValue;
 	    	}
-	    	if(data.addReduceUnitNetLayerValue && data.addReduceDealLayerNum && field == 'addReduceDealLayerNum'){        		
+	    	if(data.addReduceUnitNetLayerValue && data.addReduceDealLayerNum && field == 'addReduceDealLayerNum'){
 	   			rowData.addReduceDealLayerAmt = Number(JoyinMath.doMul(data.addReduceUnitNetLayerValue,data.addReduceDealLayerNum,2));
-        	} 
-	    	
+        	}
+
 	    	layAmtReduceNetTable.renderRow(data.LAY_TABLE_INDEX, rowData);
 	    	var arr = layAmtReduceNetTable.getAllRows();
 	    	for ( var i = 0; i <arr.length; i++){
@@ -828,7 +828,7 @@ $(function() {
 		   	$('#addReduceDealAmt').val(addReduceDealLayerAmtSum).trigger("change");
 		   	$('#addReduceDealNum').val(addReduceDealLayerNumSum);
 //		   	$('#redDealAmt').val(expireLayerProfitSum).trigger("change");
-	    }    
+	    }
     });
     /*查询货币产品的分红方式和分红规则，
      * 如果分红规则不是 不规则，则查询分红计划表，是否存在计息结束日等于平台日的分红计划，不存在则计息结束日字段为空，不可做分红交易
@@ -845,15 +845,15 @@ $(function() {
     		$('#bonusShareConfirmDate03').val(Date.ofDate(iPlatformDate).format('yyyy-MM-dd'));
     	}
     	//modify by wm 红利下发日默认平台日  end
-    	Joyin.ajaxJson(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/queryBonusRule', 
-        	{'finprodId':finprodId,'dealType':dealType}, 
+    	Joyin.ajaxJson(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/queryBonusRule',
+        	{'finprodId':finprodId,'dealType':dealType},
         	function(result) {
         		if("C9"==dealType){
         			if(result.payType=='02'){
         				JoyinUtil.showMessage("该产品只支持红利再投！");
         				return;
         			}
-        			if(result.payCycle=='09' || (result.payCycle=='08' && !result.mdate)  || result.payCycle=='07'){  
+        			if(result.payCycle=='09' || (result.payCycle=='08' && !result.mdate)  || result.payCycle=='07'){
         				//modify by wm 取消计息结束日对红利下发日的联动 start
         				//$('#bonusCashEndDate03').val(Date.ofDate(iPlatformDate).format('yyyy-MM-dd')).trigger("change");
         				$('#bonusCashEndDate03').val(Date.ofDate(iPlatformDate).format('yyyy-MM-dd'));
@@ -866,7 +866,7 @@ $(function() {
         					$('#bonusCashEndDate03').val(Date.ofDate(mdate).format('yyyy-MM-dd'));
         					//modify by wm 取消计息结束日对红利下发日的联动end
         				}
-        				
+
         			}
         		}else if("C10"==dealType){
         			if(result.payType=='01'){
@@ -878,10 +878,10 @@ $(function() {
         			}else{
         				var mdate = result.mdate;
         				if(mdate){
-        					//取消计息结束日联动再投确认日联动，并将平台日赋值再投确认日 start modify by wm 
+        					//取消计息结束日联动再投确认日联动，并将平台日赋值再投确认日 start modify by wm
         					//$('#bonusShareEndDate03').val(Date.ofDate(mdate).format('yyyy-MM-dd')).trigger("change");
         					$('#bonusShareEndDate03').val(Date.ofDate(mdate).format('yyyy-MM-dd'));
-        					//取消计息结束日联动再投确认日联动，并将平台日赋值再投确认日 end modify by wm 
+        					//取消计息结束日联动再投确认日联动，并将平台日赋值再投确认日 end modify by wm
         				}
         			}
         			$('#bonusShareAfterShareNumBf').val(result.bonusShareAfterShareNumBf);
@@ -890,7 +890,7 @@ $(function() {
         	}
         );
     };
-    
+
     /**
      * 交易类型选择，录单模块联动变化
      */
@@ -902,28 +902,28 @@ $(function() {
 		//系统状态
 		var operateType= $('#operateType').val();
     	//净值产品还是货币产品
-    	var profitType = $('#profitType').val(); 
+    	var profitType = $('#profitType').val();
     	//交易类型
-    	var dealType = $('#dealType').val(); 
+    	var dealType = $('#dealType').val();
     	//产品处理模式 add by wm 分档判断条件
-    	var dealMode = $('#dealMode').val(); 
-    	
+    	var dealMode = $('#dealMode').val();
+
 //    	$('#subModel').hide();
 //    	$('#purModel').hide();
 //    	$('#redModel').hide();
 //    	$('#redCycleModel').hide();
 //    	$('#expireModel').hide();
-//    	$('#expireCycleModel').hide();    	
+//    	$('#expireCycleModel').hide();
 //    	$('#addReduceModel').hide();
 //    	$('#addReduceCycleModel').hide();
 //    	$('#subModel03').hide();
 //    	$('#purModel03').hide();
 //    	$('#redModel03').hide();
-//    	$('#expireModel03').hide();  	
+//    	$('#expireModel03').hide();
 //    	$('#addReduceModel03').hide();
 //    	$('#bonusCashModel03').hide();
 //    	$('#bonusShareModel03').hide();
-//    	
+//
 //    	$('#FinNetProductDuration_div_red_layering').prop('hidden', true);
 //    	$('#FinNetProductDuration_div_expire_layering').prop('hidden', true);
 //    	$('#FinNetProductDuration_div_reduce_layering').prop('hidden', true);
@@ -939,11 +939,11 @@ $(function() {
 //    	$(".hkxx").find(".layui-table-view .layui-table-box .layui-table-body table tbody tr td").html("");
     	if("01"==profitType){
     		//净值产品
-    		if("C1"==dealType){ 
+    		if("C1"==dealType){
         		//认购
             	if("N"==isCycle){
                 	//非周期产品期次结束日、期次支付日隐藏，确认日取产品起息日，不可修改
-                	$('#subCycleEndDateDiv').hide(); 
+                	$('#subCycleEndDateDiv').hide();
             		$('#subCyclePayDateDiv').hide();
 					if($("#pageModel").val() != PAGE_MODEL_REFERENCE) {
 						$('#subConfirmDate').val(Date.ofDate($('#vDate').val()).format('yyyy-MM-dd'));
@@ -951,7 +951,7 @@ $(function() {
             		$('#subConfirmDate').attr("disabled",true);
                 }else {
                 	//周期产品期次结束日、期次支付日展示，确认日取系统平台日，可修改
-                	$('#subCycleEndDateDiv').show(); 
+                	$('#subCycleEndDateDiv').show();
             		$('#subCyclePayDateDiv').show();
 					if($("#pageModel").val() != PAGE_MODEL_REFERENCE){
             		$('#subConfirmDate').val(Date.ofDate(iPlatformDate).format('yyyy-MM-dd'));}
@@ -973,16 +973,16 @@ $(function() {
         		//申购
         		if("N"==isCycle){
                 	//非周期产品期次结束日、期次支付日隐藏
-            		$('#purCycleEndDateDiv').hide(); 
+            		$('#purCycleEndDateDiv').hide();
             		$('#purCyclePayDateDiv').hide();
                 }else {
                 	//周期产品期次结束日、期次支付日展示
-            		$('#purCycleEndDateDiv').show(); 
+            		$('#purCycleEndDateDiv').show();
             		$('#purCyclePayDateDiv').show();
-                } 
+                }
         		//确认日等于平台日期
         		if(!$('#purConfirmDate').val() && $("#pageModel").val() != PAGE_MODEL_REFERENCE){
-        			$('#purConfirmDate').val(Date.ofDate(iPlatformDate).format('yyyy-MM-dd')).trigger("change"); 
+        			$('#purConfirmDate').val(Date.ofDate(iPlatformDate).format('yyyy-MM-dd')).trigger("change");
         		}
         		if("11"==dealMode){
         			$('#purNetValueDate').attr("disabled",true);
@@ -1001,7 +1001,7 @@ $(function() {
         		}
         		maneModelDivChange();
         		$('#purModel').show();
-        		
+
         	}else if("C4"==dealType){
         		//分档
         		if("11"==dealMode){
@@ -1018,7 +1018,7 @@ $(function() {
         		}
         		//普通
         		else{
-        			//赎回，周期产品不支持部分赎回 
+        			//赎回，周期产品不支持部分赎回
             		if("N"==isCycle){
             			$('#redDealNum').attr("disabled",false);
             			$('#redDealAmt').attr("disabled",false);
@@ -1044,7 +1044,7 @@ $(function() {
             			$('#redCost').attr("disabled",true);
             			$('#redProfit').attr("disabled",true);
             			$('#redManaFreeVal').attr("disabled",true);
-            			
+
             		}
         		}
         		$('#redTitle').text("赎回要素");
@@ -1053,7 +1053,7 @@ $(function() {
         		if(!$('#redConfirmDate').val()){
         			$('#redConfirmDate').val(Date.ofDate(iPlatformDate).format('yyyy-MM-dd')).trigger("change");
         		}
-        		$('#redModel').show();        		 
+        		$('#redModel').show();
         	}else if("C17"==dealType){
         		//提前赎回，周期产品不支持提前赎回
         		$('#redDealNum').attr("disabled",false);
@@ -1085,7 +1085,7 @@ $(function() {
 //        			$('#redPurFeeHd').attr("disabled",false);
 //        			$('#redProfit').attr("disabled",false);
 //        			$('#redCost').attr("disabled",false);
-        			//赎回，周期产品不支持部分赎回 
+        			//赎回，周期产品不支持部分赎回
             		if("N"==isCycle){
             			$('#redDealNum').attr("disabled",false);
             			$('#redDealAmt').attr("disabled",false);
@@ -1095,7 +1095,7 @@ $(function() {
             			$('#redPurFeeHd').attr("disabled",false);
             			$('#redCost').attr("disabled",false);
             			$('#redProfit').attr("disabled",false);
-            		}else{ 
+            		}else{
             			//周期型产品交易份额不可修改，通过列表汇总赋值
             			$('#redNetValueDate').attr("disabled",true);
             			$('#redUnitNetValue').attr("disabled",true);
@@ -1107,15 +1107,15 @@ $(function() {
             			$('#redPurFeeHd').attr("disabled",true);
             			$('#redCost').attr("disabled",true);
             			$('#redProfit').attr("disabled",true);
-            			$('#redManaFreeVal').attr("disabled",true); 
+            			$('#redManaFreeVal').attr("disabled",true);
             		}
-        		} 
+        		}
     			$('#redModel').show();
     			if("Y"==isCycle){
     				$('#redCycleModel').show();
     				redCycleDataInit();
     			}
-        		 
+
         	}else if("C18"==dealType){
         		//违约赎回，周期产品不支持违约赎回
         		$('#redDealNum').attr("disabled",false);
@@ -1126,7 +1126,7 @@ $(function() {
     			if(!$('#redConfirmDate').val() && $("#pageModel").val() != PAGE_MODEL_REFERENCE){
     				$('#redConfirmDate').val(Date.ofDate(iPlatformDate).format('yyyy-MM-dd')).trigger("change");
     			}
-    			$('#redModel').show();    
+    			$('#redModel').show();
     			if("Y"==isCycle){
     				redCycleDataInit();
     			}
@@ -1134,7 +1134,7 @@ $(function() {
         		//add by gcl start
         		$('#expireDealNum').attr("disabled",true);
         		//add by gcl end
-        		
+
         		$('#expireTitle').text("到期要素");
         		//确认日等于平台日期
         		if(!$('#expireConfirmDate').val() && $("#pageModel").val() != PAGE_MODEL_REFERENCE){
@@ -1247,15 +1247,15 @@ $(function() {
         			$('#addReduceDealAmt').attr("disabled",true);
         		}
             	if("C3"==dealType){
-            		$('#addReduceTitle').text("强增要素"); 
+            		$('#addReduceTitle').text("强增要素");
             	}else if("C6"==dealType){
-            		$('#addReduceTitle').text("强减要素"); 
+            		$('#addReduceTitle').text("强减要素");
             	}
-            	
+
             	if(!$('#addReduceConfirmDate').val()){
 	            	//赎回确认日等于平台日期
-	        		$('#addReduceConfirmDate').val(Date.ofDate(iPlatformDate).format('yyyy-MM-dd')).trigger("change"); 
-            	}    
+	        		$('#addReduceConfirmDate').val(Date.ofDate(iPlatformDate).format('yyyy-MM-dd')).trigger("change");
+            	}
             	if("11"==dealMode){
         			$('#FinNetProductDuration_div_reduce_layering').prop('hidden', false);
         			$('#addReduceNetValueDate').attr("disabled",true);
@@ -1272,8 +1272,8 @@ $(function() {
         	}
     	}else if("03"==profitType){
     		//货币型产品
-    		if("C1"==dealType){ 
-    			//认购    			
+    		if("C1"==dealType){
+    			//认购
     			$('#subConfirmDate03').val(Date.ofDate($('#vDate').val()).format('yyyy-MM-dd'));
         		$('#subConfirmDate03').attr("disabled",true);
         		$('#subModel03').show();
@@ -1288,7 +1288,7 @@ $(function() {
     			//计息结束日赋值
     			if(!$('#bonusCashEndDate03').val()){
     				queryBonusRule();
-    			}    			
+    			}
     			$('#bonusCashModel03').show();
         	}else if("C10"==dealType){
         		//货币产品红利再投
@@ -1303,12 +1303,12 @@ $(function() {
         		//初始化时 赎回确认日等于平台日期
         		if(!$('#redConfirmDate03').val()){
         			$('#redConfirmDate03').val(Date.ofDate(iPlatformDate).format('yyyy-MM-dd')).trigger("change");
-        		} 
+        		}
         		if("C18"==dealType){
         			$('#divLiquidatedDamages03').show();
         		}else{
         			$('#divLiquidatedDamages03').hide();
-        		}        		
+        		}
         		$('#redModel03').show();
         		if("C4"==dealType || "C17"==dealType){
         			var redPrinAmt = $('#redPrinAmt03').val();
@@ -1319,21 +1319,21 @@ $(function() {
     			//确认日等于产品到期日
     			if(!$('#expireConfirmDate03').val()){
     				$('#expireConfirmDate03').val(Date.ofDate($('#mDate').val()).format('yyyy-MM-dd')).trigger("change");
-    			}    			
+    			}
     			$('#expireModel03').show();
     		}else if("C3"==dealType || "C6"==dealType){
     			if("C3"==dealType){
-            		$('#addReduceTitle').text("强增要素"); 
+            		$('#addReduceTitle').text("强增要素");
             	}else if("C6"==dealType){
-            		$('#addReduceTitle').text("强减要素"); 
-            	} 
+            		$('#addReduceTitle').text("强减要素");
+            	}
     			if(!$('#addReduceConfirmDate03').val()){
     				$('#addReduceConfirmDate03').val(Date.ofDate(iPlatformDate).format('yyyy-MM-dd'));
     			}
     			$('#addReduceModel03').show();
     		}
     	}
-    	
+
     };
     var preRedCycleDataTableList = [];
     /**
@@ -1345,7 +1345,7 @@ $(function() {
             type: 'POST',
             data: function() {
             		return getRedParams();
-    			} 
+    			}
         },
         cols:[
             {field:'finprodId',visible :false}
@@ -1353,7 +1353,7 @@ $(function() {
             ,{field:'redPeriodId',title: 'FinNetProductDuration.periodId',sortable:false, width:120,visible :$("#maneWay").val() == "01" ? true:false}
             ,{field:'vDate',title: 'FinNetProductDuration.cycleStartDate', width:120,type:'date',sortable:false}
             ,{field:'mDate',title: 'FinNetProductDuration.cycleEndDate', width:120,type:'date',sortable:false}
-            ,{field:'redNetValueDate', title: 'FinNetProductDuration.netValueDate',type:'date', width:110,sortable:false,edit:true}            
+            ,{field:'redNetValueDate', title: 'FinNetProductDuration.netValueDate',type:'date', width:110,sortable:false,edit:true}
             ,{field:'redUnitNetValue', title: 'FinNetProductDuration.unitNetValue',type:'number', digit:4, width:80,sortable:false,edit:true}
             ,{field:'redDealNum', title: 'FinNetProductDuration.dealNum',type:'number', width:110,sortable:false,edit:true}
             ,{field:'redDealAmt', title: 'FinNetProductDuration.dealAmt',type:'number', width:110,sortable:false,edit:true}
@@ -1407,7 +1407,7 @@ $(function() {
         		$("#redCost").val(0);
         		$("#redProfit").val(0);
         		$("#redManaFreeVal").val(0);
-            		
+
             	for(var i in table){
             		redCycleDataTable.renderRow(i, {redDealAmt: table[i].redDealNum*table[i].redUnitNetValue});
             		redCycleDataTable.renderRow(i, {redFeeLc: '0'});
@@ -1440,24 +1440,24 @@ $(function() {
         	redCycleDataTable.uncheck();
         	var redCycleDataTableList = redCycleDataTable.getAllRows();
         	if(field == "redFeeLc"){
-        		redCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+        		redCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
             			{redTotalNetValue: parseFloat(redCycleDataTableList[data.LAY_TABLE_INDEX].redDealAmt)-value});	//净金额
         	}
         	//交易份额
         	if(field == "redDealNum"){
-        		if(preRedCycleDataTableList[data.LAY_TABLE_INDEX].redDealNum 
+        		if(preRedCycleDataTableList[data.LAY_TABLE_INDEX].redDealNum
         				&& parseFloat(value) > parseFloat(preRedCycleDataTableList[data.LAY_TABLE_INDEX].redDealNum)){
         			//延迟加载，重置交易份额
             		setTimeout(function () {
-            			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+            			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
     	        				{redDealNum: preRedCycleDataTableList[data.LAY_TABLE_INDEX].redDealNum});
             			//修改交易金额     净值*交易份额
                 		if(redCycleDataTableList[data.LAY_TABLE_INDEX].redUnitNetValue
                 				*preRedCycleDataTableList[data.LAY_TABLE_INDEX].redDealNum == 0){
-                			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+                			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
         	        				{redDealAmt: "0"});
                 		}else{
-                			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+                			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
         	        				{redDealAmt: redCycleDataTableList[data.LAY_TABLE_INDEX].redUnitNetValue
                 						*preRedCycleDataTableList[data.LAY_TABLE_INDEX].redDealNum});
                 		}
@@ -1465,11 +1465,11 @@ $(function() {
                 		//修改净金额
                 		if(parseFloat(redCycleDataTableList[data.LAY_TABLE_INDEX].redDealAmt)
             					-redCycleDataTableList[data.LAY_TABLE_INDEX].redFeeLc == 0){
-                			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+                			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
                     				{redTotalNetValue: "0"});
                 		}
             			else{
-            				redCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+            				redCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
             	    				{redTotalNetValue: parseFloat(redCycleDataTableList[data.LAY_TABLE_INDEX].redDealAmt)
             	    					-redCycleDataTableList[data.LAY_TABLE_INDEX].redFeeLc});
             			}
@@ -1478,21 +1478,21 @@ $(function() {
         		else{
         			//修改交易金额     净值*交易份额
             		if(redCycleDataTableList[data.LAY_TABLE_INDEX].redUnitNetValue*value == 0){
-            			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+            			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
     	        				{redDealAmt: "0"});
             		}else{
-            			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+            			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
     	        				{redDealAmt: redCycleDataTableList[data.LAY_TABLE_INDEX].redUnitNetValue*value});
             		}
             		redCycleDataTableList = redCycleDataTable.getAllRows();
             		//修改净金额
             		if(parseFloat(redCycleDataTableList[data.LAY_TABLE_INDEX].redDealAmt)
         					-redCycleDataTableList[data.LAY_TABLE_INDEX].redFeeLc == 0){
-            			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+            			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
                 				{redTotalNetValue: "0"});
             		}
         			else{
-        				redCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+        				redCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
         	    				{redTotalNetValue: parseFloat(redCycleDataTableList[data.LAY_TABLE_INDEX].redDealAmt)
         	    					-redCycleDataTableList[data.LAY_TABLE_INDEX].redFeeLc});
         			}
@@ -1503,11 +1503,11 @@ $(function() {
         		//修改净金额
         		if(parseFloat(redCycleDataTableList[data.LAY_TABLE_INDEX].redDealAmt)
     					-redCycleDataTableList[data.LAY_TABLE_INDEX].redFeeLc == 0){
-        			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+        			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
             				{redTotalNetValue: "0"});
         		}
     			else{
-    				redCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+    				redCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
     	    				{redTotalNetValue: parseFloat(redCycleDataTableList[data.LAY_TABLE_INDEX].redDealAmt)
     	    					-redCycleDataTableList[data.LAY_TABLE_INDEX].redFeeLc});
     			}
@@ -1530,7 +1530,7 @@ $(function() {
                     }
                 }
 
-    			Joyin.ajaxJson(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/getTrdValueByCdate', 
+    			Joyin.ajaxJson(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/getTrdValueByCdate',
     	        	{finprodId:$('#finprodId').val(),redNetValueDate:value,dealType:$("#dealType").val()},
     	        	function(result) {
     	        		//修改净值
@@ -1538,21 +1538,21 @@ $(function() {
     	        		redCycleDataTableList = redCycleDataTable.getAllRows();
     	        		//修改交易金额     净值*交易份额
     	        		if(redCycleDataTableList[data.LAY_TABLE_INDEX].redDealNum*result == 0){
-    	        			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+    	        			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
         	        				{redDealAmt: "0"});
     	        		}else{
-    	        			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+    	        			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
         	        				{redDealAmt: redCycleDataTableList[data.LAY_TABLE_INDEX].redDealNum*result});
     	        		}
     	        		redCycleDataTableList = redCycleDataTable.getAllRows();
     	        		//修改净金额
     	        		if(parseFloat(redCycleDataTableList[data.LAY_TABLE_INDEX].redDealAmt)
     	    					-redCycleDataTableList[data.LAY_TABLE_INDEX].redFeeLc == 0){
-    	        			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+    	        			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
     	            				{redTotalNetValue: "0"});
     	        		}
     	    			else{
-    	    				redCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+    	    				redCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
     	    	    				{redTotalNetValue: parseFloat(redCycleDataTableList[data.LAY_TABLE_INDEX].redDealAmt)
     	    	    					-redCycleDataTableList[data.LAY_TABLE_INDEX].redFeeLc});
     	    			}
@@ -1563,21 +1563,21 @@ $(function() {
     		if(field == "redUnitNetValue"){
         		//修改交易金额     净值*交易份额
         		if(redCycleDataTableList[data.LAY_TABLE_INDEX].redDealNum*value == 0){
-        			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+        			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
 	        				{redDealAmt: "0"});
         		}else{
-        			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+        			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
 	        				{redDealAmt: redCycleDataTableList[data.LAY_TABLE_INDEX].redDealNum*value});
         		}
         		redCycleDataTableList = redCycleDataTable.getAllRows();
         		//修改净金额
         		if(parseFloat(redCycleDataTableList[data.LAY_TABLE_INDEX].redDealAmt)
     					-redCycleDataTableList[data.LAY_TABLE_INDEX].redFeeLc == 0){
-        			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+        			redCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
             				{redTotalNetValue: "0"});
         		}
     			else{
-    				redCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+    				redCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
     	    				{redTotalNetValue: parseFloat(redCycleDataTableList[data.LAY_TABLE_INDEX].redDealAmt)
     	    					-redCycleDataTableList[data.LAY_TABLE_INDEX].redFeeLc});
     			}
@@ -1639,13 +1639,13 @@ $(function() {
 		else{
 			redCycleDataTable.load();
 		}
-		
+
     };
     /**
      * 赎回期次子产品列表check选中事件
      */
     var redCycleDataTableCheck = function() {
-	   
+
     	var redCycleDataTableList = redCycleDataTable.getAllCheckedRows();
     	var redDealNumTotal = 0;
     	var redDealAmtTotal = 0;
@@ -1657,7 +1657,7 @@ $(function() {
     	var redProfitTotal = 0;		//赎回收益总和
     	var redManaFreeValTotal = 0;		//浮动管理费总和
     	for(var i in redCycleDataTableList){
-    		
+
     		if(redCycleDataTableList[i].redDealNum){
 				redDealNumTotal = redDealNumTotal + parseFloat(redCycleDataTableList[i].redDealNum);
     		}
@@ -1714,7 +1714,7 @@ $(function() {
             type: 'POST',
             data: function() {
                 	return getExpireParams();
-        		} 
+        		}
         },
         cols:[
         	{field:'finprodId',visible :false}
@@ -1722,7 +1722,7 @@ $(function() {
         	,{field:'redPeriodId',title: 'FinNetProductDuration.periodId',sortable:false, width:120,visible :$("#maneWay").val() == "01" ? true:false}
             ,{field:'vDate',title: 'FinNetProductDuration.cycleStartDate', width:120,type:'date',sortable:false}
             ,{field:'mDate',title: 'FinNetProductDuration.cycleEndDate', width:120,type:'date',sortable:false}
-            ,{field:'expireNetValueDate', title: 'FinNetProductDuration.netValueDate',type:'date', width:100,sortable:false,edit:true}            
+            ,{field:'expireNetValueDate', title: 'FinNetProductDuration.netValueDate',type:'date', width:100,sortable:false,edit:true}
             ,{field:'expireUnitNetValue', title: 'FinNetProductDuration.unitNetValue',type:'number', digit:4, width:100,sortable:false,edit:true}
             ,{field:'expireDealNum', title: 'FinNetProductDuration.dealNum',type:'number', width:100,sortable:false}
             ,{field:'expireDealAmt', title: 'FinNetProductDuration.dealAmt',type:'number', width:100,sortable:false,edit:true}
@@ -1784,7 +1784,7 @@ $(function() {
         	var expireCycleDataTableList = expireCycleDataTable.getAllRows();
         	//净值日期选择联动
     		if(field == "expireNetValueDate"){
-    			Joyin.ajaxJson(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/getTrdValueByCdate', 
+    			Joyin.ajaxJson(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/getTrdValueByCdate',
     	        	{finprodId:$('#finprodId').val(),redNetValueDate:value,dealType:$("#dealType").val()},
     	        	function(result) {
     	        		//修改净值
@@ -1792,10 +1792,10 @@ $(function() {
     	        		expireCycleDataTableList = expireCycleDataTable.getAllRows();
     	        		//修改交易金额     净值*交易份额
     	        		if(expireCycleDataTableList[data.LAY_TABLE_INDEX].expireDealNum*result == 0){
-    	        			expireCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+    	        			expireCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
         	        				{expireDealAmt: "0"});
     	        		}else{
-    	        			expireCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+    	        			expireCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
         	        				{expireDealAmt: expireCycleDataTableList[data.LAY_TABLE_INDEX].expireDealNum*result});
     	        		}
     	        	}
@@ -1805,10 +1805,10 @@ $(function() {
     		if(field == "expireUnitNetValue"){
         		//修改交易金额     净值*交易份额
         		if(expireCycleDataTableList[data.LAY_TABLE_INDEX].expireDealNum*value == 0){
-        			expireCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+        			expireCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
 	        				{expireDealAmt: "0"});
         		}else{
-        			expireCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+        			expireCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
 	        				{expireDealAmt: expireCycleDataTableList[data.LAY_TABLE_INDEX].expireDealNum*value});
         		}
     		}
@@ -1816,10 +1816,10 @@ $(function() {
     		if(field == "expireDealNum"){
         		//修改交易金额     净值*交易份额
         		if(expireCycleDataTableList[data.LAY_TABLE_INDEX].expireUnitNetValue*value == 0){
-        			expireCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+        			expireCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
 	        				{expireDealAmt: "0"});
         		}else{
-        			expireCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+        			expireCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
 	        				{expireDealAmt: expireCycleDataTableList[data.LAY_TABLE_INDEX].expireUnitNetValue*value});
         		}
     		}
@@ -1876,7 +1876,7 @@ $(function() {
 			if(expireCycleDataTableList[i].expireManaFreeVal){
 				expireManaFreeValTotal = expireManaFreeValTotal + parseFloat(expireCycleDataTableList[i].expireManaFreeVal);
 			}
-    		
+
     	}
     	$("#expireDealNum").val(expireDealNumTotal);
     	$("#expireDealAmt").val(expireDealAmtTotal);
@@ -1893,7 +1893,7 @@ $(function() {
             type: 'POST',
             data:function() {
                 return getAddReduceParams();
-            } 
+            }
         },
         cols:[
         	{field:'finprodId',visible :false}
@@ -1901,7 +1901,7 @@ $(function() {
         	,{field:'redPeriodId',title: 'FinNetProductDuration.periodId',sortable:false, width:120,visible :$("#maneWay").val() == "01" ? true:false}
             ,{field:'vDate',title: 'FinNetProductDuration.cycleStartDate', width:120,type:'date',sortable:false}
             ,{field:'mDate',title: 'FinNetProductDuration.cycleEndDate', width:120,type:'date',sortable:false}
-            ,{field:'addReduceNetValueDate', title: 'FinNetProductDuration.netValueDate',type:'date', width:100,sortable:false,edit:true}            
+            ,{field:'addReduceNetValueDate', title: 'FinNetProductDuration.netValueDate',type:'date', width:100,sortable:false,edit:true}
             ,{field:'addReduceUnitNetValue', title: 'FinNetProductDuration.unitNetValue',type:'number', digit:4, width:100,sortable:false,edit:true}
             ,{field:'addReduceDealNum', title: 'FinNetProductDuration.dealNum',type:'number', width:120,sortable:false,edit:true}
             ,{field:'addReduceDealAmt', title: 'FinNetProductDuration.dealAmt',type:'number', width:120,sortable:false,edit:true}
@@ -1949,7 +1949,7 @@ $(function() {
         	var addReduceCycleDataTableList = addReduceCycleDataTable.getAllRows();
         	//净值日期选择联动
     		if(field == "addReduceNetValueDate"){
-    			Joyin.ajaxJson(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/getTrdValueByCdate', 
+    			Joyin.ajaxJson(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/getTrdValueByCdate',
     	        	{finprodId:$('#finprodId').val(),redNetValueDate:value,dealType:$("#dealType").val()},
     	        	function(result) {
     	        		//修改净值
@@ -1957,12 +1957,12 @@ $(function() {
     	        		addReduceCycleDataTableList = addReduceCycleDataTable.getAllRows();
     	        		//修改交易金额     净值*交易份额
     	        		if(addReduceCycleDataTableList[data.LAY_TABLE_INDEX].addReduceDealNum*result == 0){
-    	        			addReduceCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+    	        			addReduceCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
         	        				{addReduceDealAmt: "0"});
     	        		}else{
-    	        			addReduceCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+    	        			addReduceCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
         	        				{addReduceDealAmt: addReduceCycleDataTableList[data.LAY_TABLE_INDEX].addReduceDealNum*result});
-        	        		
+
     	        		}
     	        	}
         		);
@@ -1971,10 +1971,10 @@ $(function() {
     		if(field == "addReduceUnitNetValue"){
         		//修改交易金额     净值*交易份额
         		if(addReduceCycleDataTableList[data.LAY_TABLE_INDEX].addReduceDealNum*value == 0){
-        			addReduceCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+        			addReduceCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
 	        				{addReduceDealAmt: "0"});
         		}else{
-        			addReduceCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+        			addReduceCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
 	        				{addReduceDealAmt: addReduceCycleDataTableList[data.LAY_TABLE_INDEX].addReduceDealNum*value});
         		}
     		}
@@ -1982,10 +1982,10 @@ $(function() {
     		if(field == "addReduceDealNum"){
         		//修改交易金额     净值*交易份额
         		if(addReduceCycleDataTableList[data.LAY_TABLE_INDEX].addReduceUnitNetValue*value == 0){
-        			addReduceCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+        			addReduceCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
 	        				{addReduceDealAmt: "0"});
         		}else{
-        			addReduceCycleDataTable.renderRow(data.LAY_TABLE_INDEX, 
+        			addReduceCycleDataTable.renderRow(data.LAY_TABLE_INDEX,
 	        				{addReduceDealAmt: addReduceCycleDataTableList[data.LAY_TABLE_INDEX].addReduceUnitNetValue*value});
         		}
     		}
@@ -2001,7 +2001,7 @@ $(function() {
         		,netValueDate:$("#addReduceNetValueDate").val()
 				,workflowId : workflowId
 				, tradeId : $('#tradeId').val()}
-        
+
         return pageParam;
     };
     /**
@@ -2033,12 +2033,12 @@ $(function() {
     	$("#addReduceDealNum").val(addReduceDealNumTotal);
     	$("#addReduceDealAmt").val(addReduceDealAmtTotal);
 	};
-	
+
     window.componentLoadCallback = function(isDone, pagePath, params){
         if(isDone){
             window.BussTrdTransferOrder['bussTrdTransferOrder'].setStlCommandInput(function () {
                 var data = $.serializeToObject("#submitForm", true);
-                data.counterId = '324';                
+                data.counterId = '324';
                 var dealType = $('#dealType').val();
                 var profitType = $('#profitType').val();
 				if (!$("#finprodMarketId").val()) {
@@ -2058,14 +2058,14 @@ $(function() {
                     	data.tradeDate = $('#purConfirmDate').val();
                     }else if("C4"==dealType || "C17"==dealType || "C18"==dealType){
                     	data.tradeAmt = $('#redTotalNetValue').val();
-                    	data.tradeDate = $('#redPayDate').val();                	
+                    	data.tradeDate = $('#redPayDate').val();
                     }else if("C5"==dealType || "C20"==dealType){
                     	data.tradeAmt = $('#expireDealAmt').val();
-                    	data.tradeDate = $('#expirePayDate').val();                	
+                    	data.tradeDate = $('#expirePayDate').val();
                     }else if("C3"==dealType || "C6"==dealType){
                         var repPageId = 'FinNetProductDuration';
                     	data.tradeAmt = $('#addReduceDealAmt').val();
-                    	data.tradeDate = $('#addReduceConfirmDate').val();                	
+                    	data.tradeDate = $('#addReduceConfirmDate').val();
                     }
                 }else if("03"==profitType){
                 	if("C1"==dealType){
@@ -2076,19 +2076,19 @@ $(function() {
                     	data.tradeDate = $('#purConfirmDate03').val();
                     }else if("C4"==dealType || "C17"==dealType || "C18"==dealType){
                     	data.tradeAmt = $('#redTotalNetValue03').val();
-                    	data.tradeDate = $('#redPrinPayDate03').val();                	
+                    	data.tradeDate = $('#redPrinPayDate03').val();
                     }else if("C5"==dealType || "C20"==dealType){
                     	data.tradeAmt = $('#expireDealAmt03').val();
-                    	data.tradeDate = $('#expirePrinPayDate03').val();                	
+                    	data.tradeDate = $('#expirePrinPayDate03').val();
                     }else if("C3"==dealType || "C6"==dealType){
                     	data.tradeAmt = $('#addReduceDealAmt03').val();
-                    	data.tradeDate = $('#addReduceConfirmDate03').val();              	
+                    	data.tradeDate = $('#addReduceConfirmDate03').val();
                     }else if("C9"==dealType){
                     	data.tradeAmt = $('#bonusCashBonusAmt03').val();
-                    	data.tradeDate = $('#bonusCashBonusDate03').val();              	
+                    	data.tradeDate = $('#bonusCashBonusDate03').val();
                     }else if("C10"==dealType){
                     	data.tradeAmt = $('#bonusShareAmt03').val();
-                    	data.tradeDate = $('#bonusShareConfirmDate03').val();              	
+                    	data.tradeDate = $('#bonusShareConfirmDate03').val();
                     }
                 }
                 //是否轧差清算 yzg 20191108 start
@@ -2097,10 +2097,10 @@ $(function() {
                 	data.liquidationYesno = str[16];
                 }
                 //是否轧差清算 yzg 20191108 end
-                
+
                 data.ps = dealType;
                 data.finprodType2 = 'F16';
-                
+
                 return {
                     'isTotalTrade':'Y'
                     ,'bankLendingType':null
@@ -2112,7 +2112,7 @@ $(function() {
             });
         }
     };
-    
+
     /**
      * 界面数据变化重新生成划款指令
      */
@@ -2121,7 +2121,7 @@ $(function() {
     	var profitType = $('#profitType').val();
     	var portfolioId = $('#portfolioId').val();
         var ccy = $('#finccy').val();
-        var tradeDate; 
+        var tradeDate;
     	var tradeAmt;
     	if("01"==profitType){
 	        if("C1"==dealType){
@@ -2134,10 +2134,10 @@ $(function() {
 	        	tradeAmt = $('#redTotalNetValue').val();
 	        	tradeDate = $('#redPayDate').val();
 	        }else if("C5"==dealType || "C20"==dealType){
-            	tradeAmt = $('#expireDealAmt').val();   
+            	tradeAmt = $('#expireDealAmt').val();
             	tradeDate = $('#expirePayDate').val();
             }else if("C3"==dealType || "C6"==dealType){
-            	tradeAmt = $('#addReduceDealAmt').val();    
+            	tradeAmt = $('#addReduceDealAmt').val();
             	tradeDate = $('#addReduceConfirmDate').val();
             }
     	}else if("03"==profitType){
@@ -2151,24 +2151,24 @@ $(function() {
 	        	tradeAmt = $('#redTotalNetValue03').val();
 	        	tradeDate = $('#redPrinPayDate03').val();
 	        }else if("C5"==dealType || "C20"==dealType){
-            	tradeAmt = $('#expireDealAmt03').val(); 
+            	tradeAmt = $('#expireDealAmt03').val();
             	tradeDate = $('#expirePrinPayDate03').val();
             }else if("C3"==dealType || "C6"==dealType){
-            	tradeAmt = $('#addReduceDealAmt03').val(); 
+            	tradeAmt = $('#addReduceDealAmt03').val();
             	tradeDate = $('#addReduceConfirmDate03').val();
             }else if("C9"==dealType){
-            	tradeAmt = $('#bonusCashBonusAmt03').val();  
+            	tradeAmt = $('#bonusCashBonusAmt03').val();
             	tradeDate = $('#bonusCashBonusDate03').val();
             }else if("C10"==dealType){
-            	tradeAmt = $('#bonusShareAmt03').val();    
-            	tradeDate = $('#bonusShareConfirmDate03').val();  
+            	tradeAmt = $('#bonusShareAmt03').val();
+            	tradeDate = $('#bonusShareConfirmDate03').val();
             }
     	}
     	if(tradeAmt && portfolioId && ccy && dealType && tradeDate){
             $('#bussTrdTransferOrder_btn_generate').click();
         }
     };
-    
+
     /**
      * 认购确认日变动，如果是周期型产品，并且之前做过认购，自动带出期次信息
      */
@@ -2177,13 +2177,13 @@ $(function() {
     	if("Y"==isCycle){
             var finprodId = $('#finprodId').val();
             var subConfirmDate = $('#subConfirmDate').val();
-            Joyin.ajaxJson(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/getCycleInfo', 
-            	{'finprodId':finprodId,'subConfirmDate':subConfirmDate}, 
+            Joyin.ajaxJson(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/getCycleInfo',
+            	{'finprodId':finprodId,'subConfirmDate':subConfirmDate},
             	function(result) {
 	                var r = result.data;
 	                var subCycleEndDate = Date.ofDate(r.subCycleEndDate).format('yyyy-MM-dd');
 	                var subCyclePayDate = Date.ofDate(r.subCyclePayDate).format('yyyy-MM-dd');
-	                
+
 	                //赋值
 	                $('#subCycleEndDate').val(subCycleEndDate).attr("disabled",true);
 	                $('#subCyclePayDate').val(subCyclePayDate).attr("disabled",true);;
@@ -2197,11 +2197,11 @@ $(function() {
     	var redDealAmt = 0;
     	if(redDealNum && redUnitNetValue){
     		redDealAmt = Number(JoyinMath.doMul(redDealNum,redUnitNetValue,2));
-    	}   
+    	}
     	//赎回金额千分位显示
     	$('#redDealAmt').val(get_thousand_num(redDealAmt)).trigger("change");
     };
-    
+
     var redTotalNetValueInit = function(){
     	var redDealAmt = $('#redDealAmt').val();
     	var redFeeLc = $('#redFeeLc').val();
@@ -2211,21 +2211,21 @@ $(function() {
     		}
     		//净金额千分位显示
     		$('#redTotalNetValue').val(get_thousand_num(JoyinMath.doMinus(Number(redDealAmt),redFeeLc)));
-    		
+
     	}
     };
-    
+
     //实现金额数目千分位显示
-    function get_thousand_num(num) { 
+    function get_thousand_num(num) {
              return num.toString().replace(/\d+/, function (n) {
-             // 先提取整数部分        
+             // 先提取整数部分
              return n.replace(/(\d)(?=(\d{3})+$)/g, function ($1) {
-                   // 对整数部分添加分隔符            
-                   return $1 + ",";       
-                    });    
+                   // 对整数部分添加分隔符
+                   return $1 + ",";
+                    });
                });
       }
-    
+
     /**
      * 货币型计算赎回理论金额
      * 	= 剩余未分配利润*(交易本金/剩余本金)
@@ -2241,20 +2241,20 @@ $(function() {
     		if("C4"==dealType || "C17"==dealType ||"C18"==dealType){
         		netValueDate = $("#redConfirmDate03").val();
         		var object = {'netValueDate':netValueDate,'dealDate':dealDate,'finprodId':finprodId};
-                Joyin.ajaxSync(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/getNetValueInfoForHB', object, 
+                Joyin.ajaxSync(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/getNetValueInfoForHB', object,
             		function (data) {
-	                    if (data &&data.purDealNum!=0 &&  $('#redPrinAmt03').val() && $('#redPrinAmt03').val()!=0){        			
+	                    if (data &&data.purDealNum!=0 &&  $('#redPrinAmt03').val() && $('#redPrinAmt03').val()!=0){
 	            			$('#redProfit03').val(JoyinMath.doMul(data.purDealAmt,JoyinMath.doDiv($('#redPrinAmt03').val(), data.purDealNum,10),2));
-	                    }else{                			
+	                    }else{
 	            			$('#redProfit03').val(null);
 	                    }
-	                    
+
             		}
                 )
         	}
     	}
     };
-    
+
     /**
      * 获取净值信息：净值日、净值
      * type:
@@ -2268,9 +2268,9 @@ $(function() {
     	var dealType = $("#dealType").val();
     	var profitType = $("#profitType").val();
     	var isCycle = $("#isCycle").val();
-    	
+
     	var dealMode = $("#dealMode").val();
-    	
+
     	if("01"==profitType){
     		if(1==type){
         		if("C2"==dealType){
@@ -2302,7 +2302,7 @@ $(function() {
             	}else if("C5"==dealType || "C20"==dealType){
             		dealDate = $("#expireNetValueDate").val();
             	}
-        	}  
+        	}
     	}else if("03"==profitType){
     		if("C4"==dealType || "C17"==dealType ||"C18"==dealType){
         		netValueDate = $("#redConfirmDate03").val();
@@ -2310,7 +2310,7 @@ $(function() {
         		netValueDate = $("#expireConfirmDate03").val();
         	}
     	}
-    	
+
         var object = {'netValueDate':netValueDate,'dealDate':dealDate,'finprodId':finprodId};
         //净值型产品分档时，界面不展示相关内容，由分层汇总获得
         if(dealMode == '11'){
@@ -2345,7 +2345,7 @@ $(function() {
         else if(((1==type || 3==type) && dealDate) || (2==type && netValueDate)) {
             //获取净值参考日
             Joyin.ajax(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/getNetValueInfo1', object, function (data) {
-                if (data) { 
+                if (data) {
                 	if("01"==profitType){
                 		if(1==type || 3==type){
                     		if("C2"==dealType){
@@ -2382,7 +2382,7 @@ $(function() {
     	                        	expireCycleDataInit();
                                 }
     	                	}
-                    	}else{                		
+                    	}else{
                     		if("C2"==dealType){
                     			$('#purUnitNetValue').val(data.purUnitNetValue);
                         	}else if("C3"==dealType || "C6"==dealType){
@@ -2396,7 +2396,7 @@ $(function() {
                         	}
                     	}
                 	}else if("03"==profitType){
-                		if("C4"==dealType || "C17"==dealType || "C18"==dealType){    
+                		if("C4"==dealType || "C17"==dealType || "C18"==dealType){
                 			$('#redPrinAmt03').val(data.purDealNum);
                 			$('#redProfit03').val(data.purDealAmt);
                 			$('#totalRedPrinAmt03').val(data.purDealNum);
@@ -2411,7 +2411,7 @@ $(function() {
                 			$('#expireDealAmt03').val(JoyinMath.doAdd(data.purDealNum,data.purDealAmt)).trigger("change");
                     	}
                 	}
-                	                	
+
                 }else{
                 	if("01"==profitType){
                 		if(1==type){
@@ -2449,7 +2449,7 @@ $(function() {
     	                	}
                     	}
                 	}else if("03"==profitType){
-                		if("C4"==dealType || "C17"==dealType || "C18"==dealType){                			
+                		if("C4"==dealType || "C17"==dealType || "C18"==dealType){
                 			$('#redPrinAmt03').val(null);
                 			$('#redProfit03').val(null);
                 			$('#totalRedPrinAmt03').val(null);
@@ -2464,10 +2464,10 @@ $(function() {
                 			$('#expireDealAmt03').val(null);
                     	}
                 	}
-                	
+
                 }
                /* if("Y"==isCycle){
-                	addReduceCycleDataInit();           	
+                	addReduceCycleDataInit();
                 }*/
             })
         }
@@ -2484,7 +2484,7 @@ $(function() {
         var finprodId = dataBef.finprodId;
     	var dealType = $("#dealType").val();
     	var profitType = $("#profitType").val();
-    	
+
     	if("01"==profitType){
     		if("C2"==dealType){
     			dealDate = dataBef.purNetValueLayerDate;
@@ -2499,7 +2499,7 @@ $(function() {
         var object = {'netValueDate':netValueDate,'dealDate':dealDate,'finprodId':finprodId};
         //获取净值参考日
         Joyin.ajaxSync(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/getNetValueInfo', object, function (data) {
-            if (data) { 
+            if (data) {
             	if("01"==profitType){
             		if("C2"==dealType){
             			dataBef.purUnitNetLayerValue = data.purUnitNetValue;
@@ -2512,7 +2512,7 @@ $(function() {
                 		dataBef.expireDealLayerNum = data.purDealNum;
                 		dataBef.expireDealLayerAmt = JoyinMath.doMul(data.purDealNum,data.purUnitNetValue,2);
                 	}
-            	}                	
+            	}
             }
         })
     };
@@ -2521,7 +2521,7 @@ $(function() {
      * add by 20191230
      */
     var getNearWorkDay = function (confirmDate) {
-    	
+
     	var dealType = $("#dealType").val();
     	var calendarId = $("#calendarId").val();
     	var profitType = $("#profitType").val();
@@ -2529,12 +2529,12 @@ $(function() {
         if(confirmDate){
             //获取下一工作日
             Joyin.ajaxJson(basePath + 'invest/product/productelement/netvalueproduct/FinNetValueProductBuild002/getNearWorkDay', object, function (data) {
-                if (data) { 
+                if (data) {
                 	if("01"==profitType){
                 		if("C4"==dealType || "C17"==dealType){
-                			$('#redPayDate').val(Date.ofDate(data).format('yyyy-MM-dd')); 
+                			$('#redPayDate').val(Date.ofDate(data).format('yyyy-MM-dd'));
                 		}
-                	}              	
+                	}
                 }
             })
         }
@@ -2544,7 +2544,7 @@ $(function() {
      * add by wm 2019-06-20
      */
     var getNextWorkDay = function (confirmDate) {
-    	
+
     	var dealType = $("#dealType").val();
     	var calendarId = $("#calendarId").val();
  //   	var isCycle = $("#isCycle").val();
@@ -2553,24 +2553,24 @@ $(function() {
         if(confirmDate){
             //获取下一工作日
             Joyin.ajaxJson(basePath + 'invest/product/productelement/netvalueproduct/FinNetValueProductBuild002/getNextWorkDay', object, function (data) {
-                if (data) { 
+                if (data) {
                 	if("01"==profitType){
                 		if("C4"==dealType || "C17"==dealType){
-                			$('#redPayDate').val(Date.ofDate(data).format('yyyy-MM-dd')); 
+                			$('#redPayDate').val(Date.ofDate(data).format('yyyy-MM-dd'));
                 		}
                 		else if("C5"==dealType || "C20"==dealType){
                     		$('#expirePayDate').val(Date.ofDate(data).format('yyyy-MM-dd')).trigger("change");
                 		}
                 	}else if("03"==profitType){
                 		if("C5"==dealType || "C20"==dealType){
-//                    		$('#expirePrinPayDate03').val(Date.ofDate(data).format('yyyy-MM-dd')); 
-                        	$('#expireProfitPayDate03').val(Date.ofDate(data).format('yyyy-MM-dd')); 
-                        	
+//                    		$('#expirePrinPayDate03').val(Date.ofDate(data).format('yyyy-MM-dd'));
+                        	$('#expireProfitPayDate03').val(Date.ofDate(data).format('yyyy-MM-dd'));
+
                         	//本金支付日默认为确认日
-                        	$('#expirePrinPayDate03').val(Date.ofDate(confirmDate).format('yyyy-MM-dd')); 
+                        	$('#expirePrinPayDate03').val(Date.ofDate(confirmDate).format('yyyy-MM-dd'));
                     	}
                 	}
-                	                	
+
                 }
             })
         }
@@ -2582,12 +2582,12 @@ $(function() {
     	/*if(addReduceDealNum && addReduceUnitNetValue){
     		$('#addReduceDealAmt').val(JoyinMath.doMul(addReduceUnitNetValue,addReduceDealNum,2));
     	}*/
-    	
+
     };
-    
+
     var calExpireDealAmt03 = function(){
     	var expirePrinAmt = $('#expirePrinAmt03').val();
-    	var expireProfit = $('#expireProfit03').val();   
+    	var expireProfit = $('#expireProfit03').val();
     	if(!expirePrinAmt){
     		expirePrinAmt = 0;
     	}
@@ -2596,10 +2596,10 @@ $(function() {
     	}
     	$('#expireDealAmt03').val(JoyinMath.doAdd(Number(expirePrinAmt),Number(expireProfit))).trigger("change");
     };
-    
+
     var calRedDealAmt03 = function(){
     	var redPrinAmt = $('#redPrinAmt03').val();
-    	var redProfit = $('#redProfit03').val();   
+    	var redProfit = $('#redProfit03').val();
     	if(!redPrinAmt){
     		redPrinAmt = 0;
     	}
@@ -2612,7 +2612,7 @@ $(function() {
     	$('#redDealAmt03').val(JoyinMath.doAdd(Number(redPrinAmt),Number(redProfit)));
 		calRedTotalNetValue03();
     };
-    
+
     var calRedTotalNetValue03 = function(){
     	var redFee = $('#redFeeLc03').val();
     	var redDealAmt = $('#redDealAmt03').val();
@@ -2624,9 +2624,9 @@ $(function() {
     		reloadSettle();
     	}
     };
-    
-    
-    
+
+
+
     //判断是提交或是保存
     function saveOrSubmit(operateType) {
     	//TISHKBS-1443 add by yujiaping 2020-11-19 开放式产品添加限制产品不能在到期日之后做申赎的存续期 start
@@ -2645,7 +2645,7 @@ $(function() {
         object.operateType = operateType;
         var dealType = object.dealType;
         //产品收益类型
-    	var profitType = object.profitType; 
+    	var profitType = object.profitType;
     	if('01' == profitType ){
     		if('C1' == dealType ){
             	object.finNetProductDurationLayerList = layAmtNetTable.getAllRows();
@@ -2711,7 +2711,7 @@ $(function() {
                     if(operateType === 'save') {
                         WorkFlow.doSaveList(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/save', object, "FinNetProductDuration_btn_save",null,
                         		function(){window.top.layui.tab.tabDelete('PRODUCT_SIDE_001_003_008','FinNetProductDuration');});
-                       
+
                     }else if(operateType === 'submit') {
                         WorkFlow.doSubmitList(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/save', object, "FinNetProductDuration_btn_submit",
                         		null,
@@ -2719,7 +2719,7 @@ $(function() {
                         	window.top.layui.tab.tabDelete('PRODUCT_SIDE_001_003_008','FinNetProductDuration');
                         			}
                         );
-                        
+
                     }else if(operateType === 'revoke') {
                     	//update by gcl 2019/4/8 start
                     	WorkFlow.doRevokeList(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/doRevoke', object, "FinNetProductDuration_btn_revoke");
@@ -2731,12 +2731,12 @@ $(function() {
         Joyin.ajaxJson(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/check', object, function(result) {
         	Joyin.ajaxJson(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/checkDuraAmt', object, function(result) {
         	//if(result1 != null){
-        		//Joyin.confirm(result1.data, function(){ 
+        		//Joyin.confirm(result1.data, function(){
             Joyin.confirm(result.data, function() {
                 if(operateType === 'save') {
                     WorkFlow.doSaveList(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/save', object, "FinNetProductDuration_btn_save",null,
                     		function(){window.top.layui.tab.tabDelete('PRODUCT_SIDE_001_003_008','FinNetProductDuration');});
-                   
+
                 }else if(operateType === 'submit') {
                     WorkFlow.doSubmitList(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/save', object, "FinNetProductDuration_btn_submit",
                     		null,
@@ -2744,7 +2744,7 @@ $(function() {
                     	window.top.layui.tab.tabDelete('PRODUCT_SIDE_001_003_008','FinNetProductDuration');
                     			}
                     );
-                    
+
                 }else if(operateType === 'revoke') {
                 	WorkFlow.doRevokeList(basePath + 'invest/product/productduration/netproductDuration/FinNetProductDuration/doRevoke', object, "FinNetProductDuration_btn_revoke");
                 }
@@ -2753,14 +2753,14 @@ $(function() {
         	//}
            });
         });
-       		
+
        		 //return;
-        
-         
-       
+
+
+
         }
     };
-    
+
     var init = function(){
     	dealTypeChange();
     	var operateType = $('#operateType').val();
@@ -2769,20 +2769,20 @@ $(function() {
     		$('#FinNetProductDuration_btn_submit').hide();
     		$('#FinNetProductDuration_btn_revoke').show();
     		$('#FinNetProductDuration_btn_revoke').attr('disabled',false)
-    		
+
     		//layui-btn-disabled
     	}else{
     		$('#FinNetProductDuration_btn_revoke').hide();
     	}
     };
-    
+
     /**
      * 画面加载完成
      */
     $(function() {
-    	
+
     	$('#namediv').hide();
-    	init();	
+    	init();
     	// 绑定按钮事件
         $('#FinNetProductDuration_btn_save').click(function() {
             saveOrSubmit('save');
@@ -2790,15 +2790,17 @@ $(function() {
         $('#FinNetProductDuration_btn_submit').click(function() {
             saveOrSubmit('submit');
         });
-        
+
         $('#FinNetProductDuration_btn_revoke').click(function() {
             saveOrSubmit('revoke');
         });
-        
+
         $('#FinNetProductDuration_btn_cancel').click(function() {
-        	window.top.layui.tab.tabDelete('PRODUCT_SIDE_001_003_008','FinNetProductDuration');
-        });
-        
+			Joyin.confirm("请确认是否要关闭？", function() {
+				window.top.layui.tab.tabDelete('PRODUCT_SIDE_001_003_008','FinNetProductDuration');
+			});
+		});
+
     	//产品代码联动
         $('#finprodMarketId').change(function() {
             finprodMarketIdChange();
@@ -2828,13 +2830,13 @@ $(function() {
         	$('#subDealNum').val(JoyinMath.doAdd(Number($('#subDealAmt').val()),Number(0))).trigger("change");
         	reloadSettle();
         });
-        
+
         //认购确认日变动：如果周期型产品，已在确认日做过认购，则联动带出期次结束日和期次支付日
         $('#subConfirmDate').change(function() {
         	subConfirmDateChange();
         	reloadSettle();
         });
-        
+
         //申购确认日变动：带出最近的净值日和净值
         $('#purConfirmDate').change(function() {
         	getNetValueInfo(1);
@@ -2850,31 +2852,31 @@ $(function() {
         });
         //申购净值日变动：带出净值日对应的净值
         $('#purNetValueDate').change(function() {
-        	//modify by wm 净值日修改为取净值日当前最近的净值，包括净值日当天 2019-07-03 
+        	//modify by wm 净值日修改为取净值日当前最近的净值，包括净值日当天 2019-07-03
 //        	getNetValueInfo(2);
         	getNetValueInfo(3);
         });
-        
+
         //申购交易金额联动,交易份额=交易金额/单位净值
         $('#purDealAmt').change(function() {
         	var purUnitNetValue = $('#purUnitNetValue').val();
         	var purDealAmt = $('#purDealAmt').val();
-        	if(purUnitNetValue && purDealAmt){        		
+        	if(purUnitNetValue && purDealAmt){
         		var purDealNum = Number(JoyinMath.doDiv(purDealAmt,purUnitNetValue,2));
         		$('#purDealNum').val(purDealNum);
-        	}    
-        	if(purUnitNetValue==0){        		
+        	}
+        	if(purUnitNetValue==0){
         		$('#purDealNum').val(0);
-        	}   
+        	}
         	reloadSettle();
         });
-        
+
         //赎回确认日变动：带出最近的净值日和净值
         $('#redConfirmDate').change(function() {
         	var confirmDate = $('#redConfirmDate').val();
         	//modify by wm 净值型产品赎回支付日修改为下一工作日 start 2019-06-20
         	var payDate = Date.ofDate(confirmDate).format('yyyy-MM-dd');
-        	//$('#redPayDate').val(payDate); 
+        	//$('#redPayDate').val(payDate);
         	getNearWorkDay(confirmDate);
         	//modify by wm 净值型产品赎回支付日修改为下一工作日 end 2019-06-20
         	getNetValueInfo(1);
@@ -2887,32 +2889,32 @@ $(function() {
         		}
         	}
         });
-        
+
         //赎回净值日变动：带出净值日对应的净值
         $('#redNetValueDate').change(function() {
-        	//modify by wm 净值日修改为取净值日当前最近的净值，包括净值日当天 2019-07-03 
+        	//modify by wm 净值日修改为取净值日当前最近的净值，包括净值日当天 2019-07-03
 //        	getNetValueInfo(2);
         	getNetValueInfo(3);
         });
         //赎回份额联动
         $('#redDealNum').change(function() {
         	redDealAmtInit();
-        	
+
         });
         $('#redUnitNetValue').change(function() {
         	redDealAmtInit();
         });
-        
-        $('#redDealAmt').change(function() {        	
+
+        $('#redDealAmt').change(function() {
         	redTotalNetValueInit();
         	reloadSettle();
-        });        
-                
+        });
+
         $('#redFeeLc').change(function() {
         	redTotalNetValueInit();
         	reloadSettle();
         });
-        
+
         //到期确认日变动：带出最近的净值日和净值
         $('#expireConfirmDate').change(function() {
         	getNetValueInfo(1);
@@ -2925,22 +2927,22 @@ $(function() {
         		}
         	}
         });
-        
+
         //到期净值日变动：带出净值日对应的净值
         $('#expireNetValueDate').change(function() {
-        	//modify by wm 净值日修改为取净值日当前最近的净值，包括净值日当天 2019-07-03 
+        	//modify by wm 净值日修改为取净值日当前最近的净值，包括净值日当天 2019-07-03
 //        	getNetValueInfo(2);
         	getNetValueInfo(3);
         });
-        
+
         $('#expireDealAmt').change(function() {
         	reloadSettle();
         });
-        
+
         $('#expirePayDate').change(function() {
         	reloadSettle();
         });
-        
+
         //强增确认日变动：带出最近的净值日和净值
         $('#addReduceConfirmDate').change(function() {
         	getNetValueInfo(1);
@@ -2953,21 +2955,21 @@ $(function() {
         		}
         	}
         });
-        
+
         //强增净值日变动：带出净值日对应的净值
         $('#addReduceNetValueDate').change(function() {
-        	//modify by wm 净值日修改为取净值日当前最近的净值，包括净值日当天 2019-07-03 
+        	//modify by wm 净值日修改为取净值日当前最近的净值，包括净值日当天 2019-07-03
 //        	getNetValueInfo(2);
         	getNetValueInfo(3);
         });
-        
-        
-        
+
+
+
         $('#addReduceDealNum').change(function() {
         	addReduceDealAmtInit();
         	reloadSettle();
         });
-        
+
         $('#addReduceUnitNetValue').change(function() {
         	addReduceDealAmtInit();
         	reloadSettle();
@@ -2980,9 +2982,9 @@ $(function() {
             	$(".hkxx").find(".layui-table-view .layui-table-box .layui-table-body table tbody tr td").html("");
         	}
         });
-        
-        
-        
+
+
+
         $('#subDealAmt03').change(function() {
         	reloadSettle();
         });
@@ -2996,20 +2998,20 @@ $(function() {
             	$(".hkxx").find(".layui-table-view .layui-table-box .layui-table-body table tbody tr td").html("");
         	}
         });
-        
+
         $('#purDealAmt03').change(function() {
         	reloadSettle();
         });
-        
-        $('#redConfirmDate03').change(function() {        	
+
+        $('#redConfirmDate03').change(function() {
         	var confirmDate = $('#redConfirmDate03').val();
         	//var payDate = Date.ofDate(confirmDate).DateAdd('d', 1).format('yyyy-MM-dd');
-//        	$('#redPrinPayDate03').val(payDate); 
+//        	$('#redPrinPayDate03').val(payDate);
         	//本金支付日默认为确认日
-        	$('#redPrinPayDate03').val(Date.ofDate(confirmDate).format('yyyy-MM-dd')); 
+        	$('#redPrinPayDate03').val(Date.ofDate(confirmDate).format('yyyy-MM-dd'));
         	//modify by wm 收益支付日与本金支付已相同，既为确认日 start 2019-07-05
-        	//$('#redProfitPayDate03').val(payDate); 
-        	$('#redProfitPayDate03').val(Date.ofDate(confirmDate).format('yyyy-MM-dd')); 
+        	//$('#redProfitPayDate03').val(payDate);
+        	$('#redProfitPayDate03').val(Date.ofDate(confirmDate).format('yyyy-MM-dd'));
         	//modify by wm 收益支付日与本金支付已相同，既为确认日 end 2019-07-05
         	//delete by wm 货币型产品赎回无需展示 start 2019-07-05
         	//查询交易本金和收益金额
@@ -3017,9 +3019,9 @@ $(function() {
         	//delete by wm 货币型产品赎回无需展示 end 2019-07-05
         });
         //货币型产品本金支付日联动修改收益支付日
-        $('#redPrinPayDate03').change(function() {        	
+        $('#redPrinPayDate03').change(function() {
         	var payDate = $('#redPrinPayDate03').val();
-        	$('#redProfitPayDate03').val(Date.ofDate(payDate).format('yyyy-MM-dd')); 
+        	$('#redProfitPayDate03').val(Date.ofDate(payDate).format('yyyy-MM-dd'));
         });
 		$('#redPrinAmt03').change(function() {
 /*			var totalRedPrinAmt03 = $('#totalRedPrinAmt03').val();
@@ -3027,64 +3029,64 @@ $(function() {
 			var redPrinAmt03 = $('#redPrinAmt03').val();*/
 			// 计算理论收益
 			calRedProfit03();
-			
+
 	/*		if(totalRedPrinAmt03 && totalRedProfit03 && redPrinAmt03){
 				$('#redProfit03').val(JoyinMath.doMul(redPrinAmt03,JoyinMath.doDiv(totalRedProfit03,totalRedPrinAmt03),2));
-			}	*/		
+			}	*/
 			calRedDealAmt03();
-			
+
 		});
 		$('#redProfit03').change(function() {
 			calRedDealAmt03();
 		});
-		
-		$('#expirePrinAmt03').change(function() {		
+
+		$('#expirePrinAmt03').change(function() {
 			calExpireDealAmt03();
-			
+
 		});
 		$('#expireProfit03').change(function() {
 			calExpireDealAmt03();
 		});
-        
+
         $('#redFeeLc03').change(function() {
-        	calRedTotalNetValue03();     
+        	calRedTotalNetValue03();
         	reloadSettle();
         });
-        
-        $('#expireConfirmDate03').change(function() {        	
+
+        $('#expireConfirmDate03').change(function() {
         	var confirmDate = $('#expireConfirmDate03').val();
         	//modify by wm 货币型产品到期/提前终止本金支付日和收益支付日修改为下一工作日 start 2019-06-20
         	var payDate = Date.ofDate(confirmDate).format('yyyy-MM-dd');
-        	$('#expirePrinPayDate03').val(payDate); 
-        	$('#expireProfitPayDate03').val(payDate); 
+        	$('#expirePrinPayDate03').val(payDate);
+        	$('#expireProfitPayDate03').val(payDate);
 //        	getNextWorkDay(confirmDate);
         	//modify by wm 货币型产品到期/提前终止本金支付日和收益支付日修改为下一工作日 end 2019-06-20
         	//查询交易本金和收益金额
-        	getNetValueInfo(2);       	
+        	getNetValueInfo(2);
         });
-        
-        $('#expireDealAmt03').change(function() {        	
-        	reloadSettle();     	
+
+        $('#expireDealAmt03').change(function() {
+        	reloadSettle();
         });
-        
-        $('#bonusCashEndDate03').change(function() { 
+
+        $('#bonusCashEndDate03').change(function() {
         	var bonusCashEndDate03 = $('#bonusCashEndDate03').val();
         	var d =Date.ofDate(bonusCashEndDate03).format('yyyy-MM-dd');
-        	$('#bonusCashBonusDate03').val(d); 
+        	$('#bonusCashBonusDate03').val(d);
         });
-        
-        $('#bonusShareEndDate03').change(function() {        	
+
+        $('#bonusShareEndDate03').change(function() {
         	var bonusShareEndDate03 = $('#bonusShareEndDate03').val();
         	var d = Date.ofDate(bonusShareEndDate03).format('yyyy-MM-dd');
-        	$('#bonusShareConfirmDate03').val(d); 
+        	$('#bonusShareConfirmDate03').val(d);
         });
-        $('#bonusShareAmt03').change(function() {        	
+        $('#bonusShareAmt03').change(function() {
         	var bonusShareAmt03 = $('#bonusShareAmt03').val();
         	var bonusShareAfterShareNumBf = $('#bonusShareAfterShareNumBf').val();
         	var bonusShareAfterShareNum03 = JoyinMath.doAdd(bonusShareAmt03, bonusShareAfterShareNumBf);
-        	$('#bonusShareAfterShareNum03').val(bonusShareAfterShareNum03); 
+        	$('#bonusShareAfterShareNum03').val(bonusShareAfterShareNum03);
         });
-        
+
         // add by wm 增加现金分红的分红金额联动刷新指令信息
         $('#bonusCashBonusAmt03').change(function() {
         	reloadSettle();
@@ -3124,7 +3126,7 @@ $(function() {
 			if($('#isCycle').val() == "Y"){
 			expireCycleDataTableCheck();
               }
-		}	
+		}
 		//TISHKBS-2081 CLONE - 周期型产品到期、提前终止流程中修改 净值日没有置灰 start
 		if($("#dealType").val()=="C5" || $("#dealType").val()=="C20"){
 			if($('#isCycle').val() == "Y"){

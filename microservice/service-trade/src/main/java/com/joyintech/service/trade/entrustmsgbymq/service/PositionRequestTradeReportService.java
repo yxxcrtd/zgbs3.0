@@ -10,10 +10,7 @@ import com.joyintech.service.trade.entrustmsgbymq.dto.TrdTempDto;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
-import com.joyintech.tams.common.base.entity.EtrEntrust;
-import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
-import com.joyintech.tams.common.base.entity.FinPledgeDispDetailTemp;
-import com.joyintech.tams.common.base.entity.PtlCapacctInfo;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
@@ -28,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -413,92 +411,96 @@ public class PositionRequestTradeReportService {
                     || DictCodeListExt3.交易方向_中途换券.getValue().equals(entity.getPs())
                     || DictCodeListExt3.交易方向_到期续做.getValue().equals(entity.getPs())
                     || DictCodeListExt3.交易方向_解除质押.getValue().equals(entity.getPs())) {
-                Map<String, Object> ptlSec = new HashMap<>();
-                ptlSec.put("portfolioId", dto.getPortfolioId());
-                ptlSec.put("secAcctId", dto.getSecAcctId());
-                ptlSec.put("tradeId", trdTempDto.getTradeId());
-                ptlSec.put("etrId", entity.getEntrustId());
-                // 融入券券面总额
-                ptlSec.put("integrateSecAmount", dto.getIntegrateSecAmount());
-                if (DictCodeListExt3.交易方向_中途换券.getValue().equals(entity.getPs())) {
-                    FinPledgeDispDetailTemp temp = this.getFinPledgeDispDetailTemp(entity, DictCodeListExt3.质押券置换_置换方向_换入.getValue());
-                    if (null != temp) {
-                        ptlSec.put("finprodId", temp.getFinprodId());
-                        // 本方券券面总额
-                        ptlSec.put("ownSecAmount", ArithmeticUtil.multiply(temp.getPledgeDisplaceAmt(), new BigDecimal(100)));
-                        // 券面总额
-                        ptlSec.put("secAmount", ArithmeticUtil.multiply(temp.getPledgeDisplaceAmt(), new BigDecimal(100)));
+                if (DictCodeListExt3.交易方向_中途换券.getValue().equals(entity.getPs())
+                        || DictCodeListExt3.交易方向_解除质押.getValue().equals(entity.getPs())) {
+                    List<FinPledgeDispDetailTemp> tempList = new ArrayList<>();
+                    if(DictCodeListExt3.交易方向_中途换券.getValue().equals(entity.getPs())){
+                        tempList = this.getFinPledgeDispDetailTemp(entity, DictCodeListExt3.质押券置换_置换方向_换入.getValue());
                     }
-                } else if (DictCodeListExt3.交易方向_解除质押.getValue().equals(entity.getPs())) {
-                    // ZGTFCP-1900:修改解除质押字段赋值 modify by fuyongsheng 20220327 start
-                    FinPledgeDispDetailTemp temp = this.getFinPledgeDispDetailTemp(entity, DictCodeListExt3.质押券置换_置换方向_换出.getValue());
-                    if (null != temp) {
-                        ptlSec.put("finprodId", temp.getFinprodId());
-                        // 本方券券面总额
-                        ptlSec.put("ownSecAmount", ArithmeticUtil.multiply(temp.getPledgeDisplaceAmt(), new BigDecimal(100)));
-                        // 券面总额
-                        ptlSec.put("secAmount", ArithmeticUtil.multiply(temp.getPledgeDisplaceAmt(), new BigDecimal(100)));
+                    else if(DictCodeListExt3.交易方向_解除质押.getValue().equals(entity.getPs())){
+                        tempList = this.getFinPledgeDispDetailTemp(entity, DictCodeListExt3.质押券置换_置换方向_换出.getValue());
                     }
-                    // ZGTFCP-1900:修改解除质押字段赋值 modify by fuyongsheng 20220327 end
+                    if(!CollectionUtils.isEmpty(tempList)){
+                        for(FinPledgeDispDetailTemp temp : tempList){
+                            Map<String, Object> ptlSec = new HashMap<>();
+                            ptlSec.put("portfolioId", dto.getPortfolioId());
+                            ptlSec.put("secAcctId", dto.getSecAcctId());
+                            ptlSec.put("tradeId", trdTempDto.getTradeId());
+                            ptlSec.put("etrId", entity.getEntrustId());
+                            // 融入券券面总额
+                            ptlSec.put("integrateSecAmount", dto.getIntegrateSecAmount());
+                            ptlSec.put("finprodId", temp.getFinprodId());
+                            // 本方券券面总额
+                            ptlSec.put("ownSecAmount", ArithmeticUtil.multiply(temp.getPledgeDisplaceAmt(), new BigDecimal(100)));
+                            // 券面总额
+                            ptlSec.put("secAmount", ArithmeticUtil.multiply(temp.getPledgeDisplaceAmt(), new BigDecimal(100)));
+                            ptlSecList.add(ptlSec);
+                        }
+                    }
                 } else {
-                    if(entity.getFinDealPledge() != null) {
-                        ptlSec.put("finprodId", entity.getFinDealPledge().getPledgeFinprodId());
-                        // 本方券券面总额
-                        ptlSec.put("ownSecAmount", ArithmeticUtil.multiply(entity.getFinDealPledge().getPledgeNumber(), new BigDecimal(100)));
-                        // 券面总额
-                        ptlSec.put("secAmount", ArithmeticUtil.multiply(entity.getFinDealPledge().getPledgeNumber(), new BigDecimal(100)));
-                    }else if(entity.getFinDealPledgeList() != null && entity.getFinDealPledgeList().size() > 0){
-                        ptlSec.put("finprodId", entity.getFinDealPledgeList().get(0).getPledgeFinprodId());
-                        // 本方券券面总额
-                        ptlSec.put("ownSecAmount", ArithmeticUtil.multiply(entity.getFinDealPledgeList().get(0).getPledgeNumber(), new BigDecimal(100)));
-                        // 券面总额
-                        ptlSec.put("secAmount", ArithmeticUtil.multiply(entity.getFinDealPledgeList().get(0).getPledgeNumber(), new BigDecimal(100)));
+                    if(!CollectionUtils.isEmpty(entity.getFinDealPledgeList())){
+                        for(FinDealPledge finDealPledge : entity.getFinDealPledgeList()){
+                            Map<String, Object> ptlSec = new HashMap<>();
+                            ptlSec.put("portfolioId", dto.getPortfolioId());
+                            ptlSec.put("secAcctId", dto.getSecAcctId());
+                            ptlSec.put("tradeId", trdTempDto.getTradeId());
+                            ptlSec.put("etrId", entity.getEntrustId());
+                            // 融入券券面总额
+                            ptlSec.put("integrateSecAmount", dto.getIntegrateSecAmount());
+                            ptlSec.put("finprodId", finDealPledge.getPledgeFinprodId());
+                            // 本方券券面总额
+                            ptlSec.put("ownSecAmount", ArithmeticUtil.multiply(finDealPledge.getPledgeNumber(), new BigDecimal(100)));
+                            // 券面总额
+                            ptlSec.put("secAmount", ArithmeticUtil.multiply(finDealPledge.getPledgeNumber(), new BigDecimal(100)));
+                            ptlSecList.add(ptlSec);
+                        }
                     }
                 }
-                ptlSecList.add(ptlSec);
             }
             if (DictCodeListExt3.交易方向_解除质押.getValue().equals(entity.getPs())
                     || DictCodeListExt3.交易方向_到期续做.getValue().equals(entity.getPs())
                     || DictCodeListExt3.交易方向_到期购回.getValue().equals(entity.getPs())
                     || DictCodeListExt3.交易方向_提前购回.getValue().equals(entity.getPs())
                     || DictCodeListExt3.交易方向_中途换券.getValue().equals(entity.getPs())) {
-                Map<String, Object> ptlRelieveSec = new HashMap<>();
-                ptlRelieveSec.put("portfolioId", dto.getPortfolioId());
-                ptlRelieveSec.put("secAcctId", dto.getSecAcctId());
-                ptlRelieveSec.put("tradeId", trdTempDto.getTradeId());
-                ptlRelieveSec.put("etrId", entity.getEntrustId());
-                // 融入券券面总额
-                ptlRelieveSec.put("integrateSecAmount", dto.getIntegrateSecAmount());
-                if (DictCodeListExt3.交易方向_解除质押.getValue().equals(entity.getPs())) {
+                if (DictCodeListExt3.交易方向_解除质押.getValue().equals(entity.getPs())
+                        || DictCodeListExt3.交易方向_中途换券.getValue().equals(entity.getPs())) {
                     // ZGTFCP-1900:修改解除质押字段赋值 modify by fuyongsheng 20220327 start
-                    FinPledgeDispDetailTemp temp = this.getFinPledgeDispDetailTemp(entity, DictCodeListExt3.质押券置换_置换方向_换出.getValue());
-                    if (null != temp) {
-                        ptlRelieveSec.put("finprodId", temp.getFinprodId());
-                        // 本方券券面总额
-                        ptlRelieveSec.put("ownSecAmount", ArithmeticUtil.multiply(temp.getPledgeDisplaceAmt(), new BigDecimal(100)));
-                        // 券面总额
-                        ptlRelieveSec.put("secAmount", ArithmeticUtil.multiply(temp.getPledgeDisplaceAmt(), new BigDecimal(100)));
+                    List<FinPledgeDispDetailTemp> tempList = this.getFinPledgeDispDetailTemp(entity, DictCodeListExt3.质押券置换_置换方向_换出.getValue());
+                    if (!CollectionUtils.isEmpty(tempList)) {
+                        for(FinPledgeDispDetailTemp temp : tempList){
+                            Map<String, Object> ptlRelieveSec = new HashMap<>();
+                            ptlRelieveSec.put("portfolioId", dto.getPortfolioId());
+                            ptlRelieveSec.put("secAcctId", dto.getSecAcctId());
+                            ptlRelieveSec.put("tradeId", trdTempDto.getTradeId());
+                            ptlRelieveSec.put("etrId", entity.getEntrustId());
+                            ptlRelieveSec.put("finprodId", temp.getFinprodId());
+                            // 本方券券面总额
+                            ptlRelieveSec.put("ownSecAmount", ArithmeticUtil.multiply(temp.getPledgeDisplaceAmt(), new BigDecimal(100)));
+                            // 券面总额
+                            ptlRelieveSec.put("secAmount", ArithmeticUtil.multiply(temp.getPledgeDisplaceAmt(), new BigDecimal(100)));
+                            ptlRelieveSecList.add(ptlRelieveSec);
+                        }
                     }
                     // ZGTFCP-1900:修改解除质押字段赋值 modify by fuyongsheng 20220327 end
-                } else if (DictCodeListExt3.交易方向_中途换券.getValue().equals(entity.getPs())) {
-                    FinPledgeDispDetailTemp temp = this.getFinPledgeDispDetailTemp(entity, DictCodeListExt3.质押券置换_置换方向_换出.getValue());
-                    if (null != temp) {
-                        ptlRelieveSec.put("finprodId", temp.getFinprodId());
-                        // 本方券券面总额
-                        ptlRelieveSec.put("ownSecAmount", ArithmeticUtil.multiply(temp.getPledgeDisplaceAmt(), new BigDecimal(100)));
-                        // 券面总额
-                        ptlRelieveSec.put("secAmount", ArithmeticUtil.multiply(temp.getPledgeDisplaceAmt(), new BigDecimal(100)));
+                }  else {
+                    if(!CollectionUtils.isEmpty(entity.getPositionBaseData().getFinDealPledgeList())){
+                        for(FinDealPledge finDealPledge : entity.getPositionBaseData().getFinDealPledgeList()){
+                            Map<String, Object> ptlRelieveSec = new HashMap<>();
+                            ptlRelieveSec.put("portfolioId", dto.getPortfolioId());
+                            ptlRelieveSec.put("secAcctId", dto.getSecAcctId());
+                            ptlRelieveSec.put("tradeId", trdTempDto.getTradeId());
+                            ptlRelieveSec.put("etrId", entity.getEntrustId());
+                            // 融入券券面总额
+                            ptlRelieveSec.put("integrateSecAmount", dto.getIntegrateSecAmount());
+                            ptlRelieveSec.put("finprodId", finDealPledge.getPledgeFinprodId());
+                            // ZGTFCP-1739:需要乘以100 modify by fuyongsheng 20220325 start
+                            ptlRelieveSec.put("ownSecAmount", ArithmeticUtil.multiply(finDealPledge.getPledgeNumber(), new BigDecimal(100)));
+                            ptlRelieveSec.put("secAmount", ArithmeticUtil.multiply(finDealPledge.getPledgeNumber(), new BigDecimal(100)));
+                            ptlRelieveSecList.add(ptlRelieveSec);
+                        }
                     }
-                } else {
-                    ptlRelieveSec.put("finprodId", entity.getPositionBaseData().getFinDealPledge().getPledgeFinprodId());
-                    // ZGTFCP-1739:需要乘以100 modify by fuyongsheng 20220325 start
-                    ptlRelieveSec.put("ownSecAmount", ArithmeticUtil.multiply(entity.getPositionBaseData()
-                            .getFinDealPledge().getPledgeNumber(), new BigDecimal(100)));
-                    ptlRelieveSec.put("secAmount", ArithmeticUtil.multiply(entity.getPositionBaseData()
-                            .getFinDealPledge().getPledgeNumber(), new BigDecimal(100)));
                     // ZGTFCP-1739:需要乘以100 modify by fuyongsheng 20220325 end
                 }
-                ptlRelieveSecList.add(ptlRelieveSec);
             }
         }
         resultMap.put("ptlCashList", ptlCashList);
@@ -754,16 +756,17 @@ public class PositionRequestTradeReportService {
      * @param tradeType
      * @return
      */
-    private FinPledgeDispDetailTemp getFinPledgeDispDetailTemp(TrdTempDto entity, String tradeType) {
+    private List<FinPledgeDispDetailTemp> getFinPledgeDispDetailTemp(TrdTempDto entity, String tradeType) {
+        List<FinPledgeDispDetailTemp> result = new ArrayList<>();
         List<FinPledgeDispDetailTemp> finPledgeDispDetailTemps = entity.getFinPledgeDispDetailTempList();
         if (!StringUtil.isEmptyList(finPledgeDispDetailTemps)) {
             for (FinPledgeDispDetailTemp temp : finPledgeDispDetailTemps) {
                 if (tradeType.equals(temp.getTradeType())) {
-                    return temp;
+                    result.add(temp);
                 }
             }
         }
-        return null;
+        return result;
     }
 
     /**

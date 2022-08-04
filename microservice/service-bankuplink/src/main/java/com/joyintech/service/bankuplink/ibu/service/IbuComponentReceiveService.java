@@ -978,6 +978,7 @@ public class IbuComponentReceiveService extends BaseService{
      * @return
      */
     private boolean updateRepoRequestPositionRule(QuoteResultDto quoteResultDto) {
+        logger.info("updateRepoRequestPositionRule[头寸引擎处理头寸]:{}",JsonUtils.object2Json(quoteResultDto));
         if (null != quoteResultDto && null != quoteResultDto.getRepoDialogueQuote()) {
             List<IbuQuoteCrepPledgeDto> ibuQuoteCrepPledgeDtoList = null;
             if (null != quoteResultDto.getRepoDialogueQuote().getIbuQuoteCrepPledgeDtoList()) {
@@ -986,6 +987,14 @@ public class IbuComponentReceiveService extends BaseService{
             IbuQuoteCrepDto ibuQuoteCrepDto = quoteResultDto.getRepoDialogueQuote().getIbuQuoteCrepDto();
             CfetsRepoDealQuotedPrice001Dto dto = new CfetsRepoDealQuotedPrice001Dto();
             BeanUtil.copyPropertiesIgnoreNull(dto, ibuQuoteCrepDto);
+            // 清算速度
+            if (ibuQuoteCrepDto.getSettleSpeed().compareTo(0L) == 0) {
+                dto.setSettleSpreed("01");
+            } else if (ibuQuoteCrepDto.getSettleSpeed().compareTo(1L) == 0) {
+                dto.setSettleSpreed("02");
+            } else if (ibuQuoteCrepDto.getSettleSpeed().compareTo(2L) == 0) {
+                dto.setSettleSpreed("03");
+            }
             dto.setQuoteId(ibuQuoteCrepDto.getQuoteId());
             dto.setPortfolioId(ibuQuoteCrepDto.getTradeStatus());
             dto.setTradeStatus(dto.getTradeStatus());
@@ -994,7 +1003,7 @@ public class IbuComponentReceiveService extends BaseService{
             dto.setIsMq("Y"); //mq推送标识
             dto.setIsDzh(quoteResultDto.getRepoDialogueQuote().getIsDzh());
             if (null != ibuQuoteCrepPledgeDtoList && ibuQuoteCrepPledgeDtoList.size() > 0) {
-                List<CfetsRepoDealQuotedPrice003Dto> pledgeBondList = new ArrayList<CfetsRepoDealQuotedPrice003Dto>();
+                List<CfetsRepoDealQuotedPrice003Dto> pledgeBondList = new ArrayList<>();
                 if (StringUtil.equals(quoteResultDto.getRepoDialogueQuote().getIsDzh(), "Y")) {
                     //多组合 处理持仓 传入拆分后质押券
                     List<IbuQuoteEntCrepPledgeDto> ibuQuoteEntCrepPledges = quoteResultDto.getRepoDialogueQuote().getIbuQuoteEntCrepPledgeDtoList();
@@ -1034,10 +1043,12 @@ public class IbuComponentReceiveService extends BaseService{
                     BussinessDictCodeList.银行间上行报价状态_已撤回.getValue())) {
                 cfetsQuotedCommonService.sendPositionMethod(dto, DictCodeListExt3.流程节点_审批生效.getValue(), DictCodeListExt3.系统动作_撤回.getValue(), DictCodeListExt3.系统动作_撤回.getValue(), null);
                 return true;
-            } else if (StringUtil.equals(ibuQuoteCrepDto.getTradeStatus(),
+            } else if (CollectionUtils.isNotEmpty(ptlAllocationList)
+                    && (StringUtil.equals(ibuQuoteCrepDto.getTradeStatus(),
                     BussinessDictCodeList.银行间上行报价状态_已终止.getValue())
                     || StringUtil.equals(ibuQuoteCrepDto.getTradeStatus(),
-                    BussinessDictCodeList.银行间上行报价状态_已过期.getValue())) {
+                    BussinessDictCodeList.银行间上行报价状态_已过期.getValue()))) {
+                // 首次交谈 直接拒绝不处理头寸
                 cfetsQuotedCommonService.sendPositionMethod(dto, DictCodeListExt3.流程节点_审批生效.getValue(), DictCodeListExt3.系统动作_撤回.getValue(), DictCodeListExt3.系统动作_撤回.getValue(), null);
                 return true;
             }

@@ -81,9 +81,9 @@ public class CfetsBondAutoDurDealGenerateTask extends BatchBaseService {
         }
         catch (Exception e) {
             e.printStackTrace();
-            logger.error(e.getMessage());
+            logger.error("存续期自动生成批处理报错:{}",e.getMessage());
             //异常信息记录到批处理的日志详情
-            throw new BatchException(RiskUtil.getLogString(e));
+            RiskUtil.getLogString(e);
         }
 
         return result;

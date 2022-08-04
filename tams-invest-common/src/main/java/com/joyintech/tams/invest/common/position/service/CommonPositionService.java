@@ -1,9 +1,7 @@
 package com.joyintech.tams.invest.common.position.service;
 
 import com.alibaba.fastjson.JSON;
-import com.greenpineyu.fel.FelEngine;
-import com.greenpineyu.fel.FelEngineImpl;
-import com.greenpineyu.fel.context.FelContext;
+import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -12,17 +10,15 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.CommonUtil;
-import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
-import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
+import com.joyintech.tams.invest.common.component.base.group.impl.dao.BasePtlCashPositionInfoMapper;
+import com.joyintech.tams.invest.common.component.base.group.impl.dao.BasePtlSecPositionInfoMapper;
 import com.joyintech.tams.invest.common.position.dao.CommonPtlPositionMapper;
 import com.joyintech.tams.invest.common.position.dto.PostionParameter;
 import com.joyintech.tams.invest.common.position.dto.PtlPositionFlowCfg;
 import com.joyintech.tams.invest.common.position.dto.PtlPositionScene;
-import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
+import com.joyintech.tams.invest.common.trade.dao.EtrCommonCashPositionMapper;
 import com.joyintech.tams.invest.common.util.ExpressionUtil;
-import com.joyintech.tools.collectors.JoyinCollectors;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +61,15 @@ public class CommonPositionService {
 	private EtrEntrustMapper etrEntrustMapper;
 	@Autowired
 	private EtrEntrustAddMapper etrEntrustAddMapper;
-	
+
+	@Autowired
+	private EtrCommonCashPositionMapper etrCommonCashPositionMapper;
+
+	@Autowired
+	private BasePtlCashPositionInfoMapper basePtlCashPositionInfoMapper;
+
+	@Autowired
+	private BasePtlSecPositionInfoMapper basePtlSecPositionInfoMapper;
 	/**
 	 * 头寸处理入口
 	 */
@@ -120,7 +124,7 @@ public class CommonPositionService {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * 公共流水处理方式
 	 * @param parameter
@@ -149,7 +153,7 @@ public class CommonPositionService {
 				etrCashPositionFlow.setAcctId(acctId);
 			}
 			insertEtrCashPositionFlow(etrCashPositionFlow);//入库
-			
+
 		}else if(StringUtil.equals(ptlPositionFlowCfg.getFlowType(), "02")){//指令持仓
 			EtrSecPositionFlow etrSecPositionFlow = BeanUtil.mapToObject(properties, EtrSecPositionFlow.class);
 			if(!StringUtil.equals(ptlPositionFlowCfg.getProcessConfig(), "01")){
@@ -193,7 +197,7 @@ public class CommonPositionService {
 			insertPtlSecPositionFlow(ptlSecPositionFlow);//入库
 		}
 	}
-	
+
 	/**
 	 * 公共撤销、退回流水处理方式
 	 * @param
@@ -232,6 +236,7 @@ public class CommonPositionService {
 		Map<String,Object> dataMap =ptlPositionFlowCfg.getDataMap();
 		Map<String, Object> param = new HashMap<>();
 		for(String key:dataMap.keySet()){
+			logger.debug("参数 {}，{}",key,dataMap.get(key));
 			if (StringUtil.isNotEmpty(dataMap.get(key)) && dataMap.get(key).toString().startsWith("custom")){
 				Object o = ExpressionUtil.eval((String)dataMap.get(key), properties);
 				param.put(key, o);
@@ -241,14 +246,14 @@ public class CommonPositionService {
 		}
 		return param;
 	}
-	
+
 
 	/**
 	 * 启动时调此方法,加载2个配置表的数据
 	 */
 	public Map<String,Object> init() {
 		initSceneConfig();//初始化场景配置
-		
+
 		initFlowCfgConfig();//初始化
 		Map<String,Object> result =new HashMap<>();
 		result.put("status", "success");
@@ -273,7 +278,7 @@ public class CommonPositionService {
 					try{
 						dataMap = JsonUtils.json2Object(ptlPositionFlowCfg2.getParameterConfig(), Map.class);
 					}catch (Exception e) {
-						
+
 					}
 					ptlPositionFlowCfg2.setDataMap(dataMap);
 					scenePtlPositionFlowCfg.add(ptlPositionFlowCfg2);
@@ -282,7 +287,7 @@ public class CommonPositionService {
 			ptlPositionFlowCfgMap.put(ptlPositionFlowCfg.getSceneId(), scenePtlPositionFlowCfg);
 		}
 		FLOW_CFG = ptlPositionFlowCfgMap;
-		
+
 	}
 
 
@@ -306,7 +311,7 @@ public class CommonPositionService {
 		}
 		SCENE_CFG =ptlPositionSceneMap;
 	}
-	
+
 	/**
 	 * 生成uuid
 	 * @return
@@ -355,6 +360,103 @@ public class CommonPositionService {
 			etrSecPositionFlow.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());
 			insertEtrSecPositionFlow(etrSecPositionFlow);
 		});
+		return true;
+	}
+
+	/**
+	 * 深交所正回购到期续做 日间、日终 头寸特殊处理
+	 */
+	public boolean dealPositionForSJSDQXZ(Map<String, Object> properties) {
+		String flowType = String.valueOf(properties.get("flowType"));
+		String processConfig = String.valueOf(properties.get("processConfig"));
+		// 置换方向
+		String tradeType = String.valueOf(properties.get("tradeType"));
+		List<FinDealPledge> finDealPledgeList = (List<FinDealPledge>) properties.get("finDealPledgeList");
+		if (StringUtil.equals(flowType, "02")) {//指令持仓
+			for (FinDealPledge finDealPledge : finDealPledgeList) {
+
+				EtrSecPositionFlow etrSecPositionFlow = BeanUtil.mapToObject(properties, EtrSecPositionFlow.class);
+				etrSecPositionFlow.setInvAim(selectHoldInvAim(etrSecPositionFlow.getPortfolioId(), finDealPledge.getPledgeFinprodId()));
+				etrSecPositionFlow.setFinprodId(finDealPledge.getPledgeFinprodId());
+				etrSecPositionFlow.setAmount(finDealPledge.getPledgeNumber());
+				if (!StringUtil.equals(processConfig, "01")) {
+					etrSecPositionFlow.setAmount(etrSecPositionFlow.getAmount().negate());
+				}
+				if (etrSecPositionFlow.getCdate() == null) {
+					etrSecPositionFlow.setCdate(getSysDate());
+				}
+				etrSecPositionFlow.setSeqno(getUuid());//设置主键
+				insertEtrSecPositionFlow(etrSecPositionFlow);//入库
+			}
+		} else if (StringUtil.equals(flowType, "04")) {//交易持仓
+			for (FinDealPledge finDealPledge : finDealPledgeList) {
+				PtlSecPositionFlow ptlSecPositionFlow = BeanUtil.mapToObject(properties, PtlSecPositionFlow.class);
+				ptlSecPositionFlow.setFinprodId(finDealPledge.getPledgeFinprodId());
+				ptlSecPositionFlow.setInvAim(selectHoldInvAim(ptlSecPositionFlow.getPortfolioId(), finDealPledge.getPledgeFinprodId()));
+				ptlSecPositionFlow.setAmount(finDealPledge.getPledgeNumber());
+				if (!StringUtil.equals(processConfig, "01")) {
+					ptlSecPositionFlow.setAmount(ptlSecPositionFlow.getAmount().negate());
+				}
+				if (ptlSecPositionFlow.getCdate() == null) {
+					ptlSecPositionFlow.setCdate(getSysDate());
+				}
+				ptlSecPositionFlow.setSeqno(getUuid());//设置主键
+				insertPtlSecPositionFlow(ptlSecPositionFlow);//入库
+			}
+		} else {
+			throw new BusinessException("深交所正回购到期续做日间成交流水处理,配置无效");
+		}
+		return true;
+	}
+
+	/**
+	 * 中途换券流水处理
+	 */
+	public boolean dealPositionForZTHQRLS(Map<String, Object> properties) {
+		String flowType = String.valueOf(properties.get("flowType"));
+		String processConfig = String.valueOf(properties.get("processConfig"));
+		// 置换方向
+		String tradeType = String.valueOf(properties.get("tradeType"));
+		List<FinPledgeDispDetailTemp> finPledgeDispDetailTempList = (List<FinPledgeDispDetailTemp>) properties.get("finPledgeDispDetailTempList");
+		if (StringUtil.equals(flowType, "02")) {//指令持仓
+			for (FinPledgeDispDetailTemp finPledgeDispDetailTemp : finPledgeDispDetailTempList) {
+				if (!StringUtil.equals(finPledgeDispDetailTemp.getTradeType(), tradeType)) {
+					continue;
+				}
+				EtrSecPositionFlow etrSecPositionFlow = BeanUtil.mapToObject(properties, EtrSecPositionFlow.class);
+				etrSecPositionFlow.setInvAim(selectHoldInvAim(etrSecPositionFlow.getPortfolioId(), finPledgeDispDetailTemp.getFinprodId()));
+				etrSecPositionFlow.setFinprodId(finPledgeDispDetailTemp.getFinprodId());
+				etrSecPositionFlow.setAmount(finPledgeDispDetailTemp.getPledgeDisplaceAmt());
+				if (!StringUtil.equals(processConfig, "01")) {
+					etrSecPositionFlow.setAmount(etrSecPositionFlow.getAmount().negate());
+				}
+				if (etrSecPositionFlow.getCdate() == null) {
+					etrSecPositionFlow.setCdate(getSysDate());
+				}
+				etrSecPositionFlow.setSeqno(getUuid());//设置主键
+				insertEtrSecPositionFlow(etrSecPositionFlow);//入库
+			}
+		} else if (StringUtil.equals(flowType, "04")) {//交易持仓
+			for (FinPledgeDispDetailTemp finPledgeDispDetailTemp : finPledgeDispDetailTempList) {
+				if (!StringUtil.equals(finPledgeDispDetailTemp.getTradeType(), tradeType)) {
+					continue;
+				}
+				PtlSecPositionFlow ptlSecPositionFlow = BeanUtil.mapToObject(properties, PtlSecPositionFlow.class);
+				ptlSecPositionFlow.setFinprodId(finPledgeDispDetailTemp.getFinprodId());
+				ptlSecPositionFlow.setInvAim(selectHoldInvAim(ptlSecPositionFlow.getPortfolioId(), finPledgeDispDetailTemp.getFinprodId()));
+				ptlSecPositionFlow.setAmount(finPledgeDispDetailTemp.getPledgeDisplaceAmt());
+				if (!StringUtil.equals(processConfig, "01")) {
+					ptlSecPositionFlow.setAmount(ptlSecPositionFlow.getAmount().negate());
+				}
+				if (ptlSecPositionFlow.getCdate() == null) {
+					ptlSecPositionFlow.setCdate(getSysDate());
+				}
+				ptlSecPositionFlow.setSeqno(getUuid());//设置主键
+				insertPtlSecPositionFlow(ptlSecPositionFlow);//入库
+			}
+		} else {
+			throw new BusinessException("中途换券日间成交流水处理,配置无效");
+		}
 		return true;
 	}
 
@@ -530,16 +632,26 @@ public class CommonPositionService {
 		}
 		EtrCashPosition etrCashPosition = commonPtlPositionMapper.selectEtrCashPosition(etrCashPositionFlow);
 		if(StringUtil.isNotEmpty(etrCashPosition)){
-			etrCashPosition.setAmount(ArithmeticUtil.doAdd(etrCashPosition.getAmount(),etrCashPositionFlow.getAmount()));
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 start
+//			etrCashPosition.setAmount(ArithmeticUtil.doAdd(etrCashPosition.getAmount(),etrCashPositionFlow.getAmount()));
 //			etrCashPositionMapper.updateByPrimaryKeySelective(etrCashPosition);
-			commonPtlPositionMapper.updateEtrCashPosition(etrCashPosition);
+//			commonPtlPositionMapper.updateEtrCashPosition(etrCashPosition);
+			BeanUtil.copyPropertiesIgnoreNull(etrCashPosition, etrCashPositionFlow);
+			etrCommonCashPositionMapper.updateByPrimaryKeySelectiveForFlow(etrCashPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 end
 		}else{
 			etrCashPosition = new EtrCashPosition();
 			BeanUtil.copyPropertiesIgnoreNull(etrCashPosition, etrCashPositionFlow);
-			etrCashPositionMapper.insertSelective(etrCashPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 start
+			try {
+				etrCashPositionMapper.insertSelective(etrCashPosition);
+			} catch (Exception e) {
+				etrCommonCashPositionMapper.updateByPrimaryKeySelectiveForFlow(etrCashPosition);
+			}
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 end
 		}
 	}
-	
+
 	/**
 	 * 入库委托持仓流水信息
 	 * @param etrSecPositionFlow
@@ -550,21 +662,35 @@ public class CommonPositionService {
 		etrSecPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
 		// modify by etliu 20220308 end
 
+		if(StringUtil.isBlank(etrSecPositionFlow.getInvAim())){
+			etrSecPositionFlow.setInvAim("999999");
+		}
+
 		etrSecPositionFlowMapper.insertSelective(etrSecPositionFlow);
 		if(getSysDate().compareTo(etrSecPositionFlow.getCdate()) != 0){//非T+0流水不需要更新余额
 			return;
 		}
 		EtrSecPosition etrSecPosition = commonPtlPositionMapper.selectEtrSecPosition(etrSecPositionFlow);
 		if(StringUtil.isNotEmpty(etrSecPosition)){
-			etrSecPosition.setAmount(ArithmeticUtil.doAdd(etrSecPosition.getAmount(),etrSecPositionFlow.getAmount()));
-			commonPtlPositionMapper.updateEtrSecPosition(etrSecPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 start
+			// etrSecPosition.setAmount(ArithmeticUtil.doAdd(etrSecPosition.getAmount(),etrSecPositionFlow.getAmount()));
+			// commonPtlPositionMapper.updateEtrSecPosition(etrSecPosition);
+			BeanUtil.copyPropertiesIgnoreNull(etrSecPosition, etrSecPositionFlow);
+			etrCommonCashPositionMapper.updateByPrimaryKeySelectiveForSecFlow(etrSecPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 end
 		}else{
 			etrSecPosition = new EtrSecPosition();
 			BeanUtil.copyPropertiesIgnoreNull(etrSecPosition, etrSecPositionFlow);
-			etrSecPositionMapper.insertSelective(etrSecPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 start
+			try {
+				etrSecPositionMapper.insertSelective(etrSecPosition);
+			} catch (Exception e) {
+				etrCommonCashPositionMapper.updateByPrimaryKeySelectiveForSecFlow(etrSecPosition);
+			}
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 end
 		}
 	}
-	
+
 	/**
 	 * 入库交易现金流水信息
 	 * @param ptlCashPositionFlow
@@ -581,16 +707,26 @@ public class CommonPositionService {
 		}
 		PtlCashPosition ptlCashPosition = commonPtlPositionMapper.selectPtlCashPosition(ptlCashPositionFlow);
 		if(StringUtil.isNotEmpty(ptlCashPosition)){
-			ptlCashPosition.setAmount(ArithmeticUtil.doAdd(ptlCashPosition.getAmount(),ptlCashPositionFlow.getAmount()));
-			commonPtlPositionMapper.updatePtlCashPosition(ptlCashPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 start
+//			ptlCashPosition.setAmount(ArithmeticUtil.doAdd(ptlCashPosition.getAmount(),ptlCashPositionFlow.getAmount()));
+//			commonPtlPositionMapper.updatePtlCashPosition(ptlCashPosition);
+			BeanUtil.copyPropertiesIgnoreNull(ptlCashPosition, ptlCashPositionFlow);
+			basePtlCashPositionInfoMapper.updateByPrimaryKeySelectiveForFlow(ptlCashPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 end
 		}else{
 			ptlCashPosition = new PtlCashPosition();
 			BeanUtil.copyPropertiesIgnoreNull(ptlCashPosition, ptlCashPositionFlow);
-			ptlCashPositionMapper.insertSelective(ptlCashPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 start
+			try {
+				ptlCashPositionMapper.insertSelective(ptlCashPosition);
+			} catch (Exception e) {
+				basePtlCashPositionInfoMapper.updateByPrimaryKeySelectiveForFlow(ptlCashPosition);
+			}
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 end
 		}
 
 	}
-	
+
 	/**
 	 * 入库交易持仓流水信息
 	 * @param ptlSecPositionFlow
@@ -601,23 +737,37 @@ public class CommonPositionService {
 		ptlSecPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
 		// modify by etliu 20220308 end
 
+		if(StringUtil.isBlank(ptlSecPositionFlow.getInvAim())){
+			ptlSecPositionFlow.setInvAim("999999");
+		}
+
 		ptlSecPositionFlowMapper.insertSelective(ptlSecPositionFlow);
 		if(getSysDate().compareTo(ptlSecPositionFlow.getCdate()) != 0){//非T+0流水不需要更新余额
 			return;
 		}
 		PtlSecPosition ptlSecPosition = commonPtlPositionMapper.selectPtlSecPosition(ptlSecPositionFlow);
 		if(StringUtil.isNotEmpty(ptlSecPosition)){
-			ptlSecPosition.setAmount(ArithmeticUtil.doAdd(ptlSecPosition.getAmount(),ptlSecPositionFlow.getAmount()));
-			commonPtlPositionMapper.updatePtlSecPosition(ptlSecPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 start
+//			ptlSecPosition.setAmount(ArithmeticUtil.doAdd(ptlSecPosition.getAmount(),ptlSecPositionFlow.getAmount()));
+//			commonPtlPositionMapper.updatePtlSecPosition(ptlSecPosition);
+			BeanUtil.copyPropertiesIgnoreNull(ptlSecPosition, ptlSecPositionFlow);
+			basePtlSecPositionInfoMapper.updateByPrimaryKeySelectiveForFlow(ptlSecPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 end
 		}else{
 			ptlSecPosition = new PtlSecPosition();
 			BeanUtil.copyPropertiesIgnoreNull(ptlSecPosition, ptlSecPositionFlow);
-			ptlSecPositionMapper.insertSelective(ptlSecPosition);
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 start
+			try {
+				ptlSecPositionMapper.insertSelective(ptlSecPosition);
+			} catch (Exception e) {
+				basePtlSecPositionInfoMapper.updateByPrimaryKeySelectiveForFlow(ptlSecPosition);
+			}
+			// XYHGFXSJ-595:解决并发问题 modify by fuyongsheng 20220727 end
 		}
 
 	}
-	
-	
+
+
 	/**
 	 * 获取平台日
 	 * @return
@@ -625,8 +775,8 @@ public class CommonPositionService {
 	public Date getSysDate(){
 		return commonPtlPositionMapper.getSysDate();
 	}
-	
-	
+
+
 	private BigDecimal object2BigDecimal(Object object){
 		if(!StringUtil.isNotEmpty(object)){
 			return BigDecimal.ZERO;
@@ -636,7 +786,7 @@ public class CommonPositionService {
 		}
 		return BigDecimal.ZERO;
 	}
-	
+
 	private Date object2Date(Object object){
 		if(!StringUtil.isNotEmpty(object)){
 			return null;

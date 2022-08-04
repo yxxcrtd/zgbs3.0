@@ -1521,6 +1521,7 @@ public class CfetsQuotedCommonService extends BaseService {
             posport.setCashAmount(ptlDto.getFpriceAmt());
             ptlCashList.add(posport);
         }
+        entity.setIsDzh(DictCodeList.是否_是.getValue());
         List<CfetsRepoDealQuotedPrice003Dto> pledgeBondList = this.质押券拆分(entity);
         if (StringUtil.isNotEmpty(pledgeBondList)) {
             for (CfetsRepoDealQuotedPrice003Dto pledgeDto : pledgeBondList) {
@@ -1529,7 +1530,7 @@ public class CfetsQuotedCommonService extends BaseService {
                 secport.setEtrId(pledgeDto.getEntrustId());
                 secport.setFinprodId(pledgeDto.getFinprodId());
                 secport.setTradeId(entity.getQuoteId());
-                Map<String, Object> map = new HashMap<String, Object>();
+                Map<String, Object> map = new HashMap<>();
                 map.put("portfolioId", pledgeDto.getPortfolioId());
                 map.put("finprodId", pledgeDto.getFinprodId());
                 String secAcctId = this.qryPortfolioSecAcctId(map);

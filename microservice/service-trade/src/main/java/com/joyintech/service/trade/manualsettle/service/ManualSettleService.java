@@ -20,6 +20,7 @@ import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommServi
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.DictCodeListStl;
 import com.joyintech.tams.invest.common.component.base.entrust.BaseEtrInvestInfoService;
 import com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto;
 import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
@@ -212,7 +213,13 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                     // modify by etliu 20220725 end
 
                     // XYHGFXSJ-8:构建质押品信息list modify by fuyongsheng 20220718 start
-                    infContractDetailfile.setPledgeList(this.genPledgeDtoList(trdProductTempDeal.getTradeId()));
+                    if(DictCodeListExt3.交易方向_中途换券.getValue().equals(infContractDetailfile.getPs())){
+                        // XYHGFXSJ-724 【实时资产头寸查询】协议回购上交所正回购中途换券数据日间交收后，实时资产里的质押券没有变更
+                        infContractDetailfile.setPledgeList(manualSettleMapper.selectFinDealPledgeByTradeId2(trdProductTempDeal.getFinprodId()));
+                        // XYHGFXSJ-724 【实时资产头寸查询】协议回购上交所正回购中途换券数据日间交收后，实时资产里的质押券没有变更
+                    }else {
+                        infContractDetailfile.setPledgeList(this.genPledgeDtoList(trdProductTempDeal.getFinprodId()));
+                    }
                     // XYHGFXSJ-8:构建质押品信息list modify by fuyongsheng 20220718 end
                     if (DictCodeList.回购拆借方向_正回购.getValue().equals(infContractDetailfile.getPs())
                             || DictCodeList.回购拆借方向_逆回购.getValue().equals(infContractDetailfile.getPs())) {
@@ -243,12 +250,36 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                         // modify by etliu 20220720 end
                         // 临时交易及其他数据处理
                         tradePreClearingService.trdRepoPeriod(trdTempDto, infContractDetailfile);
+
+                        // modify by etliu 20220727 start
+                        // 3.0.6协议回购+风险升级 XYHGFXSJ-461
+                        //【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误
+                        if (DictCodeListExt3.交易方向_提前购回.getValue().equals(infContractDetailfile.getPs())
+                                || DictCodeListExt3.交易方向_到期购回.getValue().equals(infContractDetailfile.getPs())
+                                || DictCodeListExt3.交易方向_解除质押.getValue().equals(infContractDetailfile.getPs())) {
+                            List<ManualSettleDto> tepmPledgeInfoList = manualSettleMapper.selectPledgeInfo(infContractDetailfile.getFinprodId());
+                            if (!StringUtil.isEmptyList(tepmPledgeInfoList)) {
+                                ((InfContractDetailfile) trdTempDto.getData()).setFinprodId(tepmPledgeInfoList.get(0).getPledgeId());
+                                trdTempDto.setTradeAmt(tepmPledgeInfoList.get(0).getPrin());
+                            }
+                        }
+                        // modify by etliu 20220727 end
                     }
                     else if (DictCodeListExt3.交易方向_到期续做.getValue().equals(infContractDetailfile.getPs())){
                         // 指令信息处理
                         tradePreClearingService.buildPositionBaseData(trdTempDto, infContractDetailfile);
                         // 临时交易及其他数据处理
                         tradePreClearingService.trdRepoPeriodT56(trdTempDto, infContractDetailfile, true);
+
+                        // modify by etliu 20220727 start
+                        // 3.0.6协议回购+风险升级 XYHGFXSJ-461
+                        //【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误
+                        List<ManualSettleDto> tepmPledgeInfoList = manualSettleMapper.selectPledgeInfo(infContractDetailfile.getFinprodId());
+                        if (!StringUtil.isEmptyList(tepmPledgeInfoList)) {
+                            ((InfContractDetailfile) trdTempDto.getData()).setFinprodId(tepmPledgeInfoList.get(0).getPledgeId());
+                            trdTempDto.setTradeAmt(tepmPledgeInfoList.get(0).getPrin());
+                        }
+                        // modify by etliu 20220727 end
                     }
 
                     // modify by etliu 20220227 start
@@ -279,13 +310,24 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                         parameter.setPs(parameter.getPs() + trdTempDto.getRedoType());
                     }
 
+                    // 中途换券换钱特殊处理
+                    if (StringUtil.equals(trdTempDto.getPs(),DictCodeListExt3.交易方向_中途换券.getValue())
+                            // 中途换券的换钱tradeAmt不为空
+                            && StringUtil.isNotEmpty(trdTempDto.getTradeAmt()) &&
+                            StringUtil.equals(infContractDetailfile.getTradeMarket(),DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
+                        parameter.setPs(parameter.getPs() + "_" + DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换钱.getValue());
+                    }
+
                     // add by etliu 20220116 start
                     // GZYHTZJY-1145: 【场内对账清结算1231】深交所协议回购首期交易，日终头寸更新有误【解决日期：2022-01-14】】
                     if (StringUtil.isNotBlank(trdTempDto.getFinprodId())) {
                         trdTempDto.setPledgeInvAim(commonPositionService.selectHoldInvAim(trdTempDto.getPortfolioId(), trdTempDto.getFinprodId()));
                     }
-                    if (trdTempDto.getFinDealPledge() != null && StringUtil.isNotBlank(trdTempDto.getFinDealPledge().getPledgeFinprodId())) {
-                        trdTempDto.setFinDealPledgePledgeInvAim(commonPositionService.selectHoldInvAim(trdTempDto.getPortfolioId(), trdTempDto.getFinDealPledge().getPledgeFinprodId()));
+//                    if (trdTempDto.getFinDealPledge() != null && StringUtil.isNotBlank(trdTempDto.getFinDealPledge().getPledgeFinprodId())) {
+//                        trdTempDto.setFinDealPledgePledgeInvAim(commonPositionService.selectHoldInvAim(trdTempDto.getPortfolioId(), trdTempDto.getFinDealPledge().getPledgeFinprodId()));
+//                    }
+                    if (!CollectionUtils.isEmpty(trdTempDto.getFinDealPledgeList()) && StringUtil.isNotBlank(trdTempDto.getFinDealPledgeList().get(0).getPledgeFinprodId())) {
+                        trdTempDto.setFinDealPledgePledgeInvAim(commonPositionService.selectHoldInvAim(trdTempDto.getPortfolioId(), trdTempDto.getFinDealPledgeList().get(0).getPledgeFinprodId()));
                     }
                     if (trdTempDto.getData() != null && StringUtil.isNotBlank(((InfContractDetailfile) trdTempDto.getData()).getFinprodId())) {
                         trdTempDto.setDataPledgeInvAim(commonPositionService.selectHoldInvAim(trdTempDto.getPortfolioId(), ((InfContractDetailfile) trdTempDto.getData()).getFinprodId()));
@@ -297,12 +339,13 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                     // add by etliu 20220116 end
 
                     parameter.setCustom(trdTempDto);
-                    try {
+//                    try {
                         logger.info("手工交收处理请求报文:" + JsonUtils.object2Json(parameter));
                         commonPositionService.process(parameter);
-                    } catch (Exception e) {
-                        logger.error("手工交收处理请求失败:", e);
-                    }
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                        logger.error("手工交收处理请求失败:", e);
+//                    }
 //                    // 3.调用基础组件.【投资委托组件.完成委托】，写入委托完成状况信息(投资委托场合才执行此步)
 //                    if (!finProductTradeDto.isNeedHandleFinishEntrust()) {
 //                        baseTradeProductDealCommService.finishEntrust(finProductTradeDto.getBaseTradeProductDealDtos(), false);
@@ -425,9 +468,13 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                 // 广农商二阶段 GNS-973:【广农商场内清算】深交所协议回购 正/逆回购 提前/到期购回，点击交收失败后，头寸更新有误
                 if (trdProductTempDeal != null &&
                         !StringUtil.equals(DictCodeListExt3.交易方向_提前购回.getValue(), trdProductTempDeal.getPs())
-                        && !StringUtil.equals(DictCodeListExt3.交易方向_到期购回.getValue(), trdProductTempDeal.getPs())) {
+                        && !StringUtil.equals(DictCodeListExt3.交易方向_到期购回.getValue(), trdProductTempDeal.getPs())
+                        //XYHGFXSJ-821 【实时资产头寸查询】深交所正回购首期，场内日间交收失败，债券指令可用持仓回冲的流水错误
+                        && !StringUtil.equals(DictCodeListExt3.交易方向_正回购.getValue(), trdProductTempDeal.getPs()
+                        //XYHGFXSJ-821 【实时资产头寸查询】深交所正回购首期，场内日间交收失败，债券指令可用持仓回冲的流水错误
+                )) {
                     etrCashPositionFlowDto.setAmount(trdProductTempDeal.getTradeAmt());
-                    if(etrCashPositionFlowDto.getAmount()==null){
+                    if (etrCashPositionFlowDto.getAmount() == null) {
                         etrCashPositionFlowDto.setAmount(trdProductTempDeal.getPrinAmt());
                     }
                 } else {
@@ -445,7 +492,11 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                 // 广农商二阶段 GNS-973:【广农商场内清算】深交所协议回购 正/逆回购 提前/到期购回，点击交收失败后，头寸更新有误
                 if (trdProductTempDeal != null &&
                         !StringUtil.equals(DictCodeListExt3.交易方向_提前购回.getValue(), trdProductTempDeal.getPs())
-                        && !StringUtil.equals(DictCodeListExt3.交易方向_到期购回.getValue(), trdProductTempDeal.getPs())) {
+                        && !StringUtil.equals(DictCodeListExt3.交易方向_到期购回.getValue(), trdProductTempDeal.getPs())
+                        //XYHGFXSJ-821 【实时资产头寸查询】深交所正回购首期，场内日间交收失败，债券指令可用持仓回冲的流水错误
+                        && !StringUtil.equals(DictCodeListExt3.交易方向_正回购.getValue(), trdProductTempDeal.getPs()
+                        //XYHGFXSJ-821 【实时资产头寸查询】深交所正回购首期，场内日间交收失败，债券指令可用持仓回冲的流水错误
+                )) {
                     etrSecPositionFlowDto.setAmount(trdProductTempDeal.getShareAmt());
                     if (etrSecPositionFlowDto.getAmount() == null) {
                         etrSecPositionFlowDto.setAmount(dto.getPledgeNumber());
@@ -551,5 +602,5 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
         return null;
     }
 
-} 
+}
 

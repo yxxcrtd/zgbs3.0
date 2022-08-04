@@ -411,10 +411,12 @@
 			1 = 1
 			AND std.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})
 			<if test="checkResultList != null and checkResultList.size() > 0">
-			    AND NOT EXISTS (SELECT 1 FROM SETTLE_TRANS_TG_MAPPING temp where temp.TRADE_ID = std.TRADE_ID)
-				<foreach collection="checkResultList" item="result" open="AND stds.CHECK_RESULT IN (" close=")" separator=",">
+			    AND (stds.CHECK_RESULT IS NULL
+				<foreach collection="checkResultList" item="result" open="OR stds.CHECK_RESULT IN (" close=")"
+						 separator=",">
 					#{result,jdbcType=VARCHAR}
 				</foreach>
+			    )
 			</if>
 			<if test="dealDate != null">
 				AND std.DEAL_DATE = #{dealDate,jdbcType=DATE}
@@ -1121,6 +1123,7 @@
 		<!-- add by etlliu 20220220 end -->
 		T1.PS,
 		T1.ENTRUST_DATE,
+		T1.ENTRUST_TYPE,
 		T2.SEC_ACCT_ID,
 		T2.DEAL_CUR_ACCT,
 		<!--GNS-946:关联交易表查询首期成交编号 modify by fuyongsheng 20220223 start-->
@@ -1585,11 +1588,16 @@
 		SELECT
 			TRADE_ID,
 			PLEDGE_FINPROD_ID,
+			PLEDGE_NUMBER,
 			DISPLACE_DIRECTION
 		FROM
 			SETTLE_TRANS_DATA_TOTAL_PLEDGE
 		WHERE
 			TRADE_ID = #{seqId,jdbcType=VARCHAR}
+			AND BRANCH = 0
+			<if test="direction != null and direction != ''">
+				AND DISPLACE_DIRECTION = #{direction,jdbcType=VARCHAR}
+			</if>
 	</select>
 
 	<!--modify by etliu 20211227 start-->
@@ -1750,7 +1758,24 @@
 			ETR_PLEDGE
 		WHERE
 			ENTRUST_ID = #{entrustId, jdbcType=VARCHAR}
-		  AND FINPROD_ID = #{finProdId, jdbcType=VARCHAR}
+			<if test="displaceDir != null and displaceDir != ''">
+				AND DISPLACE_DIR = #{displaceDir,jdbcType=VARCHAR}
+			</if>
+	</select>
+
+	<select id="selectSettleTansTotalPledges" resultType="com.joyintech.tams.common.base.entity.EtrPledge">
+		SELECT
+		ENTRUST_ID,
+		FINPROD_ID,
+		PLEDGE_NUMBER
+		FROM
+		ETR_PLEDGE
+		WHERE
+		ENTRUST_ID = #{entrustId, jdbcType=VARCHAR}
+		AND FINPROD_ID = #{finProdId, jdbcType=VARCHAR}
+		<if test="displaceDir != null and displaceDir != ''">
+			AND DISPLACE_DIR = #{displaceDir,jdbcType=VARCHAR}
+		</if>
 	</select>
 	<!--add 查询投管交易编号 by liujs 20220512 start-->
 	<select id="selectTradeIdTgs" resultType="java.lang.String">
@@ -1830,7 +1855,4 @@
 		</where>
 	</select>
 
-	<select id="selectBidEntrustIds" resultType="java.lang.String">
-
-	</select>
 </mapper>

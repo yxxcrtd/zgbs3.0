@@ -979,7 +979,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             /*融入券卖空待购回持仓*/
             resp.add(BaseMap.newMap()
                     .put("field", "RRQMKDGHCC")
-                    .put("name", "卖空待回购持仓（元）")
+                    .put("name", "卖空待购回持仓（元）")
                     .put("amount", "--")
                     .put("type", "cc"));
         }
@@ -1134,7 +1134,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             /*融入券卖空待购回持仓*/
             resp.add(BaseMap.newMap()
                     .put("field", RRQMKDGHCC)
-                    .put("name", "卖空待回购持仓（元）")
+                    .put("name", "卖空待购回持仓（元）")
                     .put("amount", decimalToStr(bm.getBigDecimal(RRQMKDGHCC), "0.00"))
                     .put("type", "cc"));
         }
@@ -2297,6 +2297,16 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                     AjaxResult res=new AjaxResult();
                     ValidMessage  validMessage= new ValidMessage();
                     validMessage.setMessage("只有指令状态为已撤回、已退回的指令允许修改");
+                    res.setErrorList(Arrays.asList(validMessage));
+                    return res;
+                }
+                Map<String, Object> pageParam = new HashMap<>();
+                pageParam.put("entrustId", Item.getEntrustId());
+                List<String> entrustIds = cfetsetrIbBondinfoMapper.findEtrEntrustIsSettleFail(pageParam);
+                if(CollectionUtils.isNotEmpty(entrustIds)){
+                    AjaxResult res=new AjaxResult();
+                    ValidMessage  validMessage= new ValidMessage();
+                    validMessage.setMessage("指令存在交收失败的数据，不允许修改");
                     res.setErrorList(Arrays.asList(validMessage));
                     return res;
                 }

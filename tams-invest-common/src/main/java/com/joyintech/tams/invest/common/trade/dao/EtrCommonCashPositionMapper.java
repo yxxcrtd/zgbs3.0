@@ -367,6 +367,13 @@ public interface EtrCommonCashPositionMapper {
     BigDecimal getEtrExchangeFinishAmt(Map<String,Object> map);
 
     /**
+     * 查询指令已交易完成金额或者额度
+     * @param map 委托代码
+     * @return 指令已交易完成金额或者额度
+     */
+    BigDecimal getAllEtrFinishAmt(Map<String,Object> map);
+
+    /**
      * 或者汇总交易份额
      * @param entrustId
      * @return

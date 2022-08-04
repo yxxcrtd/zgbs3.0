@@ -161,15 +161,20 @@ public class ExchangeTransMatchRepo2Service extends ExchangeTransMatchRepoCommon
         dealTotal.setParValue(dealDto.getParValue());
 
         // 净价总额
-        dealTotal.setCpriceAmt(ArithmeticUtil.multiply(entrustDto.getMarchQty(),dealDto.getUnitCprice()));
+        // XYHGFXSJ-869:金额单用金额赋值 modify by fuyongsheng 20220804 start
+        // dealTotal.setCpriceAmt(ArithmeticUtil.multiply(entrustDto.getMarchQty(),dealDto.getUnitCprice()));
+        dealTotal.setCpriceAmt(ArithmeticUtil.multiply(entrustDto.getMarchAmt(),dealDto.getUnitCprice()));
         // 全价总额
-        dealTotal.setFpriceAmt(ArithmeticUtil.multiply(entrustDto.getMarchQty(),dealDto.getUnitFprice()));
+        // dealTotal.setFpriceAmt(ArithmeticUtil.multiply(entrustDto.getMarchQty(),dealDto.getUnitFprice()));
+        dealTotal.setFpriceAmt(ArithmeticUtil.multiply(entrustDto.getMarchAmt(),dealDto.getUnitFprice()));
         // 交易本金
         dealTotal.setPrinAmt(ArithmeticUtil.subtract(dealTotal.getFpriceAmt(),entrustDto.getMarchFeeAmtPay()));
         // 交易金额
         dealTotal.setTradeAmt(ArithmeticUtil.subtract(entrustDto.getMarchAmt(),entrustDto.getMarchFeeAmtPay()));
         // 利息总额
-        dealTotal.setIntAmt(ArithmeticUtil.multiply(entrustDto.getMarchQty(),dealDto.getUnitInt()));
+        // dealTotal.setIntAmt(ArithmeticUtil.multiply(entrustDto.getMarchQty(),dealDto.getUnitInt()));
+        dealTotal.setIntAmt(ArithmeticUtil.multiply(entrustDto.getMarchAmt(),dealDto.getUnitInt()));
+        // XYHGFXSJ-869:金额单用金额赋值 modify by fuyongsheng 20220804 end
         // 随交易支付费用
         dealTotal.setFeeAmtPay(entrustDto.getMarchFeeAmtPay());
         // 未随交易支付费用
@@ -206,7 +211,10 @@ public class ExchangeTransMatchRepo2Service extends ExchangeTransMatchRepoCommon
         // 起息日
         dealTotal.setVdate(dealDto.getVdate());
         // 交易份额
-        dealTotal.setShareAmt(entrustDto.getMarchQty());
+        // XYHGFXSJ-869:金额单用金额赋值 modify by fuyongsheng 20220804 start
+        // dealTotal.setShareAmt(entrustDto.getMarchQty());
+        dealTotal.setShareAmt(entrustDto.getMarchAmt());
+        // XYHGFXSJ-869:金额单用金额赋值 modify by fuyongsheng 20220804 end
         // 总交易费用
         dealTotal.setFeeAmt(ArithmeticUtil.doAdd(entrustDto.getMarchFeeAmtPay(),entrustDto.getMarchFeeAmtPay()));
         // 交易方向
@@ -271,7 +279,7 @@ public class ExchangeTransMatchRepo2Service extends ExchangeTransMatchRepoCommon
         // 单位净价
         trdProductDeal.setUnitCprice(null);
         // 交易本金
-        trdProductDeal.setPrinAmt(entrustDto.getMarchQty());
+        trdProductDeal.setPrinAmt(entrustDto.getMarchAmt());
         // 利息总额
         trdProductDeal.setIntAmt(dealDto.getIntAmt());
         // 全价总额
@@ -300,9 +308,9 @@ public class ExchangeTransMatchRepo2Service extends ExchangeTransMatchRepoCommon
         // 交易方向
         trdProductDeal.setPs(dealDto.getPs());
         // 利息总额
-        trdProductDeal.setIntAmt(null);
-        // 全价总额
-        trdProductDeal.setFpriceAmt(null);
+//        trdProductDeal.setIntAmt(null);
+//        // 全价总额
+//        trdProductDeal.setFpriceAmt(null);
         // 交易方向
         trdProductDeal.setPs(DictCodeList.交易方向_买入.getValue());
         // 投管业务类型
@@ -316,6 +324,19 @@ public class ExchangeTransMatchRepo2Service extends ExchangeTransMatchRepoCommon
         if(StringUtil.equals(entrustDto.getEntrustClass(), DictCodeListExt3.投资指令类型_多组合单资产指令.getValue())) {
             trdProductDeal.setTotleTradeId(trdFinProductDealTotal.getTotleTradeId());
             trdFinProductDealTotal.setTgBusiType(trdProductDeal.getTgBusiType());
+        }
+        // 交易对手
+        if(!StringUtil.isEmpty(dealDto.getCounterId())){
+            trdProductDeal.setCounterId(dealDto.getCounterId());
+        }else if(!StringUtil.isEmpty(entrustDto.getCounterId())){
+            trdProductDeal.setCounterId(entrustDto.getCounterId());
+        }else{
+            if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())) {
+                trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHANGHAI);
+            }
+            else if(StringUtil.equals(dealDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
+                trdProductDeal.setCounterId(BussinessConstant.COUNTER_PARTY_ID_SHENZHEN);
+            }
         }
         return trdProductDeal;
     }

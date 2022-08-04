@@ -71,7 +71,9 @@
         select TOTLE_TRADE_ID from TRD_FIN_PRODUCT_DEAL_TOTAL
         where trade_date =#{batchDate}
           and BUSI_TYPE = #{busiType}
-          and update_user = #{updateUser}
+        <if test="updateUser != null and updateUser != ''">
+            and update_user = #{updateUser}
+        </if>
           <if test="finProdType2 != null and finProdType2 != ''">
             and FINPROD_TYPE2 = #{finProdType2}
           </if>
@@ -83,7 +85,9 @@
         delete from TRD_FIN_PRODUCT_DEAL_TOTAL tfpft
         where tfpft.trade_date =#{batchDate}
           and tfpft.BUSI_TYPE = #{busiType}
-          and tfpft.update_user = #{updateUser}
+        <if test="updateUser != null and updateUser != ''">
+            and tfpft.update_user = #{updateUser}
+        </if>
         <if test="finProdType2 != null and finProdType2 != ''">
             and tfpft.FINPROD_TYPE2 = #{finProdType2}
         </if>
@@ -93,7 +97,9 @@
     <delete id="deleteTrdProductDeal">
         delete from trd_product_deal tfpft
         where tfpft.trade_date =#{batchDate}
-        and tfpft.update_user = #{updateUser}
+        <if test="updateUser != null and updateUser != ''">
+            and tfpft.update_user = #{updateUser}
+        </if>
         <if test="finProdType2 != null and finProdType2 != ''">
             and tfpft.FINPROD_TYPE2 = #{finProdType2}
         </if>
@@ -105,7 +111,9 @@
         where tfpft.trade_id in (
             select trade_id from trd_product_deal
             where trade_date =#{batchDate}
-            and update_user = #{updateUser}
+            <if test="updateUser != null and updateUser != ''">
+                and update_user = #{updateUser}
+            </if>
             <if test="finProdType2 != null and finProdType2 != ''">
                 and FINPROD_TYPE2 = #{finProdType2}
             </if>
@@ -119,7 +127,9 @@
         select TOTLE_TRADE_ID from TRD_PRODUCT_TEMP_DEAL_TOTAL
         where trade_date =#{batchDate}
         and BUSI_TYPE = #{busiType}
-        and update_user = #{updateUser}
+        <if test="updateUser != null and updateUser != ''">
+            and update_user = #{updateUser}
+        </if>
         <if test="tradeMarket != null and tradeMarket != ''">
             and TRADE_MARKET = #{tradeMarket}
         </if>
@@ -134,7 +144,9 @@
         delete from TRD_PRODUCT_TEMP_DEAL_TOTAL tfpft
         where tfpft.trade_date =#{batchDate}
         and tfpft.BUSI_TYPE = #{busiType}
-        and tfpft.update_user = #{updateUser}
+        <if test="updateUser != null and updateUser != ''">
+            and tfpft.update_user = #{updateUser}
+        </if>
         <if test="tradeMarket != null and tradeMarket != ''">
             and tfpft.TRADE_MARKET = #{tradeMarket}
         </if>
@@ -147,7 +159,9 @@
     <delete id="deleteTrdProductTempDeal">
         delete from TRD_PRODUCT_TEMP_DEAL tfpft
         where tfpft.trade_date =#{batchDate}
-        and tfpft.update_user = #{updateUser}
+        <if test="updateUser != null and updateUser != ''">
+            and tfpft.update_user = #{updateUser}
+        </if>
         <if test="tradeMarket != null and tradeMarket != ''">
             and tfpft.TRADE_MARKET = #{tradeMarket}
         </if>
@@ -162,7 +176,9 @@
         where tfpft.trade_id in (
         select trade_id from TRD_PRODUCT_TEMP_DEAL
         where trade_date =#{batchDate}
-        and update_user = #{updateUser}
+        <if test="updateUser != null and updateUser != ''">
+            and update_user = #{updateUser}
+        </if>
         <if test="tradeMarket != null and tradeMarket != ''">
             and TRADE_MARKET = #{tradeMarket}
         </if>
@@ -201,7 +217,9 @@
                     TRD_PRODUCT_TEMP_DEAL tptd ON tfpft.TRADE_ID = tptd.TRADE_ID
                 where
                     tfpft.settle_date =#{batchDate}
-                    and tfpft.update_user = #{updateUser}
+                    <if test="updateUser != null and updateUser != ''">
+                        and tfpft.update_user = #{updateUser}
+                    </if>
                     <if test="tradeMarket != null and tradeMarket != ''">
                         and tptd.TRADE_MARKET = #{tradeMarket}
                     </if>

@@ -190,7 +190,7 @@ public class TradeRdsCommonAop {
      * modify by jiangpeng on 20210511 ZGBSSE-351
      * 【标准券管理】标准券入库交易审核报错,标准券出库交易审核报错
      */
-    private List<String> ignoreList=Arrays.asList("ChannelFeePay002Service","TrdStandardBond002Service","TrdStandardBond003Service");
+    private List<String> ignoreList=Arrays.asList("ChannelFeePay002Service","TrdStandardBond002Service","TrdStandardBond003Service","NetPlanTransfer001Service","TrdFundInvestTrade001Service");
     /*@Pointcut("execution(* com.joyintech.workflow.engine.service.ProcessStartService.start(..))")
     protected void startPoint() {
 

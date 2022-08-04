@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.collect.Maps;
+import com.joyintech.tams.exchange.common.enums.EntrustBussTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.BusiTypeTgEnum;
 import com.joyintech.tams.exchange.service.trade.processor.msg.MsgReceiverManager;
 import org.apache.commons.collections4.CollectionUtils;
@@ -514,9 +515,10 @@ public class TradeMsgProcessor {
                 orderInterface.setErrorMsg(ErrorCode.INSTRUCTIONS_STATUS_ERROR.errorMsg);
                 return false;
             }
+            InstructionPledge instructionPledge = null;
             if (InvestmentAssetType1.NEGOTIATED_REPO.value.equals(instruction.getAssetType1())
-                    && StringUtil.isNotEmpty(orderInterface.getStockCode())) {
-                InstructionPledge instructionPledge = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(instruction.getEntrustId(), orderInterface.getStockCode());
+                    && !StringUtil.equals(EntrustBussTypeEnum.中途换券指令_换钱.value, instruction.getEntrustBussType())) {
+                instructionPledge = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(instruction.getEntrustId(), orderInterface.getStockCode());
                 if (Objects.nonNull(instructionPledge)) {
                     BigDecimal usedPledgeNumber = TradeUtils.add(instructionPledge.getUsedPledgeNumber(), orderInterface.getEntrustVolume(), 0);
                     if ((usedPledgeNumber.compareTo(instructionPledge.getPledgeNumber()) > 0)) {
@@ -524,9 +526,9 @@ public class TradeMsgProcessor {
                         orderInterface.setErrorMsg(ErrorCode.INSTRUCTION_PLEDGE_NUMBER_ERROR.errorMsg);
                         return false;
                     } else {
-                        transactionHelper.setInstructionPledge(instructionPledge);
-                        logger.info("{}占用抵押券数量 PledgeNumber {} UsedPledgeNumber {} EntrustVolume {}", instructionPledge.getEntrustId(),
-                                instructionPledge.getPledgeNumber(), instructionPledge.getUsedPledgeNumber(), orderInterface.getEntrustVolume());
+//                        transactionHelper.setInstructionPledge(instructionPledge);
+//                        logger.info("{}占用抵押券数量 PledgeNumber {} UsedPledgeNumber {} EntrustVolume {}", instructionPledge.getEntrustId(),
+//                                instructionPledge.getPledgeNumber(), instructionPledge.getUsedPledgeNumber(), orderInterface.getEntrustVolume());
                         instructionPledge.setUsedPledgeNumber(usedPledgeNumber);
                     }
                 }
@@ -546,7 +548,12 @@ public class TradeMsgProcessor {
                     orderInterface.setErrorMsg(errorMsg);
                     return false;
                 }
-                instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() + entrustVolume));
+                if(EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg())
+                        && !BusiTypeTgEnum.首期.codeEquals(instruction.getBusiTypeTg())){
+                    instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() + instruction.getEntrustNum()));
+                }else  {
+                    instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() + entrustVolume));
+                }
 //                messageSenderService.pushProgressToMQ(instruction);
                 messageSenderManagement.pushProgress(instruction);
                 logger.info("frozen instruction EntrustNum {} FrozenQuantity {} EntrustLeftAmt {}", instruction.getEntrustNum(), instruction.getFrozenQuantity(), instruction.getEntrustLeftAmt());
@@ -567,6 +574,11 @@ public class TradeMsgProcessor {
                 messageSenderManagement.pushProgress(instruction);
                 logger.info("frozen instruction EntrustAmt {} FrozenQuantity {} EntrustLeftAmt {}", instruction.getEntrustAmt(), instruction.getFrozenQuantity(), instruction.getEntrustLeftAmt());
             }
+            if(Objects.nonNull(instructionPledge)){
+                logger.info("{}占用抵押券数量 PledgeNumber {} UsedPledgeNumber {} EntrustVolume {}", instructionPledge.getEntrustId(),
+                        instructionPledge.getPledgeNumber(), instructionPledge.getUsedPledgeNumber(), orderInterface.getEntrustVolume());
+                transactionHelper.setInstructionPledge(instructionPledge);
+            }
         } else if (!Strings.isNullOrEmpty(ServiceApplication.INSTRUCTION_SERVICE) && EntrustUtils.isIntentionEntrust(orderInterface.getEntrustProp())) {
             if (instruction.volumeInstruction()) {
                 long leftNum = instruction.getEntrustNum() - instruction.getEntrustLeftAmt().longValue() - instruction.getFrozenQuantity().longValue();
@@ -582,7 +594,12 @@ public class TradeMsgProcessor {
                     orderInterface.setErrorMsg(errorMsg);
                     return false;
                 }
-                instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() + entrustVolume));
+                if(EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg())
+                        && !BusiTypeTgEnum.首期.codeEquals(instruction.getBusiTypeTg())){
+                    instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() + instruction.getEntrustNum()));
+                }else  {
+                    instruction.setFrozenQuantity(BigDecimal.valueOf(instruction.getFrozenQuantity().longValue() + entrustVolume));
+                }
 //                messageSenderService.pushProgressToMQ(instruction);
                 messageSenderManagement.pushProgress(instruction);
                 logger.info("frozen instruction EntrustNum {} FrozenQuantity {} EntrustLeftAmt {}", instruction.getEntrustNum(), instruction.getFrozenQuantity(), instruction.getEntrustLeftAmt());

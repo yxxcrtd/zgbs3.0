@@ -156,4 +156,12 @@ public interface EtrExchangeAgreRepTradeMapper {
      * @return
      */
     List<SelectOptionDto> selectPortfolioList(Map<String, Object> map);
+
+    /**
+     * 查询行情编号已经做了的指令
+     *
+     * @param requestId 行情编号
+     * @return 指令条数
+     */
+    int selectEtrEntrustCountByRequestId(@Param("requestId") String requestId);
 }

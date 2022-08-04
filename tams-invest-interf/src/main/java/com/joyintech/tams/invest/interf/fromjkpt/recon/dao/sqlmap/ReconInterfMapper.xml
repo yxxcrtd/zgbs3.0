@@ -918,8 +918,8 @@ WHERE
                 YJ COMMISSION_AMT,
                 WTBH ENTRUST_ID,
                 CASE
-                    WHEN YWBS = '4429' and MMFX= '1' then '03'
-                    WHEN YWBS = '债券质押初始交易' and MMFX= '买' then '03'
+                    WHEN YWBS = '4429' and MMFX= '1' then '04'
+                    WHEN YWBS = '债券质押初始交易' and MMFX= '买' then '04'
                     WHEN YWBS = '4429' and MMFX= '2' then '03'
                     WHEN YWBS = '债券质押初始交易' and MMFX= '卖' then '03'
                     WHEN YWBS = '4430' and MMFX= '1' then 'T95'

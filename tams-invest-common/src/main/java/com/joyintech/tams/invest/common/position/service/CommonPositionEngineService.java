@@ -62,6 +62,9 @@ public class CommonPositionEngineService {
     public String getDeliveryType(String finprodId) {
         String deliveryType = StringUtil.EMPTY;
         FinProduct finProduct = finProductMapper.selectByPrimaryKey(finprodId);
+        if(null == finProduct){
+            return deliveryType;
+        }
         // ZGCPCN-1580:一级投标债结算方式赋值 modify by fuyongsheng 20220621 start
         if (DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(finProduct.getFinprodType2())) {
             FinProductTypeKey key = new FinProductTypeKey();

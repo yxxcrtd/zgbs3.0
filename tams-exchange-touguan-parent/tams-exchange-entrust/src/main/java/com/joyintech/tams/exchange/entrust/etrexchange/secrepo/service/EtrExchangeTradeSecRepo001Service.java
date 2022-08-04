@@ -1562,6 +1562,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
      */
     private List<ValidMessage> checkPriceRangeCommon(String finprodType, FinProduct finproduct, EtrExchangeTradeSaveSecRepoRequest entity,
                                                     BigDecimal checkPrice, String nowDate, EtrExchangeTradeQuotationHqSecRepoResponse quotation) {
+        Boolean hasQuote = StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam("TRD_USE_QUOTE"));
         List<ValidMessage> validMessageList = new ArrayList<>();
         FinProductType finProductType = new FinProductType();
         if(finproduct!=null&&finproduct.getFinprodId()!=null){
@@ -1593,14 +1594,14 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         // 开盘集合竞价
         else if(StringUtil.equals(trdPriceTimeConfig.getPriceTimeType(),DictCodeListExt3.价格申报范围类型_开盘集合竞价.getValue())){
             if(StringUtil.equals(finprodType,DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
-                if(quotation!=null&&quotation.getPreClosePrice()!=null
+                if(hasQuote && quotation!=null&&quotation.getPreClosePrice()!=null
                         &&(checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(1.3),quotation.getPreClosePrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(0.7),quotation.getPreClosePrice()))<0)){
                     validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(3,RoundingMode.HALF_UP,BigDecimal.valueOf(0.7),quotation.getPreClosePrice())+","+ArithmeticUtil.multiply(3,RoundingMode.HALF_UP,BigDecimal.valueOf(1.3),quotation.getPreClosePrice())+"]之外"));
                 }
             }
             else if(StringUtil.equals(finprodType,DictCodeList.回购类型_质押式竞价回购.getValue())){
-                if(quotation!=null&&quotation.getPreClosePrice()!=null
+                if(hasQuote && quotation!=null&&quotation.getPreClosePrice()!=null
                         &&(checkPrice.compareTo(ArithmeticUtil.multiply(3,RoundingMode.HALF_UP,new BigDecimal(2),quotation.getPreClosePrice()))>0
                         ||checkPrice.compareTo(BigDecimal.ZERO)<0)){
                     validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+ArithmeticUtil.multiply(3,RoundingMode.HALF_UP,new BigDecimal(2),quotation.getPreClosePrice())+"]之外"));
@@ -1615,13 +1616,13 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                         ||StringUtil.equals(finProductType.getType6(), DictCodeList.WIND一级分类_含债券一级分类等_政府支持机构债.getValue())
                         ||(StringUtil.equals(finProductType.getType6(), DictCodeList.WIND一级分类_含债券一级分类等_金融债.getValue())
                             &&StringUtil.equals(finProductType.getType7(), DictCodeList.WIND二级分类_含债券二级分类等_政策银行债.getValue()))){
-                    if(quotation!=null&&quotation.getLastPrice()!=null
+                    if(hasQuote && quotation!=null&&quotation.getLastPrice()!=null
                             &&(checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(1.1),quotation.getLastPrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(0.9),quotation.getLastPrice()))<0)){
                         validMessageList.add(new ValidMessage("指令价格在有效价格范围["+ArithmeticUtil.multiply(3,RoundingMode.HALF_UP,BigDecimal.valueOf(0.9),quotation.getLastPrice())+","+ArithmeticUtil.multiply(3,RoundingMode.HALF_UP,BigDecimal.valueOf(1.1),quotation.getLastPrice())+"]之外"));
                     }
                 }else{
-                    if(quotation!=null&&quotation.getLastPrice()!=null
+                    if(hasQuote && quotation!=null&&quotation.getLastPrice()!=null
                             &&(checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(1.2),quotation.getLastPrice()))>0
                             ||checkPrice.compareTo(ArithmeticUtil.multiply(BigDecimal.valueOf(0.8),quotation.getLastPrice()))<0)){
                         if(quotation.getLastPrice().compareTo(BigDecimal.ZERO)==0){
@@ -1633,7 +1634,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
                 }
             }
             else if(StringUtil.equals(finprodType,DictCodeList.回购类型_质押式竞价回购.getValue())){
-                if(quotation!=null&&quotation.getLastPrice()!=null
+                if(hasQuote && quotation!=null&&quotation.getLastPrice()!=null
                         &&(checkPrice.compareTo(ArithmeticUtil.doAdd(3,RoundingMode.HALF_UP,BigDecimal.valueOf(0.01),quotation.getLastPrice()))>0
                         ||checkPrice.compareTo(BigDecimal.ZERO)<0)){
                     validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+ArithmeticUtil.doAdd(3,RoundingMode.HALF_UP,BigDecimal.valueOf(0.01),quotation.getLastPrice())+"]之外"));

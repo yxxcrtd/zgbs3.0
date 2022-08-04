@@ -80,6 +80,7 @@
             width: 180,
             title: 'CfetsEtribBondInfo003.entrustOwnNum',
             sortable: false,
+            edit: false,
             visible: SHORT_SELLING_SUPPORTED == '02' ? (ps != 'T03' ? true : false) : false,
             type: 'number',
             digit: 2
@@ -304,6 +305,18 @@
                         table.renderRow(data.LAY_TABLE_INDEX, data);
                     })
                 }
+                if(ps == 'T01') {//获取模式
+                    if($("#finprodIdhid").val()){
+                        Joyin.ajax(basePath + 'cfets/etrib/cfetsEtrIbBondinfo/queryInvaimBySecIdAndPrd/'+value+'/'+$("#finprodIdhid").val(), {}, function (result) {
+                            console.log(result);
+                            if(result.data) {
+                                data.businessModel = result.data;
+                                table.renderRow(data.LAY_TABLE_INDEX, data);
+                            }
+                        },false)
+                    }
+
+                }
                 if(ps == 'T02' || ps == 'T03') {//获取数量和模式
                     Joyin.ajax(basePath + 'cfets/etrib/cfetsEtrIbBondinfo/selectPortfolioIdForSelect?ps='+ps+'&finprodId='+$("#finprodIdhid").val() +"&initValue="+value, {}, function (result) {
                         console.log(result);
@@ -333,7 +346,12 @@
                 }
             }
             if (field == 'entrustNum') {
-                data.entrustOwnNum = value;
+                if(!data.entrustIntegrateNum){
+                    data.entrustIntegrateNum ="0";
+                    data.entrustOwnNum = value;
+                }else{
+                    data.entrustOwnNum = JoyinMath.doMinus(data.entrustNum,data.entrustIntegrateNum,2);
+                }
                 table.renderRow(data.LAY_TABLE_INDEX, data);
             }
             if(field == 'entrustIntegrateNum') {

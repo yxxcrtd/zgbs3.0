@@ -252,7 +252,7 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                             dealTotal.setFpriceAmt(totalFpriceamt);
                             dealTotal.setUnitFprice(settleTransDataDto.getUnitFprice());
                         } else{
-                            unitCprice = ArithmeticUtil.divide(totalCpriceAmt, totalShareAmt, 8);
+                            unitCprice = ArithmeticUtil.divide(totalCpriceAmt, totalShareAmt, 4);
                             dealTotal.setCpriceAmt(totalCpriceAmt);
                             dealTotal.setUnitCprice(unitCprice);
                             unitInt=settleTransDataDto.getUnitInt();
@@ -582,7 +582,11 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                                 //到期金额
                                 dealTotal.setmTradeAmt(item.getmTradeAmt());
                                 //首期成交编号
-                                dealTotal.setfCjbh(item.getfCjbh());
+                                if(DictCodeList.交易方向_到期续做.getValue().equals(item.getPs())){
+                                    dealTotal.setfCjbh(item.getTradeId());
+                                }else{
+                                    dealTotal.setfCjbh(item.getfCjbh());
+                                }
                             }
                             //当笔成交数据明细.质押品信息流水号 非空
                             if(StringUtil.isNotEmpty(item.getPledgeTradeId())){
@@ -907,11 +911,12 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
             // GZYHTZJY-1100:深交所的到期续作到期交付日特殊处理 modify fuyongsheng 20220113 end
             //  汇总交易编号
             dealTotal.setSeqId(IDGenerator.generate());
-            if(DictCodeList.交易方向_买入.getValue().equals(dealTotal.getPs())){
-                // modify by fuyongsheng 协议回购首期的FCjbh存明细表的主键 start
+            if(DictCodeList.交易方向_买入.getValue().equals(dealTotal.getPs())
+                    || DictCodeList.交易方向_到期续做.getValue().equals(dealTotal.getPs())){
+                // XYHGFXSJ-619 :modify by fuyongsheng 协议回购首期和到期续作的FCjbh存明细表的主键 start
                 // dealTotal.setfCjbh(settleTransDataDto.getCjbh());
                 dealTotal.setfCjbh(settleTransDataDto.getTradeId());
-                // modify by fuyongsheng 协议回购首期的FCjbh存明细表的主键 end
+                // XYHGFXSJ-619 :modify by fuyongsheng 协议回购首期和到期续作的FCjbh存明细表的主键 end
             }
             settleTransDataList.add(dealTotal);
             //当笔成交数据明细.附属表流水号 非空

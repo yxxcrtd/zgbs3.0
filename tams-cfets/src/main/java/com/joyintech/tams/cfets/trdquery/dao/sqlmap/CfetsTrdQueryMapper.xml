@@ -2904,7 +2904,7 @@
             <![CDATA[ AND T1.trade_date >= #{startDate}]]>
             <![CDATA[ AND T1.trade_date <= #{endDate}]]>
             <if test="submitUserId != null and submitUserId != ''">
-                and (T1.create_user= #{submitUserId} or T1.update_user= #{submitUserId})
+                and (T1.create_user= #{submitUserId} or T1.update_user= #{submitUserId} or t1.TRADER= #{submitUserId})
             </if>
             <if test="finprodIdList != null and finprodIdList.size() > 0">
                 AND nvl(T3.TERM_TYPE,T1.FINPROD_ID) in
@@ -3049,7 +3049,7 @@
             <![CDATA[ AND T1.trade_date >= #{startDate}]]>
             <![CDATA[ AND T1.trade_date <= #{endDate}]]>
             <if test="submitUserId != null and submitUserId != ''">
-                and (T1.create_user= #{submitUserId} or T1.update_user= #{submitUserId})
+                and (T1.create_user= #{submitUserId} or T1.update_user= #{submitUserId} or t1.TRADER= #{submitUserId})
             </if>
             <if test="finprodIdList != null and finprodIdList.size() > 0">
                 AND nvl(T3.TERM_TYPE,T1.FINPROD_ID) in
@@ -3193,7 +3193,7 @@
             <![CDATA[ AND T1.trade_date >= #{startDate}]]>
             <![CDATA[ AND T1.trade_date <= #{endDate}]]>
             <if test="submitUserId != null and submitUserId != ''">
-                and (T1.create_user= #{submitUserId} or T1.update_user= #{submitUserId})
+                and (T1.create_user= #{submitUserId} or T1.update_user= #{submitUserId} or t1.TRADER= #{submitUserId})
             </if>
             <if test="finprodIdList != null and finprodIdList.size() > 0">
                 AND nvl(T3.TERM_TYPE,T1.FINPROD_ID) in
@@ -3333,7 +3333,7 @@
             <![CDATA[ AND TFPDT.TRADE_DATE >= #{startDate}]]>
             <![CDATA[ AND TFPDT.TRADE_DATE <= #{endDate}]]>
             <if test="submitUserId != null and submitUserId != ''">
-                and (TFPDT.create_user= #{submitUserId} or TFPDT.update_user= #{submitUserId})
+                and (TFPDT.create_user= #{submitUserId} or TFPDT.update_user= #{submitUserId} or TFPDT.TRADER= #{submitUserId})
             </if>
             <if test="finprodIdList != null and finprodIdList.size() > 0">
                 AND FP.FINPROD_ID in
@@ -3513,7 +3513,7 @@
         <![CDATA[ AND T1.trade_date >= #{startDate}]]>
         <![CDATA[ AND T1.trade_date <= #{endDate}]]>
         <if test="submitUserId != null and submitUserId != ''">
-            and (t1.create_user= #{submitUserId} or t1.update_user= #{submitUserId})
+            and (t1.create_user= #{submitUserId} or t1.update_user= #{submitUserId} or T1.TRADER= #{submitUserId})
         </if>
         <if test="portfolioIdList != null and portfolioIdList.size() > 0">
             AND t2.portfolio_id in
@@ -3666,7 +3666,7 @@
         <![CDATA[ AND T1.trade_date >= #{startDate}]]>
         <![CDATA[ AND T1.trade_date <= #{endDate}]]>
         <if test="submitUserId != null and submitUserId != ''">
-            and (t1.create_user= #{submitUserId} or t1.update_user= #{submitUserId})
+            and (t1.create_user= #{submitUserId} or t1.update_user= #{submitUserId} or T1.TRADER= #{submitUserId})
         </if>
         <if test="portfolioIdList != null and portfolioIdList.size() > 0">
             AND t2.portfolio_id in
@@ -3816,7 +3816,7 @@
         <![CDATA[ AND T1.trade_date >= #{startDate}]]>
         <![CDATA[ AND T1.trade_date <= #{endDate}]]>
         <if test="submitUserId != null and submitUserId != ''">
-            and (t1.create_user= #{submitUserId} or t1.update_user= #{submitUserId})
+            and (t1.create_user= #{submitUserId} or t1.update_user= #{submitUserId} or T1.TRADER= #{submitUserId})
         </if>
         <if test="portfolioIdList != null and portfolioIdList.size() > 0">
             AND t2.portfolio_id in
@@ -3974,7 +3974,7 @@
         <![CDATA[ AND TPD.trade_date >= #{startDate}]]>
         <![CDATA[ AND TPD.trade_date <= #{endDate}]]>
         <if test="submitUserId != null and submitUserId != ''">
-            and (TPD.create_user= #{submitUserId} or TPD.update_user= #{submitUserId})
+            and (TPD.create_user= #{submitUserId} or TPD.update_user= #{submitUserId} or TPD.TRADER= #{submitUserId})
         </if>
         <if test="portfolioIdList != null and portfolioIdList.size() > 0">
             AND TPDA.PORTFOLIO_ID in
@@ -4971,6 +4971,21 @@
                             from IBU_QUOTE_ETR_RE) deal on deal.ENTRUST_ID = eea.ENTRUST_ID
                  left join TRDQUTO_MATCH_INFO tmi on tmi.PRE_TRADE_ID = deal.TOTLE_TRADE_ID
         where eea.FORCED_FINISH_AMT is not null and tmi.TRD_ID = #{totleTradeId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="findEtrEntrustIsSettleFail" resultType="java.lang.String">
+        select distinct eea.ENTRUST_ID
+        from ETR_ENTRUST_ADD eea
+                 left join (select TOTLE_TRADE_ID, ENTRUST_ID, TRADE_ID
+                            from REG_FIN_PRODUCT_DEAL
+                            union
+                            select QUOTE_ID TOTLE_TRADE_ID, ENTRUST_ID, QUOTE_ID
+                            from IBU_QUOTE_ETR_RE) deal on deal.ENTRUST_ID = eea.ENTRUST_ID
+                 left join TRDQUTO_MATCH_INFO tmi on tmi.PRE_TRADE_ID = deal.TOTLE_TRADE_ID
+                 left join ETR_ENTRUST ee on ee.ENTRUST_ID = eea.ENTRUST_ID
+        where eea.CLOSE_AMT is not null and tmi.TRD_ID = #{totleTradeId,jdbcType=VARCHAR}
+            and nvl(eea.FORCED_FINISH_AMT,0) - nvl(eea.CLOSE_AMT,0) <![CDATA[<]]> 0
+            and ee.ENTRUST_STATUS = #{entrustStatus,jdbcType=VARCHAR}
     </select>
 
     <select id="findFxmrManualSettleInfo" resultType="com.joyintech.tams.cfets.trdquery.dto.CfetsTrdBidInfoResponse">

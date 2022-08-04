@@ -158,4 +158,6 @@ public interface CfetsEtrIbBondinfoMapper {
      */
     SppiImportData queryAssetIsSppiTest(Map pageParam);
 
+    List<String> findEtrEntrustIsSettleFail(Map<String, Object> pageParam);
+
 }

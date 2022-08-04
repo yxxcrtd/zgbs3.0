@@ -165,6 +165,7 @@ public class TrdInvestDealQuery001Service extends BaseService<TrdInvestDealQuery
 	    if(!list.isEmpty()){
             for(TrdInvestDealQuery001Dto dto:list){
                 String finType2=dto.getFinprodType2();
+				dto.setFinType2(finType2);
 				dto.setFinprodType2(transferFinprodType2(finType2, dto.getFinprodId()));
             }    
         }

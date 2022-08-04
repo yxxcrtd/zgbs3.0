@@ -968,6 +968,20 @@
         </if>
           )
     </select>
+
+    <select id="getAllEtrFinishAmt" resultType="java.math.BigDecimal">
+        select sum(finishAmt) finishAmt from
+        (
+            select case when #{sumTradeFlag} = '01' then nvl(deal.trade_amt,0) else nvl(deal.share_amt,0)/100 end as finishAmt
+                from trd_product_deal deal
+                inner join trd_product_deal_add ad on deal.trade_id = ad.trade_id
+            where ad.entrust_id = #{entrustId}
+                and ad.portfolio_id = #{portfolioId}
+                and deal.trade_status = #{TRADE_STATUS_01}
+                and deal.is_cancel = #{YES_OR_NO_N}
+        )
+    </select>
+
     <select id="selectSumShareAmt"  resultType="java.math.BigDecimal">
       select sum(T.AMOUNT) AMOUNT
                   from PTL_SEC_POSITION_FLOW T
