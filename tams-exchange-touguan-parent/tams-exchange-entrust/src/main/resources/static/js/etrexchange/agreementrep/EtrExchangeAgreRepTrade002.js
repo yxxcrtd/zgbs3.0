@@ -523,7 +523,6 @@
     };
 
     var repSecNumCal = function () {
-        debugger;
         var tradeAmt = $("#tradeAmt").val();
         var conRatio = $("#conRatio").val();
         var repSecId = $("#repSecId").val();
@@ -534,7 +533,6 @@
                 var param = {repSecId: object.finprodId, iPlatformDate: iPlatformDate};
                 Joyin.ajaxSync(basePath + 'invest/entrust/etragrereptrade/EtrAgreRepTrade001/getFaceValue', param, function (obj) {
                     if (obj && obj != '') {
-                        debugger;
                         if (obj == 0) {
                             $("#repSecNum").val(0);
                             $("#printAmt").val(0);
@@ -1439,7 +1437,6 @@
                     $("#addCla_div").show();
                     $("#addCla").attr("disabled", false);
                 }
-                debugger;
                 let outAmtValue = $("#outAmt").val();
                 console.log("outAmtValue " + outAmtValue);
                 if (outAmtValue != null && outAmtValue != "" && outAmtValue != undefined) {
@@ -2206,6 +2203,9 @@
                 $("#outRepSecNum").attr('disabled', true);
                 $("#outAmt").attr('disabled', true);
                 $("#reqOnId").attr('disabled', true);
+            }
+            if(entity.entrustBussType === '31'){
+                $("#outAmt").attr('disabled', false);
             }
         }
         if (entityStr) {
