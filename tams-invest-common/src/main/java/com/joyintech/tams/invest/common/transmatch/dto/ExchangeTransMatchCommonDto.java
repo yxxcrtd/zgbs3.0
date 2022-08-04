@@ -191,7 +191,7 @@ public class ExchangeTransMatchCommonDto extends SettleTransDataTotal {
             return ArithmeticUtil.doAdd(getStampFee(),getJsfAmt(),getGhfAmt(),getZgfAmt(),getSxfAmt(),getSettleFee(),getCommissionAmt());
         }
         else {
-            return ArithmeticUtil.doAdd(getStampFee(),getJsfAmt(),getGhfAmt(),getZgfAmt(),getSxfAmt(),getSettleFee());
+            return ArithmeticUtil.doAdd(getStampFee(),getJsfAmt(),getGhfAmt(),getZgfAmt(),getSxfAmt(),getSettleFee(),getCommissionAmt());
         }
 
     }
