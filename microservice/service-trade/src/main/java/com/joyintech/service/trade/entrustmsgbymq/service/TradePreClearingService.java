@@ -2396,7 +2396,9 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                                 OriPledgeInfo oriPledgeInfo1 = new OriPledgeInfo();
                                 BeanUtils.copyProperties(oriPledgeInfo,oriPledgeInfo1);
                                 oriPledgeInfo1.setPledgeNumber(oriPledgeInfo1.getPledgeNumber().add(StringUtil.equals(pledgeListDto.getDisplaceDir(),"01") ? pledgeListDto.getPledgeNumber() : pledgeListDto.getPledgeNumber().negate()));
-                                replacePledgeList.add(oriPledgeInfo1);
+                                if(oriPledgeInfo1.getPledgeNumber().compareTo(BigDecimal.ZERO) >0){
+                                    replacePledgeList.add(oriPledgeInfo1);
+                                }
                             }
                         }
                     }
