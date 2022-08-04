@@ -1010,13 +1010,27 @@
                 0 dealPercent,
                 0 finishAmt,
                 CASE
+                when wfl_etr_entrust.ps = 'T93' and wfl_etr_entrust.TRADE_MARKET = '04' then
+                ROUND( nvl( wfl_etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
+                WHEN wfl_etr_entrust.ENTRUST_TYPE = '31' THEN
+                ROUND( nvl( wfl_etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
+                WHEN wfl_etr_entrust.ENTRUST_TYPE = '21' THEN
+                ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )*100
                 WHEN wfl_etr_entrust_add.TARGET_TYPE = '01' THEN
-                ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
+                ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
+                ELSE ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
                 END AS avaNum,
                 0 finishDealAmt,
                 CASE
+                when wfl_etr_entrust.ps = 'T93' and wfl_etr_entrust.TRADE_MARKET = '04' then
+                ROUND( nvl( wfl_etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
+                WHEN wfl_etr_entrust.ENTRUST_TYPE = '31' THEN
+                ROUND( nvl( wfl_etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
+                WHEN wfl_etr_entrust.ENTRUST_TYPE = '21' THEN
+                ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )*100
                 WHEN wfl_etr_entrust_add.TARGET_TYPE = '01' THEN
-                ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 ) ELSE ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
+                ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
+                ELSE ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
                 END AS avaDealAmt,
                 nvl(detail.PORTFOLIO_ID,PTL_PORTFOLIO.PORTFOLIO_ID) portfolioId,
                 nvl(detail.PORTFOLIO_NAME,PTL_PORTFOLIO.PORTFOLIO_NAME) portfolioName,
