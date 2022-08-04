@@ -2204,8 +2204,14 @@
                 $("#outAmt").attr('disabled', true);
                 $("#reqOnId").attr('disabled', true);
             }
+            //中途换券 换钱
             if(entity.entrustBussType === '31'){
                 $("#outAmt").attr('disabled', false);
+            }
+            //中途换券 换券
+            if(entity.entrustBussType === '21'){
+                $("#outRepSecId").attr('disabled', false);
+                $("#outRepSecNum").attr('disabled', false);
             }
         }
         if (entityStr) {
