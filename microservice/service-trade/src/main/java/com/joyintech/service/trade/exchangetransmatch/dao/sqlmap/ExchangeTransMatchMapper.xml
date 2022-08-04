@@ -695,8 +695,9 @@
         <!--GNS-892:回购需特殊处理 modify by fuyongsheng 20220227 start-->
         <!--A.MARCH_QTY_EN tradeNum,-->
         CASE
-        WHEN C.SEC_TYPE = #{SEC_TYPE_09} THEN A.MARCH_AMT
-        ELSE A.MARCH_QTY
+            WHEN STDT.REPO_TYPE = #{TARGET_BACK_TYPE_H01} AND EEA.TARGET_TYPE = #{TARGET_CLASS_01} THEN A.MARCH_QTY
+            WHEN C.SEC_TYPE = #{SEC_TYPE_09} THEN A.MARCH_AMT
+            ELSE A.MARCH_QTY
         END tradeNum,
         <!--GNS-892:回购需特殊处理 modify by fuyongsheng 20220227 end-->
         CASE
@@ -712,8 +713,12 @@
         AND B.MATCH_STATUS IN (#{TRD_MATCH_STATUS_1},#{TRD_MATCH_STATUS_2})
         INNER JOIN SETTLE_TRANS_DATA_TOTAL C
         ON A.SEQ_NO = C.SEQ_ID
+        LEFT JOIN
+            SETTLE_TRANS_DATA_TOTAL_ADD STDT ON STDT.TRADE_ID = C.SEQ_ID
         LEFT JOIN ETR_ENTRUST D
         ON D.ENTRUST_ID = A.ENTRUNST_TRADE_ID
+        LEFT JOIN
+            ETR_ENTRUST_ADD EEA ON D.ENTRUST_ID = EEA.ENTRUST_ID
         LEFT JOIN FIN_PRODUCT E
         ON E.FINPROD_ID = C.FINPROD_ID
         LEFT JOIN PTL_PORTFOLIO F
