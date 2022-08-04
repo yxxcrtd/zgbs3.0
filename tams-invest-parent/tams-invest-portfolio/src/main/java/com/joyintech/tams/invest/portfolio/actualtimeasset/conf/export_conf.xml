@@ -11,7 +11,7 @@
             <Cell order="7" name="实际持仓">actualPositionAmount</Cell>
             <Cell order="8" name="指令可用持仓">instructionsAmount</Cell>
             <Cell order="9" name="交易可用持仓">tradePositionAmount</Cell>
-            <Cell order="10" name="质押持仓">preReductionAmount</Cell>
+            <Cell order="10" name="质押持仓">pledgeAmount</Cell>
             <Cell order="11" name="市值">marketValue</Cell>
         </Row>
     </Worksheet>
