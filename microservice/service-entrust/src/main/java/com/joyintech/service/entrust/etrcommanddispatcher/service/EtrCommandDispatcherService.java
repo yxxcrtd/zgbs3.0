@@ -168,11 +168,11 @@ public class EtrCommandDispatcherService extends BaseService<EtrCommandDispatche
 
 	    	}
     	}
-    	if(pledgelist != null && !pledgelist.isEmpty() ){
-			pledgelist.forEach(v->{
-				v.setDisplaceDir(displaceDir);
-			});
-		}
+//    	if(pledgelist != null && !pledgelist.isEmpty() ){
+//			pledgelist.forEach(v->{
+//				v.setDisplaceDir(displaceDir);
+//			});
+//		}
     	return pledgelist;
     }
 
