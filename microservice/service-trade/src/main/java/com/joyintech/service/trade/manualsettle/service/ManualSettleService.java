@@ -20,6 +20,7 @@ import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommServi
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.DictCodeListStl;
 import com.joyintech.tams.invest.common.component.base.entrust.BaseEtrInvestInfoService;
 import com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto;
 import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
@@ -307,6 +308,14 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                     trdTempDto.setTradeDate(DateUtil.platDateFromCache());
                     if (StringUtil.equals(trdTempDto.getPs(), DictCodeListExt3.交易方向_到期续做.getValue()) && StringUtil.isNotEmpty(trdTempDto.getRedoType())) {
                         parameter.setPs(parameter.getPs() + trdTempDto.getRedoType());
+                    }
+
+                    // 中途换券换钱特殊处理
+                    if (StringUtil.equals(trdTempDto.getPs(),DictCodeListExt3.交易方向_中途换券.getValue())
+                            // 中途换券的换钱tradeAmt不为空
+                            && StringUtil.isNotEmpty(trdTempDto.getTradeAmt()) &&
+                            StringUtil.equals(infContractDetailfile.getTradeMarket(),DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
+                        parameter.setPs(parameter.getPs() + "_" + DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换钱.getValue());
                     }
 
                     // add by etliu 20220116 start
