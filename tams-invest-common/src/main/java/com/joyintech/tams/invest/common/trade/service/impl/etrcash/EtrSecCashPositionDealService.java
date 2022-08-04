@@ -1399,7 +1399,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         // 交易方向
         String ps = etrEntrust.getPs();
         BigDecimal etrFinish = EtrCommonCashPositionDealService.getEtrFinishAmt(etrEntrust.getEntrustId());
-        // BigDecimal 委托全价 = gen委托全价(etrEntrust.getEntrustId(),entrustCommonDto.getEtrEntrust().getEntrustDate());
+        BigDecimal 委托全价 = gen委托全价(etrEntrust.getEntrustId(), entrustCommonDto.getEtrEntrust().getEntrustDate(), etrEntrust.getTradeMarket(), entrustCommonDto);
 
         Map<String, Object> map = new HashMap<>();
         map.put("entrustId", etrEntrust.getEntrustId());
@@ -1443,10 +1443,33 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                 amount = ArithmeticUtil.subtract(amount, EtrCommonCashPositionDealService.getEtrExchangeFinishAmtMuilt(map));
                 //amount = ArithmeticUtil.subtract(amount, EtrCommonCashPositionDealService.getEtrExchangeFinishAmt(map));
             }
-            /*if (StringUtil.equals(etrEntrust.getTradeMarket(), DictCodeListExt1.交易场所_银行间.getValue())) {
-                map.put("sumTradeFlag", "01");
-                amount = ArithmeticUtil.subtract(amount, EtrCommonCashPositionDealService.getEtrExchangeFinishAmtMuilt(map));
-            }*/
+            // 交收失败时部分回冲
+            if (StringUtil.equals(entrustCommonDto.getIsSettleFail(), DictCodeListExt1.是否_是.getValue())) {
+                amount = BigDecimal.ZERO;
+                if (entrustCommonDto.isCloseEtr()) {
+                    map.put("sumTradeFlag", "02");
+                    // 指令额度 - 已关闭的额度 - 已成交额度(交易表中有效数据额度汇总) = 未使用额度(含当前交收失败这笔)
+                    amount = ArithmeticUtil.subtract(ArithmeticUtil.subtract(etrEntrust.getEntrustNum(), etrEntrustAdd.getCloseAmt())
+                            , EtrCommonCashPositionDealService.getEtrFinishAmtMuilt(map));
+                } else if (entrustCommonDto.getDeal() != null) {
+                    // 交收失败的额度
+                    amount = ArithmeticUtil.divide(entrustCommonDto.getDeal().getShareAmt(), BigDecimal.valueOf(100), 2);
+                }
+                // 记录交收失败的额度
+                etrEntrustAdd.setCloseAmt(ArithmeticUtil.doAdd(etrEntrustAdd.getCloseAmt(), amount));
+                // 清算速度为T+1时,T日指令关闭时已经处理过差额,此时冲销交易上的金额
+                if (etrEntrustAdd.getSettleSpreed() == 1L) {
+                    // 扣除交收失败的额度
+                    amount = ArithmeticUtil.subtract(amount, entrustCommonDto.getDeal().getShareAmt());
+                    // 委托全价*未使用额度
+                    amount = ArithmeticUtil.multiply(委托全价, amount);
+                    // 加上交收失败的交易金额
+                    amount = ArithmeticUtil.doAdd(amount, entrustCommonDto.getDeal().getTradeAmt());
+                } else {
+                    // 委托全价*交收失败的额度 或 委托全价*未使用额度  [指令不关闭时未使用额度不处理]
+                    amount = ArithmeticUtil.multiply(委托全价, amount);
+                }
+            }
 
             etrCashPositionFlowDto.setAmount(amount);
             etrCashPositionFlowDto.setAcctId(acctId);
@@ -1485,7 +1508,16 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                 // 指令关闭冲销的额度 = 指令额度 - 已完成额度
 				etrSecPositionFlowDto.setAmount(ArithmeticUtil.subtract(etrEntrust.getEntrustNum(), etrFinish));
 			}
-			etrSecPositionFlowDto.setCloseFlag("01"); // 委托关闭特殊处理, 委托关闭后,再撤销交易时, 委托状态会变成已接收,这时应该要把这笔数据删除
+            // 交收失败时部分回冲
+            if (StringUtil.equals(entrustCommonDto.getIsSettleFail(), DictCodeListExt1.是否_是.getValue())
+                    && entrustCommonDto.getDeal() != null) {
+                // 交收失败的额度
+                etrSecPositionFlowDto.setAmount(ArithmeticUtil.divide(entrustCommonDto.getDeal().getShareAmt(), BigDecimal.valueOf(100), 2));
+                // 记录交收失败的额度
+                etrEntrustAdd.setCloseAmt(ArithmeticUtil.doAdd(etrEntrustAdd.getCloseAmt(), etrSecPositionFlowDto.getAmount()));
+            }else{
+                etrSecPositionFlowDto.setCloseFlag("01"); // 委托关闭特殊处理, 委托关闭后,再撤销交易时, 委托状态会变成已接收,这时应该要把这笔数据删除
+            }
 			etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
 		}
     }
