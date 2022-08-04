@@ -140,8 +140,10 @@ public class ExchangeTransMatchRepo5Service extends ExchangeTransMatchRepoCommon
         // 净价总额
         dealTotal.setCpriceAmt(null);
         // 交易份额
-        dealTotal.setShareAmt(entrustDto.getMarchQty());
-        BigDecimal proportion = ArithmeticUtil.divide(entrustDto.getMarchQty(),dealDto.getShareAmt(),2);
+        // dealTotal.setShareAmt(entrustDto.getMarchQty());
+        dealTotal.setShareAmt(entrustDto.getMarchAmt());
+        // BigDecimal proportion = ArithmeticUtil.divide(entrustDto.getMarchQty(),dealDto.getShareAmt(),2);
+        BigDecimal proportion = ArithmeticUtil.divide(entrustDto.getMarchAmt(),dealDto.getShareAmt(),2);
         // 交易本金
         dealTotal.setPrinAmt(ArithmeticUtil.multiply(proportion,dealDto.getPrinAmt()));
         // 利息总额
@@ -200,7 +202,8 @@ public class ExchangeTransMatchRepo5Service extends ExchangeTransMatchRepoCommon
         dealTotal.setPortfolioId(entrustDto.getPortfolioId());
 
         //到期本金
-        dealTotal.setDqprinAmt(entrustDto.getMarchQty());
+        // dealTotal.setDqprinAmt(entrustDto.getMarchQty());
+        dealTotal.setDqprinAmt(entrustDto.getMarchAmt());
         // 投管业务类型
         dealTotal.setTgBusiType(DictCodeListExt3.共通业务类型_质押券置换.getValue());
         // 如果汇总成交.金融产品类型（投管） = 债券质押式正回购，则为‘债券质押式正回购到期’。否则为‘债券质押式逆回购到期’
@@ -431,7 +434,8 @@ public class ExchangeTransMatchRepo5Service extends ExchangeTransMatchRepoCommon
                 IntSettleTransData.setShareAmt(BigDecimal.ZERO);
                 IntSettleTransData.setPrinAmt(BigDecimal.ZERO);
                 //交易金额 = 成交数据明细.到期利息*汇总成交匹配结果表.匹配份额/成交数据明细.到期本金
-                IntSettleTransData.setTradeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(item.getmIntAmt(),entrustDto.getMarchQty()),item.getmPrinAmt(),2));
+                // IntSettleTransData.setTradeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(item.getmIntAmt(),entrustDto.getMarchQty()),item.getmPrinAmt(),2));
+                IntSettleTransData.setTradeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(item.getmIntAmt(),entrustDto.getMarchAmt()),item.getmPrinAmt(),2));
                 //全价总额 = 交易金额
                 IntSettleTransData.setFpriceAmt(IntSettleTransData.getTradeAmt());
                 //利息总额 = 交易金额
@@ -462,9 +466,12 @@ public class ExchangeTransMatchRepo5Service extends ExchangeTransMatchRepoCommon
                 SettleTransData prinSettleTransData = new SettleTransData();
                 BeanUtil.copyPropertiesIgnoreNull(prinSettleTransData,item);
 
-                prinSettleTransData.setShareAmt(entrustDto.getMarchQty());
-                prinSettleTransData.setPrinAmt(entrustDto.getMarchQty());
-                prinSettleTransData.setTradeAmt(entrustDto.getMarchQty());
+//                prinSettleTransData.setShareAmt(entrustDto.getMarchQty());
+//                prinSettleTransData.setPrinAmt(entrustDto.getMarchQty());
+//                prinSettleTransData.setTradeAmt(entrustDto.getMarchQty());
+                prinSettleTransData.setShareAmt(entrustDto.getMarchAmt());
+                prinSettleTransData.setPrinAmt(entrustDto.getMarchAmt());
+                prinSettleTransData.setTradeAmt(entrustDto.getMarchAmt());
                 prinSettleTransData.setPs(DictCodeList.交易方向_还本到账.getValue());
 
                 prinSettleTransData.setIntAmt(BigDecimal.ZERO);
