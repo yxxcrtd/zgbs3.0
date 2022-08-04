@@ -1474,7 +1474,8 @@
                        nvl(wiqer.FPRICE_AMT, 0) - nvl(eea.CLOSE_AMT, 0),0) ENTRUST_AMT,
                        ee.PORTFOLIO_ID,
                        eea.TERM_DAYS            REPO_TERM,
-                       eea.SETTLE_SPREED        SETTLE_SPREED
+                       eea.SETTLE_SPREED        SETTLE_SPREED,
+                       eea.CLOSE_AMT
                 from ETR_ENTRUST ee
                  left join ETR_ENTRUST_ADD eea on ee.ENTRUST_ID = eea.ENTRUST_ID
                  left join (select t.TRADE_AMT ENTRUST_AMT, t.ENTRUST_ID

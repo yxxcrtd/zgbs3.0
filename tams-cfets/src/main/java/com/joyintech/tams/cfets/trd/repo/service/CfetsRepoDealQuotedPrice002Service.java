@@ -1097,7 +1097,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
      */
     @Override
     public void doUpdate(CfetsRepoDealQuotedPrice001Dto entity) {
-        if (StringUtil.equals("save", entity.getOperatorType())){
+        if (StringUtil.equals("save", entity.getOperateType())){
             return;
         }
         if (!StringUtil.equals("revoke", entity.getOperatorType())
