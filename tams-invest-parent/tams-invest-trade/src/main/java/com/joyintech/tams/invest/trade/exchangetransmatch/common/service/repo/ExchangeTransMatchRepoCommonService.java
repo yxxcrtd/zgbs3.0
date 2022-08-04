@@ -789,26 +789,26 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
 
         this.buildPositionBaseData(trdTempDto, infContractDetailfile, baseTradeProductDealDtos, firstFinDealPledgeTempList);
 
-        // 质押券置换换出信息
-        if (finPledgeDisplaceDetailHuanChu != null) {
-            List<FinPledgeDispDetailTemp> finPledgeDispDetailTempList = new ArrayList<>();
-            FinPledgeDispDetailTemp finPledgeDispDetailTemp = new FinPledgeDispDetailTemp();
-            BeanUtil.copyPropertiesIgnoreNull(finPledgeDispDetailTemp, finPledgeDisplaceDetailHuanChu);
-            finPledgeDispDetailTemp.setPledgeDisplaceAmt(ArithmeticUtil.divide(finPledgeDisplaceDetailHuanChu.getPledgeDisplaceAmt(),
-                    new BigDecimal(100), 2, RoundingMode.HALF_UP));
-            finPledgeDispDetailTempList.add(finPledgeDispDetailTemp);
-            trdTempDto.setFinPledgeDispDetailTempList(finPledgeDispDetailTempList);
-        }
+//        // 质押券置换换出信息
+//        if (finPledgeDisplaceDetailHuanChu != null) {
+//            List<FinPledgeDispDetailTemp> finPledgeDispDetailTempList = new ArrayList<>();
+//            FinPledgeDispDetailTemp finPledgeDispDetailTemp = new FinPledgeDispDetailTemp();
+//            BeanUtil.copyPropertiesIgnoreNull(finPledgeDispDetailTemp, finPledgeDisplaceDetailHuanChu);
+//            finPledgeDispDetailTemp.setPledgeDisplaceAmt(ArithmeticUtil.divide(finPledgeDisplaceDetailHuanChu.getPledgeDisplaceAmt(),
+//                    new BigDecimal(100), 2, RoundingMode.HALF_UP));
+//            finPledgeDispDetailTempList.add(finPledgeDispDetailTemp);
+//            trdTempDto.setFinPledgeDispDetailTempList(finPledgeDispDetailTempList);
+//        }
 
         // 质押券置换换入信息
-        if (finPledgeDisplaceDetailHuanRu != null) {
-            FinDealPledge finDealPledge = new FinDealPledge();
-            finDealPledge.setPledgeFinprodId(finPledgeDisplaceDetailHuanRu.getFinprodId());
-            // 老头存质押数量=质押面额/100
-            finDealPledge.setPledgeNumber(ArithmeticUtil.divide(finPledgeDisplaceDetailHuanRu.getPledgeDisplaceAmt(),
-                    new BigDecimal(100), 2, RoundingMode.HALF_UP));
-            trdTempDto.setFinDealPledge(finDealPledge);
-        }
+//        if (finPledgeDisplaceDetailHuanRu != null) {
+//            FinDealPledge finDealPledge = new FinDealPledge();
+//            finDealPledge.setPledgeFinprodId(finPledgeDisplaceDetailHuanRu.getFinprodId());
+//            // 老头存质押数量=质押面额/100
+//            finDealPledge.setPledgeNumber(ArithmeticUtil.divide(finPledgeDisplaceDetailHuanRu.getPledgeDisplaceAmt(),
+//                    new BigDecimal(100), 2, RoundingMode.HALF_UP));
+//            trdTempDto.setFinDealPledge(finDealPledge);
+//        }
 
         // XYHGFXSJ-767 【实时资产头寸查询】协议回购上交所正回购中途换券日终清结算后，实时资产报表里数据错误
         if (StringUtil.equals(trdTempDto.getPs(),DictCodeListExt3.交易方向_中途换券.getValue())){
@@ -852,8 +852,11 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
         if (StringUtil.isNotBlank(trdTempDto.getFinprodId())) {
             trdTempDto.setPledgeInvAim(commonPositionService.selectHoldInvAim(trdTempDto.getPortfolioId(), trdTempDto.getFinprodId()));
         }
-        if (trdTempDto.getFinDealPledge() != null && StringUtil.isNotBlank(trdTempDto.getFinDealPledge().getPledgeFinprodId())) {
-            trdTempDto.setFinDealPledgePledgeInvAim(commonPositionService.selectHoldInvAim(trdTempDto.getPortfolioId(), trdTempDto.getFinDealPledge().getPledgeFinprodId()));
+//        if (trdTempDto.getFinDealPledge() != null && StringUtil.isNotBlank(trdTempDto.getFinDealPledge().getPledgeFinprodId())) {
+//            trdTempDto.setFinDealPledgePledgeInvAim(commonPositionService.selectHoldInvAim(trdTempDto.getPortfolioId(), trdTempDto.getFinDealPledge().getPledgeFinprodId()));
+//        }
+        if (CollectionUtils.isNotEmpty(trdTempDto.getFinDealPledgeList()) && StringUtil.isNotBlank(trdTempDto.getFinDealPledgeList().get(0).getPledgeFinprodId())) {
+            trdTempDto.setFinDealPledgePledgeInvAim(commonPositionService.selectHoldInvAim(trdTempDto.getPortfolioId(), trdTempDto.getFinDealPledgeList().get(0).getPledgeFinprodId()));
         }
         if (trdTempDto.getData() != null && StringUtil.isNotBlank(((InfContractDetailfile) trdTempDto.getData()).getFinprodId())) {
             trdTempDto.setDataPledgeInvAim(commonPositionService.selectHoldInvAim(trdTempDto.getPortfolioId(), ((InfContractDetailfile) trdTempDto.getData()).getFinprodId()));
@@ -922,18 +925,27 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
         FinDealPledgeKey finDealPledgeKey = new FinDealPledgeKey();
         finDealPledgeKey.setFinprodId(finprodId);
         finDealPledgeKey.setBranch(0L);
-        FinDealPledge finDealPledge = exchangeTransMatchCommonMapper.selectFinDealPledgeByPrimaryKey(finDealPledgeKey);
-        if (finDealPledge == null && !StringUtil.isEmptyList(firstFinDealPledgeTempList)) {
-            finDealPledge = firstFinDealPledgeTempList.get(0);
-        }
-        positionBaseData.setFinDealPledge(finDealPledge);
+        List<FinDealPledge> finDealPledgeList = exchangeTransMatchCommonMapper.selectFinDealPledges(finDealPledgeKey);
+//        if (finDealPledge == null && !StringUtil.isEmptyList(firstFinDealPledgeTempList)) {
+//            finDealPledge = firstFinDealPledgeTempList.get(0);
+//        }
+//        positionBaseData.setFinDealPledge(finDealPledge);
+//
+//        if (finDealPledge != null) {
+//            infContractDetailfile.setFinprodId(finDealPledge.getPledgeFinprodId());
+//            infContractDetailfile.setShareAmt(finDealPledge.getPledgeNumber());
+//        }
+//
+//        trdTempDto.setFinDealPledge(finDealPledge);
+        positionBaseData.setFinDealPledgeList(finDealPledgeList);
 
-        if (finDealPledge != null) {
-            infContractDetailfile.setFinprodId(finDealPledge.getPledgeFinprodId());
-            infContractDetailfile.setShareAmt(finDealPledge.getPledgeNumber());
+        if (CollectionUtils.isNotEmpty(finDealPledgeList)) {
+            infContractDetailfile.setFinprodId(finDealPledgeList.get(0).getPledgeFinprodId());
+            infContractDetailfile.setShareAmt(finDealPledgeList.get(0).getPledgeNumber());
         }
 
-        trdTempDto.setFinDealPledge(finDealPledge);
+        // trdTempDto.setFinDealPledge(finDealPledge);
+        trdTempDto.setFinDealPledgeList(finDealPledgeList);
 
         // 正回购到期续做
         if (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue(), trdTempDto.getFinprodType2())

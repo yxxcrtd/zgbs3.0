@@ -134,8 +134,8 @@ public class CommonTrdTempDto extends TrdProductDeal{
 	/**
 	 * 回购质押品
 	 */
-	private FinDealPledge finDealPledge;
-	
+	// private FinDealPledge finDealPledge;
+	private List<FinDealPledge> finDealPledgeList;
 	/**
 	 * 交易类金融产品
 	 */
@@ -805,25 +805,34 @@ public class CommonTrdTempDto extends TrdProductDeal{
 		this.trdProductTempDealAddB = trdProductTempDealAddB;
 	}
 
-	/**
-	 * 获取 finDealPledge
-	 *
-	 * @return finDealPledge
-	 */
-	public FinDealPledge getFinDealPledge() {
-		return finDealPledge;
+//	/**
+//	 * 获取 finDealPledge
+//	 *
+//	 * @return finDealPledge
+//	 */
+//	public FinDealPledge getFinDealPledge() {
+//		return finDealPledge;
+//	}
+//
+//	/**
+//	 * 设置 finDealPledge
+//	 *
+//	 * @param finDealPledge
+//	 *            finDealPledge
+//	 */
+//	public void setFinDealPledge(FinDealPledge finDealPledge) {
+//		this.finDealPledge = finDealPledge;
+//	}
+
+
+	public List<FinDealPledge> getFinDealPledgeList() {
+		return finDealPledgeList;
 	}
 
-	/**
-	 * 设置 finDealPledge
-	 *
-	 * @param finDealPledge
-	 *            finDealPledge
-	 */
-	public void setFinDealPledge(FinDealPledge finDealPledge) {
-		this.finDealPledge = finDealPledge;
+	public void setFinDealPledgeList(List<FinDealPledge> finDealPledgeList) {
+		this.finDealPledgeList = finDealPledgeList;
 	}
-	
+
 	/**
 	 * 获取 finTradeProduct
 	 *
