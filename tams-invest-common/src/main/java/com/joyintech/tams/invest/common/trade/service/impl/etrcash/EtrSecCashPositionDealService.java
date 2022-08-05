@@ -1511,8 +1511,15 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
             // 交收失败时部分回冲
             if (StringUtil.equals(entrustCommonDto.getIsSettleFail(), DictCodeListExt1.是否_是.getValue())
                     && entrustCommonDto.getDeal() != null) {
+                BigDecimal amount = ArithmeticUtil.divide(entrustCommonDto.getDeal().getShareAmt(), BigDecimal.valueOf(100), 2);
+                if (entrustCommonDto.isCloseEtr()) {
+                    map.put("sumTradeFlag", "02");
+                    // 指令额度 - 已关闭的额度 - 已成交额度(交易表中有效数据额度汇总) = 未使用额度(含当前交收失败这笔)
+                    amount = ArithmeticUtil.subtract(ArithmeticUtil.subtract(etrEntrust.getEntrustNum(), etrEntrustAdd.getCloseAmt())
+                            , EtrCommonCashPositionDealService.getEtrFinishAmtMuilt(map));
+                }
                 // 交收失败的额度
-                etrSecPositionFlowDto.setAmount(ArithmeticUtil.divide(entrustCommonDto.getDeal().getShareAmt(), BigDecimal.valueOf(100), 2));
+                etrSecPositionFlowDto.setAmount(amount);
                 // 记录交收失败的额度
                 etrEntrustAdd.setCloseAmt(ArithmeticUtil.doAdd(etrEntrustAdd.getCloseAmt(), etrSecPositionFlowDto.getAmount()));
             }else{

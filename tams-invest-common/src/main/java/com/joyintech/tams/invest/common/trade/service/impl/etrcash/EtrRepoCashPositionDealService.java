@@ -1399,8 +1399,10 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                     map.put("entrustId", etrEntrust.getEntrustId());
                     map.put("portfolioId", etrEntrust.getPortfolioId());
                     map.put("sumTradeFlag", "02");
-                    // 指令额度-已成交额度 = 未使用额度
-                    amount = ArithmeticUtil.subtract(etrEntrust.getEntrustNum(),EtrCommonCashPositionDealService.getEtrFinishAmtMuilt(map));
+                    // 指令额度 - 已关闭额度 -已成交额度 = 未使用额度
+                    amount = ArithmeticUtil.subtract(
+                            ArithmeticUtil.subtract(etrEntrust.getEntrustAmt(), etrEntrustAdd.getCloseAmt()),
+                            EtrCommonCashPositionDealService.getEtrFinishAmtMuilt(map));
                 }
                 // 减少交收失败的金额
                 if(entrustCommonDto.getDeal()!=null
