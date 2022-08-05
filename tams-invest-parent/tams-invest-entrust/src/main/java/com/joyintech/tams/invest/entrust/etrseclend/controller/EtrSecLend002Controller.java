@@ -291,12 +291,14 @@ public class EtrSecLend002Controller extends BaseController {
             return new AjaxResult(br);
         }
         dto.setDecisionAct(DictCodeListExt3.系统动作_修改.getValue());
+        dto.setSystemAct(DictCodeListExt3.系统动作_修改.getValue());
         if(!StringUtil.isNotEmpty(dto.getEntrustId())){
             BussinessCodeParameter param = new BussinessCodeParameter();
             param.setCommonBusinessExtType(DictCodeListExt2.fromDictCodeList(DictCodeListExt2.共通业务类型_债券借贷投资委托));
             String code = bussGetBussinessIdService !=null ? bussGetBussinessIdService.buildBussinessCode(param):IDGenerator.generate();
             dto.setEntrustId(code);
             dto.setDecisionAct(DictCodeListExt3.系统动作_新建.getValue());
+            dto.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
         }
         // GLCP-34:债券借贷指令不需要预占 modify by fuyongsehng 20220707 start
 //        if (StringUtil.equals(BussinessConstant.SUBMIT, dto.getOperateType())) {

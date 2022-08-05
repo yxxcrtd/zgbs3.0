@@ -157,6 +157,8 @@ public class EtrSecLendDto extends EtrEntrust implements ProcessEntity {
 
     private String decisionAct;//决策动作
 
+    private String systemAct;//系统动作
+
     private String balanceCheck;//是否校验余额
 
     public String getDecisionAct() {
@@ -731,5 +733,13 @@ public class EtrSecLendDto extends EtrEntrust implements ProcessEntity {
 
     public void setBalanceCheck(String balanceCheck) {
         this.balanceCheck = balanceCheck;
+    }
+
+    public String getSystemAct() {
+        return systemAct;
+    }
+
+    public void setSystemAct(String systemAct) {
+        this.systemAct = systemAct;
     }
 }

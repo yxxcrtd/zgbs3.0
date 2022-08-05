@@ -21,7 +21,9 @@ import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.exception.MessageException;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.util.*;
+import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysUser;
+import com.joyintech.system.base.entity.SysWflBusinessList;
 import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
@@ -101,6 +103,9 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
      */
     @Autowired(required = false)
     private BaseEtrInvestInfoService baseEtrInvestInfoService;
+
+    @Autowired(required=false)
+    private SysWflBusinessListMapper sysWflBusinessListMapper;
 
     /**
      * 债券投资委托查询 <功能详细描述>
@@ -333,7 +338,11 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
         if(StringUtil.isNotEmpty(confirmOk)){
             dto.setBalanceCheck("N");
         }
-        dto.setDecisionAct(DictCodeListExt3.系统动作_修改.getValue());
+        SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey(dto.getWorkflowId());
+        if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
+            dto.setDecisionAct(DictCodeListExt3.系统动作_修改.getValue());
+        }
+
         deleteWflEntity(dto);
         restTemplate.postForObject(
                 ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrSecLend/doInsert",dto,
@@ -372,7 +381,7 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
         position.setTradePlace(dto.getTradeMarket());
         position.setSettleSpeed(dto.getSettleSpeed());
         position.setDecisionAct(dto.getDecisionAct());
-        position.setSystemAct(dto.getDecisionAct());
+        position.setSystemAct(dto.getSystemAct());
         position.setCdate(dto.getVdate());
         position.setCcy(dto.getCcy());
         position.setTotalTradeId(dto.getEntrustId());
