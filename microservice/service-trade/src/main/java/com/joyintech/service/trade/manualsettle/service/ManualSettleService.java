@@ -260,7 +260,7 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                             List<ManualSettleDto> tepmPledgeInfoList = manualSettleMapper.selectPledgeInfo(infContractDetailfile.getFinprodId());
                             if (!StringUtil.isEmptyList(tepmPledgeInfoList)) {
                                 ((InfContractDetailfile) trdTempDto.getData()).setFinprodId(tepmPledgeInfoList.get(0).getPledgeId());
-                                trdTempDto.setTradeAmt(tepmPledgeInfoList.get(0).getPrin());
+                                trdTempDto.setTradeAmt(tepmPledgeInfoList.get(0).getPrin() == null ? BigDecimal.ZERO : tepmPledgeInfoList.get(0).getPrin());
                             }
                         }
                         // modify by etliu 20220727 end
