@@ -972,7 +972,11 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                 });
             }
             if(finProductTradeDto.isNotWorkflow()){
-                etrSecPositionFlowDto.setAmount(finProductTradeDto.getTrdProductDeal().getPrinAmt().negate());
+                if(finProductTradeDto.getTrdProductDeal().getPrinAmt() != null){
+                    etrSecPositionFlowDto.setAmount(finProductTradeDto.getTrdProductDeal().getPrinAmt().negate());
+                }else{
+                    etrSecPositionFlowDto.setAmount(BigDecimal.ZERO);
+                }
                 etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
             }
         }
