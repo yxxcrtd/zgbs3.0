@@ -1173,14 +1173,19 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
         if (CollectionUtils.isEmpty(listTemp)) {
             listTemp = cfetsManualSettleMapper.getTempDealDetailsByTradeId(entity.getTradeId());
         }
+        List<CfetsManualSettleDealInfo> list = new ArrayList<>();
         // 关闭指令
         if (CollectionUtils.isNotEmpty(listTemp)) {
             listTemp.forEach(dealInfo -> {
                 // 变更指令状态及处理头寸
                 if (!this.closeDelegateMethod(dealInfo, entity.getFinprodType2())) {
-                    logger.error("关闭指令失败:{}", dealInfo.getEntrustId());
+                    logger.info("指令未关闭:{}", dealInfo.getEntrustId());
+                }else{
+                    list.add(dealInfo);
                 }
             });
+            // 发送指令关闭头寸报文
+            this.closeDelegatePositionMethod(list, entity.getTgBusiType());
             // 发送指令关闭头寸报文
             SpringContextUtil.getApplicationContext().getBean(CfetsManualSettleService.class).closeDelegate(listTemp, entity.getRemark(), entity.getTgBusiType());
         }
@@ -1322,7 +1327,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
         // 系统参数判断
         if (!StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
             logger.info("是否处理旧头寸标识:否");
-            return true;
+            return isCloseEtr;
         }
         // 冲销逻辑(部分冲销)
         EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(dealInfo.getEntrustId());
@@ -1357,7 +1362,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
         }
         //插入旧头寸
         baseEtrCashPositionCommService.entrustCloseSectionExecute(entrustCommonDto);
-        return true;
+        return isCloseEtr;
     }
 
     /**
@@ -1577,9 +1582,9 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                     && !DictCodeListExt1.投资目的_卖空.getValue().equals(trdProductDeal.getInvAim())) {
                 baseTradeProductDealDto.setStlPayOrdersList(stlPayOrders);
             }
-            // 指令清算速度是否为T+0
+            // 指令清算速度是否为T+1
             EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(item.getEntrustId());
-            if (etrEntrustAdd != null && etrEntrustAdd.getSettleSpreed() == 0L) {
+            if (etrEntrustAdd != null && etrEntrustAdd.getSettleSpreed() == 1L) {
                 baseTradeProductDealDto.setSpeed0(true);
             }
             finProductTradeDto.setBaseTradeProductDealDtos(Collections.singletonList(baseTradeProductDealDto));

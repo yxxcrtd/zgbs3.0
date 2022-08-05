@@ -55,11 +55,9 @@ var TrdBondLendTargetDuration001;
             , {field: 'tradeTypeString', width: 180, title: '交易类型', sortField: 'tradeType'}
             , {field: 'mpFinprodId', width: 200, title: '原始交易编号', sortField: 'MP_FINPROD_ID'}
             , {
-                field: 'finprodMarketId', width: 200, title: '标的债券代码', sortField: 'FINPROD_MARKET_ID',
+                field: 'finprodMarketId', title: '标的债券代码', width: '200', sortField: 'FINPROD_MARKET_ID',
                 render: function (data, type, row, meta) {
-                    if (row.finprodMarketId != undefined) {
-                        return "<a onclick=\"showDetailByFinprodId('" + row.finprodId + "')\" + style='cursor: pointer;'>" + row.finprodMarketId + "</a>";
-                    }
+                    return "<a  class='pro-link finprodIdLink' style='cursor: pointer;'>" + data + "</ a>";
                 }
             }
             , {field: 'finprodAbbr', width: 200, title: '标的债券名称', sortField: 'finprodAbbr'}
@@ -112,6 +110,24 @@ var TrdBondLendTargetDuration001;
                 });
         };
         confirmTrade(data, PAGE_MODEL_NEW);
+    });
+    /**
+     * 资产代码链接
+     */
+    table.bind('click', '.finprodIdLink', function (row) {
+        //在新建界面进行显示单行的详细信息
+        let finprodId = row.finprodMarketId
+        var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a"; // 默认债券标的
+        var param = {
+            pageModel: PAGE_MODEL_REFERENCE,
+            isQuickInput: true,
+            finprodId: finprodId
+        };
+        Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+            basePath + url,
+            "98%", "98%",
+            param);
+        //
     });
 
     var exportExcel = function () {

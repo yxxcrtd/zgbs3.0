@@ -477,11 +477,18 @@
                     </div>
                 </div>
 
+<!--                <div class="form-inline-wrap" style="width: 50%; padding-top:6px;" id="origRepSecId_div" th:if="${entity?.ps eq PS_T94}">-->
+<!--                    <label class="layui-form-label" style="width: 150px;" data-th-text="#{EtrExchangeAgreRepTrade001.origRepSecId}">当前质押券</label>-->
+<!--                    <div class="layui-input-inline input-inline" style=" margin: 0px; margin-left: auto;">-->
+<!--                        <select  type="text" id="origRepSecId" name="origRepSecId" class="layui-input form-input input-select" placeholder="请输入内容" data-th-data-url="@{'/etrexchange/agreementrep/EtrExchangeAgreRepTrade001/getFinprodMarketInfoWfl'}"-->
+<!--                                 parentIds="acctTradeMarket" th:initValue="${entity?.origRepSecId}" data-th-placeholder="#{SysCommon.placeholder}"  formatoption=false></select>-->
+<!--                    </div>-->
+<!--                </div>-->
                 <div class="form-inline-wrap" style="width: 50%; padding-top:6px;" id="origRepSecId_div" th:if="${entity?.ps eq PS_T94}">
                     <label class="layui-form-label" style="width: 150px;" data-th-text="#{EtrExchangeAgreRepTrade001.origRepSecId}">当前质押券</label>
                     <div class="layui-input-inline input-inline" style=" margin: 0px; margin-left: auto;">
                         <select  type="text" id="origRepSecId" name="origRepSecId" class="layui-input form-input input-select" placeholder="请输入内容" data-th-data-url="@{'/etrexchange/agreementrep/EtrExchangeAgreRepTrade001/getFinprodMarketInfoWfl'}"
-                                 parentIds="acctTradeMarket" th:initValue="${entity?.origRepSecId}" data-th-placeholder="#{SysCommon.placeholder}"  formatoption=false></select>
+                                 parentIds="acctTradeMarket" th:initValue="${entity?.origRepSecId}" data-th-placeholder="#{SysCommon.placeholder}" showAll="true" multiple></select>
                     </div>
                 </div>
 

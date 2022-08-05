@@ -346,6 +346,9 @@ public class TrdInvestDealQuery001Service extends CommonExportService<TrdInvestD
                     } else {
                         dto.setRate(dto.getExerYield());
                     }
+                } else if (DictCodeListExt2.平安资产类型_债券借贷.getValue().equals(finprodType2)) {
+                    // 费率
+                    dto.setRate(dto.getYield());
                 }
                 // add by caozhenming 20210730 end
 
