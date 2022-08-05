@@ -2794,6 +2794,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
 
     @Override
     public String generateTitle(CfetsPrimaryBidManageSaveRequest dto, OperationType type) {
+        if (StringUtil.equals(dto.getIsWin(), DictCodeList.是否_否.getValue())) {
+            return "未中标日期" + GlobalConstant.OPEN_PARENTHESIS + iPlatformDate.getSysDateStr() + GlobalConstant.CLOSE_PARENTHESIS +
+                    "资产简称" + GlobalConstant.OPEN_PARENTHESIS + dto.getFinprodAbbr() + GlobalConstant.CLOSE_PARENTHESIS + "未中标";
+        }
         // 设置流程业务说明
         String date = "中标日期" +
                 GlobalConstant.OPEN_PARENTHESIS + iPlatformDate.getSysDateStr() + GlobalConstant.CLOSE_PARENTHESIS;
