@@ -248,6 +248,8 @@ public class BussRepoSecService extends BaseService<PledgeBondInfoDto>{
             tradeMarket = DictCodeList.交易流通场所_银行间债券市场.getValue();
         }
         Page<PledgeBondInfoDto> resultList = new Page<>();
+
+
         if (DictCodeList.回购拆借方向_正回购.getValue().equals(ps)||DictCodeList.回购拆借方向_融入.getValue().equals(ps)) {
             params.put("POSITION_TYPE_01", DictCodeList.持仓类型_可用.getValue());
             params.put("POSITION_TYPE_03", DictCodeList.持仓类型_实际.getValue());
@@ -258,6 +260,16 @@ public class BussRepoSecService extends BaseService<PledgeBondInfoDto>{
             params.put("plateDate", platformDateImpl.getSysDateStr());
             params.put("repRegistOrg", StringUtil.splitToList(GlobalConstant.COMMA, (String) params.get("repRegistOrg")));
             params.put("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+
+            if(DictCodeList.回购拆借方向_融入.getValue().equals(ps)){
+                if(StringUtil.equals(params.get("pageFromTz"), "EtrSecLend002")){
+                    params.put("flag","ETR");
+                }else if (StringUtil.equals(params.get("pageFromTz"), "TrdBondLendTrade002")){
+                    params.put("flag","TRD");
+                }
+                resultList = this.queryForPage(page, length,() -> bussRepoSecMapper.selectNewAvaPledgeBondDetailList(params));
+                return resultList;
+            }
             
             // add by etliu 20210303 银行间上下行 start
 //            param.ignoreFlowTradeId = ignoreFlowTradeId;

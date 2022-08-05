@@ -663,21 +663,14 @@ public class EtrSecLendService extends BaseService {
         dto.setEntrust(true);
         Date sysdate = DateUtil.parse((String)param.get("sysDate"));
         dto.setCdate(sysdate);
-        List<String> acctTypeList = new ArrayList<>();
-        acctTypeList.add(DictCodeListExt1.资金账户类型_产品托管户.getValue());
-        dto.setAcctType(acctTypeList);
         dto.setFinprodId((String)param.get("finprodId"));
         dto.setCcy((String)param.get("ccy"));
-        dto.setHodingType(DictCodeList.持仓类型_可用.getValue());
+        dto.setHodingType(DictCodeListExt3.资产类型_债券借贷本方券可用持仓.getValue());
         dto.setPortfolioId((String)param.get("portfolioId"));
-        
-        
+        dto.setSecAcctId((String)param.get("secAcctId"));
         Map<String, Object> result = new HashMap<>();
-        if (basePtlSecPositionInfoService != null) {
-            acctTypeList.add(DictCodeListExt1.资金账户类型_券商资金账户.getValue());
-            BigDecimal position = basePtlSecPositionInfoService.queryUsableSecPosition(dto);
-            result.put("position", ArithmeticUtil.multiply(position, new BigDecimal(100)));
-        }
+        BigDecimal position = etrSecLendMapper.queryUsableSecPosition(dto);
+        result.put("position", position);
         return result;
     }
 

@@ -334,7 +334,7 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
             dto.setBalanceCheck("N");
         }
         dto.setDecisionAct(DictCodeListExt3.系统动作_修改.getValue());
-        deleteWflEntityAndFlow(dto);
+        deleteWflEntity(dto);
         restTemplate.postForObject(
                 ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrSecLend/doInsert",dto,
                 Integer.class);

@@ -143,9 +143,9 @@
             return;
         }
 
-        Joyin.ajaxJson(basePath + 'invest/entrust/etrinvestbondinfo/EtrInvestBondInfo002/getAssetAvailablePosition', params,
+        Joyin.ajaxJson(basePath + '/invest/entrust/etrseclend/EtrSecLend002/getAssetAvailablePosition', params,
             function (result) {
-                $('#bussTrdAvailableCashQuery_assetPosition').val(result.position*100).trigger('blur');
+                $('#bussTrdAvailableCashQuery_assetPosition').val(result.position).trigger('blur');
             });
         // modify by etliu 20211129 end
     }
