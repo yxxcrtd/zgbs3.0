@@ -521,7 +521,7 @@ public class EtrSecLendService extends BaseService {
         EtrEntrust etrEntrust = new EtrEntrust();
         EtrEntrustAdd etrEntrustAdd = new EtrEntrustAdd();
         WflEtrTarget wflEtrTarget=new WflEtrTarget();
-        if (StringUtil.equals(operateType, "submit") || StringUtil.equals(operateType, "NEW")) {
+        if (StringUtil.equals(operateType, "submit") || StringUtil.equals(operateType, "NEW") || StringUtil.equals(operateType, "MODIFY") ) {
             dto.setEntrustStatus(DictCodeListExt3.委托状态_流程中.getValue());
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, dto);
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, dto.getEtrInvestPersonInfo());
@@ -680,7 +680,7 @@ public class EtrSecLendService extends BaseService {
      */
     public void doBackFlow(EtrSecLendDto dto) {
         //删除流水
-        baseEtrCashPositionCommService.entrustCloseExecute(dto.getEntrustId());
+        baseEtrCashPositionCommService.entrustCloseExecute(dto.getEntrustId(), DictCodeList.是否_是.getValue());
         //删除流程中数据
 //        Map<String, Object> param = new HashMap<>();
 //        param.put("workflowId", dto.getWorkflowId());
