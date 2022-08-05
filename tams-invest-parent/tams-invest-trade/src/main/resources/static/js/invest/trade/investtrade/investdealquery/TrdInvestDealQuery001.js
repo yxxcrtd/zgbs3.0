@@ -36,7 +36,7 @@ var showDetailByFinprodId = function (finprodId, finprodType2) {
         //         pageModel: PAGE_MODEL_REFERENCE,
         //         finprodId: finprodId
         //     });
-        //基金类标的信息查看
+        // 一级市场债
     } else if (finprodType2 == PINAN_ASSET_TYPE_F17) {
         console.log("---------------PINAN_ASSET_TYPE_F17-----------------")
         console.log(finprodId)
@@ -50,6 +50,7 @@ var showDetailByFinprodId = function (finprodId, finprodType2) {
             basePath + url,
             "98%", "98%",
             param);
+        //基金类标的信息查看
     } else if (finprodType2 == PINAN_ASSET_TYPE_F02) {
         label = 'FinFundTarget002.detail';
         pagePath = "invest/asset/fund/FinFundTarget002/init";
@@ -106,6 +107,7 @@ var showDetailByFinprodId = function (finprodId, finprodType2) {
                 pageModel: PAGE_MODEL_REFERENCE,
                 finprodId: finprodId
             });
+        //买断式回购
     } else if (finprodType2 == PINAN_ASSET_TYPE_F10) {
         label = 'FinBondTargetAsset002.title';
         pagePath = "invest/asset/bond/FinBondTargetAsset002/init";
@@ -114,6 +116,7 @@ var showDetailByFinprodId = function (finprodId, finprodType2) {
                 pageModel: PAGE_MODEL_REFERENCE,
                 finprodId: finprodId
             });
+        //计划类资产(货币型)
     } else if (finprodType2 == PINAN_ASSET_TYPE_F09) {
         label = 'FinPlanAssetC002.title';
         pagePath = "invest/asset/plan/plancur/FinPlanAssetC002/init";
@@ -122,6 +125,7 @@ var showDetailByFinprodId = function (finprodId, finprodType2) {
                 pageModel: PAGE_MODEL_REFERENCE,
                 finprodId: finprodId
             });
+        //股票
     } else if (finprodType2 == PINAN_ASSET_TYPE_F11) {
         label = 'FinStockInfo002.title';
         pagePath = "invest/asset/stock/FinStockInfo002/init";
@@ -130,6 +134,7 @@ var showDetailByFinprodId = function (finprodId, finprodType2) {
                 pageModel: PAGE_MODEL_REFERENCE,
                 finprodId: finprodId
             });
+        //期权
     } else if (finprodType2 == PINAN_ASSET_TYPE_F18) {
         label = 'TrdOptionTrade002.reference';
         pagePath = "invest/trade/option/TrdOptionTrade002/init";
@@ -138,6 +143,7 @@ var showDetailByFinprodId = function (finprodId, finprodType2) {
                 pageModel: PAGE_MODEL_REFERENCE,
                 finprodId: finprodId
             });
+        //期货
     } else if (finprodType2 == PINAN_ASSET_TYPE_F19) {
         label = 'FinProjectNetTargetAsset002.reference';
         pagePath = "invest/asset/projectnet/FinProjectNetTargetAsset002/init";
@@ -218,9 +224,9 @@ $(function () {
             var tradeDateVal = data.tradeDateVal;
             console.log("----------------dblclick-------------------")
             console.log(validStatus)
-            if(validStatus=="01"){
-                return;
-            }
+            // if(validStatus=="01"){
+            //     return;
+            // }
 
             //债券委托详情 网下申购
             if (data.finprodType2 == PINAN_ASSET_TYPE_F01 && data.ps == PS_T04 && data.purchModle == '02'
@@ -492,7 +498,7 @@ $(function () {
                 //             workflowStatus: data.validStatus
                 //         });
                 // }
-            //债券借贷查看页面
+            // 债券借贷查看页面
             else if (data.finprodType2 == PINAN_ASSET_TYPE_F12) {
                 label = 'TrdBondLendInvestTrade002.reference';
                 pagePath = "invest/trade/bondlend/TrdBondLendInvestTrade002/init";
