@@ -1148,10 +1148,15 @@
         SELECT
         INV_AIM
         FROM
-        ETR_SEC_POSITION
-        WHERE PORTFOLIO_ID = #{portfolioId} and cdate=#{cdate} and SEC_ACCT_ID =#{secAcctId}
-            and HODING_TYPE=#{hodingType} and FINPROD_ID =#{finprodId}
-        and INV_AIM !='999999' and  ROWNUM = 1
+        ETR_SEC_POSITION p
+        WHERE p.PORTFOLIO_ID = #{portfolioId}  and p.SEC_ACCT_ID =#{secAcctId}
+            and p.HODING_TYPE=#{hodingType} and p.FINPROD_ID =#{finprodId}
+        and p.INV_AIM !='999999'
+        and cdate= (select max(cdate) from ETR_SEC_POSITION p1 where cdate &lt;=#{cdate}
+            and p.PORTFOLIO_ID = p1.PORTFOLIO_ID  and p.SEC_ACCT_ID =p1.SEC_ACCT_ID
+          and p.HODING_TYPE=p1.HODING_TYPE and p.FINPROD_ID =p1.FINPROD_ID and p1.INV_AIM !='999999'
+            )
+          and  ROWNUM = 1
         group by INV_AIM
     </select>
 
