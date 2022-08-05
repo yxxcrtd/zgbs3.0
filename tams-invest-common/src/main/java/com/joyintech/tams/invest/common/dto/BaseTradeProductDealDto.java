@@ -226,7 +226,7 @@ public class BaseTradeProductDealDto {
     private String stage;
 
     /**
-     * 清算速度是否为T+0
+     * 清算速度是否为T+1
      */
     private boolean isSpeed0;
 

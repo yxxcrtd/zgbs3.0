@@ -1577,7 +1577,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                     && !DictCodeListExt1.投资目的_卖空.getValue().equals(trdProductDeal.getInvAim())) {
                 baseTradeProductDealDto.setStlPayOrdersList(stlPayOrders);
             }
-            // 指令清算速度是否为T+0
+            // 指令清算速度是否为T+1
             EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(item.getEntrustId());
             if (etrEntrustAdd != null && etrEntrustAdd.getSettleSpreed() == 1L) {
                 baseTradeProductDealDto.setSpeed0(true);
