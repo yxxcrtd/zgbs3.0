@@ -938,6 +938,16 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                 }
             }
         }
+
+        /**
+         * 深交所中途换券和解除质押 不需要处理日间头寸
+         */
+        if(DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(infContractDetailfile.getTradeMarket())
+                && (StringUtil.equals(trdTempDto.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())
+                || StringUtil.equals(trdTempDto.getPs(), DictCodeListExt3.交易方向_中途换券.getValue()))){
+            trdTempDto.setIsManualSettle("Y");
+        }
+
         // 调用业务组件.【金融产品交易共通.交易产品接口】,写入[实际]的组合持仓流水及现金流水
         // 手工交收判断 add by yufei 20201022 start
         finProductTradeDto.setIsDealSettlePosition(trdTempDto.getIsManualSettle());

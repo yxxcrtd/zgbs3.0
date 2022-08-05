@@ -1039,6 +1039,20 @@ public class EtrExchangeTradeCommon001Service extends CommonExportService<EtrExc
      * @return
      */
     public Page<SelectOptionDto> getFinprodMarketInfo(Map<String, Object> map) {
+        //多质押券特殊处理
+        final String initValue = String.valueOf(map.get("initValue"));
+        if (initValue.contains(com.joyintech.framework.constant.GlobalConstant.COMMA)) {
+            List<SelectOptionDto> list = new ArrayList<>();
+            String[] initValues = initValue.split(com.joyintech.framework.constant.GlobalConstant.COMMA);
+            for (String initValue1 : initValues) {
+                map.put("initValue", initValue1);
+                Page<SelectOptionDto> selectOptionDtoPage = restTemplate.postForPage(
+                        ServiceApplication.BASICDATA_SERVICE_NAME + "/MstSecuritiesAccountInfo/getFinprodMarketInfoNewUi", map,
+                        SelectOptionDto.class);
+                list.addAll(selectOptionDtoPage.getRoot());
+            }
+            return new Page(list);
+        }
         return restTemplate.postForPage(
                 ServiceApplication.BASICDATA_SERVICE_NAME + "/MstSecuritiesAccountInfo/getFinprodMarketInfoNewUi", map,
                 SelectOptionDto.class);
