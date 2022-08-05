@@ -349,7 +349,7 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
 //        position.setSettleSpeed(dto.getSettleSpeed());
         position.setDecisionAct(decisionAct);
         position.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
-        position.setCdate(dto.getTradeDate());
+        position.setCdate(DateUtil.platDateFromCache());
         position.setCcy(dto.getCcy());
         position.setTotalTradeId(dto.getBusiCode());
         position.setFlowStatus(flowStatus);
