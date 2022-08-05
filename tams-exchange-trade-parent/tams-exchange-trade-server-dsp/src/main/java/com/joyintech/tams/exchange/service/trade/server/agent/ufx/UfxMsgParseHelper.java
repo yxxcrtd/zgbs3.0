@@ -244,14 +244,14 @@ public class UfxMsgParseHelper {
             //处理标志
             int realStatus = Integer.parseInt((String) ds.get("real_status"));
             if (realStatus != 0 && realStatus != 4) {
-                trade.setBrokerTradeId((String) ds.get("entrust_no"));
+                //trade.setBrokerTradeId((String) ds.get("entrust_no"));
                 if (2 == realType) {
                     trade.setTradeType(TradeType.CANCEL_INVALID.value);
                 } else if (0 == realType) {
                     trade.setTradeType(TradeType.INVALID.value);
                 }
             } else {
-                trade.setBrokerTradeId((String) ds.get("business_id"));
+               // trade.setBrokerTradeId((String) ds.get("business_id"));
                 if (2 == realType) {
                     trade.setTradeType(TradeType.CANCEL.value);
                 } else if (0 == realType) {
@@ -259,6 +259,11 @@ public class UfxMsgParseHelper {
                 }
 
             }
+            trade.setBrokerTradeId((String) ds.get("business_id"));
+            if (Strings.isNullOrEmpty(trade.getBrokerTradeId())){
+                trade.setBrokerTradeId((String) ds.get("entrust_no"));
+            }
+
             trade.setBrokerEntrustId((String) ds.get("entrust_no"));
             trade.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("cancel_info")));
             trade.setTradedBalance(new BigDecimal((String) ds.get("business_balance")));

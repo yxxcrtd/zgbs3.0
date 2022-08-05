@@ -146,10 +146,10 @@ public class KCBPWMsgParseHelper {
 //            trade.setBrokerTradeId(resMap.get("matchcode"));
             if (realStatus != 0 && realStatus != 1) {
                 //  废单 有正常的委托，也有撤销的委托
-                trade.setBrokerTradeId((String) resMap.get("ordersno"));
+               // trade.setBrokerTradeId((String) resMap.get("ordersno"));
 //                trade.setBrokerTradeId((String) resMap.get("orderid"));
             } else {
-                trade.setBrokerTradeId(resMap.get("matchcode"));
+               // trade.setBrokerTradeId(resMap.get("matchcode"));
                 // 成交 有正常的委托，也有撤销的委托
 //                if (realStatus == 0)
 //                    trade.setBrokerTradeId((String) resMap.get("orderid"));
@@ -164,6 +164,10 @@ public class KCBPWMsgParseHelper {
 //                    trade.setReportNo(OAO[1]);
 //                }
 //            }
+            trade.setBrokerTradeId((String) resMap.get("matchcode"));
+            if (Strings.isNullOrEmpty(trade.getBrokerTradeId())) {
+                trade.setBrokerTradeId((String) resMap.get("ordersno"));
+            }
             if (!Strings.isNullOrEmpty(resMap.get("sysdate"))) {
                 trade.setTradingDay(resMap.get("sysdate"));
             } else if (!Strings.isNullOrEmpty(resMap.get("trddate"))) {
