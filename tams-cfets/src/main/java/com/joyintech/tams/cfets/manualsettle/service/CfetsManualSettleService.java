@@ -1579,7 +1579,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             }
             // 指令清算速度是否为T+0
             EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(item.getEntrustId());
-            if (etrEntrustAdd != null && etrEntrustAdd.getSettleSpreed() == 0L) {
+            if (etrEntrustAdd != null && etrEntrustAdd.getSettleSpreed() == 1L) {
                 baseTradeProductDealDto.setSpeed0(true);
             }
             finProductTradeDto.setBaseTradeProductDealDtos(Collections.singletonList(baseTradeProductDealDto));
