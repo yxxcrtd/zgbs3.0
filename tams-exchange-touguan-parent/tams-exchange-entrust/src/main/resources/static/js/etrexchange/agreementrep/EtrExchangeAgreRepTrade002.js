@@ -1437,6 +1437,17 @@
                     //补充协议
                     $("#addCla_div").show();
                     $("#addCla").attr("disabled", false);
+
+                    // /XYHGFXSJ-914  【待办】深交所逆回购-中途换券，从行情接收后保存，期望不可编辑，与协议回购指令页面一致
+                    let reqOnId = $("#reqOnId").val();
+                    if (reqOnId && reqOnId != ''){
+                        //组合名称
+                        $("#portfolioId").attr("disabled", true);
+                        //换出债券
+                        $("#outRepSecId").attr("disabled", true);
+                        //换出债券数量
+                        $("#outRepSecNum").attr("disabled", true);
+                    }
                 }
                 let outAmtValue = $("#outAmt").val();
                 console.log("outAmtValue " + outAmtValue);
@@ -2210,7 +2221,7 @@
                 $("#outAmt").attr('disabled', false);
             }
             //中途换券 换券
-            if(entity.entrustBussType === '21'){
+            if(entity.entrustBussType === '21' && !entity.reqOnId){
                 $("#outRepSecId").attr('disabled', false);
                 $("#outRepSecNum").attr('disabled', false);
             }
