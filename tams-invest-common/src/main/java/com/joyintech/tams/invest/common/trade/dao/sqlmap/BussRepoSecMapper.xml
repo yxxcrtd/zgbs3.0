@@ -1703,6 +1703,9 @@
                 PTL_SEC_POSITION_RULE psp
             </otherwise>
         </choose>
+        <if test="entrustId !='' and entrustId !='' ">
+            INNER JOIN ETR_PLEDGE ep ON ep.ENTRUST_ID=#{entrustId} and ep.FINPROD_ID = psp.FINPROD_ID
+        </if>
         INNER JOIN PTL_PORTFOLIO pp ON
         psp.PORTFOLIO_ID = pp.PORTFOLIO_ID
         left JOIN PTL_POSITION_CFG ppc ON

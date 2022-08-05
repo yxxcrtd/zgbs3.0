@@ -536,4 +536,11 @@ public class TrdBondLendInvestTrade002Controller extends BaseController {
     public List<SelectOptionDto> getPortfolioId(@RequestParam Map<String, Object> params) {
         return trdBondLendInvestTrade002Service.getPortfolioId(params);
     }
+
+    //组合代码
+    @ResponseBody
+    @RequestMapping("getAssetAvailablePosition")
+    public Map<String, Object> getAssetAvailablePosition(@RequestBody Map<String, Object> params) {
+        return trdBondLendInvestTrade002Service.getAssetAvailablePosition(params);
+    }
 }

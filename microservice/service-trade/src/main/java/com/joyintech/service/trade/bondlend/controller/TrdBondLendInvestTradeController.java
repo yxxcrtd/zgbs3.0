@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,6 +113,13 @@ public class TrdBondLendInvestTradeController {
     public List<SuggestDto> getSecManageAcctId(@RequestBody Map<String, Object> param) {
         return trdBondLendInvestTradeService.getSecManageAcctId(param);
     }
+
+    @RequestMapping("getAssetAvailablePosition")
+    public Map<String, Object> getAssetAvailablePosition(@RequestBody Map<String, Object> param) {
+        return trdBondLendInvestTradeService.getAssetAvailablePosition(param);
+    }
+
+
 
     /**
      * 通道：联想框文本框

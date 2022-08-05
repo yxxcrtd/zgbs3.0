@@ -555,13 +555,18 @@ var table;
         params.finprodId = $("#finprodId").val();
         params.secAcctId = $("#secManageAcctId").val();
         // 债券借贷资产可用持仓乘100by赵东东 2019.8.30 start
-        params.multiParam=100;
-        // 债券借贷资产可用持仓乘100by赵东东 2019.8.30 end
-        if (window.BussTrdAvailableCashQuery && window.BussTrdAvailableCashQuery["bussTrdAvailableCashQuery"]) {
-            window.BussTrdAvailableCashQuery["bussTrdAvailableCashQuery"].updateCash(function () {
-                return params
-            });
-        }
+        // params.multiParam=100;
+        // // 债券借贷资产可用持仓乘100by赵东东 2019.8.30 end
+        // if (window.BussTrdAvailableCashQuery && window.BussTrdAvailableCashQuery["bussTrdAvailableCashQuery"]) {
+        //     window.BussTrdAvailableCashQuery["bussTrdAvailableCashQuery"].updateCash(function () {
+        //         return params
+        //     });
+        // }
+        Joyin.ajaxJson(JoyinUtil.getRealPath('/invest/trade/bondlend/TrdBondLendInvestTrade002/getAssetAvailablePosition'), params, function (result) {
+            if(result){
+                $("#bussTrdAvailableCashQuery_assetPosition").val(result.position).trigger("change").trigger("blur");
+            }
+        },false)
     };
 
     //画面初始化

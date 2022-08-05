@@ -21,6 +21,7 @@ import com.joyintech.tams.common.base.entity.StlCapacctInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +47,8 @@ public interface TrdBondLendInvestTradeMapper {
     List<TrdBondLendInvestTradeDto> selectDeal(Map<String, Object> paraMap);
 
     List<SuggestDto> getSecManageAcctId(Map<String, Object> param);
-    
+
+    BigDecimal getAssetAvailablePosition (Map<String, Object> param);
     
     List<SuggestDto> getChannel(Map<String, Object> param);
 

@@ -304,7 +304,7 @@ public class EtrSecLendService extends BaseService {
            etrEntrust.setEntrustDate(iPlatformDate.getSysDate());
 //           etrEntrust.setEntrustAmt(dto.getTotalAmt().multiply(new BigDecimal(10000)));
            etrEntrust.setEntrustAmt(dto.getTotalAmt());
-           etrEntrust.setEntrustNum(dto.getTotalAmt().multiply(new BigDecimal(100)));
+           etrEntrust.setEntrustNum(dto.getTotalAmt());
            etrEntrust.setAvailableNum(dto.getObjectAvailablePosition());
            etrEntrust.setPrice(dto.getBusiRate());
            etrEntrust.setCalendarId(dto.getCalendarId());
@@ -426,7 +426,7 @@ public class EtrSecLendService extends BaseService {
            etrEntrust.setEntrustDate(iPlatformDate.getSysDate());
 //           etrEntrust.setEntrustAmt(dto.getTotalAmt().multiply(new BigDecimal(10000)));
            etrEntrust.setEntrustAmt(dto.getTotalAmt());
-           etrEntrust.setEntrustNum(dto.getTotalAmt().multiply(new BigDecimal(100)));
+           etrEntrust.setEntrustNum(dto.getTotalAmt());
            etrEntrust.setAvailableNum(dto.getObjectAvailablePosition());
            etrEntrust.setPrice(dto.getBusiRate());
            etrEntrust.setCalendarId(dto.getCalendarId());
