@@ -104,12 +104,14 @@ FROM
 		AND J.BACK_LEND_DIRECTION=#{BACK_LEND_DIRECTION_03}
 
 		<if test="sysDate != null and sysDate != ''">
-			AND (H.VDATE &lt;= TO_DATE(#{sysDate},'YYYY-MM-DD') AND TO_DATE(#{sysDate},'YYYY-MM-DD') &lt;= H.MDATE)
+			AND (H.VDATE &lt;= TO_DATE(#{sysDate},'YYYY-MM-DD'))
+			         <!--AND TO_DATE(#{sysDate},'YYYY-MM-DD') &lt;= H.MDATE)-->
 		</if>
 		AND not exists(
 		select TT.FINPROD_ID from
 		TRD_FIN_PRODUCT_DEAL_TOTAL TT where
-		TT.PS = 'T07'
+		<!-- TT.PS = 'T07' -->
+		TT.PS in ('T07','T96','T95','T93')
 		AND TT.FINPROD_ID = H.FINPROD_ID
 		AND TT.TRADE_STATUS = '01'
 		AND TT.IS_CANCEL = 'N'
@@ -215,12 +217,14 @@ FROM
 		AND B.TRADE_STATUS='01'AND B.IS_CANCEL='N' and F.IS_SEC_BOND = 'Y' AND J.BACK_LEND_DIRECTION=#{BACK_LEND_DIRECTION_03}
 
 		<if test="sysDate != null and sysDate != ''">
-			AND (H.VDATE &lt;= TO_DATE(#{sysDate},'YYYY-MM-DD') AND TO_DATE(#{sysDate},'YYYY-MM-DD') &lt;= H.MDATE)
+			AND (H.VDATE &lt;= TO_DATE(#{sysDate},'YYYY-MM-DD'))
+			         <!-- AND TO_DATE(#{sysDate},'YYYY-MM-DD') &lt;= H.MDATE) -->
 		</if>
 		AND not exists(
 		select TT.FINPROD_ID from
 		TRD_FIN_PRODUCT_DEAL_TOTAL TT where
-		TT.PS = 'T07'
+		<!-- TT.PS = 'T07' -->
+		TT.PS in ('T07','T96','T95','T93')
 		AND TT.FINPROD_ID = H.FINPROD_ID
 		AND TT.TRADE_STATUS = '01'
 		AND TT.IS_CANCEL = 'N'
