@@ -133,7 +133,7 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
             }
             item.setIsSLDeal(DictCodeList.是否_是.getValue());
         });
-
+        tradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
         baseTradeProductDealCommServiceImpl.execute(tradeDto);
 
         if (StringUtil.isNotEmpty(entity.getActPortfolioId()) && !StringUtil.equals(entity.getPortfolioId(), entity.getActPortfolioId())) {
@@ -511,6 +511,13 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
             RequestUtil.getPageParam(), RepoInfo.class));
     }
 
+    public Map<String,Object> getShowHandNum() {
+        return restTemplate.postForObject(ServiceApplication.PERIOD_SERVICE_NAME + "/TrdSecLendDuration/getShowHandNum",
+                RequestUtil.getPageParam(), Map.class);
+    }
+
+
+
     /**
      * 写入融入券的组合持仓流水
      * @param input    画面参数Dto
@@ -545,6 +552,7 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
                 resultDto.setTradeId(input.getBusiCode());
                 // 投资目的
                 resultDto.setInvAim(ptlSecPositionFlow.getInvAim());
+                resultDto.setIsExistNew(DictCodeList.是否_是.getValue());
 
                 lstPtlSecPositionFlowDto.add(resultDto);
             }

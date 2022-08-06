@@ -39,6 +39,8 @@ import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 
+import java.util.Map;
+
 /**
  * @author : 裴家俊
  * @version V1.0 债券借贷存续期 确认
@@ -124,6 +126,18 @@ public class TrdSecLendDuration002Controller extends BaseController {
     @RequestMapping("findRepoInfo")
     public Page<RepoInfo> findRepoInfo() {
         return trdSecLendDuration002Service.findRepoInfo();
+    }
+
+
+    /**
+     * 检索债券质押信息
+     *
+     * @return 债券质押信息
+     */
+    @ResponseBody
+    @RequestMapping("getShowHandNum")
+    public Map<String,Object> getShowHandNum() {
+        return trdSecLendDuration002Service.getShowHandNum();
     }
 
     /**

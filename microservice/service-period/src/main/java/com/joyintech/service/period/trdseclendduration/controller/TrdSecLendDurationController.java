@@ -44,6 +44,12 @@ public class TrdSecLendDurationController {
         return trdSecLendDurationService.findPage(page, length, param);
     }
 
+    @PostMapping("getShowHandNum")
+    public Map<String,Object> findPage(@RequestBody Map<String, Object> param) {
+        return trdSecLendDurationService.getShowHandNum(param);
+    }
+
+
     /**
      * 查询有效、撤销或待处理的存续期交易数据
      *

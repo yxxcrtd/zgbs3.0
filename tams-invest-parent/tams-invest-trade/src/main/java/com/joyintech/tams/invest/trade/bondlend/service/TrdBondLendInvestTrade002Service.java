@@ -523,6 +523,7 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
                 });
             }
             // 调用业务组件.【金融产品交易共通.交易产品接口】,写入交易基本信息与[实际]的组合持仓流水及现金流水
+            finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
             baseTradeProductDealCommService.execute(finProductTradeDto);
             
             //子组合插入流水
@@ -1050,6 +1051,7 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
                 finProductTrade.setActPortfolioId(entity.getActPortfolioId());
             });
         }
+        finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
         baseTradeProductDealCommService.execute(finProductTradeDto);
         //子组合插入流水
         if(StringUtil.isNotEmpty(entity.getActPortfolioId()) && !StringUtil.equals(entity.getActPortfolioId(), entity.getPortfolioId())) {
@@ -1531,6 +1533,7 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
             }
             // 调用业务组件.【金融产品交易共通.交易产品接口】, insert
             // 调用业务组件.【金融产品交易共通.交易产品接口】,写入[实际]的组合持仓流水及现金流水
+            finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
             baseTradeProductDealCommService.execute(finProductTradeDto);
             //子组合插入流水
             if(StringUtil.isNotEmpty(entity.getActPortfolioId()) && !StringUtil.equals(entity.getActPortfolioId(),
@@ -1823,6 +1826,8 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
                     // 投资目的
                     resultDto.setInvAim(ptlSecPositionFlow.getInvAim());
 
+                    resultDto.setIsExistNew(DictCodeList.是否_是.getValue());
+
                     lstPtlSecPositionFlowDto.add(resultDto);
                 }
             }
@@ -1873,6 +1878,8 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
                         // 投资目的 = 按“摊余成本类-公允价值变动计入其他综合收益-公允价值变动计入当期损益”的顺序依次冻结，削减对应投资目的债券可用持仓
                         resultDto.setInvAim(StringUtil.isEmpty(avaBond.getInvAim()) ? "999999" : avaBond.getInvAim());
 
+                        resultDto.setIsExistNew(DictCodeList.是否_是.getValue());
+
                         if (avaPrin.compareTo(BigDecimal.ZERO) > 0) {
                             lstPtlSecPositionFlowDto.add(resultDto);
                             if (StringUtil.isNotEmpty(input.getActPortfolioId()) && !StringUtil.equals(input.getActPortfolioId(), input.getPortfolioId())) {
@@ -1911,6 +1918,8 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
                 resultDto.setTradeId(input.getTradeId());
                 // 投资目的 = 按“摊余成本类-公允价值变动计入其他综合收益-公允价值变动计入当期损益”的顺序依次冻结，削减对应投资目的债券可用持仓
                 resultDto.setInvAim("999999");
+
+                resultDto.setIsExistNew(DictCodeList.是否_是.getValue());
                 lstPtlSecPositionFlowDto.add(resultDto);
                 if (StringUtil.isNotEmpty(input.getActPortfolioId()) && !StringUtil.equals(input.getActPortfolioId(), input.getPortfolioId())) {
                     PtlSecPositionFlowDto subResultDto = new PtlSecPositionFlowDto();
@@ -1966,6 +1975,8 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
                     // 投资目的
                     resultDto.setInvAim(ptlSecPositionFlow.getInvAim());
 
+                    resultDto.setIsExistNew(DictCodeList.是否_是.getValue());
+
                     lstPtlSecPositionFlowDto.add(resultDto);
                 }
             }
@@ -2018,6 +2029,7 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
                             // 投资目的 = 按“摊余成本类-公允价值变动计入其他综合收益-公允价值变动计入当期损益”的顺序依次冻结，削减对应投资目的债券可用持仓
                             resultDto.setInvAim(StringUtil.isEmpty(avaBond.getInvAim()) ? "999999" : avaBond.getInvAim());
 
+                            resultDto.setIsExistNew(DictCodeList.是否_是.getValue());
                             if (avaPrin.compareTo(BigDecimal.ZERO) > 0) {
                                 if (StringUtil.isNotEmpty(input.getActPortfolioId()) && !StringUtil.equals(input.getActPortfolioId(), input.getPortfolioId())) {
                                     PtlSecPositionFlowDto subResultDto = new PtlSecPositionFlowDto();
@@ -2081,6 +2093,8 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
         resultDto.setFinprodId(input.getFinprodId());
         // 分支序号
         resultDto.setBranch(0L);
+
+        resultDto.setIsExistNew(DictCodeList.是否_是.getValue());
         // 持仓类型
         if (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_债券借贷融入.getValue(), input.getFinprodType2())) {
             resultDto.setHodingType(DictCodeListExt1.持仓类型_融入.getValue());
