@@ -10,6 +10,8 @@ import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
 import com.joyintech.tams.invest.common.trade.dao.TrdCommonBaseMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -748,6 +750,14 @@ public class InvestDealRevokeService {
 
     public List<EtrSecPositionFlowDto> getEtrSecPositionFlowsByTradeIds(List<String> tradeIds){
         return investDealRevokeMapper.getEtrSecPositionFlowsByTradeIds(tradeIds);
+    }
+
+    public List<PtlCashPositionFlowDto> getPtlCashPositionFlowsByOrderIds(List<String> tradeIds){
+        return investDealRevokeMapper.getPtlCashPositionFlowsByOrderIds(tradeIds);
+    }
+
+    public List<EtrCashPositionFlowDto> getEtrCashPositionFlowsByOrderIds(List<String> tradeIds){
+        return investDealRevokeMapper.getEtrCashPositionFlowsByOrderIds(tradeIds);
     }
 
     public void deleteZyTrdStasecFlows(List<String> tradeIds){

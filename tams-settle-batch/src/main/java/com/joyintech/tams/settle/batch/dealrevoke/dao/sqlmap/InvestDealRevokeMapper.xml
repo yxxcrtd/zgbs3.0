@@ -906,6 +906,34 @@ FROM TRD_PRODUCT_DEAL A
         </where>
     </select>
 
+    <select id="getPtlCashPositionFlowsByOrderIds" resultType="com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto">
+        SELECT
+        <include refid="com.joyintech.tams.common.base.dao.PtlCashPositionFlowMapper.Base_Column_List"/>
+        FROM
+            PTL_CASH_POSITION_FLOW
+        <where>
+            <if test="orderIds != null and orderIds.size() > 0">
+                <foreach collection="orderIds" item="item" open="ORDER_ID IN (" close=")" separator=",">
+                    #{item,jdbcType=VARCHAR}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="getEtrCashPositionFlowsByOrderIds" resultType="com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto">
+        SELECT
+        <include refid="com.joyintech.tams.common.base.dao.EtrCashPositionFlowMapper.Base_Column_List"/>
+        FROM
+            ETR_CASH_POSITION_FLOW
+        <where>
+            <if test="orderIds != null and orderIds.size() > 0">
+                <foreach collection="orderIds" item="item" open="ORDER_ID IN (" close=")" separator=",">
+                    #{item,jdbcType=VARCHAR}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
     <delete id="deleteZyTrdStasecFlows">
         DELETE FROM
         TRD_STASEC_FLOW
@@ -1134,4 +1162,8 @@ FROM TRD_PRODUCT_DEAL A
             AND brt.IS_WIN = #{IS_WIN_Y}
             AND bo.BID_MODLE = #{BID_MODLE_03}
     </select>
+
+    <delete id="deleteEtrFinishStatus">
+        DELETE FROM ETR_FINISH_STATUS WHERE TRADE_ID = #{tradeId}
+    </delete>
 </mapper>

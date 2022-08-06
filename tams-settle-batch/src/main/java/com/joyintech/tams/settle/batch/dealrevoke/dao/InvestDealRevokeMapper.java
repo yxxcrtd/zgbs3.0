@@ -1,7 +1,10 @@
 package com.joyintech.tams.settle.batch.dealrevoke.dao;
 
+import com.joyintech.tams.business.common.dto.CashPositionFlowDto;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -179,6 +182,10 @@ public interface InvestDealRevokeMapper {
 
     List<EtrSecPositionFlowDto> getEtrSecPositionFlowsByTradeIds(@Param("tradeIds") List<String> tradeIds);
 
+    List<PtlCashPositionFlowDto> getPtlCashPositionFlowsByOrderIds(@Param("orderIds") List<String> orderIds);
+
+    List<EtrCashPositionFlowDto> getEtrCashPositionFlowsByOrderIds(@Param("orderIds") List<String> orderIds);
+
     void deleteZyTrdStasecFlows(@Param("tradeIds") List<String> tradeIds);
 
     void deleteZyTrdStasecFlowDetails(@Param("tradeIds") List<String> tradeIds);
@@ -234,4 +241,11 @@ public interface InvestDealRevokeMapper {
      * @return
      */
     List<TrdProductDeal> getFirstBondNeedRevokeTrdProductDeals(Map<String, Object> param);
+
+    /**
+     * 删除日间委托完成度
+     * @param tradeId 参数
+     * @return
+     */
+    int deleteEtrFinishStatus(String tradeId);
 }

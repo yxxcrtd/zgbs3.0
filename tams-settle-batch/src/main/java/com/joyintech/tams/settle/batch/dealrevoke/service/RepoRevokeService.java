@@ -1,15 +1,25 @@
 package com.joyintech.tams.settle.batch.dealrevoke.service;
 
-import com.joyintech.background.component.common.pack.common.util.StringUtil;
+import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.IDGenerator;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.dao.*;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.settle.batch.datagather.service.StlDataGatherService;
+import com.joyintech.tams.settle.batch.dealrevoke.dao.InvestDealRevokeMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +40,27 @@ public class RepoRevokeService implements BaseRevokeService {
 
     @Autowired
     private StlDataGatherService stlDataGatherService;
+
+    @Autowired
+    private TrdDealTotalAddMapper trdDealTotalAddMapper;
+
+    @Autowired
+    private EtrEntrustAddMapper etrEntrustAddMapper;
+
+    @Autowired
+    private PtlSecPositionFlowMapper ptlSecPositionFlowMapper;
+
+    @Autowired
+    private EtrSecPositionFlowMapper etrSecPositionFlowMapper;
+
+    @Autowired
+    private PtlCashPositionFlowMapper ptlCashPositionFlowMapper;
+
+    @Autowired
+    private EtrCashPositionFlowMapper etrCashPositionFlowMapper;
+
+    @Autowired
+    private InvestDealRevokeMapper investDealRevokeMapper;
 
     /**
      * 回购交易撤销
@@ -55,24 +86,142 @@ public class RepoRevokeService implements BaseRevokeService {
             List<String> totalTradeIdList =  totalTradeIdMap.entrySet().stream()
 //                    .filter(item-> StringUtil.equals(item.getValue(), DictCodeList.交易方向_买入.getValue()))
                     .map(item->item.getKey()).collect(Collectors.toList());
+            // 筛选协议回购特殊处理
+            List<String> totalTradeIdListH01 = new ArrayList<>();
+            List<String> totalTradeIdListOther = new ArrayList<>();
+            for(String totalTradeId : totalTradeIdList){
+                TrdDealTotalAdd trdDealTotalAdd = trdDealTotalAddMapper.selectByPrimaryKey(totalTradeId);
+                if(trdDealTotalAdd != null && StringUtil.isNotEmpty(trdDealTotalAdd.getEntrustId())){
+                    EtrEntrustAdd entrustAdd = etrEntrustAddMapper.selectByPrimaryKey(trdDealTotalAdd.getEntrustId());
+                    if(entrustAdd != null && DictCodeList.回购类型_质押式协议回购.getValue().equals(entrustAdd.getRedoType())){
+                        totalTradeIdListH01.add(totalTradeId);
+                        continue;
+                    }
+                }
+                totalTradeIdListOther.add(totalTradeId);
+            }
+
             Map<String, Object> param = new HashMap<>();
-            param.put("totalTradeIdList", totalTradeIdList);
+            param.put("totalTradeIdList", totalTradeIdListOther);
             param.put("status", DictCodeListExt1.交易流程状态_撤销.getValue());
             param.put("busiType", DictCodeList.共通业务类型_质押式回购交易.getValue());
+            // 处理非协议回购头寸
             stlDataGatherService.excutePosition(param);
+            // 处理协议回购头寸
+            this.excuteH01Position(totalTradeIdListH01);
             investDealRevokeService.revokeDealTotal(totalTradeIdList);
-            List<String> tqzzTotalTradeIdList =  totalTradeIdMap.entrySet().stream()
-                    .filter(item-> StringUtil.equals(item.getValue(), DictCodeListExt3.交易方向_投资端_提前终止.getValue())
-                    || StringUtil.equals(item.getValue(), DictCodeList.交易方向_到期续做.getValue())
-                    || StringUtil.equals(item.getValue(), DictCodeList.交易方向_到期.getValue()))
-                    .map(Map.Entry::getKey).collect(Collectors.toList());
-            if(CollectionUtils.isNotEmpty(tqzzTotalTradeIdList)){
-                investDealRevokeService.deletePtlSecPositionFlow(tqzzTotalTradeIdList);
-                investDealRevokeService.deleteEtrSecPositionFlow(tqzzTotalTradeIdList);
-                investDealRevokeService.deleteEtrCashPositionFlow(tqzzTotalTradeIdList);
-                investDealRevokeService.deletePtlCashPositionFlow(tqzzTotalTradeIdList);
-            }
+//            List<String> tqzzTotalTradeIdList =  totalTradeIdMap.entrySet().stream()
+//                    .filter(item-> StringUtil.equals(item.getValue(), DictCodeListExt3.交易方向_投资端_提前终止.getValue())
+//                    || StringUtil.equals(item.getValue(), DictCodeList.交易方向_到期续做.getValue())
+//                    || StringUtil.equals(item.getValue(), DictCodeList.交易方向_到期.getValue()))
+//                    .map(Map.Entry::getKey).collect(Collectors.toList());
+//            if(CollectionUtils.isNotEmpty(tqzzTotalTradeIdList)){
+//                investDealRevokeService.deletePtlSecPositionFlow(tqzzTotalTradeIdList);
+//                investDealRevokeService.deleteEtrSecPositionFlow(tqzzTotalTradeIdList);
+//                investDealRevokeService.deleteEtrCashPositionFlow(tqzzTotalTradeIdList);
+//                investDealRevokeService.deletePtlCashPositionFlow(tqzzTotalTradeIdList);
+//            }
         }
+    }
+
+    /**
+     * 处理协议回购头寸
+     * @param totalTradeIdList
+     */
+    private void excuteH01Position(List<String> totalTradeIdList){
+        if(CollectionUtils.isEmpty(totalTradeIdList)){
+            return;
+        }
+        List<String> tradeIdList = investDealRevokeService.searchTradeIdsByTotalTradeIds(totalTradeIdList);
+        List<PtlSecPositionFlowDto> ptlSecPositionFlows = investDealRevokeService.getPtlSecPositionFlowsByTradeIds(tradeIdList);
+        // 撤销登录反向流水
+        if(CollectionUtils.isNotEmpty(ptlSecPositionFlows)){
+            for(PtlSecPositionFlowDto ptlSecPositionFlow : ptlSecPositionFlows){
+                ptlSecPositionFlow.setSeqno(IDGenerator.generate());
+                ptlSecPositionFlow.setTradeId(ptlSecPositionFlow.getTradeId() + "R");
+                ptlSecPositionFlow.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
+                ptlSecPositionFlow.setAmount(ptlSecPositionFlow.getAmount().negate());
+                ptlSecPositionFlowMapper.insertSelective(ptlSecPositionFlow);
+            }
+
+            //更新余额
+            ptlSecPositionFlows.forEach(item ->{
+                if(null!=item.getAmount()){
+                    item.setAmount(item.getAmount().negate());
+                    PtlSecPosition ptlSecPosition = new PtlSecPosition();
+                    BeanUtil.copyPropertiesIgnoreNull(ptlSecPosition, item);
+                    investDealRevokeMapper.updatePtlSecPosition(ptlSecPosition);
+                }
+            });
+        }
+
+        List<EtrSecPositionFlowDto> etrSecPositionFlows = investDealRevokeService.getEtrSecPositionFlowsByTradeIds(tradeIdList);
+        if(CollectionUtils.isNotEmpty(etrSecPositionFlows)){
+            // 撤销登录反向流水
+            for(EtrSecPositionFlowDto etrSecPositionFlow : etrSecPositionFlows){
+                etrSecPositionFlow.setSeqno(IDGenerator.generate());
+                etrSecPositionFlow.setTradeId(etrSecPositionFlow.getTradeId() + "R");
+                etrSecPositionFlow.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
+                etrSecPositionFlow.setAmount(etrSecPositionFlow.getAmount().negate());
+                etrSecPositionFlowMapper.insertSelective(etrSecPositionFlow);
+            }
+
+            // 更新余额
+            etrSecPositionFlows.forEach(item ->{
+                if(null!=item.getAmount()){
+                    item.setAmount(item.getAmount().negate());
+                    EtrSecPosition etrSecPosition = new EtrSecPosition();
+                    BeanUtil.copyPropertiesIgnoreNull(etrSecPosition, item);
+                    investDealRevokeMapper.updateEtrSecPosition(etrSecPosition);
+                }
+            });
+        }
+
+        List<PtlCashPositionFlowDto> ptlCashPositionFlowDtos = investDealRevokeService.getPtlCashPositionFlowsByOrderIds(tradeIdList);
+        if(CollectionUtils.isNotEmpty(ptlCashPositionFlowDtos)){
+            // 撤销登录反向流水
+            for(PtlCashPositionFlowDto ptlCashPositionFlowDto : ptlCashPositionFlowDtos){
+                ptlCashPositionFlowDto.setSeqno(IDGenerator.generate());
+                ptlCashPositionFlowDto.setOrderId(ptlCashPositionFlowDto.getOrderId() + "R");
+                ptlCashPositionFlowDto.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
+                ptlCashPositionFlowDto.setAmount(ptlCashPositionFlowDto.getAmount().negate());
+                ptlCashPositionFlowMapper.insertSelective(ptlCashPositionFlowDto);
+            }
+            // 更新余额
+            ptlCashPositionFlowDtos.forEach(item ->{
+                if(null!=item.getAmount()){
+                    item.setAmount(item.getAmount().negate());
+                    PtlCashPosition ptlCashPosition = new PtlCashPosition();
+                    BeanUtil.copyPropertiesIgnoreNull(ptlCashPosition, item);
+                    investDealRevokeMapper.updatePtlCashPosition(ptlCashPosition);
+                }
+            });
+        }
+
+        List<EtrCashPositionFlowDto> etrCashPositionFlows = investDealRevokeService.getEtrCashPositionFlowsByOrderIds(tradeIdList);
+        if(CollectionUtils.isNotEmpty(etrCashPositionFlows)){
+            // 撤销登录反向流水
+            for(EtrCashPositionFlowDto etrCashPositionFlow : etrCashPositionFlows){
+                etrCashPositionFlow.setSeqno(IDGenerator.generate());
+                etrCashPositionFlow.setOrderId(etrCashPositionFlow.getOrderId() + "R");
+                etrCashPositionFlow.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
+                etrCashPositionFlow.setAmount(etrCashPositionFlow.getAmount().negate());
+                etrCashPositionFlowMapper.insertSelective(etrCashPositionFlow);
+            }
+            // 更新余额
+            etrCashPositionFlows.forEach(item ->{
+                if(null!=item.getAmount()){
+                    item.setAmount(item.getAmount().negate());
+                    EtrCashPosition etrCashPosition = new EtrCashPosition();
+                    BeanUtil.copyPropertiesIgnoreNull(etrCashPosition, item);
+                    investDealRevokeMapper.updateEtrCashPosition(etrCashPosition);
+                }
+            });
+        }
+        // 删除委托完成度
+        Map<String, Object> param = new HashMap<>();
+        param.put("trdIdList", tradeIdList);
+        investDealRevokeMapper.deleteEtrFinishStatusByTrdId(param);
     }
 
     @Override
