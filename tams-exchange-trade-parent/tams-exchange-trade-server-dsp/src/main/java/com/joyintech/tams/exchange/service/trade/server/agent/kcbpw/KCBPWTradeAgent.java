@@ -344,6 +344,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
             }
             TerminalId terminalId = new TerminalId();
             BeanUtils.copyProperties(entrust, terminalId);
+            terminalId.KeyType = "E";
             onRspEntrust(terminalId);
         } catch (Exception e) {
             logger.error("send entrust error:{},{}", entrust.getId(), e.getMessage(), e);
@@ -428,6 +429,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
 
             TerminalId terminalId = new TerminalId();
             BeanUtils.copyProperties(entrust, terminalId);
+            terminalId.KeyType = "I";
             onRspIntegratedEntrust(terminalId);
         } catch (Exception e) {
             logger.error("send integratedEntrust error:{},{}", entrust.getId(), e.getMessage(), e);

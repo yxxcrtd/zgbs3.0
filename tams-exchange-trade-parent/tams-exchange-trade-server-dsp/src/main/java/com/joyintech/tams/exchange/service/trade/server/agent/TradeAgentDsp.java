@@ -364,7 +364,7 @@ public abstract class TradeAgentDsp implements TradeAgent {
      * 处理成交通知
      */
     public void onRtnTrade(Trade tradeRecord) {
-        if (!Strings.isNullOrEmpty(tradeRecord.KeyType) && !Strings.isNullOrEmpty(tradeRecord.getEntrustId())) {
+        if (Strings.isNullOrEmpty(tradeRecord.KeyType) && !Strings.isNullOrEmpty(tradeRecord.getEntrustId())) {
             tradeRecord.KeyType = tradeRecord.getEntrustId().substring(0, 1).toUpperCase();
         }
         String key = AgentServerUtil.GetTradeCacheKey(tradeRecord.KeyType, tradeRecord.getAccountId(), tradeRecord.getBrokerEntrustId());
@@ -421,7 +421,7 @@ public abstract class TradeAgentDsp implements TradeAgent {
 //    }
     public void onRspCancelEntrust(CancelEntrustBean cancelEntrustBean) {
         if (!Strings.isNullOrEmpty(cancelEntrustBean.getCancelBrokerEntrustId())) {
-            String key = AgentServerUtil.GetTradeCacheKey("E", cancelEntrustBean.getAccountId(), cancelEntrustBean.getBrokerEntrustId());
+            String key = AgentServerUtil.GetTradeCacheKey("E", cancelEntrustBean.getAccountId(), cancelEntrustBean.getCancelBrokerEntrustId());
             tradeHelper.getEntrustMap().put(key, cancelEntrustBean.getCancelId());
         }
         TradeMsgReceiver msgReceiver = msgReceiverManager.getReceiverByEntrustId(cancelEntrustBean.getCancelId());
@@ -436,7 +436,7 @@ public abstract class TradeAgentDsp implements TradeAgent {
 
             //  处理成交回报 在委托回报之前的情况
             if (tradeHelper.getTradeMap().size() > 0) {
-                tradeHelper.handleCancelTradeRspBeforeEntrustRsp(msgReceiver, tradeHelper.getTradeMap(), cancelEntrustBean);
+                tradeHelper.handleCancelTradeRspBeforeEntrustRsp(msgReceiver, tradeHelper.getTradeMap(), cancelEntrustBean, "E");
             }
         } else {
             logger.warn("onRspCancelEntrust terminalId not found receiver: id - brokerEntrustId {} - {}", cancelEntrustBean.getId(), cancelEntrustBean.getBrokerEntrustId());
@@ -470,7 +470,7 @@ public abstract class TradeAgentDsp implements TradeAgent {
 //    }
     public void onRspCancelIntegratedEntrust(CancelEntrustBean cancelEntrustBean) {
         if (!Strings.isNullOrEmpty(cancelEntrustBean.getCancelBrokerEntrustId())) {
-            String key = AgentServerUtil.GetTradeCacheKey("I", cancelEntrustBean.getAccountId(), cancelEntrustBean.getBrokerEntrustId());
+            String key = AgentServerUtil.GetTradeCacheKey("I", cancelEntrustBean.getAccountId(), cancelEntrustBean.getCancelBrokerEntrustId());
             tradeHelper.getEntrustMap().put(key, cancelEntrustBean.getCancelId());
         }
         TradeMsgReceiver msgReceiver = msgReceiverManager.getReceiverByIntegratedEntrustId(cancelEntrustBean.getCancelId());
@@ -484,7 +484,7 @@ public abstract class TradeAgentDsp implements TradeAgent {
             }
             //  处理成交回报 在委托回报之前的情况
             if (tradeHelper.getTradeMap().size() > 0) {
-                tradeHelper.handleCancelTradeRspBeforeEntrustRsp(msgReceiver, tradeHelper.getTradeMap(), cancelEntrustBean);
+                tradeHelper.handleCancelTradeRspBeforeEntrustRsp(msgReceiver, tradeHelper.getTradeMap(), cancelEntrustBean, "I");
             }
         } else {
             logger.warn("onRspCancelIntegratedEntrust terminalId not found receiver: id - brokerEntrustId {} - {}", cancelEntrustBean.getId(), cancelEntrustBean.getBrokerEntrustId());

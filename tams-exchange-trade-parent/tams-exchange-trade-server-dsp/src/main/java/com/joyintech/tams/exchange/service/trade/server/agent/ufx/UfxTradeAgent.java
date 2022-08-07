@@ -263,6 +263,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
 
             TerminalId terminalId = new TerminalId();
             BeanUtils.copyProperties(entrust, terminalId);
+            terminalId.KeyType = "E";
             onRspEntrust(terminalId);
             // endregion
 
@@ -352,6 +353,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
             }
             TerminalId terminalId = new TerminalId();
             BeanUtils.copyProperties(entrust, terminalId);
+            terminalId.KeyType = "I";
             onRspIntegratedEntrust(terminalId);
         } catch (Exception e) {
             logger.error("send integratedEntrust error:{},{}", entrust.getId(), e.getMessage(), e);
@@ -366,43 +368,24 @@ public class UfxTradeAgent extends TradeAgentDsp {
      */
     @Override
     public void cancelEntrust(Entrust entrust, EntrustInterface cancelEntrust) {
-        // 新业务代码场景处理标识；true为新场景代码
-        boolean newFlag = false;
+        CancelEntrustBean cancelEntrustBean = getCancelEntrustBean(entrust, cancelEntrust);
         int functionCode = FunctionCode.REQ_CANCEL_ENTRUST.value;
         // 333017  平台委托--委托撤单
         String entrustProp = "Bidding";
-        ResultBean resultBean;
-        CancelEntrustBean cancelEntrustBean = getCancelEntrustBean(entrust, cancelEntrust);
-
         if (EntrustProp.HS.value.equals(entrust.getEntrustProp()) && Market.SHSE.value.equals(entrust.getMarket())) {
-            newFlag = true;
             // xiazelei 修改于 2022/5/25 16:58  332743  固收债券回售申报撤单
             entrustProp = "BondSellBackSH";
         }
 
         try {
-            if (!newFlag) {
-
-                // region 参数组装
-                Map<String, Object> parameters = Maps.newHashMap();
-                parameters.put("account", entrust.getAccountId());
-                parameters.put("entrust_no", cancelEntrustBean.getBrokerEntrustId());
-                parameters.put("entrust_date", cancelEntrustBean.getTradingDay());
-                // endregion
-
-                TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), functionCode, entrustProp);
-                //= terminalAgentInfoService.selectOne(getTerminalName(), functionCode);
-                agentInfo.setAccountId(entrust.getAccountId());
-                resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
-            } else {
-
-                // region 参数组装
-                // 自定义参数
-                Map<String, Object> customParam = getCustomParam(entrust.getAccountId());
-                // endregion
-                // 332743   固收债券回售申报撤单 柜台只返回 entrust_no一个字段
-                resultBean = triggerCodeAdapter(functionCode, entrustProp, entrust, customParam);
-            }
+            // region 参数组装
+            // 自定义参数
+            Map<String, Object> customParam = getCustomParam(entrust.getAccountId());
+            customParam.put("cancelId", cancelEntrust.getId());
+            customParam.put("entrustDate", cancelEntrustBean.getTradingDay());
+            // endregion
+            // 332743   固收债券回售申报撤单 柜台只返回 entrust_no一个字段
+            ResultBean resultBean = triggerCodeAdapter(functionCode, entrustProp, entrust, customParam);
             Map<String, Object> ds = (Map<String, Object>) resultBean.getData();
 
             // 获取成功标识
@@ -453,13 +436,10 @@ public class UfxTradeAgent extends TradeAgentDsp {
     @Override
     public void cancelIntegratedEntrust(IntegratedEntrust integratedEntrust, IntegratedEntrust cancelEntrust) {
         CancelEntrustBean cancelEntrustBean = getCancelEntrustBean(integratedEntrust, cancelEntrust);
-        // 新业务代码场景处理标识；true为新场景代码
-        boolean newFlag = false;
         // 场景代码
         int functionCode = FunctionCode.REQ_CANCEL_INTEGRATED_ENTRUST.value;
         // 场景属性
         String entrustProp = null;
-        ResultBean resultBean;
         if (IntegratedEntrustUtils.isBulk(cancelEntrustBean.getEntrustProp())) {
             //大宗
             entrustProp = "Bulk";
@@ -470,7 +450,6 @@ public class UfxTradeAgent extends TradeAgentDsp {
         } else if (IntegratedEntrustUtils.isRepurchaseSZ(cancelEntrustBean.getEntrustProp(),
                 cancelEntrustBean.getEntrustBs(), cancelEntrustBean.getMarket())) {
             // 332402 债券质押式协议回购_深交所撤回
-            newFlag = true;
             entrustProp = "RepurchaseSZ";
         } else if (IntegratedEntrustUtils.isRepurchaseSH(cancelEntrustBean.getEntrustProp(),
                 cancelEntrustBean.getEntrustBs(), cancelEntrustBean.getMarket())) {
@@ -479,12 +458,10 @@ public class UfxTradeAgent extends TradeAgentDsp {
         } else if (Market.SZSE.value.equals(integratedEntrust.getMarket()) && EntrustProp.SZ_XSCJ_XD.value.equals(integratedEntrust.getEntrustProp())) {
             // xiazelei 修改于 2022/6/24 14:55
             //  332651 深圳债券现券委托撤单-- 332647   深圳-债券现券交易协商委托
-            newFlag = true;
             entrustProp = "BondOrderSZ";
         } else if (Market.SZSE.value.equals(integratedEntrust.getMarket()) && EntrustProp.SZ_XSCJ_JS.value.equals(integratedEntrust.getEntrustProp())) {
             // xiazelei 修改于 2022/6/24 14:55
             // 332651  深圳债券现券委托撤单--  332648   深圳-债券现券交易协商确认委托
-            newFlag = true;
             entrustProp = "BondAgreeSZ";
         }
 
@@ -497,23 +474,13 @@ public class UfxTradeAgent extends TradeAgentDsp {
         }
 
         try {
-            if (!newFlag) {
-                String accountId = integratedEntrust.getAccountId();
-                Map<String, Object> parameters = Maps.newHashMap();
-                parameters.put("account", accountId);
-                parameters.put("entrust_no", cancelEntrustBean.getBrokerEntrustId());
-
-                TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), functionCode, entrustProp);
-                agentInfo.setAccountId(accountId);
-                resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
-            } else {
-                // region 参数组装
-                // 自定义参数
-                Map<String, Object> customParam = getCustomParam(integratedEntrust.getAccountId());
-                // endregion
-                // 332651	 深圳债券现券委托撤单 柜台只返回 entrust_no一个字段
-                resultBean = triggerCodeAdapter(functionCode, entrustProp, integratedEntrust, customParam);
-            }
+            // region 参数组装
+            // 自定义参数
+            Map<String, Object> customParam = getCustomParam(integratedEntrust.getAccountId());
+            customParam.put("cancelId", cancelEntrust.getId());
+            // endregion
+            // 332651	 深圳债券现券委托撤单 柜台只返回 entrust_no一个字段
+            ResultBean resultBean = triggerCodeAdapter(functionCode, entrustProp, integratedEntrust, customParam);
 
             Map<String, Object> ds = (Map<String, Object>) resultBean.getData();
 

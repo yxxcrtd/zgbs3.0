@@ -445,7 +445,7 @@ public class TradeHelper {
 
     //  处理成交回报 在委托回报之前的情况
     public void handleTradeRspBeforeEntrustRsp(TradeMsgReceiver msgReceiver, Map<String, List<Trade>> tradeMap, TerminalId terminalId) {
-        String key = terminalId.getAccountId() + "_" + terminalId.getBrokerEntrustId();
+        String key = AgentServerUtil.GetTradeCacheKey(terminalId.KeyType, terminalId.getAccountId(), terminalId.getBrokerEntrustId());
         List<Trade> tradeList = tradeMap.get(key);
         if (Objects.nonNull(tradeList) && !tradeList.isEmpty()) {
             logger.info("process account trade cache accountId_brokerEntrustId: {}", key);
@@ -473,8 +473,9 @@ public class TradeHelper {
     }
 
     //  处理成交回报 在委托回报之前的情况
-    public void handleCancelTradeRspBeforeEntrustRsp(TradeMsgReceiver msgReceiver, Map<String, List<Trade>> tradeMap, CancelEntrustBean cancelEntrustBean) {
-        String key = cancelEntrustBean.getAccountId() + "_" + cancelEntrustBean.getCancelBrokerEntrustId();
+    public void handleCancelTradeRspBeforeEntrustRsp(TradeMsgReceiver msgReceiver, Map<String, List<Trade>> tradeMap, CancelEntrustBean cancelEntrustBean,String keyType) {
+        //String key = cancelEntrustBean.getAccountId() + "_" + cancelEntrustBean.getCancelBrokerEntrustId();
+        String key = AgentServerUtil.GetTradeCacheKey(keyType, cancelEntrustBean.getAccountId(), cancelEntrustBean.getCancelBrokerEntrustId());
         List<Trade> tradeList = tradeMap.get(key);
         if (Objects.nonNull(tradeList) && !tradeList.isEmpty()) {
             logger.info("process account trade cache accountId_cancelBrokerEntrustId: {}", key);
