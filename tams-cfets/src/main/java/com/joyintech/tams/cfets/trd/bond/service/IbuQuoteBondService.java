@@ -1018,12 +1018,12 @@ public class IbuQuoteBondService extends BaseService {
         List<CfetsBondDealEntrustOrderDto> entrustDtos = cfetsIbuQuoteBondMapper.listEntrust(param);
         if(entrustDtos != null && entrustDtos.size()>0){
             List<CfetsEtribBondInfo003Dto> dtolist = new ArrayList<>();
-            for(CfetsBondDealEntrustOrderDto  item : entrustDtos){
+            for(CfetsBondDealEntrustOrderDto  item : entrustDtos) {
                 // 委托指令查询
                 EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(item.getEntrustId());
                 // 更改委托状态
                 etrEntrust.setEntrustStatus(com.joyintech.tams.constant.DictCodeList.委托状态_已完成.getValue());
-                etrEntrust.setRemark(StringUtil.join(etrEntrust.getRemark(),(String)param.get("remark")));
+                etrEntrust.setRemark(StringUtil.join(etrEntrust.getRemark(), (String) param.get("remark")));
                 // 修改委托指令表中值
                 int flag = etrEntrustMapper.updateByPrimaryKeySelective(etrEntrust);
                 // 修改委托指令分发表中值 add by yangwenjun 20201209
@@ -1032,18 +1032,25 @@ public class IbuQuoteBondService extends BaseService {
                 EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(item.getEntrustId());
                 //获取已完成额度
                 Map<String, Object> params = new HashMap<>();
-                params.put("sumTradeFlag","01");
-                params.put("portfolioId",etrEntrust.getPortfolioId());
-                params.put("entrustId",etrEntrust.getEntrustId());
+                params.put("sumTradeFlag", "02");
+                params.put("portfolioId", etrEntrust.getPortfolioId());
+                params.put("entrustId", etrEntrust.getEntrustId());
                 params.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
                 params.put("YES_OR_NO_N", com.joyintech.tams.constant.DictCodeList.是否_否.getValue());
                 params.put("PS_T01", com.joyintech.tams.constant.DictCodeList.交易方向_买入.getValue());
                 BigDecimal finshAmt = cfetsIbuQuoteRepoMapper.selectFinshAmt(params);
                 BigDecimal entrustAmt = etrEntrust.getEntrustNum() != null ? etrEntrust.getEntrustNum() : etrEntrust.getEntrustAmt();
+                BigDecimal forcedFinishAmt = ArithmeticUtil.subtract(entrustAmt, finshAmt);
                 etrEntrustAdd.setForcedFinishAmt(ArithmeticUtil.subtract(entrustAmt, finshAmt));
                 etrEntrustAddMapper.updateByPrimaryKeySelective(etrEntrustAdd);
                 CfetsEtribBondInfo003Dto etrInvestBondInfoDto = new CfetsEtribBondInfo003Dto();
-                BeanUtil.copyPropertiesIgnoreNull(etrInvestBondInfoDto,item);
+                BeanUtil.copyPropertiesIgnoreNull(etrInvestBondInfoDto, item);
+                if (StringUtil.equals(etrEntrust.getPs(), com.joyintech.tams.constant.DictCodeList.交易方向_买入.getValue())) {
+                    // 委托数量*全价 = 委托金额
+                    forcedFinishAmt = ArithmeticUtil.round(ArithmeticUtil.multiply(forcedFinishAmt,
+                            etrEntrustAdd.getFullPrice()), 2, RoundingMode.HALF_UP);
+                }
+                etrInvestBondInfoDto.setForcedFinishAmt(ArithmeticUtil.subtract(entrustAmt, finshAmt));
                 dtolist.add(etrInvestBondInfoDto);
             }
             List<String> entrustIdList = dtolist.stream().map(
@@ -1070,9 +1077,10 @@ public class IbuQuoteBondService extends BaseService {
             // 完整包名不要变更,否则值不同
             if (StringUtil.equals(com.joyintech.tams.constant.DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))){
                 //插入旧头寸
-                dtolist.forEach(item ->{
-                    baseEtrCashPositionCommService.entrustCloseExecute(item.getEntrustId(), com.joyintech.tams.constant.DictCodeList.是否_是.getValue());
-                });
+                dtolist.forEach(item ->
+                        baseEtrCashPositionCommService.entrustCloseExecute(item.getEntrustId(),
+                                com.joyintech.tams.constant.DictCodeList.是否_是.getValue(), item.getForcedFinishAmt(), null)
+                );
             }
 
             //发送头寸，批量关闭
@@ -1111,7 +1119,6 @@ public class IbuQuoteBondService extends BaseService {
                 }
                 if(null!=item.getTradeFinishPercent()&&item.getTradeFinishPercent().compareTo(BigDecimal.ZERO)==0){
                     errorList.add(new ValidMessage("只可对成交进度>0的已接收未完成指令进行强制完成操作!"));
-                    return;
                 }
             });
         }
