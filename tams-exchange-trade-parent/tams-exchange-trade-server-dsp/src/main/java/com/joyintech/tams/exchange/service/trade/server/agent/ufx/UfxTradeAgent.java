@@ -158,7 +158,8 @@ public class UfxTradeAgent extends TradeAgentDsp {
         Map<String, String> parameters = Maps.newHashMap();
         parameters.put("account", accountId);
         parameters.put("password_type", "2");
-        parameters.put("position_str", positionStr);
+        //parameters.put("position_str", positionStr);
+        parameters.put("position_str", "");
         parameters.put("request_num", String.valueOf(requestNum));
         // '1'-逆序　'0'-正序
         parameters.put("query_direction", "0");
@@ -1234,8 +1235,10 @@ public class UfxTradeAgent extends TradeAgentDsp {
         parameters.put("password_type", "2");
         parameters.put("password", getAccount(accountId).getTradePwd());
         if (!Objects.isNull(positionStr) && !Objects.isNull(positionStr.getTradePositionStr())) {
-            parameters.put("position_str", positionStr.getTradePositionStr());
+            // parameters.put("position_str", positionStr.getTradePositionStr());
         }
+        // 国海证券 position_str 与广发证券的逻辑不同有问题。暂时先注释
+        parameters.put("position_str", "");
         parameters.put("query_direction", "0");
         parameters.put("request_num", "1000");
         parameters.put("query_type", "0");

@@ -118,7 +118,7 @@ public class TradeAgentTerminal extends Agent implements TradeAgent, IAgentMsgHa
 
     @Override
     protected Object getResponseObjectFromMessage(ProtocolMessage message) throws Exception {
-    	logger.debug("TradeAgentTerminal getResponseObjectFromMessage: functionCode={}，requestId={}，message{}", message.getFc(), message.getReqId(), JsonUtils.getJsonFromObject(message));
+        logger.debug("TradeAgentTerminal getResponseObjectFromMessage: functionCode={}，requestId={}，message{}", message.getFc(), message.getReqId(), JsonUtils.getJsonFromObject(message));
         if (message.getFc() == FunctionCode.NOTIFY_ENTRUST.value) {
             return JsonUtils.getObjectFromJson(message.getBody(), Entrust.class);
         } else if (message.getFc() == FunctionCode.NOTIFY_TRADE.value) {
@@ -406,7 +406,7 @@ public class TradeAgentTerminal extends Agent implements TradeAgent, IAgentMsgHa
                 JsonUtils.getJsonFromObject(tradeRecord));
         String key = tradeRecord.getAccountId() + "_" + tradeRecord.getBrokerEntrustId();
         String entrustId = tradeHelper.getEntrustMap().get(key);
-        logger.info("onRtnTrade()，委托编号：{}",  entrustId);
+        logger.info("onRtnTrade()，委托编号：{}", entrustId);
         if (!Strings.isNullOrEmpty(entrustId)) {
             TradeMsgReceiver msgReceiver = msgReceiverManager.getTradeReceiverByEntrustId(entrustId);
             if (Objects.nonNull(msgReceiver)) {
@@ -498,7 +498,7 @@ public class TradeAgentTerminal extends Agent implements TradeAgent, IAgentMsgHa
 
             //  处理成交回报 在委托回报之前的情况
             if (tradeHelper.getTradeMap().size() > 0) {
-                tradeHelper.handleCancelTradeRspBeforeEntrustRsp(msgReceiver, tradeHelper.getTradeMap(), cancelEntrustBean);
+                tradeHelper.handleCancelTradeRspBeforeEntrustRsp(msgReceiver, tradeHelper.getTradeMap(), cancelEntrustBean, "I");
             }
         } else {
             logger.warn("onRspCancelEntrust terminalId not found receiver: id - brokerEntrustId {} - {}", cancelEntrustBean.getId(), cancelEntrustBean.getBrokerEntrustId());
@@ -522,7 +522,7 @@ public class TradeAgentTerminal extends Agent implements TradeAgent, IAgentMsgHa
             }
             //  处理成交回报 在委托回报之前的情况
             if (tradeHelper.getTradeMap().size() > 0) {
-                tradeHelper.handleCancelTradeRspBeforeEntrustRsp(msgReceiver, tradeHelper.getTradeMap(), cancelEntrustBean);
+                tradeHelper.handleCancelTradeRspBeforeEntrustRsp(msgReceiver, tradeHelper.getTradeMap(), cancelEntrustBean,"E");
             }
         } else {
             logger.warn("onRspCancelIntegratedEntrust terminalId not found receiver: id - brokerEntrustId {} - {}", cancelEntrustBean.getId(), cancelEntrustBean.getBrokerEntrustId());
@@ -597,9 +597,9 @@ public class TradeAgentTerminal extends Agent implements TradeAgent, IAgentMsgHa
         asyncWrite(FunctionCode.REQ_QRY_FUTURES_COMMISSION_RATE, futuresInstrumentCommissionRateQryBean);
     }
 
-	@Override
-	public List<NegotiateQuoteReceiveBean> reqNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean)
-			throws Exception {
-		return (List<NegotiateQuoteReceiveBean>) syncWrite(FunctionCode.REQ_QRY_INTEGRATED_NEGOTIATE_QUOTE_RECEIVE, negotiateQuoteQueryBean);
-	}
+    @Override
+    public List<NegotiateQuoteReceiveBean> reqNegotiateQuoteReceive(NegotiateQuoteQueryBean negotiateQuoteQueryBean)
+            throws Exception {
+        return (List<NegotiateQuoteReceiveBean>) syncWrite(FunctionCode.REQ_QRY_INTEGRATED_NEGOTIATE_QUOTE_RECEIVE, negotiateQuoteQueryBean);
+    }
 }

@@ -315,7 +315,7 @@ public class UfxMsgParseHelper {
 //            }
             if (realStatus != 0 && realStatus != 4) {
                 //  废单 有正常的委托，也有撤销的委托
-                trade.setBrokerTradeId((String) ds.get("entrust_no"));
+                // trade.setBrokerTradeId((String) ds.get("entrust_no"));
                 if (2 == realType) {
                     // 撤单 失败 撤单废单
                     trade.setTradeType(TradeType.CANCEL_INVALID.value);
@@ -325,7 +325,7 @@ public class UfxMsgParseHelper {
                 }
             } else {
                 // 成交 有正常的委托，也有撤销的委托
-                trade.setBrokerTradeId((String) ds.get("business_id"));
+                // trade.setBrokerTradeId((String) ds.get("business_id"));
                 if (2 == realType) {
                     // 撤单成功
                     trade.setTradeType(TradeType.CANCEL.value);
@@ -333,6 +333,14 @@ public class UfxMsgParseHelper {
                     // 普通委托 成功
                     trade.setTradeType(TradeType.NORMAL.value);
                 }
+            }
+            // 排除无效的现券协商成交记录--实时清算记录
+            if (!((String) ds.get("business_id")).equals((String) ds.get("cbp_business_id")))
+                continue;
+
+            trade.setBrokerTradeId((String) ds.get("business_id"));
+            if (Strings.isNullOrEmpty(trade.getBrokerTradeId())) {
+                trade.setBrokerTradeId((String) ds.get("entrust_no"));
             }
             trade.setTradedPrice(BigDecimal.valueOf(Double.parseDouble((String) ds.get("business_price"))));
             trade.setTradedBalance(BigDecimal.valueOf(Double.parseDouble((String) ds.get("business_balance"))));
