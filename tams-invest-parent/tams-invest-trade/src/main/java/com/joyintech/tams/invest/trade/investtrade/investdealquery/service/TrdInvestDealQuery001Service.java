@@ -234,7 +234,7 @@ public class TrdInvestDealQuery001Service extends CommonExportService<TrdInvestD
         pageParam.put("IRSType_01", DictCodeListExt2.互换方式_收取固定.getValue());
         pageParam.put("IRSType_02", DictCodeListExt2.互换方式_收取浮动.getValue());
         //add by wangpeng end
-        //add by wangpeng 201909019 外汇 利率互换 页面查询交易方向为真实交易方向  
+        //add by wangpeng 201909019 外汇 利率互换 页面查询交易方向为真实交易方向
         pageParam.put("finType_F11", DictCodeListExt1.金融产品类型_投管用_即期.getValue());
         pageParam.put("finType_F12", DictCodeListExt1.金融产品类型_投管用_远期.getValue());
         pageParam.put("finType_F13", DictCodeListExt1.金融产品类型_投管用_掉期.getValue());
@@ -357,11 +357,14 @@ public class TrdInvestDealQuery001Service extends CommonExportService<TrdInvestD
                     dto.setfTradeId(null);
                 }
 
-                if (StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())
-                        && Objects.nonNull(dto.getTradeAmt())) {
-                    dto.setTradeAmt(dto.getTradeAmt().multiply(BigDecimal.valueOf(100)));
-                }
-
+                //XYHGFXSJ-957 【实时资产、资金头寸查询】【交易查询】协议回购深交所正回购中途换券-换钱，日终成交匹配后，问题如下：
+                /*
+                 if (StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())
+                 && Objects.nonNull(dto.getTradeAmt())) {
+                 dto.setTradeAmt(dto.getTradeAmt().multiply(BigDecimal.valueOf(100)));
+                 }
+                 */
+                //XYHGFXSJ-957 【实时资产、资金头寸查询】【交易查询】协议回购深交所正回购中途换券-换钱，日终成交匹配后，问题如下：
             }
         }
         return returnList;
