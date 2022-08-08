@@ -975,11 +975,21 @@
             select case when #{sumTradeFlag} = '01' then nvl(deal.trade_amt,0) else nvl(deal.share_amt,0) end as finishAmt
                 from trd_product_deal deal
                 inner join trd_product_deal_add ad on deal.trade_id = ad.trade_id
+                <if test="settleStatus!=null and settleStatus!=''">
+                    left join TRD_BANK_MANUAL_SETTLE_INFO tbmsi on tbmsi.TRADE_ID = deal.TOTLE_TRADE_ID
+                </if>
             where ad.entrust_id = #{entrustId}
                 and ad.portfolio_id = #{portfolioId}
                 and deal.trade_status = #{TRADE_STATUS_01}
                 and deal.is_cancel = #{YES_OR_NO_N}
+                <if test="settleStatus!=null and settleStatus!=''">
+                    and ( tbmsi.SETTLE_STATUS is null or tbmsi.SETTLE_STATUS = #{settleStatus} )
+                </if>
         )
+    </select>
+
+    <select id="getEtrStatus" resultType="java.lang.String">
+        select ENTRUST_STATUS from ETR_ENTRUST where ENTRUST_ID = #{entrustId}
     </select>
 
     <select id="selectSumShareAmt"  resultType="java.math.BigDecimal">
