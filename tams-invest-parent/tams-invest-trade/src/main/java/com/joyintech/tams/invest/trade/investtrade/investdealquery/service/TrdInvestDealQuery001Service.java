@@ -358,12 +358,10 @@ public class TrdInvestDealQuery001Service extends CommonExportService<TrdInvestD
                 }
 
                 //XYHGFXSJ-957 【实时资产、资金头寸查询】【交易查询】协议回购深交所正回购中途换券-换钱，日终成交匹配后，问题如下：
-                /*
-                 if (StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())
-                 && Objects.nonNull(dto.getTradeAmt())) {
-                 dto.setTradeAmt(dto.getTradeAmt().multiply(BigDecimal.valueOf(100)));
-                 }
-                 */
+                if (StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())
+                        && Objects.nonNull(dto.getTradeAmt()) && !StringUtil.equals(dto.getEntrustType(), DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令_换钱.getValue())) {
+                    dto.setTradeAmt(dto.getTradeAmt().multiply(BigDecimal.valueOf(100)));
+                }
                 //XYHGFXSJ-957 【实时资产、资金头寸查询】【交易查询】协议回购深交所正回购中途换券-换钱，日终成交匹配后，问题如下：
             }
         }
