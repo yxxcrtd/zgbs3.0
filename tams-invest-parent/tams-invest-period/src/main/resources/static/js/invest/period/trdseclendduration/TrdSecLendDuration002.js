@@ -116,7 +116,13 @@
             window.BussTrdTransferOrder['bussTrdTransferOrder'].setStlCommandInput(function () {
                 var deal = JSON.parse(dealString);
                 deal.tradeAmt = $("#tradeAmt").val();//即借贷费用 + 现金交割金额
-                deal.settleDate = $("#mdate").val();
+                /*modify by jiangpeng on 20210420 start BS-1593 【债券借贷交易存续期】：缺少资金到账日*/
+                var settleDate = $("#settleDate").val();
+                if (settleDate === null || settleDate === '') {
+                    return Joyin.error("请输入资金到账日。");
+                }
+                deal.settleDate = settleDate;
+                /*modify by jiangpeng on 20210420 end BS-1593 【债券借贷交易存续期】：缺少资金到账日*/
                 return {
                     'isTotalTrade': YES_OR_NO_Y
                     , 'bankLendingType': $("#mDeliveryType").val()
