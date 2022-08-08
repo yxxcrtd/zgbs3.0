@@ -3,6 +3,7 @@ package com.joyintech.service.entrust.etrcommanddispatcher.service;
 import com.alibaba.fastjson.JSON;
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.service.entrust.etrcommanddispatcher.dao.EtrCommandDispatcherMapper;
 import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrCommandDispatcherDto;
 import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrCommandDispatcherTotalDto;
@@ -107,7 +108,10 @@ public class EtrCommandDispatcherService extends BaseService<EtrCommandDispatche
 			dto.setPageCount(1);
 			//放弃使用mq推送消息,采用接口调用
 			//messageSenderService.pushCommandMsgToMQ(dto);
-			sendMessageByInf(dto);
+			String msg = sendMessageByInf(dto);
+			if(StringUtil.isNotEmpty(msg)){
+				throw new BusinessException("指令分发错误：" + msg);
+			}
 		}
      }
 
