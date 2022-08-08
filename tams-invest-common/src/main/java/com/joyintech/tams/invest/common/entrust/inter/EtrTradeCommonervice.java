@@ -883,12 +883,18 @@ public class EtrTradeCommonervice extends BaseService {
         if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())) {
             holdingType = DictCodeListExt3.资产类型_场内信用保护凭证可用持仓.getValue();
         }
-        if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+        if (!StringUtil.equals(dto.getTradePlat(), TempConstant.AGR_EREP_ETR) && (
+                dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
                 || dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())
-                || dto.getFinprodType2().equals("ZYSHG")) {
+                || dto.getFinprodType2().equals("ZYSHG"))) {
             dto.setFinprodId("XN_PRODID999");
             holdingType = DictCodeListExt3.资产类型_通用回购融资券可用持仓.getValue();
         }
+
+        if (StringUtil.equals(dto.getTradePlat(), TempConstant.AGR_EREP_ETR)) {
+            holdingType = DictCodeListExt3.资产类型_质押式协议回购本方券非净额结算可用持仓.getValue();
+        }
+
         dto.setHoldingType(holdingType);
 
     }
@@ -896,9 +902,9 @@ public class EtrTradeCommonervice extends BaseService {
     //持仓数量类型
     public void handleUableSecType(PositionCashSecDto dto) {
         String holdingType = DictCodeListExt3.资产类型_资产账户持仓.getValue();
-        if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+        if ((dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
                 || dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())
-                || dto.getFinprodType2().equals("ZYSHG")) {
+                || dto.getFinprodType2().equals("ZYSHG")) && !StringUtil.equals(dto.getTradePlat(), TempConstant.AGR_EREP_ETR)) {
             holdingType = DictCodeListExt3.资产类型_通用回购融资券折算后额度.getValue();
             dto.setFinprodId("XN_PRODID999");
         }
