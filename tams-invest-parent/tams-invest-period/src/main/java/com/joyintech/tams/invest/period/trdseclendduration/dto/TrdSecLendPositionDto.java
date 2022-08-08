@@ -41,6 +41,8 @@ public class TrdSecLendPositionDto {
 
     private String userId;//当前用户
 
+    private String isOutCash;//是否融入债券付息还本（付）
+
     private List<TrdSecLendCashPositionDto> ptlCashList; //组合数据集
 
     private List<TrdSecLendSecPositionDto> ptlTargetList; //标的券数据集
@@ -191,6 +193,14 @@ public class TrdSecLendPositionDto {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getIsOutCash() {
+        return isOutCash;
+    }
+
+    public void setIsOutCash(String isOutCash) {
+        this.isOutCash = isOutCash;
     }
 
     public List<TrdSecLendCashPositionDto> getPtlCashList() {

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.joyintech.framework.ajax.MessageType;
+import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
@@ -16,6 +17,7 @@ import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.dto.common.InvestInterfCommDto;
 import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
@@ -97,6 +99,9 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
      */
     @Autowired
     private AutoPeriodSeclendCommonService autoPeriodSeclendCommonService;
+
+    @Autowired
+    private MstWorkflowCommonServiceMapperImpl mstWorkflowCommonServiceMapperImpl;
 
 
     @Autowired(required=false)
@@ -504,6 +509,13 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
 
         restTemplate.postForObject(ServiceApplication.PERIOD_SERVICE_NAME + "/TrdSecLendDuration/doDelete", trdCommonDeleteDto,
             String.class);
+
+        ProcessMark processMark = mstWorkflowCommonServiceMapperImpl.getBusinessInfo(workflowId);
+        if (StringUtil.isNotEmpty(processMark)
+                && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
+            //发送头寸
+            PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt4.头寸业务类型_银行间债券借贷首期.getValue(),entity.getPs());
+        }
     }
 
     public Page<RepoInfo> findRepoInfo() {
