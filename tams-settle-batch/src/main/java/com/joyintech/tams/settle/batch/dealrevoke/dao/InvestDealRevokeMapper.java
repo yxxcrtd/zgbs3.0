@@ -242,10 +242,4 @@ public interface InvestDealRevokeMapper {
      */
     List<TrdProductDeal> getFirstBondNeedRevokeTrdProductDeals(Map<String, Object> param);
 
-    /**
-     * 删除日间委托完成度
-     * @param tradeId 参数
-     * @return
-     */
-    int deleteEtrFinishStatus(String tradeId);
 }
