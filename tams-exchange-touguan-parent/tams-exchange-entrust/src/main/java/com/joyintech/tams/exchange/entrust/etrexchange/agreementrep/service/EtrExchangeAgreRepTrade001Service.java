@@ -185,6 +185,9 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
     @Autowired
     private EtrPledgeMapper etrPledgeMapper;
 
+    @Autowired
+    private TrdProductDealMapper trdProductDealMapper;
+
     /**
      * 对手方交易员联想文本框初始化。
      *
@@ -2879,6 +2882,15 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
             }
         }
+
+        //【实时资产头寸查询】深交所正回购解除质押，已撤回指令修改提交，没有对质押式回购指令可用持仓 处理
+        if (DictCodeListExt3.交易方向_解除质押.getValue().equals(dto.getPs())) {
+            TrdProductDeal trdProductDeal = trdProductDealMapper.selectByPrimaryKey(dto.getFinprodId());
+            if (null != trdProductDeal) {
+                dto.setTradeAmt(trdProductDeal.getTradeAmt());
+            }
+        }
+        //【实时资产头寸查询】深交所正回购解除质押，已撤回指令修改提交，没有对质押式回购指令可用持仓 处理
         return dto;
     }
 

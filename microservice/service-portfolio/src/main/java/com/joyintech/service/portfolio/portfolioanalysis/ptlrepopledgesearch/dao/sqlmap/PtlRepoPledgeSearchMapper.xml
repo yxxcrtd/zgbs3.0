@@ -91,6 +91,7 @@ FROM
 		LEFT JOIN MST_CUSTOMER_INFO_ADD E ON E.CUSTOMER_ID = D.ISSUER
 		LEFT JOIN FIN_PRODUCT_ADD F ON A.PLEDGE_FINPROD_ID = F.FINPROD_ID
 		LEFT JOIN TRD_PRODUCT_DEAL_ADD G ON G.TRADE_ID = B.TRADE_ID
+		left join ETR_ENTRUST_ADD K ON G.ENTRUST_ID = K.ENTRUST_ID
 		LEFT JOIN FIN_PRODUCT_ADD fpa ON G.PORTFOLIO_ID=fpa.PORTFOLIO_ID
 		/*修改关联条件 2019/3/6 start*/
 		LEFT JOIN FIN_TRADE_PRODUCT H ON A.FINPROD_ID = H.FINPROD_ID
@@ -102,7 +103,7 @@ FROM
 		AND B.TRADE_STATUS='01'AND B.IS_CANCEL='N'
 		and F.IS_SEC_BOND = 'N'
 		AND J.BACK_LEND_DIRECTION=#{BACK_LEND_DIRECTION_03}
-
+		and ((G.ENTRUST_ID is not null and K.ASSET_TYPE1 != 'H01') or G.ENTRUST_ID is null)
 		<if test="sysDate != null and sysDate != ''">
 			AND (H.VDATE &lt;= TO_DATE(#{sysDate},'YYYY-MM-DD'))
 			         <!--AND TO_DATE(#{sysDate},'YYYY-MM-DD') &lt;= H.MDATE)-->
@@ -207,6 +208,7 @@ FROM
 		LEFT JOIN MST_CUSTOMER_INFO_ADD E ON E.CUSTOMER_ID = D.ISSUER
 		LEFT JOIN FIN_PRODUCT_ADD F ON A.PLEDGE_FINPROD_ID = F.FINPROD_ID
 		LEFT JOIN TRD_PRODUCT_DEAL_ADD G ON G.TRADE_ID = B.TRADE_ID
+		left join ETR_ENTRUST_ADD K ON G.ENTRUST_ID = K.ENTRUST_ID
 		LEFT JOIN FIN_PRODUCT_ADD fpa ON G.PORTFOLIO_ID=fpa.PORTFOLIO_ID
 		/*修改关联条件 2019/3/6 start*/
 		LEFT JOIN FIN_TRADE_PRODUCT H ON A.FINPROD_ID = H.FINPROD_ID
@@ -215,7 +217,7 @@ FROM
 		WHERE
 		1 = 1
 		AND B.TRADE_STATUS='01'AND B.IS_CANCEL='N' and F.IS_SEC_BOND = 'Y' AND J.BACK_LEND_DIRECTION=#{BACK_LEND_DIRECTION_03}
-
+		and ((G.ENTRUST_ID is not null and K.ASSET_TYPE1 != 'H01') or G.ENTRUST_ID is null)
 		<if test="sysDate != null and sysDate != ''">
 			AND (H.VDATE &lt;= TO_DATE(#{sysDate},'YYYY-MM-DD'))
 			         <!-- AND TO_DATE(#{sysDate},'YYYY-MM-DD') &lt;= H.MDATE) -->
@@ -316,6 +318,7 @@ FROM
 		LEFT JOIN MST_CUSTOMER_INFO_ADD E ON E.CUSTOMER_ID = D.ISSUER
 		LEFT JOIN FIN_PRODUCT_ADD F ON A.PLEDGE_FINPROD_ID = F.FINPROD_ID
 		LEFT JOIN TRD_PRODUCT_DEAL_ADD G ON G.TRADE_ID = B.TRADE_ID
+		left join ETR_ENTRUST_ADD K ON G.ENTRUST_ID = K.ENTRUST_ID
 		LEFT JOIN FIN_PRODUCT_ADD fpa ON G.PORTFOLIO_ID=fpa.PORTFOLIO_ID
 		/*修改关联条件 2019/3/6 start*/
 		LEFT JOIN FIN_TRADE_PRODUCT H ON A.FINPROD_ID = H.FINPROD_ID
@@ -324,7 +327,7 @@ FROM
 		WHERE
 		1 = 1
 		AND B.TRADE_STATUS='01'AND B.IS_CANCEL='N' AND J.BACK_LEND_DIRECTION in (#{BACK_LEND_DIRECTION_05},#{BACK_LEND_DIRECTION_06})
-
+		and ((G.ENTRUST_ID is not null and K.ASSET_TYPE1 != 'H01') or G.ENTRUST_ID is null)
 		<if test="sysDate != null and sysDate != ''">
 			AND (H.VDATE &lt;= TO_DATE(#{sysDate},'YYYY-MM-DD') AND TO_DATE(#{sysDate},'YYYY-MM-DD') &lt;= H.MDATE)
 		</if>
@@ -370,6 +373,120 @@ FROM
 		</if>
 		<!--  add by swwan 【重庆银行】 增加 交易对手  2021年7月22日 end -->
 
+		<!-- add by wsz 将协议回购区分出来 start-->
+		UNION ALL
+		SELECT
+		A.PLEDGE_AMT,
+		(A.PLEDGE_RATIO * 100) pledgeRatio,
+		(A.PLEDGE_FACE_VALUE * A.PLEDGE_NUMBER) pledgeFaceValue,
+		C.TYPE_4,
+		C.TYPE_5,
+		B.finprod_type2,
+		D.FINPROD_MARKET_ID,
+		D.FINPROD_ABBR finprodAbbr,
+		D.REGIST_ORG,
+		decode(E.PARTY_TYPE2,'01','国有企业','02','集体企业','03','民营企业','04','外资企业','05','公众企业','99','其他企业') companyNature,
+		(CASE
+		WHEN F.IS_SEC_BOND = 'Y'
+		THEN '次级债'
+		ELSE null
+		END) isSecBond,
+		G.PORTFOLIO_ID counterId,
+		(H.INT_RATE * 100) intRate,
+		H.TERM,
+		H.VDATE,
+		H.MDATE,
+		/*add by swwan 重庆银行 添加交易对手 2021/7/22 start*/
+		mcp.COUNTER_NAME counter,
+		/*add by swwan 重庆银行 添加交易对手 2021/7/22 end*/
+		(
+		select decode(I.GRADE_RESULT,'01','AAA+','02','AAA','03','AAA-','04','AA+','05','AA','06','AA-','07','A+','08','A','09','A-','10','A-1','11','A-2','12','A-3','13','BBB+','14','BBB','15','BBB-','16','BB+','17','BB','18','BB-','19','B+','20','B','21','B-','22','CCC+','23','CCC','24','CCC-','25','CC+','26','CC','27','CC-','28','C+','29','C','30','C-','31','D','')
+		from MST_BOND_CREDIT_RATING I where I.O_TYPE='01' and I.O_CODE=  D.FINPROD_MARKET_ID and I.GRADE_DATE &lt;= TO_DATE(#{sysDate},'YYYY-MM-DD')
+
+		and I.GRADE_DATE =(
+		select max(a.GRADE_DATE)
+		from MST_BOND_CREDIT_RATING a  where a.O_TYPE='01' and a.O_CODE= I.O_CODE and a.GRADE_DATE &lt;= TO_DATE(#{sysDate},'YYYY-MM-DD')
+
+		)
+		and I.GRADE_RESULT = (
+		select max(GRADE_RESULT)
+		from MST_BOND_CREDIT_RATING  where O_TYPE='01' and O_CODE= I.O_CODE and GRADE_DATE = I.GRADE_DATE
+		)
+
+		) GRADE_RESULT
+		FROM
+		FIN_DEAL_PLEDGE A
+		LEFT JOIN TRD_PRODUCT_DEAL B ON A.FINPROD_ID = B.TRADE_ID
+		LEFT JOIN FIN_PRODUCT_TYPE C ON A.PLEDGE_FINPROD_ID = C.FINPROD_ID
+		LEFT JOIN FIN_PRODUCT D ON A.PLEDGE_FINPROD_ID = D.FINPROD_ID
+		LEFT JOIN MST_CUSTOMER_INFO_ADD E ON E.CUSTOMER_ID = D.ISSUER
+		LEFT JOIN FIN_PRODUCT_ADD F ON A.PLEDGE_FINPROD_ID = F.FINPROD_ID
+		LEFT JOIN TRD_PRODUCT_DEAL_ADD G ON G.TRADE_ID = B.TRADE_ID
+		left join ETR_ENTRUST_ADD K ON G.ENTRUST_ID = K.ENTRUST_ID
+		LEFT JOIN FIN_PRODUCT_ADD fpa ON G.PORTFOLIO_ID=fpa.PORTFOLIO_ID
+		LEFT JOIN FIN_TRADE_PRODUCT H ON A.FINPROD_ID = H.FINPROD_ID
+		LEFT JOIN PA_TRD_PRODUCT_DEAL J ON J.TRADE_ID = B.TRADE_ID
+		LEFT JOIN MST_COUNTER_PARTY mcp on H.COUNTER_ID = mcp.COUNTER_ID
+		LEFT JOIN trd_fin_product_deal_total  L /** 金融产品临时交易1 **/
+		ON H.finprod_id = L.finprod_id
+		AND H.branch = L.branch
+		AND L.ps in ('T54', 'T07', 'T93', 'T56')
+		WHERE
+		1=1
+		AND B.TRADE_STATUS='01'AND B.IS_CANCEL='N'
+		and F.IS_SEC_BOND = 'N'
+		AND J.BACK_LEND_DIRECTION=#{BACK_LEND_DIRECTION_03}
+		AND K.ASSET_TYPE = 'H01'
+		AND G.ENTRUST_ID is not null
+		AND L.totle_trade_id is null
+		<if test="sysDate != null and sysDate != ''">
+			AND (H.VDATE &lt;= TO_DATE(#{sysDate},'YYYY-MM-DD'))
+		</if>
+		AND not exists(
+		select TT.FINPROD_ID from
+		TRD_FIN_PRODUCT_DEAL_TOTAL TT where
+		TT.PS in ('T07','T96','T95','T93')
+		AND TT.FINPROD_ID = H.FINPROD_ID
+		AND TT.TRADE_STATUS = '01'
+		AND TT.IS_CANCEL = 'N'
+		AND TT.TRADE_DATE &lt;= TO_DATE(#{sysDate},'YYYY-MM-DD')
+		)
+		<if test="counterIdList != null and counterIdList.size()>0">
+			<foreach collection="counterIdList" index="index" open="AND (G.PORTFOLIO_ID IN (" item="counterId" separator="," close=")">
+				<if test="(index % 998) == 0">
+					null) OR G.PORTFOLIO_ID IN (
+				</if>
+				#{counterId,jdbcType=VARCHAR}
+			</foreach>)
+		</if>
+		<if test=" prodManager !=null and prodManager.size()>0" >
+			AND (fpa.PROD_MANAGER IN
+			<foreach collection="prodManager" item="item" index="index" open="(" close=")" separator=",">
+				<if test="(index % 998) == 0">
+					null) OR fpa.PROD_MANAGER IN (
+				</if>
+				#{item}
+			</foreach>
+			)
+		</if>
+		<if test="finprodMarketId != null and finprodMarketId !=''">
+			AND A.PLEDGE_FINPROD_ID LIKE CONCAT(CONCAT('%',#{finprodMarketId}),'%')
+		</if>
+		<if test="type4 != null and type4 !=''">
+			AND C.TYPE_4  = #{type4}
+		</if>
+		<if test="type5 != null and type5 !=''">
+			AND C.TYPE_5  = #{type5}
+		</if>
+		<if test="counterList != null and counterList.size()>0">
+			<foreach collection="counterList" index="index" open="AND (H.COUNTER_ID IN (" item="counter" separator="," close=")">
+				<if test="(index % 998) == 0">
+					null) OR H.COUNTER_ID IN (
+				</if>
+				#{counter,jdbcType=VARCHAR}
+			</foreach>)
+		</if>
+		<!-- add by wsz 将协议回购区分出来 end -->
 		union all
 		<!--标准债-->
 
@@ -522,13 +639,14 @@ FROM
 		LEFT JOIN FIN_TRADE_PRODUCT ftp
 		ON ((tpd.TRADE_STATUS = '01' AND ftp.FINPROD_ID = tpd.TRADE_ID))
 		LEFT JOIN FIN_PLEDGE_DISPLACE fpd ON tpd.trade_id=fpd.f_trade_id
+		left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on tfpdt.TOTLE_TRADE_ID = tpd.TOTLE_TRADE_ID
 		LEFT JOIN FIN_PLEDGE_DISPLACE_RESULT fpdr  ON fpd.trade_id=fpdr.trade_id
 		LEFT JOIN PA_TRD_PRODUCT_DEAL ptpd ON ptpd.TRADE_ID = tpd.TRADE_ID
 		LEFT JOIN FIN_DEAL_TARGET fdt on tpd.TRADE_ID = fdt.FINPROD_ID
 		LEFT JOIN FIN_PRODUCT fp ON fp.finprod_id =fdt.pledge_finprod_id
 		WHERE pp.INVEST_YESORNO = 'Y' and fpd.trade_id is not null
 		      <!-- XYHGFXSJ-874 解除质押不展示 -->
-		      and tpd.TG_BUSI_TYPE != 'EX015'
+		      and tfpdt.PS != 'T93'
 		      <!-- XYHGFXSJ-874 解除质押不展示 -->
 		<if test="portfolioIdList != null and portfolioIdList.size()>0">
 			<foreach collection="portfolioIdList" open="AND pp.PORTFOLIO_ID IN (" item="portfolioId" separator="," close=")">
@@ -711,10 +829,16 @@ FROM
 		inner JOIN PTL_PORTFOLIO ON PTL_PORTFOLIO.PORTFOLIO_ID = TRD_PRODUCT_DEAL_ADD.PORTFOLIO_ID
 		LEFT JOIN FIN_DEAL_PLEDGE ON TRD_PRODUCT_DEAL.TRADE_ID = FIN_DEAL_PLEDGE.FINPROD_ID
 		LEFT JOIN FIN_PRODUCT ON FIN_PRODUCT.FINPROD_ID = FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID
+		LEFT JOIN FIN_TRADE_PRODUCT H ON FIN_DEAL_PLEDGE.FINPROD_ID = H.FINPROD_ID /*修改关联条件 2019/3/6 end*/
+		LEFT JOIN trd_fin_product_deal_total  L /** 金融产品临时交易1 **/
+		ON H.finprod_id = L.finprod_id
+		AND H.branch = L.branch
+		AND L.ps in ('T54', 'T07', 'T93', 'T56')
 		WHERE TRD_PRODUCT_DEAL.FINPROD_TYPE2  IN ('F02', 'F04', 'F05')
 		AND TRD_PRODUCT_DEAL.PS                = 'T01'
 		AND TRD_PRODUCT_DEAL.TRADE_STATUS = '01'
 		AND TRD_PRODUCT_DEAL.IS_CANCEL    = 'N'
+		AND L.totle_trade_id is null
 		/*组合代码*/
 		<if test="groupcode != null and groupcode.size() > 0">
 			and TRD_PRODUCT_DEAL_ADD.PORTFOLIO_ID in

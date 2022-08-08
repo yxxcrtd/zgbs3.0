@@ -79,6 +79,16 @@ public class EtrExchangeAgreRepTradeValidator implements EtrCommonValidator {
             }
         }
 
+        //XYHGFXSJ-931 【协议回购指令】深交所正回购中途换券，指令新建面板，若换出债券和换入债券相同，选择审批人后提交，报错。 期望：换出债券和换入债券若相同，应不可提交。
+        if (StringUtil.equals(DictCodeListExt3.交易方向_中途换券.getValue(), dto.getPs())
+                && StringUtil.isNotBlank(dto.getNewRepSecId())
+                && StringUtil.isNotBlank(dto.getOutRepSecId())) {
+            if (StringUtil.equals(dto.getNewRepSecId(), dto.getOutRepSecId())) {
+                errorList.add(new ValidMessage("", "换入债券不能和换出债券相同！"));
+            }
+        }
+        //XYHGFXSJ-931 【协议回购指令】深交所正回购中途换券，指令新建面板，若换出债券和换入债券相同，选择审批人后提交，报错。 期望：换出债券和换入债券若相同，应不可提交。
+
         if (StringUtil.equals(DictCodeListExt3.交易方向_首期.getValue(), dto.getPs())
                 || StringUtil.equals(DictCodeListExt3.交易方向_正回购.getValue(), dto.getPs())
                 || StringUtil.equals(DictCodeListExt3.交易方向_逆回购.getValue(), dto.getPs())

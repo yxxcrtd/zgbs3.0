@@ -22,7 +22,9 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.system.base.entity.SysUser;
 import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.common.base.dao.TrdProductDealMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
+import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
@@ -68,6 +70,9 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
 
     @Autowired
     private EtrExchangeAgreRepTradeMapper etrExchangeAgreRepTradeMapper;
+
+    @Autowired
+    private TrdProductDealMapper trdProductDealMapper;
 
     /**
      * 平台日期
@@ -682,6 +687,14 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
                         .collect(Collectors.joining(",", "", ""));
                 dto.setNextUser(sysUsers);
             }
+            //处理中途换券回购金额 修改时使用 XYHGFXSJ-917
+            if (StringUtil.equals(DictCodeListExt3.交易方向_中途换券.getValue(), dto.getPs())) {
+                TrdProductDeal trdProductDeal = trdProductDealMapper.selectByPrimaryKey(dto.getInitialNum());
+                if (null != trdProductDeal) {
+                    dto.setEntrustAmt(trdProductDeal.getTradeAmt());
+                }
+            }
+            //处理中途换券回购金额 修改时使用 XYHGFXSJ-917
         }
         return page;
     }

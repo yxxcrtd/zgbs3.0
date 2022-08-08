@@ -1442,31 +1442,42 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                 map.put("entrustClass", etrEntrust.getEntrustClass());
                 amount = ArithmeticUtil.subtract(amount, EtrCommonCashPositionDealService.getEtrExchangeFinishAmtMuilt(map));
                 //amount = ArithmeticUtil.subtract(amount, EtrCommonCashPositionDealService.getEtrExchangeFinishAmt(map));
-            }
-            // 交收失败时部分回冲
-            if (StringUtil.equals(entrustCommonDto.getIsSettleFail(), DictCodeListExt1.是否_是.getValue())) {
-                amount = BigDecimal.ZERO;
-                if (entrustCommonDto.isCloseEtr()) {
-                    map.put("sumTradeFlag", "02");
-                    // 指令额度 - 已关闭的额度 - 已成交额度(交易表中有效数据额度汇总) = 未使用额度(含当前交收失败这笔)
-                    amount = ArithmeticUtil.subtract(ArithmeticUtil.subtract(etrEntrust.getEntrustNum(), etrEntrustAdd.getCloseAmt())
-                            , EtrCommonCashPositionDealService.getEtrFinishAmtMuilt(map));
-                } else if (entrustCommonDto.getDeal() != null) {
-                    // 交收失败的额度
-                    amount = ArithmeticUtil.divide(entrustCommonDto.getDeal().getShareAmt(), BigDecimal.valueOf(100), 2);
-                }
-                // 记录交收失败的额度
-                etrEntrustAdd.setCloseAmt(ArithmeticUtil.doAdd(etrEntrustAdd.getCloseAmt(), amount));
-                // 清算速度为T+1时,T日指令关闭时已经处理过差额,此时冲销交易上的金额
-                if (etrEntrustAdd.getSettleSpreed() == 1L) {
-                    // 扣除交收失败的额度
-                    amount = ArithmeticUtil.subtract(amount, entrustCommonDto.getDeal().getShareAmt());
-                    // 委托全价*未使用额度
+            } else {
+                // 交收失败时部分回冲
+                if (StringUtil.equals(entrustCommonDto.getIsSettleFail(), DictCodeListExt1.是否_是.getValue())) {
+                    amount = BigDecimal.ZERO;
+                    if (entrustCommonDto.isCloseEtr()) {
+                        map.put("sumTradeFlag", "02");
+                        // 指令额度 - 已关闭的额度 - 强制完成的额度 - 已成交额度(交易表中有效数据额度汇总) = 未使用额度
+                        amount = ArithmeticUtil.subtract(ArithmeticUtil.subtract(
+                                ArithmeticUtil.subtract(etrEntrust.getEntrustNum(), etrEntrustAdd.getCloseAmt()), etrEntrustAdd.getForcedFinishAmt())
+                                , EtrCommonCashPositionDealService.getEtrFinishAmtMuilt(map));
+                    } else if (entrustCommonDto.getDeal() != null) {
+                        // 交收失败的额度
+                        amount = ArithmeticUtil.divide(entrustCommonDto.getDeal().getShareAmt(), BigDecimal.valueOf(100), 2);
+                    }
+                    // 记录交收失败的额度
+                    etrEntrustAdd.setCloseAmt(ArithmeticUtil.doAdd(etrEntrustAdd.getCloseAmt(), amount));
+                    // 清算速度为T+1时,T日指令关闭时已经处理过差额,此时冲销交易上的金额
+                    if (etrEntrustAdd.getSettleSpreed() == 1L) {
+                        // 加上交收失败的交易金额
+                        amount = entrustCommonDto.getDeal().getTradeAmt();
+                    } else {
+                        // 委托全价*交收失败的额度 或 委托全价*未使用额度  [指令不关闭时未使用额度不处理]
+                        amount = ArithmeticUtil.multiply(委托全价, amount);
+                    }
+                } else if (entrustCommonDto.getForcedFinishAmt() != null) {
+                    // 强制完成
+                    amount = entrustCommonDto.getForcedFinishAmt();
+                    // 委托全价*强制完成额度
                     amount = ArithmeticUtil.multiply(委托全价, amount);
-                    // 加上交收失败的交易金额
-                    amount = ArithmeticUtil.doAdd(amount, entrustCommonDto.getDeal().getTradeAmt());
                 } else {
-                    // 委托全价*交收失败的额度 或 委托全价*未使用额度  [指令不关闭时未使用额度不处理]
+                    map.put("sumTradeFlag", "02");
+                    // 指令额度 - 已关闭的额度 - 强制完成的额度 - 已成交额度(交易表中有效数据额度汇总) = 未使用额度
+                    amount = ArithmeticUtil.subtract(ArithmeticUtil.subtract(
+                            ArithmeticUtil.subtract(etrEntrust.getEntrustNum(), etrEntrustAdd.getCloseAmt()), etrEntrustAdd.getForcedFinishAmt())
+                            , EtrCommonCashPositionDealService.getEtrFinishAmtMuilt(map));
+                    // 委托全价*未使用额度
                     amount = ArithmeticUtil.multiply(委托全价, amount);
                 }
             }
@@ -1503,10 +1514,15 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
 					etrSecPositionFlowDto.setAmount(ArithmeticUtil.subtract(etrEntrust.getEntrustNum(), etrFinish));
 				}
 			} else {
-			    // 已完成额度 = 指令完成表中额度 + 交收失败关闭的额度
-                etrFinish = ArithmeticUtil.doAdd(etrFinish, etrEntrustAdd.getCloseAmt());
+                // 已完成额度 = 指令完成表中额度 + 交收失败关闭的额度 + 强制完成额度
+                etrFinish = ArithmeticUtil.doAdd(etrFinish, etrEntrustAdd.getCloseAmt(),
+                        entrustCommonDto.getForcedFinishAmt() != null ? BigDecimal.ZERO : etrEntrustAdd.getForcedFinishAmt());
                 // 指令关闭冲销的额度 = 指令额度 - 已完成额度
 				etrSecPositionFlowDto.setAmount(ArithmeticUtil.subtract(etrEntrust.getEntrustNum(), etrFinish));
+                // 强制完成
+                if (entrustCommonDto.getForcedFinishAmt() != null) {
+                    etrSecPositionFlowDto.setAmount(entrustCommonDto.getForcedFinishAmt());
+                }
 			}
             // 交收失败时部分回冲
             if (StringUtil.equals(entrustCommonDto.getIsSettleFail(), DictCodeListExt1.是否_是.getValue())

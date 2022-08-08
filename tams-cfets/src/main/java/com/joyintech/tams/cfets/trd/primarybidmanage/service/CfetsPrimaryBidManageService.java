@@ -43,6 +43,7 @@ import com.joyintech.tams.cfets.trd.bond.dto.CalRequest;
 import com.joyintech.tams.cfets.trd.bond.dto.CalRespone;
 import com.joyintech.tams.cfets.trd.bond.service.IbuQuoteBondCalService;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao.CfetsTrdFirstBidFirm002Mapper;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dao.CfetsPrimaryBidManageMapper;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.*;
 import com.joyintech.tams.common.base.dao.*;
@@ -2788,5 +2789,41 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         bussTrdTransferOrder.add(bussTrdTransferOrderDto);
         logger.info("划款指令信息:{}", JsonUtils.object2Json(bussTrdTransferOrder));
         return bussTrdTransferOrder;
+    }
+
+
+    @Override
+    public String generateTitle(CfetsPrimaryBidManageSaveRequest dto, OperationType type) {
+        if (StringUtil.equals(dto.getIsWin(), DictCodeList.是否_否.getValue())) {
+            return "未中标日期" + GlobalConstant.OPEN_PARENTHESIS + iPlatformDate.getSysDateStr() + GlobalConstant.CLOSE_PARENTHESIS +
+                    "资产简称" + GlobalConstant.OPEN_PARENTHESIS + dto.getFinprodAbbr() + GlobalConstant.CLOSE_PARENTHESIS + "未中标";
+        }
+        // 设置流程业务说明
+        String date = "中标日期" +
+                GlobalConstant.OPEN_PARENTHESIS + iPlatformDate.getSysDateStr() + GlobalConstant.CLOSE_PARENTHESIS;
+        String finprodAbbr = null;
+        String winType = null;
+        String bidPriceStr = null;
+        String winPrinamt = null;
+        String str = null;
+        if (StringUtil.isNotEmpty(dto.getFinprodAbbr())) {
+            finprodAbbr = "资产简称:" + GlobalConstant.OPEN_PARENTHESIS + dto.getFinprodAbbr() + GlobalConstant.CLOSE_PARENTHESIS;
+        }
+        if (StringUtil.isNotEmpty(dto.getFinprodId())) {
+            winType = "中标方式:" + GlobalConstant.OPEN_PARENTHESIS + SysDataUtil.getNameFromDataDict(DictCode.中标方式, dto.getWinType()) + GlobalConstant.CLOSE_PARENTHESIS;
+        }
+        if (StringUtil.isNotEmpty(dto.getTenderTarget())) {
+            bidPriceStr = "中标标位:" + GlobalConstant.OPEN_PARENTHESIS + this.getBidPriceStr(dto) + GlobalConstant.CLOSE_PARENTHESIS;
+        }
+        if (StringUtil.isNotEmpty(dto.getWinPrinamt())) {
+            winPrinamt = "中标券面总额" + GlobalConstant.OPEN_PARENTHESIS + ArithmeticUtil.divide(dto.getWinPrinamt(),
+                    BigDecimal.valueOf(10000), 2) + "万元" + GlobalConstant.CLOSE_PARENTHESIS;
+        }
+        str = date;
+        str += StringUtil.isNotEmpty(finprodAbbr) ? finprodAbbr : "";
+        str += StringUtil.isNotEmpty(winType) ? winType : "";
+        str += StringUtil.isNotEmpty(bidPriceStr) ? bidPriceStr : "";
+        str += StringUtil.isNotEmpty(winPrinamt) ? winPrinamt : "";
+        return str;
     }
 }

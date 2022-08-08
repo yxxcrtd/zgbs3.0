@@ -313,9 +313,9 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
      */
     public List<StlPayOrdersDto> generateStlPayOrdersList(ExchangeTransMatchCommonDto dealDto, ExchangeTransMatchCommonEntrustDto entrustDto, TrdProductDeal trdProductDeal) {
         List<StlPayOrdersDto> stlPayOrdersList = new ArrayList<>();
-        if(trdProductDeal.getTradeAmt() == null){
-            return stlPayOrdersList;
-        }
+//        if(trdProductDeal.getTradeAmt() == null){
+//            return stlPayOrdersList;
+//        }
         StlPayOrdersDto stlPayOsrdersDto = createStlPayOrders(dealDto, entrustDto, trdProductDeal);
         // 收付方向
         if (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue(), dealDto.getFinprodType2())) {
@@ -344,7 +344,7 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
         // 本方资金账户
         stlPayOrders.setMyAcctNo(dealDto.getAcctNo());
         // 结算金额
-        stlPayOrders.setSettleAmt(trdProductDeal.getTradeAmt());
+        stlPayOrders.setSettleAmt(trdProductDeal.getTradeAmt() == null ? BigDecimal.ZERO:trdProductDeal.getTradeAmt());
         // 币种
         stlPayOrders.setCcy(trdProductDeal.getCcy());
         // 是否需要发送

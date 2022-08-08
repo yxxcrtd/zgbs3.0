@@ -674,10 +674,12 @@
             </if>
             and not exists (
             select 1 from TRD_PRODUCT_DEAL tpd
+            left join TRD_BANK_MANUAL_SETTLE_INFO tbmsi on tpd.TOTLE_TRADE_ID = tbmsi.TRADE_ID
             where tpd.PS in(#{T03},#{T39})
             and tpd.SETTLE_DATE = fep1.ACT_EXERCISE_DATE
             AND TPD.FINPROD_ID = PSP.FINPROD_ID
             and tpd.TRADE_STATUS = '01'
+            and tbmsi.SETTLE_STATUS is not null and tbmsi.SETTLE_STATUS = '02'
             AND TPD.IS_CANCEL='N'
             )
             and PSP.CDATE = to_date(#{sysDate},'YYYY-MM-DD')
