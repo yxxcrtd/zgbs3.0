@@ -210,8 +210,12 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         // 处理换钱场景
         if(DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换钱.getValue().equals(dealDto.getBusiSceneCalss())){
             dealTotal.setShareAmt(null);
-            dealTotal.setPrinAmt(dealDto.getPrinAmt());
-            dealTotal.setTradeAmt(dealDto.getPrinAmt());
+            // XYHGFXSJ-957:交易金额登录有误 modify by fuyongsheng 20220808 start
+//            dealTotal.setPrinAmt(dealDto.getPrinAmt());
+//            dealTotal.setTradeAmt(dealDto.getPrinAmt());
+            dealTotal.setPrinAmt(entrustDto.getMarchAmt());
+            dealTotal.setTradeAmt(entrustDto.getMarchAmt());
+            // XYHGFXSJ-957:交易金额登录有误 modify by fuyongsheng 20220808 end
         }
         return dealTotal;
     }
@@ -226,7 +230,8 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
             // 交易方向
             trdProductDeal.setPs(entrustDto.getPs());
             // 交易金额
-            trdProductDeal.setTradeAmt(dealDto.getPrinAmt());
+            // trdProductDeal.setTradeAmt(dealDto.getPrinAmt());
+            trdProductDeal.setTradeAmt(entrustDto.getMarchAmt());
             trdProductDealList.add(trdProductDeal);
             return trdProductDealList;
         }
