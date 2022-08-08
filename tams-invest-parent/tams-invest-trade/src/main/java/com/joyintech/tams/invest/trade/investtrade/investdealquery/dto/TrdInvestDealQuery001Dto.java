@@ -385,4 +385,14 @@ public class TrdInvestDealQuery001Dto extends WflTrdProductDeal {
     public void setFinType2(String finType2) {
         this.finType2 = finType2;
     }
+
+    private String entrustType;
+
+    public String getEntrustType() {
+        return entrustType;
+    }
+
+    public void setEntrustType(String entrustType) {
+        this.entrustType = entrustType;
+    }
 }
