@@ -934,6 +934,20 @@ FROM TRD_PRODUCT_DEAL A
         </where>
     </select>
 
+    <select id="getStlPayOrderIdsByTradeIds" resultType="com.joyintech.tams.common.base.entity.StlPayOrders">
+        SELECT
+        <include refid="com.joyintech.tams.common.base.dao.StlPayOrdersMapper.Base_Column_List"/>
+        FROM
+            STL_PAY_ORDERS
+        <where>
+            <if test="tradeIds != null and tradeIds.size() > 0">
+                <foreach collection="tradeIds" item="item" open="TRADE_ID IN (" close=")" separator=",">
+                    #{item,jdbcType=VARCHAR}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
     <delete id="deleteZyTrdStasecFlows">
         DELETE FROM
         TRD_STASEC_FLOW

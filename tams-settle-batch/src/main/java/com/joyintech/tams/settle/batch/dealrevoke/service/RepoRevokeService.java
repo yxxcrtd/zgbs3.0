@@ -10,6 +10,7 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.settle.batch.datagather.service.StlDataGatherService;
@@ -177,46 +178,50 @@ public class RepoRevokeService implements BaseRevokeService {
             });
         }
 
-        List<PtlCashPositionFlowDto> ptlCashPositionFlowDtos = investDealRevokeService.getPtlCashPositionFlowsByOrderIds(tradeIdList);
-        if(CollectionUtils.isNotEmpty(ptlCashPositionFlowDtos)){
-            // 撤销登录反向流水
-            for(PtlCashPositionFlowDto ptlCashPositionFlowDto : ptlCashPositionFlowDtos){
-                ptlCashPositionFlowDto.setSeqno(IDGenerator.generate());
-                ptlCashPositionFlowDto.setOrderId(ptlCashPositionFlowDto.getOrderId() + "R");
-                ptlCashPositionFlowDto.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
-                ptlCashPositionFlowDto.setAmount(ptlCashPositionFlowDto.getAmount().negate());
-                ptlCashPositionFlowMapper.insertSelective(ptlCashPositionFlowDto);
-            }
-            // 更新余额
-            ptlCashPositionFlowDtos.forEach(item ->{
-                if(null!=item.getAmount()){
-                    item.setAmount(item.getAmount().negate());
-                    PtlCashPosition ptlCashPosition = new PtlCashPosition();
-                    BeanUtil.copyPropertiesIgnoreNull(ptlCashPosition, item);
-                    investDealRevokeMapper.updatePtlCashPosition(ptlCashPosition);
+        List<StlPayOrdersDto> stlPayOrdersDtos = investDealRevokeService.getStlPayOrderIdsByTradeIds(tradeIdList);
+        if(CollectionUtils.isNotEmpty(stlPayOrdersDtos)){
+            List<String> orderIds = stlPayOrdersDtos.stream().map(StlPayOrdersDto::getOrderId).collect(Collectors.toList());
+            List<PtlCashPositionFlowDto> ptlCashPositionFlowDtos = investDealRevokeService.getPtlCashPositionFlowsByOrderIds(orderIds);
+            if(CollectionUtils.isNotEmpty(ptlCashPositionFlowDtos)){
+                // 撤销登录反向流水
+                for(PtlCashPositionFlowDto ptlCashPositionFlowDto : ptlCashPositionFlowDtos){
+                    ptlCashPositionFlowDto.setSeqno(IDGenerator.generate());
+                    ptlCashPositionFlowDto.setOrderId(ptlCashPositionFlowDto.getOrderId() + "R");
+                    ptlCashPositionFlowDto.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
+                    ptlCashPositionFlowDto.setAmount(ptlCashPositionFlowDto.getAmount().negate());
+                    ptlCashPositionFlowMapper.insertSelective(ptlCashPositionFlowDto);
                 }
-            });
-        }
+                // 更新余额
+                ptlCashPositionFlowDtos.forEach(item ->{
+                    if(null!=item.getAmount()){
+                        item.setAmount(item.getAmount().negate());
+                        PtlCashPosition ptlCashPosition = new PtlCashPosition();
+                        BeanUtil.copyPropertiesIgnoreNull(ptlCashPosition, item);
+                        investDealRevokeMapper.updatePtlCashPosition(ptlCashPosition);
+                    }
+                });
+            }
 
-        List<EtrCashPositionFlowDto> etrCashPositionFlows = investDealRevokeService.getEtrCashPositionFlowsByOrderIds(tradeIdList);
-        if(CollectionUtils.isNotEmpty(etrCashPositionFlows)){
-            // 撤销登录反向流水
-            for(EtrCashPositionFlowDto etrCashPositionFlow : etrCashPositionFlows){
-                etrCashPositionFlow.setSeqno(IDGenerator.generate());
-                etrCashPositionFlow.setOrderId(etrCashPositionFlow.getOrderId() + "R");
-                etrCashPositionFlow.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
-                etrCashPositionFlow.setAmount(etrCashPositionFlow.getAmount().negate());
-                etrCashPositionFlowMapper.insertSelective(etrCashPositionFlow);
-            }
-            // 更新余额
-            etrCashPositionFlows.forEach(item ->{
-                if(null!=item.getAmount()){
-                    item.setAmount(item.getAmount().negate());
-                    EtrCashPosition etrCashPosition = new EtrCashPosition();
-                    BeanUtil.copyPropertiesIgnoreNull(etrCashPosition, item);
-                    investDealRevokeMapper.updateEtrCashPosition(etrCashPosition);
+            List<EtrCashPositionFlowDto> etrCashPositionFlows = investDealRevokeService.getEtrCashPositionFlowsByOrderIds(orderIds);
+            if(CollectionUtils.isNotEmpty(etrCashPositionFlows)){
+                // 撤销登录反向流水
+                for(EtrCashPositionFlowDto etrCashPositionFlow : etrCashPositionFlows){
+                    etrCashPositionFlow.setSeqno(IDGenerator.generate());
+                    etrCashPositionFlow.setOrderId(etrCashPositionFlow.getOrderId() + "R");
+                    etrCashPositionFlow.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
+                    etrCashPositionFlow.setAmount(etrCashPositionFlow.getAmount().negate());
+                    etrCashPositionFlowMapper.insertSelective(etrCashPositionFlow);
                 }
-            });
+                // 更新余额
+                etrCashPositionFlows.forEach(item ->{
+                    if(null!=item.getAmount()){
+                        item.setAmount(item.getAmount().negate());
+                        EtrCashPosition etrCashPosition = new EtrCashPosition();
+                        BeanUtil.copyPropertiesIgnoreNull(etrCashPosition, item);
+                        investDealRevokeMapper.updateEtrCashPosition(etrCashPosition);
+                    }
+                });
+            }
         }
         // 删除委托完成度
         Map<String, Object> param = new HashMap<>();

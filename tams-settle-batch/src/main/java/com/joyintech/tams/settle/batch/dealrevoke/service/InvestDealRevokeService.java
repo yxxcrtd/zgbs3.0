@@ -11,6 +11,7 @@ import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
 import com.joyintech.tams.invest.common.trade.dao.TrdCommonBaseMapper;
 import org.slf4j.Logger;
@@ -752,13 +753,18 @@ public class InvestDealRevokeService {
         return investDealRevokeMapper.getEtrSecPositionFlowsByTradeIds(tradeIds);
     }
 
-    public List<PtlCashPositionFlowDto> getPtlCashPositionFlowsByOrderIds(List<String> tradeIds){
-        return investDealRevokeMapper.getPtlCashPositionFlowsByOrderIds(tradeIds);
+    public List<PtlCashPositionFlowDto> getPtlCashPositionFlowsByOrderIds(List<String> orderIds){
+        return investDealRevokeMapper.getPtlCashPositionFlowsByOrderIds(orderIds);
     }
 
-    public List<EtrCashPositionFlowDto> getEtrCashPositionFlowsByOrderIds(List<String> tradeIds){
-        return investDealRevokeMapper.getEtrCashPositionFlowsByOrderIds(tradeIds);
+    public List<EtrCashPositionFlowDto> getEtrCashPositionFlowsByOrderIds(List<String> orderIds){
+        return investDealRevokeMapper.getEtrCashPositionFlowsByOrderIds(orderIds);
     }
+
+    public List<StlPayOrdersDto> getStlPayOrderIdsByTradeIds(List<String> tradeIds){
+        return investDealRevokeMapper.getStlPayOrderIdsByTradeIds(tradeIds);
+    }
+
 
     public void deleteZyTrdStasecFlows(List<String> tradeIds){
         if(CollectionUtils.isEmpty(tradeIds)){
