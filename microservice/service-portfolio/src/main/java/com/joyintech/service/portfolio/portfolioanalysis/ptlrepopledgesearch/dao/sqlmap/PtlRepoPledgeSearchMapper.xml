@@ -436,7 +436,7 @@ FROM
 		AND B.TRADE_STATUS='01'AND B.IS_CANCEL='N'
 		and F.IS_SEC_BOND = 'N'
 		AND J.BACK_LEND_DIRECTION=#{BACK_LEND_DIRECTION_03}
-		AND K.ASSET_TYPE = 'H01'
+		AND K.ASSET_TYPE1 = 'H01'
 		AND G.ENTRUST_ID is not null
 		AND L.totle_trade_id is null
 		<if test="sysDate != null and sysDate != ''">
