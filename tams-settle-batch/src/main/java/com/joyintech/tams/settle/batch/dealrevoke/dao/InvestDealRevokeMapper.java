@@ -4,6 +4,7 @@ import com.joyintech.tams.business.common.dto.CashPositionFlowDto;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import org.apache.ibatis.annotations.Param;
@@ -185,6 +186,8 @@ public interface InvestDealRevokeMapper {
     List<PtlCashPositionFlowDto> getPtlCashPositionFlowsByOrderIds(@Param("orderIds") List<String> orderIds);
 
     List<EtrCashPositionFlowDto> getEtrCashPositionFlowsByOrderIds(@Param("orderIds") List<String> orderIds);
+
+    List<StlPayOrdersDto> getStlPayOrderIdsByTradeIds(@Param("tradeIds") List<String> tradeIds);
 
     void deleteZyTrdStasecFlows(@Param("tradeIds") List<String> tradeIds);
 
