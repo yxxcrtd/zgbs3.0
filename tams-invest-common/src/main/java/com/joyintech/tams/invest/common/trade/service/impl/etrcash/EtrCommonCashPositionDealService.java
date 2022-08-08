@@ -1712,6 +1712,17 @@ public class EtrCommonCashPositionDealService extends BaseService {
         map.put("YES_OR_NO_N", DictCodeList.是否_否.getValue());
         return etrCommonCashPositionMapper.getAllEtrFinishAmt(map);
     }
+
+    /**
+     * 指令已完成金额或者额度(成交)
+     * @param sumTradeFlag 01 交易金额 or 交易份额
+     * @return
+     * @see
+     * @since 1.0
+     */
+    public static String getEtrStatus(Map<String, Object> map) {
+        return etrCommonCashPositionMapper.getEtrStatus(map);
+    }
     /**
      * 查询指令可用现金(新表)
      *

@@ -620,7 +620,7 @@ FROM
 		fp.finprod_market_id finprodId,
 		fp.finprod_abbr finprodName,
 		ptpd.back_lend_direction tradePs,
-		tpd.share_amt tradeAmt,
+		ee.share_amt tradeAmt,
 		ftp.TRADE_MARKET tradeMarket,
 		tpd.TRADE_DATE tradeDate,
 		tpd.vdate  vPayDate,
@@ -633,6 +633,15 @@ FROM
 		FROM TRD_PRODUCT_DEAL tpd
 		LEFT JOIN TRD_PRODUCT_DEAL_ADD tpda
 		ON tpda.TRADE_ID = tpd.TRADE_ID
+		LEFT JOIN (
+			SELECT
+				CASE WHEN ee.ps = 'T94' THEN ee.ENTRUST_AMT ELSE tpd.share_amt END share_amt,
+				ee.ENTRUST_ID
+			FROM
+				TRD_PRODUCT_DEAL tpd
+				LEFT JOIN TRD_PRODUCT_DEAL_ADD tpda ON tpda.TRADE_ID = tpd.TRADE_ID
+				LEFT JOIN ETR_ENTRUST ee ON tpda.ENTRUST_ID = ee.ENTRUST_ID
+		) ee ON tpda.ENTRUST_ID = ee.ENTRUST_ID
 		LEFT JOIN PTL_TRADE PT
 		ON tpd.TRADE_ID = PT.BUSI_NO
 		LEFT JOIN PTL_PORTFOLIO pp
@@ -668,7 +677,7 @@ FROM
 			AND  tpd.BUSI_TYPE=#{tradeType,jdbcType=VARCHAR}
 		</if>
 		GROUP BY fpd.TRADE_ID,tpd.BUSI_TYPE,tpd.TRADE_ID,tpda.ENTRUST_ID,pp.PORTFOLIO_ID,pp.portfolio_name,
-		fp.finprod_market_id,fp.finprod_abbr,ptpd.back_lend_direction,tpd.share_amt,ftp.TRADE_MARKET,tpd.TRADE_DATE,
+		fp.finprod_market_id,fp.finprod_abbr,ptpd.back_lend_direction,ee.share_amt,ftp.TRADE_MARKET,tpd.TRADE_DATE,
 		tpd.vdate,tpd.mdate,ftp.TERM_TYPE,ftp.act_cap_days,fpd.trade_date,tpd.CCY,tpd.REMARK
 		ORDER BY fpd.TRADE_DATE DESC
 	</select>
