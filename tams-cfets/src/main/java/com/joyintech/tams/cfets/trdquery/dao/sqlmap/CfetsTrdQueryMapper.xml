@@ -4984,7 +4984,7 @@
                  left join TRDQUTO_MATCH_INFO tmi on tmi.PRE_TRADE_ID = deal.TOTLE_TRADE_ID
                  left join ETR_ENTRUST ee on ee.ENTRUST_ID = eea.ENTRUST_ID
         where eea.CLOSE_AMT is not null and tmi.TRD_ID = #{totleTradeId,jdbcType=VARCHAR}
-            and nvl(eea.FORCED_FINISH_AMT,0) - nvl(eea.CLOSE_AMT,0) <![CDATA[<]]> 0
+            and nvl(eea.CLOSE_AMT,0) <![CDATA[<]]> 0
             and ee.ENTRUST_STATUS = #{entrustStatus,jdbcType=VARCHAR}
     </select>
 

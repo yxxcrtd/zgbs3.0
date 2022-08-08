@@ -1339,11 +1339,11 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                 map.put("entrustClass", etrEntrust.getEntrustClass());
                 map.put("portfolioId",etrEntrust.getPortfolioId());
                 map.put("entrustId",etrEntrust.getEntrustId());
-                BigDecimal finishAmt = EtrCommonCashPositionDealService.getEtrExchangeFinishAmtMuilt(map);
+                BigDecimal finishAmt = EtrCommonCashPositionDealService.getEtrFinishAmtMuilt(map);
                 //BigDecimal finishAmt = EtrCommonCashPositionDealService.getEtrFinishAmt(etrEntrust.getEntrustId());
                 BigDecimal closeAmt = etrEntrustAdd.getCloseAmt();
-                // 已完成额度 = 交易表中有效额度 + 已关闭额度 + 强制完成额度
-                finishAmt = ArithmeticUtil.doAdd(finishAmt, closeAmt, entrustCommonDto.getForcedFinishAmt());
+                // 已完成额度 = 交易表中有效额度 + 已关闭额度
+                finishAmt = ArithmeticUtil.doAdd(finishAmt, closeAmt);
                 // 减少委托本金金额
                 etrCashPositionFlowDto.setAmount(ArithmeticUtil.subtract(etrEntrust.getEntrustAmt(), finishAmt));
                 etrEntrustAdd.setCloseAmt(ArithmeticUtil.doAdd(closeAmt, etrCashPositionFlowDto.getAmount()));
@@ -1399,9 +1399,10 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                     map.put("entrustId", etrEntrust.getEntrustId());
                     map.put("portfolioId", etrEntrust.getPortfolioId());
                     map.put("sumTradeFlag", "02");
-                    // 指令额度 - 已关闭额度 -已成交额度 = 未使用额度
-                    amount = ArithmeticUtil.subtract(
+                    // 指令额度 - 已关闭额度 -已成交额度 - 强制完成额度 = 未使用额度
+                    amount = ArithmeticUtil.subtract(ArithmeticUtil.subtract(
                             ArithmeticUtil.subtract(etrEntrust.getEntrustAmt(), etrEntrustAdd.getCloseAmt()),
+                            entrustCommonDto.getForcedFinishAmt() != null ? BigDecimal.ZERO : etrEntrustAdd.getForcedFinishAmt()),
                             EtrCommonCashPositionDealService.getEtrFinishAmtMuilt(map));
                 }
                 // 减少交收失败的金额

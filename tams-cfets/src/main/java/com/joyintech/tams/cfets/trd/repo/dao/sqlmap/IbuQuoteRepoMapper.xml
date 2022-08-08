@@ -1502,7 +1502,7 @@
              ) T
             LEFT JOIN IBU_PORTFOLIO_ACCT_RELA IPAR
                 ON T.PORTFOLIO_ID = IPAR.PORTFOLIO_ID AND IPAR.CFETS_ACCT_TYPE = '01'
-            group by IPAR.PARTY_ID,T.REPO_TERM,T.SETTLE_SPREED
+            group by IPAR.PARTY_ID,T.REPO_TERM,T.SETTLE_SPREED,T.CLOSE_AMT
     </select>
 
     <!--查询产品质押债券 证券账户-->
@@ -2911,7 +2911,7 @@
     </select>
 
     <select id="selectFinshAmt" resultType="java.math.BigDecimal">
-        select nvl(sum(decode(deal.ps,#{PS_T01},deal.trade_amt,deal.share_amt)),0) as finishAmt
+        select nvl(sum(decode('01',#{sumTradeFlag},deal.trade_amt,deal.share_amt)),0) as finishAmt
         from trd_product_deal deal
         inner join trd_product_deal_add ad
         on deal.trade_id = ad.trade_id
