@@ -615,7 +615,10 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
             bean.setPortfolioId(trdProductDealAdd.getPortfolioId());
             bean.setSecAcctId(dealEntity.getSecManageAcctId());
             if(DictCodeListExt3.交易方向_解除质押.getValue().equals(ps)){
-                bean.setCashAcctId(this.getPtlCapAcctNo(entity));
+                // XYHGFXSJ-930:解除质押资金账户赋值 modify by fuyongsheng 20220808 start
+                // bean.setCashAcctId(this.getPtlCapAcctNo(entity));
+                bean.setCashAcctId(exchangeTransMatchCommonMapper.queryAccountNo(bean.getSecAcctId()));
+                // XYHGFXSJ-930:解除质押资金账户赋值 modify by fuyongsheng 20220808 end
                 if(DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(dealEntity.getTradeMarket())){
                     bean.setCashAmount(BigDecimal.ZERO);
                 }else{
