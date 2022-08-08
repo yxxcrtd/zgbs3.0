@@ -208,7 +208,7 @@ public class BussRepoSecImplService implements BussRepoSecService {
                 if (PAGE_FROM_EtrRepo002.equals(bussRepoSec.getPageFrom())
                 		||PAGE_FROM_EtrIbRepoinfo002.equals(bussRepoSec.getPageFrom())
                 		||PAGE_FROM_EtribRepoInfo003.equals(bussRepoSec.getPageFrom())
-                        ||PAGE_FROM_EtrSecLend002.equals(bussRepoSec.getPageFrom())
+//                        ||PAGE_FROM_EtrSecLend002.equals(bussRepoSec.getPageFrom())
                 		) {
                     EtrPledge etrPledge = new EtrPledge();
                     // 委托代码 = 委托代码
