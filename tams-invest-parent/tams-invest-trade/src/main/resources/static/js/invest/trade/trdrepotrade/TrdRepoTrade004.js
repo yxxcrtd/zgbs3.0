@@ -397,6 +397,14 @@ function saveOrSubmit(operateType) {
                         }
                     }
                 }
+                if(object.outDataTable){
+                    var index = object.outDataTable.length;
+                    for(var i = 0 ;i<index;i++){
+                        object.outDataTable[i].avaPledgePrin = object.outDataTable[i].avaPledgePrin*10000;
+                        object.outDataTable[i].pledgePrin = object.outDataTable[i].pledgePrin*10000
+                        object.outDataTable[i].prin = object.outDataTable[i].prin*10000
+                    }
+                }
 
                 //提交前计算最终质押券列表中的值
                 outOk();
@@ -452,6 +460,14 @@ function saveOrSubmit(operateType) {
                             object.bussRepoSec.pledgeBondList[i].pledgePrin = object.bussRepoSec.pledgeBondList[i].pledgePrin*10000
                             object.bussRepoSec.pledgeBondList[i].prin = object.bussRepoSec.pledgeBondList[i].prin*10000
                         }
+                    }
+                }
+                if(object.outDataTable){
+                    var index = object.outDataTable.length;
+                    for(var i = 0 ;i<index;i++){
+                        object.outDataTable[i].avaPledgePrin = object.outDataTable[i].avaPledgePrin*10000;
+                        object.outDataTable[i].pledgePrin = object.outDataTable[i].pledgePrin*10000
+                        object.outDataTable[i].prin = object.outDataTable[i].prin*10000
                     }
                 }
 

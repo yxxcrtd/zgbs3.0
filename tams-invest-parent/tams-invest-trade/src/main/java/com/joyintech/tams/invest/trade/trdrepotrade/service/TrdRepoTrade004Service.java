@@ -355,15 +355,15 @@ public class TrdRepoTrade004Service extends BaseService<TrdRepoTrade004Dto> impl
                 position.setPtlSecList(secList);
             }
             if(StringUtil.isNotEmpty(dto.getOutDataTable())){
-                for (PledgeBondInfoDto pledgeBondInfoDto : dto.getBussRepoSec().getPledgeBondList()) {
+                for (PledgeBondInfoDto pledgeBondInfoDto : dto.getOutDataTable()) {
                     TrdSecLendSecPositionDto ptlRelieveSec = new TrdSecLendSecPositionDto();
                     ptlRelieveSec.setPortfolioId(dto.getPortfolioId());
                     ptlRelieveSec.setEtrId(dto.getEntrustId());
                     ptlRelieveSec.setTradeId(dto.getBussinessCode());
                     ptlRelieveSec.setFinprodId(pledgeBondInfoDto.getFinprodId());
                     ptlRelieveSec.setSecAcctId(dto.getSecAcctId()); // 证券账户
-                    ptlRelieveSec.setSecAmount(pledgeBondInfoDto.getPledgePrin());
-                    ptlRelieveSec.setOwnSecAmount(pledgeBondInfoDto.getPledgePrin());
+                    ptlRelieveSec.setSecAmount(pledgeBondInfoDto.getPrin());
+                    ptlRelieveSec.setOwnSecAmount(pledgeBondInfoDto.getPrin());
                     ptlRelieveSec.setIntegrateSecAmount(BigDecimal.ZERO);
                     ptlRelieveSecList.add(ptlRelieveSec);
                 }
@@ -574,29 +574,31 @@ public class TrdRepoTrade004Service extends BaseService<TrdRepoTrade004Dto> impl
             finDealPledge.setFinprodId(entity.getTradeId());//原业务编号
             finDealPledge.setPledgeFinprodId(item.getFinprodId());//金融产品代码
             finDealPledge.setBranch(entity.getBranch()==null?Long.parseLong(CacheUtil.getSysParam(BussinessConstant.NOBRANCHNOVALUE)):entity.getBranch());//分支序号
-            finDealPledge.setPledgeAmt(item.getPledgePrin());//质押面值=质押券面总额
-            finDealPledge.setPledgeNumber(item.getPledgePrin().divide(new BigDecimal(100)));//质押数量=list.质押券面总额/100
+            BigDecimal pledgePrin = item.getPledgePrin().multiply(new BigDecimal(10000));
+            finDealPledge.setPledgeAmt(pledgePrin);//质押面值=质押券面总额
+            finDealPledge.setPledgeNumber(pledgePrin.divide(new BigDecimal(100)));//质押数量=list.质押券面总额/100
             finDealPledge.setPledgeRatio(item.getPledgeRatio().divide(new BigDecimal(100)));//质押率= list.折算比例/100
             finDealPledge.setPledgeAmt(finDealPledge.getPledgeAmt().multiply(finDealPledge.getPledgeRatio()));//质押金额= 质押券置换结果.质押面值*质押券置换结果.质押率
             finDealPledge.setPledgeFaceValue(new BigDecimal(100));//面值
             finDealPledgeMapper.insert(finDealPledge);
         });
-
-        try{
-            sendNewPosition(entity,DictCodeListExt3.系统动作_新建.getValue(),DictCodeListExt3.流程节点_审批生效.getValue());
-        }catch (PositionException e){
-            Message message = PositionUtil.ajaxErrorReturn(e);
-            BaseMap bm = (BaseMap) message.getData();
-            if(bm==null){
-                WorkFlowUtil.showMessage( message.getMessage(), MessageType.错误消息);
-            }
-            String code = (String) bm.get("code");
-            StringBuffer messageStr = (StringBuffer) bm.get("message");
-            if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
-                WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
-            }
-            if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
-                WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
+        if(entity.getPs().equals(DictCodeList.回购拆借方向_融入.getValue())||entity.getPs().equals(DictCodeList.回购拆借方向_正回购.getValue())) {
+            try {
+                sendNewPosition(entity, DictCodeListExt3.系统动作_新建.getValue(), DictCodeListExt3.流程节点_审批生效.getValue());
+            } catch (PositionException e) {
+                Message message = PositionUtil.ajaxErrorReturn(e);
+                BaseMap bm = (BaseMap) message.getData();
+                if (bm == null) {
+                    WorkFlowUtil.showMessage(message.getMessage(), MessageType.错误消息);
+                }
+                String code = (String) bm.get("code");
+                StringBuffer messageStr = (StringBuffer) bm.get("message");
+                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                    WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
+                }
+                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+                    WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
+                }
             }
         }
     }
