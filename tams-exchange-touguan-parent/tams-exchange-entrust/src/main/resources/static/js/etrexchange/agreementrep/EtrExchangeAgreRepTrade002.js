@@ -1889,7 +1889,7 @@
     }
 
     function finalSaveOrSubmit(object) {
-        Joyin.ajaxJson(basePath + '/etrexchange/agreementrep/EtrExchangeAgreRepTrade001/checkSaveError', object,
+        Joyin.ajaxJson(basePath + 'etrexchange/agreementrep/EtrExchangeAgreRepTrade001/checkSaveError', object,
             function (result) {
                 Joyin.confirm(result.data, function () {
                     if (object.operateType === 'save') {
@@ -1911,6 +1911,10 @@
     function saveOrSubmit(operateType) {
         var s;
         var object = getSearchParams();
+        let arr = object.origRepSecId ;
+        if(arr.length >=0){
+            object.origRepSecId = arr[0];
+        }
         object.operateType = operateType;
         //object.pageModel = pageModel;
 
