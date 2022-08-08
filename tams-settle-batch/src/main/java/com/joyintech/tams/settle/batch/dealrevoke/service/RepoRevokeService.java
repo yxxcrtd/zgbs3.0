@@ -85,7 +85,7 @@ public class RepoRevokeService implements BaseRevokeService {
                 TrdProductDealAdd trdProductDealAdd = trdProductDealAddMapper.selectByPrimaryKey(tradeId);
                 if(trdProductDealAdd != null && StringUtil.isNotEmpty(trdProductDealAdd.getEntrustId())){
                     EtrEntrustAdd entrustAdd = etrEntrustAddMapper.selectByPrimaryKey(trdProductDealAdd.getEntrustId());
-                    if(entrustAdd != null && DictCodeList.回购类型_质押式协议回购.getValue().equals(entrustAdd.getRedoType())){
+                    if(entrustAdd != null && DictCodeList.回购类型_质押式协议回购.getValue().equals(entrustAdd.getAssetType1())){
                         tradeIdListH01.add(tradeId);
                         continue;
                     }
@@ -116,7 +116,7 @@ public class RepoRevokeService implements BaseRevokeService {
                 TrdDealTotalAdd trdDealTotalAdd = trdDealTotalAddMapper.selectByPrimaryKey(totalTradeId);
                 if(trdDealTotalAdd != null && StringUtil.isNotEmpty(trdDealTotalAdd.getEntrustId())){
                     EtrEntrustAdd entrustAdd = etrEntrustAddMapper.selectByPrimaryKey(trdDealTotalAdd.getEntrustId());
-                    if(entrustAdd != null && DictCodeList.回购类型_质押式协议回购.getValue().equals(entrustAdd.getRedoType())){
+                    if(entrustAdd != null && DictCodeList.回购类型_质押式协议回购.getValue().equals(entrustAdd.getAssetType1())){
                         totalTradeIdListH01.add(totalTradeId);
                         continue;
                     }
