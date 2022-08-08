@@ -46,6 +46,9 @@ public class RepoRevokeService implements BaseRevokeService {
     private TrdDealTotalAddMapper trdDealTotalAddMapper;
 
     @Autowired
+    private TrdProductDealAddMapper trdProductDealAddMapper;
+
+    @Autowired
     private EtrEntrustAddMapper etrEntrustAddMapper;
 
     @Autowired
@@ -74,11 +77,30 @@ public class RepoRevokeService implements BaseRevokeService {
         // 交易方向= 质押券入库、质押券出库是参照普通交易撤销逻辑，生成已生效的撤销交易数据，同时反向更新头寸信息、持仓信息以及委托完成信息。
         if(null != tradeIdMap && !tradeIdMap.isEmpty() && tradeIdMap.size()>0) {
             List<String> tradeIdList =  tradeIdMap.entrySet().stream().map(item->item.getKey()).collect(Collectors.toList());
+
+            // 筛选协议回购特殊处理
+            List<String> tradeIdListH01 = new ArrayList<>();
+            List<String> tradeIdListOther = new ArrayList<>();
+            for(String tradeId : tradeIdList){
+                TrdProductDealAdd trdProductDealAdd = trdProductDealAddMapper.selectByPrimaryKey(tradeId);
+                if(trdProductDealAdd != null && StringUtil.isNotEmpty(trdProductDealAdd.getEntrustId())){
+                    EtrEntrustAdd entrustAdd = etrEntrustAddMapper.selectByPrimaryKey(trdProductDealAdd.getEntrustId());
+                    if(entrustAdd != null && DictCodeList.回购类型_质押式协议回购.getValue().equals(entrustAdd.getRedoType())){
+                        tradeIdListH01.add(tradeId);
+                        continue;
+                    }
+                }
+                tradeIdListOther.add(tradeId);
+            }
+
             Map<String, Object> param = new HashMap<>();
-            param.put("tradeIdList", tradeIdList);
+            param.put("tradeIdList", tradeIdListOther);
             param.put("status", DictCodeListExt1.交易流程状态_撤销.getValue());
             param.put("busiType", DictCodeList.共通业务类型_质押式回购交易.getValue());
+            // 处理非协议回购头寸
             stlDataGatherService.excutePosition(param);
+            // 处理协议回购头寸
+            this.excuteH01Position(tradeIdListH01, new ArrayList<>());
             investDealRevokeService.revokeDeal(tradeIdList);
         }
         // 参考债券质押式回购到期续做、提前终止、到期交易撤销逻辑，生成已生效的撤销交易数据，同时反向更新头寸信息、持仓信息以及委托完成信息。注意不要调用对外发送逻辑。
@@ -109,7 +131,7 @@ public class RepoRevokeService implements BaseRevokeService {
             // 处理非协议回购头寸
             stlDataGatherService.excutePosition(param);
             // 处理协议回购头寸
-            this.excuteH01Position(totalTradeIdListH01);
+            this.excuteH01Position(new ArrayList<>(), totalTradeIdListH01);
             investDealRevokeService.revokeDealTotal(totalTradeIdList);
 //            List<String> tqzzTotalTradeIdList =  totalTradeIdMap.entrySet().stream()
 //                    .filter(item-> StringUtil.equals(item.getValue(), DictCodeListExt3.交易方向_投资端_提前终止.getValue())
@@ -127,13 +149,16 @@ public class RepoRevokeService implements BaseRevokeService {
 
     /**
      * 处理协议回购头寸
+     * @param tradeIdList
      * @param totalTradeIdList
      */
-    private void excuteH01Position(List<String> totalTradeIdList){
-        if(CollectionUtils.isEmpty(totalTradeIdList)){
+    private void excuteH01Position(List<String> tradeIdList, List<String> totalTradeIdList){
+        if(CollectionUtils.isEmpty(tradeIdList) && CollectionUtils.isEmpty(totalTradeIdList)){
             return;
         }
-        List<String> tradeIdList = investDealRevokeService.searchTradeIdsByTotalTradeIds(totalTradeIdList);
+        if(CollectionUtils.isEmpty(tradeIdList) && CollectionUtils.isNotEmpty(totalTradeIdList)){
+            tradeIdList = investDealRevokeService.searchTradeIdsByTotalTradeIds(totalTradeIdList);
+        }
         List<PtlSecPositionFlowDto> ptlSecPositionFlows = investDealRevokeService.getPtlSecPositionFlowsByTradeIds(tradeIdList);
         // 撤销登录反向流水
         if(CollectionUtils.isNotEmpty(ptlSecPositionFlows)){
