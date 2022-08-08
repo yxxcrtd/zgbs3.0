@@ -451,22 +451,22 @@ public class TrdBondLendInvestTrade002Controller extends BaseController {
     AjaxResult save(@RequestBody TrdBondLendInvestTradeDto dto) throws Exception {
 
         //万元转换 add  by yeming 20210817 start
-        if(dto.getBussRepoSec() != null){
-            if( dto.getBussRepoSec().getTotalPrinAmt()  != null){
-                dto.getBussRepoSec().setTotalPrinAmt(ArithmeticUtil.multiply( dto.getBussRepoSec().getTotalPrinAmt(),new BigDecimal(10000)));
-            }
-            for (PledgeBondInfoDto pledgeBond :  dto.getBussRepoSec().getPledgeBondList()) {
-                if (pledgeBond.getAvaPledgePrin() != null) {
-                    pledgeBond.setAvaPledgePrin(ArithmeticUtil.multiply(pledgeBond.getAvaPledgePrin(), new BigDecimal(10000)));
-                }
-                if (pledgeBond.getPledgePrin() != null) {
-                    pledgeBond.setPledgePrin(ArithmeticUtil.multiply(pledgeBond.getPledgePrin(), new BigDecimal(10000)));
-                }
-                if (pledgeBond.getPrin() != null) {
-                    pledgeBond.setPrin(ArithmeticUtil.multiply(pledgeBond.getPrin(), new BigDecimal(10000)));
-                }
-            }
-        }
+//        if(dto.getBussRepoSec() != null){
+//            if( dto.getBussRepoSec().getTotalPrinAmt()  != null){
+//                dto.getBussRepoSec().setTotalPrinAmt(ArithmeticUtil.multiply( dto.getBussRepoSec().getTotalPrinAmt(),new BigDecimal(10000)));
+//            }
+//            for (PledgeBondInfoDto pledgeBond :  dto.getBussRepoSec().getPledgeBondList()) {
+//                if (pledgeBond.getAvaPledgePrin() != null) {
+//                    pledgeBond.setAvaPledgePrin(ArithmeticUtil.multiply(pledgeBond.getAvaPledgePrin(), new BigDecimal(10000)));
+//                }
+//                if (pledgeBond.getPledgePrin() != null) {
+//                    pledgeBond.setPledgePrin(ArithmeticUtil.multiply(pledgeBond.getPledgePrin(), new BigDecimal(10000)));
+//                }
+//                if (pledgeBond.getPrin() != null) {
+//                    pledgeBond.setPrin(ArithmeticUtil.multiply(pledgeBond.getPrin(), new BigDecimal(10000)));
+//                }
+//            }
+//        }
         //万元转换 add  by yeming 20210817 end
         
         if(StringUtil.isBlank(dto.getTradeId())) {

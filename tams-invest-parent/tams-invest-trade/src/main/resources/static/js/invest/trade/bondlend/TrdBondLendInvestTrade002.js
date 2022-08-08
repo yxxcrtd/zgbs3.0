@@ -71,6 +71,20 @@ var table;
             object.counterType = $('#trdInvestPersonInfo_counterId').select2('data')[0].object;
             object.counterId=$('#trdInvestPersonInfo_counterId').select2('data')[0].id;
         }
+
+        if(object.bussRepoSec){
+            if( object.bussRepoSec.totalPrinAmt){
+                object.bussRepoSec.totalPrinAmt =object.bussRepoSec.totalPrinAmt*10000;
+            }
+            if(object.bussRepoSec.pledgeBondList){
+                var index = object.bussRepoSec.pledgeBondList.length;
+                for(var i = 0 ;i<index;i++){
+                    object.bussRepoSec.pledgeBondList[i].avaPledgePrin = object.bussRepoSec.pledgeBondList[i].avaPledgePrin*10000;
+                    object.bussRepoSec.pledgeBondList[i].pledgePrin = object.bussRepoSec.pledgeBondList[i].pledgePrin*10000
+                    object.bussRepoSec.pledgeBondList[i].prin = object.bussRepoSec.pledgeBondList[i].prin*10000
+                }
+            }
+        }
         
         //校验质押券置换安排是否为空
 //        var exchangePledge = object.bussRepoSec.exchangePledge;
