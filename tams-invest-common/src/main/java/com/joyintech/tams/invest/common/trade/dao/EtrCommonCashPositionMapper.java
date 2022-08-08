@@ -373,6 +373,8 @@ public interface EtrCommonCashPositionMapper {
      */
     BigDecimal getAllEtrFinishAmt(Map<String,Object> map);
 
+    String getEtrStatus(Map<String,Object> map);
+
     /**
      * 或者汇总交易份额
      * @param entrustId

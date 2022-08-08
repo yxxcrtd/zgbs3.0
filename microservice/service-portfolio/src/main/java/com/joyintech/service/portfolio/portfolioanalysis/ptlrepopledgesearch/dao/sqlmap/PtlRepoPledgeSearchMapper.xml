@@ -376,7 +376,7 @@ FROM
 		<!-- add by wsz 将协议回购区分出来 start-->
 		UNION ALL
 		SELECT
-		A.PLEDGE_AMT,
+		nvl(A.PLEDGE_AMT, M.ENTRUST_AMT) PLEDGE_AMT,
 		(A.PLEDGE_RATIO * 100) pledgeRatio,
 		(A.PLEDGE_FACE_VALUE * A.PLEDGE_NUMBER) pledgeFaceValue,
 		C.TYPE_4,
@@ -422,7 +422,8 @@ FROM
 		LEFT JOIN MST_CUSTOMER_INFO_ADD E ON E.CUSTOMER_ID = D.ISSUER
 		LEFT JOIN FIN_PRODUCT_ADD F ON A.PLEDGE_FINPROD_ID = F.FINPROD_ID
 		LEFT JOIN TRD_PRODUCT_DEAL_ADD G ON G.TRADE_ID = B.TRADE_ID
-		left join ETR_ENTRUST_ADD K ON G.ENTRUST_ID = K.ENTRUST_ID
+		LEFT JOIN ETR_ENTRUST M ON G.ENTRUST_ID = M.ENTRUST_ID
+		LEFT JOIN ETR_ENTRUST_ADD K ON G.ENTRUST_ID = K.ENTRUST_ID
 		LEFT JOIN FIN_PRODUCT_ADD fpa ON G.PORTFOLIO_ID=fpa.PORTFOLIO_ID
 		LEFT JOIN FIN_TRADE_PRODUCT H ON A.FINPROD_ID = H.FINPROD_ID
 		LEFT JOIN PA_TRD_PRODUCT_DEAL J ON J.TRADE_ID = B.TRADE_ID
@@ -436,7 +437,7 @@ FROM
 		AND B.TRADE_STATUS='01'AND B.IS_CANCEL='N'
 		and F.IS_SEC_BOND = 'N'
 		AND J.BACK_LEND_DIRECTION=#{BACK_LEND_DIRECTION_03}
-		AND K.ASSET_TYPE = 'H01'
+		AND K.ASSET_TYPE1 = 'H01'
 		AND G.ENTRUST_ID is not null
 		AND L.totle_trade_id is null
 		<if test="sysDate != null and sysDate != ''">
@@ -619,7 +620,7 @@ FROM
 		fp.finprod_market_id finprodId,
 		fp.finprod_abbr finprodName,
 		ptpd.back_lend_direction tradePs,
-		tpd.share_amt tradeAmt,
+		ee.share_amt tradeAmt,
 		ftp.TRADE_MARKET tradeMarket,
 		tpd.TRADE_DATE tradeDate,
 		tpd.vdate  vPayDate,
@@ -632,6 +633,15 @@ FROM
 		FROM TRD_PRODUCT_DEAL tpd
 		LEFT JOIN TRD_PRODUCT_DEAL_ADD tpda
 		ON tpda.TRADE_ID = tpd.TRADE_ID
+		LEFT JOIN (
+			SELECT
+				CASE WHEN ee.ps = 'T94' THEN ee.ENTRUST_AMT ELSE tpd.share_amt END share_amt,
+				ee.ENTRUST_ID
+			FROM
+				TRD_PRODUCT_DEAL tpd
+				LEFT JOIN TRD_PRODUCT_DEAL_ADD tpda ON tpda.TRADE_ID = tpd.TRADE_ID
+				LEFT JOIN ETR_ENTRUST ee ON tpda.ENTRUST_ID = ee.ENTRUST_ID
+		) ee ON tpda.ENTRUST_ID = ee.ENTRUST_ID
 		LEFT JOIN PTL_TRADE PT
 		ON tpd.TRADE_ID = PT.BUSI_NO
 		LEFT JOIN PTL_PORTFOLIO pp
@@ -639,14 +649,14 @@ FROM
 		LEFT JOIN FIN_TRADE_PRODUCT ftp
 		ON ((tpd.TRADE_STATUS = '01' AND ftp.FINPROD_ID = tpd.TRADE_ID))
 		LEFT JOIN FIN_PLEDGE_DISPLACE fpd ON tpd.trade_id=fpd.f_trade_id
-		left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on tfpdt.TOTLE_TRADE_ID = tpd.TOTLE_TRADE_ID
+		left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on tfpdt.TOTLE_TRADE_ID = fpd.TRADE_ID
 		LEFT JOIN FIN_PLEDGE_DISPLACE_RESULT fpdr  ON fpd.trade_id=fpdr.trade_id
 		LEFT JOIN PA_TRD_PRODUCT_DEAL ptpd ON ptpd.TRADE_ID = tpd.TRADE_ID
 		LEFT JOIN FIN_DEAL_TARGET fdt on tpd.TRADE_ID = fdt.FINPROD_ID
 		LEFT JOIN FIN_PRODUCT fp ON fp.finprod_id =fdt.pledge_finprod_id
 		WHERE pp.INVEST_YESORNO = 'Y' and fpd.trade_id is not null
 		      <!-- XYHGFXSJ-874 解除质押不展示 -->
-		      and tfpdt.PS != 'T93'
+		      and (tfpdt.PS != 'T93' or tfpdt.PS is null)
 		      <!-- XYHGFXSJ-874 解除质押不展示 -->
 		<if test="portfolioIdList != null and portfolioIdList.size()>0">
 			<foreach collection="portfolioIdList" open="AND pp.PORTFOLIO_ID IN (" item="portfolioId" separator="," close=")">
@@ -667,7 +677,7 @@ FROM
 			AND  tpd.BUSI_TYPE=#{tradeType,jdbcType=VARCHAR}
 		</if>
 		GROUP BY fpd.TRADE_ID,tpd.BUSI_TYPE,tpd.TRADE_ID,tpda.ENTRUST_ID,pp.PORTFOLIO_ID,pp.portfolio_name,
-		fp.finprod_market_id,fp.finprod_abbr,ptpd.back_lend_direction,tpd.share_amt,ftp.TRADE_MARKET,tpd.TRADE_DATE,
+		fp.finprod_market_id,fp.finprod_abbr,ptpd.back_lend_direction,ee.share_amt,ftp.TRADE_MARKET,tpd.TRADE_DATE,
 		tpd.vdate,tpd.mdate,ftp.TERM_TYPE,ftp.act_cap_days,fpd.trade_date,tpd.CCY,tpd.REMARK
 		ORDER BY fpd.TRADE_DATE DESC
 	</select>

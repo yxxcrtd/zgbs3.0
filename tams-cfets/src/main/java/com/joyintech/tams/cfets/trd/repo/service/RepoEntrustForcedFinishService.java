@@ -39,7 +39,7 @@ public class RepoEntrustForcedFinishService extends BaseService<RepoEntrustForce
     }
     @Override
     public Map<String, Object> getRuntimeVariables(ProcessMark entity, String taskId) throws WorkFlowException {
-        Map<String, Object> variables = new HashMap();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("needNextCheck", false);
         return variables;
     }
