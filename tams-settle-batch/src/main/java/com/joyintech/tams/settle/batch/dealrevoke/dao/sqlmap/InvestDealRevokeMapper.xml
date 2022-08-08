@@ -1163,7 +1163,4 @@ FROM TRD_PRODUCT_DEAL A
             AND bo.BID_MODLE = #{BID_MODLE_03}
     </select>
 
-    <delete id="deleteEtrFinishStatus">
-        DELETE FROM ETR_FINISH_STATUS WHERE TRADE_ID = #{tradeId}
-    </delete>
 </mapper>
