@@ -357,6 +357,7 @@ var outOk = function () {
  */
 function saveOrSubmit(operateType) {
     var object = $.serializeToObject('#submitForm');
+    object.balanceCheck ='Y';
     var inSelectedAllRows=object.bussRepoSec.pledgeBondList;
     var isCommit=false;//是否提交
     var ps= $('#ps').val();
@@ -383,6 +384,19 @@ function saveOrSubmit(operateType) {
         if(JoyinMath.doMinus(inSumPledgePrin,$("#outSumAmt").val())<0 && inSelectedAllRows.length > 0)
         {
             Joyin.confirm("换入债券小于换出债券，是否确认？",function() {
+                if(object.bussRepoSec){
+                    if( object.bussRepoSec.totalPrinAmt){
+                        object.bussRepoSec.totalPrinAmt =object.bussRepoSec.totalPrinAmt*10000;
+                    }
+                    if(object.bussRepoSec.pledgeBondList){
+                        var index = object.bussRepoSec.pledgeBondList.length;
+                        for(var i = 0 ;i<index;i++){
+                            object.bussRepoSec.pledgeBondList[i].avaPledgePrin = object.bussRepoSec.pledgeBondList[i].avaPledgePrin*10000;
+                            object.bussRepoSec.pledgeBondList[i].pledgePrin = object.bussRepoSec.pledgeBondList[i].pledgePrin*10000
+                            object.bussRepoSec.pledgeBondList[i].prin = object.bussRepoSec.pledgeBondList[i].prin*10000
+                        }
+                    }
+                }
 
                 //提交前计算最终质押券列表中的值
                 outOk();
@@ -427,6 +441,19 @@ function saveOrSubmit(operateType) {
         }
         Joyin.ajaxJson(basePath + 'invest/trade/trdrepotrade/TrdRepoTrade004/check', object, function (result) {
             Joyin.confirm(result.data, function () {
+                if(object.bussRepoSec){
+                    if( object.bussRepoSec.totalPrinAmt){
+                        object.bussRepoSec.totalPrinAmt =object.bussRepoSec.totalPrinAmt*10000;
+                    }
+                    if(object.bussRepoSec.pledgeBondList){
+                        var index = object.bussRepoSec.pledgeBondList.length;
+                        for(var i = 0 ;i<index;i++){
+                            object.bussRepoSec.pledgeBondList[i].avaPledgePrin = object.bussRepoSec.pledgeBondList[i].avaPledgePrin*10000;
+                            object.bussRepoSec.pledgeBondList[i].pledgePrin = object.bussRepoSec.pledgeBondList[i].pledgePrin*10000
+                            object.bussRepoSec.pledgeBondList[i].prin = object.bussRepoSec.pledgeBondList[i].prin*10000
+                        }
+                    }
+                }
 
                 if (operateType === 'save') {
                     WorkFlow.doSaveList(basePath + 'invest/trade/trdrepotrade/TrdRepoTrade004/save', object, "TrdRepoTrade004_btn_save", "TrdRepoTrade004", function () {
