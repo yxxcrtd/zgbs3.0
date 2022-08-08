@@ -138,8 +138,14 @@ public class EtrCommandDispatcherService extends BaseService<EtrCommandDispatche
     public List<EtrTradePledgeDto> selectPledgeList(List<EtrCommandDispatcherDto> list , String displaceDir){
     	List<EtrTradePledgeDto> pledgelist = new ArrayList<EtrTradePledgeDto>();
 
+		//已查询质押券的指令列表，防止重复查询质押券
+		List<String> entrustIds = new ArrayList<>();
+
     	if(list != null && !list.isEmpty()) {
 	    	for(EtrCommandDispatcherDto dto : list) {
+				if(entrustIds.contains(dto.getEntrustId())){
+					continue;
+				}
 	    		if("F02".equals(dto.getFinprodType2()) || "F03".equals(dto.getFinprodType2()) ) {
 					if (StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), dto.getBusiTypeTg()) ||
 							(StringUtil.equals(DictCodeListExt3.投管业务类型_中途换券.getValue(), dto.getBusiTypeTg()) &&
@@ -169,7 +175,7 @@ public class EtrCommandDispatcherService extends BaseService<EtrCommandDispatche
 						}
 					}
 	    		}
-
+				entrustIds.add(dto.getEntrustId());
 	    	}
     	}
 //    	if(pledgelist != null && !pledgelist.isEmpty() ){
