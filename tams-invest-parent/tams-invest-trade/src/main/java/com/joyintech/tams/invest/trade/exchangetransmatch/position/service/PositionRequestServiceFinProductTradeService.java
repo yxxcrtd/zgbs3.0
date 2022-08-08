@@ -658,8 +658,7 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
         }
         // 质押券数据集	ptlSecList
         if ((DictCodeListExt3.交易方向_正回购.getValue().equals(ps)
-                || DictCodeListExt3.交易方向_中途换券.getValue().equals(ps)
-                || DictCodeListExt3.交易方向_解除质押.getValue().equals(ps))) {
+                || DictCodeListExt3.交易方向_中途换券.getValue().equals(ps))) {
             List<Map<String, Object>> list = new ArrayList<>();
             if(DictCodeListExt3.交易方向_中途换券.getValue().equals(ps)){
                 // ZGTFCP-1805:修改中途换券字段赋值 modify by fuyongsheng 20220324 start
@@ -679,21 +678,6 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
                     list.add(map);
                 }
                 // ZGTFCP-1805:修改中途换券字段赋值 modify by fuyongsheng 20220324 end
-            }
-            else if(DictCodeListExt3.交易方向_解除质押.getValue().equals(ps)){
-                for(FinPledgeDisplaceResult finPledgeDisplaceResult : finPledgeDisplaceResultList){
-                    bean = new PositionRequestBaseBean();
-                    bean.setPortfolioId(trdProductDealAdd.getPortfolioId());
-                    bean.setSecAcctId(dealEntity.getSecManageAcctId());
-                    bean.setTradeId(dealEntity.getTradeId());
-                    bean.setEtrId(trdProductDealAdd.getEntrustId());
-                    bean.setFinprodId(finPledgeDisplaceResult.getFinprodId());
-                    bean.setSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
-                    bean.setOwnSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
-                    bean.setIntegrateSecAmount(BigDecimal.ZERO);
-                    Map<String, Object> map = BeanUtil.object2Map(bean);
-                    list.add(map);
-                }
             }
             // 正回购
             else {
