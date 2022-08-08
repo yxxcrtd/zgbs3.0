@@ -761,7 +761,7 @@ public class InvestDealRevokeService {
         return investDealRevokeMapper.getEtrCashPositionFlowsByOrderIds(orderIds);
     }
 
-    public List<StlPayOrdersDto> getStlPayOrderIdsByTradeIds(List<String> tradeIds){
+    public List<StlPayOrders> getStlPayOrderIdsByTradeIds(List<String> tradeIds){
         return investDealRevokeMapper.getStlPayOrderIdsByTradeIds(tradeIds);
     }
 

@@ -203,9 +203,9 @@ public class RepoRevokeService implements BaseRevokeService {
             });
         }
 
-        List<StlPayOrdersDto> stlPayOrdersDtos = investDealRevokeService.getStlPayOrderIdsByTradeIds(tradeIdList);
-        if(CollectionUtils.isNotEmpty(stlPayOrdersDtos)){
-            List<String> orderIds = stlPayOrdersDtos.stream().map(StlPayOrdersDto::getOrderId).collect(Collectors.toList());
+        List<StlPayOrders> stlPayOrders = investDealRevokeService.getStlPayOrderIdsByTradeIds(tradeIdList);
+        if(CollectionUtils.isNotEmpty(stlPayOrders)){
+            List<String> orderIds = stlPayOrders.stream().map(StlPayOrders::getOrderId).collect(Collectors.toList());
             List<PtlCashPositionFlowDto> ptlCashPositionFlowDtos = investDealRevokeService.getPtlCashPositionFlowsByOrderIds(orderIds);
             if(CollectionUtils.isNotEmpty(ptlCashPositionFlowDtos)){
                 // 撤销登录反向流水
