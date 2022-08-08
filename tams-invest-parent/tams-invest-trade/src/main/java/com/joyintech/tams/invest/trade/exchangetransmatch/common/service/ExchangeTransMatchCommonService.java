@@ -1217,6 +1217,8 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     finDealPledge.setPledgeRatio(pledgeRatio);
                 }
                 for(FinDealPledge finDealPledge : finDealPledgeList){
+                    finDealPledge.setCreateTime(new Date());
+                    finDealPledge.setUpdateTime(new Date());
                     finDealPledgeMapper.insertSelective(finDealPledge);
                 }
             }
