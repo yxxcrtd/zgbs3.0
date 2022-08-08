@@ -553,6 +553,7 @@ public class EtrSecLendDto extends EtrEntrust implements ProcessEntity {
      * 获取 secAcctId
      * @return secAcctId.
      */
+    @NotEmpty(fieldName = "EtrSecLend.secAcctId", groups = {ValidateGroupEdit.class})
     public String getSecAcctId() {
         return secAcctId;
     }
