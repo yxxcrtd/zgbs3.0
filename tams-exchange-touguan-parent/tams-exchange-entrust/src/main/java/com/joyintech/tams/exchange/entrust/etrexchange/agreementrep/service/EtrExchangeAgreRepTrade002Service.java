@@ -688,7 +688,7 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
                 dto.setNextUser(sysUsers);
             }
             //处理中途换券回购金额 修改时使用 XYHGFXSJ-917
-            if (StringUtil.equals(DictCodeListExt3.交易方向_中途换券.getValue(), dto.getPs()) || StringUtil.equals(DictCodeListExt3.交易方向_解除质押.getValue(), dto.getPs())) {
+            if (StringUtil.equals(DictCodeListExt3.交易方向_中途换券.getValue(), dto.getPs())) {
                 TrdProductDeal trdProductDeal = trdProductDealMapper.selectByPrimaryKey(dto.getInitialNum());
                 if (null != trdProductDeal) {
                     dto.setEntrustAmt(trdProductDeal.getTradeAmt());
