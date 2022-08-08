@@ -38,7 +38,7 @@ $(function() {
              {field:'portfolioName', title: 'ActualTimeCapital001.portfolioName', width : 200}//组合名称
             ,{field:'portfolioId', visible:false}//组合编码
             ,{field:'cdate', visible:false, type:'date'}//
-            ,{field:'acctNo', title: 'ActualTimeCapital001.acctNo',width : 150}//账户
+            ,{field:'acctNo', title: '帐号',width : 150}//账户
             ,{field:'acctName', title: 'ActualTimeCapital001.acctName', width : 200}//账号名称
             ,{field:'ccy', title: 'ActualTimeCapital001.ccy', width : 150}//币种
             ,{field:'cashBalance', title: 'ActualTimeCapital001.cashBalance', type:'number', width : 200}//现金余额
