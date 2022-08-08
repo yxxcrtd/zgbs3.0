@@ -187,7 +187,7 @@ public interface InvestDealRevokeMapper {
 
     List<EtrCashPositionFlowDto> getEtrCashPositionFlowsByOrderIds(@Param("orderIds") List<String> orderIds);
 
-    List<StlPayOrdersDto> getStlPayOrderIdsByTradeIds(@Param("tradeIds") List<String> tradeIds);
+    List<StlPayOrders> getStlPayOrderIdsByTradeIds(@Param("tradeIds") List<String> tradeIds);
 
     void deleteZyTrdStasecFlows(@Param("tradeIds") List<String> tradeIds);
 
