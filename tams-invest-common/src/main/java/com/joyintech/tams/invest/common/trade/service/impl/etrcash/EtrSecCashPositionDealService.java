@@ -937,7 +937,9 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                     // 最后一笔时
                     Map<String, Object> map = new HashMap<>();
                     map.put("entrustId", entrustId);
-                    map.put("portfolioId", finProductTradeDto.getTrdProductDeal().getPortfolioId());
+                    map.put("portfolioId", StringUtil.isNotEmpty(finProductTradeDto.getTrdProductDeal().getPortfolioId()) ?
+                            finProductTradeDto.getTrdProductDeal().getPortfolioId()
+                            : finProductTradeDto.getTrdProductDealAdd().getPortfolioId());
                     map.put("sumTradeFlag", "01");
                     map.put("settleStatus",DictCodeListExt3.交收状态_未交收.getValue());
                     String etrStatus = EtrCommonCashPositionDealService.getEtrStatus(map);
