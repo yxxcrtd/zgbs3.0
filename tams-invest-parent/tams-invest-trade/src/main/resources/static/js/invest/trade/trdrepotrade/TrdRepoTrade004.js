@@ -391,7 +391,9 @@ function saveOrSubmit(operateType) {
                     if(object.bussRepoSec.pledgeBondList){
                         var index = object.bussRepoSec.pledgeBondList.length;
                         for(var i = 0 ;i<index;i++){
-                            object.bussRepoSec.pledgeBondList[i].avaPledgePrin = object.bussRepoSec.pledgeBondList[i].avaPledgePrin*10000;
+                            if(object.bussRepoSec.pledgeBondList[i].avaPledgePrin){
+                                object.bussRepoSec.pledgeBondList[i].avaPledgePrin = object.bussRepoSec.pledgeBondList[i].avaPledgePrin*10000;
+                            }
                             object.bussRepoSec.pledgeBondList[i].pledgePrin = object.bussRepoSec.pledgeBondList[i].pledgePrin*10000
                             object.bussRepoSec.pledgeBondList[i].prin = object.bussRepoSec.pledgeBondList[i].prin*10000
                         }
@@ -456,7 +458,9 @@ function saveOrSubmit(operateType) {
                     if(object.bussRepoSec.pledgeBondList){
                         var index = object.bussRepoSec.pledgeBondList.length;
                         for(var i = 0 ;i<index;i++){
-                            object.bussRepoSec.pledgeBondList[i].avaPledgePrin = object.bussRepoSec.pledgeBondList[i].avaPledgePrin*10000;
+                            if(object.bussRepoSec.pledgeBondList[i].avaPledgePrin){
+                                object.bussRepoSec.pledgeBondList[i].avaPledgePrin = object.bussRepoSec.pledgeBondList[i].avaPledgePrin*10000;
+                            }
                             object.bussRepoSec.pledgeBondList[i].pledgePrin = object.bussRepoSec.pledgeBondList[i].pledgePrin*10000
                             object.bussRepoSec.pledgeBondList[i].prin = object.bussRepoSec.pledgeBondList[i].prin*10000
                         }
