@@ -301,12 +301,15 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
 
         // 投管业务类型 : 如果交易方向 = ‘到期续作’，并且汇总成交.金融产品类型（投管） = 债券质押式正回购，则为‘债券质押式正回购’。
         //如果交易方向 = ‘到期续作’，并且汇总成交.金融产品类型（投管） = 债券质押式逆回购，则为‘债券质押式逆回购’。
-        if(StringUtil.equals(dealDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())) {
-            dealTotal.setTgBusiType(DictCodeListExt1.平安业务类型_正回购.getValue());
-        }
-        else {
-            dealTotal.setTgBusiType(DictCodeListExt1.平安业务类型_逆回购.getValue());
-        }
+//        if(StringUtil.equals(dealDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())) {
+//            dealTotal.setTgBusiType(DictCodeListExt1.平安业务类型_正回购.getValue());
+//        }
+//        else {
+//            dealTotal.setTgBusiType(DictCodeListExt1.平安业务类型_逆回购.getValue());
+//        }
+        // XYHGFXSJ-976:修改投管业务类型 modify by fuyongsheng 20220809 start
+        dealTotal.setTgBusiType(DictCodeListExt3.投管业务类型_到期续做.getValue());
+        // XYHGFXSJ-976:修改投管业务类型 modify by fuyongsheng 20220809 end
         //首期结算方式
         dealTotal.setDeliveryType(DictCodeListExt1.结算方式_券款对付.getValue());
         //到期结算方式
