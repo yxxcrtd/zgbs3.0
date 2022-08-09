@@ -511,6 +511,7 @@ public class TrdBondLendTargetDuration002Service extends BaseService<TrdBondLend
             logger.error(e.getMessage(),e);
         }
         saveDataWhenStartWorkflow(entity, OperationType.MODIFY);
+        保存持仓(entity, OperationType.MODIFY, true);
         String act = DictCodeListExt3.系统动作_新建.getValue();
         SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey(entity.getWorkflowId());
         if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
