@@ -599,7 +599,12 @@
             eted.DEAL_MODE declaType,
             ete.FINPROD_ID finprodId,
             case when ete.ps = 'T96' then
-            fin_trade_product.Mdate else null end backDate
+            fin_trade_product.Mdate else null end backDate,
+        eNew.FINPROD_ID swapIntoBonds,
+        eNew.PLEDGE_NUMBER/100 swapIntoBondsVolume,
+        eNew.PLEDGE_RATIO * 100 newDiscount,
+        eOld.FINPROD_ID swapOutBonds,
+        eOld.PLEDGE_NUMBER/100 swapOutBondsVolume
         FROM ETR_ENTRUST ete
         INNER JOIN ETR_ENTRUST_ADD eted ON ete.entrust_id = eted.entrust_id
         LEFT JOIN FIN_PRODUCT_TYPE_CONFIG btm ON ( ete.FINPROD_TYPE2 = btm.INPUT_VALUE_2 OR btm.INPUT_VALUE_2 IS NULL )
@@ -627,6 +632,8 @@
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON eted.SEC_ACCT_ID = ssai.SEC_ACCT_ID
         LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
         LEFT JOIN etr_pledge ee ON ete.entrust_id = ee.entrust_id /** 委托指令回购质押品 **/
+        LEFT JOIN etr_pledge eOld ON eOld.DISPLACE_DIR = '02'  and ete.entrust_id = eOld.entrust_id
+        LEFT JOIN etr_pledge eNew ON eNew.DISPLACE_DIR = '01'  and ete.entrust_id = eNew.entrust_id
         LEFT JOIN (
             SELECT
                 tpd.F_TRADE_ID,
@@ -754,7 +761,12 @@
         eted.DEAL_MODE declaType,
         ete.FINPROD_ID finprodId,
         case when ete.ps = 'T96' then
-        fin_trade_product.Mdate else null end backDate
+        fin_trade_product.Mdate else null end backDate,
+        eNew.FINPROD_ID swapIntoBonds,
+        eNew.PLEDGE_NUMBER/100 swapIntoBondsVolume,
+        eNew.PLEDGE_RATIO * 100 newDiscount,
+        eOld.FINPROD_ID swapOutBonds,
+        eOld.PLEDGE_NUMBER/100 swapOutBondsVolume
 
         FROM WFL_ETR_ENTRUST ete
         INNER JOIN WFL_ETR_ENTRUST_ADD eted ON ete.entrust_id = eted.entrust_id
@@ -783,6 +795,8 @@
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON eted.SEC_ACCT_ID = ssai.SEC_ACCT_ID
         LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
         LEFT JOIN wfl_etr_pledge ee ON ete.entrust_id = ee.entrust_id /** 委托指令回购质押品 **/
+        LEFT JOIN wfl_etr_pledge eOld ON eOld.DISPLACE_DIR = '02'  and ete.entrust_id = eOld.entrust_id
+        LEFT JOIN wfl_etr_pledge eNew ON eNew.DISPLACE_DIR = '01'  and ete.entrust_id = eNew.entrust_id
         LEFT JOIN (
             SELECT
                 tpd.F_TRADE_ID,
