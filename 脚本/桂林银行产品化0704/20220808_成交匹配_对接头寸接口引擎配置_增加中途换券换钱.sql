@@ -1,0 +1,5 @@
+--协议回购接口 中途换券换钱
+delete from INTERF_POSITION_CONFIG where TRADE_PLAT = 'TRANS_MATCH' AND INTERF_TYPE IN ('REPO002') and FINPROD_TYPE IN ('F01-H01', 'F01-B14-H01') AND PS IN ('T94') AND ENTITY = 'com.joyintech.tams.invest.trade.exchangetransmatch.common.dto.ExchangeTransMatchBaseTradeDto';
+
+INSERT INTO INTERF_POSITION_CONFIG (TRADE_PLAT, FINPROD_TYPE, PS, BUSI_ACT, POSITION_TYPE, ENTITY, INTERF_TYPE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, REMARK, ENABLE) VALUES ('TRANS_MATCH', 'F01-H01', 'T94', '19', 'TRD', 'com.joyintech.tams.invest.trade.exchangetransmatch.common.dto.ExchangeTransMatchBaseTradeDto', 'REPO002', 'system', null, sysdate, 'system', sysdate, '场内协议回购成交匹配-中途换券-换钱', 'Y');
+INSERT INTO INTERF_POSITION_CONFIG (TRADE_PLAT, FINPROD_TYPE, PS, BUSI_ACT, POSITION_TYPE, ENTITY, INTERF_TYPE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, REMARK, ENABLE) VALUES ('TRANS_MATCH', 'F01-B14-H01', 'T94', '19', 'TRD', 'com.joyintech.tams.invest.trade.exchangetransmatch.common.dto.ExchangeTransMatchBaseTradeDto', 'REPO002', 'system', null, sysdate, 'system', sysdate, '场内协议回购成交匹配-可转债-中途换券-换钱', 'Y');

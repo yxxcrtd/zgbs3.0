@@ -1912,7 +1912,7 @@
         var s;
         var object = getSearchParams();
         let arr = object.origRepSecId ;
-        if(arr.length >=0){
+        if(arr && arr.length >=0){
             object.origRepSecId = arr[0];
         }
         object.operateType = operateType;

@@ -622,10 +622,11 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
                 if(DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(dealEntity.getTradeMarket())){
                     bean.setCashAmount(BigDecimal.ZERO);
                 }else{
-                    FinTradeProduct finTradeProduct = exchangeTransMatchCommonMapper.getFinTradeProduct(etrEntrust.getFinprodId());
-                    if(finTradeProduct != null){
-                        bean.setCashAmount(finTradeProduct.getmTradeAmt());
-                    }
+//                    FinTradeProduct finTradeProduct = exchangeTransMatchCommonMapper.getFinTradeProduct(etrEntrust.getFinprodId());
+//                    if(finTradeProduct != null){
+//                        bean.setCashAmount(finTradeProduct.getmTradeAmt());
+//                    }
+                    bean.setCashAmount(dealEntity.getTradeAmt());
                 }
             }else{
                 bean.setCashAcctId(exchangeTransMatchCommonMapper.queryAccountNo(bean.getSecAcctId()));

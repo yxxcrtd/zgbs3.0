@@ -1494,7 +1494,8 @@ public class StlDataDealSzdSjsjgProcessService {
                     settleTransDataPledge.setPledgeAmt(settleTransData.getPrinAmt());
                     stlDownDataDealWriteBaseDto.getSettleTransDataPledgeList().add(settleTransDataPledge);
                 } else if (StringUtil.equals(szdSjsjg.getJgywlb(), StlDataDealProcessConstant.SJSJG_YWLB_XYBG)
-                        || StringUtil.equals(szdSjsjg.getJgywlb(), StlDataDealProcessConstant.SJSJG_YWLB_XYJZ)) {
+//                        || StringUtil.equals(szdSjsjg.getJgywlb(), StlDataDealProcessConstant.SJSJG_YWLB_XYJZ)
+                ) {
                     if(!DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换钱.getValue().equals(settleTransData.getBusiSceneCalss())){
                         // 数据明细质押品信息DTO
                         SettleTransDataPledge settleTransDataPledge = new SettleTransDataPledge();
