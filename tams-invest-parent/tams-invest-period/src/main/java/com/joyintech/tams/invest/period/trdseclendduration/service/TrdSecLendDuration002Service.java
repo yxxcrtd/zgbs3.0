@@ -389,13 +389,13 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
         target.setFinprodId( dto.getPledgeFinprodId());
         target.setSecAcctId(dto.getSecManageAcctId()); // 证券账户
         target.setSecAmount(dto.getShareAmt());
-        if(StringUtil.equals(dto.getPs(),DictCodeList.回购拆借方向_融入.getValue())) {
-            target.setIntegrateSecAmount(dto.getShareAmt());
-            target.setOwnSecAmount(BigDecimal.ZERO);
-        }else{
+//        if(StringUtil.equals(dto.getPs(),DictCodeList.回购拆借方向_融入.getValue())) {
+//            target.setIntegrateSecAmount(dto.getShareAmt());
+//            target.setOwnSecAmount(BigDecimal.ZERO);
+//        }else{
             target.setOwnSecAmount(dto.getShareAmt());
             target.setIntegrateSecAmount(BigDecimal.ZERO);
-        }
+//        }
         targetList.add(target);
         position.setPtlTargetList(targetList);
         if(StringUtil.equals(dto.getPs(),DictCodeList.回购拆借方向_融入.getValue())){
