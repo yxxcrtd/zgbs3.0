@@ -319,6 +319,7 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
                     item.setIsSLDeal(DictCodeList.是否_是.getValue());
                 });
                 //add by jiangpeng on 20210429 end
+                tradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
                 baseTradeProductDealCommServiceImpl.execute(tradeDto);
                 if (StringUtil.isNotEmpty(entity.getActPortfolioId()) && !StringUtil.equals(entity.getPortfolioId(), entity.getActPortfolioId())) {
                     tradeDto.getBaseTradeProductDealDtos().forEach(
@@ -354,7 +355,7 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
 //        position.setSettleSpeed(dto.getSettleSpeed());
         position.setDecisionAct(decisionAct);
         position.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
-        position.setCdate(DateUtil.platDateFromCache());
+        position.setCdate(dto.getSettleDate());
         position.setCcy(dto.getCcy());
         position.setTotalTradeId(dto.getBusiCode());
         position.setFlowStatus(flowStatus);
