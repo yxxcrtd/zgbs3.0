@@ -19,10 +19,7 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.jdbc.enums.DataSourceType;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.select.SuggestDto;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.ExportUtil;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.exportpdf.service.CommonExportPdfService;
@@ -338,6 +335,15 @@ public class TrdInvestDealQuery001Service extends CommonExportService<TrdInvestD
                         || DictCodeList.平安资产类型_买断式回购.getValue().equals(finprodType2)) {
                     // 回购利率
                     dto.setRate(dto.getUnitInt());
+                    //XYHGFXSJ-933 【交易查询】协议回购深交所正回购提前购回，交易查询中的交易价格 显示错误，利率为空。 期望：交易价格 应为空，利率为5.000%
+                    if (StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_投资端_提前终止.getValue()) ||
+                            StringUtil.equals(dto.getPs(), DictCodeList.交易方向_到期.getValue())) {
+                        if (null != dto.getTradePrice()) {
+                            dto.setRate(ArithmeticUtil.multiply(dto.getTradePrice(), BigDecimal.valueOf(100)));
+                            dto.setTradePrice(null);
+                        }
+                    }
+                    //XYHGFXSJ-933 【交易查询】协议回购深交所正回购提前购回，交易查询中的交易价格 显示错误，利率为空。 期望：交易价格 应为空，利率为5.000%
                 } else if (DictCodeList.平安资产类型_债券.getValue().equals(finprodType2)) {
                     // 到期收益率或行权收益率
                     BigDecimal yield = dto.getYield();
