@@ -120,7 +120,13 @@ public class TrdRepoTrade004Controller extends BaseController {
 
             model.addAttribute("entity_outBussRepoSec",
                     dto.getOutDataTable() == null ? null : JsonUtils.object2Json(
-                            dto.getOutDataTable()));
+                            dto.getOutDataTable().stream()
+                                    .filter(a->(a.getPledgePrin()==null?new BigDecimal(0):a.getPledgePrin()).compareTo(new BigDecimal(0))!=0)
+                                    .map(entity -> {
+                                        entity.setPledgePrin(ArithmeticUtil.divide(entity.getPledgePrin(), 10000, 2));
+                                        entity.setPrin(ArithmeticUtil.divide(entity.getPrin(), 10000, 2));
+                                        return entity;
+                                    }).toArray()));
             //最终质押券列表
 //            //选出质押券列表
 //            if(!StringUtil.isEmptyList(dto.getBussResultRepoSec())) {

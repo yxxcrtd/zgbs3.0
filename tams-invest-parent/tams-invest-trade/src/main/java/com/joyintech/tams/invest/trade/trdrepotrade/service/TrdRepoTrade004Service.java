@@ -165,6 +165,9 @@ public class TrdRepoTrade004Service extends BaseService<TrdRepoTrade004Dto> impl
      */
     @Override
     public void doInsert(TrdRepoTrade004Dto entity, OperationType operationType) {
+        if ("save".equals(entity.getOperateType())) {
+            return;
+        }
         handleBussFlowData(entity,DictCodeListExt3.系统动作_新建.getValue());
     }
 
@@ -175,7 +178,10 @@ public class TrdRepoTrade004Service extends BaseService<TrdRepoTrade004Dto> impl
      */
     @Override
     public void doUpdate(TrdRepoTrade004Dto entity) {
-        AllTradeCommonUtil.deletePosition(entity.getCancelRemark(), entity.getTradeId());
+        if ("save".equals(entity.getOperateType())) {
+            return;
+        }
+        AllTradeCommonUtil.deletePosition(entity.getCancelRemark(), entity.getBussinessCode());
         String act = DictCodeListExt3.系统动作_新建.getValue();
         SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey(entity.getWorkflowId());
         if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
@@ -193,7 +199,7 @@ public class TrdRepoTrade004Service extends BaseService<TrdRepoTrade004Dto> impl
      */
     @Override
     public void doBack(TrdRepoTrade004Dto entity){
-        AllTradeCommonUtil.deletePosition(entity.getCancelRemark(), entity.getTradeId());
+        AllTradeCommonUtil.deletePosition(entity.getCancelRemark(), entity.getBussinessCode());
     }
     
     /**
@@ -700,7 +706,7 @@ public class TrdRepoTrade004Service extends BaseService<TrdRepoTrade004Dto> impl
                             // 币种 = 金融产品交易Entity.币种
                             resultDto.setCcy(input.getCcy());
                             // 交易编号 = 金融产品交易Entity.交易编号
-                            resultDto.setTradeId(input.getTradeId());
+                            resultDto.setTradeId(input.getBussinessCode());
                             // 投资目的 = 按“摊余成本类-公允价值变动计入其他综合收益-公允价值变动计入当期损益”的顺序依次冻结，削减对应投资目的债券可用持仓
                             resultDto.setInvAim(StringUtil.isEmpty(avaBond.getInvAim()) ? "999999" : avaBond.getInvAim());
 

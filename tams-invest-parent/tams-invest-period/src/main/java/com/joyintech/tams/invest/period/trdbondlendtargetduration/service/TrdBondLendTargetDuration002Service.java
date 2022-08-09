@@ -218,6 +218,7 @@ public class TrdBondLendTargetDuration002Service extends BaseService<TrdBondLend
                 }
             }
             ptlCashPositionFlowDto.setOrderId(stlPayOrders.getOrderId());
+            ptlCashPositionFlowDto.setIsExistNew(DictCodeList.是否_是.getValue());
             ptlCashPositionFlowDtos.add(ptlCashPositionFlowDto);
         });
 
