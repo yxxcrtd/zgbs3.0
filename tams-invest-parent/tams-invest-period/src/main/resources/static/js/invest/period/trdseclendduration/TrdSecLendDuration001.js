@@ -91,7 +91,7 @@
      * 绑定编辑事件
      */
     table.bind('click', '.edit', function (data, index) {
-        data.pageModel = PAGE_MODEL_EDIT;
+        data.pageModel = PAGE_MODEL_NEW;
         Joyin.dialog(JoyinUtil.getLabel("TrdSecLendDuration002.confirm"),
             basePath + "invest/period/trdseclendduration/TrdSecLendDuration002/init",
             "98%", "95%", data, function () {

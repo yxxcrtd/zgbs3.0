@@ -175,7 +175,7 @@
             $("#mTradeAmt").val(JoyinMath.doMinus($("#tradeAmt").val(), $("#prinAmt").val(), 2, JoyinMath.ROUND_HALF_UP)).trigger('blur')
         })
 
-        if (pageModel == PAGE_MODEL_EDIT && isTodoList != 'true') {
+        if ((pageModel == PAGE_MODEL_EDIT || pageModel == PAGE_MODEL_NEW) && isTodoList != 'true') {
             $("#invAim").prop("disabled", true);
             if ($("isCashPay").prop("checked")) {
                 $("#prinAmt").prop("disabled", false).change();
