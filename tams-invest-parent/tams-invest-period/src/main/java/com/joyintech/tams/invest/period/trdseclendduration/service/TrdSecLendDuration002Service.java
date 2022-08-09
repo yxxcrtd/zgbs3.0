@@ -524,9 +524,9 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
             RequestUtil.getPageParam(), RepoInfo.class));
     }
 
-    public Map<String,Object> getShowHandNum() {
+    public Map<String,Object> getShowHandNum(Map<String, Object> map) {
         return restTemplate.postForObject(ServiceApplication.PERIOD_SERVICE_NAME + "/TrdSecLendDuration/getShowHandNum",
-                RequestUtil.getPageParam(), Map.class);
+                map, Map.class);
     }
 
 

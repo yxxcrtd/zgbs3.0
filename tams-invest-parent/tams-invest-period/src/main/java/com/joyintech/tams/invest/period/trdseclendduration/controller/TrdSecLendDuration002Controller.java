@@ -152,8 +152,8 @@ public class TrdSecLendDuration002Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("getShowHandNum")
-    public Map<String,Object> getShowHandNum() {
-        return trdSecLendDuration002Service.getShowHandNum();
+    public Map<String,Object> getShowHandNum(@RequestBody Map<String, Object> map) {
+        return trdSecLendDuration002Service.getShowHandNum(map);
     }
 
     /**

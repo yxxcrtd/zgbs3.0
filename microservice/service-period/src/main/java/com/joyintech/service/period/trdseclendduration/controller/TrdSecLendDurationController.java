@@ -45,7 +45,7 @@ public class TrdSecLendDurationController {
     }
 
     @PostMapping("getShowHandNum")
-    public Map<String,Object> findPage(@RequestBody Map<String, Object> param) {
+    public Map<String,Object> getShowHandNum(@RequestBody Map<String, Object> param) {
         return trdSecLendDurationService.getShowHandNum(param);
     }
 
