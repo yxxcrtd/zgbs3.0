@@ -154,6 +154,73 @@ public class CfetsEtrDispatcherInfoExcResponse extends CfetsEtrDispatcherExcInfo
     @ApiModelProperty(name = "declaType", value = "申报类型")
     private String declaType;
 
+
+    @ApiModelProperty(name = "swapIntoBonds", value = "换入债券")
+    private String swapIntoBonds;
+
+    @ApiModelProperty(name = "swapIntoBondsVolume", value = "换入债券数量")
+    private BigDecimal swapIntoBondsVolume;
+
+    @ApiModelProperty(name = "swapOutBonds", value = "换出债券")
+    private String swapOutBonds;
+
+    @ApiModelProperty(name = "swapOutBondsVolume", value = "换出债券数量")
+    private BigDecimal swapOutBondsVolume;
+
+    @ApiModelProperty(name = "newDiscount", value = "新折算率")
+    private BigDecimal newDiscount;
+
+    @ApiModelProperty(name = "exchangeAmount", value = "换出金额")
+    private BigDecimal exchangeAmount;
+
+    public BigDecimal getExchangeAmount() {
+        return exchangeAmount;
+    }
+
+    public void setExchangeAmount(BigDecimal exchangeAmount) {
+        this.exchangeAmount = exchangeAmount;
+    }
+
+    public String getSwapIntoBonds() {
+        return swapIntoBonds;
+    }
+
+    public void setSwapIntoBonds(String swapIntoBonds) {
+        this.swapIntoBonds = swapIntoBonds;
+    }
+
+    public BigDecimal getSwapIntoBondsVolume() {
+        return swapIntoBondsVolume;
+    }
+
+    public void setSwapIntoBondsVolume(BigDecimal swapIntoBondsVolume) {
+        this.swapIntoBondsVolume = swapIntoBondsVolume;
+    }
+
+    public String getSwapOutBonds() {
+        return swapOutBonds;
+    }
+
+    public void setSwapOutBonds(String swapOutBonds) {
+        this.swapOutBonds = swapOutBonds;
+    }
+
+    public BigDecimal getSwapOutBondsVolume() {
+        return swapOutBondsVolume;
+    }
+
+    public void setSwapOutBondsVolume(BigDecimal swapOutBondsVolume) {
+        this.swapOutBondsVolume = swapOutBondsVolume;
+    }
+
+    public BigDecimal getNewDiscount() {
+        return newDiscount;
+    }
+
+    public void setNewDiscount(BigDecimal newDiscount) {
+        this.newDiscount = newDiscount;
+    }
+
     private String declaTypeStr;
 
     public BigDecimal getPledgeStandardNumber() {

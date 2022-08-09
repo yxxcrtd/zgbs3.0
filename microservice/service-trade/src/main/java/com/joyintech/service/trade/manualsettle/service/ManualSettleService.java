@@ -268,6 +268,13 @@ public class ManualSettleService extends BaseService<ManualSettleDto> {
                     else if (DictCodeListExt3.交易方向_到期续做.getValue().equals(infContractDetailfile.getPs())){
                         // 指令信息处理
                         tradePreClearingService.buildPositionBaseData(trdTempDto, infContractDetailfile);
+
+                        //XYHGFXSJ-910 【实时资金头寸查询】【组合资金账户头寸查询】【现金流缺口分析】深交所逆回购-到期续做(不变更对手方)，日间交收回溯后，老头寸报表数据没有变化回冲，期望：会回冲到交收确认前的状态
+                        if (StringUtil.isNotBlank(stlPayOrdersDto.getOrderId())) {
+                            trdTempDto.setOrderId(stlPayOrdersDto.getOrderId());
+                        }
+                        //XYHGFXSJ-910 【实时资金头寸查询】【组合资金账户头寸查询】【现金流缺口分析】深交所逆回购-到期续做(不变更对手方)，日间交收回溯后，老头寸报表数据没有变化回冲，期望：会回冲到交收确认前的状态
+
                         // 临时交易及其他数据处理
                         tradePreClearingService.trdRepoPeriodT56(trdTempDto, infContractDetailfile, true);
 

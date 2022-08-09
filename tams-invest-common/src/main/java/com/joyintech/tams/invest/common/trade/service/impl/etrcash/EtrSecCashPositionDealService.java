@@ -937,7 +937,9 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                     // 最后一笔时
                     Map<String, Object> map = new HashMap<>();
                     map.put("entrustId", entrustId);
-                    map.put("portfolioId", finProductTradeDto.getTrdProductDeal().getPortfolioId());
+                    map.put("portfolioId", StringUtil.isNotEmpty(finProductTradeDto.getTrdProductDeal().getPortfolioId()) ?
+                            finProductTradeDto.getTrdProductDeal().getPortfolioId()
+                            : finProductTradeDto.getTrdProductDealAdd().getPortfolioId());
                     map.put("sumTradeFlag", "01");
                     map.put("settleStatus",DictCodeListExt3.交收状态_未交收.getValue());
                     String etrStatus = EtrCommonCashPositionDealService.getEtrStatus(map);
@@ -1551,20 +1553,20 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
 				} else {
 					etrSecPositionFlowDto.setAmount(ArithmeticUtil.subtract(etrEntrust.getEntrustNum(), etrFinish));
 				}
-			} else {
+			} else if (!StringUtil.equals(entrustCommonDto.getIsSettleFail(), DictCodeListExt1.是否_是.getValue())) {
                 // 已完成额度 = 指令完成表中额度 + 交收失败关闭的额度 + 强制完成额度
                 etrFinish = ArithmeticUtil.doAdd(etrFinish, etrEntrustAdd.getCloseAmt(),
                         entrustCommonDto.getForcedFinishAmt() != null ? BigDecimal.ZERO : etrEntrustAdd.getForcedFinishAmt());
                 // 指令关闭冲销的额度 = 指令额度 - 已完成额度
-				etrSecPositionFlowDto.setAmount(ArithmeticUtil.subtract(etrEntrust.getEntrustNum(), etrFinish));
+                etrSecPositionFlowDto.setAmount(ArithmeticUtil.subtract(etrEntrust.getEntrustNum(), etrFinish));
                 // 强制完成
                 if (entrustCommonDto.getForcedFinishAmt() != null) {
                     etrSecPositionFlowDto.setAmount(entrustCommonDto.getForcedFinishAmt());
-                }else{
+                } else {
                     // 指令关闭的额度
                     etrEntrustAdd.setCloseAmt(ArithmeticUtil.doAdd(etrEntrustAdd.getCloseAmt(), etrSecPositionFlowDto.getAmount()));
                 }
-			}
+            }
             // 交收失败时部分回冲
             if (StringUtil.equals(entrustCommonDto.getIsSettleFail(), DictCodeListExt1.是否_是.getValue())
                     && entrustCommonDto.getDeal() != null) {

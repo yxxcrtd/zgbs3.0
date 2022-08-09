@@ -636,7 +636,8 @@ FROM
 		LEFT JOIN (
 			SELECT
 				CASE WHEN ee.ps = 'T94' THEN ee.ENTRUST_AMT ELSE tpd.share_amt END share_amt,
-				ee.ENTRUST_ID
+				ee.ENTRUST_ID,
+				ee.ENTRUST_TYPE
 			FROM
 				TRD_PRODUCT_DEAL tpd
 				LEFT JOIN TRD_PRODUCT_DEAL_ADD tpda ON tpda.TRADE_ID = tpd.TRADE_ID
@@ -658,6 +659,7 @@ FROM
 		      <!-- XYHGFXSJ-874 解除质押不展示 -->
 		      and (tfpdt.PS != 'T93' or tfpdt.PS is null)
 		      <!-- XYHGFXSJ-874 解除质押不展示 -->
+			  and ee.ENTRUST_TYPE != '31'
 		<if test="portfolioIdList != null and portfolioIdList.size()>0">
 			<foreach collection="portfolioIdList" open="AND pp.PORTFOLIO_ID IN (" item="portfolioId" separator="," close=")">
 				#{portfolioId,jdbcType=VARCHAR}
