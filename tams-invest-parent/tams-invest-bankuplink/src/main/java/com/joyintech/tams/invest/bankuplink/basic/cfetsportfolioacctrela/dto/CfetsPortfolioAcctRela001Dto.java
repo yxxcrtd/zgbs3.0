@@ -81,6 +81,9 @@ public class CfetsPortfolioAcctRela001Dto extends IbuPortfolioAcctRela implement
      */
     private String portfolioIdOld;
 
+    @PrimaryKey(value = Field.PK_3)
+    private String portfolioIdMd5;
+
     /**
      * 选中的数据
      */
@@ -216,9 +219,16 @@ public class CfetsPortfolioAcctRela001Dto extends IbuPortfolioAcctRela implement
      */
     @Override
     @NotEmpty(fieldName = "CfetsPortfolioAcctRela001.portfolioId", groups = {ValidateGroupEdit.class})
-    @PrimaryKey(value = Field.PK_3)
     public String getPortfolioId() {
         return super.getPortfolioId();
+    }
+
+    public String getPortfolioIdMd5() {
+        return portfolioIdMd5;
+    }
+
+    public void setPortfolioIdMd5(String portfolioIdMd5) {
+        this.portfolioIdMd5 = portfolioIdMd5;
     }
 
     /**
