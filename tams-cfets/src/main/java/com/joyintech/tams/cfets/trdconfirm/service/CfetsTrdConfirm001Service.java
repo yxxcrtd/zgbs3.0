@@ -218,9 +218,6 @@ public class CfetsTrdConfirm001Service extends BaseService {
     BaseAssetCashPositionCommMapper baseAssetCashPositionCommMapper;
 
     @Autowired(required = false)
-    private BaseEtrCashPositionCommService baseEtrCashPositionCommService;
-
-    @Autowired(required = false)
     private BasePtlCashPositionInfoService basePtlCashPositionInfoService;
 
 

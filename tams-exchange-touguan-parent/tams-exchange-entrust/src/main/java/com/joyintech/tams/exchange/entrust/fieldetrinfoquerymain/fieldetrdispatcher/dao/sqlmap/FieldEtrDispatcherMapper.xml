@@ -584,9 +584,11 @@
             eted.M_INT_AMT mIntAmt,
             eted.M_TRADE_AMT mTradeAmt,
             case when ete.ps in ('T68', 'T69') then ete.price * 100
+                when ete.ps = 'T94' then trdPledge.Pledge_Ratio
                 else ee.Pledge_Ratio * 100 end as pledgeRatio, /** 折算率 **/
-            ee.PLEDGE_NUMBER pledgeNumber,
+            nvl(ee.PLEDGE_NUMBER, trdPledge.PLEDGE_NUMBER) pledgeNumber,
             ee.PLEDGE_NUMBER * ee.Pledge_Face_Value pledStrdPrinAmt,
+            ete.ENTRUST_AMT exchangeAmount,
             eted.TRADE_ID tradeId,
             old.origRepSecNum oldPledgeNumber,
             old.origPrintAmt oldPledStrdPrinAmt,
@@ -600,10 +602,10 @@
             ete.FINPROD_ID finprodId,
             case when ete.ps = 'T96' then
             fin_trade_product.Mdate else null end backDate,
-        eNew.FINPROD_ID swapIntoBonds,
+        eNew.FINPROD_MARKET_ID swapIntoBonds,
         eNew.PLEDGE_NUMBER/100 swapIntoBondsVolume,
         eNew.PLEDGE_RATIO * 100 newDiscount,
-        eOld.FINPROD_ID swapOutBonds,
+        eOld.FINPROD_MARKET_ID swapOutBonds,
         eOld.PLEDGE_NUMBER/100 swapOutBondsVolume
         FROM ETR_ENTRUST ete
         INNER JOIN ETR_ENTRUST_ADD eted ON ete.entrust_id = eted.entrust_id
@@ -632,8 +634,16 @@
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON eted.SEC_ACCT_ID = ssai.SEC_ACCT_ID
         LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
         LEFT JOIN etr_pledge ee ON ete.entrust_id = ee.entrust_id /** 委托指令回购质押品 **/
-        LEFT JOIN etr_pledge eOld ON eOld.DISPLACE_DIR = '02'  and ete.entrust_id = eOld.entrust_id
-        LEFT JOIN etr_pledge eNew ON eNew.DISPLACE_DIR = '01'  and ete.entrust_id = eNew.entrust_id
+        LEFT JOIN (
+            select ep1.*, fp1.FINPROD_MARKET_ID
+            from etr_pledge ep1 left join  FIN_PRODUCT fp1
+            ON ep1.finprod_id = fp1.finprod_id
+        ) eOld ON eOld.DISPLACE_DIR = '02'  and ete.entrust_id = eOld.entrust_id
+        LEFT JOIN (
+            select ep1.*, fp1.FINPROD_MARKET_ID
+            from etr_pledge ep1 left join  FIN_PRODUCT fp1
+            ON ep1.finprod_id = fp1.finprod_id
+        ) eNew ON eNew.DISPLACE_DIR = '01'  and ete.entrust_id = eNew.entrust_id
         LEFT JOIN (
             SELECT
                 tpd.F_TRADE_ID,
@@ -646,6 +656,17 @@
             LEFT JOIN FIN_PRODUCT t4 ON t4.FINPROD_ID = t2.PLEDGE_FINPROD_ID
         ) old ON eted.TRADE_ID = old.F_TRADE_ID
         <!--LEFT JOIN etr_pledge oee ON ete.entrust_id = oee.entrust_id-->
+        LEFT JOIN (
+            SELECT
+                A.FINPROD_ID tradeId,
+                MAX( B.Pledge_Ratio ) * 100 Pledge_Ratio,
+                SUM(B.PLEDGE_NUMBER)  PLEDGE_NUMBER
+            FROM
+            FIN_TRADE_PRODUCT A
+            INNER JOIN FIN_DEAL_PLEDGE B ON B.FINPROD_ID = A.FINPROD_ID AND B.BRANCH = A.BRANCH
+            LEFT JOIN FIN_PRODUCT FP ON FP.FINPROD_ID = B.PLEDGE_FINPROD_ID
+            GROUP BY
+            A.FINPROD_ID ) trdPledge ON trdPledge.tradeId = ete.FINPROD_ID
         LEFT JOIN SYS_USER su on ete.INV_MANAGER_ID = su.USER_NAME
         left join MST_COUNTER_PARTY mcp on ete.COUNTER_ID = mcp.COUNTER_ID
         LEFT JOIN OPT_TARGET_INFO ON eted.ASSET_TYPE_10 = OPT_TARGET_INFO.TARGET_ID
@@ -746,9 +767,11 @@
         eted.M_INT_AMT mIntAmt,
         eted.M_TRADE_AMT mTradeAmt,
         case when ete.ps in ('T68', 'T69') then ete.price * 100
-            else ee.Pledge_Ratio * 100 end as pledgeRatio, /** 折算率 **/
-        ee.PLEDGE_NUMBER pledgeNumber,
+        when ete.ps = 'T94' then trdPledge.Pledge_Ratio
+        else ee.Pledge_Ratio * 100 end as pledgeRatio, /** 折算率 **/
+        nvl(ee.PLEDGE_NUMBER, trdPledge.PLEDGE_NUMBER) pledgeNumber,
         ee.PLEDGE_NUMBER * ee.Pledge_Face_Value pledStrdPrinAmt,
+        ete.ENTRUST_AMT exchangeAmount,
         eted.TRADE_ID tradeId,
         old.origRepSecNum oldPledgeNumber,
         old.origPrintAmt oldPledStrdPrinAmt,
@@ -762,10 +785,10 @@
         ete.FINPROD_ID finprodId,
         case when ete.ps = 'T96' then
         fin_trade_product.Mdate else null end backDate,
-        eNew.FINPROD_ID swapIntoBonds,
+        eNew.FINPROD_MARKET_ID swapIntoBonds,
         eNew.PLEDGE_NUMBER/100 swapIntoBondsVolume,
         eNew.PLEDGE_RATIO * 100 newDiscount,
-        eOld.FINPROD_ID swapOutBonds,
+        eOld.FINPROD_MARKET_ID swapOutBonds,
         eOld.PLEDGE_NUMBER/100 swapOutBondsVolume
 
         FROM WFL_ETR_ENTRUST ete
@@ -795,8 +818,16 @@
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON eted.SEC_ACCT_ID = ssai.SEC_ACCT_ID
         LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
         LEFT JOIN wfl_etr_pledge ee ON ete.entrust_id = ee.entrust_id /** 委托指令回购质押品 **/
-        LEFT JOIN wfl_etr_pledge eOld ON eOld.DISPLACE_DIR = '02'  and ete.entrust_id = eOld.entrust_id
-        LEFT JOIN wfl_etr_pledge eNew ON eNew.DISPLACE_DIR = '01'  and ete.entrust_id = eNew.entrust_id
+        LEFT JOIN  (
+            select ep1.*, fp1.FINPROD_MARKET_ID
+            from wfl_etr_pledge ep1 left join  FIN_PRODUCT fp1
+            ON ep1.finprod_id = fp1.finprod_id
+        ) eOld ON eOld.DISPLACE_DIR = '02'  and ete.entrust_id = eOld.entrust_id
+        LEFT JOIN   (
+            select ep1.*, fp1.FINPROD_MARKET_ID
+            from wfl_etr_pledge ep1 left join  FIN_PRODUCT fp1
+            ON ep1.finprod_id = fp1.finprod_id
+        ) eNew ON eNew.DISPLACE_DIR = '01'  and ete.entrust_id = eNew.entrust_id
         LEFT JOIN (
             SELECT
                 tpd.F_TRADE_ID,
@@ -809,6 +840,17 @@
             LEFT JOIN FIN_PRODUCT t4 ON t4.FINPROD_ID = t2.PLEDGE_FINPROD_ID
         ) old ON eted.TRADE_ID = old.F_TRADE_ID
         <!--LEFT JOIN etr_pledge oee ON ete.entrust_id = oee.entrust_id-->
+        LEFT JOIN (
+        SELECT
+            A.FINPROD_ID tradeId,
+            MAX( B.Pledge_Ratio ) * 100 Pledge_Ratio,
+            SUM(B.PLEDGE_NUMBER) PLEDGE_NUMBER
+        FROM
+            FIN_TRADE_PRODUCT A
+            INNER JOIN FIN_DEAL_PLEDGE B ON B.FINPROD_ID = A.FINPROD_ID AND B.BRANCH = A.BRANCH
+            LEFT JOIN FIN_PRODUCT FP ON FP.FINPROD_ID = B.PLEDGE_FINPROD_ID
+            GROUP BY
+            A.FINPROD_ID ) trdPledge ON trdPledge.tradeId = ete.FINPROD_ID
         LEFT JOIN SYS_USER su on ete.INV_MANAGER_ID = su.USER_NAME
         left join MST_COUNTER_PARTY mcp on ete.COUNTER_ID = mcp.COUNTER_ID
         LEFT JOIN OPT_TARGET_INFO ON eted.ASSET_TYPE_10 = OPT_TARGET_INFO.TARGET_ID

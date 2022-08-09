@@ -170,6 +170,17 @@ public class CfetsEtrDispatcherInfoExcResponse extends CfetsEtrDispatcherExcInfo
     @ApiModelProperty(name = "newDiscount", value = "新折算率")
     private BigDecimal newDiscount;
 
+    @ApiModelProperty(name = "exchangeAmount", value = "换出金额")
+    private BigDecimal exchangeAmount;
+
+    public BigDecimal getExchangeAmount() {
+        return exchangeAmount;
+    }
+
+    public void setExchangeAmount(BigDecimal exchangeAmount) {
+        this.exchangeAmount = exchangeAmount;
+    }
+
     public String getSwapIntoBonds() {
         return swapIntoBonds;
     }

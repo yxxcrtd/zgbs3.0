@@ -1150,7 +1150,8 @@
 			   WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
 			   WHEN STD.DELIVERY_RESULT = '04' THEN  '0'
         WHEN eea.ASSET_TYPE1 = 'H01'
-        THEN STD.SHARE_AMT / TT.TRADED_BALANCE * 100  ||''
+        THEN
+        decode(TT.TRADED_BALANCE, 0,0,null,0,STD.SHARE_AMT / TT.TRADED_BALANCE) * 100  ||''
 			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME * 100 || ''
 			 END                                                   DELIVERY_SCHEDULE,
 <!--			 TTH.ACCOUNT_ID                                        ACCT_ACCOUNT,-->
@@ -1211,7 +1212,8 @@
 			   WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
 			   WHEN STD.DELIVERY_RESULT = '04' THEN '0'
         WHEN eea.ASSET_TYPE1 = 'H01'
-        THEN STD.SHARE_AMT / TT.TRADED_BALANCE * 100 ||''
+        THEN
+        decode(TT.TRADED_BALANCE, 0,0,null,0,STD.SHARE_AMT / TT.TRADED_BALANCE) * 100 ||''
 			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME * 100 || ''
 			 END                                                   DELIVERY_SCHEDULE,
 			 TT.ACCOUNT_ID                                         ACCT_ACCOUNT,
