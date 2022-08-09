@@ -1290,7 +1290,8 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
         }
         // 删除历史流水 避免历史流水影响下次提交
         baseAssetCashPositionCommMapper.deleteCashPositionByOrderIds(Collections.singletonList(quoteId));
-        baseAssetCashPositionCommMapper.deletePositionByTradeIdNotPledge(quoteId);
+        // 报价第一次提交(新建/回复) 退回时删除历史流水 避免对下次提交造成干扰
+        baseAssetCashPositionCommMapper.deletePositionByTradeId(quoteId);
         return true;
     }
 

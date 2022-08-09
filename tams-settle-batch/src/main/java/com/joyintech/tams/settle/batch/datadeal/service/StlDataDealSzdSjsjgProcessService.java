@@ -1520,7 +1520,7 @@ public class StlDataDealSzdSjsjgProcessService {
                         settleTransDataPledge.setTradeId(settleTransData.getTradeId());
                         settleTransDataPledge.setBranch(0L);
                         // 质押金融产品代码  金融产品类型(投管).债券 + 质押品明细.证券代码 + ".SZ"
-                        settleTransDataPledge.setPledgeFinprodId(DictCodeListExt1.金融产品类型_投管用_债券.getValue() + info.getFinprodId() + ".SZ");
+                        settleTransDataPledge.setPledgeFinprodId(DictCodeListExt1.金融产品类型_投管用_债券.getValue() + GlobalConstant.UNDER_LINE + info.getPledgeFinprodId() + ".SZ");
                         // 质押面值
                         settleTransDataPledge.setPledgeFaceValue(finCashPlanMapper.selectFaceValue(settleTransData.getFinprodId(), DateUtil.format(DateUtil.platDateFromCache())));
                         // 质押数量
@@ -1530,6 +1530,7 @@ public class StlDataDealSzdSjsjgProcessService {
                                 ArithmeticUtil.multiply(settleTransDataPledge.getPledgeNumber(), settleTransDataPledge.getPledgeFaceValue()), 2));
                         // 质押金额
                         settleTransDataPledge.setPledgeAmt(null);
+                        settleTransDataPledge.setDisplaceDirection(DictCodeListExt3.质押券置换_置换方向_换出.getValue());
                         stlDownDataDealWriteBaseDto.getSettleTransDataPledgeList().add(settleTransDataPledge);
                     }
                 } else if ((StringUtil.equals(szdSjsjg.getJgywlb(), StlDataDealProcessConstant.SJSJG_YWLB_XYXB) && DictCodeListExt3.交易方向_到期续做.getValue().equals(settleTransData.getPs())

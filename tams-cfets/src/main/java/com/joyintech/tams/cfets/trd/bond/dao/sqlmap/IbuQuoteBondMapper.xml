@@ -112,7 +112,7 @@
         ETR_ENTRUST_ADD.FULL_PRICE unitFprice,
         to_char(ETR_ENTRUST_ADD.TRANSMIT_TIME,'hh24:mi:ss') transmitTime,
         ROUND(NVL(T8.totalShareAmt,0)/100) finishDealAmt,
-        ROUND((NVL(ETR_ENTRUST.ENTRUST_NUM, 0) - NVL(T8.totalShareAmt,0))/100) avaDealAmt,
+        ROUND((NVL(ETR_ENTRUST.ENTRUST_NUM, 0) - NVL(T8.totalShareAmt,0)- - NVL(ETR_ENTRUST_ADD.CLOSE_AMT,0))/100) avaDealAmt,
         D.ITEM_VALUE entrustStatusStr,
         E.ITEM_VALUE psStr,
         F.ITEM_VALUE priceModelStr,

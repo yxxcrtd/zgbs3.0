@@ -159,7 +159,8 @@
                     - NVL(T5.FINISH_AMT,0) - NVL(T7.ENT_FINISH_AMT,0) - NVL(ETR_ENTRUST_ADD.CLOSE_AMT,0)      avaNum/*剩余指令额度(元)*/
                 </if>
                 , ROUND(NVL(C2.totalShareAmt,0))                                                              finishDealAmt/*已成交额度(元)*/
-                , ROUND(NVL(ETR_ENTRUST.ENTRUST_AMT, 0) - NVL(C2.totalShareAmt,0))                            avaDealAmt/*剩余成交额度(元)*/
+                , ROUND(NVL(ETR_ENTRUST.ENTRUST_AMT, 0) - NVL(C2.totalShareAmt,0) - NVL(ETR_ENTRUST_ADD.CLOSE_AMT,0))
+                                                                                                              avaDealAmt/*剩余成交额度(元)*/
                 , trunc(nvl(NVL(T5.FINISH_AMT, 0)+
                                        NVL(T7.ENT_FINISH_AMT, 0),0)/(ETR_ENTRUST.ENTRUST_AMT),4)*100          transactioncom/*执行进度(%)*/
                 , trunc(NVL(C2.totalShareAmt,0)/(ETR_ENTRUST.ENTRUST_AMT),4)*100                              tradeFinishPercent/* 成交进度(%)*/

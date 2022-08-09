@@ -2885,7 +2885,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
         //【实时资产头寸查询】深交所正回购解除质押，已撤回指令修改提交，没有对质押式回购指令可用持仓 处理
         if (DictCodeListExt3.交易方向_解除质押.getValue().equals(dto.getPs())) {
-            TrdProductDeal trdProductDeal = trdProductDealMapper.selectByPrimaryKey(dto.getFinprodId());
+            TrdProductDeal trdProductDeal = trdProductDealMapper.selectByPrimaryKey(dto.getInitialNum());
             if (null != trdProductDeal) {
                 dto.setTradeAmt(trdProductDeal.getTradeAmt());
             }
