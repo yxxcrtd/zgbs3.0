@@ -523,7 +523,7 @@
                 and t1.TRADE_STATUS = #{TRADE_STATUS01}
                 and t1.IS_CANCEL = #{YES_OR_NO_N}
                 AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
-                and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS})
+                and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS},#{PST93},#{PST94},#{PST95},#{PST96})
                 <if test="portfolioId != null and !portfolioId.isEmpty()">
                     AND (PP.PORTFOLIO_ID IN (<foreach collection="portfolioId" index= "index" item="item" separator=",">#{item}</foreach> )
                     or
@@ -591,7 +591,7 @@
             and T1.PORTFOLIO_ID <include refid="com.joyintech.service.period.trdbondduration.dao.TrdBondDurationMapper.portfolioAth"/>
             and t1.TRADE_STATUS = #{TRADE_STATUS03}
             AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
-            and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS})
+            and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS},#{PST93},#{PST94},#{PST95},#{PST96})
             <if test="portfolioId != null and !portfolioId.isEmpty()">
                 AND (PP.PORTFOLIO_ID IN (<foreach collection="portfolioId" index= "index" item="item" separator=",">#{item}</foreach> )
                 or

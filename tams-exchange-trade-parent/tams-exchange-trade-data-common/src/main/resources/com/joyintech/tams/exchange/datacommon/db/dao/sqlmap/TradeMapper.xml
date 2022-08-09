@@ -437,7 +437,7 @@
 				 WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
 				 WHEN STD.DELIVERY_RESULT = '04' THEN  '0'
         WHEN eea.ASSET_TYPE1 = 'H01'
-        THEN STD.SHARE_AMT / A.TRADED_VOLUME ||''
+        THEN decode(A.TRADED_BALANCE,0,0,null,0,STD.SHARE_AMT /A.TRADED_BALANCE) * 100 ||''
 				 ELSE STD.SHARE_AMT / A.TRADED_VOLUME * 100 || ''
 			   END                                                   DELIVERY_SCHEDULE_TEMP
 		  FROM T_TRADE A
@@ -486,7 +486,7 @@
 			   END                         DELIVERY_RESULT_TEMP,
 			   CASE WHEN std1.DELIVERY_RESULT != '05' THEN '100'
         WHEN eea.ASSET_TYPE1 = 'H01'
-        THEN std2.SHARE_AMT / std1.SHARE_AMT ||''
+        THEN decode(std1.SHARE_AMT,0,0,null,0, std2.SHARE_AMT / std1.SHARE_AMT) * 100 ||''
 					ELSE std2.SHARE_AMT / std1.SHARE_AMT * 100 || ''
 			   END                         DELIVERY_SCHEDULE_TEMP
 		  FROM SETTLE_TRANS_DATA std1

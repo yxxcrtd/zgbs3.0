@@ -127,7 +127,7 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         // 净价总额
         dealTotal.setCpriceAmt(null);
         // 交易份额
-        dealTotal.setShareAmt(entrustDto.getMarchQty());
+        dealTotal.setShareAmt(entrustDto.getMarchQty() == null ? BigDecimal.ZERO : entrustDto.getMarchQty());
         // 交易本金
         dealTotal.setPrinAmt(null);
         // 利息总额
@@ -137,7 +137,7 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         // 随交易支付费用
         dealTotal.setFeeAmtPay(null);
         // 交易金额
-        dealTotal.setTradeAmt(entrustDto.getMarchAmt());
+        dealTotal.setTradeAmt(entrustDto.getMarchAmt() == null ? BigDecimal.ZERO : entrustDto.getMarchAmt());
         // 未随交易支付费用
         dealTotal.setFeeAmtUnpay(null);
         // 总交易费用
