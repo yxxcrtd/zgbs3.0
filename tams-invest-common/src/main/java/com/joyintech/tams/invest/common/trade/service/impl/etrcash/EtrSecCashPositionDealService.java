@@ -937,7 +937,9 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                     // 最后一笔时
                     Map<String, Object> map = new HashMap<>();
                     map.put("entrustId", entrustId);
-                    map.put("portfolioId", finProductTradeDto.getTrdProductDeal().getPortfolioId());
+                    map.put("portfolioId", StringUtil.isNotEmpty(finProductTradeDto.getTrdProductDeal().getPortfolioId()) ?
+                            finProductTradeDto.getTrdProductDeal().getPortfolioId()
+                            : finProductTradeDto.getTrdProductDealAdd().getPortfolioId());
                     map.put("sumTradeFlag", "01");
                     map.put("settleStatus",DictCodeListExt3.交收状态_未交收.getValue());
                     String etrStatus = EtrCommonCashPositionDealService.getEtrStatus(map);
@@ -947,8 +949,10 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                         BigDecimal amount = EtrCommonCashPositionDealService.getEtrSurplusAmt(entrustId, finProductTradeDto.getTrdProductDeal().getPortfolioId());
                         EtrCashPositionFlowDto ret = new EtrCashPositionFlowDto();
                         BeanUtil.copyPropertiesIgnoreNull(ret, etrCashPositionFlowDto);
-                        ret.setSeqno(EtrCommonCashPositionDealService.getSeqNo());
+                        ret.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
+                        ret.setOffsetId(entrustId);
                         ret.setAmount(amount);
+                        ret.setSeqno(getSeqNo());
                         // 添加现金流水到目标dto
                         etrPositionHoldDto.getPtlCashPositionFlows().add(ret);
                     } else {
