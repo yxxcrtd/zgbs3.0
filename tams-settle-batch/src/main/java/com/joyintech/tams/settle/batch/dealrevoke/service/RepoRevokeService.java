@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -168,7 +169,7 @@ public class RepoRevokeService implements BaseRevokeService {
                 ptlSecPositionFlowDto.setSeqno(IDGenerator.generate());
                 ptlSecPositionFlowDto.setTradeId(ptlSecPositionFlowDto.getTradeId() + "R");
                 ptlSecPositionFlowDto.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
-                ptlSecPositionFlowDto.setAmount(ptlSecPositionFlowDto.getAmount().negate());
+                ptlSecPositionFlowDto.setAmount(ptlSecPositionFlowDto.getAmount() == null ? BigDecimal.ZERO : ptlSecPositionFlowDto.getAmount().negate());
                 ptlSecPositionFlowMapper.insertSelective(ptlSecPositionFlowDto);
             }
 
@@ -192,7 +193,7 @@ public class RepoRevokeService implements BaseRevokeService {
                 etrSecPositionFlowDto.setSeqno(IDGenerator.generate());
                 etrSecPositionFlowDto.setTradeId(etrSecPositionFlowDto.getTradeId() + "R");
                 etrSecPositionFlowDto.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
-                etrSecPositionFlowDto.setAmount(etrSecPositionFlowDto.getAmount().negate());
+                etrSecPositionFlowDto.setAmount(etrSecPositionFlowDto.getAmount() == null ? BigDecimal.ZERO : etrSecPositionFlowDto.getAmount().negate());
                 etrSecPositionFlowMapper.insertSelective(etrSecPositionFlowDto);
             }
 
@@ -219,7 +220,7 @@ public class RepoRevokeService implements BaseRevokeService {
                     ptlCashPositionFlowDto.setSeqno(IDGenerator.generate());
                     ptlCashPositionFlowDto.setOrderId(ptlCashPositionFlowDto.getOrderId() + "R");
                     ptlCashPositionFlowDto.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
-                    ptlCashPositionFlowDto.setAmount(ptlCashPositionFlowDto.getAmount().negate());
+                    ptlCashPositionFlowDto.setAmount(ptlCashPositionFlowDto.getAmount() == null ? BigDecimal.ZERO : ptlCashPositionFlowDto.getAmount().negate());
                     ptlCashPositionFlowMapper.insertSelective(ptlCashPositionFlowDto);
                 }
                 // 更新余额
@@ -242,7 +243,7 @@ public class RepoRevokeService implements BaseRevokeService {
                     etrCashPositionFlowDto.setSeqno(IDGenerator.generate());
                     etrCashPositionFlowDto.setOrderId(etrCashPositionFlowDto.getOrderId() + "R");
                     etrCashPositionFlowDto.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
-                    etrCashPositionFlowDto.setAmount(etrCashPositionFlowDto.getAmount().negate());
+                    etrCashPositionFlowDto.setAmount(etrCashPositionFlowDto.getAmount() == null ? BigDecimal.ZERO : etrCashPositionFlowDto.getAmount().negate());
                     etrCashPositionFlowMapper.insertSelective(etrCashPositionFlowDto);
                 }
                 // 更新余额
