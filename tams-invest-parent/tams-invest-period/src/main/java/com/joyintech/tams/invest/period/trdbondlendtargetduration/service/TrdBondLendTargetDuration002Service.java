@@ -238,8 +238,9 @@ public class TrdBondLendTargetDuration002Service extends BaseService<TrdBondLend
                 }
             }
         }
-
-        if (!流程中) {
+        if (DictCodeListExt3.平安业务类型_融入债券付息还本_付.getValue().equals(entity.getTradeType()) && 流程中) {
+            baseEtrCashPositionCommService.portfolioEtrCashPosition(ptlPositionHoldDto, true);
+        }else if (!DictCodeListExt3.平安业务类型_融入债券付息还本_付.getValue().equals(entity.getTradeType())&&!流程中) {
             baseEtrCashPositionCommService.portfolioEtrCashPosition(ptlPositionHoldDto, true);
         }
     }
