@@ -947,8 +947,10 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                         BigDecimal amount = EtrCommonCashPositionDealService.getEtrSurplusAmt(entrustId, finProductTradeDto.getTrdProductDeal().getPortfolioId());
                         EtrCashPositionFlowDto ret = new EtrCashPositionFlowDto();
                         BeanUtil.copyPropertiesIgnoreNull(ret, etrCashPositionFlowDto);
-                        ret.setSeqno(EtrCommonCashPositionDealService.getSeqNo());
+                        ret.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
+                        ret.setOffsetId(entrustId);
                         ret.setAmount(amount);
+                        ret.setSeqno(getSeqNo());
                         // 添加现金流水到目标dto
                         etrPositionHoldDto.getPtlCashPositionFlows().add(ret);
                     } else {
