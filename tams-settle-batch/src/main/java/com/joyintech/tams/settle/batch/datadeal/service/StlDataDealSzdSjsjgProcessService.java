@@ -1533,8 +1533,8 @@ public class StlDataDealSzdSjsjgProcessService {
                         settleTransDataPledge.setDisplaceDirection(DictCodeListExt3.质押券置换_置换方向_换出.getValue());
                         stlDownDataDealWriteBaseDto.getSettleTransDataPledgeList().add(settleTransDataPledge);
                     }
-                } else if ((StringUtil.equals(szdSjsjg.getJgywlb(), StlDataDealProcessConstant.SJSJG_YWLB_XYXB) && DictCodeListExt3.交易方向_到期续做.getValue().equals(settleTransData.getPs())
-                        && DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(settleTransData.getFinprodType2()))
+                } else if ((StringUtil.equals(szdSjsjg.getJgywlb(), StlDataDealProcessConstant.SJSJG_YWLB_XYXB) && DictCodeListExt3.交易方向_到期续做.getValue().equals(settleTransData.getPs()))
+                        //&& DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(settleTransData.getFinprodType2())
                         || StringUtil.equals(szdSjsjg.getJgywlb(), StlDataDealProcessConstant.SJSJG_YWLB_XYCS)) {
                     List<SzdSjsfw> szdSjsfwList = select首期质押品SJSFW(settleTransData.getfCjbh(), szdSjsjg.getJgcjrq(), szdSjsjg.getJgtgdy());
                     for (SzdSjsfw info : szdSjsfwList) {

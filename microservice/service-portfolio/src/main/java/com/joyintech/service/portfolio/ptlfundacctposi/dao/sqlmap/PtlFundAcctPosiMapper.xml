@@ -175,8 +175,8 @@
 	A.CCY               CCY,
 	B.TRADE_ID          BUSINO,
 	<!-- update by xr for tishkbs-648 流水表未存分层信息，交易表金额不带正负，start-->
-	case when A.AMOUNT >=0 then  NVL(C.Trade_Amt*1,A.AMOUNT)
-	else NVL(C.Trade_Amt*-1,A.AMOUNT) end as AMOUNT,
+	case when A.AMOUNT >=0 then  NVL(A.AMOUNT,C.Trade_Amt*1)
+	else NVL(A.AMOUNT,C.Trade_Amt*-1) end as AMOUNT,
 	<!-- update by xr for tishkbs-648 流水表未存分层信息，交易表金额不带正负，end-->
 	F.PORTFOLIO_NAME    PORTFOLIONAME,
 	nvl(D.FINPROD_MARKET_ID,D1.FINPROD_MARKET_ID) FINPRODMARKETID,

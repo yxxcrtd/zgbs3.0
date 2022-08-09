@@ -97,14 +97,6 @@ public class EntrustStatusService {
 
             // 处理对接了头寸引擎的指令关闭 start
             List<EntrustClosePosEtrReqDto> etrReqDtoList = entrustStatusMapper.selectEntrustList(params);
-            List<EntrustClosePosEtrReqDto> etrReqDtoList1 = new ArrayList<>();
-            for(EntrustClosePosEtrReqDto item : etrReqDtoList){
-                if("WTBOND202112212981".equals(item.getCloseId())||"WTBOND202112212983".equals(item.getCloseId())){
-                    etrReqDtoList1.add(item);
-                    break;
-                }
-            }
-            etrReqDtoList = etrReqDtoList1;
             logger.info("待关闭指令:{}",JsonUtils.object2Json(etrReqDtoList));
             // List<String> entrustIds = entrustStatusMapper.selectEntrustIds(params);
             List<String> entrustIds = new ArrayList<>();

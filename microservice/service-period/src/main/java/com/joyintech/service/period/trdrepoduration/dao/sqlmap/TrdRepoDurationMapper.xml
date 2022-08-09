@@ -620,8 +620,28 @@
                 T4.INT_RATE*100 INT_RATE,
                 T1.COUNTER_ID counterId,
                 t6.COUNTER_NAME counterName,
-                T1.COUNTER_TRADER,
-                T1.TRADER,
+                <!--T1.COUNTER_TRADER,
+                T1.TRADER,-->
+                (
+                    SELECT DISTINCT
+                        mddi.TRADER_NAME
+                    FROM
+                        MST_DEALER_DETAIL_INFO mddi
+                    WHERE
+                    mddi.DEALER_NO = ptpdd.OUT_DEALER_NO
+                    AND mddi.TRADE_MARKET = T4.Trade_Market
+                    AND mddi.TRADER_NO = T1.COUNTER_TRADER
+                ) AS COUNTER_TRADER,
+                (
+                    SELECT DISTINCT
+                        mddi.TRADER_NAME
+                    FROM
+                        MST_DEALER_DETAIL_INFO mddi
+                    WHERE
+                    mddi.DEALER_NO = ptpdd.DEALER_NO
+                    AND mddi.TRADE_MARKET = T4.Trade_Market
+                    AND mddi.TRADER_NO = T1.TRADER
+                ) AS TRADER,
                 T1.SEC_MANAGE_ACCT_ID,
                 T4.FINPROD_ID,
                 T1.PORTFOLIO_ID,
@@ -669,6 +689,7 @@
             LEFT JOIN PTL_PORTFOLIO PP ON PT.PORTFOLIO_ID = PP.PORTFOLIO_ID
             LEFT JOIN TRD_TRADE_FEE_TOTAL ttft on ttft.TOTLE_TRADE_ID = T1.TOTLE_TRADE_ID and ttft.FEE_TYPE = #{FEE_TYPE_JSF}
             LEFT JOIN TRD_PRODUCT_DEAL ptpd on ptpd.TRADE_ID =  T4.FINPROD_ID
+            LEFT JOIN trd_product_deal_add ptpdd ON ptpd.trade_id = ptpdd.trade_id
             where
                 PP.INVEST_YESORNO='Y'
             <if test="statusValid == PAGE_DATE_STATUS05">
