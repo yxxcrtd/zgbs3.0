@@ -4,7 +4,6 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.exchange.common.bean.EntrustQueryBean;
 import com.joyintech.tams.exchange.common.bean.TradeQryBean;
 import com.joyintech.tams.exchange.common.bean.TradeQueryBean;
@@ -125,7 +124,7 @@ public class TradeServiceImpl extends AsyncServiceImpl<String, Trade> implements
     public Trade queryTradeByAccountIdAndBrokerTradeId(String accountId, String key) {
         Map<String, Trade> map = accountIdMap.get(accountId);
         if (Objects.nonNull(map)) {
-            return map.get(DateUtil.getSysDate().replace("-", "") + "_" + key);
+            return map.get(key);
         }
         return null;
     }
