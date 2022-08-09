@@ -715,9 +715,9 @@ public class EtrSecLendService extends BaseService {
         //删除流水
         baseEtrCashPositionCommService.entrustCloseExecute(dto.getEntrustId(), DictCodeList.是否_是.getValue());
         //删除流程中数据
-//        Map<String, Object> param = new HashMap<>();
-//        param.put("workflowId", dto.getWorkflowId());
-//        etrSecLendMapper.deleteWflwflEtrTarget(dto.getWorkflowId());
+        Map<String, Object> param = new HashMap<>();
+        param.put("workflowId", dto.getWorkflowId());
+        etrSecLendMapper.deleteWflwflEtrTarget(dto.getWorkflowId());
     }
     
 }
