@@ -261,7 +261,7 @@
 			AND T4.FINPROD_MARKET_ID = #{finprodMarketId}
 		</if>
 		<if test="paBizType != null and !paBizType.isEmpty()">
-			AND T3.PA_BUSS_TYPE = #{paBizType}
+			AND nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) = #{paBizType}
 		</if>
 		<if test="tradeDateStart != null and !tradeDateStart.isEmpty()">
 			AND T1.SETTLE_DATE >= to_date(#{tradeDateStart}, 'yyyy-MM-dd')
@@ -933,11 +933,11 @@
 				nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 				case
                     when T1.PORTFOLIO_ID is not null then T1.PORTFOLIO_ID
-                    else order2.portfolio_id 
+                    else order2.portfolio_id
                 end as portfolioId,
                  case
                     when T1.PORTFOLIO_ID is not null then T2.PORTFOLIO_NAME
-                    else order2.portfolio_name 
+                    else order2.portfolio_name
                 end as portfolioName,
 				NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
 				nvl(SAI.SEC_ACCT_NAME, fp.FINPROD_NAME) secAcctName,
@@ -1045,7 +1045,7 @@
 			        AND T4.FINPROD_MARKET_ID = #{finprodMarketId}
 		        </if>
 		        <if test="paBizType != null and !paBizType.isEmpty()">
-			        AND T3.PA_BUSS_TYPE = #{paBizType}
+			        AND nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) = #{paBizType}
 		        </if>
 		        <if test="tradeDateStart != null and !tradeDateStart.isEmpty()">
 			        AND T1.SETTLE_DATE >= to_date(#{tradeDateStart}, 'yyyy-MM-dd')
@@ -1572,7 +1572,7 @@
 			AND T4.FINPROD_MARKET_ID = #{finprodMarketId}
 		</if>
 		<if test="paBizType != null and !paBizType.isEmpty()">
-			AND T3.PA_BUSS_TYPE = #{paBizType}
+			AND nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) = #{paBizType}
 		</if>
 		<if test="tradeDateStart != null and !tradeDateStart.isEmpty()">
 			AND T1.TRADE_DATE >= to_date(#{tradeDateStart}, 'yyyy-MM-dd')
@@ -1607,7 +1607,7 @@
                 a.trade_id
             from STL_PAY_ORDERS A
             inner join ptl_portfolio  b on a.portfolio_id = b.portfolio_id
-            order by a.trade_id,b.portfolio_id 
+            order by a.trade_id,b.portfolio_id
         )
     </sql>
 
@@ -1647,17 +1647,17 @@
 
 	<!--资产代码联想框-->
 	<select id="getFinprodMarketIds" resultType="com.joyintech.framework.select.SuggestDto">
-		SELECT 
+		SELECT
 			FINPROD_MARKET_ID code,
 			FINPROD_ABBR shortName
 		FROM
 			FIN_PRODUCT
-		LEFT JOIN 
+		LEFT JOIN
 			FIN_PRODUCT_TYPE
-		ON 
+		ON
 			FIN_PRODUCT.FINPROD_ID = FIN_PRODUCT_TYPE.FINPROD_ID
 		<where>
-			<if test="finprodMarketId !=null and finprodMarketId != ''">	
+			<if test="finprodMarketId !=null and finprodMarketId != ''">
 				(FINPROD_MARKET_ID like concat(concat('%',
 				#{finprodMarketId,jdbcType=VARCHAR}),'%')
 				OR
@@ -1665,7 +1665,7 @@
 				#{finprodMarketId,jdbcType=VARCHAR}),'%'))
 			</if>
 			AND FIN_PRODUCT_TYPE.TYPE_8 IS NOT NULL
-		</where>	
+		</where>
 	</select>
 	<!--证券账户-->
 	<select id="getSecAcctIdAndChlIds" resultType="com.joyintech.framework.select.SelectOptionDto">
@@ -1718,7 +1718,7 @@
 		</where>
 		)
 	</sql>
-	
+
 	<select id="getType6" resultType="java.lang.String" parameterType="java.lang.String">
 		select type_6 from FIN_PRODUCT_TYPE where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
 	</select>
