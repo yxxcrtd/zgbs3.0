@@ -2307,4 +2307,12 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
             riskCreditListCommonValidatorService.deleteCredit(entity.getTradeId());
         }
     }
+
+    public List<FinDealPledge> getFinishAmtPledgeList(String entrustId) {
+        Map<String,Object > map = new HashMap<>();
+        map.put("entrustId",entrustId);
+        return  restTemplate.postForList(ServiceApplication.TRADE_SERVICE_NAME
+                        + "/TrdBondLendInvestTrade/getFinishAmtPledgeList",map,
+                FinDealPledge.class);
+    }
 }

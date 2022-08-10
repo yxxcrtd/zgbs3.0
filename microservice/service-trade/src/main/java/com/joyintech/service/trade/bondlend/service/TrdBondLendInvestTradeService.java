@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.joyintech.framework.util.DateUtil;
+import com.joyintech.tams.common.base.entity.FinDealPledge;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -167,6 +168,12 @@ public class TrdBondLendInvestTradeService extends BaseService {
         return this.queryForSuggest(() -> trdBondLendInvestTradeMapper.getSecManageAcctId(param),
             null);
     }
+
+    public List<FinDealPledge> getFinishAmtPledgeList(Map<String, Object> param) {
+        return this.queryForSuggest(() -> trdBondLendInvestTradeMapper.getFinishAmtPledgeList(param),
+                null);
+    }
+
 
     public Map<String, Object> getAssetAvailablePosition(Map<String, Object> param) {
         Map<String, Object> result = new HashMap<>();

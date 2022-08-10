@@ -18,6 +18,7 @@ import com.joyintech.service.trade.bondlend.dto.FinCashPlanDto;
 import com.joyintech.service.trade.bondlend.dto.SecInfoModelDto;
 import com.joyintech.service.trade.bondlend.dto.TrdBondLendInvestTradeDto;
 import com.joyintech.service.trade.bondlend.service.TrdBondLendInvestTradeService;
+import com.joyintech.tams.common.base.entity.FinDealPledge;
 import com.joyintech.tams.common.base.entity.StlCapacctInfo;
 import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommService;
 import com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto;
@@ -99,6 +100,11 @@ public class TrdBondLendInvestTradeController {
     @RequestMapping("getEntrustInfo/{entrustId}")
     public BaseEtrInvestInfoDto getEntrustInfo(@PathVariable("entrustId") String entrustId) {
         return trdBondLendInvestTradeService.getEntrustInfo(entrustId);
+    }
+
+    @RequestMapping("getFinishAmtPledgeList")
+    public List<FinDealPledge> getFinishAmtPledgeList(@RequestBody Map<String, Object> param) {
+        return trdBondLendInvestTradeService.getFinishAmtPledgeList(param);
     }
 
     /**

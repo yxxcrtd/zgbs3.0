@@ -672,5 +672,24 @@
           and CCY = #{ccy,jdbcType=VARCHAR}
     </select>
 
+    <select id="getFinishAmtPledgeList" resultType="com.joyintech.tams.common.base.entity.FinDealPledge" >
+        SELECT
+            PLEDGE_FINPROD_ID ,sum(PLEDGE_AMT) PLEDGE_AMT ,sum(PLEDGE_NUMBER)  PLEDGE_NUMBER
+        FROM
+            FIN_DEAL_PLEDGE a
+                LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON
+                a.FINPROD_ID = b.TRADE_ID
+                LEFT JOIN TRD_PRODUCT_DEAL c ON
+                c.TRADE_ID = b.TRADE_ID
+        WHERE
+            1 = 1
+          AND c.IS_CANCEL = 'N'
+          AND c.TRADE_STATUS = '01'
+          AND b.ENTRUST_ID =#{entrustId}
+        GROUP BY PLEDGE_FINPROD_ID
+    </select>
+
+
+
 
 </mapper>

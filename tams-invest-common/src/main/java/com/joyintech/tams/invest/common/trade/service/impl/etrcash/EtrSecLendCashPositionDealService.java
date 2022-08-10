@@ -162,6 +162,7 @@ public class EtrSecLendCashPositionDealService  {
         }
         else {// 到期
             // 融入到期，只在提交时，体现持仓和现金.只需处理债券交割，现金交割（暂不实现）
+            etrSecPositionFlowDto.setCdate(finProductTradeDto.getTrdProductDeal().getSettleDate());
             if (StringUtil.equals(deal.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券借贷融入.getValue())) {
                 if (DictCodeList.持仓类型_可用.equals(持仓类型) || etrPositionHoldDto.isNeedNegative()) {
                     EtrSecPositionFlowDto etrSecPositionFlowDto1 = new EtrSecPositionFlowDto();

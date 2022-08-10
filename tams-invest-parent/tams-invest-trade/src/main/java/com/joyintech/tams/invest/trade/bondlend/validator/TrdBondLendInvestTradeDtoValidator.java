@@ -22,8 +22,12 @@ import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.tams.common.base.entity.EtrPledge;
+import com.joyintech.tams.common.base.entity.FinDealPledge;
+import com.joyintech.tams.invest.common.component.base.entrust.BaseEtrInvestInfoService;
 import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
 import com.joyintech.tams.invest.trade.bondlend.dto.TrdBondLendInvestTradeDto;
+import com.joyintech.tams.invest.trade.bondlend.service.TrdBondLendInvestTrade002Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -59,11 +63,19 @@ public class TrdBondLendInvestTradeDtoValidator implements TradeCommonValidator 
     private BussTrdTransferOrderService bussTrdTransferOrderService;
 
     /**
+     * 投资委托基础组件
+     */
+    @Autowired(required = false)
+    private BaseEtrInvestInfoService baseEtrInvestInfoService;
+
+    /**
      * TrdBondInvestTrade002Service
      */
     @Autowired
     private TrdBondInvestTrade002Service trdBondInvestTrade002Service;
-    
+    @Autowired
+    private TrdBondLendInvestTrade002Service trdBondLendInvestTrade002Service;
+
     @Autowired
 	private TradeCommonService tradeCommonService;
 
@@ -74,22 +86,22 @@ public class TrdBondLendInvestTradeDtoValidator implements TradeCommonValidator 
     public List<ValidMessage> bussValid(Object value) {
         TrdBondLendInvestTradeDto inputDto = (TrdBondLendInvestTradeDto)value;
         //万元转换 add  by yeming 20210817 start
-        if(inputDto.getBussRepoSec() != null){
-            if( inputDto.getBussRepoSec().getTotalPrinAmt()  != null && StringUtil.equals(CacheUtil.getSysParam("entrustAmtUnit"),"02")){
-                inputDto.getBussRepoSec().setTotalPrinAmt(ArithmeticUtil.multiply(2, RoundingMode.HALF_UP, inputDto.getBussRepoSec().getTotalPrinAmt(),new BigDecimal(10000)));
-            }
-            for (PledgeBondInfoDto pledgeBond :  inputDto.getBussRepoSec().getPledgeBondList()) {
-                if (pledgeBond.getAvaPledgePrin() != null) {
-                    pledgeBond.setAvaPledgePrin(ArithmeticUtil.multiply(2, RoundingMode.HALF_UP,pledgeBond.getAvaPledgePrin(), new BigDecimal(10000)));
-                }
-                if (pledgeBond.getPledgePrin() != null) {
-                    pledgeBond.setPledgePrin(ArithmeticUtil.multiply(2, RoundingMode.HALF_UP,pledgeBond.getPledgePrin(), new BigDecimal(10000)));
-                }
-                if (pledgeBond.getPrin() != null) {
-                    pledgeBond.setPrin(ArithmeticUtil.multiply(2, RoundingMode.HALF_UP,pledgeBond.getPrin(), new BigDecimal(10000)));
-                }
-            }
-        }
+//        if(inputDto.getBussRepoSec() != null){
+//            if( inputDto.getBussRepoSec().getTotalPrinAmt()  != null && StringUtil.equals(CacheUtil.getSysParam("entrustAmtUnit"),"02")){
+//                inputDto.getBussRepoSec().setTotalPrinAmt(ArithmeticUtil.multiply(2, RoundingMode.HALF_UP, inputDto.getBussRepoSec().getTotalPrinAmt(),new BigDecimal(10000)));
+//            }
+//            for (PledgeBondInfoDto pledgeBond :  inputDto.getBussRepoSec().getPledgeBondList()) {
+//                if (pledgeBond.getAvaPledgePrin() != null) {
+//                    pledgeBond.setAvaPledgePrin(ArithmeticUtil.multiply(2, RoundingMode.HALF_UP,pledgeBond.getAvaPledgePrin(), new BigDecimal(10000)));
+//                }
+//                if (pledgeBond.getPledgePrin() != null) {
+//                    pledgeBond.setPledgePrin(ArithmeticUtil.multiply(2, RoundingMode.HALF_UP,pledgeBond.getPledgePrin(), new BigDecimal(10000)));
+//                }
+//                if (pledgeBond.getPrin() != null) {
+//                    pledgeBond.setPrin(ArithmeticUtil.multiply(2, RoundingMode.HALF_UP,pledgeBond.getPrin(), new BigDecimal(10000)));
+//                }
+//            }
+//        }
         //万元转换 add  by yeming 20210817 end
         List<ValidMessage> errorList = new ArrayList<>();
 
@@ -218,6 +230,29 @@ public class TrdBondLendInvestTradeDtoValidator implements TradeCommonValidator 
             		errorList.add(validMessage);
             	}
             }
+            if (StringUtil.equals(DictCodeList.回购拆借方向_融入.getValue(), inputDto.getPs())) {
+                for(PledgeBondInfoDto pledgeBondInfoDto : inputDto.getBussRepoSec().getPledgeBondList()){
+                    //获取交易已用
+                    List<FinDealPledge> finDealPledgeList =trdBondLendInvestTrade002Service.getFinishAmtPledgeList(inputDto.getEntrustId());
+                    //指令额度
+                    com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto resultDto = baseEtrInvestInfoService.queryActiveMandate(inputDto.getEntrustId());
+                    for(com.joyintech.tams.common.base.entity.EtrPledge etrPledge :resultDto.getEtrPledgeList()){
+                        if(StringUtil.equals(pledgeBondInfoDto.getFinprodId(),etrPledge.getFinprodId())){
+                            for(FinDealPledge finDealPledge:finDealPledgeList){
+                                if(StringUtil.equals(pledgeBondInfoDto.getFinprodId(),finDealPledge.getPledgeFinprodId())){
+                                    //交易占用
+                                    BigDecimal jy = ArithmeticUtil.doAdd(pledgeBondInfoDto.getPledgePrin(),finDealPledge.getPledgeAmt());
+                                    if(jy.compareTo(etrPledge.getPledgeAmt())>0){
+                                        ValidMessage validMessage = new ValidMessage("质押券总额不能超过指令【" + inputDto.getEntrustId() + "】指定的质押券总额,"+"当前可使用"+ArithmeticUtil.subtract(etrPledge.getPledgeAmt(),finDealPledge.getPledgeAmt())+"元");
+                                        errorList.add(validMessage);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
 
             // 委托场合时且交易方向为买入
             if (StringUtil.equals(DictCodeList.交易方向_买入.getValue(), inputDto.getPs())) {
