@@ -1095,7 +1095,7 @@
             WHERE B.PORTFOLIO_ID = #{portfolioId}
                AND fp.FINPROD_ID = #{finprodId}
                AND B.CCY = #{ccy}
-               AND B.ACCT_TYPE = decode(ssai.REGIST_ORG,#{REGIST_ORG_02},#{ACCT_TYPE_A09},#{ACCT_TYPE_A10})
+               AND B.ACCT_TYPE = decode(fp.REGIST_ORG,#{REGIST_ORG_02},#{ACCT_TYPE_A09},#{ACCT_TYPE_A10})
     </select>
 
     <select id="selectDVPCapacctInfoListByAcctId" resultType="com.joyintech.tams.common.base.entity.StlCapacctInfo">

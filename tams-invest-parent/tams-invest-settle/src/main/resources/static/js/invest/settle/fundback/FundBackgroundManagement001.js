@@ -1,4 +1,33 @@
-var table
+/**
+ * 交易信息查看页面
+ */
+var showDetailTrdPage = function (paBussType, tradeId, validStatus, tradeDateVal, tradeMarket) {
+    //一级投标债券 银行间/商业银行柜台
+    if (paBussType==='151' && (tradeMarket === '01' || tradeMarket === '02')
+        && validStatus === "05") {
+        console.log("----------PINAN_ASSET_TYPE_F17-------------");
+        if (validStatus !== '05') {
+            tradeId = tradeId.substring(0, tradeId.length - 1)
+        }
+        let param = {
+            "busiCode": tradeId,
+            "startDate": tradeDateVal,
+            "endDate": tradeDateVal,
+            "finprodType2": FINPROD_TYPE_TG_F32
+        };
+        let url = "home.html?a=a&busiCode=" + tradeId
+            + "&finprodType2=" + FINPROD_TYPE_TG_F32
+            + "&startDate=" + tradeDateVal
+            + "&endDate=" + tradeDateVal
+            + "&pageModel=1&editable=false&isTodoList=true#/transactionSearch/detail?a=a";
+
+        Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+            basePath + url,
+            "95%", "90%",
+            param);
+    }
+}
+let table;
 (function () {
     /**
      * 获取查询参数
@@ -40,8 +69,18 @@ var table
             {field: 'statusValidString', width: 200, sortField:'statusValid', title: '有效状态'}
             , {
                 field: 'bizCode', width: 200, title: '业务编号', render: function (data, type, row, meta) {
-                    if(row.paBussType==='212'||row.paBussType==='180'||row.paBussType==='151'||row.paBussType==='202'||row.paBussType==='09'){
-                        return  data ;
+                    if(row.paBussType==='212'||row.paBussType==='180'||row.paBussType==='202'||row.paBussType==='09'){
+                        return data;
+                    }
+                    if(row.paBussType==='151'&& (row.tradeMarket === '01' || row.tradeMarket === '02')){
+                        return "<a onclick=\"showDetailTrdPage('" + row.paBussType + "','"+ row.bizCode + "','" + row.statusValid + "','"
+                            + row.cashDate + "','" + row.tradeMarket + "')\" + style='cursor: pointer;'>" + row.bizCode + "</a>";
+                    }
+                    if(row.paBussType==='151'&& (row.tradeMarket !== '01' && row.tradeMarket !== '02')){
+                        row.pageModel=PAGE_MODEL_REFERENCE;
+                        Joyin.dialog(JoyinUtil.getLabel("PrimaryBiddingManage002.reference"),
+                            JoyinUtil.getRealPath("invest/trade/primarybiddingmanage/PrimaryBiddingManage002/init"),
+                            "99%", "99%", row);
                     }
                     return "<a class='pro-link' style='cursor: pointer;' " +
                         "href='javascript:openOperateWindow(\"" + row.statusValid + "\",\"" + row.paBussType + "\",\"" + row.portfolioId + "\",\""

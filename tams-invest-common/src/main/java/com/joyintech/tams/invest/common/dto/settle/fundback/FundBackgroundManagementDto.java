@@ -71,6 +71,11 @@ public class FundBackgroundManagementDto extends BaseEntity {
     private String finProdMarketName;
 
     /**
+     * 债券资产交易场所
+     */
+    private String tradeMarket;
+
+    /**
      * 现金流日期
      */
     private String cashDate;
@@ -543,5 +548,13 @@ public class FundBackgroundManagementDto extends BaseEntity {
 
     public void setPaBussTypeAdd(boolean paBussTypeAdd) {
         this.paBussTypeAdd = paBussTypeAdd;
+    }
+
+    public String getTradeMarket() {
+        return tradeMarket;
+    }
+
+    public void setTradeMarket(String tradeMarket) {
+        this.tradeMarket = tradeMarket;
     }
 }

@@ -3450,10 +3450,10 @@ public class CfetsTrdConfirmService extends BaseService {
         String payAcctNo = null;
         // 收款账户
         String recAcctNo = null;
-        // 债券买入 || 逆回购首期
-        if (StringUtil.equals(temp.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue())
-                || (StringUtil.equals(temp.getFinprodType2(), DictCodeListExt1.金融产品类型_债券.getValue())
-                && StringUtil.equals(temp.getPs(), DictCodeList.交易方向_买入.getValue()))) {
+        // 一级申购 || 债券买入 || 逆回购首期
+        if (StringUtil.equals(deal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue())
+                || (StringUtil.equals(deal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券.getValue())
+                && StringUtil.equals(deal.getPs(), DictCodeList.交易方向_买入.getValue()))) {
             payAcctNo = EtrCommonCashPositionDealService.select组合托管户(deal.getPortfolioId(), deal.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("portfolioId", deal.getPortfolioId());
@@ -3462,10 +3462,10 @@ public class CfetsTrdConfirmService extends BaseService {
             recAcctNo = joyinbusinessCommonService.selectDVPCapacctInfoListByAcctId(paramMap);
         }
         // 债券卖出/回售 || 正回购首期
-        if (StringUtil.equals(temp.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())
-                || (StringUtil.equals(temp.getFinprodType2(), DictCodeListExt1.金融产品类型_债券.getValue())
-                && (StringUtil.equals(temp.getPs(), DictCodeList.交易方向_卖出.getValue())
-                || StringUtil.equals(temp.getPs(), DictCodeList.交易方向_行权_回售.getValue())))) {
+        if (StringUtil.equals(deal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())
+                || (StringUtil.equals(deal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券.getValue())
+                && (StringUtil.equals(deal.getPs(), DictCodeList.交易方向_卖出.getValue())
+                || StringUtil.equals(deal.getPs(), DictCodeList.交易方向_行权_回售.getValue())))) {
             recAcctNo = EtrCommonCashPositionDealService.select组合托管户(deal.getPortfolioId(), deal.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("portfolioId", deal.getPortfolioId());
