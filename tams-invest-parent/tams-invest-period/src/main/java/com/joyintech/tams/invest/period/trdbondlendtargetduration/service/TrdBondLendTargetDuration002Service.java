@@ -375,6 +375,9 @@ public class TrdBondLendTargetDuration002Service extends BaseService<TrdBondLend
             setWorkflowId(entity.getTradeInfoDto(), entity.getWorkflowId());
         }
         saveDataWhenStartWorkflow(entity, type);
+        if(type == OperationType.DELETE||type == OperationType.REVOKE){
+             return;
+        }
         保存持仓(entity, type, true);
         try{
             String confirmOk = RequestUtil.getParam("confirmOk");
