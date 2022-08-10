@@ -2586,13 +2586,13 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             paramMap.put("ccy",deal.getCcy());
             String recAcctNo = joyinbusinessCommonService.selectCounterCapacctInfoList(paramMap);
             bussTrdTransferOrderDto.setRecAcctNo(recAcctNo);
-        } else if (isJys) {
+        } else if (!isJys) {
+            // 银行间 一级分销 DVP资金账户
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("portfolioId",deal.getPortfolioId());
             paramMap.put("finprodId",deal.getFinprodId());
             paramMap.put("ccy",deal.getCcy());
             String recAcctNo = joyinbusinessCommonService.selectDVPCapacctInfoList(paramMap);
-            // 银行间 一级分销 DVP资金账户
             bussTrdTransferOrderDto.setRecAcctNo(recAcctNo);
         } else {
             // 交易所 一级分销 清算户（虚拟）

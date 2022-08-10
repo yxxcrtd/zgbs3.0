@@ -2008,6 +2008,15 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                 messages.add(new ValidMessage("组合分配处“券面总额”不允许小于等于0。"));
 
             }
+            if (StringUtil.isNotEmpty(dtoList.get(i).getPortfolioId()) && StringUtil.isNotEmpty(allDto.getFinprodId())) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("portfolioId", dtoList.get(i).getPortfolioId());
+                map.put("finprodId", allDto.getFinprodId());
+                String secAcctId = joyinbusinessCommonService.qryPortfolioSecAcctId(map);
+                if(StringUtil.isEmpty(secAcctId)) {
+                    messages.add(new ValidMessage("组合下资产所属登记托管机构的证券账户不可为空。"));
+                }
+            }
             if (StringUtil.equals(shortSellingSupported, "02")) {
                 if (StringUtil.isNotEmpty(distrib.getEntrustOwnNum()) && distrib.getEntrustOwnNum().compareTo(BigDecimal.ZERO) < 0) {
                     messages.add(new ValidMessage("组合分配处“本方券券面总额”不允许小于0。"));

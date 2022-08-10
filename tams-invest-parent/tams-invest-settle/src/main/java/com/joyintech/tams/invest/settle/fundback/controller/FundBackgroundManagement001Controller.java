@@ -57,6 +57,7 @@ public class FundBackgroundManagement001Controller extends BaseController {
         model.addAttribute("PROFIT_TYPE02", BussinessDictCodeList.收益类型_预期收益.getValue());
         String sysDate = platformDateImpl.getSysDateStr();
         model.addAttribute("cashDate", sysDate + " - " + sysDate);
+        model.addAttribute("FINPROD_TYPE_TG_F32", BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
         return super.init(model);
     }
 
