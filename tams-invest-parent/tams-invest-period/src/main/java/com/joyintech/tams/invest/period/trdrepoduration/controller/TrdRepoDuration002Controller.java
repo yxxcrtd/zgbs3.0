@@ -28,6 +28,7 @@ import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -179,6 +180,12 @@ public class TrdRepoDuration002Controller extends BaseController {
                     deal.setPs(type);
                 }
             } else {
+                if(StringUtils.equals(entity.getPs(), "T54")){
+                    entity.setPs("T96");
+                }
+                if(StringUtils.equals(entity.getPs(), "T07")){
+                    entity.setPs("T95");
+                }
                 type = entity.getPs();
             }
 
