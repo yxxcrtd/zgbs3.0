@@ -128,7 +128,7 @@ public class UpdateTraderService {
 
                     }
                     //非法人（从机构）
-                    if(temp02 > 0){
+                    if(temp02 > 0) {
                         //非法人相关处理
                         MstCounterParty mstCounterParty = new MstCounterParty();
                         mstCounterParty.setCounterId(baseGetBusinessId != null ? baseGetBusinessId.buildBussinessCode(
@@ -139,24 +139,27 @@ public class UpdateTraderService {
 
                         //获取主机构ID
                         map.put("partyId", mstCfetsCustomerInfo.getPartyId());
-                        String mpartyId = updateTraderMapper.selectMpartyId(map);
-                        //获取主机构名称
-                        //MstCfetsCustomerInfo temp = updateTraderMapper.selectInfo(mstCfetsCustomerInfo.getPartyId());
-                        MstCfetsCustomerInfo temp = new MstCfetsCustomerInfo();
-                        if (StringUtil.isNotEmpty(mpartyId)) {
-                            temp = updateTraderMapper.selectMpartyInfo(mpartyId);
+                        // 存在一个从机构对应多个主机构
+                        List<String> mpartyIds = updateTraderMapper.selectMpartyId(map);
+                        for (String mpartyId : mpartyIds) {
+                            //获取主机构名称
+                            //MstCfetsCustomerInfo temp = updateTraderMapper.selectInfo(mstCfetsCustomerInfo.getPartyId());
+                            MstCfetsCustomerInfo temp = new MstCfetsCustomerInfo();
+                            if (StringUtil.isNotEmpty(mpartyId)) {
+                                temp = updateTraderMapper.selectMpartyInfo(mpartyId);
+                            }
+                            String linkId = "";
+                            if (temp != null) {
+                                //按名称进行匹配
+                                map.put("partyCustomerName", temp.getPartyName());
+                                //获取主机构交易对手的link_Id
+                                linkId = updateTraderMapper.checkCustomerName(map);
+                            }
+                            if (StringUtil.isNotEmpty(linkId)) {
+                                mstCounterParty.setManagerId(linkId);
+                            }
+                            mstCounterPartyMapper.insertSelective(mstCounterParty);
                         }
-                        String linkId = "";
-                        if (temp != null) {
-                            //按名称进行匹配
-                            map.put("partyCustomerName",temp.getPartyName());
-                            //获取主机构交易对手的link_Id
-                            linkId = updateTraderMapper.checkCustomerName(map);
-                        }
-                        if(StringUtil.isNotEmpty(linkId)){
-                            mstCounterParty.setManagerId(linkId);
-                        }
-                        mstCounterPartyMapper.insertSelective(mstCounterParty);
                     }
     			/*update by chenjiaxing 银行间交易对手信息录入之后需要生成对应的交易对手信息，如果是非法人机构默认为资管产品；
     			如果是法人机构需要匹配机构信息是否已存在，不存在建立为市场机构交易对手，存在的话，则不再建立 20210730 end*/
