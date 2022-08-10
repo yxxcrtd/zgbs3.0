@@ -420,6 +420,11 @@ public class FieldEtrDispatcherService extends BaseService {
                         StringUtil.equals(DictCodeListExt2.价格模式_市价指令.getValue(), fieldResponseDto.getPriceModel())) {
                     fieldResponseDto.setUnitPrice(null);
                 }
+                if (StringUtil.equals(DictCodeListExt3.交易方向_中途换券.getValue(), fieldResponseDto.getPs())) {
+                    if(!fieldResponseDto.getFinprodMarketId().contains(",")){
+                        fieldResponseDto.setFinprodMarketId(fieldResponseDto.getSwapOutBonds());
+                    }
+                }
                 if (StringUtil.equals(fieldResponseDto.getAssetType(), 平安资产类型_质押式回购.getValue())
                         && !StringUtil.equals(fieldResponseDto.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())
                         && Objects.nonNull(fieldResponseDto.getPledgeNumber())) {
