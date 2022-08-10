@@ -238,15 +238,18 @@ public class TrdBondLendInvestTradeDtoValidator implements TradeCommonValidator 
                     com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto resultDto = baseEtrInvestInfoService.queryActiveMandate(inputDto.getEntrustId());
                     for(com.joyintech.tams.common.base.entity.EtrPledge etrPledge :resultDto.getEtrPledgeList()){
                         if(StringUtil.equals(pledgeBondInfoDto.getFinprodId(),etrPledge.getFinprodId())){
+                            BigDecimal jy = pledgeBondInfoDto.getPledgePrin();
+                            BigDecimal sy =etrPledge.getPledgeAmt();
                             for(FinDealPledge finDealPledge:finDealPledgeList){
                                 if(StringUtil.equals(pledgeBondInfoDto.getFinprodId(),finDealPledge.getPledgeFinprodId())){
                                     //交易占用
-                                    BigDecimal jy = ArithmeticUtil.doAdd(pledgeBondInfoDto.getPledgePrin(),finDealPledge.getPledgeAmt());
-                                    if(jy.compareTo(etrPledge.getPledgeAmt())>0){
-                                        ValidMessage validMessage = new ValidMessage("质押券总额不能超过指令【" + inputDto.getEntrustId() + "】指定的质押券总额,"+"当前可使用"+ArithmeticUtil.subtract(etrPledge.getPledgeAmt(),finDealPledge.getPledgeAmt())+"元");
-                                        errorList.add(validMessage);
-                                    }
+                                    jy = ArithmeticUtil.doAdd(pledgeBondInfoDto.getPledgePrin(),finDealPledge.getPledgeAmt());
+                                    sy =ArithmeticUtil.subtract(etrPledge.getPledgeAmt(),finDealPledge.getPledgeAmt());
                                 }
+                            }
+                            if(jy.compareTo(etrPledge.getPledgeAmt())>0){
+                                ValidMessage validMessage = new ValidMessage("质押券总额不能超过指令【" + inputDto.getEntrustId() + "】指定的质押券总额,"+"当前可使用"+sy+"元");
+                                errorList.add(validMessage);
                             }
                         }
                     }

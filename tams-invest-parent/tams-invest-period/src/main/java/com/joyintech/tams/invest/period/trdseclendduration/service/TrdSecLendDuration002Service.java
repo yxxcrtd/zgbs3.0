@@ -25,10 +25,15 @@ import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.invest.common.service.InvestInterfCommService;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
+import com.joyintech.tams.invest.period.trdbondduration.dto.TrdBondDuration002ProcessDto;
+import com.joyintech.tams.invest.period.trdbondduration.service.TrdBondDuration002Service;
 import com.joyintech.tams.invest.period.trdseclendduration.dto.TrdSecLendCashPositionDto;
 import com.joyintech.tams.invest.period.trdseclendduration.dto.TrdSecLendPositionDto;
 import com.joyintech.tams.invest.period.trdseclendduration.dto.TrdSecLendSecPositionDto;
+import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -67,6 +72,7 @@ import com.joyintech.workflow.engine.service.BaseProcessService;
 @Service
 public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration002Dto> implements BaseProcessService<TrdSecLendDuration002Dto> {
 
+    private Logger logger = LoggerFactory.getLogger(TrdSecLendDuration002Service.class);
     @Autowired
     private BussCommonMapperDelegateService bussCommonMapperDelegateService;
 
@@ -426,6 +432,20 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
         baseTradeProductDealCommServiceImpl.delete(entity.getWorkflowId());
         prepareEntity(entity);
         saveDataWhenStartWorkflow(entity, OperationType.NEW);
+        ProcessMark newEntity;
+        try {
+            newEntity = WorkFlowUtil.getBusinessObjectFromRequest(TrdSecLendDuration002Dto.class, true);
+            // 工作流ID
+            newEntity.setWorkflowId(entity.getWorkflowId());
+            newEntity.setStatus(entity.getStatus());
+            newEntity.setBusinessData(JsonUtils.object2Json(entity));
+            // 更新业务表数据
+            // 操作留痕表
+            WorkflowContext.getProcessMarkService().insertIntoProcessMark(newEntity);
+        }
+        catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
 
         String act = DictCodeListExt3.系统动作_新建.getValue();
         SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey(entity.getWorkflowId());

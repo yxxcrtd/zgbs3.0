@@ -474,7 +474,7 @@
       FROM
            (
             <!-- 债券借贷交易画面有委托代码是双击查看报错修正 modify by renping 20191017 start -->
-            <if test="entrustId != null and entrustId != '' and (bizCode == null or bizCode == '')">
+            <if test="entrustId != null and entrustId != '' and (bizCode == null or bizCode == '') and (isTrdBondLend == null or isTrdBondLend == '') ">
             <!-- 债券借贷交易画面有委托代码是双击查看报错修正 modify by renping 20191017 end -->
                   SELECT
                     ENTRUST_ID bussId,
@@ -500,6 +500,35 @@
                     WHERE
                     ENTRUST_ID = #{entrustId}
             </if>
+           <if test="entrustId != null and entrustId != '' and (bizCode == null or bizCode == '') and (isTrdBondLend != null and isTrdBondLend =='TrdBondLendTrade002' ) ">
+               SELECT
+               ENTRUST_ID bussId,
+               FINPROD_ID pledgeId,
+               PLEDGE_FACE_VALUE,
+               a.PLEDGE_NUMBER-nvl(b.PLEDGE_NUMBER,0) PLEDGE_NUMBER,
+               PLEDGE_RATIO,
+               a.PLEDGE_AMT-nvl(b.PLEDGE_AMT,0) PLEDGE_AMT
+               FROM
+               ETR_PLEDGE a
+               LEFT JOIN (
+               SELECT
+               PLEDGE_FINPROD_ID ,sum(PLEDGE_AMT) PLEDGE_AMT ,sum(PLEDGE_NUMBER)  PLEDGE_NUMBER
+               FROM
+               FIN_DEAL_PLEDGE a
+               LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON
+               a.FINPROD_ID = b.TRADE_ID
+               LEFT JOIN TRD_PRODUCT_DEAL c ON
+               c.TRADE_ID = b.TRADE_ID
+               WHERE
+               1 = 1
+               AND c.IS_CANCEL = 'N'
+               AND c.TRADE_STATUS = '01'
+               AND b.ENTRUST_ID =#{entrustId}
+               GROUP BY PLEDGE_FINPROD_ID
+               ) b ON a.FINPROD_ID = b.PLEDGE_FINPROD_ID
+               WHERE
+               ENTRUST_ID = #{entrustId}
+           </if>
             <if test="bizCode != null and bizCode != ''">
                 SELECT
                     fdp.FINPROD_ID bussId,
