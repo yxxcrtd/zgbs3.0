@@ -2,7 +2,7 @@ package com.joyintech.tams.exchange.common.constant;
 
 public enum AgentType {
 
-    KINGDOM_KCBP("金证kcbp", "kcbp"),
+    KINGDOM_KCBPW("金证kcbpw", "kcbpw"),
     UFX("恒生ufx", "ufx"),
     KD_GATEWAY("金证KDGateway", "KDGateway"),
     JSD("金仕达", "jsd"),
@@ -19,8 +19,8 @@ public enum AgentType {
 
     public static AgentType agentType(String value) {
         switch (value) {
-            case "kcbp":
-                return KINGDOM_KCBP;
+            case "kcbpw":
+                return KINGDOM_KCBPW;
             case "ufx":
                 return UFX;
             case "KDGateway":
@@ -33,6 +33,6 @@ public enum AgentType {
 
     // 区分债券柜台， 成交为净价成交柜台
     public static boolean isNetPriceTrade(String agentType) {
-        return KINGDOM_KCBP.value.equals(agentType) || KD_GATEWAY.value.equals(agentType) || JSD.value.equals(agentType);
+        return KINGDOM_KCBPW.value.equals(agentType) || KD_GATEWAY.value.equals(agentType) || JSD.value.equals(agentType);
     }
 }

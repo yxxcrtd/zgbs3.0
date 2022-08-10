@@ -2311,8 +2311,12 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             trdFinProductDealTotal.setTradePlat(DictCodeList.交易平台_综合协议交易平台.getValue());
         } else if (DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(dto.getTradeMarket())) {
             trdFinProductDealTotal.setTradePlat(DictCodeList.交易平台_固定收益平台.getValue());
-        } else if (DictCodeListExt1.交易场所_银行间.getValue().equals(dto.getTradeMarket())) {
+        } else if (DictCodeListExt1.交易场所_银行间.getValue().equals(dto.getTradeMarket())
+                && StringUtil.equals(dto.getPayType(), BussinessDictCodeList.缴款方式_一级分销.getValue())) {
             trdFinProductDealTotal.setTradePlat(DictCodeList.交易平台_外汇交易中心.getValue());
+        } else if (DictCodeListExt1.交易场所_银行间.getValue().equals(dto.getTradeMarket())
+                && StringUtil.equals(dto.getPayType(), BussinessDictCodeList.缴款方式_一级缴款.getValue())) {
+            trdFinProductDealTotal.setTradePlat(DictCodeList.交易平台_其它.getValue());
         }
         // 交易市场
         trdFinProductDealTotal.setTradeMarketMode(DictCodeListExt1.交易市场_一级市场.getValue());
@@ -2514,7 +2518,12 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 ptlTrade.setBusiId(deal.getFinprodId());
                 ptlTrade.setBusiTable(BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue());
                 ptlTrades.add(ptlTrade);
-                bussTrdTransferOrder.addAll(this.dealOrders(deal));
+                // 是否一级缴款
+                boolean isPayType02 = StringUtil.equals(dto.getPayType(), BussinessDictCodeList.缴款方式_一级缴款.getValue());
+                // 是否交易所
+                boolean isJys = !StringUtil.equals(dto.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                        && !StringUtil.equals(dto.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue());
+                bussTrdTransferOrder.addAll(this.dealOrders(deal, isJys, isPayType02));
             }
             List<BussTrdTransferOrderDto> bussTrdTransferOrderDtoList = new ArrayList<>(bussTrdTransferOrderService.save(bussTrdTransferOrder));
             List<StlPayOrders> stlPayOrders = new ArrayList<>();
@@ -2539,11 +2548,13 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
      * 划款指令信息
      *
      * @param temp
+     * @param isJys       是否交易所
+     * @param isPayType02 是否一级缴款
      * @return java.util.List<com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto>
      * @author jiangpeng
      * @date 2022/7/8 11:45
      */
-    public List<BussTrdTransferOrderDto> dealOrders(TrdProductDeal temp) {
+    public List<BussTrdTransferOrderDto> dealOrders(TrdProductDeal temp, boolean isJys, boolean isPayType02) {
         // =====================划款指令信息=====================
         List<BussTrdTransferOrderDto> bussTrdTransferOrder = new ArrayList<>();
         BussSettleOrderParameterDto bussSettleOrderParameterDto = new BussSettleOrderParameterDto();
@@ -2558,21 +2569,48 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         bussSettleOrderParameterDto.setPortfolioId(deal.getPortfolioId());
         bussSettleOrderParameterDto.setDeal(deal);
         BussTrdTransferOrderDto bussTrdTransferOrderDto = bussTrdTransferOrderService.generateOrder(bussSettleOrderParameterDto);
-        String acctId = EtrCommonCashPositionDealService.select组合托管户(deal.getPortfolioId(), deal.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
-        bussTrdTransferOrderDto.setPayAcctNo(acctId);
-        String ps = DictCodeListExt1.收支方向_支出.getValue();
-        if (StringUtil.equals(deal.getPs(), DictCodeList.交易方向_卖出.getValue())
-                || StringUtil.equals(deal.getPs(), DictCodeList.回购拆借方向_正回购.getValue())) {
-            ps = DictCodeListExt1.收支方向_收入.getValue();
-            bussTrdTransferOrderDto.setRecAcctNo(acctId);
-            bussTrdTransferOrderDto.setPayAcctNo(null);
+        // 交易所 一级分销 付款账户为 券商资金账户 其他为托管户
+        if (isJys && !isPayType02) {
+            // 根据证券账户查询资金账户
+            String acctNo = cfetsTrdFirstBidFirm002Mapper.selectAcctNoByEntrustDetail(deal.getEntrustId(), deal.getPortfolioId());
+            bussTrdTransferOrderDto.setPayAcctNo(acctNo);
+        } else {
+            String acctId = EtrCommonCashPositionDealService.select组合托管户(deal.getPortfolioId(), deal.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
+            bussTrdTransferOrderDto.setPayAcctNo(acctId);
         }
-        bussTrdTransferOrderDto.setPs(ps);
+        // 收款账户
+        // 一级缴款 交易对手账户（承销商账户）
+        if (isPayType02) {
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("counterId",deal.getCounterId());
+            paramMap.put("ccy",deal.getCcy());
+            String recAcctNo = joyinbusinessCommonService.selectCounterCapacctInfoList(paramMap);
+            bussTrdTransferOrderDto.setRecAcctNo(recAcctNo);
+        } else if (isJys) {
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("portfolioId",deal.getPortfolioId());
+            paramMap.put("finprodId",deal.getFinprodId());
+            paramMap.put("ccy",deal.getCcy());
+            String recAcctNo = joyinbusinessCommonService.selectDVPCapacctInfoList(paramMap);
+            // 银行间 一级分销 DVP资金账户
+            bussTrdTransferOrderDto.setRecAcctNo(recAcctNo);
+        } else {
+            // 交易所 一级分销 清算户（虚拟）
+            String SETTLE_ACCT_NO = CacheUtil.getSysParam(BussinessConstant.SETTLE_ACCT_NO_KEY);
+            bussTrdTransferOrderDto.setRecAcctNo(SETTLE_ACCT_NO);
+        }
+        bussTrdTransferOrderDto.setPs(DictCodeListExt1.收支方向_支出.getValue());
         bussTrdTransferOrderDto.setIsTotalTrade(BussinessDictCodeList.是否_否.getValue());
         bussTrdTransferOrderDto.setOrderRetStatus(DictCodeList.指令处理状态_处理成功.getValue());
         bussTrdTransferOrderDto.setTradeId(deal.getTradeId());
         bussTrdTransferOrderDto.setPortfolioId(deal.getPortfolioId());
-        bussTrdTransferOrderDto.setIsNeedSend(DictCodeList.是否_是.getValue());
+        // 一级缴款默认发送划款指令
+        if (isPayType02) {
+            bussTrdTransferOrderDto.setIsNeedSend(DictCodeList.是否_是.getValue());
+        } else {
+            bussTrdTransferOrderDto.setIsNeedSend(DictCodeList.是否_否.getValue());
+        }
+        bussTrdTransferOrderDto.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
         bussTrdTransferOrder.add(bussTrdTransferOrderDto);
         // 划款指令表Entity 构造结束----------------------------------------------------------
         return bussTrdTransferOrder;

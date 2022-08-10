@@ -28,6 +28,7 @@ public enum FunctionCode {
     REQ_CANCEL_INTEGRATED_ENTRUST("综合撤单", 109),
 
     REQ_QRY_INTEGRATED_ENTRUST("查询综合订单", 110),
+    // 综合业务行情查询
     REQ_QRY_INTEGRATED_QUOTE("查询大宗行情", 111),
     REQ_QRY_TRADE_ENABLE("查询最大交易数量", 112),
     REQ_QRY_HISTORY_TRADE("查询历史交易明细", 113),
@@ -38,7 +39,7 @@ public enum FunctionCode {
     REQ_QRY_INTEGRATED_BULK_QUOTE("查询大宗行情", 118),
     REQ_QRY_INTEGRATED_BULK_CLOSE_QUOTE("查询盘后大宗行情", 119),
     REQ_QRY_INTEGRATED_REPURCHASE_QUOTE("查询协议回购行情", 120),
-    REQ_QRY_INTEGRATED_FIXED_INCOME_QUOTE("查询上海固收平台报价行情", 121),
+    REQ_QRY_INTEGRATED_FIXED_INCOME_QUOTE("查询固收平台报价行情", 121),
     REQ_QRY_FUTURES_INSTRUMENT("查询期货合约", 122),
     REQ_QRY_FUTURES_POSITION("查询期货持仓", 123),
     REQ_QRY_FUTURES_POSITION_DETAIL("查询期货持仓明细", 124),

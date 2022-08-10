@@ -1,8 +1,8 @@
-package com.joyintech.tams.exchange.service.trade.server.agent.kcbp;
+package com.joyintech.tams.exchange.service.trade.server.agent.kcbpw;
 
 import java.util.Map;
 
-public class KCBPAccount {
+public class KCBPWAccount {
     private String accountId;
     private String agentType;
     /**
@@ -36,8 +36,8 @@ public class KCBPAccount {
     private String protocolBack_SH_PositionStr_entrust;
     private String fixedIncome_PositionStr_entrust;
     private String RTGS_PositionStr;
-    private String bondNegotiate_SZ_PositionStr_Trade;
-    private String bondNegotiate_SZ_PositionStr_Entrust;
+    private String bondNegotiate_SZ_PositionStr_Trade="";
+    private String bondNegotiate_SZ_PositionStr_Entrust="";
 
     public String getEntrustPositionStr() {
         return entrustPositionStr == null ? "" : entrustPositionStr;
@@ -175,19 +175,19 @@ public class KCBPAccount {
         this.RTGS_PositionStr = RTGS_PositionStr;
     }
 
-	public String getBondNegotiate_SZ_PositionStr_Trade() {
-		return bondNegotiate_SZ_PositionStr_Trade;
-	}
+    public String getBondNegotiate_SZ_PositionStr_Trade() {
+        return bondNegotiate_SZ_PositionStr_Trade;
+    }
 
-	public void setBondNegotiate_SZ_PositionStr_Trade(String bondNegotiate_SZ_PositionStr_Trade) {
-		this.bondNegotiate_SZ_PositionStr_Trade = bondNegotiate_SZ_PositionStr_Trade;
-	}
+    public void setBondNegotiate_SZ_PositionStr_Trade(String bondNegotiate_SZ_PositionStr_Trade) {
+        this.bondNegotiate_SZ_PositionStr_Trade = bondNegotiate_SZ_PositionStr_Trade;
+    }
 
-	public String getBondNegotiate_SZ_PositionStr_Entrust() {
-		return bondNegotiate_SZ_PositionStr_Entrust;
-	}
+    public String getBondNegotiate_SZ_PositionStr_Entrust() {
+        return bondNegotiate_SZ_PositionStr_Entrust;
+    }
 
-	public void setBondNegotiate_SZ_PositionStr_Entrust(String bondNegotiate_SZ_PositionStr_Entrust) {
-		this.bondNegotiate_SZ_PositionStr_Entrust = bondNegotiate_SZ_PositionStr_Entrust;
-	}
+    public void setBondNegotiate_SZ_PositionStr_Entrust(String bondNegotiate_SZ_PositionStr_Entrust) {
+        this.bondNegotiate_SZ_PositionStr_Entrust = bondNegotiate_SZ_PositionStr_Entrust;
+    }
 }

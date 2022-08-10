@@ -1012,7 +1012,9 @@ public class EtrExchangeTrade001Service extends CommonExportService<EtrExchangeT
 					}
 
 					//对手方交易席位
-					dto.setOppositeSeat((String)tmp.get("propSeatNo"));
+					// add by yanjianhui 修改原因propSeatNo字段错误，应按398大宗交易行情查询中的字段修改  日期  2022-7-14
+					//dto.setOppositeSeat((String)tmp.get("propSeatNo"));
+					dto.setOppositeSeat((String)tmp.get("seatNo"));
 
 					//订单编号
 					dto.setAgreeNum((String)tmp.get("contractId"));
@@ -1068,23 +1070,33 @@ public class EtrExchangeTrade001Service extends CommonExportService<EtrExchangeT
 					}
 
 					//价格（净价） / 回购利率
-					if(tmp.get("entrustPrice") !=null) {
-						dto.setnPrice(new BigDecimal((Double)tmp.get("entrustPrice")));
+					if((Double)tmp.get("entrustPrice") !=null) {
+						// yanjianhui 2022/7/15 :如参数为 double 类型转换成BigDecimal，得先转换成 String 类型再入参
+						//dto.setEntrustPrice(new BigDecimal((Double)tmp.get("entrustPrice")));
+						dto.setEntrustPrice(new BigDecimal(((Double)tmp.get("entrustPrice")).toString()));
 					}
 
 					//全价
 					if(tmp.get("fullPrice") !=null) {
-						dto.setfPrice(new BigDecimal((Double)tmp.get("fullPrice")));
+						// yanjianhui 2022/7/19 :价格Double类型直接强转BigDecimal会造成精度缺失
+						dto.setfPrice(new BigDecimal(((Double)tmp.get("fullPrice")).toString()));
 					}
 
 					//收益率
 					if(tmp.get("expireIncomeRate") !=null) {
-						dto.setYield(new BigDecimal((Double)tmp.get("expireIncomeRate")));
+						// yanjianhui 2022/7/19 :价格Double类型直接强转BigDecimal会造成精度缺失
+						dto.setYield(new BigDecimal(((Double)tmp.get("expireIncomeRate")).toString()));
 					}
 
+					// yanjianhui 2022/7/19 :订单编号设置字段修正
+                    /*//订单编号
+                    dto.setOrderId((String)tmp.get("contractId"));*/
 					//订单编号
-					dto.setOrderId((String)tmp.get("contractId"));
-
+					if(tmp.get("contractId")!=null){
+						dto.setOrderId((String)tmp.get("contractId"));
+					}else if(tmp.get("orderNo") !=null) {
+						dto.setOrderId((String) tmp.get("orderNo"));
+					}
 					list.add(dto);
 				});
 			}
