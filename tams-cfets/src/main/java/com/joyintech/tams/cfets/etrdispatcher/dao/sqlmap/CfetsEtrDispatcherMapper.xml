@@ -2782,7 +2782,8 @@
             end as pledgeRatio, /** 折算率 **/
         nvl(ee.PLEDGE_NUMBER/100, trdPledge.PLEDGE_NUMBER) pledgeNumber,
         ee.PLEDGE_NUMBER * ee.Pledge_Face_Value pledStrdPrinAmt,
-        ete.ENTRUST_AMT exchangeAmount,
+        case when ete.ENTRUST_TYPE = '21' then null else
+        ete.ENTRUST_AMT end exchangeAmount,
         eted.TRADE_ID tradeId,
 <!--        oee.Pledge_Ratio * 100 oldPledgeRatio, /** 折算率 **/-->
 <!--        oee.PLEDGE_NUMBER oldPledgeNumber,-->
@@ -2928,7 +2929,8 @@
         end as pledgeRatio, /** 折算率 **/
         nvl(ee.PLEDGE_NUMBER/100, trdPledge.PLEDGE_NUMBER) pledgeNumber,
         ee.PLEDGE_NUMBER * ee.Pledge_Face_Value pledStrdPrinAmt,
-        ete.ENTRUST_AMT exchangeAmount,
+        case when ete.ENTRUST_TYPE = '21' then null else
+        ete.ENTRUST_AMT end exchangeAmount,
         eted.TRADE_ID tradeId,
 <!--        oee.Pledge_Ratio * 100 oldPledgeRatio, /** 折算率 **/-->
 <!--        oee.PLEDGE_NUMBER oldPledgeNumber,-->
