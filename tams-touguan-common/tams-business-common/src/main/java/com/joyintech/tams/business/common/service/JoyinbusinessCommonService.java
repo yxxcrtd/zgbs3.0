@@ -14,6 +14,7 @@ import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
 import com.joyintech.tams.business.common.dto.*;
+import com.joyintech.tams.common.base.entity.StlCapacctInfo;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
@@ -618,5 +619,57 @@ public class JoyinbusinessCommonService extends BaseService {
         param.put("sysdate", iPlatformDate.getSysDate());
         // 查询资金账户
         return super.queryForPage(dto.getPageMode().getPageNo(), dto.getPageMode().getPageSize(), () -> joyinbusinessCommonMapper.queryAcctNo(param));
+    }
+
+    /**
+     * 检索交易对手资金账户共通
+     * @param counterId 交易对手ID
+     * @param ccy
+     * @return 交易对手资金账户
+     */
+    public String selectCounterCapacctInfoList(Map<String, Object> paramMap) {
+        paramMap.put("acctType",DictCodeListExt1.资金账户类型_交易对手账户.getValue());
+        // 查询资金账户
+        List<StlCapacctInfo> list = joyinbusinessCommonMapper.selectCounterCapacctInfoList(paramMap);
+        if(CollectionUtils.isNotEmpty(list)){
+            return list.get(0).getAcctNo();
+        }
+        return null;
+    }
+
+    /**
+     * 检索交易对手资金账户共通
+     * @param counterId 交易对手ID
+     * @param ccy
+     * @return 交易对手资金账户
+     */
+    public String selectDVPCapacctInfoList(Map<String, Object> paramMap) {
+        paramMap.put("REGIST_ORG_02",DictCodeList.登记托管机构_中债_上海清算所.getValue());
+        paramMap.put("ACCT_TYPE_A09",DictCodeListExt1.资金账户类型_上清所DVP账户.getValue());
+        paramMap.put("ACCT_TYPE_A10",DictCodeListExt1.资金账户类型_中债登DVP账户.getValue());
+        // 查询资金账户
+        List<StlCapacctInfo> list = joyinbusinessCommonMapper.selectDVPCapacctInfoList(paramMap);
+        if(CollectionUtils.isNotEmpty(list)){
+            return list.get(0).getAcctNo();
+        }
+        return null;
+    }
+
+    /**
+     * 根据证券账户检索交易DVP资金账户共通
+     * @param counterId 交易对手ID
+     * @param ccy
+     * @return 交易对手资金账户
+     */
+    public String selectDVPCapacctInfoListByAcctId(Map<String, Object> paramMap) {
+        paramMap.put("REGIST_ORG_02",DictCodeList.登记托管机构_中债_上海清算所.getValue());
+        paramMap.put("ACCT_TYPE_A09",DictCodeListExt1.资金账户类型_上清所DVP账户.getValue());
+        paramMap.put("ACCT_TYPE_A10",DictCodeListExt1.资金账户类型_中债登DVP账户.getValue());
+        // 查询资金账户
+        List<StlCapacctInfo> list = joyinbusinessCommonMapper.selectDVPCapacctInfoListByAcctId(paramMap);
+        if(CollectionUtils.isNotEmpty(list)){
+            return list.get(0).getAcctNo();
+        }
+        return null;
     }
 }
