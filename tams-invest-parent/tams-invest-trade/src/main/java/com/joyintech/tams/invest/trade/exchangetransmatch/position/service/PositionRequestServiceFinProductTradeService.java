@@ -730,8 +730,17 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
                     bean.setTradeId(dealEntity.getTradeId());
                     bean.setEtrId(trdProductDealAdd.getEntrustId());
                     bean.setFinprodId(finPledgeDisplaceResult.getFinprodId());
-                    bean.setSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
-                    bean.setOwnSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
+                    // XYHGFXSJ-963:深交所解除质押有钱的那笔交易发送新头寸报文不处理解除质押券数据集 modify by fuyongsheng 20220810 start
+                    if(DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(dealEntity.getTradeMarket())
+                            && dealEntity.getTradeAmt() != null
+                            && dealEntity.getTradeAmt().compareTo(BigDecimal.ZERO) > 0){
+                        bean.setSecAmount(BigDecimal.ZERO);
+                        bean.setOwnSecAmount(BigDecimal.ZERO);
+                    }else{
+                        bean.setSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
+                        bean.setOwnSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
+                    }
+                    // XYHGFXSJ-963:深交所解除质押有钱的那笔交易发送新头寸报文不处理解除质押券数据集 modify by fuyongsheng 20220810 end
                     bean.setIntegrateSecAmount(BigDecimal.ZERO);
                     Map<String, Object> map = BeanUtil.object2Map(bean);
                     list.add(map);
