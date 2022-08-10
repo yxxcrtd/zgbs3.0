@@ -7,6 +7,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondQryBean;
+import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveQryRequest;
+import com.joyintech.tams.exchange.common.bean.response.quote.repurchase.RepurchaseQuoteReceiveResponse;
 import com.joyintech.tams.exchange.common.bean.terminal.RTGSStatusBean;
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.*;
@@ -843,6 +845,11 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
         agentInfo.setAccountId(accountId);
         ResultBean resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
         return KCBPWMsgParseHelper.parseIntegratedRepurchaseQuote(AgentUtil.getQueryListKCBPW(resultBean));
+    }
+
+    @Override
+    public List<RepurchaseQuoteReceiveResponse> reqIntegratedRepurchaseQuoteReceive(RepurchaseQuoteReceiveQryRequest bean) throws Exception {
+        return null;
     }
 
     /**
