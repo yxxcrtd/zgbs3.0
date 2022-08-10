@@ -461,6 +461,7 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         /***********************************************************************/
         etrSinglePortfolioDto.setDealMode(dto.getDealMode());//交易方式
         etrSinglePortfolioDto.setPriceType(dto.getPriceType());//计价方式
+        etrSinglePortfolioDto.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         if(DictCodeListExt3.上农商_指令业务类型_通用式质押回购指令.getValue().equals(etrSinglePortfolioDto.getEntrustType())){
             etrSinglePortfolioDto.setPrice(dto.getRepoRate());
             etrSinglePortfolioDto.setEntrustAmt(ArithmeticUtil.multiply(dto.getRepoAmt(),new BigDecimal(10000)));
