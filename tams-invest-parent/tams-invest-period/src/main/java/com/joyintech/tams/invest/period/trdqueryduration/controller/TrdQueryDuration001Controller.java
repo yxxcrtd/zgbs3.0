@@ -10,9 +10,11 @@
 
 package com.joyintech.tams.invest.period.trdqueryduration.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.base.intf.DataDictItem;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectDto;
 import com.joyintech.framework.select.SelectOptionDto;
@@ -43,6 +45,7 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 存续期交易查询页面
@@ -61,11 +64,23 @@ public class TrdQueryDuration001Controller extends BaseController{
 	 */
 	@Autowired
 	private TrdQueryDuration001Service trdQueryDuration001Service;
-	
+
 	@Override
 	@RequestMapping(PAGE_INIT)
 	public String init(Model model) {
 		setSelectOptionToModel(model,DictCode.画面数据状态,DictCode.平安资产类型,DictCode.平安业务类型);
+		//XYHGFXSJ-1001 【存续期交易查询】查询条件业务类型缺少
+		List<SelectOptionDto> PA_TYPES = JSON.parseArray(Objects.requireNonNull(model.getAttribute(DictCode.平安业务类型.getValue())).toString(),SelectOptionDto.class);
+        List<? extends DataDictItem> items = CacheUtil.getDictCode(DictCode.投管业务类型.getValue()).getItems();
+        for (DataDictItem item : items) {
+            PA_TYPES.add(new SelectOptionDto(){{
+                setId(item.getItemCode());
+                setText(item.getItemValue());
+                setCol(DictCode.平安业务类型.getValue());
+            }});
+        }
+        //XYHGFXSJ-1001 【存续期交易查询】查询条件业务类型缺少
+        model.addAttribute(DictCode.平安业务类型.getValue(),JSON.toJSONString(PA_TYPES));
         model.addAttribute("PINAN_ASSET_TYPE_F01", DictCodeList.平安资产类型_债券.getValue());
         model.addAttribute("PINAN_ASSET_TYPE_F02", DictCodeList.平安资产类型_基金.getValue());
         model.addAttribute("PINAN_ASSET_TYPE_F03", DictCodeList.平安资产类型_计划类资产_利率型.getValue());
@@ -176,7 +191,7 @@ public class TrdQueryDuration001Controller extends BaseController{
 	 	return trdQueryDuration001Service.export(this.getPageId(),RequestUtil.getParameters(getRequest()));
 	}
 
-	
+
     /**
      * 导出check
      * @return
@@ -189,7 +204,7 @@ public class TrdQueryDuration001Controller extends BaseController{
         return commonCheck(result, dto.getOperateType());
     }
 
-    
+
     @ResponseBody
     @RequestMapping("getType6")
     public String getType6(@RequestParam("finprodId") String finprodId) {
