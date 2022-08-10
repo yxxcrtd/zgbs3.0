@@ -1,6 +1,7 @@
 package com.joyintech.tams.exchange.common.db.domain;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.base.Strings;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.exchange.common.utils.DoubleSerializerUtils;
 import com.joyintech.tams.exchange.common.utils.TradeUtils;
@@ -195,6 +196,12 @@ public class Trade implements Serializable, KeyMethodInterface<String> {
     @ApiModelProperty(value = "")
     public int count;
 
+
+    /**
+     * E 普通委托 I 综合委托
+     */
+    public String KeyType;
+
     @Size(max = 32)
     @ApiModelProperty(value = "报文编号")
     private String reportNo;
@@ -306,6 +313,9 @@ public class Trade implements Serializable, KeyMethodInterface<String> {
 
     public void setEntrustId(String entrustId) {
         this.entrustId = entrustId == null ? null : entrustId.trim();
+        if (!Strings.isNullOrEmpty(entrustId)) {
+            this.KeyType = entrustId.substring(0, 1).toUpperCase();
+        }
     }
 
     public String getAccountId() {

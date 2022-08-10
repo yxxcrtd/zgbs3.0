@@ -1,34 +1,26 @@
 package com.joyintech.tams.exchange.service.trade.server.agent;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.map.MapUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
-import com.joyintech.tams.exchange.common.constant.Market;
-import com.joyintech.tams.exchange.common.net.protocol.FunctionCode;
+import com.joyintech.tams.exchange.common.db.domain.Account;
 import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.common.utils.SpringContextUtils;
 import com.joyintech.tams.exchange.service.trade.dao.domain.TerminalAgentInfo;
 import com.joyintech.tams.exchange.service.trade.server.agent.ufx.UfxTradeAgent;
-import com.joyintech.tams.exchange.service.trade.service.TerminalAgentInfoService;
 import com.joyintech.tams.exchange.service.trade.util.http.HttpClientUtil;
 import com.joyintech.tams.exchange.service.trade.util.http.HttpParameter;
 import com.joyintech.tams.exchange.service.trade.util.http.HttpResult;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Field;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -60,11 +52,30 @@ public class TradeAgentHelper {
     }
 
     public synchronized ResultBean doRequest(TerminalAgentInfo agentInfo, Object message) {
-        ResultBean resultBean=new ResultBean();
+
+        ResultBean resultBean = new ResultBean();
         String accountId = agentInfo.getAccountId();
         boolean loginStatus = tradeAgentManager.getAgentLoginStatus(accountId);
+        Map map = Maps.newConcurrentMap();
+        // if (loginStatus && message instanceof Map) {
+        if (message instanceof Map) {
+            map = (Map) message;
+        }
+        if (map.get("AgentCode") == null) {
+            TradeAgent tradeAgent = tradeAgentManager.getAccountAgent(accountId);
+            if (tradeAgent != null) {
+                Map<String, Account> accountMap = ((Map<String, Account>) tradeAgent.getAccountMap());
+                if (accountMap != null) {
+                    Account account = accountMap.get(accountId);
+                    // 柜台代码 关联DSP动态数据源
+                    if (account != null){
+                        map.put("AgentCode", account.getBrokerId());
+                    }
+                }
+            }
+        }
+
         if (loginStatus && message instanceof Map && "ufx".equals(agentInfo.getAgentType())) {
-            Map map = (Map) message;
             map.put("password", ((UfxTradeAgent) SpringContextUtils.getBean("ufx")).getAccount(accountId).getTradePwd());
         }
         if (!loginStatus && agentInfo.getFunctionCode() != 4) {

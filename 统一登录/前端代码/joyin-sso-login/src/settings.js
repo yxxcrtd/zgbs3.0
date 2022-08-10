@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: '统一身份认证平台',
+  title: '金融资产平台3.0',
 
   /**
    * @type {boolean} true | false

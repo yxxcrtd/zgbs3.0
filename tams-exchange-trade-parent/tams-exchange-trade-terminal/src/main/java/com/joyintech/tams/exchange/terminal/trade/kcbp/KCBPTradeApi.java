@@ -845,7 +845,7 @@ public class KCBPTradeApi {
     }
 
     public void cancelEntrust(CancelEntrustBean cancelEntrustBean, Long requestId) {
-        cancelEntrustBean.setAgentType(AgentType.KINGDOM_KCBP.value);
+        cancelEntrustBean.setAgentType(AgentType.KINGDOM_KCBPW.value);
         KCBPAccount kcbpAccount = kcbpTradeClient.getKCBPAccount(cancelEntrustBean.getAccountId());
         Map<String, String> parameters = Maps.newHashMap(kcbpAccount.getHeadMessages());
         parameters.put("funcid", KCBP_FUNCTION_CODE_CANCEL_ENTRUST);
@@ -864,7 +864,7 @@ public class KCBPTradeApi {
     }
 
     public void cancelIntegratedEntrust(CancelEntrustBean cancelEntrustBean, Long requestId) {
-        cancelEntrustBean.setAgentType(AgentType.KINGDOM_KCBP.value);
+        cancelEntrustBean.setAgentType(AgentType.KINGDOM_KCBPW.value);
         KCBPAccount kcbpAccount = kcbpTradeClient.getKCBPAccount(cancelEntrustBean.getAccountId());
         Map<String, String> parameters = Maps.newHashMap(kcbpAccount.getHeadMessages());
         if (IntegratedEntrustUtils.isProtocolBack_SZ(cancelEntrustBean.getEntrustProp())) {

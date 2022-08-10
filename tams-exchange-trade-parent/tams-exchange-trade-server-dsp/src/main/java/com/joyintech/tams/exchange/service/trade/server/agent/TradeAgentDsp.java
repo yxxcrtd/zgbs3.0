@@ -8,6 +8,7 @@ import com.joyintech.tams.exchange.common.bean.terminal.RTGSStatusBean;
 import com.joyintech.tams.exchange.common.constant.AccountLoginStatus;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.db.domain.*;
+import com.joyintech.tams.exchange.common.utils.AgentServerUtil;
 import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.service.trade.dao.domain.TerminalAgentInfo;
 import com.joyintech.tams.exchange.service.trade.processor.TradeHelper;
@@ -148,13 +149,14 @@ public abstract class TradeAgentDsp implements TradeAgent {
      * 获取公共自定义参数
      * 返回公共参数map之后可以按照各自业务编码增加新的自定义参数
      *
-     * @param params
+     * @param params 第一个参数是账户，顺序不可变
      * @return
      */
     public Map<String, Object> getCustomParam(Object... params) {
         Map<String, Object> customParam = Maps.newHashMap();
-        // 设置密码配置
-        customParam.put("password", getAccount(params[0].toString()).getTradePwd());
+        // 设置密码配置  第一个参数是账户，顺序不可变
+        if (params[0] != null && !Strings.isNullOrEmpty(params[0].toString()))
+            customParam.put("password", getAccount(params[0].toString()).getTradePwd());
         return customParam;
     }
 
@@ -163,12 +165,12 @@ public abstract class TradeAgentDsp implements TradeAgent {
      * 接口交易码通用适配器，只适用于functionCode和 entrustProp 的t_terminal_agent_info表配置
      * 通过functionCode和entrustProp  定位唯一的柜台接口码
      * 此逻辑将字段转换工作转移到DSP接口平台的路由中配置映射关系，不再投管系统中编码处理映射关系。
+     *
      * @param functionCode
      * @param entrustProp
      * @param param
      * @param customParam
      * @return
-     *
      */
     public synchronized ResultBean triggerCodeAdapter(int functionCode, String entrustProp, Object param, Map<String, Object> customParam) {
         // 定位DSP接口平台交易码【触发器编码】
@@ -181,14 +183,16 @@ public abstract class TradeAgentDsp implements TradeAgent {
         Map<String, Object> paramMap = BeanUtil.beanToMap(param);
         // 合并自定义参数
         paramMap.putAll(customParam);
-        agentInfo.setAccountId(String.valueOf(paramMap.get("accountId") ));
+        agentInfo.setAccountId(String.valueOf(paramMap.get("accountId")));
         return tradeAgentHelper.doRequest(agentInfo, paramMap);
     }
+
     /**
      * xiazelei 修改于 2022/5/26 10:31
      * 接口交易码通用适配器，只适用于functionCode和 entrustProp 的t_terminal_agent_info表配置
      * 通过functionCode和entrustProp  定位唯一的柜台接口码
      * 此逻辑将字段转换工作转移到DSP接口平台的路由中配置映射关系，不再投管系统中编码处理映射关系。
+     *
      * @param functionCode
      * @param entrustProp
      * @param param
@@ -204,7 +208,7 @@ public abstract class TradeAgentDsp implements TradeAgent {
         }
         // 合并自定义参数
         param.putAll(customParam);
-        agentInfo.setAccountId(String.valueOf(param.get("accountId") ));
+        agentInfo.setAccountId(String.valueOf(param.get("accountId")));
         return tradeAgentHelper.doRequest(agentInfo, param);
     }
 
@@ -246,14 +250,14 @@ public abstract class TradeAgentDsp implements TradeAgent {
     public void onRspEntrust(TerminalId terminalId) {
         // 缓存已经回来且有柜台委托编号的委托
         if (!Strings.isNullOrEmpty(terminalId.getBrokerEntrustId())) {
-            String key = terminalId.getAccountId() + "_" + terminalId.getBrokerEntrustId();
+            String key = AgentServerUtil.GetTradeCacheKey("E", terminalId.getAccountId(), terminalId.getBrokerEntrustId());
             tradeHelper.getEntrustMap().put(key, terminalId.getId());
         }
         TradeMsgReceiver msgReceiver = msgReceiverManager.getReceiverByEntrustId(terminalId.getId());
         if (Objects.nonNull(msgReceiver)) {
             msgReceiver.handleRthTerminalId(terminalId);
             // 处理主推委托 在回报之前的情况, 通知补发
-            String key = terminalId.getAccountId() + "_" + terminalId.getBrokerEntrustId();
+            String key = AgentServerUtil.GetTradeCacheKey("E", terminalId.getAccountId(), terminalId.getBrokerEntrustId());
             EntrustInterface entrustInterface = tradeHelper.getEntrustNotifyByAccountIdAndBrokerEntrustId(key);
             if (Objects.nonNull(entrustInterface)) {
                 tradeHelper.handleTradeNotifyEntrustRspBeforeOnEntrustRsp(msgReceiver, key, MsgType.NOTIFY_ENTRUST);
@@ -271,14 +275,14 @@ public abstract class TradeAgentDsp implements TradeAgent {
     public void onRspIntegratedEntrust(TerminalId terminalId) {
         // 缓存已经回来且有柜台委托编号的委托
         if (!Strings.isNullOrEmpty(terminalId.getBrokerEntrustId())) {
-            String key = terminalId.getAccountId() + "_" + terminalId.getBrokerEntrustId();
+            String key = AgentServerUtil.GetTradeCacheKey("I", terminalId.getAccountId(), terminalId.getBrokerEntrustId());
             tradeHelper.getEntrustMap().put(key, terminalId.getId());
         }
         TradeMsgReceiver msgReceiver = msgReceiverManager.getReceiverByIntegratedEntrustId(terminalId.getId());
         if (Objects.nonNull(msgReceiver)) {
             msgReceiver.addMsg(MsgType.RESP_INTEGRATED, terminalId);
             // 处理主推委托 在回报之前的情况, 通知补发
-            String key = terminalId.getAccountId() + "_" + terminalId.getBrokerEntrustId();
+            String key = AgentServerUtil.GetTradeCacheKey("I", terminalId.getAccountId(), terminalId.getBrokerEntrustId());
             EntrustInterface entrustInterface = tradeHelper.getEntrustNotifyByAccountIdAndBrokerEntrustId(key);
             if (Objects.nonNull(entrustInterface)) {
                 tradeHelper.handleTradeNotifyEntrustRspBeforeOnEntrustRsp(msgReceiver, key, MsgType.NOTIFY_INTEGRATED);
@@ -307,7 +311,8 @@ public abstract class TradeAgentDsp implements TradeAgent {
                     String accountId = entrust.getAccountId();
                     String localEntrustId = entrust.getLocalEntrustId();
                     String brokerEntrustId = entrust.getBrokerEntrustId();
-                    tradeHelper.setEntrustNotifyMap(accountId + "_" + brokerEntrustId, entrust);
+                    String key = AgentServerUtil.GetTradeCacheKey("E", accountId, brokerEntrustId);
+                    tradeHelper.setEntrustNotifyMap(key, entrust);
                     logger.warn("entrust not has id, accountId - localEntrustId - brokerEntrustId {} - {} - {}", accountId, localEntrustId, brokerEntrustId);
                 }
             } else {
@@ -337,7 +342,8 @@ public abstract class TradeAgentDsp implements TradeAgent {
                     String accountId = integratedEntrust.getAccountId();
                     String localEntrustId = integratedEntrust.getLocalEntrustId();
                     String brokerEntrustId = integratedEntrust.getBrokerEntrustId();
-                    tradeHelper.setEntrustNotifyMap(accountId + "_" + brokerEntrustId, integratedEntrust);
+                    String key = AgentServerUtil.GetTradeCacheKey("I", accountId, brokerEntrustId);
+                    tradeHelper.setEntrustNotifyMap(key, integratedEntrust);
                     logger.warn("integratedEntrust not has id, accontId - localEntrustId - brokerEntrustId {} - {} - {}", accountId, localEntrustId, brokerEntrustId);
                 }
             } else {
@@ -358,7 +364,10 @@ public abstract class TradeAgentDsp implements TradeAgent {
      * 处理成交通知
      */
     public void onRtnTrade(Trade tradeRecord) {
-        String key = tradeRecord.getAccountId() + "_" + tradeRecord.getBrokerEntrustId();
+        if (Strings.isNullOrEmpty(tradeRecord.KeyType) && !Strings.isNullOrEmpty(tradeRecord.getEntrustId())) {
+            tradeRecord.KeyType = tradeRecord.getEntrustId().substring(0, 1).toUpperCase();
+        }
+        String key = AgentServerUtil.GetTradeCacheKey(tradeRecord.KeyType, tradeRecord.getAccountId(), tradeRecord.getBrokerEntrustId());
         String entrustId = tradeHelper.getEntrustMap().get(key);
         if (!Strings.isNullOrEmpty(entrustId)) {
             TradeMsgReceiver msgReceiver = msgReceiverManager.getTradeReceiverByEntrustId(entrustId);
@@ -412,14 +421,14 @@ public abstract class TradeAgentDsp implements TradeAgent {
 //    }
     public void onRspCancelEntrust(CancelEntrustBean cancelEntrustBean) {
         if (!Strings.isNullOrEmpty(cancelEntrustBean.getCancelBrokerEntrustId())) {
-            String key = cancelEntrustBean.getAccountId() + "_" + cancelEntrustBean.getCancelBrokerEntrustId();
+            String key = AgentServerUtil.GetTradeCacheKey("E", cancelEntrustBean.getAccountId(), cancelEntrustBean.getCancelBrokerEntrustId());
             tradeHelper.getEntrustMap().put(key, cancelEntrustBean.getCancelId());
         }
         TradeMsgReceiver msgReceiver = msgReceiverManager.getReceiverByEntrustId(cancelEntrustBean.getCancelId());
         if (Objects.nonNull(msgReceiver)) {
             msgReceiver.addMsg(MsgType.RESP_CANCEL, cancelEntrustBean);
             // 处理主推委托 在回报之前的情况, 通知补发
-            String key = cancelEntrustBean.getAccountId() + "_" + cancelEntrustBean.getCancelBrokerEntrustId();
+            String key = AgentServerUtil.GetTradeCacheKey("E", cancelEntrustBean.getAccountId(), cancelEntrustBean.getBrokerEntrustId());
             EntrustInterface entrustInterface = tradeHelper.getEntrustNotifyByAccountIdAndBrokerEntrustId(key);
             if (Objects.nonNull(entrustInterface)) {
                 tradeHelper.handleTradeNotifyEntrustRspBeforeOnEntrustRsp(msgReceiver, key, MsgType.NOTIFY_ENTRUST);
@@ -427,7 +436,7 @@ public abstract class TradeAgentDsp implements TradeAgent {
 
             //  处理成交回报 在委托回报之前的情况
             if (tradeHelper.getTradeMap().size() > 0) {
-                tradeHelper.handleCancelTradeRspBeforeEntrustRsp(msgReceiver, tradeHelper.getTradeMap(), cancelEntrustBean);
+                tradeHelper.handleCancelTradeRspBeforeEntrustRsp(msgReceiver, tradeHelper.getTradeMap(), cancelEntrustBean, "E");
             }
         } else {
             logger.warn("onRspCancelEntrust terminalId not found receiver: id - brokerEntrustId {} - {}", cancelEntrustBean.getId(), cancelEntrustBean.getBrokerEntrustId());
@@ -461,21 +470,21 @@ public abstract class TradeAgentDsp implements TradeAgent {
 //    }
     public void onRspCancelIntegratedEntrust(CancelEntrustBean cancelEntrustBean) {
         if (!Strings.isNullOrEmpty(cancelEntrustBean.getCancelBrokerEntrustId())) {
-            String key = cancelEntrustBean.getAccountId() + "_" + cancelEntrustBean.getCancelBrokerEntrustId();
+            String key = AgentServerUtil.GetTradeCacheKey("I", cancelEntrustBean.getAccountId(), cancelEntrustBean.getCancelBrokerEntrustId());
             tradeHelper.getEntrustMap().put(key, cancelEntrustBean.getCancelId());
         }
         TradeMsgReceiver msgReceiver = msgReceiverManager.getReceiverByIntegratedEntrustId(cancelEntrustBean.getCancelId());
         if (Objects.nonNull(msgReceiver)) {
             msgReceiver.addMsg(MsgType.RESP_CANCEL, cancelEntrustBean);
             // 处理主推委托 在回报之前的情况, 通知补发
-            String key = cancelEntrustBean.getAccountId() + "_" + cancelEntrustBean.getCancelBrokerEntrustId();
+            String key = AgentServerUtil.GetTradeCacheKey("I", cancelEntrustBean.getAccountId(), cancelEntrustBean.getBrokerEntrustId());
             EntrustInterface entrustInterface = tradeHelper.getEntrustNotifyByAccountIdAndBrokerEntrustId(key);
             if (Objects.nonNull(entrustInterface)) {
                 tradeHelper.handleTradeNotifyEntrustRspBeforeOnEntrustRsp(msgReceiver, key, MsgType.NOTIFY_INTEGRATED);
             }
             //  处理成交回报 在委托回报之前的情况
             if (tradeHelper.getTradeMap().size() > 0) {
-                tradeHelper.handleCancelTradeRspBeforeEntrustRsp(msgReceiver, tradeHelper.getTradeMap(), cancelEntrustBean);
+                tradeHelper.handleCancelTradeRspBeforeEntrustRsp(msgReceiver, tradeHelper.getTradeMap(), cancelEntrustBean, "I");
             }
         } else {
             logger.warn("onRspCancelIntegratedEntrust terminalId not found receiver: id - brokerEntrustId {} - {}", cancelEntrustBean.getId(), cancelEntrustBean.getBrokerEntrustId());
