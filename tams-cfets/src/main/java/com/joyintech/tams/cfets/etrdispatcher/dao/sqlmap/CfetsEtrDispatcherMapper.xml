@@ -2714,7 +2714,15 @@
         CASE WHEN det.PORTFOLIO_ID IS NULL THEN ete.PORTFOLIO_ID ELSE det.PORTFOLIO_ID END AS portfolioId,
         pp.portfolio_name portfolioName,
         ete.BUSINESS_MODEL busiModel,
-        NVL(fp.finprod_market_id,ete.STOCK_ID) finprodMarketId,
+        CASE
+        when ete.PS IN ('T94') then
+        trdPledge.FINPROD_MARKET_ID
+        WHEN eted.ASSET_TYPE = 'F07'
+        AND ete.PS IN ( '03', '04', 'T56', 'T93', 'T95', 'T96' ) THEN
+        ete.STOCK_ID ELSE ( CASE WHEN fp.FINPROD_MARKET_ID IS NOT NULL THEN fp.FINPROD_MARKET_ID ELSE eted.ASSET_TYPE_10 END )
+        END finprodMarketId,
+
+        <!--NVL(fp.finprod_market_id,ete.STOCK_ID) finprodMarketId,-->
         nvl(fp.finprod_abbr,ete.finprod_id) finprodAbbr,
         ete.trade_market tradeMarket,
         decode(ete.PS,'T56',eted.BUSI_PS,'T92',eted.BUSI_PS,'T93',eted.BUSI_PS,'T94',eted.BUSI_PS,'T95',eted.BUSI_PS,'T96',eted.BUSI_PS,ete.PS)  ps,
@@ -2862,7 +2870,14 @@
         CASE WHEN det.PORTFOLIO_ID IS NULL THEN ete.PORTFOLIO_ID ELSE det.PORTFOLIO_ID END AS portfolioId,
         pp.portfolio_name portfolioName,
         ete.BUSINESS_MODEL busiModel,
-        NVL(fp.finprod_market_id,ete.STOCK_ID) finprodMarketId,
+        CASE
+        when ete.PS IN ('T94') then
+        trdPledge.FINPROD_MARKET_ID
+        WHEN eted.ASSET_TYPE = 'F07'
+        AND ete.PS IN ( '03', '04', 'T56', 'T93', 'T95', 'T96' ) THEN
+        ete.STOCK_ID ELSE ( CASE WHEN fp.FINPROD_MARKET_ID IS NOT NULL THEN fp.FINPROD_MARKET_ID ELSE eted.ASSET_TYPE_10 END )
+        END finprodMarketId,
+        <!--NVL(fp.finprod_market_id,ete.STOCK_ID) finprodMarketId,-->
         nvl(fp.finprod_abbr,ete.finprod_id) finprodAbbr,
         ete.trade_market tradeMarket,
         decode(ete.PS,'T56',eted.BUSI_PS,'T92',eted.BUSI_PS,'T93',eted.BUSI_PS,'T94',eted.BUSI_PS,'T95',eted.BUSI_PS,'T96',eted.BUSI_PS,ete.PS)  ps,

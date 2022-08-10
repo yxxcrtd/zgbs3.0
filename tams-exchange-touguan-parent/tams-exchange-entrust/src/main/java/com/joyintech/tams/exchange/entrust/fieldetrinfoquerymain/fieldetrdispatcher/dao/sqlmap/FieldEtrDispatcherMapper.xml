@@ -506,6 +506,8 @@
             fpi.TENDER_EDATE tenderEdate,
             fpi.PAY_EDATE payEdate,
             CASE
+            when ete.PS IN ('T94') then
+                trdPledge.FINPROD_MARKET_ID
             WHEN eted.ASSET_TYPE = 'F07'
             AND ete.PS IN ( '03', '04', 'T56', 'T93', 'T94', 'T95', 'T96' ) THEN
             ete.STOCK_ID ELSE ( CASE WHEN fp.FINPROD_MARKET_ID IS NOT NULL THEN fp.FINPROD_MARKET_ID ELSE eted.ASSET_TYPE_10 END )
@@ -660,6 +662,7 @@
         LEFT JOIN (
             SELECT
                 A.FINPROD_ID tradeId,
+                listagg ( FP.FINPROD_MARKET_ID, ',' ) within GROUP ( ORDER BY FP.FINPROD_MARKET_ID ) FINPROD_MARKET_ID,
                 MAX( B.Pledge_Ratio ) * 100 Pledge_Ratio,
                 SUM(B.PLEDGE_NUMBER)  PLEDGE_NUMBER
             FROM
@@ -690,6 +693,8 @@
         fpi.TENDER_EDATE tenderEdate,
         fpi.PAY_EDATE payEdate,
         CASE
+        when ete.PS IN ('T94') then
+        trdPledge.FINPROD_MARKET_ID
         WHEN eted.ASSET_TYPE = 'F07'
         AND ete.PS IN ( '03', '04', 'T56', 'T93', 'T94', 'T95', 'T96' ) THEN
         ete.STOCK_ID ELSE ( CASE WHEN fp.FINPROD_MARKET_ID IS NOT NULL THEN fp.FINPROD_MARKET_ID ELSE eted.ASSET_TYPE_10 END )
@@ -845,6 +850,7 @@
         LEFT JOIN (
         SELECT
             A.FINPROD_ID tradeId,
+            listagg ( FP.FINPROD_MARKET_ID, ',' ) within GROUP ( ORDER BY FP.FINPROD_MARKET_ID ) FINPROD_MARKET_ID,
             MAX( B.Pledge_Ratio ) * 100 Pledge_Ratio,
             SUM(B.PLEDGE_NUMBER) PLEDGE_NUMBER
         FROM
