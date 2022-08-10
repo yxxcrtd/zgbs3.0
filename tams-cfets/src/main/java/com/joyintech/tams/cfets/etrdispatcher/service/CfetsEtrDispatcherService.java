@@ -2285,7 +2285,7 @@ public class CfetsEtrDispatcherService extends BaseService {
                         StringUtil.equals(DictCodeListExt2.价格模式_市价指令.getValue(), fieldResponseDto.getPriceModel())){
                     fieldResponseDto.setUnitPrice(null);
                 }
-                if (StringUtil.equals(DictCodeListExt3.交易方向_中途换券.getValue(), fieldResponseDto.getPs())) {
+                if (StringUtil.equals(DictCodeListExt3.投管业务类型_中途换券.getValue(), fieldResponseDto.getBusiTypePosition())) {
                     if(!fieldResponseDto.getFinprodMarketId().contains(",")){
                         fieldResponseDto.setFinprodMarketId(fieldResponseDto.getSwapOutBonds());
                     }
