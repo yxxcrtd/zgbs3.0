@@ -83,7 +83,7 @@
                 TO_CHAR(WTT.VDATE, 'yyyy-MM-dd') VDATE,<!--金融产品交易汇总业务流程.起息日        计息开始日-->
                 TO_CHAR(WTT.MDATE, 'yyyy-MM-dd') MDATE,<!--金融产品交易汇总业务流程.到期日        计息结束日-->
                 TO_CHAR(WTT.TRADE_DATE, 'yyyy-MM-dd') TRADE_DATE,<!--金融产品交易汇总业务流程.交易日        实付（收）日期-->
-                WTT.SHARE_AMT*100 amount,<!--金融产品交易汇总业务流程.交易份额*100        券面总额-->
+                WTT.SHARE_AMT amount,<!--金融产品交易汇总业务流程.交易份额        券面总额-->
                 WTT.FPRICE_AMT tradeAmt,<!--金融产品交易汇总业务流程.全价总额        实收本（付）息总额-->
                 wtt.WORKFLOW_ID,<!--金融产品交易汇总业务流程.工作流代码        工作流代码-->
                 WTT.INT_AMT,<!-- 实收利息 -->
