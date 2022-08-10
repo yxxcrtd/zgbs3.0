@@ -2,6 +2,7 @@ package com.joyintech.tams.invest.batch.autodurdealgenerate.cfetsbond.service;
 
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.*;
+import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
@@ -46,6 +47,12 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
 
     @Autowired(required = false)
     private PinganBatchCommonService pinganBatchCommonService;
+
+    /**
+     * 公共方法service
+     */
+    @Autowired
+    private JoyinbusinessCommonService joyinbusinessCommonService;
 
     public void execute(Date batchDate) {
         Map<String, Object> paramMap1 = new HashMap<String, Object>();
@@ -340,6 +347,17 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
             for (WflStlPayOrders wflStlPayOrder : wflStlPayOrders) {
                 StlPayOrders stlPayOrder = new StlPayOrders();
                 BeanUtil.copyPropertiesIgnoreNull(stlPayOrder, wflStlPayOrder);
+                if(StringUtil.equals(trdProductDeal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())){
+                    paramMap.put("portfolioId", trdProductDealAdd.getPortfolioId());
+                    paramMap.put("secAcctId", trdProductDeal.getSecManageAcctId());
+                    paramMap.put("ccy", trdProductDeal.getCcy());
+                    stlPayOrder.setCounterAcctNo(joyinbusinessCommonService.selectDVPCapacctInfoListByAcctId(paramMap));
+                }else{
+                    paramMap.put("portfolioId", trdProductDealAdd.getPortfolioId());
+                    paramMap.put("secAcctId", trdProductDeal.getSecManageAcctId());
+                    paramMap.put("ccy", trdProductDeal.getCcy());
+                    stlPayOrder.setMyAcctNo(joyinbusinessCommonService.selectDVPCapacctInfoListByAcctId(paramMap));
+                }
                 stlPayOrders.add(stlPayOrder);
             }
             trdBondDurDbInertDto.setStlPayOrdersList(stlPayOrders);
