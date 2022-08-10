@@ -2284,7 +2284,7 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
      */
     @Override
     public void doBack(TrdBondLendInvestTradeDto entity) {
-        AllTradeCommonUtil.deletePosition(entity.getCancelRemark(), entity.getTradeId());
+        AllTradeCommonUtil.deletePosition(entity.getRevokeReason(), entity.getTradeId());
         //删除授信占用
         if (null != entity.getTradeId() && !"".equals(entity.getTradeId()) && !StringUtil.isNotEmpty(entity.getRevokeReason())){
             riskCreditListCommonValidatorService.deleteCredit(entity.getTradeId());
