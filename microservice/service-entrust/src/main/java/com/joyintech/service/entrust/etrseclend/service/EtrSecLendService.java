@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.joyintech.framework.util.ArithmeticUtil;
+import com.joyintech.service.entrust.common.service.WFlowCommonService;
 import com.joyintech.service.entrust.etrseclend.dto.BussEtrInvestPersonInfoDto;
 import com.joyintech.tams.invest.common.component.base.core.MstFileCommonService;
 import com.joyintech.tams.invest.common.component.base.entrust.BaseEtrInvestInfoService;
@@ -713,7 +714,7 @@ public class EtrSecLendService extends BaseService {
      */
     public void doBackFlow(EtrSecLendDto dto) {
         //删除流水
-        baseEtrCashPositionCommService.entrustCloseExecute(dto.getEntrustId(), DictCodeList.是否_是.getValue());
+        WFlowCommonService.doBackFlow(dto.getWorkflowId(), dto.getEntrustId());
         //删除流程中数据
         Map<String, Object> param = new HashMap<>();
         param.put("workflowId", dto.getWorkflowId());
