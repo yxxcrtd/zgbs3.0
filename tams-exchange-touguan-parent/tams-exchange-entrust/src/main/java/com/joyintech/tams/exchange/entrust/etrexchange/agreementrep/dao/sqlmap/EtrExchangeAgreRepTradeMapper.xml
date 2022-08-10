@@ -776,7 +776,7 @@
                     'T94', DECODE(pledge.DISPLACE_DIR,
                             '01',pledge.finprod_id,
                             null),
-                    'T56', pledge.finprod_id,
+        <!--'T56', pledge.finprod_id,-->
                     trdPledge.finprod_id
                 )                                                                       AS finprodId,
                 DECODE(etr_entrust.ps,
@@ -786,7 +786,7 @@
                     'T94', DECODE(pledge.DISPLACE_DIR,
                             '01',pledge.Finprod_Market_Id,
                             null),
-                    'T56', pledge.Finprod_Market_Id,
+        <!--'T56', pledge.Finprod_Market_Id,-->
                     trdPledge.Finprod_Market_Id
             )                                                                           AS finprodMarketId,         /** 质押代码 **/
                 DECODE(etr_entrust.ps,
@@ -796,7 +796,7 @@
                     'T94', DECODE(pledge.DISPLACE_DIR,
                             '01',pledge.finprod_abbr,
                             null),
-                    'T56', pledge.finprod_abbr,
+                    <!--'T56', pledge.finprod_abbr,-->
                     trdPledge.finprod_abbr
                 )                                                                        AS finprodAbbr,            /** 质押券名称 **/
                 DECODE(etr_entrust.ps,
@@ -1061,7 +1061,7 @@
                     'T94', DECODE(pledge.DISPLACE_DIR,
                             '01',pledge.finprod_id,
                             null),
-                    'T56', pledge.finprod_id,
+                    <!--'T56', pledge.finprod_id,-->
                     trdPledge.finprod_id
                 ) AS finprodId,
                 DECODE(wfl_etr_entrust.ps,
@@ -1071,7 +1071,7 @@
                     'T94', DECODE(pledge.DISPLACE_DIR,
                             '01',pledge.Finprod_Market_Id,
                             null),
-                    'T56', pledge.Finprod_Market_Id,
+                    <!--'T56', pledge.Finprod_Market_Id,-->
                     trdPledge.Finprod_Market_Id
                 ) AS finprodMarketId,/** 质押代码 **/
                 DECODE(wfl_etr_entrust.ps,
@@ -1081,7 +1081,7 @@
                     'T94', DECODE(pledge.DISPLACE_DIR,
                             '01',pledge.finprod_abbr,
                             null),
-                    'T56', pledge.finprod_abbr,
+                    <!--'T56', pledge.finprod_abbr,-->
                     trdPledge.finprod_abbr
                 ) AS finprodAbbr, /** 质押券名称 **/
                 DECODE(wfl_etr_entrust.ps,
