@@ -1426,7 +1426,8 @@ public class UfxTradeAgent extends TradeAgentDsp {
         if (IntegratedEntrustUtils.isFixedIncome_BS(integratedEntrust.getEntrustProp())) {
             //指定对手方
             parameters.put("trader_id", integratedEntrust.getLiaisonTel());
-            parameters.put("oppo_trader_id", integratedEntrust.getLiaisonName());
+            // 兼容产品和项目，旧交易对手方取不到，取新的
+            parameters.put("oppo_trader_id", StringUtils.isEmpty(integratedEntrust.getLiaisonName()) ? integratedEntrust.getPropTradeId() : integratedEntrust.getLiaisonName());
             parameters.put("oppo_agency", integratedEntrust.getPropSeatNo());
             parameters.put("cbpconfer_id", integratedEntrust.getContractId());
         } else if (IntegratedEntrustUtils.isFixedIncome_ChenJiao(integratedEntrust.getEntrustProp())
