@@ -136,7 +136,7 @@ public class RepoRevokeService implements BaseRevokeService {
             // 处理非协议回购头寸
             stlDataGatherService.excutePosition(param);
             Map<String, Object> paramH01 = new HashMap<>();
-            paramH01.put("tradeIdList", totalTradeIdListH01);
+            paramH01.put("totalTradeIdList", totalTradeIdListH01);
             paramH01.put("status", DictCodeListExt1.交易流程状态_撤销.getValue());
             paramH01.put("busiType", DictCodeList.共通业务类型_质押式回购交易.getValue());
             // 处理老头存标识,N:不处理老头存
