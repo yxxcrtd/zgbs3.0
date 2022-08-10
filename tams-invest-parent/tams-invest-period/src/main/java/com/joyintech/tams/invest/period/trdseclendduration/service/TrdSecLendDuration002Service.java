@@ -640,8 +640,9 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
 
             BaseTradeProductDealDto baseTradeProductDealDto = new BaseTradeProductDealDto();
             baseTradeProductDealDtos.add(baseTradeProductDealDto);
+            deal.setTradeId(trdBondDuration001Dto.getBusiCode());
             if (operationType == OperationType.REVOKE) {
-                deal.setTradeId(deal.getTradeId() + "R");
+                deal.setTradeId(trdBondDuration001Dto.getBusiCode() + "R");
             }
             TrdProductDeal pTrdProductDeal = bussCommonMapperDelegateService.selectBySinglePrimaryKey(TrdProductDealMapper.class,
                     deal.getFinprodId(), TrdProductDeal.class);
