@@ -147,6 +147,7 @@ public class TrdRepoDuration002Controller extends BaseController {
                             String orgcounterName=entity.getCounterName();
                             BeanUtil.copyPropertiesIgnoreNull(entity, trdTrdRepoDuration);
                             entity.setCounterName(orgcounterName);//修复因copy后导致丢失的数值
+                            entity.setTermTypeReback(entity.getTermTypeReback().replace("-", ""));
                         }
                     }
                 }
