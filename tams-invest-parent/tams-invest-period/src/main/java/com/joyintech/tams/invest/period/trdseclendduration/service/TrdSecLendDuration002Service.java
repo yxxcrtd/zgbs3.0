@@ -24,6 +24,7 @@ import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.invest.common.service.InvestInterfCommService;
+import com.joyintech.tams.invest.common.trade.dao.EtrCommonCashPositionMapper;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.invest.period.trdbondduration.dto.TrdBondDuration002ProcessDto;
 import com.joyintech.tams.invest.period.trdbondduration.service.TrdBondDuration002Service;
@@ -112,6 +113,14 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
 
     @Autowired(required=false)
     private SysWflBusinessListMapper sysWflBusinessListMapper;
+
+    @Autowired
+    private FinDealPledgeMapper finDealPledgeMapper;
+
+    @Autowired
+    private EtrCommonCashPositionMapper etrCommonCashPositionMapper;
+
+
 
     public TrdSecLendDuration002Dto findEffectiveData(Map<String, Object> pageParam) {
         pageParam.put("userName", LoginUserUtil.getUserName());
@@ -616,36 +625,78 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
         List<PtlSecPositionFlowDto> lstPtlSecPositionFlowDto = new ArrayList<>();
         // isNegate is true冲销时（撤销）
         // 根据交易编号检索组合持仓流水（持仓类型为实际）
-        List<PtlSecPositionFlow> lstReal = this.selectPtlSecPositionFlow(isNegate?input.getBusiCode():input.getFinprodId(),true);
-        if (!StringUtil.isEmptyList(lstReal)) {
-            PtlSecPositionFlowDto resultDto;
-            for (PtlSecPositionFlow ptlSecPositionFlow : lstReal) {
-                resultDto = new PtlSecPositionFlowDto();
-                // 组合代码
-                resultDto.setPortfolioId(ptlSecPositionFlow.getPortfolioId());
-                // 证券管理账户/通道代码
-                resultDto.setSecAcctId(ptlSecPositionFlow.getSecAcctId());
-                // 金融产品代码
-                resultDto.setFinprodId(ptlSecPositionFlow.getFinprodId());
-                // 分支序号
-                resultDto.setBranch(ptlSecPositionFlow.getBranch());
-                // 持仓类型
-                resultDto.setHodingType(DictCodeList.持仓类型_质押.getValue());
-                // 日期
-                resultDto.setCdate(input.getMdate());
-                // 数量
-                resultDto.setAmount(ptlSecPositionFlow.getAmount().negate());
-                // 币种
-                resultDto.setCcy(ptlSecPositionFlow.getCcy());
-                // 交易编号
-                resultDto.setTradeId(input.getBusiCode());
-                // 投资目的
-                resultDto.setInvAim(ptlSecPositionFlow.getInvAim());
+        if(isNegate){ //撤销
+            List<PtlSecPositionFlow> lstReal = this.selectPtlSecPositionFlow(isNegate?input.getBusiCode():input.getFinprodId(),true);
+            if (!StringUtil.isEmptyList(lstReal)) {
+                PtlSecPositionFlowDto resultDto;
+                for (PtlSecPositionFlow ptlSecPositionFlow : lstReal) {
+                    resultDto = new PtlSecPositionFlowDto();
+                    // 组合代码
+                    resultDto.setPortfolioId(ptlSecPositionFlow.getPortfolioId());
+                    // 证券管理账户/通道代码
+                    resultDto.setSecAcctId(ptlSecPositionFlow.getSecAcctId());
+                    // 金融产品代码
+                    resultDto.setFinprodId(ptlSecPositionFlow.getFinprodId());
+                    // 分支序号
+                    resultDto.setBranch(ptlSecPositionFlow.getBranch());
+                    // 持仓类型
+                    resultDto.setHodingType(DictCodeList.持仓类型_质押.getValue());
+                    // 日期
+                    resultDto.setCdate(input.getMdate());
+                    // 数量
+                    resultDto.setAmount(ptlSecPositionFlow.getAmount().negate());
+                    // 币种
+                    resultDto.setCcy(ptlSecPositionFlow.getCcy());
+                    // 交易编号
+                    resultDto.setTradeId(input.getBusiCode());
+                    // 投资目的
+                    resultDto.setInvAim(ptlSecPositionFlow.getInvAim());
 
-                lstPtlSecPositionFlowDto.add(resultDto);
+                    resultDto.setIsExistNew(DictCodeList.是否_是.getValue());
 
+                    lstPtlSecPositionFlowDto.add(resultDto);
+
+                }
+            }
+        }else{
+            //到期
+            FinDealPledgeKey key = new FinDealPledgeKey();
+            key.setBranch(0L);
+            key.setFinprodId(input.getFinprodId());
+            List<FinDealPledge>  finDealPledgeList =finDealPledgeMapper.selectByFinprodId(key);
+            if (!StringUtil.isEmptyList(finDealPledgeList)) {
+                PtlSecPositionFlowDto resultDto;
+                for (FinDealPledge finDealPledge : finDealPledgeList) {
+                    resultDto = new PtlSecPositionFlowDto();
+                    // 组合代码
+                    resultDto.setPortfolioId(input.getPortfolioId());
+                    // 证券管理账户/通道代码
+                    resultDto.setSecAcctId(input.getSecManageAcctId());
+                    // 金融产品代码
+                    resultDto.setFinprodId(finDealPledge.getPledgeFinprodId());
+                    // 分支序号
+                    resultDto.setBranch(0L);
+                    // 持仓类型
+                    resultDto.setHodingType(DictCodeList.持仓类型_质押.getValue());
+                    // 日期
+                    resultDto.setCdate(input.getMdate());
+                    // 数量
+                    resultDto.setAmount(finDealPledge.getPledgeAmt().negate());
+                    // 币种
+                    resultDto.setCcy(input.getCcy());
+                    // 交易编号
+                    resultDto.setTradeId(input.getBusiCode());
+                    // 投资目的
+                    resultDto.setInvAim(getInvAim(input,finDealPledge.getPledgeFinprodId()));
+
+                    resultDto.setIsExistNew(DictCodeList.是否_是.getValue());
+
+                    lstPtlSecPositionFlowDto.add(resultDto);
+
+                }
             }
         }
+
         if (StringUtil.isEmptyList(lstPtlSecPositionFlowDto)) {
             return true;
         } else {
@@ -654,6 +705,17 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
             return restTemplate.postForObject(ServiceApplication.PORTFOLIO_SERVICE_NAME + "/common/ptlposition/insertPosition",
                 ptlPositionHoldDto, Boolean.class);
         }
+    }
+
+
+    public String getInvAim(TrdSecLendDuration002Dto input,String finprodId){
+        EtrSecPositionFlowDto paramsDto = new EtrSecPositionFlowDto();
+        paramsDto.setPortfolioId(input.getPortfolioId());
+        paramsDto.setSecAcctId(input.getSecManageAcctId());
+        paramsDto.setCdate(input.getTradeDate());
+        paramsDto.setFinprodId(finprodId);
+        paramsDto.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());
+        return etrCommonCashPositionMapper.selectInvAim(paramsDto);
     }
     private FinProductTradeDto genFinProductTradeDto(TrdSecLendDuration002Dto trdBondDuration001Dto, OperationType operationType) {
         // 5.构造调用组件的输入参数DTO
