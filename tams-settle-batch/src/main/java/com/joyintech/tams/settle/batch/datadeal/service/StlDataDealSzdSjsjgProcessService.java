@@ -1485,14 +1485,34 @@ public class StlDataDealSzdSjsjgProcessService {
                 else if (StringUtil.equals(szdSjsjg.getJgywlb(), StlDataDealProcessConstant.SJSJG_YWLB_XYXZ)){
                     //业务类别 = 到期续做 时新增数据明细质押品信息DTO  add by msk
                     // 数据明细质押品信息DTO
-                    SettleTransDataPledge settleTransDataPledge = new SettleTransDataPledge();
-                    settleTransDataPledge.setTradeId(settleTransData.getTradeId());
-                    settleTransDataPledge.setBranch(0L);
-                    settleTransDataPledge.setPledgeFinprodId(DictCodeListExt1.金融产品类型_投管用_债券.getValue()+ "_" + szdSjsjg.getJgzqdm() + ".SZ");
-                    settleTransDataPledge.setPledgeNumber(ArithmeticUtil.divide(settleTransData.getPrinAmt(), 100, 2));
-                    settleTransDataPledge.setPledgeRatio(BigDecimal.ONE);
-                    settleTransDataPledge.setPledgeAmt(settleTransData.getPrinAmt());
-                    stlDownDataDealWriteBaseDto.getSettleTransDataPledgeList().add(settleTransDataPledge);
+//                    SettleTransDataPledge settleTransDataPledge = new SettleTransDataPledge();
+//                    settleTransDataPledge.setTradeId(settleTransData.getTradeId());
+//                    settleTransDataPledge.setBranch(0L);
+//                    settleTransDataPledge.setPledgeFinprodId(DictCodeListExt1.金融产品类型_投管用_债券.getValue()+ "_" + szdSjsjg.getJgzqdm() + ".SZ");
+//                    settleTransDataPledge.setPledgeNumber(ArithmeticUtil.divide(settleTransData.getPrinAmt(), 100, 2));
+//                    settleTransDataPledge.setPledgeRatio(BigDecimal.ONE);
+//                    settleTransDataPledge.setPledgeAmt(settleTransData.getPrinAmt());
+//                    stlDownDataDealWriteBaseDto.getSettleTransDataPledgeList().add(settleTransDataPledge);
+                    // XYHGFXSJ-493:到期续作不变更对手方取首期的质押品信息 modify by fuyongsheng 20220811 start
+                    List<OriPledgeInfo> oriPledgeInfos = finTradeProductMapper.getOriFinDealPledgeList(settleTransData.getFinprodId());
+                    for (OriPledgeInfo info : oriPledgeInfos) {
+                        SettleTransDataPledge settleTransDataPledge = new SettleTransDataPledge();
+                        settleTransDataPledge.setTradeId(settleTransData.getTradeId());
+                        settleTransDataPledge.setBranch(0L);
+                        // 质押金融产品代码  金融产品类型(投管).债券 + 质押品明细.证券代码 + ".SZ"
+                        settleTransDataPledge.setPledgeFinprodId(DictCodeListExt1.金融产品类型_投管用_债券.getValue() + GlobalConstant.UNDER_LINE + info.getPledgeFinprodId() + ".SZ");
+                        // 质押面值
+                        settleTransDataPledge.setPledgeFaceValue(finCashPlanMapper.selectFaceValue(settleTransDataPledge.getPledgeFinprodId(), DateUtil.format(DateUtil.platDateFromCache())));
+                        // 质押数量
+                        settleTransDataPledge.setPledgeNumber(info.getPledgeNumber());
+                        // 质押率
+                        settleTransDataPledge.setPledgeRatio(ArithmeticUtil.divide(settleTransData.getPrinAmt(),
+                            ArithmeticUtil.multiply(settleTransDataPledge.getPledgeNumber(), settleTransDataPledge.getPledgeFaceValue()), 2));
+                        // 质押金额
+                        settleTransDataPledge.setPledgeAmt(null);
+                        stlDownDataDealWriteBaseDto.getSettleTransDataPledgeList().add(settleTransDataPledge);
+                    }
+                    // XYHGFXSJ-493:到期续作不变更对手方取首期的质押品信息 modify by fuyongsheng 20220811 end
                 } else if (StringUtil.equals(szdSjsjg.getJgywlb(), StlDataDealProcessConstant.SJSJG_YWLB_XYBG)
 //                        || StringUtil.equals(szdSjsjg.getJgywlb(), StlDataDealProcessConstant.SJSJG_YWLB_XYJZ)
                 ) {
@@ -1522,7 +1542,7 @@ public class StlDataDealSzdSjsjgProcessService {
                         // 质押金融产品代码  金融产品类型(投管).债券 + 质押品明细.证券代码 + ".SZ"
                         settleTransDataPledge.setPledgeFinprodId(DictCodeListExt1.金融产品类型_投管用_债券.getValue() + GlobalConstant.UNDER_LINE + info.getPledgeFinprodId() + ".SZ");
                         // 质押面值
-                        settleTransDataPledge.setPledgeFaceValue(finCashPlanMapper.selectFaceValue(settleTransData.getFinprodId(), DateUtil.format(DateUtil.platDateFromCache())));
+                        settleTransDataPledge.setPledgeFaceValue(finCashPlanMapper.selectFaceValue(settleTransDataPledge.getPledgeFinprodId(), DateUtil.format(DateUtil.platDateFromCache())));
                         // 质押数量
                         settleTransDataPledge.setPledgeNumber(info.getPledgeNumber());
                         // 质押率

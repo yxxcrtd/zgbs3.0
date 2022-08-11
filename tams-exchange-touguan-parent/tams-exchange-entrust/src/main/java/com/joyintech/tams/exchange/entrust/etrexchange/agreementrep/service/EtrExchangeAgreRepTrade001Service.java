@@ -2517,12 +2517,6 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         }
         etrSinglePortfolioDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
         etrSinglePortfolioDto.setAssetType1("H01");
-
-        if (!交易方向_首期.getValue().equals(dto.getPs()) && StringUtils.isEmpty(dto.getInitialNum())) {
-            etrSinglePortfolioDto.setFinprodId(getFinprodIdNoFirst(dto));
-        } else if (!StringUtils.isEmpty(dto.getInitialNum())) {
-            etrSinglePortfolioDto.setFinprodId(dto.getInitialNum());
-        }
 //        etrSinglePortfolioDto.setDealCurAcct(dto.getAcctNo());// 资金账户
 //        /***********************************************************************/
 //        etrSinglePortfolioDto.setDealMode(dto.getDeclaType());//申报类型-db 交易方式
@@ -3236,12 +3230,6 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         String tradeId = "";
         //wsz 修改行情到期续作 首次结算时间传值
         String date = "";
-        if (!StringUtils.isEmpty(dto.getOrigSerialDate())
-                || DictCodeListExt3.上农商_指令业务类型_协议回购到期续做指令.getValue().equals(dto.getEntrustBussType())) {
-            date = dto.getOrigSerialDate();
-        } else {
-            date = dto.getFristSettleDate();
-        }
         // 当一个资金账号下挂多个证券账号时，传入的证券帐号可能不同，导致查询失败，因此不传secAcctId
         TrdProductDeal trdProductDeal = trdCommonBaseService.getFirstRepoTrade(dto.getIntiTradeId(),
                 "", "",
