@@ -192,6 +192,10 @@ public class TrdBondLendTargetDuration002Service extends BaseService<TrdBondLend
         if (!DictCodeListExt3.平安业务类型_融入债券付息还本_付.getValue().equals(entity.getTradeType()) && 流程中) {
             return;
         }
+        boolean isCancel = false;
+        if (operationType == OperationType.DELETE || operationType == OperationType.REVOKE) {
+            isCancel = true;
+        }
         List<PtlCashPositionFlowDto> ptlCashPositionFlowDtos = Lists.newArrayList();
         entity.getTradeInfoDto().getStlPayOrdersList().forEach(stlPayOrders -> {
             PtlCashPositionFlowDto ptlCashPositionFlowDto = new PtlCashPositionFlowDto();
@@ -238,9 +242,11 @@ public class TrdBondLendTargetDuration002Service extends BaseService<TrdBondLend
                 }
             }
         }
-        if (DictCodeListExt3.平安业务类型_融入债券付息还本_付.getValue().equals(entity.getTradeType()) && 流程中) {
+        if (DictCodeListExt3.平安业务类型_融入债券付息还本_付.getValue().equals(entity.getTradeType()) && 流程中) {//付息流程中
             baseEtrCashPositionCommService.portfolioEtrCashPosition(ptlPositionHoldDto, true);
-        }else if (!DictCodeListExt3.平安业务类型_融入债券付息还本_付.getValue().equals(entity.getTradeType())&&!流程中) {
+        }else if (DictCodeListExt3.平安业务类型_融入债券付息还本_付.getValue().equals(entity.getTradeType()) && !流程中&&isCancel) { //付息撤销生效
+            baseEtrCashPositionCommService.portfolioEtrCashPosition(ptlPositionHoldDto, true);
+        }else if (!DictCodeListExt3.平安业务类型_融入债券付息还本_付.getValue().equals(entity.getTradeType())&&!流程中) {//收息生效
             baseEtrCashPositionCommService.portfolioEtrCashPosition(ptlPositionHoldDto, true);
         }
     }
