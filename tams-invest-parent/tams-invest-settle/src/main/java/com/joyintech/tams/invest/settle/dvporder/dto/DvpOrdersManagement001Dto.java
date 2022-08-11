@@ -19,6 +19,11 @@ import java.util.List;
  **/
 public class DvpOrdersManagement001Dto extends DvpOrdersManagementDto implements ProcessEntity {
 
+
+    /**
+     * 交易场所
+     */
+    private String tradeMarket;
     /**
      * 划款类型
      * 
@@ -99,5 +104,15 @@ public class DvpOrdersManagement001Dto extends DvpOrdersManagementDto implements
 
     public void setOrderId(String orderId) {
         this.orderId = orderId;
+    }
+
+    @Override
+    public String getTradeMarket() {
+        return tradeMarket;
+    }
+
+    @Override
+    public void setTradeMarket(String tradeMarket) {
+        this.tradeMarket = tradeMarket;
     }
 }

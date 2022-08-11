@@ -1500,7 +1500,9 @@ public class StlDataDealSzdSjsjgProcessService {
                         settleTransDataPledge.setTradeId(settleTransData.getTradeId());
                         settleTransDataPledge.setBranch(0L);
                         // 质押金融产品代码  金融产品类型(投管).债券 + 质押品明细.证券代码 + ".SZ"
-                        settleTransDataPledge.setPledgeFinprodId(DictCodeListExt1.金融产品类型_投管用_债券.getValue() + GlobalConstant.UNDER_LINE + info.getPledgeFinprodId() + ".SZ");
+                        // XYHGFXSJ-1035:修改到期续作质押券代码赋值 modify by fuyongsheng 20220811 start
+                        settleTransDataPledge.setPledgeFinprodId(info.getPledgeFinprodId());
+                        // XYHGFXSJ-1035:修改到期续作质押券代码赋值 modify by fuyongsheng 20220811 end
                         // 质押面值
                         settleTransDataPledge.setPledgeFaceValue(finCashPlanMapper.selectFaceValue(settleTransDataPledge.getPledgeFinprodId(), DateUtil.format(DateUtil.platDateFromCache())));
                         // 质押数量
@@ -1540,7 +1542,7 @@ public class StlDataDealSzdSjsjgProcessService {
                         settleTransDataPledge.setTradeId(settleTransData.getTradeId());
                         settleTransDataPledge.setBranch(0L);
                         // 质押金融产品代码  金融产品类型(投管).债券 + 质押品明细.证券代码 + ".SZ"
-                        settleTransDataPledge.setPledgeFinprodId(DictCodeListExt1.金融产品类型_投管用_债券.getValue() + GlobalConstant.UNDER_LINE + info.getPledgeFinprodId() + ".SZ");
+                        settleTransDataPledge.setPledgeFinprodId(info.getPledgeFinprodId());
                         // 质押面值
                         settleTransDataPledge.setPledgeFaceValue(finCashPlanMapper.selectFaceValue(settleTransDataPledge.getPledgeFinprodId(), DateUtil.format(DateUtil.platDateFromCache())));
                         // 质押数量

@@ -809,6 +809,8 @@
                             '01',pledge.Pledge_Ratio,
                             null),
                     'T56', pledge.Pledge_Ratio,
+                    'T95', pledge.Pledge_Ratio,
+                    'T96', pledge.Pledge_Ratio,
                     trdPledge.Pledge_Ratio
                 )                                                                        AS conRatio,               /** 折算率 **/
                 DECODE(etr_entrust.ps,
@@ -1094,6 +1096,8 @@
                             '01',pledge.Pledge_Ratio,
                             null),
                     'T56', pledge.Pledge_Ratio,
+                    'T95', pledge.Pledge_Ratio,
+                    'T96', pledge.Pledge_Ratio,
                     trdPledge.Pledge_Ratio
                 ) AS conRatio, /** 折算率 **/
                 DECODE(wfl_etr_entrust.ps,
