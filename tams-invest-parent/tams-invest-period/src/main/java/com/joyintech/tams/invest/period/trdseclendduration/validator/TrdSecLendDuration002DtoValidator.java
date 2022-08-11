@@ -33,8 +33,9 @@ public class TrdSecLendDuration002DtoValidator implements BeanValidator {
         List<ValidMessage> errorList = new ArrayList<>();
         if (!"revoke".equals(dto.getOperateType())) {
             errorList.addAll(bussTrdTransferOrderService.check(dto.getBussTrdTransferOrder()));
+        }else{
+            periodCommonService.periodCommonRevokeCheck(dto.getStatusValid(), dto.getBusiCode(), errorList);
         }
-        periodCommonService.periodCommonRevokeCheck(dto.getStatusValid(), dto.getBusiCode(), errorList);
         return errorList;
     }
 }
