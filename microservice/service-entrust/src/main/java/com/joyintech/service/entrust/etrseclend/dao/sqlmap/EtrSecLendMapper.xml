@@ -273,7 +273,7 @@
 	<select id="getFinprodId" resultMap="finprodIdMap">
 		SELECT
 		A.FINPROD_ID id,
-		A.FINPROD_MARKET_ID text,
+		A.FINPROD_ABBR text,
 		A.FINPROD_ID,
 		A.FINPROD_NAME,
 		TO_CHAR(A.VDATE, 'yyyy-MM-dd') VDATE,
