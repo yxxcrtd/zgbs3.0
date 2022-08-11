@@ -83,7 +83,7 @@
                 TO_CHAR(WTT.VDATE, 'yyyy-MM-dd') VDATE,<!--金融产品交易汇总业务流程.起息日        计息开始日-->
                 TO_CHAR(WTT.MDATE, 'yyyy-MM-dd') MDATE,<!--金融产品交易汇总业务流程.到期日        计息结束日-->
                 TO_CHAR(WTT.TRADE_DATE, 'yyyy-MM-dd') TRADE_DATE,<!--金融产品交易汇总业务流程.交易日        实付（收）日期-->
-                WTT.SHARE_AMT amount,<!--金融产品交易汇总业务流程.交易份额        券面总额-->
+                WTT.SHARE_AMT*100 amount,<!--金融产品交易汇总业务流程.交易份额*100        券面总额-->
                 WTT.FPRICE_AMT tradeAmt,<!--金融产品交易汇总业务流程.全价总额        实收本（付）息总额-->
                 wtt.WORKFLOW_ID,<!--金融产品交易汇总业务流程.工作流代码        工作流代码-->
                 WTT.INT_AMT,<!-- 实收利息 -->
@@ -194,7 +194,7 @@
                             /* 现金流计划.现金流类型                            现金流类型*/
                             FCP.PAY_DATE,
                             /* 现金流计划.调整后的计划支付日                            计划支付日*/
-                            RANK() OVER (PARTITION BY FCP.FINPROD_ID ORDER BY FCP.MDATE) RANK
+                            RANK() OVER (PARTITION BY TPD.TRADE_ID ORDER BY FCP.MDATE) RANK
                         FROM TRD_PRODUCT_DEAL TPD
                         INNER JOIN TRD_PRODUCT_DEAL_ADD TPDA ON TPD.TRADE_ID = TPDA.TRADE_ID
                         INNER JOIN FIN_DEAL_TARGET FDT ON TPD.TRADE_ID = FDT.FINPROD_ID
