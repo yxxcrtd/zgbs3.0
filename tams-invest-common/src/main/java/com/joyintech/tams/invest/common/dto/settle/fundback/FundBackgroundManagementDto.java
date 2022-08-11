@@ -150,6 +150,21 @@ public class FundBackgroundManagementDto extends BaseEntity {
     private boolean paBussTypeAdd;
 
     /**
+     * 交易对手
+     */
+    private String counterId;
+
+    /**
+     * 指令代码
+     */
+    private String entrustId;
+
+    /**
+     * 投标代码
+     */
+    private String bidId;
+
+    /**
      * 获取 statusValid
      *
      * @return statusValid
@@ -556,5 +571,29 @@ public class FundBackgroundManagementDto extends BaseEntity {
 
     public void setTradeMarket(String tradeMarket) {
         this.tradeMarket = tradeMarket;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    public String getEntrustId() {
+        return entrustId;
+    }
+
+    public void setEntrustId(String entrustId) {
+        this.entrustId = entrustId;
+    }
+
+    public String getBidId() {
+        return bidId;
+    }
+
+    public void setBidId(String bidId) {
+        this.bidId = bidId;
     }
 }
