@@ -29,6 +29,7 @@ import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.common.base.dao.EtrEntrustBackupMapper;
 import com.joyintech.tams.common.base.entity.PtlPortfolio;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
@@ -106,6 +107,9 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
 
     @Autowired(required=false)
     private SysWflBusinessListMapper sysWflBusinessListMapper;
+
+    @Autowired
+    private EtrEntrustBackupMapper etrEntrustBackupMapper;
 
     /**
      * 债券投资委托查询 <功能详细描述>
@@ -289,19 +293,20 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
 
     @Override
     public void doBack(EtrSecLendDto entity) {
-        doBackFlow(entity);
+//        doBackFlow(entity);
         //deleteWflEntity(entity);
     }
 
     @Override
     public void doDelete(String workflowId) {
         EtrSecLendDto entity = getBussinessEntityByWorkflowId(workflowId);
-//        //从废弃表中获取，转移到指令表
-//        etrEntrustBackupMapper.insertEtrFromQuery(entity.getEntrustId());
-//        etrEntrustBackupMapper.insertEtrAddFromQuery(entity.getEntrustId());
-//        // 删除废弃表
-//        etrEntrustBackupMapper.deleteByPrimaryKey(entity.getEntrustId());
-//        etrEntrustBackupMapper.deleteAddByPrimaryKey(entity.getEntrustId());
+        doBackFlow(entity);
+        //从废弃表中获取，转移到指令表
+        etrEntrustBackupMapper.insertEtrFromQuery(entity.getEntrustId());
+        etrEntrustBackupMapper.insertEtrAddFromQuery(entity.getEntrustId());
+        // 删除废弃表
+        etrEntrustBackupMapper.deleteByPrimaryKey(entity.getEntrustId());
+        etrEntrustBackupMapper.deleteAddByPrimaryKey(entity.getEntrustId());
         ProcessMark processMark = mstWorkflowCommonServiceMapperImpl.getBusinessInfo(workflowId);
         if (StringUtil.isNotEmpty(processMark)
                 && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {

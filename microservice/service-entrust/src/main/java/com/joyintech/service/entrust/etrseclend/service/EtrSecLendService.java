@@ -636,7 +636,7 @@ public class EtrSecLendService extends BaseService {
             entity.setEtrEntrust(etrEntrust);
             entity.setEtrEntrustAdd(etrEntrustAdd);
             entity.setEtrPledgeList(etrPledgeList);
-            baseEtrInvestInfoService.newDelegateFlow(entity);
+            baseEtrInvestInfoService.insertWithQuery(entity);
             //委托开始日对委托的持仓流水和现金流水做处理
             if(baseEtrCashPositionCommService!=null){
                 entrustCommonDto.setEtrEntrust(etrEntrust);
