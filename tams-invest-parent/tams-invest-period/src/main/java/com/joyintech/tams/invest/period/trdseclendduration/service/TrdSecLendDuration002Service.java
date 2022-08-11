@@ -659,40 +659,42 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
                 }
             }
         }else{
-            //到期
-            FinDealPledgeKey key = new FinDealPledgeKey();
-            key.setBranch(0L);
-            key.setFinprodId(input.getFinprodId());
-            List<FinDealPledge>  finDealPledgeList =finDealPledgeMapper.selectByFinprodId(key);
-            if (!StringUtil.isEmptyList(finDealPledgeList)) {
-                PtlSecPositionFlowDto resultDto;
-                for (FinDealPledge finDealPledge : finDealPledgeList) {
-                    resultDto = new PtlSecPositionFlowDto();
-                    // 组合代码
-                    resultDto.setPortfolioId(input.getPortfolioId());
-                    // 证券管理账户/通道代码
-                    resultDto.setSecAcctId(input.getSecManageAcctId());
-                    // 金融产品代码
-                    resultDto.setFinprodId(finDealPledge.getPledgeFinprodId());
-                    // 分支序号
-                    resultDto.setBranch(0L);
-                    // 持仓类型
-                    resultDto.setHodingType(DictCodeList.持仓类型_质押.getValue());
-                    // 日期
-                    resultDto.setCdate(input.getMdate());
-                    // 数量
-                    resultDto.setAmount(finDealPledge.getPledgeNumber().negate());
-                    // 币种
-                    resultDto.setCcy(input.getCcy());
-                    // 交易编号
-                    resultDto.setTradeId(input.getBusiCode());
-                    // 投资目的
-                    resultDto.setInvAim(getInvAim(input,finDealPledge.getPledgeFinprodId()));
+            if (DictCodeListExt1.金融产品类型_投管用_债券借贷融入.getValue().equals(input.getFinprodType2())) {
+                //到期
+                FinDealPledgeKey key = new FinDealPledgeKey();
+                key.setBranch(0L);
+                key.setFinprodId(input.getFinprodId());
+                List<FinDealPledge>  finDealPledgeList =finDealPledgeMapper.selectByFinprodId(key);
+                if (!StringUtil.isEmptyList(finDealPledgeList)) {
+                    PtlSecPositionFlowDto resultDto;
+                    for (FinDealPledge finDealPledge : finDealPledgeList) {
+                        resultDto = new PtlSecPositionFlowDto();
+                        // 组合代码
+                        resultDto.setPortfolioId(input.getPortfolioId());
+                        // 证券管理账户/通道代码
+                        resultDto.setSecAcctId(input.getSecManageAcctId());
+                        // 金融产品代码
+                        resultDto.setFinprodId(finDealPledge.getPledgeFinprodId());
+                        // 分支序号
+                        resultDto.setBranch(0L);
+                        // 持仓类型
+                        resultDto.setHodingType(DictCodeList.持仓类型_质押.getValue());
+                        // 日期
+                        resultDto.setCdate(input.getMdate());
+                        // 数量
+                        resultDto.setAmount(finDealPledge.getPledgeNumber().negate());
+                        // 币种
+                        resultDto.setCcy(input.getCcy());
+                        // 交易编号
+                        resultDto.setTradeId(input.getBusiCode());
+                        // 投资目的
+                        resultDto.setInvAim(getInvAim(input,finDealPledge.getPledgeFinprodId()));
 
-                    resultDto.setIsExistNew(DictCodeList.是否_是.getValue());
+                        resultDto.setIsExistNew(DictCodeList.是否_是.getValue());
 
-                    lstPtlSecPositionFlowDto.add(resultDto);
+                        lstPtlSecPositionFlowDto.add(resultDto);
 
+                    }
                 }
             }
         }
