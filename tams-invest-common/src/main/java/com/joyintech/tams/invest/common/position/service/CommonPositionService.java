@@ -326,6 +326,7 @@ public class CommonPositionService {
 	 * @return
 	 */
 	public boolean renewalAfterMaturity(Map<String,Object> param) {
+		logger.debug("[处理协议回购到期续作,冲销新质押券持仓],参数：{}", JSON.toJSONString(param));
 		// 指令环节，新质押券持仓
 		BigDecimal etrAmt = BigDecimal.ZERO;
 		List<EtrSecPositionFlow> etrSecPositionFlows = commonPtlPositionMapper.selectEtrSecPositionFlowByFin(param);
@@ -367,6 +368,7 @@ public class CommonPositionService {
 	 * 深交所正回购到期续做 日间、日终 头寸特殊处理
 	 */
 	public boolean dealPositionForSJSDQXZ(Map<String, Object> properties) {
+		logger.debug("[处理深交所正回购到期续做头寸],参数：{}", JSON.toJSONString(properties));
 		String flowType = String.valueOf(properties.get("flowType"));
 		String processConfig = String.valueOf(properties.get("processConfig"));
 		// 置换方向
@@ -413,6 +415,7 @@ public class CommonPositionService {
 	 * 中途换券流水处理
 	 */
 	public boolean dealPositionForZTHQRLS(Map<String, Object> properties) {
+		logger.debug("[处理协议回购中途换券头寸],参数：{}", JSON.toJSONString(properties));
 		String flowType = String.valueOf(properties.get("flowType"));
 		String processConfig = String.valueOf(properties.get("processConfig"));
 		// 置换方向

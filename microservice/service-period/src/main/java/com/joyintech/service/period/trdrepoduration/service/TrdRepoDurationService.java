@@ -214,7 +214,21 @@ public class TrdRepoDurationService extends BaseService<TrdRepoDurationDto> {
         //有回购类型查询条件是 不显示银行间的数据
         param.put("TRADE_PLACE_01",DictCodeListExt1.交易场所_银行间.getValue());
         param.put("TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue());
-		
+		Object listPs = param.get("psType");
+        List<String> result = new ArrayList<>();
+        if (listPs instanceof ArrayList<?>) {
+            for (Object o : (List<?>) listPs) {
+                result.add(String.class.cast(o));
+                if(Objects.equals(String.class.cast(o), "T95")){
+                    result.add("T07");
+                }
+                if(Objects.equals(String.class.cast(o), "T96")){
+                    result.add("T54");
+                }
+            }
+        }
+        param.put("psType", result);
+
     }
 
     public TrdRepoDurationDto findEffectiveData(Map<String, Object> params) {

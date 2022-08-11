@@ -314,7 +314,7 @@
         and ((fcp.MDATE = to_date(#{sysDate},'YYYY-MM-DD') AND psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD') - 1)
         OR (fcp.MDATE != to_date(#{sysDate},'YYYY-MM-DD') AND psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD')))
         <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 start -->
-        and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07') and TRADE_MARKET in ('03','04'))
         and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
         <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 end -->
         and (fp.IS_RIGHT = 'N' or fp.IS_RIGHT is null)

@@ -120,6 +120,7 @@
 <div layout:fragment="script">
     <script data-th-inline="javascript" type="text/javascript">
         var TRADE_FLOW_STATUS01 = /*[[${TRADE_FLOW_STATUS01}]]*/'';
+        var FINPROD_TYPE_TG_F32 = /*[[${FINPROD_TYPE_TG_F32}]]*/'';
     </script>
     <div class="commonVariable" th:replace="invest/settle/balance/settleCommon::commonVariable"></div>
     <script data-th-src="@{/js/invest/settle/fundback/FundBackgroundManagement001.js}" type="text/javascript"></script>

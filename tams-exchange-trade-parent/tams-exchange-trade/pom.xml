@@ -30,11 +30,11 @@
             <groupId>com.joyintech</groupId>
             <version>3.0.0</version>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <artifactId>tams-exchange-trade-server-dsp</artifactId>-->
-        <!--            <groupId>com.joyintech</groupId>-->
-        <!--            <version>3.0.0</version>-->
-        <!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <artifactId>tams-exchange-trade-server-dsp</artifactId>-->
+<!--            <groupId>com.joyintech</groupId>-->
+<!--            <version>3.0.0</version>-->
+<!--        </dependency>-->
 <!--        <dependency>-->
 <!--            <artifactId>tams-exchange-trade-quote</artifactId>-->
 <!--            <groupId>com.joyintech</groupId>-->

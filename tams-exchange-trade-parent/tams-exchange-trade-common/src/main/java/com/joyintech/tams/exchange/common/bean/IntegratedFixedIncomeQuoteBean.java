@@ -32,7 +32,7 @@ public class IntegratedFixedIncomeQuoteBean {
     @ApiModelProperty(name = "interest", value = "债券应计利息")
     private double interest;//债券应计利息 bondintr
     @ApiModelProperty(name = "reportTime", value = "报价时间")
-    private int reportTime;
+    private Long reportTime;
 
     public int getErrorCode() {
         return errorCode;
@@ -130,11 +130,11 @@ public class IntegratedFixedIncomeQuoteBean {
         this.interest = interest;
     }
 
-    public int getReportTime() {
+    public Long getReportTime() {
         return reportTime;
     }
 
-    public void setReportTime(int reportTime) {
+    public void setReportTime(Long reportTime) {
         this.reportTime = reportTime;
     }
 }

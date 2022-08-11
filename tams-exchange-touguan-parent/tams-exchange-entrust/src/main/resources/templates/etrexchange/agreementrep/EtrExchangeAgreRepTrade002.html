@@ -408,7 +408,7 @@
                     <label class="layui-form-label" style="width: 150px;" id="repSecIdLabel" data-th-text="#{EtrExchangeAgreRepTrade001.repSecId}">质押券</label>
                     <div class="layui-input-inline input-inline" style=" margin: 0px; margin-left: auto;">
                         <select required type="text" id="repSecId" name="repSecId" class="layui-input form-input input-select" placeholder="请输入内容" data-th-data-url="@{'/etrexchange/agreementrep/EtrExchangeAgreRepTrade001/getFinprodMarketInfoWfl'}"
-                                 parentIds="acctTradeMarket" th:initValue="${entity?.repSecId}" data-th-placeholder="#{SysCommon.placeholder}"  formatoption=false></select>
+                                 parentIds="acctTradeMarket" th:initValue="${entity?.repSecId}" data-th-placeholder="#{SysCommon.placeholder}"  formatoption=false multiple></select>
                     </div>
                 </div>
                 <div class="form-inline-wrap" style="width: 50%; padding-top:6px;" id="conRatio_div">

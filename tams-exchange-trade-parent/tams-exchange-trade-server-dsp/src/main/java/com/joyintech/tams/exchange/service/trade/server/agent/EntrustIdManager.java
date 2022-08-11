@@ -23,12 +23,27 @@ public class EntrustIdManager {
     private static final String localEntrustPrefix = "l";
     private static final String entrustPrefix = "e";
     private static final String RTGSPrefix = "r";
-
+    // 金证W 深圳现券协商成交 撤销成交与委托下单缓存
+    // 综合撤销业务
+    public static final String KCBPW_ZHC_Prefix = "KWZHC";
+    // 平台撤销业务
+    public static final String KCBPW_PTC_Prefix = "KWPTC";
+    // 综合业务
+    public static final String KCBPW_ZH_Prefix = "KWZH";
+    // 平台业务
+    public static final String KCBPW_PT_Prefix = "KWPT";
     private RocksDB rocksDB;
     @Value("${agent.cache.path:cache}")
     private String cachePath;
     private Map<String, String> entrustIds = Maps.newConcurrentMap();
     private Map<String, String> localEntrustIds = Maps.newConcurrentMap();
+    // 仅系统日期当日有效，需要定时清理非当日数据。每日3点清理 生产环境会部署多台服务实例
+    private Map<String, String> kcbpwZHCancelEntrustIds = Maps.newConcurrentMap();
+    private Map<String, String> kcbpwPTCancelEntrustIds = Maps.newConcurrentMap();
+
+    // 下单的场景
+    private Map<String, String> kcbpwZHEntrustIds = Maps.newConcurrentMap();
+    private Map<String, String> kcbpwPTEntrustIds = Maps.newConcurrentMap();
     /**
      * 记录交收信息
      */
@@ -53,6 +68,14 @@ public class EntrustIdManager {
                     localEntrustIds.put(key, value);
                 } else if (key.startsWith(RTGSPrefix)) {
                     reportNos.put(key, value);
+                } else if (key.startsWith(KCBPW_ZHC_Prefix)) {
+                    kcbpwZHCancelEntrustIds.put(key, value);
+                } else if (key.startsWith(KCBPW_PTC_Prefix)) {
+                    kcbpwPTCancelEntrustIds.put(key, value);
+                } else if (key.startsWith(KCBPW_ZH_Prefix)) {
+                    kcbpwZHEntrustIds.put(key, value);
+                } else if (key.startsWith(KCBPW_PT_Prefix)) {
+                    kcbpwPTEntrustIds.put(key, value);
                 } else {
                     entrustIds.put(key, value);
                 }
@@ -60,6 +83,13 @@ public class EntrustIdManager {
         } catch (Exception e) {
             logger.error("rocks db open path:{} error:{}", cachePath, e);
         }
+    }
+
+    /**
+     * 仅系统日期当日有效，需要定时清理非当日数据。每日3点清理 生产环境会部署多台服务实例
+     */
+    public void clearKCBPWCache() {
+
     }
 
     public void clearCache() {
@@ -89,6 +119,146 @@ public class EntrustIdManager {
             }
         });
     }
+
+    /**
+     * 綜合撤销业务
+     *
+     * @param accountId
+     * @param brokeEntrustId
+     * @return
+     */
+    public String getKcbpwZHCancelEntrustId(String accountId, String brokeEntrustId) {
+        if (Strings.isNullOrEmpty(brokeEntrustId)) {
+            return null;
+        }
+        return kcbpwZHCancelEntrustIds.get(getKey(KCBPW_ZHC_Prefix, accountId, brokeEntrustId));
+    }
+
+    /**
+     * 綜合业务
+     *
+     * @param accountId
+     * @param brokeEntrustId
+     * @return
+     */
+    public String getKcbpwZHEntrustId(String accountId, String brokeEntrustId) {
+        if (Strings.isNullOrEmpty(brokeEntrustId)) {
+            return null;
+        }
+        return kcbpwZHEntrustIds.get(getKey(KCBPW_ZH_Prefix, accountId, brokeEntrustId));
+    }
+
+
+    /**
+     * 普通撤销业务
+     *
+     * @param accountId
+     * @param brokeEntrustId
+     * @return
+     */
+    public String getKcbpwPTCancelEntrustId(String accountId, String brokeEntrustId) {
+        if (Strings.isNullOrEmpty(brokeEntrustId)) {
+            return null;
+        }
+        return kcbpwPTCancelEntrustIds.get(getKey(KCBPW_PTC_Prefix, accountId, brokeEntrustId));
+    }
+
+    /**
+     * 普通业务
+     *
+     * @param accountId
+     * @param brokeEntrustId
+     * @return
+     */
+    public String getKcbpwPTEntrustId(String accountId, String brokeEntrustId) {
+        if (Strings.isNullOrEmpty(brokeEntrustId)) {
+            return null;
+        }
+        return kcbpwPTEntrustIds.get(getKey(KCBPW_PT_Prefix, accountId, brokeEntrustId));
+    }
+
+
+    /**
+     * 金证W 综合业务 被撤销与撤销委托编号关联临时存储
+     * 仅当日有效
+     *
+     * @param accountId
+     * @param brokeEntrustId 被撤销的委托编号
+     * @param ordersNo       撤销的委托编号
+     * @param orderId        撤销的交易ID
+     */
+    public void setKcbpwZHCancelEntrustId(String accountId, String brokeEntrustId, String ordersNo, String orderId) {
+        // "ordersno": "3", "orderid": "B200000004",
+        String key = getKey(KCBPW_ZHC_Prefix, accountId, brokeEntrustId);
+        String value = ordersNo + "|" + orderId;
+        if (Strings.isNullOrEmpty(brokeEntrustId)) {
+            logger.info("brokeEntrustId is empty: id = {}", brokeEntrustId);
+            return;
+        }
+        kcbpwZHCancelEntrustIds.put(key, value);
+        saveIdAsync(key, value);
+    }
+
+    /**
+     * 综合业务
+     *
+     * @param accountId
+     * @param brokeEntrustId
+     * @param id
+     */
+    public void setKcbpwZHEntrustId(String accountId, String brokeEntrustId, String id) {
+        // "ordersno": "3", "orderid": "B200000004",
+        String key = getKey(KCBPW_ZH_Prefix, accountId, brokeEntrustId);
+        String value = id;
+        if (Strings.isNullOrEmpty(brokeEntrustId)) {
+            logger.info("brokeEntrustId is empty: id = {}", brokeEntrustId);
+            return;
+        }
+        kcbpwZHEntrustIds.put(key, value);
+        saveIdAsync(key, value);
+    }
+
+    /**
+     * 金证W 普通业务 被撤销与撤销委托编号关联临时存储
+     * 仅当日有效
+     *
+     * @param accountId
+     * @param brokeEntrustId 被撤销的委托编号
+     * @param ordersNo       撤销的委托编号
+     * @param orderId        撤销的交易ID
+     */
+    public void setKcbpwPTCancelEntrustId(String accountId, String brokeEntrustId, String ordersNo, String orderId) {
+        // "ordersno": "3", "orderid": "B200000004",
+        String key = getKey(KCBPW_PTC_Prefix, accountId, brokeEntrustId);
+        String value = ordersNo + "|" + orderId;
+        if (Strings.isNullOrEmpty(brokeEntrustId)) {
+            logger.info("brokeEntrustId is empty: id = {}", brokeEntrustId);
+            return;
+        }
+        kcbpwPTCancelEntrustIds.put(key, value);
+        saveIdAsync(key, value);
+    }
+
+    /**
+     * 普通业务
+     *
+     * @param accountId
+     * @param brokeEntrustId
+     * @param ordersNo
+     * @param orderId
+     */
+    public void setKcbpwPTEntrustId(String accountId, String brokeEntrustId, String ordersNo, String orderId) {
+        // "ordersno": "3", "orderid": "B200000004",
+        String key = getKey(KCBPW_PT_Prefix, accountId, brokeEntrustId);
+        String value = ordersNo + "|" + orderId;
+        if (Strings.isNullOrEmpty(brokeEntrustId)) {
+            logger.info("brokeEntrustId is empty: id = {}", brokeEntrustId);
+            return;
+        }
+        kcbpwPTEntrustIds.put(key, value);
+        saveIdAsync(key, value);
+    }
+
 
     public void setBrokeEntrustIdMapping(String accountId, String brokeEntrustId, String id) {
         String key = getKey(entrustPrefix, accountId, brokeEntrustId);

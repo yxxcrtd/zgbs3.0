@@ -20,6 +20,12 @@ public class FundBackgroundManagement001Dto extends FundBackgroundManagementDto 
 	 * 发送状态 20200317 add
 	 */
 	private String sendStatusStr;
+
+    /**
+     * 债券资产交易场所
+     */
+    private String tradeMarket;
+
     public String getStatusValidString() {
         return SysDataUtil.getNameFromDataDict(DictCode.画面数据状态, getStatusValid());
     }
@@ -63,5 +69,14 @@ public class FundBackgroundManagement001Dto extends FundBackgroundManagementDto 
 		return StringUtil.isNotEmpty(super.getSendStatus()) 
 				? SysDataUtil.getNameFromDataDict(DictCode.发送状态 , super.getSendStatus()) : "" ;
 	}
-    
+
+    @Override
+    public String getTradeMarket() {
+        return tradeMarket;
+    }
+
+    @Override
+    public void setTradeMarket(String tradeMarket) {
+        this.tradeMarket = tradeMarket;
+    }
 }

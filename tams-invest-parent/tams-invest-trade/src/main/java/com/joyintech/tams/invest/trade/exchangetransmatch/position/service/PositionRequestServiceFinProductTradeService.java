@@ -9,6 +9,7 @@ import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustDetailMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
+import com.joyintech.tams.common.base.dao.FinTradeProductMapper;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -63,6 +64,9 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
 
     @Autowired
     private TrdCommonBaseService trdCommonBaseService;
+
+    @Autowired
+    private FinTradeProductMapper finTradeProductMapper;
 
     @Autowired
     private CommonPositionService commonPositionService;
@@ -646,12 +650,20 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
             bean.setCashAcctId(exchangeTransMatchCommonMapper.queryAccountNo(bean.getSecAcctId()));
             bean.setTradeId(dealEntity.getTradeId());
             bean.setEtrId(trdProductDealAdd.getEntrustId());
+            // XYHGFXSJ-843:修改到期续做轧差金额赋值 modify by fuyongsheng 20220810 start
             // ZGTFCP-1672:到期续作金额赋值 modify by fuyongsheng 20220323 start
             if(DictCodeList.交易方向_买入.getValue().equals(dealEntity.getPs())){
-                bean.setCashAmount(dealEntity.getTradeAmt());
+                FinTradeProductKey key = new FinTradeProductKey();
+                key.setFinprodId(trdFinProductDealTotal.getFinprodId());
+                key.setBranch(0L);
+                FinTradeProduct finTradeProduct = finTradeProductMapper.selectByPrimaryKey(key);
+                bean.setCashAmount(ArithmeticUtil.subtract(dealEntity.getTradeAmt(), finTradeProduct.getmTradeAmt()));
             }else{ // 收息到账、还本到账
-                bean.setCashAmount(dealEntity.getTradeAmt().negate());
+                // 到期续作生成3笔交易,1笔新开买入,1笔收息到账,1笔还本到账;只处理新开的那条数据
+                resultMap.put(INTERFACE_TYPE, null);
+                return;
             }
+            // XYHGFXSJ-843:修改到期续做轧差金额赋值 modify by fuyongsheng 20220810 end
             // ZGTFCP-1672:到期续作金额赋值 modify by fuyongsheng 20220323 end
             list.add(BeanUtil.object2Map(bean));
             resultMap.put("ptlOffsetCashList", list);
@@ -730,8 +742,17 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
                     bean.setTradeId(dealEntity.getTradeId());
                     bean.setEtrId(trdProductDealAdd.getEntrustId());
                     bean.setFinprodId(finPledgeDisplaceResult.getFinprodId());
-                    bean.setSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
-                    bean.setOwnSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
+                    // XYHGFXSJ-963:深交所解除质押有钱的那笔交易发送新头寸报文不处理解除质押券数据集 modify by fuyongsheng 20220810 start
+                    if(DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(dealEntity.getTradeMarket())
+                            && dealEntity.getTradeAmt() != null
+                            && dealEntity.getTradeAmt().compareTo(BigDecimal.ZERO) > 0){
+                        bean.setSecAmount(BigDecimal.ZERO);
+                        bean.setOwnSecAmount(BigDecimal.ZERO);
+                    }else{
+                        bean.setSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
+                        bean.setOwnSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
+                    }
+                    // XYHGFXSJ-963:深交所解除质押有钱的那笔交易发送新头寸报文不处理解除质押券数据集 modify by fuyongsheng 20220810 end
                     bean.setIntegrateSecAmount(BigDecimal.ZERO);
                     Map<String, Object> map = BeanUtil.object2Map(bean);
                     list.add(map);

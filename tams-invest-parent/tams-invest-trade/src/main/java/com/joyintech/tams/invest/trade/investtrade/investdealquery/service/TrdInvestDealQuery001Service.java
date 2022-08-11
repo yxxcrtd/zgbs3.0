@@ -337,7 +337,8 @@ public class TrdInvestDealQuery001Service extends CommonExportService<TrdInvestD
                     dto.setRate(dto.getUnitInt());
                     //XYHGFXSJ-933 【交易查询】协议回购深交所正回购提前购回，交易查询中的交易价格 显示错误，利率为空。 期望：交易价格 应为空，利率为5.000%
                     if (StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_投资端_提前终止.getValue()) ||
-                            StringUtil.equals(dto.getPs(), DictCodeList.交易方向_到期.getValue())) {
+                            StringUtil.equals(dto.getPs(), DictCodeList.交易方向_到期.getValue())
+                            || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_到期续做.getValue())) {
                         if (null != dto.getTradePrice()) {
                             dto.setRate(ArithmeticUtil.multiply(dto.getTradePrice(), BigDecimal.valueOf(100)));
                             dto.setTradePrice(null);
