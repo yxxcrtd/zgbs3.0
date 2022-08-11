@@ -2582,8 +2582,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             bussTrdTransferOrderDto.setPayAcctNo(acctId);
         }
         // 收款账户
-        // 一级缴款 交易对手账户（承销商账户）
-        if (isPayType02) {
+        // 一级缴款/商业银行柜台 交易对手账户（承销商账户）
+        FinProduct finProduct = finProductMapper.selectByPrimaryKey(deal.getFinprodId());
+        if (isPayType02 || StringUtil.equals(finProduct.getTradeMarket(), DictCodeListExt1.交易场所_商业银行柜台.getValue())) {
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("counterId",deal.getCounterId());
             paramMap.put("ccy",deal.getCcy());

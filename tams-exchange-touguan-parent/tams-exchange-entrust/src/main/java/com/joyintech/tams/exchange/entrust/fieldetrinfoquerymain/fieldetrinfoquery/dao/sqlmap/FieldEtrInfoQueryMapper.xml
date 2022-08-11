@@ -1151,7 +1151,7 @@
 			   WHEN STD.DELIVERY_RESULT = '04' THEN  '0'
         WHEN eea.ASSET_TYPE1 = 'H01'
         THEN
-        decode(TT.TRADED_BALANCE, 0,0,null,0,STD.SHARE_AMT / TT.TRADED_BALANCE) * 100  ||''
+        decode(TT.TRADED_VOLUME, 0,0,null,0,STD.SHARE_AMT / TT.TRADED_VOLUME) ||''
 			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME * 100 || ''
 			 END                                                   DELIVERY_SCHEDULE,
 <!--			 TTH.ACCOUNT_ID                                        ACCT_ACCOUNT,-->
@@ -1213,7 +1213,7 @@
 			   WHEN STD.DELIVERY_RESULT = '04' THEN '0'
         WHEN eea.ASSET_TYPE1 = 'H01'
         THEN
-        decode(TT.TRADED_BALANCE, 0,0,null,0,STD.SHARE_AMT / TT.TRADED_BALANCE) * 100 ||''
+        decode(TT.TRADED_VOLUME, 0,0,null,0,STD.SHARE_AMT / TT.TRADED_VOLUME)||''
 			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME * 100 || ''
 			 END                                                   DELIVERY_SCHEDULE,
 			 TT.ACCOUNT_ID                                         ACCT_ACCOUNT,
@@ -1343,6 +1343,7 @@
         <!-- LEFT JOIN ETR_ENTRUST_DETAIL EED ON EE.ENTRUST_ID = EED.ENTRUST_ID
         LEFT JOIN PTL_PORTFOLIO PP ON EED.PORTFOLIO_ID = PP.PORTFOLIO_ID -->
       WHERE A.INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR}
+        and A.STOCK_CODE is not null
       ORDER BY A.CREATE_TIME DESC
     </select>
 
