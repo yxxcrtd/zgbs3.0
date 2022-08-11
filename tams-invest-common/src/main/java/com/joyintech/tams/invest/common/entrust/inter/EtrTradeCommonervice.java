@@ -1,10 +1,13 @@
 package com.joyintech.tams.invest.common.entrust.inter;
 
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.FinProductAddMapper;
+import com.joyintech.tams.common.base.dao.FinProductMapper;
+import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.common.base.entity.FinProductAdd;
 import com.joyintech.tams.common.base.entity.PtlCapacctInfo;
 import com.joyintech.tams.constant.DictCodeList;
@@ -50,6 +53,9 @@ public class EtrTradeCommonervice extends BaseService {
 
     @Autowired(required = false)
     private FinProductAddMapper finProductAddMapper;
+
+    @Autowired(required = false)
+    private FinProductMapper finProductMapper;
 
 
     /**
@@ -170,10 +176,34 @@ public class EtrTradeCommonervice extends BaseService {
             List<PositionCashSecDto> secList = new ArrayList<>();
             for (PositionCashSecDto dto : list) {
                 if (StringUtil.isNotEmpty(dto.getFinprodId()) && StringUtil.isNotEmpty(dto.getSecAcctId())) {
-                    PositionCashSecDto cashSecDto = new PositionCashSecDto();
-                    BeanUtil.copyPropertiesIgnoreNull(cashSecDto, dto); //复制资产信息
-                    handleSecType(cashSecDto);
-                    secList.add(cashSecDto);
+
+                    //XYHGFXSJ-1056 【协议回购指令】深交所正回购，头寸展示区域，可质押数量、持仓数量，若存在多个质押券，选择组合、账户和资产后，应汇总展示
+                    if (dto.getFinprodId().contains(GlobalConstant.COMMA)) {
+                        String[] finprodIds = dto.getFinprodId().split(GlobalConstant.COMMA);
+                        for (String finprod : finprodIds) {
+                            if (StringUtil.isNotEmpty(finprod)) {
+                                FinProduct finProduct = null;
+                                finProduct = finProductMapper.selectByFinprodMarketId(finprod);
+                                if (null == finProduct) {
+                                    finProductMapper.selectByPrimaryKey(finprod);
+                                }
+                                if (null != finProduct) {
+                                    PositionCashSecDto cashSecDto = new PositionCashSecDto();
+                                    BeanUtil.copyPropertiesIgnoreNull(cashSecDto, dto); //复制资产信息
+                                    cashSecDto.setFinprodId(finProduct.getFinprodId());
+                                    cashSecDto.setFinprodType2(finProduct.getFinprodType2());
+                                    handleSecType(cashSecDto);
+                                    secList.add(cashSecDto);
+                                }
+                            }
+                        }
+                    } else {
+                        PositionCashSecDto cashSecDto = new PositionCashSecDto();
+                        BeanUtil.copyPropertiesIgnoreNull(cashSecDto, dto); //复制资产信息
+                        handleSecType(cashSecDto);
+                        secList.add(cashSecDto);
+                    }
+                    //XYHGFXSJ-1056 【协议回购指令】深交所正回购，头寸展示区域，可质押数量、持仓数量，若存在多个质押券，选择组合、账户和资产后，应汇总展示
                 }
             }
             //持仓
