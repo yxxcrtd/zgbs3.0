@@ -488,7 +488,9 @@
          wsz 20220729 修改多质押券-->
         detail.stockName stockName,
         detail.stockCode stockCode,
-        detail.Pledge_Ratio * 100 discountRate, /** 折算率 **/
+        <!-- detail.Pledge_Ratio * 100 discountRate, /** 折算率 **/-->
+        CASE WHEN detail.Pledge_Number IS NULL OR detail.Pledge_Number = 0 then detail.Pledge_Ratio * 100
+        else ROUND(fin_trade_product.Prin/(detail.Pledge_Number*100),4)*100 end as discountRate,
         detail.Pledge_Number / 100 repSecNum, /** 质押券数量 **/
         detail.Pledge_Face_Value pledgeFaceValue,/** 质押券面值**/
         detail.Pledge_Face_Value * detail.Pledge_Number pledStrdPrinAmt,/** 质押券面总额 **/
