@@ -71,25 +71,40 @@
 		null CDATE,
 		'' PORTFOLIO_ID,
 		'' ACCTID,
-		temp.ccy CCY,
+		MM.ccy CCY,
 		'' HODINGTYPE,
 		'' ACCTTYPE,
 		'' PORTFOLIONAME,
 		'' ACCTNAME,
 		'' TRUSTEE_ID,
-		<!-- decode(SUM(AMOUNT),null,0,SUM(AMOUNT)) AMOUNT,-->
-		decode( SUM( quotaIn ), NULL, 0, SUM( quotaIn ) ) + decode( SUM( quotaOut ), NULL, 0, SUM( quotaOut ) ) AMOUNT,
+		decode(SUM(AMOUNT),null,0,SUM(AMOUNT)) AMOUNT,
 		decode(SUM(AMOUNT1),null,0,SUM(AMOUNT1)) AMOUNT1,
 		decode(SUM(quotaIn),null,0,SUM(quotaIn)) quotaIn,
 		decode(SUM(quotaOut),null,0,SUM(quotaOut)) quotaOut,
 		'01' isSummary
-		from temp
+		from
+		<!-- wsz XYHGFXSJ-1031 查询每个分组最大的日期 金额累计 -->
+			(SELECT
+				TT.*
+			FROM
+				(
+				SELECT
+					ROW_NUMBER ( ) OVER ( PARTITION BY temp.PORTFOLIO_ID, temp.ACCTID,
+						temp.CCY, temp.HODINGTYPE, temp.ACCTNAME ORDER BY temp.CDATE DESC
+					) rn,
+					temp.*
+				FROM
+					temp
+				) TT
+			WHERE
+			TT.rn = 1)  MM
+		<!-- wsz XYHGFXSJ-1031 查询每个分组最大的日期 金额累计 -->
 		<where>
 			<if test='quota != null and quota == "Y"'>
-				temp.AMOUNT1 != 0
+				MM.AMOUNT1 != 0
 			</if>
 		</where>
-		group by ccy
+		group by MM.ccy
 	</if>
 	)T1
 	<where>
