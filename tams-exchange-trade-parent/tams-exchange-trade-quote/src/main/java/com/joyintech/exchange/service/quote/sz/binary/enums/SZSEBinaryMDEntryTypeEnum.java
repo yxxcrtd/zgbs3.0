@@ -29,6 +29,10 @@ public enum SZSEBinaryMDEntryTypeEnum {
      */
     OPEN("4"),
     /**
+     * 收盘价
+     */
+    CLOSE("5"),
+    /**
      * 最高价
      */
     HIGH("7"),
@@ -95,7 +99,11 @@ public enum SZSEBinaryMDEntryTypeEnum {
     /**
      * 昨收盘加权平均价
      */
-    WEIGHTED_AVERAGE_YESTDAY_CLOSE("xk");
+    WEIGHTED_AVERAGE_YESTDAY_CLOSE("xk"),
+    /**
+     * 匹配成交最近价
+     */
+    MATCH_THE_LATEST_PRICE("xv");
 
     private static final Map<String, SZSEBinaryMDEntryTypeEnum> mapping;
 

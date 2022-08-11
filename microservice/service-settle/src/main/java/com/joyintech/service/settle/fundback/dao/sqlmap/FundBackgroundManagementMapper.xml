@@ -211,6 +211,7 @@
             T1.FINPROD_ID,
             nvl(T2.FINPROD_MARKET_ID,T5.PORTFOLIO_ID) FINPROD_MARKET_ID,/*金融产品交易汇总.理财产品代码 产品/资产代码*/
             nvl(NVL(T2.FINPROD_ABBR, T2.FINPROD_NAME),T3.PORTFOLIO_NAME) finProdMarketName,
+            T2.TRADE_MARKET tradeMarket,
             TO_CHAR(T5.SETTLE_DATE,'yyyy-MM-dd') cashDate,/*划款指令业务流程.结算日期 现金流日期*/
             <!-- modify by mashukai 20201203 TISHKBS-1209 start -->
             T5.SETTLE_AMT cashAmt,/*金融产品交易汇总业务流程.交易金额 划款金额*/
@@ -300,6 +301,7 @@
             T1.FINPROD_ID,
             T2.FINPROD_MARKET_ID,
             NVL(T2.FINPROD_ABBR, T2.FINPROD_NAME) finProdMarketName,
+            T2.TRADE_MARKET tradeMarket,
             TO_CHAR(T5.SETTLE_DATE,'yyyy-MM-dd') cashDate,
             T1.TRADE_AMT cashAmt,
             T1.WORKFLOW_ID
@@ -381,6 +383,7 @@
             T1.FINPROD_ID,
             nvl(T2.FINPROD_MARKET_ID,T5.PORTFOLIO_ID) FINPROD_MARKET_ID,/*金融产品交易汇总.理财产品代码 产品/资产代码*/
             nvl(NVL(T2.FINPROD_ABBR, T2.FINPROD_NAME),T3.PORTFOLIO_NAME) finProdMarketName,
+            T2.TRADE_MARKET tradeMarket,
             TO_CHAR(T5.SETTLE_DATE,'yyyy-MM-dd') cashDate,/*划款指令.结算日期 现金流日期*/
             <!-- modify by mashukai 20201203 TISHKBS-1209 start -->
             T5.SETTLE_AMT cashAmt,/*金融产品交易汇总.交易金额 划款金额*/
@@ -457,6 +460,7 @@
             T1.FINPROD_ID,
             T2.FINPROD_MARKET_ID,
             NVL(T2.FINPROD_ABBR, T2.FINPROD_NAME) finProdMarketName,
+            T2.TRADE_MARKET tradeMarket,
             TO_CHAR(T5.SETTLE_DATE,'yyyy-MM-dd') cashDate,
             T1.TRADE_AMT cashAmt,
             NULL WORKFLOW_ID

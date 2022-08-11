@@ -841,11 +841,14 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
         }
         // 中途换券换钱特殊处理
         if (StringUtil.equals(trdTempDto.getPs(),DictCodeListExt3.交易方向_中途换券.getValue())
+        // XYHGFXSJ-1045:中途换券换钱交易金额不为空并且大于0 modify by fuyongsheng 20220811 start
         // 中途换券的换钱tradeAmt不为空
-                && StringUtil.isNotEmpty(baseTradeProductDealDtos.get(0).getTrdProductDeal().getTradeAmt()) &&
-                StringUtil.equals(baseTradeProductDealDtos.get(0).getTrdProductDeal().getTradeMarket(),DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
+                && StringUtil.isNotEmpty(baseTradeProductDealDtos.get(0).getTrdProductDeal().getTradeAmt())
+                && baseTradeProductDealDtos.get(0).getTrdProductDeal().getTradeAmt().compareTo(BigDecimal.ZERO) > 0
+                && StringUtil.equals(baseTradeProductDealDtos.get(0).getTrdProductDeal().getTradeMarket(),DictCodeListExt1.交易场所_深圳证券交易所.getValue())){
             parameter.setPs(parameter.getPs() + "_" + DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换钱.getValue());
         }
+        // XYHGFXSJ-1045:中途换券换钱交易金额不为空并且大于0 modify by fuyongsheng 20220811 end
 
         // add by etliu 20220116 start
         // GZYHTZJY-1145: 【场内对账清结算1231】深交所协议回购首期交易，日终头寸更新有误【解决日期：2022-01-14】】
@@ -868,7 +871,7 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
         // add by etliu 20220116 end
 
         parameter.setCustom(trdTempDto);
-        logger.info("持仓请求报文:" + JsonUtils.object2Json(parameter));
+        logger.info("成交匹配持仓请求报文:" + JsonUtils.object2Json(parameter));
         commonPositionService.process(parameter);
     }
 

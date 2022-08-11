@@ -208,14 +208,22 @@ public class ExchangeTransMatchRepo5Service extends ExchangeTransMatchRepoCommon
         dealTotal.setTgBusiType(DictCodeListExt3.共通业务类型_质押券置换.getValue());
         // 如果汇总成交.金融产品类型（投管） = 债券质押式正回购，则为‘债券质押式正回购到期’。否则为‘债券质押式逆回购到期’
         // GZYHTZJY-1039:modify by fuyongsheng 20220106 start
-        if(StringUtil.equals(dealDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())) {
-            // dealTotal.setTgBusiType(DictCodeListExt1.平安业务类型_正回购.getValue());
-            dealTotal.setTgBusiType(DictCodeListExt1.平安业务类型_正回购到期.getValue());
+//        if(StringUtil.equals(dealDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())) {
+//            // dealTotal.setTgBusiType(DictCodeListExt1.平安业务类型_正回购.getValue());
+//            dealTotal.setTgBusiType(DictCodeListExt1.平安业务类型_正回购到期.getValue());
+//        }
+//        else {
+//            // dealTotal.setTgBusiType(DictCodeListExt1.平安业务类型_逆回购.getValue());
+//            dealTotal.setTgBusiType(DictCodeListExt1.平安业务类型_逆回购到期.getValue());
+//        }
+        // XYHGFXSJ-976:修改投管业务类型赋值 modify by fuyongsheng 20220809 start
+        if(StringUtil.equals(entrustDto.getPs(), DictCodeListExt3.交易方向_提前购回.getValue())){
+            dealTotal.setTgBusiType(DictCodeListExt3.投管业务类型_提前购回.getValue());
         }
-        else {
-            // dealTotal.setTgBusiType(DictCodeListExt1.平安业务类型_逆回购.getValue());
-            dealTotal.setTgBusiType(DictCodeListExt1.平安业务类型_逆回购到期.getValue());
+        else if(StringUtil.equals(entrustDto.getPs(), DictCodeListExt3.交易方向_到期购回.getValue())){
+            dealTotal.setTgBusiType(DictCodeListExt3.投管业务类型_到期购回.getValue());
         }
+        // XYHGFXSJ-976:修改投管业务类型赋值 modify by fuyongsheng 20220809 end
         // GZYHTZJY-1039:modify by fuyongsheng 20220106 end
         //首期结算方式
         dealTotal.setDeliveryType(DictCodeListExt1.结算方式_券款对付.getValue());

@@ -98,7 +98,7 @@
             WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' then
                 ROUND( decode(nvl( T5.ORDER_FINISH_AMT, 0 ),0,0,nvl( T5.ORDER_FINISH_AMT, 0 ) / nvl(decode(ETR_ENTRUST.ENTRUST_AMT, 0, 1,ETR_ENTRUST.ENTRUST_AMT), 1 )), 4 )*100
             WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
-                ROUND( nvl( T5.ORDER_FINISH_AMT * 100, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )* 100
+                    ROUND( nvl( T5.ORDER_FINISH_AMT, 0 ) / nullif( etr_entrust.ENTRUST_AMT, 0 ), 4 )*100
             WHEN ETR_ENTRUST_ADD.TARGET_TYPE = '01' THEN
                 ROUND( decode(nvl( T5.ORDER_FINISH_AMT, 0 ),0,0, nvl( T5.ORDER_FINISH_AMT, 0 )/ nvl( ETR_ENTRUST.ENTRUST_NUM, 1 )), 4 )*100
             ELSE ROUND( nvl( T5.ORDER_FINISH_AMT, 0 ) / nvl( ETR_ENTRUST.ENTRUST_AMT, 1 ), 4 )*100
@@ -107,7 +107,7 @@
             WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' then
                 ROUND( decode(nvl( T5.ENT_FINISH_AMT, 0 ),0,0,nvl( T5.ENT_FINISH_AMT, 0 ) / nvl( decode(ETR_ENTRUST.ENTRUST_AMT, 0, 1,ETR_ENTRUST.ENTRUST_AMT), 1 )), 4 ) *100
             WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
-                ROUND( nvl( T5.ENT_FINISH_AMT * 100, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )* 100
+                ROUND( nvl( T5.ENT_FINISH_AMT, 0 ) / nullif( etr_entrust.ENTRUST_AMT, 0 ), 4 ) * 100
             WHEN ETR_ENTRUST_ADD.TARGET_TYPE = '01' THEN
                 ROUND( decode(nvl( T5.ENT_FINISH_AMT, 0 ),0,0, nvl( T5.ENT_FINISH_AMT, 0 )/ nvl( ETR_ENTRUST.ENTRUST_NUM, 1 )), 4 )*100
             ELSE ROUND( nvl( T5.ENT_FINISH_AMT, 0 ) / nvl( ETR_ENTRUST.ENTRUST_AMT, 1 ), 4 ) *100
@@ -127,7 +127,7 @@
             WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' THEN
                 ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )
             WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
-                ROUND( nvl( etr_entrust.ENTRUST_AMT/100, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ) , 4 )
+                ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )
             WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
                 decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,
                 'EX017',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ))/100, 4 ),
@@ -151,7 +151,7 @@
             WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' THEN
                 ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ), 4 )
             WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
-                ROUND( nvl( etr_entrust.ENTRUST_AMT/100, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ) , 4 )
+                ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ), 4 )
             WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
                 decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,
                 'EX017',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ))/100, 4 ),
@@ -1141,8 +1141,8 @@
 			 CASE
 			   WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
 			   WHEN STD.DELIVERY_RESULT = '01'  THEN '正常交收'
-			   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'  
-			   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败' 
+			   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'
+			   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败'
 			   WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收'
                WHEN STD.DELIVERY_RESULT = '05'  THEN '交收通知'
              END                                                   DELIVERY_RESULT,
@@ -1203,8 +1203,8 @@
 			 CASE
 			   WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
 			   WHEN STD.DELIVERY_RESULT = '01'  THEN '正常交收'
-			   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'  
-			   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败' 
+			   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'
+			   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败'
 			   WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收'
                WHEN STD.DELIVERY_RESULT = '05'  THEN '交收通知'
 			 END                                                   DELIVERY_RESULT,

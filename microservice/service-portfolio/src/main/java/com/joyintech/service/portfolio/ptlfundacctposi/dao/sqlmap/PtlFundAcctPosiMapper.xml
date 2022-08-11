@@ -77,7 +77,8 @@
 		'' PORTFOLIONAME,
 		'' ACCTNAME,
 		'' TRUSTEE_ID,
-		decode(SUM(AMOUNT),null,0,SUM(AMOUNT)) AMOUNT,
+		<!-- decode(SUM(AMOUNT),null,0,SUM(AMOUNT)) AMOUNT,-->
+		decode( SUM( quotaIn ), NULL, 0, SUM( quotaIn ) ) + decode( SUM( quotaOut ), NULL, 0, SUM( quotaOut ) ) AMOUNT,
 		decode(SUM(AMOUNT1),null,0,SUM(AMOUNT1)) AMOUNT1,
 		decode(SUM(quotaIn),null,0,SUM(quotaIn)) quotaIn,
 		decode(SUM(quotaOut),null,0,SUM(quotaOut)) quotaOut,

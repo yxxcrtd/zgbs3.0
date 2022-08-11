@@ -927,9 +927,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                 etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
 
                 //场内交易下单成交交易日间不产生流水影响指令现金 add by chendijun
-                // 场外T+1的指令在T日已关闭,差额在T日处理过了,此时交收不处理差额
-                if (!StringUtil.equals(finProductTradeDto.getIsFromExchange(), DictCodeList.是否_是.getValue())
-                        && !finProductTradeDto.isSpeed0()) {
+                if (!StringUtil.equals(finProductTradeDto.getIsFromExchange(), DictCodeList.是否_是.getValue())) {
                     // 交割日减少(交易金额-交易券面总额*委托全价/债券面值）
                     etrCashPositionFlowDto.setAmount(交易日减少金额);
                     // 添加现金流水到目标dto
@@ -941,11 +939,22 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                             finProductTradeDto.getTrdProductDeal().getPortfolioId()
                             : finProductTradeDto.getTrdProductDealAdd().getPortfolioId());
                     map.put("sumTradeFlag", "01");
-                    map.put("settleStatus",DictCodeListExt3.交收状态_未交收.getValue());
+                    map.put("settleStatus", DictCodeListExt3.交收状态_未交收.getValue());
                     String etrStatus = EtrCommonCashPositionDealService.getEtrStatus(map);
-                    // 已完成或已关闭的指令 该指令下最后一笔交收 回冲所有
-                    if ((StringUtil.equals(etrStatus, "04") || StringUtil.equals(etrStatus, "06"))
+                    if (finProductTradeDto.isSpeed1() && StringUtil.equals(etrStatus, "06")) {
+                        // 场外T+1的指令在T日已关闭,差额在T日处理过了,此时交收不处理差额
+                        EtrCashPositionFlowDto ret = new EtrCashPositionFlowDto();
+                        BeanUtil.copyPropertiesIgnoreNull(ret, etrCashPositionFlowDto);
+                        ret.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
+                        ret.setOffsetId(entrustId);
+                        ret.setAmount(ret.getAmount().negate());
+                        ret.setSeqno(getSeqNo());
+                        // 添加现金流水到目标dto
+                        etrPositionHoldDto.getPtlCashPositionFlows().add(ret);
+
+                    } else if ((StringUtil.equals(etrStatus, "04") || StringUtil.equals(etrStatus, "06"))
                             && EtrCommonCashPositionDealService.getEtrFinishAmtMuilt(map) == null) {
+                        // 已完成或已关闭的指令 该指令下最后一笔交收 回冲所有
                         BigDecimal amount = EtrCommonCashPositionDealService.getEtrSurplusAmt(entrustId, finProductTradeDto.getTrdProductDeal().getPortfolioId());
                         EtrCashPositionFlowDto ret = new EtrCashPositionFlowDto();
                         BeanUtil.copyPropertiesIgnoreNull(ret, etrCashPositionFlowDto);
