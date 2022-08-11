@@ -1587,7 +1587,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             // 回售清算速度为空
             if (etrEntrustAdd != null && StringUtil.isNotEmpty(etrEntrustAdd.getSettleSpreed())
                     && etrEntrustAdd.getSettleSpreed() == 1L) {
-                baseTradeProductDealDto.setSpeed0(true);
+                baseTradeProductDealDto.setSpeed1(true);
             }
             finProductTradeDto.setBaseTradeProductDealDtos(Collections.singletonList(baseTradeProductDealDto));
             finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
