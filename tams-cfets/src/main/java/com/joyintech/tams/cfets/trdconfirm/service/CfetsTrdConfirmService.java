@@ -3500,6 +3500,31 @@ public class CfetsTrdConfirmService extends BaseService {
             paramMap.put("ccy", deal.getCcy());
             payAcctNo = joyinbusinessCommonService.selectDVPCapacctInfoListByAcctId(paramMap);
         }
+        // 商业银行柜台  一级申购 || 债券买入 || 逆回购首期
+        if (StringUtil.equals(deal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券.getValue())
+                && StringUtil.equals(deal.getPs(), DictCodeList.交易方向_买入.getValue())) {
+            FinProduct finProduct = finProductMapper.selectByPrimaryKey(deal.getFinprodId());
+            if (StringUtil.equals(finProduct.getTradeMarket(), DictCodeListExt1.交易场所_商业银行柜台.getValue())) {
+                // 收款账户 交易对手账户
+                Map<String, Object> paramMap = new HashMap<>();
+                paramMap.put("counterId", deal.getCounterId());
+                paramMap.put("ccy", deal.getCcy());
+                recAcctNo = joyinbusinessCommonService.selectCounterCapacctInfoList(paramMap);
+            }
+        }
+        // 商业银行柜台   债券卖出/回售 || 正回购首期
+        if ((StringUtil.equals(deal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券.getValue())
+                && (StringUtil.equals(deal.getPs(), DictCodeList.交易方向_卖出.getValue())
+                || StringUtil.equals(deal.getPs(), DictCodeList.交易方向_行权_回售.getValue())))) {
+            FinProduct finProduct = finProductMapper.selectByPrimaryKey(deal.getFinprodId());
+            if (StringUtil.equals(finProduct.getTradeMarket(), DictCodeListExt1.交易场所_商业银行柜台.getValue())) {
+                // 收款账户 交易对手账户
+                Map<String, Object> paramMap = new HashMap<>();
+                paramMap.put("counterId", deal.getCounterId());
+                paramMap.put("ccy", deal.getCcy());
+                payAcctNo = joyinbusinessCommonService.selectCounterCapacctInfoList(paramMap);
+            }
+        }
 
         bussTrdTransferOrderDto.setPayAcctNo(payAcctNo);
         bussTrdTransferOrderDto.setRecAcctNo(recAcctNo);
