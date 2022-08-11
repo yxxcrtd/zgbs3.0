@@ -131,8 +131,6 @@ public class UpdateTraderService {
                     if(temp02 > 0) {
                         //非法人相关处理
                         MstCounterParty mstCounterParty = new MstCounterParty();
-                        mstCounterParty.setCounterId(baseGetBusinessId != null ? baseGetBusinessId.buildBussinessCode(
-                                bussinessCodeParameter) : IDGenerator.generate());
                         mstCounterParty.setCounterName(mstCfetsCustomerInfo.getPartyName());
                         mstCounterParty.setCounterType(DictCodeListExt1.交易对手类型_资管产品.getValue());
                         mstCounterParty.setPartyId(mstCfetsCustomerInfo.getPartyId());
@@ -142,6 +140,8 @@ public class UpdateTraderService {
                         // 存在一个从机构对应多个主机构
                         List<String> mpartyIds = updateTraderMapper.selectMpartyId(map);
                         for (String mpartyId : mpartyIds) {
+                            mstCounterParty.setCounterId(baseGetBusinessId != null ? baseGetBusinessId.buildBussinessCode(
+                                    bussinessCodeParameter) : IDGenerator.generate());
                             //获取主机构名称
                             //MstCfetsCustomerInfo temp = updateTraderMapper.selectInfo(mstCfetsCustomerInfo.getPartyId());
                             MstCfetsCustomerInfo temp = new MstCfetsCustomerInfo();
