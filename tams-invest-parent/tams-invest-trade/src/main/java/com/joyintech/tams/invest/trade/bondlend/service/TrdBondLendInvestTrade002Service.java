@@ -1909,7 +1909,7 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
                 // 持仓类型
                 resultDto.setHodingType(DictCodeList.持仓类型_融入.getValue());
                 // 日期 = 金融产品交易Entity.交易日
-                resultDto.setCdate(input.getTradeDate());
+                resultDto.setCdate(input.getVdate());
                 // 数量 = 输出券面总额
                 resultDto.setAmount(com.joyintech.framework.util.ArithmeticUtil.divide(input.getTrdProductDeal().getShareAmt(), new BigDecimal("100"), 4));
                 // 币种 = 金融产品交易Entity.币种
