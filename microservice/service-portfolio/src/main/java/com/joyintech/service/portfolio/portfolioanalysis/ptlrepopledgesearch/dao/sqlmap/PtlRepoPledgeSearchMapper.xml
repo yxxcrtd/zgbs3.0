@@ -103,7 +103,7 @@ FROM
 		AND B.TRADE_STATUS='01'AND B.IS_CANCEL='N'
 		and F.IS_SEC_BOND = 'N'
 		AND J.BACK_LEND_DIRECTION=#{BACK_LEND_DIRECTION_03}
-		and ((G.ENTRUST_ID is not null and K.ASSET_TYPE1 != 'H01') or G.ENTRUST_ID is null)
+		and ((G.ENTRUST_ID is not null /*and K.ASSET_TYPE1 != 'H01'*/) or G.ENTRUST_ID is null)
 		<if test="sysDate != null and sysDate != ''">
 			AND (H.VDATE &lt;= TO_DATE(#{sysDate},'YYYY-MM-DD'))
 			         <!--AND TO_DATE(#{sysDate},'YYYY-MM-DD') &lt;= H.MDATE)-->
@@ -976,7 +976,7 @@ FROM
 		AND TRD_PRODUCT_DEAL.TRADE_STATUS = '01'
 		AND TRD_PRODUCT_DEAL.IS_CANCEL    = 'N'
 		AND TRD_PRODUCT_DEAL_ADD.ENTRUST_ID is not null
-		AND eea.asset_type1 = 'H01'
+		-- AND eea.asset_type1 = 'H01'
 		AND L.totle_trade_id is null
 		/*组合代码*/
 		<if test="groupcode != null and groupcode.size() > 0">

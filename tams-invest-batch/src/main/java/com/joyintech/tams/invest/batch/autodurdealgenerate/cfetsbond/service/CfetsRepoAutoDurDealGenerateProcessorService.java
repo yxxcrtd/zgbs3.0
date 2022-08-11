@@ -319,6 +319,7 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
         trdProductDeal.setSettleDate(DateUtil.parse(entity.getSettleDate()));
         trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
         trdProductDeal.setIsCancel(DictCodeList.是否_否.getValue());
+        trdProductDeal.setIsOutTrade(DictCodeList.是否_是.getValue());
 
         // 查找cashId
         Map<String, Object> paramMap = new HashMap<>();

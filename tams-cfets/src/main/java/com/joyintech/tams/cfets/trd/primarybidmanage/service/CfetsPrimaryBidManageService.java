@@ -153,6 +153,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     @Autowired(required = false)
     private PtlTradeMapper ptlTradeMapper;
 
+    @Autowired
+    private PaTrdProductDealMapper paTrdProductDealMapper;
+
     @Autowired(required = false)
     private EtrFinishStatusMapper etrFinishStatusMapper;
 
@@ -707,6 +710,12 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 trdProductDeal.setIsCancel(DictCodeList.是否_否.getValue());
                 trdProductDealMapper.insertSelective(trdProductDeal);
             }
+            PaTrdProductDeal paTrdProductDeal = new PaTrdProductDeal();
+            paTrdProductDeal.setTradeId(trdProductDeal.getTradeId()); // 交易编号
+            paTrdProductDeal.setPaBussType(trdProductDeal.getTgBusiType());
+            paTrdProductDeal.setDeptCode(null); // 交易所属部门
+            paTrdProductDeal.setWorkflowId(null); // 工作流代码
+            paTrdProductDealMapper.insertSelective(paTrdProductDeal);
         }
         //金融产品交易附属表
         for(TrdProductDealAdd trdProductDealAdd: dto.getTrdProductDealAddList()) {
@@ -968,6 +977,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             trdProductDeal.setInvAim(invAim);
             trdProductDeal.setTrader(dto.getOuTraderId());
             trdProductDeal.setPortfolioId(portfolioId);
+            trdProductDeal.setIsOutTrade(DictCodeList.是否_是.getValue());
             trdProductDealList.add(trdProductDeal);
             //金融产品交易附属表
             TrdProductDealAdd  trdProductDealAdd = new TrdProductDealAdd();
@@ -2875,8 +2885,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             bussTrdTransferOrderDto.setPayAcctNo(acctId);
         }
         // 收款账户
-        // 一级缴款 交易对手账户（承销商账户）
-        if (isPayType02) {
+        // 一级缴款/商业银行柜台 交易对手账户（承销商账户）
+        FinProduct finProduct = finProductMapper.selectByPrimaryKey(deal.getFinprodId());
+        if (isPayType02 || StringUtil.equals(finProduct.getTradeMarket(), DictCodeListExt1.交易场所_商业银行柜台.getValue())) {
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("counterId",deal.getCounterId());
             paramMap.put("ccy",deal.getCcy());
