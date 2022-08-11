@@ -963,6 +963,7 @@
                     $("#addCla").attr("disabled", false);
                 }
             } else if (ps == 'T95') {
+                $("#printAmt_div").hide();
                 if (repPs == BACK_LEND_DIRECTION_03) {
                     //本方交易员
                     $("#trader_div").hide();
@@ -1114,6 +1115,7 @@
                     $("#addCla").attr("disabled", false);
                 }
             } else if (ps == 'T56') {
+                $("#printAmt_div").hide();
                 if (repPs == BACK_LEND_DIRECTION_03) {
                     //本方交易员
                     $("#trader_div").hide();
