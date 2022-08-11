@@ -150,9 +150,9 @@ $(function() {
 		}
 	}
 	
-	$("#bondId").keyup(function(){
-		  $("#secAcctId").val($("#bondId").val());
-	});
+	// $("#bondId").keyup(function(){
+	// 	  $("#secAcctId").val($("#bondId").val());
+	// });
     
     
     /**
