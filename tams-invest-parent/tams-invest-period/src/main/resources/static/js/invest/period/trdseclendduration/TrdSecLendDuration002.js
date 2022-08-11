@@ -79,31 +79,31 @@
             object.isCashPay = 'N'
         }
 
-        if (shortSellingSupported == '01') {
-            if ($("#ps").val() == '05') {
-                // TradeCommon.getSecPositionForSaleAll(setParam(), function (result) {
-                //     if (object.isCashPay == 'N' && (result.INTEGRATE_POSITION || 0) * 1 < $("#shareAmt").val() * 1 && object.isCashPay == 'N') {
-                //         return Joyin.error("融入券可用持仓不足，请先购回")
-                //     }
-                //     object.assetIntegrateAvailablePosition = result.INTEGRATE_POSITION;
-                //     save(object, operateType);
-                // });
-                Joyin.ajaxJson(basePath + 'invest/period/trdseclendduration/TrdSecLendDuration002/getShowHandNum', setParam(),
-                    function (result) {
-                        if (object.isCashPay == 'N' && (result.INTEGRATE_POSITION || 0) * 1 < $("#shareAmt").val() * 1) {
-                            return Joyin.error("融入券可用持仓不足，请先购回")
-                        }
-                        object.assetIntegrateAvailablePosition = result.INTEGRATE_POSITION;
-                        save(object, operateType);
-                    });
-            }
-            else {
-                save(object, operateType);
-            }
-        }
-        else {
+        // if (shortSellingSupported == '01') {
+        //     if ($("#ps").val() == '05') {
+        //         // TradeCommon.getSecPositionForSaleAll(setParam(), function (result) {
+        //         //     if (object.isCashPay == 'N' && (result.INTEGRATE_POSITION || 0) * 1 < $("#shareAmt").val() * 1 && object.isCashPay == 'N') {
+        //         //         return Joyin.error("融入券可用持仓不足，请先购回")
+        //         //     }
+        //         //     object.assetIntegrateAvailablePosition = result.INTEGRATE_POSITION;
+        //         //     save(object, operateType);
+        //         // });
+        //         Joyin.ajaxJson(basePath + 'invest/period/trdseclendduration/TrdSecLendDuration002/getShowHandNum', setParam(),
+        //             function (result) {
+        //                 if (object.isCashPay == 'N' && (result.INTEGRATE_POSITION || 0) * 1 < $("#shareAmt").val() * 1) {
+        //                     return Joyin.error("融入券可用持仓不足，请先购回")
+        //                 }
+        //                 object.assetIntegrateAvailablePosition = result.INTEGRATE_POSITION;
+        //                 save(object, operateType);
+        //             });
+        //     }
+        //     else {
+        //         save(object, operateType);
+        //     }
+        // }
+        // else {
             save(object, operateType);
-        }
+        // }
     }
 
     function save(object, operateType) {
