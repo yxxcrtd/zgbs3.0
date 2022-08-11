@@ -1047,12 +1047,13 @@
     </select>
 
     <select id="selectShengYuEntrustAmt" resultType="java.math.BigDecimal">
-        select t1.ENTRUST_AMT - nvl(t2.PLEDGE_FACE_VALUE,0) shengYuEntrustAmt
+        select t1.ENTRUST_AMT - nvl(t2.PRIN_AMT,0) shengYuEntrustAmt
         from (select ENTRUST_AMT from ETR_ENTRUST where ENTRUST_ID=#{entrustId}) t1,
-             (select sum(PLEDGE_FACE_VALUE) PLEDGE_FACE_VALUE from FIN_DEAL_TARGET where FINPROD_ID
-                                                                                             in (select TRADE_ID from TRD_PRODUCT_DEAL where TRADE_STATUS = '01' and (IS_CANCEL = 'N' or IS_CANCEL is null)
-                                                                                                                                         and TRADE_ID in (select TRADE_ID from TRD_PRODUCT_DEAL_ADD where ENTRUST_ID=#{entrustId}
-                     ))) t2
+             (select sum(PRIN_AMT) PRIN_AMT  from TRD_PRODUCT_DEAL
+                    where TRADE_STATUS = '01'  and (IS_CANCEL = 'N' or IS_CANCEL is null)
+                                and TRADE_ID in (select TRADE_ID from TRD_PRODUCT_DEAL_ADD where ENTRUST_ID=#{entrustId}
+                     )
+                 ) t2
     </select>
 
     <select id="selectZhiLingChiCang" resultType="java.math.BigDecimal">

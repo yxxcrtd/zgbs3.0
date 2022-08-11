@@ -114,17 +114,20 @@ public class EtrSecLendCashPositionDealService  {
                                 etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto1);
                             }
                         }
-                    }else{
+                    }
+                }
+                if (DictCodeList.持仓类型_实际.equals(持仓类型)){
+                    if (StringUtils.isNotEmpty(entrustId)) {
                         BigDecimal shengYuEntrustAmt = etrCommonCashPositionMapper.selectShengYuEntrustAmt(entrustId);
                         //判断这笔指令剩余待完成额度是否等于此次交易额度，如果等于就冲销指令中质押券头寸，然后按照交易中质押券券面占用头寸
-                        if(finProductTradeDto.getTrdProductDeal().getPrinAmt().compareTo(shengYuEntrustAmt)==0){
+                        if (finProductTradeDto.getTrdProductDeal().getPrinAmt().compareTo(shengYuEntrustAmt) == 0) {
                             BussRepoSecDto bussRepoSecDto = finProductTradeDto.getBussRepoSec();
-                            if (bussRepoSecDto!=null && bussRepoSecDto.getPledgeBondList()!= null && bussRepoSecDto.getPledgeBondList().size()>0 ) {
+                            if (bussRepoSecDto != null && bussRepoSecDto.getPledgeBondList() != null && bussRepoSecDto.getPledgeBondList().size() > 0) {
                                 List<PledgeBondInfoDto> pledgeBondListDetailed = bussRepoSecDto.getPledgeBondList();
                                 for (PledgeBondInfoDto pledgeBondInfoDto : pledgeBondListDetailed) {
                                     EtrSecPositionFlowDto etrSecPositionFlowDto1 = new EtrSecPositionFlowDto();
                                     BeanUtil.copyPropertiesIgnoreNull(etrSecPositionFlowDto1, etrSecPositionFlowDto);
-                                    etrSecPositionFlowDto1.setAmount(etrCommonCashPositionMapper.selectZhiLingChiCang(entrustId,pledgeBondInfoDto.getFinprodId()).negate());
+                                    etrSecPositionFlowDto1.setAmount(etrCommonCashPositionMapper.selectZhiLingChiCang(entrustId, pledgeBondInfoDto.getFinprodId()).negate());
                                     etrSecPositionFlowDto1.setFinprodId(pledgeBondInfoDto.getFinprodId());
                                     etrSecPositionFlowDto1.setSeqno(EtrCommonCashPositionDealService.getSeqNo());
                                     getSecPositionInvAim(etrSecPositionFlowDto1);
