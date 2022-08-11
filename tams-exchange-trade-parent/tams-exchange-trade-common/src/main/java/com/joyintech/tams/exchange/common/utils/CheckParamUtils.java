@@ -129,10 +129,10 @@ public class CheckParamUtils {
             return ErrorCode.REQ_PARAMETER_INSTRUCTION_ID_ERROR;
         if (Strings.isNullOrEmpty(entrustBs))
             return ErrorCode.REQ_PARAMETER_ENTRUST_BS_ERROR;
-        if (!BusiTypeTgEnum.中途换券.codeEquals(busiTypeTg)) {
-            if (Strings.isNullOrEmpty(stockCode) || StockCodeUtils.getMarketAndStockCode(stockCode).length != 2)
-                return ErrorCode.REQ_PARAMETER_STOCK_CODE_ERROR;
-        }
+//        if (!BusiTypeTgEnum.中途换券.codeEquals(busiTypeTg) || !BusiTypeTgEnum.解除质押.codeEquals(busiTypeTg) || !BusiTypeTgEnum.到期续做.codeEquals(busiTypeTg)) {
+//            if (Strings.isNullOrEmpty(stockCode) || StockCodeUtils.getMarketAndStockCode(stockCode).length != 2)
+//                return ErrorCode.REQ_PARAMETER_STOCK_CODE_ERROR;
+//        }
 //        if (IntegratedEntrustUtils.isProtocolBack_SZ(entrustProp) && Market.SHSE.value.equals(market))
 //            return ErrorCode.SH_UN_SUPPORT_PROTOCOL_BACK_INSTRUMENT;
 //        if (IntegratedEntrustUtils.isProtocolBack_SH(entrustProp) && Market.SZSE.value.equals(market))

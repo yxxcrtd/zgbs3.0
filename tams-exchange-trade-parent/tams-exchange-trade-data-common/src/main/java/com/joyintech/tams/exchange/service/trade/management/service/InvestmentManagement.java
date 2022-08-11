@@ -648,7 +648,8 @@ public class InvestmentManagement extends BaseService {
                     instrument = instrumentService.findById(finprodMarketId);
                 }
             }
-            if (ObjectUtil.isNull(instrument)) {
+
+            if (!EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg()) && ObjectUtil.isNull(instrument)) {
                 logger.warn("获取合约信息失败，无法填充最小价差等交易属性信息 => 【instructionId = {}, finprodMarketId = {}】", instruction.getEntrustId(), finprodMarketId);
                 continue;
             }
