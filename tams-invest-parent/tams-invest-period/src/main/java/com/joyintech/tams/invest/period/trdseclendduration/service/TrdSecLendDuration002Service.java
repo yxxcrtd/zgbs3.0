@@ -681,7 +681,7 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
                     // 日期
                     resultDto.setCdate(input.getMdate());
                     // 数量
-                    resultDto.setAmount(finDealPledge.getPledgeAmt().negate());
+                    resultDto.setAmount(finDealPledge.getPledgeNumber().negate());
                     // 币种
                     resultDto.setCcy(input.getCcy());
                     // 交易编号
