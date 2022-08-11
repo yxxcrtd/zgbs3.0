@@ -3475,7 +3475,7 @@ public class CfetsTrdConfirmService extends BaseService {
         }
 
         bussTrdTransferOrderDto.setPayAcctNo(payAcctNo);
-        bussTrdTransferOrderDto.setPayAcctNo(recAcctNo);
+        bussTrdTransferOrderDto.setRecAcctNo(recAcctNo);
         String ps = DictCodeListExt1.收支方向_支出.getValue();
         if (StringUtil.equals(temp.getPs(), DictCodeList.交易方向_卖出.getValue())
                 || StringUtil.equals(temp.getPs(), DictCodeList.回购拆借方向_正回购.getValue())) {
