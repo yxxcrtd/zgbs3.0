@@ -66,7 +66,7 @@ public abstract class BaseCheckKit {
 
     protected Instrument getInstrument(Instruction instruction) {
         Instrument instrument = instrumentService.findById(instruction.getFinprodMarketId());
-        if (ObjectUtil.isNull(instrument)) {
+        if (!EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg()) && ObjectUtil.isNull(instrument)) {
             throw new BusinessResultException(ErrorCode.DERIVATIVE_INSTRUMENT_ERROR);
         }
         return instrument;
