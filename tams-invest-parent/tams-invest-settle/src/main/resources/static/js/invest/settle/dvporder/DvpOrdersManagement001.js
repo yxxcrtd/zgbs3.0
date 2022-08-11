@@ -1,3 +1,75 @@
+/**
+ * 交易信息查看页面
+ */
+var showDetailTrdPage = function (paBussType, tradeId, tradeDateVal, tradeMarket) {
+    let param;
+    let url;
+    console.log("----------------showDetailTrdPage-------------------")
+    //债券委托详情 银行间/商业银行柜台
+    if ((paBussType === '09' || paBussType === '10') && (tradeMarket === '01' || tradeMarket === '02')) {
+        console.log("----------------PINAN_ASSET_TYPE_F01----------------------")
+
+        param = {
+            "busiCode": tradeId,
+            "startDate": tradeDateVal,
+            "endDate": tradeDateVal,
+            "finprodType2": PINAN_ASSET_TYPE_F01
+        };
+        url = "home.html?a=a&busiCode=" + tradeId
+            + "&startDate=" + tradeDateVal
+            + "&endDate=" + tradeDateVal
+            + "&finprodType2=" + PINAN_ASSET_TYPE_F01
+            + "&pageModel=1&editable=false&isTodoList=true#/transactionSearch/detail?a=a";
+
+        Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+            basePath + url,
+            "95%", "90%",
+            param);
+    }
+    //回购委托详情 银行间/商业银行柜台
+    else if ((paBussType === '19' || paBussType === '20') && (tradeMarket === '01' || tradeMarket === '02')) {
+        console.log("----------PINAN_ASSET_TYPE_F07-------------");
+
+        param = {
+            "busiCode": tradeId,
+            "startDate": tradeDateVal,
+            "endDate": tradeDateVal,
+            "finprodType2": PINAN_ASSET_TYPE_F07
+        };
+        url = "home.html?a=a&busiCode=" + tradeId
+            + "&startDate=" + tradeDateVal
+            + "&endDate=" + tradeDateVal
+            + "&finprodType2=" + PINAN_ASSET_TYPE_F07 +
+            "&pageModel=1&editable=false&isTodoList=true#/transactionSearch/detail?a=a";
+
+        Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+            basePath + url,
+            "95%", "90%",
+            param);
+    }
+    //一级投标债券 银行间/商业银行柜台
+    else if ((paBussType === '151' || paBussType === '202'|| paBussType === '180') && (tradeMarket === '01' || tradeMarket === '02')) {
+        console.log("----------PINAN_ASSET_TYPE_F17-------------");
+
+        param = {
+            "busiCode": tradeId,
+            "startDate": tradeDateVal,
+            "endDate": tradeDateVal,
+            "finprodType2": FINPROD_TYPE_TG_F32
+        };
+        url = "home.html?a=a&busiCode=" + tradeId
+            + "&finprodType2=" + FINPROD_TYPE_TG_F32
+            + "&startDate=" + tradeDateVal
+            + "&endDate=" + tradeDateVal
+            + "&pageModel=1&editable=false&isTodoList=true#/transactionSearch/detail?a=a";
+
+        Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+            basePath + url,
+            "95%", "90%",
+            param);
+    }
+}
+
 $(function () {
     /**
      * 获取查询参数
@@ -56,6 +128,12 @@ $(function () {
         cols: [
             {
                 field: 'bizCode', title: '业务编号', width: 200, render: function (data, type, row, meta) {
+                    // 09债券类资产买入 180一级申购 202债券分销买入确认 151中标结果维护
+                    if (row.paBussType === '180' || row.paBussType === '202' || row.paBussType === '151' || row.paBussType === '09'
+                            || row.paBussType === '10' || row.paBussType === '19' || row.paBussType === '20') {
+                        return "<a onclick=\"showDetailTrdPage('" + row.paBussType + "','" + row.bizCode + "','"
+                            + row.settleDate + "','" + row.tradeMarket + "')\" + style='cursor: pointer;'>" + row.bizCode + "</a>";
+                    }
                     return "<a class='pro-link' style='cursor: pointer;' " +
                         "href='javascript:openOperateWindow(\"" + PAGE_STATUS_05 + "\",\"" + row.paBussType + "\",\"" + row.portfolioId + "\",\""
                         + row.bizCode + "\",\"" + row.finprodId + "\",\"" + row.orderId + "\")'>" + data + "</a>";

@@ -92,6 +92,9 @@ public class DvpOrdersManagement001Controller extends BaseController {
         model.addAttribute("PINAN_BUSINESS_TYPE_107", DictCodeListExt2.平安业务类型_债券借贷融入到期.getValue());
         model.addAttribute("PINAN_BUSINESS_TYPE_108", DictCodeListExt2.平安业务类型_债券借贷融出到期.getValue());
         model.addAttribute("PINAN_BUSINESS_TYPE_81", BussinessDictCodeList.平安业务类型_DVP划款.getValue());
+        model.addAttribute("PINAN_ASSET_TYPE_F01", DictCodeList.平安资产类型_债券.getValue());
+        model.addAttribute("PINAN_ASSET_TYPE_F07", DictCodeList.平安资产类型_质押式回购.getValue());
+        model.addAttribute("FINPROD_TYPE_TG_F32", BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
         return super.init(model);
     }
 

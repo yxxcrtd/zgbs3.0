@@ -371,8 +371,8 @@ public class CfetsBondAutoDurDealGenerateProcessorService extends BaseService {
         for(RegFinProductDeal regFinProductDeal : regFinProductDealList) {
             TrdProductDeal trdProductDeal = new TrdProductDeal();
             BeanUtil.copyPropertiesIgnoreNull(trdProductDeal,regFinProductDeal);
-            trdProductDeal.setTradeDate(DateUtil.parse(DateUtil.format(batchDate)));
-            trdProductDeal.setSettleDate(DateUtil.parse(DateUtil.format(batchDate)));
+            trdProductDeal.setTradeDate(trdFinProductDealTotal.getTradeDate());
+            trdProductDeal.setSettleDate(trdFinProductDealTotal.getSettleDate());
             trdProductDeal.setTradeId(autoPeriodCommonService.buildBussinessCode(parameter));
             trdProductDeal.setBusiType(DictCodeList.共通业务类型_债券类资产存续期.getValue());
             trdProductDeal.setFinprodId(regFinProductDeal.getFinprodId());
