@@ -209,8 +209,10 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
         InvestInterfCommDto investInterfCommDto = new InvestInterfCommDto();
         investInterfCommDto.setPageId("TrdSecLendDuration002");
         investInterfCommDto.setTradeStatus(交易流程状态.getValue());
-        baseTradeProductDealDto.getTrdProductDeal().setPs(DictCodeList.交易方向_到期.getValue());
-        investInterfCommDto.setTrdProductDeal(baseTradeProductDealDto.getTrdProductDeal());
+        TrdProductDeal deal1 = new TrdProductDeal();
+        BeanUtil.copyPropertiesIgnoreNull(deal1, baseTradeProductDealDto.getTrdProductDeal());
+        deal1.setPs(DictCodeList.交易方向_到期.getValue());
+        investInterfCommDto.setTrdProductDeal(deal1);
         investInterfCommDto.setTrdProductDealAdd(baseTradeProductDealDto.getTrdProductDealAdd());
         if (baseTradeProductDealDto.getStlPayOrdersList() != null
                 && !baseTradeProductDealDto.getStlPayOrdersList().isEmpty()) {
