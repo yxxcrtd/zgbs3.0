@@ -103,7 +103,7 @@ public class RepoRevokeService implements BaseRevokeService {
             paramH01.put("status", DictCodeListExt1.交易流程状态_撤销.getValue());
             paramH01.put("busiType", DictCodeList.共通业务类型_质押式回购交易.getValue());
             // 处理老头存标识,N:不处理老头存
-            param.put("dealOldPositionFlag", DictCodeList.是否_否.getValue());
+            paramH01.put("dealOldPositionFlag", DictCodeList.是否_否.getValue());
             stlDataGatherService.excutePosition(paramH01);
             this.excuteH01Position(tradeIdListH01, new ArrayList<>());
             investDealRevokeService.revokeDeal(tradeIdList);
@@ -133,16 +133,16 @@ public class RepoRevokeService implements BaseRevokeService {
             param.put("totalTradeIdList", totalTradeIdListOther);
             param.put("status", DictCodeListExt1.交易流程状态_撤销.getValue());
             param.put("busiType", DictCodeList.共通业务类型_质押式回购交易.getValue());
-            // 处理非协议回购头寸
+            // 处理非协议回购需指令匹配头寸
             stlDataGatherService.excutePosition(param);
             Map<String, Object> paramH01 = new HashMap<>();
             paramH01.put("totalTradeIdList", totalTradeIdListH01);
             paramH01.put("status", DictCodeListExt1.交易流程状态_撤销.getValue());
             paramH01.put("busiType", DictCodeList.共通业务类型_质押式回购交易.getValue());
             // 处理老头存标识,N:不处理老头存
-            param.put("dealOldPositionFlag", DictCodeList.是否_否.getValue());
+            paramH01.put("dealOldPositionFlag", DictCodeList.是否_否.getValue());
             stlDataGatherService.excutePosition(paramH01);
-            // 处理协议回购头寸
+            // 处理协议回购需匹配指令头寸
             this.excuteH01Position(new ArrayList<>(), totalTradeIdListH01);
             investDealRevokeService.revokeDealTotal(totalTradeIdList);
 //            List<String> tqzzTotalTradeIdList =  totalTradeIdMap.entrySet().stream()
