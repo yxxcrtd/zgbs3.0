@@ -218,6 +218,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
     private PtlTradeMapper ptlTradeMapper;
 
     @Autowired
+    private PaTrdProductDealMapper paTrdProductDealMapper;
+
+    @Autowired
     private TrdTradeFeeTotalMapper trdTradeFeeTotalMapper;
 
     @Autowired
@@ -2516,7 +2519,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 BeanUtil.copyPropertiesIgnoreNull(ptlTrade, deal);
                 ptlTrade.setBusiNo(deal.getTradeId());
                 ptlTrade.setBusiId(deal.getFinprodId());
-                ptlTrade.setBusiTable(BussinessDictCodeList.共同业务类型_一级投标确认_投标_分销买入.getValue());
+                ptlTrade.setBusiTable(DictCodeList.业务表_金融产品表.getValue());
                 ptlTrades.add(ptlTrade);
                 // 是否一级缴款
                 boolean isPayType02 = StringUtil.equals(dto.getPayType(), BussinessDictCodeList.缴款方式_一级缴款.getValue());
@@ -3067,6 +3070,12 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                     trdProductDeal.setIsCancel(DictCodeList.是否_否.getValue());
                     trdProductDealMapper.insertSelective(trdProductDeal);
                 }
+                PaTrdProductDeal paTrdProductDeal = new PaTrdProductDeal();
+                paTrdProductDeal.setTradeId(trdProductDeal.getTradeId()); // 交易编号
+                paTrdProductDeal.setPaBussType(trdProductDeal.getTgBusiType());
+                paTrdProductDeal.setDeptCode(null); // 交易所属部门
+                paTrdProductDeal.setWorkflowId(null); // 工作流代码
+                paTrdProductDealMapper.insertSelective(paTrdProductDeal);
             }
             if (!isJys) {
                 entity.getTrdTradeFeeDetails().forEach(

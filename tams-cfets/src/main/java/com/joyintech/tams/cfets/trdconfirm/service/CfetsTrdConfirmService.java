@@ -505,6 +505,7 @@ public class CfetsTrdConfirmService extends BaseService {
             deal.setEntrustId(regDeal.getEntrustId());
             deal.setbTradeId(regDeal.getTradeId());
             deal.setTradeMarket(dtoReg.getTradeMarket());
+            deal.setIsOutTrade(BussinessDictCodeList.是否_是.getValue());
             deals.add(deal);
             // =====================划款指令信息=====================
             bussTrdTransferOrderDtoList.addAll(this.dealOrders(deal, dtoReg.getPs()));
@@ -528,11 +529,11 @@ public class CfetsTrdConfirmService extends BaseService {
             // 金融产品交易附属表Entity 构造结束 ----------------------------------------------------------
 
             // 组合交易表Entity 构造开始----------------------------------------------------------
-            生成组合交易(regDeal, deal.getTradeId(), ptlTrades);
+            生成组合交易Bid(regDeal, deal.getTradeId(), ptlTrades);
 
 
             // 金融产品交易扩展Entity 构造开始----------------------------------------------------------
-            生成交易扩展表(regDeal, deal.getTradeId(), paTrdProductDeals);
+            生成交易扩展表Bid(regDeal, deal.getTradeId(), paTrdProductDeals);
 
 //            trdTradeFeeDetails.addAll(生成交易费用明细数据(regDeal.getTradeId(), deal.getTradeId()));
 
@@ -748,6 +749,8 @@ public class CfetsTrdConfirmService extends BaseService {
             deal.setCounterId(entity.getCounterId());
             deal.setCounterTrader(entity.getCounterTrader());
             deal.setbTradeId(regDeal.getTradeId());
+            // 是否外部交易
+            deal.setIsOutTrade(DictCodeList.是否_是.getValue());
             deals.add(deal);
 
             // =====================划款指令信息=====================
@@ -1077,6 +1080,8 @@ public class CfetsTrdConfirmService extends BaseService {
             deal.setTrader(entity.getTrader());
             deal.setCounterId(entity.getCounterId());
             deal.setCounterTrader(entity.getCounterTrader());
+            // 是否外部交易
+            deal.setIsOutTrade(DictCodeList.是否_是.getValue());
             deals.add(deal);
 
             // =====================划款指令信息=====================
@@ -1999,11 +2004,33 @@ public class CfetsTrdConfirmService extends BaseService {
         ptlTrade.setWorkflowId(null); // 工作流代码
         ptlTrades.add(ptlTrade);
     }
+    private void 生成组合交易Bid(CfetsRegFinProductDealDto dto, String 交易编号, List<PtlTrade> ptlTrades) {
+        PtlTrade ptlTrade = new PtlTrade();
+        ptlTrade.setPortfolioId(dto.getPortfolioId()); // 组合代码
+        ptlTrade.setBusiNo(交易编号); // 业务编号
+        ptlTrade.setBusiTable(DictCodeList.业务表_金融产品表.getValue()); // 业务表
+        ptlTrade.setBusiId(dto.getFinprodId()); // 业务明细代码
+        ptlTrade.setBusiType(dto.getBusiType()); // 业务类型
+        ptlTrade.setInvAim(dto.getInvAim()); // 投资目的
+        ptlTrade.setSecManageAcctId(dto.getSecManageAcctId()); // 证券托管户代码
+        ptlTrade.setSettleDate(dto.getSettleDate()); // 实际发生日
+        ptlTrade.setWorkflowId(null); // 工作流代码
+        ptlTrades.add(ptlTrade);
+    }
     private void 生成交易扩展表(CfetsRegFinProductDealDto dto, String 交易编号,
                          List<PaTrdProductDeal> paTrdProductDeals) {
         PaTrdProductDeal paTrdProductDeal = new PaTrdProductDeal();
         paTrdProductDeal.setTradeId(交易编号); // 交易编号
         paTrdProductDeal.setPaBussType(getPaBussType(dto.getPs()));
+        paTrdProductDeal.setDeptCode(null); // 交易所属部门
+        paTrdProductDeal.setWorkflowId(null); // 工作流代码
+        paTrdProductDeals.add(paTrdProductDeal);
+    }
+    private void 生成交易扩展表Bid(CfetsRegFinProductDealDto dto, String 交易编号,
+                         List<PaTrdProductDeal> paTrdProductDeals) {
+        PaTrdProductDeal paTrdProductDeal = new PaTrdProductDeal();
+        paTrdProductDeal.setTradeId(交易编号); // 交易编号
+        paTrdProductDeal.setPaBussType(dto.getTgBusiType());
         paTrdProductDeal.setDeptCode(null); // 交易所属部门
         paTrdProductDeal.setWorkflowId(null); // 工作流代码
         paTrdProductDeals.add(paTrdProductDeal);

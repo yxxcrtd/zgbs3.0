@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -90,6 +91,12 @@ public class DvpOrdersManagementService extends BaseService<DvpOrdersManagementD
         param.put("PINAN_BUSINESS_TYPE_91", BussinessDictCodeList.平安业务类型_DVP资金调拨_中债DVP_托管户.getValue());
         param.put("PINAN_BUSINESS_TYPE_92", BussinessDictCodeList.平安业务类型_DVP资金调拨_上清DVP_中债DVP.getValue());
         param.put("PINAN_BUSINESS_TYPE_93", BussinessDictCodeList.平安业务类型_DVP资金调拨_中债DVP_上清DVP.getValue());
+        param.put("PINAN_BUSINESS_TYPE_202", DictCodeListExt4.平安业务类型_债券分销买入确认.getValue());
+        param.put("PINAN_BUSINESS_TYPE_180", DictCodeListExt4.平安业务类型_一级申购.getValue());
+        param.put("PINAN_BUSINESS_TYPE_151", DictCodeListExt4.平安业务类型_中标结果维护.getValue());
+        param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
+        param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
+        param.put("PAY_TYPE_01", BussinessDictCodeList.缴款方式_一级分销.getValue());
         param.put("F29", DictCodeListExt1.金融产品类型_投管用_债券借贷融入.getValue());
         param.put("F30", DictCodeListExt1.金融产品类型_投管用_债券借贷融出.getValue());
     }

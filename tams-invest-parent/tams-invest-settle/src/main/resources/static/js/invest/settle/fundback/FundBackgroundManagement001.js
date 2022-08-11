@@ -5,7 +5,7 @@ var showDetailTrdPage = function (paBussType, tradeId, validStatus, tradeDateVal
     console.log("----------------showDetailTrdPage-------------------")
     console.log(validStatus)
     //债券委托详情 银行间/商业银行柜台
-    if (paBussType === '09' && (data.tradeMarket == '01' || data.tradeMarket == '02')
+    if (paBussType === '09' && (tradeMarket == '01' || tradeMarket == '02')
         && validStatus !== '03') {
         console.log("----------------PINAN_ASSET_TYPE_F01----------------------")
 
