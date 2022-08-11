@@ -185,7 +185,7 @@ public class EtrTradeCommonervice extends BaseService {
                                 FinProduct finProduct = null;
                                 finProduct = finProductMapper.selectByFinprodMarketId(finprod);
                                 if (null == finProduct) {
-                                    finProductMapper.selectByPrimaryKey(finprod);
+                                    finProduct = finProductMapper.selectByPrimaryKey(finprod);
                                 }
                                 if (null != finProduct) {
                                     PositionCashSecDto cashSecDto = new PositionCashSecDto();
