@@ -20,7 +20,7 @@
  		where edb.rec_status in (#{entruststatusyjs},'04')
    			and ee.finprod_type2 = #{pinanassettypeyj}
    			and ee.finprod_id = #{finprodId,jdbcType=VARCHAR}
-   			and ee.counter_id =#{counterId,jdbcType=VARCHAR}
+   			and ( ee.counter_id =#{counterId,jdbcType=VARCHAR} or ee.counter_id is null)
 			AND instr(','||#{entrustId}||',', ','||ee.ENTRUST_ID||',') > 0
    			and rownum = 1
    	</select>
@@ -37,11 +37,11 @@
   		  left join ETR_ENTRUST_BID_PRICE eebp
     		on ee.entrust_id = eebp.entrust_id
   		  left join ptl_portfolio pp
-    		ON pp.portfolio_id = ee.PORTFOLIO_ID
+    		ON pp.portfolio_id = eebp.PORTFOLIO_ID
  		where edb.rec_status in (#{entruststatusyjs},'04')
    			and ee.finprod_type2 = #{pinanassettypeyj}
    			and ee.finprod_id = #{finprodId,jdbcType=VARCHAR}
-   			and ee.counter_id = #{counterId,jdbcType=VARCHAR}
+   			and ( ee.counter_id =#{counterId,jdbcType=VARCHAR} or ee.counter_id is null)
 			AND instr(','||#{entrustId}||',', ','||ee.ENTRUST_ID||',') > 0
    			<if test="bidId == null">
    			and ee.entrust_id not in (select BOBP.ENTRUST_ID 
@@ -67,7 +67,7 @@
  		where edb.rec_status in (#{entruststatusyjs},'04')
    			and ee.finprod_type2 = #{pinanassettypeyj}
    			and ee.finprod_id = #{finprodId,jdbcType=VARCHAR}
-   			and ee.counter_id = #{counterId,jdbcType=VARCHAR}
+   			and ( ee.counter_id =#{counterId,jdbcType=VARCHAR} or ee.counter_id is null)
 			AND instr(','||#{entrustId}||',', ','||ee.ENTRUST_ID||',') > 0
    			<if test="bidId == null">
    			and ee.entrust_id not in (select BOBP.ENTRUST_ID 

@@ -212,6 +212,9 @@
             nvl(T2.FINPROD_MARKET_ID,T5.PORTFOLIO_ID) FINPROD_MARKET_ID,/*金融产品交易汇总.理财产品代码 产品/资产代码*/
             nvl(NVL(T2.FINPROD_ABBR, T2.FINPROD_NAME),T3.PORTFOLIO_NAME) finProdMarketName,
             T2.TRADE_MARKET tradeMarket,
+            T1.COUNTER_ID counterId,
+            null entrustId,
+            null bidId,
             TO_CHAR(T5.SETTLE_DATE,'yyyy-MM-dd') cashDate,/*划款指令业务流程.结算日期 现金流日期*/
             <!-- modify by mashukai 20201203 TISHKBS-1209 start -->
             T5.SETTLE_AMT cashAmt,/*金融产品交易汇总业务流程.交易金额 划款金额*/
@@ -302,6 +305,9 @@
             T2.FINPROD_MARKET_ID,
             NVL(T2.FINPROD_ABBR, T2.FINPROD_NAME) finProdMarketName,
             T2.TRADE_MARKET tradeMarket,
+            T1.COUNTER_ID counterId,
+            null entrustId,
+            null bidId,
             TO_CHAR(T5.SETTLE_DATE,'yyyy-MM-dd') cashDate,
             T1.TRADE_AMT cashAmt,
             T1.WORKFLOW_ID
@@ -384,6 +390,9 @@
             nvl(T2.FINPROD_MARKET_ID,T5.PORTFOLIO_ID) FINPROD_MARKET_ID,/*金融产品交易汇总.理财产品代码 产品/资产代码*/
             nvl(NVL(T2.FINPROD_ABBR, T2.FINPROD_NAME),T3.PORTFOLIO_NAME) finProdMarketName,
             T2.TRADE_MARKET tradeMarket,
+            T1.COUNTER_ID counterId,
+            null entrustId,
+            null bidId,
             TO_CHAR(T5.SETTLE_DATE,'yyyy-MM-dd') cashDate,/*划款指令.结算日期 现金流日期*/
             <!-- modify by mashukai 20201203 TISHKBS-1209 start -->
             T5.SETTLE_AMT cashAmt,/*金融产品交易汇总.交易金额 划款金额*/
@@ -461,6 +470,9 @@
             T2.FINPROD_MARKET_ID,
             NVL(T2.FINPROD_ABBR, T2.FINPROD_NAME) finProdMarketName,
             T2.TRADE_MARKET tradeMarket,
+            T1.COUNTER_ID counterId,
+            T10.ENTRUST_ID entrustId,
+            BRT.BID_ID bidId,
             TO_CHAR(T5.SETTLE_DATE,'yyyy-MM-dd') cashDate,
             T1.TRADE_AMT cashAmt,
             NULL WORKFLOW_ID
@@ -489,6 +501,7 @@
             left join SYS_WFL_BUSINESS_LIST T6 ON T1.TRADE_ID = T6.TRADE_ID AND T6.action_type in (#{new}, 'modify')  AND T6.BUSINESS_TYPE NOT IN ('126','38','V19','V20')
             LEFT JOIN STL_CAPACCT_INFO T8 ON T5.MY_ACCT_NO=T8.ACCT_NO
             LEFT JOIN STL_CAPACCT_INFO T9 ON T5.COUNTER_ACCT_NO=T9.ACCT_NO
+            left join BID_RESULT_TOTAL BRT on BRT.TOTAL_WIN_ID = T1.B_TRADE_ID
             <where>
                 (T4.PA_BUSS_TYPE IN (#{PA_BUSINESS_TYPE12}, #{PA_BUSINESS_TYPE13}, #{PA_BUSINESS_TYPE14},#{PA_BUSINESS_TYPE15},
                 #{PA_BUSINESS_TYPE16},
