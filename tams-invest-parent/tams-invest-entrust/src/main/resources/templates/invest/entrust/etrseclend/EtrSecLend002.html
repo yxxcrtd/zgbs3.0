@@ -180,7 +180,7 @@
                             </div>
                 <!-- 引业务组件投资委托人员信息组件 -->
                 <div class="page-component" th:data-path="@{/component/trade/BussEtrInvestPersonInfo/init}"
-                     th:data-params="|{entityName: 'etrInvestPersonInfo',entity:'${person_entity}'}|"></div>
+                     th:data-params="|{entityName: 'etrInvestPersonInfo', innerTrade: false,entity:'${person_entity}'}|"></div>
                 <!--质押券信息-->
                  <div id="pledgeStamps_div" class="page-component" th:data-path="@{/component/trade/BussRepoSec/init}"
                     th:data-params="|{entityName: 'bussRepoSec', pageFrom: 'EtrSecLend002', entity:'${entity_bussRepoSecDto}', portfolioId:'${entity?.portfolioId==null?'':entity?.portfolioId}', ps:'${entity?.busiPs==null?'':entity?.busiPs}', bizCode:'${''}', entrustId:'${entity?.entrustId==null?'':entity?.entrustId}', tradeMarketId: 'tradeMarket'}|"></div>
