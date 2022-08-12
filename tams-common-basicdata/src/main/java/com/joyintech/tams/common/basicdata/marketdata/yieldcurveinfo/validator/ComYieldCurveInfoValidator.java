@@ -79,7 +79,6 @@ public class ComYieldCurveInfoValidator implements BeanValidator {
                     pk4.setBusinessDataPk1(dto.getCurveCode());
                     pk4.setBusinessDataPk2(dto.getCurveDateStr());
                     pk4.setBusinessDataPk3(dto.getCurveType());
-                    pk4.setBusinessDataPk4(dto.getKeyPointStr());
                     if(mstWorkflowCommonService.isInWflProcess(pk4)){
                         errorList.add(new ValidMessage("数据已存在于流程中，不允许添加"));
                     }
@@ -98,7 +97,6 @@ public class ComYieldCurveInfoValidator implements BeanValidator {
                 pk4.setBusinessDataPk1(dto.getCurveCode());
                 pk4.setBusinessDataPk2(dto.getCurveDateStr());
                 pk4.setBusinessDataPk3(dto.getCurveType());
-                pk4.setBusinessDataPk4(dto.getKeyPointStr());
                 if(mstWorkflowCommonService.isInWflProcess(pk4)){
                     errorList.add(new ValidMessage("数据已存在于流程中，不允许修改"));
                 }
