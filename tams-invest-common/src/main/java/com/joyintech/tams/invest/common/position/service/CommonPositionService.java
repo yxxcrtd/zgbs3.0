@@ -558,7 +558,7 @@ public class CommonPositionService {
 		EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(String.valueOf(param.get("entrustId")));
 		// 委托附属表
 		EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(String.valueOf(param.get("entrustId")));
-
+		param.put("cDate", etrEntrust.getEntrustDate());
 		//委托额度
 		BigDecimal entrustAmt = BigDecimal.ZERO;
 		if (StringUtil.isNotEmpty(etrEntrust)) {

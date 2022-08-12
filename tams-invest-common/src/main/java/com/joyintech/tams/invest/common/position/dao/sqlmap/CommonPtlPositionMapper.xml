@@ -88,6 +88,9 @@
         select SEQNO,AMOUNT,PORTFOLIO_ID,ACCT_ID,HODING_TYPE,CDATE,CCY,ORDER_ID,CHL_FINPROD_ID
         from ETR_CASH_POSITION_FLOW
         where ORDER_ID= #{entrustId} and OFFSET_ID is null and OFFSET_FLAG = '01'
+        <if test = "cDate != null">
+            AND CDATE = #{cDate,jdbcType=DATE}
+        </if>
         <if test="closeFlag != null and closeFlag == 'N'.toString() ">
             AND EXISTS (SELECT 1 FROM PTL_CASH_POSITION_FLOW F WHERE F.ENTRUST_ID = ETR_CASH_POSITION_FLOW.ORDER_ID and F.OFFSET_ID is null and F.OFFSET_FLAG = '01')
         </if>
@@ -135,9 +138,22 @@
     </select>
     
     <select id="selectPtlCashPositionFlowByEntrustId" resultType="com.joyintech.tams.common.base.entity.PtlCashPositionFlow"  >
-       select AMOUNT,PORTFOLIO_ID,ACCT_ID,HODING_TYPE,CDATE,CCY,ORDER_ID,CHL_FINPROD_ID,ENTRUST_ID
-       from PTL_CASH_POSITION_FLOW 
-       where ENTRUST_ID= #{entrustId} and OFFSET_ID is null and OFFSET_FLAG = '01'
+        select
+            PCPF.AMOUNT,PCPF.PORTFOLIO_ID,PCPF.ACCT_ID,PCPF.HODING_TYPE,PCPF.CDATE,PCPF.CCY,PCPF.ORDER_ID,PCPF.CHL_FINPROD_ID,PCPF.ENTRUST_ID
+        from
+            PTL_CASH_POSITION_FLOW PCPF
+        LEFT JOIN
+            STL_PAY_ORDERS SPO ON PCPF.ORDER_ID = SPO.ORDER_ID
+        LEFT JOIN
+            TRD_PRODUCT_DEAL TPD ON TPD.TRADE_ID = SPO.TRADE_ID
+        where
+            PCPF.ENTRUST_ID= #{entrustId}
+            and PCPF.OFFSET_ID is null
+            and PCPF.OFFSET_FLAG = '01'
+            AND (TPD.TRADE_ID IS NULL OR (TPD.TRADE_STATUS  = '01' AND TPD.IS_CANCEL = 'N'))
+            <if test = "cDate != null">
+                AND PCPF.CDATE = #{cDate,jdbcType=DATE}
+            </if>
     </select>
     
     <select id="selectPtlSecPositionFlowByEntrustId" resultType="com.joyintech.tams.common.base.entity.PtlSecPositionFlow"  >
