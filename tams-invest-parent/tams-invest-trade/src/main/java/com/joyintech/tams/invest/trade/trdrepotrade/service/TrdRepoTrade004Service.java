@@ -303,7 +303,7 @@ public class TrdRepoTrade004Service extends BaseService<TrdRepoTrade004Dto> impl
         position.setSettleSpeed(dto.getSettleSpeedStr());
         position.setDecisionAct(decisionAct);
         position.setSystemAct(DictCodeListExt3.系统动作_新建.getValue());
-        position.setCdate(dto.getTradeDate());
+        position.setCdate(dto.getSubstitutionDate());
         position.setCcy(dto.getCcy());
         position.setTotalTradeId(dto.getBussinessCode());
         position.setFlowStatus(flowStatus);
