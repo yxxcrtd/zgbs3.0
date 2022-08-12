@@ -240,6 +240,15 @@ public class InterfSysTrdConfigController{
         return  interfSysTrdConfigService.getDealerTraderInfo(dto);
     }
 
+    /**
+     * 交易商交易员信息查询接口
+     */
+    @ResponseBody
+    @PostMapping("/getOrderNoList")
+    public List<String> selectTraderInfo(){
+        return  interfSysTrdConfigService.getOrderNoList();
+    }
+
 
     /**
      * 债券现券买入指令提交校验时对于使权不重大的购入价条件判断

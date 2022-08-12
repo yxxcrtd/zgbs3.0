@@ -1206,7 +1206,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 }
                 BigDecimal totalAmt = BigDecimal.ZERO;
                 for(FinDealPledge finDealPledge : finDealPledgeList){
-                    totalAmt = ArithmeticUtil.doAdd(ArithmeticUtil.multiply(finDealPledge.getPledgeNumber(), finDealPledge.getPledgeFaceValue()));
+                    totalAmt = ArithmeticUtil.doAdd(totalAmt, ArithmeticUtil.multiply(finDealPledge.getPledgeNumber(), finDealPledge.getPledgeFaceValue()));
                 }
                 // 查询首期交易信息
                 TrdProductDeal firstDeal = trdProductDealMapper.selectByPrimaryKey(dealTotal.getFinprodId());

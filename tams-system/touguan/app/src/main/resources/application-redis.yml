@@ -1,7 +1,13 @@
 spring:
   redis:
-     host: 192.168.60.185
-     port: 6388
-     password: joyin!234
+    host: 192.168.60.185
+    port: 6388
+    password: joyin!234
+    lettuce:
+      cluster:
+#        nodes: 192.168.90.47:6379,192.168.90.47:6380,192.168.90.47:6381,192.168.90.47:6382,192.168.90.47:6383,192.168.90.47:6384
+        refresh:
+          adaptive: true   #自动刷新集群
+          period: 60000ms       #刷新间隔为10毫秒,做灾备测试时设置小一点,生产和测试环境redis节点切换不频繁,设置到一个合理的值,比如1分钟
   redislock:
     redissonEnabled: false

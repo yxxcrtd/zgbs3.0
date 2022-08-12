@@ -342,6 +342,10 @@ public class InterfSysTrdConfigService{
         return interfSysTrdConfigMapper.getDealerTraderInfo(dto);
     }
 
+    public List<String> getOrderNoList() {
+        return interfSysTrdConfigMapper.getOrderNoList();
+    }
+
     public Map<String, Object> getBidPriceConInfo(Map<String, Object> params) {
         Map<String, Object> resultMap = new HashMap<>();
 //        if (params.get("ps") == null || params.get("finprodId") == null  || params.get("businessModel") == null || params.get("price") == null){

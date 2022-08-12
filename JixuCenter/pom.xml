@@ -20,9 +20,9 @@
 	</repositories>
 
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.9.RELEASE</version>
+		<groupId>com.joyintech</groupId>
+		<artifactId>tams-parent</artifactId>
+		<version>0.0.5.8</version>
 	</parent>
 
 	<!-- <url>http://maven.aliyun.com/nexus/content/groups/public/</url> -->
@@ -106,7 +106,7 @@
 		<dependency>
 			<groupId>com.joyintech</groupId>
 			<artifactId>framework-core</artifactId>
-			<version>0.0.5.4</version>
+			<version>0.0.5.8</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/javax.persistence/javax.persistence-api -->
 		<dependency>
