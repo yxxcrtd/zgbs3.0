@@ -15,7 +15,6 @@
      */
     function getSearchParams() {
         var object = $.serializeToObject('#sumbitForm_hg');
-
         var acctNo = $("#acctNo").val();
         object.acctNo = acctNo;
 
@@ -1917,6 +1916,12 @@
         if(arr && arr.length >=0){
             object.origRepSecId = arr[0];
         }
+        // XYHGFXSJ-1068:修改质押券字段赋值 modify by fuyongsheng 20220812 start
+        let arrRepSecId = object.repSecId ;
+        if(arrRepSecId && arrRepSecId.length >=0){
+            object.repSecId = arrRepSecId.join();
+        }
+        // XYHGFXSJ-1068:修改质押券字段赋值 modify by fuyongsheng 20220812 end
         object.operateType = operateType;
         //object.pageModel = pageModel;
 
