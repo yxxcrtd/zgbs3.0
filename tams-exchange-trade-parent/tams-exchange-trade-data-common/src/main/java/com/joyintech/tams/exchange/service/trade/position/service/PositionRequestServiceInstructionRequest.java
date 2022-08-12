@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.joyintech.tams.constant.DictCodeList.交易方向_行权_回售;
 import static com.joyintech.tams.constant.DictCodeList.是否_否;
@@ -493,38 +494,39 @@ public class PositionRequestServiceInstructionRequest {
                 && (交易方向_中途换券.getValue().equals(ps) || 交易方向_到期续做.getValue().equals(ps) || 交易方向_正回购.getValue().equals(ps))) {
             List<Map<String, Object>> list = new ArrayList<>(1);
             // 查询质押券集合
-//            InstructionPledge instructionPledge = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
 
-            InstructionPledge instructionPledge = null;
+            List<InstructionPledge> instructionPledgeList;
             if (交易方向_中途换券.getValue().equals(ps)) {
                 List<InstructionPledge> pledgeList = instructionPledgeService.queryInstructionPledgesByInstructionId(entity.getEntrustId());
-                instructionPledge = pledgeList.stream().filter(item -> PledgeDisPlaceDirEnum.SWAP_IN.codeEquals(item.getDisplaceDir())).findFirst().orElse(null);
+                instructionPledgeList = pledgeList.stream().filter(item -> PledgeDisPlaceDirEnum.SWAP_IN.codeEquals(item.getDisplaceDir())).collect(Collectors.toList());
             } else {
-                instructionPledge = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
+                instructionPledgeList = instructionPledgeService.queryInstructionPledgesByInstructionId(entity.getEntrustId());
             }
-            if (Objects.nonNull(instructionPledge)) {
-                bean = new PositionRequestBaseBean();
-                bean.setPortfolioId(entity.getPortfolioId());
-                // 债券代码 指令.质押券的金融产品代码
-                bean.setFinprodId(instructionPledge.getFinprodId());
-                bean.setSecAcctId(entity.getSecAcctId());
-                bean.setTradeId(entity.getEntrustNo());
-                bean.setEtrId(entity.getEntrustId());
-                BigDecimal secAmount;
-                if (交易方向_中途换券.getValue().equals(ps)) {
-                    secAmount = commonPositionEngineService.multiplyWithOneHundred(instructionPledge.getPledgeNumber());
-                } else {
-                    secAmount = commonPositionEngineService.multiplyWithOneHundred(entity.getEntrustNum());
+            for (InstructionPledge pledge : instructionPledgeList) {
+                if (Objects.nonNull(pledge)) {
+                    bean = new PositionRequestBaseBean();
+                    bean.setPortfolioId(entity.getPortfolioId());
+                    // 债券代码 指令.质押券的金融产品代码
+                    bean.setFinprodId(pledge.getFinprodId());
+                    bean.setSecAcctId(entity.getSecAcctId());
+                    bean.setTradeId(entity.getEntrustNo());
+                    bean.setEtrId(entity.getEntrustId());
+                    BigDecimal secAmount;
+                    if (交易方向_中途换券.getValue().equals(ps)) {
+                        secAmount = commonPositionEngineService.multiplyWithOneHundred(pledge.getPledgeNumber());
+                    } else {
+                        secAmount = commonPositionEngineService.multiplyWithOneHundred(entity.getEntrustNum());
+                    }
+                    bean.setSecAmount(secAmount);
+
+                    Map<String, Object> map = BeanUtil.object2Map(bean);
+                    //融入券券面总额
+                    map.put(INTEGRATE_SEC_AMOUNT, BigDecimal.ZERO);
+                    //本方券券面总额 指令.质押券数量*100 乘以一百
+                    map.put(OWN_SEC_AMOUNT, secAmount);
+
+                    list.add(map);
                 }
-                bean.setSecAmount(secAmount);
-
-                Map<String, Object> map = BeanUtil.object2Map(bean);
-                //融入券券面总额
-                map.put(INTEGRATE_SEC_AMOUNT, BigDecimal.ZERO);
-                //本方券券面总额 指令.质押券数量*100 乘以一百
-                map.put(OWN_SEC_AMOUNT, secAmount);
-
-                list.add(map);
             }
             resultMap.put(PTL_SEC_LIST, list);
         }
@@ -535,25 +537,25 @@ public class PositionRequestServiceInstructionRequest {
             /*&& 交易方向_正回购.getValue().equals(firstRepoPs)*/) {
             List<Map<String, Object>> list = new ArrayList<>(4);
             // 查询质押券集合
-//            InstructionPledge item = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
-            InstructionPledge item = null;
+            List<InstructionPledge> instructionPledgeList;
             if (交易方向_中途换券.getValue().equals(ps)) {
                 List<InstructionPledge> pledgeList = instructionPledgeService.queryInstructionPledgesByInstructionId(entity.getEntrustId());
-                item = pledgeList.stream().filter(o -> PledgeDisPlaceDirEnum.SWAP_OUT.codeEquals(o.getDisplaceDir())).findFirst().orElse(null);
+                instructionPledgeList = pledgeList.stream().filter(o -> PledgeDisPlaceDirEnum.SWAP_OUT.codeEquals(o.getDisplaceDir())).collect(Collectors.toList());
             } else {
-                item = instructionPledgeService.queryInstructionPledgesByInstructionIdAndStockCode(entity.getEntrustId(), entity.getFinprodMarketId());
+                instructionPledgeList = instructionPledgeService.queryInstructionPledgesByInstructionId(entity.getEntrustId());
+                ;
             }
-            //取单个质押券
-            if (Objects.nonNull(item)) {
-                bean = new PositionRequestBaseBean();
-                bean.setPortfolioId(entity.getPortfolioId());
-                // 债券代码 指令.质押券的金融产品代码
-                bean.setFinprodId(item.getFinprodId());
-                bean.setSecAcctId(entity.getSecAcctId());
-                bean.setTradeId(entity.getEntrustNo());
-                bean.setEtrId(entity.getEntrustId());
+            for (InstructionPledge pledge : instructionPledgeList) {
+                if (Objects.nonNull(pledge)) {
+                    bean = new PositionRequestBaseBean();
+                    bean.setPortfolioId(entity.getPortfolioId());
+                    // 债券代码 指令.质押券的金融产品代码
+                    bean.setFinprodId(pledge.getFinprodId());
+                    bean.setSecAcctId(entity.getSecAcctId());
+                    bean.setTradeId(entity.getEntrustNo());
+                    bean.setEtrId(entity.getEntrustId());
 
-                //券面总额 IF 交易方向 = 解除质押 THEN 下单.质押券数量*100 ELSE 下单到期续作对应首期的成交回报.质押券数量
+                    //券面总额 IF 交易方向 = 解除质押 THEN 下单.质押券数量*100 ELSE 下单到期续作对应首期的成交回报.质押券数量
 //                if (交易方向_中途换券.getValue().equals(ps)) {
 //                    BigDecimal secAmount = commonPositionEngineService.multiplyWithOneHundred(item.getPledgeNumber());
 //                    bean.setSecAmount(secAmount);
@@ -561,15 +563,16 @@ public class PositionRequestServiceInstructionRequest {
 //                    BigDecimal secAmount = commonPositionEngineService.multiplyWithOneHundred(item.getPledgeNumber());
 //                    bean.setSecAmount(secAmount);
 //                }
-                BigDecimal secAmount = commonPositionEngineService.multiplyWithOneHundred(item.getPledgeNumber());
-                bean.setSecAmount(secAmount);
+                    BigDecimal secAmount = commonPositionEngineService.multiplyWithOneHundred(pledge.getPledgeNumber());
+                    bean.setSecAmount(secAmount);
 
-                Map<String, Object> map = BeanUtil.object2Map(bean);
-                //融入券券面总额
-                map.put(INTEGRATE_SEC_AMOUNT, BigDecimal.ZERO);
-                //本方券券面总额
-                map.put(OWN_SEC_AMOUNT, bean.getSecAmount());
-                list.add(map);
+                    Map<String, Object> map = BeanUtil.object2Map(bean);
+                    //融入券券面总额
+                    map.put(INTEGRATE_SEC_AMOUNT, BigDecimal.ZERO);
+                    //本方券券面总额
+                    map.put(OWN_SEC_AMOUNT, bean.getSecAmount());
+                    list.add(map);
+                }
             }
             resultMap.put(PTL_RELIEVE_SEC_LIST, list);
         }
