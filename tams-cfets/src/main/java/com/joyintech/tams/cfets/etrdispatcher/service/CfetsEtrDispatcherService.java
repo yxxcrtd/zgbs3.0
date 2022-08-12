@@ -355,6 +355,30 @@ public class CfetsEtrDispatcherService extends BaseService {
         pageLimit.setRoot(list);
         if (!list.isEmpty()) {
             for (CfetsEtrDispatcherTradeListResponse response : list) {
+
+                //XYHGFXSJ-1058 【指令分发】【场内指令查询】【场内交易】协议回购深交所正回购到期购回、提前购回-存在多个质押券，问题如下
+                if (StringUtil.isNotEmpty(response.getFinprodMarketId()) && response.getFinprodMarketId().contains(GlobalConstant.COMMA)) {
+                    List<String> finprodAbbrs = new ArrayList<>();
+                    String[] finprodIds = response.getFinprodMarketId().split(GlobalConstant.COMMA);
+                    for (String finprod : finprodIds) {
+                        if (StringUtil.isNotEmpty(finprod)) {
+                            FinProduct finProduct = null;
+                            finProduct = finProductMapper.selectByFinprodMarketId(finprod);
+                            if (null == finProduct) {
+                                finProductMapper.selectByPrimaryKey(finprod);
+                                finProduct = finProductMapper.selectByPrimaryKey(finprod);
+                            }
+                            if (null != finProduct) {
+                                finprodAbbrs.add(finProduct.getFinprodAbbr());
+                            }
+                        }
+                    }
+                    if (!finprodAbbrs.isEmpty()) {
+                        response.setFinprodAbbr(String.join(GlobalConstant.COMMA, finprodAbbrs));
+                    }
+                }
+                //XYHGFXSJ-1058 【指令分发】【场内指令查询】【场内交易】协议回购深交所正回购到期购回、提前购回-存在多个质押券，问题如下
+
                 response.setTraderId(response.getTrader());
                 if (StringUtil.isNotEmpty(response.getTrader())) {
                     String[] traders = response.getTrader().split(",");
