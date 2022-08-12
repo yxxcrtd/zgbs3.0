@@ -1382,7 +1382,12 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                     // 新业务 在交易执行时才占用债券的指令可用持仓 所以强制完成时不用释放
                     // 交收失败时需要释放
                     // 质押品的组合持仓流水
-                    etrPositionHoldDto.setPtlSecPositionFlows(ptlSecPositionFlowLogic(entrustCommonDto, false));
+//                    etrPositionHoldDto.setPtlSecPositionFlows(ptlSecPositionFlowLogic(entrustCommonDto, false));
+                    // 减少交收失败的金额
+                    if (entrustCommonDto.getDeal() != null
+                            && entrustCommonDto.getDeal().getTradeAmt() != null) {
+                        etrEntrustAdd.setCloseAmt(ArithmeticUtil.doAdd(etrEntrustAdd.getCloseAmt(), entrustCommonDto.getDeal().getTradeAmt()));
+                    }
                 }
             }
             else if (DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(ps)) {
@@ -1429,7 +1434,7 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
     private static List<EtrSecPositionFlowDto> ptlSecPositionFlowLogic(EntrustCommonDto input,boolean flag) {
         // List<组合持仓流水DTO>(若上记的List<回购质押品DTO>为空，则此为空，反之循环构造DTO)
         // 通过上记输出的List<输出的质押品DTO>，循环该List构造组合持仓流水DTO
-        List<EtrSecPositionFlowDto> list = new ArrayList<EtrSecPositionFlowDto>() ;
+        List<EtrSecPositionFlowDto> list = new ArrayList<>() ;
         // 查询委托的质押券信息
         Map<String, Object> initSearchParam = new HashMap<>();
         initSearchParam.put("portfolioId", input.getEtrEntrust().getPortfolioId());

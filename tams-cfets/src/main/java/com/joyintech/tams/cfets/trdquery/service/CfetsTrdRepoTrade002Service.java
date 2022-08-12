@@ -1171,6 +1171,7 @@ public class CfetsTrdRepoTrade002Service extends BaseService<CfetsTrdRepoTrade00
         }
         cfetsTrdConfirmMapper.deleteByTrdId(bizCode);
 
+        logger.info("isNeedDealPosition:" + isNeedDealPosition);
         //发送头寸
         if(isNeedDealPosition){
             if(isRevoke) {
@@ -1186,19 +1187,6 @@ public class CfetsTrdRepoTrade002Service extends BaseService<CfetsTrdRepoTrade00
             BaseQuoteDto baseQuoteDto = new BaseQuoteDto();
             baseQuoteDto.setQuoteId(totleTradeId);
             cfetsQuotedCommonService.deleteByQuoteId(baseQuoteDto);
-            List<PtlSecPositionFlowDto> ptlSecPositionFlows = new ArrayList<>();
-            List<PtlSecPositionFlow> positionFlows = baseAssetCashPositionCommMapper.selectAllPositionByOffsetFlag(totleTradeId,
-                    DictCodeList.冲正标识_正常交易.getValue());
-            for (PtlSecPositionFlow ptlSecPositionFlow : positionFlows) {
-                if (StringUtil.equals(ptlSecPositionFlow.getHodingType(), DictCodeList.持仓类型_质押.getValue())) {
-                    PtlSecPositionFlowDto flowDto = new PtlSecPositionFlowDto();
-                    BeanUtil.copyPropertiesIgnoreNull(flowDto, ptlSecPositionFlow);
-                    flowDto.setAmount(flowDto.getAmount().negate());
-                    flowDto.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
-                    flowDto.setOffsetId(ptlSecPositionFlow.getTradeId());
-                    basePtlSecPositionInfoService.inertSecPositionFlow(flowDto);
-                }
-            }
         }
     }
 
