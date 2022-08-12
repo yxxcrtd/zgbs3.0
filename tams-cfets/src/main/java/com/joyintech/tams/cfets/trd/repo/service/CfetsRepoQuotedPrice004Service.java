@@ -2172,6 +2172,9 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
                             // 数据已入新头寸，Y：已入
                             resultDto.setIsExistNew(DictCodeList.是否_是.getValue());
                             if (avaPrin.compareTo(BigDecimal.ZERO) > 0) {
+                                if (isNegate) {
+                                    resultDto.setCdate(iPlatformDate.getSysDate());
+                                }
                                 EtrSecPositionFlowDto etrSecPositionFlowDto = this.etrSecPositionFlowLogic(resultDto, pledgeBond.getEntrustId());
                                 if (isNegate) {
                                     etrSecPositionFlowDto.setAmount(etrSecPositionFlowDto.getAmount().negate());
