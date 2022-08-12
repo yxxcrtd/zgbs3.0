@@ -93,9 +93,20 @@
         PTL_CASH_POSITION_FLOW pcpf
         left join PTL_PORTFOLIO pp on pcpf.PORTFOLIO_ID = pp.PORTFOLIO_ID
         left join (SELECT ORDER_ID,TRADE_ID,ORDER_STATUS FROM STL_PAY_ORDERS UNION ALL SELECT ORDER_ID,TRADE_ID,ORDER_STATUS FROM STL_PAY_TEMP_ORDERS ) spo on pcpf.ORDER_ID = spo.ORDER_ID
-        left join (SELECT TRADE_ID,TRADE_STATUS,IS_CANCEL,FINPROD_ID,PS,FINPROD_TYPE2 FROM TRD_PRODUCT_DEAL UNION ALL SELECT TRADE_ID,TRADE_STATUS,IS_CANCEL,FINPROD_ID,PS,FINPROD_TYPE2 FROM TRD_PRODUCT_TEMP_DEAL a
+        /**left join (SELECT TRADE_ID,TRADE_STATUS,IS_CANCEL,FINPROD_ID,PS,FINPROD_TYPE2 FROM TRD_PRODUCT_DEAL UNION ALL SELECT TRADE_ID,TRADE_STATUS,IS_CANCEL,FINPROD_ID,PS,FINPROD_TYPE2 FROM TRD_PRODUCT_TEMP_DEAL a
             WHERE NOT EXISTS (SELECT 1 FROM TRD_PRODUCT_DEAL b WHERE a.TRADE_ID =b.TRADE_ID )
-            ) trd on spo.TRADE_ID = trd.TRADE_ID
+            ) trd on spo.TRADE_ID = trd.TRADE_ID**/
+        left join (SELECT T.TRADE_ID, T.TRADE_STATUS, T.IS_CANCEL, T.FINPROD_ID, NVL(EE.PS,T.PS) PS, NVL(EE.FINPROD_TYPE2,T.FINPROD_TYPE2) FINPROD_TYPE2
+        FROM TRD_PRODUCT_DEAL T
+        left join TRD_PRODUCT_DEAL_ADD TA on TA.TRADE_ID = T.TRADE_ID
+        left join ETR_ENTRUST EE ON EE.ENTRUST_ID = TA.ENTRUST_ID
+        UNION ALL
+        SELECT F.TRADE_ID, F.TRADE_STATUS, F.IS_CANCEL, F.FINPROD_ID, NVL(EE.PS,F.PS) PS, nvl(EE.FINPROD_TYPE2,F.FINPROD_TYPE2) FINPROD_TYPE2
+        FROM TRD_PRODUCT_TEMP_DEAL F
+        left join TRD_PRODUCT_DEAL_ADD FA on FA.TRADE_ID = F.TRADE_ID
+        left join ETR_ENTRUST EE ON EE.ENTRUST_ID = FA.ENTRUST_ID
+        WHERE NOT EXISTS(SELECT 1 FROM TRD_PRODUCT_DEAL b WHERE F.TRADE_ID = b.TRADE_ID)
+        ) trd on spo.TRADE_ID = trd.TRADE_ID
         left join PA_TRD_PRODUCT_DEAL ptpd on ptpd.TRADE_ID = trd.TRADE_ID
         LEFT JOIN TRD_PRODUCT_DEAL TRD1 ON TRD1.TRADE_ID = PCPF.ORDER_ID<!-- 子组合资金调配，用交易编号关联指令编号 -->
         LEFT JOIN PA_TRD_PRODUCT_DEAL PTPD1 ON PTPD1.TRADE_ID = TRD1.TRADE_ID
@@ -303,8 +314,9 @@
         and ((fcp.MDATE = to_date(#{sysDate},'YYYY-MM-DD') AND psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD') - 1)
         OR (fcp.MDATE != to_date(#{sysDate},'YYYY-MM-DD') AND psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD')))
         <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 start -->
-        and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07') and TRADE_MARKET in ('03','04'))
         and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        and not EXISTS (select 1 from TRD_FIN_PRODUCT_DEAL_TOTAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
         <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 end -->
         and (fp.IS_RIGHT = 'N' or fp.IS_RIGHT is null)
         and (fp.FINPROD_TYPE2 not in ('F18','F17','F07') or fp.FINPROD_TYPE2 is null)
@@ -674,10 +686,12 @@
             </if>
             and not exists (
             select 1 from TRD_PRODUCT_DEAL tpd
+            left join TRD_BANK_MANUAL_SETTLE_INFO tbmsi on tpd.TOTLE_TRADE_ID = tbmsi.TRADE_ID
             where tpd.PS in(#{T03},#{T39})
             and tpd.SETTLE_DATE = fep1.ACT_EXERCISE_DATE
             AND TPD.FINPROD_ID = PSP.FINPROD_ID
             and tpd.TRADE_STATUS = '01'
+            and tbmsi.SETTLE_STATUS is not null and tbmsi.SETTLE_STATUS = '02'
             AND TPD.IS_CANCEL='N'
             )
             and PSP.CDATE = to_date(#{sysDate},'YYYY-MM-DD')

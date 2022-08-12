@@ -10,6 +10,7 @@
 
 package com.joyintech.tams.invest.period.trdqueryduration.dto;
 
+import com.google.common.base.Objects;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
@@ -24,6 +25,8 @@ import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.annotation.PrimaryKey.Field;
+import org.apache.commons.lang3.StringUtils;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -104,21 +107,27 @@ public class TrdQueryDuration001Dto extends TrdQueryDurationDto {
 	 * @return PaBussTypeString
 	 */
 	public String getPaBussTypeString() {
+		String paBussTypeName = null;
 		if (DictCodeListExt1.画面数据状态_待处理.getValue().equals(getStatusValid())) {
 			if (getCashType() != null && getCashType().contains(DictCodeList.现金流类型_中间还本.getValue())) {
-				return DictCodeListExt1.平安业务类型_债券中间还本.getCodeName();
+				paBussTypeName = DictCodeListExt1.平安业务类型_债券中间还本.getCodeName();
 			}
 			else if (getCashType() != null && (getCashType().contains(DictCodeList.现金流类型_到期还本.getValue())
 					|| getCashType().contains(DictCodeList.现金流类型_到期收息.getValue()))) {
-				return DictCodeListExt1.平安业务类型_债券到期.getCodeName();
+				paBussTypeName = DictCodeListExt1.平安业务类型_债券到期.getCodeName();
 			}
 			else {
-				return DictCodeListExt1.平安业务类型_债券中间收息.getCodeName();
+				paBussTypeName =  DictCodeListExt1.平安业务类型_债券中间收息.getCodeName();
 			}
 		}
-		else {
-			return SysDataUtil.getNameFromDataDict(DictCode.平安业务类型, getPaBussType());
+		if (StringUtils.isEmpty(paBussTypeName)||Objects.equal(paBussTypeName,getPaBussType())){
+			paBussTypeName = SysDataUtil.getNameFromDataDict(DictCode.投管业务类型, getPaBussType());
 		}
+		if(StringUtils.isEmpty(paBussTypeName)||Objects.equal(paBussTypeName,getPaBussType())){
+			paBussTypeName = SysDataUtil.getNameFromDataDict(DictCode.平安业务类型, getPaBussType());
+		}
+
+		return paBussTypeName;
 	}
 
 	@Override

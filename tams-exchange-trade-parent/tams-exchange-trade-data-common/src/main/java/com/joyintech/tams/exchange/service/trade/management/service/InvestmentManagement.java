@@ -648,7 +648,8 @@ public class InvestmentManagement extends BaseService {
                     instrument = instrumentService.findById(finprodMarketId);
                 }
             }
-            if (ObjectUtil.isNull(instrument)) {
+
+            if (!EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg()) && ObjectUtil.isNull(instrument)) {
                 logger.warn("获取合约信息失败，无法填充最小价差等交易属性信息 => 【instructionId = {}, finprodMarketId = {}】", instruction.getEntrustId(), finprodMarketId);
                 continue;
             }
@@ -657,7 +658,7 @@ public class InvestmentManagement extends BaseService {
             MinTrdUnitLimit minTrdUnitLimit = minTrdUnitLimitService.getMinTrdUnitLimit(instruction, instrument);
 
             minPriceAndMinTrdUnitLimitBean = new MinPriceAndMinTrdUnitLimitBean(finprodMarketId, ErrorCode.SUCCESS.value, ErrorCode.SUCCESS.errorMsg);
-            minPriceAndMinTrdUnitLimitBean.setIsFullPrice(instrument.getIsFullPrice());
+            minPriceAndMinTrdUnitLimitBean.setIsFullPrice(instrument == null ? null : instrument.getIsFullPrice());
             // 特殊处理新债和质押式回购,将多条数据同时塞入
             if (ObjectUtil.isNull(minPrice)) {
                 String tradeMarket = instruction.getTradeMarket();
@@ -699,7 +700,7 @@ public class InvestmentManagement extends BaseService {
                 minPriceAndMinTrdUnitLimitBean.setMinTrdUnitLimitList(ListUtil.of(minTrdUnitLimit));
             }
 
-            minPriceAndMinTrdUnitLimitBean.setSubStockType(instrument.getSubStockType());
+            minPriceAndMinTrdUnitLimitBean.setSubStockType(instrument == null ? null : instrument.getSubStockType());
 
             logger.info("填充最小价差等交易属性信息 => 【minPriceAndMinTrdUnitLimitBean = {}】", minPriceAndMinTrdUnitLimitBean);
             if (CollectionUtils.isNotEmpty(minPriceAndMinTrdUnitLimitBean.getMinPriceList())

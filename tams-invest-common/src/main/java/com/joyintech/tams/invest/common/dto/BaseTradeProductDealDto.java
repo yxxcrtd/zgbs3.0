@@ -225,6 +225,11 @@ public class BaseTradeProductDealDto {
      */
     private String stage;
 
+    /**
+     * 清算速度是否为T+1
+     */
+    private boolean isSpeed1;
+
     public Date getExRightsDate() {
         return exRightsDate;
     }
@@ -719,5 +724,13 @@ public class BaseTradeProductDealDto {
 
     public void setStage(String stage) {
         this.stage = stage;
+    }
+
+    public boolean isSpeed1() {
+        return isSpeed1;
+    }
+
+    public void setSpeed1(boolean speed1) {
+        isSpeed1 = speed1;
     }
 }

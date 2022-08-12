@@ -51,7 +51,7 @@
 		T1.BUY_COST_AMT,
 		T1.BUY_CLEAN_PRICE,
 		<!-- T1.MARKET_VALUE, -->
-		NVL(T1.dsc_cost_amt_b,0) + NVL(T1.tdy_float_ingpl_b,0)+NVL(T1.DELAY_PAY_AMT,0) MARKET_VALUE,
+		NVL(T1.dsc_cost_amt_b,0) + NVL(T1.tdy_float_ingpl_b,0)+NVL(T1.DELAY_PAY_AMT,0)+nvl(T1.TDY_LOSS_AMT,0) MARKET_VALUE,
 		T1.MARKET_CLEAN_PRICE,
 		T1.TDY_INTINCEXP,
 		T1.TDY_DSCINCEXP_ADD,
@@ -159,7 +159,7 @@
 		      ( select
 		          max(val_date) val_date
 		        from RSK_VALTBL_ASSET_SUB
-		        where LENGTH(T1.SUB_CODE) &gt; 8  
+		        where LENGTH(T1.SUB_CODE) &gt; 8
 		          and PTL_ID = #{portfolioId,jdbcType=VARCHAR}
 		          <![CDATA[and VAL_DATE <=  TO_DATE(#{cdate},'YYYY-MM-DD')]]>
 		        )
@@ -182,10 +182,10 @@
 		<if test="cdate != null and cdate != ''">
 			<!-- TISHKBS-621 【批处理-估值穿透逻辑问题】目前系统跑批逻辑为只能取导入底层估值日的数据，期望，跑批日无底层数据时，取跑批日前最新的底层数据 modify by lizhi 20200629 start -->
 			<!-- AND VAL_DATE = TO_DATE(#{cdate},'YYYY-MM-DD') -->
-			AND VAL_DATE = 
+			AND VAL_DATE =
 		      ( select
 		          max(val_date) val_date
-		        from RSK_VALTBL_SUM_ASSET_SUB 
+		        from RSK_VALTBL_SUM_ASSET_SUB
 		        where PTL_ID = #{portfolioId,jdbcType=VARCHAR}
 		          <![CDATA[and VAL_DATE <=  TO_DATE(#{cdate},'YYYY-MM-DD')]]>
 		        )

@@ -4,7 +4,6 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.exchange.common.bean.EntrustQueryBean;
 import com.joyintech.tams.exchange.common.bean.TradeQryBean;
 import com.joyintech.tams.exchange.common.bean.TradeQueryBean;
@@ -15,6 +14,7 @@ import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.db.domain.TradeExample;
 import com.joyintech.tams.exchange.common.request.PageMode;
 import com.joyintech.tams.exchange.common.request.PageTradeInfoRequest;
+import com.joyintech.tams.exchange.common.utils.AgentServerUtil;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.datacommon.cache.impl.AsyncServiceImpl;
 import com.joyintech.tams.exchange.datacommon.db.dao.IMybatisMapper;
@@ -92,7 +92,7 @@ public class TradeServiceImpl extends AsyncServiceImpl<String, Trade> implements
                 tradeQueryBean.setEntrustBs(entrust.getEntrustBs());
                 tradeQueryBean.setStockName(entrust.getStockName());
             }
-            if("EX005".equals(tradeQueryBean.getBusiTypeTg())){
+            if ("EX005".equals(tradeQueryBean.getBusiTypeTg())) {
                 tradeQueryBean.setTradedPrice(tradeQueryBean.getTradedPrice().multiply(BigDecimal.valueOf(100)));
             }
 
@@ -121,10 +121,10 @@ public class TradeServiceImpl extends AsyncServiceImpl<String, Trade> implements
     }
 
     @Override
-    public Trade queryTradeByAccountIdAndBrokerTradeId(String accountId, String brokerTradeId) {
+    public Trade queryTradeByAccountIdAndBrokerTradeId(String accountId, String key) {
         Map<String, Trade> map = accountIdMap.get(accountId);
         if (Objects.nonNull(map)) {
-            return map.get(DateUtil.getSysDate().replace("-", "") + "_" + brokerTradeId);
+            return map.get(key);
         }
         return null;
     }
@@ -168,7 +168,7 @@ public class TradeServiceImpl extends AsyncServiceImpl<String, Trade> implements
             if (InvestAssetTypeEnum.isFutures(tradeHistory.getAssetType())) {
                 tradeHistory.setStockCode(StockCodeUtils.getStockCode(tradeHistory.getStockCode()));
             }
-            if("EX005".equals(tradeHistory.getBusiTypeTg())){
+            if ("EX005".equals(tradeHistory.getBusiTypeTg())) {
                 tradeHistory.setTradedPrice(tradeHistory.getTradedPrice().multiply(BigDecimal.valueOf(100)));
             }
         });
@@ -230,7 +230,9 @@ public class TradeServiceImpl extends AsyncServiceImpl<String, Trade> implements
             accountMap = new ConcurrentHashMap<>();
             accountIdMap.put(trade.getAccountId(), accountMap);
         }
-        accountMap.put(trade.getTradingDay() + "_" + trade.getBrokerTradeId(), trade);
+        //撤单、废单成交无需去重。 支持重复处理
+        String key = AgentServerUtil.GetTradeCacheKey(trade.KeyType, trade.getAccountId(), trade.getBrokerEntrustId()+ "_" + trade.getBrokerTradeId());
+        accountMap.put(key, trade);
     }
 
     @Override
@@ -258,7 +260,8 @@ public class TradeServiceImpl extends AsyncServiceImpl<String, Trade> implements
             Map<String, Trade> map1 = instructionIdMap.get(trade.getInstructionId());
             if (Objects.nonNull(map1)) map1.remove(trade.getId());
         }
-        accountIdMap.get(trade.getAccountId()).remove(trade.getTradingDay() + "_" + trade.getBrokerTradeId());
+        String key = AgentServerUtil.GetTradeCacheKey(trade.KeyType, trade.getAccountId(), trade.getBrokerEntrustId()+ "_" + trade.getBrokerTradeId());
+        accountIdMap.get(trade.getAccountId()).remove(key);
     }
 
     @Override

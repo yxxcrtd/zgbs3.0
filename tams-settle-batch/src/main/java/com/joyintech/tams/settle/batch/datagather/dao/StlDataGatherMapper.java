@@ -35,7 +35,7 @@ public interface StlDataGatherMapper {
 
     /**
      * 获取投管交易编号
-     * @param 查询参数
+     * @param paraMap 查询参数
      * @return 投管交易编号
      */
     List<String> selectTradeIdTgs(Map<String, Object> paraMap);
@@ -233,7 +233,7 @@ public interface StlDataGatherMapper {
 
     String selectCqBtradeId(@Param("secAcctId") String secAcctId, @Param("finprodId") String finprodId,@Param("dealDate") Date dealDate);
 
-    List<SettleTransDataTotalPledge> selectSettleTransDataTotalPledge(String seqId);
+    List<SettleTransDataTotalPledge> selectSettleTransDataTotalPledge(String seqId, String direction);
 
     // modify by etliu 20211227 start
     // GZYHTZJY-777:回售交易当日无法得到成交的清算数据，导致无法匹配到对应的上行委托或指令
@@ -271,10 +271,18 @@ public interface StlDataGatherMapper {
     /**
      * 查询指令质押券信息
      * @param entrustId
-     * @param finProdId
+     * @param displaceDir 置换方向
      * @return
      */
-    List<EtrPledge> selectEtrPledges(@Param("entrustId")String entrustId, @Param("finProdId")String finProdId);
+    List<EtrPledge> selectEtrPledges(@Param("entrustId")String entrustId, @Param("displaceDir") String displaceDir);
+
+    /**
+     * 查询清算质押券信息
+     * @param tradeId
+     * @param displaceDir 置换方向
+     * @return
+     */
+    List<SettleTransDataTotalPledge> selectSettleTansTotalPledges(@Param("tradeId")String tradeId, @Param("displaceDir") String displaceDir);
 
     int selectDzcjList(Map<String, Object> searchParam);
     /**
@@ -305,5 +313,4 @@ public interface StlDataGatherMapper {
      */
     List<SettleTransDataDto> selectBondFirstBiddingData(Map<String, Object> searchParam);
 
-    List<String> selectBidEntrustIds(Map<String, Object> searchParam);
 }

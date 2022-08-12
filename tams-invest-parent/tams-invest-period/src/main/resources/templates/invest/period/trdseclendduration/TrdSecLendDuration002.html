@@ -306,6 +306,18 @@
                                                 th:initValue="${entity?.invAim}"></select>
                                     </div>
                                 </div>
+                                <!--add by jiangpeng on 20210420 start BS-1593 【债券借贷交易存续期】：缺少资金到账日-->
+                                <div class="form-inline-wrap">
+                                    <label class="layui-form-label form-label-wrap"
+                                           th:text="#{TrdSecLendDuration002.settleDate}">资金到账日</label>
+                                    <div class="layui-input-inline input-inline">
+                                        <input required type="text" id="settleDate" name="settleDate"
+                                               class="layui-input form-input input-dateSelect" placeholder="请输入内容"
+                                               data-th-placeholder="#{SysCommon.placeholder}"
+                                               data-th-value="${#dates.format(entity?.settleDate,'yyyy-MM-dd')}" />
+                                    </div>
+                                </div>
+                                <!--add by jiangpeng on 20210420 end BS-1593 【债券借贷交易存续期】：缺少资金到账日-->
                             </div>
                         </div>
                     </div>

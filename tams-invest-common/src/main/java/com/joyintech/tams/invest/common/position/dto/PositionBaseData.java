@@ -4,6 +4,8 @@ import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.common.base.entity.FinDealPledge;
 
+import java.util.List;
+
 public class PositionBaseData extends BaseEntity {
 
     /**
@@ -25,8 +27,8 @@ public class PositionBaseData extends BaseEntity {
      * 质押券信息
      * @return
      */
-    private FinDealPledge finDealPledge;
-
+    // private FinDealPledge finDealPledge;
+    private List<FinDealPledge> finDealPledgeList;
     public FinTradeProductDto getFinTradeProductDto() {
         return finTradeProductDto;
     }
@@ -51,11 +53,19 @@ public class PositionBaseData extends BaseEntity {
         this.etrEntrustAddDto = etrEntrustAddDto;
     }
 
-    public FinDealPledge getFinDealPledge() {
-        return finDealPledge;
+//    public FinDealPledge getFinDealPledge() {
+//        return finDealPledge;
+//    }
+//
+//    public void setFinDealPledge(FinDealPledge finDealPledge) {
+//        this.finDealPledge = finDealPledge;
+//    }
+
+    public List<FinDealPledge> getFinDealPledgeList() {
+        return finDealPledgeList;
     }
 
-    public void setFinDealPledge(FinDealPledge finDealPledge) {
-        this.finDealPledge = finDealPledge;
+    public void setFinDealPledgeList(List<FinDealPledge> finDealPledgeList) {
+        this.finDealPledgeList = finDealPledgeList;
     }
 }

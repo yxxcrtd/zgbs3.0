@@ -19,10 +19,7 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.jdbc.enums.DataSourceType;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.select.SuggestDto;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.ExportUtil;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.exportpdf.service.CommonExportPdfService;
@@ -234,7 +231,7 @@ public class TrdInvestDealQuery001Service extends CommonExportService<TrdInvestD
         pageParam.put("IRSType_01", DictCodeListExt2.互换方式_收取固定.getValue());
         pageParam.put("IRSType_02", DictCodeListExt2.互换方式_收取浮动.getValue());
         //add by wangpeng end
-        //add by wangpeng 201909019 外汇 利率互换 页面查询交易方向为真实交易方向  
+        //add by wangpeng 201909019 外汇 利率互换 页面查询交易方向为真实交易方向
         pageParam.put("finType_F11", DictCodeListExt1.金融产品类型_投管用_即期.getValue());
         pageParam.put("finType_F12", DictCodeListExt1.金融产品类型_投管用_远期.getValue());
         pageParam.put("finType_F13", DictCodeListExt1.金融产品类型_投管用_掉期.getValue());
@@ -338,6 +335,16 @@ public class TrdInvestDealQuery001Service extends CommonExportService<TrdInvestD
                         || DictCodeList.平安资产类型_买断式回购.getValue().equals(finprodType2)) {
                     // 回购利率
                     dto.setRate(dto.getUnitInt());
+                    //XYHGFXSJ-933 【交易查询】协议回购深交所正回购提前购回，交易查询中的交易价格 显示错误，利率为空。 期望：交易价格 应为空，利率为5.000%
+                    if (StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_投资端_提前终止.getValue()) ||
+                            StringUtil.equals(dto.getPs(), DictCodeList.交易方向_到期.getValue())
+                            || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_到期续做.getValue())) {
+                        if (null != dto.getTradePrice()) {
+                            dto.setRate(ArithmeticUtil.multiply(dto.getTradePrice(), BigDecimal.valueOf(100)));
+                            dto.setTradePrice(null);
+                        }
+                    }
+                    //XYHGFXSJ-933 【交易查询】协议回购深交所正回购提前购回，交易查询中的交易价格 显示错误，利率为空。 期望：交易价格 应为空，利率为5.000%
                 } else if (DictCodeList.平安资产类型_债券.getValue().equals(finprodType2)) {
                     // 到期收益率或行权收益率
                     BigDecimal yield = dto.getYield();
@@ -346,6 +353,9 @@ public class TrdInvestDealQuery001Service extends CommonExportService<TrdInvestD
                     } else {
                         dto.setRate(dto.getExerYield());
                     }
+                } else if (DictCodeListExt2.平安资产类型_债券借贷.getValue().equals(finprodType2)) {
+                    // 费率
+                    dto.setRate(dto.getYield());
                 }
                 // add by caozhenming 20210730 end
 
@@ -354,11 +364,12 @@ public class TrdInvestDealQuery001Service extends CommonExportService<TrdInvestD
                     dto.setfTradeId(null);
                 }
 
+                //XYHGFXSJ-957 【实时资产、资金头寸查询】【交易查询】协议回购深交所正回购中途换券-换钱，日终成交匹配后，问题如下：
                 if (StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())
-                        && Objects.nonNull(dto.getTradeAmt())) {
+                        && Objects.nonNull(dto.getTradeAmt()) && !StringUtil.equals(dto.getEntrustType(), DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令_换钱.getValue())) {
                     dto.setTradeAmt(dto.getTradeAmt().multiply(BigDecimal.valueOf(100)));
                 }
-
+                //XYHGFXSJ-957 【实时资产、资金头寸查询】【交易查询】协议回购深交所正回购中途换券-换钱，日终成交匹配后，问题如下：
             }
         }
         return returnList;

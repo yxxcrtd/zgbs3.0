@@ -610,10 +610,11 @@ public class AutoPeriodCommonService extends BaseService {
                 TrdProductTempDeal tempDeal = new TrdProductTempDeal();
                 BeanUtil.copyPropertiesIgnoreNull(tempDeal,trdProductDeal);
                 if(StringUtil.isNotEmpty(tempDeal.getFinprodType2())) {
-                    if (StringUtil.equals(tempDeal.getFinprodType2(), "F01")) {
+                    if (StringUtil.equals(tempDeal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券.getValue())) {
                         tempDeal.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
-                    } else if (StringUtil.equals(tempDeal.getFinprodType2(), "F02") || StringUtil.equals(tempDeal.getFinprodType2(), "F03")) {
-                        tempDeal.setBusiType("TRD16");
+                    } else if (StringUtil.equals(tempDeal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())
+                            || StringUtil.equals(tempDeal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue())) {
+                        tempDeal.setBusiType(DictCodeList.共通业务类型_质押式回购存续期.getValue());
                     }
                 }
                 trdProductTempDealMapper.insert(tempDeal);
@@ -815,7 +816,7 @@ public class AutoPeriodCommonService extends BaseService {
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("busiType", busiType);
         paramMap.put("finProdType2", finProdType2);
-        paramMap.put("updateUser", "system");
+//        paramMap.put("updateUser", "system");
         paramMap.put("batchDate", batchDate);
         paramMap.put("tradeMarket",tradeMarket);
 

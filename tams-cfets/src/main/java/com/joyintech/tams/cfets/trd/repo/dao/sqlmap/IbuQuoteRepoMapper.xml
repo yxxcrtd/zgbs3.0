@@ -152,14 +152,15 @@
                 , NVL(ETR_ENTRUST.ENTRUST_AMT, 0)
                 <if test="isInit ==null or isInit == ''">
                     , NVL(ETR_ENTRUST.ENTRUST_AMT, 0)
-                    - NVL(T5.FINISH_AMT,0) - NVL(T7.ENT_FINISH_AMT,0)                                         avaNum/*剩余指令额度(元)*/
+                    - NVL(T5.FINISH_AMT,0) - NVL(T7.ENT_FINISH_AMT,0) - NVL(ETR_ENTRUST_ADD.CLOSE_AMT,0)      avaNum/*剩余指令额度(元)*/
                 </if>
                 <if test="isInit !=null and isInit != ''">
                     , NVL(ETR_ENTRUST.ENTRUST_AMT, 0)- NVL(ETR_ENTRUST_ADD.FORCED_FINISH_AMT,0)
-                    - NVL(T5.FINISH_AMT,0) - NVL(T7.ENT_FINISH_AMT,0)                                         avaNum/*剩余指令额度(元)*/
+                    - NVL(T5.FINISH_AMT,0) - NVL(T7.ENT_FINISH_AMT,0) - NVL(ETR_ENTRUST_ADD.CLOSE_AMT,0)      avaNum/*剩余指令额度(元)*/
                 </if>
                 , ROUND(NVL(C2.totalShareAmt,0))                                                              finishDealAmt/*已成交额度(元)*/
-                , ROUND(NVL(ETR_ENTRUST.ENTRUST_AMT, 0) - NVL(C2.totalShareAmt,0))                            avaDealAmt/*剩余成交额度(元)*/
+                , ROUND(NVL(ETR_ENTRUST.ENTRUST_AMT, 0) - NVL(C2.totalShareAmt,0) - NVL(ETR_ENTRUST_ADD.CLOSE_AMT,0))
+                                                                                                              avaDealAmt/*剩余成交额度(元)*/
                 , trunc(nvl(NVL(T5.FINISH_AMT, 0)+
                                        NVL(T7.ENT_FINISH_AMT, 0),0)/(ETR_ENTRUST.ENTRUST_AMT),4)*100          transactioncom/*执行进度(%)*/
                 , trunc(NVL(C2.totalShareAmt,0)/(ETR_ENTRUST.ENTRUST_AMT),4)*100                              tradeFinishPercent/* 成交进度(%)*/
@@ -1468,13 +1469,14 @@
     </select>
 
     <select id="findEtrLastNumByEtrId" resultType="com.joyintech.tams.cfets.trd.repo.dto.CfetsRepoDealEntrustOrderDto">
-        select sum(T.ENTRUST_AMT) avaNum ,IPAR.PARTY_ID,T.REPO_TERM,T.SETTLE_SPREED
+        select sum(T.ENTRUST_AMT) avaNum ,IPAR.PARTY_ID,T.REPO_TERM,T.SETTLE_SPREED,T.CLOSE_AMT
         from (
                  select nvl(ee.ENTRUST_AMT - nvl(eea.FORCED_FINISH_AMT, 0) - nvl(rfpd.ENTRUST_AMT, 0) - nvl(wrfpd.TRADE_AMT, 0) - nvl(IBQER.ENTRUST_AMT, 0) -
-                       nvl(wiqer.FPRICE_AMT, 0),0) ENTRUST_AMT,
+                       nvl(wiqer.FPRICE_AMT, 0) - nvl(eea.CLOSE_AMT, 0),0) ENTRUST_AMT,
                        ee.PORTFOLIO_ID,
                        eea.TERM_DAYS            REPO_TERM,
-                       eea.SETTLE_SPREED        SETTLE_SPREED
+                       eea.SETTLE_SPREED        SETTLE_SPREED,
+                       eea.CLOSE_AMT
                 from ETR_ENTRUST ee
                  left join ETR_ENTRUST_ADD eea on ee.ENTRUST_ID = eea.ENTRUST_ID
                  left join (select t.TRADE_AMT ENTRUST_AMT, t.ENTRUST_ID
@@ -1501,7 +1503,7 @@
              ) T
             LEFT JOIN IBU_PORTFOLIO_ACCT_RELA IPAR
                 ON T.PORTFOLIO_ID = IPAR.PORTFOLIO_ID AND IPAR.CFETS_ACCT_TYPE = '01'
-            group by IPAR.PARTY_ID,T.REPO_TERM,T.SETTLE_SPREED
+            group by IPAR.PARTY_ID,T.REPO_TERM,T.SETTLE_SPREED,T.CLOSE_AMT
     </select>
 
     <!--查询产品质押债券 证券账户-->
@@ -2579,7 +2581,7 @@
             deal.ENTRUST_ID entrustId/*指令代码*/,
             deal.PORTFOLIO_ID portfolioId/*组合代码*/,
             pp.PORTFOLIO_NAME portfolioName/*组合名称*/,
-            ROUND((ee.ENTRUST_AMT) - NVL(T5.FINISH_AMT, 0) - NVL(T6.ENT_FINISH_AMT, 0) )  avaNum/*剩余指令额度*/,
+            ROUND((ee.ENTRUST_AMT) - NVL(T5.FINISH_AMT, 0) - NVL(T6.ENT_FINISH_AMT, 0) -nvl(eea.CLOSE_AMT, 0) )  avaNum/*剩余指令额度*/,
             null avaNumold/*剩余指令额度*/,
             deal.TRADE_AMT tradeAmt/*交易金额*/,
             fee1.FEE_AMT dealFeeAmt/*交易手续费*/,
@@ -2594,6 +2596,7 @@
             <include refid="sql_ProductDeal"></include>
         ) deal
         left join ETR_ENTRUST ee on ee.ENTRUST_ID = deal.ENTRUST_ID
+        left join ETR_ENTRUST_ADD eea on ee.ENTRUST_ID = eea.ENTRUST_ID
         left join (<include refid="sql_Fee"></include>) fee1
             on deal.TRADE_ID = fee1.TRADE_ID and fee1.FEE_TYPE = 'B06' /*交易手续费*/
         left join (<include refid="sql_Fee"></include>) fee2
@@ -2909,7 +2912,7 @@
     </select>
 
     <select id="selectFinshAmt" resultType="java.math.BigDecimal">
-        select nvl(sum(decode(deal.ps,#{PS_T01},deal.trade_amt,deal.share_amt)),0) as finishAmt
+        select nvl(sum(decode('01',#{sumTradeFlag},deal.trade_amt,deal.share_amt)),0) as finishAmt
         from trd_product_deal deal
         inner join trd_product_deal_add ad
         on deal.trade_id = ad.trade_id

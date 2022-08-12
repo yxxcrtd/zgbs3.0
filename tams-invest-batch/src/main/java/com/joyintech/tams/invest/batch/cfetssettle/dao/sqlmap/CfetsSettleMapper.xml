@@ -102,6 +102,13 @@
 		<if test="tradePlat_01 != null and tradePlat_01 != '' and tradePlat_02 != null and tradePlat_02 != ''">
 			AND ( T1.TRADE_MARKET in( #{tradePlat_01},#{tradePlat_02} ) or T1.TRADE_MARKET is null )
 		</if>
+		<if test="notAssetType != null and notAssetType.size()>0">
+			AND T1.FINPROD_TYPE2 not IN (
+			<foreach item="item" index="index" collection="notAssetType" separator=",">
+				#{item}
+			</foreach>
+			)
+		</if>
 		union all
 		SELECT
 			T1.TOTLE_TRADE_ID totalTradeId,
@@ -171,6 +178,13 @@
 		and sdpm.status is null
 		<if test="tradePlat_01 != null and tradePlat_01 != '' and tradePlat_02 != null and tradePlat_02 != ''">
 			AND ( T1.TRADE_MARKET in( #{tradePlat_01},#{tradePlat_02} ) or T1.TRADE_MARKET is null )
+		</if>
+		<if test="notAssetType != null and notAssetType.size()>0">
+			AND T1.FINPROD_TYPE2 not IN (
+			<foreach item="item" index="index" collection="notAssetType" separator=",">
+				#{item}
+			</foreach>
+			)
 		</if>
 	</select>
 

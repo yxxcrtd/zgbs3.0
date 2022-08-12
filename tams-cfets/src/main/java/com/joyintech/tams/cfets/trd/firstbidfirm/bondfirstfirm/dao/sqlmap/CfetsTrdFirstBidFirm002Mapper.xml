@@ -591,4 +591,8 @@
                  select WIN_PRIN_AMT from WFL_BID_ORDER where FINPROD_ID = #{finprodId,jdbcType=VARCHAR} and BID_MODLE = #{WIN_TYPE_01,jdbcType=VARCHAR}
              )
     </select>
+
+    <select id="selectAcctNoByEntrustDetail" resultType="java.lang.String">
+        select ACCT_NO from ETR_ENTRUST_DETAIL where ENTRUST_ID = #{entrustId} and PORTFOLIO_ID = #{portfolioId} and ROWNUM = 1
+    </select>
 </mapper>

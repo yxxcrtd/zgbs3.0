@@ -1652,7 +1652,7 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
 
 
     //20210922 从DictCodeList迁移过来  by yflv start
-    共通业务类型_资产要素信息维护(DictCode.共通业务类型,"MST26","资产要素信息维护"),
+    共通业务类型_资产要素信息维护(DictCode.共通业务类型,"MST40","资产要素信息维护"),
 	共通业务类型_资产基本信息维护(DictCode.共通业务类型,"SVR01","资产基本信息维护"),
     项目类计提区间倒减方式_倒减科目余额(DictCode.项目类计提区间倒减方式,"01","倒减科目余额"),
 	项目类计提区间倒减方式_倒减前一日计算结果(DictCode.项目类计提区间倒减方式,"02","倒减前一日计算结果"),
@@ -1955,7 +1955,7 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
     投管业务类型_信用保护凭证(DictCode.投管业务类型,"EX019","信用保护凭证"),
 
     共通业务类型_利率互换交易(DictCode.共通业务类型,"TRD53","利率互换交易"),
-	
+
 	场内多组合分配方式_单笔数量(DictCode.场内多组合分配方式,"01","单笔数量"),
     场内多组合分配方式_单笔金额(DictCode.场内多组合分配方式,"02","单笔金额"),
     场内多组合分配方式_总数量(DictCode.场内多组合分配方式,"03","总数量"),

@@ -165,6 +165,8 @@ public interface EntrustMsgbyMQMapper {
 
     FinDealPledge selectFinDealPledgeByPrimaryKey(FinDealPledgeKey finDealPledgeKey);
 
+    List<FinDealPledge> selectFinDealPledges(FinDealPledgeKey finDealPledgeKey);
+
     FinProductOthCode selectFinProductOthCode(Map<String, Object> map);
 
     String selectPledgeId(String getvTradeId);
@@ -179,5 +181,15 @@ public interface EntrustMsgbyMQMapper {
      * @return
      */
     List<OriPledgeInfo> getOriFinDealPledgeList(@Param("tradeId") String tradeId);
+
+    /**
+     * 根据委托代码查询交易员
+     *
+     * @param entrustId 委托代码
+     * @return 交易员
+     * @see
+     * @since 1.0
+     */
+    String queryTradeIdForTInstruction(Map<String,Object>param);
 
 }

@@ -39,8 +39,8 @@
                  ON PTLACCT.PORTFOLIO_ID = PTL.PORTFOLIO_ID
                 AND PTLACCT.ACCT_NO = PTL.ACCT_ID
 				LEFT JOIN PTL_PORTFOLIO PP ON PP.PORTFOLIO_ID = PTL.PORTFOLIO_ID
-				LEFT JOIN FIN_PRODUCT_ADD 
-				ON FIN_PRODUCT_ADD.PORTFOLIO_ID = PTL.PORTFOLIO_ID	 
+				LEFT JOIN FIN_PRODUCT_ADD
+				ON FIN_PRODUCT_ADD.PORTFOLIO_ID = PTL.PORTFOLIO_ID
 	            LEFT JOIN FIN_PRODUCT FP
                 ON FP.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
   				left join MST_CUSTOMER_INFO mci on FP.TRUSTEE_ID = mci.CUSTOMER_ID
@@ -58,7 +58,7 @@
    AND PTL.CCY = FLOW.CCY
    AND PTL.HODING_TYPE = FLOW.HODING_TYPE
    LEFT JOIN FIN_PRODUCT_ADD
-   ON FIN_PRODUCT_ADD.PORTFOLIO_ID = PTL.PORTFOLIO_ID	 
+   ON FIN_PRODUCT_ADD.PORTFOLIO_ID = PTL.PORTFOLIO_ID
    LEFT JOIN FIN_PRODUCT FP
    ON FP.FINPROD_ID = FIN_PRODUCT_ADD.FINPROD_ID
    <include refid="sqlwhere"></include>
@@ -71,7 +71,7 @@
 		null CDATE,
 		'' PORTFOLIO_ID,
 		'' ACCTID,
-		temp.ccy CCY,
+		MM.ccy CCY,
 		'' HODINGTYPE,
 		'' ACCTTYPE,
 		'' PORTFOLIONAME,
@@ -82,13 +82,29 @@
 		decode(SUM(quotaIn),null,0,SUM(quotaIn)) quotaIn,
 		decode(SUM(quotaOut),null,0,SUM(quotaOut)) quotaOut,
 		'01' isSummary
-		from temp
+		from
+		<!-- wsz XYHGFXSJ-1031 查询每个分组最大的日期 金额累计 -->
+			(SELECT
+				TT.*
+			FROM
+				(
+				SELECT
+					ROW_NUMBER ( ) OVER ( PARTITION BY temp.PORTFOLIO_ID, temp.ACCTID,
+						temp.CCY, temp.HODINGTYPE, temp.ACCTNAME ORDER BY temp.CDATE DESC
+					) rn,
+					temp.*
+				FROM
+					temp
+				) TT
+			WHERE
+			TT.rn = 1)  MM
+		<!-- wsz XYHGFXSJ-1031 查询每个分组最大的日期 金额累计 -->
 		<where>
 			<if test='quota != null and quota == "Y"'>
-				temp.AMOUNT1 != 0
+				MM.AMOUNT1 != 0
 			</if>
 		</where>
-		group by ccy
+		group by MM.ccy
 	</if>
 	)T1
 	<where>
@@ -147,7 +163,7 @@
    </where>
 </sql>
 	<select id="selectForHasChildren" resultType="java.lang.Integer">
-		select count(*) from 
+		select count(*) from
 			PTL_CASH_POSITION_FLOW A
 			inner join PTL_CASH_POSITION D
 			on A.PORTFOLIO_ID = D.PORTFOLIO_ID
@@ -163,20 +179,20 @@
 			and A.HODING_TYPE = #{hodingType}
 			and A.ACCT_ID = #{acctId}
 	</select>
-	
+
 <!-- 头寸明细查询 -->
 <select id="select1" resultType="com.joyintech.service.portfolio.ptlfundacctposi.dto.PtlFundAcctPosiDto">
     select * from (with temp as (
 	select A.*,'02' isSummary from (
-	
+
 	select * from (
 	SELECT DISTINCT A.CDATE             CDATE,
 	A.PORTFOLIO_ID      PORTFOLIOID,
 	A.CCY               CCY,
 	B.TRADE_ID          BUSINO,
 	<!-- update by xr for tishkbs-648 流水表未存分层信息，交易表金额不带正负，start-->
-	case when A.AMOUNT >=0 then  NVL(C.Trade_Amt*1,A.AMOUNT)
-	else NVL(C.Trade_Amt*-1,A.AMOUNT) end as AMOUNT,
+	case when A.AMOUNT >=0 then  NVL(A.AMOUNT,C.Trade_Amt*1)
+	else NVL(A.AMOUNT,C.Trade_Amt*-1) end as AMOUNT,
 	<!-- update by xr for tishkbs-648 流水表未存分层信息，交易表金额不带正负，end-->
 	F.PORTFOLIO_NAME    PORTFOLIONAME,
 	nvl(D.FINPROD_MARKET_ID,D1.FINPROD_MARKET_ID) FINPRODMARKETID,
@@ -187,7 +203,8 @@
 	PA.PA_BUSS_TYPE) BUSITYPE*/
 	NVL(SYS1.ITEM_VALUE,SYS3.ITEM_VALUE) BUSITYPE,
 	<!--NVL(SYS2.ITEM_VALUE,SYS4.ITEM_VALUE) ps-->
-	NVL(SYS5.ITEM_VALUE,NVL(SYS2.ITEM_VALUE,SYS4.ITEM_VALUE)) ps
+	<!--NVL(SYS5.ITEM_VALUE,NVL(SYS2.ITEM_VALUE,SYS4.ITEM_VALUE)) ps-->
+	NVL(SYS2.ITEM_VALUE,NVL(SYS5.ITEM_VALUE,SYS4.ITEM_VALUE)) ps
 	FROM PTL_CASH_POSITION_FLOW A
 	LEFT JOIN (
 		select orders.ORDER_ID,rfpd.TRADE_ID from STL_PAY_ORDERS orders
@@ -209,8 +226,17 @@
 	<!-- B.PORTFOLIO_ID = A.PORTFOLIO_ID AND  -->
 	(B.ORDER_ID = A.ORDER_ID OR orders.ORDER_ID = B.ORDER_ID)
 	LEFT JOIN TRD_FIN_PRODUCT_DEAL_TOTAL TTOTAL ON  B.TRADE_ID = TTOTAL.TOTLE_TRADE_ID
-	LEFT JOIN (SELECT FINPROD_TYPE2,TRADE_ID,TOTLE_TRADE_ID,TRADE_STATUS,FINPROD_ID,PS,TRADE_AMT FROM TRD_PRODUCT_DEAL
-			UNION ALL SELECT FINPROD_TYPE2,TRADE_ID,TOTLE_TRADE_ID,TRADE_STATUS,FINPROD_ID,PS,TRADE_AMT  FROM TRD_PRODUCT_TEMP_DEAL ) C
+	/**LEFT JOIN (SELECT FINPROD_TYPE2,TRADE_ID,TOTLE_TRADE_ID,TRADE_STATUS,FINPROD_ID,PS,TRADE_AMT FROM TRD_PRODUCT_DEAL
+			UNION ALL SELECT FINPROD_TYPE2,TRADE_ID,TOTLE_TRADE_ID,TRADE_STATUS,FINPROD_ID,PS,TRADE_AMT  FROM TRD_PRODUCT_TEMP_DEAL ) C**/
+	LEFT JOIN (SELECT NVL(EE.FINPROD_TYPE2,T.FINPROD_TYPE2) FINPROD_TYPE2,T.TRADE_ID,T.TOTLE_TRADE_ID,T.TRADE_STATUS,T.FINPROD_ID,NVL(EE.PS,T.PS) PS,T.TRADE_AMT
+	FROM TRD_PRODUCT_DEAL T
+	left join TRD_PRODUCT_DEAL_ADD TA on TA.TRADE_ID = T.TRADE_ID
+	left join ETR_ENTRUST EE ON EE.ENTRUST_ID = TA.ENTRUST_ID
+	UNION ALL
+	SELECT NVL(EE.FINPROD_TYPE2,F.FINPROD_TYPE2) FINPROD_TYPE2,F.TRADE_ID,F.TOTLE_TRADE_ID,F.TRADE_STATUS,F.FINPROD_ID,NVL(EE.PS,F.PS) PS,F.TRADE_AMT
+	FROM TRD_PRODUCT_TEMP_DEAL F
+	left join TRD_PRODUCT_DEAL_ADD FA on FA.TRADE_ID = F.TRADE_ID
+	left join ETR_ENTRUST EE ON EE.ENTRUST_ID = FA.ENTRUST_ID) C
 	<!-- modify by wj 20200423 组合资金账户头寸查询，点击明细页面没有记录 -->
 	<!-- ON B.TRADE_ID = C.TOTLE_TRADE_ID,C.TRADE_ID   -->
 	ON ( C.FINPROD_TYPE2 IN ('F02','F03','F04','F05','F08','F09') AND B.TRADE_ID = C.TRADE_ID )
@@ -275,7 +301,7 @@
 	null              FINPRODABBR,
 	/*pa.PA_BUSS_TYPE              BUSITYPE*/
 	SYS1.ITEM_VALUE  BUSITYPE,
-	NVL(SYS3.ITEM_VALUE,SYS2.ITEM_VALUE) ps
+	NVL(SYS4.ITEM_VALUE,NVL(SYS3.ITEM_VALUE,SYS2.ITEM_VALUE)) ps
 	FROM PTL_CASH_POSITION_FLOW A
 	INNER JOIN stl_dvp_orders B
 	ON B.ORDER_ID = A.ORDER_ID
@@ -283,6 +309,10 @@
 	ON B.ORDER_ID = SDTM.ORDER_ID
 	LEFT JOIN TRD_PRODUCT_DEAL T
 	ON T.TRADE_ID = SDTM.TRADE_ID
+	LEFT JOIN TRD_PRODUCT_DEAL_ADD TA
+	ON TA.TRADE_ID = T.TRADE_ID
+	LEFT JOIN ETR_ENTRUST EE
+	ON EE.ENTRUST_ID = TA.ENTRUST_ID
 	LEFT JOIN PA_TRD_PRODUCT_DEAL PA
 	on t.trade_id = pa.trade_id
 	LEFT JOIN PTL_TRADE PT
@@ -292,6 +322,7 @@
 	LEFT JOIN sys_datadict_list SYS1 on T.FINPROD_TYPE2 = SYS1.item_code and SYS1.dict_code = 'FINPROD_TYPE_TG'
 	LEFT JOIN sys_datadict_list SYS2 on T.PS = SYS2.item_code and SYS2.dict_code = 'PS'
 	left join sys_datadict_list SYS3 on PA.BACK_LEND_DIRECTION = SYS3.ITEM_CODE and SYS3.DICT_CODE = 'BACK_LEND_DIRECTION'
+	LEFT JOIN sys_datadict_list SYS4 on EE.PS = SYS4.item_code and SYS4.dict_code = 'PS'
 	WHERE 1 = 1 AND B.ORDER_STATUS!='02'
 	<if test="portfolioId != null and portfolioId != ''">
 		and A.PORTFOLIO_ID = #{portfolioId}
@@ -316,10 +347,10 @@
 	</if>
 	)A
     )
-    select * from temp 
+    select * from temp
     <if test='isMultiLevel == null or isMultiLevel!="01"'>
 	union
-	select   
+	select
         null     CDATE,
 	    ''       PORTFOLIOID,
 	    ''       CCY,
@@ -352,7 +383,7 @@
 			</if>
 		</where>
     </select>
-	
+
 	<select id="select2" resultType="com.joyintech.service.portfolio.ptlfundacctposi.dto.PtlFundAcctPosiDto">
 		select	DISTINCT
 				A.CDATE cdate,
@@ -376,7 +407,7 @@
 			inner join PTL_PORTFOLIO C
 			on A.PORTFOLIO_ID = C.PORTFOLIO_ID
 			left join (
-			select a.PORTFOLIO_ID,a.ACCT_ID,a.CDATE,a.CCY,a.HODING_TYPE,sum(a.AMOUNT) amount1 from Ptl_cash_Position_Flow a 
+			select a.PORTFOLIO_ID,a.ACCT_ID,a.CDATE,a.CCY,a.HODING_TYPE,sum(a.AMOUNT) amount1 from Ptl_cash_Position_Flow a
 			group by a.PORTFOLIO_ID,a.ACCT_ID,a.CDATE,a.CCY,a.HODING_TYPE
 			) D on A.PORTFOLIO_ID=D.PORTFOLIO_ID and A.ACCT_ID=D.ACCT_ID and A.CDATE=D.CDATE and A.CCY=D.CCY and A.HODING_TYPE = D.HODING_TYPE
 			<where>
@@ -431,7 +462,7 @@
 				</if>
 			</where>
 	</select>
-	
+
 	<select id = "getAllCcy" parameterType="java.util.Map" resultType="java.lang.String">
 		select distinct ccy from PTL_CASH_POSITION
 		<if test='startCDate != null'>

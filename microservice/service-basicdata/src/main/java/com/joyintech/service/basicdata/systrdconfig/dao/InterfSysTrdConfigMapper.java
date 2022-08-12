@@ -86,6 +86,8 @@ public interface InterfSysTrdConfigMapper {
 
     List<TradeInfoProResponse> getDealerTraderInfo(TradeInfoProRequest dto);
 
+    List<String> getOrderNoList();
+
     Map<String, Object> getMstRepoProductInfo(Map<String,Object> map);
 
     //查询资产是否进行了SPPI测试

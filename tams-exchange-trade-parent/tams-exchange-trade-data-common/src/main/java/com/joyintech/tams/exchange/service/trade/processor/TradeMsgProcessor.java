@@ -1060,7 +1060,11 @@ public class TradeMsgProcessor {
             transactionHelper.setInstructionBean(instruction);
             tradeCallbackHelper.processEntrustTrade(dbEntrust, tradeRecord, now, instruction);
         }
-        dbEntrust.setErrorMsg(entrust.getErrorMsg());
+        if (!Strings.isNullOrEmpty(entrust.getErrorMsg())) {
+            dbEntrust.setErrorMsg(entrust.getErrorMsg());
+        } else if (!Strings.isNullOrEmpty(dbEntrust.getErrorMsg())) {
+            entrust.setErrorMsg(dbEntrust.getErrorMsg());
+        }
         dbEntrust.setEntrustStatus(entrust.getEntrustStatus());
     }
 

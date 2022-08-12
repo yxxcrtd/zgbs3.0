@@ -139,7 +139,7 @@ public class TrdTempDto extends TrdProductDeal{
 	/**
 	 * 回购质押品
 	 */
-	private FinDealPledge finDealPledge;
+	//private FinDealPledge finDealPledge;
 
 	/**
 	 * 回购质押品列表
@@ -814,25 +814,25 @@ public class TrdTempDto extends TrdProductDeal{
 	public void setTrdProductTempDealAddB(TrdProductTempDealAdd trdProductTempDealAddB) {
 		this.trdProductTempDealAddB = trdProductTempDealAddB;
 	}
-
-	/**
-	 * 获取 finDealPledge
-	 *
-	 * @return finDealPledge
-	 */
-	public FinDealPledge getFinDealPledge() {
-		return finDealPledge;
-	}
-
-	/**
-	 * 设置 finDealPledge
-	 *
-	 * @param finDealPledge
-	 *            finDealPledge
-	 */
-	public void setFinDealPledge(FinDealPledge finDealPledge) {
-		this.finDealPledge = finDealPledge;
-	}
+//
+//	/**
+//	 * 获取 finDealPledge
+//	 *
+//	 * @return finDealPledge
+//	 */
+//	public FinDealPledge getFinDealPledge() {
+//		return finDealPledge;
+//	}
+//
+//	/**
+//	 * 设置 finDealPledge
+//	 *
+//	 * @param finDealPledge
+//	 *            finDealPledge
+//	 */
+//	public void setFinDealPledge(FinDealPledge finDealPledge) {
+//		this.finDealPledge = finDealPledge;
+//	}
 
 	/**
 	 * 获取 finTradeProduct

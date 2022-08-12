@@ -81,13 +81,17 @@ public class MinPriceServiceImpl implements MinPriceService {
     public MinPrice getMinPrice(Instruction instruction, Instrument instrument) {
         String tradeMarket = instruction.getTradeMarket();
         String tradePlat = TradePlatUtils.trd2EtrTradePlat(instruction);
-        String assetType = instrument.getAssetType();
-        String assetType1 = instrument.getAssetType1();
+//        String assetType = instrument.getAssetType();
+//        String assetType1 = instrument.getAssetType1();
+        String assetType;
+        String assetType1;
         if(PLEDGE_REPURCHASE.codeEquals(instruction.getAssetType()) ){
             assetType = instruction.getAssetType();
             assetType1 = instruction.getAssetType1();
+        }else {
+            assetType = instrument.getAssetType();
+            assetType1 = instrument.getAssetType1();
         }
-
         MinPrice minPrice = getMinPrice(tradeMarket, tradePlat, assetType, assetType1);
         if (ObjectUtil.isNull(minPrice)) {
             String dealMode = instruction.getDealMode();

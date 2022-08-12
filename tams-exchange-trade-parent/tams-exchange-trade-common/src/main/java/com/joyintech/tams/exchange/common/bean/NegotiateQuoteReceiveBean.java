@@ -74,6 +74,31 @@ public class NegotiateQuoteReceiveBean {
     @ApiModelProperty(name = "traderName", value = "本方交易员名称")
     private String traderName;
 
+    private String execId;
+
+    /**
+     * 对手方交易商名称
+     */
+    private String cpMemberName;
+
+    /**
+     * 对手方交易员名称
+     */
+    private String cpTraderName;
+
+    /**
+     * 对手方交易主体名称
+     */
+    private String cpInvestorName;
+
+
+    public String getExecId() {
+        return execId;
+    }
+    public void setExecId(String execId) {
+        this.execId = execId;
+    }
+
     public String getRequestStatusStr() {
         if (RequestStatus.WAIT_CONFIRM.getCode() == requestStatus) {
             return "待本方确认";
@@ -299,5 +324,29 @@ public class NegotiateQuoteReceiveBean {
 
     public void setTraderName(String traderName) {
         this.traderName = traderName;
+    }
+
+    public String getCpMemberName() {
+        return cpMemberName;
+    }
+
+    public void setCpMemberName(String cpMemberName) {
+        this.cpMemberName = cpMemberName;
+    }
+
+    public String getCpTraderName() {
+        return cpTraderName;
+    }
+
+    public void setCpTraderName(String cpTraderName) {
+        this.cpTraderName = cpTraderName;
+    }
+
+    public String getCpInvestorName() {
+        return cpInvestorName;
+    }
+
+    public void setCpInvestorName(String cpInvestorName) {
+        this.cpInvestorName = cpInvestorName;
     }
 }

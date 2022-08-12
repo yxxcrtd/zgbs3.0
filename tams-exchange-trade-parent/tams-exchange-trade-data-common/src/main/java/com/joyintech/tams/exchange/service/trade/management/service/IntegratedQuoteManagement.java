@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveQryRequest;
 import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveRequest;
@@ -174,6 +175,7 @@ public class IntegratedQuoteManagement {
     }
 
     private void setNegotiateQuoteSendBean(NegotiateQuoteSendBean negotiateQuoteSendBean, IntegratedEntrustVo integratedEntrust) {
+        negotiateQuoteSendBean.setId(integratedEntrust.getId());
         negotiateQuoteSendBean.setRequestNo(integratedEntrust.getId());
         negotiateQuoteSendBean.setRequestTime(DateUtil.formatDateTime(integratedEntrust.getCreateTime()));
         negotiateQuoteSendBean.setStockCode(integratedEntrust.getStockCode());
@@ -223,7 +225,6 @@ public class IntegratedQuoteManagement {
      */
     public ResultBean queryRepurchaseQuoteReceive(RepurchaseQuoteReceiveRequest request) {
         List<RepurchaseQuoteReceiveResponse> list = Lists.newArrayList();
-
         RepurchaseQuoteReceiveQryRequest quoteQryBean = new RepurchaseQuoteReceiveQryRequest();
 //        Instruction instruction = instructionService.findById(request.getInstructionId());
 //        String entrustProp = EntrustPropUtils.getEntrustProp(instruction, quoteQryBean.getEntrustProp());
@@ -252,12 +253,27 @@ public class IntegratedQuoteManagement {
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
-
+        //add 交易行情是否接收使用
+        List<String> listOrderNo = getOrderNoList();
         for (RepurchaseQuoteReceiveResponse response : list) {
+            response.setUseFlg(DictCodeList.是否_否.getValue());
+            String requestNo = response.getRequestNo();
+            if (ObjectUtil.isNotEmpty(requestNo) && !listOrderNo.isEmpty() && listOrderNo.size()>0) {
+                List<String> list1 = listOrderNo.stream().filter(f -> StrUtil.equals(f, requestNo)).collect(Collectors.toList());
+                if(list1.isEmpty() && list1.size()>0){
+                    response.setUseFlg(DictCodeList.是否_是.getValue());
+                }
+            }
+
             fillSelfDealerTradeInfo(response);
 
             fillPropDealerTradeInfo(response);
         }
+    }
+
+    private List<String> getOrderNoList(){
+        List<String> dealerTraderList = commonManagement.getOrderNoList();
+        return dealerTraderList;
     }
 
     private void fillSelfDealerTradeInfo(RepurchaseQuoteReceiveResponse response) {

@@ -18,6 +18,7 @@ import java.util.Map;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.invest.common.service.InvestInterfCommService;
+import com.joyintech.tams.invest.common.service.MapperDelegateService;
 import com.joyintech.tams.invest.common.util.MapParseUtil;
 import com.joyintech.tams.invest.portfolio.ptlcashflow.dto.PartyInfoDto;
 import com.joyintech.tams.invest.portfolio.ptlcashflow.dto.PtlCashFlowInterfaceDto;
@@ -104,6 +105,9 @@ public class PtlCashFlowService extends CommonExportService<PtlCashFlowDto>
      */
     @Autowired
     private InvestInterfCommService investInterfCommService;
+
+    @Autowired
+    private MapperDelegateService bussCommonMapperDelegateService;
     /**
      * {@inheritDoc}
      */
@@ -119,7 +123,8 @@ public class PtlCashFlowService extends CommonExportService<PtlCashFlowDto>
         else if (OperationType.NEW.equals(type)) {
             action = "insert";
         }
-        
+
+        this.deleteWflData(entity.getWorkflowId());
         restTemplate.postForObject(
             ServiceApplication.PORTFOLIO_SERVICE_NAME + "/PtlCashFlow/" + action, entity,
             Integer.class);
@@ -200,6 +205,14 @@ public class PtlCashFlowService extends CommonExportService<PtlCashFlowDto>
         catch (Exception ex)
         {}
     }
+
+    private void deleteWflData(String workflowId) {
+        bussCommonMapperDelegateService.deleteBySpecificKey("WFL_TRD_PRODUCT_DEAL", "WORKFLOW_ID",workflowId);
+        bussCommonMapperDelegateService.deleteBySpecificKey("WFL_TRD_PRODUCT_DEAL_ADD", "WORKFLOW_ID",workflowId);
+        bussCommonMapperDelegateService.deleteBySpecificKey("WFL_STL_PAY_ORDERS", "WORKFLOW_ID",workflowId);
+        bussCommonMapperDelegateService.deleteBySpecificKey("WFL_PA_TRD_PRODUCT_DEAL", "WORKFLOW_ID",workflowId);
+    }
+
     @Override
     public void doInsert(PtlCashFlowDto entity, OperationType type) {
         saveDataWhenStartWorkflow(entity, type);

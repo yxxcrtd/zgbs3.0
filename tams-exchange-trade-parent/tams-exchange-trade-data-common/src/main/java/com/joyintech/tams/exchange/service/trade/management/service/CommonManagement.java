@@ -626,6 +626,18 @@ public class CommonManagement extends BaseService {
 //        return list.stream().filter(o -> StringUtil.isEmpty(o.getIsOur()) || StringUtil.equals(o.getIsOur(), "N")).collect(Collectors.toList());
     }
 
+    public List<String> getOrderNoList(){
+        logger.info("调用查询接口");
+        List<Object> list = Lists.newArrayList();
+        String url = ServiceApplication.BASIC_DATA_SERVICE + TradeServiceURL.getOrderNoList;
+        try {
+            list = simpleRestTemplate.postForObject(url, null, List.class);
+        } catch (Exception e) {
+            logger.error("doPost() called with exception => 【url = {}】", url, e);
+        }
+        return JsonUtils.getObjectListFromJson(JsonUtils.getJsonFromObject(list), String.class);
+    }
+
     public List<TradeInfoProResponse> getDealerTraderInfo(TradeInfoProRequest dto) {
         logger.info("调用投管接口查询交易商交易员信息");
         Map<String, Object> params = BeanUtil.object2Map(dto);

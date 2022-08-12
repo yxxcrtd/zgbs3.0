@@ -12,6 +12,7 @@ package com.joyintech.service.bankuplink.basic.cfetsportfolioacctrela.dto;
 
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.tams.common.base.entity.IbuPortfolioAcctRela;
+import com.joyintech.workflow.engine.annotation.PrimaryKey;
 
 /**
  * CFETS账户关联 〈功能详细描述〉
@@ -57,17 +58,22 @@ public class CfetsPortfolioAcctRela001Dto extends IbuPortfolioAcctRela {
     /**
      * 机构21位码旧值
      */
+    @PrimaryKey(value = PrimaryKey.Field.PK_2)
     private String partyIdOld;
 
     /**
      * 账户来源旧值
      */
+    @PrimaryKey(value = PrimaryKey.Field.PK_1)
     private String cfetsAcctTypeOld;
 
     /**
      * 组合代码旧值
      */
     private String portfolioIdOld;
+
+    @PrimaryKey(value = PrimaryKey.Field.PK_3)
+    private String portfolioIdMd5;
 
     /**
      * 获取 partyIdOld
@@ -231,4 +237,11 @@ public class CfetsPortfolioAcctRela001Dto extends IbuPortfolioAcctRela {
         return super.getPartyId();
     }
 
+    public String getPortfolioIdMd5() {
+        return portfolioIdMd5;
+    }
+
+    public void setPortfolioIdMd5(String portfolioIdMd5) {
+        this.portfolioIdMd5 = portfolioIdMd5;
+    }
 }

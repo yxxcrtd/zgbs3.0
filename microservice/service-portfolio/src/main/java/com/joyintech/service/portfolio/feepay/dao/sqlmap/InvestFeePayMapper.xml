@@ -1345,17 +1345,27 @@ AND NOT EXISTS (
 		and tpd.totle_trade_id = #{tradeId}
 	</select>
 
-	<select id="getPortFolioName" resultType="com.joyintech.framework.select.SelectOptionDto">
-		select pp.PORTFOLIO_ID id,pp.PORTFOLIO_NAME text from PTL_PORTFOLIO pp
-		inner JOIN PTL_SEC_ACCT psa
-		ON psa.PORTFOLIO_ID = pp.PORTFOLIO_ID
-		where psa.ACCT_NO = #{secAcctId}
-		and pp.MDATE <![CDATA[>=]]> to_date(#{payDate},'yyyy-mm-dd')
-		and to_date(#{payDate},'yyyy-mm-dd') <![CDATA[>=]]> pp.VDATE
-		<if test="initValue != null and initValue != ''">
-			AND pp.PORTFOLIO_ID = #{initValue}
-		</if>
-	</select>
+    <select id="getPortFolioName" resultType="com.joyintech.framework.select.SelectOptionDto">
+        select distinct pp.PORTFOLIO_ID id,pp.PORTFOLIO_NAME text from PTL_PORTFOLIO pp
+        inner JOIN PTL_SEC_ACCT psa
+        ON psa.PORTFOLIO_ID = pp.PORTFOLIO_ID
+        where 1=1
+        <if test="secAcctId != null and secAcctId != ''">
+            and psa.ACCT_NO = #{secAcctId}
+        </if>
+        <!--and pp.MDATE <![CDATA[>=]]> to_date(#{payDate},'yyyy-mm-dd') 测试要求能选到已到期的组合，为了能做投资费用支付 edit by yangxin at 20220726-->
+        and to_date(#{payDate},'yyyy-mm-dd') <![CDATA[>=]]> pp.VDATE
+        <if test="initValue != null and initValue != ''">
+            AND pp.PORTFOLIO_ID = #{initValue}
+        </if>
+        <if test="search != null and search != ''">
+            AND (
+            pp.PORTFOLIO_ID LIKE CONCAT('%', CONCAT(#{search}, '%'))
+            or
+            pp.PORTFOLIO_NAME LIKE CONCAT('%', CONCAT(#{search}, '%'))
+            )
+        </if>
+    </select>
 
 
 	<sql id="getMaxHisNo">

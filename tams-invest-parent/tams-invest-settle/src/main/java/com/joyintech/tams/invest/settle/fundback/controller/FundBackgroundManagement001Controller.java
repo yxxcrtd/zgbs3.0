@@ -2,6 +2,8 @@ package com.joyintech.tams.invest.settle.fundback.controller;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import com.joyintech.tams.constant.DictCodeList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -57,6 +59,9 @@ public class FundBackgroundManagement001Controller extends BaseController {
         model.addAttribute("PROFIT_TYPE02", BussinessDictCodeList.收益类型_预期收益.getValue());
         String sysDate = platformDateImpl.getSysDateStr();
         model.addAttribute("cashDate", sysDate + " - " + sysDate);
+        model.addAttribute("PINAN_ASSET_TYPE_F01", DictCodeList.平安资产类型_债券.getValue());
+        model.addAttribute("PINAN_ASSET_TYPE_F07", DictCodeList.平安资产类型_质押式回购.getValue());
+        model.addAttribute("FINPROD_TYPE_TG_F32", BussinessDictCodeList.金融产品类型_投管用_一级投标债券.getValue());
         return super.init(model);
     }
 

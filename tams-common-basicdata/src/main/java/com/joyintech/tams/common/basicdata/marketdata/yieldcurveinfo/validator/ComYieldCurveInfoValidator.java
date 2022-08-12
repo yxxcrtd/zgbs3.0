@@ -8,6 +8,9 @@ import java.util.Map;
 
 import com.joyintech.tams.common.basicdata.marketdata.yieldcurveinfo.dto.ComYieldCurveInfoDto;
 import com.joyintech.tams.common.basicdata.marketdata.yieldcurveinfo.service.ComYieldCurveInfoService;
+import com.joyintech.tams.component.base.core.MstWorkflowCommonService;
+import com.joyintech.tams.component.base.core.dto.WflValidInputParameter;
+import com.joyintech.tams.constant.DictCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +24,7 @@ import com.joyintech.workflow.engine.util.WorkFlowUtil;
 
 /**
  * 收益率曲线信息验证 〈一句话功能简述〉 〈功能详细描述〉
- * 
+ *
  * @author wangzhao
  * @version 1.0 2018年8月9日
  * @see ComYieldCurveInfoValidator
@@ -31,10 +34,16 @@ import com.joyintech.workflow.engine.util.WorkFlowUtil;
 @Component
 public class ComYieldCurveInfoValidator implements BeanValidator {
     /**
-     * 
+     *
      */
     @Autowired
     private ComYieldCurveInfoService comYieldCurveInfoService;
+
+    /**
+     * 流程组件
+     */
+    @Autowired
+    private MstWorkflowCommonService mstWorkflowCommonService;
 
     @Override
     public List<ValidMessage> valid(Object value) {
@@ -61,9 +70,17 @@ public class ComYieldCurveInfoValidator implements BeanValidator {
                         pageParam);
                     if (list != null && !list.isEmpty()) {
                         errorList.add(new ValidMessage("curveCode", getMessage(
-                            "BUSS_COM_E_0006", getMessage("ComYieldCurveInfo001.curveName") + ":"
-                                               + getMessage("ComYieldCurveInfo001.curveDate")+":"+getMessage("ComYieldCurveInfo001.curveType"))));
+                            "BUSS_COM_E_0006", getMessage("ComYieldCurveInfo001.curveName") + ","
+                                               + getMessage("ComYieldCurveInfo001.curveDate")+","+getMessage("ComYieldCurveInfo001.curveType"),",")));
 
+                    }
+                    WflValidInputParameter pk4  = new WflValidInputParameter();
+                    pk4.setPageId("ComYieldCurveInfo002");
+                    pk4.setBusinessDataPk1(dto.getCurveCode());
+                    pk4.setBusinessDataPk2(dto.getCurveDateStr());
+                    pk4.setBusinessDataPk3(dto.getCurveType());
+                    if(mstWorkflowCommonService.isInWflProcess(pk4)){
+                        errorList.add(new ValidMessage("数据已存在于流程中，不允许添加"));
                     }
                 }
             }
@@ -75,6 +92,14 @@ public class ComYieldCurveInfoValidator implements BeanValidator {
 //                        getMessage("BUSS_COM_E_0018", getMessage("ComYieldCurveInfo001.curveDate"),
 //                            getMessage("ComYieldCurveInfo001.sysDate"))));
 //                }
+                WflValidInputParameter pk4  = new WflValidInputParameter();
+                pk4.setPageId("ComYieldCurveInfo002");
+                pk4.setBusinessDataPk1(dto.getCurveCode());
+                pk4.setBusinessDataPk2(dto.getCurveDateStr());
+                pk4.setBusinessDataPk3(dto.getCurveType());
+                if(mstWorkflowCommonService.isInWflProcess(pk4)){
+                    errorList.add(new ValidMessage("数据已存在于流程中，不允许修改"));
+                }
             }
 
             if (StringUtil.equals(dto.getOperateType(), "delete")) {

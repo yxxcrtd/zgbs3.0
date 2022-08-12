@@ -24,6 +24,7 @@ import com.joyintech.tams.invest.batch.entrust.dao.EntrustStatusMapper;
 import com.joyintech.tams.invest.batch.entrust.dto.EntrustClosePosEtrReqDto;
 import com.joyintech.tams.invest.batch.entrust.dto.EntrustClosePositionReqDto;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
 import com.joyintech.tams.invest.common.trade.CreditLinesUpdate;
 import com.joyintech.tams.invest.common.trade.CreditLinesUpdateImpl;
 import com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto;
@@ -64,6 +65,9 @@ public class EntrustStatusService {
 
     @Autowired
     private JoyinbusinessCommonService joyinbusinessCommonService;
+
+    @Autowired
+    private CommonPositionEngineService commonPositionEngineService;
 
     /**
      * 是否单体服务
@@ -139,7 +143,7 @@ public class EntrustStatusService {
 
 
             // 处理未对接了头寸引擎的指令关闭 start
-            List<String> entrustIdExistNews = entrustIdList.stream().map(item->item.getCloseId()).collect(Collectors.toList());
+            List<String> entrustIdExistNews = entrustIdList.stream().map(EntrustClosePosEtrReqDto::getCloseId).collect(Collectors.toList());
             entrustIdExistNews.forEach(s -> {
                 if (!entrustIdsNotNeedUpdateOldPosition.contains(s)) {
                     baseEtrCashPositionCommService.entrustCloseExecute(s, DictCodeList.是否_是.getValue());
@@ -200,6 +204,11 @@ public class EntrustStatusService {
             } else {
                 closeItem.setBusiType(busiTypePosition);
             }
+            // XYHGFXSJ-1115:协议回购的头寸类型特殊处理 modify by fuyongsheng 20220812 start
+            if(DictCodeList.回购类型_质押式协议回购.getValue().equals(t.getAssetType1())){
+                closeItem.setBusiType(commonPositionEngineService.getPositionBusiType(t.getFinprodType2(), t.getPs(), t.getAssetType1()));
+            }
+            // XYHGFXSJ-1115:协议回购的头寸类型特殊处理 modify by fuyongsheng 20220812 end
             if (StringUtil.isNotEmpty(t.getPs())) {
                 closeItem.setPs(t.getPs());
             } else {

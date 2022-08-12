@@ -1589,4 +1589,11 @@ from
         ) where rownum=1
 
     </select>
+
+    <select id="findEtrEntrustIsSettleFail" resultType="java.lang.String">
+        select distinct eea.ENTRUST_ID
+        from ETR_ENTRUST_ADD eea
+        where eea.CLOSE_AMT is not null and eea.ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+            and nvl(eea.CLOSE_AMT,0) <![CDATA[<]]> 0
+    </select>
 </mapper>

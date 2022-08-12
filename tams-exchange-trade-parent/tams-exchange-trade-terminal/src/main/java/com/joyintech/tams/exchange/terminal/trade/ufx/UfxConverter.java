@@ -1218,7 +1218,7 @@ public class UfxConverter {
             integratedFixedIncomeQuoteBean.setStockCode(ds.getString("stock_code") + "." + StockCodeUtils.getMarket(integratedFixedIncomeQuoteQryBean.getStockCode()));
             integratedFixedIncomeQuoteBean.setStockName(ds.getString("stock_name"));
             integratedFixedIncomeQuoteBean.setOrderNo(ds.getString("buy_confirm_id"));
-            integratedFixedIncomeQuoteBean.setReportTime(ds.getInt("report_time"));
+            integratedFixedIncomeQuoteBean.setReportTime(ds.getLong("report_time"));
             integratedFixedIncomeQuoteBean.setAgencyName(ds.getString("agency_name"));
             integratedFixedIncomeQuoteBean.setEntrustPrice(ds.getDouble("buy_price"));
             integratedFixedIncomeQuoteBean.setEntrustVolume(ds.getInt("buy_quote_amount"));
@@ -1232,7 +1232,7 @@ public class UfxConverter {
                 integratedFixedIncomeQuoteBean2.setStockCode(ds.getString("stock_code") + "." + StockCodeUtils.getMarket(integratedFixedIncomeQuoteQryBean.getStockCode()));
                 integratedFixedIncomeQuoteBean2.setStockName(ds.getString("stock_name"));
                 integratedFixedIncomeQuoteBean2.setOrderNo(ds.getString("sell_confirm_id"));
-                integratedFixedIncomeQuoteBean2.setReportTime(ds.getInt("report_time_x"));
+                integratedFixedIncomeQuoteBean2.setReportTime(ds.getLong("report_time_x"));
                 integratedFixedIncomeQuoteBean2.setAgencyName(ds.getString("other_agency"));
                 integratedFixedIncomeQuoteBean2.setEntrustPrice(ds.getDouble("sell_price"));
                 integratedFixedIncomeQuoteBean2.setEntrustVolume(ds.getInt("sell_quote_amount"));

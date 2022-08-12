@@ -1334,7 +1334,7 @@ public class KCBPConverter {
                         break;
                     }
                     case "ordertime": {
-                        integratedFixedIncomeQuoteBean.setReportTime(Integer.parseInt(value));
+                        integratedFixedIncomeQuoteBean.setReportTime(Long.parseLong(value));
                         break;
                     }
                     case "company": {

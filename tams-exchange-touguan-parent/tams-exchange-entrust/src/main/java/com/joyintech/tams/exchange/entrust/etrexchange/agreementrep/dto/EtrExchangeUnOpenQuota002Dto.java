@@ -112,6 +112,9 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
      */
     private String expireSettleDate;
 
+    /** 是否被使用*/
+    private String useFlg;
+
     @ApiModelProperty(name = "outRepAmt", value = "换出质押券孳息")
     private BigDecimal outRepAmt;
 
@@ -736,5 +739,13 @@ public class EtrExchangeUnOpenQuota002Dto extends BaseEntity {
 
     public void setOutRepAmt(BigDecimal outRepAmt) {
         this.outRepAmt = outRepAmt;
+    }
+
+    public String getUseFlg() {
+        return useFlg;
+    }
+
+    public void setUseFlg(String useFlg) {
+        this.useFlg = useFlg;
     }
 }

@@ -9,6 +9,7 @@ import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustDetailMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
+import com.joyintech.tams.common.base.dao.FinTradeProductMapper;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -63,6 +64,9 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
 
     @Autowired
     private TrdCommonBaseService trdCommonBaseService;
+
+    @Autowired
+    private FinTradeProductMapper finTradeProductMapper;
 
     @Autowired
     private CommonPositionService commonPositionService;
@@ -615,14 +619,18 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
             bean.setPortfolioId(trdProductDealAdd.getPortfolioId());
             bean.setSecAcctId(dealEntity.getSecManageAcctId());
             if(DictCodeListExt3.交易方向_解除质押.getValue().equals(ps)){
-                bean.setCashAcctId(this.getPtlCapAcctNo(entity));
+                // XYHGFXSJ-930:解除质押资金账户赋值 modify by fuyongsheng 20220808 start
+                // bean.setCashAcctId(this.getPtlCapAcctNo(entity));
+                bean.setCashAcctId(exchangeTransMatchCommonMapper.queryAccountNo(bean.getSecAcctId()));
+                // XYHGFXSJ-930:解除质押资金账户赋值 modify by fuyongsheng 20220808 end
                 if(DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(dealEntity.getTradeMarket())){
                     bean.setCashAmount(BigDecimal.ZERO);
                 }else{
-                    FinTradeProduct finTradeProduct = exchangeTransMatchCommonMapper.getFinTradeProduct(etrEntrust.getFinprodId());
-                    if(finTradeProduct != null){
-                        bean.setCashAmount(finTradeProduct.getmTradeAmt());
-                    }
+//                    FinTradeProduct finTradeProduct = exchangeTransMatchCommonMapper.getFinTradeProduct(etrEntrust.getFinprodId());
+//                    if(finTradeProduct != null){
+//                        bean.setCashAmount(finTradeProduct.getmTradeAmt());
+//                    }
+                    bean.setCashAmount(dealEntity.getTradeAmt());
                 }
             }else{
                 bean.setCashAcctId(exchangeTransMatchCommonMapper.queryAccountNo(bean.getSecAcctId()));
@@ -642,20 +650,27 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
             bean.setCashAcctId(exchangeTransMatchCommonMapper.queryAccountNo(bean.getSecAcctId()));
             bean.setTradeId(dealEntity.getTradeId());
             bean.setEtrId(trdProductDealAdd.getEntrustId());
+            // XYHGFXSJ-843:修改到期续做轧差金额赋值 modify by fuyongsheng 20220810 start
             // ZGTFCP-1672:到期续作金额赋值 modify by fuyongsheng 20220323 start
             if(DictCodeList.交易方向_买入.getValue().equals(dealEntity.getPs())){
-                bean.setCashAmount(dealEntity.getTradeAmt());
+                FinTradeProductKey key = new FinTradeProductKey();
+                key.setFinprodId(trdFinProductDealTotal.getFinprodId());
+                key.setBranch(0L);
+                FinTradeProduct finTradeProduct = finTradeProductMapper.selectByPrimaryKey(key);
+                bean.setCashAmount(ArithmeticUtil.subtract(dealEntity.getTradeAmt(), finTradeProduct.getmTradeAmt()));
             }else{ // 收息到账、还本到账
-                bean.setCashAmount(dealEntity.getTradeAmt().negate());
+                // 到期续作生成3笔交易,1笔新开买入,1笔收息到账,1笔还本到账;只处理新开的那条数据
+                resultMap.put(INTERFACE_TYPE, null);
+                return;
             }
+            // XYHGFXSJ-843:修改到期续做轧差金额赋值 modify by fuyongsheng 20220810 end
             // ZGTFCP-1672:到期续作金额赋值 modify by fuyongsheng 20220323 end
             list.add(BeanUtil.object2Map(bean));
             resultMap.put("ptlOffsetCashList", list);
         }
         // 质押券数据集	ptlSecList
         if ((DictCodeListExt3.交易方向_正回购.getValue().equals(ps)
-                || DictCodeListExt3.交易方向_中途换券.getValue().equals(ps)
-                || DictCodeListExt3.交易方向_解除质押.getValue().equals(ps))) {
+                || DictCodeListExt3.交易方向_中途换券.getValue().equals(ps))) {
             List<Map<String, Object>> list = new ArrayList<>();
             if(DictCodeListExt3.交易方向_中途换券.getValue().equals(ps)){
                 // ZGTFCP-1805:修改中途换券字段赋值 modify by fuyongsheng 20220324 start
@@ -675,21 +690,6 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
                     list.add(map);
                 }
                 // ZGTFCP-1805:修改中途换券字段赋值 modify by fuyongsheng 20220324 end
-            }
-            else if(DictCodeListExt3.交易方向_解除质押.getValue().equals(ps)){
-                for(FinPledgeDisplaceResult finPledgeDisplaceResult : finPledgeDisplaceResultList){
-                    bean = new PositionRequestBaseBean();
-                    bean.setPortfolioId(trdProductDealAdd.getPortfolioId());
-                    bean.setSecAcctId(dealEntity.getSecManageAcctId());
-                    bean.setTradeId(dealEntity.getTradeId());
-                    bean.setEtrId(trdProductDealAdd.getEntrustId());
-                    bean.setFinprodId(finPledgeDisplaceResult.getFinprodId());
-                    bean.setSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
-                    bean.setOwnSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
-                    bean.setIntegrateSecAmount(BigDecimal.ZERO);
-                    Map<String, Object> map = BeanUtil.object2Map(bean);
-                    list.add(map);
-                }
             }
             // 正回购
             else {
@@ -742,8 +742,17 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
                     bean.setTradeId(dealEntity.getTradeId());
                     bean.setEtrId(trdProductDealAdd.getEntrustId());
                     bean.setFinprodId(finPledgeDisplaceResult.getFinprodId());
-                    bean.setSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
-                    bean.setOwnSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
+                    // XYHGFXSJ-963:深交所解除质押有钱的那笔交易发送新头寸报文不处理解除质押券数据集 modify by fuyongsheng 20220810 start
+                    if(DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(dealEntity.getTradeMarket())
+                            && dealEntity.getTradeAmt() != null
+                            && dealEntity.getTradeAmt().compareTo(BigDecimal.ZERO) > 0){
+                        bean.setSecAmount(BigDecimal.ZERO);
+                        bean.setOwnSecAmount(BigDecimal.ZERO);
+                    }else{
+                        bean.setSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
+                        bean.setOwnSecAmount(ArithmeticUtil.multiply(finPledgeDisplaceResult.getPledgeAmt(), new BigDecimal(100)));
+                    }
+                    // XYHGFXSJ-963:深交所解除质押有钱的那笔交易发送新头寸报文不处理解除质押券数据集 modify by fuyongsheng 20220810 end
                     bean.setIntegrateSecAmount(BigDecimal.ZERO);
                     Map<String, Object> map = BeanUtil.object2Map(bean);
                     list.add(map);

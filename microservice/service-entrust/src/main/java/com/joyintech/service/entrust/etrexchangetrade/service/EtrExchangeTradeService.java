@@ -2043,7 +2043,14 @@ public class EtrExchangeTradeService extends BaseService{
             etrBondFxdIncmPlatSHDto.setCalMode(dto.getCalculateField());// 计算方式
             etrBondFxdIncmPlatSHDto.setFinprodType2(dto.getFinprodType2());// 金融产品类型（投管）
             etrBondFxdIncmPlatSHDto.setAssetType(DictCodeList.平安资产类型_债券.getValue());// 资产大类
-            etrBondFxdIncmPlatSHDto.setSettleSpreed(StringUtil.isNotEmpty(dto.getSettleSpeed())?Long.parseLong(dto.getSettleSpeed()):0L);//清算速度
+            // TISHKS-1639:清算速度赋值有误 modify by fuyongsheng 20220810 start
+            // etrBondFxdIncmPlatSHDto.setSettleSpreed(StringUtil.isNotEmpty(dto.getSettleSpeed())?Long.parseLong(dto.getSettleSpeed()):0L);//清算速度
+            if (StringUtil.equals(dto.getSettleSpeed(), DictCodeList.清算速度_T_0.getValue())) {
+                etrBondFxdIncmPlatSHDto.setSettleSpreed(0L);
+            } else if (StringUtil.equals(dto.getSettleSpeed(), DictCodeList.清算速度_T_1.getValue())) {
+                etrBondFxdIncmPlatSHDto.setSettleSpreed(1L);
+            }
+            // TISHKS-1639:清算速度赋值有误 modify by fuyongsheng 20220810 end
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, etrBondFxdIncmPlatSHDto);
             BeanUtil.copyPropertiesIgnoreNull(etrEntrustAdd, etrBondFxdIncmPlatSHDto);
         }

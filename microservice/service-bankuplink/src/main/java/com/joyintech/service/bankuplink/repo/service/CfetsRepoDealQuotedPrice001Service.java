@@ -819,6 +819,8 @@ public class CfetsRepoDealQuotedPrice001Service extends BaseService {
 	    String ps = dto.getPs();
         String isDzh = dto.getIsDzh();
         String isMq = dto.getIsMq(); //是否mq  前台传过来 质押券没有拆分  mq推过来  质押券已经拆分 无需处理
+        // 组合数据为空默认为  回退到回复方初始化数据
+        boolean flag = true;
 		// 指令持仓流水 、现金流水处理
 		if(StringUtils.isNotEmpty(dto.getQuoteId())){
             if (!StringUtil.equals(dto.getTradeStatus(), BussinessDictCodeList.银行间上行报价状态_已撤回.getValue())) {
@@ -826,6 +828,11 @@ public class CfetsRepoDealQuotedPrice001Service extends BaseService {
 //                baseAssetCashPositionCommMapper.deletePositionByTradeId(dto.getQuoteId());
             }
 			RepoDialogueQuoteDto repoDialogueQuoteDto = ibuMainService.getRepoDialogueQuote(dto.getQuoteId());
+            if (repoDialogueQuoteDto != null
+                    && repoDialogueQuoteDto.getIbuQuoteCrepDto() != null
+                    && CollectionUtils.isEmpty(repoDialogueQuoteDto.getIbuQuoteEtrReDtoList())) {
+                flag = false;
+            }
 			if(null != repoDialogueQuoteDto && null != repoDialogueQuoteDto.getIbuQuoteCrepDto()){
                 //组合代码为空默认为  回退到回复方初始化数据
                 if(StringUtil.equals(dto.getQuotaPageModel(),QuotaPageModelUtil.MODEL_RESTOREDAYOFF)
@@ -957,13 +964,14 @@ public class CfetsRepoDealQuotedPrice001Service extends BaseService {
                             ptlSecPositionFlowDtoUnit.setOffsetFlag(DictCodeList.冲正标识_正常交易.getValue());
                             
                             ptlSecPositionFlowDtoUnit.setAmount(ArithmeticUtil.divide(prin,new BigDecimal(100),2));// 数量
+                            // 撤回生成一笔反向的流水
                             if (StringUtil.equals(dto.getTradeStatus(), BussinessDictCodeList.银行间上行报价状态_已撤回.getValue())) {
                                 ptlSecPositionFlowDtoUnit.setAmount(ptlSecPositionFlowDtoUnit.getAmount().negate());
                             }
                             ptlSecPositionFlowDtoUnit.setpFinprodId(null);// 母金融产品代码
                             ptlSecPositionFlowDtoUnit.setTradeId(dto.getQuoteId());// 成交编号
                             if (StringUtils.isNotEmpty(dto.getPortfolioId()) && StringUtils.isNotEmpty(cfetsRepoDealQuotedPrice003Dto.getFinprodId())) {
-                                Map<String, Object> map = new HashMap<String, Object>();
+                                Map<String, Object> map = new HashMap<>();
                                 map.put("portfolioId", dto.getPortfolioId());
                                 map.put("finprodId", cfetsRepoDealQuotedPrice003Dto.getFinprodId());
                                 String secAcctId = cfetsQuotedCommonMapper.qryPortfolioSecAcctId(map);
@@ -1020,9 +1028,6 @@ public class CfetsRepoDealQuotedPrice001Service extends BaseService {
             BeanUtil.copyPropertiesIgnoreNull(secPositionFlowDto, etrSecPositionFlowDto);
             secPositionFlowDto.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());
             secPositionFlowDto.setAmount(secPositionFlowDto.getAmount().negate());
-            if (StringUtil.equals(dto.getTradeStatus(), BussinessDictCodeList.银行间上行报价状态_已撤回.getValue())) {
-                secPositionFlowDto.setAmount(secPositionFlowDto.getAmount().negate());
-            }
             etrSecPositionFlows.add(secPositionFlowDto);
         });
 
@@ -1042,7 +1047,7 @@ public class CfetsRepoDealQuotedPrice001Service extends BaseService {
                     flowDto.setCreateUser(LoginUserUtil.getUserName());
                     flowDto.setUpdateUser(LoginUserUtil.getUserName());
                 }
-                if (!StringUtil.equals(dto.getTradeStatus(), BussinessDictCodeList.银行间上行报价状态_已撤回.getValue())) {
+                if (flag && !StringUtil.equals(dto.getTradeStatus(), BussinessDictCodeList.银行间上行报价状态_已撤回.getValue())) {
                     flowDto.setSeqno(IDGenerator.generate());
                     ptlPositionHoldDto.getPtlSecPositionFlows().add(flowDto);
                 }

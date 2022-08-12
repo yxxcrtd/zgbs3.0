@@ -4,6 +4,7 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.tams.business.common.dto.*;
 import com.joyintech.tams.common.base.entity.FinCashCalcRule;
 import com.joyintech.tams.common.base.entity.FinProduct;
+import com.joyintech.tams.common.base.entity.StlCapacctInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -319,4 +320,30 @@ public interface JoyinbusinessCommonMapper {
      * @date 2021/12/13 16:13
      */
     String qryPortfolioSecAcctId(Map<String, Object> param);
+
+    /**
+     * 检索交易对手资金账户共通
+     * @param counterId 交易对手ID
+     * @param ccy
+     * @return 交易对手资金账户
+     */
+    List<StlCapacctInfo> selectCounterCapacctInfoList(Map<String, Object> paramMap);
+
+    /**
+     * 检索交易DVP资金账户共通
+     * @param portfolioId 组合代码
+     * @param finprodId
+     * @param ccy
+     * @return DVP资金账户
+     */
+    List<StlCapacctInfo> selectDVPCapacctInfoList(Map<String, Object> paramMap);
+
+    /**
+     * 根据证券账户检索交易DVP资金账户共通
+     * @param portfolioId 组合代码
+     * @param finprodId
+     * @param ccy
+     * @return DVP资金账户
+     */
+    List<StlCapacctInfo> selectDVPCapacctInfoListByAcctId(Map<String, Object> paramMap);
 }

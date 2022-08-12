@@ -23,6 +23,7 @@ import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.service.bankuplink.common.dto.TrdBondInvestTradeDto;
 import com.joyintech.service.bankuplink.common.util.ProdTypeUtil;
 import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.cfets.trd.repo.service.CfetsRepoQuotedPrice004Service;
 import com.joyintech.tams.cfets.trdconfirm.dao.CfetsTrdConfirmMapper;
@@ -114,6 +115,12 @@ public class CfetsTrdConfirmService extends BaseService {
 
     @Autowired
     private CfetsRepoQuotedPrice004Service cfetsRepoQuotedPrice004Service;
+
+    /**
+     * 公共方法service
+     */
+    @Autowired
+    private JoyinbusinessCommonService joyinbusinessCommonService;
 
     // 交易份额小数保留位数
     private final int decimalPlaces_4 = 4;
@@ -498,6 +505,7 @@ public class CfetsTrdConfirmService extends BaseService {
             deal.setEntrustId(regDeal.getEntrustId());
             deal.setbTradeId(regDeal.getTradeId());
             deal.setTradeMarket(dtoReg.getTradeMarket());
+            deal.setIsOutTrade(BussinessDictCodeList.是否_是.getValue());
             deals.add(deal);
             // =====================划款指令信息=====================
             bussTrdTransferOrderDtoList.addAll(this.dealOrders(deal, dtoReg.getPs()));
@@ -521,11 +529,11 @@ public class CfetsTrdConfirmService extends BaseService {
             // 金融产品交易附属表Entity 构造结束 ----------------------------------------------------------
 
             // 组合交易表Entity 构造开始----------------------------------------------------------
-            生成组合交易(regDeal, deal.getTradeId(), ptlTrades);
+            生成组合交易Bid(regDeal, deal.getTradeId(), ptlTrades);
 
 
             // 金融产品交易扩展Entity 构造开始----------------------------------------------------------
-            生成交易扩展表(regDeal, deal.getTradeId(), paTrdProductDeals);
+            生成交易扩展表Bid(regDeal, deal.getTradeId(), paTrdProductDeals);
 
 //            trdTradeFeeDetails.addAll(生成交易费用明细数据(regDeal.getTradeId(), deal.getTradeId()));
 
@@ -741,6 +749,8 @@ public class CfetsTrdConfirmService extends BaseService {
             deal.setCounterId(entity.getCounterId());
             deal.setCounterTrader(entity.getCounterTrader());
             deal.setbTradeId(regDeal.getTradeId());
+            // 是否外部交易
+            deal.setIsOutTrade(DictCodeList.是否_是.getValue());
             deals.add(deal);
 
             // =====================划款指令信息=====================
@@ -1070,6 +1080,8 @@ public class CfetsTrdConfirmService extends BaseService {
             deal.setTrader(entity.getTrader());
             deal.setCounterId(entity.getCounterId());
             deal.setCounterTrader(entity.getCounterTrader());
+            // 是否外部交易
+            deal.setIsOutTrade(DictCodeList.是否_是.getValue());
             deals.add(deal);
 
             // =====================划款指令信息=====================
@@ -1992,11 +2004,33 @@ public class CfetsTrdConfirmService extends BaseService {
         ptlTrade.setWorkflowId(null); // 工作流代码
         ptlTrades.add(ptlTrade);
     }
+    private void 生成组合交易Bid(CfetsRegFinProductDealDto dto, String 交易编号, List<PtlTrade> ptlTrades) {
+        PtlTrade ptlTrade = new PtlTrade();
+        ptlTrade.setPortfolioId(dto.getPortfolioId()); // 组合代码
+        ptlTrade.setBusiNo(交易编号); // 业务编号
+        ptlTrade.setBusiTable(DictCodeList.业务表_金融产品表.getValue()); // 业务表
+        ptlTrade.setBusiId(dto.getFinprodId()); // 业务明细代码
+        ptlTrade.setBusiType(dto.getBusiType()); // 业务类型
+        ptlTrade.setInvAim(dto.getInvAim()); // 投资目的
+        ptlTrade.setSecManageAcctId(dto.getSecManageAcctId()); // 证券托管户代码
+        ptlTrade.setSettleDate(dto.getSettleDate()); // 实际发生日
+        ptlTrade.setWorkflowId(null); // 工作流代码
+        ptlTrades.add(ptlTrade);
+    }
     private void 生成交易扩展表(CfetsRegFinProductDealDto dto, String 交易编号,
                          List<PaTrdProductDeal> paTrdProductDeals) {
         PaTrdProductDeal paTrdProductDeal = new PaTrdProductDeal();
         paTrdProductDeal.setTradeId(交易编号); // 交易编号
         paTrdProductDeal.setPaBussType(getPaBussType(dto.getPs()));
+        paTrdProductDeal.setDeptCode(null); // 交易所属部门
+        paTrdProductDeal.setWorkflowId(null); // 工作流代码
+        paTrdProductDeals.add(paTrdProductDeal);
+    }
+    private void 生成交易扩展表Bid(CfetsRegFinProductDealDto dto, String 交易编号,
+                         List<PaTrdProductDeal> paTrdProductDeals) {
+        PaTrdProductDeal paTrdProductDeal = new PaTrdProductDeal();
+        paTrdProductDeal.setTradeId(交易编号); // 交易编号
+        paTrdProductDeal.setPaBussType(dto.getTgBusiType());
         paTrdProductDeal.setDeptCode(null); // 交易所属部门
         paTrdProductDeal.setWorkflowId(null); // 工作流代码
         paTrdProductDeals.add(paTrdProductDeal);
@@ -3438,21 +3472,73 @@ public class CfetsTrdConfirmService extends BaseService {
         bussSettleOrderParameterDto.setPortfolioId(deal.getPortfolioId());
         bussSettleOrderParameterDto.setDeal(deal);
         BussTrdTransferOrderDto bussTrdTransferOrderDto = bussTrdTransferOrderService.generateOrder(bussSettleOrderParameterDto);
-        String acctId = EtrCommonCashPositionDealService.select组合托管户(deal.getPortfolioId(), deal.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
-        bussTrdTransferOrderDto.setPayAcctNo(acctId);
+
+        // 付款账户
+        String payAcctNo = null;
+        // 收款账户
+        String recAcctNo = null;
+        // 一级申购 || 债券买入 || 逆回购首期
+        if (StringUtil.equals(deal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue())
+                || (StringUtil.equals(deal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券.getValue())
+                && StringUtil.equals(deal.getPs(), DictCodeList.交易方向_买入.getValue()))) {
+            payAcctNo = EtrCommonCashPositionDealService.select组合托管户(deal.getPortfolioId(), deal.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("portfolioId", deal.getPortfolioId());
+            paramMap.put("secAcctId", deal.getSecManageAcctId());
+            paramMap.put("ccy", deal.getCcy());
+            recAcctNo = joyinbusinessCommonService.selectDVPCapacctInfoListByAcctId(paramMap);
+        }
+        // 债券卖出/回售 || 正回购首期
+        if (StringUtil.equals(deal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())
+                || (StringUtil.equals(deal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券.getValue())
+                && (StringUtil.equals(deal.getPs(), DictCodeList.交易方向_卖出.getValue())
+                || StringUtil.equals(deal.getPs(), DictCodeList.交易方向_行权_回售.getValue())))) {
+            recAcctNo = EtrCommonCashPositionDealService.select组合托管户(deal.getPortfolioId(), deal.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("portfolioId", deal.getPortfolioId());
+            paramMap.put("secAcctId", deal.getSecManageAcctId());
+            paramMap.put("ccy", deal.getCcy());
+            payAcctNo = joyinbusinessCommonService.selectDVPCapacctInfoListByAcctId(paramMap);
+        }
+        // 商业银行柜台  一级申购 || 债券买入 || 逆回购首期
+        if (StringUtil.equals(deal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券.getValue())
+                && StringUtil.equals(deal.getPs(), DictCodeList.交易方向_买入.getValue())) {
+            FinProduct finProduct = finProductMapper.selectByPrimaryKey(deal.getFinprodId());
+            if (StringUtil.equals(finProduct.getTradeMarket(), DictCodeListExt1.交易场所_商业银行柜台.getValue())) {
+                // 收款账户 交易对手账户
+                Map<String, Object> paramMap = new HashMap<>();
+                paramMap.put("counterId", deal.getCounterId());
+                paramMap.put("ccy", deal.getCcy());
+                recAcctNo = joyinbusinessCommonService.selectCounterCapacctInfoList(paramMap);
+            }
+        }
+        // 商业银行柜台   债券卖出/回售 || 正回购首期
+        if ((StringUtil.equals(deal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券.getValue())
+                && (StringUtil.equals(deal.getPs(), DictCodeList.交易方向_卖出.getValue())
+                || StringUtil.equals(deal.getPs(), DictCodeList.交易方向_行权_回售.getValue())))) {
+            FinProduct finProduct = finProductMapper.selectByPrimaryKey(deal.getFinprodId());
+            if (StringUtil.equals(finProduct.getTradeMarket(), DictCodeListExt1.交易场所_商业银行柜台.getValue())) {
+                // 收款账户 交易对手账户
+                Map<String, Object> paramMap = new HashMap<>();
+                paramMap.put("counterId", deal.getCounterId());
+                paramMap.put("ccy", deal.getCcy());
+                payAcctNo = joyinbusinessCommonService.selectCounterCapacctInfoList(paramMap);
+            }
+        }
+
+        bussTrdTransferOrderDto.setPayAcctNo(payAcctNo);
+        bussTrdTransferOrderDto.setRecAcctNo(recAcctNo);
         String ps = DictCodeListExt1.收支方向_支出.getValue();
         if (StringUtil.equals(temp.getPs(), DictCodeList.交易方向_卖出.getValue())
                 || StringUtil.equals(temp.getPs(), DictCodeList.回购拆借方向_正回购.getValue())) {
             ps = DictCodeListExt1.收支方向_收入.getValue();
-            bussTrdTransferOrderDto.setRecAcctNo(acctId);
-            bussTrdTransferOrderDto.setPayAcctNo(null);
         }
         bussTrdTransferOrderDto.setPs(ps);
         bussTrdTransferOrderDto.setIsTotalTrade(BussinessDictCodeList.是否_否.getValue());
         bussTrdTransferOrderDto.setOrderRetStatus(DictCodeList.指令处理状态_处理成功.getValue());
         bussTrdTransferOrderDto.setTradeId(deal.getTradeId());
         bussTrdTransferOrderDto.setPortfolioId(deal.getPortfolioId());
-        bussTrdTransferOrderDto.setIsNeedSend(DictCodeList.是否_是.getValue());
+        bussTrdTransferOrderDto.setIsNeedSend(DictCodeList.是否_否.getValue());
         bussTrdTransferOrder.add(bussTrdTransferOrderDto);
         logger.info("划款指令信息:{}", JsonUtils.object2Json(bussTrdTransferOrder));
         return bussTrdTransferOrder;

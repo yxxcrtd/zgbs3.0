@@ -98,7 +98,7 @@
             WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' then
                 ROUND( decode(nvl( T5.ORDER_FINISH_AMT, 0 ),0,0,nvl( T5.ORDER_FINISH_AMT, 0 ) / nvl(decode(ETR_ENTRUST.ENTRUST_AMT, 0, 1,ETR_ENTRUST.ENTRUST_AMT), 1 )), 4 )*100
             WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
-                ROUND( nvl( T5.ORDER_FINISH_AMT * 100, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )* 100
+                    ROUND( nvl( T5.ORDER_FINISH_AMT, 0 ) / nullif( etr_entrust.ENTRUST_AMT, 0 ), 4 )*100
             WHEN ETR_ENTRUST_ADD.TARGET_TYPE = '01' THEN
                 ROUND( decode(nvl( T5.ORDER_FINISH_AMT, 0 ),0,0, nvl( T5.ORDER_FINISH_AMT, 0 )/ nvl( ETR_ENTRUST.ENTRUST_NUM, 1 )), 4 )*100
             ELSE ROUND( nvl( T5.ORDER_FINISH_AMT, 0 ) / nvl( ETR_ENTRUST.ENTRUST_AMT, 1 ), 4 )*100
@@ -107,7 +107,7 @@
             WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' then
                 ROUND( decode(nvl( T5.ENT_FINISH_AMT, 0 ),0,0,nvl( T5.ENT_FINISH_AMT, 0 ) / nvl( decode(ETR_ENTRUST.ENTRUST_AMT, 0, 1,ETR_ENTRUST.ENTRUST_AMT), 1 )), 4 ) *100
             WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
-                ROUND( nvl( T5.ENT_FINISH_AMT * 100, 0 ) / nvl( etr_entrust.ENTRUST_AMT, 1 ), 4 )* 100
+                ROUND( nvl( T5.ENT_FINISH_AMT, 0 ) / nullif( etr_entrust.ENTRUST_AMT, 0 ), 4 ) * 100
             WHEN ETR_ENTRUST_ADD.TARGET_TYPE = '01' THEN
                 ROUND( decode(nvl( T5.ENT_FINISH_AMT, 0 ),0,0, nvl( T5.ENT_FINISH_AMT, 0 )/ nvl( ETR_ENTRUST.ENTRUST_NUM, 1 )), 4 )*100
             ELSE ROUND( nvl( T5.ENT_FINISH_AMT, 0 ) / nvl( ETR_ENTRUST.ENTRUST_AMT, 1 ), 4 ) *100
@@ -127,7 +127,7 @@
             WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' THEN
                 ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )
             WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
-                ROUND( nvl( etr_entrust.ENTRUST_AMT/100, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ) , 4 )
+                ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ), 4 )
             WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
                 decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,
                 'EX017',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ORDER_FINISH_AMT, 0 ))/100, 4 ),
@@ -151,7 +151,7 @@
             WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' THEN
                 ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ), 4 )
             WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
-                ROUND( nvl( etr_entrust.ENTRUST_AMT/100, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ) , 4 )
+                ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ), 4 )
             WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
                 decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,
                 'EX017',ROUND( (nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ))/100, 4 ),
@@ -1141,14 +1141,17 @@
 			 CASE
 			   WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
 			   WHEN STD.DELIVERY_RESULT = '01'  THEN '正常交收'
-			   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'  
-			   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败' 
+			   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'
+			   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败'
 			   WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收'
                WHEN STD.DELIVERY_RESULT = '05'  THEN '交收通知'
              END                                                   DELIVERY_RESULT,
 			 CASE
 			   WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
 			   WHEN STD.DELIVERY_RESULT = '04' THEN  '0'
+        WHEN eea.ASSET_TYPE1 = 'H01'
+        THEN
+        decode(TT.TRADED_VOLUME, 0,0,null,0,STD.SHARE_AMT / TT.TRADED_VOLUME) ||''
 			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME * 100 || ''
 			 END                                                   DELIVERY_SCHEDULE,
 <!--			 TTH.ACCOUNT_ID                                        ACCT_ACCOUNT,-->
@@ -1159,6 +1162,7 @@
              DECODE(TT.COUNTER_NAME, NULL, DECODE(TTH.COUNTER_NAME,NULL,null,TTH.COUNTER_NAME), TT.COUNTER_NAME)       COUNTER_NAME
 		FROM SETTLE_TRANS_DATA STD
 		LEFT JOIN T_TRADE TT ON (TT.BROKER_TRADE_ID = STD.CJBH AND TT.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TT.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD') AND TT.TRADE_TYPE = '0')
+        left join ETR_ENTRUST_ADD eea on TT.INSTRUCTION_ID = eea.ENTRUST_ID
 		LEFT JOIN T_TRADEHISTORY TTH ON (TTH.BROKER_TRADE_ID = STD.CJBH AND TTH.SEC_ACCT_ID = STD.SEC_ACCT_ID AND TTH.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
 		LEFT JOIN FIN_PRODUCT FP ON STD.FINPROD_ID = FP.FINPROD_ID
         LEFT JOIN ( SELECT te.TRADE_ID, to_char(wm_concat ( te.ENTRUST_ID ))  ENTRUST_ID
@@ -1199,20 +1203,24 @@
 			 CASE
 			   WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
 			   WHEN STD.DELIVERY_RESULT = '01'  THEN '正常交收'
-			   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'  
-			   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败' 
+			   WHEN STD.DELIVERY_RESULT = '02'  THEN '部分交收'
+			   WHEN STD.DELIVERY_RESULT = '03'  THEN '交收失败'
 			   WHEN STD.DELIVERY_RESULT = '04'  THEN '未交收'
                WHEN STD.DELIVERY_RESULT = '05'  THEN '交收通知'
 			 END                                                   DELIVERY_RESULT,
 			 CASE
 			   WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
 			   WHEN STD.DELIVERY_RESULT = '04' THEN '0'
+        WHEN eea.ASSET_TYPE1 = 'H01'
+        THEN
+        decode(TT.TRADED_VOLUME, 0,0,null,0,STD.SHARE_AMT / TT.TRADED_VOLUME)||''
 			   ELSE STD.SHARE_AMT / TT.TRADED_VOLUME * 100 || ''
 			 END                                                   DELIVERY_SCHEDULE,
 			 TT.ACCOUNT_ID                                         ACCT_ACCOUNT,
             TT.PROP_ACCT_NO                                        PROP_ACCT_NO,
         TT.COUNTER_NAME COUNTER_NAME
 		FROM T_TRADE TT
+        left join ETR_ENTRUST_ADD eea on TT.INSTRUCTION_ID = eea.ENTRUST_ID
 		LEFT JOIN SETTLE_TRANS_DATA STD
 		  ON TT.BROKER_TRADE_ID = STD.CJBH
 		 AND TT.SEC_ACCT_ID = STD.SEC_ACCT_ID
@@ -1335,6 +1343,7 @@
         <!-- LEFT JOIN ETR_ENTRUST_DETAIL EED ON EE.ENTRUST_ID = EED.ENTRUST_ID
         LEFT JOIN PTL_PORTFOLIO PP ON EED.PORTFOLIO_ID = PP.PORTFOLIO_ID -->
       WHERE A.INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR}
+        and A.STOCK_CODE is not null
       ORDER BY A.CREATE_TIME DESC
     </select>
 

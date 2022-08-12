@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import com.joyintech.background.component.common.pack.common.util.ArithmeticUtil;
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.tams.common.base.dao.MstCounterPartyMapper;
 import com.joyintech.tams.common.base.entity.MstCounterParty;
@@ -17,6 +19,7 @@ import com.joyintech.service.trade.primarybiddingmanage.dao.PrimaryBiddingManage
 import com.joyintech.service.trade.primarybiddingmanage.dto.PrimaryBiddingManageDto;
 import com.joyintech.service.trade.primarybiddingmanage.dto.PrimaryBiddingPortfolioDto;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import org.springframework.util.CollectionUtils;
 
 @Service("backPrimaryBiddingManage002Service")
 public class PrimaryBiddingManage002Service extends BaseService<PrimaryBiddingManageDto> {
@@ -42,17 +45,23 @@ public class PrimaryBiddingManage002Service extends BaseService<PrimaryBiddingMa
 
         // 查询汇总投标确认页面基本信息
         primaryBiddingManageDto = primaryBiddingManage002Mapper.getEntityByMap(map);
-        primaryBiddingManageDto.setAllBidPrinAmt(new BigDecimal(map.get("allBidPrinAmt").toString()));
 
         // 查询投标组合列表,根据资产、交易对手
-        List<PrimaryBiddingPortfolioDto> primaryBiddingPortfolioDtolist = new ArrayList<PrimaryBiddingPortfolioDto>();
+        List<PrimaryBiddingPortfolioDto> primaryBiddingPortfolioDtolist;
         primaryBiddingPortfolioDtolist = primaryBiddingManage002Mapper.getPrimaryBiddingPortfoliolist(map);
         primaryBiddingManageDto.setPrimaryBiddingPortfolioDtolist(primaryBiddingPortfolioDtolist);
 
         // 查询汇总投标列表,根据资产、交易对手
-        List<PrimaryBiddingPortfolioDto> primaryBiddingAlllist = new ArrayList<PrimaryBiddingPortfolioDto>();
+        List<PrimaryBiddingPortfolioDto> primaryBiddingAlllist;
         primaryBiddingAlllist = primaryBiddingManage002Mapper.getPrimaryBiddingAlllist(map);
         primaryBiddingManageDto.setPrimaryBiddingAllDtolist(primaryBiddingAlllist);
+        if (map.get("allBidPrinAmt") != null) {
+            primaryBiddingManageDto.setAllBidPrinAmt(new BigDecimal(map.get("allBidPrinAmt").toString()));
+        } else if (!CollectionUtils.isEmpty(primaryBiddingPortfolioDtolist)) {
+            primaryBiddingManageDto.setAllBidPrinAmt(primaryBiddingPortfolioDtolist.stream().map(PrimaryBiddingPortfolioDto::getBidPrinAmt)
+                    .filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add));
+            primaryBiddingManageDto.setAllBidPrinAmt(ArithmeticUtil.divide(primaryBiddingManageDto.getAllBidPrinAmt(), BigDecimal.valueOf(10000), 2));
+        }
 
         return primaryBiddingManageDto;
     }
