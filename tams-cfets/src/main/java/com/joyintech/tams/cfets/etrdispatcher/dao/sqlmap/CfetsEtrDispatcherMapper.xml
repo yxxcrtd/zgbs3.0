@@ -102,7 +102,7 @@
             else TO_CHAR(ROUND(ETR_ENTRUST.price,3)*100, 'FM9999999999999990.900')
 			end
         WHEN ETR_ENTRUST_ADD.ASSET_TYPE IN ('F05', 'F04', 'F03', 'F09', 'F06', 'F02') THEN TO_CHAR(round( 0, 4 ),'FM9999999999999990.9000')
-        WHEN ETR_ENTRUST_ADD.ASSET_TYPE IN ('F07') THEN TO_CHAR( nvl(ETR_ENTRUST.PRICE,0)*100, 'FM9999999999999990.9000')|| ' %'
+        WHEN ETR_ENTRUST_ADD.ASSET_TYPE IN ('F07','F12') THEN TO_CHAR( nvl(ETR_ENTRUST.PRICE,0)*100, 'FM9999999999999990.9000')|| ' %'
         WHEN ETR_ENTRUST_ADD.ASSET_TYPE IN ('F11') THEN TO_CHAR( ETR_ENTRUST.PRICE, 'FM9999999999999990.90')
         when  btm.busi_type = '02' then
         case  when ETR_ENTRUST_ADD.CALCULATE_FIELD = 'price' then TO_CHAR( ETR_ENTRUST.PRICE, 'FM9999999999999990.9000')
@@ -990,8 +990,8 @@
         tpd.remark remark,
         ftp.TERM_TYPE termType,
         ftp.TERM repoTerm,
-        TO_CHAR(FTP.VPAY_DATE,'YYYY-MM-DD') vpayDate,/*首次结算日*/
-        TO_CHAR(FTP.MPAY_DATE,'YYYY-MM-DD') mpayDate,/*到期结算日*/
+        NVL(TO_CHAR(FTP.VPAY_DATE,'YYYY-MM-DD'),TO_CHAR(FTP.VDATE,'YYYY-MM-DD')) vpayDate,/*首次结算日*/
+        NVL(TO_CHAR(FTP.MPAY_DATE,'YYYY-MM-DD'),TO_CHAR(FTP.MDATE,'YYYY-MM-DD')) mpayDate,/*到期结算日*/
         ftp.ACT_CAP_DAYS actCapDays,
         ftp.INT_RATE * 100 rebackPrice,
         TPD.TRADE_AMT tradeAmt,
@@ -1002,7 +1002,8 @@
         FDP.PLEDGE_NUMBER * 100 secTotalPrin,
         tpd.TRADE_AMT actPayAmt,
         tpd.PRIN_AMT prinAmt,
-        sdl_registOrg.ITEM_VALUE registOrgStr
+        sdl_registOrg.ITEM_VALUE registOrgStr,
+        FDTFP.FINPROD_NAME targetFinprodName
     </sql>
 
     <select id="getEtrDispatcherDealListInfo"
@@ -1034,6 +1035,8 @@
         <!-- left join FIN_DEAL_PLEDGE on tpd.FINPROD_ID = FIN_DEAL_PLEDGE.FINPROD_ID-->
         <!-- LEFT JOIN FIN_PRODUCT fp3 ON fp3.FINPROD_ID = FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID-->
         LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID  = tpd.CHL_ID
+        LEFT JOIN FIN_DEAL_TARGET FDT ON tpd.FINPROD_ID  = FDT.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT FDTFP ON FDTFP.FINPROD_ID  = FDT.PLEDGE_FINPROD_ID
         WHERE tpd.TRADE_ID  in (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
         OR tpd.B_TRADE_ID in (SELECT TRADE_ID FROM trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
         union all
@@ -1064,6 +1067,8 @@
         <!-- left join FIN_DEAL_PLEDGE on tpd.FINPROD_ID = FIN_DEAL_PLEDGE.FINPROD_ID-->
         <!-- LEFT JOIN FIN_PRODUCT fp3 ON fp3.FINPROD_ID = FIN_DEAL_PLEDGE.PLEDGE_FINPROD_ID-->
         LEFT JOIN FIN_PRODUCT fp2 ON fp2.FINPROD_ID  = tpd.CHL_ID
+        LEFT JOIN FIN_DEAL_TARGET FDT ON tpd.FINPROD_ID  = FDT.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT FDTFP ON FDTFP.FINPROD_ID  = FDT.PLEDGE_FINPROD_ID
         WHERE tpd.TRADE_ID  in (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
         OR tpd.B_TRADE_ID in (SELECT TRADE_ID FROM wfl_trd_product_deal_add WHERE ENTRUST_ID  = #{entrustId})
     </select>
