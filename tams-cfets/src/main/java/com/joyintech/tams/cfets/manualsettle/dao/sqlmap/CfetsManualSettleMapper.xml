@@ -492,11 +492,11 @@
             AND t.tradeMarket in( #{tradePlat_01},#{tradePlat_02})
         </if>
         <if test="notAssetType != null and notAssetType.size()>0">
-            AND t.assetType not IN (
+            AND ( t.assetType not IN (
             <foreach item="item" index="index" collection="notAssetType" separator=",">
                 #{item}
             </foreach>
-            )
+            ) or t.assetType is null)
         </if>
         <!-- 关键字模糊查询 -->
         <include refid="vagueQueryWhere"></include>
