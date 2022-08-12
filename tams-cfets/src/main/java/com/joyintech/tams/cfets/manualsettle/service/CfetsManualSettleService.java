@@ -1821,11 +1821,9 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
         // 正回购到期 交收 指令质押券可用持仓增加 组合质押券质押持仓减少 回溯反向处理
         if (StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())
                 && !isFlowStart && !isBack
-                && ((StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收失败.getValue())
-                && StringUtil.equals(busiType, DictCodeListExt3.头寸业务类型_质押式回购首期.getValue()))
-                || ((StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收.getValue())
+                && ((StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收.getValue())
                 || StringUtil.equals(DictCodeListExt3.交收操作类型_回溯.getValue(), buttonType))
-                && StringUtil.equals(busiType, DictCodeListExt3.头寸业务类型_质押式回购到期.getValue())))) {
+                && StringUtil.equals(busiType, DictCodeListExt3.头寸业务类型_质押式回购到期.getValue()))) {
             this.settleFailPosition(listTemp, busiType, StringUtil.equals(DictCodeListExt3.交收操作类型_回溯.getValue(), buttonType));
         }
         if (StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())

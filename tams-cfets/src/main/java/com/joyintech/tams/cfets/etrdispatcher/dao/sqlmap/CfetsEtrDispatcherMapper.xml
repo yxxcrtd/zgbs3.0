@@ -2794,7 +2794,7 @@
         when ete.ps = 'T94' then trdPledge.Pledge_Ratio
         else nvl(decode( eted.ASSET_TYPE, 'F07' , ee.Pledge_Ratio , fscr.SCALE ), 0 ) * 100
             end as pledgeRatio, /** 折算率 **/
-        nvl(ee.PLEDGE_NUMBER/100, trdPledge.PLEDGE_NUMBER) pledgeNumber,
+        nvl(ee.PLEDGE_NUMBER, trdPledge.PLEDGE_NUMBER) pledgeNumber,
         ee.PLEDGE_NUMBER * ee.Pledge_Face_Value pledStrdPrinAmt,
         case when ete.ENTRUST_TYPE = '21' then null else
         ete.ENTRUST_AMT end exchangeAmount,
@@ -2948,7 +2948,7 @@
         when ete.ps = 'T94' then trdPledge.Pledge_Ratio
         else nvl(decode( eted.ASSET_TYPE, 'F07' , ee.Pledge_Ratio , fscr.SCALE ), 0 ) * 100
         end as pledgeRatio, /** 折算率 **/
-        nvl(ee.PLEDGE_NUMBER/100, trdPledge.PLEDGE_NUMBER) pledgeNumber,
+        nvl(ee.PLEDGE_NUMBER, trdPledge.PLEDGE_NUMBER) pledgeNumber,
         ee.PLEDGE_NUMBER * ee.Pledge_Face_Value pledStrdPrinAmt,
         case when ete.ENTRUST_TYPE = '21' then null else
         ete.ENTRUST_AMT end exchangeAmount,

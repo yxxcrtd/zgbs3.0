@@ -10,6 +10,7 @@ import com.google.common.collect.Table;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.invest.common.trade.dao.CreditLinesDealsMapper;
 import com.joyintech.tams.invest.common.trade.dto.MinTrdUnitLimitDto;
 import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.service.bidding.ExchangeTransMatchBidding1Service;
@@ -82,7 +83,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
     private ExchangeTransMatchCommonMapper exchangeTransMatchCommonMapper;
     
     @Autowired
-    private EtrEntrustAddMapper etrEntrustAddMapper;
+    private CreditLinesDealsMapper creditLinesDealsMapper;
 
     @Autowired
     private SettleTransDataTotalMatchMapper settleTransDataTotalMatchMapper;
@@ -1579,8 +1580,13 @@ public class ExchangeTransMatchCommonService extends BaseService {
                         //更新首期的质押品信息
                         // ZGTFCP-1805 : 先filter再findFirst modify by fuyongsheng 20220324 start
                         // FinPledgeDisplaceResult finPledgeDisplaceResult = finPledgeDisplaceResultList.stream().findFirst().filter(result->StringUtil.equals(result.getResultType(),DictCodeListExt3.质押券置换_置换结果_置换前.getValue())).get();
-                        FinPledgeDisplaceResult finPledgeDisplaceResult = finPledgeDisplaceResultList.stream().filter(result->StringUtil.equals(result.getResultType(),DictCodeListExt3.质押券置换_置换结果_置换前.getValue())).findFirst().get();
+                        // FinPledgeDisplaceResult finPledgeDisplaceResult = finPledgeDisplaceResultList.stream().filter(result->StringUtil.equals(result.getResultType(),DictCodeListExt3.质押券置换_置换结果_置换前.getValue())).findFirst().get();
                         // ZGTFCP-1805 : 先filter再findFirst modify by fuyongsheng 20220324 end
+                        List<FinPledgeDisplaceResult> finPledgeDisplaceResults = finPledgeDisplaceResultList
+                                .stream()
+                                .filter(result->StringUtil.equals(result.getResultType(),DictCodeListExt3.质押券置换_置换结果_置换前.getValue()))
+                                .collect(Collectors.toList());
+                        // modify by fuyongsheng 撤销中途换券交易,要删除质押品表,登录质押品置换表置换前数据
                         if(StringUtil.equals(itemList.get(0).getPs(), DictCodeListExt3.交易方向_中途换券.getValue())){
 //                            List<FinDealPledge> firstFinDealPledgeList = exchangeTransMatchRepo3Service.getFirstRepoFinDealPledge(settleTransDataTotal.getfCjbh(),settleTransDataTotal.getVdate(),itemList.get(0).getPortfolioId());
                             List<FinDealPledge> firstFinDealPledgeList = exchangeTransMatchRepo3Service.getFirstRepoFinDealPledge(
@@ -1588,10 +1594,25 @@ public class ExchangeTransMatchCommonService extends BaseService {
                                     settleTransDataTotal.getSeatNumber(),settleTransDataTotal.getSecAcctId());
                             if(!StringUtil.isEmptyList(firstFinDealPledgeList)) {
                                 for(FinDealPledge finDealPledge:firstFinDealPledgeList) {
+//                                    finDealPledge.setPledgeFinprodId(finPledgeDisplaceResult.getFinprodId());
+//                                    finDealPledge.setPledgeRatio(finPledgeDisplaceResult.getScale());
+//                                    finDealPledge.setPledgeAmt(finPledgeDisplaceResult.getPledgeAmt());
+//                                    finDealPledgeMapper.updateByPrimaryKeySelective(finDealPledge);
+                                    finDealPledgeMapper.deleteByPrimaryKey(finDealPledge);
+                                }
+                            }
+                            if(CollectionUtils.isNotEmpty(finPledgeDisplaceResults)){
+                                for(FinPledgeDisplaceResult finPledgeDisplaceResult : finPledgeDisplaceResults){
+                                    FinDealPledge finDealPledge = new FinDealPledge();
+                                    finDealPledge.setBranch(0L);
+                                    finDealPledge.setFinprodId(settleTransDataTotal.getFinprodId());
                                     finDealPledge.setPledgeFinprodId(finPledgeDisplaceResult.getFinprodId());
+                                    finDealPledge.setPledgeNumber(finPledgeDisplaceResult.getPledgeAmt());
                                     finDealPledge.setPledgeRatio(finPledgeDisplaceResult.getScale());
-                                    finDealPledge.setPledgeAmt(finPledgeDisplaceResult.getPledgeAmt());
-                                    finDealPledgeMapper.updateByPrimaryKeySelective(finDealPledge);
+                                    finDealPledge.setPledgeFaceValue(this.select券面面值(finDealPledge.getPledgeFinprodId()));
+                                    finDealPledge.setCreateTime(new Date());
+                                    finDealPledge.setUpdateTime(new Date());
+                                    finDealPledgeMapper.insertSelective(finDealPledge);
                                 }
                             }
                         }
@@ -2221,5 +2242,13 @@ public class ExchangeTransMatchCommonService extends BaseService {
 
     public String getTradeIdByTotalTradeId(String totalTradeId){
         return exchangeTransMatchCommonMapper.getTradeIdByTotalTradeId(totalTradeId);
+    }
+
+    private BigDecimal select券面面值(String finprodId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("finprodId", finprodId);
+        params.put("tradeDate", com.joyintech.framework.util.DateUtil.platDateFromCache());
+        BigDecimal faceValue = creditLinesDealsMapper.getFaceValue(params);
+        return null == faceValue ? new BigDecimal(100) : faceValue;
     }
 }
