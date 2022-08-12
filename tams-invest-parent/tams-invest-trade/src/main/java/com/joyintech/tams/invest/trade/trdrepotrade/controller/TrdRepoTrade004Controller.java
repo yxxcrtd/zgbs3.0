@@ -313,11 +313,11 @@ public class TrdRepoTrade004Controller extends BaseController {
             processParameter.setOperationType(OperationType.MODIFY);
         }
         workFlowParameter.setComment(entity -> WorkFlowUtil.concatComment(
-                "质押券置换交易编号：" + entity.getTradeId() + "置换日期：" + dto.getSubstitutionDate())
+                "质押券置换交易编号：" + entity.getTradeId() + "置换日期：" + DateUtil.format(dto.getSubstitutionDate()))
         );
 
         //业务编号参数
-
+        dto.setBusiType(DictCodeListExt3.共通业务类型_质押券置换.getValue());
         String bussinessCode="";
         BussinessCodeParameter parameter = new BussinessCodeParameter();
         parameter.setCommonBusinessExtType(
