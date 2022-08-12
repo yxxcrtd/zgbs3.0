@@ -491,6 +491,13 @@
         <if test="tradePlat_01 != null and tradePlat_01 != '' and tradePlat_02 != null and tradePlat_02 != ''">
             AND t.tradeMarket in( #{tradePlat_01},#{tradePlat_02})
         </if>
+        <if test="notAssetType != null and notAssetType.size()>0">
+            AND t.assetType not IN (
+            <foreach item="item" index="index" collection="notAssetType" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
         <!-- 关键字模糊查询 -->
         <include refid="vagueQueryWhere"></include>
         order by t.settleStatus,t.settleDate,t.finprodType2,t.tgBusiType,t.finprodMarketId,t.cleanStatus)
