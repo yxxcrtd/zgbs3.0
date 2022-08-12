@@ -2246,7 +2246,6 @@
                 $("#outRepSecId").attr('disabled', false);
                 $("#outRepSecNum").attr('disabled', false);
             }
-            debugger;
             //XYHGFXSJ-1096 【待办事项】到期续作-变更对手方--行情接收后保存，除组合名称、对手方外，期望不可编辑
             if (entity.reqOnId && entity.ps == 'T92'){
                 //回购期限
