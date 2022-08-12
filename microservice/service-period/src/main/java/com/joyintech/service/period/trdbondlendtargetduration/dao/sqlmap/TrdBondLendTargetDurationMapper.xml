@@ -609,7 +609,12 @@
                             <!-- AND fcp.PAY_DATE >= #{PLATEFORM_DATE} -->
                             AND pp.PORTFOLIO_ID <include refid="com.joyintech.service.period.trdbondduration.dao.TrdBondDurationMapper.portfolioAth"/>
                             AND TPD.TRADE_ID = #{mpFinprodId}
-                            AND FCP.CASH_TYPE = #{cashType}
+                            <if test="cashTypeList !=null and cashTypeList.size()>0 ">
+                                AND FCP.CASH_TYPE in
+                                <foreach collection="cashTypeList" item="item" index= "index" open="(" close=")" separator="," >
+                                    #{item}
+                                </foreach>
+                            </if>
                             )
                   ) ASP
                 GROUP BY
