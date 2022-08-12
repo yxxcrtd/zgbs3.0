@@ -466,7 +466,12 @@ public class ExchangeTransMatchRepo4Service extends ExchangeTransMatchRepoCommon
             // 关联系统交易编号
             // trdProductDeal.setfTradeId(settleTransData.getCjbh());
             // XYHGFXSJ-590:关联系统交易编号赋值 modify by fuyongsheng 20220727 start
-            trdProductDeal.setfTradeId(dealDto.getfCjbh());
+            if(StringUtil.equals(settleTransData.getTradeMarket(),DictCodeListExt1.交易场所_上海证券交易所.getValue())
+                    && DictCodeList.交易方向_买入.getValue().equals(settleTransData.getPs())) {
+                trdProductDeal.setfTradeId(settleTransData.getTradeId());
+            }else{
+                trdProductDeal.setfTradeId(dealDto.getfCjbh());
+            }
             // XYHGFXSJ-590:关联系统交易编号赋值 modify by fuyongsheng 20220727 end
             // 现金流代码
             trdProductDeal.setCashId(null);
