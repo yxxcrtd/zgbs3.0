@@ -905,6 +905,7 @@
         and (fp.FINPROD_TYPE2 not in ('F18','F17','F07') or fp.FINPROD_TYPE2 is null)
         and psp.ccy = #{ccy1,jdbcType=VARCHAR}
         and pa.USER_ID = #{userId}
+        and psp.AMOUNT > 0
         union all
 
         <!-- 3、查询非含权资产未来现金流(存款+项目类+计划类利率)。（资产收息预测、资产还本预测、资产到期预测） -->
@@ -1097,6 +1098,7 @@
         )
         and fp.CCY = #{ccy1,jdbcType=VARCHAR}
         and pa.USER_ID = #{userId}
+        and psp.AMOUNT > 0
         union all
 
         <!-- 5、查询含权资产未来现金流。（含权债行权预测） -->
@@ -1185,6 +1187,7 @@
         and fep1.EXERCISE_DATE is not null
         and fp.CCY = #{ccy1,jdbcType=VARCHAR}
         and pa.USER_ID = #{userId}
+        and psp.AMOUNT > 0
         ) total
         <!--多级法人改造 add by jingqiongqiong 20200615-->
         group by total.ccy,total.portfolioId,total.fundAccount,total.portfolioId1,total.portfolioSeries
@@ -1396,6 +1399,7 @@
         and (fp.CCY = #{ccy1,jdbcType=VARCHAR} OR FTP.CCY = #{ccy1,jdbcType=VARCHAR})
         and pa.USER_ID = #{userId}
         and (fp.FINPROD_TYPE2 not in ('F18','F17','F07') or fp.FINPROD_TYPE2 is null)
+        and psp.AMOUNT > 0
         union all
 
         <!-- 3、查询非含权资产未来现金流（存款+项目类+计划类利率）。（资产收息预测、资产还本预测、资产到期预测） -->
@@ -1488,6 +1492,7 @@
         and (fp.CCY = #{ccy1,jdbcType=VARCHAR} OR FTP.CCY = #{ccy1,jdbcType=VARCHAR})
         and pa.USER_ID = #{userId}
         and fp.FINPROD_TYPE2  in ('F18','F17','F07')
+        and psp.AMOUNT > 0
         union all
 
         <!-- 4、查询含权资产未来现金流。（含权债收息、还本预测） -->
@@ -1583,6 +1588,7 @@
         )
         and fp.CCY = #{ccy1,jdbcType=VARCHAR}
         and pa.USER_ID = #{userId}
+        and psp.AMOUNT > 0
         union all
 
         <!-- 5、查询含权资产未来现金流。（含权债行权预测） -->
@@ -1672,6 +1678,7 @@
         and fep1.EXERCISE_DATE is not null
         and fp.CCY = #{ccy1,jdbcType=VARCHAR}
         and pa.USER_ID = #{userId}
+        and psp.AMOUNT > 0
         ) total left join FIN_TERM_STRUCT_INFO ftsi on
         <if test="searchDateStart1 != null and searchDateStart1 != ''">
             (ceil(total.cDate-TO_DATE(#{searchDateStart1}, 'YYYY-MM-DD')) &gt;= ftsi.MIN_DAYS or ftsi.MIN_DAYS is null)
