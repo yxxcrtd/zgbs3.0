@@ -165,6 +165,7 @@ public class CfetsManualSettleQueryService extends BaseService{
         pageParam.put("PS_T02", DictCodeList.交易方向_卖出.getValue());
         pageParam.put("tradePlat_01", BussinessDictCodeList.交易场所_银行间.getValue());
         pageParam.put("tradePlat_02", BussinessDictCodeList.交易场所_商业银行柜台市场.getValue());
+        pageParam.put("notAssetType", Arrays.asList(DictCodeListExt1.金融产品类型_投管用_债券借贷融入.getValue(), DictCodeListExt1.金融产品类型_投管用_债券借贷融出.getValue()));
 
 
         pageParam.put("FINPROD_TYPE_TG_F03", DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
