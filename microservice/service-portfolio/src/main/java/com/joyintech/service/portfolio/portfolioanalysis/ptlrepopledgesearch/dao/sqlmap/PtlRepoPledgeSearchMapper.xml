@@ -327,7 +327,7 @@ FROM
 		WHERE
 		1 = 1
 		AND B.TRADE_STATUS='01'AND B.IS_CANCEL='N' AND J.BACK_LEND_DIRECTION in (#{BACK_LEND_DIRECTION_05},#{BACK_LEND_DIRECTION_06})
-		and ((G.ENTRUST_ID is not null and K.ASSET_TYPE1 != 'H01') or G.ENTRUST_ID is null)
+
 		<if test="sysDate != null and sysDate != ''">
 			AND (H.VDATE &lt;= TO_DATE(#{sysDate},'YYYY-MM-DD') AND TO_DATE(#{sysDate},'YYYY-MM-DD') &lt;= H.MDATE)
 		</if>
@@ -649,7 +649,7 @@ FROM
 		LEFT JOIN FIN_PRODUCT fp ON fp.finprod_id =fdt.pledge_finprod_id
 		WHERE pp.INVEST_YESORNO = 'Y' and fpd.trade_id is not null
 		<!-- add wsz 20220810 非协议回购 -->
-		and (tpda.ENTRUST_ID is null or eea.asset_type1 != 'H01')
+		and (tpda.ENTRUST_ID is null or eea.asset_type1 != 'H01' or eea.asset_type1 is null )
 		<!-- add wsz 20220810 非协议回购 -->
 		<if test="portfolioIdList != null and portfolioIdList.size()>0">
 			<foreach collection="portfolioIdList" open="AND pp.PORTFOLIO_ID IN (" item="portfolioId" separator="," close=")">
