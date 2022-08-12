@@ -313,7 +313,7 @@ public class TrdRepoTrade004Controller extends BaseController {
             processParameter.setOperationType(OperationType.MODIFY);
         }
         workFlowParameter.setComment(entity -> WorkFlowUtil.concatComment(
-                "质押券置换交易编号：" + entity.getTradeId() + "置换日期：" + DateUtil.getSysDate())
+                "质押券置换交易编号：" + entity.getTradeId() + "置换日期：" + dto.getSubstitutionDate())
         );
 
         //业务编号参数
