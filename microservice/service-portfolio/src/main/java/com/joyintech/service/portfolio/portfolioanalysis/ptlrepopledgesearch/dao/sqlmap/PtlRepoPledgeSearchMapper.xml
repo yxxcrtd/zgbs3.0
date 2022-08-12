@@ -326,7 +326,7 @@ FROM
 		LEFT JOIN PA_TRD_PRODUCT_DEAL J ON J.TRADE_ID = B.TRADE_ID
 		WHERE
 		1 = 1
-		AND B.TRADE_STATUS='01'AND B.IS_CANCEL='N' AND J.BACK_LEND_DIRECTION in (#{BACK_LEND_DIRECTION_05},#{BACK_LEND_DIRECTION_06})
+		AND B.TRADE_STATUS='01'AND B.IS_CANCEL='N' AND J.BACK_LEND_DIRECTION in (#{BACK_LEND_DIRECTION_05})
 
 		<if test="sysDate != null and sysDate != ''">
 			AND (H.VDATE &lt;= TO_DATE(#{sysDate},'YYYY-MM-DD') AND TO_DATE(#{sysDate},'YYYY-MM-DD') &lt;= H.MDATE)
@@ -372,6 +372,106 @@ FROM
 			</foreach>)
 		</if>
 		<!--  add by swwan 【重庆银行】 增加 交易对手  2021年7月22日 end -->
+		union all
+		SELECT
+		A.PLEDGE_FACE_VALUE PLEDGE_AMT,
+		null  pledgeRatio,
+		A.PLEDGE_FACE_VALUE  pledgeFaceValue,
+		C.TYPE_4,
+		C.TYPE_5,
+		'F15' finprod_type2,
+		D.FINPROD_MARKET_ID,
+		D.FINPROD_ABBR finprodAbbr,
+		D.REGIST_ORG,
+		decode(E.PARTY_TYPE2,'01','国有企业','02','集体企业','03','民营企业','04','外资企业','05','公众企业','99','其他企业') companyNature,
+		(CASE
+		WHEN F.IS_SEC_BOND = 'Y'
+		THEN '次级债'
+		ELSE null
+		END) isSecBond,
+		G.PORTFOLIO_ID counterId,
+		(H.INT_RATE * 100) intRate,
+		H.TERM,
+		H.VDATE,
+		H.MDATE,
+		/*add by swwan 重庆银行 添加交易对手 2021/7/22 start*/
+		mcp.COUNTER_NAME counter,
+		/*add by swwan 重庆银行 添加交易对手 2021/7/22 end*/
+		(
+		select decode(I.GRADE_RESULT,'01','AAA+','02','AAA','03','AAA-','04','AA+','05','AA','06','AA-','07','A+','08','A','09','A-','10','A-1','11','A-2','12','A-3','13','BBB+','14','BBB','15','BBB-','16','BB+','17','BB','18','BB-','19','B+','20','B','21','B-','22','CCC+','23','CCC','24','CCC-','25','CC+','26','CC','27','CC-','28','C+','29','C','30','C-','31','D','')
+		from MST_BOND_CREDIT_RATING I where I.O_TYPE='01' and I.O_CODE=  D.FINPROD_MARKET_ID and I.GRADE_DATE &lt;= TO_DATE(#{sysDate},'YYYY-MM-DD')
+
+		and I.GRADE_DATE =(
+		select max(a.GRADE_DATE)
+		from MST_BOND_CREDIT_RATING a  where a.O_TYPE='01' and a.O_CODE= I.O_CODE and a.GRADE_DATE &lt;= TO_DATE(#{sysDate},'YYYY-MM-DD')
+
+		)
+		and I.GRADE_RESULT = (
+		select max(GRADE_RESULT)
+		from MST_BOND_CREDIT_RATING  where O_TYPE='01' and O_CODE= I.O_CODE and GRADE_DATE = I.GRADE_DATE
+		)
+
+		) GRADE_RESULT
+		FROM
+		FIN_DEAL_TARGET A
+		LEFT JOIN TRD_PRODUCT_DEAL B ON A.FINPROD_ID = B.TRADE_ID
+		LEFT JOIN FIN_PRODUCT_TYPE C ON A.PLEDGE_FINPROD_ID = C.FINPROD_ID
+		LEFT JOIN FIN_PRODUCT D ON A.PLEDGE_FINPROD_ID = D.FINPROD_ID
+		LEFT JOIN MST_CUSTOMER_INFO_ADD E ON E.CUSTOMER_ID = D.ISSUER
+		LEFT JOIN FIN_PRODUCT_ADD F ON A.PLEDGE_FINPROD_ID = F.FINPROD_ID
+		LEFT JOIN TRD_PRODUCT_DEAL_ADD G ON G.TRADE_ID = B.TRADE_ID
+		left join ETR_ENTRUST_ADD K ON G.ENTRUST_ID = K.ENTRUST_ID
+		LEFT JOIN FIN_PRODUCT_ADD fpa ON G.PORTFOLIO_ID=fpa.PORTFOLIO_ID
+		/*修改关联条件 2019/3/6 start*/
+		LEFT JOIN FIN_TRADE_PRODUCT H ON A.FINPROD_ID = H.FINPROD_ID
+		LEFT JOIN MST_COUNTER_PARTY mcp on H.COUNTER_ID = mcp.COUNTER_ID
+		LEFT JOIN PA_TRD_PRODUCT_DEAL J ON J.TRADE_ID = B.TRADE_ID
+		WHERE
+		1 = 1
+		AND B.TRADE_STATUS='01'AND B.IS_CANCEL='N' AND J.BACK_LEND_DIRECTION in (#{BACK_LEND_DIRECTION_06})
+		<if test="sysDate != null and sysDate != ''">
+			AND (H.VDATE &lt;= TO_DATE(#{sysDate},'YYYY-MM-DD') AND TO_DATE(#{sysDate},'YYYY-MM-DD') &lt;= H.MDATE)
+		</if>
+		AND not exists(
+		select TT.FINPROD_ID from
+		TRD_FIN_PRODUCT_DEAL_TOTAL TT where
+		TT.PS = 'T07'
+		AND TT.FINPROD_ID = H.FINPROD_ID
+		AND TT.TRADE_STATUS = '01'
+		AND TT.IS_CANCEL = 'N'
+		AND TT.TRADE_DATE &lt;= TO_DATE(#{sysDate},'YYYY-MM-DD')
+		)
+		<if test="counterIdList != null and counterIdList.size()>0">
+			<foreach collection="counterIdList" open="AND G.PORTFOLIO_ID IN (" item="counterId" separator="," close=")">
+				#{counterId,jdbcType=VARCHAR}
+			</foreach>
+		</if>
+		<!--  add by wangyang1 【吉林银行】 增加 产品经理  2019年9月29日 start -->
+		<if test=" prodManager !=null and prodManager.size()>0 " >
+			AND fpa.PROD_MANAGER IN
+			<foreach collection="prodManager" item="item" open="(" close=")" separator=",">
+				#{item}
+			</foreach>
+		</if>
+		<!--  add by wangyang1 【吉林银行】 增加 产品经理end -->
+		<if test="finprodMarketId != null and finprodMarketId !=''">
+			AND A.PLEDGE_FINPROD_ID LIKE CONCAT(CONCAT('%',#{finprodMarketId}),'%')
+		</if>
+		<if test="type4 != null and type4 !=''">
+			AND C.TYPE_4  = #{type4}
+		</if>
+		<if test="type5 != null and type5 !=''">
+			AND C.TYPE_5  = #{type5}
+		</if>
+		<!--  add by swwan 【重庆银行】 增加 交易对手  2021年7月22日 start -->
+		<if test="counterList != null and counterList.size()>0">
+			<foreach collection="counterList" index="index" open="AND (H.COUNTER_ID IN (" item="counter" separator="," close=")">
+				<if test="(index % 998) == 0">
+					null) OR H.COUNTER_ID IN (
+				</if>
+				#{counter,jdbcType=VARCHAR}
+			</foreach>)
+		</if>
 
 		<!-- add by wsz 将协议回购区分出来 start-->
 		UNION ALL
