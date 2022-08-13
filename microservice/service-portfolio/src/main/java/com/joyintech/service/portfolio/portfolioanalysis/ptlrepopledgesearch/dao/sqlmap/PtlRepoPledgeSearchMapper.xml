@@ -98,8 +98,12 @@ FROM
 		/*修改关联条件 2019/3/6 end*/
 		LEFT JOIN PA_TRD_PRODUCT_DEAL J ON J.TRADE_ID = B.TRADE_ID
 		LEFT JOIN MST_COUNTER_PARTY mcp on H.COUNTER_ID = mcp.COUNTER_ID
+		left join ETR_ENTRUST ee2 on ee2.FINPROD_ID = G.TRADE_ID and ee2.ps = 'T94'
 		WHERE
 		1=1
+		<!-- 中途换券 换钱不展示-->
+		and (ee2.ENTRUST_TYPE != '31' or ee2.ENTRUST_TYPE is null)
+		  and A.PLEDGE_AMT is not null
 		AND B.TRADE_STATUS='01'AND B.IS_CANCEL='N'
 		and F.IS_SEC_BOND = 'N'
 		AND J.BACK_LEND_DIRECTION=#{BACK_LEND_DIRECTION_03}
@@ -112,7 +116,7 @@ FROM
 		select TT.FINPROD_ID from
 		TRD_FIN_PRODUCT_DEAL_TOTAL TT where
 		<!-- TT.PS = 'T07' -->
-		TT.PS in ('T07','T96','T95','T93')
+		TT.PS in ('T07','T96','T95','T93','T54','T94','T56')
 		AND TT.FINPROD_ID = H.FINPROD_ID
 		AND TT.TRADE_STATUS = '01'
 		AND TT.IS_CANCEL = 'N'
@@ -226,7 +230,7 @@ FROM
 		select TT.FINPROD_ID from
 		TRD_FIN_PRODUCT_DEAL_TOTAL TT where
 		<!-- TT.PS = 'T07' -->
-		TT.PS in ('T07','T96','T95','T93')
+		TT.PS in ('T07','T96','T95','T93','T54','T94','T56')
 		AND TT.FINPROD_ID = H.FINPROD_ID
 		AND TT.TRADE_STATUS = '01'
 		AND TT.IS_CANCEL = 'N'
@@ -334,7 +338,7 @@ FROM
 		AND not exists(
 		select TT.FINPROD_ID from
 		TRD_FIN_PRODUCT_DEAL_TOTAL TT where
-		TT.PS = 'T07'
+		TT.PS in ('T07','T96','T95','T93','T54','T94','T56')
 		AND TT.FINPROD_ID = H.FINPROD_ID
 		AND TT.TRADE_STATUS = '01'
 		AND TT.IS_CANCEL = 'N'
@@ -446,7 +450,7 @@ FROM
 		AND not exists(
 		select TT.FINPROD_ID from
 		TRD_FIN_PRODUCT_DEAL_TOTAL TT where
-		TT.PS in ('T07','T96','T95','T93')
+		TT.PS in ('T07','T96','T95','T93','T54','T94','T56','T56')
 		AND TT.FINPROD_ID = H.FINPROD_ID
 		AND TT.TRADE_STATUS = '01'
 		AND TT.IS_CANCEL = 'N'
@@ -718,7 +722,7 @@ FROM
 		<!-- XYHGFXSJ-874 解除质押不展示 -->
 		and (tfpdt.PS != 'T93' or tfpdt.PS is null)
 		<!-- XYHGFXSJ-874 解除质押不展示 -->
-		and ee2.ENTRUST_TYPE != '31'
+		and (ee2.ENTRUST_TYPE != '31' or ee2.ENTRUST_TYPE is null)
 		<if test="portfolioIdList != null and portfolioIdList.size()>0">
 			<foreach collection="portfolioIdList" open="AND pp.PORTFOLIO_ID IN (" item="portfolioId" separator="," close=")">
 				#{portfolioId,jdbcType=VARCHAR}
