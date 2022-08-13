@@ -2269,6 +2269,8 @@
                 $("#repSecNum").attr("disabled", true);
                 //资金账户
                 $("#acctNo").attr("disabled", true);
+                //质押券
+                $("#repSecId").attr("disabled", true);
             }
             //XYHGFXSJ-1096 【待办事项】到期续作-变更对手方--行情接收后保存，除组合名称、对手方外，期望不可编辑
         }
