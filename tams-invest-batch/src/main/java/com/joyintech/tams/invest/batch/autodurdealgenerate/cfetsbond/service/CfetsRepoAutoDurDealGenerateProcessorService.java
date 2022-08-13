@@ -99,7 +99,7 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
      */
     public  List<TrdRepoDurationDto> listTrdRepoDuration(Date batchDate){
         Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("statusValid", Arrays.asList(DictCodeListExt1.画面数据状态_待处理.getValue()));
+        paramMap.put("statusValid", Collections.singletonList(DictCodeListExt1.画面数据状态_待处理.getValue()));
         paramMap.put("ps", Arrays.asList(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue()));
         paramMap.put("notChannelFlag", "1");
         String mdate = DateUtil.format(batchDate);
@@ -359,6 +359,7 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
                     paramMap.put("ccy", trdProductDeal.getCcy());
                     stlPayOrder.setMyAcctNo(joyinbusinessCommonService.selectDVPCapacctInfoListByAcctId(paramMap));
                 }
+                stlPayOrder.setIsNeedSend(DictCodeList.是否_否.getValue());
                 stlPayOrders.add(stlPayOrder);
             }
             trdBondDurDbInertDto.setStlPayOrdersList(stlPayOrders);
