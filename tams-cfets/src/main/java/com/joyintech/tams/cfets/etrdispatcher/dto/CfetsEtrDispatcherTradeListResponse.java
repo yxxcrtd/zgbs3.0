@@ -101,6 +101,9 @@ public class CfetsEtrDispatcherTradeListResponse extends EtrEntrust {
     @ApiModelProperty(name="transRemainderAmt",value="剩余成交额度",example="1")
     private BigDecimal transRemainderAmt;
 
+    @ApiModelProperty(name="closeAmt",value="指令关闭额度",example="1")
+    private BigDecimal closeAmt;
+
     @ApiModelProperty(name="transmitTime",value="下达时间",example="HH:MM:SS")
     private String transmitTime;
 
@@ -401,6 +404,14 @@ public class CfetsEtrDispatcherTradeListResponse extends EtrEntrust {
 
     public void setTransRemainderAmt(BigDecimal transRemainderAmt) {
         this.transRemainderAmt = transRemainderAmt;
+    }
+
+    public BigDecimal getCloseAmt() {
+        return closeAmt;
+    }
+
+    public void setCloseAmt(BigDecimal closeAmt) {
+        this.closeAmt = closeAmt;
     }
 
     public String getTransmitTime() {

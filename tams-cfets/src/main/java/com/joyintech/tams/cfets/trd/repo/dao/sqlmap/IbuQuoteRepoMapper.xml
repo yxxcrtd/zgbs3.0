@@ -324,7 +324,7 @@
         <if test="repo_pledge_model != null and repo_pledge_model.equals('03')">
             LEFT JOIN ETR_SEC_STOCK ON ETR_SEC_STOCK.PLEDGE_STOCK_ID = ETR_ENTRUST_ADD.PLEDGE_STOCK_ID
         </if>
-            LEFT JOIN (select sum(SHARE_AMT) totalShareAmt,tpda.ENTRUST_ID
+            LEFT JOIN (select sum(TRADE_AMT) totalShareAmt,tpda.ENTRUST_ID
                         from TRD_PRODUCT_DEAL tpd
                         left join TRD_PRODUCT_DEAL_ADD tpda on tpd.TRADE_ID = tpda.TRADE_ID
                         where tpd.IS_CANCEL = 'N' and tpd.TRADE_STATUS = '01'
