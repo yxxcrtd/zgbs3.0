@@ -439,14 +439,14 @@
                 </div>
 
                 <div class="form-inline-wrap" style="width: 50%; padding-top:6px;" id="newRepSecId_div" >
-                    <label class="layui-form-label" style="width: 150px;" data-th-text="#{EtrExchangeAgreRepTrade001.newRepSecId}">换入券</label>
+                    <label class="layui-form-label" style="width: 150px;" id = "newRepSecIds" data-th-text="#{EtrExchangeAgreRepTrade001.newRepSecId}">换入券</label>
                     <div class="layui-input-inline input-inline" style=" margin: 0px; margin-left: auto;">
                         <select required type="text" id="newRepSecId" name="newRepSecId" class="layui-input form-input input-select" placeholder="请输入内容" data-th-data-url="@{'/etrexchange/agreementrep/EtrExchangeAgreRepTrade001/getFinprodMarketInfoWfl'}"
                                 parentIds="acctTradeMarket,expireSettleDate" th:initValue="${entity?.newRepSecId}" data-th-placeholder="#{SysCommon.placeholder}"  formatoption=false></select>
                     </div>
                 </div>
                 <div class="form-inline-wrap" style="width: 50%; padding-top:6px;" id="newConRatio_div">
-                    <label class="layui-form-label" style="width: 150px;" data-th-text="#{EtrExchangeAgreRepTrade001.newConRatio}">新折算率</label>
+                    <label class="layui-form-label" style="width: 150px;" id = "newConRatios" data-th-text="#{EtrExchangeAgreRepTrade001.newConRatio}">新折算率</label>
                     <div class="layui-input-inline input-inline" style=" margin: 0px; margin-left: auto;">
                         <input type="text" id="newConRatio" name="newConRatio" placeholder="请输入内容" data-pattern="" data-fixtype="2" data-textrange='2' class="layui-input form-input text-number"
                                data-th-value="${entity?.newConRatio}" required="required" autocomplete="off" maxlength=9>
@@ -454,7 +454,7 @@
                     </div>
                 </div>
                 <div class="form-inline-wrap" style="width: 50%; padding-top:6px;" id="newRepSecNum_div">
-                    <label class="layui-form-label" style="width: 150px;" data-th-text="#{EtrExchangeAgreRepTrade001.newRepSecNum}">换入债券数量</label>
+                    <label class="layui-form-label" style="width: 150px;" id = "newRepSecNums" data-th-text="#{EtrExchangeAgreRepTrade001.newRepSecNum}">换入债券数量</label>
                     <div class="layui-input-inline input-inline" style=" margin: 0px; margin-left: auto;">
                         <input type="text" id="newRepSecNum" name="newRepSecNum" placeholder="请输入内容" data-pattern="" data-fixtype="2" data-textrange='2' class="layui-input form-input text-number"
                                data-th-value="${entity?.newRepSecNum}" required="required" autocomplete="off" maxlength=9>
