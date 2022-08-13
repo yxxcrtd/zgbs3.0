@@ -69,6 +69,10 @@
         NVL(NVL(NVL(TRD.FINPROD_TYPE2, TFPDT.FINPROD_TYPE2), TRD1.FINPROD_TYPE2),PTPD.PA_BUSS_TYPE)   AS CASHFLOWTYPE,
         <!-- modify by etliu 20220728 start 3.0.6协议回购+风险升级 XYHGFXSJ-640【实时资产头寸查询】【现金流缺口分析】协议回购深交所正回购提起购回，手工交收确认后，1、现金流缺口分析的现金流明细中，交易方向 显示错误，应显示提前购回。 2、实时资产头寸查询，债券质押式回购 债券， 持仓展示错误 start -->
         case
+            when TRD.PS = 'T56'
+            then TRD.PS
+            WHEN TRD.PS = 'T07' or TFPDT.ps = 'T07' THEN
+            'T95'
             when FPT.TYPE_8 = 'F07' and FPT.TYPE_6 = 'H01' and NVL(NVL(TRD.PS, TFPDT.PS), TRD1.PS) != 'T01' then NVL(NVL(TRD.PS, TFPDT.PS), TRD1.PS)
             when FPT.TYPE_8 in ('F07','F10','F12') then FPT.type_7 else NVL(NVL(TRD.PS, TFPDT.PS), TRD1.PS) end as  cashType,
         <!-- modify by etliu 20220728 start 3.0.6协议回购+风险升级 XYHGFXSJ-640【实时资产头寸查询】【现金流缺口分析】协议回购深交所正回购提起购回，手工交收确认后，1、现金流缺口分析的现金流明细中，交易方向 显示错误，应显示提前购回。 2、实时资产头寸查询，债券质押式回购 债券， 持仓展示错误 end -->
