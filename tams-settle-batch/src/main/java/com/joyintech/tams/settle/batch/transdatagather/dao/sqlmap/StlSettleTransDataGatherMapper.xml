@@ -272,6 +272,13 @@
         </trim>
     </insert>
 
+    <delete id="deleteSettleTransDataTotalPledge">
+        delete
+        from SETTLE_TRANS_DATA_TOTAL_PLEDGE
+        where TRADE_ID = #{tradeId,jdbcType=VARCHAR}
+          and BRANCH = #{branch,jdbcType=DECIMAL}
+          and PLEDGE_FINPROD_ID = #{pledgeFinprodId,jdbcType=VARCHAR}
+    </delete>
 
 
 </mapper>

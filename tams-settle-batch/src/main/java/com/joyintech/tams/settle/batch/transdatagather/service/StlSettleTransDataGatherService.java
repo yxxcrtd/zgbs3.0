@@ -126,6 +126,8 @@ public class StlSettleTransDataGatherService {
     }
 
     public int insetSettleTransDataTotalPledge(SettleTransDataTotalPledge settleTransDataTotalPledge) {
+        //防止重复插入
+        stlSettleTransDataGatherMapper.deleteSettleTransDataTotalPledge(settleTransDataTotalPledge);
         return stlSettleTransDataGatherMapper.insetSettleTransDataTotalPledge(settleTransDataTotalPledge);
     }
 
