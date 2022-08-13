@@ -91,7 +91,7 @@
 		  F.SETTLE_SPREED settleSpeed,/**清算速度*/
 		  F.VDATE valueDate,/**起息日*/
 		  F.VDATE2 valueDate2,/**起息日2*/
-		  F.MDATE maturityDate,/**到期日*/
+		  F.mpay_date maturityDate,/**到期日*/
 		  F.MDATE2 maturityDate2,/**到期日2*/
           NVL( F.TERM_DAYS ,FTP.TERM) termDays,/**期限天数*/
 		  F.TERM_DAYS2  termDays2,/**期限天数2*/
