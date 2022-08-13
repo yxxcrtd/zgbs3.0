@@ -488,6 +488,8 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                         dealTotal.setSettleDate(settleTransDataDto.getSettleDate());
                         //清算速度
                         dealTotal.setSettleSpeed(settleTransDataDto.getSettleSpeed());
+                        // 交易份额
+                        dealTotal.setShareAmt(settleTransDataDto.getShareAmt());
                         for (StlSettleTransDataGatherDto item : list) {
                             if(StringUtil.equals(item.getBusiSceneCalss(), DictCodeListStl.业务场景分类明细_债券协议正回购_首期_买入.getValue())
                                     ||StringUtil.equals(item.getBusiSceneCalss(), DictCodeListStl.业务场景分类明细_债券协议逆回购_首期_买入.getValue())){

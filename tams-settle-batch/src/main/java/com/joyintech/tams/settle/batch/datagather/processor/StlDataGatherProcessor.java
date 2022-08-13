@@ -359,8 +359,14 @@ public abstract class StlDataGatherProcessor extends BaseProcessor<NeedOperateEn
                 }
             }
         }else{
-            if(null != settleTransDataDto.getShareAmt() && settleTransDataDto.getShareAmt().compareTo(currEtrEntrust.getEntrustAmt())<=0){
-                entrustIds.add(currEtrEntrust.getEntrustId());
+            if(DictCodeListExt3.上农商_指令业务类型_协议回购解除质押指令_线上.getValue().equals(currEtrEntrust.getEntrustType())){
+                if(settleTransDataDto.getFpriceAmt().compareTo(currEtrEntrust.getEntrustAmt()) <= 0){
+                    entrustIds.add(currEtrEntrust.getEntrustId());
+                }
+            }else{
+                if(null != settleTransDataDto.getShareAmt() && settleTransDataDto.getShareAmt().compareTo(currEtrEntrust.getEntrustAmt())<=0){
+                    entrustIds.add(currEtrEntrust.getEntrustId());
+                }
             }
         }
     }
