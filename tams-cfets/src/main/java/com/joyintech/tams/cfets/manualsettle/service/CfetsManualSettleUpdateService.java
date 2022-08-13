@@ -359,7 +359,7 @@ public class CfetsManualSettleUpdateService extends BaseService<CfetsManualSettl
         //汇总交易编号	单交易时传交易编号
         req.setbTotalTradeId(cfetsManualSettleUpdateRequest.getTradeId());
         //汇总交易编号
-        req.setTotalTradeId(trdBankManualSettleInfo.getSettleSeqNo());
+        req.setTotalTradeId(cfetsManualSettleUpdateRequest.getTradeId());
         //流程状态	流程节点 ，提交 审批通过
         req.setFlowStatus(DictCodeListExt3.流程节点_审批生效.getValue());
         //余额校验	Y：需校验   N：不需校验
