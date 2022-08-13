@@ -747,9 +747,10 @@
         <!-- F.RATE_TYPE intRateType, -->
         F.INT_TYPE intRateType,
         G.PAY_CYCLE yearIntRate,
-        G.CALC_RULE calMethod,
+        G.CALC_RULE calMethod
+         <!--XYHGFXSJ-1069:代码无需用到 nextExeDate,nextExercisePrice modify by fuyongsheng 20220813 start,
         H.EXERCISE_DATE nextExeDate,
-        H.EXERCISE_PRICE nextExercisePrice
+        H.EXERCISE_PRICE nextExercisePrice-->
         FROM FIN_PRODUCT A
         LEFT JOIN FIN_CASH_INFO B
         ON A.FINPROD_ID = B.FINPROD_ID
@@ -767,7 +768,7 @@
         LEFT JOIN FIN_CASH_PAY_RULE G
         ON G.CASH_ID = B.CASH_ID
         AND G.FINPROD_TYPE2 = #{finprodType2}
-        LEFT JOIN (
+        <!--LEFT JOIN (
         SELECT *
         FROM FIN_EXERCISE_PLAN
         WHERE
@@ -775,7 +776,7 @@
         SELECT MIN(EXERCISE_DATE) FROM FIN_EXERCISE_PLAN WHERE FINPROD_ID = #{finprodId} AND FINPROD_TYPE2 = #{finprodType2} AND EXERCISE_DATE &gt;= #{sysDate}
         )
         AND FINPROD_ID = #{finprodId} AND FINPROD_TYPE2 = #{finprodType2}
-        ) H ON 1=1
+        ) H ON 1=1XYHGFXSJ-1069:代码无需用到 nextExeDate,nextExercisePrice modify by fuyongsheng 20220813 end-->
         WHERE
         A.FINPROD_ID = #{finprodId}
     </select>
