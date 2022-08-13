@@ -1,4 +1,4 @@
-var initFlag = false;
+var initFlag = true;
 $(function() {
 
     getoutDataTable();
@@ -18,42 +18,53 @@ $(function() {
 window.componentLoadCallback = function (isDone, pagePath, params) {
     if (isDone)
     {
-        var workflowId=$('#workflowId').val();
-        if(workflowId!=='')
-        {
-        	initFlag = true;
-            outOk();
-            initFlag = false;
-        }
-        else {
-            var oldpledgeBondList = null;//定义换入质押券列表值没发生变化前的记录
-            var oldOutBondList = null;//定义换出债券列表值没发生变化前的记录
-            var intertime = setInterval(function () {
-                var object = $.serializeToObject('#submitForm');
-                if (object.bussRepoSec !== undefined
-                    && ((object.bussRepoSec.pledgeBondList != null
-                            && object.bussRepoSec.pledgeBondList.length > 0
-                            && oldpledgeBondList !== JSON.stringify(object.bussRepoSec.pledgeBondList))
-                        || (object.outDataTable != null
-                            && object.outDataTable.length > 0
-                            && oldOutBondList !== JSON.stringify(object.outDataTable))
-                    )
-                ) {
-                    oldpledgeBondList = JSON.stringify(object.bussRepoSec.pledgeBondList);
-                    oldOutBondList = JSON.stringify(object.outDataTable);
-                    outOk();
+        // var workflowId=$('#workflowId').val();
+        // if(workflowId!=='')
+
+        if(initFlag) {
+            var workflowId=$('#workflowId').val();
+            if(workflowId!='') {
+                if (initFlag) {
+                    //流程中换出质押券换出债券汇总券面总额计算值sum(换出面额)
+                    if (entity_outBussRepoSec != null && entity_outBussRepoSec.length > 0) {
+
+                        var outSumAmtValue = 0;
+                        for (var i = entity_outBussRepoSec.length - 1; i >= 0; i--) {
+                            outSumAmtValue = JoyinMath.doAdd(outSumAmtValue, entity_outBussRepoSec[i].prin * entity_outBussRepoSec[i].pledgeRatio / 100);
+                        }
+                        $("#outSumAmt").val(outSumAmtValue);//换出质押券换出债券汇总券面总额计算值
+                    }
                 }
-                if ((object.bussRepoSec.pledgeBondList.length === 0
+            }
+        }
+        var oldpledgeBondList = null;//定义换入质押券列表值没发生变化前的记录
+        var oldOutBondList = null;//定义换出债券列表值没发生变化前的记录
+        var intertime = setInterval(function () {
+            var object = $.serializeToObject('#submitForm');
+            if (object.bussRepoSec !== undefined
+                && ((object.bussRepoSec.pledgeBondList != null
+                        && object.bussRepoSec.pledgeBondList.length > 0
+                        && oldpledgeBondList !== JSON.stringify(object.bussRepoSec.pledgeBondList))
+                    || (object.outDataTable != null
+                        && object.outDataTable.length > 0
+                        && oldOutBondList !== JSON.stringify(object.outDataTable))
+                )
+            ) {
+                oldpledgeBondList = JSON.stringify(object.bussRepoSec.pledgeBondList);
+                oldOutBondList = JSON.stringify(object.outDataTable);
+                outOk();
+            }
+            if ((object.bussRepoSec.pledgeBondList.length === 0
                     && oldpledgeBondList !== JSON.stringify(object.bussRepoSec.pledgeBondList))
-                    || (object.outDataTable.length === 0
-                        && oldpledgeBondList !== JSON.stringify(object.outDataTable))) {
-                    oldpledgeBondList = JSON.stringify(object.bussRepoSec.pledgeBondList);
-                    oldOutBondList = JSON.stringify(object.outDataTable);
-                    outOk();
-                }
-            }, 2000);
-        }
+                || (object.outDataTable.length === 0
+                    && oldpledgeBondList !== JSON.stringify(object.outDataTable))) {
+                oldpledgeBondList = JSON.stringify(object.bussRepoSec.pledgeBondList);
+                oldOutBondList = JSON.stringify(object.outDataTable);
+                outOk();
+            }
+        }, 2000);
         setBussRepoSecInput();
+        initFlag = false;
     }
 };
 /**
@@ -206,29 +217,30 @@ var outOk = function () {
     //确认按钮前清空最终质押券列表中数据
     var workflowId=$('#workflowId').val();
 debugger;
-    if(workflowId!='')
-    {
-
-        //流程中换出质押券换出债券汇总券面总额计算值sum(换出面额)
-        if (entity_outBussRepoSec!= null && entity_outBussRepoSec.length > 0) {
-
-            var outSumAmtValue = 0;
-            for (var i = entity_outBussRepoSec.length - 1; i >= 0; i--) {
-                outSumAmtValue = JoyinMath.doAdd(outSumAmtValue, entity_outBussRepoSec[i].prin * entity_outBussRepoSec[i].pledgeRatio/100 );
-            }
-            $("#outSumAmt").val(outSumAmtValue);//换出质押券换出债券汇总券面总额计算值
-        }
-        if(!initFlag){
-            //清空最终质押券列表
-            resultTable.clear(function () {
-            });
-        }
-    }
-    else
-    { //清空最终质押券列表
+    // if(workflowId!='')
+    // {
+    //     if(initFlag) {
+    //         //流程中换出质押券换出债券汇总券面总额计算值sum(换出面额)
+    //         if (entity_outBussRepoSec != null && entity_outBussRepoSec.length > 0) {
+    //
+    //             var outSumAmtValue = 0;
+    //             for (var i = entity_outBussRepoSec.length - 1; i >= 0; i--) {
+    //                 outSumAmtValue = JoyinMath.doAdd(outSumAmtValue, entity_outBussRepoSec[i].prin * entity_outBussRepoSec[i].pledgeRatio / 100);
+    //             }
+    //             $("#outSumAmt").val(outSumAmtValue);//换出质押券换出债券汇总券面总额计算值
+    //         }
+    //     }
+    //     if(!initFlag){
+    //         //清空最终质押券列表
+    //         resultTable.clear(function () {
+    //         });
+    //     }
+    // }
+    // else
+    // { //清空最终质押券列表
         resultTable.clear(function () {
         });
-    }
+    // }
 
 
     //业务逻辑：最终质押券信息数据=选出质押券列表中未选中的数据+选入质押券列表中的所有数据
@@ -342,19 +354,20 @@ debugger;
         $("#sumAmt").val('');
     }
 
-    if(workflowId!='')
-    {
-
-        //流程中换出质押券换出债券汇总券面总额计算值sum(换出面额)
-        if (bussResultRepoSecMsg!= null && bussResultRepoSecMsg.length > 0) {
-
-            var sumAmtValue = 0;
-            for (var i = bussResultRepoSecMsg.length - 1; i >= 0; i--) {
-                sumAmtValue = JoyinMath.doAdd(sumAmtValue, bussResultRepoSecMsg[i].pledgePrin*bussResultRepoSecMsg[i].pledgeRatio/100);
-            }
-            $("#sumAmt").val(sumAmtValue);//换出质押券换出债券汇总券面总额计算值
-        }
-    }
+    // if(workflowId!='')
+    // {
+    //     if(initFlag) {
+    //         //流程中换出质押券换出债券汇总券面总额计算值sum(换出面额)
+    //         if (bussResultRepoSecMsg != null && bussResultRepoSecMsg.length > 0) {
+    //
+    //             var sumAmtValue = 0;
+    //             for (var i = bussResultRepoSecMsg.length - 1; i >= 0; i--) {
+    //                 sumAmtValue = JoyinMath.doAdd(sumAmtValue, bussResultRepoSecMsg[i].pledgePrin * bussResultRepoSecMsg[i].pledgeRatio / 100);
+    //             }
+    //             $("#sumAmt").val(sumAmtValue);//换出质押券换出债券汇总券面总额计算值
+    //         }
+    //     }
+    // }
 
 };
 
