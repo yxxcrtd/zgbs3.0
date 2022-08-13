@@ -527,9 +527,9 @@
             SELECT  ENTRUST_ID bussId
                    ,FINPROD_ID pledgeId
                    ,PLEDGE_FACE_VALUE
-                   ,PLEDGE_NUMBER
+                   ,( PLEDGE_NUMBER - nvl(CLOST_NUMBER,0) ) PLEDGE_NUMBER
                    ,PLEDGE_RATIO
-                   ,PLEDGE_NUMBER*100
+                   ,( PLEDGE_NUMBER - nvl(CLOST_NUMBER,0) )*100
             FROM ETR_PLEDGE
             WHERE
                 <if test="entrustIdList != null and entrustIdList.size() > 0">
@@ -687,15 +687,16 @@
             from (
                      select ep.ENTRUST_ID
                            ,ep.FINPROD_ID
-                           ,(nvl(ep.PLEDGE_NUMBER,0) - nvl(wrfp.PLEDGE_NUMBER,0) - nvl(rfp.PLEDGE_NUMBER,0)) PLEDGE_NUMBER
+                           ,(nvl((ep.PLEDGE_NUMBER - nvl(ep.CLOST_NUMBER,0) ),0) - nvl(wrfp.PLEDGE_NUMBER,0) - nvl(rfp.PLEDGE_NUMBER,0)) PLEDGE_NUMBER
                            ,ep.PLEDGE_RATIO
                      from ETR_PLEDGE ep
                      left join WFL_REG_FIN_PLEDGE wrfp
                             on wrfp.PLEDGE_FINPROD_ID = ep.FINPROD_ID and ep.ENTRUST_ID = wrfp.ENTRUST_ID
-                     left join ( select t.ENTRUST_ID, t.PLEDGE_FINPROD_ID, t.PLEDGE_NUMBER
+                     left join ( select t.ENTRUST_ID, t.PLEDGE_FINPROD_ID,  sum(t.PLEDGE_NUMBER) PLEDGE_NUMBER
                                  from REG_FIN_PLEDGE t
                                  left join REG_FIN_PRODUCT_DEAL rfpd on t.TRADE_ID = rfpd.TRADE_ID
                                  where rfpd.IS_CANCEL = 'N'  and rfpd.TRADE_STATUS ='01'
+                                    group by t.ENTRUST_ID,t.PLEDGE_FINPROD_ID
                                  ) rfp on rfp.PLEDGE_FINPROD_ID = ep.FINPROD_ID and ep.ENTRUST_ID = rfp.ENTRUST_ID
                     <where>
                         <if test="entrustIdList != null and entrustIdList.size() > 0">
@@ -1228,9 +1229,9 @@
                     ENTRUST_ID bussId,
                     FINPROD_ID pledgeId,
                     PLEDGE_FACE_VALUE,
-                    PLEDGE_NUMBER,
+                    (PLEDGE_NUMBER - nvl(CLOST_NUMBER,0)) PLEDGE_NUMBER,
                     PLEDGE_RATIO,
-                    PLEDGE_NUMBER*100
+                    (PLEDGE_NUMBER - nvl(CLOST_NUMBER,0)) *100
                 FROM
                     ETR_PLEDGE
                 WHERE
@@ -1401,7 +1402,7 @@
     <select id="findEtrPrinByEtrIds" resultType="com.joyintech.tams.cfets.trd.repo.dto.RepoEntrustPledgeDto">
         select ENTRUST_ID entrustId, FINPROD_ID finprodId, sum(PLEDGE_NUMBER) avaPledgePrin
         from (
-                 select ENTRUST_ID, FINPROD_ID, PLEDGE_NUMBER
+                 select ENTRUST_ID, FINPROD_ID, ( PLEDGE_NUMBER - nvl(CLOST_NUMBER,0) ) PLEDGE_NUMBER
                  from ETR_PLEDGE ep
                 <where>
                     <if test="entrustIdList != null and entrustIdList.size() > 0">
