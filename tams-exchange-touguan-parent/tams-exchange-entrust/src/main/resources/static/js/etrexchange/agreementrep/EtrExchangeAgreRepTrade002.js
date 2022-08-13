@@ -1280,6 +1280,7 @@
                     $("#addCla").attr("disabled", false);
                 }
             } else if (ps == 'T94') {
+                $("#outAmt").attr("disabled", true)
                 if (repPs == BACK_LEND_DIRECTION_03) {
                     //本方交易员
                     $("#trader_div").hide();
@@ -2241,6 +2242,16 @@
             if(entity.entrustBussType === '31'){
                 $("#outAmt").attr('disabled', false);
             }
+            if(entity.reqOnId && entity.reqOnId != ""){
+                $("#newRepSecId").removeAttr("required")
+                $("#newRepSecNum").removeAttr("required")
+                $("#newConRatio").removeAttr("required")
+                $("#newRepSecIds").find('> .must').remove();
+                $("#newRepSecNums").find('> .must').remove();
+                $("#newConRatios").find('> .must').remove();
+                $("#outAmt").attr("disabled", true)
+                $("#origConRatio").val(Math.round(entity.tradeAmt / entity.origRepSecNum /100)).trigger('change');
+            }
             //中途换券 换券
             if(entity.entrustBussType === '21' && !entity.reqOnId){
                 $("#outRepSecId").attr('disabled', false);
@@ -2258,6 +2269,8 @@
                 $("#repSecNum").attr("disabled", true);
                 //资金账户
                 $("#acctNo").attr("disabled", true);
+                //质押券
+                $("#repSecId").attr("disabled", true);
             }
             //XYHGFXSJ-1096 【待办事项】到期续作-变更对手方--行情接收后保存，除组合名称、对手方外，期望不可编辑
         }

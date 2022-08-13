@@ -12,6 +12,7 @@ package com.joyintech.tams.exchange.entrust.fieldetrinfoquerymain.fieldetrinfoqu
 
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.intf.DataDictItem;
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.ArithmeticUtil;
@@ -21,6 +22,8 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.business.common.dto.CommonSearchInfoRequest;
 import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.common.base.dao.FinProductMapper;
+import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -66,6 +69,9 @@ public class FieldEtrInfoQueryService extends BaseService {
     private FieldEtrInfoQueryMapper fieldEtrInfoQueryMapper;
     @Autowired
     private IPlatformDate iPlatformDate;
+
+    @Autowired
+    private FinProductMapper finProductMapper;
 
     /**
      * 指令列表分页查询
@@ -197,6 +203,30 @@ public class FieldEtrInfoQueryService extends BaseService {
         if (org.apache.commons.collections.CollectionUtils.isNotEmpty(list)) {
 
             for (FieldEtrInfoQueryListResponse response : list) {
+
+                //XYHGFXSJ-1111 【指令分发】【场内指令查询】协议回购指令，问题如下
+                if (StringUtil.isNotEmpty(response.getFinprodMarketId()) && response.getFinprodMarketId().contains(GlobalConstant.COMMA)) {
+                    List<String> finprodAbbrs = new ArrayList<>();
+                    String[] finprodIds = response.getFinprodMarketId().split(GlobalConstant.COMMA);
+                    for (String finprod : finprodIds) {
+                        if (StringUtil.isNotEmpty(finprod)) {
+                            FinProduct finProduct = null;
+                            finProduct = finProductMapper.selectByFinprodMarketId(finprod);
+                            if (null == finProduct) {
+                                finProductMapper.selectByPrimaryKey(finprod);
+                                finProduct = finProductMapper.selectByPrimaryKey(finprod);
+                            }
+                            if (null != finProduct) {
+                                finprodAbbrs.add(finProduct.getFinprodAbbr());
+                            }
+                        }
+                    }
+                    if (!finprodAbbrs.isEmpty()) {
+                        response.setFinprodAbbr(String.join(GlobalConstant.COMMA, finprodAbbrs));
+                    }
+                }
+                //XYHGFXSJ-1111 【指令分发】【场内指令查询】协议回购指令，问题如下
+
                 //一级投标债券 重新计算执行进度和成交进度
                 if (StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue()) ||
                         StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {

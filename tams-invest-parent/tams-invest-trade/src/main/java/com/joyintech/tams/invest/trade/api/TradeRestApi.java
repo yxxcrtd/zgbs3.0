@@ -142,6 +142,7 @@ public class TradeRestApi {
                                 && StringUtil.equals(DictCodeList.交易方向_到期.getValue(), tempDto.getTrdFinProductDealTotal().getPs())) {
                             tempDto.getTrdProductDeal().setPs(DictCodeList.交易方向_到期.getValue());
                         }
+                        tempDto.setDayEndBatch("true".equals(param.getDayEndBatch()));
                     }
                 }
                 // add by etliu 20220219 end

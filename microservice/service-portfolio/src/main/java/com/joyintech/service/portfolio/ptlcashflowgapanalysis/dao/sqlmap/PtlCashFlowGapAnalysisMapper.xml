@@ -315,9 +315,8 @@
         OR (fcp.MDATE != to_date(#{sysDate},'YYYY-MM-DD') AND psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD')))
         <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 start -->
         and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07') and TRADE_MARKET in ('03','04'))
-        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07')
-                                                              and tptd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR} AND tptd.IS_CANCEL='N')
-        and not EXISTS (select 1 from TRD_FIN_PRODUCT_DEAL_TOTAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
+        and not EXISTS (select 1 from TRD_FIN_PRODUCT_DEAL_TOTAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93'))
         <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 end -->
         and (fp.IS_RIGHT = 'N' or fp.IS_RIGHT is null)
         and (fp.FINPROD_TYPE2 not in ('F18','F17','F07') or fp.FINPROD_TYPE2 is null)
@@ -450,7 +449,7 @@
         OR (fcp.MDATE != to_date(#{sysDate},'YYYY-MM-DD') AND psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD')))
         <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 start -->
         and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
-        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07') and tptd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR} AND tptd.IS_CANCEL='N')
+        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
         <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 end -->
         and (fp.IS_RIGHT = 'N' or fp.IS_RIGHT is null)
         and fp.FINPROD_TYPE2  in ('F18','F17','F07')
@@ -575,7 +574,7 @@
         OR (fcp.MDATE != to_date(#{sysDate},'YYYY-MM-DD') AND psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD')))
         <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 start -->
         and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
-        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07') and tptd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR} AND tptd.IS_CANCEL='N')
+        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
         <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 end -->
         and fp.IS_RIGHT = 'Y'
         and (
@@ -899,14 +898,13 @@
         )
         <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 start -->
         and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
-        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07') and tptd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR} AND tptd.IS_CANCEL='N')
+        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
         <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 end -->
         and psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD')
         and (fp.IS_RIGHT = 'N' or fp.IS_RIGHT is null)
         and (fp.FINPROD_TYPE2 not in ('F18','F17','F07') or fp.FINPROD_TYPE2 is null)
         and psp.ccy = #{ccy1,jdbcType=VARCHAR}
         and pa.USER_ID = #{userId}
-        and psp.AMOUNT > 0
         union all
 
         <!-- 3、查询非含权资产未来现金流(存款+项目类+计划类利率)。（资产收息预测、资产还本预测、资产到期预测） -->
@@ -995,7 +993,7 @@
         )
         <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 start -->
         and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
-        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07') and tptd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR} AND tptd.IS_CANCEL='N')
+        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
         <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 end -->
         and psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD')
         and fp.FINPROD_TYPE2  in ('F18','F17','F07')
@@ -1079,7 +1077,7 @@
         )
         <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 start -->
         and not EXISTS (select 1 from TRD_PRODUCT_TEMP_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
-        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07') and tptd.TRADE_STATUS = #{TRADE_STATUS_01, jdbcType=VARCHAR} AND tptd.IS_CANCEL='N')
+        and not EXISTS (select 1 from TRD_PRODUCT_DEAL tptd where tptd.FINPROD_ID = fcp.FINPROD_ID and tptd.PS in ('T96', 'T95', 'T93', 'T07'))
         <!--  add by etliu 3.0.6协议回购+风险升级 XYHGFXSJ-461 【现金流缺口分析】协议式上交所正回购提前购回数据，日间交收后，现金流缺口分析、组合未来头寸分析、实时资产头寸查询报表显示错误 end -->
         and psp.CDATE = to_date(#{sysDate},'YYYY-MM-DD')
         and fp.IS_RIGHT = 'Y'
@@ -1099,7 +1097,6 @@
         )
         and fp.CCY = #{ccy1,jdbcType=VARCHAR}
         and pa.USER_ID = #{userId}
-        and psp.AMOUNT > 0
         union all
 
         <!-- 5、查询含权资产未来现金流。（含权债行权预测） -->
@@ -1188,7 +1185,6 @@
         and fep1.EXERCISE_DATE is not null
         and fp.CCY = #{ccy1,jdbcType=VARCHAR}
         and pa.USER_ID = #{userId}
-        and psp.AMOUNT > 0
         ) total
         <!--多级法人改造 add by jingqiongqiong 20200615-->
         group by total.ccy,total.portfolioId,total.fundAccount,total.portfolioId1,total.portfolioSeries
@@ -1400,7 +1396,6 @@
         and (fp.CCY = #{ccy1,jdbcType=VARCHAR} OR FTP.CCY = #{ccy1,jdbcType=VARCHAR})
         and pa.USER_ID = #{userId}
         and (fp.FINPROD_TYPE2 not in ('F18','F17','F07') or fp.FINPROD_TYPE2 is null)
-        and psp.AMOUNT > 0
         union all
 
         <!-- 3、查询非含权资产未来现金流（存款+项目类+计划类利率）。（资产收息预测、资产还本预测、资产到期预测） -->
@@ -1493,7 +1488,6 @@
         and (fp.CCY = #{ccy1,jdbcType=VARCHAR} OR FTP.CCY = #{ccy1,jdbcType=VARCHAR})
         and pa.USER_ID = #{userId}
         and fp.FINPROD_TYPE2  in ('F18','F17','F07')
-        and psp.AMOUNT > 0
         union all
 
         <!-- 4、查询含权资产未来现金流。（含权债收息、还本预测） -->
@@ -1589,7 +1583,6 @@
         )
         and fp.CCY = #{ccy1,jdbcType=VARCHAR}
         and pa.USER_ID = #{userId}
-        and psp.AMOUNT > 0
         union all
 
         <!-- 5、查询含权资产未来现金流。（含权债行权预测） -->
@@ -1679,7 +1672,6 @@
         and fep1.EXERCISE_DATE is not null
         and fp.CCY = #{ccy1,jdbcType=VARCHAR}
         and pa.USER_ID = #{userId}
-        and psp.AMOUNT > 0
         ) total left join FIN_TERM_STRUCT_INFO ftsi on
         <if test="searchDateStart1 != null and searchDateStart1 != ''">
             (ceil(total.cDate-TO_DATE(#{searchDateStart1}, 'YYYY-MM-DD')) &gt;= ftsi.MIN_DAYS or ftsi.MIN_DAYS is null)
