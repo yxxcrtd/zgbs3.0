@@ -3002,7 +3002,7 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         if(StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_到期续做.getValue()) && DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(dto.getTradeMarket())
             &&DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getRepPs()) ){
             List<FinDealPledge> finDealPledgeList = finDealPledgeMapper.selectByFinprodId(new FinDealPledgeKey(){{
-                setFinprodId(postionFlowDto.getFinprodId());
+                setFinprodId(postionFlowDto.getInitialNum());
                 setBranch(0L);
             }});
             postionFlowDto.setFinDealPledgeList(finDealPledgeList);
