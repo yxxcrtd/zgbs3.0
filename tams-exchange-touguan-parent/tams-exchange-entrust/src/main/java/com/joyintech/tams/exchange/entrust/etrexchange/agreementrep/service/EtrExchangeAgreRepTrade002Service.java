@@ -1031,11 +1031,11 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
             if (StringUtil.isNotEmpty(dto.getTradeId()) && this.isAlreadyDoEntrust(dto.getPs(), dto.getTradeId())) {
                 dto.setUseFlg(DictCodeList.是否_是.getValue());
             }
-//            if (StringUtil.isNotEmpty(dto.getReqOnId())) {
-//                if (this.isAlreadyDoEntrustByRequestId(dto.getReqOnId())) {
-//                    dto.setUseFlg(DictCodeList.是否_是.getValue());
-//                }
-//            }
+            if (StringUtil.isNotEmpty(dto.getReqOnId())) {
+                if (this.isAlreadyDoEntrustByRequestId(dto.getReqOnId())) {
+                    dto.setUseFlg(DictCodeList.是否_是.getValue());
+                }
+            }
             //add wsz 添加状态判断是否被使用 end
             list.add(dto);
         });
