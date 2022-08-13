@@ -5,6 +5,7 @@ import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.validation.annotation.ValidLogic;
+import com.joyintech.tams.common.base.entity.FinDealPledge;
 import com.joyintech.tams.common.base.entity.FinTradeProduct;
 import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.validator.EtrExchangeAgreRepTradeValidator;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
@@ -660,5 +661,15 @@ public class EtrExchangeAgreRepTrade001Dto extends BaseEntity implements Process
 
 	public void setPledgeInvAim(String pledgeInvAim) {
 		this.pledgeInvAim = pledgeInvAim;
+	}
+
+	private List<FinDealPledge>  finDealPledgeList;
+
+	public List<FinDealPledge> getFinDealPledgeList() {
+		return finDealPledgeList;
+	}
+
+	public void setFinDealPledgeList(List<FinDealPledge> finDealPledgeList) {
+		this.finDealPledgeList = finDealPledgeList;
 	}
 }

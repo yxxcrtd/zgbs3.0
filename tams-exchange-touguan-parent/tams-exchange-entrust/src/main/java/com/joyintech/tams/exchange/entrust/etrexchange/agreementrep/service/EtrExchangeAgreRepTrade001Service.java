@@ -2998,6 +2998,18 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         }
         //实时资产头寸查询】协议回购上交所正回购到期续做数据日间交收后，对应报表里数值错误
 
+        //深交所正回购到期续做指令,新质押券持仓
+        if(StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_到期续做.getValue()) && DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(dto.getTradeMarket())
+            &&DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getRepPs()) ){
+            List<FinDealPledge> finDealPledgeList = finDealPledgeMapper.selectByFinprodId(new FinDealPledgeKey(){{
+                setFinprodId(postionFlowDto.getFinprodId());
+                setBranch(0L);
+            }});
+            postionFlowDto.setFinDealPledgeList(finDealPledgeList);
+        }
+
+        //深交所正回购到期续做指令,新质押券持仓
+
         parameter.setCustom(postionFlowDto);
 //        try {
             logger.info("新建指令持仓请求报文:" + JsonUtils.object2Json(parameter));
