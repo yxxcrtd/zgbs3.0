@@ -70,6 +70,7 @@
         100,0),'F17',NVL(ETR_ENTRUST.ENTRUST_NUM *100,0),NVL(ETR_ENTRUST.ENTRUST_AMT,ETR_ENTRUST.ENTRUST_NUM)) entrustAmt,
         decode(ETR_ENTRUST_ADD.ASSET_TYPE,'F01',NVL(ETR_FINISH_STATUSA.FINISH_AMT * 100,0),'F10',NVL(ETR_FINISH_STATUSA.FINISH_AMT *
         100,0),'F17',NVL(ETR_FINISH_STATUSA.FINISH_AMT * 100,0),NVL(ETR_FINISH_STATUSA.FINISH_AMT,0)) finishAmt,
+        nvl(ETR_ENTRUST_ADD.CLOSE_AMT,0) closeAmt,
         ETR_ENTRUST.CCY ccy,
         ETR_ENTRUST.ENTRUST_DATE entrustDate,
         ETR_ENTRUST.VDATE vdate,
@@ -197,7 +198,7 @@
         ) ELSE (
             CASE
             WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' THEN
-            ( NVL( T7.FINISH_AMT, 0 ) + NVL( T9.ENT_FINISH_AMT * 100, 0 ) ) / 10000 ELSE round( ( NVL( T7.FINISH_AMT, 0 ) + NVL( T9.ENT_FINISH_AMT, 0 ) ) / 10000, 2 )
+            ( NVL( T7.FINISH_AMT, 0 ) + NVL( TT9.ENT_FINISH_AMT * 100, 0 ) ) / 10000 ELSE round( ( NVL( T7.FINISH_AMT, 0 ) + NVL( TT9.ENT_FINISH_AMT, 0 ) ) / 10000, 2 )
             END
         )
         END AS execFinishAmt,
@@ -218,8 +219,9 @@
         ) ELSE (
             CASE
             WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' THEN
-            NVL( ETR_ENTRUST.ENTRUST_NUM, 0 ) / 100 - NVL( T7.FINISH_AMT, 0 ) / 10000 - NVL( T9.ENT_FINISH_AMT, 0 ) / 100 ELSE round(
-            ( NVL( ETR_ENTRUST.ENTRUST_AMT, 0 ) - NVL( T7.FINISH_AMT, 0 ) - NVL( T9.ENT_FINISH_AMT, 0 ) ) / 10000, 2  )
+            NVL( ETR_ENTRUST.ENTRUST_NUM, 0 ) / 100 - NVL( T7.FINISH_AMT, 0 ) / 10000 - NVL( TT9.ENT_FINISH_AMT, 0 ) / 100 - NVL( ETR_ENTRUST_ADD.CLOSE_AMT, 0 ) / 100
+             ELSE round(
+            ( NVL( ETR_ENTRUST.ENTRUST_AMT, 0 )- NVL( ETR_ENTRUST_ADD.CLOSE_AMT, 0 ) - NVL( T7.FINISH_AMT, 0 ) - NVL( TT9.ENT_FINISH_AMT, 0 ) ) / 10000, 2  )
             END
         )
         END AS execRemainderAmt,
@@ -234,8 +236,8 @@
         ) ELSE (
             CASE
             WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' THEN
-            ROUND( NVL( CB.totalShareAmt, nvl( C2B.totalShareAmt, 0 ) ) + NVL( T6.FINISH_AMT * 100, 0 ) ) / 10000 ELSE ROUND(
-            ( NVL( C.totalShareAmt, nvl( C2.FPRICE_AMT, 0 ) ) + NVL( T6.FINISH_AMT, 0 ) ) / 10000, 2  )
+            ROUND( NVL( C5.totalShareAmt * 100, 0 ) ) / 10000 ELSE ROUND(
+            ( NVL( C5.totalTradeAmt , 0 ) ) / 10000, 2  )
             END
         )
         END AS transFinishAmt,
@@ -256,9 +258,10 @@
         ) ELSE (
             CASE
             WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' THEN
-            NVL( ETR_ENTRUST.ENTRUST_NUM, 0 ) / 100 - ROUND( NVL( CB.totalShareAmt, nvl( C2B.totalShareAmt, 0 ) ) + NVL( T6.FINISH_AMT * 100, 0 ) ) / 10000 ELSE ROUND(
+            ROUND((NVL( ETR_ENTRUST.ENTRUST_NUM, 0 ) / 100 - NVL( ETR_ENTRUST_ADD.CLOSE_AMT, 0 ) / 100 - NVL( C5.totalShareAmt * 100, 0 )) / 10000,2)
+            ELSE ROUND(
             (
-            NVL( ETR_ENTRUST.ENTRUST_AMT, 0 ) - NVL( C.totalShareAmt, nvl( C2.FPRICE_AMT, 0 ) ) + NVL( T6.FINISH_AMT, 0 )
+            NVL( ETR_ENTRUST.ENTRUST_AMT, 0 )- NVL( ETR_ENTRUST_ADD.CLOSE_AMT, 0 ) - NVL( C5.totalTradeAmt, 0 )
             ) / 10000, 2 )
             END
         )
@@ -325,6 +328,13 @@
         where QUOTE_ID in (select QUOTE_ID from IBU_QUOTE_CREP where TRADE_STATUS = '07')
         GROUP BY iqer.ENTRUST_ID) C /*质押式回购银行间报价 按指令代码汇总 交易份额，债券数量等*/
         ON C.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
+        LEFT JOIN (select sum(TRADE_AMT) totalTradeAmt,sum(SHARE_AMT) totalShareAmt,tpda.ENTRUST_ID
+        from TRD_PRODUCT_DEAL tpd
+        left join TRD_PRODUCT_DEAL_ADD tpda on tpd.TRADE_ID = tpda.TRADE_ID
+        where tpd.IS_CANCEL = 'N' and tpd.TRADE_STATUS = '01'
+        group by tpda.ENTRUST_ID
+        ) C5/*质押式回购银行间报价*/
+        ON C5.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
         LEFT JOIN (SELECT iqer.ENTRUST_ID, iqer.FPRICE_AMT
         FROM IBU_QUOTE_ETR_RE iqer /*质押式回购银行间报价*/
         where QUOTE_ID in (select QUOTE_ID from IBU_QUOTE_CREP where TRADE_STATUS = '07')) C2/*质押式回购银行间报价*/
@@ -403,6 +413,15 @@
         ) SECT ON SECT.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
 
         LEFT JOIN ETR_FINISH_STATUS T9 ON T9.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID  AND ETR_ENTRUST.ENTRUST_ID = T9.TRADE_ID
+        LEFT JOIN(
+                SELECT
+                ENTRUST_ID,
+                SUM(ENT_FINISH_AMT) AS ENT_FINISH_AMT
+                FROM
+                ETR_FINISH_STATUS
+                GROUP BY
+                ENTRUST_ID) TT9 ON
+        ETR_ENTRUST.ENTRUST_ID = TT9.ENTRUST_ID
         LEFT JOIN (
         SELECT bo.BID_MODLE, brt.IS_WIN ,bo.FINPROD_ID ,bobp.ENTRUST_ID  FROM  BID_ORDER bo
         LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
