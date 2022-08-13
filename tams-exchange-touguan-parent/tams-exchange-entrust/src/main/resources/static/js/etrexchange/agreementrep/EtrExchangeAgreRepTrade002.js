@@ -1280,6 +1280,7 @@
                     $("#addCla").attr("disabled", false);
                 }
             } else if (ps == 'T94') {
+                $("#outAmt").attr("disabled", true)
                 if (repPs == BACK_LEND_DIRECTION_03) {
                     //本方交易员
                     $("#trader_div").hide();
@@ -2240,6 +2241,16 @@
             //中途换券 换钱
             if(entity.entrustBussType === '31'){
                 $("#outAmt").attr('disabled', false);
+            }
+            if(entity.reqOnId && entity.reqOnId != ""){
+                $("#newRepSecId").removeAttr("required")
+                $("#newRepSecNum").removeAttr("required")
+                $("#newConRatio").removeAttr("required")
+                $("#newRepSecIds").find('> .must').remove();
+                $("#newRepSecNums").find('> .must').remove();
+                $("#newConRatios").find('> .must').remove();
+                $("#outAmt").attr("disabled", true)
+                $("#origConRatio").val(Math.round(entity.tradeAmt / entity.origRepSecNum /100)).trigger('change');
             }
             //中途换券 换券
             if(entity.entrustBussType === '21' && !entity.reqOnId){
