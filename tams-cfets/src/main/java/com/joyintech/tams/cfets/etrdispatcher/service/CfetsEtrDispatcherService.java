@@ -415,7 +415,7 @@ public class CfetsEtrDispatcherService extends BaseService {
                 //这里特殊处理成交进度和成交额度,如果场内和场外的资产类型重合了，考虑用业务类型或者交易场所进行区分，不能单纯的排除某一种类型
                 if(DictCodeUtil.equals(response.getFinprodType2(),BussinessDictCodeList.平安资产类型_一级投标债券,BussinessDictCodeList.平安资产类型_计划类资产_利率型,
                         BussinessDictCodeList.平安资产类型_计划类资产_货币型,BussinessDictCodeList.平安资产类型_计划类资产_净值型,BussinessDictCodeList.平安资产类型_拆借,BussinessDictCodeList.平安资产类型_买断式回购,
-                        BussinessDictCodeList.平安资产类型_存款,BussinessDictCodeList.平安资产类型_项目类资产)
+                        BussinessDictCodeList.平安资产类型_存款,BussinessDictCodeList.平安资产类型_项目类资产,BussinessDictCodeList.平安资产类型_债券借贷)
                         || (DictCodeUtil.equals(response.getFinprodType2(),DictCodeList.平安资产类型_质押式回购)
                             && (StringUtil.equals(response.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_质押式回购首期.getValue()) || StringUtil.equals(response.getBusiTypePosition(), 头寸业务类型_质押式回购到期.getValue())))
                         || StringUtil.equals(response.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_现券交易.getValue())

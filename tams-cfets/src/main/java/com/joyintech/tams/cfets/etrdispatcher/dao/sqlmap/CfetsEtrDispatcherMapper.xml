@@ -964,7 +964,7 @@
     <sql id="etrDispatcherDealListInfo">
         #{busiTypePosition} busiTypePosition,
         tpda.entrust_id entrustId,
-        FDP.PLEDGE_FINPROD_ID pledgeFinprodId,
+        nvl(FDTFP.FINPROD_ID,FDP.PLEDGE_FINPROD_ID) pledgeFinprodId,
         NVL( fp2.FINPROD_ABBR, fp2.FINPROD_NAME ) chlIdName,
         tpd.trade_market tradeMarket,
         tpd.UNIT_CPRICE fCprice,
@@ -982,8 +982,9 @@
         tpda.portfolio_id portfolioId,
         pp.portfolio_name portfolioName,
         case when tpd.FINPROD_TYPE2 in ('F04','F05') then FDP.finprod_market_id else fp.finprod_market_id end finprodMarketId,
-        case when tpd.FINPROD_TYPE2 in ('F04','F05') then FDP.finprod_abbr else fp.finprod_abbr  end finprodAbbr,
-        nvl(tpdt.ps, tpd.PS) ps,
+        case when tpd.FINPROD_TYPE2 in ('F04','F05') then FDP.finprod_abbr
+             when tpd.FINPROD_TYPE2 in ('F29','F30') then FDTFP.finprod_abbr else fp.finprod_abbr end finprodAbbr,
+        case when tpd.FINPROD_TYPE2 in ('F29','F30') then fpt.TYPE_7  else nvl(tpdt.ps, tpd.PS) end  ps,
         ssai.sec_acct_name secAcctId,
         to_char(tpd.trade_date,'yyyy-MM-dd') tradeDate,
         DECODE(tpd.settle_speed,0,'01',1,'02','2','03') settleSpeed,
@@ -991,7 +992,7 @@
         tpd.unit_cprice unitPrice,
         tpd.yield*100 matureYield,
         tpd.exer_yield*100 exerYield,
-        tpd.share_amt/100 shareNum,
+        case when tpd.FINPROD_TYPE2 in ('F29','F30') then tpd.PRIN_AMT/10000 else tpd.share_amt/100 end shareNum,
         tpd.unit_int unitInt,
         tpd.unit_fprice allPrice,
         tpd.cprice_amt cpriceAmt,
@@ -1007,7 +1008,7 @@
         ftp.TERM repoTerm,
         NVL(TO_CHAR(FTP.VPAY_DATE,'YYYY-MM-DD'),TO_CHAR(FTP.VDATE,'YYYY-MM-DD')) vpayDate,/*首次结算日*/
         NVL(TO_CHAR(FTP.MPAY_DATE,'YYYY-MM-DD'),TO_CHAR(FTP.MDATE,'YYYY-MM-DD')) mpayDate,/*到期结算日*/
-        ftp.ACT_CAP_DAYS actCapDays,
+        case when tpd.FINPROD_TYPE2 in ('F29','F30') then FTP.MDATE -FTP.VDATE else ftp.ACT_CAP_DAYS end  actCapDays,
         ftp.INT_RATE * 100 rebackPrice,
         TPD.TRADE_AMT tradeAmt,
         FTP.M_INT_AMT mIntAmt, /*回购利息*/
@@ -1017,8 +1018,8 @@
         FDP.PLEDGE_NUMBER * 100 secTotalPrin,
         tpd.TRADE_AMT actPayAmt,
         tpd.PRIN_AMT prinAmt,
-        sdl_registOrg.ITEM_VALUE registOrgStr,
-        FDTFP.FINPROD_NAME targetFinprodName
+        sdl_registOrg.ITEM_VALUE registOrgStr
+
     </sql>
 
     <select id="getEtrDispatcherDealListInfo"

@@ -208,9 +208,6 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
     @ApiModelProperty(name = "deliverySchedule", value = "交收进度")
     private String deliverySchedule;
 
-    @ApiModelProperty(name = "targetFinprodName", value = "标的券代码")
-    private String targetFinprodName;
-
     public String getEffectFlag() {
         return effectFlag;
     }
@@ -1862,11 +1859,4 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
         this.bidModle = bidModle;
     }
 
-    public String getTargetFinprodName() {
-        return targetFinprodName;
-    }
-
-    public void setTargetFinprodName(String targetFinprodName) {
-        this.targetFinprodName = targetFinprodName;
-    }
 }
