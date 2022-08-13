@@ -2014,7 +2014,7 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
                     // 分支序号
                     finDealPledge.setBranch(finTradeProduct.getBranch());
                     finDealPledge.setPledgeFinprodId(pledgeInfo.getFinprodMarketId());
-                    BigDecimal faceValue = trdCommonBaseService.getFaceValue(infContractDetailfile.getFinprodId(), infContractDetailfile.getTradeDate());
+                    BigDecimal faceValue = trdCommonBaseService.getFaceValue(finDealPledge.getPledgeFinprodId(), infContractDetailfile.getTradeDate());
                     finDealPledge.setPledgeFaceValue(faceValue);
                     finDealPledge.setPledgeNumber(pledgeInfo.getPledgeNumber());
                     finDealPledge.setPledgeAmt(infContractDetailfile.getTradeAmt());
