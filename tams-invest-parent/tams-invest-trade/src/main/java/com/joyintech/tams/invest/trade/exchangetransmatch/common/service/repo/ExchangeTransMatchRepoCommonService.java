@@ -1008,7 +1008,7 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
             }
         }
         // XYHGFXSJ-1130:modify by fuyongsheng 20220813 start
-        if(null != finTradeProductDto.getmTradeAmt()){
+        if(null == finTradeProductDto.getmTradeAmt()){
             finTradeProductDto.setmTradeAmt(mTradeAmt);
         }
         // XYHGFXSJ-1130:modify by fuyongsheng 20220813 end

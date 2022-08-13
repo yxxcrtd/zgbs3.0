@@ -365,10 +365,10 @@ public class CommonPositionService {
 	}
 
 	/**
-	 * 深交所正回购到期续做 日间、日终 头寸特殊处理
+	 * 协议回购质押券持仓处理
 	 */
 	public boolean dealPositionForXYHGZYQ(Map<String, Object> properties) {
-		logger.debug("[处理深交所正回购到期续做头寸],参数：{}", JSON.toJSONString(properties));
+		logger.debug("[协议回购质押券持仓处理],参数：{}", JSON.toJSONString(properties));
 		String flowType = String.valueOf(properties.get("flowType"));
 		String processConfig = String.valueOf(properties.get("processConfig"));
 		// 置换方向
@@ -406,7 +406,7 @@ public class CommonPositionService {
 				insertPtlSecPositionFlow(ptlSecPositionFlow);//入库
 			}
 		} else {
-			throw new BusinessException("深交所正回购到期续做日间成交流水处理,配置无效");
+			throw new BusinessException("协议回购质押券持仓处理,配置无效");
 		}
 		return true;
 	}

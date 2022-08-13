@@ -819,6 +819,8 @@ FROM
 		left join ETR_ENTRUST ee2 on ee2.FINPROD_ID = tpd.TRADE_ID and ee2.ps = 'T94'
 		WHERE pp.INVEST_YESORNO = 'Y' and fpd.trade_id is not null
 		and eea.asset_type1 = 'H01'
+		and ee.ps != 'T94'
+		And ee2.ps != 'T94'
 		<!-- XYHGFXSJ-874 解除质押不展示 -->
 		and (tfpdt.PS != 'T93' or tfpdt.PS is null)
 		<!-- XYHGFXSJ-874 解除质押不展示 -->
@@ -844,6 +846,82 @@ FROM
 		GROUP BY fpd.TRADE_ID,tpd.BUSI_TYPE,tpd.TRADE_ID,tpda.ENTRUST_ID,pp.PORTFOLIO_ID,pp.portfolio_name,
 		fp.finprod_market_id,fp.finprod_abbr,ptpd.back_lend_direction,fdp.PLEDGE_NUMBER,ftp.TRADE_MARKET,tpd.TRADE_DATE,
 		tpd.vdate,tpd.mdate,ftp.TERM_TYPE,ftp.act_cap_days,fpd.trade_date,tpd.CCY,tpd.REMARK
+
+		union all
+
+		SELECT
+		tfpdt.TOTLE_TRADE_ID businessCode,
+		tpd.BUSI_TYPE tradeType,
+		tpd.TRADE_ID sourceBusinessCode,
+		tdta.ENTRUST_ID entrustCode,
+		pp.PORTFOLIO_ID portfolioId,
+		pp.portfolio_name portfolioName,
+		fp.finprod_market_id finprodId,
+		fp.finprod_abbr finprodName,
+		ptpd.back_lend_direction tradePs,
+		tfpdt.SHARE_AMT * 100 tradeAmt,
+		ftp.TRADE_MARKET tradeMarket,
+		tpd.TRADE_DATE tradeDate,
+		tpd.vdate vPayDate,
+		tpd.mdate mPayDate,
+		ftp.TERM_TYPE termType,
+		tpd.mdate - tpd.vdate actCapDays,
+		fpd.trade_date pledgeSubstitutionDate,
+		tpd.CCY ccy,
+		tpd.REMARK remark
+		FROM
+		TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt
+		LEFT JOIN TRD_DEAL_TOTAL_ADD tdta ON tfpdt.TOTLE_TRADE_ID = tdta.TOTLE_TRADE_ID
+		LEFT JOIN ETR_ENTRUST ee ON tdta.ENTRUST_ID = ee.ENTRUST_ID
+		LEFT JOIN ETR_ENTRUST_add eea ON ee.ENTRUST_ID = eea.ENTRUST_ID
+		LEFT JOIN TRD_PRODUCT_DEAL tpd ON tfpdt.FINPROD_ID = tpd.FINPROD_ID
+		LEFT JOIN PTL_PORTFOLIO pp ON ee.PORTFOLIO_ID = PP.PORTFOLIO_ID
+		LEFT JOIN FIN_PRODUCT fp ON fp.finprod_id = tfpdt.finprod_id
+		LEFT JOIN PA_TRD_PRODUCT_DEAL ptpd ON ptpd.TRADE_ID = tpd.TRADE_ID
+		LEFT JOIN FIN_TRADE_PRODUCT ftp ON ( ( tpd.TRADE_STATUS = '01' AND ftp.FINPROD_ID = tpd.FINPROD_ID ) )
+		LEFT JOIN FIN_PLEDGE_DISPLACE fpd ON tpd.trade_id = fpd.f_trade_id
+		WHERE pp.INVEST_YESORNO = 'Y' and fpd.trade_id is not null
+		and eea.asset_type1 = 'H01'
+		AND ee.PS = 'T94'
+		AND ( ee.ENTRUST_TYPE != '31' OR ee.ENTRUST_TYPE IS NULL )
+		<if test="portfolioIdList != null and portfolioIdList.size()>0">
+			<foreach collection="portfolioIdList" open="AND pp.PORTFOLIO_ID IN (" item="portfolioId" separator="," close=")">
+				#{portfolioId,jdbcType=VARCHAR}
+			</foreach>
+		</if>
+
+		<if test="substitutionTradeStartDate != null and substitutionTradeStartDate != '' and substitutionTradeEndDate != null and substitutionTradeEndDate != ''">
+			AND ( tpd.TRADE_DATE &lt;= TO_DATE(#{substitutionTradeEndDate},'YYYY-MM-DD') AND TO_DATE(#{substitutionTradeStartDate},'YYYY-MM-DD') &lt;= tpd.TRADE_DATE)
+		</if>
+		<if test="substitutionStartDate != null and substitutionStartDate != '' and substitutionEndDate != null and substitutionEndDate != ''">
+			AND ( fpd.TRADE_DATE &lt;=  TO_DATE(#{substitutionEndDate},'YYYY-MM-DD') AND TO_DATE(#{substitutionStartDate},'YYYY-MM-DD') &lt;= fpd.TRADE_DATE)
+		</if>
+		<if test="tradePs != null and tradePs != '' ">
+			AND ptpd.back_lend_direction=#{tradePs,jdbcType=VARCHAR}
+		</if>
+		<if test="tradeType != null and tradeType != '' ">
+			AND  tpd.BUSI_TYPE=#{tradeType,jdbcType=VARCHAR}
+		</if>
+		GROUP BY
+		tfpdt.TOTLE_TRADE_ID,
+		tpd.BUSI_TYPE,
+		tpd.TRADE_ID,
+		tdta.ENTRUST_ID,
+		pp.PORTFOLIO_ID,
+		pp.portfolio_name,
+		fp.finprod_market_id,
+		fp.finprod_abbr,
+		ptpd.back_lend_direction,
+		tfpdt.SHARE_AMT * 100,
+		ftp.TRADE_MARKET,
+		tpd.TRADE_DATE,
+		tpd.vdate,
+		tpd.mdate,
+		ftp.TERM_TYPE,
+		tpd.mdate - tpd.vdate,
+		fpd.trade_date,
+		tpd.CCY,
+		tpd.REMARK
 		) T
 		ORDER BY T.tradeDate DESC
 		<!-- add wsz 20220810 非协议回购 -->

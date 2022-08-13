@@ -977,7 +977,8 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                 }else{
                     etrSecPositionFlowDto.setAmount(BigDecimal.ZERO);
                 }
-                etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
+                // 统一挪到方法最后添加
+                // etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
             }
         }
         // 交易提交
@@ -1015,9 +1016,11 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                 }
                 // XYHGFXSJ-1047:撤销数据的正负号在外面的方法统一处理了,这里无需取反 modify by fuyongsheng 20220813 end
                 // 添加现金流水到目标dto
-                etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
+                // 统一挪到方法最后添加
+                // etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
             }
         }
+        etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
     }
 
     /**
