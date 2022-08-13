@@ -1284,13 +1284,13 @@ public class TradeHelper {
         String stockCode = integratedEntrust.getStockCode();
         String tradingDay = commonManagement.getTradingDay();
         Instruction instruction = instructionService.findById(integratedEntrust.getInstructionId());
+        if (Market.isShMarket(instruction.getTradeMarket())) {
+            integratedEntrust.setMarket(Market.SHSE.value);
+        } else if (Market.isSzMarket(instruction.getTradeMarket())) {
+            integratedEntrust.setMarket(Market.SZSE.value);
+        }
         //中途换券-换钱
         if (StringUtil.equals(EntrustBussTypeEnum.中途换券指令_换钱.value, instruction.getEntrustBussType())) {
-            if (Market.isShMarket(instruction.getTradeMarket())) {
-                integratedEntrust.setMarket(Market.SHSE.value);
-            } else if (Market.isSzMarket(instruction.getTradeMarket())) {
-                integratedEntrust.setMarket(Market.SZSE.value);
-            }
             //填充资产信息
             fillStockInfo(integratedEntrust, instruction);
         } else {
@@ -1298,8 +1298,8 @@ public class TradeHelper {
             createOrderByInstrument(integratedEntrust, instrument, null);
 
             if (StringUtil.isNotEmpty(stockCode)) {
-                integratedEntrust.setMarket(StockCodeUtils.getMarket(stockCode));
-                integratedEntrust.setStockCode(integratedEntrust.getStockCode());
+                integratedEntrust.setStockCode(stockCode);
+                integratedEntrust.setStockName(instruction.getFinprodAbbr());
             }
         }
         if (StringUtil.equals(instruction.getFinprodType2(), 金融产品类型_投管用_债券质押式正回购.getValue())
@@ -1364,7 +1364,13 @@ public class TradeHelper {
             integratedEntrust.setPs(instruction.getTradeSide());
             integratedEntrust.setEntrustClass(instruction.getEntrustClass());
             integratedEntrust.setAccountName(instruction.getAcctName());
-
+            //本方对手方交易信息为空时从传参取值
+            if(StringUtil.isEmpty(integratedEntrust.getAccountId())){
+                integratedEntrust.setAccountId(instruction.getAcctNo());
+            }
+            if(StringUtil.isEmpty(integratedEntrust.getPropDealerId())){
+                integratedEntrust.setPropDealerId(instruction.getCounterDealerId());
+            }
             fillSelfDealerTradeInfo(integratedEntrust);
             fillPropDealerTradeInfo(integratedEntrust);
 
