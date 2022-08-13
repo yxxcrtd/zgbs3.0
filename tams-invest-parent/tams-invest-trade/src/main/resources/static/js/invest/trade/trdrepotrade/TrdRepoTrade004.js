@@ -205,7 +205,7 @@ var setBussRepoSecInput = function () {
 var outOk = function () {
     //确认按钮前清空最终质押券列表中数据
     var workflowId=$('#workflowId').val();
-
+debugger;
     if(workflowId!='')
     {
 
@@ -224,6 +224,9 @@ var outOk = function () {
         resultTable.clear(function () {
         });
     }
+    //清空最终质押券列表
+    resultTable.clear(function () {
+    });
 
     //业务逻辑：最终质押券信息数据=选出质押券列表中未选中的数据+选入质押券列表中的所有数据
     var object = $.serializeToObject('#submitForm');

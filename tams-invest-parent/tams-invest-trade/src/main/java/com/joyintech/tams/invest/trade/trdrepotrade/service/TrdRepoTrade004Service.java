@@ -515,38 +515,38 @@ public class TrdRepoTrade004Service extends BaseService<TrdRepoTrade004Dto> impl
 
         });
         // LOOP  质押券置换明细.换入list
-//        entity.getBussRepoSec().getPledgeBondList().forEach(item->
-//        {
-//            //1.质押券置换明细处理
-//            FinPledgeDisplaceDetail finPledgeDisplaceDetail=new FinPledgeDisplaceDetail();
-//            finPledgeDisplaceDetail.setSeqNo(UUID.randomUUID().toString().replace("-","")); //流水号
-//            finPledgeDisplaceDetail.setBranch(entity.getBranch()==null?new BigDecimal(CacheUtil.getSysParam(BussinessConstant.NOBRANCHNOVALUE)):new BigDecimal( entity.getBranch()));//分支序号
-//            finPledgeDisplaceDetail.setFinprodId(item.getFinprodId());//金融产品代码
-//            finPledgeDisplaceDetail.setTradeId(finPledgeDisplace.getTradeId());//质押券置换信息.业务编号
-//            finPledgeDisplaceDetail.setTradeType(DictCodeListExt3.质押券置换_置换方向_换入.getValue());//置换方向(01换出;02换入)
-//            finPledgeDisplaceDetail.setScale(item.getPledgeRatio());//折算比例换出list.折算比例
-//            finPledgeDisplaceDetail.setPledgeDisplaceAmt(item.getPledgePrin());//换入面额
-//            finPledgeDisplaceDetail.setStatus(DictCodeListExt1.有效状态_有效.getValue());
-//            finPledgeDisplaceDetailMapper.insert(finPledgeDisplaceDetail);
-//
-//            //2.组合持仓流水处理//更新换入的质押品信息的质押状态为  可用-》质押(根据组合代码、通道、置换日期、持仓类型可用更新对应数据为质押)
-//
-//            if(entity.getPs().equals(DictCodeList.回购拆借方向_融入.getValue())||entity.getPs().equals(DictCodeList.回购拆借方向_正回购.getValue())) {
-//                //质押状态改成质押前删除之前相关质押状态为可用的数据
-//                Map<String,Object> positionFlowParm=new HashMap<>();
-//                positionFlowParm.put("portfolioId",entity.getPortfolioId());
-//                positionFlowParm.put("secAcctId",StringUtil.isEmpty(entity.getSecAcctId()) ?
-//                        (StringUtil.isEmpty(entity.getChlId()) ? "999999": entity.getChlId()) :
-//                        entity.getSecAcctId());
-//                positionFlowParm.put("finprodId",item.getFinprodId());
-//                positionFlowParm.put("substitutionDate",DateUtil.format(entity.getSubstitutionDate(),"yyyy-MM-dd"));
-//                positionFlowParm.put("hodingType",DictCodeList.持仓类型_质押.getValue());
-//                deletePtlSecPositionFlowByParm(positionFlowParm);
-//
-//                //换入时按质押式正回购持仓 处理  AC-》FVOCI-》FVTPL
-//                ptlSecPositionFlowLogic(entity,false,entity.getBussRepoSec().getPledgeBondList());
-//            }
-//        });
+        entity.getBussRepoSec().getPledgeBondList().forEach(item->
+        {
+            //1.质押券置换明细处理
+            FinPledgeDisplaceDetail finPledgeDisplaceDetail=new FinPledgeDisplaceDetail();
+            finPledgeDisplaceDetail.setSeqNo(UUID.randomUUID().toString().replace("-","")); //流水号
+            finPledgeDisplaceDetail.setBranch(entity.getBranch()==null?new BigDecimal(CacheUtil.getSysParam(BussinessConstant.NOBRANCHNOVALUE)):new BigDecimal( entity.getBranch()));//分支序号
+            finPledgeDisplaceDetail.setFinprodId(item.getFinprodId());//金融产品代码
+            finPledgeDisplaceDetail.setTradeId(finPledgeDisplace.getTradeId());//质押券置换信息.业务编号
+            finPledgeDisplaceDetail.setTradeType(DictCodeListExt3.质押券置换_置换方向_换入.getValue());//置换方向(01换出;02换入)
+            finPledgeDisplaceDetail.setScale(item.getPledgeRatio());//折算比例换出list.折算比例
+            finPledgeDisplaceDetail.setPledgeDisplaceAmt(item.getPledgePrin());//换入面额
+            finPledgeDisplaceDetail.setStatus(DictCodeListExt1.有效状态_有效.getValue());
+            finPledgeDisplaceDetailMapper.insert(finPledgeDisplaceDetail);
+
+            //2.组合持仓流水处理//更新换入的质押品信息的质押状态为  可用-》质押(根据组合代码、通道、置换日期、持仓类型可用更新对应数据为质押)
+
+            if(entity.getPs().equals(DictCodeList.回购拆借方向_融入.getValue())||entity.getPs().equals(DictCodeList.回购拆借方向_正回购.getValue())) {
+                //质押状态改成质押前删除之前相关质押状态为可用的数据
+                Map<String,Object> positionFlowParm=new HashMap<>();
+                positionFlowParm.put("portfolioId",entity.getPortfolioId());
+                positionFlowParm.put("secAcctId",StringUtil.isEmpty(entity.getSecAcctId()) ?
+                        (StringUtil.isEmpty(entity.getChlId()) ? "999999": entity.getChlId()) :
+                        entity.getSecAcctId());
+                positionFlowParm.put("finprodId",item.getFinprodId());
+                positionFlowParm.put("substitutionDate",DateUtil.format(entity.getSubstitutionDate(),"yyyy-MM-dd"));
+                positionFlowParm.put("hodingType",DictCodeList.持仓类型_质押.getValue());
+                deletePtlSecPositionFlowByParm(positionFlowParm);
+
+                //换入时按质押式正回购持仓 处理  AC-》FVOCI-》FVTPL
+                ptlSecPositionFlowLogic(entity,false,entity.getBussRepoSec().getPledgeBondList());
+            }
+        });
         //LOOP  质押券置换结果list
         List<PledgeBondInfoDto> resultList = new ArrayList<PledgeBondInfoDto>();
         Map<String,List<PledgeBondInfoDto>> resultMap = entity.getBussResultRepoSec().stream().collect(JoyinCollectors.groupingBy(
