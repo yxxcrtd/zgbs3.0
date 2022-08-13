@@ -1443,7 +1443,8 @@ public class TradePreClearingService extends BaseService<InfContractDetailfile>{
         // 交易本金 = 交易金额
         dto.setPrinAmt(dto.getTradeAmt());
         // 交易份额 = 交易金额 edit by yufei 2020-10-19
-        dto.setShareAmt(dto.getTradeAmt());
+        // dto.setShareAmt(dto.getTradeAmt());
+        dto.setShareAmt(infContractDetailfile.getShareAmt());
         // 交易编号
         BussinessCodeParameter param = new BussinessCodeParameter();
         // 交割日
