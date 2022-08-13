@@ -496,6 +496,8 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                         dealTotal.setMdate(settleTransDataDto.getMdate());
                         // 首期交付日
                         dealTotal.setVpayDate(settleTransDataDto.getVpayDate());
+                        // 币种
+                        dealTotal.setCcy(settleTransDataDto.getCcy());
                         for (StlSettleTransDataGatherDto item : list) {
                             if(StringUtil.equals(item.getBusiSceneCalss(), DictCodeListStl.业务场景分类明细_债券协议正回购_首期_买入.getValue())
                                     ||StringUtil.equals(item.getBusiSceneCalss(), DictCodeListStl.业务场景分类明细_债券协议逆回购_首期_买入.getValue())){
