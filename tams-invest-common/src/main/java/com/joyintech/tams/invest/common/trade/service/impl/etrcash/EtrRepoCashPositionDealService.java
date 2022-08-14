@@ -977,7 +977,8 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                 }else{
                     etrSecPositionFlowDto.setAmount(BigDecimal.ZERO);
                 }
-                etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
+                // 统一挪到方法最后添加
+                // etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
             }
         }
         // 交易提交
@@ -1006,12 +1007,13 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                 });
             }
             if(StringUtil.isEmpty(finProductTradeDto.getEntrustId())) { // 无委托
-                // 现金流水dto处理 交割日减少(交易金额-交易券面总额*委托全价/债券面值）
                 etrSecPositionFlowDto.setAmount(prinAmt.negate());
                 // 添加现金流水到目标dto
-                etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
+                // 统一挪到方法最后添加
+                // etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
             }
         }
+        etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
     }
 
     /**

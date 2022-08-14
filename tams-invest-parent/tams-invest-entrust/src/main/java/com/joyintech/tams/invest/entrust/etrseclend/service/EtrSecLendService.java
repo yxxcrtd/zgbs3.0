@@ -15,16 +15,37 @@ import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.joyintech.framework.ajax.MessageType;
+import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.base.entity.ProcessMark;
+import com.joyintech.framework.exception.MessageException;
 import com.joyintech.framework.security.LoginUserUtil;
+import com.joyintech.framework.util.*;
+import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysUser;
+import com.joyintech.system.base.entity.SysWflBusinessList;
+import com.joyintech.tams.business.common.exception.PositionException;
+import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.service.PositionHttpRequest;
+import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.common.base.dao.EtrEntrustBackupMapper;
+import com.joyintech.tams.common.base.entity.PtlPortfolio;
+import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.*;
+import com.joyintech.tams.invest.common.component.base.entrust.BaseEtrInvestInfoService;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
+import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.invest.entrust.etrlendspecinfo.dto.EtrLendSpecInfoDto;
+import com.joyintech.tams.invest.entrust.etrseclend.dto.EtrSecLendCashPositionDto;
 import com.joyintech.tams.invest.entrust.etrseclend.dto.EtrSecLendDto;
+import com.joyintech.tams.invest.entrust.etrseclend.dto.EtrSecLendPositionDto;
+import com.joyintech.tams.invest.entrust.etrseclend.dto.EtrSecLendSecPositionDto;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,8 +58,6 @@ import com.joyintech.framework.jdbc.enums.DataSourceType;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
 import com.joyintech.tams.component.business.common.service.DateCalService;
@@ -46,6 +65,7 @@ import com.joyintech.tams.component.business.trade.BussRepoSecService;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 债券投资委托画面端service 〈功能详细描述〉
@@ -75,6 +95,21 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
 
     @Autowired
     private CommonBusinessService commonBusinessService;
+
+    @Autowired
+    private MstWorkflowCommonServiceMapperImpl mstWorkflowCommonServiceMapperImpl;
+
+    /**
+     * 投资委托基础组件
+     */
+    @Autowired(required = false)
+    private BaseEtrInvestInfoService baseEtrInvestInfoService;
+
+    @Autowired(required=false)
+    private SysWflBusinessListMapper sysWflBusinessListMapper;
+
+    @Autowired
+    private EtrEntrustBackupMapper etrEntrustBackupMapper;
 
     /**
      * 债券投资委托查询 <功能详细描述>
@@ -221,6 +256,9 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
      */
     @Override
     public void doInsert(EtrSecLendDto dto, OperationType type){
+        if ("save".equals(dto.getOperateType())) {
+            return;
+        }
         dto.setOperateType(type.toString());
         restTemplate.postForObject(
                 ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrSecLend/doInsert",dto,
@@ -230,22 +268,68 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
             bussRepoSecService.deletePledgeBond(dto.getEntrustId(), dto.getBussRepoSec().getPageFrom());
             bussRepoSecService.insert(dto.getBussRepoSec(),dto.getEntrustId());
         }
+        String confirmOk = RequestUtil.getParam("confirmOk");
+        if(StringUtil.isNotEmpty(confirmOk)){
+            dto.setBalanceCheck("N");
+        }
+        try{
+            sendNewPosition(dto);
+        }catch (PositionException e){
+            Message message = PositionUtil.ajaxErrorReturn(e);
+            BaseMap bm = (BaseMap) message.getData();
+            if(bm==null){
+                WorkFlowUtil.showMessage( message.getMessage(), MessageType.错误消息);
+            }
+            String code = (String) bm.get("code");
+            StringBuffer messageStr = (StringBuffer) bm.get("message");
+            if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
+            }
+            if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+                WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
+            }
+        }
     }
 
     @Override
     public void doBack(EtrSecLendDto entity) {
-        doBackFlow(entity);
+//        doBackFlow(entity);
         //deleteWflEntity(entity);
     }
 
+    @Override
+    public void doDelete(String workflowId) {
+        EtrSecLendDto entity = getBussinessEntityByWorkflowId(workflowId);
+        doBackFlow(entity);
+        //从废弃表中获取，转移到指令表
+        etrEntrustBackupMapper.insertEtrFromQuery(entity.getEntrustId());
+        etrEntrustBackupMapper.insertEtrAddFromQuery(entity.getEntrustId());
+        // 删除废弃表
+        etrEntrustBackupMapper.deleteByPrimaryKey(entity.getEntrustId());
+        etrEntrustBackupMapper.deleteAddByPrimaryKey(entity.getEntrustId());
+        ProcessMark processMark = mstWorkflowCommonServiceMapperImpl.getBusinessInfo(workflowId);
+        if (StringUtil.isNotEmpty(processMark)
+                && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
+            //发送头寸
+            PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(),DictCodeListExt1.子系统代码_委托.getValue(),DictCodeListExt4.头寸业务类型_银行间债券借贷首期.getValue(),entity.getPs());
+        }
+    }
 
+    /**
+     * 删除流程中数据和流水
+     * @param dto
+     */
+    public void deleteWflEntityAndFlow(EtrSecLendDto dto) {
+        restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME+"/EtrSecLend/doDeleteFlow",
+                dto, Void.class);
+    }
 
     /**
      * 删除流程中数据和流水
      * @param dto
      */
     public void deleteWflEntity(EtrSecLendDto dto) {
-        restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME+"/EtrSecLend/doDeleteFlow",
+        restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME+"/EtrSecLend/doDeleteWfl",
                 dto, Void.class);
     }
 
@@ -255,17 +339,110 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
      */
     @Override
     public void doUpdate(EtrSecLendDto dto){
+        String confirmOk = RequestUtil.getParam("confirmOk");
+        if(StringUtil.isNotEmpty(confirmOk)){
+            dto.setBalanceCheck("N");
+        }
+        SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey(dto.getWorkflowId());
+        if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
+            dto.setDecisionAct(DictCodeListExt3.系统动作_修改.getValue());
+        }
+
         deleteWflEntity(dto);
         restTemplate.postForObject(
                 ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrSecLend/doInsert",dto,
                 Integer.class);
-
         //新增或修改质押券信息
         if(bussRepoSecService != null && dto.getBussRepoSec() != null){
             bussRepoSecService.deletePledgeBond(dto.getEntrustId(), dto.getBussRepoSec().getPageFrom());
             bussRepoSecService.insert(dto.getBussRepoSec(),dto.getEntrustId());
         }
+        try{
+            sendNewPosition(dto);
+        }catch (PositionException e){
+            Message message = PositionUtil.ajaxErrorReturn(e);
+            BaseMap bm = (BaseMap) message.getData();
+            if(bm==null){
+                WorkFlowUtil.showMessage( message.getMessage(), MessageType.错误消息);
+            }
+            String code = (String) bm.get("code");
+            StringBuffer messageStr = (StringBuffer) bm.get("message");
+            if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
+            }
+            if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+                WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
+            }
+        }
     }
+
+
+    private void sendNewPosition (EtrSecLendDto dto){
+        EtrSecLendPositionDto position = new EtrSecLendPositionDto();
+        position.setWorkFlowId(dto.getWorkflowId());
+        position.setBusiType(DictCodeListExt4.头寸业务类型_银行间债券借贷首期.getValue());
+        position.setBusiAct(DictCodeListExt3.业务动作_投资指令.getValue());
+        position.setPs(dto.getBusiPs());
+        position.setTradePlace(dto.getTradeMarket());
+        position.setSettleSpeed(dto.getSettleSpeed());
+        position.setDecisionAct(dto.getDecisionAct());
+        position.setSystemAct(dto.getSystemAct());
+        position.setCdate(dto.getVdate());
+        position.setCcy(dto.getCcy());
+        position.setTotalTradeId(dto.getEntrustId());
+        position.setFlowStatus(DictCodeListExt3.流程节点_流程提交.getValue());
+        position.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
+        position.setBalanceCheck(dto.getBalanceCheck());
+        position.setInterfaceType("Bond008");
+        position.setUserId(SecurityUtil.getLoginUser().getUserName());
+        if(StringUtil.equals(DictCodeListExt3.系统动作_修改.getValue(),dto.getDecisionAct())){
+            position.setbTotalTradeId(dto.getEntrustId());
+        }
+
+        List<EtrSecLendCashPositionDto> cashList = new ArrayList<>();
+        List<EtrSecLendSecPositionDto> targetList = new ArrayList<>();
+        List<EtrSecLendSecPositionDto> secList = new ArrayList<>();
+
+//        EtrSecLendCashPositionDto  cash = new EtrSecLendCashPositionDto();
+//        cash.setPortfolioId(dto.getPortfolioId());
+//        cash.setEtrId(dto.getEntrustId());
+//        String acct =EtrCommonCashPositionDealService.select组合托管户(dto.getPortfolioId(), dto.getCcy(), DictCodeListExt2.资金账户类型_托管户.getValue());
+//        cash.setCashAcctId(acct);
+//        cash.setCashAmount(dto.getTotalAmt());
+//        cashList.add(cash);
+        EtrSecLendSecPositionDto target=new EtrSecLendSecPositionDto();
+        target.setPortfolioId(dto.getPortfolioId());
+        target.setEtrId(dto.getEntrustId());
+        target.setFinprodId( dto.getFinprodId());
+        target.setSecAcctId(dto.getSecAcctId()); // 证券账户
+        target.setSecAmount(dto.getTotalAmt());
+        if(StringUtil.equals(dto.getPs(),DictCodeList.回购拆借方向_融入.getValue())) {
+            target.setIntegrateSecAmount(dto.getTotalAmt());
+            target.setOwnSecAmount(BigDecimal.ZERO);
+        }else{
+            target.setOwnSecAmount(dto.getTotalAmt());
+            target.setIntegrateSecAmount(BigDecimal.ZERO);
+        }
+        targetList.add(target);
+        position.setPtlTargetList(targetList);
+        if(StringUtil.isNotEmpty(dto.getBussRepoSec())&&!StringUtil.isEmptyList(dto.getBussRepoSec().getPledgeBondList())){
+            for(PledgeBondInfoDto pledgeBondInfoDto:dto.getBussRepoSec().getPledgeBondList()){
+                EtrSecLendSecPositionDto secport=new EtrSecLendSecPositionDto();
+                secport.setPortfolioId(dto.getPortfolioId());
+                secport.setEtrId(dto.getEntrustId());
+                secport.setFinprodId( pledgeBondInfoDto.getFinprodId());
+                secport.setSecAcctId(dto.getSecAcctId()); // 证券账户
+                secport.setSecAmount(pledgeBondInfoDto.getPledgePrin().multiply(new BigDecimal(10000)));
+                secport.setOwnSecAmount(pledgeBondInfoDto.getPledgePrin().multiply(new BigDecimal(10000)));
+                secport.setIntegrateSecAmount(BigDecimal.ZERO);
+                secList.add(secport);
+            }
+            position.setPtlSecList(secList);
+        }
+        PositionHttpRequest.send(position);
+    }
+
+
     /**
      *
      * 删除投资委托
@@ -324,10 +501,34 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
      * @see
      * @since 1.0
      */
-    public boolean closeDelegate(String entrustId,String closeWay) {
-        return restTemplate.getForObject(
-                ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrSecLend/close?entrustId="+entrustId+"&closeWay="+closeWay,
-                boolean.class);
+    @Transactional
+    @DTXTransaction
+    public boolean closeDelegate(EtrSecLendDto dto,String closeWay) {
+//        boolean b = restTemplate.getForObject(
+//                ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrSecLend/close?entrustId="+dto.getEntrustId()+"&closeWay="+closeWay,
+//                boolean.class);
+        boolean b = baseEtrInvestInfoService.closeDelegate(dto.getEntrustId(), closeWay);
+        closeDelegate(Arrays.asList(dto));
+        return b;
+    }
+
+    public void closeDelegate(List<EtrSecLendDto> dtolist) {
+        Map<String,Object> req=new HashMap<>();
+        List<Map<String,Object>> etrList=new ArrayList<>();
+        for(EtrSecLendDto dto: dtolist){
+            Map<String,Object> closeItem= new HashMap<>();
+            closeItem.put("busiType",DictCodeListExt4.头寸业务类型_银行间债券借贷首期.getValue());
+            closeItem.put("ps",dto.getBusiPs());
+            closeItem.put("closeId",dto.getEntrustId());
+            closeItem.put("systemAct",DictCodeListExt3.系统动作_关闭.getValue());
+            closeItem.put("busiAct",DictCodeListExt3.业务动作_指令手动关闭.getValue());
+            etrList.add(closeItem);
+        }
+        req.put("data",etrList);
+        req.put("userId",SecurityUtil.getLoginUser().getUserName());
+        req.put("totalTradeId",IDGenerator.generate());
+        req.put("modelType",DictCodeListExt1.子系统代码_委托.getValue());
+        PositionHttpRequest.batchClose(req);
     }
 
     /**
@@ -405,5 +606,79 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
     public void doBackFlow(EtrSecLendDto dto) {
         restTemplate.postForObject(ServiceApplication.ENTRUST_SERVICE_NAME+"/EtrSecLend/doBackFlow",
                 dto, Void.class);
+    }
+
+    public Message ajaxErrorReturn(Exception e) {
+        String message = e.getMessage();
+        if (StringUtil.isNotEmpty(message)){
+            String[] arr = message.split("\\|");
+            if(arr != null && arr.length == 2){
+                String[] arr1 = arr[0].split("\\:");
+                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, arr1[1].trim()) ||
+                        StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, arr1[1].trim())) {
+                    // 头寸返回对象
+                    String a=arr[1];
+                    String b=a.replaceAll("&quot;","\"");
+                    BaseMap data = JsonUtils.json2Object(b, BaseMap.class);
+
+                    StringBuffer strb = new StringBuffer("【<br/>");
+                    Map responseMap_data = (Map) data.get("data");
+                    if (responseMap_data != null) {
+                        List checkResults = (List) responseMap_data.get("checkResults");
+                        if (checkResults != null) {
+                            for (int i = 0; i < checkResults.size(); i++) {
+                                BaseMap flow = BaseMap.newMap((Map) checkResults.get(i));
+                                BigDecimal CHECKBALANCE = flow.getBigDecimal("CHECKBALANCE");
+                                String UNIT = flow.getString("UNIT");
+                                String PORTFOLIO_ID = flow.getString("PORTFOLIO_ID");
+                                String HODING_TYPE = flow.getString("HODING_TYPE");
+                                String MODEL_TYPE = flow.getString("MODEL_TYPE");
+//                                PtlPortfolio obj = ptlPortfolioMapper.selectByPrimaryKey(PORTFOLIO_ID);
+                                String portfolioName = "";
+//                                if (obj != null) {
+//                                    portfolioName = obj.getPortfolioName();
+//                                }else{
+//                                    portfolioName=PORTFOLIO_ID;
+//                                }
+                                strb.append(PORTFOLIO_ID);
+                                strb.append("(");
+                                strb.append(portfolioName);
+                                strb.append(")");
+//                                strb.append(CHECKBALANCE.toPlainString());
+                                strb.append("【");
+                                strb.append(SysDataUtil.getNameFromDataDict(DictCode.子系统代码, MODEL_TYPE));
+                                strb.append(SysDataUtil.getNameFromDataDict(DictCode.头寸资产类型, HODING_TYPE));
+                                strb.append("】余额不足，当前余额为：").append(CHECKBALANCE.toPlainString()).append(UNIT.toString());
+                                if ((i + 1) == checkResults.size()) {
+                                    strb.append("<br/>");
+                                } else {
+                                    strb.append("；<br/>");
+                                }
+                            }
+                        }
+                    }
+                    if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, arr1[1].trim())) {
+                        strb.append("】，请确认是否继续？");
+                        /**
+                         * 余额不足，软控确认
+                         */
+                        BaseMap bm = BaseMap.newMap()
+                                .put("code", arr1[1].trim())
+                                .put("message", strb)
+                                .put("data", data);
+                        return new Message().success().setData(bm);
+                    } else {
+                        strb.append("】");
+                        /**
+                         * 余额不足，硬控提示
+                         */
+                        return new Message().fail().setMessage(strb.toString());
+                    }
+                }
+            }else {
+                return new Message().fail().setMessage(message).setData(null);
+            }
+        }
+        return new Message().fail().setMessage("无返回信息，未知异常").setData(null);
     }
 }

@@ -79,6 +79,7 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
      */
     public void sendFinProductTradeDto(FinProductTradeDto finProductTradeDto) {
         logger.debug("【发送成交匹配头寸请求】finProductTradeDto:{}", JSON.toJSONString(finProductTradeDto));
+        boolean executeFlag = false;
         for (BaseTradeProductDealDto entity:finProductTradeDto.getBaseTradeProductDealDtos()) {
             Map<String, Object> resultMap = new HashMap<>();
             resultMap.put("decisionAct", DictCodeListExt3.系统动作_新建.getValue());
@@ -91,6 +92,7 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
                 finprodType += "-" + type6;
             }
             // ZGTFCP-1164:修改判断协议回购方法 modify by fuyongsheng 20220317 start
+            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(entity.getTrdProductDealAdd().getEntrustId());
             EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entity.getTrdProductDealAdd().getEntrustId());
             if(etrEntrustAdd != null){
                 if (DictCodeList.回购类型_质押式协议回购.getValue().equals(etrEntrustAdd.getAssetType1())
@@ -99,6 +101,18 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
                 }
             }
             // ZGTFCP-1164:修改判断协议回购方法 modify by fuyongsheng 20220317 end
+            // 深交所解除质押多券解除质押没有钱的数据只处理一次
+            if(DictCodeListExt3.交易方向_解除质押.getValue().equals(etrEntrust.getPs())){
+                if(DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(entity.getTrdProductDeal().getTradeMarket())
+                        && (entity.getTrdProductDeal().getTradeAmt() == null
+                        || entity.getTrdProductDeal().getTradeAmt().compareTo(BigDecimal.ZERO) == 0)){
+                    if(!executeFlag){
+                        executeFlag = true;
+                    }else{
+                        continue;
+                    }
+                }
+            }
             String interType = commonPositionEngineService.getPositionInterType(PositionConstant.POSITION_TYPE_TRD, TRADE_PLAT,
                     finprodType, entity.getTrdProductDeal().getPs(), DictCodeListExt3.业务动作_成交匹配.getValue(), entity.getClass().getName());
             if (PositionConstant.INTERF_TYPE_BOND002.equals(interType)) {

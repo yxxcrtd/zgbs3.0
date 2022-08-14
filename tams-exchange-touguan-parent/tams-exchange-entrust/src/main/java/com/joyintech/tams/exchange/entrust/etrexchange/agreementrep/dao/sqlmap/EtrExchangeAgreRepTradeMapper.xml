@@ -696,6 +696,7 @@
     <select id="selectEtrEntrust" parameterType="Map" resultType="com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExchangeAgreRepTrade003Dto">
         select distinct * from (
             select
+                etr_entrust.ENTRUST_TYPE AS entrustType,
                 etr_entrust.entrust_id                                                  AS entrustId,              /** 指令编号 **/
                 etr_entrust.entrust_status                                              AS entrustStatus,          /** 指令状态 **/
                 etr_entrust.FINPROD_ID                                                  AS initialNum,
@@ -724,34 +725,34 @@
                 END AS dealPercent,
                 CASE
                 WHEN etr_entrust.PS = 'T94' THEN
-                        decode(etr_entrust.ENTRUST_TYPE,'21',ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )*100,ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 ))
-                    when etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' and ETR_ENTRUST.ENTRUST_TYPE = '22' then ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )*100
+                        decode(etr_entrust.ENTRUST_TYPE,'21',ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )/100,ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 ))
+                    when etr_entrust.ps = 'T93' and ETR_ENTRUST.ENTRUST_TYPE = '22' then ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )/100
                     ELSE ROUND( nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
                 END finishAmt,
                 CASE
-                    when etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' then
-                        decode(ETR_ENTRUST.ENTRUST_TYPE,'32',ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 ),ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )*100)
+                    when etr_entrust.ps = 'T93' then
+                        decode(ETR_ENTRUST.ENTRUST_TYPE,'32',ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 ),ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )/100)
                     WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
                         ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
                     WHEN etr_entrust.ENTRUST_TYPE = '21' THEN
-                        ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )*100
+                        ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )/100
                     WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
                         ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
                     ELSE ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
                 END AS avaNum,
                 CASE
                     WHEN etr_entrust.PS = 'T94' THEN
-                        decode(etr_entrust.ENTRUST_TYPE,'21',ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )*100,ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 ))
-                    when etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' and ETR_ENTRUST.ENTRUST_TYPE = '22' then ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )*100
+                        decode(etr_entrust.ENTRUST_TYPE,'21',ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )/100,ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 ))
+                    when etr_entrust.ps = 'T93' and ETR_ENTRUST.ENTRUST_TYPE = '22' then ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )/100
                     ELSE ROUND( nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
                 END finishDealAmt,
                 CASE
-                    when etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' then
-                        decode(ETR_ENTRUST.ENTRUST_TYPE,'32',ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 ),ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )*100)
+                    when etr_entrust.ps = 'T93' then
+                        decode(ETR_ENTRUST.ENTRUST_TYPE,'32',ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 ),ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )/100)
                     WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
                         ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
                     WHEN etr_entrust.ENTRUST_TYPE = '21' THEN
-                        ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )*100
+                        ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )/100
                     WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
                         ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
                     ELSE ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
@@ -1013,6 +1014,7 @@
             <if test="entrustStatus ==null or ''.equals(entrustStatus) or '08'.equals(entrustStatus)">
                 union all
                 select
+                wfl_etr_entrust.ENTRUST_TYPE AS entrustType,
                 wfl_etr_entrust.entrust_id entrustId, /** 指令编号 **/
                 '08' entrustStatus, /** 指令状态 **/
                 wfl_etr_entrust.FINPROD_ID initialNum,
@@ -1020,24 +1022,24 @@
                 0 dealPercent,
                 0 finishAmt,
                 CASE
-                when wfl_etr_entrust.ps = 'T93' and wfl_etr_entrust.TRADE_MARKET = '04' then
-                decode(wfl_etr_entrust.entrust_type,'32',ROUND( nvl( wfl_etr_entrust.ENTRUST_AMT, 0 ), 4 ),ROUND( nvl( wfl_etr_entrust.entrust_num, 0 ), 4 )*100)
+                when wfl_etr_entrust.ps = 'T93'  then
+                decode(wfl_etr_entrust.entrust_type,'32',ROUND( nvl( wfl_etr_entrust.ENTRUST_AMT, 0 ), 4 ),ROUND( nvl( wfl_etr_entrust.entrust_num, 0 ), 4 )/100)
                 WHEN wfl_etr_entrust.ENTRUST_TYPE = '31' THEN
                 ROUND( nvl( wfl_etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
                 WHEN wfl_etr_entrust.ENTRUST_TYPE = '21' THEN
-                ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )*100
+                ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )/100
                 WHEN wfl_etr_entrust_add.TARGET_TYPE = '01' THEN
                 ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
                 ELSE ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ORDER_FINISH_AMT, 0 ), 4 )
                 END AS avaNum,
                 0 finishDealAmt,
                 CASE
-                when wfl_etr_entrust.ps = 'T93' and wfl_etr_entrust.TRADE_MARKET = '04' then
-                decode(wfl_etr_entrust.entrust_type,'32',ROUND( nvl( wfl_etr_entrust.ENTRUST_AMT, 0 ), 4 ),ROUND( nvl( wfl_etr_entrust.entrust_num, 0 ), 4 )*100)
+                when wfl_etr_entrust.ps = 'T93' then
+                decode(wfl_etr_entrust.entrust_type,'32',ROUND( nvl( wfl_etr_entrust.ENTRUST_AMT, 0 ), 4 ),ROUND( nvl( wfl_etr_entrust.entrust_num, 0 ), 4 )/100)
                 WHEN wfl_etr_entrust.ENTRUST_TYPE = '31' THEN
                 ROUND( nvl( wfl_etr_entrust.ENTRUST_AMT, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
                 WHEN wfl_etr_entrust.ENTRUST_TYPE = '21' THEN
-                ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )*100
+                ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )/100
                 WHEN wfl_etr_entrust_add.TARGET_TYPE = '01' THEN
                 ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )
                 ELSE ROUND( nvl( wfl_etr_entrust.ENTRUST_NUM, 0 ) - nvl( etr_finish_status.ENT_FINISH_AMT, 0 ), 4 )

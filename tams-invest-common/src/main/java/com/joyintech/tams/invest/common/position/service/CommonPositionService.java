@@ -365,6 +365,53 @@ public class CommonPositionService {
 	}
 
 	/**
+	 * 协议回购质押券持仓处理
+	 */
+	public boolean dealPositionForXYHGZYQ(Map<String, Object> properties) {
+		logger.debug("[协议回购质押券持仓处理],参数：{}", JSON.toJSONString(properties));
+		String flowType = String.valueOf(properties.get("flowType"));
+		String processConfig = String.valueOf(properties.get("processConfig"));
+		// 置换方向
+		String tradeType = String.valueOf(properties.get("tradeType"));
+		List<FinDealPledge> finDealPledgeList = (List<FinDealPledge>) properties.get("finDealPledgeList");
+		if (StringUtil.equals(flowType, "02")) {//指令持仓
+			for (FinDealPledge finDealPledge : finDealPledgeList) {
+
+				EtrSecPositionFlow etrSecPositionFlow = BeanUtil.mapToObject(properties, EtrSecPositionFlow.class);
+				etrSecPositionFlow.setInvAim(selectHoldInvAim(etrSecPositionFlow.getPortfolioId(), finDealPledge.getPledgeFinprodId()));
+				etrSecPositionFlow.setFinprodId(finDealPledge.getPledgeFinprodId());
+				etrSecPositionFlow.setAmount(finDealPledge.getPledgeNumber());
+				if (!StringUtil.equals(processConfig, "01")) {
+					etrSecPositionFlow.setAmount(etrSecPositionFlow.getAmount().negate());
+				}
+				if (etrSecPositionFlow.getCdate() == null) {
+					etrSecPositionFlow.setCdate(getSysDate());
+				}
+				etrSecPositionFlow.setSeqno(getUuid());//设置主键
+				insertEtrSecPositionFlow(etrSecPositionFlow);//入库
+			}
+		} else if (StringUtil.equals(flowType, "04")) {//交易持仓
+			for (FinDealPledge finDealPledge : finDealPledgeList) {
+				PtlSecPositionFlow ptlSecPositionFlow = BeanUtil.mapToObject(properties, PtlSecPositionFlow.class);
+				ptlSecPositionFlow.setFinprodId(finDealPledge.getPledgeFinprodId());
+				ptlSecPositionFlow.setInvAim(selectHoldInvAim(ptlSecPositionFlow.getPortfolioId(), finDealPledge.getPledgeFinprodId()));
+				ptlSecPositionFlow.setAmount(finDealPledge.getPledgeNumber());
+				if (!StringUtil.equals(processConfig, "01")) {
+					ptlSecPositionFlow.setAmount(ptlSecPositionFlow.getAmount().negate());
+				}
+				if (ptlSecPositionFlow.getCdate() == null) {
+					ptlSecPositionFlow.setCdate(getSysDate());
+				}
+				ptlSecPositionFlow.setSeqno(getUuid());//设置主键
+				insertPtlSecPositionFlow(ptlSecPositionFlow);//入库
+			}
+		} else {
+			throw new BusinessException("协议回购质押券持仓处理,配置无效");
+		}
+		return true;
+	}
+
+	/**
 	 * 深交所正回购到期续做 日间、日终 头寸特殊处理
 	 */
 	public boolean dealPositionForSJSDQXZ(Map<String, Object> properties) {

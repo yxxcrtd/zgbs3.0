@@ -130,6 +130,9 @@ public class EntrustStatusService {
                                     || (StringUtil.equals(item.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue()))
                                     || (StringUtil.equals(item.getBusiTypePosition(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())))
                     .collect(Collectors.toList());
+            List<EntrustClosePosEtrReqDto> oldEntrustIdList = etrReqDtoList.stream().filter(item -> (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券借贷融入.getValue())
+                                    || StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券借贷融出.getValue())))
+                    .collect(Collectors.toList());
             //entrustStatusMapper.updateDistributeStatus(params);//add by yangwenjun 20201211 更新委托指令分发表中的接收状态
            // entrustStatusMapper.updateEntrustStatus(params);
             // 日终关闭委托时，同步释放授信预占
@@ -138,7 +141,8 @@ public class EntrustStatusService {
             updateBusModel(sysDate);
             //操作记录表
             closeDelegatOprHisMethod(entrustIdList);
-            closeDelegatePositionMethod(entrustIdList);
+            oldEntrustIdList.addAll(entrustIdList);
+            closeDelegatePositionMethod(oldEntrustIdList);
             // 处理对接了头寸引擎的指令关闭 start
 
 
@@ -196,6 +200,8 @@ public class EntrustStatusService {
                         && StringUtil.equals(t.getPs(), BussinessDictCodeList.交易方向_行权回售.getValue())) {
                     busiTypePosition = DictCodeListExt3.头寸业务类型_债券行权交易.getValue(); // 业务类型：01债券一级投标，02现券交易，03债券行权交易，04债券存续期交易
                 }
+            }else if (StringUtil.equals(t.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券借贷融出.getValue())||StringUtil.equals(t.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券借贷融入.getValue())){
+                busiTypePosition = DictCodeListExt4.头寸业务类型_银行间债券借贷首期.getValue();
             } else {
                 busiTypePosition = DictCodeListExt3.头寸业务类型_质押式回购首期.getValue();
             }

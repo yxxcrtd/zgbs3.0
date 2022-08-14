@@ -13,11 +13,12 @@
         <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
         <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
         <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+        <result column="CLOST_NUMBER" property="clostNumber" jdbcType="DECIMAL" />
     </resultMap>
     <sql id="Base_Column_List" >
         ENTRUST_ID ENTRUST_ID, FINPROD_ID FINPROD_ID, PLEDGE_FACE_VALUE PLEDGE_FACE_VALUE, 
         PLEDGE_NUMBER PLEDGE_NUMBER, PLEDGE_RATIO PLEDGE_RATIO, PLEDGE_AMT PLEDGE_AMT, CREATE_USER CREATE_USER, 
-        CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME
+        CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME,CLOST_NUMBER
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -45,11 +46,11 @@
         insert into ETR_PLEDGE (ENTRUST_ID, FINPROD_ID, PLEDGE_FACE_VALUE, 
             PLEDGE_NUMBER, PLEDGE_RATIO, PLEDGE_AMT, 
             CREATE_USER, CREATE_DEPT, CREATE_TIME, 
-            UPDATE_USER, UPDATE_TIME)
+            UPDATE_USER, UPDATE_TIME,CLOST_NUMBER)
         values (#{entrustId,jdbcType=VARCHAR}, #{finprodId,jdbcType=VARCHAR}, #{pledgeFaceValue,jdbcType=DECIMAL}, 
             #{pledgeNumber,jdbcType=DECIMAL}, #{pledgeRatio,jdbcType=DECIMAL}, #{pledgeAmt,jdbcType=DECIMAL}, 
             #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-            #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+            #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{clostNumber,jdbcType=DECIMAL})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.EtrPledge" >
         insert into ETR_PLEDGE
@@ -87,6 +88,9 @@
             <if test="updateTime != null" >
                 UPDATE_TIME,
             </if>
+            <if test="clostNumber != null" >
+                CLOST_NUMBER,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="entrustId != null" >
@@ -122,14 +126,17 @@
             <if test="updateTime != null" >
                 #{updateTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="clostNumber != null" >
+                #{clostNumber,jdbcType=DECIMAL},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.EtrPledge" >
         insert into ETR_PLEDGE(ENTRUST_ID, FINPROD_ID, PLEDGE_FACE_VALUE, PLEDGE_NUMBER, 
-        PLEDGE_RATIO, PLEDGE_AMT, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME
+        PLEDGE_RATIO, PLEDGE_AMT, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME,CLOST_NUMBER
         )
         select ENTRUST_ID, FINPROD_ID, PLEDGE_FACE_VALUE, PLEDGE_NUMBER, 
-            PLEDGE_RATIO, PLEDGE_AMT, CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
+            PLEDGE_RATIO, PLEDGE_AMT, CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME,CLOST_NUMBER
             
              from ETR_PLEDGE
              where 1 = 1 and ENTRUST_ID = #{entrustId,jdbcType=VARCHAR} and FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
@@ -155,6 +162,9 @@
             <if test="updateTime != null" >
                 UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="clostNumber != null" >
+                CLOST_NUMBER = #{clostNumber,jdbcType=DECIMAL},
+            </if>
         </set>
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
           and FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
@@ -166,7 +176,8 @@
             PLEDGE_RATIO = #{pledgeRatio,jdbcType=DECIMAL},
             PLEDGE_AMT = #{pledgeAmt,jdbcType=DECIMAL},
             UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
-            UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+            UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            CLOST_NUMBER = #{clostNumber,jdbcType=DECIMAL}
         where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
           and FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </update>

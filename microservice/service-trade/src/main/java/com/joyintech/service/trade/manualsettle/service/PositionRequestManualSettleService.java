@@ -437,13 +437,32 @@ public class PositionRequestManualSettleService {
                     map.put("finprodId", temp.getFinprodId());
                     map.put("ownSecAmount", temp.getPledgeDisplaceAmt().multiply(new BigDecimal(100)));
                     map.put("secAmount", temp.getPledgeDisplaceAmt().multiply(new BigDecimal(100)));
+                    list.add(map);
                 }
             }else{
-                map.put("finprodId", entity.getPledgeId());
-                map.put("ownSecAmount", entity.getPledgeNumber().multiply(new BigDecimal(100)));
-                map.put("secAmount", entity.getPledgeNumber().multiply(new BigDecimal(100)));
+                TrdProductTempDeal trdProductTempDeal = trdProductTempDealMapper.selectByPrimaryKey(entity.getTradeId());
+                if (trdProductTempDeal != null && !StringUtil.equals(DictCodeListExt3.交易方向_到期续做.getValue(), infContractDetailfile.getPs())) {
+                    map.put("finprodId", entity.getPledgeId());
+                    map.put("ownSecAmount", trdProductTempDeal.getShareAmt().multiply(new BigDecimal(100)));
+                    map.put("secAmount", trdProductTempDeal.getShareAmt().multiply(new BigDecimal(100)));
+                    list.add(map);
+                } else {
+                    FinDealPledgeKey key = new FinDealPledgeKey();
+                    key.setFinprodId(infContractDetailfile.getFinprodId());
+                    key.setBranch(0L);
+                    // 查询首期质押券
+                    List<FinDealPledge> finDealPledges = finDealPledgeMapper.selectByFinprodId(key);
+                    if(CollectionUtils.isNotEmpty(finDealPledges)){
+                        for(FinDealPledge finDealPledge : finDealPledges){
+                            Map<String, Object> map1 = new HashMap<>(map);
+                            map1.put("finprodId", finDealPledge.getPledgeFinprodId());
+                            map1.put("ownSecAmount", finDealPledge.getPledgeNumber().multiply(new BigDecimal(100)));
+                            map1.put("secAmount", finDealPledge.getPledgeNumber().multiply(new BigDecimal(100)));
+                            list.add(map1);
+                        }
+                    }
+                }
             }
-            list.add(map);
             resultMap.put("ptlSecList", list);
         }
 

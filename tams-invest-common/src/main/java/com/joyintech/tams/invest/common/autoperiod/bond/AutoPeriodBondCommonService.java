@@ -7,7 +7,7 @@ package com.joyintech.tams.invest.common.autoperiod.bond;
 
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.base.dto.UploadFile;
-import com.joyintech.framework.listener.FileAttachmentProcess;import com.joyintech.framework.security.LoginUserUtil;
+import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -26,17 +26,13 @@ import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDt
 import com.joyintech.tams.invest.common.dto.period.trdbondduration.TrdBondDurDbInertDto;
 import com.joyintech.tams.invest.common.dto.period.trdbondduration.TrdBondDurationDto;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
-import com.joyintech.tams.systemtools.util.CommonUtil;
 import com.joyintech.tools.collectors.JoyinCollectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -1069,7 +1065,7 @@ public class AutoPeriodBondCommonService {
         deal.setTradeDate(DateUtil.parse(entity.getTradeDate()));
         deal.setVdate(DateUtil.parse(entity.getvDate()));
         deal.setMdate(DateUtil.parse(entity.getmDate()));
-        deal.setSettleDate(deal.getTradeDate());
+        deal.setSettleDate(entity.getPayDate() != null ? DateUtil.parse(entity.getPayDate()) : deal.getTradeDate());
         deal.setCcy(entity.getCcy());
         deal.setShareAmt(finAssetIntInfo.getAmount());
         //TODO
@@ -1100,7 +1096,7 @@ public class AutoPeriodBondCommonService {
         dealadd.setStatus(DictCodeList.数据状态_新建.getValue());
         dealadd.setOurShareAmt(deal.getShareAmt());
         // 金融产品交易信息DTO.划款指令表Entity -> 划款指令业务流程表
-        WflStlPayOrders stlPayOrdersDto = genNew划款指令流程(entity, deal, dealadd);
+        WflStlPayOrders stlPayOrdersDto = genNew划款指令流程(deal, dealadd);
         wflStlPayOrdersList.add(stlPayOrdersDto);
 
         PtlTrade ptlTrade2 = new PtlTrade();
@@ -1142,12 +1138,11 @@ public class AutoPeriodBondCommonService {
     /**
      * 生成划款指令
      *
-     * @param entity 交易数据
      * @return 划款指令
      * @see
      * @since 1.0
      */
-    private WflStlPayOrders genNew划款指令流程(TrdBondDurationDto entity,WflTrdProductDeal trdProductDeal,WflTrdProductDealAdd trdProductDealAdd) {
+    private WflStlPayOrders genNew划款指令流程(WflTrdProductDeal trdProductDeal, WflTrdProductDealAdd trdProductDealAdd) {
         WflStlPayOrders wflstlPayOrders = new WflStlPayOrders();
         BussinessCodeParameter bussinessCodeParameter = new BussinessCodeParameter();
         bussinessCodeParameter.setSeqNo("9998");
@@ -1168,7 +1163,7 @@ public class AutoPeriodBondCommonService {
         wflstlPayOrders.setSettleAmt(trdProductDeal.getTradeAmt());
         wflstlPayOrders.setCcy(trdProductDeal.getCcy());
         wflstlPayOrders.setSettleStatus(DictCodeList.结算状态_已结算.getValue());
-        wflstlPayOrders.setIsNeedSend(DictCodeListExt1.是否_是.getValue());
+        wflstlPayOrders.setIsNeedSend(DictCodeListExt1.是否_否.getValue());
         wflstlPayOrders.setIsTotalTrade(DictCodeListExt1.是否_否.getValue());
         wflstlPayOrders.setTradeId(trdProductDeal.getTradeId());
         wflstlPayOrders.setOrderStatus(DictCodeListExt1.指令状态_新建.getValue());

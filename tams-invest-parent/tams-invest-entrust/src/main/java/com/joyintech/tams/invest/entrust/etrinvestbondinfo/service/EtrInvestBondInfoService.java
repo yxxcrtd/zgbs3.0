@@ -483,6 +483,7 @@ public class EtrInvestBondInfoService extends CommonExportService<EtrInvestBondI
         if(StringUtil.isEmpty(dto1.getSecAcctId())){
             dto1.setSecAcctId((String)param.get("chlId"));
         }
+        dto1.setIsContain9((String)param.get("isContain9"));
         dto1.setInvAim((String)param.get("invAim"));
         dto1.setHodingType(DictCodeListExt1.持仓类型_委托指令可用.getValue());
 //        var data = {portfolioId:portfolioId1,calId:$('#calendarId').val(),finprodId:$('#finprodIdhid').val(),ccy:$('#ccy').val(), secAcctId: $("#secManageAcctId").val(), chlId: $('#chlFinprodId').val()}

@@ -45,7 +45,7 @@ public class TrdRepoTrade004DtoValidator implements TradeCommonValidator {
             }
         }
         //最终质押券列表不能为空
-        if(StringUtil.isEmptyList(inputDto == null?null:inputDto.getBussResultRepoSec())||inputDto == null?null:inputDto.getBussResultRepoSec().size()==0)
+        if(StringUtil.isEmptyList(inputDto == null?null:inputDto.getBussResultRepoSec())||inputDto == null?true:inputDto.getBussResultRepoSec().size()==0)
         {
             ValidMessage validMessage = new ValidMessage("最终质押券列表不能为空!");
             errorList.add(validMessage);

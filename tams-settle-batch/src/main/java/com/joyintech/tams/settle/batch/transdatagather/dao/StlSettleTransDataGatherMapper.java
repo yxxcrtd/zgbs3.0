@@ -41,6 +41,6 @@ public interface StlSettleTransDataGatherMapper {
 
     int  insetSettleTransDataTotalPledge(SettleTransDataTotalPledge settleTransDataTotalPledge);
 
-
+    int  deleteSettleTransDataTotalPledge(SettleTransDataTotalPledge settleTransDataTotalPledge);
 
 }

@@ -10,6 +10,7 @@
 
 package com.joyintech.service.period.trdseclendduration.dao;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +36,10 @@ public interface TrdSecLendDurationMapper {
     List<SelectOptionDto> getPortfolioId(Map<String, Object> param);
 
     List<TrdSecLendDurationDto> findPage(Map<String, Object> param);
+
+    BigDecimal getShowHandNum(Map<String, Object> param);
+
+
 
     TrdSecLendDurationDto findEffectiveData(Map<String, Object> param);
 

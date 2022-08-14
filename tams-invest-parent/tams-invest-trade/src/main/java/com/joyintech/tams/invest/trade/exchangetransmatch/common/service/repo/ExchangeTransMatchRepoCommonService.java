@@ -1007,7 +1007,11 @@ public class ExchangeTransMatchRepoCommonService extends BaseService {
                 }
             }
         }
-        finTradeProductDto.setmTradeAmt(mTradeAmt);
+        // XYHGFXSJ-1130:modify by fuyongsheng 20220813 start
+        if(null == finTradeProductDto.getmTradeAmt()){
+            finTradeProductDto.setmTradeAmt(mTradeAmt);
+        }
+        // XYHGFXSJ-1130:modify by fuyongsheng 20220813 end
     }
     // modify by etliu 20220110 end
 }

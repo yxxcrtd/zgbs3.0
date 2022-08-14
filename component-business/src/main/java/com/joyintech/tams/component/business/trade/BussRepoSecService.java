@@ -60,6 +60,12 @@ public interface BussRepoSecService {
      */
     String PAGE_FROM_TrdRepoTrade003 = "TrdRepoTrade003";
 
+    String PAGE_FROM_TrdBondLendTrade002 = "TrdBondLendTrade002";
+
+    String PAGE_FROM_EtrSecLend002 = "EtrSecLend002";
+
+
+
     /**
      * 债券代码：下拉框
      *

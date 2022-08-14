@@ -33,6 +33,12 @@ public class EtrPledge extends EtrPledgeKey {
      */
     private String displaceDir;
 
+    /**
+     * 关闭额度
+     */
+    @JsonSerialize(using=BigDecimalSerializer.class)
+    private BigDecimal clostNumber;
+
 
     /**
      * 取得 质押面值
@@ -104,5 +110,13 @@ public class EtrPledge extends EtrPledgeKey {
 
     public void setDisplaceDir(String displaceDir) {
         this.displaceDir = displaceDir;
+    }
+
+    public BigDecimal getClostNumber() {
+        return clostNumber;
+    }
+
+    public void setClostNumber(BigDecimal clostNumber) {
+        this.clostNumber = clostNumber;
     }
 }

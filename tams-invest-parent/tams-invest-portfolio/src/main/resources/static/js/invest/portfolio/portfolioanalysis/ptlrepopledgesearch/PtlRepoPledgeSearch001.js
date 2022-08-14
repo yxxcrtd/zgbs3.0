@@ -250,12 +250,23 @@ $(function() {
      */
     substitutionDataTable.bind('click', '.finprodId-link', function (row) {
 
-        Joyin.dialog(JoyinUtil.getLabel("FinBondTargetAsset002"),
-            basePath + "invest/asset/bond/FinBondTargetAsset002/init",
-            "95%", "90%",
-            { pageModel:PAGE_MODEL_REFERENCE,
-                finprodId: row.finprodId,
-                finprodName: row.finprodName });
+        var url = "home.html?a=a&finprodMarketId=" + row.finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a"; // 默认债券标的
+        var param = {
+            pageModel: PAGE_MODEL_REFERENCE,
+            isQuickInput: true,
+            finprodId: row.finprodId
+        };
+        Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+            basePath + url,
+            "98%", "98%",
+            param);
+
+        // Joyin.dialog(JoyinUtil.getLabel("FinBondTargetAsset002"),
+        //     basePath + "invest/asset/bond/FinBondTargetAsset002/init",
+        //     "95%", "90%",
+        //     { pageModel:PAGE_MODEL_REFERENCE,
+        //         finprodId: row.finprodId,
+        //         finprodName: row.finprodName });
     });
     /**
      * 绑定导出事件->质押券置换查询导出
