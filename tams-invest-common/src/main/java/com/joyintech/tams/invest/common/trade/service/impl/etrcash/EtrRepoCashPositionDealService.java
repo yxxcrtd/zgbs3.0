@@ -1007,14 +1007,7 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                 });
             }
             if(StringUtil.isEmpty(finProductTradeDto.getEntrustId())) { // 无委托
-                // XYHGFXSJ-1047:撤销数据的正负号在外面的方法统一处理了,这里无需取反 modify by fuyongsheng 20220813 start
-                if(etrPositionHoldDto.isNeedNegative()){
-                    etrSecPositionFlowDto.setAmount(prinAmt);
-                }else{
-                    // 现金流水dto处理 交割日减少(交易金额-交易券面总额*委托全价/债券面值）
-                    etrSecPositionFlowDto.setAmount(prinAmt.negate());
-                }
-                // XYHGFXSJ-1047:撤销数据的正负号在外面的方法统一处理了,这里无需取反 modify by fuyongsheng 20220813 end
+                etrSecPositionFlowDto.setAmount(prinAmt.negate());
                 // 添加现金流水到目标dto
                 // 统一挪到方法最后添加
                 // etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
