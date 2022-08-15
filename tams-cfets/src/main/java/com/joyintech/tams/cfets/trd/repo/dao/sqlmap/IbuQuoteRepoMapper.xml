@@ -145,7 +145,7 @@
     </resultMap>
 
     <select id="listEntrust" resultMap="resultMap">
-        SELECT *
+        SELECT distinct *
         FROM (
             SELECT ETR_ENTRUST.ENTRUST_STATUS                                                                 entrustStatus/*指令状态*/
                 , (NVL(T5.FINISH_AMT,0)+NVL(T7.ENT_FINISH_AMT,0))                                             finishAmt/*已完成额度(元)*/
@@ -1545,7 +1545,7 @@
     </select>
     <!--有效-->
     <sql id="statusValid_01">
-        select '01'                                                                                       statusValid/*有效*/,
+        select distinct '01'                                                                                       statusValid/*有效*/,
                '04'                                                                                       quoteType/*交易类型*/,
                RFPDT.TRADE_DATE                                                                           tradeDate/*成交日期*/,
                RFPDT.ps                                                                                   ps/*本方方向*/,
@@ -1595,7 +1595,7 @@
     </sql>
     <!--撤销-->
     <sql id="statusValid_03">
-        select '03'                                                                                       statusValid/*有效*/,
+        select distinct '03'                                                                                       statusValid/*有效*/,
                '04'                                                                                       quoteType/*交易类型*/,
                RFPDT.TRADE_DATE                                                                           tradeDate/*成交日期*/,
                RFPDT.ps                                                                                   ps/*本方方向*/,
@@ -1644,7 +1644,7 @@
     </sql>
     <!--流程中-->
     <sql id="statusValid_04">
-        select '04'                                                                                        statusValid/*有效*/,
+        select distinct '04'                                                                                        statusValid/*有效*/,
                '04'                                                                                        quoteType/*交易类型*/,
                WRFPDT.TRADE_DATE                                                                           tradeDate/*成交日期*/,
                WRFPDT.ps                                                                                   ps/*本方方向*/,
@@ -2116,7 +2116,7 @@
 
     <sql id="sql_listDayReg">
         <!--非流程中登记数据-->
-        SELECT CASE
+        SELECT distinct CASE
                        WHEN RFPDT.IS_CANCEL = 'Y' THEN '03'
                        ELSE '01' END      validStatus,
                     RFPDT.QUOTE_TYPE       quoteType,
@@ -2189,7 +2189,7 @@
                 </if>
         UNION ALL
         <!--流程中数据-->
-        SELECT  '04'      validStatus,
+        SELECT  distinct '04'      validStatus,
                 RFPDT.QUOTE_TYPE       quoteType,
                 RFPDT.TRADE_AMT        tradeAmt,
                 RFPDT.RATE             rate,
