@@ -1,5 +1,6 @@
 package com.joyintech.tams.invest.common.trade.service.impl.etrcash;
 
+import com.alibaba.fastjson.JSON;
 import com.joyintech.calculation.CalculatorFactory;
 import com.joyintech.calculation.bonds.PaperIrReset;
 import com.joyintech.calculation.bonds.SecIntSchedule;
@@ -362,12 +363,18 @@ public class EtrCommonCashPositionDealService extends BaseService {
         accurIntCalInParameter.setPaperIrResetList(paperIrResetList);
         // 从计算工厂中创建应计利息计算器
         AccurIntCalculator calc = CalculatorFactory.createAccurIntCalculator();
-        // 计算利息
-        AccurIntCalOutParameter accurIntCalOutParameter = calc.calculate(accurIntCalInParameter);
+        // XYHGFXSJ-815:跑批因为垃圾数据会导致计算利息异常 modify by fuyongsheng 20220802 start
         // 百元面值应计利息
         BigDecimal accurInt = BigDecimal.ZERO;
         final int SCALE = 12;
-        accurInt = ArithmeticUtil.round(accurIntCalOutParameter.getInterest(), SCALE, RoundingMode.HALF_UP);
+        // 计算利息
+        try{
+            AccurIntCalOutParameter accurIntCalOutParameter = calc.calculate(accurIntCalInParameter);
+            accurInt = ArithmeticUtil.round(accurIntCalOutParameter.getInterest(), SCALE, RoundingMode.HALF_UP);
+        }catch (Exception ex){
+            logger.error("计算利息异常,参数:" + JSON.toJSONString(accurIntCalInParameter), ex);
+        }
+        // XYHGFXSJ-815:跑批因为垃圾数据会导致计算利息异常 modify by fuyongsheng 20220802 end
         // a.当前债券面额取得（根据还本计划计算）
         Map<String, Object> paraMap = new HashMap<String, Object>();
         paraMap.put("finprodId", finprodId);
@@ -1690,6 +1697,31 @@ public class EtrCommonCashPositionDealService extends BaseService {
             bigDecimal=getEtrExchangeFinishAmt(map);
         }
         return bigDecimal;
+    }
+
+
+    /**
+     * 指令已完成金额或者额度(成交)
+     * @param sumTradeFlag 01 交易金额 or 交易份额
+     * @return
+     * @see
+     * @since 1.0
+     */
+    public static BigDecimal getEtrFinishAmtMuilt(Map<String, Object> map) {
+        map.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
+        map.put("YES_OR_NO_N", DictCodeList.是否_否.getValue());
+        return etrCommonCashPositionMapper.getAllEtrFinishAmt(map);
+    }
+
+    /**
+     * 指令已完成金额或者额度(成交)
+     * @param sumTradeFlag 01 交易金额 or 交易份额
+     * @return
+     * @see
+     * @since 1.0
+     */
+    public static String getEtrStatus(Map<String, Object> map) {
+        return etrCommonCashPositionMapper.getEtrStatus(map);
     }
     /**
      * 查询指令可用现金(新表)

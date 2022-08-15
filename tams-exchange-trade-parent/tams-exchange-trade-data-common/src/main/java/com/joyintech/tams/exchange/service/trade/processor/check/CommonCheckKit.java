@@ -337,8 +337,8 @@ public class CommonCheckKit extends BaseCheckKit {
         }
 
         if (EntrustUtils.isNotBuyOrSellTrade(instruction.getBusiTypeTg())
-                || EnumUtil.in(instruction.getAssetType(), InvestAssetTypeEnum.BOND)) {
-            log.info("【非买卖交易和债券交易】不需要检查价格是否满足涨跌停价：busiTypeTg={}", instruction.getBusiTypeTg());
+                || EnumUtil.in(instruction.getAssetType(), InvestAssetTypeEnum.BOND, InvestAssetTypeEnum.PLEDGE_REPURCHASE)) {
+            log.info("【非买卖交易、债券交易和质押式回购】不需要检查价格是否满足涨跌停价：busiTypeTg={}", instruction.getBusiTypeTg());
             return;
         }
         if (lowerLimitPrice.compareTo(entrustPrice) > 0

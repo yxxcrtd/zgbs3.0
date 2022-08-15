@@ -20,9 +20,12 @@ import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.system.base.entity.SysUser;
 import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.common.base.dao.TrdProductDealMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
+import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
@@ -42,6 +45,7 @@ import com.joyintech.tams.invest.common.dto.position.PositionCashSecDto;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeCommonervice;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tools.collectors.JoyinCollectors;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +72,9 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
 
     @Autowired
     private EtrExchangeAgreRepTradeMapper etrExchangeAgreRepTradeMapper;
+
+    @Autowired
+    private TrdProductDealMapper trdProductDealMapper;
 
     /**
      * 平台日期
@@ -682,6 +689,14 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
                         .collect(Collectors.joining(",", "", ""));
                 dto.setNextUser(sysUsers);
             }
+            //处理中途换券回购金额 修改时使用 XYHGFXSJ-917
+            if (StringUtil.equals(DictCodeListExt3.交易方向_中途换券.getValue(), dto.getPs())) {
+                TrdProductDeal trdProductDeal = trdProductDealMapper.selectByPrimaryKey(dto.getInitialNum());
+                if (null != trdProductDeal) {
+                    dto.setEntrustAmt(trdProductDeal.getTradeAmt());
+                }
+            }
+            //处理中途换券回购金额 修改时使用 XYHGFXSJ-917
         }
         return page;
     }
@@ -1011,12 +1026,51 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
             if (dto.getConRatio() != null) {
                 dto.setConRatio(ArithmeticUtil.multiply(dto.getConRatio(), BigDecimal.valueOf(100)));
             }
-
+            //add wsz 添加状态判断是否被使用 start
+            dto.setUseFlg(DictCodeList.是否_否.getValue());
+            if (StringUtil.isNotEmpty(dto.getTradeId()) && this.isAlreadyDoEntrust(dto.getPs(), dto.getTradeId())) {
+                dto.setUseFlg(DictCodeList.是否_是.getValue());
+            }
+            if (StringUtil.isNotEmpty(dto.getReqOnId())) {
+                if (this.isAlreadyDoEntrustByRequestId(dto.getReqOnId())) {
+                    dto.setUseFlg(DictCodeList.是否_是.getValue());
+                }
+            }
+            //add wsz 添加状态判断是否被使用 end
             list.add(dto);
         });
 
         page.setRoot(list);
         return page;
+    }
+
+
+    /**
+     * 判断是否已经存在该行情编号的指令
+     *
+     * @param requestId          交易方向
+     * @return 是否已经存在该行情编号的指令
+     */
+    public boolean isAlreadyDoEntrustByRequestId(String requestId) {
+        int count = etrExchangeAgreRepTradeMapper.selectEtrEntrustCountByRequestId(requestId);
+        if (count > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean isAlreadyDoEntrust(String ps, String initTradeId) {
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("ps", ps);
+        paramMap.put("initTradeId", initTradeId);
+
+        int count = etrExchangeAgreRepTradeMapper.selectDoneEtrEntrustCount(paramMap);
+        if (count > 0) {
+            return true;
+        }
+
+        return false;
     }
 
     private String mathEntrustPs(String prop) {

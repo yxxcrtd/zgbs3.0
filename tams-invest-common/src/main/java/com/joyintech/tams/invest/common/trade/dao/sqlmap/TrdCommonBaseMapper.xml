@@ -1475,13 +1475,13 @@
                 STD.F_CJBH            F_CJBH,
                 STD.FRAGMENTARY_FUNDS FRAGMENTARY_FUNDS,
                 STD.DELIVERY_RESULT   DELIVERY_RESULT,
-                STTM.TRADE_ID_TG      FINPROD_ID,
-                TRD.FINPROD_TYPE2     FINPROD_TYPE2
+                NVL(TRD.FINPROD_ID,STTM.TRADE_ID_TG) FINPROD_ID
            FROM SETTLE_TRANS_DATA STD
            LEFT JOIN SETTLE_TRANS_TG_MAPPING STTM ON STD.TRADE_ID = STTM.TRADE_ID
-           LEFT JOIN TRD_PRODUCT_DEAL TRD ON STTM.TRADE_ID = TRD.TRADE_ID AND TRD.TRADE_STATUS = '01' AND TRD.IS_CANCEL = 'N'
+           LEFT JOIN TRD_FIN_PRODUCT_DEAL_TOTAL TRDT ON STTM.TRADE_ID_TG = TRDT.totle_TRADE_ID
+           LEFT JOIN TRD_PRODUCT_DEAL TRD on TRD.totle_trade_id = TRDT.totle_TRADE_ID  AND TRD.ps = 'T01' AND TRD.IS_CANCEL = 'N'
           WHERE STD.CJBH = #{sqcjbh, jdbcType=VARCHAR}
-            AND STD.PS = 'T01'
+            AND (STD.PS = 'T01' OR TRD.PS = 'T01')
         <if test="seatNumber != null and seatNumber != ''">
             AND STD.SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
         </if>
@@ -1501,6 +1501,7 @@
         WHERE A.F_TRADE_ID = #{fCjbh}
           AND A.IS_CANCEL = 'N'
           AND A.TRADE_STATUS = '01'
+          and A.PS = 'T01'
     </select>
 
     <select id="getInfContractPortfolioDetails" resultType="com.joyintech.tams.common.base.entity.InfContractPortfolioDetail">

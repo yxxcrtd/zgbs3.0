@@ -148,4 +148,12 @@ public interface BaseEtrCashPositionCommService {
      * @since 1.0
      */
     BigDecimal queryEtrAvailableCashNew(PtlCashPositionFlowDto ptlCashPositionFlowDto);
+
+    /**
+     * 指令回冲部分
+     *
+     * @param entrustCommonDto
+     * @return 执行结果
+     */
+    CommonResult entrustCloseSectionExecute(EntrustCommonDto entrustCommonDto);
 }

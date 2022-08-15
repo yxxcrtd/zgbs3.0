@@ -407,7 +407,7 @@
             </div>
 			<!-- 质押券信息 -->
             <div class="page-component" th:data-path="@{/component/trade/BussRepoSec/init}"
-                th:data-params="|{entityName: 'bussRepoSec', pageFrom: 'TrdRepoTrade002', entity:'${entity_bussRepoSecDto}',isBondLendTrade:'yes',bussBondType:'F29', portfolioId:'${entity?.portfolioId==null?'':entity?.portfolioId}', ps:'${entity?.ps==null?'':entity?.ps}', bizCode:'${tradeId==null?'':tradeId}', entrustId:'${entity?.entrustId==null?'':entity?.entrustId}', tradeMarketId:'01'}|"></div>
+                th:data-params="|{entityName: 'bussRepoSec', pageFrom: 'TrdBondLendTrade002', entity:'${entity_bussRepoSecDto}',isBondLendTrade:'yes',bussBondType:'F29', portfolioId:'${entity?.portfolioId==null?'':entity?.portfolioId}', ps:'${entity?.ps==null?'':entity?.ps}', bizCode:'${tradeId==null?'':tradeId}', entrustId:'${entity?.entrustId==null?'':entity?.entrustId}', tradeMarketId:'01'}|"></div>
              <!-- 人员信息 -->
             <div class="page-component" th:data-path="@{/component/trade/TrdInvestPersonInfo002/init}"
                  th:data-params="|{entityName: 'trdInvestPersonInfo', pageFrom: 'submitForm', entity:'${entity_trdInvestPersonInfo}',pageId:'${pageId}'}|"></div>

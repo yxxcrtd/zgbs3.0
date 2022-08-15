@@ -24,14 +24,14 @@ $(function() {
             }
         },
         cols:[
-            {field:'seqNo',width:150,title: '流水号'}
-            ,{field:'tradeId',width:150,title: '交易编号'}
-            ,{field:'finprodId',width:150,title: '金融产品代码'}
+            {field:'seqNo',width:150,title: '流水号',sortField:'seq_No'}
+            ,{field:'tradeId',width:150,title: '交易编号',sortField:'trade_id'}
+            ,{field:'finprodId',width:150,title: '金融产品代码',sortField:'finprod_id'}
             ,{field:'branch',width:150,title: '分支编号'}
-            ,{field:'tradeTypeName',width:150,title: '置换类型'}
-            ,{field:'pledgeDisplaceAmt',width:150,title: '质押券面额(元)'}
+            ,{field:'tradeTypeName',width:150,title: '置换类型',sortField:'trade_type'}
+            ,{field:'pledgeDisplaceAmt',width:150,title: '质押券面额(元)',sortField:'pledge_displace_amt', type: 'money'}
             ,{field:'scale',width:150,title: '折算比例%'}
-            ,{field:'firstNetprice',width:150,title: '首次净价'}
+            ,{field:'firstNetprice',width:150,title: '首次净价',sortField:'first_netprice'}
 
         ],
         searchOnInit: true,

@@ -18,6 +18,7 @@ import java.util.Map;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.invest.common.service.InvestInterfCommService;
+import com.joyintech.tams.invest.common.service.MapperDelegateService;
 import com.joyintech.tams.invest.common.util.MapParseUtil;
 import com.joyintech.tams.invest.portfolio.ptlcashflow.dto.PartyInfoDto;
 import com.joyintech.tams.invest.portfolio.ptlcashflow.dto.PtlCashFlowInterfaceDto;
@@ -36,7 +37,9 @@ import com.joyintech.framework.security.User;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommService;
 import com.joyintech.tams.component.business.trade.BussTrdTransferOrderService;
@@ -46,13 +49,27 @@ import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
 import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.dto.common.BussTrdTransferOrderBase;
-import com.joyintech.tams.invest.common.dto.common.TrdCommonWflParam;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
+import com.joyintech.tams.invest.common.service.InvestInterfCommService;
+import com.joyintech.tams.invest.common.service.MapperDelegateService;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
+import com.joyintech.tams.invest.common.util.MapParseUtil;
+import com.joyintech.tams.invest.portfolio.ptlcashflow.dto.PartyInfoDto;
 import com.joyintech.tams.invest.portfolio.ptlcashflow.dto.PtlCashFlowDto;
+import com.joyintech.tams.invest.portfolio.ptlcashflow.dto.PtlCashFlowInterfaceDto;
+import com.joyintech.tams.invest.portfolio.ptlcashflow.dto.SettleInfoDto;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 自定义现金流
@@ -104,6 +121,9 @@ public class PtlCashFlowService extends CommonExportService<PtlCashFlowDto>
      */
     @Autowired
     private InvestInterfCommService investInterfCommService;
+
+    @Autowired
+    private MapperDelegateService bussCommonMapperDelegateService;
     /**
      * {@inheritDoc}
      */
@@ -119,7 +139,8 @@ public class PtlCashFlowService extends CommonExportService<PtlCashFlowDto>
         else if (OperationType.NEW.equals(type)) {
             action = "insert";
         }
-        
+
+        this.deleteWflData(entity.getWorkflowId());
         restTemplate.postForObject(
             ServiceApplication.PORTFOLIO_SERVICE_NAME + "/PtlCashFlow/" + action, entity,
             Integer.class);
@@ -200,6 +221,14 @@ public class PtlCashFlowService extends CommonExportService<PtlCashFlowDto>
         catch (Exception ex)
         {}
     }
+
+    private void deleteWflData(String workflowId) {
+        bussCommonMapperDelegateService.deleteBySpecificKey("WFL_TRD_PRODUCT_DEAL", "WORKFLOW_ID",workflowId);
+        bussCommonMapperDelegateService.deleteBySpecificKey("WFL_TRD_PRODUCT_DEAL_ADD", "WORKFLOW_ID",workflowId);
+        bussCommonMapperDelegateService.deleteBySpecificKey("WFL_STL_PAY_ORDERS", "WORKFLOW_ID",workflowId);
+        bussCommonMapperDelegateService.deleteBySpecificKey("WFL_PA_TRD_PRODUCT_DEAL", "WORKFLOW_ID",workflowId);
+    }
+
     @Override
     public void doInsert(PtlCashFlowDto entity, OperationType type) {
         saveDataWhenStartWorkflow(entity, type);

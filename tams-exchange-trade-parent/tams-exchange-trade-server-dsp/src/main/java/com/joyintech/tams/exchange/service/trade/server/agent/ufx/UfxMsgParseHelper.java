@@ -1,32 +1,9 @@
 package com.joyintech.tams.exchange.service.trade.server.agent.ufx;
 
 import com.google.common.base.Strings;
-import com.joyintech.tams.exchange.common.bean.AccountFinance;
-import com.joyintech.tams.exchange.common.bean.HistoryTrade;
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkCloseQuoteBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedBulkQuoteBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedFixedIncomeQuoteBean;
-import com.joyintech.tams.exchange.common.bean.IntegratedQuote;
-import com.joyintech.tams.exchange.common.bean.IntegratedRepurchaseQuoteBean;
-import com.joyintech.tams.exchange.common.bean.PledgeDiscount;
-import com.joyintech.tams.exchange.common.bean.QuoteQryBean;
-import com.joyintech.tams.exchange.common.bean.ResultBean;
-import com.joyintech.tams.exchange.common.bean.StandardBonds;
-import com.joyintech.tams.exchange.common.constant.BSFlag;
-import com.joyintech.tams.exchange.common.constant.CbptransType;
-import com.joyintech.tams.exchange.common.constant.EntrustBs;
-import com.joyintech.tams.exchange.common.constant.EntrustStatus;
-import com.joyintech.tams.exchange.common.constant.ExchangeType;
-import com.joyintech.tams.exchange.common.constant.FullPriceConst;
-import com.joyintech.tams.exchange.common.constant.Market;
-import com.joyintech.tams.exchange.common.constant.TradeType;
-import com.joyintech.tams.exchange.common.db.domain.Entrust;
-import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
-import com.joyintech.tams.exchange.common.db.domain.Instrument;
-import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
-import com.joyintech.tams.exchange.common.db.domain.LoginInfo;
-import com.joyintech.tams.exchange.common.db.domain.PositionBean;
-import com.joyintech.tams.exchange.common.db.domain.Trade;
+import com.joyintech.tams.exchange.common.bean.*;
+import com.joyintech.tams.exchange.common.constant.*;
+import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.utils.CbptransTypeUtils;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.common.utils.ErrorMsgUtils;
@@ -36,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -130,7 +108,10 @@ public class UfxMsgParseHelper {
                     logger.error("businessAmount:{}", e.getMessage());
                 }
             }
+
             entrust.setTradedPrice(new BigDecimal((String) ds.get("business_price")));
+//            if("f".equals((String) ds.get("entrust_prop"))) {
+//            }
             entrust.setReportTime((String) ds.get("report_time"));
             try {
                 String entrustStatus = (String) ds.get("entrust_status");
@@ -263,20 +244,26 @@ public class UfxMsgParseHelper {
             //处理标志
             int realStatus = Integer.parseInt((String) ds.get("real_status"));
             if (realStatus != 0 && realStatus != 4) {
-                trade.setBrokerTradeId((String) ds.get("entrust_no"));
+                //trade.setBrokerTradeId((String) ds.get("entrust_no"));
                 if (2 == realType) {
                     trade.setTradeType(TradeType.CANCEL_INVALID.value);
                 } else if (0 == realType) {
                     trade.setTradeType(TradeType.INVALID.value);
                 }
             } else {
-                trade.setBrokerTradeId((String) ds.get("business_id"));
+               // trade.setBrokerTradeId((String) ds.get("business_id"));
                 if (2 == realType) {
                     trade.setTradeType(TradeType.CANCEL.value);
                 } else if (0 == realType) {
                     trade.setTradeType(TradeType.NORMAL.value);
                 }
+
             }
+            trade.setBrokerTradeId((String) ds.get("business_id"));
+            if (Strings.isNullOrEmpty(trade.getBrokerTradeId())){
+                trade.setBrokerTradeId((String) ds.get("entrust_no"));
+            }
+
             trade.setBrokerEntrustId((String) ds.get("entrust_no"));
             trade.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("cancel_info")));
             trade.setTradedBalance(new BigDecimal((String) ds.get("business_balance")));
@@ -291,8 +278,6 @@ public class UfxMsgParseHelper {
     public static List<Trade> qryProtocolBackTradeBack(String accountId, List<Map<String, Object>> resList) {
         List<Trade> list = new ArrayList<>();
         for (Map<String, Object> ds : resList) {
-            //处理标志
-            int realStatus = Integer.parseInt((String) ds.get("real_status"));
             Trade trade = new Trade();
             trade.setAccountId(accountId);
             trade.setPositionStr((String) ds.get("position_str"));
@@ -311,21 +296,51 @@ public class UfxMsgParseHelper {
             trade.setEntrustProp((String) ds.get("entrust_prop"));
             trade.setTradedVolume((long) Double.parseDouble((String) ds.get("business_amount")));
             trade.setPropSeatNo((String) ds.get("prop_seat_no"));
+            //处理标志 成交状态 0 成交，2 废单，4 确认
+            int realStatus = Integer.parseInt((String) ds.get("real_status"));
+            // xiazelei 修改于 2022/7/1 13:55  0	买卖 2	撤单
             int realType = Integer.parseInt((String) ds.get("real_type"));
+//            if (2 == realType) {
+//                 if (2 == realStatus) {
+//                     trade.setTradeType(TradeType.CANCEL_INVALID.value);
+//                } else if (4 == realStatus||0 == realStatus) {
+//                     trade.setTradeType(TradeType.INVALID.value);
+//                }
+//            } else if (0 == realType) {
+//                if (2 == realStatus) {
+//                    trade.setTradeType(TradeType.CANCEL.value);
+//                } else if (4 == realStatus||0 == realStatus) {
+//                    trade.setTradeType(TradeType.NORMAL.value);
+//                }
+//            }
             if (realStatus != 0 && realStatus != 4) {
-                trade.setBrokerTradeId((String) ds.get("entrust_no"));
+                //  废单 有正常的委托，也有撤销的委托
+                // trade.setBrokerTradeId((String) ds.get("entrust_no"));
                 if (2 == realType) {
+                    // 撤单 失败 撤单废单
                     trade.setTradeType(TradeType.CANCEL_INVALID.value);
                 } else if (0 == realType) {
+                    // 普通委托 失败  柜台废单
                     trade.setTradeType(TradeType.INVALID.value);
                 }
             } else {
-                trade.setBrokerTradeId((String) ds.get("business_id"));
+                // 成交 有正常的委托，也有撤销的委托
+                // trade.setBrokerTradeId((String) ds.get("business_id"));
                 if (2 == realType) {
+                    // 撤单成功
                     trade.setTradeType(TradeType.CANCEL.value);
                 } else if (0 == realType) {
+                    // 普通委托 成功
                     trade.setTradeType(TradeType.NORMAL.value);
                 }
+            }
+            // 排除无效的现券协商成交记录--实时清算记录
+            if (!((String) ds.get("business_id")).equals((String) ds.get("cbp_business_id")))
+                continue;
+
+            trade.setBrokerTradeId((String) ds.get("business_id"));
+            if (Strings.isNullOrEmpty(trade.getBrokerTradeId())) {
+                trade.setBrokerTradeId((String) ds.get("entrust_no"));
             }
             trade.setTradedPrice(BigDecimal.valueOf(Double.parseDouble((String) ds.get("business_price"))));
             trade.setTradedBalance(BigDecimal.valueOf(Double.parseDouble((String) ds.get("business_balance"))));
@@ -338,9 +353,8 @@ public class UfxMsgParseHelper {
         return list;
     }
 
-    public static List<IntegratedQuote> parseIntegratedQuotes(ResultBean resultBean, QuoteQryBean quoteQryBean) {
+    public static List<IntegratedQuote> parseIntegratedQuotes(List<Map<String, Object>> resList, QuoteQryBean quoteQryBean) {
         List<IntegratedQuote> list = new ArrayList<>();
-        List<Map<String, Object>> resList = (List<Map<String, Object>>) resultBean.getData();
         for (Map<String, Object> ds : resList) {
             IntegratedQuote integratedQuoteBt = new IntegratedQuote();
             integratedQuoteBt.setContractId((String) ds.get("cbpconfer_id"));
@@ -377,7 +391,9 @@ public class UfxMsgParseHelper {
                 }
             }
             integratedQuoteBt.setStockType((String) ds.get("stock_type"));
-            integratedQuoteBt.setStockCode((String) ds.get("stock_code"));
+            integratedQuoteBt.setMarket(quoteQryBean.getMarket());
+            String stockCode = (String) ds.get("stock_code");
+            integratedQuoteBt.setStockCode(stockCode + "." + quoteQryBean.getMarket());
             integratedQuoteBt.setStockName((String) ds.get("stock_name"));
             String expireYearRate = (String) ds.get("expire_year_rate");
             if (!Strings.isNullOrEmpty(expireYearRate)) {
@@ -522,9 +538,8 @@ public class UfxMsgParseHelper {
         return list;
     }
 
-    public static List<HistoryTrade> parseHistoryTrade(ResultBean resultBean, String accountId) {
+    public static List<HistoryTrade> parseHistoryTrade(List<Map<String, Object>> resList, String accountId) {
         List<HistoryTrade> list = new ArrayList<>();
-        List<Map<String, Object>> resList = (List<Map<String, Object>>) resultBean.getData();
         for (Map<String, Object> ds : resList) {
             HistoryTrade historyTrade = new HistoryTrade();
             historyTrade.setTradingDay((String) ds.get("init_date"));
@@ -567,9 +582,8 @@ public class UfxMsgParseHelper {
         return list;
     }
 
-    public static List<AccountFinance> parseCustomerFinance(ResultBean resultBean, String accountId) {
+    public static List<AccountFinance> parseCustomerFinance(List<Map<String, Object>> resList, String accountId) {
         List<AccountFinance> list = new ArrayList<>();
-        List<Map<String, Object>> resList = (List<Map<String, Object>>) resultBean.getData();
         for (Map<String, Object> ds : resList) {
             AccountFinance accountFinance = new AccountFinance();
             accountFinance.setAccountId(accountId);
@@ -582,10 +596,8 @@ public class UfxMsgParseHelper {
         return list;
     }
 
-    public static List<PositionBean> parseAccountPosition(ResultBean resultBean, String accountId) {
+    public static List<PositionBean> parseAccountPosition(List<Map<String, Object>> resList, String accountId) {
         List<PositionBean> list = new ArrayList<>();
-
-        List<Map<String, Object>> resList = (List<Map<String, Object>>) resultBean.getData();
         for (Map<String, Object> ds : resList) {
             PositionBean positionBean = new PositionBean();
             positionBean.setAccountId(accountId);
@@ -610,9 +622,8 @@ public class UfxMsgParseHelper {
 
     }
 
-    public static List<Instrument> parseInstrumentInfo(ResultBean resultBean) {
+    public static List<Instrument> parseInstrumentInfo(List<Map<String, Object>> resList) {
         List<Instrument> list = new ArrayList<>();
-        List<Map<String, Object>> resList = (List<Map<String, Object>>) resultBean.getData();
         for (Map<String, Object> ds : resList) {
             Instrument instrument = new Instrument();
             instrument.setStockCode((String) ds.get("stock_code"));
@@ -657,9 +668,8 @@ public class UfxMsgParseHelper {
         return null;
     }
 
-    public static List<StandardBonds> parseStandardBonds(ResultBean resultBean, String accountId) {
+    public static List<StandardBonds> parseStandardBonds(List<Map<String, Object>> resList, String accountId) {
         List<StandardBonds> list = new ArrayList<StandardBonds>();
-        List<Map<String, Object>> resList = (List<Map<String, Object>>) resultBean.getData();
         for (Map<String, Object> ds : resList) {
             StandardBonds standardBonds = new StandardBonds();
             standardBonds.setStockCode((String) ds.get("bond_code"));
@@ -681,9 +691,8 @@ public class UfxMsgParseHelper {
         return list;
     }
 
-    public static List<IntegratedBulkQuoteBean> parseIntegratedBulkQuote(ResultBean resultBean, String market) {
+    public static List<IntegratedBulkQuoteBean> parseIntegratedBulkQuote(List<Map<String, Object>> resList, String market) {
         List<IntegratedBulkQuoteBean> list = new ArrayList<>();
-        List<Map<String, Object>> resList = (List<Map<String, Object>>) resultBean.getData();
         for (Map<String, Object> ds : resList) {
             IntegratedBulkQuoteBean integratedBulkQuoteBean = new IntegratedBulkQuoteBean();
             integratedBulkQuoteBean.setOrderNo((String) ds.get("order_no"));
@@ -698,10 +707,23 @@ public class UfxMsgParseHelper {
                 integratedBulkQuoteBean.setStockCode(stockCode + "." + market);
             }
             integratedBulkQuoteBean.setStockName((String) ds.get("stock_name"));
-            integratedBulkQuoteBean.setEntrustPrice(Double.parseDouble((String) ds.get("entrust_price")));
-            integratedBulkQuoteBean.setEntrustAmount(Integer.parseInt((String) ds.get("entrust_amount")));
-            integratedBulkQuoteBean.setBusinessAmount(Integer.parseInt((String) ds.get("business_amount")));
-            integratedBulkQuoteBean.setCompactTerm(Integer.parseInt((String) ds.get("compact_term")));
+            String entrustPrice = (String) ds.get("entrust_price");
+            if (Strings.isNullOrEmpty(entrustPrice))
+                entrustPrice = "0";
+            integratedBulkQuoteBean.setEntrustPrice(Double.parseDouble(entrustPrice));
+            String entrustAmount = (String) ds.get("entrust_amount");
+            if (Strings.isNullOrEmpty(entrustAmount))
+                entrustAmount = "0";
+            //yanjianhui 修改于 2022/7/8 15:27  修改含有小数的整数字段【后台返回的整数字段不规范可能含有小数部分如0.00】，只取整数部分。
+            integratedBulkQuoteBean.setEntrustAmount(Double.valueOf(entrustAmount).intValue());
+            String businessAmount = (String) ds.get("business_amount");
+            if (Strings.isNullOrEmpty(businessAmount))
+                businessAmount = "0";
+            integratedBulkQuoteBean.setBusinessAmount(Integer.parseInt(businessAmount));
+            String compactTerm = (String) ds.get("compact_term");
+            if (Strings.isNullOrEmpty(compactTerm))
+                compactTerm = "0";
+            integratedBulkQuoteBean.setCompactTerm(Integer.parseInt(compactTerm));
             integratedBulkQuoteBean.setRelationName((String) ds.get("relation_name"));
             integratedBulkQuoteBean.setRelationTel((String) ds.get("relation_tel"));
             integratedBulkQuoteBean.setCbpconferId((String) ds.get("cbpconfer_id"));
@@ -713,9 +735,8 @@ public class UfxMsgParseHelper {
         return list;
     }
 
-    public static List<IntegratedBulkCloseQuoteBean> parseIntegratedBulkCloseQuote(ResultBean resultBean, String market) {
+    public static List<IntegratedBulkCloseQuoteBean> parseIntegratedBulkCloseQuote(List<Map<String, Object>> resList, String market) {
         List<IntegratedBulkCloseQuoteBean> list = new ArrayList<>();
-        List<Map<String, Object>> resList = (List<Map<String, Object>>) resultBean.getData();
         for (Map<String, Object> ds : resList) {
             IntegratedBulkCloseQuoteBean integratedBulkCloseQuoteBean = new IntegratedBulkCloseQuoteBean();
             integratedBulkCloseQuoteBean.setExchangeType((String) ds.get("exchange_type"));
@@ -731,15 +752,16 @@ public class UfxMsgParseHelper {
             integratedBulkCloseQuoteBean.setBusinessAmount(Integer.parseInt((String) ds.get("business_amount")));
             integratedBulkCloseQuoteBean.setBuyAmount1(Double.parseDouble((String) ds.get("buy_amount1")));
             integratedBulkCloseQuoteBean.setSaleAmount1(Double.parseDouble((String) ds.get("sale_amount1")));
-            integratedBulkCloseQuoteBean.setWeightavgPrice(Double.parseDouble((String) ds.get("weightavg_price")));
+            /*
+            yanjianhui 22/7/12 上海盘后固定价格交易行情查询文档中没有该字段，加上会导致空指针异常
+            integratedBulkCloseQuoteBean.setWeightavgPrice(Double.parseDouble((String) ds.get("weightavg_price")));*/
             list.add(integratedBulkCloseQuoteBean);
         }
         return list;
     }
 
-    public static List<IntegratedRepurchaseQuoteBean> parseIntegratedRepurchaseQuote(ResultBean resultBean) {
+    public static List<IntegratedRepurchaseQuoteBean> parseIntegratedRepurchaseQuote(List<Map<String, Object>> resList) {
         List<IntegratedRepurchaseQuoteBean> list = new ArrayList<>();
-        List<Map<String, Object>> resList = (List<Map<String, Object>>) resultBean.getData();
         for (Map<String, Object> ds : resList) {
             IntegratedRepurchaseQuoteBean integratedRepurchaseQuoteBean = new IntegratedRepurchaseQuoteBean();
             integratedRepurchaseQuoteBean.setCbpconferId((String) ds.get("cbpconfer_id"));
@@ -789,41 +811,130 @@ public class UfxMsgParseHelper {
         return list;
     }
 
-    public static List<IntegratedFixedIncomeQuoteBean> parseIntegratedFixedIncomeQuote(ResultBean resultBean, String market) {
+    public static List<IntegratedFixedIncomeQuoteBean> parseIntegratedFixedIncomeQuote(List<Map<String, Object>> resList, String entrustProp) {
         List<IntegratedFixedIncomeQuoteBean> list = new ArrayList<IntegratedFixedIncomeQuoteBean>();
-        List<Map<String, Object>> resList = (List<Map<String, Object>>) resultBean.getData();
         for (Map<String, Object> ds : resList) {
-            IntegratedFixedIncomeQuoteBean integratedFixedIncomeQuoteBean = new IntegratedFixedIncomeQuoteBean();
-            integratedFixedIncomeQuoteBean.setStockCode(ds.get("stock_code") + "." + market);
-            integratedFixedIncomeQuoteBean.setStockName((String) ds.get("stock_name"));
-            integratedFixedIncomeQuoteBean.setOrderNo((String) ds.get("buy_confirm_id"));
-            integratedFixedIncomeQuoteBean.setReportTime(Integer.parseInt((String) ds.get("report_time")));
-            integratedFixedIncomeQuoteBean.setAgencyName((String) ds.get("agency_name"));
-            integratedFixedIncomeQuoteBean.setEntrustPrice(Double.parseDouble((String) ds.get("buy_price")));
-            integratedFixedIncomeQuoteBean.setEntrustVolume(Integer.parseInt((String) ds.get("buy_quote_amount")));
-            integratedFixedIncomeQuoteBean.setFullPrice(Double.parseDouble((String) ds.get("buy_quote_price")));
-            integratedFixedIncomeQuoteBean.setExpireIncomeRate(Double.parseDouble((String) ds.get("buy_exchange_rate")));
-            integratedFixedIncomeQuoteBean.setInterest(Double.parseDouble((String) ds.get("stock_interest")));
-            integratedFixedIncomeQuoteBean.setEntrustBs(EntrustBs.BUY.value);
-            list.add(integratedFixedIncomeQuoteBean);
-            if (!Strings.isNullOrEmpty((String) ds.get("sell_price"))) {
-                IntegratedFixedIncomeQuoteBean integratedFixedIncomeQuoteBean2 = new IntegratedFixedIncomeQuoteBean();
-                integratedFixedIncomeQuoteBean2.setStockCode(ds.get("stock_code") + "." + market);
-                integratedFixedIncomeQuoteBean2.setStockName((String) ds.get("stock_name"));
-                integratedFixedIncomeQuoteBean2.setOrderNo((String) ds.get("sell_confirm_id"));
-                integratedFixedIncomeQuoteBean2.setReportTime(Integer.parseInt((String) ds.get("report_time_x")));
-                integratedFixedIncomeQuoteBean2.setAgencyName((String) ds.get("other_agency"));
-                integratedFixedIncomeQuoteBean2.setEntrustPrice(Double.parseDouble((String) ds.get("sell_price")));
-                integratedFixedIncomeQuoteBean2.setEntrustVolume(Integer.parseInt((String) ds.get("sell_quote_amount")));
-                integratedFixedIncomeQuoteBean2.setFullPrice(Double.parseDouble((String) ds.get("sell_quote_price")));
-                integratedFixedIncomeQuoteBean2.setExpireIncomeRate(Double.parseDouble((String) ds.get("sell_exchange_rate")));
-                integratedFixedIncomeQuoteBean2.setInterest(Double.parseDouble((String) ds.get("stock_interest")));
-                integratedFixedIncomeQuoteBean.setEntrustBs(EntrustBs.SELL.value);
-                list.add(integratedFixedIncomeQuoteBean2);
+            // 361 查询上海固收平台报价行情
+            if ("IntegratedBondQuoteSH".equals(entrustProp)) {
+                // region 买方
+                IntegratedFixedIncomeQuoteBean fixedIncomeQuoteBuyBean = new IntegratedFixedIncomeQuoteBean();
+                fixedIncomeQuoteBuyBean.setStockCode(ds.get("stock_code") + "." + Market.SHSE.value);
+                fixedIncomeQuoteBuyBean.setStockName((String) ds.get("stock_name"));
+                fixedIncomeQuoteBuyBean.setOrderNo((String) ds.get("buy_confirm_id"));
+                String reportTime = (String) ds.get("report_time");
+                if (Strings.isNullOrEmpty(reportTime))
+                    reportTime = "000000";
+                Calendar cal = Calendar.getInstance();
+                cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(reportTime.substring(0, 2)));
+                cal.set(Calendar.MINUTE, Integer.parseInt(reportTime.substring(2, 4)));
+                cal.set(Calendar.SECOND, Integer.parseInt(reportTime.substring(4, 6)));
+                fixedIncomeQuoteBuyBean.setReportTime(cal.getTime().getTime());
+                fixedIncomeQuoteBuyBean.setAgencyName((String) ds.get("agency_name"));
+                fixedIncomeQuoteBuyBean.setEntrustPrice(Double.parseDouble((String) ds.get("buy_price")));
+                fixedIncomeQuoteBuyBean.setEntrustVolume(Integer.parseInt((String) ds.get("buy_quote_amount")));
+                fixedIncomeQuoteBuyBean.setFullPrice(Double.parseDouble((String) ds.get("buy_quote_price")));
+                fixedIncomeQuoteBuyBean.setExpireIncomeRate(Double.parseDouble((String) ds.get("buy_exchange_rate")));
+                fixedIncomeQuoteBuyBean.setInterest(Double.parseDouble((String) ds.get("stock_interest")));
+                fixedIncomeQuoteBuyBean.setEntrustBs(EntrustBs.BUY.value);
+                list.add(fixedIncomeQuoteBuyBean);
+
+                // endregion
+
+                // region 卖方
+                if (!Strings.isNullOrEmpty((String) ds.get("sell_price"))) {
+                    IntegratedFixedIncomeQuoteBean fixedIncomeQuoteSellBean = new IntegratedFixedIncomeQuoteBean();
+                    fixedIncomeQuoteSellBean.setStockCode(ds.get("stock_code") + "." + Market.SHSE.value);
+                    fixedIncomeQuoteSellBean.setStockName((String) ds.get("stock_name"));
+                    fixedIncomeQuoteSellBean.setOrderNo((String) ds.get("sell_confirm_id"));
+                    reportTime = (String) ds.get("report_time_x");
+                    if (Strings.isNullOrEmpty(reportTime))
+                        reportTime = "000000";
+                    cal = Calendar.getInstance();
+                    cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(reportTime.substring(0, 2)));
+                    cal.set(Calendar.MINUTE, Integer.parseInt(reportTime.substring(2, 4)));
+                    cal.set(Calendar.SECOND, Integer.parseInt(reportTime.substring(4, 6)));
+                    fixedIncomeQuoteSellBean.setReportTime(cal.getTime().getTime());
+                    fixedIncomeQuoteSellBean.setAgencyName((String) ds.get("other_agency"));
+                    fixedIncomeQuoteSellBean.setEntrustPrice(Double.parseDouble((String) ds.get("sell_price")));
+                    fixedIncomeQuoteSellBean.setEntrustVolume(Integer.parseInt((String) ds.get("sell_quote_amount")));
+                    fixedIncomeQuoteSellBean.setFullPrice(Double.parseDouble((String) ds.get("sell_quote_price")));
+                    fixedIncomeQuoteSellBean.setExpireIncomeRate(Double.parseDouble((String) ds.get("sell_exchange_rate")));
+                    fixedIncomeQuoteSellBean.setInterest(Double.parseDouble((String) ds.get("stock_interest")));
+                    fixedIncomeQuoteSellBean.setEntrustBs(EntrustBs.SELL.value);
+                    list.add(fixedIncomeQuoteSellBean);
+                }
+                // endregion
             }
+
         }
         return list;
 
+    }
+
+
+    public static List<NegotiateQuoteReceiveBean> parseNegotiateQuoteReceiveBean(String accountId, String side, List<Map<String, Object>> resList) {
+        List<NegotiateQuoteReceiveBean> list = new ArrayList<>();
+        for (Map<String, Object> ds : resList) {
+            // 只要方向相反的记录
+            if (!side.equals(ds.get("entrust_bs")))
+                continue;
+            NegotiateQuoteReceiveBean receiveBean = new NegotiateQuoteReceiveBean();
+
+            receiveBean.setRequestTime((String) (ds.get("init_date")));
+            //receiveBean.setRequestStatus(Integer.parseInt((String) ds.get("bondtrade_trans_status")));
+            receiveBean.setStockCode((String) (ds.get("stock_code")));
+            receiveBean.setStockName((String) (ds.get("stock_name")));
+            receiveBean.setBs((String) (ds.get("entrust_bs")));
+            receiveBean.setAmount(BigDecimal.valueOf(Double.parseDouble((String) ds.get("entrust_amount"))).intValue());
+            receiveBean.setExecId((String) (ds.get("exec_id")));
+            // receiveBean.setFullPrice(new BigDecimal((String) (ds.get("entrust_price"))));
+            receiveBean.setEntrustPrice(new BigDecimal((String) (ds.get("entrust_price"))));
+            receiveBean.setEntrustBalance(new BigDecimal((String) (ds.get("entrust_balance"))));
+            receiveBean.setMemberId((String) (ds.get("agency_no")));
+            receiveBean.setTraderCode((String) (ds.get("trader_id")));
+            receiveBean.setInvestorId((String) (ds.get("bond_investor_id")));
+            receiveBean.setInvestorType((String) (ds.get("bond_investor_type")));
+            receiveBean.setCpMemberId((String) (ds.get("oppo_agency")));
+            receiveBean.setCpTraderCode((String) (ds.get("oppo_trader_id")));
+            receiveBean.setCpInvestorId((String) (ds.get("oppo_bond_investor_id")));
+            receiveBean.setCpInvestorType((String) (ds.get("oppo_bond_investor_type")));
+            receiveBean.setConfirmId((String) (ds.get("cbpconfer_id")));
+            receiveBean.setPositionStr((String) (ds.get("position_str")));
+            receiveBean.setRemark((String) (ds.get("remark")));
+            // 状态转换
+            // 0-未处理，1-已接受，2-已拒绝，3-已撤销，4-发起方委托被拒，5-已成交，6-已超时
+            String status = (String) (ds.get("bondtrade_trans_status"));
+            // 请求状态(1：待确认 2：已回复 3：已撤销 4：已成交 )
+            int newStatus = RequestStatus.WAIT_CONFIRM.getValue();
+
+            if ("0".equals(status))
+                newStatus = RequestStatus.WAIT_CONFIRM.getValue();
+            else if ("1".equals(status))
+                newStatus = RequestStatus.REPLIED.getValue();
+            else if ("2".equals(status))
+                newStatus = RequestStatus.REPLIED.getValue();
+            else if ("3".equals(status))
+                newStatus = RequestStatus.CANCELED.getValue();
+            else if ("5".equals(status))
+                newStatus = RequestStatus.DEALED.getValue();
+            else
+                newStatus = RequestStatus.OTHER.getValue();
+            receiveBean.setRequestStatus(newStatus);
+            receiveBean.setRequestStatusStr(RequestStatus.getRequestStatusName(newStatus));
+            receiveBean.setBsStr((String) (ds.get("entrust_bs")));
+            receiveBean.setInvestorTypeStr((String) (ds.get("bond_investor_type")));
+            receiveBean.setCpInvestorTypeStr((String) (ds.get("oppo_bond_investor_type")));
+            receiveBean.setAmountView(new BigDecimal((String) (ds.get("entrust_amount"))));
+            receiveBean.setMemberName((String) (ds.get("agency_no")));
+            receiveBean.setInvestorName((String) (ds.get("bond_investor_id")));
+            receiveBean.setTraderName((String) (ds.get("trader_id")));
+            receiveBean.setCpMemberName((String) (ds.get("oppo_agency")));
+            receiveBean.setCpTraderName((String) (ds.get("oppo_trader_id")));
+            receiveBean.setCpInvestorName((String) (ds.get("oppo_bond_investor_id")));
+
+            list.add(receiveBean);
+        }
+        return list;
     }
 
     private static void getEntrustStatusByUfx(String entrustStatus, EntrustInterface entrust) {
@@ -853,7 +964,9 @@ public class UfxMsgParseHelper {
                 entrust.setEntrustStatus(EntrustStatus.REPORTED_TOBE_CANCEL.value);
                 break;
             case "V":
-                entrust.setEntrustStatus(EntrustStatus.REPORTED.value);
+                // xiazelei 修改于 2022/7/1 10:49
+                //经恒生柜台确认 深交所 V 已确认即已成交  BTA
+                entrust.setEntrustStatus(EntrustStatus.SUCCEEDED.value);
                 break;
             default:
                 entrust.setEntrustStatus(Integer.parseInt(entrustStatus));
@@ -878,6 +991,4 @@ public class UfxMsgParseHelper {
         }
         return "";
     }
-
-
 }

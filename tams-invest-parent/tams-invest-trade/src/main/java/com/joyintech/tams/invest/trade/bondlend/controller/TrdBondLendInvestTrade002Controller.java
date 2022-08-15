@@ -14,6 +14,7 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.exception.MessageException;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
@@ -450,22 +451,22 @@ public class TrdBondLendInvestTrade002Controller extends BaseController {
     AjaxResult save(@RequestBody TrdBondLendInvestTradeDto dto) throws Exception {
 
         //万元转换 add  by yeming 20210817 start
-        if(dto.getBussRepoSec() != null){
-            if( dto.getBussRepoSec().getTotalPrinAmt()  != null){
-                dto.getBussRepoSec().setTotalPrinAmt(ArithmeticUtil.multiply( dto.getBussRepoSec().getTotalPrinAmt(),new BigDecimal(10000)));
-            }
-            for (PledgeBondInfoDto pledgeBond :  dto.getBussRepoSec().getPledgeBondList()) {
-                if (pledgeBond.getAvaPledgePrin() != null) {
-                    pledgeBond.setAvaPledgePrin(ArithmeticUtil.multiply(pledgeBond.getAvaPledgePrin(), new BigDecimal(10000)));
-                }
-                if (pledgeBond.getPledgePrin() != null) {
-                    pledgeBond.setPledgePrin(ArithmeticUtil.multiply(pledgeBond.getPledgePrin(), new BigDecimal(10000)));
-                }
-                if (pledgeBond.getPrin() != null) {
-                    pledgeBond.setPrin(ArithmeticUtil.multiply(pledgeBond.getPrin(), new BigDecimal(10000)));
-                }
-            }
-        }
+//        if(dto.getBussRepoSec() != null){
+//            if( dto.getBussRepoSec().getTotalPrinAmt()  != null){
+//                dto.getBussRepoSec().setTotalPrinAmt(ArithmeticUtil.multiply( dto.getBussRepoSec().getTotalPrinAmt(),new BigDecimal(10000)));
+//            }
+//            for (PledgeBondInfoDto pledgeBond :  dto.getBussRepoSec().getPledgeBondList()) {
+//                if (pledgeBond.getAvaPledgePrin() != null) {
+//                    pledgeBond.setAvaPledgePrin(ArithmeticUtil.multiply(pledgeBond.getAvaPledgePrin(), new BigDecimal(10000)));
+//                }
+//                if (pledgeBond.getPledgePrin() != null) {
+//                    pledgeBond.setPledgePrin(ArithmeticUtil.multiply(pledgeBond.getPledgePrin(), new BigDecimal(10000)));
+//                }
+//                if (pledgeBond.getPrin() != null) {
+//                    pledgeBond.setPrin(ArithmeticUtil.multiply(pledgeBond.getPrin(), new BigDecimal(10000)));
+//                }
+//            }
+//        }
         //万元转换 add  by yeming 20210817 end
         
         if(StringUtil.isBlank(dto.getTradeId())) {
@@ -514,12 +515,19 @@ public class TrdBondLendInvestTrade002Controller extends BaseController {
             getMessage("TrdBondLendInvestTrade002.tradeId") + GlobalConstant.COLON + entity.getTradeId(),
             getMessage("TrdBondLendInvestTrade002.finprodName") + GlobalConstant.COLON + entity.getFinprodName(),
             getMessage("TrdBondLendInvestTrade002.tradeDate") + GlobalConstant.COLON + DateUtil.format(entity.getTradeDate())));
-
+//        try{
+//            String msg = trdBondLendInvestTrade002Service.start(processParameter, dto);
+//            return new AjaxResult(msg);
+//        }catch (MessageException e){
+//            AjaxResult m =new AjaxResult(e.getMessage(),e.getMessageType());
+//            return m ;
+//        }
         String msg = trdBondLendInvestTrade002Service.start(processParameter, dto);
+        return new AjaxResult(msg);
         
         //授信占用额度
 //        trdCommonController.delLinesDeal(dto.getRiskCreditListCommonDto(),dto.getTradeId());
-        return new AjaxResult(msg);
+
     }
     
     //组合代码
@@ -527,5 +535,12 @@ public class TrdBondLendInvestTrade002Controller extends BaseController {
     @RequestMapping("getPortfolioId")
     public List<SelectOptionDto> getPortfolioId(@RequestParam Map<String, Object> params) {
         return trdBondLendInvestTrade002Service.getPortfolioId(params);
+    }
+
+    //组合代码
+    @ResponseBody
+    @RequestMapping("getAssetAvailablePosition")
+    public Map<String, Object> getAssetAvailablePosition(@RequestBody Map<String, Object> params) {
+        return trdBondLendInvestTrade002Service.getAssetAvailablePosition(params);
     }
 }

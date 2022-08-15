@@ -8,24 +8,27 @@
                 T2.TRADER trader,
                 T2.DEAL_MODE,
                 CASE
-                    WHEN (T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND T1.PS IN (#{PS_T93})) THEN
+                    WHEN (T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND T1.PS IN (#{PS_T93}) AND T1.ENTRUST_TYPE = #{ENTRUST_TYPE_22}) THEN
                         NVL(T4.PLEDGE_NUMBER,0) - NVL(ST93.MARCH_QTY_EN,0)
                     WHEN (T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND T1.PS IN (#{PS_T94}) AND T1.ENTRUST_TYPE = #{ENTRUST_TYPE_21}) THEN
                         NVL(T3.PLEDGE_NUMBER,0) - NVL(ST94.MARCH_QTY_EN,0)
                 ELSE
                     NVL(T1.ENTRUST_NUM,0) - NVL(S.MARCH_QTY_EN,0) END remainEntrustNum,
                 CASE
-                    WHEN (T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND T1.PS IN (#{PS_T93})) THEN
+                    WHEN (T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND T1.PS IN (#{PS_T93}) AND T1.ENTRUST_TYPE = #{ENTRUST_TYPE_22}) THEN
                         NVL(T4.PLEDGE_NUMBER,0) - NVL(ST93.MARCH_QTY_EN,0)
                     WHEN (T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND T1.PS IN (#{PS_T94}) AND T1.ENTRUST_TYPE = #{ENTRUST_TYPE_21}) THEN
                     NVL(T3.PLEDGE_NUMBER,0) - NVL(ST94.MARCH_QTY_EN,0)
                 ELSE
                     NVL(T1.ENTRUST_AMT,0) - NVL(S.MARCH_AMT_EN,0)
                 END remainEntrustAmt,
+                ti.TRADE_ID tradeId,<!--交易员-->
                 T1.*
             FROM ETR_ENTRUST T1
             LEFT JOIN
                 ETR_ENTRUST_ADD T2 ON T1.ENTRUST_ID = T2.ENTRUST_ID
+            <!--交易员-->
+            left join T_INSTRUCTION ti ON ti.ENTRUST_ID = T1.ENTRUST_ID
             LEFT JOIN (
                 SELECT
                     ENTRUNST_TRADE_ID,
@@ -608,6 +611,6 @@
     <select id="selectFinDealPledgeByEntrust" resultType="com.joyintech.tams.common.base.pojo.PledgeListDto">
         select distinct FINPROD_ID finprodMarketId, PLEDGE_DISPLACE_AMT pledgeNumber, TRADE_TYPE displaceDir
         from FIN_PLEDGE_DISP_DETAIL_TEMP
-        where TRADE_ID = (select TRADE_ID from FIN_PLEDGE_DISP_TEMP where F_TRADE_ID = (select FINPROD_ID from ETR_ENTRUST where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}))
+        where TRADE_ID = (select TRADE_ID from FIN_PLEDGE_DISP_TEMP where F_TRADE_ID = (select FINPROD_ID from ETR_ENTRUST where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}) and ROWNUM = 1)
     </select>
 </mapper>

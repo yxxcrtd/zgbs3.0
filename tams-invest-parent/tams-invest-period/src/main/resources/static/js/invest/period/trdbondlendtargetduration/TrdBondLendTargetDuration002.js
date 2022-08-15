@@ -74,6 +74,7 @@
         if (FileCommon) {
             object.uploadFileList = FileCommon.getUploadFileInfo();
         }
+        object.balanceCheck ='Y'
         Joyin.ajaxJson(basePath + 'invest/period/trdbondlendtargetduration/TrdBondLendTargetDuration002/check', object, function (result) {
             Joyin.confirm(result.data, function () {
                 if (operateType === 'save') {

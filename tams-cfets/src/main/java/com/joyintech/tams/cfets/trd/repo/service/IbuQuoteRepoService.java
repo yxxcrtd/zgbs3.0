@@ -2422,9 +2422,10 @@ public class IbuQuoteRepoService extends BaseService {
 
             if (StringUtil.equals(com.joyintech.tams.constant.DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
                 //插入旧头寸
-                dtolist.forEach(item -> {
-                    baseEtrCashPositionCommService.entrustCloseExecute(item.getEntrustId(), com.joyintech.tams.constant.DictCodeList.是否_是.getValue());
-                });
+                dtolist.forEach(item ->
+                        baseEtrCashPositionCommService.entrustCloseExecute(item.getEntrustId(),
+                                com.joyintech.tams.constant.DictCodeList.是否_是.getValue(), item.getForcedFinishAmt(), null)
+                );
             }
 //            //发送头寸，批量关闭
             cfetsEtrIbBondinfoService.closeDelegatePositionMethod(dtolist, DictCodeList.平安资产类型_质押式回购.getValue());

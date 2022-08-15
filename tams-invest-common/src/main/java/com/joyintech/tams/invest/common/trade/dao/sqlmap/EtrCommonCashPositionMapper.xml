@@ -73,6 +73,10 @@
             <if test="invAim!=null and invAim!='' ">
                 and t.INV_AIM = #{invAim}
             </if>
+            <!-- 是否算上融入券-->
+            <if test="isContain9!=null and isContain9=='N'.toString() ">
+                and t.INV_AIM != '999999'
+            </if>
         	and t.hoding_type = #{hodingType,jdbcType=VARCHAR}
         	and t.cdate = #{cdate,jdbcType=DATE}
      </select>
@@ -747,9 +751,10 @@
         <!-- F.RATE_TYPE intRateType, -->
         F.INT_TYPE intRateType,
         G.PAY_CYCLE yearIntRate,
-        G.CALC_RULE calMethod,
+        G.CALC_RULE calMethod
+         <!--XYHGFXSJ-1069:代码无需用到 nextExeDate,nextExercisePrice modify by fuyongsheng 20220813 start,
         H.EXERCISE_DATE nextExeDate,
-        H.EXERCISE_PRICE nextExercisePrice
+        H.EXERCISE_PRICE nextExercisePrice-->
         FROM FIN_PRODUCT A
         LEFT JOIN FIN_CASH_INFO B
         ON A.FINPROD_ID = B.FINPROD_ID
@@ -767,7 +772,7 @@
         LEFT JOIN FIN_CASH_PAY_RULE G
         ON G.CASH_ID = B.CASH_ID
         AND G.FINPROD_TYPE2 = #{finprodType2}
-        LEFT JOIN (
+        <!--LEFT JOIN (
         SELECT *
         FROM FIN_EXERCISE_PLAN
         WHERE
@@ -775,7 +780,7 @@
         SELECT MIN(EXERCISE_DATE) FROM FIN_EXERCISE_PLAN WHERE FINPROD_ID = #{finprodId} AND FINPROD_TYPE2 = #{finprodType2} AND EXERCISE_DATE &gt;= #{sysDate}
         )
         AND FINPROD_ID = #{finprodId} AND FINPROD_TYPE2 = #{finprodType2}
-        ) H ON 1=1
+        ) H ON 1=1XYHGFXSJ-1069:代码无需用到 nextExeDate,nextExercisePrice modify by fuyongsheng 20220813 end-->
         WHERE
         A.FINPROD_ID = #{finprodId}
     </select>
@@ -968,6 +973,30 @@
         </if>
           )
     </select>
+
+    <select id="getAllEtrFinishAmt" resultType="java.math.BigDecimal">
+        select sum(finishAmt) finishAmt from
+        (
+            select case when #{sumTradeFlag} = '01' then nvl(deal.trade_amt,0) else nvl(deal.share_amt,0) end as finishAmt
+                from trd_product_deal deal
+                inner join trd_product_deal_add ad on deal.trade_id = ad.trade_id
+                <if test="settleStatus!=null and settleStatus!=''">
+                    left join TRD_BANK_MANUAL_SETTLE_INFO tbmsi on tbmsi.TRADE_ID = deal.TOTLE_TRADE_ID
+                </if>
+            where ad.entrust_id = #{entrustId}
+                and ad.portfolio_id = #{portfolioId}
+                and deal.trade_status = #{TRADE_STATUS_01}
+                and deal.is_cancel = #{YES_OR_NO_N}
+                <if test="settleStatus!=null and settleStatus!=''">
+                    and ( tbmsi.SETTLE_STATUS is null or tbmsi.SETTLE_STATUS = #{settleStatus} )
+                </if>
+        )
+    </select>
+
+    <select id="getEtrStatus" resultType="java.lang.String">
+        select ENTRUST_STATUS from ETR_ENTRUST where ENTRUST_ID = #{entrustId}
+    </select>
+
     <select id="selectSumShareAmt"  resultType="java.math.BigDecimal">
       select sum(T.AMOUNT) AMOUNT
                   from PTL_SEC_POSITION_FLOW T
@@ -1019,12 +1048,13 @@
     </select>
 
     <select id="selectShengYuEntrustAmt" resultType="java.math.BigDecimal">
-        select t1.ENTRUST_AMT - nvl(t2.PLEDGE_FACE_VALUE,0) shengYuEntrustAmt
+        select t1.ENTRUST_AMT - nvl(t2.PRIN_AMT,0) shengYuEntrustAmt
         from (select ENTRUST_AMT from ETR_ENTRUST where ENTRUST_ID=#{entrustId}) t1,
-             (select sum(PLEDGE_FACE_VALUE) PLEDGE_FACE_VALUE from FIN_DEAL_TARGET where FINPROD_ID
-                                                                                             in (select TRADE_ID from TRD_PRODUCT_DEAL where TRADE_STATUS = '01' and (IS_CANCEL = 'N' or IS_CANCEL is null)
-                                                                                                                                         and TRADE_ID in (select TRADE_ID from TRD_PRODUCT_DEAL_ADD where ENTRUST_ID=#{entrustId}
-                     ))) t2
+             (select sum(PRIN_AMT) PRIN_AMT  from TRD_PRODUCT_DEAL
+                    where TRADE_STATUS = '01'  and (IS_CANCEL = 'N' or IS_CANCEL is null)
+                                and TRADE_ID in (select TRADE_ID from TRD_PRODUCT_DEAL_ADD where ENTRUST_ID=#{entrustId}
+                     )
+                 ) t2
     </select>
 
     <select id="selectZhiLingChiCang" resultType="java.math.BigDecimal">
@@ -1124,4 +1154,23 @@
         WHERE
             TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
     </select>
+
+
+    <select id="selectInvAim" resultType="java.lang.String" parameterType="com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto">
+        SELECT
+        INV_AIM
+        FROM
+        ETR_SEC_POSITION p
+        WHERE p.PORTFOLIO_ID = #{portfolioId}  and p.SEC_ACCT_ID =#{secAcctId}
+            and p.HODING_TYPE=#{hodingType} and p.FINPROD_ID =#{finprodId}
+        and p.INV_AIM !='999999'
+        and cdate= (select max(cdate) from ETR_SEC_POSITION p1 where cdate &lt;=#{cdate}
+            and p.PORTFOLIO_ID = p1.PORTFOLIO_ID  and p.SEC_ACCT_ID =p1.SEC_ACCT_ID
+          and p.HODING_TYPE=p1.HODING_TYPE and p.FINPROD_ID =p1.FINPROD_ID and p1.INV_AIM !='999999'
+            )
+          and  ROWNUM = 1
+        group by INV_AIM
+    </select>
+
+
 </mapper>

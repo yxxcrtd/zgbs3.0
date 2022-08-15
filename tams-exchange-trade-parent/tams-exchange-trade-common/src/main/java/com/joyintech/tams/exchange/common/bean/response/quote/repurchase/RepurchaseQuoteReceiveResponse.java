@@ -189,6 +189,16 @@ public class RepurchaseQuoteReceiveResponse {
     private String pledgeNumberStr;
     @ApiModelProperty(name = "discountStr", value = "折算率(%)")
     private String discountStr;
+    
+    private String useFlg;
+
+    public String getUseFlg() {
+        return useFlg;
+    }
+
+    public void setUseFlg(String useFlg) {
+        this.useFlg = useFlg;
+    }
 
     public String getRequestNo() {
         return requestNo;

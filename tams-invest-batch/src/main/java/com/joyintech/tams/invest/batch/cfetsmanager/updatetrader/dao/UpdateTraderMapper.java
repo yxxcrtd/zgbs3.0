@@ -54,7 +54,7 @@ public interface UpdateTraderMapper {
 	 * @param map
 	 * @return
 	 */
-	String selectMpartyId(Map<String, Object> map);
+	List<String> selectMpartyId(Map<String, Object> map);
 
 	/**
 	 * 获取机构信息

@@ -3,6 +3,7 @@ package com.joyintech.service.entrust.etrcommanddispatcher.service;
 import com.alibaba.fastjson.JSON;
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.service.entrust.etrcommanddispatcher.dao.EtrCommandDispatcherMapper;
 import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrCommandDispatcherDto;
 import com.joyintech.service.entrust.etrcommanddispatcher.dto.EtrCommandDispatcherTotalDto;
@@ -107,7 +108,10 @@ public class EtrCommandDispatcherService extends BaseService<EtrCommandDispatche
 			dto.setPageCount(1);
 			//放弃使用mq推送消息,采用接口调用
 			//messageSenderService.pushCommandMsgToMQ(dto);
-			sendMessageByInf(dto);
+			String msg = sendMessageByInf(dto);
+			if(StringUtil.isNotEmpty(msg)){
+				throw new BusinessException("指令分发错误：" + msg);
+			}
 		}
      }
 
@@ -134,8 +138,14 @@ public class EtrCommandDispatcherService extends BaseService<EtrCommandDispatche
     public List<EtrTradePledgeDto> selectPledgeList(List<EtrCommandDispatcherDto> list , String displaceDir){
     	List<EtrTradePledgeDto> pledgelist = new ArrayList<EtrTradePledgeDto>();
 
+		//已查询质押券的指令列表，防止重复查询质押券
+		List<String> entrustIds = new ArrayList<>();
+
     	if(list != null && !list.isEmpty()) {
 	    	for(EtrCommandDispatcherDto dto : list) {
+				if(entrustIds.contains(dto.getEntrustId())){
+					continue;
+				}
 	    		if("F02".equals(dto.getFinprodType2()) || "F03".equals(dto.getFinprodType2()) ) {
 					if (StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), dto.getBusiTypeTg()) ||
 							(StringUtil.equals(DictCodeListExt3.投管业务类型_中途换券.getValue(), dto.getBusiTypeTg()) &&
@@ -165,14 +175,14 @@ public class EtrCommandDispatcherService extends BaseService<EtrCommandDispatche
 						}
 					}
 	    		}
-
+				entrustIds.add(dto.getEntrustId());
 	    	}
     	}
-    	if(pledgelist != null && !pledgelist.isEmpty() ){
-			pledgelist.forEach(v->{
-				v.setDisplaceDir(displaceDir);
-			});
-		}
+//    	if(pledgelist != null && !pledgelist.isEmpty() ){
+//			pledgelist.forEach(v->{
+//				v.setDisplaceDir(displaceDir);
+//			});
+//		}
     	return pledgelist;
     }
 

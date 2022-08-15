@@ -1043,10 +1043,12 @@ public class IbuComponentReceiveService extends BaseService{
                     BussinessDictCodeList.银行间上行报价状态_已撤回.getValue())) {
                 cfetsQuotedCommonService.sendPositionMethod(dto, DictCodeListExt3.流程节点_审批生效.getValue(), DictCodeListExt3.系统动作_撤回.getValue(), DictCodeListExt3.系统动作_撤回.getValue(), null);
                 return true;
-            } else if (StringUtil.equals(ibuQuoteCrepDto.getTradeStatus(),
+            } else if (CollectionUtils.isNotEmpty(ptlAllocationList)
+                    && (StringUtil.equals(ibuQuoteCrepDto.getTradeStatus(),
                     BussinessDictCodeList.银行间上行报价状态_已终止.getValue())
                     || StringUtil.equals(ibuQuoteCrepDto.getTradeStatus(),
-                    BussinessDictCodeList.银行间上行报价状态_已过期.getValue())) {
+                    BussinessDictCodeList.银行间上行报价状态_已过期.getValue()))) {
+                // 首次交谈 直接拒绝不处理头寸
                 cfetsQuotedCommonService.sendPositionMethod(dto, DictCodeListExt3.流程节点_审批生效.getValue(), DictCodeListExt3.系统动作_撤回.getValue(), DictCodeListExt3.系统动作_撤回.getValue(), null);
                 return true;
             }

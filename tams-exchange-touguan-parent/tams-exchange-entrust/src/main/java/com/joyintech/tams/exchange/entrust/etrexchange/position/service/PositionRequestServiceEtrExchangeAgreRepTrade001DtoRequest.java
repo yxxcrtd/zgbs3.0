@@ -9,11 +9,9 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.service.TamsBusinessCommonService;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
+import com.joyintech.tams.common.base.dao.FinDealPledgeMapper;
 import com.joyintech.tams.common.base.dao.FinTradeProductMapper;
-import com.joyintech.tams.common.base.entity.EtrEntrust;
-import com.joyintech.tams.common.base.entity.FinTradeProduct;
-import com.joyintech.tams.common.base.entity.FinTradeProductKey;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -26,6 +24,7 @@ import com.joyintech.tams.invest.common.entrust.inter.EtrTradeCommonervice;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
 import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import com.joyintech.tams.invest.entrust.etragrereptrade.dto.EtrAgreRepTradeDto;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +53,7 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
     private TrdCommonBaseService trdCommonBaseService;
 
     @Autowired
-    private EtrEntrustMapper etrEntrustMapper;
+    private FinDealPledgeMapper finDealPledgeMapper;
 
     @Autowired
     private FinTradeProductMapper finTradeProductMapper;
@@ -287,29 +286,51 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
                 || 交易方向_中途换券.getValue().equals(ps)
                 || 交易方向_到期购回.getValue().equals(ps)
                 || 交易方向_提前购回.getValue().equals(ps))) {
-            List<Map<String, Object>> list = new ArrayList<>(1);
-            bean = new PositionRequestBaseBean();
-            bean.setPortfolioId(entity.getPortfolioId());
-            bean.setFinprodId(entity.getFinprodId());
-            bean.setSecAcctId(entity.getSecAcctId());
-            bean.setTradeId(null);
-            bean.setEtrId(entity.getEntrustId());
-            // 券面总额 指令.质押券数量*100
-            bean.setSecAmount(entity.getRepSecNum().multiply(BigDecimal.valueOf(100L)));
-
+            List<Map<String, Object>> list = new ArrayList<>();
+            // XYHGFXSJ-1092:修改解除质押数据集赋值 modify by fuyongsheng 20220811 start
             if (交易方向_中途换券.getValue().equals(ps)) {
+                bean = new PositionRequestBaseBean();
+                bean.setPortfolioId(entity.getPortfolioId());
+                bean.setSecAcctId(entity.getSecAcctId());
+                bean.setTradeId(null);
+                bean.setEtrId(entity.getEntrustId());
+                // 券面总额 指令.质押券数量*100
                 bean.setFinprodId(entity.getOutfinprodId());
                 bean.setSecAmount(entity.getOutRepSecNum().multiply(BigDecimal.valueOf(100L)));
+                Map<String, Object> map = BeanUtil.object2Map(bean);
+                //融入券券面总额
+                map.put("integrateSecAmount", BigDecimal.ZERO);
+                //本方券券面总额 指令.质押券数量*100
+                map.put("ownSecAmount", bean.getSecAmount());
+                list.add(map);
             }
-
-            Map<String, Object> map = BeanUtil.object2Map(bean);
-            //融入券券面总额
-            map.put("integrateSecAmount", null);
-            //本方券券面总额 指令.质押券数量*100
-            map.put("ownSecAmount", bean.getSecAmount());
-
-            list.add(map);
-
+            else {
+                if(null != entity.getFirstFinTradeProduct() && StringUtil.isNotEmpty(entity.getFirstFinTradeProduct().getFinprodId())){
+                    FinDealPledgeKey key = new FinDealPledgeKey();
+                    key.setFinprodId(entity.getFirstFinTradeProduct().getFinprodId());
+                    key.setBranch(0L);
+                    // 查询首期质押券
+                    List<FinDealPledge> finDealPledges = finDealPledgeMapper.selectByFinprodId(key);
+                    if(CollectionUtils.isNotEmpty(finDealPledges)){
+                        for(FinDealPledge finDealPledge : finDealPledges){
+                            bean = new PositionRequestBaseBean();
+                            bean.setPortfolioId(entity.getPortfolioId());
+                            bean.setSecAcctId(entity.getSecAcctId());
+                            bean.setTradeId(null);
+                            bean.setEtrId(entity.getEntrustId());
+                            // 券面总额 指令.质押券数量*100
+                            bean.setFinprodId(finDealPledge.getPledgeFinprodId());
+                            bean.setSecAmount(finDealPledge.getPledgeNumber().multiply(BigDecimal.valueOf(100L)));
+                            Map<String, Object> map = BeanUtil.object2Map(bean);
+                            //融入券券面总额
+                            map.put("integrateSecAmount", BigDecimal.ZERO);
+                            map.put("ownSecAmount", bean.getSecAmount());
+                            list.add(map);
+                        }
+                    }
+                }
+            }
+            // XYHGFXSJ-1092:修改解除质押数据集赋值 modify by fuyongsheng 20220811 end
             resultMap.put("ptlRelieveSecList", list);
         }
     }

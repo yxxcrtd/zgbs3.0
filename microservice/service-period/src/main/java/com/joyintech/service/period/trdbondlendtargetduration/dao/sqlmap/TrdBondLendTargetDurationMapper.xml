@@ -192,9 +192,9 @@
                             /* 现金流计划.现金流代码                            现金流代码*/
                             FCP.CASH_TYPE,
                             /* 现金流计划.现金流类型                            现金流类型*/
-                            FCP.PAY_DATE,
+                            FCP.PAY_DATE
                             /* 现金流计划.调整后的计划支付日                            计划支付日*/
-                            RANK() OVER (PARTITION BY FCP.FINPROD_ID ORDER BY FCP.MDATE) RANK
+
                         FROM TRD_PRODUCT_DEAL TPD
                         INNER JOIN TRD_PRODUCT_DEAL_ADD TPDA ON TPD.TRADE_ID = TPDA.TRADE_ID
                         INNER JOIN FIN_DEAL_TARGET FDT ON TPD.TRADE_ID = FDT.FINPROD_ID
@@ -277,8 +277,7 @@
                                 AND FCP.PAY_DATE &lt;= to_date(#{mdateEnd}, 'yyyy-MM-dd')
                             </if>
                             )
-                    WHERE
-                        RANK = 1 ) ASP
+                     ) ASP
                 GROUP BY
                     ASP.TRADE_ID,
                     ASP.FINPROD_ID,
@@ -564,9 +563,9 @@
                             FCP.CASH_TYPE,
                             /* 现金流计划.现金流类型                            现金流类型*/
                             FCP.PAY_DATE,
-                            FCP.RANGE_YIELD,
+                            FCP.RANGE_YIELD
                             /* 现金流计划.调整后的计划支付日                            计划支付日*/
-                            RANK() OVER (PARTITION BY FCP.FINPROD_ID ORDER BY FCP.MDATE) RANK
+
                         FROM TRD_PRODUCT_DEAL TPD
                         INNER JOIN TRD_PRODUCT_DEAL_ADD TPDA ON TPD.TRADE_ID = TPDA.TRADE_ID
                         INNER JOIN FIN_DEAL_TARGET FDT ON TPD.TRADE_ID = FDT.FINPROD_ID
@@ -610,9 +609,14 @@
                             <!-- AND fcp.PAY_DATE >= #{PLATEFORM_DATE} -->
                             AND pp.PORTFOLIO_ID <include refid="com.joyintech.service.period.trdbondduration.dao.TrdBondDurationMapper.portfolioAth"/>
                             AND TPD.TRADE_ID = #{mpFinprodId}
+                            <if test="cashTypeList !=null and cashTypeList.size()>0 ">
+                                AND FCP.CASH_TYPE in
+                                <foreach collection="cashTypeList" item="item" index= "index" open="(" close=")" separator="," >
+                                    #{item}
+                                </foreach>
+                            </if>
                             )
-                    WHERE
-                        RANK = 1) ASP
+                  ) ASP
                 GROUP BY
                     ASP.TRADE_ID,
                     ASP.BRANCH,

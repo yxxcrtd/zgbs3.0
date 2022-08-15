@@ -1423,7 +1423,7 @@ from
         select
         tt.portfolio_id as portfolioId,
         pp.portfolio_name portfolioName,
-        inva.INV_AIM as businessModel,
+        nvl(inva.INV_AIM,'FVTPL') as businessModel,
         nvl(tt.entrustNum,0)/10000 as entrustNum
         from
         (select a.portfolio_id,a.finprod_id,
@@ -1588,5 +1588,12 @@ from
         where t.bond_id=#{finprodId,jdbcType=VARCHAR}
         ) where rownum=1
 
+    </select>
+
+    <select id="findEtrEntrustIsSettleFail" resultType="java.lang.String">
+        select distinct eea.ENTRUST_ID
+        from ETR_ENTRUST_ADD eea
+        where eea.CLOSE_AMT is not null and eea.ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+            and nvl(eea.CLOSE_AMT,0) <![CDATA[>]]> 0
     </select>
 </mapper>

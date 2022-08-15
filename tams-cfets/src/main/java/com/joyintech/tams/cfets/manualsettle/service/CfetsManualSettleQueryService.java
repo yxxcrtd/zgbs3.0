@@ -130,8 +130,8 @@ public class CfetsManualSettleQueryService extends BaseService{
                 , DictCodeListExt1.平安业务类型_债券类资产行权.getValue(), DictCodeListExt1.平安业务类型_债券中间收息.getValue(), DictCodeListExt1.平安业务类型_债券中间还本.getValue()
                 , DictCodeListExt1.平安业务类型_债券到期.getValue(), DictCodeListExt1.平安业务类型_正回购.getValue(), DictCodeListExt1.平安业务类型_逆回购到期.getValue()
                 , DictCodeListExt1.平安业务类型_正回购到期.getValue(), DictCodeListExt1.平安业务类型_买断式正回购.getValue(), DictCodeListExt1.平安业务类型_买断式逆回购.getValue()
-                , DictCodeListExt1.平安业务类型_买断式正回购到期.getValue(), DictCodeListExt1.平安业务类型_买断式逆回购到期.getValue(), DictCodeListExt2.平安业务类型_债券借贷融入.getValue()
-                , DictCodeListExt2.平安业务类型_债券借贷融出.getValue(), DictCodeListExt2.平安业务类型_债券借贷融入到期.getValue(), DictCodeListExt2.平安业务类型_债券借贷融出到期.getValue()
+                , DictCodeListExt1.平安业务类型_买断式正回购到期.getValue(), DictCodeListExt1.平安业务类型_买断式逆回购到期.getValue()
+//                , DictCodeListExt2.平安业务类型_债券借贷融入.getValue(), DictCodeListExt2.平安业务类型_债券借贷融出.getValue(), DictCodeListExt2.平安业务类型_债券借贷融入到期.getValue(), DictCodeListExt2.平安业务类型_债券借贷融出到期.getValue()
                 , DictCodeListExt4.平安业务类型_一级申购.getValue(),DictCodeListExt4.平安业务类型_中标结果维护.getValue(),DictCodeListExt4.平安业务类型_债券分销买入确认.getValue()));
         //收付方向
         pageParam.put("feePs02", DictCodeListExt1.收付方向_支出.getValue());
@@ -165,6 +165,7 @@ public class CfetsManualSettleQueryService extends BaseService{
         pageParam.put("PS_T02", DictCodeList.交易方向_卖出.getValue());
         pageParam.put("tradePlat_01", BussinessDictCodeList.交易场所_银行间.getValue());
         pageParam.put("tradePlat_02", BussinessDictCodeList.交易场所_商业银行柜台市场.getValue());
+        pageParam.put("notAssetType", Arrays.asList(DictCodeListExt1.金融产品类型_投管用_债券借贷融入.getValue(), DictCodeListExt1.金融产品类型_投管用_债券借贷融出.getValue()));
 
 
         pageParam.put("FINPROD_TYPE_TG_F03", DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());

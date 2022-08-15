@@ -71,6 +71,20 @@ var table;
             object.counterType = $('#trdInvestPersonInfo_counterId').select2('data')[0].object;
             object.counterId=$('#trdInvestPersonInfo_counterId').select2('data')[0].id;
         }
+
+        if(object.bussRepoSec){
+            if( object.bussRepoSec.totalPrinAmt){
+                object.bussRepoSec.totalPrinAmt =object.bussRepoSec.totalPrinAmt*10000;
+            }
+            if(object.bussRepoSec.pledgeBondList){
+                var index = object.bussRepoSec.pledgeBondList.length;
+                for(var i = 0 ;i<index;i++){
+                    object.bussRepoSec.pledgeBondList[i].avaPledgePrin = object.bussRepoSec.pledgeBondList[i].avaPledgePrin*10000;
+                    object.bussRepoSec.pledgeBondList[i].pledgePrin = object.bussRepoSec.pledgeBondList[i].pledgePrin*10000
+                    object.bussRepoSec.pledgeBondList[i].prin = object.bussRepoSec.pledgeBondList[i].prin*10000
+                }
+            }
+        }
         
         //校验质押券置换安排是否为空
 //        var exchangePledge = object.bussRepoSec.exchangePledge;
@@ -85,6 +99,7 @@ var table;
 //            	Joyin.ajaxJson(basePath + 'invest/trade/TrdCommonController/delLinesDeal',result1.data,function(result2) {}); 
             	object.riskCreditListCommonDto = result1.data;
             	Joyin.confirm(result.data, function() {
+                    object.balanceCheck ='Y';
                     if(operateType === 'save') {
                         WorkFlow.doSaveList(basePath + 'invest/trade/bondlend/TrdBondLendInvestTrade002/save', object, "TrdBondLendInvestTrade002_btn_save");
                     }
@@ -554,13 +569,18 @@ var table;
         params.finprodId = $("#finprodId").val();
         params.secAcctId = $("#secManageAcctId").val();
         // 债券借贷资产可用持仓乘100by赵东东 2019.8.30 start
-        params.multiParam=100;
-        // 债券借贷资产可用持仓乘100by赵东东 2019.8.30 end
-        if (window.BussTrdAvailableCashQuery && window.BussTrdAvailableCashQuery["bussTrdAvailableCashQuery"]) {
-            window.BussTrdAvailableCashQuery["bussTrdAvailableCashQuery"].updateCash(function () {
-                return params
-            });
-        }
+        // params.multiParam=100;
+        // // 债券借贷资产可用持仓乘100by赵东东 2019.8.30 end
+        // if (window.BussTrdAvailableCashQuery && window.BussTrdAvailableCashQuery["bussTrdAvailableCashQuery"]) {
+        //     window.BussTrdAvailableCashQuery["bussTrdAvailableCashQuery"].updateCash(function () {
+        //         return params
+        //     });
+        // }
+        Joyin.ajaxJson(JoyinUtil.getRealPath('/invest/trade/bondlend/TrdBondLendInvestTrade002/getAssetAvailablePosition'), params, function (result) {
+            if(result){
+                $("#bussTrdAvailableCashQuery_assetPosition").val(result.position).trigger("change").trigger("blur");
+            }
+        },false)
     };
 
     //画面初始化

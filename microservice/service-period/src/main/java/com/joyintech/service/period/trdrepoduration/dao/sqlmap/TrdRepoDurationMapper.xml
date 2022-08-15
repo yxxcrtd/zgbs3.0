@@ -498,16 +498,23 @@
                 to_char(T4.VDATE, 'yyyy-MM-dd') vDate/*计息开始日*/,
                 to_char(T4.MDATE, 'yyyy-MM-dd') mDate/*计息结束日*/,
                 NULL TERM,
-                T3.THEORY_PRIN/*理论本金*/,
+                nvl(T3.THEORY_PRIN, T4.PRIN) THEORY_PRIN/*理论本金*/,
                 T1.TRADE_MARKET TRADE_MARKET,
                 to_char(T1.SETTLE_DATE, 'yyyy-MM-dd') SETTLE_DATE,
-                T3.THEORY_INT/*理论利息*/,
-                T3.THEORY_AMT/*理论本息总额*/,
-                <!-- 存续期增加通道费 modify by renping 20191028 start -->
+                nvl(T3.THEORY_INT, t4.M_INT_AMT) THEORY_INT/*理论利息*/,
+                nvl(T3.THEORY_AMT, T4.M_TRADE_AMT) THEORY_AMT/*理论本息总额*/,
+                <!-- 存续期增加通道费 modify by renping 20191028 start
                 T1.FPRICE_AMT,/*实收本息总额*/
-                T1.TRADE_AMT,
+                T1.TRADE_AMT,-->
+                nvl(T4.M_TRADE_AMT ,T1.FPRICE_AMT) FPRICE_AMT, /*实收本息总额*/
+                nvl(T4.M_TRADE_AMT ,T1.TRADE_AMT) TRADE_AMT,
                 <!-- 存续期增加通道费 modify by renping 20191028 end -->
-                T1.PS/*交易方向*/
+            CASE
+
+            WHEN T1.PS = 'T54' THEN
+            'T96'
+            WHEN T1.PS = 'T07' THEN
+            'T95' ELSE T1.PS end PS/*交易方向*/
                 ,null workflow_id
                 FROM TRD_FIN_PRODUCT_DEAL_TOTAL T1
                 LEFT JOIN FIN_PRODUCT fp1 on fp1.FINPROD_ID = T1.CHL_ID
@@ -523,7 +530,7 @@
                 and t1.TRADE_STATUS = #{TRADE_STATUS01}
                 and t1.IS_CANCEL = #{YES_OR_NO_N}
                 AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
-                and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS})
+                and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS},#{PST93},#{PST94},#{PST95},#{PST96})
                 <if test="portfolioId != null and !portfolioId.isEmpty()">
                     AND (PP.PORTFOLIO_ID IN (<foreach collection="portfolioId" index= "index" item="item" separator=",">#{item}</foreach> )
                     or
@@ -568,16 +575,22 @@
             to_char(T4.VDATE, 'yyyy-MM-dd') vDate/*计息开始日*/,
             to_char(T4.MDATE, 'yyyy-MM-dd') mDate/*计息结束日*/,
             NULL TERM,
-            T3.THEORY_PRIN/*理论本金*/,
+            nvl(T3.THEORY_PRIN, T4.PRIN) THEORY_PRIN/*理论本金*/,
             T1.TRADE_MARKET TRADE_MARKET,
             to_char(T1.SETTLE_DATE, 'yyyy-MM-dd') SETTLE_DATE,
-            T3.THEORY_INT/*理论利息*/,
-            T3.THEORY_AMT/*理论本息总额*/,
-            <!-- 存续期增加通道费 modify by renping 20191028 start -->
+            nvl(T3.THEORY_INT, t4.M_INT_AMT) THEORY_INT/*理论利息*/,
+            nvl(T3.THEORY_AMT, T4.M_TRADE_AMT) THEORY_AMT/*理论本息总额*/,
+            <!-- 存续期增加通道费 modify by renping 20191028 start
             T1.FPRICE_AMT ,/*实收本息总额*/
-            T1.TRADE_AMT,
+            T1.TRADE_AMT,-->
+            nvl(T4.M_TRADE_AMT ,T1.FPRICE_AMT) FPRICE_AMT, /*实收本息总额*/
+            nvl(T4.M_TRADE_AMT ,T1.TRADE_AMT) TRADE_AMT,
             <!-- 存续期增加通道费 modify by renping 20191028 end -->
-            T1.PS/*交易方向*/
+            CASE
+            WHEN T1.PS = 'T54' THEN
+            'T96'
+            WHEN T1.PS = 'T07' THEN
+            'T95' ELSE T1.PS end PS/*交易方向*/
             ,null workflow_id
             FROM TRD_FIN_PRODUCT_DEAL_TOTAL T1
             LEFT JOIN FIN_PRODUCT fp1 on fp1.FINPROD_ID = T1.CHL_ID
@@ -591,7 +604,7 @@
             and T1.PORTFOLIO_ID <include refid="com.joyintech.service.period.trdbondduration.dao.TrdBondDurationMapper.portfolioAth"/>
             and t1.TRADE_STATUS = #{TRADE_STATUS03}
             AND (T1.TRADE_MARKET IS NULL OR T1.TRADE_MARKET != #{TRADE_MARKET_01})
-            and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS})
+            and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS},#{PST93},#{PST94},#{PST95},#{PST96})
             <if test="portfolioId != null and !portfolioId.isEmpty()">
                 AND (PP.PORTFOLIO_ID IN (<foreach collection="portfolioId" index= "index" item="item" separator=",">#{item}</foreach> )
                 or
@@ -620,8 +633,10 @@
                 T4.INT_RATE*100 INT_RATE,
                 T1.COUNTER_ID counterId,
                 t6.COUNTER_NAME counterName,
-                T1.COUNTER_TRADER,
-                T1.TRADER,
+                <!--T1.COUNTER_TRADER,
+                T1.TRADER,-->
+                ptpd.COUNTER_TRADER,
+                ptpd.TRADER,
                 T1.SEC_MANAGE_ACCT_ID,
                 T4.FINPROD_ID,
                 T1.PORTFOLIO_ID,
@@ -639,15 +654,16 @@
                 to_char(T4.VDATE, 'yyyy-MM-dd') vDate/*计息开始日*/,
                 to_char(T4.MDATE, 'yyyy-MM-dd') mDate/*计息结束日*/,
                 T7.TERM,/*回购期限*/
-                T3.THEORY_PRIN/*理论本金*/,
+                nvl(T3.THEORY_PRIN, T4.PRIN) THEORY_PRIN/*理论本金*/,
                 T1.TRADE_MARKET TRADE_MARKET,
                 to_char(T1.SETTLE_DATE, 'yyyy-MM-dd') SETTLE_DATE,
-                T3.THEORY_INT/*理论利息*/,
-                T3.THEORY_AMT/*理论本息总额*/,
-                T1.TRADE_AMT/*实收本息总额*/,
+                nvl(T3.THEORY_INT, t4.M_INT_AMT) THEORY_INT/*理论利息*/,
+                nvl(T3.THEORY_AMT, T4.M_TRADE_AMT) THEORY_AMT/*理论本息总额*/,
                 tdta.TERMINATE_RATE *100 terminateRate,
                 tdta.PENALTY_INTAMT,
-                T1.FPRICE_AMT,
+                nvl(T4.M_TRADE_AMT ,T1.FPRICE_AMT) FPRICE_AMT,
+                /*实收本息总额*/
+                nvl(T4.M_TRADE_AMT ,T1.TRADE_AMT) TRADE_AMT,
                 T1.FEE_AMT channelFee,
                 <!-- 交易结算费用 start -->
                 ttft.FEE_AMT actTradeFee,
@@ -669,6 +685,7 @@
             LEFT JOIN PTL_PORTFOLIO PP ON PT.PORTFOLIO_ID = PP.PORTFOLIO_ID
             LEFT JOIN TRD_TRADE_FEE_TOTAL ttft on ttft.TOTLE_TRADE_ID = T1.TOTLE_TRADE_ID and ttft.FEE_TYPE = #{FEE_TYPE_JSF}
             LEFT JOIN TRD_PRODUCT_DEAL ptpd on ptpd.TRADE_ID =  T4.FINPROD_ID
+            LEFT JOIN trd_product_deal_add ptpdd ON ptpd.trade_id = ptpdd.trade_id
             where
                 PP.INVEST_YESORNO='Y'
             <if test="statusValid == PAGE_DATE_STATUS05">
@@ -702,11 +719,11 @@
                 to_char(T1.VDATE, 'yyyy-MM-dd') vDate/*计息开始日*/,
                 to_char(T1.MDATE, 'yyyy-MM-dd') mDate/*计息结束日*/,
                 T4.TERM,/*回购期限*/
-                T3.THEORY_PRIN/*利息本金*/,
+                nvl(T3.THEORY_PRIN, T4.PRIN) THEORY_PRIN/*利息本金*/,
                 T1.TRADE_MARKET TRADE_MARKET,
                 to_char(T1.SETTLE_DATE, 'yyyy-MM-dd') SETTLE_DATE,
-                T3.THEORY_INT/*理论利息*/,
-                T3.THEORY_AMT/*理论本息总额*/,
+                nvl(T3.THEORY_INT, t4.M_INT_AMT) THEORY_INT/*理论利息*/,
+                nvl(T3.THEORY_AMT, T4.M_TRADE_AMT) THEORY_AMT/*理论本息总额*/,
                 T1.TRADE_AMT/*实收本息总额*/,T1.WORKFLOW_ID,
                 T1.FPRICE_AMT,
                 T1.FEE_AMT channelFee
@@ -930,7 +947,7 @@
     SELECT
     TO_CHAR(deal.MDATE, 'yyyy-MM-dd') mDatex,/*续做到期日*/
     deal.PRIN_AMT theoryPrinex,/*续做本金*/
-    total.ACCOUNTING_AMT setAmt,/*结算金额*/
+    info.M_TRADE_AMT setAmt,/*结算金额*/
     info.M_INT_AMT theoryIntex,/*续做利息*/
     deal.COUNTER_ID counterIdex,/*续做交易对手*/
     countinfo.COUNTER_NAME counterNamex, /*续做交易对手名称*/
@@ -943,18 +960,12 @@
     info.INT_RATE*100 intRatex, /*续做利率*/
     feedeal.FEE_AMT commissionAmt, /*佣金费*/
     feedeal.IS_PAY_WITH_TRADE isPayWithTrade/*佣金随交易支付*/
-    FROM TRD_FIN_PRODUCT_DEAL_TOTAL total
-    LEFT JOIN WFL_TRD_DEAL_TOTAL_ADD wfl
-    ON total.TOTLE_TRADE_ID=wfl.TOTLE_TRADE_ID
-    LEFT JOIN trd_product_deal deal
-    ON wfl.MP_FINPROD_ID=deal.trade_id
-    left join fin_trade_product info
-    on  wfl.MP_FINPROD_ID=info.FINPROD_ID
-    and wfl.MP_BRANCH=info.branch
-    left join MST_COUNTER_PARTY countinfo
-    on deal.COUNTER_ID=countinfo.COUNTER_ID
-    left join TRD_TRADE_FEE_DETAIL feedeal
-    on feedeal.trade_id=deal.trade_id
+    FROM
+    TRD_FIN_PRODUCT_DEAL_TOTAL total
+	LEFT JOIN trd_product_deal deal ON total.TOTLE_TRADE_ID = deal.TOTLE_TRADE_ID AND deal.ps ='T01'
+	LEFT JOIN fin_trade_product info ON deal.TRADE_ID = info.FINPROD_ID
+	LEFT JOIN MST_COUNTER_PARTY countinfo ON deal.COUNTER_ID = countinfo.COUNTER_ID
+	LEFT JOIN TRD_TRADE_FEE_DETAIL feedeal ON feedeal.trade_id = deal.trade_id
     and feedeal.FEE_TYPE=#{FEE_TYPE_YJF}
     WHERE total.TOTLE_TRADE_ID=#{busiCode}
     </select>

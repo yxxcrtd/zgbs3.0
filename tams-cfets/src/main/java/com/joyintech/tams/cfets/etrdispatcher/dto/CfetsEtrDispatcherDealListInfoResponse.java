@@ -1858,4 +1858,5 @@ public class CfetsEtrDispatcherDealListInfoResponse extends CfetsEtrDispatcherBa
     public void setBidModle(String bidModle) {
         this.bidModle = bidModle;
     }
+
 }

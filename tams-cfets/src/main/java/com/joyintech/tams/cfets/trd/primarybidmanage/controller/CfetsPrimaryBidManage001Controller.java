@@ -392,6 +392,7 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
             for (CfetsPrimaryBidManageSaveRequest requestDto: dto.getSelectedItem()) {
                 CfetsPrimaryBidManageSaveRequest saveRequest = cfetsPrimaryBidManageService.selectBasicInfo(requestDto);
                 saveRequest.setRemark(dto.getRemark());
+                cfetsPrimaryBidManageService.selectCash(saveRequest);
                 selectedItem.add(saveRequest);
             }
             dto.setSelectedItem(selectedItem);
@@ -446,11 +447,12 @@ public class CfetsPrimaryBidManage001Controller extends BaseController{
             dto.setIsWin(DictCodeList.是否_否.getValue());
             dto.setRemark("未中标");
             dto.setTotalWinId(IDGenerator.generate());
-            ProcessParameter<CfetsPrimaryBidManageSaveRequest> processParameter = new ProcessParameter<CfetsPrimaryBidManageSaveRequest>();
-            WorkFlowParameter<CfetsPrimaryBidManageSaveRequest> params = new WorkFlowParameter<CfetsPrimaryBidManageSaveRequest>();
+            cfetsPrimaryBidManageService.selectCash(dto);
+            ProcessParameter<CfetsPrimaryBidManageSaveRequest> processParameter = new ProcessParameter<>();
+            WorkFlowParameter<CfetsPrimaryBidManageSaveRequest> params = new WorkFlowParameter<>();
             params.setPageId("CfetsPrimaryBidManage002");
             params.setElementId(dto.getElementId());
-            params.setBusinessCode(item -> item.getBidId());
+            params.setBusinessCode(CfetsPrimaryBidManageSaveRequest::getBidId);
             if (StringUtil.equals(dto.getBidModle(),DictCodeListExt4.投标方式_自主投标.getValue())) {
                 params.setBusinessType(DictCodeListExt4.共通业务类型_中标结果维护自主投标.getValue());
             }else{

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.joyintech.framework.util.ArithmeticUtil;
+import com.joyintech.service.entrust.common.service.WFlowCommonService;
 import com.joyintech.service.entrust.etrseclend.dto.BussEtrInvestPersonInfoDto;
 import com.joyintech.tams.invest.common.component.base.core.MstFileCommonService;
 import com.joyintech.tams.invest.common.component.base.entrust.BaseEtrInvestInfoService;
@@ -304,7 +305,7 @@ public class EtrSecLendService extends BaseService {
            etrEntrust.setEntrustDate(iPlatformDate.getSysDate());
 //           etrEntrust.setEntrustAmt(dto.getTotalAmt().multiply(new BigDecimal(10000)));
            etrEntrust.setEntrustAmt(dto.getTotalAmt());
-           etrEntrust.setEntrustNum(dto.getTotalAmt().multiply(new BigDecimal(100)));
+           etrEntrust.setEntrustNum(dto.getTotalAmt());
            etrEntrust.setAvailableNum(dto.getObjectAvailablePosition());
            etrEntrust.setPrice(dto.getBusiRate());
            etrEntrust.setCalendarId(dto.getCalendarId());
@@ -426,7 +427,7 @@ public class EtrSecLendService extends BaseService {
            etrEntrust.setEntrustDate(iPlatformDate.getSysDate());
 //           etrEntrust.setEntrustAmt(dto.getTotalAmt().multiply(new BigDecimal(10000)));
            etrEntrust.setEntrustAmt(dto.getTotalAmt());
-           etrEntrust.setEntrustNum(dto.getTotalAmt().multiply(new BigDecimal(100)));
+           etrEntrust.setEntrustNum(dto.getTotalAmt());
            etrEntrust.setAvailableNum(dto.getObjectAvailablePosition());
            etrEntrust.setPrice(dto.getBusiRate());
            etrEntrust.setCalendarId(dto.getCalendarId());
@@ -485,6 +486,39 @@ public class EtrSecLendService extends BaseService {
                     }
                 }
             }
+            if( dto.getBussRepoSec().getTotalPrinAmt()  != null){
+                dto.getBussRepoSec().setTotalPrinAmt(ArithmeticUtil.multiply( dto.getBussRepoSec().getTotalPrinAmt(),new BigDecimal(10000)));
+            }
+            if(StringUtil.isNotEmpty(dto.getBussRepoSec()) && !StringUtil.isEmptyList(dto.getBussRepoSec().getPledgeBondList())) {
+                for (PledgeBondInfoDto pledgeBond : dto.getBussRepoSec().getPledgeBondList()) {
+                    if (pledgeBond.getAvaPledgePrin() != null) {
+                        pledgeBond.setAvaPledgePrin(ArithmeticUtil.multiply(pledgeBond.getAvaPledgePrin(), new BigDecimal(10000)));
+                    }
+                    if (pledgeBond.getPledgePrin() != null) {
+                        pledgeBond.setPledgePrin(ArithmeticUtil.multiply(pledgeBond.getPledgePrin(), new BigDecimal(10000)));
+                    }
+                }
+            }
+            List<EtrPledge> etrPledgeList = new ArrayList<>();
+            if(StringUtil.isNotEmpty(dto.getBussRepoSec()) && !StringUtil.isEmptyList(dto.getBussRepoSec().getPledgeBondList())) {
+                for(PledgeBondInfoDto pledgeBond : dto.getBussRepoSec().getPledgeBondList()) {
+                    EtrPledge etrPledge = new EtrPledge();
+                    // 委托代码 = 委托代码
+                    etrPledge.setEntrustId(dto.getEntrustId());
+                    // 金融产品代码 = 输出质押品DTO.金融产品代码
+                    etrPledge.setFinprodId(pledgeBond.getFinprodId());
+                    // 质押面值 = 输出质押品DTO.质押面值
+                    etrPledge.setPledgeFaceValue(new BigDecimal("100"));
+                    // 质押数量 = 输出质押品DTO.质押数量
+                    etrPledge.setPledgeNumber(ArithmeticUtil.divide(pledgeBond.getPledgePrin(), new BigDecimal("100"), 4));
+                    // 质押率 = 输出质押品DTO.质押率
+                    etrPledge.setPledgeRatio(ArithmeticUtil.divide(pledgeBond.getPledgeRatio(), new BigDecimal("100"), 4));
+                    // 质押金额 = 输出质押品DTO.质押金额
+                    etrPledge.setPledgeAmt(ArithmeticUtil.multiply(pledgeBond.getPledgePrin(), etrPledge.getPledgeRatio()));
+                    etrPledgeList.add(etrPledge);
+                }
+            }
+            entity.setEtrPledgeList(etrPledgeList);
             entity.setEtrEntrust(etrEntrust);
             entity.setEtrEntrustAdd(etrEntrustAdd);
             baseEtrInvestInfoService.updateDelegate(entity);
@@ -521,7 +555,7 @@ public class EtrSecLendService extends BaseService {
         EtrEntrust etrEntrust = new EtrEntrust();
         EtrEntrustAdd etrEntrustAdd = new EtrEntrustAdd();
         WflEtrTarget wflEtrTarget=new WflEtrTarget();
-        if (StringUtil.equals(operateType, "submit") || StringUtil.equals(operateType, "NEW")) {
+        if (StringUtil.equals(operateType, "submit") || StringUtil.equals(operateType, "NEW") || StringUtil.equals(operateType, "MODIFY") ) {
             dto.setEntrustStatus(DictCodeListExt3.委托状态_流程中.getValue());
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, dto);
             BeanUtil.copyPropertiesIgnoreNull(etrEntrust, dto.getEtrInvestPersonInfo());
@@ -602,7 +636,7 @@ public class EtrSecLendService extends BaseService {
             entity.setEtrEntrust(etrEntrust);
             entity.setEtrEntrustAdd(etrEntrustAdd);
             entity.setEtrPledgeList(etrPledgeList);
-            baseEtrInvestInfoService.newDelegateFlow(entity);
+            baseEtrInvestInfoService.insertWithQuery(entity);
             //委托开始日对委托的持仓流水和现金流水做处理
             if(baseEtrCashPositionCommService!=null){
                 entrustCommonDto.setEtrEntrust(etrEntrust);
@@ -634,6 +668,22 @@ public class EtrSecLendService extends BaseService {
     	etrSecLendMapper.deleteWflwflEtrTarget(dto.getWorkflowId());
     	baseEtrInvestInfoService.deleteDelegateFlow(param);
     }
+
+    /**
+     * 删除流程中数据和流水
+     * @param dto
+     */
+    public void doDeleteWfl(EtrSecLendDto dto) {
+        //删除流水
+//        baseEtrCashPositionCommService.entrustCloseExecute(dto.getEntrustId());
+        //删除流程中数据
+        Map<String, Object> param = new HashMap<>();
+        param.put("workflowId", dto.getWorkflowId());
+        etrSecLendMapper.deleteWflwflEtrTarget(dto.getWorkflowId());
+        baseEtrInvestInfoService.deleteDelegateFlow(param);
+    }
+
+
     /**
      * 组合可用持仓查询 <功能详细描述>
      * 
@@ -647,21 +697,14 @@ public class EtrSecLendService extends BaseService {
         dto.setEntrust(true);
         Date sysdate = DateUtil.parse((String)param.get("sysDate"));
         dto.setCdate(sysdate);
-        List<String> acctTypeList = new ArrayList<>();
-        acctTypeList.add(DictCodeListExt1.资金账户类型_产品托管户.getValue());
-        dto.setAcctType(acctTypeList);
         dto.setFinprodId((String)param.get("finprodId"));
         dto.setCcy((String)param.get("ccy"));
-        dto.setHodingType(DictCodeList.持仓类型_可用.getValue());
+        dto.setHodingType(DictCodeListExt3.资产类型_债券借贷本方券可用持仓.getValue());
         dto.setPortfolioId((String)param.get("portfolioId"));
-        
-        
+        dto.setSecAcctId((String)param.get("secAcctId"));
         Map<String, Object> result = new HashMap<>();
-        if (basePtlSecPositionInfoService != null) {
-            acctTypeList.add(DictCodeListExt1.资金账户类型_券商资金账户.getValue());
-            BigDecimal position = basePtlSecPositionInfoService.queryUsableSecPosition(dto);
-            result.put("position", ArithmeticUtil.multiply(position, new BigDecimal(100)));
-        }
+        BigDecimal position = etrSecLendMapper.queryUsableSecPosition(dto);
+        result.put("position", position);
         return result;
     }
 
@@ -671,11 +714,11 @@ public class EtrSecLendService extends BaseService {
      */
     public void doBackFlow(EtrSecLendDto dto) {
         //删除流水
-        baseEtrCashPositionCommService.entrustCloseExecute(dto.getEntrustId());
+        WFlowCommonService.doBackFlow(dto.getWorkflowId(), dto.getEntrustId());
         //删除流程中数据
-//        Map<String, Object> param = new HashMap<>();
-//        param.put("workflowId", dto.getWorkflowId());
-//        etrSecLendMapper.deleteWflwflEtrTarget(dto.getWorkflowId());
+        Map<String, Object> param = new HashMap<>();
+        param.put("workflowId", dto.getWorkflowId());
+        etrSecLendMapper.deleteWflwflEtrTarget(dto.getWorkflowId());
     }
     
 }

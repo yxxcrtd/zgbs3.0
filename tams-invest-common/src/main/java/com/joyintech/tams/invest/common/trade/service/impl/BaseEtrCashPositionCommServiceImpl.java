@@ -429,6 +429,17 @@ public class BaseEtrCashPositionCommServiceImpl extends BaseService implements B
     }
 
     @Override
+    public CommonResult entrustCloseSectionExecute(EntrustCommonDto entrustCommonDto) {
+        if (entrustCommonDto != null
+                && entrustCommonDto.getEtrEntrust() != null) {
+            EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(entrustCommonDto.getEtrEntrust().getEntrustId());
+            entrustCommonDto.setEtrEntrustAdd(etrEntrustAdd);
+            this.entrustCloseSectionSinglePortfolio(entrustCommonDto);
+        }
+        return new CommonResult(CommonResult.SUCCED, "处理完成");
+    }
+
+    @Override
     public CommonResult executeBidResultsMaintenanceExecute(BidOrderBidPrice bidPriceDto) {
         // 处理结果
         EtrPositionHoldDto etrPositionHoldDto = new EtrPositionHoldDto();
@@ -704,8 +715,11 @@ public class BaseEtrCashPositionCommServiceImpl extends BaseService implements B
                 etrEntrustAddMapper.updateByPrimaryKeySelective(etrEntrustAdd);
             }
             if(etrEntrustAdd != null && !StringUtil.equals(etrEntrustAdd.getAssetType1(), DictCodeList.回购类型_质押式协议回购.getValue())){
-                etrPositionHoldDto.getPtlCashPositionFlows().forEach(etrCashPositionFlowDto -> etrCashPositionFlowDto.setCdate(platformDateImpl.getSysDate()));
-                etrPositionHoldDto.getPtlSecPositionFlows().forEach(etrSecPositionFlowDto -> etrSecPositionFlowDto.setCdate(platformDateImpl.getSysDate()));
+                if (!(StringUtil.equals(etrEntrust.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券借贷融入.getValue())
+                        || StringUtil.equals(etrEntrust.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券借贷融出.getValue()))){
+                    etrPositionHoldDto.getPtlCashPositionFlows().forEach(etrCashPositionFlowDto -> etrCashPositionFlowDto.setCdate(platformDateImpl.getSysDate()));
+                    etrPositionHoldDto.getPtlSecPositionFlows().forEach(etrSecPositionFlowDto -> etrSecPositionFlowDto.setCdate(platformDateImpl.getSysDate()));
+                }
                 EtrCommonCashPositionDealService.持久化流水Dto(etrPositionHoldDto);
             }
         }
@@ -713,6 +727,53 @@ public class BaseEtrCashPositionCommServiceImpl extends BaseService implements B
     @Override
     public BigDecimal queryEtrAvailableCashNew(PtlCashPositionFlowDto ptlCashPositionFlowDto) {
         return etrCommonCashPositionDealService.queryEtrAvailableCashNew(ptlCashPositionFlowDto);
+    }
+
+    //单组合关闭指令头寸处理
+    public void entrustCloseSectionSinglePortfolio(EntrustCommonDto entrustCommonDto) {
+        if (entrustCommonDto != null
+                && entrustCommonDto.getEtrEntrust() != null) {
+            // 处理结果
+            EtrPositionHoldDto etrPositionHoldDto = new EtrPositionHoldDto();
+            etrPositionHoldDto.setDealEtr(entrustCommonDto.isCloseEtr());
+            EtrEntrust etrEntrust = entrustCommonDto.getEtrEntrust();
+            // 持仓流水
+            List<EtrSecPositionFlowDto> etrSecPositionFlows = new ArrayList<>();
+            // 现金流水
+            List<EtrCashPositionFlowDto> etrCashPositionFlows = new ArrayList<>();
+            etrPositionHoldDto.setPtlCashPositionFlows(etrCashPositionFlows);
+            etrPositionHoldDto.setPtlSecPositionFlows(etrSecPositionFlows);
+
+            if (DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(etrEntrust.getFinprodType2())) {
+                // 债券
+                EtrSecCashPositionDealService.deal债券EntrustClose(entrustCommonDto, etrPositionHoldDto);
+
+            } else if (StringUtil.equals(etrEntrust.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+                    || StringUtil.equals(etrEntrust.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())) {
+                // 回购
+                EtrRepoCashPositionDealService.dealRepoEntrustClose(entrustCommonDto, etrPositionHoldDto);
+            }
+            // 数据是否已入新头寸
+            if (StringUtil.isNotEmpty(entrustCommonDto.getIsExistNew())) {
+                etrPositionHoldDto.getPtlCashPositionFlows().forEach(item -> item.setIsExistNew(entrustCommonDto.getIsExistNew()));
+                etrPositionHoldDto.getPtlSecPositionFlows().forEach(item -> item.setIsExistNew(entrustCommonDto.getIsExistNew()));
+            }
+            // 非新系统生成的旧头寸数据不入库
+            List<String> finprodType2List = StringUtil.splitToList(",", CacheUtil.getSysParam(BussinessConstant.finprodType2List));
+            if (finprodType2List.contains(etrEntrust.getFinprodType2())
+                    && StringUtil.isEmpty(entrustCommonDto.getIsExistNew())
+                    && StringUtil.equals(etrEntrust.getTradeMarket(), DictCodeListExt1.交易场所_银行间.getValue())) {
+                return;
+            }
+            EtrEntrustAdd etrEntrustAdd = entrustCommonDto.getEtrEntrustAdd();
+            if (etrEntrustAdd != null) {
+                // 委托指令附属表查询
+                etrEntrustAddMapper.updateByPrimaryKeySelective(etrEntrustAdd);
+            }
+            etrPositionHoldDto.getPtlCashPositionFlows().forEach(etrCashPositionFlowDto -> etrCashPositionFlowDto.setCdate(platformDateImpl.getSysDate()));
+            etrPositionHoldDto.getPtlSecPositionFlows().forEach(etrSecPositionFlowDto -> etrSecPositionFlowDto.setCdate(platformDateImpl.getSysDate()));
+            EtrCommonCashPositionDealService.持久化流水Dto(etrPositionHoldDto);
+        }
     }
 
 }

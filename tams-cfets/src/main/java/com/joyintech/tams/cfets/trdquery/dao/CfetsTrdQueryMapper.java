@@ -340,6 +340,8 @@ public interface CfetsTrdQueryMapper {
 
     List<String> findEtrEntrustIsForcedFinish(Map<String, Object> pageParam);
 
+    List<String> findEtrEntrustIsSettleFail(Map<String, Object> pageParam);
+
     CfetsTrdBidInfoResponse findFxmrManualSettleInfo(Map<String, Object> pageParam);
 
     List<BidPortIntFenPeiInfoDto> findFxmrPortIntFenPeiInfoList(Map<String, Object> pageParam);

@@ -260,6 +260,7 @@ public class StlDataGatherService {
         // GNS-949:增加是否工作流数据标识 modify by fuyongsheng 20220227 start
         param.put("isNotWorkflow", "true");
         // GNS-949:增加是否工作流数据标识 modify by fuyongsheng 20220227 end
+        param.put("dayEndBatch", "true");
         // 调用债券交易计算逻辑
         if (isSingle) {
             simpleRestTemplate.postForObject(tamsSerever + "/invest/trade/api/execute", param, Map.class);

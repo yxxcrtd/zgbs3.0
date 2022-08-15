@@ -30,11 +30,11 @@
             <groupId>com.joyintech</groupId>
             <version>3.0.0</version>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <artifactId>tams-exchange-trade-server-dsp</artifactId>-->
-        <!--            <groupId>com.joyintech</groupId>-->
-        <!--            <version>3.0.0</version>-->
-        <!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <artifactId>tams-exchange-trade-server-dsp</artifactId>-->
+<!--            <groupId>com.joyintech</groupId>-->
+<!--            <version>3.0.0</version>-->
+<!--        </dependency>-->
 <!--        <dependency>-->
 <!--            <artifactId>tams-exchange-trade-quote</artifactId>-->
 <!--            <groupId>com.joyintech</groupId>-->
@@ -60,7 +60,7 @@
         <dependency>
             <groupId>com.joyintech</groupId>
             <artifactId>framework-rabbitmq</artifactId>
-            <version>0.0.5.4</version>
+            <version>0.0.5.8</version>
         </dependency>
         <dependency>
             <groupId>com.joyintech</groupId>
@@ -69,16 +69,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>io.lettuce</groupId>
-                    <artifactId>lettuce-core</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
         </dependency>
     </dependencies>
 

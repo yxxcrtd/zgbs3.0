@@ -1316,8 +1316,9 @@ public class CfetsEtrBondFirstBid002Service extends CommonExportService<CfetsEtr
                     }
                 }
 
-                if (StringUtil.equals(cfetsDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())
-                        || StringUtil.equals(cfetsDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue())) {
+                if (    !StringUtil.equals(cfetsDto.getIssueClass(),DictCodeListExt4.新债_发行方式_报价发行.getValue()) &&
+                        (StringUtil.equals(cfetsDto.getTradeMarket(), DictCodeListExt1.交易场所_上海证券交易所.getValue())
+                        || StringUtil.equals(cfetsDto.getTradeMarket(), DictCodeListExt1.交易场所_深圳证券交易所.getValue()))) {
                     //资金账户不能为空
                     if (StringUtil.isEmpty(bidDto.getAcctNo())) {
                         messages.add(new ValidMessage("组合[" + bidDto.getPortfolioId() + "],资金账户不能为空！"));

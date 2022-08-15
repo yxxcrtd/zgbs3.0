@@ -16,6 +16,7 @@ import com.joyintech.tams.invest.trade.exchangetransmatch.common.dto.ExchangeTra
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,7 +114,7 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         // 清算速度
         dealTotal.setSettleSpeed(StringUtil.isNotEmpty(dealDto.getSettleSpeed())?dealDto.getSettleSpeed():0L);
         // 交易币种
-        dealTotal.setCcy(null);
+        dealTotal.setCcy(entrustDto.getCcy());
 
         // 单位净价
         dealTotal.setUnitCprice(null);
@@ -126,7 +127,7 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         // 净价总额
         dealTotal.setCpriceAmt(null);
         // 交易份额
-        dealTotal.setShareAmt(entrustDto.getMarchQty());
+        dealTotal.setShareAmt(entrustDto.getMarchQty() == null ? BigDecimal.ZERO : entrustDto.getMarchQty());
         // 交易本金
         dealTotal.setPrinAmt(null);
         // 利息总额
@@ -136,7 +137,7 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         // 随交易支付费用
         dealTotal.setFeeAmtPay(null);
         // 交易金额
-        dealTotal.setTradeAmt(entrustDto.getMarchAmt());
+        dealTotal.setTradeAmt(entrustDto.getMarchAmt() == null ? BigDecimal.ZERO : entrustDto.getMarchAmt());
         // 未随交易支付费用
         dealTotal.setFeeAmtUnpay(null);
         // 总交易费用
@@ -210,8 +211,12 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
         // 处理换钱场景
         if(DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换钱.getValue().equals(dealDto.getBusiSceneCalss())){
             dealTotal.setShareAmt(null);
-            dealTotal.setPrinAmt(dealDto.getPrinAmt());
-            dealTotal.setTradeAmt(dealDto.getPrinAmt());
+            // XYHGFXSJ-957:交易金额登录有误 modify by fuyongsheng 20220808 start
+//            dealTotal.setPrinAmt(dealDto.getPrinAmt());
+//            dealTotal.setTradeAmt(dealDto.getPrinAmt());
+            dealTotal.setPrinAmt(entrustDto.getMarchAmt());
+            dealTotal.setTradeAmt(entrustDto.getMarchAmt());
+            // XYHGFXSJ-957:交易金额登录有误 modify by fuyongsheng 20220808 end
         }
         return dealTotal;
     }
@@ -226,7 +231,8 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
             // 交易方向
             trdProductDeal.setPs(entrustDto.getPs());
             // 交易金额
-            trdProductDeal.setTradeAmt(dealDto.getPrinAmt());
+            // trdProductDeal.setTradeAmt(dealDto.getPrinAmt());
+            trdProductDeal.setTradeAmt(entrustDto.getMarchAmt());
             trdProductDealList.add(trdProductDeal);
             return trdProductDealList;
         }
@@ -285,6 +291,8 @@ public class ExchangeTransMatchRepo3Service extends ExchangeTransMatchRepoCommon
             bussinessCodeParameter.setCommonBusinessType(DictCodeList.共通业务类型_逆回购录入);
         }
         trdProductDeal.setTradeId(baseGetBusinessId.buildBussinessCode(bussinessCodeParameter));
+        // 赋值默认值
+        trdProductDeal.setTradeAmt(BigDecimal.ZERO);
         trdProductDeal.setBusiType(DictCodeList.业务类型_债券质押式回购交易.getValue());
         // 金融产品类型
         trdProductDeal.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());

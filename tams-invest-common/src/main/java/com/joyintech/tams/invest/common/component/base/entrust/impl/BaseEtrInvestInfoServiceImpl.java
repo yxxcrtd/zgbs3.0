@@ -992,7 +992,7 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
             if (etrFinishAmtDto != null && etrEntrust != null) {
                 BigDecimal 委托额度 = BigDecimal.ZERO;
                 // 根据指令的目标类型判断
-                if (StringUtil.equals(etrEntrust.getPs(), DictCodeListExt3.交易方向_解除质押.getValue()) || StringUtil.equals(etrEntrust.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())) {
+                if (StringUtil.equals(etrEntrust.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())) {
                     // 解除质押/中途换券 委托额度取值修改成质押数量 add by yufei 2020-10-16
                     EtrPledgeKey key = new EtrPledgeKey();
                     key.setEntrustId(entrustId);

@@ -189,4 +189,6 @@ public interface CfetsTrdFirstBidFirm002Mapper {
      * @date 2022/6/21 11:29
      */
     BigDecimal selectSumTotalBidNumByFinprodId(Map<String, Object> param);
+
+    String selectAcctNoByEntrustDetail(@Param("entrustId") String entrustId,@Param("portfolioId") String portfolioId);
 }

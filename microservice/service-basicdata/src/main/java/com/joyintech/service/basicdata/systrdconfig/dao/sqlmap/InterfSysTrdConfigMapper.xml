@@ -539,6 +539,9 @@
         where TEMP.rn = 1
     </select>
 
+    <select id="getOrderNoList" resultType="java.lang.String">
+        select distinct SELLER_NO from T_INTEGRATED_ENTRUST where SELLER_NO is not null
+    </select>
 
     <select id="getDealerTraderInfo"
             resultType="com.joyintech.service.basicdata.systrdconfig.dto.TradeInfoProResponse">

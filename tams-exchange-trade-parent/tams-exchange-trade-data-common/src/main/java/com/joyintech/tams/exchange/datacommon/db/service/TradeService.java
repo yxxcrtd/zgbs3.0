@@ -21,7 +21,7 @@ public interface TradeService extends AsyncService<String, Trade> {
 
     List<Trade> queryTradeByAccountId(String accountId);
 
-    Trade queryTradeByAccountIdAndBrokerTradeId(String accountId, String brokerTradeId);
+    Trade queryTradeByAccountIdAndBrokerTradeId(String accountId, String key);
 
     String genDBId();
 

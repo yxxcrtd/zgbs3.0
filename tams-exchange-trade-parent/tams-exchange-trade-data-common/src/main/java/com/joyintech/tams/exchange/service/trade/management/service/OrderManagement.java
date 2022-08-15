@@ -181,18 +181,18 @@ public class OrderManagement extends BaseService {
 
         String instructionId = integratedEntrust.getInstructionId();
         // SPPI检查
-        OrderPlaceBean orderPlaceBean = new OrderPlaceBean();
-        orderPlaceBean.setInstructionId(instructionId);
-        orderPlaceBean.setEntrustPrice(integratedEntrust.getEntrustPrice());
-        ResultBean sppiResult = checkSPPI(orderPlaceBean);
-        if (sppiResult.isFail()) {
-            return sppiResult;
-        } else {
-            BidPriceConInfoResponse response = (BidPriceConInfoResponse) sppiResult.getData();
-            if (ObjectUtil.isNotNull(response) && response.getStatus() != 0) {
-                return ResultBean.error(ErrorCode.CHECK_ERROR.value, "SPPI 校验失败：" + response.getMessage(), orderPlaceBean);
-            }
-        }
+//        OrderPlaceBean orderPlaceBean = new OrderPlaceBean();
+//        orderPlaceBean.setInstructionId(instructionId);
+//        orderPlaceBean.setEntrustPrice(integratedEntrust.getEntrustPrice());
+//        ResultBean sppiResult = checkSPPI(orderPlaceBean);
+//        if (sppiResult.isFail()) {
+//            return sppiResult;
+//        } else {
+//            BidPriceConInfoResponse response = (BidPriceConInfoResponse) sppiResult.getData();
+//            if (ObjectUtil.isNotNull(response) && response.getStatus() != 0) {
+//                return ResultBean.error(ErrorCode.CHECK_ERROR.value, "SPPI 校验失败：" + response.getMessage(), orderPlaceBean);
+//            }
+//        }
 
         //头寸引擎余额检查---start
         try {

@@ -237,4 +237,15 @@ public class ExchangeTransMatchCommonEntrustDto extends EtrEntrust {
     public void setSecAcctId(String secAcctId) {
         this.secAcctId = secAcctId;
     }
+
+    /*交易员*/
+    private String tradeId;
+
+    public String getTradeId() {
+        return tradeId;
+    }
+
+    public void setTradeId(String tradeId) {
+        this.tradeId = tradeId;
+    }
 }

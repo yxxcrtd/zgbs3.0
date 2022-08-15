@@ -71,7 +71,7 @@
 		  A.Mdate MDATE,/**委托结束日*/
 		  CASE
 		  	WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_AMT
-			WHEN F.ASSET_TYPE = 'F07' and A.PS in ('T93') and A.TRADE_MARKET = '04' then A.ENTRUST_AMT <!--深圳解除质押-->
+			WHEN F.ASSET_TYPE = 'F07' and A.PS in ('T93') and A.TRADE_MARKET = '04' and A.ENTRUST_TYPE = '32' then A.ENTRUST_AMT <!--深圳解除质押-->
 		  ELSE DECODE(F.TARGET_TYPE, '02', A.ENTRUST_AMT, 0)
 		  END entrustAmt, /**委托额度*/
           CASE
@@ -79,7 +79,7 @@
           ELSE
           	DECODE(F.TARGET_TYPE, '01',
           		case
-		  		when A.PS in ('T93') AND A.TRADE_MARKET = '04' THEN null
+		  		when A.PS in ('T93') AND A.TRADE_MARKET = '04' AND A.ENTRUST_TYPE = '32' THEN null
           		ELSE A.ENTRUST_NUM END, 0)
           END entrustNum, /**委托数量*/
 		  A.ENTRUST_STATUS entrustStatus,/**委托状态*/
@@ -91,7 +91,7 @@
 		  F.SETTLE_SPREED settleSpeed,/**清算速度*/
 		  F.VDATE valueDate,/**起息日*/
 		  F.VDATE2 valueDate2,/**起息日2*/
-		  F.MDATE maturityDate,/**到期日*/
+		  F.mpay_date maturityDate,/**到期日*/
 		  F.MDATE2 maturityDate2,/**到期日2*/
           NVL( F.TERM_DAYS ,FTP.TERM) termDays,/**期限天数*/
 		  F.TERM_DAYS2  termDays2,/**期限天数2*/

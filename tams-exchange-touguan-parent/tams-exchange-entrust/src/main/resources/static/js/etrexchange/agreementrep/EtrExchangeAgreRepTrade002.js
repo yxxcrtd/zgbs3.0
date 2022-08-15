@@ -15,7 +15,6 @@
      */
     function getSearchParams() {
         var object = $.serializeToObject('#sumbitForm_hg');
-
         var acctNo = $("#acctNo").val();
         object.acctNo = acctNo;
 
@@ -29,6 +28,17 @@
         }
         object.mdate = object.vdate;
         object.entrustDate = object.vdate;
+
+        let arr = object.origRepSecId ;
+        if(arr && arr.length >=0){
+            object.origRepSecId = arr[0];
+        }
+        // XYHGFXSJ-1068:修改质押券字段赋值 modify by fuyongsheng 20220812 start
+        let arrRepSecId = object.repSecId ;
+        if(arrRepSecId && arrRepSecId.length >=0){
+            object.repSecId = arrRepSecId.join();
+        }
+        // XYHGFXSJ-1068:修改质押券字段赋值 modify by fuyongsheng 20220812 end
 
         return object;
     };
@@ -355,15 +365,15 @@
         }
         var attr = $("#tradeMarket").attr("disabled");
         if (tradeMarket && !attr && tradeMarket == '03') {
-            $("#psList").val('03');
+            $("#psList").val('03,T92');
             $("#ps").val('').trigger('change');
             $("#repSecId").val('').trigger('change');
         } else if (tradeMarket && !attr && tradeMarket == '04') {
-            $("#psList").val('03,04');
+            $("#psList").val('03,04,T92');
             $("#ps").val('').trigger('change');
             $("#repSecId").val('').trigger('change');
         } else if (!tradeMarket && !attr) {
-            $("#psList").val('03,04');
+            $("#psList").val('03,04,T92');
             $("#ps").val('').trigger('change');
             $("#repSecId").val('').trigger('change');
         }
@@ -374,7 +384,7 @@
         linkAcctNo(false);
         pageShowEdit(false);
         $("#acctTradeMarket").val(tradeMarket);
-        linkPledgeUnit();
+        // linkPledgeUnit();
         removeMustOfRepSecId();
     };
     var settleDateChange = function () {
@@ -447,7 +457,12 @@
         var occupyDays = $("#occupyDays").val();
         var tradeAmt = $("#tradeAmt").val();
         var y = $("#yield").val();
-        $("#yield").val(Number(y).toFixed(2)).trigger('change');
+        var fixedNum = 2;
+        var tradeMarket = $("#tradeMarket").val();
+        if (tradeMarket === TRADE_MARKET_03){
+            fixedNum = 3;
+        }
+        $("#yield").val(Number(y).toFixed(fixedNum));
         if (occupyDays && tradeAmt && y) {
             var intamt = Math.round(tradeAmt * y / 100 * occupyDays / 365 * 100) / 100;
             var expireSettleAmt = parseFloat(intamt) + parseFloat(tradeAmt);
@@ -529,11 +544,11 @@
                 Joyin.ajaxSync(basePath + 'invest/entrust/etragrereptrade/EtrAgreRepTrade001/getFaceValue', param, function (obj) {
                     if (obj && obj != '') {
                         if (obj == 0) {
-                            $("#repSecNum").val(0).toFixed(2);
+                            $("#repSecNum").val(0);
                             $("#printAmt").val(0);
                         } else {
-                            $("#repSecNum").val(Math.round(tradeAmt * 100 / conRatio / obj).toFixed(2));
-                            $("#printAmt").val(Math.round(tradeAmt * 100 / conRatio));
+                            $("#repSecNum").val(Math.round(tradeAmt * 100 / conRatio / obj/100).toFixed(2));
+                            $("#printAmt").val(Math.round(tradeAmt * 100 / conRatio/100));
                         }
                         $("#pledgeFaceValue").val(obj).trigger('change');
                     }
@@ -663,7 +678,7 @@
                 if (init) {
                     $("#fristSettleDate").attr("disabled", true);
                 } else {
-                    $("#fristSettleDate").val(iPlatformDate).attr("disabled", true).trigger('change');
+                    $("#fristSettleDate").val(iPlatformDate).attr("disabled", true);
                 }
                 //到期结算日
                 $("#expireSettleDate").attr("disabled", true);
@@ -676,7 +691,7 @@
                 //质押券
                 $("#repSecId").attr("disabled", false);
                 //折算比例
-                $("#conRatio").attr("disabled", false);
+                $("#conRatio").attr("disabled", true);
                 //质押数量
                 $("#repSecNum").attr("disabled", false);
                 //券面金额
@@ -718,7 +733,7 @@
                 //补充协议
                 $("#addCla_div").show();
                 $("#addCla").attr("disabled", false);
-
+                $("#fristSettleDate").trigger('change');
             } else if (ps == 'T92' && repPs == BACK_LEND_DIRECTION_04) {
                 //本方交易员
                 $("#trader_div").hide();
@@ -751,7 +766,7 @@
                 //质押券
                 $("#repSecId").attr("disabled", false);
                 //折算比例
-                $("#conRatio").attr("disabled", false);
+                $("#conRatio").attr("disabled", true);
                 //质押数量
                 $("#repSecNum").attr("disabled", false);
                 //券面金额
@@ -895,7 +910,7 @@
                     //回购金额
                     $("#tradeAmt").attr("disabled", true);
                     //回购利率
-                    $("#yield").attr("disabled", true);
+                    $("#yield").attr("disabled", false);
                     //首期结算日
                     $("#fristSettleDate").attr("disabled", true);
                     //到期结算日
@@ -958,6 +973,7 @@
                     $("#addCla").attr("disabled", false);
                 }
             } else if (ps == 'T95') {
+                $("#printAmt_div").hide();
                 if (repPs == BACK_LEND_DIRECTION_03) {
                     //本方交易员
                     $("#trader_div").hide();
@@ -1109,6 +1125,7 @@
                     $("#addCla").attr("disabled", false);
                 }
             } else if (ps == 'T56') {
+                $("#printAmt_div").hide();
                 if (repPs == BACK_LEND_DIRECTION_03) {
                     //本方交易员
                     $("#trader_div").hide();
@@ -1221,7 +1238,8 @@
                     //交易对手
                     if ($("#redoType").val() == '1') {
                         $("#counterId").attr("disabled", false);
-                    } else {
+                    }
+                    else {
                         $("#counterId").attr("disabled", true);
                     }
 
@@ -1262,11 +1280,7 @@
                     $("#addCla").attr("disabled", false);
                 }
             } else if (ps == 'T94') {
-                let outAmtValue = $("#outAmt").val()
-                if (outAmtValue != null && outAmtValue != "" && outAmtValue != undefined) {
-                    $("#outRepSecNum").val("")
-                    $("#newRepSecNum").val("")
-                }
+                $("#outAmt").attr("disabled", true)
                 if (repPs == BACK_LEND_DIRECTION_03) {
                     //本方交易员
                     $("#trader_div").hide();
@@ -1436,6 +1450,26 @@
                     //补充协议
                     $("#addCla_div").show();
                     $("#addCla").attr("disabled", false);
+
+                    // /XYHGFXSJ-914  【待办】深交所逆回购-中途换券，从行情接收后保存，期望不可编辑，与协议回购指令页面一致
+                    let reqOnId = $("#reqOnId").val();
+                    if (reqOnId && reqOnId != ''){
+                        //组合名称
+                        $("#portfolioId").attr("disabled", true);
+                        //换出债券
+                        $("#outRepSecId").attr("disabled", true);
+                        //换出债券数量
+                        $("#outRepSecNum").attr("disabled", true);
+                    }
+                }
+                let outAmtValue = $("#outAmt").val();
+                console.log("outAmtValue " + outAmtValue);
+                if (outAmtValue != null && outAmtValue != "" && outAmtValue != undefined) {
+                    $("#outRepSecNum").val("");
+                    $("#newRepSecNum").val("");
+                    $("#newRepSecId").val("");
+                    $("#newRepSecId").attr("disabled", true);
+                    $("#newRepSecNum").attr("disabled", true);
                 }
             } else if (ps == 'T93') {
                 if (repPs == BACK_LEND_DIRECTION_03) {
@@ -1820,7 +1854,11 @@
                 } else {
                     riskParams.finprodType2 = 'F03';
                 }
-                riskParams.finprodId = $("#repSecId").val();
+                let arr = $("#repSecId").val() ;
+                if(arr && arr.length >=0){
+                    riskParams.finprodId = 'F01_' + arr[0];
+                }
+                // riskParams.finprodId = $("#repSecId").val();
                 riskParams.repoAmt = $("#tradeAmt").val();
                 riskParams.expireSettleAmt = $("#entrustAmt").val();
                 riskParams.entrustDate = $("#vdate").val();
@@ -1828,13 +1866,17 @@
                 riskParams.mdate = $("#vdate").val();
 
                 Joyin.ajaxJson(basePath + '/etrexchange/agreementrep/etrExchangeAgreRepTradeRiskCal/doRiskcal', riskParams, function (data) {
-                    $("#riskTrialSpan").html("&nbsp;&nbsp;" + data.data.data.riskTrialSpan);
+                    let riskTrialSpan = data.data.data.riskTrialSpan;
+                    if (!riskTrialSpan){
+                        riskTrialSpan = '试算通过';
+                    }
+                    $("#riskTrialSpan").html("&nbsp;&nbsp;" + riskTrialSpan);
                     entity_RiskTrialRetList = data.data.data.riskcalReturnList;
                     if (!entity_RiskTrialRetList) {
                         entity_RiskTrialRetList = []
                     }
                     $.each(entity_RiskTrialRetList, function (index, item) {
-                        item.conclusion = data.data.data.riskTrialSpan;
+                        item.conclusion = riskTrialSpan;
                     })
                     tableRisk.clear();
                     tableRisk.addRow(entity_RiskTrialRetList);
@@ -1868,7 +1910,7 @@
     }
 
     function finalSaveOrSubmit(object) {
-        Joyin.ajaxJson(basePath + '/etrexchange/agreementrep/EtrExchangeAgreRepTrade001/checkSaveError', object,
+        Joyin.ajaxJson(basePath + 'etrexchange/agreementrep/EtrExchangeAgreRepTrade001/checkSaveError', object,
             function (result) {
                 Joyin.confirm(result.data, function () {
                     if (object.operateType === 'save') {
@@ -1890,6 +1932,7 @@
     function saveOrSubmit(operateType) {
         var s;
         var object = getSearchParams();
+
         object.operateType = operateType;
         //object.pageModel = pageModel;
 
@@ -2195,6 +2238,41 @@
                 $("#outAmt").attr('disabled', true);
                 $("#reqOnId").attr('disabled', true);
             }
+            //中途换券 换钱
+            if(entity.entrustBussType === '31'){
+                $("#outAmt").attr('disabled', false);
+            }
+            if(entity.reqOnId && entity.reqOnId != ""){
+                $("#newRepSecId").removeAttr("required")
+                $("#newRepSecNum").removeAttr("required")
+                $("#newConRatio").removeAttr("required")
+                $("#newRepSecIds").find('> .must').remove();
+                $("#newRepSecNums").find('> .must').remove();
+                $("#newConRatios").find('> .must').remove();
+                $("#outAmt").attr("disabled", true)
+                $("#origConRatio").val(Math.round(entity.tradeAmt / entity.origRepSecNum /100)).trigger('change');
+            }
+            //中途换券 换券
+            if(entity.entrustBussType === '21' && !entity.reqOnId){
+                $("#outRepSecId").attr('disabled', false);
+                $("#outRepSecNum").attr('disabled', false);
+            }
+            //XYHGFXSJ-1096 【待办事项】到期续作-变更对手方--行情接收后保存，除组合名称、对手方外，期望不可编辑
+            if (entity.reqOnId && entity.ps == 'T92'){
+                //回购期限
+                $("#term").attr("disabled", true);
+                //回购金额
+                $("#tradeAmt").attr("disabled", true);
+                //回购利率
+                $("#yield").attr("disabled", true);
+                //质押数量
+                $("#repSecNum").attr("disabled", true);
+                //资金账户
+                $("#acctNo").attr("disabled", true);
+                //质押券
+                $("#repSecId").attr("disabled", true);
+            }
+            //XYHGFXSJ-1096 【待办事项】到期续作-变更对手方--行情接收后保存，除组合名称、对手方外，期望不可编辑
         }
         if (entityStr) {
             var etrData = JSON.parse(entityStr);

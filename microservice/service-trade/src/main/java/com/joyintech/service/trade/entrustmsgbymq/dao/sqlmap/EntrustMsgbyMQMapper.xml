@@ -175,6 +175,14 @@
 		and BRANCH = #{branch,jdbcType=DECIMAL}
 	</select>
 
+	<select id="selectFinDealPledges" resultMap="FinDealPledgeBaseResultMap" parameterType="com.joyintech.tams.common.base.entity.FinDealPledgeKey" >
+		select
+		<include refid="com.joyintech.tams.common.base.dao.FinDealPledgeMapper.Base_Column_List" />
+		from FIN_DEAL_PLEDGE
+		where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+		and BRANCH = #{branch,jdbcType=DECIMAL}
+	</select>
+
 	<select id="selectFinProductOthCode" resultType="com.joyintech.tams.common.base.entity.FinProductOthCode">
 		SELECT
 			FINPROD_ID as finprodId,
@@ -220,5 +228,12 @@
 	<!--		from TRD_PRODUCT_DEAL-->
 	<!--		where F_TRADE_ID = #{fTradeId,jdbcType=VARCHAR}-->
 	<!--	</select>-->
+
+	<select id="queryTradeIdForTInstruction" resultType="java.lang.String">
+		select
+			ti.TRADE_ID as tradeId   /*交易员*/
+		from T_INSTRUCTION ti
+		where ti.ENTRUST_ID = #{entrustId}
+	</select>
 
 </mapper>

@@ -66,6 +66,7 @@
             t5.FINPROD_ID,
             t5.FINPROD_MARKET_ID,
             NVL(T5.FINPROD_ABBR, T5.FINPROD_NAME) finprodName,
+            T1.TRADE_MARKET tradeMarket,
             TO_CHAR(t1.TRADE_DATE, 'yyyy-MM-dd') TRADE_DATE,
             TO_CHAR(t1.SETTLE_DATE, 'yyyy-MM-dd') SETTLE_DATE,
             T1.TRADE_AMT,
@@ -83,6 +84,8 @@
         LEFT JOIN STL_PAY_ORDERS T6 ON T1.TRADE_ID = T6.TRADE_ID
         LEFT JOIN PTL_CAPACCT_INFO T7 ON T6.COUNTER_ACCT_NO = T7.ACCT_NO AND T1.CCY = T7.CCY AND T2.PORTFOLIO_ID = T7.PORTFOLIO_ID
         LEFT JOIN STL_DVP_TRADE_MATCH T9 ON T1.TRADE_ID = T9.TRADE_ID
+        left join BID_RESULT_TOTAL BRT on T1.B_TRADE_ID = BRT.TOTAL_WIN_ID
+        left join BID_ORDER bo on bo.BID_ID = BRT.BID_ID
         and exists(select 1 from STL_DVP_ORDERS where  T9.order_id=STL_DVP_ORDERS.order_id and (STL_DVP_ORDERS.ORDER_STATUS is null or STL_DVP_ORDERS.ORDER_STATUS!='02'))
 
         LEFT JOIN STL_SEC_ACCT_INFO SSAI ON SSAI.SEC_ACCT_ID = T1.SEC_MANAGE_ACCT_ID AND SSAI.TRD_ACCT_CCY = T1.CCY
@@ -105,6 +108,8 @@
         #{PINAN_BUSINESS_TYPE_52},
         #{PINAN_BUSINESS_TYPE_76},
         #{PINAN_BUSINESS_TYPE_77})
+            OR ( T3.PA_BUSS_TYPE IN ( #{PINAN_BUSINESS_TYPE_180}, #{PINAN_BUSINESS_TYPE_202}) and T1.TRADE_MARKET in (#{TRADE_PLACE_01},#{TRADE_PLACE_02}))
+        OR ( T3.PA_BUSS_TYPE IN ( #{PINAN_BUSINESS_TYPE_151}) and T1.TRADE_MARKET in (#{TRADE_PLACE_01},#{TRADE_PLACE_02}) and bo.PAY_TYPE = #{PAY_TYPE_01})
             OR (T3.PA_BUSS_TYPE IN (#{PINAN_BUSINESS_TYPE_11}) AND T1.PS = #{T03})
             OR (T1.FINPROD_TYPE2 IN (#{F29}, #{F30}))
         )
@@ -166,6 +171,7 @@
         t5.FINPROD_ID,
         t5.FINPROD_MARKET_ID,
         NVL(T5.FINPROD_ABBR, T5.FINPROD_NAME) finprodName,
+        T1.TRADE_MARKET tradeMarket,
         TO_CHAR(t1.TRADE_DATE, 'yyyy-MM-dd') TRADE_DATE,
         TO_CHAR(t1.SETTLE_DATE, 'yyyy-MM-dd') SETTLE_DATE,
         T1.TRADE_AMT,
@@ -264,6 +270,7 @@
             else
             SCI.ACCT_NAME
             end recAcctName,
+            '',
             '',
             '',
             '',

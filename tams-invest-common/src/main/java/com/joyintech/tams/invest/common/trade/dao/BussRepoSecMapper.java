@@ -118,6 +118,7 @@ public interface BussRepoSecMapper {
      */
     List<PledgeBondInfoDto> selectAvaPledgeBondDetailListSellRepoForBankDzh(Map<String, Object> params);
 
+    List<PledgeBondInfoDto> selectNewAvaPledgeBondDetailList(Map<String, Object> params);
 
     List<String> selectFinprodIdByPledge (@Param("pledgeStockId")String pledgeStockId);
 }

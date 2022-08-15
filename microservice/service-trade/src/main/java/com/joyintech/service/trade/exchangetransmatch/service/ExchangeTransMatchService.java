@@ -42,6 +42,9 @@ public class ExchangeTransMatchService extends BaseService {
         map.put("FINPROD_TYPE_TG_F10", DictCodeListExt1.金融产品类型_投管用_股票.getValue());
         map.put("TRADE_PLACE_03", DictCodeListExt1.交易场所_上海证券交易所.getValue());
         map.put("TARGET_BACK_TYPE_H01", DictCodeList.回购类型_质押式协议回购.getValue());
+        map.put("BUSI_SCENE_CALSS_0902RS0103", DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换钱.getValue());
+        map.put("PS_T93", DictCodeListExt3.交易方向_解除质押.getValue());
+        map.put("TRADE_MARKET_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue());
         map.put("PS_T07", DictCodeList.交易方向_到期.getValue());
 
         return super.queryForPage(page, length, () -> exchangeTransMatchMapper.findPage(map));
@@ -55,6 +58,10 @@ public class ExchangeTransMatchService extends BaseService {
         map.put("ENTRUST_CLASS_02",DictCodeListExt3.投资指令类型_多组合单资产指令.getValue());
         map.put("SEC_TYPE_09", DictCodeListExt1.证券品种_回购.getValue());
         map.put("FINPROD_TYPE_TG_F10", DictCodeListExt1.金融产品类型_投管用_股票.getValue());
+        map.put("TARGET_BACK_TYPE_H01", DictCodeList.回购类型_质押式协议回购.getValue());
+        map.put("TARGET_CLASS_01", DictCodeListExt3.目标类型_数量.getValue());
+        map.put("TARGET_CLASS_02", DictCodeListExt3.目标类型_金额.getValue());
+
         if(StringUtil.isNotEmpty(map.get("finprodType2"))) {
             if(StringUtil.equals((String)map.get("finprodType2"),DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
                 map.put("secType", DictCodeListExt1.证券品种_债券.getValue());
@@ -120,7 +127,10 @@ public class ExchangeTransMatchService extends BaseService {
         map.put("IS_CANCEL_N", DictCodeList.是否_否.getValue());
         map.put("DISPLACE_DIRECTION_01",  DictCodeListExt3.质押券置换_置换方向_换入.getValue());
         map.put("ENTRUST_TYPE_31",  上农商_指令业务类型_协议回购中途换券指令_换钱.getValue());
+        map.put("ENTRUST_TYPE_22",  DictCodeListExt3.上农商_指令业务类型_协议回购解除质押指令.getValue());
         map.put("ENTRUST_TYPE_21",  DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue());
+        map.put("TARGET_TYPE_01", DictCodeListExt3.目标类型_数量.getValue());
+        map.put("TARGET_TYPE_02", DictCodeListExt3.目标类型_金额.getValue());
         // GNS-956:特殊场景不加日期条件查询指令 modify by fuyongsheng 20220224 start
         String ps = String.valueOf(map.get("ps"));
         String finprodType = String.valueOf(map.get("finprodType1"));

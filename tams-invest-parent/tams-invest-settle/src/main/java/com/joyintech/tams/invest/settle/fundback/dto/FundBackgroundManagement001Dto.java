@@ -20,6 +20,27 @@ public class FundBackgroundManagement001Dto extends FundBackgroundManagementDto 
 	 * 发送状态 20200317 add
 	 */
 	private String sendStatusStr;
+
+    /**
+     * 债券资产交易场所
+     */
+    private String tradeMarket;
+
+    /**
+     * 交易对手
+     */
+    private String counterId;
+
+    /**
+     * 指令代码
+     */
+    private String entrustId;
+
+    /**
+     * 投标代码
+     */
+    private String bidId;
+
     public String getStatusValidString() {
         return SysDataUtil.getNameFromDataDict(DictCode.画面数据状态, getStatusValid());
     }
@@ -63,5 +84,44 @@ public class FundBackgroundManagement001Dto extends FundBackgroundManagementDto 
 		return StringUtil.isNotEmpty(super.getSendStatus()) 
 				? SysDataUtil.getNameFromDataDict(DictCode.发送状态 , super.getSendStatus()) : "" ;
 	}
-    
+
+    @Override
+    public String getTradeMarket() {
+        return tradeMarket;
+    }
+
+    @Override
+    public void setTradeMarket(String tradeMarket) {
+        this.tradeMarket = tradeMarket;
+    }
+
+    @Override
+    public String getCounterId() {
+        return counterId;
+    }
+
+    @Override
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    @Override
+    public String getEntrustId() {
+        return entrustId;
+    }
+
+    @Override
+    public void setEntrustId(String entrustId) {
+        this.entrustId = entrustId;
+    }
+
+    @Override
+    public String getBidId() {
+        return bidId;
+    }
+
+    @Override
+    public void setBidId(String bidId) {
+        this.bidId = bidId;
+    }
 }

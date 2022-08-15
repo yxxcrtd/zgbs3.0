@@ -344,6 +344,9 @@ public class TrdBondLendInvestTradeDto extends TrdProductDeal implements Process
     
     private RiskCreditListCommonDto riskCreditListCommonDto;
 
+
+    private String balanceCheck;//是否校验余额
+
     public String getExchangePledge() {
         return exchangePledge;
     }
@@ -1215,5 +1218,13 @@ public class TrdBondLendInvestTradeDto extends TrdProductDeal implements Process
 
     public void setRiskCreditListCommonDto(RiskCreditListCommonDto riskCreditListCommonDto) {
         this.riskCreditListCommonDto = riskCreditListCommonDto;
+    }
+
+    public String getBalanceCheck() {
+        return balanceCheck;
+    }
+
+    public void setBalanceCheck(String balanceCheck) {
+        this.balanceCheck = balanceCheck;
     }
 }

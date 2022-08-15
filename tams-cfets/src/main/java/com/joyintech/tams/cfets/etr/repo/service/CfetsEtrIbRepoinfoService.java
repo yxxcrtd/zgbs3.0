@@ -10,6 +10,7 @@
 
 package com.joyintech.tams.cfets.etr.repo.service;
 
+import com.joyintech.background.component.common.pack.common.util.ArithmeticUtil;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
@@ -619,17 +620,16 @@ public class CfetsEtrIbRepoinfoService extends BaseService{
             AjaxResult res=new AjaxResult();
             ValidMessage validMessage= new ValidMessage();
             validMessage.setMessage(getMessage("COMMON_E_0002"));
-            res.setErrorList(Arrays.asList(validMessage));
+            res.setErrorList(Collections.singletonList(validMessage));
             return res;
         }
         List<CfetsEtribRepoInfo003Dto> selectedItem = dto.getSelectedItem();
-        AjaxResult ajaxResult=new AjaxResult();
         if(StringUtil.isNotEmpty(selectedItem)){
             if(selectedItem.size()>1){
                 AjaxResult res=new AjaxResult();
                 ValidMessage  validMessage= new ValidMessage();
                 validMessage.setMessage("委托指令修改仅允许一条数据");
-                res.setErrorList(Arrays.asList(validMessage));
+                res.setErrorList(Collections.singletonList(validMessage));
                 return res;
             }
             for(CfetsEtribRepoInfo003Dto Item:selectedItem){
@@ -639,7 +639,7 @@ public class CfetsEtrIbRepoinfoService extends BaseService{
                     AjaxResult res=new AjaxResult();
                     ValidMessage  validMessage= new ValidMessage();
                     validMessage.setMessage("只有指令状态为已撤回、已退回的指令允许修改");
-                    res.setErrorList(Arrays.asList(validMessage));
+                    res.setErrorList(Collections.singletonList(validMessage));
                     return res;
                 }
 
@@ -653,9 +653,19 @@ public class CfetsEtrIbRepoinfoService extends BaseService{
                         AjaxResult res=new AjaxResult();
                         ValidMessage  validMessage= new ValidMessage();
                         validMessage.setMessage("存在流程中数据，无法修改。");
-                        res.setErrorList(Arrays.asList(validMessage));
+                        res.setErrorList(Collections.singletonList(validMessage));
                         return res;
                     }
+                }
+                Map<String, Object> pageParam = new HashMap<>();
+                pageParam.put("entrustId", Item.getEntrustId());
+                List<String> entrustIds = cfetsetrIbBondinfoMapper.findEtrEntrustIsSettleFail(pageParam);
+                if(CollectionUtils.isNotEmpty(entrustIds)){
+                    AjaxResult res=new AjaxResult();
+                    ValidMessage  validMessage= new ValidMessage();
+                    validMessage.setMessage("指令存在交收失败的数据，不允许修改");
+                    res.setErrorList(Collections.singletonList(validMessage));
+                    return res;
                 }
             };
         }
@@ -668,6 +678,36 @@ public class CfetsEtrIbRepoinfoService extends BaseService{
         param.put("sysDate", iPlatformDate.getSysDateStr());
         param.put("VALUATION_SOURCE_CBC", DictCodeList.估值来源_中债登_CBC.getValue());
         return  cfetsEtrIbRepoinfoMapper.findEtrinfo(param);
+    }
+
+    /**
+     * 模式三获取可用质押券额度
+     *
+     * @param dto
+     * @return com.joyintech.tams.cfets.etr.repo.dto.CfetsEtribRepoInfo003Dto
+     * @author jiangpeng
+     * @date 2022/8/8 16:07
+     */
+    public void getPledgeable03(CfetsEtribRepoInfo003Dto dto) {
+        if (dto == null || CollectionUtils.isEmpty(dto.getEtrInvestRepoInfoDtos())
+                || !StringUtil.equals(CacheUtil.getSysParam(BussinessConstant.REPO_PLEDGE_MODEL), "03")) {
+            return;
+        }
+        dto.getEtrInvestRepoInfoDtos().forEach(item -> {
+            if (item.getZyqk() != null && item.getPortfolioId() != null) {
+                Map<String, Object> param = new HashMap<>();
+                param.put("A_012", DictCodeListExt3.资产类型_质押式双边回购本方券已质押持仓.getValue());
+                param.put("S_002", DictCodeListExt3.资产类型_可质押持仓.getValue());
+                param.put("sysDate", iPlatformDate.getSysDateStr());
+                param.put("pledgeStockId", item.getZyqk());
+                param.put("portfolioId", item.getPortfolioId());
+                BigDecimal pledgeable = cfetsEtrIbRepoinfoMapper.getPledgeable(param);
+                if (pledgeable == null) {
+                    pledgeable = BigDecimal.ZERO;
+                }
+                item.setAvaPledgePrin(ArithmeticUtil.divide(pledgeable,BigDecimal.valueOf(10000),2));
+            }
+        });
     }
 
 

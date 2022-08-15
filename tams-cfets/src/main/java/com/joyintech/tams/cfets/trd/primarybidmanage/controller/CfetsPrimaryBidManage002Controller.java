@@ -332,7 +332,7 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
         }
         dto.setIsWin(DictCodeList.是否_是.getValue());
         cfetsPrimaryBidManageService.selectCash(dto);
-        WorkFlowParameter<CfetsPrimaryBidManageSaveRequest> params = new WorkFlowParameter<CfetsPrimaryBidManageSaveRequest>();
+        WorkFlowParameter<CfetsPrimaryBidManageSaveRequest> params = new WorkFlowParameter<>();
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
         params.setBusinessCode(CfetsPrimaryBidManageSaveRequest::getBidId);
@@ -350,7 +350,7 @@ public class CfetsPrimaryBidManage002Controller extends BaseController{
                     + "中标标位" + GlobalConstant.OPEN_PARENTHESIS + cfetsPrimaryBidManageService.getBidPriceStr(entity) + GlobalConstant.CLOSE_PARENTHESIS
                     + "中标券面总额" + GlobalConstant.OPEN_PARENTHESIS + ArithmeticUtil.divide(dto.getWinPrinamt(), BigDecimal.valueOf(10000), 2) + "万元" + GlobalConstant.CLOSE_PARENTHESIS);
         });
-        ProcessParameter<CfetsPrimaryBidManageSaveRequest> parameter = new ProcessParameter<CfetsPrimaryBidManageSaveRequest>();
+        ProcessParameter<CfetsPrimaryBidManageSaveRequest> parameter = new ProcessParameter<>();
         parameter.setOperationType(OperationType.NEW);
         parameter.setWorkFlowParameter(params);
         try {

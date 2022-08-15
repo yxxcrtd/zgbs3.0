@@ -355,6 +355,30 @@ public class CfetsEtrDispatcherService extends BaseService {
         pageLimit.setRoot(list);
         if (!list.isEmpty()) {
             for (CfetsEtrDispatcherTradeListResponse response : list) {
+
+                //XYHGFXSJ-1058 【指令分发】【场内指令查询】【场内交易】协议回购深交所正回购到期购回、提前购回-存在多个质押券，问题如下
+                if (StringUtil.isNotEmpty(response.getFinprodMarketId()) && response.getFinprodMarketId().contains(GlobalConstant.COMMA)) {
+                    List<String> finprodAbbrs = new ArrayList<>();
+                    String[] finprodIds = response.getFinprodMarketId().split(GlobalConstant.COMMA);
+                    for (String finprod : finprodIds) {
+                        if (StringUtil.isNotEmpty(finprod)) {
+                            FinProduct finProduct = null;
+                            finProduct = finProductMapper.selectByFinprodMarketId(finprod);
+                            if (null == finProduct) {
+                                finProductMapper.selectByPrimaryKey(finprod);
+                                finProduct = finProductMapper.selectByPrimaryKey(finprod);
+                            }
+                            if (null != finProduct) {
+                                finprodAbbrs.add(finProduct.getFinprodAbbr());
+                            }
+                        }
+                    }
+                    if (!finprodAbbrs.isEmpty()) {
+                        response.setFinprodAbbr(String.join(GlobalConstant.COMMA, finprodAbbrs));
+                    }
+                }
+                //XYHGFXSJ-1058 【指令分发】【场内指令查询】【场内交易】协议回购深交所正回购到期购回、提前购回-存在多个质押券，问题如下
+
                 response.setTraderId(response.getTrader());
                 if (StringUtil.isNotEmpty(response.getTrader())) {
                     String[] traders = response.getTrader().split(",");
@@ -391,14 +415,14 @@ public class CfetsEtrDispatcherService extends BaseService {
                 //这里特殊处理成交进度和成交额度,如果场内和场外的资产类型重合了，考虑用业务类型或者交易场所进行区分，不能单纯的排除某一种类型
                 if(DictCodeUtil.equals(response.getFinprodType2(),BussinessDictCodeList.平安资产类型_一级投标债券,BussinessDictCodeList.平安资产类型_计划类资产_利率型,
                         BussinessDictCodeList.平安资产类型_计划类资产_货币型,BussinessDictCodeList.平安资产类型_计划类资产_净值型,BussinessDictCodeList.平安资产类型_拆借,BussinessDictCodeList.平安资产类型_买断式回购,
-                        BussinessDictCodeList.平安资产类型_存款,BussinessDictCodeList.平安资产类型_项目类资产)
+                        BussinessDictCodeList.平安资产类型_存款,BussinessDictCodeList.平安资产类型_项目类资产,BussinessDictCodeList.平安资产类型_债券借贷)
                         || (DictCodeUtil.equals(response.getFinprodType2(),DictCodeList.平安资产类型_质押式回购)
                             && (StringUtil.equals(response.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_质押式回购首期.getValue()) || StringUtil.equals(response.getBusiTypePosition(), 头寸业务类型_质押式回购到期.getValue())))
                         || StringUtil.equals(response.getBusiTypePosition(),DictCodeListExt3.头寸业务类型_现券交易.getValue())
                         || (StringUtil.equals(response.getFinprodType2(),BussinessDictCodeList.平安资产类型_基金.getValue()) && StringUtil.isEmpty(response.getBusiTypePosition()))) {
                     DecimalFormat df = new DecimalFormat("0.##");
                     response.setDealProgress(ArithmeticUtil.divide(response.getFinishAmt(), response.getEntrustAmt(), 4).multiply(new BigDecimal("100")));
-                    response.setTransRemainderAmt(new BigDecimal(df.format(ArithmeticUtil.divide(ArithmeticUtil.subtract(response.getEntrustAmt(), response.getFinishAmt()), new BigDecimal("10000"), 4))));
+                    response.setTransRemainderAmt(new BigDecimal(df.format(ArithmeticUtil.divide(ArithmeticUtil.subtract(ArithmeticUtil.subtract(response.getEntrustAmt(),response.getCloseAmt()), response.getFinishAmt()), new BigDecimal("10000"), 4))));
                     response.setTransFinishAmt(new BigDecimal(df.format(ArithmeticUtil.divide(response.getFinishAmt(), new BigDecimal("10000"), 4))));
                 } else if (StringUtil.equals(response.getBusiTypePosition(), DictCodeListExt3.投管业务类型_现券交易.getValue())) {
                     if (StringUtil.equals(response.getTargetType(), DictCodeListExt3.目标类型_数量.getValue())) {
@@ -2284,6 +2308,11 @@ public class CfetsEtrDispatcherService extends BaseService {
                 if(StringUtil.equals(DictCodeListExt3.投管业务类型_通用式质押回购.getValue(), dto.getBusiTypePosition()) &&
                         StringUtil.equals(DictCodeListExt2.价格模式_市价指令.getValue(), fieldResponseDto.getPriceModel())){
                     fieldResponseDto.setUnitPrice(null);
+                }
+                if (StringUtil.equals(DictCodeListExt3.投管业务类型_中途换券.getValue(), fieldResponseDto.getBusiTypePosition())) {
+                    if(!fieldResponseDto.getFinprodMarketId().contains(",")){
+                        fieldResponseDto.setFinprodMarketId(fieldResponseDto.getSwapOutBonds());
+                    }
                 }
                 ////将投资经理转为真实姓名
                 if (StringUtil.isNotEmpty(fieldResponseDto.getInvManagerId())) {

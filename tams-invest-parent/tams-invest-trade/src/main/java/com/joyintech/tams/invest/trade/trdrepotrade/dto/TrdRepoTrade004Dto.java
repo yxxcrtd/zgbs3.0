@@ -77,6 +77,8 @@ public class TrdRepoTrade004Dto extends TrdProductDeal implements ProcessEntity 
      */
     private BigDecimal tradeAmtAndFee;
 
+    private String balanceCheck;//是否校验余额
+
     /**
      * 获取 channelFee
      *
@@ -1672,5 +1674,13 @@ public class TrdRepoTrade004Dto extends TrdProductDeal implements ProcessEntity 
 
     public void setBussinessCode(String bussinessCode) {
         this.bussinessCode = bussinessCode;
+    }
+
+    public String getBalanceCheck() {
+        return balanceCheck;
+    }
+
+    public void setBalanceCheck(String balanceCheck) {
+        this.balanceCheck = balanceCheck;
     }
 }

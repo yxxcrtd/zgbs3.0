@@ -4456,70 +4456,78 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
      * @return
      */
     public AjaxResult  checkRevoke(CfetsTrdQueryTradeInfoListResponse input) {
-        List<CfetsTrdQueryTradeInfoListResponse> list=input.getSelectedItem();
-        for(CfetsTrdQueryTradeInfoListResponse inputDto:list){
+        List<CfetsTrdQueryTradeInfoListResponse> list = input.getSelectedItem();
+        for (CfetsTrdQueryTradeInfoListResponse inputDto : list) {
             WflValidInputParameter parameter = new WflValidInputParameter();
-            if(StringUtil.equals(inputDto.getFinprodType2(),DictCodeListExt1.金融产品类型_债券.getValue())){
+            if (StringUtil.equals(inputDto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券.getValue())) {
                 parameter.setPageId("CfetsTrdBondInvestTrade002");
                 parameter.setBusinessDataPk1(inputDto.getTotleTradeId() + "R");
-            }else if(StringUtil.equals(inputDto.getFinprodType2(),DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())
-                    || StringUtil.equals(inputDto.getFinprodType2(),DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue())){
+            } else if (StringUtil.equals(inputDto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())
+                    || StringUtil.equals(inputDto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue())) {
                 parameter.setPageId("CfetsTrdRepoTrade002");
                 parameter.setBusinessDataPk1(inputDto.getTotleTradeId() + "R");
             } else if (StringUtil.equals(inputDto.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())
                     && StringUtil.equals(inputDto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级申购.getValue())) {
-                if(!StringUtil.equals(inputDto.getSettleStatus(),DictCodeListExt3.交收状态_未交收.getValue())){
+                if (!StringUtil.equals(inputDto.getSettleStatus(), DictCodeListExt3.交收状态_未交收.getValue())) {
                     AjaxResult m = new AjaxResult();
-                    m.setErrorList(Arrays.asList(new ValidMessage("已完成交收,不可撤销")));
+                    m.setErrorList(Collections.singletonList(new ValidMessage("已完成交收,不可撤销")));
                     return m;
                 }
                 parameter.setPageId("CfetsTrdFirstBondInvestTrade002");
                 parameter.setBusinessDataPk1(inputDto.getTotleTradeId());
             }
-            if(StringUtil.equals(inputDto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())){
+            if (StringUtil.equals(inputDto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券一级投标.getValue())) {
                 AjaxResult m = new AjaxResult();
-                m.setErrorList(Arrays.asList(new ValidMessage("一级投标成交数据不允许撤销,请撤销中标结果维护/分销买入数据")));
+                m.setErrorList(Collections.singletonList(new ValidMessage("一级投标成交数据不允许撤销,请撤销中标结果维护/分销买入数据")));
                 return m;
             }
             //parameter.setBusinessDataPk2("F01");
             if (mstWorkflowCommonService.isInWflProcess(parameter)) {
                 AjaxResult m = new AjaxResult();
-                m.setErrorList(Arrays.asList(new ValidMessage(this.getMessage("BUSS_COM_E_0023"))));
+                m.setErrorList(Collections.singletonList(new ValidMessage(this.getMessage("BUSS_COM_E_0023"))));
                 return m;
             }
-            if(inputDto.getTradeDate().compareTo(iPlatformDate.getSysDate())!=0){
+            if (inputDto.getTradeDate().compareTo(iPlatformDate.getSysDate()) != 0) {
                 AjaxResult m = new AjaxResult();
-                m.setErrorList(Arrays.asList(new ValidMessage("只可在交易生效日进行撤销操作")));
+                m.setErrorList(Collections.singletonList(new ValidMessage("只可在交易生效日进行撤销操作")));
                 return m;
             }
-            if(StringUtil.equals(inputDto.getPs(),DictCodeList.交易方向_卖出.getValue())
-                    || StringUtil.equals(inputDto.getPs(),DictCodeList.交易方向_行权_回售.getValue())
-                    || StringUtil.equals(inputDto.getPs(),DictCodeList.回购拆借方向_正回购.getValue())
-            ){
-                if(!StringUtil.equals(inputDto.getSettleStatus(),DictCodeListExt3.交收状态_未交收.getValue())){
+            if (StringUtil.equals(inputDto.getPs(), DictCodeList.交易方向_卖出.getValue())
+                    || StringUtil.equals(inputDto.getPs(), DictCodeList.交易方向_行权_回售.getValue())
+                    || StringUtil.equals(inputDto.getPs(), DictCodeList.回购拆借方向_正回购.getValue())
+            ) {
+                if (!StringUtil.equals(inputDto.getSettleStatus(), DictCodeListExt3.交收状态_未交收.getValue())) {
                     AjaxResult m = new AjaxResult();
-                    m.setErrorList(Arrays.asList(new ValidMessage("已完成交收,不可撤销")));
+                    m.setErrorList(Collections.singletonList(new ValidMessage("已完成交收,不可撤销")));
                     return m;
                 }
             }
             CfetsTrdBondInvestTradeDto dto = this.getTrdBondInvestTradeDto(inputDto.getTotleTradeId() + "R");
-            if(StringUtil.isNotEmpty(dto)){
+            if (StringUtil.isNotEmpty(dto)) {
                 AjaxResult m = new AjaxResult();
-                m.setErrorList(Arrays.asList(new ValidMessage("已撤销的交易不允许撤销")));
+                m.setErrorList(Collections.singletonList(new ValidMessage("已撤销的交易不允许撤销")));
                 return m;
             }
-            CfetsTrdRepoTrade002Dto dtoRepo =cfetsTrdRepoTrade002Service.getTrdRepoInvestTradeDto(inputDto.getTotleTradeId() + "R");
-            if(StringUtil.isNotEmpty(dtoRepo)){
+            CfetsTrdRepoTrade002Dto dtoRepo = cfetsTrdRepoTrade002Service.getTrdRepoInvestTradeDto(inputDto.getTotleTradeId() + "R");
+            if (StringUtil.isNotEmpty(dtoRepo)) {
                 AjaxResult m = new AjaxResult();
-                m.setErrorList(Arrays.asList(new ValidMessage("已撤销的交易不允许撤销")));
+                m.setErrorList(Collections.singletonList(new ValidMessage("已撤销的交易不允许撤销")));
                 return m;
             }
             Map<String, Object> pageParam = new HashMap<>();
-            pageParam.put("totleTradeId",inputDto.getTotleTradeId());
+            pageParam.put("totleTradeId", inputDto.getTotleTradeId());
             List<String> entrusIds = cfetsTrdQueryMapper.findEtrEntrustIsForcedFinish(pageParam);
-            if(CollectionUtils.isNotEmpty(entrusIds)){
+            if (CollectionUtils.isNotEmpty(entrusIds)) {
                 AjaxResult m = new AjaxResult();
-                m.setErrorList(Arrays.asList(new ValidMessage("存在已强制完成指令的交易不允许撤销")));
+                m.setErrorList(Collections.singletonList(new ValidMessage("存在已强制完成指令的交易不允许撤销")));
+                return m;
+            }
+            pageParam.put("entrustStatus", DictCodeList.委托状态_已关闭.getValue());
+            entrusIds = cfetsTrdQueryMapper.findEtrEntrustIsSettleFail(pageParam);
+            if (CollectionUtils.isNotEmpty(entrusIds)) {
+                AjaxResult m = new AjaxResult();
+                String entrustIdsStr = StringUtil.joinString(entrusIds,GlobalConstant.COMMA);
+                m.setErrorList(Collections.singletonList(new ValidMessage("指令: " + entrustIdsStr + " 存在已交收失败的数据,不允许撤销")));
                 return m;
             }
         }

@@ -4,7 +4,7 @@
 	<sql id="bonddurationdzfh">
 		T1.TOTLE_TRADE_ID busiCode,
 		T5.TYPE_8 finprodType2,
-		T3.PA_BUSS_TYPE paBussType,
+		nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 		dealAdd.PORTFOLIO_ID portfolioId,
 		pp.PORTFOLIO_NAME portfolioName,
 		concat(regexp_replace(listagg(T1.sec_manage_acct_id, ',') within group(order by T1.totle_trade_id),'([^,]+)(,\1)*(,|$)','\1\3')
@@ -34,7 +34,7 @@
 		'${PAGE_DATE_STATUS05}' statusValid,
 		T1.TOTLE_TRADE_ID busiCode,
 		T5.TYPE_8 finprodType2,
-		t3.PA_BUSS_TYPE paBussType,
+		nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 		decode(order2.portfolio_id,null,ppTemp.portfolio_id,order2.portfolio_id) portfolioId,
 		decode(order2.portfolio_name,null,ppTemp.portfolio_name,order2.portfolio_name) portfolioName,
 		NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -75,6 +75,7 @@
 		AND wtdta.MP_FINPROD_ID IS NULL
 		AND T1.IS_CANCEL = #{YESNO_N}
 		AND T1.FINPROD_TYPE2 = #{FINPROD_TYPE_TGF01}
+		AND T1.TRADE_MARKET in ('03','04')
 		<if test="busiCode != null and !busiCode.isEmpty()">
 			AND T1.TOTLE_TRADE_ID = #{busiCode}
 		</if>
@@ -99,7 +100,7 @@
 		'${PAGE_DATE_STATUS05}' statusValid,
 		T1.TOTLE_TRADE_ID busiCode,
 		T5.TYPE_8 finprodType2,
-		t3.PA_BUSS_TYPE paBussType,
+		nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 		T1.PORTFOLIO_ID portfolioId,
 		T2.PORTFOLIO_NAME portfolioName,
 		NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -137,7 +138,7 @@
 		and T1.PORTFOLIO_ID <include refid="portfolioAth"/>
 		and t1.TRADE_STATUS = #{TRADE_STATUS01}
 		and t1.IS_CANCEL = #{YES_OR_NO_N}
-		and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS})
+		and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS},'T93', 'T94', 'T96')
 		<include refid="where_sql" />
 		ORDER BY T1.TRADE_DATE DESC)
 		union all
@@ -146,7 +147,7 @@
 		'${PAGE_DATE_STATUS05}' statusValid,
 		T1.TOTLE_TRADE_ID busiCode,
 		T5.TYPE_8 finprodType2,
-		t3.PA_BUSS_TYPE paBussType,
+		nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 		case
 		when T1.PORTFOLIO_ID is not null then T1.PORTFOLIO_ID
 		else order2.portfolio_id
@@ -214,7 +215,7 @@
 		'${PAGE_DATE_STATUS05}' statusValid,
 		T1.TOTLE_TRADE_ID busiCode,
 		T5.TYPE_8 finprodType2,
-		t3.PA_BUSS_TYPE paBussType,
+		nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 		T1.PORTFOLIO_ID portfolioId,
 		T2.PORTFOLIO_NAME portfolioName,
 		NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -261,7 +262,7 @@
 			AND T4.FINPROD_MARKET_ID = #{finprodMarketId}
 		</if>
 		<if test="paBizType != null and !paBizType.isEmpty()">
-			AND T3.PA_BUSS_TYPE = #{paBizType}
+			AND nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) = #{paBizType}
 		</if>
 		<if test="tradeDateStart != null and !tradeDateStart.isEmpty()">
 			AND T1.SETTLE_DATE >= to_date(#{tradeDateStart}, 'yyyy-MM-dd')
@@ -289,7 +290,7 @@
 		#{PAGE_DATE_STATUS05} statusValid,
 		T1.TOTLE_TRADE_ID busiCode,
 		T5.TYPE_8 finprodType2,
-		t3.PA_BUSS_TYPE paBussType,
+		nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 		dealAdd.PORTFOLIO_ID portfolioId,
 		pp.PORTFOLIO_NAME portfolioName,
 		NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -353,7 +354,7 @@
 		#{PAGE_DATE_STATUS05} statusValid,
 		T1.TOTLE_TRADE_ID busiCode,
 		T5.TYPE_8 finprodType2,
-		t3.PA_BUSS_TYPE paBussType,
+		nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 		dealAdd.PORTFOLIO_ID portfolioId,
 		pp.PORTFOLIO_NAME portfolioName,
 		NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -398,7 +399,7 @@
 		'${PAGE_DATE_STATUS05}' statusValid,
 		T1.TOTLE_TRADE_ID busiCode,
 		T5.TYPE_8 finprodType2,
-		T3.PA_BUSS_TYPE paBussType,
+		nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 		order2.portfolio_id portfolioId,
 		order2.portfolio_name portfolioName,
 		NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -449,7 +450,7 @@
 		'${PAGE_DATE_STATUS05}' statusValid,
 		T1.TOTLE_TRADE_ID busiCode,
 		T5.TYPE_8 finprodType2,
-		t3.PA_BUSS_TYPE paBussType,
+		nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 		T1.PORTFOLIO_ID portfolioId,
 		T2.PORTFOLIO_NAME portfolioName,
 		NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -495,7 +496,7 @@
 		'${PAGE_DATE_STATUS05}' statusValid,
 		T1.TOTLE_TRADE_ID busiCode,
 		T5.TYPE_8 finprodType2,
-		t3.PA_BUSS_TYPE paBussType,
+		nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 		order2.portfolio_id portfolioId,
 		order2.portfolio_name portfolioName,
 		NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -543,7 +544,7 @@
 		'${PAGE_DATE_STATUS05}' statusValid,
 		T1.TOTLE_TRADE_ID busiCode,
 		T5.TYPE_8 finprodType2,
-		t3.PA_BUSS_TYPE paBussType,
+		nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 		T1.PORTFOLIO_ID portfolioId,
 		T2.PORTFOLIO_NAME portfolioName,
 		NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -587,7 +588,7 @@
 		'${PAGE_DATE_STATUS05}' statusValid,
 		T1.TOTLE_TRADE_ID busiCode,
 		T5.TYPE_8 finprodType2,
-		t3.PA_BUSS_TYPE paBussType,
+		nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 		dealAdd.PORTFOLIO_ID portfolioId,
 		pp.PORTFOLIO_NAME portfolioName,
 		NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -636,7 +637,7 @@
 		'${PAGE_DATE_STATUS05}' statusValid,
 		T1.TOTLE_TRADE_ID busiCode,
 		T5.TYPE_8 finprodType2,
-		t3.PA_BUSS_TYPE paBussType,
+		nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 		T1.PORTFOLIO_ID portfolioId,
 		T2.PORTFOLIO_NAME portfolioName,
 		NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -692,7 +693,7 @@
 		'${PAGE_DATE_STATUS05}' statusValid,
 		T1.TOTLE_TRADE_ID busiCode,
 		T5.TYPE_8 finprodType2,
-		t3.PA_BUSS_TYPE paBussType,
+		nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 		T1.PORTFOLIO_ID portfolioId,
 		T2.PORTFOLIO_NAME portfolioName,
 		NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -737,7 +738,7 @@
 		'${PAGE_DATE_STATUS05}' statusValid,
 		T1.TOTLE_TRADE_ID busiCode,
 		T5.TYPE_8 finprodType2,
-		t3.PA_BUSS_TYPE paBussType,
+		nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 		T1.PORTFOLIO_ID portfolioId,
 		T2.PORTFOLIO_NAME portfolioName,
 		NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -818,7 +819,7 @@
 				'${PAGE_DATE_STATUS06}' statusValid,
 				T1.P_TRADE_ID busiCode,
 		        T5.TYPE_8 finprodType2,
-				t3.PA_BUSS_TYPE paBussType,
+				nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 				decode(order2.portfolio_id,null,ppTemp.portfolio_id,order2.portfolio_id) portfolioId,
 				decode(order2.portfolio_name,null,ppTemp.portfolio_name,order2.portfolio_name) portfolioName,
 				NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -859,6 +860,7 @@
 			AND wtdta.MP_FINPROD_ID IS NULL
 			AND T1.BUSI_TYPE = #{TRD10}
 			AND T1.FINPROD_TYPE2 = #{FINPROD_TYPE_TGF01}
+			AND T1.TRADE_MARKET in ('03','04')
 			<if test="busiCode != null and !busiCode.isEmpty()">
 				AND T1.P_TRADE_ID = #{busiCode}
 			</if>
@@ -884,7 +886,7 @@
 				'${PAGE_DATE_STATUS06}' statusValid,
 				T1.P_TRADE_ID busiCode,
 				T5.TYPE_8 finprodType2,
-				t3.PA_BUSS_TYPE paBussType,
+				nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 				T1.PORTFOLIO_ID portfolioId,
 				T2.PORTFOLIO_NAME portfolioName,
 				NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -920,7 +922,7 @@
 		    WHERE T2.INVEST_YESORNO = 'Y' AND T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TGF02}, #{FINPROD_TYPE_TGF03})
 			and T1.PORTFOLIO_ID <include refid="portfolioAth"/>
 			and t1.TRADE_STATUS = #{TRADE_STATUS03}
-			and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS})
+			and t1.PS in (#{PST07},#{PST56},#{PS_TQZZ},#{PS_YQFS},'T93', 'T94', 'T96')
 			<include refid="where_sql" />
 			ORDER BY T1.TRADE_DATE DESC)
 		union all
@@ -930,14 +932,14 @@
 				'${PAGE_DATE_STATUS06}' statusValid,
 				T1.TOTLE_TRADE_ID busiCode,
 		        T5.TYPE_8 finprodType2,
-				t3.PA_BUSS_TYPE paBussType,
+				nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 				case
                     when T1.PORTFOLIO_ID is not null then T1.PORTFOLIO_ID
-                    else order2.portfolio_id 
+                    else order2.portfolio_id
                 end as portfolioId,
                  case
                     when T1.PORTFOLIO_ID is not null then T2.PORTFOLIO_NAME
-                    else order2.portfolio_name 
+                    else order2.portfolio_name
                 end as portfolioName,
 				NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
 				nvl(SAI.SEC_ACCT_NAME, fp.FINPROD_NAME) secAcctName,
@@ -998,7 +1000,7 @@
 					'${PAGE_DATE_STATUS06}' statusValid,
 					T1.TOTLE_TRADE_ID busiCode,
 					T5.TYPE_8 finprodType2,
-					t3.PA_BUSS_TYPE paBussType,
+					nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 					T1.PORTFOLIO_ID portfolioId,
 					T2.PORTFOLIO_NAME portfolioName,
 					NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -1045,7 +1047,7 @@
 			        AND T4.FINPROD_MARKET_ID = #{finprodMarketId}
 		        </if>
 		        <if test="paBizType != null and !paBizType.isEmpty()">
-			        AND T3.PA_BUSS_TYPE = #{paBizType}
+			        AND nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) = #{paBizType}
 		        </if>
 		        <if test="tradeDateStart != null and !tradeDateStart.isEmpty()">
 			        AND T1.SETTLE_DATE >= to_date(#{tradeDateStart}, 'yyyy-MM-dd')
@@ -1073,7 +1075,7 @@
 					#{PAGE_DATE_STATUS06} statusValid,
 					T1.TOTLE_TRADE_ID busiCode,
 					T5.TYPE_8 finprodType2,
-					t3.PA_BUSS_TYPE paBussType,
+					nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 					dealAdd.PORTFOLIO_ID portfolioId,
 					pp.PORTFOLIO_NAME portfolioName,
 					NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -1137,7 +1139,7 @@
 				#{PAGE_DATE_STATUS06} statusValid,
 				T1.TOTLE_TRADE_ID busiCode,
 				T5.TYPE_8 finprodType2,
-				t3.PA_BUSS_TYPE paBussType,
+				nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 				dealAdd.PORTFOLIO_ID portfolioId,
 				pp.PORTFOLIO_NAME portfolioName,
 				NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -1182,7 +1184,7 @@
 				'${PAGE_DATE_STATUS06}' statusValid,
 				T1.TOTLE_TRADE_ID busiCode,
 				T5.TYPE_8 finprodType2,
-				T3.PA_BUSS_TYPE paBussType,
+				nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 			    order2.portfolio_id portfolioId,
                 order2.portfolio_name portfolioName,
 				NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -1231,7 +1233,7 @@
 				'${PAGE_DATE_STATUS06}' statusValid,
 				T1.TOTLE_TRADE_ID busiCode,
 				T5.TYPE_8 finprodType2,
-				t3.PA_BUSS_TYPE paBussType,
+				nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 				T1.PORTFOLIO_ID portfolioId,
 				T2.PORTFOLIO_NAME portfolioName,
 				NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -1276,7 +1278,7 @@
 				'${PAGE_DATE_STATUS06}' statusValid,
 				T1.TOTLE_TRADE_ID busiCode,
 				T5.TYPE_8 finprodType2,
-				t3.PA_BUSS_TYPE paBussType,
+				nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 			    order2.portfolio_id portfolioId,
                 order2.portfolio_name portfolioName,
 				NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -1322,7 +1324,7 @@
 				'${PAGE_DATE_STATUS06}' statusValid,
 				T1.TOTLE_TRADE_ID busiCode,
 				T5.TYPE_8 finprodType2,
-				t3.PA_BUSS_TYPE paBussType,
+				nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 				T1.PORTFOLIO_ID portfolioId,
 				T2.PORTFOLIO_NAME portfolioName,
 				NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -1366,7 +1368,7 @@
 				'${PAGE_DATE_STATUS06}' statusValid,
 				T1.TOTLE_TRADE_ID busiCode,
 				T5.TYPE_8 finprodType2,
-				t3.PA_BUSS_TYPE paBussType,
+				nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 				dealAdd.PORTFOLIO_ID portfolioId,
 				pp.PORTFOLIO_NAME portfolioName,
 				NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -1418,7 +1420,7 @@
 				'${PAGE_DATE_STATUS06}' statusValid,
 				T1.TOTLE_TRADE_ID busiCode,
 				T5.TYPE_8 finprodType2,
-		        t3.PA_BUSS_TYPE paBussType,
+		        nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 				T1.PORTFOLIO_ID portfolioId,
 				T2.PORTFOLIO_NAME portfolioName,
 				NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -1472,7 +1474,7 @@
 				'${PAGE_DATE_STATUS06}' statusValid,
 				T1.TOTLE_TRADE_ID busiCode,
 				T5.TYPE_8 finprodType2,
-				t3.PA_BUSS_TYPE paBussType,
+				nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 				T1.PORTFOLIO_ID portfolioId,
 				T2.PORTFOLIO_NAME portfolioName,
 				NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -1516,7 +1518,7 @@
 				'${PAGE_DATE_STATUS06}' statusValid,
 				T1.TOTLE_TRADE_ID busiCode,
 				T5.TYPE_8 finprodType2,
-				t3.PA_BUSS_TYPE paBussType,
+				nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) paBussType,
 				T1.PORTFOLIO_ID portfolioId,
 				T2.PORTFOLIO_NAME portfolioName,
 				NVL(T1.SEC_MANAGE_ACCT_ID, T1.CHL_ID) secManageAcctId,
@@ -1572,7 +1574,7 @@
 			AND T4.FINPROD_MARKET_ID = #{finprodMarketId}
 		</if>
 		<if test="paBizType != null and !paBizType.isEmpty()">
-			AND T3.PA_BUSS_TYPE = #{paBizType}
+			AND nvl(t3.PA_BUSS_TYPE, T1.TG_BUSI_TYPE) = #{paBizType}
 		</if>
 		<if test="tradeDateStart != null and !tradeDateStart.isEmpty()">
 			AND T1.TRADE_DATE >= to_date(#{tradeDateStart}, 'yyyy-MM-dd')
@@ -1607,7 +1609,7 @@
                 a.trade_id
             from STL_PAY_ORDERS A
             inner join ptl_portfolio  b on a.portfolio_id = b.portfolio_id
-            order by a.trade_id,b.portfolio_id 
+            order by a.trade_id,b.portfolio_id
         )
     </sql>
 
@@ -1647,17 +1649,17 @@
 
 	<!--资产代码联想框-->
 	<select id="getFinprodMarketIds" resultType="com.joyintech.framework.select.SuggestDto">
-		SELECT 
+		SELECT
 			FINPROD_MARKET_ID code,
 			FINPROD_ABBR shortName
 		FROM
 			FIN_PRODUCT
-		LEFT JOIN 
+		LEFT JOIN
 			FIN_PRODUCT_TYPE
-		ON 
+		ON
 			FIN_PRODUCT.FINPROD_ID = FIN_PRODUCT_TYPE.FINPROD_ID
 		<where>
-			<if test="finprodMarketId !=null and finprodMarketId != ''">	
+			<if test="finprodMarketId !=null and finprodMarketId != ''">
 				(FINPROD_MARKET_ID like concat(concat('%',
 				#{finprodMarketId,jdbcType=VARCHAR}),'%')
 				OR
@@ -1665,7 +1667,7 @@
 				#{finprodMarketId,jdbcType=VARCHAR}),'%'))
 			</if>
 			AND FIN_PRODUCT_TYPE.TYPE_8 IS NOT NULL
-		</where>	
+		</where>
 	</select>
 	<!--证券账户-->
 	<select id="getSecAcctIdAndChlIds" resultType="com.joyintech.framework.select.SelectOptionDto">
@@ -1718,7 +1720,7 @@
 		</where>
 		)
 	</sql>
-	
+
 	<select id="getType6" resultType="java.lang.String" parameterType="java.lang.String">
 		select type_6 from FIN_PRODUCT_TYPE where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
 	</select>

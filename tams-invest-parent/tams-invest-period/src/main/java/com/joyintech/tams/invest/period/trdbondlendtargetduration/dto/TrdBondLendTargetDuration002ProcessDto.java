@@ -47,6 +47,8 @@ public class TrdBondLendTargetDuration002ProcessDto extends TrdBondLendTargetDur
      * 附件上传
      */
     private List<UploadFile> uploadFileList;
+
+    private String balanceCheck;//是否校验余额
     /**
      * 获取 statusValidString
      *
@@ -166,5 +168,13 @@ public class TrdBondLendTargetDuration002ProcessDto extends TrdBondLendTargetDur
             return df2.format(super.getTheoryAmt());
         }
         return "";
+    }
+
+    public String getBalanceCheck() {
+        return balanceCheck;
+    }
+
+    public void setBalanceCheck(String balanceCheck) {
+        this.balanceCheck = balanceCheck;
     }
 }

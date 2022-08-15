@@ -71,6 +71,11 @@ public class FundBackgroundManagementDto extends BaseEntity {
     private String finProdMarketName;
 
     /**
+     * 债券资产交易场所
+     */
+    private String tradeMarket;
+
+    /**
      * 现金流日期
      */
     private String cashDate;
@@ -143,6 +148,21 @@ public class FundBackgroundManagementDto extends BaseEntity {
      * 区分费用支付(true 产品费用  false 投资费用支付
      */
     private boolean paBussTypeAdd;
+
+    /**
+     * 交易对手
+     */
+    private String counterId;
+
+    /**
+     * 指令代码
+     */
+    private String entrustId;
+
+    /**
+     * 投标代码
+     */
+    private String bidId;
 
     /**
      * 获取 statusValid
@@ -543,5 +563,37 @@ public class FundBackgroundManagementDto extends BaseEntity {
 
     public void setPaBussTypeAdd(boolean paBussTypeAdd) {
         this.paBussTypeAdd = paBussTypeAdd;
+    }
+
+    public String getTradeMarket() {
+        return tradeMarket;
+    }
+
+    public void setTradeMarket(String tradeMarket) {
+        this.tradeMarket = tradeMarket;
+    }
+
+    public String getCounterId() {
+        return counterId;
+    }
+
+    public void setCounterId(String counterId) {
+        this.counterId = counterId;
+    }
+
+    public String getEntrustId() {
+        return entrustId;
+    }
+
+    public void setEntrustId(String entrustId) {
+        this.entrustId = entrustId;
+    }
+
+    public String getBidId() {
+        return bidId;
+    }
+
+    public void setBidId(String bidId) {
+        this.bidId = bidId;
     }
 }

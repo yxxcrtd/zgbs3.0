@@ -4973,6 +4973,21 @@
         where eea.FORCED_FINISH_AMT is not null and tmi.TRD_ID = #{totleTradeId,jdbcType=VARCHAR}
     </select>
 
+    <select id="findEtrEntrustIsSettleFail" resultType="java.lang.String">
+        select distinct eea.ENTRUST_ID
+        from ETR_ENTRUST_ADD eea
+                 left join (select TOTLE_TRADE_ID, ENTRUST_ID, TRADE_ID
+                            from REG_FIN_PRODUCT_DEAL
+                            union
+                            select QUOTE_ID TOTLE_TRADE_ID, ENTRUST_ID, QUOTE_ID
+                            from IBU_QUOTE_ETR_RE) deal on deal.ENTRUST_ID = eea.ENTRUST_ID
+                 left join TRDQUTO_MATCH_INFO tmi on tmi.PRE_TRADE_ID = deal.TOTLE_TRADE_ID
+                 left join ETR_ENTRUST ee on ee.ENTRUST_ID = eea.ENTRUST_ID
+        where eea.CLOSE_AMT is not null and tmi.TRD_ID = #{totleTradeId,jdbcType=VARCHAR}
+            and nvl(eea.CLOSE_AMT,0) <![CDATA[>]]> 0
+            and ee.ENTRUST_STATUS = #{entrustStatus,jdbcType=VARCHAR}
+    </select>
+
     <select id="findFxmrManualSettleInfo" resultType="com.joyintech.tams.cfets.trdquery.dto.CfetsTrdBidInfoResponse">
         SELECT
             CASE WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_02} AND FPI.TENDER_TYPE IN(#{TENDER_TYPE_01},#{TENDER_TYPE_02})

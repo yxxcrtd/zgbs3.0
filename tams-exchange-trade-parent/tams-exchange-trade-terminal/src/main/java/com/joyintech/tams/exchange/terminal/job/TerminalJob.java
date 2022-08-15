@@ -54,7 +54,7 @@ public class TerminalJob {
             return;
         }
         try {
-            KCBPTradeClient kcbpTradeClient = SpringContextUtils.getBean(AgentType.KINGDOM_KCBP.value);
+            KCBPTradeClient kcbpTradeClient = SpringContextUtils.getBean(AgentType.KINGDOM_KCBPW.value);
             if (Objects.nonNull(kcbpTradeClient)) {
                 kcbpTradeClient.querySystemStatus();
             }

@@ -248,6 +248,9 @@ public class TradeRdsCommonAop {
                 return;
             }
             // modify by zhangrui1 20200509 批量接口逻辑 start
+            if(StringUtil.equals(mapTrd.get("busiType"), DictCodeListExt3.共通业务类型_质押券置换.getValue())){
+                return;
+            }
 //            revokeBackRiskCommon(mapTrd,BussinessDictCodeListRds.接口系统ID_实占接口.getValue(),joinPoint);
             String infCode = BussinessDictCodeListRds.接口系统ID_实占接口.getValue();
             if (批量接口相关交易方向.contains(CommonUtil.findValue(mapTrd, PageFieldToInterfFactory.INF_PS))) {

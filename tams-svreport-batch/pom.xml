@@ -34,7 +34,7 @@
         <dependency>
             <groupId>com.joyintech</groupId>
             <artifactId>framework-log</artifactId>
-            <version>0.0.5.4</version>
+            <version>0.0.5.8</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -60,7 +60,7 @@
 	   </plugins>
 	</build>
 
-    <dependencyManagement>
+    <!--<dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -68,7 +68,7 @@
                 <version>1.5.9.RELEASE</version>
             </dependency>
         </dependencies>
-    </dependencyManagement>
+    </dependencyManagement>-->
 
 
 </project>

@@ -252,7 +252,7 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                             dealTotal.setFpriceAmt(totalFpriceamt);
                             dealTotal.setUnitFprice(settleTransDataDto.getUnitFprice());
                         } else{
-                            unitCprice = ArithmeticUtil.divide(totalCpriceAmt, totalShareAmt, 8);
+                            unitCprice = ArithmeticUtil.divide(totalCpriceAmt, totalShareAmt, 4);
                             dealTotal.setCpriceAmt(totalCpriceAmt);
                             dealTotal.setUnitCprice(unitCprice);
                             unitInt=settleTransDataDto.getUnitInt();
@@ -488,6 +488,16 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                         dealTotal.setSettleDate(settleTransDataDto.getSettleDate());
                         //清算速度
                         dealTotal.setSettleSpeed(settleTransDataDto.getSettleSpeed());
+                        // 交易份额
+                        dealTotal.setShareAmt(settleTransDataDto.getShareAmt());
+                        // 起息日
+                        dealTotal.setVdate(settleTransDataDto.getVdate());
+                        // 到期日
+                        dealTotal.setMdate(settleTransDataDto.getMdate());
+                        // 首期交付日
+                        dealTotal.setVpayDate(settleTransDataDto.getVpayDate());
+                        // 币种
+                        dealTotal.setCcy(settleTransDataDto.getCcy());
                         for (StlSettleTransDataGatherDto item : list) {
                             if(StringUtil.equals(item.getBusiSceneCalss(), DictCodeListStl.业务场景分类明细_债券协议正回购_首期_买入.getValue())
                                     ||StringUtil.equals(item.getBusiSceneCalss(), DictCodeListStl.业务场景分类明细_债券协议逆回购_首期_买入.getValue())){
