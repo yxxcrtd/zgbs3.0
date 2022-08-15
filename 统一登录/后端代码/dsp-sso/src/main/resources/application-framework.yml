@@ -1,20 +1,32 @@
 spring:
   datasource:
-    type: org.apache.commons.dbcp2.BasicDataSource
-    driverClassName: oracle.jdbc.OracleDriver
-    validationQuery: SELECT 1 FROM DUAL
-    maxTotal: 10
-    maxIdle: 10
-    minIdle: 5
-    timeBetweenEvictionRunsMillis: 60000
-    numTestsPerEvictionRun: 10
-    removeAbandonedOnBorrow: true
-    removeAbandonedOnMaintenance: true
-    logAbandoned: true
-    connectionProperties: oracle.net.CONNECT_TIMEOUT=50000;oracle.net.ReadTimeout=50000  
+#    type: org.apache.commons.dbcp2.BasicDataSource
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: oracle.jdbc.driver.OracleDriver
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     username: BS303INIT_TEST1008_03
     password: BS303INIT_TEST1008_03
+    #defaultTransactionIsolation:
+    name: master                             #数据库名称
+    initialSize: 10                          #在连接池中初始化多少个连接
+    maxIdle: 10                              #回收空闲连接时，将保证至少有min-idle个连接.
+    maxTotal: 200                            #连接池中最多支持多少个活动会话
+    maxWaitMillis: 10000                     #程序向连接池中请求连接时,超过maxWait的值后认为本次请求失败(不配置或为-1则无限等待)
+    minEvictableIdleTimeMillis: 180000       #池中某个连接的空闲时长达到 N 毫秒后, 连接池在下次检查空闲连接时回收该连接,要小于防火墙超时设置net.netfilter.nf_conntrack_tcp_timeout_established
+    timeBetweenEvictionRunsMillis: 10000     #检查空闲连接的频率，单位毫秒, 非正整数时表示不进行检查
+    #defaultAutoCommit: true                 #是否默认提交
+    #testWhileIdle: true                     #当程序请求连接，池在分配连接时，是否先检查该连接是否有效
+    #testOnBorrow: false                     #程序 申请 连接时,进行连接有效性检查（低效，影响性能）
+    #testOnReturn: false                     #程序 返还 连接时,进行连接有效性检查（低效，影响性能）
+    #validationQuery:                        #检查池中的连接是否仍可用的 SQL 语句,drui会连接到数据库执行该SQL, 如果正常返回，则表示连接可用，否则表示连接不可用
+    filters: stat,slf4j                      #stat:监控统计,slf4j:日志监控
+    filterStatEnabled: true                  #是否启用监控统计
+    filterStatLogSlowSql: true               #日志中显示SQL
+    filterStatSlowSqlMillis: 3000            #慢SQL监控
+    filterSlf4jEnabled: true
+    filterSlf4jStatementExecutableSqlLogEnable: true
+    statServletLoginUser: joyin
+    statServletLoginKey: joyin
     reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
 #  redis:
 #    database: 15
@@ -46,26 +58,36 @@ spring:
     backOffMultiplier: 2
     useExponentialBackOff: true
     maximumRedeliveryDelay: -1
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration 
+
+
+
 base:
   datasource:
-    type: org.apache.commons.dbcp2.BasicDataSource
-    driverClassName: oracle.jdbc.OracleDriver
-    maxTotal: 10
-    maxIdle: 10
-    minIdle: 5
-    timeBetweenEvictionRunsMillis: 60000
-    numTestsPerEvictionRun: 10
-    removeAbandonedOnBorrow: true
-    removeAbandonedOnMaintenance: true
-    logAbandoned: true
-    connectionProperties: oracle.net.CONNECT_TIMEOUT=50000;oracle.net.ReadTimeout=50000
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: oracle.jdbc.driver.OracleDriver
     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
     username: BS303INIT_TEST1008_03
     password: BS303INIT_TEST1008_03
-mybatis:
-  mapperLocations: classpath*:mapper/*.xml,classpath*:com/joyintech/**/dao/sqlmap/**/*.xml
+    #defaultTransactionIsolation:
+    name: base                               #数据库名称
+    initialSize: 10                          #在连接池中初始化多少个连接
+    maxIdle: 10                              #回收空闲连接时，将保证至少有min-idle个连接.
+    maxTotal: 200                            #连接池中最多支持多少个活动会话
+    maxWaitMillis: 10000                     #程序向连接池中请求连接时,超过maxWait的值后认为本次请求失败(不配置或为-1则无限等待)
+    minEvictableIdleTimeMillis: 180000       #池中某个连接的空闲时长达到 N 毫秒后, 连接池在下次检查空闲连接时回收该连接,要小于防火墙超时设置net.netfilter.nf_conntrack_tcp_timeout_established
+    timeBetweenEvictionRunsMillis: 10000     #检查空闲连接的频率，单位毫秒, 非正整数时表示不进行检查
+    #defaultAutoCommit: true                 #是否默认提交
+    #testWhileIdle: true                     #当程序请求连接，池在分配连接时，是否先检查该连接是否有效
+    #testOnBorrow: false                     #程序 申请 连接时,进行连接有效性检查（低效，影响性能）
+    #testOnReturn: false                     #程序 返还 连接时,进行连接有效性检查（低效，影响性能）
+    #validationQuery:                        #检查池中的连接是否仍可用的 SQL 语句,drui会连接到数据库执行该SQL, 如果正常返回，则表示连接可用，否则表示连接不可用
+    filters: stat,slf4j                      #stat:监控统计,slf4j:日志监控
+    filterStatEnabled: true                  #是否启用监控统计
+    filterStatLogSlowSql: true               #日志中显示SQL
+    filterStatSlowSqlMillis: 3000            #慢SQL监控
+    filterSlf4jEnabled: true
+    filterSlf4jStatementExecutableSqlLogEnable: true
+
 #####################################
 #                 分布式事务配置                      #
 #####################################
@@ -98,7 +120,8 @@ eureka:
 #                      服务白名单                        #
 ##################################### 
 shiro:
-  sessionId: JSESSIONID
+#  sessionId: JSESSIONID
+  sessionId: JSID
   casClientName: datarouter
 # allowUrl: /webjars/**,/swagger/**,/v2/api-docs,/swagger-ui.html,doc.html,/swagger-resources/**,/swagger-resources,/configuration/security,/configuration/ui
   allowUrl: /sso/auth/**,/joyin-sso-login/**,/login.html
@@ -132,4 +155,4 @@ application:
 ##################################### 
 log:
   path: /home/tams/logs/tams
-  level: info
+  level: debug

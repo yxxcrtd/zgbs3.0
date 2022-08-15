@@ -48,14 +48,14 @@ public class RskPortfolioPackageDtlValidator implements BeanValidator{
             for(RskPortfolioPackageDtl entity:rskPortfolioPackageDtlList){
             	 //组合成分不可为空
                 if(StringUtil.isEmpty(entity.getPortfolioId())){
-                    resultList.add(new ValidMessage("",
+                    resultList.add(new ValidMessage("rskPortfolioPackageDtlList",
                         getMessage("COMMON_E_0057", getMessage("RskSupervisionPortfPoint003.portfolioMix"))));
                     break;
                 }
             }
         }
         else{
-        	 resultList.add(new ValidMessage("",
+        	 resultList.add(new ValidMessage("rskPortfolioPackageDtlList",
                      getMessage("COMMON_E_0057", getMessage("RskSupervisionPortfPoint003.portfolioMix"))));
         }
         return resultList;

@@ -464,6 +464,7 @@ public class CfetsEtrIbRepoinfoController extends BaseController{
         try {
             CfetsEtribRepoInfo003Dto item = dto.getSelectedItem().get(0);
             CfetsEtribRepoInfo003Dto result = cfetsEtrIbRepoinfoService.findEtrinfo(item);
+            cfetsEtrIbRepoinfoService.getPledgeable03(result);
             AjaxResult m =new AjaxResult();
             m.setData(result);
             return new Message<AjaxResult>().success().setData(m);

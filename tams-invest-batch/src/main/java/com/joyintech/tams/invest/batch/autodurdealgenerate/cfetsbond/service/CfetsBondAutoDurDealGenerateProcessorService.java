@@ -371,8 +371,8 @@ public class CfetsBondAutoDurDealGenerateProcessorService extends BaseService {
         for(RegFinProductDeal regFinProductDeal : regFinProductDealList) {
             TrdProductDeal trdProductDeal = new TrdProductDeal();
             BeanUtil.copyPropertiesIgnoreNull(trdProductDeal,regFinProductDeal);
-            trdProductDeal.setTradeDate(DateUtil.parse(DateUtil.format(batchDate)));
-            trdProductDeal.setSettleDate(DateUtil.parse(DateUtil.format(batchDate)));
+            trdProductDeal.setTradeDate(trdFinProductDealTotal.getTradeDate());
+            trdProductDeal.setSettleDate(trdFinProductDealTotal.getSettleDate());
             trdProductDeal.setTradeId(autoPeriodCommonService.buildBussinessCode(parameter));
             trdProductDeal.setBusiType(DictCodeList.共通业务类型_债券类资产存续期.getValue());
             trdProductDeal.setFinprodId(regFinProductDeal.getFinprodId());
@@ -430,15 +430,17 @@ public class CfetsBondAutoDurDealGenerateProcessorService extends BaseService {
             stlPayOrders.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
 //            String acctNo = autoPeriodCommonService.selectDealCapacctInfo(regFinProductDealTotal.getSecManageAcctId(), trdFinProductDealTotal.getCcy());
 //            stlPayOrders.setMyAcctNo(acctNo);
-            String acctId = EtrCommonCashPositionDealService.select组合托管户(trdProductDealAdd.getPortfolioId(),
+            String myAcctNo = EtrCommonCashPositionDealService.select组合托管户(trdProductDealAdd.getPortfolioId(),
                     trdProductDeal.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
-            stlPayOrders.setMyAcctNo(acctId);
+            String counterAcctNo = null;
+            stlPayOrders.setMyAcctNo(myAcctNo);
+            stlPayOrders.setCounterAcctNo(counterAcctNo);
             stlPayOrders.setSettleDate(DateUtil.parse(DateUtil.format(batchDate)));
             stlPayOrders.setPs(DictCodeListExt1.收支方向_收入.getValue());
             stlPayOrders.setSettleAmt(trdProductDeal.getTradeAmt());
             stlPayOrders.setCcy(regFinProductDealTotal.getCcy());
             stlPayOrders.setSettleStatus(DictCodeList.结算状态_已结算.getValue());
-            stlPayOrders.setIsNeedSend(DictCodeListExt1.是否_是.getValue());
+            stlPayOrders.setIsNeedSend(DictCodeListExt1.是否_否.getValue());
             stlPayOrders.setIsTotalTrade(DictCodeListExt1.是否_是.getValue());
             stlPayOrders.setTradeId(trdProductDeal.getTradeId());
             stlPayOrders.setOrderStatus(DictCodeListExt1.指令状态_新建.getValue());

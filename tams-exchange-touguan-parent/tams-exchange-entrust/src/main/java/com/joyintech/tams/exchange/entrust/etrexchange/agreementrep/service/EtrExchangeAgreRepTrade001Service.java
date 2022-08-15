@@ -185,6 +185,9 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
     @Autowired
     private EtrPledgeMapper etrPledgeMapper;
 
+    @Autowired
+    private TrdProductDealMapper trdProductDealMapper;
+
     /**
      * 对手方交易员联想文本框初始化。
      *
@@ -2514,12 +2517,6 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         }
         etrSinglePortfolioDto.setAssetType(DictCodeList.平安资产类型_质押式回购.getValue());
         etrSinglePortfolioDto.setAssetType1("H01");
-
-        if (!交易方向_首期.getValue().equals(dto.getPs()) && StringUtils.isEmpty(dto.getInitialNum())) {
-            etrSinglePortfolioDto.setFinprodId(getFinprodIdNoFirst(dto));
-        } else if (!StringUtils.isEmpty(dto.getInitialNum())) {
-            etrSinglePortfolioDto.setFinprodId(dto.getInitialNum());
-        }
 //        etrSinglePortfolioDto.setDealCurAcct(dto.getAcctNo());// 资金账户
 //        /***********************************************************************/
 //        etrSinglePortfolioDto.setDealMode(dto.getDeclaType());//申报类型-db 交易方式
@@ -2879,6 +2876,15 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
 
             }
         }
+
+        //【实时资产头寸查询】深交所正回购解除质押，已撤回指令修改提交，没有对质押式回购指令可用持仓 处理
+        if (DictCodeListExt3.交易方向_解除质押.getValue().equals(dto.getPs())) {
+            TrdProductDeal trdProductDeal = trdProductDealMapper.selectByPrimaryKey(dto.getInitialNum());
+            if (null != trdProductDeal) {
+                dto.setTradeAmt(trdProductDeal.getTradeAmt());
+            }
+        }
+        //【实时资产头寸查询】深交所正回购解除质押，已撤回指令修改提交，没有对质押式回购指令可用持仓 处理
         return dto;
     }
 
@@ -2991,6 +2997,18 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
             postionFlowDto.setPledgeInvAim(commonPositionService.selectHoldInvAim(postionFlowDto.getPortfolioId(), postionFlowDto.getFinprodId()));
         }
         //实时资产头寸查询】协议回购上交所正回购到期续做数据日间交收后，对应报表里数值错误
+
+        //深交所正回购到期续做指令,新质押券持仓
+        if(StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_到期续做.getValue()) && DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(dto.getTradeMarket())
+            &&DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getRepPs()) ){
+            List<FinDealPledge> finDealPledgeList = finDealPledgeMapper.selectByFinprodId(new FinDealPledgeKey(){{
+                setFinprodId(postionFlowDto.getInitialNum());
+                setBranch(0L);
+            }});
+            postionFlowDto.setFinDealPledgeList(finDealPledgeList);
+        }
+
+        //深交所正回购到期续做指令,新质押券持仓
 
         parameter.setCustom(postionFlowDto);
 //        try {
@@ -3165,11 +3183,8 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         }
         //wsz 修改行情到期续作 首次结算时间传值
         String date = "";
-        if (!StringUtils.isEmpty(dto.getOrigSerialDate())
-                || DictCodeListExt3.上农商_指令业务类型_协议回购到期续做指令.getValue().equals(dto.getEntrustBussType())) {
+        if (!StringUtils.isEmpty(dto.getOrigSerialDate())) {
             date = dto.getOrigSerialDate();
-        } else {
-            date = dto.getFristSettleDate();
         }
         TrdProductDeal trdProductDeal = trdCommonBaseService.getFirstRepoTrade(dto.getIntiTradeId(),
                 "", dto.getSecAcctId(),
@@ -3177,6 +3192,9 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         //wsz 修改行情到期续作 首次结算时间传值
         if (trdProductDeal != null) {
             tradeId = trdProductDeal.getFinprodId();
+        }
+        if(StringUtils.isEmpty(tradeId)){
+            return null;
         }
 
         return this.selectCurrPledgeInfo(tradeId);
@@ -3224,12 +3242,6 @@ public class EtrExchangeAgreRepTrade001Service extends CommonExportService<EtrEx
         String tradeId = "";
         //wsz 修改行情到期续作 首次结算时间传值
         String date = "";
-        if (!StringUtils.isEmpty(dto.getOrigSerialDate())
-                || DictCodeListExt3.上农商_指令业务类型_协议回购到期续做指令.getValue().equals(dto.getEntrustBussType())) {
-            date = dto.getOrigSerialDate();
-        } else {
-            date = dto.getFristSettleDate();
-        }
         // 当一个资金账号下挂多个证券账号时，传入的证券帐号可能不同，导致查询失败，因此不传secAcctId
         TrdProductDeal trdProductDeal = trdCommonBaseService.getFirstRepoTrade(dto.getIntiTradeId(),
                 "", "",

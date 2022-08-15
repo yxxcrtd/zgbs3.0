@@ -32,6 +32,19 @@ public class PositionUpdateParam {
      */
     private String isNotWorkflow;
 
+    /**
+     * 是否日终批处理
+     */
+    private String dayEndBatch;
+
+    public String getDayEndBatch() {
+        return dayEndBatch;
+    }
+
+    public void setDayEndBatch(String dayEndBatch) {
+        this.dayEndBatch = dayEndBatch;
+    }
+
     public String getDealOldPositionFlag() {
         return dealOldPositionFlag;
     }

@@ -1,10 +1,13 @@
 package com.joyintech.tams.invest.common.entrust.inter;
 
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.FinProductAddMapper;
+import com.joyintech.tams.common.base.dao.FinProductMapper;
+import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.common.base.entity.FinProductAdd;
 import com.joyintech.tams.common.base.entity.PtlCapacctInfo;
 import com.joyintech.tams.constant.DictCodeList;
@@ -50,6 +53,9 @@ public class EtrTradeCommonervice extends BaseService {
 
     @Autowired(required = false)
     private FinProductAddMapper finProductAddMapper;
+
+    @Autowired(required = false)
+    private FinProductMapper finProductMapper;
 
 
     /**
@@ -170,10 +176,34 @@ public class EtrTradeCommonervice extends BaseService {
             List<PositionCashSecDto> secList = new ArrayList<>();
             for (PositionCashSecDto dto : list) {
                 if (StringUtil.isNotEmpty(dto.getFinprodId()) && StringUtil.isNotEmpty(dto.getSecAcctId())) {
-                    PositionCashSecDto cashSecDto = new PositionCashSecDto();
-                    BeanUtil.copyPropertiesIgnoreNull(cashSecDto, dto); //复制资产信息
-                    handleSecType(cashSecDto);
-                    secList.add(cashSecDto);
+
+                    //XYHGFXSJ-1056 【协议回购指令】深交所正回购，头寸展示区域，可质押数量、持仓数量，若存在多个质押券，选择组合、账户和资产后，应汇总展示
+                    if (dto.getFinprodId().contains(GlobalConstant.COMMA)) {
+                        String[] finprodIds = dto.getFinprodId().split(GlobalConstant.COMMA);
+                        for (String finprod : finprodIds) {
+                            if (StringUtil.isNotEmpty(finprod)) {
+                                FinProduct finProduct = null;
+                                finProduct = finProductMapper.selectByFinprodMarketId(finprod);
+                                if (null == finProduct) {
+                                    finProduct = finProductMapper.selectByPrimaryKey(finprod);
+                                }
+                                if (null != finProduct) {
+                                    PositionCashSecDto cashSecDto = new PositionCashSecDto();
+                                    BeanUtil.copyPropertiesIgnoreNull(cashSecDto, dto); //复制资产信息
+                                    cashSecDto.setFinprodId(finProduct.getFinprodId());
+                                    cashSecDto.setFinprodType2(finProduct.getFinprodType2());
+                                    handleSecType(cashSecDto);
+                                    secList.add(cashSecDto);
+                                }
+                            }
+                        }
+                    } else {
+                        PositionCashSecDto cashSecDto = new PositionCashSecDto();
+                        BeanUtil.copyPropertiesIgnoreNull(cashSecDto, dto); //复制资产信息
+                        handleSecType(cashSecDto);
+                        secList.add(cashSecDto);
+                    }
+                    //XYHGFXSJ-1056 【协议回购指令】深交所正回购，头寸展示区域，可质押数量、持仓数量，若存在多个质押券，选择组合、账户和资产后，应汇总展示
                 }
             }
             //持仓
@@ -883,12 +913,18 @@ public class EtrTradeCommonervice extends BaseService {
         if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue())) {
             holdingType = DictCodeListExt3.资产类型_场内信用保护凭证可用持仓.getValue();
         }
-        if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+        if (!StringUtil.equals(dto.getTradePlat(), TempConstant.AGR_EREP_ETR) && (
+                dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
                 || dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())
-                || dto.getFinprodType2().equals("ZYSHG")) {
+                || dto.getFinprodType2().equals("ZYSHG"))) {
             dto.setFinprodId("XN_PRODID999");
             holdingType = DictCodeListExt3.资产类型_通用回购融资券可用持仓.getValue();
         }
+
+        if (StringUtil.equals(dto.getTradePlat(), TempConstant.AGR_EREP_ETR)) {
+            holdingType = DictCodeListExt3.资产类型_质押式协议回购本方券非净额结算可用持仓.getValue();
+        }
+
         dto.setHoldingType(holdingType);
 
     }
@@ -896,9 +932,9 @@ public class EtrTradeCommonervice extends BaseService {
     //持仓数量类型
     public void handleUableSecType(PositionCashSecDto dto) {
         String holdingType = DictCodeListExt3.资产类型_资产账户持仓.getValue();
-        if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+        if ((dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
                 || dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())
-                || dto.getFinprodType2().equals("ZYSHG")) {
+                || dto.getFinprodType2().equals("ZYSHG")) && !StringUtil.equals(dto.getTradePlat(), TempConstant.AGR_EREP_ETR)) {
             holdingType = DictCodeListExt3.资产类型_通用回购融资券折算后额度.getValue();
             dto.setFinprodId("XN_PRODID999");
         }

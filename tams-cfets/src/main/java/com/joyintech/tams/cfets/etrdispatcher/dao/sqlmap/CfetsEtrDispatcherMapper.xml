@@ -70,6 +70,7 @@
         100,0),'F17',NVL(ETR_ENTRUST.ENTRUST_NUM *100,0),NVL(ETR_ENTRUST.ENTRUST_AMT,ETR_ENTRUST.ENTRUST_NUM)) entrustAmt,
         decode(ETR_ENTRUST_ADD.ASSET_TYPE,'F01',NVL(ETR_FINISH_STATUSA.FINISH_AMT * 100,0),'F10',NVL(ETR_FINISH_STATUSA.FINISH_AMT *
         100,0),'F17',NVL(ETR_FINISH_STATUSA.FINISH_AMT * 100,0),NVL(ETR_FINISH_STATUSA.FINISH_AMT,0)) finishAmt,
+        nvl(ETR_ENTRUST_ADD.CLOSE_AMT,0) closeAmt,
         ETR_ENTRUST.CCY ccy,
         ETR_ENTRUST.ENTRUST_DATE entrustDate,
         ETR_ENTRUST.VDATE vdate,
@@ -115,13 +116,15 @@
         else TO_CHAR( ETR_ENTRUST.PRICE, 'FM9999999999999990.9000')
         END AS etrPrice,
         CASE
-        WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04'
-        THEN ROUND(decode(nvl(T9.ORDER_FINISH_AMT, 0) , 0, 0,nvl(T9.ORDER_FINISH_AMT, 0) / nvl(decode(ETR_ENTRUST.ENTRUST_AMT, 0, 1,ETR_ENTRUST.ENTRUST_AMT), 1)), 4)* 100
         WHEN ETR_ENTRUST.TRADE_MARKET = '03' OR ETR_ENTRUST.TRADE_MARKET = '04' THEN
         (
             CASE
+            when etr_entrust.ps = 'T93'  and etr_entrust.ENTRUST_TYPE = '32' then
+            ROUND( decode(nvl( T9.ORDER_FINISH_AMT, 0 ),0,0, nvl( T9.ORDER_FINISH_AMT, 0 ) / nvl( decode(ETR_ENTRUST.ENTRUST_AMT, 0, 1,ETR_ENTRUST.ENTRUST_AMT), 1 )), 4 )*100
+            when etr_entrust.ps = 'T93'  and etr_entrust.ENTRUST_TYPE = '22' then
+            ROUND(nvl( T9.ORDER_FINISH_AMT, 0 ) / nullif( etr_entrust.ENTRUST_NUM, 0 ) , 4 )*100
             when etr_entrust.ENTRUST_TYPE = '31' then
-            ROUND(decode(nvl(T9.ORDER_FINISH_AMT, 0), 0, 0, (T9.ORDER_FINISH_AMT * 100) / nvl(etr_entrust.ENTRUST_AMT, 1)), 4) * 100
+            ROUND( nvl( T9.ORDER_FINISH_AMT, 0 ) / nullif( etr_entrust.ENTRUST_AMT, 0 ), 4 )*100
             WHEN ETR_ENTRUST_ADD.TARGET_TYPE = '01'
 --                 and etr_entrust.ps != 'T93'
 --                 and etr_entrust.TRADE_MARKET != '04'
@@ -144,13 +147,15 @@
         )
         END AS exeProgress,
         CASE
-        WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04'
-        THEN ROUND(decode(nvl(T9.ENT_FINISH_AMT, 0),0,0,nvl(T9.ENT_FINISH_AMT, 0) / nvl(decode(ETR_ENTRUST.ENTRUST_AMT, 0, 1,ETR_ENTRUST.ENTRUST_AMT), 1)), 4)* 100
         WHEN ETR_ENTRUST.TRADE_MARKET = '03' OR ETR_ENTRUST.TRADE_MARKET = '04' THEN
         (
             CASE
+        when etr_entrust.ps = 'T93'  and etr_entrust.ENTRUST_TYPE = '32' then
+        ROUND( decode(nvl( T9.ENT_FINISH_AMT, 0 ),0,0,nvl( T9.ENT_FINISH_AMT, 0 ) / nvl( decode(ETR_ENTRUST.ENTRUST_AMT, 0, 1,ETR_ENTRUST.ENTRUST_AMT), 1 )), 4 )*100
+        when etr_entrust.ps = 'T93'  and etr_entrust.ENTRUST_TYPE = '22' then
+        ROUND(nvl( T9.ENT_FINISH_AMT, 0 ) / nullif( etr_entrust.ENTRUST_NUM, 0 ) , 4 )*100
             when etr_entrust.ENTRUST_TYPE = '31' then
-            ROUND(decode(nvl(T9.ENT_FINISH_AMT, 0), 0, 0, T9.ENT_FINISH_AMT * 100 / nvl(etr_entrust.ENTRUST_AMT, 1)), 4) * 100
+            ROUND( nvl( T9.ENT_FINISH_AMT, 0 ) / nullif( etr_entrust.ENTRUST_AMT, 0 ), 4 ) * 100
             WHEN etr_entrust_add.TARGET_TYPE = '01'
 --                 and etr_entrust.ps != 'T93'
 --                 and etr_entrust.TRADE_MARKET != '04'
@@ -184,11 +189,16 @@
         CASE
         WHEN ETR_ENTRUST.TRADE_MARKET = '03' OR ETR_ENTRUST.TRADE_MARKET = '04' THEN
         (
-            ROUND( nvl( T9.ORDER_FINISH_AMT, 0 ), 4 )
+            case
+            WHEN etr_entrust.PS = 'T94' THEN
+            decode(etr_entrust.ENTRUST_TYPE,'21',ROUND( nvl( T9.ORDER_FINISH_AMT, 0 ), 4 )/100,ROUND( nvl( T9.ORDER_FINISH_AMT, 0 ), 4 ))
+            when etr_entrust.ps = 'T93' and ETR_ENTRUST.ENTRUST_TYPE = '22' then ROUND( nvl( T9.ORDER_FINISH_AMT, 0 ), 4 )/100
+            else ROUND( nvl( T9.ORDER_FINISH_AMT, 0 ), 4 )
+            END
         ) ELSE (
             CASE
             WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' THEN
-            ( NVL( T7.FINISH_AMT, 0 ) + NVL( T5.ENT_FINISH_AMT * 100, 0 ) ) / 10000 ELSE round( ( NVL( T7.FINISH_AMT, 0 ) + NVL( T5.ENT_FINISH_AMT, 0 ) ) / 10000, 2 )
+            ( NVL( T7.FINISH_AMT, 0 ) + NVL( TT9.ENT_FINISH_AMT * 100, 0 ) ) / 10000 ELSE round( ( NVL( T7.FINISH_AMT, 0 ) + NVL( TT9.ENT_FINISH_AMT, 0 ) ) / 10000, 2 )
             END
         )
         END AS execFinishAmt,
@@ -196,10 +206,12 @@
         WHEN ETR_ENTRUST.TRADE_MARKET = '03' OR ETR_ENTRUST.TRADE_MARKET = '04' THEN
         (
             CASE
-                WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' THEN
-                    ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T9.ORDER_FINISH_AMT, 0 ), 4 )
+                when etr_entrust.ps = 'T93' then
+                decode(ETR_ENTRUST.ENTRUST_TYPE,'32',ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T9.ORDER_FINISH_AMT, 0 ), 4 ),ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T9.ORDER_FINISH_AMT, 0 ), 4 )/100)
                 WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
-                    ROUND( nvl( etr_entrust.ENTRUST_AMT/100, 0 ) - nvl( T9.ORDER_FINISH_AMT, 0 ) , 4 )
+                ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T9.ORDER_FINISH_AMT, 0 ), 4 )
+                WHEN etr_entrust.ENTRUST_TYPE = '21' THEN
+                ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T9.ORDER_FINISH_AMT, 0 ), 4 )/100
                 WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
                     ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T9.ORDER_FINISH_AMT, 0 ), 4 )
                 ELSE ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T9.ORDER_FINISH_AMT, 0 ), 4 )
@@ -207,20 +219,25 @@
         ) ELSE (
             CASE
             WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' THEN
-            NVL( ETR_ENTRUST.ENTRUST_NUM, 0 ) / 100 - NVL( T7.FINISH_AMT, 0 ) / 10000 - NVL( T5.ENT_FINISH_AMT, 0 ) / 100 ELSE round(
-            ( NVL( ETR_ENTRUST.ENTRUST_AMT, 0 ) - NVL( T7.FINISH_AMT, 0 ) - NVL( T5.ENT_FINISH_AMT, 0 ) ) / 10000, 2  )
+            NVL( ETR_ENTRUST.ENTRUST_NUM, 0 ) / 100 - NVL( T7.FINISH_AMT, 0 ) / 10000 - NVL( TT9.ENT_FINISH_AMT, 0 ) / 100 - NVL( ETR_ENTRUST_ADD.CLOSE_AMT, 0 ) / 100
+             ELSE round(
+            ( NVL( ETR_ENTRUST.ENTRUST_AMT, 0 )- NVL( ETR_ENTRUST_ADD.CLOSE_AMT, 0 ) - NVL( T7.FINISH_AMT, 0 ) - NVL( TT9.ENT_FINISH_AMT, 0 ) ) / 10000, 2  )
             END
         )
         END AS execRemainderAmt,
         CASE
         WHEN ETR_ENTRUST.TRADE_MARKET = '03' OR ETR_ENTRUST.TRADE_MARKET = '04' THEN
-        (
-            ROUND( nvl( T9.ENT_FINISH_AMT, 0 ), 4 )
+        (   case
+            WHEN etr_entrust.PS = 'T94' THEN
+            decode(etr_entrust.ENTRUST_TYPE,'21',ROUND( nvl( T9.ENT_FINISH_AMT, 0 ), 4 )/100,ROUND( nvl( T9.ENT_FINISH_AMT, 0 ), 4 ))
+            when etr_entrust.ps = 'T93' and ETR_ENTRUST.ENTRUST_TYPE = '22' then ROUND( nvl( T9.ENT_FINISH_AMT, 0 ), 4 )/100
+            else ROUND( nvl( T9.ENT_FINISH_AMT, 0 ), 4 )
+            END
         ) ELSE (
             CASE
             WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' THEN
-            ROUND( NVL( CB.totalShareAmt, nvl( C2B.totalShareAmt, 0 ) ) + NVL( T6.FINISH_AMT * 100, 0 ) ) / 10000 ELSE ROUND(
-            ( NVL( C.totalShareAmt, nvl( C2.FPRICE_AMT, 0 ) ) + NVL( T6.FINISH_AMT, 0 ) ) / 10000, 2  )
+            ROUND( NVL( C5.totalShareAmt * 100, 0 ) ) / 10000 ELSE ROUND(
+            ( NVL( C5.totalTradeAmt , 0 ) ) / 10000, 2  )
             END
         )
         END AS transFinishAmt,
@@ -228,10 +245,12 @@
         WHEN ETR_ENTRUST.TRADE_MARKET = '03' OR ETR_ENTRUST.TRADE_MARKET = '04' THEN
         (
             CASE
-            WHEN etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' THEN
-                ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T9.ENT_FINISH_AMT, 0 ), 4 )
+            when etr_entrust.ps = 'T93' then
+            decode(ETR_ENTRUST.ENTRUST_TYPE,'32',ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T9.ENT_FINISH_AMT, 0 ), 4 ),ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T9.ENT_FINISH_AMT, 0 ), 4 )/100)
             WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
-                ROUND( nvl( etr_entrust.ENTRUST_AMT/100, 0 ) - nvl( T9.ENT_FINISH_AMT, 0 ) , 4 )
+            ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T9.ENT_FINISH_AMT, 0 ), 4 )
+            WHEN etr_entrust.ENTRUST_TYPE = '21' THEN
+            ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T9.ENT_FINISH_AMT, 0 ), 4 )/100
             WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
                 ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T9.ENT_FINISH_AMT, 0 ), 4 )
             ELSE ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T9.ENT_FINISH_AMT, 0 ), 4 )
@@ -239,9 +258,10 @@
         ) ELSE (
             CASE
             WHEN ETR_ENTRUST_ADD.ASSET_TYPE = 'F01' THEN
-            NVL( ETR_ENTRUST.ENTRUST_NUM, 0 ) / 100 - ROUND( NVL( CB.totalShareAmt, nvl( C2B.totalShareAmt, 0 ) ) + NVL( T6.FINISH_AMT * 100, 0 ) ) / 10000 ELSE ROUND(
+            ROUND((NVL( ETR_ENTRUST.ENTRUST_NUM, 0 ) / 100 - NVL( ETR_ENTRUST_ADD.CLOSE_AMT, 0 ) / 100 - NVL( C5.totalShareAmt * 100, 0 )) / 10000,2)
+            ELSE ROUND(
             (
-            NVL( ETR_ENTRUST.ENTRUST_AMT, 0 ) - NVL( C.totalShareAmt, nvl( C2.FPRICE_AMT, 0 ) ) + NVL( T6.FINISH_AMT, 0 )
+            NVL( ETR_ENTRUST.ENTRUST_AMT, 0 )- NVL( ETR_ENTRUST_ADD.CLOSE_AMT, 0 ) - NVL( C5.totalTradeAmt, 0 )
             ) / 10000, 2 )
             END
         )
@@ -308,6 +328,13 @@
         where QUOTE_ID in (select QUOTE_ID from IBU_QUOTE_CREP where TRADE_STATUS = '07')
         GROUP BY iqer.ENTRUST_ID) C /*质押式回购银行间报价 按指令代码汇总 交易份额，债券数量等*/
         ON C.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
+        LEFT JOIN (select sum(TRADE_AMT) totalTradeAmt,sum(SHARE_AMT) totalShareAmt,tpda.ENTRUST_ID
+        from TRD_PRODUCT_DEAL tpd
+        left join TRD_PRODUCT_DEAL_ADD tpda on tpd.TRADE_ID = tpda.TRADE_ID
+        where tpd.IS_CANCEL = 'N' and tpd.TRADE_STATUS = '01'
+        group by tpda.ENTRUST_ID
+        ) C5/*质押式回购银行间报价*/
+        ON C5.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
         LEFT JOIN (SELECT iqer.ENTRUST_ID, iqer.FPRICE_AMT
         FROM IBU_QUOTE_ETR_RE iqer /*质押式回购银行间报价*/
         where QUOTE_ID in (select QUOTE_ID from IBU_QUOTE_CREP where TRADE_STATUS = '07')) C2/*质押式回购银行间报价*/
@@ -386,6 +413,15 @@
         ) SECT ON SECT.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
 
         LEFT JOIN ETR_FINISH_STATUS T9 ON T9.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID  AND ETR_ENTRUST.ENTRUST_ID = T9.TRADE_ID
+        LEFT JOIN(
+                SELECT
+                ENTRUST_ID,
+                SUM(ENT_FINISH_AMT) AS ENT_FINISH_AMT
+                FROM
+                ETR_FINISH_STATUS
+                GROUP BY
+                ENTRUST_ID) TT9 ON
+        ETR_ENTRUST.ENTRUST_ID = TT9.ENTRUST_ID
         LEFT JOIN (
         SELECT bo.BID_MODLE, brt.IS_WIN ,bo.FINPROD_ID ,bobp.ENTRUST_ID  FROM  BID_ORDER bo
         LEFT JOIN BID_ORDER_BID_PRICE bobp ON bobp.BID_ID = bo.BID_ID
@@ -2166,7 +2202,7 @@
 
     <select id="getEtrDispatcherExeListInfo"
             resultType="com.joyintech.tams.cfets.etrdispatcher.dto.CfetsEtrDispatcherExeListInfoResponse">
-        SELECT
+        SELECT distinct
         decode(tpdp.is_cancel,'Y',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) effectFlag,
         <include refid="etrDispatcherExeListInfo"/>
         FROM REG_FIN_PRODUCT_DEAL tpdp
@@ -2182,7 +2218,7 @@
 
         union all
 
-        SELECT
+        SELECT distinct
         #{TRADE_FLOW_STATUS01} effectFlag,
         <include refid="etrDispatcherExeListInfo"/>
         FROM WFL_REG_FIN_PRODUCT_DEAL tpdp
@@ -2198,7 +2234,7 @@
 
         union all
 
-        SELECT
+        SELECT distinct
         decode(tpdp.trade_status,'15',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) as effectFlag,
         <include refid="etrDispatcherExeListInfo1"/>
         FROM IBU_QUOTE_BOND tpdp
@@ -2214,7 +2250,7 @@
 
         union all
 
-        SELECT
+        SELECT distinct
         #{TRADE_FLOW_STATUS01} effectFlag,
         <include refid="etrDispatcherExeListInfo1"/>
         FROM WFL_IBU_QUOTE_BOND2 tpdp
@@ -2228,7 +2264,7 @@
         LEFT JOIN FIN_EXERCISE_PLAN T6 ON tpdp.FINPROD_ID = T6.FINPROD_ID AND T6.EXERCISE_TYPE ='02'
         WHERE wiqe.entrust_id = #{entrustId}
         union all
-        select
+        select distinct
         decode(iqc.trade_status,'15',#{TRADE_FLOW_STATUS03},#{TRADE_FLOW_STATUS02}) as effectFlag,
         <include refid="etrDispatcherExeListInfo2"/>
         from IBU_QUOTE_CREP iqc
@@ -2239,7 +2275,7 @@
         LEFT JOIN MST_CFETS_CUSTOMER_TRADER mcct ON iqc.CP_TRADER_ID = mcct.trader_id
         WHERE iqer.entrust_id = #{entrustId}
         union all
-        select
+        select distinct
         #{TRADE_FLOW_STATUS01} effectFlag,
         <include refid="etrDispatcherExeListInfo2"/>
         from WFL_IBU_QUOTE_CREP iqc
@@ -2714,7 +2750,15 @@
         CASE WHEN det.PORTFOLIO_ID IS NULL THEN ete.PORTFOLIO_ID ELSE det.PORTFOLIO_ID END AS portfolioId,
         pp.portfolio_name portfolioName,
         ete.BUSINESS_MODEL busiModel,
-        NVL(fp.finprod_market_id,ete.STOCK_ID) finprodMarketId,
+        CASE
+        when ete.PS IN ('T94') then
+        trdPledge.FINPROD_MARKET_ID
+        WHEN eted.ASSET_TYPE = 'F07'
+        AND ete.PS IN ( '03', '04', 'T56', 'T93', 'T95', 'T96' ) THEN
+        ete.STOCK_ID ELSE ( CASE WHEN fp.FINPROD_MARKET_ID IS NOT NULL THEN fp.FINPROD_MARKET_ID ELSE eted.ASSET_TYPE_10 END )
+        END finprodMarketId,
+
+        <!--NVL(fp.finprod_market_id,ete.STOCK_ID) finprodMarketId,-->
         nvl(fp.finprod_abbr,ete.finprod_id) finprodAbbr,
         ete.trade_market tradeMarket,
         decode(ete.PS,'T56',eted.BUSI_PS,'T92',eted.BUSI_PS,'T93',eted.BUSI_PS,'T94',eted.BUSI_PS,'T95',eted.BUSI_PS,'T96',eted.BUSI_PS,ete.PS)  ps,
@@ -2777,10 +2821,13 @@
         eted.M_INT_AMT mIntAmt,
         eted.M_TRADE_AMT mTradeAmt,
         case when ete.PS in ('T68','T69') then ete.price * 100
+        when ete.ps = 'T94' then trdPledge.Pledge_Ratio
         else nvl(decode( eted.ASSET_TYPE, 'F07' , ee.Pledge_Ratio , fscr.SCALE ), 0 ) * 100
             end as pledgeRatio, /** 折算率 **/
-        ee.PLEDGE_NUMBER/100 pledgeNumber,
+        decode(ete.PS,'T94',trdPledge.PLEDGE_NUMBER,nvl(ee.PLEDGE_NUMBER/100, trdPledge.PLEDGE_NUMBER)) pledgeNumber,
         ee.PLEDGE_NUMBER * ee.Pledge_Face_Value pledStrdPrinAmt,
+        case when ete.ENTRUST_TYPE = '21' then null else
+        ete.ENTRUST_AMT end exchangeAmount,
         eted.TRADE_ID tradeId,
 <!--        oee.Pledge_Ratio * 100 oldPledgeRatio, /** 折算率 **/-->
 <!--        oee.PLEDGE_NUMBER oldPledgeNumber,-->
@@ -2796,7 +2843,12 @@
         fp.FINPROD_TYPE2 finprodTypeTg,
         eted.DEAL_MODE declaType,T7.FINPROD_ID stockSecId,
         case when ete.ps = 'T96' then
-        fin_trade_product.Mdate else null end backDate
+        fin_trade_product.Mdate else null end backDate,
+        eNew.FINPROD_MARKET_ID swapIntoBonds,
+        eNew.PLEDGE_NUMBER/100 swapIntoBondsVolume,
+        eNew.PLEDGE_RATIO * 100 newDiscount,
+        eOld.FINPROD_MARKET_ID swapOutBonds,
+        eOld.PLEDGE_NUMBER/100 swapOutBondsVolume
         FROM ETR_ENTRUST ete
         INNER JOIN ETR_ENTRUST_ADD eted ON ete.entrust_id = eted.entrust_id
         LEFT JOIN FIN_PRODUCT_CONVERTIBLE FPC ON ete.FINPROD_ID = FPC.FINPROD_ID
@@ -2814,9 +2866,16 @@
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON eted.SEC_ACCT_ID = ssai.SEC_ACCT_ID
         LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
         LEFT JOIN etr_pledge ee ON ete.entrust_id = ee.entrust_id /** 委托指令回购质押品 **/
-<!--        LEFT JOIN ETR_ENTRUST oete ON  oete.entrust_id = eted.TRADE_ID-->
-<!--        LEFT JOIN etr_pledge oee ON oete.entrust_id = oee.entrust_id-->
-<!--        LEFT JOIN FIN_PRODUCT T6 ON oete.FINPROD_ID = T6.FINPROD_ID-->
+        LEFT JOIN (
+            select ep1.*, fp1.FINPROD_MARKET_ID
+            from etr_pledge ep1 left join  FIN_PRODUCT fp1
+            ON ep1.finprod_id = fp1.finprod_id
+        ) eOld ON eOld.DISPLACE_DIR = '02'  and ete.entrust_id = eOld.entrust_id
+        LEFT JOIN (
+            select ep1.*, fp1.FINPROD_MARKET_ID
+            from etr_pledge ep1 left join  FIN_PRODUCT fp1
+            ON ep1.finprod_id = fp1.finprod_id
+        ) eNew ON eNew.DISPLACE_DIR = '01' and ete.entrust_id = eNew.entrust_id
         LEFT JOIN (
             SELECT
                 A.FINPROD_ID                                                            tradeId,
@@ -2847,7 +2906,14 @@
         CASE WHEN det.PORTFOLIO_ID IS NULL THEN ete.PORTFOLIO_ID ELSE det.PORTFOLIO_ID END AS portfolioId,
         pp.portfolio_name portfolioName,
         ete.BUSINESS_MODEL busiModel,
-        NVL(fp.finprod_market_id,ete.STOCK_ID) finprodMarketId,
+        CASE
+        when ete.PS IN ('T94') then
+        trdPledge.FINPROD_MARKET_ID
+        WHEN eted.ASSET_TYPE = 'F07'
+        AND ete.PS IN ( '03', '04', 'T56', 'T93', 'T95', 'T96' ) THEN
+        ete.STOCK_ID ELSE ( CASE WHEN fp.FINPROD_MARKET_ID IS NOT NULL THEN fp.FINPROD_MARKET_ID ELSE eted.ASSET_TYPE_10 END )
+        END finprodMarketId,
+        <!--NVL(fp.finprod_market_id,ete.STOCK_ID) finprodMarketId,-->
         nvl(fp.finprod_abbr,ete.finprod_id) finprodAbbr,
         ete.trade_market tradeMarket,
         decode(ete.PS,'T56',eted.BUSI_PS,'T92',eted.BUSI_PS,'T93',eted.BUSI_PS,'T94',eted.BUSI_PS,'T95',eted.BUSI_PS,'T96',eted.BUSI_PS,ete.PS)  ps,
@@ -2909,10 +2975,13 @@
         eted.M_INT_AMT mIntAmt,
         eted.M_TRADE_AMT mTradeAmt,
         case when ete.PS in ('T68','T69') then ete.price * 100
+        when ete.ps = 'T94' then trdPledge.Pledge_Ratio
         else nvl(decode( eted.ASSET_TYPE, 'F07' , ee.Pledge_Ratio , fscr.SCALE ), 0 ) * 100
         end as pledgeRatio, /** 折算率 **/
-        ee.PLEDGE_NUMBER pledgeNumber,
+        decode(ete.PS,'T94',trdPledge.PLEDGE_NUMBER,nvl(ee.PLEDGE_NUMBER/100, trdPledge.PLEDGE_NUMBER)) pledgeNumber,
         ee.PLEDGE_NUMBER * ee.Pledge_Face_Value pledStrdPrinAmt,
+        case when ete.ENTRUST_TYPE = '21' then null else
+        ete.ENTRUST_AMT end exchangeAmount,
         eted.TRADE_ID tradeId,
 <!--        oee.Pledge_Ratio * 100 oldPledgeRatio, /** 折算率 **/-->
 <!--        oee.PLEDGE_NUMBER oldPledgeNumber,-->
@@ -2927,7 +2996,12 @@
         fp.Is_Right isRight,sci.ACCT_NAME                                                     trdAcctId,
         fp.FINPROD_TYPE2                                                                      finprodTypeTg,
         eted.DEAL_MODE declaType,T7.FINPROD_ID                                                stockSecId,
-        case when ete.ps = 'T96' then fin_trade_product.Mdate else null end                   backDate
+        case when ete.ps = 'T96' then fin_trade_product.Mdate else null end                   backDate,
+        eNew.FINPROD_MARKET_ID swapIntoBonds,
+        eNew.PLEDGE_NUMBER/100 swapIntoBondsVolume,
+        eNew.PLEDGE_RATIO * 100 newDiscount,
+        eOld.FINPROD_MARKET_ID swapOutBonds,
+        eOld.PLEDGE_NUMBER/100 swapOutBondsVolume
         FROM WFL_ETR_ENTRUST ete
         INNER JOIN WFL_ETR_ENTRUST_ADD eted ON ete.entrust_id = eted.entrust_id
         LEFT JOIN FIN_PRODUCT_CONVERTIBLE FPC ON ete.FINPROD_ID = FPC.FINPROD_ID
@@ -2946,9 +3020,16 @@
         LEFT JOIN STL_SEC_ACCT_INFO ssai ON eted.SEC_ACCT_ID = ssai.SEC_ACCT_ID
         LEFT JOIN STL_CAPACCT_INFO sci ON sci.ACCT_NO = ssai.TRD_ACCT_ID
         LEFT JOIN wfl_etr_pledge ee ON ete.entrust_id = ee.entrust_id /** 委托指令回购质押品 **/
-<!--        LEFT JOIN ETR_ENTRUST oete ON  oete.entrust_id = eted.TRADE_ID-->
-<!--        LEFT JOIN etr_pledge oee ON oete.entrust_id = oee.entrust_id-->
-<!--        LEFT JOIN FIN_PRODUCT T6 ON oete.FINPROD_ID = T6.FINPROD_ID-->
+        LEFT JOIN (
+            select ep1.*, fp1.FINPROD_MARKET_ID
+            from wfl_etr_pledge ep1 left join  FIN_PRODUCT fp1
+            ON ep1.finprod_id = fp1.finprod_id
+        ) eOld ON eOld.DISPLACE_DIR = '02'  and ete.entrust_id = eOld.entrust_id
+        LEFT JOIN (
+            select ep1.*, fp1.FINPROD_MARKET_ID
+            from wfl_etr_pledge ep1 left join  FIN_PRODUCT fp1
+            ON ep1.finprod_id = fp1.finprod_id
+        ) eNew ON eNew.DISPLACE_DIR = '01'  and ete.entrust_id = eNew.entrust_id
         LEFT JOIN (
             SELECT
                 A.FINPROD_ID                                                            tradeId,
@@ -3257,6 +3338,7 @@
         <!-- LEFT JOIN ETR_ENTRUST_DETAIL EED ON EE.ENTRUST_ID = EED.ENTRUST_ID
         LEFT JOIN PTL_PORTFOLIO PP ON EED.PORTFOLIO_ID = PP.PORTFOLIO_ID -->
       WHERE A.INSTRUCTION_ID = #{instructionId,jdbcType=VARCHAR}
+        and A.STOCK_CODE is not null
       ORDER BY A.CREATE_TIME DESC
     </select>
 

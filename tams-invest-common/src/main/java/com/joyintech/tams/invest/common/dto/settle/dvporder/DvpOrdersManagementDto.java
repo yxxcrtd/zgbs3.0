@@ -162,6 +162,11 @@ public class DvpOrdersManagementDto extends BaseEntity {
      * 登记托管机构
      */
     private String registOrg;
+
+    /**
+     * 交易场所
+     */
+    private String tradeMarket;
     
     /**
      * 指令状态，新建，撤销
@@ -763,6 +768,12 @@ public class DvpOrdersManagementDto extends BaseEntity {
     public void setRemark(String remark) {
         this.remark = remark;
     }
-    
-    
+
+    public String getTradeMarket() {
+        return tradeMarket;
+    }
+
+    public void setTradeMarket(String tradeMarket) {
+        this.tradeMarket = tradeMarket;
+    }
 }

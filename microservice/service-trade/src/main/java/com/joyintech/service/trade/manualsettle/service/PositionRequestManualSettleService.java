@@ -20,6 +20,7 @@ import com.joyintech.tams.invest.common.position.dto.EtrEntrustAddDto;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
 import com.joyintech.tams.invest.common.trade.dto.PortfolioCalculateDto;
 import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +64,9 @@ public class PositionRequestManualSettleService {
 
     @Autowired
     private TrdProductTempDealAddMapper trdProductTempDealAddMapper;
+
+    @Autowired
+    private FinDealPledgeMapper finDealPledgeMapper;
 
     public static final String TRADE_PLAT = "TRD_MANUAL_SETTLE";
 
@@ -417,8 +421,7 @@ public class PositionRequestManualSettleService {
         // if (DictCodeListExt3.交易方向_解除质押.getValue().equals(infContractDetailfile.getPs())) {
         if (DictCodeListExt3.交易方向_正回购.getValue().equals(infContractDetailfile.getPs())
             || DictCodeListExt3.交易方向_中途换券.getValue().equals(infContractDetailfile.getPs())
-            || DictCodeListExt3.交易方向_到期续做.getValue().equals(infContractDetailfile.getPs())
-            || DictCodeListExt3.交易方向_解除质押.getValue().equals(infContractDetailfile.getPs())) {
+            || DictCodeListExt3.交易方向_到期续做.getValue().equals(infContractDetailfile.getPs())) {
             List<Map<String, Object>> list = new ArrayList<>(4);
             Map<String, Object> map = new HashMap<>();
             map.put("portfolioId", entity.getPortfolioId());
@@ -434,13 +437,32 @@ public class PositionRequestManualSettleService {
                     map.put("finprodId", temp.getFinprodId());
                     map.put("ownSecAmount", temp.getPledgeDisplaceAmt().multiply(new BigDecimal(100)));
                     map.put("secAmount", temp.getPledgeDisplaceAmt().multiply(new BigDecimal(100)));
+                    list.add(map);
                 }
             }else{
-                map.put("finprodId", entity.getPledgeId());
-                map.put("ownSecAmount", entity.getPledgeNumber().multiply(new BigDecimal(100)));
-                map.put("secAmount", entity.getPledgeNumber().multiply(new BigDecimal(100)));
+                TrdProductTempDeal trdProductTempDeal = trdProductTempDealMapper.selectByPrimaryKey(entity.getTradeId());
+                if (trdProductTempDeal != null && !StringUtil.equals(DictCodeListExt3.交易方向_到期续做.getValue(), infContractDetailfile.getPs())) {
+                    map.put("finprodId", entity.getPledgeId());
+                    map.put("ownSecAmount", trdProductTempDeal.getShareAmt().multiply(new BigDecimal(100)));
+                    map.put("secAmount", trdProductTempDeal.getShareAmt().multiply(new BigDecimal(100)));
+                    list.add(map);
+                } else {
+                    FinDealPledgeKey key = new FinDealPledgeKey();
+                    key.setFinprodId(infContractDetailfile.getFinprodId());
+                    key.setBranch(0L);
+                    // 查询首期质押券
+                    List<FinDealPledge> finDealPledges = finDealPledgeMapper.selectByFinprodId(key);
+                    if(CollectionUtils.isNotEmpty(finDealPledges)){
+                        for(FinDealPledge finDealPledge : finDealPledges){
+                            Map<String, Object> map1 = new HashMap<>(map);
+                            map1.put("finprodId", finDealPledge.getPledgeFinprodId());
+                            map1.put("ownSecAmount", finDealPledge.getPledgeNumber().multiply(new BigDecimal(100)));
+                            map1.put("secAmount", finDealPledge.getPledgeNumber().multiply(new BigDecimal(100)));
+                            list.add(map1);
+                        }
+                    }
+                }
             }
-            list.add(map);
             resultMap.put("ptlSecList", list);
         }
 
@@ -452,33 +474,49 @@ public class PositionRequestManualSettleService {
                 || DictCodeListExt3.交易方向_中途换券.getValue().equals(infContractDetailfile.getPs()))
         {
             List<Map<String, Object>> list = new ArrayList<>(4);
-            Map<String, Object> map = new HashMap<>();
-            map.put("portfolioId", entity.getPortfolioId());
-            map.put("finprodId", entity.getPledgeId());
-            map.put("secAcctId", infContractDetailfile.getBondId());
-            // ZGTFCP-1372:修改字段赋值 modify by fuyongsheng 20220319 start
-            map.put("tradeId", entity.getTradeId());
-            map.put("etrId", etrEntrust.getEntrustId());
-            // ZGTFCP-1372:修改字段赋值 modify by fuyongsheng 20220319 end
-            map.put("integrateSecAmount", new BigDecimal(0));
-            if(DictCodeListExt3.交易方向_解除质押.getValue().equals(infContractDetailfile.getPs())){
-                map.put("ownSecAmount", entity.getPledgeNumber().multiply(new BigDecimal(100)));
-                map.put("secAmount", entity.getPledgeNumber().multiply(new BigDecimal(100)));
-            }else if(DictCodeListExt3.交易方向_中途换券.getValue().equals(infContractDetailfile.getPs())){
+            // XYHGFXSJ-1092:修改解除质押数据集赋值 modify by fuyongsheng 20220811 start
+            if(DictCodeListExt3.交易方向_中途换券.getValue().equals(infContractDetailfile.getPs())){
+                Map<String, Object> map = new HashMap<>();
+                map.put("portfolioId", entity.getPortfolioId());
+                map.put("finprodId", entity.getPledgeId());
+                map.put("secAcctId", infContractDetailfile.getBondId());
+                // ZGTFCP-1372:修改字段赋值 modify by fuyongsheng 20220319 start
+                map.put("tradeId", entity.getTradeId());
+                map.put("etrId", etrEntrust.getEntrustId());
+                // ZGTFCP-1372:修改字段赋值 modify by fuyongsheng 20220319 end
+                map.put("integrateSecAmount", new BigDecimal(0));
                 FinPledgeDispDetailTemp temp = this.getFinPledgeDispDetailTemp(infContractDetailfile, DictCodeListExt3.质押券置换_置换方向_换出.getValue());
                 if(null != temp){
                     map.put("finprodId", temp.getFinprodId());
                     map.put("ownSecAmount", temp.getPledgeDisplaceAmt().multiply(new BigDecimal(100)));
                     map.put("secAmount", temp.getPledgeDisplaceAmt().multiply(new BigDecimal(100)));
+                    list.add(map);
                 }
             }
-            // ZGTFCP-2059:提前购回、到期购回、提前续作使用当前质押券信息 modify by fuyongsheng 20220329 start
             else {
-                map.put("ownSecAmount", entity.getPledgeNumber().multiply(new BigDecimal(100)));
-                map.put("secAmount", entity.getPledgeNumber().multiply(new BigDecimal(100)));
+                FinDealPledgeKey key = new FinDealPledgeKey();
+                key.setFinprodId(infContractDetailfile.getFinprodId());
+                key.setBranch(0L);
+                // 查询首期质押券
+                List<FinDealPledge> finDealPledges = finDealPledgeMapper.selectByFinprodId(key);
+                if(CollectionUtils.isNotEmpty(finDealPledges)){
+                    for(FinDealPledge finDealPledge : finDealPledges){
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("portfolioId", entity.getPortfolioId());
+                        map.put("finprodId", finDealPledge.getPledgeFinprodId());
+                        map.put("secAcctId", infContractDetailfile.getBondId());
+                        // ZGTFCP-1372:修改字段赋值 modify by fuyongsheng 20220319 start
+                        map.put("tradeId", entity.getTradeId());
+                        map.put("etrId", etrEntrust.getEntrustId());
+                        // ZGTFCP-1372:修改字段赋值 modify by fuyongsheng 20220319 end
+                        map.put("integrateSecAmount", new BigDecimal(0));
+                        map.put("ownSecAmount", finDealPledge.getPledgeNumber().multiply(new BigDecimal(100)));
+                        map.put("secAmount", finDealPledge.getPledgeNumber().multiply(new BigDecimal(100)));
+                        list.add(map);
+                    }
+                }
             }
-            // ZGTFCP-2059:提前购回、到期购回、提前续作使用当前质押券信息 modify by fuyongsheng 20220329 end
-            list.add(map);
+            // XYHGFXSJ-1092:修改解除质押数据集赋值 modify by fuyongsheng 20220811 end
             resultMap.put("ptlRelieveSecList", list);
         }
     }

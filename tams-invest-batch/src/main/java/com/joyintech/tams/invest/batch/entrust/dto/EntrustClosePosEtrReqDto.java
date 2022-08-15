@@ -54,6 +54,19 @@ public class EntrustClosePosEtrReqDto {
 
     private String finprodId;
 
+    /**
+     * 资产类型
+     */
+    private String assetType1;
+
+    public String getAssetType1() {
+        return assetType1;
+    }
+
+    public void setAssetType1(String assetType1) {
+        this.assetType1 = assetType1;
+    }
+
     public String getBusiType() {
         return busiType;
     }

@@ -1,10 +1,30 @@
 package com.joyintech.tams.invest.period.trdseclendduration.controller;
 
+import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.ajax.MessageType;
+import com.joyintech.framework.annotation.PageId;
+import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.base.intf.IDictCode;
+import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.util.*;
-import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.common.base.entity.TrdProductDeal;
+import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
+import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
+import com.joyintech.tams.invest.common.dto.period.trdrepoduration.RepoInfo;
+import com.joyintech.tams.invest.period.common.service.PeriodCommonService;
 import com.joyintech.tams.invest.period.trdseclendduration.dto.TrdSecLendDuration002Dto;
 import com.joyintech.tams.invest.period.trdseclendduration.service.TrdSecLendDuration002Service;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import com.joyintech.workflow.engine.dto.ProcessParameter;
+import com.joyintech.workflow.engine.dto.WorkFlowParameter;
+import com.joyintech.workflow.engine.exception.WorkFlowException;
+import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,30 +33,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
-import com.joyintech.framework.ajax.AjaxResult;
-import com.joyintech.framework.annotation.PageId;
-import com.joyintech.framework.base.BaseController;
-import com.joyintech.framework.base.intf.IDictCode;
-import com.joyintech.framework.constant.GlobalConstant;
-import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.validation.groups.ValidateGroupEdit;
-import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
-import com.joyintech.tams.systemtools.interf.IPlatformDate;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
-import com.joyintech.tams.invest.common.dto.period.trdrepoduration.RepoInfo;
-import com.joyintech.tams.invest.period.common.service.PeriodCommonService;
-import com.joyintech.tams.invest.period.trdrepoduration.dto.TrdRepoDuration002Dto;
-import com.joyintech.tams.invest.period.trdrepoduration.service.TrdRepoDuration002Service;
-import com.joyintech.workflow.engine.dto.ProcessParameter;
-import com.joyintech.workflow.engine.dto.WorkFlowParameter;
-import com.joyintech.workflow.engine.exception.WorkFlowException;
-import com.joyintech.workflow.engine.util.WorkFlowUtil;
 
 /**
  * @author : 裴家俊
@@ -101,6 +97,11 @@ public class TrdSecLendDuration002Controller extends BaseController {
             }
         }
         TrdProductDeal deal = trdSecLendDuration002Service.getTrdProductDeal(entity);
+        /*add by jiangpeng on 20210420 start BS-1593 【债券借贷交易存续期】：缺少资金到账日*/
+        if (StringUtil.isNotEmpty(entity) && entity.getSettleDate() == null) {
+            entity.setSettleDate(DateUtil.parse(DateUtil.getSysDate()));
+        }
+        /*add by jiangpeng on 20210420 end BS-1593 【债券借贷交易存续期】：缺少资金到账日*/
         deal.setTradeId(StringUtil.EMPTY);
         model.addAttribute(GlobalConstant.ENTITY, entity);
         model.addAttribute("deal", JsonUtils.object2Json(deal));
@@ -135,6 +136,16 @@ public class TrdSecLendDuration002Controller extends BaseController {
     @ResponseBody
     @RequestMapping("check")
     public AjaxResult check(@RequestBody @Validated({ValidateGroupEdit.class}) TrdSecLendDuration002Dto dto, BindingResult result) {
+        /*add by jiangpeng on 20210420 start BS-1593 【债券借贷交易存续期】：缺少资金到账日*/
+        if (dto.getSettleDate() == null) {
+            return new AjaxResult("请输入资金到账日。！", MessageType.错误消息);
+        } else {
+            int dateFlag = DateUtil.compareDate(dto.getSettleDate(), dto.getMdate());
+            if (dateFlag == -1) {
+                return new AjaxResult("资金到账日不能早于到期日！", MessageType.错误消息);
+            }
+        }
+        /*add by jiangpeng on 20210420 end BS-1593 【债券借贷交易存续期】：缺少资金到账日*/
         return commonCheck(result, dto.getOperateType());
     }
 

@@ -1423,7 +1423,7 @@ from
         select
         tt.portfolio_id as portfolioId,
         pp.portfolio_name portfolioName,
-        inva.INV_AIM as businessModel,
+        nvl(inva.INV_AIM,'FVTPL') as businessModel,
         nvl(tt.entrustNum,0)/10000 as entrustNum
         from
         (select a.portfolio_id,a.finprod_id,
@@ -1480,7 +1480,9 @@ from
         on p.finprod_id=T1.finprod_id
         where
         T1.is_right='Y'
-        and p.exercise_date>#{platDate}
+        <if test="platDate!=null">
+            and p.exercise_date>#{platDate}
+        </if>
         and T1.finprod_id=#{finprodId,jdbcType=VARCHAR}
     </select>
     <!--查询该资产该组合的所有的业务模式-->
@@ -1594,6 +1596,6 @@ from
         select distinct eea.ENTRUST_ID
         from ETR_ENTRUST_ADD eea
         where eea.CLOSE_AMT is not null and eea.ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
-            and nvl(eea.FORCED_FINISH_AMT,0) - nvl(eea.CLOSE_AMT,0) <![CDATA[<]]> 0
+            and nvl(eea.CLOSE_AMT,0) <![CDATA[>]]> 0
     </select>
 </mapper>

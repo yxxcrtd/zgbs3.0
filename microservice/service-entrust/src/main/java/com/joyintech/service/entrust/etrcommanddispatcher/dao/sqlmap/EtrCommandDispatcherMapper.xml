@@ -71,7 +71,7 @@
 		A.Mdate MDATE,/**委托结束日*/
 		CASE
 		WHEN A.FINPROD_TYPE2 ='F36' THEN A.ENTRUST_AMT
-		WHEN F.ASSET_TYPE = 'F07' and A.PS in ('T93') and A.TRADE_MARKET = '04' then A.ENTRUST_AMT <!--深圳解除质押-->
+		WHEN F.ASSET_TYPE = 'F07' and A.PS in ('T93') and A.TRADE_MARKET = '04' and A.ENTRUST_TYPE = '32' then A.ENTRUST_AMT <!--深圳解除质押-->
 		ELSE DECODE(F.TARGET_TYPE, '02', A.ENTRUST_AMT, 0)
 		END entrustAmt, /**委托额度*/
 		CASE
@@ -79,7 +79,7 @@
 		ELSE
 		DECODE(F.TARGET_TYPE, '01',
 		case
-		when A.PS in ('T93') AND A.TRADE_MARKET = '04' THEN null
+		when A.PS in ('T93') AND A.TRADE_MARKET = '04' AND A.ENTRUST_TYPE = '32' THEN null
 		ELSE A.ENTRUST_NUM END, 0)
 		END entrustNum, /**委托数量*/
 		A.ENTRUST_STATUS entrustStatus,/**委托状态*/
@@ -217,7 +217,7 @@
 	        A1.Pledge_Number oldPledgeNumber,/*质押数量*/
 	        A1.PLEDGE_RATIO  oldPledgeRatio,/*质押率*/
 	        A1.PLEDGE_AMT oldPledgeAmt,/*质押金额*/
-			A.DISPLACE_DIR displaceDir/*置换方向*/
+			nvl(A.DISPLACE_DIR,'00') displaceDir/*置换方向*/
 	    FROM
 	    ETR_PLEDGE A
 	    LEFT JOIN FIN_PRODUCT C ON A.FINPROD_ID=C.FINPROD_ID

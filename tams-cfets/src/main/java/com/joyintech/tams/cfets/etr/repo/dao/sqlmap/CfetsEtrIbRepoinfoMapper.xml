@@ -55,9 +55,9 @@
          round((NVL(T4.FINISH_AMT,0)+NVL(T5.ENT_FINISH_AMT,0))/(T1.ENTRUST_AMT),4)*100 execProcess,
          round(NVL(T5.FINISH_AMT,0)/(T1.ENTRUST_AMT),4)*100 transProcess,
          (NVL(T4.FINISH_AMT, 0)+ NVL(T5.ENT_FINISH_AMT, 0))  as execFinishAmt,
-         (NVL(T1.ENTRUST_AMT,0) - NVL(T5.ENT_FINISH_AMT,0) - NVL(T4.FINISH_AMT,0)) as execRemainderAmt,
+         (NVL(T1.ENTRUST_AMT,0) - NVL(T5.ENT_FINISH_AMT,0) - NVL(T4.FINISH_AMT,0) - nvl(ETR_ENTRUST_ADD.CLOSE_AMT,0)) as execRemainderAmt,
          NVL(T5.FINISH_AMT,0)  as transFinishAmt,
-         (NVL(T1.ENTRUST_AMT,0) - NVL(T5.FINISH_AMT,0)) as transRemainderAmt,
+         (NVL(T1.ENTRUST_AMT,0) - NVL(T5.FINISH_AMT,0) - nvl(ETR_ENTRUST_ADD.CLOSE_AMT,0)) as transRemainderAmt,
         T1.REMARK,
           null approver,
          TO_CHAR(T1.ENTRUST_DATE, 'yyyy-MM-dd') as entrustDateStr,
@@ -67,6 +67,7 @@
         from
         ETR_ENTRUST T1
             left join MST_COUNTER_PARTY mcp on T1.COUNTER_ID=mcp.COUNTER_ID
+         left join ETR_ENTRUST_ADD on T1.ENTRUST_ID = ETR_ENTRUST_ADD.ENTRUST_ID
         INNER JOIN
         PTL_PORTFOLIO_AUTHORITY PPA
         ON
@@ -391,7 +392,7 @@
         LEFT JOIN (SELECT RANK() OVER(PARTITION BY O_CODE ORDER BY GRADE_DATE DESC,CAST(GRADE_RESULT AS DECIMAL) DESC)
         NUM, O_CODE, GRADE_RESULT
         FROM MST_BOND_CREDIT_RATING
-        WHERE GRADE_DATE &lt;= to_date(#{sysDate},'yyyy-MM-dd')
+        WHERE GRADE_DATE &lt;= to_date(#{sysDate},'yyyy-MM-dd') and O_TYPE = '02'
         and GRADE_ORG_ID !='22') MBCR
         ON MBCR.O_CODE = FIN_PRODUCT.FINPROD_MARKET_ID AND MBCR.NUM = 1
         LEFT JOIN ASSET_DAILY_INFO atd

@@ -97,8 +97,8 @@
     else round((NVL(T7.FINISH_AMT, 0) + NVL(T5.ENT_FINISH_AMT, 0))/10000,2) end as execFinishAmt,
 
     case when ETR_ENTRUST_ADD.ASSET_TYPE = 'F01'
-    then NVL(ETR_ENTRUST.ENTRUST_NUM, 0)/100 - NVL(T7.FINISH_AMT,0)/10000 - NVL(T5.ENT_FINISH_AMT,0)/100
-    else round((NVL(ETR_ENTRUST.ENTRUST_AMT, 0) - NVL(T7.FINISH_AMT, 0) - NVL(T5.ENT_FINISH_AMT, 0))/10000,2) end
+    then NVL(ETR_ENTRUST.ENTRUST_NUM, 0)/100 - NVL(T7.FINISH_AMT,0)/10000 - NVL(T5.ENT_FINISH_AMT,0)/100 - NVL( ETR_ENTRUST_ADD.CLOSE_AMT, 0 ) / 100
+    else round((NVL(ETR_ENTRUST.ENTRUST_AMT, 0)- NVL( ETR_ENTRUST_ADD.CLOSE_AMT, 0 ) - NVL(T7.FINISH_AMT, 0) - NVL(T5.ENT_FINISH_AMT, 0))/10000,2) end
     as execRemainderAmt,
 
     case when ETR_ENTRUST_ADD.ASSET_TYPE = 'F01'
@@ -107,8 +107,8 @@
     end                                                          as transFinishAmt,
 
     case when ETR_ENTRUST_ADD.ASSET_TYPE = 'F01'
-    then NVL(ETR_ENTRUST.ENTRUST_NUM, 0)/100 - ROUND(NVL(CB.totalShareAmt,nvl(C2B.totalShareAmt,0))+NVL(T6.FINISH_AMT*100,0))/10000
-    else ROUND((NVL(ETR_ENTRUST.ENTRUST_AMT, 0) - NVL(C.totalShareAmt, nvl(C2.FPRICE_AMT, 0)) + NVL(T6.FINISH_AMT, 0))/10000,2)
+        THEN ROUND((NVL( ETR_ENTRUST.ENTRUST_NUM, 0 ) / 100 - NVL( ETR_ENTRUST_ADD.CLOSE_AMT, 0 ) / 100 - NVL( C5.totalShareAmt * 100, 0 )) / 10000,2)
+    else ROUND((NVL( ETR_ENTRUST.ENTRUST_AMT, 0 )- NVL( ETR_ENTRUST_ADD.CLOSE_AMT, 0 ) - NVL( C5.totalTradeAmt, 0 ))/10000,2)
     end                                                          as transRemainderAmt,
     to_char(ETR_ENTRUST_ADD.TRANSMIT_TIME,'hh24:mi:ss') transmitTime,
     to_char(ETR_ENTRUST_ADD.TRANSMIT_TIME,'hh24:mi') transmitTimeSer,
@@ -166,6 +166,13 @@
     ON
     ETR_ENTRUST.ENTRUST_ID = ETR_ENTRUST_ADD.ENTRUST_ID
     LEFT JOIN OPT_TARGET_INFO ON ETR_ENTRUST_ADD.ASSET_TYPE_10 = OPT_TARGET_INFO.TARGET_ID
+    LEFT JOIN (select sum(TRADE_AMT) totalTradeAmt,sum(SHARE_AMT) totalShareAmt,tpda.ENTRUST_ID
+    from TRD_PRODUCT_DEAL tpd
+    left join TRD_PRODUCT_DEAL_ADD tpda on tpd.TRADE_ID = tpda.TRADE_ID
+    where tpd.IS_CANCEL = 'N' and tpd.TRADE_STATUS = '01'
+    group by tpda.ENTRUST_ID
+    ) C5
+        ON C5.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
     LEFT JOIN (
         SELECT ENTRUST_ID,
         to_char(wm_concat ( ETR_ENTRUST_DETAIL.PORTFOLIO_ID )) PORTFOLIO_ID,

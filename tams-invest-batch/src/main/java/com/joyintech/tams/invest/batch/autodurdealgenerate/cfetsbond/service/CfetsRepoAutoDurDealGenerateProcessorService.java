@@ -2,6 +2,7 @@ package com.joyintech.tams.invest.batch.autodurdealgenerate.cfetsbond.service;
 
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.*;
+import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
@@ -46,6 +47,12 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
 
     @Autowired(required = false)
     private PinganBatchCommonService pinganBatchCommonService;
+
+    /**
+     * 公共方法service
+     */
+    @Autowired
+    private JoyinbusinessCommonService joyinbusinessCommonService;
 
     public void execute(Date batchDate) {
         Map<String, Object> paramMap1 = new HashMap<String, Object>();
@@ -92,7 +99,7 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
      */
     public  List<TrdRepoDurationDto> listTrdRepoDuration(Date batchDate){
         Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("statusValid", Arrays.asList(DictCodeListExt1.画面数据状态_待处理.getValue()));
+        paramMap.put("statusValid", Collections.singletonList(DictCodeListExt1.画面数据状态_待处理.getValue()));
         paramMap.put("ps", Arrays.asList(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue()));
         paramMap.put("notChannelFlag", "1");
         String mdate = DateUtil.format(batchDate);
@@ -312,6 +319,7 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
         trdProductDeal.setSettleDate(DateUtil.parse(entity.getSettleDate()));
         trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
         trdProductDeal.setIsCancel(DictCodeList.是否_否.getValue());
+        trdProductDeal.setIsOutTrade(DictCodeList.是否_是.getValue());
 
         // 查找cashId
         Map<String, Object> paramMap = new HashMap<>();
@@ -340,6 +348,18 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
             for (WflStlPayOrders wflStlPayOrder : wflStlPayOrders) {
                 StlPayOrders stlPayOrder = new StlPayOrders();
                 BeanUtil.copyPropertiesIgnoreNull(stlPayOrder, wflStlPayOrder);
+                if(StringUtil.equals(trdProductDeal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())){
+                    paramMap.put("portfolioId", trdProductDealAdd.getPortfolioId());
+                    paramMap.put("secAcctId", trdProductDeal.getSecManageAcctId());
+                    paramMap.put("ccy", trdProductDeal.getCcy());
+                    stlPayOrder.setCounterAcctNo(joyinbusinessCommonService.selectDVPCapacctInfoListByAcctId(paramMap));
+                }else{
+                    paramMap.put("portfolioId", trdProductDealAdd.getPortfolioId());
+                    paramMap.put("secAcctId", trdProductDeal.getSecManageAcctId());
+                    paramMap.put("ccy", trdProductDeal.getCcy());
+                    stlPayOrder.setMyAcctNo(joyinbusinessCommonService.selectDVPCapacctInfoListByAcctId(paramMap));
+                }
+                stlPayOrder.setIsNeedSend(DictCodeList.是否_否.getValue());
                 stlPayOrders.add(stlPayOrder);
             }
             trdBondDurDbInertDto.setStlPayOrdersList(stlPayOrders);

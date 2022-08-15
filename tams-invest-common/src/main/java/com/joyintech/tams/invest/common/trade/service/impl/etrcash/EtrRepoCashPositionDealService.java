@@ -972,8 +972,13 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                 });
             }
             if(finProductTradeDto.isNotWorkflow()){
-                etrSecPositionFlowDto.setAmount(finProductTradeDto.getTrdProductDeal().getPrinAmt().negate());
-                etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
+                if(finProductTradeDto.getTrdProductDeal().getPrinAmt() != null){
+                    etrSecPositionFlowDto.setAmount(finProductTradeDto.getTrdProductDeal().getPrinAmt().negate());
+                }else{
+                    etrSecPositionFlowDto.setAmount(BigDecimal.ZERO);
+                }
+                // 统一挪到方法最后添加
+                // etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
             }
         }
         // 交易提交
@@ -1002,12 +1007,13 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                 });
             }
             if(StringUtil.isEmpty(finProductTradeDto.getEntrustId())) { // 无委托
-                // 现金流水dto处理 交割日减少(交易金额-交易券面总额*委托全价/债券面值）
                 etrSecPositionFlowDto.setAmount(prinAmt.negate());
                 // 添加现金流水到目标dto
-                etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
+                // 统一挪到方法最后添加
+                // etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
             }
         }
+        etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
     }
 
     /**
@@ -1335,11 +1341,11 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                 map.put("entrustClass", etrEntrust.getEntrustClass());
                 map.put("portfolioId",etrEntrust.getPortfolioId());
                 map.put("entrustId",etrEntrust.getEntrustId());
-                BigDecimal finishAmt = EtrCommonCashPositionDealService.getEtrExchangeFinishAmtMuilt(map);
+                BigDecimal finishAmt = EtrCommonCashPositionDealService.getEtrFinishAmtMuilt(map);
                 //BigDecimal finishAmt = EtrCommonCashPositionDealService.getEtrFinishAmt(etrEntrust.getEntrustId());
                 BigDecimal closeAmt = etrEntrustAdd.getCloseAmt();
-                // 已完成额度 = 交易表中有效额度 + 已关闭额度 + 强制完成额度
-                finishAmt = ArithmeticUtil.doAdd(finishAmt, closeAmt, entrustCommonDto.getForcedFinishAmt());
+                // 已完成额度 = 交易表中有效额度 + 已关闭额度
+                finishAmt = ArithmeticUtil.doAdd(finishAmt, closeAmt);
                 // 减少委托本金金额
                 etrCashPositionFlowDto.setAmount(ArithmeticUtil.subtract(etrEntrust.getEntrustAmt(), finishAmt));
                 etrEntrustAdd.setCloseAmt(ArithmeticUtil.doAdd(closeAmt, etrCashPositionFlowDto.getAmount()));
@@ -1378,7 +1384,12 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                     // 新业务 在交易执行时才占用债券的指令可用持仓 所以强制完成时不用释放
                     // 交收失败时需要释放
                     // 质押品的组合持仓流水
-                    etrPositionHoldDto.setPtlSecPositionFlows(ptlSecPositionFlowLogic(entrustCommonDto, false));
+//                    etrPositionHoldDto.setPtlSecPositionFlows(ptlSecPositionFlowLogic(entrustCommonDto, false));
+                    // 减少交收失败的金额
+                    if (entrustCommonDto.getDeal() != null
+                            && entrustCommonDto.getDeal().getTradeAmt() != null) {
+                        etrEntrustAdd.setCloseAmt(ArithmeticUtil.doAdd(etrEntrustAdd.getCloseAmt(), entrustCommonDto.getDeal().getTradeAmt()));
+                    }
                 }
             }
             else if (DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(ps)) {
@@ -1395,8 +1406,11 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                     map.put("entrustId", etrEntrust.getEntrustId());
                     map.put("portfolioId", etrEntrust.getPortfolioId());
                     map.put("sumTradeFlag", "02");
-                    // 指令额度-已成交额度 = 未使用额度
-                    amount = ArithmeticUtil.subtract(etrEntrust.getEntrustNum(),EtrCommonCashPositionDealService.getEtrFinishAmtMuilt(map));
+                    // 指令额度 - 已关闭额度 -已成交额度 - 强制完成额度 = 未使用额度
+                    amount = ArithmeticUtil.subtract(ArithmeticUtil.subtract(
+                            ArithmeticUtil.subtract(etrEntrust.getEntrustAmt(), etrEntrustAdd.getCloseAmt()),
+                            entrustCommonDto.getForcedFinishAmt() != null ? BigDecimal.ZERO : etrEntrustAdd.getForcedFinishAmt()),
+                            EtrCommonCashPositionDealService.getEtrFinishAmtMuilt(map));
                 }
                 // 减少交收失败的金额
                 if(entrustCommonDto.getDeal()!=null
@@ -1422,7 +1436,7 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
     private static List<EtrSecPositionFlowDto> ptlSecPositionFlowLogic(EntrustCommonDto input,boolean flag) {
         // List<组合持仓流水DTO>(若上记的List<回购质押品DTO>为空，则此为空，反之循环构造DTO)
         // 通过上记输出的List<输出的质押品DTO>，循环该List构造组合持仓流水DTO
-        List<EtrSecPositionFlowDto> list = new ArrayList<EtrSecPositionFlowDto>() ;
+        List<EtrSecPositionFlowDto> list = new ArrayList<>() ;
         // 查询委托的质押券信息
         Map<String, Object> initSearchParam = new HashMap<>();
         initSearchParam.put("portfolioId", input.getEtrEntrust().getPortfolioId());

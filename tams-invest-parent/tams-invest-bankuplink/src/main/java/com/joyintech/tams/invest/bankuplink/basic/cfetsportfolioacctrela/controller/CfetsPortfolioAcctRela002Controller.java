@@ -12,6 +12,7 @@ package com.joyintech.tams.invest.bankuplink.basic.cfetsportfolioacctrela.contro
 
 import javax.validation.Valid;
 
+import com.joyintech.framework.util.EncryptUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -122,8 +123,11 @@ public class CfetsPortfolioAcctRela002Controller extends BaseController {
         if(!StringUtil.isNotEmpty(dto.getCfetsAcctTypeOld())){
             dto.setCfetsAcctTypeOld(dto.getCfetsAcctType());
         }
-        ProcessParameter<CfetsPortfolioAcctRela001Dto> processParameter = new ProcessParameter<CfetsPortfolioAcctRela001Dto>();
-        WorkFlowParameter<CfetsPortfolioAcctRela001Dto> params = new WorkFlowParameter<CfetsPortfolioAcctRela001Dto>();
+        if(StringUtil.isNotEmpty(dto.getPortfolioId())){
+            dto.setPortfolioIdMd5(EncryptUtil.getInstance().md5(dto.getPortfolioId()));
+        }
+        ProcessParameter<CfetsPortfolioAcctRela001Dto> processParameter = new ProcessParameter<>();
+        WorkFlowParameter<CfetsPortfolioAcctRela001Dto> params = new WorkFlowParameter<>();
         params.setPageId(this.getPageId());
         params.setElementId(dto.getElementId());
         params.setBusinessCode(dto.getPortfolioId()+"-"+ dto.getPartyId()+"-" + dto.getCfetsAcctType());
@@ -156,15 +160,20 @@ public class CfetsPortfolioAcctRela002Controller extends BaseController {
         if (br.hasErrors()) {
             return new AjaxResult(br);
         }
-        if(!StringUtil.isNotEmpty(dto.getPartyIdOld())){
-            dto.setPartyIdOld(dto.getPartyId());
-        }
-        if(!StringUtil.isNotEmpty(dto.getPortfolioIdOld())){
-            dto.setPortfolioIdOld(dto.getPortfolioId());
-        }
-        if(!StringUtil.isNotEmpty(dto.getCfetsAcctTypeOld())){
-            dto.setCfetsAcctTypeOld(dto.getCfetsAcctType());
-        }
+        dto.getSelectedItem().forEach(item->{
+            if(!StringUtil.isNotEmpty(item.getPartyIdOld())){
+                item.setPartyIdOld(item.getPartyId());
+            }
+            if(!StringUtil.isNotEmpty(item.getPortfolioIdOld())){
+                item.setPortfolioIdOld(item.getPortfolioId());
+            }
+            if(!StringUtil.isNotEmpty(item.getCfetsAcctTypeOld())){
+                item.setCfetsAcctTypeOld(item.getCfetsAcctType());
+            }
+            if(StringUtil.isNotEmpty(item.getPortfolioId())){
+                item.setPortfolioIdMd5(EncryptUtil.getInstance().md5(item.getPortfolioId()));
+            }
+        });
         ProcessParameter<CfetsPortfolioAcctRela001Dto> processParameter = new ProcessParameter<>();
         WorkFlowParameter<CfetsPortfolioAcctRela001Dto> params = new WorkFlowParameter<>();
         params.setPageId(this.getPageId());

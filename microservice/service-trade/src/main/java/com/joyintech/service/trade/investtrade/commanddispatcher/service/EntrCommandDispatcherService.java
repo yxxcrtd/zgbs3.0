@@ -122,8 +122,14 @@ public class EntrCommandDispatcherService extends BaseService<EntrCommandDispatc
     public List<EntrTradePledgeDto> selectPledgeList(List<EntrCommandDispatcherDto> list){
     	List<EntrTradePledgeDto> pledgelist = new ArrayList<EntrTradePledgeDto>();
 
+    	//已查询质押券的指令列表，防止重复查询质押券
+    	List<String> entrustIds = new ArrayList<>();
+
     	if(list != null && !list.isEmpty()) {
 	    	for(EntrCommandDispatcherDto dto : list) {
+	    		if(entrustIds.contains(dto.getEntrustId())){
+	    			continue;
+				}
 	    		if("F02".equals(dto.getFinprodType2()) || "F03".equals(dto.getFinprodType2()) ) {
 					if (StringUtil.equals(DictCodeListExt3.投管业务类型_首期.getValue(), dto.getBusiTypeTg()) ||
 							(StringUtil.equals(DictCodeListExt3.投管业务类型_中途换券.getValue(), dto.getBusiTypeTg()) &&
@@ -153,6 +159,7 @@ public class EntrCommandDispatcherService extends BaseService<EntrCommandDispatc
 						}
 					}
 	    		}
+	    		entrustIds.add(dto.getEntrustId());
 	    	}
     	}
 		logger.error("指令分发质押券详情：{}",JSONObject.toJSONString(pledgelist));

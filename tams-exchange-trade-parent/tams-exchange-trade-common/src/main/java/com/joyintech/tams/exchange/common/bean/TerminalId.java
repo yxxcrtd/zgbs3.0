@@ -8,6 +8,11 @@ public class TerminalId {
     private String errorMsg;
     private String reportNo;//柜台报盘编号
 
+    /**
+     *       E 普通委托 I 综合委托
+     */
+    public String KeyType;
+
     public String getAccountId() {
         return accountId;
     }

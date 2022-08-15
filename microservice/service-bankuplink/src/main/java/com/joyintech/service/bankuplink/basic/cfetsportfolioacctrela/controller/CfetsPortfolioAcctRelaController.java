@@ -13,6 +13,11 @@ package com.joyintech.service.bankuplink.basic.cfetsportfolioacctrela.controller
 import java.util.ArrayList;
 import java.util.Map;
 
+import com.joyintech.background.component.common.pack.common.constant.DictCodeList;
+import com.joyintech.framework.base.entity.ProcessMark;
+import com.joyintech.framework.util.EncryptUtil;
+import com.joyintech.framework.util.JsonUtils;
+import com.joyintech.workflow.engine.WorkflowContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -81,7 +86,18 @@ public class CfetsPortfolioAcctRelaController {
     	String portfolioIds = dto.getPortfolioId();
     	for(String portfolioId:portfolioIds.split(",")) {
     		dto.setPortfolioId(portfolioId);
+            dto.setPortfolioIdMd5(EncryptUtil.getInstance().md5(dto.getPortfolioId()));
     		cfetsPortfolioAcctRelaService.doInsert(dto);
+    		// 处理为留痕dto
+            ProcessMark processMark = WorkflowContext.getProcessMarkService().getParameterByAnnotation(dto);
+            // 设置工作流
+            processMark.setWorkflowId(dto.getWorkflowId());
+            // 设置画面ID
+            processMark.setPageId("CfetsPortfolioAcctRela002");
+            processMark.setStatus(DictCodeList.数据状态_新建.getValue());
+            // 业务entity
+            processMark.setBusinessData(JsonUtils.object2Json(dto));
+            WorkflowContext.getProcessMarkService().insertIntoProcessMark(processMark);
     	}
     }
 

@@ -4,6 +4,8 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.BeanValidator;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
+import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
@@ -11,6 +13,7 @@ import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.trade.exchangetransmatch.manualmatch.dto.ExchangeTransMatch002Dto;
 import com.joyintech.tams.invest.trade.exchangetransmatch.manualmatch.dto.ExchangeTransMatch003Dto;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -18,6 +21,10 @@ import java.util.List;
 
 @Component
 public class ExchangeTransMatchValidator implements BeanValidator {
+
+    @Autowired
+    private EtrEntrustMapper etrEntrustMapper;
+
     @Override
     public List<ValidMessage> valid(Object entity) {
         ArrayList<ValidMessage> errorList = new ArrayList<ValidMessage>();// 生成错误集合
@@ -41,8 +48,15 @@ public class ExchangeTransMatchValidator implements BeanValidator {
                 if(!StringUtil.isEmptyList(dealDto.getEntrustList()) && dealDto.getEntrustList().size()>1){
                     errorList.add(new ValidMessage("协议回购时只能选择一条指令进行匹配!"));
                 }else if(!StringUtil.isEmptyList(dealDto.getEntrustList()) && dealDto.getEntrustList().size()==1){
-                    if(dealDto.getRemainNum().compareTo(dealDto.getEntrustList().get(0).getEntrustAmt())>0){
-                        errorList.add(new ValidMessage("不符合协议回购匹配规则!"));
+                    EtrEntrust entrust = etrEntrustMapper.selectByPrimaryKey(dealDto.getEntrustList().get(0).getEntrustId());
+                    if(DictCodeListExt3.上农商_指令业务类型_协议回购中途换券指令.getValue().equals(entrust.getEntrustType())){
+                        if(dealDto.getRemainNum().compareTo(dealDto.getEntrustList().get(0).getEntrustNum())>0){
+                            errorList.add(new ValidMessage("不符合协议回购匹配规则!"));
+                        }
+                    }else{
+                        if(dealDto.getRemainNum().compareTo(dealDto.getEntrustList().get(0).getEntrustAmt())>0){
+                            errorList.add(new ValidMessage("不符合协议回购匹配规则!"));
+                        }
                     }
                 }
             }

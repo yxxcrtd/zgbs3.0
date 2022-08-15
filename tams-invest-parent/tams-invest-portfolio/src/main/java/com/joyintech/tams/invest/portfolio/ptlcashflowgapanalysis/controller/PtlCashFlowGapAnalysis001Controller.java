@@ -2,13 +2,13 @@ package com.joyintech.tams.invest.portfolio.ptlcashflowgapanalysis.controller;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
-import com.joyintech.framework.grid.Page; 
+import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.select.SelectDto;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.RequestUtil;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.invest.portfolio.ptlcashflowgapanalysis.dto.PtlCashFlowGapAnalysis001Dto;
 import com.joyintech.tams.invest.portfolio.ptlcashflowgapanalysis.service.PtlCashFlowGapAnalysis001Service;
@@ -43,12 +43,8 @@ public class PtlCashFlowGapAnalysis001Controller extends BaseController {
      */
     @Override
     public String init(Model model) {
-        this.setSelectOptionToModel(model, DictCode.金额显示精度);
-        this.setSelectOptionToModel(model, DictCode.币种);
-        this.setSelectOptionToModel(model, DictCode.平安业务类型);
-        this.setSelectOptionToModel(model, DictCode.金融产品类型_投管用);
-        this.setSelectOptionToModel(model, DictCode.交易方向);
-        this.setSelectOptionToModel(model, DictCode.组合系列);
+        // 初始化参数字典
+        this.fromDataDic(model);
         PtlCashFlowGapAnalysis001Dto dto = new PtlCashFlowGapAnalysis001Dto();
         dto.setDisplayAccuracy("01");
         dto.setCcy("CNY"); 
@@ -59,6 +55,33 @@ public class PtlCashFlowGapAnalysis001Controller extends BaseController {
 
         model.addAttribute("platDate", DateUtil.format(iPlatformDate.getSysDate()) + " - " + DateUtil.format(iPlatformDate.getSysDate()));
         return super.init(model);
+    }
+
+    /**
+     * 初始化参数字典
+     *
+     * @param model
+     * @author jiangpeng
+     * @date 2022/8/5 15:53
+     */
+    private void fromDataDic(Model model) {
+        this.setSelectOptionToModel(model, DictCode.金额显示精度, DictCode.币种, DictCode.平安业务类型, DictCode.交易方向, DictCode.组合系列);
+        //添加数据字典
+        SelectDto selectTgDto = this.getSelectDataFromDataDic(DictCode.金融产品类型_投管用, null);
+        SelectDto selectPaDto = this.getSelectDataFromDataDic(DictCode.平安业务类型, null);
+        if (selectPaDto != null && !StringUtil.isEmptyList(selectPaDto.getOptions())) {
+            List<SelectOptionDto> options = selectPaDto.getOptions();
+            for (int index = options.size() - 1; index >= 0; index--) {
+                SelectOptionDto option = options.get(index);
+                // 去除不需要的字典类型
+                if (StringUtil.equals(option.getId(), DictCodeListExt1.平安业务类型_资金划拨银证转账.getValue())
+                        || StringUtil.equals(option.getId(), DictCodeListExt1.平安业务类型_资金划拨证银转账.getValue())) {
+                    selectTgDto.getOptions().add(option);
+                }
+            }
+            List<SelectOptionDto> resultIptions = selectTgDto.getOptions();
+            model.addAttribute("FINPROD_TYPE_TG", JsonUtils.objectArray2Json(resultIptions.toArray()));
+        }
     }
     
     /**

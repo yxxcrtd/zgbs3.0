@@ -408,7 +408,7 @@ public class TerminalAgent extends Agent implements ITerminalMsgHandler, ITermin
         if (!serverExtendInfoSet.contains(serverExtendInfo)) {
             tradeRequest.init(this, serverExtendInfo, this);
             // 如果是金正柜台，则判断连接是否建立，若没有建立，则账号下次登录也需要重新建立连接
-            if (AgentType.KINGDOM_KCBP.value.equals(agentType)) {
+            if (AgentType.KINGDOM_KCBPW.value.equals(agentType)) {
                 KCBPTradeClient kcbpTradeClient = (KCBPTradeClient) tradeRequest;
                 if (kcbpTradeClient.isConnectionFlag(serverExtendInfo)) {
                     serverExtendInfoSet.add(serverExtendInfo);

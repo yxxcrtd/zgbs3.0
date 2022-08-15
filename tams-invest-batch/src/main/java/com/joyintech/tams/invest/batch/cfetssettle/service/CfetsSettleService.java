@@ -559,6 +559,7 @@ public class CfetsSettleService extends BaseService {
         pageParam.put("PS_T02", DictCodeList.交易方向_卖出.getValue());
 
         pageParam.put("FINPROD_TYPE_TG_F03", DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
+        pageParam.put("notAssetType", Arrays.asList(DictCodeListExt1.金融产品类型_投管用_债券借贷融入.getValue(), DictCodeListExt1.金融产品类型_投管用_债券借贷融出.getValue()));
 
         //查询待交收数据List
         List<CfetsSettleAllInfoDto> cfetsSettleDtoList = cfetsSettleMapper.selectAllSettleToDoList(pageParam);

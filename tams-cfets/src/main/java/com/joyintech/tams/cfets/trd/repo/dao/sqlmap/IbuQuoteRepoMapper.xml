@@ -145,7 +145,7 @@
     </resultMap>
 
     <select id="listEntrust" resultMap="resultMap">
-        SELECT *
+        SELECT distinct *
         FROM (
             SELECT ETR_ENTRUST.ENTRUST_STATUS                                                                 entrustStatus/*指令状态*/
                 , (NVL(T5.FINISH_AMT,0)+NVL(T7.ENT_FINISH_AMT,0))                                             finishAmt/*已完成额度(元)*/
@@ -159,7 +159,8 @@
                     - NVL(T5.FINISH_AMT,0) - NVL(T7.ENT_FINISH_AMT,0) - NVL(ETR_ENTRUST_ADD.CLOSE_AMT,0)      avaNum/*剩余指令额度(元)*/
                 </if>
                 , ROUND(NVL(C2.totalShareAmt,0))                                                              finishDealAmt/*已成交额度(元)*/
-                , ROUND(NVL(ETR_ENTRUST.ENTRUST_AMT, 0) - NVL(C2.totalShareAmt,0))                            avaDealAmt/*剩余成交额度(元)*/
+                , ROUND(NVL(ETR_ENTRUST.ENTRUST_AMT, 0) - NVL(C2.totalShareAmt,0) - NVL(ETR_ENTRUST_ADD.CLOSE_AMT,0))
+                                                                                                              avaDealAmt/*剩余成交额度(元)*/
                 , trunc(nvl(NVL(T5.FINISH_AMT, 0)+
                                        NVL(T7.ENT_FINISH_AMT, 0),0)/(ETR_ENTRUST.ENTRUST_AMT),4)*100          transactioncom/*执行进度(%)*/
                 , trunc(NVL(C2.totalShareAmt,0)/(ETR_ENTRUST.ENTRUST_AMT),4)*100                              tradeFinishPercent/* 成交进度(%)*/
@@ -323,7 +324,7 @@
         <if test="repo_pledge_model != null and repo_pledge_model.equals('03')">
             LEFT JOIN ETR_SEC_STOCK ON ETR_SEC_STOCK.PLEDGE_STOCK_ID = ETR_ENTRUST_ADD.PLEDGE_STOCK_ID
         </if>
-            LEFT JOIN (select sum(SHARE_AMT) totalShareAmt,tpda.ENTRUST_ID
+            LEFT JOIN (select sum(TRADE_AMT) totalShareAmt,tpda.ENTRUST_ID
                         from TRD_PRODUCT_DEAL tpd
                         left join TRD_PRODUCT_DEAL_ADD tpda on tpd.TRADE_ID = tpda.TRADE_ID
                         where tpd.IS_CANCEL = 'N' and tpd.TRADE_STATUS = '01'
@@ -526,9 +527,9 @@
             SELECT  ENTRUST_ID bussId
                    ,FINPROD_ID pledgeId
                    ,PLEDGE_FACE_VALUE
-                   ,PLEDGE_NUMBER
+                   ,( PLEDGE_NUMBER - nvl(CLOST_NUMBER,0) ) PLEDGE_NUMBER
                    ,PLEDGE_RATIO
-                   ,PLEDGE_NUMBER*100
+                   ,( PLEDGE_NUMBER - nvl(CLOST_NUMBER,0) )*100
             FROM ETR_PLEDGE
             WHERE
                 <if test="entrustIdList != null and entrustIdList.size() > 0">
@@ -686,15 +687,16 @@
             from (
                      select ep.ENTRUST_ID
                            ,ep.FINPROD_ID
-                           ,(nvl(ep.PLEDGE_NUMBER,0) - nvl(wrfp.PLEDGE_NUMBER,0) - nvl(rfp.PLEDGE_NUMBER,0)) PLEDGE_NUMBER
+                           ,(nvl((ep.PLEDGE_NUMBER - nvl(ep.CLOST_NUMBER,0) ),0) - nvl(wrfp.PLEDGE_NUMBER,0) - nvl(rfp.PLEDGE_NUMBER,0)) PLEDGE_NUMBER
                            ,ep.PLEDGE_RATIO
                      from ETR_PLEDGE ep
                      left join WFL_REG_FIN_PLEDGE wrfp
                             on wrfp.PLEDGE_FINPROD_ID = ep.FINPROD_ID and ep.ENTRUST_ID = wrfp.ENTRUST_ID
-                     left join ( select t.ENTRUST_ID, t.PLEDGE_FINPROD_ID, t.PLEDGE_NUMBER
+                     left join ( select t.ENTRUST_ID, t.PLEDGE_FINPROD_ID,  sum(t.PLEDGE_NUMBER) PLEDGE_NUMBER
                                  from REG_FIN_PLEDGE t
                                  left join REG_FIN_PRODUCT_DEAL rfpd on t.TRADE_ID = rfpd.TRADE_ID
                                  where rfpd.IS_CANCEL = 'N'  and rfpd.TRADE_STATUS ='01'
+                                    group by t.ENTRUST_ID,t.PLEDGE_FINPROD_ID
                                  ) rfp on rfp.PLEDGE_FINPROD_ID = ep.FINPROD_ID and ep.ENTRUST_ID = rfp.ENTRUST_ID
                     <where>
                         <if test="entrustIdList != null and entrustIdList.size() > 0">
@@ -1227,9 +1229,9 @@
                     ENTRUST_ID bussId,
                     FINPROD_ID pledgeId,
                     PLEDGE_FACE_VALUE,
-                    PLEDGE_NUMBER,
+                    (PLEDGE_NUMBER - nvl(CLOST_NUMBER,0)) PLEDGE_NUMBER,
                     PLEDGE_RATIO,
-                    PLEDGE_NUMBER*100
+                    (PLEDGE_NUMBER - nvl(CLOST_NUMBER,0)) *100
                 FROM
                     ETR_PLEDGE
                 WHERE
@@ -1400,7 +1402,7 @@
     <select id="findEtrPrinByEtrIds" resultType="com.joyintech.tams.cfets.trd.repo.dto.RepoEntrustPledgeDto">
         select ENTRUST_ID entrustId, FINPROD_ID finprodId, sum(PLEDGE_NUMBER) avaPledgePrin
         from (
-                 select ENTRUST_ID, FINPROD_ID, PLEDGE_NUMBER
+                 select ENTRUST_ID, FINPROD_ID, ( PLEDGE_NUMBER - nvl(CLOST_NUMBER,0) ) PLEDGE_NUMBER
                  from ETR_PLEDGE ep
                 <where>
                     <if test="entrustIdList != null and entrustIdList.size() > 0">
@@ -1502,7 +1504,7 @@
              ) T
             LEFT JOIN IBU_PORTFOLIO_ACCT_RELA IPAR
                 ON T.PORTFOLIO_ID = IPAR.PORTFOLIO_ID AND IPAR.CFETS_ACCT_TYPE = '01'
-            group by IPAR.PARTY_ID,T.REPO_TERM,T.SETTLE_SPREED
+            group by IPAR.PARTY_ID,T.REPO_TERM,T.SETTLE_SPREED,T.CLOSE_AMT
     </select>
 
     <!--查询产品质押债券 证券账户-->
@@ -1543,7 +1545,7 @@
     </select>
     <!--有效-->
     <sql id="statusValid_01">
-        select '01'                                                                                       statusValid/*有效*/,
+        select distinct '01'                                                                                       statusValid/*有效*/,
                '04'                                                                                       quoteType/*交易类型*/,
                RFPDT.TRADE_DATE                                                                           tradeDate/*成交日期*/,
                RFPDT.ps                                                                                   ps/*本方方向*/,
@@ -1593,7 +1595,7 @@
     </sql>
     <!--撤销-->
     <sql id="statusValid_03">
-        select '03'                                                                                       statusValid/*有效*/,
+        select distinct '03'                                                                                       statusValid/*有效*/,
                '04'                                                                                       quoteType/*交易类型*/,
                RFPDT.TRADE_DATE                                                                           tradeDate/*成交日期*/,
                RFPDT.ps                                                                                   ps/*本方方向*/,
@@ -1642,7 +1644,7 @@
     </sql>
     <!--流程中-->
     <sql id="statusValid_04">
-        select '04'                                                                                        statusValid/*有效*/,
+        select distinct '04'                                                                                        statusValid/*有效*/,
                '04'                                                                                        quoteType/*交易类型*/,
                WRFPDT.TRADE_DATE                                                                           tradeDate/*成交日期*/,
                WRFPDT.ps                                                                                   ps/*本方方向*/,
@@ -2114,7 +2116,7 @@
 
     <sql id="sql_listDayReg">
         <!--非流程中登记数据-->
-        SELECT CASE
+        SELECT distinct CASE
                        WHEN RFPDT.IS_CANCEL = 'Y' THEN '03'
                        ELSE '01' END      validStatus,
                     RFPDT.QUOTE_TYPE       quoteType,
@@ -2187,7 +2189,7 @@
                 </if>
         UNION ALL
         <!--流程中数据-->
-        SELECT  '04'      validStatus,
+        SELECT  distinct '04'      validStatus,
                 RFPDT.QUOTE_TYPE       quoteType,
                 RFPDT.TRADE_AMT        tradeAmt,
                 RFPDT.RATE             rate,
@@ -2911,7 +2913,7 @@
     </select>
 
     <select id="selectFinshAmt" resultType="java.math.BigDecimal">
-        select nvl(sum(decode(deal.ps,#{PS_T01},deal.trade_amt,deal.share_amt)),0) as finishAmt
+        select nvl(sum(decode('01',#{sumTradeFlag},deal.trade_amt,deal.share_amt)),0) as finishAmt
         from trd_product_deal deal
         inner join trd_product_deal_add ad
         on deal.trade_id = ad.trade_id

@@ -39,6 +39,13 @@
      * 保存
      */
     var saveOrSubmitAction = function (operatorType) {
+        if (EXPORT_SHOW === '01') {
+            //select_counterTrader
+            $("#counterTrader").val($("#select_counterTrader").val());
+        } else {
+            //input_counterTrader
+            $("#counterTrader").val($("#input_counterTrader").val());
+        }
         var object = $.serializeToObject('#submitForm', true);
         object.operatorType = operatorType;
         object.isDzh = 'Y';

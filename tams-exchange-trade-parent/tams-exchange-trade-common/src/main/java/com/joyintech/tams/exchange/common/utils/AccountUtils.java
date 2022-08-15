@@ -9,8 +9,8 @@ public class AccountUtils {
         // 兼容投管字典类型和
         if (AccountType.UFX.value.equals(accountType) || AgentType.UFX.value.equals(accountType)) {
             return AgentType.UFX.value;
-        } else if (AccountType.KINGDOM_KCBP.value.equals(accountType) || AgentType.KINGDOM_KCBP.value.equals(accountType)) {
-            return AgentType.KINGDOM_KCBP.value;
+        } else if (AccountType.KINGDOM_KCBPW.value.equals(accountType) || AgentType.KINGDOM_KCBPW.value.equals(accountType)) {
+            return AgentType.KINGDOM_KCBPW.value;
         } else if (AccountType.JSD.value.equals(accountType) || AgentType.JSD.value.equals(accountType)) {
             return AgentType.JSD.value;
         } else if (AccountType.KDGateway.value.equals(accountType) || AgentType.KD_GATEWAY.value.equals(accountType)) {

@@ -1,0 +1,2 @@
+alter table SETTLE_TRANS_DATA_PLEDGE drop constraint PK_SETTLE_TRANS_DATA_PLEDGE cascade drop index;
+alter table SETTLE_TRANS_DATA_PLEDGE add constraint PK_SETTLE_TRANS_DATA_PLEDGE primary key (TRADE_ID, BRANCH, PLEDGE_FINPROD_ID) using index;

@@ -1008,12 +1008,12 @@
     </select>
 
     <select id="selectBasisByFinprodId" resultType="com.joyintech.tams.common.base.entity.FinCashCalcRule">
-        select fccr.FINPROD_ID, fccr.MARKET_BASIS, fccr.BASIS
+        select T.FINPROD_ID, T.MARKET_BASIS, T.BASIS
         from (
-        select row_number() over (PARTITION BY FINPROD_ID order by EFF_DATE desc ) num, CASH_ID
-        from FIN_CASH_CALC_RULE
-        where EFF_DATE <![CDATA[<=]]> #{sysDate} and FINPROD_ID = #{finprodId}) T
-        left join FIN_CASH_CALC_RULE fccr on fccr.CASH_ID = T.CASH_ID and T.num = 1
+            select row_number() over (PARTITION BY FINPROD_ID order by EFF_DATE desc ) num, CASH_ID,MARKET_BASIS,FINPROD_ID,BASIS
+            from FIN_CASH_CALC_RULE
+            where EFF_DATE <![CDATA[<=]]> #{sysDate} and FINPROD_ID = #{finprodId}) T
+        where T.num = 1
     </select>
     <select id="selectCfetsOprHisByEntrustId" resultType="com.joyintech.tams.business.common.dto.EtrEntrustOperHisDto">
         select his.ENTRUST_ID entrustId,sdl.ITEM_VALUE operType,to_char(his.OPER_TIME, 'yyyy-MM-dd') operDate,to_char(his.OPER_TIME, 'hh24:mi:ss') operTime,
@@ -1055,5 +1055,59 @@
           AND PSA.PORTFOLIO_ID = #{portfolioId}
           AND R.SECID = #{finprodId}
         AND ROWNUM = 1
+    </select>
+
+    <select id="selectCounterCapacctInfoList" resultType="com.joyintech.tams.common.base.entity.StlCapacctInfo">
+        SELECT DISTINCT
+        B.ACCT_NO as acctNo,
+        B.BUSI_ACCT_NO busiAcctNo,
+        B.CCY CCY,
+        A.ACCT_TYPE acctType,
+        B.ACCT_NAME as acctName,
+        B.OWN_DEPT stockExchangeNo,
+        '1' status,
+        B.ACC_PASS acctPwd,
+        B.TRADE_PASS tradePwd
+        FROM
+        MST_COUNTER_ACCT A, STL_CAPACCT_INFO B
+        <where>
+            A.COUNTER_ID = #{counterId}
+            <if test="acctType != null and !acctType.isEmpty()">
+                and A.ACCT_TYPE =#{acctType}
+            </if>
+            <!-- AND A.ACCT_TYPE = #{acctType}-->
+            AND A.ACCT_NO = B.ACCT_NO
+            AND A.IS_OPEN = '01'    /**add  by  张年  20190904 交易对手资金账户只能选择启用状态下的账户**/
+            AND A.CCY = B.CCY
+            <if test="ccy != null and !ccy.isEmpty()">
+                AND A.CCY = #{ccy}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectDVPCapacctInfoList" resultType="com.joyintech.tams.common.base.entity.StlCapacctInfo">
+            SELECT DISTINCT B.ACCT_NO   as acctNo,
+                            C.ACCT_NAME as acctName
+            FROM PTL_CAPACCT_INFO B
+            inner join
+                 STL_CAPACCT_INFO C on B.ACCT_NO = C.ACCT_NO
+              AND B.CCY = C.CCY , FIN_PRODUCT fp
+            WHERE B.PORTFOLIO_ID = #{portfolioId}
+               AND fp.FINPROD_ID = #{finprodId}
+               AND B.CCY = #{ccy}
+               AND B.ACCT_TYPE = decode(fp.REGIST_ORG,#{REGIST_ORG_02},#{ACCT_TYPE_A09},#{ACCT_TYPE_A10})
+    </select>
+
+    <select id="selectDVPCapacctInfoListByAcctId" resultType="com.joyintech.tams.common.base.entity.StlCapacctInfo">
+        SELECT DISTINCT B.ACCT_NO   as acctNo,
+        C.ACCT_NAME as acctName
+        FROM PTL_CAPACCT_INFO B
+        inner join
+        STL_CAPACCT_INFO C on B.ACCT_NO = C.ACCT_NO
+        AND B.CCY = C.CCY , STL_SEC_ACCT_INFO ssai
+        WHERE B.PORTFOLIO_ID = #{portfolioId}
+            AND ssai.SEC_ACCT_ID = #{secAcctId}
+            AND B.CCY = #{ccy}
+            AND B.ACCT_TYPE = decode(ssai.REGIST_ORG,#{REGIST_ORG_02},#{ACCT_TYPE_A09},#{ACCT_TYPE_A10})
     </select>
 </mapper>
