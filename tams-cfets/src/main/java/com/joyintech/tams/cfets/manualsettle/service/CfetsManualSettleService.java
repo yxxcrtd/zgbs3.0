@@ -93,6 +93,9 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
     private StlPayTempOrdersMapper stlPayTempOrdersMapper;
 
     @Autowired
+    private PaTrdProductDealMapper paTrdProductDealMapper;
+
+    @Autowired
     private IPlatformDate platformDateImpl;
 
     @Autowired
@@ -1208,8 +1211,33 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 autoPeriodCommonService.updateDealDataCancel(entity.getTradeId(), DictCodeList.是否_否.getValue());
                 // 划款指令从temp转到实际表
                 List<TrdProductTempDeal> list = trdProductTempDealMapper.selectByTotalTradeId(entity.getTradeId());
+                List<PaTrdProductDeal> paTrdProductDeals = new ArrayList<>();
                 if(CollectionUtils.isNotEmpty(list)) {
-                    List<String> tradeIds = list.stream().map(TrdProductTempDeal::getTradeId).collect(Collectors.toList());
+                    List<String> tradeIds = new ArrayList<>();
+                    list.forEach(item -> {
+                                tradeIds.add(item.getTradeId());
+                                PaTrdProductDeal paTrdProductDeal = new PaTrdProductDeal();
+                                paTrdProductDeal.setTradeId(item.getTradeId());
+                                if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+                                        && StringUtil.equals(item.getPs(), DictCodeList.交易方向_到期.getValue())) {
+                                    paTrdProductDeal.setPaBussType(DictCodeListExt1.平安业务类型_正回购到期.getValue());
+                                } else if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())
+                                        && StringUtil.equals(item.getPs(), DictCodeList.交易方向_到期.getValue())) {
+                                    paTrdProductDeal.setPaBussType(DictCodeListExt1.平安业务类型_逆回购到期.getValue());
+                                } else if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())
+                                        && StringUtil.equals(item.getPs(), DictCodeList.交易方向_收息.getValue())) {
+                                    paTrdProductDeal.setPaBussType(DictCodeListExt1.平安业务类型_债券中间收息.getValue());
+                                } else if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())
+                                        && StringUtil.equals(item.getPs(), DictCodeList.交易方向_还本.getValue())) {
+                                    paTrdProductDeal.setPaBussType(DictCodeListExt1.平安业务类型_债券中间还本.getValue());
+                                } else if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())
+                                        && StringUtil.equals(item.getPs(), DictCodeList.交易方向_到期.getValue())) {
+                                    paTrdProductDeal.setPaBussType(DictCodeListExt1.平安业务类型_债券到期.getValue());
+                                }
+                                paTrdProductDealMapper.deleteByPrimaryKey(paTrdProductDeal.getTradeId());
+                                paTrdProductDealMapper.insertSelective(paTrdProductDeal);
+                            }
+                    );
                     // 先删后插
                     stlPayOrdersMapper.deleteByTradeIds(tradeIds);
                     stlPayTempOrdersMapper.insertStlPayOrders(tradeIds);
@@ -1219,8 +1247,33 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 autoPeriodCommonService.insertDealDataFromTemp(entity.getTradeId());
                 // 划款指令从temp转到实际表
                 List<TrdProductTempDeal> list = trdProductTempDealMapper.selectByTotalTradeId(entity.getTradeId());
+                List<PaTrdProductDeal> paTrdProductDeals = new ArrayList<>();
                 if(CollectionUtils.isNotEmpty(list)) {
-                    List<String> tradeIds = list.stream().map(TrdProductTempDeal::getTradeId).collect(Collectors.toList());
+                    List<String> tradeIds = new ArrayList<>();
+                    list.forEach(item -> {
+                                tradeIds.add(item.getTradeId());
+                                PaTrdProductDeal paTrdProductDeal = new PaTrdProductDeal();
+                                paTrdProductDeal.setTradeId(item.getTradeId());
+                                if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
+                                        && StringUtil.equals(item.getPs(), DictCodeList.交易方向_到期.getValue())) {
+                                    paTrdProductDeal.setPaBussType(DictCodeListExt1.平安业务类型_正回购到期.getValue());
+                                } else if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())
+                                        && StringUtil.equals(item.getPs(), DictCodeList.交易方向_到期.getValue())) {
+                                    paTrdProductDeal.setPaBussType(DictCodeListExt1.平安业务类型_逆回购到期.getValue());
+                                } else if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())
+                                        && StringUtil.equals(item.getPs(), DictCodeList.交易方向_收息.getValue())) {
+                                    paTrdProductDeal.setPaBussType(DictCodeListExt1.平安业务类型_债券中间收息.getValue());
+                                } else if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())
+                                        && StringUtil.equals(item.getPs(), DictCodeList.交易方向_还本.getValue())) {
+                                    paTrdProductDeal.setPaBussType(DictCodeListExt1.平安业务类型_债券中间还本.getValue());
+                                } else if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券.getValue())
+                                        && StringUtil.equals(item.getPs(), DictCodeList.交易方向_到期.getValue())) {
+                                    paTrdProductDeal.setPaBussType(DictCodeListExt1.平安业务类型_债券到期.getValue());
+                                }
+                                paTrdProductDealMapper.deleteByPrimaryKey(paTrdProductDeal.getTradeId());
+                                paTrdProductDealMapper.insertSelective(paTrdProductDeal);
+                            }
+                    );
                     stlPayTempOrdersMapper.insertStlPayOrders(tradeIds);
                     logger.info("新增:划款指令从temp转到实际表 tradeIds:{}",tradeIds);
                 }

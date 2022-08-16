@@ -21,6 +21,7 @@ import com.joyintech.tams.invest.common.dto.period.trdbondduration.TrdBondDurDbI
 import com.joyintech.tams.invest.common.dto.period.trdrepoduration.RepoInfo;
 import com.joyintech.tams.invest.common.dto.period.trdrepoduration.TrdRepoDurationDto;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
+import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -348,17 +349,12 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
             for (WflStlPayOrders wflStlPayOrder : wflStlPayOrders) {
                 StlPayOrders stlPayOrder = new StlPayOrders();
                 BeanUtil.copyPropertiesIgnoreNull(stlPayOrder, wflStlPayOrder);
-                if(StringUtil.equals(trdProductDeal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())){
-                    paramMap.put("portfolioId", trdProductDealAdd.getPortfolioId());
-                    paramMap.put("secAcctId", trdProductDeal.getSecManageAcctId());
-                    paramMap.put("ccy", trdProductDeal.getCcy());
-                    stlPayOrder.setCounterAcctNo(joyinbusinessCommonService.selectDVPCapacctInfoListByAcctId(paramMap));
-                }else{
-                    paramMap.put("portfolioId", trdProductDealAdd.getPortfolioId());
-                    paramMap.put("secAcctId", trdProductDeal.getSecManageAcctId());
-                    paramMap.put("ccy", trdProductDeal.getCcy());
-                    stlPayOrder.setMyAcctNo(joyinbusinessCommonService.selectDVPCapacctInfoListByAcctId(paramMap));
-                }
+                paramMap.put("portfolioId", trdProductDealAdd.getPortfolioId());
+                paramMap.put("secAcctId", trdProductDeal.getSecManageAcctId());
+                paramMap.put("ccy", trdProductDeal.getCcy());
+                stlPayOrder.setCounterAcctNo(joyinbusinessCommonService.selectDVPCapacctInfoListByAcctId(paramMap));
+                stlPayOrder.setMyAcctNo(EtrCommonCashPositionDealService.select组合托管户(trdProductDealAdd.getPortfolioId(),
+                        trdProductDeal.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue()));
                 stlPayOrder.setIsNeedSend(DictCodeList.是否_否.getValue());
                 stlPayOrders.add(stlPayOrder);
             }
