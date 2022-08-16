@@ -39,7 +39,7 @@
         MST_CFETS_CUSTOMER_INFO.PARTY_ABBR mySideAbbr,
         <!-- 本方交易员 -->
         (SELECT
-        MST_CFETS_CUSTOMER_TRADER.TRADER_ID
+        distinct MST_CFETS_CUSTOMER_TRADER.TRADER_ID
         FROM
         MST_CFETS_CUSTOMER_TRADER
         INNER JOIN SYS_USER_ADD
@@ -61,7 +61,7 @@
         ) mySideTrader,
         <!-- 本方交易员名称 -->
         (SELECT
-        MST_CFETS_CUSTOMER_TRADER.TRADER_NAME
+        distinct MST_CFETS_CUSTOMER_TRADER.TRADER_NAME
         FROM
         MST_CFETS_CUSTOMER_TRADER
         INNER JOIN SYS_USER_ADD

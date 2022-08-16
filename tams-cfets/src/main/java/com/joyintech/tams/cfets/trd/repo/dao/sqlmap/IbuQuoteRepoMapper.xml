@@ -199,7 +199,7 @@
                 , MCCI.PARTY_ID                                                                               mySide/* 本方 */
                 , MCCI.PARTY_ABBR                                                                             mySideAbbr/* 本方名称 */
                 , (
-                    SELECT MST_CFETS_CUSTOMER_TRADER.TRADER_ID
+                    SELECT distinct MST_CFETS_CUSTOMER_TRADER.TRADER_ID
                     FROM MST_CFETS_CUSTOMER_TRADER
                     INNER JOIN SYS_USER_ADD
                     ON SYS_USER_ADD.ibu_trader = MST_CFETS_CUSTOMER_TRADER.TRADER_ID
@@ -211,7 +211,7 @@
                     FROM MST_CFETS_CUSTOMER_RELA
                     WHERE MST_CFETS_CUSTOMER_RELA.SPARTY_ID = MCCI.PARTY_ID))               mySideTrader /* 本方交易员 */
                 , (
-                    SELECT MST_CFETS_CUSTOMER_TRADER.TRADER_NAME
+                    SELECT distinct MST_CFETS_CUSTOMER_TRADER.TRADER_NAME
                     FROM MST_CFETS_CUSTOMER_TRADER
                     INNER JOIN SYS_USER_ADD
                     ON SYS_USER_ADD.ibu_trader = MST_CFETS_CUSTOMER_TRADER.TRADER_ID
