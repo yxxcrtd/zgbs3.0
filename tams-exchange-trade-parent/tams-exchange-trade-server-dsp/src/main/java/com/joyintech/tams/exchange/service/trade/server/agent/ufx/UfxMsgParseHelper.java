@@ -251,7 +251,7 @@ public class UfxMsgParseHelper {
                     trade.setTradeType(TradeType.INVALID.value);
                 }
             } else {
-               // trade.setBrokerTradeId((String) ds.get("business_id"));
+                // trade.setBrokerTradeId((String) ds.get("business_id"));
                 if (2 == realType) {
                     trade.setTradeType(TradeType.CANCEL.value);
                 } else if (0 == realType) {
@@ -882,7 +882,14 @@ public class UfxMsgParseHelper {
 
             receiveBean.setRequestTime((String) (ds.get("init_date")));
             //receiveBean.setRequestStatus(Integer.parseInt((String) ds.get("bondtrade_trans_status")));
-            receiveBean.setStockCode((String) (ds.get("stock_code")));
+            String exchangeType = (String) ds.get("exchange_type");
+            String market = "";
+            if (ExchangeType.SH.value.equals(exchangeType)) {
+                market = Market.SHSE.value;
+            } else if (ExchangeType.SZ.value.equals(exchangeType)) {
+                market = Market.SZSE.value;
+            }
+            receiveBean.setStockCode(((String) (ds.get("stock_code"))) + "." + market);
             receiveBean.setStockName((String) (ds.get("stock_name")));
             receiveBean.setBs((String) (ds.get("entrust_bs")));
             receiveBean.setAmount(BigDecimal.valueOf(Double.parseDouble((String) ds.get("entrust_amount"))).intValue());

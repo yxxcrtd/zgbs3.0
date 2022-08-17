@@ -421,6 +421,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
                 for (Map<String, String> resMap : resList) {
                     entrust.setBrokerEntrustId(resMap.get("ordersno"));
                     entrust.setReportNo(AgentUtil.GetMapValue(resMap, "orderid"));
+                    // 缓存委托的ID
                     entrustIdManager.setKcbpwZHEntrustId(entrust.getAccountId(),
                             entrust.getBrokerEntrustId() + "|" + entrust.getReportNo(), entrust.getId());
                 }
@@ -462,9 +463,17 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
                 List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
                 for (Map<String, String> resMap : resList) {
                     cancelEntrustBean.setCancelBrokerEntrustId(resMap.get("ordersno"));
+                    // 撤销的orderid 优先取 orderid。没有取cancelorderid
+                    String orderid = AgentUtil.GetMapValue(resMap, "orderid");
+                    if (Strings.isNullOrEmpty(orderid)) {
+                        orderid = AgentUtil.GetMapValue(resMap, "cancelorderid");
+                    }
                     // 缓存被撤销与撤销的委托更新
                     entrustIdManager.setKcbpwPTCancelEntrustId(entrust.getAccountId(), entrust.getBrokerEntrustId(),
-                            resMap.get("ordersno"), AgentUtil.GetMapValue(resMap, "cancelorderid"));// resMap.get("orderid")
+                            resMap.get("ordersno"), orderid);
+                    // 缓存撤销的ID
+                    entrustIdManager.setKcbpwPTEntrustId(entrust.getAccountId(),
+                            cancelEntrustBean.getCancelBrokerEntrustId() + "|" + entrust.getReportNo(), cancelEntrustBean.getCancelId());
                 }
             } else {
                 cancelEntrustBean.setErrorCode(resultBean.getErrorCode());
@@ -553,6 +562,9 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
                     if (Strings.isNullOrEmpty(orderid)) {
                         orderid = AgentUtil.GetMapValue(resMap, "cancelorderid");
                     }
+                    // 410413 竞价与综合共用此接口
+                    // if (entrustProp == "Bulk") {}
+
                     // 缓存被撤销与撤销的委托更新
                     entrustIdManager.setKcbpwZHCancelEntrustId(integratedEntrust.getAccountId(), integratedEntrust.getBrokerEntrustId(),
                             resMap.get("ordersno"), orderid);
@@ -1141,7 +1153,20 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
         // 废单成交将成交转换为委托推送 -- 返回废单原因
         if (TradeType.isInvalid(trade.getTradeType())) {
             if (flag) {
+                // 410411 410413 410510 410436竞价与综合共用此接口.
                 Entrust entrust = new Entrust();
+                // 获取取消的ordersNo、orderId
+                String ordersNoAndorderId = entrustIdManager.getKcbpwPTCancelEntrustId(kcbpAccount.getAccountId(), trade.getBrokerEntrustId());
+                if (!Strings.isNullOrEmpty(ordersNoAndorderId)) {
+                    String[] OAO = ordersNoAndorderId.split("\\|");
+                    // 修改成撤销的委托编号，同时要把下单的委托状态从部成待撤还原成部成。部成的记录错误信息撤单失败
+                    trade.setBrokerEntrustId(OAO[0]);
+                    // entrustIdManager.getKcbpwPTEntrustId(trade.getAccountId(), "111|0500000011")
+                    // 获取取消的ordersNo、orderId
+                    trade.setEntrustId(entrustIdManager.getKcbpwPTEntrustId(trade.getAccountId(), trade.getBrokerEntrustId() + "|" + trade.getReportNo()));
+                    trade.setReportNo(OAO[1]);
+                }
+
                 BeanUtils.copyProperties(trade, entrust);
                 entrust.setId(trade.getEntrustId());
                 entrust.setEntrustStatus(EntrustStatus.INVALID.value);
@@ -1160,7 +1185,11 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
                 String ordersNoAndorderId = null;
                 // 撤单成功
                 if (flag) {
+                    // 410411 410413 410510 410436竞价与综合共用此接口.
                     ordersNoAndorderId = entrustIdManager.getKcbpwPTCancelEntrustId(kcbpAccount.getAccountId(), trade.getBrokerEntrustId());
+                    if (Strings.isNullOrEmpty(ordersNoAndorderId)) {
+                        ordersNoAndorderId = entrustIdManager.getKcbpwZHCancelEntrustId(kcbpAccount.getAccountId(), trade.getBrokerEntrustId());
+                    }
                 } else {
                     ordersNoAndorderId = entrustIdManager.getKcbpwZHCancelEntrustId(kcbpAccount.getAccountId(), trade.getBrokerEntrustId());
                 }
@@ -1190,10 +1219,25 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
                 return;
             }
             entrustList.forEach(entrust -> {
+                // 可执行标识
+                Boolean flag = false;
+
                 //可能不存在id，用前缀区分普通和综合
                 String key = entrustPrefix + "_" + entrust.getId() + "_" + entrust.getBrokerEntrustId() + "_" + entrust.getAccountId();
                 Integer entrustStatus = entrustIdAndStatusMap.get(key);
                 if (Objects.isNull(entrustStatus) || entrustStatus != entrust.getEntrustStatus()) {
+                    flag = true;
+                } else {
+                    if (EntrustStatus.PART_SUCCESS.value == entrust.getEntrustStatus()) {
+                        String ordersNoAndorderId = entrustIdManager.getKcbpwPTCancelEntrustId(kcbpAccount.getAccountId(), entrust.getBrokerEntrustId());
+                        if (!Strings.isNullOrEmpty(ordersNoAndorderId)) {
+                            entrust.setErrorMsg("柜台部撤失败");
+                            flag = true;
+                        }
+                    }
+                }
+
+                if (flag) {
                     logger.info("委托[{}]新增或状态发生变更，推送委托。oldEntrustStatus [{}]  newEntrustStatus [{}]", key, entrustStatus, entrust.getEntrustStatus());
                     logger.info("onEntrust {}", JsonUtils.getJsonFromObject(entrust));
                     onRtnEntrust(entrust);

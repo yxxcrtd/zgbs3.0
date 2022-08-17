@@ -41,7 +41,18 @@ public class NegotiateQuoteQueryBean {
 
     @ApiModelProperty(name = "pageSize", value = "记录数", example = "1000")
     private int pageSize;
-    
+
+	@ApiModelProperty(name = "execId", value = "交易系统执行编号")
+	private String execId;
+
+	public String getExecId() {
+		return execId;
+	}
+
+	public void setExecId(String execId) {
+		this.execId = execId;
+	}
+
 	public int getRequestStatus() {
 		return requestStatus;
 	}
