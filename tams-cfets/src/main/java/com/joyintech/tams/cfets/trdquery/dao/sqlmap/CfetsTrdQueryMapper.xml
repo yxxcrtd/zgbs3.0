@@ -763,7 +763,7 @@
         select distinct
         reg.ou_party_id as traderid,
         m1.PARTY_ABBR as traderidStr,
-        COALESCE (sua.IBU_TRADER, su.real_name, reg.ou_trader_id) AS trader,
+        nvl(su.real_name,reg.ou_trader_id) AS trader,
         reg.counter_id as counterId,
         m2.counter_name as counterIdStr,
         nvl(su1.TRADER_NAME,reg.counter_trader)  as counterTrader,
