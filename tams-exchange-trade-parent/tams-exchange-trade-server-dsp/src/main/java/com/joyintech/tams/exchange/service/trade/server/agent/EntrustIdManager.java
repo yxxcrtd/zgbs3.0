@@ -244,13 +244,12 @@ public class EntrustIdManager {
      *
      * @param accountId
      * @param brokeEntrustId
-     * @param ordersNo
-     * @param orderId
+     * @param id
      */
-    public void setKcbpwPTEntrustId(String accountId, String brokeEntrustId, String ordersNo, String orderId) {
+    public void setKcbpwPTEntrustId(String accountId, String brokeEntrustId, String id) {
         // "ordersno": "3", "orderid": "B200000004",
         String key = getKey(KCBPW_PT_Prefix, accountId, brokeEntrustId);
-        String value = ordersNo + "|" + orderId;
+        String value = id;
         if (Strings.isNullOrEmpty(brokeEntrustId)) {
             logger.info("brokeEntrustId is empty: id = {}", brokeEntrustId);
             return;

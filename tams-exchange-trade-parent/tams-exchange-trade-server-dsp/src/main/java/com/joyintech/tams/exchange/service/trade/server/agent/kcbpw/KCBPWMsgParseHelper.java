@@ -42,11 +42,22 @@ public class KCBPWMsgParseHelper {
             // entrust.setId(entrustIdManager.getIdByLocalEntrustId(accountId, resMap.get("ordergroup")));
             entrust.setReportNo(resMap.get("orderid"));
             entrust.setBrokerEntrustId(resMap.get("ordersno"));
+            String key = entrust.getBrokerEntrustId() + "|" + entrust.getReportNo();
             if ("410510".equals(tradeCode)) {
+                // 410411 410413 410510 410436竞价与综合共用此接口
+                // 1
                 entrust.setId(entrustIdManager.getIdByLocalEntrustId(accountId, resMap.get("ordergroup")));
+                // 2
+                if (Strings.isNullOrEmpty(entrust.getId())) {
+                    // 获取部撤的委托ID"ordersno": "111" == "ordergroup": "111", 部撤没有有效ordergroup
+                    entrust.setId(entrustIdManager.getKcbpwPTEntrustId(accountId, key));
+                    // 3
+                    if (Strings.isNullOrEmpty(entrust.getId())) {
+                        entrust.setId(entrustIdManager.getKcbpwZHEntrustId(accountId, key));
+                    }
+                }
             } else {
-                String brokeEntrustId = entrust.getBrokerEntrustId() + "|" + entrust.getReportNo();
-                entrust.setId(entrustIdManager.getKcbpwZHEntrustId(accountId, brokeEntrustId));
+                entrust.setId(entrustIdManager.getKcbpwZHEntrustId(accountId, key));
             }
             entrust.setFinanceAccount(resMap.get("fundid"));
             entrust.setBsFlag(resMap.get("bsflag"));
@@ -119,11 +130,15 @@ public class KCBPWMsgParseHelper {
             trade.setReportNo(resMap.get("orderid"));
             trade.setBrokerEntrustId(resMap.get("ordersno"));
             trade.setLocalEntrustId(resMap.get("ordergroup"));
+            String key = trade.getBrokerEntrustId() + "|" + trade.getReportNo();
             if ("410436".equals(tradeCode)) {
+                // 410411 410413 410510 410436竞价与综合共用此接口
                 // trade.setEntrustId(entrustIdManager.getIdByLocalEntrustId(accountId, resMap.get("ordergroup")));
+                // if (Strings.isNullOrEmpty(trade.getEntrustId())) {
+                //  trade.setEntrustId(entrustIdManager.getKcbpwZHEntrustId(accountId, key));
+                // }
             } else {
-                String brokeEntrustId = trade.getBrokerEntrustId() + "|" + trade.getReportNo();
-                //trade.setEntrustId(entrustIdManager.getKcbpwZHEntrustId(accountId, brokeEntrustId));
+                //trade.setEntrustId(entrustIdManager.getKcbpwZHEntrustId(accountId, key));
             }
             // trade.setFinanceAccount(resMap.get("fundid"));
             trade.setBsFlag(resMap.get("bsflag"));
@@ -146,10 +161,10 @@ public class KCBPWMsgParseHelper {
 //            trade.setBrokerTradeId(resMap.get("matchcode"));
             if (realStatus != 0 && realStatus != 1) {
                 //  废单 有正常的委托，也有撤销的委托
-               // trade.setBrokerTradeId((String) resMap.get("ordersno"));
+                // trade.setBrokerTradeId((String) resMap.get("ordersno"));
 //                trade.setBrokerTradeId((String) resMap.get("orderid"));
             } else {
-               // trade.setBrokerTradeId(resMap.get("matchcode"));
+                // trade.setBrokerTradeId(resMap.get("matchcode"));
                 // 成交 有正常的委托，也有撤销的委托
 //                if (realStatus == 0)
 //                    trade.setBrokerTradeId((String) resMap.get("orderid"));
@@ -165,6 +180,10 @@ public class KCBPWMsgParseHelper {
 //                }
 //            }
             trade.setBrokerTradeId((String) resMap.get("matchcode"));
+            // 忽略撤单的废单的无效成交记录
+//            if (Strings.isNullOrEmpty(trade.getBrokerTradeId())) {
+//                continue;
+//            }
             if (Strings.isNullOrEmpty(trade.getBrokerTradeId())) {
                 trade.setBrokerTradeId((String) resMap.get("ordersno"));
             }
