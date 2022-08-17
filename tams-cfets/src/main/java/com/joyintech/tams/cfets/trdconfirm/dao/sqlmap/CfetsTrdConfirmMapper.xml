@@ -1230,7 +1230,7 @@
         I.quoteid as quoteid,
         I.ourinstitutioncode as traderid,
         mccit.PARTY_ABBR as traderidName,
-        su.real_name trader,
+        nvl(TRADER_NAME,su.real_name) trader,
         I.Counterinstitutioncode as counterId,
         mccic.PARTY_ABBR as counterIdName,
         decode(I.Clearingmethod,'13','01','6','02') as clearType,
@@ -1253,6 +1253,7 @@
         on ts.SECID=fp.finprod_market_id
         and fp.finprod_type='F01'
         LEFT JOIN SYS_USER_ADD sua ON nvl(ts.TRAD,tr.BUYTRADER) =sua.IBU_TRADER
+        LEFT JOIN MST_CFETS_CUSTOMER_TRADER mcct ON nvl(ts.TRAD,tr.BUYTRADER) =mcct.TRADER_ID
         LEFT JOIN SYS_USER su ON sua.USER_ID =su.USER_ID
        <!-- LEFT JOIN (
         SELECT distinct i.EXECID ,nvl(iqb.QUOTE_ID,iqc.QUOTE_ID) QUOTEID
