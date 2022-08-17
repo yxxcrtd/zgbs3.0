@@ -55,7 +55,7 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<hibernate.version>5.3.33</hibernate.version>
 		<!--<jackson.version>2.9.2</jackson.version>-->
-		<framework.version>0.0.5.8</framework.version>
+		<framework.version>0.0.5.9</framework.version>
 		<logback.version>1.3.0-alpha9</logback.version>
 		<slf4j.version>2.0.0-alpha4</slf4j.version>
 	</properties>
