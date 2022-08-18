@@ -1,7 +1,7 @@
 -- 删除数据
 delete from t_terminal_agent_info where agent_type='kcbp' or  agent_type='kcbpw';
 -- 导入数据
- 
+
 insert into t_terminal_agent_info (ID, AGENT_TYPE, FUNCTION_CODE, ENTRUST_PROP, QUOTE_TYPE, MARKET, ENTRUST_BS, CREATE_TIME, GP_CODE, TRIGGER_CODE, REMARK, STATUS)
 values (1, 'kcbp', 4, null, null, null, null, to_date('13-10-2021 16:27:13', 'dd-mm-yyyy hh24:mi:ss'), 'GZYH', 'GZ_KCBP_410301', '登录资金账号', 1);
 
@@ -154,28 +154,28 @@ values (50, 'kcbp', 411552, null, null, null, null, to_date('14-10-2021 09:41:34
 
 insert into t_terminal_agent_info (ID, AGENT_TYPE, FUNCTION_CODE, ENTRUST_PROP, QUOTE_TYPE, MARKET, ENTRUST_BS, CREATE_TIME, GP_CODE, TRIGGER_CODE, REMARK, STATUS)
 values (51, 'kcbp', 11, null, 2, null, null, to_date('23-03-2022 15:52:32', 'dd-mm-yyyy hh24:mi:ss'), 'GZYH', 'GZ_KCBP_410559', '深圳盘后固定价格交易行情查询', 1);
- 
+
 
 insert into t_terminal_agent_info (ID, AGENT_TYPE, FUNCTION_CODE, ENTRUST_PROP, QUOTE_TYPE, MARKET, ENTRUST_BS, CREATE_TIME, GP_CODE, TRIGGER_CODE, REMARK, STATUS)
-values (150, 'kcbp', 108, 'BondOrderSZ', null, null, null, str_to_date('2022-02-16 10:22:24', '%Y-%m-%d %T'), 'GZYH', 'GZ_KCBP_410677', '深圳现券协商成交申报', 1);
- 
-insert into t_terminal_agent_info (ID, AGENT_TYPE, FUNCTION_CODE, ENTRUST_PROP, QUOTE_TYPE, MARKET, ENTRUST_BS, CREATE_TIME, GP_CODE, TRIGGER_CODE, REMARK, STATUS)
-values (151, 'kcbp', 108, 'BondAgreeSZ',null, null, null, str_to_date('2022-02-16 10:22:24', '%Y-%m-%d %T'), 'GZYH', 'GZ_KCBP_410678', '深圳现券协商成交申报回复', 1);
+values (150, 'kcbp', 108, 'BondOrderSZ', null, null, null, to_date('23-03-2022 15:52:32', 'dd-mm-yyyy hh24:mi:ss'), 'GZYH', 'GZ_KCBP_410677', '深圳现券协商成交申报', 1);
 
 insert into t_terminal_agent_info (ID, AGENT_TYPE, FUNCTION_CODE, ENTRUST_PROP, QUOTE_TYPE, MARKET, ENTRUST_BS, CREATE_TIME, GP_CODE, TRIGGER_CODE, REMARK, STATUS)
-values (152, 'kcbp', 109, 'BondOrderSZ', null, null, null, str_to_date('2022-02-16 10:22:24', '%Y-%m-%d %T'), 'GZYH', 'GZ_KCBP_410679', '深圳现券成交申报、现券竞买发起、现券竞买应价撤单', 1);
+values (151, 'kcbp', 108, 'BondAgreeSZ',null, null, null, to_date('23-03-2022 15:52:32', 'dd-mm-yyyy hh24:mi:ss'), 'GZYH', 'GZ_KCBP_410678', '深圳现券协商成交申报回复', 1);
 
 insert into t_terminal_agent_info (ID, AGENT_TYPE, FUNCTION_CODE, ENTRUST_PROP, QUOTE_TYPE, MARKET, ENTRUST_BS, CREATE_TIME, GP_CODE, TRIGGER_CODE, REMARK, STATUS)
-values (153, 'kcbp', 105, 'ProtocolBack', null, null, null, str_to_date('2022-02-16 10:22:24', '%Y-%m-%d %T'), 'GZYH', 'GZ_KCBP_410680', '深圳现券协商成交、竞买发起、竞买应价委托查询', 1);
+values (152, 'kcbp', 109, 'BondOrderSZ', null, null, null, to_date('23-03-2022 15:52:32', 'dd-mm-yyyy hh24:mi:ss'), 'GZYH', 'GZ_KCBP_410679', '深圳现券成交申报、现券竞买发起、现券竞买应价撤单', 1);
 
 insert into t_terminal_agent_info (ID, AGENT_TYPE, FUNCTION_CODE, ENTRUST_PROP, QUOTE_TYPE, MARKET, ENTRUST_BS, CREATE_TIME, GP_CODE, TRIGGER_CODE, REMARK, STATUS)
-values (154, 'kcbp', 104, 'ProtocolBack', null, null, null, str_to_date('2022-02-16 10:22:24', '%Y-%m-%d %T'), 'GZYH', 'GZ_KCBP_410681', '深圳现券协商成交、竞买发起、竞买应价成交查询', 1);
+values (153, 'kcbp', 105, 'ProtocolBack', null, null, null, to_date('23-03-2022 15:52:32', 'dd-mm-yyyy hh24:mi:ss'), 'GZYH', 'GZ_KCBP_410680', '深圳现券协商成交、竞买发起、竞买应价委托查询', 1);
 
 insert into t_terminal_agent_info (ID, AGENT_TYPE, FUNCTION_CODE, ENTRUST_PROP, QUOTE_TYPE, MARKET, ENTRUST_BS, CREATE_TIME, GP_CODE, TRIGGER_CODE, REMARK, STATUS)
-values (155, 'kcbp', 130, 'BondConsultQuerySZ', null, null, null, str_to_date('2022-02-16 10:22:24', '%Y-%m-%d %T'), 'GZYH', 'GZ_KCBP_410682', '转发成交申报查询', 1);
- 
+values (154, 'kcbp', 104, 'ProtocolBack', null, null, null, to_date('23-03-2022 15:52:32', 'dd-mm-yyyy hh24:mi:ss'), 'GZYH', 'GZ_KCBP_410681', '深圳现券协商成交、竞买发起、竞买应价成交查询', 1);
 
--- 金证W柜台 修改名称 
+insert into t_terminal_agent_info (ID, AGENT_TYPE, FUNCTION_CODE, ENTRUST_PROP, QUOTE_TYPE, MARKET, ENTRUST_BS, CREATE_TIME, GP_CODE, TRIGGER_CODE, REMARK, STATUS)
+values (155, 'kcbp', 130, 'BondConsultQuerySZ', null, null, null, to_date('23-03-2022 15:52:32', 'dd-mm-yyyy hh24:mi:ss'), 'GZYH', 'GZ_KCBP_410682', '转发成交申报查询', 1);
+
+
+-- 金证W柜台 修改名称
 update t_terminal_agent_info set gp_code='KCBPW' ,agent_type='kcbpw' where gp_code='GZYH';
 update t_terminal_agent_info set TRIGGER_CODE=CONCAT('TG_KCBPW', substr(TRIGGER_CODE,8)) where agent_type='kcbpw';
  
