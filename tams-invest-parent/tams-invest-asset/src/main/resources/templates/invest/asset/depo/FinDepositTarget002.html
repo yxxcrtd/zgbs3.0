@@ -214,6 +214,15 @@
 											<span class="input-right-show">元</span>
 										</div>
 									</div>
+										<div class="form-inline-wrap" id="isInnerAdv_div">
+											<label class="layui-form-label form-label-wrap"
+												   data-th-text="#{FinDepositTarget002.isInnerAdv}">是否支持转仓</label>
+											<div class="layui-input-inline input-inline">
+												<input type="checkbox" th:id="isInnerAdv" th:name="isInnerAdv"
+													   lay-skin="switch" data-th-value="${YES}" lay-text="是|否" lay-filter="isInnerAdv"
+													   data-th-checked="${YES} ==${entity?.isInnerAdv}">
+											</div>
+										</div>
 									</div>
 									<div class="layui-form-item">
 									<div class="form-inline-wrap">
