@@ -24,8 +24,8 @@ import com.joyintech.service.bankuplink.common.dto.TrdBondInvestTradeDto;
 import com.joyintech.service.bankuplink.common.util.ProdTypeUtil;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
+import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
-import com.joyintech.tams.cfets.trd.repo.service.CfetsRepoQuotedPrice004Service;
 import com.joyintech.tams.cfets.trdconfirm.dao.CfetsTrdConfirmMapper;
 import com.joyintech.tams.cfets.trdconfirm.dto.*;
 import com.joyintech.tams.cfets.trdquery.dao.CfetsTrdQueryMapper;
@@ -113,8 +113,6 @@ public class CfetsTrdConfirmService extends BaseService {
     @Autowired
     private MstWorkflowCommonService mstWorkflowCommonService;
 
-    @Autowired
-    private CfetsRepoQuotedPrice004Service cfetsRepoQuotedPrice004Service;
 
     /**
      * 公共方法service
@@ -2491,7 +2489,7 @@ public class CfetsTrdConfirmService extends BaseService {
                     str.append(",证券账户");
                 }
                 if (StringUtil.isNotEmpty(regInfo.getYield()) && StringUtil.isNotEmpty(cstpInfo.getTradeYield())
-                        && cfetsRepoQuotedPrice004Service.ACompareToB(regInfo.getYield(), cstpInfo.getTradeYield(), 4) != 0) {
+                        && BigDecimalUtil.ACompareToB(regInfo.getYield(), cstpInfo.getTradeYield(), 4) != 0) {
                     str.append(",净价/到期收益率");
                 }
                 if (StringUtil.isNotEmpty(regInfo.getFaceValue()) && StringUtil.isNotEmpty(cstpInfo.getLastqty())
@@ -2514,7 +2512,7 @@ public class CfetsTrdConfirmService extends BaseService {
                 //判断可选要素是否一致
                 StringBuilder validateStr = new StringBuilder();
                 if (StringUtil.isNotEmpty(regInfo.getTradeAmt()) && StringUtil.isNotEmpty(cstpInfo.getTradeAmt())
-                        && cfetsRepoQuotedPrice004Service.ACompareToB(regInfo.getTradeAmt(), cstpInfo.getTradeAmt(), 2) != 0) {
+                        && BigDecimalUtil.ACompareToB(regInfo.getTradeAmt(), cstpInfo.getTradeAmt(), 2) != 0) {
                     validateStr.append("结算金额要素不一致（结算金额：CSTP成交数据为").append(cstpInfo.getTradeAmt())
                             .append(",交易执行数据为").append(regInfo.getTradeAmt()).append(", 将以接口数据数据为准）,");
                 }
@@ -2556,7 +2554,7 @@ public class CfetsTrdConfirmService extends BaseService {
                         str.append(",证券账户");
                     }
                     if (StringUtil.isNotEmpty(regInfo.getRate()) && StringUtil.isNotEmpty(cstpInfo.getTradeYield())
-                            && cfetsRepoQuotedPrice004Service.ACompareToB(regInfo.getRate(), cstpInfo.getTradeYield(), 4) != 0) {
+                            && BigDecimalUtil.ACompareToB(regInfo.getRate(), cstpInfo.getTradeYield(), 4) != 0) {
                         str.append(",回购利率");
                     }
                     if (StringUtil.isNotEmpty(regInfo.getVsettleDate()) && StringUtil.isNotEmpty(cstpInfo.getVsettleDate())
@@ -3047,6 +3045,7 @@ public class CfetsTrdConfirmService extends BaseService {
         CfetsTrdConfirmRegInfoListResponse confirmDto=new CfetsTrdConfirmRegInfoListResponse();
         String dealType="999999";
         boolean isContinue = true, isUpdate = false, isInsert = false;
+        logger.info(" 1.CSTP下行成交回报数据的成交编号匹配已生成的银行间交易数据中的成交编号,根据cstp下行成交回报的成交编号，查询匹配关系 ");
         //1.CSTP下行成交回报数据的成交编号匹配已生成的银行间交易数据中的成交编号,根据cstp下行成交回报的成交编号，查询匹配关系
         CfetsTrdConfirmMatchDto matchDto=cfetsTrdConfirmMapper.selectMatchDtoByExecId(interfTradSecdeal.getFedealno());
         if(isContinue && null!=matchDto && StringUtil.isNotEmpty(matchDto.getPreTradeId())){
@@ -3148,9 +3147,9 @@ public class CfetsTrdConfirmService extends BaseService {
                 && StringUtil.equals(confirmDto.getPs(), interfTradSecdeal.getPs())
                 && StringUtil.equals(confirmDto.getSettleSpeed(), interfTradSecdeal.getSettleSpeed())
                 && StringUtil.equals(confirmDto.getSecManageAcctId(), interfTradSecdeal.getOurdepositaccountnumber())
-                && (cfetsRepoQuotedPrice004Service.ACompareToB(confirmDto.getYield(),interfTradSecdeal.getYield8(),4)==0 ||
-                cfetsRepoQuotedPrice004Service.ACompareToB(confirmDto.getUnitCprice(),interfTradSecdeal.getPrice8(),4)==0 )
-                && cfetsRepoQuotedPrice004Service.ACompareToB(confirmDto.getFaceValue(),interfTradSecdeal.getPrinamt(),2)==0
+                && (BigDecimalUtil.ACompareToB(confirmDto.getYield(),interfTradSecdeal.getYield8(),4)==0 ||
+                BigDecimalUtil.ACompareToB(confirmDto.getUnitCprice(),interfTradSecdeal.getPrice8(),4)==0 )
+                && BigDecimalUtil.ACompareToB(confirmDto.getFaceValue(),interfTradSecdeal.getPrinamt(),2)==0
                 && confirmDto.getSettleDate().compareTo(interfTradSecdeal.getSettdate())==0
                 && StringUtil.equals(confirmDto.getDeliveryType(), iCstpTrade.getDeliverytype())
         ) {
@@ -3412,10 +3411,10 @@ public class CfetsTrdConfirmService extends BaseService {
                && StringUtil.equals(confirmDto.getPs(), interfOpicsTradRepo.getPs())
                && StringUtil.equals(confirmDto.getSettleSpeed(), interfOpicsTradRepo.getSettleSpeed())
                && StringUtil.equals(confirmDto.getSecManageAcctId(), interfOpicsTradRepo.getOurdepositaccountnumber())
-               &&  cfetsRepoQuotedPrice004Service.ACompareToB(confirmDto.getRate(),iCstpTrade.getPrice(),4) == 0
+               &&  BigDecimalUtil.ACompareToB(confirmDto.getRate(),iCstpTrade.getPrice(),4) == 0
                && StringUtil.equals(sdf.format(confirmDto.getVsettleDate()), iCstpTrade.getSettldate())
                && StringUtil.equals(sdf.format(confirmDto.getMsettleDate()), iCstpTrade.getSettldate2())
-               && cfetsRepoQuotedPrice004Service.ACompareToB(confirmDto.getTradeAmt(),iCstpTrade.getTradecashamt(),2) == 0
+               && BigDecimalUtil.ACompareToB(confirmDto.getTradeAmt(),iCstpTrade.getTradecashamt(),2) == 0
        ) {
            //更新下行匹配关系表
            if (isUpdate) {
