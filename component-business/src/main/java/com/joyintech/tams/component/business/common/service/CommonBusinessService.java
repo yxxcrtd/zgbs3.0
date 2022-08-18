@@ -761,7 +761,7 @@ public class CommonBusinessService extends BaseService {
 //                            + "，交易方向：" + 交易方向);
 //            logger.error("未授权或未设置授权", e);
 //            throw e;
-            variables.put(BussinessConstant.是否需要上级审批, true);
+            variables.put(BussinessConstant.是否需要上级审批, false);
             return variables;
             // modify by etliu 20220325 end
         }
