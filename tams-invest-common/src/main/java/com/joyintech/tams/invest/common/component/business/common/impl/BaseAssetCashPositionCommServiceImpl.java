@@ -1719,12 +1719,14 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
              */
             // GLCP-157:修改股票、债券申购、申购确认登录现金流水逻辑 modify by fuyongsheng 20220714 start
             else if (DictCodeListExt1.金融产品类型_投管用_股票.getValue().equals(deal.getFinprodType2())
-                     && (DictCodeList.交易方向_买入.getValue().equals(deal.getPs())
-                         || DictCodeListExt2.交易方向_配股.getValue().equals(deal.getPs())
-                         || DictCodeListExt2.交易方向_增发.getValue().equals(deal.getPs())
-                         || DictCodeListExt2.交易方向_新股中签.getValue().equals(deal.getPs())
-                         || DictCodeList.交易方向_申购.getValue().equals(deal.getPs())
-                         || DictCodeList.交易方向_申购确认.getValue().equals(deal.getPs()))) {
+                    && (DictCodeList.交易方向_买入.getValue().equals(deal.getPs())
+                    || DictCodeListExt2.交易方向_配股.getValue().equals(deal.getPs())
+                    || DictCodeListExt2.交易方向_增发.getValue().equals(deal.getPs())
+                    || DictCodeListExt2.交易方向_新股中签.getValue().equals(deal.getPs()))
+                    || ((DictCodeListExt1.金融产品类型_投管用_股票.getValue().equals(deal.getFinprodType2()) ||
+                    DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(deal.getFinprodType2())) && (
+                    DictCodeList.交易方向_申购.getValue().equals(deal.getPs())
+                            || DictCodeList.交易方向_申购确认.getValue().equals(deal.getPs())))) {
                 if(DictCodeList.交易方向_申购.getValue().equals(deal.getPs())){
                     // 申购登录在途的现金流水
                     PtlCashPositionFlowDto ztFlowDto = this.genZtPtlCashPositionFlow(portfolioId, deal, stlPayOrder, chlId);
