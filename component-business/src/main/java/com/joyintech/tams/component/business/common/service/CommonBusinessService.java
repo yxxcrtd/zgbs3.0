@@ -542,12 +542,19 @@ public class CommonBusinessService extends BaseService {
      * @since 1.0
      */
     private FinProductTypeConfig getRskAuthorizeType(String assetId, String assetType) {
-        if (assetId != null && assetId.length() > 0) {
+        if (StringUtil.isNotEmpty(assetType)) {
+            FinProductTypeConfig finProductTypeConfig = new FinProductTypeConfig();
+            finProductTypeConfig.setConfigType(DictCodeListExt2.配置类型_授权分类.getValue());
+            finProductTypeConfig.setInputValue1(assetType);
+            finProductTypeConfig = restTemplate.postForObject(
+                    ServiceApplication.COMMON_SERVICE_NAME + "/core/getAssetFiveType",
+                    finProductTypeConfig, FinProductTypeConfig.class);
+            return finProductTypeConfig;
+        }else if (assetId != null && assetId.length() > 0) {
             FinProductTypeKey finProductTypeKey = new FinProductTypeKey();
             finProductTypeKey.setFinprodId(assetId);
             finProductTypeKey.setBranch(0L);
-            FinProductType finProductType = finProductTypeMapper
-                    .selectByPrimaryKey(finProductTypeKey);
+            FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(finProductTypeKey);
             FinProductTypeConfig finProductTypeConfig = new FinProductTypeConfig();
             finProductTypeConfig.setConfigType(DictCodeListExt2.配置类型_授权分类.getValue());
             finProductTypeConfig.setInputValue1(finProductType.getType8());
@@ -555,14 +562,6 @@ public class CommonBusinessService extends BaseService {
             finProductTypeConfig.setInputValue3(finProductType.getType10());
             finProductTypeConfig.setInputValue4(finProductType.getType11());
             finProductTypeConfig.setInputValue5(finProductType.getType12());
-            finProductTypeConfig = restTemplate.postForObject(
-                    ServiceApplication.COMMON_SERVICE_NAME + "/core/getAssetFiveType",
-                    finProductTypeConfig, FinProductTypeConfig.class);
-            return finProductTypeConfig;
-        } else if (StringUtil.isNotEmpty(assetType)) {
-            FinProductTypeConfig finProductTypeConfig = new FinProductTypeConfig();
-            finProductTypeConfig.setConfigType(DictCodeListExt2.配置类型_授权分类.getValue());
-            finProductTypeConfig.setInputValue1(assetType);
             finProductTypeConfig = restTemplate.postForObject(
                     ServiceApplication.COMMON_SERVICE_NAME + "/core/getAssetFiveType",
                     finProductTypeConfig, FinProductTypeConfig.class);
