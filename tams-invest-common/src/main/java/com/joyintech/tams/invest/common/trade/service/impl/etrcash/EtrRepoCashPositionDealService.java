@@ -1348,7 +1348,7 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                 finishAmt = ArithmeticUtil.doAdd(finishAmt, closeAmt);
                 // 减少委托本金金额
                 etrCashPositionFlowDto.setAmount(ArithmeticUtil.subtract(etrEntrust.getEntrustAmt(), finishAmt));
-                etrEntrustAdd.setCloseAmt(ArithmeticUtil.doAdd(closeAmt, etrCashPositionFlowDto.getAmount()));
+//                etrEntrustAdd.setCloseAmt(ArithmeticUtil.doAdd(closeAmt, etrCashPositionFlowDto.getAmount()));
                 etrCashPositionFlowDto.setAcctId(acctId);
                 etrCashPositionFlowDto.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
                 etrCashPositionFlowDto.setOffsetId(etrEntrust.getEntrustId());
