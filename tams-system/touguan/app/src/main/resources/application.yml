@@ -48,6 +48,7 @@ spring:
     - microservice #微服务
     - exchange     #场内、银行间
     - position      #头寸
+    - kaptcha      #验证码
   
   cloud:
     nacos:
