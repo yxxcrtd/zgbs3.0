@@ -191,6 +191,10 @@
 		<if test="tradeMarketMode != null and tradeMarketMode != ''">
 			and m.TRADE_MARKET_MODE = #{tradeMarketMode,jdbcType=VARCHAR}
 		</if>
+		<!--券商代码-->
+		<if test="customerId != null and customerId != ''">
+			and m.CUSTOMER_ID = #{customerId,jdbcType=VARCHAR}
+		</if>
 		<!--		<if test="tradePlat != null and tradePlat != ''">-->
 		<!--			and m.TRADE_PLAT = #{tradePlat,jdbcType=VARCHAR}-->
 		<!--		</if>-->

@@ -52,6 +52,7 @@ public class MstCommissionSetValidator implements BeanValidator {
     public static final String PS = "ps";
     public static final String SEC_ACCT_ID = "secAcctId";
     public static final String TERM_TYPE = "termType";
+    public static final String CUSTOMER_ID = "customerId";
 
     /**
      * 共通Mapper的通用代理方案
@@ -264,6 +265,9 @@ public class MstCommissionSetValidator implements BeanValidator {
                 map.put(SEC_ACCT_ID, secAcctId);
                 // 期限品种
                 map.put(TERM_TYPE, termType);
+                // 券商代码
+                String customerId = dto.getCustomerId();
+                map.put(CUSTOMER_ID, customerId);
                 int count = mstCommissionSetService.searchRepeatBySecPs(map);
                 if (count > 0) {
                     StringBuffer sb = new StringBuffer();
@@ -285,6 +289,9 @@ public class MstCommissionSetValidator implements BeanValidator {
                     }
                     if (StringUtil.isNotEmpty(termType) && StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.回购期限品种, termType))) {
                         sb.append(SysDataUtil.getNameFromDataDict(DictCode.回购期限品种, termType)).append("(期限品种)");
+                    }
+                    if (StringUtil.isNotEmpty(customerId) && StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.回购期限品种, termType))) {
+                        sb.append(customerId).append("(券商代码)");
                     }
                     sb.append(getPsStr(ps)).append("(交易方向)");
                     sb.append(DateUtil.format(dto.getEffDate())).append("(生效日)");
