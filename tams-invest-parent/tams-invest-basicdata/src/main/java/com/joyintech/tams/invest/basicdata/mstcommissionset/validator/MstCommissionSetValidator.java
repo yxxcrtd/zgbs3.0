@@ -290,7 +290,7 @@ public class MstCommissionSetValidator implements BeanValidator {
                     if (StringUtil.isNotEmpty(termType) && StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.回购期限品种, termType))) {
                         sb.append(SysDataUtil.getNameFromDataDict(DictCode.回购期限品种, termType)).append("(期限品种)");
                     }
-                    if (StringUtil.isNotEmpty(customerId) && StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(DictCode.回购期限品种, termType))) {
+                    if (StringUtil.isNotEmpty(customerId)) {
                         sb.append(customerId).append("(券商代码)");
                     }
                     sb.append(getPsStr(ps)).append("(交易方向)");
