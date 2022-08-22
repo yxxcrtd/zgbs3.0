@@ -53,6 +53,7 @@ public class MstCommissionSetValidator implements BeanValidator {
     public static final String SEC_ACCT_ID = "secAcctId";
     public static final String TERM_TYPE = "termType";
     public static final String CUSTOMER_ID = "customerId";
+    public static final String PORFTFOLIO_ID = "portfolioId";
 
     /**
      * 共通Mapper的通用代理方案
@@ -268,9 +269,15 @@ public class MstCommissionSetValidator implements BeanValidator {
                 // 券商代码
                 String customerId = dto.getCustomerId();
                 map.put(CUSTOMER_ID, customerId);
+                // 组合代码
+                String portfolioId = dto.getPortfolioId();
+                map.put(PORFTFOLIO_ID, portfolioId);
                 int count = mstCommissionSetService.searchRepeatBySecPs(map);
                 if (count > 0) {
                     StringBuffer sb = new StringBuffer();
+                    if (StringUtil.isNotEmpty(portfolioId)) {
+                        sb.append(portfolioId).append("(组合)");
+                    }
                     if (StringUtil.isNotEmpty(tradeMarket) && StringUtil.isNotEmpty(SysDataUtil.getNameFromDataDict(BussinessDictCode.交易场所, tradeMarket))) {
                         sb.append(SysDataUtil.getNameFromDataDict(BussinessDictCode.交易场所, tradeMarket)).append("(交易场所)");
                     }

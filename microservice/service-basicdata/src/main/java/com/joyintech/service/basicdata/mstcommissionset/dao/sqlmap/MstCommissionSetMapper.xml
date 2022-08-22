@@ -195,6 +195,12 @@
 		<if test="customerId != null and customerId != ''">
 			and m.CUSTOMER_ID = #{customerId,jdbcType=VARCHAR}
 		</if>
+		<if test="portfolioId != null and portfolioId != ''">
+			and m.PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+		</if>
+		<if test="portfolioId == null or portfolioId == ''">
+			and m.PORTFOLIO_ID is NULL
+		</if>
 		<!--		<if test="tradePlat != null and tradePlat != ''">-->
 		<!--			and m.TRADE_PLAT = #{tradePlat,jdbcType=VARCHAR}-->
 		<!--		</if>-->
