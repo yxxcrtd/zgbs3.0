@@ -341,7 +341,7 @@ public abstract class OccupyReleasService<V> extends EventBaseService<V> {
                               + BussinessDictCodeListRds.参数粒度_实时.getValue();
                 BigDecimal temp = offsetMap.get(tKey);
                 BigDecimal offset = item.getOffsetVal();
-                if (offset != null && offset.compareTo(BigDecimal.ZERO) > 0) {
+                if (offset != null && offset.compareTo(BigDecimal.ZERO) > 0 && temp !=null) {
                     BigDecimal val = offset.min(temp.abs());
                     offset = offset.subtract(temp.abs());
                     offset = BigDecimal.ZERO.max(offset);
