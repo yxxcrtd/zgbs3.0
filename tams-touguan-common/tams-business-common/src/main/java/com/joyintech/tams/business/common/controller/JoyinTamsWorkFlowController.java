@@ -4,20 +4,17 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.exception.MessageException;
 import com.joyintech.framework.util.JsonUtils;
-import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.workflow.engine.controller.WorkFlowController;
 import com.joyintech.workflow.engine.service.UserSelectService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.activiti.engine.impl.util.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -190,6 +187,18 @@ public class JoyinTamsWorkFlowController  {
 					ajaxResult.setData(messageException.getMessage());
 					return new Message<AjaxResult>().success().setData(ajaxResult);
 				}else{
+					ajaxResult.setMessageType(MessageType.错误消息);
+					ajaxResult.setData(messageException.getMessage());
+					return new Message<AjaxResult>().success().setData(ajaxResult);
+				}
+			} else if (e instanceof MessageException) {
+				AjaxResult ajaxResult = new AjaxResult();
+				MessageException messageException = (MessageException) e;
+				if (messageException.getMessageType() != null && StringUtil.equals("confirm", messageException.getMessageType().getCode())) {
+					ajaxResult.setMessageType(MessageType.确认消息);
+					ajaxResult.setData(messageException.getMessage());
+					return new Message<AjaxResult>().success().setData(ajaxResult);
+				} else {
 					ajaxResult.setMessageType(MessageType.错误消息);
 					ajaxResult.setData(messageException.getMessage());
 					return new Message<AjaxResult>().success().setData(ajaxResult);
