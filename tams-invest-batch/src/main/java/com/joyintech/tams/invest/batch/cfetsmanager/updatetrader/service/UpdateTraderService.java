@@ -133,40 +133,39 @@ public class UpdateTraderService {
                         MstCounterParty mstCounterParty = new MstCounterParty();
                         mstCounterParty.setCounterName(mstCfetsCustomerInfo.getPartyName());
                         mstCounterParty.setCounterType(DictCodeListExt1.交易对手类型_资管产品.getValue());
+                        mstCounterParty.setCounterId(baseGetBusinessId != null ? baseGetBusinessId.buildBussinessCode(
+                                bussinessCodeParameter) : IDGenerator.generate());
                         mstCounterParty.setPartyId(mstCfetsCustomerInfo.getPartyId());
 
                         //获取主机构ID
                         map.put("partyId", mstCfetsCustomerInfo.getPartyId());
                         // 存在一个从机构对应多个主机构
                         List<String> mpartyIds = updateTraderMapper.selectMpartyId(map);
-                        for (String mpartyId : mpartyIds) {
-                            mstCounterParty.setCounterId(baseGetBusinessId != null ? baseGetBusinessId.buildBussinessCode(
-                                    bussinessCodeParameter) : IDGenerator.generate());
-                            //获取主机构名称
-                            //MstCfetsCustomerInfo temp = updateTraderMapper.selectInfo(mstCfetsCustomerInfo.getPartyId());
-                            MstCfetsCustomerInfo temp = new MstCfetsCustomerInfo();
-                            if (StringUtil.isNotEmpty(mpartyId)) {
-                                temp = updateTraderMapper.selectMpartyInfo(mpartyId);
-                            }
-                            String linkId = "";
-                            if (temp != null) {
-                                //按名称进行匹配
-                                map.put("partyCustomerName", temp.getPartyName());
-                                //获取主机构交易对手的link_Id
-                                linkId = updateTraderMapper.checkCustomerName(map);
-                            }
-                            if (StringUtil.isNotEmpty(linkId)) {
-                                mstCounterParty.setManagerId(linkId);
-                            }
-                            mstCounterPartyMapper.insertSelective(mstCounterParty);
+                        //获取主机构名称
+                        //MstCfetsCustomerInfo temp = updateTraderMapper.selectInfo(mstCfetsCustomerInfo.getPartyId());
+                        MstCfetsCustomerInfo temp = new MstCfetsCustomerInfo();
+                        if (CollectionUtils.isNotEmpty(mpartyIds)
+                                && mpartyIds.size() < 2 && StringUtil.isNotEmpty(mpartyIds.get(0))) {
+                            temp = updateTraderMapper.selectMpartyInfo(mpartyIds.get(0));
                         }
+                        String linkId = "";
+                        if (temp != null) {
+                            //按名称进行匹配
+                            map.put("partyCustomerName", temp.getPartyName());
+                            //获取主机构交易对手的link_Id
+                            linkId = updateTraderMapper.checkCustomerName(map);
+                        }
+                        if (StringUtil.isNotEmpty(linkId)) {
+                            mstCounterParty.setManagerId(linkId);
+                        }
+                        mstCounterPartyMapper.insertSelective(mstCounterParty);
                     }
     			/*update by chenjiaxing 银行间交易对手信息录入之后需要生成对应的交易对手信息，如果是非法人机构默认为资管产品；
     			如果是法人机构需要匹配机构信息是否已存在，不存在建立为市场机构交易对手，存在的话，则不再建立 20210730 end*/
                 }
 
     		}
-    	}	
-    	
+    	}
+
     }
 }
