@@ -3269,7 +3269,7 @@
                 ''  settleSpeedStr,
                 TFPDT.SEC_MANAGE_ACCT_ID as secManageAcctId,
                 T7.SEC_ACCT_NAME secManageAcctIdStr,
-                CASE WHEN FPI.ISSUE_CLASS IN (#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN BO.WIN_PRIN_AMT/10000
+                CASE WHEN FPI.ISSUE_CLASS IN (#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN TFPDT.share_amt/100
                      WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN BO.SUBSCRIPTION_AMOUNT/10000 END faceValue,
                 case
                      when BO.BID_MODLE IS NULL THEN ( case when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
@@ -3909,7 +3909,7 @@
         '' settleSpeedStr,
         TPD.SEC_MANAGE_ACCT_ID secManageAcctId,
         T7.SEC_ACCT_NAME  secManageAcctIdStr,
-        CASE WHEN FPI.ISSUE_CLASS IN (#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN BO.WIN_PRIN_AMT/10000
+        CASE WHEN FPI.ISSUE_CLASS IN (#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN TPD.share_amt/100
             WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN BO.SUBSCRIPTION_AMOUNT/10000 END faceValue,
         case
             when BO.BID_MODLE IS NULL THEN ( case when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
