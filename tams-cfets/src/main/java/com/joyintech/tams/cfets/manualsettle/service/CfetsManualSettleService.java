@@ -230,23 +230,20 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                                 || StringUtil.equals(cfetsDto.getPs(), DictCodeListExt3.交易方向_投资端_逾期返售.getValue()))
                                 && StringUtil.equals(cfetsDto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())
                                 && StringUtil.equals(cfetsDto.getCleanStatus(), DictCodeListExt3.清算状态_清算成功.getValue()))
-                                // 逆回购 到期/提前终止/逾期返售 清算成功
+                                // 逆回购 到期/提前终止/逾期返售 不判断清算状态
                                 || ((StringUtil.equals(cfetsDto.getPs(), DictCodeList.交易方向_到期.getValue())
                                 || StringUtil.equals(cfetsDto.getPs(), DictCodeList.交易方向_提前终止.getValue())
                                 || StringUtil.equals(cfetsDto.getPs(), DictCodeListExt3.交易方向_投资端_逾期返售.getValue()))
-                                && StringUtil.equals(cfetsDto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue())
-                                && StringUtil.equals(cfetsDto.getCleanStatus(), DictCodeListExt3.清算状态_清算成功.getValue()))
-                                //
+                                && StringUtil.equals(cfetsDto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue()))
+                                //  借贷 到期 清算成功
                                 || (StringUtil.equals(cfetsDto.getPs(), DictCodeList.交易方向_到期.getValue())
-                                && (StringUtil.equals(cfetsDto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券买断式正回购.getValue())
-                                || StringUtil.equals(cfetsDto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券借贷融入.getValue()))
+                                && StringUtil.equals(cfetsDto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券借贷融入.getValue())
                                 && StringUtil.equals(cfetsDto.getCleanStatus(), DictCodeListExt3.清算状态_清算成功.getValue()))
-                                // 正回购/逆回购 首期 清算成功
+                                // 买断式逆回购 首期 清算成功
                                 || (StringUtil.equals(cfetsDto.getPs(), DictCodeList.交易方向_买入.getValue())
-                                && (StringUtil.equals(cfetsDto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券买断式逆回购.getValue())
-                                || StringUtil.equals(cfetsDto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue()))
+                                && StringUtil.equals(cfetsDto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券买断式逆回购.getValue())
                                 && StringUtil.equals(cfetsDto.getCleanStatus(), DictCodeListExt3.清算状态_清算成功.getValue()))
-                                //
+                                //  债券存续期 行权(回售/赎回) 正回购 债券卖出
                                 || (StringUtil.equals(cfetsDto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券存续期交易.getValue())
                                 || StringUtil.equals(cfetsDto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券行权交易.getValue())
                                 || (StringUtil.equals(cfetsDto.getTgBusiType(), DictCodeListExt3.头寸业务类型_现券交易.getValue())
@@ -256,8 +253,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                                 || (StringUtil.equals(cfetsDto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue())
                                 && StringUtil.equals(cfetsDto.getPs(), DictCodeListExt3.交易方向_逆回购.getValue()))
                                 || (StringUtil.equals(cfetsDto.getTgBusiType(), DictCodeListExt3.头寸业务类型_债券行权交易.getValue())
-                                && StringUtil.equals(cfetsDto.getPs(), DictCodeList.交易方向_行权_回售.getValue()))
-                        )
+                                && StringUtil.equals(cfetsDto.getPs(), DictCodeList.交易方向_行权_回售.getValue())) )
                                 // 一级投标 清算成功
                                 || (StringUtil.equals(cfetsDto.getPs(), DictCodeList.交易方向_买入.getValue())
                                 && StringUtil.equals(cfetsDto.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())
