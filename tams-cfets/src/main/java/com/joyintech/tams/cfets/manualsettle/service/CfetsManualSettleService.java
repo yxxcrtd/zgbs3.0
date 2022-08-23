@@ -854,7 +854,8 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 posport.setCashAmount(dto.getTradeAmt());
                 ptlCashList.add(posport);
                 List<PledgeBondInfoDto> pledgeBondList = cfetsManualSettleMapper.getPledgeListByTradeId(dto.getFinprodId());
-                if (StringUtil.isNotEmpty(pledgeBondList)) {
+                if (StringUtil.isNotEmpty(pledgeBondList)
+                        && StringUtil.equals(dto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())) {
                     for (PledgeBondInfoDto regFinPledge : pledgeBondList) {
                         CfetsEtrIbRepoPosPortfolioSecRequest secport = new CfetsEtrIbRepoPosPortfolioSecRequest();
                         secport.setPortfolioId(dto.getPortfolioId());
@@ -926,7 +927,9 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             req.setCdate(platformDateImpl.getSysDate());
             req.setCcy(cfetsManualSettleRequest.getCcy());
             req.setPtlCashList(ptlCashList);
-            req.setPtlSecList(ptlSecList);
+            if(CollectionUtils.isNotEmpty(ptlSecList)) {
+                req.setPtlSecList(ptlSecList);
+            }
             Map<String, Object> param = PositionHttpRequest.send(req);
             ThreadLocalUtil.setLocalCache(param);
         }
