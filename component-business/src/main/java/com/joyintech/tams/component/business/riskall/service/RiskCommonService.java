@@ -303,14 +303,16 @@ public class RiskCommonService {
         }
         // 判断授权是否控制
         // 入参不为空、授权控制类别为软控、硬控
-        if ((StringUtil.equals(riskCommonInputDto.getEventType(), NodeConfigConstant.ENTRUST) && DictCodeListExt1.是或否_是.getValue().equals(CacheUtil.getSysParam(BussinessConstant.ETRLIMIT_SWITCH)))
+        if ((StringUtil.equals(riskCommonInputDto.getEventType(), NodeConfigConstant.ENTRUST) && DictCodeListExt1.是或否_是.getValue().equals(CacheUtil.getSysParam(BussinessConstant.ETRLIMIT_SWITCH)) )
            || (StringUtil.equals(riskCommonInputDto.getEventType(), NodeConfigConstant.TRADE) && DictCodeListExt1.是或否_是.getValue().equals(CacheUtil.getSysParam(BussinessConstant.AUTHORIZE_LIMIT)))) {
-            List<RiskAuthorizeDto> authorizeList = new ArrayList<>();
-            RiskAuthorizeDto riskAuthorizeDto = excessTraderAuthorizeAmt(riskCommonInputDto);
-            if (Objects.nonNull(riskAuthorizeDto)){
-                authorizeList.add(riskAuthorizeDto);
+            if (!StringUtil.equals(riskCommonInputDto.getAuthorizeControl(),DictCodeListRsk.风险控制类别_不控.getValue())) {
+                List<RiskAuthorizeDto> authorizeList = new ArrayList<>();
+                RiskAuthorizeDto riskAuthorizeDto = excessTraderAuthorizeAmt(riskCommonInputDto);
+                if (Objects.nonNull(riskAuthorizeDto)) {
+                    authorizeList.add(riskAuthorizeDto);
+                }
+                riskCommonOutputDto.setAuthorizeList(authorizeList);
             }
-            riskCommonOutputDto.setAuthorizeList(authorizeList);
         }
         // 判断名单是否控制
         //是否验证资产
