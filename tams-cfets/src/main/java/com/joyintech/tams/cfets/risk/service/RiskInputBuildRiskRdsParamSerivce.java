@@ -192,7 +192,7 @@ public class RiskInputBuildRiskRdsParamSerivce extends RiskCommonService {
                 bondDto.setTradeId(item.getTotleTradeId() + item.getPortfolioId());
                 bondDto.setFinprodId(entity.getFinprodId());
             } else {
-                bondDto = map.get(entity.getRegIbuId() + item.getPortfolioId());
+                bondDto = map.get(entity.getTotleTradeId() + item.getPortfolioId());
                 // 交易份额
                 bondDto.setShareAmt(ArithmeticUtil.doAdd(bondDto.getShareAmt(), item.getShareAmt()));
                 // 总交易费用
