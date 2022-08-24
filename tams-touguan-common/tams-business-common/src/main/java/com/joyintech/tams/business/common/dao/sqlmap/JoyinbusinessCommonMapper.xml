@@ -189,6 +189,7 @@
              )
             OR  (fpi.ISSUE_CLASS IN ('02', '03') AND T3.LISTING_DATE IS  NULL)
         )
+        and  ( T1.CIRCULATION_DATE <![CDATA[>]]> #{platDate,jdbcType=DATE} or T1.CIRCULATION_DATE is null)
         <if test="tradePlace != null and tradePlace.size() > 0">
             AND T1.TRADE_MARKET in
             <foreach collection="tradePlace" item="item" open="(" close=")" separator=",">
