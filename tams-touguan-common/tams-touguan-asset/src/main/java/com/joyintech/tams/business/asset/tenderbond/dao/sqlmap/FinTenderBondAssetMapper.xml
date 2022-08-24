@@ -527,6 +527,45 @@
         )
     </select>
 
+    <select id="countApperarFinprodIdUse" resultType="java.lang.Integer">
+        select sum(qty)
+        from (select count(1) as qty
+              from ETR_ENTRUST t
+                       inner join FIN_PRODUCT fp on t.FINPROD_ID = fp.FINPROD_ID
+                       inner join FIN_PRODUCT_ADD fpa on fp.FINPROD_MARKET_ID = fpa.APPEAR_MARKET_ID
+              where fpa.FINPROD_ID = #{finprodId}
+                and t.ENTRUST_STATUS not in ('05', '07')
+                and t.FINPROD_TYPE2 = 'F01'
+                and t.ps = 'T02'
+              union all
+              select count(1) as qty
+              from WFL_ETR_ENTRUST t
+                       inner join FIN_PRODUCT fp on t.FINPROD_ID = fp.FINPROD_ID
+                       inner join FIN_PRODUCT_ADD fpa on fp.FINPROD_MARKET_ID = fpa.APPEAR_MARKET_ID
+              where fpa.FINPROD_ID = #{finprodId}
+                and t.FINPROD_TYPE2 = 'F01'
+                and t.ps = 'T02'
+              union all
+              select count(1) as qty
+              from TRD_FIN_PRODUCT_DEAL_TOTAL t
+                       inner join TRD_PRODUCT_DEAL d on t.TOTLE_TRADE_ID = d.TOTLE_TRADE_ID
+                       inner join FIN_PRODUCT fp on t.FINPROD_ID = fp.FINPROD_ID
+                       inner join FIN_PRODUCT_ADD fpa on fp.FINPROD_MARKET_ID = fpa.APPEAR_MARKET_ID
+              where fpa.FINPROD_ID = #{finprodId}
+                and t.IS_CANCEL = 'N'
+                and t.TRADE_STATUS = '01'
+                and t.FINPROD_TYPE2 = 'F01'
+                and t.ps = 'T02'
+              union all
+              select count(1) as qty
+              from WFL_TRD_FIN_PRODUCT_DEAL_TOTAL t
+                       inner join FIN_PRODUCT fp on t.FINPROD_ID = fp.FINPROD_ID
+                       inner join FIN_PRODUCT_ADD fpa on fp.FINPROD_MARKET_ID = fpa.APPEAR_MARKET_ID
+              where fpa.FINPROD_ID = #{finprodId}
+                and t.FINPROD_TYPE2 = 'F01'
+                and t.ps = 'T02')
+    </select>
+
     <select id="countListing" resultType="java.lang.Integer">
         select count(1) as qty from TRD_FIN_PRODUCT_DEAL_TOTAL where FINPROD_ID=#{finprodId} and IS_CANCEL ='N'
     </select>
