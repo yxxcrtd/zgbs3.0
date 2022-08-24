@@ -13,6 +13,7 @@ package com.joyintech.tams.invest.risk.customerrelationtree.agencydetailsinf.ser
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.framework.grid.Page;
 import org.springframework.stereotype.Service;
 
 import com.joyintech.framework.export.CommonExportService;
@@ -61,8 +62,8 @@ public class AgencyDetailsInf002Service extends CommonExportService<SeniorExecut
 	 * @see
 	 * @since 1.0
 	 */
-	public List<SelectOptionDto> getRelateOrgInf(Map<String, Object> pageParam) {
-		return restTemplate.postForList(ServiceApplication.RISK_SERVICE_NAME + "/AgencyDetailsInf002/getRelateOrgInf",
+	public Page<SelectOptionDto> getRelateOrgInf(Map<String, Object> pageParam) {
+		return restTemplate.postForPage(ServiceApplication.RISK_SERVICE_NAME + "/AgencyDetailsInf002/getRelateOrgInf",
 				pageParam, SelectOptionDto.class);
 	}
 

@@ -61,7 +61,7 @@ public class AgencyDetailsInf002Controller extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping("/getRelateOrgInf")
-	public List<SelectOptionDto> getRelateOrgInf() {
+	public Page<SelectOptionDto> getRelateOrgInf() {
 		return agencyDetailsInf002Service.getRelateOrgInf(RequestUtil.getPageParam());
 	}
 

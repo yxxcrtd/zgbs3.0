@@ -54,9 +54,10 @@ public class AgencyDetailsInf002Controller {
      * @param param
      * @return
      */
-    @PostMapping("/getRelateOrgInf")
-    public List<SelectOptionDto> getRelateOrgInf(@RequestBody Map<String, Object> param) {
-        return agencyDetailsInf002Service.getRelateOrgInf(param);
+    @PostMapping("/getRelateOrgInf/{page}/{length}")
+    public Page<SelectOptionDto> getRelateOrgInf(@RequestBody Map<String, Object> param,
+                                                 @PathVariable("page") int page, @PathVariable("length") int length) {
+        return agencyDetailsInf002Service.getRelateOrgInf(page, length, param);
     }
     
     /**

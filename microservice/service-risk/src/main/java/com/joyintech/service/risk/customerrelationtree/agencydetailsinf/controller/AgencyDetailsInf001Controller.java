@@ -11,22 +11,15 @@
 package com.joyintech.service.risk.customerrelationtree.agencydetailsinf.controller;
 
 
-import java.util.List;
-import java.util.Map;
-
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.joyintech.service.risk.customerrelationtree.agencydetailsinf.dto.AgencyDetailsInf001Dto;
 import com.joyintech.service.risk.customerrelationtree.agencydetailsinf.service.AgencyDetailsInf001Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -68,9 +61,10 @@ public class AgencyDetailsInf001Controller {
 	 * @see
 	 * @since 1.0
 	 */
-	@GetMapping("/getAgency")
-    public List<SelectOptionDto> getAgency(String agencyId) {
-        return agencyDetailsInf001Service.getAgency(agencyId);
+	@PostMapping("getAgency/{page}/{length}")
+    public Page<SelectOptionDto> getAgency(@RequestBody Map<String, Object> param,
+										   @PathVariable("page") int page, @PathVariable("length") int length) {
+        return agencyDetailsInf001Service.getAgency(page, length, param);
     }
 	
 	/**
