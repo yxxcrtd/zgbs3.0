@@ -1,0 +1,1 @@
+update SYS_PAGE set IS_NEED_WORKFLOW = '01' where PAGE_ID = 'FinBondAsset003';
