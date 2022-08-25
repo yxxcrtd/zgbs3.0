@@ -1692,7 +1692,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
             if(StringUtil.isNotEmpty(settleTransDataTotalStatus)) {
                 //取得剩余匹配份额
                 BigDecimal remainNum = exchangeTransMatchCommonMapper.getRemainNum(dto.getSeqNo());
-                if(DictCodeList.回购类型_质押式协议回购.getValue().equals(settleTransDataTotalAdd.getRepoType())){
+                if(settleTransDataTotalAdd != null && DictCodeList.回购类型_质押式协议回购.getValue().equals(settleTransDataTotalAdd.getRepoType())){
                     settleTransDataTotalStatus.setMatchStatus(DictCodeListExt3.下行交易匹配状态_未匹配.getValue());
                 }else{
                     settleTransDataTotalStatus.setMatchStatus(BigDecimal.ZERO.compareTo(remainNum) >=0
@@ -1706,7 +1706,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 settleTransDataTotalStatus.setSeqNo(dto.getSeqNo());
                 //取得剩余匹配份额
                 BigDecimal remainNum = exchangeTransMatchCommonMapper.getRemainNum(dto.getSeqNo());
-                if(DictCodeList.回购类型_质押式协议回购.getValue().equals(settleTransDataTotalAdd.getRepoType())){
+                if(settleTransDataTotalAdd != null && DictCodeList.回购类型_质押式协议回购.getValue().equals(settleTransDataTotalAdd.getRepoType())){
                     settleTransDataTotalStatus.setMatchStatus(DictCodeListExt3.下行交易匹配状态_未匹配.getValue());
                 }else{
                     settleTransDataTotalStatus.setMatchStatus(BigDecimal.ZERO.compareTo(remainNum) >=0
