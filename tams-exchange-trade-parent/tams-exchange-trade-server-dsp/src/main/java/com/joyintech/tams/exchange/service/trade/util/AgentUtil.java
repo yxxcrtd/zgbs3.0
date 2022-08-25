@@ -10,10 +10,49 @@ import com.joyintech.tams.exchange.common.constant.ExchangeType;
 import com.joyintech.tams.exchange.common.constant.InvestorType;
 import com.joyintech.tams.exchange.common.constant.Market;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
 public class AgentUtil {
+
+    /**
+     * 日期格式化
+     * 10442119
+     * @param time
+     * @return
+     */
+    public static String FormatApiTimeToString(String time) {
+        // 10442119
+        if (Strings.isNullOrEmpty(time)) {
+            time = "000000";
+        }
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(time.substring(0, 2)));
+        cal.set(Calendar.MINUTE, Integer.parseInt(time.substring(2, 4)));
+        cal.set(Calendar.SECOND, Integer.parseInt(time.substring(4, 6)));
+        SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return timeFormat.format(cal.getTime());
+    }
+
+    /**
+     * 日期格式化
+     * 10442119
+     * @param time
+     * @return
+     */
+    public static Long FormatApiTimeToLong(String time) {
+        // 10442119
+        if (Strings.isNullOrEmpty(time)) {
+            time = "000000";
+        }
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(time.substring(0, 2)));
+        cal.set(Calendar.MINUTE, Integer.parseInt(time.substring(2, 4)));
+        cal.set(Calendar.SECOND, Integer.parseInt(time.substring(4, 6)));
+        return cal.getTime().getTime();
+    }
 
     /**
      * 统一处理有空格的key

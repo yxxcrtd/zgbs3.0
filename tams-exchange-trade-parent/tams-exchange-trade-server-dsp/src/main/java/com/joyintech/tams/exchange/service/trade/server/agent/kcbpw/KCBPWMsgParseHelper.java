@@ -9,6 +9,7 @@ import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.service.trade.server.agent.EntrustIdManager;
+import com.joyintech.tams.exchange.service.trade.util.AgentUtil;
 import org.springframework.beans.BeanUtils;
 
 import java.math.BigDecimal;
@@ -694,7 +695,7 @@ public class KCBPWMsgParseHelper {
             if (!Strings.isNullOrEmpty(resMap.get("HQYWLB"))) {
                 integratedBulkQuoteBean.setEntrustProp(EntrustUtils.getEntrustProp(resMap.get("HQYWLB"), "SZ"));
                 integratedBulkQuoteBean.setEntrustBs(EntrustUtils.getEntrustBs(resMap.get("HQYWLB")));
-            } else if(!Strings.isNullOrEmpty(resMap.get("HQZLLB"))){
+            } else if (!Strings.isNullOrEmpty(resMap.get("HQZLLB"))) {
                 // yanjianhui 2022/7/19 :金证那边的HQYWLB字段返回空因此无法对行情类型、方向进行操作。
                 String flag = resMap.get("HQZLLB");
                 // yanjianhui 2022/7/19 :字段逻辑错误修改
@@ -780,7 +781,7 @@ public class KCBPWMsgParseHelper {
         List<NegotiateQuoteReceiveBean> list = Lists.newArrayListWithExpectedSize(resList.size());
         for (Map<String, String> resMap : resList) {
             NegotiateQuoteReceiveBean receiveBean = new NegotiateQuoteReceiveBean();
-            receiveBean.setRequestTime(resMap.get("transacttime"));//申报时间
+            receiveBean.setRequestTime(AgentUtil.FormatApiTimeToString(resMap.get("transacttime")));
             int status = Integer.parseInt((String) (resMap.get("reportstatus")));
             receiveBean.setRequestStatus(status);
             receiveBean.setRequestStatusStr(RequestStatus.getRequestStatusName(status));
@@ -979,14 +980,7 @@ public class KCBPWMsgParseHelper {
             integratedFixedIncomeQuoteBean.setStockName(resMap.get("stkname"));
             integratedFixedIncomeQuoteBean.setEntrustBs(EntrustUtils.getEntrustBs(resMap.get("bsflag")));
             integratedFixedIncomeQuoteBean.setOrderNo(resMap.get("orderid"));
-            String reportTime = (String) resMap.get("ordertime");
-            if (Strings.isNullOrEmpty(reportTime))
-                reportTime = "000000";
-            Calendar cal = Calendar.getInstance();
-            cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(reportTime.substring(0, 2)));
-            cal.set(Calendar.MINUTE, Integer.parseInt(reportTime.substring(2, 4)));
-            cal.set(Calendar.SECOND, Integer.parseInt(reportTime.substring(4, 6)));
-            integratedFixedIncomeQuoteBean.setReportTime(cal.getTime().getTime());
+            integratedFixedIncomeQuoteBean.setReportTime(AgentUtil.FormatApiTimeToLong((String) resMap.get("ordertime")));
             integratedFixedIncomeQuoteBean.setAgencyName(resMap.get("company"));
             if (!Strings.isNullOrEmpty(resMap.get("orderprice"))) {
                 integratedFixedIncomeQuoteBean.setEntrustPrice(Double.parseDouble(resMap.get("orderprice")));

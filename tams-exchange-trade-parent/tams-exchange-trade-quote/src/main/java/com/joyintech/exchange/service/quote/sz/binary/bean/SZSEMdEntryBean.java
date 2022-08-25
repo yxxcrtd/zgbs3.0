@@ -8,7 +8,8 @@ package com.joyintech.exchange.service.quote.sz.binary.bean;
  * @date 2021/10/29 16:37
  */
 public class SZSEMdEntryBean {
-    private int mdEntryPx;
+    // yanjianhui 修改于 2022/8/24 10:07  接受数据的字段类型错误，应为double。
+    private double mdEntryPx;
     private int mdEntrySize;
     private String mdEntryType;
     private int mdPriceLevel;
@@ -16,11 +17,11 @@ public class SZSEMdEntryBean {
     private int numberOfOrders;
     private int orderQty;
 
-    public int getMdEntryPx() {
+    public double getMdEntryPx() {
         return mdEntryPx;
     }
 
-    public void setMdEntryPx(int mdEntryPx) {
+    public void setMdEntryPx(double mdEntryPx) {
         this.mdEntryPx = mdEntryPx;
     }
 

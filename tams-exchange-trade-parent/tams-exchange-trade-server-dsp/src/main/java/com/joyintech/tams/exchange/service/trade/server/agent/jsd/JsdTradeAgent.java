@@ -751,9 +751,9 @@ public class JsdTradeAgent extends TradeAgentDsp {
             Account account = entry.getValue();
             String accountId = account.getId();
             logger.info("account：{}，status：{}", accountId, getStatus(accountId));
-            if (getStatus(accountId) != AccountLoginStatus.TRADING.value) {
-                return;
-            }
+//            if (getStatus(accountId) != AccountLoginStatus.TRADING.value) {
+//                return;
+//            }
             boolean loginStatus = tradeAgentManager.getAgentLoginStatus(accountId);
             if (loginStatus) {
                 executeQueryNextTrade(account);

@@ -178,18 +178,12 @@ public class UfxTradeAgent extends TradeAgentDsp {
      * 333002 普通委托	用于竞价平台所有委托业务下单
      * 333012 ETF申购
      * 333013 ETF赎回
-     * xiazelei 修改于 2022/5/25 14:29 增加新的交易接口
-     * 332742 固收债券回售申报
      */
     @Override
     public void entrust(Entrust entrust) {
         logger.info("send entrust:{}", entrust.getId());
-        // 新业务代码场景处理标识；true为新场景代码
-        boolean newFlag = false;
         // 场景代码
         int functionCode = FunctionCode.REQ_ENTRUST.value;
-        ResultBean resultBean;
-
         // region  业务场景判断
         // 333002竞价平台普通委托
         // 场景属性
@@ -201,49 +195,35 @@ public class UfxTradeAgent extends TradeAgentDsp {
             } else if (EntrustBs.SELL.value.equals(entrust.getEntrustBs())) {
                 entrustProp = "ETF_APPLY_SELL";
             }
-        } else if (EntrustProp.HS.value.equals(entrust.getEntrustProp()) && Market.SHSE.value.equals(entrust.getMarket())) {
-            newFlag = true;
-            // xiazelei 修改于 2022/5/25 16:58  332742 固收债券回售申报
-            entrustProp = "BondSellBackSH";
         }
         // endregion
 
         // region 接口调用
         try {
-            if (!newFlag) {
 
-                // region 参数组装
-                Map<String, Object> parameters = Maps.newHashMap();
-                parameters.put("account", entrust.getAccountId());
-                parameters.put("stkcode", StockCodeUtils.getStockCode(entrust.getStockCode()));
-                parameters.put("exchange_type", AgentUtil.ExchangeMarketUFX(entrust.getMarket()));
-                parameters.put("stock_code", StockCodeUtils.getStockCode(entrust.getStockCode()));
-                parameters.put("entrust_amount", entrust.getEntrustVolume());
-                //全价
-                if (FullPriceConst.FULL_PRICE.value.equals(entrust.getIsFullPrice())) {
-                    parameters.put("entrust_price", entrust.getFullPrice().toPlainString());
-                } else {//净价
-                    parameters.put("entrust_price", entrust.getEntrustPrice().toPlainString());
-                }
-                parameters.put("entrust_bs", entrust.getEntrustBs());
-                parameters.put("entrust_prop", entrust.getEntrustProp());
-                parameters.put("batch_no", entrust.getLocalEntrustId());
-                parameters.put("entrust_reference", entrust.getId());
-                // endregion
-
-                TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), functionCode, entrustProp);
-                agentInfo.setAccountId(entrust.getAccountId());
-                parameters.put("password", getAccount(agentInfo.getAccountId()).getTradePwd());
-                resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
-            } else {
-
-                // region 参数组装
-                // 自定义参数
-                Map<String, Object> customParam = getCustomParam(entrust.getAccountId());
-                // endregion
-                // 332742 固收债券回售申报 柜台只返回 entrust_no一个字段
-                resultBean = triggerCodeAdapter(functionCode, entrustProp, entrust, customParam);
+            // region 参数组装
+            Map<String, Object> parameters = Maps.newHashMap();
+            parameters.put("account", entrust.getAccountId());
+            parameters.put("stkcode", StockCodeUtils.getStockCode(entrust.getStockCode()));
+            parameters.put("exchange_type", AgentUtil.ExchangeMarketUFX(entrust.getMarket()));
+            parameters.put("stock_code", StockCodeUtils.getStockCode(entrust.getStockCode()));
+            parameters.put("entrust_amount", entrust.getEntrustVolume());
+            //全价
+            if (FullPriceConst.FULL_PRICE.value.equals(entrust.getIsFullPrice())) {
+                parameters.put("entrust_price", entrust.getFullPrice().toPlainString());
+            } else {//净价
+                parameters.put("entrust_price", entrust.getEntrustPrice().toPlainString());
             }
+            parameters.put("entrust_bs", entrust.getEntrustBs());
+            parameters.put("entrust_prop", entrust.getEntrustProp());
+            parameters.put("batch_no", entrust.getLocalEntrustId());
+            parameters.put("entrust_reference", entrust.getId());
+            // endregion
+
+            TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), functionCode, entrustProp);
+            agentInfo.setAccountId(entrust.getAccountId());
+            parameters.put("password", getAccount(agentInfo.getAccountId()).getTradePwd());
+            ResultBean resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
 
             // region 返回结果处理
             Map<String, Object> ds = (Map<String, Object>) resultBean.getData();
@@ -259,10 +239,17 @@ public class UfxTradeAgent extends TradeAgentDsp {
                 entrust.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
             } else {
                 // 失败 柜台废单 还原持仓
+                // yanjianhui 修改于 2022/8/24 11:23  柜台报错返回空报文导致指令进度没有被释放处理。
+                String errorMsg = null;
+                if (ds != null) {
+                    errorMsg = ErrorMsgUtils.subErrorMsg((String) ds.get("error_info"));
+                } else {
+                    errorMsg = resultBean.getErrorMsg();
+                }
                 entrust.setErrorCode(ErrorCode.INVALID.value);
                 entrust.setEntrustStatus(EntrustStatus.INVALID.value);
-                entrust.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
-                logger.warn("integratedEntrust failed ErrorNo:{}，reason:{}", resultBean.getErrorCode(), ds.get("error_info"));
+                entrust.setErrorMsg(errorMsg);
+                logger.warn("integratedEntrust failed ErrorNo:{}，reason:{}", resultBean.getErrorCode(), errorMsg);
             }
 
             TerminalId terminalId = new TerminalId();
@@ -346,14 +333,17 @@ public class UfxTradeAgent extends TradeAgentDsp {
                 entrust.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
             } else {
                 // 失败 柜台废单 还原持仓
-                entrust.setEntrustStatus(EntrustStatus.INVALID.value);
+                // yanjianhui 修改于 2022/8/24 11:23  柜台报错返回空报文导致指令进度没有被释放处理。
+                String errorMsg = null;
                 if (ds != null) {
-                    entrust.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
+                    errorMsg = ErrorMsgUtils.subErrorMsg((String) ds.get("error_info"));
                 } else {
-                    entrust.setErrorMsg(resultBean.getErrorMsg());
+                    errorMsg = resultBean.getErrorMsg();
                 }
+                entrust.setErrorMsg(errorMsg);
+                entrust.setEntrustStatus(EntrustStatus.INVALID.value);
                 entrust.setErrorCode(ErrorCode.INVALID.value);
-                logger.warn("integratedEntrust failed ErrorNo:{}，reason:{}", resultBean.getErrorCode(), ds.get("error_info"));
+                logger.warn("integratedEntrust failed ErrorNo:{}，reason:{}", resultBean.getErrorCode(), errorMsg);
             }
             TerminalId terminalId = new TerminalId();
             BeanUtils.copyProperties(entrust, terminalId);
@@ -367,8 +357,6 @@ public class UfxTradeAgent extends TradeAgentDsp {
 
     /**
      * 333017  委托撤单 用于竞价平台所有委托业务撤单
-     * xiazelei 修改于 2022/5/25 16:58
-     * 332743  固收债券回售申报撤单
      */
     @Override
     public void cancelEntrust(Entrust entrust, EntrustInterface cancelEntrust) {
@@ -376,11 +364,6 @@ public class UfxTradeAgent extends TradeAgentDsp {
         int functionCode = FunctionCode.REQ_CANCEL_ENTRUST.value;
         // 333017  平台委托--委托撤单
         String entrustProp = "Bidding";
-        if (EntrustProp.HS.value.equals(entrust.getEntrustProp()) && Market.SHSE.value.equals(entrust.getMarket())) {
-            // xiazelei 修改于 2022/5/25 16:58  332743  固收债券回售申报撤单
-            entrustProp = "BondSellBackSH";
-        }
-
         try {
             // region 参数组装
             // 自定义参数
@@ -388,7 +371,6 @@ public class UfxTradeAgent extends TradeAgentDsp {
             customParam.put("cancelId", cancelEntrust.getId());
             customParam.put("entrustDate", cancelEntrustBean.getTradingDay());
             // endregion
-            // 332743   固收债券回售申报撤单 柜台只返回 entrust_no一个字段
             ResultBean resultBean = triggerCodeAdapter(functionCode, entrustProp, entrust, customParam);
             Map<String, Object> ds = (Map<String, Object>) resultBean.getData();
 
@@ -410,17 +392,19 @@ public class UfxTradeAgent extends TradeAgentDsp {
                     }
                     cancelEntrustBean.setStockCode((String) ds.get("stock_code"));
                     cancelEntrustBean.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
-                } else if ("BondSellBackSH".equals(entrustProp)) {
-                    // 332743  固收债券回售申报撤单
-                    cancelEntrustBean.setMarket(Market.SHSE.value);
-                    cancelEntrustBean.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
-                    cancelEntrustBean.setBrokerEntrustId(entrust.getBrokerEntrustId());
                 }
             } else {
                 // 失败 柜台废单
+                // yanjianhui 修改于 2022/8/24 11:23  柜台报错返回空报文导致指令进度没有被释放处理。
+                String errorMsg = null;
+                if(ds != null){
+                    errorMsg = ErrorMsgUtils.subErrorMsg((String)ds.get("error_info"));
+                }else{
+                    errorMsg = resultBean.getErrorMsg();
+                }
                 cancelEntrustBean.setErrorCode(resultBean.getErrorCode());
                 cancelEntrustBean.setEntrustStatus(EntrustStatus.INVALID.value);
-                cancelEntrustBean.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
+                cancelEntrustBean.setErrorMsg(errorMsg);
             }
             onRspCancelEntrust(cancelEntrustBean);
         } catch (Exception e) {
@@ -1005,9 +989,9 @@ public class UfxTradeAgent extends TradeAgentDsp {
             String accountId = entry.getKey();
             LoginInfo loginInfo = entry.getValue();
             logger.info("account：{}，status：{}", accountId, getStatus(accountId));
-            if (getStatus(accountId) != AccountLoginStatus.TRADING.value) {
-                return;
-            }
+//            if (getStatus(accountId) != AccountLoginStatus.TRADING.value) {
+//                return;
+//            }
             boolean loginStatus = tradeAgentManager.getAgentLoginStatus(accountId);
             if (loginStatus) {
                 executeQueryNextTrade(accountId, loginInfo);

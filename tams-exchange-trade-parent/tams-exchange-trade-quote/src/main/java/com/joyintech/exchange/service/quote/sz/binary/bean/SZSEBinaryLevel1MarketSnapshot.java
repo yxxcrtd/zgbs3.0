@@ -223,7 +223,7 @@ public class SZSEBinaryLevel1MarketSnapshot {
         }
     }
 
-    private void setPriceDetail(SZSEBinaryMDEntryTypeEnum priceType, int level, long volume, long price) {
+    private void setPriceDetail(SZSEBinaryMDEntryTypeEnum priceType, int level, long volume, double price) {
         if (priceType == null) {
             return;
         }

@@ -962,9 +962,9 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
             KCBPWAccount kcbpAccount = entry.getValue();
             String accountId = kcbpAccount.getAccountId();
             logger.info("account：{}，status：{}", accountId, getStatus(accountId));
-            if (getStatus(accountId) != AccountLoginStatus.TRADING.value) {
-                return;
-            }
+//            if (getStatus(accountId) != AccountLoginStatus.TRADING.value) {
+//                return;
+//            }
             boolean loginStatus = tradeAgentManager.getAgentLoginStatus(accountId);
             if (loginStatus) {
                 executeQueryNextTrade(kcbpAccount);
