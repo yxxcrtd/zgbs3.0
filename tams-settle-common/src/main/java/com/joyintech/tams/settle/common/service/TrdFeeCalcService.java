@@ -399,10 +399,6 @@ public class TrdFeeCalcService {
 			if (StringUtil.isNotEmpty(tradeFeatureInformation.getSecAcctId())) {
 				localPlanSearchInfo.setSecAcctId(tradeFeatureInformation.getSecAcctId());
 			}
-			// 资金账户
-			if (StringUtil.isNotEmpty(tradeFeatureInformation.getAcctNo())) {
-				localPlanSearchInfo.setCapitalAccountNo(tradeFeatureInformation.getAcctNo());
-			}
 			// 券商代码
 			if (StringUtil.isNotEmpty(stlDownDataDealAccountInfoDto.getBrokerId())) {
 				localPlanSearchInfo.setBrokerageNo(stlDownDataDealAccountInfoDto.getBrokerId());
