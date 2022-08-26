@@ -771,10 +771,10 @@ public class CfetsQuotedTradeCommonService{
             interfCstpSecdeal.setTrad(traderId);
         }
         if(StringUtil.isNotEmpty(interfCstpTrade.getOurinstitutioncode())){
-            int count = cstpMapper.getPtlByOurinstitutioncode(interfCstpTrade.getOurinstitutioncode());
-            logger.info("本方机构已经关联组合数:{}", count);
+//            int count = cstpMapper.getPtlByOurinstitutioncode(interfCstpTrade.getOurinstitutioncode());
+//            logger.info("本方机构已经关联组合数:{}", count);
             //TODO 不应该用该逻辑,应该根据本方角色判断交易方向
-            if (count > 0) {
+//            if (count > 0) {
                 interfCstpSecdeal.setTrad(interfCstpTrade.getOurtradername());
                 interfCstpSecdeal.setCno(interfCstpTrade.getCounterinstitutioncode());
                 interfCstpSecdeal.setClienttrader(interfCstpTrade.getCountertradername());
@@ -783,16 +783,16 @@ public class CfetsQuotedTradeCommonService{
                 } else {
                     interfCstpSecdeal.setPs(DictCodeList.交易方向_卖出.getValue());
                 }
-            } else {
-                interfCstpSecdeal.setTrad(interfCstpTrade.getCountertradername());
-                interfCstpSecdeal.setCno(interfCstpTrade.getOurinstitutioncode());
-                interfCstpSecdeal.setClienttrader(interfCstpTrade.getOurtradername());
-                if (StringUtil.equals(interfCstpSecdeal.getPs(), "P")) {
-                    interfCstpSecdeal.setPs(DictCodeList.交易方向_卖出.getValue());
-                } else {
-                    interfCstpSecdeal.setPs(DictCodeList.交易方向_买入.getValue());
-                }
-            }
+//            } else {
+//                interfCstpSecdeal.setTrad(interfCstpTrade.getCountertradername());
+//                interfCstpSecdeal.setCno(interfCstpTrade.getOurinstitutioncode());
+//                interfCstpSecdeal.setClienttrader(interfCstpTrade.getOurtradername());
+//                if (StringUtil.equals(interfCstpSecdeal.getPs(), "P")) {
+//                    interfCstpSecdeal.setPs(DictCodeList.交易方向_卖出.getValue());
+//                } else {
+//                    interfCstpSecdeal.setPs(DictCodeList.交易方向_买入.getValue());
+//                }
+//            }
         }
         // 根据原始交易编号，判断数据是否已经存在，如果已存在则更新，否则进入插入操作
         if (StringUtil.isNotEmpty(dealno)) {
