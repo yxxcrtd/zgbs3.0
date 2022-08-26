@@ -668,7 +668,7 @@ public class StlDataDealSzdJsmxProcessService {
 						String calendarId = CacheUtil.getSysParam(StlDataDealProcessConstant.STL_DOWNDATA_DEAL_SHJYS_CALID);
 						settleTransData.setMpayDate(stlDataDealProcessCommonService.getNextWorkDay(DateUtil.parse(szdJsmx.getQtrq()), calendarId));
 						// 交割日
-						settleTransData.setSettleDate(DateUtil.parse(szdJsmx.getJsrq()));
+						settleTransData.setSettleDate(DateUtil.parse(szdJsmx.getJyrq()));
 						// 本金金额
 						// BigDecimal bjje = new BigDecimal(Math.abs(new BigDecimal(szdJsmx.getQsje()).doubleValue()));
 						// 本金金额 = 成交数量 fuyongsheng 20211101 edit start
