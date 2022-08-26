@@ -131,7 +131,6 @@ public class PositionRequestPtlFoundAllocation002Request {
         map.put("cashAcctId",entity.getMyAcctNo());
         map.put("cashAmount",entity.getSettleAmt());
         ptlTrusteeshipList.add(map);
-        resultMap.put("ptlTrusteeshipList", ptlTrusteeshipList);
         //设置收款账户列表
 
         List<Map<String, Object>> ptlSecuritiesList = new ArrayList<>();
@@ -141,7 +140,15 @@ public class PositionRequestPtlFoundAllocation002Request {
         maps.put("cashAcctId",entity.getCounterAcctNo());
         maps.put("cashAmount",entity.getSettleAmt());
         ptlSecuritiesList.add(maps);
-        resultMap.put("ptlSecuritiesList", ptlSecuritiesList);
+        // 托管户和证券户数据
+        if (Objects.equals(entity.getPayType(), DictCodeListExt1.指令类型_银证转账_银转证.getValue())
+                || Objects.equals(entity.getPayType(), "01") || Objects.equals(entity.getPayType(), "HK01")) {
+            resultMap.put("ptlTrusteeshipList", ptlTrusteeshipList);//托管户
+            resultMap.put("ptlSecuritiesList", ptlSecuritiesList);//证券户
+        } else {
+            resultMap.put("ptlTrusteeshipList", ptlSecuritiesList);//证券户
+            resultMap.put("ptlSecuritiesList", ptlTrusteeshipList);//托管户
+        }
     }
 
 
