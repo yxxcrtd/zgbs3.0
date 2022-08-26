@@ -837,6 +837,7 @@ public class TrdFeeCalcService {
 					trdFeetConfig = trdFeeConfigs_brokerageNo.get(0);
 				}
 			}
+			feePlan.setTrdFeeConfig(trdFeetConfig);
 			// 1.2 交易费用配置明细
 			List<TrdFeeConfigDetail> trdFeeConfigDetails = trdFeeCalcMapper
 					.getTrdFeeConfigDetail(trdFeetConfig.getSeqNo());
