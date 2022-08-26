@@ -792,7 +792,7 @@ public class StlDataDealSzdJsmxProcessService {
 						// 交易日期
 						settleTransData.setTradeDate(settleTransData.getMdate());
 						// 交割日期
-						settleTransData.setSettleDate(DateUtil.parse(szdJsmx.getJsrq()));
+						settleTransData.setSettleDate(DateUtil.parse(szdJsmx.getJyrq()));
 						// 首期交收日
 						String calendarId = CacheUtil.getSysParam(StlDataDealProcessConstant.STL_DOWNDATA_DEAL_SHJYS_CALID);
 						settleTransData.setVpayDate(stlDataDealProcessCommonService.getNextWorkDay(DateUtil.parse(szdJsmx.getJyrq()), calendarId));
