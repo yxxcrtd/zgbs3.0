@@ -47,10 +47,10 @@ public class KCBPUTradeAgent extends TradeAgentDsp {
         kcbpuAccounts.put(kcbpAccount.getAccountId(), kcbpAccount);
     }
 
-//    @PostConstruct
-//    public void init() {
-//        setTerminalName(AgentType.KINGDOM_KCBPU.value);
-//    }
+    @PostConstruct
+    public void init() {
+        setTerminalName(AgentType.KINGDOM_KCBPU.value);
+    }
 
 
     /**
@@ -87,7 +87,7 @@ public class KCBPUTradeAgent extends TradeAgentDsp {
                 String data = JsonUtils.getJsonFromObject(resultBean.getData());
                 logger.info("金证(U版)用户登录信息：{}", data);
                 KCBPUAccount kcbpAccount = JsonUtils.getObjectFromJson(data, KCBPUAccount.class);
-               // kcbpAccount.setAgentType(AgentType.KINGDOM_KCBPU.value);
+                kcbpAccount.setAgentType(AgentType.KINGDOM_KCBPU.value);
                 resultBean.setData(kcbpAccount);
 
                 //保存登录信息

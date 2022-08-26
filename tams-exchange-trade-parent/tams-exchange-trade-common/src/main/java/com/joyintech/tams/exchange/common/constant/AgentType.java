@@ -3,6 +3,7 @@ package com.joyintech.tams.exchange.common.constant;
 public enum AgentType {
 
     KINGDOM_KCBPW("金证kcbpw", "kcbpw"),
+    KINGDOM_KCBPU("金证kcbpu","kcbpu"),
     UFX("恒生ufx", "ufx"),
     KD_GATEWAY("金证KDGateway", "KDGateway"),
     JSD("金仕达", "jsd"),
@@ -27,6 +28,8 @@ public enum AgentType {
                 return KD_GATEWAY;
             case "ctp":
                 return CTP;
+            case "kcbpu":
+                return KINGDOM_KCBPU;
         }
         return null;
     }

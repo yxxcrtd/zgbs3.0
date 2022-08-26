@@ -660,9 +660,8 @@
         MST_CFETS_CUSTOMER_TRADER.MPARTY_ID
         FROM MST_CFETS_CUSTOMER_TRADER
         INNER JOIN(
-        SELECT nvl(t2.mparty_id,t1.party_id) PARTY_ID
-        from MST_CFETS_CUSTOMER_INFO t1 LEFT JOIN MST_CFETS_CUSTOMER_RELA t2
-        on t1.party_id = t2.sparty_id
+        SELECT t1.party_id PARTY_ID
+        from MST_CFETS_CUSTOMER_INFO t1
         WHERE 1 = 1
         <if test="partyId != null and !partyId.equals('')">
             AND t1.PARTY_ID = #{partyId}
