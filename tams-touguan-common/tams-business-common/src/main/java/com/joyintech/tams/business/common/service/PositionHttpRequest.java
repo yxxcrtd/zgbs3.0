@@ -26,7 +26,7 @@ public class PositionHttpRequest {
     /**
      * 日志
      */
-    private static Logger logger = LoggerFactory.getLogger(PositionHttpRequest.class);
+    private static final Logger logger = LoggerFactory.getLogger(PositionHttpRequest.class);
 
     public final static String CODE_BUSI_RK = "300";    // 返回业务信息拒绝，余额不足，软控，前端确认
     public final static String CODE_BUSI_YK = "310";    // 返回业务信息拒绝，余额不足，硬控，前端提示
@@ -59,11 +59,19 @@ public class PositionHttpRequest {
         }
 
         logger.info("发送头寸报文:{}", JsonUtils.object2Json(params));
-        String res = sendPrivate(params);
-        logger.info("头寸返回数据:{}", res);
-        Map msgMap = JsonUtils.json2Object(res, Map.class);
-        if (msgMap == null) {
-            throw new PositionException("头寸返回数据为空！");
+        Map msgMap = null;
+        try {
+            String res = sendPrivate(params);
+            logger.info("头寸返回数据:{}", res);
+            msgMap = JsonUtils.json2Object(res, Map.class);
+            if (msgMap == null) {
+                logger.error("头寸返回数据为空");
+                throw new PositionException("头寸返回数据为空！");
+            }
+        } catch (Exception e) {
+            // 报错发送回滚头寸报文
+            logger.error("调用头寸报错", e);
+            roll((Long) params.get("seqno"), (String) params.get("modelType"), e.getMessage());
         }
 
         if (!StringUtil.equals("success", msgMap.get("code") + "")) {
@@ -216,10 +224,17 @@ public class PositionHttpRequest {
         try {
             roll(bm);
         } catch (Exception e) {
-            errorMsg += "\n" + e.getMessage();
+            if (!StringUtil.equals(e.getMessage(), errorMsg)) {
+                errorMsg += "\n" + e.getMessage();
+            }
+            logger.error(e.getMessage(), e);
         }
         // 页面端根据异常信息返回前端
         throw new PositionException(errorMsg);
+    }
+
+    public static void roll(Long revokeId, String modelType, String errorMsg) {
+        roll(String.valueOf(revokeId), modelType, errorMsg);
     }
 
     public static void sendRevoke(String revokeId, String modelType, String errorMsg) {
