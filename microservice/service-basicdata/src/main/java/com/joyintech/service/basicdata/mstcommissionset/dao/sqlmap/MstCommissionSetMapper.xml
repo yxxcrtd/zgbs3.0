@@ -83,6 +83,15 @@
 			<if test="effDate != null and effDate != ''">
 				and m.EFF_DATE = to_date(#{effDate},'yyyy-MM-dd')
 			</if>
+			<if test="portfolioId != null and portfolioId != ''">
+				and m.PORTFOLIO_ID = #{portfolioId}
+			</if>
+			<if test="customerId != null and customerId != ''">
+				and t1.customerId = #{customerId}
+			</if>
+			<if test="capitalAccountNo != null and capitalAccountNo != ''">
+				and m.CAPITAL_ACCOUNT_NO = #{capitalAccountNo}
+			</if>
 			order by m.BATCH_SEQ,m.EFF_DATE desc
 	</select>
 	
