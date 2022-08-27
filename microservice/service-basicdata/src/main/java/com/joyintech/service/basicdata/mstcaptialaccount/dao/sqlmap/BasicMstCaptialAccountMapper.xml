@@ -360,6 +360,10 @@
 		from STL_CAPACCT_INFO SCI
 				 left join MST_SALE_DEPARTMENT MSD on SCI.OWN_DEPT = MSD.SALE_DEPID
 		where MSD.BROKER_ID= #{brokerId,jdbcType=VARCHAR}
+		<if test="search != null and search != ''">
+			AND (SCI.ACCT_NO LIKE CONCAT('%',CONCAT(#{search},'%'))
+			OR SCI.ACCT_NAME LIKE CONCAT('%',CONCAT(#{search},'%')))
+		</if>
 	</select>
 
 </mapper>

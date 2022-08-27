@@ -544,8 +544,8 @@ public class MstCaptialAccountService extends BaseService<MstCaptialAccountDto>{
      * @param param
      * @return
      */
-    public List<SelectOptionDto>  getAcctInfo(Map<String,Object> param){
-        return basicMstCaptialAccountMapper.getAcctInfo(param);
+    public Page<SelectOptionDto> getAcctInfo(Map<String, Object> param, int page, int length) {
+        return this.queryForPageForSelectReturn(page, length, () -> basicMstCaptialAccountMapper.getAcctInfo(param));
     }
     
 }
