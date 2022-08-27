@@ -545,7 +545,7 @@ public class MstCaptialAccountService extends BaseService<MstCaptialAccountDto>{
      * @return
      */
     public List<SelectOptionDto>  getAcctInfo(Map<String,Object> param){
-        return stlCapacctInfoMapper.getAcctInfo(param);
+        return basicMstCaptialAccountMapper.getAcctInfo(param);
     }
     
 }
