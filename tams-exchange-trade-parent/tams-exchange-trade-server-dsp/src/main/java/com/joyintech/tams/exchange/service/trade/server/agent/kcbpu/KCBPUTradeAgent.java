@@ -1,5 +1,6 @@
 package com.joyintech.tams.exchange.service.trade.server.agent.kcbpu;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.joyintech.tams.exchange.common.bean.*;
 import com.joyintech.tams.exchange.common.bean.bond.StandardBondQryBean;
@@ -11,6 +12,7 @@ import com.joyintech.tams.exchange.common.constant.EntrustStatus;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.net.protocol.FunctionCode;
+import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
 import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.service.trade.dao.domain.TerminalAgentInfo;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgentDsp;
@@ -33,7 +35,6 @@ public class KCBPUTradeAgent extends TradeAgentDsp {
 
     private static final Logger logger = LoggerFactory.getLogger(KCBPUTradeAgent.class);
 
-
     /**
      * 记录已经登录的账号
      */
@@ -52,7 +53,6 @@ public class KCBPUTradeAgent extends TradeAgentDsp {
         setTerminalName(AgentType.KINGDOM_KCBPU.value);
     }
 
-
     /**
      * 301登录 登录资金账户
      *
@@ -61,12 +61,10 @@ public class KCBPUTradeAgent extends TradeAgentDsp {
      */
     @Override
     public ResultBean reqLoginAccount(AccountLoginReqBean accountLoginReqBean) {
-
         // 场景代码
-        int functionCode = FunctionCode.REQ_QRY_INTEGRATED_NEGOTIATE_QUOTE_RECEIVE.value;
+        int functionCode = FunctionCode.REQ_ACCOUNT_LOGIN.value;
         // 场景属性
-        // 410682 转发成交申报查询  深圳现券协商成交转发成交申报查询
-        String entrustProp = "BondConsultQuerySZ";
+        String entrustProp = "Login";
 
         try {
             Account account = accountLoginReqBean.getAccount();
@@ -74,7 +72,6 @@ public class KCBPUTradeAgent extends TradeAgentDsp {
             // 账户交易密码解密
             account.setPwd(new String(Base64.decodeBase64(account.getPwd())));
             account.setTradePwd(new String(Base64.decodeBase64(account.getTradePwd())));
-
 
             Map<String, Object> customParam = new ConcurrentHashMap<>();
             customParam.put("procName", "");
@@ -98,7 +95,6 @@ public class KCBPUTradeAgent extends TradeAgentDsp {
                 addTradeRequest(accountId, this);
                 addAccount(accountId, account);
                 setStatus(account.getId(), AccountLoginStatus.LOGGED);
-
 
                 //登录成功后发送重传请求
                 terminalHelper.reqReissueEntrust(accountId);
@@ -159,6 +155,7 @@ public class KCBPUTradeAgent extends TradeAgentDsp {
 
     /**
      * 376 当日成交明细查询
+     *
      * @param accountId
      * @return
      */
@@ -195,10 +192,9 @@ public class KCBPUTradeAgent extends TradeAgentDsp {
     public void entrust(Entrust entrust) {
         logger.info("send entrust:{}", entrust.getId());
         // 场景代码
-        int functionCode = FunctionCode.REQ_QRY_INTEGRATED_NEGOTIATE_QUOTE_RECEIVE.value;
+        int functionCode = FunctionCode.REQ_ENTRUST.value;
         // 场景属性
-        // 410682 转发成交申报查询  深圳现券协商成交转发成交申报查询
-        String entrustProp = "BondConsultQuerySZ";
+        String entrustProp = "Bidding";
 
         try {
             // region 参数组装
@@ -228,19 +224,147 @@ public class KCBPUTradeAgent extends TradeAgentDsp {
         }
     }
 
+    /**
+     * 403
+     * 596
+     *
+     * @param iEntrust
+     */
     @Override
-    public void integratedEntrust(IntegratedEntrust integratedEntrust) {
+    public void integratedEntrust(IntegratedEntrust iEntrust) {
+        logger.info("send IntegratedEntrust:{}", iEntrust.getId());
+        // 场景代码
+        int functionCode = FunctionCode.REQ_ENTRUST.value;
+        // 场景属性
+        // 默认 403
+        String entrustProp = "Bidding";
+        // 596 协议回购 上海 深圳
+        if (IntegratedEntrustUtils.isProtocolBack_SZ(iEntrust.getEntrustProp())) {
+            entrustProp = "ProtocolBack";
+        }
+        try {
+            // region 参数组装
+            // 自定义参数
+            Map<String, Object> customParam = getCustomParam(iEntrust.getAccountId());
+            // endregion
+            ResultBean resultBean = triggerCodeAdapter(functionCode, entrustProp, iEntrust, customParam);
 
+            iEntrust.setEntrustStatus(EntrustStatus.TOBE_REPORTED.value);
+            if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
+                List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
+                for (Map<String, String> resMap : resList) {
+                    iEntrust.setBrokerEntrustId(resMap.get("ordersno"));
+                    iEntrust.setReportNo(AgentUtil.GetMapValue(resMap, "orderid"));
+                    // 缓存委托的ID
+                    entrustIdManager.setKcbpwZHEntrustId(iEntrust.getAccountId(),
+                            iEntrust.getBrokerEntrustId() + "|" + iEntrust.getReportNo(), iEntrust.getId());
+                }
+            } else {
+                iEntrust.setErrorCode(resultBean.getErrorCode());
+                iEntrust.setErrorMsg(resultBean.getErrorMsg());
+            }
+
+            TerminalId terminalId = new TerminalId();
+            BeanUtils.copyProperties(iEntrust, terminalId);
+            terminalId.KeyType = "I";
+            onRspIntegratedEntrust(terminalId);
+        } catch (Exception e) {
+            logger.error("send integratedEntrust error:{},{}", iEntrust.getId(), e.getMessage(), e);
+            throw new RuntimeException(ErrorCode.TERMINAL_API_ERROR.errorMsg);
+        }
     }
 
+    /**
+     * 404
+     *
+     * @param entrust
+     * @param cancelEntrust
+     */
     @Override
     public void cancelEntrust(Entrust entrust, EntrustInterface cancelEntrust) {
+        CancelEntrustBean cancelEntrustBean = getCancelEntrustBean(entrust, cancelEntrust);
+        logger.info("send entrust:{}", entrust.getId());
+        // 场景代码
+        int functionCode = FunctionCode.REQ_ENTRUST.value;
+        // 场景属性
+        // 默认 404
+        String entrustProp = "Bidding";
+        try {
+            // region 参数组装
+            // 自定义参数
+            Map<String, Object> customParam = getCustomParam(entrust.getAccountId());
+            // endregion
+            ResultBean resultBean = triggerCodeAdapter(functionCode, entrustProp, entrust, customParam);
 
+            if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
+                List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
+                for (Map<String, String> resMap : resList) {
+                    cancelEntrustBean.setCancelBrokerEntrustId(resMap.get("ordersno"));
+                    // 撤销的orderid 优先取 orderid。没有取cancelorderid
+                    String orderid = AgentUtil.GetMapValue(resMap, "orderid");
+                    if (Strings.isNullOrEmpty(orderid)) {
+                        orderid = AgentUtil.GetMapValue(resMap, "cancelorderid");
+                    }
+                    // 缓存被撤销与撤销的委托更新
+                    entrustIdManager.setKcbpwPTCancelEntrustId(entrust.getAccountId(), entrust.getBrokerEntrustId(),
+                            resMap.get("ordersno"), orderid);
+                    // 缓存撤销的ID
+                    entrustIdManager.setKcbpwPTEntrustId(entrust.getAccountId(),
+                            cancelEntrustBean.getCancelBrokerEntrustId() + "|" + entrust.getReportNo(), cancelEntrustBean.getCancelId());
+                }
+            } else {
+                cancelEntrustBean.setErrorCode(resultBean.getErrorCode());
+                cancelEntrustBean.setErrorMsg(resultBean.getErrorMsg());
+            }
+            onRspCancelEntrust(cancelEntrustBean);
+        } catch (Exception e) {
+            logger.error(" cancelEntrust error:{},{}", entrust.getId(), e.getMessage(), e);
+            throw new RuntimeException(ErrorCode.TERMINAL_API_ERROR.errorMsg);
+        }
     }
 
     @Override
-    public void cancelIntegratedEntrust(IntegratedEntrust integratedEntrust, IntegratedEntrust cancelEntrust) {
+    public void cancelIntegratedEntrust(IntegratedEntrust iEntrust, IntegratedEntrust cancelEntrust) {
+        CancelEntrustBean cancelEntrustBean = getCancelEntrustBean(iEntrust, cancelEntrust);
+        logger.info("send entrust:{}", iEntrust.getId());
+        // 场景代码
+        int functionCode = FunctionCode.REQ_ENTRUST.value;
+        // 场景属性
+        // 默认 404
+        String entrustProp = "Bidding";
+        try {
+            // region 参数组装
+            // 自定义参数
+            Map<String, Object> customParam = getCustomParam(iEntrust.getAccountId());
+            // endregion
+            ResultBean resultBean = triggerCodeAdapter(functionCode, entrustProp, iEntrust, customParam);
+            if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
+                List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
+                for (Map<String, String> resMap : resList) {
+                    cancelEntrustBean.setCancelBrokerEntrustId(resMap.get("ordersno"));
+                    // 撤销的orderid 优先取 orderid。没有取cancelorderid
+                    String orderid = AgentUtil.GetMapValue(resMap, "orderid");
+                    if (Strings.isNullOrEmpty(orderid)) {
+                        orderid = AgentUtil.GetMapValue(resMap, "cancelorderid");
+                    }
 
+                    // 缓存被撤销与撤销的委托更新
+                    entrustIdManager.setKcbpwZHCancelEntrustId(iEntrust.getAccountId(), iEntrust.getBrokerEntrustId(),
+                            resMap.get("ordersno"), orderid);
+                    entrustIdManager.setKcbpwZHEntrustId(iEntrust.getAccountId(),
+                            cancelEntrustBean.getCancelBrokerEntrustId() + "|" + orderid, cancelEntrustBean.getCancelId());
+                }
+
+            } else {
+                cancelEntrustBean.setErrorCode(resultBean.getErrorCode());
+                cancelEntrustBean.setErrorMsg(resultBean.getErrorMsg());
+            }
+            onRspCancelIntegratedEntrust(cancelEntrustBean);
+
+        } catch (Exception e) {
+            logger.error(" cancelIntegratedEntrust error:{},{}", iEntrust.getId(), e.getMessage(), e);
+            throw new RuntimeException(ErrorCode.TERMINAL_API_ERROR.errorMsg);
+        }
     }
 
 
