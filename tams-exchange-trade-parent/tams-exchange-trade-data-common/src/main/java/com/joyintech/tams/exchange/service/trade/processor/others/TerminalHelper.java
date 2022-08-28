@@ -455,7 +455,62 @@ public class TerminalHelper {
 //        }
 //        return new ArrayList<>();
     }
+    public List<IntegratedBulkCloseQuoteBean> queryIntegratedBulkCloseQuote(IntegratedBulkCloseQuoteQryBean integratedBulkCloseQuoteQryBean) {
+        // 交易页面调用tick获取行情客户端大宗盘后行情
+        List<IntegratedBulkCloseQuoteBean> integratedBulkCloseQuoteBeanList = new ArrayList<>();
+        IntegratedBulkCloseQuoteBean integratedBulkCloseQuoteBean = new IntegratedBulkCloseQuoteBean();
+        String stockCode = integratedBulkCloseQuoteQryBean.getStockCode();
+        integratedBulkCloseQuoteBean.setStockCode(stockCode);
+        if (StringUtil.endsWith(stockCode, "SH")) {
+            ResultBean resultBean = simpleRestTemplate.getForObject(ServiceApplication.QUOTE_SERVICE_NAME + TradeServiceURL.prefix + TradeServiceURL.queryQuoteTick + "?stock_code=" + stockCode, ResultBean.class);
+            if (resultBean.getData()!=null){
+                integratedBulkCloseQuoteBean.setClosingPrice((Double) ((Map)resultBean.getData()).get("closePrice"));
+                integratedBulkCloseQuoteBean.setWeightavgPrice((Double) ((Map)resultBean.getData()).get("averageDailyPrice"));
+            }
+        } else if (StringUtil.endsWith(stockCode, "SZ")) {
+            ResultBean resultBean_060 = simpleRestTemplate.getForObject(ServiceApplication.QUOTE_SERVICE_NAME + TradeServiceURL.prefix + TradeServiceURL.queryQuoteTick + "?stock_code=" + stockCode + ".060", ResultBean.class);
+            ResultBean resultBean_061 = simpleRestTemplate.getForObject(ServiceApplication.QUOTE_SERVICE_NAME + TradeServiceURL.prefix + TradeServiceURL.queryQuoteTick + "?stock_code=" + stockCode + ".061", ResultBean.class);
+            if (resultBean_060.getData()!=null){
+                integratedBulkCloseQuoteBean.setClosingPrice((Double) ((Map)resultBean_060.getData()).get("closePrice"));
+            }
+            if (resultBean_061.getData() != null) {
+                integratedBulkCloseQuoteBean.setWeightavgPrice((Double) ((Map)resultBean_061.getData()).get("averageDailyPrice"));
+            }
+        }
+        integratedBulkCloseQuoteBeanList.add(integratedBulkCloseQuoteBean);
+        return integratedBulkCloseQuoteBeanList;
 
+//        if (pageSize > 0) {
+//            if (pageSize > 1000) {
+//                pageSize = 1000;
+//            }
+//        }
+//
+//        IntegratedBulkCloseQuoteQryBean integratedBulkCloseQuoteQryBean = new IntegratedBulkCloseQuoteQryBean(stockCode, exchangeType, accountId, pageSize);
+//
+//        TradeAgent tradeAgent = getAgent(accountId);
+//        if (Objects.nonNull(tradeAgent)) {
+//            try {
+//                List<IntegratedBulkCloseQuoteBean> beanList = tradeAgent.reqIntegratedBulkCloseQuote(integratedBulkCloseQuoteQryBean);
+//                if (Objects.nonNull(beanList)) {
+//                    beanList.forEach(quoteBean -> {
+//                        Instrument instrument = instrumentService.findById(quoteBean.getStockCode());
+//                        if (Objects.nonNull(instrument)) {
+//                            quoteBean.setStockName(instrument.getStockName());
+//                            quoteBean.setAssetType(instrument.getAssetType());
+//                        } else {
+//                            logger.info("未找到匹配的合约代码信息！！ {}", quoteBean.getStockCode());
+//                        }
+//                    });
+//                }
+//                return beanList;
+//            } catch (Exception e) {
+//                logger.error("reqIntegratedBulkCloseQuote error {}", "\r\n" + e);
+//            }
+//        }
+//        return new ArrayList<>();
+    }
+    
     public List<IntegratedRepurchaseQuoteBean> queryIntegratedRepurchaseQuote(IntegratedRepurchaseQuoteQryBean integratedRepurchaseQuoteQryBean) {
         int pageSize = integratedRepurchaseQuoteQryBean.getPageSize();
         if (pageSize > 1000) {

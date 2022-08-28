@@ -419,7 +419,7 @@ public class CfetsSettleService extends BaseService {
             positionRulePtlData.setTradeId(dto.getTradeId());
             positionRulePtlData.setEtrId(dto.getEntrustId());
             if (StringUtil.isNotEmpty(dto.getPortfolioId())) {
-                Map<String, Object> map = new HashMap<String, Object>();
+                Map<String, Object> map = new HashMap<>();
                 map.put("portfolioId", dto.getPortfolioId());
                 map.put("acctType", BussinessDictCodeList.资金账户类型_托管账户.getValue());
                 map.put("ccy", dto.getCcy());
@@ -431,20 +431,16 @@ public class CfetsSettleService extends BaseService {
             positionRulePtlData.setCashAmount(dto.getTradeAmt());
             ptlCashList.add(positionRulePtlData);
             List<PledgeBondInfoDto> pledgeBondList = cfetsSettleMapper.getPledgeListByTradeId(dto.getFinprodId());
-            if (StringUtil.isNotEmpty(pledgeBondList)) {
+            logger.info("质押券:{}",JsonUtils.object2Json(pledgeBondList));
+            if (StringUtil.isNotEmpty(pledgeBondList)
+                    && StringUtil.equals(dto.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())) {
                 for (PledgeBondInfoDto regFinPledge : pledgeBondList) {
                     CfetsEtrIbRepoPosPortfolioSecRequest secport = new CfetsEtrIbRepoPosPortfolioSecRequest();
                     secport.setPortfolioId(dto.getPortfolioId());
                     secport.setEtrId(dto.getEntrustId());
                     secport.setTradeId(dto.getTradeId());
                     secport.setFinprodId(regFinPledge.getFinprodId());
-                    Map<String, Object> map = new HashMap<String, Object>();
-                    map.put("portfolioId", dto.getPortfolioId());
-                    map.put("finprodId", regFinPledge.getFinprodId());
-                    String secAcctId = this.qryPortfolioSecAcctId(map);
-                    if (StringUtil.isNotEmpty(secAcctId)) {
-                        secport.setSecAcctId(secAcctId); // 证券账户
-                    }
+                    secport.setSecAcctId(dto.getSecManageAcctId()); // 证券账户
                     secport.setSecAmount(ArithmeticUtil.multiply(regFinPledge.getPledgePrin(), new BigDecimal("100")));
                     secport.setOwnSecAmount(ArithmeticUtil.multiply(regFinPledge.getPledgePrin(), new BigDecimal("100")));
                     secport.setIntegrateSecAmount(BigDecimal.ZERO);
