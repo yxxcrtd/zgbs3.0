@@ -229,7 +229,7 @@ application:
   #以下根据实际ip和端口进行修改
   loadbalance: false
   micorservice:
-    contextPath:
+    contextpath:
       single: true
       commonService: http://127.0.0.1:8080/tams
       basicDataService: http://127.0.0.1:8080/tams
@@ -313,7 +313,7 @@ application:
   sqldirpassword: GLB_INV
   #以下根据实际ip和端口进行修改
   micorservice:
-    contextPath:
+    contextpath:
       single: true
       commonService: http://127.0.0.1:8080/tams
       basicDataService: http://127.0.0.1:8080/tams
@@ -395,7 +395,7 @@ application:
   sqldirpassword: GLB_INV
   #以下根据实际ip和端口进行修改
   micorservice:
-    contextPath:
+    contextpath:
       single: true
       commonService: http://127.0.0.1:8080/tams
       basicDataService: http://127.0.0.1:8080/tams
