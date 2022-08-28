@@ -576,4 +576,40 @@ public class StlDataDealProcessCommonService {
 		}
 		return finProductType.getType6();
 	}
+
+	/**
+	 * 根据
+	 * @param termType
+	 * @return
+	 */
+	public Integer getDayByTermType(String termType){
+		if(DictCodeList.回购期限品种_GC001.getValue().equals(termType)){
+			return Integer.parseInt("1");
+		}
+		if(DictCodeList.回购期限品种_GC002.getValue().equals(termType)){
+			return Integer.parseInt("2");
+		}
+		if(DictCodeList.回购期限品种_GC003.getValue().equals(termType)){
+			return Integer.parseInt("3");
+		}
+		if(DictCodeList.回购期限品种_GC004.getValue().equals(termType)){
+			return Integer.parseInt("4");
+		}
+		if(DictCodeList.回购期限品种_GC007.getValue().equals(termType)){
+			return Integer.parseInt("7");
+		}
+		if(DictCodeList.回购期限品种_GC014.getValue().equals(termType)){
+			return Integer.parseInt("14");
+		}
+		if(DictCodeList.回购期限品种_GC028.getValue().equals(termType)){
+			return Integer.parseInt("28");
+		}
+		if(DictCodeList.回购期限品种_GC091.getValue().equals(termType)){
+			return Integer.parseInt("91");
+		}
+		if(DictCodeList.回购期限品种_GC182.getValue().equals(termType)){
+			return Integer.parseInt("182");
+		}
+		return Integer.parseInt("0");
+	}
 }
