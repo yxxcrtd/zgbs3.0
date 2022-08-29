@@ -82,10 +82,15 @@ public enum EntrustProp implements IEnum<String> {
     SZ_REPURCHASE_BUYBACK("深圳债券质押协议回购购回交易", "BPR"),
     SZ_REPURCHASE_RENEWAL("深圳债券质押协议回购到期续做", "BPT"),
 
+    SZ_REPURCHASE_BOND_CHANGE("债券质押协议回购质押券变更委托", "BPV"),
+    SZ_REPURCHASE_REMOVE_PLEDGE("债券质押协议回购解除质押委托", "BPW"),
+    SZ_REPURCHASE_BUYBEFORE("债券质押协议回购提前购回委托", "BPU"),
+    SZ_REPURCHASE_AGREE("债券质押协议回购逆回购方确认委托", ""),
+
+
     //深圳 协议回购 增加 解除质押、换券申报
     SZ_REPURCHASE_RELEASE("深圳债券质押协议回购解除质押", "BPD1"),
     SZ_REPURCHASE_EXCHANGE("深圳债券质押协议回购换券申报", "BPE1"),
-
     // 上海固收平台
     SH_FIXEDINCOME_BAOJIA_CONFIRM("确定报价", "FI1"),
     SH_FIXEDINCOME_TRADE_CLICK("点击成交", "FI3"),
@@ -219,7 +224,7 @@ public enum EntrustProp implements IEnum<String> {
         return EnumUtil.in(entrustProp, SH_REPURCHASE_RELEASE, SH_REPURCHASE_RELEASE_CONFIRM,
                 SH_REPURCHASE_RELEASE_REFUSE, SH_REPURCHASE_EXCHANGE,
                 SH_REPURCHASE_EXCHANGE_CONFIRM, SH_REPURCHASE_EXCHANGE_REFUSE,
-                SZ_REPURCHASE_RELEASE, SZ_REPURCHASE_EXCHANGE);
+                SZ_REPURCHASE_REMOVE_PLEDGE,SZ_REPURCHASE_BOND_CHANGE);
     }
 
     // 中途换券

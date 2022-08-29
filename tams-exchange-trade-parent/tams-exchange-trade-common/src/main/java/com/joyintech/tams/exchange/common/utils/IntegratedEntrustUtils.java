@@ -15,8 +15,11 @@ public class IntegratedEntrustUtils {
             if (EntrustProp.SZ_REPURCHASE_BEGIN.value.equals(entrustProp)
                     || EntrustProp.SZ_REPURCHASE_RENEWAL.value.equals(entrustProp)
                     || EntrustProp.SZ_REPURCHASE_BUYBACK.value.equals(entrustProp)
-                    || EntrustProp.SZ_REPURCHASE_RELEASE.value.equals(entrustProp)
-                    || EntrustProp.SZ_REPURCHASE_EXCHANGE.value.equals(entrustProp)) {
+                    || EntrustProp.SZ_REPURCHASE_BUYBEFORE.value.equals(entrustProp)
+                    || EntrustProp.SZ_REPURCHASE_BOND_CHANGE.value.equals(entrustProp)
+                    || EntrustProp.SZ_REPURCHASE_REMOVE_PLEDGE.value.equals(entrustProp)
+                    || EntrustProp.SZ_REPURCHASE_AGREE.value.equals(entrustProp)
+                    ) {
                 return true;
             }
         }
