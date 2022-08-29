@@ -2,7 +2,9 @@ package com.joyintech.tams.exchange.service.trade.server.agent.kcbpu;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.joyintech.tams.exchange.common.bean.NegotiateQuoteReceiveBean;
+import com.joyintech.tams.exchange.common.constant.AgentType;
 import com.joyintech.tams.exchange.common.constant.RequestStatus;
 import com.joyintech.tams.exchange.common.db.domain.Entrust;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
@@ -16,6 +18,34 @@ import java.util.List;
 import java.util.Map;
 
 public class KCBPUMsgParseHelper {
+
+    /**
+     * 转化账户
+     *
+     * @param resList
+     * @param accountId
+     * @return
+     */
+    public static KCBPUAccount parseAccount(List<Map<String, String>> resList, String accountId) {
+        KCBPUAccount kcbpuAccount = new KCBPUAccount();
+        kcbpuAccount.setAgentType(AgentType.KINGDOM_KCBPU.value);
+        kcbpuAccount.setAccountId(accountId);
+        Map<String, String> secuIds = Maps.newConcurrentMap();
+        for (Map<String, String> map : resList) {
+            kcbpuAccount.setCustId(map.get("USER_CODE"));
+            kcbpuAccount.setOrgId(map.get("BRANCH"));
+            kcbpuAccount.setFundId(map.get("ACCOUNT"));
+            if ("00".equals(map.get("MARKET"))) {
+                // 00 深圳
+                secuIds.put("0", map.get("SECU_ACC"));
+            } else {
+                // 10 上海
+                secuIds.put("1", map.get("SECU_ACC"));
+            }
+        }
+        kcbpuAccount.setSecuIds(secuIds);
+        return kcbpuAccount;
+    }
 
     /**
      * 374 委托查询

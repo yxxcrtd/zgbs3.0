@@ -77,9 +77,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
     @Override
     public ResultBean reqLoginAccount(AccountLoginReqBean accountLoginReqBean) {
         Account account = accountLoginReqBean.getAccount();
-        // 账户交易密码解密
-        account.setPwd(new String(Base64.decodeBase64(account.getPwd())));
-        account.setTradePwd(new String(Base64.decodeBase64(account.getTradePwd())));
+        AgentUtil.SetDecodeBase64(account);
         String accountId = account.getId();
         TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), FunctionCode.REQ_ACCOUNT_LOGIN.value);
         agentInfo.setAccountId(accountId);
