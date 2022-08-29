@@ -848,6 +848,7 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
     private static void deal_交易所_逆回购(BaseTradeProductDealDto finProductTradeDto, DictCodeList 持仓类型,
                                      EtrPositionHoldDto etrPositionHoldDto) {
         BigDecimal 交易日金额 = finProductTradeDto.getTrdProductDeal().getTradeAmt();
+        BigDecimal 交易日本金 = finProductTradeDto.getTrdProductDeal().getPrinAmt();
 //         交易生成的持仓流水
          EtrSecPositionFlowDto etrSecPositionFlowDto = EtrCommonCashPositionDealService.getEtrSecPositionFlowDto(finProductTradeDto);
         // 交易生成的现金流水
@@ -896,7 +897,7 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
             || null != finProductTradeDto.getTrdProductDeal()
             ) { // 无委托
                 // 现金流水dto处理 交割日减少(交易金额-交易券面总额*委托全价/债券面值）
-                etrSecPositionFlowDto.setAmount(交易日金额);
+                etrSecPositionFlowDto.setAmount(交易日本金);
                 // 添加现金流水到目标dto
                 etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
             }
