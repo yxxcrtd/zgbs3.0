@@ -5,6 +5,7 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.file.SafelyFile;
 import com.joyintech.framework.jdbc.datasource.DataSource;
 import com.joyintech.framework.jdbc.enums.DataSourceType;
+import com.joyintech.framework.listener.FileTypeValidator;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
@@ -98,6 +99,8 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
 
     @Autowired
     private CommonBusinessService commonBusinessService;
+    @Autowired(required = false)
+    private FileTypeValidator fileTypeValidator;
 
     /**
      * 保存操作类型
@@ -317,6 +320,11 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         if (!folder.exists())
             folder.createNewFile();
         FileUtils.copyInputStreamToFile(file.getInputStream(),folder);
+        String[] types = null;
+        if(null != fileTypeValidator && !fileTypeValidator.valid(types, folder)) {
+            FileUtils.forceDelete(folder);
+            throw new IOException("MSG:上传的文件格式不被允许，请删除后重新上传。");
+        }
         SysUploadFileInfo fileInfo = new SysUploadFileInfo();
         String uuid = UUID.randomUUID().toString().replace("-", "");
         fileInfo.setSeqNo(uuid);
