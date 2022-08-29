@@ -241,7 +241,11 @@ public class CreditProtectionCertificate002Controller extends BaseController {
                 return new Message<SysUploadFileInfo>().success().setData(fileInfo);
             }
         }catch (Exception e){
-            e.printStackTrace();
+            String errorMsg = e.getMessage();
+            if(errorMsg!=null && errorMsg.startsWith("MSG")){
+                errorMsg = errorMsg.substring(3);
+                return new Message<SysUploadFileInfo>().fail().setMessage(errorMsg);
+            }
             return new Message<SysUploadFileInfo>().fail().setMessage("文件上传异常");
         }
         return null;
