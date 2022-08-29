@@ -139,6 +139,19 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
     }
 
     /**
+     * 回购期限
+     */
+    private String termType;
+
+    public String getTermType() {
+        return termType;
+    }
+
+    public void setTermType(String termType) {
+        this.termType = termType;
+    }
+
+    /**
      * 获取 otherEntrustStatus
      * @return otherEntrustStatus.
      */
@@ -368,7 +381,10 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
 
     public String getTermDays() {
         if(StringUtils.equals(this.getBusiTypePosition(), DictCodeListExt3.投管业务类型_通用式质押回购.getValue())){
-            return convertTermDays(getFinprodAbbr());
+            // GLLCUAT-319:修改场内竞价回购查询回购期限 modify by fuyongsheng 20220829 start
+            // return convertTermDays(getFinprodAbbr());
+            return convertTermDays(getTermType());
+            // GLLCUAT-319:修改场内竞价回购查询回购期限 modify by fuyongsheng 20220829 end
         }
         return termDays;
     }

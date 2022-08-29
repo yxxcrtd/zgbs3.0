@@ -2428,7 +2428,7 @@
         from INTERF_CSTP_TRADE I
         INNER JOIN (SELECT EXECID ,MAX(UPDATETIME) UPDATETIME FROM  INTERF_CSTP_TRADE GROUP BY EXECID)	II ON  II.EXECID = I.EXECID AND II.UPDATETIME = I.UPDATETIME
         left join INTERF_OPICS_TRAD_REPO tr on tr.oritradeid = I.EXECID
-        left join INTERF_TRAD_SECDEAL ts on ts.FEDEALNO = I.EXECID
+        left join INTERF_TRAD_SECDEAL ts on ts.FEDEALNO = I.EXECID and DECODE(I.OURINSTITUTIONROLE, '119', 'T01', 'T02') = ts.PS
         left join fin_product fp on ts.SECID=fp.finprod_market_id and fp.finprod_type='F01'
         LEFT JOIN SYS_USER_ADD sua ON nvl(ts.TRAD,tr.BUYTRADER) =sua.IBU_TRADER
         LEFT JOIN SYS_USER su ON sua.USER_ID =su.USER_ID

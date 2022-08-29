@@ -86,11 +86,7 @@
             editCell: function (value, row, field, cell, column) {
                 if (column.field == 'payAcctNo') {
                     if (typeof value != "undefined" && value) {
-                        $.each(row.payAcctNoList, function (i, v) {
-                            if (v.id == value) {
-                                row.payAcctName = v.text;
-                            }
-                        });
+                        row.payAcctName = $(cell).data('sd')[0].text;
                     }
                     if (typeof value == "undefined" || value == null || value == "") {
                         row.payAcctName = "";
@@ -128,11 +124,7 @@
 
                 } else if (column.field == 'recAcctNo') {
                     if (typeof value != "undefined" && value) {
-                        $.each(row.recAcctNoList, function (i, v) {
-                            if (v.id == value) {
-                                row.recAcctName = v.text;
-                            }
-                        });
+                        row.recAcctName = $(cell).data('sd')[0].text;
                     }
                     if (typeof value == "undefined" || value == null || value == "") {
                         row.recAcctName = "";

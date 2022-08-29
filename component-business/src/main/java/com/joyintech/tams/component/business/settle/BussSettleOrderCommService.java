@@ -59,36 +59,26 @@ public interface BussSettleOrderCommService {
             optionDto.setText(item.getAcctName());
             return optionDto;
         }).collect(Collectors.toList());
-//        if (StringUtil.equals(dto.getPs(), DictCodeListExt1.收支方向_收入.getValue())) {
-//            ret.setPayAcctNoList(counterCapacctList);
-//            ret.setRecAcctNoList(myCapacctList);
-//        }
-//        else {
-//            ret.setPayAcctNoList(myCapacctList);
-//            ret.setRecAcctNoList(counterCapacctList);
-//        }
-        ret.setPayAcctNoList(myCapacctList);
-        ret.setRecAcctNoList(counterCapacctList);
 
         // 画面划款信息，账号信息无默认值，需要下拉勾选（业务共通主件）
-        if (!StringUtil.isEmptyList(ret.getPayAcctNoList())) {
-            if("null".equals(ret.getPayAcctNoList().get(0).getId())){
+        if (!StringUtil.isEmptyList(myCapacctList)) {
+            if("null".equals(myCapacctList.get(0).getId())){
                 ret.setPayAcctNo(null);
                 ret.setPayAcctName(null);
             }else{
-                ret.setPayAcctNo(ret.getPayAcctNoList().get(0).getId());
-                ret.setPayAcctName(ret.getPayAcctNoList().get(0).getText()); 
+                ret.setPayAcctNo(myCapacctList.get(0).getId());
+                ret.setPayAcctName(myCapacctList.get(0).getText());
             }  
         }
-        if (!StringUtil.isEmptyList(ret.getRecAcctNoList())) {
+        if (!StringUtil.isEmptyList(counterCapacctList)) {
             // null转成空字符串 add by renping 20191030 start
-            if("null".equals(ret.getRecAcctNoList().get(0).getId())){
+            if("null".equals(counterCapacctList.get(0).getId())){
                 ret.setRecAcctNo(null);
                 ret.setRecAcctName(null);
             }else{
             // null转成空字符串 add by renping 20191030 end
-                ret.setRecAcctNo(ret.getRecAcctNoList().get(0).getId());
-                ret.setRecAcctName(ret.getRecAcctNoList().get(0).getText()); 
+                ret.setRecAcctNo(counterCapacctList.get(0).getId());
+                ret.setRecAcctName(counterCapacctList.get(0).getText());
             // null转成空字符串 add by renping 20191030 start
             }  
             // null转成空字符串 add by renping 20191030 end

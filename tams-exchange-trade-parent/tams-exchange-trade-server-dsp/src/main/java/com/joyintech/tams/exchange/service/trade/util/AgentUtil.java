@@ -9,6 +9,8 @@ import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.constant.ExchangeType;
 import com.joyintech.tams.exchange.common.constant.InvestorType;
 import com.joyintech.tams.exchange.common.constant.Market;
+import com.joyintech.tams.exchange.common.db.domain.Account;
+import org.apache.commons.codec.binary.Base64;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -18,8 +20,20 @@ import java.util.Map;
 public class AgentUtil {
 
     /**
+     * 密碼解密
+     *
+     * @param account
+     */
+    public static void SetDecodeBase64(Account account) {
+        // 账户交易密码解密
+        account.setPwd(new String(Base64.decodeBase64(account.getPwd())));
+        account.setTradePwd(new String(Base64.decodeBase64(account.getTradePwd())));
+    }
+
+    /**
      * 日期格式化
      * 10442119
+     *
      * @param time
      * @return
      */
@@ -39,6 +53,7 @@ public class AgentUtil {
     /**
      * 日期格式化
      * 10442119
+     *
      * @param time
      * @return
      */

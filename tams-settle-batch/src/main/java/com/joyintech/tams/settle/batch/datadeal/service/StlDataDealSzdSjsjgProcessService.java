@@ -1065,6 +1065,7 @@ public class StlDataDealSzdSjsjgProcessService {
             settleTransData.setShareAmt(abs(szdSjsjg.getJgjssl()));
             //交割日期
             settleTransData.setSettleDate(DateUtil.parseDate(szdSjsjg.getJgfsrq(), DateUtil.DEFAULT_OTHER_FORMAT));
+            settleTransData.setTradeDate(DateUtil.parseDate(szdSjsjg.getJgcjrq(), DateUtil.DEFAULT_OTHER_FORMAT));
             //业务场景分类
             settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券质押式竞价正回购_标准券入库.getValue());
             // 回购类型
