@@ -421,7 +421,7 @@ public class PositionHttpRequest {
      * @param req
      * @throws PositionException
      */
-    public static void batchRevoke(Object req) throws PositionException {
+    public static Map<String, Object> batchRevoke(Object req) throws PositionException {
         //
         logger.info("batchRevoke发送头寸报文:" + JsonUtils.object2Json(req));
         //处理seqno
@@ -436,6 +436,7 @@ public class PositionHttpRequest {
         } else if (!StringUtil.equals("success", msgMap.get("code") + "")) {
             throw new PositionException(JsonUtils.object2Json(msgMap));
         }
+        return params;
     }
 
     private static String batchClosePrivate(Object param) {
