@@ -404,15 +404,24 @@
     }
 
     var tradeMarketChange = function(){
-        AssetCommon.setTradeMarketId($('#tradeMarket').val());
-        if($('#tradeMarket').val() == '09'){
-            $('#trmFundType_id').val('').trigger('change');
-            $('#trmFundType_id').prop('disabled',true);
-            $('#trmFundAbbr').val('');
-            $('#trmFundAbbr').prop('disabled',true);
+        let $tradeMarket = $('#tradeMarket');
+        let $trmFundTypeId = $('#trmFundType_id');
+        let $trmFundAbbr = $('#trmFundAbbr');
+        let $isInnerAdvDiv = $('#isInnerAdv_div');
+
+        AssetCommon.setTradeMarketId($tradeMarket.val());
+        if($tradeMarket.val() === '09'){
+            $trmFundTypeId.val('').trigger('change');
+            $trmFundTypeId.prop('disabled',true);
+            $trmFundAbbr.val('');
+            $trmFundAbbr.prop('disabled',true);
+            $isInnerAdvDiv.show();
         }else{
-            $('#trmFundType_id').prop('disabled',false);
-            $('#trmFundAbbr').prop('disabled',false);
+            $trmFundTypeId.prop('disabled',false);
+            $trmFundAbbr.prop('disabled',false);
+            $('#isInnerAdv').prop('checked', false).trigger('change');
+            layui.form.render();
+            $isInnerAdvDiv.hide();
         }
         secondTypeChange();
         trmFundTypeChange();
