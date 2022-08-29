@@ -2066,7 +2066,11 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
 //            }
 //        }
         listTemp.forEach(deal -> {
-                    String regId = cfetsManualSettleMapper.selectRegTradeIdBytradeId(deal.getFinprodId());
+                    // 交易明细表查询对应登记编号
+                    String regId = cfetsManualSettleMapper.selectRegTradeIdBytradeIdFromDeal(deal.getFinprodId());
+                    if (StringUtil.isEmpty(regId)) {
+                        regId = cfetsManualSettleMapper.selectRegTradeIdBytradeId(deal.getFinprodId());
+                    }
                     if (StringUtil.isEmpty(regId)) {
                         regId = cfetsManualSettleMapper.selectQuoteIdBytradeId(deal.getFinprodId());
                     }
