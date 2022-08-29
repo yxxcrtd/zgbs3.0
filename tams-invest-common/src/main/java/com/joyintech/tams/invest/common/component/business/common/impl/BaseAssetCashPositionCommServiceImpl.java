@@ -453,7 +453,9 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 }
                 //抵消赎回提交时的可用持仓
                 // modify by jiangpeng on 20210526 ZGBSSE-418 计划类净值型提交时没有可用持仓
-                if(!StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue(),deal.getFinprodType2())) {
+                if (!StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue(), deal.getFinprodType2())
+                        && (!StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_基金.getValue(), deal.getFinprodType2())
+                        && CollectionUtils.isEmpty(list))) {
                     PtlSecPositionFlowDto resultDtoky = new PtlSecPositionFlowDto();
                     BeanUtils.copyProperties(resultDto, resultDtoky);
                     resultDtoky.setHodingType(DictCodeList.持仓类型_可用.getValue());
