@@ -589,63 +589,65 @@ public class FieldEtrInfoQueryListResponse extends EtrEntrust {
      */
     private String convertTermDays(String termType){
         String termDays = "";
-        switch (termType){
-            case "GC001":
-                termDays = "1";
-                break;
-            case "R-001":
-                termDays = "1";
-                break;
-            case "GC002":
-                termDays = "2";
-                break;
-            case "R-002":
-                termDays = "2";
-                break;
-            case "GC003":
-                termDays = "3";
-                break;
-            case "R-003":
-                termDays = "3";
-                break;
-            case "GC004":
-                termDays = "4";
-                break;
-            case "R-004":
-                termDays = "4";
-                break;
-            case "GC007":
-                termDays = "7";
-                break;
-            case "R-007":
-                termDays = "7";
-                break;
-            case "GC014":
-                termDays = "14";
-                break;
-            case "R-014":
-                termDays = "14";
-                break;
-            case "GC028":
-                termDays = "28";
-                break;
-            case "R-028":
-                termDays = "28";
-                break;
-            case "GC091":
-                termDays = "91";
-                break;
-            case "R-091":
-                termDays = "91";
-                break;
-            case "GC182":
-                termDays = "182";
-                break;
-            case "R-182":
-                termDays = "182";
-                break;
-            default:
-                break;
+        if(termType !=null) {
+            switch (termType) {
+                case "GC001":
+                    termDays = "1";
+                    break;
+                case "R-001":
+                    termDays = "1";
+                    break;
+                case "GC002":
+                    termDays = "2";
+                    break;
+                case "R-002":
+                    termDays = "2";
+                    break;
+                case "GC003":
+                    termDays = "3";
+                    break;
+                case "R-003":
+                    termDays = "3";
+                    break;
+                case "GC004":
+                    termDays = "4";
+                    break;
+                case "R-004":
+                    termDays = "4";
+                    break;
+                case "GC007":
+                    termDays = "7";
+                    break;
+                case "R-007":
+                    termDays = "7";
+                    break;
+                case "GC014":
+                    termDays = "14";
+                    break;
+                case "R-014":
+                    termDays = "14";
+                    break;
+                case "GC028":
+                    termDays = "28";
+                    break;
+                case "R-028":
+                    termDays = "28";
+                    break;
+                case "GC091":
+                    termDays = "91";
+                    break;
+                case "R-091":
+                    termDays = "91";
+                    break;
+                case "GC182":
+                    termDays = "182";
+                    break;
+                case "R-182":
+                    termDays = "182";
+                    break;
+                default:
+                    break;
+            }
         }
         return termDays;
     }

@@ -91,7 +91,7 @@ public class RskValRelateImport001Service extends CommonExportService<RskValRela
     @Autowired(required = false)
     private IPlatformDate iPlatformDate;
 
-    @Autowired(required = false)
+//    @Autowired(required = false)
     private static final Logger logger = LoggerFactory.getLogger(RskValRelateImport001Service.class);
     /**
      * 指标结构映射
