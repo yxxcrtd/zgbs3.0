@@ -42,6 +42,9 @@ public class RepoCalRequest {
     @ApiModelProperty(name = "price", value = "回购利率%", example = "7.02")
     private BigDecimal price;
 
+    @ApiModelProperty(name = "registOrg", value = "登记托管机构", example = "01")
+    private String registOrg;
+
     public Date getTradeDate() {
         return tradeDate;
     }
@@ -112,6 +115,14 @@ public class RepoCalRequest {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public String getRegistOrg() {
+        return registOrg;
+    }
+
+    public void setRegistOrg(String registOrg) {
+        this.registOrg = registOrg;
     }
 }
 
