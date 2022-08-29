@@ -42,6 +42,7 @@ public class KCBPUTradeAgent extends TradeAgentDsp {
      * 记录已经登录的账号
      */
     private Map<String, KCBPUAccount> kcbpuAccounts = Maps.newConcurrentMap();
+
     public KCBPUAccount getkcbpuAccount(String accountId) {
         return kcbpuAccounts.get(accountId);
     }
@@ -74,24 +75,18 @@ public class KCBPUTradeAgent extends TradeAgentDsp {
         try {
             Account account = accountLoginReqBean.getAccount();
             String accountId = account.getId();
-            // 账户交易密码解密
-            account.setPwd(new String(Base64.decodeBase64(account.getPwd())));
-            account.setTradePwd(new String(Base64.decodeBase64(account.getTradePwd())));
-
+            AgentUtil.SetDecodeBase64(account);
             Map<String, Object> customParam = new ConcurrentHashMap<>();
-            customParam.put("procName", "");
-            customParam.put("terminalinfo", "");
-
+            // 用户标识类型 U:用户代码 Z：资金账号 S:证件号 C：别名 其他：股东账户
+            customParam.put("usercls", "Z");
+            customParam.put("procName", "安徽兆尹");
+            customParam.put("terminalInfo", "投资管理系统");
             ResultBean resultBean = triggerCodeAdapter(functionCode, entrustProp, accountLoginReqBean, customParam);
-
             //账户登录成功，记录登录成功的账户
             if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
-                String data = JsonUtils.getJsonFromObject(resultBean.getData());
-                logger.info("金证(U版)用户登录信息：{}", data);
-                KCBPUAccount kcbpuAccount = JsonUtils.getObjectFromJson(data, KCBPUAccount.class);
-                kcbpuAccount.setAgentType(AgentType.KINGDOM_KCBPU.value);
+                logger.info("account {} login success", accountId);
+                KCBPUAccount kcbpuAccount = KCBPUMsgParseHelper.parseAccount(AgentUtil.getQueryListKCBPW(resultBean), accountId);
                 resultBean.setData(kcbpuAccount);
-
                 //保存登录信息
                 addkcbpuAccount(kcbpuAccount);
                 tradeAgentManager.addAccounts(this, accountId);

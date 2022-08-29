@@ -90,10 +90,8 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
     public ResultBean reqLoginAccount(AccountLoginReqBean accountLoginReqBean) {
         try {
             Account account = accountLoginReqBean.getAccount();
-            // 账户交易密码解密
-            account.setPwd(new String(Base64.decodeBase64(account.getPwd())));
-            account.setTradePwd(new String(Base64.decodeBase64(account.getTradePwd())));
             String accountId = account.getId();
+            AgentUtil.SetDecodeBase64(account);
             TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), FunctionCode.REQ_ACCOUNT_LOGIN.value);
             agentInfo.setAccountId(accountId);
             Map<String, String> parameters = Maps.newHashMap();
