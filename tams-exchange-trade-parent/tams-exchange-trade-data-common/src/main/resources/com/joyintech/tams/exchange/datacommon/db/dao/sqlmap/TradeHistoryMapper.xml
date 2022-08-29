@@ -278,13 +278,15 @@
                DECODE(STD.TRADE_MARKET, '01', '银行间', '02', '商业银行柜台', '03', '上海证券交易所', '04', '深圳证券交易所')     MARKET,
                FP.FINPROD_MARKET_ID                                      STOCK_CODE,
                FP.FINPROD_ABBR                                           STOCK_NAME,
-               EEA.BUSI_TYPE_POSITION                                    BUSI_TYPE_TG,
-               DECODE(TT.PS, NULL, A.PS)                                 ENTRUST_BS,
-               DECODE(TT.TRADED_VOLUME, NULL, A.TRADED_VOLUME)           TRADED_VOLUME,
-               DECODE(TT.TRADED_PRICE, NULL, A.TRADED_PRICE)             TRADED_PRICE,
-               DECODE(TT.CLEAR_BALANCE, NULL, A.CLEAR_BALANCE)           TRADED_BALANCE,
-               DECODE(TT.TRADING_DAY, NULL, A.TRADING_DAY)               TRADE_DATE,
-               DECODE(TT.TRADE_TIME, NULL, A.TRADE_TIME)                 DEAL_TIME,
+               <!--GLLCUAT-320:历史成交查询字段缺失 modify by fuyongsheng 20220829 start-->
+               NVL(EEA.BUSI_TYPE_POSITION, STD.BUSI_TYPE)                BUSI_TYPE_TG,
+               NVL2(TT.PS, A.PS, STD.PS)                                 ENTRUST_BS,
+               NVL2(TT.TRADED_VOLUME, A.TRADED_VOLUME, STD.SHARE_AMT)    TRADED_VOLUME,
+               NVL2(TT.TRADED_PRICE, A.TRADED_PRICE, STD.UNIT_CPRICE)    TRADED_PRICE,
+               NVL2(TT.CLEAR_BALANCE, A.CLEAR_BALANCE, STD.TRADE_AMT)    TRADED_BALANCE,
+               NVL2(TT.TRADING_DAY, A.TRADING_DAY, TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))   TRADE_DATE,
+               NVL2(TT.TRADE_TIME, A.TRADE_TIME, STD.CREATE_TIME)          DEAL_TIME,
+               <!--GLLCUAT-320:历史成交查询字段缺失 modify by fuyongsheng 20220829 end-->
                CASE
                  WHEN STD.DELIVERY_RESULT IS NULL THEN '未交收'
                  WHEN STD.DELIVERY_RESULT = '01' THEN '正常交收'
@@ -295,6 +297,7 @@
                CASE
                  WHEN STD.DELIVERY_RESULT IS NULL THEN '0'
                  WHEN STD.DELIVERY_RESULT = '04' THEN '0'
+                 WHEN TT.TRADED_VOLUME IS NULL THEN '100'
                  ELSE STD.SHARE_AMT / TT.TRADED_VOLUME * 100 || ''
                END                                                       DELIVERY_SCHEDULE,
                STD.CREATE_TIME
