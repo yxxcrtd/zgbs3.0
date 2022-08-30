@@ -364,6 +364,9 @@
 			AND (SCI.ACCT_NO LIKE CONCAT('%',CONCAT(#{search},'%'))
 			OR SCI.ACCT_NAME LIKE CONCAT('%',CONCAT(#{search},'%')))
 		</if>
+		<if test="initValue != null and initValue != ''">
+			AND SCI.ACCT_NO = #{initValue}
+		</if>
 	</select>
 
 </mapper>
