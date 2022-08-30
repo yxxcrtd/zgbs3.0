@@ -1741,4 +1741,13 @@ public class EtrCommonCashPositionDealService extends BaseService {
     public static List<TrdProductDeal> selectTrdProductDealByTotleTradeId(String totleTradeId){
         return etrCommonCashPositionMapper.selectTrdProductDealByTotleTradeId(totleTradeId);
     }
+
+    /**
+     * 根据指令编号查询交易
+     * @param entrustId
+     * @return
+     */
+    public static List<TrdProductDeal> selectTrdProductDealByEntrustId(String entrustId){
+        return etrCommonCashPositionMapper.selectTrdProductDealByEntrustId(entrustId);
+    }
 }
