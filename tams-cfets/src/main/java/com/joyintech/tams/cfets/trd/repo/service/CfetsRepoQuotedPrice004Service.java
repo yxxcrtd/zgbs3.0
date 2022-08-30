@@ -2125,7 +2125,7 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
 
         // List<组合持仓流水DTO>(若上记的List<回购质押品DTO>为空，则此为空，反之循环构造DTO)
         // 通过上记输出的List<输出的质押品DTO>，循环该List构造组合持仓流水DTO
-        if (!StringUtil.isEmptyList(input.getRegFinPledges())
+        if (!CollectionUtils.isEmpty(input.getRegFinPledges())
                 && DictCodeList.回购拆借方向_正回购.getValue().equals(input.getRegFinProductDealTotal().getPs())) {
             for (RegFinProductDeal deal : input.getRegFinProductDeals()) {
                 // 可质押券信息（含投资目的）
@@ -2134,6 +2134,7 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
                 avaMap.entrySet().stream().forEach(entry -> {
                     Collections.sort(entry.getValue(), (o1, o2) -> o1.getInvAimSort().compareTo(o2.getInvAimSort()));
                 });
+                logger.info("可质押券信息:{}",JsonUtils.object2Json(avaMap));
                 PtlSecPositionFlowDto resultDto;
                 for (RegFinPledge pledgeBond : input.getRegFinPledges()) {
                     if (!StringUtil.equals(pledgeBond.getTradeId(), deal.getTradeId())) {
@@ -2142,7 +2143,7 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
                     // 待分配投资目的的质押券面总额
                     BigDecimal pledgePrin = pledgeBond.getPledgeNumber();//数量
                     List<PledgeBondInfoDto> pledgeBondInfoDtos = avaMap.get(pledgeBond.getPledgeFinprodId());
-                    if (!StringUtil.isEmptyList(pledgeBondInfoDtos)) {
+                    if (CollectionUtils.isNotEmpty(pledgeBondInfoDtos)) {
                         for (PledgeBondInfoDto avaBond : pledgeBondInfoDtos) {
                             resultDto = new PtlSecPositionFlowDto();
 
@@ -2195,6 +2196,8 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
                                 break;
                             }
                         }
+                    } else {
+                        logger.error("质押券信息{}无持仓", pledgeBond.getPledgeFinprodId());
                     }
                 }
             }

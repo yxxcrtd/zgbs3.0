@@ -1153,7 +1153,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             }
         } catch (PositionException e) {
             logger.error("交收失败-头寸处理异常",e);
-            WorkFlowUtil.showMessage("头寸处理异常,请检查头寸日期", MessageType.错误消息);
+            WorkFlowUtil.showMessage(e.getMessage(), MessageType.错误消息);
             throw new PositionException(e);
         } catch(Exception e) {
             //e.printStackTrace();
