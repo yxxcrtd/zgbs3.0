@@ -31,7 +31,6 @@
         <div class="pro-module-wrapper pro-module-base"
              title="基本信息">
             <div class="pro-module-wrap">
-                <input type="hidden" id="acctNoList" name="selectValue" data-th-value="|${acctNoList}|">
                 <input style="display:none" type="text" id="finprodId" name="finprodId" data-th-value="${entity?.finprodId}" class="layui-input form-input" />
                 <input style="display:none" type="text" id="trader" name="trader" data-th-value="${trader}" class="layui-input form-input" />
                 <input style="display:none" type="text" id="type" name="type" data-th-value="${type}" class="layui-input form-input" />
@@ -144,8 +143,6 @@
                     <h3 class="pro-module-title"><span class="title-des">指令信息</span><i class="iconfont icon-arrow-down pro-down-icon"></i></h3>
                     <div class="pro-module-item">
                         <div class="layui-form-item">
-                            <input type="hidden" th:id="|bussTrdTransferOrder_payAcctNo|" th:name="selectValue" value="pay">
-                            <input type="hidden" th:id="|bussTrdTransferOrder_recAcctNo|" th:name="selectValue" value="rec">
                             <a th:id="|bussTrdTransferOrder_btn_generate|" class="layui-btn layui-btn-sm" th:text="#{BussTrdTransferOrder.generate}">生成指令</a>
                         </div>
                         <table class="layui-table" th:id="|bussTrdTransferOrder_table|" th:name="bussTrdTransferOrder"></table>

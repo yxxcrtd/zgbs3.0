@@ -174,6 +174,7 @@ public class PositionRequestManualSettleService {
 
         Map<String,Object> paraMap = new HashMap<>();
         paraMap.put("dealNo", entity.getTradeId());
+        paraMap.put("entrustId", etrEntrust.getEntrustId());
         List<PortfolioCalculateDto> list = trdCommonBaseService.queryPortfolioCalculate(paraMap);
 
         List<Map<String, Object>> ptlList = new ArrayList<>();
@@ -254,6 +255,7 @@ public class PositionRequestManualSettleService {
 
         Map<String,Object> paraMap = new HashMap<>();
         paraMap.put("dealNo", entity.getTradeId());
+        paraMap.put("entrustId", etrEntrust.getEntrustId());
         List<PortfolioCalculateDto> list = trdCommonBaseService.queryPortfolioCalculate(paraMap);
         List<Map<String, Object>> ptlCashList = new ArrayList<>(4);
         List<Map<String, Object>> bondSecList = new ArrayList<>(4);
@@ -564,6 +566,7 @@ public class PositionRequestManualSettleService {
 
         Map<String,Object> paraMap = new HashMap<>();
         paraMap.put("dealNo", entity.getTradeId());
+        paraMap.put("entrustId", infContractDetailfile.getEntrustId());
         List<PortfolioCalculateDto> list = trdCommonBaseService.queryPortfolioCalculate(paraMap);
         //组合数据集
         List<Map<String, Object>> ptlList = new ArrayList<>(4);
