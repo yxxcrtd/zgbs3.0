@@ -908,6 +908,7 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
             EtrCashPositionFlowDto etrCashPositionFlowDto1 = new EtrCashPositionFlowDto();
             BeanUtil.copyPropertiesIgnoreNull(etrCashPositionFlowDto1, etrCashPositionFlowDto);
             etrCashPositionFlowDto1.setAmount(交易日本金);
+            etrCashPositionFlowDto1.setSeqno(getSeqNo());
             etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto1);
 
             etrCashPositionFlowDto.setAmount(交易日金额.negate());
