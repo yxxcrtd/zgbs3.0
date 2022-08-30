@@ -905,6 +905,8 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                 etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
 //            }
             // 登录两笔流水:1、通过本金冲销指令流水 2、交易金额流水
+            etrCashPositionFlowDto.setAcctId(EtrCommonCashPositionDealService.select资金账户(
+                    finProductTradeDto.getTrdProductDeal().getSecManageAcctId(), finProductTradeDto.getTrdProductDeal().getCcy()));
             EtrCashPositionFlowDto etrCashPositionFlowDto1 = new EtrCashPositionFlowDto();
             BeanUtil.copyPropertiesIgnoreNull(etrCashPositionFlowDto1, etrCashPositionFlowDto);
             etrCashPositionFlowDto1.setAmount(交易日本金);
