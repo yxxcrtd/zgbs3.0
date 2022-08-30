@@ -5,6 +5,7 @@ import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
+import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
@@ -18,10 +19,12 @@ import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.invest.common.entrust.dto.EntrustCommonDto;
+import com.joyintech.tams.invest.common.trade.dao.EtrCommonCashPositionMapper;
 import com.joyintech.tools.collectors.JoyinCollectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
@@ -866,7 +869,7 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
         String chlType = StringUtil.isEmpty(chlId) ? null : EtrCommonCashPositionDealService.queryChlType(chlId);
         // 交易提交
         if (DictCodeList.持仓类型_可用.equals(持仓类型) || etrPositionHoldDto.isNeedNegative()) {
-            if (StringUtil.isEmpty(entrustId) || null != finProductTradeDto.getTrdProductDeal()) { // 无委托
+            if (StringUtil.isEmpty(entrustId)) { // 无委托
                 // 现金流水dto处理 交割日减少(交易金额-交易券面总额*委托全价/债券面值）
                 etrCashPositionFlowDto.setAmount(交易日金额.negate());
                 // 设置账号
@@ -893,14 +896,22 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
             }
         }
         if (DictCodeList.持仓类型_实际.equals(持仓类型) || etrPositionHoldDto.isNeedNegative()) {
-            if (StringUtil.isEmpty(entrustId)
-            || null != finProductTradeDto.getTrdProductDeal()
-            ) { // 无委托
+//            if (StringUtil.isEmpty(entrustId)
+//            || null != finProductTradeDto.getTrdProductDeal()
+//            ) { // 无委托
                 // 现金流水dto处理 交割日减少(交易金额-交易券面总额*委托全价/债券面值）
                 etrSecPositionFlowDto.setAmount(交易日本金);
                 // 添加现金流水到目标dto
                 etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
-            }
+//            }
+            // 登录两笔流水:1、通过本金冲销指令流水 2、交易金额流水
+            EtrCashPositionFlowDto etrCashPositionFlowDto1 = new EtrCashPositionFlowDto();
+            BeanUtil.copyPropertiesIgnoreNull(etrCashPositionFlowDto1, etrCashPositionFlowDto);
+            etrCashPositionFlowDto1.setAmount(交易日本金);
+            etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto1);
+
+            etrCashPositionFlowDto.setAmount(交易日金额.negate());
+            etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
         }
     }
 
@@ -1336,19 +1347,32 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                                 etrEntrust.getCcy());
                     }
                 }
-                //获取已完成额度
-                Map<String,Object> map=new HashMap<>();
-                map.put("sumTradeFlag","01");
-                map.put("entrustClass", etrEntrust.getEntrustClass());
-                map.put("portfolioId",etrEntrust.getPortfolioId());
-                map.put("entrustId",etrEntrust.getEntrustId());
-                BigDecimal finishAmt = EtrCommonCashPositionDealService.getEtrFinishAmtMuilt(map);
-                //BigDecimal finishAmt = EtrCommonCashPositionDealService.getEtrFinishAmt(etrEntrust.getEntrustId());
-                BigDecimal closeAmt = etrEntrustAdd.getCloseAmt();
-                // 已完成额度 = 交易表中有效额度 + 已关闭额度
-                finishAmt = ArithmeticUtil.doAdd(finishAmt, closeAmt);
-                // 减少委托本金金额
-                etrCashPositionFlowDto.setAmount(ArithmeticUtil.subtract(etrEntrust.getEntrustAmt(), finishAmt));
+                if(StringUtil.equals(tradePlace, DictCodeListExt1.交易场所_银行间.getValue())){
+                    //获取已完成额度
+                    Map<String,Object> map=new HashMap<>();
+                    map.put("sumTradeFlag","01");
+                    map.put("entrustClass", etrEntrust.getEntrustClass());
+                    map.put("portfolioId",etrEntrust.getPortfolioId());
+                    map.put("entrustId",etrEntrust.getEntrustId());
+                    BigDecimal finishAmt = EtrCommonCashPositionDealService.getEtrFinishAmtMuilt(map);
+                    //BigDecimal finishAmt = EtrCommonCashPositionDealService.getEtrFinishAmt(etrEntrust.getEntrustId());
+                    BigDecimal closeAmt = etrEntrustAdd.getCloseAmt();
+                    // 已完成额度 = 交易表中有效额度 + 已关闭额度
+                    finishAmt = ArithmeticUtil.doAdd(finishAmt, closeAmt);
+                    // 减少委托本金金额
+                    etrCashPositionFlowDto.setAmount(ArithmeticUtil.subtract(etrEntrust.getEntrustAmt(), finishAmt));
+                }else{ // 交易所
+                    // 1、根据指令查询已匹配交易数据
+                    List<TrdProductDeal> trdProductDeals = EtrCommonCashPositionDealService.selectTrdProductDealByEntrustId(
+                            etrEntrust.getEntrustId());
+                    // 交易总金额
+                    BigDecimal tradeAmtSum = BigDecimal.ZERO;
+                    if(!CollectionUtils.isEmpty(trdProductDeals)){
+                        tradeAmtSum = trdProductDeals.stream().map(TrdProductDeal::getTradeAmt).reduce(BigDecimal.ZERO, BigDecimal::add);
+                    }
+                    // 2、冲销指令金额和已匹配交易数据的差额
+                    etrCashPositionFlowDto.setAmount(ArithmeticUtil.subtract(etrEntrust.getEntrustAmt(), tradeAmtSum));
+                }
 //                etrEntrustAdd.setCloseAmt(ArithmeticUtil.doAdd(closeAmt, etrCashPositionFlowDto.getAmount()));
                 etrCashPositionFlowDto.setAcctId(acctId);
                 etrCashPositionFlowDto.setOffsetFlag(DictCodeList.冲正标识_冲销交易.getValue());
