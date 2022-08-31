@@ -4784,7 +4784,7 @@
         LEFT JOIN TRD_TRADE_FEE_DETAIL ttft1 ON tpd.trade_id = ttft1.trade_id AND ttft1.fee_type =#{feeType08}
         LEFT JOIN ETR_ENTRUST ee ON TPDA.Entrust_Id = ee.entrust_id
         left join fin_trade_product ftp on ftp.finprod_id=TPD.TRADE_ID
-        left join (select pledge.finprod_id,sum(pledge.pledge_number*100) as disFaceValue
+        left join (select pledge.finprod_id,sum(pledge.pledge_number*pledge.pledge_ratio*100) as disFaceValue
         from FIN_DEAL_PLEDGE pledge group by pledge.finprod_id)pledges
         on ftp.finprod_id=pledges.finprod_id
         where TPD.TOTLE_TRADE_ID = #{totleTradeId} and  TPD.Trade_Status='01'
@@ -4910,7 +4910,7 @@
                nvl(fp.finprod_abbr, ipo.SECNAME)         AS finprodAbbr,
                tpda.portfolio_id as portfolioId,
                pp.portfolio_name as portfolioName,
-               (rp.pledge_number*rp.pledge_ratio)/100 as pledgePrin,
+               rp.pledge_number/100 as pledgePrin,
                rp.pledge_ratio*100 as pledgeRate,
                mbvi.NETPRICE as firstNetPrice,
                nvl(fp.REGIST_ORG, ipo.INSTITUTION)           AS repRegistOrg
