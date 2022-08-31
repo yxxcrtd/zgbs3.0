@@ -149,7 +149,7 @@ public class UpdateTraderService {
                             temp = updateTraderMapper.selectMpartyInfo(mpartyIds.get(0));
                         }
                         String linkId = "";
-                        if (temp != null) {
+                        if (temp != null && StringUtil.isNotEmpty(temp.getPartyName())) {
                             //按名称进行匹配
                             map.put("partyCustomerName", temp.getPartyName());
                             //获取主机构交易对手的link_Id
