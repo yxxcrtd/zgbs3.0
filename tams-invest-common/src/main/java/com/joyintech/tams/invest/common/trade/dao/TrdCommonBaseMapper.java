@@ -391,9 +391,10 @@ public interface TrdCommonBaseMapper {
     /**
      * 查询下单对应的委托编号信息
      * @param dealNo
+     * @param entrustId
      * @return
      */
-    InfContractDetailfile selectInfContractDetailfile(String dealNo);
+    InfContractDetailfile selectInfContractDetailfile(String dealNo, String entrustId);
 
     /**
      * 查询下单信息

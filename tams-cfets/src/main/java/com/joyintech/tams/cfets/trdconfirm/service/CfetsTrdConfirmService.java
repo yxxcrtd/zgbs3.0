@@ -24,6 +24,7 @@ import com.joyintech.service.bankuplink.common.dto.TrdBondInvestTradeDto;
 import com.joyintech.service.bankuplink.common.util.ProdTypeUtil;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
+import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.cfets.trdconfirm.dao.CfetsTrdConfirmMapper;
@@ -249,44 +250,52 @@ public class CfetsTrdConfirmService extends BaseService {
     /**
      * 交易执行-成交确认
      */
-    public AjaxResult trdConfirmSaveMethod(CfetsTrdConfirmRegInfoListResponse dto){
+    public AjaxResult trdConfirmSaveMethod(CfetsTrdConfirmRegInfoListResponse dto) {
         List<CfetsTrdConfirmRegInfoListResponse> selectedItem = dto.getSelectedItem();
         List<ValidMessage> messages = new ArrayList<>();
-        if(StringUtil.isNotEmpty(selectedItem)){
-            for(CfetsTrdConfirmRegInfoListResponse item:selectedItem){
-                    try{
-                        if(StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.登记资产类型_债券.getValue())
-                        || StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.CSTP资产类型_债券.getValue())
-                        ){
-                            //对dto进行封装
-                            CfetsTrdBondInvestTradeDto entity = packageEquity(item, DictCodeListExt1.生成方式_画面录入.getValue());
-                            //成交确认提交方法
-                            // ((CfetsTrdConfirmService) AopContext.currentProxy()).doCompleteMethod(entity,OperationType.NEW);
-                            cfetsTrdConfirm001Service.doCompleteMethod(entity, OperationType.NEW);
-                        } else if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.登记资产类型_一级申购.getValue())
-                                || StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.CSTP资产类型_一级申购.getValue())) {
-                            CfetsTrdFirstBondInvestTradeDto entity = this.prepareBidEntity(item.getTotleTradeId(), DictCodeListExt1.生成方式_画面录入.getValue());
-                            cfetsTrdConfirm001Service.doCompleteBidMethod(entity, OperationType.NEW, DictCodeListExt1.生成方式_画面录入.getValue());
-                        } else {
-                            CfetsTrdRepoTrade003Dto entity = this.packageRepoEquity(item, DictCodeListExt1.生成方式_画面录入.getValue());
-                            //成交确认提交方法
-                            cfetsTrdConfirm001Service.doCompleteRepoMethod(entity, OperationType.NEW, true);
-                        }
-
-                    }catch (Exception e) {
-                        //若插入数据异常，提示错误信息
-                        Message ms= PositionUtil.ajaxErrorReturn(e);
-                        if(null!=ms && StringUtil.isNotEmpty(ms.getMessage())){
-                            messages.add(new ValidMessage("业务编号："+item.getTotleTradeId()+"成交确认失败。"+ms.getMessage()));
-                        }else{
-                            messages.add(new ValidMessage("业务编号："+item.getTotleTradeId()+"成交确认失败。"));
-                        }
-                        e.printStackTrace();
+        // 头寸信息记录 用于报错回滚
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        String totleTradeId = null;
+        try {
+            if (StringUtil.isNotEmpty(selectedItem)) {
+                for (CfetsTrdConfirmRegInfoListResponse item : selectedItem) {
+                    totleTradeId = item.getTotleTradeId();
+                    if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.登记资产类型_债券.getValue())
+                            || StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.CSTP资产类型_债券.getValue())
+                    ) {
+                        //对dto进行封装
+                        CfetsTrdBondInvestTradeDto entity = packageEquity(item, DictCodeListExt1.生成方式_画面录入.getValue());
+                        //成交确认提交方法
+                        // ((CfetsTrdConfirmService) AopContext.currentProxy()).doCompleteMethod(entity,OperationType.NEW);
+                        mapList.addAll(cfetsTrdConfirm001Service.doCompleteMethod(entity, OperationType.NEW));
+                    } else if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.登记资产类型_一级申购.getValue())
+                            || StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.CSTP资产类型_一级申购.getValue())) {
+                        CfetsTrdFirstBondInvestTradeDto entity = this.prepareBidEntity(item.getTotleTradeId(), DictCodeListExt1.生成方式_画面录入.getValue());
+                        mapList.addAll(cfetsTrdConfirm001Service.doCompleteBidMethod(entity, OperationType.NEW, DictCodeListExt1.生成方式_画面录入.getValue()));
+                    } else {
+                        CfetsTrdRepoTrade003Dto entity = this.packageRepoEquity(item, DictCodeListExt1.生成方式_画面录入.getValue());
+                        //成交确认提交方法
+                        mapList.addAll(cfetsTrdConfirm001Service.doCompleteRepoMethod(entity, OperationType.NEW, true));
                     }
+                }
             }
+        } catch (Exception e) {
+            //若插入数据异常，提示错误信息
+            Message ms = PositionUtil.ajaxErrorReturn(e);
+            if (null != ms && StringUtil.isNotEmpty(ms.getMessage())) {
+                messages.add(new ValidMessage("业务编号：" + totleTradeId + "成交确认失败。" + ms.getMessage()));
+            } else {
+                messages.add(new ValidMessage("业务编号：" + totleTradeId + "成交确认失败。"));
+            }
+            if (CollectionUtils.isNotEmpty(mapList)) {
+                mapList.forEach(map -> {
+                    PositionHttpRequest.roll((Long) map.get("seqno"), (String) map.get("modelType"), e.getMessage());
+                });
+            }
+            e.printStackTrace();
         }
-        if(!StringUtil.isEmptyList(messages) && messages.size()>0){
-            AjaxResult res=new AjaxResult();
+        if (!StringUtil.isEmptyList(messages) && messages.size() > 0) {
+            AjaxResult res = new AjaxResult();
             res.setErrorList(messages);
             return res;
         }
@@ -2705,6 +2714,8 @@ public class CfetsTrdConfirmService extends BaseService {
         CfetsTrdConfirmRegInfoListResponse regInfo = manualMatchDto.getSelectedCfetsTrdConfirmRegInfoList().get(0);
         CfetsTrdConfirmCstpInfoListResponse cstpInfo = manualMatchDto.getSelectedCfetsTrdConfirmCstpInfoList().get(0);
         List<ValidMessage> messages = new ArrayList<>();
+        // 头寸信息记录 用于报错回滚
+        List<Map<String, Object>> mapList = new ArrayList<>();
         try{
             if(StringUtil.equals(regInfo.getFinprodType2(), DictCodeListExt1.登记资产类型_债券.getValue())){
                 //对dto进行封装
@@ -2717,7 +2728,7 @@ public class CfetsTrdConfirmService extends BaseService {
                     entity.getCfetsTrdConfirmMatchDto().setMatchStatus(BussinessDictCodeList.匹配状态_已匹配.getValue());
                 }
                 entity.setOprType(DictCodeListExt3.操作类型_手工匹配确认.getValue());
-                cfetsTrdConfirm001Service.doCompleteMethod(entity, OperationType.NEW);
+                mapList.addAll(cfetsTrdConfirm001Service.doCompleteMethod(entity, OperationType.NEW));
             }else if(StringUtil.equals(regInfo.getFinprodType2(), DictCodeListExt1.登记资产类型_质押式回购.getValue())){
                 //对dto进行封装
                 CfetsTrdRepoTrade003Dto entity=packageRepoEquity(regInfo, DictCodeListExt1.生成方式_画面录入.getValue());
@@ -2730,7 +2741,7 @@ public class CfetsTrdConfirmService extends BaseService {
                 }
                 entity.setOprType(DictCodeListExt3.操作类型_手工匹配确认.getValue());
                 //成交确认提交方法
-                cfetsTrdConfirm001Service.doCompleteRepoMethod(entity, OperationType.NEW,false);
+                mapList.addAll(cfetsTrdConfirm001Service.doCompleteRepoMethod(entity, OperationType.NEW,false));
             } else if (StringUtil.equals(regInfo.getFinprodType2(), DictCodeListExt1.登记资产类型_一级申购.getValue())) {
                 CfetsTrdFirstBondInvestTradeDto entity = this.prepareBidEntity(regInfo.getTotleTradeId(), DictCodeListExt1.生成方式_画面录入.getValue());
                 if (null != entity.getCfetsTrdConfirmMatchDto()) {
@@ -2741,7 +2752,7 @@ public class CfetsTrdConfirmService extends BaseService {
                     entity.getCfetsTrdConfirmMatchDto().setMatchStatus(BussinessDictCodeList.匹配状态_已匹配.getValue());
                 }
                 entity.setOprType(DictCodeListExt3.操作类型_手工匹配确认.getValue());
-                cfetsTrdConfirm001Service.doCompleteBidMethod(entity, OperationType.NEW, DictCodeListExt1.生成方式_画面录入.getValue());
+                mapList.addAll(cfetsTrdConfirm001Service.doCompleteBidMethod(entity, OperationType.NEW, DictCodeListExt1.生成方式_画面录入.getValue()));
             }
         }catch (Exception e) {
             //若插入数据异常，提示错误信息
@@ -2750,6 +2761,11 @@ public class CfetsTrdConfirmService extends BaseService {
                 messages.add(new ValidMessage("业务编号："+regInfo.getTotleTradeId()+"手工匹配确认失败。"+ms.getMessage()));
             }else{
                 messages.add(new ValidMessage("业务编号："+regInfo.getTotleTradeId()+"手工匹配确认失败。"));
+            }
+            if (CollectionUtils.isNotEmpty(mapList)) {
+                mapList.forEach(map -> {
+                    PositionHttpRequest.roll((Long) map.get("seqno"), (String) map.get("modelType"), e.getMessage());
+                });
             }
             e.printStackTrace();
         }
@@ -2985,6 +3001,8 @@ public class CfetsTrdConfirmService extends BaseService {
             regInfo.setDealType(matchDto.getDealType());
             regInfo.setTotleTradeId(matchDto.getPreTradeId());
             List<ValidMessage> messages = new ArrayList<>();
+            // 头寸信息记录 用于报错回滚
+            List<Map<String, Object>> mapList = new ArrayList<>();
             try{
                 if(StringUtil.isNotEmpty(interfTradSecdeal)){
                     //对dto进行封装
@@ -2994,7 +3012,7 @@ public class CfetsTrdConfirmService extends BaseService {
                     matchDto.setTrdConfStatus(oldMatchDto.getTrdConfStatus());
                     entity.setCfetsTrdConfirmMatchDto(matchDto);
                     entity.setOprType(DictCodeListExt3.操作类型_自动匹配确认.getValue());
-                    cfetsTrdConfirm001Service.doCompleteMethod(entity, OperationType.NEW);
+                    mapList.addAll(cfetsTrdConfirm001Service.doCompleteMethod(entity, OperationType.NEW));
                 } else if (StringUtil.isNotEmpty(interfOpicsTradRepo)) {
                     //对dto进行封装
                     CfetsTrdRepoTrade003Dto entity=packageRepoEquity(regInfo, DictCodeListExt1.生成方式_接口接入.getValue());
@@ -3004,7 +3022,7 @@ public class CfetsTrdConfirmService extends BaseService {
                     entity.setCfetsTrdConfirmMatchDto(matchDto);
                     entity.setOprType(DictCodeListExt3.操作类型_自动匹配确认.getValue());
                     //成交确认提交方法
-                    cfetsTrdConfirm001Service.doCompleteRepoMethod(entity, OperationType.NEW,false);
+                    mapList.addAll(cfetsTrdConfirm001Service.doCompleteRepoMethod(entity, OperationType.NEW,false));
                 } else if(StringUtil.isNotEmpty(regInfo.getTotleTradeId())){
                     //对dto进行封装
                     CfetsTrdFirstBondInvestTradeDto entity = this.prepareBidEntity(regInfo.getTotleTradeId(), DictCodeListExt1.生成方式_接口接入.getValue());
@@ -3014,15 +3032,20 @@ public class CfetsTrdConfirmService extends BaseService {
                     entity.setCfetsTrdConfirmMatchDto(matchDto);
                     entity.setOprType(DictCodeListExt3.操作类型_自动匹配确认.getValue());
                     //成交确认提交方法
-                    cfetsTrdConfirm001Service.doCompleteBidMethod(entity, OperationType.NEW, DictCodeListExt1.生成方式_接口接入.getValue());
+                    mapList.addAll(cfetsTrdConfirm001Service.doCompleteBidMethod(entity, OperationType.NEW, DictCodeListExt1.生成方式_接口接入.getValue()));
                 }
-            }catch (Exception e) {
+            } catch (Exception e) {
                 //若插入数据异常，提示错误信息
                 Message ms = PositionUtil.ajaxErrorReturn(e);
                 if (null != ms && StringUtil.isNotEmpty(ms.getMessage())) {
                     messages.add(new ValidMessage("业务编号：" + regInfo.getTotleTradeId() + "自动匹配确认失败。" + ms.getMessage()));
                 } else {
                     messages.add(new ValidMessage("业务编号：" + regInfo.getTotleTradeId() + "自动匹配确认失败。"));
+                }
+                if (CollectionUtils.isNotEmpty(mapList)) {
+                    mapList.forEach(map -> {
+                        PositionHttpRequest.roll((Long) map.get("seqno"), (String) map.get("modelType"), e.getMessage());
+                    });
                 }
                 e.printStackTrace();
                 logger.error(e.getMessage(), e);

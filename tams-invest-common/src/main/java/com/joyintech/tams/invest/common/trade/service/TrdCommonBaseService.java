@@ -1262,7 +1262,8 @@ public class TrdCommonBaseService extends BaseService {
         String dealNo = (String) paraMap.get("dealNo");
         // 关联交易编号
         String fTradeId = (String) paraMap.get("fTradeId");
-
+        // 指令编号
+        String entrustId = null != paraMap.get("entrustId") ? (String) paraMap.get("entrustId") : StringUtil.EMPTY;
         if(!StringUtil.isEmpty(dealNo)){
             // 查询关联交易编号
             fTradeId = trdCommonBaseMapper.selectFTradeId(dealNo);
@@ -1271,7 +1272,7 @@ public class TrdCommonBaseService extends BaseService {
             return portfolioDtos;
         }
         // 查询下单对应的委托编号信息
-        InfContractDetailfile infContractDetailfile = trdCommonBaseMapper.selectInfContractDetailfile(fTradeId);
+        InfContractDetailfile infContractDetailfile = trdCommonBaseMapper.selectInfContractDetailfile(fTradeId, entrustId);
         // 查询指令信息
         EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(infContractDetailfile.getEntrustId());
         if(etrEntrust == null){

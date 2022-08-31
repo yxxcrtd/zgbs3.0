@@ -304,6 +304,9 @@
         		STL_PAY_TEMP_ORDERS C
         	WHERE
         		A.TRADE_ID = B.TRADE_ID AND A.TRADE_DATE = #{dealDate,jdbcType=DATE} AND A.TRADE_ID = C.TRADE_ID
+                <!--只处理场内数据 modify by fuyongsheng 20220830 start-->
+                AND A.TRADE_MARKET IN ('03', '04')
+                <!--只处理场内数据 modify by fuyongsheng 20220830 end-->
         		<if test="finprodType2List != null and finprodType2List.size() > 0">
 	                <foreach collection="finprodType2List" item="finprodType2" open="AND A.FINPROD_TYPE2 IN (" close=")" separator=",">
 	                    #{finprodType2,jdbcType=VARCHAR}
@@ -325,6 +328,9 @@
         		TRD_PRODUCT_TEMP_DEAL_ADD B
         	WHERE
         		A.TRADE_ID = B.TRADE_ID AND A.TRADE_DATE = #{dealDate,jdbcType=DATE}
+                <!--只处理场内数据 modify by fuyongsheng 20220830 start-->
+                AND A.TRADE_MARKET IN ('03', '04')
+                <!--只处理场内数据 modify by fuyongsheng 20220830 end-->
         		<if test="finprodType2List != null and finprodType2List.size() > 0">
 	                <foreach collection="finprodType2List" item="finprodType2" open="AND A.FINPROD_TYPE2 IN (" close=")" separator=",">
 	                    #{finprodType2,jdbcType=VARCHAR}
@@ -349,6 +355,9 @@
         		STL_PAY_TEMP_ORDERS C
         	WHERE
         		A.TRADE_ID = B.TRADE_ID AND A.TRADE_DATE = #{dealDate,jdbcType=DATE} AND A.TRADE_ID = C.TRADE_ID
+                <!--只处理场内数据 modify by fuyongsheng 20220830 start-->
+                AND A.TRADE_MARKET IN ('03', '04')
+                <!--只处理场内数据 modify by fuyongsheng 20220830 end-->
         		<if test="finprodType2List != null and finprodType2List.size() > 0">
 	                <foreach collection="finprodType2List" item="finprodType2" open="AND A.FINPROD_TYPE2 IN (" close=")" separator=",">
 	                    #{finprodType2,jdbcType=VARCHAR}
@@ -370,6 +379,9 @@
         		TRD_PRODUCT_TEMP_DEAL_ADD B
         	WHERE
         		A.TRADE_ID = B.TRADE_ID AND A.TRADE_DATE = #{dealDate,jdbcType=DATE}
+                <!--只处理场内数据 modify by fuyongsheng 20220830 start-->
+                AND A.TRADE_MARKET IN ('03', '04')
+                <!--只处理场内数据 modify by fuyongsheng 20220830 end-->
         		<if test="finprodType2List != null and finprodType2List.size() > 0">
 	                <foreach collection="finprodType2List" item="finprodType2" open="AND A.FINPROD_TYPE2 IN (" close=")" separator=",">
 	                    #{finprodType2,jdbcType=VARCHAR}
@@ -391,6 +403,9 @@
         		TRD_PRODUCT_TEMP_DEAL_ADD B
         	WHERE
         		A.TRADE_ID = B.TRADE_ID AND A.TRADE_DATE = #{dealDate,jdbcType=DATE}
+                <!--只处理场内数据 modify by fuyongsheng 20220830 start-->
+                AND A.TRADE_MARKET IN ('03', '04')
+                <!--只处理场内数据 modify by fuyongsheng 20220830 end-->
         		<if test="finprodType2List != null and finprodType2List.size() > 0">
 	                <foreach collection="finprodType2List" item="finprodType2" open="AND A.FINPROD_TYPE2 IN (" close=")" separator=",">
 	                    #{finprodType2,jdbcType=VARCHAR}
@@ -432,6 +447,9 @@
         		STL_PAY_TEMP_ORDERS C
         	WHERE
         		A.TRADE_ID = B.TRADE_ID AND A.TRADE_DATE = #{dealDate,jdbcType=DATE} AND A.TRADE_ID = C.TRADE_ID
+                <!--只处理场内数据 modify by fuyongsheng 20220830 start-->
+                AND A.TRADE_MARKET IN ('03', '04')
+                <!--只处理场内数据 modify by fuyongsheng 20220830 end-->
         		<if test="finprodType2List != null and finprodType2List.size() > 0">
 	                <foreach collection="finprodType2List" item="finprodType2" open="AND A.FINPROD_TYPE2 IN (" close=")" separator=",">
 	                    #{finprodType2,jdbcType=VARCHAR}
@@ -455,6 +473,9 @@
         TRD_PRODUCT_TEMP_DEAL_ADD B
         WHERE
         A.TRADE_ID = B.TRADE_ID AND A.TRADE_DATE = #{dealDate,jdbcType=DATE}
+        <!--只处理场内数据 modify by fuyongsheng 20220830 start-->
+        AND A.TRADE_MARKET IN ('03', '04')
+        <!--只处理场内数据 modify by fuyongsheng 20220830 end-->
         <if test="finprodType2List != null and finprodType2List.size() > 0">
             <foreach collection="finprodType2List" item="finprodType2" open="AND A.FINPROD_TYPE2 IN (" close=")" separator=",">
                 #{finprodType2,jdbcType=VARCHAR}
@@ -480,6 +501,9 @@
         STL_PAY_TEMP_ORDERS C
         WHERE
         A.TRADE_ID = B.TRADE_ID AND A.TRADE_DATE = #{dealDate,jdbcType=DATE} AND A.TRADE_ID = C.TRADE_ID
+        <!--只处理场内数据 modify by fuyongsheng 20220830 start-->
+        AND A.TRADE_MARKET IN ('03', '04')
+        <!--只处理场内数据 modify by fuyongsheng 20220830 end-->
         <if test="finprodType2List != null and finprodType2List.size() > 0">
             <foreach collection="finprodType2List" item="finprodType2" open="AND A.FINPROD_TYPE2 IN (" close=")" separator=",">
                 #{finprodType2,jdbcType=VARCHAR}
@@ -504,6 +528,9 @@
         TRD_PRODUCT_TEMP_DEAL_ADD B
         WHERE
         A.TRADE_ID = B.TRADE_ID AND A.TRADE_DATE = #{dealDate,jdbcType=DATE}
+        <!--只处理场内数据 modify by fuyongsheng 20220830 start-->
+        AND A.TRADE_MARKET IN ('03', '04')
+        <!--只处理场内数据 modify by fuyongsheng 20220830 end-->
         <if test="finprodType2List != null and finprodType2List.size() > 0">
             <foreach collection="finprodType2List" item="finprodType2" open="AND A.FINPROD_TYPE2 IN (" close=")" separator=",">
                 #{finprodType2,jdbcType=VARCHAR}
@@ -529,6 +556,9 @@
         STL_PAY_TEMP_ORDERS C
         WHERE
         A.TRADE_ID = B.TRADE_ID AND A.TRADE_DATE = #{dealDate,jdbcType=DATE} AND A.TRADE_ID = C.TRADE_ID
+        <!--只处理场内数据 modify by fuyongsheng 20220830 start-->
+        AND A.TRADE_MARKET IN ('03', '04')
+        <!--只处理场内数据 modify by fuyongsheng 20220830 end-->
         <if test="finprodType2List != null and finprodType2List.size() > 0">
             <foreach collection="finprodType2List" item="finprodType2" open="AND A.FINPROD_TYPE2 IN (" close=")" separator=",">
                 #{finprodType2,jdbcType=VARCHAR}
@@ -548,6 +578,9 @@
        		STL_PAY_TEMP_ORDERS C
        	WHERE
        		A.TRADE_ID = B.TRADE_ID AND A.TRADE_DATE = #{dealDate,jdbcType=DATE} AND A.TRADE_ID = C.TRADE_ID
+            <!--只处理场内数据 modify by fuyongsheng 20220830 start-->
+            AND A.TRADE_MARKET IN ('03', '04')
+            <!--只处理场内数据 modify by fuyongsheng 20220830 end-->
        		<if test="finprodType2List != null and finprodType2List.size() > 0">
                 <foreach collection="finprodType2List" item="finprodType2" open="AND A.FINPROD_TYPE2 IN (" close=")" separator=",">
                     #{finprodType2,jdbcType=VARCHAR}

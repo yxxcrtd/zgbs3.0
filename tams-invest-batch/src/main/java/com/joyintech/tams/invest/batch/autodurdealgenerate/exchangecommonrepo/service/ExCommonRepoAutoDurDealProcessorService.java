@@ -212,8 +212,8 @@ public class ExCommonRepoAutoDurDealProcessorService extends BaseService {
             ptlCashPositionFlow.setAmount(ArithmeticUtil.multiply(dto.getTradeAmt(),new BigDecimal("-1")));
         }
         ptlCashPositionFlow.setCcy(dto.getCcy());
-        ptlCashPositionFlow.setHodingType(DictCodeList.持仓类型_可用.getValue());
-        ptlCashPositionFlow.setCdate(DateUtil.parse(dto.getTradeDate()));
+        ptlCashPositionFlow.setHodingType(DictCodeList.持仓类型_实际.getValue());
+        ptlCashPositionFlow.setCdate(DateUtil.parse(dto.getSettleDate()));
         ptlCashPositionFlow.setOrderId(spo.getOrderId());
         BussinessCodeParameter bussinessCodeParameter = new BussinessCodeParameter();
         bussinessCodeParameter.setSeqNo("9999");

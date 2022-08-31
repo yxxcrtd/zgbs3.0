@@ -18,6 +18,7 @@ import java.util.Map;
 
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
+import com.joyintech.framework.util.BeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -229,12 +230,24 @@ public class TrdDepositInvestTrade001Service extends BaseService<TrdDepositInves
 //            dto.setHodingType(DictCodeList.持仓类型_可用.getValue());
             dto.setCcy(map.get("ccy").toString());
             BigDecimal s = basePtlCashPositionInfoService.queryUsableCashPosition(dto);
+
+            //查询新表可用现金
+            PtlCashPositionFlowDto dtoNew = new PtlCashPositionFlowDto();
+            BeanUtil.copyPropertiesIgnoreNull(dtoNew,dto);
+            dtoNew.setCdate(DateUtil.parse(map.get("tradeDate").toString()));
+            dtoNew.setHodingType(DictCodeListExt3.资产类型_汇总可用现金.getValue());
+            dtoNew.setDateType(0);
+            BigDecimal cashT0_new = basePtlCashPositionInfoService.queryTrdAvailableCashNew(dtoNew);
+            s = ArithmeticUtil.doAdd(s, cashT0_new);
 //            dto.setCdate(DateUtil.addDay(DateUtil.parse(map.get("tradeDate").toString()), day));
             SuggestDto sDto = new SuggestDto();
 
             final Date tradeDay = DateUtil.parse(map.get("tradeDay").toString());
             dto.setCdate(tradeDay);
             BigDecimal s1 = basePtlCashPositionInfoService.queryUsableCashPosition(dto);
+            dtoNew.setDateType(1);
+            BigDecimal cashT1_new = basePtlCashPositionInfoService.queryTrdAvailableCashNew(dtoNew);
+            s1 = ArithmeticUtil.doAdd(s1, cashT1_new);
 
             acctTypeList.clear();
             acctTypeList.add(DictCodeListExt1.资金账户类型_券商资金账户.getValue());
