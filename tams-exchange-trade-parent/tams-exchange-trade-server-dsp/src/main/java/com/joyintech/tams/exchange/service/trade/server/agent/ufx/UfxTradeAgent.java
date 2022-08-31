@@ -306,7 +306,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
                 || "RepurchaseSQSZ".equals(entrustProp)
                 || "RepurchaseBuybackSZ".equals(entrustProp)
                 || "RepurchaseRenewalSZ".equals(entrustProp)
-               || "RepurchaseBuyBeforeSZ".equals(entrustProp)
+                || "RepurchaseBuyBeforeSZ".equals(entrustProp)
                 || "RepurchaseRemovePledgeSZ".equals(entrustProp)
                 || "RepurchaseBondChangeSZ".equals(entrustProp)
                 || "RepurchaseAgreeSZ".equals(entrustProp))
@@ -406,9 +406,9 @@ public class UfxTradeAgent extends TradeAgentDsp {
                 // 失败 柜台废单
                 // yanjianhui 修改于 2022/8/24 11:23  柜台报错返回空报文导致指令进度没有被释放处理。
                 String errorMsg = null;
-                if(ds != null){
-                    errorMsg = ErrorMsgUtils.subErrorMsg((String)ds.get("error_info"));
-                }else{
+                if (ds != null) {
+                    errorMsg = ErrorMsgUtils.subErrorMsg((String) ds.get("error_info"));
+                } else {
                     errorMsg = resultBean.getErrorMsg();
                 }
                 cancelEntrustBean.setErrorCode(resultBean.getErrorCode());
@@ -1172,7 +1172,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
             }
             reList.addAll(list);
         }
-        logger.debug("ReqQueryIntegrateOrder reback : {}", JSONArray.toJSONString(reList));
+        // logger.debug("ReqQueryIntegrateOrder reback : {}", JSONArray.toJSONString(reList));
         return reList;
     }
 
@@ -1259,7 +1259,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
         PositionStr positionStr = positionStrMap.get(loginInfo.getFundAccount());
 
         List<Trade> list = getProtocolBackTrade(accountId, positionStr, "ProtocolBack");
-        if (org.apache.commons.collections.CollectionUtils.isEmpty(list)) {
+        if (CollectionUtils.isEmpty(list)) {
             return;
         }
         String position_str = list.get(list.size() - 1).getPositionStr();
@@ -1554,9 +1554,9 @@ public class UfxTradeAgent extends TradeAgentDsp {
      * 332403 债券质押协议回购委托查询
      * 在协议回购之前要进行查询  原申报合同序号  后才可做交易。
      */
-    public String qryProtocolBackTradeSZ(String brokerEntrustId,String accountId)
+    public String qryProtocolBackTradeSZ(String brokerEntrustId, String accountId)
             throws Exception {
-        NegotiateQuoteQueryBean queryBean=new NegotiateQuoteQueryBean();
+        NegotiateQuoteQueryBean queryBean = new NegotiateQuoteQueryBean();
         List<NegotiateQuoteReceiveBean> list;
         // 332403   债券质押协议回购委托查询
         // 场景代码
@@ -1568,11 +1568,11 @@ public class UfxTradeAgent extends TradeAgentDsp {
         String entrustDate = sdf.format(new Date());
         // 自定义参数
         Map<String, Object> customParam = getCustomParam(queryBean.getAccountId());
-        customParam.put("brokerEntrustId",brokerEntrustId);
-        customParam.put("entrustDate",entrustDate);
-        customParam.put("accountId",accountId);
+        customParam.put("brokerEntrustId", brokerEntrustId);
+        customParam.put("entrustDate", entrustDate);
+        customParam.put("accountId", accountId);
         ResultBean resultBean = triggerCodeAdapter(functionCode, entrustProp, queryBean, customParam);
         // region 返回结果处理
-        return UfxMsgParseHelper.getJoinReportId( AgentUtil.getQueryListUFX(resultBean));
+        return UfxMsgParseHelper.getJoinReportId(AgentUtil.getQueryListUFX(resultBean));
     }
 }

@@ -5,13 +5,11 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
-import com.joyintech.tams.exchange.common.constant.ErrorCode;
-import com.joyintech.tams.exchange.common.constant.ExchangeType;
-import com.joyintech.tams.exchange.common.constant.InvestorType;
-import com.joyintech.tams.exchange.common.constant.Market;
+import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.Account;
 import org.apache.commons.codec.binary.Base64;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
@@ -48,6 +46,33 @@ public class AgentUtil {
         cal.set(Calendar.SECOND, Integer.parseInt(time.substring(4, 6)));
         SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return timeFormat.format(cal.getTime());
+    }
+
+    /**
+     * 金证U版格式化
+     *
+     * @param time "ORDER_DATE": "2022-08-31 11:11:14.239829",
+     * @return
+     */
+    public static String FormatApiTimeKCBPU(String time) {
+        // 10442119
+        if (time.length() <= 19) {
+            return time;
+        }
+        return time.substring(0, 19);
+    }
+
+    /**
+     * BigDecimal 转换
+     *
+     * @param value
+     * @return
+     */
+    public static BigDecimal Parse2BigDecimal(String value) {
+        if (Strings.isNullOrEmpty(value)) {
+            value = "0";
+        }
+        return new BigDecimal(value);
     }
 
     /**
@@ -115,7 +140,65 @@ public class AgentUtil {
      * @param market 投管交易所代码
      * @return 金证柜台交易所代码
      */
-    public static String ExchangeMarketKCBP(String market) {
+    public static String ExchangeMarketKCBPU(String market) {
+        // 00:深圳10:上海
+        if (Market.SZSE.value.equals(market)) {
+            return "00";
+        } else if (Market.SHSE.value.equals(market)) {
+            return "10";
+        } else
+            return "";
+    }
+
+    /**
+     * 投管与金证柜台交易所代码转换
+     *
+     * @param market 投管交易所代码
+     * @return 金证柜台交易所代码
+     */
+    public static String GetMarketKCBPU(String market) {
+        // 00、0:深圳10、1:上海
+        if ("00".equals(market) || "0".equals(market)) {
+            return Market.SZSE.value;
+        } else if ("10".equals(market) || "1".equals(market)) {
+            return Market.SHSE.value;
+        } else
+            return "";
+    }
+
+    public static String GetMarketKCBPW(String market) {
+        if ("1".equals(market)) {
+            return Market.SHSE.value;
+        } else if ("0".equals(market)) {
+            return Market.SZSE.value;
+        }
+
+        return market;
+    }
+
+    /**
+     * 转换金证U版字典
+     *
+     * @param bsFlag
+     * @return
+     */
+    public static String GetBSFlagForKCBPU(String bsFlag) {
+        String bs = "";
+        if (BSFlag.PPCJMR.value.equals(bsFlag)) {
+            bs = "0B";
+        } else if (BSFlag.PPCJMC.value.equals(bsFlag)) {
+            bs = "0S";
+        }
+        return bs;
+    }
+
+    /**
+     * 投管与金证柜台交易所代码转换
+     *
+     * @param market 投管交易所代码
+     * @return 金证柜台交易所代码
+     */
+    public static String ExchangeMarketKCBPW(String market) {
         if (Market.SZSE.value.equals(market)) {
             return "0";
         } else if (Market.SHSE.value.equals(market)) {

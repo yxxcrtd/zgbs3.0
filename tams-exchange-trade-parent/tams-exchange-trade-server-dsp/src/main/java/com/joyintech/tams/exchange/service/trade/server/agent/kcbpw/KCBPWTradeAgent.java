@@ -20,7 +20,6 @@ import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.service.trade.dao.domain.TerminalAgentInfo;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgentDsp;
 import com.joyintech.tams.exchange.service.trade.util.AgentUtil;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -250,7 +249,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
         String beginDate = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
         Map<String, String> parameters = Maps.newHashMap();
         parameters.put("accountId", accountId);
-        parameters.put("market", AgentUtil.ExchangeMarketKCBP(Market.SZSE.value));
+        parameters.put("market", AgentUtil.ExchangeMarketKCBPW(Market.SZSE.value));
         parameters.put("secuid", "");
         parameters.put("ordersno", "");
         parameters.put("count", "100");
@@ -279,7 +278,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
         String beginDate = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
         Map<String, String> parameters = Maps.newHashMap();
         parameters.put("accountId", accountId);
-        parameters.put("market", AgentUtil.ExchangeMarketKCBP(Market.SHSE.value));
+        parameters.put("market", AgentUtil.ExchangeMarketKCBPW(Market.SHSE.value));
         parameters.put("fundid", "");
         parameters.put("secuid", "");
         parameters.put("stkcode", "");
@@ -320,7 +319,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
             parameters.put("accountId", entrust.getAccountId());
             parameters.put("entrustProp", entrust.getEntrustProp());
             parameters.put("entrustBs", entrust.getEntrustBs());
-            parameters.put("market", AgentUtil.ExchangeMarketKCBP(entrust.getMarket()));
+            parameters.put("market", AgentUtil.ExchangeMarketKCBPW(entrust.getMarket()));
             parameters.put("stkcode", StockCodeUtils.getStockCode(entrust.getStockCode()));
             parameters.put("bsflag", entrust.getBsFlag());
             parameters.put("price", String.valueOf(entrust.getEntrustPrice()));
@@ -381,7 +380,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
         parameters.put("accountId", entrust.getAccountId());
         parameters.put("entrustProp", entrust.getEntrustProp());
         parameters.put("entrustBs", entrust.getEntrustBs());
-        parameters.put("market", AgentUtil.ExchangeMarketKCBP(entrust.getMarket()));
+        parameters.put("market", AgentUtil.ExchangeMarketKCBPW(entrust.getMarket()));
         parameters.put("bsflag", entrust.getBsFlag());
         parameters.put("stkcode", StockCodeUtils.getStockCode(entrust.getStockCode()));
         entrustProp = getIntegratedEntrustProp(entrust, parameters);
@@ -405,7 +404,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
                 if ("BondOrderSZ".equals(entrustProp) || "BondAgreeSZ".equals(entrustProp)) {
                     // 410677 深圳现券协商成交申报
                     // 410678 深圳现券协商成交申报回复
-                    customParam.put("market", AgentUtil.ExchangeMarketKCBP(entrust.getMarket()));
+                    customParam.put("market", AgentUtil.ExchangeMarketKCBPW(entrust.getMarket()));
                     //customParam.put("ownerType", AgentUtil.TradeActorKCBP(entrust.getDealerPartyType()));
                     // customParam.put("cpInvestorType", AgentUtil.TradeActorKCBP(entrust.getPropPartyType()));
                 }
@@ -546,7 +545,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
                 // region 参数组装
                 // 自定义参数
                 Map<String, Object> customParam = getCustomParam(integratedEntrust.getAccountId());
-                customParam.put("market", AgentUtil.ExchangeMarketKCBP(integratedEntrust.getMarket()));
+                customParam.put("market", AgentUtil.ExchangeMarketKCBPW(integratedEntrust.getMarket()));
                 // endregion
                 resultBean = triggerCodeAdapter(functionCode, entrustProp, integratedEntrust, customParam);
             }
@@ -613,7 +612,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
         String[] marketAndStockCode = StockCodeUtils.getMarketAndStockCode(qryBean.getStockCode());
         Map<String, Object> parameters = Maps.newHashMap();
         parameters.put("accountId", qryBean.getAccountId());
-        parameters.put("market", AgentUtil.ExchangeMarketKCBP(marketAndStockCode[1]));
+        parameters.put("market", AgentUtil.ExchangeMarketKCBPW(marketAndStockCode[1]));
         parameters.put("stockCode", marketAndStockCode[0]);
         parameters.put("bsflag", EntrustUtils.getBsFlag(qryBean.getEntrustProp(), qryBean.getEntrustBs()));
         parameters.put("price", qryBean.getEntrustPrice());
@@ -686,7 +685,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
         parameters.put("accountId", accountId);
         String market = StockCodeUtils.getMarket(stockCode);
         parameters.put("stkcode", StockCodeUtils.getStockCode(stockCode));
-        parameters.put("market", AgentUtil.ExchangeMarketKCBP(market));
+        parameters.put("market", AgentUtil.ExchangeMarketKCBPW(market));
         TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), FunctionCode.REQ_QRY_POSITION.value);
         agentInfo.setAccountId(accountId);
         ResultBean resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
@@ -702,7 +701,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
         String accountId = instrumentQryBean.getAccountId();
         Map<String, String> parameters = Maps.newHashMap();
         parameters.put("accountId", accountId);
-        parameters.put("market", AgentUtil.ExchangeMarketKCBP(instrumentQryBean.getMarket()));
+        parameters.put("market", AgentUtil.ExchangeMarketKCBPW(instrumentQryBean.getMarket()));
         parameters.put("stkcode", "");
         parameters.put("rowcount", String.valueOf(instrumentQryBean.getRowCount()));
         parameters.put("poststr", instrumentQryBean.getPostStr());
@@ -730,7 +729,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
             marketStr = marketAndStockCode[1];
             parameters.put("stkcode", marketAndStockCode[0]);
         }
-        parameters.put("market", AgentUtil.ExchangeMarketKCBP(marketStr));
+        parameters.put("market", AgentUtil.ExchangeMarketKCBPW(marketStr));
         parameters.put("qryflag", "1");
         parameters.put("count", "100");
         parameters.put("poststr", "");
@@ -759,7 +758,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
             }
             parameters.put("stkcode", StockCodeUtils.getStockCode(stockCode));
         }
-        parameters.put("market", AgentUtil.ExchangeMarketKCBP(marketStr));
+        parameters.put("market", AgentUtil.ExchangeMarketKCBPW(marketStr));
         parameters.put("qryflag", "1");
         parameters.put("count", "100");
         parameters.put("poststr", "");
@@ -874,7 +873,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
         Map<String, String> parameters = Maps.newHashMap();
 
         parameters.put("stkcode", StockCodeUtils.getStockCode(stockCode));
-        parameters.put("market", AgentUtil.ExchangeMarketKCBP(Market.SHSE.value));
+        parameters.put("market", AgentUtil.ExchangeMarketKCBPW(Market.SHSE.value));
         parameters.put("count", String.valueOf(fixedIncomeQuoteQryBean.getPageSize()));
         parameters.put("bsflag", "");
         parameters.put("posstr", "");
@@ -1358,7 +1357,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
         String accountId = kcbpAccount.getAccountId();
         Map<String, String> parameters = Maps.newHashMap();
         parameters.put("accountId", accountId);
-        parameters.put("market", AgentUtil.ExchangeMarketKCBP(Market.SHSE.value));
+        parameters.put("market", AgentUtil.ExchangeMarketKCBPW(Market.SHSE.value));
         parameters.put("secuid", "");
         parameters.put("stkcode", "");
         parameters.put("ordersno", "");
@@ -1391,7 +1390,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
         String beginDate = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
         Map<String, String> parameters = Maps.newHashMap();
         parameters.put("accountId", accountId);
-        parameters.put("market", AgentUtil.ExchangeMarketKCBP(Market.SHSE.value));
+        parameters.put("market", AgentUtil.ExchangeMarketKCBPW(Market.SHSE.value));
         parameters.put("secuid", "");
         parameters.put("fundid", "");
         parameters.put("stkcode", "");
@@ -1466,7 +1465,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
         // region 参数组装
         // 自定义参数
         Map<String, Object> customParam = getCustomParam(kcbpAccount.getAccountId());
-        customParam.put("market", AgentUtil.ExchangeMarketKCBP(Market.SZSE.value));
+        customParam.put("market", AgentUtil.ExchangeMarketKCBPW(Market.SZSE.value));
         customParam.put("beginDate", beginDate);
         customParam.put("endDate", beginDate);
         customParam.put("pageSize", 100);
@@ -1564,7 +1563,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
         String beginDate = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
         Map<String, String> parameters = Maps.newHashMap();
         parameters.put("accountId", accountId);
-        parameters.put("market", AgentUtil.ExchangeMarketKCBP(Market.SZSE.value));
+        parameters.put("market", AgentUtil.ExchangeMarketKCBPW(Market.SZSE.value));
         parameters.put("secuid", "");
         parameters.put("fundid", "");
         parameters.put("ordersno", "");
@@ -1602,7 +1601,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
         // region 参数组装
         // 自定义参数
         Map<String, Object> customParam = getCustomParam(kcbpAccount.getAccountId());
-        customParam.put("market", AgentUtil.ExchangeMarketKCBP(Market.SZSE.value));
+        customParam.put("market", AgentUtil.ExchangeMarketKCBPW(Market.SZSE.value));
         customParam.put("beginDate", beginDate);
         customParam.put("endDate", beginDate);
         customParam.put("pageSize", 100);
@@ -1634,7 +1633,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
         String beginDate = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
         Map<String, String> parameters = Maps.newHashMap();
         parameters.put("accountId", accountId);
-        parameters.put("market", AgentUtil.ExchangeMarketKCBP(Market.SHSE.value));
+        parameters.put("market", AgentUtil.ExchangeMarketKCBPW(Market.SHSE.value));
         parameters.put("secuid", "");
         parameters.put("fundid", "");
         parameters.put("stkcode", "");
@@ -1787,7 +1786,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
             // 固收平台确定报价行情查询  460018
             quoteQryBean.setMarket(Market.SHSE.value);
             parameters.put("stkcode", StockCodeUtils.getStockCode(quoteQryBean.getStockCode()));
-            parameters.put("market", AgentUtil.ExchangeMarketKCBP(Market.SHSE.value));
+            parameters.put("market", AgentUtil.ExchangeMarketKCBPW(Market.SHSE.value));
             parameters.put("bsflag", "");
             parameters.put("count", "100");
             parameters.put("posstr", "");
