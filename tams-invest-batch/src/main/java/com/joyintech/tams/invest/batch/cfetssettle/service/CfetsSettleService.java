@@ -298,12 +298,10 @@ public class CfetsSettleService extends BaseService {
                     this.insertOldBidPosition(cfetsManualSettleInsertDto, DictCodeListExt3.交收操作类型_交收.getValue(), false);
                 }
             }
-        } catch (PositionException e) {
+        } catch (Exception e) {
             if (CollectionUtils.isNotEmpty(mapList)) {
                 mapList.forEach(item -> {
-                    String revokeId = String.valueOf(item.get("seqno"));
-                    String modelType = (String) item.get("modelType");
-                    PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+                    PositionHttpRequest.roll((Long) item.get("seqno"), (String) item.get("modelType"), e.getMessage());
                 });
             }
             throw e;

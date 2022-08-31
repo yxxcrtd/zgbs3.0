@@ -201,12 +201,10 @@ public class CfetsBondAutoDurDealGenerateProcessorService extends BaseService {
                 autoPeriodCommonService.insertCfetsTempDealData(trdBondDurationDto.getTrdBondDurDbInertDto());
                 mapList.add(sendPositionMethod(trdBondDurationDto.getTrdBondDurDbInertDto().getTrdFinProductDealTotal()));
             }
-        } catch ( PositionException e) {
+        } catch (Exception e) {
             if (CollectionUtils.isNotEmpty(mapList)) {
                 mapList.forEach(item -> {
-                    String revokeId = String.valueOf(item.get("seqno"));
-                    String modelType = (String) item.get("modelType");
-                    PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+                    PositionHttpRequest.roll((Long) item.get("seqno"), (String) item.get("modelType"), e.getMessage());
                 });
             }
             throw e;

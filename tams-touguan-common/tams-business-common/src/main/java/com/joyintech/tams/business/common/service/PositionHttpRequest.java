@@ -386,7 +386,7 @@ public class PositionHttpRequest {
      * @param req
      * @throws PositionException
      */
-    public static void batchClose(Object req) throws PositionException {
+    public static Map<String, Object> batchClose(Object req) throws PositionException {
         //
         //处理seqno
         Map<String, Object> params = JsonUtils.stringToMap(JsonUtils.object2Json(req));
@@ -401,7 +401,6 @@ public class PositionHttpRequest {
         } else if (!StringUtil.equals("success", msgMap.get("code") + "")) {
             throw new PositionException(JsonUtils.object2Json(msgMap));
         }
-
      /*   if (!StringUtil.equals("success", msgMap.get("code") + "")){
             if(StringUtil.equals("FL0007", msgMap.get("code"))){
                 throw new PositionException(CODE_BUSI_REFUSE + "|" + JsonUtils.object2Json(msgMap));
@@ -410,6 +409,7 @@ public class PositionHttpRequest {
                 throw new PositionException("头寸返回数据为空！");
             }
         }*/
+        return params;
     }
 
     /**
