@@ -915,6 +915,12 @@
         WHERE regtotal.TOTLE_TRADE_ID = #{tradeId} and regdeal.ENTRUST_ID = #{entrustId}
     </select>
 
+    <select id="selectRegTradeIdBytradeIdFromDeal" resultType="java.lang.String">
+        SELECT deal.B_TRADE_ID
+        FROM TRD_PRODUCT_DEAL deal
+        WHERE deal.TRADE_ID = #{tradeId}
+    </select>
+
     <select id="selectRegTradeIdBytradeId" resultType="java.lang.String">
         SELECT regdeal.TRADE_ID
         FROM REG_FIN_PRODUCT_DEAL regdeal

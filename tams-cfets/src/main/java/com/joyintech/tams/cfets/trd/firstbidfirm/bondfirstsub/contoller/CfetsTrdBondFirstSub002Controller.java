@@ -123,6 +123,9 @@ public class CfetsTrdBondFirstSub002Controller extends BaseController {
         //刷新时间
         initPageParams.put("ibuQuoteBondFirst_etrTable_refresh_period", CacheUtil.getSysParam("ibuQuoteBond_etrTable_refresh_period"));
         initPageParams.put("effDate", CacheUtil.getSysParam("ibuVar_quoteEffTime"));
+        // 风险开关
+        initPageParams.put("risk_math_switch", CacheUtil.getSysParam("risk_math_switch"));
+        initPageParams.put("pageRedisFlag", CacheUtil.getSysParam("pageRedisFlag"));
 
         //流程id
         String workflowId = "null".equals(map.get(GlobalConstant.WORKFLOW_ID)) ? null : (String) map.get(GlobalConstant.WORKFLOW_ID);

@@ -233,6 +233,9 @@ public class RiskNodeConfigDtl {
      * @return AUTHORIZE_CONTROL 授权控制：00：不控 01：软控 02：硬控
      */
     public String getAuthorizeControl() {
+        if(StringUtil.equals(this.authorizeControl, DictCodeListRsk.风险控制类别_不控.getValue())) {
+            return DictCodeListRsk.风险控制类别_不控.getValue();
+        }
         return Boolean.parseBoolean(CacheUtil.getSysParam("IS_AUTHORIZATION_SOFTCONTROL")) ? DictCodeListRsk.风险控制类别_软控.getValue() : DictCodeListRsk.风险控制类别_硬控.getValue();
     }
 

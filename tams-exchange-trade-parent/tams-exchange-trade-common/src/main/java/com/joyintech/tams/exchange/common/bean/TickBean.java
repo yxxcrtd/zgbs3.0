@@ -72,6 +72,11 @@ public class TickBean {
 	
 	@ApiModelProperty(name = "bidVolume", value = "买方数量")
     private List<Integer> bidVolume = new ArrayList<>();
+	
+	@ApiModelProperty(name = "closePrice", value = "收盘价")
+	private double closePrice;           // 收盘价
+	@ApiModelProperty(name = "averageDailyPrice", value = "日均价")
+    private double averageDailyPrice;    // 日均价
 
     public void addAskPrice(double price) {
         askPrice.add(price);
@@ -249,5 +254,21 @@ public class TickBean {
 
     public void setBidVolume(List<Integer> bidVolume) {
         this.bidVolume = bidVolume;
+    }
+
+    public double getClosePrice() {
+        return closePrice;
+    }
+
+    public void setClosePrice(double closePrice) {
+        this.closePrice = closePrice;
+    }
+
+    public double getAverageDailyPrice() {
+        return averageDailyPrice;
+    }
+
+    public void setAverageDailyPrice(double averageDailyPrice) {
+        this.averageDailyPrice = averageDailyPrice;
     }
 }

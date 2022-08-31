@@ -77,9 +77,7 @@ public class CfetsSettleTask extends BatchBaseService {
             cfetsSettleService.autoSettle(batchDate, this.getProductIdList());
             result.setStatus(BatchStatus.COMPLETED);
         } catch (Exception e) {
-           logger.error(e.getMessage());
-            //异常信息记录到批处理的日志详情
-            RiskUtil.getLogString(e);
+           logger.error(e.getMessage(),e);
         }
         return result;
     }

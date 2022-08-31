@@ -203,4 +203,6 @@ public interface BasicMstCaptialAccountMapper {
      */
     MstCaptialAccountDto getFirstRateByownDept(String ownDept);
 
+    List<SelectOptionDto> getAcctInfo(Map<String,Object> param);
+
 	}

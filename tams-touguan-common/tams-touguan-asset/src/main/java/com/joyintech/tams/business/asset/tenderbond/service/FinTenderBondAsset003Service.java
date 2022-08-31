@@ -424,9 +424,12 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                     validMessages.add(new ValidMessage("发行阶段不为已上市的不能进行撤销"));
                 }
             }
-            Integer count = finTenderBoundAssetMapper.countFinprodIdUse(dto.getFinprodId(), DictCodeList.是否_否.getValue(), null, DictCodeList.是否_否.getValue());
-            if (Objects.nonNull(count) && count > 0) {
-                validMessages.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
+            // 上市日等于平台日
+            if (StringUtil.isNotEmpty(dto.getListingDate()) && dto.getListingDate().compareTo(iPlatformDate.getSysDate()) == 0) {
+                Integer count = finTenderBoundAssetMapper.countApperarFinprodIdUse(dto.getFinprodId());
+                if (Objects.nonNull(count) && count > 0) {
+                    validMessages.add(new ValidMessage("存在指令或者交易使用了该记录信息"));
+                }
             }
         } else {
             if (Objects.nonNull(dto.getIssueStatus()) && StringUtil.equals(dto.getIssueStatus(), DictCodeListExt1.发行状态_发行失败.getValue())) {

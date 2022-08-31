@@ -30,10 +30,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 数据清算step2 processor Service - 处理上中登JSMX
@@ -663,12 +660,23 @@ public class StlDataDealSzdJsmxProcessService {
 						// 到期日
 						settleTransData.setMdate(DateUtil.parse(szdJsmx.getQtrq()));
 						// 首期交收日
-						settleTransData.setVpayDate(DateUtil.parse(szdJsmx.getJsrq()));
+						// settleTransData.setVpayDate(DateUtil.parse(szdJsmx.getJsrq()));
+						settleTransData.setVpayDate(DateUtil.parse(szdJsmx.getQsrq()));
 						// 到期交收日
 						String calendarId = CacheUtil.getSysParam(StlDataDealProcessConstant.STL_DOWNDATA_DEAL_SHJYS_CALID);
-						settleTransData.setMpayDate(stlDataDealProcessCommonService.getNextWorkDay(DateUtil.parse(szdJsmx.getQtrq()), calendarId));
+//						settleTransData.setMpayDate(stlDataDealProcessCommonService.getNextWorkDay(DateUtil.parse(szdJsmx.getQtrq()), calendarId));
+						// 获取期限品种日期
+						Integer days = stlDataDealProcessCommonService.getDayByTermType(settleTransData.getTermType());
+						// 到期交收日 = 交收日期+期限品种日期
+						Date mPayDateTemp = DateUtil.addDay(DateUtil.parse(szdJsmx.getJsrq()), days);
+						// 判断到期交收日是否是节假日,如果是节假日,则取下一个工作日
+						String isHoliday = stlDataDealProcessCommonService.getIsHoliday(mPayDateTemp, calendarId);
+						if("0".equals(isHoliday)){
+							mPayDateTemp = stlDataDealProcessCommonService.getNextWorkDay(mPayDateTemp, calendarId);
+						}
+						settleTransData.setMpayDate(mPayDateTemp);
 						// 交割日
-						settleTransData.setSettleDate(DateUtil.parse(szdJsmx.getJsrq()));
+						settleTransData.setSettleDate(DateUtil.parse(szdJsmx.getJyrq()));
 						// 本金金额
 						// BigDecimal bjje = new BigDecimal(Math.abs(new BigDecimal(szdJsmx.getQsje()).doubleValue()));
 						// 本金金额 = 成交数量 fuyongsheng 20211101 edit start
@@ -790,12 +798,18 @@ public class StlDataDealSzdJsmxProcessService {
 						// 到期日
 						settleTransData.setMdate(DateUtil.parse(szdJsmx.getQtrq()));
 						// 交易日期
-						settleTransData.setTradeDate(settleTransData.getMdate());
+						// settleTransData.setTradeDate(settleTransData.getMdate());
+						settleTransData.setTradeDate(DateUtil.parse(szdJsmx.getQsrq()));
 						// 交割日期
-						settleTransData.setSettleDate(DateUtil.parse(szdJsmx.getJsrq()));
+						// settleTransData.setSettleDate(DateUtil.parse(szdJsmx.getJyrq()));
+						settleTransData.setSettleDate(DateUtil.parse(szdJsmx.getQsrq()));
+
 						// 首期交收日
-						String calendarId = CacheUtil.getSysParam(StlDataDealProcessConstant.STL_DOWNDATA_DEAL_SHJYS_CALID);
-						settleTransData.setVpayDate(stlDataDealProcessCommonService.getNextWorkDay(DateUtil.parse(szdJsmx.getJyrq()), calendarId));
+//						String calendarId = CacheUtil.getSysParam(StlDataDealProcessConstant.STL_DOWNDATA_DEAL_SHJYS_CALID);
+//						settleTransData.setVpayDate(stlDataDealProcessCommonService.getNextWorkDay(DateUtil.parse(szdJsmx.getJyrq()), calendarId));
+						SettleTransData sqSettleTransData = this.selectH02SqSettleTransData(settleTransData.getVdate(),
+								settleTransData.getSeatNumber(), settleTransData.getCjbh());
+						settleTransData.setVpayDate(sqSettleTransData.getVpayDate());
 						// 到期交收日
 						settleTransData.setMpayDate(DateUtil.parse(szdJsmx.getJsrq()));
 						// 本金金额
@@ -2679,5 +2693,21 @@ public class StlDataDealSzdJsmxProcessService {
 	 */
 	private BigDecimal abs(String value) {
 		return null != value ? new BigDecimal(value).abs() : null;
+	}
+
+
+	/**
+	 * 查询竞价回购首期成交数据
+	 * @param vdate
+	 * @param seatNumber
+	 * @param cjbh
+	 * @return
+	 */
+	private SettleTransData selectH02SqSettleTransData(Date vdate, String seatNumber, String cjbh){
+		List<SettleTransData> settleTransDatas = stlDownDataDealMapper.selectH02SqSettleTransData(vdate,seatNumber,cjbh);
+		if(!CollectionUtils.isEmpty(settleTransDatas)){
+			return settleTransDatas.get(0);
+		}
+		return new SettleTransData();
 	}
 }

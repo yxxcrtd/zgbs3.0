@@ -134,12 +134,12 @@
         <dependency>
             <groupId>com.joyintech</groupId>
             <artifactId>framework-core</artifactId>
-            <version>0.0.5.8</version>
+            <version>0.0.5.12</version>
         </dependency>
         <dependency>
             <groupId>com.joyintech</groupId>
             <artifactId>joyintech-system</artifactId>
-            <version>0.0.5.8</version>
+            <version>0.0.5.12</version>
         </dependency>
     </dependencies>
     <build>

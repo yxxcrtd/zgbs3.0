@@ -10,17 +10,6 @@
 
 package com.joyintech.tams.invest.risk.customerrelationtree.agencydetailsinf.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.joyintech.tams.systemtools.interf.IPlatformDate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.export.ExportParam;
 import com.joyintech.framework.grid.Page;
@@ -31,6 +20,16 @@ import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.risk.customerrelationtree.agencydetailsinf.dto.AgencyDetailsInf001Dto;
 import com.joyintech.tams.invest.risk.customerrelationtree.agencydetailsinf.dto.TreeNode;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 机构详细信息service
@@ -76,9 +75,9 @@ public class AgencyDetailsInf001Service extends CommonExportService<AgencyDetail
 	 * @see
 	 * @since 1.0
 	 */
-	public List<SelectOptionDto> getAgency(String agencyId) {
-        return restTemplate.getForList(ServiceApplication.RISK_SERVICE_NAME
-                + "/AgencyDetailsInf001/getAgency?agencyId=" +StringUtil.defaultString(agencyId),SelectOptionDto.class);       
+	public Page<SelectOptionDto> getAgency(Map<String, Object> pageParam) {
+        return restTemplate.postForPage(ServiceApplication.RISK_SERVICE_NAME
+				+ "/AgencyDetailsInf001/getAgency", pageParam, SelectOptionDto.class);
     }
 	
 	/**

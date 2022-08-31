@@ -235,8 +235,10 @@ public class FinBondAsset001Service extends BaseService {
      */
     public Page<SelectOptionDto> getCustomer(SelectOptionCommonRequest request) {
         Map<String, Object> map = BeanUtil.object2Map(request);
-        Page<SelectOptionDto> page = super.queryForPage(request.getPageMode().getPageNo(),
-                request.getPageMode().getPageSize(),
+        int pageNo = request.getPageMode() == null || request.getPageMode().getPageNo() == 0 ? 1 : request.getPageMode().getPageNo();
+        int pageSize = request.getPageMode() == null || request.getPageMode().getPageSize() == 0 ? 10 : request.getPageMode().getPageSize();
+        Page<SelectOptionDto> page = super.queryForPage(pageNo,
+                pageSize,
                 () -> finBondAssetMapper.getCustomer(map));
         return page;
     }

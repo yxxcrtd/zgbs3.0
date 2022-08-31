@@ -23,6 +23,8 @@ public interface TradeService extends AsyncService<String, Trade> {
 
     Trade queryTradeByAccountIdAndBrokerTradeId(String accountId, String key);
 
+    void setTradeCache(Trade trade);
+
     String genDBId();
 
     @Deprecated

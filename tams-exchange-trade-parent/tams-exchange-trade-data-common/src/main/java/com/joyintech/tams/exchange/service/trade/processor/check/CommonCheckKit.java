@@ -341,8 +341,8 @@ public class CommonCheckKit extends BaseCheckKit {
             log.info("【非买卖交易、债券交易和质押式回购】不需要检查价格是否满足涨跌停价：busiTypeTg={}", instruction.getBusiTypeTg());
             return;
         }
-        if (lowerLimitPrice.compareTo(entrustPrice) > 0
-                || upperLimitPrice.compareTo(entrustPrice) < 0) {
+        if ((lowerLimitPrice.compareTo(BigDecimal.ZERO) > 0 && lowerLimitPrice.compareTo(entrustPrice) > 0)
+                || (upperLimitPrice.compareTo(BigDecimal.ZERO) > 0 && upperLimitPrice.compareTo(entrustPrice) < 0)) {
             String errorMsg = StrUtil.format("委托价格[{}]不符合涨跌停价限制：跌停价[{}]~涨停价[{}]",
                     entrustPrice, lowerLimitPrice, upperLimitPrice);
             log.error(errorMsg);
@@ -371,7 +371,7 @@ public class CommonCheckKit extends BaseCheckKit {
         String entrustProp = EntrustPropUtils.getEntrustProp(instruction, order.getEntrustProp());
         long entrustVolume = order.getEntrustVolume();
         BigDecimal entrustBalance = NumberUtil.mul(entrustVolume, order.getEntrustPrice());
-        if(EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg())){
+        if (EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg())) {
             entrustBalance = order.getEntrustBalance();
         }
 
@@ -391,15 +391,15 @@ public class CommonCheckKit extends BaseCheckKit {
         }
 
         BigDecimal minAmt = minTrdUnitLimit.getMinAmt();
-        if(entrustVolume < minNum && entrustBalance.compareTo(minAmt) < 0){
+        if (entrustVolume < minNum && entrustBalance.compareTo(minAmt) < 0) {
             String errorMsg = "";
             String busiTypeTg = instruction.getBusiTypeTg();
-            if(DictCodeListExt3.投管业务类型_解除质押.getValue().equals(busiTypeTg) || DictCodeListExt3.投管业务类型_现券交易.getValue().equals(busiTypeTg)){
+            if (DictCodeListExt3.投管业务类型_解除质押.getValue().equals(busiTypeTg) || DictCodeListExt3.投管业务类型_现券交易.getValue().equals(busiTypeTg)) {
                 errorMsg = StrUtil.format("委托数量[{}]万元不符合最小买入数量限制[{}]万元，委托金额[{}]不符合最小买入金额限制[{}]",
-                        (ArithmeticUtil.divide(BigDecimal.valueOf(entrustVolume), new BigDecimal(100),2)),
+                        (ArithmeticUtil.divide(BigDecimal.valueOf(entrustVolume), new BigDecimal(100), 2)),
                         ArithmeticUtil.divide(BigDecimal.valueOf(minNum),
-                                new BigDecimal(100),2), entrustBalance, minAmt);
-            }else{
+                                new BigDecimal(100), 2), entrustBalance, minAmt);
+            } else {
                 errorMsg = StrUtil.format("委托数量[{}]不符合最小买入数量限制[{}]，委托金额[{}]不符合最小买入金额限制[{}]",
                         entrustVolume, minNum, entrustBalance, minAmt);
             }

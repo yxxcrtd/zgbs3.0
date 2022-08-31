@@ -204,27 +204,32 @@ spring:
 #    host: 192.168.90.198
 #    port: 6379
 #    timeout: 20000
+  cache:
+    type: redis
   redis:
-    cluster:
-      nodes: 192.168.90.47:6379,192.168.90.47:6380,192.168.90.47:6381,192.168.90.47:6382,192.168.90.47:6383,192.168.90.47:6384
+    host: 192.168.60.185
+    port: 6388
+    password: joyin!234
+#    cluster:
+#      nodes: 192.168.90.47:6379,192.168.90.47:6380,192.168.90.47:6381,192.168.90.47:6382,192.168.90.47:6383,192.168.90.47:6384
   redislock:
     redissonEnabled: false
   datasource:
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+    url: jdbc:oracle:thin:@//192.168.70.32:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008_03
-    password: BS303INIT_TEST1008_03
-    reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
+    username: GLB_INV
+    password: GLB_INV#a1
+    reportSqlldrDatabaseName: 192.168.70.32:1521/orcl
 #应用配置
 application:
-  sqldirurl: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+  sqldirurl: jdbc:oracle:thin:@//192.168.70.32:1521/orcl
   driverClassName: oracle.jdbc.driver.OracleDriver
-  sqldiruserName: BS303INIT_TEST1008_03
-  sqldirpassword: BS303INIT_TEST1008_03
+  sqldiruserName: GLB_INV
+  sqldirpassword: GLB_INV#a1
   #以下根据实际ip和端口进行修改
   loadbalance: false
   micorservice:
-    contextPath:
+    contextpath:
       single: true
       commonService: http://127.0.0.1:8080/tams
       basicDataService: http://127.0.0.1:8080/tams
@@ -253,17 +258,17 @@ application:
 #base数据库配置
 base:
   datasource:
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+    url: jdbc:oracle:thin:@//192.168.70.32:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008_03
-    password: BS303INIT_TEST1008_03
+    username: GLB_INV
+    password: GLB_INV#a1
 #interf数据源配置
 interf:
    datasource:
-     url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+     url: jdbc:oracle:thin:@//192.168.70.32:1521/orcl
      driverClassName: oracle.jdbc.driver.OracleDriver
-     username: BS303INIT_TEST1008_03
-     password: BS303INIT_TEST1008_03
+     username: GLB_INV
+     password: GLB_INV#a1
 #日志路径配置
 log:
   path: /home/tams/logs/touguan/batch
@@ -295,20 +300,20 @@ spring:
   redislock:
     redissonEnabled: false
   datasource:
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+    url: jdbc:oracle:thin:@//192.168.70.32:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008_03
-    password: BS303INIT_TEST1008_03
-    reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
+    username: GLB_INV
+    password: GLB_INV
+    reportSqlldrDatabaseName: 192.168.70.32:1521/orcl
 #应用配置
 application:
-  sqldirurl: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+  sqldirurl: jdbc:oracle:thin:@//192.168.70.32:1521/orcl
   driverClassName: oracle.jdbc.driver.OracleDriver
-  sqldiruserName: BS303INIT_TEST1008_03
-  sqldirpassword: BS303INIT_TEST1008_03
+  sqldiruserName: GLB_INV
+  sqldirpassword: GLB_INV
   #以下根据实际ip和端口进行修改
   micorservice:
-    contextPath:
+    contextpath:
       single: true
       commonService: http://127.0.0.1:8080/tams
       basicDataService: http://127.0.0.1:8080/tams
@@ -337,17 +342,17 @@ application:
 #base数据库配置
 base:
   datasource:
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+    url: jdbc:oracle:thin:@//192.168.70.32:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008_03
-    password: BS303INIT_TEST1008_03
+    username: GLB_INV
+    password: GLB_INV
 #interf数据源配置
 interf:
   datasource:
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+    url: jdbc:oracle:thin:@//192.168.70.32:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008_03
-    password: BS303INIT_TEST1008_03
+    username: GLB_INV
+    password: GLB_INV
 #日志路径配置
 log:
   path: /home/tams/logs/touguan/batch
@@ -377,20 +382,20 @@ spring:
   redislock:
     redissonEnabled: false
   datasource:
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+    url: jdbc:oracle:thin:@//192.168.70.32:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008_03
-    password: BS303INIT_TEST1008_03
-    reportSqlldrDatabaseName: 192.168.70.245:1521/orcl
+    username: GLB_INV
+    password: GLB_INV
+    reportSqlldrDatabaseName: 192.168.70.32:1521/orcl
 #应用配置
 application:
-  sqldirurl: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+  sqldirurl: jdbc:oracle:thin:@//192.168.70.32:1521/orcl
   driverClassName: oracle.jdbc.driver.OracleDriver
-  sqldiruserName: BS303INIT_TEST1008_03
-  sqldirpassword: BS303INIT_TEST1008_03
+  sqldiruserName: GLB_INV
+  sqldirpassword: GLB_INV
   #以下根据实际ip和端口进行修改
   micorservice:
-    contextPath:
+    contextpath:
       single: true
       commonService: http://127.0.0.1:8080/tams
       basicDataService: http://127.0.0.1:8080/tams
@@ -419,17 +424,17 @@ application:
 #base数据库配置
 base:
   datasource:
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+    url: jdbc:oracle:thin:@//192.168.70.32:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008_03
-    password: BS303INIT_TEST1008_03
+    username: GLB_INV
+    password: GLB_INV
 #interf数据源配置
 interf:
   datasource:
-    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+    url: jdbc:oracle:thin:@//192.168.70.32:1521/orcl
     driverClassName: oracle.jdbc.driver.OracleDriver
-    username: BS303INIT_TEST1008_03
-    password: BS303INIT_TEST1008_03
+    username: GLB_INV
+    password: GLB_INV
 #日志路径配置
 log:
   path: /home/tams/logs/touguan/batch

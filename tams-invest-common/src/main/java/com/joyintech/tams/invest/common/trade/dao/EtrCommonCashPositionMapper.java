@@ -454,6 +454,12 @@ public interface EtrCommonCashPositionMapper {
      */
     List<TrdProductDeal> selectTrdProductDealByTotleTradeId(@Param("totleTradeId") String totleTradeId);
 
-    String  selectInvAim(EtrSecPositionFlowDto sec);
+    /**
+     * 根据指令编号查询交易
+     * @param entrustId
+     * @return
+     */
+    List<TrdProductDeal> selectTrdProductDealByEntrustId(@Param("entrustId") String entrustId);
 
+    String  selectInvAim(EtrSecPositionFlowDto sec);
 }

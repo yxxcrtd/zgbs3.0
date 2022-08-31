@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Date;
 import java.util.List;
 import java.util.Objects;
@@ -73,10 +74,12 @@ public class TradeCallbackHelper {
     public void onTrade(Trade tradeRecord) {
         logger.info("成交回报信息 {}", JsonUtils.getJsonFromObject(tradeRecord));
         //撤单、废单成交无需去重。 支持重复处理
-        String key = AgentServerUtil.GetTradeCacheKey(tradeRecord.KeyType, tradeRecord.getAccountId(), tradeRecord.getBrokerEntrustId()+"_"+tradeRecord.getBrokerTradeId());
+        String key = AgentServerUtil.GetTradeCacheKey(tradeRecord.KeyType, tradeRecord.getAccountId(), tradeRecord.getBrokerEntrustId() + "_" + tradeRecord.getBrokerTradeId());
         Trade tradeDb = tradeService.queryTradeByAccountIdAndBrokerTradeId(tradeRecord.getAccountId(), key);
         Date now = new Date(System.currentTimeMillis());
         if (Objects.isNull(tradeDb)) {
+            // 立即缓存，减少重复执行的时间差
+            tradeService.setTradeCache(tradeRecord);
             EntrustInterface entrust = null;
             //处理大宗成交回报
             if (IntegratedEntrustUtils.isIntegratedEntrust(tradeRecord.getEntrustProp())
@@ -90,7 +93,7 @@ public class TradeCallbackHelper {
                     logger.info("tradeRecord has not found businessFlag brokerEntrustId is {}", tradeRecord.getBrokerEntrustId());
                 }
                 if (Objects.nonNull(entrust)) {
-                    if(tradeRecord.getFinanceAccount()==null){
+                    if (tradeRecord.getFinanceAccount() == null) {
                         tradeRecord.setAccountName(entrust.getAccountName());
                         tradeRecord.setFinanceAccount(entrust.getFinanceAccount());
                     }
@@ -166,8 +169,11 @@ public class TradeCallbackHelper {
                 } else {
                     logger.info("onTrade tradeRecord has no entrust localEntrustId and brokerEntrustId -- {}", tradeRecord.getBrokerTradeId());
                 }
+                if (EntrustProp.HS.value.equals(entrust.getEntrustProp())) {
+                    tradeRecord.setTradedVolume(entrust.getEntrustVolume());
+                }
                 if (Objects.nonNull(entrust)) {
-                    if(tradeRecord.getFinanceAccount()==null){
+                    if (tradeRecord.getFinanceAccount() == null) {
                         tradeRecord.setAccountName(entrust.getAccountName());
                         tradeRecord.setFinanceAccount(entrust.getFinanceAccount());
                     }
@@ -268,6 +274,13 @@ public class TradeCallbackHelper {
         tradeRecord.setCreateTime(now);
         tradeRecord.setUpdateTime(now);
 //        tradeRecord.setFullPrice(bondHelper.getFullPriceByTradePrice(tradeRecord, entrust.getIsFullPrice(), instruction));
+        // 深交所 质押出入库 成交报文 价格为空 赋值委托值
+        if (StringUtil.equals(tradeRecord.getEntrustProp(), EntrustProp.ZYCRK.value)
+                && StringUtil.equals(tradeRecord.getMarket(), Market.SZSE.value)
+                && (tradeRecord.getTradedPrice() == null || BigDecimal.ZERO.compareTo(tradeRecord.getTradedPrice()) == 0)
+                && entrust.getEntrustPrice() != null) {
+            tradeRecord.setTradedPrice(entrust.getEntrustPrice().divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
+        }
         tradeRecord.setPortfolioName(instruction.getPortfolioName());
         tradeRecord.setSecAcctId(instruction.getSecAcctId());
         tradeRecord.setSecAcctName(instruction.getSecAcctName());

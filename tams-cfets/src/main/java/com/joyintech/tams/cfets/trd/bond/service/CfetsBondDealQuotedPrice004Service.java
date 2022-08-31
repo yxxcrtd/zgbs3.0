@@ -17,12 +17,14 @@ import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.service.entrust.common.service.WFlowCommonService;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysWflBusinessList;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
+import com.joyintech.tams.business.common.dto.CfetsSearchInfoRequest;
 import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
@@ -213,7 +215,16 @@ public class CfetsBondDealQuotedPrice004Service extends BaseService<CfetsBondDea
             if (StringUtil.isEmpty(entity.getCounterId())) {
                 errorList.add(new ValidMessage("请输入对手方"));
             }
-            if (StringUtil.equals(CacheUtil.getSysParam("EXPORT_SHOW"), "01") && StringUtil.isEmpty(entity.getCounterTrader()) && (StringUtil.equals(entity.getQuoteStyle(), "01") || StringUtil.equals(entity.getQuoteStyle(), "02"))) {
+            // 交易对手未绑定21位码,对手方交易员非必填
+            CfetsSearchInfoRequest cfetsSearchInfoRequest = new CfetsSearchInfoRequest();
+            cfetsSearchInfoRequest.setDealType("01");
+            cfetsSearchInfoRequest.setInitValue(entity.getCounterId());
+            List<SelectOptionDto> list = joyinbusinessCommonService.queryMySideOrCount(cfetsSearchInfoRequest);
+            if (CollectionUtils.isNotEmpty(list)
+                    && StringUtil.isNotEmpty(list.get(0).getObject())
+                    &&StringUtil.equals(CacheUtil.getSysParam("EXPORT_SHOW"), "01")
+                    && StringUtil.isEmpty(entity.getCounterTrader())
+                    && (StringUtil.equals(entity.getQuoteStyle(), "01") || StringUtil.equals(entity.getQuoteStyle(), "02"))) {
                 errorList.add(new ValidMessage("请输入对手方交易员"));
             }
             if (StringUtil.isEmpty(entity.getCcy())) {
