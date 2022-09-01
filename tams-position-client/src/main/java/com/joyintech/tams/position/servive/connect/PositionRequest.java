@@ -39,8 +39,8 @@ public class PositionRequest {
      * 刷新缓存
      * @param param
      */
-    public  void updateBalance(Object param) {
-        positionHttpRequest.updateBalance(param);
+    public  String updateBalance(Object param) {
+       return  positionHttpRequest.updateBalance(param);
     }
 
     /**
