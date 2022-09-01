@@ -64,23 +64,15 @@ public class PositionHttpRequest {
 
         logger.info("发送头寸报文:{}", JsonUtils.object2Json(params));
         Map msgMap = null;
-        try {
-            String res = sendPrivate(params);
-            logger.info("头寸返回数据:{}", res);
-            msgMap = JsonUtils.json2Object(res, Map.class);
-            if (msgMap == null) {
-                logger.error("头寸返回数据为空");
-                throw new PositionException("头寸返回数据为空！");
-            }
-        }catch(PositionHttpRuntimeException ioException){
-            logger.error("调用头寸报错：", ioException);
-        } catch (Exception e) {
-            // 报错发送回滚头寸报文
-            logger.error("调用头寸报错", e);
-            roll((String) params.get("seqno"), (String) params.get("modelType"), e.getMessage());
+        String res = sendPrivate(params);
+        logger.info("头寸返回数据:{}", res);
+        msgMap = JsonUtils.json2Object(res, Map.class);
+        if (msgMap == null) {
+            logger.error("头寸返回数据为空");
+            throw new PositionException("头寸返回数据为空！");
         }
         if (!StringUtil.equals("success", msgMap.get("code") + "")) {
-            if (StringUtil.equals("FL0007", msgMap.get("code"))) {
+            if (StringUtil.equals(PzxMessageCode.FL0007.name(), msgMap.get("code"))) {
                 // 头寸引擎提示现金不足时需要再校验原投管现金
                 // 返回true，表示现金够，重新发送
                 boolean isEnough = positionCheck.checkForFL0007(req, msgMap);
@@ -88,7 +80,7 @@ public class PositionHttpRequest {
                     // 软控时，加上原投管现金仍不足时需前端确认
                     throw new PositionException(PositionConstant.CODE_BUSI_RK + "|" + JsonUtils.object2Json(msgMap));
                 }
-            } else if (StringUtil.equals("CT0001", msgMap.get("code"))) {
+            } else if (StringUtil.equals(PzxMessageCode.CT0001.name(), msgMap.get("code"))) {
                 // 头寸引擎提示现金不足时需要再校验原投管现金
                 throw new PositionException((String) msgMap.get("message"));
 //                }
@@ -165,13 +157,6 @@ public class PositionHttpRequest {
             throw new PositionException("头寸返回数据为空！");
         }
         logger.info("返回头寸报文: {}", message);
-        if (!StringUtil.equals("success", message.get("code"))) {
-            if (StringUtil.equals("FL0007", message.get("code"))) {
-                throw new PositionException(PositionConstant.CODE_BUSI_RK + "|" + message.get("message"));
-            } else {
-                throw new PositionException(message.get("message") + "");
-            }
-        }
         return bm;
     }
 
@@ -323,8 +308,17 @@ public class PositionHttpRequest {
      * @param param
      * @return
      */
-    private  String delete(Object param) {
-        return httpPostRequest(positionUrl + "/position/endpoint/delete", param);
+    private  String delete(Map<String, Object> param) {
+        try{
+            return httpPostRequest(positionUrl + "/position/endpoint/delete", param);
+        }catch(PositionHttpRuntimeException ioException){
+            logger.error("调用头寸报错io：", ioException);
+        } catch (Exception e) {
+            // 报错发送回滚头寸报文
+            logger.error("调用头寸报错", e);
+            roll((String) param.get("seqno"), (String) param.get("modelType"), e.getMessage());
+        }
+        return null;
     }
 
     /**
@@ -333,8 +327,17 @@ public class PositionHttpRequest {
      * @param param
      * @return
      */
-    private  String revoke(Object param) {
-        return httpPostRequest(positionUrl + "/position/endpoint/revoke", param);
+    private  String revoke(Map<String, Object> param) {
+        try{
+            return httpPostRequest(positionUrl + "/position/endpoint/revoke", param);
+        }catch(PositionHttpRuntimeException ioException){
+            logger.error("调用头寸报错io：", ioException);
+        } catch (Exception e) {
+            // 报错发送回滚头寸报文
+            logger.error("调用头寸报错", e);
+            roll((String) param.get("seqno"), (String) param.get("modelType"), e.getMessage());
+        }
+        return null;
     }
 
     /**
@@ -351,16 +354,16 @@ public class PositionHttpRequest {
          positionMqRequest.roll(param);
     }
 
-    /**
-     * 从头寸引擎查询头寸余额
-     *
-     * @param param
-     * @return
-     */
-    @Deprecated
-    protected  String query(Object param) {
-        return httpPostRequest(positionUrl + "/position/search/balance/etrSecPositionRule", param);
-    }
+//    /**
+//     * 从头寸引擎查询头寸余额
+//     *
+//     * @param param
+//     * @return
+//     */
+//    @Deprecated
+//    protected  String query(Object param) {
+//        return httpPostRequest(positionUrl + "/position/search/balance/etrSecPositionRule", param);
+//    }
 
 
     /**
@@ -368,8 +371,17 @@ public class PositionHttpRequest {
      * @param param
      * @return
      */
-    private  String batchClosePrivate(Object param) {
-        return httpPostRequest(positionUrl + "/position/endpoint/batchClose", param);
+    private  String batchClosePrivate(Map<String, Object> param) {
+        try{
+            return httpPostRequest(positionUrl + "/position/endpoint/batchClose", param);
+        }catch(PositionHttpRuntimeException ioException){
+            logger.error("调用头寸报错io：", ioException);
+        } catch (Exception e) {
+            // 报错发送回滚头寸报文
+            logger.error("调用头寸报错", e);
+            roll((String) param.get("seqno"), (String) param.get("modelType"), e.getMessage());
+        }
+        return null;
     }
 
     /**
@@ -377,8 +389,17 @@ public class PositionHttpRequest {
      * @param param
      * @return
      */
-    private  String batchRevokePrivate(Object param) {
-        return httpPostRequest(positionUrl + "/position/endpoint/batchRevoke", param);
+    private  String batchRevokePrivate(Map<String, Object> param) {
+        try{
+            return httpPostRequest(positionUrl + "/position/endpoint/batchRevoke", param);
+        }catch(PositionHttpRuntimeException ioException){
+            logger.error("调用头寸报错io：", ioException);
+        } catch (Exception e) {
+            // 报错发送回滚头寸报文
+            logger.error("调用头寸报错", e);
+            roll((String) param.get("seqno"), (String) param.get("modelType"), e.getMessage());
+        }
+        return null;
     }
 
     /**
@@ -413,18 +434,17 @@ public class PositionHttpRequest {
      * @param param
      * @return
      */
-    private  String sendPrivate(Object param) {
-        return httpPostRequest(positionUrl + "/position/endpoint/updatePosition", param);
-    }
-
-    /**
-     * 发送上市流通接口
-     *
-     * @param param
-     * @return
-     */
-    private  String sendSsltPosition(Object param) {
-        return httpPostRequest(positionUrl + "/position/endpoint/upToMarket", param);
+    private  String sendPrivate(Map<String, Object> param) {
+        try{
+            return httpPostRequest(positionUrl + "/position/endpoint/updatePosition", param);
+        }catch(PositionHttpRuntimeException ioException){
+            logger.error("调用头寸报错io：", ioException);
+        } catch (Exception e) {
+            // 报错发送回滚头寸报文
+            logger.error("调用头寸报错", e);
+            roll((String) param.get("seqno"), (String) param.get("modelType"), e.getMessage());
+        }
+        return null;
     }
 
 }
