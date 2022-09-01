@@ -52,6 +52,8 @@
 		<!-- 接口 -->
 		<module>tams-valuation-interf</module>
 		<module>tams-customer-interf</module>
+		<!--头寸调用客户端-->
+		<module>tams-position-client</module>
 
 		<!-- 微服务 -->
 		<module>microservice/service-asset</module>
