@@ -63,7 +63,7 @@ public class KCBPWMsgParseHelper {
             entrust.setFinanceAccount(resMap.get("fundid"));
             entrust.setBsFlag(resMap.get("bsflag"));
             entrust.setReportTime(resMap.get("reporttime"));
-            entrust.setMarket(getMarket(resMap.get("market")));
+            entrust.setMarket(AgentUtil.GetMarketKCBPW(resMap.get("market")));
             entrust.setLocalEntrustId(resMap.get("ordergroup"));
             entrust.setStockCode(resMap.get("stkcode"));
             entrust.setStockName(resMap.get("stkname"));
@@ -143,7 +143,7 @@ public class KCBPWMsgParseHelper {
             }
             // trade.setFinanceAccount(resMap.get("fundid"));
             trade.setBsFlag(resMap.get("bsflag"));
-            trade.setMarket(getMarket(resMap.get("market")));
+            trade.setMarket(AgentUtil.GetMarketKCBPW(resMap.get("market")));
             trade.setStockCode(resMap.get("stkcode"));
             trade.setStockName(resMap.get("stkname"));
             trade.setTradeTime(resMap.get("matchtime"));
@@ -280,7 +280,7 @@ public class KCBPWMsgParseHelper {
                 integratedQuote.setPropSeatNo(resMap.get("PartyIDfqsa"));
             }
             if (resMap.containsKey("market")) {
-                integratedQuote.setMarket(getMarket(resMap.get("market")));
+                integratedQuote.setMarket(AgentUtil.GetMarketKCBPW(resMap.get("market")));
             }
             if (resMap.containsKey("stkname")) {
                 integratedQuote.setStockName(resMap.get("stkname"));
@@ -551,7 +551,7 @@ public class KCBPWMsgParseHelper {
             positionBean.setAccountId(accountId);
             // TODO 待处理
             positionBean.setFinanceAccount("");
-            positionBean.setMarket(getMarket(resMap.get("market")));
+            positionBean.setMarket(AgentUtil.GetMarketKCBPW(resMap.get("market")));
             positionBean.setStockCode(resMap.get("stkcode"));
             positionBean.setStockName(resMap.get("stkname"));
             if (!Strings.isNullOrEmpty(resMap.get("costprice"))) {
@@ -579,7 +579,7 @@ public class KCBPWMsgParseHelper {
             Instrument instrument = new Instrument();
             instrument.setPostStr(resMap.get("poststr"));
             if (!Strings.isNullOrEmpty(resMap.get("market"))) {
-                instrument.setMarket(getMarket(resMap.get("market")));
+                instrument.setMarket(AgentUtil.GetMarketKCBPW(resMap.get("market")));
             }
             instrument.setStockName(resMap.get("stkname"));
             instrument.setStockCode(resMap.get("stkcode"));
@@ -626,7 +626,7 @@ public class KCBPWMsgParseHelper {
             PledgeDiscount pledgeDiscount = new PledgeDiscount();
             pledgeDiscount.setAccountId(accountId);
             String mkt = resMap.get("market");
-            pledgeDiscount.setMarket(getMarket(resMap.get("market")));
+            pledgeDiscount.setMarket(AgentUtil.GetMarketKCBPW(resMap.get("market")));
             pledgeDiscount.setStockAccount(resMap.get("secuid"));
             pledgeDiscount.setStockCode(resMap.get("stkcode"));
             pledgeDiscount.setFinanceAccount(resMap.get("fundid"));
@@ -654,7 +654,7 @@ public class KCBPWMsgParseHelper {
         for (Map<String, String> resMap : resList) {
             StandardBonds standardBonds = new StandardBonds();
             standardBonds.setAccountId(accountId);
-            standardBonds.setMarket(getMarket(resMap.get("market")));
+            standardBonds.setMarket(AgentUtil.GetMarketKCBPW(resMap.get("market")));
             standardBonds.setStockAccount(resMap.get("secuid"));
             standardBonds.setStockCode(resMap.get("stkcode"));
             standardBonds.setStockType(resMap.get("stktype"));
@@ -1076,16 +1076,6 @@ public class KCBPWMsgParseHelper {
             return liaisonTel.split("-");
         }
         return null;
-    }
-
-    public static String getMarket(String market) {
-        if ("1".equals(market)) {
-            return Market.SHSE.value;
-        } else if ("0".equals(market)) {
-            return Market.SZSE.value;
-        }
-
-        return market;
     }
 
     public static String getInnerCode(String market, String stockCode) {

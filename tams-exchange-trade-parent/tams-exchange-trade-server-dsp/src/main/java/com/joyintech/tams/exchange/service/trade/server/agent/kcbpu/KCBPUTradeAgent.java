@@ -12,21 +12,22 @@ import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.net.protocol.FunctionCode;
 import com.joyintech.tams.exchange.common.utils.IntegratedEntrustUtils;
 import com.joyintech.tams.exchange.common.utils.JsonUtils;
-import com.joyintech.tams.exchange.service.trade.dao.domain.TerminalAgentInfo;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgentDsp;
-import com.joyintech.tams.exchange.service.trade.server.agent.kcbpw.KCBPWAccount;
-import com.joyintech.tams.exchange.service.trade.server.agent.kcbpw.KCBPWMsgParseHelper;
 import com.joyintech.tams.exchange.service.trade.util.AgentUtil;
-import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component("kcbpu")
@@ -34,6 +35,13 @@ public class KCBPUTradeAgent extends TradeAgentDsp {
 
     // region 私有对象
     private static final Logger logger = LoggerFactory.getLogger(KCBPUTradeAgent.class);
+    @Value("${agent.query.count:2}")
+    private int kcbpuTradeCount;
+    /**
+     * 查询线程
+     */
+    private List<ThreadPoolExecutor> poolExecutors = Lists.newArrayListWithCapacity(kcbpuTradeCount);
+    private ThreadPoolExecutor poolExecutor = null;
     private Map<String, Integer> entrustIdAndStatusMap = Maps.newConcurrentMap();
     private volatile Map<String, PositionStr> positionStrMap = Maps.newConcurrentMap();
     private final String entrustPrefix = "e";
@@ -137,6 +145,8 @@ public class KCBPUTradeAgent extends TradeAgentDsp {
             // region 参数组装
             // 自定义参数
             Map<String, Object> customParam = getCustomParam(entrust.getAccountId());
+            customParam.put("market", AgentUtil.ExchangeMarketKCBPU(entrust.getMarket()));
+            customParam.put("bsFlag", AgentUtil.GetBSFlagForKCBPU(entrust.getBsFlag()));
             // endregion
             ResultBean resultBean = triggerCodeAdapter(functionCode, entrustProp, entrust, customParam);
 
@@ -703,6 +713,41 @@ public class KCBPUTradeAgent extends TradeAgentDsp {
     // endregion
 
     // region 定时查询任务
+
+    @Override
+    public void queryNextTrade() {
+        if (MapUtils.isEmpty(kcbpuAccounts)) {
+            return;
+        }
+        for (Map.Entry<String, KCBPUAccount> entry : kcbpuAccounts.entrySet()) {
+            KCBPUAccount kcbpuAccount = entry.getValue();
+            String accountId = kcbpuAccount.getAccountId();
+            logger.info("account：{}，status：{}", accountId, getStatus(accountId));
+//            if (getStatus(accountId) != AccountLoginStatus.TRADING.value) {
+//                return;
+//            }
+            boolean loginStatus = tradeAgentManager.getAgentLoginStatus(accountId);
+            if (loginStatus) {
+                executeQueryNextTrade(kcbpuAccount);
+            }
+        }
+    }
+
+    private void executeQueryNextTrade(KCBPUAccount kcbpuAccount) {
+        if (null == poolExecutor) {
+            poolExecutor = new ThreadPoolExecutor(8, 20, 1000, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>(100), new ThreadPoolExecutor.DiscardPolicy());
+            poolExecutor.prestartAllCoreThreads();
+        }
+
+        for (KCBPUTradeAgent.QueryEnum queryEnum : KCBPUTradeAgent.QueryEnum.getValues()) {
+            try {
+                poolExecutor.execute(new KCBPUTradeAgent.QueryTask(queryEnum, kcbpuAccount));
+                Thread.sleep(500);
+            } catch (Exception e) {
+                logger.error("{}执行异常：{}", queryEnum.name(), e.getMessage(), e);
+            }
+        }
+    }
 
     class QueryTask implements Runnable {
         private QueryEnum queryEnum;
