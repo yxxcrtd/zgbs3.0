@@ -34,6 +34,8 @@
         <result column="SAME_ORG" property="sameOrg" jdbcType="VARCHAR" />
         <result column="SINGLEINVESTOR_HOLDING_MAX" property="singleInvestorholdingMax" jdbcType="DECIMAL" />
         <result column="IS_FACE_SINGLEINVESTOR" property="isFaceSingleInvestor" jdbcType="VARCHAR" />
+        <result column="AGENCY_ORIENTED" property="agencyOriented" jdbcType="VARCHAR" />
+
     </resultMap>
     <sql id="Base_Column_List" >
         FINPROD_ID FINPROD_ID, PRD_BAND PRD_BAND, CYY_TYPE CYY_TYPE, SALE_CHANNEL SALE_CHANNEL, 
@@ -44,7 +46,7 @@
         CREATE_TIME CREATE_TIME, UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME, CONSIGNMENT_FLAG CONSIGNMENT_FLAG, 
         BEFOREEND_FLAG BEFOREEND_FLAG, RED_FLAG RED_FLAG, DEFAULTRED_FLAG DEFAULTRED_FLAG, 
         BEFOREESTABLISH_FLAG BEFOREESTABLISH_FLAG, CONTINUE_FLAG CONTINUE_FLAG, RAISE_AMT_PLAN RAISE_AMT_PLAN, 
-        INVESTOR_TYPE INVESTOR_TYPE, SAME_ORG SAME_ORG ,SINGLEINVESTOR_HOLDING_MAX,IS_FACE_SINGLEINVESTOR
+        INVESTOR_TYPE INVESTOR_TYPE, SAME_ORG SAME_ORG ,SINGLEINVESTOR_HOLDING_MAX,IS_FACE_SINGLEINVESTOR,AGENCY_ORIENTED
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -77,7 +79,7 @@
             CONSIGNMENT_FLAG, BEFOREEND_FLAG, RED_FLAG, 
             DEFAULTRED_FLAG, BEFOREESTABLISH_FLAG, 
             CONTINUE_FLAG, RAISE_AMT_PLAN, INVESTOR_TYPE, 
-            SAME_ORG,SINGLEINVESTOR_HOLDING_MAX,IS_FACE_SINGLEINVESTOR)
+            SAME_ORG,SINGLEINVESTOR_HOLDING_MAX,IS_FACE_SINGLEINVESTOR,AGENCY_ORIENTED)
         values (#{finprodId,jdbcType=VARCHAR}, #{prdBand,jdbcType=VARCHAR}, #{cyyType,jdbcType=VARCHAR}, 
             #{saleChannel,jdbcType=VARCHAR}, #{saleArea,jdbcType=VARCHAR}, #{saleMax,jdbcType=DECIMAL}, 
             #{saleMin,jdbcType=DECIMAL}, #{toffStart,jdbcType=DECIMAL}, #{lowestAmt,jdbcType=DECIMAL}, 
@@ -88,7 +90,8 @@
             #{consignmentFlag,jdbcType=VARCHAR}, #{beforeendFlag,jdbcType=VARCHAR}, #{redFlag,jdbcType=VARCHAR}, 
             #{defaultredFlag,jdbcType=VARCHAR}, #{beforeestablishFlag,jdbcType=VARCHAR}, 
             #{continueFlag,jdbcType=VARCHAR}, #{raiseAmtPlan,jdbcType=DECIMAL}, #{investorType,jdbcType=VARCHAR}, 
-            #{sameOrg,jdbcType=VARCHAR},#{singleInvestorholdingMax,jdbcType=DECIMAL},#{isFaceSingleInvestor,jdbcType=VARCHAR})
+            #{sameOrg,jdbcType=VARCHAR},#{singleInvestorholdingMax,jdbcType=DECIMAL},#{isFaceSingleInvestor,jdbcType=VARCHAR}
+            ,#{agencyOriented,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.PrdSaleParam" >
         insert into PRD_SALE_PARAM
@@ -189,6 +192,9 @@
             <if test="isFaceSingleInvestor != null" >
                 IS_FACE_SINGLEINVESTOR,
             </if>
+            <if test="agencyOriented != null" >
+                AGENCY_ORIENTED,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="finprodId != null" >
@@ -287,6 +293,9 @@
             <if test="isFaceSingleInvestor != null" >
                 #{isFaceSingleInvestor,jdbcType=VARCHAR},
             </if>
+            <if test="agencyOriented != null" >
+                #{agencyOriented,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.PrdSaleParam" >
@@ -295,13 +304,13 @@
         CAN_PLGE, MAX_PLGE_RATE, FIRST_SALE_VDATE, FIRST_SALE_MDATE, CREATE_USER, CREATE_DEPT, 
         CREATE_TIME, UPDATE_USER, UPDATE_TIME, CONSIGNMENT_FLAG, BEFOREEND_FLAG, RED_FLAG, 
         DEFAULTRED_FLAG, BEFOREESTABLISH_FLAG, CONTINUE_FLAG, RAISE_AMT_PLAN, INVESTOR_TYPE, 
-        SAME_ORG,SINGLEINVESTOR_HOLDING_MAX,IS_FACE_SINGLEINVESTOR)
+        SAME_ORG,SINGLEINVESTOR_HOLDING_MAX,IS_FACE_SINGLEINVESTOR,AGENCY_ORIENTED)
         select FINPROD_ID, PRD_BAND, CYY_TYPE, SALE_CHANNEL, SALE_AREA, 
             SALE_MAX, SALE_MIN, TOFF_START, LOWEST_AMT, HUGE_RED_RATIO, MIN_PAPER_QTY, MIN_REDM_QTY, 
             CAN_PLGE, MAX_PLGE_RATE, FIRST_SALE_VDATE, FIRST_SALE_MDATE, CREATE_USER, CREATE_DEPT, 
             CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, CONSIGNMENT_FLAG, BEFOREEND_FLAG, RED_FLAG, 
             DEFAULTRED_FLAG, BEFOREESTABLISH_FLAG, CONTINUE_FLAG, RAISE_AMT_PLAN, INVESTOR_TYPE, 
-            SAME_ORG,SINGLEINVESTOR_HOLDING_MAX,IS_FACE_SINGLEINVESTOR
+            SAME_ORG,SINGLEINVESTOR_HOLDING_MAX,IS_FACE_SINGLEINVESTOR,AGENCY_ORIENTED
              from PRD_SALE_PARAM
              where 1 = 1 and FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </insert>
@@ -392,6 +401,9 @@
             <if test="isFaceSingleInvestor != null" >
                 IS_FACE_SINGLEINVESTOR = #{isFaceSingleInvestor,jdbcType=VARCHAR},
             </if>
+            <if test="agencyOriented != null" >
+                AGENCY_ORIENTED = #{agencyOriented,jdbcType=VARCHAR},
+            </if>
         </set>
         where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </update>
@@ -424,7 +436,8 @@
             INVESTOR_TYPE = #{investorType,jdbcType=VARCHAR},
             SAME_ORG = #{sameOrg,jdbcType=VARCHAR},
             SINGLEINVESTOR_HOLDING_MAX = #{singleInvestorholdingMax,jdbcType=DECIMAL},
-            IS_FACE_SINGLEINVESTOR = #{isFaceSingleInvestor,jdbcType=VARCHAR}
+            IS_FACE_SINGLEINVESTOR = #{isFaceSingleInvestor,jdbcType=VARCHAR},
+            AGENCY_ORIENTED = #{agencyOriented,jdbcType=VARCHAR}
         where FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </update>
 </mapper>

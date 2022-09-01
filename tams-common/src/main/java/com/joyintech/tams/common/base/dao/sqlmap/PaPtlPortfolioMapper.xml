@@ -13,11 +13,12 @@
         <result column="UPDATE_USER" property="updateUser" jdbcType="VARCHAR" />
         <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
         <result column="PORTFOLIO_SERIES" property="portfolioSeries" jdbcType="VARCHAR" />
+        <result column="SELF_MANAGEMENT" property="selfManagement" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
         PORTFOLIO_ID PORTFOLIO_ID, IS_GUARANTEE IS_GUARANTEE, OPEN_TYPE OPEN_TYPE, RAISE_TYPE RAISE_TYPE, 
         INVEST_NATURE INVEST_NATURE, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, 
-        UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME,PORTFOLIO_SERIES
+        UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME,PORTFOLIO_SERIES,SELF_MANAGEMENT
     </sql>
     <sql id="Sql_All_Data" >
         select 
@@ -43,11 +44,11 @@
         insert into PA_PTL_PORTFOLIO (PORTFOLIO_ID, IS_GUARANTEE, OPEN_TYPE, 
             RAISE_TYPE, INVEST_NATURE, CREATE_USER, 
             CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
-            UPDATE_TIME,PORTFOLIO_SERIES)
+            UPDATE_TIME,PORTFOLIO_SERIES,SELF_MANAGEMENT)
         values (#{portfolioId,jdbcType=VARCHAR}, #{isGuarantee,jdbcType=VARCHAR}, #{openType,jdbcType=VARCHAR}, 
             #{raiseType,jdbcType=VARCHAR}, #{investNature,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, 
             #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, 
-            #{updateTime,jdbcType=TIMESTAMP},#{portfolioSeries,jdbcType=VARCHAR})
+            #{updateTime,jdbcType=TIMESTAMP},#{portfolioSeries,jdbcType=VARCHAR},#{selfManagement,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.PaPtlPortfolio" >
         insert into PA_PTL_PORTFOLIO
@@ -85,6 +86,9 @@
             <if test="portfolioSeries != null" >
                 PORTFOLIO_SERIES,
             </if>
+            <if test="selfManagement != null" >
+                SELF_MANAGEMENT,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="portfolioId != null" >
@@ -120,14 +124,17 @@
             <if test="portfolioSeries != null" >
                 #{portfolioSeries,jdbcType=VARCHAR},
             </if>
+            <if test="selfManagement != null" >
+                #{selfManagement,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.PaPtlPortfolio" >
         insert into PA_PTL_PORTFOLIO(PORTFOLIO_ID, IS_GUARANTEE, OPEN_TYPE, RAISE_TYPE, INVEST_NATURE, 
-        CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME,PORTFOLIO_SERIES)
+        CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME,PORTFOLIO_SERIES,SELF_MANAGEMENT)
         select PORTFOLIO_ID, IS_GUARANTEE, OPEN_TYPE, RAISE_TYPE, INVEST_NATURE, 
             CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
-             from PA_PTL_PORTFOLIO
+                ,PORTFOLIO_SERIES,SELF_MANAGEMENT from PA_PTL_PORTFOLIO
              where 1 = 1 and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.PaPtlPortfolio" >
@@ -154,6 +161,9 @@
             <if test="portfolioSeries != null" >
                 PORTFOLIO_SERIES = #{portfolioSeries,jdbcType=VARCHAR},
             </if>
+            <if test="selfManagement != null" >
+                SELF_MANAGEMENT = #{selfManagement,jdbcType=VARCHAR},
+            </if>
         </set>
         where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
     </update>
@@ -164,7 +174,8 @@
             RAISE_TYPE = #{raiseType,jdbcType=VARCHAR},
             INVEST_NATURE = #{investNature,jdbcType=VARCHAR},
             UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
-            UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
-        where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+            UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            SELF_MANAGEMENT = #{selfManagement,jdbcType=VARCHAR},
+            where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
     </update>
 </mapper>

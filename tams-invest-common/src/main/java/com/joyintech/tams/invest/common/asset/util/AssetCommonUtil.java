@@ -420,6 +420,38 @@ public class AssetCommonUtil {
     }
 
     /**
+     * 获取组合的开放模式
+     *
+     * @param ptlList 指定产品(支持多个)
+     * @return 备注 KEY 产品代码 VALUE：产品开放模式
+     */
+    public static Map<String,String> compareOpenMode(List<String> ptlList) {
+        if(StringUtil.isEmptyList(ptlList)){
+            return null;
+        }
+        //查询开放规则表
+        List<FinOpenRule> finOpenRuleList = assetGenerateMapper.getFinOpenRule(ptlList.stream().map(item -> {
+            item = DictCodeListExt1.金融产品类型_投管用_理财产品.getValue() + GlobalConstant.UNDER_LINE + item;
+            return item;
+        }).collect(Collectors.toList()));
+        if(StringUtil.isEmptyList(finOpenRuleList)){
+            return null;
+        }
+        //以产品分组为key,value为规则基本信息List
+        Map<String,List<FinOpenRule>> ptlRuleMap = finOpenRuleList.stream().collect(JoyinCollectors.groupingBy(x->StringUtil.replaceAll(x.getCashId(),
+                DictCodeListExt1.金融产品类型_投管用_理财产品.getValue() + GlobalConstant.UNDER_LINE,StringUtil.EMPTY)));
+        Map<String,String> retMap=new HashMap<>();
+        ptlRuleMap.forEach((k,vRuleList)->{
+            //若是高频开放的产品默认日开(目前产品设计高频开放没有计划信息)
+            //&&CommonUtil.isType(vRuleList.get(0).getOpenMode(),DictCodeList.开放模式_高频开放)
+            if(!StringUtil.isEmptyList(vRuleList)){
+                retMap.put(k,vRuleList.get(0).getOpenMode());
+            }
+        });
+        return retMap;
+    }
+
+    /**
      * 获取产品投资周期
      * @param tPlanList  需要处理的计划(开放或赎回计划)
      * @return

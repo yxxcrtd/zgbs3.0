@@ -34,6 +34,11 @@ public class PaPtlPortfolio extends BaseEntity {
     private String portfolioSeries;
 
     /**
+     * 自主管理计划
+     */
+    private String selfManagement;
+
+    /**
      * 取得 组合代码
      * @return 组合代码
      */
@@ -127,5 +132,13 @@ public class PaPtlPortfolio extends BaseEntity {
      */
     public void setPortfolioSeries(String portfolioSeries) {
         this.portfolioSeries = portfolioSeries;
+    }
+
+    public String getSelfManagement() {
+        return selfManagement;
+    }
+
+    public void setSelfManagement(String selfManagement) {
+        this.selfManagement = selfManagement;
     }
 }

@@ -90,7 +90,9 @@ public class BussFinProductSaleParamCommonRateController extends BaseController 
         model.addAttribute("ccy", !StringUtil.isNotEmpty(this.getParam("ccy"))||"null".equals(this.getParam("ccy"))?"CNY":this.getParam("ccy"));
         model.addAttribute("repCashPrinCcy", "CNY");
         model.addAttribute("repCashProfCcy", "CNY");
-      //update zhangweiqi 设置默认值 end
+        model.addAttribute("agencyOriented", "Y");
+
+        //update zhangweiqi 设置默认值 end
         model.addAttribute("issueType", StringUtil.isNotEmpty(this.getParam("issueType")) ? this.getParam("issueType") : DictCodeListExt1.募集方式_公募.getValue());
         model.addAttribute("firstSaleVdate", this.getParam("firstSaleVdate"));
         model.addAttribute("firstSaleMdate", this.getParam("firstSaleMdate"));
@@ -120,6 +122,8 @@ public class BussFinProductSaleParamCommonRateController extends BaseController 
             model.addAttribute("repCashProfCcy", repdto.getRepCashProfCcy());
             model.addAttribute("repInvestorType", repdto.getRepInvestorType());
             model.addAttribute("repRaiseAmtPlan", repdto.getRepRaiseAmtPlan());
+            model.addAttribute("agencyOriented", dto.getAgencyOriented());
+
         }
         else if (StringUtil.isNotEmpty(this.getParam("finprodId"))){
         	
@@ -138,6 +142,7 @@ public class BussFinProductSaleParamCommonRateController extends BaseController 
             model.addAttribute("repCashPrinCcy", repdto.getRepCashPrinCcy());
             model.addAttribute("repCashProfCcy", repdto.getRepCashProfCcy());
             model.addAttribute("repInvestorType", dto.getInvestorType());
+            model.addAttribute("agencyOriented", dto.getAgencyOriented());
 //            model.addAttribute("repRaiseAmtPlan", repdto.getRepRaiseAmtPlan());
         }
         return "component/prod/BussFinProductSaleParamCommonRate";

@@ -80,7 +80,8 @@ public class RskSupervisionPortfPoint003Controller extends BaseController {
         	rskPortfolioPackage003Dto.getRskPortfolioPoolConfigDto().getPtlParamPoolConfigList().forEach(item ->{
         		String[] arrayStr=item.getClassifyDimensionVal().split(GlobalConstant.COMMA);
         		listSortType.stream().filter(
-	                option -> StringUtil.equals(option.getParentId(), BussinessDictCodeRds.分类维度.getValue() + GlobalConstant.POINT + item.getClassifyDimension())
+	                option ->(StringUtil.equals(option.getParentId(),BussinessDictCodeRds.分类维度.getValue() + GlobalConstant.POINT + item.getClassifyDimension())
+                            || option.getParentId().indexOf(BussinessDictCodeRds.分类维度.getValue() + GlobalConstant.POINT + item.getClassifyDimension()) >= 0)
 	               &&(item.getClassifyDimensionVal().indexOf(option.getId().replace(option.getCol() + GlobalConstant.POINT,""))>=0)
                        ).forEach(
                               option -> {
@@ -125,6 +126,11 @@ public class RskSupervisionPortfPoint003Controller extends BaseController {
         }
         SelectDto selectDto4 = this.getSelectDataFromDataDic(BussinessDictCodeRds.投资性质, null);
         for (SelectOptionDto dto : selectDto4.getOptions()) {
+            dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
+            listFloatRate.add(dto);
+        }
+        SelectDto selectDto5 = this.getSelectDataFromDataDic(BussinessDictCodeRds.是否, null);
+        for (SelectOptionDto dto : selectDto5.getOptions()) {
             dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
             listFloatRate.add(dto);
         }
