@@ -667,11 +667,11 @@ public class StlDataDealSzdJsmxProcessService {
 //						settleTransData.setMpayDate(stlDataDealProcessCommonService.getNextWorkDay(DateUtil.parse(szdJsmx.getQtrq()), calendarId));
 						// 获取期限品种日期
 						Integer days = stlDataDealProcessCommonService.getDayByTermType(settleTransData.getTermType());
-						// 到期交收日 = 交收日期+期限品种日期
-						Date mPayDateTemp = DateUtil.addDay(DateUtil.parse(szdJsmx.getJsrq()), days);
+						// 到期交收日 = 首期交收日期+期限品种日期
+						Date mPayDateTemp = DateUtil.addDay(settleTransData.getVpayDate(), days);
 						// 判断到期交收日是否是节假日,如果是节假日,则取下一个工作日
 						String isHoliday = stlDataDealProcessCommonService.getIsHoliday(mPayDateTemp, calendarId);
-						if("0".equals(isHoliday)){
+						if(!"0".equals(isHoliday)){
 							mPayDateTemp = stlDataDealProcessCommonService.getNextWorkDay(mPayDateTemp, calendarId);
 						}
 						settleTransData.setMpayDate(mPayDateTemp);
