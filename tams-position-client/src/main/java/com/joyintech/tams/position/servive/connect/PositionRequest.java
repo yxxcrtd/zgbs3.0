@@ -36,6 +36,14 @@ public class PositionRequest {
     }
 
     /**
+     * 刷新缓存
+     * @param param
+     */
+    public  void updateBalance(Object param) {
+        positionHttpRequest.updateBalance(param);
+    }
+
+    /**
      * 回滚接口
      * @param revokeId
      * @param modelType

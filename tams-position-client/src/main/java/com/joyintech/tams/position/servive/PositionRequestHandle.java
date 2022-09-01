@@ -44,6 +44,16 @@ public class PositionRequestHandle {
     }
 
     /**
+     * 刷新缓存
+     * @param param
+     */
+    public  void updateBalance(Object param) {
+        positionRequest.updateBalance(param);
+    }
+
+
+
+    /**
      * 实际是roll接口
      * @param revokeId
      * @param modelType

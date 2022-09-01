@@ -395,7 +395,7 @@ public class PositionHttpRequest {
      * @param param
      * @return
      */
-    private  String updateBalance(Object param) {
+    protected  String updateBalance(Object param) {
         return httpPostRequest(positionUrl + "/position/batch/main/updateBalance", param);
     }
 
