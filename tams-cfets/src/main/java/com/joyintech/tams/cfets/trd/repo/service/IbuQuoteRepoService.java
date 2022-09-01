@@ -1368,6 +1368,9 @@ public class IbuQuoteRepoService extends BaseService {
                     calRequest.setSecManageAcctId(secAcctId);
                 }
             }
+            if(pledgeDto != null && StringUtil.isNotEmpty(pledgeDto.getRepRegistOrg())){
+                calRequest.setRegistOrg(pledgeDto.getRepRegistOrg());
+            }
         }
 
         temp = this.calFee(calRequest);//计算费用
