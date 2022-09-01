@@ -9,6 +9,7 @@ import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.service.trade.server.agent.EntrustIdManager;
+import com.joyintech.tams.exchange.service.trade.util.AgentUtil;
 import org.springframework.beans.BeanUtils;
 
 import java.math.BigDecimal;
@@ -42,16 +43,27 @@ public class KCBPWMsgParseHelper {
             // entrust.setId(entrustIdManager.getIdByLocalEntrustId(accountId, resMap.get("ordergroup")));
             entrust.setReportNo(resMap.get("orderid"));
             entrust.setBrokerEntrustId(resMap.get("ordersno"));
+            String key = entrust.getBrokerEntrustId() + "|" + entrust.getReportNo();
             if ("410510".equals(tradeCode)) {
+                // 410411 410413 410510 410436竞价与综合共用此接口
+                // 1
                 entrust.setId(entrustIdManager.getIdByLocalEntrustId(accountId, resMap.get("ordergroup")));
+                // 2
+                if (Strings.isNullOrEmpty(entrust.getId())) {
+                    // 获取部撤的委托ID"ordersno": "111" == "ordergroup": "111", 部撤没有有效ordergroup
+                    entrust.setId(entrustIdManager.getKcbpwPTEntrustId(accountId, key));
+                    // 3
+                    if (Strings.isNullOrEmpty(entrust.getId())) {
+                        entrust.setId(entrustIdManager.getKcbpwZHEntrustId(accountId, key));
+                    }
+                }
             } else {
-                String brokeEntrustId = entrust.getBrokerEntrustId() + "|" + entrust.getReportNo();
-                entrust.setId(entrustIdManager.getKcbpwZHEntrustId(accountId, brokeEntrustId));
+                entrust.setId(entrustIdManager.getKcbpwZHEntrustId(accountId, key));
             }
             entrust.setFinanceAccount(resMap.get("fundid"));
             entrust.setBsFlag(resMap.get("bsflag"));
             entrust.setReportTime(resMap.get("reporttime"));
-            entrust.setMarket(getMarket(resMap.get("market")));
+            entrust.setMarket(AgentUtil.GetMarketKCBPW(resMap.get("market")));
             entrust.setLocalEntrustId(resMap.get("ordergroup"));
             entrust.setStockCode(resMap.get("stkcode"));
             entrust.setStockName(resMap.get("stkname"));
@@ -119,15 +131,19 @@ public class KCBPWMsgParseHelper {
             trade.setReportNo(resMap.get("orderid"));
             trade.setBrokerEntrustId(resMap.get("ordersno"));
             trade.setLocalEntrustId(resMap.get("ordergroup"));
+            String key = trade.getBrokerEntrustId() + "|" + trade.getReportNo();
             if ("410436".equals(tradeCode)) {
+                // 410411 410413 410510 410436竞价与综合共用此接口
                 // trade.setEntrustId(entrustIdManager.getIdByLocalEntrustId(accountId, resMap.get("ordergroup")));
+                // if (Strings.isNullOrEmpty(trade.getEntrustId())) {
+                //  trade.setEntrustId(entrustIdManager.getKcbpwZHEntrustId(accountId, key));
+                // }
             } else {
-                String brokeEntrustId = trade.getBrokerEntrustId() + "|" + trade.getReportNo();
-                //trade.setEntrustId(entrustIdManager.getKcbpwZHEntrustId(accountId, brokeEntrustId));
+                //trade.setEntrustId(entrustIdManager.getKcbpwZHEntrustId(accountId, key));
             }
             // trade.setFinanceAccount(resMap.get("fundid"));
             trade.setBsFlag(resMap.get("bsflag"));
-            trade.setMarket(getMarket(resMap.get("market")));
+            trade.setMarket(AgentUtil.GetMarketKCBPW(resMap.get("market")));
             trade.setStockCode(resMap.get("stkcode"));
             trade.setStockName(resMap.get("stkname"));
             trade.setTradeTime(resMap.get("matchtime"));
@@ -146,10 +162,10 @@ public class KCBPWMsgParseHelper {
 //            trade.setBrokerTradeId(resMap.get("matchcode"));
             if (realStatus != 0 && realStatus != 1) {
                 //  废单 有正常的委托，也有撤销的委托
-               // trade.setBrokerTradeId((String) resMap.get("ordersno"));
+                // trade.setBrokerTradeId((String) resMap.get("ordersno"));
 //                trade.setBrokerTradeId((String) resMap.get("orderid"));
             } else {
-               // trade.setBrokerTradeId(resMap.get("matchcode"));
+                // trade.setBrokerTradeId(resMap.get("matchcode"));
                 // 成交 有正常的委托，也有撤销的委托
 //                if (realStatus == 0)
 //                    trade.setBrokerTradeId((String) resMap.get("orderid"));
@@ -165,6 +181,10 @@ public class KCBPWMsgParseHelper {
 //                }
 //            }
             trade.setBrokerTradeId((String) resMap.get("matchcode"));
+            // 忽略撤单的废单的无效成交记录
+//            if (Strings.isNullOrEmpty(trade.getBrokerTradeId())) {
+//                continue;
+//            }
             if (Strings.isNullOrEmpty(trade.getBrokerTradeId())) {
                 trade.setBrokerTradeId((String) resMap.get("ordersno"));
             }
@@ -260,7 +280,7 @@ public class KCBPWMsgParseHelper {
                 integratedQuote.setPropSeatNo(resMap.get("PartyIDfqsa"));
             }
             if (resMap.containsKey("market")) {
-                integratedQuote.setMarket(getMarket(resMap.get("market")));
+                integratedQuote.setMarket(AgentUtil.GetMarketKCBPW(resMap.get("market")));
             }
             if (resMap.containsKey("stkname")) {
                 integratedQuote.setStockName(resMap.get("stkname"));
@@ -531,7 +551,7 @@ public class KCBPWMsgParseHelper {
             positionBean.setAccountId(accountId);
             // TODO 待处理
             positionBean.setFinanceAccount("");
-            positionBean.setMarket(getMarket(resMap.get("market")));
+            positionBean.setMarket(AgentUtil.GetMarketKCBPW(resMap.get("market")));
             positionBean.setStockCode(resMap.get("stkcode"));
             positionBean.setStockName(resMap.get("stkname"));
             if (!Strings.isNullOrEmpty(resMap.get("costprice"))) {
@@ -559,7 +579,7 @@ public class KCBPWMsgParseHelper {
             Instrument instrument = new Instrument();
             instrument.setPostStr(resMap.get("poststr"));
             if (!Strings.isNullOrEmpty(resMap.get("market"))) {
-                instrument.setMarket(getMarket(resMap.get("market")));
+                instrument.setMarket(AgentUtil.GetMarketKCBPW(resMap.get("market")));
             }
             instrument.setStockName(resMap.get("stkname"));
             instrument.setStockCode(resMap.get("stkcode"));
@@ -606,7 +626,7 @@ public class KCBPWMsgParseHelper {
             PledgeDiscount pledgeDiscount = new PledgeDiscount();
             pledgeDiscount.setAccountId(accountId);
             String mkt = resMap.get("market");
-            pledgeDiscount.setMarket(getMarket(resMap.get("market")));
+            pledgeDiscount.setMarket(AgentUtil.GetMarketKCBPW(resMap.get("market")));
             pledgeDiscount.setStockAccount(resMap.get("secuid"));
             pledgeDiscount.setStockCode(resMap.get("stkcode"));
             pledgeDiscount.setFinanceAccount(resMap.get("fundid"));
@@ -634,7 +654,7 @@ public class KCBPWMsgParseHelper {
         for (Map<String, String> resMap : resList) {
             StandardBonds standardBonds = new StandardBonds();
             standardBonds.setAccountId(accountId);
-            standardBonds.setMarket(getMarket(resMap.get("market")));
+            standardBonds.setMarket(AgentUtil.GetMarketKCBPW(resMap.get("market")));
             standardBonds.setStockAccount(resMap.get("secuid"));
             standardBonds.setStockCode(resMap.get("stkcode"));
             standardBonds.setStockType(resMap.get("stktype"));
@@ -675,7 +695,7 @@ public class KCBPWMsgParseHelper {
             if (!Strings.isNullOrEmpty(resMap.get("HQYWLB"))) {
                 integratedBulkQuoteBean.setEntrustProp(EntrustUtils.getEntrustProp(resMap.get("HQYWLB"), "SZ"));
                 integratedBulkQuoteBean.setEntrustBs(EntrustUtils.getEntrustBs(resMap.get("HQYWLB")));
-            } else if(!Strings.isNullOrEmpty(resMap.get("HQZLLB"))){
+            } else if (!Strings.isNullOrEmpty(resMap.get("HQZLLB"))) {
                 // yanjianhui 2022/7/19 :金证那边的HQYWLB字段返回空因此无法对行情类型、方向进行操作。
                 String flag = resMap.get("HQZLLB");
                 // yanjianhui 2022/7/19 :字段逻辑错误修改
@@ -761,7 +781,7 @@ public class KCBPWMsgParseHelper {
         List<NegotiateQuoteReceiveBean> list = Lists.newArrayListWithExpectedSize(resList.size());
         for (Map<String, String> resMap : resList) {
             NegotiateQuoteReceiveBean receiveBean = new NegotiateQuoteReceiveBean();
-            receiveBean.setRequestTime(resMap.get("transacttime"));//申报时间
+            receiveBean.setRequestTime(AgentUtil.FormatApiTimeToString(resMap.get("transacttime")));
             int status = Integer.parseInt((String) (resMap.get("reportstatus")));
             receiveBean.setRequestStatus(status);
             receiveBean.setRequestStatusStr(RequestStatus.getRequestStatusName(status));
@@ -960,14 +980,7 @@ public class KCBPWMsgParseHelper {
             integratedFixedIncomeQuoteBean.setStockName(resMap.get("stkname"));
             integratedFixedIncomeQuoteBean.setEntrustBs(EntrustUtils.getEntrustBs(resMap.get("bsflag")));
             integratedFixedIncomeQuoteBean.setOrderNo(resMap.get("orderid"));
-            String reportTime = (String) resMap.get("ordertime");
-            if (Strings.isNullOrEmpty(reportTime))
-                reportTime = "000000";
-            Calendar cal = Calendar.getInstance();
-            cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(reportTime.substring(0, 2)));
-            cal.set(Calendar.MINUTE, Integer.parseInt(reportTime.substring(2, 4)));
-            cal.set(Calendar.SECOND, Integer.parseInt(reportTime.substring(4, 6)));
-            integratedFixedIncomeQuoteBean.setReportTime(cal.getTime().getTime());
+            integratedFixedIncomeQuoteBean.setReportTime(AgentUtil.FormatApiTimeToLong((String) resMap.get("ordertime")));
             integratedFixedIncomeQuoteBean.setAgencyName(resMap.get("company"));
             if (!Strings.isNullOrEmpty(resMap.get("orderprice"))) {
                 integratedFixedIncomeQuoteBean.setEntrustPrice(Double.parseDouble(resMap.get("orderprice")));
@@ -1063,16 +1076,6 @@ public class KCBPWMsgParseHelper {
             return liaisonTel.split("-");
         }
         return null;
-    }
-
-    public static String getMarket(String market) {
-        if ("1".equals(market)) {
-            return Market.SHSE.value;
-        } else if ("0".equals(market)) {
-            return Market.SZSE.value;
-        }
-
-        return market;
     }
 
     public static String getInnerCode(String market, String stockCode) {

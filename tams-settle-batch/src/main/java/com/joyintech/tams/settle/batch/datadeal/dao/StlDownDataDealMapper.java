@@ -187,4 +187,13 @@ public interface StlDownDataDealMapper {
      * @return
      */
     List<FinProduct> getFinproduct(@Param("finProdMarketId") String finProdMarketId, @Param("finprodType2") String finprodType2);
+
+    /**
+     * 查询首期成交明细信息
+     * @param vdate
+     * @param seatNumber
+     * @param cjbh
+     * @return
+     */
+    List<SettleTransData> selectH02SqSettleTransData(@Param("vdate") Date vdate, @Param("seatNumber")String seatNumber, @Param("cjbh")String cjbh);
 }

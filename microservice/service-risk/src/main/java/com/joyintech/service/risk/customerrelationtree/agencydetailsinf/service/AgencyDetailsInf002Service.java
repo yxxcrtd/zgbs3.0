@@ -13,6 +13,7 @@ package com.joyintech.service.risk.customerrelationtree.agencydetailsinf.service
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.framework.grid.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.joyintech.framework.base.BaseService;
@@ -44,11 +45,11 @@ public class AgencyDetailsInf002Service extends BaseService<SeniorExecutiveInfDt
 	 * @see
 	 * @since 1.0
 	 */
-	public List<SelectOptionDto> getRelateOrgInf(Map<String, Object> param) {
+	public Page<SelectOptionDto> getRelateOrgInf(int pageNo, int length, Map<String, Object> param) {
 		DynamicDataSourceHolder.putDataSource(DataSourceType.OTHER);
-		List<SelectOptionDto> resultList = agencyDetailsInf002Mapper.getRelateOrgInf(param);
+		Page<SelectOptionDto> page = super.queryForPageForSelectReturn(pageNo, length, () -> agencyDetailsInf002Mapper.getRelateOrgInf(param));
 		DynamicDataSourceHolder.clearDataSource();
-		return resultList;
+		return page;
 	}
 
 	/**

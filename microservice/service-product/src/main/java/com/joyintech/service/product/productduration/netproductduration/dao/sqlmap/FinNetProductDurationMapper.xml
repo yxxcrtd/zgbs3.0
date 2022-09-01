@@ -55,7 +55,7 @@
            AND C.ISSUE_STATUS IN (#{ISSUE_STATUS_01, jdbcType = VARCHAR}, #{ISSUE_STATUS_03, jdbcType = VARCHAR})
        </if>
        <if test="search !=null and search !=''">
-           AND A.FINPROD_MARKET_ID LIKE CONCAT(CONCAT('%',#{search}),'%')
+           AND ( A.FINPROD_MARKET_ID LIKE CONCAT(CONCAT('%',#{search}),'%') or A.FINPROD_ABBR LIKE CONCAT(CONCAT('%',#{search}),'%') )
        </if>
        <if test="initValue != null and initValue != ''">
            AND	A.FINPROD_MARKET_ID = #{initValue,jdbcType=VARCHAR}

@@ -1155,7 +1155,18 @@
             TOTLE_TRADE_ID = #{totleTradeId,jdbcType=VARCHAR}
     </select>
 
-
+    <select id="selectTrdProductDealByEntrustId" resultType="com.joyintech.tams.common.base.entity.TrdProductDeal">
+        SELECT
+        <include refid="com.joyintech.tams.common.base.dao.TrdProductDealMapper.Base_Column_List" />
+        FROM
+            TRD_PRODUCT_DEAL tpd
+        LEFT JOIN
+            TRD_PRODUCT_DEAL_ADD tpda ON tpd.TRADE_ID = tpda.TRADE_ID
+        WHERE
+            tpda.ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+            AND tpd.TRADE_STATUS = '01'
+            AND tpd.IS_CANCEL = 'N'
+    </select>
     <select id="selectInvAim" resultType="java.lang.String" parameterType="com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto">
         SELECT
         INV_AIM
@@ -1170,7 +1181,4 @@
             )
           and  ROWNUM = 1
         group by INV_AIM
-    </select>
-
-
-</mapper>
+    </select></mapper>

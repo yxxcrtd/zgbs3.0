@@ -524,8 +524,10 @@ public class IbuQuoteRepoService extends BaseService {
             feeTypeList.add(BussinessDictCodeList.费用类型_交易手续费.getValue());
             feeTypeList.add(BussinessDictCodeList.费用类型_结算手续费.getValue());
             inputDto.setFeeTypeList(feeTypeList);
-            // 登记托管机构用证券托管户的登记托管机构
-            if (StringUtil.isNotEmpty(dto.getSecManageAcctId())) {
+            if (StringUtil.isNotEmpty(dto.getRegistOrg())) {
+                inputDto.setRegistOrg(dto.getRegistOrg());
+            } else if (StringUtil.isNotEmpty(dto.getSecManageAcctId())) {
+                // 登记托管机构用证券托管户的登记托管机构
                 String registOrg = cfetsIbuQuoteBondMapper.getRegistOrg(dto.getSecManageAcctId());
                 inputDto.setRegistOrg(registOrg);
             }
@@ -1130,6 +1132,11 @@ public class IbuQuoteRepoService extends BaseService {
         calRequest.setTradeAmt(request.getTradeAmt());//交易金额
         calRequest.setPs(request.getPs());//交易方向
         calRequest.setSecManageAcctId(request.getSecManageAcctId());//证券账户
+        if (CollectionUtils.isNotEmpty(request.getRepoEntrustPledgeDtos())
+                && StringUtil.isNotEmpty(request.getRepoEntrustPledgeDtos().get(0))
+                && StringUtil.isNotEmpty(request.getRepoEntrustPledgeDtos().get(0).getRepRegistOrg())) {
+            calRequest.setRegistOrg(request.getRepoEntrustPledgeDtos().get(0).getRepRegistOrg());
+        }
         calRequest.setTermType(request.getTermType());//期限品种
         calRequest.setPledgeNum(request.getRepoEntrustPledgeDtos().size());//质押券数量
         calRequest.setTradeDate(iPlatformDate.getSysDate());//交易日期

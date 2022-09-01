@@ -453,7 +453,9 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 }
                 //抵消赎回提交时的可用持仓
                 // modify by jiangpeng on 20210526 ZGBSSE-418 计划类净值型提交时没有可用持仓
-                if(!StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue(),deal.getFinprodType2())) {
+                if (!StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue(), deal.getFinprodType2())
+                        && (!StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_基金.getValue(), deal.getFinprodType2())
+                        && CollectionUtils.isEmpty(list))) {
                     PtlSecPositionFlowDto resultDtoky = new PtlSecPositionFlowDto();
                     BeanUtils.copyProperties(resultDto, resultDtoky);
                     resultDtoky.setHodingType(DictCodeList.持仓类型_可用.getValue());
@@ -1719,12 +1721,14 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
              */
             // GLCP-157:修改股票、债券申购、申购确认登录现金流水逻辑 modify by fuyongsheng 20220714 start
             else if (DictCodeListExt1.金融产品类型_投管用_股票.getValue().equals(deal.getFinprodType2())
-                     && (DictCodeList.交易方向_买入.getValue().equals(deal.getPs())
-                         || DictCodeListExt2.交易方向_配股.getValue().equals(deal.getPs())
-                         || DictCodeListExt2.交易方向_增发.getValue().equals(deal.getPs())
-                         || DictCodeListExt2.交易方向_新股中签.getValue().equals(deal.getPs()))
-                         || DictCodeList.交易方向_申购.getValue().equals(deal.getPs())
-                         || DictCodeList.交易方向_申购确认.getValue().equals(deal.getPs())) {
+                    && (DictCodeList.交易方向_买入.getValue().equals(deal.getPs())
+                    || DictCodeListExt2.交易方向_配股.getValue().equals(deal.getPs())
+                    || DictCodeListExt2.交易方向_增发.getValue().equals(deal.getPs())
+                    || DictCodeListExt2.交易方向_新股中签.getValue().equals(deal.getPs()))
+                    || ((DictCodeListExt1.金融产品类型_投管用_股票.getValue().equals(deal.getFinprodType2()) ||
+                    DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(deal.getFinprodType2())) && (
+                    DictCodeList.交易方向_申购.getValue().equals(deal.getPs())
+                            || DictCodeList.交易方向_申购确认.getValue().equals(deal.getPs())))) {
                 if(DictCodeList.交易方向_申购.getValue().equals(deal.getPs())){
                     // 申购登录在途的现金流水
                     PtlCashPositionFlowDto ztFlowDto = this.genZtPtlCashPositionFlow(portfolioId, deal, stlPayOrder, chlId);

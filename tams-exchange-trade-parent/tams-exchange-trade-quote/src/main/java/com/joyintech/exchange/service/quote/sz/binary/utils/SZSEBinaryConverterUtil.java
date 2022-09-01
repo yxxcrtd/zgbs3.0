@@ -32,6 +32,8 @@ public class SZSEBinaryConverterUtil {
         tick.setUpperLimitPrice(data.getHighLimitPx());
         tick.setLowerLimitPrice(data.getLowLimitPx());
         tick.setPreClosePrice(data.getPrevClosePx());
+        tick.setClosePrice(data.getClosePrice());// 收盘价
+        tick.setAverageDailyPrice(data.getAverageDailyPrice());// 日均价
         tick.setSettlePrice(data.getClearingPrice());
         for (int i = 0; i < data.getOfferPrices().size(); i++) {
             tick.addAskPrice(data.getOfferPrices().get(i));

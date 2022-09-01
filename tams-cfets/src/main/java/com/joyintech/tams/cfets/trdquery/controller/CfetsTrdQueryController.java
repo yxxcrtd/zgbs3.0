@@ -238,14 +238,12 @@ public class CfetsTrdQueryController extends BaseController {
      *
      * @param dto
      * @return Page<CfetsTrdQueryIbuInfoListResponse>
-     * @throws Exception Exception
      * @since 1.0
      */
     @ApiOperation(value = "成交列表分页查询", notes = "成交列表分页查询")
     @PostMapping("/queryAllCstpInfoList")
     @ResponseBody
-    public Message<Page<CfetsTrdQueryCstpInfoListResponse>> queryAllCstpInfoList(@RequestBody CfetsTrdQueryCstpInfoListRequest dto)
-            throws Exception {
+    public Message<Page<CfetsTrdQueryCstpInfoListResponse>> queryAllCstpInfoList(@RequestBody CfetsTrdQueryCstpInfoListRequest dto) {
         try {
             Page<CfetsTrdQueryCstpInfoListResponse> page =cfetsTrdQueryService.queryAllCstpInfoList(dto);
             return new Message<Page<CfetsTrdQueryCstpInfoListResponse>>().success().setData(page);

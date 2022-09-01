@@ -48,6 +48,7 @@ spring:
     - microservice #微服务
     - exchange     #场内、银行间
     - position      #头寸
+    - kaptcha      #验证码
   
   cloud:
     nacos:
@@ -74,7 +75,8 @@ spring:
     encoding: UTF-8
   ## 缓存 ##  
   cache:
-    type: ehcache
+    type: redis
+#    type: ehcache
     ehcache:
       config: classpath:ehcache_app.xml
   autoconfigure:

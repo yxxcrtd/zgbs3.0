@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 import cn.hutool.core.collection.ListUtil;
 import com.joyintech.tams.exchange.common.bean.request.RepurchaseQuoteReceiveQryRequest;
 import com.joyintech.tams.exchange.common.bean.response.quote.repurchase.RepurchaseQuoteReceiveResponse;
+import com.joyintech.tams.exchange.service.trade.util.AgentUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -77,10 +78,8 @@ public class JsdTradeAgent extends TradeAgentDsp {
     public ResultBean reqLoginAccount(AccountLoginReqBean accountLoginReqBean) {
         try {
             Account account = accountLoginReqBean.getAccount();
-            // 账户交易密码解密
-            account.setPwd(new String(Base64.decodeBase64(account.getPwd())));
-            account.setTradePwd(new String(Base64.decodeBase64(account.getTradePwd())));
             String accountId = account.getId();
+            AgentUtil.SetDecodeBase64(account);
             TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), FunctionCode.REQ_ACCOUNT_LOGIN.value);
             agentInfo.setAccountId(accountId);
             Map<String, String> parameters = Maps.newHashMap();
@@ -751,9 +750,9 @@ public class JsdTradeAgent extends TradeAgentDsp {
             Account account = entry.getValue();
             String accountId = account.getId();
             logger.info("account：{}，status：{}", accountId, getStatus(accountId));
-            if (getStatus(accountId) != AccountLoginStatus.TRADING.value) {
-                return;
-            }
+//            if (getStatus(accountId) != AccountLoginStatus.TRADING.value) {
+//                return;
+//            }
             boolean loginStatus = tradeAgentManager.getAgentLoginStatus(accountId);
             if (loginStatus) {
                 executeQueryNextTrade(account);

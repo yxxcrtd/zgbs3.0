@@ -45,13 +45,14 @@ public class AgencyDetailsInf001Service extends BaseService<AgencyDetailsInf001D
     
     /**
      * 机构联想框
-     * @param agencyId
+     * @param pageParam
      * @return
      * @see
      * @since 1.0
      */
-    public List<SelectOptionDto> getAgency(String agencyId) {
-        return agencyDetailsInf001Mapper.getAgency(agencyId);
+    public Page<SelectOptionDto> getAgency(int page, int length, Map<String, Object> pageParam) {
+        String agencyId = (String) pageParam.get("search");
+        return super.queryForPageForSelectReturn(page, length, () -> agencyDetailsInf001Mapper.getAgency(agencyId));
     }
     
     /**

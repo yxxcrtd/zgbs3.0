@@ -377,7 +377,7 @@ public class EtrCommonController extends BaseController {
                 // 副总裁/总裁助理授权额度检查相关处理
                 counterId = inputDto.getCounterId();
                 // 修改获取金额by赵东东 2019.8.23 start
-                prinAmt = inputDto.getTotalAmt().multiply(new BigDecimal(10000));
+                prinAmt = inputDto.getTotalAmt();
                 // 修改获取金额by赵东东 2019.8.23 end
                 平安资产类型 = DictCodeListExt2.平安资产类型_债券借贷.getValue();
                 windtypeone = inputDto.getFinprodType2();

@@ -10,7 +10,10 @@
             tradeMarket : $('#MstCommissionSet001_tradeMarket').val(),
             feeType : $('#MstCommissionSet001_feeType').val(),
             tradeType : $("#tradeType").val()?$("#tradeType").val().join(","):'',
-            effDate : $("#effDate").val()
+            effDate : $("#effDate").val(),
+            portfolioId : $("#portfolioId").val(),
+            customerId : $("#customerId").val(),
+            capitalAccountNo : $("#capitalAccountNo").val()
         }
     };
     // 新建

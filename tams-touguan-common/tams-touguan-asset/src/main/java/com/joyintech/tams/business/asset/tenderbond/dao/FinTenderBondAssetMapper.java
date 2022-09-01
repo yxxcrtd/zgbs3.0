@@ -83,6 +83,14 @@ public interface FinTenderBondAssetMapper {
     Integer countFinprodIdUse(@Param("finprodId") String finprodId, @Param("isCancel") String isCancel, @Param("isClose") String isClose, @Param("ps") String ps);
 
     /**
+     * 删除时判断金融产品代码上市代码是否使用过
+     *
+     * @param finprodId
+     * @return
+     */
+    Integer countApperarFinprodIdUse(@Param("finprodId") String finprodId);
+
+    /**
      * 判断是否存在上市流通交易数据
      *
      * @param finprodId

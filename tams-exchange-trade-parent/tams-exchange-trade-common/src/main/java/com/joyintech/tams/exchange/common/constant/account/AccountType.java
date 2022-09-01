@@ -6,7 +6,8 @@ public enum AccountType {
     JSD("金仕达", "3"),
     KDGateway("金证KDGateway", "4"),
     CTP("上期所综合交易平台", "5"),
-    MOCK("模拟撮合终端", "10");
+    MOCK("模拟撮合终端", "10"),
+    KINGDOM_KCBPU("金证U","15");
 
 
     public final String value;

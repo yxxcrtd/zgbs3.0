@@ -1480,7 +1480,9 @@ from
         on p.finprod_id=T1.finprod_id
         where
         T1.is_right='Y'
-        and p.exercise_date>#{platDate}
+        <if test="platDate!=null">
+            and p.exercise_date>#{platDate}
+        </if>
         and T1.finprod_id=#{finprodId,jdbcType=VARCHAR}
     </select>
     <!--查询该资产该组合的所有的业务模式-->

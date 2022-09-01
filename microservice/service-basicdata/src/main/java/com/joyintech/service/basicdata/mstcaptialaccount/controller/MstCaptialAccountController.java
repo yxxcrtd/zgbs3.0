@@ -206,9 +206,9 @@ public class MstCaptialAccountController {
 
 
 
-    @PostMapping("/getAcctInfo")
-    public List<SelectOptionDto> getAcctInfo(@RequestBody Map<String,Object> param){
-        return mstCaptialAccountService.getAcctInfo(param);
+    @PostMapping("/getAcctInfo/{page}/{length}")
+    public Page<SelectOptionDto> getAcctInfo(@RequestBody Map<String,Object> param, @PathVariable int page, @PathVariable int length){
+        return mstCaptialAccountService.getAcctInfo(param, page, length);
     }
 
 }

@@ -74,7 +74,7 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
         Map<String,List<StlSettleTransDataGatherDto>> mapList=selectNeedTotalDataList
                 .stream()
                 .collect(Collectors.groupingBy(dto ->
-                        dto.getApplyTradeId() + "_" + dto.getSeatNumber()));
+                        dto.getApplyTradeId() + "_" + dto.getSeatNumber()+ "_" + dto.getSecAcctId()));
         //4、循环当前循环的map的value
         List<SettleTransDataTotal> settleTransDataList=new ArrayList<>();
         List<SettleTransDataTotalAdd> settleTransDataAddList=new ArrayList<>();
@@ -252,7 +252,7 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                             dealTotal.setFpriceAmt(totalFpriceamt);
                             dealTotal.setUnitFprice(settleTransDataDto.getUnitFprice());
                         } else{
-                            unitCprice = ArithmeticUtil.divide(totalCpriceAmt, totalShareAmt, 4);
+                            unitCprice = ArithmeticUtil.divide(totalCpriceAmt, totalShareAmt, 8);
                             dealTotal.setCpriceAmt(totalCpriceAmt);
                             dealTotal.setUnitCprice(unitCprice);
                             unitInt=settleTransDataDto.getUnitInt();
@@ -263,7 +263,7 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                     }
                     else if(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(settleTransDataDto.getFinprodType2())
                             || DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(settleTransDataDto.getFinprodType2())){
-                        dealTotal.setUnitCprice(ArithmeticUtil.divide(totalCpriceAmt, totalShareAmt, 4));
+                        dealTotal.setUnitCprice(ArithmeticUtil.divide(totalCpriceAmt, totalShareAmt, 8));
                         dealTotal.setUnitInt(null);
                         dealTotal.setUnitFprice(null);
                         prinAmt = totalPrinAmt;

@@ -606,7 +606,8 @@ public class TrdPlanNetInvestTrade003Controller extends BaseController {
         if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_申购确认.getValue())) {
             trdProductDealAdd.setPurCfmDate(dto.getTradeDate());
         }
-        else if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_赎回确认.getValue())) {
+        else if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_赎回确认.getValue())
+                || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_赎回到账.getValue())) { //增加赎回到账，修复GLLCUAT-236
             trdProductDealAdd.setRedCfmDate(dto.getRedCfmDate());
         }
         trdProductDealAdd.setTradeId(dto.getTradeId());

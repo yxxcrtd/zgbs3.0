@@ -261,8 +261,8 @@ public class MstCommissionSetService extends CommonExportService<MstCommissionSe
      * @param param
      * @return
      */
-    public List<SelectOptionDto> getMstAcctInfo(Map<String, Object> param) {
-        return restTemplate.postForList(
+    public Page<SelectOptionDto> getMstAcctInfo(Map<String, Object> param) {
+        return restTemplate.postForPage(
                 ServiceApplication.BASICDATA_SERVICE_NAME + "/MstCaptialAccount/getAcctInfo",
                 param, SelectOptionDto.class);
     }

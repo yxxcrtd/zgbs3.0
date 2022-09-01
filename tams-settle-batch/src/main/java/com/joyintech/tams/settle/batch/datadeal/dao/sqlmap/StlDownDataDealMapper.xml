@@ -784,4 +784,15 @@
 		FINPROD_MARKET_ID = #{finProdMarketId,jdbcType=VARCHAR}
 		AND FINPROD_TYPE2 = #{finprodType2,jdbcType=VARCHAR}
 	</select>
+
+	<select id="selectH02SqSettleTransData" resultType="com.joyintech.tams.common.base.entity.SettleTransData">
+		SELECT
+			<include refid="com.joyintech.tams.common.base.dao.SettleTransDataMapper.Base_Column_List" />
+		FROM
+			SETTLE_TRANS_DATA
+		WHERE
+			CJBH = #{cjbh,jdbcType=VARCHAR}
+		AND VDATE = #{vdate,jdbcType=DATE}
+		AND SEAT_NUMBER = #{seatNumber,jdbcType=VARCHAR}
+	</select>
 </mapper>

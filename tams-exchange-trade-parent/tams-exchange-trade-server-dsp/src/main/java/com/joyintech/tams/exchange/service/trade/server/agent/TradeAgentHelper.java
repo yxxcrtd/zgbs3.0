@@ -96,7 +96,12 @@ public class TradeAgentHelper {
                 resultBean.setErrorCode(ErrorCode.TERMINAL_API_ERROR.value);
                 resultBean.setErrorMsg(agentResult.getMessage());
             }
-
+            if (resultBean == null) {
+                resultBean = new ResultBean();
+                resultBean.setErrorCode(ErrorCode.NoData.value);
+                resultBean.setErrorMsg(ErrorCode.NoData.errorMsg);
+                return resultBean;
+            }
             JSONObject jData = null;
             // xiazelei 20220402 error_info判断登录过期时使用；
             // "error_info": "[330030][登录已过期，请重新登录]\r\n[client_id=030800006116,fund_account=21506238,error_no_t=-17]\n",

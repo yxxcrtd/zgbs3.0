@@ -3,7 +3,6 @@
  */
 $(function() {
 	var needInit = true;
-	var acctNoList;
     var uploadFileList =[];
 	/**
      * 页面初始化
@@ -239,7 +238,7 @@ $(function() {
             , {
                 field: 'payAcctNo', width: 130, title: 'BussTrdTransferOrder.payAcctNo', edit: true, sortable:false,
                 editOption: {
-                    type: 'select', multiple: false, searchable: true, showField: 'id', parentIds:'orderId_select,acctNoList',
+                    type: 'select', multiple: false, searchable: true, showField: 'id', parentIds:'orderId_select',
                     url: JoyinUtil.getRealPath("/common/multiOrder/select"), id: 'payAcctNo', postData:function () {
                         return {selectValue: JSON.stringify(orderAcctMap), type: 'pay'};
                     }
@@ -249,7 +248,7 @@ $(function() {
             , {
                 field: 'recAcctNo', width: 130, title: 'BussTrdTransferOrder.recAcctNo', edit: true, sortable:false,
                 editOption: {
-                    type: 'select', multiple: false, searchable: true, showField: 'id', parentIds:'orderId_select,acctNoList',
+                    type: 'select', multiple: false, searchable: true, showField: 'id', parentIds:'orderId_select',
                     url: JoyinUtil.getRealPath("/common/multiOrder/select"),id: 'recAcctNo',  postData:function () {
                         return {selectValue: JSON.stringify(orderAcctMap), type: 'rec'};
                     }
@@ -276,20 +275,12 @@ $(function() {
         data: [],
         editCell: function (value, row, field, cell, column) {
             if (field == 'payAcctNo') {
-                $.each(acctNoList, function (i, v) {
-                    if (v.id == value) {
-                        row.payAcctName = v.text;
-                    }
-                });
+                row.payAcctName = $(cell).data('sd')[0].text;
                 if (typeof value == "undefined" || value == null || value == "") {
                     row.payAcctName = "";
                 }
             } else {
-                $.each(acctNoList, function (i, v) {
-                    if (v.id == value) {
-                        row.recAcctName = v.text;
-                    }
-                });
+                row.recAcctName = $(cell).data('sd')[0].text;
                 if (typeof value == "undefined" || value == null || value == "") {
                     row.recAcctName = "";
                 }
@@ -566,6 +557,5 @@ $(function() {
         $('#TrdDepoDuration003_btn_submit').click(function() {
             saveOrSubmit('submit');
         });
-        acctNoList = JSON.parse($("#acctNoList").val());
     });
 }());

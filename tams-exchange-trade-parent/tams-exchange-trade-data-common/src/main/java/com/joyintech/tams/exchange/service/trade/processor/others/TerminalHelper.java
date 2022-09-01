@@ -6,6 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
 
+import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.util.BeanUtil;import com.joyintech.background.component.common.pack.common.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.*;
@@ -19,6 +20,8 @@ import com.joyintech.tams.exchange.common.bean.response.quote.repurchase.Repurch
 import com.joyintech.tams.exchange.common.constant.*;
 import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.enums.exchange.RepurchaseTypeEnum;
+import com.joyintech.tams.exchange.common.microservice.ServiceApplication;
+import com.joyintech.tams.exchange.common.microservice.TradeServiceURL;
 import com.joyintech.tams.exchange.common.utils.ConvertListUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.datacommon.db.service.*;
@@ -34,6 +37,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -71,6 +75,10 @@ public class TerminalHelper {
     private CommonManagement commonManagement;
     @Autowired
     private InvestInterfaceHelper investInterfaceHelper;
+	
+	@Autowired(required = false)
+    @Qualifier("simpleRestTemplate")
+    protected JoyinRestTemplate simpleRestTemplate;
 
     private final int batchSize = 1000; // 委托成交比对时，分页发送数据大小
 
@@ -132,6 +140,30 @@ public class TerminalHelper {
 
     //指令页面大宗的交易行情和和盘后调用该方法。固收没调用。
     public List<IntegratedQuote> queryIntegratedQuote(int quoteType, String stockCode, String accountId, String oppositeLiaisonTel, String liaisonTel, int pageSize, String posStr) {
+        // 指令页面调用tick获取行情客户端大宗盘后行情
+        if (quoteType == 2) {
+            List<IntegratedQuote> integratedQuoteList = new ArrayList<>();
+            IntegratedQuote integratedQuote = new IntegratedQuote();
+            integratedQuote.setStockCode(stockCode);
+            if (StringUtil.endsWith(stockCode, "SH")) {
+                ResultBean resultBean = simpleRestTemplate.getForObject(ServiceApplication.QUOTE_SERVICE_NAME + TradeServiceURL.prefix + TradeServiceURL.queryQuoteTick + "?stock_code=" + stockCode, ResultBean.class);
+               if (resultBean.getData()!=null){
+                   integratedQuote.setEntrustPrice((Double) ((Map)resultBean.getData()).get("closePrice"));// 收盘价
+                   integratedQuote.setFullPrice((Double) ((Map)resultBean.getData()).get("averageDailyPrice"));//日均价
+               }
+            } else if (StringUtil.endsWith(stockCode, "SZ")) {
+                ResultBean resultBean_060 = simpleRestTemplate.getForObject(ServiceApplication.QUOTE_SERVICE_NAME + TradeServiceURL.prefix + TradeServiceURL.queryQuoteTick + "?stock_code=" + stockCode + ".060", ResultBean.class);
+                ResultBean resultBean_061 = simpleRestTemplate.getForObject(ServiceApplication.QUOTE_SERVICE_NAME + TradeServiceURL.prefix + TradeServiceURL.queryQuoteTick + "?stock_code=" + stockCode + ".061", ResultBean.class);
+                if(resultBean_060.getData()!=null){
+                    integratedQuote.setEntrustPrice((Double) ((Map)resultBean_060.getData()).get("closePrice"));// 收盘价
+                }
+                if (resultBean_061.getData() != null) {
+                    integratedQuote.setFullPrice((Double) ((Map)resultBean_061.getData()).get("averageDailyPrice"));//日均价
+                }
+            }
+            integratedQuoteList.add(integratedQuote);
+            return integratedQuoteList;
+        }
         QuoteQryBean quoteQryBean = new QuoteQryBean();
         // 投管没有账号入参，需要单独处理
         TradeAgent tradeAgent = null;
@@ -178,8 +210,8 @@ public class TerminalHelper {
             try {
                 String market = quoteQryBean.getMarket();
                 // yanjianhui 2022/7/15 :如果是查上海的盘后就用364上海盘后查询（科创板以外无盘后行情）的过滤
-                if (quoteType == 2 && "SH".equals(market)) {
-                    IntegratedBulkCloseQuoteQryBean integratedBulkCloseQuoteQryBean = new IntegratedBulkCloseQuoteQryBean(stockCode, ExchangeType.SH.value, accountId, pageSize);
+                if(quoteType == 2 && StringUtil.endsWith(stockCode, "SH")){
+                    IntegratedBulkCloseQuoteQryBean integratedBulkCloseQuoteQryBean = new IntegratedBulkCloseQuoteQryBean(stockCode, ExchangeType.SH.value,accountId , pageSize);
                     List<IntegratedQuote> integratedQuotesCopy = new ArrayList<>();
                     List<IntegratedBulkCloseQuoteBean> beanList = tradeAgent.reqIntegratedBulkCloseQuote(integratedBulkCloseQuoteQryBean);
                     //将List<IntegratedBulkCloseQuoteBean> 转换成List<IntegratedQuote>才能返回。
@@ -369,36 +401,116 @@ public class TerminalHelper {
         return list;
     }
 
-    public List<IntegratedBulkCloseQuoteBean> queryIntegratedBulkCloseQuote(IntegratedBulkCloseQuoteQryBean integratedBulkCloseQuoteQryBean) {
-        int pageSize = integratedBulkCloseQuoteQryBean.getPageSize();
-        if (pageSize > 1000) {
-            integratedBulkCloseQuoteQryBean.setPageSize(1000);
-        }
-
-        List<IntegratedBulkCloseQuoteBean> list = new ArrayList<>();
-        TradeAgent tradeAgent = getAgent(integratedBulkCloseQuoteQryBean.getAccountId());
-        if (Objects.nonNull(tradeAgent)) {
-            try {
-                List<IntegratedBulkCloseQuoteBean> beanList = tradeAgent.reqIntegratedBulkCloseQuote(integratedBulkCloseQuoteQryBean);
-                if (Objects.nonNull(beanList) && beanList.size() > 0) {
-                    beanList.forEach(quoteBean -> {
-                        Instrument instrument = instrumentService.findById(quoteBean.getStockCode());
-                        if (Objects.nonNull(instrument)) {
-                            quoteBean.setStockName(instrument.getStockName());
-                            quoteBean.setAssetType(instrument.getAssetType());
-                        } else {
-                            logger.info("未找到匹配的合约代码信息！！ {}", quoteBean.getStockCode());
-                        }
-                    });
-                    list.addAll(beanList);
-                }
-            } catch (Exception e) {
-                logger.error("reqIntegratedBulkCloseQuote error {}", "\r\n" + e);
+    public List<IntegratedBulkCloseQuoteBean> queryIntegratedBulkCloseQuote(String stockCode, String exchangeType, String accountId, int pageSize) {
+        // 交易页面调用tick获取行情客户端大宗盘后行情
+        List<IntegratedBulkCloseQuoteBean> integratedBulkCloseQuoteBeanList = new ArrayList<>();
+        IntegratedBulkCloseQuoteBean integratedBulkCloseQuoteBean = new IntegratedBulkCloseQuoteBean();
+        integratedBulkCloseQuoteBean.setStockCode(stockCode);
+        if (StringUtil.endsWith(stockCode, "SH")) {
+            ResultBean resultBean = simpleRestTemplate.getForObject(ServiceApplication.QUOTE_SERVICE_NAME + TradeServiceURL.prefix + TradeServiceURL.queryQuoteTick + "?stock_code=" + stockCode, ResultBean.class);
+            if (resultBean.getData()!=null){
+                integratedBulkCloseQuoteBean.setClosingPrice((Double) ((Map)resultBean.getData()).get("closePrice"));
+                integratedBulkCloseQuoteBean.setWeightavgPrice((Double) ((Map)resultBean.getData()).get("averageDailyPrice"));
+            }
+        } else if (StringUtil.endsWith(stockCode, "SZ")) {
+            ResultBean resultBean_060 = simpleRestTemplate.getForObject(ServiceApplication.QUOTE_SERVICE_NAME + TradeServiceURL.prefix + TradeServiceURL.queryQuoteTick + "?stock_code=" + stockCode + ".060", ResultBean.class);
+            ResultBean resultBean_061 = simpleRestTemplate.getForObject(ServiceApplication.QUOTE_SERVICE_NAME + TradeServiceURL.prefix + TradeServiceURL.queryQuoteTick + "?stock_code=" + stockCode + ".061", ResultBean.class);
+            if (resultBean_060.getData()!=null){
+                integratedBulkCloseQuoteBean.setClosingPrice((Double) ((Map)resultBean_060.getData()).get("closePrice"));
+            }
+            if (resultBean_061.getData() != null) {
+                integratedBulkCloseQuoteBean.setWeightavgPrice((Double) ((Map)resultBean_061.getData()).get("averageDailyPrice"));
             }
         }
-        return list;
-    }
+        integratedBulkCloseQuoteBeanList.add(integratedBulkCloseQuoteBean);
+        return integratedBulkCloseQuoteBeanList;
 
+//        if (pageSize > 0) {
+//            if (pageSize > 1000) {
+//                pageSize = 1000;
+//            }
+//        }
+//
+//        IntegratedBulkCloseQuoteQryBean integratedBulkCloseQuoteQryBean = new IntegratedBulkCloseQuoteQryBean(stockCode, exchangeType, accountId, pageSize);
+//
+//        TradeAgent tradeAgent = getAgent(accountId);
+//        if (Objects.nonNull(tradeAgent)) {
+//            try {
+//                List<IntegratedBulkCloseQuoteBean> beanList = tradeAgent.reqIntegratedBulkCloseQuote(integratedBulkCloseQuoteQryBean);
+//                if (Objects.nonNull(beanList)) {
+//                    beanList.forEach(quoteBean -> {
+//                        Instrument instrument = instrumentService.findById(quoteBean.getStockCode());
+//                        if (Objects.nonNull(instrument)) {
+//                            quoteBean.setStockName(instrument.getStockName());
+//                            quoteBean.setAssetType(instrument.getAssetType());
+//                        } else {
+//                            logger.info("未找到匹配的合约代码信息！！ {}", quoteBean.getStockCode());
+//                        }
+//                    });
+//                }
+//                return beanList;
+//            } catch (Exception e) {
+//                logger.error("reqIntegratedBulkCloseQuote error {}", "\r\n" + e);
+//            }
+//        }
+//        return new ArrayList<>();
+    }
+    public List<IntegratedBulkCloseQuoteBean> queryIntegratedBulkCloseQuote(IntegratedBulkCloseQuoteQryBean integratedBulkCloseQuoteQryBean) {
+        // 交易页面调用tick获取行情客户端大宗盘后行情
+        List<IntegratedBulkCloseQuoteBean> integratedBulkCloseQuoteBeanList = new ArrayList<>();
+        IntegratedBulkCloseQuoteBean integratedBulkCloseQuoteBean = new IntegratedBulkCloseQuoteBean();
+        String stockCode = integratedBulkCloseQuoteQryBean.getStockCode();
+        integratedBulkCloseQuoteBean.setStockCode(stockCode);
+        if (StringUtil.endsWith(stockCode, "SH")) {
+            ResultBean resultBean = simpleRestTemplate.getForObject(ServiceApplication.QUOTE_SERVICE_NAME + TradeServiceURL.prefix + TradeServiceURL.queryQuoteTick + "?stock_code=" + stockCode, ResultBean.class);
+            if (resultBean.getData()!=null){
+                integratedBulkCloseQuoteBean.setClosingPrice((Double) ((Map)resultBean.getData()).get("closePrice"));
+                integratedBulkCloseQuoteBean.setWeightavgPrice((Double) ((Map)resultBean.getData()).get("averageDailyPrice"));
+            }
+        } else if (StringUtil.endsWith(stockCode, "SZ")) {
+            ResultBean resultBean_060 = simpleRestTemplate.getForObject(ServiceApplication.QUOTE_SERVICE_NAME + TradeServiceURL.prefix + TradeServiceURL.queryQuoteTick + "?stock_code=" + stockCode + ".060", ResultBean.class);
+            ResultBean resultBean_061 = simpleRestTemplate.getForObject(ServiceApplication.QUOTE_SERVICE_NAME + TradeServiceURL.prefix + TradeServiceURL.queryQuoteTick + "?stock_code=" + stockCode + ".061", ResultBean.class);
+            if (resultBean_060.getData()!=null){
+                integratedBulkCloseQuoteBean.setClosingPrice((Double) ((Map)resultBean_060.getData()).get("closePrice"));
+            }
+            if (resultBean_061.getData() != null) {
+                integratedBulkCloseQuoteBean.setWeightavgPrice((Double) ((Map)resultBean_061.getData()).get("averageDailyPrice"));
+            }
+        }
+        integratedBulkCloseQuoteBeanList.add(integratedBulkCloseQuoteBean);
+        return integratedBulkCloseQuoteBeanList;
+
+//        if (pageSize > 0) {
+//            if (pageSize > 1000) {
+//                pageSize = 1000;
+//            }
+//        }
+//
+//        IntegratedBulkCloseQuoteQryBean integratedBulkCloseQuoteQryBean = new IntegratedBulkCloseQuoteQryBean(stockCode, exchangeType, accountId, pageSize);
+//
+//        TradeAgent tradeAgent = getAgent(accountId);
+//        if (Objects.nonNull(tradeAgent)) {
+//            try {
+//                List<IntegratedBulkCloseQuoteBean> beanList = tradeAgent.reqIntegratedBulkCloseQuote(integratedBulkCloseQuoteQryBean);
+//                if (Objects.nonNull(beanList)) {
+//                    beanList.forEach(quoteBean -> {
+//                        Instrument instrument = instrumentService.findById(quoteBean.getStockCode());
+//                        if (Objects.nonNull(instrument)) {
+//                            quoteBean.setStockName(instrument.getStockName());
+//                            quoteBean.setAssetType(instrument.getAssetType());
+//                        } else {
+//                            logger.info("未找到匹配的合约代码信息！！ {}", quoteBean.getStockCode());
+//                        }
+//                    });
+//                }
+//                return beanList;
+//            } catch (Exception e) {
+//                logger.error("reqIntegratedBulkCloseQuote error {}", "\r\n" + e);
+//            }
+//        }
+//        return new ArrayList<>();
+    }
+    
     public List<IntegratedRepurchaseQuoteBean> queryIntegratedRepurchaseQuote(IntegratedRepurchaseQuoteQryBean integratedRepurchaseQuoteQryBean) {
         int pageSize = integratedRepurchaseQuoteQryBean.getPageSize();
         if (pageSize > 1000) {

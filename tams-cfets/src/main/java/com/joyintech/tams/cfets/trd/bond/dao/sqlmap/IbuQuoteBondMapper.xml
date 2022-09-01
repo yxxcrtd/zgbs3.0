@@ -3,7 +3,7 @@
 <mapper namespace="com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper">
 
     <select id="listEntrust" resultType="com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealEntrustOrderDto">
-        select * from (SELECT
+        select distinct * from (SELECT
         ETR_ENTRUST.ENTRUST_STATUS entrustStatus,
         trunc(nvl(NVL(T5.FINISH_AMT, 0)+ NVL(T7.ENT_FINISH_AMT*100, 0),0)/(ETR_ENTRUST.ENTRUST_NUM*100),4)*100 transactioncom,
         ETR_ENTRUST.INV_MANAGER_ID invManagerId,
@@ -39,7 +39,7 @@
         MST_CFETS_CUSTOMER_INFO.PARTY_ABBR mySideAbbr,
         <!-- 本方交易员 -->
         (SELECT
-        MST_CFETS_CUSTOMER_TRADER.TRADER_ID
+        distinct MST_CFETS_CUSTOMER_TRADER.TRADER_ID
         FROM
         MST_CFETS_CUSTOMER_TRADER
         INNER JOIN SYS_USER_ADD
@@ -61,7 +61,7 @@
         ) mySideTrader,
         <!-- 本方交易员名称 -->
         (SELECT
-        MST_CFETS_CUSTOMER_TRADER.TRADER_NAME
+        distinct MST_CFETS_CUSTOMER_TRADER.TRADER_NAME
         FROM
         MST_CFETS_CUSTOMER_TRADER
         INNER JOIN SYS_USER_ADD
@@ -461,7 +461,7 @@
     <!--指令的执行明细-->
     <select id="listDealTransactionDetails" resultType="com.joyintech.tams.cfets.trd.bond.dto.DealTransactionDetailsDto">
         <!--生效及撤销的登记数据-->
-        SELECT
+        SELECT distinct
         T1.TRADE_STATUS validStatus,
         '04' QUOTE_TYPE,
         T3.TRADE_DATE settleDate,
@@ -523,7 +523,7 @@
         )
         <!--流程中登记数据-->
         UNION ALL
-        SELECT
+        SELECT distinct
         '04' validStatus,
         '04' QUOTE_TYPE,
         null settleDate,
@@ -582,7 +582,7 @@
         )
         <!--对话报价-->
         UNION ALL
-        select
+        select distinct
         y.VALID_STATUS validStatus
         ,y.I_Q_B_QUOTE_TYPE
         ,y.I_Q_B_SETTLE_DATE settleDate
@@ -932,7 +932,7 @@
         )y
         <!--请求报价-->
         UNION ALL
-        select
+        select distinct
         y.VALID_STATUS validStatus
         ,y.I_Q_B_QUOTE_TYPE
         ,y.I_Q_B_SETTLE_DATE settleDate
@@ -1273,7 +1273,7 @@
 
     <!--当日登记-->
     <select id="listDayReg" resultType="com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDayRegDto">
-    select TT.*,D.ITEM_VALUE validStatusStr,E.ITEM_VALUE psStr,F.ITEM_VALUE quoteTypeStr,G.ITEM_VALUE assetTypeStr,H.ITEM_VALUE settleSpeedStr,I.ITEM_VALUE tradeMarketStr from (
+    select distinct TT.*,D.ITEM_VALUE validStatusStr,E.ITEM_VALUE psStr,F.ITEM_VALUE quoteTypeStr,G.ITEM_VALUE assetTypeStr,H.ITEM_VALUE settleSpeedStr,I.ITEM_VALUE tradeMarketStr from (
         <!--买卖登记数据-->
         SELECT
             T1.TRADE_STATUS validStatus,
@@ -1404,7 +1404,7 @@
         </if>
         UNION ALL
         <!--回售登记数据-->
-        SELECT
+        SELECT distinct
             T1.TRADE_STATUS validStatus,
             T1.PS,
             T1.QUOTE_TYPE,
@@ -1539,7 +1539,7 @@
         </if>
         UNION ALL
         <!--流程中数据-->
-        SELECT
+        SELECT distinct
             '04' validStatus,
             T1.PS,
             T1.QUOTE_TYPE,
@@ -1950,7 +1950,7 @@
 
     <!--登记初始化 生效 撤销-->
     <select id="getCfetsBondDealQuoteCommonDto" resultType="com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealQuoteCommonDto">
-        SELECT
+        SELECT distinct
             T1.TOTLE_TRADE_ID  quoteId
             ,T1.TRADE_STATUS validStatus
             ,T1.QUOTE_TYPE quoteStyle
@@ -2019,7 +2019,7 @@
 
     <!--登记初始化 流程中-->
     <select id="getWflCfetsBondDealQuoteCommonDto" resultType="com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealQuoteCommonDto">
-        SELECT
+        SELECT distinct
             T1.TOTLE_TRADE_ID  quoteId
             ,T1.TRADE_STATUS validStatus
             ,T1.QUOTE_TYPE quoteStyle

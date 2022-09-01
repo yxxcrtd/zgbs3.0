@@ -419,18 +419,18 @@ public class EtrFundService extends BaseService<EtrFundDto> {
 
             // List<委托指令分发Entity>
             List<EtrDistribute> etrDistributeList = new ArrayList<>();
-            /*List<String> traderList = StringUtil.splitToList(GlobalConstant.COMMA,entity.getBussEtrInvestPersonInfoDto().getTrader());
+            List<String> traderList = StringUtil.splitToList(GlobalConstant.COMMA,entity.getBussEtrInvestPersonInfoDto().getTrader());
             for(String trader:traderList){
                 EtrDistribute etrDistribute = new EtrDistribute();
                 //设置接收状态
                 etrDistribute.setRecStatus(DictCodeList.委托状态_待接收.getValue());
-                //设置指定交易员指定交易员 = 指定交易员       
+                //设置指定交易员指定交易员 = 指定交易员
                 etrDistribute.setTrader(trader);
                 //设置委托代码
                 etrDistribute.setEntrustId(entity.getEntrustId());
                 //
                 etrDistributeList.add(etrDistribute);
-            }*/
+            }
             // List<委托完成状况表Entity>
             List<EtrFinishStatus> etrFinishStatusList = new ArrayList<>();
            /* EtrFinishStatus etrFinishStatus = new EtrFinishStatus();
@@ -547,11 +547,11 @@ public class EtrFundService extends BaseService<EtrFundDto> {
             entrustCommonDto.setEtrEntrust(etrEntrust);
             entrustCommonDto.setEtrEntrustAdd(etrEntrustAdd);
         }
-        if (DictCodeList.是否_是.getValue().equals(isPushMsg)) {
-            Map<String, Object> param = new HashMap<>();
-            param.put("entrustId", entity.getEntrustId());
-            etrCommandDispatcherService.pushCommandMsg(param);
-        }
+//        if (DictCodeList.是否_是.getValue().equals(isPushMsg)) {
+//            Map<String, Object> param = new HashMap<>();
+//            param.put("entrustId", entity.getEntrustId());
+//            etrCommandDispatcherService.pushCommandMsg(param);
+//        }
 
 //        if(baseEtrCashPositionCommService!=null){
 //            baseEtrCashPositionCommService.entrustStartExecute(entrustCommonDto);

@@ -617,13 +617,4 @@ public class FxSecrepoQuote002Service extends BaseService<FxSecrepoQuote002Dto> 
         //"修改历史表记录的生效状态
         fxSecrepoQuoteMapper.updateByPrimaryKeySelectiveHist(entity);
     }
-    public String resultMessage(CallReturn callReturn)
-            throws ServiceException {
-        boolean success = callReturn.isSuccess();
-        if (success){
-            return "发送成功！";
-        }else{
-            return callReturn.getMessage();
-        }
-    }
 }

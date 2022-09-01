@@ -136,6 +136,7 @@ public class PositionRequestTradeReportService {
 
         Map<String, Object> paraMap = new HashMap<>();
         paraMap.put("fTradeId", entity.getfTradeId());
+        paraMap.put("entrustId", entity.getEntrustId());
         List<PortfolioCalculateDto> list = trdCommonBaseService.queryPortfolioCalculate(paraMap);
 
         Map<String, TrdTempDto> trdTempDtoMap = trdTempDtoList.stream().collect(Collectors.toMap(TrdTempDto::getPortfolioId, TrdTempDto -> TrdTempDto, (k1, k2) -> k1));
@@ -187,6 +188,7 @@ public class PositionRequestTradeReportService {
 
         Map<String, Object> paraMap = new HashMap<>();
         paraMap.put("fTradeId", entity.getfTradeId());
+        paraMap.put("entrustId", entity.getEntrustId());
         List<PortfolioCalculateDto> list = trdCommonBaseService.queryPortfolioCalculate(paraMap);
         List<Map<String, Object>> ptlCashList = new ArrayList<>(4);
         List<Map<String, Object>> bondSecList = new ArrayList<>(4);
@@ -245,6 +247,7 @@ public class PositionRequestTradeReportService {
 
         Map<String, Object> paraMap = new HashMap<>();
         paraMap.put("fTradeId", entity.getfTradeId());
+        paraMap.put("entrustId", entity.getEntrustId());
         List<PortfolioCalculateDto> list = trdCommonBaseService.queryPortfolioCalculate(paraMap);
         List<Map<String, Object>> ptlList = new ArrayList<>(4);
         List<Map<String, Object>> ptlSecList = new ArrayList<>(4);
@@ -338,6 +341,7 @@ public class PositionRequestTradeReportService {
 
         Map<String,Object> paraMap = new HashMap<>();
         paraMap.put("fTradeId", entity.getfTradeId());
+        paraMap.put("entrustId", entity.getEntrustId());
         List<PortfolioCalculateDto> list = trdCommonBaseService.queryPortfolioCalculate(paraMap);
         // ZGTFCP-1246:协议回购需要传前次交易编号(下单的委托编号) modify by fuyongsheng 20220318 start
         // 前次交易编号
@@ -524,6 +528,7 @@ public class PositionRequestTradeReportService {
 
         Map<String, Object> paraMap = new HashMap<>();
         paraMap.put("fTradeId", entity.getfTradeId());
+        paraMap.put("entrustId", entity.getEntrustId());
         List<PortfolioCalculateDto> list = trdCommonBaseService.queryPortfolioCalculate(paraMap);
         List<Map<String, Object>> ptlList = new ArrayList<>(4);
         Map<String, TrdTempDto> trdTempDtoMap = trdTempDtoList.stream().collect(Collectors.toMap(TrdTempDto::getPortfolioId, TrdTempDto -> TrdTempDto, (k1, k2) -> k1));
@@ -566,6 +571,7 @@ public class PositionRequestTradeReportService {
 
         Map<String, Object> paraMap = new HashMap<>();
         paraMap.put("fTradeId", entity.getfTradeId());
+        paraMap.put("entrustId", entity.getEntrustId());
         List<PortfolioCalculateDto> list = trdCommonBaseService.queryPortfolioCalculate(paraMap);
         List<Map<String, Object>> ptlList = new ArrayList<>(4);
         List<Map<String, Object>> ptlRoList = new ArrayList<>(4);
@@ -642,6 +648,7 @@ public class PositionRequestTradeReportService {
 
         Map<String, Object> paraMap = new HashMap<>();
         paraMap.put("fTradeId", entity.getfTradeId());
+        paraMap.put("entrustId", entity.getEntrustId());
         List<PortfolioCalculateDto> list = trdCommonBaseService.queryPortfolioCalculate(paraMap);
         // 前次交易编号
         if (!StringUtil.isEmptyList(list)) {

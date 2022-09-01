@@ -7,6 +7,8 @@ import com.alibaba.fastjson.JSON;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
+import com.joyintech.tams.common.base.dao.TrdProductDealAddMapper;
+import com.joyintech.tams.common.base.dao.TrdProductTempDealAddMapper;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
@@ -84,6 +86,8 @@ public class InvestDealRevokeService {
     @Autowired
     private EtrEntrustAddMapper etrEntrustAddMapper;
 
+    @Autowired
+    private TrdProductTempDealAddMapper trdProductTempDealAddMapper;
 
     private Map<String, Object> createCommonParam(Date tradeDate, List<String> portfolioIdList) {
         Map<String, Object> param = new HashMap<>();
@@ -435,17 +439,26 @@ public class InvestDealRevokeService {
                 if (null == deal.getfTradeId()) {
                     continue;
                 }
+                // 查询临时交易附属表
+                TrdProductTempDealAdd dealAdd = trdProductTempDealAddMapper.selectByPrimaryKey(deal.getTradeId());
+                if(null == dealAdd){
+                    logger.debug("[撤销日间下单数据未找到临时交易附属表数据],tradeId={}", deal.getTradeId());
+                    continue;
+                }
                 // 查询下单明细数据
-                InfContractDetailfile infContractDetailfile = trdCommonBaseMapper.selectInfContractDetailfile(deal.getfTradeId());
+                InfContractDetailfile infContractDetailfile = trdCommonBaseMapper.selectInfContractDetailfile(deal.getfTradeId(), dealAdd.getEntrustId());
                 if(null == infContractDetailfile){
+                    logger.debug("[撤销日间下单数据未找到下单明细数据],tradeId={},dealNo={}", deal.getTradeId(), deal.getfTradeId());
                     continue;
                 }
                 EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(infContractDetailfile.getEntrustId());
                 if(null == etrEntrust){
+                    logger.debug("[撤销日间下单数据未找到指令数据],entrustId={}", infContractDetailfile.getEntrustId());
                     continue;
                 }
                 EtrEntrustAdd etrEntrustAdd = etrEntrustAddMapper.selectByPrimaryKey(infContractDetailfile.getEntrustId());
                 if(null == etrEntrustAdd){
+                    logger.debug("[撤销日间下单数据未找到指令附属表数据],entrustId={}", infContractDetailfile.getEntrustId());
                     continue;
                 }
                 data.put("busiType", commonPositionEngineService.getPositionBusiType(etrEntrust.getFinprodType2(), etrEntrust.getPs(),

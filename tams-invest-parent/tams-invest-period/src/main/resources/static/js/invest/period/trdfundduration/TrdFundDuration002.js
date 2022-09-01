@@ -1,7 +1,6 @@
 (function() {
     var initFlag = true;
     var needInit = true;
-    var acctNoList;
     var editCellData;
     //份额总数
     var sumRegistShare;
@@ -346,7 +345,7 @@
                 multiple : false,
                 searchable : false,
                 showField : 'id',
-                parentIds : 'orderId_select,acctNoList',
+                parentIds : 'orderId_select',
                 url : JoyinUtil.getRealPath("/common/multiOrder/select"),
                 id : 'payAcctNo',
                 postData : function() {
@@ -372,7 +371,7 @@
                 multiple : false,
                 searchable : false,
                 showField : 'id',
-                parentIds : 'orderId_select,acctNoList',
+                parentIds : 'orderId_select',
                 url : JoyinUtil.getRealPath("/common/multiOrder/select"),
                 id : 'recAcctNo',
                 postData : function() {
@@ -430,20 +429,12 @@
         data : [],
         editCell : function(value, row, field, cell, column) {
             if (field == 'payAcctNo') {
-                $.each(acctNoList, function(i, v) {
-                    if (v.id == value) {
-                        row.payAcctName = v.text;
-                    }
-                });
+                row.payAcctName = $(cell).data('sd')[0].text;
                 if (typeof value == "undefined" || value == null || value == "") {
                     row.payAcctName = "";
                 }
             } else {
-                $.each(acctNoList, function(i, v) {
-                    if (v.id == value) {
-                        row.recAcctName = v.text;
-                    }
-                });
+                row.recAcctName = $(cell).data('sd')[0].text;
                 if (typeof value == "undefined" || value == null || value == "") {
                     row.recAcctName = "";
                 }
@@ -1008,7 +999,6 @@
         if($("#type").val()!="03"&&$("#type").val()!="06"){
         	$("#bussTrdTransferOrder_div").hide();
         }
-        acctNoList = JSON.parse($("#acctNoList").val());
     };
     /**
      * 画面加载完成

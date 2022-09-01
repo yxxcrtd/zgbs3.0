@@ -41,7 +41,15 @@ public enum SZSEBinaryMDStreamIDEnum {
     /**
      * 盘后固定价格
      */
-    AFTER_HOURS_FIXED_PRICE("MD102");
+    AFTER_HOURS_FIXED_PRICE("MD102"),
+    /**
+     * 以收盘价交易的盘后定价大宗交易快照行情
+     */
+    MD_STREAM_ID_060("060"),
+    /**
+     * 以成交量加权平均价交易的盘后定价大宗交易快照行情
+     */
+    MD_STREAM_ID_061("061");
 
     private static final Map<String, SZSEBinaryMDStreamIDEnum> mapping;
 

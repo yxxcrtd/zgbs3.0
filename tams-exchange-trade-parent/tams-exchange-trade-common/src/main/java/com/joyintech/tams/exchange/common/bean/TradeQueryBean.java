@@ -640,7 +640,17 @@ public class TradeQueryBean implements Serializable {
 
     public String getEntrustBsStr() {
         if (StringUtil.isEmpty(ps)) {
+            ps = entrustBs;
+        }
+        if(StringUtil.isEmpty(ps)){
             return null;
+        }
+        if(DictCodeList.交易方向_买入.getValue().equals(ps)){
+            if(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(finprodType2) ){
+                ps = DictCodeListExt2.交易方向_正回购.getValue();
+            }else if(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(finprodType2) ){
+                ps = DictCodeListExt2.交易方向_逆回购.getValue();
+            }
         }
         DictCodeListExt2 dictCode = DictCodeListExt2.from(DictCode.交易方向, ps);
         if (Objects.nonNull(dictCode)) {
@@ -695,6 +705,10 @@ public class TradeQueryBean implements Serializable {
         DictCodeListExt3 dictCode = DictCodeListExt3.from(DictCode.投管业务类型, busiTypeTg);
         if (Objects.nonNull(dictCode)) {
             return dictCode.getCodeName();
+        }
+        DictCodeList busiTypeDictCode = DictCodeList.from(DictCode.业务类型, busiTypeTg);
+        if (Objects.nonNull(busiTypeDictCode)) {
+            return busiTypeDictCode.getCodeName();
         }
         return busiTypeTg;
     }

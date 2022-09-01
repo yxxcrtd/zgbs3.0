@@ -33,6 +33,7 @@ import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,7 +58,7 @@ import static com.mchange.v2.log.MLog.getLogger;
 @Service
 public class CfetsQuotedTradeCommonService{
 
-    private static org.slf4j.Logger logger = LoggerFactory.getLogger(CfetsQuotedTradeCommonService.class);
+    private static final Logger logger = LoggerFactory.getLogger(CfetsQuotedTradeCommonService.class);
 
     /**
      * 库表生成的cstp交易处理
@@ -175,7 +176,7 @@ public class CfetsQuotedTradeCommonService{
                 // 插入或更新债券交易表
                 interfTradSecdeal = insertOrUpdateSec(iCstpTrade);
                 // 交易所下行数据自动生成交易
-                getLogger().info("银行间下行自动匹配(债券)录单开关状态：" + flagAutoTrade);
+                logger.info("银行间下行自动匹配(债券)录单开关状态：" + flagAutoTrade);
                 if (StringUtil.equals(flagAutoTrade, "01")) {
                     //secAutoTradeService.secAutoTrade(iCstpTrade,interfTradSecdeal,resultBaseDto);
                 }else{
@@ -185,7 +186,7 @@ public class CfetsQuotedTradeCommonService{
                 // 插入或更新回购交易表
                 interfOpicsTradRepo = insertOrUpdateRepo(iCstpTrade,entity.getNoUnderlyings());
                 // 交易所下行数据自动生成交易
-                getLogger().info("银行间下行自动匹配(回购)录单开关状态：" + flagAutoTrade);
+                logger.info("银行间下行自动匹配(回购)录单开关状态：" + flagAutoTrade);
                 if (StringUtil.equals(flagAutoTrade, "01")) {
                     //repoAutoTradeService.repoAutoTrade(iCstpTrade,interfOpicsTradRepo,resultBaseDto);
                 }else{
@@ -195,7 +196,7 @@ public class CfetsQuotedTradeCommonService{
            // if (StringUtil.equals(flagAutoTrade, "01")) {
                 InterfTradSecdeal finalInterfTradSecdeal = interfTradSecdeal;
                 InterfOpicsTradRepo finalInterfOpicsTradRepo = interfOpicsTradRepo;
-                getLogger().info("银行间下行成交处理业务数据线程开启");
+                logger.info("银行间下行成交处理业务数据线程开启");
                 Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -238,7 +239,7 @@ public class CfetsQuotedTradeCommonService{
         }
         ResultBaseDto resultBaseDto = new ResultBaseDto(true);
         try {
-            getLogger().info("银行间下行成交处理业务数据线程开启");
+            logger.info("银行间下行成交处理业务数据线程开启");
             InterfCstpBjfxjg interfCstpBjfxjg = interfCstpBjfxjgMapper.selectByPrimaryKey(trdId);
             //单位转化
             if(StringUtil.isNotEmpty(interfCstpBjfxjg.getSpread())) {
@@ -252,7 +253,7 @@ public class CfetsQuotedTradeCommonService{
             // 一级申购下行数据只有银行间债券,此处处理添加后缀
             interfCstpBjfxjg.setInstrumentId(interfCstpBjfxjg.getInstrumentId() + ".IB");
             InterfCstpBjfxjg finalInterfCstpBjfxjg = interfCstpBjfxjg;
-            getLogger().info("一级申购 下行接口数据:" + JsonUtils.object2Json(interfCstpBjfxjg));
+            logger.info("一级申购 下行接口数据:" + JsonUtils.object2Json(interfCstpBjfxjg));
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -629,6 +630,7 @@ public class CfetsQuotedTradeCommonService{
         interfOpicsTradRepo.setProdtype(ProdTypeUtil.PRODTYPE_PLEDGE);
         interfOpicsTradRepo.setOritradeid(execid);
         if(StringUtil.isNotEmpty(iCstpTrade.getOurinstitutioncode())){
+            //TODO 不应该用该逻辑,应该根据本方角色判断交易方向
             int count = cstpMapper.getPtlByOurinstitutioncode(iCstpTrade.getOurinstitutioncode());
             //已经关联组合
             if(count>0){
@@ -749,7 +751,7 @@ public class CfetsQuotedTradeCommonService{
     private InterfTradSecdeal insertOrUpdateSec(InterfCstpTrade interfCstpTrade) {
         //交易方向转换
         String ps = StringUtils.EMPTY;
-        if (StringUtils.equals(interfCstpTrade.getSide(), this.SIDE_BUY)) {
+        if (StringUtils.equals(interfCstpTrade.getSide(), SIDE_BUY)) {
             ps = DictCodeList.交易方向_买入.getValue();
         }else {
             ps =  DictCodeList.交易方向_卖出.getValue();
@@ -769,23 +771,28 @@ public class CfetsQuotedTradeCommonService{
             interfCstpSecdeal.setTrad(traderId);
         }
         if(StringUtil.isNotEmpty(interfCstpTrade.getOurinstitutioncode())){
-            int count = cstpMapper.getPtlByOurinstitutioncode(interfCstpTrade.getOurinstitutioncode());
-            //已经关联组合
-            if(count>0){
+//            int count = cstpMapper.getPtlByOurinstitutioncode(interfCstpTrade.getOurinstitutioncode());
+//            logger.info("本方机构已经关联组合数:{}", count);
+            //TODO 不应该用该逻辑,应该根据本方角色判断交易方向
+//            if (count > 0) {
                 interfCstpSecdeal.setTrad(interfCstpTrade.getOurtradername());
                 interfCstpSecdeal.setCno(interfCstpTrade.getCounterinstitutioncode());
                 interfCstpSecdeal.setClienttrader(interfCstpTrade.getCountertradername());
-                if(StringUtil.equals(interfCstpSecdeal.getPs(),"P")){
+                if (StringUtil.equals(interfCstpSecdeal.getPs(), "P")) {
                     interfCstpSecdeal.setPs(DictCodeList.交易方向_买入.getValue());
-                }else{
+                } else {
                     interfCstpSecdeal.setPs(DictCodeList.交易方向_卖出.getValue());
                 }
-            }else{
-                interfCstpSecdeal.setTrad(interfCstpTrade.getCountertradername());
-                interfCstpSecdeal.setCno(interfCstpTrade.getOurinstitutioncode());
-                interfCstpSecdeal.setClienttrader(interfCstpTrade.getOurtradername());
-
-            }
+//            } else {
+//                interfCstpSecdeal.setTrad(interfCstpTrade.getCountertradername());
+//                interfCstpSecdeal.setCno(interfCstpTrade.getOurinstitutioncode());
+//                interfCstpSecdeal.setClienttrader(interfCstpTrade.getOurtradername());
+//                if (StringUtil.equals(interfCstpSecdeal.getPs(), "P")) {
+//                    interfCstpSecdeal.setPs(DictCodeList.交易方向_卖出.getValue());
+//                } else {
+//                    interfCstpSecdeal.setPs(DictCodeList.交易方向_买入.getValue());
+//                }
+//            }
         }
         // 根据原始交易编号，判断数据是否已经存在，如果已存在则更新，否则进入插入操作
         if (StringUtil.isNotEmpty(dealno)) {

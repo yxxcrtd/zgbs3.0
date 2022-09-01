@@ -97,6 +97,8 @@ public class DvpOrdersManagementService extends BaseService<DvpOrdersManagementD
         param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
         param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());
         param.put("PAY_TYPE_01", BussinessDictCodeList.缴款方式_一级分销.getValue());
+        param.put("F02", DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
+        param.put("F03", DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
         param.put("F29", DictCodeListExt1.金融产品类型_投管用_债券借贷融入.getValue());
         param.put("F30", DictCodeListExt1.金融产品类型_投管用_债券借贷融出.getValue());
     }

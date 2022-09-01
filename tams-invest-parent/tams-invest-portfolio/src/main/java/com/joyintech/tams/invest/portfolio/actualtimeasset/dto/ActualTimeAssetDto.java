@@ -181,7 +181,7 @@ public class ActualTimeAssetDto extends BaseEntity {
                 || DictCodeList.平安资产类型_拆借.getValue().equals(this.getType8())) {
             return SysDataUtil.getNameFromDataDict(DictCode.回购拆借方向, this.getType7());
         }
-        return SysDataUtil.getNameFromDataDict(DictCode.行内资产二级分类, this.getType9());
+        return SysDataUtil.getNameFromDataDict(DictCode.行内资产三级分类, this.getType9());
     }
     
     
