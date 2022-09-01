@@ -174,19 +174,6 @@
                                         </select>
                                     </div>
                                 </div>
-                                <!--桂林个性化 start-->
-                                <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-label-wrap">自主管理计划</label>
-                                    <div class="layui-input-inline input-inline">
-                                        <select id="selfManagement" name="selfManagement"
-                                                class="layui-input form-input input-select" placeholder="请输入内容"
-                                                data-th-placeholder="#{SysCommon.placeholder}"
-                                                data-th-data-result="${YES_OR_NO}"
-                                                data-th-initvalue="${selfManagement}" >
-                                        </select>
-                                    </div>
-                                </div>
-                                <!--桂林个性化 end-->
                             </div>
                             <!--<div class="pro-module-wrap" th:id="value_div">
                                 <div class="pro-module">
@@ -292,7 +279,7 @@
                                            data-th-text="#{ValuactionInfo.unitvalueMode}">单位净值尾数处理方式</label>
                                     <div class="layui-input-inline input-inline">
                                         <select th:id="unitvalueMode" th:name="ptlValParam.unitvalueMode"
-                                                 data-th-data-result="${MANTISSA_PROCESS_MODE}"
+                                                data-th-data-result="${MANTISSA_PROCESS_MODE}"
                                                 th:initvalue="${ptlValParam?.unitvalueMode}"
                                                 class="layui-input form-input input-select" placeholder="请输入内容"
                                                 data-th-placeholder="#{SysCommon.placeholder}">
@@ -318,7 +305,7 @@
                                     <div class="layui-input-inline input-inline">
                                         <select th:id="milionProfitDecMode" th:name="ptlValParam.milionProfitDecMode"
                                                 th:initValue="${ptlValParam?.milionProfitDecMode}"
-                                                 data-th-data-result="${MANTISSA_PROCESS_MODE}"
+                                                data-th-data-result="${MANTISSA_PROCESS_MODE}"
                                                 class="layui-input form-input input-select" placeholder="请输入内容"
                                                 data-th-placeholder="#{SysCommon.placeholder}">
                                         </select>
@@ -349,18 +336,18 @@
                                     </div>
                                 </div>
                             </div>
-                           <!-- <div class="layui-form-item" >
-                                <div class="form-inline-wrap">
-                                    <label class="layui-form-label form-label-wrap"
-                                           data-th-text="#{ValuactionInfo.isCountingCurInt}">托管活期利息计提</label>
-                                    <div class="layui-input-inline input-inline">
-                                        <input type="checkbox" th:id="isCountingCurInt"
-                                               th:name="ptlValParam.isCountingCurInt" lay-skin="switch"
-                                               th:value="${YES}" lay-text="是|否"
-                                               th:checked="${ptlValParam?.isCountingCurInt}">
-                                    </div>
-                                </div>
-                            </div>-->
+                            <!-- <div class="layui-form-item" >
+                                 <div class="form-inline-wrap">
+                                     <label class="layui-form-label form-label-wrap"
+                                            data-th-text="#{ValuactionInfo.isCountingCurInt}">托管活期利息计提</label>
+                                     <div class="layui-input-inline input-inline">
+                                         <input type="checkbox" th:id="isCountingCurInt"
+                                                th:name="ptlValParam.isCountingCurInt" lay-skin="switch"
+                                                th:value="${YES}" lay-text="是|否"
+                                                th:checked="${ptlValParam?.isCountingCurInt}">
+                                     </div>
+                                 </div>
+                             </div>-->
                         </div>
                     </div>
                 </div>
@@ -384,7 +371,7 @@
                                 <div class="form-inline-wrap" style="width: 100%;">
                                     <div class="layui-input-inline input-inline" style="margin:0 10px;width: 98%!important;">
                                         <textarea id="remark" name="remark" class="layui-textarea" placeholder="请输入内容"
-                                        th:text ="${entity?.remark}" th:placeholder="#{SysCommon.placeholder}"></textarea>
+                                                  th:text ="${entity?.remark}" th:placeholder="#{SysCommon.placeholder}"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -392,7 +379,7 @@
                     </div>
                 </div>
             </div>
-           <div class="pro-module-wrapper step step2" title="用户分配">
+            <div class="pro-module-wrapper step step2" title="用户分配">
                 <!--用户分配 -->
                 <div class="pro-module-wrap expandAllWrap_div">
                     <div class="pro-module">
@@ -423,7 +410,7 @@
                             </div>
                         </div>
                     </div>
-                </div> 
+                </div>
                 <div class="row text-center stepbar stepbar_div">
                     <a id="PtlManagementInfo002_btn_save" class="layui-btn layui-btn-sm btn-save"
                        data-th-text="#{SysCommon.save}">保存</a>
@@ -448,7 +435,7 @@
         var profitType01 = /*[[${profitType01}]]*/'';
         var profitType02 = /*[[${profitType02}]]*/'';
         var profitType03 = /*[[${profitType03}]]*/'';
-        var loginUser = /*[[${loginUser}]]*/''; 
+        var loginUser = /*[[${loginUser}]]*/'';
     </script>
     <script data-th-src="@{/js/invest/portfolio/ptlmanagementinfo/PtlManagementInfo002.js}">
     </script>
