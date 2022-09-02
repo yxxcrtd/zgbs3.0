@@ -191,6 +191,6 @@
     <select id="findReCash" resultType="java.math.BigDecimal">
         select sum(f.AMOUNT)
         from ETR_CASH_POSITION_FLOW f
-        where f.ORDER_ID = #{orderId, jdbcType=VARCHAR}
+        where f.OFFSET_ID = #{orderId, jdbcType=VARCHAR}
     </select>
 </mapper>
