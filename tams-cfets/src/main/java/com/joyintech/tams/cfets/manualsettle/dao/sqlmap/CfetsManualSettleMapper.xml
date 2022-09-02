@@ -1854,6 +1854,17 @@
         order by pm.create_time desc
     </select>
 
+    <select id="getSettleStatusByTradeId" resultType="java.lang.String">
+    select SETTLE_STATUS
+    from (
+             select SETTLE_STATUS
+             from TRD_BANK_MANUAL_SETTLE_INFO
+             where TRADE_ID = #{tradeId}
+             order by UPDATE_TIME desc
+         )
+    where ROWNUM = 1
+</select>
+
     <resultMap id="trdBondInvestTradeFullResultMap" type="com.joyintech.tams.cfets.trdquery.dto.CfetsTrdBondInvestTradeDto"
                extends="com.joyintech.tams.common.base.dao.TrdProductDealMapper.BaseResultMap">
         <result column="fee_amt"    property="channelFee"   jdbcType="DECIMAL"/>

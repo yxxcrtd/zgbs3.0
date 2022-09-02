@@ -209,7 +209,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                     logger.info("交收-交收日期与平台日不同:{}", cfetsDto.getTradeId() + ":" + cfetsDto.getSettleDate());
                     continue;
                 }
-                if (!StringUtil.equals(cfetsDto.getSettleStatus(), DictCodeListExt3.交收状态_未交收.getValue())) {
+                if (!StringUtil.equals(this.getSettleStatus(cfetsDto.getTradeId()), DictCodeListExt3.交收状态_未交收.getValue())) {
                     logger.info("交收-交收状态状态不是未交收:{}", cfetsDto.getTradeId() + ":" + cfetsDto.getSettleStatusStr());
                     continue;
                 }
@@ -282,7 +282,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                     logger.info("交收失败-交收日期与平台日不同:{}", cfetsDto.getTradeId() + ":" + cfetsDto.getSettleDate());
                     continue;
                 }
-                if (!StringUtil.equals(cfetsDto.getSettleStatus(), DictCodeListExt3.交收状态_未交收.getValue())) {
+                if (!StringUtil.equals(this.getSettleStatus(cfetsDto.getTradeId()), DictCodeListExt3.交收状态_未交收.getValue())) {
                     logger.info("交收失败-交收状态状态不是未交收:{}", cfetsDto.getTradeId() + ":" + cfetsDto.getSettleStatusStr());
                     continue;
                 }
@@ -310,7 +310,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 }
                 //判断勾选记录交收状态是否为“已交收”
                 if(!isInwflFlag && StringUtil.equals(cfetsDto.getSettleDate(), DateUtil.format(platformDateImpl.getSysDate()))
-                        && StringUtil.equals(cfetsDto.getSettleStatus(), DictCodeListExt3.交收状态_已交收.getValue())){
+                        && StringUtil.equals(this.getSettleStatus(cfetsDto.getTradeId()), DictCodeListExt3.交收状态_已交收.getValue())){
                     returnList.add(cfetsDto);
                 }
             }
@@ -347,6 +347,19 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             returnMsg = true;//存在流程中数据
         }
         return returnMsg;
+    }
+
+    /**
+     * 判断选择的交收状态
+     * @param tradeId 原交易编号
+     * @return String 交收状态
+     */
+    private String getSettleStatus(String tradeId) {
+        String settleStatus = cfetsManualSettleMapper.getSettleStatusByTradeId(tradeId);
+        if (StringUtil.isEmpty(settleStatus)) {
+            settleStatus = DictCodeListExt3.交收状态_未交收.getValue();
+        }
+        return settleStatus;
     }
 
     /**
