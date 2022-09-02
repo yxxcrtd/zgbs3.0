@@ -5,7 +5,7 @@
     <logger name="com.ibm.ws.webcontainer.srt.SRTServletResponse" level="OFF" />
     <logger name="com.ibm.ws.webcontainer.servlet.ServletWrapper" level="OFF" />
     <!-- 参数设置 -->
-	<include resource="com/joyintech/framework/logging/logback-base.xml"/>
+	<include resource="logback-base.xml"/>
 	
     <!-- 日志级别 -->
     <root level="${loglevel}">

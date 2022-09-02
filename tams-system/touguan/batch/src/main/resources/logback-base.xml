@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+	<!-- <include resource="org/springframework/boot/logging/logback/base.xml" /> -->
+	<include resource="logback-appender.xml" />
+	<include resource="logback-level.xml" />
+
+    <logger name="com.codingapi.txlcn" additivity="false">
+        <level value="DEBUG"/>
+        <appender-ref ref="txlcn"/>
+        <appender-ref ref="console"/>
+    </logger>
+
+    <logger name="com.joyintech.framework.security.redis" additivity="false">
+        <level value="${loglevel}"/>
+        <appender-ref ref="shiro"/>
+        <appender-ref ref="console"/>
+    </logger>
+</included>
