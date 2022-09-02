@@ -1498,7 +1498,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
         parameters.put("repurchase_date", integratedEntrust.getBackDate());
         parameters.put("expire_year_rate", convertExpireYearRate(integratedEntrust.getEntrustPrice()));
         parameters.put("entrust_prop", integratedEntrust.getEntrustProp());
-        //到期续作
+        //到期续做
         if (IntegratedEntrustUtils.isRepurchaseRenewalSH(integratedEntrust.getEntrustProp(),
                 integratedEntrust.getEntrustBs(), integratedEntrust.getMarket())) {
             //协议回购质权人类型
@@ -1512,12 +1512,17 @@ public class UfxTradeAgent extends TradeAgentDsp {
             //原申请日期
             parameters.put("orig_entrust_date", integratedEntrust.getFirstSettleDate());
         }
-        parameters.put("oppo_agency_name", integratedEntrust.getPropSeatName());
-        parameters.put("agency_no", integratedEntrust.getSellerNo().substring(1, 4));
-        parameters.put("trader_id", integratedEntrust.getSellerNo());
-        parameters.put("oppo_agency", integratedEntrust.getPropSeatNo());
+        parameters.put("oppo_agency_name", integratedEntrust.getDealerName());
+        // yanjianhui 修改于 2022/9/2 15:39 交易商代码段为DealerId字段。此判断有待商榷。
+        if(integratedEntrust.getSellerNo() == null){
+            parameters.put("agency_no", integratedEntrust.getDealerId());
+        }else{
+            parameters.put("agency_no", integratedEntrust.getSellerNo().substring(1, 4));
+        }
+        parameters.put("trader_id", integratedEntrust.getTradeId());
+        parameters.put("oppo_agency", integratedEntrust.getPropDealerId());
         //借用成交标号 处理对方交易员
-        parameters.put("oppo_trader_id", integratedEntrust.getLiaisonTel());
+        parameters.put("oppo_trader_id", integratedEntrust.getPropTradeId());
         if (!Strings.isNullOrEmpty(integratedEntrust.getRemark())) {
             parameters.put("remark", integratedEntrust.getRemark());
         }
