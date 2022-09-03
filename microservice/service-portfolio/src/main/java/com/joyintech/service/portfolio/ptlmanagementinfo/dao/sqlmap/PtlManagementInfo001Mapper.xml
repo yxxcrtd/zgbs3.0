@@ -517,6 +517,7 @@
 		T1.VDATE vdate,
 		T1.MDATE mdate,
 		T2.IS_GUARANTEE isGuarantee,
+		T2.SELF_MANAGEMENT selfManagement,
 		T2.OPEN_TYPE openType,
 		T2.RAISE_TYPE raiseType,
 		T2.INVEST_NATURE investNature,

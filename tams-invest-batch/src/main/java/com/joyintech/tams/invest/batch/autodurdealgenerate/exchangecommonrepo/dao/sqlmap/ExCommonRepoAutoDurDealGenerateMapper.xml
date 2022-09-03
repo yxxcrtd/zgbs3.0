@@ -3,8 +3,13 @@
 <mapper namespace="com.joyintech.tams.invest.batch.autodurdealgenerate.exchangecommonrepo.dao.ExCommonRepoAutoDurDealGenerateMapper">
 
     <select id="selectTrdProductTempDealRevokeData" resultType="com.joyintech.tams.common.base.entity.TrdProductTempDeal">
-        select * from TRD_PRODUCT_TEMP_DEAL
+        select * from TRD_PRODUCT_TEMP_DEAL tptd
         where BUSI_TYPE =#{busiType} and TRADE_DATE =#{batchDate}
+          AND NOT EXISTS (
+                SELECT 1 FROM TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt
+                WHERE tptd.FINPROD_ID =tfpdt.FINPROD_ID AND tfpdt.MDATE =tptd.MDATE
+                  AND tfpdt.IS_CANCEL ='N' AND tfpdt.TRADE_STATUS ='01' AND tfpdt.PS ='T07'
+            )
     </select>
 
 
@@ -87,6 +92,11 @@
         AND T1.IS_CANCEL = 'N' AND T1.PS = 'T01'
         AND T2.PARENT_PORTFOLIO_ID is null AND T2.INVEST_YESORNO = 'Y'
         AND T4.MDATE=#{batchDate} AND T5.TYPE_6 ='H02'
+        AND NOT EXISTS (
+            SELECT 1 FROM TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt
+            WHERE t1.FINPROD_ID =tfpdt.FINPROD_ID AND tfpdt.MDATE =t4.MDATE
+              AND tfpdt.IS_CANCEL ='N' AND tfpdt.TRADE_STATUS ='01' AND tfpdt.PS ='T07'
+        )
     </select>
 
 

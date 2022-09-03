@@ -1038,7 +1038,18 @@ public class TrdFeeCalcService {
             });
         }
         if (DictCodeListExt3.佣金计算方式_按成交编号计算.getValue().equals(commCalMethod)) {
-            return trdDetailDtos;
+        	// GLLCUAT-341:修改成交明细维度计算佣金过程中费用逻辑 modify by fuyongsheng 20220901 start
+			// 按照成交明细编号分组，循环分组信息
+			Map<String, List<TrdDetailDto>> listMap = trdDetailDtos.stream()
+					.collect(Collectors.groupingBy(TrdDetailDto::getTradeId));
+			listMap.forEach((x, y) -> {
+				TrdDetailDto allDetail = new TrdDetailDto();
+				allDetail.setTradeId(x);
+				allDetail = setTrdAmtAll(listMap.get(x), allDetail);
+				res.add(allDetail);
+			});
+			// GLLCUAT-341:修改成交明细维度计算佣金过程中费用逻辑 modify by fuyongsheng 20220901 end
+			// return trdDetailDtos;
         }
         return res;
     }

@@ -15,22 +15,22 @@
         <result column="PORTFOLIO_SERIES" property="portfolioSeries" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
-        PORTFOLIO_ID PORTFOLIO_ID, IS_GUARANTEE IS_GUARANTEE, OPEN_TYPE OPEN_TYPE, RAISE_TYPE RAISE_TYPE, 
-        INVEST_NATURE INVEST_NATURE, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, 
+        PORTFOLIO_ID PORTFOLIO_ID, IS_GUARANTEE IS_GUARANTEE, OPEN_TYPE OPEN_TYPE, RAISE_TYPE RAISE_TYPE,
+        INVEST_NATURE INVEST_NATURE, CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME,
         UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME,PORTFOLIO_SERIES
     </sql>
     <sql id="Sql_All_Data" >
-        select 
+        select
         <include refid="com.joyintech.tams.common.base.dao.PaPtlPortfolioMapper.Base_Column_List" />
         from PA_PTL_PORTFOLIO
     </sql>
     <sql id="Sql_All_Effective_Data" >
-        select 
+        select
         <include refid="com.joyintech.tams.common.base.dao.PaPtlPortfolioMapper.Base_Column_List" />
         from PA_PTL_PORTFOLIO
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
-        select 
+        select
         <include refid="com.joyintech.tams.common.base.dao.PaPtlPortfolioMapper.Base_Column_List" />
         from PA_PTL_PORTFOLIO
         where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
@@ -40,14 +40,14 @@
         where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
     </delete>
     <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.PaPtlPortfolio" >
-        insert into PA_PTL_PORTFOLIO (PORTFOLIO_ID, IS_GUARANTEE, OPEN_TYPE, 
-            RAISE_TYPE, INVEST_NATURE, CREATE_USER, 
-            CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
-            UPDATE_TIME,PORTFOLIO_SERIES)
-        values (#{portfolioId,jdbcType=VARCHAR}, #{isGuarantee,jdbcType=VARCHAR}, #{openType,jdbcType=VARCHAR}, 
-            #{raiseType,jdbcType=VARCHAR}, #{investNature,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, 
-            #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, 
-            #{updateTime,jdbcType=TIMESTAMP},#{portfolioSeries,jdbcType=VARCHAR})
+        insert into PA_PTL_PORTFOLIO (PORTFOLIO_ID, IS_GUARANTEE, OPEN_TYPE,
+                                      RAISE_TYPE, INVEST_NATURE, CREATE_USER,
+                                      CREATE_DEPT, CREATE_TIME, UPDATE_USER,
+                                      UPDATE_TIME,PORTFOLIO_SERIES)
+        values (#{portfolioId,jdbcType=VARCHAR}, #{isGuarantee,jdbcType=VARCHAR}, #{openType,jdbcType=VARCHAR},
+                #{raiseType,jdbcType=VARCHAR}, #{investNature,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR},
+                #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR},
+                #{updateTime,jdbcType=TIMESTAMP},#{portfolioSeries,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.PaPtlPortfolio" >
         insert into PA_PTL_PORTFOLIO
@@ -123,12 +123,12 @@
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.PaPtlPortfolio" >
-        insert into PA_PTL_PORTFOLIO(PORTFOLIO_ID, IS_GUARANTEE, OPEN_TYPE, RAISE_TYPE, INVEST_NATURE, 
-        CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME,PORTFOLIO_SERIES)
-        select PORTFOLIO_ID, IS_GUARANTEE, OPEN_TYPE, RAISE_TYPE, INVEST_NATURE, 
-            CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
-             from PA_PTL_PORTFOLIO
-             where 1 = 1 and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+        insert into PA_PTL_PORTFOLIO(PORTFOLIO_ID, IS_GUARANTEE, OPEN_TYPE, RAISE_TYPE, INVEST_NATURE,
+                                     CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME,PORTFOLIO_SERIES)
+        select PORTFOLIO_ID, IS_GUARANTEE, OPEN_TYPE, RAISE_TYPE, INVEST_NATURE,
+               CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
+        from PA_PTL_PORTFOLIO
+        where 1 = 1 and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.joyintech.tams.common.base.entity.PaPtlPortfolio" >
         update PA_PTL_PORTFOLIO

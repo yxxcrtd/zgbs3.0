@@ -157,6 +157,11 @@ public class PrdSaleParam extends BaseEntity {
     private String isFaceSingleInvestor;
 
     /**
+     * 自主管理计划
+     */
+    private String agencyOriented;
+
+    /**
      * 取得 金融产品代码
      * @return 金融产品代码
      */
@@ -572,5 +577,13 @@ public class PrdSaleParam extends BaseEntity {
 
     public void setIsFaceSingleInvestor(String isFaceSingleInvestor) {
         this.isFaceSingleInvestor = isFaceSingleInvestor;
+    }
+
+    public String getAgencyOriented() {
+        return agencyOriented;
+    }
+
+    public void setAgencyOriented(String agencyOriented) {
+        this.agencyOriented = agencyOriented;
     }
 }

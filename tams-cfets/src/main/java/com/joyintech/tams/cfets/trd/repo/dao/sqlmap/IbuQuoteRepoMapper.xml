@@ -622,6 +622,7 @@
             FROM MST_BOND_CREDIT_RATING
             WHERE GRADE_DATE <![CDATA[<=]]> to_date(#{platDate, jdbcType=VARCHAR}, 'yyyy-MM-dd')
             AND GRADE_ORG_ID !='22'
+            AND O_TYPE = '02'
         ) MBCR
             ON MBCR.O_CODE = fp.FINPROD_MARKET_ID AND MBCR.NUM = 1
 		LEFT JOIN (
@@ -770,6 +771,7 @@
             FROM MST_BOND_CREDIT_RATING
             WHERE GRADE_DATE <![CDATA[<=]]> to_date(#{platDate, jdbcType=VARCHAR}, 'yyyy-MM-dd')
             AND GRADE_ORG_ID !='22'
+            AND O_TYPE = '02'
         ) MBCR
             ON MBCR.O_CODE = fp.FINPROD_MARKET_ID AND MBCR.NUM = 1
 		LEFT JOIN (
@@ -936,6 +938,7 @@
             FROM MST_BOND_CREDIT_RATING
             WHERE GRADE_DATE <![CDATA[<=]]> to_date(#{platDate},'yyyy-MM-dd')
                 and GRADE_ORG_ID !='22'
+                AND O_TYPE = '02'
 		) MBCR
 		    ON MBCR.O_CODE = FIN_PRODUCT.FINPROD_MARKET_ID
 		    AND MBCR.NUM = 1
@@ -1327,6 +1330,7 @@
                 FROM MST_BOND_CREDIT_RATING
                 WHERE GRADE_DATE <![CDATA[<=]]> to_date(#{platDate, jdbcType=VARCHAR},'yyyy-MM-dd')
                     and GRADE_ORG_ID !='22'
+                    AND O_TYPE = '02'
             ) MBCR
                 ON MBCR.O_CODE = fp.FINPROD_MARKET_ID
                 AND MBCR.NUM = 1
@@ -2544,6 +2548,7 @@
             FROM MST_BOND_CREDIT_RATING
             WHERE GRADE_DATE <![CDATA[<=]]> to_date(#{platDate, jdbcType=VARCHAR},'yyyy-MM-dd')
             and GRADE_ORG_ID !='22'
+            AND O_TYPE = '02'
         ) MBCR
             ON MBCR.O_CODE = fp.FINPROD_MARKET_ID AND MBCR.NUM = 1
 		LEFT JOIN (

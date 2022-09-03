@@ -1,21 +1,16 @@
-package com.joyintech.tams.cfets.etr.socket;
+package com.joyintech.tams.position.servive;
 
-import com.joyintech.framework.listener.AppStartupListener;
-import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.JsonUtils;
-import com.joyintech.tams.business.common.pojo.BaseMap;
-import com.joyintech.tams.cfets.etr.bond.dao.WebSocketMapper;
-import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.position.dao.PositionUpdateBalanceMapper;
+import com.joyintech.tams.position.pojo.BaseMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
@@ -51,7 +46,7 @@ public class PositionUpdateBalanceService implements  ApplicationListener<Applic
 
     private static RabbitTemplate rabbitTemplate;
 
-    private static WebSocketMapper webSocketMapper;
+    private static PositionUpdateBalanceMapper positionUpdateBalanceMapper;
 
 
     @Autowired
@@ -61,8 +56,8 @@ public class PositionUpdateBalanceService implements  ApplicationListener<Applic
 
 
     @Autowired
-    public void setWebSocketMapper(WebSocketMapper webSocketMapper) {
-        PositionUpdateBalanceService.webSocketMapper = webSocketMapper;
+    public void setPositionUpdateBalanceMapper(PositionUpdateBalanceMapper positionUpdateBalanceMapper) {
+        PositionUpdateBalanceService.positionUpdateBalanceMapper = positionUpdateBalanceMapper;
     }
 
     public static String QUEUE_POSITION_UPDATE = "queue.position.update.balance";
@@ -77,9 +72,9 @@ public class PositionUpdateBalanceService implements  ApplicationListener<Applic
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
         if(applicationEvent instanceof ContextRefreshedEvent){
             Map<String,Object> param = new HashMap<>();
-            param.put("paraCode","positionMqEnable");
-            String paraValue =webSocketMapper.selectSysParaByCode(param);
-            if(StringUtils.equals(paraValue, DictCodeList.是否_是.getValue())){
+            param.put("paraCode","positionMqUpdateBalanceEnable");
+            String paraValue = positionUpdateBalanceMapper.selectSysParaByCode(param);
+            if(StringUtils.equals(paraValue, "Y")){
                 logger.info("启动头寸余额检测");
                 star();
             }else{
@@ -227,11 +222,11 @@ public class PositionUpdateBalanceService implements  ApplicationListener<Applic
      * @param dataMap
      */
     public static void insertOrUpdate(BaseMap dataMap) {
-        int count = webSocketMapper.select(dataMap);
+        int count = positionUpdateBalanceMapper.select(dataMap);
         if (count == 0){
-            webSocketMapper.insert(dataMap);
+            positionUpdateBalanceMapper.insert(dataMap);
         }else{
-            webSocketMapper.update(dataMap);
+            positionUpdateBalanceMapper.update(dataMap);
         }
     }
 
@@ -239,7 +234,7 @@ public class PositionUpdateBalanceService implements  ApplicationListener<Applic
         if (list != null && !list.isEmpty()){
             Map param = (Map) list.get(0);
             param.put("tableName",tableName);
-            webSocketMapper.deleteFlows(param);
+            positionUpdateBalanceMapper.deleteFlows(param);
         }
         for (Object obj : list){
             BaseMap each = BaseMap.newMap((Map) obj);
@@ -261,7 +256,7 @@ public class PositionUpdateBalanceService implements  ApplicationListener<Applic
                 each.put("CDATE", each.getDate("CDATE"));
                 each.put("CREATE_TIME", each.getDate("CREATE_TIME"));
                 each.put("tableName", tableName);
-                webSocketMapper.insertFlows(each);
+                positionUpdateBalanceMapper.insertFlows(each);
             }
 
         }
