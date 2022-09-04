@@ -93,7 +93,7 @@ public class KCBPUTradeAgent extends TradeAgentDsp {
             //账户登录成功，记录登录成功的账户
             if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
                 logger.info("account {} login success", accountId);
-                KCBPUAccount kcbpuAccount = KCBPUMsgParseHelper.parseAccount(AgentUtil.getQueryListKCBPW(resultBean), accountId);
+                KCBPUAccount kcbpuAccount = KCBPUMsgParseHelper.parseAccount((Map<String, Object>) resultBean.getData(), accountId);
                 resultBean.setData(kcbpuAccount);
                 //保存登录信息
                 addkcbpuAccount(kcbpuAccount);
