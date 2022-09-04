@@ -2,11 +2,14 @@ package com.joyintech.tams.position.servive;
 
 import com.joyintech.tams.position.exception.PositionException;
 import com.joyintech.tams.position.servive.connect.PositionRequest;
+import com.joyintech.tams.position.util.ThreadLocalUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -30,7 +33,9 @@ public class PositionRequestHandle {
      * @throws PositionException
      */
     public  Map<String, Object> send(Object req) throws PositionException {
-        return positionRequest.send(req);
+        Map<String, Object> param = positionRequest.send(req);
+        ThreadLocalUtil.setLocalCache(param);
+        return param;
     }
 
     /**
@@ -73,7 +78,9 @@ public class PositionRequestHandle {
      * @throws PositionException
      */
     public  Map<String, Object> doDeleteByWorkFlowId(String workFlowId, String modelType, String busiType, String ps) throws PositionException {
-        return positionRequest.doDeleteByWorkFlowId(workFlowId,modelType,busiType,ps);
+        Map<String, Object> param = positionRequest.doDeleteByWorkFlowId(workFlowId,modelType,busiType,ps);
+        ThreadLocalUtil.setLocalCache(param);
+        return param;
     }
 
     /**
@@ -86,7 +93,9 @@ public class PositionRequestHandle {
      * @throws PositionException
      */
     public  Map<String, Object> dorevoke(String revokeId, String modelType, String busiType, String ps) throws PositionException {
-        return positionRequest.dorevoke(revokeId,modelType,busiType,ps);
+        Map<String, Object> param = positionRequest.dorevoke(revokeId,modelType,busiType,ps);
+        ThreadLocalUtil.setLocalCache(param);
+        return param;
     }
 
 
@@ -97,7 +106,9 @@ public class PositionRequestHandle {
      * @throws PositionException
      */
     public  Map<String, Object> batchClose(Object req) throws PositionException {
-        return positionRequest.batchClose(req);
+        Map<String, Object> param = positionRequest.batchClose(req);
+        ThreadLocalUtil.setLocalCache(param);
+        return param;
     }
 
     /**
@@ -107,7 +118,9 @@ public class PositionRequestHandle {
      * @throws PositionException
      */
     public  Map<String, Object> batchRevoke(Object req) throws PositionException {
-        return positionRequest.batchRevoke(req);
+        Map<String, Object> param = positionRequest.batchRevoke(req);
+        ThreadLocalUtil.setLocalCache(param);
+        return param;
     }
 
     /**
@@ -138,6 +151,20 @@ public class PositionRequestHandle {
      */
     public  Map<String, Object> getBatchLog(Object req) throws PositionException {
         return  positionRequest.getBatchLog(req);
+    }
+
+    /**
+     *
+     * @return
+     * @throws PositionException
+     */
+    public  Map<String, Object> threadRollAll() throws PositionException {
+        ArrayList<ArrayList<String>> allist = ThreadLocalUtil.getTarget();
+        for(ArrayList<String> slist:allist){
+            roll(slist.get(0),slist.get(1),"");
+        }
+        ThreadLocalUtil.cleanLocalCache();
+        return null;
     }
 
 }

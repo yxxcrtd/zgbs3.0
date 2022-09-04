@@ -18,6 +18,7 @@ import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +88,10 @@ public class CfetsManualSettleController extends BaseController {
     @PostMapping("doManualSettle")
     public Message<AjaxResult> doManualSettle(@RequestBody CfetsManualSettleRequest cfetsRequest, BindingResult br) {
 
+        AjaxResult ajaxResult = cfetsManualSettleService.checkManualSettleSave(cfetsRequest, br);
+        if (ajaxResult != null && CollectionUtils.isNotEmpty(ajaxResult.getErrorList())) {
+            return new Message<AjaxResult>().success().setData(ajaxResult);
+        }
         List<CfetsManualSettleDto> dtoList = cfetsRequest.getSelectedItem();
         //保存
         ProcessParameter<CfetsManualSettleDto> processParameter = new ProcessParameter<>();

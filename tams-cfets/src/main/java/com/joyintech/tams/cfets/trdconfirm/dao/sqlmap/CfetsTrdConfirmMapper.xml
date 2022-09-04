@@ -2537,11 +2537,9 @@
         <if test="secManageAcctId != null and secManageAcctId != ''">
             and reg.sec_manage_acct_id = #{secManageAcctId,jdbcType=VARCHAR}
         </if>
-        <!--        <if test="yield != null">-->
-        <!--            and to_char(reg.yield,'FM990.9999')=to_char(#{yield},'FM990.9999')-->
-        <!--        </if>-->
-        <if test="price != null">
-            and to_char(reg.UNIT_CPRICE,'FM990.9999')=to_char(#{price},'FM990.9999')
+        <if test="price != null and  yield != null">
+            and ( to_char(reg.UNIT_CPRICE,'FM990.9999')=to_char(#{price},'FM990.9999')
+                    or to_char(reg.yield,'FM990.999999')=to_char(#{yield},'FM990.999999') )
         </if>
         <if test="faceValue != null">
             and reg.face_value=#{faceValue}

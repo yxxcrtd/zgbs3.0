@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+	<!-- 读取spring.application.name中的属性来生成日志文件名 -->
+	<springProperty scope="context" name="springAppName" source="spring.application.name" defaultValue="demo"/>
+
+	<property name="CONSOLE_LOG_PATTERN" value="[%highlight(%-5level)] %blue(%d{HH:mm:ss.SSS}) [%boldYellow(%thread)]%cyan(%file:%line) %X{user} | %X{traceId} %boldGreen(%logger{60}) - %highlight(%msg) %n"/>
+	<property name="FILE_LOG_PATTERN" value="[%-5level]%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %X{user} | %X{traceId} %logger{36}:[%L] - %msg%n"/>
+	<!-- ch.qos.logback.core.ConsoleAppender 控制台输出 -->
+	<appender name="sync-console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${CONSOLE_LOG_PATTERN}</pattern>
+		</encoder>
+	</appender>
+	<appender name="console" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="sync-console" />
+		<includeCallerData>true</includeCallerData>
+	</appender>
+
+	<!-- ch.qos.logback.core.rolling.RollingFileAppender 文件日志输出 -->
+	<appender name="sync-file"
+		class="com.joyintech.framework.logging.appender.JoyinRollingFileAppender">
+		<File>${logfolder}/${springAppName}/daily/daily.log</File>
+		<append>true</append>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>${loglevel}</level>
+		</filter>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<FileNamePattern>${logfolder}/${springAppName}/daily/%d{yyyy-MM-dd}/daily-%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+			<MaxHistory>365</MaxHistory>
+			<maxFileSize>200MB</maxFileSize>
+			<totalSizeCap>50GB</totalSizeCap>
+		</rollingPolicy>
+		<encoder>
+			<charset>utf-8</charset>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+		</encoder>
+	</appender>
+	<appender name="file" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="sync-file" />
+		<includeCallerData>true</includeCallerData>
+	</appender>
+
+	<appender name="sync-error"
+		class="com.joyintech.framework.logging.appender.JoyinRollingFileAppender">
+		<File>${logfolder}/${springAppName}/error/error.log</File>
+		<append>true</append>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>${logfolder}/${springAppName}/error.%i.log.zip</fileNamePattern>
+			<minIndex>1</minIndex>
+			<maxIndex>3</maxIndex>
+		</rollingPolicy>
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<maxFileSize>100MB</maxFileSize>
+		</triggeringPolicy>
+		<encoder>
+			<charset>utf-8</charset>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+		</encoder>
+	</appender>
+	<appender name="error" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="sync-error" />
+		<includeCallerData>true</includeCallerData>
+	</appender>
+
+	<!-- shiro 日志配置 -->
+	<appender name="sync-shiro" class="com.joyintech.framework.logging.appender.JoyinRollingFileAppender">
+		<file>${logfolder}/${springAppName}/shiro/shiro.log</file>
+		<append>true</append>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>${loglevel}</level>
+		</filter>
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<FileNamePattern>${logfolder}/${springAppName}/shiro/%d{yyyy-MM-dd}/shiro-%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+			<MaxHistory>365</MaxHistory>
+			<maxFileSize>100MB</maxFileSize>
+			<totalSizeCap>10GB</totalSizeCap>
+		</rollingPolicy>
+		<encoder>
+			<charset>utf-8</charset>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+		</encoder>
+	</appender>
+	<appender name="shiro" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="sync-shiro" />
+		<includeCallerData>true</includeCallerData>
+	</appender>
+
+	<!-- 分布式事务日志配置 -->
+	<appender name="sync-txlcn" class="com.joyintech.framework.logging.appender.JoyinRollingFileAppender">
+		<file>${logfolder}/${springAppName}/txlcn/tc.log</file>
+		<append>true</append>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>DEBUG</level>
+		</filter>
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${logfolder}/${springAppName}/txlcn/%d{yyyy-MM-dd}/tc-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+			<MaxHistory>100</MaxHistory>
+			<maxFileSize>10MB</maxFileSize>
+			<totalSizeCap>1GB</totalSizeCap>
+		</rollingPolicy>
+		<encoder>
+			<charset>utf-8</charset>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+		</encoder>
+	</appender>
+	<appender name="txlcn" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="sync-txlcn" />
+		<includeCallerData>true</includeCallerData>
+	</appender>
+
+</included>

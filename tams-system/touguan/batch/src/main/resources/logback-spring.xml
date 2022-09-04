@@ -4,7 +4,7 @@
     <springProperty scope="context" name="logfolder" source="log.path"/>
 
     <!-- 参数设置 -->
-	<include resource="com/joyintech/framework/logging/logback-base.xml"/>
+	<include resource="logback-base.xml"/>
 	
     <!-- 日志级别 -->
     <root level="${loglevel}">

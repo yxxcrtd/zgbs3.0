@@ -1,0 +1,4 @@
+--表结构变更
+
+alter table PRD_SALE_PARAM add AGENCY_ORIENTED varchar2(50);
+comment on column PRD_SALE_PARAM.AGENCY_ORIENTED is '是否面向非机构投资者';

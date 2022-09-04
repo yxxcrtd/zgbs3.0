@@ -50,7 +50,8 @@ public class PositionRequest {
      * @param errorMsg
      */
     public  void roll(String revokeId, String modelType, String errorMsg) {
-        positionMqRequest.roll(revokeId,modelType,errorMsg);
+//        positionMqRequest.roll(revokeId,modelType,errorMsg);
+        positionHttpRequest.roll(revokeId,modelType,errorMsg);
     }
 
     /**
@@ -60,7 +61,8 @@ public class PositionRequest {
      * @param errorMsg
      */
     public  void sendRevoke(String revokeId, String modelType, String errorMsg) {
-        positionMqRequest.sendRevoke(revokeId,modelType,errorMsg);
+//        positionMqRequest.sendRevoke(revokeId,modelType,errorMsg);
+        positionHttpRequest.sendRevoke(revokeId,modelType,errorMsg);
     }
 
     /**

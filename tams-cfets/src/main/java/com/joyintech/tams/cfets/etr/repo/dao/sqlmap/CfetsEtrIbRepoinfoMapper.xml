@@ -393,6 +393,7 @@
         NUM, O_CODE, GRADE_RESULT
         FROM MST_BOND_CREDIT_RATING
         WHERE GRADE_DATE &lt;= to_date(#{sysDate},'yyyy-MM-dd') and O_TYPE = '02'
+        AND O_TYPE = '02'
         and GRADE_ORG_ID !='22') MBCR
         ON MBCR.O_CODE = FIN_PRODUCT.FINPROD_MARKET_ID AND MBCR.NUM = 1
         LEFT JOIN ASSET_DAILY_INFO atd
@@ -759,6 +760,7 @@
 		FROM MST_BOND_CREDIT_RATING
 		WHERE GRADE_DATE &lt;= to_date(#{sysDate},'yyyy-MM-dd')
 		and GRADE_ORG_ID !='22'
+        AND O_TYPE = '02'
 		) MBCR
 		ON MBCR.O_CODE = FIN_PRODUCT.FINPROD_MARKET_ID
 		AND MBCR.NUM = 1
@@ -1338,6 +1340,7 @@
                 FROM MST_BOND_CREDIT_RATING
                 WHERE GRADE_DATE <![CDATA[<=]]> to_date(#{plateDate}, 'yyyy-MM-dd')
                 AND GRADE_ORG_ID !='22'
+                AND O_TYPE = '02'
             ) MBCR
             ON MBCR.O_CODE = FIN_PRODUCT.FINPROD_MARKET_ID AND MBCR.NUM = 1
             WHERE 1=1

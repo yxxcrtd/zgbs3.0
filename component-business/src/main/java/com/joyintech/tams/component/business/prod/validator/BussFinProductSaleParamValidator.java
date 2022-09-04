@@ -13,6 +13,8 @@ package com.joyintech.tams.component.business.prod.validator;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import org.springframework.stereotype.Component;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.BeanValidator;
@@ -142,6 +144,10 @@ public class BussFinProductSaleParamValidator implements BeanValidator {
                     resultList.add(new ValidMessage("singleInvestorholdingMax", "请输入0-100间数值"));
                 }
             }
+            if (StringUtil.isEmpty(bussFinProductSaleParamDto.getAgencyOriented())) {
+                resultList.add(new ValidMessage("agencyOriented", "请输入是否面向非机构投资者"));
+            }
+
 //            //净值型和货币型的限制
 //           if(StringUtil.equals(bussFinProductSaleParamDto.getPageId(), "FinNetValueProductBuild002")){
 //                //销售渠道
