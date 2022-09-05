@@ -273,7 +273,26 @@ public class IbuQuoteRepoService extends BaseService {
         }
         int pageNo = dto.getPageMode() == null ? 1 : dto.getPageMode().getPageNo();
         int pageSize = dto.getPageMode() == null ? 10 : dto.getPageMode().getPageSize();
-        return super.queryForPage(pageNo, pageSize, () -> cfetsIbuQuoteRepoMapper.listEntrust(pageParam));
+        Page<CfetsRepoDealEntrustOrderDto> page = super.queryForPage(pageNo, pageSize, () -> cfetsIbuQuoteRepoMapper.listEntrust(pageParam));
+        List<RepoEntrustDto> results = new ArrayList<>();
+        // 查询质押券信息
+        if (page != null && CollectionUtils.isNotEmpty(page.getRoot())
+                && StringUtil.equals(CacheUtil.getSysParam("repo_pledge_model"), "02")) {
+            page.getRoot().forEach(item -> {
+                List<RepoEntrustPledgeDto> repoEntrustPledgeDtos = cfetsIbuQuoteRepoMapper.listRepoPledges(item.getEntrustId());
+                if (CollectionUtils.isNotEmpty(repoEntrustPledgeDtos)) {
+                    item.setRepoEntrustPledgeDtos(repoEntrustPledgeDtos);
+                }
+                RepoEntrustDto entrustDto = JsonUtils.json2Object(JsonUtils.object2Json(item), RepoEntrustDto.class);
+                results.add(entrustDto);
+            });
+        }
+        Page<RepoEntrustDto> resultPage = new Page<>();
+        BeanUtil.copyPropertiesIgnoreNull(page, resultPage, "root");
+        if (CollectionUtils.isNotEmpty(results)) {
+            resultPage.setRoot(results);
+        }
+        return resultPage;
     }
 
     /**
@@ -295,6 +314,16 @@ public class IbuQuoteRepoService extends BaseService {
         }
         List<RepoEntrustDto> result = new ArrayList<>();
         List<CfetsRepoDealEntrustOrderDto> list = cfetsIbuQuoteRepoMapper.listEntrust(pageParam);
+        // 查询质押券信息
+        if (CollectionUtils.isNotEmpty(list)
+                && StringUtil.equals(CacheUtil.getSysParam("repo_pledge_model"), "02")) {
+            list.forEach(item -> {
+                List<RepoEntrustPledgeDto> repoEntrustPledgeDtos = cfetsIbuQuoteRepoMapper.listRepoPledges(item.getEntrustId());
+                if (CollectionUtils.isNotEmpty(repoEntrustPledgeDtos)) {
+                    item.setRepoEntrustPledgeDtos(repoEntrustPledgeDtos);
+                }
+            });
+        }
         list.forEach(item -> {
             RepoEntrustDto entrustDto = JsonUtils.json2Object(JsonUtils.object2Json(item), RepoEntrustDto.class);
             result.add(entrustDto);
@@ -448,7 +477,7 @@ public class IbuQuoteRepoService extends BaseService {
     /**
      * 添加指令联动添加质押券
      *
-     * @param cfetsRepoDealQuoteRequest 查询条件
+     * @param request 查询条件
      * @return 初始化数据
      */
     public List<RepoEntrustPledgeDto> ptlAllocationAddAfter(RepoAutoAllocationRequest request) {
@@ -872,7 +901,7 @@ public class IbuQuoteRepoService extends BaseService {
     /**
      * 查询交易执行明细信息
      *
-     * @param entrustId 指令代码
+     * @param param 指令代码
      * @return java.util.List<com.joyintech.tams.cfets.bankuplink.repo.dto.DealTransactionDetailsDto>
      * @author jiangpeng
      * @date 2021/12/20 14:31
@@ -880,9 +909,6 @@ public class IbuQuoteRepoService extends BaseService {
     public Page<RepoDealTransactionDetailsDto> listDealTransactionDetails(Map<String, Object> param) {
         String loginUserId = LoginUserUtil.getUserName();
         param.put("rolePos03", DictCodeListExt2.角色岗位_交易处长.getValue());
-        if ("admin".equals(loginUserId)) {
-//            loginUserId = "jp";//TODO 测试写死登录用户 提交代码时修改
-        }
         param.put("loginUserId", loginUserId);
         int pageNo = 1;
         int pageSize = 10;

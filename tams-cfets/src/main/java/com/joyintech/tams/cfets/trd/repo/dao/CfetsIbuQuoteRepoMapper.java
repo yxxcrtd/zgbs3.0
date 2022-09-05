@@ -46,6 +46,14 @@ public interface CfetsIbuQuoteRepoMapper {
     List<CfetsRepoDealEntrustOrderDto> listEntrust(Map<String, Object> param);
 
     /**
+     * 质押券查询(指令列表查询)
+     *
+     * @param param 条件
+     * @return 指令列表
+     */
+    List<RepoEntrustPledgeDto> listRepoPledges(@Param("entrustId")String entrustId);
+
+    /**
      * 查询质押券信息
      *
      * @param param 条件
