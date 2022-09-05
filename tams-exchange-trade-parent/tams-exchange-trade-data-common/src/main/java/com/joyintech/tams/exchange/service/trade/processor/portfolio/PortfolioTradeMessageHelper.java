@@ -2,16 +2,14 @@ package com.joyintech.tams.exchange.service.trade.processor.portfolio;
 
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.investment.PortfolioTradeMessage;
 import com.joyintech.tams.exchange.common.constant.ErrorCode;
 import com.joyintech.tams.exchange.common.constant.InstructionPs;
-import com.joyintech.tams.exchange.common.db.domain.EntrustInterface;
-import com.joyintech.tams.exchange.common.db.domain.Instruction;
-import com.joyintech.tams.exchange.common.db.domain.PortfolioDetail;
-import com.joyintech.tams.exchange.common.db.domain.Trade;
+import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.enums.exchange.PortfolioDetailBusiTypeEnum;
 import com.joyintech.tams.exchange.common.enums.invest.InvestAssetTypeEnum;
 import com.joyintech.tams.exchange.common.request.PositionInstructionRequest;
@@ -22,6 +20,7 @@ import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailByManualMapp
 import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailMapper;
 import com.joyintech.tams.exchange.datacommon.db.service.TradeService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,10 +79,15 @@ public class PortfolioTradeMessageHelper {
 
         //2、保存 成交组合分配
         logger.info("保存成交组合分配");
-        for (Map.Entry<String, PortfolioDetail> entry : portfolioDetailMap.entrySet()) {
-            PortfolioDetail value = entry.getValue();
-            value.setBusiId(trade.getId());
-            portfolioDetailMapper.insert(value);
+//        for (Map.Entry<String, PortfolioDetail> entry : portfolioDetailMap.entrySet()) {
+//            PortfolioDetail value = entry.getValue();
+//            value.setBusiId(trade.getId());
+//            portfolioDetailMapper.insert(value);
+//        }
+        savePortfolioDetail(portfolioDetailMap, entrust);
+
+        if (MapUtils.isEmpty(portfolioDetailMap)) {
+            return portfolioTradeMessages;
         }
 
         //3、查询成交对应委托下单的组合分配
@@ -145,10 +149,15 @@ public class PortfolioTradeMessageHelper {
 
         //2、保存 委托组合分配
         logger.info("构建下单组合分配：保存 委托组合分配，【instructionId={}】,【entrustId={}】", instructionClone.getEntrustId(), entrust.getId());
-        for (Map.Entry<String, PortfolioDetail> entry : portfolioDetailMap.entrySet()) {
-            PortfolioDetail value = entry.getValue();
-            value.setBusiId(entrust.getId());
-            portfolioDetailMapper.insert(entry.getValue());
+//        for (Map.Entry<String, PortfolioDetail> entry : portfolioDetailMap.entrySet()) {
+//            PortfolioDetail value = entry.getValue();
+//            value.setBusiId(entrust.getId());
+//            portfolioDetailMapper.insert(entry.getValue());
+//        }
+        savePortfolioDetail(portfolioDetailMap, entrust);
+
+        if (MapUtils.isEmpty(portfolioDetailMap)) {
+            return calculateResponses;
         }
 
         //3、组装委托组合分配
@@ -212,7 +221,7 @@ public class PortfolioTradeMessageHelper {
 
         //3、保存 撤销组合分配
         logger.info("构建撤单组合分配：保存 委托组合分配，【instructionId={}】,【entrustId={}】", entrustId, entrust.getId());
-        orderDetails.forEach(o -> {
+        for (PortfolioDetail o : orderDetails) {
             o.setBusiId(entrust.getId());
             o.setInstructionId(entrustId);
 
@@ -224,10 +233,15 @@ public class PortfolioTradeMessageHelper {
                 o.setTargetAmt(o.getTargetAmt().subtract(tradeAmt));
             }
 
+            List<PortfolioDetail> details = selectPortfolioDetail(o);
+            if (CollectionUtils.isNotEmpty(details)) {
+                break;
+            }
+
             portfolioDetailMapper.insert(o);
 
             cancelDetails.add(o);
-        });
+        }
 
         //4、组装委托组合分配
         logger.info("构建撤单组合分配：组装委托组合分配，【instructionId={}】,【entrustId={}】", entrustId, entrust.getId());
@@ -260,5 +274,29 @@ public class PortfolioTradeMessageHelper {
         return calculateResponses;
     }
 
+
+    private void savePortfolioDetail(Map<String, PortfolioDetail> portfolioDetailMap, EntrustInterface entrust) {
+        for (Map.Entry<String, PortfolioDetail> entry : portfolioDetailMap.entrySet()) {
+            PortfolioDetail value = entry.getValue();
+            value.setBusiId(entrust.getId());
+
+            List<PortfolioDetail> details = selectPortfolioDetail(value);
+            if (CollectionUtils.isNotEmpty(details)) {
+                portfolioDetailMap.clear();
+                return;
+            }
+
+            portfolioDetailMapper.insert(entry.getValue());
+        }
+    }
+
+    private List<PortfolioDetail> selectPortfolioDetail(PortfolioDetail value) {
+        PortfolioDetailExample example = new PortfolioDetailExample();
+        PortfolioDetailExample.Criteria criteria = example.createCriteria();
+        criteria.andBusiIdEqualTo(value.getBusiId());
+        criteria.andBusiTypeEqualTo(value.getBusiType());
+        criteria.andPortfolioIdEqualTo(value.getPortfolioId());
+        return portfolioDetailMapper.selectByExample(example);
+    }
 
 }
