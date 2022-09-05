@@ -235,6 +235,9 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
     @Autowired
     private BasRiskMathCommService basRiskMathCommService;
 
+    @Autowired
+    private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
+
 
     /**
      * {@inheritDoc}
@@ -1009,6 +1012,11 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         tempParamMap.put("psT03", DictCodeList.交易方向_行权_回售.getValue());
         tempParamMap.put("psT39", DictCodeList.交易方向_行权_赎回.getValue());
         SecInfoModelDto secInfoModelDto = etrExchangeTradeSecRepoMapper.getSecInfoModel(tempParamMap);
+        // 根据资产代码查询计息基础(交易市场和发行人)
+        FinCashCalcRule finCashCalcRule = joyinbusinessCommonMapper.selectBasisByFinprodId(finprodId, DateUtil.platDateFromCache());
+        if (StringUtil.isNotEmpty(finCashCalcRule) && StringUtil.isNotEmpty(finCashCalcRule.getMarketBasis())) {
+            secInfoModelDto.setBasis(finCashCalcRule.getMarketBasis());
+        }
         SecInfoModel secInfoModel = toSecInfoModel(secInfoModelDto);
         if (secInfoModelDto != null && secInfoModelDto.getStartDate() != null
                 && DateUtil.compareTo(secInfoModelDto.getStartDate(), settleDate) > 0) {
