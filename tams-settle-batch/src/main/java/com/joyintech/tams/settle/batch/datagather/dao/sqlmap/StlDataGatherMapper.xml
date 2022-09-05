@@ -309,6 +309,7 @@
 		AND std.APPLY_TRADE_ID = stdsq.CJBH-->
 		AND std.VDATE = stdsq.VDATE
 		AND std.CJBH = stdsq.CJBH
+		AND stdsq.PS = 'T01'
 		<!--ZGTFCP-1317:修改查询到期数据条件 modify by fuyongsheng 20220318 end-->
 		INNER JOIN
 		<!--GNS-889:使用首期成交编号 modify by fuyongsheng 20220219 start-->
