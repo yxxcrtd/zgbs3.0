@@ -125,11 +125,11 @@ public abstract class StlDataGatherReader extends BaseReader<InvestTradeReaderDt
                 if (CollectionUtils.isNotEmpty(value)) {
                     SettleTransDataDto settleTransDataDtoInit = value.get(0);
                     BeanUtil.copyPropertiesIgnoreNull(settleTransDataDto, settleTransDataDtoInit);
-                    settleTransDataDto.setCpriceAmt(settleTransDataDtos.stream().map(item -> item.getCpriceAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
-                    settleTransDataDto.setShareAmt(settleTransDataDtos.stream().map(item -> item.getShareAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
-                    settleTransDataDto.setIntAmt(settleTransDataDtos.stream().map(item -> item.getIntAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
-                    settleTransDataDto.setFpriceAmt(settleTransDataDtos.stream().map(item -> item.getFpriceAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
-                    settleTransDataDto.setTradeAmt(settleTransDataDtos.stream().map(item -> item.getTradeAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                    settleTransDataDto.setCpriceAmt(value.stream().map(item -> item.getCpriceAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                    settleTransDataDto.setShareAmt(value.stream().map(item -> item.getShareAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                    settleTransDataDto.setIntAmt(value.stream().map(item -> item.getIntAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                    settleTransDataDto.setFpriceAmt(value.stream().map(item -> item.getFpriceAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                    settleTransDataDto.setTradeAmt(value.stream().map(item -> item.getTradeAmt()).reduce(BigDecimal.ZERO, BigDecimal::add));
                     if ((null != settleTransDataDto.getIntAmt() || settleTransDataDto.getIntAmt().compareTo(BigDecimal.ZERO) != 0)
                             && settleTransDataDto.getIntAmt().compareTo(settleTransDataDto.getFpriceAmt()) != 0) {
                         if (DateUtil.compareDate(settleTransDataDtoInit.getMdate(), settleTransDataDtoInit.getMdate2()) == 0) {
