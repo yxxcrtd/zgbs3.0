@@ -38,7 +38,6 @@ import com.joyintech.service.bankuplink.common.dto.TrdBondInvestTradeDto;
 import com.joyintech.service.bankuplink.common.service.CfetsQuotedCommonService;
 import com.joyintech.system.base.dao.SysUploadFileInfoMapper;
 import com.joyintech.system.base.entity.SysUploadFileInfo;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
 import com.joyintech.tams.cfets.manualsettle.dto.PortIntFenPeiInfoDto;
 import com.joyintech.tams.cfets.trd.bond.service.CfetsBondDealQuotedPrice004Service;
@@ -104,6 +103,7 @@ import com.joyintech.tams.invest.trade.bond.dto.BaseEtrInvestInfoDto;
 import com.joyintech.tams.invest.trade.bond.dto.SecCpriceInfoDto;
 import com.joyintech.tams.invest.trade.bond.dto.TrdBondInvestTradeCSTPDto;
 import com.joyintech.tams.invest.trade.common.service.TradeCommonService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -362,6 +362,12 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
 
     @Autowired
     private CfetsTrdBondFirstSub002Service cfetsTrdBondFirstSub002Service;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     // 交易份额小数保留位数
     private int decimalPlaces_4 = 4;
@@ -1120,13 +1126,12 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
             trdProductDeal.setUpdateUser(finProductTradeDto.getUpdateUser());
 
             //          一级投标信息不为空
-            if(StringUtil.isNotEmpty(entity.getBondFirstSign())){
+            if (StringUtil.isNotEmpty(entity.getBondFirstSign())) {
                 baseTradeProductDealDto.setBondFirstSign(entity.getBondFirstSign());
             }
             String tradeId = trdProductDeal.getTradeId();
             trdProductDeal.setTradeId(entity.getTotleTradeId()); // 让生成的组合流水的tradeId是汇总表的值
             baseTradeCommExecute(finProductTradeDto);
-
 
 
             // 调用投管接口 add by renping 20190205 start
@@ -1139,10 +1144,10 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
             investInterfCommDto.setTrdProductDealAdd(baseTradeProductDealDto.getTrdProductDealAdd());
             if (!StringUtil.isEmptyList(baseTradeProductDealDto.getStlPayOrdersList())) {
                 investInterfCommDto.setStlPayOrders(
-                    baseTradeProductDealDto.getStlPayOrdersList().get(0));
+                        baseTradeProductDealDto.getStlPayOrdersList().get(0));
             }
             investInterfCommDto.setTradeFeeDetaillist(
-                baseTradeProductDealDto.getTrdTradeFeeDetailList());
+                    baseTradeProductDealDto.getTrdTradeFeeDetailList());
             investInterfCommService.doInvestInterf(investInterfCommDto);
             // 调用投管接口 add by renping 20190205 end
             trdProductDeal.setTradeId(tradeId);
@@ -1162,7 +1167,7 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
                 }
 
             }
-            TrdBondInvestTradeDto bondDto=new  TrdBondInvestTradeDto();
+            TrdBondInvestTradeDto bondDto = new TrdBondInvestTradeDto();
             BeanUtil.copyPropertiesIgnoreNull(bondDto, baseTradeProductDealDto);
             bondDto.setTotleTradeId(cetradeid);
             bondDto.setFinprodId(entity.getFinprodId());
@@ -1189,21 +1194,21 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
         }
         params.put("bizCode", bizCode);
         params.put("updateUser", SecurityUtil.getLoginUser().getUserName());
-        if(StringUtil.isNotEmpty(settleRemark)){
-            params.put("revokeReason", entity.getRevokeReason()==null?settleRemark :"交易撤销:"+ entity.getRevokeReason()+settleRemark);
-        }else if(StringUtil.isNotEmpty(entity.getRevokeReason())){
-            params.put("revokeReason", "交易撤销:"+ entity.getRevokeReason());
+        if (StringUtil.isNotEmpty(settleRemark)) {
+            params.put("revokeReason", entity.getRevokeReason() == null ? settleRemark : "交易撤销:" + entity.getRevokeReason() + settleRemark);
+        } else if (StringUtil.isNotEmpty(entity.getRevokeReason())) {
+            params.put("revokeReason", "交易撤销:" + entity.getRevokeReason());
         }
-        restTemplate.postForObject(ServiceApplication.TRADE_SERVICE_NAME + "/common/trdcommonbase/doRevokeComplete?", params,String.class);
+        restTemplate.postForObject(ServiceApplication.TRADE_SERVICE_NAME + "/common/trdcommonbase/doRevokeComplete?", params, String.class);
 
         //basRiskMathCommService.insert(entity.getRiskTrialRetDto(), entity.getTotleTradeId());
 
         // 调用基础组件.【交易报送组件】删除交易报送信息
-        restTemplate.postForObject(ServiceApplication.TRADE_SERVICE_NAME + "/common/trdcommonbase/deleteRepTrade",Arrays.asList(entity.getTotleTradeId()), Boolean.class);
+        restTemplate.postForObject(ServiceApplication.TRADE_SERVICE_NAME + "/common/trdcommonbase/deleteRepTrade", Arrays.asList(entity.getTotleTradeId()), Boolean.class);
 
         //撤销数据为登记时，将登记数据置为已撤销。删除下行匹配关系表数据
         RegFinProductDealTotal regTotal = cfetsTrdQueryMapper.selectRegTotalInfoById(bizCode);
-        if(null!=regTotal){
+        if (null != regTotal) {
             String remark = StringUtil.isEmpty(regTotal.getRemark()) ? "" : regTotal.getRemark();
             if (StringUtil.isNotBlank(remark)) {
                 remark = remark + "\n" + (settleRemark == null ? "" : settleRemark) + "交易撤销：" + entity.getRevokeReason();
@@ -1218,8 +1223,8 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
         String exeId = cfetsTrdQueryMapper.seleteByTrdId(bizCode);
         cfetsTrdConfirmMapper.deleteByTrdId(bizCode);
 
-       //发送头寸
-        if(isNeedDealPosition) {
+        //发送头寸
+        if (isNeedDealPosition) {
             String ps = entity.getPs();
             String busiType = StringUtil.EMPTY;
             if (StringUtil.equals(ps, BussinessDictCodeList.交易方向_行权回售.getValue())) {
@@ -1231,11 +1236,11 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
                 busiType = DictCodeListExt3.头寸业务类型_现券交易.getValue();
             }
             if (isRevoke) {
-                PositionHttpRequest.dorevoke(bizCode, DictCodeListExt1.子系统代码_交易.getValue(), busiType, ps);
+                positionRequestHandle.dorevoke(bizCode, DictCodeListExt1.子系统代码_交易.getValue(), busiType, ps);
             }
 
-            // PositionHttpRequest.deleteMethod(bizCode,DictCodeListExt1.子系统代码_交易.getValue(),"Bond001");
-        }else{
+            // positionRequestHandle.deleteMethod(bizCode,DictCodeListExt1.子系统代码_交易.getValue(),"Bond001");
+        } else {
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("totleTradeId", totleTradeId);
             paramMap.put("tradeStatus", BussinessDictCodeList.银行间上行报价状态_已撤销.getValue());
@@ -1249,7 +1254,7 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
             cfetsTrdQueryMapper.updateInterfTradSecdealByTradeId(paramMap);
         }
         TrdBondInvestTradeDto tradeDto = new TrdBondInvestTradeDto();
-        BeanUtil.copyPropertiesIgnoreNull(tradeDto,entity);
+        BeanUtil.copyPropertiesIgnoreNull(tradeDto, entity);
         tradeDto.setTrdBondInvestTradeDtoList(list);
         return tradeDto;
     }

@@ -12,7 +12,6 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.*;
@@ -30,6 +29,7 @@ import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.MinPirceDto;
 import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.MinTrdUnitLimitDto;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -86,6 +86,12 @@ public class EtrCreditProtectionCertificateController extends BaseController {
     public static final String ENTRUST_RECORD_MODIFY = "modify";
     @Autowired
     ExchangeEntrustRdsCommonAop exchangeEntrustRdsCommonAop;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     @ApiOperation(value = "场内现券下单参数", notes = "场内现券下单参数")
     @PostMapping("/getPageParams")
@@ -716,7 +722,7 @@ public class EtrCreditProtectionCertificateController extends BaseController {
                 }catch (Exception e) {
                     for(EtrCreditProtectionCertificateApplyRequest etrExchangeTradeSaveSecRepoRequest :etrExchangeTrade001DtoList) {
                         logger.warn("场内交易多组合指令头寸发送失败，EntrustId:{},PositionSeqno:{}", etrExchangeTradeSaveSecRepoRequest.getEntrustId(), etrExchangeTradeSaveSecRepoRequest.getPositionSeqno().toString());
-                        PositionHttpRequest.sendRevoke(etrExchangeTradeSaveSecRepoRequest.getPositionSeqno().toString(), "ETR", "场内交易多组合指令头寸发送失败");
+                        positionRequestHandle.sendRevoke(etrExchangeTradeSaveSecRepoRequest.getPositionSeqno().toString(), "ETR", "场内交易多组合指令头寸发送失败");
                     }
 //                    //撤销风险预占
 //                    riskEtrExchangeTrade001DtoList.stream().forEach(itemTemp->{

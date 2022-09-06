@@ -3,7 +3,6 @@ package com.joyintech.tams.exchange.service.trade.position.service;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.joyintech.framework.util.*;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.service.TamsBusinessCommonService;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.exchange.common.bean.OrderPlaceBean;
@@ -24,6 +23,7 @@ import com.joyintech.tams.exchange.service.trade.position.bean.PositionRequestBa
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeCommonervice;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeOtherCommonService;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -65,6 +65,12 @@ public class PositionRequestServiceInstructionRequest {
     private TamsBusinessCommonService tamsBusinessCommonService;
 
     /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
+
+    /**
      * Instruction 请求对象使用
      */
     public void sendRequest(PositionInstructionRequest entity, String busiAct, String decisionAct, String systemAct) {
@@ -103,7 +109,7 @@ public class PositionRequestServiceInstructionRequest {
         } else {
             return;
         }
-        PositionHttpRequest.send(resultMap);
+        positionRequestHandle.send(resultMap);
     }
 
     /**

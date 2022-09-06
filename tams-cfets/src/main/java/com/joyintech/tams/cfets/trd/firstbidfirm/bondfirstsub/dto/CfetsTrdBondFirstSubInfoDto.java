@@ -14,6 +14,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 一级申购信息 页面展示及提交用
@@ -120,6 +121,10 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
     private CfetsEtribdoRiskcalResponse riskcalResponse;
 
     private String rskApproval;
+    /**
+     * 头寸返回值记录,用于回滚头寸数据
+     */
+    List<Map<String, Object>> mapList ;
 
     public String getValidStatus() {
         return validStatus;
@@ -381,6 +386,14 @@ public class CfetsTrdBondFirstSubInfoDto extends BaseEntity implements ProcessEn
 
     public void setRskApproval(String rskApproval) {
         this.rskApproval = rskApproval;
+    }
+
+    public List<Map<String, Object>> getMapList() {
+        return mapList;
+    }
+
+    public void setMapList(List<Map<String, Object>> mapList) {
+        this.mapList = mapList;
     }
 }
 

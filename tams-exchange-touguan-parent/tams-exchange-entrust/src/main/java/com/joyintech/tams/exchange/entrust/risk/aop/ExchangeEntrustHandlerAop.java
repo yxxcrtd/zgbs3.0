@@ -8,11 +8,11 @@ import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.component.business.riskall.constant.NodeConfigConstant;
 import com.joyintech.tams.component.business.riskall.dto.RiskCommonOutputDto;
 import com.joyintech.tams.exchange.entrust.risk.service.ExchangeRiskInputParamService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.workflow.engine.constant.OperationType;
 import org.apache.commons.collections.CollectionUtils;
 import org.aspectj.lang.JoinPoint;
@@ -40,10 +40,16 @@ public class ExchangeEntrustHandlerAop {
     /**
      * 日志
      */
-    private static Logger logger = LoggerFactory.getLogger(ExchangeEntrustHandlerAop.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExchangeEntrustHandlerAop.class);
 
     @Autowired
     private ExchangeRiskInputParamService inputParamSerivce;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
 
     /**
@@ -158,7 +164,7 @@ public class ExchangeEntrustHandlerAop {
             mapList.forEach(item -> {
                 String revokeId = String.valueOf(item.get("seqno"));
                 String modelType = (String) item.get("modelType");
-                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+                positionRequestHandle.roll(revokeId, modelType, e.getMessage());
             });
         } finally {
             ThreadLocalUtil.cleanLocalCache();
@@ -188,7 +194,7 @@ public class ExchangeEntrustHandlerAop {
             mapList.forEach(item -> {
                 String revokeId = String.valueOf(item.get("seqno"));
                 String modelType = (String) item.get("modelType");
-                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+                positionRequestHandle.roll(revokeId, modelType, e.getMessage());
             });
         } finally {
             ThreadLocalUtil.cleanLocalCache();
@@ -218,7 +224,7 @@ public class ExchangeEntrustHandlerAop {
             mapList.forEach(item -> {
                 String revokeId = String.valueOf(item.get("seqno"));
                 String modelType = (String) item.get("modelType");
-                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+                positionRequestHandle.roll(revokeId, modelType, e.getMessage());
             });
         } finally {
             ThreadLocalUtil.cleanLocalCache();
@@ -244,7 +250,7 @@ public class ExchangeEntrustHandlerAop {
             mapList.forEach(item -> {
                 String revokeId = String.valueOf(item.get("seqno"));
                 String modelType = (String) item.get("modelType");
-                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+                positionRequestHandle.roll(revokeId, modelType, e.getMessage());
             });
         } finally {
             ThreadLocalUtil.cleanLocalCache();
@@ -270,7 +276,7 @@ public class ExchangeEntrustHandlerAop {
             mapList.forEach(item -> {
                 String revokeId = String.valueOf(item.get("seqno"));
                 String modelType = (String) item.get("modelType");
-                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+                positionRequestHandle.roll(revokeId, modelType, e.getMessage());
             });
         } finally {
             ThreadLocalUtil.cleanLocalCache();

@@ -10,13 +10,13 @@ import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
 import com.joyintech.tams.cfets.risk.service.RiskInputParamSerivce;
 import com.joyintech.tams.component.business.riskall.constant.NodeConfigConstant;
 import com.joyintech.tams.component.business.riskall.dto.RiskCommonOutputDto;
 import com.joyintech.tams.constant.DictCodeListRsk;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.workflow.engine.constant.OperationType;
 import org.apache.commons.collections4.CollectionUtils;
 import org.aspectj.lang.JoinPoint;
@@ -45,6 +45,12 @@ public class CfetsEntrustHanderAop {
 
     @Autowired
     private RiskInputParamSerivce inputParamSerivce;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
 
     /**
@@ -153,7 +159,7 @@ public class CfetsEntrustHanderAop {
             mapList.forEach(item -> {
                 String revokeId = String.valueOf(item.get("seqno"));
                 String modelType = (String) item.get("modelType");
-                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+                positionRequestHandle.roll(revokeId, modelType, e.getMessage());
             });
         } finally {
             ThreadLocalUtil.cleanLocalCache();
@@ -183,7 +189,7 @@ public class CfetsEntrustHanderAop {
             mapList.forEach(item -> {
                 String revokeId = String.valueOf(item.get("seqno"));
                 String modelType = (String) item.get("modelType");
-                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+                positionRequestHandle.roll(revokeId, modelType, e.getMessage());
             });
         } finally {
             ThreadLocalUtil.cleanLocalCache();
@@ -213,7 +219,7 @@ public class CfetsEntrustHanderAop {
             mapList.forEach(item -> {
                 String revokeId = String.valueOf(item.get("seqno"));
                 String modelType = (String) item.get("modelType");
-                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+                positionRequestHandle.roll(revokeId, modelType, e.getMessage());
             });
         } finally {
             ThreadLocalUtil.cleanLocalCache();
@@ -239,7 +245,7 @@ public class CfetsEntrustHanderAop {
             mapList.forEach(item -> {
                 String revokeId = String.valueOf(item.get("seqno"));
                 String modelType = (String) item.get("modelType");
-                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+                positionRequestHandle.roll(revokeId, modelType, e.getMessage());
             });
         } finally {
             ThreadLocalUtil.cleanLocalCache();
@@ -265,7 +271,7 @@ public class CfetsEntrustHanderAop {
             mapList.forEach(item -> {
                 String revokeId = String.valueOf(item.get("seqno"));
                 String modelType = (String) item.get("modelType");
-                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+                positionRequestHandle.roll(revokeId, modelType, e.getMessage());
             });
         } finally {
             ThreadLocalUtil.cleanLocalCache();

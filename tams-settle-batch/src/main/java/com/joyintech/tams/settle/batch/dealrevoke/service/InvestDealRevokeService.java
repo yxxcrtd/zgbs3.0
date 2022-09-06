@@ -7,15 +7,14 @@ import com.alibaba.fastjson.JSON;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
-import com.joyintech.tams.common.base.dao.TrdProductDealAddMapper;
 import com.joyintech.tams.common.base.dao.TrdProductTempDealAddMapper;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
-import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
 import com.joyintech.tams.invest.common.trade.dao.TrdCommonBaseMapper;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,15 +29,12 @@ import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.invest.common.component.base.group.BasePtlSecPositionInfoService;
 import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
-import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
-import com.joyintech.tams.settle.batch.datadeal.service.StlDataDealProcessCommonService;
 import com.joyintech.tams.settle.batch.dealrevoke.dao.InvestDealRevokeMapper;
 
 /**
@@ -85,6 +81,12 @@ public class InvestDealRevokeService {
 
     @Autowired
     private EtrEntrustAddMapper etrEntrustAddMapper;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     @Autowired
     private TrdProductTempDealAddMapper trdProductTempDealAddMapper;
@@ -488,9 +490,9 @@ public class InvestDealRevokeService {
             batchRevoke.put("totalTradeId",IDGenerator.generate());
             batchRevoke.put("modelType",DictCodeListExt1.子系统代码_交易.getValue());
             //ZGTFCP-1222:更换头寸批处理接口 modify by fuyongsheng  20220318 start
-            // PositionHttpRequest.batchClose(batchRevoke);
+            // positionRequestHandle.batchClose(batchRevoke);
             logger.debug("【批量撤销日间交易数据】batchRevoke:{}", JSON.toJSONString(batchRevoke));
-            PositionHttpRequest.batchRevoke(batchRevoke);
+            positionRequestHandle.batchRevoke(batchRevoke);
             //ZGTFCP-1222:更换头寸批处理接口 modify by fuyongsheng  20220318 end
 
 
@@ -499,9 +501,9 @@ public class InvestDealRevokeService {
             orderBatchRevoke.put("totalTradeId",IDGenerator.generate());
             orderBatchRevoke.put("modelType",DictCodeListExt1.子系统代码_交易.getValue());
             //ZGTFCP-1222:更换头寸批处理接口 modify by fuyongsheng  20220318 start
-            // PositionHttpRequest.batchClose(orderBatchRevoke);
+            // positionRequestHandle.batchClose(orderBatchRevoke);
             logger.debug("【批量撤销日间下单数据】orderBatchRevoke:{}", JSON.toJSONString(orderBatchRevoke));
-            PositionHttpRequest.batchRevoke(orderBatchRevoke);
+            positionRequestHandle.batchRevoke(orderBatchRevoke);
             //ZGTFCP-1222:更换头寸批处理接口 modify by fuyongsheng  20220318 end
         }
         // 撤销日间成交交易调用新头寸接口 add by fuyongsheng 20220308 end
@@ -530,7 +532,7 @@ public class InvestDealRevokeService {
             stasecBatchRevoke.put("totalTradeId",IDGenerator.generate());
             stasecBatchRevoke.put("modelType",DictCodeListExt1.子系统代码_交易.getValue());
             logger.debug("【批量撤销日间标准券出入库数据】stasecBatchRevoke:{}", JSON.toJSONString(stasecBatchRevoke));
-            PositionHttpRequest.batchRevoke(stasecBatchRevoke);
+            positionRequestHandle.batchRevoke(stasecBatchRevoke);
             // ZGTFCP-1621:冲销成交回报的质押券出入库流水 add by fuyongsheng 20220322 end
         }
 
@@ -566,7 +568,7 @@ public class InvestDealRevokeService {
             firstBondBatchRevoke.put("totalTradeId",IDGenerator.generate());
             firstBondBatchRevoke.put("modelType",DictCodeListExt1.子系统代码_交易.getValue());
             logger.debug("【批量撤销中标结果维护中的自主投标一级分销数据】batchRevoke:{}", JSON.toJSONString(firstBondBatchRevoke));
-            PositionHttpRequest.batchRevoke(firstBondBatchRevoke);
+            positionRequestHandle.batchRevoke(firstBondBatchRevoke);
         }
         // 撤销中标结果维护中的自主投标的一级分销头寸 add by fuyongsheng 20220622 end
     }

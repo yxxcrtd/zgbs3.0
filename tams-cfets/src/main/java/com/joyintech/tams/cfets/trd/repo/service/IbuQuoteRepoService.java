@@ -21,7 +21,6 @@ import com.joyintech.tams.business.common.entity.CfgDataTableShowFlag;
 import com.joyintech.tams.business.common.entity.CfgReadonlyFormShow;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbClosePosEtrRequest;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbClosePositionRequest;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
@@ -55,6 +54,7 @@ import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
 import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
 import com.joyintech.tams.invest.entrust.etrinvestbondinfo.dto.EtrInvestBondInfoDto;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.systemtools.util.CommonUtil;
 import org.apache.commons.collections4.CollectionUtils;
@@ -183,6 +183,12 @@ public class IbuQuoteRepoService extends BaseService {
 
     @Autowired
     private CfetsEtrIbBondinfo002Service cfetsEtrIbBondinfo002Service;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     /**
      * 利率保留位数
@@ -2504,7 +2510,7 @@ public class IbuQuoteRepoService extends BaseService {
      * @author jiangpeng
      * @date 2021/12/20 14:46
      */
-    public void closeDelegatePositionMethod(List<EtrInvestBondInfoDto> dtolist) {
+    public Map<String, Object> closeDelegatePositionMethod(List<EtrInvestBondInfoDto> dtolist) {
         CfetsEtrIbClosePositionRequest req = new CfetsEtrIbClosePositionRequest();
         List<CfetsEtrIbClosePosEtrRequest> etrList = new ArrayList<>();
         for (EtrInvestBondInfoDto t : dtolist) {
@@ -2520,7 +2526,7 @@ public class IbuQuoteRepoService extends BaseService {
         req.setUserId(SecurityUtil.getLoginUser().getUserName());
         req.setTotalTradeId(IDGenerator.generate());
         req.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
-        PositionHttpRequest.batchClose(req);
+        return positionRequestHandle.batchClose(req);
     }
 
     /**

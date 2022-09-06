@@ -20,7 +20,6 @@ import com.joyintech.tams.business.common.dto.CfetsBondPortfolioCashRequest;
 import com.joyintech.tams.business.common.dto.CfetsBondPositionRequest;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.etr.bond.dto.*;
@@ -29,8 +28,6 @@ import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPosPortfolioCashReque
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPosPortfolioSecRequest;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPositionRequest;
 import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
-import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleDealInfo;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubProductDto;
 import com.joyintech.tams.cfets.trd.repo.service.CfetsRepoQuotedPrice004Service;
 import com.joyintech.tams.cfets.trdconfirm.dao.CfetsTrdConfirmMapper;
 import com.joyintech.tams.cfets.trdconfirm.dto.*;
@@ -65,10 +62,10 @@ import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDt
 import com.joyintech.tams.invest.common.dto.trade.entrust.EtrFinishStatusDto;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
-import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.invest.interf.service.InterfComponentService;
 import com.joyintech.tams.invest.trade.lend.dto.FinTradeProductDto;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.systemtools.util.CommonUtil;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -92,8 +89,7 @@ import java.util.stream.Collectors;
  * @see CfetsTrdConfirm001Service
  * @since 1.0
  */
-@Transactional
-@Service("CfetsTrdConfirm001Service")
+@Service("CfetsTrdConfirm001Service_dtx")
 public class CfetsTrdConfirm001Service extends BaseService {
 
     /**
@@ -188,6 +184,12 @@ public class CfetsTrdConfirm001Service extends BaseService {
     private CfetsRepoQuotedPrice004Service cfetsRepoQuotedPrice004Service;
 
     /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
+
+    /**
      * 投资委托信息Service
      */
     @Autowired
@@ -222,7 +224,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    @DTXTransaction
+    @DTXTransaction(transactionListener = "positionRollService")
     public List<Map<String, Object>> doCompleteMethod(CfetsTrdBondInvestTradeDto entity, OperationType operationType) {
         List<String> finishEtrList=new ArrayList<>();
         //买入含权债时，自动创建交易对手 add by wangwei5 2020-03-23 Start
@@ -450,7 +452,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
         return mapList;
     }
     @Transactional(rollbackFor = Exception.class)
-    @DTXTransaction
+    @DTXTransaction(transactionListener = "positionRollService")
     public List<Map<String, Object>> doCompleteRepoMethod(CfetsTrdRepoTrade003Dto entity, OperationType operationType, boolean isTrdConfirm) {
         List<String> finishEtrList = new ArrayList<>();
         TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
@@ -652,7 +654,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
      * @date 2022/5/6 16:26
      */
     @Transactional(rollbackFor = Exception.class)
-    @DTXTransaction
+    @DTXTransaction(transactionListener = "positionRollService")
     public List<Map<String, Object>> doCompleteBidMethod(CfetsTrdFirstBondInvestTradeDto entity, OperationType operationType, String genType) {
         logger.info("一级申购成交确认处理,入参:" + JsonUtils.object2Json(entity));
         List<String> finishEtrList = new ArrayList<>();
@@ -1483,7 +1485,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
         req.setUserId(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
         req.setTotalTradeId(IDGenerator.generate());
         req.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
-        return PositionHttpRequest.batchClose(req);
+        return positionRequestHandle.batchClose(req);
     }
 
     /**
@@ -1791,6 +1793,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
                         + "/common/trdcommonbase/insertFinProductCashData",
                 inputDto, Boolean.class);
     }
+
     private Map<String, Object> sendPositionMethod(CfetsTrdBondInvestTradeDto entity){
         List<CfetsEtrIbPosPortfolioRequest> ptlList=new ArrayList<>();
         for (TrdProductDeal dto : entity.getTrdProductDeals()) {
@@ -1862,7 +1865,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
         req.setFinprodId(entity.getFinprodId());
         req.setPtlList(ptlList);
         req.setbTotalTradeId(entity.getRegIbuId());
-        Map<String, Object> param = PositionHttpRequest.send(req);
+        Map<String, Object> param = positionRequestHandle.send(req);
         ThreadLocalUtil.setLocalCache(param);
         return param;
     }
@@ -1944,7 +1947,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
         req.setbTotalTradeId(entity.getRegIbuId());
         req.setPtlCashList(ptlCashList);
         req.setPtlSecList(ptlSecList);
-        Map<String, Object> param = PositionHttpRequest.send(req);
+        Map<String, Object> param = positionRequestHandle.send(req);
         ThreadLocalUtil.setLocalCache(param);
         return param;
     }
@@ -2047,7 +2050,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
         req.setFinprodId(entity.getFinprodId());
         req.setPtlList(ptlList);
         req.setbTotalTradeId(entity.getRegIbuId());
-        Map<String, Object> param = PositionHttpRequest.send(req);
+        Map<String, Object> param = positionRequestHandle.send(req);
         ThreadLocalUtil.setLocalCache(param);
         return param;
     }
@@ -2257,7 +2260,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
         req.setFinprodId(bidOrder.getFinprodId());
         req.setPtlList(ptlList);
         req.setbTotalTradeId(bidOrder.getBidId());
-        Map<String, Object> param = PositionHttpRequest.send(req);
+        Map<String, Object> param = positionRequestHandle.send(req);
         ThreadLocalUtil.setLocalCache(param);
     }
 
@@ -2283,7 +2286,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
         req.setUserId(SecurityUtil.getLoginUser().getUserName());
         req.setTotalTradeId(IDGenerator.generate());
         req.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
-        PositionHttpRequest.batchClose(req);
+        positionRequestHandle.batchClose(req);
     }
 
 }

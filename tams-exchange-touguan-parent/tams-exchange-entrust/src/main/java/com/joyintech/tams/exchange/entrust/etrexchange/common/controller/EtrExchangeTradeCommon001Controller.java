@@ -27,7 +27,6 @@ import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.dao.SppiImportDataMapper;
 import com.joyintech.tams.common.base.entity.FinExercisePlan;
@@ -43,7 +42,6 @@ import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.*;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.service.EtrExchangeTradeCommon001Service;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.service.EtrExchangeTradeCommonValidatorService;
 import com.joyintech.tams.exchange.entrust.etrexchange.hqjj.validator.EtrExchangeTradeJj001Validator;
-import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeSaveSecRepoRequest;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
@@ -54,12 +52,12 @@ import com.joyintech.tams.invest.common.entrust.inter.EtrTradeCommonervice;
 import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.MinPirceDto;
 import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.MinTrdUnitLimitDto;
 import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.TrdOthCodeInfoDto;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,6 +143,12 @@ public class EtrExchangeTradeCommon001Controller extends BaseController {
 
     @Autowired
     private SppiImportDataMapper sppiImportDataMapper;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     /**
      * 由于交易平台不同，设置不同交易平台对应的委托方向
@@ -1723,7 +1727,7 @@ public class EtrExchangeTradeCommon001Controller extends BaseController {
                 } catch (Exception e) {
                     for (EtrExchangeTradeSaveRequest etrExchangeTradeSaveRequest : etrExchangeTrade001DtoList) {
                         logger.warn("场内交易多组合指令头寸发送失败，EntrustId:{},PositionSeqno:{}", etrExchangeTradeSaveRequest.getEntrustId(), etrExchangeTradeSaveRequest.getPositionSeqno().toString());
-                        PositionHttpRequest.sendRevoke(etrExchangeTradeSaveRequest.getPositionSeqno().toString(), "ETR", "场内交易多组合指令头寸发送失败");
+                        positionRequestHandle.sendRevoke(etrExchangeTradeSaveRequest.getPositionSeqno().toString(), "ETR", "场内交易多组合指令头寸发送失败");
                     }
                     //撤销风险预占
                     riskEtrExchangeTrade001DtoList.stream().forEach(item -> {

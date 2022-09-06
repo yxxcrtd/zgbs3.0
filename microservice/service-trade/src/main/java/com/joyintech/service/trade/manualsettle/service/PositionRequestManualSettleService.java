@@ -3,23 +3,20 @@ package com.joyintech.service.trade.manualsettle.service;
 import com.alibaba.fastjson.JSON;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.service.trade.entrustmsgbymq.dto.TrdTempDto;
 import com.joyintech.service.trade.entrustmsgbymq.service.TradePreCommonService;
 import com.joyintech.service.trade.manualsettle.dao.ManualSettleMapper;
 import com.joyintech.service.trade.manualsettle.dto.ManualSettleDto;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
-import com.joyintech.tams.invest.common.position.dto.EtrEntrustAddDto;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
 import com.joyintech.tams.invest.common.trade.dto.PortfolioCalculateDto;
 import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +25,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.joyintech.tams.constant.DictCodeList.是否_否;
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
@@ -67,6 +63,12 @@ public class PositionRequestManualSettleService {
 
     @Autowired
     private FinDealPledgeMapper finDealPledgeMapper;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     public static final String TRADE_PLAT = "TRD_MANUAL_SETTLE";
 
@@ -115,7 +117,7 @@ public class PositionRequestManualSettleService {
             this.certificate001(entity, resultMap);
         }
         if(StringUtil.isNotEmpty(resultMap.get(INTERFACE_TYPE))){
-            PositionHttpRequest.send(resultMap);
+            positionRequestHandle.send(resultMap);
         }else{
             logger.debug("[手工交收未找到对应的接口配置]");
         }

@@ -14,7 +14,6 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
@@ -29,6 +28,7 @@ import com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto;
 import com.joyintech.tams.invest.common.dto.trade.entrust.EtrFinishStatusDto;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
 import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -187,6 +187,12 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
 
     @Autowired
     private CommonPositionEngineService commonPositionEngineService;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     /* 委托操作相关校验 <一句话功能简述> <功能详细描述>
      *
@@ -1128,7 +1134,7 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
             batchClose.put("totalTradeId", IDGenerator.generate());
             batchClose.put("modelType", DictCodeListExt1.子系统代码_委托.getValue());
             logger.debug("【批量关闭指令数据】batchRevoke:{}", JSON.toJSONString(batchClose));
-            PositionHttpRequest.batchClose(batchClose);
+            positionRequestHandle.batchClose(batchClose);
         }
         // ZGTFCP-1529:指令完成后调用新头寸批量关闭接口 modify by fuyongsheng 20220327 end
         // 判断完成委托是否完成
