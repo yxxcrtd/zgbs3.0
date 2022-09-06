@@ -55,15 +55,11 @@
 	 	B.IS_ENABLED isEnabled,
 	 	A.PORTFOLIO_LEVEL portfolioLevel,
 	 	A.START_DATE startDate,
-	 	A.END_DATE  endDate,
-	 	D.PORTNAME as portfolioMix
+	 	A.END_DATE  endDate
 	 FROM 
 	 	RSK_PORTFOLIO_INDICATOR A
 	 	LEFT JOIN RSK_ISUP_INDICATOR B on A.IND_ID=B.IND_ID
 	 	LEFT JOIN RSK_PORTFOLIO_PACKAGE C on A.PORTFOLIO_ID=C.PTL_BAG_ID
-	 <![CDATA[	LEFT JOIN (SELECT  LISTAGG(n.PORTFOLIO_NAME || ',') WITHIN GROUP (ORDER BY m.PTL_BAG_ID) as PORTNAME  ,PTL_BAG_ID from RSK_PORTFOLIO_PACKAGE_DTL m ]]>
-	 	           inner join PTL_PORTFOLIO n on m.PORTFOLIO_ID=n.PORTFOLIO_ID group by m.PTL_BAG_ID) D
-	 	 on  A.PORTFOLIO_ID=D.PTL_BAG_ID
 	 <where>
 	    <if test="portfolioId != null and portfolioId != ''">
 	 	   A.PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
