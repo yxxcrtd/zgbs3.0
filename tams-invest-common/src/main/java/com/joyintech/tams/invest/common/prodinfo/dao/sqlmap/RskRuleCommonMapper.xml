@@ -36,7 +36,7 @@
 				row_number() over (partition by cit.FINPROD_ID order by foor.OPEN_TYPE desc) rownumber
 			FROM CASH_INFO_TEMP cit
 			INNER JOIN FIN_OPEN_RULE foor ON cit.CASH_ID = FOOR.CASH_ID
-			where foor.OPEN_TYPE in ('02', '01')
+			where foor.OPEN_TYPE in ('03','02', '01')
 		) t1
 		WHERE t1.rownumber = 1
 		)
