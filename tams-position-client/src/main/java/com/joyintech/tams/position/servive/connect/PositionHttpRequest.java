@@ -123,6 +123,12 @@ public class PositionHttpRequest {
     }
 
     protected  void roll(String revokeId, String modelType, String errorMsg) {
+        rollNotException(revokeId,modelType,errorMsg);
+        // 页面端根据异常信息返回前端
+        throw new PositionException(errorMsg);
+    }
+
+    protected  void rollNotException(String revokeId, String modelType, String errorMsg) {
         BaseMap bm = BaseMap.newMap() .put("revokeId", revokeId) .put("modelType", modelType) .put("userId", LoginUserUtil.getUserName());
         logger.info("发送回滚头寸报文:" + JsonUtils.object2Json(bm));
         try {
@@ -131,7 +137,6 @@ public class PositionHttpRequest {
             logger.error("回滚头寸报错", e);
         }
         // 页面端根据异常信息返回前端
-        throw new PositionException(errorMsg);
     }
 
     protected  void sendRevoke(String revokeId, String modelType, String errorMsg) {

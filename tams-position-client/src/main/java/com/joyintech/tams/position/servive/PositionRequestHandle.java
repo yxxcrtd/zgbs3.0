@@ -49,6 +49,16 @@ public class PositionRequestHandle {
     }
 
     /**
+     * 回滚接口
+     * @param revokeId
+     * @param modelType
+     * @param errorMsg
+     */
+    public  void rollNotException(String revokeId, String modelType, String errorMsg) {
+        positionRequest.rollNotException(revokeId,modelType,errorMsg);
+    }
+
+    /**
      * 刷新缓存
      * @param param
      */
