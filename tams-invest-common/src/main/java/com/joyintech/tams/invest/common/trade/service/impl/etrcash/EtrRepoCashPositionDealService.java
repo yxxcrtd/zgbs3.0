@@ -438,7 +438,7 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                         etrSecPositionFlowDto.setAmount(交易券面总额.negate());
                         etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
                     }
-//                    etrPositionHoldDto.getPtlSecPositionFlows().addAll(ptlSecPositionFlowLogic(finProductTradeDto, false));
+                    etrPositionHoldDto.getPtlSecPositionFlows().addAll(ptlSecPositionFlowLogic(finProductTradeDto, false));
                     // 查找委托时的指令持仓,用于冲销
 //                    etrSecPositionFlowDtos = EtrCommonCashPositionDealService.selectAllPositionByTotle(entrustId);
                 } else {
