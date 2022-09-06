@@ -74,7 +74,7 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
         Map<String,List<StlSettleTransDataGatherDto>> mapList=selectNeedTotalDataList
                 .stream()
                 .collect(Collectors.groupingBy(dto ->
-                        dto.getApplyTradeId() + "_" + dto.getSeatNumber()+ "_" + dto.getSecAcctId()));
+                        dto.getApplyTradeId() + "_" + dto.getSeatNumber()+ "_" + dto.getSecAcctId()+ "_" + dto.getPs()));
         //4、循环当前循环的map的value
         List<SettleTransDataTotal> settleTransDataList=new ArrayList<>();
         List<SettleTransDataTotalAdd> settleTransDataAddList=new ArrayList<>();
