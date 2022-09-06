@@ -126,7 +126,7 @@ public class PositionHttpRequest {
         BaseMap bm = BaseMap.newMap() .put("revokeId", revokeId) .put("modelType", modelType) .put("userId", LoginUserUtil.getUserName());
         logger.info("发送回滚头寸报文:" + JsonUtils.object2Json(bm));
         try {
-            rollMq(bm);
+            rollHttp(bm);
         } catch (Exception e) {
             logger.error("回滚头寸报错", e);
         }
