@@ -5,7 +5,7 @@
             <Cell order="1" name="组合名称">portfolioName</Cell>
             <Cell order="2" name="证券账户">secAcctInfo</Cell>
             <Cell order="3" name="资产类型">type8Name</Cell>
-            <Cell order="4" name="资产二级类型">type7Name</Cell>
+            <Cell order="4" name="资产二级类型">type9Str</Cell>
             <Cell order="5" name="资产代码">finprodMarketId</Cell>
             <Cell order="6" name="资产名称">finprodAbbr</Cell>
             <Cell order="7" name="实际持仓">actualPositionAmount</Cell>
