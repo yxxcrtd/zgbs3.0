@@ -421,11 +421,15 @@ public class InvestDealRevokeService {
             Map<String, Object> batchRevoke = new HashMap<>();
             // 日间下单撤销
             Map<String, Object> orderBatchRevoke = new HashMap<>();
+            // 撤销通用回购到期数据撤销
+            Map<String, Object> repoH02ExpiredBatchRevoke = new HashMap<>();
 
             // 日间成交撤销数据列表
             List<Map<String, Object>> dataList = new ArrayList<>();
             // 日间下单撤销数据列表
             List<Map<String, Object>> orderDataList = new ArrayList<>();
+            // 撤销通用回购到期数据列表
+            List<Map<String, Object>> repoH02ExpiredDataList = new ArrayList<>();
             // 交易编号去重
             List<TrdProductTempDeal> distinctDeals = trdProductTempDeals
                     .stream()
@@ -433,11 +437,21 @@ public class InvestDealRevokeService {
                             () -> new TreeSet<>(Comparator.comparing(TrdProductTempDeal::getTradeId))), ArrayList::new));
             Set<String> orderIdSet = new HashSet<>();
             for(TrdProductTempDeal deal : distinctDeals){
+                if(DictCodeListExt3.头寸业务类型_通用回购到期.getValue().equals(deal.getBusiType())){
+                    // 撤销通用回购到期数据
+                    Map<String, Object> repoH02ExpiredData = new HashMap<>();
+                    repoH02ExpiredData.put("busiType", DictCodeListExt3.头寸业务类型_通用回购到期.getValue());
+                    repoH02ExpiredData.put("ps", deal.getPs());
+                    repoH02ExpiredData.put("closeId", deal.getTradeId());
+                    repoH02ExpiredData.put("systemAct", DictCodeListExt3.系统动作_新建.getValue());
+                    repoH02ExpiredData.put("busiAct", DictCodeListExt3.业务动作_成交匹配.getValue());
+                    repoH02ExpiredDataList.add(repoH02ExpiredData);
+                    continue;
+                }
                 // 日间成交撤销数据
                 Map<String, Object> data = new HashMap<>();
                 // 日间下单撤销数据
                 Map<String, Object> orderData = new HashMap<>();
-
                 if (null == deal.getfTradeId()) {
                     continue;
                 }
@@ -505,6 +519,15 @@ public class InvestDealRevokeService {
             logger.debug("【批量撤销日间下单数据】orderBatchRevoke:{}", JSON.toJSONString(orderBatchRevoke));
             positionRequestHandle.batchRevoke(orderBatchRevoke);
             //ZGTFCP-1222:更换头寸批处理接口 modify by fuyongsheng  20220318 end
+
+            if(!CollectionUtils.isEmpty(repoH02ExpiredDataList)){
+                repoH02ExpiredBatchRevoke.put("data", repoH02ExpiredDataList);
+                repoH02ExpiredBatchRevoke.put("userId", LoginUserUtil.getUserName());
+                repoH02ExpiredBatchRevoke.put("totalTradeId",IDGenerator.generate());
+                repoH02ExpiredBatchRevoke.put("modelType",DictCodeListExt1.子系统代码_交易.getValue());
+                logger.debug("【批量撤销通用回购到期数据】repoH02ExpiredBatchRevoke:{}", JSON.toJSONString(repoH02ExpiredBatchRevoke));
+                positionRequestHandle.batchRevoke(repoH02ExpiredBatchRevoke);
+            }
         }
         // 撤销日间成交交易调用新头寸接口 add by fuyongsheng 20220308 end
 
