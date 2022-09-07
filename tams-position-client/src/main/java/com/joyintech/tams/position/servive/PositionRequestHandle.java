@@ -171,7 +171,7 @@ public class PositionRequestHandle {
     public  Map<String, Object> threadRollAll() throws PositionException {
         ArrayList<ArrayList<String>> allist = ThreadLocalUtil.getTarget();
         for(ArrayList<String> slist:allist){
-            roll(slist.get(0),slist.get(1),"");
+            rollNotException(slist.get(0),slist.get(1),"");
         }
         ThreadLocalUtil.cleanLocalCache();
         return null;
