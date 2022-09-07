@@ -22,9 +22,9 @@
 			<groupId>com.joyintech</groupId>
 			<artifactId>framework-core</artifactId>
 		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>com.joyintech</groupId>
 			<artifactId>framework-rabbitmq</artifactId>
-		</dependency>
+		</dependency>-->
     </dependencies>
 </project>

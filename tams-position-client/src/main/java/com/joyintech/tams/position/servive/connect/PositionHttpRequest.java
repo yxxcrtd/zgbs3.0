@@ -143,7 +143,7 @@ public class PositionHttpRequest {
         BaseMap bm = BaseMap.newMap().put("revokeId", revokeId).put("modelType", modelType).put("userId", LoginUserUtil.getUserName());
         logger.info("发送头寸报文:" + JsonUtils.object2Json(bm));
         try {
-            rollMq(bm);
+            rollHttp(bm);
         } catch (Exception e) {
             logger.error("回滚头寸报错", e);
         }
@@ -355,9 +355,9 @@ public class PositionHttpRequest {
         return httpPostRequest(positionUrl + "/position/endpoint/roll", param);
     }
 
-    private  void rollMq(Object param) {
-         positionMqRequest.roll(param);
-    }
+//    private  void rollMq(Object param) {
+//         positionMqRequest.roll(param);
+//    }
 
 //    /**
 //     * 从头寸引擎查询头寸余额
