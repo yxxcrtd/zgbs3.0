@@ -392,9 +392,33 @@ public class EntrustUtils {
             return BSFlag.PHDJDZMR.value;
         } else if (entrustProp.equals(EntrustProp.LARGE_AFTER_CLOSING_WEIGHT_PRICE.value) && entrustBs.equals(EntrustBs.SELL.value)) {
             return BSFlag.PHDJDZMC.value;
-        } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_XD.value) && entrustBs.equals(EntrustBs.BUY.value)) {
+        }
+//        else if (entrustProp.equals(EntrustProp.SZ_XSCJ_XD.value) && entrustBs.equals(EntrustBs.BUY.value)) {
+//            return BSFlag.XSCJSBMR.value;
+//        } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_XD.value) && entrustBs.equals(EntrustBs.SELL.value)) {
+//            return BSFlag.XSCJSBMC.value;
+//        } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_JS.value) && entrustBs.equals(EntrustBs.BUY.value)) {
+//            return BSFlag.XSCJHFJSMR.value;
+//        } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_JS.value) && entrustBs.equals(EntrustBs.SELL.value)) {
+//            return BSFlag.XSCJHFJSMC.value;
+//        } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_JJ.value) && entrustBs.equals(EntrustBs.BUY.value)) {
+//            return BSFlag.XSCJHFJJMR.value;
+//        } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_JJ.value) && entrustBs.equals(EntrustBs.SELL.value)) {
+//            return BSFlag.XSCJHFJJMC.value;
+//        }
+        return BSFlag.ZQMR.value;
+    }
+
+    public static String getBsFlag(String entrustProp, String entrustBs, String market) {
+        if (entrustProp.equals(EntrustProp.SZ_XSCJ_XD.value) && entrustBs.equals(EntrustBs.BUY.value)) {
+            if (StringUtil.equals(market, Market.SHSE.value)) {
+                return BSFlag.ZDDSFSBMR.value;
+            }
             return BSFlag.XSCJSBMR.value;
         } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_XD.value) && entrustBs.equals(EntrustBs.SELL.value)) {
+            if (StringUtil.equals(market, Market.SHSE.value)) {
+                return BSFlag.ZDDSFSBMC.value;
+            }
             return BSFlag.XSCJSBMC.value;
         } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_JS.value) && entrustBs.equals(EntrustBs.BUY.value)) {
             return BSFlag.XSCJHFJSMR.value;
@@ -405,6 +429,7 @@ public class EntrustUtils {
         } else if (entrustProp.equals(EntrustProp.SZ_XSCJ_JJ.value) && entrustBs.equals(EntrustBs.SELL.value)) {
             return BSFlag.XSCJHFJJMC.value;
         }
+
         return BSFlag.ZQMR.value;
     }
 
