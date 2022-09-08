@@ -24,6 +24,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.sound.midi.Instrument;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -1571,29 +1572,4 @@ public class UfxTradeAgent extends TradeAgentDsp {
         return list;
     }
 
-    /**
-     * yanjianhui
-     * 332403 债券质押协议回购委托查询
-     * 在协议回购之前要进行查询  原申报合同序号  后才可做交易。
-     */
-    public String qryProtocolBackTradeSZ(String brokerEntrustId, String accountId) throws Exception {
-        NegotiateQuoteQueryBean queryBean = new NegotiateQuoteQueryBean();
-        List<NegotiateQuoteReceiveBean> list;
-        // 332403   债券质押协议回购委托查询
-        // 场景代码
-        int functionCode = FunctionCode.REQ_QRY_ENTRUST.value;
-        // 场景属性
-        String entrustProp = "RepurchaseOrderSZ";
-        // 日期生成
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        String entrustDate = sdf.format(new Date());
-        // 自定义参数
-        Map<String, Object> customParam = getCustomParam(queryBean.getAccountId());
-        customParam.put("brokerEntrustId", brokerEntrustId);
-        customParam.put("entrustDate", entrustDate);
-        customParam.put("accountId", accountId);
-        ResultBean resultBean = triggerCodeAdapter(functionCode, entrustProp, queryBean, customParam);
-        // region 返回结果处理
-        return UfxMsgParseHelper.getJoinReportId(AgentUtil.getQueryListUFX(resultBean));
-    }
 }
