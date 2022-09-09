@@ -356,7 +356,7 @@
 				<include refid="validStatus01_sql"/>
 			</otherwise>
 			</choose>
-		) order by PERIODPRODID , STARTDATE desc
+		) order by PERIODPRODID , STARTDATE
 	</select>
 
 	<select id="getInvestCycle" resultType="com.joyintech.framework.select.SelectOptionDto">
