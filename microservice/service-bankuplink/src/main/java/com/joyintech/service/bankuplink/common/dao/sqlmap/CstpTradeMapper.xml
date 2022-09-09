@@ -59,7 +59,12 @@
                          and  t.businesstype =  #{businesstype,jdbcType=VARCHAR})
     </select>
     <select id="selectBuytrader" parameterType="String" resultType="String">
-    select TRADER_ID from MST_CFETS_CUSTOMER_TRADER where TRADER_NAME = #{ourtraderchinesename,jdbcType=VARCHAR}
+    select mcct.TRADER_ID
+        from MST_CFETS_CUSTOMER_TRADER mcct
+             inner join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = mcct.PARTY_ID
+    where mcct.TRADER_NAME = #{ourtraderchinesename,jdbcType=VARCHAR}
+            AND PARTY_CUSTOMER_ID = #{ourinstitutioncode,jdbcType=VARCHAR}
+            AND ROWNUM = 1
     </select>
      <select id="selectSeller" parameterType="String" resultType="String">
  	select t.institution_code
