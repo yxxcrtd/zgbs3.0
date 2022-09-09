@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.service.TamsBusinessCommonService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -13,8 +12,8 @@ import com.joyintech.tams.exchange.entrust.etrexchange.cdtprocer.dto.EtrCreditPr
 import com.joyintech.tams.exchange.entrust.etrexchange.position.bean.PositionRequestBaseBean;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeOperateSecRepoRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradePortfolioSecRepoRequest;
-import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeSaveSecRepoRequest;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -23,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.*;
@@ -40,12 +38,18 @@ public class PositionRequestServiceTradSaveCpcRequest {
     @Autowired
     private TamsBusinessCommonService tamsBusinessCommonService;
 
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
+
     public void sendEtrExchangeTradeSaveRequest(EtrCreditProtectionCertificateApplyRequest entity, String decisionAct, String systemAct) {
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("decisionAct", decisionAct);
         resultMap.put("systemAct", systemAct);
         this.setCommonField(entity, resultMap,decisionAct);//设置公共字段，个性化的需要在具体接口中覆盖
-        PositionHttpRequest.send(resultMap);
+        positionRequestHandle.send(resultMap);
     }
 
     /**
@@ -55,7 +59,7 @@ public class PositionRequestServiceTradSaveCpcRequest {
      */
     public void sendDelete(EtrCreditProtectionCertificateApplyRequest entity) {
         String busiType = DictCodeListExt3.头寸业务类型_信用保护凭证交易.getValue();
-        PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(), POSITION_TYPE_ETR, busiType, entity.getPs());
+        positionRequestHandle.doDeleteByWorkFlowId(entity.getWorkflowId(), POSITION_TYPE_ETR, busiType, entity.getPs());
     }
     /**
      * 关闭时使用---关闭-共通接口
@@ -79,7 +83,7 @@ public class PositionRequestServiceTradSaveCpcRequest {
         map.put(BUSI_TYPE, DictCodeListExt3.头寸业务类型_信用保护凭证交易.getValue());
         list.add(map);
         resultMap.put("data", list);
-        PositionHttpRequest.batchClose(resultMap);
+        positionRequestHandle.batchClose(resultMap);
     }
 
     /**

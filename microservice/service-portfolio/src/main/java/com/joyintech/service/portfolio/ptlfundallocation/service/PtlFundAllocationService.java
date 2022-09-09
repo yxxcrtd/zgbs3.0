@@ -21,7 +21,7 @@ import com.joyintech.service.portfolio.position.service.PositionRequestPtlFoundA
 import com.joyintech.service.portfolio.ptlfundallocation.dao.PtlFundAllocationMapper;
 import com.joyintech.service.portfolio.ptlfundallocation.dto.PtlFundAllocation001Dto;
 import com.joyintech.service.portfolio.ptlfundallocation.dto.PtlFundAllocationDto;
-import com.joyintech.tams.business.common.exception.PositionException;
+import com.joyintech.tams.position.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;

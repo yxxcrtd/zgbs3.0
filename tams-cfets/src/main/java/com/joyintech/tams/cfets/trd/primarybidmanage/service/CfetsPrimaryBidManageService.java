@@ -30,21 +30,18 @@ import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.entity.CfgDataTableShow;
 import com.joyintech.tams.business.common.entity.CfgDataTableShowFlag;
 import com.joyintech.tams.business.common.entity.CfgReadonlyFormShow;
-import com.joyintech.tams.business.common.exception.PositionException;
+import com.joyintech.tams.position.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.business.common.util.ThreadLocalUtil;
-import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleDealInfo;
 import com.joyintech.tams.cfets.position.service.PositionInfoService;
 import com.joyintech.tams.cfets.trd.bond.dto.CalRequest;
 import com.joyintech.tams.cfets.trd.bond.dto.CalRespone;
 import com.joyintech.tams.cfets.trd.bond.service.IbuQuoteBondCalService;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao.CfetsTrdFirstBidFirm002Mapper;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dao.CfetsPrimaryBidManageMapper;
 import com.joyintech.tams.cfets.trd.primarybidmanage.dto.*;
 import com.joyintech.tams.common.base.dao.*;
@@ -73,6 +70,8 @@ import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMappe
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
 import com.joyintech.tams.invest.common.trade.dto.SecInfoModelDto;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
+import com.joyintech.tams.position.constant.PositionConstant;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tools.collectors.JoyinCollectors;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -232,6 +231,12 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
 
     @Autowired
     private PositionInfoService positionInfoService;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     /**
      * 默认设置
@@ -646,7 +651,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             }
             if (type.equals(OperationType.REVOKE) || type.equals(OperationType.DELETE)) {
                 // 匹配取消
-                PositionHttpRequest.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
+                positionRequestHandle.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
                         DictCodeListExt3.头寸业务类型_债券一级投标.getValue(), DictCodeList.交易方向_买入.getValue());
                 if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
                     // 老头寸处理
@@ -1189,7 +1194,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         req.setCdate(iPlatformDate.getSysDate());
         req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         req.setPtlList(ptlList);
-        Map<String, Object> param = PositionHttpRequest.send(req);
+        Map<String, Object> param = positionRequestHandle.send(req);
         ThreadLocalUtil.setLocalCache(param);
     }
 
@@ -1380,16 +1385,16 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     String code = (String) bm.get("code");
                     messageStr = JsonUtils.json2Object(bm.get("message").toString(), String.class);
                     if (StringUtil.isEmpty(confirmOk)
-                            && StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                            && StringUtil.equals(PositionConstant.CODE_BUSI_RK, code)) {
                         WorkFlowUtil.showMessage(messageStr, MessageType.确认消息);
                     }
-                    if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK,code)) {
+                    if (StringUtil.equals(PositionConstant.CODE_BUSI_YK,code)) {
                         WorkFlowUtil.showMessage(messageStr, MessageType.错误消息);
                     }
                 }else{
                     messageStr = message.getMessage();
                     if (StringUtil.isEmpty(confirmOk)
-                            && StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, message.getCode())) {
+                            && StringUtil.equals(PositionConstant.CODE_BUSI_RK, message.getCode())) {
                         WorkFlowUtil.showMessage(messageStr, MessageType.确认消息);
                     }else {
                         WorkFlowUtil.showMessage(messageStr, MessageType.错误消息);
@@ -1413,7 +1418,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         CfetsPrimaryBidManageSaveRequest entity = getBussinessEntityByWorkflowId(workflowId);
         if (StringUtil.isNotEmpty(processMark)
                 && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
-            PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(), DictCodeListExt1.子系统代码_交易.getValue(),
+            positionRequestHandle.doDeleteByWorkFlowId(entity.getWorkflowId(), DictCodeListExt1.子系统代码_交易.getValue(),
                     DictCodeListExt3.头寸业务类型_债券一级投标.getValue(), DictCodeList.交易方向_买入.getValue());
         }
         wflBidResultTotalMapper.deleteByWorkflowId(workflowId);

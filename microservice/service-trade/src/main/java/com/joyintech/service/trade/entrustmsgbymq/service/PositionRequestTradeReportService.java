@@ -7,7 +7,6 @@ import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.trade.entrustmsgbymq.dto.TrdMoreConvrate;
 import com.joyintech.service.trade.entrustmsgbymq.dto.TrdTempDto;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.entity.*;
@@ -20,6 +19,7 @@ import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
 import com.joyintech.tams.invest.common.trade.dto.PortfolioCalculateDto;
 import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +53,12 @@ public class PositionRequestTradeReportService {
 
     @Autowired
     private EtrEntrustMapper etrEntrustMapper;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     @Autowired(required = false)
     @Qualifier("simpleRestTemplate")
@@ -107,7 +113,7 @@ public class PositionRequestTradeReportService {
             this.certificate001(trdTempDto, resultMap);
         }
         if (StringUtil.isNotEmpty(resultMap.get(INTERFACE_TYPE))) {
-            PositionHttpRequest.send(resultMap);
+            positionRequestHandle.send(resultMap);
         } else {
             logger.debug("[成交回报未找到对应的接口配置]");
         }

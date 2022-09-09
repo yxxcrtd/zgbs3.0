@@ -107,7 +107,7 @@
     end                                                          as transFinishAmt,
 
     case when ETR_ENTRUST_ADD.ASSET_TYPE = 'F01'
-        THEN ROUND((NVL( ETR_ENTRUST.ENTRUST_NUM, 0 ) / 100 - NVL( ETR_ENTRUST_ADD.CLOSE_AMT, 0 ) / 100 - NVL( C5.totalShareAmt * 100, 0 )) / 10000,2)
+        THEN ROUND((NVL( ETR_ENTRUST.ENTRUST_NUM/100, 0 ) - NVL( ETR_ENTRUST_ADD.CLOSE_AMT/100, 0 )  - NVL( C5.totalShareAmt/100, 0 )),2)
     else ROUND((NVL( ETR_ENTRUST.ENTRUST_AMT, 0 )- NVL( ETR_ENTRUST_ADD.CLOSE_AMT, 0 ) - NVL( C5.totalTradeAmt, 0 ))/10000,2)
     end                                                          as transRemainderAmt,
     to_char(ETR_ENTRUST_ADD.TRANSMIT_TIME,'hh24:mi:ss') transmitTime,

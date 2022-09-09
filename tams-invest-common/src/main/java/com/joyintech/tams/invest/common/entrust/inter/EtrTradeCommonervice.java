@@ -4,7 +4,6 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.pojo.BaseMap;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.FinProductAddMapper;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
@@ -21,6 +20,7 @@ import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.position.*;
 import com.joyintech.tams.invest.common.entrust.dao.EtrTrdCommonMapper;
 import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +56,12 @@ public class EtrTradeCommonervice extends BaseService {
 
     @Autowired(required = false)
     private FinProductMapper finProductMapper;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
 
     /**
@@ -598,7 +604,7 @@ public class EtrTradeCommonervice extends BaseService {
         Map<String, Object> map = new HashMap<>();
         BigDecimal sumAmount = BigDecimal.ZERO;
         map.put("ptlList", buildPosition(ptList, flowType, positionType));
-        String msg = PositionHttpRequest.queryPosition(map);
+        String msg = positionRequestHandle.queryPosition(map);
         BaseMap bm = JsonUtils.json2Object(msg, BaseMap.class);
         if (bm != null && StringUtil.equals("success", bm.getString("code"))) {
             List<LinkedHashMap> list = (List<LinkedHashMap>) bm.get("data");

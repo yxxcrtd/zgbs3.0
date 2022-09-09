@@ -49,7 +49,7 @@ public interface SysDateRefreshPositionCache {
 //                        logger.error("", e);
 //                    }
 //                    long start = System.currentTimeMillis();
-////                    String res = PositionHttpRequest.updateBalance(o);
+////                    String res = positionRequestHandle.updateBalance(o);
 ////                    logger.info("缓存头寸缓存请求返回" + res);
 //                    logger.info("缓存头寸缓存请求结束" + (System.currentTimeMillis() - start));
 //                    logger.info("----------平台日切换更新头寸内存数据库请求结束----------");

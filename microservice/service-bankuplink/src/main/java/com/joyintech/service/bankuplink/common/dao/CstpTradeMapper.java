@@ -65,7 +65,7 @@ public interface CstpTradeMapper {
      * @see
      * @since 1.0
      */
-    String selectBuytrader(@Param("ourtraderchinesename") String ourtraderchinesename);
+    String selectBuytrader(@Param("ourtraderchinesename") String ourtraderchinesename,@Param("ourinstitutioncode") String ourinstitutioncode);
 
     /**
      * 机构中文全称，查询序列号

@@ -5,19 +5,18 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeOperateSecRepoRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradePortfolioSecRepoRequest;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.dto.EtrExchangeTradeSaveSecRepoRequest;
-import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.FinProductOthCodeDto;
 import com.joyintech.tams.exchange.entrust.etrexchange.secrepo.service.EtrExchangeTradeSecRepo001Service;
 import com.joyintech.tams.exchange.entrust.etrexchange.position.bean.PositionRequestBaseBean;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeOtherCommonService;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
 import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.TrdMoreConvrateDto;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -29,9 +28,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 
-import static com.joyintech.tams.constant.DictCodeList.*;
-import static com.joyintech.tams.constant.DictCodeListExt2.交易方向_配股;
-import static com.joyintech.tams.constant.DictCodeListExt2.申购方式_网上申购;
 import static com.joyintech.tams.constant.DictCodeListExt3.*;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.*;
 
@@ -49,6 +45,12 @@ public class PositionRequestServiceEtrExchangeTradeSaveSecRepoRequest {
     private EtrExchangeTradeSecRepo001Service etrExchangeTradeCommon001Service;
     @Autowired
     private EtrTradeOtherCommonService etrTradeOtherCommonService;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     /**
      * EtrExchangeTradeSaveRequest请求对象使用
@@ -89,7 +91,7 @@ public class PositionRequestServiceEtrExchangeTradeSaveSecRepoRequest {
             //TODO 根据条件判断调用其他接口
             return;
         }
-        PositionHttpRequest.send(resultMap);
+        positionRequestHandle.send(resultMap);
     }
 
     /**
@@ -100,7 +102,7 @@ public class PositionRequestServiceEtrExchangeTradeSaveSecRepoRequest {
     public void sendDelete(EtrExchangeTradeSaveSecRepoRequest entity) {
         log.info("sendDelete() called with parameters => 【entity = {}】", JsonUtils.object2Json(entity));
         String busiType = commonPositionEngineService.getPositionBusiType(entity.getFinprodType2(), entity.getPs(), entity.getAssetType2());
-        PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(), POSITION_TYPE_ETR, busiType, entity.getPs());
+        positionRequestHandle.doDeleteByWorkFlowId(entity.getWorkflowId(), POSITION_TYPE_ETR, busiType, entity.getPs());
     }
 
     /**
@@ -113,7 +115,7 @@ public class PositionRequestServiceEtrExchangeTradeSaveSecRepoRequest {
         return;
 //        log.info("sendRevoke() called with parameters => 【entity = {}】", JsonUtils.object2Json(entity));
 //        String busiType = commonPositionEngineService.getPositionBusiType(entity.getFinprodType2(), entity.getPs(), null);
-//        PositionHttpRequest.dorevoke(entity.getEntrustId(), POSITION_TYPE_TRD, busiType, entity.getPs());
+//        positionRequestHandle.dorevoke(entity.getEntrustId(), POSITION_TYPE_TRD, busiType, entity.getPs());
     }
 
     /**
@@ -140,7 +142,7 @@ public class PositionRequestServiceEtrExchangeTradeSaveSecRepoRequest {
         list.add(map);
         resultMap.put("data", list);
 
-        PositionHttpRequest.batchClose(resultMap);
+        positionRequestHandle.batchClose(resultMap);
     }
 
     /**

@@ -54,6 +54,11 @@ public class PositionRequest {
         positionHttpRequest.roll(revokeId,modelType,errorMsg);
     }
 
+    public  void rollNotException(String revokeId, String modelType, String errorMsg) {
+//        positionMqRequest.roll(revokeId,modelType,errorMsg);
+        positionHttpRequest.roll(revokeId,modelType,errorMsg);
+    }
+
     /**
      * 实际是roll接口
      * @param revokeId

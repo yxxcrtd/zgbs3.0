@@ -19,11 +19,10 @@ import com.joyintech.tams.business.common.dto.CfetsBondPortfolioCashRequest;
 import com.joyintech.tams.business.common.dto.CfetsBondPositionRequest;
 import com.joyintech.tams.business.common.dto.CfetsSearchInfoRequest;
 import com.joyintech.tams.business.common.dto.PageMode;
-import com.joyintech.tams.business.common.exception.PositionException;
+import com.joyintech.tams.position.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.business.common.util.ThreadLocalUtil;
@@ -67,13 +66,14 @@ import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
+import com.joyintech.tams.position.constant.PositionConstant;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
-import org.activiti.engine.impl.util.CollectionUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -264,6 +264,12 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
      */
     @Autowired
     private BaseEtrInvestInfoMapper etrInvestInfoMapper;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     /**
      * <投标确认>界面初始化检查
@@ -2861,10 +2867,10 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 String code = (String) bm.get("code");
                 String messageStr = JsonUtils.json2Object((String) bm.get("message").toString(), String.class);
                 if (StringUtil.isEmpty(confirmOk)
-                        && StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                        && StringUtil.equals(PositionConstant.CODE_BUSI_RK, code)) {
                     WorkFlowUtil.showMessage(messageStr, MessageType.确认消息);
                 }
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+                if (StringUtil.equals(PositionConstant.CODE_BUSI_YK, code)) {
                     WorkFlowUtil.showMessage(messageStr, MessageType.错误消息);
                 }
                 throw new PositionException(messageStr);
@@ -2906,7 +2912,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             //头寸
             if (OperationType.REVOKE.equals(type) || OperationType.DELETE.equals(type)) {
                 // 撤销
-                PositionHttpRequest.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
+                positionRequestHandle.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
                         DictCodeListExt3.头寸业务类型_债券一级投标.getValue(), DictCodeList.交易方向_买入.getValue());
             }
             List<String> finishEtrList = new ArrayList<>();
@@ -3168,7 +3174,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         try {
             if (isNeedDealPosition) {
                 // 匹配取消
-                PositionHttpRequest.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
+                positionRequestHandle.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
                         DictCodeListExt3.头寸业务类型_债券一级申购.getValue(), DictCodeList.交易方向_买入.getValue());
             }
             if (StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), entity.getBiddingMethod())) {
@@ -3225,7 +3231,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         CfetsTrdFirstBidFirmInfoDto entity = getBussinessEntityByWorkflowId(workflowId);
         if (StringUtil.isNotEmpty(processMark)
                 && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
-            PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(), DictCodeListExt1.子系统代码_交易.getValue(),
+            positionRequestHandle.doDeleteByWorkFlowId(entity.getWorkflowId(), DictCodeListExt1.子系统代码_交易.getValue(),
                     DictCodeListExt3.头寸业务类型_债券一级投标.getValue(), DictCodeList.交易方向_买入.getValue());
         }
     }
@@ -3799,9 +3805,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 errorList.add(new ValidMessage("投标产品列表中指令投标券面总额不可为空!"));
             }
             // 业务模式
-            if (!StringUtil.isNotEmpty(item.getBusinessModel())) {
-                errorList.add(new ValidMessage("投标产品列表中业务模式不可为空!"));
-            }
+//            if (!StringUtil.isNotEmpty(item.getBusinessModel())) {
+//                errorList.add(new ValidMessage("投标产品列表中业务模式不可为空!"));
+//            }
             // 投资经理
             if (!StringUtil.isNotEmpty(item.getInvManagerId())) {
                 errorList.add(new ValidMessage("投标产品列表中投资经理不可为空!"));
@@ -3922,9 +3928,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 errorList.add(new ValidMessage("投标产品列表中投标标位不可为空!"));
             }
             // 业务模式
-            if (!StringUtil.isNotEmpty(item.getBusinessModel())) {
-                errorList.add(new ValidMessage("投标产品列表中业务模式不可为空!"));
-            }
+//            if (!StringUtil.isNotEmpty(item.getBusinessModel())) {
+//                errorList.add(new ValidMessage("投标产品列表中业务模式不可为空!"));
+//            }
             // 证券账户
             if (!StringUtil.isNotEmpty(item.getSecManageAcctId()) && !isJys) {
                 errorList.add(new ValidMessage("投标产品列表中证券账户不可为空!"));
@@ -4062,7 +4068,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         req.setCdate(entity.getTradeDate());
         req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         req.setPtlList(ptlList);
-        Map<String, Object> param = PositionHttpRequest.send(req);
+        Map<String, Object> param = positionRequestHandle.send(req);
         ThreadLocalUtil.setLocalCache(param);
     }
 
@@ -4153,7 +4159,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         req.setCdate(entity.getTradeDate());
         req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         req.setPtlList(ptlList);
-        Map<String, Object> param = PositionHttpRequest.send(req);
+        Map<String, Object> param = positionRequestHandle.send(req);
         ThreadLocalUtil.setLocalCache(param);
     }
 
@@ -4391,7 +4397,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         req.setUserId(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
         req.setTotalTradeId(IDGenerator.generate());
         req.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
-        PositionHttpRequest.batchClose(req);
+        positionRequestHandle.batchClose(req);
     }
 
     /**

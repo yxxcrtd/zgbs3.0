@@ -288,7 +288,7 @@
                NVL2(TT.CLEAR_BALANCE, A.CLEAR_BALANCE, STD.TRADE_AMT)    TRADED_BALANCE,
                 case when TT.TRADING_DAY is not null then TT.TRADING_DAY
                 when A.TRADING_DAY is not null then A.TRADING_DAY
-                else TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD') end TRADE_DATE,
+                else TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD') end TRADING_DAY,
                NVL2(TT.TRADE_TIME, A.TRADE_TIME, STD.CREATE_TIME)          DEAL_TIME,
                <!--GLLCUAT-320:历史成交查询字段缺失 modify by fuyongsheng 20220829 end-->
                CASE
