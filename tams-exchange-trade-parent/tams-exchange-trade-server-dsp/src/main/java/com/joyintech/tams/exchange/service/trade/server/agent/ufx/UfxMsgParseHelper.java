@@ -341,16 +341,26 @@ public class UfxMsgParseHelper {
                     trade.setTradeType(TradeType.NORMAL.value);
                 }
             }
-            // 排除无效的现券协商成交记录--实时清算记录
-            if (!((String) ds.get("business_id")).equals((String) ds.get("cbp_business_id")))
-                continue;
+            
+            // yanjianhui 修改于 2022/8/29 16:14 对协议回购交易变动的数据的处理。
+            if(trade.getEntrustProp().equals("BPN")||trade.getEntrustProp().equals("BPB")){
+                trade.setBrokerTradeId((String) ds.get("cbp_business_id"));
+                trade.setTradedVolume((long) Double.parseDouble((String) ds.get("entrust_amount")));
+                trade.setTradedPrice(BigDecimal.valueOf(Double.parseDouble((String) ds.get("expire_year_rate"))));
+                trade.setTradedBalance(BigDecimal.valueOf(Double.parseDouble((String) ds.get("entrust_balance"))));
+            }else {
+                // 排除无效的现券协商成交记录--实时清算记录
+                if (!((String) ds.get("business_id")).equals((String) ds.get("cbp_business_id")))
+                    continue;
+                trade.setBrokerTradeId((String) ds.get("business_id"));
+                trade.setTradedPrice(BigDecimal.valueOf(Double.parseDouble((String) ds.get("business_price"))));
+                trade.setTradedBalance(BigDecimal.valueOf(Double.parseDouble((String) ds.get("business_balance"))));
+            }
 
-            trade.setBrokerTradeId((String) ds.get("business_id"));
             if (Strings.isNullOrEmpty(trade.getBrokerTradeId())) {
                 trade.setBrokerTradeId((String) ds.get("entrust_no"));
             }
-            trade.setTradedPrice(BigDecimal.valueOf(Double.parseDouble((String) ds.get("business_price"))));
-            trade.setTradedBalance(BigDecimal.valueOf(Double.parseDouble((String) ds.get("business_balance"))));
+
             String businessTime = (String) ds.get("business_time");
             if (!Strings.isNullOrEmpty(businessTime)) {
                 trade.setTradeTime(businessTime);
@@ -863,13 +873,7 @@ public class UfxMsgParseHelper {
         return list;
 
     }
-    // yanjianhui 修改于 2022/8/10 15:42 获取原合同序号。
-    public static String getJoinReportId( List<Map<String, Object>> resList) {
-        for (Map<String, Object> ds : resList) {
-            return (String)ds.get("join_report_id");
-        }
-        return null;
-    }
+
 
 
     public static List<NegotiateQuoteReceiveBean> parseNegotiateQuoteReceiveBean(String accountId, String side, List<Map<String, Object>> resList) {

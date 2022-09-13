@@ -415,6 +415,10 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
             if (inputDto.getPositionType().equals(DictCodeList.持仓类型_可用.getValue()) && DictCodeList.交易方向_赎回.getValue().equals(deal.getPs())) {
                 resultDto.setCdate(deal.getTradeDate());
                 resultDto.setAmount(ArithmeticUtil.multiply(StringUtil.isNotEmpty(deal.getShareAmt()) ? deal.getShareAmt() : deal.getTradeAmt(), new BigDecimal(-1)));
+                if(!StringUtil.isNotEmpty(deal.getShareAmt())&&(DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue().equals(deal.getFinprodType2())&& DictCodeList.收益类型_净值型.getValue().equals(profitType))){
+                    BigDecimal netValue = EtrCommonCashPositionDealService.getPlanNetValue(deal.getFinprodId(),deal.getTradeDate());
+                    resultDto.setAmount(ArithmeticUtil.multiply(ArithmeticUtil.divide(deal.getTradeAmt(), netValue, 2), new BigDecimal(-1)));
+                }
                 result.add(resultDto);
             }
             if (inputDto.getPositionType().equals(DictCodeList.持仓类型_实际.getValue()) &&
@@ -422,6 +426,10 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 resultDto.setCdate(deal.getTradeDate());
                 resultDto.setHodingType(DictCodeList.持仓类型_可用.getValue());
                 resultDto.setAmount(ArithmeticUtil.multiply(StringUtil.isNotEmpty(deal.getShareAmt()) ? deal.getShareAmt() : deal.getTradeAmt(), new BigDecimal(-1)));
+                if(!StringUtil.isNotEmpty(deal.getShareAmt())&&(DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue().equals(deal.getFinprodType2())&& DictCodeList.收益类型_净值型.getValue().equals(profitType))){
+                    BigDecimal netValue = EtrCommonCashPositionDealService.getPlanNetValue(deal.getFinprodId(),deal.getTradeDate());
+                    resultDto.setAmount(ArithmeticUtil.multiply(ArithmeticUtil.divide(deal.getTradeAmt(), netValue, 2), new BigDecimal(-1)));
+                }
                 result.add(resultDto);
             }
             if (/*!(DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue().equals(deal.getFinprodType2())
@@ -433,12 +441,14 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 params.put("holdingType",DictCodeList.持仓类型_在途.getValue());
                 List<PtlSecPositionFlow> list = ptlSecPositionFlowMapper.selectSecFlow(params);
                 if(list.isEmpty()) {
+                    params.put("holdingType",DictCodeList.持仓类型_可用.getValue());
+                    List<PtlSecPositionFlow> avaList = ptlSecPositionFlowMapper.selectSecFlow(params);
                     resultDto.setCdate(deal.getTradeDate());
                     resultDto.setAmount(ArithmeticUtil.multiply(deal.getShareAmt(), new BigDecimal(-1)));
                     result.add(resultDto);
                     PtlSecPositionFlowDto resultDtozt = new PtlSecPositionFlowDto();
                     BeanUtils.copyProperties(resultDto, resultDtozt);
-                    resultDtozt.setAmount(deal.getShareAmt());
+                    resultDtozt.setAmount(avaList.get(0).getAmount());//净值型赎回金额 预占份额可能不正确，查询冲销
                     resultDtozt.setHodingType(DictCodeList.持仓类型_可用.getValue());
                     result.add(resultDtozt);
                 }else{

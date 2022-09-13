@@ -1,4 +1,4 @@
-package com.joyintech.tams.business.common.exception;
+package com.joyintech.tams.position.exception;
 
 public class PositionException extends RuntimeException {
 

@@ -36,7 +36,6 @@ import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.system.base.dao.SysUploadFileInfoMapper;
 import com.joyintech.system.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
@@ -96,6 +95,7 @@ import com.joyintech.tams.invest.trade.bond.dto.TrdBondInvestTradeCSTPDto;
 import com.joyintech.tams.invest.trade.bond.dto.TrdBondInvestTradeDto;
 import com.joyintech.tams.invest.trade.common.service.TradeCommonService;
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.service.ExchangeTransMatchCommonService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -342,6 +342,11 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
 
     // 交易份额小数保留位数
     private int decimalPlaces_4 = 4;
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 	
     /**
      * 交易及存续期交易，保存进待办，点批量审批时候需要报错。 {@inheritDoc}
@@ -2017,7 +2022,7 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
                 // ZGCPCN-252:银行间和场内公用代码,银行间改造新头寸,目前场内尚未支持,后续支持再处理 modify by fuyongsheng 20220509 start
                 if(!DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(entity.getTradeMarket())
                         && !DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(entity.getTradeMarket())){
-                    PositionHttpRequest.dorevoke(entity.getTotleTradeId(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt3.头寸业务类型_债券一级投标.getValue(),entity.getPs());
+                    positionRequestHandle.dorevoke(entity.getTotleTradeId(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt3.头寸业务类型_债券一级投标.getValue(),entity.getPs());
                 }
                 // ZGCPCN-252:银行间和场内公用代码,银行间改造新头寸,目前场内尚未支持,后续支持再处理 modify by fuyongsheng 20220509 end
             }
@@ -4912,6 +4917,6 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
             ptlList.add(pltMap);
         }
         result.put("ptlList",ptlList);
-        PositionHttpRequest.send(result);
+        positionRequestHandle.send(result);
     }
 }

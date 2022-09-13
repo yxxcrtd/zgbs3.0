@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -78,15 +77,14 @@ public class CfetsManualSettleQueryController extends BaseController {
         initPageParams.put("REG_ASSET_TYPE", this.getSelectDataFromDataDic(DictCode.登记资产类型, null));
 
         initPageParams.put("pageId", "cfetsManualSettleQuery");
-        return new Message<Map<String, Object>>(initPageParams).success();
+        return new Message<>(initPageParams).success();
     }
 
     /**
      * 银行间手工交收分页查询
      *
-     * @param dto
+     * @param dto 查询条件
      * @return Page<CfetsManualSettleTradeListRespond>
-     * @see
      * @since 1.0
      */
     @ApiOperation(value = "银行间手工交收分页查询", notes = "银行间手工交收分页查询")
@@ -107,26 +105,21 @@ public class CfetsManualSettleQueryController extends BaseController {
     @ApiOperation(value = "手工交收列表导出", notes = "手工交收列表导出")
     public void exportEtrDispatcherList(@RequestBody CfetsExportRequestDto req, HttpServletResponse response) {
         // 导出
-        ExcelUitl.doExport(req, response, "手工交收", () -> {
-            List dataList = cfetsManualSettleQueryService.findPage(req.getDto(CfetsManualSettleTradeListRequest.class)).getRoot();
-            return dataList;
-        });
+        ExcelUitl.doExport(req, response, "手工交收", () ->
+                cfetsManualSettleQueryService.findPage(req.getDto(CfetsManualSettleTradeListRequest.class)).getRoot());
     }
 
     /**
      * 交收流水列表分页查询
      *
-     * @param dto
+     * @param dto 查询条件
      * @return Page<CfetsManualSettleFlowRespond>
-     * @throws Exception Exception
-     * @see
      * @since 1.0
      */
     @ApiOperation(value = "交收流水列表分页查询", notes = "交收流水列表分页查询")
     @PostMapping("/findManualSettleFlow")
     @ResponseBody
-    public Message<Page<CfetsManualSettleFlowRespond>> findManualSettleFlow(@RequestBody CfetsManualSettleCommonRequest dto)
-            throws Exception {
+    public Message<Page<CfetsManualSettleFlowRespond>> findManualSettleFlow(@RequestBody CfetsManualSettleCommonRequest dto) {
         try {
             Page<CfetsManualSettleFlowRespond> page = cfetsManualSettleQueryService.findManualSettleFlow(dto);
             return new Message<Page<CfetsManualSettleFlowRespond>>().success().setData(page);
@@ -142,9 +135,9 @@ public class CfetsManualSettleQueryController extends BaseController {
     public Message<Map<String,Object>> findManualSettleInfo(@PathVariable("pageCode") String pageCode,
                                                               @PathVariable("dtCode") String dtCode,
                                                               @PathVariable("spcdCode") String spcdCode,
-                                                              @RequestBody CfetsManualSettleCommonRequest dto) throws Exception {
+                                                              @RequestBody CfetsManualSettleCommonRequest dto) {
         try {
-            Map<String,Object> resultData = new HashMap<>();
+            Map<String,Object> resultData;
             CfetsManualSettleDto settleDto = dto.getSelectedItem().get(0);
             if ((DictCodeListExt4.投标方式_分销买入.getValue().equals(settleDto.getBidModle())
                     || DictCodeListExt4.投标方式_自主投标.getValue().equals(settleDto.getBidModle())

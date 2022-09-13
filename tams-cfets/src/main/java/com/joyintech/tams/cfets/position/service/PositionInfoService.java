@@ -6,7 +6,6 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.pojo.BaseMap;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.cfets.position.dao.PositionInfoMapper;
 import com.joyintech.tams.cfets.position.dto.PositionCashRequestDetailDto;
 import com.joyintech.tams.cfets.position.dto.PositionCashSecDto;
@@ -19,6 +18,7 @@ import com.joyintech.tams.invest.common.component.base.group.BasePtlCashPosition
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.position.PositionQueryDto;
 import com.joyintech.tams.invest.entrust.common.service.EtrCommonService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -61,6 +60,12 @@ public class PositionInfoService {
 
     @Autowired
     private PositionInfoMapper positionInfoMapper;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     /**
      * 日期计算
@@ -277,7 +282,7 @@ public class PositionInfoService {
         Map<String, Object> map = new HashMap<>();
         BigDecimal sumAmount = BigDecimal.ZERO;
         map.put("ptlList", buildPosition(ptList, flowType, positionType));
-        String msg = PositionHttpRequest.queryPosition(map);
+        String msg = positionRequestHandle.queryPosition(map);
         BaseMap bm = JsonUtils.json2Object(msg, BaseMap.class);
         if (bm != null && StringUtil.equals("success", bm.getString("code"))) {
             List<LinkedHashMap> list = (List<LinkedHashMap>) bm.get("data");

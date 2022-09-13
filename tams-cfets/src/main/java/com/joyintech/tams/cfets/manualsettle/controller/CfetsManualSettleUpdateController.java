@@ -6,12 +6,15 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.select.SelectDto;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleUpdateRequest;
 import com.joyintech.tams.cfets.manualsettle.dto.PortSettleinfoDto;
 import com.joyintech.tams.cfets.manualsettle.service.CfetsManualSettleUpdateService;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -26,7 +29,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.HashMap;
 import java.util.List;
@@ -71,7 +77,22 @@ public class CfetsManualSettleUpdateController extends BaseController {
         Map<String, Object> initPageParams = new HashMap<>();
         //数据字典初始化数据
         //资产类型
-        initPageParams.put("PINAN_ASSET_TYPE", this.getSelectDataFromDataDic(DictCode.平安资产类型, null));
+//        initPageParams.put("PINAN_ASSET_TYPE", this.getSelectDataFromDataDic(DictCode.平安资产类型, null));
+        SelectDto selectDto = this.getSelectDataFromDataDic(DictCode.平安资产类型, null);
+        if (selectDto != null && !StringUtil.isEmptyList(selectDto.getOptions())) {
+            List<SelectOptionDto> options = selectDto.getOptions();
+            for (int index = options.size() - 1; index >= 0; index--) {
+                SelectOptionDto option = options.get(index);
+                // 修改对应文本
+                if (StringUtil.equals(option.getId(), DictCodeList.平安资产类型_计划类资产_利率型.getValue())) {
+                    option.setText("债券质押式回购");
+                }
+                if (StringUtil.equals(option.getId(), DictCodeList.平安资产类型_基金.getValue())) {
+                    option.setText("债券质押式回购");
+                }
+            }
+            initPageParams.put("PINAN_ASSET_TYPE", selectDto);
+        }
         //业务类型
         initPageParams.put("BUSI_TYPE_POSITION", this.getSelectDataFromDataDic(DictCode.头寸业务类型, null));
         //交易方向

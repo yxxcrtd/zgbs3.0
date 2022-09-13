@@ -172,7 +172,7 @@
         listagg(T1.CASH_ID, ',') within group ( order by T1.CASH_ID ) CASH_ID,
         min(T1.VDATE) VDATE,
         T1.MDATE,
-        SUM(T1.CASH_AMT * T1.AMOUNT) fpriceAmt,
+        SUM(nvl(T1.CASH_AMT,T1.INT_AMT) * T1.AMOUNT) fpriceAmt,
         /*理论本息总额*/
         sum(case when T1.CASH_TYPE IN (#{CASH_CLASS_TYPE01}, '04') then 0
         else T1.PRIN_AMT * T1.AMOUNT end) prinAmt,

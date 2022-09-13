@@ -308,8 +308,10 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                         settleTransData.setZgfAmt(dto.getZgfAmt()); // 证管费
                         settleTransData.setStampFee(dto.getStampFee()); // 印花税
                         settleTransData.setSettleFee(dto.getSettleFee()); // 结算费
-                        settleTransData.setTradeAmt(dto.getTradeAmt()); // 成交金额
-                        settleTransData.setShareAmt(dto.getTradeNum()); // 成交份额
+                        // GLLCUAT-358:modify by fuyongsehng 20220906 start
+                        settleTransData.setTradeAmt(dto.getTradeAmt().abs()); // 成交金额
+                        settleTransData.setShareAmt(dto.getTradeNum().abs()); // 成交份额
+                        // GLLCUAT-358:modify by fuyongsehng 20220906 end
                         settleTransDataMapper.updateByPrimaryKeySelective(settleTransData);
                     }
                 }

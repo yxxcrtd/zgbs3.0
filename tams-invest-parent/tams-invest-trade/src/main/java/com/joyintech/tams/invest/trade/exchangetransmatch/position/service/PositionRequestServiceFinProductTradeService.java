@@ -5,7 +5,6 @@ import com.google.common.collect.Maps;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustDetailMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
@@ -28,13 +27,13 @@ import com.joyintech.tams.invest.trade.exchangetransmatch.common.dao.ExchangeTra
 import com.joyintech.tams.invest.trade.exchangetransmatch.position.bean.PositionRequestBaseBean;
 import com.joyintech.tams.invest.trade.exchangetransmatch.position.bean.TrdMoreConvrateDto;
 import com.joyintech.tams.invest.trade.exchangetransmatch.position.constant.PositionConstant;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 import static com.joyintech.tams.constant.DictCodeList.是否_否;
 import static com.joyintech.tams.constant.DictCodeListExt3.交易单位_份;
@@ -72,6 +71,12 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
     private CommonPositionService commonPositionService;
   
     public static final String TRADE_PLAT = "TRANS_MATCH";
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     /**
      * BaseTradeProductDealDto请求对象使用
@@ -131,7 +136,7 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
                 this.credit001(entity, resultMap);
             }
             if(StringUtil.isNotEmpty(resultMap.get(INTERFACE_TYPE))){
-                PositionHttpRequest.send(resultMap);
+                positionRequestHandle.send(resultMap);
             }else{
                 logger.debug("[成交匹配未找到对应的接口配置]");
             }
@@ -146,7 +151,7 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
     public void sendRevoke(List<ExchangeTransMatchCommonRevokeDto> exchangeTransMatchCommonRevokeDtoList) {
         for (ExchangeTransMatchCommonRevokeDto entity:exchangeTransMatchCommonRevokeDtoList) {
             String busiType = commonPositionEngineService.getPositionBusiType(entity.getFinprodType2(),entity.getPs(), null);
-            PositionHttpRequest.dorevoke(entity.getTradeId(), PositionConstant.POSITION_TYPE_TRD, busiType, entity.getPs());
+            positionRequestHandle.dorevoke(entity.getTradeId(), PositionConstant.POSITION_TYPE_TRD, busiType, entity.getPs());
         }
     }
 

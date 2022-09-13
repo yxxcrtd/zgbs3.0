@@ -105,6 +105,11 @@ public class RiskUtil {
 			put(BussinessDictCodeListRds.分类维度_是否面向单一投资者.getValue(),"IS_FACE_SINGLEINVESTOR");
 			put(BussinessDictCodeListRds.分类维度_说明书是否披露风险标志.getValue(),"DIRECT_DISCLOSURE_RISK_FLAG");
 			put(BussinessDictCodeListRds.分类维度_开放周期.getValue(),"PTL_PORTFOLIO.PORTFOLIO_ID");
+			put(BussinessDictCodeListRds.分类维度_是否面向非机构投资者.getValue(),"PRD_SALE_PARAM.AGENCY_ORIENTED");
+			put(BussinessDictCodeListRds.分类维度_开放模式.getValue(),"CASH_RULE_TEMP.OPEN_MODE");
+			put(BussinessDictCodeListRds.分类维度_是否现金管理类产品.getValue(),"FIN_PRODUCT_ADD.IS_CASH_MANAGE");
+			put(BussinessDictCodeListRds.分类维度_自主管理计划.getValue(),"PA_PTL_PORTFOLIO.SELF_MANAGEMENT");
+
 		}
 	};
 

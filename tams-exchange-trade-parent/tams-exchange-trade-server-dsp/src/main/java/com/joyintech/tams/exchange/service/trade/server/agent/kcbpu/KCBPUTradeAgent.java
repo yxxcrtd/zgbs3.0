@@ -93,7 +93,7 @@ public class KCBPUTradeAgent extends TradeAgentDsp {
             //账户登录成功，记录登录成功的账户
             if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
                 logger.info("account {} login success", accountId);
-                KCBPUAccount kcbpuAccount = KCBPUMsgParseHelper.parseAccount(AgentUtil.getQueryListKCBPW(resultBean), accountId);
+                KCBPUAccount kcbpuAccount = KCBPUMsgParseHelper.parseAccount((Map<String, Object>) resultBean.getData(), accountId);
                 resultBean.setData(kcbpuAccount);
                 //保存登录信息
                 addkcbpuAccount(kcbpuAccount);
@@ -232,7 +232,7 @@ public class KCBPUTradeAgent extends TradeAgentDsp {
         CancelEntrustBean cancelEntrustBean = getCancelEntrustBean(entrust, cancelEntrust);
         logger.info("send entrust:{}", entrust.getId());
         // 场景代码
-        int functionCode = FunctionCode.REQ_ENTRUST.value;
+        int functionCode = FunctionCode.REQ_CANCEL_ENTRUST.value;
         // 场景属性
         // 默认 404
         String entrustProp = "Bidding";
@@ -240,18 +240,19 @@ public class KCBPUTradeAgent extends TradeAgentDsp {
             // region 参数组装
             // 自定义参数
             Map<String, Object> customParam = getCustomParam(entrust.getAccountId());
+            customParam.put("market", AgentUtil.ExchangeMarketKCBPU(entrust.getMarket()));
             // endregion
             ResultBean resultBean = triggerCodeAdapter(functionCode, entrustProp, entrust, customParam);
 
             if (resultBean.getErrorCode() == ErrorCode.SUCCESS.value) {
                 List<Map<String, String>> resList = (List<Map<String, String>>) resultBean.getData();
                 for (Map<String, String> resMap : resList) {
-                    cancelEntrustBean.setCancelBrokerEntrustId(resMap.get("ordersno"));
+                    cancelEntrustBean.setCancelBrokerEntrustId(resMap.get("ORDER_ID"));
                     // 撤销的orderid 优先取 orderid。没有取cancelorderid
-                    String orderid = AgentUtil.GetMapValue(resMap, "orderid");
-                    if (Strings.isNullOrEmpty(orderid)) {
-                        orderid = AgentUtil.GetMapValue(resMap, "cancelorderid");
-                    }
+                    String orderid = AgentUtil.GetMapValue(resMap, "ORDER_ID");
+//                    if (Strings.isNullOrEmpty(orderid)) {
+//                        orderid = AgentUtil.GetMapValue(resMap, "cancelorderid");
+//                    }
                     // 缓存被撤销与撤销的委托更新
                     entrustIdManager.setKcbpwPTCancelEntrustId(entrust.getAccountId(), entrust.getBrokerEntrustId(),
                             resMap.get("ordersno"), orderid);
@@ -275,7 +276,7 @@ public class KCBPUTradeAgent extends TradeAgentDsp {
         CancelEntrustBean cancelEntrustBean = getCancelEntrustBean(iEntrust, cancelEntrust);
         logger.info("send entrust:{}", iEntrust.getId());
         // 场景代码
-        int functionCode = FunctionCode.REQ_ENTRUST.value;
+        int functionCode = FunctionCode.REQ_CANCEL_ENTRUST.value;
         // 场景属性
         // 默认 404
         String entrustProp = "Bidding";

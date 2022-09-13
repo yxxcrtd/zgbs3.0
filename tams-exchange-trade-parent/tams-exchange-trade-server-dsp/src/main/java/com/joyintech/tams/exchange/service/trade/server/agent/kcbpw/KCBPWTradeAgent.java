@@ -79,6 +79,7 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
     public void removeAccount(String accountId) {
         accountMap.remove(accountId);
         kcbpAccounts.remove(accountId);
+        orderAccountMap.remove(accountId);
     }
 
     /**
@@ -114,6 +115,8 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
                 addTradeRequest(accountId, this);
                 addAccount(accountId, account);
                 setStatus(account.getId(), AccountLoginStatus.LOGGED);
+
+                orderAccountMap.remove(accountId);
 
                 //登录成功后发送重传请求
                 terminalHelper.reqReissueEntrust(accountId);
@@ -336,6 +339,9 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
                     entrust.setBrokerEntrustId(resMap.get("ordersno"));
                     entrust.setReportNo(AgentUtil.GetMapValue(resMap, "orderid"));
                 }
+
+                //保存当前下单账号
+                orderAccountMap.put(entrust.getAccountId(), entrust.getBrokerEntrustId());
             } else {
                 entrust.setEntrustStatus(EntrustStatus.INVALID.value);
                 entrust.setErrorCode(resultBean.getErrorCode());
@@ -422,6 +428,9 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
                     entrustIdManager.setKcbpwZHEntrustId(entrust.getAccountId(),
                             entrust.getBrokerEntrustId() + "|" + entrust.getReportNo(), entrust.getId());
                 }
+
+                //保存当前下单账号
+                orderAccountMap.put(entrust.getAccountId(), entrust.getBrokerEntrustId());
             } else {
                 entrust.setErrorCode(resultBean.getErrorCode());
                 entrust.setErrorMsg(resultBean.getErrorMsg());
@@ -472,6 +481,12 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
                     entrustIdManager.setKcbpwPTEntrustId(entrust.getAccountId(),
                             cancelEntrustBean.getCancelBrokerEntrustId() + "|" + entrust.getReportNo(), cancelEntrustBean.getCancelId());
                 }
+
+                //保存当前下单账号
+                orderAccountMap.put(entrust.getAccountId(), cancelEntrustBean.getCancelBrokerEntrustId());
+
+                //触发委托查询
+                executeQueryWithCancelOrder(entrust.getAccountId(), QueryEnum.queryIncrementEntrust);
             } else {
                 cancelEntrustBean.setErrorCode(resultBean.getErrorCode());
                 cancelEntrustBean.setErrorMsg(resultBean.getErrorMsg());
@@ -569,6 +584,11 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
                             cancelEntrustBean.getCancelBrokerEntrustId() + "|" + orderid, cancelEntrustBean.getCancelId());
                 }
 
+                //保存当前下单账号
+                orderAccountMap.put(cancelEntrustBean.getAccountId(), cancelEntrustBean.getCancelBrokerEntrustId());
+
+                //触发委托查询
+                executeQueryWithCancelOrder(cancelEntrustBean.getAccountId(), QueryEnum.getQueryEnum(entrustProp));
             } else {
                 cancelEntrustBean.setErrorCode(resultBean.getErrorCode());
                 cancelEntrustBean.setErrorMsg(resultBean.getErrorMsg());
@@ -952,20 +972,49 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
 
     @Override
     public void queryNextTrade() {
-        if (MapUtils.isEmpty(kcbpAccounts)) {
+        //登录成功用户
+        if (MapUtils.isEmpty(kcbpAccounts) || MapUtils.isEmpty(orderAccountMap)) {
             return;
         }
-        for (Map.Entry<String, KCBPWAccount> entry : kcbpAccounts.entrySet()) {
-            KCBPWAccount kcbpAccount = entry.getValue();
-            String accountId = kcbpAccount.getAccountId();
+
+        //下单账号
+        Set<String> orderAccounts = orderAccountMap.keySet();
+        for (String accountId : orderAccounts) {
+            KCBPWAccount kcbpAccount = kcbpAccounts.get(accountId);
             logger.info("account：{}，status：{}", accountId, getStatus(accountId));
-//            if (getStatus(accountId) != AccountLoginStatus.TRADING.value) {
-//                return;
-//            }
             boolean loginStatus = tradeAgentManager.getAgentLoginStatus(accountId);
             if (loginStatus) {
                 executeQueryNextTrade(kcbpAccount);
             }
+        }
+//        for (Map.Entry<String, KCBPWAccount> entry : kcbpAccounts.entrySet()) {
+//            KCBPWAccount kcbpAccount = entry.getValue();
+//            String accountId = kcbpAccount.getAccountId();
+//            logger.info("account：{}，status：{}", accountId, getStatus(accountId));
+////            if (getStatus(accountId) != AccountLoginStatus.TRADING.value) {
+////                return;
+////            }
+//            boolean loginStatus = tradeAgentManager.getAgentLoginStatus(accountId);
+//            if (loginStatus) {
+//                executeQueryNextTrade(kcbpAccount);
+//            }
+//        }
+    }
+
+    private void executeQueryWithCancelOrder(String accountId, QueryEnum queryEnum) {
+        logger.info("【撤销委托】触发委托状态查询：accountId={},queryEnum={}", accountId, queryEnum);
+        if (Objects.isNull(queryEnum)) {
+            return;
+        }
+        if (null == poolExecutor) {
+            poolExecutor = new ThreadPoolExecutor(8, 20, 1000, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>(100), new ThreadPoolExecutor.DiscardPolicy());
+            poolExecutor.prestartAllCoreThreads();
+        }
+
+        try {
+            poolExecutor.execute(new QueryTask(queryEnum, kcbpAccounts.get(accountId), cancelOrderInterval));
+        } catch (Exception e) {
+            logger.error("{}执行异常：{}", queryEnum.name(), e.getMessage(), e);
         }
     }
 
@@ -975,10 +1024,11 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
             poolExecutor.prestartAllCoreThreads();
         }
 
-        for (QueryEnum queryEnum : QueryEnum.getValues()) {
+        List<QueryEnum> list = Lists.newArrayList(QueryEnum.queryIncrementTrade, QueryEnum.queryFixedIncomeTrade,
+                QueryEnum.queryProtocolBack_SZ_Trade, QueryEnum.queryProtocolBack_SH_Trade, QueryEnum.queryBondNegotiate_SZ_Trade);
+        for (QueryEnum queryEnum : list) {
             try {
                 poolExecutor.execute(new QueryTask(queryEnum, kcbpAccount));
-                Thread.sleep(500);
             } catch (Exception e) {
                 logger.error("{}执行异常：{}", queryEnum.name(), e.getMessage(), e);
             }
@@ -986,41 +1036,62 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
     }
 
     enum QueryEnum {
-        queryIncrementEntrust(1),
-        queryFixedIncomeEntrust(2),
-        queryProtocolBack_SH_Entrust(3),
-        queryProtocolBack_SZ_Entrust(4),
-        queryIncrementTrade(5),
-        queryFixedIncomeTrade(6),
-        queryProtocolBack_SZ_Trade(7),
-        queryProtocolBack_SH_Trade(8),
-        queryBondNegotiate_SZ_Entrust(9),
-        queryBondNegotiate_SZ_Trade(10),
+        queryIncrementEntrust(Lists.newArrayList("Bulk")),
+        queryFixedIncomeEntrust(Lists.newArrayList("FixedIncome")),
+        queryProtocolBack_SH_Entrust(Lists.newArrayList("ProtocolBack_SH")),
+        queryProtocolBack_SZ_Entrust(Lists.newArrayList("ProtocolBack_SZ")),
+        queryBondNegotiate_SZ_Entrust(Lists.newArrayList("BondOrderSZ", "BondAgreeSZ")),
+
+        queryIncrementTrade,
+        queryFixedIncomeTrade,
+        queryProtocolBack_SZ_Trade,
+        queryProtocolBack_SH_Trade,
+        queryBondNegotiate_SZ_Trade,
         ;
 
-        private Integer code;
+        private List<String> entrustProps;
 
-        QueryEnum(Integer code) {
-            this.code = code;
+        QueryEnum() {
+
         }
 
-        public Integer getCode() {
-            return code;
+        QueryEnum(List<String> entrustProps) {
+            this.entrustProps = entrustProps;
         }
 
-        public static List<QueryEnum> getValues() {
-            return Lists.newArrayList(QueryEnum.values()).stream()
-                    .sorted(Comparator.comparing(QueryEnum::getCode)).collect(Collectors.toList());
+        public static QueryEnum getQueryEnum(String entrustProp) {
+            for (QueryEnum queryEnum : values()) {
+                if (org.apache.commons.collections.CollectionUtils.isNotEmpty(queryEnum.getEntrustProps())
+                        && queryEnum.getEntrustProps().contains(entrustProp)) {
+                    return queryEnum;
+                }
+            }
+            return null;
+        }
+
+        public List<String> getEntrustProps() {
+            return entrustProps;
+        }
+
+        public void setEntrustProps(List<String> entrustProps) {
+            this.entrustProps = entrustProps;
         }
     }
 
     class QueryTask implements Runnable {
         private QueryEnum queryEnum;
         private KCBPWAccount kcbpAccount;
+        private long sleep;
 
         public QueryTask(QueryEnum queryEnum, KCBPWAccount kcbpAccount) {
             this.queryEnum = queryEnum;
             this.kcbpAccount = kcbpAccount;
+        }
+
+        public QueryTask(QueryEnum queryEnum, KCBPWAccount kcbpAccount, long sleep) {
+            this.queryEnum = queryEnum;
+            this.kcbpAccount = kcbpAccount;
+            this.sleep = sleep;
         }
 
         @Override
@@ -1040,22 +1111,27 @@ public class KCBPWTradeAgent extends TradeAgentDsp {
                     case queryProtocolBack_SZ_Entrust:
                         queryProtocolBack_SZ_Entrust(kcbpAccount);
                         return;
-                    case queryIncrementTrade:
-                        queryIncrementTrade(kcbpAccount);
-                        return;
-                    case queryFixedIncomeTrade:
-                        queryFixedIncomeTrade(kcbpAccount);
-                        return;
-                    case queryProtocolBack_SH_Trade:
-                        queryProtocolBack_SH_Trade(kcbpAccount);
-                        return;
-                    case queryProtocolBack_SZ_Trade:
-                        queryProtocolBack_SZ_Trade(kcbpAccount);
-                        return;
                     case queryBondNegotiate_SZ_Entrust:
                         queryBondNegotiate_SZ_Entrust(kcbpAccount);
                         return;
+                    case queryIncrementTrade:
+                        queryIncrementEntrust(kcbpAccount);
+                        queryIncrementTrade(kcbpAccount);
+                        return;
+                    case queryFixedIncomeTrade:
+                        queryFixedIncomeEntrust(kcbpAccount);
+                        queryFixedIncomeTrade(kcbpAccount);
+                        return;
+                    case queryProtocolBack_SH_Trade:
+                        queryProtocolBack_SH_Entrust(kcbpAccount);
+                        queryProtocolBack_SH_Trade(kcbpAccount);
+                        return;
+                    case queryProtocolBack_SZ_Trade:
+                        queryProtocolBack_SZ_Entrust(kcbpAccount);
+                        queryProtocolBack_SZ_Trade(kcbpAccount);
+                        return;
                     case queryBondNegotiate_SZ_Trade:
+                        queryBondNegotiate_SZ_Entrust(kcbpAccount);
                         queryBondNegotiate_SZ_Trade(kcbpAccount);
                         return;
                     default:

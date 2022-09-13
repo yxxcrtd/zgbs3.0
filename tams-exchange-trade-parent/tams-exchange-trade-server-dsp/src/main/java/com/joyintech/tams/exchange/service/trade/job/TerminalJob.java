@@ -24,7 +24,7 @@ public class TerminalJob {
     @Autowired
     private TradeAgentManager tradeAgentManager;
 
-    @Scheduled(fixedRateString = "${agent.query.interval:1000}")
+    @Scheduled(fixedRateString = "${agent.query.interval:100000}")
     public void queryTrade() {
         if (Objects.isNull(SpringContextUtils.getApplicationContext())) {
             logger.info("applicationContext 为空");

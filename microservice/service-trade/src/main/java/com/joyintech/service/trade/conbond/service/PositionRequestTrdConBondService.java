@@ -2,15 +2,14 @@ package com.joyintech.service.trade.conbond.service;
 
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.trade.conbond.dao.TrdConBondMapper;
 import com.joyintech.service.trade.conbond.dto.TrdConBondDto;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +34,12 @@ public class PositionRequestTrdConBondService {
     private TrdConBondMapper trdConBondMapper;
 
     /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
+
+    /**
      * TrdConBondDto请求对象使用
      *
      * @param entity
@@ -44,7 +49,7 @@ public class PositionRequestTrdConBondService {
         resultMap.put("decisionAct", decisionAct);
         resultMap.put("systemAct", systemAct);
         this.bond003(entity, resultMap);
-        PositionHttpRequest.send(resultMap);
+        positionRequestHandle.send(resultMap);
     }
 
     /**
@@ -53,7 +58,7 @@ public class PositionRequestTrdConBondService {
      * @param workflowId
      */
     public void sendDelete(String workflowId) {
-        PositionHttpRequest.doDeleteByWorkFlowId(workflowId, POSITION_TYPE_TRD, DictCodeListExt3.头寸业务类型_网下申购.getValue(), DictCodeList.交易方向_申购.getValue());
+        positionRequestHandle.doDeleteByWorkFlowId(workflowId, POSITION_TYPE_TRD, DictCodeListExt3.头寸业务类型_网下申购.getValue(), DictCodeList.交易方向_申购.getValue());
     }
 
     /**
@@ -62,7 +67,7 @@ public class PositionRequestTrdConBondService {
      * @param entity
      */
     public void sendRevoke(TrdConBondDto entity) {
-        PositionHttpRequest.dorevoke(entity.getTrdProductDeal().getTradeId(), POSITION_TYPE_TRD, DictCodeListExt3.头寸业务类型_网下申购.getValue(), DictCodeList.交易方向_申购.getValue());
+        positionRequestHandle.dorevoke(entity.getTrdProductDeal().getTradeId(), POSITION_TYPE_TRD, DictCodeListExt3.头寸业务类型_网下申购.getValue(), DictCodeList.交易方向_申购.getValue());
     }
 
     /**

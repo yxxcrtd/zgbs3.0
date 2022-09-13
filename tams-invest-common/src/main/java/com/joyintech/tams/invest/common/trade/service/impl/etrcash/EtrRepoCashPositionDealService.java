@@ -434,7 +434,11 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                 if (!etrPositionHoldDto.isNeedNegative()) {
                     //到期日每只券增加交易质押券面总额/100
                     // 冲销首期交易数据
-                    etrPositionHoldDto.getPtlSecPositionFlows().addAll(ptlSecPositionFlowLogic(finProductTradeDto, false));
+                    if(StringUtil.equals(finProductTradeDto.getTrdProductDeal().getPs(), DictCodeList.交易方向_到期.getValue())){
+                        etrSecPositionFlowDto.setAmount(交易券面总额.negate());
+                        etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
+                    }
+//                    etrPositionHoldDto.getPtlSecPositionFlows().addAll(ptlSecPositionFlowLogic(finProductTradeDto, false));
                     // 查找委托时的指令持仓,用于冲销
                     etrSecPositionFlowDtos = EtrCommonCashPositionDealService.selectAllPositionByTotle(entrustId);
                 } else {

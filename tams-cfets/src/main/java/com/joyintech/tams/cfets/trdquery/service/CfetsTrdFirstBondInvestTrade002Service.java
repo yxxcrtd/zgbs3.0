@@ -8,7 +8,6 @@ package com.joyintech.tams.cfets.trdquery.service;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInitRequest;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub002Service;
@@ -29,6 +28,7 @@ import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
 import com.joyintech.tams.invest.common.dto.trade.entrust.EtrFinishStatusDto;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import org.apache.commons.collections.CollectionUtils;
@@ -88,6 +88,12 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
     @Autowired
     private BaseEtrInvestInfoService baseEtrInvestInfoServiceImpl;
 
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
+
 
     /**
      * 一级申购撤销doComplete
@@ -98,7 +104,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
      */
     public CfetsTrdBondFirstSubInfoDto doCompleteBidRevoke(CfetsTrdFirstBondInvestTradeDto entity, String settleRemark, Boolean isNeedDealPosition,Boolean isRevoke) {
         logger.info("一级申购撤销doComplete,入参:" + JsonUtils.object2Json(entity));
-        CfetsTrdBondFirstSubInfoDto tradeDto = null;
+        CfetsTrdBondFirstSubInfoDto tradeDto = new CfetsTrdBondFirstSubInfoDto();
         Map<String, Object> params = new HashMap<>();
         params.put("workflowId", entity.getWorkflowId());
         String bizCode = entity.getTotleTradeId();
@@ -141,8 +147,7 @@ public class CfetsTrdFirstBondInvestTrade002Service extends BaseService<CfetsTrd
         //发送头寸
         String ps = DictCodeList.交易方向_买入.getValue();
         String busiType = DictCodeListExt3.头寸业务类型_债券一级申购.getValue();
-        PositionHttpRequest.dorevoke(bizCode, DictCodeListExt1.子系统代码_交易.getValue(), busiType, ps);
-
+        positionRequestHandle.dorevoke(bizCode, DictCodeListExt1.子系统代码_交易.getValue(), busiType, ps);
         return tradeDto;
     }
 

@@ -8,11 +8,12 @@ import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
-import com.joyintech.tams.cfets.manualsettle.dto.*;
+import com.joyintech.tams.business.common.util.RedisSingleLock;
+import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleDto;
+import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleRequest;
 import com.joyintech.tams.cfets.manualsettle.service.CfetsManualSettleService;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
-import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
@@ -24,11 +25,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 @PageId("CfetsManualSettle")
@@ -39,6 +44,9 @@ public class CfetsManualSettleController extends BaseController {
 
     @Autowired
     private CfetsManualSettleService cfetsManualSettleService;
+
+    @Autowired
+    private RedisSingleLock redisSingleLock;
 
     @Override
     public String init(Model model) {
@@ -88,51 +96,62 @@ public class CfetsManualSettleController extends BaseController {
     public Message<AjaxResult> doManualSettle(@RequestBody CfetsManualSettleRequest cfetsRequest, BindingResult br) {
 
         List<CfetsManualSettleDto> dtoList = cfetsRequest.getSelectedItem();
-        //保存
-        ProcessParameter<CfetsManualSettleDto> processParameter = new ProcessParameter<>();
-        WorkFlowParameter<CfetsManualSettleDto> params = new WorkFlowParameter<>();
-        params.setPageId("CfetsManualSettle");
-        params.setElementId(dtoList.get(0).getElementId());
-        params.setBusinessCode(CfetsManualSettleDto::getTradeId);
-        params.setBusinessType(DictCodeListExt3.共通业务类型_交收管理.getValue());
-
-        String finalOpertType;
-
-        if(dtoList.get(0)!=null && StringUtil.equals(dtoList.get(0).getButtonType(),DictCodeListExt3.交收操作类型_回溯.getValue())){
-            finalOpertType = DictCodeListExt3.交收操作类型_回溯.getCodeName();
-        }else if(dtoList.get(0)!=null && StringUtil.equals(dtoList.get(0).getButtonType(),DictCodeListExt3.交收操作类型_交收.getValue())){
-            finalOpertType = DictCodeListExt3.交收操作类型_交收.getCodeName();
-        }else{
-            finalOpertType = DictCodeListExt3.交收操作类型_交收失败.getCodeName();
+        boolean flag = false;
+        String tradeId = null;
+        for (CfetsManualSettleDto item : dtoList) {
+            if (!redisSingleLock.tryLock(item.getTradeId(), UUID.randomUUID().toString(), 10)) {
+                flag = true;
+                tradeId = item.getTradeId();
+            }
         }
+        if(flag){
+            return new Message<AjaxResult>().fail().setMessage("交易编号:" + tradeId + " 已被他人操作!");
+        }
+        try {
+            //保存
+            ProcessParameter<CfetsManualSettleDto> processParameter = new ProcessParameter<>();
+            WorkFlowParameter<CfetsManualSettleDto> params = new WorkFlowParameter<>();
+            params.setPageId("CfetsManualSettle");
+            params.setElementId(dtoList.get(0).getElementId());
+            params.setBusinessCode(CfetsManualSettleDto::getTradeId);
+            params.setBusinessType(DictCodeListExt3.共通业务类型_交收管理.getValue());
 
-        String finalOpertType1 = finalOpertType;
-        DecimalFormat format = new DecimalFormat("#,###.00");
+            String finalOpertType;
 
-        params.setComment((entity) -> {
-            String settleArg = getMessage("交收金额") + GlobalConstant.COLON + (entity.getSettleAmt()== null?"":format.format(entity.getSettleAmt())) + "元";
-            if(StringUtil.equals(entity.getPs(), BussinessDictCodeList.交易方向_买入.getValue())){
-                settleArg = getMessage("交收数量") + GlobalConstant.COLON + entity.getSettleNum();
+            if (dtoList.get(0) != null && StringUtil.equals(dtoList.get(0).getButtonType(), DictCodeListExt3.交收操作类型_回溯.getValue())) {
+                finalOpertType = DictCodeListExt3.交收操作类型_回溯.getCodeName();
+            } else if (dtoList.get(0) != null && StringUtil.equals(dtoList.get(0).getButtonType(), DictCodeListExt3.交收操作类型_交收.getValue())) {
+                finalOpertType = DictCodeListExt3.交收操作类型_交收.getCodeName();
+            } else {
+                finalOpertType = DictCodeListExt3.交收操作类型_交收失败.getCodeName();
             }
-            if(StringUtil.isNotEmpty(entity.getFinprodAbbr())) {
-                return WorkFlowUtil.concatComment(
-                        getMessage("交收日期") + GlobalConstant.COLON + entity.getSettleDate(),
-                        getMessage("原业务编号") + GlobalConstant.COLON + entity.getTradeId(),
-                        getMessage("业务类型") + GlobalConstant.COLON + entity.getTgBusiTypeStr(),
-                        (getMessage("资产简称") + GlobalConstant.COLON + entity.getFinprodAbbr()),
-                        getMessage("交收操作") + GlobalConstant.COLON + finalOpertType1,
-                        settleArg);
-            }else {
-                return WorkFlowUtil.concatComment(
-                        getMessage("交收日期") + GlobalConstant.COLON + entity.getSettleDate(),
-                        getMessage("原业务编号") + GlobalConstant.COLON + entity.getTradeId(),
-                        getMessage("业务类型") + GlobalConstant.COLON + entity.getTgBusiTypeStr(),
-                        getMessage("交收操作") + GlobalConstant.COLON + finalOpertType1,
-                        settleArg);
-            }
-        });
-        processParameter.setWorkFlowParameter(params);
-        try{
+
+            String finalOpertType1 = finalOpertType;
+            DecimalFormat format = new DecimalFormat("#,###.00");
+
+            params.setComment((entity) -> {
+                String settleArg = getMessage("交收金额") + GlobalConstant.COLON + (entity.getSettleAmt() == null ? "" : format.format(entity.getSettleAmt())) + "元";
+                if (StringUtil.equals(entity.getPs(), BussinessDictCodeList.交易方向_买入.getValue())) {
+                    settleArg = getMessage("交收数量") + GlobalConstant.COLON + entity.getSettleNum();
+                }
+                if (StringUtil.isNotEmpty(entity.getFinprodAbbr())) {
+                    return WorkFlowUtil.concatComment(
+                            getMessage("交收日期") + GlobalConstant.COLON + entity.getSettleDate(),
+                            getMessage("原业务编号") + GlobalConstant.COLON + entity.getTradeId(),
+                            getMessage("业务类型") + GlobalConstant.COLON + entity.getTgBusiTypeStr(),
+                            (getMessage("资产简称") + GlobalConstant.COLON + entity.getFinprodAbbr()),
+                            getMessage("交收操作") + GlobalConstant.COLON + finalOpertType1,
+                            settleArg);
+                } else {
+                    return WorkFlowUtil.concatComment(
+                            getMessage("交收日期") + GlobalConstant.COLON + entity.getSettleDate(),
+                            getMessage("原业务编号") + GlobalConstant.COLON + entity.getTradeId(),
+                            getMessage("业务类型") + GlobalConstant.COLON + entity.getTgBusiTypeStr(),
+                            getMessage("交收操作") + GlobalConstant.COLON + finalOpertType1,
+                            settleArg);
+                }
+            });
+            processParameter.setWorkFlowParameter(params);
             String msg = cfetsManualSettleService.start(processParameter,
                     dtoList.toArray(new CfetsManualSettleDto[dtoList.size()]));
             return new Message<AjaxResult>().success().setMessage("处理完成");
@@ -140,6 +159,10 @@ public class CfetsManualSettleController extends BaseController {
             logger.error("交收错误",e);
             //return new Message<AjaxResult>().fail().setMessage("交收失败");
             return PositionUtil.ajaxErrorReturn(e);
+        } finally {
+            for (CfetsManualSettleDto item : dtoList) {
+                redisSingleLock.releaseLock(item.getTradeId());
+            }
         }
     }
 

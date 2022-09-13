@@ -27,7 +27,6 @@ import static com.joyintech.tams.invest.common.position.constant.PositionCommonC
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.OWN_SEC_AMOUNT;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.POSITION_ETR_PAGE;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.POSITION_TYPE_ETR;
-import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.POSITION_TYPE_TRD;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.PS;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.PTL_CASH_LIST;
 import static com.joyintech.tams.invest.common.position.constant.PositionCommonConstant.PTL_LIST;
@@ -51,9 +50,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import com.alibaba.fastjson.JSONArray;
-import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeOtherCommonService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -70,7 +68,6 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -80,7 +77,6 @@ import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.EtrExchangeTra
 import com.joyintech.tams.exchange.entrust.etrexchange.common.dto.FinProductOthCodeDto;
 import com.joyintech.tams.exchange.entrust.etrexchange.common.service.EtrExchangeTradeCommon001Service;
 import com.joyintech.tams.exchange.entrust.etrexchange.position.bean.PositionRequestBaseBean;
-import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
 import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.TrdMoreConvrateDto;
 
@@ -98,6 +94,12 @@ public class PositionRequestServiceEtrExchangeTradeSaveRequest {
     private EtrExchangeTradeCommon001Service etrExchangeTradeCommon001Service;
     @Autowired
     private EtrTradeOtherCommonService etrTradeOtherCommonService;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     /**
      * EtrExchangeTradeSaveRequest请求对象使用
@@ -136,7 +138,7 @@ public class PositionRequestServiceEtrExchangeTradeSaveRequest {
             //TODO 根据条件判断调用其他接口
             return;
         }
-        PositionHttpRequest.send(resultMap);
+        positionRequestHandle.send(resultMap);
     }
 
     /**
@@ -147,7 +149,7 @@ public class PositionRequestServiceEtrExchangeTradeSaveRequest {
     public void sendDelete(EtrExchangeTradeSaveRequest entity) {
         log.info("sendDelete() called with parameters => 【entity = {}】", JsonUtils.object2Json(entity));
         String busiType = commonPositionEngineService.getPositionBusiType(entity.getFinprodType2(), entity.getPs(), entity.getAssetType2());
-        PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(), POSITION_TYPE_ETR, busiType, entity.getPs());
+        positionRequestHandle.doDeleteByWorkFlowId(entity.getWorkflowId(), POSITION_TYPE_ETR, busiType, entity.getPs());
     }
 
     /**
@@ -159,7 +161,7 @@ public class PositionRequestServiceEtrExchangeTradeSaveRequest {
         return;
        /* log.info("sendRevoke() called with parameters => 【entity = {}】", JsonUtils.object2Json(entity));
         String busiType = commonPositionEngineService.getPositionBusiType(entity.getFinprodType2(), entity.getPs(), null);
-        PositionHttpRequest.dorevoke(entity.getEntrustId(), POSITION_TYPE_TRD, busiType, entity.getPs());*/
+        positionRequestHandle.dorevoke(entity.getEntrustId(), POSITION_TYPE_TRD, busiType, entity.getPs());*/
     }
 
     /**
@@ -186,7 +188,7 @@ public class PositionRequestServiceEtrExchangeTradeSaveRequest {
         list.add(map);
         resultMap.put("data", list);
 
-        PositionHttpRequest.batchClose(resultMap);
+        positionRequestHandle.batchClose(resultMap);
     }
 
     /**

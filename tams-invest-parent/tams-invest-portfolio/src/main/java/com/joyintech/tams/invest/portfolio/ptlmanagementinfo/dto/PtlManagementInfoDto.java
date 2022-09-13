@@ -166,6 +166,11 @@ public class PtlManagementInfoDto extends PtlPortfolio implements ITableRow,Proc
     @NotEmpty(fieldName="PtlManagementInfo002.portfolioSeries",groups = {ValidateGroupEdit.class})
     private String portfolioSeries;
 
+    /**
+     * 自主管理计划
+     */
+    private String selfManagement;
+
     public String getInvestNatureStr(){
         return SysDataUtil.getNameFromDataDict(DictCode.投资性质, this.investNature);
     }
@@ -465,5 +470,13 @@ public class PtlManagementInfoDto extends PtlPortfolio implements ITableRow,Proc
 
     public void setPortfolioSeries(String portfolioSeries) {
         this.portfolioSeries = portfolioSeries;
+    }
+
+    public String getSelfManagement() {
+        return selfManagement;
+    }
+
+    public void setSelfManagement(String selfManagement) {
+        this.selfManagement = selfManagement;
     }
 }
