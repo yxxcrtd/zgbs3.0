@@ -9,24 +9,26 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.business.common.util.RedisSingleLock;
-import com.joyintech.tams.cfets.manualsettle.dto.*;
+import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleDto;
+import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleRequest;
 import com.joyintech.tams.cfets.manualsettle.service.CfetsManualSettleService;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
-import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -157,7 +159,7 @@ public class CfetsManualSettleController extends BaseController {
             logger.error("交收错误",e);
             //return new Message<AjaxResult>().fail().setMessage("交收失败");
             return PositionUtil.ajaxErrorReturn(e);
-        }finally {
+        } finally {
             for (CfetsManualSettleDto item : dtoList) {
                 redisSingleLock.releaseLock(item.getTradeId());
             }
