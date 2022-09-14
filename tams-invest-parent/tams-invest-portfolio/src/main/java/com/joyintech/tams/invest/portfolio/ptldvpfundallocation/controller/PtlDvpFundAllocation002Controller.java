@@ -173,7 +173,7 @@ public class PtlDvpFundAllocation002Controller extends BaseController {
             ValidMessage message = new ValidMessage(
                     getMessage("BUSS_COM_E_0003", getMessage("PtlDvpFundAllocation001.settleAmts"),
                             getMessage("PtlDvpFundAllocation001.myAcctAmount")));
-            ajaxResult.setMessage(message.getMessage(), MessageType.确认消息);
+            ajaxResult.setMessage(message.getMessage() + "是否确认？", MessageType.确认消息);
             return ajaxResult;
         }
         return commonCheck(result, dto.getOperateType());
