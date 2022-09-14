@@ -40,6 +40,7 @@ $(function() {
             ,{field:'cdate', visible:false, type:'date'}//
             ,{field:'acctNo', title: '帐号',width : 150}//账户
             ,{field:'acctName', title: 'ActualTimeCapital001.acctName', width : 200}//账号名称
+            ,{field:'acctTypeStr', title: '帐号类型',width : 150}//账户类型
             ,{field:'ccy', title: 'ActualTimeCapital001.ccy', width : 150}//币种
             ,{field:'cashBalance', title: 'ActualTimeCapital001.cashBalance', type:'number', width : 200}//现金余额
             ,{field:'cashAvailable', title: 'ActualTimeCapital001.cashAvailable', type:'number', width : 200}//指令可用现金
