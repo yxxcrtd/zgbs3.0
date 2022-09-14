@@ -250,7 +250,16 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 && BigDecimal.ZERO.compareTo(deal.getShareAmt()) == 0) {
                 return result;
             }
-            resultDto.setCdate(deal.getTradeDate());
+            // GLLCUAT-472:债券到期的持仓流水日期登交割日期 modify by fuyongsheng 20220914 start
+            // resultDto.setCdate(deal.getTradeDate());
+            if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(deal.getFinprodType2())
+                    && DictCodeList.交易方向_到期.getValue().equals(deal.getPs())){
+                resultDto.setCdate(deal.getSettleDate());
+            }
+            else{
+                resultDto.setCdate(deal.getTradeDate());
+            }
+            // GLLCUAT-472:债券到期的持仓流水日期登交割日期 modify by fuyongsheng 20220914 end
             resultDto.setAmount(ArithmeticUtil.multiply(deal.getShareAmt(), new BigDecimal(-1)));
 
             if (DictCodeList.交易方向_卖出.getValue().equals(deal.getPs())
