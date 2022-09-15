@@ -3,7 +3,7 @@ package com.joyintech.tams.exchange.common.constant;
 import com.joyintech.tams.exchange.common.enums.IEnum;
 
 public enum ErrorCode implements IEnum<Integer> {
-
+    NoData(-2, "查询无记录"),
     INVALID(-1, "柜台废单"),
     SUCCESS(0, "success"),
     /**
@@ -109,7 +109,7 @@ public enum ErrorCode implements IEnum<Integer> {
     ENTRUST_PROP_NOT_EXIT(1020, "委托属性不存在"),
 
 
-    CANCEL_ENTRUST_BUSI_ERROR(1021, "该类业务不可撤单"),    
+    CANCEL_ENTRUST_BUSI_ERROR(1021, "该类业务不可撤单"),
     UN_SUPPORT_ENTRUST_PROP(1021, "现券交易不支持当前委托属性"),
     TRADE_NOT_EMPTY(1022, "本方交易员不能为空"),
     DEALER_NOT_EMPTY(1023, "本方交易商ID或名称不能为空"),
@@ -210,7 +210,7 @@ public enum ErrorCode implements IEnum<Integer> {
     INSTRUCTIONS_SELL_OPTIMAL_PRICE_ERROR(4058, "公平交易卖出或逆回购委托价格不得低于最优价"),
 
     ENTRUST_BSFLAG_PARSE_ERROR(4996, "委托买卖类别解析异常"),
-INSTRUCTIONS_NO_GUARD_BOND_ERROR(4059, "非担保债券不支持公平交易"),
+    INSTRUCTIONS_NO_GUARD_BOND_ERROR(4059, "非担保债券不支持公平交易"),
 
     APPOINT_INSTRUCTION_EXIST_PARAMETER_ERROR(4997, "分发指令数据存在不合法"),
 

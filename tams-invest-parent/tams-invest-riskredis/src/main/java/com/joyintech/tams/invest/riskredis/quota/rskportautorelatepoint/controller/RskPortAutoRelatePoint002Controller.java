@@ -15,6 +15,7 @@ import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeRds;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.riskredis.quota.rskportautorelatepoint.dto.RskPortAutoRelatePoint002Dto;
@@ -124,6 +125,16 @@ public class RskPortAutoRelatePoint002Controller extends BaseController {
         }
         SelectDto selectDto7 = this.getSelectDataFromDataDic(BussinessDictCodeRds.说明书是否披露风险标志, null);
         for (SelectOptionDto dto : selectDto7.getOptions()) {
+            dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
+            listFloatRate.add(dto);
+        }
+        SelectDto selectDto8 = this.getSelectDataFromDataDic(BussinessDictCodeRds.是否, null);
+        for (SelectOptionDto dto : selectDto8.getOptions()) {
+            dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
+            listFloatRate.add(dto);
+        }
+        SelectDto selectDto9 = this.getSelectDataFromDataDic(DictCode.开放模式, null);
+        for (SelectOptionDto dto : selectDto9.getOptions()) {
             dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
             listFloatRate.add(dto);
         }

@@ -75,8 +75,8 @@ public class QuoteService {
 //            stockCode = futuresInstrument.getInnerCode();
 //        }
         if (useInterfQuoteFlag) {
-            String code = interfHttpRequestUtil.getSimpleStockCode(stockCode);
-            String quoteStr = interfHttpRequestUtil.doRequest(code);
+//            String code = interfHttpRequestUtil.getSimpleStockCode(stockCode);
+            String quoteStr = interfHttpRequestUtil.doRequest(stockCode);
             tickBean = this.convertTick(quoteStr);
         } else {
             tickBean = TickConverter.convertTick(quoteTickService.findFromRedisById(stockCode));

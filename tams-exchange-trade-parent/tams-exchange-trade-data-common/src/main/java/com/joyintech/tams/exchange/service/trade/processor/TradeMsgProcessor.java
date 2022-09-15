@@ -925,6 +925,7 @@ public class TradeMsgProcessor {
         // 处理订单状态
         if (entrust.getEntrustStatus() >= dbEntrust.getEntrustStatus()) {
             dbEntrust.setEntrustStatus(entrust.getEntrustStatus());
+            dbEntrust.setErrorMsg(entrust.getErrorMsg());
             if (Strings.isNullOrEmpty(dbEntrust.getBrokerEntrustId())) {
                 dbEntrust.setBrokerEntrustId(entrust.getBrokerEntrustId());
             }

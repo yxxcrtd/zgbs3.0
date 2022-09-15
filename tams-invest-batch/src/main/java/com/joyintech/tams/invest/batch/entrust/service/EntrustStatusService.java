@@ -17,8 +17,6 @@ import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
-import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.batch.entrust.dao.EntrustStatusMapper;
 import com.joyintech.tams.invest.batch.entrust.dto.EntrustClosePosEtrReqDto;
@@ -29,6 +27,7 @@ import com.joyintech.tams.invest.common.trade.CreditLinesUpdate;
 import com.joyintech.tams.invest.common.trade.CreditLinesUpdateImpl;
 import com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto;
 import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +67,12 @@ public class EntrustStatusService {
 
     @Autowired
     private CommonPositionEngineService commonPositionEngineService;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     /**
      * 是否单体服务
@@ -225,7 +230,7 @@ public class EntrustStatusService {
             req.setTotalTradeId(IDGenerator.generate());
             req.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
             logger.info("[关闭委托状态更新]批处理发送头寸开始");
-            PositionHttpRequest.batchClose(req);
+            positionRequestHandle.batchClose(req);
         }
 
     }

@@ -201,6 +201,10 @@ public class EtrPlanAssetNService extends BaseService<EtrPlanAssetNDto> {
         return this.queryForPageForSelectReturn(page, length,()->etrPlanAssetNMapper.getfinprodIdForAdd1(map));
     }
 
+    public String getCountIdByManager(String manager) {
+        return etrPlanAssetNMapper.getCountIdByManager(manager);
+    }
+
     /**
      * 获取新建界面的组合代码联想下拉框框 <功能详细描述>
      * 

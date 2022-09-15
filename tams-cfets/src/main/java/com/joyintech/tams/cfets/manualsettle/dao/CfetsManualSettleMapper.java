@@ -116,6 +116,14 @@ public interface CfetsManualSettleMapper {
      * @param tradeId 参数
      * @return String
      */
+    String selectRegTradeIdBytradeIdFromDeal(@Param("tradeId") String tradeId);
+
+    /**
+     * 登记编号查询
+     *
+     * @param tradeId 参数
+     * @return String
+     */
     String selectRegTradeIdBytradeId(@Param("tradeId") String tradeId);
 
     /**
@@ -284,6 +292,15 @@ public interface CfetsManualSettleMapper {
      * @since 1.0
      */
     List<String> getBusinessData(WflValidInputParameter wflValidInputParameter);
+
+    /**
+     * 根据交易编号获取交收状态表里的状态
+     * @author jiangpeng
+     * @date 2022/9/2 17:03
+     * @param tradeId
+     * @return java.lang.String
+     */
+    String getSettleStatusByTradeId(@Param("tradeId") String tradeId);
 
     /**
      * 查询债券交易基本信息

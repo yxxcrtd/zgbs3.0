@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joyintech.tams.invest.batch.autodurdealgenerate.exchangecommonrepo.dao.ExCommonRepoAutoDurDealGenerateMapper">
+
+    <select id="selectTrdProductTempDealRevokeData" resultType="com.joyintech.tams.common.base.entity.TrdProductTempDeal">
+        select * from TRD_PRODUCT_TEMP_DEAL tptd
+        where BUSI_TYPE =#{busiType} and TRADE_DATE =#{batchDate}
+          AND NOT EXISTS (
+                SELECT 1 FROM TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt
+                WHERE tptd.FINPROD_ID =tfpdt.FINPROD_ID AND tfpdt.MDATE =tptd.MDATE
+                  AND tfpdt.IS_CANCEL ='N' AND tfpdt.TRADE_STATUS ='01' AND tfpdt.PS ='T07'
+            )
+    </select>
+
+
+    <delete id="deleteStlPayTempOrdersData">
+        delete from STL_PAY_TEMP_ORDERS
+            where Order_id in
+        <foreach collection="tradeIdList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="deleteTrdProductTempDeal">
+        delete from TRD_PRODUCT_TEMP_DEAL
+        where TRADE_ID in
+        <foreach collection="tradeIdList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="deleteTrdProductTempDealAdd">
+        delete from TRD_PRODUCT_TEMP_DEAL_ADD
+        where TRADE_ID in
+        <foreach collection="tradeIdList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="deletePtlCashFlow">
+        delete from PTL_CASH_POSITION_FLOW
+        where ORDER_ID in
+        <foreach collection="tradeIdList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="deleteEtrCashFlow">
+        delete from ETR_CASH_POSITION_FLOW
+        where ORDER_ID in
+        <foreach collection="tradeIdList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="selectAllData" resultType="com.joyintech.tams.invest.common.dto.period.trdrepoduration.TrdRepoDurationDto">
+        SELECT
+        T1.CCY,
+        T4.BASIS,
+        T4.INT_RATE,
+        T1.COUNTER_ID,
+        T1.COUNTER_TRADER counterTrader,
+        T1.TRADER,
+        T4.FINPROD_ID,
+        T2.PORTFOLIO_ID,
+        T2.PORTFOLIO_NAME,
+        T5.TYPE_6 type_6,
+        T1.FINPROD_TYPE2 ,
+        T1.SEC_MANAGE_ACCT_ID,
+        to_char(T1.TRADE_DATE, 'yyyy-MM-dd') TRADE_DATE,
+        to_char(T4.VDATE, 'yyyy-MM-dd') vDate/*计息开始日*/,
+        to_char(T4.MDATE, 'yyyy-MM-dd') mDate/*计息结束日*/,
+        to_char(T4.MPAY_DATE, 'yyyy-MM-dd') mpayDate/**/,
+        T4.TERM,/*回购期限*/
+        T1.PRIN_AMT THEORY_PRIN/*理论本金*/,
+        T1.TRADE_MARKET TradeMarket,
+        #{batchDate} SETTLE_DATE,
+        T1.PRIN_AMT + FCP.INT_AMT THEORY_AMT/*理论本息总额 T1.PRIN_AMT + NVL(PSV.TDY_INTINCEXP, FCP.INT_AMT)*/,
+        T1.PRIN_AMT + FCP.INT_AMT FPRICE_AMT,
+        T1.PRIN_AMT + FCP.INT_AMT TRADE_AMT
+        ,T1.PS/*交易方向*/
+        FROM TRD_PRODUCT_DEAL T1
+        LEFT JOIN TRD_PRODUCT_DEAL_ADD T3 ON T1.TRADE_ID = T3.TRADE_ID
+        LEFT JOIN PTL_PORTFOLIO T2 ON T2.PORTFOLIO_ID = T3.PORTFOLIO_ID
+        LEFT JOIN FIN_PRODUCT fp1 on fp1.FINPROD_ID = T1.CHL_ID
+        LEFT JOIN FIN_CASH_INFO FCI ON T1.FINPROD_ID = FCI.FINPROD_ID AND T1.CCY = FCI.CCY AND FCI.CASH_TYPE_2 = 'C02'
+        LEFT JOIN FIN_CASH_PLAN FCP ON FCI.CASH_ID = FCP.CASH_ID
+        LEFT JOIN FIN_TRADE_PRODUCT T4 ON T1.FINPROD_ID = T4.FINPROD_ID
+        LEFT JOIN FIN_PRODUCT_TYPE T5 ON T4.FINPROD_ID = T5.FINPROD_ID
+        WHERE t1.TRADE_STATUS = '01' AND T1.TRADE_MARKET IN ('03','04')
+        AND T1.FINPROD_TYPE2 IN ('F02', 'F03')
+        AND T1.IS_CANCEL = 'N' AND T1.PS = 'T01'
+        AND T2.PARENT_PORTFOLIO_ID is null AND T2.INVEST_YESORNO = 'Y'
+        AND T4.MDATE=#{batchDate} AND T5.TYPE_6 ='H02'
+        AND NOT EXISTS (
+            SELECT 1 FROM TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt
+            WHERE t1.FINPROD_ID =tfpdt.FINPROD_ID AND tfpdt.MDATE =t4.MDATE
+              AND tfpdt.IS_CANCEL ='N' AND tfpdt.TRADE_STATUS ='01' AND tfpdt.PS ='T07'
+        )
+    </select>
+
+
+    <update id="updatePtlCashPosition" parameterType="com.joyintech.tams.common.base.entity.PtlCashPosition" >
+        update PTL_CASH_POSITION
+        <set >
+            <if test="amount != null" >
+                AMOUNT = AMOUNT + #{amount},
+            </if>
+            <if test="chlFinprodId != null" >
+                CHL_FINPROD_ID = #{chlFinprodId,jdbcType=VARCHAR},
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+        and ACCT_ID = #{acctId,jdbcType=VARCHAR}
+        and HODING_TYPE = #{hodingType,jdbcType=VARCHAR}
+        and CDATE = #{cdate,jdbcType=DATE}
+        and CCY = #{ccy,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateEtrCashPosition" parameterType="com.joyintech.tams.common.base.entity.EtrCashPosition" >
+        update ETR_CASH_POSITION
+        <set >
+            <if test="amount != null" >
+                AMOUNT =  AMOUNT + #{amount},
+            </if>
+            <if test="chlFinprodId != null" >
+                CHL_FINPROD_ID = #{chlFinprodId,jdbcType=VARCHAR},
+            </if>
+            <if test="updateUser != null" >
+                UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null" >
+                UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+        and ACCT_ID = #{acctId,jdbcType=VARCHAR}
+        and HODING_TYPE = #{hodingType,jdbcType=VARCHAR}
+        and CDATE = #{cdate,jdbcType=DATE}
+        and CCY = #{ccy,jdbcType=VARCHAR}
+    </update>
+
+    <select id="listPtlCashPositionFlow" resultType="com.joyintech.tams.common.base.entity.PtlCashPosition" >
+        SELECT PORTFOLIO_ID,ACCT_ID,HODING_TYPE,CDATE,CCY,sum(AMOUNT) AMOUNT
+        FROM PTL_CASH_POSITION_FLOW WHERE ORDER_ID IN (
+        SELECT
+        C.ORDER_ID
+        FROM
+        TRD_PRODUCT_TEMP_DEAL A,
+        TRD_PRODUCT_TEMP_DEAL_ADD B,
+        STL_PAY_TEMP_ORDERS C
+        WHERE
+        A.TRADE_ID = B.TRADE_ID AND A.TRADE_DATE = #{batchDate,jdbcType=DATE} AND A.TRADE_ID = C.TRADE_ID
+        <foreach collection="tradeIdList" item="tradeId" open="AND A.TRADE_ID IN (" close=")" separator=",">
+            #{tradeId,jdbcType=VARCHAR}
+        </foreach>
+        )
+        GROUP BY PORTFOLIO_ID,ACCT_ID,HODING_TYPE,CDATE,CCY
+    </select>
+
+    <select id="listEtrCashPositionFlow" resultType="com.joyintech.tams.common.base.entity.EtrCashPosition" >
+        SELECT PORTFOLIO_ID,ACCT_ID,HODING_TYPE,CDATE,CCY,sum(AMOUNT) AMOUNT
+        FROM ETR_CASH_POSITION_FLOW WHERE ORDER_ID IN (
+        SELECT
+        C.ORDER_ID
+        FROM
+        TRD_PRODUCT_TEMP_DEAL A,
+        TRD_PRODUCT_TEMP_DEAL_ADD B,
+        STL_PAY_TEMP_ORDERS C
+        WHERE
+        A.TRADE_ID = B.TRADE_ID AND A.TRADE_DATE = #{batchDate,jdbcType=DATE} AND A.TRADE_ID = C.TRADE_ID
+        <foreach collection="tradeIdList" item="tradeId" open="AND A.TRADE_ID IN (" close=")" separator=",">
+            #{tradeId,jdbcType=VARCHAR}
+        </foreach>
+        )
+        GROUP BY PORTFOLIO_ID,ACCT_ID,HODING_TYPE,CDATE,CCY
+    </select>
+
+</mapper>

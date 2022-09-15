@@ -55,12 +55,35 @@ public class IRskRulePoolConfig extends RskRulePoolConfig {
 
 
     /**
+     * 匹配开放模式
+     * @param portList
+     * @return 返回匹配到的组合，多个用逗号分隔
+     */
+    public  String matchOpenMode(List<String> portList){
+        if(CommonUtil.isType(getClassifyDimension(), BussinessDictCodeListRds.分类维度_开放模式)) {
+            Map<String,String> ptlCycleMap= AssetCommonUtil.compareOpenMode(portList);
+            if(!CollectionUtils.isEmpty(ptlCycleMap)) {
+                Iterator<String> iterator = portList.iterator();
+                while (iterator.hasNext()) {
+                    String item = iterator.next();
+                    String cycle = ptlCycleMap.getOrDefault(item,null);
+                    if (!match(cycle)) {
+                        iterator.remove();
+                    }
+                };
+                return portList.size() == 0 ? "null" : StringUtil.joinString(portList, GlobalConstant.COMMA);
+            }
+        }
+        return "null";
+    }
+
+    /**
      * 匹配配置项
      * @param val
      * @return
      */
     private boolean match(String val){
-        if(null==val)return true;
+        if(null == val) return true;
         List<String> clsValList=StringUtil.splitToList(GlobalConstant.COMMA,getClassifyDimensionVal());
         return clsValList.contains(val);
     }

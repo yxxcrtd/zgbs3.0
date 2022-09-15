@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.tams.constant.DictCodeListExt3;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -838,6 +839,14 @@ public class TrdPlanNetInvestTradeService extends BaseService<TrdPlanNetInvestTr
 
         acctTypeList.add(DictCodeListExt1.资金账户类型_券商资金账户.getValue());
         BigDecimal cashT = basePtlCashPositionInfoService.queryUsableCashPosition(dto);
+        //查询新表可用现金
+        PtlCashPositionFlowDto dtoNew = new PtlCashPositionFlowDto();
+        BeanUtil.copyPropertiesIgnoreNull(dtoNew,dto);
+        dtoNew.setCdate(vdate);
+        dtoNew.setHodingType(DictCodeListExt3.资产类型_汇总可用现金.getValue());
+        dtoNew.setDateType(0);
+        BigDecimal cashT0_new = basePtlCashPositionInfoService.queryTrdAvailableCashNew(dtoNew);
+        cashT = com.joyintech.calculation.util.ArithmeticUtil.doAdd(cashT, cashT0_new);
         result.put("cashT", cashT);
 
         if (StringUtil.isNotEmpty(param.get("chlId"))) {
@@ -855,6 +864,9 @@ public class TrdPlanNetInvestTradeService extends BaseService<TrdPlanNetInvestTr
             dto2.setPortfolioId((String)param.get("portfolioId"));
             dto2.setCcy((String)param.get("ccy"));
             BigDecimal cashT1 = basePtlCashPositionInfoService.queryUsableCashPosition(dto2);
+            dtoNew.setDateType(1);
+            BigDecimal cashT1_new = basePtlCashPositionInfoService.queryTrdAvailableCashNew(dtoNew);
+            cashT1 = com.joyintech.calculation.util.ArithmeticUtil.doAdd(cashT1, cashT1_new);
             result.put("cashT1", cashT1);
         }
         return result;

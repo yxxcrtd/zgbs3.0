@@ -1276,7 +1276,11 @@
         select
         <include refid="com.joyintech.tams.common.base.dao.InfContractDetailfileMapper.Base_Column_List" />
         from INF_CONTRACT_DETAILFILE
-        where DEAL_NO = #{dealNo}
+        where
+            DEAL_NO = #{dealNo}
+        <if test="entrustId != null and entrustId != ''">
+            AND ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}
+        </if>
     </select>
 
     <select id="selectEtrEntrustDetailByEntrustId" resultType="com.joyintech.tams.common.base.entity.EtrEntrustDetail">

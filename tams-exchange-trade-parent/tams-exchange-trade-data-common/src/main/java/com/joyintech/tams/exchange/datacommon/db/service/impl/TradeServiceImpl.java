@@ -130,6 +130,18 @@ public class TradeServiceImpl extends AsyncServiceImpl<String, Trade> implements
     }
 
     @Override
+    public void setTradeCache(Trade trade) {
+        Map<String, Trade> accountMap = accountIdMap.get(trade.getAccountId());
+        if (Objects.isNull(accountMap)) {
+            accountMap = new ConcurrentHashMap<>();
+            accountIdMap.put(trade.getAccountId(), accountMap);
+        }
+        //撤单、废单成交无需去重。 支持重复处理
+        String key = AgentServerUtil.GetTradeCacheKey(trade.KeyType, trade.getAccountId(), trade.getBrokerEntrustId() + "_" + trade.getBrokerTradeId());
+        accountMap.put(key, trade);
+    }
+
+    @Override
     public String genDBId() {
         return super.genDbId();
     }
@@ -231,7 +243,7 @@ public class TradeServiceImpl extends AsyncServiceImpl<String, Trade> implements
             accountIdMap.put(trade.getAccountId(), accountMap);
         }
         //撤单、废单成交无需去重。 支持重复处理
-        String key = AgentServerUtil.GetTradeCacheKey(trade.KeyType, trade.getAccountId(), trade.getBrokerEntrustId()+ "_" + trade.getBrokerTradeId());
+        String key = AgentServerUtil.GetTradeCacheKey(trade.KeyType, trade.getAccountId(), trade.getBrokerEntrustId() + "_" + trade.getBrokerTradeId());
         accountMap.put(key, trade);
     }
 
@@ -260,7 +272,7 @@ public class TradeServiceImpl extends AsyncServiceImpl<String, Trade> implements
             Map<String, Trade> map1 = instructionIdMap.get(trade.getInstructionId());
             if (Objects.nonNull(map1)) map1.remove(trade.getId());
         }
-        String key = AgentServerUtil.GetTradeCacheKey(trade.KeyType, trade.getAccountId(), trade.getBrokerEntrustId()+ "_" + trade.getBrokerTradeId());
+        String key = AgentServerUtil.GetTradeCacheKey(trade.KeyType, trade.getAccountId(), trade.getBrokerEntrustId() + "_" + trade.getBrokerTradeId());
         accountIdMap.get(trade.getAccountId()).remove(key);
     }
 

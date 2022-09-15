@@ -143,7 +143,7 @@ public class MultiOrderCommonController extends BaseController {
     public List<SelectOptionDto> select() throws IOException {
         String selectValue = getParam("selectValue");
         List<SelectOptionDto> tempList = new ArrayList<>();
-        if(selectValue.indexOf("isUsePageAcctTrue")!=-1){
+        if(selectValue.contains("isUsePageAcctTrue")){
             tempList =JsonUtils.json2List(selectValue, SelectOptionDto.class);
         }    
         if (!StringUtil.isEmptyList(tempList)) {

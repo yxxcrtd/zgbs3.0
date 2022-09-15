@@ -65,6 +65,47 @@
                                        placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}" >
                             </div>
                         </div>
+                        <div class="layui-inline layui-col-xs4 layui-col-md4 layui-col-sm4 layui-col-lg4">
+                            <label class="layui-form-label form-lable"
+                                   data-th-text="#{MstCommissionSet002.portfolioId}">组合代码</label>
+                            <div class="layui-input-inline input-inline">
+                                <select type="text" id="portfolioId" name="portfolioId"
+                                        class="layui-input form-input input-select" placeholder="请输入内容"
+                                        data-th-placeholder="#{SysCommon.placeholder}"
+                                        data-th-initvalue="${entity?.portfolioId}"
+                                        data-th-data-url="@{/business/common/CommonSelect/selectPortfolioId?ww=false}" >
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline layui-col-xs4 layui-col-md4 layui-col-sm4 layui-col-lg4">
+                            <label class="layui-form-label form-lable"
+                                   data-th-text="#{MstCommissionSet002.customerId}">券商代码</label>
+                            <div class="layui-input-inline input-inline">
+                                <select type="text" id="customerId" name="customerId"
+                                        class="layui-input  input-select" placeholder="请输入内容"
+                                        data-th-placeholder="#{SysCommon.placeholder}"
+                                        data-th-initvalue="${entity?.customerId}"
+                                        data-th-data-url="@{/invest/basicdata/mstcommissionset/MstCommissionSet002/getMstCustomerInfo}"
+                                        allowClear="true">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline layui-col-xs4 layui-col-md4 layui-col-sm4 layui-col-lg4">
+                            <label class="layui-form-label form-lable"
+                                   data-th-text="#{MstCommissionSet002.capitalAccountNo}">资金账号</label>
+                            <div class="layui-input-inline input-inline">
+                                <select type="text" id="capitalAccountNo" name="capitalAccountNo"
+                                        class="layui-input  input-select" placeholder="请输入内容"
+                                        data-th-placeholder="#{SysCommon.placeholder}"
+                                        data-th-initvalue="${entity?.capitalAccountNo}"
+                                        parentIds="customerId"
+                                        data-th-data-url="@{/invest/basicdata/mstcommissionset/MstCommissionSet002/getMstAcctInfo}"
+                                        allowClear="true">
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>

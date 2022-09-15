@@ -7,6 +7,7 @@ import com.joyintech.tams.exchange.common.db.domain.*;
 import com.joyintech.tams.exchange.common.utils.CbptransTypeUtils;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
 import com.joyintech.tams.exchange.common.utils.ErrorMsgUtils;
+import com.joyintech.tams.exchange.service.trade.util.AgentUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,7 +130,10 @@ public class UfxMsgParseHelper {
                 entrust.setCancelVolume(Double.valueOf(withdrawAmount).longValue());
             }
             entrust.setId((String) ds.get("entrust_reference"));
-            entrust.setReportNo((String) ds.get("report_no"));
+            String real_report_no = (String) ds.get("real_report_no");
+            if (!Strings.isNullOrEmpty(real_report_no)) {
+                entrust.setReportNo(real_report_no.trim());
+            }
             list.add(entrust);
         }
 
@@ -153,7 +157,10 @@ public class UfxMsgParseHelper {
             } else if (ExchangeType.SZ.value.equals(exchangeType)) {
                 entrust.setMarket(Market.SZSE.value);
             }
-            entrust.setReportNo((String) ds.get("report_no"));
+            String real_report_no = (String) ds.get("real_report_no");
+            if (!Strings.isNullOrEmpty(real_report_no)) {
+                entrust.setReportNo(real_report_no.trim());
+            }
             entrust.setStockCode((String) ds.get("stock_code"));
             entrust.setStockName((String) ds.get("stock_name"));
             entrust.setEntrustBs((String) ds.get("entrust_bs"));
@@ -251,7 +258,7 @@ public class UfxMsgParseHelper {
                     trade.setTradeType(TradeType.INVALID.value);
                 }
             } else {
-               // trade.setBrokerTradeId((String) ds.get("business_id"));
+                // trade.setBrokerTradeId((String) ds.get("business_id"));
                 if (2 == realType) {
                     trade.setTradeType(TradeType.CANCEL.value);
                 } else if (0 == realType) {
@@ -269,7 +276,7 @@ public class UfxMsgParseHelper {
             trade.setTradedBalance(new BigDecimal((String) ds.get("business_balance")));
             trade.setStockName((String) ds.get("stock_name"));
             trade.setEntrustProp((String) ds.get("entrust_prop"));
-            trade.setReportNo((String) ds.get("report_no"));
+            //trade.setReportNo((String) ds.get("report_no"));
             list.add(trade);
         }
         return list;
@@ -334,16 +341,26 @@ public class UfxMsgParseHelper {
                     trade.setTradeType(TradeType.NORMAL.value);
                 }
             }
-            // 排除无效的现券协商成交记录--实时清算记录
-            if (!((String) ds.get("business_id")).equals((String) ds.get("cbp_business_id")))
-                continue;
+            
+            // yanjianhui 修改于 2022/8/29 16:14 对协议回购交易变动的数据的处理。
+            if(trade.getEntrustProp().equals("BPN")||trade.getEntrustProp().equals("BPB")){
+                trade.setBrokerTradeId((String) ds.get("cbp_business_id"));
+                trade.setTradedVolume((long) Double.parseDouble((String) ds.get("entrust_amount")));
+                trade.setTradedPrice(BigDecimal.valueOf(Double.parseDouble((String) ds.get("expire_year_rate"))));
+                trade.setTradedBalance(BigDecimal.valueOf(Double.parseDouble((String) ds.get("entrust_balance"))));
+            }else {
+                // 排除无效的现券协商成交记录--实时清算记录
+                if (!((String) ds.get("business_id")).equals((String) ds.get("cbp_business_id")))
+                    continue;
+                trade.setBrokerTradeId((String) ds.get("business_id"));
+                trade.setTradedPrice(BigDecimal.valueOf(Double.parseDouble((String) ds.get("business_price"))));
+                trade.setTradedBalance(BigDecimal.valueOf(Double.parseDouble((String) ds.get("business_balance"))));
+            }
 
-            trade.setBrokerTradeId((String) ds.get("business_id"));
             if (Strings.isNullOrEmpty(trade.getBrokerTradeId())) {
                 trade.setBrokerTradeId((String) ds.get("entrust_no"));
             }
-            trade.setTradedPrice(BigDecimal.valueOf(Double.parseDouble((String) ds.get("business_price"))));
-            trade.setTradedBalance(BigDecimal.valueOf(Double.parseDouble((String) ds.get("business_balance"))));
+
             String businessTime = (String) ds.get("business_time");
             if (!Strings.isNullOrEmpty(businessTime)) {
                 trade.setTradeTime(businessTime);
@@ -821,14 +838,7 @@ public class UfxMsgParseHelper {
                 fixedIncomeQuoteBuyBean.setStockCode(ds.get("stock_code") + "." + Market.SHSE.value);
                 fixedIncomeQuoteBuyBean.setStockName((String) ds.get("stock_name"));
                 fixedIncomeQuoteBuyBean.setOrderNo((String) ds.get("buy_confirm_id"));
-                String reportTime = (String) ds.get("report_time");
-                if (Strings.isNullOrEmpty(reportTime))
-                    reportTime = "000000";
-                Calendar cal = Calendar.getInstance();
-                cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(reportTime.substring(0, 2)));
-                cal.set(Calendar.MINUTE, Integer.parseInt(reportTime.substring(2, 4)));
-                cal.set(Calendar.SECOND, Integer.parseInt(reportTime.substring(4, 6)));
-                fixedIncomeQuoteBuyBean.setReportTime(cal.getTime().getTime());
+                fixedIncomeQuoteBuyBean.setReportTime(AgentUtil.FormatApiTimeToLong((String) ds.get("report_time")));
                 fixedIncomeQuoteBuyBean.setAgencyName((String) ds.get("agency_name"));
                 fixedIncomeQuoteBuyBean.setEntrustPrice(Double.parseDouble((String) ds.get("buy_price")));
                 fixedIncomeQuoteBuyBean.setEntrustVolume(Integer.parseInt((String) ds.get("buy_quote_amount")));
@@ -846,14 +856,7 @@ public class UfxMsgParseHelper {
                     fixedIncomeQuoteSellBean.setStockCode(ds.get("stock_code") + "." + Market.SHSE.value);
                     fixedIncomeQuoteSellBean.setStockName((String) ds.get("stock_name"));
                     fixedIncomeQuoteSellBean.setOrderNo((String) ds.get("sell_confirm_id"));
-                    reportTime = (String) ds.get("report_time_x");
-                    if (Strings.isNullOrEmpty(reportTime))
-                        reportTime = "000000";
-                    cal = Calendar.getInstance();
-                    cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(reportTime.substring(0, 2)));
-                    cal.set(Calendar.MINUTE, Integer.parseInt(reportTime.substring(2, 4)));
-                    cal.set(Calendar.SECOND, Integer.parseInt(reportTime.substring(4, 6)));
-                    fixedIncomeQuoteSellBean.setReportTime(cal.getTime().getTime());
+                    fixedIncomeQuoteSellBean.setReportTime(AgentUtil.FormatApiTimeToLong((String) ds.get("report_time_x")));
                     fixedIncomeQuoteSellBean.setAgencyName((String) ds.get("other_agency"));
                     fixedIncomeQuoteSellBean.setEntrustPrice(Double.parseDouble((String) ds.get("sell_price")));
                     fixedIncomeQuoteSellBean.setEntrustVolume(Integer.parseInt((String) ds.get("sell_quote_amount")));
@@ -872,6 +875,7 @@ public class UfxMsgParseHelper {
     }
 
 
+
     public static List<NegotiateQuoteReceiveBean> parseNegotiateQuoteReceiveBean(String accountId, String side, List<Map<String, Object>> resList) {
         List<NegotiateQuoteReceiveBean> list = new ArrayList<>();
         for (Map<String, Object> ds : resList) {
@@ -882,7 +886,14 @@ public class UfxMsgParseHelper {
 
             receiveBean.setRequestTime((String) (ds.get("init_date")));
             //receiveBean.setRequestStatus(Integer.parseInt((String) ds.get("bondtrade_trans_status")));
-            receiveBean.setStockCode((String) (ds.get("stock_code")));
+            String exchangeType = (String) ds.get("exchange_type");
+            String market = "";
+            if (ExchangeType.SH.value.equals(exchangeType)) {
+                market = Market.SHSE.value;
+            } else if (ExchangeType.SZ.value.equals(exchangeType)) {
+                market = Market.SZSE.value;
+            }
+            receiveBean.setStockCode(((String) (ds.get("stock_code"))) + "." + market);
             receiveBean.setStockName((String) (ds.get("stock_name")));
             receiveBean.setBs((String) (ds.get("entrust_bs")));
             receiveBean.setAmount(BigDecimal.valueOf(Double.parseDouble((String) ds.get("entrust_amount"))).intValue());

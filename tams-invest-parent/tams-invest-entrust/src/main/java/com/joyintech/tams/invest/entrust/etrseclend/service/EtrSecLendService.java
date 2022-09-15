@@ -383,7 +383,7 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
                 Map<String, Object> params = CommonBusinessService.setParams(dto.getCounterId(), dto.getTotalAmt()/*.multiply(new BigDecimal(10000))*/, LoginUserUtil.getUserName(),
                         DictCodeListExt2.平安资产类型_债券借贷.getValue(), null, dto.getTradeMarket(), dto.getBusiPs()
                         // 资产类型改为授权类型 add by renping 2019-08-06  start
-                        , dto.getFinprodId(), dto.getWorkflowId()
+                        , null, dto.getWorkflowId()
                         // 资产类型改为授权类型 add by renping 2019-08-06  end
                 );
                 return commonBusinessService.是否需要上级审批_委托用(params);

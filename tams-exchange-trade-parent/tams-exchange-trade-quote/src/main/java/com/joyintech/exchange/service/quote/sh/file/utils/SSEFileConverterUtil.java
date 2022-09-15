@@ -75,6 +75,7 @@ public class SSEFileConverterUtil {
         tick.setTradeBalance(sseFileQuoteBean.getTotalValueTraded());
         tick.setSettlePrice(0);
         tick.setPreClosePrice(sseFileQuoteBean.getPreClosePx());
+        tick.setClosePrice(sseFileQuoteBean.getClosePx());// 收盘价
         tick.addBidPrice(sseFileQuoteBean.getBuyPrice1());
         tick.addBidPrice(sseFileQuoteBean.getBuyPrice2());
         tick.addBidPrice(sseFileQuoteBean.getBuyPrice3());

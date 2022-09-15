@@ -18,6 +18,7 @@ import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.security.LoginUserUtil;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
@@ -365,6 +366,19 @@ public class TrdPlanNetInvestTrade003Controller extends BaseController {
     }
 
     /**
+     * 查询单位净值和净值日期
+     *
+     * @return
+     * @see
+     * @since 1.0
+     */
+    @RequestMapping("getLastPriceAndLastDate")
+    @ResponseBody
+    public SelectOptionDto getLastPriceAndLastDate(@RequestParam Map<String, Object> map) {
+        return trdPlanNetInvestTrade003Service.getLastPriceAndLastDate(map);
+    }
+
+    /**
      * 保存按钮点击时的check
      *
      * @param dto dto
@@ -606,7 +620,8 @@ public class TrdPlanNetInvestTrade003Controller extends BaseController {
         if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_申购确认.getValue())) {
             trdProductDealAdd.setPurCfmDate(dto.getTradeDate());
         }
-        else if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_赎回确认.getValue())) {
+        else if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_赎回确认.getValue())
+                || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_赎回到账.getValue())) { //增加赎回到账，修复GLLCUAT-236
             trdProductDealAdd.setRedCfmDate(dto.getRedCfmDate());
         }
         trdProductDealAdd.setTradeId(dto.getTradeId());

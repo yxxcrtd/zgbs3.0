@@ -123,6 +123,7 @@
         t8.PAY_DATE >= #{PLATEFORM_DATE}
         AND T8.MDATE = #{PLATEFORM_DATE}
         and T10.FINPROD_MARKET_ID is not null
+        and T10.TRADE_MARKET in ('01','02')
         GROUP BY
         t8.SEC_ACCT_ID,SAI.SEC_ACCT_NAME, fp.FINPROD_NAME,
         t10.FINPROD_MARKET_ID,
@@ -171,7 +172,7 @@
         listagg(T1.CASH_ID, ',') within group ( order by T1.CASH_ID ) CASH_ID,
         min(T1.VDATE) VDATE,
         T1.MDATE,
-        SUM(T1.CASH_AMT * T1.AMOUNT) fpriceAmt,
+        SUM(nvl(T1.CASH_AMT,T1.INT_AMT) * T1.AMOUNT) fpriceAmt,
         /*理论本息总额*/
         sum(case when T1.CASH_TYPE IN (#{CASH_CLASS_TYPE01}, '04') then 0
         else T1.PRIN_AMT * T1.AMOUNT end) prinAmt,
@@ -461,6 +462,7 @@
         AND T1.settle_date = #{PLATEFORM_DATE,jdbcType=DATE}
         AND T1.TRADE_STATUS = #{TRADE_STATUS01}
         AND T1.IS_CANCEL != #{YESNO_Y}
+        and T1.TRADE_MARKET in ('01','02')
         /*不存在生效的交易*/
         and NOT EXISTS (SELECT 1 FROM TRD_FIN_PRODUCT_DEAL_TOTAL TPDA
         left join trd_product_deal deal
@@ -650,6 +652,9 @@
         </if>
         <if test="tradeMarket != null and tradeMarket != ''">
             and tfpft.TRADE_MARKET = #{tradeMarket}
+        </if>
+        <if test="psT39 != null and psT39 != ''">
+            and tfpft.ps = #{psT39}
         </if>
     </select>
 

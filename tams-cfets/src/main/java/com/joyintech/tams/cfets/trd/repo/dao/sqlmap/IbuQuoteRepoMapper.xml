@@ -136,13 +136,22 @@
         <id property="secManageAcctIdSQ" column="secManageAcctIdSQ"/>
         <id property="portfolioSeries" column="portfolioSeries"/>
         <id property="termType" column="termType"/>
-        <collection property="repoEntrustPledgeDtos" ofType="com.joyintech.tams.cfets.trd.repo.dto.RepoEntrustPledgeDto"
+        <!--<collection property="repoEntrustPledgeDtos" ofType="com.joyintech.tams.cfets.trd.repo.dto.RepoEntrustPledgeDto"
                     javaType="java.util.ArrayList" >
             <result column="bondCode" property="bondCode" jdbcType="VARCHAR" />
             <result column="bondAbbrName" property="bondAbbrName" jdbcType="VARCHAR" />
             <result column="pledgePrin" property="pledgePrin" jdbcType="VARCHAR" />
-        </collection>
+        </collection>-->
     </resultMap>
+    <select id="listRepoPledges" resultType="com.joyintech.tams.cfets.trd.repo.dto.RepoEntrustPledgeDto">
+        select
+            fp.FINPROD_MARKET_ID                       bondCode
+           ,fp.FINPROD_ABBR                            bondAbbrName
+           ,PLEDGES.PLEDGE_NUMBER * 100                pledgePrin
+        from ETR_PLEDGE PLEDGES
+                    inner join FIN_PRODUCT fp on PLEDGES.FINPROD_ID = fp.FINPROD_ID
+        where PLEDGES.ENTRUST_ID = #{entrustId}
+    </select>
 
     <select id="listEntrust" resultMap="resultMap">
         SELECT distinct *
@@ -170,9 +179,9 @@
             <if test="repo_pledge_model != null and repo_pledge_model.equals('02')">
                 ,PLEDGE.finprodIds /*质押债券*/
                 ,PLEDGE.finprodMarketNames /*质押债券*/
-                ,fp.FINPROD_MARKET_ID                                                                          bondCode
+                /*,fp.FINPROD_MARKET_ID                                                                          bondCode
                 ,fp.FINPROD_ABBR                                                                               bondAbbrName
-                ,PLEDGES.PLEDGE_NUMBER * 100                                                                   pledgePrin
+                ,PLEDGES.PLEDGE_NUMBER * 100                                                                   pledgePrin*/
             </if>
             <if test="repo_pledge_model != null and repo_pledge_model.equals('03')">
                 ,ETR_ENTRUST_ADD.PLEDGE_STOCK_ID                                                              pledgeStockId/*质押券库*/
@@ -199,7 +208,7 @@
                 , MCCI.PARTY_ID                                                                               mySide/* 本方 */
                 , MCCI.PARTY_ABBR                                                                             mySideAbbr/* 本方名称 */
                 , (
-                    SELECT MST_CFETS_CUSTOMER_TRADER.TRADER_ID
+                    SELECT distinct MST_CFETS_CUSTOMER_TRADER.TRADER_ID
                     FROM MST_CFETS_CUSTOMER_TRADER
                     INNER JOIN SYS_USER_ADD
                     ON SYS_USER_ADD.ibu_trader = MST_CFETS_CUSTOMER_TRADER.TRADER_ID
@@ -211,7 +220,7 @@
                     FROM MST_CFETS_CUSTOMER_RELA
                     WHERE MST_CFETS_CUSTOMER_RELA.SPARTY_ID = MCCI.PARTY_ID))               mySideTrader /* 本方交易员 */
                 , (
-                    SELECT MST_CFETS_CUSTOMER_TRADER.TRADER_NAME
+                    SELECT distinct MST_CFETS_CUSTOMER_TRADER.TRADER_NAME
                     FROM MST_CFETS_CUSTOMER_TRADER
                     INNER JOIN SYS_USER_ADD
                     ON SYS_USER_ADD.ibu_trader = MST_CFETS_CUSTOMER_TRADER.TRADER_ID
@@ -318,8 +327,8 @@
                 group by ENTRUST_ID
             ) PLEDGE /*质押式回购银行间报价 按指令代码汇总 交易份额，债券数量等*/
                 ON PLEDGE.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
-            LEFT JOIN ETR_PLEDGE PLEDGES on PLEDGES.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
-            left join FIN_PRODUCT fp on PLEDGES.FINPROD_ID = fp.FINPROD_ID/*质押式回购银行间报价 按指令代码汇总 交易份额，债券数量等*/
+            /*LEFT JOIN ETR_PLEDGE PLEDGES on PLEDGES.ENTRUST_ID = ETR_ENTRUST.ENTRUST_ID
+            left join FIN_PRODUCT fp on PLEDGES.FINPROD_ID = fp.FINPROD_ID*/
         </if>
         <if test="repo_pledge_model != null and repo_pledge_model.equals('03')">
             LEFT JOIN ETR_SEC_STOCK ON ETR_SEC_STOCK.PLEDGE_STOCK_ID = ETR_ENTRUST_ADD.PLEDGE_STOCK_ID
@@ -622,6 +631,7 @@
             FROM MST_BOND_CREDIT_RATING
             WHERE GRADE_DATE <![CDATA[<=]]> to_date(#{platDate, jdbcType=VARCHAR}, 'yyyy-MM-dd')
             AND GRADE_ORG_ID !='22'
+            AND O_TYPE = '02'
         ) MBCR
             ON MBCR.O_CODE = fp.FINPROD_MARKET_ID AND MBCR.NUM = 1
 		LEFT JOIN (
@@ -770,6 +780,7 @@
             FROM MST_BOND_CREDIT_RATING
             WHERE GRADE_DATE <![CDATA[<=]]> to_date(#{platDate, jdbcType=VARCHAR}, 'yyyy-MM-dd')
             AND GRADE_ORG_ID !='22'
+            AND O_TYPE = '02'
         ) MBCR
             ON MBCR.O_CODE = fp.FINPROD_MARKET_ID AND MBCR.NUM = 1
 		LEFT JOIN (
@@ -936,6 +947,7 @@
             FROM MST_BOND_CREDIT_RATING
             WHERE GRADE_DATE <![CDATA[<=]]> to_date(#{platDate},'yyyy-MM-dd')
                 and GRADE_ORG_ID !='22'
+                AND O_TYPE = '02'
 		) MBCR
 		    ON MBCR.O_CODE = FIN_PRODUCT.FINPROD_MARKET_ID
 		    AND MBCR.NUM = 1
@@ -1327,6 +1339,7 @@
                 FROM MST_BOND_CREDIT_RATING
                 WHERE GRADE_DATE <![CDATA[<=]]> to_date(#{platDate, jdbcType=VARCHAR},'yyyy-MM-dd')
                     and GRADE_ORG_ID !='22'
+                    AND O_TYPE = '02'
             ) MBCR
                 ON MBCR.O_CODE = fp.FINPROD_MARKET_ID
                 AND MBCR.NUM = 1
@@ -2544,6 +2557,7 @@
             FROM MST_BOND_CREDIT_RATING
             WHERE GRADE_DATE <![CDATA[<=]]> to_date(#{platDate, jdbcType=VARCHAR},'yyyy-MM-dd')
             and GRADE_ORG_ID !='22'
+            AND O_TYPE = '02'
         ) MBCR
             ON MBCR.O_CODE = fp.FINPROD_MARKET_ID AND MBCR.NUM = 1
 		LEFT JOIN (

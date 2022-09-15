@@ -1,0 +1,2 @@
+--关闭信用保护凭证的授权
+update RSK_NODE_CONFIG_DTL set AUTHORIZE_CONTROL='00' where NODE_ID LIKE '35%' OR NODE_ID LIKE '36%';

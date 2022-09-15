@@ -5,11 +5,12 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.portfolio.position.constant.PositionConstant;
 import com.joyintech.service.portfolio.ptlfundallocation.dto.PtlFundAllocationDto;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -18,6 +19,12 @@ import static com.joyintech.tams.invest.common.position.constant.PositionCommonC
 
 @Service
 public class PositionRequestPtlFoundAllocation002Request {
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
 
     /**
@@ -31,7 +38,7 @@ public class PositionRequestPtlFoundAllocation002Request {
         resultMap.put("systemAct", systemAct);
         this.setCommonField(entity, resultMap);
 
-        PositionHttpRequest.send(resultMap);
+        positionRequestHandle.send(resultMap);
     }
 
 
@@ -52,7 +59,7 @@ public class PositionRequestPtlFoundAllocation002Request {
             busiType = DictCodeListExt3.头寸业务类型_证银转账.getValue();
             ps = DictCodeListExt3.交易方向_证银转账.getValue();
         }
-        PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(), POSITION_TYPE_TRD, busiType, ps);
+        positionRequestHandle.doDeleteByWorkFlowId(entity.getWorkflowId(), POSITION_TYPE_TRD, busiType, ps);
     }
 
     /**
@@ -71,7 +78,7 @@ public class PositionRequestPtlFoundAllocation002Request {
             busiType = DictCodeListExt3.头寸业务类型_证银转账.getValue();
             ps = DictCodeListExt3.交易方向_证银转账.getValue();
         }
-        PositionHttpRequest.dorevoke(entity.getTradeId(), POSITION_TYPE_TRD, busiType, ps);
+        positionRequestHandle.dorevoke(entity.getTradeId(), POSITION_TYPE_TRD, busiType, ps);
     }
 
     /**
@@ -131,7 +138,6 @@ public class PositionRequestPtlFoundAllocation002Request {
         map.put("cashAcctId",entity.getMyAcctNo());
         map.put("cashAmount",entity.getSettleAmt());
         ptlTrusteeshipList.add(map);
-        resultMap.put("ptlTrusteeshipList", ptlTrusteeshipList);
         //设置收款账户列表
 
         List<Map<String, Object>> ptlSecuritiesList = new ArrayList<>();
@@ -141,7 +147,15 @@ public class PositionRequestPtlFoundAllocation002Request {
         maps.put("cashAcctId",entity.getCounterAcctNo());
         maps.put("cashAmount",entity.getSettleAmt());
         ptlSecuritiesList.add(maps);
-        resultMap.put("ptlSecuritiesList", ptlSecuritiesList);
+        // 托管户和证券户数据
+        if (Objects.equals(entity.getPayType(), DictCodeListExt1.指令类型_银证转账_银转证.getValue())
+                || Objects.equals(entity.getPayType(), "01") || Objects.equals(entity.getPayType(), "HK01")) {
+            resultMap.put("ptlTrusteeshipList", ptlTrusteeshipList);//托管户
+            resultMap.put("ptlSecuritiesList", ptlSecuritiesList);//证券户
+        } else {
+            resultMap.put("ptlTrusteeshipList", ptlSecuritiesList);//证券户
+            resultMap.put("ptlSecuritiesList", ptlTrusteeshipList);//托管户
+        }
     }
 
 

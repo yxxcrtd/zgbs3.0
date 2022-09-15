@@ -152,7 +152,7 @@ public class EtrCashPosAutoGenerationService {
                     flow.setChlFinprodId(null);
                 }
                 flow.setAcctId(acctId);
-                flow.setAmount(可用现金);
+                flow.setAmount(ArithmeticUtil.multiply(可用现金, new BigDecimal(-1)));
                 flow.setOffsetFlag(DictCodeList.冲正标识_正常交易.getValue());
                 flow.setCdate(batchDate);
                 etrCashPositionFlowMapper.insertSelective(flow);

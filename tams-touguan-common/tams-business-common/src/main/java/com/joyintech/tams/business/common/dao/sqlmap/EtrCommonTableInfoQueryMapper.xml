@@ -43,7 +43,9 @@
             his.entrust_id in (
                 select #{entrustId} from dual
                 union
-                select PRE_TRADE_ID from TRDQUTO_MATCH_INFO where CSTP_TRADE_ID = #{entrustId})
+                select PRE_TRADE_ID from TRDQUTO_MATCH_INFO where CSTP_TRADE_ID = #{entrustId}
+                union
+                select TRD_ID from TRDQUTO_MATCH_INFO where EXE_ID = #{entrustId})
         <if test="busiType !=null and busiType !=''">
             and his.BUSINESS_TYPE=#{busiType,jdbcType=VARCHAR}
         </if>

@@ -25,7 +25,7 @@ import com.joyintech.service.entrust.etrconbond.service.EtrConBondService;
 import com.joyintech.service.entrust.etrconbond.service.PositionRequestEtrConBondService;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysWflBusinessList;
-import com.joyintech.tams.business.common.exception.PositionException;
+import com.joyintech.tams.position.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.PositionUtil;

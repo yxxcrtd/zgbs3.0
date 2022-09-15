@@ -250,7 +250,16 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 && BigDecimal.ZERO.compareTo(deal.getShareAmt()) == 0) {
                 return result;
             }
-            resultDto.setCdate(deal.getTradeDate());
+            // GLLCUAT-472:债券到期的持仓流水日期登交割日期 modify by fuyongsheng 20220914 start
+            // resultDto.setCdate(deal.getTradeDate());
+            if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(deal.getFinprodType2())
+                    && DictCodeList.交易方向_到期.getValue().equals(deal.getPs())){
+                resultDto.setCdate(deal.getSettleDate());
+            }
+            else{
+                resultDto.setCdate(deal.getTradeDate());
+            }
+            // GLLCUAT-472:债券到期的持仓流水日期登交割日期 modify by fuyongsheng 20220914 end
             resultDto.setAmount(ArithmeticUtil.multiply(deal.getShareAmt(), new BigDecimal(-1)));
 
             if (DictCodeList.交易方向_卖出.getValue().equals(deal.getPs())
@@ -415,6 +424,10 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
             if (inputDto.getPositionType().equals(DictCodeList.持仓类型_可用.getValue()) && DictCodeList.交易方向_赎回.getValue().equals(deal.getPs())) {
                 resultDto.setCdate(deal.getTradeDate());
                 resultDto.setAmount(ArithmeticUtil.multiply(StringUtil.isNotEmpty(deal.getShareAmt()) ? deal.getShareAmt() : deal.getTradeAmt(), new BigDecimal(-1)));
+                if(!StringUtil.isNotEmpty(deal.getShareAmt())&&(DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue().equals(deal.getFinprodType2())&& DictCodeList.收益类型_净值型.getValue().equals(profitType))){
+                    BigDecimal netValue = EtrCommonCashPositionDealService.getPlanNetValue(deal.getFinprodId(),deal.getTradeDate());
+                    resultDto.setAmount(ArithmeticUtil.multiply(ArithmeticUtil.divide(deal.getTradeAmt(), netValue, 2), new BigDecimal(-1)));
+                }
                 result.add(resultDto);
             }
             if (inputDto.getPositionType().equals(DictCodeList.持仓类型_实际.getValue()) &&
@@ -422,6 +435,10 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 resultDto.setCdate(deal.getTradeDate());
                 resultDto.setHodingType(DictCodeList.持仓类型_可用.getValue());
                 resultDto.setAmount(ArithmeticUtil.multiply(StringUtil.isNotEmpty(deal.getShareAmt()) ? deal.getShareAmt() : deal.getTradeAmt(), new BigDecimal(-1)));
+                if(!StringUtil.isNotEmpty(deal.getShareAmt())&&(DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue().equals(deal.getFinprodType2())&& DictCodeList.收益类型_净值型.getValue().equals(profitType))){
+                    BigDecimal netValue = EtrCommonCashPositionDealService.getPlanNetValue(deal.getFinprodId(),deal.getTradeDate());
+                    resultDto.setAmount(ArithmeticUtil.multiply(ArithmeticUtil.divide(deal.getTradeAmt(), netValue, 2), new BigDecimal(-1)));
+                }
                 result.add(resultDto);
             }
             if (/*!(DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue().equals(deal.getFinprodType2())
@@ -433,12 +450,14 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 params.put("holdingType",DictCodeList.持仓类型_在途.getValue());
                 List<PtlSecPositionFlow> list = ptlSecPositionFlowMapper.selectSecFlow(params);
                 if(list.isEmpty()) {
+                    params.put("holdingType",DictCodeList.持仓类型_可用.getValue());
+                    List<PtlSecPositionFlow> avaList = ptlSecPositionFlowMapper.selectSecFlow(params);
                     resultDto.setCdate(deal.getTradeDate());
                     resultDto.setAmount(ArithmeticUtil.multiply(deal.getShareAmt(), new BigDecimal(-1)));
                     result.add(resultDto);
                     PtlSecPositionFlowDto resultDtozt = new PtlSecPositionFlowDto();
                     BeanUtils.copyProperties(resultDto, resultDtozt);
-                    resultDtozt.setAmount(deal.getShareAmt());
+                    resultDtozt.setAmount(avaList.get(0).getAmount());//净值型赎回金额 预占份额可能不正确，查询冲销
                     resultDtozt.setHodingType(DictCodeList.持仓类型_可用.getValue());
                     result.add(resultDtozt);
                 }else{
@@ -453,7 +472,9 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 }
                 //抵消赎回提交时的可用持仓
                 // modify by jiangpeng on 20210526 ZGBSSE-418 计划类净值型提交时没有可用持仓
-                if(!StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue(),deal.getFinprodType2())) {
+                if (!StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue(), deal.getFinprodType2())
+                        && (!StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_基金.getValue(), deal.getFinprodType2())
+                        && CollectionUtils.isEmpty(list))) {
                     PtlSecPositionFlowDto resultDtoky = new PtlSecPositionFlowDto();
                     BeanUtils.copyProperties(resultDto, resultDtoky);
                     resultDtoky.setHodingType(DictCodeList.持仓类型_可用.getValue());
@@ -1719,12 +1740,14 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
              */
             // GLCP-157:修改股票、债券申购、申购确认登录现金流水逻辑 modify by fuyongsheng 20220714 start
             else if (DictCodeListExt1.金融产品类型_投管用_股票.getValue().equals(deal.getFinprodType2())
-                     && (DictCodeList.交易方向_买入.getValue().equals(deal.getPs())
-                         || DictCodeListExt2.交易方向_配股.getValue().equals(deal.getPs())
-                         || DictCodeListExt2.交易方向_增发.getValue().equals(deal.getPs())
-                         || DictCodeListExt2.交易方向_新股中签.getValue().equals(deal.getPs()))
-                         || DictCodeList.交易方向_申购.getValue().equals(deal.getPs())
-                         || DictCodeList.交易方向_申购确认.getValue().equals(deal.getPs())) {
+                    && (DictCodeList.交易方向_买入.getValue().equals(deal.getPs())
+                    || DictCodeListExt2.交易方向_配股.getValue().equals(deal.getPs())
+                    || DictCodeListExt2.交易方向_增发.getValue().equals(deal.getPs())
+                    || DictCodeListExt2.交易方向_新股中签.getValue().equals(deal.getPs()))
+                    || ((DictCodeListExt1.金融产品类型_投管用_股票.getValue().equals(deal.getFinprodType2()) ||
+                    DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(deal.getFinprodType2())) && (
+                    DictCodeList.交易方向_申购.getValue().equals(deal.getPs())
+                            || DictCodeList.交易方向_申购确认.getValue().equals(deal.getPs())))) {
                 if(DictCodeList.交易方向_申购.getValue().equals(deal.getPs())){
                     // 申购登录在途的现金流水
                     PtlCashPositionFlowDto ztFlowDto = this.genZtPtlCashPositionFlow(portfolioId, deal, stlPayOrder, chlId);
@@ -1866,7 +1889,16 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
 
                     || (DictCodeListExt1.金融产品类型_投管用_项目类资产.getValue().equals(deal.getFinprodType2())
                         && 还本_到期_收息.contains(deal.getPs()))) {
-                    resultDto.setCdate(deal.getSettleDate());
+                    //GLLCUAT-472:债券到期现金流水登录日期使用划款指令的结算日期 modify by fuyongsheng 20220914 start
+                    // resultDto.setCdate(deal.getSettleDate());
+                    if(DictCodeList.交易方向_到期.getValue().equals(deal.getPs())
+                            && DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(deal.getFinprodType2())
+                            && !DictCodeListExt1.交易场所_银行间.getValue().equals(deal.getTradeMarket())){
+                        resultDto.setCdate(stlPayOrder.getSettleDate());
+                    }else{
+                        resultDto.setCdate(deal.getSettleDate());
+                    }
+                    //GLLCUAT-472:债券到期现金流水登录日期使用划款指令的结算日期 modify by fuyongsheng 20220914 end
                     resultDto.setAmount(stlPayOrder.getSettleAmt());
                     resultDto.setSplitType(DictCodeListExt3.拆分标识_已拆分.getValue());
                     result.add(resultDto);

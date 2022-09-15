@@ -215,7 +215,7 @@ public class CfetsTrdRedeem001Service extends BaseService<CfetsTrdRedeemDealRegi
             //登录业务流程
             insertWfl(cfetsBondDealDbDto);
             //头寸
-          //  PositionHttpRequest.send(preparePosition(cfetsBondDealDbDto,type));
+          //  positionRequestHandle.send(preparePosition(cfetsBondDealDbDto,type));
         }
         //履历表 -> AOP
 
@@ -235,7 +235,7 @@ public class CfetsTrdRedeem001Service extends BaseService<CfetsTrdRedeemDealRegi
             insertWfl(cfetsBondDealDbDto);
             ProcessMark newEntity;
             //头寸
-          //  PositionHttpRequest.send(preparePosition(cfetsBondDealDbDto,OperationType.NEW));
+          //  positionRequestHandle.send(preparePosition(cfetsBondDealDbDto,OperationType.NEW));
             try {
                 newEntity = WorkFlowUtil.getBusinessObjectFromRequest(CfetsTrdRedeemDealRegisterQuoteDto.class, true);
                 // 工作流ID
@@ -264,9 +264,9 @@ public class CfetsTrdRedeem001Service extends BaseService<CfetsTrdRedeemDealRegi
         updateSecDelistingDate(entity,operationType);
         //头寸
         /*if (operationType.equals(OperationType.REVOKE) || operationType.equals(OperationType.DELETE)) {
-            PositionHttpRequest.sendRevoke(cfetsBondDealDbDto.getRegFinProductDealTotal().getTotleTradeId(),DictCodeListExt1.子系统代码_交易.getValue(),"Bond001");
+            positionRequestHandle.sendRevoke(cfetsBondDealDbDto.getRegFinProductDealTotal().getTotleTradeId(),DictCodeListExt1.子系统代码_交易.getValue(),"Bond001");
         }else{
-            PositionHttpRequest.send(preparePosition(cfetsBondDealDbDto,operationType));
+            positionRequestHandle.send(preparePosition(cfetsBondDealDbDto,operationType));
         }*/
         //处理指令执行进度
         //insertEtrFinishStatus(cfetsBondDealDbDto,operationType);
@@ -364,7 +364,7 @@ public class CfetsTrdRedeem001Service extends BaseService<CfetsTrdRedeemDealRegi
         deleteBussFlowData(workflowId);
        // CfetsTrdRedeemDealRegisterQuoteDto  entity = getBussinessEntityByWorkflowId(workflowId);
         //发送头寸
-       // PositionHttpRequest.deleteMethod(entity.getTotleTradeId(),DictCodeListExt1.子系统代码_交易.getValue());
+       // positionRequestHandle.deleteMethod(entity.getTotleTradeId(),DictCodeListExt1.子系统代码_交易.getValue());
 
     }
 

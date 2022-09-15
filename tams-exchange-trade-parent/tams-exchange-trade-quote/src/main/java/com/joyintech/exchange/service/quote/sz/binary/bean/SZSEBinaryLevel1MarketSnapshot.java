@@ -3,15 +3,23 @@ package com.joyintech.exchange.service.quote.sz.binary.bean;
 
 import com.alibaba.fastjson.JSON;
 import com.joyintech.exchange.service.quote.sz.binary.enums.SZSEBinaryMDEntryTypeEnum;
+import com.joyintech.exchange.service.quote.sz.binary.enums.SZSEBinaryMDStreamIDEnum;
+import com.joyintech.exchange.service.quote.sz.binary.enums.SZSEBinaryMsgTypeEnum;
+import com.joyintech.framework.util.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * 300111 集中竞价交易行情
+ * 300111 集中竞价交易行情，300211 债券现券交易和通用质押式回购行情，300611 盘后定价大宗交易行情
  */
 
 public class SZSEBinaryLevel1MarketSnapshot {
+    /**
+     * 消息类型
+     */
+    protected int msgType;
     /**
      * 数据生成时间
      */
@@ -156,6 +164,38 @@ public class SZSEBinaryLevel1MarketSnapshot {
      * 委托数量
      */
     private int orderQty;
+    /**
+     * 收盘价
+     */
+    private double closePrice;
+    /**
+     * 日均价
+     */
+    private double averageDailyPrice;
+
+    public int getMsgType() {
+        return msgType;
+    }
+
+    public void setMsgType(int msgType) {
+        this.msgType = msgType;
+    }
+
+    public double getClosePrice() {
+        return closePrice;
+    }
+
+    public void setClosePrice(double closePrice) {
+        this.closePrice = closePrice;
+    }
+
+    public double getAverageDailyPrice() {
+        return averageDailyPrice;
+    }
+
+    public void setAverageDailyPrice(double averageDailyPrice) {
+        this.averageDailyPrice = averageDailyPrice;
+    }
 
     public void addBidPx(double px) {
         bidPrices.add(px);
@@ -216,6 +256,14 @@ public class SZSEBinaryLevel1MarketSnapshot {
         if (noMDEntries == mdEntryBeanList.size()) {
             for (int i = 0; i < mdEntryBeanList.size(); i++) {
                 SZSEMdEntryBean mdEntryBean = mdEntryBeanList.get(i);
+                if(this.msgType == SZSEBinaryMsgTypeEnum.MSG_TYPE_300611.getValue()){// 盘后大宗定价行情 档位有两种买和卖 这里无论买卖价格一致,取第一个元素即可
+                    if (StringUtil.equals(SZSEBinaryMDStreamIDEnum.MD_STREAM_ID_060.getValue(),this.mdStreamId)){// 收盘价
+                        setClosePrice(mdEntryBean.getMdEntryPx());
+                    }else if (StringUtil.equals(SZSEBinaryMDStreamIDEnum.MD_STREAM_ID_061.getValue(),this.mdStreamId)) {// 日均价
+                        setAverageDailyPrice(mdEntryBean.getMdEntryPx());
+                    }
+                    return;
+                }
                 SZSEBinaryMDEntryTypeEnum msgTypeEnum = SZSEBinaryMDEntryTypeEnum.lookup(mdEntryBean.getMdEntryType())
                         .orElseThrow(() -> new IllegalArgumentException("unknown msg type: " + mdEntryBean.getMdEntryType()));
                 setPriceDetail(msgTypeEnum, mdEntryBean.getMdPriceLevel() - 1, mdEntryBean.getMdEntrySize(), mdEntryBean.getMdEntryPx());
@@ -223,7 +271,7 @@ public class SZSEBinaryLevel1MarketSnapshot {
         }
     }
 
-    private void setPriceDetail(SZSEBinaryMDEntryTypeEnum priceType, int level, long volume, long price) {
+    private void setPriceDetail(SZSEBinaryMDEntryTypeEnum priceType, int level, long volume, double price) {
         if (priceType == null) {
             return;
         }

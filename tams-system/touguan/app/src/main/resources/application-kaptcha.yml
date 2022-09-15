@@ -1,0 +1,17 @@
+youkol:
+  web:
+    kaptcha:
+      cache:
+        type: redis
+      config:
+        kaptcha:
+          textproducer:
+            font:
+              size: 30
+              color: black
+#          border: no
+          border:
+            color: gray
+          noise:
+            color: green
+      enabled: true

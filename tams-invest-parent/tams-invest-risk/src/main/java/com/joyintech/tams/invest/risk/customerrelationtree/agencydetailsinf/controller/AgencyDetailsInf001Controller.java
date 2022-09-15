@@ -10,12 +10,15 @@
 
 package com.joyintech.tams.invest.risk.customerrelationtree.agencydetailsinf.controller;
 
-import java.util.List;
-
+import com.joyintech.framework.ajax.AjaxResult;
+import com.joyintech.framework.annotation.PageId;
+import com.joyintech.framework.base.BaseController;
+import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.tams.invest.risk.customerrelationtree.agencydetailsinf.dto.AgencyDetailsInf001Dto;
 import com.joyintech.tams.invest.risk.customerrelationtree.agencydetailsinf.dto.TreeNode;
 import com.joyintech.tams.invest.risk.customerrelationtree.agencydetailsinf.service.AgencyDetailsInf001Service;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,13 +26,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.joyintech.framework.ajax.AjaxResult;
-import com.joyintech.framework.annotation.PageId;
-import com.joyintech.framework.base.BaseController;
-import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.RequestUtil;
 
 /**
  * 机构详细信息页面
@@ -82,8 +78,8 @@ public class AgencyDetailsInf001Controller extends BaseController{
      */
     @ResponseBody
     @RequestMapping("getAgency")
-    public List<SelectOptionDto> getAgency(String search){
-        return agencyDetailsInf001Service.getAgency(search);
+    public Page<SelectOptionDto> getAgency(){
+        return agencyDetailsInf001Service.getAgency(RequestUtil.getParameters(getRequest()));
     }
     
     /**

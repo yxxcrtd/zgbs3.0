@@ -763,7 +763,7 @@
         select distinct
         reg.ou_party_id as traderid,
         m1.PARTY_ABBR as traderidStr,
-        COALESCE (sua.IBU_TRADER, su.real_name, reg.ou_trader_id) AS trader,
+        nvl(su.real_name,reg.ou_trader_id) AS trader,
         reg.counter_id as counterId,
         m2.counter_name as counterIdStr,
         nvl(su1.TRADER_NAME,reg.counter_trader)  as counterTrader,
@@ -2428,7 +2428,7 @@
         from INTERF_CSTP_TRADE I
         INNER JOIN (SELECT EXECID ,MAX(UPDATETIME) UPDATETIME FROM  INTERF_CSTP_TRADE GROUP BY EXECID)	II ON  II.EXECID = I.EXECID AND II.UPDATETIME = I.UPDATETIME
         left join INTERF_OPICS_TRAD_REPO tr on tr.oritradeid = I.EXECID
-        left join INTERF_TRAD_SECDEAL ts on ts.FEDEALNO = I.EXECID
+        left join INTERF_TRAD_SECDEAL ts on ts.FEDEALNO = I.EXECID and DECODE(I.OURINSTITUTIONROLE, '119', 'T01', 'T02') = ts.PS
         left join fin_product fp on ts.SECID=fp.finprod_market_id and fp.finprod_type='F01'
         LEFT JOIN SYS_USER_ADD sua ON nvl(ts.TRAD,tr.BUYTRADER) =sua.IBU_TRADER
         LEFT JOIN SYS_USER su ON sua.USER_ID =su.USER_ID
@@ -2664,12 +2664,12 @@
     <select id="selectCstpBondFormDataByKey" resultType="com.joyintech.tams.cfets.trdquery.dto.CfetsTrdQueryCstpInfoListResponse">
 
         select distinct
-        to_char(total.trade_date,'yyyy-MM-dd') as tradeDate,
+        to_char(to_date(I.TRADEDATE,'yyyyMMdd'),'yyyy-MM-dd') as tradeDate,
         I.execid as execid,
-        I.Ourinstitutioncode as buyId,
-        I.Ourinstitutionchinesefullname as buyIdStr,
-        I.Counterinstitutioncode as sellId,
-        I.Institutionchinesefullname as sellIdStr,
+        case when I.SIDE = '1' then I.Ourinstitutioncode else I.COUNTERINSTITUTIONCODE end as buyId,
+        case when I.SIDE = '1' then I.Ourinstitutionchinesefullname else I.INSTITUTIONCHINESEFULLNAME end as buyIdStr,
+        case when I.SIDE = '4' then I.Ourinstitutioncode else I.COUNTERINSTITUTIONCODE end  as sellId,
+        case when I.SIDE = '4' then I.Ourinstitutionchinesefullname else I.INSTITUTIONCHINESEFULLNAME end as sellIdStr,
         fp.finprod_id as finprodId,
         ts.SECID as finprodMarketId,
         fp.finprod_abbr as finprodAbbr,
@@ -2685,22 +2685,22 @@
         ts.settamt as tradeAmt,
         ts.unit_int as unitInt,
         ts.convintamt as intAmt,
-        I.Ourinstitutioncode as institutionb,
-        I.Ourinstitutionchinesefullname as institutionbStr,
-        I.Ourtradername as traderb,
-        I.ourcapitalaccountname as capitalacctNameb,
-        I.Ourcapitalaccountnumber as capitalacctNumberb,
-        I.Ourdepositaccountname as depositAcctNameb,
-        I.Ourdepositaccountnumber as depositAcctNumberb,
-        I.Ourdepositinstitution as depositAcctOrgb,
-        I.Ourinstitutioncode as institutions,
-        I.Ourinstitutionchinesefullname as institutionsStr,
-        I.Countertradername as traders,
-        I.Countercapitalaccountname as capitalacctNames,
-        I.Countercapitalaccountnumber as capitalacctNumbers,
-        I.Counterdepositaccountname depositAcctNames,
-        I.Counterdepositaccountnumber as depositAcctNumbers,
-        I.Counterdepositinstitution as depositAcctOrgs
+        case when I.OURINSTITUTIONROLE = '119' then I.Ourinstitutioncode else I.COUNTERINSTITUTIONCODE end as institutionb,
+        case when I.OURINSTITUTIONROLE = '119' then I.Ourinstitutionchinesefullname else I.INSTITUTIONCHINESEFULLNAME end as institutionbStr,
+        case when I.OURINSTITUTIONROLE = '119' then nvl(I.Ourtraderchinesename,I.Ourtradername) else nvl(I.Countertraderchinesename,I.Countertradername) end as traderb,
+        case when I.OURINSTITUTIONROLE = '119' then I.ourcapitalaccountname else I.COUNTERCAPITALACCOUNTNAME end as capitalacctNameb,
+        case when I.OURINSTITUTIONROLE = '119' then I.Ourcapitalaccountnumber else I.COUNTERCAPITALACCOUNTNUMBER end as capitalacctNumberb,
+        case when I.OURINSTITUTIONROLE = '119' then I.Ourdepositaccountname else I.COUNTERDEPOSITACCOUNTNAME end as depositAcctNameb,
+        case when I.OURINSTITUTIONROLE = '119' then I.Ourdepositaccountnumber else I.COUNTERDEPOSITACCOUNTNUMBER end as depositAcctNumberb,
+        case when I.OURINSTITUTIONROLE = '119' then I.Ourdepositinstitution else I.COUNTERDEPOSITINSTITUTION end as depositAcctOrgb,
+        case when I.OURINSTITUTIONROLE = '120' then I.Ourinstitutioncode else I.COUNTERINSTITUTIONCODE end  as institutions,
+        case when I.OURINSTITUTIONROLE = '120' then I.Ourinstitutionchinesefullname else I.INSTITUTIONCHINESEFULLNAME end as institutionsStr,
+        case when I.OURINSTITUTIONROLE = '120' then nvl(I.Ourtraderchinesename,I.Ourtradername) else nvl(I.Countertraderchinesename,I.Countertradername) end as traders,
+        case when I.OURINSTITUTIONROLE = '120' then I.ourcapitalaccountname else I.COUNTERCAPITALACCOUNTNAME end as capitalacctNames,
+        case when I.OURINSTITUTIONROLE = '120' then I.Ourcapitalaccountnumber else I.COUNTERCAPITALACCOUNTNUMBER end as capitalacctNumbers,
+        case when I.OURINSTITUTIONROLE = '120' then I.Ourdepositaccountname else I.COUNTERDEPOSITACCOUNTNAME end as depositAcctNames,
+        case when I.OURINSTITUTIONROLE = '120' then I.Ourdepositaccountnumber else I.COUNTERDEPOSITACCOUNTNUMBER end as depositAcctNumbers,
+        case when I.OURINSTITUTIONROLE = '120' then I.Ourdepositinstitution else I.COUNTERDEPOSITINSTITUTION end as depositAcctOrgs
         from INTERF_CSTP_TRADE I
         INNER JOIN (SELECT EXECID ,MAX(UPDATETIME) UPDATETIME FROM  INTERF_CSTP_TRADE GROUP BY EXECID)	II ON  II.EXECID = I.EXECID AND II.UPDATETIME = I.UPDATETIME
         left join INTERF_TRAD_SECDEAL ts on ts.FEDEALNO = I.EXECID
@@ -2714,12 +2714,12 @@
         where  I.execid = #{execId,jdbcType=VARCHAR}
     </select>
     <select id="selectCstpRepoFormDataByKey" resultType="com.joyintech.tams.cfets.trdquery.dto.CfetsTrdQueryCstpInfoListResponse">
-        select distinct to_char(total.trade_date,'yyyy-MM-dd')  as tradeDate,
+        select distinct to_char(to_date(I.TRADEDATE,'yyyyMMdd'),'yyyy-MM-dd') as tradeDate,
         I.execid as execid,
-        I.Ourinstitutioncode as rbRepo,
-        I.Ourinstitutionchinesefullname as rbRepoStr,
-        I.Counterinstitutioncode as rsRepo,
-        I.Institutionchinesefullname as rsRepoStr,
+        case when I.SIDE = '1' then I.Ourinstitutioncode else I.COUNTERINSTITUTIONCODE end as rbRepo,
+        case when I.SIDE = '1' then I.Ourinstitutionchinesefullname else I.INSTITUTIONCHINESEFULLNAME end as rbRepoStr,
+        case when I.SIDE = '4' then I.Ourinstitutioncode else I.COUNTERINSTITUTIONCODE end  as rsRepo,
+        case when I.SIDE = '4' then I.Ourinstitutionchinesefullname else I.INSTITUTIONCHINESEFULLNAME end as rsRepoStr,
         tr.term as repoTerm,
         I.Price*100 as tradeYield,
         I.Tradecashamt as tradeAmt,
@@ -2735,22 +2735,22 @@
         decode(I.deliveryType,'0','03','5','02','4','01') as deliveryType,
         decode(I.Deliverytype2,'0','03','5','02','4','01') as mdeliveryType,
         tr.dealtext as remark,
-        I.Ourinstitutioncode as institutionb,
-        I.Ourinstitutionchinesefullname as institutionbStr,
-        nvl(I.Ourtraderchinesename,I.Ourtradername) as traderb,
-        I.ourcapitalaccountname as capitalacctNameb,
-        I.Ourcapitalaccountnumber as capitalacctNumberb,
-        I.Ourdepositaccountname as depositAcctNameb,
-        I.Ourdepositaccountnumber as depositAcctNumberb,
-        I.Ourdepositinstitution as depositAcctOrgb,
-        I.Ourinstitutioncode as institutions,
-        I.Ourinstitutionchinesefullname as institutionsStr,
-        nvl(I.Countertraderchinesename,I.Countertradername) as traders,
-        I.Countercapitalaccountname as capitalacctNames,
-        I.Countercapitalaccountnumber as capitalacctNumbers,
-        I.Counterdepositaccountname depositAcctNames,
-        I.Counterdepositaccountnumber as depositAcctNumbers,
-        I.Counterdepositinstitution as depositAcctOrgs
+        case when I.OURINSTITUTIONROLE = '119' then I.Ourinstitutioncode else I.COUNTERINSTITUTIONCODE end as institutionb,
+        case when I.OURINSTITUTIONROLE = '119' then I.Ourinstitutionchinesefullname else I.INSTITUTIONCHINESEFULLNAME end as institutionbStr,
+        case when I.OURINSTITUTIONROLE = '119' then nvl(I.Ourtraderchinesename,I.Ourtradername) else nvl(I.Countertraderchinesename,I.Countertradername) end as traderb,
+        case when I.OURINSTITUTIONROLE = '119' then I.ourcapitalaccountname else I.COUNTERCAPITALACCOUNTNAME end as capitalacctNameb,
+        case when I.OURINSTITUTIONROLE = '119' then I.Ourcapitalaccountnumber else I.COUNTERCAPITALACCOUNTNUMBER end as capitalacctNumberb,
+        case when I.OURINSTITUTIONROLE = '119' then I.Ourdepositaccountname else I.COUNTERDEPOSITACCOUNTNAME end as depositAcctNameb,
+        case when I.OURINSTITUTIONROLE = '119' then I.Ourdepositaccountnumber else I.COUNTERDEPOSITACCOUNTNUMBER end as depositAcctNumberb,
+        case when I.OURINSTITUTIONROLE = '119' then I.Ourdepositinstitution else I.COUNTERDEPOSITINSTITUTION end as depositAcctOrgb,
+        case when I.OURINSTITUTIONROLE = '120' then I.Ourinstitutioncode else I.COUNTERINSTITUTIONCODE end  as institutions,
+        case when I.OURINSTITUTIONROLE = '120' then I.Ourinstitutionchinesefullname else I.INSTITUTIONCHINESEFULLNAME end as institutionsStr,
+        case when I.OURINSTITUTIONROLE = '120' then nvl(I.Ourtraderchinesename,I.Ourtradername) else nvl(I.Countertraderchinesename,I.Countertradername) end as traders,
+        case when I.OURINSTITUTIONROLE = '120' then I.ourcapitalaccountname else I.COUNTERCAPITALACCOUNTNAME end as capitalacctNames,
+        case when I.OURINSTITUTIONROLE = '120' then I.Ourcapitalaccountnumber else I.COUNTERCAPITALACCOUNTNUMBER end as capitalacctNumbers,
+        case when I.OURINSTITUTIONROLE = '120' then I.Ourdepositaccountname else I.COUNTERDEPOSITACCOUNTNAME end as depositAcctNames,
+        case when I.OURINSTITUTIONROLE = '120' then I.Ourdepositaccountnumber else I.COUNTERDEPOSITACCOUNTNUMBER end as depositAcctNumbers,
+        case when I.OURINSTITUTIONROLE = '120' then I.Ourdepositinstitution else I.COUNTERDEPOSITINSTITUTION end as depositAcctOrgs
         from INTERF_CSTP_TRADE I
         INNER JOIN (SELECT EXECID ,MAX(UPDATETIME) UPDATETIME FROM  INTERF_CSTP_TRADE GROUP BY EXECID)	II ON  II.EXECID = I.EXECID AND II.UPDATETIME = I.UPDATETIME
         left join INTERF_OPICS_TRAD_REPO  tr on tr.oritradeid = I.EXECID
@@ -2901,6 +2901,7 @@
             left join ibu_quote_bond_det ibuDet on ibuDet.QUOTE_ID=nvl(match.PRE_TRADE_ID,T1.B_TRADE_ID) and ibuDet.TRADE_STATUS='07'
             WHERE   T1.trade_status='01' and T1.FINPROD_TYPE2 in ('F01','F02','F03') and T1.ps in ('T01','T02','T03','03','04')
               and T8.SETTLE_STATUS in ('02','04') <!-- 已交收和交收失败 --> /*已交收在下面一段中已查询,此处再查询会导致查询重复*/
+            and T1.TRADE_MARKET in ('01','02') /*银行间和商业柜台*/
             <![CDATA[ AND T1.trade_date >= #{startDate}]]>
             <![CDATA[ AND T1.trade_date <= #{endDate}]]>
             <if test="submitUserId != null and submitUserId != ''">
@@ -3046,6 +3047,7 @@
             WHERE T1.trade_status='01' and T1.FINPROD_TYPE2 in ('F01','F02','F03') and T1.ps in ('T01','T02','T03','03','04')
             and ((T8.SETTLE_STATUS is null or T8.SETTLE_STATUS = '01'))
             and not exists (select 1 from TRD_PRODUCT_TEMP_DEAL_TOTAL where T1.TOTLE_TRADE_ID=TOTLE_TRADE_ID)
+            and T1.TRADE_MARKET in ('01','02') /*银行间和商业柜台*/
             <![CDATA[ AND T1.trade_date >= #{startDate}]]>
             <![CDATA[ AND T1.trade_date <= #{endDate}]]>
             <if test="submitUserId != null and submitUserId != ''">
@@ -3189,6 +3191,7 @@
             left join reg_fin_product_deal_total_add regAdd on regAdd.totle_trade_id=nvl(match.PRE_TRADE_ID,T1.B_TRADE_ID)
             left join ibu_quote_bond_det ibuDet on ibuDet.QUOTE_ID=nvl(match.PRE_TRADE_ID,T1.B_TRADE_ID) and ibuDet.TRADE_STATUS='07'
             WHERE T1.trade_status='01' and T1.FINPROD_TYPE2 in ('F01','F02','F03') and T1.ps in ('T01','T02','T03','03','04')
+            and T1.TRADE_MARKET in ('01','02') /*银行间和商业柜台*/
             and (T8.SETTLE_STATUS is null or T8.SETTLE_STATUS = '01')
             <![CDATA[ AND T1.trade_date >= #{startDate}]]>
             <![CDATA[ AND T1.trade_date <= #{endDate}]]>
@@ -3269,7 +3272,7 @@
                 ''  settleSpeedStr,
                 TFPDT.SEC_MANAGE_ACCT_ID as secManageAcctId,
                 T7.SEC_ACCT_NAME secManageAcctIdStr,
-                CASE WHEN FPI.ISSUE_CLASS IN (#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN BO.WIN_PRIN_AMT/10000
+                CASE WHEN FPI.ISSUE_CLASS IN (#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN TFPDT.share_amt/100
                      WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN BO.SUBSCRIPTION_AMOUNT/10000 END faceValue,
                 case
                      when BO.BID_MODLE IS NULL THEN ( case when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
@@ -3327,6 +3330,7 @@
             LEFT JOIN STL_SEC_ACCT_INFO T7 ON TFPDT.SEC_MANAGE_ACCT_ID = T7.SEC_ACCT_ID
             left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
             WHERE TFPDT.TRADE_STATUS = #{TRADE_STATUS_01}
+                and TFPDT.TRADE_MARKET in ('01','02') /*银行间和商业柜台*/
               AND	TFPDT.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F32}
               AND	FP.TRADE_MARKET IN (#{TRADE_PLACE_01},#{TRADE_PLACE_02})
               AND	(BO.BID_ID IS NOT NULL OR BRT.TOTAL_WIN_ID IS NOT NULL OR TMI.PRE_TRADE_ID IS NOT NULL)
@@ -3512,6 +3516,7 @@
         and T8.SETTLE_STATUS in ('02','04') <!-- 已交收和交收失败 -->
         <![CDATA[ AND T1.trade_date >= #{startDate}]]>
         <![CDATA[ AND T1.trade_date <= #{endDate}]]>
+        and T1.TRADE_MARKET in ('01','02') /*银行间和商业柜台*/
         <if test="submitUserId != null and submitUserId != ''">
             and (t1.create_user= #{submitUserId} or t1.update_user= #{submitUserId} or T1.TRADER= #{submitUserId})
         </if>
@@ -3665,6 +3670,7 @@
         and not exists (select 1 from TRD_PRODUCT_TEMP_DEAL_TOTAL where T1.TOTLE_TRADE_ID=TOTLE_TRADE_ID)
         <![CDATA[ AND T1.trade_date >= #{startDate}]]>
         <![CDATA[ AND T1.trade_date <= #{endDate}]]>
+        and T1.TRADE_MARKET in ('01','02') /*银行间和商业柜台*/
         <if test="submitUserId != null and submitUserId != ''">
             and (t1.create_user= #{submitUserId} or t1.update_user= #{submitUserId} or T1.TRADER= #{submitUserId})
         </if>
@@ -3815,6 +3821,7 @@
         and (T8.SETTLE_STATUS is null or T8.SETTLE_STATUS = '01')
         <![CDATA[ AND T1.trade_date >= #{startDate}]]>
         <![CDATA[ AND T1.trade_date <= #{endDate}]]>
+        and T1.TRADE_MARKET in ('01','02') /*银行间和商业柜台*/
         <if test="submitUserId != null and submitUserId != ''">
             and (t1.create_user= #{submitUserId} or t1.update_user= #{submitUserId} or T1.TRADER= #{submitUserId})
         </if>
@@ -3909,7 +3916,7 @@
         '' settleSpeedStr,
         TPD.SEC_MANAGE_ACCT_ID secManageAcctId,
         T7.SEC_ACCT_NAME  secManageAcctIdStr,
-        CASE WHEN FPI.ISSUE_CLASS IN (#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN BO.WIN_PRIN_AMT/10000
+        CASE WHEN FPI.ISSUE_CLASS IN (#{ISSUE_CLASS_02},#{ISSUE_CLASS_03}) THEN TPD.share_amt/100
             WHEN FPI.ISSUE_CLASS = #{ISSUE_CLASS_01} THEN BO.SUBSCRIPTION_AMOUNT/10000 END faceValue,
         case
             when BO.BID_MODLE IS NULL THEN ( case when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02'
@@ -4784,7 +4791,7 @@
         LEFT JOIN TRD_TRADE_FEE_DETAIL ttft1 ON tpd.trade_id = ttft1.trade_id AND ttft1.fee_type =#{feeType08}
         LEFT JOIN ETR_ENTRUST ee ON TPDA.Entrust_Id = ee.entrust_id
         left join fin_trade_product ftp on ftp.finprod_id=TPD.TRADE_ID
-        left join (select pledge.finprod_id,sum(pledge.pledge_number*100) as disFaceValue
+        left join (select pledge.finprod_id,sum(pledge.pledge_number*pledge.pledge_ratio*100) as disFaceValue
         from FIN_DEAL_PLEDGE pledge group by pledge.finprod_id)pledges
         on ftp.finprod_id=pledges.finprod_id
         where TPD.TOTLE_TRADE_ID = #{totleTradeId} and  TPD.Trade_Status='01'
@@ -4910,7 +4917,7 @@
                nvl(fp.finprod_abbr, ipo.SECNAME)         AS finprodAbbr,
                tpda.portfolio_id as portfolioId,
                pp.portfolio_name as portfolioName,
-               (rp.pledge_number*rp.pledge_ratio)/100 as pledgePrin,
+               rp.pledge_number/100 as pledgePrin,
                rp.pledge_ratio*100 as pledgeRate,
                mbvi.NETPRICE as firstNetPrice,
                nvl(fp.REGIST_ORG, ipo.INSTITUTION)           AS repRegistOrg

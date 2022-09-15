@@ -685,6 +685,11 @@ public class FinBondAsset002Controller extends BaseController {
             logger.info("文件上传结束");
         } catch (Exception e) {
             logger.error("文件上传异常", e);
+            String errorMsg = e.getMessage();
+            if(errorMsg!=null && errorMsg.startsWith("MSG")){
+                errorMsg = errorMsg.substring(4);
+                return new Message<SysUploadFileInfo>().fail().setMessage(errorMsg);
+            }
             return new Message<SysUploadFileInfo>().fail().setMessage("文件上传异常");
         }
         return null;

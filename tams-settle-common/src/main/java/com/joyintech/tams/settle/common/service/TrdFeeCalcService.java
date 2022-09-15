@@ -821,11 +821,26 @@ public class TrdFeeCalcService {
         List<TrdFeeConfig> trdFeeConfigs = trdFeeCalcMapper.getTrdFeeConfig(searchParam);
         if (trdFeeConfigs != null && !trdFeeConfigs.isEmpty()) {
             feePlan = new FeePlan();
-			// 取第一条数据
-			feePlan.setTrdFeeConfig(trdFeeConfigs.get(0));
+			TrdFeeConfig trdFeetConfig = trdFeeConfigs.get(0);
+			// 资金账户不为空
+			if(StringUtil.isNotEmpty(planSearchInfo.getCapitalAccountNo())){
+				List<TrdFeeConfig> trdFeeConfigs_capitalAccountNo = trdFeeConfigs.stream().filter(x->StringUtil.equals(x.getCapitalAccountNo(),planSearchInfo.getCapitalAccountNo())).collect(Collectors.toList());
+				if (!trdFeeConfigs_capitalAccountNo.isEmpty()) {
+					trdFeetConfig = trdFeeConfigs_capitalAccountNo.get(0);
+				}
+			}else if(StringUtil.isNotEmpty(planSearchInfo.getBrokerageNo())){
+				List<TrdFeeConfig> trdFeeConfigs_brokerageNo = trdFeeConfigs.stream().filter(x->
+						StringUtil.equals(x.getCustomerId(),planSearchInfo.getBrokerageNo())
+								&&!StringUtil.isNotEmpty(planSearchInfo.getCapitalAccountNo())
+				).collect(Collectors.toList());
+				if (!trdFeeConfigs_brokerageNo.isEmpty()) {
+					trdFeetConfig = trdFeeConfigs_brokerageNo.get(0);
+				}
+			}
+			feePlan.setTrdFeeConfig(trdFeetConfig);
 			// 1.2 交易费用配置明细
 			List<TrdFeeConfigDetail> trdFeeConfigDetails = trdFeeCalcMapper
-					.getTrdFeeConfigDetail(trdFeeConfigs.get(0).getSeqNo());
+					.getTrdFeeConfigDetail(trdFeetConfig.getSeqNo());
             feePlan.setTrdFeeConfigDetails(trdFeeConfigDetails);
         }
         return feePlan;
@@ -1023,7 +1038,18 @@ public class TrdFeeCalcService {
             });
         }
         if (DictCodeListExt3.佣金计算方式_按成交编号计算.getValue().equals(commCalMethod)) {
-            return trdDetailDtos;
+        	// GLLCUAT-341:修改成交明细维度计算佣金过程中费用逻辑 modify by fuyongsheng 20220901 start
+			// 按照成交明细编号分组，循环分组信息
+			Map<String, List<TrdDetailDto>> listMap = trdDetailDtos.stream()
+					.collect(Collectors.groupingBy(TrdDetailDto::getTradeId));
+			listMap.forEach((x, y) -> {
+				TrdDetailDto allDetail = new TrdDetailDto();
+				allDetail.setTradeId(x);
+				allDetail = setTrdAmtAll(listMap.get(x), allDetail);
+				res.add(allDetail);
+			});
+			// GLLCUAT-341:修改成交明细维度计算佣金过程中费用逻辑 modify by fuyongsheng 20220901 end
+			// return trdDetailDtos;
         }
         return res;
     }

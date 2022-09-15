@@ -13,6 +13,7 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.jdbc.datasource.DataSource;
 import com.joyintech.framework.jdbc.enums.DataSourceType;
 import com.joyintech.framework.listener.FileAttachmentProcess;
+import com.joyintech.framework.listener.FileTypeValidator;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
@@ -189,6 +190,8 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
 
     @Autowired
     private JoyinFSMapper joyinFSMapper;
+    @Autowired(required = false)
+    private FileTypeValidator fileTypeValidator;
 
     public static final String ENTRUST_RECORD_INSERT = "insert";
 
@@ -1667,6 +1670,11 @@ public class FinBondAssetService extends BaseService<FinBondAssetSaveRequest> im
         if (!folder.exists())
             folder.createNewFile();
         FileUtils.copyInputStreamToFile(file.getInputStream(),folder);
+        String[] types = {fileNameList.get(1)};
+        if(null != fileTypeValidator && !fileTypeValidator.valid(types, folder)) {
+            FileUtils.forceDelete(folder);
+            throw new IOException("MSG:上传的文件格式不被允许，请重新上传文件。");
+        }
         SysUploadFileInfo fileInfo = new SysUploadFileInfo();
         String uuid = UUID.randomUUID().toString().replace("-", "");
         fileInfo.setSeqNo(uuid);

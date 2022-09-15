@@ -158,7 +158,7 @@
         </if>
         union all
         select * from (
-            select '有效'                 effectiveStatusName,
+            select distinct '有效'                 effectiveStatusName,
             '03'                         finprodType2,
             fpt.TYPE_9 as assetType,
             bo.FINPROD_ID                finprodId,
@@ -405,7 +405,7 @@
         </if>
     </select>
     <sql id="onlyIbuInfo">
-        select  '有效' as effectiveStatusName,
+        select distinct '有效' as effectiveStatusName,
         '01'    finprodType2,
         fpt.TYPE_9 as assetType,
         ib.finprod_id as finprodId,
@@ -535,7 +535,7 @@
             AND ibd.execid = #{execid,jdbcType=VARCHAR}
         </if>
         union all
-        select  '有效' as effectiveStatusName,
+        select distinct '有效' as effectiveStatusName,
         '02'    finprodType2,
         null as assetType,
         ic.term_type as finprodId,
@@ -1230,7 +1230,7 @@
         I.quoteid as quoteid,
         I.ourinstitutioncode as traderid,
         mccit.PARTY_ABBR as traderidName,
-        su.real_name trader,
+        nvl(TRADER_NAME,su.real_name) trader,
         I.Counterinstitutioncode as counterId,
         mccic.PARTY_ABBR as counterIdName,
         decode(I.Clearingmethod,'13','01','6','02') as clearType,
@@ -1248,11 +1248,12 @@
         from INTERF_CSTP_TRADE I
         INNER JOIN (SELECT EXECID ,MAX(UPDATETIME) UPDATETIME FROM  INTERF_CSTP_TRADE GROUP BY EXECID)	II ON  II.EXECID = I.EXECID AND II.UPDATETIME = I.UPDATETIME
         left join INTERF_OPICS_TRAD_REPO tr on tr.oritradeid = I.EXECID
-        left join INTERF_TRAD_SECDEAL ts on ts.FEDEALNO = I.EXECID
+        left join INTERF_TRAD_SECDEAL ts on ts.FEDEALNO = I.EXECID and DECODE(I.OURINSTITUTIONROLE, '119', 'T01', 'T02') = ts.PS
         left join fin_product fp
         on ts.SECID=fp.finprod_market_id
         and fp.finprod_type='F01'
         LEFT JOIN SYS_USER_ADD sua ON nvl(ts.TRAD,tr.BUYTRADER) =sua.IBU_TRADER
+        LEFT JOIN MST_CFETS_CUSTOMER_TRADER mcct ON nvl(ts.TRAD,tr.BUYTRADER) =mcct.TRADER_ID
         LEFT JOIN SYS_USER su ON sua.USER_ID =su.USER_ID
        <!-- LEFT JOIN (
         SELECT distinct i.EXECID ,nvl(iqb.QUOTE_ID,iqc.QUOTE_ID) QUOTEID
@@ -1930,7 +1931,7 @@
     </sql>
     <select id="findAllTrdBondList" resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmExecBondInfoResponse">
     select * from (
-        select reg.totle_trade_id as busiCode,
+        select distinct reg.totle_trade_id as busiCode,
         reg.trade_date as tradeDate,
         '04' as busiType,
         fp.finprod_id as finprodId,
@@ -1989,7 +1990,7 @@
 
         union all
 
-        select ib.cfets_quote_id as busiCode,
+        select distinct ib.cfets_quote_id as busiCode,
         ib.quote_date as tradeDate,
         ib.quote_type as busiType,
         fp.finprod_id as finprodId,
@@ -2052,7 +2053,7 @@
 
     <select id="findAllTrdBidList" resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmExecFirstBondInfoResponse">
         select * from (
-            select bo.BID_ID                        busiCode
+            select distinct bo.BID_ID                        busiCode
                  ,'04'                              busiType
                  , bo.BID_DATE                      tradeDate
                  , fp.FINPROD_ID                    finprodId
@@ -2118,7 +2119,7 @@
 
     <select id="findAllTrdRepoList" resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmExecRepoInfoResponse">
         select * from (
-        select reg.totle_trade_id as busiCode,
+        select distinct reg.totle_trade_id as busiCode,
         reg.trade_date as tradeDate,
         '04' as busiType,
         reg.TERM_TYPE as termType,
@@ -2173,7 +2174,7 @@
 
         union all
 
-        select ic.cfets_quote_id as busiCode,
+        select distinct ic.cfets_quote_id as busiCode,
         ic.quote_date as tradeDate,
         ic.quote_type as busiType,
         ic.term_type as termType,
@@ -2282,7 +2283,7 @@
 
     <select id="findAllCstpBidList" resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmExecFirstBondInfoResponse">
     select * from (
-        select icb.TRD_ID                                                  execid
+        select distinct icb.TRD_ID                                                  execid
              , fp.FINPROD_ID                                               finprodId
              , icb.INSTRUMENT_ID                                           finprodMarketId
              , icb.INSTRUMENT_SHORT_NAME                                   finprodAbbr
@@ -2536,11 +2537,9 @@
         <if test="secManageAcctId != null and secManageAcctId != ''">
             and reg.sec_manage_acct_id = #{secManageAcctId,jdbcType=VARCHAR}
         </if>
-        <!--        <if test="yield != null">-->
-        <!--            and to_char(reg.yield,'FM990.9999')=to_char(#{yield},'FM990.9999')-->
-        <!--        </if>-->
-        <if test="price != null">
-            and to_char(reg.UNIT_CPRICE,'FM990.9999')=to_char(#{price},'FM990.9999')
+        <if test="price != null and  yield != null">
+            and ( to_char(reg.UNIT_CPRICE,'FM990.9999')=to_char(#{price},'FM990.9999')
+                    or to_char(reg.yield,'FM990.999999')=to_char(#{yield},'FM990.999999') )
         </if>
         <if test="faceValue != null">
             and reg.face_value=#{faceValue}

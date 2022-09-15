@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -51,6 +52,9 @@ public abstract class TradeAgentDsp implements TradeAgent {
     @Autowired
     protected TerminalAgentInfoService terminalAgentInfoService;
 
+    @Value("${agent.query.cancelOrderInterval:10000}")
+    protected long cancelOrderInterval;
+
     private String terminalName;
 
     private AtomicInteger localOffset = new AtomicInteger(0);
@@ -72,6 +76,9 @@ public abstract class TradeAgentDsp implements TradeAgent {
 
     protected Map<String, List<Trade>> tradeListMapByBroker = new HashMap<>();
     protected Map<String, Map<String, ReissueTradeBean>> reissueTradeBeanMap = Maps.newConcurrentMap();
+
+    //下单的账号
+    protected Map<String, String> orderAccountMap = Maps.newConcurrentMap();
 
     public void clearReissueCache(String accountId) {
         reissueEntrustBeanMap.remove(accountId);

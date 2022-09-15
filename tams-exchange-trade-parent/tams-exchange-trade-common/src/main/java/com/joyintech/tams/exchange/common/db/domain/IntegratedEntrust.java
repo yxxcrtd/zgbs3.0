@@ -417,6 +417,8 @@ public class IntegratedEntrust extends BaseEntity implements Serializable, Entru
     @ApiModelProperty(name = "propAcctName", value = "对手资金账户名称")
     private String propAcctName;
     // 信用保护凭证使用 --end
+
+
     public String getSoftSkipMode() {
         return softSkipMode;
     }

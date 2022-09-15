@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -210,6 +211,12 @@ public class TrdAvailableCashQueryService {
         for (String secNo : secManager) {
             dto.setSeqno(secNo);
             ret = ArithmeticUtil.doAdd(basePtlCashPositionInfoService.queryUsableCashPosition(dto), ret);
+            //查询新表可用现金
+            PtlCashPositionFlowDto dtoNew = new PtlCashPositionFlowDto();
+            BeanUtil.copyPropertiesIgnoreNull(dtoNew, dto);
+            dtoNew.setHodingType(DictCodeListExt3.资产类型_汇总可用现金.getValue());
+            dtoNew.setDateType(0);
+            ret = ArithmeticUtil.doAdd(basePtlCashPositionInfoService.queryTrdAvailableCashNew(dtoNew), ret);
         }
         return ret;
     }

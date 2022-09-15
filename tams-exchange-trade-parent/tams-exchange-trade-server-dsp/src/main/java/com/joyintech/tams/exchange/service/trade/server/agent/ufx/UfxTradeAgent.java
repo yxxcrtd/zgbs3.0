@@ -1,7 +1,6 @@
 package com.joyintech.tams.exchange.service.trade.server.agent.ufx;
 
 import cn.hutool.core.collection.ListUtil;
-import com.alibaba.fastjson.JSONArray;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -16,9 +15,8 @@ import com.joyintech.tams.exchange.common.utils.*;
 import com.joyintech.tams.exchange.service.trade.dao.domain.TerminalAgentInfo;
 import com.joyintech.tams.exchange.service.trade.server.agent.TradeAgentDsp;
 import com.joyintech.tams.exchange.service.trade.util.AgentUtil;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -70,15 +69,14 @@ public class UfxTradeAgent extends TradeAgentDsp {
     public void removeAccount(String accountId) {
         accountMap.remove(accountId);
         loginAccounts.remove(accountId);
+        orderAccountMap.remove(accountId);
     }
 
 
     @Override
     public ResultBean reqLoginAccount(AccountLoginReqBean accountLoginReqBean) {
         Account account = accountLoginReqBean.getAccount();
-        // 账户交易密码解密
-        account.setPwd(new String(Base64.decodeBase64(account.getPwd())));
-        account.setTradePwd(new String(Base64.decodeBase64(account.getTradePwd())));
+        AgentUtil.SetDecodeBase64(account);
         String accountId = account.getId();
         TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), FunctionCode.REQ_ACCOUNT_LOGIN.value);
         agentInfo.setAccountId(accountId);
@@ -98,6 +96,8 @@ public class UfxTradeAgent extends TradeAgentDsp {
             addTradeRequest(accountId, this);
             addAccount(accountId, account);
             setStatus(account.getId(), AccountLoginStatus.LOGGED);
+
+            orderAccountMap.remove(accountId);
 
             LoginInfo loginInfo = UfxMsgParseHelper.parseLoginInfo((Map<String, Object>) resultBean.getData());
             addLoginInfo(accountId, loginInfo);
@@ -178,18 +178,12 @@ public class UfxTradeAgent extends TradeAgentDsp {
      * 333002 普通委托	用于竞价平台所有委托业务下单
      * 333012 ETF申购
      * 333013 ETF赎回
-     * xiazelei 修改于 2022/5/25 14:29 增加新的交易接口
-     * 332742 固收债券回售申报
      */
     @Override
     public void entrust(Entrust entrust) {
         logger.info("send entrust:{}", entrust.getId());
-        // 新业务代码场景处理标识；true为新场景代码
-        boolean newFlag = false;
         // 场景代码
         int functionCode = FunctionCode.REQ_ENTRUST.value;
-        ResultBean resultBean;
-
         // region  业务场景判断
         // 333002竞价平台普通委托
         // 场景属性
@@ -201,49 +195,35 @@ public class UfxTradeAgent extends TradeAgentDsp {
             } else if (EntrustBs.SELL.value.equals(entrust.getEntrustBs())) {
                 entrustProp = "ETF_APPLY_SELL";
             }
-        } else if (EntrustProp.HS.value.equals(entrust.getEntrustProp()) && Market.SHSE.value.equals(entrust.getMarket())) {
-            newFlag = true;
-            // xiazelei 修改于 2022/5/25 16:58  332742 固收债券回售申报
-            entrustProp = "BondSellBackSH";
         }
         // endregion
 
         // region 接口调用
         try {
-            if (!newFlag) {
 
-                // region 参数组装
-                Map<String, Object> parameters = Maps.newHashMap();
-                parameters.put("account", entrust.getAccountId());
-                parameters.put("stkcode", StockCodeUtils.getStockCode(entrust.getStockCode()));
-                parameters.put("exchange_type", AgentUtil.ExchangeMarketUFX(entrust.getMarket()));
-                parameters.put("stock_code", StockCodeUtils.getStockCode(entrust.getStockCode()));
-                parameters.put("entrust_amount", entrust.getEntrustVolume());
-                //全价
-                if (FullPriceConst.FULL_PRICE.value.equals(entrust.getIsFullPrice())) {
-                    parameters.put("entrust_price", entrust.getFullPrice().toPlainString());
-                } else {//净价
-                    parameters.put("entrust_price", entrust.getEntrustPrice().toPlainString());
-                }
-                parameters.put("entrust_bs", entrust.getEntrustBs());
-                parameters.put("entrust_prop", entrust.getEntrustProp());
-                parameters.put("batch_no", entrust.getLocalEntrustId());
-                parameters.put("entrust_reference", entrust.getId());
-                // endregion
-
-                TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), functionCode, entrustProp);
-                agentInfo.setAccountId(entrust.getAccountId());
-                parameters.put("password", getAccount(agentInfo.getAccountId()).getTradePwd());
-                resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
-            } else {
-
-                // region 参数组装
-                // 自定义参数
-                Map<String, Object> customParam = getCustomParam(entrust.getAccountId());
-                // endregion
-                // 332742 固收债券回售申报 柜台只返回 entrust_no一个字段
-                resultBean = triggerCodeAdapter(functionCode, entrustProp, entrust, customParam);
+            // region 参数组装
+            Map<String, Object> parameters = Maps.newHashMap();
+            parameters.put("account", entrust.getAccountId());
+            parameters.put("stkcode", StockCodeUtils.getStockCode(entrust.getStockCode()));
+            parameters.put("exchange_type", AgentUtil.ExchangeMarketUFX(entrust.getMarket()));
+            parameters.put("stock_code", StockCodeUtils.getStockCode(entrust.getStockCode()));
+            parameters.put("entrust_amount", entrust.getEntrustVolume());
+            //全价
+            if (FullPriceConst.FULL_PRICE.value.equals(entrust.getIsFullPrice())) {
+                parameters.put("entrust_price", entrust.getFullPrice().toPlainString());
+            } else {//净价
+                parameters.put("entrust_price", entrust.getEntrustPrice().toPlainString());
             }
+            parameters.put("entrust_bs", entrust.getEntrustBs());
+            parameters.put("entrust_prop", entrust.getEntrustProp());
+            parameters.put("batch_no", entrust.getLocalEntrustId());
+            parameters.put("entrust_reference", entrust.getId());
+            // endregion
+
+            TerminalAgentInfo agentInfo = terminalAgentInfoService.selectOne(getTerminalName(), functionCode, entrustProp);
+            agentInfo.setAccountId(entrust.getAccountId());
+            parameters.put("password", getAccount(agentInfo.getAccountId()).getTradePwd());
+            ResultBean resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
 
             // region 返回结果处理
             Map<String, Object> ds = (Map<String, Object>) resultBean.getData();
@@ -257,12 +237,22 @@ public class UfxTradeAgent extends TradeAgentDsp {
                 entrust.setReportTime((String) ds.get("entrust_time"));
                 entrust.setReportNo((String) ds.get("report_no"));
                 entrust.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
+
+                //保存当前下单账号
+                orderAccountMap.put(entrust.getAccountId(), entrust.getBrokerEntrustId());
             } else {
                 // 失败 柜台废单 还原持仓
+                // yanjianhui 修改于 2022/8/24 11:23  柜台报错返回空报文导致指令进度没有被释放处理。
+                String errorMsg = null;
+                if (ds != null) {
+                    errorMsg = ErrorMsgUtils.subErrorMsg((String) ds.get("error_info"));
+                } else {
+                    errorMsg = resultBean.getErrorMsg();
+                }
                 entrust.setErrorCode(ErrorCode.INVALID.value);
                 entrust.setEntrustStatus(EntrustStatus.INVALID.value);
-                entrust.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
-                logger.warn("integratedEntrust failed ErrorNo:{}，reason:{}", resultBean.getErrorCode(), ds.get("error_info"));
+                entrust.setErrorMsg(errorMsg);
+                logger.warn("integratedEntrust failed ErrorNo:{}，reason:{}", resultBean.getErrorCode(), errorMsg);
             }
 
             TerminalId terminalId = new TerminalId();
@@ -284,6 +274,11 @@ public class UfxTradeAgent extends TradeAgentDsp {
      * 332400   债券质押协议回购初始交易	深交所质押式协议回购首期报单
      * 332401   债券质押协议回购购回交易	深交所质押式协议回购到期购回、提前购回报单
      * 332410   深圳债券质押协议回购到期续做
+     * yanjianhui 修改于 2022/7/31 15:58 新增交易接口。
+     * 332434   债券质押协议回购提前购回委托
+     * 332435    债券质押协议回购质押券变更委托
+     * 332436   债券质押协议回购解除质押委托
+     * 332437   债券质押协议回购逆回购方确认委托
      * 332725	协议回购委托确认	上交所质押式协议回购首期、购回、换券、续做、解除质押等所有业务报单
      * xiazelei 修改于 2022/5/25 14:29 增加新的交易接口
      * 332647   债券现券交易协商委托
@@ -310,10 +305,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
         // 332648   深圳-债券现券交易协商确认委托
         // 332400   债券质押协议回购初始交易	深交所质押式协议回购首期报单
         // 332401   债券质押协议回购购回交易	深交所质押式协议回购到期购回、提前购回报单
-        if ("BondOrderSZ".equals(entrustProp)
-                || "BondAgreeSZ".equals(entrustProp)
-                || "RepurchaseSQSZ".equals(entrustProp)
-                || "RepurchaseBuybackSZ".equals(entrustProp))
+        if ("BondOrderSZ".equals(entrustProp) || "BondAgreeSZ".equals(entrustProp) || "RepurchaseSQSZ".equals(entrustProp) || "RepurchaseBuybackSZ".equals(entrustProp) || "RepurchaseRenewalSZ".equals(entrustProp) || "RepurchaseBuyBeforeSZ".equals(entrustProp) || "RepurchaseRemovePledgeSZ".equals(entrustProp) || "RepurchaseBondChangeSZ".equals(entrustProp) || "RepurchaseAgreeSZ".equals(entrustProp))
             newFlag = true;
 
         try {
@@ -344,16 +336,22 @@ public class UfxTradeAgent extends TradeAgentDsp {
                     entrust.setTradingDay(initDate);
                 }
                 entrust.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
+
+                //保存当前下单账号
+                orderAccountMap.put(entrust.getAccountId(), entrust.getBrokerEntrustId());
             } else {
                 // 失败 柜台废单 还原持仓
-                entrust.setEntrustStatus(EntrustStatus.INVALID.value);
+                // yanjianhui 修改于 2022/8/24 11:23  柜台报错返回空报文导致指令进度没有被释放处理。
+                String errorMsg = null;
                 if (ds != null) {
-                    entrust.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
+                    errorMsg = ErrorMsgUtils.subErrorMsg((String) ds.get("error_info"));
                 } else {
-                    entrust.setErrorMsg(resultBean.getErrorMsg());
+                    errorMsg = resultBean.getErrorMsg();
                 }
+                entrust.setErrorMsg(errorMsg);
+                entrust.setEntrustStatus(EntrustStatus.INVALID.value);
                 entrust.setErrorCode(ErrorCode.INVALID.value);
-                logger.warn("integratedEntrust failed ErrorNo:{}，reason:{}", resultBean.getErrorCode(), ds.get("error_info"));
+                logger.warn("integratedEntrust failed ErrorNo:{}，reason:{}", resultBean.getErrorCode(), errorMsg);
             }
             TerminalId terminalId = new TerminalId();
             BeanUtils.copyProperties(entrust, terminalId);
@@ -367,8 +365,6 @@ public class UfxTradeAgent extends TradeAgentDsp {
 
     /**
      * 333017  委托撤单 用于竞价平台所有委托业务撤单
-     * xiazelei 修改于 2022/5/25 16:58
-     * 332743  固收债券回售申报撤单
      */
     @Override
     public void cancelEntrust(Entrust entrust, EntrustInterface cancelEntrust) {
@@ -376,11 +372,6 @@ public class UfxTradeAgent extends TradeAgentDsp {
         int functionCode = FunctionCode.REQ_CANCEL_ENTRUST.value;
         // 333017  平台委托--委托撤单
         String entrustProp = "Bidding";
-        if (EntrustProp.HS.value.equals(entrust.getEntrustProp()) && Market.SHSE.value.equals(entrust.getMarket())) {
-            // xiazelei 修改于 2022/5/25 16:58  332743  固收债券回售申报撤单
-            entrustProp = "BondSellBackSH";
-        }
-
         try {
             // region 参数组装
             // 自定义参数
@@ -388,7 +379,6 @@ public class UfxTradeAgent extends TradeAgentDsp {
             customParam.put("cancelId", cancelEntrust.getId());
             customParam.put("entrustDate", cancelEntrustBean.getTradingDay());
             // endregion
-            // 332743   固收债券回售申报撤单 柜台只返回 entrust_no一个字段
             ResultBean resultBean = triggerCodeAdapter(functionCode, entrustProp, entrust, customParam);
             Map<String, Object> ds = (Map<String, Object>) resultBean.getData();
 
@@ -410,17 +400,25 @@ public class UfxTradeAgent extends TradeAgentDsp {
                     }
                     cancelEntrustBean.setStockCode((String) ds.get("stock_code"));
                     cancelEntrustBean.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
-                } else if ("BondSellBackSH".equals(entrustProp)) {
-                    // 332743  固收债券回售申报撤单
-                    cancelEntrustBean.setMarket(Market.SHSE.value);
-                    cancelEntrustBean.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
-                    cancelEntrustBean.setBrokerEntrustId(entrust.getBrokerEntrustId());
                 }
+
+                //保存当前下单账号
+                orderAccountMap.put(cancelEntrustBean.getAccountId(), cancelEntrustBean.getCancelBrokerEntrustId());
+
+                //触发委托查询
+                executeQueryWithCancelOrder(cancelEntrustBean.getAccountId(), QueryEnum.qryOrder);
             } else {
                 // 失败 柜台废单
+                // yanjianhui 修改于 2022/8/24 11:23  柜台报错返回空报文导致指令进度没有被释放处理。
+                String errorMsg = null;
+                if (ds != null) {
+                    errorMsg = ErrorMsgUtils.subErrorMsg((String) ds.get("error_info"));
+                } else {
+                    errorMsg = resultBean.getErrorMsg();
+                }
                 cancelEntrustBean.setErrorCode(resultBean.getErrorCode());
                 cancelEntrustBean.setEntrustStatus(EntrustStatus.INVALID.value);
-                cancelEntrustBean.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
+                cancelEntrustBean.setErrorMsg(errorMsg);
             }
             onRspCancelEntrust(cancelEntrustBean);
         } catch (Exception e) {
@@ -447,16 +445,13 @@ public class UfxTradeAgent extends TradeAgentDsp {
         if (IntegratedEntrustUtils.isBulk(cancelEntrustBean.getEntrustProp())) {
             //大宗
             entrustProp = "Bulk";
-        } else if (Market.SHSE.value.equals(cancelEntrustBean.getMarket())
-                && IntegratedEntrustUtils.isFixedIncome(cancelEntrustBean.getEntrustProp())) {
+        } else if (Market.SHSE.value.equals(cancelEntrustBean.getMarket()) && IntegratedEntrustUtils.isFixedIncome(cancelEntrustBean.getEntrustProp())) {
             //固收撤回
             entrustProp = "FixedIncome";
-        } else if (IntegratedEntrustUtils.isRepurchaseSZ(cancelEntrustBean.getEntrustProp(),
-                cancelEntrustBean.getEntrustBs(), cancelEntrustBean.getMarket())) {
+        } else if (IntegratedEntrustUtils.isRepurchaseSZ(cancelEntrustBean.getEntrustProp(), cancelEntrustBean.getEntrustBs(), cancelEntrustBean.getMarket())) {
             // 332402 债券质押式协议回购_深交所撤回
             entrustProp = "RepurchaseSZ";
-        } else if (IntegratedEntrustUtils.isRepurchaseSH(cancelEntrustBean.getEntrustProp(),
-                cancelEntrustBean.getEntrustBs(), cancelEntrustBean.getMarket())) {
+        } else if (IntegratedEntrustUtils.isRepurchaseSH(cancelEntrustBean.getEntrustProp(), cancelEntrustBean.getEntrustBs(), cancelEntrustBean.getMarket())) {
             //债券质押式协议回购_上交所撤回
             entrustProp = "RepurchaseSH";
         } else if (Market.SZSE.value.equals(integratedEntrust.getMarket()) && EntrustProp.SZ_XSCJ_XD.value.equals(integratedEntrust.getEntrustProp())) {
@@ -495,13 +490,17 @@ public class UfxTradeAgent extends TradeAgentDsp {
                 // 成功 已报
                 cancelEntrustBean.setCancelBrokerEntrustId((String) ds.get("entrust_no"));
                 cancelEntrustBean.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
+
+                //保存当前下单账号
+                orderAccountMap.put(cancelEntrustBean.getAccountId(), cancelEntrustBean.getCancelBrokerEntrustId());
+
+                //触发委托查询
+                executeQueryWithCancelOrder(cancelEntrustBean.getAccountId(), QueryEnum.queryIntegratedOrder);
             } else {
                 // 失败 柜台废单
                 cancelEntrustBean.setEntrustStatus(EntrustStatus.INVALID.value);
-                if (ds != null)
-                    cancelEntrustBean.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
-                else
-                    cancelEntrustBean.setErrorMsg(resultBean.getErrorMsg());
+                if (ds != null) cancelEntrustBean.setErrorMsg(ErrorMsgUtils.subErrorMsg((String) ds.get("error_info")));
+                else cancelEntrustBean.setErrorMsg(resultBean.getErrorMsg());
                 cancelEntrustBean.setErrorCode(resultBean.getErrorCode());
             }
 
@@ -544,8 +543,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
 
     private String getEntrustProp(QuoteQryBean quoteQryBean, Map<String, Object> parameters) {
         String entrustProp = null;
-        if (QuoteType.BULK_QUOTE.value == quoteQryBean.getQuoteType()
-                || QuoteType.AFTER_BULK_QUOTE.value == quoteQryBean.getQuoteType()) {
+        if (QuoteType.BULK_QUOTE.value == quoteQryBean.getQuoteType() || QuoteType.AFTER_BULK_QUOTE.value == quoteQryBean.getQuoteType()) {
             // 398大宗
             entrustProp = "IntegratedQuote";
             String market = StockCodeUtils.getMarket(quoteQryBean.getStockCode());
@@ -553,8 +551,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
             quoteQryBean.setMarket(market);
             parameters.put("cbphq_type", "00");
             parameters.put("stock_code", StockCodeUtils.getStockCode(quoteQryBean.getStockCode()));
-        } else if (QuoteType.NON_PUBLIC_PROTOCOL_BACK_QUOTE.value == quoteQryBean.getQuoteType()
-                || QuoteType.PUBLIC_PROTOCOL_BACK_QUOTE.value == quoteQryBean.getQuoteType()) {
+        } else if (QuoteType.NON_PUBLIC_PROTOCOL_BACK_QUOTE.value == quoteQryBean.getQuoteType() || QuoteType.PUBLIC_PROTOCOL_BACK_QUOTE.value == quoteQryBean.getQuoteType()) {
             //  332728上海债券质押式协议回购行情信息查询
             entrustProp = "RepurchaseSH";
             if (QuoteType.NON_PUBLIC_PROTOCOL_BACK_QUOTE.value == quoteQryBean.getQuoteType()) {
@@ -786,8 +783,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
         return getQueryIntegratedBulkQuote(agentInfo, parameters, pageSize, positionStr, market);
     }
 
-    private List<IntegratedBulkQuoteBean> getQueryIntegratedBulkQuote(TerminalAgentInfo agentInfo, Map<String, Object> parameters,
-                                                                      int pageSize, String positionStr, String market) {
+    private List<IntegratedBulkQuoteBean> getQueryIntegratedBulkQuote(TerminalAgentInfo agentInfo, Map<String, Object> parameters, int pageSize, String positionStr, String market) {
         parameters.put("request_num", pageSize);
         parameters.put("position_str", positionStr);
         ResultBean resultBean = tradeAgentHelper.doRequest(agentInfo, parameters);
@@ -833,8 +829,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
      * 332728 协议回购行情查询
      */
     @Override
-    public List<IntegratedRepurchaseQuoteBean> reqIntegratedRepurchaseQuote(IntegratedRepurchaseQuoteQryBean
-                                                                                    quoteQryBean) throws Exception {
+    public List<IntegratedRepurchaseQuoteBean> reqIntegratedRepurchaseQuote(IntegratedRepurchaseQuoteQryBean quoteQryBean) throws Exception {
         String accountId = quoteQryBean.getAccountId();
         Map<String, Object> parameters = Maps.newHashMap();
         parameters.put("account", accountId);
@@ -869,9 +864,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
         return getQueryIntegratedRepurchaseQuote(agentInfo, parameters, pageSize, positionStr);
     }
 
-    private List<IntegratedRepurchaseQuoteBean> getQueryIntegratedRepurchaseQuote(TerminalAgentInfo agentInfo,
-                                                                                  Map<String, Object> parameters,
-                                                                                  int pageSize, String positionStr) {
+    private List<IntegratedRepurchaseQuoteBean> getQueryIntegratedRepurchaseQuote(TerminalAgentInfo agentInfo, Map<String, Object> parameters, int pageSize, String positionStr) {
         //请求行数
         parameters.put("request_num", pageSize);
         //定位串
@@ -893,8 +886,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
      * --目前忽略此接口 386 债券现券逐笔委托行情查询
      */
     @Override
-    public List<IntegratedFixedIncomeQuoteBean> reqIntegratedFixedIncomeQuote(IntegratedFixedIncomeQuoteQryBean
-                                                                                      fixedIncomeQuoteQryBean) throws Exception {
+    public List<IntegratedFixedIncomeQuoteBean> reqIntegratedFixedIncomeQuote(IntegratedFixedIncomeQuoteQryBean fixedIncomeQuoteQryBean) throws Exception {
         // 场景代码
         int functionCode = FunctionCode.REQ_QRY_INTEGRATED_FIXED_INCOME_QUOTE.value;
         // 场景属性
@@ -902,8 +894,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
 
         String stockCode = fixedIncomeQuoteQryBean.getStockCode();
         //  无效查询返回空记录
-        if (Strings.isNullOrEmpty(stockCode))
-            return Lists.newArrayList();
+        if (Strings.isNullOrEmpty(stockCode)) return Lists.newArrayList();
 
         String market = StockCodeUtils.getMarket(stockCode);
 
@@ -998,20 +989,47 @@ public class UfxTradeAgent extends TradeAgentDsp {
     @Override
     public void queryNextTrade() {
         //登录成功用户
-        if (MapUtils.isEmpty(loginAccounts)) {
+        if (MapUtils.isEmpty(loginAccounts) || MapUtils.isEmpty(orderAccountMap)) {
             return;
         }
-        for (Map.Entry<String, LoginInfo> entry : loginAccounts.entrySet()) {
-            String accountId = entry.getKey();
-            LoginInfo loginInfo = entry.getValue();
+
+        //下单账号
+        Set<String> orderAccounts = orderAccountMap.keySet();
+        logger.info("queryNextTrade()，查询成交委托数据：orderAccounts={}", orderAccounts);
+        for (String accountId : orderAccounts) {
+            LoginInfo loginInfo = loginAccounts.get(accountId);
             logger.info("account：{}，status：{}", accountId, getStatus(accountId));
-            if (getStatus(accountId) != AccountLoginStatus.TRADING.value) {
-                return;
-            }
             boolean loginStatus = tradeAgentManager.getAgentLoginStatus(accountId);
             if (loginStatus) {
                 executeQueryNextTrade(accountId, loginInfo);
             }
+        }
+
+//        for (Map.Entry<String, LoginInfo> entry : loginAccounts.entrySet()) {
+//            String accountId = entry.getKey();
+//            LoginInfo loginInfo = entry.getValue();
+//            logger.info("account：{}，status：{}", accountId, getStatus(accountId));
+////            if (getStatus(accountId) != AccountLoginStatus.TRADING.value) {
+////                return;
+////            }
+//            boolean loginStatus = tradeAgentManager.getAgentLoginStatus(accountId);
+//            if (loginStatus) {
+//                executeQueryNextTrade(accountId, loginInfo);
+//            }
+//        }
+    }
+
+    private void executeQueryWithCancelOrder(String accountId, QueryEnum queryEnum) {
+        logger.info("【撤销委托】触发委托状态查询：accountId={},queryEnum={}", accountId, queryEnum);
+        if (null == poolExecutor) {
+            poolExecutor = new ThreadPoolExecutor(8, 20, 1000, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>(100), new ThreadPoolExecutor.DiscardPolicy());
+            poolExecutor.prestartAllCoreThreads();
+        }
+
+        try {
+            poolExecutor.execute(new QueryTask(queryEnum, loginAccounts.get(accountId), accountId, cancelOrderInterval));
+        } catch (Exception e) {
+            logger.error("{}执行异常：{}", queryEnum.name(), e.getMessage(), e);
         }
     }
 
@@ -1023,33 +1041,37 @@ public class UfxTradeAgent extends TradeAgentDsp {
             poolExecutor.prestartAllCoreThreads();
         }
 
-        for (QueryEnum queryEnum : QueryEnum.values()) {
+        List<QueryEnum> list = Lists.newArrayList(QueryEnum.qryTrade, QueryEnum.qryProtocolBackTrade);
+        for (QueryEnum queryEnum : list) {
             try {
                 poolExecutor.execute(new QueryTask(queryEnum, loginInfo, accountId));
-                Thread.sleep(3000);
             } catch (Exception e) {
                 logger.error("{}执行异常：{}", queryEnum.name(), e.getMessage(), e);
             }
         }
-
     }
 
     enum QueryEnum {
-        qryOrder,
-        queryIntegratedOrder,
-        qryTrade,
-        qryProtocolBackTrade;
+        qryOrder, queryIntegratedOrder, qryTrade, qryProtocolBackTrade;
     }
 
     class QueryTask implements Runnable {
         private QueryEnum queryEnum;
         private LoginInfo loginInfo;
         private String accountId;
+        private long sleep;
 
         public QueryTask(QueryEnum queryEnum, LoginInfo loginInfo, String accountId) {
             this.queryEnum = queryEnum;
             this.loginInfo = loginInfo;
             this.accountId = accountId;
+        }
+
+        public QueryTask(QueryEnum queryEnum, LoginInfo loginInfo, String accountId, long sleep) {
+            this.queryEnum = queryEnum;
+            this.loginInfo = loginInfo;
+            this.accountId = accountId;
+            this.sleep = sleep;
         }
 
         @Override
@@ -1065,9 +1087,12 @@ public class UfxTradeAgent extends TradeAgentDsp {
                         queryIntegratedOrder(loginInfo, accountId);
                         return;
                     case qryTrade:
+                        qryOrder(loginInfo, accountId);
+                        queryIntegratedOrder(loginInfo, accountId);
                         qryTrade(loginInfo, accountId);
                         return;
                     case qryProtocolBackTrade: {
+                        queryIntegratedOrder(loginInfo, accountId);
                         // qryProtocolBackTradeSZ(loginInfo, accountId);
                         // 332705 综合成交查询
                         qryProtocolBackTradeSH(loginInfo, accountId);
@@ -1179,7 +1204,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
             }
             reList.addAll(list);
         }
-        logger.debug("ReqQueryIntegrateOrder reback : {}", JSONArray.toJSONString(reList));
+        // logger.debug("ReqQueryIntegrateOrder reback : {}", JSONArray.toJSONString(reList));
         return reList;
     }
 
@@ -1287,6 +1312,40 @@ public class UfxTradeAgent extends TradeAgentDsp {
                 logger.info("废单成交转换为委托通知  trade：[{}]  IntegratedEntrust: [{}]", JsonUtils.getJsonFromObject(trade), JsonUtils.getJsonFromObject(entrust));
                 onRtnIntegratedEntrust(entrust);
             } else {
+                onRtnTrade(trade);
+            }
+        });
+    }
+
+    /**
+     * 332404 债券质押协议回购合约查询 深圳
+     */
+    public void qryContractTradeSZ(LoginInfo loginInfo, String accountId) {
+        // yanjianhui 修改于 2022/8/1 10:25 还未实现。
+        PositionStr positionStr = positionStrMap.get(loginInfo.getFundAccount());
+
+        List<Trade> list = getProtocolBackTrade(accountId, positionStr, "ProtocolBack");
+        if (CollectionUtils.isEmpty(list)) {
+            return;
+        }
+        String position_str = list.get(list.size() - 1).getPositionStr();
+        if (Objects.isNull(positionStr)) {
+            positionStr = new PositionStr();
+        }
+        positionStr.setProtocolBackPositionStr(position_str);
+        logger.debug("qryProtocolBack_Trade position_str : {}", position_str);
+        positionStrMap.put(loginInfo.getFundAccount(), positionStr);
+
+        list.forEach(trade -> {
+            // 废单成交将成交转换为委托推送 -- 返回废单原因
+            if (TradeType.isInvalid(trade.getTradeType())) {
+                IntegratedEntrust entrust = new IntegratedEntrust();
+                BeanUtils.copyProperties(trade, entrust);
+                entrust.setId(trade.getEntrustId());
+                entrust.setEntrustStatus(EntrustStatus.INVALID.value);
+                logger.info("废单成交转换为委托通知  trade：[{}]  IntegratedEntrust: [{}]", JsonUtils.getJsonFromObject(trade), JsonUtils.getJsonFromObject(entrust));
+                onRtnIntegratedEntrust(entrust);
+            } else {
                 trade.KeyType = "I";
                 onRtnTrade(trade);
             }
@@ -1354,26 +1413,32 @@ public class UfxTradeAgent extends TradeAgentDsp {
             //大宗 332702
             bulkIntegratedEntrust(entrust, parameters);
             return "Bulk";
-        } else if (Market.SHSE.value.equals(entrust.getMarket())
-                && IntegratedEntrustUtils.isFixedIncome(entrust.getEntrustProp())) {
+        } else if (Market.SHSE.value.equals(entrust.getMarket()) && IntegratedEntrustUtils.isFixedIncome(entrust.getEntrustProp())) {
             //固收委托确认 332722
             fixedIncomeEntrust(entrust, parameters);
             return "FixedIncome";
-        } else if (IntegratedEntrustUtils.isRepurchaseSQSZ(entrust.getEntrustProp(),
-                entrust.getEntrustBs(), entrust.getMarket())) {
+        } else if (IntegratedEntrustUtils.isRepurchaseSQSZ(entrust.getEntrustProp(), entrust.getEntrustBs(), entrust.getMarket())) {
             //债券质押式协议回购_首期_深交所 332400
-            repurchaseSQSZ(entrust, parameters);
             return "RepurchaseSQSZ";
         } else if (IntegratedEntrustUtils.isRepurchaseBuybackSZ(entrust.getEntrustProp(), entrust.getMarket())) {
             //深圳债券质押协议回购购回交易 332401
-            repurchaseBuybackSZ(entrust, parameters);
             return "RepurchaseBuybackSZ";
         } else if (IntegratedEntrustUtils.isRepurchaseRenewalSZ(entrust.getEntrustProp(), entrust.getMarket())) {
             //深圳债券质押协议回购到期续做 332410
-            repurchaseRenewalSZ(entrust, parameters);
             return "RepurchaseRenewalSZ";
-        } else if (IntegratedEntrustUtils.isRepurchaseSH(entrust.getEntrustProp(),
-                entrust.getEntrustBs(), entrust.getMarket())) {
+        } else if (Market.SZSE.value.equals(entrust.getMarket()) && EntrustProp.SZ_REPURCHASE_BUYBEFORE.value.equals(entrust.getEntrustProp())) {
+            //债券质押协议回购提前购回委托  332434
+            return "RepurchaseBuyBeforeSZ";
+        } else if (Market.SZSE.value.equals(entrust.getMarket()) && EntrustProp.SZ_REPURCHASE_BOND_CHANGE.value.equals(entrust.getEntrustProp())) {
+            //债券质押协议回购质押券变更委托  332435
+            return "RepurchaseBondChangeSZ";
+        } else if (Market.SZSE.value.equals(entrust.getMarket()) && EntrustProp.SZ_REPURCHASE_REMOVE_PLEDGE.value.equals(entrust.getEntrustProp())) {
+            //债券质押协议回购解除质押委托  332436
+            return "RepurchaseRemovePledgeSZ";
+        } else if (Market.SZSE.value.equals(entrust.getMarket()) && EntrustProp.SZ_REPURCHASE_AGREE.value.equals(entrust.getEntrustProp())) {
+            //债券质押协议回购逆回购方确认委托  332437
+            return "RepurchaseAgreeSZ";
+        } else if (IntegratedEntrustUtils.isRepurchaseSH(entrust.getEntrustProp(), entrust.getEntrustBs(), entrust.getMarket())) {
             //债券质押式协议回购_上交所 332725
             repurchaseSH(entrust, parameters);
             return "RepurchaseSH";
@@ -1400,14 +1465,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
         parameters.put("entrust_amount", integratedEntrust.getEntrustVolume());
         parameters.put("entrust_bs", integratedEntrust.getEntrustBs());
         //意向申报/定价/成交申报卖出
-        if (!((EntrustBs.SELL.value.equals(integratedEntrust.getEntrustBs()) &&
-                (EntrustProp.CONFIRM.value.equals(integratedEntrust.getEntrustProp())
-                        || EntrustProp.SET_PRICE.value.equals(integratedEntrust.getEntrustProp())
-                        || EntrustProp.INTENTION.value.equals(integratedEntrust.getEntrustProp())))
-                || (EntrustBs.BUY.value.equals(integratedEntrust.getEntrustBs()) &&
-                (EntrustProp.LARGE_AFTER_CLOSING_WEIGHT_PRICE.value.equals(integratedEntrust.getEntrustProp())
-                ))
-        )) {
+        if (!((EntrustBs.SELL.value.equals(integratedEntrust.getEntrustBs()) && (EntrustProp.CONFIRM.value.equals(integratedEntrust.getEntrustProp()) || EntrustProp.SET_PRICE.value.equals(integratedEntrust.getEntrustProp()) || EntrustProp.INTENTION.value.equals(integratedEntrust.getEntrustProp()))) || (EntrustBs.BUY.value.equals(integratedEntrust.getEntrustBs()) && (EntrustProp.LARGE_AFTER_CLOSING_WEIGHT_PRICE.value.equals(integratedEntrust.getEntrustProp()))))) {
             parameters.put("entrust_balance", integratedEntrust.getEntrustBalance().toPlainString());
         }
         if (IntegratedEntrustUtils.isBulk_YX_DJ(integratedEntrust.getBsFlag())) {
@@ -1439,8 +1497,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
             parameters.put("oppo_trader_id", StringUtils.isEmpty(integratedEntrust.getLiaisonName()) ? integratedEntrust.getPropTradeId() : integratedEntrust.getLiaisonName());
             parameters.put("oppo_agency", integratedEntrust.getPropSeatNo());
             parameters.put("cbpconfer_id", integratedEntrust.getContractId());
-        } else if (IntegratedEntrustUtils.isFixedIncome_ChenJiao(integratedEntrust.getEntrustProp())
-                || IntegratedEntrustUtils.isFixedIncome_BaoJia(integratedEntrust.getEntrustProp())) {
+        } else if (IntegratedEntrustUtils.isFixedIncome_ChenJiao(integratedEntrust.getEntrustProp()) || IntegratedEntrustUtils.isFixedIncome_BaoJia(integratedEntrust.getEntrustProp())) {
             //点击成交申报 最优价成交 可转换成交  定价申报
             parameters.put("trader_id", integratedEntrust.getLiaisonTel());
         } else {
@@ -1448,49 +1505,12 @@ public class UfxTradeAgent extends TradeAgentDsp {
         }
     }
 
-
-    private void repurchaseSQSZ(IntegratedEntrust integratedEntrust, Map<String, Object> parameters) {
-        parameters.put("exchange_type", AgentUtil.ExchangeMarketUFX(integratedEntrust.getMarket()));
-        parameters.put("cbpconfer_id", integratedEntrust.getContractId());
-        parameters.put("entrust_amount", integratedEntrust.getEntrustVolume());
-        parameters.put("entrust_bs", integratedEntrust.getEntrustBs());
-        parameters.put("entrust_balance", integratedEntrust.getEntrustBalance().toPlainString());
-        parameters.put("date_back", integratedEntrust.getBackDate());
-        parameters.put("prop_seat_no", integratedEntrust.getPropSeatNo());
-        parameters.put("expire_year_rate", convertExpireYearRate(integratedEntrust.getEntrustPrice()));
-        parameters.put("back_term", integratedEntrust.getCompactTerm());
-        parameters.put("entrust_reference", integratedEntrust.getId());
-    }
-
-    private void repurchaseBuybackSZ(IntegratedEntrust integratedEntrust, Map<String, Object> parameters) {
-        parameters.put("exchange_type", AgentUtil.ExchangeMarketUFX(integratedEntrust.getMarket()));
-        parameters.put("cbpconfer_id", integratedEntrust.getContractId());
-        parameters.put("entrust_balance", integratedEntrust.getEntrustBalance().toPlainString());
-        parameters.put("entrust_bs", integratedEntrust.getEntrustBs());
-        parameters.put("expire_year_rate", convertExpireYearRate(integratedEntrust.getEntrustPrice()));
-        parameters.put("orig_report_id", integratedEntrust.getOrigSerialNo());
-        parameters.put("original_date", integratedEntrust.getFirstSettleDate());
-        parameters.put("compact_term", integratedEntrust.getCompactTerm());
-    }
-
-    private void repurchaseRenewalSZ(IntegratedEntrust integratedEntrust, Map<String, Object> parameters) {
-        parameters.put("exchange_type", AgentUtil.ExchangeMarketUFX(integratedEntrust.getMarket()));
-        parameters.put("cbpconfer_id", integratedEntrust.getContractId());
-        parameters.put("entrust_balance", integratedEntrust.getEntrustBalance().toPlainString());
-        parameters.put("entrust_bs", integratedEntrust.getEntrustBs());
-        parameters.put("expire_year_rate", convertExpireYearRate(integratedEntrust.getEntrustPrice()));
-        parameters.put("orig_report_id", integratedEntrust.getOrigSerialNo());
-        parameters.put("back_term", integratedEntrust.getCompactTerm());
-        parameters.put("original_date", integratedEntrust.getFirstSettleDate());
-    }
-
     protected void repurchaseSH(IntegratedEntrust integratedEntrust, Map<String, Object> parameters) {
         parameters.put("exchange_type", AgentUtil.ExchangeMarketUFX(integratedEntrust.getMarket()));
         parameters.put("entrust_amount", integratedEntrust.getEntrustVolume());
         parameters.put("entrust_bs", integratedEntrust.getEntrustBs());
         //债券质押式协议回购_上交所_确认/拒绝
-        if (IntegratedEntrustUtils.isRepurchase_SH_ConfirmOrRefuse(integratedEntrust.getEntrustProp(),
-                integratedEntrust.getEntrustBs(), integratedEntrust.getMarket())) {
+        if (IntegratedEntrustUtils.isRepurchase_SH_ConfirmOrRefuse(integratedEntrust.getEntrustProp(), integratedEntrust.getEntrustBs(), integratedEntrust.getMarket())) {
             parameters.put("cbpconfer_id", integratedEntrust.getContractId());
         }
         // xiazelei 修改于 2022/4/22 10:37 修改所有的.doubleValue() 科学计数法有问题
@@ -1498,26 +1518,29 @@ public class UfxTradeAgent extends TradeAgentDsp {
         parameters.put("repurchase_date", integratedEntrust.getBackDate());
         parameters.put("expire_year_rate", convertExpireYearRate(integratedEntrust.getEntrustPrice()));
         parameters.put("entrust_prop", integratedEntrust.getEntrustProp());
-        //到期续作
-        if (IntegratedEntrustUtils.isRepurchaseRenewalSH(integratedEntrust.getEntrustProp(),
-                integratedEntrust.getEntrustBs(), integratedEntrust.getMarket())) {
+        //到期续做
+        if (IntegratedEntrustUtils.isRepurchaseRenewalSH(integratedEntrust.getEntrustProp(), integratedEntrust.getEntrustBs(), integratedEntrust.getMarket())) {
             //协议回购质权人类型
             parameters.put("bprsrc_status", integratedEntrust.getTransCode());
         }
         //非首期
-        if (IntegratedEntrustUtils.isRepurchaseUNSQSH(integratedEntrust.getEntrustProp(),
-                integratedEntrust.getEntrustBs(), integratedEntrust.getMarket())) {
+        if (IntegratedEntrustUtils.isRepurchaseUNSQSH(integratedEntrust.getEntrustProp(), integratedEntrust.getEntrustBs(), integratedEntrust.getMarket())) {
             //原约定号
             parameters.put("orig_cbpconfer_id", integratedEntrust.getOrigSerialNo());
             //原申请日期
             parameters.put("orig_entrust_date", integratedEntrust.getFirstSettleDate());
         }
-        parameters.put("oppo_agency_name", integratedEntrust.getPropSeatName());
-        parameters.put("agency_no", integratedEntrust.getSellerNo().substring(1, 4));
-        parameters.put("trader_id", integratedEntrust.getSellerNo());
-        parameters.put("oppo_agency", integratedEntrust.getPropSeatNo());
+        parameters.put("oppo_agency_name", integratedEntrust.getDealerName());
+        // yanjianhui 修改于 2022/9/2 15:39 交易商代码段为DealerId字段。此判断有待商榷。
+        if (integratedEntrust.getSellerNo() == null) {
+            parameters.put("agency_no", integratedEntrust.getDealerId());
+        } else {
+            parameters.put("agency_no", integratedEntrust.getSellerNo().substring(1, 4));
+        }
+        parameters.put("trader_id", integratedEntrust.getTradeId());
+        parameters.put("oppo_agency", integratedEntrust.getPropDealerId());
         //借用成交标号 处理对方交易员
-        parameters.put("oppo_trader_id", integratedEntrust.getLiaisonTel());
+        parameters.put("oppo_trader_id", integratedEntrust.getPropTradeId());
         if (!Strings.isNullOrEmpty(integratedEntrust.getRemark())) {
             parameters.put("remark", integratedEntrust.getRemark());
         }
@@ -1529,8 +1552,7 @@ public class UfxTradeAgent extends TradeAgentDsp {
     }
 
     @Override
-    public List<NegotiateQuoteReceiveBean> reqNegotiateQuoteReceive(NegotiateQuoteQueryBean queryBean)
-            throws Exception {
+    public List<NegotiateQuoteReceiveBean> reqNegotiateQuoteReceive(NegotiateQuoteQueryBean queryBean) throws Exception {
         List<NegotiateQuoteReceiveBean> list;
         // 332653   债券现券转发申报信息查询 深圳协商成交 接收对方发起的报文
         // 场景代码
@@ -1548,6 +1570,5 @@ public class UfxTradeAgent extends TradeAgentDsp {
         // endregion
         return list;
     }
-
 
 }
