@@ -69,6 +69,8 @@
 
         <!-- 前台应用 -->
         <module>../../tams-customer-interf</module>
+        <!--头寸调用客户端-->
+        <module>../../tams-position-client</module>
 
 <!--        <module>../../tams-exchange-parent</module>-->
 

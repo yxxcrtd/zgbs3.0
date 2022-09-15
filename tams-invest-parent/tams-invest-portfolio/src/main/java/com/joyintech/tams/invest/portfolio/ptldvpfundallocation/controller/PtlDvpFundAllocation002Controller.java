@@ -15,6 +15,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.joyintech.framework.ajax.MessageType;
+import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.constant.DictCodeList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -163,6 +165,17 @@ public class PtlDvpFundAllocation002Controller extends BaseController {
     @ResponseBody
     @RequestMapping("check")
     public AjaxResult check(@RequestBody @Valid PtlDvpFundAllocationDto dto, BindingResult result) {
+        // 划拨金额不能大于付款账户余额
+        if (dto.getMyAcctAmount() != null
+                && dto.getSettleAmt() != null
+                && dto.getMyAcctAmount().compareTo(dto.getSettleAmt()) < 0) {
+            AjaxResult ajaxResult = new AjaxResult();
+            ValidMessage message = new ValidMessage(
+                    getMessage("BUSS_COM_E_0003", getMessage("PtlDvpFundAllocation001.settleAmts"),
+                            getMessage("PtlDvpFundAllocation001.myAcctAmount")));
+            ajaxResult.setMessage(message.getMessage() + "是否确认？", MessageType.确认消息);
+            return ajaxResult;
+        }
         return commonCheck(result, dto.getOperateType());
     }
     

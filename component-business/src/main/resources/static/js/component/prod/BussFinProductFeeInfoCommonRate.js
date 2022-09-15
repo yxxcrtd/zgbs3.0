@@ -399,35 +399,54 @@
             }
         }
     }
-    
-   //add by gcl 2019/3/29 start
-    function eAccrDatechange(){
-    	var finAssetIntInfos = bussFinProductFeeInfoTable.getAllRows();
-    	if(finAssetIntInfos.length>0){
-	    	 var eAccrDateVal=addDate($('#' + mdate).val(),-1);
-	    	 $.each(finAssetIntInfos,function(index,obj){
-	           if(finAssetIntInfos[index].chargeType != CHARGE_TYPE_02){
-	               bussFinProductFeeInfoTable.renderRow(index, {eAccrDate: eAccrDateVal});
-	           }
-	       });
-	    	 //到期日和首次付费日联动
-			var firstCalEndDateVal=$('#' + mdate).val();
-			$.each(finAssetIntInfos,function(index,obj){
-				if(finAssetIntInfos[index].chargeType != CHARGE_TYPE_02){
-					bussFinProductFeeInfoTable.renderRow(index, {firstCalEndDate: firstCalEndDateVal});
-				}
-			});
-    	}
-    }
-    //联动起息日和计提开始日
-	function provisionFirstDaychange(){
+
+
+
+	//add by gcl 2019/3/29 start
+	function eAccrDatechange(){
 		var finAssetIntInfos = bussFinProductFeeInfoTable.getAllRows();
-		if(finAssetIntInfos.length>0){
-			var provisionFirstDayVal=$('#' + vdate).val();
-			$.each(finAssetIntInfos,function(index,obj){
-				if(finAssetIntInfos[index].chargeType != CHARGE_TYPE_02){
-					bussFinProductFeeInfoTable.renderRow(index, {provisionFirstDay: provisionFirstDayVal});
+		if (finAssetIntInfos.length > 0) {
+			var eAccrDateVal = addDate($('#' + mdate).val(), -1);
+			$.each(finAssetIntInfos, function (index, obj) {
+				var rowData = {};
+				//费用规则选择联动
+				payFeeRuleChange(finAssetIntInfos[index].payFeeRule, rowData);
+				if (finAssetIntInfos[index].chargeType !== CHARGE_TYPE_02) {
+					// bussFinProductFeeInfoTable.renderRow(index, {eAccrDate: eAccrDateVal});
+					rowData.eAccrDate = eAccrDateVal;
 				}
+				bussFinProductFeeInfoTable.renderRow(index, rowData);
+			});
+			//到期日和首次付费日联动
+			// var firstCalEndDateVal=$('#' + mdate).val();
+			// $.each(finAssetIntInfos,function(index,obj){
+			// if(finAssetIntInfos[index].chargeType != CHARGE_TYPE_02){
+			// 	bussFinProductFeeInfoTable.renderRow(index, {firstCalEndDate: firstCalEndDateVal});
+			// }
+			// });
+		}
+	}
+
+	//联动起息日和计提开始日
+	function provisionFirstDaychange() {
+		var finAssetIntInfos = bussFinProductFeeInfoTable.getAllRows();
+		if (finAssetIntInfos.length > 0) {
+			var provisionFirstDayVal = $('#' + vdate).val();
+			$.each(finAssetIntInfos, function (index, obj) {
+				var rowData = {};
+				if (finAssetIntInfos[index].chargeType !== CHARGE_TYPE_02) {
+					rowData.provisionFirstDay = provisionFirstDayVal;
+				}
+				//费用规则选择联动
+				payFeeRuleChange(finAssetIntInfos[index].payFeeRule, rowData);
+				var vdate = $('#' + getElementById('vdateElement').val()).val();
+				if ((finAssetIntInfos[index].netAssetValueDay === BASE_DATE_TYPE_02 || finAssetIntInfos[index].netAssetValueDay === BASE_DATE_TYPE_03) &&
+					rowData.provisionFirstDay === provisionFirstDayVal && finAssetIntInfos[index].basicBill === BILL_BASE_FEE_KIND_03) {
+					rowData.firstBaseType = BASIC_BILL_04;
+				} else {
+					rowData.firstBaseType = '';
+				}
+				bussFinProductFeeInfoTable.renderRow(index, rowData);
 			});
 		}
 	}

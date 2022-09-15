@@ -331,6 +331,7 @@
 			<result column="FINPROD_ID" property="finprodId" jdbcType="VARCHAR" />
 			<result column="VDATE" property="finvdate" jdbcType="DATE" />
 			<result column="MDATE" property="finmdate" jdbcType="DATE" />
+			<result column="MANAGER" property="manager" jdbcType="VARCHAR" />
 			<result column="CCY" property="ccy" jdbcType="VARCHAR" />
 			<!--修改TYPE_6为TYPE_9,添加type10-11 zhangpuyu 2019/7/29 start-->
 			<!-- <result column="TYPE_6" property="assetType1" jdbcType="VARCHAR" /> -->
@@ -351,6 +352,7 @@
 		T1.CCY,
 		T1.VDATE,
 		T1.MDATE,
+		T1.MANAGER,
 		<!--修改TYPE_6为TYPE_9,添加type10-11 zhangpuyu 2019/7/29 start-->
 		<!-- T2.TYPE_6, -->
 		T2.TYPE_9,
@@ -566,5 +568,12 @@
 		  AND B.MANAGER = A.CUSTOMER_ID(+)
 		  AND B.FINPROD_MARKET_ID = #{finprodId}
 		  AND C.VAL_DATE =to_date(#{sysdate},'yyyy-MM-dd')
+	</select>
+
+	<select id="getCountIdByManager" resultType="java.lang.String">
+		SELECT
+			MCP.COUNTER_ID
+		FROM MST_COUNTER_PARTY MCP
+		where MCP.COUNTER_TYPE = '01' AND MCP.LINK_ID = #{manager}
 	</select>
 </mapper>

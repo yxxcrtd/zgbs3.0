@@ -114,6 +114,13 @@ public class EtrPlanAssetNController  {
         Page<SelectOptionDto> temp = etrPlanAssetNService.getfinprodIdForAdd1(page,length,map);
         return temp;
     }
+
+    @GetMapping("getCountIdByManager")
+    @ResponseBody
+    public String getCountIdByManager(String manager) {
+        return etrPlanAssetNService.getCountIdByManager(manager);
+    }
+
     /**
      * 
      * 获取新建界面的组合代码联想下拉框框

@@ -1770,7 +1770,10 @@ public class StlDataDealSzdSjsjgProcessService {
         //        BussinessDictCodeListRds.操作符_加.getValue(), BussinessDictCodeListRds.特征值偏移单位_自然日.getValue())));
         // settleTransData.setTradeDate(DateUtil.parse(szdSjsjg.getJgqsrq()));
         // modify by fuyongsheng 交易日无需+1自然日 end
-        settleTransData.setTradeDate(DateUtil.parse(szdSjsjg.getJgjsrq()));
+        // GLLCUAT-472:交易日期取清算日期 modify by fuyongsheng 20220914 start
+        // settleTransData.setTradeDate(DateUtil.parse(szdSjsjg.getJgjsrq()));
+        settleTransData.setTradeDate(DateUtil.parse(szdSjsjg.getJgqsrq()));
+        // GLLCUAT-472:交易日期取清算日期 modify by fuyongsheng 20220914 end
         // 交割日期
         settleTransData.setSettleDate(DateUtil.parse(szdSjsjg.getJgjsrq()));
         // 交易币种
