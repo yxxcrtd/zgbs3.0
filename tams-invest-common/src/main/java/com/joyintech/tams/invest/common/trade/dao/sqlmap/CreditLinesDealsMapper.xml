@@ -1021,6 +1021,22 @@
 		</where>
 	</select>
 
+	<!--获取最新净值和净值日期-->
+	<select id="getLastPriceAndLastDate" resultType="com.joyintech.framework.select.SelectOptionDto">
+		SELECT
+		A.VALUATION id
+		,to_char(A.VAL_DATE, 'yyyy-MM-dd') text
+		FROM
+		FIN_PRODUCT_VALUATION A, FIN_PRODUCT C
+		<where>
+			C.FINPROD_ID = #{finprodId} AND C.FINPROD_MARKET_ID = A.FINPROD_ID AND C.FINPROD_TYPE2 = A.FINPROD_TYPE2
+			AND A.VAL_DATE = (SELECT MAX(VAL_DATE)
+			FROM FIN_PRODUCT_VALUATION A2
+			WHERE A2.FINPROD_ID = A.FINPROD_ID
+			AND A2.VAL_DATE &lt;= TO_DATE(#{cdate},'yyyy-MM-dd'))
+		</where>
+	</select>
+
 	<select id="selectByPrimaryKey" resultType="com.joyintech.tams.common.base.entity.FinProductType" parameterType="com.joyintech.tams.common.base.entity.FinProductTypeKey" >
 		select
 			FINPROD_ID FINPROD_ID, BRANCH BRANCH, TYPE_1 TYPE_1, TYPE_2 TYPE_2, TYPE_3 TYPE_3,
