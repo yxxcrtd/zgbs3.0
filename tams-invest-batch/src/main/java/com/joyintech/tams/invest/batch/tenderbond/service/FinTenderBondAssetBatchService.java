@@ -11,7 +11,6 @@ import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.FinProductAddMapper;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.dao.TrdFinProductBarterTotalMapper;
@@ -30,6 +29,7 @@ import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.valuationusemerge.WflValidInputParameter;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 //import org.apache.commons.collections.CollectionUtils;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +82,12 @@ public class FinTenderBondAssetBatchService {
 
     @Resource
     private BasePtlSecPositionInfoService basePtlSecPositionInfoService;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     /**
      * 是否单体服务
@@ -173,7 +179,7 @@ public class FinTenderBondAssetBatchService {
             if (CollectionUtils.isNotEmpty(seqNoList)) {
                 String errorMsg = new String();
                 seqNoList.forEach(i -> {
-                    PositionHttpRequest.sendRevoke(i + "", DictCodeListExt1.子系统代码_交易.getValue(), errorMsg);
+                    positionRequestHandle.sendRevoke(i + "", DictCodeListExt1.子系统代码_交易.getValue(), errorMsg);
                 });
                 if (StringUtil.isNotEmpty(errorMsg)) {
                     throw new RuntimeException("上市流通批处理失败,头寸冲正失败");
@@ -334,7 +340,7 @@ public class FinTenderBondAssetBatchService {
             param.put("interfaceType", "Bond002");
         }
         seqList.add(seqNo);
-        PositionHttpRequest.send(param);
+        positionRequestHandle.send(param);
         //处理旧头寸
         this.insertOldPostion(dto,finproductId,plateDate);
     }

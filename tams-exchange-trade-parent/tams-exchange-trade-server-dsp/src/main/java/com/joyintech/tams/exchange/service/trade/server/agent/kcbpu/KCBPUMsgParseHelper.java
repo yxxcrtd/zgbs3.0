@@ -1,6 +1,9 @@
 package com.joyintech.tams.exchange.service.trade.server.agent.kcbpu;
 
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.json.JSON;
+import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -14,6 +17,7 @@ import com.joyintech.tams.exchange.common.db.domain.Entrust;
 import com.joyintech.tams.exchange.common.db.domain.IntegratedEntrust;
 import com.joyintech.tams.exchange.common.db.domain.Trade;
 import com.joyintech.tams.exchange.common.utils.EntrustUtils;
+import com.joyintech.tams.exchange.common.utils.JsonUtils;
 import com.joyintech.tams.exchange.common.utils.StockCodeUtils;
 import com.joyintech.tams.exchange.service.trade.server.agent.EntrustIdManager;
 import com.joyintech.tams.exchange.service.trade.util.AgentUtil;
@@ -27,29 +31,25 @@ import java.util.Map;
 public class KCBPUMsgParseHelper {
 
     /**
-     * 转化账户
+     * 转换账户
      *
-     * @param resList
+     * @param map
      * @param accountId
      * @return
      */
-    public static KCBPUAccount parseAccount(List<Map<String, String>> resList, String accountId) {
+    public static KCBPUAccount parseAccount(Map<String, Object> map, String accountId) {
         KCBPUAccount kcbpuAccount = new KCBPUAccount();
         kcbpuAccount.setAgentType(AgentType.KINGDOM_KCBPU.value);
         kcbpuAccount.setAccountId(accountId);
         Map<String, String> secuIds = Maps.newConcurrentMap();
-        for (Map<String, String> map : resList) {
-            kcbpuAccount.setCustId(map.get("USER_CODE"));
-            kcbpuAccount.setOrgId(map.get("BRANCH"));
-            kcbpuAccount.setFundId(map.get("ACCOUNT"));
-            if ("00".equals(map.get("MARKET"))) {
-                // 00 深圳
-                secuIds.put("0", map.get("SECU_ACC"));
-            } else {
-                // 10 上海
-                secuIds.put("1", map.get("SECU_ACC"));
-            }
-        }
+        kcbpuAccount.setCustId(map.get("userCode").toString());
+        kcbpuAccount.setOrgId(map.get("branch").toString());
+        kcbpuAccount.setFundId(map.get("account").toString());
+        Map<String, String> secuIdMap = (Map<String, String>) map.get("secuIds");
+        // 00 深圳
+        secuIds.put("0", secuIdMap.get("00"));
+        // 10 上海
+        secuIds.put("1", secuIdMap.get("10"));
         kcbpuAccount.setSecuIds(secuIds);
         return kcbpuAccount;
     }
@@ -67,6 +67,7 @@ public class KCBPUMsgParseHelper {
         List<Entrust> entrustList = Lists.newArrayListWithExpectedSize(resList.size());
         for (Map<String, String> map : resList) {
             Entrust entrust = new Entrust();
+            entrust.setEntrustStatus(AgentUtil.SetKCBPUEntrustStatus(map));
             entrust.setId(map.get("EXT_ORDER_ID"));
             entrust.setAccountId(accountId);
             entrust.setReportNo(map.get("ORDER_ID"));
@@ -86,9 +87,9 @@ public class KCBPUMsgParseHelper {
             entrust.setTradedPrice(AgentUtil.Parse2BigDecimal(map.get("MATCHED_PRICE")));
             entrust.setTradedVolume(AgentUtil.Parse2BigDecimal(map.get("MATCHED_QTY")).longValue());
             entrust.setTradedBalance(AgentUtil.Parse2BigDecimal(map.get("MATCHED_AMT")));
+            entrust.setErrorMsg(map.get("OP_REMARK"));
             entrustList.add(entrust);
         }
-
         return entrustList;
     }
 
@@ -115,7 +116,7 @@ public class KCBPUMsgParseHelper {
             trade.setBrokerEntrustId(resMap.get("ORDER_ID"));
             //trade.setLocalEntrustId(resMap.get("ordergroup"));
             // trade.setFinanceAccount(resMap.get("fundid"));
-            trade.setBsFlag(resMap.get("TRD_ID"));// 需要转换???????????????????????????????????????????????????????????????????????
+            //trade.setBsFlag(AgentUtil.ParseBSFlagForKCBPU(resMap.get("TRD_ID")));// 需要转换???????????????????????????????????????????????????????????????????????
             trade.setMarket(AgentUtil.GetMarketKCBPU(resMap.get("MARKET")));
             trade.setStockName(resMap.get("SECU_NAME"));
             trade.setStockCode(StockCodeUtils.formatStockCode(resMap.get("SECU_CODE"), AgentUtil.GetMarketKCBPU(resMap.get("MARKET"))));
@@ -123,16 +124,17 @@ public class KCBPUMsgParseHelper {
             trade.setTradedPrice(AgentUtil.Parse2BigDecimal(resMap.get("MATCHED_PRICE")));
             trade.setTradedVolume(AgentUtil.Parse2BigDecimal(resMap.get("MATCHED_QTY")).longValue());
             trade.setTradedBalance(AgentUtil.Parse2BigDecimal(resMap.get("MATCHED_AMT")));
-            int realStatus = Integer.parseInt((String) resMap.get("matchtype"));
+            // 处理成交状态
             // 成交类型0:普通成交1:撤单成交2:废单3:内部撤单4:撤单废单
-            trade.setTradeType(realStatus);
+            trade.setTradeType(AgentUtil.SetKCBPUTradeStatus(resMap));
+
             trade.setBrokerTradeId((String) resMap.get("MATCHED_SN"));
             if (Strings.isNullOrEmpty(trade.getBrokerTradeId())) {
                 trade.setBrokerTradeId((String) resMap.get("ORDER_ID"));
             }
             trade.setTradingDay(resMap.get("TRD_DATE"));
-            trade.setEntrustProp(EntrustUtils.getEntrustProp(trade.getBsFlag(), trade.getMarket()));
-            trade.setEntrustBs(EntrustUtils.getEntrustBs(trade.getBsFlag()));// 需要转换???????????????????????????????????????????????????????????????????????
+            //trade.setEntrustProp(EntrustUtils.getEntrustProp(trade.getBsFlag(), trade.getMarket()));
+            //trade.setEntrustBs(EntrustUtils.getEntrustBs(trade.getBsFlag()));// 需要转换???????????????????????????????????????????????????????????????????????
             if (Strings.isNullOrEmpty(trade.getBrokerTradeId()) && TradeType.probablyNoBrokerTradeId(trade.getTradeType())) {
                 trade.setBrokerTradeId("cancel_" + trade.getBrokerEntrustId());
             }

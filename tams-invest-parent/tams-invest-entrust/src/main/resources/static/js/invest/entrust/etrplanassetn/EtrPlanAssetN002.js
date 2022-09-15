@@ -365,6 +365,19 @@
             // 画星星
             star();
             $("#etrInvestPersonInfo_counterId").empty();
+            $("#etrInvestPersonInfo_counterId").prop('disabled', false);
+            if (ps === 'T04' || ps === 'T06') {
+                if ($('#finprodId').val() && $('#finprodId').select2('data') && $('#finprodId').select2('data')[0]) {
+                    var data = $('#finprodId').select2('data')[0].object;
+                    var paramObj = {};
+                    paramObj.manager = data.manager;
+                    Joyin.ajaxSync(basePath + 'invest/entrust/etrplanassetn/EtrPlanAssetN002/getCountIdByManager', paramObj, function (result) {
+                        $("#etrInvestPersonInfo_counterId").textSelect('setValue', result);
+                        $("#etrInvestPersonInfo_counterId").trigger('change');
+                        $("#etrInvestPersonInfo_counterId").prop('disabled', true);
+                    });
+                }
+            }
         });
         /**
          * 资产代码
@@ -385,6 +398,18 @@
                     $("#redSpeed").val(result.REDSPEED).trigger('change');
                 });
                 finprodId = data.finprodId;
+                $("#etrInvestPersonInfo_counterId").empty();
+                $("#etrInvestPersonInfo_counterId").prop('disabled', false);
+                if (ps === 'T04' || ps === 'T06') {
+                    var paramObj = {};
+                    paramObj.manager = data.manager;
+                    Joyin.ajaxSync(basePath + 'invest/entrust/etrplanassetn/EtrPlanAssetN002/getCountIdByManager', paramObj, function (result) {
+                        $("#etrInvestPersonInfo_counterId").textSelect('setValue', result);
+                        $("#etrInvestPersonInfo_counterId").trigger('change');
+                        $("#etrInvestPersonInfo_counterId").prop('disabled', true);
+                    });
+                }
+                $('#portfolioId').val("001a").trigger('change').attr('disabled',true);
                 $('#finprodIdhid').val(data.finprodId).trigger('change');
                 $('#finprodName').val($('#finprodId').val()).trigger('change');
                 $('#calendarId').val(data.calendarId).trigger('change');

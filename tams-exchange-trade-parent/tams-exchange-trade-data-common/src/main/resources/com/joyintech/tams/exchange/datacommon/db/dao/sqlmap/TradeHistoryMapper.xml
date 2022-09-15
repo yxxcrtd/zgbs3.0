@@ -270,7 +270,7 @@
     </select>
     <select id="selectHistoryTradeByPage" resultMap="QueryResultMap" parameterType="com.joyintech.tams.exchange.common.bean.TradeQryBean">
 		SELECT *
-		  FROM (SELECT decode(TT.INSTRUCTION_ID, NULL, A.INSTRUCTION_ID) INSTRUCTION_ID,
+		  FROM (SELECT NVL(TT.INSTRUCTION_ID, A.INSTRUCTION_ID) INSTRUCTION_ID,
                STD.APPLY_TRADE_ID                                        BROKER_ENTRUST_ID,
                STD.CJBH                                                  BROKER_TRADE_ID,
                TT.PORTFOLIO_NAME                                         PORTFOLIO_NAME,
@@ -280,11 +280,15 @@
                FP.FINPROD_ABBR                                           STOCK_NAME,
                <!--GLLCUAT-320:历史成交查询字段缺失 modify by fuyongsheng 20220829 start-->
                NVL(EEA.BUSI_TYPE_POSITION, STD.BUSI_TYPE)                BUSI_TYPE_TG,
-               NVL2(TT.PS, A.PS, STD.PS)                                 ENTRUST_BS,
+                case when TT.PS is not null then TT.PS
+                when A.PS is not null then A.PS
+                when STD.PS is not null then STD.PS end ENTRUST_BS,
                NVL2(TT.TRADED_VOLUME, A.TRADED_VOLUME, STD.SHARE_AMT)    TRADED_VOLUME,
                NVL2(TT.TRADED_PRICE, A.TRADED_PRICE, STD.UNIT_CPRICE)    TRADED_PRICE,
                NVL2(TT.CLEAR_BALANCE, A.CLEAR_BALANCE, STD.TRADE_AMT)    TRADED_BALANCE,
-               NVL2(TT.TRADING_DAY, A.TRADING_DAY, TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))   TRADE_DATE,
+                case when TT.TRADING_DAY is not null then TT.TRADING_DAY
+                when A.TRADING_DAY is not null then A.TRADING_DAY
+                else TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD') end TRADING_DAY,
                NVL2(TT.TRADE_TIME, A.TRADE_TIME, STD.CREATE_TIME)          DEAL_TIME,
                <!--GLLCUAT-320:历史成交查询字段缺失 modify by fuyongsheng 20220829 end-->
                CASE
@@ -303,13 +307,13 @@
                STD.CREATE_TIME
           FROM SETTLE_TRANS_DATA STD
           LEFT JOIN T_TRADE TT
-            ON (TT.BROKER_TRADE_ID = STD.TRADE_ID AND
+            ON ((TT.BROKER_TRADE_ID = STD.APPLY_TRADE_ID OR TT.BROKER_TRADE_ID = STD.CJBH) AND
                TT.SEC_ACCT_ID = STD.SEC_ACCT_ID AND
-               TT.TRADE_TIME = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
+               TT.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
           LEFT JOIN T_TRADEHISTORY A
-            ON (A.BROKER_TRADE_ID = STD.CJBH AND
+            ON ((TT.BROKER_TRADE_ID = STD.APPLY_TRADE_ID OR TT.BROKER_TRADE_ID = STD.CJBH) AND
                A.SEC_ACCT_ID = STD.SEC_ACCT_ID AND
-               A.TRADE_TIME = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
+               A.TRADING_DAY = TO_CHAR(STD.TRADE_DATE, 'YYYYMMDD'))
           LEFT JOIN FIN_PRODUCT FP ON STD.FINPROD_ID = FP.FINPROD_ID
           LEFT JOIN STL_CAPACCT_INFO SCI ON STD.ACCT_NO = SCI.ACCT_NO
           LEFT JOIN ETR_ENTRUST EE ON TT.INSTRUCTION_ID = EE.ENTRUST_ID

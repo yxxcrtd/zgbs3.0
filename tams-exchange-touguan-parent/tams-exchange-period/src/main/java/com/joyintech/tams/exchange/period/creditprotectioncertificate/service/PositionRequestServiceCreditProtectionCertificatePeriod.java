@@ -4,15 +4,16 @@ import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.BaseBussinessDto;
 import com.joyintech.tams.exchange.period.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodSaveDto;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -38,6 +39,12 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
      */
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
+
     public void sendCreditProtectionCertificatePeriod(CreditProtectionCertificatePeriodSaveDto entity, String decisionAct, String systemAct, String flowStatus) {
         log.info("sendCreditProtectionCertificatePeriod() called with parameters => 【entity = {}】, 【decisionAct = {}】, 【systemAct = {}】", JsonUtils.object2Json(entity), decisionAct, systemAct);
         Map<String, Object> resultMap = new HashMap<>();
@@ -45,7 +52,7 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
         resultMap.put("systemAct", systemAct);
         resultMap.put("flowStatus", flowStatus);
         period001(entity, resultMap);
-        PositionHttpRequest.send(resultMap);
+        positionRequestHandle.send(resultMap);
     }
 
     /**
@@ -59,7 +66,7 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
         if (StringUtil.equals(entity.getPaBussType(), DictCodeListExt1.平安业务类型_到期.getValue())) {
             ps = DictCodeList.交易方向_到期.getValue();
         }
-        PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(), POSITION_TYPE_TRD, DictCodeListExt3.头寸业务类型_信用保护凭证存续期.getValue(), ps);
+        positionRequestHandle.doDeleteByWorkFlowId(entity.getWorkflowId(), POSITION_TYPE_TRD, DictCodeListExt3.头寸业务类型_信用保护凭证存续期.getValue(), ps);
     }
 
     public void sendRevokeCreditProtectionCertificatePeriod(CreditProtectionCertificatePeriodSaveDto entity) {
@@ -68,7 +75,7 @@ public class PositionRequestServiceCreditProtectionCertificatePeriod {
         if (StringUtil.equals(entity.getPaBussType(), DictCodeListExt1.平安业务类型_到期.getValue())) {
             ps = DictCodeList.交易方向_到期.getValue();
         }
-        PositionHttpRequest.dorevoke(entity.getBusiCode(), DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_信用保护凭证存续期.getValue(), ps);
+        positionRequestHandle.dorevoke(entity.getBusiCode(), DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_信用保护凭证存续期.getValue(), ps);
     }
 
     private void period001(CreditProtectionCertificatePeriodSaveDto entity, Map<String, Object> resultMap) {

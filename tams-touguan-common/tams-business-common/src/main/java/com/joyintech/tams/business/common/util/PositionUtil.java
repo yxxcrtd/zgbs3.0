@@ -7,13 +7,16 @@ import com.joyintech.tams.business.common.dto.PositionBondExecuteParam;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.CashPositionService;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.PtlPortfolioMapper;
 import com.joyintech.tams.common.base.entity.PtlPortfolio;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.position.check.PositionCheck;
+import com.joyintech.tams.position.constant.PositionConstant;
+import com.joyintech.tams.position.exception.PositionException;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +30,9 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class PositionUtil {
+public class PositionUtil implements PositionCheck {
 
-    private static Logger logger = LoggerFactory.getLogger(PositionUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(PositionUtil.class);
 
     private static PtlPortfolioMapper ptlPortfolioMapper;
 
@@ -39,6 +42,12 @@ public class PositionUtil {
      * 平台日期
      */
     private static IPlatformDate iPlatformDate;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     /**
      * 初始化头寸通用信息
@@ -70,8 +79,8 @@ public class PositionUtil {
                 /**
                  * 头寸引擎业务失败，待前端确认是否校验
                  */
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, arr[0]) ||
-                        StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, arr[0])){
+                if (StringUtil.equals(PositionConstant.CODE_BUSI_RK, arr[0]) ||
+                        StringUtil.equals(PositionConstant.CODE_BUSI_YK, arr[0])){
                     // 头寸返回对象
                     BaseMap data = JsonUtils.json2Object(arr[1], BaseMap.class);
 
@@ -112,7 +121,7 @@ public class PositionUtil {
                         }
                     }
 
-                    if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, arr[0])){
+                    if (StringUtil.equals(PositionConstant.CODE_BUSI_RK, arr[0])){
                         strb.append("】，请确认是否继续？");
                         /**
                          * 余额不足，软控确认
@@ -143,7 +152,7 @@ public class PositionUtil {
      * @param msgMap
      * @return
      */
-    public static boolean checkForFL0007(Object req, Map msgMap) {
+    public boolean checkForFL0007(Object req, Map msgMap) {
         BaseMap tamsReq = JsonUtils.json2Object(JsonUtils.object2Json(req), BaseMap.class);
 
         Map responseMap_data = (Map) msgMap.get("data");
@@ -201,7 +210,7 @@ public class PositionUtil {
             if (newcheckResults.isEmpty()){
                 // 不存在最终余额不足情况，重发
                 tamsReq.put("balanceCheck", "N");
-                PositionHttpRequest.send(tamsReq);
+                positionRequestHandle.send(tamsReq);
                 return true;
             }else{
                 responseMap_data.put("checkResults", newcheckResults);

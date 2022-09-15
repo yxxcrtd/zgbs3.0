@@ -2475,9 +2475,12 @@ public class StlDataDealSzdJsmxProcessService {
 		// modify by fuyongsheng 20211218 交易日期取清算日期 start
 		// settleTransData.setTradeDate(DateUtil.parse(szdJsmx.getQsrq()));
 		// modify by fuyongsheng 20211218 交易日期取清算日期 end
+		// GLLCUAT-472:交易日期取清算日期 modify by fuyongsheng 20220914 start
 		// ZGCPCN-1601:交易日期取交收日期 modify by fuyongsheng 20220622 start
-		settleTransData.setTradeDate(DateUtil.parse(szdJsmx.getJsrq()));
+		// settleTransData.setTradeDate(DateUtil.parse(szdJsmx.getJsrq()));
+		settleTransData.setTradeDate(DateUtil.parse(szdJsmx.getQsrq()));
 		// ZGCPCN-1601:交易日期取交收日期 modify by fuyongsheng 20220622 end
+		// GLLCUAT-472:交易日期取清算日期 modify by fuyongsheng 20220914 end
 		// modify by fuyongsheng 20211217 交易日期无需+1自然日 end
 		// 交割日期
 		settleTransData.setSettleDate(DateUtil.parse(szdJsmx.getJsrq()));

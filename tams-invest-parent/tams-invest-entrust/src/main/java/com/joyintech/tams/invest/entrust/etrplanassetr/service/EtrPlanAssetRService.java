@@ -375,9 +375,10 @@ public class EtrPlanAssetRService extends CommonExportService<EtrPlanAssetRDto> 
             Date tradeDay = dateCalService.calculationTradingDay(DateUtil.parse(DateUtil.format(vdate)), 1, holidayList, "1");
             param.put("vdate1",DateUtil.format(tradeDay));
         }
-        return restTemplate.postForObject(
-                ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrPlanAssetR/getProAvailableCash",param,
-                Map.class);
+        return etrCommonService.getProAvailableCash(param);
+//        return restTemplate.postForObject(
+//                ServiceApplication.ENTRUST_SERVICE_NAME + "/EtrPlanAssetR/getProAvailableCash",param,
+//                Map.class);
     }
 
     /**

@@ -11,32 +11,17 @@
 package com.joyintech.tams.invest.batch.autogenerationrule.commonservice;
 
 import com.joyintech.background.component.common.pack.common.util.IDGenerator;
-import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.busicommon.productRating.dto.CommonProductRatingDto;
-import com.joyintech.tams.busicommon.productRating.service.CommonProductRatingService;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
-import com.joyintech.tams.common.base.dao.AssetTargetDbMapper;
-import com.joyintech.tams.common.base.entity.AssetTargetDb;
-import com.joyintech.tams.common.base.entity.FinCashCalcRule;
-import com.joyintech.tams.common.base.entity.FinExercisePlan;
-import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.invest.batch.autogeneration.secpos.dao.SecPosAutoGenerationMapper;
-import com.joyintech.tams.invest.batch.autogeneration.secpos.dto.AssetTargetDbDto;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -45,7 +30,13 @@ public class CommonRuleGenerationService {
     /**
      * 日志
      */
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     public void autoGeneration(Date batchDate, List<String> productIdList,String batchType) {
         String batchSeqno = IDGenerator.generate();
@@ -114,14 +105,14 @@ public class CommonRuleGenerationService {
         req.put("batchDate",batchDate);
         req.put("user","system");
         // 发送请求
-        PositionHttpRequest.sendBatch(req);
+        positionRequestHandle.sendBatch(req);
     }
 
     private Map<String,Object> getBatchLog(String batchSeqno) {
         Map<String,Object> req = new HashMap<>();
         req.put("batchSeqno",batchSeqno);
         // 获取结果
-        Map<String,Object> res =PositionHttpRequest.getBatchLog(req);
+        Map<String,Object> res =positionRequestHandle.getBatchLog(req);
         return res;
     }
 

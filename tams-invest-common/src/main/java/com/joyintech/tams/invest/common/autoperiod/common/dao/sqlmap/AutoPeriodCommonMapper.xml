@@ -216,7 +216,7 @@
                 LEFT JOIN
                     TRD_PRODUCT_TEMP_DEAL tptd ON tfpft.TRADE_ID = tptd.TRADE_ID
                 where
-                    tfpft.settle_date =#{batchDate}
+                    tptd.trade_date =#{batchDate}
                     <if test="updateUser != null and updateUser != ''">
                         and tfpft.update_user = #{updateUser}
                     </if>

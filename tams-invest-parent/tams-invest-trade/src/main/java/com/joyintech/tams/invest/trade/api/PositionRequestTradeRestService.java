@@ -1,11 +1,9 @@
 package com.joyintech.tams.invest.trade.api;
 
 import com.alibaba.fastjson.JSON;
-import com.google.common.collect.Maps;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
 import com.joyintech.tams.common.base.dao.TrdProductDealAddMapper;
 import com.joyintech.tams.common.base.entity.*;
@@ -19,16 +17,13 @@ import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
-import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
 import com.joyintech.tams.invest.common.position.service.CommonPositionService;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
-import com.joyintech.tams.invest.common.trade.dto.PortfolioCalculateDto;
-import com.joyintech.tams.invest.common.trade.dto.PortfolioCalculateDto;
-import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import com.joyintech.tams.invest.trade.exchangetransmatch.position.bean.PositionRequestBaseBean;
 import com.joyintech.tams.invest.trade.exchangetransmatch.position.constant.PositionConstant;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +62,11 @@ public class PositionRequestTradeRestService {
 
     @Autowired
     private TrdProductDealAddMapper trdProductDealAddMapper;
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     public static final String TRADE_PLAT = "TRANS_MATCH";
 
@@ -138,7 +138,7 @@ public class PositionRequestTradeRestService {
                 }
             }
             // ZGTFCP-1883:中途换券成交匹配发送的tradeId是totleTradeId,撤销时保持一致 modify by fuyongsheng 20220327 end
-            PositionHttpRequest.dorevoke(tradeId, PositionConstant.POSITION_TYPE_TRD, busiType, ps);
+            positionRequestHandle.dorevoke(tradeId, PositionConstant.POSITION_TYPE_TRD, busiType, ps);
         }
     }
 
@@ -183,7 +183,7 @@ public class PositionRequestTradeRestService {
             this.bond003(entity, resultMap);
         }
         if(StringUtil.isNotEmpty(resultMap.get(INTERFACE_TYPE))){
-            PositionHttpRequest.send(resultMap);
+            positionRequestHandle.send(resultMap);
         }else{
             logger.debug("[存续期未找到对应的接口配置]");
             // 债券的可转债申购上市流通、股票的红利再投上市流通需要调用上市流通专用接口
@@ -677,7 +677,7 @@ public class PositionRequestTradeRestService {
         resultMap.put("userId", LoginUserUtil.getUserName());
         resultMap.put("totalTradeId", IDGenerator.generate());
         resultMap.put("finprodId", entity.getTrdProductDeal().getFinprodId());
-        PositionHttpRequest.sendSslt(resultMap);
+        positionRequestHandle.send(resultMap);
     }
     // ZGTFCP-1593:上市流通特殊处理 modify by fuyongsheng 20220323 end
 

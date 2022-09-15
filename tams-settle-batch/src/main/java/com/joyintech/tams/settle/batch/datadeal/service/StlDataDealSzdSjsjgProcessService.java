@@ -1337,9 +1337,11 @@ public class StlDataDealSzdSjsjgProcessService {
             if(StringUtil.equals(DictCodeListExt1.证券品种_债券.getValue(), stlDownDataDealOperatorDto.getFinprodType()) &&
                 (szdSjsjg.getJgywlb().equals(StlDataDealProcessConstant.SJSJG_YWLB_QPPX)
                             || szdSjsjg.getJgywlb().equals(StlDataDealProcessConstant.SJSJG_YWLB_QPDF)
-                            || szdSjsjg.getJgywlb().equals(StlDataDealProcessConstant.SJSJG_YWLB_ZQSH)) &&
-                StringUtil.equals(DictCodeListStl.清算数据源表_深中登SJSJG.getValue(), stlDownDataDealOperatorDto.getDataFile()) &&
-                StringUtil.isEmpty(szdSjsjg.getJgzqlb())){
+                            || szdSjsjg.getJgywlb().equals(StlDataDealProcessConstant.SJSJG_YWLB_ZQSH))
+//                    &&
+//                StringUtil.equals(DictCodeListStl.清算数据源表_深中登SJSJG.getValue(), stlDownDataDealOperatorDto.getDataFile()) &&
+//                StringUtil.isEmpty(szdSjsjg.getJgzqlb())
+            ){
                 // QPPX、QPDF、ZQSH场景
                 stlDownDataDealWriteBaseDto = dealBondSpecialType(szdSjsjg, stlDownDataDealOperatorDto,  accountInfoDtolist);
             }else if((StringUtil.equals(szdSjsjg.getJgywlb(), StlDataDealProcessConstant.SJSJG_YWLB_ZYRK) ||
@@ -1768,7 +1770,10 @@ public class StlDataDealSzdSjsjgProcessService {
         //        BussinessDictCodeListRds.操作符_加.getValue(), BussinessDictCodeListRds.特征值偏移单位_自然日.getValue())));
         // settleTransData.setTradeDate(DateUtil.parse(szdSjsjg.getJgqsrq()));
         // modify by fuyongsheng 交易日无需+1自然日 end
-        settleTransData.setTradeDate(DateUtil.parse(szdSjsjg.getJgjsrq()));
+        // GLLCUAT-472:交易日期取清算日期 modify by fuyongsheng 20220914 start
+        // settleTransData.setTradeDate(DateUtil.parse(szdSjsjg.getJgjsrq()));
+        settleTransData.setTradeDate(DateUtil.parse(szdSjsjg.getJgqsrq()));
+        // GLLCUAT-472:交易日期取清算日期 modify by fuyongsheng 20220914 end
         // 交割日期
         settleTransData.setSettleDate(DateUtil.parse(szdSjsjg.getJgjsrq()));
         // 交易币种
