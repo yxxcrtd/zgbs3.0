@@ -5,6 +5,7 @@
 
 package com.joyintech.tams.invest.common.trade.dao;
 
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
 import com.joyintech.tams.invest.common.trade.dto.FinProductCredit;
@@ -134,6 +135,8 @@ public interface CreditLinesDealsMapper {
 	List<CreditLines> getCeLinesInfoforassetPierce(Map<String,Object> model);
     List<CreditMstInfo> selectCreditMstInfo(String seqno);
 	BigDecimal getLastPrice(@Param("finprodId")String finprodId,@Param("sysDate")Date sysDate);
+
+	SelectOptionDto getLastPriceAndLastDate(Map<String,Object> map);
 
 	FinProductType selectByPrimaryKey(FinProductTypeKey key);
 
