@@ -216,6 +216,15 @@ public class EtrPlanAssetN002Controller extends BaseController {
         Page<SelectOptionDto> temp = etrPlanAssetNService.getfinprodIdForAdd(RequestUtil.getPageParam());
         return temp;
     }
+
+    /**
+     * 通过管理人查询交易对手
+     */
+    @ResponseBody
+    @RequestMapping("/getCountIdByManager")
+    public String getCountIdByManager(String manager) {
+        return etrPlanAssetNService.getCountIdByManager(manager);
+    }
     
     /**
      * 
