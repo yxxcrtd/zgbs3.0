@@ -101,6 +101,9 @@ public class BussRepoSecController extends BaseController {
                 //质押式回购报价页面  单独处理
                 if(StringUtils.isNotEmpty(pageFrom)&&(StringUtils.equals(pageFrom,"CfetsRepoDealQuotedPrice002")||StringUtils.equals(pageFrom,"CfetsRepoDealQuotedPrice003"))){
                 }else{
+                    if(StringUtil.equals(pageFrom,"TrdBondLendTrade002")){
+                        initSearchParam.put("isTrdBondLend","TrdBondLendTrade002");
+                    }
                     entity = bussRepoSecService.selectBussRepoSec(initSearchParam);
                 }
             }

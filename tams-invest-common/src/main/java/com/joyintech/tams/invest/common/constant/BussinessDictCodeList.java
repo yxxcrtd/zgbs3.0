@@ -3850,6 +3850,7 @@ public enum BussinessDictCodeList implements BaseDictCodeList {
      * 平安资产类型_股票
      */
     平安资产类型_股票(BussinessDictCode.平安资产类型,"F11","股票"),
+    平安资产类型_债券借贷(BussinessDictCode.平安资产类型,"F12","债券借贷"),
     // add by wangguoxian 交易所交易费用设置 20190717 end
     /**
      * 二级资产类别_票据类

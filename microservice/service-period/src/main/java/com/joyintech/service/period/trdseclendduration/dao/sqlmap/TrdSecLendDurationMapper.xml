@@ -580,4 +580,18 @@
 		and PS = 'T07'
 	</select>
 
+    <select id="getShowHandNum" resultType="java.math.BigDecimal" >
+        select
+            SUM(AMOUNT)
+        from ETR_SEC_POSITION_RULE
+        where CDATE = to_date(#{tradeDate,jdbcType=VARCHAR},'yyyy-MM-dd') and date_type=0
+          and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+          and HODING_TYPE = #{hodingType,jdbcType=VARCHAR}
+          and SEC_ACCT_ID = #{secAcctId,jdbcType=VARCHAR}
+          and FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+          and CCY = #{ccy,jdbcType=VARCHAR}
+    </select>
+
+
+
 </mapper>

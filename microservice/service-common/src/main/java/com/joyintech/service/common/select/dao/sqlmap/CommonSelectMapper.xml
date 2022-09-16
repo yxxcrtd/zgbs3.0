@@ -14,6 +14,8 @@
                     FINPROD_MARKET_ID LIKE CONCAT('%', CONCAT(#{param}, '%'))
                     OR
                     FINPROD_NAME LIKE CONCAT('%', CONCAT(#{param}, '%'))
+                    OR
+                    FINPROD_ABBR LIKE CONCAT('%', CONCAT(#{param}, '%'))
                 )
             </if>
             <if test="FINPROD_TYPE_TG != null and FINPROD_TYPE_TG != ''">

@@ -175,6 +175,19 @@ public class EtrSecLendController {
     public void doDeleteFlow(@RequestBody EtrSecLendDto dto) {
     	etrSecLendService.doDeleteFlow(dto);
     }
+
+    /**
+     * 删除流程中数据和流水
+     * @param dto
+     */
+    @Transactional
+    @DTXTransaction
+    @PostMapping("doDeleteWfl")
+    public void doDeleteWfl(@RequestBody EtrSecLendDto dto) {
+        etrSecLendService.doDeleteWfl(dto);
+    }
+
+
     /**
      * 
      * 删除投资委托

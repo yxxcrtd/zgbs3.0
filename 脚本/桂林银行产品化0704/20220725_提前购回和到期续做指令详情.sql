@@ -53,10 +53,6 @@ INSERT INTO CFG_READONLY_FORM_SHOW("PAGECODE", "DTCODE", "SPCDCODE", "COLCODE", 
 INSERT INTO CFG_READONLY_FORM_SHOW("PAGECODE", "DTCODE", "SPCDCODE", "COLCODE", "COLNAME", "DICTCODE", "SEQNO", "EXTENDCFG", "STATUS", "REMARK1", "REMARK2", "REMARK3", "SPCDCODE_DESC") VALUES ('FieldEtrDispatcher', 'FieldEtrDispatcherInfo', 'EX011', 'tradeId', '初始交易编号', NULL, '24', '{"colAlign": "left"}', '1', '0', NULL, NULL, '999999');
 INSERT INTO CFG_READONLY_FORM_SHOW("PAGECODE", "DTCODE", "SPCDCODE", "COLCODE", "COLNAME", "DICTCODE", "SEQNO", "EXTENDCFG", "STATUS", "REMARK1", "REMARK2", "REMARK3", "SPCDCODE_DESC") VALUES ('FieldEtrDispatcher', 'FieldEtrDispatcherInfo', 'EX011', 'unitPrice', '回购利率', NULL, '14', '{"colAlign": "left","dataType":"amount","precision":"3","unit":"%"}', '1', '0', NULL, NULL, '999999');
 INSERT INTO CFG_READONLY_FORM_SHOW("PAGECODE", "DTCODE", "SPCDCODE", "COLCODE", "COLNAME", "DICTCODE", "SEQNO", "EXTENDCFG", "STATUS", "REMARK1", "REMARK2", "REMARK3", "SPCDCODE_DESC") VALUES ('FieldEtrDispatcher', 'FieldEtrDispatcherInfo', 'EX011', 'vpayDate', '首期结算日', NULL, '16', '{"colAlign": "left"}', '1', '0', NULL, NULL, '999999');
-
--EX013
-
-
 delete from CFG_READONLY_FORM_SHOW where PAGECODE = 'CfetsEtrDispatcher' and DTCODE = 'CfetsEtrDispatcherInfo' and SPCDCODE = 'EX013';
 INSERT INTO CFG_READONLY_FORM_SHOW("PAGECODE", "DTCODE", "SPCDCODE", "COLCODE", "COLNAME", "DICTCODE", "SEQNO", "EXTENDCFG", "STATUS", "REMARK1", "REMARK2", "REMARK3", "SPCDCODE_DESC") VALUES ('CfetsEtrDispatcher', 'CfetsEtrDispatcherInfo', 'EX013', 'addCla', '补充协议', NULL, '25', '{"colAlign": "left"}', '1', '0', NULL, NULL, '999999');
 INSERT INTO CFG_READONLY_FORM_SHOW("PAGECODE", "DTCODE", "SPCDCODE", "COLCODE", "COLNAME", "DICTCODE", "SEQNO", "EXTENDCFG", "STATUS", "REMARK1", "REMARK2", "REMARK3", "SPCDCODE_DESC") VALUES ('CfetsEtrDispatcher', 'CfetsEtrDispatcherInfo', 'EX013', 'busiTypePositionStr', '业务类型', NULL, '4', '{"colAlign": "left"}', '1', '0', NULL, NULL, '999999');

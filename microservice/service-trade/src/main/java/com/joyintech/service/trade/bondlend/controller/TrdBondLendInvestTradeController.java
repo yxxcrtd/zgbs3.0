@@ -18,6 +18,7 @@ import com.joyintech.service.trade.bondlend.dto.FinCashPlanDto;
 import com.joyintech.service.trade.bondlend.dto.SecInfoModelDto;
 import com.joyintech.service.trade.bondlend.dto.TrdBondLendInvestTradeDto;
 import com.joyintech.service.trade.bondlend.service.TrdBondLendInvestTradeService;
+import com.joyintech.tams.common.base.entity.FinDealPledge;
 import com.joyintech.tams.common.base.entity.StlCapacctInfo;
 import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommService;
 import com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto;
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,6 +102,11 @@ public class TrdBondLendInvestTradeController {
         return trdBondLendInvestTradeService.getEntrustInfo(entrustId);
     }
 
+    @RequestMapping("getFinishAmtPledgeList")
+    public List<FinDealPledge> getFinishAmtPledgeList(@RequestBody Map<String, Object> param) {
+        return trdBondLendInvestTradeService.getFinishAmtPledgeList(param);
+    }
+
     /**
      * 查询证券托管户：联想框文本框
      *
@@ -112,6 +119,13 @@ public class TrdBondLendInvestTradeController {
     public List<SuggestDto> getSecManageAcctId(@RequestBody Map<String, Object> param) {
         return trdBondLendInvestTradeService.getSecManageAcctId(param);
     }
+
+    @RequestMapping("getAssetAvailablePosition")
+    public Map<String, Object> getAssetAvailablePosition(@RequestBody Map<String, Object> param) {
+        return trdBondLendInvestTradeService.getAssetAvailablePosition(param);
+    }
+
+
 
     /**
      * 通道：联想框文本框

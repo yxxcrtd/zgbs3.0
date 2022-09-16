@@ -164,14 +164,30 @@
                   INV_AIM,
                   </if>
 <!--                 PSV.END_DAYS_1, -->
-                SUM(DECODE(PSP.HODING_TYPE,#{POSITION_TYPE_06},-PSP.AMOUNT,'11',-PSP.AMOUNT,PSP.AMOUNT)) AMOUNT, psp.SEC_ACCT_ID
+
+               <choose>
+                   <when test="ps!=null and ps=='05' ">
+                       SUM(DECODE(PSP.HODING_TYPE,#{POSITION_TYPE_06},-PSP.AMOUNT,'11',-PSP.AMOUNT,PSP.AMOUNT)) AMOUNT
+                   </when>
+                   <otherwise>
+                       SUM(DECODE(PSP.HODING_TYPE,#{POSITION_TYPE_06},-PSP.AMOUNT,'11',-PSP.AMOUNT,PSP.AMOUNT)) AMOUNT
+                   </otherwise>
+               </choose>
+                    , psp.SEC_ACCT_ID
             	from PTL_SEC_POSITION PSP
   				LEFT JOIN FIN_PRODUCT T ON PSP.FINPROD_ID = T.FINPROD_ID
   				LEFT JOIN FIN_PRODUCT FPSAI ON PSP.SEC_ACCT_ID = FPSAI.FINPROD_ID
  				WHERE T.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01}
    				and psp.PORTFOLIO_ID = #{portfolioId, jdbcType=VARCHAR}
    				AND psp.CDATE &lt;= TO_DATE(#{plateDate, jdbcType=VARCHAR}, 'yyyy-MM-dd')
-   				and PSP.HODING_TYPE IN (#{POSITION_TYPE_01}, #{POSITION_TYPE_03},#{POSITION_TYPE_05},#{POSITION_TYPE_06}, '11', '08')
+               <choose>
+                   <when test="ps!=null and ps=='05' ">
+                       and PSP.HODING_TYPE IN (#{POSITION_TYPE_01}, #{POSITION_TYPE_03},#{POSITION_TYPE_06}, '11', '08')
+                   </when>
+                   <otherwise>
+                       and PSP.HODING_TYPE IN (#{POSITION_TYPE_01}, #{POSITION_TYPE_03},#{POSITION_TYPE_05},#{POSITION_TYPE_06}, '11', '08')
+                   </otherwise>
+               </choose>
    				<if test="secAcctId != null and secAcctId != '' and secAcctId !='undefined'">
                       AND PSP.SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
                 </if>
@@ -458,7 +474,7 @@
       FROM
            (
             <!-- 债券借贷交易画面有委托代码是双击查看报错修正 modify by renping 20191017 start -->
-            <if test="entrustId != null and entrustId != '' and (bizCode == null or bizCode == '')">
+            <if test="entrustId != null and entrustId != '' and (bizCode == null or bizCode == '') and (isTrdBondLend == null or isTrdBondLend == '') ">
             <!-- 债券借贷交易画面有委托代码是双击查看报错修正 modify by renping 20191017 end -->
                   SELECT
                     ENTRUST_ID bussId,
@@ -484,6 +500,35 @@
                     WHERE
                     ENTRUST_ID = #{entrustId}
             </if>
+           <if test="entrustId != null and entrustId != '' and (bizCode == null or bizCode == '') and (isTrdBondLend != null and isTrdBondLend =='TrdBondLendTrade002' ) ">
+               SELECT
+               ENTRUST_ID bussId,
+               FINPROD_ID pledgeId,
+               PLEDGE_FACE_VALUE,
+               a.PLEDGE_NUMBER-nvl(b.PLEDGE_NUMBER,0) PLEDGE_NUMBER,
+               PLEDGE_RATIO,
+               a.PLEDGE_AMT-nvl(b.PLEDGE_AMT,0) PLEDGE_AMT
+               FROM
+               ETR_PLEDGE a
+               LEFT JOIN (
+               SELECT
+               PLEDGE_FINPROD_ID ,sum(PLEDGE_AMT) PLEDGE_AMT ,sum(PLEDGE_NUMBER)  PLEDGE_NUMBER
+               FROM
+               FIN_DEAL_PLEDGE a
+               LEFT JOIN TRD_PRODUCT_DEAL_ADD b ON
+               a.FINPROD_ID = b.TRADE_ID
+               LEFT JOIN TRD_PRODUCT_DEAL c ON
+               c.TRADE_ID = b.TRADE_ID
+               WHERE
+               1 = 1
+               AND c.IS_CANCEL = 'N'
+               AND c.TRADE_STATUS = '01'
+               AND b.ENTRUST_ID =#{entrustId}
+               GROUP BY PLEDGE_FINPROD_ID
+               ) b ON a.FINPROD_ID = b.PLEDGE_FINPROD_ID
+               WHERE
+               ENTRUST_ID = #{entrustId}
+           </if>
             <if test="bizCode != null and bizCode != ''">
                 SELECT
                     fdp.FINPROD_ID bussId,
@@ -1636,6 +1681,139 @@
             ELSE 0
             END
         </if>
+    </select>
+
+
+    <select id="selectNewAvaPledgeBondDetailList" resultType="com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto">
+        SELECT
+        fp.FINPROD_MARKET_ID bondCode,
+        fp.FINPROD_ID finprodId,
+        fp.FINPROD_ABBR bondAbbrName,
+        fp.MDATE mdate,
+        fp.REGIST_ORG repRegistOrg,
+        MBCR.GRADE_RESULT gradeResult,
+        mbvi.LAST_PERIOD endDays1,
+        ava.SEC_ACCT_ID secAcctId,
+        NVL(ava.pledStrdPrinAmt, 0) prin,
+        NVL(ava.pledgeAmount, 0) pledgePrin,
+        NVL(ava.pledgeAmount, 0) pledgePrinInit,
+        NVL(ava.pledStrdPrinAmt, 0) avaPledgePrin,
+        mbvi.NETPRICE firstNetPrice,
+        fpt.type_6 secType
+        ,pp.portfolio_id
+        ,pp.PORTFOLIO_NAME
+        FROM
+        (
+        SELECT
+        TEMP.PORTFOLIO_ID,
+        /*组合代码*/
+        TEMP.PORTFOLIO_NAME,
+        TEMP.SEC_ACCT_ID,
+        /*证券账户/通道代码*/
+        TEMP.FINPROD_ID,
+        /*分支序号*/
+        SUM(TEMP.pledStrdPrinAmt) pledStrdPrinAmt, /*可质押券面总额*/
+        SUM(TEMP.pledgeAmount) pledgeAmount /*已质押质押券面总额*/
+        FROM (
+        SELECT
+        psp.PORTFOLIO_ID, pp.PORTFOLIO_NAME,
+        psp.SEC_ACCT_ID, psp.FINPROD_ID,
+        pp.VDATE,
+        CASE WHEN ppc.S_HOLDINGTYPE = 'S_002' THEN psp.AMOUNT*nvl(ppc.CAL_FLAG,1) ELSE 0 END
+        AS pledStrdPrinAmt, /*可质押券面总额*/
+        CASE WHEN psp.HODING_TYPE in ('A_012','A_032') THEN psp.AMOUNT*nvl(ppc.CAL_FLAG,1) ELSE 0 END
+        AS pledgeAmount /*已质押质押券面总额*/
+        FROM
+        <choose>
+            <when test="flag =='ETR' ">
+                ETR_SEC_POSITION_RULE psp
+            </when>
+            <otherwise>
+                PTL_SEC_POSITION_RULE psp
+            </otherwise>
+        </choose>
+        <if test="entrustId !='' and entrustId !='' ">
+            INNER JOIN ETR_PLEDGE ep ON ep.ENTRUST_ID=#{entrustId} and ep.FINPROD_ID = psp.FINPROD_ID
+        </if>
+        INNER JOIN PTL_PORTFOLIO pp ON
+        psp.PORTFOLIO_ID = pp.PORTFOLIO_ID
+        left JOIN PTL_POSITION_CFG ppc ON
+        psp.HODING_TYPE =ppc.HOLDINGTYPE AND ppc.S_HOLDINGTYPE ='S_002'
+        WHERE 1 = 1
+        AND psp.CDATE = to_date(#{plateDate, jdbcType=VARCHAR},'yyyy-MM-dd')/*组合持仓.日期 = 平台日*/
+        AND psp.DATE_TYPE =0 AND ( ppc.S_HOLDINGTYPE ='S_002' or psp.HODING_TYPE in ('A_012','A_032'))
+        <if test="portfolioId != null and portfolioId!='' ">
+            and psp.PORTFOLIO_ID  =#{portfolioId}
+        </if>
+        ) TEMP
+        WHERE 1 = 1
+            GROUP BY
+            TEMP.PORTFOLIO_ID, TEMP.PORTFOLIO_NAME,
+            TEMP.SEC_ACCT_ID, TEMP.FINPROD_ID, TEMP.VDATE
+            HAVING SUM(TEMP.pledStrdPrinAmt) > 0 /*只统计可质押券面总额>0*/
+        )ava
+        INNER JOIN  FIN_PRODUCT fp
+        ON  fp.FINPROD_ID = ava.FINPROD_ID
+        AND fp.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F01}
+        <if test="tradeMarket != null and tradeMarket != ''">
+            AND fp.TRADE_MARKET = #{tradeMarket}
+        </if>
+        LEFT JOIN (
+        SELECT
+        RANK() OVER(PARTITION BY O_CODE ORDER BY GRADE_DATE DESC, DECODE(GRADE_ORG_ID,'22',NULL, GRADE_ORG_ID), grade_result DESC, O_TYPE) NUM,
+        O_CODE,
+        GRADE_RESULT
+        FROM
+        MST_BOND_CREDIT_RATING
+        WHERE GRADE_DATE &lt;= TO_DATE(#{plateDate, jdbcType=VARCHAR}, 'yyyy-MM-dd')
+        ) MBCR ON MBCR.O_CODE = fp.FINPROD_MARKET_ID AND MBCR.NUM = 1
+
+        LEFT JOIN   MST_BOND_VALUATION_INFO mbvi
+        ON  mbvi.SEC_ID = fp.FINPROD_MARKET_ID
+        AND mbvi.VALUE_DATE &lt;= TO_DATE(#{plateDate, jdbcType=VARCHAR}, 'yyyy-MM-dd')
+        AND mbvi.VALUE_SOURCE ='CBC'
+        AND NOT EXISTS (
+        SELECT
+        1
+        FROM
+        MST_BOND_VALUATION_INFO mbviInner
+        WHERE
+        mbviInner.SEC_ID = fp.FINPROD_MARKET_ID
+        AND mbviInner.VALUE_DATE &lt;= TO_DATE(#{plateDate, jdbcType=VARCHAR}, 'yyyy-MM-dd')
+        AND mbviInner.VALUE_SOURCE ='CBC'
+        AND mbviInner.VALUE_DATE > mbvi.VALUE_DATE
+        )
+        LEFT JOIN FIN_PRODUCT_TYPE FPT
+        ON fp.FINPROD_ID = FPT.FINPROD_ID
+        left join PTL_PORTFOLIO pp on  pp.portfolio_id = ava.portfolio_id
+        LEFT JOIN FIN_PRODUCT_ADD FPA
+        ON FPA.FINPROD_ID = fp.FINPROD_ID
+        <where>
+            AND (FPA.IS_ISSUE_ASSET IS NULL OR FPA.IS_ISSUE_ASSET = 'N')
+            <if test="repRegistOrg != null and repRegistOrg.size() > 0">
+                AND fp.REGIST_ORG in
+                <foreach collection="repRegistOrg" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="bondCode != null and bondCode != ''">
+                AND fp.FINPROD_MARKET_ID = #{bondCode, jdbcType=VARCHAR}
+            </if>
+            <if test="bondTypeArr != null and bondTypeArr.length > 0 ">
+                AND FPT.TYPE_4 in
+                <foreach collection="bondTypeArr" item="item" open="(" separator="," close=")">
+                    #{item, jdbcType=VARCHAR}
+                </foreach>
+            </if>
+            <!-- 可质押列表增加“债项评级”、“到期日”、“登记托管机构”、“剩余期限”字段 add by renping 20191011 start -->
+            <if test="endDays1Start != null and endDays1Start != ''">
+                AND mbvi.LAST_PERIOD >= to_number(#{endDays1Start})
+            </if>
+            <if test="endDays1End != null and endDays1Start != ''">
+                AND mbvi.LAST_PERIOD &lt;= to_number(#{endDays1End})
+            </if>
+            <!-- 可质押列表增加“债项评级”、“到期日”、“登记托管机构”、“剩余期限”字段 add by renping 20191011 end -->
+        </where>
     </select>
 
     <select id="selectFinprodIdByPledge" resultType="java.lang.String" >

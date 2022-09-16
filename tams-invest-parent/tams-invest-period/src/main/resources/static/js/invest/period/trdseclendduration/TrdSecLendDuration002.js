@@ -79,27 +79,36 @@
             object.isCashPay = 'N'
         }
 
-        if (shortSellingSupported == '01') {
-            if ($("#ps").val() == '05') {
-                TradeCommon.getSecPositionForSaleAll(setParam(), function (result) {
-                    if (object.isCashPay == 'N' && (result.INTEGRATE_POSITION || 0) * 1 < $("#shareAmt").val() * 1 && object.isCashPay == 'N') {
-                        return Joyin.error("融入券可用持仓不足，请先购回")
-                    }
-                    object.assetIntegrateAvailablePosition = result.INTEGRATE_POSITION;
-                    save(object, operateType);
-                });
-            }
-            else {
-                save(object, operateType);
-            }
-        }
-        else {
+        // if (shortSellingSupported == '01') {
+        //     if ($("#ps").val() == '05') {
+        //         // TradeCommon.getSecPositionForSaleAll(setParam(), function (result) {
+        //         //     if (object.isCashPay == 'N' && (result.INTEGRATE_POSITION || 0) * 1 < $("#shareAmt").val() * 1 && object.isCashPay == 'N') {
+        //         //         return Joyin.error("融入券可用持仓不足，请先购回")
+        //         //     }
+        //         //     object.assetIntegrateAvailablePosition = result.INTEGRATE_POSITION;
+        //         //     save(object, operateType);
+        //         // });
+        //         Joyin.ajaxJson(basePath + 'invest/period/trdseclendduration/TrdSecLendDuration002/getShowHandNum', setParam(),
+        //             function (result) {
+        //                 if (object.isCashPay == 'N' && (result.INTEGRATE_POSITION || 0) * 1 < $("#shareAmt").val() * 1) {
+        //                     return Joyin.error("融入券可用持仓不足，请先购回")
+        //                 }
+        //                 object.assetIntegrateAvailablePosition = result.INTEGRATE_POSITION;
+        //                 save(object, operateType);
+        //             });
+        //     }
+        //     else {
+        //         save(object, operateType);
+        //     }
+        // }
+        // else {
             save(object, operateType);
-        }
+        // }
     }
 
     function save(object, operateType) {
         object.operateType = operateType;
+        object.balanceCheck ='Y';
         Joyin.ajaxJson(basePath + 'invest/period/trdseclendduration/TrdSecLendDuration002/check', object, function (result) {
             Joyin.confirm(result.data, function () {
                 if (operateType === 'save') {
@@ -166,9 +175,9 @@
             $("#mTradeAmt").val(JoyinMath.doMinus($("#tradeAmt").val(), $("#prinAmt").val(), 2, JoyinMath.ROUND_HALF_UP)).trigger('blur')
         })
 
-        if (pageModel == PAGE_MODEL_EDIT && isTodoList != 'true') {
+        if (pageModel == PAGE_MODEL_EDIT || pageModel == PAGE_MODEL_NEW ) {
             $("#invAim").prop("disabled", true);
-            if ($("isCashPay").prop("checked")) {
+            if ($("#isCashPay").prop("checked")) {
                 $("#prinAmt").prop("disabled", false).change();
                 if ($("#ps").val() == '05') {
                     $("#invAim").prop("disabled", false);

@@ -36,7 +36,7 @@
                                            data-th-text="#{EtrSecLend.vdate}">指令开始日</label>
                                     <div class="layui-input-inline input-inline">
                                         <input class="layui-input form-input input-dateSelect" id="vdate"
-                                               name="vdate" placeholder="请选择时间" disabled="disabled"
+                                               name="vdate" placeholder="请选择时间"
                                                data-th-value='${#dates.format(entity?.vdate,"yyyy-MM-dd")}'
                                                required="required">
                                     </div>
@@ -46,7 +46,7 @@
                                            data-th-text="#{EtrSecLend.mdate}">指令终止日</label>
                                     <div class="layui-input-inline input-inline">
                                         <input class="layui-input form-input input-dateSelect" id="mdate"
-                                               name="mdate" placeholder="请选择时间" disabled="disabled"
+                                               name="mdate" placeholder="请选择时间"
                                                data-th-value='${#dates.format(entity?.mdate,"yyyy-MM-dd")}'
                                                required="required">
                                     </div>
@@ -180,7 +180,7 @@
                             </div>
                 <!-- 引业务组件投资委托人员信息组件 -->
                 <div class="page-component" th:data-path="@{/component/trade/BussEtrInvestPersonInfo/init}"
-                     th:data-params="|{entityName: 'etrInvestPersonInfo',entity:'${person_entity}'}|"></div>
+                     th:data-params="|{entityName: 'etrInvestPersonInfo', innerTrade: false,entity:'${person_entity}'}|"></div>
                 <!--质押券信息-->
                  <div id="pledgeStamps_div" class="page-component" th:data-path="@{/component/trade/BussRepoSec/init}"
                     th:data-params="|{entityName: 'bussRepoSec', pageFrom: 'EtrSecLend002', entity:'${entity_bussRepoSecDto}', portfolioId:'${entity?.portfolioId==null?'':entity?.portfolioId}', ps:'${entity?.busiPs==null?'':entity?.busiPs}', bizCode:'${''}', entrustId:'${entity?.entrustId==null?'':entity?.entrustId}', tradeMarketId: 'tradeMarket'}|"></div>

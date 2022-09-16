@@ -3227,6 +3227,8 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
         PageFieldToInterfFactory.mapping(dataMap, infMap);
         doCommon(infMap, v);
         infMap.put(PageFieldToInterfFactory.INF_EVENTDATE, eventDate);
+        infMap.put("assetCode",null);
+        infMap.put("marketCode",null);
         result.add(infMap);
         infMap = new HashMap<>();
         // 债券

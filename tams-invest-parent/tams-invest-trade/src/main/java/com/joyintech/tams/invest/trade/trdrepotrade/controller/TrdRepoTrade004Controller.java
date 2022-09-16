@@ -120,7 +120,13 @@ public class TrdRepoTrade004Controller extends BaseController {
 
             model.addAttribute("entity_outBussRepoSec",
                     dto.getOutDataTable() == null ? null : JsonUtils.object2Json(
-                            dto.getOutDataTable()));
+                            dto.getOutDataTable().stream()
+                                    .filter(a->(a.getPledgePrin()==null?new BigDecimal(0):a.getPledgePrin()).compareTo(new BigDecimal(0))!=0)
+                                    .map(entity -> {
+                                        entity.setPledgePrin(ArithmeticUtil.divide(entity.getPledgePrin(), 10000, 2));
+                                        entity.setPrin(ArithmeticUtil.divide(entity.getPrin(), 10000, 2));
+                                        return entity;
+                                    }).toArray()));
             //最终质押券列表
 //            //选出质押券列表
 //            if(!StringUtil.isEmptyList(dto.getBussResultRepoSec())) {
@@ -307,11 +313,11 @@ public class TrdRepoTrade004Controller extends BaseController {
             processParameter.setOperationType(OperationType.MODIFY);
         }
         workFlowParameter.setComment(entity -> WorkFlowUtil.concatComment(
-                "质押券置换交易编号：" + entity.getTradeId() + "置换日期：" + DateUtil.getSysDate())
+                "质押券置换交易编号：" + entity.getTradeId() + "置换日期：" + DateUtil.format(dto.getSubstitutionDate()))
         );
 
         //业务编号参数
-
+        dto.setBusiType(DictCodeListExt3.共通业务类型_质押券置换.getValue());
         String bussinessCode="";
         BussinessCodeParameter parameter = new BussinessCodeParameter();
         parameter.setCommonBusinessExtType(

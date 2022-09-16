@@ -460,4 +460,6 @@ public interface EtrCommonCashPositionMapper {
      * @return
      */
     List<TrdProductDeal> selectTrdProductDealByEntrustId(@Param("entrustId") String entrustId);
+
+    String  selectInvAim(EtrSecPositionFlowDto sec);
 }

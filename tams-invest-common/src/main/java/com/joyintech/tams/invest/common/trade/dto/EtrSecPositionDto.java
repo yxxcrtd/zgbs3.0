@@ -19,4 +19,16 @@ public class EtrSecPositionDto extends EtrSecPosition{
      */
     private static final long serialVersionUID = -3662738469690669899L;
 
+    /**
+     * 用于买断式回购取持仓 债券借贷不包含买入券使用
+     */
+    private String isContain9;
+
+    public String getIsContain9() {
+        return isContain9;
+    }
+
+    public void setIsContain9(String isContain9) {
+        this.isContain9 = isContain9;
+    }
 }

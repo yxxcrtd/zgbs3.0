@@ -75,6 +75,7 @@
 		AND wtdta.MP_FINPROD_ID IS NULL
 		AND T1.IS_CANCEL = #{YESNO_N}
 		AND T1.FINPROD_TYPE2 = #{FINPROD_TYPE_TGF01}
+		AND T1.TRADE_MARKET in ('03','04')
 		<if test="busiCode != null and !busiCode.isEmpty()">
 			AND T1.TOTLE_TRADE_ID = #{busiCode}
 		</if>
@@ -859,6 +860,7 @@
 			AND wtdta.MP_FINPROD_ID IS NULL
 			AND T1.BUSI_TYPE = #{TRD10}
 			AND T1.FINPROD_TYPE2 = #{FINPROD_TYPE_TGF01}
+			AND T1.TRADE_MARKET in ('03','04')
 			<if test="busiCode != null and !busiCode.isEmpty()">
 				AND T1.P_TRADE_ID = #{busiCode}
 			</if>

@@ -15,13 +15,23 @@ var showDetailByFinprodId=function(finprodId,finprodType2){
     var pagePath='';
     //债券标的信息查看
     if(finprodType2 == PINAN_ASSET_TYPE_F01){
-        label='FinBondTargetAsset002.title';
-        pagePath = "invest/asset/bond/FinBondTargetAsset002/init";
-        Joyin.dialog(JoyinUtil.getLabel(label),basePath+pagePath,
-            "95%", "90%",{
-                pageModel:PAGE_MODEL_REFERENCE,
-                finprodId:finprodId
-            });//基金类标的信息查看
+        // label='FinBondTargetAsset002.title';
+        // pagePath = "invest/asset/bond/FinBondTargetAsset002/init";
+        // Joyin.dialog(JoyinUtil.getLabel(label),basePath+pagePath,
+        //     "95%", "90%",{
+        //         pageModel:PAGE_MODEL_REFERENCE,
+        //         finprodId:finprodId
+        //     });//基金类标的信息查看
+        var url = "home.html?a=a&finprodMarketId=" + finprodId + "&pageModel=1&editable=false&isTodoList=true#/approve/subjectbond?a=a"; // 默认债券标的
+        var param = {
+            pageModel: PAGE_MODEL_REFERENCE,
+            isQuickInput: true,
+            finprodId: finprodId
+        };
+        Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+            basePath + url,
+            "98%", "98%",
+            param);
     }else if(finprodType2 == PINAN_ASSET_TYPE_F02){
         label='FinFundTarget002.detail';
         pagePath = "invest/asset/fund/FinFundTarget002/init";

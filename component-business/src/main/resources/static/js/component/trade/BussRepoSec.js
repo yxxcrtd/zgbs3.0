@@ -252,7 +252,8 @@
                         // add by etliu 20210303 银行间上下行 start
                         ,ignoreFlowTradeId: param.data.ignoreFlowTradeId
                         // add by etliu 20210303 银行间上下行 end
-                        ,pageFromTz:(getElementById("pageFrom").val()=='TrdRepoTrade002'||getElementById("pageFrom").val()=='CfetsRepoDealQuotedPrice002'||getElementById("pageFrom").val()=='CfetsRepoDealQuotedPrice003')?getElementById("pageFrom").val():''
+                        ,pageFromTz:(getElementById("pageFrom").val()=='TrdRepoTrade002'||getElementById("pageFrom").val()=='CfetsRepoDealQuotedPrice002'||getElementById("pageFrom").val()=='CfetsRepoDealQuotedPrice003'
+                        ||getElementById("pageFrom").val()=='EtrSecLend002'||getElementById("pageFrom").val()=='TrdBondLendTrade002')?getElementById("pageFrom").val():''
                         //产品化_质押式回购交易界面,正回购时：点击添加后的可质押券范围为投资经理移入可质押库的、该组合下的债券，不可选不在质押库里债券 add by zhangpei 20201125 end
                         ,isDzh:isDzh
                         ,quoteId:quoteId

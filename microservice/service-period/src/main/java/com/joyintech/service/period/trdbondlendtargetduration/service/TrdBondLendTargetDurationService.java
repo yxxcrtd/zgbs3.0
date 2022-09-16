@@ -132,6 +132,10 @@ public class TrdBondLendTargetDurationService extends BaseService {
 
     public TrdBondLendTargetDurationDto findEffectiveData(Map<String, Object> params) {
         setParams(params);
+        if (com.joyintech.framework.util.StringUtil.isNotEmpty(params.get("cashType"))) {
+            List<String> cashType = com.joyintech.framework.util.StringUtil.splitToList(",", (String)params.get("cashType"));
+            params.put("cashTypeList",cashType );
+        }
         // 根据statusValid查询数据
         return trdBondLendTargetDurationMapper.findEffectiveData(params);
     }

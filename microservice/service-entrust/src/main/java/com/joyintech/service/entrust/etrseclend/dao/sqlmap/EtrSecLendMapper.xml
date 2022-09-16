@@ -273,7 +273,7 @@
 	<select id="getFinprodId" resultMap="finprodIdMap">
 		SELECT
 		A.FINPROD_ID id,
-		A.FINPROD_MARKET_ID text,
+		A.FINPROD_ABBR text,
 		A.FINPROD_ID,
 		A.FINPROD_NAME,
 		TO_CHAR(A.VDATE, 'yyyy-MM-dd') VDATE,
@@ -312,6 +312,8 @@
 				A.FINPROD_MARKET_ID LIKE CONCAT('%', CONCAT(#{search}, '%'))
 				or
 				A.FINPROD_NAME LIKE CONCAT('%', CONCAT(#{search}, '%'))
+				or
+				A.FINPROD_ABBR LIKE CONCAT('%', CONCAT(#{search}, '%'))
 				)
 			</if>
 			<if test="initValue != null and initValue != ''">
@@ -578,4 +580,17 @@
 	<delete id="deleteWflwflEtrTarget">
 		DELETE FROM WFL_ETR_TARGET WHERE WORKFLOW_ID = #{workflowId}
 	</delete>
+
+	<select id="queryUsableSecPosition" resultType="java.math.BigDecimal" >
+		select
+		SUM(AMOUNT)
+		from ETR_SEC_POSITION_RULE
+		where CDATE = #{cdate,jdbcType=DATE} and date_type=0
+			and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+			and HODING_TYPE = #{hodingType,jdbcType=VARCHAR}
+			and SEC_ACCT_ID = #{secAcctId,jdbcType=VARCHAR}
+		  and FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+		  and CCY = #{ccy,jdbcType=VARCHAR}
+	</select>
+
 </mapper>

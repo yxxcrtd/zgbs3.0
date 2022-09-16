@@ -23,6 +23,8 @@ import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.riskinfrds.util.EntrustCompleteUtil;
 import com.joyintech.tams.invest.entrust.common.aop.EntrustRdsCommonAop;
 import com.joyintech.tams.invest.entrust.etrseclend.dto.EtrSecLendDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -55,6 +57,7 @@ import com.joyintech.tams.invest.entrust.etrseclend.service.EtrSecLendService;
 @PageId("EtrSecLend001")
 @RequestMapping("/invest/entrust/etrseclend/EtrSecLend001")
 public class EtrSecLend001Controller extends BaseController {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * 债券借贷投资委托service
@@ -142,7 +145,13 @@ public class EtrSecLend001Controller extends BaseController {
         List<String> entrustIdList = new ArrayList<>();
         if(dtolist != null && dtolist.size()>0){
             for(EtrSecLendDto entity : dtolist){
-                if(etrSecLendService.closeDelegate(entity.getEntrustId(), entity.getCloseWay())){
+                Boolean flag = false;
+                try{
+                    flag= etrSecLendService.closeDelegate(entity, entity.getCloseWay());
+                }catch (Exception e){
+                    logger.error("关闭委托报错",e);
+                }
+                if(flag){
                     ajaxResult.setMessage(this.getMessage("ETR_X_003"));
                     entrustIdList.add(entity.getEntrustId());
                 }else{

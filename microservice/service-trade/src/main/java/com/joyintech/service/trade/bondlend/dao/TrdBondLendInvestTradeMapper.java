@@ -15,12 +15,14 @@ import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.service.trade.bondlend.dto.FinCashPlanDto;
 import com.joyintech.service.trade.bondlend.dto.SecInfoModelDto;
 import com.joyintech.service.trade.bondlend.dto.TrdBondLendInvestTradeDto;
+import com.joyintech.tams.common.base.entity.FinDealPledge;
 import com.joyintech.tams.common.base.entity.PtlSecValution;
 import com.joyintech.tams.common.base.entity.PtlSecValutionKey;
 import com.joyintech.tams.common.base.entity.StlCapacctInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +48,10 @@ public interface TrdBondLendInvestTradeMapper {
     List<TrdBondLendInvestTradeDto> selectDeal(Map<String, Object> paraMap);
 
     List<SuggestDto> getSecManageAcctId(Map<String, Object> param);
-    
+
+    List<FinDealPledge> getFinishAmtPledgeList(Map<String, Object> param);
+
+    BigDecimal getAssetAvailablePosition (Map<String, Object> param);
     
     List<SuggestDto> getChannel(Map<String, Object> param);
 

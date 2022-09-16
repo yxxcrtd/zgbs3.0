@@ -33,13 +33,26 @@
                         </select>
                     </div>
                 </div>
-                <div class="layui-inline layui-col-md4 layui-col-sm4 layui-col-lg4 layui-col-xs4">
+                <!--<div class="layui-inline layui-col-md4 layui-col-sm4 layui-col-lg4 layui-col-xs4">
                     <label class="layui-form-label form-lable" >标的债券代码</label>
                     <div class="layui-input-inline input-inline">
                         <select id="finprodMarketId" name="finprodMarketId" formatoption='true' class="layui-input form-input input-select"
                                 data-th-data-url="@{/invest/period/trdbondduration/TrdBondDuration001/getFinprodMarketId}"
                                 th:initValue = '${finprodMarketId}' allowClear="true" placeholder="请输入内容" >
                         </select>
+                    </div>
+                </div>-->
+                <div class="layui-inline layui-col-md4 layui-col-xs4 layui-col-sm4 layui-col-lg4">
+                    <label class="layui-form-label form-lable"
+                           data-th-text="#{TrdBondLendInvestTrade001.finprodId}">标的债券代码</label>
+                    <div class="layui-input-inline input-inline">
+                        <input type="text" id="finprodId" name="finprodId"
+                               class="layui-input form-input input-lenovoselect" placeholder="请输入内容"
+                               data-th-placeholder="#{SysCommon.placeholder}"
+                               data-th-data-url="@{/business/common/CommonSelect/getAssetIdBond}"
+                               data-idfield="code" data-keyfield="hidCode"
+                               data-th-data-effectivefieldsalias='|{"code":"#{TrdBondLendInvestTrade001.finprodId}","shortName":"#{TrdBondLendInvestTrade001.finprodName}"}|'
+                               data-th-value="${entity?.finprodMarketId}">
                     </div>
                 </div>
             </div>

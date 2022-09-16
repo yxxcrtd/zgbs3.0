@@ -6,6 +6,7 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.autoperiod.common.service.InvestPeriodCommonService;
 import com.joyintech.service.period.trdseclendduration.dao.TrdSecLendDurationMapper;
 import com.joyintech.tams.common.base.dao.*;
@@ -104,6 +105,16 @@ public class TrdSecLendDurationService extends BaseService<TrdRepoDurationDto> {
         Page<TrdSecLendDurationDto> pageList = queryForPageForSelectReturn(page, length, () -> trdSecLendDurationMapper.findPage(param));
         return pageList;
     }
+
+    public Map<String,Object> getShowHandNum( Map<String, Object> param) {
+        param.put("hodingType", DictCodeListExt3.资产类型_债券借贷融入券可用持仓.getValue());
+        BigDecimal intposition = trdSecLendDurationMapper.getShowHandNum(param);
+        Map<String,Object> result = new HashMap<>();
+        result.put("INTEGRATE_POSITION",intposition);
+        return result;
+    }
+
+
 
     public List<TrdSecLendDurationDto> selectAllData(Map<String, Object> param) {
         setParams(param);

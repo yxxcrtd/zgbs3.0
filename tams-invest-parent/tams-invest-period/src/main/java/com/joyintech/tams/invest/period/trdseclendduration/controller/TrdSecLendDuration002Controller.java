@@ -1,5 +1,21 @@
 package com.joyintech.tams.invest.period.trdseclendduration.controller;
 
+import com.joyintech.framework.exception.MessageException;
+import com.joyintech.framework.util.*;
+import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.DictCodeListExt1;
+import com.joyintech.tams.invest.period.trdseclendduration.dto.TrdSecLendDuration002Dto;
+import com.joyintech.tams.invest.period.trdseclendduration.service.TrdSecLendDuration002Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
@@ -33,6 +49,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.Map;
 
 /**
  * @author : 裴家俊
@@ -126,6 +144,18 @@ public class TrdSecLendDuration002Controller extends BaseController {
         return trdSecLendDuration002Service.findRepoInfo();
     }
 
+
+    /**
+     * 检索债券质押信息
+     *
+     * @return 债券质押信息
+     */
+    @ResponseBody
+    @RequestMapping("getShowHandNum")
+    public Map<String,Object> getShowHandNum(@RequestBody Map<String, Object> map) {
+        return trdSecLendDuration002Service.getShowHandNum(map);
+    }
+
     /**
      * 画面点击保存按钮时check
      *
@@ -182,6 +212,13 @@ public class TrdSecLendDuration002Controller extends BaseController {
         trdSecLendDuration002Service.prepareEntity(dto);
         String msg = trdSecLendDuration002Service.start(processParameter, dto);
         return new AjaxResult(msg);
+//        try{
+//            String msg = trdSecLendDuration002Service.start(processParameter, dto);
+//            return new AjaxResult(msg);
+//        }catch (MessageException e){
+//            AjaxResult m =new AjaxResult(e.getMessage(),e.getMessageType());
+//            return m ;
+//        }
     }
 
 }

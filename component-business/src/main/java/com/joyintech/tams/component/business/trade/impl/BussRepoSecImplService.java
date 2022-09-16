@@ -167,7 +167,7 @@ public class BussRepoSecImplService implements BussRepoSecService {
                             PledgeBondInfoDto avaPledgeDto = list.getRoot().get(j) ;
                             if(StringUtil.isNotEmpty(avaPledgeDto.getAvaPledgePrin())){
                                 if(StringUtil.equals(avaPledgeDto.getBondCode(), pledgeDto.getBondCode())
-                                    &&avaPledgeDto.getAvaPledgePrin().compareTo(pledgeDto.getPledgePrin())==0){
+                                    &&avaPledgeDto.getAvaPledgePrin().compareTo(pledgeDto.getAvaPledgePrin().multiply(new BigDecimal(10000)))==0){
                                     list.getRoot().remove(avaPledgeDto) ;
                                 }
                             }
@@ -208,6 +208,7 @@ public class BussRepoSecImplService implements BussRepoSecService {
                 if (PAGE_FROM_EtrRepo002.equals(bussRepoSec.getPageFrom())
                 		||PAGE_FROM_EtrIbRepoinfo002.equals(bussRepoSec.getPageFrom())
                 		||PAGE_FROM_EtribRepoInfo003.equals(bussRepoSec.getPageFrom())
+//                        ||PAGE_FROM_EtrSecLend002.equals(bussRepoSec.getPageFrom())
                 		) {
                     EtrPledge etrPledge = new EtrPledge();
                     // 委托代码 = 委托代码
@@ -225,7 +226,8 @@ public class BussRepoSecImplService implements BussRepoSecService {
                     etrPledgeMapper.insertSelective(etrPledge);
                 }
                 // 回购投资交易新建
-                else if (PAGE_FROM_TrdRepoTrade002.equals(bussRepoSec.getPageFrom())||PAGE_FROM_TrdRepoTrade003.equals(bussRepoSec.getPageFrom())) {
+                else if (PAGE_FROM_TrdRepoTrade002.equals(bussRepoSec.getPageFrom())||PAGE_FROM_TrdRepoTrade003.equals(bussRepoSec.getPageFrom())
+                        ||PAGE_FROM_TrdBondLendTrade002.equals(bussRepoSec.getPageFrom())) {
                     FinDealPledge finDealPledge = new FinDealPledge();
                     // 金融产品代码 = 金融产品交易Entity.交易编号
                     finDealPledge.setFinprodId(bizCode);
