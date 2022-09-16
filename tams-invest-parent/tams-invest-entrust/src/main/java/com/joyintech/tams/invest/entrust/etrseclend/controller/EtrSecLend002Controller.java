@@ -21,7 +21,6 @@ import com.joyintech.framework.exception.RestTemplateException;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.entity.PtlPortfolio;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
