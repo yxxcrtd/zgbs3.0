@@ -40,6 +40,8 @@ import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -64,6 +66,8 @@ import static com.joyintech.tams.invest.trade.bond.service.TrdBondInvestTrade002
 @RequestMapping("/cfets/bond/IbuQuoteBond004")
 @Api(tags = "CFETS债券交易-登记")
 public class IbuQuoteBond004Controller extends BaseController {
+
+    private static final Logger logger = LoggerFactory.getLogger(IbuQuoteBond004Controller.class);
 
     /**
      * {@linkplain}
@@ -257,7 +261,7 @@ public class IbuQuoteBond004Controller extends BaseController {
         try{
             msg = cfetsBondDealQuotedPrice004Service.start(processParameter, cfetsBondDealRegisterQuoteDto);
         }catch (Exception e){
-            //e.printStackTrace();
+            logger.error(e.getMessage(), e);
             return PositionUtil.ajaxErrorReturn(e);
         }
         return new Message<AjaxResult>().success().setData(new AjaxResult(msg));

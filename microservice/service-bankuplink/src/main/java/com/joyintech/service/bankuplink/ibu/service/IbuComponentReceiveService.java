@@ -36,7 +36,6 @@ import com.joyintech.service.bankuplink.repo.dao.CfetsRepoDealQuotedPrice001Mapp
 import com.joyintech.service.bankuplink.repo.dto.CfetsRepoDealQuotedPrice001Dto;
 import com.joyintech.service.bankuplink.repo.dto.CfetsRepoDealQuotedPrice003Dto;
 import com.joyintech.service.bankuplink.repo.service.CfetsRepoDealQuotedPrice001Service;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.common.base.entity.PtlSecPositionFlow;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -48,6 +47,7 @@ import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.common.PtlAllocationDto;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -122,6 +122,12 @@ public class IbuComponentReceiveService extends BaseService{
      */
     @Autowired(required = false)
     private BasePtlSecPositionInfoService basePtlSecPositionInfoService;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     /**
      * 日志
@@ -868,13 +874,13 @@ public class IbuComponentReceiveService extends BaseService{
             });
             dto.setCfetsBondDealDialogueQuoteDtoList(cfetsBondDealRequestQuoteDtoList);
             if (StringUtil.equals(ibuQuoteBondDto.getTradeStatus(), BussinessDictCodeList.银行间上行报价状态_已撤回.getValue())) {
-                PositionHttpRequest.send(cfetsQuotedCommonService.prepareDialoguePosition(dto, DictCodeListExt3.流程节点_审批生效.getValue(),DictCodeListExt3.系统动作_撤回.getValue(),DictCodeListExt3.系统动作_撤回.getValue(),null));
+                positionRequestHandle.send(cfetsQuotedCommonService.prepareDialoguePosition(dto, DictCodeListExt3.流程节点_审批生效.getValue(),DictCodeListExt3.系统动作_撤回.getValue(),DictCodeListExt3.系统动作_撤回.getValue(),null));
                 return true;
             } else if (StringUtil.equals(ibuQuoteBondDto.getTradeStatus(),
                     BussinessDictCodeList.银行间上行报价状态_已终止.getValue())
                     || StringUtil.equals(ibuQuoteBondDto.getTradeStatus(),
                     BussinessDictCodeList.银行间上行报价状态_已过期.getValue())) {
-                PositionHttpRequest.send(cfetsQuotedCommonService.prepareDialoguePosition(dto, DictCodeListExt3.流程节点_审批生效.getValue(),DictCodeListExt3.系统动作_关闭.getValue(),DictCodeListExt3.系统动作_关闭.getValue(),null));
+                positionRequestHandle.send(cfetsQuotedCommonService.prepareDialoguePosition(dto, DictCodeListExt3.流程节点_审批生效.getValue(),DictCodeListExt3.系统动作_关闭.getValue(),DictCodeListExt3.系统动作_关闭.getValue(),null));
                 return true;
             }
         }
@@ -959,13 +965,13 @@ public class IbuComponentReceiveService extends BaseService{
             });
             dto.setCfetsBondDealRequestQuoteDtoList(cfetsBondDealRequestQuoteDtoList);
             if (StringUtil.equals(ibuQuoteBondDto.getTradeStatus(), BussinessDictCodeList.银行间上行报价状态_已撤回.getValue())) {
-                PositionHttpRequest.send(cfetsQuotedCommonService.prepareRequestPosition(dto, DictCodeListExt3.流程节点_审批生效.getValue(),DictCodeListExt3.系统动作_撤回.getValue(),DictCodeListExt3.系统动作_撤回.getValue(),null));
+                positionRequestHandle.send(cfetsQuotedCommonService.prepareRequestPosition(dto, DictCodeListExt3.流程节点_审批生效.getValue(),DictCodeListExt3.系统动作_撤回.getValue(),DictCodeListExt3.系统动作_撤回.getValue(),null));
                 return true;
             } else if (StringUtil.equals(ibuQuoteBondDto.getTradeStatus(),
                     BussinessDictCodeList.银行间上行报价状态_已终止.getValue())
                     || StringUtil.equals(ibuQuoteBondDto.getTradeStatus(),
                     BussinessDictCodeList.银行间上行报价状态_已过期.getValue())) {
-                PositionHttpRequest.send(cfetsQuotedCommonService.prepareRequestPosition(dto, DictCodeListExt3.流程节点_审批生效.getValue(),DictCodeListExt3.系统动作_撤回.getValue(),DictCodeListExt3.系统动作_撤回.getValue(),null));
+                positionRequestHandle.send(cfetsQuotedCommonService.prepareRequestPosition(dto, DictCodeListExt3.流程节点_审批生效.getValue(),DictCodeListExt3.系统动作_撤回.getValue(),DictCodeListExt3.系统动作_撤回.getValue(),null));
                 return true;
             }
         }

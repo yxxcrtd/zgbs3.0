@@ -250,7 +250,16 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 && BigDecimal.ZERO.compareTo(deal.getShareAmt()) == 0) {
                 return result;
             }
-            resultDto.setCdate(deal.getTradeDate());
+            // GLLCUAT-472:债券到期的持仓流水日期登交割日期 modify by fuyongsheng 20220914 start
+            // resultDto.setCdate(deal.getTradeDate());
+            if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(deal.getFinprodType2())
+                    && DictCodeList.交易方向_到期.getValue().equals(deal.getPs())){
+                resultDto.setCdate(deal.getSettleDate());
+            }
+            else{
+                resultDto.setCdate(deal.getTradeDate());
+            }
+            // GLLCUAT-472:债券到期的持仓流水日期登交割日期 modify by fuyongsheng 20220914 end
             resultDto.setAmount(ArithmeticUtil.multiply(deal.getShareAmt(), new BigDecimal(-1)));
 
             if (DictCodeList.交易方向_卖出.getValue().equals(deal.getPs())
@@ -1880,7 +1889,16 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
 
                     || (DictCodeListExt1.金融产品类型_投管用_项目类资产.getValue().equals(deal.getFinprodType2())
                         && 还本_到期_收息.contains(deal.getPs()))) {
-                    resultDto.setCdate(deal.getSettleDate());
+                    //GLLCUAT-472:债券到期现金流水登录日期使用划款指令的结算日期 modify by fuyongsheng 20220914 start
+                    // resultDto.setCdate(deal.getSettleDate());
+                    if(DictCodeList.交易方向_到期.getValue().equals(deal.getPs())
+                            && DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(deal.getFinprodType2())
+                            && !DictCodeListExt1.交易场所_银行间.getValue().equals(deal.getTradeMarket())){
+                        resultDto.setCdate(stlPayOrder.getSettleDate());
+                    }else{
+                        resultDto.setCdate(deal.getSettleDate());
+                    }
+                    //GLLCUAT-472:债券到期现金流水登录日期使用划款指令的结算日期 modify by fuyongsheng 20220914 end
                     resultDto.setAmount(stlPayOrder.getSettleAmt());
                     resultDto.setSplitType(DictCodeListExt3.拆分标识_已拆分.getValue());
                     result.add(resultDto);

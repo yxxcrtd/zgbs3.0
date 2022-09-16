@@ -8,13 +8,13 @@ import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.entrust.etrconbond.dao.EtrConBondMapper;
 import com.joyintech.service.entrust.etrconbond.dto.EtrConBondDto;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +43,12 @@ public class PositionRequestEtrConBondService {
     private EtrConBondMapper etrConBondMapper;
 
     /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
+
+    /**
      * EtrConBondDto请求对象使用
      *
      * @param entity
@@ -54,7 +60,7 @@ public class PositionRequestEtrConBondService {
 //        String interType = commonPositionEngineService.getPositionInterType("ETR", entity.getTradePlat(), finprodType, entity.getPs(), entity.getOptType(), entity.getClass().getName());
         this.bond003(entity, resultMap);
         log.info("sendEtrConBondDto() called with parameters => 【entity = {}】", JsonUtils.object2Json(entity));
-        PositionHttpRequest.send(resultMap);
+        positionRequestHandle.send(resultMap);
     }
 
     /**
@@ -64,7 +70,7 @@ public class PositionRequestEtrConBondService {
      */
     public void sendDelete(EtrConBondDto entity) {
         log.info("sendDelete() called with parameters => 【entity = {}】", JsonUtils.object2Json(entity));
-        PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(), "ETR", DictCodeListExt3.头寸业务类型_网下申购.getValue(), DictCodeList.交易方向_申购.getValue());
+        positionRequestHandle.doDeleteByWorkFlowId(entity.getWorkflowId(), "ETR", DictCodeListExt3.头寸业务类型_网下申购.getValue(), DictCodeList.交易方向_申购.getValue());
     }
 
     /**
@@ -74,7 +80,7 @@ public class PositionRequestEtrConBondService {
      */
     public void sendRevoke(EtrConBondDto entity) {
         log.info("sendRevoke() called with parameters => 【entity = {}】", JsonUtils.object2Json(entity));
-        PositionHttpRequest.dorevoke(entity.getEntrustId(), "TRD", DictCodeListExt3.头寸业务类型_网下申购.getValue(), DictCodeList.交易方向_申购.getValue());
+        positionRequestHandle.dorevoke(entity.getEntrustId(), "TRD", DictCodeListExt3.头寸业务类型_网下申购.getValue(), DictCodeList.交易方向_申购.getValue());
     }
 
     /**
@@ -94,7 +100,7 @@ public class PositionRequestEtrConBondService {
 //        resultMap.put("closeId", entrustId);
 //
 //        log.info("sendClose() called with parameters => 【entity = {}】", JsonUtils.object2Json(resultMap));
-//        PositionHttpRequest.batchClose(resultMap);
+//        positionRequestHandle.batchClose(resultMap);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("userId", SecurityUtil.getLoginUser().getUserName());
         resultMap.put("totalTradeId", IDGenerator.generate(32));
@@ -111,7 +117,7 @@ public class PositionRequestEtrConBondService {
 
         list.add(map);
         resultMap.put("data",list);
-        PositionHttpRequest.batchClose(resultMap);
+        positionRequestHandle.batchClose(resultMap);
     }
 
     /**

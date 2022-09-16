@@ -13,9 +13,11 @@ package com.joyintech.tams.business.common.service;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.constant.DictCodeList;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.service.SysDateRefreshPositionCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -33,6 +35,12 @@ public class SysDateRefreshPositionCacheImpl implements SysDateRefreshPositionCa
     public  static Logger logger = LoggerFactory.getLogger(SysDateRefreshPositionCacheImpl.class);
 
     public ExecutorService fixedThreadPool = Executors.newFixedThreadPool(1);
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
 
 //    @Pointcut("execution(* com.joyintech.system.sysdate.controller.SysDate001Controller.update(..))")
@@ -59,7 +67,7 @@ public class SysDateRefreshPositionCacheImpl implements SysDateRefreshPositionCa
 //                        logger.error("", e);
 //                    }
                     long start = System.currentTimeMillis();
-                    String res = PositionHttpRequest.updateBalance(o);
+                    String res = positionRequestHandle.updateBalance(o);
                     logger.info("缓存头寸缓存请求返回" + res);
                     logger.info("缓存头寸缓存请求结束" + (System.currentTimeMillis() - start));
                     logger.info("----------平台日切换更新头寸内存数据库请求结束----------");

@@ -74,7 +74,8 @@
             T6.COUNTER_ACCT_NO,
             T6.MY_ACCT_NO,
             SSAI.REGIST_ORG,
-            case when t9.ORDER_ID is null then '${DISPOSE_STATUS_02}'  else '${DISPOSE_STATUS_01}' end dealStatus
+            case when t9.ORDER_ID is null then '${DISPOSE_STATUS_02}'  else '${DISPOSE_STATUS_01}' end dealStatus,
+            t9.ORDER_ID
         FROM
         TRD_PRODUCT_DEAL T1
         LEFT JOIN TRD_PRODUCT_DEAL_ADD T2 ON T1.TRADE_ID = T2.TRADE_ID
@@ -108,10 +109,12 @@
         #{PINAN_BUSINESS_TYPE_52},
         #{PINAN_BUSINESS_TYPE_76},
         #{PINAN_BUSINESS_TYPE_77})
-            OR ( T3.PA_BUSS_TYPE IN ( #{PINAN_BUSINESS_TYPE_180}, #{PINAN_BUSINESS_TYPE_202}) and T1.TRADE_MARKET in (#{TRADE_PLACE_01},#{TRADE_PLACE_02}))
-        OR ( T3.PA_BUSS_TYPE IN ( #{PINAN_BUSINESS_TYPE_151}) and T1.TRADE_MARKET in (#{TRADE_PLACE_01},#{TRADE_PLACE_02}) and bo.PAY_TYPE = #{PAY_TYPE_01})
-            OR (T3.PA_BUSS_TYPE IN (#{PINAN_BUSINESS_TYPE_11}) AND T1.PS = #{T03})
-            OR (T1.FINPROD_TYPE2 IN (#{F29}, #{F30})) OR (T1.FINPROD_TYPE2 IN (#{F02}, #{F03}))
+        OR ( T3.PA_BUSS_TYPE IN ( #{PINAN_BUSINESS_TYPE_180}, #{PINAN_BUSINESS_TYPE_202}) and T1.TRADE_MARKET in
+        (#{TRADE_PLACE_01},#{TRADE_PLACE_02}))
+        OR ( T3.PA_BUSS_TYPE IN ( #{PINAN_BUSINESS_TYPE_151}) and T1.TRADE_MARKET in
+        (#{TRADE_PLACE_01},#{TRADE_PLACE_02}) and bo.PAY_TYPE = #{PAY_TYPE_01})
+        OR (T3.PA_BUSS_TYPE IN (#{PINAN_BUSINESS_TYPE_11}) AND T1.PS = #{T03})
+        OR (T1.FINPROD_TYPE2 IN (#{F29}, #{F30})) OR (T1.FINPROD_TYPE2 IN (#{F02}, #{F03}))
         )
         /*查询债券、回购交易场所为银行间，证券账户来源是理财、是否发送指令是否*/
         AND SSAI.SEC_ACCT_SOURCE = #{ACCOUNT_SOURCE_01}
@@ -179,7 +182,8 @@
         T6.COUNTER_ACCT_NO,
         T6.MY_ACCT_NO,
         SSAI.REGIST_ORG,
-        case when t9.ORDER_ID is null then '${DISPOSE_STATUS_02}' else '${DISPOSE_STATUS_01}' end dealStatus
+        case when t9.ORDER_ID is null then '${DISPOSE_STATUS_02}' else '${DISPOSE_STATUS_01}' end dealStatus,
+        t9.ORDER_ID
         FROM
         TRD_FIN_PRODUCT_DEAL_TOTAL T1
         LEFT JOIN PA_TRD_FIN_PRODUCT_DEAL_TOTAL T3 ON T1.TOTLE_TRADE_ID = T3.TOTLE_TRADE_ID
@@ -203,7 +207,7 @@
         AND SSAI.TRADE_PLACE = #{TRADE_PLACE_01}
         AND T1.IS_OUT_TRADE != 'N'
 		/*BS-252  去除下面条件限制    债券交易STL_PAY_ORDERS.TRADE_ID存的是TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID  modifly by caojin  2020/6/23  start*/
-        AND (T3.PA_BUSS_TYPE    IN ( '76', '77', '52', '51','09','10','11','19','20','74','75')
+        AND (T3.PA_BUSS_TYPE    IN ( '76', '77', '52', '51','11','19','20','74','75')
         OR (T1.FINPROD_TYPE2    IN ('F29', 'F30')) )
         /*BS-252  去除下面条件限制    债券交易STL_PAY_ORDERS.TRADE_ID存的是TRD_FIN_PRODUCT_DEAL_TOTAL.TOTLE_TRADE_ID  modifly by caojin  2020/6/23  end*/
         <if test="portfolioId != null and !portfolioId.isEmpty()">
@@ -287,7 +291,8 @@
             '02'
             else
             '01'
-            end dealStatus
+            end dealStatus,
+            SDTM.ORDER_ID
         FROM TRD_PRODUCT_DEAL T1
         LEFT JOIN STL_DVP_TRADE_MATCH SDTM ON T1.TRADE_ID = SDTM.TRADE_ID
         LEFT JOIN STL_DVP_ORDERS T2 ON T2.ORDER_ID = SDTM.ORDER_ID
@@ -303,7 +308,8 @@
                           STL_DVP_ORDERS.ORDER_STATUS != '02'))
         WHERE T1.IS_CANCEL = 'N'
         and t1.TRADE_STATUS = '01'
-        AND T3.PA_BUSS_TYPE IN (#{PINAN_BUSINESS_TYPE_88}, #{PINAN_BUSINESS_TYPE_89},#{PINAN_BUSINESS_TYPE_90},#{PINAN_BUSINESS_TYPE_91},#{PINAN_BUSINESS_TYPE_92},#{PINAN_BUSINESS_TYPE_93})
+        AND T3.PA_BUSS_TYPE IN (#{PINAN_BUSINESS_TYPE_88},
+        #{PINAN_BUSINESS_TYPE_89},#{PINAN_BUSINESS_TYPE_90},#{PINAN_BUSINESS_TYPE_91},#{PINAN_BUSINESS_TYPE_92},#{PINAN_BUSINESS_TYPE_93})
         <if test="portfolioId != null and !portfolioId.isEmpty()">
             AND T2.PORTFOLIO_ID IN
             <foreach collection="portfolioId" open="(" close=")" separator="," item="item">#{item}</foreach>
@@ -328,7 +334,8 @@
                and 1=2
             </if>
             <if test="paBusinessType1 != null and !paBusinessType1.isEmpty()">
-                AND nvl(T3.PA_BUSS_TYPE,T1.TG_BUSI_TYPE) IN (#{PINAN_BUSINESS_TYPE_88}, #{PINAN_BUSINESS_TYPE_89},#{PINAN_BUSINESS_TYPE_90},#{PINAN_BUSINESS_TYPE_91},#{PINAN_BUSINESS_TYPE_92},#{PINAN_BUSINESS_TYPE_93})
+                AND nvl(T3.PA_BUSS_TYPE,T1.TG_BUSI_TYPE) IN (#{PINAN_BUSINESS_TYPE_88},
+                #{PINAN_BUSINESS_TYPE_89},#{PINAN_BUSINESS_TYPE_90},#{PINAN_BUSINESS_TYPE_91},#{PINAN_BUSINESS_TYPE_92},#{PINAN_BUSINESS_TYPE_93})
             </if>
         </if>
         <if test="dealStatus != null and !dealStatus.isEmpty() and dealStatus == DISPOSE_STATUS_01">

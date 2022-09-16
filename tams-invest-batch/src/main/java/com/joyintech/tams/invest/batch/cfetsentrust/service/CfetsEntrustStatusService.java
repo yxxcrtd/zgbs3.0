@@ -16,7 +16,6 @@ import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
@@ -24,6 +23,7 @@ import com.joyintech.tams.invest.batch.cfetsentrust.dao.CfetsEntrustStatusMapper
 import com.joyintech.tams.invest.batch.cfetsentrust.dto.CfetsEntrustClosePosEtrReqDto;
 import com.joyintech.tams.invest.batch.cfetsentrust.dto.CfetsEntrustClosePositionReqDto;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +34,7 @@ import java.util.*;
  * 〈功能详细描述〉
  * @author zhangnian
  * @version 1.0 2019年2月15日
- * @see EntrustStatusService
+ * @see CfetsEntrustStatusService
  * @since 1.0
  */
 @Service
@@ -44,6 +44,12 @@ public class CfetsEntrustStatusService {
     private CfetsEntrustStatusMapper entrustStatusMapper;
     @Autowired
     private JoyinbusinessCommonService joyinbusinessCommonService;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
 
    /* @Autowired
@@ -97,7 +103,7 @@ public class CfetsEntrustStatusService {
         req.setUserId("SYSTEM");
         req.setTotalTradeId(IDGenerator.generate());
         req.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
-        PositionHttpRequest.batchClose(req);
+        positionRequestHandle.batchClose(req);
     }
     private void closeDelegatOprHisMethod(List<CfetsEntrustClosePosEtrReqDto> entrustIdList){
         if(entrustIdList != null && entrustIdList.size()>0) {

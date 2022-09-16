@@ -255,25 +255,25 @@
 		//判断起息日是否为节假日
 		if($('#FinNetValueProductBuild002_vdate').val() && vmflag == 1){
 			//交易日和首次计费基数联动 yzg 20191020 start 
-			if(pageModel == PAGE_MODEL_NEW || pageModel == PAGE_MODEL_EDIT){
-				var vdate = $('#FinNetValueProductBuild002_vdate').val();
-				var bussFinProductFeeInfoRows = BussFinProductFeeInfo.getAllRows();
-				var bussFinProductFeeInfoTable = BussFinProductFeeInfo.bussFinProductFeeInfoTable;
-		        if(bussFinProductFeeInfoRows&&bussFinProductFeeInfoRows.length>0){
-		     	   for(var i=0;i<bussFinProductFeeInfoRows.length;i++){
-		     		   var rowData = bussFinProductFeeInfoRows[i];
-		     		   var data ={};
-		     		   var provisionFirstDay = Date.ofDate(rowData.provisionFirstDay).format('yyyy-MM-dd');
-		     		   if((rowData.netAssetValueDay === BASE_DATE_TYPE_02 || rowData.netAssetValueDay === BASE_DATE_TYPE_03) && provisionFirstDay === vdate && rowData.basicBill === BILL_BASE_FEE_KIND_03){
-		     			  data.firstBaseType = BASIC_BILL_04;
-		     			  bussFinProductFeeInfoTable.renderRow(rowData.LAY_TABLE_INDEX, data);
-		     		   }else{
-		     			  data.firstBaseType = '';
-		     			  bussFinProductFeeInfoTable.renderRow(rowData.LAY_TABLE_INDEX, data);
-		     		   }
-		     	   }
-		        }
-			}
+			// if(pageModel == PAGE_MODEL_NEW || pageModel == PAGE_MODEL_EDIT){
+			// 	var vdate = $('#FinNetValueProductBuild002_vdate').val();
+			// 	var bussFinProductFeeInfoRows = BussFinProductFeeInfo.getAllRows();
+			// 	var bussFinProductFeeInfoTable = BussFinProductFeeInfo.bussFinProductFeeInfoTable;
+		    //     if(bussFinProductFeeInfoRows&&bussFinProductFeeInfoRows.length>0){
+		    //  	   for(var i=0;i<bussFinProductFeeInfoRows.length;i++){
+		    //  		   var rowData = bussFinProductFeeInfoRows[i];
+		    //  		   var data ={};
+		    //  		   var provisionFirstDay = Date.ofDate(rowData.provisionFirstDay).format('yyyy-MM-dd');
+		    //  		   if((rowData.netAssetValueDay === BASE_DATE_TYPE_02 || rowData.netAssetValueDay === BASE_DATE_TYPE_03) && provisionFirstDay === vdate && rowData.basicBill === BILL_BASE_FEE_KIND_03){
+		    //  			  data.firstBaseType = BASIC_BILL_04;
+		    //  			  bussFinProductFeeInfoTable.renderRow(rowData.LAY_TABLE_INDEX, data);
+		    //  		   }else{
+		    //  			  data.firstBaseType = '';
+		    //  			  bussFinProductFeeInfoTable.renderRow(rowData.LAY_TABLE_INDEX, data);
+		    //  		   }
+		    //  	   }
+		    //     }
+			// }
 			//交易日和首次计费基数联动 yzg 20191020 end
 	        
 			if($('#FinNetValueProductBuild002_calendarId').val()){
@@ -836,6 +836,15 @@
 			//add by yejiejie 2019-3-1 start
 			dateChange();
 			//add by yejiejie 2019-3-1 end
+			if ($("#FinNetValueProductBuild002_operationType").val() === ISSUE_MODE_01) {
+				var mdate = $("#FinNetValueProductBuild002_mdate").val();
+				var feeID = $("#bussFinProductFloatFeeDto_feeId").val();
+				if (mdate != null && mdate != '' && feeID != '' && feeID != null) {
+					var mdateLow = Date.ofDate(mdate).DateAdd('d', -1).format('yyyy-MM-dd');
+					$("#bussFinProductFloatFeeDto_provisionFirstDay").val(mdateLow);
+					$("#bussFinProductFloatFeeDto_eAccrDate").val(mdateLow).prop('disabled', true);
+				}
+			}
 		});
 		$('#FinNetValueProductBuild002_dealMode').change(function(){
 		    PROD_STYLE = '';

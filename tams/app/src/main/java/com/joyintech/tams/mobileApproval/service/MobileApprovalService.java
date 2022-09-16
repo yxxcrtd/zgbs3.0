@@ -975,7 +975,7 @@ public class MobileApprovalService extends CommonExportService<PreInvestApproveI
     private ResultDto doBack(WorkFlowInfoDto workFlowInfoDto, String comment,String operatorUserId) throws Exception {
         ResultDto resultDto = new ResultDto();
         if (!workFlowInfoDto.getProcessInstanceId().isEmpty()) {
-            WorkflowContext.getProcessService().rollbackProcess(workFlowInfoDto.getProcessInstanceId(), operatorUserId, comment, "", "");
+            WorkflowContext.getProcessService().rollbackProcess(workFlowInfoDto.getProcessInstanceId(), operatorUserId, comment, "", "","");
             resultDto.setMsg("流程已回退");
             resultDto.setStatus("success");
             resultDto.setCode("000");

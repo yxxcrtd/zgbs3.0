@@ -873,13 +873,7 @@ public class UfxMsgParseHelper {
         return list;
 
     }
-    // yanjianhui 修改于 2022/8/10 15:42 获取原合同序号。
-    public static String getJoinReportId( List<Map<String, Object>> resList) {
-        for (Map<String, Object> ds : resList) {
-            return (String)ds.get("join_report_id");
-        }
-        return null;
-    }
+
 
 
     public static List<NegotiateQuoteReceiveBean> parseNegotiateQuoteReceiveBean(String accountId, String side, List<Map<String, Object>> resList) {

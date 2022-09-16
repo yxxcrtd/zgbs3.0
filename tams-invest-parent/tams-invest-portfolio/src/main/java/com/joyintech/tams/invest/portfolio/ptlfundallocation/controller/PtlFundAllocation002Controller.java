@@ -246,20 +246,22 @@ public class PtlFundAllocation002Controller extends BaseController {
             }
             str += getMessage("PTL_FUND_ALLOCATION_0001",getMessage("PtlFundAllocation001.settleAmts"));
         }
-        // add by xingxiaokang 2019-03-09 划拨金额不能大于付款账户余额 start  
-        if (StringUtil.isNotEmpty(dto.getSettleAmt()) && StringUtil.isNotEmpty(dto.getMyAcctAmount()) && dto.getSettleAmt().compareTo(dto.getMyAcctAmount())==1) {
-            if (StringUtil.isNotBlank(str)) {
-                str += changeLineMark;
-            }
-            str += getMessage("BUSS_COM_E_0003", getMessage("PtlFundAllocation001.settleAmts"),
-                getMessage("PtlDvpFundAllocation001.myAcctAmount"));
-        }
-        // add by xingxiaokang 2019-03-09 划拨金额不能大于付款账户余额 end
         if (StringUtil.isNotEmpty(str)) {
             AjaxResult res = new AjaxResult();
             res.setMessage(str, MessageType.错误消息);
             return res;
         }
+        // add by xingxiaokang 2019-03-09 划拨金额不能大于付款账户余额 start
+        if (StringUtil.isNotEmpty(dto.getSettleAmt())
+                && StringUtil.isNotEmpty(dto.getMyAcctAmount())
+                && dto.getSettleAmt().compareTo(dto.getMyAcctAmount()) > 0) {
+            String message = getMessage("BUSS_COM_E_0003", getMessage("PtlFundAllocation001.settleAmts"),
+                    getMessage("PtlDvpFundAllocation001.myAcctAmount"));
+            AjaxResult res = new AjaxResult();
+            res.setMessage(message + "是否确认？", MessageType.确认消息);
+            return res;
+        }
+        // add by xingxiaokang 2019-03-09 划拨金额不能大于付款账户余额 end
         return commonCheck(result, dto.getOperateType());
     }
 

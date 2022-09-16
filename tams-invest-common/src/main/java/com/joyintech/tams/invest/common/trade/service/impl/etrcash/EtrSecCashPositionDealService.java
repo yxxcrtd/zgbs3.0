@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService.getSeqNo;
+import static com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService.logger;
 
 /**
  * @program: 2.1.0
@@ -57,6 +58,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
      */
     public static void deal债券CashPosition(BaseTradeProductDealDto finProductTradeDto, DictCodeList 持仓类型,
                                           EtrPositionHoldDto etrPositionHoldDto) {
+        logger.info("EtrSecCashPositionDealService.deal债券CashPosition -> param:{}", JsonUtils.object2Json(finProductTradeDto));
         // 交易场所
         String tradePlace = finProductTradeDto.getTrdProductDeal().getTradeMarket();
         TrdProductDeal deal = finProductTradeDto.getTrdProductDeal();
@@ -74,9 +76,13 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         String secManageAcctId = finProductTradeDto.getTrdProductDeal().getSecManageAcctId();
         // 交易日期
         Date tradeDate = finProductTradeDto.getTrdProductDeal().getTradeDate();
+        // 交收日期
+        Date settleDate = finProductTradeDto.getTrdProductDeal().getSettleDate();
         // 交易生成的持仓流水
         EtrSecPositionFlowDto etrSecPositionFlowDto = EtrCommonCashPositionDealService.getEtrSecPositionFlowDto(
             finProductTradeDto);
+        // 债券持仓生成在交收日
+        etrSecPositionFlowDto.setCdate(settleDate);
         // 交易生成的现金流水
         EtrCashPositionFlowDto etrCashPositionFlowDto = EtrCommonCashPositionDealService.getEtrCashPositionFlowDto(
             finProductTradeDto);
@@ -140,6 +146,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                 }
             }
             else {
+                // 通道
                 if (StringUtil.equals(chlType, DictCodeListExt2.划款方式_逐笔划款.getValue())) {
                     // 逐笔划款通道
                     etrCashPositionFlowDto.setChlFinprodId(null);

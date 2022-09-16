@@ -724,7 +724,7 @@ from
             LEFT JOIN (
                 <!--账户现金-->
                 SELECT d.PORTFOLIO_ID, sum(d.AMOUNT) AMOUNT
-                FROM ETR_CASH_POSITION_RULE d
+                FROM PTL_CASH_POSITION_RULE d
                 where d.cdate = to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') AND d.HODING_TYPE =#{C_01} and DATE_TYPE ='0' 
                 <if test="acctId != null and acctId !=''">
                     and d.ACCT_ID = #{acctId,jdbcType=VARCHAR}

@@ -17,14 +17,7 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.security.User;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.IDGenerator;
-import com.joyintech.framework.util.JsonUtils;
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.service.entrust.etrinvestbondinfo.service.EtrInvestBondInfoService;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
@@ -33,66 +26,25 @@ import com.joyintech.tams.business.common.dto.PositionRulePtlData;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrIbBondinfoMapper;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsBussCombDistribtBaseDto;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsBussCombDistribtDto;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrCalcAmountRequest;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrCalcAmountResponse;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrFinProductDto;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbBondPosiInfoRequestDto;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbBondPosiPage001RequestDto;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbBondPosinfo001Dto;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbBondinfo001Dto;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbBondinfo002Dto;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbBondinfoDto;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbClosePosEtrRequest;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbClosePositionRequest;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbdoRiskcalDto;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbdoRiskcalRequest;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbfindEtrinfoRequest;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbfindEtrinfoResponse;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrInvestBondInfoReqDto;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrTrdProductDealDto;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribSaveRequest;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
-import com.joyintech.tams.cfets.etr.bond.dto.CfetsUnitCostDto;
+import com.joyintech.tams.cfets.etr.bond.dto.*;
 import com.joyintech.tams.cfets.etr.socket.BondSocketClient;
 import com.joyintech.tams.cfets.position.dto.PositionCashSecDto;
 import com.joyintech.tams.cfets.position.service.PositionInfoService;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
-import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
-import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
-import com.joyintech.tams.common.base.dao.SppiImportDataMapper;
-import com.joyintech.tams.common.base.dao.WflEtrEntrustAddMapper;
-import com.joyintech.tams.common.base.dao.WflEtrEntrustMapper;
-import com.joyintech.tams.common.base.entity.EtrDistribute;
-import com.joyintech.tams.common.base.entity.EtrEntrust;
-import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
-import com.joyintech.tams.common.base.entity.FinExercisePlan;
-import com.joyintech.tams.common.base.entity.FinProduct;
-import com.joyintech.tams.common.base.entity.PtlPortfolio;
-import com.joyintech.tams.common.base.entity.SppiImportData;
-import com.joyintech.tams.common.base.entity.WflEtrEntrust;
-import com.joyintech.tams.common.base.entity.WflEtrEntrustAdd;
-import com.joyintech.tams.common.base.entity.WflEtrEntrustKey;
+import com.joyintech.tams.common.base.dao.*;
+import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.basicdata.dto.BusiFinProductRatingDto;
 import com.joyintech.tams.component.business.basicdata.service.BusiProductRatingService;
-import com.joyintech.tams.constant.DictCode;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.component.base.entrust.impl.BaseEtrInvestInfoServiceImpl;
 import com.joyintech.tams.invest.common.component.base.group.BasePtlCashPositionInfoService;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto;
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
-import com.joyintech.tams.invest.common.dto.common.PtlAllocationDto;
 import com.joyintech.tams.invest.common.entrust.dto.EntrustCommonDto;
 import com.joyintech.tams.invest.common.riskinfrds.util.EntrustCompleteUtil;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
@@ -100,6 +52,7 @@ import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommSer
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.invest.entrust.common.service.EtrCommonService;
 import com.joyintech.tams.invest.entrust.etrinvestbondinfo.dto.EtrInvestBondInfoDto;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -193,13 +146,19 @@ public class CfetsEtrIbBondinfoService extends BaseService{
 
     @Autowired
     private SppiImportDataMapper sppiImportDataMapper;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
     /**
      * 持仓信息查询
      *
      * @param page int
      * @param length int
      * @param pageParam int
-     * @return
+     * @return result
      * @see
      * @since 1.0
      */
@@ -391,16 +350,17 @@ public class CfetsEtrIbBondinfoService extends BaseService{
      * @see
      * @since 1.0
      */
+    @Deprecated
     public Page<CfetsEtrIbBondPosinfo001Dto> findPositionsPageNew(int page, int length,
                                                                Map<String, Object> pageParam) {
         Page<CfetsEtrIbBondPosinfo001Dto> result = new Page<CfetsEtrIbBondPosinfo001Dto>();
         List<CfetsEtrIbBondPosinfo001Dto> resultList = new ArrayList<CfetsEtrIbBondPosinfo001Dto>();
         pageParam.put("sysDate", iPlatformDate.getSysDateStr());
         //调用头寸，查询当前日期的所有持仓数据
-        Map<String, Object> map=new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         //map.put("cdate",pageParam.get("sysDate"));
         map.put("cdate","2021-09-06");
-        String m=PositionHttpRequest.query(map);
+        String m = /*positionRequestHandle.query(map)*/null;
         List<Map> list = JsonUtils.json2Object(m, List.class);
         List<String> portfolioIdList=new ArrayList<>();//组合List
         List<String> finprodIdList=new ArrayList<>();//资产List
@@ -2399,7 +2359,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         }
         return false;
     }
-    public void closeDelegatePositionMethod(List<CfetsEtribBondInfo003Dto> dtolist,String assetType){
+    public Map<String, Object> closeDelegatePositionMethod(List<CfetsEtribBondInfo003Dto> dtolist,String assetType){
         CfetsEtrIbClosePositionRequest req=new CfetsEtrIbClosePositionRequest();
         List<CfetsEtrIbClosePosEtrRequest> etrList=new ArrayList<>();
         for(CfetsEtribBondInfo003Dto t: dtolist){
@@ -2431,7 +2391,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         req.setUserId(SecurityUtil.getLoginUser().getUserName());
         req.setTotalTradeId(IDGenerator.generate());
         req.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
-        PositionHttpRequest.batchClose(req);
+        return positionRequestHandle.batchClose(req);
     }
     public void closeDelegatOprHisMethod(CfetsEtribBondInfo003Dto dto){
         List<CfetsEtribBondInfo003Dto> dtolist = dto.getSelectedItem();
@@ -2603,12 +2563,12 @@ public class CfetsEtrIbBondinfoService extends BaseService{
     }
 
     @Transactional
-    public Message<AjaxResult> closeDelegate( CfetsEtribBondInfo003Dto dto) throws Exception {
+    public Message<AjaxResult> closeDelegate( CfetsEtribBondInfo003Dto dto) {
 
         List<CfetsEtribBondInfo003Dto> dtolist = dto.getSelectedItem();
 
-        if(dtolist != null && dtolist.size()>0){
-            for(CfetsEtribBondInfo003Dto entity : dtolist){
+        if (dtolist != null && dtolist.size() > 0) {
+            for (CfetsEtribBondInfo003Dto entity : dtolist) {
                 closeDelegateMethod(entity.getEntrustId());
             }
             // add by zhangrui1 批量委托关闭 start
@@ -2616,18 +2576,17 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             List<String> entrustIdList = dtolist.stream().map(
                     CfetsEtribBondInfo003Dto::getEntrustId).collect(Collectors.toList());
             // ZGZGST-2330:委托关闭判断是否有完成额度，分情况处理 fuyongsheng 20210919 edit start
-            if(CollectionUtils.isNotEmpty(entrustIdList)){
+            if (CollectionUtils.isNotEmpty(entrustIdList)) {
                 Map<String, BigDecimal> etrFinishMap = EntrustCompleteUtil.getEtrFinishAmtList(entrustIdList);
                 //委托没有做过交易的，和撤销相同逻辑，删除预占
                 List<CfetsEtribBondInfo003Dto> recallEntrustIdList = new ArrayList<>();
                 //委托已有完成额度，做过交易，走关闭完成的逻辑，更新预占
                 List<String> closeEntrustIdList = new ArrayList<>();
-                for(CfetsEtribBondInfo003Dto etrDto : dtolist) {
-                    if(StringUtil.isNotEmpty(etrFinishMap) && StringUtil.isNotEmpty(etrFinishMap.get(etrDto.getEntrustId()))
-                            && BigDecimal.ZERO.compareTo(etrFinishMap.get(etrDto.getEntrustId()))<0) {
+                for (CfetsEtribBondInfo003Dto etrDto : dtolist) {
+                    if (StringUtil.isNotEmpty(etrFinishMap) && StringUtil.isNotEmpty(etrFinishMap.get(etrDto.getEntrustId()))
+                            && BigDecimal.ZERO.compareTo(etrFinishMap.get(etrDto.getEntrustId())) < 0) {
                         closeEntrustIdList.add(etrDto.getEntrustId());
-                    }
-                    else if(entrustIdList.contains(etrDto.getEntrustId())){
+                    } else if (entrustIdList.contains(etrDto.getEntrustId())) {
                         recallEntrustIdList.add(etrDto);
                     }
                 }

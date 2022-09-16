@@ -217,9 +217,17 @@ $(function() {
             var finprodId = $('#finprodId').val();
             var tradeAmt = $('#tradeAmt').val();
             if(netDate && finprodId){
-                var data = {finprodId:finprodId,netDate:netDate}
-                Joyin.ajaxSync(basePath + 'invest/trade/plannet/TrdPlanNetInvestTrade003/getPrice', data , function(result) {
-                    $('#unitCprice').val(result).trigger('blur').change();
+                var data = {finprodId:finprodId,cdate:netDate}
+                $('#unitCprice').val('').trigger('blur').change();
+                Joyin.ajaxSync(basePath + 'invest/trade/plannet/TrdPlanNetInvestTrade003/getLastPriceAndLastDate', data , function(result) {
+                    if (result === '') {
+                        console.log("当前资产查询单位净值为空！");
+                        return;
+                    }
+                    $('#unitCprice').val(result.id).trigger('blur').change();
+                    if (netDate !== result.text) {
+                        $('#netDate').val(result.text).trigger('blur').change();
+                    }
                 });
             }
         });

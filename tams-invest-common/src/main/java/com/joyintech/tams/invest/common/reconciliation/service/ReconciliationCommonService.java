@@ -150,13 +150,13 @@ public class ReconciliationCommonService {
             BigDecimal otherFee = ArithmeticUtil.doAdd(dto.getJsfAmt2(),dto.getZgfAmt2(),dto.getSettleFee2());
             if (ArithmeticUtil.subtract(dto.getTradeAmt(), dto.getTradeAmt2()).abs().compareTo(wuChaZhi) <= 0
                     && ArithmeticUtil.subtract(dto.getTradeNum(), dto.getTradeNum2()).abs().compareTo(wuChaZhi) <= 0
-                    && ArithmeticUtil.subtract(dto.getStampFee(), dto.getStampFee2()).abs().compareTo(wuChaZhi) <= 0
+//                    && ArithmeticUtil.subtract(dto.getStampFee(), dto.getStampFee2()).abs().compareTo(wuChaZhi) <= 0
 //                        && ArithmeticUtil.subtract(dto.getOtherFeeamt(), otherFee).abs().compareTo(wuChaZhi) <= 0
-                    && ArithmeticUtil.subtract(dto.getGhfAmt(), dto.getGhfAmt2()).abs().compareTo(wuChaZhi) <= 0
+//                    && ArithmeticUtil.subtract(dto.getGhfAmt(), dto.getGhfAmt2()).abs().compareTo(wuChaZhi) <= 0
 //                    && ArithmeticUtil.subtract(dto.getSxfAmt(), dto.getSxfAmt2()).abs().compareTo(wuChaZhi) <= 0
-                    && ArithmeticUtil.subtract(dto.getJsfAmt(), dto.getJsfAmt2()).abs().compareTo(wuChaZhi) <= 0
-                    && ArithmeticUtil.subtract(dto.getZgfAmt(), dto.getZgfAmt2()).abs().compareTo(wuChaZhi) <= 0
-                    && ArithmeticUtil.subtract(dto.getSettleFee(), dto.getSettleFee2()).abs().compareTo(wuChaZhi) <= 0
+//                    && ArithmeticUtil.subtract(dto.getJsfAmt(), dto.getJsfAmt2()).abs().compareTo(wuChaZhi) <= 0
+//                    && ArithmeticUtil.subtract(dto.getZgfAmt(), dto.getZgfAmt2()).abs().compareTo(wuChaZhi) <= 0
+//                    && ArithmeticUtil.subtract(dto.getSettleFee(), dto.getSettleFee2()).abs().compareTo(wuChaZhi) <= 0
                     && ArithmeticUtil.subtract(dto.getCommissionAmt(), dto.getCommissionAmt2()).abs().compareTo(wuChaZhi) <= 0
 //                    && dto.getFinprodType() != null && dto.getFinprodType().equals(dto.getFinprodType2())
 //                    && dto.getPs() != null && dto.getPs().equals(dto.getPs2())
@@ -182,29 +182,29 @@ public class ReconciliationCommonService {
                     checkInfo = checkInfo + "佣金结算数据【" + commissionAmt2 + "】对账单【" + commissionAmt + "】\n";
                 }
                 //待对账数据.证管费 ！= 待对账数据.清算证管费
-                if (ArithmeticUtil.subtract(dto.getZgfAmt(), dto.getZgfAmt2()).compareTo(BigDecimal.ZERO) != 0) {
-                    String zgfAmt2 = dto.getZgfAmt2() == null ? "空" : dto.getZgfAmt2().toString();
-                    String zgfAmt = dto.getZgfAmt() == null ? "空" : dto.getZgfAmt().toString();
-                    checkInfo = checkInfo + "证管费结算数据【" + zgfAmt2 + "】对账单【" + zgfAmt + "】\n";
-                }
+//                if (ArithmeticUtil.subtract(dto.getZgfAmt(), dto.getZgfAmt2()).compareTo(BigDecimal.ZERO) != 0) {
+//                    String zgfAmt2 = dto.getZgfAmt2() == null ? "空" : dto.getZgfAmt2().toString();
+//                    String zgfAmt = dto.getZgfAmt() == null ? "空" : dto.getZgfAmt().toString();
+//                    checkInfo = checkInfo + "证管费结算数据【" + zgfAmt2 + "】对账单【" + zgfAmt + "】\n";
+//                }
                 // 待对账数据.印花税 ！= 待对账数据.清算印花税
-                if (ArithmeticUtil.subtract(dto.getStampFee(), dto.getStampFee2()).compareTo(BigDecimal.ZERO) != 0) {
-                    String stampFee2 = dto.getStampFee2() == null ? "空" : dto.getStampFee2().toString();
-                    String stampFee = dto.getStampFee() == null ? "空" : dto.getStampFee().toString();
-                    checkInfo = checkInfo + "印花税结算数据【" + stampFee2 + "】对账单【" + stampFee + "】\n";
-                }
+//                if (ArithmeticUtil.subtract(dto.getStampFee(), dto.getStampFee2()).compareTo(BigDecimal.ZERO) != 0) {
+//                    String stampFee2 = dto.getStampFee2() == null ? "空" : dto.getStampFee2().toString();
+//                    String stampFee = dto.getStampFee() == null ? "空" : dto.getStampFee().toString();
+//                    checkInfo = checkInfo + "印花税结算数据【" + stampFee2 + "】对账单【" + stampFee + "】\n";
+//                }
                 //待对账数据.结算费 ！= 待对账数据.清算结算费
-                if (ArithmeticUtil.subtract(dto.getSettleFee(), dto.getSettleFee2()).compareTo(BigDecimal.ZERO) != 0) {
-                    String settleFee2 = dto.getSettleFee2() == null ? "空" : dto.getSettleFee2().toString();
-                    String settleFee = dto.getSettleFee() == null ? "空" : dto.getSettleFee().toString();
-                    checkInfo = checkInfo + "结算费结算数据【" + settleFee2 + "】对账单【" + settleFee + "】\n";
-                }
+//                if (ArithmeticUtil.subtract(dto.getSettleFee(), dto.getSettleFee2()).compareTo(BigDecimal.ZERO) != 0) {
+//                    String settleFee2 = dto.getSettleFee2() == null ? "空" : dto.getSettleFee2().toString();
+//                    String settleFee = dto.getSettleFee() == null ? "空" : dto.getSettleFee().toString();
+//                    checkInfo = checkInfo + "结算费结算数据【" + settleFee2 + "】对账单【" + settleFee + "】\n";
+//                }
                 // 待对账数据.过户费 ！= 待对账数据.清算过户费
-                if (ArithmeticUtil.subtract(dto.getGhfAmt(), dto.getGhfAmt2()).compareTo(BigDecimal.ZERO) != 0) {
-                    String getGhfAmt2 = dto.getGhfAmt2() == null ? "空" : dto.getGhfAmt2().toString();
-                    String getGhfAmt = dto.getGhfAmt() == null ? "空" : dto.getGhfAmt().toString();
-                    checkInfo = checkInfo + "过户费结算数据【" + getGhfAmt2 + "】对账单【" + getGhfAmt + "】\n";
-                }
+//                if (ArithmeticUtil.subtract(dto.getGhfAmt(), dto.getGhfAmt2()).compareTo(BigDecimal.ZERO) != 0) {
+//                    String getGhfAmt2 = dto.getGhfAmt2() == null ? "空" : dto.getGhfAmt2().toString();
+//                    String getGhfAmt = dto.getGhfAmt() == null ? "空" : dto.getGhfAmt().toString();
+//                    checkInfo = checkInfo + "过户费结算数据【" + getGhfAmt2 + "】对账单【" + getGhfAmt + "】\n";
+//                }
                 // 待对账数据.手续费 ！= 待对账数据.清算手续费
 //                if (ArithmeticUtil.subtract(dto.getSxfAmt(), dto.getSxfAmt2()).compareTo(BigDecimal.ZERO) != 0) {
 //                    String getSxfAmt2 = dto.getSxfAmt2() == null ? "空" : dto.getSxfAmt2().toString();

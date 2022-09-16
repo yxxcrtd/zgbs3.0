@@ -4,7 +4,7 @@
 //import com.joyintech.framework.util.*;
 //import com.joyintech.tams.business.common.dao.EtrTrdCommonMapper;
 //import com.joyintech.tams.business.common.dto.*;
-//import com.joyintech.tams.business.common.exception.PositionException;
+//import com.joyintech.tams.position.exception.PositionException;
 //import com.joyintech.tams.business.common.pojo.BaseMap;
 //import com.joyintech.tams.constant.DictCodeList;
 //import com.joyintech.tams.constant.DictCodeListExt1;
@@ -439,7 +439,7 @@
 //        BigDecimal sumAmount=null;
 //        map.put("ptList",buildPosition(ptList,flowType,positionType));
 //        try {
-//                String msg=PositionHttpRequest.queryPosition(map);
+//                String msg=positionRequestHandle.queryPosition(map);
 //                Map message = JsonUtils.json2Object(msg, Map.class);
 //                if (message != null&&StringUtil.equals("success", message.get("code"))) {
 //                    List<PositionQueryAmountDto> list=JsonUtils.json2List(message.get("data").toString(),PositionQueryAmountDto.class);

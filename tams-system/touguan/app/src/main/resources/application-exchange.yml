@@ -68,7 +68,8 @@ agent:
     host: http://192.168.90.208:1668/dsp
     url: /datarouter/http/json/callTrigger
   query:
-    interval: 10000
+    interval: 100000 #查询委托、成交数据定时任务时间间隔
+    cancelOrderInterval: 10000 #撤单查询委托数据延迟时间
     count: 2
   keep:
     fixRate: 30000

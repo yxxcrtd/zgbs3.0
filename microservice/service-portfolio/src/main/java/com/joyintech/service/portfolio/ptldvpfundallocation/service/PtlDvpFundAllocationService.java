@@ -377,32 +377,32 @@ public class PtlDvpFundAllocationService extends BaseService<PtlDvpFundAllocatio
          * 付款账户处理（新建付款信息或修改付款账户金额）
          */
         // 调用组合可用现金和实际现金查询更新组件，将组合现金流水改为实际，并处理组合现金表数据
-        if (entity.getPtlCashPositionFlow() != null) {
-            entity.getPtlCashPositionFlow().forEach(ptlCashPositionFlow -> {
-                PtlCashPositionFlowDto ptlCashPositionFlowDto_FuKuan = new PtlCashPositionFlowDto();
-                BeanUtil.copyPropertiesIgnoreNull(ptlCashPositionFlowDto_FuKuan, ptlCashPositionFlow);
-                ptlCashPositionFlowDto_FuKuan.setHodingType(BussinessDictCodeList.持仓类型_实际.getValue());
-                ptlCashPositionFlowDto_FuKuan.setSplitType(DictCodeListExt3.拆分标识_已拆分.getValue());
-                basePtlCashPositionInfoService.insertCashPositionFlow(ptlCashPositionFlowDto_FuKuan);
-
-                /**
-                 * 收款账户处理（新建付款信息或修改付款账户金额）
-                 */
-                String accountId_ShouKuan = entity.getCounterAcctNo();
-                // if (!StringUtil.isEmptyList(entity.getStlPayOrdersList())) {
-                // accountId_ShouKuan = entity.getStlPayOrdersList().get(0).getCounterAcctNo();
-                // }
-                if (StringUtil.isNotBlank(accountId_ShouKuan)) {
-                    ptlCashPositionFlowDto_FuKuan.setAcctId(accountId_ShouKuan);
-                    ptlCashPositionFlowDto_FuKuan.setAmount(
-                            ptlCashPositionFlowDto_FuKuan.getAmount().negate());
-                    ptlCashPositionFlowDto_FuKuan.setHodingType(
-                            BussinessDictCodeList.持仓类型_实际.getValue());
-                    ptlCashPositionFlowDto_FuKuan.setSplitType(DictCodeListExt3.拆分标识_已拆分.getValue());
-                    basePtlCashPositionInfoService.insertCashPositionFlow(ptlCashPositionFlowDto_FuKuan);
-                }
-            });
-        }
+//        if (entity.getPtlCashPositionFlow() != null) {
+//            entity.getPtlCashPositionFlow().forEach(ptlCashPositionFlow -> {
+//                PtlCashPositionFlowDto ptlCashPositionFlowDto_FuKuan = new PtlCashPositionFlowDto();
+//                BeanUtil.copyPropertiesIgnoreNull(ptlCashPositionFlowDto_FuKuan, ptlCashPositionFlow);
+//                ptlCashPositionFlowDto_FuKuan.setHodingType(BussinessDictCodeList.持仓类型_实际.getValue());
+//                ptlCashPositionFlowDto_FuKuan.setSplitType(DictCodeListExt3.拆分标识_已拆分.getValue());
+//                basePtlCashPositionInfoService.insertCashPositionFlow(ptlCashPositionFlowDto_FuKuan);
+//
+//                /**
+//                 * 收款账户处理（新建付款信息或修改付款账户金额）
+//                 */
+//                String accountId_ShouKuan = entity.getCounterAcctNo();
+//                // if (!StringUtil.isEmptyList(entity.getStlPayOrdersList())) {
+//                // accountId_ShouKuan = entity.getStlPayOrdersList().get(0).getCounterAcctNo();
+//                // }
+//                if (StringUtil.isNotBlank(accountId_ShouKuan)) {
+//                    ptlCashPositionFlowDto_FuKuan.setAcctId(accountId_ShouKuan);
+//                    ptlCashPositionFlowDto_FuKuan.setAmount(
+//                            ptlCashPositionFlowDto_FuKuan.getAmount().negate());
+//                    ptlCashPositionFlowDto_FuKuan.setHodingType(
+//                            BussinessDictCodeList.持仓类型_实际.getValue());
+//                    ptlCashPositionFlowDto_FuKuan.setSplitType(DictCodeListExt3.拆分标识_已拆分.getValue());
+//                    basePtlCashPositionInfoService.insertCashPositionFlow(ptlCashPositionFlowDto_FuKuan);
+//                }
+//            });
+//        }
         // // 调用估值接口 start
         // if (!StringUtil.isEmptyList(entity.getStlPayOrdersList())) {
         // for (StlPayOrders stlPayOrders : entity.getStlPayOrdersList()) {
@@ -514,19 +514,19 @@ public class PtlDvpFundAllocationService extends BaseService<PtlDvpFundAllocatio
 
         // 撤销组合现金余额数据 收付款账户
         // 根据指令编号查询之前的组合现金流水记录，插入相反的流水记录
-        Map<String, Object> paramMap = new HashMap<String, Object>();
-        paramMap.put("orderId", orderId);
-        List<PtlCashPositionFlow> ptlCashPositionFlowList = ptlDvpFundAllocationMapper.selectPtlCashPositionFlowList(
-            paramMap);
-        if (!StringUtil.isEmptyList(ptlCashPositionFlowList)) {
-            for (PtlCashPositionFlow ptlCashPositionFlow : ptlCashPositionFlowList) {
-                PtlCashPositionFlowDto ptlCashPositionFlowDto = new PtlCashPositionFlowDto();
-                BeanUtil.copyPropertiesIgnoreNull(ptlCashPositionFlowDto, ptlCashPositionFlow);
-                ptlCashPositionFlowDto.setAmount(ptlCashPositionFlow.getAmount().negate());
-                ptlCashPositionFlowDto.setOrderId(orderIdNew);
-                basePtlCashPositionInfoService.insertCashPositionFlow(ptlCashPositionFlowDto);
-            }
-        }
+//        Map<String, Object> paramMap = new HashMap<String, Object>();
+//        paramMap.put("orderId", orderId);
+//        List<PtlCashPositionFlow> ptlCashPositionFlowList = ptlDvpFundAllocationMapper.selectPtlCashPositionFlowList(
+//            paramMap);
+//        if (!StringUtil.isEmptyList(ptlCashPositionFlowList)) {
+//            for (PtlCashPositionFlow ptlCashPositionFlow : ptlCashPositionFlowList) {
+//                PtlCashPositionFlowDto ptlCashPositionFlowDto = new PtlCashPositionFlowDto();
+//                BeanUtil.copyPropertiesIgnoreNull(ptlCashPositionFlowDto, ptlCashPositionFlow);
+//                ptlCashPositionFlowDto.setAmount(ptlCashPositionFlow.getAmount().negate());
+//                ptlCashPositionFlowDto.setOrderId(orderIdNew);
+//                basePtlCashPositionInfoService.insertCashPositionFlow(ptlCashPositionFlowDto);
+//            }
+//        }
 
         // // 调用估值接口 start
         // if (!StringUtil.isEmptyList(entity.getStlPayOrdersList())) {
@@ -558,13 +558,13 @@ public class PtlDvpFundAllocationService extends BaseService<PtlDvpFundAllocatio
         // 先删除流程中数据
         tradeProductDealCommService.delete(entity.getWorkflowId());
 
-        if (entity.getPtlCashPositionFlow() != null) {
-            entity.getPtlCashPositionFlow().forEach(ptlCashPositionFlow -> {
-                if (StringUtil.isNotBlank(ptlCashPositionFlow.getAcctId())) {
-                    mapperDelegateService.insert(PtlCashPositionFlowMapper.class, ptlCashPositionFlow);
-                }
-            });
-        }
+//        if (entity.getPtlCashPositionFlow() != null) {
+//            entity.getPtlCashPositionFlow().forEach(ptlCashPositionFlow -> {
+//                if (StringUtil.isNotBlank(ptlCashPositionFlow.getAcctId())) {
+//                    mapperDelegateService.insert(PtlCashPositionFlowMapper.class, ptlCashPositionFlow);
+//                }
+//            });
+//        }
 
         if (!StringUtil.equals("revoke", entity.getOperateType())
             && !StringUtil.equals("delete", entity.getOperateType())) {
@@ -580,16 +580,16 @@ public class PtlDvpFundAllocationService extends BaseService<PtlDvpFundAllocatio
 
     public int doInsert(PtlDvpFundAllocationDto entity) {
         String operType = entity.getOperateType();
-        if (!StringUtil.equals(operType, OperationType.REVOKE.name())
-            && !StringUtil.equals(operType, OperationType.DELETE.name())) {
-            if (entity.getPtlCashPositionFlow() != null) {
-                entity.getPtlCashPositionFlow().forEach(ptlCashPositionFlow -> {
-                    if (StringUtil.isNotBlank(ptlCashPositionFlow.getAcctId())) {
-                        mapperDelegateService.insert(PtlCashPositionFlowMapper.class, ptlCashPositionFlow);
-                    }
-                });
-            }
-        }
+//        if (!StringUtil.equals(operType, OperationType.REVOKE.name())
+//            && !StringUtil.equals(operType, OperationType.DELETE.name())) {
+//            if (entity.getPtlCashPositionFlow() != null) {
+//                entity.getPtlCashPositionFlow().forEach(ptlCashPositionFlow -> {
+//                    if (StringUtil.isNotBlank(ptlCashPositionFlow.getAcctId())) {
+//                        mapperDelegateService.insert(PtlCashPositionFlowMapper.class, ptlCashPositionFlow);
+//                    }
+//                });
+//            }
+//        }
         // 插入业务流程表
         if (!StringUtil.equals(operType, OperationType.DELETE.name())) {
             this.insertBussFlowData(entity, OperationType.valueOf(operType));

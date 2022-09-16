@@ -284,6 +284,11 @@ public class EtrPlanAssetNService extends CommonExportService<EtrPlanAssetNDto> 
                 + "/EtrPlanAssetN/getfinprodIdForAdd1",map,SelectOptionDto.class);
     }
 
+    public String getCountIdByManager(String manager) {
+        return restTemplate.getForObject(ServiceApplication.ENTRUST_SERVICE_NAME
+                + "/EtrPlanAssetN/getCountIdByManager?manager=" + manager ,String.class);
+    }
+
     /**
      * 校验方法 <功能详细描述>
      *
