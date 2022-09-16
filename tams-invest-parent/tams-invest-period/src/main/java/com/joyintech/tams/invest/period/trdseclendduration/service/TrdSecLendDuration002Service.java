@@ -12,10 +12,8 @@ import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysWflBusinessList;
-import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.constant.*;
@@ -60,6 +58,9 @@ import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
 import com.joyintech.tams.invest.period.common.service.PeriodCommonService;
 import com.joyintech.tams.invest.period.trdseclendduration.dto.TrdSecLendDuration002Dto;
+import com.joyintech.tams.position.constant.PositionConstant;
+import com.joyintech.tams.position.exception.PositionException;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 
@@ -120,6 +121,11 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
     @Autowired
     private EtrCommonCashPositionMapper etrCommonCashPositionMapper;
 
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
 
     public TrdSecLendDuration002Dto findEffectiveData(Map<String, Object> pageParam) {
@@ -181,7 +187,7 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
         this.ptlBlendSecPositionFlowLogic(entity,  OperationType.REVOKE == operationType?true:false);
 
         if (OperationType.REVOKE == operationType) {
-            PositionHttpRequest.dorevoke(entity.getBusiCode(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt4.头寸业务类型_银行间债券借贷到期.getValue(),entity.getPs());
+                positionRequestHandle.dorevoke(entity.getBusiCode(), DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt4.头寸业务类型_银行间债券借贷到期.getValue(), entity.getPs());
         }else{
             try{
                 sendNewPosition(entity,DictCodeListExt3.系统动作_新建.getValue(),DictCodeListExt3.流程节点_审批生效.getValue());
@@ -193,10 +199,10 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
                 }
                 String code = (String) bm.get("code");
                 StringBuffer messageStr = (StringBuffer) bm.get("message");
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                    if (StringUtil.equals(PositionConstant.CODE_BUSI_RK, code)) {
                     WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
                 }
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+                    if (StringUtil.equals(PositionConstant.CODE_BUSI_YK, code)) {
                     WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
                 }
             }
@@ -261,10 +267,10 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
                 }
                 String code = (String) bm.get("code");
                 StringBuffer messageStr = (StringBuffer) bm.get("message");
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                if (StringUtil.equals(PositionConstant.CODE_BUSI_RK, code)) {
                     WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
                 }
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+                if (StringUtil.equals(PositionConstant.CODE_BUSI_YK, code)) {
                     WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
                 }
             }
@@ -436,7 +442,7 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
             }
             position.setPtlRelieveSecList(secList);
         }
-        PositionHttpRequest.send(position);
+        positionRequestHandle.send(position);
     }
 
     private WflTrdDealTotalAdd gen汇总附属业务流程(TrdSecLendDuration002Dto entity, WflTrdFinProductDealTotal trdFinProductDealTotal) {
@@ -482,10 +488,10 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
             }
             String code = (String) bm.get("code");
             StringBuffer messageStr = (StringBuffer) bm.get("message");
-            if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+            if (StringUtil.equals(PositionConstant.CODE_BUSI_RK, code)) {
                 WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
             }
-            if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+            if (StringUtil.equals(PositionConstant.CODE_BUSI_YK, code)) {
                 WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
             }
         }
@@ -551,7 +557,7 @@ public class TrdSecLendDuration002Service extends BaseService<TrdSecLendDuration
         if (StringUtil.isNotEmpty(processMark)
                 && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
             //发送头寸
-            PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt4.头寸业务类型_银行间债券借贷首期.getValue(),entity.getPs());
+            positionRequestHandle.doDeleteByWorkFlowId(entity.getWorkflowId(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt4.头寸业务类型_银行间债券借贷首期.getValue(),entity.getPs());
         }
     }
 
