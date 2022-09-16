@@ -24,10 +24,8 @@ import com.joyintech.framework.util.*;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysUser;
 import com.joyintech.system.base.entity.SysWflBusinessList;
-import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.dao.EtrEntrustBackupMapper;
 import com.joyintech.tams.common.base.entity.PtlPortfolio;
@@ -43,6 +41,10 @@ import com.joyintech.tams.invest.entrust.etrseclend.dto.EtrSecLendCashPositionDt
 import com.joyintech.tams.invest.entrust.etrseclend.dto.EtrSecLendDto;
 import com.joyintech.tams.invest.entrust.etrseclend.dto.EtrSecLendPositionDto;
 import com.joyintech.tams.invest.entrust.etrseclend.dto.EtrSecLendSecPositionDto;
+import com.joyintech.tams.position.constant.PositionConstant;
+import com.joyintech.tams.position.exception.PositionException;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
+import com.joyintech.tams.position.servive.connect.PositionHttpRequest;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.apache.commons.collections4.CollectionUtils;
@@ -110,6 +112,12 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
 
     @Autowired
     private EtrEntrustBackupMapper etrEntrustBackupMapper;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     /**
      * 债券投资委托查询 <功能详细描述>
@@ -282,10 +290,10 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
             }
             String code = (String) bm.get("code");
             StringBuffer messageStr = (StringBuffer) bm.get("message");
-            if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+            if (StringUtil.equals(PositionConstant.CODE_BUSI_RK, code)) {
                 WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
             }
-            if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+            if (StringUtil.equals(PositionConstant.CODE_BUSI_YK, code)) {
                 WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
             }
         }
@@ -311,7 +319,7 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
         if (StringUtil.isNotEmpty(processMark)
                 && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
             //发送头寸
-            PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(),DictCodeListExt1.子系统代码_委托.getValue(),DictCodeListExt4.头寸业务类型_银行间债券借贷首期.getValue(),entity.getPs());
+            positionRequestHandle.doDeleteByWorkFlowId(entity.getWorkflowId(),DictCodeListExt1.子系统代码_委托.getValue(),DictCodeListExt4.头寸业务类型_银行间债券借贷首期.getValue(),entity.getPs());
         }
     }
 
@@ -367,10 +375,10 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
             }
             String code = (String) bm.get("code");
             StringBuffer messageStr = (StringBuffer) bm.get("message");
-            if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+            if (StringUtil.equals(PositionConstant.CODE_BUSI_RK, code)) {
                 WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
             }
-            if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+            if (StringUtil.equals(PositionConstant.CODE_BUSI_YK, code)) {
                 WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
             }
         }
@@ -439,7 +447,7 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
             }
             position.setPtlSecList(secList);
         }
-        PositionHttpRequest.send(position);
+        positionRequestHandle.send(position);
     }
 
 
@@ -528,7 +536,7 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
         req.put("userId",SecurityUtil.getLoginUser().getUserName());
         req.put("totalTradeId",IDGenerator.generate());
         req.put("modelType",DictCodeListExt1.子系统代码_委托.getValue());
-        PositionHttpRequest.batchClose(req);
+        positionRequestHandle.batchClose(req);
     }
 
     /**
@@ -614,8 +622,8 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
             String[] arr = message.split("\\|");
             if(arr != null && arr.length == 2){
                 String[] arr1 = arr[0].split("\\:");
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, arr1[1].trim()) ||
-                        StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, arr1[1].trim())) {
+                if (StringUtil.equals(PositionConstant.CODE_BUSI_RK, arr1[1].trim()) ||
+                        StringUtil.equals(PositionConstant.CODE_BUSI_YK, arr1[1].trim())) {
                     // 头寸返回对象
                     String a=arr[1];
                     String b=a.replaceAll("&quot;","\"");
@@ -657,7 +665,7 @@ public class EtrSecLendService extends CommonExportService<EtrSecLendDto> implem
                             }
                         }
                     }
-                    if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, arr1[1].trim())) {
+                    if (StringUtil.equals(PositionConstant.CODE_BUSI_RK, arr1[1].trim())) {
                         strb.append("】，请确认是否继续？");
                         /**
                          * 余额不足，软控确认
