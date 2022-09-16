@@ -28,10 +28,8 @@ import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysWflBusinessList;
-import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -53,6 +51,9 @@ import com.joyintech.tams.invest.common.trade.dao.EtrCommonCashPositionMapper;
 import com.joyintech.tams.invest.trade.bondlend.dto.TrdSecLendCashPositionDto;
 import com.joyintech.tams.invest.trade.bondlend.dto.TrdSecLendPositionDto;
 import com.joyintech.tams.invest.trade.bondlend.dto.TrdSecLendSecPositionDto;
+import com.joyintech.tams.position.constant.PositionConstant;
+import com.joyintech.tams.position.exception.PositionException;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.invest.common.component.base.group.BasePtlCashPositionInfoService;
 import com.joyintech.tams.invest.common.component.base.group.BasePtlSecPositionInfoService;
@@ -233,6 +234,12 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
     private EtrCommonCashPositionMapper etrCommonCashPositionMapper;
 
     /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
+
+    /**
      * 交易及存续期交易，保存进待办，点批量审批时候需要报错。
      * {@inheritDoc}
      */
@@ -280,10 +287,10 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
                 }
                 String code = (String) bm.get("code");
                 StringBuffer messageStr = (StringBuffer) bm.get("message");
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                if (StringUtil.equals(PositionConstant.CODE_BUSI_RK, code)) {
                     WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
                 }
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+                if (StringUtil.equals(PositionConstant.CODE_BUSI_YK, code)) {
                     WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
                 }
             }
@@ -360,7 +367,7 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
                 position.setPtlSecList(secList);
             }
         }
-        PositionHttpRequest.send(position);
+        positionRequestHandle.send(position);
     }
 
     /**
@@ -402,10 +409,10 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
                 }
                 String code = (String) bm.get("code");
                 StringBuffer messageStr = (StringBuffer) bm.get("message");
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                if (StringUtil.equals(PositionConstant.CODE_BUSI_RK, code)) {
                     WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
                 }
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+                if (StringUtil.equals(PositionConstant.CODE_BUSI_YK, code)) {
                     WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
                 }
             }
@@ -433,7 +440,7 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
         if (StringUtil.isNotEmpty(processMark)
                 && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
             //发送头寸
-            PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt4.头寸业务类型_银行间债券借贷首期.getValue(),entity.getPs());
+            positionRequestHandle.doDeleteByWorkFlowId(entity.getWorkflowId(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt4.头寸业务类型_银行间债券借贷首期.getValue(),entity.getPs());
         }
     }
 
@@ -620,10 +627,10 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
                 }
                 String code = (String) bm.get("code");
                 StringBuffer messageStr = (StringBuffer) bm.get("message");
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                if (StringUtil.equals(PositionConstant.CODE_BUSI_RK, code)) {
                     WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
                 }
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+                if (StringUtil.equals(PositionConstant.CODE_BUSI_YK, code)) {
                     WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
                 }
             }
@@ -632,7 +639,7 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
         // 撤销
         else {
             this.doCompleteRevoke(entity);
-            PositionHttpRequest.dorevoke(entity.getTradeId(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt4.头寸业务类型_银行间债券借贷首期.getValue(),entity.getPs());
+            positionRequestHandle.dorevoke(entity.getTradeId(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt4.头寸业务类型_银行间债券借贷首期.getValue(),entity.getPs());
         }
 //        调用接口  add by zhuyongkang 20191127 start
         List<String> tradeIds = new ArrayList<>();
@@ -677,10 +684,15 @@ public class TrdBondLendInvestTrade002Service extends BaseService<TrdBondLendInv
             etrList.add(closeItem);
 //        }
         req.put("data",etrList);
-        req.put("userId",SecurityUtil.getLoginUser().getUserName());
+        //移动审批报错问题修改 ldd
+        try {
+            req.put("userId",SecurityUtil.getLoginUser().getUserName());
+        }catch (Exception e){
+            req.put("userId","system");
+        }
         req.put("totalTradeId",IDGenerator.generate());
         req.put("modelType",DictCodeListExt1.子系统代码_委托.getValue());
-        PositionHttpRequest.batchClose(req);
+        positionRequestHandle.batchClose(req);
     }
 
     /**
