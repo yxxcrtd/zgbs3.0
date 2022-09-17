@@ -3572,7 +3572,14 @@ public class CfetsTrdConfirmService extends BaseService {
                 payAcctNo = joyinbusinessCommonService.selectCounterCapacctInfoList(paramMap);
             }
         }
-
+        //一级申购特殊处理
+        if (StringUtil.equals(temp.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())) {
+            // 收款账户 交易对手账户
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("counterId", deal.getCounterId());
+            paramMap.put("ccy", deal.getCcy());
+            payAcctNo = joyinbusinessCommonService.selectCounterCapacctInfoList(paramMap);
+        }
         bussTrdTransferOrderDto.setPayAcctNo(payAcctNo);
         bussTrdTransferOrderDto.setRecAcctNo(recAcctNo);
         String ps = DictCodeListExt1.收支方向_支出.getValue();
