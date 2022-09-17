@@ -2800,8 +2800,13 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
         // add by zhangrui1 基金申购使用净值1 end
         // add by zhangrui1 赎回确认日期不在指令日期时不使用指令编号 start
         if (CommonUtil.isType(finDto.getPs(), DictCodeList.交易方向_赎回确认)) {
+            EtrEntrust entrust =null;
             Date entrsutDate = DateUtil.parse(
                     (String) CommonUtil.findValue(dataMap, "entrustDate"));
+            if (null == entrsutDate&&StringUtil.isNotEmpty(finDto.getbTradeId())) {
+                entrust=AllTradeCommonUtil.findEntrustInfo(finDto.getbTradeId());
+                entrsutDate = null!=entrust?entrust.getEntrustDate():null;
+            }
             Date tradeDate = DateUtil.parse(infRiskRdsDto.getEventDate());
             Date sysDate = DateUtil.platDateFromCache();
             // 指令日期不是当天且指令日期不等于交易日期
@@ -2810,7 +2815,7 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
                 infRiskRdsDto.setPreOccupyCode(null);
             } else if (null != entrsutDate
                     && StringUtil.isEmpty(finDto.getEntrustId())) {
-                EtrEntrust entrust = AllTradeCommonUtil.findEntrustInfo(finDto.getbTradeId());
+                entrust = AllTradeCommonUtil.findEntrustInfo(finDto.getbTradeId());
                 if (entrust == null || StringUtil.isEmpty(entrust.getEntrustId())) {
                     throw new BusinessException("MSG:指令编号异常！");
                 }
@@ -2819,7 +2824,7 @@ public class InterfRiskRdsService<V extends IRiskRds> extends BaseRiskRdsService
             }
             // TISHKS-1012:entrsutDate为null没有取到对应的委托预占数据 modify by fuyongsheng 20220506 start
             else if (null == entrsutDate) {
-                EtrEntrust entrust = AllTradeCommonUtil.findEntrustInfo(finDto.getbTradeId());
+                entrust = AllTradeCommonUtil.findEntrustInfo(finDto.getbTradeId());
                 if (entrust != null && StringUtil.isNotEmpty(entrust.getEntrustId())) {
                     infRiskRdsDto.setEntrustCode(entrust.getEntrustId());
                     infRiskRdsDto.setPreOccupyCode(entrust.getEntrustId());
