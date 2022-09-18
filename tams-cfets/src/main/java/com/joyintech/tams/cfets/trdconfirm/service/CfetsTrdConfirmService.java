@@ -3578,7 +3578,7 @@ public class CfetsTrdConfirmService extends BaseService {
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("counterId", deal.getCounterId());
             paramMap.put("ccy", deal.getCcy());
-            payAcctNo = joyinbusinessCommonService.selectCounterCapacctInfoList(paramMap);
+            recAcctNo = joyinbusinessCommonService.selectCounterCapacctInfoList(paramMap);
         }
         bussTrdTransferOrderDto.setPayAcctNo(payAcctNo);
         bussTrdTransferOrderDto.setRecAcctNo(recAcctNo);
