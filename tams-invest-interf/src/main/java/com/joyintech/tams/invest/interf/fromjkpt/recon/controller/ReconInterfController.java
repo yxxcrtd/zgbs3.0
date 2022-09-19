@@ -2,6 +2,7 @@ package com.joyintech.tams.invest.interf.fromjkpt.recon.controller;
 
 import com.joyintech.background.component.common.pack.common.util.DateUtil;
 import com.joyintech.framework.annotation.DTXTransaction;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.dao.StlCashReconMapper;
 import com.joyintech.tams.common.base.dao.StlSecpReconMapper;
 import com.joyintech.tams.invest.common.service.BatchManualExcuteService;
@@ -169,7 +170,11 @@ public class ReconInterfController {
             reconInterfService.deleteStlCashRecon(param);
             List<StlCashReconDto> stlCashReconDtos = reconInterfService.listStlCashRecon(param);
             stlCashReconDtos.stream().forEach(item->{
-                stlCashReconMapper.insertSelective(item);
+                // 过滤资金账号不在我们系统中的  防止插入报错 fuyongsheng 20220919 start
+                if(StringUtil.isNotEmpty(item.getAcctNo())){
+                    stlCashReconMapper.insertSelective(item);
+                }
+                // 过滤资金账号不在我们系统中的  防止插入报错 fuyongsheng 20220919 end
             });
             logger.debug("接口平台调用对账单处理第一步-资金余额业务处理成功");
             //----------------------------------------------------------------------------------------------
@@ -180,7 +185,7 @@ public class ReconInterfController {
             reconInterfService.deleteStlSecpRecon(param);
             List<StlSecpReconDto> stlSecpReconDtos = reconInterfService.listStlSecpRecon(param);
             stlSecpReconDtos.stream().forEach(item ->{
-                stlSecpReconMapper.insertSelective(item);
+                    stlSecpReconMapper.insertSelective(item);
             });
             logger.debug("接口平台调用对账单处理第二步-持仓余额业务处理成功");
             //----------------------------------------------------------------------------------------------

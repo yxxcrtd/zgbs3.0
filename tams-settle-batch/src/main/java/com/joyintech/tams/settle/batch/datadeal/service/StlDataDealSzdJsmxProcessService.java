@@ -264,6 +264,15 @@ public class StlDataDealSzdJsmxProcessService {
 				settleTransData.setBranch(0L);
 				//申请编号
 				settleTransData.setApplyTradeId(szdJsmx.getSqbh());
+
+				// 固定收益平台的公司债现券交易没有sqbh问题修复 modify by fuyongsheng 20220919 start
+				if(StlDataDealProcessConstant.YWLX_611.equals(szdJsmx.getYwlx())
+						&& StlDataDealProcessConstant.JYFS_101.equals(szdJsmx.getJyfs())
+						&& StringUtil.isEmpty(szdJsmx.getSqbh())){
+					settleTransData.setApplyTradeId(szdJsmx.getCjbh());
+				}
+				// 固定收益平台的公司债现券交易没有sqbh问题修复 modify by fuyongsheng 20220919 end
+
 				//业务类型
 				settleTransData.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
 				// 证券品种

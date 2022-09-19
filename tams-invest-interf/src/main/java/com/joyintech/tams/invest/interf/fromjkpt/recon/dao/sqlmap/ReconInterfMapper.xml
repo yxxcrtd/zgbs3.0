@@ -157,7 +157,7 @@
         FROM
             INTERF_ZX_GFYE T1
         LEFT JOIN FIN_PRODUCT T3 ON
-            T3.FINPROD_MARKET_ID = T1.ZQDM || '.' || DECODE(T1.JYSC, '0', 'SZ', '深圳', 'SZ', '1', 'SH', '上海', 'SH')
+            T3.FINPROD_MARKET_ID = T1.ZQDM || '.' || DECODE(T1.JYSC, '0', 'SZ', '深圳', 'SZ', '1', 'SH', '上海', 'SH') AND T3.FINPROD_TYPE2 != 'F32'
          WHERE T1.SJRQ = #{execDate,jdbcType=VARCHAR} AND T1.JYSC IN ('0', '1', '深圳', '上海')
          group by
             T1.SJRQ, T1.ZQZH, T1.ZQDM,T3.FINPROD_ID,T3.FINPROD_MARKET_ID, T3.CCY
@@ -176,7 +176,7 @@
         FROM
         INTERF_CCYE T1
     LEFT JOIN FIN_PRODUCT T3
-        ON T3.FINPROD_MARKET_ID = T1.ZQDM || '.' || DECODE(T1.JYLB, '2', 'SZ', '深圳', 'SZ', '1', 'SH', '上海', 'SH')
+        ON T3.FINPROD_MARKET_ID = T1.ZQDM || '.' || DECODE(T1.JYLB, '2', 'SZ', '深圳', 'SZ', '1', 'SH', '上海', 'SH') AND T3.FINPROD_TYPE2 != 'F32'
     WHERE T1.JYRQ = #{execDate,jdbcType=VARCHAR}
     group by T1.JYRQ, T1.ZQZH, T1.ZQDM,T3.FINPROD_ID,T3.FINPROD_MARKET_ID, T1.BZLB
 </select>
