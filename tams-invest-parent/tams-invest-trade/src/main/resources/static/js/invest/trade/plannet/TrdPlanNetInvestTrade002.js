@@ -1,7 +1,7 @@
 /**
  * 计划类（净值型）新建
  */
-$(function() {
+(function() {
     var getriskdata = function () {
         var obj = {timePoint:MY_SUP_TIME_TYPE_02,valDate:$('#tradeDate').val(),portfolioCode:$('#portfolioId').val(),tradeAmount:$('#tradeAmt').val(),assetType:FINPROD_TYPE_F17,isEnabled:'01',assetCode:$('#finprodId').val(),tradeDirection:$('#ps').val()}
         //---add by 裴家俊  2019/03/20  添加资产二级类型条件---start-----
@@ -435,13 +435,21 @@ $(function() {
                 	if (null == tempWorkflowId || 'undefined' == typeof(tempWorkflowId)) {
                 		tempWorkflowId=""
                 	}
-                	data =  {finprodId:finprodId,netDate:netDate,tradeId:tempTradeId,workflowId,tempWorkflowId}; 
+                	data =  {finprodId:finprodId,cdate:netDate,tradeId:tempTradeId,workflowId,tempWorkflowId};
                 }
                 else{
-                	data =  {finprodId:finprodId,netDate:netDate};
+                	data =  {finprodId:finprodId,cdate:netDate};
                 }
-                Joyin.ajaxSync(basePath + 'invest/trade/plannet/TrdPlanNetInvestTrade003/getPrice', data , function(result) {
-                    $('#unitCprice').val(result).trigger('blur').change();
+                $('#unitCprice').val('').trigger('blur').change();
+                Joyin.ajaxSync(basePath + 'invest/trade/plannet/TrdPlanNetInvestTrade003/getLastPriceAndLastDate', data , function(result) {
+                    if (result === '') {
+                        console.log("当前资产查询单位净值为空！");
+                        return;
+                    }
+                    $('#unitCprice').val(result.id).trigger('blur').change();
+                    if (netDate !== result.text) {
+                        $('#netDate').val(result.text).trigger('blur').change();
+                    }
                 });
             }
         });

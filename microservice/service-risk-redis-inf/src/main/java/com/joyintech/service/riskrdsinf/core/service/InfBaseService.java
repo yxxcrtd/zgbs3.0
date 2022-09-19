@@ -89,6 +89,8 @@ public abstract class InfBaseService<V> {
      */
     protected static final String RISK_CODE = "RISK";
 
+    protected static final String PRE_NOT_EXISTS = "对应的预占信息不存在";
+
     @Autowired
     private PipeWriteService<String, String, V> redisWriter;
 
@@ -1011,6 +1013,7 @@ public abstract class InfBaseService<V> {
         }
         getLogger().error(errMsg, e);
         setRtnCode(response, InfDictCodeList.信息码_拒绝.getValue(), -1);
+        filterPreExceptiion(response,e);
         setRtnMsg(response, errMsg);
     }
 
@@ -1093,6 +1096,21 @@ public abstract class InfBaseService<V> {
         getLogger().info("Handle by locker time is {}", (System.currentTimeMillis() - start));
         return t;
     }
+
+    /**
+     * 添加对预占信息不存在的过滤
+     * @param response
+     * @param e
+     */
+    private void filterPreExceptiion(ClientData response,Exception e){
+        if(null!=e && e instanceof InterfException
+                &&StringUtil.endsWith(e.getMessage(),PRE_NOT_EXISTS)){
+            //信息类型
+            response.setHeadField(InfColumns.COM_STD400MSGT.fieldName(),InfDictCodeList.信息类型_正常.getValue());
+        }
+
+    }
+
 
     protected interface DoHelper<T> {
 

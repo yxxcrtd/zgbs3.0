@@ -18,10 +18,8 @@ import com.joyintech.framework.jdbc.datasource.DataSource;
 import com.joyintech.framework.jdbc.enums.DataSourceType;
 import com.joyintech.framework.listener.FileAttachmentProcess;
 import com.joyintech.framework.security.LoginUserUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.IDGenerator;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
@@ -40,6 +38,7 @@ import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.risk.service.RiskCreditListCommonValidatorService;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
+import com.joyintech.tams.invest.common.trade.dao.CreditLinesDealsMapper;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
 import com.joyintech.tams.invest.common.trade.service.MultiApproveTradeCheckService;
 import com.joyintech.tams.invest.trade.fund.dto.WorkFlowDto;
@@ -116,6 +115,9 @@ public class TrdPlanNetInvestTrade003Service extends BaseService<TrdPlanNetInves
 
     @Autowired
     private RiskCreditListCommonValidatorService riskCreditListCommonValidatorService;
+
+    @Autowired
+    private CreditLinesDealsMapper creditLinesDealsMapper;
     
     /**
      * 交易及存续期交易，保存进待办，点批量审批时候需要报错。
@@ -439,6 +441,18 @@ public class TrdPlanNetInvestTrade003Service extends BaseService<TrdPlanNetInves
         return restTemplate.postForObject(
             ServiceApplication.TRADE_SERVICE_NAME + "/TrdPlanNetInvestTrade/getPrice", map,
             BigDecimal.class);
+    }
+
+    /**
+     * 查询单位净值和净值日期
+     *
+     * @param map
+     * @return
+     * @see
+     * @since 1.0
+     */
+    public SelectOptionDto getLastPriceAndLastDate(Map<String, Object> map) {
+        return creditLinesDealsMapper.getLastPriceAndLastDate(map);
     }
 
     /**
