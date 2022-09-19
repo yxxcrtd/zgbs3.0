@@ -282,19 +282,21 @@ public class IbuQuoteRepoService extends BaseService {
         Page<CfetsRepoDealEntrustOrderDto> page = super.queryForPage(pageNo, pageSize, () -> cfetsIbuQuoteRepoMapper.listEntrust(pageParam));
         List<RepoEntrustDto> results = new ArrayList<>();
         // 查询质押券信息
-        if (page != null && CollectionUtils.isNotEmpty(page.getRoot())
-                && StringUtil.equals(CacheUtil.getSysParam("repo_pledge_model"), "02")) {
+        if (page != null && CollectionUtils.isNotEmpty(page.getRoot())) {
             page.getRoot().forEach(item -> {
-                List<RepoEntrustPledgeDto> repoEntrustPledgeDtos = cfetsIbuQuoteRepoMapper.listRepoPledges(item.getEntrustId());
-                if (CollectionUtils.isNotEmpty(repoEntrustPledgeDtos)) {
-                    item.setRepoEntrustPledgeDtos(repoEntrustPledgeDtos);
+                // 指定质押券模式,需要查询指令上指定的质押券
+                if(StringUtil.equals(CacheUtil.getSysParam("repo_pledge_model"), "02")) {
+                    List<RepoEntrustPledgeDto> repoEntrustPledgeDtos = cfetsIbuQuoteRepoMapper.listRepoPledges(item.getEntrustId());
+                    if (CollectionUtils.isNotEmpty(repoEntrustPledgeDtos)) {
+                        item.setRepoEntrustPledgeDtos(repoEntrustPledgeDtos);
+                    }
                 }
                 RepoEntrustDto entrustDto = JsonUtils.json2Object(JsonUtils.object2Json(item), RepoEntrustDto.class);
                 results.add(entrustDto);
             });
         }
         Page<RepoEntrustDto> resultPage = new Page<>();
-        BeanUtil.copyPropertiesIgnoreNull(page, resultPage, "root");
+        BeanUtil.copyPropertiesIgnoreNull(resultPage, page, "root");
         if (CollectionUtils.isNotEmpty(results)) {
             resultPage.setRoot(results);
         }
