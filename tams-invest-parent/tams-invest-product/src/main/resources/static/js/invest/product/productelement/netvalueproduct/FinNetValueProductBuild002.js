@@ -338,6 +338,150 @@
 		}
 		//add by yejiejie 2019-2-22 增加产品清盘日的联动
 	}
+
+	/**
+	 * 浮动管理费前缀拼接
+	 */
+	var getProductFeeElementById = function (id) {
+		var bussFinProductFloatFeeDto = 'bussFinProductFloatFeeDto';
+		return $('#' + bussFinProductFloatFeeDto + '_' + id);
+	}
+	/**
+	 * 起息日 到期日 联动浮动管理费
+	 */
+	var vdateOrMdateFee = function(){
+		var payCycle = getProductFeeElementById('payCycle').val();
+		// 起息日
+		var vdate = $('#FinNetValueProductBuild002_vdate').val();
+		// 到期日
+		var mdate = $('#FinNetValueProductBuild002_mdate').val();
+		if (pageModel === PAGE_MODEL_REFERENCE) {
+			return;
+		}
+		// 根据发行方式和开放模式 初始化首次计提日和计提结束日
+		var object = $.serializeToObject('#productBuildForm', false);
+		if (object.operationType == "01") {
+			var mdate1Low = Date.ofDate(mdate).DateAdd('d', -1).format('yyyy-MM-dd');
+			getProductFeeElementById('provisionFirstDay').val(mdate1Low);
+			getProductFeeElementById('eAccrDate').val(getProductFeeElementById('provisionFirstDay').val()).attr('disabled', true);
+		} else if (object.operationType == "02") {
+			var setFlag = true;
+			if (object.bussFinProductOpenPlanDto && object.bussFinProductOpenPlanDto.openMode == "02") {
+				//初始化首次计提
+				getProductFeeElementById('provisionFirstDay').val(vdate);
+				//初始化计提结束日
+				getProductFeeElementById('eAccrDate').val(mdate);
+				setFlag = false;
+			}
+			if (object.bussFinProductOpenPlanRedDto && object.bussFinProductOpenPlanRedDto.openMode == "02") {
+				//初始化首次计提
+				getProductFeeElementById('provisionFirstDay').val(vdate);
+				//初始化计提结束日
+				getProductFeeElementById('eAccrDate').val(mdate);
+				setFlag = false;
+			}
+			var profitType = object.profitType;
+			var firstdate;
+			var enddate;
+			if (object.bussFinProductOpenPlanDto && object.bussFinProductOpenPlanDto.finOpenPlanList && setFlag && profitType) {
+				var finOpenPlanList = object.bussFinProductOpenPlanDto.finOpenPlanList;
+				if (finOpenPlanList.length > 0) {
+					if (profitType == "01") {
+						firstdate = object.bussFinProductOpenPlanDto.finOpenPlanList[0].openNdate;
+						enddate = object.bussFinProductOpenPlanDto.finOpenPlanList[finOpenPlanList.length - 1].openNdate;
+					} else if (profitType == "03") {
+						firstdate = object.bussFinProductOpenPlanDto.finOpenPlanList[0].openDateEnd;
+						enddate = object.bussFinProductOpenPlanDto.finOpenPlanList[finOpenPlanList.length - 1].openDateEnd;
+					}
+
+				}
+
+			}
+			if (object.bussFinProductOpenPlanRedDto && object.bussFinProductOpenPlanRedDto.finOpenPlanList && setFlag && profitType) {
+				var finOpenPlanList = object.bussFinProductOpenPlanRedDto.finOpenPlanList;
+				var firstdate1;
+				var enddate1;
+				if (finOpenPlanList.length > 0) {
+					if (profitType == "01") {
+						firstdate1 = finOpenPlanList[0].openNdate;
+						enddate1 = finOpenPlanList[finOpenPlanList.length - 1].openNdate;
+					} else if (profitType == "03") {
+						firstdate1 = finOpenPlanList[0].openDateEnd;
+						enddate1 = finOpenPlanList[finOpenPlanList.length - 1].openDateEnd;
+					}
+					if (!firstdate) {
+						firstdate = firstdate1;
+					} else if (firstdate1 && Date.ofDate(firstdate) - Date.ofDate(firstdate1) > 0) {
+						firstdate = firstdate1;
+					}
+					if (!enddate) {
+						enddate = enddate1;
+					} else if (enddate1 && Date.ofDate(enddate) - Date.ofDate(enddate1) < 0) {
+						enddate = enddate1;
+					}
+				}
+			}
+			if (firstdate) {
+				//初始化首次计提日
+				getProductFeeElementById('provisionFirstDay').val(Date.ofDate(firstdate).Format('yyyy-MM-dd'));
+			} else if (setFlag) {
+				//初始化首次计提日
+				getProductFeeElementById('provisionFirstDay').val(vdate);
+			}
+			if (enddate) {
+				//初始化计提结束日
+				getProductFeeElementById('eAccrDate').val(Date.ofDate(enddate).Format('yyyy-MM-dd'));
+			} else if (setFlag) {
+				//初始化计提结束日
+				getProductFeeElementById('eAccrDate').val(mdate);
+			}
+		} else {
+			//初始化计提结束日
+			getProductFeeElementById('eAccrDate').val(mdate);
+			//初始化首次计提日
+			getProductFeeElementById('provisionFirstDay').val(vdate);
+		}
+		// 根据付费规则 初始化首次付费日
+		if (payCycle == "02" && vdate) {
+			var newDate = Date.ofDate(vdate).DateAdd("d", 7);
+			if (mdate && (newDate - Date.ofDate(mdate) > 0)) {
+				getProductFeeElementById('firstPayDate').val(mdate).trigger('change');
+			} else {
+				getProductFeeElementById('firstPayDate').val(newDate.Format('yyyy-MM-dd')).trigger('change');
+			}
+		} else if (payCycle == "03" && vdate) {
+			var newDate = Date.ofDate(vdate).DateAdd("m", 1);
+			if (mdate && (newDate - Date.ofDate(mdate) > 0)) {
+				getProductFeeElementById('firstPayDate').val(mdate).trigger('change');
+			} else {
+				getProductFeeElementById('firstPayDate').val(newDate.Format('yyyy-MM-dd')).trigger('change')
+			}
+		} else if (payCycle == "04" && vdate) {
+			var newDate = Date.ofDate(vdate).DateAdd("m", 3);
+			if (mdate && (newDate - Date.ofDate(mdate) > 0)) {
+				getProductFeeElementById('firstPayDate').val(mdate).trigger('change');
+			} else {
+				getProductFeeElementById('firstPayDate').val(newDate.Format('yyyy-MM-dd')).trigger('change');
+			}
+
+		} else if (payCycle == "05" && vdate) {
+			var newDate = Date.ofDate(vdate).DateAdd("y", 1);
+			if (mdate && (newDate - Date.ofDate(mdate) > 0)) {
+				getProductFeeElementById('firstPayDate').val(mdate).trigger('change');
+			} else {
+				getProductFeeElementById('firstPayDate').val(newDate.Format('yyyy-MM-dd')).trigger('change');
+			}
+		} else if (payCycle == "06" && vdate) {
+			var newDate = Date.ofDate(vdate).DateAdd("m", 6);
+			if (mdate && (newDate - Date.ofDate(mdate) > 0)) {
+				getProductFeeElementById('firstPayDate').val(mdate).trigger('change');
+			} else {
+				getProductFeeElementById('firstPayDate').val(newDate.Format('yyyy-MM-dd')).trigger('change');
+			}
+		} else if (payCycle == "07" && mdate) {
+			getProductFeeElementById('firstPayDate').val(mdate).trigger('change');
+		}
+	}
 	var getNextWorkDay = function(mdate,calendarId){
 		var bankCode = $("#bankCode").val().trim();
 		// modify by jiangpeng on 20200723 添加是否永续债条件
@@ -830,21 +974,14 @@
 			//add by yejiejie 2019-3-1 start
 			dateChange();
 			//add by yejiejie 2019-3-1 end
+			vdateOrMdateFee();
 		});
 		$('#FinNetValueProductBuild002_mdate').change(function(){
 			vdateMdateChangeAction(2);
 			//add by yejiejie 2019-3-1 start
 			dateChange();
 			//add by yejiejie 2019-3-1 end
-			if ($("#FinNetValueProductBuild002_operationType").val() === ISSUE_MODE_01) {
-				var mdate = $("#FinNetValueProductBuild002_mdate").val();
-				var feeID = $("#bussFinProductFloatFeeDto_feeId").val();
-				if (mdate != null && mdate != '' && feeID != '' && feeID != null) {
-					var mdateLow = Date.ofDate(mdate).DateAdd('d', -1).format('yyyy-MM-dd');
-					$("#bussFinProductFloatFeeDto_provisionFirstDay").val(mdateLow);
-					$("#bussFinProductFloatFeeDto_eAccrDate").val(mdateLow).prop('disabled', true);
-				}
-			}
+			vdateOrMdateFee();
 		});
 		$('#FinNetValueProductBuild002_dealMode').change(function(){
 		    PROD_STYLE = '';
