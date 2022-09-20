@@ -3,6 +3,7 @@ package com.joyintech.tams.business.common.service;
 import com.codingapi.txlcn.tc.core.TxTransactionInfo;
 import com.codingapi.txlcn.tc.support.listener.TransactionListener;
 import com.joyintech.tams.position.servive.PositionRequestHandle;
+import com.joyintech.tams.position.util.ThreadLocalUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +35,7 @@ public class PositionRollService implements TransactionListener {
 
     @Override
     public void onTransactionClean(String groupId, String unitId, int transactionState) {
-
+        // 清除线程缓存
+        ThreadLocalUtil.cleanLocalCache();
     }
 }
