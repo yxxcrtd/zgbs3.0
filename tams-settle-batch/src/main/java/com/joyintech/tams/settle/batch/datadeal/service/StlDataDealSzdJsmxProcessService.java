@@ -262,6 +262,8 @@ public class StlDataDealSzdJsmxProcessService {
 				settleTransData.setDealDate(stlDownDataDealOperatorDto.getDealDate());
 				// 分支序号
 				settleTransData.setBranch(0L);
+				// 对个别场景清算明细数据sqbh为空的情况进行特殊处理
+				this.handleSzdJsmxSqbh(stlDownDataDealOperatorDto, szdJsmx);
 				//申请编号
 				settleTransData.setApplyTradeId(szdJsmx.getSqbh());
 
@@ -2706,6 +2708,38 @@ public class StlDataDealSzdJsmxProcessService {
 		return null != value ? new BigDecimal(value).abs() : null;
 	}
 
+	/**
+	 * 处理部分场景sqbh为空的情况
+	 * @param stlDownDataDealOperatorDto
+	 * @param szdJsmx
+	 */
+	private void handleSzdJsmxSqbh(StlDownDataDealOperatorDto stlDownDataDealOperatorDto, SzdJsmx szdJsmx){
+		if(StringUtil.lowerCase(stlDownDataDealOperatorDto.getDataFile()).startsWith(StlDataDealProcessConstant.SZD_JSMX_02)){
+			if(StlDataDealProcessConstant.YWLX_003.equals(szdJsmx.getYwlx())
+					|| StlDataDealProcessConstant.YWLX_004.equals(szdJsmx.getYwlx())
+					|| StlDataDealProcessConstant.YWLX_601.equals(szdJsmx.getYwlx())
+					|| StlDataDealProcessConstant.YWLX_605.equals(szdJsmx.getYwlx())
+					|| StlDataDealProcessConstant.YWLX_611.equals(szdJsmx.getYwlx())){
+				if(StringUtil.isEmpty(szdJsmx.getSqbh())){
+					szdJsmx.setSqbh(szdJsmx.getCjbh());
+				}
+			}
+		}
+		else if(StringUtil.lowerCase(stlDownDataDealOperatorDto.getDataFile()).startsWith(StlDataDealProcessConstant.SZD_JSMX_03)){
+			if(StlDataDealProcessConstant.YWLX_601.equals(szdJsmx.getYwlx())
+					|| StlDataDealProcessConstant.YWLX_605.equals(szdJsmx.getYwlx())
+					|| StlDataDealProcessConstant.YWLX_611.equals(szdJsmx.getYwlx())){
+				if(StringUtil.isEmpty(szdJsmx.getSqbh())){
+					szdJsmx.setSqbh(szdJsmx.getCjbh());
+				}
+			}
+			else if(StlDataDealProcessConstant.YWLX_305.equals(szdJsmx.getYwlx())){
+				if(StringUtil.isEmpty(szdJsmx.getSqbh())){
+					szdJsmx.setSqbh(szdJsmx.getJsbh());
+				}
+			}
+		}
+	}
 
 	/**
 	 * 查询竞价回购首期成交数据
