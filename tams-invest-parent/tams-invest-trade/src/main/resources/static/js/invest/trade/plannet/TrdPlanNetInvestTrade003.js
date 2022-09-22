@@ -181,7 +181,7 @@ $(function() {
                }
                 //赎回确认的时候如果交易金额或者交易份额为空的时候可编辑 yjm end 20191014
                 // $('#channelFee_div').show();
-                if(ps == ps_T24 && single==1){
+                if(ps === ps_T24 && single===1){
                     $('#expectedArrivalDate').attr('disabled',false);
                     $('#expectedArrivalDate').attr('data-ignore',true);
                     $('#TrdPlanNetInvestTrade003_btn_save').attr('data-ignore',true).removeClass("layui-btn-disabled");;
@@ -238,17 +238,17 @@ $(function() {
             var unitCprice = $('#unitCprice').val();
             var ps = $('#ps').val();
             var shareAmt = $('#shareAmt').val();
-            if(ps == ps_T05){
+            if(ps === ps_T05){
                 var tradeAmtHid = $('#tradeAmtHid').val();
                 // 申购确认，调整交易份额  交易份额不应显示反算理论值 yjm 20190726
-                if(unitCprice != null && unitCprice != '' && tradeAmtHid) {
+                if (unitCprice != null && unitCprice !== '' && tradeAmtHid && pageModel !== PAGE_MODEL_REFERENCE) {
                     $('#shareAmt').val(tradeAmtHid / unitCprice).trigger('blur');
                 }
-            }else if((ps == ps_T19 || ps == ps_T24)){
+            }else if((ps === ps_T19 || ps === ps_T24)){
                 var tradeAmt = $('#tradeAmt').val();
-                if(unitCprice != null && unitCprice != '' && shareAmt){
-                	if(ps == ps_T19){
-                		if(pageModel != PAGE_MODEL_REFERENCE){
+                if(unitCprice != null && unitCprice !== '' && shareAmt){
+                	if(ps === ps_T19){
+                		if(pageModel !== PAGE_MODEL_REFERENCE){
                             var isDisabled = $("#tradeAmt").prop("disabled");
                             var isDisabled1 = $("#shareAmt").prop("disabled");
                             if(!isDisabled && isDisabled1){
@@ -258,15 +258,15 @@ $(function() {
                 		}
                 	}
                 	else{
-                		if(pageModel != PAGE_MODEL_REFERENCE){
-                		$('#tradeAmt').val(shareAmt*unitCprice).trigger('blur');
-                		}
+                        if (pageModel !== PAGE_MODEL_REFERENCE) {
+                            $('#tradeAmt').val(shareAmt * unitCprice).trigger('blur');
+                        }
                         $('#tradeAmtHid').val(shareAmt*unitCprice).trigger('blur');
                 	}
                     $('#feeAmtRedem').change();
-                }else if(unitCprice != null && unitCprice != '' && unitCprice != 0 && tradeAmt){
-                	if(pageModel != PAGE_MODEL_REFERENCE){
-                    $('#shareAmt').val(tradeAmt/unitCprice).trigger('blur');
+                }else if(unitCprice != null && unitCprice !== '' && unitCprice !== 0 && tradeAmt){
+                	if(pageModel !== PAGE_MODEL_REFERENCE){
+                        $('#shareAmt').val(tradeAmt / unitCprice).trigger('blur');
                 	}
                 }
             }
@@ -278,10 +278,10 @@ $(function() {
            var portfolioId =  $('#portfolioId').val();
            var ps = $('#ps').val();
            var finprodId = $('#finprodId').val();
-           if(ps == ps_T05 && finprodId && portfolioId){
+           if(ps === ps_T05 && finprodId && portfolioId){
                getPtlCashPositionInfo();
            }
-           if((ps == ps_T19 || ps == ps_T24) && finprodId && portfolioId){
+           if((ps === ps_T19 || ps === ps_T24) && finprodId && portfolioId){
                getPtlSecPositionInfo();
            }
         });
@@ -298,7 +298,7 @@ $(function() {
             if(!feeAmtPay){
                 feeAmtPay=0;
             }
-            if(tradeAmt){
+            if (tradeAmt && pageModel !== PAGE_MODEL_REFERENCE) {
                 $('#tradeAmtHid').val(Number(tradeAmt)-Number(feeAmtPay)).trigger('blur');
                 var unitCprice = $('#unitCprice').val();
                 if(unitCprice){
@@ -330,15 +330,15 @@ $(function() {
             // }
             var isDisabled = $("#tradeAmt").prop("disabled");
             var isDisabled1 = $("#shareAmt").prop("disabled");
-            if(isDisabled && !isDisabled1){
+            if (isDisabled && !isDisabled1) {
                 // 如果金额不允许编辑 则影响的是份额
-            	if(pageModel != PAGE_MODEL_REFERENCE){
-                $('#shareAmt').val(JoyinMath.doDiv(JoyinMath.doAdd(tradeAmt,feeAmtRedem,2) ,unitCprice,2)  ).trigger('change');
-            	}
-            }else{
-            	if(pageModel != PAGE_MODEL_REFERENCE){
-                $('#tradeAmt').val(Number(tradeAmt)-Number(feeAmtRedem)).trigger('blur');
-            	}
+                if (pageModel !== PAGE_MODEL_REFERENCE) {
+                    $('#shareAmt').val(JoyinMath.doDiv(JoyinMath.doAdd(tradeAmt, feeAmtRedem, 2), unitCprice, 2)).trigger('change');
+                }
+            } else {
+                if (pageModel !== PAGE_MODEL_REFERENCE) {
+                    $('#tradeAmt').val(Number(tradeAmt) - Number(feeAmtRedem)).trigger('blur');
+                }
             }
         });
         /**
@@ -362,7 +362,7 @@ $(function() {
             var tradeAmt = $('#tradeAmt').val();
             var unitCprice = $('#unitCprice').val();
             var ps = $('#ps').val();
-            if(unitCprice && $('#tradeAmt').val() && ps != ps_T19 && ps != ps_T24){
+            if(unitCprice && $('#tradeAmt').val() && ps !== ps_T19 && ps !== ps_T24){
                 $('#shareAmt').val($('#tradeAmt').val()/unitCprice).trigger('blur');
             }
         });
@@ -380,7 +380,7 @@ $(function() {
 
 
         $('#shareAmt').change(function(){
-            if($('#ps').val() == ps_T19 || $('#ps').val() == ps_T24 ){
+            if($('#ps').val() === ps_T19 || $('#ps').val() === ps_T24 ){
                 var unitCprice = $('#unitCprice').val();
                 var shareAmt = $('#shareAmt').val();
                 var isDisabled = $("#tradeAmt").prop("disabled");
@@ -507,7 +507,7 @@ $(function() {
         $('#TrdPlanNetInvestTrade003_btn_risk').click(function(){
             //-----------add by jjpei 2020-01-07 风险新版本 start----------
             //---申购确认与到账不需要风险试算----
-            if($("#ps").val()!=ps_T19){
+            if($("#ps").val()!==ps_T19){
                 return;
             }
             var object = $.serializeToObject('#submitForm', true);
@@ -515,7 +515,7 @@ $(function() {
             //-----------add by jjpei 2020-01-07 风险新版本 end----------
         })
        //是否展示资产四五级分类
-         if(IS_SHOW_TYPE == '01'){
+         if(IS_SHOW_TYPE === '01'){
          	$('#type11Div').show();
          }else{
          	$('#type11Div').hide();

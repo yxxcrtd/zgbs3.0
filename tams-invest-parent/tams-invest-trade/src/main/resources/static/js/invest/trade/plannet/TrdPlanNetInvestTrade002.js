@@ -400,7 +400,7 @@
         $('#tradeAmt').change(function(){
             var tradeAmt = $('#tradeAmt').val();
             var ps = $('#ps').val();
-            if(ps == ps_T04 || ps == ps_T06){
+            if ((ps == ps_T04 || ps == ps_T06) && pageModel !== PAGE_MODEL_REFERENCE) {
                 if(tradeAmt){
                     $('#shareAmt').val('').attr('disabled',true).attr('required',false);
                 }else{
@@ -408,7 +408,7 @@
                 }
                 star();
             }
-            if(ps == ps_mr || ps == ps_mc){
+            if ((ps == ps_mr || ps == ps_mc) && pageModel !== PAGE_MODEL_REFERENCE) {
                 var feeAmtPay = $('#feeAmtPay').val();
                 var unitCprice = $('#unitCprice').val();
                 if(unitCprice && $('#tradeAmt').val()){
@@ -469,7 +469,7 @@
 //                    $('#shareAmt').val(tradeAmt/unitCprice).trigger('blur');
 //                }
 //            }else 
-            if((ps == ps_mr || ps == ps_mc)){
+            if((ps == ps_mr || ps == ps_mc) && pageModel !== PAGE_MODEL_REFERENCE){
                 if(unitCprice != null && unitCprice != '' && shareAmt){
                     $('#tradeAmt').val(shareAmt*unitCprice).trigger('blur').attr('disabled',true);
                 }else if(unitCprice != null && unitCprice != '' && unitCprice != 0 && tradeAmt){
