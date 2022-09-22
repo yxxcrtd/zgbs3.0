@@ -42,4 +42,21 @@
     <select id="getFirstTradeAmtByTradeId" resultType="java.math.BigDecimal">
         select ftp.M_TRADE_AMT from FIN_TRADE_PRODUCT ftp where ftp.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </select>
+
+    <select id="getFinProductAddBatch" resultType="com.joyintech.tams.common.base.entity.FinProductAdd">
+        select
+        <include refid="com.joyintech.tams.common.base.dao.FinProductAddMapper.Base_Column_List" />
+        from FIN_PRODUCT_ADD
+        where
+        1 = 1
+        <if test="finprodIds != null and !finprodIds.isEmpty() ">
+            AND FINPROD_ID in
+            <foreach collection="finprodIds" item="item" index="index" open="(" separator="," close=")">
+                <if test="(index % 999) == 998">
+                    null) OR FINPROD_ID in (
+                </if>
+                #{item}
+            </foreach>
+        </if>
+    </select>
 </mapper>
