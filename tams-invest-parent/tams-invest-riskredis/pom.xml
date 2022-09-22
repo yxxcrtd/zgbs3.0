@@ -8,6 +8,13 @@
   <artifactId>tams-invest-riskredis</artifactId>
   <name>tams-invest-riskredis</name>
   <description>风险REDIS管理</description>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+            <version>1.7</version>
+        </dependency>
+    </dependencies>
   <build>
    <plugins>
       <!-- 打包源代码插件 -->
