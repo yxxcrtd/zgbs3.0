@@ -16,6 +16,8 @@ import java.util.Date;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.SysDataUtil;
+import com.joyintech.tams.constant.DictCode;
 
 public class ActualTimeCapital001Dto extends BaseEntity {
 
@@ -168,6 +170,10 @@ public class ActualTimeCapital001Dto extends BaseEntity {
     
     public void setAcctType(String acctType) {
         this.acctType = acctType;
+    }
+
+    public String getAcctTypeStr() {
+        return SysDataUtil.getNameFromDataDict(DictCode.资金账户类型, this.getAcctType());
     }
 
     

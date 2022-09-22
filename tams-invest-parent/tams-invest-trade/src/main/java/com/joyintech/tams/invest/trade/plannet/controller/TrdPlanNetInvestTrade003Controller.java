@@ -18,6 +18,7 @@ import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.security.LoginUserUtil;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
@@ -362,6 +363,19 @@ public class TrdPlanNetInvestTrade003Controller extends BaseController {
     @ResponseBody
     public BigDecimal getPrice(@RequestParam Map<String, Object> map) {
         return trdPlanNetInvestTrade003Service.getPrice(map);
+    }
+
+    /**
+     * 查询单位净值和净值日期
+     *
+     * @return
+     * @see
+     * @since 1.0
+     */
+    @RequestMapping("getLastPriceAndLastDate")
+    @ResponseBody
+    public SelectOptionDto getLastPriceAndLastDate(@RequestParam Map<String, Object> map) {
+        return trdPlanNetInvestTrade003Service.getLastPriceAndLastDate(map);
     }
 
     /**

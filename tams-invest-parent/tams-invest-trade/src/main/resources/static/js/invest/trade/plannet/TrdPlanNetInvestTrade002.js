@@ -1,7 +1,7 @@
 /**
  * 计划类（净值型）新建
  */
-$(function() {
+(function() {
     var getriskdata = function () {
         var obj = {timePoint:MY_SUP_TIME_TYPE_02,valDate:$('#tradeDate').val(),portfolioCode:$('#portfolioId').val(),tradeAmount:$('#tradeAmt').val(),assetType:FINPROD_TYPE_F17,isEnabled:'01',assetCode:$('#finprodId').val(),tradeDirection:$('#ps').val()}
         //---add by 裴家俊  2019/03/20  添加资产二级类型条件---start-----
@@ -400,7 +400,7 @@ $(function() {
         $('#tradeAmt').change(function(){
             var tradeAmt = $('#tradeAmt').val();
             var ps = $('#ps').val();
-            if(ps == ps_T04 || ps == ps_T06){
+            if ((ps == ps_T04 || ps == ps_T06) && pageModel !== PAGE_MODEL_REFERENCE) {
                 if(tradeAmt){
                     $('#shareAmt').val('').attr('disabled',true).attr('required',false);
                 }else{
@@ -408,7 +408,7 @@ $(function() {
                 }
                 star();
             }
-            if(ps == ps_mr || ps == ps_mc){
+            if ((ps == ps_mr || ps == ps_mc) && pageModel !== PAGE_MODEL_REFERENCE) {
                 var feeAmtPay = $('#feeAmtPay').val();
                 var unitCprice = $('#unitCprice').val();
                 if(unitCprice && $('#tradeAmt').val()){
@@ -435,13 +435,21 @@ $(function() {
                 	if (null == tempWorkflowId || 'undefined' == typeof(tempWorkflowId)) {
                 		tempWorkflowId=""
                 	}
-                	data =  {finprodId:finprodId,netDate:netDate,tradeId:tempTradeId,workflowId,tempWorkflowId}; 
+                	data =  {finprodId:finprodId,cdate:netDate,tradeId:tempTradeId,workflowId,tempWorkflowId};
                 }
                 else{
-                	data =  {finprodId:finprodId,netDate:netDate};
+                	data =  {finprodId:finprodId,cdate:netDate};
                 }
-                Joyin.ajaxSync(basePath + 'invest/trade/plannet/TrdPlanNetInvestTrade003/getPrice', data , function(result) {
-                    $('#unitCprice').val(result).trigger('blur').change();
+                $('#unitCprice').val('').trigger('blur').change();
+                Joyin.ajaxSync(basePath + 'invest/trade/plannet/TrdPlanNetInvestTrade003/getLastPriceAndLastDate', data , function(result) {
+                    if (result === '') {
+                        console.log("当前资产查询单位净值为空！");
+                        return;
+                    }
+                    $('#unitCprice').val(result.id).trigger('blur').change();
+                    if (netDate !== result.text) {
+                        $('#netDate').val(result.text).trigger('blur').change();
+                    }
                 });
             }
         });
@@ -461,7 +469,7 @@ $(function() {
 //                    $('#shareAmt').val(tradeAmt/unitCprice).trigger('blur');
 //                }
 //            }else 
-            if((ps == ps_mr || ps == ps_mc)){
+            if((ps == ps_mr || ps == ps_mc) && pageModel !== PAGE_MODEL_REFERENCE){
                 if(unitCprice != null && unitCprice != '' && shareAmt){
                     $('#tradeAmt').val(shareAmt*unitCprice).trigger('blur').attr('disabled',true);
                 }else if(unitCprice != null && unitCprice != '' && unitCprice != 0 && tradeAmt){

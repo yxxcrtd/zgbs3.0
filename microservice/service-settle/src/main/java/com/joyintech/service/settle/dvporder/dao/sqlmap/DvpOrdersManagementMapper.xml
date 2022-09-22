@@ -74,7 +74,8 @@
             T6.COUNTER_ACCT_NO,
             T6.MY_ACCT_NO,
             SSAI.REGIST_ORG,
-            case when t9.ORDER_ID is null then '${DISPOSE_STATUS_02}'  else '${DISPOSE_STATUS_01}' end dealStatus
+            case when t9.ORDER_ID is null then '${DISPOSE_STATUS_02}'  else '${DISPOSE_STATUS_01}' end dealStatus,
+            t9.ORDER_ID
         FROM
         TRD_PRODUCT_DEAL T1
         LEFT JOIN TRD_PRODUCT_DEAL_ADD T2 ON T1.TRADE_ID = T2.TRADE_ID
@@ -181,7 +182,8 @@
         T6.COUNTER_ACCT_NO,
         T6.MY_ACCT_NO,
         SSAI.REGIST_ORG,
-        case when t9.ORDER_ID is null then '${DISPOSE_STATUS_02}' else '${DISPOSE_STATUS_01}' end dealStatus
+        case when t9.ORDER_ID is null then '${DISPOSE_STATUS_02}' else '${DISPOSE_STATUS_01}' end dealStatus,
+        t9.ORDER_ID
         FROM
         TRD_FIN_PRODUCT_DEAL_TOTAL T1
         LEFT JOIN PA_TRD_FIN_PRODUCT_DEAL_TOTAL T3 ON T1.TOTLE_TRADE_ID = T3.TOTLE_TRADE_ID
@@ -289,7 +291,8 @@
             '02'
             else
             '01'
-            end dealStatus
+            end dealStatus,
+            SDTM.ORDER_ID
         FROM TRD_PRODUCT_DEAL T1
         LEFT JOIN STL_DVP_TRADE_MATCH SDTM ON T1.TRADE_ID = SDTM.TRADE_ID
         LEFT JOIN STL_DVP_ORDERS T2 ON T2.ORDER_ID = SDTM.ORDER_ID

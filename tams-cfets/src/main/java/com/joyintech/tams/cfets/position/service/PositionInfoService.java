@@ -6,7 +6,6 @@ import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.business.common.pojo.BaseMap;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.cfets.position.dao.PositionInfoMapper;
 import com.joyintech.tams.cfets.position.dto.PositionCashRequestDetailDto;
 import com.joyintech.tams.cfets.position.dto.PositionCashSecDto;
@@ -19,6 +18,7 @@ import com.joyintech.tams.invest.common.component.base.group.BasePtlCashPosition
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.position.PositionQueryDto;
 import com.joyintech.tams.invest.entrust.common.service.EtrCommonService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,16 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,6 +52,12 @@ public class PositionInfoService {
 
     @Autowired
     private PositionInfoMapper positionInfoMapper;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     /**
      * 日期计算
@@ -175,6 +172,15 @@ public class PositionInfoService {
                 positionQueryDto.setCdate(iPlatformDate.getSysDate());
                 // 实际现金（账户现金）
                 realCash = ArithmeticUtil.doAdd(realCash, basePtlCashPositionInfoService.queryUsableCashPosition(positionQueryDto));
+                BaseMap inMap = BaseMap.newMap()
+                    .put("S_004", DictCodeListExt3.资产类型_汇总可用现金.getValue())
+                    .put("C_01", DictCodeListExt3.资产类型_现金账户持仓.getValue())
+                    .put("portfolioIdList", Arrays.asList(portfolioId))
+                    .put("cdate", cdate)
+                    .put("acctId", acctId);
+                Map map = positionInfoMapper.queryEtrAvailableCash(inMap);
+                BaseMap outMap = BaseMap.newMap(map);
+                realCash =ArithmeticUtil.doAdd(realCash, outMap.getBigDecimal("ZHXJ"));
             }
         }
 
@@ -277,7 +283,7 @@ public class PositionInfoService {
         Map<String, Object> map = new HashMap<>();
         BigDecimal sumAmount = BigDecimal.ZERO;
         map.put("ptlList", buildPosition(ptList, flowType, positionType));
-        String msg = PositionHttpRequest.queryPosition(map);
+        String msg = positionRequestHandle.queryPosition(map);
         BaseMap bm = JsonUtils.json2Object(msg, BaseMap.class);
         if (bm != null && StringUtil.equals("success", bm.getString("code"))) {
             List<LinkedHashMap> list = (List<LinkedHashMap>) bm.get("data");
@@ -416,6 +422,7 @@ public class PositionInfoService {
                 positionQueryDto2.setPortfolioId(portfolioId);
                 positionQueryDto2.setCcy(DictCodeList.币种_人民币_CNY.getValue());
                 positionQueryDto2.setCdate(iPlatformDate.getSysDate());
+                positionQueryDto2.setAcctType(acctTypeList);
                 // 实际现金（账户现金）
                 realCash = ArithmeticUtil.doAdd(realCash, basePtlCashPositionInfoService.queryUsableCashPosition(positionQueryDto2));
 
@@ -453,7 +460,7 @@ public class PositionInfoService {
 
         rs.put("cashT", ArithmeticUtil.doAdd(cashT, outMap.getBigDecimal("T0KYXJ")));
         rs.put("cashT1", ArithmeticUtil.doAdd(cashT1, outMap.getBigDecimal("T1KYXJ")));
-        rs.put("realCash",realCash);
+        rs.put("realCash",ArithmeticUtil.doAdd(realCash, outMap.getBigDecimal("ZHXJ")));
         rs.put("secDesirableCash", secDesirableCash);
         return rs;
     }

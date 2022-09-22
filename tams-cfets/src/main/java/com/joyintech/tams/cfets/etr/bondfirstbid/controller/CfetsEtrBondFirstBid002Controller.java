@@ -28,6 +28,7 @@ import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.entrust.common.aop.EntrustRdsCommonAop;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -75,10 +76,10 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
     private BaseGetBusinessId bussGetBussinessIdService;
 
     /**
-     * 头寸信息
+     * 头寸引擎
      */
     @Autowired
-    private PositionInfoService positionInfoService;
+    private PositionRequestHandle positionRequestHandle;
 
 
     @ResponseBody
@@ -139,48 +140,47 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
     @ApiOperation(value = "多组合指令新建保存/提交", notes = "多组合指令新建保存/提交")
     @PostMapping("save")
     public Message<AjaxResult> save(@RequestBody CfetsEtrBondFirstBidSaveRequest cfetsDto) {
+        try {
+            if (StringUtil.isNotEmpty(cfetsDto.getEntrustId())
+                    && (StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_招标发行.getValue())
+                    || StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_簿记建档.getValue()))) {
+                //根据指令代码获取指令信息
+                EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(cfetsDto.getEntrustId());
+                cfetsDto.setEntrustStatus(etrEntrust.getEntrustStatus());
+                if (etrEntrust != null && !(StringUtil.equals(DictCodeList.委托状态_已退回.getValue(), etrEntrust.getEntrustStatus())
+                        || StringUtil.equals(DictCodeList.委托状态_已撤回.getValue(), etrEntrust.getEntrustStatus()))) {
+                    //投标量没有改高，不走流程直接更新原指令信息
+                    if (cfetsDto.getTotalBiddingNum().compareTo(ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), BigDecimal.valueOf(100))) < 1) {
+                        CfetsEtrBondFirstBid002Dto allDto = cfetsEtrBondFirstBid002Service.packageEquity(cfetsDto);
+                        allDto.setTotalEtrustId(cfetsDto.getEntrustId());
+                        cfetsEtrBondFirstBid002Service.saveModifyPassInfo(allDto);
+                        //发送头寸
+                        cfetsEtrBondFirstBid002Service.sendPositionMethod(allDto, Boolean.FALSE, "1");
+                        AjaxResult m = new AjaxResult("一级投标指令修改成功！");
+                        return new Message<AjaxResult>().success().setData(m);
+                    }
+                }
 
-        if (StringUtil.isNotEmpty(cfetsDto.getEntrustId())
-                && (StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_招标发行.getValue())
-                || StringUtil.equals(cfetsDto.getIssueClass(), DictCodeListExt4.新债_发行方式_簿记建档.getValue()))) {
-            //根据指令代码获取指令信息
-            EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(cfetsDto.getEntrustId());
-            cfetsDto.setEntrustStatus(etrEntrust.getEntrustStatus());
-            if (etrEntrust != null && !(StringUtil.equals(DictCodeList.委托状态_已退回.getValue(), etrEntrust.getEntrustStatus())
-                    || StringUtil.equals(DictCodeList.委托状态_已撤回.getValue(), etrEntrust.getEntrustStatus()))) {
-                //投标量没有改高，不走流程直接更新原指令信息
-                if (cfetsDto.getTotalBiddingNum().compareTo(ArithmeticUtil.multiply(etrEntrust.getEntrustNum(), BigDecimal.valueOf(100))) < 1) {
-                    CfetsEtrBondFirstBid002Dto allDto = cfetsEtrBondFirstBid002Service.packageEquity(cfetsDto);
-                    allDto.setTotalEtrustId(cfetsDto.getEntrustId());
-                    cfetsEtrBondFirstBid002Service.saveModifyPassInfo(allDto);
-                    //发送头寸
-                    cfetsEtrBondFirstBid002Service.sendPositionMethod(allDto, Boolean.FALSE, "1");
-                    AjaxResult m = new AjaxResult("一级投标指令修改成功！");
-                    return new Message<AjaxResult>().success().setData(m);
+            }
+
+            CfetsEtrBondFirstBid002Dto allDto = cfetsEtrBondFirstBid002Service.packageEquity(cfetsDto);
+
+            List<CfetsEtrBondFirstBid002Dto> dataList = new ArrayList<>();
+
+            for (CfetsEtrBondFirstBid002Dto dto : allDto.getEtrInvestBondFirstBidDtos()) {
+                if (!StringUtil.isNotEmpty(dto.getEntrustId())) {
+                    BussinessCodeParameter param = new BussinessCodeParameter();
+                    param.setCommonBusinessType(DictCodeListExt3.共通业务类型_一级投标指令);
+                    String code = bussGetBussinessIdService != null ? bussGetBussinessIdService.buildBussinessCode(param) : IDGenerator.generate();
+                    dto.setEntrustId(code);
+                }
+
+                //预占功能
+                if (StringUtil.isNotEmpty(dto.getEntrustId())) {
+                    dataList.add(dto);
                 }
             }
 
-        }
-
-        CfetsEtrBondFirstBid002Dto allDto = cfetsEtrBondFirstBid002Service.packageEquity(cfetsDto);
-
-        List<CfetsEtrBondFirstBid002Dto> dataList = new ArrayList<>();
-
-        for (CfetsEtrBondFirstBid002Dto dto : allDto.getEtrInvestBondFirstBidDtos()) {
-            if (!StringUtil.isNotEmpty(dto.getEntrustId())) {
-                BussinessCodeParameter param = new BussinessCodeParameter();
-                param.setCommonBusinessType(DictCodeListExt3.共通业务类型_一级投标指令);
-                String code = bussGetBussinessIdService != null ? bussGetBussinessIdService.buildBussinessCode(param) : IDGenerator.generate();
-                dto.setEntrustId(code);
-            }
-
-            //预占功能
-            if (StringUtil.isNotEmpty(dto.getEntrustId())) {
-                dataList.add(dto);
-            }
-        }
-
-        try {
             if (StringUtil.equals(BussinessConstant.SUBMIT, allDto.getOperateType())) {
                 AjaxResult ar = EntrustRdsCommonAop.doListPreOccupy(
                         dataList, DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue(),
@@ -190,37 +190,31 @@ public class CfetsEtrBondFirstBid002Controller extends BaseController {
                     return new Message<AjaxResult>().success().setData(ar);
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return PositionUtil.ajaxErrorReturn(e);
-        }
 
-        EntrustRdsCommonAop.riskListToChildren(allDto.getRiskTrialRetDto(), allDto.getEtrInvestBondFirstBidDtos(),
-                (dto, list) -> dto.setRiskTrialRetDto(list));
+            EntrustRdsCommonAop.riskListToChildren(allDto.getRiskTrialRetDto(), allDto.getEtrInvestBondFirstBidDtos(),
+                    (dto, list) -> dto.setRiskTrialRetDto(list));
 
-        // 临时主键
-        if(StringUtil.isNotEmpty(cfetsDto.getEntrustId())){
-            allDto.setTotalEtrustId(cfetsDto.getEntrustId());
-        }else{
-            BussinessCodeParameter param = new BussinessCodeParameter();
-            param.setCommonBusinessType(DictCodeListExt3.共通业务类型_一级投标指令);
-            String generatedId = bussGetBussinessIdService != null ? bussGetBussinessIdService.buildBussinessCode(param) : IDGenerator.generate();
-            allDto.setTotalEtrustId(generatedId);
-        }
+            // 临时主键
+            if (StringUtil.isNotEmpty(cfetsDto.getEntrustId())) {
+                allDto.setTotalEtrustId(cfetsDto.getEntrustId());
+            } else {
+                BussinessCodeParameter param = new BussinessCodeParameter();
+                param.setCommonBusinessType(DictCodeListExt3.共通业务类型_一级投标指令);
+                String generatedId = bussGetBussinessIdService != null ? bussGetBussinessIdService.buildBussinessCode(param) : IDGenerator.generate();
+                allDto.setTotalEtrustId(generatedId);
+            }
 
-        ProcessParameter<CfetsEtrBondFirstBid002Dto> processParameter = new ProcessParameter<>();
-        WorkFlowParameter<CfetsEtrBondFirstBid002Dto> params = new WorkFlowParameter<>();
+            ProcessParameter<CfetsEtrBondFirstBid002Dto> processParameter = new ProcessParameter<>();
+            WorkFlowParameter<CfetsEtrBondFirstBid002Dto> params = new WorkFlowParameter<>();
 
-        params.setPageId(this.getPageId());
-        params.setElementId(cfetsDto.getElementId());
-        params.setBusinessCode(CfetsEtrBondFirstBid002Dto::getTotalEtrustId);
-        params.setBusinessType(DictCodeListExt3.共通业务类型_一级投标指令.getValue());
-        processParameter.setOperationType(OperationType.NEW);
-        processParameter.setWorkFlowParameter(params);
+            params.setPageId(this.getPageId());
+            params.setElementId(cfetsDto.getElementId());
+            params.setBusinessCode(CfetsEtrBondFirstBid002Dto::getTotalEtrustId);
+            params.setBusinessType(DictCodeListExt3.共通业务类型_一级投标指令.getValue());
+            processParameter.setOperationType(OperationType.NEW);
+            processParameter.setWorkFlowParameter(params);
 
-        String msg = null;
-        try {
-            msg = cfetsEtrBondFirstBid002Service.start(processParameter, allDto);
+            String msg = cfetsEtrBondFirstBid002Service.start(processParameter, allDto);
             AjaxResult m = new AjaxResult(msg);
             return new Message<AjaxResult>().success().setData(m);
         } catch (Exception e) {

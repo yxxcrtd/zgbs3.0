@@ -488,7 +488,7 @@ public class TradeHelper {
     }
 
     //  处理成交回报 在委托回报之前的情况
-    public void handleCancelTradeRspBeforeEntrustRsp(TradeMsgReceiver msgReceiver, Map<String, List<Trade>> tradeMap, CancelEntrustBean cancelEntrustBean,String keyType) {
+    public void handleCancelTradeRspBeforeEntrustRsp(TradeMsgReceiver msgReceiver, Map<String, List<Trade>> tradeMap, CancelEntrustBean cancelEntrustBean, String keyType) {
         //String key = cancelEntrustBean.getAccountId() + "_" + cancelEntrustBean.getCancelBrokerEntrustId();
         String key = AgentServerUtil.GetTradeCacheKey(keyType, cancelEntrustBean.getAccountId(), cancelEntrustBean.getCancelBrokerEntrustId());
         List<Trade> tradeList = tradeMap.get(key);
@@ -1328,6 +1328,8 @@ public class TradeHelper {
             //协议回购
             if (EntrustUtils.isPledgeAgreementRepurchase(busiTypeTg)) {
                 integratedEntrust.setBsFlag(EntrustUtils.getPledgeAgreementBsFlag(busiTypeTg, integratedEntrust.getEntrustProp(), integratedEntrust.getEntrustBs(), integratedEntrust.getConformOrRefuse()));
+            } else if (EntrustUtils.isNewBond(busiTypeTg)) {
+                integratedEntrust.setBsFlag(EntrustUtils.getBsFlag(integratedEntrust.getEntrustProp(), integratedEntrust.getEntrustBs(), integratedEntrust.getMarket()));
             } else {
                 integratedEntrust.setBsFlag(EntrustUtils.getBsFlag(integratedEntrust.getEntrustProp(), integratedEntrust.getEntrustBs()));
             }
@@ -1365,10 +1367,10 @@ public class TradeHelper {
             integratedEntrust.setEntrustClass(instruction.getEntrustClass());
             integratedEntrust.setAccountName(instruction.getAcctName());
             //本方对手方交易信息为空时从传参取值
-            if(StringUtil.isEmpty(integratedEntrust.getAccountId())){
+            if (StringUtil.isEmpty(integratedEntrust.getAccountId())) {
                 integratedEntrust.setAccountId(instruction.getAcctNo());
             }
-            if(StringUtil.isEmpty(integratedEntrust.getPropDealerId())){
+            if (StringUtil.isEmpty(integratedEntrust.getPropDealerId())) {
                 integratedEntrust.setPropDealerId(instruction.getCounterDealerId());
             }
             fillSelfDealerTradeInfo(integratedEntrust);

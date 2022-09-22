@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.joyintech</groupId>
 		<artifactId>tams-parent</artifactId>
-		<version>0.0.5.12</version>
+		<version>0.0.5.13</version>
 	</parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -69,6 +69,8 @@
 
         <!-- 前台应用 -->
         <module>../../tams-customer-interf</module>
+        <!--头寸调用客户端-->
+        <module>../../tams-position-client</module>
 
 <!--        <module>../../tams-exchange-parent</module>-->
 

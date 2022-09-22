@@ -59,6 +59,15 @@
             <groupId>com.joyintech</groupId>
             <artifactId>joyintech-system</artifactId>
         </dependency>
+		<dependency>
+			<groupId>com.joyintech</groupId>
+			<artifactId>tams-position-client</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+        <dependency>
+            <groupId>com.codingapi.txlcn</groupId>
+            <artifactId>txlcn-tc</artifactId>
+        </dependency>
 
     </dependencies>
 </project>

@@ -471,6 +471,7 @@ from
                             AND DECODE(t1.VALUE_SOURCE, #{VALUATION_SOURCE_CBC}, #{REGIST_ORG_01}, #{VALUATION_SOURCE_SCH}, #{REGIST_ORG_02}, 'NULL')=T2.REGIST_ORG
                         WHERE VALUE_DATE <![CDATA[<=]]> to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') 
                             AND VALUE_SOURCE IN (#{VALUATION_SOURCE_CBC},#{VALUATION_SOURCE_SCH})
+                            AND t2.TRADE_MARKET IN ('01','02')
                     ) WHERE rn =1
                 ) tt on tt.SEC_ID=d.FINPROD_MARKET_ID
             </if>
@@ -504,6 +505,7 @@ from
                             </foreach>
                         </if>
                         AND a.TRADE_DATE &lt;= to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') - 1
+                        AND a.TRADE_MARKET IN ('01','02')
                     ) WHERE rn = 1
                     UNION
                     SELECT nvl(T1.FINPROD_ID, a.FINPROD_ID) FINPROD_ID, b.PORTFOLIO_ID, a.INV_AIM
@@ -525,6 +527,7 @@ from
                         </foreach>
                     </if>
                     AND a.TRADE_DATE = to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd')
+                    AND a.TRADE_MARKET IN ('01','02')
                 ) GROUP BY FINPROD_ID, PORTFOLIO_ID
             ) invaim on invaim.FINPROD_ID=etrptl.FINPROD_ID and invaim.PORTFOLIO_ID=etrptl.PORTFOLIO_ID
             <if test="search != null and search != ''">
@@ -724,7 +727,7 @@ from
             LEFT JOIN (
                 <!--账户现金-->
                 SELECT d.PORTFOLIO_ID, sum(d.AMOUNT) AMOUNT
-                FROM ETR_CASH_POSITION_RULE d
+                FROM PTL_CASH_POSITION_RULE d
                 where d.cdate = to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') AND d.HODING_TYPE =#{C_01} and DATE_TYPE ='0' 
                 <if test="acctId != null and acctId !=''">
                     and d.ACCT_ID = #{acctId,jdbcType=VARCHAR}

@@ -25,7 +25,6 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.system.base.dao.SysUploadFileInfoMapper;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
@@ -62,6 +61,7 @@ import com.joyintech.tams.invest.common.trade.service.MultiApproveTradeCheckServ
 import com.joyintech.tams.invest.trade.conbond.dto.TrdConBond003Dto;
 import com.joyintech.tams.invest.trade.conbond.dto.TrdConBondDto;
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.service.ExchangeTransMatchCommonService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -194,6 +194,11 @@ public class TrdConBond002Service extends BaseService<TrdConBondDto> implements 
 
     @Autowired
     private CommonPositionEngineService commonPositionEngineService;
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     /**
      * 交易及存续期交易，保存进待办，点批量审批时候需要报错。
@@ -751,7 +756,7 @@ public class TrdConBond002Service extends BaseService<TrdConBondDto> implements 
             TrdConBondDto entity = getBussinessEntityByWorkflowId(workflowId);
             logger.info("sendDelete() called with parameters => 【entity = {}】", JsonUtils.object2Json(entity));
             String busiType = commonPositionEngineService.getPositionBusiType(entity.getFinprodType2(), entity.getPs(), null);
-            PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(), POSITION_TYPE_ETR, busiType, entity.getPs());
+            positionRequestHandle.doDeleteByWorkFlowId(entity.getWorkflowId(), POSITION_TYPE_ETR, busiType, entity.getPs());
         }
         baseTradeProductDealCommService.delete(workflowId);
     }

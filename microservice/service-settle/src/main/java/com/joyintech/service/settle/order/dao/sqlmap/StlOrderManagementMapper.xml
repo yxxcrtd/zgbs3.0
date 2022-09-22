@@ -167,11 +167,11 @@
         T10.ORDER_ID orderId,
         nvl(T8.PA_BUSS_TYPE,T4.TG_BUSI_TYPE) paBizType,
         NVL(T10.PAY_TYPE, T12.PAY_TYPE) PAY_TYPE,
-        T5.PORTFOLIO_ID,
-        t7.PORTFOLIO_NAME,
+        nvl(T5.PORTFOLIO_ID,pp.PORTFOLIO_ID) PORTFOLIO_ID,
+        nvl(t7.PORTFOLIO_NAME,pp.PORTFOLIO_NAME) PORTFOLIO_NAME,
         t6.FINPROD_ID finprodId,
-        t6.FINPROD_MARKET_ID,
-        nvl(t6.FINPROD_ABBR, t6.FINPROD_NAME) finprodName,
+        nvl(t6.FINPROD_MARKET_ID,pp.PORTFOLIO_ID) FINPROD_MARKET_ID,
+        nvl(nvl(t6.FINPROD_ABBR, t6.FINPROD_NAME),pp.PORTFOLIO_NAME) finprodName,
         to_char(NVL(T10.SETTLE_DATE, T12.SETTLE_DATE), 'yyyy-MM-dd') SETTLE_DATE,
         NVL(T10.SETTLE_AMT, T12.SETTLE_AMT) SETTLE_AMT,
         NVL(T10.CCY, T12.CCY) CCY,
@@ -188,7 +188,7 @@
         IPO.ORDER_RET_STATUS orderRetStatus,
         T6.PROFIT_TYPE,
         '${NO}' isDvp,
-        0  paBizTypeAdd
+        case when T5.PORTFOLIO_ID is not null then 0 else 1 end  paBussTypeAdd
         FROM TRD_PRODUCT_DEAL T4
         LEFT JOIN TRD_PRODUCT_DEAL_ADD T5 ON T4.TRADE_ID = T5.TRADE_ID
         LEFT JOIN PA_TRD_PRODUCT_DEAL T8 ON T4.TRADE_ID = T8.TRADE_ID
@@ -196,6 +196,7 @@
         LEFT JOIN PTL_PORTFOLIO T7 ON T5.PORTFOLIO_ID = T7.PORTFOLIO_ID
         LEFT JOIN TRD_FIN_PRODUCT_DEAL_TOTAL T11 ON T4.TOTLE_TRADE_ID = T11.TOTLE_TRADE_ID
         LEFT JOIN STL_PAY_ORDERS T10 ON T10.TRADE_ID = T4.TRADE_ID AND T10.IS_TOTAL_TRADE=#{NO} AND T10.ORDER_STATUS = #{ORDER_STATUS_01}
+        LEFT JOIN PTL_PORTFOLIO pp ON T10.PORTFOLIO_ID = pp.PORTFOLIO_ID
         <!-- 查询列表中增加“付款账户”、“付款账户名称”、“收款账户”、“收款账户名称”、“划款用途”、“币种” 20191030 add by renping start -->
         LEFT JOIN STL_CAPACCT_INFO T02 /*收款方*/ON ((T10.PS = #{PS01} and T10.MY_ACCT_NO = T02.ACCT_NO) OR (T10.PS = #{PS02} and T10.COUNTER_ACCT_NO =
         T02.ACCT_NO))
@@ -252,7 +253,7 @@
         AND T10.IS_NEED_SEND = #{YES}
 
         <if test="portfolioId != null and !portfolioId.isEmpty()">
-            <foreach collection="portfolioId" open="AND T5.PORTFOLIO_ID in (" close=")" item="item" separator=",">#{item}</foreach>
+            <foreach collection="portfolioId" open="AND T10.PORTFOLIO_ID in (" close=")" item="item" separator=",">#{item}</foreach>
         </if>
         <if test="finprodId != null and !finprodId.isEmpty()">
             <foreach collection="finprodId" open="AND T4.FINPROD_ID in (" close=")" item="item" separator=",">#{item}</foreach>

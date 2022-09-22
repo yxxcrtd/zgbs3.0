@@ -559,7 +559,10 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
         // 指令类型
         stlPayOrders.setOrderType(null);
         // 结算日期
-        stlPayOrders.setSettleDate(total.getSettleDate());
+        // GLLCUAT-472:划款结算日期取交易日期 modify by fuyongsheng 20220914 start
+        // stlPayOrders.setSettleDate(total.getSettleDate());
+        stlPayOrders.setSettleDate(total.getTradeDate());
+        // GLLCUAT-472:划款结算日期取交易日期 modify by fuyongsheng 20220914 end
         // 本方资金账户
         stlPayOrders.setMyAcctNo(acctNo);
         // 结算金额

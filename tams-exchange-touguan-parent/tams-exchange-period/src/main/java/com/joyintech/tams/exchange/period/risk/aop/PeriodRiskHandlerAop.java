@@ -3,9 +3,9 @@ package com.joyintech.tams.exchange.period.risk.aop;
 import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.exchange.period.risk.service.PeriodRiskInputParamService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.workflow.engine.constant.OperationType;
 import org.apache.commons.collections.CollectionUtils;
 import org.aspectj.lang.JoinPoint;
@@ -34,6 +34,12 @@ public class PeriodRiskHandlerAop {
 
     @Autowired
     private PeriodRiskInputParamService inputParamSerivce;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
 
     /**
@@ -91,7 +97,7 @@ public class PeriodRiskHandlerAop {
             mapList.forEach(item -> {
                 String revokeId = String.valueOf(item.get("seqno"));
                 String modelType = (String) item.get("modelType");
-                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+                positionRequestHandle.roll(revokeId, modelType, e.getMessage());
             });
         } finally {
             ThreadLocalUtil.cleanLocalCache();
@@ -121,7 +127,7 @@ public class PeriodRiskHandlerAop {
             mapList.forEach(item -> {
                 String revokeId = String.valueOf(item.get("seqno"));
                 String modelType = (String) item.get("modelType");
-                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+                positionRequestHandle.roll(revokeId, modelType, e.getMessage());
             });
         } finally {
             ThreadLocalUtil.cleanLocalCache();
@@ -151,7 +157,7 @@ public class PeriodRiskHandlerAop {
             mapList.forEach(item -> {
                 String revokeId = String.valueOf(item.get("seqno"));
                 String modelType = (String) item.get("modelType");
-                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+                positionRequestHandle.roll(revokeId, modelType, e.getMessage());
             });
         } finally {
             ThreadLocalUtil.cleanLocalCache();
@@ -177,7 +183,7 @@ public class PeriodRiskHandlerAop {
             mapList.forEach(item -> {
                 String revokeId = String.valueOf(item.get("seqno"));
                 String modelType = (String) item.get("modelType");
-                PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+                positionRequestHandle.roll(revokeId, modelType, e.getMessage());
             });
         } finally {
             ThreadLocalUtil.cleanLocalCache();

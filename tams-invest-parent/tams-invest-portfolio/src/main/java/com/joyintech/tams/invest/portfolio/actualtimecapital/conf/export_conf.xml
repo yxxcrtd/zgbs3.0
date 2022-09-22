@@ -5,14 +5,15 @@
             <Cell order="1" name="组合名称">portfolioName</Cell>
             <Cell order="2" name="账号">acctNo</Cell>
             <Cell order="3" name="账号名称">acctName</Cell>
-            <Cell order="4" name="币种">ccy</Cell>
-            <Cell order="5" name="现金余额">cashBalance</Cell>
-            <Cell order="6" name="指令可用现金">cashAvailable</Cell>
-            <Cell order="7" name="交易可用现金">tradeCash</Cell>
-            <Cell order="8" name="可取现金">desirableCash</Cell>
-            <Cell order="9" name="预增现金">advanceCash</Cell>
-            <Cell order="10" name="预减现金">preReductionCash</Cell>
-            <Cell order="11" name="手工调整">adjustmentAmount</Cell>
+            <Cell order="4" name="账号类型">acctName</Cell>
+            <Cell order="5" name="币种">ccy</Cell>
+            <Cell order="6" name="现金余额">cashBalance</Cell>
+            <Cell order="7" name="指令可用现金">cashAvailable</Cell>
+            <Cell order="8" name="交易可用现金">tradeCash</Cell>
+            <Cell order="9" name="可取现金">desirableCash</Cell>
+            <Cell order="10" name="预增现金">advanceCash</Cell>
+            <Cell order="11" name="预减现金">preReductionCash</Cell>
+            <Cell order="12" name="手工调整">adjustmentAmount</Cell>
         </Row>
     </Worksheet>
 </Workbook>

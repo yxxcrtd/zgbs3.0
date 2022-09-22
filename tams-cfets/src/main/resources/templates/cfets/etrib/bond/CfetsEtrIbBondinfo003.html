@@ -196,6 +196,8 @@
                                         <span class="input-right-show">元</span>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="layui-form-item" >
                                 <div class="form-inline-wrap" style=" width: 25%; padding:0px;" id="matureYieldDiv">
                                     <label class="layui-form-label form-lable" style="width: 105px;">
                                         <input type="radio" id="calculateField_matureYield" name="calculateField" value="matureYield" th:title="到期收益率" />
@@ -232,7 +234,7 @@
                             <textarea id="remark" name="remark" th:value="${entity?.remark}"
                                       data-th-text="${entity?.remark}" class="layui-textarea"
                                       placeholder="请输入内容"
-                                      data-th-placeholder="#{SysCommon.placeholder}" disabled></textarea>
+                                      data-th-placeholder="#{SysCommon.placeholder}"></textarea>
                                     </div>
                                 </div>
                             </div>

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Repository;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.service.entrust.etrplanassetn.dto.EtrPlanAssetNDto;
+import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * 计划类净值委托mapper
@@ -73,6 +74,12 @@ public interface EtrPlanAssetNMapper {
     List<SelectOptionDto> getfinprodIdForAdd(Map<String, String> map);
 
     List<SelectOptionDto> getfinprodIdForAdd1(Map<String, String> map);
+
+    /**
+     * 通过管理人查询交易对手
+     */
+    String getCountIdByManager(@Param("manager") String manager);
+
     /**
      * 
      * 获取新建界面的组合代码联想下拉框框

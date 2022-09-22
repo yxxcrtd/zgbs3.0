@@ -6,9 +6,7 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.service.TamsBusinessCommonService;
-import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.dao.FinDealPledgeMapper;
 import com.joyintech.tams.common.base.dao.FinTradeProductMapper;
 import com.joyintech.tams.common.base.entity.*;
@@ -20,16 +18,15 @@ import com.joyintech.tams.exchange.entrust.etrexchange.agreementrep.dto.EtrExcha
 import com.joyintech.tams.exchange.entrust.etrexchange.position.bean.PositionRequestBaseBean;
 import com.joyintech.tams.exchange.entrust.etrexchange.position.constant.PositionConstant;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
-import com.joyintech.tams.invest.common.entrust.inter.EtrTradeCommonervice;
 import com.joyintech.tams.invest.common.position.service.CommonPositionEngineService;
 import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import com.joyintech.tams.invest.entrust.etragrereptrade.dto.EtrAgreRepTradeDto;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -59,6 +56,12 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
     private FinTradeProductMapper finTradeProductMapper;
 
     /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
+
+    /**
      * EtrExchangeAgreRepTrade001Dto 请求对象使用
      *
      * @param entity
@@ -71,7 +74,7 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
         this.setCommonField(entity, resultMap, decisionAct);//设置公共字段，个性化的需要在具体接口中覆盖
         this.repo002(entity, resultMap);
 
-        PositionHttpRequest.send(resultMap);
+        positionRequestHandle.send(resultMap);
     }
 
     /**
@@ -82,7 +85,7 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
     public void sendDelete(EtrExchangeAgreRepTrade001Dto entity) {
         log.debug("sendDelete() called with parameters => 【entity = {}】", JsonUtils.object2Json(entity));
         String busiType = commonPositionEngineService.getPositionBusiType(entity.getFinprodType2(), entity.getPs(), entity.getAssetType2());
-        PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(), PositionConstant.POSITION_TYPE_ETR, busiType, entity.getPs());
+        positionRequestHandle.doDeleteByWorkFlowId(entity.getWorkflowId(), PositionConstant.POSITION_TYPE_ETR, busiType, entity.getPs());
     }
 
     /**
@@ -93,7 +96,7 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
     public void sendRevoke(EtrExchangeAgreRepTrade003Dto entity) {
         return;
 //        String busiType = commonPositionEngineService.getPositionBusiType(entity.getFinprodType2(), entity.getPs(), null);
-//        PositionHttpRequest.dorevoke(entity.getEntrustId(), PositionConstant.POSITION_TYPE_TRD, busiType, entity.getPs());
+//        positionRequestHandle.dorevoke(entity.getEntrustId(), PositionConstant.POSITION_TYPE_TRD, busiType, entity.getPs());
     }
 
     /**
@@ -113,7 +116,7 @@ public class PositionRequestServiceEtrExchangeAgreRepTrade001DtoRequest extends 
         resultMap.put("busiAct", 业务动作_指令手动关闭.getValue());
         resultMap.put("systemAct", 系统动作_关闭.getValue());
         resultMap.put("closeId", entity.getEntrustId());
-        PositionHttpRequest.batchClose(resultMap);
+        positionRequestHandle.batchClose(resultMap);
     }
 
     /**
