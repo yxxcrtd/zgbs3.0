@@ -1792,6 +1792,8 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
     资产类型_在途资金(DictCode.头寸资产类型, "C_08", "在途资金"),
     资产类型_手工调整资金(DictCode.头寸资产类型, "C_09", "手工调整资金"),
     资产类型_实时净申赎资金(DictCode.头寸资产类型, "C_10", "实时净申赎资金"),
+    资产类型_可用中间值(DictCode.头寸资产类型, "C_11", "可用中间值"),
+    资产类型_可取中间值(DictCode.头寸资产类型, "C_12", "可取中间值"),
 
     资产类型_资产账户持仓(DictCode.头寸资产类型,"A_001","资产账户持仓"),
 
