@@ -45,8 +45,8 @@
         }
         //计划类型check 申赎不同频时必填
        if(OPEN_TYPE == '01' && ($('#scheduletype').val() == null || $('#scheduletype').val() == '')){
-           Joyin.error(JoyinUtil.getMessage("COMMON_E_0009",JoyinUtil.getLabel("FinProductOpenPlanAdjust001.scheduleType")));
-           return;
+           // Joyin.error(JoyinUtil.getMessage("COMMON_E_0009",JoyinUtil.getLabel("FinProductOpenPlanAdjust001.scheduleType")));
+           // return;
        } 
        table.load();
     }
