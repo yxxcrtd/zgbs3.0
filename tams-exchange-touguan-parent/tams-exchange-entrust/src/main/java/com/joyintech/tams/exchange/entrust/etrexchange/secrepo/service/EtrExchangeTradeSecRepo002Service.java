@@ -204,6 +204,7 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
         param.put("ENTRUST_BUSS_TYPE_28",DictCodeListExt3.上农商_指令业务类型_债券现券交易指令.getValue());
         param.put("ENTRUST_BUSS_TYPE_29",DictCodeListExt3.上农商_指令业务类型_通用式质押回购指令.getValue());
         param.put("PRICE_MODEL_PRM03",DictCodeListExt2.价格模式_市价指令.getValue());
+        param.put("rolePos05", DictCodeListExt2.角色岗位_投资经理.getValue());
         String portfolioId = (String) param.get("portfolioId");
         if (StringUtil.isNotEmpty(portfolioId)) {
             param.put("portfolioIdList",
