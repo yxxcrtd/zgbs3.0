@@ -358,6 +358,9 @@ $(function() {
          * 交易金额
          */
         $('#tradeAmt').change(function(){
+            if(pageModel === PAGE_MODEL_REFERENCE){
+                return;
+            }
             var feeAmtPay = $('#feeAmtPay').val();
             var tradeAmt = $('#tradeAmt').val();
             var unitCprice = $('#unitCprice').val();
@@ -380,6 +383,9 @@ $(function() {
 
 
         $('#shareAmt').change(function(){
+            if(pageModel === PAGE_MODEL_REFERENCE){
+                return;
+            }
             if($('#ps').val() === ps_T19 || $('#ps').val() === ps_T24 ){
                 var unitCprice = $('#unitCprice').val();
                 var shareAmt = $('#shareAmt').val();

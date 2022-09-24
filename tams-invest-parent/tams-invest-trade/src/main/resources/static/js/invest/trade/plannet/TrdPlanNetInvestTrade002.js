@@ -478,6 +478,9 @@
             }
         });
         $('#shareAmt').change(function(){
+            if(pageModel === PAGE_MODEL_REFERENCE){
+                return;
+            }
             var shareAmt = $('#shareAmt').val();
             var ps = $('#ps').val();
             if(ps == ps_T04 || ps == ps_T06){
