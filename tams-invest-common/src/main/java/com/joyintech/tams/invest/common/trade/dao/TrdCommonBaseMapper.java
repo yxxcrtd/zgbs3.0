@@ -10,7 +10,9 @@
 
 package com.joyintech.tams.invest.common.trade.dao;
 
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.invest.common.dto.TrdStaSecInfoDto;
 import com.joyintech.tams.invest.common.dto.mock.trade.MockTradeInfoDto;
 import com.joyintech.tams.invest.common.dto.mock.trade.MockTrdProductDealDto;
@@ -454,4 +456,22 @@ public interface TrdCommonBaseMapper {
      * @return
      */
     List<InfContractPortfolioDetail> getInfContractPortfolioDetails(String seqNo);
+
+    List<StlSecAcctInfo> queryStlSecAcctInfo(Map<String, Object> params);
+
+    String queryGdhFlag(@Param("finprodId") String finprodId);
+
+    List<SelectOptionDto> queryReAcctNoByPortfolioId(@Param("portfolioId") String portfolioId);
+
+    Integer queryRecAndPayAcctNo(Map<String, Object> paraMap);
+
+    Integer insertWflBusinessList(@Param("workFlowId") String workFlowId);
+
+    StlCapacctInfo queryAcctNameByNo(@Param("acctNo") String acctNo);
+
+    StlCapacctInfo queryAcctByNo(@Param("acctNo") String acctNo);
+
+    TrdProductDeal selectZCTradeId(@Param("tradeId") String tradeId);
+
+    TrdProductDeal selectZCRTradeId(@Param("tradeId") String tradeId);
 }

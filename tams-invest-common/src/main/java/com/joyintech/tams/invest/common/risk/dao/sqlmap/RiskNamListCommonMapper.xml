@@ -163,4 +163,70 @@
             </if>
         </where>
     </select>
+    <select id="relateOrgFlag" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT MCI2.CUSTOMER_NAME "customerName", COUNT(1)
+        FROM INF_ORG_CORRELATION IOC,
+             MST_CUSTOMER_INFO MCI,
+             MST_CUSTOMER_INFO_ADD MCIA,
+             SYS_INSTITUTION SII,
+             MST_CUSTOMER_INFO     MCI2
+        WHERE IOC.ORG_NO = MCI.CUSTOMER_ID
+          AND IOC.ORG_NO = MCIA.CUSTOMER_ID
+          AND MCIA.INSITITUTE_CODE = SII.INSTITUTION_CODE
+          AND SII.INSTITUTION_TYPE = '01'
+          AND IOC.ORG_NO = #{corOrgid, jdbcType=VARCHAR}
+          AND IOC.COR_ORGID = MCI2.CUSTOMER_ID
+          AND ROWNUM = 1
+        GROUP BY MCI2.CUSTOMER_NAME
+    </select>
+
+    <select id="getNameListByFinprodIds" resultType="com.joyintech.tams.invest.common.risk.dto.RiskNameListDto">
+        SELECT
+        T1.LIST_ID listId,
+        T1.LIST_TYPE listType,
+        T1.LIST_DETAIL_TYPE listDetailType,
+        T3.LIST_DETAIL_ID finprodId,
+        T3.LIST_DETAIL_NAME finprodAbbr
+        FROM
+        RSK_ACCESS_LIST T1
+        inner join RSK_ACCESS_LIST_TYPE T2 ON T1.LIST_ID = T2.LIST_ID
+        inner join RSK_ACCESS_LIST_DETAIL T3 ON T1.LIST_ID = T3.LIST_ID
+        <where>
+            <if test="listType != null and listType != ''">
+                and T1.LIST_TYPE = #{listType, jdbcType=VARCHAR}
+            </if>
+            <if test="listDetailType != null and listDetailType != ''">
+                and T1.LIST_DETAIL_TYPE = #{listDetailType, jdbcType=VARCHAR}
+            </if>
+            <if test="rskAssetType1 != null and rskAssetType1 != ''">
+                and T2.RSK_ASSET_TYPE1 = #{rskAssetType1, jdbcType=VARCHAR}
+            </if>
+            <if test="finprodIds != null and finprodIds.size() > 0">
+                and T3.LIST_DETAIL_ID in
+                <foreach collection="finprodIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="queryFpById" resultType="com.joyintech.tams.common.base.entity.FinProduct">
+        SELECT T.ISSUER, T.FINPROD_ID, T.FINANCIER, T.MANAGER
+          FROM FIN_PRODUCT T
+         WHERE instr(T.FINPROD_ID, #{finprodId, jdbcType=VARCHAR}) > 0
+    </select>
+    <select id="queryMstCP" resultType="com.joyintech.tams.common.base.entity.MstCounterParty">
+        SELECT T.LINK_ID, T.MANAGER_ID
+          FROM MST_COUNTER_PARTY T
+         WHERE T.COUNTER_ID = #{counterId, jdbcType=VARCHAR}
+           AND ROWNUM = 1
+    </select>
+    <select id="findByInstructionId" resultType="Integer">
+        SELECT COUNT (*) FROM ETR_ENTRUST T WHERE T.ENTRUST_ID = #{instructionId} and t.entrust_type in ('17','18','19','20','21','22','29')
+    </select>
+    <select id="queryInOrderId" resultType="java.lang.String">
+        SELECT STL.ORDER_ID
+          FROM WFL_TRD_PRODUCT_DEAL T, WFL_STL_PAY_ORDERS STL
+         WHERE T.TRADE_ID = STL.TRADE_ID
+           AND T.R_TRADE_ID = #{tradeId, jdbcType=VARCHAR}
+    </select>
 </mapper>

@@ -2,6 +2,7 @@ package com.joyintech.tams.invest.trade.transfer.trdrolloverpledgedrepo.dto;
 
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
+import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.tams.invest.trade.lend.dto.FinTradeProductDto;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
@@ -197,6 +198,11 @@ public class TrdRolloverPledgedRepo001Dto extends TrdProductDeal implements Proc
      * 交易员部门
      */
     private String deptCode;
+
+    /**
+     * 风险试算实体类
+     */
+    private List<RiskTrialRetDto> riskTrialRetDto;
 
     /**
      * Gets the value of isGuarantee.
@@ -999,5 +1005,13 @@ public class TrdRolloverPledgedRepo001Dto extends TrdProductDeal implements Proc
 
     public void setZcId(String zcId) {
         this.zcId = zcId;
+    }
+
+    public List<RiskTrialRetDto> getRiskTrialRetDto() {
+        return riskTrialRetDto;
+    }
+
+    public void setRiskTrialRetDto(List<RiskTrialRetDto> riskTrialRetDto) {
+        this.riskTrialRetDto = riskTrialRetDto;
     }
 }

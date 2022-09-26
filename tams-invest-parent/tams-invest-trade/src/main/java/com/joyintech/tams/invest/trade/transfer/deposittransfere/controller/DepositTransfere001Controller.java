@@ -1,5 +1,6 @@
 package com.joyintech.tams.invest.trade.transfer.deposittransfere.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
@@ -8,6 +9,7 @@ import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
@@ -18,8 +20,9 @@ import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
-import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
+import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.trade.bond.service.TrdBondInvestTrade002Service;
+import com.joyintech.tams.invest.trade.transfer.aop.RdsTransferAop;
 import com.joyintech.tams.invest.trade.transfer.deposittransfere.dto.DepositTransfere001Dto;
 import com.joyintech.tams.invest.trade.transfer.deposittransfere.dto.DepositTransfere002Dto;
 import com.joyintech.tams.invest.trade.transfer.deposittransfere.service.DepositTransfere001Service;
@@ -43,6 +46,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
 *
@@ -72,7 +76,7 @@ public class DepositTransfere001Controller extends BaseController {
         //下拉框
         this.setSelectOptionToModel(model, DictCode.币种);
         Map<String, Object> paraMap = RequestUtil.getPageParam();
-        String tradeId = (String) paraMap.get("busiId");
+        String tradeId = (String) paraMap.get("tradeId");
         String portfolioId = (String) paraMap.get("portfolioId");
         String pageModel = (String) paraMap.get("pageModel");
         String workflowId = (String) paraMap.get("workflowId");
@@ -89,6 +93,16 @@ public class DepositTransfere001Controller extends BaseController {
             model.addAttribute("entityData", JsonUtils.object2Json(entity.getDepositTransfere002Dto()));
             model.addAttribute("entity", entity);
             model.addAttribute("formTodoList", true);
+            model.addAttribute("bussTrdTransferOrder", JsonUtils.object2Json(entity.getBussTrdTransferOrder()));
+//            for (DepositTransfere002Dto info : entity.getSecResoluteDtoList()) {
+//                for (BussTrdTransferOrderDto bussDto : entity.getBussTrdTransferOrder()) {
+//                    if(bussDto.getTradeId().equals(info.getStlPayId())) {
+//                        info.setStlPayOrdersList(Arrays.asList(bussDto));
+//                    }
+//                }
+//            }
+
+
         } else {
             //初始化界面
             //Map<String, Object> map = new HashMap<>();
@@ -220,6 +234,24 @@ public class DepositTransfere001Controller extends BaseController {
 			wr.setMessage("转仓列表信息不能空", MessageType.错误消息);
 			return wr;
 		}
+        if (StringUtil.isEmptyList(dto.getBussTrdTransferOrder())) {
+            wr.setStatuCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            wr.setMessage("指令列表信息不能空", MessageType.错误消息);
+            return wr;
+        }
+        if (dto.getDepositTransfere002Dto().size() != dto.getBussTrdTransferOrder().size()) {
+            wr.setStatuCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            wr.setMessage("指令生成要素已变更，请重新生成划款指令", MessageType.错误消息);
+            return wr;
+        }
+        Map<String, BussTrdTransferOrderDto> bussMap = dto.getBussTrdTransferOrder().stream().collect(Collectors.toMap(BussTrdTransferOrderDto::getInPortfolioId, v1->v1));
+        for (DepositTransfere002Dto info : dto.getDepositTransfere002Dto()) {
+            if (null == bussMap.get(info.getPortfolioId()) || bussMap.get(info.getPortfolioId()).getSettleAmt().compareTo(info.getTransferTradeAmt()) != 0) {
+                wr.setStatuCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+                wr.setMessage("指令生成要素已变更，请重新生成划款指令", MessageType.错误消息);
+                return wr;
+            }
+        }
         if (StringUtil.isNotEmpty(dto.getChlId())) {
             Integer count;
             String str = "";
@@ -295,7 +327,7 @@ public class DepositTransfere001Controller extends BaseController {
     @ResponseBody
     @RequestMapping("save")
     public AjaxResult save(@RequestBody @Validated({
-            ValidateGroupEdit.class}) DepositTransfere001Dto dto, BindingResult br) throws WorkFlowException {
+            ValidateGroupEdit.class}) DepositTransfere001Dto dto, BindingResult br) throws Exception {
         if (br.hasErrors()) {
             return new AjaxResult(br);
         }
@@ -332,6 +364,13 @@ public class DepositTransfere001Controller extends BaseController {
                         + "交易日："
                         + DateUtil.format(entity.getTradeDate()));
         processParameter.setWorkFlowParameter(params);
+        //实占
+        if (StringUtil.equals(BussinessConstant.SUBMIT, dto.getOperateType())) {
+            AjaxResult ar = RdsTransferAop.doListOccupy(dto);
+            if (StringUtil.isNotEmpty(ar)) {
+                return ar;
+            }
+        }
         String msg = depositTransfere001Service.start(processParameter, dto);
         return new AjaxResult(msg);
     }
@@ -344,4 +383,17 @@ public class DepositTransfere001Controller extends BaseController {
         String index = baseGetBusinessId.buildBussinessCode(codeParameter);
         return index;
     }
+
+    /**
+     * 划款指令生成实体类
+     */
+    @ResponseBody
+    @RequestMapping("getEntity")
+    public List<TrdProductDeal> getEntity(){
+        Map<String,Object> map = RequestUtil.getParameters(getRequest());
+        DepositTransfere001Dto transferOutDto = BeanUtil.mapToObject(map, DepositTransfere001Dto.class);
+        List<DepositTransfere002Dto> transferInDtoList = JSONArray.parseArray(String.valueOf(map.get("dataList")), DepositTransfere002Dto.class);
+        return depositTransfere001Service.generateOrdersYQs(transferOutDto, transferInDtoList);
+    }
+
 }

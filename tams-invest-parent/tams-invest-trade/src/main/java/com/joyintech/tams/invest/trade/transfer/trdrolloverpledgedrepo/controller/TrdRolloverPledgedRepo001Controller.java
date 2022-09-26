@@ -87,6 +87,7 @@ public class TrdRolloverPledgedRepo001Controller extends BaseController {
                 model.addAttribute("PledgedRepoInfoListData", JsonUtils.object2Json(dto.getPledgedRepoInfoList()));
                 model.addAttribute("formTodoList", true);
             }
+            model.addAttribute(GlobalConstant.WORKFLOW_ID, workflowId);
         }
         else{
             if(StringUtil.isNotEmpty(tradeId)){

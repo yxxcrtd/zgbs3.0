@@ -113,7 +113,7 @@
         left join PTL_CAPACCT_INFO pci
         on pci.PORTFOLIO_ID=pp.PORTFOLIO_ID and pci.ACCT_TYPE = 'A01'
         <where>
-            pp.INVEST_YESORNO = 'Y' AND pp.PORTFOLIO_TYPE != '04'
+            pp.INVEST_YESORNO = 'Y' AND pp.PORTFOLIO_TYPE = '01'
             and pp.PORTFOLIO_ID != #{investPortfolioId}
             <!--            <if test="investPortfolioId != null and investPortfolioId != ''">-->
             <!--                AND pp.INV_TRANS_PORTF = #{investPortfolioId}-->
@@ -135,8 +135,7 @@
             <if test="tradeDate !=null and tradeDate!=''">
             	AND pp.MDATE &gt; to_date(#{tradeDate},'yyyy-mm-dd')
             </if>
-            and pci.ACCT_NO in (select ACCT_NO from PTL_CAPACCT_INFO where PORTFOLIO_ID=#{investPortfolioId} and
-            ACCT_TYPE='A01')
+            <!--and pci.ACCT_NO in (select ACCT_NO from PTL_CAPACCT_INFO where PORTFOLIO_ID=#{investPortfolioId} and ACCT_TYPE='A01')-->
         </where>
         <!--add by xuzhihao-->
     </select>
@@ -195,32 +194,80 @@
     </select>
     <!--查询前一日估值净价-->
     <select id="getLastNetPrice" resultType="java.math.BigDecimal">
-        <if test="invAim != null and invAim == 'AC'">
-            select ROUND(b.TDY_COST_AMT/b.POS_AMT, 4) NETPRICE
-            from BOK_STAT_DET_POSIITON b
-            LEFT JOIN FIN_PRODUCT f on b.BOOKSET_ID = F.FINPROD_ID
-            WHERE b.INV_AIM = #{invAim}
-            and B.BUSI_ID = #{finprodId}
-            AND TO_CHAR(B.HAPPEN_DATE, 'yyyy-MM-dd') = #{sysDate}
-            <!-- add by liuwei for huaxing 20200309 start -->
-            AND b.BOOKSET_ID = decode(f.profit_type,#{PROFIT_TYPE_02},#{portfolioId},CONCAT(#{FINPROD_TYPE_TG_F16},#{portfolioId}))
-        </if>
-        <if test="invAim != null and invAim != 'AC'">
-            SELECT
-            NETPRICE
-            FROM
-            MST_BOND_VALUATION_INFO
-            WHERE
-            SEC_ID = #{finprodMarketId}
-            AND VALUE_SOURCE = #{VALUATION_SOURCE}
-            AND VALUE_DATE = (
-            SELECT MAX(VALUE_DATE) FROM MST_BOND_VALUATION_INFO
-            WHERE to_char(VALUE_DATE, 'yyyy-MM-dd') = #{sysDate}
-            AND SEC_ID = #{finprodMarketId}
-            AND VALUE_SOURCE = #{VALUATION_SOURCE}
-            )
-        </if>
+<!--        <if test="invAim != null and invAim == 'AC'">-->
+<!--            select ROUND(b.TDY_COST_AMT/b.POS_AMT, 4) NETPRICE-->
+<!--            from BOK_STAT_DET_POSIITON b-->
+<!--            LEFT JOIN FIN_PRODUCT f on b.BOOKSET_ID = F.FINPROD_ID-->
+<!--            WHERE b.INV_AIM = #{invAim}-->
+<!--            and B.BUSI_ID = #{finprodId}-->
+<!--            AND TO_CHAR(B.HAPPEN_DATE, 'yyyy-MM-dd') = #{sysDate}-->
+<!--            &lt;!&ndash; add by liuwei for huaxing 20200309 start &ndash;&gt;-->
+<!--            AND b.BOOKSET_ID = decode(f.profit_type,#{PROFIT_TYPE_02},#{portfolioId},CONCAT(#{FINPROD_TYPE_TG_F16},#{portfolioId}))-->
+<!--        </if>-->
+<!--        <if test="invAim != null and invAim != 'AC'">-->
+<!--            SELECT-->
+<!--            NETPRICE-->
+<!--            FROM-->
+<!--            MST_BOND_VALUATION_INFO-->
+<!--            WHERE-->
+<!--            SEC_ID = #{finprodMarketId}-->
+<!--            AND VALUE_SOURCE = #{VALUATION_SOURCE}-->
+<!--            AND VALUE_DATE = (-->
+<!--            SELECT MAX(VALUE_DATE) FROM MST_BOND_VALUATION_INFO-->
+<!--            WHERE to_char(VALUE_DATE, 'yyyy-MM-dd') = #{sysDate}-->
+<!--            AND SEC_ID = #{finprodMarketId}-->
+<!--            AND VALUE_SOURCE = #{VALUATION_SOURCE}-->
+<!--            )-->
+<!--        </if>-->
 
+        select NVL(MARKET_VALUE,0)/SHARE_AMT
+        from PTL_SEC_VALUTION
+        where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+        AND FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+        AND INV_AIM = #{invAim,jdbcType=VARCHAR}
+        AND CCY =  #{ccy,jdbcType=VARCHAR}
+        AND CDATE = to_date(#{tradeDate}, 'yyyy-MM-dd')
+    </select>
+    <select resultType="int" id="selectYwmsData" parameterType="java.util.Map">
+        SELECT
+        (SELECT COUNT(1) FROM TRD_PRODUCT_DEAL FPD INNER JOIN TRD_PRODUCT_DEAL_ADD FPAD ON FPD.TRADE_ID = FPAD.TRADE_ID
+        WHERE FPD.INV_AIM != #{turnInvAim,jdbcType=VARCHAR} AND FPAD.PORTFOLIO_ID = #{portfolioIdEn,jdbcType=VARCHAR} AND FPD.FINPROD_ID = #{finprodId,jdbcType=VARCHAR})
+        +
+        (SELECT COUNT(1) FROM WFL_TRD_PRODUCT_DEAL WTP INNER JOIN WFL_TRD_PRODUCT_DEAL_ADD WTPA ON WTP.TRADE_ID = WTPA.TRADE_ID
+        WHERE WTP.INV_AIM != #{turnInvAim,jdbcType=VARCHAR} AND WTPA.PORTFOLIO_ID = #{portfolioIdEn,jdbcType=VARCHAR} AND WTP.FINPROD_ID = #{finprodId,jdbcType=VARCHAR})
+        +
+        (SELECT COUNT(1) FROM ETR_ENTRUST EE WHERE EE.INV_AIM != #{turnInvAim,jdbcType=VARCHAR} AND EE.PORTFOLIO_ID = #{portfolioIdEn,jdbcType=VARCHAR} AND EE.FINPROD_ID = #{finprodId,jdbcType=VARCHAR})
+        +
+        (SELECT COUNT(1) FROM WFL_ETR_ENTRUST WE WHERE WE.INV_AIM != #{turnInvAim,jdbcType=VARCHAR} AND WE.PORTFOLIO_ID = #{portfolioIdEn,jdbcType=VARCHAR} AND WE.FINPROD_ID = #{finprodId,jdbcType=VARCHAR})
+        +
+        (SELECT COUNT(1) FROM ETR_ENTRUST EE INNER JOIN ETR_ENTRUST_DETAIL ED ON EE.ENTRUST_ID = ED.ENTRUST_ID
+        WHERE EE.INV_AIM != #{turnInvAim,jdbcType=VARCHAR} AND  ED.PORTFOLIO_ID = #{portfolioIdEn,jdbcType=VARCHAR} AND EE.FINPROD_ID = #{finprodId,jdbcType=VARCHAR})
+        +
+        (SELECT COUNT(1) FROM WFL_ETR_ENTRUST WE INNER JOIN WFL_ETR_ENTRUST_DETAIL WED ON WE.ENTRUST_ID = WED.ENTRUST_ID
+        WHERE WE.INV_AIM != #{turnInvAim,jdbcType=VARCHAR} AND WED.PORTFOLIO_ID = #{portfolioIdEn,jdbcType=VARCHAR} AND WE.FINPROD_ID = #{finprodId,jdbcType=VARCHAR})
+        FROM DUAL
+    </select>
+
+    <select resultType="int" id="selectCpriceData">
+        select
+        (SELECT COUNT(1)
+          FROM TRD_PRODUCT_DEAL TD
+         INNER JOIN TRD_PRODUCT_DEAL_ADD TDA
+            ON TD.TRADE_ID = TDA.TRADE_ID
+         WHERE TD.INV_AIM = #{turnInvAim,jdbcType=VARCHAR}
+           AND TD.TRADE_DATE = #{tradeDate,jdbcType=TIMESTAMP}
+           AND TDA.PORTFOLIO_ID != #{portfolioId,jdbcType=VARCHAR}
+           AND TD.CPRICE_AMT = #{unitCprice,jdbcType=DECIMAL}
+           AND TD.IS_OUT_TRADE = 'N' AND TD.TRADE_STATUS = '01' AND TD.IS_CANCEL = 'N')
+        +
+        (SELECT COUNT(1)
+          FROM WFL_TRD_PRODUCT_DEAL WP
+         INNER JOIN WFL_TRD_PRODUCT_DEAL_ADD WPA
+            ON WP.TRADE_ID = WPA.TRADE_ID
+           AND WPA.PORTFOLIO_ID != #{portfolioId,jdbcType=VARCHAR}
+           AND WP.TRADE_DATE = #{tradeDate,jdbcType=TIMESTAMP}
+           AND WP.CPRICE_AMT = #{unitCprice,jdbcType=DECIMAL}
+           AND WP.IS_OUT_TRADE = 'N') from dual
     </select>
 
     <select resultType="int" id="selectData">
@@ -278,5 +325,18 @@
             AND TFPDT.TRADE_STATUS = #{TRADE_STATUS01}
             AND TFPDT.IS_CANCEL = #{NO}
         </where>
+    </select>
+
+    <select id="selectBondValuationInfo" parameterType="java.util.Map"
+            resultType="com.joyintech.service.trade.transfer.common.dto.BondValuationDto">
+        select * from
+        (select SEC_ID finprodId,  NETPRICE valuation
+         from MST_BOND_VALUATION_INFO
+         where SEC_ID = #{finprodId,jdbcType=VARCHAR}
+           and VALUE_SOURCE = #{valueSource,jdbcType=VARCHAR}
+           and VALUE_DATE  <![CDATA[ < ]]> to_date(#{tradeDate,jdbcType=VARCHAR}, 'yyyy-MM-dd')
+         order by VALUE_DATE desc
+        )
+        where rownum = 1
     </select>
 </mapper>

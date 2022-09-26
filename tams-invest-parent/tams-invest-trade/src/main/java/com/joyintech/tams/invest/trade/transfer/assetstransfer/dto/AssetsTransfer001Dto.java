@@ -3,6 +3,7 @@ package com.joyintech.tams.invest.trade.transfer.assetstransfer.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
 
@@ -731,7 +732,10 @@ public class AssetsTransfer001Dto extends BaseEntity {
      * @return invAim 投资目的
      */
     public String getInvAim() {
-        return this.invAim;
+        if(StringUtil.equals(invAim,"AC") || StringUtil.equals(invAim,"FVTPL")){
+            return this.invAim;
+        }
+        return null;
     }
     
     /**
@@ -740,7 +744,7 @@ public class AssetsTransfer001Dto extends BaseEntity {
      * @return invAim 投资目的
      */
     public String getInvAimVal() {
-    	return SysDataUtil.getNameFromDataDict(DictCode.投资目的,this.getInvAim());
+    	return SysDataUtil.getNameFromDataDict(DictCode.业务模式,this.getInvAim());
     }
 
     /**
@@ -803,5 +807,18 @@ public class AssetsTransfer001Dto extends BaseEntity {
 
     public void setTotleTradeId(String totleTradeId) {
         this.totleTradeId = totleTradeId;
+    }
+
+    /**
+     * 是否行权
+     */
+    private String isRight;
+
+    public String getIsRight() {
+        return isRight;
+    }
+
+    public void setIsRight(String isRight) {
+        this.isRight = isRight;
     }
 }

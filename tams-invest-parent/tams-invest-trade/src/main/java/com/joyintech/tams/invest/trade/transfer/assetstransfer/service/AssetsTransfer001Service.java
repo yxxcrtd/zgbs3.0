@@ -63,6 +63,9 @@ public class AssetsTransfer001Service extends BaseService<AssetsTransfer001Dto> 
         List<DataDictItem> profitList = (List<DataDictItem>) SysDataUtil.getDataDictItem(DictCode.收益类型.getValue());
         if (profitList.size() > 0) {
             for (DataDictItem map : profitList) {
+                if ("02".equals(map.getItemCode())) {
+                    continue;
+                }
                 TreeNode treeDto = new TreeNode();
                 treeDto.setId(map.getItemCode());
                 treeDto.setName(map.getItemValue());

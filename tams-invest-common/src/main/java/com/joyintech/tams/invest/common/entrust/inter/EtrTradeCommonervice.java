@@ -1168,4 +1168,69 @@ public class EtrTradeCommonervice extends BaseService {
         return resp;
     }
 
+    /**
+     * 组合现金可用
+     */
+    public BigDecimal queryPositionAvailableCash(PositionCashSecRequest requestDto) {
+        // 条件非空校验
+        posiInfoCheckCondition(requestDto);
+
+        // 组合现金可用
+        BigDecimal portfolioCash = BigDecimal.ZERO;
+
+        if (requestDto.getPtlList() == null || requestDto.getPtlList().size() == 0) {
+            return portfolioCash;
+        }
+
+        List<PositionCashSecDto> list = requestDto.getPtlList();
+        String flowType = requestDto.getFlowType();
+        if (!CollectionUtils.isEmpty(list)) {
+            //查询组合下所有现金账户
+            List<PositionCashSecDto> sumPortfolioAcctNoList = new ArrayList<>();
+            for (PositionCashSecDto dto : list) {
+                if (StringUtil.isEmpty(dto.getPortfolioId())) {
+                    continue;
+                }
+                if (StringUtil.isEmpty(dto.getCdate())) {
+                    dto.setCdate(iPlatformDate.getSysDateStr());
+                }
+                List<String> acctTypeList = new ArrayList<>();
+                acctTypeList.add(BussinessDictCodeList.资金账户类型_托管账户.getValue());
+//                acctTypeList.add(BussinessDictCodeList.资金账户类型_交易所资金账户.getValue());
+                List<PtlCapacctInfo> acctNoList = etrTrdCommonMapper.getPtlAcctInfo(dto.getPortfolioId(), acctTypeList);
+                if (!CollectionUtils.isEmpty(acctNoList)) {
+                    for (PtlCapacctInfo ptlCapacctInfo : acctNoList) {
+                        PositionCashSecDto cashSecDto = new PositionCashSecDto();
+                        BeanUtil.copyPropertiesIgnoreNull(cashSecDto, dto); //复制资产信息
+                        cashSecDto.setAcctId(ptlCapacctInfo.getAcctNo());
+                        if (StringUtil.equals(BussinessDictCodeList.资金账户类型_托管账户.getValue(), ptlCapacctInfo.getAcctType())) {
+                            cashSecDto.setHoldingType(DictCodeListExt3.资产类型_托管户可用资金.getValue());
+                        }
+                        sumPortfolioAcctNoList.add(cashSecDto);
+                    }
+                }
+            }
+            //组合资金可用
+            BigDecimal oldPortfolioAmount = BigDecimal.ZERO;
+            for (PositionCashSecDto dto : list) {
+                if (StringUtil.isEmpty(dto.getPortfolioId())) {
+                    continue;
+                }
+                if (StringUtil.isEmpty(dto.getCdate())) {
+                    dto.setCdate(iPlatformDate.getSysDateStr());
+                }
+                oldPortfolioAmount = oldPortfolioAmount.add(getPortfolioAvailableCashForChangnei(dto.getPortfolioId()));
+            }
+            if (!CollectionUtils.isEmpty(sumPortfolioAcctNoList)) {
+                //组合资金可用 2、新头寸引擎
+                BigDecimal newPortfolioAmount = queryPosition(sumPortfolioAcctNoList, flowType, DictCodeListExt3.资产类型_托管户可用资金.getValue());
+                if (newPortfolioAmount != null) {
+                    portfolioCash = ArithmeticUtil.doAdd(oldPortfolioAmount, newPortfolioAmount);
+                }
+            }
+        }
+
+        return portfolioCash;
+    }
+
 }

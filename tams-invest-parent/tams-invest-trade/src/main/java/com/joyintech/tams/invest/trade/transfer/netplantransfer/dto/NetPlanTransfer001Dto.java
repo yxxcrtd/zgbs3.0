@@ -3,6 +3,7 @@ package com.joyintech.tams.invest.trade.transfer.netplantransfer.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
@@ -119,6 +120,34 @@ public class NetPlanTransfer001Dto extends BaseEntity implements ProcessEntity {
      * 风险试算实体类
      */
     private List<RiskTrialRetDto> riskTrialRetDto;
+
+    /**
+     * 触发加签flag，风险岗审批
+     */
+    private String riskFlag;
+
+    /**
+     * 附件编号
+     */
+    private String businessId;
+
+    public String getBusinessId() {
+        return businessId;
+    }
+
+    public void setBusinessId(String businessId) {
+        this.businessId = businessId;
+    }
+
+    private String fileArrayName;
+
+    public String getFileArrayName() {
+        return fileArrayName;
+    }
+
+    public void setFileArrayName(String fileArrayName) {
+        this.fileArrayName = fileArrayName;
+    }
 
     /**
      * 获取 交易日期
@@ -546,5 +575,56 @@ public class NetPlanTransfer001Dto extends BaseEntity implements ProcessEntity {
 
     public void setZcId(String zcId) {
         this.zcId = zcId;
+    }
+
+    /**
+     * 划款指令
+     */
+    private List<BussTrdTransferOrderDto> bussTrdTransferOrder;
+
+    public List<BussTrdTransferOrderDto> getBussTrdTransferOrder() {
+        return bussTrdTransferOrder;
+    }
+
+    public void setBussTrdTransferOrder(List<BussTrdTransferOrderDto> bussTrdTransferOrder) {
+        this.bussTrdTransferOrder = bussTrdTransferOrder;
+    }
+    private String checkStatus;
+
+    private String valueStatus;
+
+    public String getCheckStatus() {
+        return checkStatus;
+    }
+
+    public void setCheckStatus(String checkStatus) {
+        this.checkStatus = checkStatus;
+    }
+
+    public String getValueStatus() {
+        return valueStatus;
+    }
+
+    public void setValueStatus(String valueStatus) {
+        this.valueStatus = valueStatus;
+    }
+
+    @JsonSerialize(using= BigDecimalSerializer.class)
+    private BigDecimal carryOverQty;
+
+    public BigDecimal getCarryOverQty() {
+        return carryOverQty;
+    }
+
+    public void setCarryOverQty(BigDecimal carryOverQty) {
+        this.carryOverQty = carryOverQty;
+    }
+
+    public String getRiskFlag() {
+        return riskFlag;
+    }
+
+    public void setRiskFlag(String riskFlag) {
+        this.riskFlag = riskFlag;
     }
 }

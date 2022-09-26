@@ -3,6 +3,7 @@ package com.joyintech.service.trade.transfer.planratetransfer.controller;
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.service.trade.transfer.common.service.TransferCommonService;
 import com.joyintech.service.trade.transfer.planratetransfer.dto.PlanTransferDto;
 import com.joyintech.service.trade.transfer.planratetransfer.dto.PlanTransferDtos;
 import com.joyintech.service.trade.transfer.planratetransfer.service.TrdPlanRateInvestTradeTransferService;
@@ -34,6 +35,8 @@ public class TrdPlanRateInvestTradeTransferController extends BaseController {
      */
     @Autowired
     private BaseRepTradeInfoService baseRepTradeInfoService;
+    @Autowired
+    private TransferCommonService transferCommonService;
 
     /**
      * 组合代码下拉框
@@ -44,9 +47,9 @@ public class TrdPlanRateInvestTradeTransferController extends BaseController {
      */
     @RequestMapping("queryProdIdInfo")
     @ResponseBody
-    public List<SelectOptionDto> queryProdIdInfo(@RequestBody Map<String, Object> param)
-    {
-        return trdPlanRateInvestTradeTransferService.selectPortoId(param);
+    public List<SelectOptionDto> queryProdIdInfo(@RequestBody Map<String, Object> param) {
+//        return trdPlanRateInvestTradeTransferService.selectPortoId(param);
+        return transferCommonService.selectPortoId(param);
     }
 
     @RequestMapping("queryAssetInt")

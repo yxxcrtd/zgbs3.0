@@ -1,6 +1,7 @@
 package com.joyintech.service.trade.transfer.sectransfer.dao;
 
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.service.trade.transfer.common.dto.BondValuationDto;
 import com.joyintech.service.trade.transfer.sectransfer.dto.SecTransfer001Dto;
 import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.common.base.entity.StlPayOrders;
@@ -93,6 +94,11 @@ public interface SecTransferMapper {
 
     int selectData(Map<String, Object> map);
 
+    int selectYwmsData(Map<String, Object> map);
+
+    int selectCpriceData(Map<String, Object> map);
+
+
     /**
      * 查询上市标的发行标的信息
      * @param param 资产代码
@@ -100,4 +106,6 @@ public interface SecTransferMapper {
      * @since 2.1.7
      */
     FinProduct selectApperInfo(Map<String, Object> param);
+
+    List<BondValuationDto> selectBondValuationInfo(Map<String, Object> param);
 }

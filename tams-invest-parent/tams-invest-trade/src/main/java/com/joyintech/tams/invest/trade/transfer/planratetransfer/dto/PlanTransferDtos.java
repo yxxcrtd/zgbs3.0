@@ -294,4 +294,41 @@ public class PlanTransferDtos extends BaseEntity {
     public void setTotleTradeIdOut(String totleTradeIdOut) {
         this.totleTradeIdOut = totleTradeIdOut;
     }
+
+    private String stlPayId;
+
+    public String getStlPayId() {
+        return stlPayId;
+    }
+
+    public void setStlPayId(String stlPayId) {
+        this.stlPayId = stlPayId;
+    }
+
+    public BigDecimal getTradeAmt() {
+        return this.getTransferTradeAmt();
+    }
+
+    private String fileArrayName;
+
+    public String getFileArrayName() {
+        return fileArrayName;
+    }
+
+    public void setFileArrayName(String fileArrayName) {
+        this.fileArrayName = fileArrayName;
+    }
+
+    /**
+     * 附件编号
+     */
+    private String businessId;
+
+    public String getBusinessId() {
+        return businessId;
+    }
+
+    public void setBusinessId(String businessId) {
+        this.businessId = businessId;
+    }
 }

@@ -16,6 +16,7 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.trade.bond.service.TrdBondInvestTrade002Service;
+import com.joyintech.tams.invest.trade.transfer.aop.RdsTransferAop;
 import com.joyintech.tams.invest.trade.transfer.lendtransfer.dto.LendTransfer001Dto;
 import com.joyintech.tams.invest.trade.transfer.lendtransfer.dto.LendTransfer002Dto;
 import com.joyintech.tams.invest.trade.transfer.lendtransfer.service.LendTransfer001Service;
@@ -296,7 +297,7 @@ public class LendTransfer001Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("save")
-    public AjaxResult save(@RequestBody LendTransfer001Dto dto, BindingResult br) throws WorkFlowException {
+    public AjaxResult save(@RequestBody LendTransfer001Dto dto, BindingResult br) throws Exception {
         if (br.hasErrors()) {
             return new AjaxResult(br);
         }
@@ -328,6 +329,13 @@ public class LendTransfer001Controller extends BaseController {
             dto.getLendTransfer002DtoList().forEach(lendTransfer002Dto -> {
                 lendTransfer001Service.genFinProductDto(lendTransfer002Dto,dto);
             });
+        }
+        //实占
+        if (StringUtil.equals(BussinessConstant.SUBMIT, dto.getOperateType())) {
+            AjaxResult ar = RdsTransferAop.doListOccupy(dto);
+            if (StringUtil.isNotEmpty(ar)) {
+                return ar;
+            }
         }
         String msg = lendTransfer001Service.start(processParameter, dto);
         return new AjaxResult(msg);

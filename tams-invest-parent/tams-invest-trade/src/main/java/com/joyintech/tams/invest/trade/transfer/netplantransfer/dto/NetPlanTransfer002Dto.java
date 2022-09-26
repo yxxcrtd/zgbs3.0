@@ -3,6 +3,7 @@ package com.joyintech.tams.invest.trade.transfer.netplantransfer.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
+import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
 
@@ -241,5 +242,51 @@ public class NetPlanTransfer002Dto extends BaseEntity {
      */
     public void setRiskTrialRetDto(List<RiskTrialRetDto> riskTrialRetDto) {
         this.riskTrialRetDto = riskTrialRetDto;
+    }
+
+    /**
+     * 划款指令
+     */
+    private List<StlPayOrdersDto> stlPayOrdersList;
+
+    public List<StlPayOrdersDto> getStlPayOrdersList() {
+        return stlPayOrdersList;
+    }
+
+    public void setStlPayOrdersList(List<StlPayOrdersDto> stlPayOrdersList) {
+        this.stlPayOrdersList = stlPayOrdersList;
+    }
+    private String fileArrayName;
+
+    public String getFileArrayName() {
+        return fileArrayName;
+    }
+
+    public void setFileArrayName(String fileArrayName) {
+        this.fileArrayName = fileArrayName;
+    }
+
+    /**
+     * 附件编号
+     */
+    private String businessId;
+
+    public String getBusinessId() {
+        return businessId;
+    }
+
+    public void setBusinessId(String businessId) {
+        this.businessId = businessId;
+    }
+
+    @JsonSerialize(using= BigDecimalSerializer.class)
+    private BigDecimal carryOverQty;
+
+    public BigDecimal getCarryOverQty() {
+        return carryOverQty;
+    }
+
+    public void setCarryOverQty(BigDecimal carryOverQty) {
+        this.carryOverQty = carryOverQty;
     }
 }

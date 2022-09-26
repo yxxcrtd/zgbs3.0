@@ -38,7 +38,10 @@
                     field: 'payAcctNo', width: 130, title: 'BussTrdTransferOrder.payAcctNo', edit: true,
                     editOption: {
                         type: 'select', multiple: false, searchable: true, parentIds: entityName + '_payAcctNo,ccy_select', showField: 'id',
-                        url: JoyinUtil.getRealPath("/component/trade/BussTrdTransferOrder/select")
+                        url: JoyinUtil.getRealPath("/component/trade/BussTrdTransferOrder/select"),
+                        postData:function () {
+                        return {selectRowValue: JSON.stringify(selectRow), type: 'payAcctNo',
+                                isLimitAcct : calcConditionObjBackUp.isLimitAcct, portfolioId : calcConditionObjBackUp.portfolioId};}
                     }, sortable: false
                 }
                 , {field: 'payAcctName', width: 150, title: 'BussTrdTransferOrder.payAcctName', sortable: false}
@@ -46,16 +49,39 @@
                     field: 'recAcctNo', width: 130, title: 'BussTrdTransferOrder.recAcctNo', edit: true,
                     editOption: {
                         type: 'select', multiple: false, searchable: true, parentIds: entityName + '_recAcctNo,ccy_select', showField: 'id',
-                        url: JoyinUtil.getRealPath("/component/trade/BussTrdTransferOrder/select")
+                        url: JoyinUtil.getRealPath("/component/trade/BussTrdTransferOrder/select"),
+                        postData:function () {
+                        return {selectRowValue: JSON.stringify(selectRow), type: 'recAcctNo',
+                                isLimitAcct : calcConditionObjBackUp.isLimitAcct, portfolioId : calcConditionObjBackUp.portfolioId};}
                     }, sortable: false
                 }
                 , {field: 'recAcctName', width: 150, title: 'BussTrdTransferOrder.recAcctName', sortable: false}
-                , {field: 'recAcctPoint', width: 150, title: 'BussTrdTransferOrder.recAcctPoint', sortable: false}
+                , {field: 'recAcctPoint', width: 150, title: 'BussTrdTransferOrder.recAcctPoint', sortable: false, render: function (data, type, row, meta) {
+                        return row.recAcctNo.split(':')[0];
+                    }}
                 , {field: 'purpose', width: 130, title: 'BussTrdTransferOrder.purpose', sortable: false, edit: orderPageId != 'OrderNewBuild002'}
                 , {field: 'remark', width: 130, title: 'BussTrdTransferOrder.remark', sortable: false, edit: orderPageId != 'OrderNewBuild002'}
                 , {field: 'portfolioId', width: 130, title: 'BussTrdTransferOrder.portfolioId', sortable: false}
+                , {field: 'inPortfolioId', title: 'BussTrdTransferOrder.inPortfolioId', visible: false} //转仓转入组合代码
                 , {field: 'portfolioName', width: 150, title: 'BussTrdTransferOrder.portfolioName', sortable: false}
-                , {field: 'inOutBank', width: 130, title: 'BussTrdTransferOrder.inOutBank', sortable: false}
+                , {field: 'inOutBank', width: 130, title: 'BussTrdTransferOrder.inOutBank', sortable: false, render: function (data, type, row, meta) {
+                        let inOutBankStr = null;
+                        Joyin.ajaxSync(JoyinUtil.getRealPath('/component/trade/BussTrdTransferOrder/queryStlCapacctInfoByAcctNo'), {
+                            ccy: row.ccy,
+                            acctNo: row.recAcctNo
+                        }, function (result) {
+                            var assetSource = JSON.parse(ASSET_SOURCE);
+                            $.each(assetSource, function (i, v) {
+                                if (v.id === result.inOutBank) {
+                                    inOutBankStr = v.text;
+                                    return inOutBankStr;
+                                }
+                            });
+                        });
+                        return inOutBankStr;
+                    }}
+            , {field: 'acctNoGdhFlag', width: 130, title: 'BussTrdTransferOrder.acctNoGdhFlag', sortable: false, visible: false}
+                , {field: 'reAcctNoGdhFlag', width: 130, title: 'BussTrdTransferOrder.reAcctNoGdhFlag', sortable: false, visible: false}
                 , {field: 'orderId', visible: false}
                 , {field: 'payType', visible: false}
                 , {field: 'ps', visible: false}
@@ -68,17 +94,39 @@
                 , {field: 'settleStatus', visible: false}
                 , {field: 'isTotalTrade', visible: false}
                 , {field: 'settleDate', visible: false}
+                , {field: 'stlPayOrderShow', visible: false}
             ],
             page: false,
             height: 200,
             data: [],
-            done: function () {
+            selectRow:[],
+            done: function (data) {
                 $("[data-field='ccy'][data-edit='select']").hide();
+                data.forEach(function(item, index) {
+                    var tr = $("[lay-id='" + entityName + "_table'] tbody tr[data-index='" + index + "']"); //$(".layui-table-view").find("tbody tr[data-index='" + index + "']");
+                    var tds = tr.find('td');
+                    //和需求沟通后结果：代码回退，划款指令前台都展示
+                    /*if (item.stlPayOrderShow == 'N') {
+                        tr.css("display", "none");
+                    } else */
+                    if (item.stlPayOrderShow == 'Y') {
+                        for (var i = 5; i<tds.length;i++) {
+                            var td = tds.eq(i);
+                            if (5 == i || 6 == i || 7 == i || 8 == i || 9 == i) {
+                                td.find('div').html('');
+                            }
+                        }
+                    }
+                });
             },
             //add by yzg 20191108 start
             beforeEditCell : function(preVal, field, rowData){
+                selectRow = rowData;
             	if(calcConditionObjBackUp!=null && calcConditionObjBackUp.repPageId == 'OrderNewBuild002'){
             		return false;
+            	}
+            	if (field == 'recAcctNo' && rowData.reAcctNoGdhFlag == 'Y') {
+            	    return false;
             	}
             	return true;
             },
@@ -115,6 +163,16 @@
                             }
                             row.payAcctNo=result.acctNo;
                             row.payAcctName = result.acctName;
+                            var rows = table.getAllRows();
+                            if ("undefined" != row.acctNoGdhFlag && "Y" == row.acctNoGdhFlag) {
+                                rows.forEach(function(item, index) {
+                                    if (item.reAcctNoGdhFlag == 'Y') {
+                                        item.recAcctNo = row.payAcctNo;
+                                        item.recAcctName = row.payAcctName;
+                                    }
+                                    table.renderRow(item.LAY_TABLE_INDEX, item);
+                                });
+                            }
                             //add by wangmin 2019-0-06 end
                             table.renderRow(row.LAY_TABLE_INDEX, row);
                         })
@@ -195,7 +253,11 @@
                     var data = calcConditionObjBackUp.deal[dataindex];
                     if (data) {
                         listdataMulti.deal = data;
-                        listdataMulti.portfolioId = data.portfolioId;
+                        if (!listdataMulti.portfolioId) {
+                            listdataMulti.portfolioId = data.portfolioId;
+                        }
+                    } else {
+                        continue;
                     }
                     if (calcConditionObjBackUp.jiaoyiType == 'dzh') {
                         listdataMulti.isDzh = "Y";

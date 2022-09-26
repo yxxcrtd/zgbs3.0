@@ -7,9 +7,11 @@ import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.security.LoginUserUtil;
+import com.joyintech.framework.select.SelectDto;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.riskrds.dto.InterfRiskRdsDto;
 import com.joyintech.tams.component.business.riskrds.service.InterfRiskRdsService;
@@ -21,12 +23,16 @@ import com.joyintech.tams.invest.common.CommonUtil;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
+import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
 import com.joyintech.tams.invest.trade.bond.service.TrdBondInvestTrade002Service;
 import com.joyintech.tams.invest.trade.common.aop.TradeRdsCommonAop;
+import com.joyintech.tams.invest.trade.transfer.aop.RdsTransferAop;
 import com.joyintech.tams.invest.trade.transfer.assign.dto.TrdAssetAssignDto;
 import com.joyintech.tams.invest.trade.transfer.assign.service.TrdAssetAssignService;
+import com.joyintech.tams.invest.trade.transfer.sectransfer.dto.SecTransferDto;
+import com.joyintech.tams.invest.trade.transfer.sectransfer.service.SecTransfer001Service;
 import com.joyintech.tams.invest.trade.transfer.trdassetsProject.dto.TrdAssetsProject001Dto;
 import com.joyintech.tams.invest.trade.transfer.trdassetsProject.dto.TrdSplitProject001Dto;
 import com.joyintech.tams.invest.trade.transfer.trdassetsProject.service.TrdAssetsProject001Service;
@@ -54,10 +60,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-//import com.joyintech.framework.grid.Page;
-/*import com.joyintech.tams.invest.period.trdprojduration.dto.TrdProjectDurationProcessDto;
-import com.joyintech.tams.invest.period.trdprojduration.service.TrdProjectDuration001Service;*/
-
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 项目类资产转仓
@@ -79,6 +82,9 @@ public class TrdAssetsProject001Controller extends BaseController {
      */
     @Autowired
     TrdPlanRateInvestTrade002Service trdPlanRateInvestTrade002Service;
+
+    @Autowired
+    private SecTransfer001Service secTransfer001Service;
     
     /**
      * TrdProjectDuration001Service 项目类资产存续期service
@@ -104,8 +110,10 @@ public class TrdAssetsProject001Controller extends BaseController {
                 || (!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotBlank(workflowId))) {
             dto = trdAssetsProject001Service.getBussinessEntityByWorkflowId(workflowId);
             model.addAttribute("entityData", JsonUtils.object2Json(dto.getProjectListInfoList()));
+            model.addAttribute("bussTrdTransferOrder", JsonUtils.object2Json(dto.getBussTrdTransferOrder()));
             model.addAttribute("formTodoList", true);
-        } 
+            model.addAttribute(GlobalConstant.WORKFLOW_ID, workflowId);
+        }
         else{
             String finprodMarketId = RequestUtil.getParam("finprodMarketId");
             BigDecimal prinamt = new BigDecimal(RequestUtil.getParam("printAmt"));
@@ -119,6 +127,7 @@ public class TrdAssetsProject001Controller extends BaseController {
         	dto.setInvTransPortf(RequestUtil.getParam("portfolioId"));
         	dto.setSecAcctId(RequestUtil.getParam("secAcctId"));
         	dto.setCpriceAmt(dto.getPrinAmt());
+        	dto.setInvAim((String) RequestUtil.getParam("invAim"));
             Map<String,Object> paraMap = new HashMap<>();
             paraMap.put("portfolioId",dto.getInvTransPortf());
             paraMap.put("finprodId","F18_" + finprodMarketId);
@@ -161,9 +170,16 @@ public class TrdAssetsProject001Controller extends BaseController {
 				dto.setIsNeedAssign(assignDto.getIsNeedAssign());
 			}
         }
+        SelectDto selectDto = this.getSelectDataFromDataDic(DictCode.业务模式, null);
+        /*SelectDto selectDto = this.getSelectDataFromDataDic(DictCode.投资目的, null);*/
+        if (selectDto != null && !StringUtil.isEmptyList(selectDto.getOptions())) {
+            List<SelectOptionDto> options = selectDto.getOptions(); 
+            model.addAttribute("TURN_INV_AIM", JsonUtils.objectArray2Json(options.toArray())); 
+        }
+        
         model.addAttribute("entity", dto);
         this.setSelectOptionToModel(model,DictCode.交易方向,
-                DictCode.交易场所, DictCode.清算速度, DictCode.有效状态, DictCode.币种, DictCode.计息基础);
+                DictCode.交易场所, DictCode.清算速度, DictCode.有效状态, DictCode.币种, DictCode.计息基础,DictCode.业务模式);
         model.addAttribute("T01", DictCodeList.交易方向_买入.getValue());
         model.addAttribute("T02", DictCodeList.交易方向_卖出.getValue());
         model.addAttribute("FINPROD_TYPE_F18", DictCodeListExt1.金融产品类型_投管用_项目类资产.getValue());
@@ -178,6 +194,32 @@ public class TrdAssetsProject001Controller extends BaseController {
         isEleShow.putAll(map);
         model.addAttribute("isEleShow", isEleShow);
         return super.init(model);
+    }
+    
+//    /**
+//     * 划款指令生成实体类
+//     */
+//    @ResponseBody
+//    @RequestMapping("getEntity")
+//    public List<TrdProductDeal> getEntity(HttpServletRequest request) {
+//        Map<String, Object> map = RequestUtil.getParameters(getRequest());
+//        TrdAssetsProject001Dto dto = BeanUtil.mapToObject(map, TrdAssetsProject001Dto.class);
+//        List<TrdAssetsProject001Dto> dtoList = JSONArray.parseArray(String.valueOf(map.get("dataList")), TrdAssetsProject001Dto.class);
+//        List<TrdProductDeal> trdProductDealList = fundAssetTransfer001Service.generateOrdersNQs(dto, dtoList);
+//        return trdProductDealList;
+//    }
+    
+    /**
+     * 划款指令生成实体类
+     */
+    @ResponseBody
+    @RequestMapping("getEntity")
+    public List<TrdProductDeal> getEntity(HttpServletRequest request){
+        Map<String,Object> map = RequestUtil.getParameters(getRequest());
+        TrdAssetsProject001Dto dto = BeanUtil.mapToObject(map, TrdAssetsProject001Dto.class);
+        List<TrdAssetsProject001Dto> dtoList = JSONArray.parseArray(String.valueOf(map.get("dataList")), TrdAssetsProject001Dto.class);
+        List<TrdProductDeal> trdProductDealList = trdAssetsProject001Service.generateOrdersNQs(dto, dtoList);
+        return trdProductDealList;
     }
 
     /**
@@ -254,6 +296,9 @@ public class TrdAssetsProject001Controller extends BaseController {
         if(StringUtil.isNotEmpty(splitPrinAmt) && StringUtil.isNotEmpty(unSplitPrinAmt) && splitPrinAmt.compareTo(unSplitPrinAmt)>0){
             errorList.add(new ValidMessage("splitPrinAmt","转仓金额不能大于剩余可转仓本金金额！"));
         }
+        if (!StringUtil.isNotEmpty(param.get("turnInvAim"))) {
+            errorList.add(new ValidMessage(this.getMessage("turnInvAim"), "请选择转仓业务模式！"));
+        }
         if(errorList!=null && errorList.size()>0){
             result.setStatuCode(500);
             result.setErrorList(errorList);
@@ -291,6 +336,34 @@ public class TrdAssetsProject001Controller extends BaseController {
 			result.setMessage("转仓列表信息不能空", MessageType.错误消息);
 			return result;
 		}
+        if (StringUtil.isEmptyList(dto.getBussTrdTransferOrder())) {
+            result.setStatuCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            result.setMessage("指令列表信息不能空", MessageType.错误消息);
+            return result;
+        }
+        if (dto.getProjectListInfoList().size() != dto.getBussTrdTransferOrder().size()) {
+            result.setStatuCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            result.setMessage("指令生成要素已变更，请重新生成划款指令", MessageType.错误消息);
+            return result;
+        }
+        Map<String, BussTrdTransferOrderDto> bussMap = dto.getBussTrdTransferOrder().stream().collect(Collectors.toMap(BussTrdTransferOrderDto::getInPortfolioId, v1->v1));
+        for (TrdSplitProject001Dto info : dto.getProjectListInfoList()) {
+            if (null == bussMap.get(info.getPortfolioId()) || bussMap.get(info.getPortfolioId()).getSettleAmt().compareTo(info.getSplitTradeAmt()) != 0) {
+                result.setStatuCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+                result.setMessage("指令生成要素已变更，请重新生成划款指令", MessageType.错误消息);
+                return result;
+            }
+            Map<String, Object> map = new HashMap<>();
+            map.put("finprodId", info.getFinprodId());
+            map.put("turnInvAim", info.getInvAim());
+            map.put("portfolioIdEn", info.getPortfolioId());
+            map.put("tradeDate", dto.getTradeDate());
+            if (secTransfer001Service.selectYwmsData(map) > 0) {
+                result.setStatuCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+                result.setMessage("同一个组合同一个资产的业务模式只能有一个！", MessageType.错误消息);
+                return result;
+            }
+        }
         if (StringUtil.isNotEmpty(dto.getChlId())) {
             Integer count;
             String str = "";
@@ -371,6 +444,7 @@ public class TrdAssetsProject001Controller extends BaseController {
         }
         params.setBusinessType(DictCodeList.共通业务类型_项目类资产交易.getValue());
 
+        Map<String, List<BussTrdTransferOrderDto>> bussList = dto.getBussTrdTransferOrder().stream().collect(Collectors.groupingBy(BussTrdTransferOrderDto::getInPortfolioId));
         if (BussinessConstant.SUBMIT.equals(dto.getOperateType())) {
             for (TrdAssetsProject001Dto entity:dto.getProjectListInfoList()) {
                 entity.setInvTransPortf(dto.getInvTransPortf());
@@ -383,6 +457,8 @@ public class TrdAssetsProject001Controller extends BaseController {
                 entity.setUnitIntAmt(dto.getUnitIntAmt());
                 entity.setUnitFprice(dto.getUnitFprice());
                 entity.setUnitCprice(dto.getUnitCprice());
+                entity.setBussTrdTransferOrder(bussList.get(entity.getPortfolioId()));
+                // TODO 取转入组合
                 entity.setBaseTradeInfoDtos(trdAssetsProject001Service.genFinProductTradeDto(entity));
             }
         }
@@ -395,26 +471,13 @@ public class TrdAssetsProject001Controller extends BaseController {
         else {
             dto.setZcId(IDGenerator.generate());
         }
-
-        // ----------add by 裴家俊 20220729 批量实占功能 start----------
+        //实占
         if (StringUtil.equals(BussinessConstant.SUBMIT, dto.getOperateType())) {
-            List<TrdAssetsProject001Dto> project001DtoList=dto.getProjectListInfoList().stream().map(item->{
-                TrdAssetsProject001Dto trdAssetsProject001Risk=new TrdAssetsProject001Dto();
-                BeanUtil.copyPropertiesIgnoreNull(trdAssetsProject001Risk,item);
-                trdAssetsProject001Risk.setPortfolioId(item.getInvTransPortf());
-                trdAssetsProject001Risk.setCounterId(item.getPortfolioId());
-                trdAssetsProject001Risk.setPs(DictCodeList.交易方向_卖出.getValue());
-                trdAssetsProject001Risk.setTradeAmt(StringUtil.isNotEmpty(item.getSplitTradeAmt())?item.getSplitTradeAmt():item.getPrinAmt());
-                return trdAssetsProject001Risk;
-            }).collect(Collectors.toList());
-            AjaxResult ar = TradeRdsCommonAop.doListOccupy(project001DtoList,
-                    DictCodeList.平安资产类型_项目类资产.getValue(), true, null);
+            AjaxResult ar = RdsTransferAop.doListOccupy(dto);
             if (StringUtil.isNotEmpty(ar)) {
                 return ar;
             }
         }
-        // ----------add by 裴家俊 20220729 批量实占功能 end----------
-
         params.setBusinessCode(dto.getZcId());
         // 设置流程业务说明, entity即传入的dto
         params.setComment(entity -> WorkFlowUtil.concatComment("交易编号：" + dto.getZcId(), "资产名称：" + dto.getFinprodName(),
