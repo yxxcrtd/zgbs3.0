@@ -376,28 +376,7 @@
             saveOrSubmit('save');
         });
         $('#TrdAssetsProject001_btn_submit').click(function () {
-            var data = projectListInfoList.getAllRows();
-            if (data != null && data != '') {
-                var object = $.serializeToObject('#TrdAssetsProject001_form', true);
-                object.portfolioId = $("#invTransPortf").val();
-                var bussTrdTransfenpeiDto = JSON.parse(JSON.stringify(data));
-                for (var i = 0; i < bussTrdTransfenpeiDto.length; i++) {
-                    bussTrdTransfenpeiDto[i].counterId = bussTrdTransfenpeiDto[i].portfolioId;
-                    delete bussTrdTransfenpeiDto[i].portfolioId;
-                    bussTrdTransfenpeiDto[i].ps = T02;
-                    if (bussTrdTransfenpeiDto[i].splitTradeAmt) {
-                        bussTrdTransfenpeiDto[i].tradeAmt = bussTrdTransfenpeiDto[i].splitTradeAmt;
-                    }
-                }
-                object.bussTrdTransfenpeiDto = bussTrdTransfenpeiDto;
-                object.tradeId = null;
-                window.BaseRiskMathComm.initBaseRiskMathRedis(basePath + 'riskrds/interf/doInfBatchData/1/RSK002/F06', object, getriskdata(),
-                    function (result, flag) {
-                        saveOrSubmit('submit');
-                    });
-            } else {
-                Joyin.error("拆分列表信息不能为空！");
-            }
+            saveOrSubmit('submit');
         });
         //风险试算
         $('#TrdAssetsProject001_btn_risk').click(function () {

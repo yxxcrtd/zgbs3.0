@@ -443,25 +443,7 @@ $(function () {
         });
         // 提交按钮事件
         $('#FundAssetTransfer001_btn_submit').click(function () {
-            var data = funAssetTransferDtoListTable.getAllRows();
-            if (data != null && data != '') {
-                var object = $.serializeToObject('#fundAssetTransfer_form', true);
-                object.portfolioId = $("#invTransPortf").val();
-                var bussTrdTransfenpeiDto = JSON.parse(JSON.stringify(data));
-                for (var i = 0; i < bussTrdTransfenpeiDto.length; i++) {
-                    bussTrdTransfenpeiDto[i].counterId = bussTrdTransfenpeiDto[i].portfolioId;
-                    delete bussTrdTransfenpeiDto[i].portfolioId;
-                    bussTrdTransfenpeiDto[i].ps = PS_T02;
-                }
-                object.bussTrdTransfenpeiDto = bussTrdTransfenpeiDto;
-                object.tradeId = null;
-                window.BaseRiskMathComm.initBaseRiskMathRedis(basePath + 'riskrds/interf/doInfBatchData/1/RSK002/F02', object, getriskdata(),
-                    function (result, flag) {
-                        saveOrSubmit('submit');
-                    });
-            } else {
-                Joyin.error("列表信息不能为空！");
-            }
+            saveOrSubmit('submit');
         });
         //风险试算按钮
         $('#FundAssetTransfer001_btn_risk').click(function () {

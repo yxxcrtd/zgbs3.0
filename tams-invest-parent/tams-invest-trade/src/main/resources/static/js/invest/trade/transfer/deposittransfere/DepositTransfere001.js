@@ -394,26 +394,8 @@
             save(object, 'save')
         });
         $('#DepositTransfere001_btn_submit').click(function () {
-            var data = table.getAllRows();
-            if(data != null && data != ''){
-                var object = $.serializeToObject('#depositTransfereForm', true);
-                object.portfolioId = $("#transferPortfolioId").val();
-                var bussTrdTransfenpeiDto = JSON.parse(JSON.stringify(data));
-                for(var i=0;i<bussTrdTransfenpeiDto.length;i++){
-                    bussTrdTransfenpeiDto[i].counterId = bussTrdTransfenpeiDto[i].portfolioId;
-                    delete bussTrdTransfenpeiDto[i].portfolioId;
-                    bussTrdTransfenpeiDto[i].ps = PS_T02;
-                }
-                object.bussTrdTransfenpeiDto = bussTrdTransfenpeiDto;
-                object.tradeId = null;
-                window.BaseRiskMathComm.initBaseRiskMathRedis(basePath + 'riskrds/interf/doInfBatchData/1/RSK002/F05',object,getriskdata(),
-                function (result,flag){
-                    var object = $.serializeToObject('#depositTransfereForm', true);
-                    save(object, 'submit')
-                });
-            }else {
-                Joyin.error("转仓列表信息不能为空！");
-            }
+            var object = $.serializeToObject('#depositTransfereForm', true);
+            save(object, 'submit')
         })
     });
 

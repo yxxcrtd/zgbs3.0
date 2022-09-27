@@ -305,24 +305,7 @@ $(function() {
         });
         // 提交按钮事件
         $('#LendTransfer001_btn_submit').click(function() {
-            var data = table.getAllRows();
-            if(data != null && data != ''){
-                var object = $.serializeToObject('#lendTransferForm', true);
-                object.portfolioId = $("#portfolioIdOut").val();
-                var bussTrdTransfenpeiDto = JSON.parse(JSON.stringify(data));
-                for(var i=0;i<bussTrdTransfenpeiDto.length;i++){
-                    bussTrdTransfenpeiDto[i].counterId = bussTrdTransfenpeiDto[i].portfolioId;
-                    delete bussTrdTransfenpeiDto[i].portfolioId;
-                }
-                object.bussTrdTransfenpeiDto = bussTrdTransfenpeiDto;
-                object.tradeId = null;
-                window.BaseRiskMathComm.initBaseRiskMathRedis(basePath + 'riskrds/interf/doInfBatchData/1/RSK002/F08',object,getriskdata(),
-                function (result,flag){
-                    saveOrSubmit('submit');
-                });
-            }else {
-                Joyin.error("转仓列表信息不能为空！");
-            }
+            saveOrSubmit('submit');
         });
         //风险试算
         $('#LendTransfer001_btn_risk').click(function(){

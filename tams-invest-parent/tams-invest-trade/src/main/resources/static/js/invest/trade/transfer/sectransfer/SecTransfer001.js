@@ -637,24 +637,7 @@ $(function () {
         });
         // 提交按钮事件
         $('#SecTransfer001_btn_submit').click(function () {
-            var data = table.getAllRows();
-            if (data != null && data != '') {
-                var object = $.serializeToObject('#secTransferForm', true);
-                object.portfolioId = $("#investPortfolioId").val();
-                //深拷贝
-                var bussTrdTransfenpeiDto = JSON.parse(JSON.stringify(data));
-                for (var i = 0; i < bussTrdTransfenpeiDto.length; i++) {
-                    delete bussTrdTransfenpeiDto[i].portfolioId;
-                    bussTrdTransfenpeiDto[i].ps = PS_T02;
-                }
-                object.bussTrdTransfenpeiDto = bussTrdTransfenpeiDto;
-                object.tradeId = null;
-                window.BaseRiskMathComm.initBaseRiskMathRedis(basePath + 'riskrds/interf/doInfBatchData/1/RSK002/F01', object, getriskdata(),function (result,flag){
-                    saveOrSubmit('submit');
-                });
-            } else {
-                Joyin.error("拆分列表信息不能为空！");
-            }
+            saveOrSubmit('submit');
         });
         //风险试算
         $('#SecTransfer001_btn_risk').click(function () {
