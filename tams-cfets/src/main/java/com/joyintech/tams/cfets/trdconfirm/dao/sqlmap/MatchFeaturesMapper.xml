@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.cfets.trdconfirm.dao.MatchFeaturesMapper">
+
+    <resultMap id="matchBusTypeMap" type="com.joyintech.tams.cfets.trdconfirm.dto.MatchBusType">
+        <id property="code" column="PARA_CODE"/>
+        <id property="name" column="PARA_NAME"/>
+        <id property="type" column="type"/>
+        <collection property="details" ofType="com.joyintech.tams.cfets.trdconfirm.dto.MatchDetFeatures"
+                    javaType="java.util.ArrayList">
+            <result property="code" column="SUB_PARA_CODE" jdbcType="VARCHAR"/>
+            <result property="name" column="SUB_PARA_NAME" jdbcType="VARCHAR"/>
+            <result property="type" column="subType" jdbcType="VARCHAR"/>
+            <result property="isDisabled" column="isDisabled" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+
+    <select id="queryMatchFeatures" resultMap="matchBusTypeMap">
+        select bsp.PARA_CODE, bsp.PARA_NAME, #{matchType01} type, bsps.SUB_PARA_CODE, bsps.SUB_PARA_NAME, bsps.PARAM_VALUE1 subType, bsps.PARAM_VALUE3 isDisabled
+        from BANK_SYS_PARA bsp
+                 inner join BANK_SYS_PARA_SUB bsps on bsp.PARA_CODE = bsps.PARA_CODE
+        where bsp.PARA_CODE in (#{matchFeatures01}, #{matchFeatures02}, #{matchFeatures03})
+        union all
+        select bsp.PARA_CODE, bsp.PARA_NAME, #{matchType02} type, bsps.SUB_PARA_CODE, bsps.SUB_PARA_NAME, bsps.PARAM_VALUE2 subType, bsps.PARAM_VALUE4 isDisabled
+        from BANK_SYS_PARA bsp
+                 inner join BANK_SYS_PARA_SUB bsps on bsp.PARA_CODE = bsps.PARA_CODE
+        where bsp.PARA_CODE in (#{matchFeatures01}, #{matchFeatures02}, #{matchFeatures03})
+    </select>
+
+    <update id="updateMatchFeatures" parameterType="java.util.List" >
+        <foreach collection="updateList" item="item" index="index" open="BEGIN" close=";END;" separator=";">
+            update BANK_SYS_PARA_SUB
+            <set>
+                <if test="item.subParaName != null">
+                    SUB_PARA_NAME = #{item.subParaName,jdbcType=VARCHAR},
+                </if>
+                <if test="item.paramValue1 != null">
+                    PARAM_VALUE1 = #{item.paramValue1,jdbcType=VARCHAR},
+                </if>
+                <if test="item.paramValue2 != null">
+                    PARAM_VALUE2 = #{item.paramValue2,jdbcType=VARCHAR},
+                </if>
+                <if test="item.dataType != null">
+                    DATA_TYPE = #{item.dataType,jdbcType=VARCHAR},
+                </if>
+                <if test="item.dataScope != null">
+                    DATA_SCOPE = #{item.dataScope,jdbcType=VARCHAR},
+                </if>
+                <if test="item.remark != null">
+                    REMARK = #{item.remark,jdbcType=VARCHAR},
+                </if>
+                <if test="item.updateUser != null">
+                    UPDATE_USER = #{item.updateUser,jdbcType=VARCHAR},
+                </if>
+                <if test="item.updateTime != null">
+                    UPDATE_TIME = #{item.updateTime,jdbcType=TIMESTAMP},
+                </if>
+            </set>
+            where PARA_CODE = #{item.paraCode,jdbcType=VARCHAR}
+            and SUB_PARA_CODE = #{item.subParaCode,jdbcType=VARCHAR}
+        </foreach>
+    </update>
+
+</mapper>
+
+

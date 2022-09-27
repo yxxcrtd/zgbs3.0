@@ -18,8 +18,10 @@ import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
+import com.joyintech.tams.cfets.trdconfirm.dto.MatchBusType;
 import com.joyintech.tams.cfets.trdconfirm.dto.*;
 import com.joyintech.tams.cfets.trdconfirm.service.CfetsTrdConfirmService;
+import com.joyintech.tams.cfets.trdconfirm.service.MatchFeaturesService;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
@@ -49,6 +51,9 @@ public class CfetsTrdConfirmController extends BaseController {
 
     @Autowired
     private CfetsTrdConfirmService cfetsTrdConfirmService;
+
+    @Autowired
+    private MatchFeaturesService matchFeaturesService;
 
     @Autowired
     private IPlatformDate iPlatformDate;
@@ -88,7 +93,7 @@ public class CfetsTrdConfirmController extends BaseController {
         initPageParams.put("sysDate", iPlatformDate.getSysDateStr());
         //pageId
         initPageParams.put("pageId", "CfetsTrdConfirm");
-        return new Message<Map<String, Object>>(initPageParams).success();
+        return new Message<>(initPageParams).success();
     }
     @ApiOperation(value = "交易执行列表分页查询", notes = "交易执行列表分页查询")
     @PostMapping("/findAllRegInfoList")
@@ -318,6 +323,32 @@ public class CfetsTrdConfirmController extends BaseController {
         } catch (Exception e) {
             logger.error("交易执行-发行失败数据异常", e);
             return new Message<AjaxResult>().fail().setMessage("发行失败数据异常");
+        }
+    }
+
+    @ApiOperation(value = "匹配元素查询", notes = "匹配元素按钮点击后，查询匹配元素配置的详细情况")
+    @PostMapping("/queryMatchFeatures")
+    @ResponseBody
+    public Message<List<MatchBusType>> queryMatchFeatures() {
+        try {
+            List<MatchBusType> list = matchFeaturesService.queryMatchFeatures();
+            return new Message<List<MatchBusType>>().success().setData(list);
+        } catch (Exception e) {
+            logger.error("匹配元素查询数据异常", e);
+            return new Message<List<MatchBusType>>().fail().setMessage("匹配元素查询数据异常");
+        }
+    }
+
+    @ApiOperation(value = "匹配元素保存", notes = "匹配元素页面保存按钮点击后，保存匹配元素")
+    @PostMapping("/saveMatchFeatures")
+    @ResponseBody
+    public Message<AjaxResult> saveMatchFeatures(@RequestBody List<MatchBusType> matchBusTypes) {
+        try {
+            AjaxResult ajax = matchFeaturesService.saveMatchFeatures(matchBusTypes);
+            return new Message<AjaxResult>().success().setData(ajax);
+        } catch (Exception e) {
+            logger.error("匹配元素保存异常", e);
+            return new Message<AjaxResult>().fail().setMessage("匹配元素保存异常");
         }
     }
 }
