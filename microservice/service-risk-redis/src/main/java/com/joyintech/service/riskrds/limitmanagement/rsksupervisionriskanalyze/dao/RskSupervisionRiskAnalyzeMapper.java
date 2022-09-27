@@ -40,7 +40,7 @@ public interface RskSupervisionRiskAnalyzeMapper {
 
     List<SelectOptionDto> selectByUserName(Map<String, Object> param);
 
-    List<SuggestDto> selectIndName(Map<String, Object> params);
+    List<SelectOptionDto> selectIndName(Map<String, Object> params);
 
-    List<SuggestDto> selectGroupName(Map<String, Object> params);
+    List<SelectOptionDto> selectGroupName(Map<String, Object> params);
 }

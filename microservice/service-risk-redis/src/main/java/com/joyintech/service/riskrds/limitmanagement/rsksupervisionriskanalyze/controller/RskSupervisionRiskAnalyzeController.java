@@ -79,13 +79,14 @@ public class RskSupervisionRiskAnalyzeController {
         return rskSupervisionRiskAnalyzeService.selectUserName(param,page,length);
     }
 
-    @PostMapping("selectIndName")
-    public List<SuggestDto> selectIndName(@RequestBody Map<String, Object> map){
-        return rskSupervisionRiskAnalyzeService.selectIndName(map);
+    @PostMapping("selectIndName/{page}/{length}")
+    public Page<SelectOptionDto> selectIndName(@RequestBody Map<String, Object> map,@PathVariable("page") int page, @PathVariable("length") int length){
+        return rskSupervisionRiskAnalyzeService.selectIndName(map,page,length);
     }
 
-    @PostMapping("selectGroupName")
-    public List<SuggestDto> selectGroupName(@RequestBody Map<String, Object> map){
-        return rskSupervisionRiskAnalyzeService.selectGroupName(map);
+
+    @PostMapping("selectGroupName/{page}/{length}")
+    public Page<SelectOptionDto> selectGroupName(@RequestBody Map<String, Object> map,@PathVariable("page") int page, @PathVariable("length") int length){
+        return rskSupervisionRiskAnalyzeService.selectGroupName(map,page,length);
     }
 }

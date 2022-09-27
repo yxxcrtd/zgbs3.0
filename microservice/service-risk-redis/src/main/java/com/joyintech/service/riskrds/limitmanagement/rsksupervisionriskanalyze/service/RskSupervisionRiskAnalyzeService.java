@@ -75,11 +75,11 @@ public class RskSupervisionRiskAnalyzeService extends BaseService<RskSupervision
         return this.queryForPageForSelectReturn(page, length, ()-> rskSupervisionRiskAnalyzeMapper.selectByUserName(pageParam));
     }
 
-    public  List<SuggestDto>  selectIndName(Map<String, Object> map) {
-        return rskSupervisionRiskAnalyzeMapper.selectIndName(map);
+    public  Page<SelectOptionDto>  selectIndName(Map<String, Object> map, int page, int length) {
+        return this.queryForPageForSelectReturn(page, length, ()-> rskSupervisionRiskAnalyzeMapper.selectIndName(map));
     }
 
-    public  List<SuggestDto>  selectGroupName(Map<String, Object> map) {
-        return rskSupervisionRiskAnalyzeMapper.selectGroupName(map);
+    public  Page<SelectOptionDto>  selectGroupName(Map<String, Object> map, int page, int length) {
+        return this.queryForPageForSelectReturn(page, length, ()-> rskSupervisionRiskAnalyzeMapper.selectGroupName(map));
     }
 }
