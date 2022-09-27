@@ -1698,6 +1698,9 @@ public class AllTradeCommonUtil {
         if (orderIds.isEmpty()) {
             orderIds = baseAssetCashPositionCommMapper.selectOrderIdsByPTotalTradeId(tradeId);
         }
+        if (orderIds.isEmpty()) {
+            orderIds = baseAssetCashPositionCommMapper.selectOrderIdsByTotalTradeId(tradeId);
+        }
         orderIds.add(tradeId);
 
         if (!orderIds.isEmpty()) {
