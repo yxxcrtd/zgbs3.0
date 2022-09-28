@@ -409,7 +409,6 @@
                         $("#etrInvestPersonInfo_counterId").prop('disabled', true);
                     });
                 }
-                $('#portfolioId').val("001a").trigger('change').attr('disabled',true);
                 $('#finprodIdhid').val(data.finprodId).trigger('change');
                 $('#finprodName').val($('#finprodId').val()).trigger('change');
                 $('#calendarId').val(data.calendarId).trigger('change');
