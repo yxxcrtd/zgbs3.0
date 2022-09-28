@@ -216,7 +216,7 @@ public class TrdProjectInvestTrade001Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("revokeCheck")
-    public AjaxResult revokeCheck(@Validated({ValidateGroupDelete.class}) TrdProjectInvestTrade001Dto dto,
+    public AjaxResult revokeCheck(@Validated({ValidateGroupDelete.class}) TrdProjectInvestTrade002Dto dto,
                                   BindingResult result) {
         // TISHKBS-1349 债券 进行买入交易后 隔天做卖出交易 卖出交易完成后对买入交易进行撤销,此时不提示存在后续交易 增加提示 add by caojin 20201001 start
         if (StringUtil.equals(dto.getOperateType(), "revoke")) {
