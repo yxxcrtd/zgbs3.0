@@ -245,8 +245,9 @@ public class FundAssetTransfer001Controller extends BaseController {
             result.setErrorList(errorList);
         } else {
             //转仓交易份额不能大于组合剩余本金
-            if (StringUtil.isNotEmpty(fundDto.getTradeAmt()) && StringUtil.isNotEmpty(bussTrdAvailableCashQuery) && StringUtil.isNotEmpty(bussTrdAvailableCashQuery.getAvalibleCash())) {
-                if (fundDto.getTradeAmt().compareTo(bussTrdAvailableCashQuery.getAvalibleCash()) > 0) {
+            if (StringUtil.isNotEmpty(fundDto.getTradeAmt()) && StringUtil.isNotEmpty(fundDto.getPortoAvailableAmt())) {
+            //StringUtil.isNotEmpty(bussTrdAvailableCashQuery) && StringUtil.isNotEmpty(bussTrdAvailableCashQuery.getAvalibleCash())) {
+                if (fundDto.getTradeAmt().compareTo(fundDto.getPortoAvailableAmt()) > 0) {
                     result.setMessage("组合剩余现金不足！", MessageType.确认消息);
                 }
             }

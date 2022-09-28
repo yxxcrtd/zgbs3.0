@@ -305,8 +305,9 @@ public class TrdAssetsProject001Controller extends BaseController {
         }
         else{
             //拆分交易金额不能大于组合剩余本金
-            if(StringUtil.isNotEmpty(splitTradeAmt)&&StringUtil.isNotEmpty(bussTrdAvailableCashQuery)&&StringUtil.isNotEmpty(bussTrdAvailableCashQuery.getAvalibleCash())){
-                if(splitTradeAmt.compareTo(bussTrdAvailableCashQuery.getAvalibleCash())>0){
+            if(StringUtil.isNotEmpty(splitTradeAmt) && StringUtil.isNotEmpty(param.get("portoAvailableAmt"))) {
+            //StringUtil.isNotEmpty(bussTrdAvailableCashQuery)&&StringUtil.isNotEmpty(bussTrdAvailableCashQuery.getAvalibleCash())){
+                if(splitTradeAmt.compareTo(new BigDecimal((String)param.get("portoAvailableAmt")))>0){
                     result.setMessage("组合剩余现金不足！", MessageType.确认消息);
                 }
             }

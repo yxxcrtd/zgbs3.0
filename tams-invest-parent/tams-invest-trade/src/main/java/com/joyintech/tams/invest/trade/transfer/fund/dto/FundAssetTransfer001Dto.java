@@ -87,6 +87,9 @@ public class FundAssetTransfer001Dto extends TrdProductDeal implements ProcessEn
      * 剩余可转仓份额
      */
     private BigDecimal rollablePrin;
+
+    private BigDecimal portoAvailableAmt;
+
     /**
      * 组合代码名称
      */
@@ -478,6 +481,14 @@ public class FundAssetTransfer001Dto extends TrdProductDeal implements ProcessEn
     @Override
     public void setTradeAmt(BigDecimal tradeAmt) {
         this.tradeAmt = tradeAmt;
+    }
+
+    public BigDecimal getPortoAvailableAmt() {
+        return portoAvailableAmt;
+    }
+
+    public void setPortoAvailableAmt(BigDecimal portoAvailableAmt) {
+        this.portoAvailableAmt = portoAvailableAmt;
     }
 
     /**
