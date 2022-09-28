@@ -790,8 +790,8 @@ public class SecTransfer001Service extends CommonExportService<SecTransfer001Dto
                     }
 
                     // 7.2删除原业务流程表中的交易记录
-                    this.deleteBussFlowData(entity.getTradeId());
-                    this.deleteBussFlowData1(entity.getTotleTradeId());
+                    this.deleteBussFlowData(baseTradeInfoDto.getTrdProductDeal().getTradeId());
+                    this.deleteBussFlowData1(baseTradeInfoDto.getTrdProductDeal().getTotleTradeId());
 
                     // 7.3写入交易信息进交易报送信息表，为中债报送用
                     this.dealInfoCbReportLogic_7_3(entity);
@@ -1848,7 +1848,7 @@ public class SecTransfer001Service extends CommonExportService<SecTransfer001Dto
         mapperDelegateService.deleteBySpecificKey("WFL_TRD_FIN_PRODUCT_DEAL_TOTAL", "TOTLE_TRADE_ID", totaltradeid);
         mapperDelegateService.deleteBySpecificKey("WFL_PA_TRD_FIN_DEAL_TOTAL", "TOTLE_TRADE_ID", totaltradeid);
         mapperDelegateService.deleteBySpecificKey("WFL_TRD_DEAL_TOTAL_ADD", "TOTLE_TRADE_ID", totaltradeid);
-
+        mapperDelegateService.deleteBySpecificKey("WFL_TRD_PRODUCT_DEAL", "TOTLE_TRADE_ID", totaltradeid);
     }
 
     /**
