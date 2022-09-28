@@ -1211,7 +1211,10 @@
     </update>
     <select id="findAllCstpInfoList" resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmCstpInfoListResponse">
         select * from (select aaa.*
-        from (select distinct I.Execid  as execid,
+        <!-- modify by etliu 20220926 性能问题处理 start -->
+        <!-- from (select distinct I.Execid  as execid, -->
+        from (select I.Execid  as execid,
+        <!-- modify by etliu 20220926 性能问题处理 end -->
         I.Businesstype as businesstype,
         fp.finprod_id as finprodId,
         decode(I.BUSINESSTYPE,'BOND',ts.SECID,'REPO',tr.secid) as finprodMarketId,
@@ -1246,14 +1249,26 @@
         icpledge.pledgeFaceValue as pledgeFaceValues,
         tr.MDEALAMT as mtradeAmt
         from INTERF_CSTP_TRADE I
-        INNER JOIN (SELECT EXECID ,MAX(UPDATETIME) UPDATETIME FROM  INTERF_CSTP_TRADE GROUP BY EXECID)	II ON  II.EXECID = I.EXECID AND II.UPDATETIME = I.UPDATETIME
+        <!-- modify by etliu 20220926 性能问题处理 start -->
+        <!-- INNER JOIN (SELECT EXECID ,MAX(UPDATETIME) UPDATETIME FROM  INTERF_CSTP_TRADE GROUP BY EXECID)	II ON  II.EXECID = I.EXECID AND II.UPDATETIME = I.UPDATETIME -->
+        INNER JOIN (SELECT EXECID ,MAX(UPDATETIME) UPDATETIME FROM  INTERF_CSTP_TRADE
+            where TRADEDATE = to_char(#{sysDate,jdbcType=DATE}, 'yyyyMMdd')
+            GROUP BY EXECID)	II ON  II.EXECID = I.EXECID AND II.UPDATETIME = I.UPDATETIME
+        <!-- modify by etliu 20220926 性能问题处理 end -->
         left join INTERF_OPICS_TRAD_REPO tr on tr.oritradeid = I.EXECID
         left join INTERF_TRAD_SECDEAL ts on ts.FEDEALNO = I.EXECID and DECODE(I.OURINSTITUTIONROLE, '119', 'T01', 'T02') = ts.PS
         left join fin_product fp
         on ts.SECID=fp.finprod_market_id
         and fp.finprod_type='F01'
         LEFT JOIN SYS_USER_ADD sua ON nvl(ts.TRAD,tr.BUYTRADER) =sua.IBU_TRADER
+        <!-- modify by etliu 20220926 性能问题处理 start -->
+        LEFT JOIN MST_CFETS_CUSTOMER_INFO mccit
+            ON I.ourinstitutioncode= mccit.party_customer_id
+        LEFT JOIN MST_CFETS_CUSTOMER_INFO mccic
+            ON I.Counterinstitutioncode= mccic.party_customer_id
         LEFT JOIN MST_CFETS_CUSTOMER_TRADER mcct ON nvl(ts.TRAD,tr.BUYTRADER) =mcct.TRADER_ID
+            and mccic.PARTY_ID = mcct.PARTY_ID
+        <!-- modify by etliu 20220926 性能问题处理 end -->
         LEFT JOIN SYS_USER su ON sua.USER_ID =su.USER_ID
        <!-- LEFT JOIN (
         SELECT distinct i.EXECID ,nvl(iqb.QUOTE_ID,iqc.QUOTE_ID) QUOTEID
@@ -1276,10 +1291,15 @@
         group by itr.tradeid
         )icpledge
         on  tr.oritradeid=icpledge.tradeid
-        LEFT JOIN MST_CFETS_CUSTOMER_INFO mccit ON I.ourinstitutioncode= mccit.party_customer_id
-        LEFT JOIN MST_CFETS_CUSTOMER_INFO mccic ON I.Counterinstitutioncode= mccic.party_customer_id
+        <!-- modify by etliu 20220926 性能问题处理 start -->
+        <!-- LEFT JOIN MST_CFETS_CUSTOMER_INFO mccit ON I.ourinstitutioncode= mccit.party_customer_id
+        LEFT JOIN MST_CFETS_CUSTOMER_INFO mccic ON I.Counterinstitutioncode= mccic.party_customer_id -->
+        <!-- modify by etliu 20220926 性能问题处理 end -->
         where ((I.BUSINESSTYPE='BOND' and 'Y'= #{bondSupportFlag,jdbcType=VARCHAR}) or (I.BUSINESSTYPE ='REPO' and 'Y'= #{repoSupportFlag,jdbcType=VARCHAR}))
-        and   nvl(ts.dealdate,tr.dealdate)= #{sysDate,jdbcType=DATE}
+        <!-- modify by etliu 20220926 性能问题处理 start -->
+        <!-- and   nvl(ts.dealdate,tr.dealdate)= #{sysDate,jdbcType=DATE} -->
+        AND I.TRADEDATE = to_char(#{sysDate,jdbcType=DATE}, 'yyyyMMdd')
+        <!-- modify by etliu 20220926 性能问题处理 end -->
         AND NOT EXISTS (SELECT 1 FROM trdquto_match_info match where I.EXECID=match.exe_id)
         <if test="regAssetType != null  and regAssetType!=''">
             AND I.BUSINESSTYPE = #{regAssetType}
@@ -1334,7 +1354,10 @@
         </if>
 
         union all
-        select distinct null                    as                                   execid,
+        <!-- modify by etliu 20220926 性能问题处理 start -->
+        <!-- select distinct null                    as                                   execid, -->
+        select null                    as                                   execid,
+        <!-- modify by etliu 20220926 性能问题处理 end -->
                 'BID'                           as                                   businesstype,
                 fp.finprod_id                   as                                   finprodId,
                 CONCAT(icb.INSTRUMENT_ID, '.IB')                                     finprodMarketId,
@@ -1379,6 +1402,9 @@
                  LEFT JOIN SYS_USER su ON sua.USER_ID = su.USER_ID
                  LEFT JOIN MST_CFETS_CUSTOMER_INFO mccit ON icb.SUBSCRIBE_INSTITUTION_ID = mccit.PARTY_ID
                  left join MST_CFETS_CUSTOMER_TRADER mcct on mcct.TRADER_ID = icb.SUBMIT_USER
+                <!-- modify by etliu 20220926 性能问题处理 start -->
+                    and mccit.PARTY_ID = mcct.PARTY_ID
+                <!-- modify by etliu 20220926 性能问题处理 end -->
         where NOT EXISTS(SELECT 1 FROM trdquto_match_info match where icb.TRD_ID = match.CSTP_TRADE_ID)
         and   to_date(substr(icb.SUBSCRIPTION_TIME,0,10),'yyyy-MM-dd')= #{sysDate,jdbcType=DATE}
         <if test="regAssetType != null  and regAssetType!='' ">
@@ -2594,17 +2620,14 @@
     <select id="findAllCstpPledgesList"
             resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmCstpInfoListResponse">
         select
-        fprepo.finprod_id as pledgeFinprodId,
-        itr.CONVRATE as pledgeRatio,
-        itr.FACETOTALAMT as pledgeFaceValue
+            nvl(fprepo.finprod_id, itr.SECID || '.' || repo.MARKET) as pledgeFinprodId,
+            itr.CONVRATE as pledgeRatio,
+            itr.FACETOTALAMT as pledgeFaceValue
         from interf_opics_trad_repo repo
-        inner join INTERF_TRAD_REPOASST itr
-        on repo.oritradeid=itr.tradeid
-        inner  join fin_product fprepo
-        on fprepo.finprod_market_id= itr.SECID|| '.' || repo.MARKET
-        and fprepo.finprod_type='F01'
+            inner join INTERF_TRAD_REPOASST itr on repo.oritradeid=itr.tradeid
+        left  join fin_product fprepo on fprepo.finprod_market_id= itr.SECID|| '.' || repo.MARKET and fprepo.finprod_type='F01'
         where itr.tradeid=#{execid,jdbcType=VARCHAR}
-        order by fprepo.finprod_id
+                order by fprepo.finprod_id
     </select>
 
     <select id="selectBidDtoByPrimaryKey"  resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmRegInfoListResponse">

@@ -1031,7 +1031,9 @@ public class RskValTableImportService extends CommonExportService<RskValtblAsset
                }
                //统计未匹配的红字展示
                //“1” “3”开头或者 ”2“开头回购融入
-               if(!handval.getSubName().contains("估值增值") && !(fplist.contains(handval.getSubCode()))){
+               // GLLCUAT-400:增加 “估增” 判断 modify by fuyongsheng 20220917 start
+               if(!(handval.getSubName().contains("估值增值") || handval.getSubName().contains("估增")) && !(fplist.contains(handval.getSubCode()))){
+               // GLLCUAT-400:增加 “估增” 判断 modify by fuyongsheng 20220917 end
                        if (!isMatch && handval.getValType() == ValType.ASSET  && (!(handval.getSubCode().substring(0, 1).equals(TAX_SECTION_BEGIN)))) {
                            handval.setIsMatch(DictCodeListExt1.是否_否.getValue());
                            unMatchList.add(handval);

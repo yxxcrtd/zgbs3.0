@@ -149,8 +149,8 @@ public class BussTrdTransferOrderController extends BaseController {
                 // entity.setRecAcctNoList(Arrays.asList(optionDto));
                 // }
 
-                entity.setPayAcctNoList(acctNoList);
-                entity.setRecAcctNoList(acctNoList);
+//                entity.setPayAcctNoList(acctNoList);
+//                entity.setRecAcctNoList(acctNoList);
                 StlCapacctInfo stlCapacctInfo = bussTrdTransferOrderService.queryStlCapacctInfoByBusiAcctNo(entity.getCcy(), entity.getRecAcctNo());
                 if (stlCapacctInfo != null){
                     entity.setRecAcctPoint(stlCapacctInfo.getLargePayno());

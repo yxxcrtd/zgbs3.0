@@ -1124,7 +1124,7 @@
         WHERE p.ACCT_ID = t1.ACCT_ID
         AND p.CCY = t1.CCY
         AND p.CDATE = t1.CDATE
-        AND p.HODING_TYPE = #{cash_hodingType,jdbcType=VARCHAR}
+        AND p.HODING_TYPE IN (#{cash_hodingType_C_11,jdbcType=VARCHAR}, #{cash_hodingType_C_12,jdbcType=VARCHAR})
         AND p.DATE_TYPE = #{dateType,jdbcType=NUMERIC}
         ) = 1 then (
         SELECT distinct p.PORTFOLIO_ID
@@ -1132,7 +1132,7 @@
         WHERE p.ACCT_ID = t1.ACCT_ID
         AND p.CCY = t1.CCY
         AND p.CDATE = t1.CDATE
-        AND p.HODING_TYPE = #{cash_hodingType,jdbcType=VARCHAR}
+        AND p.HODING_TYPE IN (#{cash_hodingType_C_11,jdbcType=VARCHAR}, #{cash_hodingType_C_12,jdbcType=VARCHAR})
         AND p.DATE_TYPE = #{dateType,jdbcType=NUMERIC}
         )
         else null end portfolioId,
@@ -1142,7 +1142,7 @@
         WHERE p.ACCT_ID = t1.ACCT_ID
         AND p.CCY = t1.CCY
         AND p.CDATE = t1.CDATE
-        AND p.HODING_TYPE = #{cash_hodingType,jdbcType=VARCHAR}
+        AND p.HODING_TYPE IN (#{cash_hodingType_C_11,jdbcType=VARCHAR}, #{cash_hodingType_C_12,jdbcType=VARCHAR})
         AND p.DATE_TYPE = #{dateType,jdbcType=NUMERIC}
         ) = 1 then (
         SELECT DISTINCT p2.PORTFOLIO_NAME
@@ -1152,7 +1152,7 @@
         WHERE p.ACCT_ID = t1.ACCT_ID
         AND p.CCY = t1.CCY
         AND p.CDATE = t1.CDATE
-        AND p.HODING_TYPE = #{cash_hodingType,jdbcType=VARCHAR}
+        AND p.HODING_TYPE IN (#{cash_hodingType_C_11,jdbcType=VARCHAR}, #{cash_hodingType_C_12,jdbcType=VARCHAR})
         AND p.DATE_TYPE = #{dateType,jdbcType=NUMERIC}
         )
         else null end portfolioName,
@@ -1180,7 +1180,7 @@
         AND p1.PORTFOLIO_ID = p2.PORTFOLIO_ID
         AND p1.CCY = p2.CCY
         WHERE p2.ACCT_TYPE = 'A07'
-        AND p1.HODING_TYPE = #{cash_hodingType,jdbcType=VARCHAR}
+        AND p1.HODING_TYPE IN (#{cash_hodingType_C_11,jdbcType=VARCHAR}, #{cash_hodingType_C_12,jdbcType=VARCHAR})
         AND p1.DATE_TYPE = #{dateType,jdbcType=NUMERIC}
         GROUP BY p1.ACCT_ID, p1.CDATE, p1.CCY
         ) t1
@@ -1421,7 +1421,7 @@
                         s1.BUSI_ACCT_NO   busiAcctNo,
                         s1.ACCT_NAME      acctName,
                         p1.CDATE          settleDate,
-                        p1.AMOUNT         xiTongAmount,
+                        SUM(p1.AMOUNT)    xiTongAmount,
                         'F20'             finprodType
 
         FROM PTL_CASH_POSITION_RULE p1
@@ -1433,11 +1433,17 @@
                  LEFT JOIN PTL_PORTFOLIO p3
                            on p1.PORTFOLIO_ID = p3.PORTFOLIO_ID
         WHERE p2.ACCT_TYPE = 'A07'
-          AND p1.HODING_TYPE = #{cash_hodingType,jdbcType=VARCHAR}
+          AND p1.HODING_TYPE IN (#{cash_hodingType_C_11,jdbcType=VARCHAR},#{cash_hodingType_C_12,jdbcType=VARCHAR})
           AND p1.DATE_TYPE = #{dateType,jdbcType=NUMERIC}
           AND s1.BUSI_ACCT_NO = #{busiAcctNo}
           AND p1.CDATE = to_date(#{settleDate},'yyyy-MM-dd')
           AND p1.CCY = #{ccy}
+        GROUP BY
+            p1.PORTFOLIO_ID,
+            p3.PORTFOLIO_NAME,
+            s1.BUSI_ACCT_NO,
+            s1.ACCT_NAME,
+            p1.CDATE
     </select>
     <select id="selectPageNew2" resultType="com.joyintech.service.basicdata.dayendaccount.dto.DayEndAccountDto">
         SELECT #{parentId} parentInfo,

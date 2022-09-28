@@ -10,6 +10,7 @@
 
 package com.joyintech.tams.invest.common.entrust.dao;
 
+import com.joyintech.tams.common.base.entity.FinProductAdd;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.tams.common.base.entity.PtlCapacctInfo;
 import com.joyintech.tams.common.base.entity.StlCapacctInfo;
@@ -55,4 +56,11 @@ public interface EtrTrdCommonMapper {
      * @return 到期结算金额
      */
     BigDecimal getFirstTradeAmtByTradeId(@Param("finprodId") String finprodId);
+
+    /**
+     * 批量查询标的附属信息
+     * @param finprodIds
+     * @return
+     */
+    List<FinProductAdd> getFinProductAddBatch(@Param("finprodIds") List<String> finprodIds);
 }

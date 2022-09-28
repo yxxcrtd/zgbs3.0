@@ -1264,7 +1264,7 @@ public class PtlPositionAnalysis002Service extends CommonExportService<PtlPositi
                 colsMap.put("sortable", sortable);//字段是否排序
                 List<TargetDetail> filedMsg = columnMaps.stream().filter(item -> item.getTaregetCode().equals(targetDetail.getTaregetCode())).collect(Collectors.toList());
                 if (filedMsg != null && filedMsg.size() > 0 && filedMsg.get(0).getTaregetTypeCode().equals("NUMBER")) {
-                    colsMap.put("type", "String");//字段类型
+                    colsMap.put("type", "number");//字段类型
                 } else if (filedMsg != null && filedMsg.size() > 0 && filedMsg.get(0).getTaregetTypeCode().equals("DATE")) {
                     colsMap.put("type", "date");//字段类型
                 } else {

@@ -1441,6 +1441,7 @@ public class StlDataDealSzdSjsjgProcessService {
                         continue;
                     }
                 }
+                handleSzdSjsjgsetApplyTradeId(settleTransData, szdSjsjg);
                 // 日终过来的文件结算价格就是全价的，需要反算净价总额、应计利息总额
                 if (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue(), settleTransData.getFinprodType2())) {
                     stlDownDataDealService.calc(settleTransData);
@@ -1984,5 +1985,18 @@ public class StlDataDealSzdSjsjgProcessService {
         LocalDate start = new LocalDate(d1);
         LocalDate end = new LocalDate(d2);
         return Days.daysBetween(start, end).getDays();
+    }
+
+    /**
+     * 处理部分场景客户订单编号为空的情况
+     * @param settleTransData
+     * @param szdSjsjg
+     */
+    private void handleSzdSjsjgsetApplyTradeId(SettleTransData settleTransData, SzdSjsjg szdSjsjg){
+       if(DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())){
+           if(StringUtil.isEmpty(settleTransData.getApplyTradeId())){
+               settleTransData.setApplyTradeId(StringUtil.isNotEmpty(szdSjsjg.getJgzxbh())?szdSjsjg.getJgzxbh():szdSjsjg.getJgywlsh());
+           }
+       }
     }
 }

@@ -16,6 +16,7 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +60,9 @@ import com.joyintech.tams.invest.trade.investtrade.investdealquery.service.TrdIn
 @PageId("TrdInvestDealQuery001")
 @RequestMapping("/invest/trade/investtrade/investdealquery/TrdInvestDealQuery001")
 public class TrdInvestDealQuery001Controller extends BaseController{
+
+	@Autowired
+	private IPlatformDate iPlatformDate;
 	/**
 	 * 交易查询service
 	 */
@@ -122,6 +126,11 @@ public class TrdInvestDealQuery001Controller extends BaseController{
         //add by yzg 是否查询资产减值清理交易 20201022 start
         model.addAttribute("IS_QUERY_ASSETS_LOSS", CacheUtil.getSysParam("IS_QUERY_ASSETS_LOSS"));
         //add by yzg 是否查询资产减值清理交易 20201022 end
+
+		String remotePathPrefix = CacheUtil.getSysParam("dateTextType");
+		if (remotePathPrefix.equals("01")){
+			model.addAttribute("sysDate", (iPlatformDate.getSysDateStr()+" - "+iPlatformDate.getSysDateStr()));
+		}
         return super.init(model);
 	}
 	/**

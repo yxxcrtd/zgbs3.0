@@ -262,8 +262,19 @@ public class StlDataDealSzdJsmxProcessService {
 				settleTransData.setDealDate(stlDownDataDealOperatorDto.getDealDate());
 				// 分支序号
 				settleTransData.setBranch(0L);
+				// 对个别场景清算明细数据sqbh为空的情况进行特殊处理
+				this.handleSzdJsmxSqbh(stlDownDataDealOperatorDto, szdJsmx);
 				//申请编号
 				settleTransData.setApplyTradeId(szdJsmx.getSqbh());
+
+				// 固定收益平台的公司债现券交易没有sqbh问题修复 modify by fuyongsheng 20220919 start
+				if(StlDataDealProcessConstant.YWLX_611.equals(szdJsmx.getYwlx())
+						&& StlDataDealProcessConstant.JYFS_101.equals(szdJsmx.getJyfs())
+						&& StringUtil.isEmpty(szdJsmx.getSqbh())){
+					settleTransData.setApplyTradeId(szdJsmx.getCjbh());
+				}
+				// 固定收益平台的公司债现券交易没有sqbh问题修复 modify by fuyongsheng 20220919 end
+
 				//业务类型
 				settleTransData.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
 				// 证券品种
@@ -1516,7 +1527,7 @@ public class StlDataDealSzdJsmxProcessService {
 				settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdJsmx.getJgdm()));
 				// 业务场景分类和交易方向
 				if (StringUtil.lowerCase(stlDownDataDealOperatorDto.getDataFile()).startsWith(StlDataDealProcessConstant.SZD_JSMX_02) && (StringUtil.equals(StlDataDealProcessConstant.YWLX_002, szdJsmx.getYwlx()) || 
-						StringUtil.equals(StlDataDealProcessConstant.YWLX_034, szdJsmx.getYwlx()) || StringUtil.equals(StlDataDealProcessConstant.YWLX_104, szdJsmx.getYwlx()))) {
+						StringUtil.equals(StlDataDealProcessConstant.YWLX_034, szdJsmx.getYwlx()))) {
 					if (StringUtil.equals(StlDataDealProcessConstant.YWLX_002, szdJsmx.getYwlx()) && StringUtil.equals(StlDataDealProcessConstant.MMBS_B, szdJsmx.getMmbz())) {
 						settleTransData.setPs(DictCodeList.交易方向_买入.getValue());
 						settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_基金_封闭式基金_买入.getValue());
@@ -1533,11 +1544,14 @@ public class StlDataDealSzdJsmxProcessService {
 						settleTransData.setPs(DictCodeList.交易方向_卖出.getValue());
 						settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_基金_分级LOF_卖出.getValue());
 					}
-					if (StringUtil.equals(StlDataDealProcessConstant.YWLX_104, szdJsmx.getYwlx()) && StringUtil.equals(StlDataDealProcessConstant.MMBS_B, szdJsmx.getMmbz())) {
+				}
+				// 大宗ETF基金交易
+				if (StringUtil.lowerCase(stlDownDataDealOperatorDto.getDataFile()).startsWith(StlDataDealProcessConstant.SZD_JSMX_03) && StringUtil.equals(StlDataDealProcessConstant.YWLX_104, szdJsmx.getYwlx())){
+					if(StringUtil.equals(StlDataDealProcessConstant.MMBS_B, szdJsmx.getMmbz())){
 						settleTransData.setPs(DictCodeList.交易方向_买入.getValue());
 						settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_基金_ETF_买入.getValue());
 					}
-					if (StringUtil.equals(StlDataDealProcessConstant.YWLX_104, szdJsmx.getYwlx()) && StringUtil.equals(StlDataDealProcessConstant.MMBS_S, szdJsmx.getMmbz())) {
+					else if(StringUtil.equals(StlDataDealProcessConstant.MMBS_S, szdJsmx.getMmbz())){
 						settleTransData.setPs(DictCodeList.交易方向_卖出.getValue());
 						settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_基金_ETF_卖出.getValue());
 					}
@@ -1937,7 +1951,8 @@ public class StlDataDealSzdJsmxProcessService {
 				}
 			}
 			// 股票买卖
-			if (StringUtil.lowerCase(stlDownDataDealOperatorDto.getDataFile()).startsWith(StlDataDealProcessConstant.SZD_JSMX_02) &&
+			if ((StringUtil.lowerCase(stlDownDataDealOperatorDto.getDataFile()).startsWith(StlDataDealProcessConstant.SZD_JSMX_02)
+					|| StringUtil.lowerCase(stlDownDataDealOperatorDto.getDataFile()).startsWith(StlDataDealProcessConstant.SZD_JSMX_03)) &&
 					StringUtil.equals(StlDataDealProcessConstant.JLLX_001, szdJsmx.getJllx()) && 
 					(StringUtil.equals(StlDataDealProcessConstant.YWLX_001, szdJsmx.getYwlx()) || StringUtil.equals(StlDataDealProcessConstant.YWLX_037, szdJsmx.getYwlx())) &&
 					Arrays.asList(jyfsArray).contains(szdJsmx.getJyfs()) && 
@@ -2697,6 +2712,38 @@ public class StlDataDealSzdJsmxProcessService {
 		return null != value ? new BigDecimal(value).abs() : null;
 	}
 
+	/**
+	 * 处理部分场景sqbh为空的情况
+	 * @param stlDownDataDealOperatorDto
+	 * @param szdJsmx
+	 */
+	private void handleSzdJsmxSqbh(StlDownDataDealOperatorDto stlDownDataDealOperatorDto, SzdJsmx szdJsmx){
+		if(StringUtil.lowerCase(stlDownDataDealOperatorDto.getDataFile()).startsWith(StlDataDealProcessConstant.SZD_JSMX_02)){
+			if(StlDataDealProcessConstant.YWLX_003.equals(szdJsmx.getYwlx())
+					|| StlDataDealProcessConstant.YWLX_004.equals(szdJsmx.getYwlx())
+					|| StlDataDealProcessConstant.YWLX_601.equals(szdJsmx.getYwlx())
+					|| StlDataDealProcessConstant.YWLX_605.equals(szdJsmx.getYwlx())
+					|| StlDataDealProcessConstant.YWLX_611.equals(szdJsmx.getYwlx())){
+				if(StringUtil.isEmpty(szdJsmx.getSqbh())){
+					szdJsmx.setSqbh(szdJsmx.getCjbh());
+				}
+			}
+		}
+		else if(StringUtil.lowerCase(stlDownDataDealOperatorDto.getDataFile()).startsWith(StlDataDealProcessConstant.SZD_JSMX_03)){
+			if(StlDataDealProcessConstant.YWLX_601.equals(szdJsmx.getYwlx())
+					|| StlDataDealProcessConstant.YWLX_605.equals(szdJsmx.getYwlx())
+					|| StlDataDealProcessConstant.YWLX_611.equals(szdJsmx.getYwlx())){
+				if(StringUtil.isEmpty(szdJsmx.getSqbh())){
+					szdJsmx.setSqbh(szdJsmx.getCjbh());
+				}
+			}
+			else if(StlDataDealProcessConstant.YWLX_305.equals(szdJsmx.getYwlx())){
+				if(StringUtil.isEmpty(szdJsmx.getSqbh())){
+					szdJsmx.setSqbh(szdJsmx.getJsbh());
+				}
+			}
+		}
+	}
 
 	/**
 	 * 查询竞价回购首期成交数据

@@ -15,8 +15,8 @@
     //表格初始化n
     var init = function () {
         if (pageModel != PAGE_MODEL_NEW && entity) {
-            getElementById('payAcctNo').val(JSON.stringify(entity.payAcctNoList));
-            getElementById('recAcctNo').val(JSON.stringify(entity.recAcctNoList));
+//            getElementById('payAcctNo').val(JSON.stringify(entity.payAcctNoList));
+//            getElementById('recAcctNo').val(JSON.stringify(entity.recAcctNoList));
         }
         /**
          * 定义数据表格

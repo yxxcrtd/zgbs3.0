@@ -9,6 +9,7 @@ import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
 import com.joyintech.tams.cfets.risk.service.RiskInputParamSerivce;
 import com.joyintech.tams.component.business.riskall.dto.RiskCommonOutputDto;
 import com.joyintech.tams.constant.DictCodeListRsk;
+import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
@@ -46,17 +47,22 @@ public class RiskTrialController {
             //TODO 目前只支持指标的试算结果返回,后期支持4种类型的试算结果返回
             if (outputDto != null && CollectionUtils.isNotEmpty(outputDto.getRiskTrialRetDto())) {
                 List<CfetsEtribdoRiskcalResponse> resultList = new ArrayList<>();
-                result.setRskStatus(outputDto.getRskTrialStatus());
-                if (StringUtil.equals(outputDto.getRskTrialStatus(), "3")) {
-                    result.setRiskTrialSpan(DictCodeListRsk.试算结果_不通过.getCodeName());
-                } else {
-                    result.setRiskTrialSpan(DictCodeListRsk.试算结果_通过.getCodeName());
-                }
-                outputDto.getRiskTrialRetDto().forEach(e -> {
+                boolean forbidFlag = false;
+                for(RiskTrialRetDto e : outputDto.getRiskTrialRetDto()){
                     CfetsEtribdoRiskcalResponse riskcalResponse = new CfetsEtribdoRiskcalResponse();
                     BeanUtil.copyPropertiesIgnoreNull(riskcalResponse, e);
+                    if(StringUtil.equals(e.getKriStatus(),"3") && !StringUtil.equals(e.getKriTrend(),"向好")){
+                        forbidFlag = true;
+                    }
                     resultList.add(riskcalResponse);
-                });
+                }
+                if (forbidFlag || StringUtil.equals(outputDto.getRskTrialStatus(), "3")) {
+                    result.setRiskTrialSpan(DictCodeListRsk.试算结果_不通过.getCodeName());
+                    result.setRskStatus("3");
+                } else {
+                    result.setRiskTrialSpan(DictCodeListRsk.试算结果_通过.getCodeName());
+                    result.setRskStatus(outputDto.getRskTrialStatus());
+                }
                 result.setRiskcalReturnList(resultList);
                 m.setData(result);
                 return new Message<AjaxResult>().success().setData(m);

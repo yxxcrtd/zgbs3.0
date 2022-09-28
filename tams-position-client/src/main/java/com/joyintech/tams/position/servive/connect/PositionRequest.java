@@ -56,7 +56,7 @@ public class PositionRequest {
 
     public  void rollNotException(String revokeId, String modelType, String errorMsg) {
 //        positionMqRequest.roll(revokeId,modelType,errorMsg);
-        positionHttpRequest.roll(revokeId,modelType,errorMsg);
+        positionHttpRequest.rollNotException(revokeId,modelType,errorMsg);
     }
 
     /**

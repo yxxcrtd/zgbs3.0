@@ -80,7 +80,7 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
             // Date mdate2 = settleTransDataDtos.get(0).getMdate2();
             List<PtlSecPosition> ptlSecPositions = Lists.newArrayList();
             // if(null != mdate2){
-                param.put("dealDate", executeDate);
+                param.put("dealDate", DateUtil.parse(DateUtil.getYesterDayDate(executeDate)));
                 // ZGZGST-4216: 查询持仓时日期使用当日持仓 fuyongsheng 20211214 modify end
                 param.put("hodingType",DictCodeList.持仓类型_实际.getValue());
                 // ZGTFCP-1363:通过开关控制查询新老头寸,默认查询新头寸 modify by fuyongsheng 20220321 start

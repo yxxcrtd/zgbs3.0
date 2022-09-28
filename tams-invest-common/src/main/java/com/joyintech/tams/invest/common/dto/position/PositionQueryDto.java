@@ -26,7 +26,18 @@ public class PositionQueryDto {
 
     private String AMOUNT;
 
+    /**
+     * 投管资产类型
+     */
+    private String finprodType2;
 
+    public String getFinprodType2() {
+        return finprodType2;
+    }
+
+    public void setFinprodType2(String finprodType2) {
+        this.finprodType2 = finprodType2;
+    }
 
     public String getSecAcctId() {
         return secAcctId;

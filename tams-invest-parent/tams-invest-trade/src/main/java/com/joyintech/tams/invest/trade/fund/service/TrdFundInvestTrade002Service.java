@@ -371,9 +371,12 @@ public class TrdFundInvestTrade002Service extends BaseService<TrdFundInvestTrade
 					if(StringUtil.equals(entity.getPs(), DictCodeList.交易方向_申购.getValue())){
 					    //生成的申购确认记录需要带出交易份额
                         confirmDto.setShareAmt(confirmDto.getTradeAmt());
-                        if(confirmDto.getType6().equals(DictCodeList.基金类资产类型_非货币基金.getValue())
-                                && confirmDto.getUnitCprice() !=null){
-                            confirmDto.setShareAmt(confirmDto.getTradeAmt().divide(confirmDto.getUnitCprice(),2, RoundingMode.HALF_UP));
+                        if(confirmDto.getType6().equals(DictCodeList.基金类资产类型_非货币基金.getValue())){
+                            if(confirmDto.getUnitCprice() !=null) {
+                                confirmDto.setShareAmt(confirmDto.getTradeAmt().divide(confirmDto.getUnitCprice(), 2, RoundingMode.HALF_UP));
+                            }else{
+                                confirmDto.setShareAmt(null);
+                            }
                         }
                     }
 					ProcessParameter<TrdFundInvestTradeConfirmDto> workFlowPatameter = getWorkFlowPatameter(confirmDto);

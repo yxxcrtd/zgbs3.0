@@ -1905,7 +1905,9 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                         && 还本_到期_收息.contains(deal.getPs()))) {
                     //GLLCUAT-472:债券到期现金流水登录日期使用划款指令的结算日期 modify by fuyongsheng 20220914 start
                     // resultDto.setCdate(deal.getSettleDate());
-                    if(DictCodeList.交易方向_到期.getValue().equals(deal.getPs())
+                    // GLLCUAT-545:还本到期收息现金流水登录日期使用划款指令的结算日期 modify by fuyongsheng 20220921 start
+                    if(还本_到期_收息.contains(deal.getPs())
+                    // GLLCUAT-545:还本到期收息现金流水登录日期使用划款指令的结算日期 modify by fuyongsheng 20220921 end
                             && DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(deal.getFinprodType2())
                             && !DictCodeListExt1.交易场所_银行间.getValue().equals(deal.getTradeMarket())){
                         resultDto.setCdate(stlPayOrder.getSettleDate());

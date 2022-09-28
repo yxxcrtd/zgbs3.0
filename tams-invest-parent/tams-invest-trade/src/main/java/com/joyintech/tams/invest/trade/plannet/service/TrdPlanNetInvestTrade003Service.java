@@ -22,6 +22,7 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
+import com.joyintech.tams.component.business.common.service.DateCalService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.settle.BussSettleOrderCommService;
 import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommService;
@@ -57,10 +58,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 〈一句话功能简述〉 〈功能详细描述〉
@@ -118,6 +116,9 @@ public class TrdPlanNetInvestTrade003Service extends BaseService<TrdPlanNetInves
 
     @Autowired
     private CreditLinesDealsMapper creditLinesDealsMapper;
+
+    @Autowired
+    private DateCalService dateCalService;
     
     /**
      * 交易及存续期交易，保存进待办，点批量审批时候需要报错。
@@ -807,5 +808,27 @@ public class TrdPlanNetInvestTrade003Service extends BaseService<TrdPlanNetInves
             redEntity.setActPortfolioId(actportfolioId);
         }
         doComplete(redEntity,OperationType.NEW);
+    }
+
+    /**
+     * 根据确认日计算净值日
+     * @param tradeDate
+     * @param finprodId
+     * @return
+     */
+    public Date calNetDate(Date tradeDate, String finprodId)  {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("finprodId", finprodId);
+        Map<String, Object> result = this.getPurSpeed(param);
+        String calId = (String)result.get("CALID");
+        List<String> holidayList = dateCalService.getDealCalendarHoliday(tradeDate,
+                DateUtil.addDay(tradeDate, 15), calId);
+        try {
+            return DateUtil.parse(dateCalService.calculationTradingDayForBefore(DateUtil.format(tradeDate), 1,
+                    holidayList, "1"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tradeDate;
     }
 }
