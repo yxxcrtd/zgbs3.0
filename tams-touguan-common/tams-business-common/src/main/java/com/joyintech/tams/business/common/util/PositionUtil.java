@@ -236,6 +236,9 @@ public class PositionUtil implements PositionCheck {
             if(StringUtil.isEmptyList(list)){
                 list = (List) tamsReq.get("ptlTrusteeshipList");
             }
+            if(StringUtil.isEmptyList(list)){
+                list = (List) tamsReq.get("ptlInList");
+            }
             if (list != null && !list.isEmpty()){
                 for (int i=0;i<list.size(); i++){
                     BaseMap each = BaseMap.newMap((Map) list.get(i));
