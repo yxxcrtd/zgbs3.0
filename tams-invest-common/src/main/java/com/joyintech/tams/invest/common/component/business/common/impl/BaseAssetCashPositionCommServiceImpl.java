@@ -6,6 +6,7 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.dao.PtlSecPositionFlowMapper;
 import com.joyintech.tams.common.base.dao.StlPayOrdersMapper;
 import com.joyintech.tams.common.base.dao.TrdFinProductDealTotalMapper;
@@ -59,6 +60,9 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
 
     @Autowired
     private TrdProductDealMapper trdProductDealMapper;
+    
+    @Autowired
+    private EtrEntrustMapper etrEntrustMapper;
 
     @Autowired
     private StlPayOrdersMapper stlPayOrdersMapper;
@@ -141,7 +145,17 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
         resultDto.setSecAcctId(StringUtil.isEmpty(secAcctId) ? "999999" : secAcctId);
         resultDto.setFinprodId(deal.getFinprodId());
         resultDto.setBranch(0L);
-        resultDto.setInvAim(StringUtil.isEmpty(deal.getInvAim()) ? "999999" : deal.getInvAim());
+        String invAim = "";
+        if(StringUtil.isNotEmpty(dealAdd.getEntrustId())) {
+        	EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(dealAdd.getEntrustId());
+        	invAim = etrEntrust.getInvAim();
+        	if(StringUtil.isEmpty(invAim)){
+        		invAim = etrEntrust.getBusinessModel();
+        	}
+        	resultDto.setInvAim(StringUtil.isEmpty(invAim) ? "999999" : invAim);
+        }else {
+        	resultDto.setInvAim(StringUtil.isEmpty(deal.getInvAim()) ? "999999" : deal.getInvAim());
+        }
         resultDto.setHodingType(inputDto.getPositionType());
         resultDto.setCcy(deal.getCcy());
         resultDto.setTradeId(deal.getTradeId());
