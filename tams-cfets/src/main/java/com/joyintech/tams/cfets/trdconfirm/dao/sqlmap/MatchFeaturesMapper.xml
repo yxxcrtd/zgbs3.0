@@ -15,19 +15,50 @@
         </collection>
     </resultMap>
 
+    <sql id="queryAutoMatchFeaturesSql">
+        select bsp.PARA_CODE, bsp.PARA_NAME, #{matchType01} type, bsps.SUB_PARA_CODE, bsps.SUB_PARA_NAME,
+        bsps.PARAM_VALUE1 subType, bsps.PARAM_VALUE3 isDisabled
+        from BANK_SYS_PARA bsp
+        inner join BANK_SYS_PARA_SUB bsps on bsp.PARA_CODE = bsps.PARA_CODE
+        <where>
+            bsp.PARA_CODE in
+            <foreach collection="matchFeaturesList" index="index" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+            <if test="isHideAutoMatch != null and isHideAutoMatch.equals('Y')">
+                AND bsps.PARAM_VALUE1 = '01'
+            </if>
+        </where>
+    </sql>
+
+    <sql id="queryManualMatchFeaturesSql">
+        select bsp.PARA_CODE, bsp.PARA_NAME, #{matchType02} type, bsps.SUB_PARA_CODE, bsps.SUB_PARA_NAME,
+        bsps.PARAM_VALUE2 subType, bsps.PARAM_VALUE4 isDisabled
+        from BANK_SYS_PARA bsp
+        inner join BANK_SYS_PARA_SUB bsps on bsp.PARA_CODE = bsps.PARA_CODE
+        <where>
+            bsp.PARA_CODE in
+            <foreach collection="matchFeaturesList" index="index" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </where>
+    </sql>
+
     <select id="queryMatchFeatures" resultMap="matchBusTypeMap">
-        select bsp.PARA_CODE, bsp.PARA_NAME, #{matchType01} type, bsps.SUB_PARA_CODE, bsps.SUB_PARA_NAME, bsps.PARAM_VALUE1 subType, bsps.PARAM_VALUE3 isDisabled
-        from BANK_SYS_PARA bsp
-                 inner join BANK_SYS_PARA_SUB bsps on bsp.PARA_CODE = bsps.PARA_CODE
-        where bsp.PARA_CODE in (#{matchFeatures01}, #{matchFeatures02}, #{matchFeatures03})
+        <include refid="queryAutoMatchFeaturesSql"/>
         union all
-        select bsp.PARA_CODE, bsp.PARA_NAME, #{matchType02} type, bsps.SUB_PARA_CODE, bsps.SUB_PARA_NAME, bsps.PARAM_VALUE2 subType, bsps.PARAM_VALUE4 isDisabled
-        from BANK_SYS_PARA bsp
-                 inner join BANK_SYS_PARA_SUB bsps on bsp.PARA_CODE = bsps.PARA_CODE
-        where bsp.PARA_CODE in (#{matchFeatures01}, #{matchFeatures02}, #{matchFeatures03})
+        <include refid="queryManualMatchFeaturesSql"/>
     </select>
 
-    <update id="updateMatchFeatures" parameterType="java.util.List" >
+    <select id="queryAutoMatchFeatures" resultMap="matchBusTypeMap">
+        <include refid="queryAutoMatchFeaturesSql"/>
+    </select>
+
+    <select id="queryManualMatchFeatures" resultMap="matchBusTypeMap">
+        <include refid="queryManualMatchFeaturesSql"/>
+    </select>
+
+    <update id="updateMatchFeatures" parameterType="java.util.List">
         <foreach collection="updateList" item="item" index="index" open="BEGIN" close=";END;" separator=";">
             update BANK_SYS_PARA_SUB
             <set>

@@ -29,6 +29,26 @@ public interface MatchFeaturesMapper {
     List<MatchBusType> queryMatchFeatures(Map<String, Object> param);
 
     /**
+     * 自动匹配元素 查询
+     *
+     * @param param
+     * @return java.util.List<com.joyintech.tams.cfets.trdconfirm.dto.matchBusType>
+     * @author jiangpeng
+     * @date 2022/9/27 10:49
+     */
+    List<MatchBusType> queryAutoMatchFeatures(Map<String, Object> param);
+
+    /**
+     * 手工匹配元素 查询
+     *
+     * @param param
+     * @return java.util.List<com.joyintech.tams.cfets.trdconfirm.dto.matchBusType>
+     * @author jiangpeng
+     * @date 2022/9/27 10:49
+     */
+    List<MatchBusType> queryManualMatchFeatures(Map<String, Object> param);
+
+    /**
      * 更新匹配元素
      *
      * @param updateList

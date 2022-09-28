@@ -14,10 +14,12 @@ import com.joyintech.background.component.common.pack.common.util.JsonUtils;
 import com.joyintech.background.component.common.pack.common.util.StringUtil;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseService;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.cfets.trdconfirm.dao.MatchFeaturesMapper;
 import com.joyintech.tams.cfets.trdconfirm.dto.BankSysParaSub;
 import com.joyintech.tams.cfets.trdconfirm.dto.MatchBusType;
 import com.joyintech.tams.cfets.trdconfirm.dto.MatchDetFeatures;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt4;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
@@ -25,10 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -60,9 +59,12 @@ public class MatchFeaturesService extends BaseService {
         Map<String, Object> param = new HashMap<>();
         param.put("matchType01", DictCodeListExt4.匹配方式_自动匹配.getValue());
         param.put("matchType02", DictCodeListExt4.匹配方式_手工匹配.getValue());
-        param.put("matchFeatures01", DictCodeListExt4.匹配业务类型_一级申购.getValue());
-        param.put("matchFeatures02", DictCodeListExt4.匹配业务类型_现券买卖.getValue());
-        param.put("matchFeatures03", DictCodeListExt4.匹配业务类型_质押式回购首期.getValue());
+        param.put("matchFeaturesList", Arrays.asList(DictCodeListExt4.匹配业务类型_一级申购.getValue(),
+                DictCodeListExt4.匹配业务类型_现券买卖.getValue(),
+                DictCodeListExt4.匹配业务类型_质押式回购首期.getValue()));
+        // 是否隐藏自动匹配元素中的可选要素
+        String isHideAutoMatch = CacheUtil.getSysParam("isHideAutoMatch");
+        param.put("isHideAutoMatch", StringUtil.isNotEmpty(isHideAutoMatch) ? isHideAutoMatch : DictCodeList.是否_是.getValue());
 
         return matchFeaturesMapper.queryMatchFeatures(param);
     }
@@ -117,5 +119,58 @@ public class MatchFeaturesService extends BaseService {
         List<BankSysParaSub> updateList = new ArrayList<>(bankSysParaSubMap.values());
         matchFeaturesMapper.updateMatchFeatures(updateList);
         return new AjaxResult();
+    }
+
+    /**
+     * 自动匹配元素查询
+     *
+     * @return java.util.List<com.joyintech.tams.cfets.trdconfirm.dto.matchBusType>
+     * @author jiangpeng
+     * @date 2022/9/27 9:35
+     */
+    public List<MatchBusType> queryAutoMatchFeatures(String businessType) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("matchType01", DictCodeListExt4.匹配方式_自动匹配.getValue());
+        param.put("matchType02", DictCodeListExt4.匹配方式_手工匹配.getValue());
+        if ( StringUtil.equals(businessType, "BID")) {
+            param.put("matchFeaturesList", Collections.singletonList(DictCodeListExt4.匹配业务类型_一级申购.getValue()));
+        }
+        if ( StringUtil.equals(businessType, "BOND")) {
+            param.put("matchFeaturesList", Collections.singletonList(DictCodeListExt4.匹配业务类型_现券买卖.getValue()));
+        }
+        if ( StringUtil.equals(businessType, "REPO")) {
+            param.put("matchFeaturesList", Collections.singletonList(DictCodeListExt4.匹配业务类型_质押式回购首期.getValue()));
+        }
+        // 是否隐藏自动匹配元素中的可选要素
+        param.put("isHideAutoMatch", DictCodeList.是否_是.getValue());
+
+        return matchFeaturesMapper.queryAutoMatchFeatures(param);
+    }
+
+    /**
+     * 手工匹配元素查询
+     *
+     * @return java.util.List<com.joyintech.tams.cfets.trdconfirm.dto.matchBusType>
+     * @author jiangpeng
+     * @date 2022/9/27 9:35
+     */
+    public MatchBusType queryManualMatchFeatures(String businessType) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("matchType01", DictCodeListExt4.匹配方式_自动匹配.getValue());
+        param.put("matchType02", DictCodeListExt4.匹配方式_手工匹配.getValue());
+        if (StringUtil.equals(businessType, "BID")) {
+            param.put("matchFeaturesList", Collections.singletonList(DictCodeListExt4.匹配业务类型_一级申购.getValue()));
+        }
+        if (StringUtil.equals(businessType, "BOND")) {
+            param.put("matchFeaturesList", Collections.singletonList(DictCodeListExt4.匹配业务类型_现券买卖.getValue()));
+        }
+        if (StringUtil.equals(businessType, "REPO")) {
+            param.put("matchFeaturesList", Collections.singletonList(DictCodeListExt4.匹配业务类型_质押式回购首期.getValue()));
+        }
+        List<MatchBusType> list = matchFeaturesMapper.queryManualMatchFeatures(param);
+        if (CollectionUtils.isEmpty(list)) {
+            return null;
+        }
+        return list.get(0);
     }
 }

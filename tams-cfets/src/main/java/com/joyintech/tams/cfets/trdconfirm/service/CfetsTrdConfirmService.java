@@ -317,7 +317,7 @@ public class CfetsTrdConfirmService extends BaseService {
             if (null != ms && StringUtil.isNotEmpty(ms.getMessage())) {
                 messages.add(new ValidMessage(getMessage("CONFIRM_MSG_009"), totleTradeId + "成交确认失败。", ms.getMessage()));
             } else {
-                messages.add(new ValidMessage(getMessage("CONFIRM_MSG_008"), totleTradeId + "成交确认失败。", ms.getMessage()));
+                messages.add(new ValidMessage(getMessage("CONFIRM_MSG_008"), totleTradeId + "成交确认失败。"));
             }
             e.printStackTrace();
         }
@@ -2520,12 +2520,12 @@ public class CfetsTrdConfirmService extends BaseService {
                         errorRs.setErrorList(Arrays.asList(new ValidMessage("上行报价数据不允许点击成交确认！")));
                         return errorRs;
                     }*/
-                    if ((StringUtil.equals(item.getFinprodType2(), "02") || StringUtil.equals(item.getFinprodType2(), "03")
-                            && (StringUtil.isEmpty(item.getCounterId()) || BigDecimalUtil.isZeroOrNull(item.getYield())))) {
-                        //价格or对手方为空，不可手工成交
-                        errorRs.setErrorList(Collections.singletonList(new ValidMessage(getMessage("CONFIRM_MSG_001"))));
-                        return errorRs;
-                    }
+//                    if ((StringUtil.equals(item.getFinprodType2(), "02") || StringUtil.equals(item.getFinprodType2(), "03")
+//                            && (StringUtil.isEmpty(item.getCounterId()) || BigDecimalUtil.isZeroOrNull(item.getYield())))) {
+//                        //价格or对手方为空，不可手工成交
+//                        errorRs.setErrorList(Collections.singletonList(new ValidMessage(getMessage("CONFIRM_MSG_001"))));
+//                        return errorRs;
+//                    }
                 }
             }
         }
@@ -2992,9 +2992,9 @@ public class CfetsTrdConfirmService extends BaseService {
             //若插入数据异常，提示错误信息
             Message ms = PositionUtil.ajaxErrorReturn(e);
             if (null != ms && StringUtil.isNotEmpty(ms.getMessage())) {
-                messages.add(new ValidMessage("业务编号：" + regInfo.getTotleTradeId() + "手工匹配确认失败。" + ms.getMessage()));
+                messages.add(new ValidMessage(getMessage("CONFIRM_MSG_014", regInfo.getTotleTradeId(), ms.getMessage())));
             } else {
-                messages.add(new ValidMessage("业务编号：" + regInfo.getTotleTradeId() + "手工匹配确认失败。"));
+                messages.add(new ValidMessage(getMessage("CONFIRM_MSG_013", regInfo.getTotleTradeId())));
             }
             e.printStackTrace();
         }
@@ -3740,6 +3740,7 @@ public class CfetsTrdConfirmService extends BaseService {
         if (StringUtil.equals(deal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue())
                 || (StringUtil.equals(deal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券.getValue())
                 && StringUtil.equals(deal.getPs(), DictCodeList.交易方向_买入.getValue()))) {
+            logger.info("划款指令生成 :一级申购 || 债券买入 || 逆回购首期");
             payAcctNo = EtrCommonCashPositionDealService.select组合托管户(deal.getPortfolioId(), deal.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("portfolioId", deal.getPortfolioId());
@@ -3752,6 +3753,7 @@ public class CfetsTrdConfirmService extends BaseService {
                 || (StringUtil.equals(deal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券.getValue())
                 && (StringUtil.equals(deal.getPs(), DictCodeList.交易方向_卖出.getValue())
                 || StringUtil.equals(deal.getPs(), DictCodeList.交易方向_行权_回售.getValue())))) {
+            logger.info("划款指令生成 :债券卖出/回售 || 正回购首期");
             recAcctNo = EtrCommonCashPositionDealService.select组合托管户(deal.getPortfolioId(), deal.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("portfolioId", deal.getPortfolioId());
@@ -3762,6 +3764,7 @@ public class CfetsTrdConfirmService extends BaseService {
         // 商业银行柜台  一级申购 || 债券买入 || 逆回购首期
         if (StringUtil.equals(deal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券.getValue())
                 && StringUtil.equals(deal.getPs(), DictCodeList.交易方向_买入.getValue())) {
+            logger.info("划款指令生成 :一级申购 || 债券买入 || 逆回购首期");
             FinProduct finProduct = finProductMapper.selectByPrimaryKey(deal.getFinprodId());
             if (StringUtil.equals(finProduct.getTradeMarket(), DictCodeListExt1.交易场所_商业银行柜台.getValue())) {
                 // 收款账户 交易对手账户
@@ -3775,6 +3778,7 @@ public class CfetsTrdConfirmService extends BaseService {
         if ((StringUtil.equals(deal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券.getValue())
                 && (StringUtil.equals(deal.getPs(), DictCodeList.交易方向_卖出.getValue())
                 || StringUtil.equals(deal.getPs(), DictCodeList.交易方向_行权_回售.getValue())))) {
+            logger.info("划款指令生成 :商业银行柜台   债券卖出/回售 || 正回购首期");
             FinProduct finProduct = finProductMapper.selectByPrimaryKey(deal.getFinprodId());
             if (StringUtil.equals(finProduct.getTradeMarket(), DictCodeListExt1.交易场所_商业银行柜台.getValue())) {
                 // 收款账户 交易对手账户
@@ -3786,6 +3790,7 @@ public class CfetsTrdConfirmService extends BaseService {
         }
         //一级申购特殊处理
         if (StringUtil.equals(temp.getFinprodType2(), DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue())) {
+            logger.info("划款指令生成 :一级申购特殊处理");
             // 收款账户 交易对手账户
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("counterId", deal.getCounterId());
