@@ -1429,6 +1429,7 @@ public class SecTransfer001Service extends CommonExportService<SecTransfer001Dto
         if ("T01".equals(entity.getPs())) {
             resultOrderDto.setPs(DictCodeListExt1.收付方向_支出.getValue());
             resultOrderDto.setPayType("01");
+            resultOrderDto.setIsNeedSend("N");
             resultOrderDto.setPortfolioId(resultOrderDto.getInPortfolioId());
             String orderId = "";
             if (baseGetBussinessId != null) {

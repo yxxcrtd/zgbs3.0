@@ -835,6 +835,7 @@ public class TrdAssetsProject001Service extends BaseService<TrdAssetsProject001D
             if ("T01".equals(trdProductDeal.getPs())) {
                 resultOrderDto.get(0).setPs("02");
                 resultOrderDto.get(0).setPayType("02");
+                resultOrderDto.get(0).setIsNeedSend("N");
                 resultOrderDto.get(0).setPortfolioId(resultOrderDto.get(0).getInPortfolioId());
                 String orderId = "";
                 if(baseGetBussinessId != null){

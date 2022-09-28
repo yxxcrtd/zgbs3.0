@@ -964,6 +964,7 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
                     if ("T01".equals(trdProductDeal.getPs())) {
                         resultOrderDto.setPs(DictCodeListExt1.收付方向_支出.getValue());
                         resultOrderDto.setPayType("02");
+                        resultOrderDto.setIsNeedSend("N");
                         resultOrderDto.setPortfolioId(resultOrderDto.getInPortfolioId());
                         String orderId = "";
                         if (baseGetBussinessId != null) {
@@ -1172,6 +1173,7 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
                 if ("T01".equals(trdProductDeal.getPs())) {
                     resultOrderDto.setPs(DictCodeListExt1.收付方向_支出.getValue());
                     resultOrderDto.setPayType("02");
+                    resultOrderDto.setIsNeedSend("N");
                     resultOrderDto.setPortfolioId(resultOrderDto.getInPortfolioId());
                     String inOrderId = riskNamListCommonMapper.queryInOrderId(resultOrderDto.getTradeId());
                     if (StringUtil.isEmpty(inOrderId)) {

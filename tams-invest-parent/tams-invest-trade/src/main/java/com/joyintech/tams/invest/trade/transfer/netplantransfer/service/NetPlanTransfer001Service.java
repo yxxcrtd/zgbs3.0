@@ -432,6 +432,9 @@ public class NetPlanTransfer001Service extends CommonExportService<NetPlanTransf
             if (!StringUtil.isNotEmpty(stl.getSettleDate())) {
                 stl.setSettleDate(baseTradeProductDealDto.getTrdProductDeal().getSettleDate());
             }
+            if (DictCodeListExt1.收付方向_支出.getValue().equals(stl.getPs())) {
+                stl.setIsNeedSend("N");
+            }
             baseTradeProductDealDto.setStlPayOrdersList(Arrays.asList(stl));
         }
     }
