@@ -15,6 +15,7 @@ import java.util.Map;
 import com.joyintech.tams.common.base.entity.StlCapacctInfo;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.validation.ValidMessage;
+import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.component.business.settle.dto.BussSettleOrderParameterDto;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 
@@ -60,4 +61,5 @@ public interface BussTrdTransferOrderService {
      * @since 1.0
      */
     StlCapacctInfo queryStlCapacctInfoByBusiAcctNo(String ccy, String busiAcctNo);
+
 }

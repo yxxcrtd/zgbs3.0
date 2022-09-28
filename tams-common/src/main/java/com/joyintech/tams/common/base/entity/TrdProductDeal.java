@@ -5,8 +5,11 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.json.CustomDateDeserialize;
+import com.joyintech.framework.select.SelectOptionDto;
+
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class TrdProductDeal extends BaseEntity {
     /***
@@ -294,6 +297,11 @@ public class TrdProductDeal extends BaseEntity {
      * 证券管理户代码
      */
     private String secManageAcctId;
+
+    /**
+     * 证券托管户名
+     */
+    private String secManageAcctName;
 
     /**
      * 关联系统交易编号
@@ -1674,5 +1682,23 @@ public class TrdProductDeal extends BaseEntity {
 
     public void setIssueType(String issueType) {
         this.issueType = issueType;
+    }
+
+    private String stlPayOrderShow;
+
+    public String getStlPayOrderShow() {
+        return stlPayOrderShow;
+    }
+
+    public void setStlPayOrderShow(String stlPayOrderShow) {
+        this.stlPayOrderShow = stlPayOrderShow;
+    }
+
+    public String getSecManageAcctName() {
+        return secManageAcctName;
+    }
+
+    public void setSecManageAcctName(String secManageAcctName) {
+        this.secManageAcctName = secManageAcctName;
     }
 }

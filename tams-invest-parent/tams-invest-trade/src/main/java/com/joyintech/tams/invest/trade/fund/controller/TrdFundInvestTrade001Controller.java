@@ -298,6 +298,35 @@ public class TrdFundInvestTrade001Controller extends BaseController {
         ProcessParameter<TrdFundInvestTradeDto> processParameter = new ProcessParameter<TrdFundInvestTradeDto>();
         WorkFlowParameter<TrdFundInvestTradeDto> params = new WorkFlowParameter<TrdFundInvestTradeDto>();
         processParameter.setWorkFlowParameter(params);
+        if (null == dto.getBussTrdTransferOrder()) {
+            Map<String, Object> accountTradId = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
+            map.put("tradeId", dto.getTradeId());
+            map.put("N", DictCodeList.是否_否.getValue());
+            accountTradId = trdFundInvestTrade001Servic.getAccountId(map);
+            if (accountTradId == null) {
+                accountTradId = trdFundInvestTrade001Servic.selectAccountTrdIdinwfl(
+                        dto.getTradeId());
+            }
+            List<BussTrdTransferOrderBase> bttob = new ArrayList<>();
+            if (accountTradId != null) {
+                if (StringUtil.equals((String)accountTradId.get("WORKFLOWID"), "0")) {
+                    bttob = trdFundInvestTrade003Service.selectOrdersByBizCode(
+                            (String)accountTradId.get("TRADID"));
+                }
+                else {
+                    bttob = bussSettleOrderCommService.selectOrdersByBizCode(
+                            (String)accountTradId.get("TRADID"));
+                }
+                if (bttob != null && bttob.size() > 0) {
+                    List<BussTrdTransferOrderDto> bttodList = new ArrayList<>();
+                    BussTrdTransferOrderDto bttod = new BussTrdTransferOrderDto();
+                    BeanUtil.copyPropertiesIgnoreNull(bttod, bttob.get(0));
+                    bttodList.add(bttod);
+                    dto.setBussTrdTransferOrder(bussTrdTransferOrderService.save(bttodList));
+                }
+            }
+        }
         if (StringUtil.equals(dto.getPs(), DictCodeListExt2.交易方向_认购.getValue())
             || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_申购.getValue())
             || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_赎回.getValue())

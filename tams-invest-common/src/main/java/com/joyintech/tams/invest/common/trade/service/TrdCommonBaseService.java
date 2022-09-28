@@ -992,6 +992,27 @@ public class TrdCommonBaseService extends BaseService {
     }
 
     /**
+     * 根据total编号查询交易编号
+     * add by hpp 2020-09-17
+     * @param tradeId
+     * @return
+     */
+    public TrdProductDeal selectZCTradeId(String tradeId){
+        return trdCommonBaseMapper.selectZCTradeId(tradeId);
+    }
+
+    /**
+     * 根据交易编号查询前置交易编号
+     * add by hpp 2020-09-17
+     * @param tradeId
+     * @return
+     */
+    public TrdProductDeal selectZCRTradeId(String tradeId){
+        return trdCommonBaseMapper.selectZCRTradeId(tradeId);
+    }
+
+
+    /**
      * 根据交易编号查询另一笔未撤销的转仓交易信息
      * add by hpp 2020-09-17
      * @param tradeId

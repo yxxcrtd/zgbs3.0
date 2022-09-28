@@ -1,6 +1,7 @@
 package com.joyintech.service.trade.transfer.netplantransfer.controller;
 
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.service.trade.transfer.common.service.TransferCommonService;
 import com.joyintech.service.trade.transfer.netplantransfer.service.NetPlanTransferService;
 import com.joyintech.tams.common.base.entity.TrdProductDeal;
 
@@ -27,6 +28,8 @@ public class NetPlanTransferController {
      */
     @Autowired
     private NetPlanTransferService netPlanTransferService;
+    @Autowired
+    private TransferCommonService transferCommonService;
 
     /**
      * 获取单位净值
@@ -48,7 +51,8 @@ public class NetPlanTransferController {
      */
     @PostMapping("getPortfolioId")
     public List<SelectOptionDto> getPortfolioId(@RequestBody Map<String,Object> map){
-        return netPlanTransferService.getPortfolioId(map);
+//        return netPlanTransferService.getPortfolioId(map);
+        return transferCommonService.selectPortoId(map);
     }
 
     /**

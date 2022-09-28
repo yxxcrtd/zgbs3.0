@@ -37,7 +37,7 @@
         from
             WFL_TRD_PRODUCT_DEAL_ADD
         where
-            WORKFLOW_ID = #{workflowId}
+            WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR}
     </select>
     <select id="checkEtrToTrdInFlow" resultType="com.joyintech.tams.common.base.entity.WflTrdProductDealAdd">
         select distinct
@@ -53,7 +53,7 @@
         from
             WFL_STL_PAY_ORDERS
         where
-            WORKFLOW_ID = #{workflowId}
+            WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR}
     </select>
 
     <update id="updateRepAssetDebt">
@@ -128,7 +128,7 @@
  	 	    from WFL_TRD_PRODUCT_DEAL
  	 	    left join wfl_trd_product_deal_oth on WFL_TRD_PRODUCT_DEAL.trade_id=wfl_trd_product_deal_oth.trade_id and WFL_TRD_PRODUCT_DEAL.workflow_status=wfl_trd_product_deal_oth.workflow_status
         	left join FIN_DEAL_PLEDGE fdp on WFL_TRD_PRODUCT_DEAL.Trade_Id = fdp.finprod_id
-        	   where WFL_TRD_PRODUCT_DEAL.WORKFLOW_ID = #{workflowId}
+        	   where WFL_TRD_PRODUCT_DEAL.WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR}
     </select>
 
     <select id="selectParam" resultType="java.lang.String">
@@ -554,6 +554,15 @@
             and tpd.IS_CANCEL = 'N' and tpd.TRADE_STATUS = '01' /*有效状态*/
             and (tpd.R_TRADE_ID = #{tradeId, jdbcType=VARCHAR} or tpd2.TOTLE_TRADE_ID = #{tradeId, jdbcType=VARCHAR})
 	</select>
+
+    <!-- 根据交易编号查询另一笔未撤销的转仓交易信息 add by hpp 2020-09-17 start -->
+    <select id="selectZCTradeId" resultType="com.joyintech.tams.common.base.entity.TrdProductDeal">
+        select TRADE_ID as tradeId from TRD_PRODUCT_DEAL where TOTLE_TRADE_ID = #{tradeId, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectZCRTradeId" resultType="com.joyintech.tams.common.base.entity.TrdProductDeal">
+        select R_TRADE_ID as tradeId from TRD_PRODUCT_DEAL where (TRADE_ID = #{tradeId, jdbcType=VARCHAR} or TOTLE_TRADE_ID = #{tradeId, jdbcType=VARCHAR})
+    </select>
 
     <select id="selectZCDealByTradeId" resultType="com.joyintech.tams.common.base.entity.TrdProductDeal">
         /*转仓买入*/
@@ -1516,4 +1525,81 @@
         where
         SEQNO = #{seqNo,jdbcType=VARCHAR}
     </select>
+
+    <select id="queryStlSecAcctInfo" parameterType="java.util.Map" resultType="com.joyintech.tams.common.base.entity.StlSecAcctInfo">
+        SELECT DISTINCT SEC_ACCT_ID, T.REC_ACCT_ID
+          FROM STL_SEC_ACCT_INFO T
+         WHERE 1 = 1
+        <if test="secManageAcctId != null"> AND T.SEC_ACCT_ID = #{secManageAcctId, jdbcType=VARCHAR} </if>
+        <if test="trdAcctId != null"> AND T.TRD_ACCT_ID = #{trdAcctId, jdbcType=VARCHAR} </if>
+    </select>
+    <select id="queryGdhFlag" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT FPA.GDH_FLAG
+          FROM FIN_PRODUCT_ADD FPA
+         WHERE FPA.FINPROD_ID = #{finprodId, jdbcType=VARCHAR}
+    </select>
+    <select id="queryReAcctNoByPortfolioId" parameterType="java.lang.String" resultType="com.joyintech.framework.select.SelectOptionDto">
+        SELECT DISTINCT PCI.ACCT_NO AS id,
+               SCI.ACCT_NAME AS text
+          FROM PTL_CAPACCT_INFO PCI, STL_CAPACCT_INFO SCI
+         WHERE PCI.ACCT_TYPE = 'A11'
+           AND PCI.ACCT_NO = SCI.ACCT_NO
+           AND PCI.PORTFOLIO_ID = #{portfolioId, jdbcType=VARCHAR}
+    </select>
+    <select id="queryRecAndPayAcctNo" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+          FROM STL_ORDERS T
+         WHERE (DECODE(T.PS, '01', T.MY_ACCT_NO, T.COUNTER_ACCT_NO) != #{recAcctNo, jdbcType=VARCHAR} OR
+                 DECODE(T.PS, '02', T.MY_ACCT_NO, T.COUNTER_ACCT_NO) != #{payAcctNo, jdbcType=VARCHAR})
+        <if test="bizCodes !=null and bizCodes.size()>0">
+            <foreach collection="bizCodes" item="item" open="and T.TRADE_ID IN (" separator="," close=")">
+                #{item,jdbcType=VARCHAR}
+            </foreach>
+        </if>
+    </select>
+    <select id="queryAcctNameByNo" resultType="com.joyintech.tams.common.base.entity.StlCapacctInfo">
+        SELECT T.ACCT_NAME, T.LARGE_PAYNO
+        FROM STL_CAPACCT_INFO T
+        WHERE T.ACCT_NO = #{acctNo,jdbcType=VARCHAR}
+        AND ROWNUM = 1
+    </select>
+    <select id="queryAcctByNo" resultType="com.joyintech.tams.common.base.entity.StlCapacctInfo">
+        SELECT T.ACCT_NAME, T.LARGE_PAYNO, B.ACCT_TYPE
+          FROM STL_CAPACCT_INFO T, PTL_CAPACCT_INFO B
+         WHERE T.ACCT_NO = #{acctNo,jdbcType=VARCHAR}
+           AND T.ACCT_NO = B.ACCT_NO
+           AND ROWNUM = 1
+    </select>
+    <insert id="insertWflBusinessList">
+	MERGE INTO ACT_HI_TASKINST AH
+	  USING(
+	  SELECT T.ID_ || 'SYS' col1,
+			 T.PROC_DEF_ID_ col2,
+			 'TRADE_SYSTEM' col3,
+			 T.PROC_INST_ID_ col4,
+			 T.EXECUTION_ID_ col5,
+			 T.PARENT_TASK_ID_ col6,
+			 '系统校验' col7,
+			 T.DESCRIPTION_ col8,
+			 T.OWNER_ col9,
+			 'system' col10,
+             sysdate+numtodsinterval(5,'second') col11,
+             sysdate+numtodsinterval(5,'second') col12,
+             sysdate+numtodsinterval(5,'second') col13,
+			 0 col14,
+			 T.DELETE_REASON_ col15,
+			 T.PRIORITY_ col16
+		FROM ACT_HI_TASKINST T, SYS_WFL_BUSINESS_LIST WFL
+	   WHERE T.PROC_INST_ID_ = WFL.WORKFLOW_ID
+		 AND T.DELETE_REASON_ = 'completed'
+		 AND T.TASK_DEF_KEY_ = 'TRADE_CHECKER'
+		 AND WFL.SEQ_NO = #{workFlowId, jdbcType=VARCHAR}) A ON (A.col1 = AH.ID_)
+	 WHEN NOT MATCHED THEN INSERT (AH.ID_, AH.PROC_DEF_ID_, AH.TASK_DEF_KEY_, AH.PROC_INST_ID_, AH.EXECUTION_ID_, AH.PARENT_TASK_ID_, AH.NAME_, AH.DESCRIPTION_, AH.OWNER_, AH.ASSIGNEE_, AH.START_TIME_, AH.CLAIM_TIME_, AH.END_TIME_, AH.DURATION_, AH.DELETE_REASON_, AH.PRIORITY_)
+	   VALUES(A.col1, A.col2, A.col3, A.col4, A.col5, A.col6, A.col7, A.col8, A.col9, A.col10, A.col11, A.col12, A.col13, A.col14, A.col15, A.col16)
+    </insert>
+
+    <select id="selectFinProductAdd" resultType="com.joyintech.tams.common.base.entity.FinProductAdd">
+        SELECT T.IS_INNER_ADV FROM FIN_PRODUCT_ADD T WHERE T.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+    </select>
+
 </mapper>

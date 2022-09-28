@@ -7,7 +7,7 @@
  * 修改内容：新建
  * 系统名称：理财资管管理系统V2.0
  */
- 
+
 package com.joyintech.tams.invest.trade.common.aop;
 
 import com.joyintech.framework.ajax.AjaxResult;
@@ -66,7 +66,7 @@ import static com.joyintech.tams.constant.DictCodeListExt1.金融产品类型_�
 @Component
 @Aspect
 public class TradeRdsCommonAop {
-    
+
     // add by zhangrui1 20200509 批量接口逻辑 start
     public static final List<String> 批量接口相关交易方向 = Arrays.asList(DictCodeListExt1.交易方向_债转股.getValue(),
             DictCodeListExt2.交易方向_转换申请.getValue(),DictCodeListExt2.交易方向_转换赎回申请.getValue());
@@ -87,14 +87,14 @@ public class TradeRdsCommonAop {
 
     @Autowired
     private RiskTrialComm riskTrialComm;
-    
- // add by etliu 20210129 start
+
+    // add by etliu 20210129 start
     /**
      * TradeCommonService
      */
     @Autowired
     private TradeCommonService tradeCommonService;
- // add by etliu 20210129 end
+    // add by etliu 20210129 end
 
     // add by zhangrui1 start
     @Autowired
@@ -108,7 +108,7 @@ public class TradeRdsCommonAop {
 
     /**
      * 设置目标数据到线程缓存
-     * 
+     *
      * @param list 目标数据
      */
     public static final <V extends Object> void setLocalCache(List<V> list) {
@@ -117,11 +117,11 @@ public class TradeRdsCommonAop {
 
     /**
      * 设置目标数据到线程缓存
-     * 
+     *
      * @param list 目标数据
      */
     @SuppressWarnings("unchecked")
-	public static final <V extends Object> void setLocalCache(V... list) {
+    public static final <V extends Object> void setLocalCache(V... list) {
         localCache.set(Arrays.asList(list));
     }
 
@@ -137,7 +137,7 @@ public class TradeRdsCommonAop {
     // add by zhangrui1 批量调用接口 start
     /**
      * 取得接口组件Service
-     * 
+     *
      * @return 接口组件Service
      */
     @SuppressWarnings("unchecked")
@@ -147,7 +147,7 @@ public class TradeRdsCommonAop {
 
     /**
      * 批量接口调用
-     * 
+     *
      * @param dtoList 批量数据
      * @param busiType 业务类型
      * @param isSingleCounter 是否同一个交易对手
@@ -158,25 +158,25 @@ public class TradeRdsCommonAop {
     public static final <T> AjaxResult doListOccupy(List<T> dtoList, String busiType,
                                                     boolean isSingleCounter,
                                                     TrdInvestPersonInfo002Dto etrInvestPersonInfo)
-        throws Exception {
+            throws Exception {
         if (!CommonUtil.isType(CacheUtil.getSysParam("pageRedisFlag"),
-            BussinessDictCodeListRds.是否_是)) {
+                BussinessDictCodeListRds.是否_是)) {
             return null;
         }
         // 接口组件Service
         InterfRiskRdsService<InterfRiskRdsDto> service = getInterfRiskRdsService();
         // 执行预占
         AjaxResult ar = service.checkRiskRds(new InterfRiskRdsDto(),
-            BussinessDictCodeListRds.事件类型_投资交易.getValue(),
-            BussinessDictCodeListRds.接口系统ID_实占批量接口.getValue(), busiType,
-            en -> service.sendRiskRdsListData(en, dtoList, map -> {
-                // 个别处理
-                // 交易对手
-                if (isSingleCounter && etrInvestPersonInfo != null) {
-                    map.put(PageFieldToInterfFactory.INF_COUNTERID,
-                        etrInvestPersonInfo.getCounterId());
-                }
-            }));
+                BussinessDictCodeListRds.事件类型_投资交易.getValue(),
+                BussinessDictCodeListRds.接口系统ID_实占批量接口.getValue(), busiType,
+                en -> service.sendRiskRdsListData(en, dtoList, map -> {
+                    // 个别处理
+                    // 交易对手
+                    if (isSingleCounter && etrInvestPersonInfo != null) {
+                        map.put(PageFieldToInterfFactory.INF_COUNTERID,
+                                etrInvestPersonInfo.getCounterId());
+                    }
+                }));
         // 判断结果，若正常则缓存数据，后面执行异常时使用缓存数据进行预占释放
         if (ar == null) {
             setLocalCache(dtoList);
@@ -200,6 +200,22 @@ public class TradeRdsCommonAop {
      * 退回时在待办中再提交
      */
     @Pointcut("execution(* com.joyintech.tams.invest.trade..*.*.doUpdate(..))")
+    protected void updatePoint1() {
+
+    }
+
+    /**
+     * 排除转仓
+     */
+    @Pointcut("execution(* com.joyintech.tams.invest.trade.transfer..*.*.doUpdate(..))")
+    protected void updatePoint2() {
+
+    }
+
+    /**
+     * 退回时在待办中再提交
+     */
+    @Pointcut("updatePoint1() && !updatePoint2()")
     protected void updatePoint() {
 
     }
@@ -208,6 +224,22 @@ public class TradeRdsCommonAop {
      * 撤销操作
      */
     @Pointcut("execution(* com.joyintech.tams.invest.trade..*.*.doComplete(..))")
+    protected void revokePoint1() {
+
+    }
+
+    /**
+     * 排除转仓
+     */
+    @Pointcut("execution(* com.joyintech.tams.invest.trade.transfer..*.*.doComplete(..))")
+    protected void revokePoint2() {
+
+    }
+
+    /**
+     * 撤销操作
+     */
+    @Pointcut("revokePoint1() && !revokePoint2()")
     protected void revokePoint() {
 
     }
@@ -216,6 +248,19 @@ public class TradeRdsCommonAop {
      * 退回操作
      */
     @Pointcut("execution(* com.joyintech.tams.invest.trade..*.*.doBack(..))")
+    protected void backPoint1() {
+    }
+
+    /**
+     * 排除转仓
+     */
+    @Pointcut("execution(* com.joyintech.tams.invest.trade.transfer..*.*.doBack(..))")
+    protected void backPoint2() {
+    }
+    /**
+     * 退回操作
+     */
+    @Pointcut("backPoint1() && !backPoint2()")
     protected void backPoint() {
     }
 
@@ -231,13 +276,13 @@ public class TradeRdsCommonAop {
             if(!checkRevokeAction(mapTrd.get("workflowId"))){
                 return;
             }
-            
+
             // add by etliu 20210129 start
             // 选择的成交编号存在对应的报价，则不影响风险
             if (mapTrd.get("fTradeId") != null) {
                 String fTradeId = (String) mapTrd.get("fTradeId");
                 if (StringUtil.isNotBlank(fTradeId) && StringUtil.equals(DictCodeList.是否_是.getValue(),
-                    tradeCommonService.checkExecIdHasQuote(fTradeId))) {
+                        tradeCommonService.checkExecIdHasQuote(fTradeId))) {
                     return;
                 }
             }
@@ -276,7 +321,7 @@ public class TradeRdsCommonAop {
             if (mapTrd.get("fTradeId") != null) {
                 String fTradeId = (String) mapTrd.get("fTradeId");
                 if (StringUtil.isNotBlank(fTradeId) && StringUtil.equals(DictCodeList.是否_是.getValue(),
-                    tradeCommonService.checkExecIdHasQuote(fTradeId))) {
+                        tradeCommonService.checkExecIdHasQuote(fTradeId))) {
                     return;
                 }
             }
@@ -399,13 +444,13 @@ public class TradeRdsCommonAop {
         if(!checkRevokeAction(mapTrd.get("workflowId"))){
             return;
         }
-        
+
         // add by etliu 20210129 start
         // 选择的成交编号存在对应的报价，则不影响风险
         if (mapTrd.get("fTradeId") != null) {
             String fTradeId = (String) mapTrd.get("fTradeId");
             if (StringUtil.isNotBlank(fTradeId) && StringUtil.equals(DictCodeList.是否_是.getValue(),
-                tradeCommonService.checkExecIdHasQuote(fTradeId))) {
+                    tradeCommonService.checkExecIdHasQuote(fTradeId))) {
                 return;
             }
         }
@@ -466,8 +511,8 @@ public class TradeRdsCommonAop {
         }
         String key = "finprodType2";
         if (CommonUtil.isType((String)mapTrd.get(key), DictCodeListExt1.金融产品类型_投管用_债券借贷)
-            || CommonUtil.isType((String)mapTrd.get(key), DictCodeListExt1.金融产品类型_投管用_债券借贷融入)
-            || CommonUtil.isType((String)mapTrd.get(key), DictCodeListExt1.金融产品类型_投管用_债券借贷融出)) {
+                || CommonUtil.isType((String)mapTrd.get(key), DictCodeListExt1.金融产品类型_投管用_债券借贷融入)
+                || CommonUtil.isType((String)mapTrd.get(key), DictCodeListExt1.金融产品类型_投管用_债券借贷融出)) {
             return;
         }
         InterfRiskRdsDto interfRiskRdsDto = new InterfRiskRdsDto();
@@ -476,20 +521,25 @@ public class TradeRdsCommonAop {
         interfRiskRdsDto.setAssetType(StringUtil.isNotEmpty(assetType)?assetType:StringUtil.EMPTY);
         interfRiskRdsDto.setFinType(StringUtil.isNotEmpty(mapTrd.get(InterfUtil.finprodType2))?mapTrd.get(InterfUtil.finprodType2).toString():StringUtil.EMPTY);
         try {
+            //特殊处理转仓撤销时，已经释放了一次占用不需要再次释放
+            if(getTarget() != null && StringUtil.equals(CommonUtil.findValue(mapTrd, "operateType"),"revoke")) {//撤销的时候
+                cleanLocalCache();
+                return;
+            }
             // add by zhangrui1 一级投标维护 start
             if (StringUtil.isNotEmpty(CommonUtil.findValue(mapTrd, BOND_FIRST_SIGN))) {
                 doFirstBondTrade(mapTrd, infCode);
             }
             else {
-            doBondBid(mapTrd, joinPoint, interfRiskRdsDto);
-            // add by zhangrui1 一级投标维护 end
-            ClientData result = interfRiskRdsService.sendRiskRdsData(mapTrd, interfRiskRdsDto);
-            if(StringUtil.isNotEmpty(result)&&StringUtil.isNotEmpty(result.getHead())&&StringUtil.isNotEmpty(result.getHead().get(InterfUtil.std400msgt))){
-                if(StringUtil.equals(result.getHead().get(InterfUtil.std400msgt).toString(),InterfUtil.E)&&StringUtil.isNotEmpty(result.getHead().get(InterfUtil.stdrtninfo))){
-                    throw new BusinessException(InterfUtil.MSG+result.getHead().get(InterfUtil.stdrtninfo).toString());
+                doBondBid(mapTrd, joinPoint, interfRiskRdsDto);
+                // add by zhangrui1 一级投标维护 end
+                ClientData result = interfRiskRdsService.sendRiskRdsData(mapTrd, interfRiskRdsDto);
+                if(StringUtil.isNotEmpty(result)&&StringUtil.isNotEmpty(result.getHead())&&StringUtil.isNotEmpty(result.getHead().get(InterfUtil.std400msgt))){
+                    if(StringUtil.equals(result.getHead().get(InterfUtil.std400msgt).toString(),InterfUtil.E)&&StringUtil.isNotEmpty(result.getHead().get(InterfUtil.stdrtninfo))){
+                        throw new BusinessException(InterfUtil.MSG+result.getHead().get(InterfUtil.stdrtninfo).toString());
+                    }
                 }
-            }
-            // add by zhangrui1 一级投标维护 start
+                // add by zhangrui1 一级投标维护 start
             }
             // add by zhangrui1 一级投标维护 end
         } catch (Exception e) {
@@ -605,17 +655,27 @@ public class TradeRdsCommonAop {
     }
 
     // add by zhangrui1 cotroller.save出错后需要撤销原来实占的数据 start
+    @Pointcut("execution(* com.joyintech.tams.invest.trade..*.controller..*.save(..))")
+    protected void savePoint1() {
+    }
+
+    /**
+     * 排除转仓
+     */
+    @Pointcut("execution(* com.joyintech.tams.invest.trade.transfer..*.controller..*.save(..))")
+    protected void savePoint2() {
+    }
     /**
      * 提交流程操作
      */
-    @Pointcut("execution(* com.joyintech.tams.invest.trade..*.controller..*.save(..))")
+    @Pointcut("savePoint1() && !savePoint2()")
     protected void savePoint() {
         // 提交流程操作
     }
 
     /**
      * 清除线程缓存
-     * 
+     *
      * @param joinPoint 切面参数
      */
     @AfterReturning(value = "savePoint()")
@@ -626,7 +686,7 @@ public class TradeRdsCommonAop {
 
     /**
      * 若提交流程出错则需要将实占的数据撤销掉
-     * 
+     *
      * @param joinPoint 切面参数
      * @param exception 抛出的异常
      */
@@ -644,12 +704,12 @@ public class TradeRdsCommonAop {
             if (mapTrd.get("fTradeId") != null) {
                 String fTradeId = (String) mapTrd.get("fTradeId");
                 if (StringUtil.isNotBlank(fTradeId) && StringUtil.equals(DictCodeList.是否_是.getValue(),
-                    tradeCommonService.checkExecIdHasQuote(fTradeId))) {
+                        tradeCommonService.checkExecIdHasQuote(fTradeId))) {
                     return;
                 }
             }
             // add by etliu 20210129 end
-            
+
             List<?> list = getTarget();
             if (CollectionUtils.isEmpty(list)) {
                 String infCode = BussinessDictCodeListRds.接口系统ID_实占释放接口.getValue();
@@ -669,7 +729,7 @@ public class TradeRdsCommonAop {
                 }
                 revokeBackRiskCommon(dataMap, infCode, joinPoint);
             }
-    	}
+        }
         // 清除线程缓存
         cleanLocalCache();
     }
@@ -679,17 +739,17 @@ public class TradeRdsCommonAop {
     /**
      * 是否开启预占功能 <br>
      * 系统参数【is_need_preoccupy（Y:开启预占）】
-     * 
+     *
      * @return true:开启预占功能
      */
     public static boolean isNeedPreoccupy() {
         return CommonUtil.isType(CacheUtil.getSysParam("is_need_preoccupy"),
-            BussinessDictCodeListRds.是否_是);
+                BussinessDictCodeListRds.是否_是);
     }
 
     /**
      * 执行风险预占计算
-     * 
+     *
      * @param dto 委托指令内容
      * @param infCode 接口代码
      * @param busiType 业务类型
@@ -698,7 +758,7 @@ public class TradeRdsCommonAop {
      */
     @SuppressWarnings("unchecked")
     public static final <T> AjaxResult doPreOccupy(T dto, String infCode, String busiType)
-        throws Exception {
+            throws Exception {
         if (!isNeedPreoccupy()) {
             return null;
         }
@@ -706,14 +766,14 @@ public class TradeRdsCommonAop {
         InterfRiskRdsService<InterfRiskRdsDto> service = getInterfRiskRdsService();
         InterfRiskRdsDto rdsDto = new InterfRiskRdsDto();
         if (CommonUtil.isType(busiType, BussinessDictCodeList.共同业务类型_中标结果确认)
-            || CommonUtil.isType(busiType, BussinessDictCodeList.共同业务类型_中标结果维护)) {
+                || CommonUtil.isType(busiType, BussinessDictCodeList.共同业务类型_中标结果维护)) {
             rdsDto.setEventStatus(busiType);
             busiType = DictCodeListExt2.平安资产类型_一级市场债.getValue();
         }
         // 执行预占
         AjaxResult ar = service.checkRiskRds(rdsDto,
-            BussinessDictCodeListRds.事件类型_投资委托.getValue(), infCode, busiType,
-            en -> service.sendRiskRdsData(dto, en));
+                BussinessDictCodeListRds.事件类型_投资委托.getValue(), infCode, busiType,
+                en -> service.sendRiskRdsData(dto, en));
         // 判断结果，若正常则缓存数据，后面执行异常时使用缓存数据进行预占释放
         if (ar == null) {
             setLocalCache(dto);
@@ -724,7 +784,7 @@ public class TradeRdsCommonAop {
 
     /**
      * 批量接口调用
-     * 
+     *
      * @param dtoList 批量数据
      * @param busiType 业务类型
      * @param infCode 接口代码
@@ -736,7 +796,7 @@ public class TradeRdsCommonAop {
     public static final <T> AjaxResult doListPreOccupy(List<T> dtoList, String busiType,
                                                        String infCode, boolean isSingleCounter,
                                                        BussEtrInvestPersonInfoDto etrInvestPersonInfo)
-        throws Exception {
+            throws Exception {
         if (!isNeedPreoccupy()) {
             return null;
         }
@@ -744,21 +804,21 @@ public class TradeRdsCommonAop {
         InterfRiskRdsService<InterfRiskRdsDto> service = getInterfRiskRdsService();
         InterfRiskRdsDto rdsDto = new InterfRiskRdsDto();
         if (CommonUtil.isType(busiType, BussinessDictCodeList.共同业务类型_中标结果确认)
-            || CommonUtil.isType(busiType, BussinessDictCodeList.共同业务类型_中标结果维护)) {
+                || CommonUtil.isType(busiType, BussinessDictCodeList.共同业务类型_中标结果维护)) {
             rdsDto.setEventStatus(busiType);
             busiType = DictCodeListExt2.平安资产类型_一级市场债.getValue();
         }
         // 执行预占
         AjaxResult ar = service.checkRiskRds(rdsDto,
-            BussinessDictCodeListRds.事件类型_投资委托.getValue(), infCode,
-            busiType, en -> service.sendRiskRdsListData(en, dtoList, map -> {
-                // 个别处理
-                // 交易对手
-                if (isSingleCounter && etrInvestPersonInfo != null) {
-                    map.put(PageFieldToInterfFactory.INF_COUNTERID,
-                        etrInvestPersonInfo.getCounterId());
-                }
-            }));
+                BussinessDictCodeListRds.事件类型_投资委托.getValue(), infCode,
+                busiType, en -> service.sendRiskRdsListData(en, dtoList, map -> {
+                    // 个别处理
+                    // 交易对手
+                    if (isSingleCounter && etrInvestPersonInfo != null) {
+                        map.put(PageFieldToInterfFactory.INF_COUNTERID,
+                                etrInvestPersonInfo.getCounterId());
+                    }
+                }));
         // 判断结果，若正常则缓存数据，后面执行异常时使用缓存数据进行预占释放
         if (ar == null) {
             setLocalCache(dtoList);
@@ -795,7 +855,7 @@ public class TradeRdsCommonAop {
 
     @SuppressWarnings("unchecked")
     public static final <T> AjaxResult doFirstBondTrade(T dto, String infCode)
-        throws Exception {
+            throws Exception {
         Map<String, Object> trdMap = CommonUtil.toMap(dto);
         // 是一级市场债分销缴款时
         if (!StringUtil.isNotEmpty(trdMap.get(BOND_FIRST_SIGN))) {
@@ -812,9 +872,9 @@ public class TradeRdsCommonAop {
         ocpMap.remove(ENTRUST_ID);
         // 执行实占
         AjaxResult ar = service.checkRiskRds(new InterfRiskRdsDto(),
-            BussinessDictCodeListRds.事件类型_投资交易.getValue(),
-            infCode, DictCodeList.平安资产类型_债券.getValue(),
-            en -> service.sendRiskRdsDataCommon(ocpMap, en));
+                BussinessDictCodeListRds.事件类型_投资交易.getValue(),
+                infCode, DictCodeList.平安资产类型_债券.getValue(),
+                en -> service.sendRiskRdsDataCommon(ocpMap, en));
         // 判断结果，若正常则缓存数据，后面执行异常时使用缓存数据进行预占释放
         if (ar == null && CommonUtil.isType(infCode, BussinessDictCodeListRds.接口系统ID_实占接口)) {
             setLocalCache(dto);
@@ -825,31 +885,31 @@ public class TradeRdsCommonAop {
         }
         if (CommonUtil.isType(infCode, BussinessDictCodeListRds.接口系统ID_实占释放接口)) {
             ClientData result = firstBondPreOcpp(trdMap,
-                BussinessDictCodeListRds.接口系统ID_预占释放接口.getValue());
+                    BussinessDictCodeListRds.接口系统ID_预占释放接口.getValue());
             // 出错需要回滚前面的数据
             if (!isOK(result)) {
                 service.checkRiskRds(new InterfRiskRdsDto(),
-                    BussinessDictCodeListRds.事件类型_投资交易.getValue(),
-                    BussinessDictCodeListRds.接口系统ID_实占接口.getValue(),
-                    DictCodeList.平安资产类型_债券.getValue(),
-                    en -> service.sendRiskRdsDataCommon(ocpMap, en));
+                        BussinessDictCodeListRds.事件类型_投资交易.getValue(),
+                        BussinessDictCodeListRds.接口系统ID_实占接口.getValue(),
+                        DictCodeList.平安资产类型_债券.getValue(),
+                        en -> service.sendRiskRdsDataCommon(ocpMap, en));
             }
         }
         return ar;
     }
 
     public static final ClientData firstBondPreOcpp(Map<String, Object> trdMap, String infCode)
-        throws Exception {
+            throws Exception {
         if (isNeedPreoccupy()) {
             // 接口组件Service
             InterfRiskRdsService<InterfRiskRdsDto> service = getInterfRiskRdsService();
             Map<String, Object> preMap = new HashMap<>();
             preMap.putAll(trdMap);
-            if (StringUtil.isNotEmpty(trdMap.get("finprodType2")) && 
+            if (StringUtil.isNotEmpty(trdMap.get("finprodType2")) &&
                     StringUtil.equals(DictCodeList.平安资产类型_债券.getValue(),(String)trdMap.get("finprodType2"))){
                 preMap.put(InterfUtil.finprodId, trdMap.get(O_FINPROD_ID) == null ? trdMap.get(InterfUtil.finprodId) : trdMap.get(O_FINPROD_ID));
             }else{
-                preMap.put(InterfUtil.finprodId, trdMap.get(O_FINPROD_ID));   
+                preMap.put(InterfUtil.finprodId, trdMap.get(O_FINPROD_ID));
             }
             preMap.put(IS_DIFF_OCCUPY, BussinessDictCodeList.是否_是.getValue());
             Object deffOcpFlg = CommonUtil.findValue(trdMap, TOTLE_TRADE_ID);
@@ -864,7 +924,7 @@ public class TradeRdsCommonAop {
             BigDecimal cpriceAmt = CommonUtil.getBigDecimal(preMap, CPRICE_AMT, BigDecimal.ZERO);
             BigDecimal unitCprice = CommonUtil.getBigDecimal(preMap, UNIT_CPRICE, BigDecimal.ONE);
             preMap.put(ENTRUST_NUM, ArithmeticUtil.multiply(
-                ArithmeticUtil.divide(cpriceAmt, unitCprice, 4), new BigDecimal(100)));
+                    ArithmeticUtil.divide(cpriceAmt, unitCprice, 4), new BigDecimal(100)));
             InterfRiskRdsDto rdsDto = new InterfRiskRdsDto();
             rdsDto.setAssetType(DictCodeListExt2.平安资产类型_一级市场债.getValue());
             rdsDto.setEventType(BussinessDictCodeListRds.事件类型_投资委托.getValue());

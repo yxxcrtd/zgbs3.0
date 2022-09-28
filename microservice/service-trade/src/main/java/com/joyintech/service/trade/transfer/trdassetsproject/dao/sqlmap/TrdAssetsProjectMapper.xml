@@ -40,7 +40,7 @@
         LEFT JOIN PTL_SEC_ACCT PSA
         ON A.PORTFOLIO_ID = PSA.PORTFOLIO_ID
         LEFT JOIN PTL_CAPACCT_INFO PCI
-        ON PCI.PORTFOLIO_ID = A.PORTFOLIO_ID
+        ON PCI.PORTFOLIO_ID = A.PORTFOLIO_ID and PCI.ACCT_TYPE = 'A01'
         WHERE A.INVEST_YESORNO = 'Y'
         AND A.PORTFOLIO_ID != #{invTransPortf,jdbcType=VARCHAR}
         AND A.MDATE &gt;=TO_DATE(#{tradeDate},'yyyy-MM-dd')
@@ -48,7 +48,8 @@
         <if test="secAcctId != null and secAcctId != ''">
             AND PSA.ACCT_NO=#{secAcctId,jdbcType=VARCHAR}
         </if>
-        AND PCI.ACCT_NO in (SELECT DISTINCT B.ACCT_NO  FROM PTL_CAPACCT_INFO B WHERE B.PORTFOLIO_ID = #{invTransPortf} AND B.ACCT_TYPE = #{capacctType} AND B.CCY = #{ccy})        <if test="initValue != null and initValue != ''">
+        <!--AND PCI.ACCT_NO in (SELECT DISTINCT B.ACCT_NO  FROM PTL_CAPACCT_INFO B WHERE B.PORTFOLIO_ID = #{invTransPortf} AND B.ACCT_TYPE = #{capacctType} AND B.CCY = #{ccy})     -->
+        <if test="initValue != null and initValue != ''">
             AND A.PORTFOLIO_ID = #{initValue}
         </if>
         <if test="userId != null and userId != ''">

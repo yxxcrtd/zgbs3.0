@@ -434,6 +434,7 @@ public class FinPlanAssetCService extends BaseService<FinPlanAssetCDto> {
         //  by zhuyongkang end
         //标的类金融产品附属表dto
         FinProductAdd finProductAdd = new FinProductAdd();
+        finProductAdd.setIsInnerAdv(finProduct.getIsInnerAdv());
         finProductAdd.setFinprodId(finProduct.getFinprodId());
         finProductAdd.setInvestNature(dto.getInvestmentAttributes());
         /*if(StringUtil.equals(dto.getTransMode(), DictCodeList.清算速度_T_0.getValue())){

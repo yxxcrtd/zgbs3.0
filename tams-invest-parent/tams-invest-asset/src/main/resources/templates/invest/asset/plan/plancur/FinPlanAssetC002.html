@@ -476,6 +476,15 @@
 											</div>
 										</div>
 										<!-- 增加[增信措施、基金经理姓名] by caozhenming 20210715 end -->
+										<div class="form-inline-wrap" id="isInnerAdv_div">
+											<label class="layui-form-label form-label-wrap"
+												   data-th-text="#{FinPlanNetAsset002.isInnerAdv}">是否支持转仓</label>
+											<div class="layui-input-inline input-inline">
+												<input type="checkbox" th:id="isInnerAdv" th:name="isInnerAdv"
+													   lay-skin="switch" data-th-value="${YES}" lay-text="是|否" lay-filter="isInnerAdv"
+													   data-th-checked="${YES} ==${entity?.isInnerAdv}">
+											</div>
+										</div>
 									</div>
 
                                     <!--     /* 新加字段 ADD by zhuyongkang 2019/09/29 end*/-->

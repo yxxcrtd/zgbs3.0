@@ -5,6 +5,7 @@ import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.base.dto.UploadFile;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.tams.invest.common.dto.period.common.BaseTotalTradeInfoDto;
+import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.annotation.PrimaryKey.Field;
@@ -877,5 +878,15 @@ public class SecResolute001Dto extends BaseEntity implements ProcessEntity {
 
 	public void setZcId(String zcId) {
 		this.zcId = zcId;
+	}
+
+	private List<BussTrdTransferOrderDto> bussTrdTransferOrder;
+
+	public List<BussTrdTransferOrderDto> getBussTrdTransferOrder() {
+		return bussTrdTransferOrder;
+	}
+
+	public void setBussTrdTransferOrder(List<BussTrdTransferOrderDto> bussTrdTransferOrder) {
+		this.bussTrdTransferOrder = bussTrdTransferOrder;
 	}
 }

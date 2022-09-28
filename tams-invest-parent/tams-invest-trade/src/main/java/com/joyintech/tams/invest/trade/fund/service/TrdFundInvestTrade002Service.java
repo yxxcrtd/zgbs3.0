@@ -262,8 +262,8 @@ public class TrdFundInvestTrade002Service extends BaseService<TrdFundInvestTrade
             List<StlPayOrdersDto> spodList = new ArrayList<>();
             for (BussTrdTransferOrderDto bttod : entity.getBussTrdTransferOrder()) {
                 spodList.add(bttod);
-                dto.setStlPayOrdersList(spodList);
             }
+            dto.setStlPayOrdersList(spodList);
 
             // <!-- 通道交易 新增 强成西 2019/03/26 start -->
             setChannelFee(entity);
@@ -648,8 +648,8 @@ public class TrdFundInvestTrade002Service extends BaseService<TrdFundInvestTrade
             List<StlPayOrdersDto> spodList = new ArrayList<>();
             for (BussTrdTransferOrderDto bttod : entity.getBussTrdTransferOrder()) {
                 spodList.add(bttod);
-                dto.setStlPayOrdersList(spodList);
             }
+            dto.setStlPayOrdersList(spodList);
 
             baseTradeProductDealDtos.add(dto);
             finProductTradeDto.setBaseTradeProductDealDtos(baseTradeProductDealDtos);

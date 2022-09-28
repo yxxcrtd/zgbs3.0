@@ -2,6 +2,8 @@ package com.joyintech.service.trade.transfer.sectransfer.controller;
 
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.service.trade.transfer.common.dto.BondValuationDto;
+import com.joyintech.service.trade.transfer.common.service.TransferCommonService;
 import com.joyintech.service.trade.transfer.sectransfer.dto.SecTransfer001Dto;
 import com.joyintech.service.trade.transfer.sectransfer.service.SecTransferService;
 import com.joyintech.tams.common.base.entity.StlPayOrders;
@@ -30,6 +32,8 @@ public class SecTransferController {
      */
     @Autowired
     private SecTransferService secResoluteService;
+    @Autowired
+    private TransferCommonService transferCommonService;
 
     /**
      * 获取联想下拉框实体类
@@ -75,7 +79,8 @@ public class SecTransferController {
      */
     @PostMapping("getPortfolioId")
     public List<SelectOptionDto> getPortfolioId(@RequestBody Map<String,Object> map){
-        return secResoluteService.getPortfolioId(map);
+//        return secResoluteService.getPortfolioId(map);
+        return transferCommonService.selectPortoId(map);
     }
 
     /**
@@ -145,5 +150,25 @@ public class SecTransferController {
     @PostMapping("selectData")
     public int selectData(@RequestBody Map<String,Object> map){
         return secResoluteService.selectData(map);
+    }
+
+    @PostMapping("selectYwmsData")
+    public int selectYwmsData(@RequestBody Map<String,Object> map){
+        return secResoluteService.selectYwmsData(map);
+    }
+
+    @PostMapping("selectCpriceData")
+    public int selectCpriceData(@RequestBody Map<String,Object> map){
+        return secResoluteService.selectCpriceData(map);
+    }
+
+    /**
+     * 估值净价
+     * @param param 参数
+     * @return 估值净价
+     */
+    @PostMapping("findValuation")
+    public BondValuationDto findValuation(@RequestBody Map<String,Object>param){
+        return secResoluteService.findValuation(param);
     }
 }

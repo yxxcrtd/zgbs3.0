@@ -9,10 +9,13 @@ import com.joyintech.framework.json.CustomDateDeserialize;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.dto.period.common.BaseTotalTradeInfoDto;
+import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.annotation.PrimaryKey.Field;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
+
+import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -118,6 +121,10 @@ public class SecTransfer001Dto extends BaseEntity implements ProcessEntity {
      * 证券托管户
      */
     private String secManageAcctId;
+	/**
+	 * 证券托管户名
+	 */
+	private String secManageAcctName;
     /**
      * 通道
      */
@@ -302,6 +309,37 @@ public class SecTransfer001Dto extends BaseEntity implements ProcessEntity {
     private BigDecimal deliveryAmount;
     
     /**
+     * 软控是否继续？Y：继续
+     */
+    private String softSkipMode;
+
+	/**
+	 * 触发加签flag，风险岗审批
+	 */
+	private String riskFlag;
+
+	public String getSoftSkipMode() {
+		return softSkipMode;
+	}
+
+	public void setSoftSkipMode(String softSkipMode) {
+		this.softSkipMode = softSkipMode;
+	}
+
+	/**
+	 * 划款指令
+	 */
+	private List<BussTrdTransferOrderDto> bussTrdTransferOrder;
+
+	public List<BussTrdTransferOrderDto> getBussTrdTransferOrder() {
+		return bussTrdTransferOrder;
+	}
+
+	public void setBussTrdTransferOrder(List<BussTrdTransferOrderDto> bussTrdTransferOrder) {
+		this.bussTrdTransferOrder = bussTrdTransferOrder;
+	}
+
+	/**
      * 获取 转仓投资目的 turnInvAim
      * @return turnInvAim.
      */
@@ -555,6 +593,14 @@ public class SecTransfer001Dto extends BaseEntity implements ProcessEntity {
 
 	public void setSecManageAcctId(String secManageAcctId) {
 		this.secManageAcctId = secManageAcctId;
+	}
+
+	public String getSecManageAcctName() {
+		return secManageAcctName;
+	}
+
+	public void setSecManageAcctName(String secManageAcctName) {
+		this.secManageAcctName = secManageAcctName;
 	}
 
 	public String getChlId() {
@@ -942,5 +988,59 @@ public class SecTransfer001Dto extends BaseEntity implements ProcessEntity {
 
 	public void setZcId(String zcId) {
 		this.zcId = zcId;
+	}
+
+	private String checkStatus;
+
+	private String valueStatus;
+
+	public String getCheckStatus() {
+		return checkStatus;
+	}
+
+	public void setCheckStatus(String checkStatus) {
+		this.checkStatus = checkStatus;
+	}
+
+	public String getValueStatus() {
+		return valueStatus;
+	}
+
+	public void setValueStatus(String valueStatus) {
+		this.valueStatus = valueStatus;
+	}
+
+	/**
+	 * 是否行权
+	 */
+	private String isRight;
+
+	public String getIsRight() {
+		return isRight;
+	}
+
+	public void setIsRight(String isRight) {
+		this.isRight = isRight;
+	}
+
+	/**
+	 * 前置交易编号，撤销新头寸
+	 */
+	private String bTotalTradeId;
+
+	public String getbTotalTradeId() {
+		return bTotalTradeId;
+	}
+
+	public void setbTotalTradeId(String bTotalTradeId) {
+		this.bTotalTradeId = bTotalTradeId;
+	}
+
+	public String getRiskFlag() {
+		return riskFlag;
+	}
+
+	public void setRiskFlag(String riskFlag) {
+		this.riskFlag = riskFlag;
 	}
 }

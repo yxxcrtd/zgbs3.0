@@ -310,6 +310,7 @@ public class FinPlanProfitAssetService extends CommonExportService<FinPlanProfit
         // 标的类金融产品附属表
         FinProductAdd finProductAdd = new FinProductAdd();
         finProductAdd.setFinprodId(finProduct.getFinprodId());
+        finProductAdd.setIsInnerAdv(finProduct.getIsInnerAdv());
         finProductAdd.setPurSpeed((long)(StringUtil.equals(dto.getTransMode(), "01") ? 0 : 1));
         finProductAdd.setInvestNature(dto.getInvestNature());
         finProductAdd.setIsOpenEveryDay(dto.getIsOpenEveryDay());

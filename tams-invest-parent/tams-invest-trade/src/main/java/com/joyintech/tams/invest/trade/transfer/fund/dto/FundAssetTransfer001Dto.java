@@ -11,6 +11,7 @@ import com.joyintech.tams.common.base.entity.WflTrdProductDealAdd;
 import com.joyintech.tams.common.base.entity.WflTrdProductDealOth;
 import com.joyintech.tams.component.business.trade.dto.BussTrdAvailableCashQuery;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
+import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.tams.invest.trade.lend.dto.FinTradeProductDto;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
@@ -86,6 +87,9 @@ public class FundAssetTransfer001Dto extends TrdProductDeal implements ProcessEn
      * 剩余可转仓份额
      */
     private BigDecimal rollablePrin;
+
+    private BigDecimal portoAvailableAmt;
+
     /**
      * 组合代码名称
      */
@@ -205,6 +209,53 @@ public class FundAssetTransfer001Dto extends TrdProductDeal implements ProcessEn
     private String deptCode;
 
     /**
+     * 对账状态
+     */
+    private String checkStatus;
+    /**
+     * 估值状态
+     */
+    private String valueStatus;
+    
+    /**
+     * 软控是否继续？Y：继续
+     */
+    private String softSkipMode;
+
+
+    /**
+     * 风险试算实体类
+     */
+    private List<RiskTrialRetDto> riskTrialRetDto;
+
+    /**
+     * 触发加签flag，风险岗审批
+     */
+    private String riskFlag;
+
+    /**
+     * 附件编号
+     */
+    private String businessId;
+
+    public String getBusinessId() {
+        return businessId;
+    }
+
+    public void setBusinessId(String businessId) {
+        this.businessId = businessId;
+    }
+
+
+    public String getSoftSkipMode() {
+		return softSkipMode;
+	}
+
+	public void setSoftSkipMode(String softSkipMode) {
+		this.softSkipMode = softSkipMode;
+	}
+
+	/**
      * Gets the value of operateType.
      *
      * @return the value of operateType
@@ -430,6 +481,14 @@ public class FundAssetTransfer001Dto extends TrdProductDeal implements ProcessEn
     @Override
     public void setTradeAmt(BigDecimal tradeAmt) {
         this.tradeAmt = tradeAmt;
+    }
+
+    public BigDecimal getPortoAvailableAmt() {
+        return portoAvailableAmt;
+    }
+
+    public void setPortoAvailableAmt(BigDecimal portoAvailableAmt) {
+        this.portoAvailableAmt = portoAvailableAmt;
     }
 
     /**
@@ -1006,5 +1065,60 @@ public class FundAssetTransfer001Dto extends TrdProductDeal implements ProcessEn
 
     public void setZcId(String zcId) {
         this.zcId = zcId;
+    }
+
+    public String getCheckStatus() {
+        return checkStatus;
+    }
+
+    public void setCheckStatus(String checkStatus) {
+        this.checkStatus = checkStatus;
+    }
+
+    public String getValueStatus() {
+        return valueStatus;
+    }
+
+    public void setValueStatus(String valueStatus) {
+        this.valueStatus = valueStatus;
+    }
+
+    public List<RiskTrialRetDto> getRiskTrialRetDto() {
+        return riskTrialRetDto;
+    }
+
+    public void setRiskTrialRetDto(List<RiskTrialRetDto> riskTrialRetDto) {
+        this.riskTrialRetDto = riskTrialRetDto;
+    }
+
+    private String fileArrayName;
+
+    public String getFileArrayName() {
+        return fileArrayName;
+    }
+
+    public void setFileArrayName(String fileArrayName) {
+        this.fileArrayName = fileArrayName;
+    }
+
+    public String getRiskFlag() {
+        return riskFlag;
+    }
+
+    public void setRiskFlag(String riskFlag) {
+        this.riskFlag = riskFlag;
+    }
+
+    /**
+     * 前置交易编号，撤销新头寸
+     */
+    private String bTotalTradeId;
+
+    public String getbTotalTradeId() {
+        return bTotalTradeId;
+    }
+
+    public void setbTotalTradeId(String bTotalTradeId) {
+        this.bTotalTradeId = bTotalTradeId;
     }
 }

@@ -27,6 +27,7 @@ import com.joyintech.tams.component.business.trade.BussTrdTransferOrderService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.invest.common.trade.dao.TrdCommonBaseMapper;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
@@ -129,6 +130,9 @@ public class TrdDepositInvestTrade002Service extends CommonExportService<TrdDepo
 
     @Autowired
     private TrdCommonBaseService trdCommonBaseService;
+
+    @Autowired
+    private TrdCommonBaseMapper trdCommonBaseMapper;
 
     // /**
     // * 划款指令表
@@ -1433,6 +1437,11 @@ public class TrdDepositInvestTrade002Service extends CommonExportService<TrdDepo
 
     @Override
     public void doBack(TrdDepositInvestTrade001Dto entity) {
+        // 是否转仓交易  - 转仓交易退回不做任何处理
+        FinProductAdd finProductAdd = trdCommonBaseMapper.selectFinProductAdd("F07_" + entity.getFinprodMarketId());
+        if (null != finProductAdd && "Y".equals(finProductAdd.getIsInnerAdv())) {
+            return;
+        }
         AllTradeCommonUtil.deletePosition(entity.getCancelRemark(), entity.getTradeId());
         
         //删除授信占用

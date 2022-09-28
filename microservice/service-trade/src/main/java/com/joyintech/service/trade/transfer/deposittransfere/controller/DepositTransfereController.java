@@ -2,6 +2,7 @@ package com.joyintech.service.trade.transfer.deposittransfere.controller;
 
 import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.service.trade.transfer.common.service.TransferCommonService;
 import com.joyintech.service.trade.transfer.deposittransfere.dto.DepositTransfereService001Dto;
 import com.joyintech.service.trade.transfer.deposittransfere.dto.DepositTransfereService002Dto;
 import com.joyintech.service.trade.transfer.deposittransfere.service.DepositTransfereService;
@@ -16,6 +17,7 @@ import java.util.Map;
 
 /**
  * 存款类资产交易转仓
+ *
  * @author hepengli
  * @version 1.0 2019年12月16日
  * @see DepositTransfereController
@@ -34,6 +36,9 @@ public class DepositTransfereController {
     @Autowired
     private BaseRepTradeInfoService baseRepTradeInfoService;
 
+    @Autowired
+    private TransferCommonService transferCommonService;
+
     /**
      * 组合代码下拉框
      *
@@ -43,9 +48,9 @@ public class DepositTransfereController {
      */
     @RequestMapping("queryProdIdInfo")
     @ResponseBody
-    public List<SelectOptionDto> queryProdIdInfo(@RequestBody Map<String, Object> param)
-    {
-        return depositTransfereService.selectPortoId(param);
+    public List<SelectOptionDto> queryProdIdInfo(@RequestBody Map<String, Object> param) {
+//        return depositTransfereService.selectPortoId(param);
+        return transferCommonService.selectPortoId(param);
     }
 
     @RequestMapping("queryAssetInt")
@@ -97,13 +102,14 @@ public class DepositTransfereController {
 
     /**
      * 获取交易编号list
+     *
      * @param map 日期、币种
      * @return 汇率（收盘价）
      * @see
      * @since 1.0
      */
     @PostMapping("getWorkflowTradeId")
-    public int getWorkflowTradeId(@RequestBody Map<String,Object> map){
+    public int getWorkflowTradeId(@RequestBody Map<String, Object> map) {
         return depositTransfereService.getWorkflowTradeId(map);
     }
 }

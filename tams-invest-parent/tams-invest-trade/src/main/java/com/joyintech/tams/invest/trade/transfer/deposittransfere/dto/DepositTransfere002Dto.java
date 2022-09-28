@@ -6,6 +6,7 @@ import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.tams.common.base.entity.PaTrdProductDeal;
 import com.joyintech.tams.common.base.entity.PtlTrade;
+import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
 
@@ -88,6 +89,19 @@ public class DepositTransfere002Dto extends BaseEntity {
      */
     @JsonSerialize(using= BigDecimalSerializer.class)
     private BigDecimal transferTradeAmt;
+
+    /**
+     * 划款指令
+     */
+    private List<BussTrdTransferOrderDto> bussTrdTransferOrder;
+
+    public List<BussTrdTransferOrderDto> getBussTrdTransferOrder() {
+        return bussTrdTransferOrder;
+    }
+
+    public void setBussTrdTransferOrder(List<BussTrdTransferOrderDto> bussTrdTransferOrder) {
+        this.bussTrdTransferOrder = bussTrdTransferOrder;
+    }
 
     public List<RiskTrialRetDto> getRiskTrialRetDto() {
         return riskTrialRetDto;
@@ -215,5 +229,38 @@ public class DepositTransfere002Dto extends BaseEntity {
 
     public void setTransferTradeAmt(BigDecimal transferTradeAmt) {
         this.transferTradeAmt = transferTradeAmt;
+    }
+
+    private String stlPayId;
+
+    public String getStlPayId() {
+        return stlPayId;
+    }
+
+    public void setStlPayId(String stlPayId) {
+        this.stlPayId = stlPayId;
+    }
+
+    private String fileArrayName;
+
+    public String getFileArrayName() {
+        return fileArrayName;
+    }
+
+    public void setFileArrayName(String fileArrayName) {
+        this.fileArrayName = fileArrayName;
+    }
+
+    /**
+     * 附件编号
+     */
+    private String businessId;
+
+    public String getBusinessId() {
+        return businessId;
+    }
+
+    public void setBusinessId(String businessId) {
+        this.businessId = businessId;
     }
 }

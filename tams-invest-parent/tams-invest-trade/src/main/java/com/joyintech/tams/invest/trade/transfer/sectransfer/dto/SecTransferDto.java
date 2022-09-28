@@ -8,6 +8,7 @@ import com.joyintech.tams.common.base.entity.TrdDealTotalAdd;
 import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
+import com.joyintech.tams.invest.common.dto.period.common.BaseTradeInfoDto;
 import com.joyintech.tams.invest.trade.bond.dto.TrdBondInvestTradeDto;
 import com.joyintech.tams.systemtools.util.SysDatadictUtil;
 
@@ -182,6 +183,19 @@ public class SecTransferDto extends TrdBondInvestTradeDto {
 	 * 汇总附属表
 	 */
 	private TrdDealTotalAdd trdDealTotalAdd;
+
+	/**
+	 * 附件编号
+	 */
+	private String businessId;
+
+	public String getBusinessId() {
+		return businessId;
+	}
+
+	public void setBusinessId(String businessId) {
+		this.businessId = businessId;
+	}
     
 	public BigDecimal getExerYield() {
 		return exerYield;
@@ -395,5 +409,62 @@ public class SecTransferDto extends TrdBondInvestTradeDto {
 	@Override
 	public void setTrdDealTotalAdd(TrdDealTotalAdd trdDealTotalAdd) {
 		this.trdDealTotalAdd = trdDealTotalAdd;
+	}
+
+	private String stlPayId;
+
+	public String getStlPayId() {
+		return stlPayId;
+	}
+
+	public void setStlPayId(String stlPayId) {
+		this.stlPayId = stlPayId;
+	}
+
+	/**
+	 * 交易金额
+	 */
+	@JsonSerialize(using= BigDecimalSerializer.class)
+	private BigDecimal tradeMoney;
+
+	public BigDecimal getTradeMoney() {
+		return tradeMoney;
+	}
+
+	public void setTradeMoney(BigDecimal tradeMoney) {
+		this.tradeMoney = tradeMoney;
+	}
+
+	private String portfolioIdIn;
+
+	public String getPortfolioIdIn() {
+		return portfolioIdIn;
+	}
+
+	public void setPortfolioIdIn(String portfolioIdIn) {
+		this.portfolioIdIn = portfolioIdIn;
+	}
+
+	private String fileArrayName;
+
+	public String getFileArrayName() {
+		return fileArrayName;
+	}
+
+	public void setFileArrayName(String fileArrayName) {
+		this.fileArrayName = fileArrayName;
+	}
+
+	/**
+	 * 交易数据
+	 */
+	private List<BaseTradeInfoDto> baseTradeInfoDtos;
+
+	public List<BaseTradeInfoDto> getBaseTradeInfoDtos() {
+		return baseTradeInfoDtos;
+	}
+
+	public void setBaseTradeInfoDtos(List<BaseTradeInfoDto> baseTradeInfoDtos) {
+		this.baseTradeInfoDtos = baseTradeInfoDtos;
 	}
 }
