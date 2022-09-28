@@ -231,7 +231,8 @@
     <select resultType="int" id="selectYwmsData" parameterType="java.util.Map">
         SELECT
         (SELECT COUNT(1) FROM TRD_PRODUCT_DEAL FPD INNER JOIN TRD_PRODUCT_DEAL_ADD FPAD ON FPD.TRADE_ID = FPAD.TRADE_ID
-        WHERE FPD.INV_AIM != #{turnInvAim,jdbcType=VARCHAR} AND FPAD.PORTFOLIO_ID = #{portfolioIdEn,jdbcType=VARCHAR} AND FPD.FINPROD_ID = #{finprodId,jdbcType=VARCHAR})
+        WHERE FPD.INV_AIM != #{turnInvAim,jdbcType=VARCHAR} AND FPAD.PORTFOLIO_ID = #{portfolioIdEn,jdbcType=VARCHAR}
+          AND FPD.FINPROD_ID = #{finprodId,jdbcType=VARCHAR} AND FPD.TRADE_STATUS = '01' AND FPD.IS_CANCEL = 'N')
         +
         (SELECT COUNT(1) FROM WFL_TRD_PRODUCT_DEAL WTP INNER JOIN WFL_TRD_PRODUCT_DEAL_ADD WTPA ON WTP.TRADE_ID = WTPA.TRADE_ID
         WHERE WTP.INV_AIM != #{turnInvAim,jdbcType=VARCHAR} AND WTPA.PORTFOLIO_ID = #{portfolioIdEn,jdbcType=VARCHAR} AND WTP.FINPROD_ID = #{finprodId,jdbcType=VARCHAR})
