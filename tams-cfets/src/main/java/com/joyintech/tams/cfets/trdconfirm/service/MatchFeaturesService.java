@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -110,7 +111,7 @@ public class MatchFeaturesService extends BaseService {
                     bankSysParaSub.setParamValue1(feature.getType());
                 }
                 if (StringUtil.equals(DictCodeListExt4.匹配方式_手工匹配.getValue(), matchBusType.getType())) {
-                    bankSysParaSub.setParamValue1(feature.getType());
+                    bankSysParaSub.setParamValue2(feature.getType());
                 }
                 bankSysParaSubMap.put(matchBusType.getCode() + feature.getCode(), bankSysParaSub);
             }
@@ -128,23 +129,28 @@ public class MatchFeaturesService extends BaseService {
      * @author jiangpeng
      * @date 2022/9/27 9:35
      */
-    public List<MatchBusType> queryAutoMatchFeatures(String businessType) {
+    public Map<String, MatchDetFeatures> queryAutoMatchFeatures(String businessType) {
         Map<String, Object> param = new HashMap<>();
         param.put("matchType01", DictCodeListExt4.匹配方式_自动匹配.getValue());
         param.put("matchType02", DictCodeListExt4.匹配方式_手工匹配.getValue());
-        if ( StringUtil.equals(businessType, "BID")) {
+        if (StringUtil.equals(businessType, "BID")) {
             param.put("matchFeaturesList", Collections.singletonList(DictCodeListExt4.匹配业务类型_一级申购.getValue()));
         }
-        if ( StringUtil.equals(businessType, "BOND")) {
+        if (StringUtil.equals(businessType, "BOND")) {
             param.put("matchFeaturesList", Collections.singletonList(DictCodeListExt4.匹配业务类型_现券买卖.getValue()));
         }
-        if ( StringUtil.equals(businessType, "REPO")) {
+        if (StringUtil.equals(businessType, "REPO")) {
             param.put("matchFeaturesList", Collections.singletonList(DictCodeListExt4.匹配业务类型_质押式回购首期.getValue()));
         }
         // 是否隐藏自动匹配元素中的可选要素
         param.put("isHideAutoMatch", DictCodeList.是否_是.getValue());
 
-        return matchFeaturesMapper.queryAutoMatchFeatures(param);
+        List<MatchBusType> list = matchFeaturesMapper.queryAutoMatchFeatures(param);
+        if (CollectionUtils.isEmpty(list)) {
+            return null;
+        }
+        return list.get(0).getDetails().stream()
+                .collect(Collectors.toMap(MatchDetFeatures::getCode, item -> item));
     }
 
     /**
@@ -154,7 +160,7 @@ public class MatchFeaturesService extends BaseService {
      * @author jiangpeng
      * @date 2022/9/27 9:35
      */
-    public MatchBusType queryManualMatchFeatures(String businessType) {
+    public Map<String, MatchDetFeatures> queryManualMatchFeatures(String businessType) {
         Map<String, Object> param = new HashMap<>();
         param.put("matchType01", DictCodeListExt4.匹配方式_自动匹配.getValue());
         param.put("matchType02", DictCodeListExt4.匹配方式_手工匹配.getValue());
@@ -171,6 +177,7 @@ public class MatchFeaturesService extends BaseService {
         if (CollectionUtils.isEmpty(list)) {
             return null;
         }
-        return list.get(0);
+        return list.get(0).getDetails().stream()
+                .collect(Collectors.toMap(MatchDetFeatures::getCode, item -> item));
     }
 }

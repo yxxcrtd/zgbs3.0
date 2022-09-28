@@ -2565,6 +2565,9 @@
         <if test="tradeAmt != null">
             and reg.trade_Amt=#{tradeAmt,jdbcType=VARCHAR}
         </if>
+        <if test="mTradeAmt != null">
+            and reg.M_TRADE_AMT=#{mTradeAmt,jdbcType=VARCHAR}
+        </if>
 
     </select>
     <!-- 查询所有登记或报价回购的质押券信息 -->
@@ -2644,6 +2647,7 @@
                 <if test="payableAmount != null">
                     and bo.PAYABLE_AMOUNT = #{payableAmount,jdbcType=DECIMAL}
                 </if>
+    order by bo.UPDATE_TIME ASC
     </select>
 
     <select id="selectWflBidDataByFinprodId" resultType="java.lang.String">
