@@ -1597,4 +1597,9 @@
 	 WHEN NOT MATCHED THEN INSERT (AH.ID_, AH.PROC_DEF_ID_, AH.TASK_DEF_KEY_, AH.PROC_INST_ID_, AH.EXECUTION_ID_, AH.PARENT_TASK_ID_, AH.NAME_, AH.DESCRIPTION_, AH.OWNER_, AH.ASSIGNEE_, AH.START_TIME_, AH.CLAIM_TIME_, AH.END_TIME_, AH.DURATION_, AH.DELETE_REASON_, AH.PRIORITY_)
 	   VALUES(A.col1, A.col2, A.col3, A.col4, A.col5, A.col6, A.col7, A.col8, A.col9, A.col10, A.col11, A.col12, A.col13, A.col14, A.col15, A.col16)
     </insert>
+
+    <select id="selectFinProductAdd" resultType="com.joyintech.tams.common.base.entity.FinProductAdd">
+        SELECT T.IS_INNER_ADV FROM FIN_PRODUCT_ADD T WHERE T.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+    </select>
+
 </mapper>

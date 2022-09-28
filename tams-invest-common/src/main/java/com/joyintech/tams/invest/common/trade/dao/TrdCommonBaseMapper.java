@@ -474,4 +474,6 @@ public interface TrdCommonBaseMapper {
     TrdProductDeal selectZCTradeId(@Param("tradeId") String tradeId);
 
     TrdProductDeal selectZCRTradeId(@Param("tradeId") String tradeId);
+
+    FinProductAdd selectFinProductAdd(@Param("finprodId") String finprodId);
 }
