@@ -282,6 +282,8 @@ public class EtrExchangeTradeEtrExchangeSecRepoResponse {
     @ApiModelProperty(name="priceType",value="价格模式")
     private String priceType;
 
+    private String assetType1;
+
     public String getPriceType() {
         return priceType;
     }
@@ -830,5 +832,13 @@ public class EtrExchangeTradeEtrExchangeSecRepoResponse {
 
     public void setDealMode(String dealMode) {
         this.dealMode = dealMode;
+    }
+
+    public String getAssetType1() {
+        return assetType1;
+    }
+
+    public void setAssetType1(String assetType1) {
+        this.assetType1 = assetType1;
     }
 }

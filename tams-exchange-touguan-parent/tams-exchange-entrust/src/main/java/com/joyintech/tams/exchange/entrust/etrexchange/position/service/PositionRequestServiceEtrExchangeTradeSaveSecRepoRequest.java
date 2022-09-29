@@ -125,7 +125,7 @@ public class PositionRequestServiceEtrExchangeTradeSaveSecRepoRequest {
      */
     public void sendClose(EtrExchangeTradeOperateSecRepoRequest entity) {
         log.info("sendClose() called with parameters => 【entity = {}】", JsonUtils.object2Json(entity));
-        String busiType = commonPositionEngineService.getPositionBusiType(entity.getFinprodType2(), entity.getPs(), null);
+        String busiType = commonPositionEngineService.getPositionBusiType(entity.getFinprodType2(), entity.getPs(), entity.getAssetType1());
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("userId", SecurityUtil.getLoginUser().getUserName());
         // 关闭指令时，无流程ID，故生成UUID传入

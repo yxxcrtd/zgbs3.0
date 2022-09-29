@@ -83,6 +83,7 @@
         ,T2.EXP_CON_NUM
         ,T2.DEAL_MODE dealMode
         ,T2.PRICE_TYPE priceType
+        ,T2.ASSET_TYPE1 assetType1
         FROM
         ETR_ENTRUST T1
         INNER JOIN ETR_ENTRUST_ADD T2 ON
@@ -233,6 +234,7 @@
         ,T2.EXP_CON_NUM
         ,T2.DEAL_MODE dealMode
         ,T2.PRICE_TYPE priceType
+        ,T2.ASSET_TYPE1 assetType1
         FROM
         WFL_ETR_ENTRUST T1
         INNER JOIN WFL_ETR_ENTRUST_ADD T2 ON
