@@ -18,37 +18,13 @@
         TT.PURPOSE,
         TT.payAcctNo,
         TT.payAcctName,
-        TT.payDepBnkName,
-        TT.payCCY,
         TT.recAcctNo,
         TT.recAcctName,
-        TT.recDepBnkName,
-        TT.recCCY,
         TT.sendDate,
         TT.sendStatus,
-        case TT.orderStatus
-        when '01'then '新建'
-        when '03' then '作废'
-        end orderStatus,
-        case TT.orderRecStatus
-        when '01' then'成功'
-        when '02' then '失败'
-        end orderRecStatus,
-        TT.sendRemark,
-        TT.remark,
-        case TT.orderRetStatus
-        when '01' then '处理成功'
-        when '02' then '处理失败'
-        when '03' then '处理中'
-        end orderRetStatus,
-        TT.sendOrderId,
+        TT.orderRecStatus,
+        TT.orderRetStatus,
         TT.PROFIT_TYPE,
-        TT.ValDt,
-        TT.pymtUseDsc,
-        TT.rmrkDsc,
-        TT.bsnTpCode,
-        TT.ty,
-        TT.totleTradeId,
         'N' isDvp,
         TT.paBizTypeAdd
         FROM
@@ -70,43 +46,19 @@
         T10.PURPOSE,
         T03.ACCT_NO payAcctNo,
         T03.ACCT_NAME payAcctName,
-        T03.BANK_DEP payDepBnkName,
-        T03.CCY payCCY,
         T02.ACCT_NO recAcctNo,
         T02.ACCT_NAME recAcctName,
-        T02.BANK_DEP recDepBnkName,
-        T02.CCY recCCY,
         <!-- 查询列表中增加“付款账户”、“付款账户名称”、“收款账户”、“收款账户名称”、“划款用途”、“币种” 20191030 add by renping end -->
-        to_char(IPO.SEND_DATE, 'yyyy-MM-dd HH24:mi:ss') sendDate,
+        to_char(T10.SEND_DATE, 'yyyy-MM-dd HH24:mi:ss') sendDate,
         NVL(IPO.SEND_STATUS,'03') sendStatus,
-        IPO.ORDER_STATUS orderStatus,
         IPO.ORDER_REC_STATUS orderRecStatus,
-        IPO.SEND_REMARK sendRemark,
-        IPO.REMARK remark,
         IPO.ORDER_RET_STATUS orderRetStatus,
-        IPO.SEND_ORDER_ID sendOrderId,
         T6.PROFIT_TYPE,
-        T4.VDATE ValDt,
-        <!-- 查询列表中划款指令类型，事由，业务号 -->
-        IHY.REMARK pymtUseDsc,
-        CASE MCIA.INSITITUTE_CODE WHEN '91310000132257510M'
-        THEN IHY.SHFY
-        WHEN '91330200711192037M'
-        THEN IHY.NBFY
-        END rmrkDsc,
-        CASE MCIA.INSITITUTE_CODE WHEN '91310000132257510M'
-        THEN IHY.SHYW
-        WHEN '91330200711192037M'
-        THEN IHY.NBYW
-        END bsnTpCode,
-        MCIA.INSITITUTE_CODE ty,
-        T4.TOTLE_TRADE_ID totleTradeId,
         '${NO}' isDvp,
         case when T4.PORTFOLIO_ID is not null then 0 else 1 end    paBizTypeAdd
         FROM TRD_FIN_PRODUCT_DEAL_TOTAL T4
         LEFT JOIN PA_TRD_FIN_PRODUCT_DEAL_TOTAL T5 ON T4.TOTLE_TRADE_ID = T5.TOTLE_TRADE_ID
         LEFT JOIN FIN_PRODUCT T6 ON T4.FINPROD_ID = T6.FINPROD_ID
-        LEFT JOIN FIN_PRODUCT FP1 ON T4.PORTFOLIO_ID = FP1.FINPROD_MARKET_ID
         LEFT JOIN PTL_PORTFOLIO T7 ON T4.PORTFOLIO_ID = T7.PORTFOLIO_ID
         LEFT JOIN STL_PAY_ORDERS T10 ON T10.TRADE_ID = T4.TOTLE_TRADE_ID AND T10.ORDER_STATUS = #{ORDER_STATUS_01}
         LEFT JOIN PTL_PORTFOLIO pp ON T10.PORTFOLIO_ID = pp.PORTFOLIO_ID
@@ -119,8 +71,6 @@
         LEFT JOIN PTL_CAPACCT_INFO T11 ON T4.PORTFOLIO_ID = T11.PORTFOLIO_ID AND T11.ACCT_NO = T10.MY_ACCT_NO AND T11.CCY = T4.CCY
         LEFT JOIN FIN_PRODUCT_ADD FPA ON T4.CHL_ID = FPA.FINPROD_ID
         LEFT JOIN INF_PAY_ORDERS_STATUS IPO ON T10.ORDER_ID = IPO.ORDER_ID
-        LEFT JOIN INF_HTDC_YW IHY ON t5.PA_BUSS_TYPE=IHY.TY
-        LEFT JOIN MST_CUSTOMER_INFO_ADD MCIA ON  MCIA.CUSTOMER_ID=FP1.TRUSTEE_ID
         WHERE (T5.PA_BUSS_TYPE IN (#{PA_BUSINESS_TYPE03},
         <!-- 利率型交易买入 yjm start 20190918-->
         #{PA_BUSINESS_TYPE33},
@@ -232,43 +182,20 @@
         decode(T10.CCY, null, T12.PURPOSE, T10.PURPOSE) PURPOSE,
         decode(T10.CCY, null, T032.ACCT_NO, T03.ACCT_NO) payAcctNo,
         decode(T10.CCY, null, T032.ACCT_NAME, T03.ACCT_NAME) payAcctName,
-        decode(T10.CCY, null, T032.BANK_DEP, T03.BANK_DEP) payDepBnkName,
-        decode(T10.CCY, null, T032.CCY, T03.CCY) payCCY,
         decode(T10.CCY, null, T022.ACCT_NO, T02.ACCT_NO) recAcctNo,
         decode(T10.CCY, null, T022.ACCT_NAME, T02.ACCT_NAME) recAcctName,
-        decode(T10.CCY, null, T022.BANK_DEP, T02.BANK_DEP) recDepBnkName,
-        decode(T10.CCY, null, T022.CCY, T02.CCY) recCCY,
         <!-- 查询列表中增加“付款账户”、“付款账户名称”、“收款账户”、“收款账户名称”、“划款用途”、“币种” 20191030 add by renping end -->
-        to_char(NVL(IPO.SEND_DATE, T12.SEND_DATE), 'yyyy-MM-dd HH24:mi:ss') sendDate,
+        to_char(NVL(T10.SEND_DATE, T12.SEND_DATE), 'yyyy-MM-dd HH24:mi:ss') sendDate,
         NVL(IPO.SEND_STATUS,'03') sendStatus,
-        IPO.ORDER_STATUS orderStatus,
         IPO.ORDER_REC_STATUS orderRecStatus,
-        IPO.SEND_REMARK sendRemark,
-        IPO.REMARK remark,
         IPO.ORDER_RET_STATUS orderRetStatus,
-        IPO.SEND_ORDER_ID sendOrderId,
         T6.PROFIT_TYPE,
-        T4.VDATE ValDt,
-        IHY.REMARK pymtUseDsc,
-        CASE MCIA.INSITITUTE_CODE WHEN '91310000132257510M'
-        THEN IHY.SHFY
-        WHEN '91330200711192037M'
-        THEN IHY.NBFY
-        END rmrkDsc,
-        CASE MCIA.INSITITUTE_CODE WHEN '91310000132257510M'
-        THEN IHY.SHYW
-        WHEN '91330200711192037M'
-        THEN IHY.NBYW
-        END bsnTpCode,
-        MCIA.INSITITUTE_CODE ty,
-        T4.TOTLE_TRADE_ID totleTradeId,
         '${NO}' isDvp,
         case when T5.PORTFOLIO_ID is not null then 0 else 1 end  paBussTypeAdd
         FROM TRD_PRODUCT_DEAL T4
         LEFT JOIN TRD_PRODUCT_DEAL_ADD T5 ON T4.TRADE_ID = T5.TRADE_ID
         LEFT JOIN PA_TRD_PRODUCT_DEAL T8 ON T4.TRADE_ID = T8.TRADE_ID
         LEFT JOIN FIN_PRODUCT T6 ON T4.FINPROD_ID = T6.FINPROD_ID
-        LEFT JOIN FIN_PRODUCT FP1 ON T5.PORTFOLIO_ID = FP1.FINPROD_MARKET_ID
         LEFT JOIN PTL_PORTFOLIO T7 ON T5.PORTFOLIO_ID = T7.PORTFOLIO_ID
         LEFT JOIN TRD_FIN_PRODUCT_DEAL_TOTAL T11 ON T4.TOTLE_TRADE_ID = T11.TOTLE_TRADE_ID
         LEFT JOIN STL_PAY_ORDERS T10 ON T10.TRADE_ID = T4.TRADE_ID AND T10.IS_TOTAL_TRADE=#{NO} AND T10.ORDER_STATUS = #{ORDER_STATUS_01}
@@ -288,8 +215,6 @@
         <!-- 查询列表中增加“付款账户”、“付款账户名称”、“收款账户”、“收款账户名称”、“划款用途”、“币种” 20191030 add by renping end -->
         LEFT JOIN FIN_PRODUCT_ADD FPA ON T4.CHL_ID = FPA.FINPROD_ID
         LEFT JOIN INF_PAY_ORDERS_STATUS IPO ON T10.ORDER_ID = IPO.ORDER_ID
-        LEFT JOIN INF_HTDC_YW IHY ON T8.PA_BUSS_TYPE=IHY.TY
-        LEFT JOIN MST_CUSTOMER_INFO_ADD MCIA ON  MCIA.CUSTOMER_ID=FP1.TRUSTEE_ID
         WHERE (T8.PA_BUSS_TYPE IN ( #{PA_BUSINESS_TYPE12},
         #{PA_BUSINESS_TYPE16},
         #{PA_BUSINESS_TYPE63},
@@ -321,9 +246,7 @@
         OR T4.TG_BUSI_TYPE IN ( #{PA_BUSINESS_TYPE12}, #{PA_BUSINESS_TYPE16},
         #{PA_BUSINESS_TYPE63},  #{PA_BUSINESS_TYPE65}, #{PA_BUSINESS_TYPE86}, #{PA_BUSINESS_TYPE64},
         #{PA_BUSINESS_TYPE21}, #{PA_BUSINESS_TYPE22}, #{PA_BUSINESS_TYPE25}, #{PA_BUSINESS_TYPE97},
-        #{PA_BUSINESS_TYPE29}, #{PA_BUSINESS_TYPE200} ,#{PA_BUSINESS_TYPE151},#{PA_BUSINESS_TYPE212},<!--#{PA_BUSINESS_TYPE202},-->
-        '145','148','149','13','18','34','38','39','40','41','45','46','47','48','49','50','54','56','58','66','67','68','73','24','28')
-        OR (T4.FINPROD_TYPE2 = 'F32' and T4.TG_BUSI_TYPE IN ('202') AND T4.TRADE_MARKET IN ('03', '04'))
+        #{PA_BUSINESS_TYPE29}, #{PA_BUSINESS_TYPE200} ,#{PA_BUSINESS_TYPE151},#{PA_BUSINESS_TYPE212},#{PA_BUSINESS_TYPE202})
         )
         /*金融产品交易扩展.平安业务类型 IN (数据字典.平安业务类型.存款类资产买入、项目类资产买入、普通拆入、普通拆出、普通拆入到期)*/
         /*金融产品交易扩展.平安业务类型 IN (数据字典.平安业务类型.特拆拆入、特拆拆入到期)*/
@@ -383,36 +306,14 @@
             T1.PURPOSE,
             T03.ACCT_NO payAcctNo,
             T03.ACCT_NAME payAcctName,
-            T03.BANK_DEP payDepBnkName,
-            T03.CCY payCCY,
             T02.ACCT_NO recAcctNo,
             T02.ACCT_NAME recAcctName,
-            T02.BANK_DEP recDepBnkName,
-            T02.CCY recCCY,
             <!-- 查询列表中增加“付款账户”、“付款账户名称”、“收款账户”、“收款账户名称”、“划款用途”、“币种” 20191030 add by renping end -->
-            to_char(IPO.SEND_DATE, 'yyyy-MM-dd HH24:mi:ss') sendDate,
+            to_char(T1.SEND_DATE, 'yyyy-MM-dd HH24:mi:ss') sendDate,
             NVL(IPO.SEND_STATUS,'03') sendStatus,
-            IPO.ORDER_STATUS orderStatus,
             IPO.ORDER_REC_STATUS orderRecStatus,
-            IPO.SEND_REMARK sendRemark,
-            IPO.REMARK remark,
             IPO.ORDER_RET_STATUS orderRetStatus,
-            IPO.SEND_ORDER_ID sendOrderId,
             null PROFIT_TYPE,
-            T2.VDATE ValDt,
-            IHY.REMARK pymtUseDsc,
-            CASE MCIA.INSITITUTE_CODE WHEN '91310000132257510M'
-            THEN IHY.SHFY
-            WHEN '91330200711192037M'
-            THEN IHY.NBFY
-            END rmrkDsc,
-            CASE MCIA.INSITITUTE_CODE WHEN '91310000132257510M'
-            THEN IHY.SHYW
-            WHEN '91330200711192037M'
-            THEN IHY.NBYW
-            END bsnTpCode,
-            MCIA.INSITITUTE_CODE ty,
-            null totleTradeId,
             '${YES}' isDvp,
             0  paBizTypeAdd
             FROM STL_DVP_ORDERS T1
@@ -424,9 +325,6 @@
             <!-- 查询列表中增加“付款账户”、“付款账户名称”、“收款账户”、“收款账户名称”、“划款用途”、“币种” 20191030 add by renping end -->
             LEFT JOIN PTL_PORTFOLIO T2 ON T1.PORTFOLIO_ID = T2.PORTFOLIO_ID
             LEFT JOIN INF_PAY_ORDERS_STATUS IPO ON T1.ORDER_ID = IPO.ORDER_ID
-            LEFT JOIN INF_HTDC_YW IHY ON '${PA_BUSINESS_TYPE81}'=IHY.TY
-            LEFT JOIN FIN_PRODUCT T6 ON T1.PORTFOLIO_ID = T6.FINPROD_MARKET_ID
-            LEFT JOIN MST_CUSTOMER_INFO_ADD MCIA ON  MCIA.CUSTOMER_ID=T6.TRUSTEE_ID
             WHERE T1.IS_NEED_SEND = #{YES}
             AND T1.ORDER_STATUS = #{ORDER_STATUS_01}
             <if test="portfolioId != null and !portfolioId.isEmpty()">
@@ -470,35 +368,13 @@
         stl.PURPOSE,
         gat.ACCT_NO payAcctNo,
         gat.ACCT_NAME payAcctName,
-        gat.BANK_DEP payDepBnkName,
-        gat.CCY payCCY,
         pay.ACCT_NO recAcctNo,
         pay.ACCT_NAME recAcctName,
-        pay.BANK_DEP recDepBnkName,
-        pay.CCY recCCY,
-        to_char(inf.SEND_DATE, 'yyyy-MM-dd HH24:mi:ss') sendDate,
+        to_char(stl.SETTLE_DATE, 'yyyy-MM-dd HH24:mi:ss') sendDate,
         NVL(inf.SEND_STATUS,'03') sendStatus,
-        inf.ORDER_STATUS orderStatus,
         inf.ORDER_REC_STATUS orderRecStatus,
-        inf.SEND_REMARK sendRemark,
-        inf.REMARK remark,
         inf.ORDER_RET_STATUS orderRetStatus,
-        inf.SEND_ORDER_ID sendOrderId,
         null PROFIT_TYPE,
-        ptl.VDATE ValDt,
-        IHY.REMARK pymtUseDsc,
-        CASE MCIA.INSITITUTE_CODE WHEN '91310000132257510M'
-        THEN IHY.SHFY
-        WHEN '91330200711192037M'
-        THEN IHY.NBFY
-        END rmrkDsc,
-        CASE MCIA.INSITITUTE_CODE WHEN '91310000132257510M'
-        THEN IHY.SHYW
-        WHEN '91330200711192037M'
-        THEN IHY.NBYW
-        END bsnTpCode,
-        MCIA.INSITITUTE_CODE ty,
-        null totleTradeId,
         '${YES}' isDvp,
         <!-- NULL FINPROD_MARKET_ID, -->
         0  paBizTypeAdd
@@ -510,9 +386,7 @@
         left join INF_PAY_ORDERS_STATUS  inf   on inf.ORDER_ID = stl.ACT_ORDER_ID
         Left JOIN STL_ACT_TRADE_MATCH stl2 ON stl.ACT_ORDER_ID = stl2.ACT_ORDER_ID
         Left JOIN TRD_FIN_PRODUCT_DEAL_TOTAL trd ON stl2.TRADE_ID = trd.TOTLE_TRADE_ID
-        LEFT JOIN FIN_PRODUCT T6 ON stl.PORTFOLIO_ID = T6.FINPROD_MARKET_ID
-        LEFT JOIN INF_HTDC_YW IHY ON stl.BUSI_TYPE=IHY.TY
-        LEFT JOIN MST_CUSTOMER_INFO_ADD MCIA ON  MCIA.CUSTOMER_ID=T6.TRUSTEE_ID
+
         WHERE  stl.ORDER_STATUS = '01'
         <if test="sendStatus != null and !sendStatus.isEmpty()">
             AND NVL(inf.SEND_STATUS,'03') = #{sendStatus}
@@ -560,7 +434,7 @@
             ON
                         spo.TRADE_ID = tpd1.TRADE_ID
                     AND (
-                                tpd1.IS_CANCEL IS NULL
+                                    tpd1.IS_CANCEL IS NULL
                                 OR  tpd1.IS_CANCEL = #{YES_NO_NO})
                     AND tpd1.TRADE_STATUS = #{TRADE_STATUS_01}
                 LEFT JOIN
@@ -568,7 +442,7 @@
             ON
                         spo.TRADE_ID = tpd2.TOTLE_TRADE_ID
                     AND (
-                                tpd2.IS_CANCEL IS NULL
+                                    tpd2.IS_CANCEL IS NULL
                                 OR  tpd2.IS_CANCEL = #{YES_NO_NO})
                     AND tpd2.TRADE_STATUS = #{TRADE_STATUS_01}
         WHERE
