@@ -75,7 +75,9 @@
         reg.yield*100 as yield,
         reg.exer_yield*100 as exerYield,
         reg.rate*100 as rate,
-        reg.m_trade_amt as mtradeAmt,null ouPartyId
+        reg.m_trade_amt as mtradeAmt,
+        null ouPartyId,
+        null otherAmt
         from reg_fin_product_deal_total reg
         left join reg_fin_product_deal_total_add regAdd
         on reg.totle_trade_id=regAdd.Totle_Trade_Id
@@ -209,7 +211,8 @@
             null                  as     exerYield,
             null                  as     rate,
             null                  as     mtradeAmt,
-            bo.OU_PARTY_ID               ouPartyId
+            bo.OU_PARTY_ID               ouPartyId,
+            fpi.ISSUE_PRICE              otherAmt
             from BID_ORDER bo
             left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
             left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = fp.FINPROD_ID
@@ -453,7 +456,9 @@
         ibd.yield*100 as yield,
         ibd.exer_yield*100 as exerYield,
         null as rate,
-        null as mtradeAmt,null ouPartyId
+        null as mtradeAmt,
+        null ouPartyId,
+        null otherAmt
         from ibu_quote_bond ib
         inner join ibu_quote_bond_det ibd
         on ib.quote_id=ibd.quote_id
@@ -577,7 +582,9 @@
         null as yield,
         null as exerYield,
         ic.rate*100 as rate,
-        ic.M_TRADE_AMT as mtradeAmt,null ouPartyId
+        ic.M_TRADE_AMT as mtradeAmt,
+        null ouPartyId,
+        null otherAmt
         from ibu_quote_crep ic
         left join (
         select I.quote_id,
@@ -1244,7 +1251,8 @@
         icpledge.pledgeFinprodId as pledgeFinprodIds,
         icpledge.pledgeRatio as pledgeRatios,
         icpledge.pledgeFaceValue as pledgeFaceValues,
-        tr.MDEALAMT as mtradeAmt
+        tr.MDEALAMT as mtradeAmt,
+        null otherAmt
         from INTERF_CSTP_TRADE I
         INNER JOIN (SELECT EXECID ,MAX(UPDATETIME) UPDATETIME FROM  INTERF_CSTP_TRADE GROUP BY EXECID)	II ON  II.EXECID = I.EXECID AND II.UPDATETIME = I.UPDATETIME
         left join INTERF_OPICS_TRAD_REPO tr on tr.oritradeid = I.EXECID
@@ -1372,7 +1380,8 @@
                 null                            as                                   pledgeFinprodIds,
                 null                            as                                   pledgeRatios,
                 null                            as                                   pledgeFaceValues,
-                null                            as                                   mtradeAmt
+                null                            as                                   mtradeAmts,
+                icb.ISSUE_PRICE                                                      otherAmt
         from INTERF_CSTP_BJFXJG icb
                  left join fin_product fp on CONCAT(icb.INSTRUMENT_ID,'.IB') = fp.finprod_market_id
                  LEFT JOIN SYS_USER_ADD sua ON icb.SUBMIT_USER = sua.IBU_TRADER
@@ -1815,17 +1824,17 @@
                     when icb.SPREAD is not null then TO_CHAR(icb.SPREAD,'FM99990.90') || 'BP'
                     when icb.COUPON_RATE is not null then to_char(icb.COUPON_RATE,'FM990.9990') ||'%' end tradeYield,*/
                 case
-                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' then SDL_SD.ITEM_VALUE || '+' || to_char(nvl(fpi.BP*10000, 0),'FM999990.90')||'BP'
-                    when fp.COUPON_SPECIES in ('02', '03') then to_char(fpi.REFER_YIELD*100,'FM99990.9990') || '%'
+                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' then SDL_SD.ITEM_VALUE || '+' || TO_CHAR(icb.SPREAD,'FM99990.90')||'BP'
+                    when fp.COUPON_SPECIES in ('02', '03') then to_char(icb.COUPON_RATE,'FM990.9990') || '%'
                     when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
-                    then to_char(fpi.REFER_YIELD*100,'FM99990.9990') || '%' end                tradeYieldStr,
+                    then to_char(icb.COUPON_RATE,'FM990.9990') || '%' end                tradeYieldStr,
                 case
                     when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' then fpi.BP*10000
                     when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD*100
                     when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
                     then fpi.REFER_YIELD*100 end                tradeYield,
                 null                            as termDays,
-                bo.PAYABLE_AMOUNT               as tradeAmt,
+                icb.ACTUAL_FEE                  as tradeAmt,
                 bo.BID_DATE                     as tradeDate,
                 deal.portfolioId                as portfolioIds,
                 deal.portfolioName              as portfolioNames,
@@ -2713,6 +2722,39 @@
           and ROWNUM = 1
     </select>
 
+    <select id="selectBidCSTPByPrimaryKey"  resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmRegInfoListResponse">
+        select icb.TRD_ID execid
+        from INTERF_CSTP_BJFXJG icb
+        where NOT EXISTS (SELECT 1 FROM trdquto_match_info match where icb.TRD_ID = match.CSTP_TRADE_ID)
+        <if test="tradeDate != null and tradeDate != ''">
+            and substr(icb.SUBSCRIPTION_TIME,0,10) = #{tradeDate,jdbcType=VARCHAR}
+        </if>
+        <if test="finprodMarketId != null and finprodMarketId != ''">
+            and icb.INSTRUMENT_ID = #{finprodMarketId,jdbcType=VARCHAR}
+        </if>
+        <if test="ouPartyId != null and ouPartyId != ''">
+            and icb.SUBSCRIBE_INSTITUTION_ID = #{ouPartyId,jdbcType=VARCHAR}
+        </if>
+        <if test="subscriptionAmount != null">
+            and icb.SUBSCRIPTION_AMOUNT = #{subscriptionAmount,jdbcType=DECIMAL}
+        </if>
+        <if test="couponRate != null">
+            and icb.COUPON_RATE = #{couponRate,jdbcType=DECIMAL}
+        </if>
+        <if test="spread != null">
+            and icb.SPREAD = #{spread,jdbcType=DECIMAL}
+        </if>
+        <if test="issuePrice != null">
+            and icb.ISSUE_PRICE = #{issuePrice,jdbcType=DECIMAL}
+        </if>
+        <if test="ourTrader != null and ourTrader != ''">
+            and icb.SUBMIT_USER = #{ourTrader,jdbcType=VARCHAR}
+        </if>
+        <if test="payableAmount != null">
+            and icb.ACTUAL_FEE = #{payableAmount,jdbcType=DECIMAL}
+        </if>
+        order by icb.SUBSCRIPTION_TIME ASC
+    </select>
 </mapper>
 
 

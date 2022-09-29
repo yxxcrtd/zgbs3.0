@@ -295,6 +295,9 @@ public class CfetsTrdConfirmRegInfoListResponse{
     @ApiModelProperty(name="selectedItem",value="选中数据",example="字符串1")
     private transient List<CfetsTrdConfirmRegInfoListResponse> selectedItem;
 
+    @ApiModelProperty(name="otherAmt",value="备用字段,用于存放一级申购发行价格等",example="99.00")
+    private BigDecimal otherAmt;
+
     public BigDecimal getParValue() {
         return parValue;
     }
@@ -1107,5 +1110,13 @@ public class CfetsTrdConfirmRegInfoListResponse{
 
     public void setCalMode(String calMode) {
         this.calMode = calMode;
+    }
+
+    public BigDecimal getOtherAmt() {
+        return otherAmt;
+    }
+
+    public void setOtherAmt(BigDecimal otherAmt) {
+        this.otherAmt = otherAmt;
     }
 }

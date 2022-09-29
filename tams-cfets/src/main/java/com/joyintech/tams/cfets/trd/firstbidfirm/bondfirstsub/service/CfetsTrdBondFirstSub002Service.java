@@ -27,6 +27,7 @@ import com.joyintech.tams.cfets.trd.bond.dto.RiskCalRequest;
 import com.joyintech.tams.cfets.trd.bond.service.IbuQuoteBondCalService;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dao.CfetsTrdBondFirstSub002Mapper;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.*;
+import com.joyintech.tams.cfets.trdconfirm.service.CfetsTrdConfirmAutoMatchService;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
@@ -167,6 +168,9 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
 
     @Autowired(required = false)
     private BasRiskMathCommService basRiskMathCommService;
+
+    @Autowired
+    private CfetsTrdConfirmAutoMatchService cfetsTrdConfirmAutoMatchService;
 
     /**
      * 申购点击check
@@ -905,7 +909,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         if (!StringUtil.isNotEmpty(entity.getTradeDate())) {
             entity.setTradeDate(DateUtil.parse(iPlatformDate.getSysDateStr()));
         }
-        logger.info("处理生效逻辑,入参:" + JsonUtils.object2Json(entity));
+        logger.info("处理生效逻辑,入参:{}", JsonUtils.object2Json(entity));
         this.deleteWflData(entity.getBidId());
         this.insertData(entity, type);
         //头寸
@@ -919,9 +923,14 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         }
         //处理指令执行进度
         this.insertEtrFinishStatus(entity, type);
-        // 系统参数 【是否支持CSTP下行接口_一级申购】
-        if(StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST"))){
-
+        if (!type.equals(OperationType.REVOKE) && !type.equals(OperationType.DELETE)) {
+            try {
+                // 调用自动匹配逻辑
+                cfetsTrdConfirmAutoMatchService.cstpAutoMatchAfterReg(null, null, entity);
+            } catch (Exception e) {
+                logger.error(getMessage("CONFIRM_MSG_008", entity.getBidId(), DictCodeListExt3.操作类型_自动匹配确认.getCodeName()));
+                logger.error(e.getMessage(), e);
+            }
         }
     }
 

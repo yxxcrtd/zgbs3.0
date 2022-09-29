@@ -302,4 +302,9 @@ public interface CfetsTrdConfirmMapper {
 
 
     BigDecimal selectEtrNum(@Param("portfolioId") String finprodId,@Param("entrustId") String entrustId);
+
+    /**
+     * 根据匹配要素,查询一级申购下行数据
+     */
+    List<CfetsTrdConfirmRegInfoListResponse> selectBidCSTPByPrimaryKey(Map<String, Object> map);
 }

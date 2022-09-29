@@ -223,7 +223,6 @@ public class CfetsTrdConfirm001Service extends BaseService {
     private BasePtlCashPositionInfoService basePtlCashPositionInfoService;
 
 
-    @Transactional(rollbackFor = Exception.class)
     @DTXTransaction(transactionListener = "positionRollService")
     public List<Map<String, Object>> doCompleteMethod(CfetsTrdBondInvestTradeDto entity, OperationType operationType) {
         List<String> finishEtrList=new ArrayList<>();
@@ -451,7 +450,6 @@ public class CfetsTrdConfirm001Service extends BaseService {
         }
         return mapList;
     }
-    @Transactional(rollbackFor = Exception.class)
     @DTXTransaction(transactionListener = "positionRollService")
     public List<Map<String, Object>> doCompleteRepoMethod(CfetsTrdRepoTrade003Dto entity, OperationType operationType, boolean isTrdConfirm) {
         List<String> finishEtrList = new ArrayList<>();
@@ -653,7 +651,6 @@ public class CfetsTrdConfirm001Service extends BaseService {
      * @author jiangpeng
      * @date 2022/5/6 16:26
      */
-    @Transactional(rollbackFor = Exception.class)
     @DTXTransaction(transactionListener = "positionRollService")
     public List<Map<String, Object>> doCompleteBidMethod(CfetsTrdFirstBondInvestTradeDto entity, OperationType operationType, String genType) {
         logger.info("一级申购成交确认处理,入参:" + JsonUtils.object2Json(entity));

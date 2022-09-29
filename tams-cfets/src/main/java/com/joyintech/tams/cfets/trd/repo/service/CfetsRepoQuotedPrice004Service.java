@@ -25,6 +25,7 @@ import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysWflBusinessList;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.dto.CfetsSearchInfoRequest;
+import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.position.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
@@ -286,7 +287,7 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
                 }
                 AjaxResult ajaxResultPartyId = cfetsQuotedCommonServicevue.checkpartyId(ptlAllocatio.getEntrustId(),
                         ptlAllocatio.getPortfolioId(), DictCodeListExt3.报价系统区分类型_质押式回购登记报价.getValue());
-                if(StringUtil.isNotEmpty(ajaxResultPartyId.getMessage())){
+                if (StringUtil.isNotEmpty(ajaxResultPartyId.getMessage())) {
                     errorList.add(new ValidMessage(ajaxResultPartyId.getMessage()));
                 }
                 if (this.ACompareToB(ptlAllocatio.getTradeAmt(), ptlAllocatio.getConvertAmt(), 6) > 0
@@ -367,38 +368,41 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
                     && ACompareToB(entity.getSettFeeAmt(), settFeeamtTotal, 12) != 0) {
                 errorList.add(new ValidMessage("组合分配结算服务费总和需要等于结算服务费"));
             }
-            //勾选指令的价格模式只存在指定价格时，回购利率默认等于指定价格指令中的回购利率，可修改，修
-            // 改后与默认值不一致时，提交时，弹出提示“ 价格模式为指定价格，交易需要按照指令指定的回购利率进行交易！”
-            if (StringUtil.isNotEmpty(yieldPRM01) && !StringUtil.isNotEmpty(minOrMaxYield)
-                    && ACompareToB(yieldPRM01, entity.getPrice(), yieldScale) != 0) {
-                errorList.add(new ValidMessage("价格模式为指定价格，交易需要按照指令指定的回购利率进行交易！"));
-            }
-            //交易方向为正回购
-            //勾选指令的价格模式只存在限价指令时，回购利率默认为空，
-            // 填入值后需不大于限价指令中回购利率的最小值，不满足时提交弹出提示“价格模式为限价指令，交易回购利率不能大于指令指定的回购利率进行交易”
-            if (!StringUtil.isNotEmpty(yieldPRM01) && StringUtil.isNotEmpty(minOrMaxYield)
-                    && ACompareToB(minOrMaxYield, entity.getPrice(), yieldScale) < 0 && StringUtil.equals(ps, DictCodeListExt3.交易方向_正回购.getValue())) {
-                errorList.add(new ValidMessage("价格模式为限价指令，交易回购利率不能大于指令指定的回购利率进行交易！"));
-            }
-            //交易方向为逆回购
-            //勾选指令的价格模式只存在限价指令时，回购利率默认为空，填入值后需不小于限价指令中回购利率的最大值，
-            // 不满足时提交弹出提示“价格模式为限价指令，交易回购利率不能小于指令指定的回购利率进行交易”
-            if (!StringUtil.isNotEmpty(yieldPRM01) && StringUtil.isNotEmpty(minOrMaxYield)
-                    && ACompareToB(minOrMaxYield, entity.getPrice(), yieldScale) > 0 && StringUtil.equals(ps, DictCodeListExt3.交易方向_逆回购.getValue())) {
-                errorList.add(new ValidMessage("价格模式为限价指令，交易回购利率不能小于指令指定的回购利率进行交易！"));
-            }
-            //勾选指令的价格模式同时存在指定价格和限价指令时，回购利率默认为空，填入值后需判断回购利率是否等于指定价格中的回购利率，
-            // 不满足提交时，弹出提示“价格模式存在指定价格，交易需要按照指令指定的回购利率进行交易！”
-            if (StringUtil.isNotEmpty(yieldPRM01) && StringUtil.isNotEmpty(minOrMaxYield)
-                    && ACompareToB(yieldPRM01, entity.getPrice(), yieldScale) != 0) {
-                errorList.add(new ValidMessage("价格模式存在指定价格，交易需要按照指令指定的回购利率进行交易！"));
-            }
-            //检查指令是否是已接收状态
-            Map<String, Object> paramFail = new HashMap<>();
-            paramFail.put("entrustIdList", entrustIdList);
-            paramFail.put("entrustStatus", BussinessDictCodeList.委托状态_已接收.getValue());
-            if (cfetsIbuQuoteBondEtrMapper.countFailEtr(paramFail) > 0) {
-                errorList.add(new ValidMessage("指令非已接收状态，不可提交!"));
+            if (!BigDecimalUtil.isZeroOrNull(entity.getPrice())
+                    || StringUtil.equals(entity.getQuoteStyle(), BussinessDictCodeList.报价方式_对话报价.getValue())) {
+                //勾选指令的价格模式只存在指定价格时，回购利率默认等于指定价格指令中的回购利率，可修改，修
+                // 改后与默认值不一致时，提交时，弹出提示“ 价格模式为指定价格，交易需要按照指令指定的回购利率进行交易！”
+                if (StringUtil.isNotEmpty(yieldPRM01) && !StringUtil.isNotEmpty(minOrMaxYield)
+                        && ACompareToB(yieldPRM01, entity.getPrice(), yieldScale) != 0) {
+                    errorList.add(new ValidMessage("价格模式为指定价格，交易需要按照指令指定的回购利率进行交易！"));
+                }
+                //交易方向为正回购
+                //勾选指令的价格模式只存在限价指令时，回购利率默认为空，
+                // 填入值后需不大于限价指令中回购利率的最小值，不满足时提交弹出提示“价格模式为限价指令，交易回购利率不能大于指令指定的回购利率进行交易”
+                if (!StringUtil.isNotEmpty(yieldPRM01) && StringUtil.isNotEmpty(minOrMaxYield)
+                        && ACompareToB(minOrMaxYield, entity.getPrice(), yieldScale) < 0 && StringUtil.equals(ps, DictCodeListExt3.交易方向_正回购.getValue())) {
+                    errorList.add(new ValidMessage("价格模式为限价指令，交易回购利率不能大于指令指定的回购利率进行交易！"));
+                }
+                //交易方向为逆回购
+                //勾选指令的价格模式只存在限价指令时，回购利率默认为空，填入值后需不小于限价指令中回购利率的最大值，
+                // 不满足时提交弹出提示“价格模式为限价指令，交易回购利率不能小于指令指定的回购利率进行交易”
+                if (!StringUtil.isNotEmpty(yieldPRM01) && StringUtil.isNotEmpty(minOrMaxYield)
+                        && ACompareToB(minOrMaxYield, entity.getPrice(), yieldScale) > 0 && StringUtil.equals(ps, DictCodeListExt3.交易方向_逆回购.getValue())) {
+                    errorList.add(new ValidMessage("价格模式为限价指令，交易回购利率不能小于指令指定的回购利率进行交易！"));
+                }
+                //勾选指令的价格模式同时存在指定价格和限价指令时，回购利率默认为空，填入值后需判断回购利率是否等于指定价格中的回购利率，
+                // 不满足提交时，弹出提示“价格模式存在指定价格，交易需要按照指令指定的回购利率进行交易！”
+                if (StringUtil.isNotEmpty(yieldPRM01) && StringUtil.isNotEmpty(minOrMaxYield)
+                        && ACompareToB(yieldPRM01, entity.getPrice(), yieldScale) != 0) {
+                    errorList.add(new ValidMessage("价格模式存在指定价格，交易需要按照指令指定的回购利率进行交易！"));
+                }
+                //检查指令是否是已接收状态
+                Map<String, Object> paramFail = new HashMap<>();
+                paramFail.put("entrustIdList", entrustIdList);
+                paramFail.put("entrustStatus", BussinessDictCodeList.委托状态_已接收.getValue());
+                if (cfetsIbuQuoteBondEtrMapper.countFailEtr(paramFail) > 0) {
+                    errorList.add(new ValidMessage("指令非已接收状态，不可提交!"));
+                }
             }
         }
         /**************************************************************组合分配********************************************/
@@ -478,7 +482,8 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
         if (!StringUtil.isNotEmpty(entity.getMySideTrader())) {
             errorList.add(new ValidMessage("请输入本方交易员"));
         }
-        if (!StringUtil.isNotEmpty(entity.getCounterId())) {
+        if (!StringUtil.isNotEmpty(entity.getCounterId())
+                && StringUtil.equals(entity.getQuoteStyle(), BussinessDictCodeList.报价方式_对话报价.getValue())) {
             errorList.add(new ValidMessage("请输入对手方"));
         }
         // 交易对手未绑定21位码,手方交易员非必填
@@ -508,8 +513,9 @@ public class CfetsRepoQuotedPrice004Service extends BaseService<CfetsRepoDealReg
         if (!StringUtil.isNotEmpty(entity.getRepoTerm())) {
             errorList.add(new ValidMessage("请输入回购期限"));
         }
-        if (!StringUtil.isNotEmpty(entity.getPrice())
-                || BigDecimal.ZERO.compareTo(entity.getPrice()) >= 0) {
+        if ((!StringUtil.isNotEmpty(entity.getPrice())
+                || BigDecimal.ZERO.compareTo(entity.getPrice()) >= 0)
+                && StringUtil.equals(entity.getQuoteStyle(), BussinessDictCodeList.报价方式_对话报价.getValue())) {
             errorList.add(new ValidMessage("请输入回购利率"));
         }
         if (!StringUtil.isNotEmpty(entity.getTradeAmt())

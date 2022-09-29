@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +44,7 @@ public class CfetsIbuQuoteBatchCommonController {
      */
     @ResponseBody
     @PostMapping("resaleregautodeal")
+    @Transactional(rollbackFor = Exception.class)
     public void resaleregautodeal(@RequestBody Map<String,Object> parm) throws Exception {
         List<String> totleTradeIds = (List<String>) parm.get("totleTradeIds");
         try{

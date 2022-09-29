@@ -25,7 +25,7 @@
             <foreach collection="matchFeaturesList" index="index" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
-            <if test="isHideAutoMatch != null and isHideAutoMatch.equals('Y')">
+            <if test="isHideAutoMatch != null and !'N'.equals(isHideAutoMatch)">
                 AND bsps.PARAM_VALUE1 = '01'
             </if>
         </where>
