@@ -1,10 +1,11 @@
 package com.joyintech.tams.invest.common.risktrialrds.dto;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.json.BigDecimalSerializer;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 监督指标输入条件DTO
@@ -26,6 +27,16 @@ public class InvestTradeTrialInput {
      * 资产代码/非必填
      */
 	private String assetCode;
+	/**
+	 * 组合代码/必填
+	 */
+	private List<String> portfolioCodeList;
+
+	/**
+	 * 指标代码
+	 */
+	private List<String> indCodeList;
+
 	 /**
      * 交易金额/交易份额/此金额实时影响指标表达式的计算/必填
      */
@@ -68,6 +79,18 @@ public class InvestTradeTrialInput {
 	}
 	public void setPortfolioCode(String portfolioCode) {
 		this.portfolioCode = portfolioCode;
+	}
+	public List<String> getPortfolioCodeList() {
+		return portfolioCodeList;
+	}
+	public void setPortfolioCodeList(List<String> portfolioCodeList) {
+		this.portfolioCodeList = portfolioCodeList;
+	}
+	public List<String> getIndCodeList() {
+		return indCodeList;
+	}
+	public void setIndCodeList(List<String> indCodeList) {
+		this.indCodeList = indCodeList;
 	}
 	public String getAssetCode() {
 		return assetCode;

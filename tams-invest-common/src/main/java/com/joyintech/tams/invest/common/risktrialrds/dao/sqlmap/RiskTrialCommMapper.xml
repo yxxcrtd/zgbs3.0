@@ -123,20 +123,19 @@
 		<where>
 			<if test="productIdList != null and !productIdList.isEmpty()">
 				 (
-				PORTFOLIO_ID in (select PORTFOLIO_ID from FIN_PRODUCT_ADD where FIN_PRODUCT_ADD.FINPROD_ID in <foreach collection="productIdList" item="obj" index="index" separator="," open="(" close=")">
+				PORTFOLIO_ID in (select PORTFOLIO_ID from FIN_PRODUCT_ADD where FIN_PRODUCT_ADD.FINPROD_ID in
+				<foreach collection="productIdList" item="obj" index="index" separator="," open="(" close=")">
 				<if test="(index % 500) == 499">
-					null) OR PORTFOLIO_ID IN (
+					null) OR  PORTFOLIO_ID IN (
 				</if>
 				#{obj}
 			</foreach>
-				)
-
+			)
 				OR
-
 				PORTFOLIO_ID in
 				<foreach collection="productIdList" item="obj" index="index" separator="," open="(" close=")">
 					<if test="(index % 500) == 499">
-						null) OR PORTFOLIO_ID IN (
+						null) OR  PORTFOLIO_ID IN (
 					</if>
 					#{obj}
 				</foreach>
@@ -147,7 +146,7 @@
 	<!-- add by 裴家俊 at 2019-07-17 start -->
 
 	<select id="selectAllPortfolioWithRisk" resultType="java.lang.Integer">
-        select count(1) as count
+   select count(1) as count
         from PTL_PORTFOLIO
     </select>
 
@@ -244,8 +243,8 @@
 	</select>
 
 <select id="getIndicatorParamAll" resultMap="ParamResultMapWithBLOBs">
-    select m.PARA_CODE,m.PARA_GRANULARITY,m.PARA_DISPLAY_TYPE,m.CONTENT from RSK_ISUP_INDICATOR_PARA_DTL m
-    inner join RSK_ISUP_INDICATOR_PARA n on m.PARA_CODE=n.PARA_CODE
+	select m.PARA_CODE,m.PARA_GRANULARITY,m.PARA_DISPLAY_TYPE,m.CONTENT from RSK_ISUP_INDICATOR_PARA_DTL m
+	inner join RSK_ISUP_INDICATOR_PARA n on m.PARA_CODE=n.PARA_CODE
     <where>
 		<if test="paramCode != null and paramCode != '' ">
             and m.PARA_CODE in ${paramCode}
@@ -255,13 +254,13 @@
 		</if>
 	</where>
 
-    union all
+		union all
 
-    select m.PARA_CODE,'FIX' as PARA_GRANULARITY,'FIX' AS PARA_DISPLAY_TYPE,m.CONTENT from RSK_ISUP_FIX_RECODE m
-    inner join 	 (select MAX(RSK_ISUP_FIX_RECODE.VALID_DATE) as VALID_DATE,PARA_CODE from RSK_ISUP_FIX_RECODE
-    <![CDATA[ where RSK_ISUP_FIX_RECODE.VALID_DATE<=to_date('${valDate}','yyyy-MM-dd') group by PARA_CODE) n on m.PARA_CODE=n.PARA_CODE and m.VALID_DATE=n.VALID_DATE
-    inner join RSK_ISUP_INDICATOR_PARA y on m.PARA_CODE=y.PARA_CODE ]]>
-</select>
+		select m.PARA_CODE,'FIX' as PARA_GRANULARITY,'FIX' AS PARA_DISPLAY_TYPE,m.CONTENT from RSK_ISUP_FIX_RECODE m
+		inner join 	 (select MAX(RSK_ISUP_FIX_RECODE.VALID_DATE) as VALID_DATE,PARA_CODE from RSK_ISUP_FIX_RECODE
+		<![CDATA[ where RSK_ISUP_FIX_RECODE.VALID_DATE<=to_date('${valDate}','yyyy-MM-dd') group by PARA_CODE) n on m.PARA_CODE=n.PARA_CODE and m.VALID_DATE=n.VALID_DATE
+		inner join RSK_ISUP_INDICATOR_PARA y on m.PARA_CODE=y.PARA_CODE ]]>
+	</select>
 
 	<select id="getRiskTrialRetInfo" resultType="com.joyintech.tams.invest.common.risktrialrds.dto.RiskTrialRetDto">
 		select
@@ -362,26 +361,63 @@
 		</foreach>
 	</delete>
 
+	<!--通过条件删除脏数据-->
+	<delete id="deleteRiskValBatchDataNew">
+		delete from RSK_ISUP_POINT_VAL VAL
+		WHERE
+		SUP_FREQUENCY = #{supFrequency, jdbcType=VARCHAR}
+		AND SUP_DATE = #{supDate, jdbcType=DATE}
+		<if test="portfolioIdList != null and portfolioIdList.size() > 0">
+			<foreach collection="portfolioIdList" item="portfolioId" index="index" open="AND (PORTFOLIO_ID IN (" close="))">
+				<if test="index > 0 ">
+					<choose>
+						<when test="index % 1000 == 0">) OR PORTFOLIO_ID IN (</when>
+						<otherwise>,</otherwise>
+					</choose>
+				</if>
+				#{portfolioId, jdbcType=VARCHAR}
+			</foreach>
+		</if>
+	</delete>
+	<!--通过条件删除脏数据-->
+	<delete id="deleteRiskValDetBatchDataNew">
+		delete from RSK_ISUP_POINT_DET_VAL VAL
+		WHERE
+			SUP_FREQUENCY = #{supFrequency, jdbcType=VARCHAR}
+			AND SUP_DATE = #{supDate, jdbcType=DATE}
+			<if test="portfolioIdList != null and portfolioIdList.size() > 0">
+				<foreach collection="portfolioIdList" item="portfolioId" index="index" open="AND (PORTFOLIO_ID IN (" close="))">
+					<if test="index > 0">
+						<choose>
+							<when test="index % 1000 == 0">) OR PORTFOLIO_ID IN (</when>
+							<otherwise>,</otherwise>
+						</choose>
+					</if>
+					#{portfolioId, jdbcType=VARCHAR}
+				</foreach>
+			</if>
+	</delete>
+
 	<select id="getPortfolioInstCode" resultType="java.lang.String">
-       select INSTITUTION_CODE from DATA_AUTH_NOTIFY_INST
-	  WHERE DATA_AUTH_NOTIFY_INST.MODEL_TYPE = '02'
-	    and DATA_AUTH_NOTIFY_INST.DATA_TYPE = 'PTL01'
-	    and DATA_AUTH_NOTIFY_INST.BUSINESS_ID = #{portfolioId,jdbcType=VARCHAR}
-    </select>
+		select INSTITUTION_CODE from DATA_AUTH_NOTIFY_INST
+		WHERE DATA_AUTH_NOTIFY_INST.MODEL_TYPE = '02'
+		  and DATA_AUTH_NOTIFY_INST.DATA_TYPE = 'PTL01'
+		  and DATA_AUTH_NOTIFY_INST.BUSINESS_ID = #{portfolioId,jdbcType=VARCHAR}
+	</select>
 	<select id="selectImportValTableProdList" resultType="java.util.Map">
 		SELECT DISTINCT prod.prodId "finprodId",max(tt.VAL_DATE) "valDate"
 		FROM (<if test="productIdList!=null and productIdList.size()>0">
-				<choose>
-					<when test="productIdList.size() == 1">
-						select '${prodId}' as prodId from DUAL
-					</when>
-					<otherwise>
-						<foreach collection="productIdList" item="item" separator="as prodId from DUAL union all select" open="select " close="as prodId from DUAL">
-							#{item}
-						</foreach>
-					</otherwise>
-				</choose>
-			</if>) prod
+		<choose>
+			<when test="productIdList.size() == 1">
+				select '${prodId}' as prodId from DUAL
+			</when>
+			<otherwise>
+				<foreach collection="productIdList" item="item" separator="as prodId from DUAL union all select" open="select " close="as prodId from DUAL">
+					#{item}
+				</foreach>
+			</otherwise>
+		</choose>
+	</if>) prod
 		LEFT JOIN FIN_PRODUCT fp1
 		ON fp1.FINPROD_ID = prod.prodId
 		LEFT JOIN PTL_SEC_VALUTION psv
@@ -391,19 +427,19 @@
 		ON fp.FINPROD_ID = psv.FINPROD_ID
 		AND fp.FINPROD_TYPE2='F17'
 		LEFT JOIN (
-			SELECT PTL_ID,max(VAL_DATE) VAL_DATE from(
-				SELECT PORTFOLIO_ID PTL_ID,
-					min(VIDT.VALDATE) VAL_DATE
-				FROM VALTBL_IMPORT_DATE_TRACE VIDT
-				WHERE
-					VIDT.VALDATE>=#{dateMin,jdbcType=DATE}
-					AND VIDT.VALDATE &lt; #{dateMax,jdbcType=DATE}
-					AND VIDT.IMPDATE = #{dateMax,jdbcType=DATE}
-					<if test="deptCode != null and deptCode != ''">
-						AND	VIDT.CREATE_DEPT = #{deptCode,jdbcType=VARCHAR}
-					</if>
-				GROUP BY PORTFOLIO_ID
-			)GROUP BY PTL_ID
+		SELECT PTL_ID,max(VAL_DATE) VAL_DATE from(
+		SELECT PORTFOLIO_ID PTL_ID,
+		min(VIDT.VALDATE) VAL_DATE
+		FROM VALTBL_IMPORT_DATE_TRACE VIDT
+		WHERE
+		VIDT.VALDATE>=#{dateMin,jdbcType=DATE}
+		AND VIDT.VALDATE &lt; #{dateMax,jdbcType=DATE}
+		AND VIDT.IMPDATE = #{dateMax,jdbcType=DATE}
+		<if test="deptCode != null and deptCode != ''">
+			AND	VIDT.CREATE_DEPT = #{deptCode,jdbcType=VARCHAR}
+		</if>
+		GROUP BY PORTFOLIO_ID
+		)GROUP BY PTL_ID
 		)tt
 		ON tt.PTL_ID = fp.FINPROD_MARKET_ID
 		GROUP BY  prod.prodId
