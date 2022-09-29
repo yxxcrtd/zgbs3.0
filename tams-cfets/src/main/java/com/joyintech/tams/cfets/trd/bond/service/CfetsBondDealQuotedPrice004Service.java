@@ -1046,7 +1046,7 @@ public class CfetsBondDealQuotedPrice004Service extends BaseService<CfetsBondDea
                     BeanUtil.copyPropertiesIgnoreNull(regFinProductDeal, regFinProductDealTotal);
                     BussinessCodeParameter codeParameter = getBussinessCodeParameter(entity.getPs());
                     regFinProductDeal.setTradeId(baseGetBusinessId.buildBussinessCode(codeParameter));
-                    regFinProductDeal.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+                    regFinProductDeal.setBusiType(DictCodeList.业务类型_债券交易.getValue());
                     regFinProductDeal.setEntrustId(ptlAllocatio.getEntrustId());
                     regFinProductDeal.setPortfolioId(ptlAllocatio.getPortfolioId());
                     regFinProductDeal.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());

@@ -167,7 +167,7 @@ public class StlDataDealSzdSjsmxProcessService {
             // 单位全价
             settleTransData.setUnitFprice(szdSjsmx.getMxqsjg());
             // 业务类型
-            settleTransData.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+            settleTransData.setBusiType(DictCodeList.业务类型_债券交易.getValue());
             // 交易币种
             settleTransData.setCcy(stlDataDealProcessCommonService.getCcy(szdSjsmx.getMxhbdh()));
             // 交易方向、业务场景明细分类
