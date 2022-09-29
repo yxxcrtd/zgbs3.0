@@ -2086,7 +2086,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 tradeDtos.forEach(tradeDto -> {
                     this.doInsertBidMethod(tradeDto);
                     // 老头寸处理
-                    this.dealOldPosition(tradeDto, false, false);
+                    this.dealOldPosition(tradeDto, false, false, false);
                 });
             }
             // 发送头寸
@@ -2826,7 +2826,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                     // 交易数据入库
                     this.doInsertBidMethod(tradeDto);
                     // 头寸入库
-                    this.dealOldPosition(tradeDto, false, false);
+                    this.dealOldPosition(tradeDto, false, false, false);
                 });
             }
             String confirmOk = RequestUtil.getParam("confirmOk");
@@ -2918,6 +2918,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             List<String> finishEtrList = new ArrayList<>();
             if (StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), entity.getBiddingMethod())) {
                 List<CfetsTrdFirstBidFirmInvestTradeDto> tradeDtos = this.prepareBidEntity(entity, type);
+                // 是否交易所
+                boolean isJys = !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                        && !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue());
                 tradeDtos.forEach(tradeDto -> {
                     this.doCompleteBidMethod(entity, tradeDto, type);
                     // 更新指令完成进度
@@ -2925,9 +2928,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                     if (CollectionUtils.isNotEmpty(finishEtrListTemp)) {
                         finishEtrList.addAll(finishEtrListTemp);
                     }
-                    if (OperationType.REVOKE.equals(type) || OperationType.DELETE.equals(type)) {
+                    if (OperationType.REVOKE.equals(type) || OperationType.DELETE.equals(type) || isJys) {
                         // 老头寸处理
-                        this.dealOldPosition(tradeDto, true, false);
+                        this.dealOldPosition(tradeDto, true, false, isJys);
                     }
                 });
             }
@@ -3184,7 +3187,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                     // 更新指令完成进度
                     List<String> finishEtrListTemp = this.baseTradeCommExecute(tradeDto, OperationType.REVOKE);
                     // 老头寸处理
-                    this.dealOldPosition(tradeDto, true, false);
+                    this.dealOldPosition(tradeDto, true, false, false);
                 });
             }
             //处理指令执行进度
@@ -3213,7 +3216,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 // 删除流程中数据
                 this.deleteTradeData(tradeDto);
                 // 老头寸处理
-                this.dealOldPosition(tradeDto, false, true);
+                this.dealOldPosition(tradeDto, false, true, false);
             });
         }
     }
@@ -4166,13 +4169,14 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
     /**
      * 老头存处理 系统参数是否处理旧头寸标识(IS_HANDLE_OLDPOS_FLAG)为Y时处理
      *
-     * @param entity   页面元素
-     * @param isRevoke 是否撤销
-     * @param isBack   是否退回
+     * @param entity        页面元素
+     * @param isRevoke      是否撤销
+     * @param isBack        是否退回
+     * @param isJYSComplete 是否是交易所(交易所债没有交收,后续无法更新头寸状态,此处用于交易所流程结束时更新持仓状态)
      * @author jiangpeng
      * @date 2022/4/28 10:37
      */
-    public void dealOldPosition(CfetsTrdFirstBidFirmInvestTradeDto entity, boolean isRevoke, boolean isBack) {
+    public void dealOldPosition(CfetsTrdFirstBidFirmInvestTradeDto entity, boolean isRevoke, boolean isBack, boolean isJYSComplete) {
         // 系统参数
         if (!StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
             return;
@@ -4220,6 +4224,10 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             BaseTradeProductDealDto baseTradeProductDealDto = new BaseTradeProductDealDto();
             baseTradeProductDealDto.setEntrustId(deal.getEntrustId());
             baseTradeProductDealDto.setStage("02");
+            if (isJYSComplete) {
+                finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_有效.getValue());
+                baseTradeProductDealDto.setStage("03");
+            }
             TrdProductDeal trdProductDeal = new TrdProductDeal();
             BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, deal);
 //            trdProductDeal.setFinprodId(entity.getFinprodId());

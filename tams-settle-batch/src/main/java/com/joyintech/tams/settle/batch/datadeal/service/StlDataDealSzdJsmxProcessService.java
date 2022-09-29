@@ -276,7 +276,7 @@ public class StlDataDealSzdJsmxProcessService {
 				// 固定收益平台的公司债现券交易没有sqbh问题修复 modify by fuyongsheng 20220919 end
 
 				//业务类型
-				settleTransData.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+				settleTransData.setBusiType(DictCodeList.业务类型_债券交易.getValue());
 				// 证券品种
 				settleTransData.setSecType(stlDownDataDealOperatorDto.getFinprodType());
 				// 交割日期
@@ -1300,7 +1300,7 @@ public class StlDataDealSzdJsmxProcessService {
 					   // settleTransDataAdd.setRepoType(DictCodeList.回购类型_质押式协议回购.getValue());
 					   // 业务类型
 					   // settleTransData.setBusiType(DictCodeList.业务类型_债券质押式回购交易.getValue());
-					   settleTransData.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+					   settleTransData.setBusiType(DictCodeList.业务类型_债券交易.getValue());
 					   // GNS-905:修改质押券出入库的回购类型和业务类型 modify by fuyongsheng 20220219 end
 					   // 金融产品类型(估值核算)
 					   settleTransData.setFinprodType(DictCodeListExt1.金融产品类型_债券.getValue());
