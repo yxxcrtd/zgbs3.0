@@ -29,7 +29,6 @@
         <result column="SL2" property="sl2" jdbcType="VARCHAR" />
         <result column="FZDM" property="fzdm" jdbcType="VARCHAR" />
         <result column="BZ" property="bz" jdbcType="VARCHAR" />
-        <result column="BY" property="by" jdbcType="VARCHAR" />
         <result column="CREATE_USER" property="createUser" jdbcType="VARCHAR" />
         <result column="CREATE_DEPT" property="createDept" jdbcType="VARCHAR" />
         <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
@@ -41,7 +40,7 @@
         SCDM SCDM, TZLB TZLB, TZRQ TZRQ, QSBH QSBH,  ZQDM ZQDM, ZQLB ZQLB,
         LTLX LTLX, QYLB QYLB, GPNF GPNF, ZH1 ZH1, ZH2 ZH2, RQ1 RQ1, RQ2 RQ2, JE1 JE1,
         JE2 JE2, JE3 JE3, JG1 JG1, JG2 JG2, BL1 BL1, BL2 BL2, SL1 SL1, SL2 SL2, FZDM FZDM,
-        BZ BZ, "BY" "BY", CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME,
+        BZ BZ,CREATE_USER CREATE_USER, CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME,
         UPDATE_USER UPDATE_USER, UPDATE_TIME UPDATE_TIME
     </sql>
     <sql id="Sql_All_Data" >
@@ -74,7 +73,7 @@
              JE1, JE2, JE3,
             JG1, JG2, BL1, BL2, 
             SL1, SL2, FZDM, BZ, 
-            BY, CREATE_USER, CREATE_DEPT, 
+            CREATE_USER, CREATE_DEPT,
             CREATE_TIME, UPDATE_USER, UPDATE_TIME
             )
         values (#{seqno,jdbcType=VARCHAR}, #{importDate,jdbcType=DATE}, #{dataFile,jdbcType=VARCHAR}, 
@@ -86,7 +85,7 @@
             #{rq3,jdbcType=VARCHAR}, #{je1,jdbcType=VARCHAR}, #{je2,jdbcType=VARCHAR}, #{je3,jdbcType=VARCHAR}, 
             #{jg1,jdbcType=VARCHAR}, #{jg2,jdbcType=VARCHAR}, #{bl1,jdbcType=VARCHAR}, #{bl2,jdbcType=VARCHAR}, 
             #{sl1,jdbcType=VARCHAR}, #{sl2,jdbcType=VARCHAR}, #{fzdm,jdbcType=VARCHAR}, #{bz,jdbcType=VARCHAR}, 
-            #{by,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, 
+            #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR},
             #{createTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
             )
     </insert>
@@ -173,9 +172,6 @@
             </if>
             <if test="bz != null" >
                 BZ,
-            </if>
-            <if test="by != null" >
-                BY,
             </if>
             <if test="createUser != null" >
                 CREATE_USER,
@@ -275,9 +271,6 @@
             <if test="bz != null" >
                 #{bz,jdbcType=VARCHAR},
             </if>
-            <if test="by != null" >
-                #{by,jdbcType=VARCHAR},
-            </if>
             <if test="createUser != null" >
                 #{createUser,jdbcType=VARCHAR},
             </if>
@@ -298,11 +291,11 @@
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.SzdTzxx" >
         insert into SZD_TZXX(SEQNO, IMPORT_DATE, DATA_FILE, IS_SETTLE_TARGET, XH, SCDM, 
         TZLB, TZRQ, QSBH, ZQDM, ZQLB, LTLX, QYLB, GPNF, ZH1, ZH2, RQ1, RQ2,  JE1,
-        JE2, JE3, JG1, JG2, BL1, BL2, SL1, SL2, FZDM, BZ, BY, CREATE_USER, CREATE_DEPT, 
+        JE2, JE3, JG1, JG2, BL1, BL2, SL1, SL2, FZDM, BZ, CREATE_USER, CREATE_DEPT,
         CREATE_TIME, UPDATE_USER, UPDATE_TIME)
         select SEQNO, IMPORT_DATE, DATA_FILE, IS_SETTLE_TARGET, XH, SCDM, 
             TZLB, TZRQ, QSBH, ZQDM, ZQLB, LTLX, QYLB, GPNF, ZH1, ZH2, RQ1, RQ2, JE1,
-            JE2, JE3, JG1, JG2, BL1, BL2, SL1, SL2, FZDM, BZ, BY, CREATE_USER, CREATE_DEPT, 
+            JE2, JE3, JG1, JG2, BL1, BL2, SL1, SL2, FZDM, BZ, CREATE_USER, CREATE_DEPT,
             CREATE_TIME, #{updateUser,jdbcType=VARCHAR} UPDATE_USER, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME
              from SZD_TZXX
              where 1 = 1 and SEQNO = #{seqno,jdbcType=VARCHAR}
@@ -394,9 +387,6 @@
             <if test="bz != null" >
                 BZ = #{bz,jdbcType=VARCHAR},
             </if>
-            <if test="by != null" >
-                BY = #{by,jdbcType=VARCHAR},
-            </if>
             <if test="updateUser != null" >
                 UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
             </if>
@@ -434,7 +424,6 @@
             SL2 = #{sl2,jdbcType=VARCHAR},
             FZDM = #{fzdm,jdbcType=VARCHAR},
             BZ = #{bz,jdbcType=VARCHAR},
-            BY = #{by,jdbcType=VARCHAR},
             UPDATE_USER = #{updateUser,jdbcType=VARCHAR},
             UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
         where SEQNO = #{seqno,jdbcType=VARCHAR}
