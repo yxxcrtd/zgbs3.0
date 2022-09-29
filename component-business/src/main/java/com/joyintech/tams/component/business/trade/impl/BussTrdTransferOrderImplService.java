@@ -298,11 +298,10 @@ public class BussTrdTransferOrderImplService extends BaseService<BussTrdTransfer
                 && StringUtil.isNotEmpty(recAcctNo)
                 && "N".equals(param.getDeal().getIsOutTrade())) {
             //N 标识为转仓
-            // 指令接口管理 要求显示转入方买入的那一条
             if (StringUtil.equals(payAcctNo, recAcctNo)) {
-                ret.setIsNeedSend(DictCodeList.是否_是.getValue());
-            } else {
                 ret.setIsNeedSend(DictCodeList.是否_否.getValue());
+            } else {
+                ret.setIsNeedSend(DictCodeList.是否_是.getValue());
             }
             // 转仓转入组合代码
             ret.setInPortfolioId(param.getDeal().getPortfolioId());
