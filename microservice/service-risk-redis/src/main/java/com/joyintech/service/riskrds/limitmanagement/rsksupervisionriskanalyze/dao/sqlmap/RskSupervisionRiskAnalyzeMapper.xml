@@ -348,8 +348,7 @@
         FROM RSK_ISUP_INDICATOR rii
     <where>
         <if test="search != null and search != ''">
-             (rii.IND_ID like concat('%',concat(#{search,jdbcType=VARCHAR},'%'))
-            OR rii.IND_NAME  like concat('%',concat(#{search,jdbcType=VARCHAR},'%')))
+             rii.IND_NAME  like concat('%',concat(#{search,jdbcType=VARCHAR},'%'))
         </if>
     </where>
 </select>
