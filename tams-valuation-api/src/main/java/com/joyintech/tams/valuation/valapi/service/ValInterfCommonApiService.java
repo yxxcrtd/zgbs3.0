@@ -1152,7 +1152,7 @@ public class ValInterfCommonApiService {
         Map<String, Object> map = new HashMap<String,Object>();
         //add by tanxuan 20200115
         if(DictCodeListExt1.金融产品类型_基金.getValue().equals(deal.getFinprodType())
-                || DictCodeList.业务类型_银行间债券交易.getValue().equals(deal.getBusiType())
+                || DictCodeList.业务类型_债券交易.getValue().equals(deal.getBusiType())
                 || DictCodeList.业务类型_债券质押式回购交易.getValue().equals(deal.getBusiType())
                 || DictCodeList.业务类型_债券买断式回购交易.getValue().equals(deal.getBusiType())
                 || DictCodeList.业务类型_债券借贷交易.getValue().equals(deal.getBusiType())

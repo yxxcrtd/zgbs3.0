@@ -338,7 +338,7 @@ public class SecExecDealTemplateRecService {
         // 交易编号 = 共通生成
         valFinProductDeal.setTradeId(tradeId);
         // 业务类型：行权回售申为债券交易预处理，赎回为债券交易
-	    valFinProductDeal.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+	    valFinProductDeal.setBusiType(DictCodeList.业务类型_债券交易.getValue());
 	    if(StringUtil.equals(DictCodeListExt3.交易方向_行权回售申请.getValue(), dto.getPs())) {
             valFinProductDeal.setBusiType(DictCodeList.业务类型_债券交易预处理.getValue());
         }

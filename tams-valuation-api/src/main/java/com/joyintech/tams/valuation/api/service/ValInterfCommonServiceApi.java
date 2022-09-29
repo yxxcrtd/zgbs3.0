@@ -1231,7 +1231,7 @@ public class ValInterfCommonServiceApi {
 //        }
         //add by tanxuan 20200115 
         if(DictCodeListExt1.金融产品类型_基金.getValue().equals(trdProductDeal.getFinprodType()) 
-        		|| DictCodeList.业务类型_银行间债券交易.getValue().equals(trdProductDeal.getBusiType())
+        		|| DictCodeList.业务类型_债券交易.getValue().equals(trdProductDeal.getBusiType())
         		|| DictCodeList.业务类型_债券质押式回购交易.getValue().equals(trdProductDeal.getBusiType())
         		|| DictCodeList.业务类型_债券买断式回购交易.getValue().equals(trdProductDeal.getBusiType())
         		|| DictCodeList.业务类型_债券借贷交易.getValue().equals(trdProductDeal.getBusiType())
@@ -1923,11 +1923,11 @@ public class ValInterfCommonServiceApi {
             sb.append("交易信息【交易状态】值不在有效范围内!").append("\n");
         }
 
-        if (DictCodeList.业务类型_银行间债券交易.getValue().equals(trdProductDeal.getBusiType())) {
+        if (DictCodeList.业务类型_债券交易.getValue().equals(trdProductDeal.getBusiType())) {
             if (StringUtils.isEmpty(trdProductDeal.getInvAim())) {
                 sb.append("交易信息【投资目的】不可为空!").append("\n");
             }
-            else if (DictCodeList.业务类型_银行间债券交易.getValue().equals(trdProductDeal.getBusiType())
+            else if (DictCodeList.业务类型_债券交易.getValue().equals(trdProductDeal.getBusiType())
                     && systemToolService.getDataDictItem(DictCode.投资目的.getValue(), trdProductDeal.getInvAim()) == null) {
                 sb.append("交易信息【投资目的】值不在有效范围内!").append("\n");
             }

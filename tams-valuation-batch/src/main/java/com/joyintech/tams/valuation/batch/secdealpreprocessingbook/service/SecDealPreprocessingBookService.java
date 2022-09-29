@@ -532,7 +532,7 @@ public class SecDealPreprocessingBookService {
             //投资目的					交易明细.投资目的
             入账查询参数.put("invAim", dealNow.getInvAim());
             //业务类型					数据字典：业务类型.债券交易
-            入账查询参数.put("busiType", DictCodeList.业务类型_银行间债券交易.getValue());
+            入账查询参数.put("busiType", DictCodeList.业务类型_债券交易.getValue());
             //交易方向					数据字典：交易方向.收息到账
             入账查询参数.put("ps", DictCodeList.交易方向_还本到账.getValue());
             //分支序号					交易明细.分支序号
@@ -938,7 +938,7 @@ public class SecDealPreprocessingBookService {
             //投资目的					交易明细.投资目的
             入账查询参数.put("invAim", dealNow.getInvAim());
             //业务类型					数据字典：业务类型.债券交易
-            入账查询参数.put("busiType", DictCodeList.业务类型_银行间债券交易.getValue());
+            入账查询参数.put("busiType", DictCodeList.业务类型_债券交易.getValue());
             //交易方向					数据字典：交易方向.收息到账
             入账查询参数.put("ps", DictCodeList.交易方向_收息到账.getValue());
             //分支序号					交易明细.分支序号
@@ -1727,7 +1727,7 @@ public class SecDealPreprocessingBookService {
             //投资目的					交易明细.投资目的
             入账查询参数.put("invAim", dealNow.getInvAim());
             //业务类型					数据字典：业务类型.债券交易
-            入账查询参数.put("busiType", DictCodeList.业务类型_银行间债券交易.getValue());
+            入账查询参数.put("busiType", DictCodeList.业务类型_债券交易.getValue());
             //交易方向					数据字典：交易方向.收息到账
             入账查询参数.put("ps", DictCodeList.交易方向_还本到账.getValue());
             //分支序号					交易明细.分支序号
@@ -2389,7 +2389,7 @@ public class SecDealPreprocessingBookService {
             //投资目的					交易明细.投资目的
             入账查询参数.put("invAim", dealNow.getInvAim());
             //业务类型					数据字典：业务类型.债券交易
-            入账查询参数.put("busiType", DictCodeList.业务类型_银行间债券交易.getValue());
+            入账查询参数.put("busiType", DictCodeList.业务类型_债券交易.getValue());
             //交易方向					数据字典：交易方向.收息到账
             入账查询参数.put("ps", DictCodeList.交易方向_还本到账.getValue());
             //分支序号					交易明细.分支序号

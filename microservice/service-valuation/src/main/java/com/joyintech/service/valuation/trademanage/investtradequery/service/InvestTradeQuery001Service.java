@@ -70,7 +70,7 @@ public class InvestTradeQuery001Service extends CommonExportService<InvestTradeD
         if(StringUtils.isNotEmpty(paAsset)){
 //            queryTypeList.add(DictCodeList.业务类型_债券买断式回购交易.getValue());
 //            queryTypeList.add(DictCodeList.业务类型_债券质押式回购交易.getValue());
-            queryTypeList.add(DictCodeList.业务类型_银行间债券交易.getValue());
+            queryTypeList.add(DictCodeList.业务类型_债券交易.getValue());
             queryTypeList.add(DictCodeList.业务类型_债券交易预处理.getValue());
             queryTypeList.add(DictCodeList.业务类型_债券借贷交易.getValue());
 //            queryTypeList.add(DictCodeList.业务类型_交易所债券交易.getValue());
