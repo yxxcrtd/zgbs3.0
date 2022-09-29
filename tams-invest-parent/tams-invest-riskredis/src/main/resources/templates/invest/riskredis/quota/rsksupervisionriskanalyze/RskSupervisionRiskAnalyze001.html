@@ -22,7 +22,7 @@
                         <div class="layui-input-inline input-inline">
                             <select type="text" class="layui-input form-input input-select" id="groupName"
                                    data-th-value="${portfolioId}" name="groupName"
-                                   formatOption="false"
+                                   formatOption="false" multiple = "true"
                                     data-th-data-url="@{/invest/riskredis/quota/rsksupervisionriskanalyze/RskSupervisionRiskAnalyze001/selectGroupName}"></select>
                         </div>
                     </div>
@@ -31,7 +31,7 @@
                                data-th-text="#{RskSupervisionRiskAnalyze001.indName}">指标名称</label>
                         <div class="layui-input-inline input-inline">
                             <select type="text" class="layui-input form-input input-select" allowClear="true"
-                                   id="indName" name="indName" formatOption="false"
+                                   id="indName" name="indName" formatOption="false" multiple = "true"
                                     data-th-data-url="@{/invest/riskredis/quota/rsksupervisionriskanalyze/RskSupervisionRiskAnalyze001/selectIndName}" ></select>
                         </div>
                     </div>
