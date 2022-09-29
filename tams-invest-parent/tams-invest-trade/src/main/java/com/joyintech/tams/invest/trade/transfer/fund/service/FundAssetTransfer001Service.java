@@ -439,7 +439,7 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
                 }
             }
         }
-        this.doDelete(workflowId);
+        this.doUpdateDelete(workflowId);
 
         if (StringUtil.equals(dto.getTradeMarket(), 交易场所_上海证券交易所.getValue())
                 || StringUtil.equals(dto.getTradeMarket(), 交易场所_深圳证券交易所.getValue())) {
@@ -1228,7 +1228,7 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
         if (!StringUtil.equals("revoke", dto.getOperateType())
                 && !StringUtil.equals("delete", dto.getOperateType())) {
             // 先删除流程中数据
-            this.doDelete(dto.getWorkflowId());
+            this.doUpdateDelete(dto.getWorkflowId());
             ProcessMark newEntity = null;
             try {
                 newEntity = WorkFlowUtil.getBusinessObjectFromRequest(FundAssetTransfer001Dto.class, true);
@@ -1300,15 +1300,18 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
     @Override
     public void doDelete(String workflowId) {
         baseTradeProductDealCommService.deleteWflData(workflowId);
-        // SZYHTGXM-770： 退回后修改，不属于作废流程，无需调用作废接口
         //增加调用头寸引擎代码start
-        /*ProcessMark processMark = mstWorkflowCommonServiceMapperImpl.getBusinessInfo(workflowId);
+        ProcessMark processMark = mstWorkflowCommonServiceMapperImpl.getBusinessInfo(workflowId);
         if (StringUtil.isNotEmpty(processMark)
                 && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
             FundAssetTransfer001Dto entity = getBussinessEntityByWorkflowId(workflowId);
             positionRequestService.sendDelete(entity);
-        }*/
+        }
         //增加调用头寸引擎代码end
+    }
+	
+	private void doUpdateDelete(String workflowId) {
+        baseTradeProductDealCommService.deleteWflData(workflowId);
     }
 
     @Override
