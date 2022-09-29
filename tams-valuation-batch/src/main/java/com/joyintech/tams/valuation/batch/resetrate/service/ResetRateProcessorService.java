@@ -87,7 +87,7 @@ public class ResetRateProcessorService extends BaseService{
         FinRateInfoDto  finRateInfoDto = readerResult.getFinRateInfoDto();
         List<FinCashCalcRuleDto> finCashCalcRuleList = new ArrayList<FinCashCalcRuleDto>();
         //债券
-        if(StringUtil.equals(finRateInfoDto.getFinprodType(), DictCodeList.业务类型_银行间债券交易.getValue())){
+        if(StringUtil.equals(finRateInfoDto.getFinprodType(), DictCodeList.业务类型_债券交易.getValue())){
             finCashCalcRuleList = encapFinCashCalcRule1(finRateInfoDto,batchExecuteInfo);
         }else{
             if(StringUtil.equals(finRateInfoDto.getResetType(), DictCodeList.重置类型_基准利率调整规则_基准利率变动后固定间隔生效.getValue())){

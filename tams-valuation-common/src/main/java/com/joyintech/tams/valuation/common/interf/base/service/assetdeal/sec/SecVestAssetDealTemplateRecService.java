@@ -367,7 +367,7 @@ public class SecVestAssetDealTemplateRecService {
         // 交易编号 = 共通生成
         valFinProductDeal.setTradeId(tradeId);
         // 交易场所为银行间则业务类型为债券交易，反之为交易场所债券
-	    valFinProductDeal.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+	    valFinProductDeal.setBusiType(DictCodeList.业务类型_债券交易.getValue());
         // 金融产品代码 = A.资产代码
         valFinProductDeal.setFinprodId(dto.getAssetId());
         // 金融产品类型 = F01 债券
