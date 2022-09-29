@@ -73,7 +73,7 @@
     <select id="findUnTransPage" resultType="com.joyintech.service.trade.transfer.assetstransfer.dto.AssetsTransferDto">
         select * from (
         SELECT
-        T.portfolioId,T.portfolioName,T.assetType,T.finprodMarketId,T.finprodName,T.chlId,T.chlName,T.secAcctId,T.secAcctName,T.vdate,T.mdate,
+        T.portfolioId,T.portfolioName,T.assetType,T.finprodMarketId, T.isRight, T.finprodName,T.chlId,T.chlName,T.secAcctId,T.secAcctName,T.vdate,T.mdate,
         T.ps,T.days,T.yield,T.amount,T.printAmt,T.posAmt,T.finprodType2,T.finprodId,T.profitType,T.tradeId,T.calendarId,T.ccy,T.invAim,T.backLendDirection
         FROM (
         <if test="tradeId == null or tradeId == ''">
@@ -82,13 +82,17 @@
             PTL_PORTFOLIO.PORTFOLIO_NAME AS portfolioName,
             FIN_PRODUCT_TYPE.TYPE_8 AS assetType,
             FIN_PRODUCT.FINPROD_MARKET_ID AS finprodMarketId,
+            FIN_PRODUCT.IS_RIGHT AS isRight,
             STL_SEC_ACCT_INFO.SEC_ACCT_ID AS secAcctId,
-            case
-            when FIN_PRODUCT_TYPE.TYPE_8 in (#{PINAN_ASSET_TYPE_F02},#{PINAN_ASSET_TYPE_F01}) then
-            FIN_PRODUCT.FINPROD_ABBR
-            else FIN_PRODUCT.FINPROD_NAME end AS finprodName,
-            CHL.FINPROD_ID AS chlId,
-            CHL.FINPROD_NAME AS chlName,
+            NVL(FIN_PRODUCT.FINPROD_ABBR,FIN_PRODUCT.FINPROD_NAME) finprodName,
+<!--            case-->
+<!--            when FIN_PRODUCT_TYPE.TYPE_8 in (#{PINAN_ASSET_TYPE_F02},#{PINAN_ASSET_TYPE_F01}) then-->
+<!--            FIN_PRODUCT.FINPROD_ABBR-->
+<!--            else FIN_PRODUCT.FINPROD_NAME end AS finprodName,-->
+<!--            CHL.FINPROD_ID AS chlId,-->
+<!--            CHL.FINPROD_NAME AS chlName,-->
+            null AS chlId,
+            null AS chlName,
             STL_SEC_ACCT_INFO.SEC_ACCT_NAME AS secAcctName,
             FIN_PRODUCT.VDATE AS vdate,
             FIN_PRODUCT.MDATE AS mdate,
@@ -122,20 +126,20 @@
             FROM PTL_SEC_POSITION
             INNER JOIN PTL_PORTFOLIO ON PTL_SEC_POSITION.PORTFOLIO_ID = PTL_PORTFOLIO.PORTFOLIO_ID
             INNER JOIN FIN_PRODUCT ON PTL_SEC_POSITION.FINPROD_ID = FIN_PRODUCT.FINPROD_ID
-            LEFT JOIN FIN_PRODUCT_ADD ON FIN_PRODUCT.FINPROD_ID =  FIN_PRODUCT_ADD.FINPROD_ID
+            INNER JOIN FIN_PRODUCT_ADD ON FIN_PRODUCT.FINPROD_ID =  FIN_PRODUCT_ADD.FINPROD_ID
             INNER JOIN FIN_PRODUCT_TYPE
             ON FIN_PRODUCT_TYPE.FINPROD_ID = FIN_PRODUCT.FINPROD_ID AND FIN_PRODUCT_TYPE.TYPE_8 IS NOT NULL AND
             FIN_PRODUCT_TYPE.BRANCH = 0
-            LEFT JOIN FIN_PRODUCT CHL
-            ON PTL_SEC_POSITION.SEC_ACCT_ID != '999999' AND CHL.FINPROD_ID = PTL_SEC_POSITION.SEC_ACCT_ID AND
-            CHL.IS_CHL = 'Y'
+<!--            LEFT JOIN FIN_PRODUCT CHL-->
+<!--            ON PTL_SEC_POSITION.SEC_ACCT_ID != '999999' AND CHL.FINPROD_ID = PTL_SEC_POSITION.SEC_ACCT_ID AND-->
+<!--            CHL.IS_CHL = 'Y'-->
             LEFT JOIN STL_SEC_ACCT_INFO on STL_SEC_ACCT_INFO.SEC_ACCT_ID = PTL_SEC_POSITION.SEC_ACCT_ID AND
             PTL_SEC_POSITION.SEC_ACCT_ID != '999999'
             LEFT JOIN (<include refid="getYield"/>) YIELD ON YIELD.FINPROD_ID = PTL_SEC_POSITION.FINPROD_ID
             WHERE PTL_SEC_POSITION.HODING_TYPE = #{POSITION_TYPE_03}
             AND PTL_SEC_POSITION.CDATE = TO_DATE(#{searchDate},'yyyy-MM-dd')
-            AND PTL_PORTFOLIO.PORTFOLIO_TYPE = #{PORTFOLIO_TYPE_01}
-            AND (FIN_PRODUCT_ADD.IS_ISSUE_ASSET IS NULL OR FIN_PRODUCT_ADD.IS_ISSUE_ASSET = 'N')
+<!--            AND PTL_PORTFOLIO.PORTFOLIO_TYPE = #{PORTFOLIO_TYPE_01}-->
+<!--            AND (FIN_PRODUCT_ADD.IS_ISSUE_ASSET IS NULL OR FIN_PRODUCT_ADD.IS_ISSUE_ASSET = 'N')-->
             <if test="assetTypeList != null and assetTypeList.size() >0">
                 <foreach collection="assetTypeList" index="index" item="item" open="AND FIN_PRODUCT_TYPE.TYPE_8 IN ("
                          separator="," close=")">
@@ -149,7 +153,12 @@
             <if test="portfolioCode != null and portfolioCode != ''">
                 AND PTL_PORTFOLIO.PORTFOLIO_ID = #{portfolioCode,jdbcType=VARCHAR}
             </if>
-
+<!--       备注：苏州银行、九江银行加这条件-->
+            and ( FIN_PRODUCT.FINPROD_TYPE2 = 'F01'
+            or (FIN_PRODUCT.FINPROD_TYPE2 in ('F07','F17','F18') and FIN_PRODUCT_ADD.IS_INNER_ADV = 'Y')
+            or (FIN_PRODUCT.FINPROD_TYPE2 = 'F06' and FIN_PRODUCT.TRADE_MARKET = '09' and FIN_PRODUCT_ADD.IS_INNER_ADV = 'Y')
+            or (FIN_PRODUCT.FINPROD_TYPE2 = 'F06' and FIN_PRODUCT.TRADE_MARKET != '09')
+            )
 
         </if>
     <!-- UNION ALL
@@ -1451,12 +1460,18 @@
         select distinct * from (
         SELECT f1.FINPROD_MARKET_ID id, nvl(f1.FINPROD_ABBR,f1.FINPROD_NAME) text
         FROM FIN_PRODUCT f1
-        left join FIN_PRODUCT_TYPE f2
-        on f1.FINPROD_ID=f2.FINPROD_ID
-        WHERE f2.type_8 in
-        <foreach collection="type8List" item="item" separator="," open="(" close=")">
-            #{item}
-        </foreach>
+        inner join FIN_PRODUCT_TYPE f2 on f1.FINPROD_ID=f2.FINPROD_ID and f2.type_8 IS NOT NULL
+        inner join FIN_PRODUCT_ADD f3 on f1.FINPROD_ID=f3.FINPROD_ID
+        WHERE f1.FINPROD_TYPE2 in ('F01','F06','F07','F17','F18')
+        and ( f1.FINPROD_TYPE2 = 'F01'
+           or (f1.FINPROD_TYPE2 in ('F07','F17','F18') and f3.IS_INNER_ADV = 'Y')
+           or (f1.FINPROD_TYPE2 = 'F06' and f1.TRADE_MARKET = '09' and f3.IS_INNER_ADV = 'Y')
+           or (f1.FINPROD_TYPE2 = 'F06' and f1.TRADE_MARKET != '09')
+        )
+<!--        f2.type_8 in-->
+<!--        <foreach collection="type8List" item="item" separator="," open="(" close=")">-->
+<!--            #{item}-->
+<!--        </foreach>-->
         <if test="search != null and search != ''">
             AND (f1.FINPROD_MARKET_ID LIKE CONCAT('%',CONCAT(#{search},'%'))
             OR f1.FINPROD_NAME LIKE CONCAT('%',CONCAT(#{search},'%'))
@@ -1468,39 +1483,40 @@
                 #{item}
             </foreach>
         </if>
-        UNION ALL
-        SELECT f1.FINPROD_MARKET_ID id, nvl(f1.FINPROD_ABBR,f1.FINPROD_NAME) text
-        FROM FIN_PRODUCT f1
-        left join FIN_PRODUCT_TYPE f2
-        on f1.FINPROD_ID=f2.FINPROD_ID
-        <!-- 多级法人改造 add by jingqiongqiong 20200615 -->
-        <if test="institutionCode != null and institutionCode != ''">
-            INNER JOIN DATA_AUTH_NOTIFY_INST dani on dani.BUSINESS_ID = f1.FINPROD_ID AND dani.MODEL_TYPE='02'
-            <!--多级法人改造 add by jingqiongqiong 20200617-->
-            <if test="resourcesTreeInstCodeList != null and resourcesTreeInstCodeList.size() > 0">
-                AND dani.INSTITUTION_CODE IN
-                <foreach collection="resourcesTreeInstCodeList" item="item" open="(" close=")" separator=",">
-                    #{item}
-                </foreach>
-            </if>
-            <!--多级法人改造 add by jingqiongqiong 20200617-->
-        </if>
-        WHERE f2.type_8 in
-        <foreach collection="type8List" item="item" separator="," open="(" close=")">
-            #{item}
-        </foreach>
-        <if test="assetTypeList!=null and assetTypeList.size() >0 ">
-            and f2.type_8 in
-            <foreach collection="assetTypeList" item="item" open="(" close=")" separator=",">
-                #{item}
-            </foreach>
-        </if>
-        <!-- 多级法人改造 add by jingqiongqiong 20200615 -->
-        <if test="search != null and search != ''">
-            AND (f1.FINPROD_MARKET_ID LIKE CONCAT('%',CONCAT(#{search},'%'))
-            OR f1.FINPROD_NAME LIKE CONCAT('%',CONCAT(#{search},'%'))
-            OR f1.FINPROD_ABBR LIKE CONCAT('%',CONCAT(#{search},'%')))
-        </if>
+<!--      苏州银行、九江银行需求  -->
+<!--        UNION ALL-->
+<!--        SELECT f1.FINPROD_MARKET_ID id, nvl(f1.FINPROD_ABBR,f1.FINPROD_NAME) text-->
+<!--        FROM FIN_PRODUCT f1-->
+<!--        left join FIN_PRODUCT_TYPE f2-->
+<!--        on f1.FINPROD_ID=f2.FINPROD_ID-->
+<!--        &lt;!&ndash; 多级法人改造 add by jingqiongqiong 20200615 &ndash;&gt;-->
+<!--        <if test="institutionCode != null and institutionCode != ''">-->
+<!--            INNER JOIN DATA_AUTH_NOTIFY_INST dani on dani.BUSINESS_ID = f1.FINPROD_ID AND dani.MODEL_TYPE='02'-->
+<!--            &lt;!&ndash;多级法人改造 add by jingqiongqiong 20200617&ndash;&gt;-->
+<!--            <if test="resourcesTreeInstCodeList != null and resourcesTreeInstCodeList.size() > 0">-->
+<!--                AND dani.INSTITUTION_CODE IN-->
+<!--                <foreach collection="resourcesTreeInstCodeList" item="item" open="(" close=")" separator=",">-->
+<!--                    #{item}-->
+<!--                </foreach>-->
+<!--            </if>-->
+<!--            &lt;!&ndash;多级法人改造 add by jingqiongqiong 20200617&ndash;&gt;-->
+<!--        </if>-->
+<!--        WHERE f2.type_8 in-->
+<!--        <foreach collection="type8List" item="item" separator="," open="(" close=")">-->
+<!--            #{item}-->
+<!--        </foreach>-->
+<!--        <if test="assetTypeList!=null and assetTypeList.size() >0 ">-->
+<!--            and f2.type_8 in-->
+<!--            <foreach collection="assetTypeList" item="item" open="(" close=")" separator=",">-->
+<!--                #{item}-->
+<!--            </foreach>-->
+<!--        </if>-->
+<!--        &lt;!&ndash; 多级法人改造 add by jingqiongqiong 20200615 &ndash;&gt;-->
+<!--        <if test="search != null and search != ''">-->
+<!--            AND (f1.FINPROD_MARKET_ID LIKE CONCAT('%',CONCAT(#{search},'%'))-->
+<!--            OR f1.FINPROD_NAME LIKE CONCAT('%',CONCAT(#{search},'%'))-->
+<!--            OR f1.FINPROD_ABBR LIKE CONCAT('%',CONCAT(#{search},'%')))-->
+<!--        </if>-->
         )
     </select>
     

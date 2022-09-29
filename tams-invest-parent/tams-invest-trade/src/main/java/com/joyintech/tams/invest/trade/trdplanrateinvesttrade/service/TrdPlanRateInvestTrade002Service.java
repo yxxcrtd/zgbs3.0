@@ -1899,7 +1899,9 @@ public class TrdPlanRateInvestTrade002Service extends CommonExportService<TrdPla
     @Override
     public void doBack(TrdPlanRateInvestTradeDto entity) {
         AllTradeCommonUtil.deletePosition(entity.getCancelRemark(), entity.getTotleTradeId());
-        AllTradeCommonUtil.deletePosition(entity.getCancelRemark(), entity.getTradeId());
+        if (null != entity.getTradeId()) {
+            AllTradeCommonUtil.deletePosition(entity.getCancelRemark(), entity.getTradeId());
+        }
 
         //删除授信占用
         if (null != entity.getTradeId() && !"".equals(entity.getTradeId()) && !StringUtil.isNotEmpty(entity.getCancelRemark())){

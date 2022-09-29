@@ -27,15 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -180,6 +172,15 @@ public class PositionInfoService {
                 positionQueryDto.setCdate(iPlatformDate.getSysDate());
                 // 实际现金（账户现金）
                 realCash = ArithmeticUtil.doAdd(realCash, basePtlCashPositionInfoService.queryUsableCashPosition(positionQueryDto));
+                BaseMap inMap = BaseMap.newMap()
+                    .put("S_004", DictCodeListExt3.资产类型_汇总可用现金.getValue())
+                    .put("C_01", DictCodeListExt3.资产类型_现金账户持仓.getValue())
+                    .put("portfolioIdList", Arrays.asList(portfolioId))
+                    .put("cdate", cdate)
+                    .put("acctId", acctId);
+                Map map = positionInfoMapper.queryEtrAvailableCash(inMap);
+                BaseMap outMap = BaseMap.newMap(map);
+                realCash =ArithmeticUtil.doAdd(realCash, outMap.getBigDecimal("ZHXJ"));
             }
         }
 
@@ -421,6 +422,7 @@ public class PositionInfoService {
                 positionQueryDto2.setPortfolioId(portfolioId);
                 positionQueryDto2.setCcy(DictCodeList.币种_人民币_CNY.getValue());
                 positionQueryDto2.setCdate(iPlatformDate.getSysDate());
+                positionQueryDto2.setAcctType(acctTypeList);
                 // 实际现金（账户现金）
                 realCash = ArithmeticUtil.doAdd(realCash, basePtlCashPositionInfoService.queryUsableCashPosition(positionQueryDto2));
 

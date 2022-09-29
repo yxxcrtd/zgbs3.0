@@ -4,12 +4,14 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.riskrds.limitmanagement.rsksupervisionriskanalyze.dao.RskSupervisionRiskAnalyzeMapper;
 import com.joyintech.service.riskrds.limitmanagement.rsksupervisionriskanalyze.dto.RskSupervisionRiskAnalyzeDto;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +44,12 @@ public class RskSupervisionRiskAnalyzeService extends BaseService<RskSupervision
                                                             Map<String, Object> pageParam){
         pageParam.put("PORTFOLIO_LEVEL_01", BussinessDictCodeListRds.组合层次_单组合.getValue());
         pageParam.put("PORTFOLIO_LEVEL_02", BussinessDictCodeListRds.组合层次_组合包.getValue());
+        if (StringUtil.isNotEmpty(pageParam.get("indName"))){
+            pageParam.put("indNameList", Arrays.asList(pageParam.get("indName").toString().split(",")));
+        }
+        if (StringUtil.isNotEmpty(pageParam.get("groupName"))){
+            pageParam.put("groupNameList", Arrays.asList(pageParam.get("groupName").toString().split(",")));
+        }
         return super.queryForPage(page, length,
             () -> rskSupervisionRiskAnalyzeMapper.select(pageParam));
     }
@@ -75,11 +83,11 @@ public class RskSupervisionRiskAnalyzeService extends BaseService<RskSupervision
         return this.queryForPageForSelectReturn(page, length, ()-> rskSupervisionRiskAnalyzeMapper.selectByUserName(pageParam));
     }
 
-    public  List<SuggestDto>  selectIndName(Map<String, Object> map) {
-        return rskSupervisionRiskAnalyzeMapper.selectIndName(map);
+    public  Page<SelectOptionDto>  selectIndName(Map<String, Object> map, int page, int length) {
+        return this.queryForPageForSelectReturn(page, length, ()-> rskSupervisionRiskAnalyzeMapper.selectIndName(map));
     }
 
-    public  List<SuggestDto>  selectGroupName(Map<String, Object> map) {
-        return rskSupervisionRiskAnalyzeMapper.selectGroupName(map);
+    public  Page<SelectOptionDto>  selectGroupName(Map<String, Object> map, int page, int length) {
+        return this.queryForPageForSelectReturn(page, length, ()-> rskSupervisionRiskAnalyzeMapper.selectGroupName(map));
     }
 }

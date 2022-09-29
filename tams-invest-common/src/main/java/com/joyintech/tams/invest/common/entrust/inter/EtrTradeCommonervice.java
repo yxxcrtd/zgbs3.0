@@ -1,5 +1,6 @@
 package com.joyintech.tams.invest.common.entrust.inter;
 
+import com.alibaba.fastjson.JSON;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.util.*;
@@ -31,6 +32,7 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 公共方法service
@@ -198,7 +200,7 @@ public class EtrTradeCommonervice extends BaseService {
                                     BeanUtil.copyPropertiesIgnoreNull(cashSecDto, dto); //复制资产信息
                                     cashSecDto.setFinprodId(finProduct.getFinprodId());
                                     cashSecDto.setFinprodType2(finProduct.getFinprodType2());
-                                    handleSecType(cashSecDto);
+                                    handleSecType(cashSecDto, null);
                                     secList.add(cashSecDto);
                                 }
                             }
@@ -206,7 +208,7 @@ public class EtrTradeCommonervice extends BaseService {
                     } else {
                         PositionCashSecDto cashSecDto = new PositionCashSecDto();
                         BeanUtil.copyPropertiesIgnoreNull(cashSecDto, dto); //复制资产信息
-                        handleSecType(cashSecDto);
+                        handleSecType(cashSecDto, null);
                         secList.add(cashSecDto);
                     }
                     //XYHGFXSJ-1056 【协议回购指令】深交所正回购，头寸展示区域，可质押数量、持仓数量，若存在多个质押券，选择组合、账户和资产后，应汇总展示
@@ -357,7 +359,7 @@ public class EtrTradeCommonervice extends BaseService {
                 if (StringUtil.isNotEmpty(dto.getFinprodId()) && StringUtil.isNotEmpty(dto.getSecAcctId())) {
                     PositionCashSecDto cashSecDto = new PositionCashSecDto();
                     BeanUtil.copyPropertiesIgnoreNull(cashSecDto, dto); //复制资产信息
-                    handleSecType(cashSecDto);
+                    handleSecType(cashSecDto, null);
                     secList.add(cashSecDto);
                     // modify by swwan 2022-06-28 TISHKS-1434 start
                     requestDto.setPtlList(secList);  //覆盖请求参数，非交易平台赋值了
@@ -632,6 +634,37 @@ public class EtrTradeCommonervice extends BaseService {
     /**
      * 从头寸引擎查询现金持仓余额
      *
+     * @param ptList
+     * @return
+     */
+    public List<PositionCashSecDto> queryPositionBatch(List<PositionCashSecDto> ptList, String flowType, String positionType) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("ptlList", buildPosition(ptList, flowType, positionType));
+        String msg = positionRequestHandle.queryPosition(map);
+        BaseMap bm = JsonUtils.json2Object(msg, BaseMap.class);
+        if (bm != null && StringUtil.equals("success", bm.getString("code"))) {
+            List<PositionCashSecDto> list = JSON.parseArray(JSON.toJSONString(bm.get("data")), PositionCashSecDto.class);
+            //债券持仓除以100
+            if(!CollectionUtils.isEmpty(list)){
+                for(PositionCashSecDto positionCashSecDto : list){
+                    if ((DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(positionCashSecDto.getFinprodType2())
+                            || DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(positionCashSecDto.getFinprodType2())
+                            || DictCodeListExt1.金融产品类型_投管用_信用保护凭证.getValue().equals(positionCashSecDto.getFinprodType2())
+                            || DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(positionCashSecDto.getFinprodType2())
+                            || "ZYSHG".equals(positionCashSecDto.getFinprodType2()))
+                            && (StringUtil.equals(flowType, "02") || StringUtil.equals(flowType, "04"))){
+                        positionCashSecDto.setAMOUNT(ArithmeticUtil.divide(positionCashSecDto.getAMOUNT(), 100, 0));
+                    }
+                }
+                return list;
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * 从头寸引擎查询现金持仓余额
+     *
      * @param ptlList
      * @return
      */
@@ -653,14 +686,22 @@ public class EtrTradeCommonervice extends BaseService {
                     dto.setPositionType(positionType);
                 }
                 //现金 01 指令现金 02 指令持仓 03 交易现金 04 交易持仓
-                if (StringUtil.equals(flowType, "01") || StringUtil.equals(flowType, "03")) {
+//                if (StringUtil.equals(flowType, "01") || StringUtil.equals(flowType, "03")) {
+                if(StringUtil.isNotEmpty(temp.getAcctId())){
                     dto.setCashAcctId(temp.getAcctId());
                 }
+//                }
                 //持仓
-                if ((StringUtil.equals(flowType, "02") || StringUtil.equals(flowType, "04"))) {
+//                if ((StringUtil.equals(flowType, "02") || StringUtil.equals(flowType, "04"))) {
+                if(StringUtil.isNotEmpty(temp.getSecAcctId())){
                     dto.setSecAcctId(temp.getSecAcctId());
+                }
+                if(StringUtil.isNotEmpty(temp.getFinprodId())){
                     dto.setFinprodId(temp.getFinprodId());
                 }
+//                }
+                // 资产类型
+                dto.setFinprodType2(temp.getFinprodType2());
                 list.add(dto);
             }
             return list;
@@ -822,7 +863,7 @@ public class EtrTradeCommonervice extends BaseService {
             PositionCashSecDto cashSecDto = new PositionCashSecDto();
             BeanUtil.copyPropertiesIgnoreNull(cashSecDto, dto); //复制资产信息
             if (StringUtil.isEmpty(dto.getHoldingType())) {
-                handleSecType(cashSecDto);
+                handleSecType(cashSecDto, null);
             }
             secList.add(cashSecDto);
         }
@@ -833,8 +874,34 @@ public class EtrTradeCommonervice extends BaseService {
         return canSec;
     }
 
+    /**
+     * 批量查询持仓
+     * @param positionCashSecDtos
+     * @return
+     */
+    public List<PositionCashSecDto> selectAvailableNumBatch(List<PositionCashSecDto> positionCashSecDtos) {
+        if(CollectionUtils.isEmpty(positionCashSecDtos)){
+            return new ArrayList<>();
+        }
+        List<String> finprodIds = positionCashSecDtos.stream()
+                .map(PositionCashSecDto::getFinprodId)
+                .distinct()
+                .collect(Collectors.toList());
+        List<FinProductAdd> finProductAdds = etrTrdCommonMapper.getFinProductAddBatch(finprodIds);
+        Map<String, FinProductAdd> finProductAddMap  = finProductAdds
+                .stream()
+                .collect(Collectors.toMap(FinProductAdd::getFinprodId, finProductAdd -> finProductAdd));
+        for(PositionCashSecDto positionCashSecDto : positionCashSecDtos){
+            if (StringUtil.isEmpty(positionCashSecDto.getHoldingType())) {
+                FinProductAdd finProductAdd = finProductAddMap.get(positionCashSecDto.getFinprodId());
+                handleSecType(positionCashSecDto, finProductAdd);
+            }
+        }
+        return queryPositionBatch(positionCashSecDtos, "02", "");
+    }
+
     //可用可用持仓类型
-    public void handleSecType(PositionCashSecDto dto) {
+    public void handleSecType(PositionCashSecDto dto, FinProductAdd finProductAdd) {
         if (StringUtil.equals(DictCodeList.交易平台_综合协议交易平台.getValue(), dto.getTradePlat())) {
             dto.setTradePlat(DictCodeList.交易平台_大宗交易平台.getValue());
         }
@@ -846,7 +913,9 @@ public class EtrTradeCommonervice extends BaseService {
             if (dto.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
                 //是否纳入净额结算 Y:是 N:否
                 String isNetSett = "";
-                FinProductAdd finProductAdd = finProductAddMapper.selectByPrimaryKey(dto.getFinprodId());
+                if(finProductAdd == null){
+                    finProductAdd = finProductAddMapper.selectByPrimaryKey(dto.getFinprodId());
+                }
                 if (finProductAdd != null) {
                     //  是否非担保
                     String isNoGuard = finProductAdd.getIsNoGuard();
@@ -1072,7 +1141,7 @@ public class EtrTradeCommonervice extends BaseService {
                 if (StringUtil.isNotEmpty(dto.getFinprodId()) && StringUtil.isNotEmpty(dto.getSecAcctId())) {
                     PositionCashSecDto cashSecDto = new PositionCashSecDto();
                     BeanUtil.copyPropertiesIgnoreNull(cashSecDto, dto); //复制资产信息
-                    handleSecType(cashSecDto);
+                    handleSecType(cashSecDto, null);
                     secList.add(cashSecDto);
                 }
             }
@@ -1166,6 +1235,71 @@ public class EtrTradeCommonervice extends BaseService {
                 .put("amount", bm.get(usableSec) == null ? 0 : bm.get(usableSec)));
 
         return resp;
+    }
+
+    /**
+     * 组合现金可用
+     */
+    public BigDecimal queryPositionAvailableCash(PositionCashSecRequest requestDto) {
+        // 条件非空校验
+        posiInfoCheckCondition(requestDto);
+
+        // 组合现金可用
+        BigDecimal portfolioCash = BigDecimal.ZERO;
+
+        if (requestDto.getPtlList() == null || requestDto.getPtlList().size() == 0) {
+            return portfolioCash;
+        }
+
+        List<PositionCashSecDto> list = requestDto.getPtlList();
+        String flowType = requestDto.getFlowType();
+        if (!CollectionUtils.isEmpty(list)) {
+            //查询组合下所有现金账户
+            List<PositionCashSecDto> sumPortfolioAcctNoList = new ArrayList<>();
+            for (PositionCashSecDto dto : list) {
+                if (StringUtil.isEmpty(dto.getPortfolioId())) {
+                    continue;
+                }
+                if (StringUtil.isEmpty(dto.getCdate())) {
+                    dto.setCdate(iPlatformDate.getSysDateStr());
+                }
+                List<String> acctTypeList = new ArrayList<>();
+                acctTypeList.add(BussinessDictCodeList.资金账户类型_托管账户.getValue());
+//                acctTypeList.add(BussinessDictCodeList.资金账户类型_交易所资金账户.getValue());
+                List<PtlCapacctInfo> acctNoList = etrTrdCommonMapper.getPtlAcctInfo(dto.getPortfolioId(), acctTypeList);
+                if (!CollectionUtils.isEmpty(acctNoList)) {
+                    for (PtlCapacctInfo ptlCapacctInfo : acctNoList) {
+                        PositionCashSecDto cashSecDto = new PositionCashSecDto();
+                        BeanUtil.copyPropertiesIgnoreNull(cashSecDto, dto); //复制资产信息
+                        cashSecDto.setAcctId(ptlCapacctInfo.getAcctNo());
+                        if (StringUtil.equals(BussinessDictCodeList.资金账户类型_托管账户.getValue(), ptlCapacctInfo.getAcctType())) {
+                            cashSecDto.setHoldingType(DictCodeListExt3.资产类型_托管户可用资金.getValue());
+                        }
+                        sumPortfolioAcctNoList.add(cashSecDto);
+                    }
+                }
+            }
+            //组合资金可用
+            BigDecimal oldPortfolioAmount = BigDecimal.ZERO;
+            for (PositionCashSecDto dto : list) {
+                if (StringUtil.isEmpty(dto.getPortfolioId())) {
+                    continue;
+                }
+                if (StringUtil.isEmpty(dto.getCdate())) {
+                    dto.setCdate(iPlatformDate.getSysDateStr());
+                }
+                oldPortfolioAmount = oldPortfolioAmount.add(getPortfolioAvailableCashForChangnei(dto.getPortfolioId()));
+            }
+            if (!CollectionUtils.isEmpty(sumPortfolioAcctNoList)) {
+                //组合资金可用 2、新头寸引擎
+                BigDecimal newPortfolioAmount = queryPosition(sumPortfolioAcctNoList, flowType, DictCodeListExt3.资产类型_托管户可用资金.getValue());
+                if (newPortfolioAmount != null) {
+                    portfolioCash = ArithmeticUtil.doAdd(oldPortfolioAmount, newPortfolioAmount);
+                }
+            }
+        }
+
+        return portfolioCash;
     }
 
 }

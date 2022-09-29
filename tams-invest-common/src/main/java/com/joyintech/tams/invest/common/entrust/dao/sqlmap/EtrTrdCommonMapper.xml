@@ -42,4 +42,43 @@
     <select id="getFirstTradeAmtByTradeId" resultType="java.math.BigDecimal">
         select ftp.M_TRADE_AMT from FIN_TRADE_PRODUCT ftp where ftp.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
     </select>
+    <select id="getQsPtlAcctInfo" resultType="com.joyintech.tams.common.base.entity.StlCapacctInfo">
+        SELECT SAI.TRD_ACCT_ID     acctNo,
+               SAI.SEC_ACCT_NAME   acctName
+          FROM PTL_CAPACCT_INFO PCI
+         INNER JOIN PTL_SEC_ACCT PSA
+            ON PCI.PORTFOLIO_ID = PSA.PORTFOLIO_ID
+         INNER JOIN STL_SEC_ACCT_INFO SAI
+            ON PSA.ACCT_NO = SAI.SEC_ACCT_ID
+           AND PCI.ACCT_NO = SAI.REC_ACCT_ID
+         WHERE PSA.ACCT_NO = #{acctNo,jdbcType=VARCHAR}
+           AND PCI.ACCT_TYPE = 'A07'
+           AND PCI.PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+    </select>
+    <select id="getPtlAcctInfoByPortId" resultType="com.joyintech.framework.select.SelectOptionDto">
+        select DISTINCT t.ACCT_NO AS id, SCI.ACCT_NAME AS text
+          from PTL_CAPACCT_INFO t, STL_CAPACCT_INFO SCI
+         where T.ACCT_NO = SCI.ACCT_NO
+           and t.PORTFOLIO_ID = #{portfolioId}
+           <if test="acctTypeList != null and !acctTypeList.isEmpty() ">
+               <foreach collection="acctTypeList" open=" and ACCT_TYPE in (" close=")" item="item" separator=",">#{item}</foreach>
+           </if>
+    </select>
+
+    <select id="getFinProductAddBatch" resultType="com.joyintech.tams.common.base.entity.FinProductAdd">
+        select
+        <include refid="com.joyintech.tams.common.base.dao.FinProductAddMapper.Base_Column_List" />
+        from FIN_PRODUCT_ADD
+        where
+        1 = 1
+        <if test="finprodIds != null and !finprodIds.isEmpty() ">
+            AND FINPROD_ID in
+            <foreach collection="finprodIds" item="item" index="index" open="(" separator="," close=")">
+                <if test="(index % 999) == 998">
+                    null) OR FINPROD_ID in (
+                </if>
+                #{item}
+            </foreach>
+        </if>
+    </select>
 </mapper>

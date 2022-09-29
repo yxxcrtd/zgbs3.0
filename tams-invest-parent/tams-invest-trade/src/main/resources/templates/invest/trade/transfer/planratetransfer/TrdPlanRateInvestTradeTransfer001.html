@@ -19,6 +19,8 @@
                 <input type="text" id="finprodType" name="finprodType" data-th-value='${entity?.finprodType}' hidden>
                 <!-- 隐藏字段 通道费 -->
                 <input type="text" id="feeAmt" name="feeAmt" data-th-value='${entity?.feeAmt}' hidden>
+
+                <input type="text" id="invAim" name="invAim" data-th-value='${entity?.invAim}' hidden>
                 <!-- 隐藏字段 交易金额 -->
                 <input type="text" id="tradeAmt" name="tradeAmt" data-th-value='${entity?.tradeAmt}' hidden>
                 <!-- 隐藏字段 交易编号 -->
@@ -121,14 +123,14 @@
                                                data-textrange="4" data-th-value='${entity?.loadRate}'>
                                     </div>
                                 </div>
-                                <div class="form-inline-wrap">
+                                <!--<div class="form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap">通道</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" name="chlId" id="chlId"
                                                class="layui-input form-input" maxlength=60 disabled="disabled"
                                                data-th-value='${entity?.chlId}'>
                                     </div>
-                                </div>
+                                </div>-->
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap">本金金额</label>
                                     <div class="layui-input-inline input-inline">
@@ -225,28 +227,43 @@
                                                data-th-placeholder="#{SysCommon.placeholder}" data-textrange="2">
                                     </div>
                                 </div>
-                                <div class="form-inline-wrap" id="chlAvailable">
+                                <div class="form-inline-wrap" id="stlPayId_div" style="display:none">
+                                    <label class="layui-form-label form-label-wrap">划款指令编号</label>
+                                    <div class="layui-input-inline input-inline">
+                                        <input disabled type="text" id="stlPayId" name="stlPayId"
+                                               class="layui-input form-input" placeholder="请输入内容"
+                                               th:placeholder="#{SysCommon.placeholder}"
+                                               th:value="${entity?.tradeId}">
+                                    </div>
+                                </div>
+                                <!--div class="form-inline-wrap" id="chlAvailable">
                                     <label class="layui-form-label form-label-wrap">通道可用现金</label>
                                     <div class="layui-input-inline input-inline">
                                         <input type="text" id="chlAvailableAmt" name="chlAvailableAmt"
                                                class="layui-input form-input text-number" disabled="disabled"
                                                data-th-placeholder="#{SysCommon.placeholder}" data-textrange="2">
                                     </div>
+                                </div-->
+
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="form-inline-wrap">
+                                    <a id="TrdPlanRateInvestTradeTransfer001_btn_add"
+                                       class="layui-btn layui-btn-sm btn-create">添加</a>
+                                    <a id="TrdPlanRateInvestTradeTransfer001_btn_searchInfo"
+                                       class="layui-btn layui-btn-sm">待转仓产品组合查询</a>
                                 </div>
-									<div class="form-inline-wrap">
-										<a id="TrdPlanRateInvestTradeTransfer001_btn_searchInfo"
-											class="layui-btn layui-btn-sm">待转仓产品组合查询</a> <a
-											id="TrdPlanRateInvestTradeTransfer001_btn_add"
-											class="layui-btn layui-btn-sm btn-create">添加</a>
-									</div>
-								</div>
-                            
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div>
                     <table class="layui-table" id="dataTable"></table>
                 </div>
+                <!-- 划款指令 -->
+                <div id="BussTrdTransferOrder" class="page-component"
+                     th:data-path="@{/component/trade/BussTrdTransferOrder/init}"
+                     th:data-params="|{entityList: '${bussTrdTransferOrder}',entityName:'bussTrdTransferOrder', isMulti : 'Y',bizCode:'${stlPayId}'}|"></div>
                 <!-- 风险试算 -->
             	<div th:if="${isEleShow['TrdPlanRateInvestTradeTransfer001_BaseRiskMathComm']} ne 'N' and ${isEleShow['BaseRiskMathComm']} ne 'N'" id="baseRiskMathComm" class="page-component" th:data-path="@{/component/common/BaseRiskMathComm/init}" 
             		th:data-params="|{entity: '${riskTrialRetDto}',workflowId:'${workflowId?: ''}',entityName:'riskTrialRetDto',tradeId:'${tradeId}'}|">
@@ -257,7 +274,7 @@
                     <a th:if="${isEleShow['TrdPlanRateInvestTradeTransfer001_btn_riskcal']} ne 'N' and ${isEleShow['BaseRiskMathComm_btn_riskcal']} ne 'N'"
                				th:id="|${pageId}_btn_risk|" class="layui-btn layui-btn-sm"
                					data-th-text="#{TrdPlanRateInvestTradeTransfer001.risk}">风险试算</a>
-                    <a id="TrdPlanRateInvestTradeTransfer001_save" class="layui-btn layui-btn-sm btn-save"
+                    <a id="TrdPlanRateInvestTradeTransfer001_btn_save" class="layui-btn layui-btn-sm btn-save"
                        data-th-text="#{SysCommon.save}">保存</a>
                     <a id="TrdPlanRateInvestTradeTransfer001_btn_submit" class="layui-btn layui-btn-sm btn-submit"
                        data-th-text="#{SysCommon.submit}">提交</a>

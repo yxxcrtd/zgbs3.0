@@ -6,6 +6,7 @@ import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.tams.common.base.entity.PtlTrade;
 import com.joyintech.tams.common.base.entity.WflTrdProductDeal;
 import com.joyintech.tams.invest.common.dto.period.common.BaseTotalTradeInfoDto;
+import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
@@ -187,6 +188,19 @@ public class DepositTransfere001Dto extends WflTrdProductDeal implements Process
      * 交割金额
      */
     private BigDecimal deliveryAmount;
+
+    /**
+     * 划款指令
+     */
+    private List<BussTrdTransferOrderDto> bussTrdTransferOrder;
+
+    public List<BussTrdTransferOrderDto> getBussTrdTransferOrder() {
+        return bussTrdTransferOrder;
+    }
+
+    public void setBussTrdTransferOrder(List<BussTrdTransferOrderDto> bussTrdTransferOrder) {
+        this.bussTrdTransferOrder = bussTrdTransferOrder;
+    }
 
     public String getOperateType() {
         return operateType;
@@ -558,5 +572,28 @@ public class DepositTransfere001Dto extends WflTrdProductDeal implements Process
 
     public void setZcId(String zcId) {
         this.zcId = zcId;
+    }
+
+    /**
+     * 附件编号
+     */
+    private String businessId;
+
+    public String getBusinessId() {
+        return businessId;
+    }
+
+    public void setBusinessId(String businessId) {
+        this.businessId = businessId;
+    }
+
+    private String fileArrayName;
+
+    public String getFileArrayName() {
+        return fileArrayName;
+    }
+
+    public void setFileArrayName(String fileArrayName) {
+        this.fileArrayName = fileArrayName;
     }
 }

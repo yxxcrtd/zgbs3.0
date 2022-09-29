@@ -230,7 +230,7 @@ public class StlDataDealSzdSjsjgProcessService {
             // 全价总额
             settleTransData.setFpriceAmt(abs(szdSjsjg.getJgqsbj()));
             // 业务类型
-            settleTransData.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+            settleTransData.setBusiType(DictCodeList.业务类型_债券交易.getValue());
             // 交易方向、业务场景明细分类、交易份额、交易日期等设置
             setBondDeal(szdSjsjg, settleTransData, settleTransDataAdd);
             // 清算速度
@@ -1035,7 +1035,7 @@ public class StlDataDealSzdSjsjgProcessService {
                 // 交易本金
                 settleTransData.setPrinAmt(abs(qsbj));
                 // 业务类型
-                settleTransData.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+                settleTransData.setBusiType(DictCodeList.业务类型_债券交易.getValue());
             }
             else {
                 // 交易份额
@@ -1049,7 +1049,7 @@ public class StlDataDealSzdSjsjgProcessService {
             //证券品种
             settleTransData.setSecType(DictCodeListExt1.证券品种_债券.getValue());
             // 业务类型
-            settleTransData.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+            settleTransData.setBusiType(DictCodeList.业务类型_债券交易.getValue());
             // 成交编号
             // settleTransData.setTradeId(szdSjsjg.getJgddbh());
             settleTransData.setApplyTradeId(szdSjsjg.getJgddbh());
@@ -1076,7 +1076,7 @@ public class StlDataDealSzdSjsjgProcessService {
             //证券品种
             settleTransData.setSecType(DictCodeListExt1.证券品种_债券.getValue());
             // 业务类型
-            settleTransData.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+            settleTransData.setBusiType(DictCodeList.业务类型_债券交易.getValue());
             // 成交编号
             // settleTransData.setTradeId(szdSjsjg.getJgddbh());
             settleTransData.setApplyTradeId(szdSjsjg.getJgddbh());
@@ -1441,6 +1441,7 @@ public class StlDataDealSzdSjsjgProcessService {
                         continue;
                     }
                 }
+                handleSzdSjsjgsetApplyTradeId(settleTransData, szdSjsjg);
                 // 日终过来的文件结算价格就是全价的，需要反算净价总额、应计利息总额
                 if (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue(), settleTransData.getFinprodType2())) {
                     stlDownDataDealService.calc(settleTransData);
@@ -1984,5 +1985,18 @@ public class StlDataDealSzdSjsjgProcessService {
         LocalDate start = new LocalDate(d1);
         LocalDate end = new LocalDate(d2);
         return Days.daysBetween(start, end).getDays();
+    }
+
+    /**
+     * 处理部分场景客户订单编号为空的情况
+     * @param settleTransData
+     * @param szdSjsjg
+     */
+    private void handleSzdSjsjgsetApplyTradeId(SettleTransData settleTransData, SzdSjsjg szdSjsjg){
+       if(DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())){
+           if(StringUtil.isEmpty(settleTransData.getApplyTradeId())){
+               settleTransData.setApplyTradeId(StringUtil.isNotEmpty(szdSjsjg.getJgzxbh())?szdSjsjg.getJgzxbh():szdSjsjg.getJgywlsh());
+           }
+       }
     }
 }

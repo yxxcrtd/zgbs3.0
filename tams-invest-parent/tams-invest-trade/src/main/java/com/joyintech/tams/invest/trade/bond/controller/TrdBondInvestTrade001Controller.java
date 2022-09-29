@@ -196,7 +196,7 @@ public class TrdBondInvestTrade001Controller extends BaseController {
         }
         /*add by xr   已撤销的交易不允许撤销*/
         TrdBondInvestTradeDto dto = trdBondInvestTrade002Service.getTrdBondInvestTradeDto(inputDto.getTradeId() + "R");
-        if(StringUtil.isNotEmpty(dto)){
+        if(Objects.isNull(dto)){
             ArrayList<ValidMessage> errorList = new ArrayList<ValidMessage>();// 生成错误集合
             errorList.add(new ValidMessage(this.getMessage("已撤销的交易不允许撤销")));
             AjaxResult ar = new AjaxResult();
@@ -290,7 +290,10 @@ public class TrdBondInvestTrade001Controller extends BaseController {
                 inputDto.setBussTrdTransferOrder(bussTrdTransferOrderDtoList);
             }
         }
-        if(StringUtil.equals(inputDto.getTradeMarketMode(),DictCodeListExt1.交易市场_一级市场.getValue())){
+        // 转仓新增债券 基金走撤销新头寸。
+        if(StringUtil.equals(inputDto.getTradeMarketMode(),DictCodeListExt1.交易市场_一级市场.getValue())
+            || DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(inputDto.getFinprodType2())
+            || DictCodeListExt1.金融产品类型_投管用_基金.getValue().equals(inputDto.getFinprodType2())){
             inputDto.setBondFirstSign("01");
         }
         inputDto.setTotleTradeId(totleTradeId + "R");

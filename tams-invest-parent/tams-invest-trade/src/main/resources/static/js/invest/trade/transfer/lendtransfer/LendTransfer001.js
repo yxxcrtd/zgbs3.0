@@ -320,6 +320,7 @@ $(function() {
                 	delete bussTrdTransfenpeiDto[i].portfolioId;
                 }
                 object.bussTrdTransfenpeiDto = bussTrdTransfenpeiDto;
+                object.tradeId = null;
                 window.BaseRiskMathComm.initBaseRiskMathRedis(basePath + 'riskrds/interf/doInfBatchData/1/RSK002/F08',object,getriskdata());
             }
             else {

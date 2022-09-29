@@ -1,6 +1,7 @@
 package com.joyintech.service.trade.transfer.lendtransfer.controller;
 
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.service.trade.transfer.common.service.TransferCommonService;
 import com.joyintech.service.trade.transfer.lendtransfer.dto.LendTransferDto;
 import com.joyintech.service.trade.transfer.lendtransfer.service.LendTransferService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,8 @@ public class LendTransferController {
      */
     @Autowired
     private LendTransferService lendTransferService;
+    @Autowired
+    private TransferCommonService transferCommonService;
 
     /**
      * 获取转仓基本信息
@@ -46,7 +49,8 @@ public class LendTransferController {
      */
     @PostMapping("getPortfolioId")
     public List<SelectOptionDto> getPortfolioId(@RequestBody Map<String,Object> map){
-        return lendTransferService.getPortfolioId(map);
+//        return lendTransferService.getPortfolioId(map);
+        return transferCommonService.selectPortoId(map);
     }
     
     /**

@@ -3,6 +3,7 @@ package com.joyintech.tams.invest.trade.transfer.trdassetsProject.dto;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.invest.common.dto.period.common.BaseTradeInfoDto;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
+import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.workflow.engine.annotation.PrimaryKey;
 import com.joyintech.workflow.engine.dto.ProcessEntity;
 
@@ -229,6 +230,11 @@ public class TrdAssetsProject001Dto extends TrdProductDeal implements ProcessEnt
      * 交割金额
      */
     private BigDecimal deliveryAmount;
+
+    /**
+     * 风险试算实体类
+     */
+    private List<RiskTrialRetDto> riskTrialRetDto;
 
 
 
@@ -1202,5 +1208,49 @@ public class TrdAssetsProject001Dto extends TrdProductDeal implements ProcessEnt
 
     public void setZcId(String zcId) {
         this.zcId = zcId;
+    }
+
+    public List<RiskTrialRetDto> getRiskTrialRetDto() {
+        return riskTrialRetDto;
+    }
+
+    public void setRiskTrialRetDto(List<RiskTrialRetDto> riskTrialRetDto) {
+        this.riskTrialRetDto = riskTrialRetDto;
+    }
+
+    /**
+     * 转仓 转出的业务模式
+     */
+    private String turnInvAim;
+
+    public String getTurnInvAim() {
+        return turnInvAim;
+    }
+
+    public void setTurnInvAim(String turnInvAim) {
+        this.turnInvAim = turnInvAim;
+    }
+
+    private String fileArrayName;
+
+    public String getFileArrayName() {
+        return fileArrayName;
+    }
+
+    public void setFileArrayName(String fileArrayName) {
+        this.fileArrayName = fileArrayName;
+    }
+
+    /**
+     * 附件编号
+     */
+    private String businessId;
+
+    public String getBusinessId() {
+        return businessId;
+    }
+
+    public void setBusinessId(String businessId) {
+        this.businessId = businessId;
     }
 }

@@ -100,14 +100,13 @@ public class QuoteJob {
             logger.info("无已登录资金账户信息，不能查询行情");
             return;
         }
-        List<RepurchaseQuoteReceiveResponse> receiveQuotes = ListUtil.list(false);
         brokerAccountMap.forEach((brokerId, account) -> {
             logger.debug("查询协议回购非公开报价行情 brokerId {}  brokerName {} accountId {}", brokerId, account.getBrokerName(), account.getId());
             List<RepurchaseQuoteReceiveResponse> list = queryRepurchaseQuoteReceive(account);
-            receiveQuotes.addAll(list);
+            receiveQuoteList.addAll(list);
         });
         // mock数据添加到非公开行情
-        receiveQuotes.addAll(receiveQuoteForMock);
+        receiveQuoteList.addAll(receiveQuoteForMock);
     }
     private List<IntegratedRepurchaseQuoteBean> queryRepurchaseQuote(Account account, int actionIn) {
         logger.debug("查询协议回购{}公开报价行情 ==> 【accountId = {}】", actionIn == 0 ? StrUtil.EMPTY : "非", account.getId());

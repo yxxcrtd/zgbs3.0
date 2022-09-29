@@ -153,7 +153,7 @@ public class EntrustPropUtils {
         } else if (StringUtil.equals(DictCodeListExt3.投管业务类型_中途换券.getValue(), busiTypeTg)) {
             return isSh ? (isPos ? EntrustProp.SH_REPURCHASE_EXCHANGE.value : EntrustProp.SH_REPURCHASE_EXCHANGE_CONFIRM.value) :  EntrustProp.SZ_REPURCHASE_EXCHANGE.value;
         } else if (StringUtil.equals(DictCodeListExt3.投管业务类型_提前购回.getValue(), busiTypeTg)) {
-            return isSh ? (isPos ? EntrustProp.SH_REPURCHASE_TERMINATE.value : EntrustProp.SH_REPURCHASE_TERMINATE_CONFIRM.value) : EntrustProp.SZ_REPURCHASE_BUYBACK.value;
+            return isSh ? (isPos ? EntrustProp.SH_REPURCHASE_TERMINATE.value : EntrustProp.SH_REPURCHASE_TERMINATE_CONFIRM.value) : EntrustProp.SZ_REPURCHASE_BUYBEFORE.value;
         } else if (StringUtil.equals(DictCodeListExt3.投管业务类型_到期购回.getValue(), busiTypeTg)) {
             return isSh ? EntrustProp.SH_REPURCHASE_EXPIRE.value : EntrustProp.SZ_REPURCHASE_BUYBACK.value;
         }

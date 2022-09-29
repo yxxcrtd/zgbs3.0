@@ -275,6 +275,19 @@ public class FinProduct extends BaseEntity {
     private Date delistingDate;
 
     /**
+     * 是否支持转仓
+     */
+    private String isInnerAdv;
+
+    public String getIsInnerAdv() {
+        return isInnerAdv;
+    }
+
+    public void setIsInnerAdv(String isInnerAdv) {
+        this.isInnerAdv = isInnerAdv;
+    }
+
+    /**
      * 取得 金融产品代码
      * @return 金融产品代码
      */

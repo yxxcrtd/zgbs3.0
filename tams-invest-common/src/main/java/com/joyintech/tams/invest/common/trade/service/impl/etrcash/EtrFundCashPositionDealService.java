@@ -2,6 +2,7 @@ package com.joyintech.tams.invest.common.trade.service.impl.etrcash;
 
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.common.base.entity.EtrEntrustAdd;
@@ -17,7 +18,6 @@ import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
-import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.entrust.dto.EntrustCommonDto;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -1006,14 +1006,21 @@ public class EtrFundCashPositionDealService extends EtrCashPositionBaseService {
         else {
             if (DictCodeList.持仓类型_实际.equals(持仓类型)) { // 有效
                 // 1.委托直投、无委托直投
+                String mstSaleFlag = CacheUtil.getSysParam("TRANSFER_MST_SALE_FLAG");
                 // 可用现金(组合、资金账户）：卖出交易日增加交易金额
-                if (StringUtil.isEmpty(chlId)) {
+                if (StringUtil.isEmpty(chlId) && !"N".equals(mstSaleFlag)) {
                     etrCashPositionFlowDto.setAmount(deal.getTradeAmt());
 //                    etrCashPositionFlowDto.setAcctId(
 //                        EtrCommonCashPositionDealService.select组合托管户(dealAdd.getPortfolioId(),
 //                                deal.getCcy(), DictCodeListExt2.资金账户类型_托管户.getValue()));
                     etrCashPositionFlowDto.setAcctId(
                             EtrCommonCashPositionDealService.select资金账户(finProductTradeDto.getTrdProductDeal().getSecManageAcctId(),deal.getCcy()));
+                    etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
+                } else if ("N".equals(mstSaleFlag)) {
+                    etrCashPositionFlowDto.setAmount(deal.getTradeAmt());
+                    etrCashPositionFlowDto.setAcctId(
+                            EtrCommonCashPositionDealService.select组合托管户(dealAdd.getPortfolioId(),
+                                    deal.getCcy(), DictCodeListExt2.资金账户类型_托管户.getValue()));
                     etrPositionHoldDto.getPtlCashPositionFlows().add(etrCashPositionFlowDto);
                 }
                 // 2.委托通道、无委托通道

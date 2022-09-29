@@ -551,6 +551,19 @@ public class FinProductAdd extends BaseEntity {
     private String basis;
 
     /**
+     * 是否支持转仓
+     */
+    private String isInnerAdv;
+
+    public String getIsInnerAdv() {
+        return isInnerAdv;
+    }
+
+    public void setIsInnerAdv(String isInnerAdv) {
+        this.isInnerAdv = isInnerAdv;
+    }
+
+    /**
      * 获取 计息基础
      *
      * @return basis 计息基础

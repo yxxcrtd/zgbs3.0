@@ -611,7 +611,7 @@ public class AutoPeriodCommonService extends BaseService {
                 BeanUtil.copyPropertiesIgnoreNull(tempDeal,trdProductDeal);
                 if(StringUtil.isNotEmpty(tempDeal.getFinprodType2())) {
                     if (StringUtil.equals(tempDeal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券.getValue())) {
-                        tempDeal.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+                        tempDeal.setBusiType(DictCodeList.业务类型_债券交易.getValue());
                     } else if (StringUtil.equals(tempDeal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())
                             || StringUtil.equals(tempDeal.getFinprodType2(), DictCodeListExt1.金融产品类型_债券质押式逆回购.getValue())) {
                         tempDeal.setBusiType(DictCodeList.业务类型_债券质押式回购交易.getValue());

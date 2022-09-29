@@ -894,7 +894,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         // 交易生成的现金流水
         EtrCashPositionFlowDto etrCashPositionFlowDto = EtrCommonCashPositionDealService.getEtrCashPositionFlowDto(
             finProductTradeDto);
-        etrCashPositionFlowDto.setOrderId(finProductTradeDto.getTrdProductDeal().getTotleTradeId());
+        etrCashPositionFlowDto.setOrderId(finProductTradeDto.getTrdProductDeal().getTradeId());
         if(StringUtil.isNotEmpty(finProductTradeDto.getPurchModle())
         		&& StringUtil.equals(DictCodeListExt2.申购方式_线下申购.getValue(), finProductTradeDto.getPurchModle())){
         	String 账号 = gen账号1(finProductTradeDto.getTrdProductDeal().getTradeMarket(),
@@ -1329,6 +1329,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                                 boolean is卖出,
                                 EtrCashPositionFlowDto etrCashPositionFlowDto){
         String chlType = StringUtil.isEmpty(chlId) ? null : EtrCommonCashPositionDealService.queryChlType(chlId);
+        String mstSaleFlag = CacheUtil.getSysParam("TRANSFER_MST_SALE_FLAG");
         if (StringUtil.equals(chlType, DictCodeListExt2.划款方式_一次性划款.getValue())
             || (StringUtil.equals(chlType, DictCodeListExt2.划款方式_逐笔划款.getValue()) && StringUtil.isBlank(counterId))) {
             etrCashPositionFlowDto.setChlFinprodId(chlId);
@@ -1342,7 +1343,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
             }
             else if ((!StringUtil.equals(tradePlace, DictCodeListExt1.交易场所_银行间.getValue()) &&
                     !StringUtil.equals(tradePlace, DictCodeListExt1.交易场所_商业银行柜台.getValue()))
-                            && StringUtil.isNotEmpty(secManageAcctId) &&!(is卖出&&EtrCommonCashPositionDealService.isInTrade(counterId))) {
+                            && StringUtil.isNotEmpty(secManageAcctId) &&!("N".equals(mstSaleFlag)&&EtrCommonCashPositionDealService.isInTrade(counterId))) {
                 return EtrCommonCashPositionDealService.select资金账户(secManageAcctId, ccy);
             }
             else {

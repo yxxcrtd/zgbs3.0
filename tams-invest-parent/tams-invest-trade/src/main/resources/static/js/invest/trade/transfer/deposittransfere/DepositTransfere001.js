@@ -11,8 +11,51 @@
                 }
                 window.BaseRiskMathComm.getparam(riskparam);
         	}
+
+            if(window.BussTrdTransferOrder && window.BussTrdTransferOrder['bussTrdTransferOrder']) {
+                window.BussTrdTransferOrder['bussTrdTransferOrder'].setStlCommandInput(function () {
+                    getEntity();
+                    entity.chlId = $("#chlId").val();
+                    return {
+                        'isTotalTrade':'N'
+                        ,'bankLendingType':null
+                        ,'portfolioId':$("#transferPortfolioId").val()
+                        ,'isUsePageAcct':false
+                        ,'deal':entity
+                        ,'jiaoyiType':'dzh'
+                        ,'isLimitAcct':'Y'
+                    };
+                });
+            }
+
         }
     };
+
+    function getEntity(){
+        // 转出
+        var object = $.serializeToObject('#depositTransfereForm');
+        // 转入组合
+        object.dataList = JSON.stringify(table.getAllRows());
+
+        Joyin.ajaxSync(basePath + 'invest/trade/transfer/deposittransfere/DepositTransfere001/getEntity', object, function(result) {
+            result.createTime = null;
+            result.updateTime = null;
+            result.tradeId = null;
+            result.totleTradeId = null;
+            result.cpriceAmt = null;
+            result.shareAmt = null;
+            result.prinAmt = null;
+            result.intAmt = null;
+            result.fpriceAmt = null;
+            // 输入备注等，点击提交，提示计息要素已变更 add by renping 20191018 start
+            result.remark = null;
+            result.counterContact = null;
+            result.counterTrader = null;
+            // 输入备注等，点击提交，提示计息要素已变更 add by renping 20191018 end
+            entity = result;
+        });
+    }
+
     /**
      * 获取查询参数
      */
@@ -55,8 +98,17 @@
             // 转让逾期本金
             , {field: 'transOverduePrinAmt', visible : false,title: '转让逾期本金',type: 'money', digit: 2, sortable: false}
             // 交割金额
-            , {field: 'deliveryAmount', visible : false,title: '交割金额',type: 'money', digit: 2, sortable: false}
-            , {field: 'operation', title: '操作', type: 'action', buttons: ['delt']}
+            , {field: 'deliveryAmount', visible : false,title: '交割金额',type: 'money', digit: 2, sortable: false, visible:false}
+            , {field:'ps', title: '交易方向',width:150,width:150, visible:false}//交易方向
+            , {field:'finprodType2', title: '投管资产类型',width:150,width:150, visible:false}//交易方向
+            , {field:'fileArrayName', title: '附件名',width:200}//附件名称
+            , {field: 'businessId', visible: false }//附件编号
+            , {title : 'SysCommon.operation',field : 'operation',type : 'action',width : 150
+                ,buttons :[
+                    {text : '&#xe67c;',clas : 'uploadFile',title : '上传'}
+                    ,{text : '&#xe640;',clas : 'delt',title : '删除'}
+                    ,{field: 'sumitSeq',visible:false}  ]}
+
         ]
     };
     if (formTodoList) {
@@ -78,7 +130,9 @@
             prinAmt: $('#transferPrinAmt').val(),
             loadRate: $('#loadRate').val(),
             intAmt: $('#payInt').val(),
-            transferTradeAmt: $('#transferTradeAmt').val()
+            transferTradeAmt: $('#transferTradeAmt').val(),
+            stlPayId : $('#stlPayId').val()
+
         };
 
         table.addRow(row);
@@ -90,15 +144,20 @@
 
     $('#portfolioId').change(function () {
         if ($('#portfolioId').val()) {
-            var dataCash = {
-                portfolioId: $('#portfolioId').val(),
-                tradeDate: $('#tradeDate').val(),
-                ccy: $('#ccy').val(),
-                calendarId : $("#calendarId").val(),
-                chlId : $("#chlId").val(),
-                finprodId : $("#finprodId").val()
-            };
-            findCash(dataCash);
+            // var dataCash = {
+            //     portfolioId: $('#portfolioId').val(),
+            //     tradeDate: $('#tradeDate').val(),
+            //     ccy: $('#ccy').val(),
+            //     calendarId : $("#calendarId").val(),
+            //     chlId : $("#chlId").val(),
+            //     finprodId : $("#finprodId").val()
+            // };
+            // findCash(dataCash);
+            var object = $('#portfolioId').select2("data")[0].object;
+            console.log("------------------------")
+            console.log(object)
+            console.log(object.availableCash)
+            $('#portoAvailableAmt').val(object.availableCash).trigger("change").trigger('blur');
         }
          if(!$('#portfolioId').val()){
         	$("#portoAvailableAmt").val('').trigger("change").trigger('blur');
@@ -159,6 +218,19 @@
             Joyin.error('本金金额不能大于剩余未拆分本金金额！');
             return;
         }
+        //添加检查数值小于0的检查
+        if(Math.sign(Number($('#transferPrinAmt').val()))==-1){
+            Joyin.error('本金金额不能小于0！');
+            return;
+        }
+        if(Math.sign(Number($('#transferTradeAmt').val()))==-1){
+            Joyin.error('交易金额不能小于0！');
+            return;
+        }
+        if(Math.sign(Number($('#payInt').val()))==-1){
+            Joyin.error('应计利息总额不能小于0！');
+            return;
+        }
         var tableRows = table.getAllRows();
         var flag = false;
         if (tableRows) {
@@ -173,6 +245,21 @@
                 return;
             }
         }
+        var transferTradeAmt = Number($("#transferTradeAmt").val());
+        var portoAvailableAmt =  Number($("#portoAvailableAmt").val());
+        if(portoAvailableAmt && transferTradeAmt > portoAvailableAmt){
+            Joyin.confirm('转入组合剩余现金不足！请确认是否添加', function () {
+                addRow(options, options1);
+                $("#portfolioId").val('').trigger("change").trigger('blur');
+                $("#transferPrinAmt").val('').trigger("change").trigger('blur');
+                $("#transferTradeAmt").val('').trigger("change").trigger('blur');
+                $('#payInt').val('').trigger("change").trigger('blur');
+                $("#portoAvailableAmt").val('').trigger("change").trigger('blur');
+                $("#chlAvailableAmt").val('').trigger("change").trigger('blur');
+            });
+
+            return;
+        }
         addRow(options, options1);
         $("#portfolioId").val('').trigger("change").trigger('blur');
         $("#transferPrinAmt").val('').trigger("change").trigger('blur');
@@ -180,6 +267,31 @@
         $('#payInt').val('').trigger("change").trigger('blur');
         $("#portoAvailableAmt").val('').trigger("change").trigger('blur');
         $("#chlAvailableAmt").val('').trigger("change").trigger('blur');
+    });
+
+    //附件上传
+    table.bind('click', '.uploadFile', function (data) {
+        //if ('2' == pageModel) {
+        //    return;
+        //}
+        data.operateType = "edit";
+        data.pageModel = PAGE_MODEL_EDIT;
+        var object = {};
+        object.rowData = JSON.stringify({});
+        object.businessId = data.businessId;
+        Joyin.dialog("上传附件",
+            JoyinUtil.getRealPath("component/entrust/EtrListUploadFile/init"),
+            "88%", "85%", object,
+            function(result){
+                var fileArrayName = '';
+                if (result && result.fileArray && _.isArray(result.fileArray) && result.fileArray.length>0) {
+                    for (var index in result.fileArray) {
+                        fileArrayName += result.fileArray[index].srcName +'，';
+                    }
+                    result.fileArrayName = fileArrayName.substr(0,fileArrayName.length-1);
+                }
+                table.renderRow(data.LAY_TABLE_INDEX, {"businessId": result.businessId, "fileArrayName": result.fileArrayName});
+            });
     });
 
     // 行内删除按钮点击事件
@@ -269,6 +381,7 @@
                 	bussTrdTransfenpeiDto[i].ps = PS_T02;
                 }
                 object.bussTrdTransfenpeiDto = bussTrdTransfenpeiDto;
+                object.tradeId = null;
                 window.BaseRiskMathComm.initBaseRiskMathRedis(basePath + 'riskrds/interf/doInfBatchData/1/RSK002/F05',object,getriskdata());
             }
             else {

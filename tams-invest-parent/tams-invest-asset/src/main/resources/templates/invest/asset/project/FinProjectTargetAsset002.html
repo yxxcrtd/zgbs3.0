@@ -463,6 +463,15 @@
 													   data-th-placeholder="#{SysCommon.placeholder}">
 											</div>
 										</div>
+										<div class="form-inline-wrap">
+											<label class="layui-form-label form-label-wrap"
+												   data-th-text="#{FinProjectTargetAsset002.isInnerAdv}">是否支持转仓</label>
+											<div class="layui-input-inline input-inline">
+												<input type="checkbox" th:id="isInnerAdv" th:name="isInnerAdv"
+													   lay-skin="switch" data-th-value="${YES}" lay-text="是|否" lay-filter="isInnerAdv"
+													   data-th-checked="${YES} ==${entity?.isInnerAdv}">
+											</div>
+										</div>
 									</div>
 									<!-- 将备注放在附件信息下 by 赵东东 2019.10.30 start -->
 									<!--<div class="layui-form-item">

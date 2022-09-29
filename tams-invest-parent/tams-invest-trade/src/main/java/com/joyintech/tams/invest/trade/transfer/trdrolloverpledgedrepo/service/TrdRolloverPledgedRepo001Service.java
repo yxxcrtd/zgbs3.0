@@ -7,6 +7,7 @@ import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
 import com.joyintech.tams.component.business.common.service.BussCommonMapperDelegateService;
 import com.joyintech.tams.component.business.common.service.BussCoreCalculateService;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
@@ -116,6 +117,13 @@ public class TrdRolloverPledgedRepo001Service extends BaseService<TrdRolloverPle
      */
     @Autowired
     private BussCommonMapperDelegateService bussCommonMapperDelegateService;
+
+    /**
+     * 风险试算组件Service
+     */
+    @Autowired(required = false)
+    private BasRiskMathCommService basRiskMathCommService;
+
 
     /**
      * 查询组合信息
@@ -686,9 +694,9 @@ public class TrdRolloverPledgedRepo001Service extends BaseService<TrdRolloverPle
                 // 组合代码 = 画面.组合代码
                 orderParameterDto.setPortfolioId(trdProductDealAdd.getPortfolioId());
 
-                BussTrdTransferOrderDto resultOrderDto = bussTrdTransferOrderService.generateOrder(orderParameterDto);
-                if (resultOrderDto != null) {
-                    input.setBussTrdTransferOrder(Arrays.asList(resultOrderDto));
+                List<BussTrdTransferOrderDto> resultOrderDtos = Arrays.asList(bussTrdTransferOrderService.generateOrder(orderParameterDto));
+                if (resultOrderDtos != null) {
+                    input.setBussTrdTransferOrder(resultOrderDtos);
                 }
             }
             if (!StringUtil.isEmptyList(input.getBussTrdTransferOrder())) {
@@ -1026,9 +1034,9 @@ public class TrdRolloverPledgedRepo001Service extends BaseService<TrdRolloverPle
                 // 组合代码 = 画面.组合代码
                 orderParameterDto.setPortfolioId(trdProductDealAdd.getPortfolioId());
 
-                BussTrdTransferOrderDto resultOrderDto = bussTrdTransferOrderService.generateOrder(orderParameterDto);
-                if (resultOrderDto != null) {
-                    output.setBussTrdTransferOrder(Arrays.asList(resultOrderDto));
+                List<BussTrdTransferOrderDto> resultOrderDtos = Arrays.asList(bussTrdTransferOrderService.generateOrder(orderParameterDto));
+                if (resultOrderDtos != null) {
+                    output.setBussTrdTransferOrder(resultOrderDtos);
                 }
             }
             if (!StringUtil.isEmptyList(output.getBussTrdTransferOrder())) {
@@ -1182,6 +1190,9 @@ public class TrdRolloverPledgedRepo001Service extends BaseService<TrdRolloverPle
 
                 // 7.7写入交易信息进交易报送信息表，为中债报送用
                 this.dealInfoCbReportLogic_7_7(input);
+
+                //插入风险试算结果
+                basRiskMathCommService.insert(dto.getRiskTrialRetDto(), dto.getTradeId());
 
                 // 发送Murex接口处理
                 //this.sendMurex(input, false);

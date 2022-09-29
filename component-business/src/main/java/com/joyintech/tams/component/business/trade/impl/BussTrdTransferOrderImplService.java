@@ -11,18 +11,20 @@ package com.joyintech.tams.component.business.trade.impl;
 
 import static com.joyintech.tams.component.business.settle.BussSettleOrderCommService.genOrderSelect;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.*;
+import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.constant.*;
 
-import com.joyintech.tams.invest.common.constant.BussinessConstant;
+import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
+import com.joyintech.tams.invest.common.trade.dao.TrdCommonBaseMapper;
+import com.joyintech.tams.invest.common.entrust.dao.EtrTrdCommonMapper;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -63,6 +65,17 @@ public class BussTrdTransferOrderImplService extends BaseService<BussTrdTransfer
     private PtlPortfolioMapper ptlPortfolioMapper;
     @Autowired
     private StlCapacctInfoMapper stlCapacctInfoMapper;
+
+    @Autowired
+    private TrdCommonBaseMapper trdCommonBaseMapper;
+
+    @Autowired
+    private EtrTrdCommonMapper etrTrdCommonMapper;
+    /**
+     * 主键生成类
+     */
+    @Autowired(required = false)
+    private BaseGetBusinessId baseGetBusinessId;
 
     /**
      * 共通Mapper的通用代理方案
@@ -169,6 +182,7 @@ public class BussTrdTransferOrderImplService extends BaseService<BussTrdTransfer
         if(param.getDeal()!=null){
         	ret.setInvAim(param.getDeal().getInvAim());
         }
+        String mstSaleFlag = CacheUtil.getSysParam("TRANSFER_MST_SALE_FLAG");
         //产品认申购的付款账户默认为募集户
         if (param.getDeal() != null
         		&& (DictCodeList.交易方向_产品认购.getValue().equals(param.getDeal().getPs())
@@ -237,6 +251,22 @@ public class BussTrdTransferOrderImplService extends BaseService<BussTrdTransfer
                     ret.setPayAcctName(listMj.get(0).getAcctName());
                 }
             }
+        } else if (DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(param.getDeal().getTradeMarket())
+                || DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(param.getDeal().getTradeMarket()) ) {
+                //|| "Y".equals(mstSaleFlag)
+            // 券商户查询(转出账户)
+            List<StlCapacctInfo> qsAcctNoOutList = etrTrdCommonMapper.getQsPtlAcctInfo(param.getSecManageAcctId(), param.getPortfolioId());
+            // 券商户查询(转入账户)
+            List<StlCapacctInfo> qsAcctNoInList = etrTrdCommonMapper.getQsPtlAcctInfo(param.getDeal().getSecManageAcctId(), param.getPortfolioId());
+            if (CollectionUtils.isNotEmpty(qsAcctNoOutList)) {
+                ret.setPayAcctNo(qsAcctNoOutList.get(0).getAcctNo());
+                ret.setPayAcctName(qsAcctNoOutList.get(0).getAcctName());
+            }
+            if (CollectionUtils.isNotEmpty(qsAcctNoInList)) {
+                ret.setRecAcctNo(qsAcctNoInList.get(0).getAcctNo());
+                ret.setRecAcctName(qsAcctNoInList.get(0).getAcctName());
+            }
+
         }
 
         // 根据组合代码获取组合名称
@@ -260,6 +290,17 @@ public class BussTrdTransferOrderImplService extends BaseService<BussTrdTransfer
                 }
                 ret.setRecAcctPoint(stlCapacctInfo.getLargePayno());
             }
+        }
+		if (StringUtil.isNotEmpty(ret.getPayAcctNo()) && StringUtil.isNotEmpty(ret.getRecAcctNo())
+                && "N".equals(param.getDeal().getIsOutTrade())) {
+            //N 标识为转仓
+            if (ret.getPayAcctNo().equals(ret.getRecAcctNo())) {
+                ret.setIsNeedSend(DictCodeList.是否_否.getValue());
+            } else {
+                ret.setIsNeedSend(DictCodeList.是否_是.getValue());
+            }
+            // 转仓转入组合代码
+            ret.setInPortfolioId(param.getDeal().getPortfolioId());
         }
 
         return ret;

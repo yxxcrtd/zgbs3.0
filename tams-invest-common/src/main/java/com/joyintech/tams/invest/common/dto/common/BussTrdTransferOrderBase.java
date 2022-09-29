@@ -384,4 +384,50 @@ public class BussTrdTransferOrderBase extends StlPayOrdersDto {
     public void setSecAcctId(String secAcctId) {
         this.secAcctId = secAcctId;
     }
+
+    /**
+     * 画面账户联动的垃圾代码
+     */
+    private String acctNoGdhFlag;
+
+    private String reAcctNoGdhFlag;
+
+    public String getAcctNoGdhFlag() {
+        return acctNoGdhFlag;
+    }
+
+    public void setAcctNoGdhFlag(String acctNoGdhFlag) {
+        this.acctNoGdhFlag = acctNoGdhFlag;
+    }
+
+    public String getReAcctNoGdhFlag() {
+        return reAcctNoGdhFlag;
+    }
+
+    public void setReAcctNoGdhFlag(String reAcctNoGdhFlag) {
+        this.reAcctNoGdhFlag = reAcctNoGdhFlag;
+    }
+
+    private String stlPayOrderShow;
+
+    public String getStlPayOrderShow() {
+        return stlPayOrderShow;
+    }
+
+    public void setStlPayOrderShow(String stlPayOrderShow) {
+        this.stlPayOrderShow = stlPayOrderShow;
+    }
+
+    /**
+     * 转仓转入组合代码
+     */
+    private String inPortfolioId;
+
+    public String getInPortfolioId() {
+        return inPortfolioId;
+    }
+
+    public void setInPortfolioId(String inPortfolioId) {
+        this.inPortfolioId = inPortfolioId;
+    }
 }

@@ -145,4 +145,6 @@ public interface BaseAssetCashPositionCommMapper {
      * @return
      */
     List<PtlSecPosition> selectPositionByFinproductId(@Param("finprodId") String finprodId, @Param("cdate") String cdate);
+
+    List<String> selectOrderIdsByTotalTradeId(String tradeId);
 }

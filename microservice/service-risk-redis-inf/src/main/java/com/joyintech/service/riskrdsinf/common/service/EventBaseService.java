@@ -590,6 +590,8 @@ public abstract class EventBaseService<V> extends InfBaseService<V> {
     }
 
     public void checkTimePoint(String key, IIndicator ind, Set<String> indList, String timePoint) {
+        getLogger().info("checkTimePoint -- > param[key:" + key + ",ind:" + JsonUtils.object2Json(ind)
+                + ",indList:" + JsonUtils.object2Json(indList) + ",timePoint:" + timePoint);
         // 指标监督时点
         String tp = ind.getTimePoint();
         // 当指标监督时点不符合事件时点时，该指标不参与计算

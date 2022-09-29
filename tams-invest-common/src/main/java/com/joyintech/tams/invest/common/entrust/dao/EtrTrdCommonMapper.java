@@ -10,7 +10,10 @@
 
 package com.joyintech.tams.invest.common.entrust.dao;
 
+import com.joyintech.tams.common.base.entity.FinProductAdd;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.tams.common.base.entity.PtlCapacctInfo;
+import com.joyintech.tams.common.base.entity.StlCapacctInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -32,6 +35,10 @@ public interface EtrTrdCommonMapper {
 
     List<PtlCapacctInfo> getPtlAcctInfo(@Param("portfolioId") String portfolioId, @Param("acctTypeList") List<String> acctTypeList);
 
+    List<SelectOptionDto> getPtlAcctInfoByPortId(@Param("portfolioId") String portfolioId, @Param("acctTypeList") List<String> acctTypeList);
+
+    List<StlCapacctInfo> getQsPtlAcctInfo(@Param("acctNo") String acctNo, @Param("portfolioId") String portfolioId);
+
     /**
      * 交易日历的节假日取得
      *
@@ -49,4 +56,11 @@ public interface EtrTrdCommonMapper {
      * @return 到期结算金额
      */
     BigDecimal getFirstTradeAmtByTradeId(@Param("finprodId") String finprodId);
+
+    /**
+     * 批量查询标的附属信息
+     * @param finprodIds
+     * @return
+     */
+    List<FinProductAdd> getFinProductAddBatch(@Param("finprodIds") List<String> finprodIds);
 }

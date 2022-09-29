@@ -14,6 +14,7 @@
             <!-- 隐藏字段 单位净值 -->
             <input type="text" id = "unitPrice" name="unitPrice" data-th-value='${entity?.unitValue}' hidden>
             <!-- 隐藏字段 组合代码 -->
+            <input type="text" id = "portfolioId" name="portfolioId" data-th-value='${entity?.portfolioIdOut}' hidden>
 <!--
             <input type="text" id = "portfolioIdOut" name="portfolioIdOut" data-th-value='${entity?.portfolioIdOut}' hidden>
 -->
@@ -90,6 +91,17 @@
                                         </select>
                                     </div>
                                 </div>
+                                <!-- 对账状态 -->
+                                <div class="form-inline-wrap">
+                                    <label class="layui-form-label form-label-wrap">对账状态</label>
+                                    <div class="layui-input-inline input-inline">
+                                        <input type="text" name="reconciliationStatus"
+                                               id="NetPlanTransfer001_reconciliationStatus"
+                                               class="layui-input form-input" disabled="disabled"
+                                               data-th-placeholder="#{SysCommon.placeholder}"
+                                               data-th-value='${entity?.checkStatus}'>
+                                    </div>
+                                </div>
                                 <!-- 通道 -->
                                 <div class="form-inline-wrap" style="display:none">
                                     <label class="layui-form-label form-label-wrap">通道</label>
@@ -119,6 +131,17 @@
                                                class="layui-input form-input text-number" disabled = "disabled"
                                                data-th-placeholder="#{SysCommon.placeholder}"
                                                data-textrange="2" data-th-value='${entity?.undistributedAmount}'>
+                                    </div>
+                                </div>
+                                <!-- 估值状态 -->
+                                <div class="form-inline-wrap">
+                                    <label class="layui-form-label form-label-wrap">估值表状态</label>
+                                    <div class="layui-input-inline input-inline">
+                                        <input type="text" name="valueStatus"
+                                               id="NetPlanTransfer001_valueStatus"
+                                               class="layui-input form-input" disabled="disabled"
+                                               data-th-placeholder="#{SysCommon.placeholder}"
+                                               data-th-value='${entity?.valueStatus}'>
                                     </div>
                                 </div>
                             </div>
@@ -164,6 +187,7 @@
                                             <input type="text" name="unitValue" id="NetPlanTransfer001_unitValue"
                                                    class="layui-input form-input text-number" data-th-value='${entity?.unitValue}'
                                                    data-textrange="4" required>
+                                            <span id="deviationDegree" class="input-right-show" style="color: red;margin-right: 15px;"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -177,6 +201,22 @@
                                                    data-textrange="2">
                                         </div>
                                     </div>
+                                    <!-- 组合现金、持仓查询 -->
+<!--                                    <div id="avaStandardBondPositionDiv" class="page-component" th:data-path="@{/component/trade/BussTrdAvailableCashQuery/init}"-->
+<!--                                         th:data-params="|{entityName: 'bussTrdAvailableCashQuery'}|"></div>-->
+                                </div>
+                                <div class="layui-form-item">
+                                    <div class="form-inline-wrap" id="portoAvailable">
+                                        <label class="layui-form-label form-label-wrap">组合可用现金</label>
+                                        <div class="layui-input-inline input-inline">
+                                            <input type="text" id="portoAvailableAmt" name="portoAvailableAmt"
+                                                   class="layui-input form-input text-number" disabled="disabled"
+                                                   data-th-placeholder="#{SysCommon.placeholder}" data-textrange="2">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
                                     <!-- 按钮 -->
                                     <div class="form-inline-wrap">
                                         <!-- 添加按钮-->
@@ -186,14 +226,11 @@
                                         <a id="NetPlanTransfer001_btn_searchInfo" class="layui-btn layui-btn-sm">待转仓产品组合查询</a>
                                     </div>
                                 </div>
-                                <div class="layui-form-item">
-                                    <!-- 组合现金、持仓查询 -->
-                                    <div id="avaStandardBondPositionDiv" class="page-component" th:data-path="@{/component/trade/BussTrdAvailableCashQuery/init}"
-                                         th:data-params="|{entityName: 'bussTrdAvailableCashQuery'}|"></div>
-                                </div>
                                 <div>
                                     <table class="layui-table pro-table-wrap" id="dataTable"></table>
                                 </div>
+                                <!-- 划款指令 -->
+                                <div id="BussTrdTransferOrder" class="page-component" th:data-path="@{/component/trade/BussTrdTransferOrder/init}" th:data-params="|{entityList: '${bussTrdTransferOrder}',entityName:'bussTrdTransferOrder', isMulti : 'Y',bizCode:'${stlPayId}'}|"></div>
                                 <!-- 风险试算 -->
             					<div th:if="${isEleShow['NetPlanTransfer001_BaseRiskMathComm']} ne 'N' and ${isEleShow['BaseRiskMathComm']} ne 'N'" id="baseRiskMathComm" class="page-component" th:data-path="@{/component/common/BaseRiskMathComm/init}" 
             						th:data-params="|{entity: '${riskTrialRetDto}',workflowId:'${workflowId?: ''}',entityName:'riskTrialRetDto',tradeId:'${tradeId}'}|">

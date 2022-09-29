@@ -20,23 +20,19 @@
                         <label class="layui-form-label form-label-wrap"
                                data-th-text="#{RskSupervisionRiskAnalyze001.groupName}">组合/组合包名称</label>
                         <div class="layui-input-inline input-inline">
-                            <input type="text" class="layui-input form-input input-lenovoselect" id="groupName"
+                            <select type="text" class="layui-input form-input input-select" id="groupName"
                                    data-th-value="${portfolioId}" name="groupName"
-                                   formatOption="false"
-                                   data-th-data-effectivefieldsalias='|{"code":"组合/组合包名称"}|'
-                                   data-th-data-url="@{/invest/riskredis/quota/rsksupervisionriskanalyze/RskSupervisionRiskAnalyze001/selectGroupName}"
-                                   maxlength=32/>
+                                   formatOption="false" multiple = "true"
+                                    data-th-data-url="@{/invest/riskredis/quota/rsksupervisionriskanalyze/RskSupervisionRiskAnalyze001/selectGroupName}"></select>
                         </div>
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-sm4 layui-col-lg4">
                         <label class="layui-form-label form-lable"
                                data-th-text="#{RskSupervisionRiskAnalyze001.indName}">指标名称</label>
                         <div class="layui-input-inline input-inline">
-                            <input type="text" class="layui-input form-input input-lenovoselect"  allowClear="true"
-                                   id="indName" name="indName" formatOption="false"
-                                   data-th-data-effectivefieldsalias='|{"code":"指标名称"}|'
-                                   data-th-data-url="@{/invest/riskredis/quota/rsksupervisionriskanalyze/RskSupervisionRiskAnalyze001/selectIndName}"
-                                   maxlength=32/>
+                            <select type="text" class="layui-input form-input input-select" allowClear="true"
+                                   id="indName" name="indName" formatOption="false" multiple = "true"
+                                    data-th-data-url="@{/invest/riskredis/quota/rsksupervisionriskanalyze/RskSupervisionRiskAnalyze001/selectIndName}" ></select>
                         </div>
                     </div>
                     <div class="layui-inline layui-col-md4 layui-col-sm4 layui-col-lg4">

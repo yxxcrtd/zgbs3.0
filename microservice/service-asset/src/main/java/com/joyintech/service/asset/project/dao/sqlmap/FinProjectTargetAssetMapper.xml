@@ -154,7 +154,8 @@
         	T6.REP_ASSET_TYPE,
         	T4.TRIAL_NO,
         	T1.CONTRACT_NO,
-        	T1.INVEST_ADVISER
+        	T1.INVEST_ADVISER,
+		 	T2.IS_INNER_ADV
 		FROM
 			FIN_PRODUCT T1
 			LEFT JOIN (

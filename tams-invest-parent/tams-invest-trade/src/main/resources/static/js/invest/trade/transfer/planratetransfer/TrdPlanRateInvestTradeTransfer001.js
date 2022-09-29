@@ -11,6 +11,26 @@
                 }
                 window.BaseRiskMathComm.getparam(riskparam);
         	}
+            if(window.BussTrdTransferOrder && window.BussTrdTransferOrder['bussTrdTransferOrder']) {
+                window.BussTrdTransferOrder['bussTrdTransferOrder'].setStlCommandInput(function () {
+                    getEntity();
+                    entity.chlId = $("#chlId").val();
+                    for (i = 0; i < entity.length; i++) {
+                        entity[i].finprodType2 = 'F17';
+                        entity[i].ps = 'T02';
+                        entity[i].ccy = 'CNY';
+                    }
+                    return {
+                        'isTotalTrade':'N'
+                        ,'bankLendingType':null
+                        ,'portfolioId':$("#transferPortfolioId").val()
+                        ,'isUsePageAcct':false
+                        ,'deal':entity
+                        ,'jiaoyiType':'dzh'
+                        ,'isLimitAcct':'Y'
+                    };
+                });
+            }
         }
     };
     /**
@@ -45,7 +65,7 @@
             , {field: 'portfolioName', width: 120, title: '组合名称'}
             , {field: 'finprodId', width: 120, title: '资产代码'}
             , {field: 'tradeDate', width: 120, title: '交易日期', type: 'date'}
-            , {field: 'settleDate', width: 120, title: '交割日期', type: 'date'}
+            , {field: 'settleDate', width: 120, title: '交割日期', type: 'date', visible:false}
             , {field: 'prinAmt', width: 120, title: '本金金额', type: 'number'}
             , {field: 'loadRate', width: 120, title: '净投资收益率%', type: 'number', digit: 4}
             , {field: 'intAmt', sortField: 'ccy', width: 130, title: '应计利息总额', type: 'number'}
@@ -54,7 +74,14 @@
             //, {field: 'assignPrinamt',width: 150,title: '待转让本金',type: 'money', digit: 2, sortable: false}
             // 待转让利息
             , {field: 'assignIntamt',width: 150,title: '待转让利息',type: 'money', digit: 2, sortable: false}
-            , {field: 'operation', title: '操作', type: 'action', buttons: ['delt']}
+            , {field: 'stlPayId', title: '划款指令编号', width: 150, visible:false}
+            , {field: 'fileArrayName', title: '附件名', width: 200}
+            , {field: 'businessId', visible: false }//附件编号
+            , {title : 'SysCommon.operation',field : 'operation',type : 'action',width : 150
+                ,buttons :[
+                    {text : '&#xe67c;',clas : 'uploadFile',title : '上传'}
+                    ,{text : '&#xe640;',clas : 'delt',title : '删除'}
+                    ,{field: 'sumitSeq',visible:false}  ]}
         ]
     };
     if (formTodoList) {
@@ -76,6 +103,7 @@
             prinAmt: $('#transferPrinAmt').val(),
             loadRate: $('#loadRate').val(),
             intAmt: $('#payInt').val(),
+            stlPayId : $('#stlPayId').val(),
             transferTradeAmt: $('#transferTradeAmt').val()
         };
         if (row.transferTradeAmt > Number($('#portoAvailableAmt').val())) {
@@ -120,21 +148,56 @@
 
     };
 
+    //附件上传
+    table.bind('click', '.uploadFile', function (data) {
+        //if ('2' == pageModel) {
+        //    return;
+        //}
+        data.operateType = "edit";
+        data.pageModel = PAGE_MODEL_EDIT;
+        var object = {};
+        object.rowData = JSON.stringify({});
+        object.businessId = data.businessId;
+        Joyin.dialog("上传附件",
+            JoyinUtil.getRealPath("component/entrust/EtrListUploadFile/init"),
+            "88%", "85%", object,
+            function(result){
+                var fileArrayName = '';
+                if (result && result.fileArray && _.isArray(result.fileArray) && result.fileArray.length>0) {
+                    for (var index in result.fileArray) {
+                        fileArrayName += result.fileArray[index].srcName +'，';
+                    }
+                    result.fileArrayName = fileArrayName.substr(0,fileArrayName.length-1);
+                }
+                table.renderRow(data.LAY_TABLE_INDEX, {"businessId": result.businessId, "fileArrayName": result.fileArrayName});
+            });
+    });
+
     $('#portfolioId').change(function () {
-        if ($('#portfolioId').val().split(':')[0]) {
-            var dataCash = {
-                portfolioId: $('#portfolioId').val().split(':')[0],
-                tradeDate: $('#tradeDate').val(),
-                ccy: $('#ccy').val(),
-                calendarId : $("#calendarId").val(),
-                finprodId : $("#finprodId").val(),
-                chlId : $("#chlId").val()
-            };
-            findCash(dataCash);
+        $('#portoAvailableAmt').val('').change().trigger('blur');
+        if ($('#portfolioId').val()) {
+            var object = $('#portfolioId').select2("data")[0].object;
+            console.log("------------------")
+            console.log(object)
+            if (object && object.availableCash) {
+                $('#portoAvailableAmt').val(object.availableCash).change().trigger('blur');
+            }
         }
-        if(!$('#portfolioId').val()){
-        	$("#portoAvailableAmt").val('').trigger("change").trigger('blur');
-        }
+
+        // if ($('#portfolioId').val().split(':')[0]) {
+        //     var dataCash = {
+        //         portfolioId: $('#portfolioId').val().split(':')[0],
+        //         tradeDate: $('#tradeDate').val(),
+        //         ccy: $('#ccy').val(),
+        //         calendarId : $("#calendarId").val(),
+        //         finprodId : $("#finprodId").val(),
+        //         chlId : $("#chlId").val()
+        //     };
+        //     findCash(dataCash);
+        // }
+        // if(!$('#portfolioId').val()){
+        // 	$("#portoAvailableAmt").val('').trigger("change").trigger('blur');
+        // }
     });
 
 
@@ -194,12 +257,24 @@
 
     //计算出拆分信息
     $('#transferPrinAmt').change(function () {
+        var transferPrinAmt = $("#transferPrinAmt").val();//本金金额
+        if (transferPrinAmt && transferPrinAmt <= 0) {
+            Joyin.error("本金金额必须大于0");
+            $("#transferPrinAmt").val('');
+            return;
+        }
         intAmtCalcu();
     });
 
     //联动交易金额修改事件
     $('#transferTradeAmt').change(function () {
         var transferTradeAmt = $('#transferTradeAmt').val();
+        if (transferTradeAmt && transferTradeAmt <= 0) {
+            Joyin.error("交易金额必须大于0");
+            $("#transferTradeAmt").val('');
+            return;
+        }
+
         var transferPrinAmt = $('#transferPrinAmt').val();
         $('#payInt').val(Number(transferTradeAmt) - Number(transferPrinAmt)).trigger("change").trigger('blur')
     });
@@ -207,7 +282,7 @@
     //绑定添加按钮
     $('#TrdPlanRateInvestTradeTransfer001_btn_add').click(function () {
         var options = $("#portfolioId option:selected").val();
-        var options1 = $("#portfolioId option:selected").text().split(':')[1];
+        var options1 = $("#portfolioId option:selected").text();
         //画面check
         if (!options || !$('#transferPrinAmt').val() || Number($("#transferPrinAmt").val()) == 0) {
             Joyin.error('组合代码和本金金额不能为空！');
@@ -266,6 +341,18 @@
             listInfoList : JSON.stringify(listInfoList)
         })
     };
+
+    function getEntity(){
+        // 转出
+        var object = $.serializeToObject('#trdPlanRateInvestTransferForm');
+        // 转入组合
+        object.dataList = JSON.stringify(table.getAllRows());
+
+        // console.log(object)
+        Joyin.ajaxSync(basePath + 'invest/trade/transfer/planratetransfer/TrdPlanRateInvestTradeTransfer001/getEntity', object, function(result) {
+            entity = result;
+        });
+    }
 
     //风险试算
     var getriskdata = function () {
@@ -327,6 +414,7 @@
                 	bussTrdTransfenpeiDto[i].ps = PS_T02;
                 }
                 object.bussTrdTransfenpeiDto = bussTrdTransfenpeiDto;
+                object.tradeId = null;
                 window.BaseRiskMathComm.initBaseRiskMathRedis(basePath + 'riskrds/interf/doInfBatchData/1/RSK002/F03',object,getriskdata());
             }
             else {

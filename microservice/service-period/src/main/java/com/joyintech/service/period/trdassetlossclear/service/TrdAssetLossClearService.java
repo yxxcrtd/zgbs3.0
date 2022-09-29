@@ -772,7 +772,7 @@ public class TrdAssetLossClearService extends BaseService<TrdDepoDurationDto> {
 		// if 明细.金融产品类型（估值） = 存款 then 数据字典.业务类型.存款类资产交易
 		// if 明细.金融产品类型（估值） = 计划类资产 then 数据字典.业务类型.计划类资产交易
 		if (durationDto.getFinprodType().equals(DictCodeListExt1.金融产品类型_债券.getValue())) {
-			trdProductDeal.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+			trdProductDeal.setBusiType(DictCodeList.业务类型_债券交易.getValue());
 		} else if (durationDto.getFinprodType().equals(DictCodeListExt1.金融产品类型_存款.getValue())
 				|| durationDto.getFinprodType().equals(DictCodeListExt1.金融产品类型_同业借款.getValue())) {
 			trdProductDeal.setBusiType(DictCodeList.业务类型_存款类资产交易.getValue());
@@ -889,7 +889,7 @@ public class TrdAssetLossClearService extends BaseService<TrdDepoDurationDto> {
 		// if 明细.金融产品类型（估值） = 存款 then 数据字典.业务类型.存款类资产交易
 		// if 明细.金融产品类型（估值） = 计划类资产 then 数据字典.业务类型.计划类资产交易
 		if (durationDto.getFinprodType().equals(DictCodeListExt1.金融产品类型_债券.getValue())) {
-			ptlTrade.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+			ptlTrade.setBusiType(DictCodeList.业务类型_债券交易.getValue());
 		} else if (durationDto.getFinprodType().equals(DictCodeListExt1.金融产品类型_存款.getValue())
 				|| durationDto.getFinprodType().equals(DictCodeListExt1.金融产品类型_同业借款.getValue())) {
 			ptlTrade.setBusiType(DictCodeList.业务类型_存款类资产交易.getValue());
@@ -929,7 +929,7 @@ public class TrdAssetLossClearService extends BaseService<TrdDepoDurationDto> {
 		// if 明细.金融产品类型（估值） = 存款 then 数据字典.业务类型.存款类资产交易
 		// if 明细.金融产品类型（估值） = 计划类资产 then 数据字典.业务类型.计划类资产交易
 		if (durationDto.getFinprodType().equals(DictCodeListExt1.金融产品类型_债券.getValue())) {
-			trdProductDeal.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+			trdProductDeal.setBusiType(DictCodeList.业务类型_债券交易.getValue());
 		} else if (durationDto.getFinprodType().equals(DictCodeListExt1.金融产品类型_存款.getValue())
 				|| durationDto.getFinprodType().equals(DictCodeListExt1.金融产品类型_同业借款.getValue())) {
 			trdProductDeal.setBusiType(DictCodeList.业务类型_存款类资产交易.getValue());
@@ -1063,7 +1063,7 @@ public class TrdAssetLossClearService extends BaseService<TrdDepoDurationDto> {
 		// if 明细.金融产品类型（估值） = 存款 then 数据字典.业务类型.存款类资产交易
 		// if 明细.金融产品类型（估值） = 计划类资产 then 数据字典.业务类型.计划类资产交易
 		if (durationDto.getFinprodType().equals(DictCodeListExt1.金融产品类型_债券.getValue())) {
-			ptlTrade.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+			ptlTrade.setBusiType(DictCodeList.业务类型_债券交易.getValue());
 		} else if (durationDto.getFinprodType().equals(DictCodeListExt1.金融产品类型_存款.getValue())
 				|| durationDto.getFinprodType().equals(DictCodeListExt1.金融产品类型_同业借款.getValue())) {
 			ptlTrade.setBusiType(DictCodeList.业务类型_存款类资产交易.getValue());

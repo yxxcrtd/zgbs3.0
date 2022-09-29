@@ -1777,7 +1777,9 @@ var TrdCommandReceive001 = function () {
                         Joyin.dialog(JoyinUtil
                                 .getLabel(label),
                             pagePath, "99%", "99%",
-                            param);
+                            param,function (){
+                                table.reload();
+                            });
                     }
                 });
 

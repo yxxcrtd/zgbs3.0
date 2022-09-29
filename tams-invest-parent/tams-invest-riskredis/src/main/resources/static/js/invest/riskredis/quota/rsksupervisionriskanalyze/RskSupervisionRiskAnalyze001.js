@@ -7,8 +7,8 @@ var rsk = function() {
      * 获取查询参数
      */
     var getSearchParams = function() {
-        var groupName = $('#groupName').val();
-        var indName = $('#indName').val();
+        var groupName = $("#groupName").val()?$("#groupName").val().join(","):'';
+        var indName = $("#indName").val()?$("#indName").val().join(","):'';
         var supType = $('#supType').val();
         var supStat = $('#supStat').val();
         var starSupDate = $('#supDate').startDate();

@@ -810,6 +810,16 @@ public class AllTradeCommonUtil {
                                 paTrdProductDeal.setPaBussType(DictCodeListExt3.平安业务类型_权益类资产_卖出.getValue());
                             }
                             // add by etliu 20210421 权益类资产相关代码合并 end
+                            else if(DictCodeList.共通业务类型_计划类资产_净值型_交易.getValue().equals(busiType)){
+                                paTrdProductDeal.setPaBussType(DictCodeListExt3.平安业务类型_计划类资产_净值型_卖出.getValue());
+                            }
+                            else if(DictCodeList.共通业务类型_基金类资产交易.getValue().equals(busiType)){
+                                if(StringUtil.equals(paTrdProductDeal.getPaBussType(),DictCodeListExt3.平安业务类型_货币基金买入.getValue())){
+                                    paTrdProductDeal.setPaBussType(DictCodeListExt3.平安业务类型_货币基金卖出.getValue());
+                                }else{
+                                    paTrdProductDeal.setPaBussType(DictCodeListExt3.平安业务类型_非货币基金卖出.getValue());
+                                }
+                            }
                             else {
                                 paTrdProductDeal.setPaBussType(DictCodeListExt1.平安业务类型_存款类资产卖出.getValue());
                             }
@@ -833,6 +843,16 @@ public class AllTradeCommonUtil {
                                 paTrdProductDeal.setPaBussType(DictCodeListExt3.平安业务类型_权益类资产_买入.getValue());
                             }
                             // add by etliu 20210421 权益类资产相关代码合并 end
+                            else if(DictCodeList.共通业务类型_计划类资产_净值型_交易.getValue().equals(busiType)){
+                                paTrdProductDeal.setPaBussType(DictCodeListExt3.平安业务类型_计划类资产_净值型_买入.getValue());
+                            }
+                            else if(DictCodeList.共通业务类型_基金类资产交易.getValue().equals(busiType)) {
+                                if (StringUtil.equals(paTrdProductDeal.getPaBussType(), DictCodeListExt3.平安业务类型_货币基金卖出.getValue())) {
+                                    paTrdProductDeal.setPaBussType(DictCodeListExt3.平安业务类型_货币基金买入.getValue());
+                                } else {
+                                    paTrdProductDeal.setPaBussType(DictCodeListExt3.平安业务类型_非货币基金买入.getValue());
+                                }
+                            }
                             else {
                                 paTrdProductDeal.setPaBussType(DictCodeListExt1.平安业务类型_存款类资产买入.getValue());
                             }
@@ -1697,6 +1717,9 @@ public class AllTradeCommonUtil {
         List<String> orderIds = baseAssetCashPositionCommMapper.selectOrderIdsByTradeId(tradeId);
         if (orderIds.isEmpty()) {
             orderIds = baseAssetCashPositionCommMapper.selectOrderIdsByPTotalTradeId(tradeId);
+        }
+        if (orderIds.isEmpty()) {
+            orderIds = baseAssetCashPositionCommMapper.selectOrderIdsByTotalTradeId(tradeId);
         }
         orderIds.add(tradeId);
 

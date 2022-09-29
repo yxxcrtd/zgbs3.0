@@ -15,9 +15,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.constant.*;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -34,11 +35,6 @@ import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectDto;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.ExportUtil;
-import com.joyintech.framework.util.FileNameUtil;
-import com.joyintech.framework.util.JsonUtils;
-import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.system.constant.SystemGlobalConstant;
 import com.joyintech.tams.invest.entrust.etrinvestallinfo.dto.EtrInvestAllInfoDto;
 import com.joyintech.tams.invest.entrust.etrinvestallinfo.service.EtrInvestAllInfoService;
@@ -56,7 +52,9 @@ import com.joyintech.tams.invest.entrust.etrrepo.dto.EtrRepoDto;
 @PageId("EtrInvestAllInfo001")
 @RequestMapping("/invest/entrust/etrinvestallinfo/EtrInvestAllInfo001")
 public class EtrInvestAllInfo001Controller extends BaseController {
-    
+    @Autowired
+    private IPlatformDate iPlatformDate;
+
     /**
      * 所有投资委托信息service
      */
@@ -120,6 +118,10 @@ public class EtrInvestAllInfo001Controller extends BaseController {
         model.addAttribute("ENTRUST_CLASS_02", DictCodeListExt3.投资指令类型_多组合单资产指令.getValue());
         model.addAttribute("TRD75", DictCodeListExt3.共通业务类型_立项指令.getValue());
 
+        String remotePathPrefix = CacheUtil.getSysParam("dateTextType");
+        if (remotePathPrefix.equals("01")){
+            model.addAttribute("sysDate", (iPlatformDate.getSysDateStr()+" - "+iPlatformDate.getSysDateStr()));
+        }
         return super.init(model);
     }
     /**

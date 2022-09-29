@@ -416,4 +416,8 @@ public class EtrExchangeTradePositionsSecRepoResponse {
     public void setTradePlat(String tradePlat) {
         this.tradePlat = tradePlat;
     }
+
+    public String getBusiKey(){
+        return getPortfolioId() + "_" + getSecAcctId() + "_" + getFinprodId();
+    }
 }

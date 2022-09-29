@@ -729,4 +729,17 @@ public class AssetsTransferDto extends BaseEntity {
     public void setTotleTradeId(String totleTradeId) {
         this.totleTradeId = totleTradeId;
     }
+
+    /**
+     * 是否行权
+     */
+    private String isRight;
+
+    public String getIsRight() {
+        return isRight;
+    }
+
+    public void setIsRight(String isRight) {
+        this.isRight = isRight;
+    }
 }
