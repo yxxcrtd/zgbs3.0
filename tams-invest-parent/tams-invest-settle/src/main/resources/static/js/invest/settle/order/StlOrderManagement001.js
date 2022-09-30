@@ -1,3 +1,33 @@
+/**
+ * 交易信息查看页面
+ */
+var showDetailTrdPage = function (paBussType, tradeId, tradeDateVal, tradeMarket) {
+    let param;
+    let url;
+    console.log("----------------showDetailTrdPage-------------------")
+    //债券委托详情 银行间/商业银行柜台
+    if ((paBussType === '09' || paBussType === '10')) {
+        console.log("----------------PINAN_ASSET_TYPE_F01----------------------")
+
+        param = {
+            "busiCode": tradeId,
+            "startDate": tradeDateVal,
+            "endDate": tradeDateVal,
+            "finprodType2": 'F01'
+        };
+        url = "home.html?a=a&busiCode=" + tradeId
+            + "&startDate=" + tradeDateVal
+            + "&endDate=" + tradeDateVal
+            + "&finprodType2=" + 'F01'
+            + "&pageModel=1&editable=false&isTodoList=true#/transactionSearch/detail?a=a";
+
+        Joyin.dialog(JoyinUtil.getLabel("SysCommon.refrence"),
+            basePath + url,
+            "95%", "90%",
+            param);
+    }
+}
+
 var parenPage = function () {
     /**
      * 获取查询参数
@@ -28,8 +58,15 @@ var parenPage = function () {
     
     var tabcols = [
             {field: 'bizCode', title: '业务编号', width: 200, sortable: false, render: function (data, type, row, meta) {
-                    if(row.paBizType=='151'||row.paBizType=='180'||row.paBizType=='202'||row.paBizType=='212'||row.paBizType=='09'){
+                    // console.log(data);
+                    // console.log(row);
+                    if(row.paBizType=='151'||row.paBizType=='180'||row.paBizType=='202'||row.paBizType=='212'){
                         return data;
+                    }
+                    // 09债券类资产买入 180一级申购 202债券分销买入确认 151中标结果维护
+                    if (row.paBizType === '09' || row.paBizType === '10') {
+                        return "<a onclick=\"showDetailTrdPage('" + row.paBizType + "','" + row.bizCode + "','"
+                            + row.settleDate + "','" + row.tradeMarket + "')\" + style='cursor: pointer;'>" + row.bizCode + "</a>";
                     }
                     return "<a class='pro-link' style='cursor: pointer;' " +
                         "href='javascript:openOperateWindow(\"" + STATUS_VALID_05 + "\",\"" + row.paBizType + "\",\"" + row.portfolioId + "\",\""
