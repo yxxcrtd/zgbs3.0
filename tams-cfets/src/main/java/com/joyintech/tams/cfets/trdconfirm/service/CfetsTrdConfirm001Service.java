@@ -180,9 +180,6 @@ public class CfetsTrdConfirm001Service extends BaseService {
     @Autowired(required = false)
     private CfetsEtribBondInfo003Service cfetsEtribBondInfo003Service;
 
-    @Autowired(required = false)
-    private CfetsRepoQuotedPrice004Service cfetsRepoQuotedPrice004Service;
-
     /**
      * 头寸引擎
      */
@@ -1905,7 +1902,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
                     Map<String, Object> map = new HashMap<String, Object>();
                     map.put("portfolioId", regFinPledge.getPortfolioId());
                     map.put("finprodId", regFinPledge.getFinprodId());
-                    String secAcctId = cfetsRepoQuotedPrice004Service.qryPortfolioSecAcctId(map);
+                    String secAcctId = joyinbusinessCommonService.qryPortfolioSecAcctId(map);
                     if (StringUtil.isNotEmpty(secAcctId)) {
                         secport.setSecAcctId(secAcctId); // 证券账户
                     }

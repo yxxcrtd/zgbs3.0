@@ -430,7 +430,7 @@ public class DealTransactionDetailsDto {
     }
 
     public String getQuoteTypeStr() {
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式, this.getQuoteType());
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.交易类型, this.getQuoteType());
     }
 
     public void setQuoteTypeStr(String quoteTypeStr) {

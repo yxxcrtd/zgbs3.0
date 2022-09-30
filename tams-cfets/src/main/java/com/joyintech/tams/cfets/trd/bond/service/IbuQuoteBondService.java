@@ -36,11 +36,9 @@ import com.joyintech.tams.invest.common.component.base.entrust.impl.BaseEtrInves
 import com.joyintech.tams.invest.common.component.base.entrust.impl.dao.BaseEtrInvestInfoMapper;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
-import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.riskinfrds.util.EntrustCompleteUtil;
 import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
-import com.joyintech.tams.invest.entrust.common.aop.EntrustRdsCommonAop;
 import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.systemtools.util.CommonUtil;
@@ -1265,7 +1263,7 @@ public class IbuQuoteBondService extends BaseService {
      */
     public boolean doBack(BondQuoteInfoDto bondQuoteInfoDto) {
         if (StringUtil.equals(bondQuoteInfoDto.getQuoteType(),
-                BussinessDictCodeList.报价方式_对话报价.getValue())) {
+                BussinessDictCodeList.交易类型_对话报价.getValue())) {
             CfetsBondDealDialogueQuoteDto cfetsBondDealDialogueQuoteDto = new CfetsBondDealDialogueQuoteDto();
             BeanUtil.copyPropertiesIgnoreNull(cfetsBondDealDialogueQuoteDto,bondQuoteInfoDto);
             ibuComponentCommonService.bondDialogueQuoteRestore(cfetsBondDealDialogueQuoteDto);
@@ -1283,7 +1281,7 @@ public class IbuQuoteBondService extends BaseService {
                     bondQuoteInfoDto, boolean.class);*/
         }
         else if (StringUtil.equals(bondQuoteInfoDto.getQuoteType(),
-                BussinessDictCodeList.报价方式_请求报价.getValue())) {
+                BussinessDictCodeList.交易类型_请求报价.getValue())) {
             CfetsBondDealRequestQuoteDto cfetsBondDealRequestQuoteDto = new CfetsBondDealRequestQuoteDto();
             BeanUtil.copyPropertiesIgnoreNull(cfetsBondDealRequestQuoteDto,bondQuoteInfoDto);
             ibuComponentCommonService.sendBondRequestQuoteRestore(cfetsBondDealRequestQuoteDto);
@@ -1310,12 +1308,12 @@ public class IbuQuoteBondService extends BaseService {
      */
     public boolean doDel(BondQuoteInfoDto bondQuoteInfoDto) {
         if (StringUtil.equals(bondQuoteInfoDto.getQuoteType(),
-                BussinessDictCodeList.报价方式_对话报价.getValue())) {
+                BussinessDictCodeList.交易类型_对话报价.getValue())) {
             cfetsBondDealQuotedPriceService.doDeletePtlPositionHoldByQuoteId(bondQuoteInfoDto.getQuoteId());
             return cfetsBondDealQuotedPriceService.deleteBondRequestQuote(bondQuoteInfoDto.getQuoteId());
         }
         else if (StringUtil.equals(bondQuoteInfoDto.getQuoteType(),
-                BussinessDictCodeList.报价方式_请求报价.getValue())) {
+                BussinessDictCodeList.交易类型_请求报价.getValue())) {
             cfetsBondDealQuotedPriceService.doDeletePtlPositionHoldByQuoteId(bondQuoteInfoDto.getQuoteId());
             return cfetsBondDealQuotedPriceService.deleteBondRequestQuote(bondQuoteInfoDto.getQuoteId());
         }

@@ -1,6 +1,5 @@
 package com.joyintech.tams.cfets.etrdispatcher.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
@@ -525,7 +524,7 @@ public class CfetsEtrDispatcherExeListInfoResponse extends CfetsEtrDispatcherBas
     }
 
     public String getBusiTypeStr() {
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式, this.getBusiType());
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.交易类型, this.getBusiType());
     }
 
     public String getExerciseDate() {

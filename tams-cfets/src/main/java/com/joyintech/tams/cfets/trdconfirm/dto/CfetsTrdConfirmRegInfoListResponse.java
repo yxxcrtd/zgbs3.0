@@ -15,7 +15,6 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
-import com.joyintech.tams.invest.entrust.etrinvestbondinfo.dto.EtrInvestBondInfoDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -1017,7 +1016,7 @@ public class CfetsTrdConfirmRegInfoListResponse{
         if(StringUtil.equals(getFinprodType2(),"03")){//一级申购登记类型为空
             return StringUtil.EMPTY;
         }
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式, getDealType());
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.交易类型, getDealType());
     }
 
     public void setDealTypeName(String dealTypeName) {
@@ -1025,7 +1024,7 @@ public class CfetsTrdConfirmRegInfoListResponse{
     }
 
     public String getQuoteTypeName() {
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式_登记, getQuoteType());
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式, getQuoteType());
     }
 
     public void setQuoteTypeName(String quoteTypeName) {

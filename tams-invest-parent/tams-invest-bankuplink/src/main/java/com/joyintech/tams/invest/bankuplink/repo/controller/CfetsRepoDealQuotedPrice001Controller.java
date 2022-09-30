@@ -117,7 +117,7 @@ public class CfetsRepoDealQuotedPrice001Controller extends BaseController {
         model.addAttribute("entrustStatusUnAccept", BussinessDictCodeList.委托状态_待接收.getValue());
         model.addAttribute("entrustStatusAccept", BussinessDictCodeList.委托状态_已接收.getValue());
         model.addAttribute("unSendStatus", BussinessDictCodeList.银行间上行发送状态_待发送.getValue());
-        model.addAttribute("quoteTypeDialog", BussinessDictCodeList.报价方式_对话报价.getValue());
+        model.addAttribute("quoteTypeDialog", BussinessDictCodeList.交易类型_对话报价.getValue());
         model.addAttribute("ps_pay_name", BussinessDictCodeList.交易方向_买入.getCodeName());
         model.addAttribute("ps_sell_name", BussinessDictCodeList.交易方向_卖出.getCodeName());
         model.addAttribute("tradeStatusPending", BussinessDictCodeList.银行间上行报价状态_待回复.getValue());
@@ -492,7 +492,7 @@ public class CfetsRepoDealQuotedPrice001Controller extends BaseController {
         AjaxResult ajaxResult = new AjaxResult();
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < dataRows.size(); i++ ) {
-        	if(StringUtil.equals(dataRows.get(i).getQuoteType(), BussinessDictCodeList.报价方式_对话报价.getValue())){
+        	if(StringUtil.equals(dataRows.get(i).getQuoteType(), BussinessDictCodeList.交易类型_对话报价.getValue())){
         		CfetsRepoDealQuotedPrice001Dto cfetsBondDealDialogueQuoteDto = new CfetsRepoDealQuotedPrice001Dto();
             	BeanUtil.copyPropertiesIgnoreNull(cfetsBondDealDialogueQuoteDto, dataRows.get(i));
 //            	cfetsBondDealDialogueQuoteDto.setAvaNum(dataRows.get(i).getEntrustAmt());
@@ -598,7 +598,7 @@ public class CfetsRepoDealQuotedPrice001Controller extends BaseController {
     	//设置流程需要信息
     	List<CfetsRepoDealQuotedPrice001Dto> cfetsRepoDealQuotedPrice001DtoList = new ArrayList<>();
     	for(RepoQuoteImportPreviewDto repoQuoteImportPreviewDto : dataList){
-        	if(StringUtil.equals(repoQuoteImportPreviewDto.getQuoteType(), BussinessDictCodeList.报价方式_对话报价.getValue())){
+        	if(StringUtil.equals(repoQuoteImportPreviewDto.getQuoteType(), BussinessDictCodeList.交易类型_对话报价.getValue())){
         		CfetsRepoDealQuotedPrice001Dto cfetsRepoDealQuotedPrice001Dto = new CfetsRepoDealQuotedPrice001Dto();
             	BeanUtil.copyPropertiesIgnoreNull(cfetsRepoDealQuotedPrice001Dto, repoQuoteImportPreviewDto);
             	cfetsRepoDealQuotedPrice001Dto.setQuotaPageModel("new");

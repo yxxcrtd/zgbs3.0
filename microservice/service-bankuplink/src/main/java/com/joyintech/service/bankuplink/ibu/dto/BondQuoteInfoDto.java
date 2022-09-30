@@ -13,8 +13,6 @@ package com.joyintech.service.bankuplink.ibu.dto;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.base.BaseEntity;
 import com.joyintech.framework.util.ArithmeticUtil;
@@ -741,7 +739,7 @@ public class BondQuoteInfoDto extends BaseEntity {
     
     private BigDecimal shareAmtHun;
     public BigDecimal getShareAmtHun(){
-        if (StringUtil.equals(this.getQuoteType(), BussinessDictCodeList.报价方式_请求报价.getValue())){
+        if (StringUtil.equals(this.getQuoteType(), BussinessDictCodeList.交易类型_请求报价.getValue())){
             if (this.getShareAmt() != null){
                 return ArithmeticUtil.divide(this.getShareAmt(), new BigDecimal(10000), 6);
             }
