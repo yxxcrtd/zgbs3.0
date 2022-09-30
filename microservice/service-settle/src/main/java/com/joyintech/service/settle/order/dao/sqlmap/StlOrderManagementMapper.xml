@@ -257,7 +257,7 @@
         /*金融产品交易扩展.平安业务类型 IN (数据字典.业务类型.非货币基金申购申请、计划类资产（净值型）申购申请)*/
         AND T4.TRADE_STATUS = #{TRADE_STATUS_01}
         AND (T4.IS_CANCEL IS NULL OR T4.IS_CANCEL = #{NO})
-        AND T10.IS_NEED_SEND = #{YES}
+        AND ((T10.IS_NEED_SEND = 'Y' AND (T4.IS_OUT_TRADE is null OR T4.IS_OUT_TRADE = 'Y')) OR (T10.IS_NEED_SEND = 'N' AND T4.IS_OUT_TRADE = 'N'))
 
         <if test="portfolioId != null and !portfolioId.isEmpty()">
             <foreach collection="portfolioId" open="AND upper(T10.PORTFOLIO_ID) in (" close=")" item="item" separator=",">upper(#{item})</foreach>
