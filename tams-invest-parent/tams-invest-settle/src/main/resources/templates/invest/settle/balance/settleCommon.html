@@ -17,8 +17,10 @@
         var 平安业务类型_计划类资产净值型_申购申请 = /*[[${PA_BUSINESS_TYPE29}]]*/'';
         var 平安业务类型_计划类资产_净值型_卖出 = /*[[${PA_BUSINESS_TYPE200}]]*/'';
         var 平安业务类型_计划类资产_利率型_申购 = /*[[${PA_BUSINESS_TYPE33}]]*/'';
+        var 平安业务类型_计划类资产_净值型_申购确认 = /*[[${PA_BUSINESS_TYPE30}]]*/'';
         var 平安业务类型_货币基金申购申请 = /*[[${PA_BUSINESS_TYPE21}]]*/'';
         var 平安业务类型_非货币基金申购申请 = /*[[${PA_BUSINESS_TYPE25}]]*/'';
+        var 平安业务类型_非货币基金赎回确认 = /*[[${PA_BUSINESS_TYPE28}]]*/'';
         var 平安业务类型_普通拆出 = /*[[${PA_BUSINESS_TYPE16}]]*/'';
         var 平安业务类型_自定义现金流支付 = /*[[${PA_BUSINESS_TYPE63}]]*/'';
         var 平安业务类型_银证转账 = /*[[${PA_BUSINESS_TYPE65}]]*/'';
@@ -262,11 +264,11 @@
                 url = 存款交易URL;
             } else if (paBussType == 平安业务类型_项目类资产买入) {
                 url = 项目类交易URL;
-            } else if (paBussType == 平安业务类型_计划类资产净值型_申购申请|| paBussType == 平安业务类型_计划类资产_净值型_卖出) {
+            } else if (paBussType == 平安业务类型_计划类资产净值型_申购申请|| paBussType == 平安业务类型_计划类资产_净值型_卖出 || paBussType == 平安业务类型_计划类资产_净值型_申购确认) {
                 url = 计划类资产净值型交易URL;
             } else if (paBussType == 平安业务类型_计划类资产_利率型_申购) {
                 url = 计划类资产利率型交易URL;
-            } else if (paBussType == 平安业务类型_货币基金申购申请 || paBussType == 平安业务类型_非货币基金申购申请) {
+            } else if (paBussType == 平安业务类型_货币基金申购申请 || paBussType == 平安业务类型_非货币基金申购申请 || paBussType == 平安业务类型_非货币基金赎回确认) {
                 url = 货币基金交易URL;
             }
             else if (paBussType == 平安业务类型_通道划款 || paBussType == 平安业务类型_通道回款) {
