@@ -133,7 +133,7 @@ public class ValRiftTask extends BatchBaseService{
             result.setStatus(BatchStatus.COMPLETED);
         }
         catch (Exception e) {
-            logger.error("估值穿透批报错",e);
+            logger.error(e.getMessage());
         }
         isRunning=false;
         return result;
