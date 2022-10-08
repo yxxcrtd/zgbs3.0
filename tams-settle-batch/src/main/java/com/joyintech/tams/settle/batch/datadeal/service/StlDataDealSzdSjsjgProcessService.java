@@ -1284,10 +1284,10 @@ public class StlDataDealSzdSjsjgProcessService {
         StlDownDataDealWriteDto stlDownDataDealWriteDto = new StlDownDataDealWriteDto();
         // 遍历 输入.SJSJG清算数据List 清算数据Entity
         for(SzdSjsjg szdSjsjg : stlDownDataDealOperatorDto.getStlDownDataDealOperatorBaseDto().getSjsjgList()) {
-            if (DictCodeListExt1.证券品种_回购.getValue().equals(stlDownDataDealOperatorDto.getFinprodType())
-                    && StringUtil.isEmpty(szdSjsjg.getJgywlsh())) {
-                continue;
-            }
+//            if (DictCodeListExt1.证券品种_回购.getValue().equals(stlDownDataDealOperatorDto.getFinprodType())
+//                    && StringUtil.isEmpty(szdSjsjg.getJgywlsh())) {
+//                continue;
+//            }
             // KEY = 证券账户号码 + 交易单元
             // GNS-865,GNS-866:交易单元为空时使用托管单元 modify by fuyongsheng 20220214 start
             String jgjydy = StringUtil.isNotEmpty(szdSjsjg.getJgjydy()) ? szdSjsjg.getJgjydy():szdSjsjg.getJgtgdy();
