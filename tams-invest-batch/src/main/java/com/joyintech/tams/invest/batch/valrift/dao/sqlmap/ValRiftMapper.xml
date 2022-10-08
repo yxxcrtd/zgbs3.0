@@ -288,7 +288,7 @@
 			RSK_VALTBL_ASSET_SUB
 			<where>
 				<if test="cdate != null and cdate != ''">
-					VAL_DATE =  TO_DATE(#{cdate},'YYYY-MM-DD')
+					VAL_DATE <![CDATA[<=]]>  TO_DATE(#{cdate},'YYYY-MM-DD')
 				</if>
 			</where>
 			GROUP BY
@@ -302,7 +302,7 @@
 			AND T1.PTL_ID = #{portfolioId,jdbcType=VARCHAR}
 		</if>
 		<if test="cdate != null and cdate != ''">
-			and T1.VAL_DATE =  TO_DATE(#{cdate},'YYYY-MM-DD')
+			and T1.VAL_DATE <![CDATA[<=]]>  TO_DATE(#{cdate},'YYYY-MM-DD')
 		</if>
 		GROUP BY T1.VAL_DATE,
 		T1.PTL_ID,
