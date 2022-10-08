@@ -128,7 +128,7 @@
         AND T4.TRADE_STATUS = #{TRADE_STATUS_01}
         AND (T4.IS_CANCEL IS NULL OR T4.IS_CANCEL = #{NO})
         AND (T4.PORTFOLIO_ID IS NOT NULL OR ( T4.PORTFOLIO_ID IS  NULL AND ( T5.PA_BUSS_TYPE =#{PA_BUSINESS_TYPE08} OR T4.TG_BUSI_TYPE =#{PA_BUSINESS_TYPE08})))
-        AND ((T10.IS_NEED_SEND = 'Y' and (TPD.IS_OUT_TRADE is null OR TPD.IS_OUT_TRADE = 'Y') ) OR (T10.IS_NEED_SEND = 'N' AND TPD.IS_OUT_TRADE = 'N'))
+        AND T10.IS_NEED_SEND = #{YES}
         <if test="portfolioId != null and !portfolioId.isEmpty()">
             <foreach collection="portfolioId" open="AND (T10.PORTFOLIO_ID in (" close=")" item="item" index="index" separator=",">
                 <if test="(index % 998) == 0">
@@ -257,8 +257,7 @@
         /*金融产品交易扩展.平安业务类型 IN (数据字典.业务类型.非货币基金申购申请、计划类资产（净值型）申购申请)*/
         AND T4.TRADE_STATUS = #{TRADE_STATUS_01}
         AND (T4.IS_CANCEL IS NULL OR T4.IS_CANCEL = #{NO})
-        AND ((T10.IS_NEED_SEND = 'Y' AND (T4.IS_OUT_TRADE is null OR T4.IS_OUT_TRADE = 'Y')) OR (T10.IS_NEED_SEND = 'N' AND T4.IS_OUT_TRADE = 'N'))
-
+        AND T10.IS_NEED_SEND = #{YES}
         <if test="portfolioId != null and !portfolioId.isEmpty()">
             <foreach collection="portfolioId" open="AND upper(T10.PORTFOLIO_ID) in (" close=")" item="item" separator=",">upper(#{item})</foreach>
         </if>

@@ -964,7 +964,6 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
                     if ("T01".equals(trdProductDeal.getPs())) {
                         resultOrderDto.setPs(DictCodeListExt1.收付方向_支出.getValue());
                         resultOrderDto.setPayType("02");
-                        resultOrderDto.setIsNeedSend("N");
                         resultOrderDto.setPortfolioId(resultOrderDto.getInPortfolioId());
                         String orderId = "";
                         if (baseGetBussinessId != null) {
@@ -975,6 +974,9 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
                             orderId = IDGenerator.generate();
                         }
                         resultOrderDto.setOrderId(orderId);
+                    }
+                    if (DictCodeList.收付方向_收入.getValue().equals(resultOrderDto.getPs())) {
+                        resultOrderDto.setIsNeedSend("N");
                     }
                     resultOrderDto.setTradeId(input.getTradeId());
                     resultOrderDto.setWorkflowId(entity.getWorkflowId());
@@ -1173,7 +1175,6 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
                 if ("T01".equals(trdProductDeal.getPs())) {
                     resultOrderDto.setPs(DictCodeListExt1.收付方向_支出.getValue());
                     resultOrderDto.setPayType("02");
-                    resultOrderDto.setIsNeedSend("N");
                     resultOrderDto.setPortfolioId(resultOrderDto.getInPortfolioId());
                     String inOrderId = riskNamListCommonMapper.queryInOrderId(resultOrderDto.getTradeId());
                     if (StringUtil.isEmpty(inOrderId)) {
@@ -1186,6 +1187,9 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
                         }
                     }
                     resultOrderDto.setOrderId(inOrderId);
+                }
+                if (DictCodeList.收付方向_收入.getValue().equals(resultOrderDto.getPs())) {
+                    resultOrderDto.setIsNeedSend("N");
                 }
                 resultOrderDto.setTradeId(output.getTradeId());
                 resultOrderDto.setWorkflowId(entity.getWorkflowId());

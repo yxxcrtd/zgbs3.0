@@ -665,7 +665,7 @@ public class TrdPlanRateInvestTradeTransfer001Service extends CommonExportServic
 				stl.setSettleDate(baseTradeProductDealDto.getTrdProductDeal().getSettleDate());
 			}
             stl.setTradeId(totleTradeId);
-			if (DictCodeListExt1.收付方向_支出.getValue().equals(stl.getPs())) {
+			if (DictCodeList.收付方向_收入.getValue().equals(stl.getPs())) {
 				stl.setIsNeedSend("N");
 			}
 			baseTradeProductDealDto.setStlPayOrdersList(Arrays.asList(stl));
