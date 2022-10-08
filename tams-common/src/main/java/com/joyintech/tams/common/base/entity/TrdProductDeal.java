@@ -177,6 +177,24 @@ public class TrdProductDeal extends BaseEntity {
     private BigDecimal tradeAmt;
 
     /**
+     * 旧交易金额
+     */
+    @JsonSerialize(using=BigDecimalSerializer.class)
+    private BigDecimal oldTradeAmt;
+
+    /**
+     * 旧全价总额
+     */
+    @JsonSerialize(using=BigDecimalSerializer.class)
+    private BigDecimal oldFpriceAmt;
+
+    /**
+     * 旧利息总额
+     */
+    @JsonSerialize(using=BigDecimalSerializer.class)
+    private BigDecimal oldIntAmt;
+
+    /**
      * 未随交易支付费用
      */
     @JsonSerialize(using=BigDecimalSerializer.class)
@@ -1674,5 +1692,29 @@ public class TrdProductDeal extends BaseEntity {
 
     public void setIssueType(String issueType) {
         this.issueType = issueType;
+    }
+
+    public BigDecimal getOldTradeAmt() {
+        return oldTradeAmt;
+    }
+
+    public void setOldTradeAmt(BigDecimal oldTradeAmt) {
+        this.oldTradeAmt = oldTradeAmt;
+    }
+
+    public BigDecimal getOldFpriceAmt() {
+        return oldFpriceAmt;
+    }
+
+    public void setOldFpriceAmt(BigDecimal oldFpriceAmt) {
+        this.oldFpriceAmt = oldFpriceAmt;
+    }
+
+    public BigDecimal getOldIntAmt() {
+        return oldIntAmt;
+    }
+
+    public void setOldIntAmt(BigDecimal oldIntAmt) {
+        this.oldIntAmt = oldIntAmt;
     }
 }
