@@ -1,6 +1,6 @@
 /**
  * 监控值指标表达式明细
- *
+ * 
  * RskIndExprDtl
  * @author zhangrui1
  */
@@ -16,17 +16,9 @@
         data: entity.paramList,
         checkbox: false,
         cols:[
-            {field:'para',visible :false}
+             {field:'para',visible :false}
             ,{field:'paraStr', title: 'RskIndExprDtl.paraStr',width:'30%', sortable: false}
-            ,{field:'paraVal', title: 'RskIndExprDtl.paraVal',width:'50%', sortable: false,
-                render : function(data, type, row, meta) {
-                    console.log(row);
-                    if(Number(row.paraVal)) {
-                        return Number(row.paraVal).toLocaleString();
-                    }
-                    return data;
-                }
-            }
+            ,{field:'paraVal', title: 'RskIndExprDtl.paraVal',width:'50%', sortable: false}
         ]
     });
 
@@ -54,10 +46,10 @@
         var divStr='';
         divStr+='<div class="layui-col-md6" style="margin-bottom:10px;overflow:hidden;height:36px;" id="dt-pz-info-' + count + '">';
         divStr+='<div class="input-inline select-ind-fh manager_fh_fh">';
-        divStr+='<select type="text" id="manager_fh" name="manager_fh" formatoption="false" class="input-select manager_fh" placeholder="请输入内容" allowClear="true" initValue="' + obj.oper + '" disabled></select>';
+        divStr+='<select type="text" id="manager_fh" name="manager_fh" formatoption="false" class="input-select manager_fh" placeholder="请输入内容" allowClear="true" initValue="' + obj.oper + '" disabled></select>'; 
         divStr+='</div>';
         divStr+='<div class="input-inline select-ind-rr">';
-        divStr+='<select type="text" id="manager_rr" name="manager_rr" formatoption="false" class="input-select manager_rr" placeholder="请输入内容" allowClear="true" initValue="' + obj.para + '" disabled></select>';
+        divStr+='<select type="text" id="manager_rr" name="manager_rr" formatoption="false" class="input-select manager_rr" placeholder="请输入内容" allowClear="true" initValue="' + obj.para + '" disabled></select>'; 
         divStr+='</div>';
         divStr+='</div>';
         return divStr;
