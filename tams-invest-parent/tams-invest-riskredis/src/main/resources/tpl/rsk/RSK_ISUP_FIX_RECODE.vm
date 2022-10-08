@@ -2,10 +2,10 @@
 
 ----风险监督指标参数
 DELETE FROM RSK_ISUP_INDICATOR_PARA WHERE PARA_CODE ='$!{param.paraCode}';
-INSERT INTO RSK_ISUP_INDICATOR_PARA (PARA_CODE, PARA_NAME, IS_FORBID, FORBID_ENUM, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, MODEL_CODE, MODEL_VALUE, IS_UP_REDIS, PARAM_DATA_TYPE, PARA_TYPE, PARAM_MATH_TYPE, PARAM_VALUE_NONE)
-VALUES('$!{param.paraCode}','$!{param.paraName}','$!{param.isForbid}','$!{param.forbidEnum}','system','1',sysdate,'system',sysdate,'','','$!{param.isUpRedis}','$!{param.paramDataType}', '$!{param.paraType}','$!{param.paramMathType}', '$!{param.paramValueNone}');
+INSERT INTO RSK_ISUP_INDICATOR_PARA (PARA_CODE, PARA_NAME, IS_FORBID, FORBID_ENUM, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, MODEL_CODE, MODEL_VALUE, IS_UP_REDIS, PARAM_DATA_TYPE, PARA_TYPE, PARAM_MATH_TYPE, PARAM_VALUE_NONE,IS_POSITION_DETAILS,POSITION_DETAILS)
+VALUES('$!{param.paraCode}','$!{param.paraName}','${param.isForbid}','${param.forbidEnum}','system','2222222',sysdate,'system',sysdate,'','','$!{param.IS_UP_REDIS}','$!{param.paramDataType}', '$!{param.paraType}','$!{param.paramMathType}', '$!{param.paramValueNone}','N',null);
 
 ---监督指标参数明细
 DELETE FROM RSK_ISUP_FIX_RECODE WHERE PARA_CODE = '$!{paramFix.paraCode}';
 INSERT INTO RSK_ISUP_FIX_RECODE (PARA_CODE, CONTENT, VALID_DATE, NOTIFY_DATE, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, INSTITUTION_CODE)
-VALUES('$!{paramFix.paraCode}','$!{paramFix.content}',to_date('$!{validDate}','yyyy-mm-dd'),to_date('$!{notifyDate}','yyyy-mm-dd'),'system','1',SYSDATE,'cdj',SYSDATE,'$!{paramFix.institutionCode}');
+VALUES('$!{paramFix.paraCode}','$!{paramFix.content}',to_date('$!{paramFix.validDate}','yyyy-mm-dd'),to_date('$!{paramFix.notifyDate}','yyyy-mm-dd'),'system','2222222',SYSDATE,'cdj',SYSDATE,'$!{paramFix.institutionCode}');

@@ -1,8 +1,6 @@
 package com.joyintech.tams.invest.riskredis.quota.rsksupervisionindicatorparam.controller;
 
 import com.joyintech.framework.grid.Page;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.riskredis.quota.rsksupervisionindicatorparam.dto.RskSupervisionIndicatorParam003Dto;
@@ -69,6 +67,7 @@ public class GeneratorSQLController {
                 if (StringUtil.isNotEmpty(paramDto.getForbidEnum())) {
                     paramDto.setForbidEnum(paramDto.getForbidEnum().replace("'", "''"));
                 }
+                context.put("param", paramDto);
                 List<RskSupervisionIndicatorParamDto> list = rskSupervisionIndicatorParamService.selectInfo(paramDto.getParaCode());
                 if (!CollectionUtils.isEmpty(list)) {
                     for (RskSupervisionIndicatorParamDto entity : list) {
@@ -85,8 +84,6 @@ public class GeneratorSQLController {
                             context.put("param" + BussinessDictCodeListRds.参数粒度_事后_日间.getValue(), entity);
                         }
                     }
-                    BeanUtil.copyPropertiesIgnoreNull(list.get(0),paramDto);
-                    context.put("param", list.get(0));
                     StringWriter paramWriter = new StringWriter();
                     paramTpl.merge(context, paramWriter);
                     paramMap.put(paramDto.getParaName(), paramWriter.toString());
@@ -101,12 +98,10 @@ public class GeneratorSQLController {
         if (!CollectionUtils.isEmpty(fixPage.getRoot())) {
             for (RskSupervisionIndicatorParamDto paramDto : fixPage.getRoot()) {
                 VelocityContext context = new VelocityContext();
+                context.put("param", paramDto);
                 List<RskSupervisionIndicatorParam003Dto> list = rskSupervisionIndicatorParam003Service.selectFixRecode(paramDto.getParaCode());
                 if (!CollectionUtils.isEmpty(list)) {
                     context.put("paramFix", list.get(0));
-                    context.put("param", list.get(0));
-                    context.put("validDate", DateUtil.format(list.get(0).getValidDate()));
-                    context.put("notifyDate", DateUtil.format(list.get(0).getNotifyDate()));
                     StringWriter fixWriter = new StringWriter();
                     paramFixTpl.merge(context, fixWriter);
                     fixMap.put(paramDto.getParaName(), fixWriter.toString());
