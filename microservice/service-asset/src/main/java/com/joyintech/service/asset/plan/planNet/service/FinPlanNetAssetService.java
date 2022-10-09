@@ -508,12 +508,6 @@ public class FinPlanNetAssetService extends BaseService<FinPlanNetAssetDto> {
         boolean isCreatePortfolio = assetCommonService.selectIsCreatePortfolio(dto.getFinProductType());
         if(isCreatePortfolio){
             ptlPortfolioMapper.updateByPrimaryKeySelective(dto.getPtlPortfolio());
-            //组合表插入
-            if(StringUtil.equals(dto.getType11(),"103")) {
-                dto.getPaPtlPortfolio().setSelfManagement("Y");
-            }else {
-                dto.getPaPtlPortfolio().setSelfManagement("N");
-            }
             paPtlPortfolioMapper.updateByPrimaryKeySelective(dto.getPaPtlPortfolio());
         }
         //end
