@@ -50,7 +50,7 @@ import java.util.*;
 
 /**
  * 处理entity所用service 〈功能详细描述〉
- * 
+ *
  * @author 丁志鹏
  * @version 1.0 2018年11月1日
  * @see TrdFundDurationDealNewEntity
@@ -541,7 +541,7 @@ public class TrdFundDurationDealNewEntity extends BaseService<TrdFundDurationNew
 
 	/**
      * 生成交易扩展 <功能详细描述>
-     * 
+     *
      * @param entity          业务实体
      * @param finAssetIntInfo 利息明细
      * @param deal            交易dto
@@ -575,7 +575,7 @@ public class TrdFundDurationDealNewEntity extends BaseService<TrdFundDurationNew
 
     /**
      * 生成交易附属 <功能详细描述>
-     * 
+     *
      * @param entity          业务entity
      * @param finAssetIntInfo 利息明细
      * @param deal            生成的交易
@@ -611,9 +611,9 @@ public class TrdFundDurationDealNewEntity extends BaseService<TrdFundDurationNew
     }
 
     /**
-     * 
+     *
      * 生成交易 <功能详细描述>
-     * 
+     *
      * @param entity          业务entity
      * @param finAssetIntInfo 利率信息
      * @return 交易dto
@@ -699,9 +699,9 @@ public class TrdFundDurationDealNewEntity extends BaseService<TrdFundDurationNew
     }
 
     /**
-     * 
+     *
      * 2.0改造生成汇总扩展交易entity <功能详细描述>
-     * 
+     *
      * @param entity                 业务entity
      * @param trdFinProductDealTotal 汇总entity
      * @return 目标entity
@@ -716,13 +716,19 @@ public class TrdFundDurationDealNewEntity extends BaseService<TrdFundDurationNew
         //除权日
         paTrdTotal.setTheoryPayDate(entity.getExRightsDate());
         paTrdTotal.setWorkflowId(entity.getWorkflowId());
+
+        //JJTZJY-130 场外公募基金存续期交易-现金分红来账分拣确认时，弹窗页面报错（bug） start
+        if(StringUtil.equals(entity.getPstype(),DictCodeList.分红方式_现金分红.getValue())){
+            paTrdTotal.setPayType(DictCodeList.分红方式_现金分红.getValue());
+        }
+        //JJTZJY-130 场外公募基金存续期交易-现金分红来账分拣确认时，弹窗页面报错（bug） end
         return paTrdTotal;
     }
 
     /**
-     * 
+     *
      * 2.0改造生成汇总交易entity <功能详细描述>
-     * 
+     *
      * @param entity 源entity
      * @return 目标entity
      * @see
@@ -761,6 +767,12 @@ public class TrdFundDurationDealNewEntity extends BaseService<TrdFundDurationNew
             trdFinProductDealTotal.setInstitutionCode(MultilevelDataAuthorityUtil.getOrganizationCode(entity.getCreateUser()));
         }
         // 多级法人改造 add by caiqun 20200615
+
+        //JJTZJY-130 场外公募基金存续期交易-现金分红来账分拣确认时，弹窗页面报错（bug） start
+        if(StringUtil.equals(entity.getPstype(),DictCodeList.分红方式_现金分红.getValue())){
+            trdFinProductDealTotal.setPs(DictCodeList.交易方向_现金分红.getValue());
+        }
+        //JJTZJY-130 场外公募基金存续期交易-现金分红来账分拣确认时，弹窗页面报错（bug） end
         return trdFinProductDealTotal;
     }
 
