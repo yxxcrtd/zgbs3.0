@@ -163,7 +163,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                     //处理旧头寸
                     this.revokeOldPostion(dto,totleTradeId);
                     try {
-                        //positionRequestHandle.dorevoke(totleTradeId, DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_上市流通.getValue(), DictCodeList.交易方向_上市流通.getValue());
+                        positionRequestHandle.dorevoke(totleTradeId, DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_上市流通.getValue(), DictCodeList.交易方向_上市流通.getValue());
                     } catch (PositionException e) {
                         logger.error("交收失败-头寸处理异常", e);
                         WorkFlowUtil.showMessage("头寸处理异常,请检查头寸日期", MessageType.错误消息);
@@ -238,7 +238,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                     param.put("interfaceType", "Bond002");
                 }
                 try {
-                    //positionRequestHandle.send(param);
+                    positionRequestHandle.send(param);
                 } catch (PositionException e) {
                     logger.error("处理失败-头寸处理异常", e);
                     WorkFlowUtil.showMessage("头寸处理异常,请检查头寸日期", MessageType.错误消息);
