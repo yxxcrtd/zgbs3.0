@@ -2813,7 +2813,7 @@
         inner join INTERF_CSTP_TRADE ict on ict.EXECID = iotr.ORITRADEID
         where NOT EXISTS (SELECT 1 FROM trdquto_match_info match where ict.EXECID = match.CSTP_TRADE_ID)
         <if test="tradeDate != null and tradeDate != ''">
-            and iotr.DEALDATE = #{tradeDate,jdbcType=VARCHAR}
+            and iotr.DEALDATE = #{tradeDate,jdbcType=DATE}
         </if>
         <if test="termDays != null">
             and iotr.TERM = #{termDays,jdbcType=DECIMAL}
