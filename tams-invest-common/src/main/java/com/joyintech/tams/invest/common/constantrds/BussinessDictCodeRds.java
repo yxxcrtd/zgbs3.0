@@ -2657,6 +2657,18 @@ public enum BussinessDictCodeRds implements com.joyintech.framework.base.BaseDic
      * 	说明书是否披露风险标志
      */
     说明书是否披露风险标志("IS_RISK_FLAG"),
+    /**
+     * 	是否面向非机构投资者
+     */
+    是否面向非机构投资者("NON_YES_OR_NO"),
+    /**
+     * 	是否现金管理类产品
+     */
+    是否现金管理类产品("CASH_YES_OR_NO"),
+    /**
+     * 	是否自主管理计划
+     */
+    是否自主管理计划("AUTONOMY_YES_OR_NO"),
     ;
     /**
      * 对应于数据字典code

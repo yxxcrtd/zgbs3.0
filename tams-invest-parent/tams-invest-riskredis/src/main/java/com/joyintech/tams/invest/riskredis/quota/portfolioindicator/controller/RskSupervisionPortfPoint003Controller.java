@@ -131,7 +131,7 @@ public class RskSupervisionPortfPoint003Controller extends BaseController {
             dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
             listFloatRate.add(dto);
         }
-        SelectDto selectDto5 = this.getSelectDataFromDataDic(BussinessDictCodeRds.是否, null);
+        SelectDto selectDto5 = this.getSelectDataFromDataDic(BussinessDictCodeRds.是否现金管理类产品, null);
         for (SelectOptionDto dto : selectDto5.getOptions()) {
             dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
             listFloatRate.add(dto);
