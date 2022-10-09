@@ -2766,10 +2766,10 @@
     </select>
 
     <select id="selectSecCSTPByPrimaryKey" resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmRegInfoListResponse">
-        select select ict.EXECID execid
+        select ict.EXECID execid
         from INTERF_TRAD_SECDEAL its
         inner join INTERF_CSTP_TRADE ict on ict.EXECID = its.FEDEALNO
-        where NOT EXISTS (SELECT 1 FROM trdquto_match_info match where ict.TRD_ID = match.CSTP_TRADE_ID)
+        where NOT EXISTS (SELECT 1 FROM trdquto_match_info match where ict.EXECID = match.CSTP_TRADE_ID)
         <if test="tradeDate != null ">
             and its.DEALDATE = #{tradeDate,jdbcType=DATE}
         </if>
