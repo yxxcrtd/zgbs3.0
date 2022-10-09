@@ -5,6 +5,7 @@ import com.joyintech.tams.invest.common.risktrialrds.dto.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -57,14 +58,18 @@ public interface RiskTrialCommMapper {
 	 * 批量删除
 	 * @param list
 	 */
-	void deleteRiskValBatchData(List<RiskTrialRetDto> list);
+	int deleteRiskValBatchData(List<RiskTrialRetDto> list);
 	/**
 	 * 批量删除
 	 * @param list
 	 */
-	void deleteRiskValDetBatchData(List<RiskTrialRetDto> list);
+	int deleteRiskValDetBatchData(List<RiskTrialRetDto> list);
 
 	String getPortfolioInstCode(@Param(value = "portfolioId") String portfolioId);
 
-    List<Map<String, Object>> selectImportValTableProdList(Map<String, Object> param);
+	List<Map<String, Object>> selectImportValTableProdList(Map<String, Object> param);
+
+	int deleteRiskValBatchDataNew(@Param("supDate") Date supDate, @Param("supFrequency") String supFrequency, @Param("portfolioIdList") List<String> portfolioIdList);
+
+	int deleteRiskValDetBatchDataNew(@Param("supDate") Date supDate, @Param("supFrequency") String supFrequency, @Param("portfolioIdList") List<String> portfolioIdList);
 }

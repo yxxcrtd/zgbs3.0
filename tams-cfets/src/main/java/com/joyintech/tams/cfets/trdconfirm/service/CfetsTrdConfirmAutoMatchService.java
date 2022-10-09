@@ -578,7 +578,11 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
             }
             if (map.get("settleDate") != null && StringUtil.equals(map.get("settleDate").getType(), "01")) {
                 // 结算日期
-                param.put("settleDate", interfTradSecdeal.getSettdate());
+                param.put("settleDate", DateUtil.format(interfTradSecdeal.getSettdate()));
+            }
+            if (map.get("counterId") != null && StringUtil.equals(map.get("counterId").getType(), "01")) {
+                // 结算日期
+                param.put("counterId", interfTradSecdeal.getCno());
             }
             if (map.get("deliveryType") != null && StringUtil.equals(map.get("deliveryType").getType(), "01")) {
                 // 结算方式

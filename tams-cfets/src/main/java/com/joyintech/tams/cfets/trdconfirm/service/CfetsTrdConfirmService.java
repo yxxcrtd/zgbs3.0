@@ -3054,10 +3054,10 @@ public class CfetsTrdConfirmService extends BaseService {
                     validateStr, "CONFIRM_MSG_013", cstpInfo.getDeliveryType(), regInfo.getDeliveryType());
         }
         // 对手方
-        if (!StringUtil.equals(regInfo.getCounterTrader(), cstpInfo.getCounterTrader())) {
+        if (!StringUtil.equals(regInfo.getCounterIdName(), cstpInfo.getTraderidName())) {
             this.buildMassege(matchMap, "counterId",
                     str, "matchDetFeatures.counterId",
-                    validateStr, "CONFIRM_MSG_013", cstpInfo.getDeliveryType(), regInfo.getDeliveryType());
+                    validateStr, "CONFIRM_MSG_013", cstpInfo.getTraderidName(), regInfo.getCounterIdName());
         }
         if (StringUtil.isNotEmpty(str) && str.length() > 0) {
             str.append(getMessage("CONFIRM_MSG_015"));

@@ -2556,8 +2556,13 @@
         reg.v_settle_date as vsettleDate,
         reg.m_settle_date as msettleDate
         from reg_fin_product_deal_total reg
-        left join fin_product fp
-        on reg.finprod_id=fp.finprod_id
+        left join fin_product fp on reg.finprod_id=fp.finprod_id
+        <if test="counterId != null and counterId != ''">
+            left join ( select mst.COUNTER_ID
+            from MST_CFETS_CUSTOMER_INFO mcci
+            left join MST_COUNTER_PARTY mst on mcci.PARTY_ID = mst.PARTY_ID
+            where mcci.PARTY_CUSTOMER_ID = #{counterId,jdbcType=VARCHAR}) mst on mst.COUNTER_ID = reg.COUNTER_ID
+        </if>
         where reg.trade_market='01' and reg.TRADE_STATUS='01' and reg.IS_CANCEL='N'
         AND NOT EXISTS (SELECT 1 FROM trdquto_match_info match where reg.totle_trade_id=match.PRE_TRADE_ID)
         <if test="totleTradeId != null and totleTradeId != ''">
