@@ -10,7 +10,6 @@
 
 package com.joyintech.tams.cfets.trdquery.dto;
 
-import com.joyintech.background.component.common.pack.common.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
@@ -19,7 +18,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * 银行间交易成交确认
@@ -471,7 +469,7 @@ public class CfetsTrdQueryRegInfoListResponse {
     }
 
     public String getQuoteTypeStr() {
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式_登记, getQuoteType());
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式, getQuoteType());
     }
 
     public void setQuoteTypeStr(String quoteTypeStr) {

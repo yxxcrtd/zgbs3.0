@@ -104,8 +104,8 @@ public class CfetsIbuQuoteBondController extends BaseController {
 		initPageParams.put("ACCOUNT_SPEED", this.getSelectDataFromDataDic(DictCode.清算速度, null));
 		initPageParams.put("SETT_MODE", this.getSelectDataFromDataDic(DictCode.结算方式, null));
 		initPageParams.put("CLEAR_TYPE", this.getSelectDataFromDataDic(DictCode.清算类型, null));
-		initPageParams.put("QUOTE_TYPE", this.getSelectDataFromDataDic(BussinessDictCode.报价方式, null));
-		initPageParams.put("QUOTE_STYLE", this.getSelectDataFromDataDic(BussinessDictCode.报价方式_登记, null));
+		initPageParams.put("QUOTE_TYPE", this.getSelectDataFromDataDic(BussinessDictCode.交易类型, null));
+		initPageParams.put("QUOTE_STYLE", this.getSelectDataFromDataDic(BussinessDictCode.报价方式, null));
 		initPageParams.put("TRADE_PLACE", this.getSelectDataFromDataDic(DictCode.交易场所, null));
 		initPageParams.put("PRICE_MODEL", this.getSelectDataFromDataDic(DictCode.价格模式, null));
 		initPageParams.put("CCY", this.getSelectDataFromDataDic(DictCode.币种, null));

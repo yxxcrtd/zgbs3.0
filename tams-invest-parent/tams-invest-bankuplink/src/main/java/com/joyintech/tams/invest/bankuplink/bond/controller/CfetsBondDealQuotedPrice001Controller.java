@@ -145,8 +145,8 @@ public class CfetsBondDealQuotedPrice001Controller extends BaseController {
         this.setSelectOptionToModel(model, BussinessDictCode.交易方向, BussinessDictCode.清算速度);
         model.addAttribute("entrustStatusUnAccept", BussinessDictCodeList.委托状态_待接收.getValue());
         model.addAttribute("entrustStatusAccept", BussinessDictCodeList.委托状态_已接收.getValue());
-        model.addAttribute("quoteTypeDialog", BussinessDictCodeList.报价方式_对话报价.getValue());
-        model.addAttribute("quoteTypeRequest", BussinessDictCodeList.报价方式_请求报价.getValue());
+        model.addAttribute("quoteTypeDialog", BussinessDictCodeList.交易类型_对话报价.getValue());
+        model.addAttribute("quoteTypeRequest", BussinessDictCodeList.交易类型_请求报价.getValue());
         model.addAttribute("quoteRoleTypeXJ", BussinessDictCodeList.银行间上行本方角色_询价方.getValue());
         model.addAttribute("quoteRoleTypeHF", BussinessDictCodeList.银行间上行本方角色_回复方.getValue());
         model.addAttribute("quoteRoleTypeFZS", BussinessDictCodeList.银行间上行本方角色_非做市方.getValue());
@@ -426,7 +426,7 @@ public class CfetsBondDealQuotedPrice001Controller extends BaseController {
         	if(StringUtils.isEmpty(counterTraderName)) {
         		counterTraderName = "";
         	}
-        	if(BussinessDictCodeList.报价方式_请求报价.getValue().equals(bondQuoteImportPreviewDto.getQuoteType())&&StringUtils.isNotEmpty(bondQuoteImportPreviewDto.getEntrustId())) {
+        	if(BussinessDictCodeList.交易类型_请求报价.getValue().equals(bondQuoteImportPreviewDto.getQuoteType())&&StringUtils.isNotEmpty(bondQuoteImportPreviewDto.getEntrustId())) {
         		for(;i+1<checkList.size();) {
         			BondQuoteImportPreviewDto temp = checkList.get(i+1);
         			if(StringUtils.isEmpty(temp.getEntrustId())&&StringUtils.isNotEmpty(temp.getCounterId())) {
@@ -472,7 +472,7 @@ public class CfetsBondDealQuotedPrice001Controller extends BaseController {
         AjaxResult ajaxResult = new AjaxResult();
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < dataRows.size(); i++ ) {
-        	if(StringUtil.equals(dataRows.get(i).getQuoteType(), BussinessDictCodeList.报价方式_请求报价.getValue())){
+        	if(StringUtil.equals(dataRows.get(i).getQuoteType(), BussinessDictCodeList.交易类型_请求报价.getValue())){
         		CfetsBondDealRequestQuoteDto cfetsBondDealRequestQuoteDto = new CfetsBondDealRequestQuoteDto();
         		BeanUtil.copyPropertiesIgnoreNull(cfetsBondDealRequestQuoteDto, dataRows.get(i));
         		cfetsBondDealRequestQuoteDto.setAvaNum(dataRows.get(i).getEntrustAmt());
@@ -499,7 +499,7 @@ public class CfetsBondDealQuotedPrice001Controller extends BaseController {
             		}
                 }
             	
-        	}else if(StringUtil.equals(dataRows.get(i).getQuoteType(), BussinessDictCodeList.报价方式_对话报价.getValue())){
+        	}else if(StringUtil.equals(dataRows.get(i).getQuoteType(), BussinessDictCodeList.交易类型_对话报价.getValue())){
         		CfetsBondDealDialogueQuoteDto cfetsBondDealDialogueQuoteDto = new CfetsBondDealDialogueQuoteDto();
             	BeanUtil.copyPropertiesIgnoreNull(cfetsBondDealDialogueQuoteDto, dataRows.get(i));
             	cfetsBondDealDialogueQuoteDto.setAvaNum(dataRows.get(i).getEntrustAmt());
@@ -556,7 +556,7 @@ public class CfetsBondDealQuotedPrice001Controller extends BaseController {
     	List<CfetsBondDealRequestQuoteDto> cfetsBondDealRequestQuoteDtoList = new ArrayList<>();
     	List<CfetsBondDealDialogueQuoteDto> cfetsBondDealDialogueQuoteDtoList = new ArrayList<>();
     	for(BondQuoteImportPreviewDto bondQuoteImportPreviewDto : dataRows){
-        	if(StringUtil.equals(bondQuoteImportPreviewDto.getQuoteType(), BussinessDictCodeList.报价方式_请求报价.getValue())){
+        	if(StringUtil.equals(bondQuoteImportPreviewDto.getQuoteType(), BussinessDictCodeList.交易类型_请求报价.getValue())){
         		CfetsBondDealRequestQuoteDto cfetsBondDealRequestQuoteDto = new CfetsBondDealRequestQuoteDto();
         		BeanUtil.copyPropertiesIgnoreNull(cfetsBondDealRequestQuoteDto, bondQuoteImportPreviewDto);
         		cfetsBondDealRequestQuoteDto.setAvaNum(bondQuoteImportPreviewDto.getEntrustAmt());
@@ -596,7 +596,7 @@ public class CfetsBondDealQuotedPrice001Controller extends BaseController {
         		cfetsBondDealRequestQuoteDtoList.add(cfetsBondDealRequestQuoteDto);
         		
         		//cfetsBondDealQuotedPrice003Service.insertWflBondRequestQuote(cfetsBondDealRequestQuoteDto);
-        	}else if(StringUtil.equals(bondQuoteImportPreviewDto.getQuoteType(), BussinessDictCodeList.报价方式_对话报价.getValue())){
+        	}else if(StringUtil.equals(bondQuoteImportPreviewDto.getQuoteType(), BussinessDictCodeList.交易类型_对话报价.getValue())){
         		CfetsBondDealDialogueQuoteDto cfetsBondDealDialogueQuoteDto = new CfetsBondDealDialogueQuoteDto();
             	BeanUtil.copyPropertiesIgnoreNull(cfetsBondDealDialogueQuoteDto, bondQuoteImportPreviewDto);
             	cfetsBondDealDialogueQuoteDto.setAvaNum(bondQuoteImportPreviewDto.getEntrustAmt());

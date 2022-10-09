@@ -19,7 +19,6 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 /**
  * 银行间交易成交确认
@@ -174,7 +173,7 @@ public class CfetsTrdConfirmExecBondInfoResponse {
     }
 
     public String getBusiTypeStr() {
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式, getBusiType());
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.交易类型, getBusiType());
     }
 
     public void setBusiTypeStr(String busiTypeStr) {

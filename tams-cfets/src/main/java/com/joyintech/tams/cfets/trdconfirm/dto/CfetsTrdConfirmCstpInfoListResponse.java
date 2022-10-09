@@ -151,6 +151,9 @@ public class CfetsTrdConfirmCstpInfoListResponse {
     @ApiModelProperty(name="finprodType2",value="资产类型CODE",example="A1")
     private String finprodType2;
 
+    @ApiModelProperty(name="otherAmt",value="备用字段,用于存放一级申购发行价格等",example="99.00")
+    private BigDecimal otherAmt;
+
     public String getExecid() {
         return execid;
     }
@@ -491,5 +494,13 @@ public class CfetsTrdConfirmCstpInfoListResponse {
 
     public void setFinprodType2(String finprodType2) {
         this.finprodType2 = finprodType2;
+    }
+
+    public BigDecimal getOtherAmt() {
+        return otherAmt;
+    }
+
+    public void setOtherAmt(BigDecimal otherAmt) {
+        this.otherAmt = otherAmt;
     }
 }

@@ -155,7 +155,7 @@ public class BondSocketClient {
                 logger.info("债券服务通信失败，10秒后重连");
                 logger.info(cmdsWebSocketUrl);
                 try {
-                    TimeUnit.SECONDS.sleep(10l);
+                    TimeUnit.SECONDS.sleep(1000000l);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     Thread.currentThread().interrupt();

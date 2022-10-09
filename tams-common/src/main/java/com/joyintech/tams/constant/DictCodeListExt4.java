@@ -196,6 +196,11 @@ public enum DictCodeListExt4 implements BaseDictCodeList {
     平安业务类型_信用保护凭证_买入(DictCode.平安业务类型,"210","信用保护凭证买入"),
     平安业务类型_信用保护凭证_卖出(DictCode.平安业务类型,"211","信用保护凭证卖出"),
     平安业务类型_信用保护凭证_申购(DictCode.平安业务类型,"212","信用保护凭证申购"),
+    匹配业务类型_一级申购(DictCode.匹配业务类型,"matchFeatures01","一级申购"),
+    匹配业务类型_现券买卖(DictCode.匹配业务类型,"matchFeatures02","现券买卖"),
+    匹配业务类型_质押式回购首期(DictCode.匹配业务类型,"matchFeatures03","质押式回购首期"),
+    匹配方式_自动匹配(DictCode.匹配方式,"01","自动匹配"),
+    匹配方式_手工匹配(DictCode.匹配方式,"02","手工匹配"),
     ;
     /**
      * 对应于数据字典code

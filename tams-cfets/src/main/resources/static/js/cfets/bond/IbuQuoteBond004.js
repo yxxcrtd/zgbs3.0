@@ -22,6 +22,38 @@
     }
 
     /**
+     * 画星星
+     */
+    var star = function () {
+        // 加红星星
+        // 查找label
+        var _findPrevLabel = function (element, level) {
+            var $el = element.prev();
+            if (!$el.is('label') && level > 0) {
+                $el = $el.find('label');
+                if ($el.length === 0) {
+                    return _findPrevLabel(element.parent(), level - 1);
+                }
+            }
+            return $el;
+        };
+
+        // 非查看模式
+        if (typeof pageModel !== 'undefined'
+            && (pageModel !== PAGE_MODEL_REFERENCE)) {
+            $('.must').each(function () {
+                $(this).remove();
+            })
+            $('*[required]').each(function () {
+                var $el = $(this);
+                var $target = _findPrevLabel($el, 3);
+                if ($target.find('> .must').length === 0) {
+                    $target.append($('<i class="must">*</i>'));
+                }
+            });
+        }
+    }
+    /**
      * 处理表格数据
      */
     var getRegData = function () {
@@ -424,13 +456,13 @@
     var paramCheck = function () {
         var object = $.serializeToObject('#submitForm', true);
         var b = false;
+        var quoteStyle = $("[name=quoteStyle]:checked").val();
         if(ps !== 'T03') {
-            if(!el("#CfetsBondDealQuotedPrice004_counterId").val() || !el("#shareAmt").val()) {
+            if ((!el("#CfetsBondDealQuotedPrice004_counterId").val() && quoteStyle === '01') || !el("#shareAmt").val()) {
                 Joyin.error("有*必填项未填写,请填写完整")
                 return false;
             }
-            var quoteStyle = $("[name=quoteStyle]:checked").val();
-            if( quoteStyle === '01' || quoteStyle === '02') {
+            if(quoteStyle === '01') {
                 if(!el("#CfetsBondDealQuotedPrice004_counterTrader").val()) {
                     Joyin.error("有*必填项未填写,请填写完整")
                     return false;
@@ -784,6 +816,27 @@
                     el("#CfetsBondDealQuotedPrice004_exerYield").attr("disabled", false);
                 }
                 calcAmt();
+                layui.form.render();
+            });
+            form.on('radio(quoteStyle)', function (data) {
+                let quoteStyleField = $("[name=quoteStyle]:checked").val();
+                if (quoteStyleField === '01') {
+                    $('#CfetsBondDealQuotedPrice004_counterId').attr('required', true);
+                    $('#CfetsBondDealQuotedPrice004_counterTrader').attr('required', true);
+                    $('#CfetsBondDealQuotedPrice004_unitCprice').attr('required', true);
+                    $('#CfetsBondDealQuotedPrice004_matureYield').attr('required', true);
+                    $('#CfetsBondDealQuotedPrice004_exerYield').attr('required', true);
+                    $('#CfetsBondDealQuotedPrice004_fpriceAmtEdit').attr('required', true);
+                }
+                if (quoteStyleField === '02' || quoteStyleField === '03') {
+                    $('#CfetsBondDealQuotedPrice004_counterId').attr('required', false);
+                    $('#CfetsBondDealQuotedPrice004_counterTrader').attr('required', false);
+                    $('#CfetsBondDealQuotedPrice004_unitCprice').attr('required', false);
+                    $('#CfetsBondDealQuotedPrice004_matureYield').attr('required', false);
+                    $('#CfetsBondDealQuotedPrice004_exerYield').attr('required', false);
+                    $('#CfetsBondDealQuotedPrice004_fpriceAmtEdit').attr('required', false);
+                }
+                star();
                 layui.form.render();
             });
         });

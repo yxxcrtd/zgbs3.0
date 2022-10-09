@@ -752,7 +752,7 @@ public class CfetsEtrDispatcherService extends BaseService {
         pageParam.put("TRADE_FLOW_STATUS01", DictCodeListExt1.交易流程状态_流程中.getValue());
         pageParam.put("TRADE_FLOW_STATUS02", DictCodeListExt1.交易流程状态_有效.getValue());
         pageParam.put("TRADE_FLOW_STATUS03", DictCodeListExt1.交易流程状态_撤销.getValue());
-        pageParam.put("quoteType", BussinessDictCodeList.报价方式_登记报价.getValue());
+        pageParam.put("quoteType", BussinessDictCodeList.交易类型_登记报价.getValue());
         List<String> entrustIdList = StringUtil.splitToList(",", (String) pageParam.get("entrustId"));
         if (StringUtil.isBlank(dto.getEntrustId()) || entrustIdList.size() > 1) {
             return new Page<CfetsEtrDispatcherExeListInfoResponse>();

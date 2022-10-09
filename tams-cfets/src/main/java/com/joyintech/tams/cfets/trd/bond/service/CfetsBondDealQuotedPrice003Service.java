@@ -709,7 +709,7 @@ public class CfetsBondDealQuotedPrice003Service extends BaseService<CfetsBondDea
         cfetsOprHisInfoRequest.setEntrustId(cfetsBondDealRequestQuoteDto.getQuoteId());
         cfetsOprHisInfoRequest.setOperType(DictCodeListExt3.操作类型_新建.getValue());
         if (StringUtil.equals(entity.getOptType(), "revoke")) {
-			entity.setQuoteType(BussinessDictCodeList.报价方式_请求报价.getValue());
+			entity.setQuoteType(BussinessDictCodeList.交易类型_请求报价.getValue());
             cfetsBondDealQuotedPriceService.doHisRevoke(bondQuoteInfoDto);
             cfetsOprHisInfoRequest.setOperType(DictCodeListExt3.操作类型_撤回.getValue());
 			/*restTemplate.postForObject(
@@ -742,7 +742,7 @@ public class CfetsBondDealQuotedPrice003Service extends BaseService<CfetsBondDea
 							+ "/CfetsBondDealQuotedPrice/sendBondRequestQuote", entity, boolean.class);*/
 				}
 			} else {// 撤回
-				entity.setQuoteType(BussinessDictCodeList.报价方式_请求报价.getValue());
+				entity.setQuoteType(BussinessDictCodeList.交易类型_请求报价.getValue());
                 cfetsBondDealQuotedPriceService.doHisRevoke(bondQuoteInfoDto);
 				/*restTemplate.postForObject(
 						ServiceApplication.BANKUPLINK_SERVICE_NAME + "/CfetsBondDealQuotedPrice/doHisRevoke", entity,

@@ -75,7 +75,9 @@
         reg.yield*100 as yield,
         reg.exer_yield*100 as exerYield,
         reg.rate*100 as rate,
-        reg.m_trade_amt as mtradeAmt,null ouPartyId
+        reg.m_trade_amt as mtradeAmt,
+        null ouPartyId,
+        null otherAmt
         from reg_fin_product_deal_total reg
         left join reg_fin_product_deal_total_add regAdd
         on reg.totle_trade_id=regAdd.Totle_Trade_Id
@@ -209,7 +211,8 @@
             null                  as     exerYield,
             null                  as     rate,
             null                  as     mtradeAmt,
-            bo.OU_PARTY_ID               ouPartyId
+            bo.OU_PARTY_ID               ouPartyId,
+            fpi.ISSUE_PRICE              otherAmt
             from BID_ORDER bo
             left join FIN_PRODUCT fp on fp.FINPROD_ID = bo.FINPROD_ID
             left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = fp.FINPROD_ID
@@ -282,8 +285,17 @@
             <if test="assetType != null and !assetType.equals('')">
                 AND fpt.TYPE_9=#{assetType,jdbcType=VARCHAR}
             </if>
+            <if test="ourTrader != null and !ourTrader.equals('')">
+                AND nvl(mcct.TRADER_Name, bo.OUR_TRADER)=#{ourTrader,jdbcType=VARCHAR}
+            </if>
             <if test="subscriptionAmount != null ">
                 AND bo.SUBSCRIPTION_AMOUNT=#{subscriptionAmount,jdbcType=DECIMAL}
+            </if>
+            <if test="payableAmount != null ">
+                AND bo.PAYABLE_AMOUNT=#{payableAmount,jdbcType=DECIMAL}
+            </if>
+            <if test="issuePrice != null">
+                and fpi.ISSUE_PRICE= #{issuePrice,jdbcType=DECIMAL}
             </if>
             <if test="counterIdList!=null  and counterIdList.size() > 0 ">
                 AND bo.OU_PARTY_ID IN
@@ -453,7 +465,9 @@
         ibd.yield*100 as yield,
         ibd.exer_yield*100 as exerYield,
         null as rate,
-        null as mtradeAmt,null ouPartyId
+        null as mtradeAmt,
+        null ouPartyId,
+        null otherAmt
         from ibu_quote_bond ib
         inner join ibu_quote_bond_det ibd
         on ib.quote_id=ibd.quote_id
@@ -577,7 +591,9 @@
         null as yield,
         null as exerYield,
         ic.rate*100 as rate,
-        ic.M_TRADE_AMT as mtradeAmt,null ouPartyId
+        ic.M_TRADE_AMT as mtradeAmt,
+        null ouPartyId,
+        null otherAmt
         from ibu_quote_crep ic
         left join (
         select I.quote_id,
@@ -1247,7 +1263,8 @@
         icpledge.pledgeFinprodId as pledgeFinprodIds,
         icpledge.pledgeRatio as pledgeRatios,
         icpledge.pledgeFaceValue as pledgeFaceValues,
-        tr.MDEALAMT as mtradeAmt
+        tr.MDEALAMT as mtradeAmt,
+        null otherAmt
         from INTERF_CSTP_TRADE I
         <!-- modify by etliu 20220926 性能问题处理 start -->
         <!-- INNER JOIN (SELECT EXECID ,MAX(UPDATETIME) UPDATETIME FROM  INTERF_CSTP_TRADE GROUP BY EXECID)	II ON  II.EXECID = I.EXECID AND II.UPDATETIME = I.UPDATETIME -->
@@ -1395,7 +1412,8 @@
                 null                            as                                   pledgeFinprodIds,
                 null                            as                                   pledgeRatios,
                 null                            as                                   pledgeFaceValues,
-                null                            as                                   mtradeAmt
+                null                            as                                   mtradeAmts,
+                icb.ISSUE_PRICE                                                      otherAmt
         from INTERF_CSTP_BJFXJG icb
                  left join fin_product fp on CONCAT(icb.INSTRUMENT_ID,'.IB') = fp.finprod_market_id
                  LEFT JOIN SYS_USER_ADD sua ON icb.SUBMIT_USER = sua.IBU_TRADER
@@ -1841,17 +1859,17 @@
                     when icb.SPREAD is not null then TO_CHAR(icb.SPREAD,'FM99990.90') || 'BP'
                     when icb.COUPON_RATE is not null then to_char(icb.COUPON_RATE,'FM990.9990') ||'%' end tradeYield,*/
                 case
-                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' then SDL_SD.ITEM_VALUE || '+' || to_char(nvl(fpi.BP*10000, 0),'FM999990.90')||'BP'
-                    when fp.COUPON_SPECIES in ('02', '03') then to_char(fpi.REFER_YIELD*100,'FM99990.9990') || '%'
+                    when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' then SDL_SD.ITEM_VALUE || '+' || TO_CHAR(icb.SPREAD,'FM99990.90')||'BP'
+                    when fp.COUPON_SPECIES in ('02', '03') then to_char(icb.COUPON_RATE,'FM990.9990') || '%'
                     when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
-                    then to_char(fpi.REFER_YIELD*100,'FM99990.9990') || '%' end                tradeYieldStr,
+                    then to_char(icb.COUPON_RATE,'FM990.9990') || '%' end                tradeYieldStr,
                 case
                     when fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '02' then fpi.BP*10000
                     when fp.COUPON_SPECIES in ('02', '03') then fpi.REFER_YIELD*100
                     when (fp.COUPON_SPECIES = '01' and fpi.INT_TYPE = '01') or fp.COUPON_SPECIES = '04'
                     then fpi.REFER_YIELD*100 end                tradeYield,
                 null                            as termDays,
-                bo.PAYABLE_AMOUNT               as tradeAmt,
+                icb.ACTUAL_FEE                  as tradeAmt,
                 bo.BID_DATE                     as tradeDate,
                 deal.portfolioId                as portfolioIds,
                 deal.portfolioName              as portfolioNames,
@@ -2591,6 +2609,9 @@
         <if test="tradeAmt != null">
             and reg.trade_Amt=#{tradeAmt,jdbcType=VARCHAR}
         </if>
+        <if test="mTradeAmt != null">
+            and reg.M_TRADE_AMT=#{mTradeAmt,jdbcType=VARCHAR}
+        </if>
 
     </select>
     <!-- 查询所有登记或报价回购的质押券信息 -->
@@ -2670,6 +2691,7 @@
                 <if test="payableAmount != null">
                     and bo.PAYABLE_AMOUNT = #{payableAmount,jdbcType=DECIMAL}
                 </if>
+    order by bo.UPDATE_TIME ASC
     </select>
 
     <select id="selectWflBidDataByFinprodId" resultType="java.lang.String">
@@ -2735,6 +2757,119 @@
           and ROWNUM = 1
     </select>
 
+    <select id="selectBidCSTPByPrimaryKey"  resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmRegInfoListResponse">
+        select icb.TRD_ID execid
+        from INTERF_CSTP_BJFXJG icb
+        where NOT EXISTS (SELECT 1 FROM trdquto_match_info match where icb.TRD_ID = match.CSTP_TRADE_ID)
+        <if test="tradeDate != null and tradeDate != ''">
+            and substr(icb.SUBSCRIPTION_TIME,0,10) = #{tradeDate,jdbcType=VARCHAR}
+        </if>
+        <if test="finprodMarketId != null and finprodMarketId != ''">
+            and icb.INSTRUMENT_ID = #{finprodMarketId,jdbcType=VARCHAR}
+        </if>
+        <if test="ouPartyId != null and ouPartyId != ''">
+            and icb.SUBSCRIBE_INSTITUTION_ID = #{ouPartyId,jdbcType=VARCHAR}
+        </if>
+        <if test="subscriptionAmount != null">
+            and icb.SUBSCRIPTION_AMOUNT = #{subscriptionAmount,jdbcType=DECIMAL}
+        </if>
+        <if test="couponRate != null">
+            and icb.COUPON_RATE = #{couponRate,jdbcType=DECIMAL}
+        </if>
+        <if test="spread != null">
+            and icb.SPREAD = #{spread,jdbcType=DECIMAL}
+        </if>
+        <if test="issuePrice != null">
+            and icb.ISSUE_PRICE = #{issuePrice,jdbcType=DECIMAL}
+        </if>
+        <if test="ourTrader != null and ourTrader != ''">
+            and icb.SUBMIT_USER = #{ourTrader,jdbcType=VARCHAR}
+        </if>
+        <if test="payableAmount != null">
+            and icb.ACTUAL_FEE = #{payableAmount,jdbcType=DECIMAL}
+        </if>
+        order by icb.SUBSCRIPTION_TIME ASC
+    </select>
+
+    <select id="selectSecCSTPByPrimaryKey" resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmRegInfoListResponse">
+        select ict.EXECID execid
+        from INTERF_TRAD_SECDEAL its
+        inner join INTERF_CSTP_TRADE ict on ict.EXECID = its.FEDEALNO
+        where NOT EXISTS (SELECT 1 FROM trdquto_match_info match where ict.EXECID = match.CSTP_TRADE_ID)
+        <if test="tradeDate != null ">
+            and its.DEALDATE = #{tradeDate,jdbcType=DATE}
+        </if>
+        <if test="finprodMarketId != null and finprodMarketId != ''">
+            and its.SECID = #{finprodMarketId,jdbcType=VARCHAR}
+        </if>
+        <if test="ps != null and ps != ''">
+            and its.PS = #{ps,jdbcType=VARCHAR}
+        </if>
+        <if test="settleSpeed != null and settleSpeed != ''">
+            and its.SETTLE_SPEED = #{settleSpeed,jdbcType=VARCHAR}
+        </if>
+        <if test="secManageAcctId != null and secManageAcctId != ''">
+            and ict.OURDEPOSITACCOUNTNUMBER = #{secManageAcctId,jdbcType=VARCHAR}
+        </if>
+        <if test="yield != null or price != null ">
+            and (its.YIELD_8 = #{yield,jdbcType=DECIMAL}
+            or its.PRICE_8 = #{price,jdbcType=DECIMAL})
+        </if>
+        <if test="faceValue != null">
+            and its.PRINAMT = #{faceValue,jdbcType=DECIMAL}
+        </if>
+        <if test="settleDate != null">
+            and its.SETTDATE = #{settleDate,jdbcType=DATE}
+        </if>
+        <if test="deliveryType != null and deliveryType != ''">
+            and ict.DELIVERYTYPE = #{deliveryType,jdbcType=VARCHAR}
+        </if>
+        <if test="counterId != null and counterId != ''">
+            and its.CNO = #{counterId,jdbcType=VARCHAR}
+        </if>
+        <if test="settleAtm != null">
+            and its.SETTAMT = #{settleAtm,jdbcType=DECIMAL}
+        </if>
+        order by ict.SENDINGTIME ASC
+    </select>
+
+    <select id="selectRepoCSTPByPrimaryKey" resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmRegInfoListResponse">
+        select ict.EXECID execid,iotr.TRADEID totleTradeId
+        from INTERF_OPICS_TRAD_REPO iotr
+        inner join INTERF_CSTP_TRADE ict on ict.EXECID = iotr.ORITRADEID
+        where NOT EXISTS (SELECT 1 FROM trdquto_match_info match where ict.EXECID = match.CSTP_TRADE_ID)
+        <if test="tradeDate != null and tradeDate != ''">
+            and iotr.DEALDATE = #{tradeDate,jdbcType=DATE}
+        </if>
+        <if test="termDays != null">
+            and iotr.TERM = #{termDays,jdbcType=DECIMAL}
+        </if>
+        <if test="ps != null and ps != ''">
+            and iotr.PS = #{ps,jdbcType=VARCHAR}
+        </if>
+        <if test="settleSpeed != null and settleSpeed != ''">
+            and iotr.SETTLE_SPEED = #{settleSpeed,jdbcType=VARCHAR}
+        </if>
+        <if test="secManageAcctId != null and secManageAcctId != ''">
+            and ict.OURDEPOSITACCOUNTNUMBER = #{secManageAcctId,jdbcType=VARCHAR}
+        </if>
+        <if test="rate != null">
+            and ict.PRICE/100 = #{rate,jdbcType=DECIMAL}
+        </if>
+        <if test="vsettleDate != null">
+            and ict.SETTLDATE = #{vsettleDate,jdbcType=VARCHAR}
+        </if>
+        <if test="msettleDate != null">
+            and ict.SETTLDATE2 = #{msettleDate,jdbcType=VARCHAR}
+        </if>
+        <if test="tradeAmt != null">
+            and iotr.REPOAMT = #{payableAmount,jdbcType=DECIMAL}
+        </if>
+        <if test="mTradeAmt != null">
+            and iotr.MDEALAMT = #{mTradeAmt,jdbcType=DECIMAL}
+        </if>
+        order by ict.SENDINGTIME ASC
+    </select>
 </mapper>
 
 

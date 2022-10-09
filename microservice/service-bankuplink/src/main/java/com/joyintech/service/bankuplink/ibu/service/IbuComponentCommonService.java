@@ -2451,7 +2451,7 @@ public class IbuComponentCommonService extends BaseService {
         else {
             ibuQuoteCrepDto.setQuoteId(this.genBusId("IBU_003"));
         }
-        ibuQuoteCrepDto.setQuoteType(BussinessDictCodeList.报价方式_对话报价.getValue()); // 报价类型，对话报价/请求报价
+        ibuQuoteCrepDto.setQuoteType(BussinessDictCodeList.交易类型_对话报价.getValue()); // 报价类型，对话报价/请求报价
         ibuQuoteCrepDto.setpQuoteId(cfetsRepoDealQuotedPrice001Dto.getpQuoteId());//外部报价编号
         // ibuQuoteCrepDto.setExeType(exeType);// 操作类型
         ibuQuoteCrepDto.setCfetsQuoteId(cfetsRepoDealQuotedPrice001Dto.getCfetsQuoteId());//CFETS报价编号
@@ -2620,7 +2620,7 @@ public class IbuComponentCommonService extends BaseService {
         else {
             ibuQuoteCrepDto.setQuoteId(this.genBusId("IBU_003"));
         }
-        ibuQuoteCrepDto.setQuoteType(BussinessDictCodeList.报价方式_对话报价.getValue()); // 报价类型，对话报价/请求报价
+        ibuQuoteCrepDto.setQuoteType(BussinessDictCodeList.交易类型_对话报价.getValue()); // 报价类型，对话报价/请求报价
         ibuQuoteCrepDto.setpQuoteId(cfetsRepoDealQuotedPrice001Dto.getQuoteId());//外部报价编号
         // ibuQuoteCrepDto.setExeType(exeType);// 操作类型
         ibuQuoteCrepDto.setCfetsQuoteId(cfetsRepoDealQuotedPrice001Dto.getCfetsQuoteId());//CFETS报价编号

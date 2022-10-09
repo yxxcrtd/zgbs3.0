@@ -21,6 +21,7 @@ import com.joyintech.tams.business.common.entity.CfgDataTableShowFlag;
 import com.joyintech.tams.business.common.entity.CfgReadonlyFormShow;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
+import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbClosePosEtrRequest;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbClosePositionRequest;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
@@ -1732,7 +1733,7 @@ public class IbuQuoteRepoService extends BaseService {
                 && StringUtil.equals(is_sys_support_quote, DictCodeList.是否_否.getValue())) {
             isReg = true;
         }
-        if (StringUtil.equals(quoteType, BussinessDictCodeList.报价方式_登记报价.getValue())) {//登记
+        if (StringUtil.equals(quoteType, BussinessDictCodeList.交易类型_登记报价.getValue())) {//登记
             isReg = true;
         }
         // 返回结果集
@@ -2703,7 +2704,7 @@ public class IbuQuoteRepoService extends BaseService {
         if (CollectionUtils.isNotEmpty(cfetsBondDealEntrustOrderDtos)) {
             for (CfetsRepoDealEntrustOrderDto item : cfetsBondDealEntrustOrderDtos) {
                 if (!StringUtil.equals(item.getEntrustStatus(), DictCodeList.委托状态_已接收)
-                        && cfetsRepoQuotedPrice004Service.ACompareToB(item.getTransactioncom(), new BigDecimal(100), 2) >= 0) {
+                        && BigDecimalUtil.ACompareToB(item.getTransactioncom(), new BigDecimal(100), 2) >= 0) {
                     return "已接收且执行进度<100%的指令,才能执行放弃操作！";
                 }
             }

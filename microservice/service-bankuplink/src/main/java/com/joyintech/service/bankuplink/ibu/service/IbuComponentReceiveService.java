@@ -166,7 +166,7 @@ public class IbuComponentReceiveService extends BaseService{
             map.put("pQuoteId", ibuQuoteBond.getpQuoteId());
             map.put("quoteId", ibuQuoteBond.getQuoteId());
             map.put("quoteType", ibuQuoteBond.getQuoteType());
-            if (StringUtil.equals(ibuQuoteBond.getQuoteType(), BussinessDictCodeList.报价方式_对话报价.getValue())) {
+            if (StringUtil.equals(ibuQuoteBond.getQuoteType(), BussinessDictCodeList.交易类型_对话报价.getValue())) {
                 Object o = restTemplate.postForObject("http://jetGatewayService/jetGateway/queryQuateStatus", map, Object.class);
                 // 无法查询到报价，发送状态则更新为失败，可以回退重操作
                 Map<String, Object> param = JsonUtils.object2Map(o);
@@ -176,7 +176,7 @@ public class IbuComponentReceiveService extends BaseService{
                 }
                 resultBaseDto = this.updateBondDialogueQuoteInterfResp(param);
             }
-            else if (StringUtil.equals(ibuQuoteBond.getQuoteType(), BussinessDictCodeList.报价方式_请求报价.getValue())) {
+            else if (StringUtil.equals(ibuQuoteBond.getQuoteType(), BussinessDictCodeList.交易类型_请求报价.getValue())) {
                 Object o = restTemplate.postForObject("http://jetGatewayService/jetGateway/queryQuateStatus", map, Object.class);
                 // 无法查询到报价，发送状态则更新为失败，可以回退重操作
                 Map<String, Object> param = JsonUtils.object2Map(o);
@@ -670,7 +670,7 @@ public class IbuComponentReceiveService extends BaseService{
             return new ResultBaseDto(true);
         }
         IbuQuoteCrepDto ibuQuoteCrepDto = tempResult.getIbuQuoteCrepDto();
-        ibuQuoteCrepDto.setQuoteType(BussinessDictCodeList.报价方式_对话报价.getValue());
+        ibuQuoteCrepDto.setQuoteType(BussinessDictCodeList.交易类型_对话报价.getValue());
         
 //        // 质押品信息
 //        if (StringUtil.isNotEmpty(param.get("pledgeList"))) {

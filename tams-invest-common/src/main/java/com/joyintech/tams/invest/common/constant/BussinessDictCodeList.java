@@ -5233,17 +5233,17 @@ public enum BussinessDictCodeList implements BaseDictCodeList {
     共同业务类型_CFETS账户关联(BussinessDictCode.共同业务类型, "MST22", "CFETS账户关联"),
 
     /**
-     * 报价方式_对话报价
+     * 交易类型_对话报价
      */
-    报价方式_对话报价(BussinessDictCode.报价方式, "01", "对话报价"),
+    交易类型_对话报价(BussinessDictCode.交易类型, "01", "对话报价"),
     /**
-     * 报价方式_请求报价
+     * 交易类型_请求报价
      */
-    报价方式_请求报价(BussinessDictCode.报价方式, "02", "请求报价"),
+    交易类型_请求报价(BussinessDictCode.交易类型, "02", "请求报价"),
     /**
-     * 报价方式_登记报价
+     * 交易类型_登记报价
      */
-    报价方式_登记报价(BussinessDictCode.报价方式, "04", "登记报价"),
+    交易类型_登记报价(BussinessDictCode.交易类型, "04", "登记报价"),
     /**
      * 清算类型_净额清算
      */
@@ -5505,6 +5505,11 @@ public enum BussinessDictCodeList implements BaseDictCodeList {
     提醒类型_小分类_固定值参数更新提醒(BussinessDictCode.提醒类型_小分类,"R5S3","固定值参数更新提醒"),
     //add by chenjiaxing 固定值参数更新提醒 20210726
     提醒类型_大分类_债券上市流通(BussinessDictCode.提醒类型_大分类,"R10","债券上市流通"),
+    报价方式_对话报价(BussinessDictCode.报价方式,"01","对话报价"),
+    报价方式_请求报价(BussinessDictCode.报价方式,"02","请求报价"),
+    报价方式_X_Bond(BussinessDictCode.报价方式,"03","X-Bond"),
+    报价方式_做市报价(BussinessDictCode.报价方式,"04","做市报价"),
+    报价方式_X_Repo(BussinessDictCode.报价方式,"05","X-Repo"),
   ;
 	//add by gaopeng 20191024 start
 	//add by gaopeng 20191024 end

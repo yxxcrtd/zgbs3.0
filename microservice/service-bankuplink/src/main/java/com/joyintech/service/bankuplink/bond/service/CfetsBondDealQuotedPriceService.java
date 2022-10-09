@@ -49,12 +49,10 @@ import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.PtlPositionHoldDto;
 import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
-import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
-import org.apache.commons.collections4.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -1023,10 +1021,10 @@ public class CfetsBondDealQuotedPriceService extends BaseService{
      */
     public boolean doHisRevoke(BondQuoteInfoDto bondQuoteInfoDto){
         QuoteResultDto quoteResultDto = new QuoteResultDto();
-        if (StringUtil.equals(bondQuoteInfoDto.getQuoteType(), BussinessDictCodeList.报价方式_对话报价.getValue())){
+        if (StringUtil.equals(bondQuoteInfoDto.getQuoteType(), BussinessDictCodeList.交易类型_对话报价.getValue())){
             quoteResultDto = ibuComponentCommonService.sendBondDialogueQuoteCancel(bondQuoteInfoDto.getQuoteId(), bondQuoteInfoDto);
         }
-        else if (StringUtil.equals(bondQuoteInfoDto.getQuoteType(), BussinessDictCodeList.报价方式_请求报价.getValue())){
+        else if (StringUtil.equals(bondQuoteInfoDto.getQuoteType(), BussinessDictCodeList.交易类型_请求报价.getValue())){
             quoteResultDto = ibuComponentCommonService.sendBondRequestQuoteCancel(bondQuoteInfoDto.getQuoteId(), bondQuoteInfoDto);
         }
         return quoteResultDto.isStatus();

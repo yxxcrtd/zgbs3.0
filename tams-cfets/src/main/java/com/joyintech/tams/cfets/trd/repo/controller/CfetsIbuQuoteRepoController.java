@@ -106,9 +106,9 @@ public class CfetsIbuQuoteRepoController extends BaseController {
         // 分配方式
         initPageParams.put("DISTRIBUTION", this.getSelectDataFromDataDic(DictCode.分配方式, null));
         // 报价方式_登记
-        initPageParams.put("QUOTE_STYLE", this.getSelectDataFromDataDic(BussinessDictCode.报价方式_登记, null));
+        initPageParams.put("QUOTE_STYLE", this.getSelectDataFromDataDic(BussinessDictCode.报价方式, null));
         // 报价方式
-        initPageParams.put("QUOTE_TYPE", this.getSelectDataFromDataDic(BussinessDictCode.报价方式, null));
+        initPageParams.put("QUOTE_TYPE", this.getSelectDataFromDataDic(BussinessDictCode.交易类型, null));
         // 币种
         initPageParams.put("CCY", this.getSelectDataFromDataDic(DictCode.币种, null));
         // 清算类型

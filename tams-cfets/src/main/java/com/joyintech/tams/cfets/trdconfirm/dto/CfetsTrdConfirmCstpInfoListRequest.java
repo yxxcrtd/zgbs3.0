@@ -4,6 +4,7 @@ import com.joyintech.tams.business.common.dto.PageMode;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -54,6 +55,9 @@ public class CfetsTrdConfirmCstpInfoListRequest {
 
     @ApiModelProperty(name="selectedItem",value="选中数据",example="字符串1")
     private transient List<CfetsTrdConfirmRegInfoListResponse> selectedItem;
+
+    @ApiModelProperty(name="otherAmt",value="备用字段,用于存放一级申购发行价格等",example="99.00")
+    private BigDecimal otherAmt;
 
     public String getRegAssetType() {
         return regAssetType;
@@ -158,6 +162,14 @@ public class CfetsTrdConfirmCstpInfoListRequest {
 
     public void setSelectedItem(List<CfetsTrdConfirmRegInfoListResponse> selectedItem) {
         this.selectedItem = selectedItem;
+    }
+
+    public BigDecimal getOtherAmt() {
+        return otherAmt;
+    }
+
+    public void setOtherAmt(BigDecimal otherAmt) {
+        this.otherAmt = otherAmt;
     }
 }
 
