@@ -23,6 +23,7 @@ import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.*;
+import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.base.core.dto.BaseFinProductBaseInfoDto;
 import com.joyintech.tams.component.base.report.dto.BaseRepMngAssetPlanInfoDto;
@@ -235,6 +236,10 @@ public class FinPlanNetAssetService extends CommonExportService<FinPlanNetAssetD
             restTemplate.postForObject(
                     ServiceApplication.ASSET_SERVICE_NAME + "/FinPlanNetAsset/" + action, entity,
                     Integer.class);
+            BaseMap param = BaseMap.newMap().put("portfolioId",entity.getFinprodMarketId()).put("openType","02") ;
+            restTemplate.postForObject(
+                    ServiceApplication.PORTFOLIO_SERVICE_NAME + "/ptlmanagementinfo/autoRelate", param,
+                    Void.class);
         }
         else{
             action = "update";
@@ -256,6 +261,12 @@ public class FinPlanNetAssetService extends CommonExportService<FinPlanNetAssetD
             restTemplate.postForObject(
                 ServiceApplication.ASSET_SERVICE_NAME + "/FinPlanNetAsset/" + action, entity,
                 Integer.class);
+            //处理组合包和指标自动关联
+            BaseMap param = BaseMap.newMap().put("portfolioId",entity.getFinprodMarketId()).put("openType","02") ;
+            restTemplate.postForObject(
+                    ServiceApplication.PORTFOLIO_SERVICE_NAME + "/ptlmanagementinfo/autoRelate", param,
+                    Void.class);
+
         }
 
         

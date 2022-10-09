@@ -138,6 +138,11 @@ public class RskPortAutoRelatePoint002Controller extends BaseController {
             dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
             listFloatRate.add(dto);
         }
+        SelectDto selectDto10 = this.getSelectDataFromDataDic(DictCode.组合类型, null);
+        for (SelectOptionDto dto : selectDto10.getOptions()) {
+            dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
+            listFloatRate.add(dto);
+        }
         return listFloatRate;
 	}
 	

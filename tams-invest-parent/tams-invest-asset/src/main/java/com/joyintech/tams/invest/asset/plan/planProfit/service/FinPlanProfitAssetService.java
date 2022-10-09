@@ -23,6 +23,7 @@ import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.*;
+import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.asset.BussFinRepaymentService;
 import com.joyintech.tams.component.business.asset.FinInterestFactorService;
@@ -237,6 +238,10 @@ public class FinPlanProfitAssetService extends CommonExportService<FinPlanProfit
             restTemplate.postForObject(
                 ServiceApplication.ASSET_SERVICE_NAME + "/FinPlanProfitAsset/" + action, entity,
                 Integer.class);
+            BaseMap param = BaseMap.newMap().put("portfolioId",entity.getFinprodMarketId()).put("openType","02") ;
+            restTemplate.postForObject(
+                    ServiceApplication.PORTFOLIO_SERVICE_NAME + "/ptlmanagementinfo/autoRelate", param,
+                    Void.class);
         }
         else {
             action = "update";
@@ -244,6 +249,10 @@ public class FinPlanProfitAssetService extends CommonExportService<FinPlanProfit
             restTemplate.postForObject(
                 ServiceApplication.ASSET_SERVICE_NAME + "/FinPlanProfitAsset/" + action, entity,
                 Integer.class);
+            BaseMap param = BaseMap.newMap().put("portfolioId",entity.getFinprodMarketId()).put("openType","02") ;
+            restTemplate.postForObject(
+                    ServiceApplication.PORTFOLIO_SERVICE_NAME + "/ptlmanagementinfo/autoRelate", param,
+                    Void.class);
         }
 
      // 二级法人权限处理
@@ -672,6 +681,8 @@ public class FinPlanProfitAssetService extends CommonExportService<FinPlanProfit
         PaPtlPortfolio paPtlPortfolio = new PaPtlPortfolio();
         paPtlPortfolio.setPortfolioId(ptlPortfolio.getPortfolioId());
         paPtlPortfolio.setInvestNature(finProductAdd.getInvestNature());
+        paPtlPortfolio.setInvestNature(dto.getInvestNature());
+
         // modify by swwan TISHKS-1483 start
         /*paPtlPortfolio.setOpenType("02");
         paPtlPortfolio.setRaiseType("2");*/
