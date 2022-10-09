@@ -2,25 +2,25 @@
 
 ----风险监督指标参数
 DELETE FROM RSK_ISUP_INDICATOR_PARA WHERE PARA_CODE ='$!{param.paraCode}';
-INSERT INTO RSK_ISUP_INDICATOR_PARA (PARA_CODE, PARA_NAME, IS_FORBID, FORBID_ENUM, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, MODEL_CODE, MODEL_VALUE, IS_UP_REDIS, PARAM_DATA_TYPE, PARA_TYPE, PARAM_MATH_TYPE, PARAM_VALUE_NONE,IS_POSITION_DETAILS,POSITION_DETAILS)
-VALUES('$!{param.paraCode}','$!{param.paraName}','${param.isForbid}','${param.forbidEnum}','system','2222222',sysdate,'system',sysdate,'','','$!{param.IS_UP_REDIS}','$!{param.paramDataType}', '$!{param.paraType}','$!{param.paramMathType}', '$!{param.paramValueNone}','$!{param.isPositionDetails}','$!{param.positionDetails}');
+INSERT INTO RSK_ISUP_INDICATOR_PARA (PARA_CODE, PARA_NAME, IS_FORBID, FORBID_ENUM, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, MODEL_CODE, MODEL_VALUE, IS_UP_REDIS, PARAM_DATA_TYPE, PARA_TYPE, PARAM_MATH_TYPE, PARAM_VALUE_NONE)
+VALUES('$!{param.paraCode}','$!{param.paraName}','$!{param.isForbid}','$!{param.forbidEnum}','system','1',sysdate,'system',sysdate,'','','$!{param.isUpRedis}','$!{param.paramDataType}', '$!{param.paraType}','$!{param.paramMathType}', '$!{param.paramValueNone}');
 
 ---监督指标参数明细
 DELETE FROM RSK_ISUP_INDICATOR_PARA_DTL WHERE PARA_CODE ='$!{param.paraCode}';
 INSERT INTO RSK_ISUP_INDICATOR_PARA_DTL (PARA_CODE, PARA_GRANULARITY, PARA_DISPLAY_TYPE, CONTENT, REDIS_FIELD, IS_FRESH_CAN_TRD, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('$!{param01.paraCode}','$!{param01.paraGranularity}', '$!{param01.paraDisplayType}','', '$!{param01.redisField}','$!{param01.isFreshCanTrd}','system','2222222',sysdate,'system',sysdate);
+VALUES('$!{param01.paraCode}','$!{param01.paraGranularity}', '$!{param01.paraDisplayType}','select 1 from dual', '$!{param01.redisField}','$!{param01.isFreshCanTrd}','system','1',sysdate,'system',sysdate);
 
 INSERT INTO RSK_ISUP_INDICATOR_PARA_DTL (PARA_CODE, PARA_GRANULARITY, PARA_DISPLAY_TYPE, CONTENT, REDIS_FIELD, IS_FRESH_CAN_TRD, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('$!{param02.paraCode}','$!{param02.paraGranularity}', '$!{param02.paraDisplayType}','', '$!{param02.redisField}','$!{param02.isFreshCanTrd}','system','2222222',sysdate,'system',sysdate);
+VALUES('$!{param02.paraCode}','$!{param02.paraGranularity}', '$!{param02.paraDisplayType}','select 1 from dual', '$!{param02.redisField}','$!{param02.isFreshCanTrd}','system','1',sysdate,'system',sysdate);
 
 INSERT INTO RSK_ISUP_INDICATOR_PARA_DTL (PARA_CODE, PARA_GRANULARITY, PARA_DISPLAY_TYPE, CONTENT, REDIS_FIELD, IS_FRESH_CAN_TRD, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('$!{param03.paraCode}','$!{param03.paraGranularity}', '$!{param03.paraDisplayType}','', '$!{param03.redisField}','$!{param03.isFreshCanTrd}','system','2222222',sysdate,'system',sysdate);
+VALUES('$!{param03.paraCode}','$!{param03.paraGranularity}', '$!{param03.paraDisplayType}','select 1 from dual', '$!{param03.redisField}','$!{param03.isFreshCanTrd}','system','1',sysdate,'system',sysdate);
 
 INSERT INTO RSK_ISUP_INDICATOR_PARA_DTL (PARA_CODE, PARA_GRANULARITY, PARA_DISPLAY_TYPE, CONTENT, REDIS_FIELD, IS_FRESH_CAN_TRD, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('$!{param04.paraCode}','$!{param04.paraGranularity}', '$!{param04.paraDisplayType}','', '$!{param04.redisField}','$!{param04.isFreshCanTrd}','system','2222222',sysdate,'system',sysdate);
+VALUES('$!{param04.paraCode}','$!{param04.paraGranularity}', '$!{param04.paraDisplayType}','select 1 from dual', '$!{param04.redisField}','$!{param04.isFreshCanTrd}','system','1',sysdate,'system',sysdate);
 
 INSERT INTO RSK_ISUP_INDICATOR_PARA_DTL (PARA_CODE, PARA_GRANULARITY, PARA_DISPLAY_TYPE, CONTENT, REDIS_FIELD, IS_FRESH_CAN_TRD, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
-VALUES('$!{param05.paraCode}','$!{param05.paraGranularity}', '$!{param05.paraDisplayType}','', '$!{param05.redisField}','$!{param05.isFreshCanTrd}','system','2222222',sysdate,'system',sysdate);
+VALUES('$!{param05.paraCode}','$!{param05.paraGranularity}', '$!{param05.paraDisplayType}','select 1 from dual', '$!{param05.redisField}','$!{param05.isFreshCanTrd}','system','1',sysdate,'system',sysdate);
 
 DECLARE
 ----实时、买入预占、卖出预占
@@ -32,9 +32,6 @@ V_CONTENT_04 CLOB := '$!{param04.content}';
 ----事后(日终)
 V_CONTENT_05 CLOB := '$!{param05.content}';
 
-----持仓明细
-V_POSITION_DETAILS CLOB := '$!{param.positionDetails}';
-
 BEGIN
 
 UPDATE RSK_ISUP_INDICATOR_PARA_DTL SET CONTENT = V_CONTENT_01_02_03 WHERE PARA_CODE = '$!{param.paraCode}' and PARA_GRANULARITY in('01','02','03');
@@ -42,8 +39,6 @@ UPDATE RSK_ISUP_INDICATOR_PARA_DTL SET CONTENT = V_CONTENT_01_02_03 WHERE PARA_C
 UPDATE RSK_ISUP_INDICATOR_PARA_DTL SET CONTENT = V_CONTENT_04 WHERE PARA_CODE = '$!{param.paraCode}' and PARA_GRANULARITY ='04';
 
 UPDATE RSK_ISUP_INDICATOR_PARA_DTL SET CONTENT = V_CONTENT_05 WHERE PARA_CODE = '$!{param.paraCode}' and PARA_GRANULARITY = '05';
-
-UPDATE RSK_ISUP_INDICATOR_PARA SET POSITION_DETAILS = V_POSITION_DETAILS WHERE PARA_CODE = '$!{param.paraCode}';
 
 END;
 /
