@@ -319,16 +319,16 @@ public class CfetsTrdConfirmService extends BaseService {
                         // 资产代码
                         pageParam.put("tradeAmt", serchExecDto.getTradeAmt());
                     }
-                    if (map.get("pledgeFinprodIds") != null && StringUtil.equals(map.get("pledgeFinprodIds").getType(), "01")) {
-                        // 资产代码
+                    if (map.get("pledgeFinprodId") != null && StringUtil.equals(map.get("pledgeFinprodId").getType(), "01")) {
+                        // 质押债券代码
                         pageParam.put("pledgeFinprodIds", serchExecDto.getPledgeFinprodIds());
                     }
-                    if (map.get("pledgeRatios") != null && StringUtil.equals(map.get("pledgeRatios").getType(), "01")) {
-                        // 资产代码
+                    if (map.get("pledgeRatio") != null && StringUtil.equals(map.get("pledgeRatio").getType(), "01")) {
+                        // 质押债券折算比例
                         pageParam.put("pledgeRatios", serchExecDto.getPledgeRatios());
                     }
-                    if (map.get("pledgeFaceValues") != null && StringUtil.equals(map.get("pledgeFaceValues").getType(), "01")) {
-                        // 资产代码
+                    if (map.get("pledgeFaceValue") != null && StringUtil.equals(map.get("pledgeFaceValue").getType(), "01")) {
+                        // 质押债券券面总额
                         pageParam.put("pledgeFaceValues", serchExecDto.getPledgeFaceValues());
                     }
                 } else if (StringUtil.equals(serchExecDto.getBusinesstype(), "BID")) {

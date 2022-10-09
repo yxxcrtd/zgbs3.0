@@ -49,10 +49,10 @@ create table BANK_SYS_PARA_SUB
     CREATE_DEPT      VARCHAR2(32),
     CREATE_TIME      TIMESTAMP(6)               not null,
     UPDATE_USER      VARCHAR2(20)               not null,
-    UPDATE_TIME      TIMESTAMP(6)               not null
+    UPDATE_TIME      TIMESTAMP(6)               not null,
+     constraint BANK_SYS_PARA_SUB_PK
+        primary key (PARA_CODE, SUB_PARA_CODE)
 );
-create unique index UI_BANK_SYS_PARA_SUB
-    on BANK_SYS_PARA_SUB (PARA_CODE, SUB_PARA_CODE);
 comment on table BANK_SYS_PARA_SUB is '银行间系统参数表';
 comment on column BANK_SYS_PARA_SUB.PARA_CODE is '参数代码,对应主表';
 comment on column BANK_SYS_PARA_SUB.SUB_PARA_CODE is '参数代码';
