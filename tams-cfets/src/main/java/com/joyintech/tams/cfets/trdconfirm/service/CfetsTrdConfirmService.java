@@ -2954,6 +2954,8 @@ public class CfetsTrdConfirmService extends BaseService {
             }
             // 手工匹配要素
             Map<String, MatchDetFeatures> matchDetFeaturesMap = matchFeaturesService.queryManualMatchFeatures(cstpInfo.getBusinesstype());
+            logger.info("登记要素:{}" , JsonUtils.object2Json(regInfo) );
+            logger.info("下行数据:{}" , JsonUtils.object2Json(cstpInfo));
             //判断基础要素是否一致
             if (StringUtil.isNotEmpty(cstpInfo.getBusinesstype()) && StringUtil.equals(cstpInfo.getBusinesstype(), "BOND")
                     && this.secMatchCheck(regInfo, cstpInfo, mes, matchDetFeaturesMap)) {
