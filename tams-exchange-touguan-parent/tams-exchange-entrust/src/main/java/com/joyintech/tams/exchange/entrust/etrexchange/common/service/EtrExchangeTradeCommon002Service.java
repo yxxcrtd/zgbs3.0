@@ -168,6 +168,13 @@ public class EtrExchangeTradeCommon002Service extends BaseService {
                             BigDecimal lastPrice = hqResponse.getLastPrice() != null ? hqResponse.getLastPrice().setScale(3, BigDecimal.ROUND_HALF_UP) : BigDecimal.valueOf(0.00);
                             entity.setPrice(lastPrice);
                         }
+
+                        //JJTZJY-110 场内指令页面持仓数量与可卖数量不符，相差100倍 start
+                        if(StringUtil.equals(entity.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())){
+                            entity.setPositionsNum(ArithmeticUtil.divide(entity.getPositionsNum(),new BigDecimal(100),2, RoundingMode.DOWN));
+                        }
+                        //JJTZJY-110 场内指令页面持仓数量与可卖数量不符，相差100倍 end
+
                         returnList.add(entity);
                     }
                     result.setRoot(returnList);

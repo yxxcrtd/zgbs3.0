@@ -1202,7 +1202,7 @@
             AND ( STD.SETTLE_SPEED = '0' OR STD.SETTLE_SPEED IS NULL )
         UNION
 	  SELECT TT.INSTRUCTION_ID                                     INSTRUCTION_ID,
-			 TT.BROKER_ENTRUST_ID                                  ENTRUST_ID,
+			 TT.REPORT_NO                                  ENTRUST_ID,
 			 TT.BROKER_TRADE_ID                                    BROKER_TRADE_ID,
 			 CASE
 			   WHEN TT.MARKET = 'SH' THEN '上海证券交易所'
@@ -1210,7 +1210,7 @@
 			   ELSE NULL
 			 END                                                   MARKET,
 			 TT.STOCK_CODE                                         STOCK_CODE,
-			 TT.STOCK_NAME                                         STOCK_NAME,
+			 FP.FINPROD_ABBR                                         STOCK_NAME,
 			 TT.PS                                                 ENTRUST_BS,
             case when TT.ASSET_TYPE = 'F07'
             then nvl(TT.TRADED_VOLUME,0)/100
@@ -1244,6 +1244,7 @@
 		FROM T_TRADE TT
         left join ETR_ENTRUST eet  ON TT.INSTRUCTION_ID = eet.ENTRUST_ID
         left join ETR_ENTRUST_ADD eea on TT.INSTRUCTION_ID = eea.ENTRUST_ID
+        left join FIN_PRODUCT FP on TT.STOCK_CODE = FP.FINPROD_MARKET_ID
 		LEFT JOIN SETTLE_TRANS_DATA STD
 		  ON TT.BROKER_TRADE_ID = STD.CJBH
 		 AND TT.SEC_ACCT_ID = STD.SEC_ACCT_ID
