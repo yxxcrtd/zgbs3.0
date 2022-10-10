@@ -223,7 +223,7 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
             // 结算金额
             param.put("settleAtm", bondDto.getFpriceAmt());
         }
-        // 获取一级申购下行数据
+        // 获取债券下行数据
         List<CfetsTrdConfirmRegInfoListResponse> confirmDtoList = cfetsTrdConfirmMapper.selectSecCSTPByPrimaryKey(param);
         if (StringUtil.isEmptyList(confirmDtoList)) {
             return null;

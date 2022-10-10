@@ -2822,7 +2822,7 @@
         <if test="secManageAcctId != null and secManageAcctId != ''">
             and ict.OURDEPOSITACCOUNTNUMBER = #{secManageAcctId,jdbcType=VARCHAR}
         </if>
-        <if test="yield != null or price != null ">
+        <if test="yield != null and price != null ">
             and (its.YIELD_8 = #{yield,jdbcType=DECIMAL}
             or its.PRICE_8 = #{price,jdbcType=DECIMAL})
         </if>
