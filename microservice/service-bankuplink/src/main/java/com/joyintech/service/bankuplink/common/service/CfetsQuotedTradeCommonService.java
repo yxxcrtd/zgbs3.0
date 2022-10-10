@@ -636,8 +636,8 @@ public class CfetsQuotedTradeCommonService{
             interfOpicsTradRepo.setBuytrader(traderId);
             //已经关联组合
 //            if(count>0){
-                interfOpicsTradRepo.setSelltrader(iCstpTrade.getCounterinstitutioncode());
-                interfOpicsTradRepo.setSeller(iCstpTrade.getCountertradername());
+                interfOpicsTradRepo.setSelltrader(iCstpTrade.getCountertradername());
+                interfOpicsTradRepo.setSeller(iCstpTrade.getCounterinstitutioncode());
                 if(StringUtil.equals(interfOpicsTradRepo.getPs(),"RB")){
                     interfOpicsTradRepo.setPs(DictCodeList.回购拆借方向_逆回购.getValue());
                 }else{

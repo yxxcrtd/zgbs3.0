@@ -296,6 +296,10 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
         if (map.get("mTradeAmt") != null && StringUtil.equals(map.get("mTradeAmt").getType(), "01")) {
             param.put("mTradeAmt", repoDto.getmTradeAmt());
         }
+        if (map.get("counterId") != null && StringUtil.equals(map.get("counterId").getType(), "01")) {
+            // 对方手
+            param.put("counterId", repoDto.getCounterId());
+        }
         // 获取一级申购下行数据
         List<CfetsTrdConfirmRegInfoListResponse> confirmDtoList = cfetsTrdConfirmMapper.selectRepoCSTPByPrimaryKey(param);
         if (StringUtil.isEmptyList(confirmDtoList)) {
@@ -878,6 +882,10 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
             }
             if (map.get("mTradeAmt") != null && StringUtil.equals(map.get("mTradeAmt").getType(), "01")) {
                 param.put("mTradeAmt", iCstpTrade.getSettlcurramt2());
+            }
+            if (map.get("counterId") != null && StringUtil.equals(map.get("counterId").getType(), "01")) {
+                // 对方手
+                param.put("counterId", interfOpicsTradRepo.getSeller());
             }
             //根据登记编号，查询登记信息
             logger.info("根据登记编号，查询登记信息");
