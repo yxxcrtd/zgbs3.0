@@ -3134,8 +3134,8 @@ public class CfetsTrdConfirmService extends BaseService {
             DecimalFormat df = new DecimalFormat("#,##0.0000");
             this.buildMassege(matchMap, "rate",
                     str, "matchDetFeatures.rate",
-                    validateStr, "CONFIRM_MSG_014", df.format(ArithmeticUtil.multiply(cstpInfo.getTradeYield(), new BigDecimal(100))) + "%",
-                    df.format(ArithmeticUtil.multiply(regInfo.getRate(), new BigDecimal(100))) + "%");
+                    validateStr, "CONFIRM_MSG_014", df.format(cstpInfo.getTradeYield()) + "%",
+                    df.format(regInfo.getRate()) + "%");
         }
         // 首次结算日
         if (StringUtil.isNotEmpty(regInfo.getVsettleDate()) && StringUtil.isNotEmpty(cstpInfo.getVsettleDate())
