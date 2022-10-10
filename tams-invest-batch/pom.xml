@@ -12,7 +12,7 @@
     <version>2.0</version>
     <properties>
         <jackson.version>2.9.2</jackson.version>
-        <framework.version>0.0.5.13</framework.version>
+        <framework.version>0.0.5.15</framework.version>
     </properties>
     <dependencies>
         <dependency>
@@ -28,7 +28,7 @@
         <dependency>
             <groupId>com.joyintech</groupId>
             <artifactId>joyintech-system</artifactId>
-            <version>0.0.5.13</version>
+            <version>0.0.5.15</version>
         </dependency>
         <dependency>
             <groupId>com.joyintech</groupId>
