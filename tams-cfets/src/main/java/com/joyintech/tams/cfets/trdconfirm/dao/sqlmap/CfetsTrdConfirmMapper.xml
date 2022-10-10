@@ -2558,7 +2558,7 @@
         from reg_fin_product_deal_total reg
         left join fin_product fp on reg.finprod_id=fp.finprod_id
         <if test="counterId != null and counterId != ''">
-            left join ( select mst.COUNTER_ID
+            inner join ( select mst.COUNTER_ID
             from MST_CFETS_CUSTOMER_INFO mcci
             left join MST_COUNTER_PARTY mst on mcci.PARTY_ID = mst.PARTY_ID
             where mcci.PARTY_CUSTOMER_ID = #{counterId,jdbcType=VARCHAR}) mst on mst.COUNTER_ID = reg.COUNTER_ID

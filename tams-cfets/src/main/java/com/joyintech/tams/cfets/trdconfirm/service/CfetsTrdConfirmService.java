@@ -3003,7 +3003,8 @@ public class CfetsTrdConfirmService extends BaseService {
         if (!StringUtil.equals(regInfo.getPs(), cstpInfo.getPs())) {
             this.buildMassege(matchMap, "ps",
                     str, "matchDetFeatures.ps",
-                    validateStr, "CONFIRM_MSG_013", BussinessDictCodeList.交易场所_银行间.getCodeName(), regInfo.getTradeMarketName());
+                    validateStr, "CONFIRM_MSG_013",
+                    SysDataUtil.getNameFromDataDict(DictCode.交易方向, cstpInfo.getPs()), SysDataUtil.getNameFromDataDict(DictCode.交易方向, regInfo.getPs()));
         }
         // 清算速度
         if (!StringUtil.equals(regInfo.getSettleSpeed(), cstpInfo.getSettleSpeed())) {
@@ -3020,9 +3021,11 @@ public class CfetsTrdConfirmService extends BaseService {
         // 净价/到期收益率
         if (StringUtil.isNotEmpty(regInfo.getYield()) && StringUtil.isNotEmpty(cstpInfo.getTradeYield())
                 && BigDecimalUtil.ACompareToB(regInfo.getYield(), cstpInfo.getTradeYield(), 4) != 0) {
+            DecimalFormat df = new DecimalFormat("#,##0.00");
             this.buildMassege(matchMap, "yield",
                     str, "matchDetFeatures.yield",
-                    validateStr, "CONFIRM_MSG_013", cstpInfo.getAcctNo(), regInfo.getSecManageAcctId());
+                    validateStr, "CONFIRM_MSG_013", df.format(ArithmeticUtil.round(cstpInfo.getTradeYield(), 2, RoundingMode.HALF_UP)),
+                    df.format(ArithmeticUtil.round(regInfo.getYield(), 2, RoundingMode.HALF_UP)));
         }
         // 券面总额
         if (StringUtil.isNotEmpty(regInfo.getFaceValue()) && StringUtil.isNotEmpty(cstpInfo.getLastqty())
@@ -3044,14 +3047,18 @@ public class CfetsTrdConfirmService extends BaseService {
         if (!StringUtil.equals(regInfo.getDeliveryType(), cstpInfo.getDeliveryType())) {
             this.buildMassege(matchMap, "deliveryType",
                     str, "matchDetFeatures.deliveryType",
-                    validateStr, "CONFIRM_MSG_013", cstpInfo.getDeliveryType(), regInfo.getDeliveryType());
+                    validateStr, "CONFIRM_MSG_013",
+                    SysDataUtil.getNameFromDataDict(DictCode.结算方式, cstpInfo.getDeliveryType())
+                    , SysDataUtil.getNameFromDataDict(DictCode.结算方式, regInfo.getDeliveryType()));
         }
         // 结算金额
         if (StringUtil.isNotEmpty(regInfo.getTradeAmt()) && StringUtil.isNotEmpty(cstpInfo.getTradeAmt())
                 && BigDecimalUtil.ACompareToB(regInfo.getTradeAmt(), cstpInfo.getTradeAmt(), 2) != 0) {
+            DecimalFormat df = new DecimalFormat("#,##0.00");
             this.buildMassege(matchMap, "settleAtm",
                     str, "matchDetFeatures.settleAtm",
-                    validateStr, "CONFIRM_MSG_013", cstpInfo.getDeliveryType(), regInfo.getDeliveryType());
+                    validateStr, "CONFIRM_MSG_013", df.format(ArithmeticUtil.round(cstpInfo.getTradeAmt(), 2, RoundingMode.HALF_UP)),
+                    df.format(ArithmeticUtil.round(regInfo.getTradeAmt(), 2, RoundingMode.HALF_UP)));
         }
         // 对手方
         if (!StringUtil.equals(regInfo.getCounterIdName(), cstpInfo.getTraderidName())) {
@@ -3334,11 +3341,17 @@ public class CfetsTrdConfirmService extends BaseService {
             if (StringUtil.isNotEmpty(str)) {
                 str.append(",");
             }
-            str.append(getMessage(labelStr));
+            str.append(this.getMessage(labelStr));
         } else {
+            if(StringUtil.isEmpty(cstpStr)){
+                cstpStr = this.getMessage("matchDetFeatures.null");
+            }
+            if(StringUtil.isEmpty(regStr)){
+                regStr = this.getMessage("matchDetFeatures.null");
+            }
             // 可选要素 手工匹配校验提示语拼接
-            validateStr.append(getMessage(messageStr,
-                    getMessage(labelStr), cstpStr, regStr));
+            validateStr.append(this.getMessage(messageStr,
+                    this.getMessage(labelStr), cstpStr, regStr));
         }
     }
 
