@@ -3024,8 +3024,8 @@ public class CfetsTrdConfirmService extends BaseService {
             DecimalFormat df = new DecimalFormat("#,##0.00");
             this.buildMassege(matchMap, "yield",
                     str, "matchDetFeatures.yield",
-                    validateStr, "CONFIRM_MSG_013", df.format(ArithmeticUtil.round(cstpInfo.getTradeYield(), 2, RoundingMode.HALF_UP)),
-                    df.format(ArithmeticUtil.round(regInfo.getYield(), 2, RoundingMode.HALF_UP)));
+                    validateStr, "CONFIRM_MSG_013", df.format(ArithmeticUtil.round(cstpInfo.getTradeYield(), 4, RoundingMode.HALF_UP))+"%",
+                    df.format(ArithmeticUtil.round(regInfo.getYield(), 4, RoundingMode.HALF_UP))+"%");
         }
         // 券面总额
         if (StringUtil.isNotEmpty(regInfo.getFaceValue()) && StringUtil.isNotEmpty(cstpInfo.getLastqty())
@@ -3095,11 +3095,11 @@ public class CfetsTrdConfirmService extends BaseService {
         // 判断可选要素是否一致
         StringBuilder validateStr = new StringBuilder();
         // 回购期限
-        if (StringUtil.isNotEmpty(regInfo.getRepoTerm()) && StringUtil.isNotEmpty(cstpInfo.getTermDays())
-                && regInfo.getRepoTerm().compareTo(cstpInfo.getTermDays()) != 0) {
+        if (StringUtil.isNotEmpty(regInfo.getTermDays()) && StringUtil.isNotEmpty(cstpInfo.getTermDays())
+                && regInfo.getTermDays().compareTo(cstpInfo.getTermDays()) != 0) {
             this.buildMassege(matchMap, "termDays",
                     str, "matchDetFeatures.termDays",
-                    validateStr, "CONFIRM_MSG_013", cstpInfo.getTermDays().toString(), regInfo.getRepoTerm().toString());
+                    validateStr, "CONFIRM_MSG_013", cstpInfo.getTermDays().toString(), regInfo.getTermDays().toString());
         }
         // 交易场所
         if (!StringUtil.equals(regInfo.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())) {
@@ -3132,8 +3132,8 @@ public class CfetsTrdConfirmService extends BaseService {
             DecimalFormat df = new DecimalFormat("#,##0.0000");
             this.buildMassege(matchMap, "rate",
                     str, "matchDetFeatures.rate",
-                    validateStr, "CONFIRM_MSG_014", df.format(ArithmeticUtil.multiply(cstpInfo.getTradeYield(), new BigDecimal(100))),
-                    df.format(ArithmeticUtil.multiply(regInfo.getRate(), new BigDecimal(100))));
+                    validateStr, "CONFIRM_MSG_014", df.format(ArithmeticUtil.multiply(cstpInfo.getTradeYield(), new BigDecimal(100))) + "%",
+                    df.format(ArithmeticUtil.multiply(regInfo.getRate(), new BigDecimal(100))) + "%");
         }
         // 首次结算日
         if (StringUtil.isNotEmpty(regInfo.getVsettleDate()) && StringUtil.isNotEmpty(cstpInfo.getVsettleDate())
@@ -3168,10 +3168,10 @@ public class CfetsTrdConfirmService extends BaseService {
                     df.format(ArithmeticUtil.round(regInfo.getMtradeAmt(), 2, RoundingMode.HALF_UP)));
         }
         // 对手方
-        if (!StringUtil.equals(regInfo.getCounterTrader(), cstpInfo.getCounterTrader())) {
+        if (!StringUtil.equals(regInfo.getCounterIdName(), cstpInfo.getTraderidName())) {
             this.buildMassege(matchMap, "counterId",
                     str, "matchDetFeatures.counterId",
-                    validateStr, "CONFIRM_MSG_013", cstpInfo.getCounterTrader(), regInfo.getCounterTrader());
+                    validateStr, "CONFIRM_MSG_013", cstpInfo.getTraderidName(), regInfo.getCounterIdName());
         }
         StringBuilder zyMes = new StringBuilder();
         //查询登记或报价的质押券信息
@@ -3186,6 +3186,7 @@ public class CfetsTrdConfirmService extends BaseService {
             str.append(",质押券信息");
         }
         if (!StringUtil.isEmptyList(regAndIbuPledges) && !StringUtil.isEmptyList(cstpPledges)) {
+            boolean flag = false;
             for (int i = 0; i < regAndIbuPledges.size(); i++) {
                 CfetsTrdConfirmRegInfoListResponse regAndIbuDemo = regAndIbuPledges.get(i);
                 CfetsTrdConfirmCstpInfoListResponse cstpDemo = cstpPledges.get(i);
@@ -3200,14 +3201,17 @@ public class CfetsTrdConfirmService extends BaseService {
                     this.buildMassege(matchMap, "pledgeRatio",
                             str, "matchDetFeatures.pledgeRatio",
                             validateStr, "CONFIRM_MSG_013", cstpInfo.getSettleSpeedName(), regInfo.getSettleSpeedName());
-                    break;
+                    flag = true;
                 }
                 if (StringUtil.isNotEmpty(regAndIbuDemo.getPledgeFaceValue()) && StringUtil.isNotEmpty(cstpDemo.getPledgeFaceValue())
                         && regAndIbuDemo.getPledgeFaceValue().compareTo(cstpDemo.getPledgeFaceValue()) != 0) {
                     this.buildMassege(matchMap, "pledgeFaceValue",
                             str, "matchDetFeatures.pledgeFaceValue",
                             validateStr, "CONFIRM_MSG_013", cstpInfo.getSettleSpeedName(), regInfo.getSettleSpeedName());
-                    break;
+                    flag = true;
+                }
+                if(flag){
+                    break ;
                 }
             }
             if (!StringUtil.isNotEmpty(zyMes) && zyMes.length() > 0) {

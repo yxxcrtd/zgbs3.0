@@ -2800,6 +2800,12 @@
         select ict.EXECID execid
         from INTERF_TRAD_SECDEAL its
         inner join INTERF_CSTP_TRADE ict on ict.EXECID = its.FEDEALNO
+        <if test="counterId != null and counterId != '' and counterId != 'null'">
+            inner join ( select mcci.PARTY_CUSTOMER_ID
+            from MST_CFETS_CUSTOMER_INFO mcci
+            left join MST_COUNTER_PARTY mst on mcci.PARTY_ID = mst.PARTY_ID
+            where mst.COUNTER_ID = #{counterId,jdbcType=VARCHAR}) mst on mst.PARTY_CUSTOMER_ID = its.CNO
+        </if>
         where NOT EXISTS (SELECT 1 FROM trdquto_match_info match where ict.EXECID = match.CSTP_TRADE_ID)
         <if test="tradeDate != null ">
             and its.DEALDATE = #{tradeDate,jdbcType=DATE}
@@ -2829,9 +2835,6 @@
         <if test="deliveryType != null and deliveryType != ''">
             and ict.DELIVERYTYPE = #{deliveryType,jdbcType=VARCHAR}
         </if>
-        <if test="counterId != null and counterId != ''">
-            and its.CNO = #{counterId,jdbcType=VARCHAR}
-        </if>
         <if test="settleAtm != null">
             and its.SETTAMT = #{settleAtm,jdbcType=DECIMAL}
         </if>
@@ -2842,6 +2845,12 @@
         select ict.EXECID execid,iotr.TRADEID totleTradeId
         from INTERF_OPICS_TRAD_REPO iotr
         inner join INTERF_CSTP_TRADE ict on ict.EXECID = iotr.ORITRADEID
+        <if test="counterId != null and counterId != '' and counterId != 'null'">
+            inner join ( select mcci.PARTY_CUSTOMER_ID
+            from MST_CFETS_CUSTOMER_INFO mcci
+            left join MST_COUNTER_PARTY mst on mcci.PARTY_ID = mst.PARTY_ID
+            where mst.COUNTER_ID = #{counterId,jdbcType=VARCHAR}) mst on mst.PARTY_CUSTOMER_ID = iotr.SELLER
+        </if>
         where NOT EXISTS (SELECT 1 FROM trdquto_match_info match where ict.EXECID = match.CSTP_TRADE_ID)
         <if test="tradeDate != null">
             and iotr.DEALDATE = #{tradeDate,jdbcType=DATE}
