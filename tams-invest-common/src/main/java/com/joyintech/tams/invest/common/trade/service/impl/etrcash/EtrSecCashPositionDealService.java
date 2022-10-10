@@ -1209,8 +1209,12 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                 finProductTradeDto);
         etrCashPositionFlowDto.setOrderId(finProductTradeDto.getEntrustId());
         // 交易场所为一级市场且是交易所的交易，付款账户为托管户 add by 马数凯 20210430
+        StlPayOrdersDto stlPayOrdersDto = new StlPayOrdersDto();
         String 账号;
-        if (StringUtil.equals(finProductTradeDto.getTrdProductDeal().getTradeMarketMode(), DictCodeListExt1.交易市场_一级市场.getValue())) {
+        if(CollectionUtils.isNotEmpty(finProductTradeDto.getStlPayOrdersList())) {
+            stlPayOrdersDto = finProductTradeDto.getStlPayOrdersList().get(0);
+            账号 = stlPayOrdersDto.getMyAcctNo();
+        }else if (StringUtil.equals(finProductTradeDto.getTrdProductDeal().getTradeMarketMode(), DictCodeListExt1.交易市场_一级市场.getValue())) {
             账号 = EtrCommonCashPositionDealService.select组合托管户(finProductTradeDto.getTrdProductDealAdd().getPortfolioId(),
                     finProductTradeDto.getTrdProductDeal().getCcy(), DictCodeListExt2.资金账户类型_托管户.getValue());
         } else {
