@@ -2688,7 +2688,7 @@
                     and fpi.BP = #{spread,jdbcType=DECIMAL}
                 </if>
                 <if test="issuePrice != null">
-                    and fp.ISSUE_PRICE = #{issuePrice,jdbcType=DECIMAL}
+                    and fpi.ISSUE_PRICE = #{issuePrice,jdbcType=DECIMAL}
                 </if>
                 <if test="ourTrader != null and ourTrader != ''">
                     and bo.OUR_TRADER = #{ourTrader,jdbcType=VARCHAR}
