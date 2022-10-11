@@ -3064,10 +3064,10 @@ public class CfetsTrdConfirmService extends BaseService {
                     df.format(ArithmeticUtil.round(regInfo.getTradeAmt(), 2, RoundingMode.HALF_UP)));
         }
         // 对手方
-        if (!StringUtil.equals(regInfo.getCounterIdName(), cstpInfo.getTraderidName())) {
+        if (!StringUtil.equals(regInfo.getCpPartyId(), cstpInfo.getCounterId())) {
             this.buildMassege(matchMap, "counterId",
                     str, "matchDetFeatures.counterId",
-                    validateStr, "CONFIRM_MSG_013", cstpInfo.getTraderidName(), regInfo.getCounterIdName());
+                    validateStr, "CONFIRM_MSG_013", cstpInfo.getCounterIdName(), regInfo.getCounterIdName());
         }
         if (StringUtil.isNotEmpty(str) && str.length() > 0) {
             str.append(getMessage("CONFIRM_MSG_015"));
@@ -3171,10 +3171,10 @@ public class CfetsTrdConfirmService extends BaseService {
                     df.format(ArithmeticUtil.round(regInfo.getMtradeAmt(), 2, RoundingMode.HALF_UP)));
         }
         // 对手方
-        if (!StringUtil.equals(regInfo.getCounterIdName(), cstpInfo.getTraderidName())) {
+        if (!StringUtil.equals(regInfo.getCpPartyId(), cstpInfo.getCounterId())) {
             this.buildMassege(matchMap, "counterId",
                     str, "matchDetFeatures.counterId",
-                    validateStr, "CONFIRM_MSG_013", cstpInfo.getTraderidName(), regInfo.getCounterIdName());
+                    validateStr, "CONFIRM_MSG_013", cstpInfo.getCounterIdName(), regInfo.getCounterIdName());
         }
         StringBuilder zyMes = new StringBuilder();
         //查询登记或报价的质押券信息

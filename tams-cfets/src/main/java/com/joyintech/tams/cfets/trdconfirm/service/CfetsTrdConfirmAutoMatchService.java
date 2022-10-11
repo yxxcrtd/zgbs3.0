@@ -203,7 +203,7 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
         }
         if (map.get("settleDate") != null && StringUtil.equals(map.get("settleDate").getType(), "01")) {
             // 结算日期
-            param.put("settleDate", DateUtil.format(bondDto.getSettleDate(), "yyyy-MM-dd"));
+            param.put("settleDate", bondDto.getSettleDate());
         }
         if (map.get("deliveryType") != null && StringUtil.equals(map.get("deliveryType").getType(), "01")) {
             // 结算方式

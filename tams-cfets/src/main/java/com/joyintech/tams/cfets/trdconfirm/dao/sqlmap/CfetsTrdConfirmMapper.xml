@@ -54,6 +54,7 @@
         reg.trade_date as tradeDate,
         reg.counter_id as counterId,
         nvl(t1.counter_name,reg.counter_id) as counterIdName,
+        mcci.PARTY_CUSTOMER_ID cpPartyId,
         deal.portfolioId as portfolioIds,
         deal.portfolioName as portfolioNames,
         reg.quote_type as quoteType,
@@ -79,6 +80,8 @@
         null ouPartyId,
         null otherAmt
         from reg_fin_product_deal_total reg
+        left join MST_COUNTER_PARTY mst on mst.COUNTER_ID = reg.counter_id
+        left join MST_CFETS_CUSTOMER_INFO mcci on mcci.PARTY_ID = mst.PARTY_ID
         left join reg_fin_product_deal_total_add regAdd
         on reg.totle_trade_id=regAdd.Totle_Trade_Id
         left join fin_product fp
@@ -189,6 +192,7 @@
             bo.BID_DATE                  tradeDate,
             null                         counterId,
             null                         counterIdName,
+            null cpPartyId,
             deal.portfolioId      as     portfolioIds,
             deal.portfolioName    as     portfolioNames,
             null                         quoteType,
@@ -444,6 +448,7 @@
         ib.quote_date as tradeDate,
         ibd.cp_party_id as counterId,
         mcci.PARTY_ABBR as counterIdName,
+        mcci.PARTY_CUSTOMER_ID cpPartyId,
         deal.portfolioId as portfolioIds,
         deal.portfolioName as portfolioNames,
         ib.quote_type as quoteType,
@@ -570,6 +575,7 @@
         ic.quote_date as tradeDate,
         ic.cp_party_id as counterId,
         mcci.PARTY_ABBR as counterIdName,
+        mcci.PARTY_CUSTOMER_ID cpPartyId,
         deal.portfolioId as portfolioIds,
         deal.portfolioName as portfolioNames,
         ic.quote_type as quoteType,
@@ -1641,9 +1647,6 @@
         <if test="ps != null  and ps!=''">
             AND reg.ps = #{ps}
         </if>
-        <if test="finprodType2 != null  and finprodType2!=''">
-            AND ct.BUSINESSTYPE = #{finprodType2}
-        </if>
         <if test="assetType != null  and assetType!=''">
             AND aaa.fpt.TYPE_9 = #{assetType}
         </if>
@@ -1789,9 +1792,6 @@
         </if>
         <if test="ps != null  and ps!=''">
             AND nvl(ib.ps,ic.repo_ps) = #{ps}
-        </if>
-        <if test="finprodType2 != null  and finprodType2!=''">
-            AND ct.BUSINESSTYPE = #{finprodType2}
         </if>
         <if test="assetType != null  and assetType!=''">
             AND aaa.fpt.TYPE_9 = #{assetType}
@@ -1948,6 +1948,9 @@
         <where>
             <if test="matchStatus_02 != null and matchStatus_02 != '' ">
                 aaa.matchStatus is not null and aaa.matchStatus != #{matchStatus_02}
+            </if>
+            <if test="finprodType2 != null  and finprodType2!=''">
+                AND aaa.finprodType2 = #{finprodType2}
             </if>
             <if test="search != null and search != '' and search !='有效' ">
                     AND ((aaa.execid || '|' || aaa.busiCode || '|' || sdl.ITEM_VALUE || '|' || aaa.finprodMarketId
