@@ -3023,7 +3023,7 @@ public class CfetsTrdConfirmService extends BaseService {
         // 净价/到期收益率
         if (StringUtil.isNotEmpty(regInfo.getYield()) && StringUtil.isNotEmpty(cstpInfo.getTradeYield())
                 && BigDecimalUtil.ACompareToB(regInfo.getYield(), cstpInfo.getTradeYield(), 4) != 0) {
-            DecimalFormat df = new DecimalFormat("#,##0.00");
+            DecimalFormat df = new DecimalFormat("#,##0.0000");
             this.buildMassege(matchMap, "yield",
                     str, "matchDetFeatures.yield",
                     validateStr, "CONFIRM_MSG_013", df.format(ArithmeticUtil.round(cstpInfo.getTradeYield(), 4, RoundingMode.HALF_UP))+"%",
