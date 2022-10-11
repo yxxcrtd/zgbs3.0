@@ -693,13 +693,14 @@ public class CfetsTrdConfirmService extends BaseService {
                 // 明细认购量/认购量 * 认购量
                 result.getTrdProductDeals().get(i).setShareAmt(
                         ArithmeticUtil.divide(
-                                ArithmeticUtil.multiply(ArithmeticUtil.multiply(interfCstpBjfxjg.getSubscriptionAmount(), new BigDecimal(100000000)),
+                                ArithmeticUtil.multiply(ArithmeticUtil.multiply(interfCstpBjfxjg.getSubscriptionAmount(), new BigDecimal(1000000)),
                                         shareAmtTemp), result.getShareAmt(), 2));
                 subscriptionAmount = ArithmeticUtil.subtract(subscriptionAmount, result.getTrdProductDeals().get(i).getShareAmt());
             }
         }
         result.setTradeAmt(interfCstpBjfxjg.getActualFee());
-        result.setShareAmt(ArithmeticUtil.multiply(interfCstpBjfxjg.getSubscriptionAmount(), new BigDecimal(100000000)));
+        // 亿元->转化为数量
+        result.setShareAmt(ArithmeticUtil.multiply(interfCstpBjfxjg.getSubscriptionAmount(), new BigDecimal(1000000)));
         logger.info("处理后数据:{}", JsonUtils.object2Json(result));
         return result;
     }
