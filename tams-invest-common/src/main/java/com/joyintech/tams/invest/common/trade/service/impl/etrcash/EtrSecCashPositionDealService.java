@@ -1228,7 +1228,8 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         etrCashPositionFlowDto.setCdate(finProductTradeDto.getTrdProductDeal().getSettleDate());
         // 有委托
         if (StringUtil.isNotEmpty(entrustId)) {
-            if (StringUtil.equals(finProductTradeDto.getStage(), "03")) {
+            if (StringUtil.equals(finProductTradeDto.getStage(), "03")
+                    || StringUtil.equals(finProductTradeDto.getStage(), "04")) {
                 etrSecPositionFlowDto.setCdate(finProductTradeDto.getTrdProductDeal().getSettleDate());
                 // 交割日增加交易券面总额/债券面值
                 etrSecPositionFlowDto.setAmount(交易日数量);
