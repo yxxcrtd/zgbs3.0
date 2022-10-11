@@ -2800,7 +2800,7 @@
     </select>
 
     <select id="selectSecCSTPByPrimaryKey" resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmRegInfoListResponse">
-        select ict.EXECID execid
+        select ict.EXECID execid,its.DEALNO totleTradeId
         from INTERF_TRAD_SECDEAL its
         inner join INTERF_CSTP_TRADE ict on ict.EXECID = its.FEDEALNO
         <if test="counterId != null and counterId != '' and counterId != 'null'">

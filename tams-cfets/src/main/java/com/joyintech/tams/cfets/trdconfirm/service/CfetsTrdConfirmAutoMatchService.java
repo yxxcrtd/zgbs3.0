@@ -233,8 +233,8 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
         //插入匹配表
         CfetsTrdConfirmMatchDto match = new CfetsTrdConfirmMatchDto();
         match.setSeqno(IDGenerator.generate());
-        match.setCstpTradeId(confirmDto.getExecid());
-        match.setExeId(null);
+        match.setCstpTradeId(confirmDto.getTotleTradeId());
+        match.setExeId(confirmDto.getExecid());
         match.setPreTradeId(bondDto.getTotleTradeId());
         match.setMatchType(DictCodeListExt3.下行交易匹配类型_自动匹配.getValue());
         match.setMatchStatus(BussinessDictCodeList.匹配状态_已匹配.getValue());
@@ -310,8 +310,8 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
         //插入匹配表
         CfetsTrdConfirmMatchDto match = new CfetsTrdConfirmMatchDto();
         match.setSeqno(IDGenerator.generate());
-        match.setCstpTradeId(confirmDto.getExecid());
-        match.setExeId(null);
+        match.setCstpTradeId(confirmDto.getTotleTradeId());
+        match.setExeId(confirmDto.getExecid());
         match.setPreTradeId(repoDto.getTotleTradeId());
         match.setMatchType(DictCodeListExt3.下行交易匹配类型_自动匹配.getValue());
         match.setMatchStatus(BussinessDictCodeList.匹配状态_已匹配.getValue());
