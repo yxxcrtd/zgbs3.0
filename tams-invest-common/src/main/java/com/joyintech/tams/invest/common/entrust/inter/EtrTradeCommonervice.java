@@ -227,6 +227,20 @@ public class EtrTradeCommonervice extends BaseService {
                 if (newRealSecAmount != null) { //持仓数量
                     realSec = realSec.add(newRealSecAmount);
                 }
+                // JJTZJY-107 指令管理-非交易业务指令-持仓tab页 持仓数量与可卖数量展示存在错误 start
+                List<PositionCashSecDto> secList2 = new ArrayList<>();
+                secList.stream().forEach(item -> {
+                    PositionCashSecDto secDto = new PositionCashSecDto();
+                    BeanUtil.copyPropertiesIgnoreNull(secDto, item); //复制资产信息
+                    secDto.setHoldingType((DictCodeListExt3.资产类型_质押式通用回购入库质押券持仓.getValue()));
+                    secList2.add(secDto);
+                });
+                BigDecimal repoNum = queryPosition(secList2, "04", ""); //质押数量
+                if (repoNum != null) { //质押数量
+                    canSec = ArithmeticUtil.subtract(canSec,repoNum);
+                }
+                // JJTZJY-107 指令管理-非交易业务指令-持仓tab页 持仓数量与可卖数量展示存在错误 end
+
                 // modify by swwan 2022-06-28 TISHKS-1434 start
                 requestDto.setPtlList(secList);  //覆盖请求参数，非交易平台赋值了
                 // modify by swwan 2022-06-28 TISHKS-1434 end
