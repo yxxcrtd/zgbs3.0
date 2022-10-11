@@ -3302,8 +3302,8 @@ public class CfetsTrdConfirmService extends BaseService {
         }
         // 本方交易员
         if (!StringUtil.equals(regInfo.getTrader(), cstpInfo.getTrader())) {
-            this.buildMassege(matchMap, "trader",
-                    str, "matchDetFeatures.trader",
+            this.buildMassege(matchMap, "ourTrader",
+                    str, "matchDetFeatures.ourTrader",
                     validateStr, "CONFIRM_MSG_013", cstpInfo.getFinprodId(), regInfo.getFinprodId());
         }
         if (StringUtil.isNotEmpty(str) && str.length() > 0) {
