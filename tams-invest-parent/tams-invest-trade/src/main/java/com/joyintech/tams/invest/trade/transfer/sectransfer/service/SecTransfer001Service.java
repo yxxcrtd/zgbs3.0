@@ -794,10 +794,10 @@ public class SecTransfer001Service extends CommonExportService<SecTransfer001Dto
                     this.deleteBussFlowData1(baseTradeInfoDto.getTrdProductDeal().getTotleTradeId());
 
                     // 7.3写入交易信息进交易报送信息表，为中债报送用
-                    this.dealInfoCbReportLogic_7_3(entity);
+                    //this.dealInfoCbReportLogic_7_3(entity);
 
                     // 7.4更新资产负债报送状态
-                    this.assetDebtCbReportLogic_7_4(entity);
+                    //this.assetDebtCbReportLogic_7_4(entity);
 
                     basRiskMathCommService.insert(entity.getRiskTrialRetDto(), entity.getTradeId());
 
