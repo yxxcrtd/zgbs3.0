@@ -1252,7 +1252,21 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             List<StlPayOrdersDto> stlPayOrders = new ArrayList<>();
             StlPayOrdersDto stlPayOrder = new StlPayOrdersDto();
             FinProduct finProduct = finProductMapper.selectByPrimaryKey(entity.getFinprodId());
-            String acctId = EtrCommonCashPositionDealService.select组合托管户(deal.getPortfolioId(), finProduct.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
+            String acctId ;
+            boolean isJysPayType02 = false;
+            // 非交易所一级缴款
+            if (StringUtil.equals(entity.getPayType(), BussinessDictCodeList.缴款方式_一级分销.getValue())
+                    && (StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_上海证券交易所.getValue())
+                    || StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_深圳证券交易所.getValue()))) {
+                isJysPayType02 = true;
+            }
+            // 交易所 一级分销 付款账户为 券商资金账户 其他为托管户
+            if (isJysPayType02) {
+                // 根据证券账户查询资金账户
+                acctId = cfetsTrdFirstBidFirm002Mapper.selectAcctNoByEntrustDetail(deal.getEntrustId(), deal.getPortfolioId());
+            } else {
+                acctId = EtrCommonCashPositionDealService.select组合托管户(deal.getPortfolioId(), finProduct.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
+            }
             stlPayOrder.setMyAcctNo(acctId);
             stlPayOrder.setOrderId(entity.getBidId());
             stlPayOrder.setCcy(finProduct.getCcy());
@@ -1271,7 +1285,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     }
 
     /**
-     * 老头存处理 系统参数是否处理旧头寸标识(IS_HANDLE_OLDPOS_FLAG)为Y时处理
+     * 交易所一级分销头存处理 系统参数是否处理旧头寸标识(IS_HANDLE_OLDPOS_FLAG)为Y时处理
      *
      * @param entity   页面元素
      * @param isRevokeOrBack 交易流程状态 参数字典 TRADE_FLOW_STATUS
