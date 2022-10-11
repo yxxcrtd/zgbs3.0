@@ -675,7 +675,7 @@ public class CfetsTrdConfirmService extends BaseService {
         // 应缴款金额
         BigDecimal tradeAmt = interfCstpBjfxjg.getActualFee();
         // 认购量
-        BigDecimal subscriptionAmount = ArithmeticUtil.multiply(interfCstpBjfxjg.getSubscriptionAmount(), new BigDecimal(100000000));
+        BigDecimal subscriptionAmount = ArithmeticUtil.multiply(interfCstpBjfxjg.getSubscriptionAmount(), new BigDecimal(1000000));
         // 倒减的那一笔回购资产代码
         // 分配结算金额和交易金额
         for (int i = 0; i < result.getTrdProductDeals().size(); i++) {
