@@ -1577,11 +1577,11 @@
                                                                    TO_CHAR(ROUND(reg.yield * 100, 4), 'FM990.0000') || '%',
                                                                    '03',
                                                                    TO_CHAR(ROUND(reg.exer_yield * 100, 4), 'FM990.0000') || '%')
-                        when reg.finprod_type2 in ('F02', 'F03') then TO_CHAR(ROUND(reg.rate * 100, 4), 'FM990.0000') || '%'
+                        when reg.finprod_type2 in ('F02', 'F03') then TO_CHAR(ROUND(ct.PRICE * 100, 4), 'FM990.0000') || '%'
                         else null end                                                     as tradeYieldStr,
                     decode(reg.finprod_type2,'F01',
                             decode(regAdd.CAL_MODE, '01',reg.unit_cprice,'02',reg.yield * 100,'03',reg.exer_yield * 100),
-                            'F02',reg.rate * 100,'F03',reg.rate * 100,null) as tradeYield,
+                            'F02',ct.PRICE * 100,'F03',ct.PRICE * 100,null) as tradeYield,
                     reg.repo_term                                                         as termDays,
                     decode(reg.finprod_type2, 'F01', reg.fprice_amt, tr.repoamt)          as tradeAmt,
                     reg.trade_date                                                        as tradeDate,
