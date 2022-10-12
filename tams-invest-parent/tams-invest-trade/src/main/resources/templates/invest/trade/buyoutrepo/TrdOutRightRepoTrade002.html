@@ -44,7 +44,7 @@
 									th:text="#{TrdOutRightRepoTrade002.baseInfo}">基本信息</span>（<span
 									class="star-sign">*</span>必填） <i
 									class="iconfont icon-arrow-down pro-down-icon"></i>
-									<input type="hidden" id="noBranchNoValue" name="noBranchNoValue" th:value="${noBranchNoValue}" /> 
+									<input type="hidden" id="noBranchNoValue" name="noBranchNoValue" th:value="${noBranchNoValue}" />
 									<input type="hidden" name="tradeId" th:value="${entity?.tradeId}" />
 									<input type="hidden" id="workflowId" name="workflowId" th:value="${entity?.workflowId}" />
 									<input type="hidden" id="settleAmtRate" name="settleAmtRate" th:value="${entity?.settleAmtRate}" />
@@ -59,12 +59,12 @@
 									<!-- 委托的回购到期日 -->
 									<input type="hidden" id="TrdOutRightRepoTrade002_entrustInfo_entrustMdate" name="entrustInfo.entrustMdate"data-th-value='${#dates.format(entity.entrustInfo?.entrustMdate,"yyyy-MM-dd")}' />
 									<!-- 委托的回购期限From -->
-									 <input type="hidden" id="TrdOutRightRepoTrade002_entrustInfo_entrustTermStart" name="entrustInfo.entrustTermStart" th:value="${entity.entrustInfo?.entrustTermStart}" /> 
+									 <input type="hidden" id="TrdOutRightRepoTrade002_entrustInfo_entrustTermStart" name="entrustInfo.entrustTermStart" th:value="${entity.entrustInfo?.entrustTermStart}" />
 									<!-- 委托的回购期限To -->
-									 <input type="hidden" id="TrdOutRightRepoTrade002_entrustInfo_entrustTermEnd" name="entrustInfo.entrustTermEnd" th:value="${entity.entrustInfo?.entrustTermEnd}" /> 
+									 <input type="hidden" id="TrdOutRightRepoTrade002_entrustInfo_entrustTermEnd" name="entrustInfo.entrustTermEnd" th:value="${entity.entrustInfo?.entrustTermEnd}" />
 									<!-- 委托的期限品种 -->
 									<!-- <input type="hidden" name="entrustInfo.entrustTermType" th:value="${entrustInfo?.entrustTermType}" /> -->
-									
+
 							</h3>
 							<div class="pro-module-item pro-item-wrap">
 								<div class="layui-form-item">
@@ -190,7 +190,7 @@
 									</div>
 								</div>
 								<div class="layui-form-item">
-									
+
 									<div class="form-inline-wrap">
 										<label class="layui-form-label form-label-wrap"
 											th:text="#{TrdOutRightRepoTrade002.repoterm}">回购期限</label>
@@ -234,7 +234,7 @@
 										<label class="layui-form-label form-label-wrap"
 											th:text="#{TrdOutRightRepoTrade002.vdate}">起息日</label>
 										<div class="layui-input-inline input-inline">
-											<input required type="text" id="TrdOutRightRepoTrade002_vdate" name="vdate" 
+											<input required type="text" id="TrdOutRightRepoTrade002_vdate" name="vdate"
 												class="layui-input form-input input-dateSelect" disabled="disabled"
 												placeholder="请输入内容" th:placeholder="#{SysCommon.placeholder}"
 												data-th-value='${entity?.vdate eq null ? platDate : #dates.format(entity?.vdate,"yyyy-MM-dd")}'>
@@ -378,7 +378,7 @@
 											   th:text="#{TrdOutRightRepoTrade002.amtInfo.firstCleanPrice}">首次净价</label>
 										<div class="layui-input-inline input-inline">
 											<input type="text" id="TrdOutRightRepoTrade002_fCleanPrice"
-												name="fCprice" data-fixtype="2" data-textrange="6"
+												name="fCprice" data-fixtype="2" data-textrange="11"
 												class="layui-input form-input text-number"
 												placeholder="请输入内容" data-th-value='${entity?.fCprice}'
 												th:placeholder="#{SysCommon.placeholder}">
@@ -391,7 +391,7 @@
 												<input type="text" id="TrdOutRightRepoTrade002_fIntAmt"
 													name="fIntAmt" data-th-value='${entity?.fIntAmt}'
 													class="layui-input form-input text-number"
-													placeholder="请输入内容" data-fixtype="2" data-textrange="6"
+													placeholder="请输入内容" data-fixtype="2" data-textrange="11"
 													th:placeholder="#{SysCommon.placeholder}">
 												<span class="input-right-show"
 													th:text="#{TrdRepoTrade002.yuan}">元</span>
@@ -404,7 +404,7 @@
 												<input type="text" id="TrdOutRightRepoTrade002_fFprice"
 													name="fFprice" data-th-value='${entity?.fFprice}'
 													class="layui-input form-input text-number"
-													placeholder="请输入内容" data-fixtype="2" data-textrange="6"
+													placeholder="请输入内容" data-fixtype="2" data-textrange="11"
 													th:placeholder="#{SysCommon.placeholder}">
 										</div>
 									</div>
@@ -456,7 +456,7 @@
 											   th:text="#{TrdOutRightRepoTrade002.amtInfo.matCleanPrice}">到期净价</label>
 										<div class="layui-input-inline input-inline">
 											<input type="text" id="TrdOutRightRepoTrade002_mCleanPrice"
-												name="mCprice" data-fixtype="2" data-textrange="6"
+												name="mCprice" data-fixtype="2" data-textrange="11"
 												class="layui-input form-input text-number"
 												placeholder="请输入内容" data-th-value='${entity?.mCprice}'
 												th:placeholder="#{SysCommon.placeholder}">
@@ -469,7 +469,7 @@
 												<input type="text" id="TrdOutRightRepoTrade002_mSettleIntAmt"
 													name="mIntAmt" data-th-value='${entity?.mIntAmt}'
 													class="layui-input form-input text-number"
-													placeholder="请输入内容" data-fixtype="2" data-textrange="6"
+													placeholder="请输入内容" data-fixtype="2" data-textrange="11"
 													th:placeholder="#{SysCommon.placeholder}">
 												<span class="input-right-show"
 													th:text="#{TrdRepoTrade002.yuan}">元</span>
@@ -482,7 +482,7 @@
 												<input type="text" id="TrdOutRightRepoTrade002_mFprice"
 													name="mFprice" data-th-value='${entity?.mFprice}'
 													class="layui-input form-input text-number"
-													placeholder="请输入内容" data-fixtype="2" data-textrange="6"
+													placeholder="请输入内容" data-fixtype="2" data-textrange="11"
 													th:placeholder="#{SysCommon.placeholder}">
 										</div>
 									</div>
