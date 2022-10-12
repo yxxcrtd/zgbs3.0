@@ -17,6 +17,17 @@
         <!-- 关键字模糊查询 -->
         <include refid="vagueQueryWhere"></include>
         order by aaa.finprodType2, aaa.ps DESC)
+        <where>
+            <if test="tradeAmt!=null">
+                tradeAmt = ${tradeAmt}
+            </if>
+            <if test="mTradeAmt!=null">
+                AND mTradeAmt = ${mTradeAmt}
+            </if>
+            <if test="counterId!=null and counterId !=''">
+                AND cpPartyId = #{counterId,jdbcType=VARCHAR}
+            </if>
+        </where>
         <!--前端传入排序字段-->
         <if test="sort != null and sort != '' and direction != null and direction != ''">
             order by ${sort} ${direction}
@@ -415,6 +426,17 @@
         <!-- 关键字模糊查询 -->
         <include refid="vagueQueryWhere"></include>
         order by aaa.finprodType2, aaa.ps DESC)
+        <where>
+            <if test="tradeAmt!=null">
+                tradeAmt = ${tradeAmt}
+            </if>
+            <if test="mTradeAmt!=null">
+                AND mTradeAmt = ${mTradeAmt}
+            </if>
+            <if test="counterId!=null and counterId !=''">
+                AND cpPartyId = #{counterId,jdbcType=VARCHAR}
+            </if>
+        </where>
         <!--前端传入排序字段-->
         <if test="sort != null and sort != '' and direction != null and direction != ''">
             order by ${sort} ${direction}
@@ -1490,6 +1512,17 @@
         <include refid="vagueQueryCstpWhere"></include>
 
         order by aaa.businesstype,aaa.ps,aaa.finprodMarketId)
+        <where>
+            <if test="tradeAmt!=null">
+                tradeAmt = ${tradeAmt}
+            </if>
+            <if test="mTradeAmt!=null">
+                AND mTradeAmt = ${mTradeAmt}
+            </if>
+            <if test="counterId!=null and counterId !=''">
+                AND counterId = #{counterId,jdbcType=VARCHAR}
+            </if>
+        </where>
         <!--前端传入排序字段-->
         <if test="sort != null and sort != '' and direction != null and direction != ''">
             order by ${sort} ${direction}

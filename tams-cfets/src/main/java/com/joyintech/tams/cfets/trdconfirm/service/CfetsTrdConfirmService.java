@@ -242,9 +242,9 @@ public class CfetsTrdConfirmService extends BaseService {
                 pageParam.put("execid", serchExecDto.getExecid());
                 Map<String, MatchDetFeatures> map = matchFeaturesService.queryManualMatchFeatures(serchExecDto.getBusinesstype());
                 if (StringUtil.equals(serchExecDto.getBusinesstype(), "BOND")) {
-                    //基础要素：成交日期、资产代码、交易场所、交易方向、清算速度、证券账户、净价/到期收益率、券面总额、结算日期、结算方式
+                    //基础要素：成交日期、资产代码、交易场所、交易方向、清算速度、证券账户、成交价（净价/到期收益率/行权收益率）、券面总额、结算日期、结算方式、结算金额、对手方
                     if (map.get("tradeDate") != null && StringUtil.equals(map.get("tradeDate").getType(), "01")) {
-                        // 资产代码
+                        // 成交日期
                         pageParam.put("tradeDate", serchExecDto.getTradeDate());
                     }
                     if (map.get("finprodMarketId") != null && StringUtil.equals(map.get("finprodMarketId").getType(), "01")) {
@@ -252,32 +252,40 @@ public class CfetsTrdConfirmService extends BaseService {
                         pageParam.put("finprodMarketId", serchExecDto.getFinprodMarketId());
                     }
                     if (map.get("ps") != null && StringUtil.equals(map.get("ps").getType(), "01")) {
-                        // 资产代码
+                        // 交易方向
                         pageParam.put("ps", serchExecDto.getPs());
                     }
                     if (map.get("settleSpeed") != null && StringUtil.equals(map.get("settleSpeed").getType(), "01")) {
-                        // 资产代码
+                        // 清算速度
                         pageParam.put("settleSpeed", serchExecDto.getSettleSpeed());
                     }
                     if (map.get("secManageAcctId") != null && StringUtil.equals(map.get("secManageAcctId").getType(), "01")) {
-                        // 资产代码
+                        // 证券账户
                         pageParam.put("secManageAcctId", serchExecDto.getAcctNo());
                     }
                     if (map.get("yield") != null && StringUtil.equals(map.get("yield").getType(), "01")) {
-                        // 资产代码
+                        // 成交价（净价/到期收益率/行权收益率）
                         pageParam.put("yield", serchExecDto.getTradeYield());
                     }
                     if (map.get("faceValue") != null && StringUtil.equals(map.get("faceValue").getType(), "01")) {
-                        // 资产代码
+                        // 券面总额
                         pageParam.put("faceValue", serchExecDto.getLastqty());
                     }
-                    if (map.get("finprodMarketId") != null && StringUtil.equals(map.get("settleDate").getType(), "01")) {
-                        // 资产代码
+                    if (map.get("settleDate") != null && StringUtil.equals(map.get("settleDate").getType(), "01")) {
+                        // 结算日期
                         pageParam.put("settleDate", serchExecDto.getSettleDate());
                     }
                     if (map.get("deliveryType") != null && StringUtil.equals(map.get("deliveryType").getType(), "01")) {
-                        // 资产代码
+                        // 结算方式
                         pageParam.put("deliveryType", serchExecDto.getDeliveryType());
+                    }
+                    if (map.get("settleAtm") != null && StringUtil.equals(map.get("settleAtm").getType(), "01")) {
+                        // 结算金额
+                        pageParam.put("settleAtm", serchExecDto.getTradeAmt());
+                    }
+                    if (map.get("counterId") != null && StringUtil.equals(map.get("counterId").getType(), "01")) {
+                        // 对手方
+                        pageParam.put("counterId", serchExecDto.getCounterId());
                     }
 
                 } else if (StringUtil.equals(serchExecDto.getBusinesstype(), "REPO")) {
@@ -318,6 +326,14 @@ public class CfetsTrdConfirmService extends BaseService {
                     if (map.get("tradeAmt") != null && StringUtil.equals(map.get("tradeAmt").getType(), "01")) {
                         // 资产代码
                         pageParam.put("tradeAmt", serchExecDto.getTradeAmt());
+                    }
+                    if (map.get("mTradeAmt") != null && StringUtil.equals(map.get("mTradeAmt").getType(), "01")) {
+                        //到期结算金额
+                        pageParam.put("mTradeAmt", serchExecDto.getMtradeAmt());
+                    }
+                    if (map.get("counterId") != null && StringUtil.equals(map.get("counterId").getType(), "01")) {
+                        //对手方
+                        pageParam.put("counterId", serchExecDto.getCounterId());
                     }
                     if (map.get("pledgeFinprodId") != null && StringUtil.equals(map.get("pledgeFinprodId").getType(), "01")) {
                         // 质押债券代码
@@ -2768,48 +2784,56 @@ public class CfetsTrdConfirmService extends BaseService {
             if (StringUtil.equals(serchCstpDto.getFinprodType2(), "01")) {
                 // 手工匹配元素查询
                 Map<String, MatchDetFeatures> map = matchFeaturesService.queryManualMatchFeatures("BOND");
-                //基础要素：成交日期、资产代码、交易场所、交易方向、清算速度、证券账户、净价/到期收益率、券面总额、结算日期、结算方式
+                //基础要素：成交日期、资产代码、交易场所、交易方向、清算速度、证券账户、成交价（净价/到期收益率/行权收益率）、券面总额、结算日期、结算方式、结算金额、对手方
                 if (map.get("tradeDate") != null && StringUtil.equals(map.get("tradeDate").getType(), "01")) {
-                    //成交日期
+                    // 成交日期
                     pageParam.put("tradeDate", serchCstpDto.getTradeDate());
                 }
                 if (map.get("finprodMarketId") != null && StringUtil.equals(map.get("finprodMarketId").getType(), "01")) {
-                    //资产代码
+                    // 资产代码
                     pageParam.put("finprodMarketId", serchCstpDto.getFinprodMarketId());
                 }
                 if (map.get("ps") != null && StringUtil.equals(map.get("ps").getType(), "01")) {
-                    //交易方向
+                    // 交易方向
                     pageParam.put("ps", serchCstpDto.getPs());
                 }
                 if (map.get("settleSpeed") != null && StringUtil.equals(map.get("settleSpeed").getType(), "01")) {
-                    //清算速度
+                    // 清算速度
                     pageParam.put("settleSpeed", serchCstpDto.getSettleSpeed());
                 }
                 if (map.get("secManageAcctId") != null && StringUtil.equals(map.get("secManageAcctId").getType(), "01")) {
-                    //证券账户
+                    // 证券账户
                     pageParam.put("secManageAcctId", serchCstpDto.getSecManageAcctId());
                 }
                 if (map.get("yield") != null && StringUtil.equals(map.get("yield").getType(), "01")) {
-                    //净价/到期收益率
+                    // 成交价 净价/到期收益率
                     pageParam.put("tradeYield", serchCstpDto.getYield());
                 }
                 if (map.get("faceValue") != null && StringUtil.equals(map.get("faceValue").getType(), "01")) {
-                    //券面总额
+                    // 券面总额
                     pageParam.put("faceValue", serchCstpDto.getFaceValue());
                 }
                 if (map.get("settleDate") != null && StringUtil.equals(map.get("settleDate").getType(), "01")) {
-                    //结算日期
+                    // 结算日期
                     pageParam.put("settleDate", serchCstpDto.getSettleDate());
                 }
                 if (map.get("deliveryType") != null && StringUtil.equals(map.get("deliveryType").getType(), "01")) {
-                    //结算方式
+                    // 结算方式
                     pageParam.put("deliveryType", serchCstpDto.getDeliveryType());
+                }
+                if (map.get("settleAtm") != null && StringUtil.equals(map.get("settleAtm").getType(), "01")) {
+                    // 结算金额
+                    pageParam.put("settleAtm", serchCstpDto.getTradeAmt());
+                }
+                if (map.get("counterId") != null && StringUtil.equals(map.get("counterId").getType(), "01")) {
+                    // 对手方
+                    pageParam.put("counterId", serchCstpDto.getCpPartyId());
                 }
             } else if (StringUtil.equals(serchCstpDto.getFinprodType2(), "02")) {
                 // 手工匹配元素查询
                 Map<String, MatchDetFeatures> map = matchFeaturesService.queryManualMatchFeatures("REPO");
-                //基础要素：成交日期、回购期限、交易场所、交易方向、清算速度、证券账户、回购利率、首次结算日、到期结算日、
-                // 首次结算金额、质押券信息（债券代码、折算比例、券面总额）
+                //基础要素：成交日期、回购期限、交易场所、交易方向、清算速度、证券账户、回购利率、首次结算日、到期结算日、交易金额、到期结算金额、对手方
+                // 质押债券代码、质押债券简称、质押债券折算比例、质押债券券面总额
                 if (map.get("tradeDate") != null && StringUtil.equals(map.get("tradeDate").getType(), "01")) {
                     //成交日期
                     pageParam.put("tradeDate", serchCstpDto.getTradeDate());
@@ -2846,6 +2870,14 @@ public class CfetsTrdConfirmService extends BaseService {
                     //首次结算金额
                     pageParam.put("tradeAmt", serchCstpDto.getTradeAmt());
                 }
+                if (map.get("mTradeAmt") != null && StringUtil.equals(map.get("mTradeAmt").getType(), "01")) {
+                    //到期结算金额
+                    pageParam.put("mTradeAmt", serchCstpDto.getMtradeAmt());
+                }
+                if (map.get("counterId") != null && StringUtil.equals(map.get("counterId").getType(), "01")) {
+                    //对手方
+                    pageParam.put("counterId", serchCstpDto.getCpPartyId());
+                }
                 if (map.get("pledgeFinprodIds") != null && StringUtil.equals(map.get("pledgeFinprodIds").getType(), "01")) {
                     //质押券信息（债券代码）
                     pageParam.put("pledgeFinprodIds", serchCstpDto.getPledgeFinprodIds());
@@ -2861,7 +2893,7 @@ public class CfetsTrdConfirmService extends BaseService {
             } else if (StringUtil.equals(serchCstpDto.getFinprodType2(), "03")) {
                 // 手工匹配元素查询
                 Map<String, MatchDetFeatures> map = matchFeaturesService.queryManualMatchFeatures("BID");
-                // 一级申购
+                // 一级申购 成交日期、资产代码、交易场所、认购量、应缴款金额、发行价格、本方、本方交易员
                 if (map.get("tradeDate") != null && StringUtil.equals(map.get("tradeDate").getType(), "01")) {
                     //成交日期
                     pageParam.put("tradeDate", DateUtil.format(serchCstpDto.getTradeDate()));
