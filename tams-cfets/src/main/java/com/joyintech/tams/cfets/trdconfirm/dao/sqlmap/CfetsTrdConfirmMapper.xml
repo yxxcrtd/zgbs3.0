@@ -24,6 +24,9 @@
             <if test="mTradeAmt!=null">
                 AND mTradeAmt = ${mTradeAmt}
             </if>
+            <if test="rate!=null">
+                AND rate = ${rate}
+            </if>
             <if test="counterId!=null and counterId !=''">
                 AND cpPartyId = #{counterId,jdbcType=VARCHAR}
             </if>
@@ -432,6 +435,9 @@
             </if>
             <if test="mTradeAmt!=null">
                 AND mTradeAmt = ${mTradeAmt}
+            </if>
+            <if test="rate!=null">
+                AND tradeYield = ${rate}
             </if>
             <if test="counterId!=null and counterId !=''">
                 AND cpPartyId = #{counterId,jdbcType=VARCHAR}
@@ -1518,6 +1524,9 @@
             </if>
             <if test="mTradeAmt!=null">
                 AND mTradeAmt = ${mTradeAmt}
+            </if>
+            <if test="rate!=null">
+                AND tradeYield = ${rate}
             </if>
             <if test="counterId!=null and counterId !=''">
                 AND counterId = #{counterId,jdbcType=VARCHAR}

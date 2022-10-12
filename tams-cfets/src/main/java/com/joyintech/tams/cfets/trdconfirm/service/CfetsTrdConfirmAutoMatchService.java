@@ -167,18 +167,34 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
         Map<String, MatchDetFeatures> map = matchFeaturesService.queryAutoMatchFeatures("BOND");
         Map<String, Object> param = new HashMap<>();
         if (map.get("tradeDate") != null && StringUtil.equals(map.get("tradeDate").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(bondDto.getTradeDate())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             //成交日期
             param.put("tradeDate", bondDto.getTradeDate());
         }
         if (map.get("finprodMarketId") != null && StringUtil.equals(map.get("finprodMarketId").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(bondDto.getFinprodMarketId())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             //资产代码
             param.put("finprodMarketId", bondDto.getFinprodMarketId());
         }
         if (map.get("ps") != null && StringUtil.equals(map.get("ps").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(bondDto.getPs())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             //交易方向
             param.put("ps", bondDto.getPs());
         }
         if (map.get("settleSpeed") != null && StringUtil.equals(map.get("settleSpeed").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(bondDto.getSettleSpeed())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             //清算速度
             if (StringUtil.equals(bondDto.getSettleSpeed(), "01")) {
                 param.put("settleSpeed", "1");
@@ -189,23 +205,43 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
             }
         }
         if (map.get("secManageAcctId") != null && StringUtil.equals(map.get("secManageAcctId").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(bondDto.getSecManageAcctId())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             //证券账户
             param.put("secManageAcctId", bondDto.getSecManageAcctId());
         }
         if (map.get("yield") != null && StringUtil.equals(map.get("yield").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(bondDto.getYield())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             //成交价
             param.put("yield", bondDto.getYield());
             param.put("price", bondDto.getPrice());
         }
         if (map.get("faceValue") != null && StringUtil.equals(map.get("faceValue").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(bondDto.getShareAmt())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             // 券面总额
             param.put("faceValue", bondDto.getShareAmt());
         }
         if (map.get("settleDate") != null && StringUtil.equals(map.get("settleDate").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(bondDto.getSettleDate())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             // 结算日期
             param.put("settleDate", bondDto.getSettleDate());
         }
         if (map.get("deliveryType") != null && StringUtil.equals(map.get("deliveryType").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(bondDto.getDeliveryType())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             // 结算方式
             if (StringUtil.equals(bondDto.getDeliveryType(), "03")) {
                 param.put("deliveryType", "0");
@@ -216,10 +252,18 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
             }
         }
         if (map.get("counterId") != null && StringUtil.equals(map.get("counterId").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(bondDto.getCounterId())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             // 对方手
             param.put("counterId", bondDto.getCounterId());
         }
         if (map.get("settleAtm") != null && StringUtil.equals(map.get("settleAtm").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(bondDto.getFpriceAmt())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             // 结算金额
             param.put("settleAtm", bondDto.getFpriceAmt());
         }
@@ -261,15 +305,31 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
         Map<String, MatchDetFeatures> map = matchFeaturesService.queryAutoMatchFeatures("REPO");
         Map<String, Object> param = new HashMap<>();
         if (map.get("tradeDate") != null && StringUtil.equals(map.get("tradeDate").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(repoDto.getTradeDate())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             param.put("tradeDate", repoDto.getTradeDate());
         }
         if (map.get("termDays") != null && StringUtil.equals(map.get("termDays").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(repoDto.getRepoTerm())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             param.put("termDays", repoDto.getRepoTerm());
         }
         if (map.get("ps") != null && StringUtil.equals(map.get("ps").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(repoDto.getPs())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             param.put("ps", repoDto.getPs());
         }
         if (map.get("settleSpeed") != null && StringUtil.equals(map.get("settleSpeed").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(repoDto.getSettleSpeed())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             if (StringUtil.equals(repoDto.getSettleSpeed(), "01")) {
                 param.put("settleSpeed", "1");
             } else if (StringUtil.equals(repoDto.getSettleSpeed(), "02")) {
@@ -279,24 +339,52 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
             }
         }
         if (map.get("secManageAcctId") != null && StringUtil.equals(map.get("secManageAcctId").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(repoDto.getSecManageAcctId())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             param.put("secManageAcctId", repoDto.getSecManageAcctId());
         }
         if (map.get("rate") != null && StringUtil.equals(map.get("rate").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(repoDto.getRate())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             param.put("rate", repoDto.getRate());
         }
         if (map.get("vsettleDate") != null && StringUtil.equals(map.get("vsettleDate").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(repoDto.getvSettleDate())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             param.put("vsettleDate", DateUtil.format(repoDto.getvSettleDate(), "yyyyMMdd"));
         }
         if (map.get("msettleDate") != null && StringUtil.equals(map.get("msettleDate").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(repoDto.getmSettleDate())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             param.put("msettleDate", DateUtil.format(repoDto.getmSettleDate(), "yyyyMMdd"));
         }
         if (map.get("tradeAmt") != null && StringUtil.equals(map.get("tradeAmt").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(repoDto.getTradeAmt())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             param.put("tradeAmt", repoDto.getTradeAmt());//首次结算金额
         }
         if (map.get("mTradeAmt") != null && StringUtil.equals(map.get("mTradeAmt").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(repoDto.getmTradeAmt())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             param.put("mTradeAmt", repoDto.getmTradeAmt());
         }
         if (map.get("counterId") != null && StringUtil.equals(map.get("counterId").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(repoDto.getCounterId())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             // 对方手
             param.put("counterId", repoDto.getCounterId());
         }
@@ -337,30 +425,58 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
         Map<String, MatchDetFeatures> map = matchFeaturesService.queryAutoMatchFeatures("BID");
         Map<String, Object> param = new HashMap<>();
         if (map.get("tradeDate") != null && StringUtil.equals(map.get("tradeDate").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(subInfoDto.getTradeDate())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             //成交日期
             param.put("tradeDate", DateUtil.format(subInfoDto.getTradeDate()));
         }
         if (map.get("finprodMarketId") != null && StringUtil.equals(map.get("finprodMarketId").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(subInfoDto.getFinprodMarketId())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             //资产代码
             param.put("finprodMarketId", StringUtil.substring(subInfoDto.getFinprodMarketId(), 0, subInfoDto.getFinprodMarketId().length() - 3));
         }
         if (map.get("ouPartyId") != null && StringUtil.equals(map.get("ouPartyId").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(subInfoDto.getOuPartyId())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             //本方
             param.put("ouPartyId", subInfoDto.getOuPartyId());
         }
         if (map.get("subscriptionAmount") != null && StringUtil.equals(map.get("subscriptionAmount").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(subInfoDto.getSubscriptionAmount())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             //认购量[亿元(小数点后保留1位)]
             param.put("subscriptionAmount", ArithmeticUtil.divide(subInfoDto.getSubscriptionAmount(), new BigDecimal(100000000), 1));
         }
         if (map.get("issuePrice") != null && StringUtil.equals(map.get("issuePrice").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(subInfoDto.getIssuePrice())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             //发行价格[元(小数点后保留2位)]
             param.put("issuePrice", ArithmeticUtil.round(subInfoDto.getIssuePrice(), 2, RoundingMode.HALF_UP));
         }
         // 一级申购 可选要素：本方交易员、应缴款金额
         if (map.get("ourTrader") != null && StringUtil.equals(map.get("ourTrader").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(subInfoDto.getOurTrader())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             param.put("ourTrader", subInfoDto.getOurTrader());//本方交易员
         }
         if (map.get("payableAmount") != null && StringUtil.equals(map.get("payableAmount").getType(), "01")) {
+            if(!StringUtil.isNotEmpty(subInfoDto.getPayableAmount())){
+                logger.info("基础要素为空值不自动匹配");
+                return null;
+            }
             //应缴款金额[元(小数点后保留2位)]
             param.put("payableAmount", ArithmeticUtil.round(subInfoDto.getPayableAmount(), 2, RoundingMode.HALF_UP));
         }

@@ -312,7 +312,7 @@ public class CfetsTrdConfirmService extends BaseService {
                         pageParam.put("secManageAcctId", serchExecDto.getAcctNo());
                     }
                     if (map.get("rate") != null && StringUtil.equals(map.get("rate").getType(), "01")) {
-                        // 资产代码
+                        // 回购利率
                         pageParam.put("rate", serchExecDto.getTradeYield());
                     }
                     if (map.get("vsettleDate") != null && StringUtil.equals(map.get("vsettleDate").getType(), "01")) {
@@ -2854,9 +2854,9 @@ public class CfetsTrdConfirmService extends BaseService {
                     //证券账户
                     pageParam.put("secManageAcctId", serchCstpDto.getSecManageAcctId());
                 }
-                if (map.get("yield") != null && StringUtil.equals(map.get("yield").getType(), "01")) {
+                if (map.get("rate") != null && StringUtil.equals(map.get("rate").getType(), "01")) {
                     //回购利率
-                    pageParam.put("tradeYield", serchCstpDto.getRate());
+                    pageParam.put("rate", serchCstpDto.getRate());
                 }
                 if (map.get("vsettleDate") != null && StringUtil.equals(map.get("vsettleDate").getType(), "01")) {
                     //首次结算日
