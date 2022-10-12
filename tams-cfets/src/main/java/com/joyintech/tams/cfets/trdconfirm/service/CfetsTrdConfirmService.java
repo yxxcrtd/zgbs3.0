@@ -265,7 +265,8 @@ public class CfetsTrdConfirmService extends BaseService {
                     }
                     if (map.get("yield") != null && StringUtil.equals(map.get("yield").getType(), "01")) {
                         // 成交价（净价/到期收益率/行权收益率）
-                        pageParam.put("yield", serchExecDto.getTradeYield());
+                        pageParam.put("yield", serchExecDto.getYield());
+                        pageParam.put("unitCprice", serchExecDto.getUnitCprice());
                     }
                     if (map.get("faceValue") != null && StringUtil.equals(map.get("faceValue").getType(), "01")) {
                         // 券面总额
@@ -281,7 +282,7 @@ public class CfetsTrdConfirmService extends BaseService {
                     }
                     if (map.get("settleAtm") != null && StringUtil.equals(map.get("settleAtm").getType(), "01")) {
                         // 结算金额
-                        pageParam.put("settleAtm", serchExecDto.getTradeAmt());
+                        pageParam.put("tradeAmt", serchExecDto.getTradeAmt());
                     }
                     if (map.get("counterId") != null && StringUtil.equals(map.get("counterId").getType(), "01")) {
                         // 对手方
@@ -2831,7 +2832,8 @@ public class CfetsTrdConfirmService extends BaseService {
                         return null;
                     }
                     // 成交价 净价/到期收益率
-                    pageParam.put("tradeYield", serchCstpDto.getYield());
+                    pageParam.put("yield", serchCstpDto.getYield());
+                    pageParam.put("unitCprice", serchCstpDto.getUnitCprice());
                 }
                 if (map.get("faceValue") != null && StringUtil.equals(map.get("faceValue").getType(), "01")) {
                     if(!StringUtil.isNotEmpty(serchCstpDto.getFaceValue())){
@@ -2863,7 +2865,7 @@ public class CfetsTrdConfirmService extends BaseService {
                         return null;
                     }
                     // 结算金额
-                    pageParam.put("settleAtm", serchCstpDto.getTradeAmt());
+                    pageParam.put("tradeAmt", serchCstpDto.getTradeAmt());
                 }
                 if (map.get("counterId") != null && StringUtil.equals(map.get("counterId").getType(), "01")) {
                     if(!StringUtil.isNotEmpty(serchCstpDto.getCpPartyId())){

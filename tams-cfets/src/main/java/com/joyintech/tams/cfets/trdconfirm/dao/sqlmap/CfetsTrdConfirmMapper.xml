@@ -18,8 +18,21 @@
         <include refid="vagueQueryWhere"></include>
         order by aaa.finprodType2, aaa.ps DESC)
         <where>
+            <if test="yield!=null or unitCprice!=nul">
+                (
+                <if test="yield!=null">
+                    yield = ${yield}
+                </if>
+                <if test="yield!=null and unitCprice!=nul">
+                    or
+                </if>
+                <if test="unitCprice!=null">
+                    unitCprice = ${unitCprice}
+                </if>
+                )
+            </if>
             <if test="tradeAmt!=null">
-                tradeAmt = ${tradeAmt}
+                AND tradeAmt = ${tradeAmt}
             </if>
             <if test="mTradeAmt!=null">
                 AND mTradeAmt = ${mTradeAmt}
@@ -430,8 +443,21 @@
         <include refid="vagueQueryWhere"></include>
         order by aaa.finprodType2, aaa.ps DESC)
         <where>
+            <if test="yield!=null or unitCprice!=nul">
+                (
+                <if test="yield!=null">
+                    yield = ${yield}
+                </if>
+                <if test="yield!=null and unitCprice!=nul">
+                    or
+                </if>
+                <if test="unitCprice!=null">
+                    unitCprice = ${unitCprice}
+                </if>
+                )
+            </if>
             <if test="tradeAmt!=null">
-                tradeAmt = ${tradeAmt}
+                AND tradeAmt = ${tradeAmt}
             </if>
             <if test="mTradeAmt!=null">
                 AND mTradeAmt = ${mTradeAmt}
@@ -1298,7 +1324,9 @@
         icpledge.pledgeRatio as pledgeRatios,
         icpledge.pledgeFaceValue as pledgeFaceValues,
         tr.MDEALAMT as mtradeAmt,
-        null otherAmt
+        null otherAmt,
+        I.PRICE unitCprice,
+        I.YIELD2 yield
         from INTERF_CSTP_TRADE I
         <!-- modify by etliu 20220926 性能问题处理 start -->
         <!-- INNER JOIN (SELECT EXECID ,MAX(UPDATETIME) UPDATETIME FROM  INTERF_CSTP_TRADE GROUP BY EXECID)	II ON  II.EXECID = I.EXECID AND II.UPDATETIME = I.UPDATETIME -->
@@ -1447,7 +1475,9 @@
                 null                            as                                   pledgeRatios,
                 null                            as                                   pledgeFaceValues,
                 null                            as                                   mtradeAmts,
-                icb.ISSUE_PRICE                                                      otherAmt
+                icb.ISSUE_PRICE                                                      otherAmt,
+                null unitCprice,
+                null yield
         from INTERF_CSTP_BJFXJG icb
                  left join fin_product fp on CONCAT(icb.INSTRUMENT_ID,'.IB') = fp.finprod_market_id
                  LEFT JOIN SYS_USER_ADD sua ON icb.SUBMIT_USER = sua.IBU_TRADER
@@ -1519,8 +1549,21 @@
 
         order by aaa.businesstype,aaa.ps,aaa.finprodMarketId)
         <where>
+            <if test="yield!=null or unitCprice!=nul">
+                (
+                <if test="yield!=null">
+                    yield = ${yield}
+                </if>
+                <if test="yield!=null and unitCprice!=nul">
+                    or
+                </if>
+                <if test="unitCprice!=null">
+                    unitCprice = ${unitCprice}
+                </if>
+                )
+            </if>
             <if test="tradeAmt!=null">
-                tradeAmt = ${tradeAmt}
+                AND tradeAmt = ${tradeAmt}
             </if>
             <if test="mTradeAmt!=null">
                 AND mTradeAmt = ${mTradeAmt}
