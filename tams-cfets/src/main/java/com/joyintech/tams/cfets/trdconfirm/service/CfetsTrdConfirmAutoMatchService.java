@@ -107,10 +107,10 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
             logger.info("-----------无可匹配的下行数据End-------------");
             return;
         }
-        // 自动确认开关
+        // 匹配确认数据是否需要手工确认_银行间成交确认
         String cfetsIsAutoSure = CacheUtil.getSysParam("CFETS_IS_AUTO_SURE");
-        logger.info("自动确认开关:{}", cfetsIsAutoSure);
-        if (StringUtil.equals(cfetsIsAutoSure, DictCodeList.是否_是.getValue())) {
+        logger.info("匹配确认数据是否需要手工确认_银行间成交确认:{}", cfetsIsAutoSure);
+        if (StringUtil.equals(cfetsIsAutoSure, DictCodeList.是否_否.getValue())) {
             logger.info("-----------自动匹配的报价数据成交确认-------------");
             //报价数据，会自动成交
             CfetsTrdConfirmRegInfoListResponse regInfo = new CfetsTrdConfirmRegInfoListResponse();
@@ -404,11 +404,12 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
         String supportCstpFlagRepo = CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_REPO");
         //是否支持CSTP下行接口_质押式回购
         logger.info("是否支持CSTP下行接口_质押式回购:{}", supportCstpFlagRepo);
-        String cfetsIsAutoSure = CacheUtil.getSysParam("CFETS_IS_AUTO_SURE");
-        logger.info("自动确认开关:{}", cfetsIsAutoSure);
         //是否支持CSTP下行接口_一级申购
         String isSupportCstpFlagBondfirst = CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST");
         logger.info("是否支持CSTP下行接口_一级申购:{}", isSupportCstpFlagBondfirst);
+        // 匹配确认数据是否需要手工确认_银行间成交确认
+        String cfetsIsAutoSure = CacheUtil.getSysParam("CFETS_IS_AUTO_SURE");
+        logger.info("匹配确认数据是否需要手工确认_银行间成交确认:{}", cfetsIsAutoSure);
         if (StringUtil.isNotEmpty(interfTradSecdeal) && StringUtil.equals(supportCstpFlagBond, DictCodeList.是否_是.getValue())) {
             logger.info("银行间CSTP成交回报-现券买卖匹配报文:{}", JsonUtils.object2Json(interfTradSecdeal));
             matchDto = this.cstpSecTradeAutoMatch(interfTradSecdeal, iCstpTrade);
@@ -424,13 +425,13 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
             return new AjaxResult();
         }
         if (StringUtil.isNotEmpty(matchDto.getDealType()) && StringUtil.equals(matchDto.getDealType(), "999999")
-                && !StringUtil.equals(cfetsIsAutoSure, DictCodeList.是否_是.getValue())) {
+                && !StringUtil.equals(cfetsIsAutoSure, DictCodeList.是否_否.getValue())) {
             //针对下行回来数据，上行或登记数据已经进行成交确认，此时更新匹配关系表
             logger.info("-----------已存在数据更新匹配关系表-------------");
             cfetsTrdConfirmMapper.updateTrdQutoMatchInfo(matchDto);
         } else if (StringUtil.isNotEmpty(matchDto.getDealType())
                 && StringUtil.equals(matchDto.getDealType(), BussinessDictCodeList.交易类型_登记报价.getValue())
-                && !StringUtil.equals(cfetsIsAutoSure, DictCodeList.是否_是.getValue())) {
+                && !StringUtil.equals(cfetsIsAutoSure, DictCodeList.是否_否.getValue())) {
             //针对登记数据，仅仅匹配
             logger.info("-----------自动匹配的登记数据成交确认-------------");
             cfetsTrdConfirmMapper.insertTrdQutoMatchInfo(matchDto);

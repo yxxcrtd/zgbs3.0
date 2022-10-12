@@ -3304,7 +3304,7 @@ public class CfetsTrdConfirmService extends BaseService {
         if (!StringUtil.equals(regInfo.getTrader(), cstpInfo.getTrader())) {
             this.buildMassege(matchMap, "ourTrader",
                     str, "matchDetFeatures.ourTrader",
-                    validateStr, "CONFIRM_MSG_013", cstpInfo.getFinprodId(), regInfo.getFinprodId());
+                    validateStr, "CONFIRM_MSG_013", cstpInfo.getTrader(), regInfo.getTrader());
         }
         if (StringUtil.isNotEmpty(str) && str.length() > 0) {
             str.append(getMessage("CONFIRM_MSG_015"));

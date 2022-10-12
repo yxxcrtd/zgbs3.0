@@ -2809,7 +2809,7 @@
             left join MST_COUNTER_PARTY mst on mcci.PARTY_ID = mst.PARTY_ID
             where mst.COUNTER_ID = #{counterId,jdbcType=VARCHAR}) mst on mst.PARTY_CUSTOMER_ID = its.CNO
         </if>
-        where NOT EXISTS (SELECT 1 FROM trdquto_match_info match where ict.EXECID = match.CSTP_TRADE_ID)
+        where NOT EXISTS (SELECT 1 FROM trdquto_match_info match where ict.EXECID = match.EXE_ID)
         <if test="tradeDate != null ">
             and its.DEALDATE = #{tradeDate,jdbcType=DATE}
         </if>
@@ -2863,7 +2863,7 @@
             left join MST_COUNTER_PARTY mst on mcci.PARTY_ID = mst.PARTY_ID
             where mst.COUNTER_ID = #{counterId,jdbcType=VARCHAR}) mst on mst.PARTY_CUSTOMER_ID = iotr.SELLER
         </if>
-        where NOT EXISTS (SELECT 1 FROM trdquto_match_info match where ict.EXECID = match.CSTP_TRADE_ID)
+        where NOT EXISTS (SELECT 1 FROM trdquto_match_info match where ict.EXECID = match.EXE_ID)
         <if test="tradeDate != null">
             and iotr.DEALDATE = #{tradeDate,jdbcType=DATE}
         </if>
