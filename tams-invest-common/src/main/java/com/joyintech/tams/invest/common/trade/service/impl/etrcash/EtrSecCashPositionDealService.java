@@ -1240,6 +1240,9 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                         交易日数量, finProductTradeDto.getTrdProductDeal().getSettleDate(),
                         finProductTradeDto.getTrdProductDeal().getTradeMarket(), finProductTradeDto.getBondFirstSign());
                 flowDto.setAmount(ArithmeticUtil.doAdd(交易日减少金额, flowDto.getAmount()));
+                if(StringUtil.equals(finProductTradeDto.getStage(), "04")){
+                    flowDto.setAmount(交易日减少金额);
+                }
                 etrPositionHoldDto.getPtlCashPositionFlows().add(flowDto);
 
             } else if (StringUtil.equals(finProductTradeDto.getStage(), "02")) {
