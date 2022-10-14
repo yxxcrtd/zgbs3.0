@@ -76,6 +76,12 @@ public class CfetsTrdConfirmCstpInfoListResponse {
     @ApiModelProperty(name="tradeYield",value="成交价%",example="1")
     private BigDecimal tradeYield;
 
+    @ApiModelProperty(name="yield",value="到期收益率%",example="1")
+    private BigDecimal yield;
+
+    @ApiModelProperty(name="unitCprice",value="净价",example="1")
+    private BigDecimal unitCprice;
+
     @ApiModelProperty(name="tradeYieldStr",value="成交价+单位",example="1")
     private String tradeYieldStr;
 
@@ -502,5 +508,21 @@ public class CfetsTrdConfirmCstpInfoListResponse {
 
     public void setOtherAmt(BigDecimal otherAmt) {
         this.otherAmt = otherAmt;
+    }
+
+    public BigDecimal getYield() {
+        return yield;
+    }
+
+    public void setYield(BigDecimal yield) {
+        this.yield = yield;
+    }
+
+    public BigDecimal getUnitCprice() {
+        return unitCprice;
+    }
+
+    public void setUnitCprice(BigDecimal unitCprice) {
+        this.unitCprice = unitCprice;
     }
 }
