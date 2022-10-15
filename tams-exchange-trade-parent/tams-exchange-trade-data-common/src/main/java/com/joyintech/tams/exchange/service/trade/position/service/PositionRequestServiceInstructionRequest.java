@@ -76,6 +76,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -141,6 +142,8 @@ public class PositionRequestServiceInstructionRequest {
     private EntrustService entrustService;
     @Autowired
     private IntegratedEntrustService integratedEntrustService;
+    @Autowired
+    private InstructionService instructionService;
 
     /**
      * 头寸引擎
@@ -278,7 +281,16 @@ public class PositionRequestServiceInstructionRequest {
                 bean = new PositionRequestBaseBean(entity);
                 bean.setPortfolioId(item.getPortfolioId());
                 bean.setFinprodId(null);
+                EntrustInterface entrust = entrustService.findById(entity.getEntrustNo());
                 BigDecimal price = Objects.isNull(entity.getFullPrice()) ? BigDecimal.ZERO : entity.getFullPrice();
+                if(entrust!=null) {
+                    price = Objects.isNull(entrust.getFullPrice()) ? BigDecimal.ZERO : entrust.getFullPrice();
+                }else {
+                    entrust = integratedEntrustService.findById(entity.getEntrustNo());
+                    if(entrust!=null) {
+                        price = Objects.isNull(entrust.getFullPrice()) ? BigDecimal.ZERO : entrust.getFullPrice();
+                    }
+                }
                 bean.setCashAmount(price.multiply(BigDecimal.valueOf(item.getEntrustNum())).setScale(2, RoundingMode.HALF_UP));
 
                 Map<String, Object> map = BeanUtil.object2Map(bean);
@@ -552,7 +564,14 @@ public class PositionRequestServiceInstructionRequest {
                     bean.setCashAmount(entity.getmTradeAmt());
                 }
             } else {
-                bean.setCashAmount(entity.getEntrustAmt());
+//                bean.setCashAmount(entity.getEntrustAmt());
+                // XYHGFXSJ-1157 恒生回报中 entrustAmt 为0, 故从指令上取
+                Instruction instruction = instructionService.findById(entity.getEntrustId());
+                if (Objects.nonNull(instruction)) {
+                    bean.setCashAmount(instruction.getEntrustAmt());
+                } else {
+                    log.warn("查询指令失败 => 【instructionId = {}】", entity.getEntrustId());
+                }
             }
 
 
