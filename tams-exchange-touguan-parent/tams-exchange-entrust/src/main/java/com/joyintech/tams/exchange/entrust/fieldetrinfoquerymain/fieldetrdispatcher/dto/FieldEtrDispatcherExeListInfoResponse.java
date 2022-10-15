@@ -528,7 +528,7 @@ public class FieldEtrDispatcherExeListInfoResponse extends FieldEtrDispatcherBas
     }
 
     public String getBusiTypeStr() {
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式, this.getBusiType());
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.交易类型, this.getBusiType());
     }
 
     public String getExerciseDate() {

@@ -11,11 +11,9 @@
 package com.joyintech.tams.invest.bankuplink.bond.dto;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.joyintech.framework.json.BigDecimalSerializer;
-import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
@@ -618,7 +616,7 @@ public class CfetsBondDealEntrustOrderDto extends EtrEntrust {
 
     public String getQuoteTypeStr() {
         if (StringUtil.isNotEmpty(this.getQuoteType())) {
-            String quoteTypeStr = SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式,
+            String quoteTypeStr = SysDataUtil.getNameFromDataDict(BussinessDictCode.交易类型,
                 this.getQuoteType());
             if (quoteTypeStr == null) {
                 return this.quoteType;

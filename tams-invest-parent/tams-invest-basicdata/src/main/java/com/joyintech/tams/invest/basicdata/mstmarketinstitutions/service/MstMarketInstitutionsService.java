@@ -392,7 +392,9 @@ public class MstMarketInstitutionsService extends CommonExportService<MstMarketI
             mstDto.setOperateType("NEW");
             mstDto.setMstBondCreditRating(new ArrayList<>());
             Set<ConstraintViolation<MstMarketInstitutionsDto>> validate = Validation.buildDefaultValidatorFactory().getValidator().validate(mstDto, ValidateGroupEdit.class);
-            logger.info("autoAddInstitutions >> 发行人校验结果：{}", JsonUtils.object2Json(validate));
+            //upd   wsc    日志输出报错   修改为tostring
+            //logger.info("autoAddInstitutions >> 发行人校验结果：{}", JsonUtils.object2Json(validate));
+            logger.info("autoAddInstitutions >> 发行人校验结果：{}", validate.toString());
             if (CollectionUtils.isNotEmpty(validate)) {//没有校验通过
                 result.put("errorCode", 0);
                 result.put("message", "匹配失败");

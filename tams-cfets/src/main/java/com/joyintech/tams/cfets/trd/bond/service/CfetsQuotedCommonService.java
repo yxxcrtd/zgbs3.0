@@ -19,6 +19,7 @@ import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.service.bankuplink.bond.service.CfetsBondDealQuotedPriceService;
 import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealQuoteCommonDto;
@@ -64,11 +65,6 @@ public class CfetsQuotedCommonService extends BaseService {
 
     @Autowired
     private CfetsIbuQuoteBondMapper cfetsIbuQuoteBondMapper;
-    /**
-     * {@linkplain}
-     */
-    @Autowired
-    private IPlatformDate iPlatformDate;
 
     /**
      * DateCalService
@@ -92,9 +88,6 @@ public class CfetsQuotedCommonService extends BaseService {
     private CfetsQuotedCommonService cfetsQuotedCommonService;
 
     @Autowired
-    private CfetsBondDealQuotedPriceService cfetsBondDealQuotedPrice;
-
-    @Autowired
     private com.joyintech.service.bankuplink.common.service.CfetsQuotedCommonService cfetsQuotedCommonServiceMicro;
 
     @Autowired
@@ -102,9 +95,6 @@ public class CfetsQuotedCommonService extends BaseService {
 
     @Autowired
     private CfetsIbuQuoteBondEtrMapper cfetsIbuQuoteBondEtrMapper;
-
-    @Autowired
-    private StlSecAcctInfoMapper stlSecAcctInfoMapper;
 
     @Autowired
     private SppiImportDataMapper sppiImportDataMapper;
@@ -440,7 +430,7 @@ public class CfetsQuotedCommonService extends BaseService {
         // 回退
         else if (StringUtil.equals(bondQuoteInfoDto.getOperationType(), "doBack")) {
             if (StringUtil.equals(bondQuoteInfoDto.getQuoteType(),
-                BussinessDictCodeList.报价方式_对话报价.getValue())) {
+                BussinessDictCodeList.交易类型_对话报价.getValue())) {
                 CfetsBondDealDialogueQuoteDto cetsBondDealDialogueQuoteDto = cfetsBondDealQuotedPrice002Service.getBondDialogueQuote(
                     bondQuoteInfoDto.getQuoteId(),null);
                 if (this.checkQuoteStatusChange(bondQuoteInfoDto, cetsBondDealDialogueQuoteDto)) {
@@ -452,7 +442,7 @@ public class CfetsQuotedCommonService extends BaseService {
                 }
             }
             else if (StringUtil.equals(bondQuoteInfoDto.getQuoteType(),
-                BussinessDictCodeList.报价方式_请求报价.getValue())) {
+                BussinessDictCodeList.交易类型_请求报价.getValue())) {
                 CfetsBondDealRequestQuoteDto cfetsBondDealRequestQuoteDto = cfetsBondDealQuotedPrice003Service.getBondRequestQuote(
                     bondQuoteInfoDto.getQuoteId(),null);
                 if (this.checkQuoteStatusChange(bondQuoteInfoDto, cfetsBondDealRequestQuoteDto)) {
@@ -472,7 +462,7 @@ public class CfetsQuotedCommonService extends BaseService {
         // 删除
         else if (StringUtil.equals(bondQuoteInfoDto.getOperationType(), "doDel")) {
             if (StringUtil.equals(bondQuoteInfoDto.getQuoteType(),
-                BussinessDictCodeList.报价方式_对话报价.getValue())) {
+                BussinessDictCodeList.交易类型_对话报价.getValue())) {
                 CfetsBondDealDialogueQuoteDto cetsBondDealDialogueQuoteDto = cfetsBondDealQuotedPrice002Service.getBondDialogueQuote(
                     bondQuoteInfoDto.getQuoteId(),null);
                 if (this.checkQuoteStatusChange(bondQuoteInfoDto, cetsBondDealDialogueQuoteDto)) {
@@ -484,7 +474,7 @@ public class CfetsQuotedCommonService extends BaseService {
                 }
             }
             else if (StringUtil.equals(bondQuoteInfoDto.getQuoteType(),
-                BussinessDictCodeList.报价方式_请求报价.getValue())) {
+                BussinessDictCodeList.交易类型_请求报价.getValue())) {
                 CfetsBondDealRequestQuoteDto cfetsBondDealRequestQuoteDto = cfetsBondDealQuotedPrice003Service.getBondRequestQuote(
                     bondQuoteInfoDto.getQuoteId(),null);
                 if (this.checkQuoteStatusChange(bondQuoteInfoDto, cfetsBondDealRequestQuoteDto)) {
@@ -501,7 +491,7 @@ public class CfetsQuotedCommonService extends BaseService {
         // 刷新
         else if (StringUtil.equals(bondQuoteInfoDto.getOperationType(), "reFresh")) {
             if (StringUtil.equals(bondQuoteInfoDto.getQuoteType(),
-                BussinessDictCodeList.报价方式_对话报价.getValue())) {
+                BussinessDictCodeList.交易类型_对话报价.getValue())) {
                 CfetsBondDealDialogueQuoteDto cetsBondDealDialogueQuoteDto = cfetsBondDealQuotedPrice002Service.getBondDialogueQuote(
                     bondQuoteInfoDto.getQuoteId(),null);
                 if (this.checkQuoteStatusChange(bondQuoteInfoDto, cetsBondDealDialogueQuoteDto)) {
@@ -515,7 +505,7 @@ public class CfetsQuotedCommonService extends BaseService {
                 }
             }
             else if (StringUtil.equals(bondQuoteInfoDto.getQuoteType(),
-                BussinessDictCodeList.报价方式_请求报价.getValue())) {
+                BussinessDictCodeList.交易类型_请求报价.getValue())) {
                 CfetsBondDealRequestQuoteDto cfetsBondDealRequestQuoteDto = cfetsBondDealQuotedPrice003Service.getBondRequestQuote(
                     bondQuoteInfoDto.getQuoteId(),null);
                 if (this.checkQuoteStatusChange(bondQuoteInfoDto, cfetsBondDealRequestQuoteDto)) {
@@ -532,7 +522,7 @@ public class CfetsQuotedCommonService extends BaseService {
         //修改
         else if (StringUtil.equals(bondQuoteInfoDto.getOperationType(), "edit")) {
             if (StringUtil.equals(bondQuoteInfoDto.getQuoteType(),
-                BussinessDictCodeList.报价方式_对话报价.getValue())) {
+                BussinessDictCodeList.交易类型_对话报价.getValue())) {
                 CfetsBondDealDialogueQuoteDto cetsBondDealDialogueQuoteDto = cfetsBondDealQuotedPrice002Service.getBondDialogueQuote(
                     bondQuoteInfoDto.getQuoteId(),null);
                 if (this.checkQuoteStatusChange(bondQuoteInfoDto, cetsBondDealDialogueQuoteDto)) {
@@ -878,20 +868,29 @@ public class CfetsQuotedCommonService extends BaseService {
 
     public  AjaxResult reclasCheck(CfetsBondDealQuoteCommonDto cfetsBondDealQuoteCommonDto){
         AjaxResult ajaxResult = new AjaxResult();
+//        // 登记(“请求报价”、“X-Repo”)且 净价为空时 不校验
+//        if (BigDecimalUtil.isZeroOrNull(cfetsBondDealQuoteCommonDto.getPrice())
+//                && (!StringUtil.equals(cfetsBondDealQuoteCommonDto.getQuoteType(), BussinessDictCodeList.交易类型_登记报价.getValue())
+//                || StringUtil.equals(cfetsBondDealQuoteCommonDto.getQuoteStyle(), BussinessDictCodeList.报价方式_对话报价.getValue()))) {
+//            return ajaxResult;
+//        }
         List<ValidMessage> errorList = new ArrayList<>();
-        if(StringUtil.equals(cfetsBondDealQuoteCommonDto.getPs(), DictCodeList.交易方向_买入.getValue())&&CollectionUtils.isNotEmpty(cfetsBondDealQuoteCommonDto.getPtlAllocatios())){
+        if (StringUtil.equals(cfetsBondDealQuoteCommonDto.getPs(), DictCodeList.交易方向_买入.getValue())
+                && CollectionUtils.isNotEmpty(cfetsBondDealQuoteCommonDto.getPtlAllocatios())) {
             //资产是否有赎回或者行权计划
             //是否不满足使权不重大购入价条件
-            Map<String, Object> entrustReclasMap = isEntrustReclas(cfetsBondDealQuoteCommonDto.getFinprodId(), cfetsBondDealQuoteCommonDto.getPrice(), cfetsBondDealQuoteCommonDto.getTradeDate());
-            if((boolean)entrustReclasMap.get("isEntrustReclas")){
-                cfetsBondDealQuoteCommonDto.getPtlAllocatios().forEach(item ->{
-                    if(StringUtil.equals(item.getBusinessModel(), DictCodeListExt3.业务模式_收取合同约定的现金流.getValue())){
-                        BaseMap baseMap = positionInfoService.queryTrdPosition(Arrays.asList(item.getPortfolioId()), DateUtil.format(cfetsBondDealQuoteCommonDto.getTradeDate()), cfetsBondDealQuoteCommonDto.getFinprodId());
+            Map<String, Object> entrustReclasMap = this.isEntrustReclas(cfetsBondDealQuoteCommonDto.getFinprodId(),
+                    cfetsBondDealQuoteCommonDto.getPrice(), cfetsBondDealQuoteCommonDto.getTradeDate());
+            if ((boolean) entrustReclasMap.get("isEntrustReclas")) {
+                cfetsBondDealQuoteCommonDto.getPtlAllocatios().forEach(item -> {
+                    if (StringUtil.equals(item.getBusinessModel(), DictCodeListExt3.业务模式_收取合同约定的现金流.getValue())) {
+                        BaseMap baseMap = positionInfoService.queryTrdPosition(Collections.singletonList(item.getPortfolioId()),
+                                DateUtil.format(cfetsBondDealQuoteCommonDto.getTradeDate()), cfetsBondDealQuoteCommonDto.getFinprodId());
                         //
-                        if(null!=baseMap&&baseMap.containsKey("ZCTRKYCC")&&((BigDecimal)baseMap.get("ZCTRKYCC")).compareTo(BigDecimal.ZERO)>0){
-                            errorList.add(new ValidMessage(StringUtil.join("交易净价不满足使权不重大的购入条件:",entrustReclasMap.get("price"),"业务模式由收取合同现金流调整为出售,请资产重分类!")));
-                        }else{
-                            errorList.add(new ValidMessage(StringUtil.join("交易净价不满足使权不重大的购入条件:",entrustReclasMap.get("price"),"业务模式由收取合同现金流调整为出售!")));
+                        if (null != baseMap && baseMap.containsKey("ZCTRKYCC") && ((BigDecimal) baseMap.get("ZCTRKYCC")).compareTo(BigDecimal.ZERO) > 0) {
+                            errorList.add(new ValidMessage(StringUtil.join("交易净价不满足使权不重大的购入条件:", entrustReclasMap.get("price"), "业务模式由收取合同现金流调整为出售,请资产重分类!")));
+                        } else {
+                            errorList.add(new ValidMessage(StringUtil.join("交易净价不满足使权不重大的购入条件:", entrustReclasMap.get("price"), "业务模式由收取合同现金流调整为出售!")));
                         }
                     }
                 });
@@ -937,6 +936,12 @@ public class CfetsQuotedCommonService extends BaseService {
      */
     public AjaxResult checkcheckAnchoring(CfetsBondDealQuoteCommonDto entity) {
         AjaxResult ajaxResult = new AjaxResult();
+        // 登记(“请求报价”、“X-Repo”)且 净价为空时 不校验
+        if (BigDecimalUtil.isZeroOrNull(entity.getPrice())
+                && (StringUtil.equals(entity.getQuoteType(), BussinessDictCodeList.交易类型_登记报价.getValue())
+                && !StringUtil.equals(entity.getQuoteStyle(), BussinessDictCodeList.报价方式_对话报价.getValue()))) {
+            return ajaxResult;
+        }
         List<ValidMessage> errorList = new ArrayList<>();
         String ps = entity.getPs();
         //以选择的锚定值check

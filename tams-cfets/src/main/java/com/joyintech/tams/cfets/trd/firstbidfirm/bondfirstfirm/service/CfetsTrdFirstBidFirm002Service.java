@@ -81,6 +81,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -2383,6 +2384,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             List<WflTrdProductDeal> deals = new ArrayList<>();
             List<WflTrdProductDealAdd> dealAdds = new ArrayList<>();
             List<WflTrdTradeFeeDetail> feeDetails = new ArrayList<>();
+            List<BussTrdTransferOrderDto> bussTrdTransferOrder = new ArrayList<>();
             for (CfetsTrdFirstBidFirmProductDto productDto : item.getList()) {
                 WflTrdProductDeal deal = new WflTrdProductDeal();
                 if (baseGetBusinessId != null) {
@@ -2436,7 +2438,18 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 feeDetail.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
                 feeDetail.setWorkflowId(dto.getWorkflowId());
                 feeDetails.add(feeDetail);
+                // 是否一级缴款
+                boolean isPayType02 = StringUtil.equals(dto.getPayType(), BussinessDictCodeList.缴款方式_一级缴款.getValue());
+                // 是否交易所
+                boolean isJys = !StringUtil.equals(dto.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                        && !StringUtil.equals(dto.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue());
+                TrdProductDeal temp = new TrdProductDeal();
+                BeanUtil.copyPropertiesIgnoreNull(temp, deal);
+                temp.setEntrustId(productDto.getEntrustId());
+                temp.setPortfolioId(productDto.getPortfolioId());
+                bussTrdTransferOrder.addAll(this.dealOrders(temp, isJys, isPayType02));
             }
+            result.setStlPayOrders(new ArrayList<>(bussTrdTransferOrderService.save(bussTrdTransferOrder)));
             result.setWflTrdProductDeals(deals);
             result.setWflTrdProductDealAdds(dealAdds);
             result.setWflTrdTradeFeeDetails(feeDetails);
@@ -2930,7 +2943,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                     }
                     if (OperationType.REVOKE.equals(type) || OperationType.DELETE.equals(type) || isJys) {
                         // 老头寸处理
-                        this.dealOldPosition(tradeDto, true, false, isJys);
+                        this.dealOldPosition(tradeDto, (OperationType.REVOKE.equals(type) || OperationType.DELETE.equals(type)), false, isJys);
                     }
                 });
             }
@@ -4183,7 +4196,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         }
         // 交易数据
         if (CollectionUtils.isEmpty(entity.getWflTrdProductDeals())
-                && CollectionUtils.isEmpty(entity.getTrdProductDeals())) {
+                && CollectionUtils.isEmpty(entity.getTrdProductDeals())
+                && CollectionUtils.isEmpty(entity.getTrdProductTempDeals())) {
             return;
         }
         List<TrdProductDeal> deals = new ArrayList<>();
@@ -4196,13 +4210,24 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 deal.setPortfolioId(dealAdd.getPortfolioId());
                 deals.add(deal);
             });
-        } else {
+        } else if (CollectionUtils.isNotEmpty(entity.getWflTrdProductDealAdds())) {
             Map<String, WflTrdProductDealAdd> dealAddMap = entity.getWflTrdProductDealAdds().stream()
                     .collect(Collectors.toMap(WflTrdProductDealAdd::getTradeId, dealAdd -> dealAdd));
             entity.getWflTrdProductDeals().forEach(wfldeal -> {
                 TrdProductDeal deal = new TrdProductDeal();
                 BeanUtil.copyPropertiesIgnoreNull(deal, wfldeal);
                 WflTrdProductDealAdd dealAdd = dealAddMap.get(wfldeal.getTradeId());
+                deal.setEntrustId(dealAdd.getEntrustId());
+                deal.setPortfolioId(dealAdd.getPortfolioId());
+                deals.add(deal);
+            });
+        } else if (CollectionUtils.isNotEmpty(entity.getTrdProductTempDeals())) {
+            Map<String, TrdProductTempDealAdd> dealAddMap = entity.getTrdProductTempDealAdds().stream()
+                    .collect(Collectors.toMap(TrdProductTempDealAdd::getTradeId, dealAdd -> dealAdd));
+            entity.getTrdProductTempDeals().forEach(wfldeal -> {
+                TrdProductDeal deal = new TrdProductDeal();
+                BeanUtil.copyPropertiesIgnoreNull(deal, wfldeal);
+                TrdProductTempDealAdd dealAdd = dealAddMap.get(wfldeal.getTradeId());
                 deal.setEntrustId(dealAdd.getEntrustId());
                 deal.setPortfolioId(dealAdd.getPortfolioId());
                 deals.add(deal);
@@ -4224,7 +4249,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             BaseTradeProductDealDto baseTradeProductDealDto = new BaseTradeProductDealDto();
             baseTradeProductDealDto.setEntrustId(deal.getEntrustId());
             baseTradeProductDealDto.setStage("02");
-            if (isJYSComplete) {
+            if (isJYSComplete && isRevoke) {
+                baseTradeProductDealDto.setStage("04");
+            } else if (isJYSComplete) {
                 finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_有效.getValue());
                 baseTradeProductDealDto.setStage("03");
             }
@@ -4259,20 +4286,35 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
 //                StlActOrder
             //处理指令完成情况
             List<StlPayOrdersDto> stlPayOrders = new ArrayList<>();
-            StlPayOrdersDto stlPayOrder = new StlPayOrdersDto();
-//            FinProduct finProduct = finProductMapper.selectByPrimaryKey(entity.getFinprodId());
-            String acctId = EtrCommonCashPositionDealService.select组合托管户(deal.getPortfolioId(), deal.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
-            stlPayOrder.setMyAcctNo(acctId);
-            stlPayOrder.setOrderId(deal.getTradeId());
-            stlPayOrder.setCcy(deal.getCcy());
-            stlPayOrder.setSettleAmt(deal.getTradeAmt());
-            if (isBack) {
-                stlPayOrder.setSettleAmt(stlPayOrder.getSettleAmt().negate());
+            try {
+                stlPayOrders = JsonUtils.json2List(JsonUtils.object2Json(entity.getStlPayOrders()), StlPayOrdersDto.class);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            stlPayOrder.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
-            stlPayOrder.setPs(DictCodeListExt1.收支方向_支出.getValue());
-            stlPayOrder.setSettleDate(deal.getSettleDate());
-            stlPayOrders.add(stlPayOrder);
+            if(CollectionUtils.isEmpty(stlPayOrders)) {
+                stlPayOrders = new ArrayList<>();
+                StlPayOrdersDto stlPayOrder = new StlPayOrdersDto();
+//            FinProduct finProduct = finProductMapper.selectByPrimaryKey(entity.getFinprodId());
+                String acctId;
+                // 交易所 一级分销 付款账户为 券商资金账户 其他为托管户
+                if (isJYSComplete) {
+                    // 根据证券账户查询资金账户
+                    acctId = cfetsTrdFirstBidFirm002Mapper.selectAcctNoByEntrustDetail(deal.getEntrustId(), deal.getPortfolioId());
+                } else {
+                    acctId = EtrCommonCashPositionDealService.select组合托管户(deal.getPortfolioId(), deal.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
+                }
+                stlPayOrder.setMyAcctNo(acctId);
+                stlPayOrder.setOrderId(deal.getTradeId());
+                stlPayOrder.setCcy(deal.getCcy());
+                stlPayOrder.setSettleAmt(deal.getTradeAmt());
+                if (isBack) {
+                    stlPayOrder.setSettleAmt(stlPayOrder.getSettleAmt().negate());
+                }
+                stlPayOrder.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
+                stlPayOrder.setPs(DictCodeListExt1.收支方向_支出.getValue());
+                stlPayOrder.setSettleDate(deal.getSettleDate());
+                stlPayOrders.add(stlPayOrder);
+            }
             baseTradeProductDealDto.setStlPayOrdersList(stlPayOrders);
             finProductTradeDto.setBaseTradeProductDealDtos(Collections.singletonList(baseTradeProductDealDto));
             baseTradeProductDealCommService.insertPosition(finProductTradeDto);

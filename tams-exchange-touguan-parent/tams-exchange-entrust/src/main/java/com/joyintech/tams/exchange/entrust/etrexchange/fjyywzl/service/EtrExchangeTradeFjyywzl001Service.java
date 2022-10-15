@@ -104,6 +104,11 @@ public class EtrExchangeTradeFjyywzl001Service extends CommonExportService<EtrEx
                         BigDecimal  repoNum=selectActNum(DictCodeListExt3.资产类型_质押式通用回购入库质押券持仓.getValue(),secDto);
                         repoNum=ArithmeticUtil.divide(repoNum,new BigDecimal(100),2, RoundingMode.DOWN);
                         entity.setRepoNum(repoNum);
+
+                        //JJTZJY-107 指令管理-非交易业务指令-持仓tab页 持仓数量与可卖数量展示存在错误 start
+                        entity.setCanRepoNum(ArithmeticUtil.subtract(canRepoNum,repoNum));
+                        //JJTZJY-107 指令管理-非交易业务指令-持仓tab页 持仓数量与可卖数量展示存在错误 end
+
                         returnList.add(entity);
                     }
                     result.setRoot(returnList);
@@ -400,7 +405,7 @@ public class EtrExchangeTradeFjyywzl001Service extends CommonExportService<EtrEx
         return null;
     }
 
-   
+
 
 
 
@@ -422,5 +427,5 @@ public class EtrExchangeTradeFjyywzl001Service extends CommonExportService<EtrEx
     }
 
 
-  
+
 }

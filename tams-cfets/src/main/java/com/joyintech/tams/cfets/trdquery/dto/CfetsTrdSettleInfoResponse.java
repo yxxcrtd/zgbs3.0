@@ -470,7 +470,7 @@ public class CfetsTrdSettleInfoResponse {
     }
 
     public String getQuoteTypeStr() {
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式_登记, getQuoteType());
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式, getQuoteType());
     }
 
     public void setQuoteTypeStr(String quoteTypeStr) {

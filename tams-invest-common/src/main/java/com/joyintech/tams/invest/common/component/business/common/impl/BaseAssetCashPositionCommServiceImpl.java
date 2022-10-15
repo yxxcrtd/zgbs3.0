@@ -642,7 +642,16 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 && ("ISSUE_CLASS_01".equals(assetType2) || "ISSUE_CLASS_02".equals(assetType2))// 发行方式 标志是否为一级投标
                 && StringUtil.equals(DictCodeList.交易方向_买入.getValue(), deal.getPs())) {
             // 成交/中标结果维护 增加在途持仓
-            if ("02".equals(stage)) {
+            // 交易所撤销 增加可用金额 减少实际
+            if ("04".equals(stage)) {
+                resultDto.setCdate(deal.getSettleDate());
+                PtlSecPositionFlowDto flowDto1 = new PtlSecPositionFlowDto();
+                BeanUtil.copyPropertiesIgnoreNull(flowDto1, resultDto);
+                flowDto1.setAmount(deal.getShareAmt());
+                flowDto1.setHodingType(DictCodeList.持仓类型_实际.getValue());
+                result.add(flowDto1);
+                return result;
+            } else if ("02".equals(stage)) {
                 resultDto.setCdate(deal.getSettleDate());
                 resultDto.setAmount(deal.getShareAmt());
                 resultDto.setHodingType(DictCodeList.持仓类型_在途.getValue());
@@ -1815,8 +1824,15 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                     && StringUtil.equals(DictCodeList.交易方向_买入.getValue(), deal.getPs())) {
                 resultDto.setCdate(stlPayOrder.getSettleDate());
                 resultDto.setHodingType(DictCodeList.持仓类型_可用.getValue());
-                // 交收 增加可用金额 减少实际
-                if ("03".equals(stage)) {
+                // 交易所撤销 增加可用金额 减少实际
+                if ("04".equals(stage)) {
+                    PtlCashPositionFlowDto flowDto2 = new PtlCashPositionFlowDto();
+                    BeanUtil.copyPropertiesIgnoreNull(flowDto2, resultDto);
+                    flowDto2.setAmount(stlPayOrder.getSettleAmt().negate());
+                    flowDto2.setHodingType(DictCodeList.持仓类型_实际.getValue());
+                    flowDto2.setIsDeleteAble(DictCodeList.是否_否.getValue());
+                    result.add(flowDto2);
+                } else if ("03".equals(stage)) {
                     PtlCashPositionFlowDto flowDto1 = new PtlCashPositionFlowDto();
                     BeanUtil.copyPropertiesIgnoreNull(flowDto1, resultDto);
                     flowDto1.setAmount(stlPayOrder.getSettleAmt());

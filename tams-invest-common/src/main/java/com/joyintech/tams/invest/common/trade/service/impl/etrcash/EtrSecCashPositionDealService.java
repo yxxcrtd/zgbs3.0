@@ -1209,8 +1209,12 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                 finProductTradeDto);
         etrCashPositionFlowDto.setOrderId(finProductTradeDto.getEntrustId());
         // 交易场所为一级市场且是交易所的交易，付款账户为托管户 add by 马数凯 20210430
+        StlPayOrdersDto stlPayOrdersDto = new StlPayOrdersDto();
         String 账号;
-        if (StringUtil.equals(finProductTradeDto.getTrdProductDeal().getTradeMarketMode(), DictCodeListExt1.交易市场_一级市场.getValue())) {
+        if(CollectionUtils.isNotEmpty(finProductTradeDto.getStlPayOrdersList())) {
+            stlPayOrdersDto = finProductTradeDto.getStlPayOrdersList().get(0);
+            账号 = stlPayOrdersDto.getMyAcctNo();
+        }else if (StringUtil.equals(finProductTradeDto.getTrdProductDeal().getTradeMarketMode(), DictCodeListExt1.交易市场_一级市场.getValue())) {
             账号 = EtrCommonCashPositionDealService.select组合托管户(finProductTradeDto.getTrdProductDealAdd().getPortfolioId(),
                     finProductTradeDto.getTrdProductDeal().getCcy(), DictCodeListExt2.资金账户类型_托管户.getValue());
         } else {
@@ -1224,7 +1228,8 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         etrCashPositionFlowDto.setCdate(finProductTradeDto.getTrdProductDeal().getSettleDate());
         // 有委托
         if (StringUtil.isNotEmpty(entrustId)) {
-            if (StringUtil.equals(finProductTradeDto.getStage(), "03")) {
+            if (StringUtil.equals(finProductTradeDto.getStage(), "03")
+                    || StringUtil.equals(finProductTradeDto.getStage(), "04")) {
                 etrSecPositionFlowDto.setCdate(finProductTradeDto.getTrdProductDeal().getSettleDate());
                 // 交割日增加交易券面总额/债券面值
                 etrSecPositionFlowDto.setAmount(交易日数量);
@@ -1235,6 +1240,9 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                         交易日数量, finProductTradeDto.getTrdProductDeal().getSettleDate(),
                         finProductTradeDto.getTrdProductDeal().getTradeMarket(), finProductTradeDto.getBondFirstSign());
                 flowDto.setAmount(ArithmeticUtil.doAdd(交易日减少金额, flowDto.getAmount()));
+                if(StringUtil.equals(finProductTradeDto.getStage(), "04")){
+                    flowDto.setAmount(交易日减少金额);
+                }
                 etrPositionHoldDto.getPtlCashPositionFlows().add(flowDto);
 
             } else if (StringUtil.equals(finProductTradeDto.getStage(), "02")) {

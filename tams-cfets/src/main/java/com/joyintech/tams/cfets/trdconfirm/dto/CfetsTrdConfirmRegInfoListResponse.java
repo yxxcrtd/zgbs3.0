@@ -15,7 +15,6 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
-import com.joyintech.tams.invest.entrust.etrinvestbondinfo.dto.EtrInvestBondInfoDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -294,6 +293,9 @@ public class CfetsTrdConfirmRegInfoListResponse{
     private String calMode;
     @ApiModelProperty(name="selectedItem",value="选中数据",example="字符串1")
     private transient List<CfetsTrdConfirmRegInfoListResponse> selectedItem;
+
+    @ApiModelProperty(name="otherAmt",value="备用字段,用于存放一级申购发行价格等",example="99.00")
+    private BigDecimal otherAmt;
 
     public BigDecimal getParValue() {
         return parValue;
@@ -1014,7 +1016,7 @@ public class CfetsTrdConfirmRegInfoListResponse{
         if(StringUtil.equals(getFinprodType2(),"03")){//一级申购登记类型为空
             return StringUtil.EMPTY;
         }
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式, getDealType());
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.交易类型, getDealType());
     }
 
     public void setDealTypeName(String dealTypeName) {
@@ -1022,7 +1024,7 @@ public class CfetsTrdConfirmRegInfoListResponse{
     }
 
     public String getQuoteTypeName() {
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式_登记, getQuoteType());
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式, getQuoteType());
     }
 
     public void setQuoteTypeName(String quoteTypeName) {
@@ -1107,5 +1109,13 @@ public class CfetsTrdConfirmRegInfoListResponse{
 
     public void setCalMode(String calMode) {
         this.calMode = calMode;
+    }
+
+    public BigDecimal getOtherAmt() {
+        return otherAmt;
+    }
+
+    public void setOtherAmt(BigDecimal otherAmt) {
+        this.otherAmt = otherAmt;
     }
 }

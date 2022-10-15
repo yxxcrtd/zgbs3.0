@@ -18,8 +18,10 @@ import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
+import com.joyintech.tams.cfets.trdconfirm.dto.MatchBusType;
 import com.joyintech.tams.cfets.trdconfirm.dto.*;
 import com.joyintech.tams.cfets.trdconfirm.service.CfetsTrdConfirmService;
+import com.joyintech.tams.cfets.trdconfirm.service.MatchFeaturesService;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
@@ -51,6 +53,9 @@ public class CfetsTrdConfirmController extends BaseController {
     private CfetsTrdConfirmService cfetsTrdConfirmService;
 
     @Autowired
+    private MatchFeaturesService matchFeaturesService;
+
+    @Autowired
     private IPlatformDate iPlatformDate;
 
     @ApiOperation(value = "查询页面初始化参数", notes = "查询页面初始化参数")
@@ -79,16 +84,16 @@ public class CfetsTrdConfirmController extends BaseController {
         initPageParams.put("PS", this.getSelectDataFromDataDic(DictCode.交易方向, null));
         initPageParams.put("TRADE_MARKET", this.getSelectDataFromDataDic(DictCode.交易场所, null));
         initPageParams.put("ACCOUNT_SPEED", this.getSelectDataFromDataDic(DictCode.清算速度, null));
-        initPageParams.put("QUOTE_TYPE", this.getSelectDataFromDataDic(BussinessDictCode.报价方式, null));
+        initPageParams.put("QUOTE_TYPE", this.getSelectDataFromDataDic(BussinessDictCode.交易类型, null));
         initPageParams.put("TRD_MATCH_TYPE", this.getSelectDataFromDataDic(DictCode.下行交易匹配类型, null));
         initPageParams.put("CSTP_BUSINESS_TYPE", this.getSelectDataFromDataDic(DictCode.CSTP资产类型, null));
-        initPageParams.put("QUOTE_STYLE", this.getSelectDataFromDataDic(BussinessDictCode.报价方式_登记, null));
+        initPageParams.put("QUOTE_STYLE", this.getSelectDataFromDataDic(BussinessDictCode.报价方式, null));
         initPageParams.put("CUSTOM_ASSET_TYPE_TWO", this.getSelectDataFromDataDic(DictCode.行内资产二级分类, null));
         // 系统日期
         initPageParams.put("sysDate", iPlatformDate.getSysDateStr());
         //pageId
         initPageParams.put("pageId", "CfetsTrdConfirm");
-        return new Message<Map<String, Object>>(initPageParams).success();
+        return new Message<>(initPageParams).success();
     }
     @ApiOperation(value = "交易执行列表分页查询", notes = "交易执行列表分页查询")
     @PostMapping("/findAllRegInfoList")
@@ -318,6 +323,32 @@ public class CfetsTrdConfirmController extends BaseController {
         } catch (Exception e) {
             logger.error("交易执行-发行失败数据异常", e);
             return new Message<AjaxResult>().fail().setMessage("发行失败数据异常");
+        }
+    }
+
+    @ApiOperation(value = "匹配元素查询", notes = "匹配元素按钮点击后，查询匹配元素配置的详细情况")
+    @PostMapping("/queryMatchFeatures")
+    @ResponseBody
+    public Message<List<MatchBusType>> queryMatchFeatures() {
+        try {
+            List<MatchBusType> list = matchFeaturesService.queryMatchFeatures();
+            return new Message<List<MatchBusType>>().success().setData(list);
+        } catch (Exception e) {
+            logger.error("匹配元素查询数据异常", e);
+            return new Message<List<MatchBusType>>().fail().setMessage("匹配元素查询数据异常");
+        }
+    }
+
+    @ApiOperation(value = "匹配元素保存", notes = "匹配元素页面保存按钮点击后，保存匹配元素")
+    @PostMapping("/saveMatchFeatures")
+    @ResponseBody
+    public Message<AjaxResult> saveMatchFeatures(@RequestBody List<MatchBusType> matchBusTypes) {
+        try {
+            AjaxResult ajax = matchFeaturesService.saveMatchFeatures(matchBusTypes);
+            return new Message<AjaxResult>().success().setData(ajax);
+        } catch (Exception e) {
+            logger.error("匹配元素保存异常", e);
+            return new Message<AjaxResult>().fail().setMessage("匹配元素保存异常");
         }
     }
 }

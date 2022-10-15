@@ -512,7 +512,11 @@ public class PositionRequestServiceFinProductTradeService extends BaseService {
             百元券面 = BigDecimal.valueOf(100);
         }
         // 标准券总额
-        map.put(STANDARD_SEC_AMOUNT, ArithmeticUtil.multiply(dealEntity.getShareAmt(), converseRadio));
+        if (DictCodeListExt3.交易方向_质押券入库.getValue().equals(ps) || DictCodeListExt3.交易方向_质押券出库.getValue().equals(ps)) {
+            map.put(STANDARD_SEC_AMOUNT, ArithmeticUtil.multiply(dealEntity.getShareAmt(), converseRadio, 百元券面));
+        }else{
+            map.put(STANDARD_SEC_AMOUNT, ArithmeticUtil.multiply(dealEntity.getShareAmt(), converseRadio));
+        }
         // 再折算率	reConversionRate "调用【再折算率查询】参数：资金账户 = 指令资金账户
         Map<String, Object> paramMap = Maps.newHashMap();
         paramMap.put("acctNo", cashAcctId);

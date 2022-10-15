@@ -143,6 +143,9 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     @Autowired(required = false)
     private TrdProductDealAddMapper trdProductDealAddMapper;
 
+    @Autowired
+    private TrdProductTempDealAddMapper trdProductTempDealAddMapper;
+
     @Autowired(required = false)
     private TrdTradeFeeTotalMapper trdTradeFeeTotalMapper;
 
@@ -222,9 +225,6 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
 
     @Autowired
     private TrdProductTempDealMapper trdProductTempDealMapper;
-
-    @Autowired
-    private TrdProductTempDealAddMapper trdProductTempDealAddMapper;
 
     @Autowired
     private TrdTempDealTotalAddMapper trdTempDealTotalAddMapper;
@@ -1210,6 +1210,17 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         if (!StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
             return;
         }
+        boolean isJysPayType02 = false;
+        // 交易所一级分销
+        if (StringUtil.equals(entity.getPayType(), BussinessDictCodeList.缴款方式_一级分销.getValue())
+                && (StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_上海证券交易所.getValue())
+                || StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_深圳证券交易所.getValue()))) {
+            isJysPayType02 = true;
+        }
+        if (isRevokeOrBack && (StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_上海证券交易所.getValue())
+                || StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_深圳证券交易所.getValue()))) {
+            return;
+        }
         for (CfetsPrimaryBidManageSaveDetailDto deal : entity.getAllocationDetails()) {
             if (!StringUtil.isNotEmpty(deal.getWinCprice())) {
                 continue;
@@ -1252,7 +1263,14 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             List<StlPayOrdersDto> stlPayOrders = new ArrayList<>();
             StlPayOrdersDto stlPayOrder = new StlPayOrdersDto();
             FinProduct finProduct = finProductMapper.selectByPrimaryKey(entity.getFinprodId());
-            String acctId = EtrCommonCashPositionDealService.select组合托管户(deal.getPortfolioId(), finProduct.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
+            String acctId ;
+            // 交易所 一级分销 付款账户为 券商资金账户 其他为托管户
+            if (isJysPayType02) {
+                // 根据证券账户查询资金账户
+                acctId = cfetsTrdFirstBidFirm002Mapper.selectAcctNoByEntrustDetail(deal.getEntrustId(), deal.getPortfolioId());
+            } else {
+                acctId = EtrCommonCashPositionDealService.select组合托管户(deal.getPortfolioId(), finProduct.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
+            }
             stlPayOrder.setMyAcctNo(acctId);
             stlPayOrder.setOrderId(entity.getBidId());
             stlPayOrder.setCcy(finProduct.getCcy());
@@ -1271,7 +1289,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     }
 
     /**
-     * 老头存处理 系统参数是否处理旧头寸标识(IS_HANDLE_OLDPOS_FLAG)为Y时处理
+     * 交易所头存处理 系统参数是否处理旧头寸标识(IS_HANDLE_OLDPOS_FLAG)为Y时处理
      *
      * @param entity   页面元素
      * @param isRevokeOrBack 交易流程状态 参数字典 TRADE_FLOW_STATUS
@@ -1283,14 +1301,13 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             return;
         }
         // 非交易所一级缴款
-        if (StringUtil.equals(entity.getPayType(), BussinessDictCodeList.缴款方式_一级分销.getValue())
-                || StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+        if (StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
                 || StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue())) {
             return;
         }
         BaseBidManageBaseInfoDto dto = entity.getBaseBidManageBaseInfoDto();
         // 划款指令map
-        Map<String, StlPayOrders> orderDtoMap = new HashMap<>();
+        Map<String, StlPayOrders> orderDtoMap;
         if(CollectionUtils.isNotEmpty(dto.getBussTrdTransferOrderList())){
             orderDtoMap = dto.getBussTrdTransferOrderList().stream()
                     .collect(Collectors.toMap(StlPayOrders::getTradeId, orderDto -> orderDto));
@@ -1311,7 +1328,11 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
             BaseTradeProductDealDto baseTradeProductDealDto = new BaseTradeProductDealDto();
             baseTradeProductDealDto.setEntrustId(deal.getEntrustId());
-            baseTradeProductDealDto.setStage("03");
+            if (isRevokeOrBack) {
+                baseTradeProductDealDto.setStage("04");
+            } else {
+                baseTradeProductDealDto.setStage("03");
+            }
             TrdProductDeal trdProductDeal = new TrdProductDeal();
             BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, deal);
             trdProductDeal.setFinprodId(entity.getFinprodId());
@@ -1332,8 +1353,13 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             add.setPortfolioId(deal.getPortfolioId());
             add.setTradeId(deal.getTradeId());
             add.setEntrustId(deal.getEntrustId());
-            if(isRevokeOrBack){
+            if (isRevokeOrBack) {
                 add = trdProductDealAddMapper.selectByPrimaryKey(trdProductDeal.getpTradeId());
+                if (add == null) {
+                    add = new TrdProductDealAdd();
+                    TrdProductTempDealAdd tempAdd = trdProductTempDealAddMapper.selectByPrimaryKey(trdProductDeal.getpTradeId());
+                    BeanUtil.copyPropertiesIgnoreNull(add, tempAdd);
+                }
                 deal.setPortfolioId(add.getPortfolioId());
                 deal.setEntrustId(add.getEntrustId());
             }
@@ -1350,7 +1376,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             }
             stlPayOrders.add(stlPayOrdersDto);
             baseTradeProductDealDto.setStlPayOrdersList(stlPayOrders);
-            finProductTradeDto.setBaseTradeProductDealDtos(Arrays.asList(baseTradeProductDealDto));
+            finProductTradeDto.setBaseTradeProductDealDtos(Collections.singletonList(baseTradeProductDealDto));
             baseTradeProductDealCommService.insertPosition(finProductTradeDto);
         }
     }

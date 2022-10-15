@@ -163,7 +163,7 @@ public class CfetsTrdConfirmExecRepoInfoResponse {
     }
 
     public String getBusiTypeStr() {
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式, getBusiType());
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.交易类型, getBusiType());
     }
 
     public void setBusiTypeStr(String busiTypeStr) {

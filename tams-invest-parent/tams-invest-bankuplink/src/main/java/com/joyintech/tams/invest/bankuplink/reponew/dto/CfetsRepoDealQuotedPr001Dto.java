@@ -1,15 +1,12 @@
 package com.joyintech.tams.invest.bankuplink.reponew.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.framework.validation.annotation.NotEmpty;
-import com.joyintech.framework.validation.annotation.ValidLogic;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.bankuplink.repo.dto.CfetsRepoDealQuotedPrice003Dto;
-import com.joyintech.tams.invest.bankuplink.repo.validator.CfetsRepoDealQuotedPrice001DtoValidator;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.dto.common.BussRepoSecDto;
@@ -1288,7 +1285,7 @@ public class CfetsRepoDealQuotedPr001Dto extends EtrEntrust implements ProcessEn
         return BussinessDictCodeList.结算方式_券款对付.getCodeName();
     }
 	public String getQuoteTypeStr(){
-        return BussinessDictCodeList.报价方式_对话报价.getCodeName();
+        return BussinessDictCodeList.交易类型_对话报价.getCodeName();
     }
 	public String getDealAmtStr() {
         if(super.getEntrustNum()!=null && this.getFinishAmt()!=null) {

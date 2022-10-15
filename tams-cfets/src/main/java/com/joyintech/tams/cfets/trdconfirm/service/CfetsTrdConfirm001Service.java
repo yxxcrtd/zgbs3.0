@@ -28,7 +28,6 @@ import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPosPortfolioCashReque
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPosPortfolioSecRequest;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPositionRequest;
 import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
-import com.joyintech.tams.cfets.trd.repo.service.CfetsRepoQuotedPrice004Service;
 import com.joyintech.tams.cfets.trdconfirm.dao.CfetsTrdConfirmMapper;
 import com.joyintech.tams.cfets.trdconfirm.dto.*;
 import com.joyintech.tams.common.base.dao.*;
@@ -52,6 +51,7 @@ import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.dto.BaseFinProductCashInputDto;
 import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.dto.common.BussRepoSecDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
@@ -60,8 +60,10 @@ import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.dto.trade.entrust.EtrFinishStatusDto;
+import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
+import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.invest.interf.service.InterfComponentService;
 import com.joyintech.tams.invest.trade.lend.dto.FinTradeProductDto;
@@ -180,14 +182,14 @@ public class CfetsTrdConfirm001Service extends BaseService {
     @Autowired(required = false)
     private CfetsEtribBondInfo003Service cfetsEtribBondInfo003Service;
 
-    @Autowired(required = false)
-    private CfetsRepoQuotedPrice004Service cfetsRepoQuotedPrice004Service;
-
     /**
      * 头寸引擎
      */
     @Autowired
     private PositionRequestHandle positionRequestHandle;
+
+    @Autowired
+    private TrdCommonBaseService trdCommonBaseService;
 
     /**
      * 投资委托信息Service
@@ -223,7 +225,6 @@ public class CfetsTrdConfirm001Service extends BaseService {
     private BasePtlCashPositionInfoService basePtlCashPositionInfoService;
 
 
-    @Transactional(rollbackFor = Exception.class)
     @DTXTransaction(transactionListener = "positionRollService")
     public List<Map<String, Object>> doCompleteMethod(CfetsTrdBondInvestTradeDto entity, OperationType operationType) {
         List<String> finishEtrList=new ArrayList<>();
@@ -429,6 +430,8 @@ public class CfetsTrdConfirm001Service extends BaseService {
             }
 
         }*/
+        // 处理头寸
+       this.oldPositionDeal(entity);
         //更新操作记录日志
         CfetsOprHisInfoRequest oprHisReq=new CfetsOprHisInfoRequest();
         oprHisReq.setEntrustId(entity.getTotleTradeId());
@@ -451,7 +454,6 @@ public class CfetsTrdConfirm001Service extends BaseService {
         }
         return mapList;
     }
-    @Transactional(rollbackFor = Exception.class)
     @DTXTransaction(transactionListener = "positionRollService")
     public List<Map<String, Object>> doCompleteRepoMethod(CfetsTrdRepoTrade003Dto entity, OperationType operationType, boolean isTrdConfirm) {
         List<String> finishEtrList = new ArrayList<>();
@@ -653,7 +655,6 @@ public class CfetsTrdConfirm001Service extends BaseService {
      * @author jiangpeng
      * @date 2022/5/6 16:26
      */
-    @Transactional(rollbackFor = Exception.class)
     @DTXTransaction(transactionListener = "positionRollService")
     public List<Map<String, Object>> doCompleteBidMethod(CfetsTrdFirstBondInvestTradeDto entity, OperationType operationType, String genType) {
         logger.info("一级申购成交确认处理,入参:" + JsonUtils.object2Json(entity));
@@ -1908,7 +1909,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
                     Map<String, Object> map = new HashMap<String, Object>();
                     map.put("portfolioId", regFinPledge.getPortfolioId());
                     map.put("finprodId", regFinPledge.getFinprodId());
-                    String secAcctId = cfetsRepoQuotedPrice004Service.qryPortfolioSecAcctId(map);
+                    String secAcctId = joyinbusinessCommonService.qryPortfolioSecAcctId(map);
                     if (StringUtil.isNotEmpty(secAcctId)) {
                         secport.setSecAcctId(secAcctId); // 证券账户
                     }
@@ -2289,4 +2290,76 @@ public class CfetsTrdConfirm001Service extends BaseService {
         positionRequestHandle.batchClose(req);
     }
 
+    /**
+     * 处理旧头寸
+     *  @param dto 入参
+     *
+     */
+    private void oldPositionDeal(CfetsTrdBondInvestTradeDto dto) {
+        // 债券面值
+        BigDecimal price = trdCommonBaseService.getFaceValue(dto.getFinprodId(), iPlatformDate.getSysDate());
+        // 调用业务组件.【金融产品交易共通.交易产品接口】,写入[可用]的组合持仓流水及现金流水
+        for (TrdProductDeal item : dto.getTrdProductDeals()) {
+            FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
+            finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
+            finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
+            finProductTradeDto.setNeedSum(true);
+            finProductTradeDto.setNeedExecuteEtrPosition(true);
+            BaseTradeProductDealDto baseTradeProductDealDto = new BaseTradeProductDealDto();
+            TrdProductDeal trdProductDeal = new TrdProductDeal();
+            BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, item);
+            baseTradeProductDealDto.setTrdProductDeal(trdProductDeal);
+
+            TrdProductDealAdd trdProductDealAdd = new TrdProductDealAdd();
+            trdProductDealAdd.setPortfolioId(item.getPortfolioId());
+            trdProductDealAdd.setTradeId(item.getTradeId());
+            trdProductDealAdd.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
+            baseTradeProductDealDto.setTrdProductDealAdd(trdProductDealAdd);
+
+            //处理指令完成情况
+            List<StlPayOrdersDto> stlPayOrders = new ArrayList<>();
+            StlPayOrdersDto stlPayOrder = new StlPayOrdersDto();
+            if (StringUtil.isEmpty(stlPayOrder.getMyAcctNo())) {
+                String acctId = EtrCommonCashPositionDealService.select组合托管户(item.getPortfolioId(), item.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
+                stlPayOrder.setMyAcctNo(acctId);
+            }
+            stlPayOrder.setOrderId(item.getTradeId());
+            stlPayOrder.setCcy(item.getCcy());
+            stlPayOrder.setSettleAmt(item.getTradeAmt());
+            stlPayOrder.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
+            stlPayOrder.setPs(item.getPs());
+            stlPayOrders.add(stlPayOrder);
+            if (CollectionUtils.isNotEmpty(stlPayOrders)
+                    && !DictCodeListExt1.投资目的_卖空.getValue().equals(trdProductDeal.getInvAim())) {
+                baseTradeProductDealDto.setStlPayOrdersList(stlPayOrders);
+            }
+
+            // 委托代码不为空设置委托编号
+            if (StringUtil.isNotEmpty(item.getEntrustId())) {
+                baseTradeProductDealDto.setEntrustId(item.getEntrustId());
+            }
+            List<BaseTradeProductDealDto> list = new ArrayList<>();
+            list.add(baseTradeProductDealDto);
+            // 冲销登记时数据
+            BaseTradeProductDealDto oldBaseTradeProductDealDto = new BaseTradeProductDealDto();
+            BeanUtil.copyPropertiesIgnoreNull(oldBaseTradeProductDealDto,baseTradeProductDealDto);
+            TrdProductDeal oldTrdProductDeal = new TrdProductDeal();
+            BeanUtil.copyPropertiesIgnoreNull(oldTrdProductDeal, item);
+            BigDecimal tradeAmt;
+            if (BigDecimalUtil.isZeroOrNull(oldTrdProductDeal.getOldTradeAmt())) {
+                // 券面总额*面值/100
+                tradeAmt = ArithmeticUtil.divide(
+                        ArithmeticUtil.multiply(item.getShareAmt(), price), new BigDecimal(100), 4, RoundingMode.HALF_UP);
+            } else {
+                tradeAmt = item.getOldTradeAmt();
+            }
+            oldTrdProductDeal.setTradeAmt(tradeAmt.negate());
+            oldBaseTradeProductDealDto.setTrdProductDeal(oldTrdProductDeal);
+            oldBaseTradeProductDealDto.getStlPayOrdersList().get(0).setSettleAmt(tradeAmt);
+            list.add(oldBaseTradeProductDealDto);
+
+            finProductTradeDto.setBaseTradeProductDealDtos(list);
+            baseTradeProductDealCommService.insertPosition(finProductTradeDto);
+        }
+    }
 }

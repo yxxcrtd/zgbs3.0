@@ -39,7 +39,6 @@ import org.springframework.web.client.RestClientException;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.export.CommonExportService;
 import com.joyintech.framework.export.ExportParam;
@@ -51,19 +50,14 @@ import com.joyintech.framework.security.User;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.ExcelUtil;
 import com.joyintech.framework.util.FileNameUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
-import com.joyintech.tams.common.base.entity.FinProduct;
 import com.joyintech.tams.component.business.trade.BussRepoSecService;
 import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.invest.bankuplink.bond.dto.BondQuoteImportPreviewDto;
-import com.joyintech.tams.invest.bankuplink.bond.dto.CfetsBondDealDialogueQuoteDto;
-import com.joyintech.tams.invest.bankuplink.bond.dto.CfetsBondDealEntrustOrderDto;
 import com.joyintech.tams.invest.bankuplink.common.service.CfetsQuotedCommonService;
 import com.joyintech.tams.invest.bankuplink.cstp.dto.CstpSelectDto;
 import com.joyintech.tams.invest.bankuplink.repo.dto.CfetsRepoDealQuotedPrice001Dto;
@@ -634,7 +628,7 @@ public class CfetsRepoDealQuotedPrice001Service extends CommonExportService<Cstp
                         setValidationMsg(p, "quoteTypeStr",
                             getMessage("QUOTE_UPLOAD_026", getMessage("QUOTE_UPLOAD_011")));
                     }else {
-                        if (!BussinessDictCodeList.报价方式_对话报价.getValue().equals(p.getQuoteType())) {
+                        if (!BussinessDictCodeList.交易类型_对话报价.getValue().equals(p.getQuoteType())) {
                             setValidationMsg(p, "quoteTypeStr",
                                 getMessage("QUOTE_UPLOAD_029", getMessage("QUOTE_UPLOAD_011")));
                         }
@@ -739,7 +733,7 @@ public class CfetsRepoDealQuotedPrice001Service extends CommonExportService<Cstp
                     }
 
                     // 对手方交易员
-                    if (StringUtil.equals(BussinessDictCodeList.报价方式_对话报价.getValue(),
+                    if (StringUtil.equals(BussinessDictCodeList.交易类型_对话报价.getValue(),
                         p.getQuoteType())) {
                         if (StringUtil.isEmpty(p.getCounterTraderName())) {
                             setValidationMsg(p, "counterTrader",
@@ -946,9 +940,9 @@ public class CfetsRepoDealQuotedPrice001Service extends CommonExportService<Cstp
             itemDto.setPortfolioId(StringUtils.stripToNull(rowList.get(2)));
             itemDto.setPortfolioName(StringUtils.stripToNull(rowList.get(3)));
             if (StringUtils.isNotBlank(rowList.get(4))) {
-                if (BussinessDictCodeList.报价方式_对话报价.getCodeName().equals(
+                if (BussinessDictCodeList.交易类型_对话报价.getCodeName().equals(
                     StringUtils.stripToNull(rowList.get(4)))) {
-                    itemDto.setQuoteType(BussinessDictCodeList.报价方式_对话报价.getValue());
+                    itemDto.setQuoteType(BussinessDictCodeList.交易类型_对话报价.getValue());
                 }else {
                     itemDto.setQuoteType(StringUtils.stripToNull(rowList.get(4)));
                 }
