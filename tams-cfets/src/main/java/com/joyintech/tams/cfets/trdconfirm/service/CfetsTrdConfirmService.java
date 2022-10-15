@@ -2682,7 +2682,9 @@ public class CfetsTrdConfirmService extends BaseService {
                         return errorRs;
                     }*/
                     if ((StringUtil.equals(item.getFinprodType2(), "01") || StringUtil.equals(item.getFinprodType2(), "02"))
-                            && (StringUtil.isEmpty(item.getCounterId()) || BigDecimalUtil.isZeroOrNull(item.getYield()))) {
+                            && (StringUtil.isEmpty(item.getCounterId()) ||
+                            (StringUtil.equals(item.getFinprodType2(), "01") && BigDecimalUtil.isZeroOrNull(item.getYield()))||
+                            (StringUtil.equals(item.getFinprodType2(), "02") && BigDecimalUtil.isZeroOrNull(item.getTradeYield())))) {
                         //价格or对手方为空，不可手工成交
                         errorRs.setErrorList(Collections.singletonList(new ValidMessage(getMessage("CONFIRM_MSG_001"))));
                         return errorRs;
