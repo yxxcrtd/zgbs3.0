@@ -1820,28 +1820,68 @@ public class EtrExchangeCommonService extends BaseService<ITableRow> {
             item.setEntrustAmt(BigDecimal.ZERO);
         });
 
-        boolean flag = true;
+        //boolean flag = true;
         //目标类型是数量安装步长分配
         int sumSize = portfolioList.size();
+        BigDecimal bigSumSize=new BigDecimal(sumSize);
         String ps = dto.getPs();
         if (StringUtil.equals(DictCodeListExt3.交易方向_质押券出库.getValue(), ps) || StringUtil.equals(DictCodeListExt3.交易方向_质押券入库.getValue(), ps)) {
             entrustPrice = ArithmeticUtil.divide(entrustPrice, new BigDecimal(100), 2);
         }
         if (StringUtil.equals(DictCodeListExt3.目标类型_数量.getValue(), dto.getTargetType())) {
-            while (flag) {
+//            while (flag) {
+//                for (int i = 0; i < sumSize; i++) {
+//                    EtrExchangeProtfolioDetailRequest item = portfolioList.get(i);
+//                    item.setEntrustAmt(Objects.equals(item.getEntrustAmt(), "--") ? new BigDecimal(0.00) : item.getEntrustAmt());
+//                    item.setEntrustNum(Objects.equals(item.getEntrustNum(), "--") ? new BigDecimal(0.00) : item.getEntrustNum());
+//                    if (leftEntrustNum.compareTo(minStep) > 0) {
+//                        item.setEntrustNum(ArithmeticUtil.doAdd(item.getEntrustNum(), minStep));
+//                        item.setEntrustAmt(ArithmeticUtil.multiply(item.getEntrustNum(), entrustPrice));
+//                        leftEntrustNum = ArithmeticUtil.subtract(leftEntrustNum, minStep);
+//                    } else {
+//                        item.setEntrustNum(ArithmeticUtil.doAdd(item.getEntrustNum(), leftEntrustNum));
+//                        item.setEntrustAmt(ArithmeticUtil.multiply(item.getEntrustNum(), entrustPrice));
+//                        flag = false;
+//                        break;
+//                    }
+//                }
+//            }
+            BigDecimal minStepSum=ArithmeticUtil.multiply(minStep,bigSumSize);
+            if(entrustNum.compareTo(minStepSum)>0){
+                BigDecimal minGys=ArithmeticUtil.divide(entrustNum,minStep,0);
+                BigDecimal minGysSum=ArithmeticUtil.divide(minGys,bigSumSize,0,RoundingMode.DOWN);
+                BigDecimal minGysSumMul=ArithmeticUtil.multiply(minStep,minGysSum);
+                for (int i = 0; i < sumSize; i++) {  //最小步长乘以组合个数能够除尽
+                    EtrExchangeProtfolioDetailRequest item = portfolioList.get(i);
+                    item.setEntrustNum(minGysSumMul);
+                    item.setEntrustAmt(ArithmeticUtil.multiply(item.getEntrustNum(), entrustPrice));
+                    leftEntrustNum = ArithmeticUtil.subtract(leftEntrustNum, minGysSumMul);
+                }
+                if(leftEntrustNum.compareTo(BigDecimal.ZERO)>0){
+                    for (int i = 0; i < sumSize; i++) {  //剩下数量=总数量-最小步长乘以组合个数再分配
+                        EtrExchangeProtfolioDetailRequest item = portfolioList.get(i);
+                        if (leftEntrustNum.compareTo(minStep) >= 0) {
+                            item.setEntrustNum(ArithmeticUtil.doAdd(item.getEntrustNum(),minStep));
+                            item.setEntrustAmt(ArithmeticUtil.multiply(item.getEntrustNum(), entrustPrice));
+                            leftEntrustNum = ArithmeticUtil.subtract(leftEntrustNum, minStep);
+                        } else if(leftEntrustNum.compareTo(BigDecimal.ZERO)>0&&leftEntrustNum.compareTo(minStep) <0){
+                            item.setEntrustNum(ArithmeticUtil.doAdd(item.getEntrustNum(),minStep));
+                            item.setEntrustAmt(ArithmeticUtil.multiply(item.getEntrustNum(), entrustPrice));
+                            leftEntrustNum = ArithmeticUtil.subtract(leftEntrustNum, leftEntrustNum);
+                        }
+                    }
+                }
+
+            }else{
                 for (int i = 0; i < sumSize; i++) {
                     EtrExchangeProtfolioDetailRequest item = portfolioList.get(i);
-                    item.setEntrustAmt(Objects.equals(item.getEntrustAmt(), "--") ? new BigDecimal(0.00) : item.getEntrustAmt());
-                    item.setEntrustNum(Objects.equals(item.getEntrustNum(), "--") ? new BigDecimal(0.00) : item.getEntrustNum());
-                    if (leftEntrustNum.compareTo(minStep) > 0) {
-                        item.setEntrustNum(ArithmeticUtil.doAdd(item.getEntrustNum(), minStep));
+                    if (leftEntrustNum.compareTo(minStep) >= 0) {
+                        item.setEntrustNum(minStep);
                         item.setEntrustAmt(ArithmeticUtil.multiply(item.getEntrustNum(), entrustPrice));
                         leftEntrustNum = ArithmeticUtil.subtract(leftEntrustNum, minStep);
-                    } else {
-                        item.setEntrustNum(ArithmeticUtil.doAdd(item.getEntrustNum(), leftEntrustNum));
+                    } else if(leftEntrustNum.compareTo(BigDecimal.ZERO)>0&&leftEntrustNum.compareTo(minStep) <0){
+                        item.setEntrustNum(leftEntrustNum);
                         item.setEntrustAmt(ArithmeticUtil.multiply(item.getEntrustNum(), entrustPrice));
-                        flag = false;
-                        break;
                     }
                 }
             }
