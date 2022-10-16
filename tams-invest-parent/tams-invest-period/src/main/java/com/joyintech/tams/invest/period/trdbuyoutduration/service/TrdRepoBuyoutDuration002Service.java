@@ -81,7 +81,7 @@ public class TrdRepoBuyoutDuration002Service extends BaseService<TrdRepoBuyoutDu
      */
     @Autowired
     private AutoPeriodRepoCommonService autoPeriodRepoCommonService;
-
+    
     @Autowired
     private RiskCreditListCommonValidatorService riskCreditListCommonValidatorService;
 
@@ -98,7 +98,7 @@ public class TrdRepoBuyoutDuration002Service extends BaseService<TrdRepoBuyoutDu
         if (OperationType.REVOKE == operationType) {
             tradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_撤销.getValue());
             entity.setOperateType(BussinessConstant.REVOKE);
-
+            
             //根据工作流代码查询交易相关信息
 //            System.out.println("tradeid-----------" + entity.getBusiCode());
             logger.info("tradeid-----------" + entity.getBusiCode());
@@ -126,33 +126,21 @@ public class TrdRepoBuyoutDuration002Service extends BaseService<TrdRepoBuyoutDu
         entity.setIssuePartyId(CacheUtil.getSysParam("issue_party_id"));
         restTemplate.postForObject(ServiceApplication.PERIOD_SERVICE_NAME + "/TrdRepoBuyoutDuration/doComplete", entity, String.class);
 
-        //modify by yangxunpeng JJTZJY-134 1.做完逆回购到期，指令可用持仓未清零处理， 2.逆回购交易入指令现金流水的时候，将一笔流水分成两笔来入，并且汇总金额不一致 start
-//        if (StringUtil.isNotEmpty(entity.getActPortfolioId()) && !entity.getActPortfolioId().equals(entity.getPortfolioId())) {
-//            tradeDto.getBaseTradeProductDealDtos().forEach(
-//                    baseTradeProductDealDto1 -> {
-//                        baseTradeProductDealDto1.getTrdProductDealAdd().setPortfolioId(entity.getActPortfolioId());
-//                        if (OperationType.REVOKE == operationType) {
-//                            getInterfInputDto(baseTradeProductDealDto1, DictCodeListExt1.交易流程状态_撤销);
-//                        }
-//                        else {
-//                            getInterfInputDto(baseTradeProductDealDto1, DictCodeListExt1.交易流程状态_有效);
-//                        }
-//                    });
-//            baseTradeProductDealCommServiceImpl.insertPosition(tradeDto);
-//            tradeDto.getBaseTradeProductDealDtos().forEach(
-//                    baseTradeProductDealDto1 -> baseTradeProductDealDto1.getTrdProductDealAdd().setPortfolioId(entity.getPortfolioId()));
-//        }
-        tradeDto.getBaseTradeProductDealDtos().forEach(
-                baseTradeProductDealDto1 -> {
-                    baseTradeProductDealDto1.getTrdProductDealAdd().setPortfolioId(entity.getActPortfolioId());
-                    if (OperationType.REVOKE == operationType) {
-                        getInterfInputDto(baseTradeProductDealDto1, DictCodeListExt1.交易流程状态_撤销);
-                    } else {
-                        getInterfInputDto(baseTradeProductDealDto1, DictCodeListExt1.交易流程状态_有效);
-                    }
-                });
-        baseTradeProductDealCommServiceImpl.insertPosition(tradeDto);
-        //modify by yangxunpeng JJTZJY-134 1.做完逆回购到期，指令可用持仓未清零处理， 2.逆回购交易入指令现金流水的时候，将一笔流水分成两笔来入，并且汇总金额不一致 end
+        if (StringUtil.isNotEmpty(entity.getActPortfolioId()) && !entity.getActPortfolioId().equals(entity.getPortfolioId())) {
+            tradeDto.getBaseTradeProductDealDtos().forEach(
+                    baseTradeProductDealDto1 -> {
+                        baseTradeProductDealDto1.getTrdProductDealAdd().setPortfolioId(entity.getActPortfolioId());
+                        if (OperationType.REVOKE == operationType) {
+                            getInterfInputDto(baseTradeProductDealDto1, DictCodeListExt1.交易流程状态_撤销);
+                        }
+                        else {
+                            getInterfInputDto(baseTradeProductDealDto1, DictCodeListExt1.交易流程状态_有效);
+                        }
+                    });
+            baseTradeProductDealCommServiceImpl.insertPosition(tradeDto);
+            tradeDto.getBaseTradeProductDealDtos().forEach(
+                    baseTradeProductDealDto1 -> baseTradeProductDealDto1.getTrdProductDealAdd().setPortfolioId(entity.getPortfolioId()));
+        }
     }
 
     private void getInterfInputDto(BaseTradeProductDealDto baseTradeProductDealDto,
@@ -276,16 +264,13 @@ public class TrdRepoBuyoutDuration002Service extends BaseService<TrdRepoBuyoutDu
                 tradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
                 baseTradeProductDealCommServiceImpl.execute(tradeDto);
 
-                //modify by yangxunpeng JJTZJY-134 1.做完逆回购到期，指令可用持仓未清零处理， 2.逆回购交易入指令现金流水的时候，将一笔流水分成两笔来入，并且汇总金额不一致 start
-//                if (StringUtil.isNotEmpty(entity.getActPortfolioId()) && !entity.getActPortfolioId().equals(entity.getPortfolioId())) {
-//                    tradeDto.getBaseTradeProductDealDtos().forEach(
-//                            baseTradeProductDealDto1 -> baseTradeProductDealDto1.getTrdProductDealAdd().setPortfolioId(entity.getActPortfolioId()));
-//                    baseTradeProductDealCommServiceImpl.insertPosition(tradeDto);
-//                    tradeDto.getBaseTradeProductDealDtos().forEach(
-//                            baseTradeProductDealDto1 -> baseTradeProductDealDto1.getTrdProductDealAdd().setPortfolioId(entity.getPortfolioId()));
-//                }
-                baseTradeProductDealCommServiceImpl.insertPosition(tradeDto);
-                //modify by yangxunpeng JJTZJY-134 1.做完逆回购到期，指令可用持仓未清零处理， 2.逆回购交易入指令现金流水的时候，将一笔流水分成两笔来入，并且汇总金额不一致 end
+                if (StringUtil.isNotEmpty(entity.getActPortfolioId()) && !entity.getActPortfolioId().equals(entity.getPortfolioId())) {
+                    tradeDto.getBaseTradeProductDealDtos().forEach(
+                            baseTradeProductDealDto1 -> baseTradeProductDealDto1.getTrdProductDealAdd().setPortfolioId(entity.getActPortfolioId()));
+                    baseTradeProductDealCommServiceImpl.insertPosition(tradeDto);
+                    tradeDto.getBaseTradeProductDealDtos().forEach(
+                            baseTradeProductDealDto1 -> baseTradeProductDealDto1.getTrdProductDealAdd().setPortfolioId(entity.getPortfolioId()));
+                }
             }
         }
     }
