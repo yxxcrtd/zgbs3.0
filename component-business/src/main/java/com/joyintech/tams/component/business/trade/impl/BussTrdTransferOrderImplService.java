@@ -279,9 +279,10 @@ public class BussTrdTransferOrderImplService extends BaseService<BussTrdTransfer
         }
 
         // 根据收款账户查询划款性质
-        if (StringUtil.isNotEmpty(ret.getRecAcctNo()) && StringUtil.isNotEmpty(ret.getCcy())){
+        String recAcctNo = ret.getRecAcctNo();
+        if (StringUtil.isNotEmpty(recAcctNo) && StringUtil.isNotEmpty(ret.getCcy())){
             StlCapacctInfoKey stlCapacctInfoKey = new StlCapacctInfoKey();
-            stlCapacctInfoKey.setAcctNo(ret.getRecAcctNo());
+            stlCapacctInfoKey.setAcctNo(recAcctNo);
             stlCapacctInfoKey.setCcy(ret.getCcy());
             StlCapacctInfo stlCapacctInfo = stlCapacctInfoMapper.selectByPrimaryKey(stlCapacctInfoKey);
             if (stlCapacctInfo != null){
@@ -291,10 +292,13 @@ public class BussTrdTransferOrderImplService extends BaseService<BussTrdTransfer
                 ret.setRecAcctPoint(stlCapacctInfo.getLargePayno());
             }
         }
-		if (StringUtil.isNotEmpty(ret.getPayAcctNo()) && StringUtil.isNotEmpty(ret.getRecAcctNo())
+        // 根据收付款账户设置是否需要发送字段
+        String payAcctNo = ret.getPayAcctNo();
+        if (StringUtil.isNotEmpty(payAcctNo)
+                && StringUtil.isNotEmpty(recAcctNo)
                 && "N".equals(param.getDeal().getIsOutTrade())) {
             //N 标识为转仓
-            if (ret.getPayAcctNo().equals(ret.getRecAcctNo())) {
+            if (StringUtil.equals(payAcctNo, recAcctNo)) {
                 ret.setIsNeedSend(DictCodeList.是否_否.getValue());
             } else {
                 ret.setIsNeedSend(DictCodeList.是否_是.getValue());

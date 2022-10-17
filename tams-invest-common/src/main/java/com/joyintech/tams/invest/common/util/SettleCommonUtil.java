@@ -124,6 +124,7 @@ public class SettleCommonUtil {
         params.put("PA_BUSINESS_TYPE18", DictCodeListExt1.平安业务类型_项目类资产卖出.getValue());
         params.put("PA_BUSINESS_TYPE83", DictCodeListExt1.平安业务类型_项目类资产卖出到账.getValue());
 
+        params.put("PA_BUSINESS_TYPE30", DictCodeListExt1.平安业务类型_计划类资产_净值型_申购确认.getValue());
         params.put("PA_BUSINESS_TYPE33", DictCodeListExt1.平安业务类型_计划类资产_利率型_申购.getValue());
         params.put("PA_BUSINESS_TYPE34", DictCodeListExt1.平安业务类型_计划类资产_利率型_赎回.getValue());
 

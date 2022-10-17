@@ -831,32 +831,38 @@ public class TrdAssetsProject001Service extends BaseService<TrdAssetsProject001D
         }
 */
         List<BussTrdTransferOrderDto> resultOrderDto = entity.getBussTrdTransferOrder();
+        BussTrdTransferOrderDto orderDto = new BussTrdTransferOrderDto();
         if (resultOrderDto != null) {
+            BeanUtil.copyPropertiesIgnoreNull(orderDto, resultOrderDto.get(0));
+
             if ("T01".equals(trdProductDeal.getPs())) {
-                resultOrderDto.get(0).setPs("02");
-                resultOrderDto.get(0).setPayType("02");
-                resultOrderDto.get(0).setPortfolioId(resultOrderDto.get(0).getInPortfolioId());
+                orderDto.setPs("02");
+                orderDto.setPayType("02");
+                orderDto.setPortfolioId(orderDto.getInPortfolioId());
                 String orderId = "";
-                if(baseGetBussinessId != null){
+                if (baseGetBussinessId != null) {
                     BussinessCodeParameter bussinessCodeParameter = new BussinessCodeParameter();
                     bussinessCodeParameter.setSeqNo("9998");
                     orderId = baseGetBussinessId.buildBussinessCode(bussinessCodeParameter);
                 } else {
                     orderId = IDGenerator.generate();
                 }
-                resultOrderDto.get(0).setOrderId(orderId);
+                orderDto.setOrderId(orderId);
+            }
+            if (DictCodeList.收付方向_收入.getValue().equals(orderDto.getPs())) {
+                orderDto.setIsNeedSend("N");
             }
         }
 
         if (!StringUtil.isEmptyList(resultOrderDto)) {
-            BussTrdTransferOrderDto bttod = resultOrderDto.get(0);
+            BussTrdTransferOrderDto bttod = orderDto;
             // 交易编号 = 业务编号 ※2生成的交易编号
             bttod.setTradeId(entity.getBizCode());
             // 指令状态 = 指令状态_新建
             bttod.setOrderStatus(DictCodeListExt1.指令状态_新建.getValue());
             // 工作流代码
             bttod.setWorkflowId(entity.getWorkflowId());
-            stlPayOrdersDto = bussTrdTransferOrderService.save(resultOrderDto).get(0);
+            stlPayOrdersDto = bussTrdTransferOrderService.save(Arrays.asList(orderDto)).get(0);
         } else {
             stlPayOrdersDto = null;
         }

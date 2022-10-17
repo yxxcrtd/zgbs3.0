@@ -459,6 +459,9 @@ public class DepositTransfere001Service extends CommonExportService<DepositTrans
             if (!StringUtil.isNotEmpty(stl.getSettleDate())) {
                 stl.setSettleDate(baseTradeProductDealDto.getTrdProductDeal().getSettleDate());
             }
+            if (DictCodeList.收付方向_收入.getValue().equals(stl.getPs())) {
+                stl.setIsNeedSend("N");
+            }
             baseTradeProductDealDto.setStlPayOrdersList(Arrays.asList(stl));
         }
     }
