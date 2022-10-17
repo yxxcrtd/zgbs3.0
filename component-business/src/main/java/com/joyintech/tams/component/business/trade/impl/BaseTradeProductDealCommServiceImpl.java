@@ -507,11 +507,11 @@ public class BaseTradeProductDealCommServiceImpl extends BaseService implements 
                     if(StringUtil.equals(baseTradeProductDealDto.getTrdProductDeal().getPs(),DictCodeListExt3.质押券置换_置换方向_换出.getValue())) {
                         continue;
                     }
-                    status.setFinishAmt(baseTradeProductDealDto.getTrdProductDeal().getShareAmt());
+                    status.setFinishAmt(baseTradeProductDealDto.getTrdProductDeal().getTradeAmt());
                 }
                 else if(StringUtil.isNotEmpty(baseTradeProductDealDto.getTrdFinProductDealTotal())
                         &&StringUtil.equals(baseTradeProductDealDto.getTrdFinProductDealTotal().getPs(),DictCodeListExt3.交易方向_解除质押.getValue())) {
-                    status.setFinishAmt(baseTradeProductDealDto.getTrdProductDeal().getShareAmt());
+                    status.setFinishAmt(baseTradeProductDealDto.getTrdProductDeal().getTradeAmt());
                 }
                 else if(StringUtil.isNotEmpty(baseTradeProductDealDto.getTrdFinProductDealTotal())
                         &&StringUtil.equals(baseTradeProductDealDto.getTrdFinProductDealTotal().getPs(),DictCodeList.交易方向_到期续做.getValue())) {
@@ -519,12 +519,12 @@ public class BaseTradeProductDealCommServiceImpl extends BaseService implements 
                     if(!StringUtil.equals(baseTradeProductDealDto.getTrdProductDeal().getPs(),DictCodeList.交易方向_买入.getValue())) {
                         continue;
                     }
-                    status.setFinishAmt(baseTradeProductDealDto.getTrdProductDeal().getShareAmt());
+                    status.setFinishAmt(baseTradeProductDealDto.getTrdProductDeal().getTradeAmt());
                 }
                 // add by etliu 20220116 start
                 // GZYHTZJY-1145: 【场内对账清结算1231】深交所协议回购首期交易，日终头寸更新有误【解决日期：2022-01-14】】
                 else if (etrEntrustAdd != null && StringUtil.equals(DictCodeList.回购类型_质押式协议回购.getValue(), etrEntrustAdd.getAssetType1())) {
-                    status.setFinishAmt(baseTradeProductDealDto.getTrdProductDeal().getShareAmt());
+                    status.setFinishAmt(baseTradeProductDealDto.getTrdProductDeal().getTradeAmt());
                 }
                 // add by etliu 20220116 end
                 else if(etrEntrustAdd != null && StringUtil.isNotEmpty(etrEntrustAdd.getTargetType())
