@@ -205,8 +205,6 @@ public class IbuQuoteBondCalService extends BaseService {
      * @return
      */
     public List<PtlAllocationDto> autoAllocation(AutoAllocationRequest autoAllocationRequest) {
-        String sellPara = CacheUtil.getSysParam("SHORT_SELLING_SUPPORTED");
-        String ps = autoAllocationRequest.getPs();
         //备份剩余额度
         List<PtlAllocationDto> ptlAllocations = autoAllocationRequest.getPtlAllocations();
         BigDecimal shareAmt = null;
@@ -218,18 +216,20 @@ public class IbuQuoteBondCalService extends BaseService {
         if (null == autoAllocationRequest.getCpriceAmt() || BigDecimal.ZERO.compareTo(autoAllocationRequest.getCpriceAmt()) == 0
                 || (StringUtil.isNotEmpty(shareAmt)
                 && BigDecimalUtil.ACompareToB(shareAmt, autoAllocationRequest.getShareAmt(), 4) != 0)) {
-            autoAllocationRequest.setCpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(autoAllocationRequest.getShareAmt(), autoAllocationRequest.getPrice()), new BigDecimal(100), 2));
+            autoAllocationRequest.setCpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(autoAllocationRequest.getShareAmt(),
+                    autoAllocationRequest.getPrice()), new BigDecimal(100), 2));
         }
         if (null == autoAllocationRequest.getFpriceAmt() || BigDecimal.ZERO.compareTo(autoAllocationRequest.getFpriceAmt()) == 0
                 || (StringUtil.isNotEmpty(shareAmt)
                 && BigDecimalUtil.ACompareToB(shareAmt, autoAllocationRequest.getShareAmt(), 4) != 0)) {
-            autoAllocationRequest.setFpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(autoAllocationRequest.getShareAmt(), autoAllocationRequest.getUnitFprice()), new BigDecimal(100), 2));
+            autoAllocationRequest.setFpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(autoAllocationRequest.getShareAmt(),
+                    autoAllocationRequest.getUnitFprice()), new BigDecimal(100), 2));
         }
         try {
             //无分配模式
             if (StringUtil.isEmpty(autoAllocationRequest.getDistribution())) {
                 //通过各自的券面总额计算金额
-                ptlAllocations = noneDistribution(autoAllocationRequest);
+                ptlAllocations = this.noneDistribution(autoAllocationRequest);
             } else {
                 if (CollectionUtils.isNotEmpty(ptlAllocations)) {
                     ptlAllocations.forEach(item -> {
@@ -239,11 +239,11 @@ public class IbuQuoteBondCalService extends BaseService {
                 }
                 //平均分配
                 if (StringUtil.equals(autoAllocationRequest.getDistribution(), "139")) {
-                    ptlAllocations = aveDistribution(autoAllocationRequest);
+                    ptlAllocations = this.aveDistribution(autoAllocationRequest);
                 }
                 //比例分配
                 if (StringUtil.equals(autoAllocationRequest.getDistribution(), "143")) {
-                    ptlAllocations = propDistribution(autoAllocationRequest);
+                    ptlAllocations = this.propDistribution(autoAllocationRequest);
                 }
                 if (CollectionUtils.isNotEmpty(ptlAllocations)) {
                     ptlAllocations.forEach(item -> {
@@ -289,7 +289,7 @@ public class IbuQuoteBondCalService extends BaseService {
         BigDecimal shareAmt = ArithmeticUtil.divide(request.getShareAmt(), new BigDecimal(10000), 1);
         List<PtlAllocationDto> ptlAllocations = request.getPtlAllocations();
         //降序
-        ptlAllocations.sort((p1, p2) -> p1.getAvaNum().compareTo(p2.getAvaNum()));
+        ptlAllocations.sort(Comparator.comparing(PtlAllocationDto::getAvaNum));
         BigDecimal avg = ArithmeticUtil.divide(shareAmt, new BigDecimal(ptlAllocations.size()), 1, RoundingMode.DOWN);
         //剩余尾差
         BigDecimal tailDifference = shareAmt;
@@ -302,9 +302,9 @@ public class IbuQuoteBondCalService extends BaseService {
             item.setAvaNum(ArithmeticUtil.subtract(item.getAvaNum(), item.getShareAmt()));
             tailDifference = ArithmeticUtil.subtract(tailDifference, item.getShareAmt());
         }
-        handleTailDifference(ptlAllocations, tailDifference);
-        calOtherForPtlAllocation(ptlAllocations, request);
-        calFee(ptlAllocations, ArithmeticUtil.multiply(shareAmt, new BigDecimal(10000)), request.getDealFeeAmt(), request.getSettFeeAmt());
+        this.handleTailDifference(ptlAllocations, tailDifference);
+        this.calOtherForPtlAllocation(ptlAllocations, request);
+        this.calFee(ptlAllocations, ArithmeticUtil.multiply(shareAmt, new BigDecimal(10000)), request.getDealFeeAmt(), request.getSettFeeAmt());
         return ptlAllocations;
     }
 
@@ -318,7 +318,7 @@ public class IbuQuoteBondCalService extends BaseService {
         BigDecimal shareAmt = ArithmeticUtil.divide(request.getShareAmt(), new BigDecimal(10000), 1);
         List<PtlAllocationDto> ptlAllocations = request.getPtlAllocations();
         //降序
-        ptlAllocations.sort((p1, p2) -> p1.getAvaNum().compareTo(p2.getAvaNum()));
+        ptlAllocations.sort(Comparator.comparing(PtlAllocationDto::getAvaNum));
         //剩余额度汇总
         BigDecimal avaNumTotal = ptlAllocations.stream().map(PtlAllocationDto::getAvaNum).reduce(BigDecimal.ZERO, BigDecimal::add);
         //尾差
@@ -327,9 +327,9 @@ public class IbuQuoteBondCalService extends BaseService {
             ptlAllocation.setShareAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(shareAmt, ptlAllocation.getAvaNum()), avaNumTotal, 1, RoundingMode.DOWN));
             tailDifference = ArithmeticUtil.subtract(tailDifference, ptlAllocation.getShareAmt());
         }
-        handleTailDifference(ptlAllocations, tailDifference);
-        calOtherForPtlAllocation(ptlAllocations, request);
-        calFee(ptlAllocations, ArithmeticUtil.multiply(shareAmt, new BigDecimal(10000)), request.getDealFeeAmt(), request.getSettFeeAmt());
+        this.handleTailDifference(ptlAllocations, tailDifference);
+        this.calOtherForPtlAllocation(ptlAllocations, request);
+        this.calFee(ptlAllocations, ArithmeticUtil.multiply(shareAmt, new BigDecimal(10000)), request.getDealFeeAmt(), request.getSettFeeAmt());
         return ptlAllocations;
     }
 
@@ -427,6 +427,11 @@ public class IbuQuoteBondCalService extends BaseService {
      * @param request
      */
     public void calOtherForPtlAllocation(List<PtlAllocationDto> ptlAllocations, AutoAllocationRequest request) {
+        if (request.getFpriceAmt() == null || request.getCpriceAmt() == null) {
+            logger.info("净价总额、全价总额为空，不分配");
+            return;
+        }
+
         //模式
         //String sellPara = CacheUtil.getSysParam("SHORT_SELLING_SUPPORTED");
         //String ps = request.getPs();

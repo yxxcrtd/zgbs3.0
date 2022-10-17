@@ -115,6 +115,8 @@ public class EtrExchangeTradeOperateSecRepoRequest extends EtrEntrust{
      */
     private String assetType;
 
+    private String assetType1;
+
 
     /**
      * 获取 implementPercent
@@ -420,5 +422,13 @@ public class EtrExchangeTradeOperateSecRepoRequest extends EtrEntrust{
 
     public void setNextUser(String nextUser) {
         this.nextUser = nextUser;
+    }
+
+    public String getAssetType1() {
+        return assetType1;
+    }
+
+    public void setAssetType1(String assetType1) {
+        this.assetType1 = assetType1;
     }
 }

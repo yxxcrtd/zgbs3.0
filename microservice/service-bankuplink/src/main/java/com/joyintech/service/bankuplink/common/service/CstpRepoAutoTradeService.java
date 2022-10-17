@@ -371,7 +371,8 @@ public class CstpRepoAutoTradeService extends BaseService<TrdRepoTrade002Dto> {
 		//if (StringUtil.isNotEmpty(entrust)) {
 			//正逆回购必须有质押券
 			//if(StringUtil.equals(entrust.getPs(), DictCodeList.回购拆借方向_正回购.getValue())&&StringUtil.isEmptyList(repoasst)){
-			if(StringUtil.isEmptyList(repoasst)){
+			// 逆回购质押品可能未录入
+			if (StringUtil.isEmptyList(repoasst)) {
 				String msg = "抵押品债券不存在！";
 				resultBaseDto.setErrMsg(msg);
 				logger.info(msg);

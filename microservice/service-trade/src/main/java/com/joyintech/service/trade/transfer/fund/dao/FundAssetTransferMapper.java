@@ -1,6 +1,7 @@
 package com.joyintech.service.trade.transfer.fund.dao;
 
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.service.trade.transfer.common.dto.BondValuationDto;
 import com.joyintech.service.trade.transfer.fund.dto.FundAssetTransfer001Dto;
 import org.springframework.stereotype.Repository;
 
@@ -22,4 +23,6 @@ public interface FundAssetTransferMapper {
     BigDecimal selCloPrice(Map<String, Object> param);
 
     int updateRep(Map<String, Object> param);
+
+    List<BondValuationDto> findValuation(Map<String, Object> param);
 }

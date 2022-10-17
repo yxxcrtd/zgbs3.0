@@ -440,7 +440,7 @@ public class EtrRepoCashPositionDealService extends EtrCashPositionBaseService {
                     }
 //                    etrPositionHoldDto.getPtlSecPositionFlows().addAll(ptlSecPositionFlowLogic(finProductTradeDto, false));
                     // 查找委托时的指令持仓,用于冲销
-//                    etrSecPositionFlowDtos = EtrCommonCashPositionDealService.selectAllPositionByTotle(entrustId);
+                    etrSecPositionFlowDtos = EtrCommonCashPositionDealService.selectAllPositionByTotle(entrustId);
                 } else {
                     // 原始交易编号
                     String orginTradeId = finProductTradeDto.getTrdProductDeal().getTradeId();

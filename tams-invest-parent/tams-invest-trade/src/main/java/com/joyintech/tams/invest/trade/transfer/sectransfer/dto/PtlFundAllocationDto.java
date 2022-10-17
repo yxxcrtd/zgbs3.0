@@ -103,7 +103,20 @@ public class PtlFundAllocationDto extends StlPayOrders implements ITableRow, Pro
      * 选中的实体类
      */
     private List<PtlFundAllocationDto> selectedItem;
-    
+
+    /**
+     * 附件编号
+     */
+    private String businessId;
+
+    public String getBusinessId() {
+        return businessId;
+    }
+
+    public void setBusinessId(String businessId) {
+        this.businessId = businessId;
+    }
+
     /**
      * 获取 selectedItem
      * @return selectedItem.

@@ -183,7 +183,7 @@ public class CfetsRepoDayPriceDto {
 
     public String getQuoteTypeStr() {
         if (StringUtil.isNotEmpty(this.getQuoteType())) {
-            String quoteTypeStr = SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式,
+            String quoteTypeStr = SysDataUtil.getNameFromDataDict(BussinessDictCode.交易类型,
                     this.getQuoteType());
             if (quoteTypeStr == null) {
                 return this.quoteType;

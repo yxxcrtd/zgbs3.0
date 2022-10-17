@@ -6,6 +6,7 @@ import com.joyintech.framework.util.BeanUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.dao.PtlSecPositionFlowMapper;
 import com.joyintech.tams.common.base.dao.StlPayOrdersMapper;
 import com.joyintech.tams.common.base.dao.TrdFinProductDealTotalMapper;
@@ -59,6 +60,9 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
 
     @Autowired
     private TrdProductDealMapper trdProductDealMapper;
+    
+    @Autowired
+    private EtrEntrustMapper etrEntrustMapper;
 
     @Autowired
     private StlPayOrdersMapper stlPayOrdersMapper;
@@ -141,7 +145,17 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
         resultDto.setSecAcctId(StringUtil.isEmpty(secAcctId) ? "999999" : secAcctId);
         resultDto.setFinprodId(deal.getFinprodId());
         resultDto.setBranch(0L);
-        resultDto.setInvAim(StringUtil.isEmpty(deal.getInvAim()) ? "999999" : deal.getInvAim());
+        String invAim = "";
+        if(StringUtil.isNotEmpty(dealAdd.getEntrustId())) {
+        	EtrEntrust etrEntrust = etrEntrustMapper.selectByPrimaryKey(dealAdd.getEntrustId());
+        	invAim = etrEntrust.getInvAim();
+        	if(StringUtil.isEmpty(invAim)){
+        		invAim = etrEntrust.getBusinessModel();
+        	}
+        	resultDto.setInvAim(StringUtil.isEmpty(invAim) ? "999999" : invAim);
+        }else {
+        	resultDto.setInvAim(StringUtil.isEmpty(deal.getInvAim()) ? "999999" : deal.getInvAim());
+        }
         resultDto.setHodingType(inputDto.getPositionType());
         resultDto.setCcy(deal.getCcy());
         resultDto.setTradeId(deal.getTradeId());
@@ -250,7 +264,16 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 && BigDecimal.ZERO.compareTo(deal.getShareAmt()) == 0) {
                 return result;
             }
-            resultDto.setCdate(deal.getTradeDate());
+            // GLLCUAT-472:债券到期的持仓流水日期登交割日期 modify by fuyongsheng 20220914 start
+            // resultDto.setCdate(deal.getTradeDate());
+            if(DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(deal.getFinprodType2())
+                    && DictCodeList.交易方向_到期.getValue().equals(deal.getPs())){
+                resultDto.setCdate(deal.getSettleDate());
+            }
+            else{
+                resultDto.setCdate(deal.getTradeDate());
+            }
+            // GLLCUAT-472:债券到期的持仓流水日期登交割日期 modify by fuyongsheng 20220914 end
             resultDto.setAmount(ArithmeticUtil.multiply(deal.getShareAmt(), new BigDecimal(-1)));
 
             if (DictCodeList.交易方向_卖出.getValue().equals(deal.getPs())
@@ -619,7 +642,16 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                 && ("ISSUE_CLASS_01".equals(assetType2) || "ISSUE_CLASS_02".equals(assetType2))// 发行方式 标志是否为一级投标
                 && StringUtil.equals(DictCodeList.交易方向_买入.getValue(), deal.getPs())) {
             // 成交/中标结果维护 增加在途持仓
-            if ("02".equals(stage)) {
+            // 交易所撤销 增加可用金额 减少实际
+            if ("04".equals(stage)) {
+                resultDto.setCdate(deal.getSettleDate());
+                PtlSecPositionFlowDto flowDto1 = new PtlSecPositionFlowDto();
+                BeanUtil.copyPropertiesIgnoreNull(flowDto1, resultDto);
+                flowDto1.setAmount(deal.getShareAmt());
+                flowDto1.setHodingType(DictCodeList.持仓类型_实际.getValue());
+                result.add(flowDto1);
+                return result;
+            } else if ("02".equals(stage)) {
                 resultDto.setCdate(deal.getSettleDate());
                 resultDto.setAmount(deal.getShareAmt());
                 resultDto.setHodingType(DictCodeList.持仓类型_在途.getValue());
@@ -1792,8 +1824,15 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
                     && StringUtil.equals(DictCodeList.交易方向_买入.getValue(), deal.getPs())) {
                 resultDto.setCdate(stlPayOrder.getSettleDate());
                 resultDto.setHodingType(DictCodeList.持仓类型_可用.getValue());
-                // 交收 增加可用金额 减少实际
-                if ("03".equals(stage)) {
+                // 交易所撤销 增加可用金额 减少实际
+                if ("04".equals(stage)) {
+                    PtlCashPositionFlowDto flowDto2 = new PtlCashPositionFlowDto();
+                    BeanUtil.copyPropertiesIgnoreNull(flowDto2, resultDto);
+                    flowDto2.setAmount(stlPayOrder.getSettleAmt().negate());
+                    flowDto2.setHodingType(DictCodeList.持仓类型_实际.getValue());
+                    flowDto2.setIsDeleteAble(DictCodeList.是否_否.getValue());
+                    result.add(flowDto2);
+                } else if ("03".equals(stage)) {
                     PtlCashPositionFlowDto flowDto1 = new PtlCashPositionFlowDto();
                     BeanUtil.copyPropertiesIgnoreNull(flowDto1, resultDto);
                     flowDto1.setAmount(stlPayOrder.getSettleAmt());
@@ -1880,7 +1919,18 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
 
                     || (DictCodeListExt1.金融产品类型_投管用_项目类资产.getValue().equals(deal.getFinprodType2())
                         && 还本_到期_收息.contains(deal.getPs()))) {
-                    resultDto.setCdate(deal.getSettleDate());
+                    //GLLCUAT-472:债券到期现金流水登录日期使用划款指令的结算日期 modify by fuyongsheng 20220914 start
+                    // resultDto.setCdate(deal.getSettleDate());
+                    // GLLCUAT-545:还本到期收息现金流水登录日期使用划款指令的结算日期 modify by fuyongsheng 20220921 start
+                    if(还本_到期_收息.contains(deal.getPs())
+                    // GLLCUAT-545:还本到期收息现金流水登录日期使用划款指令的结算日期 modify by fuyongsheng 20220921 end
+                            && DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(deal.getFinprodType2())
+                            && !DictCodeListExt1.交易场所_银行间.getValue().equals(deal.getTradeMarket())){
+                        resultDto.setCdate(stlPayOrder.getSettleDate());
+                    }else{
+                        resultDto.setCdate(deal.getSettleDate());
+                    }
+                    //GLLCUAT-472:债券到期现金流水登录日期使用划款指令的结算日期 modify by fuyongsheng 20220914 end
                     resultDto.setAmount(stlPayOrder.getSettleAmt());
                     resultDto.setSplitType(DictCodeListExt3.拆分标识_已拆分.getValue());
                     result.add(resultDto);

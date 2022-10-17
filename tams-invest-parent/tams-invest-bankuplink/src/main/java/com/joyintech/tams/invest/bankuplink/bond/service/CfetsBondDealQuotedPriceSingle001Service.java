@@ -529,7 +529,7 @@ public class CfetsBondDealQuotedPriceSingle001Service extends BaseService<CfetsB
         
 		// 历史报价撤销
 		if (StringUtil.equals(entity.getOptType(), "revoke")) {
-			entity.setQuoteType(BussinessDictCodeList.报价方式_对话报价.getValue());
+			entity.setQuoteType(BussinessDictCodeList.交易类型_对话报价.getValue());
 			restTemplate.postForObject(
 					ServiceApplication.BANKUPLINK_SERVICE_NAME + "/CfetsBondDealQuotedPrice/doHisRevoke", entity,
 					Boolean.class);
@@ -570,7 +570,7 @@ public class CfetsBondDealQuotedPriceSingle001Service extends BaseService<CfetsB
 					restTemplate.postForObject(ServiceApplication.BANKUPLINK_SERVICE_NAME
 							+ "/CfetsBondDealQuotedPrice/sendUpdateBondDialogueQuote", entity, boolean.class);
 				} else {
-					entity.setQuoteType(BussinessDictCodeList.报价方式_对话报价.getValue());
+					entity.setQuoteType(BussinessDictCodeList.交易类型_对话报价.getValue());
 					restTemplate.postForObject(
 							ServiceApplication.BANKUPLINK_SERVICE_NAME + "/CfetsBondDealQuotedPrice/doHisRevoke",
 							entity, Boolean.class);

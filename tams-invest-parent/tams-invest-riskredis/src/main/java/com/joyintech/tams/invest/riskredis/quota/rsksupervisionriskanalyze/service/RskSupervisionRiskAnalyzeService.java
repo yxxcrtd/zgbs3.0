@@ -322,17 +322,17 @@ public class RskSupervisionRiskAnalyzeService extends CommonExportService<RskSup
 	}
 
 
-	public List<SuggestDto>  selectIndName(Map<String, Object> map) {
-		return restTemplate.postForList(
+	public Page<SelectOptionDto>  selectIndName(Map<String, Object> map) {
+		return restTemplate.postForPage(
 				ServiceApplication.RISK_RDS_SERVICE_NAME + "/RskSupervisionRiskAnalyze/selectIndName", map,
-				SuggestDto.class);
+				SelectOptionDto.class);
 
 	}
 
-	public List<SuggestDto>  selectGroupName(Map<String, Object> map) {
-		return restTemplate.postForList(
+	public Page<SelectOptionDto> selectGroupName(Map<String, Object> map) {
+		return restTemplate.postForPage(
 				ServiceApplication.RISK_RDS_SERVICE_NAME + "/RskSupervisionRiskAnalyze/selectGroupName", map,
-				SuggestDto.class);
+				SelectOptionDto.class);
 
 	}
 

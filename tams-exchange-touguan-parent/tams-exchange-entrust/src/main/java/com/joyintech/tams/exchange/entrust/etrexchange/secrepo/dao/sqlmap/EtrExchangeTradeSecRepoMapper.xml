@@ -83,6 +83,7 @@
         ,T2.EXP_CON_NUM
         ,T2.DEAL_MODE dealMode
         ,T2.PRICE_TYPE priceType
+        ,T2.ASSET_TYPE1 assetType1
         FROM
         ETR_ENTRUST T1
         INNER JOIN ETR_ENTRUST_ADD T2 ON
@@ -117,7 +118,12 @@
         where T1.TRADE_MARKET in ('03','04')
         AND T2.ASSET_TYPE NOT IN ('F17')
         AND T1.ENTRUST_TYPE IN (#{ENTRUST_BUSS_TYPE_28},#{ENTRUST_BUSS_TYPE_29})
-        AND T1.CREATE_USER=#{userId}
+        AND ( T1.CREATE_USER=#{userId}
+                or EXISTS (select 1
+                from SYS_USER_ROLE sur
+                left join SYS_ROLE sr on sur.ROLE_ID = sr.ROLE_ID
+                where sur.USER_ID = #{userId}
+                and sr.ROLE_POS = #{rolePos05}) )
         <if test="sysDate !=null and !sysDate.equals('')">
             AND T1.ENTRUST_DATE = to_date(#{sysDate},'yyyy-MM-dd')
         </if>
@@ -228,6 +234,7 @@
         ,T2.EXP_CON_NUM
         ,T2.DEAL_MODE dealMode
         ,T2.PRICE_TYPE priceType
+        ,T2.ASSET_TYPE1 assetType1
         FROM
         WFL_ETR_ENTRUST T1
         INNER JOIN WFL_ETR_ENTRUST_ADD T2 ON
@@ -260,7 +267,12 @@
         where T1.TRADE_MARKET in ('03','04')
         AND T2.ASSET_TYPE NOT IN ('F17')
         AND T1.ENTRUST_TYPE in (#{ENTRUST_BUSS_TYPE_28},#{ENTRUST_BUSS_TYPE_29})
-        AND T1.CREATE_USER=#{userId}
+        AND ( T1.CREATE_USER=#{userId}
+                or EXISTS (select 1
+                from SYS_USER_ROLE sur
+                left join SYS_ROLE sr on sur.ROLE_ID = sr.ROLE_ID
+                where sur.USER_ID = #{userId}
+                and sr.ROLE_POS = #{rolePos05}) )
         <if test="sysDate !=null and !sysDate.equals('')">
             AND T1.ENTRUST_DATE = to_date(#{sysDate},'yyyy-MM-dd')
         </if>

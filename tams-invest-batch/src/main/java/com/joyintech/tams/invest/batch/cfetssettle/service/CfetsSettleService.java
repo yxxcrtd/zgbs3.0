@@ -13,15 +13,12 @@ package com.joyintech.tams.invest.batch.cfetssettle.service;
 import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseService;
-import com.joyintech.framework.exception.BusinessException;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.dto.CfetsBondPortfolioCashRequest;
 import com.joyintech.tams.business.common.dto.CfetsBondPositionRequest;
 import com.joyintech.tams.business.common.dto.PositionRulePtlData;
-import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommService;
@@ -43,6 +40,7 @@ import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,6 +116,12 @@ public class CfetsSettleService extends BaseService {
      */
     @Autowired(required = false)
     private BaseGetBussinessId baseGetBussinessIdimpl;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     /**
      * 是否单体服务
@@ -301,7 +305,7 @@ public class CfetsSettleService extends BaseService {
         } catch (Exception e) {
             if (CollectionUtils.isNotEmpty(mapList)) {
                 mapList.forEach(item -> {
-                    PositionHttpRequest.roll((Long) item.get("seqno"), (String) item.get("modelType"), e.getMessage());
+                    positionRequestHandle.roll((String) item.get("seqno"), (String) item.get("modelType"), e.getMessage());
                 });
             }
             throw e;
@@ -403,7 +407,7 @@ public class CfetsSettleService extends BaseService {
         req.setFinprodId(cfetsManualSettleInsertDto.getTrdBankManualSettleInfo().getFinprodId());
         req.setPtlList(ptlList);
         logger.info("现券发送到头寸的报文:{}", JsonUtils.object2Json(req));
-        return PositionHttpRequest.send(req);
+        return positionRequestHandle.send(req);
     }
 
     private Map<String, Object>  sendRepoPositionMethod(CfetsSettleReaderResult cfetsManualSettleInsertDto, Date batchDate) {
@@ -502,7 +506,7 @@ public class CfetsSettleService extends BaseService {
         req.setPtlCashList(ptlCashList);
         req.setPtlSecList(ptlSecList);
         logger.info("回购发送到头寸的报文:{}", JsonUtils.object2Json(req));
-        return PositionHttpRequest.send(req);
+        return positionRequestHandle.send(req);
     }
 
     private List<CfetsSettleReaderResult> createTodayTodoSettleData(Map<String, Object> pageParam) {
@@ -748,7 +752,7 @@ public class CfetsSettleService extends BaseService {
         req.setFinprodId(cfetsManualSettleInsertDto.getTrdBankManualSettleInfo().getFinprodId());
         req.setPtlList(ptlList);
         logger.info("一级申购发送的报文:{}", JsonUtils.object2Json(req));
-        return PositionHttpRequest.send(req);
+        return positionRequestHandle.send(req);
     }
 
     /**
@@ -835,7 +839,7 @@ public class CfetsSettleService extends BaseService {
         req.setFinprodId(cfetsManualSettleInsertDto.getTrdBankManualSettleInfo().getFinprodId());
         req.setPtlList(ptlList);
         logger.info("一级投标确认发送的报文:{}", JsonUtils.object2Json(req));
-        return PositionHttpRequest.send(req);
+        return positionRequestHandle.send(req);
     }
 
     /**

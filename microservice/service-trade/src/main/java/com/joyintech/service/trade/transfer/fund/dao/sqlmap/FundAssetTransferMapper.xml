@@ -6,38 +6,44 @@
         SELECT DISTINCT
         A.PORTFOLIO_ID id,
         A.PORTFOLIO_NAME text,
-        NVL(P.TDY_INTINCEXP,0) object
-        FROM PTL_PORTFOLIO A
-        LEFT JOIN PTL_SEC_ACCT PSA
-        ON A.PORTFOLIO_ID = PSA.PORTFOLIO_ID
-        LEFT JOIN PTL_CAPACCT_INFO PCI
-        ON A.PORTFOLIO_ID = PCI.PORTFOLIO_ID
-        LEFT JOIN (
-        SELECT psv.TDY_INTINCEXP,psv.PORTFOLIO_ID
+<!--        NVL(P.TDY_INTINCEXP,0) object-->
+        (SELECT NVL(TDY_INTINCEXP,0)
+        from (SELECT psv.TDY_INTINCEXP
         FROM PTL_SEC_VALUTION psv
-        WHERE psv.CDATE = to_date(#{tradeDate},'yyyy-MM-dd')
-        AND psv.INV_AIM='999999'
-        AND psv.FINPROD_ID = #{finprodIdOrg,jdbcType=VARCHAR}
-        <if test="chlId!=null and chlId!=''">
-            AND psv.SEC_ACCT_ID = #{chlId,jdbcType=VARCHAR}
-        </if>
-        )P
-        ON P.PORTFOLIO_ID = A.PORTFOLIO_ID
+        WHERE psv.CDATE &lt;= to_date(#{tradeDate},'yyyy-MM-dd') AND psv.INV_AIM='999999' AND psv.FINPROD_ID = #{finprodIdOrg,jdbcType=VARCHAR}
+        order by psv.CDATE desc
+        )
+        where rownum=1
+        ) object
+        FROM PTL_PORTFOLIO A
+        LEFT JOIN PTL_SEC_ACCT PSA ON A.PORTFOLIO_ID = PSA.PORTFOLIO_ID
+        LEFT JOIN PTL_CAPACCT_INFO PCI ON A.PORTFOLIO_ID = PCI.PORTFOLIO_ID and PCI.ACCT_TYPE = 'A01'
+<!--        LEFT JOIN (-->
+<!--        SELECT psv.TDY_INTINCEXP,psv.PORTFOLIO_ID-->
+<!--        FROM PTL_SEC_VALUTION psv-->
+<!--        WHERE psv.CDATE = to_date(#{tradeDate},'yyyy-MM-dd')-->
+<!--        AND psv.INV_AIM='999999'-->
+<!--        AND psv.FINPROD_ID = #{finprodIdOrg,jdbcType=VARCHAR}-->
+<!--        <if test="chlId!=null and chlId!=''">-->
+<!--            AND psv.SEC_ACCT_ID = #{chlId,jdbcType=VARCHAR}-->
+<!--        </if>-->
+<!--        )P-->
+<!--        ON P.PORTFOLIO_ID = A.PORTFOLIO_ID-->
         WHERE A.INVEST_YESORNO = 'Y'
         AND A.PORTFOLIO_ID != #{invTransPortf,jdbcType=VARCHAR}
         AND A.MDATE &gt;=TO_DATE(#{tradeDate},'yyyy-MM-dd')
         AND A.VDATE &lt;=TO_DATE(#{tradeDate},'yyyy-MM-dd')
-        <if test="invTransPortf != null and invTransPortf != ''">
+        <!--<if test="invTransPortf != null and invTransPortf != ''">
             AND PCI.ACCT_NO in (SELECT DISTINCT B.ACCT_NO FROM PTL_CAPACCT_INFO B WHERE B.PORTFOLIO_ID =
             #{invTransPortf} AND B.ACCT_TYPE = #{capacctType} AND B.CCY = #{ccy})
-        </if>
-        <if test="secManageAcctId != null and secManageAcctId != ''">
-            AND PSA.ACCT_NO=#{secManageAcctId,jdbcType=VARCHAR}
-        </if>
-        <if test="userId != null and userId != ''">
-            AND (A.PORTFOLIO_ID in (select PORTFOLIO_ID from PTL_PORTFOLIO_AUTHORITY where USER_ID = #{userId})
-            OR A.PARENT_PORTFOLIO_ID in (select PORTFOLIO_ID from PTL_PORTFOLIO_AUTHORITY where USER_ID = #{userId}))
-        </if>
+        </if>-->
+<!--        <if test="secManageAcctId != null and secManageAcctId != ''">-->
+<!--            AND PSA.ACCT_NO=#{secManageAcctId,jdbcType=VARCHAR}-->
+<!--        </if>-->
+<!--        <if test="userId != null and userId != ''">-->
+<!--            AND (A.PORTFOLIO_ID in (select PORTFOLIO_ID from PTL_PORTFOLIO_AUTHORITY where USER_ID = #{userId})-->
+<!--            OR A.PARENT_PORTFOLIO_ID in (select PORTFOLIO_ID from PTL_PORTFOLIO_AUTHORITY where USER_ID = #{userId}))-->
+<!--        </if>-->
         <if test="initValue != null and initValue != ''">
             AND A.PORTFOLIO_ID = #{initValue}
         </if>
@@ -50,18 +56,26 @@
     </select>
     <!--查询单位净值-->
     <select id="findInitCarryOverQty" resultType="java.math.BigDecimal">
-        select NVL(A.VALUATION, 0)
-        from (
-                 SELECT fpv.VALUATION, fpv.VAL_DATE
-                 FROM FIN_PRODUCT_VALUATION fpv
-                          LEFT JOIN FIN_PRODUCT fp
-                                    ON fp.FINPROD_MARKET_ID = fpv.FINPROD_ID
-                                        AND fp.FINPROD_TYPE2 = fpv.FINPROD_TYPE2
-                 WHERE fp.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
-                   AND fpv.VAL_DATE &lt;= to_date(#{tradeDate}, 'yyyy-MM-dd')
-                 order by fpv.VAL_DATE desc
-             ) A
-        where rownum = 1
+<!--        select NVL(A.VALUATION, 0)-->
+<!--        from (-->
+<!--                 SELECT fpv.VALUATION, fpv.VAL_DATE-->
+<!--                 FROM FIN_PRODUCT_VALUATION fpv-->
+<!--                          LEFT JOIN FIN_PRODUCT fp-->
+<!--                                    ON fp.FINPROD_MARKET_ID = fpv.FINPROD_ID-->
+<!--                                        AND fp.FINPROD_TYPE2 = fpv.FINPROD_TYPE2-->
+<!--                 WHERE fp.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}-->
+<!--                   AND fpv.VAL_DATE &lt;= to_date(#{tradeDate}, 'yyyy-MM-dd')-->
+<!--                 order by fpv.VAL_DATE desc-->
+<!--             ) A-->
+<!--        where rownum = 1-->
+
+        select (NVL(DSC_COST_AMT,0)+NVL(TDY_FLOAT_INGPL,0))/SHARE_AMT
+        from PTL_SEC_VALUTION
+        where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+        AND FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+        AND INV_AIM = '999999'
+        AND CCY =  #{ccy,jdbcType=VARCHAR}
+        AND CDATE = to_date(#{tradeDate}, 'yyyy-MM-dd')
     </select>
     <!-- 查询单位净价 -->
     <select id="findUnitCprice" resultType="java.math.BigDecimal">
@@ -110,4 +124,17 @@
         set REP_SEND_STATUS = #{YES_OR_NO_Y}
         where REP_FINPROD_ID = #{finprodId}
     </update>
+
+    <select id="findValuation" resultType="com.joyintech.service.trade.transfer.common.dto.BondValuationDto">
+        select *from (
+         select fpv.FINPROD_ID finprodId,
+                fpv.VALUATION  valuation
+         from FIN_PRODUCT_VALUATION fpv
+                      left join FIN_PRODUCT fp on fpv.FINPROD_ID = fp.FINPROD_ID and fpv.FINPROD_TYPE2 = fp.FINPROD_TYPE2
+         where fpv.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
+           AND fpv.VAL_DATE &lt; to_date(#{tradeDate}, 'yyyy-MM-dd')
+            order by fpv.VAL_DATE desc
+         )
+        where rownum = 1
+    </select>
 </mapper>

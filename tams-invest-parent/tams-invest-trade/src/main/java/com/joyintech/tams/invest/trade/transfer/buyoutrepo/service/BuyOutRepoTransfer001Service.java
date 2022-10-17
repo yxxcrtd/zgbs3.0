@@ -289,27 +289,27 @@ public class BuyOutRepoTransfer001Service extends CommonExportService<BuyOutRepo
         param.setIsTotalTrade(DictCodeList.是否_否.getValue());
         param.setPortfolioId(baseTradeProductDealDto.getTrdProductDealAdd().getPortfolioId());
         param.setDeal(baseTradeProductDealDto.getTrdProductDeal());
-        BussTrdTransferOrderDto ret = bussTrdTransferOrderService.generateOrder(param);
-        List<BussTrdTransferOrderDto> bussTrdTransferOrderDtos = new ArrayList<>();
-        if (ret != null) {
-            bussTrdTransferOrderDtos.add(ret);
-            if(StringUtil.equals(OperationType.REVOKE.toString(), mode)) {
-                ret.setOrderStatus(DictCodeListExt1.指令状态_撤销.getValue());
-            }
-            if (StringUtil.equals(ret.getPs(), DictCodeListExt1.收支方向_支出.getValue())) {
-                ret.setMyAcctNo(ret.getPayAcctNo());
-                ret.setCounterAcctNo(ret.getRecAcctNo());
-            }
-            else {
-                ret.setMyAcctNo(ret.getRecAcctNo());
-                ret.setCounterAcctNo(ret.getPayAcctNo());
-            }
-            if (StringUtil.isNotEmpty(ret.getIsNeedSend())) {
-                if (DictCodeList.是否_是.getCodeName().equals(ret.getIsNeedSend())) {
-                    ret.setIsNeedSend(DictCodeList.是否_是.getValue());
+        List<BussTrdTransferOrderDto> bussTrdTransferOrderDtos = Arrays.asList(bussTrdTransferOrderService.generateOrder(param));
+        if (bussTrdTransferOrderDtos != null) {
+            for (BussTrdTransferOrderDto ret : bussTrdTransferOrderDtos) {
+                if(StringUtil.equals(OperationType.REVOKE.toString(), mode)) {
+                    ret.setOrderStatus(DictCodeListExt1.指令状态_撤销.getValue());
                 }
-                else if (DictCodeList.是否_否.getCodeName().equals(ret.getIsNeedSend())) {
-                    ret.setIsNeedSend(DictCodeList.是否_否.getValue());
+                if (StringUtil.equals(ret.getPs(), DictCodeListExt1.收支方向_支出.getValue())) {
+                    ret.setMyAcctNo(ret.getPayAcctNo());
+                    ret.setCounterAcctNo(ret.getRecAcctNo());
+                }
+                else {
+                    ret.setMyAcctNo(ret.getRecAcctNo());
+                    ret.setCounterAcctNo(ret.getPayAcctNo());
+                }
+                if (StringUtil.isNotEmpty(ret.getIsNeedSend())) {
+                    if (DictCodeList.是否_是.getCodeName().equals(ret.getIsNeedSend())) {
+                        ret.setIsNeedSend(DictCodeList.是否_是.getValue());
+                    }
+                    else if (DictCodeList.是否_否.getCodeName().equals(ret.getIsNeedSend())) {
+                        ret.setIsNeedSend(DictCodeList.是否_否.getValue());
+                    }
                 }
             }
             StlPayOrdersDto stl = gen划款指令流程(bussTrdTransferOrderDtos, baseTradeProductDealDto.getTrdProductDealAdd(), null);

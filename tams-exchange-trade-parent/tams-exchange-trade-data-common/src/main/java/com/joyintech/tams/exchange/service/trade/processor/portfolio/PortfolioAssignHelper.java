@@ -289,12 +289,17 @@ public class PortfolioAssignHelper {
 
         //历史明细
         Map<String, List<PortfolioDetail>> map = portfolioDetails.stream().collect(Collectors.groupingBy(PortfolioDetail::getPortfolioId));
+        Map<String, List<PortfolioDetail>> canselDetailsMap = canselDetails.stream().collect(Collectors.groupingBy(PortfolioDetail::getPortfolioId));
         for (PortfolioDetail detail : list) {
             // 历史数量 根据组合代码求和
             List<PortfolioDetail> detailList = map.get(detail.getPortfolioId());
+            List<PortfolioDetail> details = canselDetailsMap.get(detail.getPortfolioId());
             BigDecimal historyNum = BigDecimal.ZERO;
             if (CollectionUtils.isNotEmpty(detailList)) {
                 historyNum = historyNum.add(detailList.stream().map(PortfolioDetail::getTargetNum).reduce(BigDecimal.ZERO, BigDecimal::add));
+            }
+            if (CollectionUtils.isNotEmpty(details)) {
+                historyNum = historyNum.subtract(details.stream().map(PortfolioDetail::getTargetNum).reduce(BigDecimal.ZERO, BigDecimal::add));
             }
             detail.setTargetNum(NumberUtil.sub(detail.getTargetNum(), historyNum));
             detail.setTargetAmt(NumberUtil.round(NumberUtil.mul(detail.getTargetNum(), price), AMT_SCALE));

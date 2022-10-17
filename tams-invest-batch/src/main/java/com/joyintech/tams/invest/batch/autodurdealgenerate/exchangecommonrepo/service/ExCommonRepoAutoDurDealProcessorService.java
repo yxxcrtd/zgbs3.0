@@ -13,7 +13,6 @@ package com.joyintech.tams.invest.batch.autodurdealgenerate.exchangecommonrepo.s
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.util.*;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.StlPayTempOrdersMapper;
 import com.joyintech.tams.common.base.dao.TrdProductTempDealAddMapper;
 import com.joyintech.tams.common.base.dao.TrdProductTempDealMapper;
@@ -22,7 +21,6 @@ import com.joyintech.tams.component.business.settle.dto.BussSettleOrderParameter
 import com.joyintech.tams.component.business.trade.impl.BussTrdTransferOrderImplService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.batch.autodurdealgenerate.exchangecommonrepo.dao.ExCommonRepoAutoDurDealGenerateMapper;
 import com.joyintech.tams.invest.common.autoperiod.common.AutoPeriodCommonService;
@@ -34,6 +32,7 @@ import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.dto.period.trdrepoduration.TrdRepoDurationDto;
 import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,6 +88,12 @@ public class ExCommonRepoAutoDurDealProcessorService extends BaseService {
     @Autowired
     private BaseEtrCashPositionCommService baseEtrCashPositionCommService;
 
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
+
 
 
     /**
@@ -140,7 +145,7 @@ public class ExCommonRepoAutoDurDealProcessorService extends BaseService {
                 rollMapList.forEach(item -> {
                     String revokeId = String.valueOf(item.get("seqno"));
                     String modelType = (String) item.get("modelType");
-                    PositionHttpRequest.roll(revokeId, modelType, e.getMessage());
+                    positionRequestHandle.roll(revokeId, modelType, e.getMessage());
                 });
             }
             throw e;
@@ -170,7 +175,7 @@ public class ExCommonRepoAutoDurDealProcessorService extends BaseService {
         batchRevoke.put("userId", LoginUserUtil.getUserName());
         batchRevoke.put("totalTradeId", IDGenerator.generate());
         batchRevoke.put("modelType",DictCodeListExt1.子系统代码_交易.getValue());
-        rollMapList.add(PositionHttpRequest.batchRevoke(batchRevoke));
+        rollMapList.add(positionRequestHandle.batchRevoke(batchRevoke));
         return tradeIdList;
     }
 
@@ -256,7 +261,7 @@ public class ExCommonRepoAutoDurDealProcessorService extends BaseService {
         ptlCash.put("cashAcctId", spo.getMyAcctNo());
         ptlCashList.add(ptlCash);
         req.put("ptlCashList",ptlCashList);
-        return PositionHttpRequest.send(req);
+        return positionRequestHandle.send(req);
     }
 
     private TrdProductTempDeal genTrdProductTempDeal(TrdRepoDurationDto dto){

@@ -103,7 +103,7 @@ public class CfetsTrdQueryController extends BaseController {
         initPageParams.put("PS", this.getSelectDataFromDataDic(DictCode.交易方向, null));
         initPageParams.put("TRADE_MARKET", this.getSelectDataFromDataDic(DictCode.交易场所, null));
         initPageParams.put("ACCOUNT_SPEED", this.getSelectDataFromDataDic(DictCode.清算速度, null));
-        initPageParams.put("QUOTE_TYPE", this.getSelectDataFromDataDic(BussinessDictCode.报价方式, null));
+        initPageParams.put("QUOTE_TYPE", this.getSelectDataFromDataDic(BussinessDictCode.交易类型, null));
         initPageParams.put("STATUS_VALID", this.getSelectDataFromDataDic(DictCode.有效状态, null));
         initPageParams.put("MATCH_STATUS", this.getSelectDataFromDataDic(DictCode.匹配状态, null));
         initPageParams.put("REG_STATUS", this.getSelectDataFromDataDic(DictCode.登记状态, null));
@@ -114,7 +114,7 @@ public class CfetsTrdQueryController extends BaseController {
 
         initPageParams.put("TRD_MATCH_TYPE", this.getSelectDataFromDataDic(DictCode.下行交易匹配类型, null));
         initPageParams.put("CSTP_BUSINESS_TYPE", this.getSelectDataFromDataDic(DictCode.CSTP资产类型, null));
-        initPageParams.put("QUOTE_STYLE", this.getSelectDataFromDataDic(BussinessDictCode.报价方式_登记, null));
+        initPageParams.put("QUOTE_STYLE", this.getSelectDataFromDataDic(BussinessDictCode.报价方式, null));
         initPageParams.put("DELIVERY_STATUS", this.getSelectDataFromDataDic(DictCode.交收状态, null));
         initPageParams.put("SHARES_TRADE_MARKET", this.getSelectDataFromDataDic(DictCode.交易市场, null));
 

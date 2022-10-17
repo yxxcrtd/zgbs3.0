@@ -222,66 +222,79 @@
 		LEFT JOIN PA_PTL_PORTFOLIO T2 ON pp.PORTFOLIO_ID = T2.PORTFOLIO_ID
 		/*计算资产占比 start*/
 		/*债券*/
-		left join(SELECT distinct BOND.VALUE_DATE AS valueDate,
-		BOND.PRICE AS price,/*市价全价*/
-		BOND.VALUE_SOURCE valueSource,
-		T1.ISSUE_AMT / 10000 ISSUE_AMT,/*发行金额*/
-		T1.FINPROD_MARKET_ID FINPROD_MARKET_ID,
-		T1.TRADE_MARKET TRADE_MARKET
-		FROM MST_BOND_VALUATION_INFO BOND
-		left join FIN_PRODUCT T1 on T1.FINPROD_MARKET_ID = BOND.SEC_ID
-		WHERE T1.FINPROD_TYPE = 'F01'
-		<!--mody by   meifaxin  2021-9-26 on条件没有完成 start-->
-		AND T1.CCY = 'CNY' and BOND.VALUE_SOURCE = 'CBC' ) mbvi1 on mbvi1.FINPROD_MARKET_ID = fp.finprod_market_id
-		<!--mody by   meifaxin  2021-9-26 on条件没有完成 end-->
-		and fp.FINPROD_TYPE2 = 'F01' and fp.TRADE_MARKET = '01'
-		<if test="searchDate != null and searchDate != ''">
-			and TO_DATE(to_char(mbvi1.valueDate,'yyyy-mm-dd'),'YYYY-MM-DD') <![CDATA[<=]]>
-			TO_DATE(#{searchDate},'YYYY-MM-DD')
-		</if>
-		left join(SELECT distinct BOND.VALUE_DATE AS valueDate,
-		BOND.PRICE AS price,/*市价全价*/
-		BOND.VALUE_SOURCE valueSource,
-		T1.ISSUE_AMT / 10000 ISSUE_AMT,/*发行金额*/
-		T1.FINPROD_MARKET_ID FINPROD_MARKET_ID,
-		T1.TRADE_MARKET TRADE_MARKET
-		FROM MST_BOND_VALUATION_INFO BOND
-		left join FIN_PRODUCT T1 on T1.FINPROD_MARKET_ID = BOND.SEC_ID
-		WHERE T1.FINPROD_TYPE = 'F01'
-		<!--mody by   meifaxin  2021-9-26 on条件没有完成 start-->
-		AND T1.CCY = 'CNY' and BOND.VALUE_SOURCE = 'CSD' ) mbvi2 on mbvi2.FINPROD_MARKET_ID=fp.finprod_market_id
-		<!--mody by   meifaxin  2021-9-26 on条件没有完成 end-->
-		    and fp.FINPROD_TYPE2 = 'F01' and fp.TRADE_MARKET != '01'
-		<if test="searchDate != null and searchDate != ''">
-			and TO_DATE(to_char(mbvi2.valueDate,'yyyy-mm-dd'),'YYYY-MM-DD') <![CDATA[<=]]>
-			TO_DATE(#{searchDate},'YYYY-MM-DD')
-		</if>
+		left join(
+			SELECT distinct BOND.VALUE_DATE AS   valueDate,
+				BOND.PRICE      AS   price,/*市价全价*/
+				BOND.VALUE_SOURCE    valueSource,
+				T1.ISSUE_AMT / 10000 ISSUE_AMT,/*发行金额*/
+				T1.FINPROD_MARKET_ID FINPROD_MARKET_ID,
+				T1.TRADE_MARKET      TRADE_MARKET
+			FROM MST_BOND_VALUATION_INFO BOND
+			INNER join FIN_PRODUCT T1 on T1.FINPROD_MARKET_ID = BOND.SEC_ID
+			INNER JOIN (
+				SELECT MAX(VALUE_DATE) VALUE_DATE, SEC_ID, VALUE_SOURCE FROM MST_BOND_VALUATION_INFO
+				<if test="searchDate != null and searchDate != ''">
+					WHERE  VALUE_DATE &lt;= TO_DATE(#{searchDate},'YYYY-MM-DD')
+				</if>
+				GROUP BY SEC_ID,VALUE_SOURCE
+			) MAX_DATA ON BOND.SEC_ID = MAX_DATA.SEC_ID AND BOND.VALUE_SOURCE = MAX_DATA.VALUE_SOURCE AND BOND.VALUE_DATE = MAX_DATA.VALUE_DATE
+			WHERE T1.FINPROD_TYPE = 'F01'
+		  	AND T1.CCY = 'CNY'
+		  	and BOND.VALUE_SOURCE = 'CBC'
+		) mbvi1 on mbvi1.FINPROD_MARKET_ID = fp.finprod_market_id and fp.FINPROD_TYPE2 = 'F01' and fp.TRADE_MARKET = '01'
+		left join(
+			SELECT distinct BOND.VALUE_DATE AS   valueDate,
+				BOND.PRICE      AS   price,/*市价全价*/
+				BOND.VALUE_SOURCE    valueSource,
+				T1.ISSUE_AMT / 10000 ISSUE_AMT,/*发行金额*/
+				T1.FINPROD_MARKET_ID FINPROD_MARKET_ID,
+				T1.TRADE_MARKET      TRADE_MARKET
+			FROM MST_BOND_VALUATION_INFO BOND
+			INNER join FIN_PRODUCT T1 on T1.FINPROD_MARKET_ID = BOND.SEC_ID
+			INNER JOIN (
+				SELECT MAX(VALUE_DATE) VALUE_DATE, SEC_ID, VALUE_SOURCE FROM MST_BOND_VALUATION_INFO
+				<if test="searchDate != null and searchDate != ''">
+					WHERE  VALUE_DATE &lt;= TO_DATE(#{searchDate},'YYYY-MM-DD')
+				</if>
+				GROUP BY SEC_ID,VALUE_SOURCE
+			) MAX_DATA ON BOND.SEC_ID = MAX_DATA.SEC_ID AND BOND.VALUE_SOURCE = MAX_DATA.VALUE_SOURCE AND BOND.VALUE_DATE = MAX_DATA.VALUE_DATE
+			WHERE T1.FINPROD_TYPE = 'F01'
+		  	AND T1.CCY = 'CNY'
+		  	and BOND.VALUE_SOURCE = 'CSD'
+		) mbvi2 on mbvi1.FINPROD_MARKET_ID = fp.finprod_market_id and fp.FINPROD_TYPE2 = 'F01' and fp.TRADE_MARKET = '01'
 		/*基金*/
-		left join(SELECT P.FINPROD_MARKET_ID finprodMarketId,
-		V.VAL_DATE valDate,
-		V.VALUATION valuation, /*单位净值*/
-		V.C_SHARES cShares /*基金行情总份额值*/
-		FROM FIN_PRODUCT P
-		INNER JOIN FIN_PRODUCT_VALUATION V
-		ON P.FINPROD_MARKET_ID = V.FINPROD_ID and p.FINPROD_TYPE = V.FINPROD_TYPE
-		INNER JOIN FIN_PRODUCT_TYPE TYPE ON P.FINPROD_ID = TYPE.FINPROD_ID
-		LEFT JOIN MST_CUSTOMER_INFO CUST
-		ON CUST.CUSTOMER_ID = P.MANAGER AND CUST.IS_ASSTE_MANAGER = 'Y'
-		WHERE P.FINPROD_TYPE = 'F06') jji
+		left join(
+			SELECT P.FINPROD_MARKET_ID finprodMarketId,
+				V.VAL_DATE          valDate,
+				V.VALUATION         valuation, /*单位净值*/
+				V.C_SHARES          cShares /*基金行情总份额值*/
+		   	FROM FIN_PRODUCT P
+			INNER JOIN FIN_PRODUCT_VALUATION V ON P.FINPROD_MARKET_ID = V.FINPROD_ID and p.FINPROD_TYPE = V.FINPROD_TYPE
+			INNER JOIN FIN_PRODUCT_TYPE TYPE ON P.FINPROD_ID = TYPE.FINPROD_ID
+			INNER JOIN (
+		   		SELECT MAX(VAL_DATE) VAL_DATE, FINPROD_ID FROM FIN_PRODUCT_VALUATION
+		    	<if test="searchDate != null and searchDate != ''">
+					WHERE  VAL_DATE &lt;= TO_DATE(#{searchDate},'YYYY-MM-DD')
+				</if>
+		   		GROUP BY FINPROD_ID
+		   	) MAX_DATA ON V.FINPROD_ID = MAX_DATA.FINPROD_ID AND V.VAL_DATE = MAX_DATA.VAL_DATE
+			LEFT JOIN MST_CUSTOMER_INFO CUST ON CUST.CUSTOMER_ID = P.MANAGER AND CUST.IS_ASSTE_MANAGER = 'Y'
+		   	WHERE P.FINPROD_TYPE = 'F06'
+		) jji
 		<!--mody by   meifaxin  2021-9-26 on条件没有完成 start-->
 		on jji.finprodMarketId=fp.finprod_market_id  and fp.FINPROD_TYPE2 = 'F06'
 		<!--mody by   meifaxin  2021-9-26 on条件没有完成 end-->
-		    <if test="searchDate != null and searchDate != ''">
-			and TO_DATE(to_char(jji.valDate,'yyyy-mm-dd'),'YYYY-MM-DD') <![CDATA[<=]]>
-			TO_DATE(#{searchDate},'YYYY-MM-DD')
-		</if>
 		/*股票*/
-		left join mst_share_price msp
-		on msp.shares_id = fp.finprod_market_id and fp.FINPROD_TYPE2 = 'F10'
-		<if test="searchDate != null and searchDate != ''">
-			and TO_DATE(to_char(msp.DEAL_DATE,'yyyy-mm-dd'),'YYYY-MM-DD') <![CDATA[<=]]>
-			TO_DATE(#{searchDate},'YYYY-MM-DD')
-		</if>
+		LEFT JOIN (
+			SELECT T.* FROM mst_share_price T
+			INNER JOIN (
+				SELECT MAX(DEAL_DATE) DEAL_DATE, shares_id FROM mst_share_price
+				<if test="searchDate != null and searchDate != ''">
+					WHERE DEAL_DATE &lt;= TO_DATE(#{searchDate},'YYYY-MM-DD')
+				</if>
+		    	GROUP BY shares_id
+			) T1 ON T1.DEAL_DATE = T.DEAL_DATE AND T.shares_id = T1.shares_id
+		) msp on msp.shares_id = fp.finprod_market_id and fp.FINPROD_TYPE2 = 'F10'
 		/*计算资产占比 end*/
 		<!--   add  by chenjiaxing 单一资产持仓分析添加资产占比，组合募集信息  end -->
 		where 1=1
@@ -457,7 +470,7 @@
 			select assetHold1.finprodMarketId,assetHold1.finprodAbbr,null portFolioName,sum(assetHold1.marketValue) as marketValue,
 			sum(assetHold1.dscCostAmt) as dscCostAmt,sum(assetHold1.shareAmt) as shareAmt,
 			round(sum(nvl(assetHold1.marketValue,0))/sum(assetHold1.tdyAssetValue)*100,2) as marketValueRatio,null portfolioId,'02' as hasChildren
-			,'root' parentInfo,assetHold1.finprodMarketId childInfo,assetHold1.ptlIssueType ptlIssueType,
+			,'root' parentInfo,assetHold1.finprodMarketId childInfo,null ptlIssueType,
 			case when assetHold1.assetRatioTemp > 0 then (sum(assetHold1.marketValue)/assetHold1.assetRatioTemp)*100 else null end as assetRatio
 			from (
 			SELECT
@@ -473,7 +486,7 @@
 			</if>
 			) assetHold1
 			WHERE decode(NVL(assetHold1.shareAmt,0),0,NVL(assetHold1.marketValue,0),NVL(assetHold1.shareAmt,0)) !=0
-			group by assetHold1.finprodMarketId,assetHold1.finprodAbbr,assetHold1.ptlIssueType,assetHold1.assetRatioTemp
+			group by assetHold1.finprodMarketId,assetHold1.finprodAbbr,assetHold1.assetRatioTemp
 		</if>
 		<if test="parentId != null and parentId neq 'root'">
 			select null finprodMarketId,null finprodAbbr,assetHold1.portFolioName,assetHold1.marketValue,assetHold1.dscCostAmt,NVL(assetHold1.shareAmt,0) shareAmt,

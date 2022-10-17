@@ -418,7 +418,7 @@ public class SecReceicableTradeTemplateRecService {
         String tradeId=interfCommonService.getTradeid(dto.getPs(),dto.getTradeDate(),"A");
         valFinProductDeal.setTradeId(tradeId);
         // 业务类型 = 02 债券交易
-        valFinProductDeal.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+        valFinProductDeal.setBusiType(DictCodeList.业务类型_债券交易.getValue());
         // 金融产品代码 = C.资产代码
         valFinProductDeal.setFinprodId(dto.getAssetId());
         // 金融产品类型 = F01 债券

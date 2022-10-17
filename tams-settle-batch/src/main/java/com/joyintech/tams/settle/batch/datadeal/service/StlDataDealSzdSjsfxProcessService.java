@@ -107,7 +107,7 @@ public class StlDataDealSzdSjsfxProcessService {
             //净价总额修改为 单位净价* 交易份额
             settleTransData.setCpriceAmt(ArithmeticUtil.multiply(settleTransData.getUnitCprice(), settleTransData.getShareAmt()));
             // 业务类型
-            settleTransData.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+            settleTransData.setBusiType(DictCodeList.业务类型_债券交易.getValue());
             // 利息总额
             settleTransData.setIntAmt(BigDecimal.ZERO);
             // 交易本金改为 交易份额 * 债券的最新面值

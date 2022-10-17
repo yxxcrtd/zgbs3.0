@@ -704,7 +704,7 @@ public class InterfCommonService {
         /* 2.1入账信息表(BOK_DEAL_ACCOUNTING) */
         String invAimMethod = null;
         if (DictCodeListExt1.金融产品类型_债券.getValue().equals(deal.getFinprodType())
-            && DictCodeList.业务类型_银行间债券交易.getValue().equals(deal.getBusiType())) {
+            && DictCodeList.业务类型_债券交易.getValue().equals(deal.getBusiType())) {
             BokBooksetExt bokBooksetExt = queryBokBooksetExtbyId(DictCode.投资目的获取方式.getValue(),
                 valBooksetInfoDto.getBooksetId());
             // added by wangzhiang 增加入账信息投资目的 20181208 start
@@ -3771,7 +3771,7 @@ public class InterfCommonService {
             return acctType;
         }
         // 判断交易是否为交易所债券、回购二级市场交易、标的券交易
-        if ((DictCodeList.业务类型_银行间债券交易.getValue().equals(productDealDto.getBusiType())
+        if ((DictCodeList.业务类型_债券交易.getValue().equals(productDealDto.getBusiType())
                 || DictCodeList.业务类型_债券质押式回购交易.getValue().equals(productDealDto.getBusiType())
                 || DictCodeList.业务类型_债券买断式回购交易.getValue().equals(productDealDto.getBusiType())
                 || DictCodeList.业务类型_债券借贷标的债券交易.getValue().equals(productDealDto.getBusiType()))
@@ -7309,7 +7309,7 @@ public class InterfCommonService {
         for (ValBooksetInfoDto bokBookset : bokSetList) {
         	String invAimMethod = null;
             if (DictCodeListExt1.金融产品类型_债券.getValue().equals(trdProductDeal.getFinprodType())
-                && DictCodeList.业务类型_银行间债券交易.getValue().equals(trdProductDeal.getBusiType())) {
+                && DictCodeList.业务类型_债券交易.getValue().equals(trdProductDeal.getBusiType())) {
                 BokBooksetExt bokBooksetExt = queryBokBooksetExtbyId(DictCode.投资目的获取方式.getValue(),
                 		bokBookset.getBooksetId());
                 invAimMethod = bokBooksetExt != null ? bokBooksetExt.getParamValue() : DictCodeListExt1.投资目的获取方式_上游提供.getValue();

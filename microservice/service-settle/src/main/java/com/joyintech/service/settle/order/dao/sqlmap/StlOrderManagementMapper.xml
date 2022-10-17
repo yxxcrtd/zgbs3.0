@@ -32,7 +32,7 @@
         SELECT
         NVL(T4.P_TOTLE_TRADE_ID, T4.TOTLE_TRADE_ID) bizCode,
         T10.ORDER_ID orderId,
-        nvl(t5.PA_BUSS_TYPE,T4.TG_BUSI_TYPE) paBizType,
+        NVL(nvl(t5.PA_BUSS_TYPE, T4.TG_BUSI_TYPE),PTPD.PA_BUSS_TYPE) paBizType,
         T10.PAY_TYPE,
         nvl(t4.PORTFOLIO_ID,pp.PORTFOLIO_ID) PORTFOLIO_ID,
         nvl(t7.PORTFOLIO_NAME,pp.PORTFOLIO_NAME) PORTFOLIO_NAME,
@@ -71,6 +71,8 @@
         LEFT JOIN PTL_CAPACCT_INFO T11 ON T4.PORTFOLIO_ID = T11.PORTFOLIO_ID AND T11.ACCT_NO = T10.MY_ACCT_NO AND T11.CCY = T4.CCY
         LEFT JOIN FIN_PRODUCT_ADD FPA ON T4.CHL_ID = FPA.FINPROD_ID
         LEFT JOIN INF_PAY_ORDERS_STATUS IPO ON T10.ORDER_ID = IPO.ORDER_ID
+        LEFT JOIN TRD_PRODUCT_DEAL TPD ON TPD.TOTLE_TRADE_ID = T4.TOTLE_TRADE_ID
+        LEFT JOIN PA_TRD_PRODUCT_DEAL PTPD ON PTPD.TRADE_ID = TPD.TRADE_ID
         WHERE (T5.PA_BUSS_TYPE IN (#{PA_BUSINESS_TYPE03},
         <!-- 利率型交易买入 yjm start 20190918-->
         #{PA_BUSINESS_TYPE33},
@@ -97,7 +99,8 @@
         #{PA_BUSINESS_TYPE107},
         #{PA_BUSINESS_TYPE137},
         #{PA_BUSINESS_TYPE138},
-        #{PA_BUSINESS_TYPE100})
+        #{PA_BUSINESS_TYPE100}, '145','148','149','38','39','40','41','45','46','47','48','49','50','54','56','58','66',
+        '67','68','73','24','28','09','10','34','30','32')
         <!--add by  caiqun 20200921 09债券类资产买入  用TRD_FIN_PRODUCT_DEAL_TOTAL关联STL_PAY_ORDERS  start-->
         OR (T5.PA_BUSS_TYPE IN (#{PA_BUSINESS_TYPE09}) AND (T4.TRADE_MARKET IN (#{TP03}, #{TP04}) AND T4.TRADE_MARKET_MODE = #{STM_01})/*以及交易所一级市场债券买入*/)
         OR (T5.PA_BUSS_TYPE IN (#{PA_BUSINESS_TYPE09}) AND (T4.TRADE_MARKET IN (#{TP01}) AND T4.TRADE_MARKET_MODE = #{STM_01} AND T4.TRADE_PLAT in (#{SHARES_TRADE_PLATFORM_01},#{SHARES_TRADE_PLATFORM_99}))/*银行间一级市场交易平台是其他*/)
@@ -107,13 +110,15 @@
         OR (T5.PA_BUSS_TYPE IN (#{PA_BUSINESS_TYPE52}, #{PA_BUSINESS_TYPE76}) AND FPA.PAY_TYPE = #{PAY_TYPE01})
         OR (T4.FINPROD_TYPE2 IN (#{F29}, #{F30}, #{F10}, #{F11}, #{F12}, #{F13}, #{F14}) AND T10.PS = #{PS01})
         OR (T4.FINPROD_TYPE2 = #{F35})
+        OR (TPD.IS_OUT_TRADE = 'N' AND PTPD.PA_BUSS_TYPE = #{PA_BUSINESS_TYPE33})
         OR T4.TG_BUSI_TYPE IN (#{PA_BUSINESS_TYPE03}, #{PA_BUSINESS_TYPE33}, #{PA_BUSINESS_TYPE17},
         #{PA_BUSINESS_TYPE06}, #{PA_BUSINESS_TYPE01}, #{PA_BUSINESS_TYPE02},
         #{PA_BUSINESS_TYPE05}, #{PA_BUSINESS_TYPE04}, #{PA_BUSINESS_TYPE07},
         #{PA_BUSINESS_TYPE08}, #{PA_BUSINESS_TYPE35}, #{PA_BUSINESS_TYPE36},
         #{PA_BUSINESS_TYPE11}, #{PA_BUSINESS_TYPE42}, #{PA_BUSINESS_TYPE43},
         #{PA_BUSINESS_TYPE116}, #{PA_BUSINESS_TYPE37}, #{PA_BUSINESS_TYPE107},#{PA_BUSINESS_TYPE137},
-        #{PA_BUSINESS_TYPE138},#{PA_BUSINESS_TYPE100}, #{PA_BUSINESS_TYPE180} , #{PA_BUSINESS_TYPE202} )
+        #{PA_BUSINESS_TYPE138},#{PA_BUSINESS_TYPE100}, #{PA_BUSINESS_TYPE180} , #{PA_BUSINESS_TYPE202},'145','148','149'
+        ,'38','39','40','41','45','46','47','48','49','50','54','56','58','66','67','68','73','24','28')
         )
         /*
         OR  (T4.PS IN ('C6','C1','C2','C4','C9','C5','C20','C17','C3') AND T4.TRADE_STATUS='01' AND T4.IS_CANCEL='N' AND (T4.IS_CANCEL IS NOT NULL OR T4.IS_CANCEL='N'))
@@ -126,10 +131,10 @@
         AND T10.IS_NEED_SEND = #{YES}
         <if test="portfolioId != null and !portfolioId.isEmpty()">
             <foreach collection="portfolioId" open="AND (T10.PORTFOLIO_ID in (" close=")" item="item" index="index" separator=",">
-            <if test="(index % 998) == 0">
-				null) or T10.PORTFOLIO_ID in (
-			</if>
-            #{item}
+                <if test="(index % 998) == 0">
+                    null) or T10.PORTFOLIO_ID in (
+                </if>
+                #{item}
             </foreach>)
         </if>
         <if test="finprodId != null and !finprodId.isEmpty()">
@@ -168,11 +173,11 @@
         T10.ORDER_ID orderId,
         nvl(T8.PA_BUSS_TYPE,T4.TG_BUSI_TYPE) paBizType,
         NVL(T10.PAY_TYPE, T12.PAY_TYPE) PAY_TYPE,
-        T5.PORTFOLIO_ID,
-        t7.PORTFOLIO_NAME,
+        nvl(T5.PORTFOLIO_ID,pp.PORTFOLIO_ID) PORTFOLIO_ID,
+        nvl(t7.PORTFOLIO_NAME,pp.PORTFOLIO_NAME) PORTFOLIO_NAME,
         t6.FINPROD_ID finprodId,
-        t6.FINPROD_MARKET_ID,
-        nvl(t6.FINPROD_ABBR, t6.FINPROD_NAME) finprodName,
+        nvl(t6.FINPROD_MARKET_ID,pp.PORTFOLIO_ID) FINPROD_MARKET_ID,
+        nvl(nvl(t6.FINPROD_ABBR, t6.FINPROD_NAME),pp.PORTFOLIO_NAME) finprodName,
         to_char(NVL(T10.SETTLE_DATE, T12.SETTLE_DATE), 'yyyy-MM-dd') SETTLE_DATE,
         NVL(T10.SETTLE_AMT, T12.SETTLE_AMT) SETTLE_AMT,
         NVL(T10.CCY, T12.CCY) CCY,
@@ -189,7 +194,7 @@
         IPO.ORDER_RET_STATUS orderRetStatus,
         T6.PROFIT_TYPE,
         '${NO}' isDvp,
-        0  paBizTypeAdd
+        case when T5.PORTFOLIO_ID is not null then 0 else 1 end  paBussTypeAdd
         FROM TRD_PRODUCT_DEAL T4
         LEFT JOIN TRD_PRODUCT_DEAL_ADD T5 ON T4.TRADE_ID = T5.TRADE_ID
         LEFT JOIN PA_TRD_PRODUCT_DEAL T8 ON T4.TRADE_ID = T8.TRADE_ID
@@ -197,6 +202,7 @@
         LEFT JOIN PTL_PORTFOLIO T7 ON T5.PORTFOLIO_ID = T7.PORTFOLIO_ID
         LEFT JOIN TRD_FIN_PRODUCT_DEAL_TOTAL T11 ON T4.TOTLE_TRADE_ID = T11.TOTLE_TRADE_ID
         LEFT JOIN STL_PAY_ORDERS T10 ON T10.TRADE_ID = T4.TRADE_ID AND T10.IS_TOTAL_TRADE=#{NO} AND T10.ORDER_STATUS = #{ORDER_STATUS_01}
+        LEFT JOIN PTL_PORTFOLIO pp ON T10.PORTFOLIO_ID = pp.PORTFOLIO_ID
         <!-- 查询列表中增加“付款账户”、“付款账户名称”、“收款账户”、“收款账户名称”、“划款用途”、“币种” 20191030 add by renping start -->
         LEFT JOIN STL_CAPACCT_INFO T02 /*收款方*/ON ((T10.PS = #{PS01} and T10.MY_ACCT_NO = T02.ACCT_NO) OR (T10.PS = #{PS02} and T10.COUNTER_ACCT_NO =
         T02.ACCT_NO))
@@ -224,7 +230,8 @@
         #{PA_BUSINESS_TYPE97},
         #{PA_BUSINESS_TYPE29},
         <!--add by  yujinfa 20201021 增加计划类净值型卖出 start-->
-        #{PA_BUSINESS_TYPE200})
+        #{PA_BUSINESS_TYPE200}, '145','148','149','13','18','34','38','39','40','41','45','46','47','48','49','50','54',
+        '56','58','66','67','68','73','24','28','09','10','34','30','32')
         <!--add by  yujinfa 20201021 增加计划类净值型卖出 end-->
         <!--add by  caiqun 20200921 09债券类资产买入  用TRD_FIN_PRODUCT_DEAL_TOTAL关联STL_PAY_ORDERS  start-->
         <!--
@@ -234,11 +241,11 @@
         AND FPA.PAY_TYPE = #{PAY_TYPE01}
         )
         -->
-        OR (T8.PA_BUSS_TYPE IN (#{PA_BUSINESS_TYPE12}, #{PA_BUSINESS_TYPE19}, #{PA_BUSINESS_TYPE75}) AND FPA.PAY_TYPE = #{PAY_TYPE01})        
-		<!--add by  caiqun 20200921 09债券类资产买入  用TRD_FIN_PRODUCT_DEAL_TOTAL关联STL_PAY_ORDERS  end-->
+        OR (T8.PA_BUSS_TYPE IN (#{PA_BUSINESS_TYPE12}, #{PA_BUSINESS_TYPE19}, #{PA_BUSINESS_TYPE75}) AND FPA.PAY_TYPE = #{PAY_TYPE01})
+        <!--add by  caiqun 20200921 09债券类资产买入  用TRD_FIN_PRODUCT_DEAL_TOTAL关联STL_PAY_ORDERS  end-->
         OR (T4.FINPROD_TYPE2 IN (#{F29},#{F30}, #{F10}, #{F11}, #{F12}, #{F13}, #{F14}) AND T10.PS = #{PS01})
         OR (T4.TG_BUSI_TYPE IN (#{PA_BUSINESS_TYPE09}) AND T4.TRADE_MARKET =#{TP02})
-	    OR (T4.FINPROD_TYPE2 = #{F35})
+        OR (T4.FINPROD_TYPE2 = #{F35})
         OR T4.TG_BUSI_TYPE IN ( #{PA_BUSINESS_TYPE12}, #{PA_BUSINESS_TYPE16},
         #{PA_BUSINESS_TYPE63},  #{PA_BUSINESS_TYPE65}, #{PA_BUSINESS_TYPE86}, #{PA_BUSINESS_TYPE64},
         #{PA_BUSINESS_TYPE21}, #{PA_BUSINESS_TYPE22}, #{PA_BUSINESS_TYPE25}, #{PA_BUSINESS_TYPE97},
@@ -251,9 +258,8 @@
         AND T4.TRADE_STATUS = #{TRADE_STATUS_01}
         AND (T4.IS_CANCEL IS NULL OR T4.IS_CANCEL = #{NO})
         AND T10.IS_NEED_SEND = #{YES}
-
         <if test="portfolioId != null and !portfolioId.isEmpty()">
-            <foreach collection="portfolioId" open="AND T5.PORTFOLIO_ID in (" close=")" item="item" separator=",">#{item}</foreach>
+            <foreach collection="portfolioId" open="AND upper(T10.PORTFOLIO_ID) in (" close=")" item="item" separator=",">upper(#{item})</foreach>
         </if>
         <if test="finprodId != null and !finprodId.isEmpty()">
             <foreach collection="finprodId" open="AND T4.FINPROD_ID in (" close=")" item="item" separator=",">#{item}</foreach>
@@ -277,7 +283,7 @@
             AND NVL(T10.SETTLE_DATE, T12.SETTLE_DATE) &lt;= TO_DATE(#{cashDateEnd}, 'yyyy-MM-dd')
         </if>
         <if test="paBusinessType != null and !paBusinessType.isEmpty()">
-           AND (
+            AND (
             <foreach collection="paBusinessType" open=" T8.PA_BUSS_TYPE in (" close=")" item="item" separator=",">#{item}</foreach>
             <foreach collection="paBusinessType" open="OR T4.TG_BUSI_TYPE in (" close=")" item="item" separator=",">#{item}</foreach>
             )
@@ -390,7 +396,7 @@
         <if test="portfolioId != null and !portfolioId.isEmpty()">
             and stl.PORTFOLIO_ID in <foreach collection="portfolioId" item="item" separator="," open="(" close=")">#{item}</foreach>
         </if>
-   		 <if test="cashDateStart != null and !cashDateStart.isEmpty()">
+        <if test="cashDateStart != null and !cashDateStart.isEmpty()">
             AND stl.SETTLE_DATE >= TO_DATE(#{cashDateStart}, 'yyyy-MM-dd')
         </if>
         <if test="cashDateEnd != null and !cashDateEnd.isEmpty()">
@@ -419,30 +425,30 @@
         </where>
     </select>
 
-	<!-- 根据接口给的交易编号查询对应的指令编号 -->
+    <!-- 根据接口给的交易编号查询对应的指令编号 -->
     <select id="findOrderIdByTradeId" resultType="com.joyintech.tams.invest.common.dto.settle.order.StlOrderManagementDto">
         SELECT
-		    spo.ORDER_ID
-		FROM
-		    STL_PAY_ORDERS spo
-		LEFT JOIN
-		    TRD_PRODUCT_DEAL tpd1
-		ON
-		    spo.TRADE_ID = tpd1.TRADE_ID
-		AND (
-		        tpd1.IS_CANCEL IS NULL
-		    OR  tpd1.IS_CANCEL = #{YES_NO_NO})
-		AND tpd1.TRADE_STATUS = #{TRADE_STATUS_01}
-		LEFT JOIN
-		    TRD_PRODUCT_DEAL tpd2
-		ON
-		    spo.TRADE_ID = tpd2.TOTLE_TRADE_ID
-		AND (
-		        tpd2.IS_CANCEL IS NULL
-		    OR  tpd2.IS_CANCEL = #{YES_NO_NO})
-		AND tpd2.TRADE_STATUS = #{TRADE_STATUS_01}
-		WHERE
-		    tpd1.TRADE_ID = #{tradeId}
-		OR  tpd2.TRADE_ID = #{tradeId}
+            spo.ORDER_ID
+        FROM
+            STL_PAY_ORDERS spo
+                LEFT JOIN
+            TRD_PRODUCT_DEAL tpd1
+            ON
+                        spo.TRADE_ID = tpd1.TRADE_ID
+                    AND (
+                                    tpd1.IS_CANCEL IS NULL
+                                OR  tpd1.IS_CANCEL = #{YES_NO_NO})
+                    AND tpd1.TRADE_STATUS = #{TRADE_STATUS_01}
+                LEFT JOIN
+            TRD_PRODUCT_DEAL tpd2
+            ON
+                        spo.TRADE_ID = tpd2.TOTLE_TRADE_ID
+                    AND (
+                                    tpd2.IS_CANCEL IS NULL
+                                OR  tpd2.IS_CANCEL = #{YES_NO_NO})
+                    AND tpd2.TRADE_STATUS = #{TRADE_STATUS_01}
+        WHERE
+            tpd1.TRADE_ID = #{tradeId}
+           OR  tpd2.TRADE_ID = #{tradeId}
     </select>
 </mapper>

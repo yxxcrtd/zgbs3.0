@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.invest.common.trade.dao.TrdCommonBaseMapper;
 import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -140,6 +141,9 @@ public class TrdProjectInvestTrade002Service extends BaseService<TrdProjectInves
 
     @Autowired
     PtlTradeMapper ptlTradeMapper;
+
+    @Autowired
+    private TrdCommonBaseMapper trdCommonBaseMapper;
 
     @Autowired
     private PaTrdProductDealMapper paTrdProductDealMapper;
@@ -1850,6 +1854,11 @@ public class TrdProjectInvestTrade002Service extends BaseService<TrdProjectInves
 
     @Override
     public void doBack(TrdProjectInvestTrade002Dto entity) {
+        // 是否转仓交易  - 转仓交易退回不做任何处理
+        FinProductAdd finProductAdd = trdCommonBaseMapper.selectFinProductAdd(entity.getFinprodId());
+        if (null != finProductAdd && "Y".equals(finProductAdd.getIsInnerAdv())) {
+            return;
+        }
         AllTradeCommonUtil.deletePosition(entity.getRevokeReason(), entity.getBizCode());
         AllTradeCommonUtil.deletePosition(entity.getRevokeReason(), entity.getTradeId());
         

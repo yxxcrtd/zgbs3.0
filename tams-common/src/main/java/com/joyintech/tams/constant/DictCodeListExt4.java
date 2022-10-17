@@ -201,6 +201,11 @@ public enum DictCodeListExt4 implements BaseDictCodeList {
     头寸业务类型_银行间债券借贷收付息还本(DictCode.头寸业务类型,"41","银行间债券借贷收付息还本"),
     头寸业务类型_银行间债券借贷到期(DictCode.头寸业务类型,"42","银行间债券借贷到期"),
 
+    匹配业务类型_一级申购(DictCode.匹配业务类型,"matchFeatures01","一级申购"),
+    匹配业务类型_现券买卖(DictCode.匹配业务类型,"matchFeatures02","现券买卖"),
+    匹配业务类型_质押式回购首期(DictCode.匹配业务类型,"matchFeatures03","质押式回购首期"),
+    匹配方式_自动匹配(DictCode.匹配方式,"01","自动匹配"),
+    匹配方式_手工匹配(DictCode.匹配方式,"02","手工匹配"),
 
     ;
     /**

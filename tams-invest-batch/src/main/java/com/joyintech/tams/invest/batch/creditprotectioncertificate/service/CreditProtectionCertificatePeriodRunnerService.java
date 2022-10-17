@@ -4,7 +4,6 @@ import com.joyintech.batch.batchbase.exception.BatchException;
 import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.util.*;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
@@ -16,7 +15,6 @@ import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditPro
 import com.joyintech.tams.invest.batch.creditprotectioncertificate.dto.CreditProtectionCertificatePeriodWriterDto;
 import com.joyintech.tams.invest.batch.susprdfutureopenplangen.relyingonresources.InvDateCalService;
 import com.joyintech.tams.invest.common.component.base.core.BaseGetBussinessId;
-import com.joyintech.tams.invest.common.component.base.group.impl.BasePtlCashPositionInfoServiceImpl;
 import com.joyintech.tams.invest.common.component.base.group.impl.BasePtlSecPositionInfoServiceImpl;
 import com.joyintech.tams.invest.common.constant.InterfCommonConstant;
 import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
@@ -27,6 +25,7 @@ import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.invest.common.position.service.CommonPositionService;
 import com.joyintech.tams.invest.common.risktrialrds.util.RiskUtil;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,8 +98,11 @@ public class CreditProtectionCertificatePeriodRunnerService {
     @Autowired
     private BasePtlSecPositionInfoServiceImpl basePtlSecPositionInfoServiceImpl;
 
+    /**
+     * 头寸引擎
+     */
     @Autowired
-    private BasePtlCashPositionInfoServiceImpl basePtlCashPositionInfoServiceImpl;
+    private PositionRequestHandle positionRequestHandle;
 
     /**
      * 是否单体服务
@@ -425,11 +427,11 @@ public class CreditProtectionCertificatePeriodRunnerService {
             ptlList.add(ptl);
         }
         resultMap.put("ptlList", ptlList);
-        PositionHttpRequest.send(resultMap);
+        positionRequestHandle.send(resultMap);
     }
 
     public void doRevokePositionForNew(String busiCode) {
-        PositionHttpRequest.dorevoke(busiCode, DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_信用保护凭证存续期.getValue(), DictCodeList.交易方向_到期.getValue());
+        positionRequestHandle.dorevoke(busiCode, DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_信用保护凭证存续期.getValue(), DictCodeList.交易方向_到期.getValue());
     }
 
     public void doRevokePositionForOld(String busiCode) {

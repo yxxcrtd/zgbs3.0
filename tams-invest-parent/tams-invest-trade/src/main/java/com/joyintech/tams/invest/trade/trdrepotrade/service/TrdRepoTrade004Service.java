@@ -12,10 +12,8 @@ import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysWflBusinessList;
-import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -38,6 +36,9 @@ import com.joyintech.tams.invest.trade.bondlend.dto.TrdSecLendCashPositionDto;
 import com.joyintech.tams.invest.trade.bondlend.dto.TrdSecLendPositionDto;
 import com.joyintech.tams.invest.trade.bondlend.dto.TrdSecLendSecPositionDto;
 import com.joyintech.tams.invest.trade.trdrepotrade.dto.TrdRepoTrade004Dto;
+import com.joyintech.tams.position.constant.PositionConstant;
+import com.joyintech.tams.position.exception.PositionException;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tools.collectors.JoyinCollectors;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
@@ -147,6 +148,12 @@ public class TrdRepoTrade004Service extends BaseService<TrdRepoTrade004Dto> impl
 
     @Autowired
     private MstWorkflowCommonServiceMapperImpl mstWorkflowCommonServiceMapperImpl;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
     /**
      * 工作流中doComplete
      *
@@ -283,10 +290,10 @@ public class TrdRepoTrade004Service extends BaseService<TrdRepoTrade004Dto> impl
                 }
                 String code = (String) bm.get("code");
                 StringBuffer messageStr = (StringBuffer) bm.get("message");
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                if (StringUtil.equals(PositionConstant.CODE_BUSI_RK, code)) {
                     WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
                 }
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+                if (StringUtil.equals(PositionConstant.CODE_BUSI_YK, code)) {
                     WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
                 }
             }
@@ -376,7 +383,7 @@ public class TrdRepoTrade004Service extends BaseService<TrdRepoTrade004Dto> impl
                 position.setPtlRelieveSecList(ptlRelieveSecList);
             }
         }
-        PositionHttpRequest.send(position);
+        positionRequestHandle.send(position);
     }
 
     @Override
@@ -395,7 +402,7 @@ public class TrdRepoTrade004Service extends BaseService<TrdRepoTrade004Dto> impl
         if (StringUtil.isNotEmpty(processMark)
                 && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
             //发送头寸
-            PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt4.头寸业务类型_银行间债券借贷质押券置换.getValue(),entity.getPs());
+            positionRequestHandle.doDeleteByWorkFlowId(entity.getWorkflowId(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt4.头寸业务类型_银行间债券借贷质押券置换.getValue(),entity.getPs());
         }
     }
     /**
@@ -599,10 +606,10 @@ public class TrdRepoTrade004Service extends BaseService<TrdRepoTrade004Dto> impl
                 }
                 String code = (String) bm.get("code");
                 StringBuffer messageStr = (StringBuffer) bm.get("message");
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                if (StringUtil.equals(PositionConstant.CODE_BUSI_RK, code)) {
                     WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
                 }
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+                if (StringUtil.equals(PositionConstant.CODE_BUSI_YK, code)) {
                     WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
                 }
             }

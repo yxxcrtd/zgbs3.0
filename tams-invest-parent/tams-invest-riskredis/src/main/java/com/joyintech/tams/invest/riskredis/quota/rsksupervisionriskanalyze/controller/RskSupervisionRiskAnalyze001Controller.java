@@ -131,21 +131,21 @@ public class RskSupervisionRiskAnalyze001Controller extends BaseController  {
      */
     @ResponseBody
     @RequestMapping("/selectIndName")
-    public List<SuggestDto> selectIndName()
+    public Page<SelectOptionDto> selectIndName()
             throws Exception {
         Map<String,Object> maps = RequestUtil.getPageParam();
         maps.put("indId",maps.get("param"));
-        List<SuggestDto> temp = rskSupervisionRiskAnalyzeService.selectIndName(maps);
+        Page<SelectOptionDto> temp = rskSupervisionRiskAnalyzeService.selectIndName(maps);
         return temp;
     }
 
     @ResponseBody
     @RequestMapping("/selectGroupName")
-    public List<SuggestDto> selectGroupName()
+    public Page<SelectOptionDto> selectGroupName()
             throws Exception {
         Map<String,Object> maps = RequestUtil.getPageParam();
         maps.put("groupName",maps.get("param"));
-        List<SuggestDto> temp = rskSupervisionRiskAnalyzeService.selectGroupName(maps);
+        Page<SelectOptionDto> temp = rskSupervisionRiskAnalyzeService.selectGroupName(maps);
         return temp;
     }
 

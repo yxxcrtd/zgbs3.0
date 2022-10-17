@@ -150,17 +150,24 @@
         AND M.IND_ID = A.IND_ID
         AND M.SUP_DATE = A.SUP_DATE
         <where>
-            <if test="indName !=null and indName !=''">
-               AND  B.IND_NAME LIKE CONCAT(CONCAT('%',#{indName}),'%')
+            <if test="indNameList !=null and indNameList.size() > 0 ">
+                AND  B.IND_NAME IN
+                <foreach collection="indNameList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
             </if>
-            <if test="groupName !=null and groupName !=''">
-               AND  ( D.PORTFOLIO_NAME LIKE CONCAT(CONCAT('%',#{groupName}),'%')
-               	<!-- add by zhuzhen 20191209 增加组合代码模糊查询条件 start -->
-               	OR D.PORTFOLIO_ID LIKE CONCAT(CONCAT('%',#{groupName}),'%')
-               	<!-- add by zhuzhen 20191209 增加组合代码模糊查询条件 end -->
-                OR E.PTL_BAG_NAME LIKE CONCAT(CONCAT('%',#{groupName}),'%')
-                <!-- add by jjpei 20191209 增加组合包代码模糊查询条件 end -->
-                OR E.PTL_BAG_ID LIKE CONCAT(CONCAT('%',#{groupName}),'%'))
+            <if test="groupNameList !=null and groupNameList.size() > 0 ">
+                AND (
+                D.PORTFOLIO_NAME IN
+                <foreach collection="groupNameList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+                OR
+                E.PTL_BAG_NAME IN
+                <foreach collection="groupNameList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+                )
             </if>
             <if test="supType !=null and supType !=''">
                AND  B.SUP_TYPE = #{supType}
@@ -341,46 +348,40 @@
     </select>
 
 
-    <select id="selectIndName" resultType="com.joyintech.framework.select.SuggestDto">
-        SELECT
-        rii.IND_ID,
-        rii.IND_NAME code,
-        rii.IND_NAME name
+<select id="selectIndName" resultType="com.joyintech.framework.select.SelectOptionDto">
+    SELECT distinct
+        rii.IND_NAME id,
+        rii.IND_NAME text
         FROM RSK_ISUP_INDICATOR rii
-        <where>
-            <if test="indId != null and indId != ''">
-                 (rii.IND_ID like concat('%',concat(#{indId,jdbcType=VARCHAR},'%'))
-                OR rii.IND_NAME  like concat('%',concat(#{indId,jdbcType=VARCHAR},'%')))
-            </if>
-        </where>
-    </select>
+    <where>
+        <if test="search != null and search != ''">
+             rii.IND_NAME  like concat('%',concat(#{search,jdbcType=VARCHAR},'%'))
+        </if>
+    </where>
+</select>
 
-    <select id="selectGroupName" resultType="com.joyintech.framework.select.SuggestDto">
-        SELECT
-        pp.PORTFOLIO_ID,
-        pp.PORTFOLIO_NAME code,
-        pp.PORTFOLIO_NAME name
-        FROM PTL_PORTFOLIO pp
-        <where>
-            <if test="groupName != null and groupName != ''">
-                (pp.PORTFOLIO_ID like concat('%',concat(#{groupName,jdbcType=VARCHAR},'%'))
-                OR pp.PORTFOLIO_NAME  like concat('%',concat(#{groupName,jdbcType=VARCHAR},'%')))
-            </if>
-        </where>
-
-        union all
-
-        SELECT
-        rpp.PTL_BAG_ID,
-        rpp.PTL_BAG_NAME code,
-        rpp.PTL_BAG_NAME name
-        FROM RSK_PORTFOLIO_PACKAGE rpp
-        <where>
-            <if test="groupName != null and groupName != ''">
-                (rpp.PTL_BAG_ID like concat('%',concat(#{groupName,jdbcType=VARCHAR},'%'))
-                OR rpp.PTL_BAG_NAME  like concat('%',concat(#{groupName,jdbcType=VARCHAR},'%')))
-            </if>
-        </where>
+<select id="selectGroupName" resultType="com.joyintech.framework.select.SelectOptionDto">
+    SELECT distinct
+        pp.PORTFOLIO_NAME id,
+        pp.PORTFOLIO_NAME text
+    FROM PTL_PORTFOLIO pp
+    <where>
+        <if test="search != null and search != ''">
+            (pp.PORTFOLIO_ID like concat('%',concat(#{search,jdbcType=VARCHAR},'%'))
+            OR pp.PORTFOLIO_NAME  like concat('%',concat(#{search,jdbcType=VARCHAR},'%')))
+        </if>
+    </where>
+    union all
+    SELECT distinct
+        rpp.PTL_BAG_NAME id,
+        rpp.PTL_BAG_NAME text
+    FROM RSK_PORTFOLIO_PACKAGE rpp
+    <where>
+        <if test="search != null and search != ''">
+            (rpp.PTL_BAG_ID like concat('%',concat(#{search,jdbcType=VARCHAR},'%'))
+            OR rpp.PTL_BAG_NAME  like concat('%',concat(#{search,jdbcType=VARCHAR},'%')))
+        </if>
+    </where>
 
     </select>
     

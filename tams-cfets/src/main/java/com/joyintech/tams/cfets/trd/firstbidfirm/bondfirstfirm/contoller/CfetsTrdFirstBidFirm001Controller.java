@@ -72,10 +72,10 @@ public class CfetsTrdFirstBidFirm001Controller extends BaseController {
     public Message<Map<String, Object>> getPageParams() {
         Map<String, Object> initPageParams = new HashMap<>();
         //数据字典初始化数据
-        // 有效状态
-        initPageParams.put("ISSUE_STATUS", this.getSelectDataFromDataDic(DictCode.发行状态, null));
         // 发行状态
-        initPageParams.put("STATUS_VALID", this.getSelectDataFromDataDic(DictCode.有效状态, null));
+        initPageParams.put("ISSUE_STATUS", this.getSelectDataFromDataDic(DictCode.发行状态, null));
+        // 有效状态
+        initPageParams.put("STATUS_VALID", this.getSelectDataFromDataDic(DictCode.交易流程状态, null));
         // 债券类型
         initPageParams.put("BOND_TYPE", this.getSelectDataFromDataDic(DictCode.行内资产四级分类, null));
         // 委托状态_待接收

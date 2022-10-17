@@ -155,6 +155,7 @@ public class FinFundTarget002Controller extends BaseController{
         model.addAttribute("CE_MODEL", CacheUtil.getSysParam(BussinessConstant.CEMODEL));
         model.addAttribute("INTI_BONUS_MODE", DictCodeList.分红方式_红利再投); // 默认分红方式-红利再投 王贵奇 2019/7/29
         model.addAttribute("NO", DictCodeList.是否_否.getValue());
+        model.addAttribute("YES", DictCodeList.是否_是.getValue());
         model.addAttribute("isShowType", CacheUtil.getSysParam("IS_SHOW_TYPE")==null?"01":CacheUtil.getSysParam("IS_SHOW_TYPE"));
         model.addAttribute("TRM_FUND_TYPE_01",DictCodeListExt2.交易所基金类型_ETF.getValue());
         model.addAttribute("TRM_FUND_TYPE_02",DictCodeListExt2.交易所基金类型_LOF.getValue());

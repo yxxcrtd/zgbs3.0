@@ -76,6 +76,12 @@ public class CfetsTrdConfirmCstpInfoListResponse {
     @ApiModelProperty(name="tradeYield",value="成交价%",example="1")
     private BigDecimal tradeYield;
 
+    @ApiModelProperty(name="yield",value="到期收益率%",example="1")
+    private BigDecimal yield;
+
+    @ApiModelProperty(name="unitCprice",value="净价",example="1")
+    private BigDecimal unitCprice;
+
     @ApiModelProperty(name="tradeYieldStr",value="成交价+单位",example="1")
     private String tradeYieldStr;
 
@@ -150,6 +156,9 @@ public class CfetsTrdConfirmCstpInfoListResponse {
 
     @ApiModelProperty(name="finprodType2",value="资产类型CODE",example="A1")
     private String finprodType2;
+
+    @ApiModelProperty(name="otherAmt",value="备用字段,用于存放一级申购发行价格等",example="99.00")
+    private BigDecimal otherAmt;
 
     public String getExecid() {
         return execid;
@@ -491,5 +500,29 @@ public class CfetsTrdConfirmCstpInfoListResponse {
 
     public void setFinprodType2(String finprodType2) {
         this.finprodType2 = finprodType2;
+    }
+
+    public BigDecimal getOtherAmt() {
+        return otherAmt;
+    }
+
+    public void setOtherAmt(BigDecimal otherAmt) {
+        this.otherAmt = otherAmt;
+    }
+
+    public BigDecimal getYield() {
+        return yield;
+    }
+
+    public void setYield(BigDecimal yield) {
+        this.yield = yield;
+    }
+
+    public BigDecimal getUnitCprice() {
+        return unitCprice;
+    }
+
+    public void setUnitCprice(BigDecimal unitCprice) {
+        this.unitCprice = unitCprice;
     }
 }

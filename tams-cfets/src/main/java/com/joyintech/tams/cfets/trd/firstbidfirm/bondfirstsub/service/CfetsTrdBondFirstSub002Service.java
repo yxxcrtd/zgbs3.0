@@ -14,22 +14,20 @@ import com.joyintech.system.base.entity.SysWflBusinessList;
 import com.joyintech.tams.business.common.dto.CfetsBondPortfolioCashRequest;
 import com.joyintech.tams.business.common.dto.CfetsBondPositionRequest;
 import com.joyintech.tams.business.common.dto.PageMode;
-import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.position.service.PositionInfoService;
-import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondMapper;
 import com.joyintech.tams.cfets.trd.bond.dto.CalRequest;
 import com.joyintech.tams.cfets.trd.bond.dto.PtlAllocationDto;
 import com.joyintech.tams.cfets.trd.bond.dto.RiskCalRequest;
 import com.joyintech.tams.cfets.trd.bond.service.IbuQuoteBondCalService;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dao.CfetsTrdBondFirstSub002Mapper;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.*;
+import com.joyintech.tams.cfets.trdconfirm.service.CfetsTrdConfirmAutoMatchService;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
@@ -50,6 +48,9 @@ import com.joyintech.tams.invest.common.risktrial.dto.RiskTrialRetDto;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
+import com.joyintech.tams.position.constant.PositionConstant;
+import com.joyintech.tams.position.exception.PositionException;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -108,7 +109,6 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
 
     @Autowired
     BaseAssetCashPositionCommMapper baseAssetCashPositionCommMapper;
-
     /**
      * 指令信息(流程中)
      */
@@ -134,13 +134,16 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     private SysWflBusinessListMapper sysWflBusinessListMapper;
 
     @Autowired
-    private CfetsIbuQuoteBondMapper cfetsIbuQuoteBondMapper;
-
-    @Autowired
     private PositionInfoService positionInfoService;
 
     @Autowired
     private FinProductMapper finProductMapper;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     /**
      * 认购量最小变动单位
@@ -166,6 +169,9 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     @Autowired(required = false)
     private BasRiskMathCommService basRiskMathCommService;
 
+    @Autowired
+    private CfetsTrdConfirmAutoMatchService cfetsTrdConfirmAutoMatchService;
+
     /**
      * 申购点击check
      *
@@ -183,7 +189,6 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             String finprodId = null;
             String secManageAcctId = null;
             for (CfetsTrdBondFirstSubEntrustDto entrustDto : request.getEntrustDtos()) {
-                ValidMessage error = new ValidMessage();
                 // 资产代码+证券账户必须一致提示信息
                 String msg = "";
                 // 1.指令状态为已接收且该指令不存在指令流程中数据，不满足弹出提示
@@ -237,13 +242,11 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      */
     public CfetsTrdBondFirstSubInfoDto queryEntrustInfoById(CfetsTrdBondFirstSubInitRequest request) {
         logger.debug("初始化申购页面,入参:" + JsonUtils.object2Json(request));
-        CfetsTrdBondFirstSubInfoDto cfetsTrdBondFirstSubInfoDto = new CfetsTrdBondFirstSubInfoDto();
+        CfetsTrdBondFirstSubInfoDto cfetsTrdBondFirstSubInfoDto;
         Map<String, Object> param = new HashMap<>();
         List<String> entrustIdList = new ArrayList<>();
         //1.查询申购产品列表(获取资产信息,及剩余指令额度)
-        request.getEntrustDtos().forEach(item -> {
-            entrustIdList.add(item.getEntrustId());
-        });
+        request.getEntrustDtos().forEach(item -> entrustIdList.add(item.getEntrustId()));
         param.put("entrustIdList", entrustIdList);
         this.setParam(param);
         List<CfetsTrdBondFirstSubInfoDto> listTmp = cfetsTrdBondFirstSub002Mapper.selectSubProducts(param);
@@ -260,7 +263,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         // 本方校验错误类型 0 符合要求 1 存在不同机构 2 存在机构为空
         int errorType = 0;
         String partyId = null;
-        String isSupportCstpFlagBondfirst = CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST");
+//        String isSupportCstpFlagBondfirst = CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST");
         for (CfetsTrdBondFirstSubProductDto product : cfetsTrdBondFirstSubInfoDto.getProductDtos()) {
             cfetsTrdBondFirstSubInfoDto.setSubscriptionAmount(ArithmeticUtil.doAdd(cfetsTrdBondFirstSubInfoDto.getSubscriptionAmount(), product.getSubscriptionAmount()));
             if (StringUtil.isEmpty(product.getPartyId())) {
@@ -293,13 +296,11 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     public CfetsTrdBondFirstSubInfoDto addOrDelList(CfetsTrdBondFirstSubInfoDto request) {
         logger.debug("添加或删除申购产品列表数据,入参:" + JsonUtils.object2Json(request));
         if (StringUtil.isNotEmpty(request.getEntrustDtos()) && request.getEntrustDtos().size() > 0) {
-            CfetsTrdBondFirstSubInfoDto cfetsTrdBondFirstSubInfoDto = new CfetsTrdBondFirstSubInfoDto();
+            CfetsTrdBondFirstSubInfoDto cfetsTrdBondFirstSubInfoDto;
             Map<String, Object> param = new HashMap<>();
             List<String> entrustIdList = new ArrayList<>();
             //1.查询申购产品列表(获取资产信息,及剩余指令额度)
-            request.getEntrustDtos().forEach(item -> {
-                entrustIdList.add(item.getEntrustId());
-            });
+            request.getEntrustDtos().forEach(item -> entrustIdList.add(item.getEntrustId()));
             param.put("entrustIdList", entrustIdList);
             this.setParam(param);
             List<CfetsTrdBondFirstSubInfoDto> listTmp = cfetsTrdBondFirstSub002Mapper.selectSubProducts(param);
@@ -318,7 +319,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         // 本方校验错误类型 0 符合要求 1 存在不同机构 2 存在机构为空
         int errorType = 0;
         String partyId = null;
-        String isSupportCstpFlagBondfirst = CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST");
+//        String isSupportCstpFlagBondfirst = CacheUtil.getSysParam("IS_SUPPORT_CSTP_FLAG_BONDFIRST");
         for (CfetsTrdBondFirstSubProductDto product : request.getProductDtos()) {
             request.setSubscriptionAmount(ArithmeticUtil.doAdd(request.getSubscriptionAmount(), product.getSubscriptionAmount()));
             if (StringUtil.isEmpty(product.getPartyId())) {
@@ -366,25 +367,6 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         logger.debug("初始化申购查看页面,结果:" + JsonUtils.object2Json(cfetsTrdBondFirstSubInfoDto));
         return cfetsTrdBondFirstSubInfoDto;
     }
-
-    /**
-     * 汇总认购量 废弃?
-     *
-     * @param cfetsTrdBondFirstSubInfoDto 申购信息
-     * @author jiangpeng
-     * @date 2022/4/24 11:26
-     */
-    /*private void sumSubscriptionAmount(CfetsTrdBondFirstSubInfoDto cfetsTrdBondFirstSubInfoDto) {
-        cfetsTrdBondFirstSubInfoDto.setSubscriptionAmount(BigDecimal.ZERO);
-        for (CfetsTrdBondFirstSubProductDto product : cfetsTrdBondFirstSubInfoDto.getProductDtos()) {
-            // 认购量不得大于各组合指令的剩余指令额度
-            // 考虑到可能有的指令不是初次申购或者不是初始化调用的该方法,此时认购量的值可能大于剩余指令额度,所以先做值比较和赋值,再汇总
-            if (BigDecimalUtil.ACompareToB(product.getSubscriptionAmount(), product.getAvaNum(), 6) > 0) {
-                product.setSubscriptionAmount(product.getAvaNum());
-            }
-            cfetsTrdBondFirstSubInfoDto.setSubscriptionAmount(ArithmeticUtil.doAdd(cfetsTrdBondFirstSubInfoDto.getSubscriptionAmount(), product.getSubscriptionAmount()));
-        }
-    }*/
 
     /**
      * 计算 应缴款金额 结算服务费
@@ -452,12 +434,12 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         // 1.按比例分配
         //按比例分配
         if (StringUtil.equals(autoRequest.getDipType(), "143")) {
-            list = this.propDistribution(subscriptionAmount, list);
+            this.propDistribution(subscriptionAmount, list);
         }
         // 2.平均分配
         // 平均分配
         if (StringUtil.equals(autoRequest.getDipType(), "139")) {
-            list = this.aveDistribution(subscriptionAmount, list);
+            this.aveDistribution(subscriptionAmount, list);
         }
         // 3.分配应缴款金额和结算服务费
         this.otherDistribution(autoRequest.getSubscriptionAmount(), autoRequest.getPayableAmount(), autoRequest.getSettFeeAmt(), list);
@@ -584,10 +566,10 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     /**
      * 分配应缴款金额和结算服务费
      *
-     * @param subAmt
-     * @param payableAmount
-     * @param settFeeAmt
-     * @param productDtos
+     * @param subAmt 认购量
+     * @param payableAmount 应缴款金额
+     * @param settFeeAmt 结算服务费
+     * @param productDtos 申购产品列表
      * @return java.util.List<com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubProductDto>
      * @author jiangpeng
      * @date 2022/4/24 14:06
@@ -654,7 +636,6 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      */
     public List<CfetsTrdBondFirstSubProductDto> otherAllocation(CfetsTrdBondFirstSubInfoDto autoRequest) {
         logger.debug("其他金额分配,入参:" + JsonUtils.object2Json(autoRequest));
-        BigDecimal subscriptionAmount = autoRequest.getSubscriptionAmount();
         // 剩余指令额度不为0的数据
         List<CfetsTrdBondFirstSubProductDto> list = new ArrayList<>();
         // 剩余指令额度为0的数据
@@ -733,20 +714,19 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     /**
      * 获取发行人名称
      *
-     * @param finprodId
+     * @param finprodId 资产代码
      * @return java.lang.String
      * @author jiangpeng
      * @date 2022/5/18 19:33
      */
     public String getIssuer(String finprodId) {
-        String Issuer = cfetsTrdBondFirstSub002Mapper.getIssuer(finprodId);
-        return Issuer;
+        return cfetsTrdBondFirstSub002Mapper.getIssuer(finprodId);
     }
 
     /**
      * 风险试算实体组装
      *
-     * @param riskCalRequest
+     * @param riskCalRequest 入参
      * @return java.util.Map<java.lang.String, java.lang.Object>
      * @author jiangpeng
      * @date 2022/4/21 14:28
@@ -794,8 +774,8 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     /**
      * 处理发起流程逻辑
      *
-     * @param dto           页面元素
-     * @param operationType 操作类型
+     * @param entity           页面元素
+     * @param type 操作类型
      * @author jiangpeng
      * @date 2022/4/24 11:42
      */
@@ -837,7 +817,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     /**
      * 退回或保存后提交
      *
-     * @param entity
+     * @param entity 页面元素
      * @author jiangpeng
      * @date 2022/4/28 19:54
      */
@@ -846,7 +826,6 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         if ("save".equals(entity.getOperateType())) {
             return;
         }
-        Map<String, Object> map = new HashMap<>();
         if (!StringUtil.isNotEmpty(entity.getTradeDate())) {
             entity.setTradeDate(DateUtil.parse(iPlatformDate.getSysDateStr()));
         }
@@ -894,10 +873,10 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
                 String code = (String) bm.get("code");
                 String messageStr = JsonUtils.json2Object(bm.get("message").toString(), String.class);
                 if (StringUtil.isEmpty(confirmOk)
-                        && StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                        && StringUtil.equals(PositionConstant.CODE_BUSI_RK, code)) {
                     WorkFlowUtil.showMessage(messageStr, MessageType.确认消息);
                 }
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+                if (StringUtil.equals(PositionConstant.CODE_BUSI_YK, code)) {
                     WorkFlowUtil.showMessage(messageStr, MessageType.错误消息);
                 }
                 throw new PositionException(messageStr);
@@ -920,8 +899,8 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     /**
      * 处理生效逻辑
      *
-     * @param dto           页面元素
-     * @param operationType 操作类型
+     * @param entity           页面元素
+     * @param type 操作类型
      * @author jiangpeng
      * @date 2022/4/24 11:42
      */
@@ -930,26 +909,35 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         if (!StringUtil.isNotEmpty(entity.getTradeDate())) {
             entity.setTradeDate(DateUtil.parse(iPlatformDate.getSysDateStr()));
         }
-        logger.info("处理生效逻辑,入参:" + JsonUtils.object2Json(entity));
+        logger.info("处理生效逻辑,入参:{}", JsonUtils.object2Json(entity));
         this.deleteWflData(entity.getBidId());
         this.insertData(entity, type);
         //头寸
         if (type.equals(OperationType.REVOKE) || type.equals(OperationType.DELETE)) {
             // 匹配取消
             cfetsTrdBondFirstSub002Mapper.deleteByPreTradeId(entity.getBidId());
-            PositionHttpRequest.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
+            positionRequestHandle.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
                     DictCodeListExt3.头寸业务类型_债券一级申购.getValue(), DictCodeList.交易方向_买入.getValue());
             // 老头寸处理
             this.dealOldPosition(entity, true);
         }
         //处理指令执行进度
         this.insertEtrFinishStatus(entity, type);
+        if (!type.equals(OperationType.REVOKE) && !type.equals(OperationType.DELETE)) {
+            try {
+                // 调用自动匹配逻辑
+                cfetsTrdConfirmAutoMatchService.cstpAutoMatchAfterReg(null, null, entity);
+            } catch (Exception e) {
+                logger.error(getMessage("CONFIRM_MSG_008", entity.getBidId(), DictCodeListExt3.操作类型_自动匹配确认.getCodeName()));
+                logger.error(e.getMessage(), e);
+            }
+        }
     }
 
     /**
      * 根据交易表数据组装dto
      *
-     * @param bidId
+     * @param bidId 投标编号
      * @return com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.dto.CfetsTrdBondFirstSubInfoDto
      * @author jiangpeng
      * @date 2022/5/12 15:08
@@ -982,6 +970,8 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      * @date 2022/5/12 14:53
      */
     public CfetsTrdBondFirstSubInfoDto dorevoke(String bidId, String remark, Boolean isNeedDealPosition,Boolean isRevoke, String tgBusiType) {
+        // 头寸返回值记录,用于回滚头寸数据
+        List<Map<String, Object>> mapList = new ArrayList<>();
         CfetsTrdBondFirstSubInfoDto entity = this.prepareDto(bidId);
         entity.setBidId(bidId);
         entity.setRemark(remark);
@@ -989,16 +979,16 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         if (isNeedDealPosition) {
             // 匹配取消
             cfetsTrdBondFirstSub002Mapper.deleteByPreTradeId(entity.getBidId());
-            if (isRevoke) {
-                PositionHttpRequest.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
-                        DictCodeListExt3.头寸业务类型_债券一级申购.getValue(), DictCodeList.交易方向_买入.getValue());
-            }
         }
         // 老头寸处理
         this.dealOldPosition(entity, true);
         //处理指令执行进度
         this.insertEtrFinishStatus(entity, OperationType.REVOKE);
-
+        if (isRevoke && isNeedDealPosition) {
+            mapList.add(positionRequestHandle.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
+                    DictCodeListExt3.头寸业务类型_债券一级申购.getValue(), DictCodeList.交易方向_买入.getValue()));
+            entity.setMapList(mapList);
+        }
         return entity;
     }
 
@@ -1026,13 +1016,15 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         CfetsTrdBondFirstSubInfoDto entity = getBussinessEntityByWorkflowId(workflowId);
         if (StringUtil.isNotEmpty(processMark)
                 && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
-            PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(), DictCodeListExt1.子系统代码_交易.getValue(),
+            positionRequestHandle.doDeleteByWorkFlowId(entity.getWorkflowId(), DictCodeListExt1.子系统代码_交易.getValue(),
                     DictCodeListExt3.头寸业务类型_债券一级申购.getValue(), DictCodeList.交易方向_买入.getValue());
         }
     }
 
     /**
-     * @param requst
+     * 当日申购撤销检查
+     *
+     * @param requst 入参
      * @return com.joyintech.framework.ajax.AjaxResult
      * @author jiangpeng
      * @date 2022/4/27 10:30
@@ -1040,7 +1032,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     public AjaxResult checkDayRegRevokeCheck(CfetsBondFirstSubCheckRequst requst) {
         AjaxResult ajaxResult = new AjaxResult();
         List<ValidMessage> errorList = new ArrayList<>();
-        String msg = "";
+        StringBuilder msgBuilder = new StringBuilder();
         for (CfetsBondFirstSubCheckDetaileRequst item : requst.getCfetsBondFirstSubCheckDetaileRequsts()) {
             // 存在已确认的数据
             if (joyinbusinessCommonService.countMatchInfo(item.getBidId(), DictCodeList.确认状态_已确认.getValue()) > 0) {
@@ -1059,13 +1051,14 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
             if (joyinbusinessCommonService.countMatchInfo(item.getBidId(), DictCodeList.确认状态_未确认.getValue()) > 0
                     && !StringUtil.equals(DictCodeList.是否_是.getValue(), requst.getIsSure()) ) {
                 //如勾选数据已生成匹配待确认的记录
-                msg += item.getBidId() + "存在已匹配待确认记录，是否确认撤销?";
+                msgBuilder.append(item.getBidId()).append("存在已匹配待确认记录，是否确认撤销?");
             }
             //如勾选数据发行状态不为空不可撤销
             if (StringUtil.isNotEmpty(item.getIssueStatus())) {
                 errorList.add(new ValidMessage(item.getBidId() + "发行状态不为空不可撤销"));
             }
         }
+        String msg = msgBuilder.toString();
         if (CollectionUtils.isNotEmpty(errorList)) {
             ajaxResult.setErrorList(errorList);
             ajaxResult.setMessageType(MessageType.错误消息);
@@ -1090,7 +1083,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     /**
      * 根据流程编号删除流程中数据
      *
-     * @param bidId 投标编号
+     * @param workflowId 工作流编号
      * @author jiangpeng
      * @date 2022/4/26 9:51
      */
@@ -1593,8 +1586,9 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     /**
      * 头寸处理
      *
-     * @param cfetsRepoDealRegisterQuoteDto
-     * @param cfetsRepoDealDbDto
+     * @param entity    入参
+     * @param isSubmit  是否提交
+     * @param confirmOk 是否校验余额
      * @author jiangpeng
      * @date 2021/12/24 10:12
      */
@@ -1654,7 +1648,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         req.setCdate(entity.getTradeDate());
         req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         req.setPtlList(ptlList);
-        Map<String, Object> param = PositionHttpRequest.send(req);
+        Map<String, Object> param = positionRequestHandle.send(req);
         ThreadLocalUtil.setLocalCache(param);
     }
 
@@ -1662,7 +1656,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
      * 老头存处理 系统参数是否处理旧头寸标识(IS_HANDLE_OLDPOS_FLAG)为Y时处理
      *
      * @param entity   页面元素
-     * @param flowType 交易流程状态 参数字典 TRADE_FLOW_STATUS
+     * @param isRevokeOrBack 交易流程状态 参数字典 TRADE_FLOW_STATUS
      * @author jiangpeng
      * @date 2022/4/28 10:37
      */
@@ -1731,13 +1725,13 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
     public void selectCash(CfetsTrdBondFirstSubInfoDto dto) {
         for (CfetsTrdBondFirstSubProductDto productDto : dto.getProductDtos()) {
             BaseMap cashMap = positionInfoService.queryTrdAvailableCash(
-                    Arrays.asList(productDto.getPortfolioId()),
+                    Collections.singletonList(productDto.getPortfolioId()),
                     dto.getTradeDateStr(),
                     null,
                     null,
                     null,
-                    Arrays.asList(DictCodeListExt1.资金账户类型_产品托管户.getValue()),
-                    Arrays.asList(DictCodeListExt1.资金账户类型_产品托管户.getValue()),
+                    Collections.singletonList(DictCodeListExt1.资金账户类型_产品托管户.getValue()),
+                    Collections.singletonList(DictCodeListExt1.资金账户类型_产品托管户.getValue()),
                     dto.getFinprodId()
             );
             productDto.setCashT(cashMap.getBigDecimal("cashT"));
@@ -1753,7 +1747,7 @@ public class CfetsTrdBondFirstSub002Service extends BaseService<CfetsTrdBondFirs
         String issuer = null;
         String finprodAbbr = null;
         String SubscriptionAmount = null;
-        String str = null;
+        String str;
         if (StringUtil.isNotEmpty(dto.getFinprodAbbr())) {
             finprodAbbr = "资产简称:" + dto.getFinprodAbbr();
         }

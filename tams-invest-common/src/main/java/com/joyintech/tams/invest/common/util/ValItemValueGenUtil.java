@@ -22,8 +22,6 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.invest.common.dto.xmlrelation.XmlRelationInputParaDto;
 import com.joyintech.tams.invest.common.dto.xmlrelation.XmlRelationOutputDto;
 import com.joyintech.tams.invest.common.util.xmlrelation.XmlRelationUtil;
@@ -1099,7 +1097,7 @@ public class ValItemValueGenUtil {
         }
         // 交易.金融产品类型(投管分类) = FINPROD_TYPE_TG.'债券'
         else if (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue(), finprodType2)) {
-            resultBusiType = DictCodeList.业务类型_银行间债券交易.getValue();
+            resultBusiType = DictCodeList.业务类型_债券交易.getValue();
         }
         // 交易.金融产品类型(投管分类) = FINPROD_TYPE_TG.'存款类资产' 并且 金融产品分类表.分类6 = DEPO_ASSET_TYPE.'同业存款'
         else if (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_存款.getValue(), finprodType2)

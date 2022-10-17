@@ -421,7 +421,7 @@ public class CfetsBondDayRegDto {
     }
 
     public String getQuoteTypeStr() {
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式_登记, this.getQuoteType());
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式, this.getQuoteType());
     }
 
     public void setQuoteTypeStr(String quoteTypeStr) {

@@ -3,11 +3,11 @@ package com.joyintech.tams.invest.batch.resaleregautodeal.service;
 import com.joyintech.batch.batchbase.exception.BatchException;
 import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.util.DateUtil;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.batch.resaleregautodeal.dao.ResaleRegAutoDealMapper;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -46,6 +46,12 @@ public class ResaleRegAutoDealService {
     private ResaleRegAutoDealMapper resaleRegAutoDealMapper;
 
     /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
+
+    /**
      * 回售登记数据自动生成成交数据
      * @param currentDate
      */
@@ -58,7 +64,7 @@ public class ResaleRegAutoDealService {
             //撤回头寸
             List<String> totalList = resaleRegAutoDealMapper.getTotleTradeId(totleTradeIds);
             for(String total : totalList) {
-                PositionHttpRequest.dorevoke(total, DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_债券行权交易.getValue(), BussinessDictCodeList.交易方向_行权回售.getValue());
+                positionRequestHandle.dorevoke(total, DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_债券行权交易.getValue(), BussinessDictCodeList.交易方向_行权回售.getValue());
             }
             //删除已经生成的数据，用来支持重复跑
             resaleRegAutoDealMapper.deletePadeal(totleTradeIds);

@@ -32,7 +32,6 @@ import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.dao.SppiImportDataMapper;
 import com.joyintech.tams.common.base.entity.FinExercisePlan;
@@ -63,6 +62,7 @@ import com.joyintech.tams.invest.common.dto.position.PositionCashSecRequest;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeCommonervice;
 import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.MinPirceDto;
 import com.joyintech.tams.invest.entrust.etrexchangetrade.dto.MinTrdUnitLimitDto;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
@@ -85,7 +85,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -159,6 +158,12 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 	private EtrExchangeTradeCommonMapper etrExchangeTradeCommonMapper;
 	@Autowired
 	ExchangeEntrustRdsCommonAop exchangeEntrustRdsCommonAop;
+
+	/**
+	 * 头寸引擎
+	 */
+	@Autowired
+	private PositionRequestHandle positionRequestHandle;
 
 	@ApiOperation(value = "场内现券下单参数", notes = "场内现券下单参数")
 	@PostMapping("/getPageParams")
@@ -1046,7 +1051,7 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 		        }catch (Exception e) {
 		        	for(EtrExchangeTradeSaveSecRepoRequest etrExchangeTradeSaveSecRepoRequest :etrExchangeTrade001DtoList) {
 		        		logger.warn("场内交易多组合指令头寸发送失败，EntrustId:{},PositionSeqno:{}", etrExchangeTradeSaveSecRepoRequest.getEntrustId(), etrExchangeTradeSaveSecRepoRequest.getPositionSeqno().toString());
-		        		PositionHttpRequest.sendRevoke(etrExchangeTradeSaveSecRepoRequest.getPositionSeqno().toString(), "ETR", "场内交易多组合指令头寸发送失败");
+		        		positionRequestHandle.sendRevoke(etrExchangeTradeSaveSecRepoRequest.getPositionSeqno().toString(), "ETR", "场内交易多组合指令头寸发送失败");
 		        	}
 					//撤销风险预占
 					riskEtrExchangeTrade001DtoList.stream().forEach(itemTemp->{

@@ -47,8 +47,9 @@ import com.joyintech.service.entrust.common.service.WFlowCommonService;
 import com.joyintech.service.entrust.etrcommanddispatcher.service.EtrCommandDispatcherService;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysWflBusinessList;
+import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
-import com.joyintech.tams.business.common.exception.PositionException;
+import com.joyintech.tams.position.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
@@ -234,6 +235,9 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
 
     @Autowired
     private BasRiskMathCommService basRiskMathCommService;
+
+    @Autowired
+    private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
 
 
     /**
@@ -1009,6 +1013,11 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
         tempParamMap.put("psT03", DictCodeList.交易方向_行权_回售.getValue());
         tempParamMap.put("psT39", DictCodeList.交易方向_行权_赎回.getValue());
         SecInfoModelDto secInfoModelDto = etrExchangeTradeSecRepoMapper.getSecInfoModel(tempParamMap);
+        // 根据资产代码查询计息基础(交易市场和发行人)
+        FinCashCalcRule finCashCalcRule = joyinbusinessCommonMapper.selectBasisByFinprodId(finprodId, DateUtil.platDateFromCache());
+        if (StringUtil.isNotEmpty(finCashCalcRule) && StringUtil.isNotEmpty(finCashCalcRule.getMarketBasis())) {
+            secInfoModelDto.setBasis(finCashCalcRule.getMarketBasis());
+        }
         SecInfoModel secInfoModel = toSecInfoModel(secInfoModelDto);
         if (secInfoModelDto != null && secInfoModelDto.getStartDate() != null
                 && DateUtil.compareTo(secInfoModelDto.getStartDate(), settleDate) > 0) {

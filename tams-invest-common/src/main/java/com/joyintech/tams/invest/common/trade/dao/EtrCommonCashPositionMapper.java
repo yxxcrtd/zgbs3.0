@@ -302,7 +302,7 @@ public interface EtrCommonCashPositionMapper {
      * @param finprodId
      * @return
      */
-    List<EtrSecPositionFlowDto> selectAllPositionByFinprodId(@Param("finprodId") String finprodId);
+    List<EtrSecPositionFlowDto> selectAllPositionByFinprodId(@Param("finprodId") String finprodId,@Param("cdate") String cdate);
 
 
     List<EtrCashPositionFlowDto> selectAllCashPositionByTotle(String tradeId);

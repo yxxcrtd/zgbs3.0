@@ -5,7 +5,6 @@ import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
-import com.joyintech.framework.exception.MessageException;
 import com.joyintech.framework.exception.RestTemplateException;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.select.SelectOptionDto;
@@ -13,8 +12,6 @@ import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
-import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
 import com.joyintech.tams.common.base.dao.PtlPortfolioMapper;
 import com.joyintech.tams.common.base.entity.FinProduct;
@@ -34,6 +31,8 @@ import com.joyintech.tams.invest.entrust.common.controller.EtrCommonController;
 import com.joyintech.tams.invest.entrust.etrconbond.dto.EtrConBondDto;
 import com.joyintech.tams.invest.entrust.etrconbond.service.EtrConBondService;
 import com.joyintech.tams.invest.entrust.etrconbond.validator.EtrConBondDtoValidator;
+import com.joyintech.tams.position.constant.PositionConstant;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.dto.PageElementConfigDto;
 import com.joyintech.tams.systemtools.util.PageElementUtil;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
@@ -304,8 +303,8 @@ public class EtrConBond002Controller extends BaseController {
             String[] arr = message.split("\\|");
             if(arr != null && arr.length == 2){
                 String[] arr1 = arr[0].split("\\:");
-                if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, arr1[1].trim()) ||
-                        StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, arr1[1].trim())) {
+                if (StringUtil.equals(PositionConstant.CODE_BUSI_RK, arr1[1].trim()) ||
+                        StringUtil.equals(PositionConstant.CODE_BUSI_YK, arr1[1].trim())) {
                     // 头寸返回对象
                     String a=arr[1];
                     String b=a.replaceAll("&quot;","\"");
@@ -345,7 +344,7 @@ public class EtrConBond002Controller extends BaseController {
                             }
                         }
                     }
-                    if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, arr1[1].trim())) {
+                    if (StringUtil.equals(PositionConstant.CODE_BUSI_RK, arr1[1].trim())) {
                         strb.append("】，请确认是否继续？");
                         /**
                          * 余额不足，软控确认

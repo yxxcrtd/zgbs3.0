@@ -5,17 +5,57 @@
 
 package com.joyintech.tams.invest.trade.bond.service;
 
+import static com.joyintech.tams.invest.common.asset.service.BondAssetCalcService.isNotFomartSec;
+import static com.joyintech.tams.invest.common.asset.service.BondAssetCalcService.toLocalDate;
+import static com.joyintech.tams.invest.common.asset.service.BondAssetCalcService.toSecInfoModel;
+import static com.joyintech.tams.invest.common.trade.AllTradeCommonUtil.copyFileInfoByFileNo;
+
+import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
+
 import com.google.common.collect.Lists;
 import com.joyintech.calculation.CalculatorFactory;
 import com.joyintech.calculation.bonds.PaperIrReset;
 import com.joyintech.calculation.bonds.SecIntSchedule;
 import com.joyintech.calculation.bonds.SecPrinSchedule;
-import com.joyintech.calculation.bonds.constant.*;
+import com.joyintech.calculation.bonds.constant.Basis;
+import com.joyintech.calculation.bonds.constant.CurrIntCalMethod;
+import com.joyintech.calculation.bonds.constant.DiscountScheme;
+import com.joyintech.calculation.bonds.constant.FlowCashScheme;
+import com.joyintech.calculation.bonds.constant.IntRateType;
+import com.joyintech.calculation.bonds.constant.NextIntCalMethod;
+import com.joyintech.calculation.bonds.constant.Variety;
 import com.joyintech.calculation.shell.AccurIntCalculator;
 import com.joyintech.calculation.shell.AccurIntForSecheduleCalculator;
 import com.joyintech.calculation.shell.PriceByYieldCalculator;
 import com.joyintech.calculation.shell.YieldByPriceCalculator;
-import com.joyintech.calculation.shell.param.*;
+import com.joyintech.calculation.shell.param.AccurIntCalInParameter;
+import com.joyintech.calculation.shell.param.AccurIntCalOutParameter;
+import com.joyintech.calculation.shell.param.PriceYieldInParameter;
+import com.joyintech.calculation.shell.param.PriceYieldOutParameter;
+import com.joyintech.calculation.shell.param.SecInfoModel;
+import com.joyintech.calculation.shell.param.YieldPriceInParameter;
+import com.joyintech.calculation.shell.param.YieldPriceOutParameter;
 import com.joyintech.calculation.util.BasicUtil;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.DTXTransaction;
@@ -31,14 +71,79 @@ import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.select.SuggestDto;
-import com.joyintech.framework.util.*;
+import com.joyintech.framework.util.ArithmeticUtil;
+import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.IDGenerator;
+import com.joyintech.framework.util.JsonUtils;
+import com.joyintech.framework.util.SpringContextUtil;
+import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.system.base.dao.SysUploadFileInfoMapper;
 import com.joyintech.system.base.entity.SysUploadFileInfo;
 import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
-import com.joyintech.tams.common.base.dao.*;
-import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.common.base.dao.EtrCashPositionFlowMapper;
+import com.joyintech.tams.common.base.dao.FinProductMapper;
+import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
+import com.joyintech.tams.common.base.dao.InterfTradSecdealMapper;
+import com.joyintech.tams.common.base.dao.MstCounterPartyMapper;
+import com.joyintech.tams.common.base.dao.PaPtlPortfolioMapper;
+import com.joyintech.tams.common.base.dao.PaTrdFinProductDealTotalMapper;
+import com.joyintech.tams.common.base.dao.PaTrdProductDealMapper;
+import com.joyintech.tams.common.base.dao.PtlCashPositionFlowMapper;
+import com.joyintech.tams.common.base.dao.PtlPortfolioMapper;
+import com.joyintech.tams.common.base.dao.PtlTradeMapper;
+import com.joyintech.tams.common.base.dao.StlPayOrdersMapper;
+import com.joyintech.tams.common.base.dao.StlSecAcctInfoMapper;
+import com.joyintech.tams.common.base.dao.TrdDealTotalAddMapper;
+import com.joyintech.tams.common.base.dao.TrdFinProductDealTotalMapper;
+import com.joyintech.tams.common.base.dao.TrdProductDealAddMapper;
+import com.joyintech.tams.common.base.dao.TrdProductDealAddPreMapper;
+import com.joyintech.tams.common.base.dao.TrdProductDealMapper;
+import com.joyintech.tams.common.base.dao.TrdProductDealPreMapper;
+import com.joyintech.tams.common.base.dao.TrdTradeFeeDetailMapper;
+import com.joyintech.tams.common.base.dao.TrdTradeFeeTotalMapper;
+import com.joyintech.tams.common.base.dao.WflPaTrdFinDealTotalMapper;
+import com.joyintech.tams.common.base.dao.WflPaTrdProductDealMapper;
+import com.joyintech.tams.common.base.dao.WflStlPayOrdersMapper;
+import com.joyintech.tams.common.base.dao.WflTrdDealTotalAddMapper;
+import com.joyintech.tams.common.base.dao.WflTrdFinProductDealTotalMapper;
+import com.joyintech.tams.common.base.dao.WflTrdProductDealAddMapper;
+import com.joyintech.tams.common.base.dao.WflTrdProductDealMapper;
+import com.joyintech.tams.common.base.entity.DebtBaseInfo;
+import com.joyintech.tams.common.base.entity.EtrEntrust;
+import com.joyintech.tams.common.base.entity.FinCashCalcRule;
+import com.joyintech.tams.common.base.entity.FinProduct;
+import com.joyintech.tams.common.base.entity.FinProductType;
+import com.joyintech.tams.common.base.entity.FinProductTypeKey;
+import com.joyintech.tams.common.base.entity.InterfTradSecdeal;
+import com.joyintech.tams.common.base.entity.MstCounterParty;
+import com.joyintech.tams.common.base.entity.PaPtlPortfolio;
+import com.joyintech.tams.common.base.entity.PaTrdFinProductDealTotal;
+import com.joyintech.tams.common.base.entity.PaTrdProductDeal;
+import com.joyintech.tams.common.base.entity.PtlPortfolio;
+import com.joyintech.tams.common.base.entity.PtlTrade;
+import com.joyintech.tams.common.base.entity.RepTrade;
+import com.joyintech.tams.common.base.entity.StlPayOrders;
+import com.joyintech.tams.common.base.entity.StlSecAcctInfo;
+import com.joyintech.tams.common.base.entity.TrdDealTotalAdd;
+import com.joyintech.tams.common.base.entity.TrdFinProductDealTotal;
+import com.joyintech.tams.common.base.entity.TrdMatchInfo;
+import com.joyintech.tams.common.base.entity.TrdProductDeal;
+import com.joyintech.tams.common.base.entity.TrdProductDealAdd;
+import com.joyintech.tams.common.base.entity.TrdProductDealAddPre;
+import com.joyintech.tams.common.base.entity.TrdProductDealPre;
+import com.joyintech.tams.common.base.entity.TrdProductDealPreKey;
+import com.joyintech.tams.common.base.entity.TrdTradeFeeDetail;
+import com.joyintech.tams.common.base.entity.TrdTradeFeeTotal;
+import com.joyintech.tams.common.base.entity.WflPaTrdFinDealTotal;
+import com.joyintech.tams.common.base.entity.WflPaTrdProductDeal;
+import com.joyintech.tams.common.base.entity.WflStlPayOrders;
+import com.joyintech.tams.common.base.entity.WflTrdDealTotalAdd;
+import com.joyintech.tams.common.base.entity.WflTrdFinProductDealTotal;
+import com.joyintech.tams.common.base.entity.WflTrdProductDeal;
+import com.joyintech.tams.common.base.entity.WflTrdProductDealAdd;
 import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.common.service.DateCalService;
@@ -96,6 +201,10 @@ import com.joyintech.tams.invest.trade.bond.dto.TrdBondInvestTradeCSTPDto;
 import com.joyintech.tams.invest.trade.bond.dto.TrdBondInvestTradeDto;
 import com.joyintech.tams.invest.trade.common.service.TradeCommonService;
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.service.ExchangeTransMatchCommonService;
+import com.joyintech.tams.invest.trade.transfer.aop.RdsTransferAop;
+import com.joyintech.tams.invest.trade.transfer.position.service.PositionRequestServiceSecTransfer001DtoRequest;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
+import com.joyintech.tams.position.servive.connect.PositionHttpRequest;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -105,25 +214,6 @@ import com.joyintech.workflow.engine.entity.FlowEntity;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
-
-import java.lang.reflect.InvocationTargetException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.joyintech.tams.invest.common.asset.service.BondAssetCalcService.*;
-import static com.joyintech.tams.invest.common.trade.AllTradeCommonUtil.copyFileInfoByFileNo;
 
 /**
  * 债券投资交易新建画面Service
@@ -340,8 +430,16 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
     @Autowired
     private CommonPositionEngineService commonPositionEngineService;
 
+    @Autowired
+    private PositionRequestServiceSecTransfer001DtoRequest positionRequestService;
+
     // 交易份额小数保留位数
     private int decimalPlaces_4 = 4;
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 	
     /**
      * 交易及存续期交易，保存进待办，点批量审批时候需要报错。 {@inheritDoc}
@@ -1066,6 +1164,13 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
         TrdProductDeal reverseTrdProductDeal = trdCommonBaseService.selectZCDealByTid(entity.getTotleTradeId(),true);
         if (reverseTrdProductDeal != null && StringUtil.equals(DictCodeList.交易方向_买入.getValue(), reverseTrdProductDeal.getPs())) {
             reverseTradeId = reverseTrdProductDeal.getTradeId();
+            //处理转仓撤销时风险释放
+            if(StringUtil.isNotEmpty(reverseTradeId)) {
+                TrdProductDeal deal = trdCommonBaseService.selectZCTradeId(reverseTradeId);
+                if(StringUtil.isNotEmpty(deal.getTradeId())) {
+                    RdsTransferAop.releaseOccupy(deal.getTradeId(), iPlatformDate.getSysDateStr());
+                }
+            }
         }
 
         List<String> totleIdList1 = Arrays.asList(entity.getTotleTradeId());
@@ -2017,10 +2122,30 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
                 // ZGCPCN-252:银行间和场内公用代码,银行间改造新头寸,目前场内尚未支持,后续支持再处理 modify by fuyongsheng 20220509 start
                 if(!DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(entity.getTradeMarket())
                         && !DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(entity.getTradeMarket())){
-                    PositionHttpRequest.dorevoke(entity.getTotleTradeId(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt3.头寸业务类型_债券一级投标.getValue(),entity.getPs());
+                    positionRequestHandle.dorevoke(entity.getTotleTradeId(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt3.头寸业务类型_债券一级投标.getValue(),entity.getPs());
                 }
                 // ZGCPCN-252:银行间和场内公用代码,银行间改造新头寸,目前场内尚未支持,后续支持再处理 modify by fuyongsheng 20220509 end
             }
+            //债券转仓撤销 新头寸撤销
+            Map<String, Object> batchRevoke = new HashMap<>();
+            Map<String, Object> data = new HashMap<>();
+            List<Map<String, Object>> dataList = new ArrayList<>();
+            data.put("busiType", "39");
+            data.put("ps", entity.getPs());
+            data.put("closeId", entity.getTotleTradeId());
+            data.put("systemAct", DictCodeListExt3.系统动作_撤销.getValue());
+            data.put("busiAct", DictCodeListExt3.业务动作_撤销.getValue());
+            dataList.add(data);
+            batchRevoke.put("data", dataList);
+            batchRevoke.put("userId", LoginUserUtil.getUserName());
+            batchRevoke.put("totalTradeId",IDGenerator.generate());
+            batchRevoke.put("modelType",DictCodeListExt1.子系统代码_交易.getValue());
+            try {
+                positionRequestHandle.batchRevoke(batchRevoke);
+            } catch (Exception e) {
+                logger.error("债券转仓撤销失败:{}", e.getMessage(), e);
+            }
+
         }
         // 如果中标结果进来 add by gejiaao 2019年8月6日 start
 //        if (StringUtil.isNotEmpty(entity.getBondFirstSign())) {
@@ -2045,7 +2170,6 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
 
         }
         // 增加调动接口 by 赵东东 20191206 end
-
     }
 
     private List<TrdTradeFeeTotal> getTrdTradeFeeDetails(TrdBondInvestTradeDto entity) {
@@ -3928,7 +4052,9 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
         if (entity.getTrdProductDealAdds() != null) {
             entity.getPaTrdProductDeals().forEach(trdProductDeal -> trdProductDeal.setWorkflowId(entity.getWorkflowId()));
         }
-        entity.getBussTrdTransferOrder().get(0).setWorkflowId(entity.getWorkflowId());
+        if (entity.getBussTrdTransferOrder() != null) {
+            entity.getBussTrdTransferOrder().get(0).setWorkflowId(entity.getWorkflowId());
+        }
     }
 
     /**
@@ -4219,7 +4345,7 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
             // =====================人员信息=====================
 
             // =====================划款指令信息=====================
-            List<BussTrdTransferOrderDto> bussTrdTransferOrder = new ArrayList<>();
+//            List<BussTrdTransferOrderDto> bussTrdTransferOrder = new ArrayList<>();
             BussSettleOrderParameterDto bussSettleOrderParameterDto = new BussSettleOrderParameterDto();
             bussSettleOrderParameterDto.setIsTotalTrade(BussinessDictCodeList.是否_否.getValue());
             bussSettleOrderParameterDto.setBankLendingType(null);
@@ -4237,15 +4363,17 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
             deal.setSecManageAcctId(trdBondInvestTradeDto.getSecManageAcctId());
             deal.setTradeMarketMode(trdBondInvestTradeDto.getTradeMarketMode());
             bussSettleOrderParameterDto.setDeal(deal);
-            BussTrdTransferOrderDto bussTrdTransferOrderDto = bussTrdTransferOrderService.generateOrder(bussSettleOrderParameterDto);
-            bussTrdTransferOrderDto.setPayAcctNoList(null);
-            bussTrdTransferOrderDto.setRecAcctNoList(null);
-            bussTrdTransferOrderDto.setIsTotalTrade(BussinessDictCodeList.是否_是.getValue());
-            if (StringUtil.equals(BussinessDictCodeList.账户来源_自营.getValue(), trdBondInvestTradeDto.getSecAcctSource())
-                    && StringUtil.equals(trdBondInvestTradeDto.getPs(), BussinessDictCodeList.交易方向_买入.getValue())) {
-                bussTrdTransferOrderDto.setIsNeedSend(BussinessDictCodeList.是否_否.getValue());
+            List<BussTrdTransferOrderDto> bussTrdTransferOrder = Arrays.asList(bussTrdTransferOrderService.generateOrder(bussSettleOrderParameterDto));
+            for (BussTrdTransferOrderDto bussTrdTransferOrderDto : bussTrdTransferOrder) {
+                bussTrdTransferOrderDto.setPayAcctNoList(null);
+                bussTrdTransferOrderDto.setRecAcctNoList(null);
+                bussTrdTransferOrderDto.setIsTotalTrade(BussinessDictCodeList.是否_是.getValue());
+                if (StringUtil.equals(BussinessDictCodeList.账户来源_自营.getValue(), trdBondInvestTradeDto.getSecAcctSource())
+                        && StringUtil.equals(trdBondInvestTradeDto.getPs(), BussinessDictCodeList.交易方向_买入.getValue())) {
+                    bussTrdTransferOrderDto.setIsNeedSend(BussinessDictCodeList.是否_否.getValue());
+                }
             }
-            bussTrdTransferOrder.add(bussTrdTransferOrderDto);
+            //bussTrdTransferOrder.add(bussTrdTransferOrderDto);
             trdBondInvestTradeDto.setBussTrdTransferOrder(bussTrdTransferOrderService.save(bussTrdTransferOrder));
             // =====================划款指令信息=====================
 
@@ -4912,6 +5040,6 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
             ptlList.add(pltMap);
         }
         result.put("ptlList",ptlList);
-        PositionHttpRequest.send(result);
+        positionRequestHandle.send(result);
     }
 }

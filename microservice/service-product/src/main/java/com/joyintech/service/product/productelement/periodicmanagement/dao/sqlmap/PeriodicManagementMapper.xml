@@ -21,6 +21,9 @@
 		AND (FIN_PRODUCT.FINPROD_ID LIKE concat(concat('%',#{search}),'%')
 		OR FIN_PRODUCT.FINPROD_ABBR LIKE concat(concat('%',#{search}),'%'))
 		</if>
+		<if test="initValue != null and initValue != ''">
+			AND FIN_PRODUCT.FINPROD_ID = #{initValue}
+		</if>
 		<!-- 修改bug BSTOZ-860 end wangcheng 20191025 -->
 		AND FIN_PRODUCT_ADD.DEAL_MODE = #{dealMode10}
 		<!-- 过滤周期子产品 -->

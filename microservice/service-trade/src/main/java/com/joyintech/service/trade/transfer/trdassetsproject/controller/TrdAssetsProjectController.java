@@ -1,6 +1,7 @@
 package com.joyintech.service.trade.transfer.trdassetsproject.controller;
 
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.service.trade.transfer.common.service.TransferCommonService;
 import com.joyintech.service.trade.transfer.trdassetsproject.service.TrdAssetsProjectService;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class TrdAssetsProjectController {
      */
     @Autowired
     TrdAssetsProjectService trdassetsProjectService;
+    @Autowired
+    private TransferCommonService transferCommonService;
+
     /**
      * 查询已拆分信息
      * @return 已拆分信息
@@ -37,7 +41,8 @@ public class TrdAssetsProjectController {
      */
     @RequestMapping("selectPortfolioId")
     public List<SelectOptionDto> selectPortfolioId(@RequestBody Map<String,Object>param){
-        return trdassetsProjectService.selectPortfolioId(param);
+//        return trdassetsProjectService.selectPortfolioId(param);
+        return transferCommonService.selectPortoId(param);
     }
 
     /**

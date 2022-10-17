@@ -46,14 +46,14 @@ public class PtlDvpFundAllocation001Validator implements BeanValidator {
                     getMessage("PtlDvpFundAllocation001.settleAmts"), "0")));
             }
 
-            // 划拨金额不能大于付款账户余额
-            if (dto.getMyAcctAmount() != null
-                && dto.getSettleAmt() != null
-                && dto.getMyAcctAmount().compareTo(dto.getSettleAmt()) < 0) {
-                errorList.add(new ValidMessage(
-                    getMessage("BUSS_COM_E_0003", getMessage("PtlDvpFundAllocation001.settleAmts"),
-                        getMessage("PtlDvpFundAllocation001.myAcctAmount"))));
-            }
+//            // 划拨金额不能大于付款账户余额
+//            if (dto.getMyAcctAmount() != null
+//                && dto.getSettleAmt() != null
+//                && dto.getMyAcctAmount().compareTo(dto.getSettleAmt()) < 0) {
+//                errorList.add(new ValidMessage(
+//                    getMessage("BUSS_COM_E_0003", getMessage("PtlDvpFundAllocation001.settleAmts"),
+//                        getMessage("PtlDvpFundAllocation001.myAcctAmount"))));
+//            }
 
             // 划款指令必填
             if (StringUtil.isEmptyList(dto.getBussTrdTransferOrder())) {

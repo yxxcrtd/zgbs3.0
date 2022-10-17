@@ -94,7 +94,7 @@ public class SecDealInfoRecService {
         if (TempConstant.债券买卖交易.equals(acctEntity.getTmpEName())) {
             rtnResult = secVestAssetDealTemplateRecService.execute(templateSourceFlgDTO,
                 acctEntity);
-            paramMap.put("busiType", DictCodeList.业务类型_银行间债券交易.getValue());
+            paramMap.put("busiType", DictCodeList.业务类型_债券交易.getValue());
             ps.add(DictCodeList.交易方向_买入.getValue());
             ps.add(DictCodeList.交易方向_卖出.getValue());
             ps.add(DictCodeList.交易方向_申购.getValue());
@@ -115,7 +115,7 @@ public class SecDealInfoRecService {
         else if (TempConstant.债券存续期交易.equals(acctEntity.getTmpEName())) {
             rtnResult = secVestPeriodTemplateRecService.execute(templateSourceFlgDTO,
                 acctEntity);
-            paramMap.put("busiType", DictCodeList.业务类型_银行间债券交易.getValue());
+            paramMap.put("busiType", DictCodeList.业务类型_债券交易.getValue());
             ps.add(DictCodeList.交易方向_收息到账.getValue());
             ps.add(DictCodeList.交易方向_还本到账.getValue());
             paramMap.put("pslist", ps);//删除除这些交易方向的数据
@@ -128,7 +128,7 @@ public class SecDealInfoRecService {
         else if (TempConstant.债券应收款项转让交易.equals(acctEntity.getTmpEName())) {
             rtnResult = secReceicableTradeTemplateRecService.execute(templateSourceFlgDTO,
                     acctEntity);
-                paramMap.put("busiType", DictCodeList.业务类型_银行间债券交易.getValue());
+                paramMap.put("busiType", DictCodeList.业务类型_债券交易.getValue());
                 ps.add(DictCodeList.交易方向_应收款项转入.getValue());
                 ps.add(DictCodeList.交易方向_应收款项转出.getValue());
                 paramMap.put("pslist", ps);
@@ -141,7 +141,7 @@ public class SecDealInfoRecService {
         else if (TempConstant.债券行权交易.equals(acctEntity.getTmpEName())) {
             rtnResult = secExecDealTemplateRecService.execute(templateSourceFlgDTO, acctEntity);
             List<String> busiTypes = new ArrayList<String>();
-            busiTypes.add(DictCodeList.业务类型_银行间债券交易.getValue());
+            busiTypes.add(DictCodeList.业务类型_债券交易.getValue());
             busiTypes.add(DictCodeList.业务类型_债券交易预处理.getValue());
             paramMap.put("busiTypelist", busiTypes);
             ps.add(DictCodeListExt3.交易方向_行权回售申请.getValue());

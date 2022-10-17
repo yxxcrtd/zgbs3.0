@@ -83,29 +83,30 @@
         },
 
         cols:[
-            {field:'tradeId', width:150 , title:"业务编号"}
-            ,{field:'portfolioId', width:150 , title:"组合代码",
+            /*{field:'tradeId', width:150 , title:"业务编号"},*/
+            {field:'portfolioId', width:150 , title:"组合代码",
                 render : function(data, type, row, meta) {
                     return '<a onclick="showPtlManagement(\'' + row.portfolioId
                         + '\')" class="pro-link"  style="cursor: pointer;">'+row.portfolioId+'</a>';
                 }}
             ,{field:'portfolioName', width:150 , title: '组合名称'}
             ,{field:'assetTypeVal', width:150 , title: '资产类型',sortField:'assetType'}
-            ,{field:'finprodMarketId', title: '资产代码/标的资产代码',
+            ,{field:'finprodMarketId', title: '资产代码',
                 render : function(data, type, row, meta) {
                     if(row.finprodMarketId !=undefined){
                         return "<a onclick=\"showDetailByFinprodId('"+row.finprodId+"','"+row.finprodMarketId+"','"+row.assetType+"')\" + style='cursor: pointer;'>"+row.finprodMarketId+"</a>";
                     }
                 }
                 ,width:150}
-            ,{field:'finprodName', width:150 , title: '资产名称/标的资产简称'}
+            ,{field:'finprodName', width:150 , title: '资产简称'}
             // 通道隐藏  by gaoshuqi 20210721
            /* ,{field:'chlName', width:150 , title: '通道'}*/
             ,{field:'secAcctName', width:150 , title: '证券账户'}
-            ,{field:'invAimVal', width:150 , title: '投资目的',sortField:'invAim'}
+            // ,{field:'invAimVal', width:150 , title: '投资目的',sortField:'invAim'}
+            ,{field:'invAimVal', width:150 , title: '业务模式',sortField:'invAim'}
             ,{field:'vdate', width:150 , title: '起息日',type:'date'}
             ,{field:'mdate', width:150 , title: '到期日',type:'date'}
-            ,{field:'backLendDirectionVal', width:150 , title: '交易方向',sortField:'backLendDirection'}
+            /* ,{field:'backLendDirectionVal', width:150 , title: '交易方向',sortField:'backLendDirection'}*/
             ,{field:'days', width:150 , title: '剩余天数',type:'number'}
             ,{field:'yield', width:150 , title: '利率/收益率（%）',type:'number', digit: 4}
             ,{field:'amount', width:150 , title: '券面总额',type:'number'}
@@ -162,8 +163,18 @@
                 object.undistributedAmount = data.posAmt;
                 object.finprodAbbr = data.finprodName;
                 Joyin.dialog("净值型计划转仓",'/invest/trade/transfer/netplantransfer/NetPlanTransfer001/init',
-                    "98%", "95%", object, function () {});
-            }else if(data.assetType == PINAN_ASSET_TYPE_F06) {
+                    "98%", "95%", object, function () {
+                    });
+            }
+            else if(data.assetType == PINAN_ASSET_TYPE_F09) {
+                var object = data;
+                object.undistributedAmount = data.posAmt;
+                object.finprodAbbr = data.finprodName;
+                Joyin.dialog("货币型计划转仓", '/invest/trade/transfer/currencytransfer/CurrencyTransfer001/init',
+                    "98%", "95%", object, function () {
+                    });
+            }
+            else if(data.assetType == PINAN_ASSET_TYPE_F06) {
             	Joyin.dialog("项目类资产交易转仓",
     					basePath + "/invest/trade/transfer/trdassetsProject/TrdAssetsProject001/init",
     					"98%", "95%", data, function () {
@@ -252,7 +263,7 @@
 
         cols:[
             {field:'statusVal', width:150 , title:"转仓状态",sortField:'status'}
-            ,{field:'tradeId', width:150 , title:"业务编号"}
+            /*,{field:'tradeId', width:150 , title:"业务编号"}*/
             ,{field:'totleTradeId', visible : false}
             ,{field:'portfolioId', width:150 , title:"组合代码",
                 render : function(data, type, row, meta) {
@@ -261,13 +272,13 @@
                 }}
             ,{field:'portfolioName', width:150 , title: '组合名称'}
             ,{field:'assetTypeVal', width:150 , title: '资产类型',sortField:'assetType'}
-            ,{field:'finprodMarketId', width:150 , title: '资产代码/标的资产代码',
+            ,{field:'finprodMarketId', width:150 , title: '资产代码',
                 render : function(data, type, row, meta) {
                     if(row.finprodMarketId !=undefined){
                         return "<a onclick=\"showDetailByFinprodId('"+row.finprodId+"','"+row.finprodMarketId+"','"+row.assetType+"')\" + style='cursor: pointer;'>"+row.finprodMarketId+"</a>";
                     }
                 }}
-            ,{field:'finprodName', width:150 , title: '资产名称/标的资产简称'}
+            ,{field:'finprodName', width:150 , title: '资产名称'}
             // 通道隐藏  by gaoshuqi 20210721
            /* ,{field:'chlName', width:150 , title: '通道'}*/
             ,{field:'tradeDate', width:150 , title: '交易日期',type:'date'}

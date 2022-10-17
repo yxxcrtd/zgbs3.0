@@ -1,6 +1,8 @@
 package com.joyintech.service.trade.transfer.fund.controller;
 
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.service.trade.transfer.common.dto.BondValuationDto;
+import com.joyintech.service.trade.transfer.common.service.TransferCommonService;
 import com.joyintech.service.trade.transfer.fund.dto.FundAssetTransfer001Dto;
 import com.joyintech.service.trade.transfer.fund.service.FundAssetTransferService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +29,17 @@ public class FundAssetTransferController {
      */
     @Autowired
     private FundAssetTransferService fundAssetTransferService;
+    @Autowired
+    private TransferCommonService transferCommonService;
+
     /**
      * 查询组合信息
      * @return list
      */
     @RequestMapping("selectPortfolioId")
     public List<SelectOptionDto> selectPortfolioId(@RequestBody Map<String,Object>param){
-        return fundAssetTransferService.selectPortfolioId(param);
+//        return fundAssetTransferService.selectPortfolioId(param);
+        return transferCommonService.selectPortoId(param);
     }
     /**
      * 非货币基金单位净值初始化值
@@ -44,6 +50,17 @@ public class FundAssetTransferController {
     public BigDecimal findInitCarryOverQty(@RequestBody Map<String,Object>param){
         return fundAssetTransferService.findInitCarryOverQty(param);
     }
+
+    /**
+     * 每日估值
+     * @param param 参数
+     * @return 每日估值
+     */
+    @RequestMapping("findValuation")
+    public BondValuationDto findValuation(@RequestBody Map<String,Object>param){
+        return fundAssetTransferService.findValuation(param);
+    }
+
     /**
      * 查询单位净价
      * @param param 参数

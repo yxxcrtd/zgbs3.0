@@ -24,6 +24,23 @@ public class TransferCommonDto {
      * 组合可用现金
      */
     private BigDecimal availableCash;
+    /**
+     * 账户账号
+     */
+    private String acctNo;
+    /**
+     * 币种
+     */
+    private String ccy;
+    /**
+     * 交易场所
+     */
+    private String tradePlace;
+
+    /**
+     * 待结转金额
+     */
+    private BigDecimal carryOverQty;
 
     /**
      * Gets the value of portfolioId.
@@ -123,5 +140,37 @@ public class TransferCommonDto {
      */
     public void setAvailableCash(BigDecimal availableCash) {
         this.availableCash = availableCash;
+    }
+
+    public String getAcctNo() {
+        return acctNo;
+    }
+
+    public void setAcctNo(String acctNo) {
+        this.acctNo = acctNo;
+    }
+
+    public String getCcy() {
+        return ccy;
+    }
+
+    public void setCcy(String ccy) {
+        this.ccy = ccy;
+    }
+
+    public String getTradePlace() {
+        return tradePlace;
+    }
+
+    public void setTradePlace(String tradePlace) {
+        this.tradePlace = tradePlace;
+    }
+
+    public BigDecimal getCarryOverQty() {
+        return carryOverQty;
+    }
+
+    public void setCarryOverQty(BigDecimal carryOverQty) {
+        this.carryOverQty = carryOverQty;
     }
 }

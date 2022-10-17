@@ -527,7 +527,13 @@ public class FinTenderBondAssetService extends BaseService<FinTenderBondAsset002
                 double a = Math.pow(ArithmeticUtil.divide(hundred, dto.getIssuePrice(), 14).doubleValue(), ArithmeticUtil.divide(BigDecimal.ONE, year, 14).doubleValue());
                 dto.setIntRate(ArithmeticUtil.subtract(new BigDecimal(a), BigDecimal.ONE));
             }
+            if(StringUtil.isNotEmpty(dto.getIntRate())){
+                dto.setIntRate(ArithmeticUtil.multiply(dto.getIntRate(),hundred));
+            }
         } else {//计算发行价格
+            if(StringUtil.isNotEmpty(dto.getIntRate())){
+                dto.setIntRate(ArithmeticUtil.divide(dto.getIntRate(),hundred,4));
+            }
             if (year.compareTo(BigDecimal.ONE) <= 0) {
                 dto.setIssuePrice(ArithmeticUtil.divide(hundred, ArithmeticUtil.doAdd(ArithmeticUtil.multiply(dto.getIntRate(), year), BigDecimal.ONE), 14));
             } else {

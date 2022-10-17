@@ -22,6 +22,8 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.invest.common.dto.common.BussTrdTransferOrderBase;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
+import com.joyintech.tams.invest.common.entrust.dao.EtrTrdCommonMapper;
+import com.joyintech.tams.invest.common.trade.dao.TrdCommonBaseMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -54,6 +57,12 @@ public class BussTrdTransferOrderController extends BaseController {
 	 */
 	@Autowired(required = false)
 	private BaseGetBusinessId baseGetBusinessId;
+
+    @Autowired
+    private TrdCommonBaseMapper trdCommonBaseMapper;
+
+   @Autowired
+    private EtrTrdCommonMapper etrTrdCommonMapper;
 
     /**
      * 共通Mapper的通用代理方案
@@ -140,8 +149,8 @@ public class BussTrdTransferOrderController extends BaseController {
                 // entity.setRecAcctNoList(Arrays.asList(optionDto));
                 // }
 
-                entity.setPayAcctNoList(acctNoList);
-                entity.setRecAcctNoList(acctNoList);
+//                entity.setPayAcctNoList(acctNoList);
+//                entity.setRecAcctNoList(acctNoList);
                 StlCapacctInfo stlCapacctInfo = bussTrdTransferOrderService.queryStlCapacctInfoByBusiAcctNo(entity.getCcy(), entity.getRecAcctNo());
                 if (stlCapacctInfo != null){
                     entity.setRecAcctPoint(stlCapacctInfo.getLargePayno());
@@ -387,16 +396,39 @@ public class BussTrdTransferOrderController extends BaseController {
     @ResponseBody
     public List<SelectOptionDto> select() throws IOException {
         List<SelectOptionDto> tempList = new ArrayList<>();
+        BussTrdTransferOrderDto bussTrdTransferOrderDto = new BussTrdTransferOrderDto();
         // DVP资金调拨管理,直接使用画面上选择的收付款账户
         String selectValue = getParam("selectValue");
+        String selectRowValue = getParam("selectRowValue");
         if(StringUtils.isNotBlank(selectValue)){
              tempList = JsonUtils.json2List(selectValue, SelectOptionDto.class);
         }
+        if(StringUtils.isNotBlank(selectRowValue)){
+            bussTrdTransferOrderDto = JsonUtils.json2Object(selectRowValue, BussTrdTransferOrderDto.class);
+        }
+        if ("Y".equals(getParam("isLimitAcct"))) {
+            String portfolioId = "";
+            if (null != bussTrdTransferOrderDto && "recAcctNo".equals(getParam("type"))) {
+                portfolioId = bussTrdTransferOrderDto.getPortfolioId();
+            }
+            if (null != bussTrdTransferOrderDto && "payAcctNo".equals(getParam("type"))) {
+                portfolioId = bussTrdTransferOrderDto.getInPortfolioId();
+            }
+            return etrTrdCommonMapper.getPtlAcctInfoByPortId(portfolioId, Arrays.asList(DictCodeListExt1.资金账户类型_产品托管户.getValue()));
+        }
+
         if (!StringUtil.isEmptyList(tempList)) {
             if (StringUtil.equals("isUsePageAcctTrue", tempList.get(0).getObject())) {
                 return tempList;
             }
         }
+        if (null != bussTrdTransferOrderDto) {
+            if (("recAcctNo".equals(getParam("type")) && "Y".equals(bussTrdTransferOrderDto.getReAcctNoGdhFlag()))
+                || "payAcctNo".equals(getParam("type")) && "Y".equals(bussTrdTransferOrderDto.getAcctNoGdhFlag())) {
+                return trdCommonBaseMapper.queryReAcctNoByPortfolioId(bussTrdTransferOrderDto.getPortfolioId());
+            }
+        }
+
         
         return bussTrdTransferOrderService.queryAcctList(RequestUtil.getPageParam());
         // String initValue = getParam("initValue");

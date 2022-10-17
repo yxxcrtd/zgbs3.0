@@ -4,20 +4,16 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.security.SecurityUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
-import com.joyintech.tams.business.asset.bond.dto.FinBondAssetSaveRequest;
-import com.joyintech.tams.business.asset.bond.service.FinBondAssetService;
-import com.joyintech.tams.business.asset.bond.service.FinBondAssetValidatorService;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
-import com.joyintech.tams.business.common.exception.PositionException;
+import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
+import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
+import com.joyintech.tams.invest.common.trade.dao.EtrCommonCashPositionMapper;
+import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
+import com.joyintech.tams.position.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
-import com.joyintech.tams.business.common.util.ValidUtils;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.*;
@@ -28,13 +24,8 @@ import com.joyintech.tams.invest.common.component.base.group.BasePtlSecPositionI
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
-import com.joyintech.tams.invest.common.dto.etr.EtrPositionHoldDto;
-import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
-import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
-import com.joyintech.tams.invest.common.trade.dao.EtrCommonCashPositionMapper;
-import com.joyintech.tams.invest.common.trade.service.BaseEtrCashPositionCommService;
-import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.dto.dto.FinBondMarketInfoDetailQueryDto;
 import com.joyintech.tams.touguan.basicdata.marketdata.bondmarketinfoquery.service.FinBondMarketInfoQuery001Service;
@@ -42,7 +33,6 @@ import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.shiro.crypto.hash.Hash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,8 +86,20 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
     @Resource
     private BasePtlSecPositionInfoService basePtlSecPositionInfoService;
 
+    @Autowired(required = false)
+    private EtrCommonCashPositionDealService etrCommonCashPositionDealService;
+
+    @Autowired(required = false)
+    private EtrCommonCashPositionMapper etrCommonCashPositionMapper;
+
     @Resource
     private IPlatformDate iPlatformDate;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     @Override
     public String generateTitle(FinTenderBondAsset003Dto entity, OperationType operationType) {
@@ -161,7 +163,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                     //处理旧头寸
                     this.revokeOldPostion(dto,totleTradeId);
                     try {
-                        PositionHttpRequest.dorevoke(totleTradeId, DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_上市流通.getValue(), DictCodeList.交易方向_上市流通.getValue());
+                        positionRequestHandle.dorevoke(totleTradeId, DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_上市流通.getValue(), DictCodeList.交易方向_上市流通.getValue());
                     } catch (PositionException e) {
                         logger.error("交收失败-头寸处理异常", e);
                         WorkFlowUtil.showMessage("头寸处理异常,请检查头寸日期", MessageType.错误消息);
@@ -236,7 +238,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                     param.put("interfaceType", "Bond002");
                 }
                 try {
-                    PositionHttpRequest.send(param);
+                    positionRequestHandle.send(param);
                 } catch (PositionException e) {
                     logger.error("处理失败-头寸处理异常", e);
                     WorkFlowUtil.showMessage("头寸处理异常,请检查头寸日期", MessageType.错误消息);
@@ -278,14 +280,18 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                     }
                 }
                 //5.处理指令流水
-         /*       List<EtrSecPositionFlowDto> etrFlowList = etrCommonCashPositionMapper.selectAllPositionByFinprodId(dto.getFinprodId());
+               List<EtrSecPositionFlowDto> etrFlowList = etrCommonCashPositionMapper.selectAllPositionByFinprodId(dto.getFinprodId(),iPlatformDate.getSysDateStr());
                 if (CollectionUtils.isNotEmpty(etrFlowList)) {
                     List<EtrSecPositionFlowDto> list = new ArrayList<>();
-                    for (EtrSecPositionFlowDto flowDto : list) {
+                    for (EtrSecPositionFlowDto flowDto : etrFlowList) {
                         EtrSecPositionFlowDto dto1 = new EtrSecPositionFlowDto();
+                        flowDto.setSeqno(IDGenerator.generate());
                         BeanUtil.copyPropertiesIgnoreNull(dto1, flowDto);
                         dto1.setAmount(dto1.getAmount().negate());
+                        dto1.setSeqno(IDGenerator.generate());
+                        dto1.setTradeId(totleTradeId);
                         list.add(dto1);
+                        flowDto.setTradeId(totleTradeId);
                         flowDto.setFinprodId(finproductId);
                     }
                     //先生成一笔一级反向流水
@@ -296,7 +302,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                     EtrPositionHoldDto holdDto1 = new EtrPositionHoldDto();
                     holdDto1.setPtlSecPositionFlows(etrFlowList);
                     etrCommonCashPositionDealService.持久化流水Dto(holdDto1);
-                }*/
+                }
             }
         }
     }
@@ -332,15 +338,19 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                     }
                 }
                 //5.处理指令流水
-          /*      List<EtrSecPositionFlowDto> etrFlowList = etrCommonCashPositionMapper.selectAllPositionByFinprodId(finproductId);
+               List<EtrSecPositionFlowDto> etrFlowList = etrCommonCashPositionMapper.selectAllPositionByFinprodId(finproductId,iPlatformDate.getSysDateStr());
                 if (CollectionUtils.isNotEmpty(etrFlowList)) {
                     List<EtrSecPositionFlowDto> list = new ArrayList<>();
-                    for (EtrSecPositionFlowDto flowDto : list) {
+                    for (EtrSecPositionFlowDto flowDto : etrFlowList) {
                         EtrSecPositionFlowDto dto1 = new EtrSecPositionFlowDto();
                         BeanUtil.copyPropertiesIgnoreNull(dto1, flowDto);
                         dto1.setAmount(dto1.getAmount().negate());
+                        dto1.setSeqno(IDGenerator.generate());
+                        dto1.setTradeId(totleTradeId);
                         list.add(dto1);
+                        flowDto.setSeqno(IDGenerator.generate());
                         flowDto.setFinprodId(dto.getFinprodId());
+                        flowDto.setTradeId(totleTradeId);
                     }
                     //先生成二级反向流水
                     EtrPositionHoldDto holdDto = new EtrPositionHoldDto();
@@ -350,7 +360,7 @@ public class FinTenderBondAsset003Service extends BaseService<FinTenderBondAsset
                     EtrPositionHoldDto holdDto1 = new EtrPositionHoldDto();
                     holdDto1.setPtlSecPositionFlows(etrFlowList);
                     etrCommonCashPositionDealService.持久化流水Dto(holdDto1);
-                }*/
+                }
             }
 
         }

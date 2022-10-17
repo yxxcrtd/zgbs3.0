@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService.getSeqNo;
+import static com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService.logger;
 
 /**
  * @program: 2.1.0
@@ -57,6 +58,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
      */
     public static void deal债券CashPosition(BaseTradeProductDealDto finProductTradeDto, DictCodeList 持仓类型,
                                           EtrPositionHoldDto etrPositionHoldDto) {
+        logger.info("EtrSecCashPositionDealService.deal债券CashPosition -> param:{}", JsonUtils.object2Json(finProductTradeDto));
         // 交易场所
         String tradePlace = finProductTradeDto.getTrdProductDeal().getTradeMarket();
         TrdProductDeal deal = finProductTradeDto.getTrdProductDeal();
@@ -74,9 +76,13 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         String secManageAcctId = finProductTradeDto.getTrdProductDeal().getSecManageAcctId();
         // 交易日期
         Date tradeDate = finProductTradeDto.getTrdProductDeal().getTradeDate();
+        // 交收日期
+        Date settleDate = finProductTradeDto.getTrdProductDeal().getSettleDate();
         // 交易生成的持仓流水
         EtrSecPositionFlowDto etrSecPositionFlowDto = EtrCommonCashPositionDealService.getEtrSecPositionFlowDto(
             finProductTradeDto);
+        // 债券持仓生成在交收日
+        etrSecPositionFlowDto.setCdate(settleDate);
         // 交易生成的现金流水
         EtrCashPositionFlowDto etrCashPositionFlowDto = EtrCommonCashPositionDealService.getEtrCashPositionFlowDto(
             finProductTradeDto);
@@ -140,6 +146,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                 }
             }
             else {
+                // 通道
                 if (StringUtil.equals(chlType, DictCodeListExt2.划款方式_逐笔划款.getValue())) {
                     // 逐笔划款通道
                     etrCashPositionFlowDto.setChlFinprodId(null);
@@ -887,7 +894,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         // 交易生成的现金流水
         EtrCashPositionFlowDto etrCashPositionFlowDto = EtrCommonCashPositionDealService.getEtrCashPositionFlowDto(
             finProductTradeDto);
-        etrCashPositionFlowDto.setOrderId(finProductTradeDto.getTrdProductDeal().getTotleTradeId());
+        etrCashPositionFlowDto.setOrderId(finProductTradeDto.getTrdProductDeal().getTradeId());
         if(StringUtil.isNotEmpty(finProductTradeDto.getPurchModle())
         		&& StringUtil.equals(DictCodeListExt2.申购方式_线下申购.getValue(), finProductTradeDto.getPurchModle())){
         	String 账号 = gen账号1(finProductTradeDto.getTrdProductDeal().getTradeMarket(),
@@ -1202,8 +1209,12 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                 finProductTradeDto);
         etrCashPositionFlowDto.setOrderId(finProductTradeDto.getEntrustId());
         // 交易场所为一级市场且是交易所的交易，付款账户为托管户 add by 马数凯 20210430
+        StlPayOrdersDto stlPayOrdersDto = new StlPayOrdersDto();
         String 账号;
-        if (StringUtil.equals(finProductTradeDto.getTrdProductDeal().getTradeMarketMode(), DictCodeListExt1.交易市场_一级市场.getValue())) {
+        if(CollectionUtils.isNotEmpty(finProductTradeDto.getStlPayOrdersList())) {
+            stlPayOrdersDto = finProductTradeDto.getStlPayOrdersList().get(0);
+            账号 = stlPayOrdersDto.getMyAcctNo();
+        }else if (StringUtil.equals(finProductTradeDto.getTrdProductDeal().getTradeMarketMode(), DictCodeListExt1.交易市场_一级市场.getValue())) {
             账号 = EtrCommonCashPositionDealService.select组合托管户(finProductTradeDto.getTrdProductDealAdd().getPortfolioId(),
                     finProductTradeDto.getTrdProductDeal().getCcy(), DictCodeListExt2.资金账户类型_托管户.getValue());
         } else {
@@ -1217,7 +1228,8 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
         etrCashPositionFlowDto.setCdate(finProductTradeDto.getTrdProductDeal().getSettleDate());
         // 有委托
         if (StringUtil.isNotEmpty(entrustId)) {
-            if (StringUtil.equals(finProductTradeDto.getStage(), "03")) {
+            if (StringUtil.equals(finProductTradeDto.getStage(), "03")
+                    || StringUtil.equals(finProductTradeDto.getStage(), "04")) {
                 etrSecPositionFlowDto.setCdate(finProductTradeDto.getTrdProductDeal().getSettleDate());
                 // 交割日增加交易券面总额/债券面值
                 etrSecPositionFlowDto.setAmount(交易日数量);
@@ -1228,6 +1240,9 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                         交易日数量, finProductTradeDto.getTrdProductDeal().getSettleDate(),
                         finProductTradeDto.getTrdProductDeal().getTradeMarket(), finProductTradeDto.getBondFirstSign());
                 flowDto.setAmount(ArithmeticUtil.doAdd(交易日减少金额, flowDto.getAmount()));
+                if(StringUtil.equals(finProductTradeDto.getStage(), "04")){
+                    flowDto.setAmount(交易日减少金额);
+                }
                 etrPositionHoldDto.getPtlCashPositionFlows().add(flowDto);
 
             } else if (StringUtil.equals(finProductTradeDto.getStage(), "02")) {
@@ -1322,6 +1337,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                                 boolean is卖出,
                                 EtrCashPositionFlowDto etrCashPositionFlowDto){
         String chlType = StringUtil.isEmpty(chlId) ? null : EtrCommonCashPositionDealService.queryChlType(chlId);
+        String mstSaleFlag = CacheUtil.getSysParam("TRANSFER_MST_SALE_FLAG");
         if (StringUtil.equals(chlType, DictCodeListExt2.划款方式_一次性划款.getValue())
             || (StringUtil.equals(chlType, DictCodeListExt2.划款方式_逐笔划款.getValue()) && StringUtil.isBlank(counterId))) {
             etrCashPositionFlowDto.setChlFinprodId(chlId);
@@ -1335,7 +1351,7 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
             }
             else if ((!StringUtil.equals(tradePlace, DictCodeListExt1.交易场所_银行间.getValue()) &&
                     !StringUtil.equals(tradePlace, DictCodeListExt1.交易场所_商业银行柜台.getValue()))
-                            && StringUtil.isNotEmpty(secManageAcctId) &&!(is卖出&&EtrCommonCashPositionDealService.isInTrade(counterId))) {
+                            && StringUtil.isNotEmpty(secManageAcctId) &&!("N".equals(mstSaleFlag)&&EtrCommonCashPositionDealService.isInTrade(counterId))) {
                 return EtrCommonCashPositionDealService.select资金账户(secManageAcctId, ccy);
             }
             else {

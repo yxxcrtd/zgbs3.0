@@ -1,5 +1,7 @@
 package com.joyintech.tams.invest.common.dto.position;
 
+import java.math.BigDecimal;
+
 /**
  * 组合数据集
  */
@@ -29,6 +31,10 @@ public class PositionCashSecDto {
 
     private String finprodType2; //资产类型投管 可用持仓必传
 
+    /**
+     * 可用持仓
+     */
+    private BigDecimal AMOUNT;
 
     public String getPortfolioId() {
         return portfolioId;
@@ -126,5 +132,17 @@ public class PositionCashSecDto {
 
     public void setFinprodType2(String finprodType2) {
         this.finprodType2 = finprodType2;
+    }
+
+    public BigDecimal getAMOUNT() {
+        return AMOUNT;
+    }
+
+    public void setAMOUNT(BigDecimal AMOUNT) {
+        this.AMOUNT = AMOUNT;
+    }
+
+    public String getBusiKey(){
+        return getPortfolioId() + "_" + getSecAcctId() + "_" + getFinprodId();
     }
 }

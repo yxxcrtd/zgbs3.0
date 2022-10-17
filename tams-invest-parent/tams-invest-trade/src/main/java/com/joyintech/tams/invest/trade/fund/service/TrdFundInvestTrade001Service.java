@@ -10,6 +10,7 @@
  
 package com.joyintech.tams.invest.trade.fund.service;
 
+import com.google.common.collect.Lists;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.export.CommonExportService;
@@ -20,16 +21,18 @@ import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.IDGenerator;
 import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.web.PlatformDate;
+import com.joyintech.tams.common.base.dao.MstCounterPartyMapper;
+import com.joyintech.tams.common.base.entity.MstCounterParty;
 import com.joyintech.tams.common.base.entity.TrdProductDeal;
 import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.settle.BussSettleOrderCommService;
 import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommService;
 import com.joyintech.tams.component.business.trade.BussTrdTransferOrderService;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
 import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
@@ -39,12 +42,19 @@ import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDt
 import com.joyintech.tams.invest.common.risk.service.RiskCreditListCommonValidatorService;
 import com.joyintech.tams.invest.common.service.InvestInterfCommService;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
+import com.joyintech.tams.invest.common.trade.dto.CreditLinesInputDto;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
 import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
+import com.joyintech.tams.invest.trade.fund.dto.TrdFundInvestTradeConfirmDto;
 import com.joyintech.tams.invest.trade.fund.dto.TrdFundInvestTradeDto;
+import com.joyintech.tams.invest.trade.transfer.aop.RdsTransferAop;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,6 +77,7 @@ import java.util.Map;
 @Transactional(rollbackFor=Exception.class)
 public class TrdFundInvestTrade001Service extends CommonExportService<TrdFundInvestTradeDto> implements BaseProcessService<TrdFundInvestTradeDto> {
 
+    private static final Logger logger = LoggerFactory.getLogger(TrdFundInvestTrade001Service.class);
     /**
      * 划款指令业务组件service
      */
@@ -97,6 +108,9 @@ public class TrdFundInvestTrade001Service extends CommonExportService<TrdFundInv
     @Autowired
     private TrdFundInvestTrade002Service trdFundInvestTrade002Service;
 
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
+
     // 调用投管接口 add by renping 20190205 start
     /**
      * 投管接口共通组件
@@ -107,6 +121,13 @@ public class TrdFundInvestTrade001Service extends CommonExportService<TrdFundInv
     
     @Autowired
     private RiskCreditListCommonValidatorService riskCreditListCommonValidatorService;
+
+    @Autowired
+    private IPlatformDate iPlatformDate;
+
+    @Autowired
+    private MstCounterPartyMapper mstCounterPartyMapper;
+
     /**
      * 
      * 分页查询
@@ -153,7 +174,6 @@ public class TrdFundInvestTrade001Service extends CommonExportService<TrdFundInv
                 fundTrade.setFlg("02");
             }
         });
-
         return res;
     }
 
@@ -167,17 +187,15 @@ public class TrdFundInvestTrade001Service extends CommonExportService<TrdFundInv
         entity.setPortfolioId(AllTradeCommonUtil.exchangePortfolio(entity.getPortfolioId()));
         List<BaseTradeProductDealDto> dtoList = restTemplate.getForList(ServiceApplication.TRADE_SERVICE_NAME + "/TrdFundInvestTrade/getFinDto?tradId="+
             entity.getTradeId(),BaseTradeProductDealDto.class);
-
         // 提前查询判断  是否  撤销 并且是 有转仓交易 并且转仓交易方向ps为买入
         String reverseTradeId = "";
         if(type == OperationType.REVOKE) {
             TrdProductDeal reverseTrdProductDeal = trdCommonBaseService.selectZCDealByTid(entity.getTradeId(),false);
             if (reverseTrdProductDeal != null && StringUtil.equals(DictCodeList.交易方向_买入.getValue(), reverseTrdProductDeal.getPs())) {
                 reverseTradeId = reverseTrdProductDeal.getTradeId();
+                RdsTransferAop.releaseOccupy(entity.getTradeId(), iPlatformDate.getSysDateStr());
             }
         }
-
-
         FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
         for(BaseTradeProductDealDto btpddto:dtoList){
             btpddto.getTrdProductDeal().setIsCancel(DictCodeList.是否_是.getValue());
@@ -220,8 +238,6 @@ public class TrdFundInvestTrade001Service extends CommonExportService<TrdFundInv
                   }
               }
             }
-            
-            
         }
         if (DictCodeListExt2.交易方向_转换申请.getValue().equals(entity.getPs()) || DictCodeListExt2.交易方向_转换确认.getValue().equals(entity.getPs())) {
             finProductTradeDto.setNeedSum(true);
@@ -271,13 +287,12 @@ public class TrdFundInvestTrade001Service extends CommonExportService<TrdFundInv
                 || StringUtil.equals(entity.getPs(), DictCodeList.交易方向_买入.getValue())
                 || StringUtil.equals(entity.getPs(), DictCodeList.交易方向_卖出.getValue())){
             //删除授信占用
-            if (null != entity.getTradeId() && !"".equals(entity.getTradeId())){
+            if (StringUtil.isNotEmpty(entity.getTradeId())){
                 riskCreditListCommonValidatorService.deleteCredit(entity.getTradeId());
             }
         }
-        
         if(StringUtil.equals(DictCodeList.交易方向_赎回确认.getValue(), entity.getPs())) {
-            if (null != entity.getTradeId() && !"".equals(entity.getTradeId())){
+            if (StringUtil.isNotEmpty(entity.getTradeId())){
                 List<String> tradeids = riskCreditListCommonValidatorService.selectTradeidByBTtradid(entity.getTradeId());
             	if (StringUtil.isNotEmpty(tradeids)) {
                 	for(String tradeid : tradeids) {
@@ -286,8 +301,19 @@ public class TrdFundInvestTrade001Service extends CommonExportService<TrdFundInv
             	}
             }
         }
-
-        // 调用投管接口 add by renping 20190205 start
+        //撤销时释放授信占用
+        if (type == OperationType.REVOKE && (StringUtil.equals(DictCodeList.交易方向_赎回确认.getValue(), entity.getPs()) ||
+                StringUtil.equals(entity.getPs(), DictCodeList.交易方向_申购.getValue()))) {
+            if (StringUtil.isNotEmpty(entity.getTradeId())){
+                CreditLinesInputDto inputDto = new CreditLinesInputDto();
+                inputDto.setTradeId(entity.getTradeId());
+                inputDto.setTradeDate(entity.getTradeDate());
+                inputDto.setCreditCallType(DictCodeListRsk.授信占用类别_实占.getValue());
+                inputDto.setTradeStatus(DictCodeListExt1.交易状态_撤销.getValue());
+                AllTradeCommonUtil.handleBeforeTradeComplete(Lists.newArrayList(inputDto), DictCodeListRsk.授信占用类别_实占.getValue());
+            }
+        }
+            // 调用投管接口 add by renping 20190205 start
         if (!(StringUtil.equals(DictCodeList.基金类资产类型_货币基金.getValue(), entity.getType6())
             && (StringUtil.equals(DictCodeListExt2.交易方向_认购.getValue(), entity.getPs())
                 || StringUtil.equals(DictCodeList.交易方向_申购.getValue(), entity.getPs())
@@ -343,7 +369,27 @@ public class TrdFundInvestTrade001Service extends CommonExportService<TrdFundInv
                     reverseDto,Integer.class);
 
         }
-
+        // 基金转仓撤销新头寸
+        if (type == OperationType.REVOKE) {
+            Map<String, Object> batchRevoke = new HashMap<>();
+            Map<String, Object> data = new HashMap<>();
+            List<Map<String, Object>> dataList = new ArrayList<>();
+            data.put("busiType", "39");
+            data.put("ps", entity.getPs());
+            data.put("closeId", entity.getTradeId());
+            data.put("systemAct", DictCodeListExt3.系统动作_撤销.getValue());
+            data.put("busiAct", DictCodeListExt3.业务动作_撤销.getValue());
+            dataList.add(data);
+            batchRevoke.put("data", dataList);
+            batchRevoke.put("userId", LoginUserUtil.getUserName());
+            batchRevoke.put("totalTradeId", IDGenerator.generate());
+            batchRevoke.put("modelType",DictCodeListExt1.子系统代码_交易.getValue());
+            try {
+                positionRequestHandle.batchRevoke(batchRevoke);
+            } catch (Exception e) {
+                logger.error("基金转仓撤销失败:{}", e.getMessage(), e);
+            }
+        }
     }
     /**
      * 

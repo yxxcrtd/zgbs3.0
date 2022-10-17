@@ -541,13 +541,13 @@ public class CfetsBondDealQuotedPrice001Service extends CommonExportService<Cfet
      */
     public boolean doBack(BondQuoteInfoDto bondQuoteInfoDto) {
         if (StringUtil.equals(bondQuoteInfoDto.getQuoteType(),
-            BussinessDictCodeList.报价方式_对话报价.getValue())) {
+            BussinessDictCodeList.交易类型_对话报价.getValue())) {
             return restTemplate.postForObject(ServiceApplication.BANKUPLINK_SERVICE_NAME
                                               + "/CfetsBondDealQuotedPrice/bondDialogueQuoteRestore",
                 bondQuoteInfoDto, boolean.class);
         }
         else if (StringUtil.equals(bondQuoteInfoDto.getQuoteType(),
-            BussinessDictCodeList.报价方式_请求报价.getValue())) {
+            BussinessDictCodeList.交易类型_请求报价.getValue())) {
             return restTemplate.postForObject(ServiceApplication.BANKUPLINK_SERVICE_NAME
                                               + "/CfetsBondDealQuotedPrice/sendBondRequestQuoteRestore",
                 bondQuoteInfoDto, boolean.class);
@@ -565,14 +565,14 @@ public class CfetsBondDealQuotedPrice001Service extends CommonExportService<Cfet
      */
     public boolean doDel(BondQuoteInfoDto bondQuoteInfoDto) {
         if (StringUtil.equals(bondQuoteInfoDto.getQuoteType(),
-            BussinessDictCodeList.报价方式_对话报价.getValue())) {
+            BussinessDictCodeList.交易类型_对话报价.getValue())) {
             return restTemplate.getForObject(ServiceApplication.BANKUPLINK_SERVICE_NAME
                                              + "/CfetsBondDealQuotedPrice/deleteBondDialogueQuote?quoteId="
                                              + bondQuoteInfoDto.getQuoteId(),
                 boolean.class);
         }
         else if (StringUtil.equals(bondQuoteInfoDto.getQuoteType(),
-            BussinessDictCodeList.报价方式_请求报价.getValue())) {
+            BussinessDictCodeList.交易类型_请求报价.getValue())) {
             return restTemplate.getForObject(ServiceApplication.BANKUPLINK_SERVICE_NAME
                                              + "/CfetsBondDealQuotedPrice/deleteBondRequestQuote?quoteId="
                                              + bondQuoteInfoDto.getQuoteId(),
@@ -719,8 +719,8 @@ public class CfetsBondDealQuotedPrice001Service extends CommonExportService<Cfet
                             getMessage("QUOTE_UPLOAD_026", getMessage("QUOTE_UPLOAD_011")));
                     }
                     else {
-                        if (!BussinessDictCodeList.报价方式_对话报价.getValue().equals(p.getQuoteType())
-                            && !BussinessDictCodeList.报价方式_请求报价.getValue().equals(
+                        if (!BussinessDictCodeList.交易类型_对话报价.getValue().equals(p.getQuoteType())
+                            && !BussinessDictCodeList.交易类型_请求报价.getValue().equals(
                                 p.getQuoteType())) {
                             setValidationMsg(p, "quoteTypeStr",
                                 getMessage("QUOTE_UPLOAD_029", getMessage("QUOTE_UPLOAD_011")));
@@ -858,7 +858,7 @@ public class CfetsBondDealQuotedPrice001Service extends CommonExportService<Cfet
                     }
 
                     // 对手方交易员
-                    if (StringUtil.equals(BussinessDictCodeList.报价方式_对话报价.getValue(),
+                    if (StringUtil.equals(BussinessDictCodeList.交易类型_对话报价.getValue(),
                         p.getQuoteType())) {
                         if (StringUtil.isEmpty(p.getCounterTraderName())) {
                             setValidationMsg(p, "counterTrader",
@@ -916,7 +916,7 @@ public class CfetsBondDealQuotedPrice001Service extends CommonExportService<Cfet
                         	if (p.getEntrustAmt().compareTo(BigDecimal.ZERO) <= 0) {
                         		setValidationMsg(p, "entrustAmt", "券面(万)必须大于0！");
                             }
-                            if (StringUtil.equals(BussinessDictCodeList.报价方式_对话报价.getValue(),p.getQuoteType())) {
+                            if (StringUtil.equals(BussinessDictCodeList.交易类型_对话报价.getValue(),p.getQuoteType())) {
                                 String numStr = ArithmeticUtil.multiply(p.getEntrustAmt(),BigDecimal.valueOf(10)).toPlainString();
                                 // Modified by JIAOXUJIN on 2020-06-10
                                 if (Double.parseDouble(numStr) % 1.0d > 0) {
@@ -946,7 +946,7 @@ public class CfetsBondDealQuotedPrice001Service extends CommonExportService<Cfet
                     }
 
                     // 净价、到期%、行权%
-                    if (StringUtil.equals(BussinessDictCodeList.报价方式_对话报价.getValue(),
+                    if (StringUtil.equals(BussinessDictCodeList.交易类型_对话报价.getValue(),
                         p.getQuoteType())) {
                         // 含权债
                         int count = 0;
@@ -1244,7 +1244,7 @@ public class CfetsBondDealQuotedPrice001Service extends CommonExportService<Cfet
             dataRows.forEach(x -> {
                 BussinessCodeParameter codeParameter = new BussinessCodeParameter();
                 if (StringUtil.equals(x.getQuoteType(),
-                    BussinessDictCodeList.报价方式_对话报价.getValue())) {
+                    BussinessDictCodeList.交易类型_对话报价.getValue())) {
                     codeParameter.setSeqNo("IBU_001");
                 }
                 else {
@@ -1389,13 +1389,13 @@ public class CfetsBondDealQuotedPrice001Service extends CommonExportService<Cfet
             itemDto.setPortfolioName(StringUtils.stripToNull(rowList.get(3)));
 
             if (StringUtils.isNotBlank(rowList.get(4))) {
-                if (BussinessDictCodeList.报价方式_对话报价.getCodeName().equals(
+                if (BussinessDictCodeList.交易类型_对话报价.getCodeName().equals(
                     StringUtils.stripToNull(rowList.get(4)))) {
-                    itemDto.setQuoteType(BussinessDictCodeList.报价方式_对话报价.getValue());
+                    itemDto.setQuoteType(BussinessDictCodeList.交易类型_对话报价.getValue());
                 }
-                else if (BussinessDictCodeList.报价方式_请求报价.getCodeName().equals(
+                else if (BussinessDictCodeList.交易类型_请求报价.getCodeName().equals(
                     StringUtils.stripToNull(rowList.get(4)))) {
-                    itemDto.setQuoteType(BussinessDictCodeList.报价方式_请求报价.getValue());
+                    itemDto.setQuoteType(BussinessDictCodeList.交易类型_请求报价.getValue());
                 }
                 else {
                     itemDto.setQuoteType(StringUtils.stripToNull(rowList.get(4)));
@@ -1425,7 +1425,7 @@ public class CfetsBondDealQuotedPrice001Service extends CommonExportService<Cfet
             itemDto.setCounterTraderName(StringUtils.stripToNull(rowList.get(11)));
             itemDto.setEntrustAmt(getDecimal(rowList.get(12)));
             if (!StringUtil.equals(itemDto.getQuoteType(),
-                BussinessDictCodeList.报价方式_请求报价.getValue())) {
+                BussinessDictCodeList.交易类型_请求报价.getValue())) {
                 itemDto.setPrice(getDecimal(rowList.get(13)));
                 itemDto.setMatureYield(getDecimal(rowList.get(14)));
                 itemDto.setExerYield(getDecimal(rowList.get(15)));

@@ -341,7 +341,7 @@ public class CfetsRepoDayRegDto {
         if(StringUtil.isNotEmpty(quoteTypeStr)){
             return quoteTypeStr;
         }else{
-            return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式_登记, this.getQuoteType());
+            return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式, this.getQuoteType());
         }
     }
 

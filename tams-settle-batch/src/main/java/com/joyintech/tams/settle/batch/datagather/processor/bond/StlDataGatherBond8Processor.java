@@ -506,14 +506,28 @@ public class StlDataGatherBond8Processor extends BaseProcessor<NeedOperateEntity
             commissionAmt.setFeeAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(resultDealTotal.getCommissionAmt(), resultDeal.getShareAmt()), shareAmtTotal, 2));
             amtInfoMap.put("commissionAmt", ArithmeticUtil.doAdd(amtInfoMap.get("commissionAmt"), commissionAmt.getFeeAmt()));
         }
-
-        trdTradeFeeDetailList.add(stampFee);
-        trdTradeFeeDetailList.add(jsfFee);
-        trdTradeFeeDetailList.add(ghfFee);
-        trdTradeFeeDetailList.add(zgfFee);
-        trdTradeFeeDetailList.add(sxfFee);
-        trdTradeFeeDetailList.add(settleFee);
-        trdTradeFeeDetailList.add(commissionAmt);
+        // 费用不为空且大于0再封装
+        if(stampFee.getFeeAmt() != null && stampFee.getFeeAmt().compareTo(BigDecimal.ZERO) > 0){
+            trdTradeFeeDetailList.add(stampFee);
+        }
+        if(jsfFee.getFeeAmt() != null && jsfFee.getFeeAmt().compareTo(BigDecimal.ZERO) > 0){
+            trdTradeFeeDetailList.add(jsfFee);
+        }
+        if(ghfFee.getFeeAmt() != null && ghfFee.getFeeAmt().compareTo(BigDecimal.ZERO) > 0){
+            trdTradeFeeDetailList.add(ghfFee);
+        }
+        if(zgfFee.getFeeAmt() != null && zgfFee.getFeeAmt().compareTo(BigDecimal.ZERO) > 0){
+            trdTradeFeeDetailList.add(zgfFee);
+        }
+        if(sxfFee.getFeeAmt() != null && sxfFee.getFeeAmt().compareTo(BigDecimal.ZERO) > 0){
+            trdTradeFeeDetailList.add(sxfFee);
+        }
+        if(settleFee.getFeeAmt() != null && settleFee.getFeeAmt().compareTo(BigDecimal.ZERO) > 0){
+            trdTradeFeeDetailList.add(settleFee);
+        }
+        if(commissionAmt.getFeeAmt() != null && commissionAmt.getFeeAmt().compareTo(BigDecimal.ZERO) > 0){
+            trdTradeFeeDetailList.add(commissionAmt);
+        }
         return trdTradeFeeDetailList;
     }
 

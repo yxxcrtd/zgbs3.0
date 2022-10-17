@@ -1335,7 +1335,7 @@ public class CfetsRepoDealQuotedPrice001Dto extends EtrEntrust implements Proces
         return BussinessDictCodeList.结算方式_券款对付.getCodeName();
     }
 	public String getQuoteTypeStr(){
-        return BussinessDictCodeList.报价方式_对话报价.getCodeName();
+        return BussinessDictCodeList.交易类型_对话报价.getCodeName();
     }
 	public String getDealAmtStr() {
         if(super.getEntrustNum()!=null && this.getFinishAmt()!=null) {

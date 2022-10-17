@@ -147,6 +147,9 @@
     <select id="selectOrderIdsByPTotalTradeId" parameterType="java.lang.String" resultType="string">
         SELECT ORDER_ID FROM WFL_STL_PAY_ORDERS WHERE TRADE_ID IN (SELECT TOTLE_TRADE_ID FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL WHERE P_TOTLE_TRADE_ID = #{tradeId,jdbcType=VARCHAR})
     </select>
+    <select id="selectOrderIdsByTotalTradeId" parameterType="java.lang.String" resultType="string">
+        SELECT ORDER_ID FROM WFL_STL_PAY_ORDERS WHERE TRADE_ID IN (SELECT TOTLE_TRADE_ID FROM WFL_TRD_PRODUCT_DEAL WHERE TRADE_ID = #{tradeId,jdbcType=VARCHAR})
+    </select>
 
     <select id="selectAllPositionByTotle" resultType="com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto">
         SELECT * FROM PTL_SEC_POSITION_FLOW WHERE TRADE_ID = #{totleId}

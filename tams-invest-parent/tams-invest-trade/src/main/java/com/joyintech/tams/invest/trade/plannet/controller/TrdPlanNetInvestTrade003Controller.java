@@ -18,6 +18,7 @@ import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
 import com.joyintech.framework.security.LoginUserUtil;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
@@ -65,10 +66,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 〈一句话功能简述〉 〈功能详细描述〉
@@ -327,7 +325,14 @@ public class TrdPlanNetInvestTrade003Controller extends BaseController {
             model.addAttribute("entity_trdInvestPersonInfo", JsonUtils.object2Json(tipiDto)); 
             model.addAttribute("isCreateUser", StringUtil.equals(dto.getCreateUser(), LoginUserUtil.getUserName())?"01":"02");
             model.addAttribute("businessId", workflowId);
-        } 
+        }
+
+        if (!StringUtil.equals(pageModel,"02")){
+            if (StringUtil.equals(dto.getPs(), DictCodeList.交易方向_赎回确认.getValue())
+                    || StringUtil.equals(dto.getPs(), DictCodeList.交易方向_申购确认.getValue())){
+                dto.setCpriceDate(trdPlanNetInvestTrade003Service.calNetDate(dto.getTradeDate() ,dto.getFinprodId()));
+            }
+        }
         dto.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue());
         dto.setProfitType(DictCodeList.收益类型_净值型.getValue());
         model.addAttribute("MY_SUP_TIME_TYPE_02", DictCodeListExt1.监督时分_交易监控.getValue());
@@ -362,6 +367,19 @@ public class TrdPlanNetInvestTrade003Controller extends BaseController {
     @ResponseBody
     public BigDecimal getPrice(@RequestParam Map<String, Object> map) {
         return trdPlanNetInvestTrade003Service.getPrice(map);
+    }
+
+    /**
+     * 查询单位净值和净值日期
+     *
+     * @return
+     * @see
+     * @since 1.0
+     */
+    @RequestMapping("getLastPriceAndLastDate")
+    @ResponseBody
+    public SelectOptionDto getLastPriceAndLastDate(@RequestParam Map<String, Object> map) {
+        return trdPlanNetInvestTrade003Service.getLastPriceAndLastDate(map);
     }
 
     /**

@@ -1,26 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.joyintech.service.trade.transfer.common.dao.TransferCommonMapper" >
+<mapper namespace="com.joyintech.service.trade.transfer.common.dao.TransferCommonMapper">
+    <select id="queryUsableCashPosition" resultType="java.math.BigDecimal">
+        select
+        SUM(AMOUNT)
+        from PTL_CASH_POSITION_FLOW
+        where CDATE <![CDATA[<=]]> #{cdate,jdbcType=DATE}
+        and HODING_TYPE in ('01' ,'03')
+        <if test="portfolioId != null and portfolioId != ''">
+            and PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+        </if>
+        <if test="acctId != null and acctId != ''">
+            and ACCT_ID = #{acctId, jdbcType=VARCHAR}
+        </if>
+        <if test="ccy != null and ccy != ''">
+            and CCY = #{ccy,jdbcType=VARCHAR}
+        </if>
+        <if test="acctType != null and !acctType.isEmpty()">
+            and ACCT_ID in (
+            SELECT ACCT_NO from PTL_CAPACCT_INFO where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+            <foreach collection="acctType" open=" and ACCT_TYPE in (" close=")" item="item" separator=",">#{item}</foreach>
+            )
+        </if>
+    </select>
+
+    <select id="findCarryOverQty" resultType="java.math.BigDecimal">
+        SELECT NVL(TDY_INTINCEXP, 0) as carryOverQty
+        from (SELECT psv.TDY_INTINCEXP
+              FROM PTL_SEC_VALUTION psv
+              WHERE psv.CDATE &lt;= to_date(#{tradeDate}, 'yyyy-MM-dd')
+                AND psv.INV_AIM = '999999'
+                AND psv.PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+                AND psv.FINPROD_ID = #{finprodIdOrg,jdbcType=VARCHAR}
+              order by psv.CDATE desc
+         )
+        where rownum = 1
+    </select>
+
     <select id="findAvaPortfolioInfo" resultType="com.joyintech.service.trade.transfer.common.dto.TransferCommonDto">
         SELECT
         DISTINCT
         pp.PORTFOLIO_ID AS portfolioId,
         pp.PORTFOLIO_NAME AS portfolioName,
         pp.VDATE AS vdate,
-        pp.MDATE AS mdate
+        pp.MDATE AS mdate,
+        pci.ACCT_NO AS acctNo,
+        pci.CCY AS ccy,
+        (SELECT NVL(TDY_INTINCEXP,0)
+        from (SELECT psv.TDY_INTINCEXP
+        FROM PTL_SEC_VALUTION psv
+        WHERE psv.CDATE &lt;= to_date(#{tradeDate},'yyyy-MM-dd') AND psv.INV_AIM='999999' AND psv.FINPROD_ID =
+        #{finprodIdOrg,jdbcType=VARCHAR}
+        order by psv.CDATE desc
+        )
+        where rownum=1
+        ) object
+        <if test="secAcctId!=null and secAcctId!=''">
+            ,ssai.TRADE_PLACE AS tradePlace
+        </if>
         FROM
         PTL_PORTFOLIO pp
-        LEFT JOIN PTL_SEC_ACCT  psa
-        ON psa.PORTFOLIO_ID = pp.PORTFOLIO_ID
-        LEFT JOIN PTL_CAPACCT_INFO pci
-        ON pci.PORTFOLIO_ID = pp.PORTFOLIO_ID
-        WHERE
-        pci.ACCT_NO in (SELECT DISTINCT B.ACCT_NO  FROM PTL_CAPACCT_INFO B WHERE B.PORTFOLIO_ID = #{portfolioId} AND B.ACCT_TYPE = #{capacctType} AND B.CCY = #{ccy})
-		<if test="secAcctId!=null and secAcctId!=''">
+        INNER JOIN PTL_CAPACCT_INFO pci ON pci.PORTFOLIO_ID = pp.PORTFOLIO_ID and pci.ACCT_TYPE = 'A01'
+        <if test="secAcctId!=null and secAcctId!=''">
+            LEFT JOIN PTL_SEC_ACCT psa ON psa.PORTFOLIO_ID = pp.PORTFOLIO_ID
+            LEFT JOIN STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = psa.ACCT_NO
+        </if>
+        WHERE pp.INVEST_YESORNO='Y' AND pp.PORTFOLIO_TYPE='01'
+        <!--        pci.ACCT_NO in (SELECT DISTINCT B.ACCT_NO  FROM PTL_CAPACCT_INFO B WHERE B.PORTFOLIO_ID = #{portfolioId} AND B.ACCT_TYPE = #{capacctType} AND B.CCY = #{ccy})-->
+        <if test="secAcctId!=null and secAcctId!=''">
             and psa.ACCT_NO = #{secAcctId,jdbcType=VARCHAR}
         </if>
-        AND PP.PORTFOLIO_ID != #{portfolioId,jdbcType=VARCHAR}
-        AND pp.INVEST_YESORNO='Y'
+        <if test="portfolioId!=null and portfolioId!=''">
+            AND PP.PORTFOLIO_ID != #{portfolioId,jdbcType=VARCHAR}
+        </if>
         AND pp.MDATE &gt;=TO_DATE(#{tradeDate},'yyyy-MM-dd')
         AND pp.VDATE &lt;=TO_DATE(#{tradeDate},'yyyy-MM-dd')
 
@@ -28,14 +80,30 @@
             AND (PP.PORTFOLIO_ID in (select PORTFOLIO_ID from PTL_PORTFOLIO_AUTHORITY where USER_ID = #{userId})
             OR PP.PARENT_PORTFOLIO_ID in (select PORTFOLIO_ID from PTL_PORTFOLIO_AUTHORITY where USER_ID = #{userId}))
         </if>
-
+        <if test="search != null and search != ''">
+            AND (pp.PORTFOLIO_ID LIKE CONCAT(CONCAT('%',#{search,jdbcType=VARCHAR}),'%')
+            OR pp.PORTFOLIO_NAME LIKE CONCAT(CONCAT('%',#{search,jdbcType=VARCHAR}),'%'))
+        </if>
     </select>
 
     <!--根据工作流查询交易信息 回退用-->
-    <select id="selectDealByworkflowId" resultMap="com.joyintech.tams.common.base.dao.WflTrdProductDealMapper.BaseResultMap" parameterType="java.lang.String" >
+    <select id="selectDealByworkflowId"
+            resultMap="com.joyintech.tams.common.base.dao.WflTrdProductDealMapper.BaseResultMap"
+            parameterType="java.lang.String">
         select
-        <include refid="com.joyintech.tams.common.base.dao.WflTrdProductDealMapper.Base_Column_List" />
+        <include refid="com.joyintech.tams.common.base.dao.WflTrdProductDealMapper.Base_Column_List"/>
         from WFL_TRD_PRODUCT_DEAL
         where WORKFLOW_ID = #{workflowId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getPtlPortfolioValuation"
+            resultType="com.joyintech.service.trade.transfer.common.dto.PortfolioValuationDto">
+        select PORTFOLIO_ID           portfolioId,
+               CDATE                  cdate,
+               CHECK_STAUTS           checkStatus,
+               VALUATION_TABLE_STATUS valuationTableStatus
+        from PTL_PORTFOLIO_VALUATION
+        where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+        order by cdate DESC
     </select>
 </mapper>

@@ -308,8 +308,10 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                         settleTransData.setZgfAmt(dto.getZgfAmt()); // 证管费
                         settleTransData.setStampFee(dto.getStampFee()); // 印花税
                         settleTransData.setSettleFee(dto.getSettleFee()); // 结算费
-                        settleTransData.setTradeAmt(dto.getTradeAmt()); // 成交金额
-                        settleTransData.setShareAmt(dto.getTradeNum()); // 成交份额
+                        // GLLCUAT-358:modify by fuyongsehng 20220906 start
+                        settleTransData.setTradeAmt(dto.getTradeAmt().abs()); // 成交金额
+                        settleTransData.setShareAmt(dto.getTradeNum().abs()); // 成交份额
+                        // GLLCUAT-358:modify by fuyongsehng 20220906 end
                         settleTransDataMapper.updateByPrimaryKeySelective(settleTransData);
                     }
                 }
@@ -749,8 +751,9 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                 if(DictCodeList.是否_否.getValue().equals(newSecPositionSwitch)) {
                     return super.queryForPage(page, length, () -> dayEndAccountMapper.selectPage1(param));
                 }else{// 默认查新头寸
-                    param.put("cash_hodingType", DictCodeListExt3.资产类型_证券户可用资金.getValue());
-                    param.put("hodingType", DictCodeListExt3.资产类型_资产账户持仓.getValue());
+                    param.put("cash_hodingType", DictCodeListExt3.资产类型_现金账户持仓.getValue());
+                    param.put("cash_hodingType_C_11", DictCodeListExt3.资产类型_可用中间值.getValue());
+                    param.put("cash_hodingType_C_12", DictCodeListExt3.资产类型_可取中间值.getValue());
                     param.put("dateType", StlDataGatherConstant.DATE_TYPE_T_0);
                     return super.queryForPage(page, length, () -> dayEndAccountMapper.selectPageNew1(param));
                 }
@@ -764,7 +767,6 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                 if(DictCodeList.是否_否.getValue().equals(newSecPositionSwitch)) {
                     return  super.queryForPage(page, length, () -> dayEndAccountMapper.selectPage2(param));
                 }else{// 默认查新头寸
-                    param.put("cash_hodingType", DictCodeListExt3.资产类型_证券户可用资金.getValue());
                     param.put("hodingType", DictCodeListExt3.资产类型_资产账户持仓.getValue());
                     param.put("dateType", StlDataGatherConstant.DATE_TYPE_T_0);
                     return  super.queryForPage(page, length, () -> dayEndAccountMapper.selectPageNew2(param));
@@ -775,7 +777,8 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
         if(DictCodeList.是否_否.getValue().equals(newSecPositionSwitch)) {
             return super.queryForPage(page, length, () -> dayEndAccountMapper.selectPage(param));
         }else{// 默认查新头寸
-            param.put("cash_hodingType", DictCodeListExt3.资产类型_证券户可用资金.getValue());
+            param.put("cash_hodingType_C_11", DictCodeListExt3.资产类型_可用中间值.getValue());
+            param.put("cash_hodingType_C_12", DictCodeListExt3.资产类型_可取中间值.getValue());
             param.put("hodingType", DictCodeListExt3.资产类型_资产账户持仓.getValue());
             param.put("dateType", StlDataGatherConstant.DATE_TYPE_T_0);
             return super.queryForPage(page, length, () -> dayEndAccountMapper.selectPageNew(param));

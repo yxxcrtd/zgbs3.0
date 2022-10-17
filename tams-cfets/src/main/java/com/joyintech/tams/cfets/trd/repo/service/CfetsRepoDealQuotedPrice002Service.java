@@ -36,11 +36,10 @@ import com.joyintech.service.entrust.common.service.WFlowCommonService;
 import com.joyintech.system.base.dao.SysWflBusinessListMapper;
 import com.joyintech.system.base.entity.SysWflBusinessList;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
-import com.joyintech.tams.business.common.exception.PositionException;
+import com.joyintech.tams.position.exception.PositionException;
 import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.business.common.util.BigDecimalUtil;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.business.common.util.ThreadLocalUtil;
@@ -53,7 +52,6 @@ import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepo003Mapper;
 import com.joyintech.tams.cfets.trd.repo.dao.CfetsIbuQuoteRepoMapper;
 import com.joyintech.tams.cfets.trd.repo.dto.*;
 import com.joyintech.tams.common.base.entity.PtlSecPositionFlow;
-import com.joyintech.tams.common.base.entity.RegFinPledge;
 import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
 import com.joyintech.tams.component.business.common.service.CommonBusinessService;
 import com.joyintech.tams.component.business.core.dto.WflValidInputParameter;
@@ -86,6 +84,8 @@ import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.trade.entrust.EtrFinishStatusDto;
 import com.joyintech.tams.invest.common.trade.dao.BaseAssetCashPositionCommMapper;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
+import com.joyintech.tams.position.constant.PositionConstant;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
@@ -206,6 +206,12 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
      */
     @Autowired
     private IbuMainService ibuMainService;
+
+    /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
 
     /**
      * 报价初始化校验
@@ -613,7 +619,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
                 if(StringUtil.isNotEmpty(ajaxResultPartyId.getMessage())){
                     errorList.add(new ValidMessage(ajaxResultPartyId.getMessage()));
                 }
-                if (cfetsRepoQuotedPrice004Service.ACompareToB(ptlAllocatio.getTradeAmt(), ptlAllocatio.getConvertAmt(), 6) > 0
+                if (BigDecimalUtil.ACompareToB(ptlAllocatio.getTradeAmt(), ptlAllocatio.getConvertAmt(), 6) > 0
                         && StringUtil.equals(ps, DictCodeListExt3.交易方向_正回购.getValue())) {
                     errorList.add(new ValidMessage("组合分配中交易金额要小于等于质押券折算总额"));
                 }
@@ -674,36 +680,36 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
 
             // 交易金额   到期结算金额  回购利息 交易手续费 结算手续费 总和需要相等
             if (StringUtil.isNotEmpty(entity.getTradeAmt())
-                    && cfetsRepoQuotedPrice004Service.ACompareToB(entity.getTradeAmt(), tradeAmtTotal, 12) != 0) {
+                    && BigDecimalUtil.ACompareToB(entity.getTradeAmt(), tradeAmtTotal, 12) != 0) {
                 errorList.add(new ValidMessage("组合分配交易金额总和需要等于交易金额"));
             }
             if (StringUtil.isNotEmpty(entity.getMtradeAmt())
-                    && cfetsRepoQuotedPrice004Service.ACompareToB(entity.getMtradeAmt(), mtradeAmtTotal, 12) != 0) {
+                    && BigDecimalUtil.ACompareToB(entity.getMtradeAmt(), mtradeAmtTotal, 12) != 0) {
                 errorList.add(new ValidMessage("组合分配到期结算金额总和需要等于到期结算金额"));
             }
             if (StringUtil.isNotEmpty(entity.getmIntAmt())
-                    && cfetsRepoQuotedPrice004Service.ACompareToB(entity.getmIntAmt(), mIntAmtTotal, 12) != 0) {
+                    && BigDecimalUtil.ACompareToB(entity.getmIntAmt(), mIntAmtTotal, 12) != 0) {
                 errorList.add(new ValidMessage("组合分配回购利息总和需要等于回购利息"));
             }
             if (StringUtil.isNotEmpty(entity.getDealFeeAmt())
-                    && cfetsRepoQuotedPrice004Service.ACompareToB(entity.getDealFeeAmt(), dealFeeAmtTotal, 12) != 0) {
+                    && BigDecimalUtil.ACompareToB(entity.getDealFeeAmt(), dealFeeAmtTotal, 12) != 0) {
                 errorList.add(new ValidMessage("组合分配交易手续费总和需要等于交易手续费"));
             }
             if (StringUtil.isNotEmpty(entity.getSettFeeAmt())
-                    && cfetsRepoQuotedPrice004Service.ACompareToB(entity.getSettFeeAmt(), settFeeamtTotal, 12) != 0) {
+                    && BigDecimalUtil.ACompareToB(entity.getSettFeeAmt(), settFeeamtTotal, 12) != 0) {
                 errorList.add(new ValidMessage("组合分配结算服务费总和需要等于结算服务费"));
             }
             //勾选指令的价格模式只存在指定价格时，回购利率默认等于指定价格指令中的回购利率，可修改，修
             // 改后与默认值不一致时，提交时，弹出提示“ 价格模式为指定价格，交易需要按照指令指定的回购利率进行交易！”
             if (StringUtil.isNotEmpty(yieldPRM01) && !StringUtil.isNotEmpty(minOrMaxYield)
-                    && cfetsRepoQuotedPrice004Service.ACompareToB(yieldPRM01, entity.getPrice(), yieldScale) != 0) {
+                    && BigDecimalUtil.ACompareToB(yieldPRM01, entity.getPrice(), yieldScale) != 0) {
                 errorList.add(new ValidMessage("价格模式为指定价格，交易需要按照指令指定的回购利率进行交易！"));
             }
             //交易方向为正回购
             //勾选指令的价格模式只存在限价指令时，回购利率默认为空，
             // 填入值后需不大于限价指令中回购利率的最小值，不满足时提交弹出提示“价格模式为限价指令，交易回购利率不能大于指令指定的回购利率进行交易”
             if (!StringUtil.isNotEmpty(yieldPRM01) && StringUtil.isNotEmpty(minOrMaxYield)
-                    && cfetsRepoQuotedPrice004Service.ACompareToB(minOrMaxYield, entity.getPrice(), yieldScale) < 0
+                    && BigDecimalUtil.ACompareToB(minOrMaxYield, entity.getPrice(), yieldScale) < 0
                     && StringUtil.equals(ps, DictCodeListExt3.交易方向_正回购.getValue())) {
                 errorList.add(new ValidMessage("价格模式为限价指令，交易回购利率不能大于指令指定的回购利率进行交易！"));
             }
@@ -711,14 +717,14 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
             //勾选指令的价格模式只存在限价指令时，回购利率默认为空，填入值后需不小于限价指令中回购利率的最大值，
             // 不满足时提交弹出提示“价格模式为限价指令，交易回购利率不能小于指令指定的回购利率进行交易”
             if (!StringUtil.isNotEmpty(yieldPRM01) && StringUtil.isNotEmpty(minOrMaxYield)
-                    && cfetsRepoQuotedPrice004Service.ACompareToB(minOrMaxYield, entity.getPrice(), yieldScale) > 0
+                    && BigDecimalUtil.ACompareToB(minOrMaxYield, entity.getPrice(), yieldScale) > 0
                     && StringUtil.equals(ps, DictCodeListExt3.交易方向_逆回购.getValue())) {
                 errorList.add(new ValidMessage("价格模式为限价指令，交易回购利率不能小于指令指定的回购利率进行交易！"));
             }
             //勾选指令的价格模式同时存在指定价格和限价指令时，回购利率默认为空，填入值后需判断回购利率是否等于指定价格中的回购利率，
             // 不满足提交时，弹出提示“价格模式存在指定价格，交易需要按照指令指定的回购利率进行交易！”
             if (StringUtil.isNotEmpty(yieldPRM01) && StringUtil.isNotEmpty(minOrMaxYield)
-                    && cfetsRepoQuotedPrice004Service.ACompareToB(yieldPRM01, entity.getPrice(), yieldScale) != 0) {
+                    && BigDecimalUtil.ACompareToB(yieldPRM01, entity.getPrice(), yieldScale) != 0) {
                 errorList.add(new ValidMessage("价格模式存在指定价格，交易需要按照指令指定的回购利率进行交易！"));
             }
             //检查指令是否是已接收状态
@@ -800,7 +806,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
         if (/*StringUtil.isNotEmpty(list.get(0).getObject())
                 &&*/ StringUtil.equals(CacheUtil.getSysParam("EXPORT_SHOW"), "01")
                 && !StringUtil.isNotEmpty(entity.getCounterTrader())
-                && StringUtil.equals(entity.getQuoteStyle(), BussinessDictCodeList.报价方式_对话报价.getValue())) {
+                && StringUtil.equals(entity.getQuoteStyle(), BussinessDictCodeList.交易类型_对话报价.getValue())) {
             errorList.add(new ValidMessage("请输入对手方交易员"));
         }
         if (!StringUtil.isNotEmpty(entity.getRepoMethod())) {
@@ -833,7 +839,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
             errorList.add(new ValidMessage("请输入质押券折算总额"));
         }
         if (StringUtil.isNotEmpty(entity.getTradeAmt()) && StringUtil.isNotEmpty(entity.getConvertAmt())
-                && cfetsRepoQuotedPrice004Service.ACompareToB(entity.getTradeAmt(), entity.getConvertAmt(), 6) > 0) {
+                && BigDecimalUtil.ACompareToB(entity.getTradeAmt(), entity.getConvertAmt(), 6) > 0) {
             errorList.add(new ValidMessage("交易金额需小于等于质押券折算总额"));
         }
         if (!StringUtil.isNotEmpty(entity.getDeliverytype())) {
@@ -992,12 +998,12 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
                 if (StringUtil.equals(pledgeDto.getFinprodId(), dto.getFinprodId())) {
                     isBondIdMatch = false;
                 }
-                if (cfetsRepoQuotedPrice004Service.ACompareToB(pledgeRatio, pledgeDto.getPledgeRatio(), 4) != 0) {
+                if (BigDecimalUtil.ACompareToB(pledgeRatio, pledgeDto.getPledgeRatio(), 4) != 0) {
                     flag = true;
                 }
                 pledgePrin = ArithmeticUtil.doAdd(pledgePrin, pledgeDto.getPledgePrin());
             }
-            if (cfetsRepoQuotedPrice004Service.ACompareToB(dto.getPledgePrin(), pledgePrin, 12) != 0) {
+            if (BigDecimalUtil.ACompareToB(dto.getPledgePrin(), pledgePrin, 12) != 0) {
                 flag = true;
             }
             if (isBondIdMatch) {
@@ -1124,10 +1130,10 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
                     String code = (String) bm.get("code");
                     String messageStr = JsonUtils.json2Object((String) bm.get("message").toString(), String.class);
                     if (StringUtil.isEmpty(confirmOk)
-                            && StringUtil.equals(PositionHttpRequest.CODE_BUSI_RK, code)) {
+                            && StringUtil.equals(PositionConstant.CODE_BUSI_RK, code)) {
                         WorkFlowUtil.showMessage(messageStr, MessageType.确认消息);
                     }
-                    if (StringUtil.equals(PositionHttpRequest.CODE_BUSI_YK, code)) {
+                    if (StringUtil.equals(PositionConstant.CODE_BUSI_YK, code)) {
                         WorkFlowUtil.showMessage(messageStr, MessageType.错误消息);
                     }
                     throw new PositionException(messageStr);
@@ -1170,7 +1176,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
         ProcessMark processMark = mstWorkflowCommonServiceMapperImpl.getBusinessInfo(workflowId);
         if (StringUtil.isNotEmpty(processMark)
                 && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
-            PositionHttpRequest.doDeleteByWorkFlowId(entity.getWorkflowId(), DictCodeListExt1.子系统代码_交易.getValue(),
+            positionRequestHandle.doDeleteByWorkFlowId(entity.getWorkflowId(), DictCodeListExt1.子系统代码_交易.getValue(),
                     DictCodeListExt3.头寸业务类型_质押式回购首期.getValue(), entity.getPs());
         }
     }
@@ -1673,7 +1679,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
         doDeleteWflDataForRepo(entity.getWorkflowId());
         //头寸
         if (type.equals(OperationType.REVOKE) || type.equals(OperationType.DELETE)) {
-            PositionHttpRequest.dorevoke(entity.getQuoteId(), DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_质押式回购首期.getValue(), entity.getPs());
+            positionRequestHandle.dorevoke(entity.getQuoteId(), DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_质押式回购首期.getValue(), entity.getPs());
         }
         joyinbusinessCommonService.updateCfetsOprHis(cfetsOprHisInfoRequest);
     }
@@ -2364,7 +2370,7 @@ public class CfetsRepoDealQuotedPrice002Service extends CommonExportService<Cfet
         req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         req.setPtlCashList(ptlCashList);
         req.setPtlSecList(ptlSecList);
-        Map<String, Object> param = PositionHttpRequest.send(req);
+        Map<String, Object> param = positionRequestHandle.send(req);
         ThreadLocalUtil.setLocalCache(param);
     }
 

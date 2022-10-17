@@ -15,7 +15,6 @@ import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.util.SysDataUtil;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.invest.common.constant.BussinessDictCode;
-import com.joyintech.tams.invest.entrust.etrinvestbondinfo.dto.EtrInvestBondInfoDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -378,7 +377,7 @@ public class CfetsTrdConfirmTrdCstpMatchResponse {
     }
 
     public String getBusiTypeStr() {
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式, getDealType());
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.交易类型, getDealType());
 
     }
 

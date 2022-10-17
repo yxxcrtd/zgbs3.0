@@ -809,7 +809,7 @@ public class BondQuoteInfoDto extends BaseEntity {
     }
 
     public BigDecimal getShareAmtHun() {
-        if (StringUtil.equals(this.getQuoteType(), BussinessDictCodeList.报价方式_请求报价.getValue())) {
+        if (StringUtil.equals(this.getQuoteType(), BussinessDictCodeList.交易类型_请求报价.getValue())) {
             if (this.getBondShareAmt() != null){
                 return ArithmeticUtil.divide(this.getBondShareAmt(), new BigDecimal(10000), 2);
             }
@@ -1062,7 +1062,7 @@ public class BondQuoteInfoDto extends BaseEntity {
      * @since 1.0
      */
     public String getIbuQuoteBondDetShareAmt() {
-    	if (StringUtil.equals(this.getQuoteType(), BussinessDictCodeList.报价方式_请求报价.getValue())) {
+    	if (StringUtil.equals(this.getQuoteType(), BussinessDictCodeList.交易类型_请求报价.getValue())) {
     		if (this.getIbuQuoteBondDet() != null && this.getIbuQuoteBondDet().getShareAmt() != null) {
                 return ArithmeticUtil.divide(this.getIbuQuoteBondDet().getShareAmt(),
                     new BigDecimal(100), 2).toPlainString();

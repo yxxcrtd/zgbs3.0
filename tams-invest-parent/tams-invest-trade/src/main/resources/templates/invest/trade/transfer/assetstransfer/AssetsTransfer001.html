@@ -156,15 +156,15 @@
                                 <div class="layui-form-item">
                                     <!-- 业务编号 -->
                                     <div class="form-inline-wrap">
-                                        <label class="layui-form-label form-lable">业务编号</label>
+                                        <!--<label class="layui-form-label form-lable">业务编号</label>
                                         <div class="layui-input-inline input-inline">
-                                            <!-- <input type="text" id="tradeId" name= "tradeId" class="layui-input form-input"
-                                                   data-th-placeholder="#{SysCommon.placeholder}"> -->
-                                            <!-- <select id="tradeId" name="tradeId"
+                                            &lt;!&ndash; <input type="text" id="tradeId" name= "tradeId" class="layui-input form-input"
+                                                   data-th-placeholder="#{SysCommon.placeholder}"> &ndash;&gt;
+                                            &lt;!&ndash; <select id="tradeId" name="tradeId"
                                                     class="layui-input form-input input-select"
                                                     data-th-data-url="@{/invest/trade/transfer/assetstransfer/AssetsTransfer001/getTradeId}"
                                                     placeholder="请输入内容" multiple="true">
-                                            </select> -->
+                                            </select> &ndash;&gt;
                                             <input id="tradeId" name="tradeId" class="layui-input form-input input-lenovoselect" 
                                                        data-th-placeholder="#{SysCommon.placeholder}"
                                                        data-th-data-url="@{/invest/trade/transfer/assetstransfer/AssetsTransfer001/getTradeId}"
@@ -172,7 +172,7 @@
                                                        data-showindex = 'false'
                                                        data-effectivefieldsalias='{"code":"业务编号","shortName":""}'
                                                  >
-                                        </div>
+                                        </div>-->
                                     </div>
                                     <!-- 转仓状态 -->
                                     <div class="form-inline-wrap">
@@ -189,7 +189,8 @@
                                     <div class="form-inline-wrap">
                                         <label class="layui-form-label form-lable">资产代码</label>
                                         <div class="layui-input-inline input-inline">
-                                            <select id="finprodId" name="finprodId" disabled="disabled"
+                                            <!--disabled="disabled"-->
+                                            <select id="finprodId" name="finprodId"
                                                     class="layui-input form-input input-select"
                                                     data-th-data-result="${finprodList}"
                                                     placeholder="请输入内容" multiple="true">

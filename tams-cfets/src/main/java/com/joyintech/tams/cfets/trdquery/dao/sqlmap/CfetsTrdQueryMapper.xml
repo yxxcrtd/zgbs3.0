@@ -2901,6 +2901,7 @@
             left join ibu_quote_bond_det ibuDet on ibuDet.QUOTE_ID=nvl(match.PRE_TRADE_ID,T1.B_TRADE_ID) and ibuDet.TRADE_STATUS='07'
             WHERE   T1.trade_status='01' and T1.FINPROD_TYPE2 in ('F01','F02','F03') and T1.ps in ('T01','T02','T03','03','04')
               and T8.SETTLE_STATUS in ('02','04') <!-- 已交收和交收失败 --> /*已交收在下面一段中已查询,此处再查询会导致查询重复*/
+            and T1.TRADE_MARKET in ('01','02') /*银行间和商业柜台*/
             <![CDATA[ AND T1.trade_date >= #{startDate}]]>
             <![CDATA[ AND T1.trade_date <= #{endDate}]]>
             <if test="submitUserId != null and submitUserId != ''">
@@ -3046,6 +3047,7 @@
             WHERE T1.trade_status='01' and T1.FINPROD_TYPE2 in ('F01','F02','F03') and T1.ps in ('T01','T02','T03','03','04')
             and ((T8.SETTLE_STATUS is null or T8.SETTLE_STATUS = '01'))
             and not exists (select 1 from TRD_PRODUCT_TEMP_DEAL_TOTAL where T1.TOTLE_TRADE_ID=TOTLE_TRADE_ID)
+            and T1.TRADE_MARKET in ('01','02') /*银行间和商业柜台*/
             <![CDATA[ AND T1.trade_date >= #{startDate}]]>
             <![CDATA[ AND T1.trade_date <= #{endDate}]]>
             <if test="submitUserId != null and submitUserId != ''">
@@ -3189,6 +3191,7 @@
             left join reg_fin_product_deal_total_add regAdd on regAdd.totle_trade_id=nvl(match.PRE_TRADE_ID,T1.B_TRADE_ID)
             left join ibu_quote_bond_det ibuDet on ibuDet.QUOTE_ID=nvl(match.PRE_TRADE_ID,T1.B_TRADE_ID) and ibuDet.TRADE_STATUS='07'
             WHERE T1.trade_status='01' and T1.FINPROD_TYPE2 in ('F01','F02','F03') and T1.ps in ('T01','T02','T03','03','04')
+            and T1.TRADE_MARKET in ('01','02') /*银行间和商业柜台*/
             and (T8.SETTLE_STATUS is null or T8.SETTLE_STATUS = '01')
             <![CDATA[ AND T1.trade_date >= #{startDate}]]>
             <![CDATA[ AND T1.trade_date <= #{endDate}]]>
@@ -3327,6 +3330,7 @@
             LEFT JOIN STL_SEC_ACCT_INFO T7 ON TFPDT.SEC_MANAGE_ACCT_ID = T7.SEC_ACCT_ID
             left join SYS_DATADICT_LIST sdl_sd on sdl_sd.DICT_CODE = 'SECRATE_DATA' and sdl_sd.ITEM_CODE = fpi.INT_RATE_ID
             WHERE TFPDT.TRADE_STATUS = #{TRADE_STATUS_01}
+                and TFPDT.TRADE_MARKET in ('01','02') /*银行间和商业柜台*/
               AND	TFPDT.FINPROD_TYPE2 = #{FINPROD_TYPE_TG_F32}
               AND	FP.TRADE_MARKET IN (#{TRADE_PLACE_01},#{TRADE_PLACE_02})
               AND	(BO.BID_ID IS NOT NULL OR BRT.TOTAL_WIN_ID IS NOT NULL OR TMI.PRE_TRADE_ID IS NOT NULL)
@@ -3512,6 +3516,7 @@
         and T8.SETTLE_STATUS in ('02','04') <!-- 已交收和交收失败 -->
         <![CDATA[ AND T1.trade_date >= #{startDate}]]>
         <![CDATA[ AND T1.trade_date <= #{endDate}]]>
+        and T1.TRADE_MARKET in ('01','02') /*银行间和商业柜台*/
         <if test="submitUserId != null and submitUserId != ''">
             and (t1.create_user= #{submitUserId} or t1.update_user= #{submitUserId} or T1.TRADER= #{submitUserId})
         </if>
@@ -3665,6 +3670,7 @@
         and not exists (select 1 from TRD_PRODUCT_TEMP_DEAL_TOTAL where T1.TOTLE_TRADE_ID=TOTLE_TRADE_ID)
         <![CDATA[ AND T1.trade_date >= #{startDate}]]>
         <![CDATA[ AND T1.trade_date <= #{endDate}]]>
+        and T1.TRADE_MARKET in ('01','02') /*银行间和商业柜台*/
         <if test="submitUserId != null and submitUserId != ''">
             and (t1.create_user= #{submitUserId} or t1.update_user= #{submitUserId} or T1.TRADER= #{submitUserId})
         </if>
@@ -3815,6 +3821,7 @@
         and (T8.SETTLE_STATUS is null or T8.SETTLE_STATUS = '01')
         <![CDATA[ AND T1.trade_date >= #{startDate}]]>
         <![CDATA[ AND T1.trade_date <= #{endDate}]]>
+        and T1.TRADE_MARKET in ('01','02') /*银行间和商业柜台*/
         <if test="submitUserId != null and submitUserId != ''">
             and (t1.create_user= #{submitUserId} or t1.update_user= #{submitUserId} or T1.TRADER= #{submitUserId})
         </if>

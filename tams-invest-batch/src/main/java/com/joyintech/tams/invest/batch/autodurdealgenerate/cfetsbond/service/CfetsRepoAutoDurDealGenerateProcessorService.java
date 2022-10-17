@@ -2,9 +2,7 @@ package com.joyintech.tams.invest.batch.autodurdealgenerate.cfetsbond.service;
 
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.*;
-import com.joyintech.tams.business.common.exception.PositionException;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
-import com.joyintech.tams.business.common.service.PositionHttpRequest;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
@@ -23,6 +21,7 @@ import com.joyintech.tams.invest.common.dto.period.trdrepoduration.RepoInfo;
 import com.joyintech.tams.invest.common.dto.period.trdrepoduration.TrdRepoDurationDto;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
+import com.joyintech.tams.position.servive.PositionRequestHandle;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -51,6 +50,12 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
     private PinganBatchCommonService pinganBatchCommonService;
 
     /**
+     * 头寸引擎
+     */
+    @Autowired
+    private PositionRequestHandle positionRequestHandle;
+
+    /**
      * 公共方法service
      */
     @Autowired
@@ -59,39 +64,50 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
     public void execute(Date batchDate) {
         Map<String, Object> paramMap1 = new HashMap<>();
         paramMap1.put("busiType", DictCodeList.共通业务类型_质押式回购存续期.getValue());
-        paramMap1.put("finProdType2", Arrays.asList(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue(),DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue()));
+        paramMap1.put("finProdType2", Arrays.asList(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue(), DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue()));
         paramMap1.put("updateUser", "system");
         paramMap1.put("batchDate", batchDate);
-        paramMap1.put("tradeMarket",DictCodeListExt1.交易场所_银行间.getValue());
+        paramMap1.put("tradeMarket", DictCodeListExt1.交易场所_银行间.getValue());
         List<TrdFinProductDealTotal> totalTradeIds = cfetsBondAutoDurDealGenerateMapper.selectTrdFinProductDealTotalData(paramMap1);
-        for(TrdFinProductDealTotal item : totalTradeIds){
-            PositionHttpRequest.dorevoke(item.getTotleTradeId(),DictCodeListExt1.子系统代码_交易.getValue(),DictCodeListExt3.头寸业务类型_质押式回购到期.getValue(),item.getPs());
-        }
-        //删除当日数据
-        autoPeriodCommonService.deleteActTempData(DictCodeList.共通业务类型_质押式回购存续期.getValue(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue(),batchDate,DictCodeListExt1.交易场所_银行间.getValue());
-        autoPeriodCommonService.deleteActTempData(DictCodeList.共通业务类型_质押式回购存续期.getValue(),DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue(),batchDate,DictCodeListExt1.交易场所_银行间.getValue());
-        //查询待处理数据
-        List<TrdRepoDurationDto> trdRepoDurationDtos = listTrdRepoDuration(batchDate);
-        //处理待处理数据明细
-        if(!CollectionUtils.isEmpty(trdRepoDurationDtos)){
-            List<TrdBondDurDbInertDto> trdBondDurDbInserts = new ArrayList<>();
-            for (TrdRepoDurationDto item : trdRepoDurationDtos) {
-                if(StringUtil.isNotEmpty(item.getFinprodId())){
-                    TrdRepoDurationDto trdRepoDuration = getTrdRepoDuration(BeanUtil.object2Map(item));
-                    BussinessCodeParameter parameter = new BussinessCodeParameter();
-                    parameter.setCommonBusinessType(DictCodeList.共通业务类型_资产存续期交易);
-                    trdRepoDuration.setBusiCode(autoPeriodCommonService.buildBussinessCode(parameter));
-                    // 画面设置的项目
-                    trdRepoDuration.setSettleDate(trdRepoDuration.getmDate());
-                    trdRepoDuration.setTradeAmt(trdRepoDuration.getTheoryAmt());
-                    // 组合转换
-                    trdRepoDuration.setActPortfolioId(trdRepoDuration.getPortfolioId());
-                    trdRepoDuration.setPortfolioId(AllTradeCommonUtil.exchangePortfolio(trdRepoDuration.getPortfolioId()));
-                    trdBondDurDbInserts.add(genDateForDb(trdRepoDuration));
-                }
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        try {
+            for (TrdFinProductDealTotal item : totalTradeIds) {
+                mapList.add(positionRequestHandle.dorevoke(item.getTotleTradeId(),
+                        DictCodeListExt1.子系统代码_交易.getValue(), DictCodeListExt3.头寸业务类型_质押式回购到期.getValue(), item.getPs()));
             }
-            //入库并处理头寸
-            this.insertAndSendPosition(trdBondDurDbInserts);
+            //删除当日数据
+            autoPeriodCommonService.deleteActTempData(DictCodeList.共通业务类型_质押式回购存续期.getValue(), DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue(), batchDate, DictCodeListExt1.交易场所_银行间.getValue());
+            autoPeriodCommonService.deleteActTempData(DictCodeList.共通业务类型_质押式回购存续期.getValue(), DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue(), batchDate, DictCodeListExt1.交易场所_银行间.getValue());
+            //查询待处理数据
+            List<TrdRepoDurationDto> trdRepoDurationDtos = listTrdRepoDuration(batchDate);
+            //处理待处理数据明细
+            if (!CollectionUtils.isEmpty(trdRepoDurationDtos)) {
+                List<TrdBondDurDbInertDto> trdBondDurDbInserts = new ArrayList<>();
+                for (TrdRepoDurationDto item : trdRepoDurationDtos) {
+                    if (StringUtil.isNotEmpty(item.getFinprodId())) {
+                        TrdRepoDurationDto trdRepoDuration = getTrdRepoDuration(BeanUtil.object2Map(item));
+                        BussinessCodeParameter parameter = new BussinessCodeParameter();
+                        parameter.setCommonBusinessType(DictCodeList.共通业务类型_资产存续期交易);
+                        trdRepoDuration.setBusiCode(autoPeriodCommonService.buildBussinessCode(parameter));
+                        // 画面设置的项目
+                        trdRepoDuration.setSettleDate(trdRepoDuration.getmDate());
+                        trdRepoDuration.setTradeAmt(trdRepoDuration.getTheoryAmt());
+                        // 组合转换
+                        trdRepoDuration.setActPortfolioId(trdRepoDuration.getPortfolioId());
+                        trdRepoDuration.setPortfolioId(AllTradeCommonUtil.exchangePortfolio(trdRepoDuration.getPortfolioId()));
+                        trdBondDurDbInserts.add(genDateForDb(trdRepoDuration));
+                    }
+                }
+                //入库并处理头寸
+                mapList.addAll(this.insertAndSendPosition(trdBondDurDbInserts));
+            }
+        } catch (Exception e) {
+            if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(mapList)) {
+                mapList.forEach(item -> {
+                    positionRequestHandle.roll((String) item.get("seqno"), (String) item.get("modelType"), e.getMessage());
+                });
+            }
+            throw e;
         }
     }
 
@@ -372,21 +388,13 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
      *  入库并处理头寸
      * @param trdBondDurDbInserts
      */
-    public void insertAndSendPosition(List<TrdBondDurDbInertDto> trdBondDurDbInserts) {
+    public List<Map<String, Object>> insertAndSendPosition(List<TrdBondDurDbInertDto> trdBondDurDbInserts) {
         List<Map<String, Object>> mapList = new ArrayList<>();
-        try {
-            for (TrdBondDurDbInertDto trdBondDurDbInertDto : trdBondDurDbInserts) {
-                autoPeriodCommonService.insertCfetsTempDealData(trdBondDurDbInertDto);
-                mapList.add(this.sendPositionMethod(trdBondDurDbInertDto));
-            }
-        } catch (Exception e) {
-            if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(mapList)) {
-                mapList.forEach(item -> {
-                    PositionHttpRequest.roll((Long) item.get("seqno"), (String) item.get("modelType"), e.getMessage());
-                });
-            }
-            throw e;
+        for (TrdBondDurDbInertDto trdBondDurDbInertDto : trdBondDurDbInserts) {
+            autoPeriodCommonService.insertCfetsTempDealData(trdBondDurDbInertDto);
+            mapList.add(this.sendPositionMethod(trdBondDurDbInertDto));
         }
+        return mapList;
     }
 
     /**
@@ -466,7 +474,7 @@ public class CfetsRepoAutoDurDealGenerateProcessorService extends BaseService {
         req.put("repoPledgeModel",CacheUtil.getSysParam("repo_pledge_model"));
         req.put("ptlCashList",ptlCashList);
         req.put("ptlSecList",ptlSecList);
-        return PositionHttpRequest.send(req);
+        return positionRequestHandle.send(req);
     }
 
     private void setParams(Map<String, Object> param) {

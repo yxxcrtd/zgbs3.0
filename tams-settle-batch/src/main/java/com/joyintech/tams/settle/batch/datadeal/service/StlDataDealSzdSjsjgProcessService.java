@@ -230,7 +230,7 @@ public class StlDataDealSzdSjsjgProcessService {
             // 全价总额
             settleTransData.setFpriceAmt(abs(szdSjsjg.getJgqsbj()));
             // 业务类型
-            settleTransData.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+            settleTransData.setBusiType(DictCodeList.业务类型_债券交易.getValue());
             // 交易方向、业务场景明细分类、交易份额、交易日期等设置
             setBondDeal(szdSjsjg, settleTransData, settleTransDataAdd);
             // 清算速度
@@ -1035,7 +1035,7 @@ public class StlDataDealSzdSjsjgProcessService {
                 // 交易本金
                 settleTransData.setPrinAmt(abs(qsbj));
                 // 业务类型
-                settleTransData.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+                settleTransData.setBusiType(DictCodeList.业务类型_债券交易.getValue());
             }
             else {
                 // 交易份额
@@ -1049,7 +1049,7 @@ public class StlDataDealSzdSjsjgProcessService {
             //证券品种
             settleTransData.setSecType(DictCodeListExt1.证券品种_债券.getValue());
             // 业务类型
-            settleTransData.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+            settleTransData.setBusiType(DictCodeList.业务类型_债券交易.getValue());
             // 成交编号
             // settleTransData.setTradeId(szdSjsjg.getJgddbh());
             settleTransData.setApplyTradeId(szdSjsjg.getJgddbh());
@@ -1076,7 +1076,7 @@ public class StlDataDealSzdSjsjgProcessService {
             //证券品种
             settleTransData.setSecType(DictCodeListExt1.证券品种_债券.getValue());
             // 业务类型
-            settleTransData.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+            settleTransData.setBusiType(DictCodeList.业务类型_债券交易.getValue());
             // 成交编号
             // settleTransData.setTradeId(szdSjsjg.getJgddbh());
             settleTransData.setApplyTradeId(szdSjsjg.getJgddbh());
@@ -1284,10 +1284,10 @@ public class StlDataDealSzdSjsjgProcessService {
         StlDownDataDealWriteDto stlDownDataDealWriteDto = new StlDownDataDealWriteDto();
         // 遍历 输入.SJSJG清算数据List 清算数据Entity
         for(SzdSjsjg szdSjsjg : stlDownDataDealOperatorDto.getStlDownDataDealOperatorBaseDto().getSjsjgList()) {
-            if (DictCodeListExt1.证券品种_回购.getValue().equals(stlDownDataDealOperatorDto.getFinprodType())
-                    && StringUtil.isEmpty(szdSjsjg.getJgywlsh())) {
-                continue;
-            }
+//            if (DictCodeListExt1.证券品种_回购.getValue().equals(stlDownDataDealOperatorDto.getFinprodType())
+//                    && StringUtil.isEmpty(szdSjsjg.getJgywlsh())) {
+//                continue;
+//            }
             // KEY = 证券账户号码 + 交易单元
             // GNS-865,GNS-866:交易单元为空时使用托管单元 modify by fuyongsheng 20220214 start
             String jgjydy = StringUtil.isNotEmpty(szdSjsjg.getJgjydy()) ? szdSjsjg.getJgjydy():szdSjsjg.getJgtgdy();
@@ -1337,9 +1337,11 @@ public class StlDataDealSzdSjsjgProcessService {
             if(StringUtil.equals(DictCodeListExt1.证券品种_债券.getValue(), stlDownDataDealOperatorDto.getFinprodType()) &&
                 (szdSjsjg.getJgywlb().equals(StlDataDealProcessConstant.SJSJG_YWLB_QPPX)
                             || szdSjsjg.getJgywlb().equals(StlDataDealProcessConstant.SJSJG_YWLB_QPDF)
-                            || szdSjsjg.getJgywlb().equals(StlDataDealProcessConstant.SJSJG_YWLB_ZQSH)) &&
-                StringUtil.equals(DictCodeListStl.清算数据源表_深中登SJSJG.getValue(), stlDownDataDealOperatorDto.getDataFile()) &&
-                StringUtil.isEmpty(szdSjsjg.getJgzqlb())){
+                            || szdSjsjg.getJgywlb().equals(StlDataDealProcessConstant.SJSJG_YWLB_ZQSH))
+//                    &&
+//                StringUtil.equals(DictCodeListStl.清算数据源表_深中登SJSJG.getValue(), stlDownDataDealOperatorDto.getDataFile()) &&
+//                StringUtil.isEmpty(szdSjsjg.getJgzqlb())
+            ){
                 // QPPX、QPDF、ZQSH场景
                 stlDownDataDealWriteBaseDto = dealBondSpecialType(szdSjsjg, stlDownDataDealOperatorDto,  accountInfoDtolist);
             }else if((StringUtil.equals(szdSjsjg.getJgywlb(), StlDataDealProcessConstant.SJSJG_YWLB_ZYRK) ||
@@ -1439,6 +1441,7 @@ public class StlDataDealSzdSjsjgProcessService {
                         continue;
                     }
                 }
+                handleSzdSjsjgsetApplyTradeId(settleTransData, szdSjsjg);
                 // 日终过来的文件结算价格就是全价的，需要反算净价总额、应计利息总额
                 if (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue(), settleTransData.getFinprodType2())) {
                     stlDownDataDealService.calc(settleTransData);
@@ -1768,7 +1771,10 @@ public class StlDataDealSzdSjsjgProcessService {
         //        BussinessDictCodeListRds.操作符_加.getValue(), BussinessDictCodeListRds.特征值偏移单位_自然日.getValue())));
         // settleTransData.setTradeDate(DateUtil.parse(szdSjsjg.getJgqsrq()));
         // modify by fuyongsheng 交易日无需+1自然日 end
-        settleTransData.setTradeDate(DateUtil.parse(szdSjsjg.getJgjsrq()));
+        // GLLCUAT-472:交易日期取清算日期 modify by fuyongsheng 20220914 start
+        // settleTransData.setTradeDate(DateUtil.parse(szdSjsjg.getJgjsrq()));
+        settleTransData.setTradeDate(DateUtil.parse(szdSjsjg.getJgqsrq()));
+        // GLLCUAT-472:交易日期取清算日期 modify by fuyongsheng 20220914 end
         // 交割日期
         settleTransData.setSettleDate(DateUtil.parse(szdSjsjg.getJgjsrq()));
         // 交易币种
@@ -1979,5 +1985,18 @@ public class StlDataDealSzdSjsjgProcessService {
         LocalDate start = new LocalDate(d1);
         LocalDate end = new LocalDate(d2);
         return Days.daysBetween(start, end).getDays();
+    }
+
+    /**
+     * 处理部分场景客户订单编号为空的情况
+     * @param settleTransData
+     * @param szdSjsjg
+     */
+    private void handleSzdSjsjgsetApplyTradeId(SettleTransData settleTransData, SzdSjsjg szdSjsjg){
+       if(DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())){
+           if(StringUtil.isEmpty(settleTransData.getApplyTradeId())){
+               settleTransData.setApplyTradeId(StringUtil.isNotEmpty(szdSjsjg.getJgzxbh())?szdSjsjg.getJgzxbh():szdSjsjg.getJgywlsh());
+           }
+       }
     }
 }

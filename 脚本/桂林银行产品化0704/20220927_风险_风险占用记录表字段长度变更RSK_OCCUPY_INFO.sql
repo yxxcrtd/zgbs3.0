@@ -1,0 +1,1 @@
+alter table RSK_OCCUPY_INFO  modify ENTRUST_CODE varchar2(100);

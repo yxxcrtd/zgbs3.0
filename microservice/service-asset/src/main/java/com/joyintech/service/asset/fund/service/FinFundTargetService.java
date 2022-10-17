@@ -406,6 +406,7 @@ public class FinFundTargetService extends BaseService<FinFundTargetDto> {
         BeanUtil.copyPropertiesIgnoreNull(finProductAdd, dto);
         //add by zhangnian  20191106 end
         finProductAdd.setFinprodId(finProduct.getFinprodId());
+        finProductAdd.setIsInnerAdv(finProduct.getIsInnerAdv());
         /*if(StringUtil.equals(dto.getPurSpeed(), DictCodeList.清算速度_T_0.getValue())){
             finProductAdd.setPurSpeed((long)0);
             finProductAdd.setRedSpeed((long)0);

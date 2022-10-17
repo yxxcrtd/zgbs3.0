@@ -97,6 +97,15 @@ public class TradeCallbackHelper {
                         tradeRecord.setAccountName(entrust.getAccountName());
                         tradeRecord.setFinanceAccount(entrust.getFinanceAccount());
                     }
+                    if (tradeRecord.getEntrustProp() == null) {
+                        tradeRecord.setEntrustProp(entrust.getEntrustProp());
+                    }
+                    if (tradeRecord.getEntrustBs() == null) {
+                        tradeRecord.setEntrustBs(entrust.getEntrustBs());
+                    }
+                    if (tradeRecord.getBsFlag() == null) {
+                        tradeRecord.setBsFlag(entrust.getBsFlag());
+                    }
                     tradeRecord.setPortfolioId(entrust.getPortfolioId());
                     tradeRecord.setEntrustProp(entrust.getEntrustProp());
                     if (IntegratedEntrustUtils.isFixedIncome(tradeRecord.getEntrustProp())) {
@@ -176,6 +185,15 @@ public class TradeCallbackHelper {
                     if (tradeRecord.getFinanceAccount() == null) {
                         tradeRecord.setAccountName(entrust.getAccountName());
                         tradeRecord.setFinanceAccount(entrust.getFinanceAccount());
+                    }
+                    if (tradeRecord.getEntrustProp() == null) {
+                        tradeRecord.setEntrustProp(entrust.getEntrustProp());
+                    }
+                    if (tradeRecord.getEntrustBs() == null) {
+                        tradeRecord.setEntrustBs(entrust.getEntrustBs());
+                    }
+                    if (tradeRecord.getBsFlag() == null) {
+                        tradeRecord.setBsFlag(entrust.getBsFlag());
                     }
                     tradeRecord.setPortfolioId(entrust.getPortfolioId());
                     //期货计算成交金额

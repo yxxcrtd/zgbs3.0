@@ -243,7 +243,7 @@ public class AutoPeriodSeclendCommonService extends BaseService {
                         deal1.setTradeAmt(deal1.getFpriceAmt());
                         deal1.setPrinAmt(ArithmeticUtil.subtract(deal1.getTradeAmt(), deal1.getIntAmt()));
                     }
-                    deal1.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+                    deal1.setBusiType(DictCodeList.业务类型_债券交易.getValue());
                     deal1.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
                     deal1.setCpriceAmt(ArithmeticUtil.subtract(deal1.getFpriceAmt(), deal1.getIntAmt()));
                     // add by jiangpeng on 20210428 start

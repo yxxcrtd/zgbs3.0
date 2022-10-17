@@ -480,7 +480,7 @@ public class BusiAutoAddSecInfoService {
         trdFinProductDealTotal.setTotleTradeId(totalTradeId);
         trdFinProductDealTotal.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         trdFinProductDealTotal.setFinprodType(DictCodeListExt1.金融产品类型_债券.getValue());
-        trdFinProductDealTotal.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+        trdFinProductDealTotal.setBusiType(DictCodeList.业务类型_债券交易.getValue());
         trdFinProductDealTotal.setFinprodId("F01_"+secId);
         trdFinProductDealTotal.setPs(DictCodeList.交易方向_上市流通.getValue());
         trdFinProductDealTotal.setIsCancel(DictCodeList.是否_否.getValue());
@@ -507,7 +507,7 @@ public class BusiAutoAddSecInfoService {
                 trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
                 trdProductDeal.setFinprodType2(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
                 trdProductDeal.setFinprodType(DictCodeListExt1.金融产品类型_债券.getValue());
-                trdProductDeal.setBusiType(DictCodeList.业务类型_银行间债券交易.getValue());
+                trdProductDeal.setBusiType(DictCodeList.业务类型_债券交易.getValue());
                 trdProductDeal.setFinprodId("F01_"+secId);
                 trdProductDeal.setTradeDate(batchDate);
                 trdProductDeal.setPs(DictCodeList.交易方向_上市流通.getValue());

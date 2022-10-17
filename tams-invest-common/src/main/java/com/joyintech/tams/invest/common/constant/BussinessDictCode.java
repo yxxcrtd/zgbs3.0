@@ -1338,9 +1338,9 @@ public enum BussinessDictCode implements com.joyintech.framework.base.BaseDictCo
     平安资产一级分类("ASSET_REPORT_TYPE_1"),
   //zhangliang hefei 银行间上行 20200512 add start
     /**
-     * 报价方式
+     * 交易类型
      */
-    报价方式("QUOTE_TYPE"),
+    交易类型("QUOTE_TYPE"),
     /**
      * 清算类型
      */
@@ -1416,7 +1416,7 @@ public enum BussinessDictCode implements com.joyintech.framework.base.BaseDictCo
      * 组合估值方法
      */
     组合估值方法("PTL_VALUATION_METHOD"),
-    报价方式_登记("QUOTE_STYLE"),
+    报价方式("QUOTE_STYLE"),
     分配方式("DISTRIBUTION"),
     CSTP息票类型("CSTP_COUPON_RATE_TYPE"),
     CSTP资产类型("CSTP_SEC_TYPE"),

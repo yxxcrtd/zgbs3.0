@@ -248,4 +248,14 @@ public class BussSettleOrderParameterDto {
 	public void setIeFlag(String ieFlag) {
 		this.ieFlag = ieFlag;
 	}
+
+    private String secManageAcctId;
+
+    public String getSecManageAcctId() {
+        return secManageAcctId;
+    }
+
+    public void setSecManageAcctId(String secManageAcctId) {
+        this.secManageAcctId = secManageAcctId;
+    }
 }

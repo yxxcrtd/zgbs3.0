@@ -22,7 +22,7 @@ public class StlDataGatherBond9Reader extends StlDataGatherReader {
     @Override
     protected void setSearchParam(Map<String, Object> searchParam) {
         searchParam.put("finprodType2", DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
-        searchParam.put("busiType", DictCodeList.业务类型_银行间债券交易.getValue());
+        searchParam.put("busiType", DictCodeList.业务类型_债券交易.getValue());
         searchParam.put("psList", Arrays.asList(DictCodeList.交易方向_买入.getValue()));
 
         searchParam.put("deliveryResult05", DictCodeListExt4.交收结果_交收通知.getValue());

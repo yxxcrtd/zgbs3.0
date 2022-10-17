@@ -385,7 +385,7 @@ public class CfetsTrdQueryIbuInfoListResponse {
     }
 
     public String getQuoteTypeStr() {
-        return SysDataUtil.getNameFromDataDict(BussinessDictCode.报价方式, getQuoteType());
+        return SysDataUtil.getNameFromDataDict(BussinessDictCode.交易类型, getQuoteType());
     }
 
     public void setQuoteTypeStr(String quoteTypeStr) {

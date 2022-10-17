@@ -1,11 +1,70 @@
 package com.joyintech.tams.invest.trade.transfer.fund.service;
 
+import static com.joyintech.tams.constant.DictCodeListExt1.交易场所_上海证券交易所;
+import static com.joyintech.tams.constant.DictCodeListExt1.交易场所_深圳证券交易所;
+import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_修改;
+import static com.joyintech.tams.constant.DictCodeListExt3.系统动作_新建;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import com.joyintech.tams.invest.common.risk.dao.RiskNamListCommonMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.google.common.collect.Maps;
+import com.joyintech.framework.ajax.MessageType;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.select.SelectOptionDto;
-import com.joyintech.framework.util.*;
-import com.joyintech.tams.common.base.dao.*;
-import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.framework.util.ArithmeticUtil;
+import com.joyintech.framework.util.BeanUtil;
+import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.DateUtil;
+import com.joyintech.framework.util.IDGenerator;
+import com.joyintech.framework.util.JsonUtils;
+import com.joyintech.framework.util.RequestUtil;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.system.base.dao.SysWflBusinessListMapper;
+import com.joyintech.system.base.entity.SysWflBusinessList;
+import com.joyintech.tams.business.common.pojo.BaseMap;
+import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.util.PositionUtil;
+import com.joyintech.tams.common.base.dao.FinProductMapper;
+import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
+import com.joyintech.tams.common.base.dao.PaTrdProductDealMapper;
+import com.joyintech.tams.common.base.dao.PtlTradeMapper;
+import com.joyintech.tams.common.base.dao.RepTradeMapper;
+import com.joyintech.tams.common.base.dao.WflPaTrdProductDealMapper;
+import com.joyintech.tams.common.base.dao.WflStlPayOrdersMapper;
+import com.joyintech.tams.common.base.dao.WflTrdProductDealAddMapper;
+import com.joyintech.tams.common.base.dao.WflTrdProductDealMapper;
+import com.joyintech.tams.common.base.entity.FinProduct;
+import com.joyintech.tams.common.base.entity.FinProductType;
+import com.joyintech.tams.common.base.entity.FinProductTypeKey;
+import com.joyintech.tams.common.base.entity.PaTrdProductDeal;
+import com.joyintech.tams.common.base.entity.PtlCapacctInfo;
+import com.joyintech.tams.common.base.entity.PtlTrade;
+import com.joyintech.tams.common.base.entity.RepTrade;
+import com.joyintech.tams.common.base.entity.TrdProductDeal;
+import com.joyintech.tams.common.base.entity.TrdProductDealAdd;
+import com.joyintech.tams.common.base.entity.WflPaTrdProductDeal;
+import com.joyintech.tams.common.base.entity.WflStlPayOrders;
+import com.joyintech.tams.common.base.entity.WflTrdProductDeal;
+import com.joyintech.tams.common.base.entity.WflTrdProductDealAdd;
+import com.joyintech.tams.common.base.entity.WflTrdProductDealKey;
+import com.joyintech.tams.component.base.core.impl.dao.MstWorkflowCommonServiceMapperImpl;
+import com.joyintech.tams.component.business.common.service.BasRiskMathCommService;
 import com.joyintech.tams.component.business.common.service.BussCommonMapperDelegateService;
 import com.joyintech.tams.component.business.core.service.BaseGetBusinessId;
 import com.joyintech.tams.component.business.settle.dto.BussSettleOrderParameterDto;
@@ -14,30 +73,32 @@ import com.joyintech.tams.component.business.trade.BussTrdTransferOrderService;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import com.joyintech.tams.constant.DictCodeListExt3;
+import com.joyintech.tams.invest.common.component.base.core.BaseGetBussinessId;
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
 import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
+import com.joyintech.tams.invest.common.entrust.dao.EtrTrdCommonMapper;
 import com.joyintech.tams.invest.common.threadservice.JasperUtil;
 import com.joyintech.tams.invest.common.trade.AllTradeCommonUtil;
 import com.joyintech.tams.invest.common.trade.dto.AllTradeCommonInputDto;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
+import com.joyintech.tams.invest.trade.transfer.common.dto.BondValuationDto;
+import com.joyintech.tams.invest.trade.transfer.common.dto.DeviationDegreeDto;
 import com.joyintech.tams.invest.trade.transfer.fund.dto.FundAssetTransfer001Dto;
 import com.joyintech.tams.invest.trade.transfer.lendtransfer.service.LendTransfer001Service;
+import com.joyintech.tams.invest.trade.transfer.position.service.PositionRequestServiceFundAssetTransfer001DtoRequest;
+import com.joyintech.tams.position.constant.PositionConstant;
+import com.joyintech.tams.position.exception.PositionException;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import com.joyintech.workflow.engine.WorkflowContext;
 import com.joyintech.workflow.engine.constant.OperationType;
+import com.joyintech.workflow.engine.exception.WorkFlowException;
 import com.joyintech.workflow.engine.service.BaseProcessService;
 import com.joyintech.workflow.engine.util.WorkFlowUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.util.*;
 
 /**
  * 基金类资产转仓service
@@ -80,9 +141,37 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
     private JasperUtil jasperUtil;
     @Autowired
     private IPlatformDate iPlatformDate;
-    
+
     @Autowired
     private LendTransfer001Service lendTransfer001Service;
+    @Autowired
+    private EtrTrdCommonMapper etrTrdCommonMapper;
+    @Autowired
+    private PositionRequestServiceFundAssetTransfer001DtoRequest positionRequestService;
+    @Autowired
+    private MstWorkflowCommonServiceMapperImpl mstWorkflowCommonServiceMapperImpl;
+    @Autowired
+    private SysWflBusinessListMapper sysWflBusinessListMapper;
+
+    @Autowired(required = false)
+    private BaseGetBussinessId baseGetBussinessId;
+
+    @Autowired
+    private RiskNamListCommonMapper riskNamListCommonMapper;
+
+    /**
+     * 风险试算组件Service
+     */
+    @Autowired(required = false)
+    private BasRiskMathCommService basRiskMathCommService;
+
+    @Override
+    public Map<String, Object> getRuntimeVariables(ProcessMark entity, String taskId) throws WorkFlowException {
+        FundAssetTransfer001Dto dto = this.getBussinessEntity(entity);
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("needRiskCheck", StringUtil.equals(dto.getRiskFlag(), DictCodeListExt1.是否_是.getValue()));
+        return variables;
+    }
 
     @Override
     public void doComplete(FundAssetTransfer001Dto dto, OperationType operationType) {
@@ -195,6 +284,9 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
                 map.put("finprodId", input.getFinprodId());
                 simpleRestTemplate.postForObject(ServiceApplication.TRADE_SERVICE_NAME + "/trade/transfer/fund/FundAssetTransfer/updateRep", map, Integer.class);
 
+                //插入风险试算结果
+                basRiskMathCommService.insert(dto.getRiskTrialRetDto(), dto.getTradeId());
+
                 // 一体化对应etliu start
                 // 所有交易生效后调用的共通方法
                 AllTradeCommonInputDto inputDto = new AllTradeCommonInputDto();
@@ -203,13 +295,8 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
                 inputDto.setTrdProductDeal(input.getTrdProductDeal());
                 // 通道交易 新增 强成西 2019/03/26 start
                 inputDto.setTrdProductDealAdd(input.getTrdProductDealAdd());
-                if (!StringUtil.isEmptyList(input.getBussTrdTransferOrder())) {
-                    for (BussTrdTransferOrderDto bttod : input.getBussTrdTransferOrder()) {
-                        stlPayOrder = new StlPayOrdersDto();
-                        BeanUtil.copyPropertiesIgnoreNull(stlPayOrder, bttod);
-                        inputDto.setStlPayOrders(stlPayOrder);
-                    }
-                }
+                inputDto.setStlPayOrders(stlPayOrder);
+
                 // 通道交易 新增 强成西 2019/03/26 end
                 AllTradeCommonUtil.handleAfterTradeComplete(inputDto);
                 // 一体化对应etliu end
@@ -352,7 +439,22 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
                 }
             }
         }
-        this.doDelete(workflowId);
+        this.doUpdateDelete(workflowId);
+
+        if (StringUtil.equals(dto.getTradeMarket(), 交易场所_上海证券交易所.getValue())
+                || StringUtil.equals(dto.getTradeMarket(), 交易场所_深圳证券交易所.getValue())) {
+            //增加调用头寸引擎代码start
+            if (!operationType.equals(OperationType.REVOKE) && !operationType.equals(OperationType.DELETE)) {
+                //新建转仓
+                String decisionAct = 系统动作_新建.getValue();
+                String systemAct = 系统动作_新建.getValue();
+                positionRequestService.sendFundAssetTransfer001DtoRequest(dto, decisionAct, systemAct, DictCodeListExt3.流程节点_审批生效.getValue(), "N");
+            } else {
+                //转仓撤销
+                positionRequestService.sendRevoke(dto.getTradeId());
+            }
+            //增加调用头寸引擎代码end
+        }
     }
 
     public void jasperExecute(FundAssetTransfer001Dto entity, Boolean isMC) {
@@ -368,7 +470,7 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
             trdProductDeal.setPs(entity.getPs());
             trdProductDeal.setFinprodId(entity.getFinprodId());
 
-            jasperUtil.jasperExecute(Arrays.asList(trdProductDeal),simpleRestTemplate);
+            jasperUtil.jasperExecute(Arrays.asList(trdProductDeal), simpleRestTemplate);
             // 生成划款指令附件:调用自定义接口项目生成Jasper报表 add by zhangJin 2019-07-29 end
         }
     }
@@ -400,12 +502,12 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
         //剩余可转仓本金金额，为可用持仓，若存在流程中数据应扣减当前流程中转仓数据start
         param.put("searchDate", DateUtil.getSysDate());
         BigDecimal wflAmt = lendTransfer001Service.selectWflAmtLend(param);
-        if(wflAmt != null) {
-    		BigDecimal newRollablePrin = ArithmeticUtil.doAdd(tradePrinOrg,wflAmt);
-    		dto.setRollablePrin(newRollablePrin);
-    	}else {               		
-    		dto.setRollablePrin(tradePrinOrg);
-    	}
+        if (wflAmt != null) {
+            BigDecimal newRollablePrin = ArithmeticUtil.doAdd(tradePrinOrg, wflAmt);
+            dto.setRollablePrin(newRollablePrin);
+        } else {
+            dto.setRollablePrin(tradePrinOrg);
+        }
         //剩余可转仓本金金额，为可用持仓，若存在流程中数据应扣减当前流程中转仓数据end
         //金融产品代码
         dto.setFinprodIdOrg((String) param.get("finprodId"));
@@ -420,10 +522,10 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
         FinProductTypeKey key = new FinProductTypeKey();
         key.setFinprodId((String) param.get("finprodId"));
         key.setBranch(Long.parseLong(CacheUtil.getSysParam(BussinessConstant.NOBRANCHNOVALUE)));
-        FinProductType type = bussCommonMapperDelegateService.selectByMultiPrimaryKey(FinProductTypeMapper.class,key,FinProductType.class);
-        FinProduct finProduct = bussCommonMapperDelegateService.selectByMultiPrimaryKey(FinProductMapper.class,(String) param.get("finprodId"),FinProduct.class);
+        FinProductType type = bussCommonMapperDelegateService.selectByMultiPrimaryKey(FinProductTypeMapper.class, key, FinProductType.class);
+        FinProduct finProduct = bussCommonMapperDelegateService.selectByMultiPrimaryKey(FinProductMapper.class, (String) param.get("finprodId"), FinProduct.class);
         dto.setTradeMarket(finProduct.getTradeMarket());
-        if(StringUtil.isNotEmpty(type)){
+        if (StringUtil.isNotEmpty(type)) {
             dto.setFundType(type.getType6());
         }
         return dto;
@@ -497,12 +599,12 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
     //查询单位净价
     public List<String> findUnitCprice(FundAssetTransfer001Dto dto) {
         Map<String, Object> param = new HashMap<>();
-        param.put("portfolioId",dto.getInvTransPortf());
+        param.put("portfolioId", dto.getInvTransPortf());
         param.put("finprodId", dto.getFinprodIdOrg());
         param.put("tardeStatus01", DictCodeListExt1.交易状态_初始.getValue());
         param.put("yesorno_no", DictCodeListExt1.是否_否.getValue());
         param.put("tradeDate", DateUtil.format(dto.getTradeDate()));
-        return  simpleRestTemplate.postForObject(ServiceApplication.TRADE_SERVICE_NAME + "/trade/transfer/fund/FundAssetTransfer/findUnitCprice", param, List.class);
+        return simpleRestTemplate.postForObject(ServiceApplication.TRADE_SERVICE_NAME + "/trade/transfer/fund/FundAssetTransfer/findUnitCprice", param, List.class);
     }
 
     /**
@@ -516,6 +618,36 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
         // 新建交易
         if (!operationType.equals(OperationType.REVOKE) && !operationType.equals(OperationType.DELETE)) {
             this.handleBussFlowData(entity);
+            entity.setbTotalTradeId(entity.getZcId()); // 回退 新头寸回冲使用
+            if (StringUtil.equals(entity.getTradeMarket(), 交易场所_上海证券交易所.getValue())
+                    || StringUtil.equals(entity.getTradeMarket(), 交易场所_深圳证券交易所.getValue())) {
+                //增加调用头寸引擎代码start
+                try {
+                    String decisionAct = 系统动作_新建.getValue();
+                    String systemAct = 系统动作_新建.getValue();
+                    String confirmOk = RequestUtil.getParam("confirmOk");
+                    String balanceCheck = "Y";
+                    if (StringUtil.isNotEmpty(confirmOk)) {
+                        balanceCheck = "N";
+                    }
+                    positionRequestService.sendFundAssetTransfer001DtoRequest(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue(), balanceCheck);
+                } catch (PositionException e) {
+                    Message message = PositionUtil.ajaxErrorReturn(e);
+                    BaseMap bm = (BaseMap) message.getData();
+                    if (bm == null) {
+                        WorkFlowUtil.showMessage(message.getMessage(), MessageType.错误消息);
+                    }
+                    String code = (String) bm.get("code");
+                    StringBuffer messageStr = (StringBuffer) bm.get("message");
+                    if (StringUtil.equals(PositionConstant.CODE_BUSI_RK, code)) {
+                        WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
+                    }
+                    if (StringUtil.equals(PositionConstant.CODE_BUSI_YK, code)) {
+                        WorkFlowUtil.showMessage(messageStr.toString(), MessageType.错误消息);
+                    }
+                }
+                //增加调用头寸引擎代码end
+            }
         }
     }
 
@@ -564,11 +696,12 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
 
                 // 金融产品交易信息DTO.划款指令表Entity -> 划款指令业务流程表
                 if (!StringUtil.isEmptyList(input.getBussTrdTransferOrder())) {
-                    WflStlPayOrders wflStlPayOrders = new WflStlPayOrders();
-                    BeanUtil.copyPropertiesIgnoreNull(wflStlPayOrders,
-                            input.getBussTrdTransferOrder().get(0));
-                    wflStlPayOrders.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
-                    wflStlPayOrdersMapper.insertSelective(wflStlPayOrders);
+                    for (BussTrdTransferOrderDto bussDto : input.getBussTrdTransferOrder()) {
+                        WflStlPayOrders wflStlPayOrders = new WflStlPayOrders();
+                        BeanUtil.copyPropertiesIgnoreNull(wflStlPayOrders, bussDto);
+                        wflStlPayOrders.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
+                        wflStlPayOrdersMapper.insertSelective(wflStlPayOrders);
+                    }
                 }
 
                 // 调用业务组件.【金融产品交易共通.交易产品接口】,写入[可用]的组合持仓流水及现金流水
@@ -628,11 +761,12 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
 
                 // 金融产品交易信息DTO.划款指令表Entity -> 划款指令业务流程表
                 if (!StringUtil.isEmptyList(output.getBussTrdTransferOrder())) {
-                    WflStlPayOrders wflStlPayOrders = new WflStlPayOrders();
-                    BeanUtil.copyPropertiesIgnoreNull(wflStlPayOrders,
-                            output.getBussTrdTransferOrder().get(0));
-                    wflStlPayOrders.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
-                    wflStlPayOrdersMapper.insertSelective(wflStlPayOrders);
+                    for (BussTrdTransferOrderDto buss : output.getBussTrdTransferOrder()) {
+                        WflStlPayOrders wflStlPayOrders = new WflStlPayOrders();
+                        BeanUtil.copyPropertiesIgnoreNull(wflStlPayOrders, buss);
+                        wflStlPayOrders.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
+                        wflStlPayOrdersMapper.insertSelective(wflStlPayOrders);
+                    }
                 }
 
                 // 调用业务组件.【金融产品交易共通.交易产品接口】,写入[可用]的组合持仓流水及现金流水
@@ -643,17 +777,16 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
                 baseTradeProductDealDto1.setTrdProductDealAdd(output.getTrdProductDealAdd());
 
                 //金融产品交易信息DTO.划款指令表Entity -> 划款指令表
-                StlPayOrdersDto stlPayOrder1 = null;
-                List<StlPayOrdersDto> stlPayOrders1 = new ArrayList<>();
+                List<StlPayOrdersDto> stlPayOrderList = new ArrayList<>();
                 if (!StringUtil.isEmptyList(output.getBussTrdTransferOrder())) {
                     for (BussTrdTransferOrderDto bttod : output.getBussTrdTransferOrder()) {
-                        stlPayOrder1 = new StlPayOrdersDto();
-                        BeanUtil.copyPropertiesIgnoreNull(stlPayOrder1, bttod);
-                        stlPayOrders1.add(stlPayOrder1);
+                        StlPayOrdersDto stlInfo = new StlPayOrdersDto();
+                        BeanUtil.copyPropertiesIgnoreNull(stlInfo, bttod);
+                        stlPayOrderList.add(stlInfo);
                     }
                 }
-                if (!StringUtil.isEmptyList(stlPayOrders1)) {
-                    baseTradeProductDealDto1.setStlPayOrdersList(stlPayOrders1);
+                if (!StringUtil.isEmptyList(stlPayOrderList)) {
+                    baseTradeProductDealDto1.setStlPayOrdersList(stlPayOrderList);
                 }
                 finProductTradeDto1.setBaseTradeProductDealDtos(Arrays.asList(baseTradeProductDealDto1));
 
@@ -823,20 +956,32 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
                 // 组合代码 = 画面.组合代码
                 orderParameterDto.setPortfolioId(trdProductDealAdd.getPortfolioId());
 
-                BussTrdTransferOrderDto resultOrderDto = bussTrdTransferOrderService.generateOrder(orderParameterDto);
+                BussTrdTransferOrderDto bussTrdTransferOrderDto = entity.getBussTrdTransferOrder().stream().
+                        collect(Collectors.groupingBy(BussTrdTransferOrderDto::getTradeId)).get(input.getTradeId()).get(0);
+                BussTrdTransferOrderDto resultOrderDto = new BussTrdTransferOrderDto();
+                BeanUtil.copyPropertiesIgnoreNull(resultOrderDto, bussTrdTransferOrderDto);
                 if (resultOrderDto != null) {
-                    input.setBussTrdTransferOrder(Arrays.asList(resultOrderDto));
+                    if ("T01".equals(trdProductDeal.getPs())) {
+                        resultOrderDto.setPs(DictCodeListExt1.收付方向_支出.getValue());
+                        resultOrderDto.setPayType("02");
+                        resultOrderDto.setPortfolioId(resultOrderDto.getInPortfolioId());
+                        String orderId = "";
+                        if (baseGetBussinessId != null) {
+                            BussinessCodeParameter bussinessCodeParameter = new BussinessCodeParameter();
+                            bussinessCodeParameter.setSeqNo("9998");
+                            orderId = baseGetBussinessId.buildBussinessCode(bussinessCodeParameter);
+                        } else {
+                            orderId = IDGenerator.generate();
+                        }
+                        resultOrderDto.setOrderId(orderId);
+                    }
+                    if (DictCodeList.收付方向_收入.getValue().equals(resultOrderDto.getPs())) {
+                        resultOrderDto.setIsNeedSend("N");
+                    }
+                    resultOrderDto.setTradeId(input.getTradeId());
+                    resultOrderDto.setWorkflowId(entity.getWorkflowId());
+                    input.setBussTrdTransferOrder(bussTrdTransferOrderService.save(Arrays.asList(resultOrderDto)));
                 }
-            }
-            if (!StringUtil.isEmptyList(input.getBussTrdTransferOrder())) {
-                BussTrdTransferOrderDto bttod = input.getBussTrdTransferOrder().get(0);
-                // 交易编号 = 业务编号 ※2生成的交易编号
-                bttod.setTradeId(input.getTradeId());
-                // 指令状态 = 指令状态_新建
-                bttod.setOrderStatus(DictCodeListExt1.指令状态_新建.getValue());
-                // 工作流代码
-                bttod.setWorkflowId(input.getWorkflowId());
-                input.setBussTrdTransferOrder(bussTrdTransferOrderService.save(input.getBussTrdTransferOrder()));
             }
         }
         // 划款指令表Entity 构造结束----------------------------------------------------------
@@ -866,7 +1011,8 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
     }
 
     private String prepareEntity1(FundAssetTransfer001Dto output, FundAssetTransfer001Dto entity) {
-        String orderId = output.getTradeId();
+        //页面的划款指令使用，一条指令对应两条交易
+        String inputId = output.getTradeId();
         //生成交易编号
         output.setTradeId(generateTradeId(false));
         output.setActPortfolioId(output.getPortfolioId());
@@ -939,6 +1085,7 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
         // 金融产品交易信息DTO.金融产品交易Entity -> 金融产品交易业务流程表
         WflTrdProductDeal wflTrdProductDeal = new WflTrdProductDeal();
         BeanUtil.copyPropertiesIgnoreNull(wflTrdProductDeal, output.getTrdProductDeal());
+        wflTrdProductDeal.setrTradeId(inputId);
         output.setWflTrdProductDeal(wflTrdProductDeal);
         // 金融产品交易Entity 构造结束-----------------------------------------------------------------------
 
@@ -996,53 +1143,59 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
 
         // 划款指令表Entity 构造开始----------------------------------------------------------
         if (bussTrdTransferOrderService != null) {
-            if (StringUtil.isEmptyList(output.getBussTrdTransferOrder())) {
-                // 后台自动生成划款指令
-                BussSettleOrderParameterDto orderParameterDto = new BussSettleOrderParameterDto();
-                // 是否汇总交易 = 是否_否
-                orderParameterDto.setIsTotalTrade(DictCodeList.是否_否.getValue());
+            //if (CollectionUtils.isNotEmpty(output.getBussTrdTransferOrder())) {
+            // 后台自动生成划款指令
+            BussSettleOrderParameterDto orderParameterDto = new BussSettleOrderParameterDto();
+            // 是否汇总交易 = 是否_否
+            orderParameterDto.setIsTotalTrade(DictCodeList.是否_否.getValue());
 
-                // 金融产品交易Entity = 上述构造的金融产品交易Entity
-                TrdProductDeal orderParameterDeal = new TrdProductDeal();
-                // 交易日期 = 画面.交易日
-                orderParameterDeal.setTradeDate(entity.getTradeDate());
-                // 交易方向 = 交易方向_买入
-                orderParameterDeal.setPs(trdProductDeal.getPs());
-                // 币种 = 画面.币种
-                orderParameterDeal.setCcy(entity.getCcy());
-                // 交易金额 = 画面.本金金额
-                orderParameterDeal.setTradeAmt(output.getTradeAmt());
-                // 交易对手 = 画面.交易对手
-                orderParameterDeal.setCounterId(trdProductDeal.getCounterId());
-                orderParameterDto.setDeal(orderParameterDeal);
+            // 金融产品交易Entity = 上述构造的金融产品交易Entity
+            TrdProductDeal orderParameterDeal = new TrdProductDeal();
+            // 交易日期 = 画面.交易日
+            orderParameterDeal.setTradeDate(entity.getTradeDate());
+            // 交易方向 = 交易方向_买入
+            orderParameterDeal.setPs(trdProductDeal.getPs());
+            // 币种 = 画面.币种
+            orderParameterDeal.setCcy(entity.getCcy());
+            // 交易金额 = 画面.本金金额
+            orderParameterDeal.setTradeAmt(output.getTradeAmt());
+            // 交易对手 = 画面.交易对手
+            orderParameterDeal.setCounterId(trdProductDeal.getCounterId());
+            orderParameterDto.setDeal(orderParameterDeal);
 
-                // 拆借类型 = null
-                orderParameterDto.setBankLendingType(null);
-                // 组合代码 = 画面.组合代码
-                orderParameterDto.setPortfolioId(trdProductDealAdd.getPortfolioId());
-
-                BussTrdTransferOrderDto resultOrderDto = bussTrdTransferOrderService.generateOrder(orderParameterDto);
-                if (resultOrderDto != null) {
-                    List<BussTrdTransferOrderDto> outOrder = Arrays.asList(resultOrderDto);
-                    for (BussTrdTransferOrderDto btt : outOrder){
-                        btt.setOrderId(orderId);
+            // 拆借类型 = null
+            orderParameterDto.setBankLendingType(null);
+            // 组合代码 = 画面.组合代码
+            orderParameterDto.setPortfolioId(trdProductDealAdd.getPortfolioId());
+            BussTrdTransferOrderDto bussTrdTransferOrderDto = entity.getBussTrdTransferOrder().stream().
+                    collect(Collectors.groupingBy(BussTrdTransferOrderDto::getTradeId)).get(inputId).get(0);
+            BussTrdTransferOrderDto resultOrderDto = new BussTrdTransferOrderDto();
+            BeanUtil.copyPropertiesIgnoreNull(resultOrderDto, bussTrdTransferOrderDto);
+            if (resultOrderDto != null) {
+                if ("T01".equals(trdProductDeal.getPs())) {
+                    resultOrderDto.setPs(DictCodeListExt1.收付方向_支出.getValue());
+                    resultOrderDto.setPayType("02");
+                    resultOrderDto.setPortfolioId(resultOrderDto.getInPortfolioId());
+                    String inOrderId = riskNamListCommonMapper.queryInOrderId(resultOrderDto.getTradeId());
+                    if (StringUtil.isEmpty(inOrderId)) {
+                        if (baseGetBussinessId != null) {
+                            BussinessCodeParameter bussinessCodeParameter = new BussinessCodeParameter();
+                            bussinessCodeParameter.setSeqNo("9998");
+                            inOrderId = baseGetBussinessId.buildBussinessCode(bussinessCodeParameter);
+                        } else {
+                            inOrderId = IDGenerator.generate();
+                        }
                     }
-                    output.setBussTrdTransferOrder(Arrays.asList(resultOrderDto));
+                    resultOrderDto.setOrderId(inOrderId);
                 }
-            }
-            if (!StringUtil.isEmptyList(output.getBussTrdTransferOrder())) {
-                BussTrdTransferOrderDto bttod = output.getBussTrdTransferOrder().get(0);
-                // 交易编号 = 业务编号 ※2生成的交易编号
-                bttod.setTradeId(output.getTradeId());
-                // 指令状态 = 指令状态_新建
-                bttod.setOrderStatus(DictCodeListExt1.指令状态_新建.getValue());
-                // 工作流代码
-                bttod.setWorkflowId(output.getWorkflowId());
-                output.setBussTrdTransferOrder(bussTrdTransferOrderService.save(output.getBussTrdTransferOrder()));
-                for (BussTrdTransferOrderDto dto : output.getBussTrdTransferOrder()){
-                    dto.setOrderId(orderId);
+                if (DictCodeList.收付方向_收入.getValue().equals(resultOrderDto.getPs())) {
+                    resultOrderDto.setIsNeedSend("N");
                 }
+                resultOrderDto.setTradeId(output.getTradeId());
+                resultOrderDto.setWorkflowId(entity.getWorkflowId());
+                output.setBussTrdTransferOrder(bussTrdTransferOrderService.save(Arrays.asList(resultOrderDto)));
             }
+            //}
         }
         // 划款指令表Entity 构造结束----------------------------------------------------------
 
@@ -1079,7 +1232,7 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
         if (!StringUtil.equals("revoke", dto.getOperateType())
                 && !StringUtil.equals("delete", dto.getOperateType())) {
             // 先删除流程中数据
-            this.doDelete(dto.getWorkflowId());
+            this.doUpdateDelete(dto.getWorkflowId());
             ProcessMark newEntity = null;
             try {
                 newEntity = WorkFlowUtil.getBusinessObjectFromRequest(FundAssetTransfer001Dto.class, true);
@@ -1091,11 +1244,54 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
                 // 操作留痕表
                 WorkflowContext.getProcessMarkService().insertIntoProcessMark(newEntity);
             } catch (Exception e) {
-                logger.error(e.getMessage(),e);
+                logger.error(e.getMessage(), e);
             }
             // 重新insert
             this.handleBussFlowData(dto);
         }
+
+        //保存不需要处理头寸
+        if (!StringUtil.equals(dto.getOperateType(), "save")) {
+            //增加调用头寸引擎代码start
+            String decisionAct = 系统动作_修改.getValue();
+            String systemAct = 系统动作_修改.getValue();
+            SysWflBusinessList sysBus = sysWflBusinessListMapper.selectByPrimaryKey(dto.getWorkflowId());
+            if (null != sysBus && StringUtil.equals(sysBus.getProcessState(), DictCodeList.流程状态_已退回.getValue())) {
+                systemAct = 系统动作_新建.getValue();
+                decisionAct = 系统动作_修改.getValue();
+                dto.setbTotalTradeId(dto.getZcId());
+            } else {
+                systemAct = 系统动作_新建.getValue();
+                decisionAct = 系统动作_新建.getValue();
+            }
+            if (StringUtil.equals("1", RequestUtil.getParam("confirmOk"))) {
+                dto.setSoftSkipMode("Y");
+            }
+            try {
+                if (StringUtil.equals(dto.getTradeMarket(), 交易场所_上海证券交易所.getValue())
+                        || StringUtil.equals(dto.getTradeMarket(), 交易场所_深圳证券交易所.getValue())) {
+                    String confirmOk = RequestUtil.getParam("confirmOk");
+                    String balanceCheck = "Y";
+                    if (StringUtil.isNotEmpty(confirmOk)) {
+                        balanceCheck = "N";
+                    }
+                    positionRequestService.sendFundAssetTransfer001DtoRequest(dto, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue(), balanceCheck);
+                }
+            } catch (PositionException e) {
+                Message message = PositionUtil.ajaxErrorReturn(e);
+                if (StringUtil.isNotBlank(message.getMessage())) {
+                    WorkFlowUtil.showMessage(message.getMessage(), MessageType.错误消息);
+                } else {
+                    if (!StringUtil.equals("1", RequestUtil.getParam("confirmOk"))) {
+                        BaseMap bm = (BaseMap) message.getData();
+                        StringBuffer messageStr = (StringBuffer) bm.get("message");
+                        WorkFlowUtil.showMessage(messageStr.toString(), MessageType.确认消息);
+                    }
+                }
+            }
+            //增加调用头寸引擎代码end
+        }
+
     }
 
     /**
@@ -1108,19 +1304,93 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
     @Override
     public void doDelete(String workflowId) {
         baseTradeProductDealCommService.deleteWflData(workflowId);
+        //增加调用头寸引擎代码start
+        ProcessMark processMark = mstWorkflowCommonServiceMapperImpl.getBusinessInfo(workflowId);
+        if (StringUtil.isNotEmpty(processMark)
+                && StringUtil.equals(processMark.getStatus(), DictCodeList.数据状态_修改中.getValue())) {
+            FundAssetTransfer001Dto entity = getBussinessEntityByWorkflowId(workflowId);
+            positionRequestService.sendDelete(entity);
+        }
+        //增加调用头寸引擎代码end
+    }
+	
+	private void doUpdateDelete(String workflowId) {
+        baseTradeProductDealCommService.deleteWflData(workflowId);
     }
 
     @Override
     public void doBack(FundAssetTransfer001Dto entity) {
         List<WflTrdProductDeal> trdProductDealList = null;
         if (StringUtil.isNotEmpty(entity.getWorkflowId())) {
-            trdProductDealList = simpleRestTemplate.postForList(ServiceApplication.TRADE_SERVICE_NAME+ "/trade/transfer/common/TransferCommon/selectDealByworkflowId",
+            trdProductDealList = simpleRestTemplate.postForList(ServiceApplication.TRADE_SERVICE_NAME + "/trade/transfer/common/TransferCommon/selectDealByworkflowId",
                     entity.getWorkflowId(), WflTrdProductDeal.class);
         }
         if (!StringUtil.isEmptyList(trdProductDealList)) {
             for (WflTrdProductDeal deal : trdProductDealList) {
-                AllTradeCommonUtil.deletePosition("",deal.getTradeId());
+                AllTradeCommonUtil.deletePosition("", deal.getTradeId());
             }
         }
+    }
+
+    public List<TrdProductDeal> generateOrdersNQs(FundAssetTransfer001Dto dto, List<FundAssetTransfer001Dto> dtoList) {
+        List<TrdProductDeal> trdProductDealList = new ArrayList<>();
+        //托管户查询
+        String portfolioId = dto.getPortfolioId();
+        List<PtlCapacctInfo> ptlCapacctList = etrTrdCommonMapper.getPtlAcctInfo(portfolioId, Arrays.asList(DictCodeListExt1.资金账户类型_产品托管户.getValue()));
+
+        for (FundAssetTransfer001Dto fundAssetDto : dtoList) {
+            String portfolioIdIn = fundAssetDto.getPortfolioId();
+            List<PtlCapacctInfo> ptlCapacctListIn = etrTrdCommonMapper.getPtlAcctInfo(portfolioIdIn, Arrays.asList(DictCodeListExt1.资金账户类型_产品托管户.getValue()));
+
+            TrdProductDeal trdProductDeal = getOrder(fundAssetDto);
+            if (ptlCapacctList.size() == 1 && ptlCapacctListIn.size() == 1 && ptlCapacctList.get(0).equals(ptlCapacctListIn.get(0))) {
+                //※划款指令共通页面调用【业务组件.划款指令共通组件.指令生成】，页面不展示
+                trdProductDeal.setStlPayOrderShow("N");
+            } else if (ptlCapacctList.size() == 1 && ptlCapacctListIn.size() == 1
+                    && ptlCapacctList.get(0).getAcctNo() != ptlCapacctListIn.get(0).getAcctNo()) {
+                //页面展示,不做任何处理
+            } else {
+                //页面展示,但是划款账号设置为空
+                trdProductDeal.setStlPayOrderShow("Y");
+            }
+            trdProductDealList.add(trdProductDeal);
+        }
+        return trdProductDealList;
+    }
+
+    public TrdProductDeal getOrder(FundAssetTransfer001Dto dto) {
+        TrdProductDeal trdProductDeal = new TrdProductDeal();
+        BeanUtil.copyPropertiesIgnoreNull(trdProductDeal, dto);
+        trdProductDeal.setTradeId(dto.getTradeId());
+        trdProductDeal.setCounterId(dto.getPortfolioId());
+        trdProductDeal.setPs(DictCodeList.交易方向_卖出.getValue());
+        trdProductDeal.setIsOutTrade("N");
+        return trdProductDeal;
+    }
+
+
+    public DeviationDegreeDto calculateDeviationDegree(DeviationDegreeDto dto) {
+        BigDecimal valuation = findValuation(dto);
+        if (Objects.nonNull(valuation)) {
+            BigDecimal deviationDegree = dto.getUnitPrice().subtract(valuation)
+                    .multiply(BigDecimal.valueOf(100)).divide(valuation, 2, RoundingMode.HALF_UP);
+            dto.setDeviationDegree(deviationDegree);
+        } else {
+            dto.setDeviationDegree(new BigDecimal("0.00"));
+        }
+        return dto;
+    }
+
+    public BigDecimal findValuation(DeviationDegreeDto dto) {
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("finprodId", dto.getFinprodId());
+        map.put("tradeDate", iPlatformDate.getSysDateStr());
+        BondValuationDto valuationDto = simpleRestTemplate.postForObject(ServiceApplication.TRADE_SERVICE_NAME
+                + "/trade/transfer/fund/FundAssetTransfer/findValuation", map, BondValuationDto.class);
+        if (Objects.nonNull(valuationDto) && Objects.nonNull(valuationDto.getValuation())) {
+            return valuationDto.getValuation();
+        }
+
+        return null;
     }
 }
