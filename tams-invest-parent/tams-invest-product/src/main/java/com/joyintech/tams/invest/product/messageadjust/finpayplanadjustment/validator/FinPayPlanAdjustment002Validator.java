@@ -239,7 +239,7 @@ public class FinPayPlanAdjustment002Validator implements BeanValidator {
 					erroList.add(new ValidMessage("", getMessage("FIN_PROD_E_0109")));
 				}
 				if (DateUtil.compareDate(finPayPlanAdjustment002Dto.getLiquidationDate(),
-						finPayPlanAdjustment002Dto.getFirstCalEndDate()) <= 0) {
+						finPayPlanAdjustment002Dto.getFirstCalEndDate()) < 0) {
 					// 首次计费结束日应该小于产品清盘日
 					erroList.add(new ValidMessage("", getMessage("FIN_PROD_E_0110")));
 
