@@ -249,7 +249,7 @@ public class EtrBuyoutCashPositionDealService extends EtrCashPositionBaseService
             });
         }
         // JJTZJY-134 1.做完逆回购到期，指令可用持仓未清零处理， 2.逆回购交易入指令现金流水的时候，将一笔流水分成两笔来入，并且汇总金额不一致 start
-        etrSecPositionFlowDto.setAmount(ArithmeticUtil.divide(trdProductDeal.getPrinAmt(),BigDecimal.valueOf(100),4, RoundingMode.HALF_UP));
+        etrSecPositionFlowDto.setAmount(ArithmeticUtil.divide(trdProductDeal.getPrinAmt(),债券面值,4, RoundingMode.HALF_UP));
         if (DictCodeListExt1.金融产品类型_投管用_债券买断式逆回购.getValue().equals(trdProductDeal.getFinprodType2())) {
             etrSecPositionFlowDto.setAmount(etrSecPositionFlowDto.getAmount().negate());
         }
