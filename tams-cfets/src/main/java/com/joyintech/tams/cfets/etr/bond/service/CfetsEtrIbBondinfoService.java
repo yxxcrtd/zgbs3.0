@@ -818,6 +818,10 @@ public class CfetsEtrIbBondinfoService extends BaseService{
      * @return
      */
     public List<BaseMap> queryPositionInfo(CfetsEtrIbBondPosiInfoRequestDto requestDto) {
+
+        List<String> acctTypes = new ArrayList<>();
+        acctTypes.add(DictCodeListExt1.资金账户类型_产品托管户.getValue());
+
         // 卖空模式
         String sellFlag = CacheUtil.getSysParam("SHORT_SELLING_SUPPORTED");
 
@@ -855,6 +859,7 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                 positionQueryDto.setPortfolioId(portfolioId);
                 positionQueryDto.setCcy(DictCodeList.币种_人民币_CNY.getValue());
                 positionQueryDto.setCdate(iPlatformDate.getSysDate());
+                positionQueryDto.setAcctType(acctTypes);
                 // 实际现金（账户现金）
                 realCash = ArithmeticUtil.doAdd(realCash, basePtlCashPositionInfoService.queryUsableCashPosition(positionQueryDto));
                 Map<String, String> secIdMap = new HashMap<>();
@@ -889,7 +894,8 @@ public class CfetsEtrIbBondinfoService extends BaseService{
                 .put("portfolioIdList", requestDto.getPortfolioIdList())
                 .put("cdate", requestDto.getCdate())
                 .put("finprodId", requestDto.getFinprodId())
-                .put("acctId", requestDto.getAcctId());
+                .put("acctId", requestDto.getAcctId())
+                .put("acctTypes", acctTypes);
         // 查询头寸信息
         Map map = cfetsetrIbBondinfoMapper.queryPositionInfo(bm);
 

@@ -439,21 +439,21 @@ from
                         </foreach>
                     </if>
                     GROUP BY a.PORTFOLIO_ID, a.FINPROD_ID
-                ) bb ON aa.PORTFOLIO_ID=bb.PORTFOLIO_ID AND aa.FINPROD_ID=bb.FINPROD_ID 
+                ) bb ON aa.PORTFOLIO_ID=bb.PORTFOLIO_ID AND aa.FINPROD_ID=bb.FINPROD_ID
             ) etrptl
             LEFT JOIN FIN_PRODUCT_TYPE c ON etrptl.FINPROD_ID = c.FINPROD_ID
             LEFT JOIN FIN_PRODUCT d ON etrptl.FINPROD_ID=d.FINPROD_ID
-            LEFT JOIN PTL_PORTFOLIO e ON etrptl.PORTFOLIO_ID=e.PORTFOLIO_ID 
+            LEFT JOIN PTL_PORTFOLIO e ON etrptl.PORTFOLIO_ID=e.PORTFOLIO_ID
             <if test="BOND_VALUATION_RULE != null and BOND_VALUATION_RULE =='01'">
                 <!-- 所有银行间债券均优先取中债，没有中债取上清 -->
                 left join (
                     select SEC_ID, NETPRICE from (
                         SELECT ROW_NUMBER () over(
-                            PARTITION BY SEC_ID 
+                            PARTITION BY SEC_ID
                             ORDER BY VALUE_DATE DESC, DECODE(VALUE_SOURCE, #{VALUATION_SOURCE_CBC}, 1, 0) DESC
                         ) rn, a.*
                         FROM MST_BOND_VALUATION_INFO a
-                        WHERE VALUE_DATE <![CDATA[<=]]> to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') 
+                        WHERE VALUE_DATE <![CDATA[<=]]> to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd')
                             AND VALUE_SOURCE IN (#{VALUATION_SOURCE_CBC},#{VALUATION_SOURCE_SCH})
                     ) WHERE rn =1
                 ) tt on tt.SEC_ID=d.FINPROD_MARKET_ID
@@ -463,13 +463,13 @@ from
                 left join (
                     select SEC_ID, NETPRICE from (
                         SELECT ROW_NUMBER () over(
-                            PARTITION BY SEC_ID 
+                            PARTITION BY SEC_ID
                             ORDER BY VALUE_DATE DESC, DECODE(T2.REGIST_ORG, #{REGIST_ORG_01}, 1, #{REGIST_ORG_02}, 1, 0) DESC
                         ) rn, t1.*
                         FROM MST_BOND_VALUATION_INFO t1
-                        LEFT JOIN FIN_PRODUCT t2 ON t1.SEC_ID =t2.FINPROD_MARKET_ID AND t2.FINPROD_TYPE =#{FINPROD_TYPE_TG_F01} 
+                        LEFT JOIN FIN_PRODUCT t2 ON t1.SEC_ID =t2.FINPROD_MARKET_ID AND t2.FINPROD_TYPE =#{FINPROD_TYPE_TG_F01}
                             AND DECODE(t1.VALUE_SOURCE, #{VALUATION_SOURCE_CBC}, #{REGIST_ORG_01}, #{VALUATION_SOURCE_SCH}, #{REGIST_ORG_02}, 'NULL')=T2.REGIST_ORG
-                        WHERE VALUE_DATE <![CDATA[<=]]> to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') 
+                        WHERE VALUE_DATE <![CDATA[<=]]> to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd')
                             AND VALUE_SOURCE IN (#{VALUATION_SOURCE_CBC},#{VALUATION_SOURCE_SCH})
                             AND t2.TRADE_MARKET IN ('01','02')
                     ) WHERE rn =1
@@ -542,7 +542,7 @@ from
             <!-- 账户持仓为0时数据不展示 -->
             where (
                     etrptl.PTL_BOND_ZHCC != 0 or etrptl.ETR_SUM_KYCC != 0 or etrptl.ETR_PLEDGE_KZYCC != 0 or etrptl.ETR_PLEDGE_YZYCC != 0
-                    or etrptl.PTL_BOND_BFQKYCC != 0 
+                    or etrptl.PTL_BOND_BFQKYCC != 0
                 ) and d.TRADE_MARKET in ('01','02') <!--只展示交易场所为银行间和商业柜台的数据-->
               and d.FINPROD_TYPE2= #{FINPROD_TYPE_TG_F01}
             <!-- 关键字模糊查询 -->
@@ -560,10 +560,10 @@ from
     <sql id="positionQueryAnd">
         <if test="search != null and search != ''">
             and (
-                etrptl.PORTFOLIO_ID || '|' || e.PORTFOLIO_NAME || '|' || etrptl.FINPROD_ID || '|' || 
-                d.FINPROD_ABBR || '|' || d.FINPROD_MARKET_ID || '|' || c.TYPE_11 || '|' || invaim.INV_AIM || '|' || 
-                f.ITEM_VALUE || '|' || g.ITEM_VALUE 
-                like '%' || #{search} || '%' 
+                etrptl.PORTFOLIO_ID || '|' || e.PORTFOLIO_NAME || '|' || etrptl.FINPROD_ID || '|' ||
+                d.FINPROD_ABBR || '|' || d.FINPROD_MARKET_ID || '|' || c.TYPE_11 || '|' || invaim.INV_AIM || '|' ||
+                f.ITEM_VALUE || '|' || g.ITEM_VALUE
+                like '%' || #{search} || '%'
                 <if test="search_isNumberFlag != null and search_isNumberFlag == true">
                     or round(etrptl.ETR_SUM_KYCC / 10000,2) = to_number(#{search})
                     or round(etrptl.ETR_PLEDGE_KZYCC / 10000,2)= to_number(#{search})
@@ -576,7 +576,7 @@ from
             )
         </if>
     </sql>
-    
+
     <!-- 查询前一日持仓指标 -->
     <select id="selectLastCostAmt" parameterType="Map" resultType="com.joyintech.tams.business.common.pojo.BaseMap">
         select
@@ -684,7 +684,7 @@ from
                 ) AS t1kyxj /*T+1日可用现金*/
                 from ETR_CASH_POSITION_RULE a
                 LEFT JOIN PTL_POSITION_CFG b ON a.HODING_TYPE =b.HOLDINGTYPE AND b.S_HOLDINGTYPE IN (#{S_004})
-                where a.cdate = to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') and b.S_HOLDINGTYPE IN (#{S_004}) 
+                where a.cdate = to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') and b.S_HOLDINGTYPE IN (#{S_004})
                 <if test="portfolioIdList != null">
                     AND a.PORTFOLIO_ID in
                     <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
@@ -712,7 +712,7 @@ from
                 from ETR_SEC_POSITION_RULE a
                 LEFT JOIN PTL_POSITION_CFG b ON a.HODING_TYPE =b.HOLDINGTYPE AND b.S_HOLDINGTYPE = #{S_001}
                 LEFT JOIN PTL_POSITION_CFG b1 ON a.HODING_TYPE =b1.HOLDINGTYPE AND b1.S_HOLDINGTYPE = #{S_003}
-                where a.cdate = to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') 
+                where a.cdate = to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd')
                 <if test="finprodId != null and finprodId !=''">
                     and a.FINPROD_ID = #{finprodId,jdbcType=VARCHAR}
                 </if>
@@ -728,7 +728,7 @@ from
                 <!--账户现金-->
                 SELECT d.PORTFOLIO_ID, sum(d.AMOUNT) AMOUNT
                 FROM PTL_CASH_POSITION_RULE d
-                where d.cdate = to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') AND d.HODING_TYPE =#{C_01} and DATE_TYPE ='0' 
+                where d.cdate = to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd') AND d.HODING_TYPE =#{C_01} and DATE_TYPE ='0'
                 <if test="acctId != null and acctId !=''">
                     and d.ACCT_ID = #{acctId,jdbcType=VARCHAR}
                 </if>
@@ -737,6 +737,18 @@ from
                     <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
                         #{item}
                     </foreach>
+                </if>
+                <if test="acctTypes != null and portfolioIdList != null and !acctTypes.isEmpty() ">
+                    and d.ACCT_ID in (
+                    SELECT ACCT_NO from PTL_CAPACCT_INFO where PORTFOLIO_ID in
+                    <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                    and ACCT_TYPE in
+                    <foreach collection="acctTypes" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                    )
                 </if>
                 GROUP BY d.PORTFOLIO_ID
             ) cc ON nvl(aa.PORTFOLIO_ID, bb.PORTFOLIO_ID)=cc.PORTFOLIO_ID
