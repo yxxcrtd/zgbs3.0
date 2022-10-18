@@ -51,6 +51,8 @@ public abstract class StlDataGatherReader extends BaseReader<InvestTradeReaderDt
             searchParam.put("dealDate", execInfo.getExecuteDate());
             setSearchParam(searchParam);
             List<SettleTransDataDto> settleTransDataDtos = stlDataGatherMapper.selectSettleTransData(searchParam);
+            // 上交所协议回购首期使用成交编号匹配上行下单数据, 然后替换对应数据
+            this.replaceSettleTransDataShH01Sq(settleTransDataDtos, searchParam);
             Map<String, List<SettleTransDataDto>> tempMap = settleTransDataDtos.stream().collect(JoyinCollectors.groupingBy(SettleTransDataDto::getOrderId));
             return tempMap.values().stream().map(InvestTradeReaderDto::new).collect(Collectors.toList());
         }else{
@@ -92,6 +94,37 @@ public abstract class StlDataGatherReader extends BaseReader<InvestTradeReaderDt
             }
         }
         return new ArrayList<InvestTradeReaderDto>();
+    }
+
+    /**
+     * 上交所协议回购首期使用成交编号匹配上行下单数据,然后替换原数据
+     * @param settleTransDataDtos
+     * @param searchParam
+     */
+    private void replaceSettleTransDataShH01Sq(List<SettleTransDataDto> settleTransDataDtos, Map<String, Object> searchParam){
+        // 上交所协议回购首期使用成交编号匹配上行下单数据, 然后替换对应数据
+        List<SettleTransDataDto> settleTransDataDtoShH01Sqs = stlDataGatherMapper.selectSettleTransDataShH01Sq(searchParam);
+        if(CollectionUtils.isNotEmpty(settleTransDataDtoShH01Sqs)){
+            Map<String, SettleTransDataDto> settleTransDataDtoShH01Map = new HashMap<>();
+            for(SettleTransDataDto settleTransDataDtoShH01Sq : settleTransDataDtoShH01Sqs){
+                settleTransDataDtoShH01Map.put(settleTransDataDtoShH01Sq.getTradeId(), settleTransDataDtoShH01Sq);
+            }
+            for(SettleTransDataDto settleTransDataDto : settleTransDataDtos){
+                SettleTransDataDto settleTransDataDtoShH01 = settleTransDataDtoShH01Map.get(settleTransDataDto.getTradeId());
+                if(settleTransDataDtoShH01 != null){
+                    // 替换指令编号和各个交易员信息
+                    settleTransDataDto.setOrderId(settleTransDataDtoShH01.getOrderId());
+                    settleTransDataDto.setEntrustId(settleTransDataDtoShH01.getEntrustId());
+                    settleTransDataDto.setTrader(settleTransDataDtoShH01.getTrader());
+                    settleTransDataDto.setCounterTrader(settleTransDataDtoShH01.getCounterTrader());
+                    settleTransDataDto.setDealerPartyNo(settleTransDataDtoShH01.getDealerPartyNo());
+                    settleTransDataDto.setOutDealerPartyNo(settleTransDataDtoShH01.getOutDealerPartyNo());
+                    settleTransDataDto.setDealerNo(settleTransDataDtoShH01.getDealerNo());
+                    settleTransDataDto.setOutDealerNo(settleTransDataDtoShH01.getOutDealerNo());
+                    settleTransDataDto.setCounterId(settleTransDataDtoShH01.getCounterId());
+                }
+            }
+        }
     }
 
     /**
