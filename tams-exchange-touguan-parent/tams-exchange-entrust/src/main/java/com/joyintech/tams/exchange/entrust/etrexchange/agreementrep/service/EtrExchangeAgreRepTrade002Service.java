@@ -875,16 +875,19 @@ public class EtrExchangeAgreRepTrade002Service extends CommonExportService {
             }
 
             // 首次结算日
-            if (StringUtil.isNotEmpty(tmp.get("firstSettleDate")) && DateUtil.isDateStr(tmp.get("firstSettleDate").toString())) {
-                dto.setFristSettleDate(DateUtil.format(DateUtil.parse(tmp.get("firstSettleDate").toString())));
+            Object firstSettleDate = tmp.get("firstSettleDate");
+            if (StringUtil.isNotEmpty(firstSettleDate) && (DateUtil.isDateStr(firstSettleDate.toString()) || DateUtil.isDateStrE(firstSettleDate.toString()))) {
+                dto.setFristSettleDate(DateUtil.format(DateUtil.parse(firstSettleDate.toString())));
             }
             // 回购到期日
-            if (StringUtil.isNotEmpty(tmp.get("repoMdate")) && DateUtil.isDateStr(tmp.get("repoMdate").toString())) {
-                dto.setBackDate(DateUtil.format(DateUtil.parse(tmp.get("repoMdate").toString())));
+            Object repoMdate = tmp.get("repoMdate");
+            if (StringUtil.isNotEmpty(repoMdate) && (DateUtil.isDateStr(repoMdate.toString()) || DateUtil.isDateStrE(repoMdate.toString()))) {
+                dto.setBackDate(DateUtil.format(DateUtil.parse(repoMdate.toString())));
             }
             // 到期结算日
-            if (StringUtil.isNotEmpty(tmp.get("backDate")) && DateUtil.isDateStr(tmp.get("backDate").toString())) {
-                dto.setExpireSettleDate(DateUtil.format(DateUtil.parse(tmp.get("backDate").toString())));
+            Object backDate = tmp.get("backDate");
+            if (StringUtil.isNotEmpty(backDate) && (DateUtil.isDateStr(backDate.toString()) || DateUtil.isDateStrE(backDate.toString()))) {
+                dto.setExpireSettleDate(DateUtil.format(DateUtil.parse(backDate.toString())));
             }
             // 换出金额
             if (StringUtil.isNotEmpty(tmp.get("swapOutBalance"))) {
