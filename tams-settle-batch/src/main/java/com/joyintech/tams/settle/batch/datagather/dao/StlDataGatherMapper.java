@@ -34,6 +34,13 @@ public interface StlDataGatherMapper {
     List<SettleTransDataDto> selectSettleTransData(Map<String, Object> paraMap);
 
     /**
+     * 获取上海协议回购首期成交明细数据
+     * @param paraMap 查询参数
+     * @return 成交明细列表
+     */
+    List<SettleTransDataDto> selectSettleTransDataShH01Sq(Map<String, Object> paraMap);
+
+    /**
      * 获取投管交易编号
      * @param paraMap 查询参数
      * @return 投管交易编号

@@ -545,6 +545,73 @@
 		</where>
 	</select>
 
+	<select id="selectSettleTransDataShH01Sq" parameterType="java.util.Map"
+			resultType="com.joyintech.tams.settle.batch.datagather.dto.SettleTransDataDto">
+		SELECT
+			NVL(tt.INSTRUCTION_ID, tth.INSTRUCTION_ID) ORDER_ID,
+			case when ptl.PROFIT_TYPE = '01' then 'FVTPL' else 'AC' end as invAim,ee.ENTRUST_ID,
+			stdta.REPO_TYPE,
+			NVL(tie.TRADE_ID, tieh.TRADE_ID) trader,
+			NVL(tie.PROP_TRADE_ID, tieh.PROP_TRADE_ID) counterTrader,
+			NVL(tie.INVESTOR_ID, tieh.INVESTOR_ID) dealerPartyNo,
+			NVL(tie.PROP_INVESTOR_ID, tieh.PROP_INVESTOR_ID) outDealerPartyNo,
+			NVL(tie.DEALER_ID, tieh.DEALER_ID) dealerNo,
+			NVL(tie.PROP_DEALER_ID, tieh.PROP_DEALER_ID) outDealerNo,
+			NVL(tie.COUNTER_ID, tieh.COUNTER_ID) counterId,
+			<include refid="settleTransDataTotalSql"></include>
+		LEFT JOIN SETTLE_TRANS_DATA_TOTAL_STATUS stdts ON std.SEQ_ID = stdts.SEQ_NO
+		LEFT JOIN SETTLE_TRANS_DATA_TOTAL_ADD stdta ON std.SEQ_ID = stdta.TRADE_ID
+		LEFT JOIN T_TRADE tt ON tt.BROKER_TRADE_ID = std.APPLY_TRADE_ID
+		LEFT JOIN T_TRADEHISTORY tth ON tth.BROKER_TRADE_ID = std.APPLY_TRADE_ID
+		LEFT JOIN T_INTEGRATED_ENTRUST tie ON tie.ID = tt.ENTRUST_ID
+		LEFT JOIN T_INTEGRATED_ENTRUSTHISTORY tieh ON tieh.ID = tt.ENTRUST_ID
+		LEFT JOIN ETR_ENTRUST ee ON ee.ENTRUST_ID = NVL(tt.INSTRUCTION_ID, tth.INSTRUCTION_ID)
+		LEFT JOIN PTL_PORTFOLIO ptl ON (ptl.PORTFOLIO_ID = std.PORTFOLIO_ID)
+		<where>
+			(stdts.MATCH_STATUS != '2' OR stdts.MATCH_STATUS IS NULL)
+		    <!--上交所协议回购首期 modify by fuyongsheng 20221018 start-->
+		    AND stdta.REPO_TYPE = 'H01'
+		    AND std.PS = 'T01'
+		    AND std.TRADE_MARKET = '03'
+			<!--上交所协议回购首期 modify by fuyongsheng 20221018 end-->
+			<if test="dealDate != null">
+				AND std.DEAL_DATE = #{dealDate,jdbcType=DATE}
+			</if>
+			<if test="finprodType2 != null and finprodType2 != 'F32'">
+				AND STD.FINPROD_TYPE2 = #{finprodType2, jdbcType=VARCHAR}
+			</if>
+			<if test="finprodType2 != null and finprodType2 == 'F32'">
+				AND STD.FINPROD_TYPE2 = #{finprodType2, jdbcType=VARCHAR}
+				AND (STD.DELIVERY_RESULT = #{deliveryResult05, jdbcType=VARCHAR}
+				OR STD.SETTLE_MODE = #{settleMode01, jdbcType=VARCHAR}
+				OR (STD.SETTLE_MODE = #{settleMode02, jdbcType=VARCHAR} AND STD.SETTLE_SPEED = #{accountSpeed0, jdbcType=NUMERIC}))
+			</if>
+			<if test="finprodIdList != null and finprodIdList.size() > 0">
+				<foreach collection="finprodIdList" item="finprodId" open="AND std.FINPROD_ID IN (" close=")" separator=",">
+					#{finprodId,jdbcType=VARCHAR}
+				</foreach>
+			</if>
+			<if test="busiType != null">
+				AND std.BUSI_TYPE = #{busiType,jdbcType=VARCHAR}
+			</if>
+			<if test="busiTypeList != null and busiTypeList.size() > 0">
+				<foreach collection="busiTypeList" item="busiType" open="AND std.BUSI_TYPE IN (" close=")" separator=",">
+					#{busiType,jdbcType=VARCHAR}
+				</foreach>
+			</if>
+			<if test="portfolioIdList != null and portfolioIdList.size() > 0">
+				<foreach collection="portfolioIdList" item="portfolioId" open="AND std.PORTFOLIO_ID IN (" close=")" separator=",">
+					#{portfolioId,jdbcType=VARCHAR}
+				</foreach>
+			</if>
+			<if test="psList != null and psList.size() > 0">
+				<foreach collection="psList" item="ps" open="AND std.PS IN (" close=")" separator=",">
+					#{ps,jdbcType=VARCHAR}
+				</foreach>
+			</if>
+		</where>
+	</select>
+
 	<!-- 前置交易编号查询 -->
 	<select id="selectBTradeId" resultType="java.lang.String">
 		SELECT DISTINCT

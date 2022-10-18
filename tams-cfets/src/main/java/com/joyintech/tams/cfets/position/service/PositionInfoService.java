@@ -97,6 +97,9 @@ public class PositionInfoService {
     public BaseMap queryEtrAvailableCash(List<PositionCashRequestDetailDto> ptlList, String cdate, String acctId, String ccy, String calId, String finprodId) {
         BaseMap rs = new BaseMap();
 
+        List<String> acctTypes = new ArrayList<>();
+        acctTypes.add(DictCodeListExt1.资金账户类型_产品托管户.getValue());
+
         BigDecimal cashT = BigDecimal.ZERO; // 指令t日可用
         BigDecimal cashT1 = BigDecimal.ZERO; // 指令t1日可用
         BigDecimal realCash = BigDecimal.ZERO; // 账户现金
@@ -160,6 +163,7 @@ public class PositionInfoService {
                         .put("ccy", ccy)
                         .put("vdate", cdate)
                         .put("calId", calId) // 银行间
+                        .put("onlyA01", true) // ZGCPCN-1557
                         ;
                 Map<String, Object> mapRst = etrCommonService.getProAvailableCash(paramMap);
                 if (mapRst != null){ // 指令t日可用，指令t1日可用
@@ -170,14 +174,16 @@ public class PositionInfoService {
                 positionQueryDto.setPortfolioId(portfolioId);
                 positionQueryDto.setCcy(DictCodeList.币种_人民币_CNY.getValue());
                 positionQueryDto.setCdate(iPlatformDate.getSysDate());
+                positionQueryDto.setAcctType(acctTypes);
                 // 实际现金（账户现金）
                 realCash = ArithmeticUtil.doAdd(realCash, basePtlCashPositionInfoService.queryUsableCashPosition(positionQueryDto));
                 BaseMap inMap = BaseMap.newMap()
-                    .put("S_004", DictCodeListExt3.资产类型_汇总可用现金.getValue())
-                    .put("C_01", DictCodeListExt3.资产类型_现金账户持仓.getValue())
-                    .put("portfolioIdList", Arrays.asList(portfolioId))
-                    .put("cdate", cdate)
-                    .put("acctId", acctId);
+                        .put("S_004", DictCodeListExt3.资产类型_汇总可用现金.getValue())
+                        .put("C_01", DictCodeListExt3.资产类型_现金账户持仓.getValue())
+                        .put("portfolioIdList", Arrays.asList(portfolioId))
+                        .put("cdate", cdate)
+                        .put("acctId", acctId)
+                        .put("acctTypes", acctTypes);
                 Map map = positionInfoMapper.queryEtrAvailableCash(inMap);
                 BaseMap outMap = BaseMap.newMap(map);
                 realCash =ArithmeticUtil.doAdd(realCash, outMap.getBigDecimal("ZHXJ"));
