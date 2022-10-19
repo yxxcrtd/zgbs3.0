@@ -45,17 +45,17 @@
             )
         </if>
     </delete>
-    
+
     <insert id="insertTodayCashPosData">
-        insert into ETR_CASH_POSITION (PORTFOLIO_ID, ACCT_ID, HODING_TYPE, 
-            CDATE, CCY, AMOUNT, 
-            CHL_FINPROD_ID, CREATE_USER, CREATE_DEPT, 
+        insert into ETR_CASH_POSITION (PORTFOLIO_ID, ACCT_ID, HODING_TYPE,
+            CDATE, CCY, AMOUNT,
+            CHL_FINPROD_ID, CREATE_USER, CREATE_DEPT,
             CREATE_TIME, UPDATE_USER, UPDATE_TIME
             )
         SELECT
             targetTable.PORTFOLIO_ID, targetTable.ACCT_ID, HODING_TYPE,
             #{batchDate,jdbcType=DATE}, targetTable.CCY, SUM(targetTable.AMOUNT),
-            targetTable.CHL_FINPROD_ID, 
+            targetTable.CHL_FINPROD_ID,
             'system', null, sysdate, 'system', sysdate
         FROM
         (
@@ -89,7 +89,7 @@
         group by
           targetTable.PORTFOLIO_ID, targetTable.ACCT_ID, targetTable.CCY, targetTable.CHL_FINPROD_ID, targetTable.HODING_TYPE
     </insert>
-    
+
     <select id="findEnableEntrust" resultMap="com.joyintech.tams.invest.common.trade.dao.EtrCommonCashPositionMapper.findEntrust_mapper">
         SELECT
             EE.ENTRUST_ID,
@@ -157,10 +157,10 @@
             EEA.ASSET_TYPE_11,
             EEA.DEAL_MODE
         FROM ETR_ENTRUST EE LEFT JOIN ETR_ENTRUST_ADD EEA ON EE.ENTRUST_ID = EEA.ENTRUST_ID
-        where (
-            (EE.FINPROD_TYPE2 = #{FINPROD_TYPE2_F10,jdbcType=VARCHAR} and EE.PRICE_MODEL = #{PRICE_MODEL_PRICE_MODEL,jdbcType=VARCHAR})
-            OR EE.FINPROD_TYPE2 = #{FINPROD_TYPE2_F01,jdbcType=VARCHAR}
-        )
+        where
+        EE.FINPROD_TYPE2 IN (#{FINPROD_TYPE2_F10,jdbcType=VARCHAR},#{FINPROD_TYPE2_F01,jdbcType=VARCHAR},#{FINPROD_TYPE2_F06,jdbcType=VARCHAR})
+        AND EE.PRICE_MODEL = #{PRICE_MODEL_PRICE_MODEL,jdbcType=VARCHAR}
+        and EE.PS IN (#{PS_T01},#{PS_T04})
         and #{batchDate,jdbcType=DATE} >= EE.VDATE
         and EE.ENTRUST_STATUS in (#{ENTRUST_STATUS_02,jdbcType=VARCHAR},#{ENTRUST_STATUS_03,jdbcType=VARCHAR},#{ENTRUST_STATUS_08,jdbcType=VARCHAR})
         <if test="productIdList != null and !productIdList.isEmpty()">
@@ -187,7 +187,7 @@
         and f.HODING_TYPE = #{type, jdbcType=VARCHAR}
         and rownum = 1
     </select>
-    
+
     <select id="findReCash" resultType="java.math.BigDecimal">
         select sum(f.AMOUNT)
         from ETR_CASH_POSITION_FLOW f

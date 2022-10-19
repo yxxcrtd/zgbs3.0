@@ -99,6 +99,9 @@ public class EtrCashPosAutoGenerationService {
         paramMap.put("ENTRUST_STATUS_03", DictCodeList.委托状态_已接收.getValue());
         paramMap.put("FINPROD_TYPE2_F10", DictCodeListExt1.金融产品类型_投管用_股票.getValue());
         paramMap.put("FINPROD_TYPE2_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+        paramMap.put("FINPROD_TYPE2_F06", DictCodeListExt1.金融产品类型_投管用_基金.getValue());
+        paramMap.put("PS_T01",DictCodeList.交易方向_买入.getValue());
+        paramMap.put("PS_T04",DictCodeList.交易方向_申购.getValue());
         List<EntrustCommonDto> etrEntrustList = cashPosAutoGenerationMapper.findEnableEntrust(paramMap);
         if (etrEntrustList != null) {
             etrEntrustList.forEach(etrEntrustComm -> {
