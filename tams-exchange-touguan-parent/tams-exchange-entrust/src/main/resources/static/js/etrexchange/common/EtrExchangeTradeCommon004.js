@@ -4476,7 +4476,7 @@
     function paramCheck() {
         var ps = $("#ps_" + currentTab).val();
         console.log(riskFlag);
-        if (ps && "Y" === pageRedisFlag && (ps !== PS_T68 && ps !== PS_T69) && (!entity_RiskTrialRetList || riskFlag !== 0)) {
+        if (ps && "Y" === pageRedisFlag && (ps !== PS_T68 && ps !== PS_T69) && (!entity_RiskTrialRetList || riskFlag !== 0 || !$('#riskTrialSpan').text() || $('#riskTrialSpan').text() === '')) {
             Joyin.error("请先完成风险试算")
             return false;
         }
@@ -4538,7 +4538,7 @@
                 saveOrSubmit('submit');
             });
         }
-        if (($('#riskTrialSpan').text() && $('#riskTrialSpan').text().trim() == '试算通过') || (ps == PS_T68 || ps == PS_T69)) {
+        if (($('#riskTrialSpan').text() && $('#riskTrialSpan').text().trim() == '试算通过') || (ps == PS_T68 || ps == PS_T69) || "Y" !== pageRedisFlag) {
             saveOrSubmit('submit');
         }
     }
@@ -5030,6 +5030,10 @@
         });
         //绑定风险是算
         $('#EtrExchangeTradeCommon004_btn_riskcal').click(function () {
+            if (pageRedisFlag === 'N'){
+                Joyin.error("风险试算未打开！");
+                return;
+            }
             var object = getSearchParams();
             var tradeMarket = $("#tradeMarket_" + currentTab).val();
 
