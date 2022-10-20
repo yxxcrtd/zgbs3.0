@@ -12,5 +12,5 @@ public interface InterfCstpTradeMapper {
 
     int insertBasicByBasicInfo(InterfCstpTrade record);
 
-    InterfCstpTrade selectByPrimaryKey(@Param("execid") String execid);
+    InterfCstpTrade selectByPrimaryKey(@Param("execid") String execid, @Param("side") String side);
 }

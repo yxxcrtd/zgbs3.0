@@ -510,7 +510,10 @@ public class CfetsTrdConfirmService extends BaseService {
             return result;
         }
         logger.info("债券下行数据:{}", JsonUtils.object2Json(interfTradSecdeal));
-        InterfCstpTrade interfCstpTrade = interfCstpTradeMapper.selectByPrimaryKey(interfTradSecdeal.getFedealno());
+        // modify by jiangpeng 20221020 GLYHSCWT-143 考虑转仓时两条数据成交编号相同的情况过通过交易方向过滤 start
+        String side = StringUtil.equals(interfTradSecdeal.getPs(), DictCodeList.交易方向_买入.getValue()) ? "1" : "4";
+        // modify by jiangpeng 20221020 GLYHSCWT-143 考虑转仓时两条数据成交编号相同的情况过通过交易方向过滤 end
+        InterfCstpTrade interfCstpTrade = interfCstpTradeMapper.selectByPrimaryKey(interfTradSecdeal.getFedealno(), side);
         if (interfCstpTrade == null) {
             logger.error("下行接口数据为空");
             return result;
@@ -616,7 +619,10 @@ public class CfetsTrdConfirmService extends BaseService {
             return result;
         }
         logger.info("回购下行数据:{}", JsonUtils.object2Json(interfOpicsTradRepo));
-        InterfCstpTrade interfCstpTrade = interfCstpTradeMapper.selectByPrimaryKey(interfOpicsTradRepo.getOritradeid());
+        // add by jiangpeng 20221020 GLYHSCWT-143 考虑转仓时两条数据成交编号相同的情况过通过交易方向过滤 start
+        String side = StringUtil.equals(interfOpicsTradRepo.getPs(), DictCodeList.回购拆借方向_逆回购.getValue()) ? "1" : "4";
+        // add by jiangpeng 20221020 GLYHSCWT-143 考虑转仓时两条数据成交编号相同的情况过通过交易方向过滤 end
+        InterfCstpTrade interfCstpTrade = interfCstpTradeMapper.selectByPrimaryKey(interfOpicsTradRepo.getOritradeid(), side);
         if (interfCstpTrade == null) {
             logger.error("下行接口数据为空");
             return result;
