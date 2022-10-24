@@ -7,7 +7,7 @@
  * 修改内容：新建
  * 系统名称：理财资管管理系统V2.0
  */
- 
+
 package com.joyintech.service.basicdata.mstsecuritiesaccount.service;
 
 import java.math.BigDecimal;
@@ -61,7 +61,7 @@ public class MstSecuritiesAccountService extends BaseService<MstSecuritiesAccoun
      */
     @Autowired
     private StlSecAcctInfoMapper  stlSecAcctInfoMapper;
-    
+
     /**
      * 查询
      * @param param
@@ -72,10 +72,10 @@ public class MstSecuritiesAccountService extends BaseService<MstSecuritiesAccoun
     {
         return super.queryForPage(page, length, () -> mstSecuritiesAccountMapper.select(param));
     }
-    
+
     /**
      * 组合代码联想下拉框 <功能详细描述>
-     * 
+     *
      * @param param 组合代码 用户Id
      * @return List<SuggestDto>
      * @see
@@ -84,7 +84,7 @@ public class MstSecuritiesAccountService extends BaseService<MstSecuritiesAccoun
     public List<SuggestDto> getPortfolioId(Map<String, Object> param) {
         return mstSecuritiesAccountMapper.getPortfolioId(param);
     }
-    
+
     /**
      * 联想文本框service层实现
      *
@@ -109,7 +109,7 @@ public class MstSecuritiesAccountService extends BaseService<MstSecuritiesAccoun
      * @param search String
      * @return SuggestDto
      */
-    public List<SelectOptionDto> getBusiAcctNo(String search) { 
+    public List<SelectOptionDto> getBusiAcctNo(String search) {
         return  mstSecuritiesAccountMapper.getBusiAcctNo(search);
     }
     /**
@@ -276,10 +276,10 @@ public class MstSecuritiesAccountService extends BaseService<MstSecuritiesAccoun
 //    public int deleteFileByBusinessId(String businessId) {
 //        return mstSecuritiesAccountMapper.deleteFileByBusinessId(businessId);
 //    }
-    
+
 	/**
 	 * 证券代码
-	 * 
+	 *
 	 * @param map
 	 * @return
 	 */
@@ -298,12 +298,12 @@ public class MstSecuritiesAccountService extends BaseService<MstSecuritiesAccoun
 		map.put("FINPROD_TYPE_TG_ZYSHG", "ZYSHG");
 		map.put("FINPROD_OTH_CODE_TYPE_05", DictCodeListExt3.金融产品其他代码类型_配债代码.getValue());
 		map.put("FINPROD_OTH_CODE_TYPE_06", DictCodeListExt3.金融产品其他代码类型_配股代码.getValue());
-		
+
 		map.put("FINPROD_TYPE_TG_F01_B14", DictCodeList.WIND一级分类_含债券一级分类等_可转债.getValue());
 		return super.queryForPageForSelectReturn(page, length, () -> mstSecuritiesAccountMapper.getFinprodMarketInfo(map));
 
 	}
-    
+
     /**
      * 组合资金账户
      * @param map
@@ -313,7 +313,7 @@ public class MstSecuritiesAccountService extends BaseService<MstSecuritiesAccoun
         List<SelectOptionDto> list = mstSecuritiesAccountMapper.getPtlSecAcctInfo(map);
     	return list;
     }
-    
+
     /**
      * 标的信息
      * @param map
@@ -322,7 +322,7 @@ public class MstSecuritiesAccountService extends BaseService<MstSecuritiesAccoun
     public List<SelectOptionDto> getFinprodId(Map<String,Object> map){
     	return mstSecuritiesAccountMapper.getPtlSecAcctInfo(map);
     }
-    
+
     /**
      * 证券账户表
      * @param map
@@ -345,7 +345,7 @@ public class MstSecuritiesAccountService extends BaseService<MstSecuritiesAccoun
     public List<SelectOptionDto> getFinprodIdByMarketId(Map<String, Object> map) {
         return mstSecuritiesAccountMapper.getFinprodIdByMarketId(map);
     }
-    
+
     public List<SelectOptionDto> getFuturesCompany(String companyNo) {
         return mstSecuritiesAccountMapper.getFuturesCompany(companyNo);
     }
@@ -360,7 +360,7 @@ public class MstSecuritiesAccountService extends BaseService<MstSecuritiesAccoun
             return "1";
         }else{
            String testStatus = "";
-           testStatus = mstSecuritiesAccountMapper.QueryForTestStatus(map);
+           testStatus = mstSecuritiesAccountMapper.QueryForTestStatus2(map);
            if(StringUtil.equals("2",testStatus)){
                return "2";
            }else if(StringUtil.equals("3",testStatus)){
