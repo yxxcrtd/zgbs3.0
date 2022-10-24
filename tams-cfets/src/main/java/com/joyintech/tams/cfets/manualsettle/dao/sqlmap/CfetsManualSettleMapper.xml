@@ -1440,11 +1440,11 @@
             TO_CHAR(T61.ACT_EXERCISE_DATE,'yyyy-MM-dd') actExerciseDate1,
             T1.SHARE_AMT/100 qty,
             decode(T1.PS,#{psT39},T81.EXERCISE_PRICE,T1.unit_cprice) unitPrice,
-            T1.Trade_Amt cpriceAmt,
+            nvl(decode(T1.PS,#{psT39},T81.EXERCISE_PRICE,T1.unit_cprice)*T1.SHARE_AMT,T1.Trade_Amt) cpriceAmt,
             T1.int_amt intAmt,
             ttft.fee_amt jyFeeAmt,
             ttft1.fee_amt jsFeeAmt,
-            T1.Trade_Amt tradeAmt,
+            nvl(decode(T1.PS,#{psT39},T81.EXERCISE_PRICE,T1.unit_cprice)*T1.SHARE_AMT,T1.Trade_Amt) tradeAmt,
             T1.unit_fprice allPrice,
             T1.fprice_amt fpriceAmt,
             T1.Yield*100 matureYield,
@@ -1634,11 +1634,11 @@
             TO_CHAR(T61.ACT_EXERCISE_DATE,'yyyy-MM-dd') actExerciseDate1,
             T1.SHARE_AMT/100 qty,
             decode(T1.PS,#{psT39},T81.EXERCISE_PRICE,T1.unit_cprice) unitPrice,
-            T1.Trade_Amt cpriceAmt,
+            nvl(decode(T1.PS,#{psT39},T81.EXERCISE_PRICE,T1.unit_cprice)*T1.SHARE_AMT,T1.Trade_Amt) cpriceAmt,
             T1.int_amt intAmt,
             ttft.fee_amt jyFeeAmt,
             ttft1.fee_amt jsFeeAmt,
-            T1.Trade_Amt tradeAmt,
+            nvl(decode(T1.PS,#{psT39},T81.EXERCISE_PRICE,T1.unit_cprice)*T1.SHARE_AMT,T1.Trade_Amt) tradeAmt,
             T1.unit_fprice allPrice,
             T1.fprice_amt fpriceAmt,
             T1.Yield*100 matureYield,
@@ -1750,7 +1750,7 @@
          LEFT JOIN ibu_quote_crep ic ON ic.quote_id = nvl(T7.PRE_TRADE_ID,T1.B_TRADE_ID)
         WHERE T1.TOTLE_TRADE_ID = #{totleTradeId} and T1.TRADE_STATUS = #{TRADE_STATUS01}
     </select>
-    
+
     <select id="findManualSettleInfoRepo2" resultType="com.joyintech.tams.cfets.trdquery.dto.CfetsTrdSettleInfoResponse">
         SELECT
             distinct
