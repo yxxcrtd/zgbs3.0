@@ -1332,14 +1332,12 @@
         <!-- INNER JOIN (SELECT EXECID ,MAX(UPDATETIME) UPDATETIME FROM  INTERF_CSTP_TRADE GROUP BY EXECID)	II ON  II.EXECID = I.EXECID AND II.UPDATETIME = I.UPDATETIME -->
         INNER JOIN (SELECT EXECID ,MAX(UPDATETIME) UPDATETIME FROM  INTERF_CSTP_TRADE
             where TRADEDATE = to_char(#{sysDate,jdbcType=DATE}, 'yyyyMMdd')
-            GROUP BY EXECID)	II ON  II.EXECID = I.EXECID AND II.UPDATETIME = I.UPDATETIME
+            GROUP BY EXECID,SIDE )	II ON  II.EXECID = I.EXECID AND II.UPDATETIME = I.UPDATETIME
         <!-- modify by etliu 20220926 性能问题处理 end -->
         left join INTERF_OPICS_TRAD_REPO tr on tr.oritradeid = I.EXECID
         left join INTERF_TRAD_SECDEAL ts on ts.FEDEALNO = I.EXECID and DECODE(I.OURINSTITUTIONROLE, '119', 'T01', 'T02') = ts.PS
-        left join fin_product fp
-        on ts.SECID=fp.finprod_market_id
-        and fp.finprod_type='F01'
-        LEFT JOIN SYS_USER_ADD sua ON nvl(ts.TRAD,tr.BUYTRADER) =sua.IBU_TRADER
+        left join fin_product fp on ts.SECID=fp.finprod_market_id and fp.finprod_type='F01'
+        LEFT JOIN SYS_USER_ADD sua ON nvl(ts.TRAD,tr.BUYTRADER) = sua.IBU_TRADER
         <!-- modify by etliu 20220926 性能问题处理 start -->
         LEFT JOIN MST_CFETS_CUSTOMER_INFO mccit
             ON I.ourinstitutioncode= mccit.party_customer_id
@@ -1356,18 +1354,17 @@
         LEFT JOIN IBU_QUOTE_BOND iqb ON iqbd.QUOTE_ID = iqb.QUOTE_ID and iqb.TRADE_STATUS='07'
         LEFT JOIN IBU_QUOTE_CREP iqc ON i.EXECID = iqc.EXECID and iqc.TRADE_STATUS='07'
         ) QUOTE ON QUOTE.EXECID=I.EXECID-->
-        left join stl_sec_acct_info stlinfo
-        on nvl(ts.OURDEPOSITACCOUNTNUMBER,tr.OURDEPOSITACCOUNTNUMBER)=stlinfo.sec_acct_id
+        left join stl_sec_acct_info stlinfo on nvl(ts.OURDEPOSITACCOUNTNUMBER,tr.OURDEPOSITACCOUNTNUMBER)=stlinfo.sec_acct_id
         left join (
-        select itr.tradeid as tradeid,
-        listagg(fprepo.finprod_id, ',') within group(order by fprepo.finprod_id) as pledgeFinprodId,
-        listagg(to_char(itr.CONVRATE,'FM99990.999999'), ',') within group(order by fprepo.finprod_id) as pledgeRatio,
-        listagg(itr.FACETOTALAMT, ',') within group(order by fprepo.finprod_id) as pledgeFaceValue
-        from INTERF_TRAD_REPOASST itr
-        inner join fin_product fprepo
-        on itr.SECID=fprepo.finprod_market_id
-        and fprepo.finprod_type='F01'
-        group by itr.tradeid
+            select itr.tradeid as tradeid,
+            listagg(fprepo.finprod_id, ',') within group(order by fprepo.finprod_id) as pledgeFinprodId,
+            listagg(to_char(itr.CONVRATE,'FM99990.999999'), ',') within group(order by fprepo.finprod_id) as pledgeRatio,
+            listagg(itr.FACETOTALAMT, ',') within group(order by fprepo.finprod_id) as pledgeFaceValue
+            from INTERF_TRAD_REPOASST itr
+            inner join fin_product fprepo
+            on itr.SECID=fprepo.finprod_market_id
+            and fprepo.finprod_type='F01'
+            group by itr.tradeid
         )icpledge
         on  tr.oritradeid=icpledge.tradeid
         <!-- modify by etliu 20220926 性能问题处理 start -->
@@ -1379,7 +1376,9 @@
         <!-- and   nvl(ts.dealdate,tr.dealdate)= #{sysDate,jdbcType=DATE} -->
         AND I.TRADEDATE = to_char(#{sysDate,jdbcType=DATE}, 'yyyyMMdd')
         <!-- modify by etliu 20220926 性能问题处理 end -->
-        AND NOT EXISTS (SELECT 1 FROM trdquto_match_info match where I.EXECID=match.exe_id)
+        <!-- modify by jiangpeng 20221020 GLYHSCWT-101 考虑转仓时两条数据成交编号相同的情况过滤时用系统生成编号 start -->
+        AND NOT EXISTS (SELECT 1 FROM trdquto_match_info match where nvl(ts.dealno,tr.tradeid) = match.CSTP_TRADE_ID)
+        <!-- modify by jiangpeng 20221020 GLYHSCWT-101 考虑转仓时两条数据成交编号相同的情况过滤时用系统生成编号 end -->
         <if test="regAssetType != null  and regAssetType!=''">
             AND I.BUSINESSTYPE = #{regAssetType}
         </if>

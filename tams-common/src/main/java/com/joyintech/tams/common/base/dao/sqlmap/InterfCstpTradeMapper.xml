@@ -1115,5 +1115,8 @@
         SC_FPRICE_AMT
         FROM INTERF_CSTP_TRADE
         WHERE EXECID = #{execid,jdbcType=VARCHAR}
+        <!-- add by jiangpeng 20221020 GLYHSCWT-143 考虑转仓时两条数据成交编号相同的情况过通过交易方向过滤 start -->
+        and SIDE = #{side,jdbcType=VARCHAR}
+        <!-- add by jiangpeng 20221020 GLYHSCWT-143 考虑转仓时两条数据成交编号相同的情况过通过交易方向过滤 end -->
     </select>
 </mapper>

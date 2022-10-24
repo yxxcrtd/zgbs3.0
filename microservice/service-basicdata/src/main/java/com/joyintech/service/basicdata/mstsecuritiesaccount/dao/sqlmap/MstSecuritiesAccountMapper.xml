@@ -525,6 +525,36 @@
         where  fp.finprod_Market_id = #{secId}
     </select>
 
+    <select id="QueryForTestStatus2" resultType="java.lang.String">
+        select
+            TMP1.isSppiPass				AS isSppiPass
+        from
+            (
+                select
+                    TMP.bondId   				AS bondId,
+                    TMP.isSppiPass				AS isSppiPass,
+                    ROW_NUMBER() OVER (PARTITION BY TMP.bondId ORDER BY TMP.updateTime DESC) AS RN
+                from
+                    (
+                        select
+                            x.finprod_id bondId,
+                            x.test_status isSppiPass,
+                            x.UPDATE_TIME updateTime
+                        from sppi_test x
+                        left join  fin_product fp on fp.FINPROD_ID = x.FINPROD_ID
+                        where fp.FINPROD_MARKET_ID=#{secId}
+                        UNION ALL
+                        select
+                            t.bond_id  bondId,
+                            t.is_sppi_pass isSppiPass,
+                            t.UPDATE_TIME updateTime
+                        from SPPI_IMPORT_DATA t
+                        left join  fin_product fp on fp.FINPROD_ID = t.bond_id
+                        where fp.FINPROD_MARKET_ID=#{secId}
+                    )TMP
+            )TMP1	where TMP1.RN=1
+    </select>
+
     <!-- 证券代码 -->
     <select id="getFinprodMarketInfoNewUi" resultMap="secAcctInfo">
         select distinct t.finprod_market_id as id,

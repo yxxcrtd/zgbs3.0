@@ -42,11 +42,11 @@
         A.ISSUE_AMT issueAmt,
         B.TYPE_6 category,
         B.TYPE_7 type,
-        <!--新增行内五级分类  zhangpuyu 2019-7-23 start-->     
+        <!--新增行内五级分类  zhangpuyu 2019-7-23 start-->
         B.TYPE_9 type9,
         B.TYPE_10 type10,
         B.TYPE_11 type11,
-        B.TYPE_12 type12, 
+        B.TYPE_12 type12,
         <!--新增行内五级分类  zhangpuyu 2019-7-23 end-->
         <!--update by zhangnian 20190916 start-->
         /*(CASE
@@ -102,8 +102,8 @@
         LEFT JOIN MST_CUSTOMER_INFO T ON T.CUSTOMER_ID = 	A.MANAGER
         <!-- add by 2019/9/29 张普裕  查询新增发行人，托管人 实际管理人 start-->
         LEFT JOIN MST_CUSTOMER_INFO T1 ON T1.CUSTOMER_ID = 	A.TRUSTEE_ID
-        LEFT JOIN MST_CUSTOMER_INFO T2 ON T2.CUSTOMER_ID = 	A.ISSUER      
-        LEFT JOIN MST_CUSTOMER_INFO T3 ON T3.CUSTOMER_ID = 	D.ACTUAL_MANAGER      
+        LEFT JOIN MST_CUSTOMER_INFO T2 ON T2.CUSTOMER_ID = 	A.ISSUER
+        LEFT JOIN MST_CUSTOMER_INFO T3 ON T3.CUSTOMER_ID = 	D.ACTUAL_MANAGER
         <!--  add by 2019/9/29 张普裕  查询新增发行人，托管人 实际管理人  end-->
     WHERE 1=1
     <if test="finprodMarketId != null and finprodMarketId !=''">
@@ -119,7 +119,7 @@
             #{type,jdbcType=VARCHAR}
     </foreach>
     </if>
-    <!--新增行内五级分类  zhangpuyu 2019-7-23 start-->   
+    <!--新增行内五级分类  zhangpuyu 2019-7-23 start-->
     <if test="type9List !=null and type9List.size()>0">
     <foreach collection="type9List" open="AND B.TYPE_9 IN (" item="type9" separator="," close=")">
             #{type9,jdbcType=VARCHAR}
@@ -140,7 +140,7 @@
             #{type12,jdbcType=VARCHAR}
     </foreach>
     </if>
-    <!--新增行内五级分类  zhangpuyu 2019-7-23 end-->   
+    <!--新增行内五级分类  zhangpuyu 2019-7-23 end-->
     <!-- <if test="transMode != null and transMode !=''">
         AND C.PUR_SPEED = DECODE(#{transMode,jdbcType=VARCHAR},'T+0',0,'T+1',1)
     </if> -->
@@ -281,12 +281,12 @@ WHERE
         C.CASH_OUT_NO cmsId,
         D.TYPE_6 category,
         D.TYPE_7 type,
-        <!--新增行内五级分类  zhangpuyu 2019-7-23 start-->   
+        <!--新增行内五级分类  zhangpuyu 2019-7-23 start-->
         D.TYPE_9 type9,
         D.TYPE_10 type10,
         D.TYPE_11 type11,
         D.TYPE_12 type12,
-        <!--新增行内五级分类  zhangpuyu 2019-7-23 end-->   
+        <!--新增行内五级分类  zhangpuyu 2019-7-23 end-->
         T.PFLSH pflsh,
         T.HAP_CREDIT_AMT hapCreditAmt,
         T.CREDIT_FLAG creditFlag,
@@ -318,8 +318,9 @@ WHERE
         <!-- 左连接新加表 by 赵东东 2019.10.15 end -->
         LEFT JOIN REP_ASSET_DEPT REP_ASSET_DEPT  on A.FINPROD_ID = REP_ASSET_DEPT.REP_FINPROD_ID
         WHERE
-        A.FINPROD_ID = B.FINPROD_ID AND A.FINPROD_ID = C.FINPROD_ID AND A.FINPROD_ID = D.FINPROD_ID 
-        AND A.FINPROD_ID = #{finprodId} 
+        A.FINPROD_ID = B.FINPROD_ID AND A.FINPROD_ID = C.FINPROD_ID AND A.FINPROD_ID = D.FINPROD_ID
+        AND A.FINPROD_ID = #{finprodId}
+        and rownum = 1
     </select>
     <select id = "getRepAssetMngProdInfoByFinprodId" resultType="com.joyintech.service.asset.plan.planNet.dto.BussRepAssetMngProdInfo">
         SELECT
@@ -397,7 +398,7 @@ WHERE
         ON FIN_PRODUCT.FINPROD_ID = FIN_PRODUCT_TYPE.FINPROD_ID
 	    <where>
 	        FIN_PRODUCT_TYPE.TYPE_8 IS NOT NULL
-			<if test="finprodMarketId !=null and finprodMarketId != ''">	
+			<if test="finprodMarketId !=null and finprodMarketId != ''">
 	          AND  FIN_PRODUCT.FINPROD_MARKET_ID = #{finprodMarketId}
 	        </if>
 	    </where>

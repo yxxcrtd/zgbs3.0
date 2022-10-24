@@ -297,7 +297,7 @@ public class EtrExchangeTradeCommon004Controller extends BaseController {
      *
      * @param model
      */
-    private void setInvAimSelectOption(Model model) {
+    public void setInvAimSelectOption(Model model) {
         SelectDto selectDto = this.getSelectDataFromDataDic(DictCode.投资目的, null);
         List<SelectOptionDto> invAimList = selectDto.getOptions().stream().filter(option -> {
             return StringUtil.equals(option.getId(), DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue()) || StringUtil.equals(option.getId(), DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue()) || StringUtil.equals(option.getId(), DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
@@ -311,7 +311,7 @@ public class EtrExchangeTradeCommon004Controller extends BaseController {
      *
      * @param model Model
      */
-    private void setSettleSpreedSelectOptions(Model model) {
+    public void setSettleSpreedSelectOptions(Model model) {
         SelectDto selectDto = this.getSelectDataFromDataDic(DictCode.清算速度, null);
         // 固定收益
         List<SelectOptionDto> settleSpreed_gd = selectDto.getOptions().stream().filter(option -> {
@@ -325,7 +325,7 @@ public class EtrExchangeTradeCommon004Controller extends BaseController {
      *
      * @param model Model
      */
-    private void setPsSelectOptions(Model model) {
+    public void setPsSelectOptions(Model model) {
         SelectDto selectDto = this.getSelectDataFromDataDic(DictCode.交易方向, null);
         // 竞价平台
         List<SelectOptionDto> ps_jj = selectDto.getOptions().stream().filter(option -> {
@@ -352,7 +352,7 @@ public class EtrExchangeTradeCommon004Controller extends BaseController {
      * @param model
      * @param isF10
      */
-    private void setPriceModelSelectOptions(Model model, Boolean isF10) {
+    public void setPriceModelSelectOptions(Model model, Boolean isF10) {
         SelectDto selectDto = this.getSelectDataFromDataDic(DictCode.价格模式, null);
         List<SelectOptionDto> priceModel_jj = selectDto.getOptions().stream().filter(option ->
                 StringUtil.equals(option.getId(), DictCodeListExt2.价格模式_限价指令.getValue())
@@ -374,7 +374,7 @@ public class EtrExchangeTradeCommon004Controller extends BaseController {
      *
      * @param model Model
      */
-    private void setDeclaTypeSelectOptions(Model model) {
+    public void setDeclaTypeSelectOptions(Model model) {
         SelectDto selectDto = this.getSelectDataFromDataDic(DictCode.申报类型, null);
         // 大宗平台
         List<SelectOptionDto> declaType_dz = selectDto.getOptions().stream().filter(option -> {
@@ -393,7 +393,7 @@ public class EtrExchangeTradeCommon004Controller extends BaseController {
      *
      * @param model Model
      */
-    private void setConstSelectOption(Model model) {
+    public void setConstSelectOption(Model model) {
         // 金融产品类型(投管用)
         model.addAttribute("FINPROD_TYPE_TG_F01", DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         model.addAttribute("FINPROD_TYPE_TG_F02", DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
