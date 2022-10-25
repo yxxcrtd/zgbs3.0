@@ -47,6 +47,7 @@ import com.joyintech.tams.invest.common.dto.common.BussinessCodeParameter;
 import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
 import com.joyintech.tams.invest.common.dto.period.common.BussTrdTransferOrderDto;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
+import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import com.joyintech.tams.invest.common.trade.service.impl.etrcash.EtrCommonCashPositionDealService;
 import com.joyintech.tams.invest.trade.lend.dto.FinTradeProductDto;
 import com.joyintech.tams.position.servive.PositionRequestHandle;
@@ -154,6 +155,9 @@ public class CfetsTrdConfirmService extends BaseService {
 
     @Autowired
     private MatchFeaturesService matchFeaturesService;
+
+    @Autowired
+    private TrdCommonBaseService trdCommonBaseService;
 
     // 交易份额小数保留位数
     private final int decimalPlaces_4 = 4;
@@ -407,16 +411,16 @@ public class CfetsTrdConfirmService extends BaseService {
                             || StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.CSTP资产类型_债券.getValue())
                     ) {
                         // 债券买卖 对dto进行封装
-                        CfetsTrdBondInvestTradeDto entity = this.packageEquity(item, DictCodeListExt1.生成方式_画面录入.getValue());
+                        CfetsTrdBondInvestTradeDto entity = this.packageEquity(item, DictCodeListExt1.生成方式_画面录入.getValue(), dto.getCstpTradeId());
                         // 成交确认提交方法
                         cfetsTrdConfirm001Service.doCompleteMethod(entity, OperationType.NEW);
                     } else if (StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.登记资产类型_一级申购.getValue())
                             || StringUtil.equals(item.getFinprodType2(), DictCodeListExt1.CSTP资产类型_一级申购.getValue())) {
                         // 一级债
-                        CfetsTrdFirstBondInvestTradeDto entity = this.prepareBidEntity(item.getTotleTradeId(), DictCodeListExt1.生成方式_画面录入.getValue());
+                        CfetsTrdFirstBondInvestTradeDto entity = this.prepareBidEntity(item.getTotleTradeId(), DictCodeListExt1.生成方式_画面录入.getValue(), dto.getCstpTradeId());
                         cfetsTrdConfirm001Service.doCompleteBidMethod(entity, OperationType.NEW, DictCodeListExt1.生成方式_画面录入.getValue());
                     } else {
-                        CfetsTrdRepoTrade003Dto entity = this.packageRepoEquity(item, DictCodeListExt1.生成方式_画面录入.getValue());
+                        CfetsTrdRepoTrade003Dto entity = this.packageRepoEquity(item, DictCodeListExt1.生成方式_画面录入.getValue(), dto.getCstpTradeId());
                         //成交确认提交方法
                         cfetsTrdConfirm001Service.doCompleteRepoMethod(entity, OperationType.NEW, true);
                     }
@@ -519,12 +523,12 @@ public class CfetsTrdConfirmService extends BaseService {
             return result;
         }
         logger.info("下行接口数据:{}", JsonUtils.object2Json(interfCstpTrade));
-        if (BigDecimalUtil.ACompareToB(interfCstpTrade.getSettlcurramt(), result.getFpriceAmt(), 4) == 0) {
-            logger.info("结算金额和下行数据相同,不做后续操作:{}", JsonUtils.object2Json(result));
-            return result;
-        }
+//        if (BigDecimalUtil.ACompareToB(interfCstpTrade.getSettlcurramt(), result.getFpriceAmt(), 4) == 0) {
+//            logger.info("结算金额和下行数据相同,不做后续操作:{}", JsonUtils.object2Json(result));
+//            return result;
+//        }
         // 交易金额
-        BigDecimal tradeAmt = interfCstpTrade.getTradecashamt();
+        BigDecimal cPriceAmt = interfCstpTrade.getTradecashamt();
         result.setPrinAmt(interfCstpTrade.getTradecashamt());
         result.setCpriceAmt(interfCstpTrade.getTradecashamt());
         // 结算金额
@@ -535,31 +539,40 @@ public class CfetsTrdConfirmService extends BaseService {
         result.setIntAmt(interfCstpTrade.getAccruedinteresttotalamt());
         // 券面总额
         BigDecimal shareAmt = result.getShareAmt();
+        // 债券面值
+        BigDecimal price = trdCommonBaseService.getFaceValue(dto.getFinprodId(), iPlatformDate.getSysDate());
         // 分配结算金额和交易金额
         for (int i = 0; i < result.getTrdProductDeals().size(); i++) {
-            result.getTrdProductDeals().get(i).setOldTradeAmt(result.getTrdProductDeals().get(i).getTradeAmt());
+            if(StringUtil.isNotEmpty(result.getTrdProductDeals().get(i).getTradeAmt())) {
+                result.getTrdProductDeals().get(i).setOldTradeAmt(result.getTrdProductDeals().get(i).getTradeAmt());
+            }else{
+                result.getTrdProductDeals().get(i).setOldTradeAmt(ArithmeticUtil.multiply(price, result.getTrdProductDeals().get(i).getShareAmt()));
+            }
             result.getTrdProductDeals().get(i).setOldFpriceAmt(result.getTrdProductDeals().get(i).getFpriceAmt());
             result.getTrdProductDeals().get(i).setOldIntAmt(result.getTrdProductDeals().get(i).getIntAmt());
             // 最后一笔数据倒减
             if (i == result.getTrdProductDeals().size() - 1) {
-                result.getTrdProductDeals().get(i).setTradeAmt(tradeAmt);
+                result.getTrdProductDeals().get(i).setCpriceAmt(cPriceAmt);
+                result.getTrdProductDeals().get(i).setPrinAmt(cPriceAmt);
                 result.getTrdProductDeals().get(i).setFpriceAmt(fpriceAmt);
+                result.getTrdProductDeals().get(i).setTradeAmt(fpriceAmt);
                 result.getTrdProductDeals().get(i).setIntAmt(intAmt);
             } else {
                 BigDecimal shareAmtTemp = result.getTrdProductDeals().get(i).getShareAmt();
                 // 明细券面总额/总券面总额 * 交易金额
-                result.getTrdProductDeals().get(i).setTradeAmt(
+                result.getTrdProductDeals().get(i).setCpriceAmt(
                         ArithmeticUtil.divide(
                                 ArithmeticUtil.multiply(interfCstpTrade.getTradecashamt(), shareAmtTemp), shareAmt, 2));
+                result.getTrdProductDeals().get(i).setPrinAmt(result.getTrdProductDeals().get(i).getCpriceAmt());
                 // 明细券面总额/总券面总额 * 结算金额
                 result.getTrdProductDeals().get(i).setFpriceAmt(
                         ArithmeticUtil.divide(
                                 ArithmeticUtil.multiply(interfCstpTrade.getSettlcurramt(), shareAmtTemp), shareAmt, 2));
-                result.getTrdProductDeals().get(i).setCpriceAmt(result.getTrdProductDeals().get(i).getTradeAmt());
+                result.getTrdProductDeals().get(i).setTradeAmt(result.getTrdProductDeals().get(i).getCpriceAmt());
                 // 利息总额 = 结算金额  - 交易金额
                 result.getTrdProductDeals().get(i).setIntAmt(
                         ArithmeticUtil.subtract(result.getTrdProductDeals().get(i).getFpriceAmt(), result.getTrdProductDeals().get(i).getCpriceAmt()));
-                tradeAmt = ArithmeticUtil.subtract(tradeAmt, result.getTrdProductDeals().get(i).getTradeAmt());
+                cPriceAmt = ArithmeticUtil.subtract(cPriceAmt, result.getTrdProductDeals().get(i).getCpriceAmt());
                 fpriceAmt = ArithmeticUtil.subtract(fpriceAmt, result.getTrdProductDeals().get(i).getFpriceAmt());
                 intAmt = ArithmeticUtil.subtract(intAmt, result.getTrdProductDeals().get(i).getIntAmt());
             }
@@ -3230,7 +3243,7 @@ public class CfetsTrdConfirmService extends BaseService {
             DecimalFormat df = new DecimalFormat("#,##0.00");
             this.buildMassege(matchMap, "settleAtm",
                     str, "matchDetFeatures.settleAtm",
-                    validateStr, "CONFIRM_MSG_013", df.format(ArithmeticUtil.round(cstpInfo.getTradeAmt(), 2, RoundingMode.HALF_UP)),
+                    validateStr, "CONFIRM_MSG_014", df.format(ArithmeticUtil.round(cstpInfo.getTradeAmt(), 2, RoundingMode.HALF_UP)),
                     df.format(ArithmeticUtil.round(regInfo.getTradeAmt(), 2, RoundingMode.HALF_UP)));
         }
         // 对手方

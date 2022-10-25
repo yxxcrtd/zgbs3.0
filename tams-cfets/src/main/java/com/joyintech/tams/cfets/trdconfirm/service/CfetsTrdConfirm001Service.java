@@ -188,9 +188,6 @@ public class CfetsTrdConfirm001Service extends BaseService {
     @Autowired
     private PositionRequestHandle positionRequestHandle;
 
-    @Autowired
-    private TrdCommonBaseService trdCommonBaseService;
-
     /**
      * 投资委托信息Service
      */
@@ -226,7 +223,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
 
 
     @DTXTransaction(transactionListener = "positionRollService")
-    public List<Map<String, Object>> doCompleteMethod(CfetsTrdBondInvestTradeDto entity, OperationType operationType) {
+    public void doCompleteMethod(CfetsTrdBondInvestTradeDto entity, OperationType operationType) {
         List<String> finishEtrList=new ArrayList<>();
         //买入含权债时，自动创建交易对手 add by wangwei5 2020-03-23 Start
         if(operationType.equals(OperationType.NEW)){
@@ -443,16 +440,14 @@ public class CfetsTrdConfirm001Service extends BaseService {
         }
         oprHisReq.setBusiDes(entity.getRemark());
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
-        List<Map<String, Object>> mapList = new ArrayList<>();
         //发送头寸
-        mapList.add(this.sendPositionMethod(entity));
+        this.sendPositionMethod(entity);
         //若指令完成需要发送指令完成头寸
         if(!StringUtil.isEmptyList(finishEtrList)){
             for(String item:finishEtrList){
-                mapList.add(closeDelegatePositionMethod(item, entity.getPs(), "bond"));
+                closeDelegatePositionMethod(item, entity.getPs(), "bond");
             }
         }
-        return mapList;
     }
     @DTXTransaction(transactionListener = "positionRollService")
     public List<Map<String, Object>> doCompleteRepoMethod(CfetsTrdRepoTrade003Dto entity, OperationType operationType, boolean isTrdConfirm) {
@@ -1795,7 +1790,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
                 inputDto, Boolean.class);
     }
 
-    private Map<String, Object> sendPositionMethod(CfetsTrdBondInvestTradeDto entity){
+    private void sendPositionMethod(CfetsTrdBondInvestTradeDto entity){
         List<CfetsEtrIbPosPortfolioRequest> ptlList=new ArrayList<>();
         for (TrdProductDeal dto : entity.getTrdProductDeals()) {
             //调用头寸
@@ -1866,9 +1861,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
         req.setFinprodId(entity.getFinprodId());
         req.setPtlList(ptlList);
         req.setbTotalTradeId(entity.getRegIbuId());
-        Map<String, Object> param = positionRequestHandle.send(req);
-        ThreadLocalUtil.setLocalCache(param);
-        return param;
+        positionRequestHandle.send(req);
     }
     private Map<String, Object> sendRepoPositionMethod(CfetsTrdRepoTrade003Dto entity){
         List<CfetsEtrIbRepoPosPortfolioCashRequest> ptlCashList = new ArrayList<>();
@@ -2296,8 +2289,9 @@ public class CfetsTrdConfirm001Service extends BaseService {
      *
      */
     private void oldPositionDeal(CfetsTrdBondInvestTradeDto dto) {
-        // 债券面值
-        BigDecimal price = trdCommonBaseService.getFaceValue(dto.getFinprodId(), iPlatformDate.getSysDate());
+        // 获取划款指令
+        Map<String, BussTrdTransferOrderDto> map = dto.getBussTrdTransferOrder().stream()
+                .collect(Collectors.toMap(BussTrdTransferOrderDto::getTradeId, orderDto -> orderDto));
         // 调用业务组件.【金融产品交易共通.交易产品接口】,写入[可用]的组合持仓流水及现金流水
         for (TrdProductDeal item : dto.getTrdProductDeals()) {
             FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
@@ -2319,15 +2313,20 @@ public class CfetsTrdConfirm001Service extends BaseService {
             //处理指令完成情况
             List<StlPayOrdersDto> stlPayOrders = new ArrayList<>();
             StlPayOrdersDto stlPayOrder = new StlPayOrdersDto();
-            if (StringUtil.isEmpty(stlPayOrder.getMyAcctNo())) {
-                String acctId = EtrCommonCashPositionDealService.select组合托管户(item.getPortfolioId(), item.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
-                stlPayOrder.setMyAcctNo(acctId);
+            BussTrdTransferOrderDto orderDto = map.get(item.getTradeId());
+            if (StringUtil.isNotEmpty(orderDto)){
+                BeanUtil.copyPropertiesIgnoreNull(stlPayOrder, orderDto);
+            }else {
+                if (StringUtil.isEmpty(stlPayOrder.getMyAcctNo())) {
+                    String acctId = EtrCommonCashPositionDealService.select组合托管户(item.getPortfolioId(), item.getCcy(), DictCodeListExt1.资金账户类型_产品托管户.getValue());
+                    stlPayOrder.setMyAcctNo(acctId);
+                }
+                stlPayOrder.setOrderId(item.getTradeId());
+                stlPayOrder.setCcy(item.getCcy());
+                stlPayOrder.setSettleAmt(item.getTradeAmt());
+                stlPayOrder.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
+                stlPayOrder.setPs(item.getPs());
             }
-            stlPayOrder.setOrderId(item.getTradeId());
-            stlPayOrder.setCcy(item.getCcy());
-            stlPayOrder.setSettleAmt(item.getTradeAmt());
-            stlPayOrder.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
-            stlPayOrder.setPs(item.getPs());
             stlPayOrders.add(stlPayOrder);
             if (CollectionUtils.isNotEmpty(stlPayOrders)
                     && !DictCodeListExt1.投资目的_卖空.getValue().equals(trdProductDeal.getInvAim())) {
@@ -2346,10 +2345,11 @@ public class CfetsTrdConfirm001Service extends BaseService {
             TrdProductDeal oldTrdProductDeal = new TrdProductDeal();
             BeanUtil.copyPropertiesIgnoreNull(oldTrdProductDeal, item);
             BigDecimal tradeAmt;
+            // 成交确认/匹配确认时 旧交易金额字段为空
+            // 手工/自动匹配时旧交易金额字段不为空
             if (BigDecimalUtil.isZeroOrNull(oldTrdProductDeal.getOldTradeAmt())) {
-                // 券面总额*面值/100
-                tradeAmt = ArithmeticUtil.divide(
-                        ArithmeticUtil.multiply(item.getShareAmt(), price), new BigDecimal(100), 4, RoundingMode.HALF_UP);
+                // 券面总额*面值
+                tradeAmt = oldTrdProductDeal.getTradeAmt();
             } else {
                 tradeAmt = item.getOldTradeAmt();
             }

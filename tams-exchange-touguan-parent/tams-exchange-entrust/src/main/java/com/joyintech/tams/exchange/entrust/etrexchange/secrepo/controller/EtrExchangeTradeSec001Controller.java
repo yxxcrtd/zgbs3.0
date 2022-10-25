@@ -85,6 +85,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -890,15 +891,19 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 					EtrExchangeTradePortfolioSecRepoRequest tempItem=dto.getPortfolioList().get(i);
 					BigDecimal disRate=BigDecimal.ZERO;
 					if(i<dto.getPortfolioList().size()-1) {
-						disRate=ArithmeticUtil.divide(tempItem.getEntrustNum(),totalEntrustNum,2);
+						if (StringUtil.equals(dto.getTargetType(), DictCodeListExt3.目标类型_金额.getValue())) {
+							disRate=ArithmeticUtil.divide(tempItem.getEntrustAmt(),totalEntrustAmt,2);
+						}else{
+							disRate=ArithmeticUtil.divide(tempItem.getEntrustNum(),totalEntrustNum,2);
+						}
 						tempSumDisRate=tempSumDisRate.add(disRate);
 					}else {
 						disRate=ArithmeticUtil.subtract(new BigDecimal("1"),tempSumDisRate);
 					}
 					tempItem.setDisRate(disRate);
 				}
-				dto.setEntrustAmt(totalEntrustAmt);
-				dto.setEntrustNum(totalEntrustNum);
+//				dto.setEntrustAmt(totalEntrustAmt);
+//				dto.setEntrustNum(totalEntrustNum);
 				dto.setIsMulti(DictCodeList.是否_是.getValue());
 				dto.setVdate(dto.getEntrustDate());
 				dto.setMdate(dto.getEntrustDate());
@@ -1321,4 +1326,4 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 		}
 	}
 }
-	
+
