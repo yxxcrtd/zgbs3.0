@@ -297,6 +297,9 @@ public class CfetsTrdConfirmRegInfoListResponse{
     @ApiModelProperty(name="otherAmt",value="备用字段,用于存放一级申购发行价格等",example="99.00")
     private BigDecimal otherAmt;
 
+    @ApiModelProperty(name="cstpTradeId",value="下行数据编号,用于匹配确认时传值",example="CSTP202209200677")
+    private String cstpTradeId;
+
     public BigDecimal getParValue() {
         return parValue;
     }
@@ -1117,5 +1120,13 @@ public class CfetsTrdConfirmRegInfoListResponse{
 
     public void setOtherAmt(BigDecimal otherAmt) {
         this.otherAmt = otherAmt;
+    }
+
+    public String getCstpTradeId() {
+        return cstpTradeId;
+    }
+
+    public void setCstpTradeId(String cstpTradeId) {
+        this.cstpTradeId = cstpTradeId;
     }
 }

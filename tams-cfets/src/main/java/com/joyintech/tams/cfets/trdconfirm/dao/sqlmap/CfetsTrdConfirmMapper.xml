@@ -1673,7 +1673,7 @@
                             decode(regAdd.CAL_MODE, '01',reg.unit_cprice,'02',reg.yield * 100,'03',reg.exer_yield * 100),
                             'F02',ct.PRICE * 100,'F03',ct.PRICE * 100,null) as tradeYield,
                     reg.repo_term                                                         as termDays,
-                    decode(reg.finprod_type2, 'F01', reg.fprice_amt, tr.repoamt)          as tradeAmt,
+                    decode(tfpdt.finprod_type2, 'F01', tfpdt.fprice_amt, tfpdt.TRADE_AMT) as tradeAmt,
                     reg.trade_date                                                        as tradeDate,
                     deal.portfolioId                                                      as portfolioIds,
                     deal.portfolioName                                                    as portfolioNames,
@@ -1689,6 +1689,7 @@
                 from trdquto_match_info m
                  inner join reg_fin_product_deal_total reg on m.pre_trade_id = reg.totle_trade_id
                  left join reg_fin_product_deal_total_add regAdd on reg.totle_trade_id = regAdd.Totle_Trade_Id
+                 left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on m.TRD_ID = tfpdt.totle_trade_id
                  left join fin_product fp on reg.finprod_id = fp.finprod_id
                  left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = reg.FINPROD_ID
                  left join SYS_DATADICT_LIST sdl on sdl.DICT_CODE = 'CUSTOM_ASSET_TYPE_TWO' and sdl.ITEM_CODE = fpt.TYPE_9
@@ -1798,7 +1799,7 @@
                       TO_CHAR(ROUND(ic.rate * 100, 4), 'FM990.0000') || '%') as tradeYieldStr,
                decode(ct.BUSINESSTYPE, 'BOND', ib.tradeYield, ic.rate * 100) as tradeYield,
                decode(ct.BUSINESSTYPE, 'REPO', ic.term, null)                as termDays,
-               decode(ct.BUSINESSTYPE, 'BOND', ib.fprice_amt, tr.repoamt)    as tradeAmt,
+               decode(tfpdt.finprod_type2, 'F01', tfpdt.fprice_amt, tfpdt.TRADE_AMT) as tradeAmt,
                nvl(ib.quote_date, ic.quote_date)                             as tradeDate,
                deal.portfolioId                                              as portfolioIds,
                deal.portfolioName                                            as portfolioNames,
@@ -1837,6 +1838,7 @@
             where t1.TRADE_STATUS = '07'
               and t2.TRADE_STATUS = '07'
         ) ib on m.pre_trade_id = ib.quote_id
+        left join TRD_FIN_PRODUCT_DEAL_TOTAL tfpdt on m.TRD_ID = tfpdt.totle_trade_id
          left join ibu_quote_crep ic on m.pre_trade_id = ic.quote_id and ic.TRADE_STATUS = '07'
         left join fin_product fp on ib.finprod_id = fp.finprod_id
          left join FIN_PRODUCT_TYPE fpt on fpt.FINPROD_ID = ib.FINPROD_ID
