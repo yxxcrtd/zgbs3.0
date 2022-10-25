@@ -203,10 +203,12 @@
                 </foreach>
             </if>
             <if test="exerciseTypeList != null and exerciseTypeList.size() > 0">
-                AND T.exerciseType in
+                AND EXISTS ( select P.FINPROD_ID from FIN_EXERCISE_PLAN P where p.FINPROD_ID=T.finprodId
+                and P.EXERCISE_TYPE in
                 <foreach collection="exerciseTypeList" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
+                )
             </if>
             <if test="exerciseDateStart != null and exerciseDateStart != ''">
                 <![CDATA[AND  T.exerciseDate >= TO_DATE(#{exerciseDateStart},'YYYY-MM-DD')]]>
@@ -240,7 +242,6 @@
         left join SYS_DATADICT_LIST sdl_it on ss.rateType=sdl_it.ITEM_CODE and sdl_it.DICT_CODE='INT_TYPE'
         left join SYS_DATADICT_LIST sdl_fu on ss.payCycle=sdl_fu.ITEM_CODE and sdl_fu.DICT_CODE='FREQUENCY_UNIT'
         left join SYS_DATADICT_LIST sdl_ir on ss.isRight=sdl_ir.ITEM_CODE and sdl_ir.DICT_CODE='YES_OR_NO'
-        left join SYS_DATADICT_LIST sdl_em on ss.exerciseType=sdl_em.ITEM_CODE and sdl_em.DICT_CODE='EXEC_MODE'
         left join SYS_DATADICT_LIST sdl_is on ss.isSus=sdl_is.ITEM_CODE and sdl_is.DICT_CODE='YES_OR_NO'
         left join SYS_DATADICT_LIST sdl_ccy on ss.ccy=sdl_ccy.ITEM_CODE and sdl_ccy.DICT_CODE='CCY'
         left join SYS_DATADICT_LIST sdl_mgrm on ss.mGradeResult=sdl_mgrm.ITEM_CODE and
@@ -262,7 +263,7 @@
             <where>( ss.finprodId || '|' || ss.finprodName || '|' || ss.finprodAbbr || '|' || ss.finprodMarketId || '|'
                 || '|' || sdl_tp.ITEM_VALUE || '|' || sdl_ro.ITEM_VALUE || '|' || ss.issuerName || '|' || sdl_catt.ITEM_VALUE || '|' || sdl_catth.ITEM_VALUE
                 || '|' || sdl_catf.ITEM_VALUE || '|' || sdl_cs.ITEM_VALUE || '|' || sdl_it.ITEM_VALUE
-                || '|' || sdl_fu.ITEM_VALUE || '|' || sdl_ir.ITEM_VALUE || '|' || sdl_em.ITEM_VALUE || '|' || sdl_is.ITEM_VALUE || '|' || sdl_ccy.ITEM_VALUE
+                || '|' || sdl_fu.ITEM_VALUE || '|' || sdl_ir.ITEM_VALUE || '|' || ss.exerciseType || '|' || sdl_is.ITEM_VALUE || '|' || sdl_ccy.ITEM_VALUE
                 || '|' || ss.basis || '|' || ss.marketBasis || '|' || sdl_ccy.ITEM_VALUE
                 || '|' || ss.crossMarketCode || '|' || ss.conceptType || '|' || sdl_mgrm.ITEM_VALUE || '|' || sdl_mgrb.ITEM_VALUE
                 || '|' || sdl_gpm.ITEM_VALUE || '|' || sdl_gpb.ITEM_VALUE  || '|' || to_char(ss.basisRate)
