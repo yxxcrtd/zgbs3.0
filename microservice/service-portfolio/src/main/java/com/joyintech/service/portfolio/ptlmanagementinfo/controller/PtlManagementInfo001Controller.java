@@ -548,6 +548,13 @@ public class PtlManagementInfo001Controller extends BaseService<PtlManagementInf
         return ptlManagementInfo001Service.insertUser(entity);
     }
 
+    @Transactional
+    @DTXTransaction
+    @PostMapping("/autoRelate")
+    public void  autoRelate(@RequestBody PtlManagementInfoDto entity){
+        ptlManagementInfo001Service.autoRelate(entity);
+    }
+
     /**
      * 投管接口（组合信息输入接口）
      * 

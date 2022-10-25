@@ -128,7 +128,7 @@ public class RskPortAutoRelatePoint002Controller extends BaseController {
             dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
             listFloatRate.add(dto);
         }
-        SelectDto selectDto8 = this.getSelectDataFromDataDic(BussinessDictCodeRds.是否, null);
+        SelectDto selectDto8 = this.getSelectDataFromDataDic(BussinessDictCodeRds.是否现金管理类产品, null);
         for (SelectOptionDto dto : selectDto8.getOptions()) {
             dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
             listFloatRate.add(dto);
@@ -138,6 +138,21 @@ public class RskPortAutoRelatePoint002Controller extends BaseController {
             dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
             listFloatRate.add(dto);
         }
+        SelectDto selectDto10 = this.getSelectDataFromDataDic(DictCode.组合类型, null);
+        for (SelectOptionDto dto : selectDto10.getOptions()) {
+            dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
+            listFloatRate.add(dto);
+        }
+        SelectDto selectDto11 = this.getSelectDataFromDataDic(BussinessDictCodeRds.是否面向非机构投资者, null);
+        for (SelectOptionDto dto : selectDto11.getOptions()) {
+            dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
+            listFloatRate.add(dto);
+        }
+       /* SelectDto selectDto12 = this.getSelectDataFromDataDic(BussinessDictCodeRds.是否自主管理计划, null);
+        for (SelectOptionDto dto : selectDto12.getOptions()) {
+            dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
+            listFloatRate.add(dto);
+        }*/
         return listFloatRate;
 	}
 	

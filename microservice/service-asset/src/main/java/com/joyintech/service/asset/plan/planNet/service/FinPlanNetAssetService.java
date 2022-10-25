@@ -503,6 +503,14 @@ public class FinPlanNetAssetService extends BaseService<FinPlanNetAssetDto> {
         	creditLines.setSeqno(credMsgMap.get("SEQNO"));
         }
         assetCommonService.updateCredit(creditLines);
+
+        //add 2019.7.15 wangpeng 根据配置 决定是否入库组合表信息
+        boolean isCreatePortfolio = assetCommonService.selectIsCreatePortfolio(dto.getFinProductType());
+        if(isCreatePortfolio){
+            ptlPortfolioMapper.updateByPrimaryKeySelective(dto.getPtlPortfolio());
+            paPtlPortfolioMapper.updateByPrimaryKeySelective(dto.getPaPtlPortfolio());
+        }
+        //end
     }
 
     /**

@@ -2646,6 +2646,12 @@ public enum BussinessDictCodeListRds implements BaseDictCodeList {
      *  分类维度_说明书是否披露风险标志
      */
     分类维度_自主管理计划(BussinessDictCodeRds.分类维度,"11","自主管理计划"),
+
+    /**
+     *  分类维度_组合类型
+     */
+    分类维度_组合类型(BussinessDictCodeRds.分类维度,"12","组合类型"),
+
     /**
      *  使用状态_启用
      */
