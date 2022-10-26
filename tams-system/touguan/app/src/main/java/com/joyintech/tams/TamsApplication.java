@@ -1,5 +1,6 @@
 package com.joyintech.tams;
 
+import cn.hutool.core.date.StopWatch;
 import com.joyintech.framework.JoyinApplication;
 import com.joyintech.framework.config.WebApplication;
 import com.joyintech.tams.common.ErrorPageFilter;
@@ -61,6 +62,10 @@ public class TamsApplication extends WebApplication {
     }
 
     public static void main(String[] args) {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         JoyinApplication.run(TamsApplication.class, args);
+        stopWatch.stop();
+        System.out.println("======================================== 启动成功！耗时：" + stopWatch.getTotalTimeMillis() / 1000 + "秒！========================================");
     }
 }
