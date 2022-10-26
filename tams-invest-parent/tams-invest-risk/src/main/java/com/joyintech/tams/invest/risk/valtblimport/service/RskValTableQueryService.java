@@ -27,9 +27,10 @@ public class RskValTableQueryService extends CommonExportService<RskValtblAssetS
     @Autowired
     private InvestInterfCommService investInterfCommService;
     public Page<RskValtblAssetSumDto> selectForPage(Map<String, Object> pageParam) {
-        return restTemplate.postForPage(
+        Page<RskValtblAssetSumDto> page = restTemplate.postForPage(
                 ServiceApplication.RISK_SERVICE_NAME + "/RskValTableQuery/findPage",
                 pageParam, RskValtblAssetSumDto.class);
+        return page;
     }
 
     public List<RskValtblAssetSubDto> selectRskValTableDetaile(Map<String, Object> param) {

@@ -2,7 +2,7 @@
 <Workbook filePath="RskValRelateImportInfo.xlsx" name="组合关联导入映射模板">
     <Worksheet javaBean="com.joyintech.tams.invest.risk.penetrationmanagement.rskvalrelateimport.dto.RskValRelateImport001Dto">
         <Row>
-            <Cell order="1" name="资产名称">name</Cell>
+            <Cell order="1" name="资管计划名称">name</Cell>
             <Cell order="2" name="起始行">startRow</Cell>
             <Cell order="3" name="科目代码列">subjectCodeColLetter</Cell>
             <Cell order="4" name="指标结构映射">structMapId</Cell>

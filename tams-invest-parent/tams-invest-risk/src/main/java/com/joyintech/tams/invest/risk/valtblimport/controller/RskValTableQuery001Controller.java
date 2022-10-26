@@ -9,6 +9,8 @@ import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.tams.invest.risk.valtblimport.dto.RskValtblAssetSubDto;
 import com.joyintech.tams.invest.risk.valtblimport.dto.RskValtblAssetSumDto;
 import com.joyintech.tams.invest.risk.valtblimport.service.RskValTableQueryService;
+import com.joyintech.tams.systemtools.interf.IPlatformDate;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +38,13 @@ import java.util.Map;
 public class RskValTableQuery001Controller extends BaseController {
 
     @Autowired
+    private IPlatformDate platformDate;
+
+    @Autowired
     private RskValTableQueryService rskValTableQueryService;
     @Override
     public String init(Model model){
+        model.addAttribute("initDate",DateUtil.format(DateUtil.addDay(platformDate.getSysDate(),-1)));
         return super.init(model);
     }
 
@@ -52,11 +58,8 @@ public class RskValTableQuery001Controller extends BaseController {
      */
     @ResponseBody
     @RequestMapping("findPage")
-    public Page<RskValtblAssetSumDto> selectAll()
-             {
-        Page<RskValtblAssetSumDto> page = rskValTableQueryService.selectForPage(
-                RequestUtil.getParameters(getRequest()));
-        return page;
+    public Page<RskValtblAssetSumDto> selectAll() {
+        return rskValTableQueryService.selectForPage(RequestUtil.getParameters(getRequest()));
     }
 
     /**
