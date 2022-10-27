@@ -223,12 +223,15 @@ public class PortfolioAssignHelper {
             portfolioDetail.setEtrSecAmount(detail.getEntrustNum());
 
             list.add(portfolioDetail);
-            if (i == len - 1) {
-                portfolioDetail.setTargetNum(totalVolume);
-                break;
-            }
+//            if (i == len - 1) {
+//                portfolioDetail.setTargetNum(totalVolume);
+//                break;
+//            }
             currVolume = detail.getEntrustNum();
             assignVolume = NumberUtil.div(NumberUtil.mul(currVolume, totalVolume), instructionVolume, 0);
+            if(assignVolume.compareTo(currVolume) > 0){
+                assignVolume = currVolume;
+            }
             assignVolume = TradeUtils.subtractMod(assignVolume, minStep);
 //
 //            if (i + minNum.intValue() < instructionDetails.size()) {//没有分到最小交易数量的不分
