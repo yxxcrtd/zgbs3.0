@@ -81,7 +81,7 @@ import java.util.stream.Collectors;
 @Service("CfetsManualSettleService")
 public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> implements BaseProcessService<CfetsManualSettleDto> {
 
-    private Logger logger = LoggerFactory.getLogger(CfetsManualSettleService.class);
+    private final Logger logger = LoggerFactory.getLogger(CfetsManualSettleService.class);
 
     @Autowired
     private CfetsManualSettleMapper cfetsManualSettleMapper;
@@ -539,9 +539,8 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
     /**
      * 构建债券发送头寸信息
      * @param cfetsManualSettleRequest
-     * @return
      */
-    private Map<String, Object> sendPositionMethod(CfetsManualSettleInsertDto cfetsManualSettleRequest, String buttonType) {
+    private void sendPositionMethod(CfetsManualSettleInsertDto cfetsManualSettleRequest, String buttonType) {
         //组装组合金额信息
         List<PositionRulePtlData> ptlList = new ArrayList<>();
         Map<String, Object> param = new HashMap<>();
@@ -648,9 +647,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             req.setFinprodId(trdBankManualSettleInfo.getFinprodId());
             req.setPtlList(ptlList);
             param = positionRequestHandle.send(req);
-            ThreadLocalUtil.setLocalCache(param);
         }
-        return param;
     }
     /**
      * 构建一级申购发送头寸信息
@@ -1565,6 +1562,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 String  orderId = cfetsManualSettleMapper.selectRegTradeIdBytradeId(item.getTradeId());
                 if (StringUtil.isNotEmpty(orderId)) {
                     orderIds.add(orderId);
+                    orderIds.add(item.getTradeId());
                 }
             });
             //对话，请求
@@ -1572,29 +1570,15 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 String orderId = cfetsManualSettleMapper.selectIbTradeIdBytradeId(item.getTradeId());
                 if (StringUtil.isNotEmpty(orderId)) {
                     orderIds.add(orderId);
+                    orderIds.add(item.getTradeId());
                 }
             });
 
             if (CollectionUtils.isNotEmpty(orderIds)) {
-                orderIds.forEach(orderId ->{
-                    AllTradeCommonUtil.deleteRegPosition(null, orderId);
-                });
+                orderIds.forEach(orderId -> AllTradeCommonUtil.deleteRegPosition(null, orderId));
                 //baseAssetCashPositionCommMapper.deleteCashPositionByOrderIds(orderIds);
             }
             return;
-        }
-
-        if (!isFlowStart) {
-            if (StringUtil.equals(cfetsManualSettleRequest.getPs(), DictCodeList.交易方向_买入.getValue())
-                    || StringUtil.equals(cfetsManualSettleRequest.getPs(), DictCodeList.交易方向_卖出.getValue())
-                    || StringUtil.equals(cfetsManualSettleRequest.getPs(), DictCodeList.交易方向_行权_回售.getValue())
-                    || StringUtil.equals(cfetsManualSettleRequest.getPs(), DictCodeList.交易方向_到期.getValue())
-                    || StringUtil.equals(cfetsManualSettleRequest.getPs(), DictCodeList.交易方向_行权_赎回.getValue())
-            ) {
-                //登记、对话，请求 交收、交收回溯处理可用
-                this.updatePtlPosition(listTemp, buttonType);
-            }
-
         }
 
         TrdBankManualSettleInfo trdBankManualSettleInfo = cfetsManualSettleRequest.getTrdBankManualSettleInfo();
@@ -1614,6 +1598,19 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             orderDtoMap = list.stream()
                     .collect(Collectors.toMap(StlPayOrders::getTradeId, orderDto -> orderDto));
             logger.info("查询出的划款指令列表:{}", JsonUtils.object2Json(orderDtoMap));
+        }
+
+        if (!isFlowStart) {
+            if (StringUtil.equals(cfetsManualSettleRequest.getPs(), DictCodeList.交易方向_买入.getValue())
+                    || StringUtil.equals(cfetsManualSettleRequest.getPs(), DictCodeList.交易方向_卖出.getValue())
+                    || StringUtil.equals(cfetsManualSettleRequest.getPs(), DictCodeList.交易方向_行权_回售.getValue())
+                    || StringUtil.equals(cfetsManualSettleRequest.getPs(), DictCodeList.交易方向_到期.getValue())
+                    || StringUtil.equals(cfetsManualSettleRequest.getPs(), DictCodeList.交易方向_行权_赎回.getValue())
+            ) {
+                //登记、对话，请求 交收、交收回溯处理可用
+                this.updatePtlPosition(listTemp, buttonType, orderDtoMap);
+            }
+
         }
         //按照交易金额排序
         listTemp = listTemp.stream().sorted(Comparator.comparing(CfetsManualSettleDealInfo::getTradeAmt).reversed()).collect(Collectors.toList());
@@ -1690,15 +1687,19 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
      * @param listTemp
      * @param buttonType
      */
-    private void updatePtlPosition(List<CfetsManualSettleDealInfo> listTemp, String buttonType) {
+    private void updatePtlPosition(List<CfetsManualSettleDealInfo> listTemp, String buttonType, Map<String, StlPayOrders> orderDtoMap) {
         List<String> orderIdList = new ArrayList<>();
+        List<String> tradeIdList = new ArrayList<>();
+        Map<String,String> tradeIdMap = new HashMap<>();
 
         //登记
         listTemp.forEach(item -> {
             String tradeId = cfetsManualSettleMapper.selectRegTradeIdBytradeId(item.getTradeId());
             if(StringUtil.isNotEmpty(tradeId)) {
                 orderIdList.add(tradeId);
+                tradeIdMap.put(tradeId, item.getTradeId());
             }
+            tradeIdList.add(item.getTradeId());
         });
 
         //对话，请求
@@ -1706,6 +1707,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             String ibTradeId = cfetsManualSettleMapper.selectIbTradeIdBytradeId(item.getTradeId());
             if (StringUtil.isNotEmpty(ibTradeId)) {
                 orderIdList.add(ibTradeId);
+                tradeIdMap.put(ibTradeId, item.getTradeId());
             }
         });
 
@@ -1713,10 +1715,11 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
 
         if (StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收.getValue())
                 && CollectionUtils.isNotEmpty(orderIds)) {
-            orderIds.forEach(orderId -> {
-                        AllTradeCommonUtil.deleteRegPosition(null, orderId);
-                    }
-            );
+            orderIds.forEach(orderId -> AllTradeCommonUtil.deleteRegPosition(null, orderId));
+        }
+        if (StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收.getValue())
+                && CollectionUtils.isNotEmpty(tradeIdList)) {
+            tradeIdList.forEach(tradeId -> AllTradeCommonUtil.deleteRegPosition(null, tradeId));
         }
         if (StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_回溯.getValue())) {
             if (CollectionUtils.isNotEmpty(orderIds)) {
@@ -1745,7 +1748,22 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                                 ptlSecPositionFlows.add(positionDeal(deal, secManageAcctId));
                             }
                             if (StringUtil.equals(deal.getPs(), DictCodeList.交易方向_买入.getValue())) {
-                                ptlCashPositionFlows.add(cashDeal(deal, acctId));
+                                PtlCashPositionFlowDto ptlCash = cashDeal(deal, acctId);
+                                //
+                                PtlCashPositionFlowDto ptlCash1 = new PtlCashPositionFlowDto();
+                                BeanUtil.copyPropertiesIgnoreNull(ptlCash1, ptlCash);
+                                ptlCash1.setOrderId(tradeIdMap.get(orderId));
+                                ptlCash1.setAmount(ptlCash1.getAmount().negate());
+                                StlPayOrdersDto stlPayOrder = new StlPayOrdersDto();
+                                BeanUtil.copyPropertiesIgnoreNull(stlPayOrder, orderDtoMap.get(tradeIdMap.get(orderId)));
+                                logger.info("债券交收处理头寸,划款指令stlPayOrder:" + JsonUtils.object2Json(stlPayOrder));
+                                //
+                                PtlCashPositionFlowDto ptlCash2 = new PtlCashPositionFlowDto();
+                                BeanUtil.copyPropertiesIgnoreNull(ptlCash2, ptlCash1);
+                                ptlCash2.setAmount(stlPayOrder.getSettleAmt().negate());
+                                ptlCashPositionFlows.add(ptlCash);
+                                ptlCashPositionFlows.add(ptlCash1);
+                                ptlCashPositionFlows.add(ptlCash2);
                             }
                         }
                     });
@@ -1774,7 +1792,22 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                             ptlSecPositionFlows.add(positionDeal(deal, secManageAcctId));
                         }
                         if (StringUtil.equals(deal.getPs(), DictCodeList.交易方向_买入.getValue())) {
-                            ptlCashPositionFlows.add(cashDeal(deal, acctId));
+                            PtlCashPositionFlowDto ptlCash = cashDeal(deal, acctId);
+                            //
+                            PtlCashPositionFlowDto ptlCash1 = new PtlCashPositionFlowDto();
+                            BeanUtil.copyPropertiesIgnoreNull(ptlCash1, ptlCash);
+                            ptlCash1.setOrderId(tradeIdMap.get(orderId));
+                            ptlCash1.setAmount(ptlCash1.getAmount().negate());
+                            StlPayOrdersDto stlPayOrder = new StlPayOrdersDto();
+                            BeanUtil.copyPropertiesIgnoreNull(stlPayOrder, orderDtoMap.get(tradeIdMap.get(orderId)));
+                            logger.info("债券交收处理头寸,划款指令stlPayOrder:" + JsonUtils.object2Json(stlPayOrder));
+                            //
+                            PtlCashPositionFlowDto ptlCash2 = new PtlCashPositionFlowDto();
+                            BeanUtil.copyPropertiesIgnoreNull(ptlCash2, ptlCash1);
+                            ptlCash2.setAmount(stlPayOrder.getSettleAmt().negate());
+                            ptlCashPositionFlows.add(ptlCash);
+                            ptlCashPositionFlows.add(ptlCash1);
+                            ptlCashPositionFlows.add(ptlCash2);
                         }
                     }
 
