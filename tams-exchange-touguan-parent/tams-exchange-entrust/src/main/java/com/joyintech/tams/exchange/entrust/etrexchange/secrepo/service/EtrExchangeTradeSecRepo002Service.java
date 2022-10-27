@@ -491,7 +491,7 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
         // 此方法是根据 行情最新价和计价方式 重新计算最新价，因为最新价是从行情取的，如果系统都没有接行情，则无需计算
         if (!StringUtil.equals(DictCodeList.是否_否.getValue(), CacheUtil.getSysParam("TRD_USE_QUOTE"))) {
             positions.forEach(v->{
-                if(v.getIsNetprice().equals("N") && v.getFinprodId() != null){
+                if("N".equals(v.getIsNetprice()) && v.getFinprodId() != null){
                     Map<String, Object> map = new HashMap<>();
                     map.put("ps", "T02");
                     map.put("calculateField", "02");
