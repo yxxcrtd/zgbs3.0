@@ -234,6 +234,11 @@ public class CommonPositionEngineService {
                     || DictCodeList.交易平台_竞价撮合平台.getValue().equals(tradePlat)) {
                 return tradePlat;
             }
+            // LCTZJYXT-78:综合协议交易平台要处理成大宗交易平台 modify by fuyongsheng 20221027 start
+            if(DictCodeList.交易平台_综合协议交易平台.getValue().equals(tradePlat)){
+                return DictCodeList.交易平台_大宗交易平台.getValue();
+            }
+            // LCTZJYXT-78:综合协议交易平台要处理成大宗交易平台 modify by fuyongsheng 20221027 end
             return null;
         } else if (INTERF_TYPE_BOND002.equals(interfaceType)) {
             return tradePlat;

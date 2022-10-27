@@ -943,6 +943,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             BigDecimal settFeeAmt = null;
             BigDecimal unitInt = null;
             String invAim = null;
+            BigDecimal unitCprice = null;
             for(CfetsPrimaryBidManageSaveDetailDto detailDto: detailDtos) {
                 cpriceAmt = ArithmeticUtil.doAdd(cpriceAmt, detailDto.getTradeAmt());
                 winPrinamt = ArithmeticUtil.doAdd(winPrinamt,detailDto.getTheWinPrinamt());
@@ -952,7 +953,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                 settFeeAmt= ArithmeticUtil.doAdd(settFeeAmt,detailDto.getSettFeeAmt());
                 invAim = detailDto.getInvAim();
                 unitInt = detailDto.getIntAmt();
+                unitCprice = detailDto.getWinCprice();
             }
+            trdProductDeal.setUnitCprice(unitCprice);
+            trdProductDeal.setUnitFprice(ArithmeticUtil.doAdd(unitCprice, unitInt));
             trdProductDeal.setCpriceAmt(cpriceAmt);
             trdProductDeal.setShareAmt(ArithmeticUtil.divide(winPrinamt,BigDecimal.valueOf(100),4));
             trdProductDeal.setPrinAmt(winPrinamt);

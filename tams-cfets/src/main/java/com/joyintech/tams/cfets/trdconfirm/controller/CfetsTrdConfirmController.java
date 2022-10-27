@@ -214,7 +214,7 @@ public class CfetsTrdConfirmController extends BaseController {
     @ResponseBody
     public Message<Page<CfetsTrdConfirmExecRepoInfoResponse>> findAllTrdRepoList(@RequestBody CfetsTrdConfirmExecCstpRequest dto) {
         try {
-            Page<CfetsTrdConfirmExecRepoInfoResponse> page =cfetsTrdConfirmService.findAllTrdRepoList(dto);
+            Page<CfetsTrdConfirmExecRepoInfoResponse> page = cfetsTrdConfirmService.findAllTrdRepoList(dto);
             return new Message<Page<CfetsTrdConfirmExecRepoInfoResponse>>().success().setData(page);
         } catch (Exception e) {
             logger.error("查询匹配确认列表分页数据异常", e);
@@ -226,7 +226,7 @@ public class CfetsTrdConfirmController extends BaseController {
     @ResponseBody
     public Message<Page<CfetsTrdConfirmCstpBondInfoResponse>> findAllCstpBondList(@RequestBody CfetsTrdConfirmExecCstpRequest dto) {
         try {
-            Page<CfetsTrdConfirmCstpBondInfoResponse> page =cfetsTrdConfirmService.findAllCstpBondList(dto);
+            Page<CfetsTrdConfirmCstpBondInfoResponse> page = cfetsTrdConfirmService.findAllCstpBondList(dto);
             return new Message<Page<CfetsTrdConfirmCstpBondInfoResponse>>().success().setData(page);
         } catch (Exception e) {
             logger.error("查询匹配确认列表分页数据异常", e);

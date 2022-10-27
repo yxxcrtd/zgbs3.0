@@ -111,10 +111,6 @@ public class PtlManagementInfoDto extends PtlPortfolio {
      */
     private String portfolioSeries;
 
-    /**
-     * 自主管理计划
-     */
-    private String selfManagement;
 
     /**
      * 获取 ptlValParam
@@ -395,11 +391,4 @@ public class PtlManagementInfoDto extends PtlPortfolio {
         this.portfolioSeries = portfolioSeries;
     }
 
-    public String getSelfManagement() {
-        return selfManagement;
-    }
-
-    public void setSelfManagement(String selfManagement) {
-        this.selfManagement = selfManagement;
-    }
 }

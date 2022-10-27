@@ -87,7 +87,6 @@ public class PtlManagementInfo002Controller extends BaseController{
                                     ,DictCode.开放类型,DictCode.是否
                                     ,DictCode.尾数处理方式,DictCode.组合系列);
         model.addAttribute("YES", DictCodeList.是否_是.getValue());
-        model.addAttribute("selfManagement", DictCodeList.是否_否.getValue());
         String portfolioId = getParam("portfolioId");
         // 判断是否存在于留痕表
         String workflowId = getParam(GlobalConstant.WORKFLOW_ID);
@@ -121,7 +120,6 @@ public class PtlManagementInfo002Controller extends BaseController{
             model.addAttribute("funDto", dto.getFundAccountInfoDto() == null ? dto1.getFundAccountInfoDto() : dto.getFundAccountInfoDto());
             model.addAttribute("secDto",dto.getSecuritiesAccountInfoDto() == null ? dto1.getSecuritiesAccountInfoDto() : dto.getSecuritiesAccountInfoDto());
             model.addAttribute("entity", dto);
-            model.addAttribute("selfManagement", dto.getSelfManagement());
 
             // 判断逐渐是否为空
         }
@@ -151,7 +149,6 @@ public class PtlManagementInfo002Controller extends BaseController{
                 model.addAttribute("funDto", dto.getFundAccountInfoDto());
                 model.addAttribute("secDto",dto.getSecuritiesAccountInfoDto());
                 model.addAttribute("entity", dto);
-                model.addAttribute("selfManagement", dto.getSelfManagement());
             }
         }
         model.addAttribute("profitType01", DictCodeList.收益类型_净值型.getValue());

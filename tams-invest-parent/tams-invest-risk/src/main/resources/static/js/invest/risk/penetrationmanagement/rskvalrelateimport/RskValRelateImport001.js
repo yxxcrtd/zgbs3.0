@@ -22,7 +22,7 @@ $(function() {
         },
         cols:[
             {field:'ptlId',visible:false}//组合代码
-            ,{field:'name', width:200 , title: 'RskValRelateImport001.groupName'}//组合名称
+            ,{field:'name', width:200 , title: '资管计划名称'}//组合名称
             ,{field:'startRow', width:200 , title: 'RskValRelateImport001.startRow'}//起始行
             ,{field:'subjectCodeCol', width:200,visible:false , title: 'RskValRelateImport001.subjectCodeCol'}//科目代码列
            /* ,{field:'startRowLetter', width:200 , title: 'RskValRelateImport001.startRow',sortField:'START_ROW'}//起始行*/
