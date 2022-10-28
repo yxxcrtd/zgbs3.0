@@ -1097,7 +1097,7 @@
         E.BASIS basis,
         <!-- 一体化对应etliu -->
         <!-- F.RATE_TYPE intRateType, -->
-        F.INT_TYPE intRateType,
+        E.CALC_TYPE intRateType,
         G.PAY_CYCLE yearIntRate,
         G.CALC_RULE calMethod,
         H.EXERCISE_DATE nextExeDate,
