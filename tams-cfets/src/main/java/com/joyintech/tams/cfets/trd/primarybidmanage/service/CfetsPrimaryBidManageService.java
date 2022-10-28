@@ -188,9 +188,6 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     private StlPayOrdersMapper stlPayOrdersMapper;
 
     @Autowired(required=false)
-    private BaseAssetCashPositionCommMapper baseAssetCashPositionCommMapper;
-
-    @Autowired(required=false)
     private SysWflBusinessListMapper sysWflBusinessListMapper;
 
     @Autowired
@@ -225,9 +222,6 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
 
     @Autowired
     private TrdProductTempDealMapper trdProductTempDealMapper;
-
-    @Autowired
-    private TrdTempDealTotalAddMapper trdTempDealTotalAddMapper;
 
     @Autowired
     private PositionInfoService positionInfoService;
@@ -268,10 +262,10 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             Map<String, Object> resultData = new HashMap<>();
             List<CfgReadonlyFormShow> infoForm = cfgReadonlyFormShowMapper.getReadonlyForm(pageCode, dtCode, spcdCode);
             //排序
-            infoForm.sort((o1, o2) -> o1.getSeqno().compareTo(o2.getSeqno()));
+            infoForm.sort(Comparator.comparing(CfgReadonlyFormShow::getSeqno));
             String userId = SecurityUtil.getLoginUser().getUserName();
             CfgDataTableShowFlag flag = cfgDataTableFlagMapper.getByPageCodeAndDtCode(pageCode, "BidProductInfo", spcdCode, userId);
-            List<CfgDataTableShow> detailTable = null;
+            List<CfgDataTableShow> detailTable;
             if (null == flag) {
                 detailTable = cfgDataTableMapper.getByPageCode(pageCode, "BidProductInfo", spcdCode, EFFERANGE_NO, USER_ID);
             } else {
@@ -409,7 +403,6 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
     }
 
     public void unBidSave(CfetsPrimaryBidManageSaveRequest request) {
-        Map<String, Object> param = BeanUtil.object2Map(request);
         BidResultTotal bidResultTotal = new BidResultTotal();
         BeanUtil.copyPropertiesIgnoreNull(bidResultTotal,request);
         wflBidResultTotalMapper.deleteByPrimaryKey(bidResultTotal.getTotalWinId());
@@ -494,7 +487,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
      */
     @Override
     public void doComplete(CfetsPrimaryBidManageSaveRequest entity, OperationType type) {
-        String action = StringUtil.EMPTY;
+        String action;
         if (OperationType.REVOKE.equals(type)) {
             // 是否交易所
             boolean isJys = !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
@@ -649,15 +642,13 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
                     etrInvestInfoServiceImpl.updateDelegateStatus(entrustId, DictCodeList.委托状态_已接收.getValue());
                 }
             }
-            if (type.equals(OperationType.REVOKE) || type.equals(OperationType.DELETE)) {
-                // 匹配取消
-                positionRequestHandle.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
-                        DictCodeListExt3.头寸业务类型_债券一级投标.getValue(), DictCodeList.交易方向_买入.getValue());
-                if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
-                    // 老头寸处理
-                    this.dealOldPositionForJYSYJ(entity,true);
-                    this.dealOldPosition(entity, true);
-                }
+            // 匹配取消
+            positionRequestHandle.dorevoke(entity.getBidId(), DictCodeListExt1.子系统代码_交易.getValue(),
+                    DictCodeListExt3.头寸业务类型_债券一级投标.getValue(), DictCodeList.交易方向_买入.getValue());
+            if(StringUtil.equals(entity.getIsWin(),DictCodeList.是否_是.getValue())) {
+                // 老头寸处理
+                this.dealOldPositionForJYSYJ(entity,true);
+                this.dealOldPosition(entity, true);
             }
             this.updateCfetsOprHis(entity.getTotalWinId(),action);
         } else {
@@ -777,7 +768,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
     }
 
-    private CfetsPrimaryBidManageSaveRequest cncapBaseBidManageBaseInfoDto(CfetsPrimaryBidManageSaveRequest dto){
+    private void cncapBaseBidManageBaseInfoDto(CfetsPrimaryBidManageSaveRequest dto){
         Long branch = StringUtil.isEmpty(CacheUtil.getSysParam(BussinessConstant.NOBRANCHNOVALUE)) ? 0
                 : Long.parseLong(CacheUtil.getSysParam(BussinessConstant.NOBRANCHNOVALUE));
         BaseBidManageBaseInfoDto baseBidManageBaseInfoDto = new BaseBidManageBaseInfoDto();
@@ -1039,7 +1030,6 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         baseBidManageBaseInfoDto.setStlOrdersList(stlOrdersList);
         baseBidManageBaseInfoDto.setBussTrdTransferOrderList(bussTrdTransferOrderService.save(bussTrdTransferOrderList));
         dto.setBaseBidManageBaseInfoDto(baseBidManageBaseInfoDto);
-        return dto;
     }
 
     /**
@@ -1287,7 +1277,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             stlPayOrder.setSettleDate(iPlatformDate.getSysDate());
             stlPayOrders.add(stlPayOrder);
             baseTradeProductDealDto.setStlPayOrdersList(stlPayOrders);
-            finProductTradeDto.setBaseTradeProductDealDtos(Arrays.asList(baseTradeProductDealDto));
+            finProductTradeDto.setBaseTradeProductDealDtos(Collections.singletonList(baseTradeProductDealDto));
             baseTradeProductDealCommService.insertPosition(finProductTradeDto);
         }
     }
@@ -1304,7 +1294,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         if (!StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
             return;
         }
-        // 非交易所一级缴款
+        // 非交易所
         if (StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
                 || StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue())) {
             return;
@@ -1350,7 +1340,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             trdProductDeal.setCcy(entity.getCcy());
             if (isRevokeOrBack) {
                 trdProductDeal.setPrinAmt(trdProductDeal.getPrinAmt().negate());
-                trdProductDeal.setFpriceAmt(trdProductDeal.getFpriceAmt().negate());
+//                trdProductDeal.setFpriceAmt(trdProductDeal.getFpriceAmt().negate());
                 trdProductDeal.setShareAmt(trdProductDeal.getShareAmt().negate());
             }
             TrdProductDealAdd add = new TrdProductDealAdd();
@@ -2970,8 +2960,8 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         String finprodAbbr = null;
         String winType = null;
         String bidPriceStr = null;
-        String winPrinamt = null;
-        String str = null;
+        String winPrinAmt = null;
+        String str;
         if (StringUtil.isNotEmpty(dto.getFinprodAbbr())) {
             finprodAbbr = "资产简称:" + GlobalConstant.OPEN_PARENTHESIS + dto.getFinprodAbbr() + GlobalConstant.CLOSE_PARENTHESIS;
         }
@@ -2982,14 +2972,14 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
             bidPriceStr = "中标标位:" + GlobalConstant.OPEN_PARENTHESIS + this.getBidPriceStr(dto) + GlobalConstant.CLOSE_PARENTHESIS;
         }
         if (StringUtil.isNotEmpty(dto.getWinPrinamt())) {
-            winPrinamt = "中标券面总额" + GlobalConstant.OPEN_PARENTHESIS + ArithmeticUtil.divide(dto.getWinPrinamt(),
+            winPrinAmt = "中标券面总额" + GlobalConstant.OPEN_PARENTHESIS + ArithmeticUtil.divide(dto.getWinPrinamt(),
                     BigDecimal.valueOf(10000), 2) + "万元" + GlobalConstant.CLOSE_PARENTHESIS;
         }
         str = date;
         str += StringUtil.isNotEmpty(finprodAbbr) ? finprodAbbr : "";
         str += StringUtil.isNotEmpty(winType) ? winType : "";
         str += StringUtil.isNotEmpty(bidPriceStr) ? bidPriceStr : "";
-        str += StringUtil.isNotEmpty(winPrinamt) ? winPrinamt : "";
+        str += StringUtil.isNotEmpty(winPrinAmt) ? winPrinAmt : "";
         return str;
     }
 
