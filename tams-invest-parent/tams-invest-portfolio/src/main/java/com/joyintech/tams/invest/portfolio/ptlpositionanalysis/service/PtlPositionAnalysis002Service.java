@@ -17,6 +17,7 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.portfolio.ptlpositionanalysis.dto.PtlPositionAnalysis003Dto;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -59,15 +60,15 @@ public class PtlPositionAnalysis002Service extends CommonExportService<PtlPositi
         String searchDate = map.get("searchDate").toString(); // 查询日期
         List<PtlPositionAnalysis003Dto> pageList = new ArrayList<>();
         String displayType = map.get("displayType").toString();
-        Page<PtlPositionAnalysis003Dto> list = restTemplate.postForPage(ServiceApplication.PORTFOLIO_SERVICE_NAME + "/PtlPositionAnalysis/secReportPage", map, PtlPositionAnalysis003Dto.class);
-
+        Map<String,Object> newMap = new HashMap<>(map);
+        newMap.remove("targetDbMap");
+        Page<PtlPositionAnalysis003Dto> list = restTemplate.postForPage(ServiceApplication.PORTFOLIO_SERVICE_NAME + "/PtlPositionAnalysis/secReportPage", newMap, PtlPositionAnalysis003Dto.class);
         //设置页面显示长度的初始值，这个正常情况下在map里会有设置
         int pageSize = 20;
         int total = 0;
         if(map.get("length")!=null) {
         	pageSize = Integer.parseInt((String)map.get("length"));
         }
-
         // 根据下钻层级重新组装树机构类型
         String level = map.get("deepLevel").toString();
         String parentId = map.get("parentId").toString();
@@ -78,7 +79,7 @@ public class PtlPositionAnalysis002Service extends CommonExportService<PtlPositi
             BigDecimal dzhLx = BigDecimal.ZERO;
             Map<String, BigDecimal> dzhMap = new HashMap<String, BigDecimal>();
             Map<String, BigDecimal> dzhLxMap = new HashMap<String, BigDecimal>();
-            if(!StringUtil.isNotEmpty(map.get("finprodMarketId"))){
+            if(!StringUtil.isNotEmpty(map.get("finprodMarketId"))) {
                 if (displayType.equals(DictCodeListExt3.展示方式_多组合汇总.getValue())){
                     //多组合汇总汇总剩余现金数据
                     if (remainList != null){
@@ -166,7 +167,6 @@ public class PtlPositionAnalysis002Service extends CommonExportService<PtlPositi
                                 }
                             }
                         });
-
                         if(pageList != null && pageList.size()>0){
                             //单组合剩余现金处理
                             this.onePortfolio(pageList,dzhMap,dzhLxMap);
@@ -929,72 +929,96 @@ public class PtlPositionAnalysis002Service extends CommonExportService<PtlPositi
                 });
             }
         }
-
+        BigDecimal bg = BigDecimal.ZERO;
+        if(map.get("sumVal1") != null) {
+            bg = (BigDecimal)map.get("sumVal1");
+        }else {
+            bg = getSumPrice(DictCodeListExt1.金融产品类型_投管用_债券.getValue(), searchDate, pass);
+        }
+        final BigDecimal sumVal1 = bg;
+        Map<String,AssetTargetDb> targetDbMap1 = new HashMap<>();
+        if(map.get("targetDbMap") != null) {
+            targetDbMap1 = (Map)map.get("targetDbMap"); ;
+        }else {
+            Map<String, Object> map1 = new HashMap<>();
+            map1.put("date", DateUtil.format(DateUtil.addDay(DateUtil.parse(searchDate), -1)));//查询日-1
+            map1.put("pass", pass);
+            List<AssetTargetDb> assetTargetList = restTemplate.postForList(ServiceApplication.TRADE_SERVICE_NAME + "/TrdBondInvestTrade/getAllYesterdayTarget", map1, AssetTargetDb.class);
+            if (CollectionUtils.isNotEmpty(assetTargetList)) {
+                for(AssetTargetDb db : assetTargetList) {
+                    targetDbMap1.put(db.getFinprodId(),db);
+                }
+            }
+        }
+        Map<String,AssetTargetDb> targetDbMap = targetDbMap1;
+        Map<String,MstCustomerInfo> customerMap = new HashMap<>();
+        Map<String,MstCounterParty> counterMap = new HashMap<>();
+        List<String> counterIds = new ArrayList<>();
+        List<String> customerIds = new ArrayList<>();
+        list.getRoot().forEach(e->{
+            if(StringUtil.isNotEmpty(e.getCounterId())) {
+                counterIds.add(e.getCounterId());
+            }
+            if(StringUtil.isNotEmpty(e.getIssueParty())) {
+                customerIds.add(e.getIssueParty());
+            }
+        });
+        if(CollectionUtils.isNotEmpty(customerIds)) {
+            List<MstCustomerInfo> customerList = mstCustomerInfoMapper.getAllCustomerName(customerIds);
+            if(CollectionUtils.isNotEmpty(customerList)) {
+                customerList.forEach(e->customerMap.put(e.getCustomerId(),e));
+            }
+        }
+        if(CollectionUtils.isNotEmpty(counterIds)) {
+            List<MstCounterParty> counterList = mstCounterPartyMapper.getAllCounterName(counterIds);
+            if(CollectionUtils.isNotEmpty(counterList)) {
+                counterList.forEach(e->counterMap.put(e.getCounterId(),e));
+            }
+        }
         list.getRoot().forEach(item -> {
-            //分类
-            String typeMsg = item.getTypeName();
-
+            String typeMsg = item.getTypeName();//分类
             if (StringUtil.isNotEmpty(typeMsg) && typeMsg.equals("child")) {
                 //是否为导出，为导出显示分类名称
                 if (map.get("export") == null) {
                     item.setTypeName("");  //子节点不显示分类名称
                 } else {
-                    item.setTypeName(SysDataUtil.getNameFromDataDict(DictCode.平安资产类型,
-                            item.getPinanAssetType()));
+                    item.setTypeName(SysDataUtil.getNameFromDataDict(DictCode.平安资产类型,item.getPinanAssetType()));
                 }
                 if (displayType.equals(DictCodeListExt3.展示方式_单组合汇总.getValue())) {
                     item.setPortfolioId("");
                 }
-                item.setPinanAssetType(SysDataUtil.getNameFromDataDict(DictCode.平安资产类型,
-                        item.getPinanAssetType()));
-                item.setCustomAssetTypeTwo(SysDataUtil.getNameFromDataDict(DictCode.资产二级分类,
-                        item.getCustomAssetTypeTwo()));
-                item.setCustomAssetTypeThree(SysDataUtil.getNameFromDataDict(DictCode.资产三级分类,
-                        item.getCustomAssetTypeThree()));
-                item.setCustomAssetTypeFour(SysDataUtil.getNameFromDataDict(DictCode.资产四级分类,
-                        item.getCustomAssetTypeFour()));
-                item.setCustomAssetTypeFive(SysDataUtil.getNameFromDataDict(DictCode.资产五级分类,
-                        item.getCustomAssetTypeFive()));
+                item.setPinanAssetType(SysDataUtil.getNameFromDataDict(DictCode.平安资产类型,item.getPinanAssetType()));
+                item.setCustomAssetTypeTwo(SysDataUtil.getNameFromDataDict(DictCode.资产二级分类,item.getCustomAssetTypeTwo()));
+                item.setCustomAssetTypeThree(SysDataUtil.getNameFromDataDict(DictCode.资产三级分类,item.getCustomAssetTypeThree()));
+                item.setCustomAssetTypeFour(SysDataUtil.getNameFromDataDict(DictCode.资产四级分类,item.getCustomAssetTypeFour()));
+                item.setCustomAssetTypeFive(SysDataUtil.getNameFromDataDict(DictCode.资产五级分类,item.getCustomAssetTypeFive()));
                 //企业性质
-                item.setCompanyNature(SysDataUtil.getNameFromDataDict(DictCode.企业性质,
-                        item.getCompanyNature()));
-
+                item.setCompanyNature(SysDataUtil.getNameFromDataDict(DictCode.企业性质,item.getCompanyNature()));
                 //所属行业
-                item.setIndustry(SysDataUtil.getNameFromDataDict(DictCode.机构所属行业一级分类,
-                        item.getIndustry()));
+                item.setIndustry(SysDataUtil.getNameFromDataDict(DictCode.机构所属行业一级分类,item.getIndustry()));
                 //行业二级分类
-                item.setIndustry2(SysDataUtil.getNameFromDataDict(DictCode.机构所属行业二级分类,
-                        item.getIndustry2()));
+                item.setIndustry2(SysDataUtil.getNameFromDataDict(DictCode.机构所属行业二级分类,item.getIndustry2()));
                 //是否国企
-                item.setIsSoe(SysDataUtil.getNameFromDataDict(DictCode.是否,
-                        item.getIsSoe()));
+                item.setIsSoe(SysDataUtil.getNameFromDataDict(DictCode.是否,item.getIsSoe()));
                 //是否上市公司
-                item.setIsListedCompany(SysDataUtil.getNameFromDataDict(DictCode.是否,
-                        item.getIsListedCompany()));
+                item.setIsListedCompany(SysDataUtil.getNameFromDataDict(DictCode.是否,item.getIsListedCompany()));
                 //是否城投债
-                item.setIsCityBond(SysDataUtil.getNameFromDataDict(DictCode.是否,
-                        item.getIsCityBond()));
-
+                item.setIsCityBond(SysDataUtil.getNameFromDataDict(DictCode.是否,item.getIsCityBond()));
                 //债券评级[只有债券资产才显示相关信息，其他资产显示为空]
                 if (StringUtil.isNotEmpty(item.getPinanAssetType()) && item.getPinanAssetType().equals(DictCodeListExt1.金融产品类型_投管用_债券.getCodeName())) {
                     // 估计收益率 保留4位小数
                     item.setBpyield(item.getBpyield() == null ? new BigDecimal(0) : item.getBpyield().setScale(4, BigDecimal.ROUND_HALF_UP));
                     //所属地区
-                    item.setCityBondLev(SysDataUtil.getNameFromDataDict(DictCode.城投债级别,
-                            item.getCityBondLev()));
-
-
+                    item.setCityBondLev(SysDataUtil.getNameFromDataDict(DictCode.城投债级别,item.getCityBondLev()));
                     //持仓占发行总额比% =持仓券面总额/发行券面总额;  持仓占债券资产规模比%=（持仓市值+应计利息）/Σ(每只债券持仓市值+每只债券应计利息)
                     if (StringUtil.isNotEmpty(item.getBshareFaceValue()) && StringUtil.isNotEmpty(item.getIssueFaceValue()) && item.getIssueFaceValue().compareTo(new BigDecimal(0)) != 0) {
                         item.setPositionTotalIssuance(item.getBshareFaceValue().multiply(new BigDecimal(100)).divide(item.getIssueFaceValue(), 2, BigDecimal.ROUND_HALF_UP));//持仓占发行总额比%
                     }
                     //根据查询日期查询当前所有债券的持仓市值和应计利息进行汇总
-
-                    BigDecimal sumVal = getSumPrice(DictCodeListExt1.金融产品类型_投管用_债券.getValue(), searchDate, pass);
+                    BigDecimal sumVal = sumVal1;
                     if (sumVal.compareTo(new BigDecimal(0)) != 0) {
                         item.setPositionBondIssuance(item.getPosValue() == null ? new BigDecimal(0) : item.getPosValue().add(item.getTdyIntincexp() == null ? new BigDecimal(0) : item.getTdyIntincexp()).multiply(new BigDecimal(100)).divide(sumVal, 2, BigDecimal.ROUND_HALF_UP));//持仓占债券资产规模比%
                     }
-
                     //*****债券评级相关******
                     //查询外部主体评级信息
                     if (StringUtil.isNotEmpty(item.getmGradeResult())) {
@@ -1003,7 +1027,6 @@ public class PtlPositionAnalysis002Service extends CommonExportService<PtlPositi
                     if (StringUtil.isNotEmpty(item.getmGradeOrg())) {
                         item.setmGradeOrg(SysDataUtil.getNameFromDataDict(DictCode.评级机构, item.getmGradeOrg()));// 主体评级结构
                     }
-
                     // 查询外部债项评级相关信息
                     if (StringUtil.isNotEmpty(item.getbGradeResult())) {
                         item.setbGradeResult(SysDataUtil.getNameFromDataDict(DictCode.评级结果, item.getbGradeResult()));//债项评级结果
@@ -1018,7 +1041,6 @@ public class PtlPositionAnalysis002Service extends CommonExportService<PtlPositi
                     if (StringUtil.isNotEmpty(item.getmGradeOrgIn())) {
                         item.setmGradeOrgIn(SysDataUtil.getNameFromDataDict(DictCode.评级机构, item.getmGradeOrgIn()));// 主体评级结构
                     }
-
                     // 查询内部债项评级相关信息
                     if (StringUtil.isNotEmpty(item.getbGradeResultIn())) {
                         item.setbGradeResultIn(SysDataUtil.getNameFromDataDict(DictCode.评级结果, item.getbGradeResultIn()));//债项评级结果
@@ -1026,23 +1048,18 @@ public class PtlPositionAnalysis002Service extends CommonExportService<PtlPositi
                     if (StringUtil.isNotEmpty(item.getbGradeOrgIn())) {
                         item.setbGradeOrgIn(SysDataUtil.getNameFromDataDict(DictCode.评级机构, item.getbGradeOrgIn()));// 债项评级结构
                     }
-
-                } else {
-                    //其他场景下剩余行权期限为空
+                } else {//其他场景下剩余行权期限为空
                     item.setLastExPeriod(null);
                 }
-
                 //股票持仓占流通股本比%=持仓数量/流通股本；持仓占总股本比%==持仓数量/总股本
                 if (StringUtil.isNotEmpty(item.getPinanAssetType()) && item.getPinanAssetType().equals(DictCodeListExt1.金融产品类型_投管用_股票.getCodeName())) {
                     if (StringUtil.isNotEmpty(item.getcShares()) && item.getcShares().compareTo(new BigDecimal(0)) != 0) {
                         item.setcSharesPercentage(item.getPosAmount() == null ? new BigDecimal(0) : item.getPosAmount().multiply(new BigDecimal(100)).divide(item.getcShares(), 2, BigDecimal.ROUND_HALF_UP));//股票持仓占流通股本比%
                     }
-
                     if (StringUtil.isNotEmpty(item.getsShares()) && item.getsShares().compareTo(new BigDecimal(0)) != 0) {
                         item.setsSharesPercentage(item.getPosAmount() == null ? new BigDecimal(0) : item.getPosAmount().multiply(new BigDecimal(100)).divide(item.getsShares(), 2, BigDecimal.ROUND_HALF_UP));//持仓占总股本比%
                     }
                 }
-
                 //是否永续
                 item.setIsSus(SysDataUtil.getNameFromDataDict(DictCode.是否, item.getIsSus()));
                 //是否含权债
@@ -1051,18 +1068,15 @@ public class PtlPositionAnalysis002Service extends CommonExportService<PtlPositi
                 item.setProfitType(SysDataUtil.getNameFromDataDict(DictCode.收益类型, item.getProfitType()));
                 //交易场所
                 item.setTradeMarket(SysDataUtil.getNameFromDataDict(DictCode.交易场所, item.getTradeMarket()));
-
                 //名义本金 对于利率互换，显示为名义本金；其他类资产显示为空
-                if (!item.getPinanAssetType().equals(DictCodeListExt1.金融产品类型_投管用_利率互换.getValue())
-                        && !item.getPinanAssetType().equals(DictCodeListExt1.金融产品类型_信用保护凭证.getCodeName())) {
+                if (!item.getPinanAssetType().equals(DictCodeListExt1.金融产品类型_投管用_利率互换.getValue()) && !item.getPinanAssetType().equals(DictCodeListExt1.金融产品类型_信用保护凭证.getCodeName())) {
                     item.setPrin(null);
                 }
-
                 //根据交易对手id 获取名称
                 if (StringUtil.isNotEmpty(item.getCounterId())) {
                     //只有交易型的资产：拆借、质押式回购、买断式回购、债券借贷、利率互换、外汇远期、外汇掉期才显示交易对手，取交易记录上的交易对手；其他资产显示为空
                     if (item.getPinanAssetType().equals(DictCodeList.平安资产类型_拆借.getCodeName()) || item.getPinanAssetType().equals(DictCodeList.平安资产类型_质押式回购.getCodeName()) || item.getPinanAssetType().equals(DictCodeList.平安资产类型_买断式回购.getCodeName()) || item.getPinanAssetType().equals(DictCodeListExt1.金融产品类型_投管用_债券借贷.getCodeName()) || item.getPinanAssetType().equals(DictCodeListExt1.金融产品类型_投管用_利率互换.getCodeName()) || item.getPinanAssetType().equals(DictCodeListExt1.金融产品类型_投管用_远期.getCodeName()) || item.getPinanAssetType().equals(DictCodeListExt1.金融产品类型_投管用_掉期.getCodeName())) {
-                        MstCounterParty mstCounterParty = mstCounterPartyMapper.selectByPrimaryKey(item.getCounterId());
+                        MstCounterParty mstCounterParty = counterMap.get(item.getCounterId());
                         item.setCounterId(mstCounterParty == null ? "" : mstCounterParty.getCounterName());
                     } else {
                         item.setCounterId("");
@@ -1070,12 +1084,10 @@ public class PtlPositionAnalysis002Service extends CommonExportService<PtlPositi
                 }
                 //发行主体
                 if (StringUtil.isNotEmpty(item.getIssueParty())) {
-                    MstCustomerInfo mstCustomerInfo = mstCustomerInfoMapper.selectByPrimaryKey(item.getIssueParty());
+                    MstCustomerInfo mstCustomerInfo = customerMap.get(item.getIssueParty());
                     item.setIssueParty(mstCustomerInfo == null ? "" : mstCustomerInfo.getCustomerName());
                 }
-
                 //债券显示为估价净价,非货币基金和净值型计划显示为单位净值,  股票显示为收盘价,  其他资产显示为空
-
                 if (item.getPinanAssetType().equals(DictCodeListExt1.金融产品类型_投管用_债券.getCodeName()) || item.getPinanAssetType().equals(DictCodeList.基金类资产类型_非货币基金.getCodeName()) || item.getPinanAssetType().equals(DictCodeListExt1.金融产品类型_投管用_股票.getCodeName())) {
                     //公允价格处理
                     if (StringUtil.isNotEmpty(item.getPinanAssetType()) && item.getPinanAssetType().equals(DictCodeListExt1.金融产品类型_投管用_债券.getCodeName())) {
@@ -1096,7 +1108,7 @@ public class PtlPositionAnalysis002Service extends CommonExportService<PtlPositi
                     }
                     //价格涨跌=价格涨跌 = 公允价格 - 昨日持仓.公允价格;价格涨跌幅=价格涨跌/ 昨日持仓.公允价格
                     BigDecimal yesterdayFairePrice = new BigDecimal(0);//昨日持仓公允价格
-                    yesterdayFairePrice = getFairePrice(item.getPinanAssetType(), item.getFinprodId(), searchDate, pass);
+                    yesterdayFairePrice = getFairePrice(item.getPinanAssetType(), item.getFinprodId(), searchDate, pass,targetDbMap);
                     item.setPriceFluctuation(item.getFairePrice() == null ? new BigDecimal(0) : item.getFairePrice().subtract(yesterdayFairePrice));
                     if (yesterdayFairePrice.compareTo(new BigDecimal(0)) != 0) {
                         item.setPriceFluctuationPercentage(item.getPriceFluctuation().multiply(new BigDecimal(100)).divide(yesterdayFairePrice, 2, BigDecimal.ROUND_HALF_UP));
@@ -1112,7 +1124,6 @@ public class PtlPositionAnalysis002Service extends CommonExportService<PtlPositi
                     // item.setBelongInstitutionNameNew(item.getBelongInstitutionName());
                 }
             }
-
             // 关闭拦截器生成的机构信息
             item.setBelongInstitutionName(null);
             item.setBelongInstitutionCode(null);
@@ -1159,7 +1170,18 @@ public class PtlPositionAnalysis002Service extends CommonExportService<PtlPositi
                 institutionNameMap.put(name.getTypeName(), name.getBelongInstitutionNameNew());
             }
         });
-
+        String pass = map.get("pass").toString();
+        BigDecimal sumVal1 = getSumPrice(DictCodeListExt1.金融产品类型_投管用_债券.getValue(), searchDate, pass);
+        map.put("sumVal1",sumVal1);
+        Map<String, Object> map1 = new HashMap<>();
+        map1.put("date", DateUtil.format(DateUtil.addDay(DateUtil.parse(searchDate), -1)));//查询日-1
+        map1.put("pass", pass);
+        List<AssetTargetDb> assetTargetList = restTemplate.postForList(ServiceApplication.TRADE_SERVICE_NAME + "/TrdBondInvestTrade/getAllYesterdayTarget", map1, AssetTargetDb.class);
+        Map<String,AssetTargetDb> targetDbMap = new HashMap<>();
+        if(CollectionUtils.isNotEmpty(assetTargetList)) {
+            assetTargetList.forEach(e->targetDbMap.put(e.getFinprodId(),e));
+            map.put("targetDbMap",targetDbMap);
+        }
         for(PtlPositionAnalysis003Dto item: list.getRoot()) {
           map.put("parentId", item.getChildInfo());
           if (item.getHasChildren().equals("01")) {
@@ -1172,15 +1194,15 @@ public class PtlPositionAnalysis002Service extends CommonExportService<PtlPositi
         	}
         	
         	//子查询中并未调用queryForPage包装分页，该结果为全部查询结果，不需要循环
-          	Page<PtlPositionAnalysis003Dto> ptlPositionAnalysis003DtoPage=selectForPage(map);
+          	Page<PtlPositionAnalysis003Dto> ptlPositionAnalysis003DtoPage = selectForPage(map);
           	for (PtlPositionAnalysis003Dto entity : ptlPositionAnalysis003DtoPage.getRoot()) {
           		if (displayType.equals(DictCodeListExt3.展示方式_单组合汇总.getValue())) {
           			entity.setPortfolioId(portfolioId);
           		}
                 for (String key : institutionNameMap.keySet()) {
                 	//资产一级分类 不止F00-F09,还会出现F1的情形，考虑到后续可能的扩展，此处去掉0
-                    if (entity.getParentInfo().startsWith(key + "F0")||entity.getParentInfo().startsWith(key + "F1")) { // todo 没有完全相等的条件
-                        entity.setBelongInstitutionNameNew(institutionNameMap.get(key)!=null?institutionNameMap.get(key).toString():"");
+                    if (entity.getParentInfo().startsWith(key + "F0") || entity.getParentInfo().startsWith(key + "F1")) { // todo 没有完全相等的条件
+                        entity.setBelongInstitutionNameNew(institutionNameMap.get(key) != null ? institutionNameMap.get(key).toString() : "");
                     }
                 }
 				if(popNum>0) {
@@ -1352,20 +1374,10 @@ public class PtlPositionAnalysis002Service extends CommonExportService<PtlPositi
      * @return
      * @paramFAIRE_PRICE
      */
-    public BigDecimal getFairePrice(String finprodType, String finprodId, String searchDate, String pass) {
+    public BigDecimal getFairePrice(String finprodType, String finprodId, String searchDate, String pass,Map<String,AssetTargetDb> targetDbMap) {
         BigDecimal fairePrice = new BigDecimal(0); //昨日公允价格
-        Map<String, Object> map = new HashMap<>();
-        map.put("finprodId", finprodId);
-        map.put("date", DateUtil.format(DateUtil.addDay(DateUtil.parse(searchDate), -1)));//查询日-1
-        map.put("pass", pass);
-        ResponseEntity<AssetTargetDb> assetTargetDbResponseEntity = restTemplate.postForEntity(
-                ServiceApplication.TRADE_SERVICE_NAME + "/TrdBondInvestTrade/getYesterdayTarget",
-                map, AssetTargetDb.class);
-        AssetTargetDb assetTargetDb = new AssetTargetDb();
-
-        if (assetTargetDbResponseEntity != null && assetTargetDbResponseEntity.getBody() != null) {
-            assetTargetDb = assetTargetDbResponseEntity.getBody();
-        } else {
+        AssetTargetDb assetTargetDb = targetDbMap.get(finprodId);
+        if (assetTargetDb == null) {
             return new BigDecimal(0);
         }
         if (StringUtil.isNotEmpty(finprodType) && finprodType.equals(DictCodeListExt1.金融产品类型_投管用_债券.getCodeName())) {
@@ -1401,9 +1413,7 @@ public class PtlPositionAnalysis002Service extends CommonExportService<PtlPositi
         map.put("date", searchDate);
         map.put("pass", pass);
         ResponseEntity<AssetTargetDb> assetTargetDbResponseEntity = restTemplate.postForEntity(
-                ServiceApplication.TRADE_SERVICE_NAME + "/TrdBondInvestTrade/getSumPrice",
-                map, AssetTargetDb.class);
-
+                ServiceApplication.TRADE_SERVICE_NAME + "/TrdBondInvestTrade/getSumPrice", map, AssetTargetDb.class);
         if (assetTargetDbResponseEntity != null && assetTargetDbResponseEntity.getBody() != null) {
             sumPrice = assetTargetDbResponseEntity.getBody().getFairePrice() == null ? new BigDecimal(0) : assetTargetDbResponseEntity.getBody().getFairePrice();
         }

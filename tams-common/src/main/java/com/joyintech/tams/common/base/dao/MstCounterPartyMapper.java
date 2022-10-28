@@ -1,5 +1,6 @@
 package com.joyintech.tams.common.base.dao;
 
+import com.joyintech.tams.common.base.dao.MstCounterPartyMapper;
 import com.joyintech.tams.common.base.entity.MstCounterParty;
 
 import java.util.List;
@@ -29,4 +30,6 @@ public interface MstCounterPartyMapper {
     List<String> getInsCounterIdByName(Map<String,Object> map);
 
     List<MstCounterParty> getCounterByName(String counterName);
+
+    List<MstCounterParty> getAllCounterName(@Param("counterIds") List<String> counterIds);
 }
