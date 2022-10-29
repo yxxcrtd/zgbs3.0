@@ -568,7 +568,7 @@ public class CfetsTrdConfirmService extends BaseService {
                 result.getTrdProductDeals().get(i).setFpriceAmt(
                         ArithmeticUtil.divide(
                                 ArithmeticUtil.multiply(interfCstpTrade.getSettlcurramt(), shareAmtTemp), shareAmt, 2));
-                result.getTrdProductDeals().get(i).setTradeAmt(result.getTrdProductDeals().get(i).getCpriceAmt());
+                result.getTrdProductDeals().get(i).setTradeAmt(result.getTrdProductDeals().get(i).getFpriceAmt());
                 // 利息总额 = 结算金额  - 交易金额
                 result.getTrdProductDeals().get(i).setIntAmt(
                         ArithmeticUtil.subtract(result.getTrdProductDeals().get(i).getFpriceAmt(), result.getTrdProductDeals().get(i).getCpriceAmt()));
