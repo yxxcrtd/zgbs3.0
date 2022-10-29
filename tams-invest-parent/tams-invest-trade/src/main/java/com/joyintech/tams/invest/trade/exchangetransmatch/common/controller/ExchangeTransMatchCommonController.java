@@ -1,5 +1,6 @@
 package com.joyintech.tams.invest.trade.exchangetransmatch.common.controller;
 
+import com.joyintech.framework.annotation.DTXTransaction;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.SettleTransDataTotalMatch;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonDto;
@@ -7,6 +8,7 @@ import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonP
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.service.ExchangeTransMatchCommonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +28,8 @@ public class ExchangeTransMatchCommonController {
      */
     @ResponseBody
     @PostMapping("transactionMacthBatch")
+    @Transactional
+    @DTXTransaction
     public void transactionMacthBatch(@RequestBody ExchangeTransMatchCommonParamDto paramDto){
         if (paramDto != null && !StringUtil.isEmptyList(paramDto.getNeedUpdateStatusEntrustIdList())) {
             exchangeTransMatchCommonService.updateEntrustStatus(paramDto.getNeedUpdateStatusEntrustIdList());
