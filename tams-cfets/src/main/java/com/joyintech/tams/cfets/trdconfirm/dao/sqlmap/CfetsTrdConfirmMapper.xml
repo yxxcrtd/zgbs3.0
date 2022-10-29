@@ -1673,7 +1673,8 @@
                             decode(regAdd.CAL_MODE, '01',reg.unit_cprice,'02',reg.yield * 100,'03',reg.exer_yield * 100),
                             'F02',ct.PRICE * 100,'F03',ct.PRICE * 100,null) as tradeYield,
                     reg.repo_term                                                         as termDays,
-                    decode(tfpdt.finprod_type2, 'F01', tfpdt.fprice_amt, tfpdt.TRADE_AMT) as tradeAmt,
+                    decode(reg.finprod_type2, 'F01', nvl(tfpdt.fprice_amt, ts.SETTAMT),
+                            nvl(tfpdt.TRADE_AMT, tr.REPOAMT))                            as tradeAmt,
                     reg.trade_date                                                        as tradeDate,
                     deal.portfolioId                                                      as portfolioIds,
                     deal.portfolioName                                                    as portfolioNames,
@@ -1716,10 +1717,10 @@
             group by fee.trade_id
         ) regfee on reg.totle_trade_id=regfee.trade_id
         left join (SELECT I.* FROM INTERF_CSTP_TRADE I
-                            INNER JOIN (SELECT EXECID, MAX(UPDATETIME) UPDATETIME
+                            INNER JOIN (SELECT EXECID, MAX(UPDATETIME) UPDATETIME, SIDE
                                         FROM INTERF_CSTP_TRADE
-                                        GROUP BY EXECID) II
-                            ON II.EXECID = I.EXECID AND II.UPDATETIME = I.UPDATETIME) ct
+                                        GROUP BY EXECID, SIDE) II
+                            ON II.EXECID = I.EXECID AND II.UPDATETIME = I.UPDATETIME and I.SIDE = II.SIDE) ct
                     on ct.EXECID = m.exe_id
         left join INTERF_OPICS_TRAD_REPO tr on tr.oritradeid =m.exe_id and tr.Tradeid=m.cstp_trade_id
         left join INTERF_TRAD_SECDEAL ts on ts.FEDEALNO = m.exe_id and ts.Dealno=m.cstp_trade_id
@@ -1799,7 +1800,8 @@
                       TO_CHAR(ROUND(ic.rate * 100, 4), 'FM990.0000') || '%') as tradeYieldStr,
                decode(ct.BUSINESSTYPE, 'BOND', ib.tradeYield, ic.rate * 100) as tradeYield,
                decode(ct.BUSINESSTYPE, 'REPO', ic.term, null)                as termDays,
-               decode(tfpdt.finprod_type2, 'F01', tfpdt.fprice_amt, tfpdt.TRADE_AMT) as tradeAmt,
+               decode(ct.BUSINESSTYPE, 'BOND', nvl(tfpdt.fprice_amt, ts.SETTAMT),
+                                            nvl(tfpdt.TRADE_AMT, tr.REPOAMT)) as tradeAmt,
                nvl(ib.quote_date, ic.quote_date)                             as tradeDate,
                deal.portfolioId                                              as portfolioIds,
                deal.portfolioName                                            as portfolioNames,
@@ -1861,9 +1863,10 @@
                     </if>
                     group by ir.quote_id)deal on m.pre_trade_id=deal.quote_id
         left join (SELECT I.* FROM INTERF_CSTP_TRADE I
-                                INNER JOIN (SELECT EXECID, MAX(UPDATETIME) UPDATETIME
+                                INNER JOIN (SELECT EXECID, MAX(UPDATETIME) UPDATETIME,SIDE
                                             FROM INTERF_CSTP_TRADE
-                                            GROUP BY EXECID) II ON II.EXECID = I.EXECID AND II.UPDATETIME = I.UPDATETIME) ct on ct.EXECID = m.exe_id
+                                            GROUP BY EXECID,SIDE) II
+                                            ON II.EXECID = I.EXECID AND II.UPDATETIME = I.UPDATETIME and I.SIDE = II.SIDE) ct on ct.EXECID = m.exe_id
         left join INTERF_OPICS_TRAD_REPO tr on tr.oritradeid =m.exe_id and tr.Tradeid=m.cstp_trade_id
         left join INTERF_TRAD_SECDEAL ts on ts.FEDEALNO = m.exe_id and ts.Dealno=m.cstp_trade_id
         left join stl_sec_acct_info stlinfo on nvl(ts.OURDEPOSITACCOUNTNUMBER,tr.OURDEPOSITACCOUNTNUMBER)=stlinfo.sec_acct_id
