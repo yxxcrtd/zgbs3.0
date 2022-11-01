@@ -11,7 +11,10 @@
 package com.joyintech.tams.invest.risk.valtblimport.controller;
 
 import java.io.FileNotFoundException;
+import java.math.BigDecimal;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +29,10 @@ import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.risk.penetrationmanagement.rskvalrelateimport.dto.RskValRelateImport001Dto;
 import com.joyintech.tams.invest.risk.penetrationmanagement.rskvalrelateimport.service.RskValRelateImport002Service;
 import com.joyintech.tams.invest.risk.valtblimport.service.RskValTableImportCommonService;
+import com.joyintech.tams.valuation.analysis.ValuationTableAnalysis;
+import com.joyintech.tams.valuation.analysis.info.ValuationTableInfo;
+import com.joyintech.tams.valuation.analysis.info.ValuationTableRow;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -95,9 +102,67 @@ public class RskValTableImport002Controller extends BaseController{
     
     @RequestMapping(value = "/initValTableInfo")
     @ResponseBody
-    public List<RskValtblAssetSubDto> initValTableInfo(@RequestBody RskValTableImportParamDto dto) throws ClassNotFoundException, FileNotFoundException, InstantiationException, IllegalAccessException {
-        List<RskValtblAssetSubDto> RskValtblAssetSubList = rskValTableImportService.viewValTable(dto);
-        return RskValtblAssetSubList;
+    public List<RskValtblAssetSubDto> initValTableInfo(@RequestBody RskValTableImportParamDto dto) throws Exception {
+        List<RskValtblAssetSubDto> rskValtblAssetSubList = new ArrayList<>();
+
+        String timeModelPath = "D:\\workspace\\zgbs-3.0\\tams-system\\touguan\\app\\src\\test\\java\\com\\joyintech\\model\\time.m";
+        String headerTrainDataDir = "D:\\workspace\\zgbs-3.0\\tams-system\\touguan\\app\\src\\test\\java\\com\\joyintech\\model\\估值表识别\\表头";
+        String aggregateTrainDataDir = "D:\\workspace\\zgbs-3.0\\tams-system\\touguan\\app\\src\\test\\java\\com\\joyintech\\model\\估值表识别\\汇总";
+        String bayesModelPath = "D:\\workspace\\zgbs-3.0\\tams-system\\touguan\\app\\src\\test\\java\\com\\joyintech\\model\\估值模型\\bayes-valuation-table-header-model.gz";
+        // String excel = "D:\\workspace\\zgbs-3.0\\tams-system\\touguan\\app\\src\\test\\java\\com\\joyintech\\model\\样表汇总\\中金华裕1号集合资产管理计划估值表-债券（应计利息和成本在一级科目下）、股票（应收利息和成本不在一级科目下）.xls";
+        String excel = dto.getValTableFileName();
+        ValuationTableAnalysis analysis = new ValuationTableAnalysis(timeModelPath, bayesModelPath, headerTrainDataDir, aggregateTrainDataDir);
+        ValuationTableInfo info = analysis.execute(excel);
+
+        System.out.println("估值表名称               : "+info.getName());
+        System.out.println("估值日期                   : "+info.getHeader().getDate());
+        System.out.println("明细头信息(从0开始) : "+info.getListHeaderIndexes()+"\r\n");
+
+        // printList(info.getList(), rskValtblAssetSubList);
+        System.out.println("\r\n"+info.getAggregateInfo());
+
+        // 日期转换 , sdf.parse(info.getHeader().getDate())
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日");
+        return printList(info.getList(), rskValtblAssetSubList);
+    }
+
+    public static List<RskValtblAssetSubDto> printList(List<ValuationTableRow> list, List<RskValtblAssetSubDto> rskValtblAssetSubList) {
+        RskValtblAssetSubDto rskValtblAssetSubDto = null;
+        for (ValuationTableRow row : list) {
+            System.out.println(row);
+            rskValtblAssetSubDto = new RskValtblAssetSubDto();
+            rskValtblAssetSubDto.setIsMatch("是");
+            rskValtblAssetSubDto.setSubCode(row.getSubjectCode());
+            rskValtblAssetSubDto.setSubName(row.getSubjectName());
+            //rskValtblAssetSubDto.setValDate(valDate);
+
+            if (!ObjectUtils.isEmpty(row.getNumber())) {
+                rskValtblAssetSubDto.setSecurityQuantity(new BigDecimal(row.getNumber().replaceAll(",", "")));
+            }
+            if (!ObjectUtils.isEmpty(row.getCnyCost())) {
+                rskValtblAssetSubDto.setUnitCost(new BigDecimal(row.getCnyCost().replaceAll(",", ""))); // 去掉千位符的逗号
+            }
+            if (!ObjectUtils.isEmpty(row.getCnyCost())) {
+                rskValtblAssetSubDto.setSecurityCost(new BigDecimal(row.getCnyCost().replaceAll(",", ""))); // 成本(本币)
+            }
+            if (!ObjectUtils.isEmpty(row.getPercentageOfCost())) {
+                rskValtblAssetSubDto.setCtnwr(new BigDecimal(row.getPercentageOfCost().replace("%", ""))); // 成本占比(去掉后面的%)
+            }
+            if (!ObjectUtils.isEmpty(row.getCnyMarketValue())) {
+                rskValtblAssetSubDto.setSmv(new BigDecimal(row.getCnyMarketValue().replaceAll(",", ""))); // 市值(本币)
+            }
+            if (!ObjectUtils.isEmpty(row.getMarketValueOfCost())) {
+                rskValtblAssetSubDto.setMcr(new BigDecimal(row.getMarketValueOfCost().replace("%", ""))); // 市值占比
+            }
+            rskValtblAssetSubList.add(rskValtblAssetSubDto);
+
+            List<ValuationTableRow> child = row.getChild();
+            if (child.size()>0) {
+                printList(child, rskValtblAssetSubList);
+            }
+        }
+
+        return rskValtblAssetSubList;
     }
     
     /**

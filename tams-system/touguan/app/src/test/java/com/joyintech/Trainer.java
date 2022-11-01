@@ -2,6 +2,9 @@ package com.joyintech;
 
 import com.joyintech.tams.valuation.analysis.ValuationTableTrain;
 
+/**
+ * 训练的目的是生成：bayes-valuation-table-header-model.gz
+ */
 public class Trainer {
 
     public static void main(String[] args) throws Exception {

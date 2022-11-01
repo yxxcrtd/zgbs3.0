@@ -10,25 +10,26 @@ RskValTableImport001 = function(){
 
                     // 解析上传文件名称，获取资产名称和估值日期
                     var arr = valTableFileName.split(chbValSplitStr);
-                    var dateFlag = true;
-                    if (typeof arr[1] != 'undefined') {
-                        var valDate = arr[1];
-                        if (valDate.indexOf('_') >= 0) {
-                            var dateArr = valDate.split('_');
-                            valDate = dateArr[0];
-                        }
-                        if (valDate.length == 8) {
-                            var year = valDate.substr(0,4);
-                            var month = valDate.substr(4,2);
-                            var day = valDate.substr(6,2);
-                            valDate = year + "-" + month + "-" + day;
-                            if (checkDate(valDate)) {
-                                $('#valDate').val(valDate);
-                                // $('#RskValTableImport001_btn_see').attr("disabled", false);
-                                dateFlag = false;
-                            }
-                        }
-                    }
+                    var dateFlag = false;
+//                    var dateFlag = true;
+//                    if (typeof arr[1] != 'undefined') {
+//                        var valDate = arr[1];
+//                        if (valDate.indexOf('_') >= 0) {
+//                            var dateArr = valDate.split('_');
+//                            valDate = dateArr[0];
+//                        }
+//                        if (valDate.length == 8) {
+//                            var year = valDate.substr(0,4);
+//                            var month = valDate.substr(4,2);
+//                            var day = valDate.substr(6,2);
+//                            valDate = year + "-" + month + "-" + day;
+//                            if (checkDate(valDate)) {
+//                                $('#valDate').val(valDate);
+//                                // $('#RskValTableImport001_btn_see').attr("disabled", false);
+//                                dateFlag = false;
+//                            }
+//                        }
+//                    }
 
                     if (dateFlag){
                         $('#ptlName').val('');
@@ -49,19 +50,19 @@ RskValTableImport001 = function(){
                         var object = $.serializeToObject('#submitForm');
                         object.valTableFileName = valTableFileName;
 
-                        Joyin.ajaxJson(basePath + 'invest/risk/valtblimport/RskValTableImport001/checkFileName',object, function(result) {
-                            if (typeof result.data == 'undefined') {
-                                $('#ptlName').val('');
-                                $('#ptlId').val('');
-                                $('#valDate').val('');
-                                $('#ptlId').trigger('change');
-                                Joyin.error("上传的估值表文件资产名称不存在!");
-                            } else {
-                                $('#ptlName').val(result.data.text);
-                                $('#ptlId').val(result.data.id);
-                                $('#ptlId').trigger('change');
-                            }
-                        });
+//                        Joyin.ajaxJson(basePath + 'invest/risk/valtblimport/RskValTableImport001/checkFileName',object, function(result) {
+//                            if (typeof result.data == 'undefined') {
+//                                $('#ptlName').val('');
+//                                $('#ptlId').val('');
+//                                $('#valDate').val('');
+//                                $('#ptlId').trigger('change');
+//                                Joyin.error("上传的估值表文件资产名称不存在!");
+//                            } else {
+//                                $('#ptlName').val(result.data.text);
+//                                $('#ptlId').val(result.data.id);
+//                                $('#ptlId').trigger('change');
+//                            }
+//                        });
                     }
                 }
             }
@@ -293,13 +294,14 @@ function checkDate(dateStr) {
         if(typeof fileInfo[0] != 'undefined'){
             object.valTableFileName = fileInfo[0].fileName;
         }
-        Joyin.ajaxJson(basePath + 'invest/risk/valtblimport/RskValTableImport001/check',object, function(result) {
-            if(check()){
-                Joyin.dialog(JoyinUtil.getLabel('估值表预览'), '../RskValTableImport002/init', '95%', '95%'
-                        ,object);
-            }
-        });
-        
+//        Joyin.ajaxJson(basePath + 'invest/risk/valtblimport/RskValTableImport001/check',object, function(result) {
+//            if(check()){
+//                Joyin.dialog(JoyinUtil.getLabel('估值表预览'), '../RskValTableImport002/init', '95%', '95%'
+//                        ,object);
+//            }
+//        });
+
+        Joyin.dialog(JoyinUtil.getLabel('估值表预览'), '../RskValTableImport002/init', '95%', '95%' ,object);
     }
 
         //批量导入

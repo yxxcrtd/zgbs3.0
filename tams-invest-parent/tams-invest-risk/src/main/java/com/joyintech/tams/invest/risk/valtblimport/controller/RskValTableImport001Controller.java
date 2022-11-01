@@ -109,8 +109,7 @@ public class RskValTableImport001Controller extends BaseController{
      */
     @ResponseBody
     @RequestMapping("check")
-    public AjaxResult check(@RequestBody @Validated({
-        ValidateGroupEdit.class}) RskValTableImportParamDto dto, BindingResult result) {
+    public AjaxResult check(@RequestBody @Validated({ValidateGroupEdit.class}) RskValTableImportParamDto dto, BindingResult result) {
         AjaxResult res= new AjaxResult();
         List<ValidMessage> errorList = new ArrayList<>();
         //检查上传的估值表是否符合要求
@@ -141,8 +140,7 @@ public class RskValTableImport001Controller extends BaseController{
         //新增通过系统参数控制可导入的估值表最小日期   系统参数：MAX_SUB_VALDATE
         String days = StringUtil.defaultString(CacheUtil.getSysParam("MAX_SUB_VALDATE"),"16");
         if(DateUtil.compareDate(dto.getValDate(),DateUtil.parse(DateUtil.addDay(DateUtil.getSysDate(),-1*Integer.valueOf(days))))<0){
-            ValidMessage validMessage = new ValidMessage(
-                    "超出可导入的估值表日期:" + DateUtil.addDay(DateUtil.getSysDate(),-1*Integer.valueOf(days)));
+            ValidMessage validMessage = new ValidMessage("超出可导入的估值表日期:" + DateUtil.addDay(DateUtil.getSysDate(),-1*Integer.valueOf(days)));
             errorList.add(validMessage);
         }
         if(isError){
@@ -152,6 +150,7 @@ public class RskValTableImport001Controller extends BaseController{
         }
         return commonCheck(result, dto.getOperateType());
     }
+
     /**
      * 点击预览时check
      * <功能详细描述>
@@ -163,8 +162,7 @@ public class RskValTableImport001Controller extends BaseController{
      */
     @ResponseBody
     @RequestMapping("checkZip")
-    public AjaxResult checkZip(@RequestBody @Validated({
-            ValidateGroupEdit.class}) RskValTableImportParamDto dto, BindingResult result) {
+    public AjaxResult checkZip(@RequestBody @Validated({ValidateGroupEdit.class}) RskValTableImportParamDto dto, BindingResult result) {
         return commonCheck(result, dto.getOperateType());
     }
 
@@ -180,7 +178,6 @@ public class RskValTableImport001Controller extends BaseController{
     @ResponseBody
     @RequestMapping("checkFileName")
     public AjaxResult checkFileName(@RequestBody RskValTableImportParamDto dto, BindingResult result) {
-
         AjaxResult ajaxResult = new AjaxResult();
         SelectOptionDto info = null;
 
@@ -200,6 +197,7 @@ public class RskValTableImport001Controller extends BaseController{
         progressBarService.removePercent(this.getPageId(), ProgressBarService.FILE_UPLOAD_ID);
         return new AjaxResult();
     }
+
     @RequestMapping(value = "/batchUploadFile")
     @ResponseBody
     public List<ExcelValidDto> batchUploadFile(HttpServletRequest request, HttpServletResponse response, ModelMap model){

@@ -8,6 +8,16 @@
   <artifactId>tams-invest-risk</artifactId>
   <name>tams-invest-risk</name>
   <description>风险管理</description>
+    
+    <dependencies>
+        <dependency>
+            <groupId>com.joyintech</groupId>
+            <artifactId>tams-valuation-analysis</artifactId>
+            <version>0.0.1</version>
+            <classifier>min</classifier>
+        </dependency>
+    </dependencies>
+
   <build>
    <plugins>
       <!-- 打包源代码插件 -->
