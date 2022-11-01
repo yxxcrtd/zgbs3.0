@@ -600,15 +600,6 @@ public class PtlPositionAnalysisService extends BaseService<PtlPositionAnalysis0
         if(StringUtil.isNotEmpty(pageParam.get("portfolioId"))){
             pageParam.put("portfolioIdList",StringUtil.splitToList(GlobalConstant.COMMA,(String)pageParam.get("portfolioId")));
         }
-
-        if(MultilevelDataAuthorityUtil.isEnabled()) {
-            //当前用户所属机构代码
-            String createInst =  MultilevelDataAuthorityUtil.getService().queryOrganizationCode(LoginUserUtil.getUserName());
-            //右上角选择框为空时 存放本级机构及有权限的下级机构 选择时 存放所选机构
-            List<String> resourcesTreeInstCodeList =  LoginUserUtil.getTreeInstCode();
-            pageParam.put("institutionCode",createInst);
-            pageParam.put("resourcesTreeInstCodeList",resourcesTreeInstCodeList);
-        }
         return ptlPositionAnalysisMapper.selectRemain(pageParam);
     }
 

@@ -221,12 +221,19 @@ public interface TrdBondInvestTradeMapper {
      */
     List<FinExercisePlan> getExerciseDate(Map<String, Object> map);
 
-/**
- * 根据资产代码查询昨日指标信息的持仓数量和综合成本收益率
- * @param map
- * @return
- */
- AssetTargetDb  getYesterdayTarget(Map<String, Object> map);
+    /**
+     * 根据资产代码查询昨日指标信息的持仓数量和综合成本收益率
+     * @param map
+     * @return
+     */
+     AssetTargetDb  getYesterdayTarget(Map<String, Object> map);
+
+    /**
+     * 根据资产代码查询昨日指标信息的持仓数量和综合成本收益率
+     * @param map
+     * @return
+     */
+    List<AssetTargetDb>  getAllYesterdayTarget(Map<String, Object> map);
 
     /**
      * 查询当前时间的持仓市值和应计利息汇总值

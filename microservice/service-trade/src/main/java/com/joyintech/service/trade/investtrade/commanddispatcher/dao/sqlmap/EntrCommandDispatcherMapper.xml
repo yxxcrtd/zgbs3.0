@@ -148,9 +148,9 @@
 		end  counterDealerId,/**对手方交易商代码*/
 		CASE
 			WHEN A.PS IN ( 'T56' ) and A.counter_id is null THEN null
-			else tpd.COUNTER_TRADER
+			else NVL(tpd.COUNTER_TRADER,A.COUNTER_TRADER)
 		end counterTrader,/**对手方交易员*/
-		tpd.TRADER  ourTrader, /*本方交易员*/
+		NVL(tpd.TRADER,F.TRADER)  ourTrader, /*本方交易员*/
 		<!-- 交易对手到期续作保持原有交易对手没有就传空-->
 		case when A.PS in ('T56') then  A.counter_id else
 		nvl( A.counter_id, tpd.COUNTER_ID ) end counterId, /*交易对手*/

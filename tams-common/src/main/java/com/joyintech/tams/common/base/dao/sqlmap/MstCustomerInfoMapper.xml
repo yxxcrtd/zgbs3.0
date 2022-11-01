@@ -343,4 +343,15 @@
             CREATE_INSTITUTIONS = #{createInstitutions,jdbcType=VARCHAR}
         where CUSTOMER_ID = #{customerId,jdbcType=VARCHAR}
     </update>
+
+    <select id="getAllCustomerName" parameterType="java.util.List" resultMap="BaseResultMap">
+        select CUSTOMER_ID , CUSTOMER_NAME FROM MST_CUSTOMER_INFO
+        <where> 1=1
+            <if test="customerIds !=null and customerIds.size() > 0">
+                <foreach collection="customerIds" item="item" open=" and CUSTOMER_ID in (" close=")" separator=",">
+                    #{item,jdbcType=VARCHAR}
+                </foreach>
+            </if>
+        </where>
+    </select>
 </mapper>

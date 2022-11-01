@@ -18,7 +18,8 @@ import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.tams.business.common.dto.CfetsExportRequestDto;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.util.ExcelUitl;
-import com.joyintech.tams.cfets.trdconfirm.dto.MatchBusType;
+import com.joyintech.tams.business.common.util.RedisSingleLock;
+import com.joyintech.tams.cfets.manualsettle.dto.CfetsManualSettleDto;
 import com.joyintech.tams.cfets.trdconfirm.dto.*;
 import com.joyintech.tams.cfets.trdconfirm.service.CfetsTrdConfirmService;
 import com.joyintech.tams.cfets.trdconfirm.service.MatchFeaturesService;
@@ -40,6 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 
 @Controller
@@ -57,6 +59,9 @@ public class CfetsTrdConfirmController extends BaseController {
 
     @Autowired
     private IPlatformDate iPlatformDate;
+
+    @Autowired
+    private RedisSingleLock redisSingleLock;
 
     @ApiOperation(value = "查询页面初始化参数", notes = "查询页面初始化参数")
     @PostMapping("/getPageParams")
@@ -111,21 +116,37 @@ public class CfetsTrdConfirmController extends BaseController {
     @ApiOperation(value = "交易执行-成交确认", notes = "交易执行-成交确认")
     @PostMapping("trdConfirmSave")
     public Message<AjaxResult> trdConfirmSave(@RequestBody CfetsTrdConfirmRegInfoListResponse dto) {
+        List<CfetsTrdConfirmRegInfoListResponse> dtoList = dto.getSelectedItem();
+        boolean flag = false;
+        String totleTradeId = null;
+        for (CfetsTrdConfirmRegInfoListResponse item : dtoList) {
+            if (!redisSingleLock.tryLock(item.getTotleTradeId(), UUID.randomUUID().toString(), 10)) {
+                flag = true;
+                totleTradeId = item.getTotleTradeId();
+            }
+        }
+        if (flag) {
+            return new Message<AjaxResult>().fail().setMessage(getMessage("CONFIRM_MSG_017", totleTradeId));
+        }
         //对选择的数据进行check
-        AjaxResult ajax= cfetsTrdConfirmService.trdConfirmSaveCheckMethod(dto);
-        if(null!=ajax && !StringUtil.isEmptyList(ajax.getErrorList())){
+        AjaxResult ajax = cfetsTrdConfirmService.trdConfirmSaveCheckMethod(dto);
+        if (null != ajax && !StringUtil.isEmptyList(ajax.getErrorList())) {
             return new Message<AjaxResult>().success().setData(ajax);
         }
         try {
             AjaxResult ajaxResult = cfetsTrdConfirmService.trdConfirmSaveMethod(dto);
-            if (null!=ajaxResult && !StringUtil.isEmptyList(ajaxResult.getErrorList())) {
+            if (null != ajaxResult && !StringUtil.isEmptyList(ajaxResult.getErrorList())) {
                 return new Message<AjaxResult>().success().setData(ajaxResult);
-            }else{
+            } else {
                 return new Message<AjaxResult>().success().setData(new AjaxResult("成交确认成功"));
             }
         } catch (Exception e) {
             logger.error("交易执行-成交确认数据异常", e);
             return new Message<AjaxResult>().fail().setMessage("成交确认数据异常");
+        } finally {
+            for (CfetsTrdConfirmRegInfoListResponse item : dtoList) {
+                redisSingleLock.releaseLock(item.getTotleTradeId());
+            }
         }
     }
     @ApiOperation(value = "CSTP成交回报分页查询", notes = "CSTP成交回报分页查询")

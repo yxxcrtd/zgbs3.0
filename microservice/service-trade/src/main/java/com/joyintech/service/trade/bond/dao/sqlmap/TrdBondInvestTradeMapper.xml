@@ -1097,7 +1097,7 @@
         E.BASIS basis,
         <!-- 一体化对应etliu -->
         <!-- F.RATE_TYPE intRateType, -->
-        F.INT_TYPE intRateType,
+        E.CALC_TYPE intRateType,
         G.PAY_CYCLE yearIntRate,
         G.CALC_RULE calMethod,
         H.EXERCISE_DATE nextExeDate,
@@ -1612,6 +1612,14 @@
         </if>
         and rownum=1
     </select>
+
+    <select id="getAllYesterdayTarget" resultType="com.joyintech.tams.common.base.entity.AssetTargetDb">
+        select t.FINPROD_ID,t.pos_amount posAmount ,t.cost_rate costRate,t.FAIRE_PRICE fairePrice from  ASSET_TARGET_DB  t  where t.cdate=to_date(#{date},'yyyy-MM-dd')
+        <if test="pass != null and pass != ''">
+            and t.IS_PERNE= #{pass}
+        </if>
+    </select>
+
     <select id="getSumPrice" resultType="com.joyintech.tams.common.base.entity.AssetTargetDb">
         select sum(t.pos_value+t.tdy_intincexp) fairePrice  from ASSET_TARGET_DB t where t.cdate=to_date(#{date},'yyyy-MM-dd')  and t.pinan_asset_type=#{finprodType}
         <if test="pass != null and pass != ''">

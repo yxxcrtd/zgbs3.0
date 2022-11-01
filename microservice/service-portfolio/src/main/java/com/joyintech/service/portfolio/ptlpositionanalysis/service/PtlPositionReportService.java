@@ -62,19 +62,8 @@ public class PtlPositionReportService extends BaseService<PtlPositionAnalysis003
         if(StringUtil.isNotEmpty(pageParam.get("displayType"))){
             pageParam.put("displayType", pageParam.get("displayType").toString());
         }
-        // 多级法人改造 add by hxy 20200702
-        if(MultilevelDataAuthorityUtil.isEnabled()) {
-            //当前用户所属机构代码
-            String createInst =  MultilevelDataAuthorityUtil.getService().queryOrganizationCode(LoginUserUtil.getUserName());
-            //右上角选择框为空时 存放本级机构及有权限的下级机构 选择时 存放所选机构
-            List<String> resourcesTreeInstCodeList =  LoginUserUtil.getTreeInstCode();
-            pageParam.put("institutionCode",createInst);
-            pageParam.put("resourcesTreeInstCodeList",resourcesTreeInstCodeList);
-        }
-
         //modify by mashukai 组合持仓分析 上市流通结转持仓后如果持仓市值和应记利息都为0时不展示该条数据 ZGBSSE-238 start
         List<PtlPositionAnalysis003Dto> newResultList = new ArrayList<PtlPositionAnalysis003Dto>();
-        
         // 多级法人改造 add by hxy 20200702
         List<PtlPositionAnalysis003Dto> resultList = ptlPositionAnalysisMapper.secReportPage(pageParam);
         if (StringUtil.isNotEmpty(pageParam.get("parentId")) && !StringUtil.equals(pageParam.get("parentId"), "root")) {

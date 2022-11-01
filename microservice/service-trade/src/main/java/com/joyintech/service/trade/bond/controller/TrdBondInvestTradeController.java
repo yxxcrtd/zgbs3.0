@@ -516,6 +516,17 @@ public class TrdBondInvestTradeController {
     public AssetTargetDb getYesterdayTarget(@RequestBody Map<String, Object> map) {
         return trdBondInvestTradeService.getYesterdayTarget(map);
     }
+
+    /**
+     *根据资产代码查询昨日指标信息的持仓数量和综合成本收益率
+     * @param map
+     * @return
+     */
+    @PostMapping("getAllYesterdayTarget")
+    public List<AssetTargetDb> getAllYesterdayTarget(@RequestBody Map<String, Object> map) {
+        return trdBondInvestTradeService.getAllYesterdayTarget(map);
+    }
+
     /**
      * 查询当前时间的持仓市值和应计利息汇总值
      *资产类型为债券，查询日期

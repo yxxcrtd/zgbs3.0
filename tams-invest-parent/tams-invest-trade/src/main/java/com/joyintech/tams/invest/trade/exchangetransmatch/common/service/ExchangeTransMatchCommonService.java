@@ -679,9 +679,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
         logger.debug("处理匹配成交相关的表---开始,委托list:"+JsonUtils.objectArray2Json(commonEntrustDtoList));
         for(ExchangeTransMatchCommonEntrustDto commonEntrustDto : commonEntrustDtoList) {
             //处理业务交易表
-            Pair<String,FinProductTradeDto> pair = this.handleFinProductTradeDto(dto,commonEntrustDto);
-            String tradeId = pair.getFirst();
-            FinProductTradeDto finProductTradeDto = pair.getSecond();
+            String tradeId = this.handleFinProductTradeDto(dto,commonEntrustDto);
             //登录:汇总成交数据匹配结果表（SETTLE_TRANS_DATA_TOTAL_MATCH）
             SettleTransDataTotalMatch settleTransDataTotalMatch = this.genSettleTransDataTotalMatch(dto,commonEntrustDto);
             // 保存SETTLE_TRANS_DATA_TOTAL_MATCH
@@ -701,9 +699,6 @@ public class ExchangeTransMatchCommonService extends BaseService {
             List<SettleTransTgMapping> settleTransTgMappingList = this.genSettleTransTgMapping(dto,tradeId);
             // 保存SETTLE_TRANS_TG_MAPPING
             this.saveSettleTransTgMapping(settleTransTgMappingList);
-            // 发送新头寸报文 modify by fuyongsheng 20220824 start
-            positionRequestService.sendFinProductTradeDto(finProductTradeDto);
-            // 发送新头寸报文 modify by fuyongsheng 20220824 end
         }
 
         //更新:汇总成交数据状态表（SETTLE_TRANS_DATA_TOTAL_STATUS）
@@ -805,7 +800,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
         }
     }
 
-    private Pair<String,FinProductTradeDto> handleFinProductTradeDto(ExchangeTransMatchCommonDto dto,ExchangeTransMatchCommonEntrustDto commonEntrustDto){
+    private String handleFinProductTradeDto(ExchangeTransMatchCommonDto dto,ExchangeTransMatchCommonEntrustDto commonEntrustDto){
         logger.debug("处理业务交易表---开始");
         FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
         finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_有效.getValue());
@@ -954,11 +949,11 @@ public class ExchangeTransMatchCommonService extends BaseService {
         }
         baseTradeProductDealDtos.addAll(exchangeTransMatchBaseTradeDtos);
         logger.debug("交易表数据:"+JsonUtils.object2Json(finProductTradeDto));
-        // 处理老头寸和指令完成度
+        // 处理新老头寸和指令完成度
         this.executePositionAndEntrustFinish(dto, commonEntrustDto, finProductTradeDto, exchangeTransMatchBaseTradeDtos,
                 finPledgeDisplaceDetailHuanChu, finPledgeDisplaceDetailHuanRu, firstFinDealPledgeTempList);
         logger.debug("处理业务交易表---结束,交易编号:"+tradeId);
-        return Pair.of(tradeId, finProductTradeDto);
+        return tradeId;
     }
 
     /**
@@ -1115,9 +1110,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
             }
         }
         //增加调用新头寸引擎代码start
-        // modify by fuyongsheng 20220824 start 挪到外层
-        // positionRequestService.sendFinProductTradeDto(finProductTradeDto);
-        // modify by fuyongsheng 20220824 end 挪到外层
+        positionRequestService.sendFinProductTradeDto(finProductTradeDto);
         //增加调用头寸引擎代码end
         // modify by etliu 20220110 start
         // GZYHTZJY-1032: 协议回购的头寸处理，需要走PTL_POSITION_FLOW_CFG配置

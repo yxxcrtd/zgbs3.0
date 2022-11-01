@@ -1,7 +1,10 @@
 package com.joyintech.tams.common.base.dao;
 
 import com.joyintech.tams.common.base.entity.MstCustomerInfo;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface MstCustomerInfoMapper {
@@ -18,4 +21,6 @@ public interface MstCustomerInfoMapper {
     int updateByPrimaryKeySelective(MstCustomerInfo record);
 
     int updateByPrimaryKey(MstCustomerInfo record);
+
+    List<MstCustomerInfo> getAllCustomerName(@Param("customerIds") List<String> customerIds);
 }

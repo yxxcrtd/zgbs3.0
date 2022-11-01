@@ -2282,6 +2282,9 @@ public class CfetsTrdConfirm001Service extends BaseService {
      *
      */
     private void oldPositionDeal(CfetsTrdBondInvestTradeDto dto) {
+        if (!StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
+            return;
+        }
         // 获取划款指令
         Map<String, BussTrdTransferOrderDto> map = dto.getBussTrdTransferOrder().stream()
                 .collect(Collectors.toMap(BussTrdTransferOrderDto::getTradeId, orderDto -> orderDto));

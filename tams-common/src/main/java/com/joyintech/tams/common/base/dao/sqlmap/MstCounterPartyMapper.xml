@@ -283,6 +283,18 @@
 		</foreach>
     </select>
 
+    <select id = "getAllCounterName" resultMap="BaseResultMap">
+        select mcp.COUNTER_ID ,mcp.COUNTER_NAME
+        from MST_COUNTER_PARTY mcp
+        <where> 1=1
+            <if test="counterIds !=null and counterIds.size() > 0">
+                <foreach collection="counterIds" item="item" open=" and mcp.COUNTER_ID in (" close=")" separator=",">
+                    #{item,jdbcType=VARCHAR}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
     <select id="getCounterByName" parameterType="java.lang.String" resultMap="BaseResultMap">
         select
             <include refid="com.joyintech.tams.common.base.dao.MstCounterPartyMapper.Base_Column_List" />
