@@ -401,7 +401,6 @@ public class CfetsTrdConfirmService extends BaseService {
     public AjaxResult trdConfirmSaveMethod(CfetsTrdConfirmRegInfoListResponse dto) {
         List<CfetsTrdConfirmRegInfoListResponse> selectedItem = dto.getSelectedItem();
         List<ValidMessage> messages = new ArrayList<>();
-        // 头寸信息记录 用于报错回滚
         String totleTradeId = null;
         try {
             if (StringUtil.isNotEmpty(selectedItem)) {
@@ -2633,7 +2632,6 @@ public class CfetsTrdConfirmService extends BaseService {
      * @return AjaxResult
      */
     public AjaxResult trdConfirmSaveCheckMethod(CfetsTrdConfirmRegInfoListResponse dto) {
-        List<ValidMessage> messages = new ArrayList<>();
         List<CfetsTrdConfirmRegInfoListResponse> selectedItem = dto.getSelectedItem();
         AjaxResult errorRs = new AjaxResult();
         if (StringUtil.isEmptyList(selectedItem)) {
