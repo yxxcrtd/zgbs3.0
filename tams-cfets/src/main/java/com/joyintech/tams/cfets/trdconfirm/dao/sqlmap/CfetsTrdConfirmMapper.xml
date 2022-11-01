@@ -2735,17 +2735,17 @@
 
     </select>
     <!-- 查询所有下行的质押券信息 -->
-    <select id="findAllCstpPledgesList"
-            resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmCstpInfoListResponse">
-        select
-            nvl(fprepo.finprod_id, itr.SECID || '.' || repo.MARKET) as pledgeFinprodId,
-            itr.CONVRATE as pledgeRatio,
-            itr.FACETOTALAMT as pledgeFaceValue
-        from interf_opics_trad_repo repo
+    <select id="findAllCstpPledgesList" resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmCstpInfoListResponse">
+        select * from (
+            select
+                nvl(fprepo.finprod_id,itr.SECID || '.' || repo.MARKET) as pledgeFinprodId,
+                itr.CONVRATE as pledgeRatio,
+                itr.FACETOTALAMT as pledgeFaceValue
+            from interf_opics_trad_repo repo
             inner join INTERF_TRAD_REPOASST itr on repo.oritradeid=itr.tradeid
-        left  join fin_product fprepo on fprepo.finprod_market_id= itr.SECID|| '.' || repo.MARKET and fprepo.finprod_type='F01'
-        where itr.tradeid=#{execid,jdbcType=VARCHAR}
-                order by fprepo.finprod_id
+            left  join fin_product fprepo on fprepo.finprod_market_id= itr.SECID|| '.' || repo.MARKET and fprepo.finprod_type='F01'
+            where itr.tradeid=#{execid,jdbcType=VARCHAR}
+        ) t order by t.pledgeFinprodId
     </select>
 
     <select id="selectBidDtoByPrimaryKey"  resultType="com.joyintech.tams.cfets.trdconfirm.dto.CfetsTrdConfirmRegInfoListResponse">
