@@ -353,7 +353,7 @@
     	<!--<if test="cdate != null and cdate != ''">
     		and #{cdate} >= to_char(TRD_PRODUCT_DEAL.MDATE, 'yyyy-MM-dd') 
     	</if>-->
-		<if test="org != null and org != '' and (feeType1 == 'B06' or feeType1 == 'B08')">
+		<if test="org != null and org != '' and (feeType1 == 'B08')">
 			and TRD_PRODUCT_DEAL.REGIST_ORG = #{org}
 		</if>
     </select>
