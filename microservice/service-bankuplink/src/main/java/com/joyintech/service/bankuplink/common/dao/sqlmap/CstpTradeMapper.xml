@@ -86,8 +86,7 @@
      SELECT '${prefix}' || #{sysDate,jdbcType=VARCHAR} || lpad(CSTP_SEQNO.NEXTVAL, 4, '0')
      FROM DUAL
     </select>
-       <select id="selectTradRepo" parameterType="String"  
-       resultType="com.joyintech.tams.common.base.entity.InterfOpicsTradRepo">
+    <select id="selectTradRepo" parameterType="String"  resultType="com.joyintech.tams.common.base.entity.InterfOpicsTradRepo">
     select DECODE(t.MARKETINDICATOR, 9, 'H01', 10, 'H03', '') prodtype,
        TRIM(t.SECURITYID) secid,
        DECODE(t.SIDE, '4', 'RS', 'RB') ps,
@@ -133,10 +132,17 @@
   from interf_cstp_trade t
  where t.execid =  #{execid,jdbcType=VARCHAR}
   and  t.businesstype =  #{businesstype,jdbcType=VARCHAR}
-   and t.updatetime = (select max(t.updatetime)
+  <if test="side !=null and side !=''">
+  and  t.SIDE=#{side,jdbcType=VARCHAR}
+  </if>
+  and  t.updatetime = (select max(t.updatetime)
                          from interf_cstp_trade t
-                        where t.execid =  #{execid,jdbcType=VARCHAR}
-                         and  t.businesstype =  #{businesstype,jdbcType=VARCHAR})
+                         where t.execid =  #{execid,jdbcType=VARCHAR}
+                         and  t.businesstype =  #{businesstype,jdbcType=VARCHAR}
+                        <if test="side !=null and side !=''">
+                            and  t.SIDE=#{side,jdbcType=VARCHAR}
+                        </if>
+      )
     </select>
      <select id="selectrepoAsset" parameterType="String" resultType="String">
  	 select t.tradeid
