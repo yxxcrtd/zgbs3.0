@@ -6,7 +6,8 @@ $(function() {
         return {
             counterType: $('#counterType').val(),
             counterId : $('#counterId').val(),
-            counterName : $('#counterName').val()
+            counterName : $('#counterName').val(),
+            partyId : $("#partyId").val() ? $("#partyId").val().join(","):''
         };
     };
 
@@ -35,6 +36,7 @@ $(function() {
              {field:'counterTypeStr',width:'25%', title: 'MstTradeOpponent001.counterType',sortField:'counterType'}
             ,{field:'counterId',width:'25%',  title: 'MstTradeOpponent001.counterId'}
             ,{field:'counterName',  title: 'MstTradeOpponent001.counterName'}
+            ,{field:'partyId',  title: 'MstTradeOpponent002.partyId1'}
             // ,{field:'managerId',width:'20%',  title: 'MstTradeOpponent001.managerId'}
             // ,{field:'trusteeId',width:'20%',  title: 'MstTradeOpponent001.trusteeId'}
             // ,{field:'type1Str',width:'20%',  title: 'MstTradeOpponent001.type1',sortField:'type1'}
