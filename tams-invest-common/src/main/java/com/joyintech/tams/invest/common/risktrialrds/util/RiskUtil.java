@@ -108,6 +108,8 @@ public class RiskUtil {
 			put(BussinessDictCodeListRds.分类维度_是否面向非机构投资者.getValue(),"PRD_SALE_PARAM.AGENCY_ORIENTED");
 			put(BussinessDictCodeListRds.分类维度_开放模式.getValue(),"CASH_RULE_TEMP.OPEN_MODE");
 			put(BussinessDictCodeListRds.分类维度_是否现金管理类产品.getValue(),"FIN_PRODUCT_ADD.IS_CASH_MANAGE");
+			put(BussinessDictCodeListRds.分类维度_组合类型.getValue(),"PTL_PORTFOLIO.PORTFOLIO_TYPE");
+
 		}
 	};
 

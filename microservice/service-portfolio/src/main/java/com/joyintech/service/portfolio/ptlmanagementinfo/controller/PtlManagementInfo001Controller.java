@@ -630,4 +630,11 @@ public class PtlManagementInfo001Controller extends BaseService<PtlManagementInf
     public Map<String, Object>  getPtlAuthInfo(@RequestBody Map<String, Object> param){
         return ptlManagementInfo001Service.getPtlAuthInfo(param);
     }
+
+    @Transactional
+    @DTXTransaction
+    @PostMapping("/autoRelate")
+    public void  autoRelate(@RequestBody PtlManagementInfoDto entity){
+        ptlManagementInfo001Service.autoRelate(entity);
+    }
 }

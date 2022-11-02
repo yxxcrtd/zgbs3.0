@@ -1552,4 +1552,15 @@ public class PtlManagementInfo001Service extends BaseService<PtlManagementInfoDt
         returnMap.put("data",ptlManagementInfo001Mapper.getPtlAuthInfo(param));
         return returnMap;
     }
+
+    /**
+     * 自动挂组合包和关联指标
+     * @param entity
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void autoRelate(PtlManagementInfoDto entity) {
+        this.relateAutoBagIndicator(entity);
+        this.relateAutoRuleIndicator(entity);
+    }
+
 }

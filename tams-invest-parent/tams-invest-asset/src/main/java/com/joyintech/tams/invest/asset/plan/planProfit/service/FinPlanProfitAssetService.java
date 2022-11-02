@@ -48,6 +48,7 @@ import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.service.InvestInterfCommService;
 import com.joyintech.tams.invest.interf.trade.fromxp.service.InterfServiceLogService;
+import com.joyintech.tams.position.pojo.BaseMap;
 import com.joyintech.tams.systemtools.util.CommonUtil;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
@@ -237,6 +238,11 @@ public class FinPlanProfitAssetService extends CommonExportService<FinPlanProfit
             restTemplate.postForObject(
                 ServiceApplication.ASSET_SERVICE_NAME + "/FinPlanProfitAsset/" + action, entity,
                 Integer.class);
+
+            BaseMap param = BaseMap.newMap().put("portfolioId",entity.getFinprodMarketId()).put("openType","02") ;
+            restTemplate.postForObject(
+                    ServiceApplication.PORTFOLIO_SERVICE_NAME + "/ptlmanagementinfo/autoRelate", param,
+                    Void.class);
         }
         else {
             action = "update";
@@ -244,6 +250,11 @@ public class FinPlanProfitAssetService extends CommonExportService<FinPlanProfit
             restTemplate.postForObject(
                 ServiceApplication.ASSET_SERVICE_NAME + "/FinPlanProfitAsset/" + action, entity,
                 Integer.class);
+
+            BaseMap param = BaseMap.newMap().put("portfolioId",entity.getFinprodMarketId()).put("openType","02") ;
+            restTemplate.postForObject(
+                    ServiceApplication.PORTFOLIO_SERVICE_NAME + "/ptlmanagementinfo/autoRelate", param,
+                    Void.class);
         }
 
      // 二级法人权限处理
@@ -670,10 +681,10 @@ public class FinPlanProfitAssetService extends CommonExportService<FinPlanProfit
         //add by lpf 20220517 start 委外组合塞PA表用于组合关联指标 start
         PaPtlPortfolio paPtlPortfolio = new PaPtlPortfolio();
         paPtlPortfolio.setPortfolioId(ptlPortfolio.getPortfolioId());
-        paPtlPortfolio.setInvestNature(finProductAdd.getInvestNature());
+        paPtlPortfolio.setInvestNature(dto.getInvestNature());
         // modify by swwan TISHKS-1483 start
-        /*paPtlPortfolio.setOpenType("02");
-        paPtlPortfolio.setRaiseType("2");*/
+        paPtlPortfolio.setOpenType("02");
+        paPtlPortfolio.setRaiseType("2");
         // modify by swwan TISHKS-1483 end
         dto.setPaPtlPortfolio(paPtlPortfolio);
         //add by lpf 20220517 start 委外组合塞PA表用于组合关联指标 end
