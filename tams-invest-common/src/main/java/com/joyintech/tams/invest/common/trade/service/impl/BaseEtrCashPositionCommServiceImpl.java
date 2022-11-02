@@ -258,6 +258,7 @@ public class BaseEtrCashPositionCommServiceImpl extends BaseService implements B
             etrPositionHoldDto.getPtlSecPositionFlows().forEach(item->item.setIsExistNew(finProductTradeDto.getIsExistNew()));
         }
 
+        logger.info("baseEtrCashPositionCommServiceImpl.executeEtrCashPosition -> param:{}", JsonUtils.object2Json(etrPositionHoldDto));
         // 维护入库流水及持仓
         etrCommonCashPositionDealService.持久化流水Dto(etrPositionHoldDto);
         return new CommonResult(CommonResult.SUCCED, "处理完成");
