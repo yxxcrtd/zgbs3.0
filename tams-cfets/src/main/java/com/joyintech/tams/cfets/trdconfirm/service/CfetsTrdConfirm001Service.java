@@ -2357,6 +2357,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
             oldStlPayOrder.setSettleAmt(tradeAmt.negate());
             oldStlPayOrders.add(oldStlPayOrder);
             oldTrdProductDeal.setTradeAmt(tradeAmt.negate());
+            oldTrdProductDeal.setShareAmt(oldTrdProductDeal.getShareAmt().negate());
             oldBaseTradeProductDealDto.setTrdProductDeal(oldTrdProductDeal);
             oldBaseTradeProductDealDto.setStlPayOrdersList(oldStlPayOrders);
             list.add(oldBaseTradeProductDealDto);
