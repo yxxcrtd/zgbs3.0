@@ -146,6 +146,9 @@ public class SppiTest002Controller extends BaseController {
 
             // 从数据库SPPI_查询详细信息
             dto = sppiTest002Service.selectSppiTestDetail(sppiTestId, finprodId);
+            //覆盖框架的设置(page已设置为相应的html,仅是覆盖pageId) for 提交--》驳回--》修改--》再提交 --》再打开审核时，打不开
+            model.addAttribute("realPageId", this.getPageId());
+            model.addAttribute(GlobalConstant.PAGE_ID, VIRTUAL_PAGE_ID);
         }
         else if (GlobalConstant.DETAIL_PAGE_MODEL_NEW.equals(this.getPageModel())) {
             dto.setFinprodId(finprodId);
@@ -162,6 +165,9 @@ public class SppiTest002Controller extends BaseController {
                 dto.setSppiTmpType(BussinessConstant.SPPI_TEMPLATE_TYPE_NOT_BOND);
                 dto.setSppiTmpNo(CacheUtil.getSysParam(BussinessConstant.NOT_BOND_SPPI_USE_TEMPLATE));
             }
+            //覆盖框架的设置(page已设置为相应的html,仅是覆盖pageId) for 提交--》驳回--》修改--》再提交 --》再打开审核时，打不开
+            model.addAttribute("realPageId", this.getPageId());
+            model.addAttribute(GlobalConstant.PAGE_ID, VIRTUAL_PAGE_ID);
         }
 
         sppiTest002Service.genFinprodMarketId(dto);
