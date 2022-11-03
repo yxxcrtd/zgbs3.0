@@ -10,6 +10,7 @@ import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
 import com.joyintech.tams.invest.entrust.common.aop.EntrustRdsCommonAop;
 import com.joyintech.tams.systemtools.dto.PageElementConfigDto;
 import com.joyintech.tams.systemtools.util.PageElementUtil;
+import com.joyintech.workflow.engine.LocalWorkFlowParameter;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -209,7 +210,9 @@ public class EtrPlanAssetC003Controller extends BaseController {
                         param) : IDGenerator.generate();
                 dto.setEntrustId(code);
             }
-            dto.setWorkflowParameter("new|||1|EtrPlanAssetC002|EtrPlanAssetC002_btn_submit|true");
+            dto.setWorkflowParameter(LocalWorkFlowParameter.getOperType()+"|"+LocalWorkFlowParameter.getUsers()+"|"+
+                    LocalWorkFlowParameter.getRoles()+"|"+LocalWorkFlowParameter.getSubmit()+"|"+LocalWorkFlowParameter.getPageId()+"|"+
+                    LocalWorkFlowParameter.getElementId()+"|"+ LocalWorkFlowParameter.getTodoList());
         }
         // ----------add by yushilong 20200721 预占功能 start----------
         if (StringUtil.equals(BussinessConstant.SUBMIT, allDto.getOperateType())) {

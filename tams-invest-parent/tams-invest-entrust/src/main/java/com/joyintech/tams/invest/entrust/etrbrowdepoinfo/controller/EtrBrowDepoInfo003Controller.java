@@ -28,6 +28,7 @@ import com.joyintech.tams.systemtools.util.PageElementUtil;
 import com.joyintech.tools.util.ValidationUtil;
 import com.joyintech.tools.util.ValidationUtil.ErrorMessage;
 import com.joyintech.tools.util.ValidationUtil.ValidResult;
+import com.joyintech.workflow.engine.LocalWorkFlowParameter;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 
@@ -197,7 +198,9 @@ public class EtrBrowDepoInfo003Controller extends BaseController {
             }
             dto.getBussEtrInvestPersonInfoDto().setInvManagerId(dto.getCreateUser());
             dto.getBussEtrInvestPersonInfoDto().setRoom(dto.getCreateDept());
-            dto.setWorkflowParameter("new|||1|EtrBrowDepoInfo003|EtrBrowDepoInfo003_btn_submit|true");
+            dto.setWorkflowParameter(LocalWorkFlowParameter.getOperType()+"|"+LocalWorkFlowParameter.getUsers()+"|"+
+                    LocalWorkFlowParameter.getRoles()+"|"+LocalWorkFlowParameter.getSubmit()+"|"+LocalWorkFlowParameter.getPageId()+"|"+
+                    LocalWorkFlowParameter.getElementId()+"|"+ LocalWorkFlowParameter.getTodoList());
         }
         // ----------add by yushilong 20200721 预占功能 start----------
         if (StringUtil.equals(BussinessConstant.SUBMIT, allDto.getOperateType())) {
