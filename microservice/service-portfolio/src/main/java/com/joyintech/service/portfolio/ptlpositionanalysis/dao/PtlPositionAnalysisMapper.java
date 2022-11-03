@@ -74,6 +74,15 @@ public interface PtlPositionAnalysisMapper {
      * @since 1.0
      */
     List<SelectOptionDto> getPortFolioInfo(Map<String, Object> map);
+
+    /**
+     * 组合的联想下拉框事件
+     * @param map 查询参数
+     * @return 查询结果
+     * @see
+     * @since 1.0
+     */
+    List<SelectOptionDto> getPortFolioInfoWW(Map<String, Object> map);
     /**
      * 查询界面导出事件
      *

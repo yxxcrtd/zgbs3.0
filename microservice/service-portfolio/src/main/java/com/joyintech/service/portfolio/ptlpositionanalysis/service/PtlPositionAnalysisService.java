@@ -292,6 +292,21 @@ public class PtlPositionAnalysisService extends BaseService<PtlPositionAnalysis0
         return ptlPositionAnalysisMapper.getPortFolioInfo(map);
     }
 
+    /**
+     * 组合的联想下拉框事件
+     *
+     * @param map 输入参数
+     * @return 结果
+     * @see
+     * @since 1.0
+     */
+    public List<SelectOptionDto> getPortFolioInfoWW(Map<String, Object> map) {
+        // add by meifaxin 组合代码查询条件下拉框，重庆期望只查询产品组合，不查委外组合 start
+        map.put("portfolioType", DictCodeListExt1.组合类型_委外组合.getValue());
+        // add by meifaxin 组合代码查询条件下拉框，重庆期望只查询产品组合，不查委外组合 end
+        return ptlPositionAnalysisMapper.getPortFolioInfoWW(map);
+    }
+
     
     private void setParaForExport(Map<String, Object> pageParam) {
         if (StringUtil.isNotEmpty(pageParam.get("portfolioId"))) {

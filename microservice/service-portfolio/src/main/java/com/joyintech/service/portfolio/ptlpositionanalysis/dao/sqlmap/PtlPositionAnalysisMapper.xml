@@ -1714,6 +1714,19 @@
         and PORTFOLIO_TYPE != #{portfolioType}
         <!-- add by meifaxin  2021-9-26  不查委外组合 end -->
 	</select>
+
+    <select id="getPortFolioInfoWW" resultType="com.joyintech.framework.select.SelectOptionDto">
+        SELECT PORTFOLIO_ID id, PORTFOLIO_NAME text
+        FROM PTL_PORTFOLIO
+        WHERE 1=1
+        <if test="search != null and search != ''">
+            AND (PORTFOLIO_ID LIKE CONCAT('%',CONCAT(#{search},'%'))
+            OR PORTFOLIO_NAME LIKE CONCAT('%',CONCAT(#{search},'%')))
+        </if>
+        <!-- add by meifaxin  2021-9-26 不查委外组合 start -->
+        and PORTFOLIO_TYPE = #{portfolioType}
+        <!-- add by meifaxin  2021-9-26  不查委外组合 end -->
+    </select>
 	
 	<!-- 导出数据 -->
 	<select id="selectForExport" resultType="com.joyintech.service.portfolio.ptlpositionanalysis.dto.PtlPositionAnalysis001Dto">

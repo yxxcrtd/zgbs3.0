@@ -194,6 +194,20 @@ public class PtlPositionAnalysis001Service extends CommonExportService<PtlPositi
     }
 
     /**
+     * 资产代码的联想下拉框事件
+     *
+     * @param map 输入的参数
+     * @return 调用微服务
+     * @see
+     * @since 1.0
+     */
+    public List<SelectOptionDto> getPortFolioInfoWW(Map<String,Object> map) {
+        return restTemplate.postForList(ServiceApplication.PORTFOLIO_SERVICE_NAME
+                        + "/PtlPositionAnalysis/getPortFolioInfoWW" , map,
+                SelectOptionDto.class);
+    }
+
+    /**
      * 剩余金额的信息
      * @param map
      * @return

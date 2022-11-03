@@ -25,9 +25,9 @@ $(function () {
         searchOnInit: false,
         isMulti: true,
         cols: [[
-            {field:'ptlId', title: '资管计划名称',visible:false, rowspan: 2,sortable: false}//组合名称
-            ,{field:'valDate', title: '查询日期',visible:true,sortable: false,type: 'date'}//查询日期
-            ,{field:'portfolioName', title: '资管计划名称',width:200, rowspan: 2,sortable: false}//组合名称
+            {field:'ptlId', title: '资管计划id',visible:false,sortable: false}//组合名称
+            // ,{field:'valDate', title: '查询日期',visible:true,rowspan: 2,sortable: false,type: 'date'}//查询日期
+            ,{field:'portfolioName', title: '资管计划名称',width:300, rowspan: 2,sortable: false}//组合名称
             ,{title: '总资产', colspan: 2,align:'center',sortable: false}//总资产
             ,{title: '净资产', colspan: 2,align:'center',sortable: false}//总资产
             ,{title: '单位净值', colspan: 2,align:'center',sortable: false}//总资产

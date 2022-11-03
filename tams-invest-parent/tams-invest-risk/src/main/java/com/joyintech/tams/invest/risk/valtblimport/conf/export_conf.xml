@@ -3,18 +3,17 @@
     <Worksheet javaBean="com.joyintech.tams.invest.risk.valtblimport.dto.RskValtblAssetSumDto" dataStart="2">
         <Row>
             <Cell order="1" name="资管计划名称">portfolioName</Cell>
-            <Cell order="2" name="查询日期">valDate</Cell>
-            <Cell order="3" name="成本">totalAssestCost</Cell>
-            <Cell order="4" name="市值">totalAssestValue</Cell>
-            <Cell order="5" name="成本">netAssestCost</Cell>
-            <Cell order="6" name="市值">netAssestValue</Cell>
-            <Cell order="7" name="成本">unitNetWorthCost</Cell>
-            <Cell order="8" name="市值">unitNetWorthValue</Cell>
-            <Cell order="9" name="较上一日">comparedWithDay</Cell>
-            <Cell order="10" name="较上月">comparedWithMonth</Cell>
-            <Cell order="11" name="较年初">comparedWithYear</Cell>
-            <Cell order="12" name="偏离金额">deviatingAmount</Cell>
-            <Cell order="13" name="偏离度">degreeOfDeviate</Cell>
+            <Cell order="2" name="成本">totalAssestCost</Cell>
+            <Cell order="3" name="市值">totalAssestValue</Cell>
+            <Cell order="4" name="成本">netAssestCost</Cell>
+            <Cell order="5" name="市值">netAssestValue</Cell>
+            <Cell order="6" name="成本">unitNetWorthCost</Cell>
+            <Cell order="7" name="市值">unitNetWorthValue</Cell>
+            <Cell order="8" name="较上一日">comparedWithDay</Cell>
+            <Cell order="9" name="较上月">comparedWithMonth</Cell>
+            <Cell order="10" name="较年初">comparedWithYear</Cell>
+            <Cell order="11" name="偏离金额">deviatingAmount</Cell>
+            <Cell order="12" name="偏离度">degreeOfDeviate</Cell>
         </Row>
     </Worksheet>
 </Workbook>
