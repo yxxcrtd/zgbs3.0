@@ -2084,10 +2084,15 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 // 组装数据-交易数据
                 List<CfetsTrdFirstBidFirmInvestTradeDto> tradeDtos = this.prepareWflBidEntity(entity);
                 // 数据入库-交易数据
+                // 是否交易所
+                boolean isJys = !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                        && !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue());
+                // 是否一级缴款
+                boolean isPayType02 = StringUtil.equals(entity.getPayType(), BussinessDictCodeList.缴款方式_一级缴款.getValue());
                 tradeDtos.forEach(tradeDto -> {
                     this.doInsertBidMethod(tradeDto);
                     // 老头寸处理
-                    this.dealOldPosition(tradeDto, false, false, false);
+                    this.dealOldPosition(tradeDto, false, false, false, isJys, isPayType02);
                 });
             }
             // 发送头寸
@@ -2834,12 +2839,18 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 tradeDtos.forEach(this::deleteTradeData);
                 // 组装数据-交易数据
                 tradeDtos = this.prepareWflBidEntity(entity);
+                // 是否交易所
+                boolean isJys = !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                        && !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue());
+                // 是否一级缴款
+                boolean isPayType02 = StringUtil.equals(entity.getPayType(), BussinessDictCodeList.缴款方式_一级缴款.getValue());
+                // 是否交易所d
                 // 数据入库-交易数据
                 tradeDtos.forEach(tradeDto -> {
                     // 交易数据入库
                     this.doInsertBidMethod(tradeDto);
                     // 头寸入库
-                    this.dealOldPosition(tradeDto, false, false, false);
+                    this.dealOldPosition(tradeDto, false, false, false, isJys, isPayType02);
                 });
             }
             String confirmOk = RequestUtil.getParam("confirmOk");
@@ -2934,6 +2945,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 // 是否交易所
                 boolean isJys = !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
                         && !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue());
+                // 是否一级缴款
+                boolean isPayType02 = StringUtil.equals(entity.getPayType(), BussinessDictCodeList.缴款方式_一级缴款.getValue());
                 tradeDtos.forEach(tradeDto -> {
                     this.doCompleteBidMethod(entity, tradeDto, type);
                     // 更新指令完成进度
@@ -2943,7 +2956,8 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                     }
                     if (OperationType.REVOKE.equals(type) || OperationType.DELETE.equals(type) || isJys) {
                         // 老头寸处理
-                        this.dealOldPosition(tradeDto, (OperationType.REVOKE.equals(type) || OperationType.DELETE.equals(type)), false, isJys);
+                        this.dealOldPosition(tradeDto, (OperationType.REVOKE.equals(type) || OperationType.DELETE.equals(type)),
+                                false, true, isJys, isPayType02);
                     }
                 });
             }
@@ -3195,12 +3209,17 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             }
             if (StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), entity.getBiddingMethod())) {
                 List<CfetsTrdFirstBidFirmInvestTradeDto> tradeDtos = this.prepareBidEntity(entity, OperationType.REVOKE);
+                // 是否交易所
+                boolean isJys = !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                        && !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue());
+                // 是否一级缴款
+                boolean isPayType02 = StringUtil.equals(entity.getPayType(), BussinessDictCodeList.缴款方式_一级缴款.getValue());
                 tradeDtos.forEach(tradeDto -> {
                     this.doCompleteBidMethod(entity, tradeDto, OperationType.REVOKE);
                     // 更新指令完成进度
                     List<String> finishEtrListTemp = this.baseTradeCommExecute(tradeDto, OperationType.REVOKE);
                     // 老头寸处理
-                    this.dealOldPosition(tradeDto, true, false, false);
+                    this.dealOldPosition(tradeDto, true, false, true, isJys, isPayType02);
                 });
             }
             //处理指令执行进度
@@ -3225,11 +3244,16 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         if (cfetsTrdBondFirstSub002Mapper.selectBidOrders(entity.getBidId()) == 0
                 && StringUtil.equals(DictCodeListExt4.投标方式_分销买入.getValue(), entity.getBiddingMethod())) {
             List<CfetsTrdFirstBidFirmInvestTradeDto> tradeDtos = this.prepareBidEntity(entity, null);
+            // 是否交易所
+            boolean isJys = !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_银行间.getValue())
+                    && !StringUtil.equals(entity.getTradeMarket(), BussinessDictCodeList.交易场所_商业银行柜台市场.getValue());
+            // 是否一级缴款
+            boolean isPayType02 = StringUtil.equals(entity.getPayType(), BussinessDictCodeList.缴款方式_一级缴款.getValue());
             tradeDtos.forEach(tradeDto -> {
                 // 删除流程中数据
                 this.deleteTradeData(tradeDto);
                 // 老头寸处理
-                this.dealOldPosition(tradeDto, false, true, false);
+                this.dealOldPosition(tradeDto, false, true, false, isJys, isPayType02);
             });
         }
     }
@@ -4084,8 +4108,7 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         req.setCdate(entity.getTradeDate());
         req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         req.setPtlList(ptlList);
-        Map<String, Object> param = positionRequestHandle.send(req);
-        ThreadLocalUtil.setLocalCache(param);
+        positionRequestHandle.send(req);
     }
 
     /**
@@ -4175,25 +4198,29 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
         req.setCdate(entity.getTradeDate());
         req.setCcy(DictCodeList.币种_人民币_CNY.getValue());
         req.setPtlList(ptlList);
-        Map<String, Object> param = positionRequestHandle.send(req);
-        ThreadLocalUtil.setLocalCache(param);
+        positionRequestHandle.send(req);
     }
 
     /**
      * 老头存处理 系统参数是否处理旧头寸标识(IS_HANDLE_OLDPOS_FLAG)为Y时处理
      *
-     * @param entity        页面元素
-     * @param isRevoke      是否撤销
-     * @param isBack        是否退回
-     * @param isJYSComplete 是否是交易所(交易所债没有交收,后续无法更新头寸状态,此处用于交易所流程结束时更新持仓状态)
+     * @param entity      页面元素
+     * @param isRevoke    是否撤销
+     * @param isBack      是否退回
+     * @param isComplete  是否是审批生效
+     * @param isJys       是否是交易所
+     * @param isPayType02 是否是一级缴款
      * @author jiangpeng
      * @date 2022/4/28 10:37
      */
-    public void dealOldPosition(CfetsTrdFirstBidFirmInvestTradeDto entity, boolean isRevoke, boolean isBack, boolean isJYSComplete) {
+    public void dealOldPosition(CfetsTrdFirstBidFirmInvestTradeDto entity, boolean isRevoke, boolean isBack, boolean isComplete,
+                                boolean isJys, boolean isPayType02) {
         // 系统参数
         if (!StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
             return;
         }
+        logger.info("CfetsTrdFirstBidFirm002Service.dealOldPosition param:{},isRevoke:{},isBack:{},isComplete:{},isJys:{},isPayType02:{}",
+                JsonUtils.object2Json(entity), isRevoke, isBack, isComplete, isJys, isPayType02);
         // 交易数据
         if (CollectionUtils.isEmpty(entity.getWflTrdProductDeals())
                 && CollectionUtils.isEmpty(entity.getTrdProductDeals())
@@ -4249,9 +4276,9 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             BaseTradeProductDealDto baseTradeProductDealDto = new BaseTradeProductDealDto();
             baseTradeProductDealDto.setEntrustId(deal.getEntrustId());
             baseTradeProductDealDto.setStage("02");
-            if (isJYSComplete && isRevoke) {
+            if (isJys && isComplete && isRevoke) {//交易所审批生效撤销 没有交收环节 直接撤销有效
                 baseTradeProductDealDto.setStage("04");
-            } else if (isJYSComplete) {
+            } else if (isJys && isComplete && !isBack) {//交易所审批生效 没有交收环节 直接持仓类型变为有效
                 finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_有效.getValue());
                 baseTradeProductDealDto.setStage("03");
             }
@@ -4291,13 +4318,13 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if(CollectionUtils.isEmpty(stlPayOrders)) {
+            if (CollectionUtils.isEmpty(stlPayOrders)) {
                 stlPayOrders = new ArrayList<>();
                 StlPayOrdersDto stlPayOrder = new StlPayOrdersDto();
 //            FinProduct finProduct = finProductMapper.selectByPrimaryKey(entity.getFinprodId());
                 String acctId;
                 // 交易所 一级分销 付款账户为 券商资金账户 其他为托管户
-                if (isJYSComplete) {
+                if (isJys && !isPayType02) {
                     // 根据证券账户查询资金账户
                     acctId = cfetsTrdFirstBidFirm002Mapper.selectAcctNoByEntrustDetail(deal.getEntrustId(), deal.getPortfolioId());
                 } else {
@@ -4307,13 +4334,13 @@ public class CfetsTrdFirstBidFirm002Service extends BaseService<CfetsTrdFirstBid
                 stlPayOrder.setOrderId(deal.getTradeId());
                 stlPayOrder.setCcy(deal.getCcy());
                 stlPayOrder.setSettleAmt(deal.getTradeAmt());
-                if (isBack) {
-                    stlPayOrder.setSettleAmt(stlPayOrder.getSettleAmt().negate());
-                }
                 stlPayOrder.setPayType(DictCodeListExt1.平安划款类型_托管划款.getValue());
                 stlPayOrder.setPs(DictCodeListExt1.收支方向_支出.getValue());
                 stlPayOrder.setSettleDate(deal.getSettleDate());
                 stlPayOrders.add(stlPayOrder);
+            }
+            if (isBack) {
+                stlPayOrders.forEach(item -> item.setSettleAmt(item.getSettleAmt().negate()));
             }
             baseTradeProductDealDto.setStlPayOrdersList(stlPayOrders);
             finProductTradeDto.setBaseTradeProductDealDtos(Collections.singletonList(baseTradeProductDealDto));

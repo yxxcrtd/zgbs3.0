@@ -132,7 +132,7 @@ $(function () {
                     if (row.paBussType === '180' || row.paBussType === '202' || row.paBussType === '151' || row.paBussType === '09'
                             || row.paBussType === '10' || row.paBussType === '19' || row.paBussType === '20') {
                         return "<a onclick=\"showDetailTrdPage('" + row.paBussType + "','" + row.bizCode + "','"
-                            + row.settleDate + "','" + row.tradeMarket + "')\" + style='cursor: pointer;'>" + row.bizCode + "</a>";
+                            + row.tradeDate + "','" + row.tradeMarket + "')\" + style='cursor: pointer;'>" + row.bizCode + "</a>";
                     }
                     return "<a class='pro-link' style='cursor: pointer;' " +
                         "href='javascript:openOperateWindow(\"" + PAGE_STATUS_05 + "\",\"" + row.paBussType + "\",\"" + row.portfolioId + "\",\""

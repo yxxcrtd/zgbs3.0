@@ -507,7 +507,6 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
     /**
      * CSTP成交回报-自动匹配
      */
-    @Transactional(rollbackFor = Exception.class)
     @DTXTransaction
     public AjaxResult cstpAutoMatchMethod(InterfTradSecdeal interfTradSecdeal,
                                           InterfOpicsTradRepo interfOpicsTradRepo, InterfCstpBjfxjg interfCstpBjfxjg, InterfCstpTrade iCstpTrade) {

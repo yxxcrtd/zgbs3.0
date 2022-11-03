@@ -179,7 +179,7 @@ public class EtrTradeCommonervice extends BaseService {
                 }
             }
             //持仓可用
-            flowType = StringUtil.equals(FLOW_TYPE_TRD, flowType) ? "04" : "02";//01 指令现金 02 指令持仓 03 交易现金 04 交易持仓
+            flowType = StringUtil.equals(FLOW_TYPE_TRD, requestDto.getFlowType()) ? "04" : "02";//01 指令现金 02 指令持仓 03 交易现金 04 交易持仓
             //筛选出有资金账户的组合
             List<PositionCashSecDto> secList = new ArrayList<>();
             for (PositionCashSecDto dto : list) {
@@ -237,7 +237,7 @@ public class EtrTradeCommonervice extends BaseService {
                 });
                 BigDecimal repoNum = queryPosition(secList2, "04", ""); //质押数量
                 if (repoNum != null) { //质押数量
-                    canSec = ArithmeticUtil.subtract(canSec,repoNum);
+//                    canSec = ArithmeticUtil.subtract(canSec,repoNum);
                 }
                 // JJTZJY-107 指令管理-非交易业务指令-持仓tab页 持仓数量与可卖数量展示存在错误 end
 

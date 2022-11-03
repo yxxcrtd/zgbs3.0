@@ -1527,7 +1527,7 @@ public class StlDataDealSzdJsmxProcessService {
 				settleTransData.setDeliveryResult(stlDataDealProcessCommonService.getDeliveryResult(szdJsmx.getJgdm()));
 				// 业务场景分类和交易方向
 				if (StringUtil.lowerCase(stlDownDataDealOperatorDto.getDataFile()).startsWith(StlDataDealProcessConstant.SZD_JSMX_02) && (StringUtil.equals(StlDataDealProcessConstant.YWLX_002, szdJsmx.getYwlx()) || 
-						StringUtil.equals(StlDataDealProcessConstant.YWLX_034, szdJsmx.getYwlx()))) {
+						StringUtil.equals(StlDataDealProcessConstant.YWLX_034, szdJsmx.getYwlx()) || StringUtil.equals(StlDataDealProcessConstant.YWLX_104, szdJsmx.getYwlx()))) {
 					if (StringUtil.equals(StlDataDealProcessConstant.YWLX_002, szdJsmx.getYwlx()) && StringUtil.equals(StlDataDealProcessConstant.MMBS_B, szdJsmx.getMmbz())) {
 						settleTransData.setPs(DictCodeList.交易方向_买入.getValue());
 						settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_基金_封闭式基金_买入.getValue());
@@ -1543,6 +1543,14 @@ public class StlDataDealSzdJsmxProcessService {
 					if (StringUtil.equals(StlDataDealProcessConstant.YWLX_034, szdJsmx.getYwlx()) && StringUtil.equals(StlDataDealProcessConstant.MMBS_S, szdJsmx.getMmbz())) {
 						settleTransData.setPs(DictCodeList.交易方向_卖出.getValue());
 						settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_基金_分级LOF_卖出.getValue());
+					}
+					if (StringUtil.equals(StlDataDealProcessConstant.YWLX_104, szdJsmx.getYwlx()) && StringUtil.equals(StlDataDealProcessConstant.MMBS_B, szdJsmx.getMmbz())) {
+						settleTransData.setPs(DictCodeList.交易方向_买入.getValue());
+						settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_基金_ETF_买入.getValue());
+					}
+					if (StringUtil.equals(StlDataDealProcessConstant.YWLX_104, szdJsmx.getYwlx()) && StringUtil.equals(StlDataDealProcessConstant.MMBS_S, szdJsmx.getMmbz())) {
+						settleTransData.setPs(DictCodeList.交易方向_卖出.getValue());
+						settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_基金_ETF_卖出.getValue());
 					}
 				}
 				// 大宗ETF基金交易

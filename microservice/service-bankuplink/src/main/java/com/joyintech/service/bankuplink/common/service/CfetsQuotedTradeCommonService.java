@@ -624,8 +624,7 @@ public class CfetsQuotedTradeCommonService{
         // 本方交易员查询,交易员代码
         String traderId = cstpMapper.selectBuytrader(iCstpTrade.getOurtraderchinesename(), iCstpTrade.getOurinstitutioncode());
 
-        InterfOpicsTradRepo interfOpicsTradRepo = cstpMapper.selectTradRepo(execid, getSysDate(),
-                BusinessTypeUtil.BUSINESSTYPE_REPO);
+        InterfOpicsTradRepo interfOpicsTradRepo = cstpMapper.selectTradRepo(execid, iCstpTrade.getSide(),getSysDate(),BusinessTypeUtil.BUSINESSTYPE_REPO);
         interfOpicsTradRepo.setDealno(dealno);
         interfOpicsTradRepo.setBuycost(cstpMapper.selectPortfolioIdByQuoteId(iCstpTrade.getQuoteid(),BusinessTypeUtil.BUSINESSTYPE_REPO));
         interfOpicsTradRepo.setProdtype(ProdTypeUtil.PRODTYPE_PLEDGE);

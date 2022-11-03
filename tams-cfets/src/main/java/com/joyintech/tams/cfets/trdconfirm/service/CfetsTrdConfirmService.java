@@ -397,11 +397,9 @@ public class CfetsTrdConfirmService extends BaseService {
     /**
      * 交易执行-成交确认
      */
-    @Transactional(rollbackFor = Exception.class)
     public AjaxResult trdConfirmSaveMethod(CfetsTrdConfirmRegInfoListResponse dto) {
         List<CfetsTrdConfirmRegInfoListResponse> selectedItem = dto.getSelectedItem();
         List<ValidMessage> messages = new ArrayList<>();
-        // 头寸信息记录 用于报错回滚
         String totleTradeId = null;
         try {
             if (StringUtil.isNotEmpty(selectedItem)) {
@@ -568,7 +566,7 @@ public class CfetsTrdConfirmService extends BaseService {
                 result.getTrdProductDeals().get(i).setFpriceAmt(
                         ArithmeticUtil.divide(
                                 ArithmeticUtil.multiply(interfCstpTrade.getSettlcurramt(), shareAmtTemp), shareAmt, 2));
-                result.getTrdProductDeals().get(i).setTradeAmt(result.getTrdProductDeals().get(i).getCpriceAmt());
+                result.getTrdProductDeals().get(i).setTradeAmt(result.getTrdProductDeals().get(i).getFpriceAmt());
                 // 利息总额 = 结算金额  - 交易金额
                 result.getTrdProductDeals().get(i).setIntAmt(
                         ArithmeticUtil.subtract(result.getTrdProductDeals().get(i).getFpriceAmt(), result.getTrdProductDeals().get(i).getCpriceAmt()));
@@ -2633,7 +2631,6 @@ public class CfetsTrdConfirmService extends BaseService {
      * @return AjaxResult
      */
     public AjaxResult trdConfirmSaveCheckMethod(CfetsTrdConfirmRegInfoListResponse dto) {
-        List<ValidMessage> messages = new ArrayList<>();
         List<CfetsTrdConfirmRegInfoListResponse> selectedItem = dto.getSelectedItem();
         AjaxResult errorRs = new AjaxResult();
         if (StringUtil.isEmptyList(selectedItem)) {
@@ -3548,7 +3545,6 @@ public class CfetsTrdConfirmService extends BaseService {
     /**
      * CSTP成交回报-手工匹配
      */
-    @Transactional(rollbackFor = Exception.class)
     public AjaxResult cstpManualMatchMethod(CfetsTrdConfirmManualMatchInfoRequest manualMatchDto) {
         //判断基础要素是否一致
         CfetsTrdConfirmRegInfoListResponse regInfo = manualMatchDto.getSelectedCfetsTrdConfirmRegInfoList().get(0);

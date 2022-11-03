@@ -21,7 +21,6 @@ import com.joyintech.tams.business.common.dto.CfetsBondPositionRequest;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.util.BigDecimalUtil;
-import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.etr.bond.dto.*;
 import com.joyintech.tams.cfets.etr.bond.service.CfetsEtribBondInfo003Service;
 import com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoPosPortfolioCashRequest;
@@ -221,6 +220,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
 
 
     @DTXTransaction(transactionListener = "positionRollService")
+    @Transactional(rollbackFor = Exception.class)
     public void doCompleteMethod(CfetsTrdBondInvestTradeDto entity, OperationType operationType) {
         List<String> finishEtrList=new ArrayList<>();
         //买入含权债时，自动创建交易对手 add by wangwei5 2020-03-23 Start
@@ -448,7 +448,8 @@ public class CfetsTrdConfirm001Service extends BaseService {
         }
     }
     @DTXTransaction(transactionListener = "positionRollService")
-    public List<Map<String, Object>> doCompleteRepoMethod(CfetsTrdRepoTrade003Dto entity, OperationType operationType, boolean isTrdConfirm) {
+    @Transactional(rollbackFor = Exception.class)
+    public void doCompleteRepoMethod(CfetsTrdRepoTrade003Dto entity, OperationType operationType, boolean isTrdConfirm) {
         List<String> finishEtrList = new ArrayList<>();
         TrdFinProductDealTotal trdFinProductDealTotal = new TrdFinProductDealTotal();
         BeanUtil.copyPropertiesIgnoreNull(trdFinProductDealTotal, entity);
@@ -582,7 +583,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
                 cfetsTrdConfirmMapper.insertTrdQutoMatchInfo(entity.getCfetsTrdConfirmMatchDto());
             } else {
                 //根据登记编号查询下行成交匹配表
-                Map<String, Object> param = new HashMap<String, Object>();
+                Map<String, Object> param = new HashMap<>();
                 param.put("preTradeId", entity.getCfetsTrdConfirmMatchDto().getPreTradeId());
                 boolean flag = cfetsTrdConfirmMapper.isExistMatchInfo(param);
                 if (flag) {
@@ -627,17 +628,14 @@ public class CfetsTrdConfirm001Service extends BaseService {
         oprHisReq.setBusiDes(entity.getRemark());
         joyinbusinessCommonService.updateCfetsOprHis(oprHisReq);
 
-        // 头寸信息记录 用于报错回滚
-        List<Map<String, Object>> mapList = new ArrayList<>();
         //发送头寸
-        mapList.add(this.sendRepoPositionMethod(entity));
+        this.sendRepoPositionMethod(entity);
         //若指令完成需要发送指令完成头寸
         if (!StringUtil.isEmptyList(finishEtrList)) {
             for (String item : finishEtrList) {
-                mapList.add(closeDelegatePositionMethod(item, entity.getPs(), "repo"));
+                closeDelegatePositionMethod(item, entity.getPs(), "repo");
             }
         }
-        return mapList;
     }
 
     /**
@@ -649,6 +647,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
      * @date 2022/5/6 16:26
      */
     @DTXTransaction(transactionListener = "positionRollService")
+    @Transactional(rollbackFor = Exception.class)
     public void doCompleteBidMethod(CfetsTrdFirstBondInvestTradeDto entity, OperationType operationType, String genType) {
         logger.info("一级申购成交确认处理,入参:" + JsonUtils.object2Json(entity));
         List<String> finishEtrList = new ArrayList<>();
@@ -1454,7 +1453,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
      * @author jiangpeng
      * @date 2022/6/11 10:46
      */
-    public Map<String, Object> closeDelegatePositionMethod(String entrustId, String ps, String type) {
+    public void closeDelegatePositionMethod(String entrustId, String ps, String type) {
         CfetsEtrIbClosePositionRequest req = new CfetsEtrIbClosePositionRequest();
         List<CfetsEtrIbClosePosEtrRequest> etrList = new ArrayList<>();
         CfetsEtrIbClosePosEtrRequest closeItem = new CfetsEtrIbClosePosEtrRequest();
@@ -1477,7 +1476,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
         req.setUserId(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
         req.setTotalTradeId(IDGenerator.generate());
         req.setModelType(DictCodeListExt1.子系统代码_委托.getValue());
-        return positionRequestHandle.batchClose(req);
+        positionRequestHandle.batchClose(req);
     }
 
     /**
@@ -1859,7 +1858,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
         req.setbTotalTradeId(entity.getRegIbuId());
         positionRequestHandle.send(req);
     }
-    private Map<String, Object> sendRepoPositionMethod(CfetsTrdRepoTrade003Dto entity){
+    private void sendRepoPositionMethod(CfetsTrdRepoTrade003Dto entity){
         List<CfetsEtrIbRepoPosPortfolioCashRequest> ptlCashList = new ArrayList<>();
         List<CfetsEtrIbRepoPosPortfolioSecRequest> ptlSecList = new ArrayList<>();
         List<PledgeBondInfoDto> pledgeBondList=new ArrayList<>();
@@ -1937,9 +1936,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
         req.setbTotalTradeId(entity.getRegIbuId());
         req.setPtlCashList(ptlCashList);
         req.setPtlSecList(ptlSecList);
-        Map<String, Object> param = positionRequestHandle.send(req);
-        ThreadLocalUtil.setLocalCache(param);
-        return param;
+        positionRequestHandle.send(req);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -2282,6 +2279,9 @@ public class CfetsTrdConfirm001Service extends BaseService {
      *
      */
     private void oldPositionDeal(CfetsTrdBondInvestTradeDto dto) {
+        if (!StringUtil.equals(DictCodeList.是否_是.getValue(), CacheUtil.getSysParam(BussinessConstant.IS_HANDLE_OLDPOS_FLAG))) {
+            return;
+        }
         // 获取划款指令
         Map<String, BussTrdTransferOrderDto> map = dto.getBussTrdTransferOrder().stream()
                 .collect(Collectors.toMap(BussTrdTransferOrderDto::getTradeId, orderDto -> orderDto));
@@ -2354,6 +2354,7 @@ public class CfetsTrdConfirm001Service extends BaseService {
             oldStlPayOrder.setSettleAmt(tradeAmt.negate());
             oldStlPayOrders.add(oldStlPayOrder);
             oldTrdProductDeal.setTradeAmt(tradeAmt.negate());
+            oldTrdProductDeal.setShareAmt(oldTrdProductDeal.getShareAmt().negate());
             oldBaseTradeProductDealDto.setTrdProductDeal(oldTrdProductDeal);
             oldBaseTradeProductDealDto.setStlPayOrdersList(oldStlPayOrders);
             list.add(oldBaseTradeProductDealDto);

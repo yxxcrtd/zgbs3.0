@@ -9,6 +9,38 @@ function showFeeDetail(secAcctId, ptlId, calcStartDate, calcEndDate, feeType, co
 		"60%", "70%", {pageModel:PAGE_MODEL_REFERENCE, secAcctId : secAcctId, ptlId : ptlId, 
 					   calcStartDate : calcStartDate, calcEndDate : calcEndDate, feeType: feeType, confirmFlag: confirmFlag, tradeId :$('#InvestFeePay002_hidden_tradeId').val(),org:$('#InvestFeePay002_regTrustOrg').val()})
 }
+/**
+ * 画星星
+ */
+var star = function() {
+	// 加红星星
+	// 查找label
+	var _findPrevLabel = function(element, level) {
+		var $el = element.prev();
+		if (!$el.is('label') && level > 0) {
+			$el = $el.find('label');
+			if ($el.length === 0) {
+				return _findPrevLabel(element.parent(), level - 1);
+			}
+		}
+		return $el;
+	};
+
+	// 非查看模式
+	if (typeof pageModel !== 'undefined'
+		&& (pageModel === PAGE_MODEL_EDIT || pageModel === PAGE_MODEL_NEW)) {
+		$('.must').each(function() {
+			$(this).remove();
+		})
+		$('*[required]').each(function() {
+			var $el = $(this);
+			var $target = _findPrevLabel($el, 3);
+			if ($target.find('> .must').length === 0) {
+				$target.append($('<i class="must">*</i>'));
+			}
+		});
+	}
+}
 // 定义函数作用域(立即执行),防止全局变量污染
 $(function() {
 	var calculateFlag = false;//是否是按计算按钮，刷新组合信息（默认为否）
@@ -149,7 +181,12 @@ $(function() {
 			$('#InvestFeePay002_hidden_feeType').val(feeType);
 			$('#InvestFeePay002_hidden_feeName').val(feeName);
 			//费用类型联动登记托管机构
-			if (feeType == '06'||feeType == '07'||feeType == '08'){
+			$('#InvestFeePay002_regTrustOrg').attr("required",true);
+			if (feeType == '06'){
+				$('#InvestFeePay002_regTrustOrg').val('').trigger('change');
+				$("#InvestFeePay002_regTrustOrg").prop("disabled", true);
+				$('#InvestFeePay002_regTrustOrg').attr("required",false);
+			} else if (feeType == '07'||feeType == '08'){
 				$("#InvestFeePay002_regTrustOrg").prop("disabled", false);
 			}else{
 				$('#InvestFeePay002_regTrustOrg').val('03').trigger('change');
@@ -170,6 +207,7 @@ $(function() {
 			$('#InvestFeePay002_hidden_feeType').val('');
 		}
 		payTradeAmtChangeAction();
+		star();
 	};
 	/**
 	 * 结算服务费联动带出默认费用（add by wm 增加交易手续费的查询）
@@ -181,7 +219,7 @@ $(function() {
 		var cdate = $('#InvestFeePay002_positionEndDate').val();
 		var startDate = $('#InvestFeePay002_positionStartDate').val();
 		var confirmFlag = $('#InvestFeePay002_hidden_operateType').val()
-		if(((feeType=='06'||feeType=='07')&&org||(feeType=='08'||feeType=='14'||feeType=='16'||feeType=='17')&&secAcctId)&&startDate&&cdate){
+		if((feeType=='06'|| (feeType=='07' && org)||(feeType=='08'||feeType=='14'||feeType=='16'||feeType=='17')&&secAcctId)&&startDate&&cdate){
 			Joyin.ajax(JoyinUtil.getRealPath('/invest/portfolio/feepay/InvestFeePay002/queryPayTradeAmt'), {secAcctId : secAcctId, feeType : feeType, org : org, cdate : cdate, startDate : startDate, confirmFlag: confirmFlag}, function(result){
 			   $('#InvestFeePay002_payAmt').val(result);
 			   $('#InvestFeePay002_actPayAmt').val(result).trigger('change');
@@ -203,7 +241,7 @@ $(function() {
 		var secAcctId = $('#InvestFeePay002_secAcctId').val();
 		var org = $('#InvestFeePay002_regTrustOrg').val();
 		if (feeType){
-			if((feeType == '06'||feeType == '07')&&org || (feeType == '14'||feeType == '16'||feeType == '17')&&secAcctId){
+			if(feeType == '06'|| (feeType == '07' && org) || (feeType == '14'||feeType == '16'||feeType == '17')&&secAcctId){
 				// 查询费用上次计提结束日
 				Joyin.ajax(JoyinUtil.getRealPath('/invest/portfolio/feepay/InvestFeePay002/queryLastPayDate'),
 					{secAcctId : secAcctId, feeType : feeType,org :org, operateType:$('#InvestFeePay002_hidden_operateType').val()}, function(result){
@@ -381,7 +419,7 @@ $(function() {
     			Joyin.error("当前费用类型下，证券账户必选！")
                 return;
     		}
-    	}else if((feeType == '06' || feeType == '07') && !regTrustOrg){
+    	}else if(feeType == '07' && !regTrustOrg){
 			Joyin.error("当前费用类型下，登记托管机构必选！")
 			return;
 		}

@@ -215,7 +215,7 @@ public class CstpRepoAutoTradeService extends BaseService<TrdRepoTrade002Dto> {
 			TrdProductDeal deal = autoTradeMapper.isExistsTrade(oritradeId);
 			if (!StringUtil.isNotEmpty(deal)) {
 				// 判断交易对手是否存在
-				InterfOpicsTradRepo interfOpicsTradRepo = cstpMapper.selectTradRepo(oritradeId,
+				InterfOpicsTradRepo interfOpicsTradRepo = cstpMapper.selectTradRepo(oritradeId,interfCstpTrade.getSide(),
 						DateUtil.format(iPlatformDate.getSysDate(), DateUtil.DEFAULT_OTHER_FORMAT),
 						BusinessTypeUtil.BUSINESSTYPE_REPO);
 				/*if (StringUtil.isNotEmpty(interfOpicsTradRepo.getSeller())

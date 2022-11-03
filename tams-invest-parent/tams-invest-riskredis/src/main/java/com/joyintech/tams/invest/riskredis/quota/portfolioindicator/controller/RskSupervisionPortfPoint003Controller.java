@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeRds;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
@@ -66,6 +67,7 @@ public class RskSupervisionPortfPoint003Controller extends BaseController {
     @Override
     public String init(Model model) {
         setSelectOptionToModel(model, DICT_CODES);
+        setSelectOptionToModel(model, DictCode.组合类型);
         List<SelectOptionDto> listSortType = addSortType();
         String workflowId = this.getParam("workflowId");
         if (!getParam("pageModel").equals(GlobalConstant.DETAIL_PAGE_MODEL_NEW)) {
@@ -80,8 +82,7 @@ public class RskSupervisionPortfPoint003Controller extends BaseController {
         	rskPortfolioPackage003Dto.getRskPortfolioPoolConfigDto().getPtlParamPoolConfigList().forEach(item ->{
         		String[] arrayStr=item.getClassifyDimensionVal().split(GlobalConstant.COMMA);
         		listSortType.stream().filter(
-	                option ->(StringUtil.equals(option.getParentId(),BussinessDictCodeRds.分类维度.getValue() + GlobalConstant.POINT + item.getClassifyDimension())
-                            || option.getParentId().indexOf(BussinessDictCodeRds.分类维度.getValue() + GlobalConstant.POINT + item.getClassifyDimension()) >= 0)
+	                option ->(StringUtil.equals(option.getParentId(),BussinessDictCodeRds.分类维度.getValue() + GlobalConstant.POINT + item.getClassifyDimension()))
 	               &&(item.getClassifyDimensionVal().indexOf(option.getId().replace(option.getCol() + GlobalConstant.POINT,""))>=0)
                        ).forEach(
                               option -> {
@@ -131,6 +132,11 @@ public class RskSupervisionPortfPoint003Controller extends BaseController {
         }
         SelectDto selectDto5 = this.getSelectDataFromDataDic(BussinessDictCodeRds.是否, null);
         for (SelectOptionDto dto : selectDto5.getOptions()) {
+            dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
+            listFloatRate.add(dto);
+        }
+        SelectDto selectDto06 = this.getSelectDataFromDataDic(DictCode.组合类型, null);
+        for (SelectOptionDto dto : selectDto06.getOptions()) {
             dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
             listFloatRate.add(dto);
         }

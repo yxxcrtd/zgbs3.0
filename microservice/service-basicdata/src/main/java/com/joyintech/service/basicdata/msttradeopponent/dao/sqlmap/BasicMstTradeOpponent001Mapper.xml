@@ -7,6 +7,7 @@
 			T4.COUNTER_TYPE counterType,
 			T4.COUNTER_NAME counterName,
 			T4.LINK_ID finprodId,
+			PARTY_ID partyId,
 			T4.TYPE_6 type1,
 			T4.TYPE_7 type2,
 			T5.CUSTOMER_NAME managerId,
@@ -17,6 +18,7 @@
 				T1.COUNTER_TYPE,
 				T1.COUNTER_NAME,
 				T1.LINK_ID,
+				T1.PARTY_ID,
 				CASE T1.COUNTER_TYPE 
 				WHEN  '03' 
 				THEN T2.ISSUER 
@@ -40,6 +42,12 @@
 			</if>
 			<if test = "counterName != null and counterName != ''">  
 				AND T1.COUNTER_NAME LIKE CONCAT('%',CONCAT(#{counterName},'%'))
+			</if>
+			<if test="partyIdList != null and partyIdList.size() > 0">
+				AND T1.PARTY_ID in
+				<foreach collection="partyIdList" item="item" open="(" close=")" separator=",">
+					#{item}
+				</foreach>
 			</if>
 		</where>
 			ORDER BY T1.COUNTER_TYPE DESC
@@ -326,7 +334,10 @@ FROM
 		mcci.PARTY_ABBR text
 		FROM
 		MST_CFETS_CUSTOMER_INFO mcci
-		WHERE mcci.PARTY_ID NOT IN (SELECT PARTY_ID FROM  MST_COUNTER_PARTY WHERE PARTY_ID IS NOT NULL)
+		WHERE 1 = 1
+	  		<if test="pageId == null or pageId == ''">
+				AND mcci.PARTY_ID NOT IN (SELECT PARTY_ID FROM  MST_COUNTER_PARTY WHERE PARTY_ID IS NOT NULL)
+			</if>
 			<if test="search != null and search != ''">
 				AND (mcci.PARTY_ID LIKE CONCAT('%', CONCAT(#{search}, '%'))
 				OR mcci.PARTY_CUSTOMER_ID LIKE CONCAT('%', CONCAT(#{search}, '%'))

@@ -1,0 +1,21 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
+<svg xmlns="http://www.w3.org/2000/svg">
+  <metadata>Created by iconfont</metadata>
+  <defs>
+  <font id="iconfont" horiz-adv-x="1024">
+    <font-face
+      font-family="iconfont"
+      font-weight="400"
+      font-stretch="normal"
+      units-per-em="1024"
+      ascent="896"
+      descent="-128"
+    />
+      <missing-glyph />
+      
+      <glyph glyph-name="filter" unicode="&#59792;" d="M363.054545 76.8c0-18.618182 9.309091-27.927273 27.927273-27.927273h242.036364c18.618182 0 27.927273 9.309091 27.927273 27.927273v186.181818H363.054545v-186.181818z m493.381819 642.327273H167.563636c-18.618182 0-37.236364-27.927273-27.927272-46.545455l204.8-353.745454h325.818181l204.8 353.745454c18.618182 18.618182 0 46.545455-18.618181 46.545455z"  horiz-adv-x="1024" />
+      
+    </font>
+  </defs>
+</svg>

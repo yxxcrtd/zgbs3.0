@@ -1314,6 +1314,7 @@ public class EtrExchangeTradeCommon001Controller extends BaseController {
             if (!CollectionUtils.isEmpty(dto.getPortfolioList())) {
                 for (EtrExchangeTradePortfolioRequest portfolio : dto.getPortfolioList()) {
                     portfolio.setPs(dto.getPs());
+                    portfolio.setEntrustAmt(ArithmeticUtil.round(portfolio.getEntrustAmt(),2,RoundingMode.HALF_UP));
                 }
             }
             // GLCP-192:组合维度需要传ps,风险是从组合维度取ps modify by fuyongsheng 20220713 end
