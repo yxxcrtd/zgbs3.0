@@ -14,4 +14,4 @@ youkol:
             color: gray
           noise:
             color: green
-      enabled: true
+      enabled: false

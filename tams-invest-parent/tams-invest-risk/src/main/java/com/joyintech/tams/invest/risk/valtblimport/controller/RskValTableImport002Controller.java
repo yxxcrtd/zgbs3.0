@@ -131,7 +131,7 @@ public class RskValTableImport002Controller extends BaseController{
         for (ValuationTableRow row : list) {
             System.out.println(row);
             rskValtblAssetSubDto = new RskValtblAssetSubDto();
-            rskValtblAssetSubDto.setIsMatch("是");
+            rskValtblAssetSubDto.setIsMatch("Y");
             rskValtblAssetSubDto.setSubCode(row.getSubjectCode());
             rskValtblAssetSubDto.setSubName(row.getSubjectName());
             //rskValtblAssetSubDto.setValDate(valDate);
@@ -154,6 +154,13 @@ public class RskValTableImport002Controller extends BaseController{
             if (!ObjectUtils.isEmpty(row.getMarketValueOfCost())) {
                 rskValtblAssetSubDto.setMcr(new BigDecimal(row.getMarketValueOfCost().replace("%", ""))); // 市值占比
             }
+            // 币种
+            rskValtblAssetSubDto.setCcy(row.getCurrency());
+
+            // 汇率
+            //System.out.println("=====汇率======" + row.getCnyCost());
+            // rskValtblAssetSubDto.setExchangeRate();
+
             rskValtblAssetSubList.add(rskValtblAssetSubDto);
 
             List<ValuationTableRow> child = row.getChild();
