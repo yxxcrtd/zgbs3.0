@@ -74,7 +74,7 @@ public class RskValTableImport002Controller extends BaseController{
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
     // NLP模型训练库文件存放路径
-    @Value("${application.nlpModel:/home/model}")
+    @Value("${application.nlpModel:/home/model/}")
     private String applicationNLPModelPath;
 
     @Autowired
