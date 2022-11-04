@@ -10,6 +10,7 @@
  
 package com.joyintech.tams.invest.risk.valtblimport.controller;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -30,11 +31,15 @@ import com.joyintech.tams.invest.risk.penetrationmanagement.rskvalrelateimport.d
 import com.joyintech.tams.invest.risk.penetrationmanagement.rskvalrelateimport.service.RskValRelateImport002Service;
 import com.joyintech.tams.invest.risk.valtblimport.service.RskValTableImportCommonService;
 import com.joyintech.tams.valuation.analysis.ValuationTableAnalysis;
+import com.joyintech.tams.valuation.analysis.ValuationTableTrain;
 import com.joyintech.tams.valuation.analysis.info.ValuationTableInfo;
 import com.joyintech.tams.valuation.analysis.info.ValuationTableRow;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -66,6 +71,11 @@ import com.joyintech.tams.invest.risk.valtblimport.service.RskValTableImportServ
 @PageId("RskValTableImport002")
 @RequestMapping("/invest/risk/valtblimport/RskValTableImport002")
 public class RskValTableImport002Controller extends BaseController{
+    Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    // NLP模型训练库文件存放路径
+    @Value("${application.nlpModel:/home/model}")
+    private String applicationNLPModelPath;
 
     @Autowired
     private RskValTableImportService rskValTableImportService;
@@ -86,6 +96,21 @@ public class RskValTableImport002Controller extends BaseController{
         model.addAttribute("trimChars", this.getParam("trimChars"));
         model.addAttribute("filterId", this.getParam("filterId"));
         model.addAttribute("ptlName", this.getParam("ptlName"));
+
+        // 学习
+        logger.info("开始学习");
+        String segModelPath = applicationNLPModelPath + "seg.m";
+        String headerTrainDataDir = applicationNLPModelPath + "估值表识别/表头";
+        String bayesModelPath = applicationNLPModelPath + "估值模型/bayes-valuation-table-header-model.gz";
+        logger.info("学习完成");
+
+        ValuationTableTrain train = new ValuationTableTrain(segModelPath, headerTrainDataDir, bayesModelPath);
+        try {
+            train.train();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         return super.init(model);
     }
     
@@ -99,27 +124,33 @@ public class RskValTableImport002Controller extends BaseController{
      * @see
      * @since 1.0
      */
-    
     @RequestMapping(value = "/initValTableInfo")
     @ResponseBody
     public List<RskValtblAssetSubDto> initValTableInfo(@RequestBody RskValTableImportParamDto dto) throws Exception {
         List<RskValtblAssetSubDto> rskValtblAssetSubList = new ArrayList<>();
 
-        String timeModelPath = "D:\\workspace\\zgbs-3.0\\tams-system\\touguan\\app\\src\\test\\java\\com\\joyintech\\model\\time.m";
-        String headerTrainDataDir = "D:\\workspace\\zgbs-3.0\\tams-system\\touguan\\app\\src\\test\\java\\com\\joyintech\\model\\估值表识别\\表头";
-        String aggregateTrainDataDir = "D:\\workspace\\zgbs-3.0\\tams-system\\touguan\\app\\src\\test\\java\\com\\joyintech\\model\\估值表识别\\汇总";
-        String bayesModelPath = "D:\\workspace\\zgbs-3.0\\tams-system\\touguan\\app\\src\\test\\java\\com\\joyintech\\model\\估值模型\\bayes-valuation-table-header-model.gz";
-        // String excel = "D:\\workspace\\zgbs-3.0\\tams-system\\touguan\\app\\src\\test\\java\\com\\joyintech\\model\\样表汇总\\中金华裕1号集合资产管理计划估值表-债券（应计利息和成本在一级科目下）、股票（应收利息和成本不在一级科目下）.xls";
+        String timeModelPath = applicationNLPModelPath + "time.m";
+        logger.info("读取time.m:" + timeModelPath);
+
+        String headerTrainDataDir = applicationNLPModelPath + "估值表识别" + File.separator + "表头";
+        logger.info("读取估值表识别的表头文件夹:" + headerTrainDataDir);
+
+        String aggregateTrainDataDir = applicationNLPModelPath + "估值表识别" + File.separator + "汇总";
+        logger.info("读取估值表识别的汇总文件夹:" + aggregateTrainDataDir);
+
+        String bayesModelPath = applicationNLPModelPath + "估值模型" + File.separator + "bayes-valuation-table-header-model.gz";
+        logger.info("读取学习后生成的估值模型文件:" + bayesModelPath);
+
         String excel = dto.getValTableFileName();
         ValuationTableAnalysis analysis = new ValuationTableAnalysis(timeModelPath, bayesModelPath, headerTrainDataDir, aggregateTrainDataDir);
         ValuationTableInfo info = analysis.execute(excel);
 
-        System.out.println("估值表名称               : "+info.getName());
-        System.out.println("估值日期                   : "+info.getHeader().getDate());
-        System.out.println("明细头信息(从0开始) : "+info.getListHeaderIndexes()+"\r\n");
+        logger.info("估值表名称:" + info.getName());
+        logger.info("估值日期:" + info.getHeader().getDate());
+        logger.info("明细头信息(从0开始):" + info.getListHeaderIndexes()+"\r\n");
 
         // printList(info.getList(), rskValtblAssetSubList);
-        System.out.println("\r\n"+info.getAggregateInfo());
+        logger.info("\r\n" + info.getAggregateInfo());
 
         // 日期转换 , sdf.parse(info.getHeader().getDate())
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日");
@@ -158,7 +189,7 @@ public class RskValTableImport002Controller extends BaseController{
             rskValtblAssetSubDto.setCcy(row.getCurrency());
 
             // 汇率
-            //System.out.println("=====汇率======" + row.getCnyCost());
+            // logger.info("=====汇率======" + row.getCnyCost());
             // rskValtblAssetSubDto.setExchangeRate();
 
             rskValtblAssetSubList.add(rskValtblAssetSubDto);

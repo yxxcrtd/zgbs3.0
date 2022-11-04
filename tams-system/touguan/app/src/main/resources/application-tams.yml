@@ -78,6 +78,7 @@ application:
     lastChromeVersion: 73
     customerName: 某某银行
   runOptimize: N  #启动优化开关
+  nlpModel: /home/model/ # NLP模型训练库文件存放路径
 
 #交易压力测试性能优化开关
 flag: false
