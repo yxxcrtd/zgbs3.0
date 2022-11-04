@@ -1509,6 +1509,16 @@ public class EtrCommonCashPositionDealService extends BaseService {
         return flows;
     }
 
+    /**
+     * 回购到期时，查询原交易指令质押持仓
+     */
+    public static List<PledgeBondInfoDto> selectAllRepoPositionByTradeId(Map<String,Object> param) {
+        param.put("INV_AIM_AC", DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
+        param.put("INV_AIM_FVOCI", DictCodeListExt1.投资目的_以收取该合同现金流量及出售金融资产为目的.getValue());
+        param.put("INV_AIM_FVTPL", DictCodeListExt1.投资目的_以出售该金融资产为目的.getValue());
+        return etrCommonCashPositionMapper.selectAllRepoPositionByTradeId(param);
+    }
+
     public static List<EtrCashPositionFlowDto> selectAllCashPositionByTotle(String tradeId) {
         List<EtrCashPositionFlowDto> flows = etrCommonCashPositionMapper.selectAllCashPositionByTotle(tradeId);
         return flows;

@@ -701,6 +701,37 @@
         SELECT * FROM ETR_SEC_POSITION_FLOW WHERE TRADE_ID = #{totleId}
     </select>
 
+    <select id="selectAllRepoPositionByTradeId" resultType="com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto">
+        select t.PORTFOLIO_ID portfolioId,
+               t.SEC_ACCT_ID,
+               t.FINPROD_ID finprodId,
+               t.INV_AIM invAim,
+               t.HODING_TYPE,
+               sum(t.AMOUNT)*-1 AvaPledgePrin,
+               t.TRADE_ID,
+               CASE
+                  WHEN t.INV_AIM = #{INV_AIM_AC} THEN 1
+                  WHEN t.INV_AIM = #{INV_AIM_FVOCI} THEN 2
+                  WHEN t.INV_AIM = #{INV_AIM_FVTPL} THEN 3
+                  ELSE 0
+               END invAimSort,
+               fp.FINPROD_MARKET_ID bondCode
+        from (
+                 select PORTFOLIO_ID,
+                        SEC_ACCT_ID,
+                        FINPROD_ID,
+                        INV_AIM,
+                        HODING_TYPE,
+                        AMOUNT,
+                        case when OFFSET_FLAG = '02' then OFFSET_ID else TRADE_ID end TRADE_ID
+                 from ETR_SEC_POSITION_FLOW
+                 where TRADE_ID = #{tradeId}
+                    or OFFSET_ID = #{tradeId}
+             ) t
+                 left join FIN_PRODUCT fp on t.FINPROD_ID = fp.FINPROD_ID
+        group by t.PORTFOLIO_ID, t.SEC_ACCT_ID, t.FINPROD_ID, t.INV_AIM, t.HODING_TYPE, t.TRADE_ID, fp.FINPROD_MARKET_ID
+    </select>
+
     <select id="selectAllPositionByFinprodId" resultType="com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto">
         SELECT * FROM ETR_SEC_POSITION WHERE FINPROD_ID = #{finprodId} AND CDATE = to_date(#{cdate},'yyyy-MM-dd')
     </select>
