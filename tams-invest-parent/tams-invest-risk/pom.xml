@@ -13,8 +13,7 @@
         <dependency>
             <groupId>com.joyintech</groupId>
             <artifactId>tams-valuation-analysis</artifactId>
-            <version>0.0.1</version>
-            <classifier>min</classifier>
+            <version>0.0.1.1</version>
         </dependency>
     </dependencies>
 
