@@ -439,6 +439,8 @@ public class CommonAutoCouponService extends BaseService {
                 finProductAdd.setIsNetprice(interfPayhsrcsecinfo.getIsNetprice());
                 finProductAdd.setCrossMarket(StringUtil.isNotBlank(interfPayhsrcsecinfo.getCrossMarketCode()) ? DictCodeList.是否_是.getValue() : DictCodeList.是否_否.getValue());
                 finProductAdd.setCrossMarketCode(interfPayhsrcsecinfo.getCrossMarketCode());
+                finProductAdd.setInvestNature("01");//设置债券的默认投资性质为01
+
                 //概念板块
                 List<String> conceptType = new ArrayList<>();
                 if (DictCodeList.是否_是.getValue().equals(interfPayhsrcsecinfo.getCityInvestSecChb())) {
