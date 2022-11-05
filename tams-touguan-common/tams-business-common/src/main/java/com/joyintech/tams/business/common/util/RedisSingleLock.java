@@ -68,6 +68,7 @@ public class RedisSingleLock {
      * @date 2022/9/7 10:41
      */
     public boolean tryLock(String key, String value, long timeout) {
+        logger.info("RedisSingleLock.tryLock --> key:{}", key);
         Boolean lockSuccess = redis.opsForValue().setIfAbsent(key, value, timeout, TimeUnit.SECONDS);
         if (lockSuccess == null) {
             throw new IllegalStateException();
