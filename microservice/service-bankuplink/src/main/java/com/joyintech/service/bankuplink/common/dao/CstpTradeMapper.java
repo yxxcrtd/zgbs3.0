@@ -120,7 +120,7 @@ public interface CstpTradeMapper {
      * @see
      * @since 1.0
      */
-    String selectRepoByExecid(@Param("execid") String execid);
+    String selectRepoByExecid(@Param("execid") String execid,@Param("ps") String ps);
 
     /**
      * 查询成交编号

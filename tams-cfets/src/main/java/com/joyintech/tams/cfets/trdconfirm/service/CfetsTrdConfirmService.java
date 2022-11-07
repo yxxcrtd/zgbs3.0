@@ -500,6 +500,7 @@ public class CfetsTrdConfirmService extends BaseService {
      */
     public CfetsTrdBondInvestTradeDto packageEquity(CfetsTrdConfirmRegInfoListResponse dto, String genType,
                                                     String cstpTradeId) {
+        logger.info("packageEquity -> param dto:{} genType:{} cstpTradeId:{}");
         CfetsTrdBondInvestTradeDto result = this.packageEquity(dto, genType);
         if (cstpTradeId == null) {
             logger.error("成交编号为空");

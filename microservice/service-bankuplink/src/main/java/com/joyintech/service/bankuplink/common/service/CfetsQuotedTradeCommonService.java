@@ -619,29 +619,32 @@ public class CfetsQuotedTradeCommonService{
     private InterfOpicsTradRepo insertOrUpdateRepo(InterfCstpTrade iCstpTrade,List<NoUnderlyings> seList) {
         // 成交编号
         String execid = iCstpTrade.getExecid();
-        // 交易编号
-        String dealno = cstpMapper.selectRepoByExecid(execid);
         // 本方交易员查询,交易员代码
         String traderId = cstpMapper.selectBuytrader(iCstpTrade.getOurtraderchinesename(), iCstpTrade.getOurinstitutioncode());
 
         InterfOpicsTradRepo interfOpicsTradRepo = cstpMapper.selectTradRepo(execid, iCstpTrade.getSide(),getSysDate(),BusinessTypeUtil.BUSINESSTYPE_REPO);
-        interfOpicsTradRepo.setDealno(dealno);
+        // 交易方向
+        String ps;
+        if(StringUtil.equals(interfOpicsTradRepo.getPs(),"RB")){
+            ps = DictCodeList.回购拆借方向_逆回购.getValue();
+        }else{
+            ps = DictCodeList.回购拆借方向_正回购.getValue();
+        }
+        // 交易编号
+        String dealNo = cstpMapper.selectRepoByExecid(execid, ps);
+        interfOpicsTradRepo.setDealno(dealNo);
         interfOpicsTradRepo.setBuycost(cstpMapper.selectPortfolioIdByQuoteId(iCstpTrade.getQuoteid(),BusinessTypeUtil.BUSINESSTYPE_REPO));
         interfOpicsTradRepo.setProdtype(ProdTypeUtil.PRODTYPE_PLEDGE);
         interfOpicsTradRepo.setOritradeid(execid);
         if(StringUtil.isNotEmpty(iCstpTrade.getOurinstitutioncode())){
-            //TODO 不应该用该逻辑,应该根据本方角色判断交易方向
+            // 不应该用该逻辑,应该根据本方角色判断交易方向
 //            int count = cstpMapper.getPtlByOurinstitutioncode(iCstpTrade.getOurinstitutioncode());
             interfOpicsTradRepo.setBuytrader(traderId);
             //已经关联组合
 //            if(count>0){
                 interfOpicsTradRepo.setSelltrader(iCstpTrade.getCountertradername());
                 interfOpicsTradRepo.setSeller(iCstpTrade.getCounterinstitutioncode());
-                if(StringUtil.equals(interfOpicsTradRepo.getPs(),"RB")){
-                    interfOpicsTradRepo.setPs(DictCodeList.回购拆借方向_逆回购.getValue());
-                }else{
-                    interfOpicsTradRepo.setPs(DictCodeList.回购拆借方向_正回购.getValue());
-                }
+                interfOpicsTradRepo.setPs(ps);
 //            }else{
 //                interfOpicsTradRepo.setBuytrader(iCstpTrade.getCountertradername());
 //                interfOpicsTradRepo.setSelltrader(iCstpTrade.getOurinstitutioncode());
@@ -658,15 +661,15 @@ public class CfetsQuotedTradeCommonService{
             interfOpicsTradRepo.setBuytrader(traderId);
         }*/
 
-        if (StringUtil.isNotEmpty(dealno)) {
+        if (StringUtil.isNotEmpty(dealNo)) {
             // 更新
-            interfOpicsTradRepo.setTradeid(dealno);
+            interfOpicsTradRepo.setTradeid(dealNo);
             // 回购交易表新加主键会自动生成更新
             repoMapper.updateByPrimaryKeySelective(interfOpicsTradRepo);
         } else {
             // 插入
-            dealno = cstpMapper.selectDealNo(DateUtil.formatDate(getSysDate()), getPrefix(isSubSystem));
-            interfOpicsTradRepo.setTradeid(dealno);
+            dealNo = cstpMapper.selectDealNo(DateUtil.formatDate(getSysDate()), getPrefix(isSubSystem));
+            interfOpicsTradRepo.setTradeid(dealNo);
             repoMapper.insertSelective(interfOpicsTradRepo);
         }
 

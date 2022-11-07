@@ -1191,9 +1191,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
      * @author jiangpeng
      * @date 2022/7/23 14:10
      */
-    private Map<String, Object> closeEtr(CfetsManualSettleDto entity) {
-        // 头寸返回值记录,用于回滚头寸数据
-        Map<String, Object> map = new HashMap<>();
+    private void closeEtr(CfetsManualSettleDto entity) {
         //关闭对应指令
         List<CfetsManualSettleDealInfo> listTemp = cfetsManualSettleMapper.getDealDetailsByTradeId(entity.getTradeId(), "Y");
         if (CollectionUtils.isEmpty(listTemp)) {
@@ -1211,11 +1209,10 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 }
             });
             // 发送指令关闭头寸报文
-            map.putAll(this.closeDelegatePositionMethod(list, entity.getTgBusiType()));
+            this.closeDelegatePositionMethod(list, entity.getTgBusiType());
             // 发送指令关闭头寸报文
             SpringContextUtil.getApplicationContext().getBean(CfetsManualSettleService.class).closeDelegate(listTemp, entity.getRemark(), entity.getTgBusiType());
         }
-        return map;
     }
 
     /**
