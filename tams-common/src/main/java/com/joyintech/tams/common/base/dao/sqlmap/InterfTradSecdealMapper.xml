@@ -65,6 +65,12 @@
         from INTERF_TRAD_SECDEAL
         where DEALNO = #{dealno,jdbcType=VARCHAR}
     </select>
+    <select id="selectByFedealno" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="com.joyintech.tams.common.base.dao.InterfTradSecdealMapper.Base_Column_List" />
+        from INTERF_TRAD_SECDEAL
+        where FEDEALNO = #{fedealno,jdbcType=VARCHAR}
+    </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
         delete from INTERF_TRAD_SECDEAL
         where DEALNO = #{dealno,jdbcType=VARCHAR}

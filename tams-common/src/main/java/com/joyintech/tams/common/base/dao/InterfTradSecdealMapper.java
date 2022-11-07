@@ -15,6 +15,8 @@ public interface InterfTradSecdealMapper {
 
     InterfTradSecdeal selectByPrimaryKey(String dealno);
 
+    InterfTradSecdeal selectByFedealno(String fedealno);
+
     int updateByPrimaryKeySelective(InterfTradSecdeal record);
 
     int updateByPrimaryKey(InterfTradSecdeal record);
