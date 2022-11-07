@@ -230,6 +230,11 @@ public abstract class EventBaseService<V> extends InfBaseService<V> {
     public static final String ASSETCODE = "assetCode";
 
     /**
+     * KEY:机构代码
+     */
+    public static final String ISSUERCODE = "issuerCode";
+
+    /**
      * KEY:资产名称
      */
     public static final String ASSETNAME = "assetName";
@@ -938,6 +943,7 @@ public abstract class EventBaseService<V> extends InfBaseService<V> {
             sysParam.setTradeNum(StringUtil.isNotEmpty(mapData.get(TRADE_NUM))?new BigDecimal(mapData.get(TRADE_NUM).toString()):null);
             sysParam.setEventType(StringUtil.isNotEmpty(mapData.get(EVENT_TYPE))?mapData.get(EVENT_TYPE).toString():null);
             sysParam.setInvAim(StringUtil.isNotEmpty(mapData.get(INVAIM))?mapData.get(INVAIM).toString():null);
+            sysParam.setIssuerCode(StringUtil.isNotEmpty(mapData.get(ISSUERCODE))?mapData.get(ISSUERCODE).toString():null);
         }else{
             return map;
         }
@@ -2121,6 +2127,17 @@ public abstract class EventBaseService<V> extends InfBaseService<V> {
         String kriStatus = res.getIndStatus();
         // 指标状态
         temp.put(KRISTATUS, kriStatus);
+        if(StringUtil.equals(ind.getIndType(),"INNER_DIREATION")){
+            temp.put(KRIVALUE, BussinessDictCodeListRds.指标状态_通过.getCodeName());
+            if (StringUtil.equals(kriStatus,BussinessDictCodeListRds.指标状态_禁止.getValue())){
+                temp.put(KRIVALUE, "违规");
+            }
+        }
+        if(StringUtil.equals(ind.getIndType(),"FORBID_FUND")){
+            if (StringUtil.equals(kriStatus,BussinessDictCodeListRds.指标状态_通过.getValue())){
+                temp.put(KRIVALUE, "正常");
+            }
+        }
         // 是否有联合指标设置
         boolean hasUnite = !CollectionUtils.isEmpty(uniteList);
         // 当存在某个指标状态超过整体状态且趋势向坏的指标时试算不通过

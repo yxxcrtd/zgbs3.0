@@ -56,6 +56,11 @@ public class SystemParam {
     private String invAim;
 
     /**
+     * 发行人code
+     */
+    private String issuerCode;
+
+    /**
      * 资产基本信息(现金规则等,以资产ID为维度)
      */
     private Map<String,Object> astCashMap;
@@ -164,6 +169,14 @@ public class SystemParam {
         this.invAim = invAim;
     }
 
+    public String getIssuerCode() {
+        return issuerCode;
+    }
+
+    public void setIssuerCode(String issuerCode) {
+        this.issuerCode = issuerCode;
+    }
+
     public Map<String, Object> getAstCashMap() {
         return astCashMap;
     }
@@ -179,10 +192,13 @@ public class SystemParam {
             GlobalConstant.OPEN_PARENTHESIS) ? assetCode : "'" + assetCode + "'";
         String ptlBagCode= StringUtil.contains(ptlBagId,
                 GlobalConstant.OPEN_PARENTHESIS) ? ptlBagId : "'" + ptlBagId + "'";
+        String issuerCode = StringUtil.contains(this.issuerCode,
+                GlobalConstant.OPEN_PARENTHESIS) ? this.issuerCode : "'" + this.issuerCode + "'";
         return sql.replaceAll("\\$\\{valDate\\}", valDate).replaceAll("\\$\\{portfolioCode\\}",
             ptlCode).replaceAll("\\$\\{assetCode\\}", astCode).replaceAll("\\$\\{tradeCode\\}",
                 tradeCode).replaceAll(
                 "\\$\\{assetType\\}", "'" +assetType+ "'").replaceAll("\\$\\{ptlBagId\\}",
-                ptlBagCode);
+                ptlBagCode).replaceAll("\\$\\{issuerCode\\}",
+                this.issuerCode);
     }
 }
