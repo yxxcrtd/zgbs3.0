@@ -10,13 +10,13 @@ tx-lcn:
     onlyError: true
          
 spring:
-  #============Master Datasource============# GLB_INV  GLB_INV  BS303INIT_TEST1008_03
+  #============Master Datasource============# BS_V3061_1015_KF  BS_V3061_1015_KF  BS303INIT_TEST1008_03
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@//192.168.70.32:1521/orcl
-    username: GLB_INV
-    password: GLB_INV#a1
+    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+    username: BS_V3061_1015_KF
+    password: BS_V3061_1015_KF
     #defaultTransactionIsolation:
     name: master                             #数据库名称
     initialSize: 10                          #在连接池中初始化多少个连接
@@ -44,9 +44,9 @@ base:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@//192.168.70.32:1521/orcl
-    username: GLB_INV
-    password: GLB_INV#a1
+    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+    username: BS_V3061_1015_KF
+    password: BS_V3061_1015_KF
     #defaultTransactionIsolation:
     name: base                               #数据库名称
     initialSize: 10                          #在连接池中初始化多少个连接
@@ -71,9 +71,9 @@ chbsend:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@//192.168.70.32:1521/orcl
-    username: GLB_INV
-    password: GLB_INV#a1
+    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+    username: BS_V3061_1015_KF
+    password: BS_V3061_1015_KF
     #defaultTransactionIsolation:
     name: chbSend                            #数据库名称
     initialSize: 10                          #在连接池中初始化多少个连接
@@ -98,9 +98,9 @@ interf:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@//192.168.70.32:1521/orcl
-    username: GLB_INV
-    password: GLB_INV#a1
+    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+    username: BS_V3061_1015_KF
+    password: BS_V3061_1015_KF
     #defaultTransactionIsolation:
     name: interf                             #数据库名称
     initialSize: 10                          #在连接池中初始化多少个连接
@@ -125,9 +125,9 @@ stresstest:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@//192.168.70.32:1521/orcl
-    username: GLB_INV
-    password: GLB_INV#a1
+    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+    username: BS_V3061_1015_KF
+    password: BS_V3061_1015_KF
     #defaultTransactionIsolation:
     name: stresstest                         #数据库名称
     initialSize: 10                          #在连接池中初始化多少个连接
@@ -153,9 +153,9 @@ wind:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@//192.168.70.32:1521/orcl
-    username: GLB_INV
-    password: GLB_INV#a1
+    url: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
+    username: BS_V3061_1015_KF
+    password: BS_V3061_1015_KF
     #defaultTransactionIsolation:
     name: wind                               #数据库名称
     initialSize: 10                          #在连接池中初始化多少个连接
@@ -177,8 +177,8 @@ wind:
     filterSlf4jStatementExecutableSqlLogEnable: true
 
 application:
-  sqldirurl: jdbc:oracle:thin:@//192.168.70.32:1521/orcl
+  sqldirurl: jdbc:oracle:thin:@//192.168.70.245:1521/orcl
   driverClassName: oracle.jdbc.driver.OracleDriver
-  sqldiruserName: GLB_INV
-  sqldirpassword: GLB_INV#a1
+  sqldiruserName: BS_V3061_1015_KF
+  sqldirpassword: BS_V3061_1015_KF
     

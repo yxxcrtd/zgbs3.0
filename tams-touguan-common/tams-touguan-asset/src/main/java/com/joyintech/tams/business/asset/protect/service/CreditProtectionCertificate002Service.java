@@ -322,7 +322,7 @@ public class CreditProtectionCertificate002Service extends BaseService<CreditPro
         FileUtils.copyInputStreamToFile(file.getInputStream(),folder);
 //        FileUtils.
         String[] types = {fileNameList.get(1)};
-        if(null != fileTypeValidator && !fileTypeValidator.valid(types, folder)) {
+        if(null != fileTypeValidator && !fileTypeValidator.valid(folder,types)) {
             FileUtils.forceDelete(folder);
             throw new IOException("MSG:上传的文件格式不被允许，请重新上传文件。");
         }

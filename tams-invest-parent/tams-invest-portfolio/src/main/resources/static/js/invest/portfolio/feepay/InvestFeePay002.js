@@ -281,7 +281,7 @@ $(function() {
 //				}
 				// TISHKBS-894 【晋商五期】【组合管理-投资费用支付】佣金的理论费用金额、实付费用金额未带出，无法提交
                 //  add by wj 20200810 start 费用类型为佣金时 登记托管机构为空
-                if(feeType == '07' || feeType == '08'){
+                if(feeType == '08'){
 					Joyin.ajax(JoyinUtil.getRealPath('/invest/portfolio/feepay/InvestFeePay002/querySecAcctOrg'), {secAcctId : secAcctId}, function(result){
 						$('#InvestFeePay002_regTrustOrg').val(result).trigger('change');
 						$('#InvestFeePay002_regTrustOrg').prop("disabled", true);

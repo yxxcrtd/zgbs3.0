@@ -469,34 +469,59 @@
 		<include refid="settleTransDataTotalSql"></include>
 		LEFT JOIN SETTLE_TRANS_DATA_TOTAL_STATUS stdts ON std.SEQ_ID = stdts.SEQ_NO
 		LEFT JOIN SETTLE_TRANS_DATA_TOTAL_ADD stdta ON std.SEQ_ID = stdta.TRADE_ID
+		LEFT JOIN FIN_PRODUCT fp ON std.FINPROD_ID = fp.FINPROD_ID
 		LEFT JOIN T_ENTRUSTHISTORY teh
-		ON (
-		LTRIM(substr(std.APPLY_TRADE_ID, 5, length(std.APPLY_TRADE_ID)), '0') = teh.BROKER_ENTRUST_ID
-		OR
-		std.APPLY_TRADE_ID = teh.BROKER_ENTRUST_ID
-		)
-		and teh.ENTRUST_STATUS IN ('2', '5', '6', '8') AND to_char(DEAL_DATE, 'yyyyMMdd') = teh.TRADING_DAY <!--XYHGFXSJ-247:AND (std.TRADE_PLAT = '02' or std.TRADE_PLAT IS NULL)-->
+			ON (
+			LTRIM(substr(std.APPLY_TRADE_ID, 5, length(std.APPLY_TRADE_ID)), '0') = teh.BROKER_ENTRUST_ID
+			OR
+			std.APPLY_TRADE_ID = teh.BROKER_ENTRUST_ID
+			)
+			and teh.ENTRUST_STATUS IN ('2', '5', '6', '8')
+			AND teh.ENTRUST_TYPE = '0'
+			AND to_char(DEAL_DATE, 'yyyyMMdd') = teh.TRADING_DAY
+			AND std.FINPROD_TYPE2 = teh.FINPROD_TYPE2
+			<if test="finprodType2 != null and finprodType2 != 'F02' and finprodType2 != 'F03'">
+				AND teh.STOCK_CODE = fp.FINPROD_MARKET_ID
+			</if>
 		LEFT JOIN T_ENTRUST te
-		ON (
-		LTRIM(substr(std.APPLY_TRADE_ID, 5, length(std.APPLY_TRADE_ID)), '0') = te.BROKER_ENTRUST_ID
-		OR
-		std.APPLY_TRADE_ID = te.BROKER_ENTRUST_ID
-		)
-		and te.ENTRUST_STATUS IN ('2', '5', '6', '8') AND to_char(DEAL_DATE, 'yyyyMMdd') = te.TRADING_DAY <!--XYHGFXSJ-247:AND (std.TRADE_PLAT = '02' or std.TRADE_PLAT IS NULL)-->
+			ON (
+			LTRIM(substr(std.APPLY_TRADE_ID, 5, length(std.APPLY_TRADE_ID)), '0') = te.BROKER_ENTRUST_ID
+			OR
+			std.APPLY_TRADE_ID = te.BROKER_ENTRUST_ID
+			)
+			and te.ENTRUST_STATUS IN ('2', '5', '6', '8')
+		    AND te.ENTRUST_TYPE = '0'
+		    AND to_char(DEAL_DATE, 'yyyyMMdd') = te.TRADING_DAY
+			AND std.FINPROD_TYPE2 = te.FINPROD_TYPE2
+			<if test="finprodType2 != null and finprodType2 != 'F02' and finprodType2 != 'F03'">
+				AND te.STOCK_CODE = fp.FINPROD_MARKET_ID
+			</if>
 		LEFT JOIN T_INTEGRATED_ENTRUSTHISTORY tieh
-		ON (
-		LTRIM(substr(std.APPLY_TRADE_ID, 5, length(std.APPLY_TRADE_ID)), '0') = tieh.BROKER_ENTRUST_ID
-		OR
-		std.APPLY_TRADE_ID = tieh.BROKER_ENTRUST_ID
-		)
-		and tieh.ENTRUST_STATUS IN ('2', '5', '6', '8') AND to_char(DEAL_DATE, 'yyyyMMdd') = tieh.TRADING_DAY <!--XYHGFXSJ-247:AND std.TRADE_PLAT IN ('03', '04', '05')-->
+			ON (
+			LTRIM(substr(std.APPLY_TRADE_ID, 5, length(std.APPLY_TRADE_ID)), '0') = tieh.BROKER_ENTRUST_ID
+			OR
+			std.APPLY_TRADE_ID = tieh.BROKER_ENTRUST_ID
+			)
+			and tieh.ENTRUST_STATUS IN ('2', '5', '6', '8')
+		    AND tieh.ENTRUST_TYPE = '5'
+		    AND to_char(DEAL_DATE, 'yyyyMMdd') = tieh.TRADING_DAY
+			AND std.FINPROD_TYPE2 = tieh.FINPROD_TYPE2
+			<if test="finprodType2 != null and finprodType2 != 'F02' and finprodType2 != 'F03'">
+				AND tieh.STOCK_CODE = fp.FINPROD_MARKET_ID
+			</if>
 		LEFT JOIN T_INTEGRATED_ENTRUST tie
-		ON (
-		LTRIM(substr(std.APPLY_TRADE_ID, 5, length(std.APPLY_TRADE_ID)), '0') = tie.BROKER_ENTRUST_ID
-		OR
-		std.APPLY_TRADE_ID = tie.BROKER_ENTRUST_ID
-		)
-		and tie.ENTRUST_STATUS IN ('2', '5', '6', '8') AND to_char(DEAL_DATE, 'yyyyMMdd') = tie.TRADING_DAY <!--XYHGFXSJ-247:AND std.TRADE_PLAT IN ('03', '04', '05')-->
+			ON (
+			LTRIM(substr(std.APPLY_TRADE_ID, 5, length(std.APPLY_TRADE_ID)), '0') = tie.BROKER_ENTRUST_ID
+			OR
+			std.APPLY_TRADE_ID = tie.BROKER_ENTRUST_ID
+			)
+			and tie.ENTRUST_STATUS IN ('2', '5', '6', '8')
+		    AND tie.ENTRUST_TYPE = '5'
+		    AND to_char(DEAL_DATE, 'yyyyMMdd') = tie.TRADING_DAY
+			AND std.FINPROD_TYPE2 = tie.FINPROD_TYPE2
+			<if test="finprodType2 != null and finprodType2 != 'F02' and finprodType2 != 'F03'">
+				AND tie.STOCK_CODE = fp.FINPROD_MARKET_ID
+			</if>
 		LEFT JOIN ETR_ENTRUST ee ON (ee.ENTRUST_ID = NVL(te.INSTRUCTION_ID, teh.INSTRUCTION_ID) OR ee.ENTRUST_ID = NVL(tie.INSTRUCTION_ID, tieh.INSTRUCTION_ID))
 		LEFT JOIN PTL_PORTFOLIO ptl ON (ptl.PORTFOLIO_ID = std.PORTFOLIO_ID)
 		<where>

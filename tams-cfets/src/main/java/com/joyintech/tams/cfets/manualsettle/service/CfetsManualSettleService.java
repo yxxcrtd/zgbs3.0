@@ -1820,8 +1820,9 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
 
     /**
      * 更新组合流水
-     * @param ptlSecPositionFlows
-     * @param ptlCashPositionFlows
+     *
+     * @param ptlSecPositionFlows  持仓流水
+     * @param ptlCashPositionFlows 现金流水
      */
     private void updatePtlFlows(List<PtlSecPositionFlowDto> ptlSecPositionFlows, List<PtlCashPositionFlowDto> ptlCashPositionFlows) {
         if (CollectionUtils.isNotEmpty(ptlSecPositionFlows)) {
@@ -1849,9 +1850,10 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
 
     /**
      * 组装组合现金流水
-     * @param deal
-     * @param acctId
-     * @return
+     *
+     * @param deal   持仓
+     * @param acctId 证券账户
+     * @return 现金流水
      */
     private PtlCashPositionFlowDto cashDeal(PtlFlowsDto deal, String acctId) {
         PtlCashPositionFlowDto resultDto = new PtlCashPositionFlowDto();
@@ -1880,9 +1882,10 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
 
     /**
      * 组装组合持仓流水
-     * @param deal
-     * @param acctId
-     * @return
+     *
+     * @param deal   持仓
+     * @param acctId 证券账户
+     * @return 持仓流水
      */
     private PtlSecPositionFlowDto positionDeal(PtlFlowsDto deal, String acctId) {
         PtlSecPositionFlowDto resultDto = new PtlSecPositionFlowDto();
@@ -1906,12 +1909,13 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
 
     /**
      * 交收确认时,重新组装质押式回购插入旧头寸
+     *
+     * @param cfetsManualSettleRequest 交收数据
+     * @param buttonType               交收类型
+     * @param finprodType2             资产类型
+     * @param isFlowStart              是否流程发起
      * @author jiangpeng
      * @date 2022/3/14 10:23
-     * @param cfetsManualSettleRequest
-     * @param buttonType
-     * @param finprodType2 资产类型
-     * @param isFlowStart 是否流程发起
      */
     public void insertOldRepoPosition(CfetsManualSettleInsertDto cfetsManualSettleRequest,
                                       String buttonType, String finprodType2,
@@ -1937,7 +1941,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                 && ((StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收.getValue())
                 || StringUtil.equals(DictCodeListExt3.交收操作类型_回溯.getValue(), buttonType))
                 && StringUtil.equals(busiType, DictCodeListExt3.头寸业务类型_质押式回购到期.getValue()))) {
-            this.settleFailPosition(listTemp, busiType, StringUtil.equals(DictCodeListExt3.交收操作类型_回溯.getValue(), buttonType));
+            this.settleFailPosition(listTemp, StringUtil.equals(DictCodeListExt3.交收操作类型_回溯.getValue(), buttonType));
         }
         if (StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_债券质押式正回购.getValue())
                 && StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收失败.getValue())) {
@@ -2060,20 +2064,21 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             baseAssetCashPositionCommMapper.deleteCashPosition03ByOrderIds(orderIds);
         }
     }
+
     /**
      * 更新质押position持仓
-     * @param bizCode
-     * @param holdingType
-     * @param tradeId
-     * @return
+     *
+     * @param bizCode     业务编号
+     * @param holdingType 持仓类型
+     * @param tradeId     业务编号
+     * @return 影响数量
      */
     public long updatePledgeBondForRevoke(String bizCode, String holdingType, String tradeId, boolean isRevoke, Date settleDate) {
         if (StringUtil.isEmpty(tradeId)) {
             tradeId = bizCode;
         }
         Map<String, Object> param = setParams(bizCode, holdingType);
-        List<PtlSecPositionFlow> ptlSecPositionFlows;
-        ptlSecPositionFlows = 更新持仓(param, tradeId, isRevoke, settleDate);
+        List<PtlSecPositionFlow> ptlSecPositionFlows = this.updateSecPosition(param, tradeId, isRevoke, settleDate);
         return ptlSecPositionFlows.size();
     }
 
@@ -2090,7 +2095,7 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
         return param;
     }
 
-    private List<PtlSecPositionFlow> 更新持仓(Map<String, Object> param, String tradeId, boolean isRevoke, Date settleDate) {
+    private List<PtlSecPositionFlow> updateSecPosition(Map<String, Object> param, String tradeId, boolean isRevoke, Date settleDate) {
         List<PtlSecPositionFlow> ptlSecPositionFlows = trdOutRightRepoTradeMapper.selectPtlSecPositionFlow(param);
         for (PtlSecPositionFlow flow : ptlSecPositionFlows) {
             PtlSecPosition position = new PtlSecPosition();
@@ -2113,19 +2118,11 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
     /**
      * 交收失败时处理头寸信息
      *
-     * @param listTemp
+     * @param listTemp 交收数据
      * @author jiangpeng
      * @date 2022/3/11 15:51
      */
-    private void settleFailPosition(List<CfetsManualSettleDealInfo> listTemp, String busiType, boolean isRevoke) {
-        // 标记委托编号,避免重复操作
-//        List<String> entrustIdList = new ArrayList<>();
-//        for (CfetsManualSettleDealInfo deal : listTemp) {
-//            if (!entrustIdList.contains(deal.getEntrustId())) {
-//                cfetsRepoQuotedPrice004Service.revokeEtrSecPosition(deal.getEntrustId(), deal.getSettleDate(), isRevoke, deal.getTradeId());
-//                entrustIdList.add(deal.getEntrustId());
-//            }
-//        }
+    private void settleFailPosition(List<CfetsManualSettleDealInfo> listTemp, boolean isRevoke) {
         listTemp.forEach(deal -> {
                     // 交易明细表查询对应登记编号
                     String regId = cfetsManualSettleMapper.selectRegTradeIdBytradeIdFromDeal(deal.getFinprodId());
@@ -2135,7 +2132,8 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
                     if (StringUtil.isEmpty(regId)) {
                         regId = cfetsManualSettleMapper.selectQuoteIdBytradeId(deal.getFinprodId());
                     }
-                    this.updatePledgeBondForRevoke(regId, DictCodeList.持仓类型_质押.getValue(), deal.getTradeId(), isRevoke, deal.getSettleDate());
+                    long size = this.updatePledgeBondForRevoke(regId, DictCodeList.持仓类型_质押.getValue(), deal.getTradeId(), isRevoke, deal.getSettleDate());
+                    logger.info("settleFailPosition updateSize:{}", size);
                 }
         );
     }
@@ -2157,6 +2155,8 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
         for (CfetsManualSettleDealInfo deal : listTemp) {
             if (StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收失败.getValue())) {
 //                tradeIdsSet.add(deal.getTradeId());
+                logger.info("insertOldBidPosition {} param:{}",
+                        DictCodeListExt3.交收操作类型_交收失败.getCodeName(), JsonUtils.object2Json(cfetsManualSettleRequest));
             } else {
                 FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
                 if (StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_回溯.getValue())) {
