@@ -49,7 +49,6 @@ import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.service.InvestInterfCommService;
 import com.joyintech.tams.invest.interf.trade.fromxp.service.InterfServiceLogService;
-import com.joyintech.tams.position.pojo.BaseMap;
 import com.joyintech.tams.systemtools.util.CommonUtil;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
