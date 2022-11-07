@@ -1009,6 +1009,7 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
                     List<CfetsTrdConfirmRegInfoListResponse>
                             regAndIbuPledges = cfetsTrdConfirmMapper.findAllRegAndIbuPledgesList(item.getTotleTradeId());
                     boolean isMatch = true;
+                    String massege = null;
                     if (StringUtil.isEmptyList(regAndIbuPledges) || StringUtil.isEmptyList(cstpPledges)) {
                         continue;
                     }
@@ -1019,18 +1020,21 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
                             if (!StringUtil.equals(regAndIbuDemo.getPledgeFinprodId(), cstpDemo.getPledgeFinprodId())
                                     && map.get("pledgeFinprodId") != null && StringUtil.equals(map.get("pledgeFinprodId").getType(), "01")) {
                                 isMatch = false;
+                                massege = "质押券id不同 下行:" + cstpDemo.getPledgeFinprodId() + "登记:" + regAndIbuDemo.getPledgeFinprodId();
                                 break;
                             }
                             if (StringUtil.isNotEmpty(regAndIbuDemo.getPledgeRatio()) && StringUtil.isNotEmpty(cstpDemo.getPledgeRatio())
                                     && regAndIbuDemo.getPledgeRatio().compareTo(cstpDemo.getPledgeRatio()) != 0
                                     && map.get("pledgeRatio") != null && StringUtil.equals(map.get("pledgeRatio").getType(), "01")) {
                                 isMatch = false;
+                                massege = "质押券折算率不同 下行:" + cstpDemo.getPledgeRatio() + "登记:" + regAndIbuDemo.getPledgeRatio();
                                 break;
                             }
                             if (StringUtil.isNotEmpty(regAndIbuDemo.getPledgeFaceValue()) && StringUtil.isNotEmpty(cstpDemo.getPledgeFaceValue())
                                     && regAndIbuDemo.getPledgeFaceValue().compareTo(cstpDemo.getPledgeFaceValue()) != 0
                                     && map.get("pledgeFaceValue") != null && StringUtil.equals(map.get("pledgeFaceValue").getType(), "01")) {
                                 isMatch = false;
+                                massege = "质押券券面总额不同 下行:" + cstpDemo.getPledgeFaceValue() + "登记:" + regAndIbuDemo.getPledgeFaceValue();
                                 break;
                             }
                         }
@@ -1041,7 +1045,7 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
                         dealType = BussinessDictCodeList.交易类型_登记报价.getValue();
                         break;
                     } else {
-                        logger.info("质押券未匹配到数据");
+                        logger.info("质押券未匹配到数据:{}", massege);
                     }
                 }
             }
