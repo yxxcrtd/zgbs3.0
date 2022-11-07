@@ -976,10 +976,10 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
 //                if(StringUtil.isNotEmpty(finProductTradeDto.getBondFirstSign())){
 //                	etrPositionHoldDto.getPtlCashPositionFlows().add(gen一级市场冲销现金流水生成(etrCashPositionFlowDto, entrustId, 交易日数量));
 //                }else{
-
-                        if (EtrCommonCashPositionDealService.getEtrFinishAmtMuilt(map) != null) {
+                        // modify by jiangpeng on 20221104 指令部分下单时,交收未生成冲销流水
+//                        if (EtrCommonCashPositionDealService.getEtrFinishAmtMuilt(map) != null) {
                             etrPositionHoldDto.getPtlCashPositionFlows().add(gen冲销现金流水生成(etrCashPositionFlowDto, entrustId, 交易日数量, finProductTradeDto.getTrdProductDeal().getSettleDate(), finProductTradeDto.getTrdProductDeal().getTradeMarket(), finProductTradeDto.getBondFirstSign()));
-                        }
+//                        }
                     }
 //                }
                 }

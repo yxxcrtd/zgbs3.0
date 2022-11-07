@@ -1,0 +1,1 @@
+delete from CFG_DATATABLE_SHOW where PAGECODE = 'EtrExchangeAgreRepTrade001' and DTCODE = 'ONWAYREP' and SPCDCODE = '999999' and COLCODE = 'intiTradeId';

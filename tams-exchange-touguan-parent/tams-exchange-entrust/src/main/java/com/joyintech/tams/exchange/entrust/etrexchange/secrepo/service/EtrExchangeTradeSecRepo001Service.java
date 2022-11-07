@@ -1645,9 +1645,9 @@ public class EtrExchangeTradeSecRepo001Service extends CommonExportService<EtrEx
             }
             else if(StringUtil.equals(finprodType,DictCodeList.回购类型_质押式竞价回购.getValue())){
                 if(hasQuote && quotation!=null&&quotation.getLastPrice()!=null
-                        &&(checkPrice.compareTo(ArithmeticUtil.doAdd(3,RoundingMode.HALF_UP,BigDecimal.valueOf(0.01),quotation.getLastPrice()))>0
+                        &&(checkPrice.compareTo(ArithmeticUtil.doAdd(3,RoundingMode.HALF_UP,BigDecimal.valueOf(1),quotation.getLastPrice()))>0
                         ||checkPrice.compareTo(BigDecimal.ZERO)<0)){
-                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+ArithmeticUtil.doAdd(3,RoundingMode.HALF_UP,BigDecimal.valueOf(0.01),quotation.getLastPrice())+"]之外"));
+                    validMessageList.add(new ValidMessage("指令价格在有效价格范围["+BigDecimal.ZERO+","+ArithmeticUtil.doAdd(3,RoundingMode.HALF_UP,BigDecimal.valueOf(1),quotation.getLastPrice())+"]之外"));
                 }
             }
         }

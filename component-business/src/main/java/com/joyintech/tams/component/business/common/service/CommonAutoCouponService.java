@@ -285,7 +285,7 @@ public class CommonAutoCouponService extends BaseService {
         if (null != dto.getSecidList() && !dto.getSecidList().isEmpty()) {
             for (String secid : dto.getSecidList()) {
                 BaseFinProductBaseInfoDto baseFinProductBaseInfoDto = new BaseFinProductBaseInfoDto();
-                //WIND_债券基本信息数据 
+                //WIND_债券基本信息数据
                 InterfPayhsrcsecinfoDto interfPayhsrcsecinfo = selectWindBondAssetBySecId(secid);
                 //WIND_债券行权信息数据
                 List<InterfPayhsrcsecoption> payhsrcsecoptionList = selectWindBondExercise(secid);
@@ -363,7 +363,7 @@ public class CommonAutoCouponService extends BaseService {
                 }*/
 //                if(null!=interfPayhsrcsecinfo && null!=interfPayhsrcsecinfo.getIssuetype()){
 //                    if(interfPayhsrcsecinfo.getIssuetype().startsWith("43901")){
-//                        finProduct.setIssueType(BussinessDictCodeList.发行方式_公开发行.getValue()); 
+//                        finProduct.setIssueType(BussinessDictCodeList.发行方式_公开发行.getValue());
 //                    }else{
 //                        finProduct.setIssueType(BussinessDictCodeList.发行方式_非公开发行.getValue());
 //                    }
@@ -439,6 +439,8 @@ public class CommonAutoCouponService extends BaseService {
                 finProductAdd.setIsNetprice(interfPayhsrcsecinfo.getIsNetprice());
                 finProductAdd.setCrossMarket(StringUtil.isNotBlank(interfPayhsrcsecinfo.getCrossMarketCode()) ? DictCodeList.是否_是.getValue() : DictCodeList.是否_否.getValue());
                 finProductAdd.setCrossMarketCode(interfPayhsrcsecinfo.getCrossMarketCode());
+                finProductAdd.setInvestNature("01");//设置债券的默认投资性质为01
+
                 //概念板块
                 List<String> conceptType = new ArrayList<>();
                 if (DictCodeList.是否_是.getValue().equals(interfPayhsrcsecinfo.getCityInvestSecChb())) {
@@ -1203,7 +1205,22 @@ public class CommonAutoCouponService extends BaseService {
 
 
                 finProductAdd.setTrmFundAbbr(infChinamutualfunddescription.getTrmFundAbbr());
-                finProductAdd.setTrmFundType(infChinamutualfunddescription.getTrmFundType());
+                /**交易所基金类型从text到id的映射 modify by yeming 2021/12/14 start**/
+                if(StringUtil.isNotEmpty(infChinamutualfunddescription.getTrmFundType())){
+                    if(StringUtil.equals(infChinamutualfunddescription.getTrmFundType(),DictCodeListExt2.交易所基金类型_ETF.getCodeName())){
+                        finProductAdd.setTrmFundType(DictCodeListExt2.交易所基金类型_ETF.getValue());
+                    }else if(StringUtil.equals(infChinamutualfunddescription.getTrmFundType(),DictCodeListExt2.交易所基金类型_LOF.getCodeName())){
+                        finProductAdd.setTrmFundType(DictCodeListExt2.交易所基金类型_LOF.getValue());
+                    }else if(StringUtil.equals(infChinamutualfunddescription.getTrmFundType(),DictCodeListExt2.交易所基金类型_分级基金.getCodeName())){
+                        finProductAdd.setTrmFundType(DictCodeListExt2.交易所基金类型_分级基金.getValue());
+                    }else if(StringUtil.equals(infChinamutualfunddescription.getTrmFundType(),DictCodeListExt2.交易所基金类型_封闭式基金.getCodeName())){
+                        finProductAdd.setTrmFundType(DictCodeListExt2.交易所基金类型_封闭式基金.getValue());
+                    }else if(StringUtil.equals(infChinamutualfunddescription.getTrmFundType(),DictCodeListExt2.交易所基金类型_实时申赎货币基金.getCodeName())){
+                        finProductAdd.setTrmFundType(DictCodeListExt2.交易所基金类型_实时申赎货币基金.getValue());
+                    }
+                }
+                /**交易所基金类型从text到id的映射 modify by yeming 2021/12/14 end**/
+
                 finProductAdd.setPurRedId(infChinamutualfunddescription.getPurRedId());
                 finProductAdd.setPurRedAbbr(infChinamutualfunddescription.getPurRedAbbr());
                 finProductAdd.setPurStartLow(infChinamutualfunddescription.getPurStartLow());
@@ -1238,6 +1255,20 @@ public class CommonAutoCouponService extends BaseService {
                         finProductAdd.setEtfType(DictCodeListExt2.ETF类型_单市场ETF.getValue());
                     }
 
+                }
+
+                if (StringUtil.isNotEmpty(infChinamutualfunddescription.getfInfoType()) && StringUtil.isNotEmpty(infChinamutualfunddescription.getfInfoType2())) {
+                    if (StringUtil.equals(infChinamutualfunddescription.getfInfoType(), BussinessDictCodeList.行内资产二级分类_公募基金.getValue())
+                            && (StringUtil.equals(infChinamutualfunddescription.getfInfoType2(), DictCodeList.基金类资产二级类型_债券基金.getValue()) ||
+                            StringUtil.equals(infChinamutualfunddescription.getfInfoType2(), DictCodeList.基金类资产二级类型_货币市场基金.getValue())
+                    )) {
+                        finProductAdd.setInvestNature(DictCodeList.投资性质_固定收益类.getValue());
+                    }else if(StringUtil.equals(infChinamutualfunddescription.getfInfoType2(), DictCodeList.基金类资产二级类型_混合基金.getValue()) ||
+                            StringUtil.equals(infChinamutualfunddescription.getfInfoType2(), DictCodeList.基金类资产二级类型_其他公募基金.getValue())){
+                        finProductAdd.setInvestNature(DictCodeList.投资性质_混合类.getValue());
+                    }else{
+                        finProductAdd.setInvestNature(DictCodeList.投资性质_权益类.getValue());
+                    }
                 }
 
 

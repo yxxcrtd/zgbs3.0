@@ -91,6 +91,9 @@ public class MstTradeOpponent001Service extends BaseService<MstTradeOpponentDto>
     
     //分页查询 获取交易对手
     private List<MstTradeOpponentDto> selectAllForPage(Map<String, Object> param) {
+        if (StringUtil.isNotEmpty(param.get("partyId"))){
+            param.put("partyIdList",StringUtil.splitToList(",",param.get("partyId").toString()));
+        }
     	List<MstTradeOpponentDto> list = basicMstTradeOpponent001Mapper.queryForPage(param);
     	if(list!=null && list.size()>0) {
     		for(MstTradeOpponentDto dto : list) {

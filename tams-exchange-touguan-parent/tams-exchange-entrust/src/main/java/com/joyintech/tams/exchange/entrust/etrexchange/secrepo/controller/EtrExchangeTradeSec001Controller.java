@@ -86,12 +86,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -659,6 +654,21 @@ public class EtrExchangeTradeSec001Controller extends BaseController{
 		List<ValidMessage> validListPriceRange = etrExchangeTradeSecRepo001Service.checkSavePriceRange(dto,br);
 		if (!CollectionUtils.isEmpty(validList)){
 			ajax.setErrorList(validList);
+		}
+
+		Iterator<ValidMessage> validMessageIter = validListPriceRange.iterator();
+		while (validMessageIter.hasNext()) {
+			ValidMessage validMessage = validMessageIter.next();
+			if (StringUtil.equals(validMessage.getMessage(), "当前时间不在允许范围时间内!")) {
+				// 闭市后是否禁止下场内交易指令(Y：禁止 N：不禁止)
+				if (DictCodeList.是否_是.getValue().equals(CacheUtil.getSysParam("etr_trade_time_switch"))
+					&& !StringUtil.equals(dto.getOperateType(),"save")) {
+					ajax.setErrorList(validListPriceRange);
+					return ajax;
+				} else {
+					validMessageIter.remove();
+				}
+			}
 		}
 
 		String confirmMsg = etrExchangeTradeSecRepoValidatorService.isNameSoftControl(dto);

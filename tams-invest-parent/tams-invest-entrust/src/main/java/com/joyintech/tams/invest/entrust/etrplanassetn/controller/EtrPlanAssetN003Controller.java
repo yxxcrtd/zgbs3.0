@@ -24,6 +24,7 @@ import com.joyintech.tams.invest.entrust.etrplanassetn.service.EtrPlanAssetNServ
 import com.joyintech.tams.systemtools.dto.PageElementConfigDto;
 import com.joyintech.tams.systemtools.util.PageElementUtil;
 import com.joyintech.tools.util.ValidationUtil;
+import com.joyintech.workflow.engine.LocalWorkFlowParameter;
 import com.joyintech.workflow.engine.dto.ProcessParameter;
 import com.joyintech.workflow.engine.dto.WorkFlowParameter;
 import com.joyintech.workflow.engine.exception.WorkFlowException;
@@ -214,7 +215,9 @@ public class EtrPlanAssetN003Controller extends BaseController {
                 dto.setEntrustId(code);
             }
             //走002界面流程
-            dto.setWorkflowParameter("new|||1|EtrPlanAssetN002|EtrPlanAssetN002_btn_submit|true");
+            dto.setWorkflowParameter(LocalWorkFlowParameter.getOperType()+"|"+LocalWorkFlowParameter.getUsers()+"|"+
+                    LocalWorkFlowParameter.getRoles()+"|"+LocalWorkFlowParameter.getSubmit()+"|"+LocalWorkFlowParameter.getPageId()+"|"+
+                    LocalWorkFlowParameter.getElementId()+"|"+ LocalWorkFlowParameter.getTodoList());
         }
         // ----------add by yushilong 20200721 预占功能 start----------
         if (StringUtil.equals(BussinessConstant.SUBMIT, allDto.getOperateType())) {

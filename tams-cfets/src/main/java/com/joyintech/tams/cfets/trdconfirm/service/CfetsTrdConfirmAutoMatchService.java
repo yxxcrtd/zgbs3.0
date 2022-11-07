@@ -116,7 +116,6 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
             CfetsTrdConfirmRegInfoListResponse regInfo = new CfetsTrdConfirmRegInfoListResponse();
             regInfo.setDealType(matchDto.getDealType());
             regInfo.setTotleTradeId(matchDto.getPreTradeId());
-            List<ValidMessage> messages = new ArrayList<>();
             matchDto.setTrdConfStatus(DictCodeList.确认状态_已确认.getValue());
             if (StringUtil.isNotEmpty(bondDealDbDto)) {
                 //对dto进行封装
@@ -507,10 +506,10 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
     /**
      * CSTP成交回报-自动匹配
      */
+    @DTXTransaction(transactionListener = "positionRollService")
     @Transactional(rollbackFor = Exception.class)
-    @DTXTransaction
-    public AjaxResult cstpAutoMatchMethod(InterfTradSecdeal interfTradSecdeal,
-                                          InterfOpicsTradRepo interfOpicsTradRepo, InterfCstpBjfxjg interfCstpBjfxjg, InterfCstpTrade iCstpTrade) {
+    public void cstpAutoMatchMethod(InterfTradSecdeal interfTradSecdeal,
+                                    InterfOpicsTradRepo interfOpicsTradRepo, InterfCstpBjfxjg interfCstpBjfxjg, InterfCstpTrade iCstpTrade) {
         logger.info("-----------银行间CSTP成交回报-自动匹配Start-------------");
         CfetsTrdConfirmMatchDto matchDto = new CfetsTrdConfirmMatchDto();
         //是否支持CSTP下行接口_现券买卖
@@ -538,7 +537,8 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
         }
         if (!StringUtil.isNotEmpty(matchDto)) {
             logger.info("-----------无可匹配的交易End-------------");
-            return new AjaxResult();
+            new AjaxResult();
+            return;
         }
         if (StringUtil.isNotEmpty(matchDto.getDealType()) && StringUtil.equals(matchDto.getDealType(), "999999")
                 && !StringUtil.equals(cfetsIsAutoSure, DictCodeList.是否_否.getValue())) {
@@ -557,7 +557,6 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
             CfetsTrdConfirmRegInfoListResponse regInfo = new CfetsTrdConfirmRegInfoListResponse();
             regInfo.setDealType(matchDto.getDealType());
             regInfo.setTotleTradeId(matchDto.getPreTradeId());
-            List<ValidMessage> messages = new ArrayList<>();
             try {
                 if (StringUtil.isNotEmpty(interfTradSecdeal)) {
                     //对dto进行封装
@@ -596,20 +595,15 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
                 //若插入数据异常，提示错误信息
                 Message ms = PositionUtil.ajaxErrorReturn(e);
                 if (null != ms && StringUtil.isNotEmpty(ms.getMessage())) {
-                    messages.add(new ValidMessage(getMessage("CONFIRM_MSG_009", regInfo.getTotleTradeId(), DictCodeListExt3.操作类型_自动匹配确认.getCodeName(), ms.getMessage())));
+                    logger.error(getMessage("CONFIRM_MSG_009", regInfo.getTotleTradeId(), DictCodeListExt3.操作类型_自动匹配确认.getCodeName(), ms.getMessage()));
                 } else {
-                    messages.add(new ValidMessage(getMessage("CONFIRM_MSG_008", regInfo.getTotleTradeId(), DictCodeListExt3.操作类型_自动匹配确认.getCodeName())));
+                    logger.error(getMessage("CONFIRM_MSG_008", regInfo.getTotleTradeId(), DictCodeListExt3.操作类型_自动匹配确认.getCodeName()));
                 }
-                logger.error(e.getMessage(), e);
-            }
-            if (!StringUtil.isEmptyList(messages) && messages.size() > 0) {
-                AjaxResult res = new AjaxResult();
-                res.setErrorList(messages);
-                return res;
+                throw e;
             }
         }
         logger.info("-----------银行间CSTP成交回报-自动匹配End-------------");
-        return new AjaxResult();
+        new AjaxResult();
     }
 
     /**
@@ -821,7 +815,6 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
             return null;
         }
         CfetsTrdConfirmRegInfoListResponse confirmDto;
-        String dealType = "999999";
         // 一级申购下行报文没有成交编号,不存在该场景
         //1.CSTP下行成交回报数据的成交编号匹配已生成的银行间交易数据中的成交编号,根据cstp下行成交回报的成交编号，查询匹配关系
         // 一级申购没有上行报文,不存在该场景
@@ -866,7 +859,6 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
             return null;
         }
         confirmDto = confirmDtoList.get(0);
-        dealType = BussinessDictCodeList.交易类型_登记报价.getValue();
         logger.info("-----------自动匹配查询到一级申购登记数据-------------");
         //将CSTP数据和已有的登记或报价数据进行比较
 
@@ -882,7 +874,7 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
         match.setCreateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
         match.setCreateDept(CommonUtil.getDeptCode());
         match.setUpdateUser(null != SecurityUtil.getLoginUser() ? SecurityUtil.getLoginUser().getUserName() : "SYSTEM");
-        match.setDealType(dealType);
+        match.setDealType(BussinessDictCodeList.交易类型_登记报价.getValue());
         return match;
     }
 

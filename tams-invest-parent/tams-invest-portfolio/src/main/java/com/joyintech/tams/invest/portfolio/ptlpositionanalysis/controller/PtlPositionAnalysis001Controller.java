@@ -216,6 +216,7 @@ public class PtlPositionAnalysis001Controller extends BaseController {
         return ptlPositionAnalysis001Service.export(this.getPageId(),
             RequestUtil.getParameters(getRequest()),"searchDate");
     }
+
     /**
      * 资产代码的下拉框事件
      *
@@ -228,6 +229,21 @@ public class PtlPositionAnalysis001Controller extends BaseController {
     public List<SelectOptionDto> getPortFolioInfo(){
         Map<String,Object> map = RequestUtil.getPageParam();
         List<SelectOptionDto> temp = ptlPositionAnalysis001Service.getPortFolioInfo(map);
+        return temp;
+    }
+
+    /**
+     * 委外的下拉框事件
+     *
+     * @return 查询结果
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("/getPortFolioInfoWW")
+    public List<SelectOptionDto> getPortFolioInfoWW(){
+        Map<String,Object> map = RequestUtil.getPageParam();
+        List<SelectOptionDto> temp = ptlPositionAnalysis001Service.getPortFolioInfoWW(map);
         return temp;
     }
 }

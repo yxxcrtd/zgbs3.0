@@ -2628,22 +2628,22 @@ public enum BussinessDictCodeListRds implements BaseDictCodeList {
     分类维度_说明书是否披露风险标志(BussinessDictCodeRds.分类维度,"07","说明书是否披露风险标志"),
 
     /**
-     *  分类维度_说明书是否披露风险标志
+     *  分类维度_是否面向非机构投资者
      */
     分类维度_是否面向非机构投资者(BussinessDictCodeRds.分类维度,"08","是否面向非机构投资者"),
 
     /**
-     *  分类维度_说明书是否披露风险标志
+     *  分类维度_开放模式
      */
     分类维度_开放模式(BussinessDictCodeRds.分类维度,"09","开放模式"),
 
     /**
-     *  分类维度_说明书是否披露风险标志
+     *  分类维度_是否现金管理类产品
      */
     分类维度_是否现金管理类产品(BussinessDictCodeRds.分类维度,"10","是否现金管理类产品"),
 
     /**
-     *  分类维度_说明书是否披露风险标志
+     *  分类维度_自主管理计划
      */
     分类维度_自主管理计划(BussinessDictCodeRds.分类维度,"11","自主管理计划"),
 

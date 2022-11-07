@@ -785,9 +785,9 @@ public class ReconciliationCommonService {
         settleTransDataNew.setCommissionAmt(ArithmeticUtil.doAdd(settleTransData.getCommissionAmt(), dto.getCommissionAmtCe()));
         if (settleTransDataNew.getCommissionAmt() != null
                 && settleTransDataNew.getCommissionAmt().compareTo(BigDecimal.ZERO) != 0
-                && StringUtil.isNotEmpty(dto.getIsPayWithTrade())) {
-            settleTransDataNew.setIsPayWithTrade(dto.getIsPayWithTrade());
-        } else if (StringUtil.isEmpty(dto.getIsPayWithTrade())
+                && StringUtil.isNotEmpty(settleTransData.getIsPayWithTrade())) {
+            settleTransDataNew.setIsPayWithTrade(settleTransData.getIsPayWithTrade());
+        } else if (StringUtil.isEmpty(settleTransData.getIsPayWithTrade())
                 && settleTransDataNew.getCommissionAmt() != null
                 && settleTransDataNew.getCommissionAmt().compareTo(BigDecimal.ZERO) != 0) {
             settleTransDataNew.setIsPayWithTrade(DictCodeListExt1.是否_否.getValue());

@@ -397,7 +397,6 @@ public class CfetsTrdConfirmService extends BaseService {
     /**
      * 交易执行-成交确认
      */
-    @Transactional(rollbackFor = Exception.class)
     public AjaxResult trdConfirmSaveMethod(CfetsTrdConfirmRegInfoListResponse dto) {
         List<CfetsTrdConfirmRegInfoListResponse> selectedItem = dto.getSelectedItem();
         List<ValidMessage> messages = new ArrayList<>();
@@ -533,20 +532,46 @@ public class CfetsTrdConfirmService extends BaseService {
         // 结算金额
         BigDecimal fpriceAmt = interfCstpTrade.getSettlcurramt();
         result.setFpriceAmt(interfCstpTrade.getSettlcurramt());
+        result.setTradeAmt(interfCstpTrade.getSettlcurramt());
         // 应计利息总额
         BigDecimal intAmt = interfCstpTrade.getAccruedinteresttotalamt();
         result.setIntAmt(interfCstpTrade.getAccruedinteresttotalamt());
         // 券面总额
         BigDecimal shareAmt = result.getShareAmt();
+        // 净价
+        BigDecimal price = interfCstpTrade.getPrice();
+        result.setUnitCprice(price);
+        // 全价
+        BigDecimal fPrice = interfCstpTrade.getDirtyprice();
+        result.setUnitFprice(fPrice);
+        // 到期收益率
+        BigDecimal yield = interfCstpTrade.getYield2();
+        result.setYield(yield);
+        // 行权收益率
+        BigDecimal strikeYield = interfCstpTrade.getStrikeyield();
+        result.setExerYield(strikeYield);
+        // 单位应计利息
+        BigDecimal unitInt = interfCstpTrade.getAccruedinterestamt();
+        result.setUnitInt(unitInt);
         // 债券面值
-        BigDecimal price = trdCommonBaseService.getFaceValue(dto.getFinprodId(), iPlatformDate.getSysDate());
+        BigDecimal faceValue = trdCommonBaseService.getFaceValue(dto.getFinprodId(), iPlatformDate.getSysDate());
         // 分配结算金额和交易金额
         for (int i = 0; i < result.getTrdProductDeals().size(); i++) {
             if(StringUtil.isNotEmpty(result.getTrdProductDeals().get(i).getTradeAmt())) {
                 result.getTrdProductDeals().get(i).setOldTradeAmt(result.getTrdProductDeals().get(i).getTradeAmt());
             }else{
-                result.getTrdProductDeals().get(i).setOldTradeAmt(ArithmeticUtil.multiply(price, result.getTrdProductDeals().get(i).getShareAmt()));
+                result.getTrdProductDeals().get(i).setOldTradeAmt(ArithmeticUtil.multiply(faceValue, result.getTrdProductDeals().get(i).getShareAmt()));
             }
+            // 净价
+            result.getTrdProductDeals().get(i).setUnitCprice(price);
+            // 全价
+            result.getTrdProductDeals().get(i).setUnitFprice(fPrice);
+            // 到期收益率
+            result.getTrdProductDeals().get(i).setYield(yield);
+            // 行权收益率
+            result.getTrdProductDeals().get(i).setExerYield(strikeYield);
+            // 单位应计利息
+            result.getTrdProductDeals().get(i).setUnitInt(unitInt);
             result.getTrdProductDeals().get(i).setOldFpriceAmt(result.getTrdProductDeals().get(i).getFpriceAmt());
             result.getTrdProductDeals().get(i).setOldIntAmt(result.getTrdProductDeals().get(i).getIntAmt());
             // 最后一笔数据倒减
@@ -3546,7 +3571,6 @@ public class CfetsTrdConfirmService extends BaseService {
     /**
      * CSTP成交回报-手工匹配
      */
-    @Transactional(rollbackFor = Exception.class)
     public AjaxResult cstpManualMatchMethod(CfetsTrdConfirmManualMatchInfoRequest manualMatchDto) {
         //判断基础要素是否一致
         CfetsTrdConfirmRegInfoListResponse regInfo = manualMatchDto.getSelectedCfetsTrdConfirmRegInfoList().get(0);

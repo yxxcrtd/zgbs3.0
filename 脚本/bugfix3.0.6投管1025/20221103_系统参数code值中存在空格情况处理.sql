@@ -1,0 +1,2 @@
+UPDATE SYS_PARA SET PARA_CODE = 'cfetsEtrIbBondinfo_positionTable_refresh_period' where PARA_CODE = 'cfetsEtrIbBondinfo_positionTable_refresh_period ';
+UPDATE SYS_PARA SET PARA_CODE = 'cfetsEtrIbBondinfo_etrTable_refresh_period' where PARA_CODE = 'cfetsEtrIbBondinfo_etrTable_refresh_period ';

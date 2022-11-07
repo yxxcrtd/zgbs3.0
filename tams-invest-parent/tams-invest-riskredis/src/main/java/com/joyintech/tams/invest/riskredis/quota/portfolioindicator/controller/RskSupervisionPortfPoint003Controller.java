@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import com.joyintech.tams.constant.DictCode;
 
+import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeRds;
 import com.joyintech.tams.invest.common.constantrds.BussinessDictCodeListRds;
@@ -82,8 +83,7 @@ public class RskSupervisionPortfPoint003Controller extends BaseController {
         	rskPortfolioPackage003Dto.getRskPortfolioPoolConfigDto().getPtlParamPoolConfigList().forEach(item ->{
         		String[] arrayStr=item.getClassifyDimensionVal().split(GlobalConstant.COMMA);
         		listSortType.stream().filter(
-	                option ->(StringUtil.equals(option.getParentId(),BussinessDictCodeRds.分类维度.getValue() + GlobalConstant.POINT + item.getClassifyDimension())
-                            || option.getParentId().indexOf(BussinessDictCodeRds.分类维度.getValue() + GlobalConstant.POINT + item.getClassifyDimension()) >= 0)
+	                option ->(StringUtil.equals(option.getParentId(),BussinessDictCodeRds.分类维度.getValue() + GlobalConstant.POINT + item.getClassifyDimension()))
 	               &&(item.getClassifyDimensionVal().indexOf(option.getId().replace(option.getCol() + GlobalConstant.POINT,""))>=0)
                        ).forEach(
                               option -> {

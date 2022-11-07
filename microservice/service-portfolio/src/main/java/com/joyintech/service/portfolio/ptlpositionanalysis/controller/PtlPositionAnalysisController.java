@@ -118,6 +118,18 @@ public class PtlPositionAnalysisController {
     public List<SelectOptionDto> getPortFolioInfo(@RequestBody Map<String,Object> param){
         return ptlPositionAnalysisService.getPortFolioInfo(param);
     }
+
+    /**
+     * 组合的联想下拉框事件
+     * @param param 输入参数
+     * @return 查询结果
+     * @see
+     * @since 1.0
+     */
+    @RequestMapping("getPortFolioInfoWW")
+    public List<SelectOptionDto> getPortFolioInfoWW(@RequestBody Map<String,Object> param){
+        return ptlPositionAnalysisService.getPortFolioInfoWW(param);
+    }
     
     /**
      * 导出查询方法

@@ -7,6 +7,7 @@ package com.joyintech.tams.invest.common.trade.dao;
 
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
+import com.joyintech.tams.invest.common.dto.common.PledgeBondInfoDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.period.trdrepoduration.RepoInfo;
@@ -295,6 +296,8 @@ public interface EtrCommonCashPositionMapper {
     List<RepoInfo> findRepoInfo(String finprodId);
 
     List<EtrSecPositionFlowDto> selectAllPositionByTotle(String tradeId);
+
+    List<PledgeBondInfoDto> selectAllRepoPositionByTradeId(Map<String, Object> params);
 
     /**
      * 根据产品代码查出所有流水

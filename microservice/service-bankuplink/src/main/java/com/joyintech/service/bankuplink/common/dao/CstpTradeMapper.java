@@ -108,6 +108,7 @@ public interface CstpTradeMapper {
      * @since 1.0
      */
     InterfOpicsTradRepo selectTradRepo(@Param("execid") String execid,
+                                       @Param("side") String side,
                                        @Param("sysDate") String sysDate,
                                        @Param("businesstype") String businesstype);
 

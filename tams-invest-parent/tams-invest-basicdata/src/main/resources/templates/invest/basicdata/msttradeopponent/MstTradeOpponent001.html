@@ -33,6 +33,18 @@
                       			data-idfield="shortName" data-keyfield="shortName" data-th-data-effectivefieldsalias='|{"code":"#{MstTradeOpponent001.counterId}","shortName":"#{MstTradeOpponent001.counterName}"}|'>
                     	</div>
                 	</div>
+					<!-- 查询条件 增加银行间机构21位码 add by 代志伟  20221102 start-->
+					<div class="layui-inline layui-col-xs4 layui-col-md4 layui-col-sm4 layui-col-lg4">
+						<label class="layui-form-label form-lable" data-th-text="#{MstTradeOpponent002.partyId1}">银行间机构21位码</label>
+						<div class="layui-input-inline input-inline">
+							<select type="text" id="partyId" name="partyId" allowClear="true"
+									class="layui-input form-input input-select" multiple=true
+									data-th-data-url="@{/invest/basicdata/msttradeopponent/MstTradeOpponent002/selectPartyId?pageId='MstTradeOpponent001'}"
+									 data-th-placeholder="#{SysCommon.placeholder}" formatoption="true">
+							</select>
+						</div>
+					</div>
+					<!-- 查询条件 增加银行间机构21位码 add by 代志伟  20221102 end-->
 	            </div>
 	        </form>
 	   		</div>

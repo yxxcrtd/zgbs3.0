@@ -60,9 +60,7 @@ public class EtrComponentUtil {
             entity.setCreateUser(entity.getUpdateUser());
         }
         // 更新时间
-        if (entity.getUpdateTime() == null) {
-            entity.setUpdateTime(dt);
-        }
+        entity.setUpdateTime(dt);
         // 创建时间
         if (entity.getCreateTime() == null) {
             entity.setCreateTime(entity.getUpdateTime());
