@@ -1440,7 +1440,7 @@
             TO_CHAR(T61.ACT_EXERCISE_DATE,'yyyy-MM-dd') actExerciseDate1,
             T1.SHARE_AMT/100 qty,
             decode(T1.PS,#{psT39},T81.EXERCISE_PRICE,T1.unit_cprice) unitPrice,
-            nvl(decode(T1.PS,#{psT39},T81.EXERCISE_PRICE,T1.unit_cprice)*T1.SHARE_AMT,T1.Trade_Amt) cpriceAmt,
+            T1.CPRICE_AMT cpriceAmt,
             T1.int_amt intAmt,
             ttft.fee_amt jyFeeAmt,
             ttft1.fee_amt jsFeeAmt,
