@@ -3,14 +3,8 @@ package com.joyintech.tams.invest.period.trdbuyoutduration.service;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
 import com.joyintech.framework.security.LoginUserUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.RequestUtil;
-import com.joyintech.framework.util.StringUtil;
-import com.joyintech.tams.common.base.dao.WflPaTrdFinDealTotalMapper;
-import com.joyintech.tams.common.base.dao.WflStlPayOrdersMapper;
-import com.joyintech.tams.common.base.dao.WflTrdFinProductDealTotalMapper;
-import com.joyintech.tams.common.base.dao.WflTrdProductDealMapper;
+import com.joyintech.framework.util.*;
+import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
 import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommService;
 import com.joyintech.tams.component.business.trade.BussTrdTransferOrderService;
@@ -21,6 +15,8 @@ import com.joyintech.tams.invest.common.autoperiod.repo.AutoPeriodRepoCommonServ
 import com.joyintech.tams.invest.common.constant.BussinessConstant;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
+import com.joyintech.tams.invest.common.dto.PtlPositionHoldDto;
+import com.joyintech.tams.invest.common.dto.PtlSecPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.dto.common.InvestInterfCommDto;
 import com.joyintech.tams.invest.common.dto.common.TrdCommonDeleteDto;
@@ -39,10 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author : 强成西
@@ -271,8 +264,77 @@ public class TrdRepoBuyoutDuration002Service extends BaseService<TrdRepoBuyoutDu
                     tradeDto.getBaseTradeProductDealDtos().forEach(
                             baseTradeProductDealDto1 -> baseTradeProductDealDto1.getTrdProductDealAdd().setPortfolioId(entity.getPortfolioId()));
                 }
+                // 写入质押品的组合持仓流水
+                this.ptlSecPositionFlowLogic(entity);
             }
         }
+    }
+
+
+    /**
+     * 写入质押品的组合持仓流水
+     *
+     * @param input    画面参数Dto
+     */
+    private boolean ptlSecPositionFlowLogic(TrdRepoBuyoutDuration002Dto input) {
+        List<PtlSecPositionFlowDto> lstPtlSecPositionFlowDto = new ArrayList<>();
+        // 根据交易编号检索组合持仓流水（持仓类型为实际）
+        List<PtlSecPositionFlow> lstReal = this.selectPtlSecPositionFlow(input.getFinprodId());
+        if (!StringUtil.isEmptyList(lstReal)) {
+            PtlSecPositionFlowDto resultDto;
+            for (PtlSecPositionFlow ptlSecPositionFlow : lstReal) {
+                resultDto = new PtlSecPositionFlowDto();
+                // 组合代码
+                resultDto.setPortfolioId(ptlSecPositionFlow.getPortfolioId());
+                // 证券管理账户/通道代码
+                resultDto.setSecAcctId(ptlSecPositionFlow.getSecAcctId());
+                // 金融产品代码
+                resultDto.setFinprodId(ptlSecPositionFlow.getFinprodId());
+                // 分支序号
+                resultDto.setBranch(ptlSecPositionFlow.getBranch());
+                // 持仓类型
+                resultDto.setHodingType(ptlSecPositionFlow.getHodingType());
+                // 日期
+                resultDto.setCdate(ptlSecPositionFlow.getCdate());
+                // 数量
+                resultDto.setAmount(ptlSecPositionFlow.getAmount().negate());
+                // 币种
+                resultDto.setCcy(ptlSecPositionFlow.getCcy());
+                // 交易编号
+                resultDto.setTradeId(input.getBusiCode());
+                // 投资目的
+                resultDto.setInvAim(ptlSecPositionFlow.getInvAim());
+
+                lstPtlSecPositionFlowDto.add(resultDto);
+
+                if (StringUtil.isNotEmpty(input.getActPortfolioId())
+                        && !StringUtil.equals(input.getActPortfolioId(), input.getPortfolioId())) {
+                    PtlSecPositionFlowDto subResultDto = new PtlSecPositionFlowDto();
+                    BeanUtil.copyPropertiesIgnoreNull(subResultDto, resultDto);
+                    subResultDto.setPortfolioId(input.getActPortfolioId());
+                    lstPtlSecPositionFlowDto.add(subResultDto);
+                }
+            }
+        }
+        PtlPositionHoldDto ptlPositionHoldDto = new PtlPositionHoldDto();
+        ptlPositionHoldDto.setPtlSecPositionFlows(lstPtlSecPositionFlowDto);
+        return restTemplate.postForObject(
+                ServiceApplication.PORTFOLIO_SERVICE_NAME + "/common/ptlposition/insertPosition",
+                ptlPositionHoldDto, Boolean.class);
+    }
+
+    /**
+     * 根据交易编号检索组合持仓流水（持仓类型为融入融出）
+     *
+     * @param bizCode 交易编号
+     * @return List<PtlSecPositionFlowDto>
+     * @see
+     * @since 1.0
+     */
+    public List<PtlSecPositionFlow> selectPtlSecPositionFlow(String bizCode) {
+        return restTemplate.postForList(
+                ServiceApplication.TRADE_SERVICE_NAME + "/TrdOutRightRepoTrade/selectPtlSecPositionFlow/" + bizCode,
+                null, PtlSecPositionFlow.class);
     }
 
     @Override
