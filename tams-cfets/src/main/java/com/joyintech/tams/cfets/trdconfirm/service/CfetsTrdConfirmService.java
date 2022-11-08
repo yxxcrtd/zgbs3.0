@@ -3237,7 +3237,7 @@ public class CfetsTrdConfirmService extends BaseService {
             DecimalFormat df = new DecimalFormat("#,##0.0000");
             this.buildMassege(matchMap, "yield",
                     str, "matchDetFeatures.yield",
-                    validateStr, "CONFIRM_MSG_013", df.format(ArithmeticUtil.round(cstpInfo.getTradeYield(), 4, RoundingMode.HALF_UP))+"%",
+                    validateStr, "CONFIRM_MSG_014", df.format(ArithmeticUtil.round(cstpInfo.getTradeYield(), 4, RoundingMode.HALF_UP))+"%",
                     df.format(ArithmeticUtil.round(regInfo.getYield(), 4, RoundingMode.HALF_UP))+"%");
         }
         // 券面总额
