@@ -41,6 +41,7 @@ import com.joyintech.tams.exchange.datacommon.db.dao.PortfolioDetailByManualMapp
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionDetailService;
 import com.joyintech.tams.exchange.datacommon.db.service.InstructionService;
 import com.joyintech.tams.exchange.service.trade.processor.portfolio.PortfolioAssignHelper;
+import com.joyintech.tams.invest.common.constant.TempConstant;
 import com.joyintech.tams.invest.common.dto.position.PositionCashSecDto;
 import com.joyintech.tams.invest.common.dto.position.PositionCashSecRequest;
 import com.joyintech.tams.invest.common.dto.position.PositionCashSecSingleResp;
@@ -409,6 +410,8 @@ public class PortfolioManager extends BaseService {
             calculateResponse.setPriceMode(instruction.getPriceMode());
             calculateResponse.setAcctNo(instruction.getAcctName());
 
+            calculateResponse.setSecInCanUse(querySecInCanUse(detail.getPortfolioId(), instruction));
+            calculateResponse.setSecOutCanUse(querySecOutCanUse(detail.getPortfolioId(), instruction));
             //指令数量
             calculateResponse.setEtrSecAmount(detail.getEntrustNum());
 
@@ -2254,6 +2257,114 @@ public class PortfolioManager extends BaseService {
 //        }
 //
 //        return getTotalLeftAmt(resultList);
+    }
+
+    /**
+     * 场内交易-标准券可用持仓可用查询
+     *
+     * @param portfolioId 组合代码
+     * @param instruction 指令信息
+     * @return java.math.BigDecimal
+     * @author jiangpeng
+     * @date 2022/11/8 10:09
+     */
+    public BigDecimal querySecInCanUse(String portfolioId, Instruction instruction) {
+        PositionCashSecDto secDto = new PositionCashSecDto();
+        secDto.setPortfolioId(portfolioId);
+        secDto.setFinprodId(instruction.getFinprodId());
+        secDto.setSecAcctId(instruction.getSecAcctId());
+        secDto.setAcctId(instruction.getAcctNo());
+        secDto.setCdate(DateUtil.format(instruction.getTradeDate()));
+        secDto.setCcy(StringUtil.isNotEmpty(instruction.getCcy()) ? instruction.getCcy() : DictCodeList.币种_人民币_CNY.getValue());
+        secDto.setTradePlat(TempConstant.NO_TRADE_BUSINESS_ETR);
+        secDto.setFinprodType2(instruction.getFinprodType2());
+
+        BigDecimal canSec = BigDecimal.ZERO; // 可用持仓
+        List<PositionCashSecDto> secList = new ArrayList<>();
+        if (StringUtil.isNotEmpty(secDto.getFinprodId()) && StringUtil.isNotEmpty(secDto.getSecAcctId())) {
+            if (StringUtil.isEmpty(secDto.getHoldingType())) {
+                etrTradeCommonervice.handleSecType(secDto, null);
+            }
+            secList.add(secDto);
+        }
+        BigDecimal newSecAmount = etrTradeCommonervice.queryPosition(secList, "04", "");
+        if (newSecAmount != null) {
+            canSec = canSec.add(newSecAmount);
+        }
+        canSec = ArithmeticUtil.divide(canSec, new BigDecimal(100), 2, RoundingMode.DOWN); //单位改成万元
+        return canSec;
+    }
+
+    /**
+     * 场内交易-质押券出库持仓
+     *
+     * @param portfolioId 组合代码
+     * @param instruction 资产代码
+     * @return java.math.BigDecimal
+     * @author jiangpeng
+     * @date 2022/11/8 10:09
+     */
+    public BigDecimal querySecOutCanUse(String portfolioId, Instruction instruction) {
+        //1、查询标准券可用
+        PositionCashSecDto cashSecDto = new PositionCashSecDto();
+        cashSecDto.setPortfolioId(portfolioId);
+        cashSecDto.setFinprodId(instruction.getFinprodId());
+        cashSecDto.setSecAcctId(instruction.getSecAcctId());
+        cashSecDto.setAcctId(instruction.getAcctNo());
+        cashSecDto.setCdate(DateUtil.format(instruction.getTradeDate()));
+        cashSecDto.setCcy(StringUtil.isNotEmpty(instruction.getCcy()) ? instruction.getCcy() : DictCodeList.币种_人民币_CNY.getValue());
+        cashSecDto.setFinprodType2(instruction.getFinprodType2());
+        List<PositionCashSecDto> proList = new ArrayList<>();
+        cashSecDto.setFinprodId("XN_PRODID999");
+        proList.add(cashSecDto);
+
+        List<PositionCashSecDto> secList = new ArrayList<>();
+        for (PositionCashSecDto temp : proList) {
+            temp.setHoldingType(DictCodeListExt3.资产类型_通用回购融资券可用持仓.getValue());
+            secList.add(temp);
+        }
+        BigDecimal secNum = etrTradeCommonervice.queryPosition(secList, "04", "");
+        //2、标准券可用/再折算率
+        Map<String, Object> param = new HashMap<>();
+        param.put("portfolioId", portfolioId);
+        param.put("finprodId", instruction.getFinprodId());
+        param.put("acctId", instruction.getAcctNo());
+        param.put("MORE_CONVRATE", 1);
+        param.put("date", instruction.getTradeDate());
+        Map scaleMap = portfolioDetailByManualMapper.findTandardRate(param);
+        BigDecimal scale = new BigDecimal(1);
+        BigDecimal tandardRate = new BigDecimal(1);
+        if (scaleMap != null) {
+            if (scaleMap.get("TANDARDRATE") != null) {
+                tandardRate = new BigDecimal(String.valueOf(scaleMap.get("TANDARDRATE")));//再折算率
+            }
+            if (scaleMap.get("SCALE") != null) {
+                scale = new BigDecimal(String.valueOf(scaleMap.get("SCALE")));//折算率
+            }
+        }
+        //secNum= ArithmeticUtil.divide(secNum, 100, 0);
+        secNum = ArithmeticUtil.divide(secNum, tandardRate, 0);
+        //3、A对应的再折算前持仓
+        cashSecDto.setFinprodId(instruction.getFinprodId());
+        List<PositionCashSecDto> secList1 = new ArrayList<>();
+        for (PositionCashSecDto temp : proList) {
+            temp.setHoldingType(DictCodeListExt3.资产类型_通用回购融资券折算前额度.getValue());
+            secList1.add(temp);
+        }
+        BigDecimal canSecNum = etrTradeCommonervice.queryPosition(secList1, "04", "");
+        BigDecimal faceValue = portfolioDetailByManualMapper.selectFaceValue(param);
+        faceValue = faceValue == null ? new BigDecimal("100") : faceValue;
+        //4、标准券可用/折算率和 A对应的再折算前持仓 比较
+        BigDecimal miniSecNum = canSecNum;
+        if (secNum.compareTo(canSecNum) < 0) {
+            miniSecNum = secNum;
+        }
+        //5、较小值/债券的折算率
+        miniSecNum = ArithmeticUtil.divide(miniSecNum, faceValue, 0);
+        miniSecNum = ArithmeticUtil.divide(miniSecNum, scale, 0);
+        miniSecNum = ArithmeticUtil.multiply(miniSecNum, new BigDecimal(100));
+        miniSecNum = ArithmeticUtil.divide(miniSecNum, new BigDecimal(100), 2, RoundingMode.DOWN); //单位改成万元
+        return miniSecNum;
     }
 }
 

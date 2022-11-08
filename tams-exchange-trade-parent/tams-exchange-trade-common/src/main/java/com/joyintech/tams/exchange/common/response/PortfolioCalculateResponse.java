@@ -85,6 +85,34 @@ public class PortfolioCalculateResponse {
     @JsonProperty("etrSecAmount")
     public BigDecimal etrSecAmount;
 
+    /**
+     * 可用持仓
+     */
+    @JsonProperty("secInCanUse")
+    private BigDecimal secInCanUse;
+
+    /**
+     * 出库持仓
+     */
+    @JsonProperty("secOutCanUse")
+    private BigDecimal secOutCanUse;
+
+    public BigDecimal getSecInCanUse() {
+        return secInCanUse;
+    }
+
+    public void setSecInCanUse(BigDecimal secInCanUse) {
+        this.secInCanUse = secInCanUse;
+    }
+
+    public BigDecimal getSecOutCanUse() {
+        return secOutCanUse;
+    }
+
+    public void setSecOutCanUse(BigDecimal secOutCanUse) {
+        this.secOutCanUse = secOutCanUse;
+    }
+
     public PortfolioCalculateResponse portfolioInfo(PortfolioInfoResponse portfolioInfo) {
         this.portfolioInfo = portfolioInfo;
         return this;
