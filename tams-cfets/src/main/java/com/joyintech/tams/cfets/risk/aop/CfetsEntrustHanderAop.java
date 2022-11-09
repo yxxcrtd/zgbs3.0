@@ -10,7 +10,6 @@ import com.joyintech.framework.util.SpringContextUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.pojo.Message;
-import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribdoRiskcalResponse;
 import com.joyintech.tams.cfets.risk.service.RiskInputParamSerivce;
 import com.joyintech.tams.component.business.riskall.constant.NodeConfigConstant;
@@ -143,26 +142,12 @@ public class CfetsEntrustHanderAop {
         Object[] args = joinPoint.getArgs();
         Map<String, Object> map = JsonUtils.object2Map(args[0]);
         String operateType = String.valueOf(map.get("operateType"));
-        try {
-            if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
-                if (StringUtil.equals(args[1].toString(), OperationType.NEW.toString())) {
-                    inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
-                } else {
-                    inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), null);
-                }
+        if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
+            if (StringUtil.equals(args[1].toString(), OperationType.NEW.toString())) {
+                inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_流程提交.getValue(), null);
+            } else {
+                inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), null);
             }
-        } catch (BusinessException e) {
-            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
-            if (CollectionUtils.isEmpty(mapList)) {
-                throw new BusinessException(e);
-            }
-            mapList.forEach(item -> {
-                String revokeId = String.valueOf(item.get("seqno"));
-                String modelType = (String) item.get("modelType");
-                positionRequestHandle.roll(revokeId, modelType, e.getMessage());
-            });
-        } finally {
-            ThreadLocalUtil.cleanLocalCache();
         }
     }
 
@@ -177,22 +162,8 @@ public class CfetsEntrustHanderAop {
         Object[] args = joinPoint.getArgs();
         Map<String, Object> map = JsonUtils.object2Map(args[0]);
         String operateType = String.valueOf(map.get("operateType"));
-        try {
-            if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
-                inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), null);
-            }
-        } catch (BusinessException e) {
-            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
-            if (CollectionUtils.isEmpty(mapList)) {
-                throw new BusinessException(e);
-            }
-            mapList.forEach(item -> {
-                String revokeId = String.valueOf(item.get("seqno"));
-                String modelType = (String) item.get("modelType");
-                positionRequestHandle.roll(revokeId, modelType, e.getMessage());
-            });
-        } finally {
-            ThreadLocalUtil.cleanLocalCache();
+        if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
+            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_修改.getValue(), 流程节点_流程提交.getValue(), null);
         }
     }
 
@@ -207,22 +178,8 @@ public class CfetsEntrustHanderAop {
         Object[] args = joinPoint.getArgs();
         Map<String, Object> map = JsonUtils.object2Map(args[0]);
         String operateType = String.valueOf(map.get("operateType"));
-        try {
-            if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
-                inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
-            }
-        } catch (BusinessException e) {
-            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
-            if (CollectionUtils.isEmpty(mapList)) {
-                throw new BusinessException(e);
-            }
-            mapList.forEach(item -> {
-                String revokeId = String.valueOf(item.get("seqno"));
-                String modelType = (String) item.get("modelType");
-                positionRequestHandle.roll(revokeId, modelType, e.getMessage());
-            });
-        } finally {
-            ThreadLocalUtil.cleanLocalCache();
+        if (StringUtil.equals("submit", operateType) || StringUtil.equals("SUBMIT", operateType)) {
+            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_新建.getValue(), 流程节点_审批生效.getValue(), null);
         }
     }
 
@@ -235,21 +192,7 @@ public class CfetsEntrustHanderAop {
     @AfterReturning("deletePoint()")
     public void occupyOnDelete(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        try {
-            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_作废.getValue(), 流程节点_流程提交.getValue(), null);
-        } catch (BusinessException e) {
-            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
-            if (CollectionUtils.isEmpty(mapList)) {
-                throw new BusinessException(e);
-            }
-            mapList.forEach(item -> {
-                String revokeId = String.valueOf(item.get("seqno"));
-                String modelType = (String) item.get("modelType");
-                positionRequestHandle.roll(revokeId, modelType, e.getMessage());
-            });
-        } finally {
-            ThreadLocalUtil.cleanLocalCache();
-        }
+        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_作废.getValue(), 流程节点_流程提交.getValue(), null);
     }
 
     /**
@@ -261,21 +204,7 @@ public class CfetsEntrustHanderAop {
     @AfterReturning("closePoint()")
     public void occupyOnClose(JoinPoint joinPoint) throws BusinessException {
         Object[] args = joinPoint.getArgs();
-        try {
-            inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_关闭.getValue(), 流程节点_流程提交.getValue(), null);
-        } catch (BusinessException e) {
-            List<Map<String, Object>> mapList = (List<Map<String, Object>>) ThreadLocalUtil.getTarget();
-            if (CollectionUtils.isEmpty(mapList)) {
-                throw new BusinessException(e);
-            }
-            mapList.forEach(item -> {
-                String revokeId = String.valueOf(item.get("seqno"));
-                String modelType = (String) item.get("modelType");
-                positionRequestHandle.roll(revokeId, modelType, e.getMessage());
-            });
-        } finally {
-            ThreadLocalUtil.cleanLocalCache();
-        }
+        inputParamSerivce.buildParamThenOccupy(args[0], 系统动作_关闭.getValue(), 流程节点_流程提交.getValue(), null);
     }
 
     /**
