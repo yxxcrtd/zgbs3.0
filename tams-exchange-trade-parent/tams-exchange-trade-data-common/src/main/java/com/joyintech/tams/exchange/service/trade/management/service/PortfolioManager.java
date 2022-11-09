@@ -2278,6 +2278,7 @@ public class PortfolioManager extends BaseService {
         secDto.setCcy(StringUtil.isNotEmpty(instruction.getCcy()) ? instruction.getCcy() : DictCodeList.币种_人民币_CNY.getValue());
         secDto.setTradePlat(TempConstant.NO_TRADE_BUSINESS_ETR);
         secDto.setFinprodType2(instruction.getFinprodType2());
+        secDto.setTradeMarket(instruction.getTradeMarket());
 
         BigDecimal canSec = BigDecimal.ZERO; // 可用持仓
         List<PositionCashSecDto> secList = new ArrayList<>();
@@ -2314,6 +2315,7 @@ public class PortfolioManager extends BaseService {
         cashSecDto.setCdate(DateUtil.format(instruction.getTradeDate()));
         cashSecDto.setCcy(StringUtil.isNotEmpty(instruction.getCcy()) ? instruction.getCcy() : DictCodeList.币种_人民币_CNY.getValue());
         cashSecDto.setFinprodType2(instruction.getFinprodType2());
+        cashSecDto.setTradeMarket(instruction.getTradeMarket());
         List<PositionCashSecDto> proList = new ArrayList<>();
         cashSecDto.setFinprodId("XN_PRODID999");
         proList.add(cashSecDto);
