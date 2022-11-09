@@ -5,7 +5,6 @@ import com.joyintech.framework.security.SecurityUtil;
 import com.joyintech.framework.util.*;
 import com.joyintech.tams.business.common.dto.PositionRulePtlData;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
-import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.manualsettle.dao.CfetsManualSettleMapper;
 import com.joyintech.tams.cfets.manualsettle.dto.*;
 import com.joyintech.tams.common.base.dao.*;
@@ -306,9 +305,8 @@ public class CfetsManualSettleUpdateService extends BaseService<CfetsManualSettl
      * 构建发送头寸信息
      * @param cfetsManualSettleUpdateRequest
      * @param trdBankManualSettleInfo
-     * @return
      */
-    private Map<String, Object> sendPositionMethod(CfetsManualSettleUpdateRequest cfetsManualSettleUpdateRequest,TrdBankManualSettleInfo trdBankManualSettleInfo) {
+    private void sendPositionMethod(CfetsManualSettleUpdateRequest cfetsManualSettleUpdateRequest, TrdBankManualSettleInfo trdBankManualSettleInfo) {
         List<PositionRulePtlData> ptlList = new ArrayList<>();
         List<PortSettleinfoDto> listTemp = cfetsManualSettleUpdateRequest.getPortSettleinfoDtoList();
         List<CfetsManualSettleDealInfo> listTemp1 = cfetsManualSettleMapper.getDealDetailsByTradeId(cfetsManualSettleUpdateRequest.getTradeId(),null);
@@ -397,9 +395,7 @@ public class CfetsManualSettleUpdateService extends BaseService<CfetsManualSettl
         req.setCcy(cfetsManualSettleUpdateRequest.getCcy());
         req.setFinprodId(cfetsManualSettleUpdateRequest.getFinprodId());
         req.setPtlList(ptlList);
-        Map<String, Object> param = positionRequestHandle.send(req);
-        ThreadLocalUtil.setLocalCache(param);
-        return param;
+        positionRequestHandle.send(req);
     }
 
 

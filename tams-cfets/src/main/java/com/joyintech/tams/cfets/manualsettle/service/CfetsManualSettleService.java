@@ -12,7 +12,6 @@ import com.joyintech.tams.business.common.dto.CfetsBondPositionRequest;
 import com.joyintech.tams.business.common.dto.CfetsOprHisInfoRequest;
 import com.joyintech.tams.business.common.dto.PositionRulePtlData;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
-import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbClosePosEtrRequest;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbClosePositionRequest;
 import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtribBondInfo003Dto;
@@ -654,10 +653,9 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
      * @param cfetsManualSettleRequest
      * @return
      */
-    private Map<String, Object> sendBidPositionMethod(CfetsManualSettleInsertDto cfetsManualSettleRequest, String buttonType) {
+    private void sendBidPositionMethod(CfetsManualSettleInsertDto cfetsManualSettleRequest, String buttonType) {
         //组装组合金额信息
         List<CfetsBondPortfolioCashRequest> ptlList = new ArrayList<>();
-        Map<String, Object> param = new HashMap<>();
         TrdBankManualSettleInfo trdBankManualSettleInfo = cfetsManualSettleRequest.getTrdBankManualSettleInfo();
         if (StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_回溯.getValue()) || StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收.getValue()) ||
                 StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收修改.getValue()) || StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收失败.getValue())) {
@@ -737,20 +735,16 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             req.setCcy(cfetsManualSettleRequest.getCcy());
             req.setFinprodId(trdBankManualSettleInfo.getFinprodId());
             req.setPtlList(ptlList);
-            param = positionRequestHandle.send(req);
-            ThreadLocalUtil.setLocalCache(param);
+            positionRequestHandle.send(req);
         }
-        return param;
     }
     /**
      * 构建一级投标确认发送头寸信息
      * @param cfetsManualSettleRequest
-     * @return
      */
-    private Map<String, Object> sendBidFirmPositionMethod(CfetsManualSettleInsertDto cfetsManualSettleRequest, String buttonType) {
+    private void sendBidFirmPositionMethod(CfetsManualSettleInsertDto cfetsManualSettleRequest, String buttonType) {
         //组装组合金额信息
         List<CfetsBondPortfolioCashRequest> ptlList = new ArrayList<>();
-        Map<String, Object> param = new HashMap<>();
         TrdBankManualSettleInfo trdBankManualSettleInfo = cfetsManualSettleRequest.getTrdBankManualSettleInfo();
         if (StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_回溯.getValue()) || StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收.getValue()) ||
                 StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收修改.getValue()) || StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收失败.getValue())) {
@@ -836,21 +830,17 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             req.setCcy(cfetsManualSettleRequest.getCcy());
             req.setFinprodId(trdBankManualSettleInfo.getFinprodId());
             req.setPtlList(ptlList);
-            param = positionRequestHandle.send(req);
-            ThreadLocalUtil.setLocalCache(param);
+            positionRequestHandle.send(req);
         }
-        return param;
     }
     /**
      * 构建回购发送头寸信息
      * @param cfetsManualSettleRequest
-     * @return
      */
-    private Map<String, Object> sendRepoPositionMethod(CfetsManualSettleInsertDto cfetsManualSettleRequest, String buttonType) {
+    private void sendRepoPositionMethod(CfetsManualSettleInsertDto cfetsManualSettleRequest, String buttonType) {
         //组装组合金额信息
         List<CfetsEtrIbRepoPosPortfolioCashRequest> ptlCashList = new ArrayList<>();
         List<CfetsEtrIbRepoPosPortfolioSecRequest> ptlSecList = new ArrayList<>();
-        Map<String, Object> param = new HashMap<>();
         TrdBankManualSettleInfo trdBankManualSettleInfo = cfetsManualSettleRequest.getTrdBankManualSettleInfo();
         if(StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_回溯.getValue()) || StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收.getValue())
            || StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收修改.getValue()) || StringUtil.equals(buttonType, DictCodeListExt3.交收操作类型_交收失败.getValue())){
@@ -952,10 +942,8 @@ public class CfetsManualSettleService extends BaseService<CfetsManualSettleDto> 
             if(CollectionUtils.isNotEmpty(ptlSecList)) {
                 req.setPtlSecList(ptlSecList);
             }
-            param = positionRequestHandle.send(req);
-            ThreadLocalUtil.setLocalCache(param);
+            positionRequestHandle.send(req);
         }
-        return param;
     }
 
     /**
