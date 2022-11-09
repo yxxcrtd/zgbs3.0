@@ -9,7 +9,7 @@
      <select id="selectRepoByExecid" parameterType="String"  resultType="String">
     select t.TRADEID from 
     INTERF_OPICS_TRAD_REPO t 
-    where t.ORITRADEID = #{execid,jdbcType=VARCHAR}
+    where t.ORITRADEID = #{execid,jdbcType=VARCHAR} and t.Ps = #{ps,jdbcType=VARCHAR}
     </select>
     
      <select id="selectTradeSec" parameterType="String"  

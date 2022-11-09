@@ -500,13 +500,17 @@ public class CfetsTrdConfirmService extends BaseService {
      */
     public CfetsTrdBondInvestTradeDto packageEquity(CfetsTrdConfirmRegInfoListResponse dto, String genType,
                                                     String cstpTradeId) {
+        logger.info("packageEquity -> param dto:{} genType:{} cstpTradeId:{}",JsonUtils.object2Json(dto),genType,cstpTradeId);
         CfetsTrdBondInvestTradeDto result = this.packageEquity(dto, genType);
-        if (cstpTradeId == null) {
-            logger.error("成交编号为空");
-            return result;
+        InterfTradSecdeal interfTradSecdeal = null;
+        if (StringUtil.isNotEmpty(cstpTradeId)) {
+            interfTradSecdeal = interfTradSecdealMapper.selectByPrimaryKey(cstpTradeId);
+        } else if (StringUtil.isNotEmpty(dto.getExecid())) {
+            logger.info("cstpTradeId is null");
+            interfTradSecdeal = interfTradSecdealMapper.selectByFedealno(dto.getExecid());
+        } else {
+            logger.error("execid is null and cstpTradeId is null");
         }
-        // 债券下行数据
-        InterfTradSecdeal interfTradSecdeal = interfTradSecdealMapper.selectByPrimaryKey(cstpTradeId);
         if (interfTradSecdeal == null || StringUtil.isEmpty(interfTradSecdeal.getFedealno())) {
             logger.error("债券下行数据为空");
             return result;
@@ -3233,7 +3237,7 @@ public class CfetsTrdConfirmService extends BaseService {
             DecimalFormat df = new DecimalFormat("#,##0.0000");
             this.buildMassege(matchMap, "yield",
                     str, "matchDetFeatures.yield",
-                    validateStr, "CONFIRM_MSG_013", df.format(ArithmeticUtil.round(cstpInfo.getTradeYield(), 4, RoundingMode.HALF_UP))+"%",
+                    validateStr, "CONFIRM_MSG_014", df.format(ArithmeticUtil.round(cstpInfo.getTradeYield(), 4, RoundingMode.HALF_UP))+"%",
                     df.format(ArithmeticUtil.round(regInfo.getYield(), 4, RoundingMode.HALF_UP))+"%");
         }
         // 券面总额

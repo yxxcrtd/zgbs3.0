@@ -976,7 +976,6 @@ public class CfetsSettleService extends BaseService {
                     && !DictCodeListExt1.投资目的_卖空.getValue().equals(trdProductDeal.getInvAim())) {
                 baseTradeProductDealDto.setStlPayOrdersList(stlPayOrders);
             }
-
             finProductTradeDto.setBaseTradeProductDealDtos(Collections.singletonList(baseTradeProductDealDto));
             finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
             baseTradeProductDealCommService.insertPosition(finProductTradeDto);

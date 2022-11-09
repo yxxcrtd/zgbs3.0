@@ -128,6 +128,12 @@ public class EtrSecCashPositionDealService extends EtrCashPositionBaseService {
                         if (stlPayOrdersDtos != null && !stlPayOrdersDtos.isEmpty()) {
                             现金处理(etrPositionHoldDto, deal, dealAdd, stlPayOrdersDtos, etrCashPositionFlowDto);
                         }
+                        // 自动交收批处理 没有流程中状态
+                        if (StringUtil.equals("03", finProductTradeDto.getStage())) {
+                            // 可用持仓 提交日削减至0
+                            etrSecPositionFlowDto.setAmount(deal.getShareAmt().negate());
+                            etrPositionHoldDto.getPtlSecPositionFlows().add(etrSecPositionFlowDto);
+                        }
                     }
                     if (DictCodeList.持仓类型_可用.equals(持仓类型) || etrPositionHoldDto.isNeedNegative()) { // 提交
                         if (StringUtil.isEmpty(entrustId)) { // 无委托

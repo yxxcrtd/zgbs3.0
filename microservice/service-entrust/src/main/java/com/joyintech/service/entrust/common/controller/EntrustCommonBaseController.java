@@ -16,6 +16,8 @@ import java.util.Map;
 import com.joyintech.service.entrust.common.service.WFlowCommonService;
 import com.joyintech.tams.invest.common.dto.BaseEtrInvestInfoDto;
 import com.joyintech.tams.invest.common.dto.trade.entrust.EtrFinishStatusDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,6 +43,8 @@ import com.joyintech.tams.invest.common.component.base.entrust.BaseEtrInvestInfo
 @RequestMapping("/common/entrustcommonbase")
 public class EntrustCommonBaseController {
 
+    private static final Logger log = LoggerFactory.getLogger(EntrustCommonBaseController.class);
+
     /**
      * 投资委托 基础组件
      */
@@ -57,6 +61,7 @@ public class EntrustCommonBaseController {
     @DTXTransaction
     @PostMapping("finishEntrust")
     public boolean finishEntrust(@RequestBody List<EtrFinishStatusDto> etrFinishStatusList) {
+        log.debug("finishEntrust() called with parameters => 【etrFinishStatusList = {}】",etrFinishStatusList);
         return baseEtrInvestInfoServiceImpl.completeDelegate(etrFinishStatusList);
     }
 

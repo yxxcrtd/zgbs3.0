@@ -1334,7 +1334,7 @@
             where TRADEDATE = to_char(#{sysDate,jdbcType=DATE}, 'yyyyMMdd')
             GROUP BY EXECID,SIDE )	II ON  II.EXECID = I.EXECID AND II.UPDATETIME = I.UPDATETIME AND II.SIDE = I.SIDE
         <!-- modify by etliu 20220926 性能问题处理 end -->
-        left join INTERF_OPICS_TRAD_REPO tr on tr.oritradeid = I.EXECID
+        left join INTERF_OPICS_TRAD_REPO tr on tr.oritradeid = I.EXECID and DECODE(I.SIDE, '1', '04', '03') = tr.PS
         left join INTERF_TRAD_SECDEAL ts on ts.FEDEALNO = I.EXECID and DECODE(I.OURINSTITUTIONROLE, '119', 'T01', 'T02') = ts.PS
         left join fin_product fp on ts.SECID=fp.finprod_market_id and fp.finprod_type='F01'
         LEFT JOIN SYS_USER_ADD sua ON nvl(ts.TRAD,tr.BUYTRADER) = sua.IBU_TRADER
@@ -1662,15 +1662,15 @@
                     case when reg.finprod_type2 = 'F01' then reg.face_value / 10000 end   as printAmt,
                     case
                         when reg.finprod_type2 = 'F01' then decode(regAdd.CAL_MODE, '01',
-                                                                   TO_CHAR(ROUND(reg.unit_cprice, 4), 'FM990.0000'),
+                                                                   TO_CHAR(ct.PRICE, 'FM990.0000'),
                                                                    '02',
-                                                                   TO_CHAR(ROUND(reg.yield * 100, 4), 'FM990.0000') || '%',
+                                                                   TO_CHAR(ROUND(ct.YIELD2 * 100, 4), 'FM990.0000') || '%',
                                                                    '03',
-                                                                   TO_CHAR(ROUND(reg.exer_yield * 100, 4), 'FM990.0000') || '%')
+                                                                   TO_CHAR(ROUND(ct.STRIKEYIELD * 100, 4), 'FM990.0000') || '%')
                         when reg.finprod_type2 in ('F02', 'F03') then TO_CHAR(ROUND(ct.PRICE * 100, 4), 'FM990.0000') || '%'
                         else null end                                                     as tradeYieldStr,
                     decode(reg.finprod_type2,'F01',
-                            decode(regAdd.CAL_MODE, '01',reg.unit_cprice,'02',reg.yield * 100,'03',reg.exer_yield * 100),
+                            decode(regAdd.CAL_MODE, '01',ct.PRICE,'02',ct.YIELD2 * 100,'03',ct.STRIKEYIELD * 100),
                             'F02',ct.PRICE * 100,'F03',ct.PRICE * 100,null) as tradeYield,
                     reg.repo_term                                                         as termDays,
                     decode(reg.finprod_type2, 'F01', nvl(tfpdt.fprice_amt, ts.SETTAMT),

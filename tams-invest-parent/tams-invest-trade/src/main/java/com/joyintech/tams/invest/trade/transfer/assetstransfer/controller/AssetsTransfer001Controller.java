@@ -78,7 +78,7 @@ public class AssetsTransfer001Controller extends BaseController {
         model.addAttribute("TRADE_STATUS_02", DictCodeListExt1.交易流程状态_有效.getValue());
         Map<String,Object> paramMap = new HashMap<>();
 //        return assetsTransfer001Service.getFinprodId(paramMap);
-        model.addAttribute("finprodList", JsonUtils.object2Json(assetsTransfer001Service.getFinprodId(paramMap)));
+//        model.addAttribute("finprodList", JsonUtils.object2Json(assetsTransfer001Service.getFinprodId(paramMap)));
         return super.init(model);
     }
 

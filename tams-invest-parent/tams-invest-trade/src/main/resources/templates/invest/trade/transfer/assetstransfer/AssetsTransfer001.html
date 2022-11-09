@@ -189,10 +189,14 @@
                                     <div class="form-inline-wrap">
                                         <label class="layui-form-label form-lable">资产代码</label>
                                         <div class="layui-input-inline input-inline">
-                                            <!--disabled="disabled"-->
-                                            <select id="finprodId" name="finprodId"
+                                            <!-- <select id="finprodId" name="finprodId" disabled="disabled"
                                                     class="layui-input form-input input-select"
                                                     data-th-data-result="${finprodList}"
+                                                    placeholder="请输入内容" multiple="true">
+                                            </select> -->
+                                            <select id="finprodId" name="finprodId"
+                                                    class="layui-input form-input input-select"
+                                                    data-th-data-url="@{/invest/trade/transfer/assetstransfer/AssetsTransfer001/getFinprodId}"
                                                     placeholder="请输入内容" multiple="true">
                                             </select>
                                         </div>

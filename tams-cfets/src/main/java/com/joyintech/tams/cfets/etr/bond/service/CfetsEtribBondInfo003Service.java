@@ -41,7 +41,6 @@ import com.joyintech.tams.business.common.pojo.BaseMap;
 import com.joyintech.tams.business.common.pojo.Message;
 import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.util.PositionUtil;
-import com.joyintech.tams.business.common.util.ThreadLocalUtil;
 import com.joyintech.tams.cfets.etr.bond.dao.CfetsEtrIbBondinfo002Mapper;
 import com.joyintech.tams.cfets.etr.bond.dto.*;
 import com.joyintech.tams.common.base.dao.EtrEntrustBackupMapper;
@@ -1715,7 +1714,7 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
      * @param isDoInsert 是否是doInsert调用
      * @param confirmOk  是否确认
      */
-    private Map<String, Object> sendPositionMethod(CfetsEtribBondInfo003Dto entity, boolean isSubmit, boolean isDoInsert, String confirmOk) {
+    private void sendPositionMethod(CfetsEtribBondInfo003Dto entity, boolean isSubmit, boolean isDoInsert, String confirmOk) {
         List<CfetsEtrIbPosPortfolioRequest> ptlList=new ArrayList<>();
         for (CfetsEtribBondInfo003Dto dto : entity.getEtrInvestBondInfoDtos()) {
             //调用头寸
@@ -1786,8 +1785,6 @@ public class CfetsEtribBondInfo003Service extends CommonExportService<CfetsEtrib
         req.setCcy(entity.getCcy());
         req.setFinprodId(entity.getFinprodId());
         req.setPtlList(ptlList);
-        Map<String, Object> param = positionRequestHandle.send(req);
-        ThreadLocalUtil.setLocalCache(param);
-        return param;
+        positionRequestHandle.send(req);
     }
 }

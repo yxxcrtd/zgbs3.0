@@ -59,4 +59,110 @@
         and BUSI_TYPE = #{busiType, jdbcType=VARCHAR}
         and BUSI_STATUS = '2'
     </select>
+
+    <!--标准券再折算率-->
+    <select id="findTandardRate" parameterType="Map"
+            resultType="Map">
+        SELECT
+        (SELECT FSCR.SCALE from FIN_STDSEC_CONVERSE_RADIO FSCR where FSCR.FINPROD_ID =#{finprodId,jdbcType=VARCHAR} AND
+        FSCR.VDATE <![CDATA[<=]]> #{date}
+        AND FSCR.MDATE <![CDATA[>=]]> #{date}   and rownum =1) scale,
+        NVL(NVL(NVL(NVL(SBMCI.MORE_CONVRATE,SBMCI2.MORE_CONVRATE),NVL(SBMCICP.MORE_CONVRATE,SBMCICP2.MORE_CONVRATE)),1),
+        #{MORE_CONVRATE}) as tandardRate
+        FROM
+        STL_SEC_ACCT_INFO SSAI
+        LEFT JOIN (select distinct pci.ACCT_NO,sci.ACCT_NAME,
+        T.CUSTOMER_ID
+        from STL_CAPACCT_INFO sci
+        LEFT JOIN PTL_CAPACCT_INFO pci ON pci.ACCT_NO = sci.ACCT_NO AND pci.CCY = sci.CCY
+        AND pci.PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+        LEFT JOIN(select msd.SALE_DEPID SALE_DEPID,
+        mci.CUSTOMER_ID
+        from mst_sale_department msd
+        left join mst_customer_info mci on mci.CUSTOMER_ID = msd.BROKER_ID
+        where mci.IS_BROKER = 'Y'
+        ) T on T.SALE_DEPID = sci.OWN_DEPT
+        where pci.ACCT_TYPE = 'A07')TEMP2 ON SSAI.TRD_ACCT_ID = TEMP2.ACCT_NO AND SSAI.TRD_ACCT_ID =
+        #{acctId,jdbcType=VARCHAR}
+        LEFT JOIN (SELECT BROKER_ID,
+        FINPROD_ID,
+        <!-- modify by etliu 20220308  标准券再折算率涉及头寸调整 start -->
+        ACCT_NO,
+        <!-- modify by etliu 20220308  标准券再折算率涉及头寸调整 end -->
+        START_DATE,
+        END_DATE,
+        MORE_CONVRATE
+        FROM STD_BOND_MORE_CONVRATE_INFO
+        WHERE
+        END_DATE IS NOT NULL AND
+        to_date(START_DATE,'yyyy-MM-dd') <![CDATA[<=]]> #{date}
+        AND to_date(END_DATE,'yyyy-MM-dd') <![CDATA[>=]]> #{date}
+        ) SBMCI
+        <!-- modify by etliu 20220308  标准券再折算率涉及头寸调整 start -->
+        <!-- ON TEMP2.CUSTOMER_ID = SBMCI.BROKER_ID AND TEMP.FINPROD_ID = SBMCI.FINPROD_ID-->
+        ON TEMP2.CUSTOMER_ID = SBMCI.BROKER_ID AND (SBMCI.FINPROD_ID=#{finprodId,jdbcType=VARCHAR} or SSAI.TRD_ACCT_ID =
+        SBMCI.ACCT_NO)
+        <!-- modify by etliu 20220308  标准券再折算率涉及头寸调整 end -->
+        LEFT JOIN (SELECT BROKER_ID,
+        FINPROD_ID,
+        <!-- modify by etliu 20220308 标准券再折算率涉及头寸调整 start -->
+        ACCT_NO,
+        <!-- modify by etliu 20220308 标准券再折算率涉及头寸调整 end -->
+        START_DATE,
+        END_DATE,
+        MORE_CONVRATE
+        FROM STD_BOND_MORE_CONVRATE_INFO
+        WHERE
+        END_DATE IS NULL AND
+        to_date(START_DATE,'yyyy-MM-dd') <![CDATA[<=]]> #{date}
+        ) SBMCI2
+        <!-- modify by etliu 20220308  标准券再折算率涉及头寸调整 start -->
+        <!--ON TEMP2.CUSTOMER_ID = SBMCI2.BROKER_ID AND TEMP.FINPROD_ID = SBMCI2.FINPROD_ID-->
+        ON TEMP2.CUSTOMER_ID = SBMCI2.BROKER_ID AND ( SBMCI2.FINPROD_ID=#{finprodId,jdbcType=VARCHAR} or
+        SSAI.TRD_ACCT_ID = SBMCI2.ACCT_NO)
+        <!-- modify by etliu 20220308  标准券再折算率涉及头寸调整 end -->
+        LEFT JOIN (SELECT BROKER_ID,
+        FINPROD_ID,
+        <!-- modify by etliu 20220308  标准券再折算率涉及头寸调整 start -->
+        ACCT_NO,
+        <!-- modify by etliu 20220308  标准券再折算率涉及头寸调整 end -->
+        START_DATE,
+        END_DATE,
+        MORE_CONVRATE
+        FROM STD_BOND_MORE_CONVRATE_INFO
+        WHERE
+        END_DATE IS NOT NULL AND
+        to_date(START_DATE,'yyyy-MM-dd') <![CDATA[<=]]> #{date}
+        AND to_date(END_DATE,'yyyy-MM-dd') <![CDATA[>=]]> #{date}
+        ) SBMCICP
+        <!-- modify by etliu 20220308  标准券再折算率涉及头寸调整 start -->
+        <!-- ON 'BROKER' = SBMCICP.FINPROD_ID AND TEMP2.CUSTOMER_ID = SBMCICP.BROKER_ID-->
+        ON ('BROKER' = SBMCICP.FINPROD_ID or 'BROKER' = SBMCICP.ACCT_NO) AND TEMP2.CUSTOMER_ID = SBMCICP.BROKER_ID
+        <!-- modify by etliu 20220308  标准券再折算率涉及头寸调整 end -->
+        LEFT JOIN (SELECT BROKER_ID,
+        FINPROD_ID,
+        <!-- modify by etliu 20220308  标准券再折算率涉及头寸调整 start -->
+        ACCT_NO,
+        <!-- modify by etliu 20220308  标准券再折算率涉及头寸调整 end -->
+        START_DATE,
+        END_DATE,
+        MORE_CONVRATE
+        FROM STD_BOND_MORE_CONVRATE_INFO
+        WHERE
+        END_DATE IS NULL AND
+        to_date(START_DATE,'yyyy-MM-dd') <![CDATA[<=]]> #{date}
+        ) SBMCICP2
+        <!-- modify by etliu 20220308  标准券再折算率涉及头寸调整 start -->
+        <!--ON 'BROKER' = SBMCICP2.FINPROD_ID AND TEMP2.CUSTOMER_ID = SBMCICP2.BROKER_ID-->
+        ON ('BROKER' = SBMCICP2.FINPROD_ID or 'BROKER' = SBMCICP2.ACCT_NO) AND TEMP2.CUSTOMER_ID = SBMCICP2.BROKER_ID
+        <!-- modify by etliu 20220308  标准券再折算率涉及头寸调整 end -->
+        where SSAI.TRD_ACCT_ID =#{acctId,jdbcType=VARCHAR} and rownum=1
+    </select>
+
+    <select id="selectFaceValue" resultType="java.math.BigDecimal">
+        SELECT 100 - sum(nvl(PRIN_AMT,0 ))
+        FROM FIN_CASH_PLAN
+        WHERE FINPROD_ID=#{finprodId}
+        AND #{date} >= MDATE
+    </select>
 </mapper>

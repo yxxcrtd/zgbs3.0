@@ -4,7 +4,9 @@ import com.joyintech.tams.exchange.common.db.domain.PortfolioDetail;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author swwan
@@ -34,4 +36,14 @@ public interface PortfolioDetailByManualMapper {
      */
     List<PortfolioDetail> selectListByBusiIdAndBusiType(@Param("busiId")String busiId, @Param("busiType")String busiType);
 
+
+    /**
+     * 标准券再折算率
+     */
+    Map findTandardRate(Map<String, Object> pageParam);
+
+    /**
+     * 债券面值
+     */
+    BigDecimal selectFaceValue(Map<String, Object> params);
 }

@@ -1076,9 +1076,11 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
         }
         // ZGCPCN-209:日间数据系列户多组合数据EntrustId和TradeId相同,需合并 modify by fuyongsheng 20220426 start
         etrFinishStatusList = mergeEtrFinishStatusList(etrFinishStatusList);
+        logger.debug("完成委托，合并数据 => 【etrFinishStatusList = {}】",etrFinishStatusList);
         // ZGCPCN-209:日间数据系列户多组合数据EntrustId和TradeId相同,需合并 modify by fuyongsheng 20220426 end
         // 是否日终批处理数据
         boolean isDayEndBatch = etrFinishStatusList.get(0).isDayEndBatch();
+        logger.debug("完成委托，是否日终批处理数据 => 【isDayEndBatch = {}】",isDayEndBatch);
         // 遍历List<委托完成状况表Entity>，保存到“委托完成状况表”
         int count = 0;
         for (EtrFinishStatusDto etrFinishStatus : etrFinishStatusList) {
@@ -1101,6 +1103,7 @@ public class BaseEtrInvestInfoServiceImpl implements BaseEtrInvestInfoService {
         }
         entrustIdList = entrustIdList.stream().distinct().collect(Collectors.toList());
         List<BaseEtrFinishAmtDto> etrFinishAmtDtoList = etrInvestInfoServiceImpl.queryDelegateStatus(entrustIdList);
+        logger.debug("完成委托，委托完成状况查询 => 【etrFinishAmtDtoList = {}】",etrFinishAmtDtoList);
         // 判断委托代码的完成额度是否大于等于100
         BigDecimal bigDecimal = new BigDecimal("100.00");
         // 指令完成关闭
