@@ -983,6 +983,11 @@ public abstract class EventBaseService<V> extends InfBaseService<V> {
             long startTime = System.currentTimeMillis();
             List<Map<String, Object>> resultSet=new ArrayList<>();
             if (BussinessDictCodeListRds.指标参数实现类型_SQL.getValue().equals(dbParamMap.get(key).getParaDisplayType())) {
+                if(StringUtil.isEmpty(sysParam.getIssuerCode())){
+                    sysParam.setIssuerCode("('')");
+                }else if(!StringUtil.contains(sysParam.getIssuerCode(),GlobalConstant.OPEN_PARENTHESIS)){
+                    sysParam.setIssuerCode(RiskUtil.convertPortfCode(sysParam.getIssuerCode()));
+                }
                 resultSet= supervisionCalcDao.selectOne(sysParam.replaceForString(content));
                 resultSet.forEach(entity-> {
                     if (entity.keySet().size() > 1) {
