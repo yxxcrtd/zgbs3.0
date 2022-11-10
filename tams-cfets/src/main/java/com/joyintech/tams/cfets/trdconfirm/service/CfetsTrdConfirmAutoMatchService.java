@@ -167,7 +167,7 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
         Map<String, Object> param = new HashMap<>();
         if (map.get("tradeDate") != null && StringUtil.equals(map.get("tradeDate").getType(), "01")) {
             if(!StringUtil.isNotEmpty(bondDto.getTradeDate())){
-                logger.info("基础要素为空值不自动匹配");
+                logger.info("基础要素{}为空值不自动匹配",getMessage("matchDetFeatures.tradeDate"));
                 return null;
             }
             //成交日期
@@ -175,7 +175,7 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
         }
         if (map.get("finprodMarketId") != null && StringUtil.equals(map.get("finprodMarketId").getType(), "01")) {
             if(!StringUtil.isNotEmpty(bondDto.getFinprodMarketId())){
-                logger.info("基础要素为空值不自动匹配");
+                logger.info("基础要素{}为空值不自动匹配",getMessage("matchDetFeatures.finprodMarketId"));
                 return null;
             }
             //资产代码
@@ -183,29 +183,29 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
         }
         if (map.get("ps") != null && StringUtil.equals(map.get("ps").getType(), "01")) {
             if(!StringUtil.isNotEmpty(bondDto.getPs())){
-                logger.info("基础要素为空值不自动匹配");
+                logger.info("基础要素{}为空值不自动匹配",getMessage("matchDetFeatures.ps"));
                 return null;
             }
             //交易方向
             param.put("ps", bondDto.getPs());
         }
         if (map.get("settleSpeed") != null && StringUtil.equals(map.get("settleSpeed").getType(), "01")) {
-            if(!StringUtil.isNotEmpty(bondDto.getSettleSpeed())){
-                logger.info("基础要素为空值不自动匹配");
+            if(!StringUtil.isNotEmpty(bondDto.getSettleSpreedCode())){
+                logger.info("基础要素{}为空值不自动匹配",getMessage("matchDetFeatures.settleSpeed"));
                 return null;
             }
             //清算速度
-            if (StringUtil.equals(bondDto.getSettleSpeed(), "01")) {
+            if (StringUtil.equals(bondDto.getSettleSpreedCode(), "01")) {
                 param.put("settleSpeed", "1");
-            } else if (StringUtil.equals(bondDto.getSettleSpeed(), "02")) {
+            } else if (StringUtil.equals(bondDto.getSettleSpreedCode(), "02")) {
                 param.put("settleSpeed", "2");
-            } else if (StringUtil.equals(bondDto.getSettleSpeed(), "03")) {
+            } else if (StringUtil.equals(bondDto.getSettleSpreedCode(), "03")) {
                 param.put("settleSpeed", "3");
             }
         }
         if (map.get("secManageAcctId") != null && StringUtil.equals(map.get("secManageAcctId").getType(), "01")) {
             if(!StringUtil.isNotEmpty(bondDto.getSecManageAcctId())){
-                logger.info("基础要素为空值不自动匹配");
+                logger.info("基础要素{}为空值不自动匹配",getMessage("matchDetFeatures.secManageAcctId"));
                 return null;
             }
             //证券账户
@@ -213,7 +213,7 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
         }
         if (map.get("yield") != null && StringUtil.equals(map.get("yield").getType(), "01")) {
             if(!StringUtil.isNotEmpty(bondDto.getYield())){
-                logger.info("基础要素为空值不自动匹配");
+                logger.info("基础要素{}为空值不自动匹配",getMessage("matchDetFeatures.yield"));
                 return null;
             }
             //成交价
@@ -222,7 +222,7 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
         }
         if (map.get("faceValue") != null && StringUtil.equals(map.get("faceValue").getType(), "01")) {
             if(!StringUtil.isNotEmpty(bondDto.getShareAmt())){
-                logger.info("基础要素为空值不自动匹配");
+                logger.info("基础要素{}为空值不自动匹配",getMessage("matchDetFeatures.faceValue"));
                 return null;
             }
             // 券面总额
@@ -230,7 +230,7 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
         }
         if (map.get("settleDate") != null && StringUtil.equals(map.get("settleDate").getType(), "01")) {
             if(!StringUtil.isNotEmpty(bondDto.getSettleDate())){
-                logger.info("基础要素为空值不自动匹配");
+                logger.info("基础要素{}为空值不自动匹配",getMessage("matchDetFeatures.settleDate"));
                 return null;
             }
             // 结算日期
@@ -238,7 +238,7 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
         }
         if (map.get("deliveryType") != null && StringUtil.equals(map.get("deliveryType").getType(), "01")) {
             if(!StringUtil.isNotEmpty(bondDto.getDeliveryType())){
-                logger.info("基础要素为空值不自动匹配");
+                logger.info("基础要素{}为空值不自动匹配",getMessage("matchDetFeatures.tradeDate"));
                 return null;
             }
             // 结算方式
@@ -252,7 +252,7 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
         }
         if (map.get("counterId") != null && StringUtil.equals(map.get("counterId").getType(), "01")) {
             if(!StringUtil.isNotEmpty(bondDto.getCounterId())){
-                logger.info("基础要素为空值不自动匹配");
+                logger.info("基础要素{}为空值不自动匹配",getMessage("matchDetFeatures.counterId"));
                 return null;
             }
             // 对方手
@@ -260,7 +260,7 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
         }
         if (map.get("settleAtm") != null && StringUtil.equals(map.get("settleAtm").getType(), "01")) {
             if(!StringUtil.isNotEmpty(bondDto.getFpriceAmt())){
-                logger.info("基础要素为空值不自动匹配");
+                logger.info("基础要素{}为空值不自动匹配",getMessage("matchDetFeatures.settleAtm"));
                 return null;
             }
             // 结算金额
