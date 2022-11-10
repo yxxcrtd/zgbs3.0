@@ -1,0 +1,63 @@
+/**风险指标参数: 投资单个资管产品交易对手余额 **/
+
+----风险监督指标参数
+DELETE FROM RSK_ISUP_INDICATOR_PARA WHERE PARA_CODE ='DGZGCPJYDSYE';
+INSERT INTO RSK_ISUP_INDICATOR_PARA (PARA_CODE, PARA_NAME, IS_FORBID, FORBID_ENUM, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, MODEL_CODE, MODEL_VALUE, IS_UP_REDIS, PARAM_DATA_TYPE, PARA_TYPE, PARAM_MATH_TYPE, PARAM_VALUE_NONE)
+VALUES('DGZGCPJYDSYE','投资单个资管产品交易对手余额', 'N' , '' ,'system','1',sysdate,'system',sysdate, null , null , 'Y' , 'String' ,  null ,  'REDIS'  ,  null );
+
+----监督指标参数明细
+DELETE FROM RSK_ISUP_INDICATOR_PARA_DTL WHERE PARA_CODE ='DGZGCPJYDSYE';
+INSERT INTO RSK_ISUP_INDICATOR_PARA_DTL (PARA_CODE, PARA_GRANULARITY, PARA_DISPLAY_TYPE, CONTENT, REDIS_FIELD, IS_FRESH_CAN_TRD, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES('DGZGCPJYDSYE','01', 'SQL','select 1 from dual',  'counterId' , 'N' ,'system','1',sysdate,'system',sysdate);
+INSERT INTO RSK_ISUP_INDICATOR_PARA_DTL (PARA_CODE, PARA_GRANULARITY, PARA_DISPLAY_TYPE, CONTENT, REDIS_FIELD, IS_FRESH_CAN_TRD, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES('DGZGCPJYDSYE','02', 'SQL','select 1 from dual',  'counterId' , 'N' ,'system','1',sysdate,'system',sysdate);
+INSERT INTO RSK_ISUP_INDICATOR_PARA_DTL (PARA_CODE, PARA_GRANULARITY, PARA_DISPLAY_TYPE, CONTENT, REDIS_FIELD, IS_FRESH_CAN_TRD, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES('DGZGCPJYDSYE','03', 'SQL','select 1 from dual',  'counterId' , 'N' ,'system','1',sysdate,'system',sysdate);
+INSERT INTO RSK_ISUP_INDICATOR_PARA_DTL (PARA_CODE, PARA_GRANULARITY, PARA_DISPLAY_TYPE, CONTENT, REDIS_FIELD, IS_FRESH_CAN_TRD, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES('DGZGCPJYDSYE','04', 'SQL','select 1 from dual',  'counterId' , 'N' ,'system','1',sysdate,'system',sysdate);
+INSERT INTO RSK_ISUP_INDICATOR_PARA_DTL (PARA_CODE, PARA_GRANULARITY, PARA_DISPLAY_TYPE, CONTENT, REDIS_FIELD, IS_FRESH_CAN_TRD, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES('DGZGCPJYDSYE','05', 'SQL','select 1 from dual',  'counterId' , 'N' ,'system','1',sysdate,'system',sysdate);
+
+DECLARE
+----实时、买入预占、卖出预占
+V_CONTENT_01_02_03 CLOB := 'SELECT FTP.Counter_Id RKEY, sum(NVL(FTP.prin,0)) RVALUE
+  FROM FIN_TRADE_PRODUCT FTP
+  LEFT JOIN mst_counter_party mcp
+    ON FTP.Counter_Id = mcp.counter_id
+ WHERE FTP.MDATE IS NOT NULL
+   AND FTP.FINPROD_TYPE2 IN (''F03'',''F05'')
+   AND FTP.BRANCH=0
+   AND mcp.counter_type = ''02''
+   AND FTP.MDATE > DATE '' ${valDate} ''
+ group by FTP.Counter_Id';
+
+----事后(日间)
+V_CONTENT_04 CLOB := 'SELECT FTP.Counter_Id RKEY, sum(NVL(FTP.prin,0)) RVALUE
+  FROM FIN_TRADE_PRODUCT FTP
+  inner JOIN mst_counter_party mcp
+    ON FTP.Counter_Id = mcp.counter_id
+  inner JOIN trd_product_deal_add tpda
+    ON FTP.FINPROD_ID = tpda.TRADE_ID
+  inner JOIN wfl_trd_product_deal_add wtpda
+    ON FTP.FINPROD_ID = wtpda.TRADE_ID
+ WHERE FTP.MDATE IS NOT NULL
+   AND FTP.FINPROD_TYPE2 IN (''F03'',''F05'')
+   AND FTP.BRANCH=0
+   AND mcp.counter_type = ''02''
+   AND FTP.MDATE > DATE '' ${valDate} ''
+   AND nvl(tpda.portfolio_id,wtpda.portfolio_id) in ${portfolioCode}
+ group by FTP.Counter_Id';
+
+----事后(日终)
+V_CONTENT_05 CLOB := 'select n.counter_id RKEY, SUM(NVL(m.Dsc_Cost_Amt,0)) as RVALUE
+          from PTL_SEC_VALUTION m
+         inner join FIN_TRADE_PRODUCT n on m.FINPROD_ID = n.FINPROD_ID and n.FINPROD_TYPE2 in (''F03'',''F05'') AND n.BRANCH=0
+         inner join mst_counter_party mcp on n.counter_id = mcp.counter_id and mcp.counter_type = ''02''
+         where m.CDATE = date''${valDate}'' AND n.MDATE > DATE''${valDate}'' group by n.counter_id';
+
+BEGIN
+UPDATE RSK_ISUP_INDICATOR_PARA_DTL SET CONTENT = V_CONTENT_01_02_03 WHERE PARA_CODE = 'DGZGCPJYDSYE' and PARA_GRANULARITY in('01','02','03');
+UPDATE RSK_ISUP_INDICATOR_PARA_DTL SET CONTENT = V_CONTENT_04 WHERE PARA_CODE = 'DGZGCPJYDSYE' and PARA_GRANULARITY = '04';
+UPDATE RSK_ISUP_INDICATOR_PARA_DTL SET CONTENT = V_CONTENT_05 WHERE PARA_CODE = 'DGZGCPJYDSYE' and PARA_GRANULARITY = '05';
+END;
+/

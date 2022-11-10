@@ -1,0 +1,5 @@
+/**风险指标: 私募产品杠杆率 **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='a4ea247283e44b1ca8f6d7344b8d6d93';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('a4ea247283e44b1ca8f6d7344b8d6d93','私募产品杠杆率','LIMIT_LECER','${CPZZC}/${CPJZCJZ}','SUPERVISION','01,02,03','DAYTIME,DAYEND', null , '{"threshold_1":{"op":">","value":"180","unit":"PERCENT","is_model":"02"}}' , '{"threshold_1":{"op":">","value":"200","unit":"PERCENT","is_model":"02"}}'  , '{"threshold_1":{"op":">","unit":"PERCENT","is_model":"02"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'Y' , '《关于规范金融机构资产管理业务的指导意见》第20条  每只开放式公募产品的总资产不得超过该产品净资产的140%，每只封闭式公募产品、每只私募产品的总资产不得超过该产品净资产的200%。计算单只产品的总资产时应当按照穿透原则合并计算所投资资产管理产品的总资产。' , 'SUP044034' );

@@ -1,0 +1,5 @@
+/**风险指标: 现金管理类产品市值法资产净值与摊余成本法计算的资产净值正偏离度绝对值不超过0.5% **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='831b0c5159b94a3caaa2cd0d555cc6f1';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('831b0c5159b94a3caaa2cd0d555cc6f1','现金管理类产品市值法资产净值与摊余成本法计算的资产净值正偏离度绝对值不超过0.5%','LIMIT_DEVIATION','${CPGZPLD}','SUPERVISION','03','DAYTIME,DAYEND', null , '{"threshold_1":{"op":">","unit":"PERCENT","is_model":"01"}}' , '{"threshold_1":{"op":">","unit":"PERCENT","is_model":"01"}}'  , '{"threshold_1":{"op":">","value":"0.5000","unit":"PERCENT","is_model":"01"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'Y' , '《关于规范现金管理类理财产品管理有关事项的通知》第6条  当影子定价确定的现金管理类产品资产净值与摊余成本法计算的资产净值正偏离度绝对值达到0.5%时，商业银行、理财公司应当暂停接受认购并在5个交易日内将正偏离度绝对值调整到0.5%以内。' , 'SUP042032' );

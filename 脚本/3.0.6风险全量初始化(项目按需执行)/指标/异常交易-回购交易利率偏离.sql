@@ -1,0 +1,5 @@
+/**风险指标: 异常交易-回购交易利率偏离 **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='e071b11d2c0844d8b52e4e661248c74f';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('e071b11d2c0844d8b52e4e661248c74f','异常交易-回购交易利率偏离','LIMIT_DEVIATION','${HGJYLL}-${QXPZQYRJQSYL}','SUPERVISION','02,03','DAYTIME,DAYEND', null , '{"threshold_1":{"op":">","value":"80","unit":"BP","is_model":"01"}}' , '{"threshold_1":{"op":">","value":"100","unit":"BP","is_model":"01"}}'  , '{"threshold_1":{"op":">","unit":"BP","is_model":"01"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'N' , null , 'SUP093083' );

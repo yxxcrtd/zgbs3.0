@@ -1,0 +1,5 @@
+/**风险指标: 现金管理类产品应当投资于期限在1年以内（含1年）的银行存款、债券回购、中央银行票据、同业存单 **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='ee448bcdbb5d42ceb42b2b67c3d700bf';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('ee448bcdbb5d42ceb42b2b67c3d700bf','现金管理类产品应当投资于期限在1年以内（含1年）的银行存款、债券回购、中央银行票据、同业存单','LIMIT_TERM','${CKHGYPTYSYQX}/${FV202008200001}','SUPERVISION','01,02,03','DAYTIME,DAYEND', null , '{"threshold_1":{"op":">","unit":"YEAR","is_model":"02"}}' , '{"threshold_1":{"op":">","unit":"YEAR","is_model":"02"}}'  , '{"threshold_1":{"op":">","value":"1","unit":"YEAR","is_model":"02"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'Y' , '《关于规范现金管理类理财产品管理有关事项的通知》第2条  （二）期限在1年以内（含1年）的银行存款、债券回购、中央银行票据、同业存单；' , 'SUP030020' );

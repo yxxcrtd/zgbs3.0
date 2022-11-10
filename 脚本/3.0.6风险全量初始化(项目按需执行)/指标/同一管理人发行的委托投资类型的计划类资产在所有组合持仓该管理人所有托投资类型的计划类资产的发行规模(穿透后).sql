@@ -1,0 +1,5 @@
+/**风险指标: 同一管理人发行的委托投资类型的计划类资产在所有组合持仓/该管理人所有托投资类型的计划类资产的发行规模(穿透后) **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='91c0a86c598a43829c06cf417d014688';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('91c0a86c598a43829c06cf417d014688','同一管理人发行的委托投资类型的计划类资产在所有组合持仓/该管理人所有托投资类型的计划类资产的发行规模(穿透后)','LIMIT_AMOUNT','${DYGLRJHLZCCCJECTH}/${ZCFXGM}','SUPERVISION','01,02,03','DAYTIME,DAYEND', null , '{"threshold_1":{"op":">","value":"8.0000","unit":"PERCENT","is_model":"02"}}' , '{"threshold_1":{"op":">","value":"9.0000","unit":"PERCENT","is_model":"02"}}'  , '{"threshold_1":{"op":">","value":"10","unit":"PERCENT","is_model":"02"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'Y' , null , 'SUP077067' );

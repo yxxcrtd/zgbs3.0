@@ -1,0 +1,5 @@
+/**风险指标: 每只现金管理类产品持有不低于该产品资产净值5%的现金、国债、中央银行票据、政策性金融债券(穿透后) **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='72ed1f74da2c4e23bb7ad4a2bc0b04f3';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('72ed1f74da2c4e23bb7ad4a2bc0b04f3','每只现金管理类产品持有不低于该产品资产净值5%的现金、国债、中央银行票据、政策性金融债券(穿透后)','LIMIT_FLUID','(${XJGMCTH}+${GZZYYHPJZCXJRZQGZCTH})/${CPJZCJZ}','SUPERVISION','01,02,03','DAYTIME,DAYEND', null , '{"threshold_1":{"op":"<","unit":"PERCENT","is_model":"02"}}' , '{"threshold_1":{"op":"<","unit":"PERCENT","is_model":"02"}}'  , '{"threshold_1":{"op":"<","value":"5","unit":"PERCENT","is_model":"02"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'Y' , '《关于规范现金管理类理财产品管理有关事项的通知》第4条  （一）每只现金管理类产品持有不低于该产品资产净值5%的现金、国债、中央银行票据、政策性金融债券' , 'SUP029019' );

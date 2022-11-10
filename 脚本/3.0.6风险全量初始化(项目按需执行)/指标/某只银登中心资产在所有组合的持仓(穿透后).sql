@@ -1,0 +1,5 @@
+/**风险指标: 某只银登中心资产在所有组合的持仓(穿透后) **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='caa48e8f84c04d98a6df5e5b9c488480';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('caa48e8f84c04d98a6df5e5b9c488480','某只银登中心资产在所有组合的持仓(穿透后)','LIMIT_AMOUNT','${DZYDZXQMZECTH}','SUPERVISION','01,02,03','DAYTIME,DAYEND', null , '{"threshold_1":{"op":">","unit":"WRMB","is_model":"02"}}' , '{"threshold_1":{"op":">","unit":"WRMB","is_model":"02"}}'  , '{"threshold_1":{"op":">","value":"20000","unit":"WRMB","is_model":"02"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'Y' , null , 'SUP024014' );

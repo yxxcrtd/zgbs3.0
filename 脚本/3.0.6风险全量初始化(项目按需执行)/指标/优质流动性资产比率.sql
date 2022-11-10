@@ -1,0 +1,5 @@
+/**风险指标: 优质流动性资产比率 **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='a12fdfacc94a448aaa48fd3ceddb9ba7';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('a12fdfacc94a448aaa48fd3ceddb9ba7','优质流动性资产比率','LIMIT_FLUID','(${XJGZZYYHPJZCXJRZQGM}+${XJGM})/${CPJZCJZ}','SUPERVISION','01,02,03','DAYTIME,DAYEND', null , '{"threshold_1":{"op":"<=","value":"6.0000","unit":"PERCENT","is_model":"02"}}' , '{"threshold_1":{"op":"<=","value":"5.0000","unit":"PERCENT","is_model":"02"}}'  , '{"threshold_1":{"op":"<=","unit":"PERCENT","is_model":"02"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'Y' , '《商业银行理财业务监督管理办法》第43条 开放式公募理财产品应当持有不低于该理财产品资产净值5%的现金或者到期日在一年以内的国债、中央银行票据和政策性金融债券。' , 'SUP058048' );

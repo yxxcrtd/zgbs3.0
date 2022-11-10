@@ -1,0 +1,5 @@
+/**风险指标: 商业银行私募封闭式理财产品投资于未上市企业股权及其受益权资产应期限匹配(穿透后) **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='c828e651729641d7b6141ce3bc11942f';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('c828e651729641d7b6141ce3bc11942f','商业银行私募封闭式理财产品投资于未上市企业股权及其受益权资产应期限匹配(穿透后)','LIMIT_TERM','${FBSLCCPDQRHKFSLCCP}-${WSSQYGQSYZCDQRCTH}','SUPERVISION','01,02,03','DAYTIME,DAYEND', null , '{"threshold_1":{"op":"<","unit":"DAY","is_model":"02"}}' , '{"threshold_1":{"op":"<","value":"0","unit":"DAY","is_model":"02"}}'  , '{"threshold_1":{"op":"<","unit":"DAY","is_model":"02"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'N' , '《商业银行理财业务监督管理办法》第44条 商业银行理财产品直接或间接投资于未上市企业股权及其受（收）益权的，应当为封闭式理财产品，并明确股权及其受（收）益权的退出安排。未上市企业股权及其受（收）益权的退出日不得晚于封闭式理财产品的到期日。' , 'SUP109102' );

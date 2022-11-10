@@ -1,0 +1,256 @@
+/**风险指标参数: 未上市企业股权及其受益权资产到期日 **/
+
+----风险监督指标参数
+DELETE FROM RSK_ISUP_INDICATOR_PARA WHERE PARA_CODE ='WSSQYGQSYZCDQR';
+INSERT INTO RSK_ISUP_INDICATOR_PARA (PARA_CODE, PARA_NAME, IS_FORBID, FORBID_ENUM, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, MODEL_CODE, MODEL_VALUE, IS_UP_REDIS, PARAM_DATA_TYPE, PARA_TYPE, PARAM_MATH_TYPE, PARAM_VALUE_NONE)
+VALUES('WSSQYGQSYZCDQR','未上市企业股权及其受益权资产到期日', 'N' , '' ,'system','1',sysdate,'system',sysdate, null , null , 'N' , 'Date' ,  null ,  'REDIS'  ,  null );
+
+----监督指标参数明细
+DELETE FROM RSK_ISUP_INDICATOR_PARA_DTL WHERE PARA_CODE ='WSSQYGQSYZCDQR';
+INSERT INTO RSK_ISUP_INDICATOR_PARA_DTL (PARA_CODE, PARA_GRANULARITY, PARA_DISPLAY_TYPE, CONTENT, REDIS_FIELD, IS_FRESH_CAN_TRD, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES('WSSQYGQSYZCDQR','01', 'SQL','select 1 from dual',  'assetCode' , 'N' ,'system','1',sysdate,'system',sysdate);
+INSERT INTO RSK_ISUP_INDICATOR_PARA_DTL (PARA_CODE, PARA_GRANULARITY, PARA_DISPLAY_TYPE, CONTENT, REDIS_FIELD, IS_FRESH_CAN_TRD, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES('WSSQYGQSYZCDQR','02', 'SQL','select 1 from dual',  'assetCode' , 'N' ,'system','1',sysdate,'system',sysdate);
+INSERT INTO RSK_ISUP_INDICATOR_PARA_DTL (PARA_CODE, PARA_GRANULARITY, PARA_DISPLAY_TYPE, CONTENT, REDIS_FIELD, IS_FRESH_CAN_TRD, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES('WSSQYGQSYZCDQR','03', 'SQL','select 1 from dual',  'assetCode' , 'N' ,'system','1',sysdate,'system',sysdate);
+INSERT INTO RSK_ISUP_INDICATOR_PARA_DTL (PARA_CODE, PARA_GRANULARITY, PARA_DISPLAY_TYPE, CONTENT, REDIS_FIELD, IS_FRESH_CAN_TRD, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES('WSSQYGQSYZCDQR','04', 'SQL','select 1 from dual',  'assetCode' , 'N' ,'system','1',sysdate,'system',sysdate);
+INSERT INTO RSK_ISUP_INDICATOR_PARA_DTL (PARA_CODE, PARA_GRANULARITY, PARA_DISPLAY_TYPE, CONTENT, REDIS_FIELD, IS_FRESH_CAN_TRD, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME)
+VALUES('WSSQYGQSYZCDQR','05', 'SQL','select 1 from dual',  'assetCode' , 'N' ,'system','1',sysdate,'system',sysdate);
+
+DECLARE
+----实时、买入预占、卖出预占
+V_CONTENT_01_02_03 CLOB := 'SELECT FP.FINPROD_ID RKEY, FP.MDATE RVALUE FROM FIN_PRODUCT FP
+
+INNER JOIN FIN_PRODUCT_TYPE FPT ON FPT.FINPROD_ID = FP.FINPROD_ID
+
+WHERE ((FPT.TYPE_8 = ''F06'' AND FPT.TYPE_10 IN (''1205'',''084'')) OR (FPT.TYPE_8 = ''F19'' AND FPT.TYPE_10 = ''084''))
+
+AND FP.VDATE <= date''${valDate}'' AND FP.MDATE >= date''${valDate}''';
+
+----事后(日间)
+V_CONTENT_04 CLOB := 'WITH TEMP2 AS (
+
+    SELECT FP.FINPROD_ID, ceil(FP.MDATE-DATE''${valDate}'') MDATE FROM FIN_PRODUCT FP
+
+    INNER JOIN FIN_PRODUCT_TYPE FPT ON FPT.FINPROD_ID = FP.FINPROD_ID
+
+    WHERE ((FPT.TYPE_8 = ''F06'' AND FPT.TYPE_10 in (''084'',''1205'')) OR (FPT.TYPE_8 = ''F19'' AND FPT.TYPE_10 = ''084''))
+
+    AND FP.VDATE <= date''${valDate}'' AND FP.MDATE >= date''${valDate}''
+
+)
+
+SELECT RKEY, RVALUE, RKEYCN FROM (
+
+SELECT SUM(NVL(SHARE_AMT,0)) SHARE_AMT, RKEY, MDATE RVALUE, FINPROD_NAME RKEYCN FROM (
+
+    SELECT SUM(NVL(PSP.SHARE_AMT,0)) SHARE_AMT, TEMP2.FINPROD_ID RKEY, TEMP2.MDATE, FP.FINPROD_NAME
+
+    FROM PTL_SEC_VALUTION PSP
+
+    INNER JOIN FIN_PRODUCT FP ON FP.FINPROD_ID = PSP.FINPROD_ID
+
+    INNER JOIN TEMP2 ON TEMP2.FINPROD_ID = FP.FINPROD_ID
+
+    WHERE PSP.CDATE = DATE ''${valDate}'' - 1 AND PSP.PORTFOLIO_ID IN ${portfolioCode}
+
+    GROUP BY TEMP2.FINPROD_ID, TEMP2.MDATE, FP.FINPROD_NAME
+
+  UNION ALL
+
+    SELECT
+
+        nvl(sum(decode(n.PS, ''T01'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      + nvl(sum(decode(n.PS, ''T04'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      + nvl(sum(decode(n.PS, ''T52'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T02'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T03'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T19'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T07'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T08'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T09'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T11'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T22'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T23'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T38'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T39'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0) AS SHARE_AMT,
+
+        TEMP2.FINPROD_ID RKEY, TEMP2.MDATE, FP.FINPROD_NAME
+
+    FROM TRD_PRODUCT_DEAL_ADD m
+
+    INNER JOIN TRD_PRODUCT_DEAL n ON m.TRADE_ID = n.TRADE_ID
+
+    INNER JOIN FIN_PRODUCT FP ON FP.FINPROD_ID = n.FINPROD_ID
+
+    INNER JOIN TEMP2 ON TEMP2.FINPROD_ID = n.FINPROD_ID
+
+    WHERE n.TRADE_DATE = DATE''${valDate}'' AND m.PORTFOLIO_ID IN ${portfolioCode}
+
+    AND n.PS IN (''T01'', ''T02'', ''T03'', ''T04'', ''T19'', ''T07'', ''T08'', ''T09'', ''T11'', ''T52'', ''T22'', ''T23'', ''T39'', ''T39'')
+
+    GROUP BY TEMP2.FINPROD_ID, TEMP2.MDATE, FP.FINPROD_NAME
+
+  UNION ALL
+
+    SELECT
+
+        nvl(sum(decode(n.PS, ''T01'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      + nvl(sum(decode(n.PS, ''T04'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      + nvl(sum(decode(n.PS, ''T52'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T02'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T03'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T19'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T07'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T08'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T09'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T11'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T22'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T23'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T38'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T39'', decode(TRADE_STATUS, ''03'', n.SHARE_AMT*-1, n.SHARE_AMT))), 0) AS SHARE_AMT,
+
+        TEMP2.FINPROD_ID RKEY, TEMP2.MDATE, FP.FINPROD_NAME
+
+    FROM TRD_PRODUCT_TEMP_DEAL_ADD m
+
+    INNER JOIN TRD_PRODUCT_TEMP_DEAL n ON m.TRADE_ID = n.TRADE_ID
+
+    INNER JOIN FIN_PRODUCT FP ON FP.FINPROD_ID = n.FINPROD_ID
+
+    INNER JOIN TEMP2 ON TEMP2.FINPROD_ID = n.FINPROD_ID
+
+    WHERE n.TRADE_DATE = DATE''${valDate}'' AND m.PORTFOLIO_ID IN ${portfolioCode}
+
+    AND n.PS IN (''T01'', ''T02'', ''T03'', ''T04'', ''T19'', ''T07'', ''T08'', ''T09'', ''T11'', ''T52'', ''T22'', ''T23'', ''T39'', ''T39'')
+
+    GROUP BY TEMP2.FINPROD_ID, TEMP2.MDATE, FP.FINPROD_NAME
+
+  UNION ALL
+
+    SELECT
+
+        nvl(sum(decode(n.PS, ''T01'', decode(TRADE_STATUS, ''03'', n.TRADE_AMT*-1, n.TRADE_AMT))), 0)
+
+      + nvl(sum(decode(n.PS, ''T04'', decode(TRADE_STATUS, ''03'', n.TRADE_AMT*-1, n.TRADE_AMT))), 0)
+
+      + nvl(sum(decode(n.PS, ''T52'', decode(TRADE_STATUS, ''03'', n.TRADE_AMT*-1, n.TRADE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T02'', decode(TRADE_STATUS, ''03'', n.TRADE_AMT*-1, n.TRADE_AMT))), 0)
+
+      - nvl(sum(decode(n.PS, ''T03'', decode(TRADE_STATUS, ''03'', n.TRADE_AMT*-1, n.TRADE_AMT))), 0)  AS TRADE_AMT,
+
+        TEMP2.FINPROD_ID RKEY, TEMP2.MDATE, FP.FINPROD_NAME
+
+    FROM WFL_TRD_PRODUCT_DEAL_ADD m
+
+    INNER JOIN WFL_TRD_PRODUCT_DEAL n ON m.TRADE_ID = n.TRADE_ID AND n.TRADE_STATUS != ''03''
+
+    INNER JOIN SYS_WFL_BUSINESS_LIST swbl on n.WORKFLOW_ID = swbl.SEQ_NO and swbl.PROCESS_STATE != ''BACK''
+
+    INNER JOIN FIN_PRODUCT FP ON FP.FINPROD_ID = n.FINPROD_ID
+
+    INNER JOIN TEMP2 ON TEMP2.FINPROD_ID = n.FINPROD_ID
+
+    WHERE m.PORTFOLIO_ID IN ${portfolioCode} AND n.TRADE_DATE = DATE''${valDate}''
+
+    AND n.PS IN (''T01'', ''T02'', ''T03'', ''T04'', ''T52'')
+
+    GROUP BY TEMP2.FINPROD_ID, TEMP2.MDATE, FP.FINPROD_NAME
+
+  UNION ALL
+
+    SELECT
+
+        nvl(sum(decode(n.PS, ''T02'', decode(TRADE_STATUS, ''03'', n.TRADE_AMT*-1, n.TRADE_AMT))), 0) AS TRADE_AMT,
+
+    TEMP2.FINPROD_ID RKEY, TEMP2.MDATE, FP.FINPROD_NAME
+
+    FROM WFL_TRD_PRODUCT_DEAL_ADD m
+
+    INNER JOIN WFL_TRD_PRODUCT_DEAL n ON m.TRADE_ID = n.TRADE_ID AND n.TRADE_STATUS != ''03''
+
+    INNER JOIN SYS_WFL_BUSINESS_LIST swbl on n.WORKFLOW_ID = swbl.SEQ_NO and swbl.PROCESS_STATE != ''BACK''
+
+    INNER JOIN FIN_PRODUCT FP ON FP.FINPROD_ID = n.FINPROD_ID
+
+    INNER JOIN TEMP2 ON TEMP2.FINPROD_ID = n.FINPROD_ID
+
+    WHERE n.counter_id IN ${portfolioCode} AND n.TRADE_DATE = DATE''${valDate}''
+
+    AND n.PS =''T02''
+
+    AND EXISTS (SELECT 1 FROM SYS_PARA WHERE PARA_CODE = ''is_auto_generate_negate_deal'' AND PARAM_VALUE = ''Y'')
+
+    GROUP BY TEMP2.FINPROD_ID, TEMP2.MDATE, FP.FINPROD_NAME
+
+) GROUP BY RKEY, MDATE, FINPROD_NAME
+
+) WHERE SHARE_AMT > 0';
+
+----事后(日终)
+V_CONTENT_05 CLOB := 'WITH TEMP2 AS (
+
+    SELECT FP.FINPROD_ID, ceil(FP.MDATE-DATE''${valDate}'') MDATE FROM FIN_PRODUCT FP
+
+    INNER JOIN FIN_PRODUCT_TYPE FPT ON FPT.FINPROD_ID = FP.FINPROD_ID
+
+    WHERE ((FPT.TYPE_8 = ''F06'' AND FPT.TYPE_10 in (''084'',''1205'')) OR (FPT.TYPE_8 = ''F19'' AND FPT.TYPE_10 = ''084''))
+
+    AND FP.VDATE <= date''${valDate}'' AND FP.MDATE >= date''${valDate}''
+
+)
+
+SELECT RKEY, RVALUE, RKEYCN FROM (
+
+SELECT SUM(NVL(SHARE_AMT,0)) SHARE_AMT, RKEY, MDATE RVALUE, FINPROD_NAME RKEYCN FROM (
+
+    SELECT SUM(NVL(PSP.SHARE_AMT,0)) SHARE_AMT, TEMP2.FINPROD_ID RKEY, TEMP2.MDATE, FP.FINPROD_NAME
+
+    FROM PTL_SEC_VALUTION PSP
+
+    INNER JOIN FIN_PRODUCT FP ON FP.FINPROD_ID = PSP.FINPROD_ID
+
+    INNER JOIN TEMP2 ON TEMP2.FINPROD_ID = FP.FINPROD_ID
+
+    WHERE PSP.CDATE = DATE ''${valDate}'' AND PSP.PORTFOLIO_ID IN ${portfolioCode}
+
+    GROUP BY TEMP2.FINPROD_ID, TEMP2.MDATE, FP.FINPROD_NAME
+
+) GROUP BY RKEY, MDATE, FINPROD_NAME
+
+) WHERE SHARE_AMT > 0';
+
+BEGIN
+UPDATE RSK_ISUP_INDICATOR_PARA_DTL SET CONTENT = V_CONTENT_01_02_03 WHERE PARA_CODE = 'WSSQYGQSYZCDQR' and PARA_GRANULARITY in('01','02','03');
+UPDATE RSK_ISUP_INDICATOR_PARA_DTL SET CONTENT = V_CONTENT_04 WHERE PARA_CODE = 'WSSQYGQSYZCDQR' and PARA_GRANULARITY = '04';
+UPDATE RSK_ISUP_INDICATOR_PARA_DTL SET CONTENT = V_CONTENT_05 WHERE PARA_CODE = 'WSSQYGQSYZCDQR' and PARA_GRANULARITY = '05';
+END;
+/

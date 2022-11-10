@@ -1,0 +1,5 @@
+/**风险指标: 固定收益类产品投资债权类资产比例(穿透后) **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='40e7a185c1db4c8a8c1aede0791f5668';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('40e7a185c1db4c8a8c1aede0791f5668','固定收益类产品投资债权类资产比例(穿透后)','LIMIT_INVEST','(${CPZCLZCGMCTH}+${XJGMCTH})/${CPZZCCTH}','SUPERVISION','01,02,03','DAYTIME,DAYEND', null , '{"threshold_1":{"op":"<","value":"90.0000","unit":"PERCENT","is_model":"02"}}' , '{"threshold_1":{"op":"<","value":"80.0000","unit":"PERCENT","is_model":"02"}}'  , '{"threshold_1":{"op":"<","unit":"PERCENT","is_model":"02"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'Y' , null , 'SUP081071' );

@@ -1,0 +1,5 @@
+/**风险指标: 异常交易-交易所债券交易净价偏离 **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='82f65d3975684ccfbf1df7641a5f9fce';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('82f65d3975684ccfbf1df7641a5f9fce','异常交易-交易所债券交易净价偏离','LIMIT_DEVIATION','(${JYSZQJYJJ}-${JYSZQQYIZZJJ})/${JYSZQQYIZZJJ}','SUPERVISION','02,03','DAYTIME,DAYEND', null , '{"threshold_1":{"op":">","value":"1.7","unit":"PERCENT","is_model":"01"}}' , '{"threshold_1":{"op":">","value":"2","unit":"PERCENT","is_model":"01"}}'  , '{"threshold_1":{"op":">","unit":"PERCENT","is_model":"01"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'N' , null , 'SUP089079' );

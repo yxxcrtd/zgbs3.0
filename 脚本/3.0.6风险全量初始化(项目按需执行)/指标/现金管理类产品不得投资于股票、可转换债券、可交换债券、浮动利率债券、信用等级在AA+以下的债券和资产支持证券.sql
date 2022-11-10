@@ -1,0 +1,5 @@
+/**风险指标: 现金管理类产品不得投资于股票、可转换债券、可交换债券、浮动利率债券、信用等级在AA+以下的债券和资产支持证券 **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='086902891df347da91422da8b18b79e2';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('086902891df347da91422da8b18b79e2','现金管理类产品不得投资于股票、可转换债券、可交换债券、浮动利率债券、信用等级在AA+以下的债券和资产支持证券','FORBID_FUND','${BKTZZQ}','SUPERVISION','01,02,03','DAYTIME,DAYEND', null , null , null  , '{"threshold_1":{"value":"01,02,03,04,05,","value_cn":"股票,可转换债券,可交换债券,浮动利率债券,信用等级在AA+以下的债券和资产支持证券,","fb_model":"Y"}}' , 'N' , '2' , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'N' , '《关于规范现金管理类理财产品管理有关事项的通知》第2条  现金管理类产品不得投资于以下金融工具： （一）股票； （二）可转换债券、可交换债券； （三）以定期存款利率为基准利率的浮动利率债券，已进入最后一个利率调整期的除外； （四）信用等级在AA+以下的债券、资产支持证券； （五）银保监会、中国人民银行禁止投资的其他金融工具。' , 'SUP026016' );

@@ -1,0 +1,5 @@
+/**风险指标: 利率债债券偏离度 **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='cb98dcf2eb724ccbac839e56c6788287';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('cb98dcf2eb724ccbac839e56c6788287','利率债债券偏离度','LIMIT_DEVIATION','(${LLZDBJYJJ}-${DBJYSZJJ})/${DBJYSZJJ}','INTERNAL','01,02,03','DAYTIME,DAYEND', null , '{"threshold_1":{"op":">=","value":"0.9","unit":"PERCENT","is_model":"01"}}' , '{"threshold_1":{"op":">=","unit":"PERCENT","is_model":"01"}}'  , '{"threshold_1":{"op":">=","value":"1","unit":"PERCENT","is_model":"01"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'Y' , null , 'INT009007' );

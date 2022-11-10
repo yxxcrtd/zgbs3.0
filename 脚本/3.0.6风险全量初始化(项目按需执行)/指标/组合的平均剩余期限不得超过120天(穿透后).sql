@@ -1,0 +1,5 @@
+/**风险指标: 组合的平均剩余期限不得超过120天(穿透后) **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='8e7bbad65ae1492ebf0252ea420bda51';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('8e7bbad65ae1492ebf0252ea420bda51','组合的平均剩余期限不得超过120天(穿透后)','LIMIT_TERM','${ZCSYQXCTH}/(${CPJZCJZ}+${ZHGZJYECTH})','SUPERVISION','01,02,03','DAYTIME,DAYEND', null , '{"threshold_1":{"op":">","unit":"DAY","is_model":"02"}}' , '{"threshold_1":{"op":">","unit":"DAY","is_model":"02"}}'  , '{"threshold_1":{"op":">","value":"120","unit":"DAY","is_model":"02"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'Y' , '《关于规范现金管理类理财产品管理有关事项的通知》第5条  商业银行、理财公司每只现金管理类产品投资组合的平均剩余期限不得超过120天，平均剩余存续期限不得超过240天。' , 'SUP046036' );

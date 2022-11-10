@@ -1,0 +1,5 @@
+/**风险指标: 全部开放式公募产品投资单一上市公司发行的股票比例(穿透后) **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='2cfe824b6561493fa6784a71005f4f3e';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('2cfe824b6561493fa6784a71005f4f3e','全部开放式公募产品投资单一上市公司发行的股票比例(穿透后)','LIMIT_CONCENT','${TZDYSSGSFXGPCTH}/${SSGSKLTGBCTH}','INTERNAL','01,02,03','DAYTIME,DAYEND', null , '{"threshold_1":{"op":">","value":"10","unit":"BP","is_model":"02"}}' , '{"threshold_1":{"op":">","value":"15","unit":"BP","is_model":"02"}}'  , '{"threshold_1":{"op":">","unit":"BP","is_model":"02"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'Y' , '《关于规范金融机构资产管理业务的指导意见》第16条  同一金融机构全部开放式公募资产管理产品投资单一上市公司发行的股票不得超过该上市公司可流通股票的15%。' , 'INT008006' );

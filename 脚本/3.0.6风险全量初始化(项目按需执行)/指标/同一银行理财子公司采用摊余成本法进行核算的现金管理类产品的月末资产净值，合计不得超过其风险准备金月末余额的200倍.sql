@@ -1,0 +1,5 @@
+/**风险指标: 同一银行理财子公司采用摊余成本法进行核算的现金管理类产品的月末资产净值，合计不得超过其风险准备金月末余额的200倍 **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='7149fdea70a94bcaa3983da9b10fe0b6';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('7149fdea70a94bcaa3983da9b10fe0b6','同一银行理财子公司采用摊余成本法进行核算的现金管理类产品的月末资产净值，合计不得超过其风险准备金月末余额的200倍','LIMIT_SCALE','${YMCPJZC}/${FV202008130061}','SUPERVISION','03','DAYTIME,DAYEND', null , '{"threshold_1":{"op":">","unit":"NONE","is_model":"02"}}' , '{"threshold_1":{"op":">","unit":"NONE","is_model":"02"}}'  , '{"threshold_1":{"op":">","value":"200.0000","unit":"NONE","is_model":"02"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'Y' , '《关于规范现金管理类理财产品管理有关事项的通知》第10条  同一理财公司采用摊余成本法进行核算的现金管理类产品的月末资产净值，合计不得超过其风险准备金月末余额的200倍。' , 'SUP031021' );

@@ -1,0 +1,5 @@
+/**风险指标: 杠杆水平不得超过120% **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='d7b0320a6e4e42d6808426c6d0257001';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('d7b0320a6e4e42d6808426c6d0257001','杠杆水平不得超过120%','LIMIT_LECER','${CPZZC}/${CPJZCJZ}','SUPERVISION','01,02,03','DAYTIME,DAYEND', null , '{"threshold_1":{"op":">","unit":"PERCENT","is_model":"02"}}' , '{"threshold_1":{"op":">","unit":"PERCENT","is_model":"02"}}'  , '{"threshold_1":{"op":">","value":"120","unit":"PERCENT","is_model":"02"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'Y' , '《关于规范现金管理类理财产品管理有关事项的通知》第4条  （四）每只现金管理类产品的杠杆水平不得超过120%，发生巨额赎回、连续3个交易日累计赎回20%以上或者连续5个交易日累计赎回30%以上的情形除外。' , 'SUP018008' );

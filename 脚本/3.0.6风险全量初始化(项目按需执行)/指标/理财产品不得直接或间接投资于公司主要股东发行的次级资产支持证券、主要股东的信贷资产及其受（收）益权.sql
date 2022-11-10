@@ -1,0 +1,5 @@
+/**风险指标: 理财产品不得直接或间接投资于公司主要股东发行的次级资产支持证券、主要股东的信贷资产及其受（收）益权 **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='0a60b2ac32af4acaba10fbb6c3a777e7';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('0a60b2ac32af4acaba10fbb6c3a777e7','理财产品不得直接或间接投资于公司主要股东发行的次级资产支持证券、主要股东的信贷资产及其受（收）益权','FORBID_FUND','${BDTZCJZDZXDJQSYQ}','SUPERVISION','01,02,03','DAYTIME,DAYEND', null , null , null  , '{"threshold_1":{"value":"01,03,","value_cn":"次级资产支持证券,信贷资产及其收受益权,","fb_model":"Y"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'N' , '《商业银行理财业务监督管理办法》第36条  商业银行理财产品不得直接投资于信贷资产，不得直接或间接投资于本行信贷资产，不得直接或间接投资于本行或其他银行业金融机构发行的理财产品，不得直接或间接投资于本行发行的次级档信贷资产支持证券。' , 'SUP043033' );

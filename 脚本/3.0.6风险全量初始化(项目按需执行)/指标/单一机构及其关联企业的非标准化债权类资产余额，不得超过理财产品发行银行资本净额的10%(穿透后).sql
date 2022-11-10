@@ -1,0 +1,5 @@
+/**风险指标: 单一机构及其关联企业的非标准化债权类资产余额，不得超过理财产品发行银行资本净额的10%(穿透后) **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='1d99d4c013eb47f88c469a216238e3de';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('1d99d4c013eb47f88c469a216238e3de','单一机构及其关联企业的非标准化债权类资产余额，不得超过理财产品发行银行资本净额的10%(穿透后)','LIMIT_TRAN','${DYGLFCTH}/${FV202001010004}','SUPERVISION','01,02,03','DAYTIME,DAYEND', null , '{"threshold_1":{"op":">","unit":"PERCENT","is_model":"02"}}' , '{"threshold_1":{"op":">","unit":"PERCENT","is_model":"02"}}'  , '{"threshold_1":{"op":">","value":"10","unit":"PERCENT","is_model":"02"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'N' , '《商业银行理财业务监督管理办法》第39条  （二）商业银行全部理财产品投资于单一债务人及其关联企业的非标准化债权类资产余额，不得超过本行资本净额的10%；' , 'SUP054044' );

@@ -1,0 +1,5 @@
+/**风险指标: 面向非机构投资者发行的理财产品不得直接或间接投资于不良资产受（收）益权(穿透后) **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='1449a8720b914b7ca4365fe7aeb85990';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('1449a8720b914b7ca4365fe7aeb85990','面向非机构投资者发行的理财产品不得直接或间接投资于不良资产受（收）益权(穿透后)','FORBID_FUND','${BDZJHJITZYBLZCSYQCTH}','SUPERVISION','01,02,03','DAYTIME,DAYEND', null , null , null  , '{"threshold_1":{"value":"Y,","value_cn":"不良资产,","fb_model":"Y"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'N' , '《商业银行理财业务监督管理办法》第36条 商业银行面向非机构投资者发行的理财产品不得直接或间接投资于不良资产、不良资产支持证券，国务院银行业监督管理机构另有规定的除外。  《商业银行理财业务监督管理办法》第40条  面向非机构投资者发行的理财产品不得直接或间接投资于不良资产受（收）益权。' , 'SUP109101' );

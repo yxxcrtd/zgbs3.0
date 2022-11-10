@@ -1,0 +1,5 @@
+/**风险指标: 单只产品摊余成本法估值偏离度 **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='8a5b29ba9eaf452693745a859fdefbcc';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('8a5b29ba9eaf452693745a859fdefbcc','单只产品摊余成本法估值偏离度','LIMIT_DEVIATION','${DZCPTYCBFGZPLD}','SUPERVISION','03','DAYTIME,DAYEND', null , '{"threshold_1":{"op":">","value":"4.25","unit":"PERCENT","is_model":"01"}}' , '{"threshold_1":{"op":">","value":"5","unit":"PERCENT","is_model":"01"}}'  , '{"threshold_1":{"op":">","unit":"PERCENT","is_model":"01"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'Y' , null , 'SUP066056' );

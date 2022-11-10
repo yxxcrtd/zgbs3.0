@@ -1,0 +1,5 @@
+/**风险指标: 有固定期限银行存款的比例合计不得超过该产品资产净值的30%(穿透后) **/
+
+DELETE FROM RSK_ISUP_INDICATOR WHERE IND_ID='0eac6af1774241eb8941aa86edb31e87';
+INSERT INTO RSK_ISUP_INDICATOR (IND_ID, IND_NAME, IND_TYPE, EXPR, SUP_TYPE, TIME_POINT, SUP_FREQUENCY, SUP_DIRECTION, WARN_COND, APPROVE_COND, FOUL_COND, IS_ADJUST, ADJUST, IS_ENABLED, MEMO, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_USER, UPDATE_TIME, IS_EXCP_WHEN_DIV_ZERO, COMPARE_DAYS, INSTITUTION_CODE, SUP_DISPLAY_CLASSIFY, ASSET_THR_TYPE, INVEST_PROPORTY, IS_DISPLAY_ORIGINAL,SUP_DOC,IND_NUM)
+VALUES('0eac6af1774241eb8941aa86edb31e87','有固定期限银行存款的比例合计不得超过该产品资产净值的30%(穿透后)','LIMIT_CONCENT','${GDQXCKGZCTH}/${CPJZCJZ}','SUPERVISION','01,02,03','DAYTIME,DAYEND', null , '{"threshold_1":{"op":">","unit":"PERCENT","is_model":"02"}}' , '{"threshold_1":{"op":">","unit":"PERCENT","is_model":"02"}}'  , '{"threshold_1":{"op":">","value":"30","unit":"PERCENT","is_model":"02"}}' , 'N' , null , '01' , null ,'system',null,sysdate,'system',sysdate, '03' , null , null , null  , null , null  , 'Y' , '《关于规范现金管理类理财产品管理有关事项的通知》第3条  （三）每只现金管理类产品投资于有固定期限银行存款的比例合计不得超过该产品资产净值的30%，投资于有存款期限，根据协议可提前支取的银行存款除外；' , 'SUP015005' );
