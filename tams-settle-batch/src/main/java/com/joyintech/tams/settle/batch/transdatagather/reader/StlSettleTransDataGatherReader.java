@@ -150,6 +150,8 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                     dealTotal.setCcy(settleTransDataDto.getCcy());
                     // 交收结果
                     dealTotal.setDeliveryResult(settleTransDataDto.getDeliveryResult());
+                    // 单位面额
+                    dealTotal.setParValue(settleTransDataDto.getParValue());
                     //单位净价
                     BigDecimal unitCprice=BigDecimal.ZERO;
                     //单位利息

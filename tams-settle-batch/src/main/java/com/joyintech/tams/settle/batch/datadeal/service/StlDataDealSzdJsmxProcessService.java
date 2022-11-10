@@ -216,6 +216,9 @@ public class StlDataDealSzdJsmxProcessService {
 				// 全价总额
 //				settleTransData.setFpriceAmt(new BigDecimal(Math.abs(new BigDecimal(szdJsmx.getQsje()).doubleValue())));
 				settleTransData.setFpriceAmt(new BigDecimal(szdJsmx.getQsje()).abs());
+				// 单位面值 调用【当前面值】
+				settleTransData.setParValue(stlDataDealProcessCommonService.getUnitPrice(settleTransData.getFinprodId(),
+						settleTransData.getTradeDate()));
 				// modify by etliu 20211225 end
 				// 清算速度
 				settleTransData.setSettleSpeed(0L);

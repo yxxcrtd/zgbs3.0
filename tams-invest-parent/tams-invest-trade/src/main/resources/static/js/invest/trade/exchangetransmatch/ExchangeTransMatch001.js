@@ -75,7 +75,13 @@
             {field:'psStr', sortField:'ps',width:200, title: 'ExchangeTransMatch001.ps'},
             {field:'remainAmount', sortField:'remainAmount',width:200, title: 'ExchangeTransMatch001.remainAmount',type: 'money'},
             {field:'remainNum', sortField:'remainNum',width:200, title: 'ExchangeTransMatch001.remainNum',type: 'number'},
-            {field:'unitFprice', sortField:'unitFprice',width:200, title: 'ExchangeTransMatch001.dealPrice',type: 'number',digit: 4},
+            {field:'unitFprice', sortField:'unitFprice',width:200, title: 'ExchangeTransMatch001.dealPrice',type: 'number', render: function(data, type, row, meta) {
+                    if (row.finprodType2 === "F01") {
+                        return parseFloat(row.unitFprice).toFixed(8);
+                    } else {
+                        return parseFloat(row.unitFprice).toFixed(4);
+                    }
+                }},
             {field:'dealDate', sortField:'dealDate',width:200, title: 'ExchangeTransMatch001.dealDate',type: 'date'},
             {field:'acctName', sortField:'acctNo',width:200, title: 'ExchangeTransMatch001.fundAccount'},
 

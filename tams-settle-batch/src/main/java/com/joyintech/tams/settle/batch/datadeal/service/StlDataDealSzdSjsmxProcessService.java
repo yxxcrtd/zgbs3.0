@@ -166,6 +166,9 @@ public class StlDataDealSzdSjsmxProcessService {
             settleTransData.setUnitCprice(szdSjsmx.getMxcjjg());
             // 单位全价
             settleTransData.setUnitFprice(szdSjsmx.getMxqsjg());
+            // 单位面值 调用【当前面值】
+            settleTransData.setParValue(stlDataDealProcessCommonService.getUnitPrice(settleTransData.getFinprodId(),
+                    settleTransData.getTradeDate()));
             // 业务类型
             settleTransData.setBusiType(DictCodeList.业务类型_债券交易.getValue());
             // 交易币种
