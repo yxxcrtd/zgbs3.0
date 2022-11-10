@@ -448,6 +448,10 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
                 //新建转仓
                 String decisionAct = 系统动作_新建.getValue();
                 String systemAct = 系统动作_新建.getValue();
+                String confirmOk = RequestUtil.getParam("confirmOk");
+                if(StringUtil.isNotEmpty(confirmOk)){
+                    dto.setSoftSkipMode("N");
+                }
                 positionRequestService.sendFundAssetTransfer001DtoRequest(dto, decisionAct, systemAct, DictCodeListExt3.流程节点_审批生效.getValue(), "N");
             } else {
                 //转仓撤销
@@ -1265,7 +1269,7 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
                 decisionAct = 系统动作_新建.getValue();
             }
             if (StringUtil.equals("1", RequestUtil.getParam("confirmOk"))) {
-                dto.setSoftSkipMode("Y");
+                dto.setSoftSkipMode("N");
             }
             try {
                 if (StringUtil.equals(dto.getTradeMarket(), 交易场所_上海证券交易所.getValue())
@@ -1332,27 +1336,28 @@ public class FundAssetTransfer001Service extends BaseService<FundAssetTransfer00
         }
     }
 
-    public List<TrdProductDeal> generateOrdersNQs(FundAssetTransfer001Dto dto, List<FundAssetTransfer001Dto> dtoList) {
+    public List<TrdProductDeal> generateOrders(FundAssetTransfer001Dto dto, List<FundAssetTransfer001Dto> dtoList) {
         List<TrdProductDeal> trdProductDealList = new ArrayList<>();
         //托管户查询
-        String portfolioId = dto.getPortfolioId();
-        List<PtlCapacctInfo> ptlCapacctList = etrTrdCommonMapper.getPtlAcctInfo(portfolioId, Arrays.asList(DictCodeListExt1.资金账户类型_产品托管户.getValue()));
+//        String portfolioId = dto.getPortfolioId();
+//        List<PtlCapacctInfo> ptlCapacctList = etrTrdCommonMapper.getPtlAcctInfo(portfolioId, Arrays.asList(DictCodeListExt1.资金账户类型_产品托管户.getValue()));
 
         for (FundAssetTransfer001Dto fundAssetDto : dtoList) {
-            String portfolioIdIn = fundAssetDto.getPortfolioId();
-            List<PtlCapacctInfo> ptlCapacctListIn = etrTrdCommonMapper.getPtlAcctInfo(portfolioIdIn, Arrays.asList(DictCodeListExt1.资金账户类型_产品托管户.getValue()));
+//            String portfolioIdIn = fundAssetDto.getPortfolioId();
+//            List<PtlCapacctInfo> ptlCapacctListIn = etrTrdCommonMapper.getPtlAcctInfo(portfolioIdIn, Arrays.asList(DictCodeListExt1.资金账户类型_产品托管户.getValue()));
 
             TrdProductDeal trdProductDeal = getOrder(fundAssetDto);
-            if (ptlCapacctList.size() == 1 && ptlCapacctListIn.size() == 1 && ptlCapacctList.get(0).equals(ptlCapacctListIn.get(0))) {
-                //※划款指令共通页面调用【业务组件.划款指令共通组件.指令生成】，页面不展示
-                trdProductDeal.setStlPayOrderShow("N");
-            } else if (ptlCapacctList.size() == 1 && ptlCapacctListIn.size() == 1
-                    && ptlCapacctList.get(0).getAcctNo() != ptlCapacctListIn.get(0).getAcctNo()) {
-                //页面展示,不做任何处理
-            } else {
-                //页面展示,但是划款账号设置为空
-                trdProductDeal.setStlPayOrderShow("Y");
-            }
+//            if (ptlCapacctList.size() == 1 && ptlCapacctListIn.size() == 1 && StringUtil.equals(ptlCapacctList.get(0).getAcctNo(),ptlCapacctListIn.get(0).getAcctNo())) {
+//                //※划款指令共通页面调用【业务组件.划款指令共通组件.指令生成】，页面不展示
+//                trdProductDeal.setStlPayOrderShow("N");
+//            } else if (ptlCapacctList.size() == 1 && ptlCapacctListIn.size() == 1
+//                    && !StringUtil.equals(ptlCapacctList.get(0).getAcctNo() ,ptlCapacctListIn.get(0).getAcctNo())) {
+//                //页面展示,不做任何处理
+//            } else {
+//                //页面展示,但是划款账号设置为空
+//                trdProductDeal.setStlPayOrderShow("Y");
+//            }
+            trdProductDeal.setTradeMarket(dto.getTradeMarket());
             trdProductDealList.add(trdProductDeal);
         }
         return trdProductDealList;

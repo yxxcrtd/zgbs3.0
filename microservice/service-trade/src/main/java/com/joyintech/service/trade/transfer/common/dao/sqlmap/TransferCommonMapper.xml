@@ -60,10 +60,13 @@
         </if>
         FROM
         PTL_PORTFOLIO pp
-        INNER JOIN PTL_CAPACCT_INFO pci ON pci.PORTFOLIO_ID = pp.PORTFOLIO_ID and pci.ACCT_TYPE = 'A01'
         <if test="secAcctId!=null and secAcctId!=''">
-            LEFT JOIN PTL_SEC_ACCT psa ON psa.PORTFOLIO_ID = pp.PORTFOLIO_ID
-            LEFT JOIN STL_SEC_ACCT_INFO ssai on ssai.SEC_ACCT_ID = psa.ACCT_NO
+            INNER JOIN PTL_SEC_ACCT psa ON psa.PORTFOLIO_ID = pp.PORTFOLIO_ID
+            LEFT JOIN STL_SEC_ACCT_INFO ssai on  ssai.SEC_ACCT_ID = psa.ACCT_NO 
+        </if>
+        LEFT JOIN PTL_CAPACCT_INFO pci ON pci.PORTFOLIO_ID = pp.PORTFOLIO_ID and ssai.TRD_ACCT_ID=pci.ACCT_NO
+        <if test="capacctType!=null and capacctType!=''">
+        and pci.ACCT_TYPE = #{capacctType,jdbcType=VARCHAR}
         </if>
         WHERE pp.INVEST_YESORNO='Y' AND pp.PORTFOLIO_TYPE='01'
         <!--        pci.ACCT_NO in (SELECT DISTINCT B.ACCT_NO  FROM PTL_CAPACCT_INFO B WHERE B.PORTFOLIO_ID = #{portfolioId} AND B.ACCT_TYPE = #{capacctType} AND B.CCY = #{ccy})-->
@@ -105,5 +108,19 @@
         from PTL_PORTFOLIO_VALUATION
         where PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
         order by cdate DESC
+    </select>
+    
+    <select id="queryPositionAvailableCash" resultType="java.math.BigDecimal">
+    	SELECT sum(amount)
+		FROM PTL_CASH_POSITION_RULE pcpr
+		WHERE pcpr.DATE_TYPE = 0
+		  AND pcpr.HODING_TYPE IN ('C_11', 'C_12')
+		  AND pcpr.CDATE = #{vdate,jdbcType=DATE}
+		  <if test="portfolioId != null and portfolioId != ''">
+            AND pcpr.PORTFOLIO_ID = #{portfolioId,jdbcType=VARCHAR}
+       	  </if>
+       	  <if test="acctNo != null and acctNo != ''">
+            AND pcpr.ACCT_ID = #{acctNo, jdbcType=VARCHAR}
+          </if>
     </select>
 </mapper>

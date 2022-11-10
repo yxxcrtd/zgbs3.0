@@ -153,7 +153,7 @@ public class PositionRequestServiceSecTransfer001DtoRequest {
      */
     private void setCommonField(SecTransfer001Dto entity, Map<String, Object> resultMap,String decisionAct) {
         String balanceCheck = "Y";
-        if (StringUtil.isNotEmpty(entity.getSoftSkipMode()) && StringUtil.equals(entity.getSoftSkipMode(), "Y")) {
+        if (StringUtil.isNotEmpty(entity.getSoftSkipMode()) && StringUtil.equals(entity.getSoftSkipMode(), "N")) {
             balanceCheck = "N";
         }
         resultMap.put("userId", SecurityUtil.getLoginUser().getUserName());

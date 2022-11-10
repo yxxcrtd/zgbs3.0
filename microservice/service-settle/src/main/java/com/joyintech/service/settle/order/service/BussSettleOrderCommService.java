@@ -902,10 +902,10 @@ public class BussSettleOrderCommService {
         dto.setTradeId(deal.getTradeId());
         dto.setOrderStatus(DictCodeListExt1.指令状态_新建.getValue());
 
-        
+        String mstSaleFlag = CacheUtil.getSysParam("TRANSFER_MST_SALE_FLAG");
         // 通道为空  并且 上交所  并且   债券业务  查券商资金账户  
         if(!StringUtil.isNotEmpty(deal.getChlId()) && ( DictCodeListExt1.估值交易市场_上交所.getValue().equals(deal.getTradeMarket())
-        		|| DictCodeListExt1.估值交易市场_深交所.getValue().equals(deal.getTradeMarket()) )){
+        		|| DictCodeListExt1.估值交易市场_深交所.getValue().equals(deal.getTradeMarket())) && "Y".equals(mstSaleFlag)){
         	if (DictCodeListExt1.收支方向_支出.getValue().equals(dto.getPs())) {
 	            dto.setMyCapacctInfoList(bussSettleOrderCommMapper.selectProdCapacctInfoList(portfolioId, deal.getCcy(),
 	                    DictCodeListExt1.资金账户类型_券商资金账户.getValue()));

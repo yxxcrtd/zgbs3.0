@@ -568,6 +568,10 @@ public class SecTransfer001Service extends CommonExportService<SecTransfer001Dto
             try {
                 String decisionAct = 系统动作_新建.getValue();
                 String systemAct = 系统动作_新建.getValue();
+                String confirmOk = RequestUtil.getParam("confirmOk");
+                if(StringUtil.isNotEmpty(confirmOk)){
+                    entity.setSoftSkipMode("N");
+                }
                 positionRequestService.sendSecTransfer001DtoRequest(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue());
             } catch (PositionException e) {
                 Message message = PositionUtil.ajaxErrorReturn(e);
@@ -666,8 +670,9 @@ public class SecTransfer001Service extends CommonExportService<SecTransfer001Dto
                     systemAct = 系统动作_新建.getValue();
                     decisionAct = 系统动作_新建.getValue();
                 }
-                if (StringUtil.equals("1", RequestUtil.getParam("confirmOk"))) {
-                    entity.setSoftSkipMode("Y");
+                String confirmOk = RequestUtil.getParam("confirmOk");
+                if(StringUtil.isNotEmpty(confirmOk)){
+                    entity.setSoftSkipMode("N");
                 }
                 try {
                     positionRequestService.sendSecTransfer001DtoRequest(entity, decisionAct, systemAct, DictCodeListExt3.流程节点_流程提交.getValue());
@@ -847,6 +852,10 @@ public class SecTransfer001Service extends CommonExportService<SecTransfer001Dto
             //新建转仓
             String decisionAct = 系统动作_新建.getValue();
             String systemAct = 系统动作_新建.getValue();
+            String confirmOk = RequestUtil.getParam("confirmOk");
+            if(StringUtil.isNotEmpty(confirmOk)){
+            	secResolute001Dto.setSoftSkipMode("N");
+            }
             positionRequestService.sendSecTransfer001DtoRequest(secResolute001Dto, decisionAct, systemAct, DictCodeListExt3.流程节点_审批生效.getValue());
         } else {
             // TODO 转仓撤销  应该是不需要的代码 待确认后删除
@@ -1106,6 +1115,10 @@ public class SecTransfer001Service extends CommonExportService<SecTransfer001Dto
                 //新建转仓
                 String decisionAct = 系统动作_新建.getValue();
                 String systemAct = 系统动作_新建.getValue();
+                String confirmOk = RequestUtil.getParam("confirmOk");
+                if(StringUtil.isNotEmpty(confirmOk)){
+                    secResolute001Dto.setSoftSkipMode("N");
+                }
                 positionRequestService.sendSecTransfer001DtoRequest(secResolute001Dto, decisionAct, systemAct, DictCodeListExt3.流程节点_审批生效.getValue());
             } else {
                 //转仓撤销
@@ -2737,69 +2750,42 @@ public class SecTransfer001Service extends CommonExportService<SecTransfer001Dto
         return trdProductDeal;
     }
 
-
-    public List<TrdProductDeal> generateOrdersYQs(SecTransferDto transferOutDto, List<SecTransferDto> transferInDtoList) {
+    
+    public List<TrdProductDeal> generateOrders(SecTransferDto transferOutDto, List<SecTransferDto> transferInDtoList) {
         List<TrdProductDeal> trdProductDealList = new ArrayList<>();
 
-        List<PtlCapacctInfo> outPayerTypeList = new ArrayList<>();
-        if (DictCodeListExt1.交易场所_银行间.getValue().equals(transferOutDto.getTradeMarket()) || DictCodeListExt1.交易场所_商业银行柜台.getValue().equals(transferOutDto.getTradeMarket())) {
-            String portfolioId = transferOutDto.getPortfolioId();
-            //托管户查询
-            outPayerTypeList = etrTrdCommonMapper.getPtlAcctInfo(portfolioId, Arrays.asList(DictCodeListExt1.资金账户类型_产品托管户.getValue()));
+//        List<PtlCapacctInfo> outPayerTypeList = new ArrayList<>();
+//        if (DictCodeListExt1.交易场所_银行间.getValue().equals(transferOutDto.getTradeMarket()) || DictCodeListExt1.交易场所_商业银行柜台.getValue().equals(transferOutDto.getTradeMarket())) {
+//            String portfolioId = transferOutDto.getPortfolioId();
+//            //托管户查询
+//            outPayerTypeList = etrTrdCommonMapper.getPtlAcctInfo(portfolioId, Arrays.asList(DictCodeListExt1.资金账户类型_产品托管户.getValue()));
 
             for (SecTransferDto secTransferDto : transferInDtoList) {
                 secTransferDto.setTradeId(secTransferDto.getStlPayId());
                 TrdProductDeal trdProductDeal = getOrder(secTransferDto);
                 trdProductDeal.setTradeAmt(secTransferDto.getTradeRepAmt());
 
-                List<PtlCapacctInfo> inPayerTypeList = etrTrdCommonMapper.getPtlAcctInfo(secTransferDto.getPortfolioId(), Arrays.asList(DictCodeListExt1.资金账户类型_产品托管户.getValue()));
-                if (outPayerTypeList.size() == 1 && inPayerTypeList.size() == 1 && outPayerTypeList.get(0).getAcctNo().equals(inPayerTypeList.get(0))) {
-                    trdProductDeal.setStlPayOrderShow("N");  //※划款指令共通页面调用【业务组件.划款指令共通组件.指令生成】，页面不展示
-                } else if (outPayerTypeList.size() == 1 && inPayerTypeList.size() == 1 && outPayerTypeList.get(0).getAcctNo() != inPayerTypeList.get(0).getAcctNo()) {
-                    //页面展示, 不做任何处理
-                } else {
-                    trdProductDeal.setStlPayOrderShow("Y");//页面展示,但是划款账号设置为空
-                }
+//                List<PtlCapacctInfo> inPayerTypeList = etrTrdCommonMapper.getPtlAcctInfo(secTransferDto.getPortfolioId(), Arrays.asList(DictCodeListExt1.资金账户类型_产品托管户.getValue()));
+//                if (outPayerTypeList.size() == 1 && inPayerTypeList.size() == 1 && StringUtil.equals(outPayerTypeList.get(0).getAcctNo(),inPayerTypeList.get(0).getAcctNo())) {
+//                    trdProductDeal.setStlPayOrderShow("N");  //※划款指令共通页面调用【业务组件.划款指令共通组件.指令生成】，页面不展示
+//                } else if (outPayerTypeList.size() == 1 && inPayerTypeList.size() == 1 && !StringUtil.equals(outPayerTypeList.get(0).getAcctNo() ,inPayerTypeList.get(0).getAcctNo())) {
+//                    //页面展示, 不做任何处理
+//                } else {
+//                    trdProductDeal.setStlPayOrderShow("Y");//页面展示,但是划款账号设置为空
+//                }
                 trdProductDealList.add(trdProductDeal);
             }
-        } else if (DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(transferOutDto.getTradeMarket()) || DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(transferOutDto.getTradeMarket())) {
-            for (SecTransferDto secTransferDto : transferInDtoList) {
-                secTransferDto.setTradeId(secTransferDto.getStlPayId());
-                TrdProductDeal trdProductDeal = getOrder(secTransferDto);
-                trdProductDeal.setTradeAmt(secTransferDto.getTradeRepAmt());
-                trdProductDeal.setStlPayOrderShow("N"); // 页面不展示
-                trdProductDealList.add(trdProductDeal);
-            }
-        }
+//        } else if (DictCodeListExt1.交易场所_深圳证券交易所.getValue().equals(transferOutDto.getTradeMarket()) || DictCodeListExt1.交易场所_上海证券交易所.getValue().equals(transferOutDto.getTradeMarket())) {
+//            for (SecTransferDto secTransferDto : transferInDtoList) {
+//                secTransferDto.setTradeId(secTransferDto.getStlPayId());
+//                TrdProductDeal trdProductDeal = getOrder(secTransferDto);
+//                trdProductDeal.setTradeAmt(secTransferDto.getTradeRepAmt());
+//                trdProductDealList.add(trdProductDeal);
+//            }
+//        }
         return trdProductDealList;
     }
 
-    public List<TrdProductDeal> generateOrdersNQs(SecTransferDto transferOutDto, List<SecTransferDto> transferInDtoList) {
-        List<TrdProductDeal> trdProductDealList = new ArrayList<>();
-        //托管户查询(转出账号)
-        List<PtlCapacctInfo> ptlCapacctList = etrTrdCommonMapper.getPtlAcctInfo(transferOutDto.getPortfolioId(), Arrays.asList(DictCodeListExt1.资金账户类型_产品托管户.getValue()));
-
-        for (SecTransferDto secTransferDto : transferInDtoList) {
-            String portfolioIdIn = secTransferDto.getPortfolioId();
-            //托管户查询(转入账号)
-            List<PtlCapacctInfo> ptlCapacctListIn = etrTrdCommonMapper.getPtlAcctInfo(portfolioIdIn, Arrays.asList(DictCodeListExt1.资金账户类型_产品托管户.getValue()));
-
-            TrdProductDeal trdProductDeal = getOrder(secTransferDto);
-            trdProductDeal.setTradeAmt(secTransferDto.getTradeRepAmt());
-
-            if (ptlCapacctList.size() == 1 && ptlCapacctListIn.size() == 1 && ptlCapacctList.get(0).equals(ptlCapacctListIn.get(0))) {
-                //※划款指令共通页面调用【业务组件.划款指令共通组件.指令生成】，页面不展示
-                trdProductDeal.setStlPayOrderShow("N");
-            } else if (ptlCapacctList.size() == 1 && ptlCapacctListIn.size() == 1 && ptlCapacctList.get(0).getAcctNo() != ptlCapacctListIn.get(0).getAcctNo()) {
-                //页面展示, 不做任何处理
-            } else {
-                //页面展示,但是划款账号设置为空
-                trdProductDeal.setStlPayOrderShow("Y");
-            }
-            trdProductDealList.add(trdProductDeal);
-        }
-        return trdProductDealList;
-    }
 
     public DeviationDegreeDto calculateDeviationDegree(DeviationDegreeDto dto) {
         BigDecimal valuation = findValuation(dto);

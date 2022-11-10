@@ -391,44 +391,21 @@ public class BussTrdTransferOrderController extends BaseController {
         // result.setData(ret);
         // return result;
     }
-
+    
     @RequestMapping("select")
     @ResponseBody
     public List<SelectOptionDto> select() throws IOException {
         List<SelectOptionDto> tempList = new ArrayList<>();
-        BussTrdTransferOrderDto bussTrdTransferOrderDto = new BussTrdTransferOrderDto();
         // DVP资金调拨管理,直接使用画面上选择的收付款账户
         String selectValue = getParam("selectValue");
-        String selectRowValue = getParam("selectRowValue");
         if(StringUtils.isNotBlank(selectValue)){
              tempList = JsonUtils.json2List(selectValue, SelectOptionDto.class);
         }
-        if(StringUtils.isNotBlank(selectRowValue)){
-            bussTrdTransferOrderDto = JsonUtils.json2Object(selectRowValue, BussTrdTransferOrderDto.class);
-        }
-        if ("Y".equals(getParam("isLimitAcct"))) {
-            String portfolioId = "";
-            if (null != bussTrdTransferOrderDto && "recAcctNo".equals(getParam("type"))) {
-                portfolioId = bussTrdTransferOrderDto.getPortfolioId();
-            }
-            if (null != bussTrdTransferOrderDto && "payAcctNo".equals(getParam("type"))) {
-                portfolioId = bussTrdTransferOrderDto.getInPortfolioId();
-            }
-            return etrTrdCommonMapper.getPtlAcctInfoByPortId(portfolioId, Arrays.asList(DictCodeListExt1.资金账户类型_产品托管户.getValue()));
-        }
-
         if (!StringUtil.isEmptyList(tempList)) {
             if (StringUtil.equals("isUsePageAcctTrue", tempList.get(0).getObject())) {
                 return tempList;
             }
         }
-        if (null != bussTrdTransferOrderDto) {
-            if (("recAcctNo".equals(getParam("type")) && "Y".equals(bussTrdTransferOrderDto.getReAcctNoGdhFlag()))
-                || "payAcctNo".equals(getParam("type")) && "Y".equals(bussTrdTransferOrderDto.getAcctNoGdhFlag())) {
-                return trdCommonBaseMapper.queryReAcctNoByPortfolioId(bussTrdTransferOrderDto.getPortfolioId());
-            }
-        }
-
         
         return bussTrdTransferOrderService.queryAcctList(RequestUtil.getPageParam());
         // String initValue = getParam("initValue");
@@ -437,6 +414,7 @@ public class BussTrdTransferOrderController extends BaseController {
         // item -> StringUtil.isEmpty(initValue) || StringUtil.equals(item.getId(),
         // initValue)).collect(Collectors.toList());
     }
+
 
     /**
      * 根据主键查询清算账户表

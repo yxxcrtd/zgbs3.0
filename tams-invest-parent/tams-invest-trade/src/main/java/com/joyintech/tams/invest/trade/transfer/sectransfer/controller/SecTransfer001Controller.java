@@ -360,16 +360,11 @@ public class SecTransfer001Controller extends BaseController {
     @RequestMapping("getEntity")
     public List<TrdProductDeal> getEntity() {
         List<TrdProductDeal> trdProductDealList = new ArrayList<>();
-        String mstSaleFlag = CacheUtil.getSysParam("TRANSFER_MST_SALE_FLAG");
         Map<String, Object> map = RequestUtil.getParameters(getRequest());
         SecTransferDto transferOutDto = BeanUtil.mapToObject(map, SecTransferDto.class);
         transferOutDto.setPortfolioId(MapUtils.getString(map, "investPortfolioId"));
         List<SecTransferDto> transferInDtoList = JSONArray.parseArray(String.valueOf(map.get("dataList")), SecTransferDto.class);
-        if ("N".equals(mstSaleFlag)) {
-            trdProductDealList = secTransfer001Service.generateOrdersYQs(transferOutDto, transferInDtoList);
-        } else if ("Y".equals(mstSaleFlag)) {
-            trdProductDealList = secTransfer001Service.generateOrdersNQs(transferOutDto, transferInDtoList);
-        }
+        trdProductDealList = secTransfer001Service.generateOrders(transferOutDto, transferInDtoList);
         return trdProductDealList;
     }
 

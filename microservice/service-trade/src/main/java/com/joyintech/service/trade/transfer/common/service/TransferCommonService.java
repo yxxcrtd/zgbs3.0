@@ -1,9 +1,23 @@
 package com.joyintech.service.trade.transfer.common.service;
 
+import static com.joyintech.tams.constant.DictCodeListExt1.交易场所_上海证券交易所;
+import static com.joyintech.tams.constant.DictCodeListExt1.交易场所_深圳证券交易所;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.google.common.collect.Lists;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.select.SelectOptionDto;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.trade.common.service.TrdAvailableCashQueryService;
@@ -12,7 +26,6 @@ import com.joyintech.service.trade.transfer.common.dto.PortfolioValuationDto;
 import com.joyintech.service.trade.transfer.common.dto.TransferCommonDto;
 import com.joyintech.tams.common.base.entity.WflTrdProductDeal;
 import com.joyintech.tams.component.business.common.service.DateCalService;
-import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.invest.common.component.base.group.BasePtlCashPositionInfoService;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
@@ -20,14 +33,6 @@ import com.joyintech.tams.invest.common.dto.PtlCashPositionFlowDto;
 import com.joyintech.tams.invest.common.dto.position.PositionCashSecDto;
 import com.joyintech.tams.invest.common.dto.position.PositionCashSecRequest;
 import com.joyintech.tams.invest.common.entrust.inter.EtrTradeCommonervice;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.util.*;
-
-import static com.joyintech.tams.constant.DictCodeListExt1.交易场所_上海证券交易所;
-import static com.joyintech.tams.constant.DictCodeListExt1.交易场所_深圳证券交易所;
 
 @Service("backTransferCommonService")
 public class TransferCommonService extends BaseService {
@@ -71,7 +76,13 @@ public class TransferCommonService extends BaseService {
 
     public List<TransferCommonDto> findAvaPortfolioInfo(Map<String, Object> param) {
         List<TransferCommonDto> result = new ArrayList<>();
-        param.put("capacctType", DictCodeListExt1.资金账户类型_产品托管户.getValue());
+        String mstSaleFlag = CacheUtil.getSysParam("TRANSFER_MST_SALE_FLAG");
+        if((DictCodeListExt1.估值交易市场_上交所.getValue().equals((String)param.get("tradeMarket"))
+        		|| DictCodeListExt1.估值交易市场_深交所.getValue().equals((String)param.get("tradeMarket"))) && "Y".equals(mstSaleFlag)){
+        	param.put("capacctType", DictCodeListExt1.资金账户类型_券商资金账户.getValue());
+        }else {
+        	param.put("capacctType", DictCodeListExt1.资金账户类型_产品托管户.getValue());
+        }
         param.put("userId", LoginUserUtil.getUserName());
         if (StringUtil.isNotEmpty((String) param.get("secManageAcctId"))) {
             param.put("secAcctId", (String) param.get("secManageAcctId"));
@@ -91,23 +102,27 @@ public class TransferCommonService extends BaseService {
 
         List<TransferCommonDto> resultList = transferCommonMapper.findAvaPortfolioInfo(param);
         for (TransferCommonDto dto : resultList) {
-            if (StringUtil.equals(dto.getTradePlace(), 交易场所_上海证券交易所.getValue())
-                    || StringUtil.equals(dto.getTradePlace(), 交易场所_深圳证券交易所.getValue())) {
+            if ((StringUtil.equals(dto.getTradePlace(), 交易场所_上海证券交易所.getValue())
+                    || StringUtil.equals(dto.getTradePlace(), 交易场所_深圳证券交易所.getValue())) && "Y".equals(mstSaleFlag)) {
                 // 新头寸
-                PositionCashSecRequest requestDto = new PositionCashSecRequest();
-                requestDto.setFlowType("01");
-
-                List<PositionCashSecDto> ptlList = Lists.newArrayList();
-                PositionCashSecDto secDto = new PositionCashSecDto();
-                secDto.setPortfolioId(dto.getPortfolioId());
-                secDto.setSecAcctId((String) param.get("secAcctId"));
-                secDto.setCdate((String) param.get("tradeDate"));
-                ptlList.add(secDto);
-                requestDto.setPtlList(ptlList);
-
-                BigDecimal availableCash = etrTradeCommonervice.queryPositionAvailableCash(requestDto);
-                dto.setAvailableCash(availableCash);
-                result.add(dto);
+//                PositionCashSecRequest requestDto = new PositionCashSecRequest();
+//                requestDto.setFlowType("01");
+//
+//                List<PositionCashSecDto> ptlList = Lists.newArrayList();
+//                PositionCashSecDto secDto = new PositionCashSecDto();
+//                secDto.setPortfolioId(dto.getPortfolioId());
+//                secDto.setSecAcctId((String) param.get("secAcctId"));
+//                secDto.setCdate((String) param.get("tradeDate"));
+//                ptlList.add(secDto);
+//                requestDto.setPtlList(ptlList);
+//                BigDecimal availableCash = etrTradeCommonervice.queryPositionAvailableCash(requestDto);
+            	Date sysdate = DateUtil.parse((String) param.get("tradeDate"));
+            	dto.setVdate(sysdate);
+                BigDecimal availableCash = transferCommonMapper.queryPositionAvailableCash(dto);
+                if (Objects.nonNull(availableCash) && availableCash.compareTo(BigDecimal.ZERO) != 0) {
+                	dto.setAvailableCash(availableCash);
+                	result.add(dto);
+                }
             } else {
                 BigDecimal availableCash = getAvailableCash(param, dto);
                 if (Objects.nonNull(availableCash) && availableCash.compareTo(BigDecimal.ZERO) != 0) {

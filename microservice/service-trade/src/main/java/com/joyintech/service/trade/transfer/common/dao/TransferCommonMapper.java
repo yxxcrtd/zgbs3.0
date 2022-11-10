@@ -22,4 +22,5 @@ public interface TransferCommonMapper {
     BigDecimal findCarryOverQty(Map<String, Object> paramMap);
 
     BigDecimal queryUsableCashPosition(PtlCashPositionFlowDto pcpdto);
+    BigDecimal queryPositionAvailableCash(TransferCommonDto tfcdto);
 }

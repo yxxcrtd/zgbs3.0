@@ -287,8 +287,8 @@ $(function () {
                         turnInvAimStr: turnInvAimOptions.text(),//投资目的
                         isPayWithTrade: 'Y',
                         tradeMarketMode: '02',   //转仓交易默认二级市场
-                        // tradeMarket : $('#tradeMarket').val(),
-                        tradeMarket: $("#tradeMarket").find("option:selected").text(),
+                        tradeMarket : $('#tradeMarket').val(),
+                        //tradeMarket: $("#tradeMarket").find("option:selected").text(),
                         // tradeAmt : $('#fpriceAmt').val(),
                         vdate: $('#vdate').val(),
                         mdate: $('#mdate').val()
@@ -446,6 +446,7 @@ $(function () {
             chlId: $("#chlId").val(),
             tradeDate: $("#tradeDate").val(),
             ccy: $("#ccy").val(),
+            tradeMarket : $('#tradeMarket').val(),
             secAcctId: $("#secManageAcctId").val(),
             listInfoList: JSON.stringify(listInfoList)
         })

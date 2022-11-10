@@ -203,7 +203,7 @@ public class FundAssetTransfer001Controller extends BaseController {
         Map<String, Object> map = RequestUtil.getParameters(getRequest());
         FundAssetTransfer001Dto dto = BeanUtil.mapToObject(map, FundAssetTransfer001Dto.class);
         List<FundAssetTransfer001Dto> dtoList = JSONArray.parseArray(String.valueOf(map.get("dataList")), FundAssetTransfer001Dto.class);
-        List<TrdProductDeal> trdProductDealList = fundAssetTransfer001Service.generateOrdersNQs(dto, dtoList);
+        List<TrdProductDeal> trdProductDealList = fundAssetTransfer001Service.generateOrders(dto, dtoList);
         return trdProductDealList;
     }
 
