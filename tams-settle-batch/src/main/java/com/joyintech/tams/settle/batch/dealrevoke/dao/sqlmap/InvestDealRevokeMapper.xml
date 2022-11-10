@@ -48,6 +48,7 @@
             A.TRADE_STATUS = #{TRADE_STATUS_01}
             AND (A.IS_CANCEL IS NULL OR A.IS_CANCEL = 'N')
             AND (D.CHECK_RESULT is null or D.CHECK_RESULT = '0')
+            AND (A.IS_SWAP_TRANSACTION is null OR A.IS_SWAP_TRANSACTION != 'Y')
             <if test="dealDateStr != null">
                 AND TO_CHAR(nvl(B.DEAL_DATE, B2.DEAL_DATE), 'yyyy-MM-dd') = #{dealDateStr,jdbcType=VARCHAR}
             </if>
@@ -103,6 +104,7 @@
             AND (A.IS_CANCEL IS NULL OR A.IS_CANCEL = 'N')
             AND B.TRADE_ID is null
             AND B2.TRADE_ID is null
+            AND (A.IS_SWAP_TRANSACTION is null OR A.IS_SWAP_TRANSACTION != 'Y')
             <if test="dealDateStr != null">
                 AND TO_CHAR(A.TRADE_DATE, 'yyyy-MM-dd') = #{dealDateStr,jdbcType=VARCHAR}
             </if>
@@ -276,6 +278,7 @@
         AND (tpd.IS_CANCEL IS NULL OR tpd.IS_CANCEL = 'N')
         AND sttm.TRADE_ID is null
         AND tpd.TOTLE_TRADE_ID is null
+        AND (tpd.IS_SWAP_TRANSACTION is null or tpd.IS_SWAP_TRANSACTION != 'Y')
         <if test="dealDateStr != null">
             AND TO_CHAR(tpd.TRADE_DATE, 'yyyy-MM-dd') = #{dealDateStr,jdbcType=VARCHAR}
         </if>
