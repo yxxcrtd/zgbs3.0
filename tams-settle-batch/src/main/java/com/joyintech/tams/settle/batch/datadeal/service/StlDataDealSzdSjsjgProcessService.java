@@ -231,6 +231,9 @@ public class StlDataDealSzdSjsjgProcessService {
             settleTransData.setFpriceAmt(abs(szdSjsjg.getJgqsbj()));
             // 业务类型
             settleTransData.setBusiType(DictCodeList.业务类型_债券交易.getValue());
+            // 单位面值 调用【当前面值】
+            settleTransData.setParValue(stlDataDealProcessCommonService.getUnitPrice(settleTransData.getFinprodId(),
+                    settleTransData.getTradeDate()));
             // 交易方向、业务场景明细分类、交易份额、交易日期等设置
             setBondDeal(szdSjsjg, settleTransData, settleTransDataAdd);
             // 清算速度

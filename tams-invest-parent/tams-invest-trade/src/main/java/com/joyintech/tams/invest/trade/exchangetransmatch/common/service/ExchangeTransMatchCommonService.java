@@ -1750,7 +1750,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     if(StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_质押券入库.getValue())
                             || StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_质押券出库.getValue())) {
                         //已匹配金额
-                        commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(marchQty,commonEntrustDto.getPrice()));
+                        commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(marchQty,commonEntrustDto.getPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
                     }
                     // modify by etliu 20220227 start
                     // 广农商二阶段 GNS-920:【广农商场内清算】广农商场内债转股清算交易生成后，对应的持仓流水更新有误
@@ -1761,19 +1761,19 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     // modify by etliu 20220227 end
                     else {
                         //已匹配金额
-                        commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(marchQty,dto.getUnitFprice()));
+                        commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(marchQty,dto.getUnitFprice()).setScale(2, BigDecimal.ROUND_HALF_UP));
                     }
 
                 }
                 else {
-                    commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(marchQty,dto.getUnitCprice()));
+                    commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(marchQty,dto.getUnitCprice()).setScale(2, BigDecimal.ROUND_HALF_UP));
                 }
 
                 //指令已匹配份额
                 BigDecimal marchQtyEn = BigDecimal.ZERO.compareTo(ArithmeticUtil.subtract(dto.getRemainNum(),commonEntrustDto.getRemainEntrustNum()))>0?dto.getRemainNum() : commonEntrustDto.getRemainEntrustNum();
                 commonEntrustDto.setMarchQtyEn(marchQtyEn);
                 //指令已匹配金额
-                commonEntrustDto.setMarchAmtEn(ArithmeticUtil.multiply(marchQtyEn,commonEntrustDto.getPrice()));
+                commonEntrustDto.setMarchAmtEn(ArithmeticUtil.multiply(marchQtyEn,commonEntrustDto.getPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
             }
             else {
                 //已匹配份额
@@ -1782,15 +1782,15 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 //已匹配金额
                 BigDecimal entrustAmt = BigDecimal.ZERO;
                 if(StringUtil.equals(dto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
-                    entrustAmt = ArithmeticUtil.multiply(entrustQty,dto.getUnitFprice());
+                    entrustAmt = ArithmeticUtil.multiply(entrustQty,dto.getUnitFprice()).setScale(2, BigDecimal.ROUND_HALF_UP);
                 }
                 else {
-                    entrustAmt = ArithmeticUtil.multiply(entrustQty,dto.getUnitCprice());
+                    entrustAmt = ArithmeticUtil.multiply(entrustQty,dto.getUnitCprice()).setScale(2, BigDecimal.ROUND_HALF_UP);
                 }
                 commonEntrustDto.setMarchAmt(BigDecimal.ZERO.compareTo(ArithmeticUtil.subtract(dto.getRemainAmount(),entrustAmt))>0?dto.getRemainAmount() : entrustAmt);
 
                 //指令已匹配份额
-                BigDecimal marchAmtEn = ArithmeticUtil.multiply(dto.getRemainNum(),dto.getUnitCprice());
+                BigDecimal marchAmtEn = ArithmeticUtil.multiply(dto.getRemainNum(),dto.getUnitCprice()).setScale(2, BigDecimal.ROUND_HALF_UP);
                 commonEntrustDto.setMarchQtyEn(ArithmeticUtil.divide(BigDecimal.ZERO.compareTo(ArithmeticUtil.subtract(marchAmtEn,commonEntrustDto.getRemainEntrustAmt()))>0?marchAmtEn : commonEntrustDto.getRemainEntrustAmt(),commonEntrustDto.getPrice(),4));
                 //指令已匹配金额
                 commonEntrustDto.setMarchAmtEn(BigDecimal.ZERO.compareTo(ArithmeticUtil.subtract(marchAmtEn,commonEntrustDto.getRemainEntrustAmt()))>0?marchAmtEn : commonEntrustDto.getRemainEntrustAmt());
@@ -1819,8 +1819,8 @@ public class ExchangeTransMatchCommonService extends BaseService {
             }
             // modify by etliu 20220228 start
             // 广农商二阶段 GNS-834:【广农商场内清算】上交所基金买入卖出，手动匹配生成的交易，随交易支付费用值没登
-            commonEntrustDto.setMarchFeeAmtPay(ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),dto.getRemainNum(),4),dto.getTotalFeeAmtPay()));
-            commonEntrustDto.setMarchFeeAmtUnPay(ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),dto.getRemainNum(),4),dto.getTotalUnFeeAmtPay()));
+            commonEntrustDto.setMarchFeeAmtPay(ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),dto.getRemainNum(),4),dto.getTotalFeeAmtPay()).setScale(2, BigDecimal.ROUND_HALF_UP));
+            commonEntrustDto.setMarchFeeAmtUnPay(ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),dto.getRemainNum(),4),dto.getTotalUnFeeAmtPay()).setScale(2, BigDecimal.ROUND_HALF_UP));
             // modify by etliu 20220228 end
         }
         //多条指令匹配时
@@ -1839,22 +1839,22 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     if(StringUtil.equals(dto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
                         if(StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_质押券入库.getValue())
                                 || StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_质押券出库.getValue())) {
-                            commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(commonEntrustDto.getRemainEntrustNum(),commonEntrustDto.getPrice()));
+                            commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(commonEntrustDto.getRemainEntrustNum(),commonEntrustDto.getPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
                         }
                         else {
-                            commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(commonEntrustDto.getRemainEntrustNum(),dto.getUnitFprice()));
+                            commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(commonEntrustDto.getRemainEntrustNum(),dto.getUnitFprice()).setScale(2, BigDecimal.ROUND_HALF_UP));
                         }
 
                     }
                     else {
-                        commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(commonEntrustDto.getRemainEntrustNum(),dto.getUnitCprice()));
+                        commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(commonEntrustDto.getRemainEntrustNum(),dto.getUnitCprice()).setScale(2, BigDecimal.ROUND_HALF_UP));
                     }
 
                 }
                 else {
                     commonEntrustDto.setMarchQty(ArithmeticUtil.divide(commonEntrustDto.getRemainEntrustAmt(),dto.getUnitCprice(),4));
                     if(StringUtil.equals(dto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
-                        commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getRemainEntrustAmt(),dto.getUnitCprice(),4),dto.getUnitFprice()));
+                        commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getRemainEntrustAmt(),dto.getUnitCprice(),4),dto.getUnitFprice()).setScale(2, BigDecimal.ROUND_HALF_UP));
                     }
                     else {
                         commonEntrustDto.setMarchAmt(commonEntrustDto.getRemainEntrustAmt());
@@ -1875,7 +1875,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     }
                     else if(StringUtil.equals(commonEntrustDto.getTargetType(),DictCodeListExt3.目标类型_数量.getValue())) {
                         commonEntrustDto.setMarchQtyEn(commonEntrustDto.getRemainEntrustNum());
-                        commonEntrustDto.setMarchAmtEn(ArithmeticUtil.multiply(commonEntrustDto.getRemainEntrustNum(),commonEntrustDto.getPrice()));
+                        commonEntrustDto.setMarchAmtEn(ArithmeticUtil.multiply(commonEntrustDto.getRemainEntrustNum(),commonEntrustDto.getPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
                     }
                     else {
                         commonEntrustDto.setMarchQtyEn(ArithmeticUtil.divide(commonEntrustDto.getRemainEntrustAmt(),commonEntrustDto.getPrice(),4));
@@ -1884,8 +1884,8 @@ public class ExchangeTransMatchCommonService extends BaseService {
 
                     // modify by etliu 20220228 start
                     // 广农商二阶段 GNS-834:【广农商场内清算】上交所基金买入卖出，手动匹配生成的交易，随交易支付费用值没登
-                    commonEntrustDto.setMarchFeeAmtPay(ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),dto.getRemainNum(),4),dto.getTotalFeeAmtPay()));
-                    commonEntrustDto.setMarchFeeAmtUnPay(ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),dto.getRemainNum(),4),dto.getTotalUnFeeAmtPay()));
+                    commonEntrustDto.setMarchFeeAmtPay(ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),dto.getRemainNum(),4),dto.getTotalFeeAmtPay()).setScale(2, BigDecimal.ROUND_HALF_UP));
+                    commonEntrustDto.setMarchFeeAmtUnPay(ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),dto.getRemainNum(),4),dto.getTotalUnFeeAmtPay()).setScale(2, BigDecimal.ROUND_HALF_UP));
                     // modify by etliu 20220228 end
                 }
 //                matchStatus = DictCodeListExt3.下行交易匹配状态_匹配完成.getValue();
@@ -1931,15 +1931,16 @@ public class ExchangeTransMatchCommonService extends BaseService {
                             }
                             else if(StringUtil.equals(commonEntrustDto.getTargetType(),DictCodeListExt3.目标类型_数量.getValue())) {
                                 commonEntrustDto.setMarchQtyEn(commonEntrustDto.getRemainEntrustNum());
-                                commonEntrustDto.setMarchAmtEn(ArithmeticUtil.multiply(commonEntrustDto.getRemainEntrustNum(),commonEntrustDto.getPrice()));
+                                commonEntrustDto.setMarchAmtEn(ArithmeticUtil.multiply(commonEntrustDto.getRemainEntrustNum(),commonEntrustDto.getPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
                             }
                             else {
                                 commonEntrustDto.setMarchQtyEn(ArithmeticUtil.divide(commonEntrustDto.getRemainEntrustAmt(),commonEntrustDto.getPrice(),4));
                                 commonEntrustDto.setMarchAmtEn(commonEntrustDto.getRemainEntrustAmt());
                             }
 
-                            commonEntrustDto.setMarchFeeAmtPay(ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),dto.getRemainNum(),4),dto.getTotalFeeAmtPay()));
-                            commonEntrustDto.setMarchFeeAmtUnPay(ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),dto.getRemainNum(),4),dto.getTotalUnFeeAmtPay()));
+                            commonEntrustDto.setMarchAmt(commonEntrustDto.getMarchAmt().setScale(2, BigDecimal.ROUND_HALF_UP));
+                            commonEntrustDto.setMarchFeeAmtPay(ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),dto.getRemainNum(),4),dto.getTotalFeeAmtPay()).setScale(2, BigDecimal.ROUND_HALF_UP));
+                            commonEntrustDto.setMarchFeeAmtUnPay(ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),dto.getRemainNum(),4),dto.getTotalUnFeeAmtPay()).setScale(2, BigDecimal.ROUND_HALF_UP));
 
                             commonEntrustDto.setLastEntrust(false);
                         }
@@ -1991,10 +1992,10 @@ public class ExchangeTransMatchCommonService extends BaseService {
 
                         if(i<commonEntrustDtoList.size()-1) {
                             marchQty = ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),totalMarchQty,4),dto.getRemainNum());
-                            marchAmt = ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),totalMarchQty,4),dto.getRemainAmount());
+                            marchAmt = ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),totalMarchQty,4),dto.getRemainAmount()).setScale(2, BigDecimal.ROUND_HALF_UP);
 
-                            commonEntrustDto.setMarchFeeAmtPay(ArithmeticUtil.multiply(ArithmeticUtil.divide(marchQty,dto.getRemainNum(),4),dto.getTotalFeeAmtPay()));
-                            commonEntrustDto.setMarchFeeAmtUnPay(ArithmeticUtil.multiply(ArithmeticUtil.divide(marchQty,dto.getRemainNum(),4),dto.getTotalUnFeeAmtPay()));
+                            commonEntrustDto.setMarchFeeAmtPay(ArithmeticUtil.multiply(ArithmeticUtil.divide(marchQty,dto.getRemainNum(),4),dto.getTotalFeeAmtPay()).setScale(2, BigDecimal.ROUND_HALF_UP));
+                            commonEntrustDto.setMarchFeeAmtUnPay(ArithmeticUtil.multiply(ArithmeticUtil.divide(marchQty,dto.getRemainNum(),4),dto.getTotalUnFeeAmtPay()).setScale(2, BigDecimal.ROUND_HALF_UP));
 
                             commonEntrustDto.setLastEntrust(false);
                         }

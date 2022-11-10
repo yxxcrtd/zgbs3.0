@@ -16,6 +16,7 @@ import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonE
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,13 +47,18 @@ public class ExchangeTransMatchBond1Service extends ExchangeTransMatchBondCommon
         // 单位面值
         trdFinProductDealTotal.setParValue(dealDto.getParValue());
         // 净价总额
-        trdFinProductDealTotal.setCpriceAmt(ArithmeticUtil.multiply(entrustDto.getMarchQty(),dealDto.getUnitCprice()));
+        trdFinProductDealTotal.setCpriceAmt(ArithmeticUtil.multiply(entrustDto.getMarchQty(),dealDto.getUnitCprice()).setScale(2, RoundingMode.HALF_UP));
         // 全价总额
-        trdFinProductDealTotal.setFpriceAmt(ArithmeticUtil.multiply(entrustDto.getMarchQty(),dealDto.getUnitFprice()));
+        trdFinProductDealTotal.setFpriceAmt(entrustDto.getMarchAmt().setScale(2, BigDecimal.ROUND_HALF_UP));
         // 交易本金
+        if (StringUtil.equals(trdFinProductDealTotal.getPs(), DictCodeList.交易方向_买入.getValue())
+                || StringUtil.equals(trdFinProductDealTotal.getPs(), DictCodeList.交易方向_卖出.getValue()) ) {
+            trdFinProductDealTotal.setPrinAmt(trdFinProductDealTotal.getCpriceAmt());
+        }
+        // 交易金额
         trdFinProductDealTotal.setTradeAmt(ArithmeticUtil.subtract(trdFinProductDealTotal.getFpriceAmt(),entrustDto.getMarchFeeAmtPay()));
-        // 利息总额
-        trdFinProductDealTotal.setIntAmt(ArithmeticUtil.multiply(entrustDto.getMarchQty(),dealDto.getUnitInt()));
+        // 利息总额  =  全价总额- 净价总额
+        trdFinProductDealTotal.setIntAmt(ArithmeticUtil.subtract(trdFinProductDealTotal.getFpriceAmt(),trdFinProductDealTotal.getCpriceAmt()));
         // 到期收益率--在TrdProductDeal生成的时候同时设值
         trdFinProductDealTotal.setYield(null);
         // 行权收益率--在TrdProductDeal生成的时候同时设值

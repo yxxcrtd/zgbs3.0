@@ -753,15 +753,16 @@ public class ExchangeTransMatchBondCommonService extends BaseService {
 
     protected void calcFeeAmtPay(ExchangeTransMatchCommonDto dealDto,ExchangeTransMatchCommonEntrustDto entrustDto,TrdProductDeal trdProductDeal) {
         // 净价总额
-        trdProductDeal.setCpriceAmt(ArithmeticUtil.multiply(dealDto.getUnitCprice(),entrustDto.getMarchQty()));
+        trdProductDeal.setCpriceAmt(ArithmeticUtil.multiply(dealDto.getUnitCprice(),entrustDto.getMarchQty()).setScale(2, RoundingMode.HALF_UP));
         // 交易份额
         trdProductDeal.setShareAmt(entrustDto.getMarchQty());
         // 交易本金
         trdProductDeal.setPrinAmt(ArithmeticUtil.multiply(entrustDto.getMarchQty(),new BigDecimal(100)));
-        // 利息总额
-        trdProductDeal.setIntAmt(ArithmeticUtil.multiply(entrustDto.getMarchQty(),dealDto.getUnitInt()));
         // 全价总额
-        trdProductDeal.setFpriceAmt(entrustDto.getMarchAmt());
+        trdProductDeal.setFpriceAmt(entrustDto.getMarchAmt().setScale(2, BigDecimal.ROUND_HALF_UP));
+        // 利息总额   =  全价总额- 净价总额
+//        trdProductDeal.setIntAmt(ArithmeticUtil.multiply(entrustDto.getMarchQty(),dealDto.getUnitInt()));
+        trdProductDeal.setIntAmt(ArithmeticUtil.subtract(trdProductDeal.getFpriceAmt(),trdProductDeal.getCpriceAmt()));
         // 随交易支付费用
         trdProductDeal.setFeeAmtPay(entrustDto.getMarchFeeAmtPay());
         // 交易金额
@@ -770,6 +771,11 @@ public class ExchangeTransMatchBondCommonService extends BaseService {
             trdProductDeal.setTradeAmt(ArithmeticUtil.doAdd(trdProductDeal.getFpriceAmt(),trdProductDeal.getFeeAmtPay()).setScale(2, RoundingMode.HALF_UP));
         }else{
             trdProductDeal.setTradeAmt(ArithmeticUtil.subtract(trdProductDeal.getFpriceAmt(),trdProductDeal.getFeeAmtPay()).setScale(2, RoundingMode.HALF_UP));
+        }
+        // 交易本金
+        if (StringUtil.equals(entrustDto.getPs(), DictCodeList.交易方向_买入.getValue())
+                || StringUtil.equals(entrustDto.getPs(), DictCodeList.交易方向_卖出.getValue()) ) {
+            trdProductDeal.setPrinAmt(trdProductDeal.getCpriceAmt());
         }
         // 未随交易支付费用
         trdProductDeal.setFeeAmtUnpay(entrustDto.getMarchFeeAmtUnPay());
