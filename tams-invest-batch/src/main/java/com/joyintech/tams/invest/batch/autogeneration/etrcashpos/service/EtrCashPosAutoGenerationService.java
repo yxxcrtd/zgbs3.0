@@ -10,10 +10,7 @@
 
 package com.joyintech.tams.invest.batch.autogeneration.etrcashpos.service;
 
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.StringUtil;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.dao.EtrCashPositionFlowMapper;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 import com.joyintech.tams.constant.DictCodeList;
@@ -80,6 +77,7 @@ public class EtrCashPosAutoGenerationService {
      * @since 1.0
      */
     public void autoGeneration(Date batchDate, List<String> productIdList) {
+        logger.info("EtrCashPosAutoGenerationService.autoGeneration start");
 
         // 删除当日持仓数据
         Map<String, Object> paramMap = new HashMap<String, Object>();
@@ -111,6 +109,7 @@ public class EtrCashPosAutoGenerationService {
                 // 剩余数量
                 BigDecimal 剩余数量 = ArithmeticUtil.subtract(etrEntrust.getEntrustNum(), etrFinish == null ? BigDecimal.ZERO : etrFinish);
                 BigDecimal 最新市价 = etrEntrust.getPrice();
+                logger.info("EtrCashPosAutoGenerationService:{}", JsonUtils.object2Json(etrEntrustComm));
                 logger.info("债券:{}",etrEntrust.getFinprodId());
                 if (etrEntrust.getFinprodType2().equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
                 	//添加新的参数  add by zhangpei 20201119 start
@@ -175,5 +174,6 @@ public class EtrCashPosAutoGenerationService {
         paramMap.put("POSITION_TYPE_E02", DictCodeListExt1.持仓类型_委托指令预增.getValue());
         paramMap.put("lastDate", DateUtil.addDay(batchDate, -1));
         cashPosAutoGenerationMapper.insertTodayCashPosData(paramMap);
+        logger.info("EtrCashPosAutoGenerationService.autoGeneration end");
     }
 }
