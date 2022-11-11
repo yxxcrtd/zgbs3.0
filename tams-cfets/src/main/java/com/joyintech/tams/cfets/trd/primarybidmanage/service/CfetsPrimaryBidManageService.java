@@ -1818,10 +1818,15 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         calRequest.setCalculateField("02");
         if (StringUtil.equals(tenderTarget, DictCodeListExt4.招标标的_利差.getValue())
                 || StringUtil.equals(tenderTarget, DictCodeListExt4.招标标的_利率.getValue())) {
-            FinProduct finProduct = finProductMapper.selectByFinprodMarketId(finprodId);//前台传值为市场代码
+            Map<String, Object> param = new HashMap<>();
+            param.put("finprodMarketId",finprodId);
+            param.put("finprodType2",DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+            FinProduct finProduct = cfetsTrdFirstBidFirm002Mapper.selectBySecFinprodMarketId(param);//前台传值为市场代码
             //CASE WHEN （标的类金融产品发行信息.招标标的 IN（利率，利差） AND 标的类金融产品.上市流通日期 IS NOT NULL）
             // 通过上市流通代码查找二级债 避免出现二级债未录入系统的问题
-            FinProduct finProduct2 = cfetsTrdFirstBidFirm002Mapper.selectByFinprodMarketId(finProduct.getFinprodMarketId());
+            param.put("finprodMarketId",finProduct.getFinprodMarketId());
+            param.put("finprodType2",DictCodeListExt1.金融产品类型_投管用_债券.getValue());
+            FinProduct finProduct2 = cfetsTrdFirstBidFirm002Mapper.selectByFinprodMarketId(param);
             if (StringUtil.isNotEmpty(finProduct2)) {
                 calRequest.setFinprodId(finProduct2.getFinprodId());
                 //THEN 参照原债券二级交易画面，到期收益率反算净价的算法，计算净价
