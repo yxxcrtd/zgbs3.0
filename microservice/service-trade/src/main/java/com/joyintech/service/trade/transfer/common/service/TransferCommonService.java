@@ -59,9 +59,9 @@ public class TransferCommonService extends BaseService {
         BigDecimal carryOverQty = transferCommonMapper.findCarryOverQty(param);
         SelectOptionDto selectOptionDto;
         for (TransferCommonDto dto : dtoList) {
-            if (Objects.isNull(dto) || dto.getAvailableCash().compareTo(new BigDecimal(0)) <= 0) {
-                continue;
-            }
+//            if (Objects.isNull(dto) || dto.getAvailableCash().compareTo(new BigDecimal(0)) <= 0) {
+//                continue;
+//            }
             dto.setCarryOverQty(carryOverQty);
             selectOptionDto = new SelectOptionDto();
             selectOptionDto.setId(dto.getPortfolioId());
@@ -121,14 +121,18 @@ public class TransferCommonService extends BaseService {
                 BigDecimal availableCash = transferCommonMapper.queryPositionAvailableCash(dto);
                 if (Objects.nonNull(availableCash) && availableCash.compareTo(BigDecimal.ZERO) != 0) {
                 	dto.setAvailableCash(availableCash);
-                	result.add(dto);
+                }else {
+                	dto.setAvailableCash(BigDecimal.ZERO);
                 }
+                result.add(dto);
             } else {
                 BigDecimal availableCash = getAvailableCash(param, dto);
                 if (Objects.nonNull(availableCash) && availableCash.compareTo(BigDecimal.ZERO) != 0) {
                     dto.setAvailableCash(availableCash);
-                    result.add(dto);
+                }else {
+                	dto.setAvailableCash(BigDecimal.ZERO);
                 }
+                result.add(dto);
             }
         }
         return result;
