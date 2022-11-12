@@ -768,6 +768,7 @@ public class SecTransfer001Service extends CommonExportService<SecTransfer001Dto
                     // -------add by 裴家俊-----end-------2019/03/29---费用明细
                     FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
                     finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_有效.getValue());
+                    finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
                     BaseTradeProductDealDto baseTradeProductDealDto = new BaseTradeProductDealDto();
                     baseTradeProductDealDto.setTrdProductDeal(trdProductDeal); // 金融产品交易
                     baseTradeProductDealDto.setTrdProductDealAdd(trdProductDealAdd); // 金融产品附属
@@ -1000,6 +1001,7 @@ public class SecTransfer001Service extends CommonExportService<SecTransfer001Dto
                 // -------add by 裴家俊-----end-------2019/03/29---费用明细
                 FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
                 finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_有效.getValue());
+                finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
                 BaseTradeProductDealDto baseTradeProductDealDto = new BaseTradeProductDealDto();
                 baseTradeProductDealDto.setTrdProductDeal(trdProductDeal); // 金融产品交易
                 baseTradeProductDealDto.setTrdProductDealAdd(trdProductDealAdd); // 金融产品附属
@@ -1216,6 +1218,7 @@ public class SecTransfer001Service extends CommonExportService<SecTransfer001Dto
                     // 调用业务组件.【金融产品交易共通.交易产品接口】,写入[可用]的组合持仓流水及现金流水
                     FinProductTradeDto finProductTradeDto = new FinProductTradeDto();
                     finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_流程中.getValue());
+                    finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
                     finProductTradeDto.setWorkflowId(entity.getWorkflowId());
                     BaseTradeProductDealDto baseTradeProductDealDto = new BaseTradeProductDealDto();
                     baseTradeProductDealDto.setTrdFinProductDealTotal(baseTradeInfoDto.getTrdFinProductDealTotal());
@@ -1783,6 +1786,7 @@ public class SecTransfer001Service extends CommonExportService<SecTransfer001Dto
                 paTrdProductDealMapper.insertSelective(paTrdProductDeal);
             }
             finProductTradeDto.setWorkflowStatus(DictCodeListExt1.交易流程状态_撤销.getValue());
+            finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
             finProductTradeDto.setBaseTradeProductDealDtos(baseTradeProductDealDtoList);
 
             // 调用业务组件.【金融产品交易共通.交易产品接口】, insert
