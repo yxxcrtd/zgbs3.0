@@ -13,7 +13,7 @@ select
     --或注释wm_concat韩式 使用xmlagg
    -- TRIM(',' FROM xmlagg(xmlparse(content aa.PRODUCT_ID||',' wellformed) ORDER BY aa.PRODUCT_ID
   --  ).getclobval()) PRODUCT_ID,
-    wm_concat(aa.PRODUCT_ID) as  PRODUCT_ID,
+    to_char(wm_concat(aa.PRODUCT_ID)) as  PRODUCT_ID,
     aa.PROCESS_TIME,
     aa.STATUS,
     aa.EXEC_COUNT,
