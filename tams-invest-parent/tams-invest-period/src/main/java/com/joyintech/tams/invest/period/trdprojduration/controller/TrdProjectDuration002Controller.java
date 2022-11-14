@@ -127,6 +127,7 @@ public class TrdProjectDuration002Controller extends BaseController {
                 } else {
                     entity.setArrivalDate(platformDateImpl.getSysDateStr());
                     entity.setTheoryAmt(ArithmeticUtil.doAdd(entity.getIntAmtTheory(), entity.getReturnAmount()));
+                    entity.setFpriceAmt(ArithmeticUtil.doAdd(entity.getIntAmtTheory(), entity.getReturnAmount()));
                 }
                 entity.setFinAssetIntInfoList(trdProjectDuration002Service.findAssetIntInfo(genParams(entity)));
                 if (DictCodeListExt1.画面数据状态_待处理.getValue().equals(statusValid) && entity != null) {

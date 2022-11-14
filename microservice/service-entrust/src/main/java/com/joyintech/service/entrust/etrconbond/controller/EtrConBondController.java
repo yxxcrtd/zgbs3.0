@@ -354,7 +354,8 @@ public class EtrConBondController {
         baseEtrInvestInfoDto.setEtrEntrustAdd(etrEntrustAdd);
         WFlowCommonService.inserBackuptWithQuery(baseEtrInvestInfoDto);
         WFlowCommonService.doBackFlow(dto.getWorkflowId(), dto.getEntrustId());
-        WFlowCommonService.doInsertFlow(dto.getOperateType(),baseEtrInvestInfoDto);
+//        WFlowCommonService.doInsertFlow(dto.getOperateType(),baseEtrInvestInfoDto);
+        WFlowCommonService.insertFlow(baseEtrInvestInfoDto);
 //        positionRequestService.sendDelete(dto);
     }
 

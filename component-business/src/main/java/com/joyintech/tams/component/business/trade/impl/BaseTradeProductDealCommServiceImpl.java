@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.invest.common.component.base.trade.BaseTradeProductDealService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -19,10 +20,6 @@ import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.jdbc.datasource.DataSource;
 import com.joyintech.framework.jdbc.enums.DataSourceType;
 import com.joyintech.framework.security.LoginUserUtil;
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.BeanUtil;
-import com.joyintech.framework.util.CacheUtil;
-import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.dao.EtrEntrustAddMapper;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.dao.EtrFinishStatusMapper;
@@ -709,6 +706,7 @@ public class BaseTradeProductDealCommServiceImpl extends BaseService implements 
     @Override
     public Boolean insertPosition(FinProductTradeDto finProductTradeDto) {
         // modify by etliu 20220308 start
+        logger.info("BaseTradeProductDealCommServiceImpl.insertPosition finProductTradeDto:{}", JsonUtils.object2Json(finProductTradeDto));
         // 场内的头寸处理，全部已经对接了头寸引擎，需要标记下
         if (!StringUtil.isEmptyList(finProductTradeDto.getBaseTradeProductDealDtos())
             && finProductTradeDto.getBaseTradeProductDealDtos().get(0).getTrdProductDeal() != null

@@ -1089,7 +1089,8 @@
         reg.COUNTER_TRADER as counterTrader,
         reg.CCY as ccy,
         reg.SETTLE_SPEED as settleSpeed,
-        reg.SETTLE_DATE as settleDate,
+        CASE WHEN reg.PS = 'T03' AND regAdd.ACT_SETTE_DATE IS NOT NULL THEN regAdd.ACT_SETTE_DATE
+        ELSE reg.settle_date END  settleDate,
         reg.UNIT_CPRICE as unitCprice,
         reg.YIELD as yield,
         reg.EXER_YIELD as exerYield,

@@ -171,14 +171,14 @@ public interface CfetsTrdFirstBidFirm002Mapper {
     int selectResultCount(Map<String, Object> param);
 
     /**
-     * 查询是否存在已中标结果维护数据
-     *
-     * @param param
-     * @return int
-     * @author jiangpeng
-     * @date 2022/6/9 15:38
+     * 查询二级债券标的
      */
-    FinProduct selectByFinprodMarketId(@Param("finprodMarketId") String finprodMarketId);
+    FinProduct selectByFinprodMarketId(Map<String, Object> param);
+
+    /**
+     * 查询一级级债券标的
+     */
+    FinProduct selectBySecFinprodMarketId(Map<String, Object> param);
 
     /**
      * 根据资产代码查询自主投标生效及流程中总汇总投标券面总额
