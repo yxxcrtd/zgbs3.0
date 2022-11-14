@@ -613,4 +613,17 @@
         from FIN_PLEDGE_DISP_DETAIL_TEMP
         where TRADE_ID = (select TRADE_ID from FIN_PLEDGE_DISP_TEMP where F_TRADE_ID = (select FINPROD_ID from ETR_ENTRUST where ENTRUST_ID = #{entrustId,jdbcType=VARCHAR}) and ROWNUM = 1)
     </select>
+
+    <select id="getPortfolioVdateInfos" resultType="com.joyintech.tams.common.base.entity.PtlPortfolio">
+        select
+            PP.PORTFOLIO_ID
+            , PP.VDATE
+        from PTL_PORTFOLIO PP
+        <where>
+            PP.PORTFOLIO_ID in
+            <foreach collection="portfolioIdList" item="id" open=" (" close=")" separator=",">
+                #{id,jdbcType=VARCHAR}
+            </foreach>
+        </where>
+    </select>
 </mapper>
