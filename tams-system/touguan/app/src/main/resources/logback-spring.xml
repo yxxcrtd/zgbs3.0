@@ -4,6 +4,8 @@
     <springProperty scope="context" name="logfolder" source="log.path"/>
     <logger name="com.ibm.ws.webcontainer.srt.SRTServletResponse" level="OFF" />
     <logger name="com.ibm.ws.webcontainer.servlet.ServletWrapper" level="OFF" />
+    <logger name="com.joyintech.framework.convert.DateConverter" level="INFO" />
+
     <!-- 参数设置 -->
 	<include resource="logback-base.xml"/>
 	
