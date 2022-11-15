@@ -259,5 +259,6 @@
         from PTL_SEC_POSITION
         where FINPROD_ID = #{finprodId,jdbcType=VARCHAR} AND HODING_TYPE IN ('01', '02','03', '04', '05', '06', '09','10','12')
         AND CDATE =to_date(#{cdate},'yyyy-MM-dd')
+        AND and AMOUNT > 0
     </select>
 </mapper>
