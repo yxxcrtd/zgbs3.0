@@ -5,7 +5,7 @@
             <Cell order="1" name="组合名称">portfolioName</Cell>
             <Cell order="2" name="账号">acctNo</Cell>
             <Cell order="3" name="账号名称">acctName</Cell>
-            <Cell order="4" name="账号类型">acctName</Cell>
+            <Cell order="4" name="账号类型">acctTypeStr</Cell>
             <Cell order="5" name="币种">ccy</Cell>
             <Cell order="6" name="现金余额">cashBalance</Cell>
             <Cell order="7" name="指令可用现金">cashAvailable</Cell>

@@ -105,7 +105,7 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 	/**
 	 * 日志
 	 */
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
 	private IPlatformDate iPlatformDate;
@@ -233,6 +233,7 @@ public class EtrExchangeTradeRepo001Controller extends BaseController{
 		initPageParams.put("IS_RISKMATH_SOFTCONTROL", CacheUtil.getSysParam("IS_RISKMATH_SOFTCONTROL"));
 		initPageParams.put("ETR_TRADE_TIME_SWITCH", CacheUtil.getSysParam("etr_trade_time_switch"));
 		initPageParams.put("ETR_CHECK_POS_SWITCH",CacheUtil.getSysParam(BussinessConstant.ETR_CHECK_POS_SWITCH));
+		initPageParams.put("etrExRepoQutRefTime", CacheUtil.getSysParam("etr_ex_repo_qut_ref_time"));
 		return new Message<Map<String, Object>>(initPageParams).success();
 	}
 

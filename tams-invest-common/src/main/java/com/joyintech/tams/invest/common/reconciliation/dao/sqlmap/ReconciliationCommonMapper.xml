@@ -312,7 +312,11 @@ where
 		SELECT COUNT(1) FROM SETTLE_TRANS_DATA_STATUS
 		WHERE
 		      CHECK_RESULT IN (#{CHECK_RESULT_0,jdbcType=VARCHAR}, #{CHECK_RESULT_2,jdbcType=VARCHAR})
-			AND TRADE_ID IN (SELECT TRADE_ID FROM SETTLE_TRANS_DATA WHERE TRADE_DATE = TO_DATE(#{execDate},'yyyyMMdd'))
+			AND TRADE_ID IN (
+				SELECT TRADE_ID FROM SETTLE_TRANS_DATA
+				WHERE TRADE_DATE = TO_DATE(#{execDate},'yyyyMMdd')
+				  and ((ps not in ('T09','T07','T08') and FINPROD_TYPE2 = 'F01') or FINPROD_TYPE2 != 'F01')
+			)
 	</select>
 
 	<delete id="deleteSettleTransDataStatusDisaccords" parameterType="java.util.Map">

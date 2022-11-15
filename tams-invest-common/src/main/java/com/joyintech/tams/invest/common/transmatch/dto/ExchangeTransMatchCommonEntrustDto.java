@@ -5,6 +5,7 @@ import com.joyintech.framework.json.BigDecimalSerializer;
 import com.joyintech.tams.common.base.entity.EtrEntrust;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 public class ExchangeTransMatchCommonEntrustDto extends EtrEntrust {
@@ -80,6 +81,11 @@ public class ExchangeTransMatchCommonEntrustDto extends EtrEntrust {
      * 转股数量
      */
     private BigDecimal conAmt;
+
+    /**
+     * 组合开始日
+     */
+    private Date portfolioVdate;
 
     public BigDecimal getConAmt() {
         return conAmt;
@@ -247,5 +253,13 @@ public class ExchangeTransMatchCommonEntrustDto extends EtrEntrust {
 
     public void setTradeId(String tradeId) {
         this.tradeId = tradeId;
+    }
+
+    public Date getPortfolioVdate() {
+        return portfolioVdate;
+    }
+
+    public void setPortfolioVdate(Date portfolioVdate) {
+        this.portfolioVdate = portfolioVdate;
     }
 }

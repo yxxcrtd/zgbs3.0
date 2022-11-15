@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
@@ -15,6 +16,7 @@ import com.joyintech.tams.invest.common.trade.dto.MinTrdUnitLimitDto;
 import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.service.bidding.ExchangeTransMatchBidding1Service;
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.service.credit.ExchangeTransMatchCredit1Service;
+import com.joyintech.tools.util.ListUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -382,7 +384,10 @@ public class ExchangeTransMatchCommonService extends BaseService {
      */
     private void handleMultiPortfolioAllocation(ExchangeTransMatchCommonDto matchDto, List<ExchangeTransMatchCommonEntrustDto> commonEntrustDtoList){
         //系列户指令处理组合分配
-        commonEntrustDtoList.stream().filter(item->StringUtil.equals(item.getEntrustClass(),DictCodeListExt3.投资指令类型_多组合单资产指令.getValue())).forEach(item->{
+        commonEntrustDtoList.stream()
+                .filter(item->StringUtil.equals(item.getEntrustClass(),DictCodeListExt3.投资指令类型_多组合单资产指令.getValue()))
+                .forEach(item->{
+            // 获取指令明细信息
             List<ExchangeTransMatchCommonEntrustDetailDto> entrustDetailDtoList = exchangeTransMatchCommonMapper.getEntrustDetailList(item.getEntrustId());
             if(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(item.getFinprodType2())){
                 entrustDetailDtoList = entrustDetailDtoList.stream()
@@ -496,7 +501,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 }
                 logger.debug("【指令编号:{},证券账户:{},最终分配数量结果为:{}】", item.getEntrustId(), item.getSecAcctId(), JSON.toJSONString(portfolioMatchQtyMap));
                 // 5、根据本次分配数量计算 分配金额和交易支付费用
-                this.calculatePortFolioMatchAmt(matchDto, item, portfolioMatchQtyMap, portfolioRemainQtyList, entrustDetailDtoList);
+                this.calculatePortFolioMatchAmt(matchDto, item, portfolioMatchQtyMap, portfolioRemainQtyList, entrustDetailDtoList, item.getMarchAmt());
             }
             logger.debug("【指令编号:{},证券账户:{},最终结果为:{}】", item.getEntrustId(), item.getSecAcctId(), JSON.toJSONString(entrustDetailDtoList));
             // ZGCPCN-1551:modify by fuyongsheng 20220620 start
@@ -515,7 +520,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
      */
     private void calculatePortFolioMatchAmt(ExchangeTransMatchCommonDto matchDto, ExchangeTransMatchCommonEntrustDto item,
                     Map<String, BigDecimal> portfolioMatchQtyMap, List<Map.Entry<String, BigDecimal>> portfolioRemainQtyList,
-                                            List<ExchangeTransMatchCommonEntrustDetailDto> entrustDetailDtoList){
+                                            List<ExchangeTransMatchCommonEntrustDetailDto> entrustDetailDtoList, BigDecimal marchAmt){
         // 本次各组合分配金额
         Map<String, BigDecimal> portfolioMatchAmtMap = new HashMap<>();
         // 本次各组合分配随交易支付费用
@@ -536,18 +541,18 @@ public class ExchangeTransMatchCommonService extends BaseService {
             if(StringUtil.equals(item.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
                 if(StringUtil.equals(item.getPs(), DictCodeListExt3.交易方向_质押券入库.getValue())
                         || StringUtil.equals(item.getPs(), DictCodeListExt3.交易方向_质押券出库.getValue())) {
-                    portfolioMatchAmtMap.put(portfolioId, ArithmeticUtil.multiply(matchQty,item.getPrice()));
+                    portfolioMatchAmtMap.put(portfolioId, ArithmeticUtil.multiply(matchQty,item.getPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
                 }
                 // 债转股不重新计算分配金额
                 else if(StringUtil.equals(item.getPs(), DictCodeListExt3.交易方向_债转股.getValue())){
                     portfolioMatchAmtMap.put(portfolioId, matchDto.getTradeAmt());
                 }
                 else {
-                    portfolioMatchAmtMap.put(portfolioId, ArithmeticUtil.multiply(matchQty,matchDto.getUnitFprice()));
+                    portfolioMatchAmtMap.put(portfolioId, ArithmeticUtil.multiply(matchQty,matchDto.getUnitFprice()).setScale(2, BigDecimal.ROUND_HALF_UP));
                 }
             }
             else {
-                portfolioMatchAmtMap.put(portfolioId, ArithmeticUtil.multiply(matchQty,matchDto.getUnitCprice()));
+                portfolioMatchAmtMap.put(portfolioId, ArithmeticUtil.multiply(matchQty,matchDto.getUnitCprice()).setScale(2, BigDecimal.ROUND_HALF_UP));
             }
 
             BigDecimal matchFeeAmtPay;
@@ -568,6 +573,12 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 portfolioMatchFeeAmtUnPayMap.put(portfolioId, ArithmeticUtil.subtract(item.getMarchFeeAmtUnPay(), marchTotalFeeAmtUnPay));
             }
         }
+        // 将尾插分配到组合开始日最小的组合上
+        String minVdatePortfolioId = this.getPortfolioIdByMinVdate(Lists.newArrayList(portfolioMatchQtyMap.keySet()));
+        logger.debug("尾插分配在组合 => 【{}】", minVdatePortfolioId);
+        BigDecimal reduce = portfolioMatchAmtMap.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+        portfolioMatchAmtMap.put(minVdatePortfolioId, marchAmt.subtract(reduce).add(portfolioMatchAmtMap.get(minVdatePortfolioId)));
+
         for(ExchangeTransMatchCommonEntrustDetailDto entrustDetailDto : entrustDetailDtoList) {
             entrustDetailDto.setMarchQty(null == portfolioMatchQtyMap.get(entrustDetailDto.getPortfolioId()) ?
                     BigDecimal.ZERO : portfolioMatchQtyMap.get(entrustDetailDto.getPortfolioId()));
@@ -1985,6 +1996,13 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 }
                 //系统参数.匹配规则 = 按照指令金额总体占比分配
                 else if(StringUtil.equals(matchRule,"03")) {
+                    // 根据组合代码批量设置组合开始日
+                    this.fillVdateToExchangeTransMatchCommonEntrustDto(commonEntrustDtoList);
+                    // 根据组合开始日逆序排列
+                    commonEntrustDtoList = commonEntrustDtoList.stream()
+                            .sorted(Comparator.comparing(ExchangeTransMatchCommonEntrustDto::getPortfolioVdate).reversed())
+                            .collect(Collectors.toList());
+
                     for(int i = 0 ;i< commonEntrustDtoList.size(); i++) {
                         ExchangeTransMatchCommonEntrustDto commonEntrustDto = commonEntrustDtoList.get(i);
                         BigDecimal marchQty = BigDecimal.ZERO;
@@ -2041,6 +2059,41 @@ public class ExchangeTransMatchCommonService extends BaseService {
         }
 
         return Pair.of(matchStatus, commonEntrustDtoList);
+    }
+
+    /**
+     * 根据组合代码批量设置组合开始日
+     * @param commonEntrustDtoList
+     */
+    private void fillVdateToExchangeTransMatchCommonEntrustDto(List<ExchangeTransMatchCommonEntrustDto> commonEntrustDtoList) {
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("portfolioIdList", commonEntrustDtoList.stream().map(ExchangeTransMatchCommonEntrustDto::getPortfolioId).collect(Collectors.toList()));
+        List<PtlPortfolio> portfolioVdateInfos = exchangeTransMatchCommonMapper.getPortfolioVdateInfos(params);
+        logger.debug("【组合开始日数据 => {}】", JsonUtils.object2Json(portfolioVdateInfos));
+
+        Map<String, Date> map = portfolioVdateInfos.stream().collect(Collectors.toMap(PtlPortfolio::getPortfolioId,
+                PtlPortfolio::getVdate, (oldValue, newValue) -> oldValue));
+        commonEntrustDtoList.forEach(item -> item.setPortfolioVdate(map.get(item.getPortfolioId())));
+    }
+
+    /**
+     * 获取组合开始日最小的组合代码
+     * @param portfolioIdList 组合代码列表
+     */
+    private String getPortfolioIdByMinVdate(List<String> portfolioIdList) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("portfolioIdList", portfolioIdList);
+        List<PtlPortfolio> portfolioVdateInfos = exchangeTransMatchCommonMapper.getPortfolioVdateInfos(params);
+        logger.debug("【组合开始日数据 => {}】", JsonUtils.object2Json(portfolioVdateInfos));
+
+        String minVdatePortfolioId = portfolioVdateInfos.stream()
+                .sorted(Comparator.comparing(PtlPortfolio::getVdate))
+                .map(PtlPortfolio::getPortfolioId)
+                .findFirst()
+                .orElse(portfolioIdList.get(0));
+        logger.debug("【组合开始日最小的组合代码 => {}】", minVdatePortfolioId);
+        return minVdatePortfolioId;
     }
 
     /**

@@ -217,4 +217,11 @@ public interface ExchangeTransMatchCommonMapper {
     // XYHGFXSJ-767 【实时资产头寸查询】协议回购上交所正回购中途换券日终清结算后，实时资产报表里数据错误
     List<PledgeListDto> selectFinDealPledgeByEntrust(@Param("entrustId") String entrustId);
     // XYHGFXSJ-767 【实时资产头寸查询】协议回购上交所正回购中途换券日终清结算后，实时资产报表里数据错误
+
+    /**
+     * 根据组合代码列表查询组合信息
+     * @param paraMap   组合代码列表
+     * @return  组合开始日
+     */
+    List<PtlPortfolio> getPortfolioVdateInfos(Map<String, Object> paraMap);
 }

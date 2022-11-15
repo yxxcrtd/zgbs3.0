@@ -737,7 +737,7 @@
     </select>
 
     <select id="selectAllPositionByFinprodId" resultType="com.joyintech.tams.invest.common.dto.etr.EtrSecPositionFlowDto">
-        SELECT * FROM ETR_SEC_POSITION WHERE FINPROD_ID = #{finprodId} AND CDATE = to_date(#{cdate},'yyyy-MM-dd')
+        SELECT * FROM ETR_SEC_POSITION WHERE FINPROD_ID = #{finprodId} AND CDATE = to_date(#{cdate},'yyyy-MM-dd') AND and AMOUNT > 0
     </select>
 
     <select id="selectAllCashPositionByTotle" resultType="com.joyintech.tams.invest.common.dto.etr.EtrCashPositionFlowDto">
