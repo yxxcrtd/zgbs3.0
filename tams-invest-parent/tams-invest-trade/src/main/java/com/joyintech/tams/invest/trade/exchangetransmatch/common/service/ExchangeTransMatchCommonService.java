@@ -1765,7 +1765,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     }
                     // modify by etliu 20220227 start
                     // 广农商二阶段 GNS-920:【广农商场内清算】广农商场内债转股清算交易生成后，对应的持仓流水更新有误
-                    if (StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_债转股.getValue())) {
+                    else if (StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_债转股.getValue())) {
                         //已匹配金额（债转股只考虑成交数据和指令一对一的场景）
                         commonEntrustDto.setMarchAmt(dto.getFpriceAmt());
                     }
