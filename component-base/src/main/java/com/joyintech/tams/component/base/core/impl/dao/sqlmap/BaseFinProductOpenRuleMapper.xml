@@ -15,7 +15,6 @@
         <result column="TRADEDAY_RULE" property="tradedayRule" jdbcType="VARCHAR" />
         <result column="HDAY_OPEN_FLAG" property="hdayOpenFlag" jdbcType="VARCHAR" />
         <result column="CALC_RULE" property="calcRule" jdbcType="VARCHAR" />
-        <result column="CLOSE_DAYS" property="closeDays" jdbcType="DECIMAL" />
         <result column="CREATE_USER" property="createUser" jdbcType="VARCHAR" />
         <result column="CREATE_DEPT" property="createDept" jdbcType="VARCHAR" />
         <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
@@ -26,7 +25,7 @@
         CASH_ID, OPEN_TYPE, OPEN_MODE, OPEN_DAYS, OPEN_CYCLE, 
         OPEN_CYCLE_UNIT, DAY_TYPE, DAY_VALUE, CALC_METHOD, 
         FIRST_OPEN_DATE, TRADEDAY_RULE, HDAY_OPEN_FLAG, 
-        CALC_RULE, CLOSE_DAYS, CREATE_USER, CREATE_DEPT, 
+        CALC_RULE, CREATE_USER, CREATE_DEPT,
         CREATE_TIME, UPDATE_USER, UPDATE_TIME
     </sql>
     <!-- 
