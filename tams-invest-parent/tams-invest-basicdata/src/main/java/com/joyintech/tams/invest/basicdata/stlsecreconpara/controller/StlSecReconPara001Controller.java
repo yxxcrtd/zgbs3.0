@@ -9,6 +9,7 @@ import com.joyintech.framework.select.SuggestDto;
 import com.joyintech.framework.util.*;
 import com.joyintech.framework.validation.groups.ValidateGroupDelete;
 import com.joyintech.tams.constant.DictCode;
+import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.constant.DictCodeListStl;
 import com.joyintech.tams.invest.basicdata.stlsecreconpara.dto.StlSecReconParaDto;
 import com.joyintech.tams.invest.basicdata.stlsecreconpara.service.StlSecReconParaService;
@@ -93,7 +94,7 @@ public class StlSecReconPara001Controller extends BaseController {
         params.setPageId("StlSecReconPara002");
         params.setElementId(dto.getElementId());
         params.setBusinessCode(dto.getSeqNo());
-        params.setBusinessType(DictCodeListStl.共通业务类型_券商对账参数设置.getValue());
+        params.setBusinessType(DictCodeListExt3.共通业务类型_券商对账参数设置.getValue());
         // 设置流程业务说明, entity即传入的dto
         params.setComment(entity -> entity.getParaCodeStr() + ":" + entity.getParaValueStr());
         processParameter.setWorkFlowParameter(params);

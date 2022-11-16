@@ -325,7 +325,6 @@ public enum DictCodeListStl implements BaseDictCodeList {
 	 */
 	对账维度_成交明细(DictCode.对账维度, "03", "成交明细"),
 
-	共通业务类型_券商对账参数设置(DictCode.共通业务类型, "STL06", "券商对账参数设置"),
 	//add by chenjiaxing 20211015 end
 	//add by likaitao 20220513 start
 	证券品种_信用保护凭证(DictCode.证券品种, "14", "信用保护凭证"),
