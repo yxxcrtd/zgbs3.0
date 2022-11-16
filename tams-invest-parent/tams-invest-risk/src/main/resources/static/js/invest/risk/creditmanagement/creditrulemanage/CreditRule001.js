@@ -101,7 +101,7 @@
             ,{field:'astType3Name', width:150 , title: 'CeRule002.astType3',sortField:'AST_TYPE_3'}
             ,{field:'astType4Name', width:150 , title: 'CeRule002.astType4',sortField:'AST_TYPE_4'}
             ,{field:'astType5Name', width:150 , title: 'CeRule002.astType5',sortField:'AST_TYPE_5'}
-            ,{field:'underAssetTypeName', width:150 , title: 'CeRule002.underAssetType'}
+            // ,{field:'underAssetTypeName', width:150 , title: 'CeRule002.underAssetType'}
             ,{field:'deductObjTypeName', width:150 , title: 'CeRule002.deductObjType',sortField:'DEDUCT_OBJ_TYPE'}
             ,{field:'creditTagName', width:150 , title: 'CeRule002.creditTag',sortField:'CREDIT_TAG_NAME'}
             ,{field:'creditTypeName', width:150 , title: 'CeRule001.creditType',sortField:'CREDIT_TYPE'}
