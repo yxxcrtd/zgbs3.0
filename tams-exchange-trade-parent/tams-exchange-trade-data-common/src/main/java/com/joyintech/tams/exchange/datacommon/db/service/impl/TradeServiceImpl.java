@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.tams.exchange.common.bean.EntrustQueryBean;
 import com.joyintech.tams.exchange.common.bean.TradeQryBean;
 import com.joyintech.tams.exchange.common.bean.TradeQueryBean;
@@ -93,7 +94,7 @@ public class TradeServiceImpl extends AsyncServiceImpl<String, Trade> implements
                 tradeQueryBean.setStockName(entrust.getStockName());
             }
             if ("EX005".equals(tradeQueryBean.getBusiTypeTg())) {
-                tradeQueryBean.setTradedPrice(tradeQueryBean.getTradedPrice().multiply(BigDecimal.valueOf(100)));
+                tradeQueryBean.setTradedPrice(ArithmeticUtil.multiply(tradeQueryBean.getTradedPrice(), BigDecimal.valueOf(100)));
             }
 
             tradeQueryBeans.add(tradeQueryBean);
@@ -181,7 +182,7 @@ public class TradeServiceImpl extends AsyncServiceImpl<String, Trade> implements
                 tradeHistory.setStockCode(StockCodeUtils.getStockCode(tradeHistory.getStockCode()));
             }
             if ("EX005".equals(tradeHistory.getBusiTypeTg())) {
-                tradeHistory.setTradedPrice(tradeHistory.getTradedPrice().multiply(BigDecimal.valueOf(100)));
+                tradeHistory.setTradedPrice(ArithmeticUtil.multiply(tradeHistory.getTradedPrice(), BigDecimal.valueOf(100)));
             }
         });
         return new PageInfo<>(tradeHistories);

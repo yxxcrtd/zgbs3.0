@@ -3,6 +3,7 @@ package com.joyintech.tams.exchange.datacommon.db.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.base.Strings;
+import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.tams.exchange.common.bean.TradeQryBean;
 import com.joyintech.tams.exchange.common.bean.TradeQueryBean;
@@ -104,7 +105,7 @@ public class TradeHistoryServiceImpl implements TradeHistoryService {
                 tradeHistory.setStockCode(StockCodeUtils.getStockCode(tradeHistory.getStockCode()));
             }
             if("EX005".equals(tradeHistory.getBusiTypeTg())){
-                tradeHistory.setTradedPrice(tradeHistory.getTradedPrice().multiply(BigDecimal.valueOf(100)));
+                tradeHistory.setTradedPrice(ArithmeticUtil.multiply(tradeHistory.getTradedPrice(), BigDecimal.valueOf(100)));
             }
         });
         return new PageInfo<>(tradeHistories);
@@ -125,7 +126,7 @@ public class TradeHistoryServiceImpl implements TradeHistoryService {
         List<TradeQueryBean> tradeQueryBeans = tradeHistoryMapper.selectTradeByPage(tradeQryBean);
         tradeQueryBeans.forEach(tradeHistory -> {
             if("EX005".equals(tradeHistory.getBusiTypeTg())){
-                tradeHistory.setTradedPrice(tradeHistory.getTradedPrice().multiply(BigDecimal.valueOf(100)));
+                tradeHistory.setTradedPrice(ArithmeticUtil.multiply(tradeHistory.getTradedPrice(), BigDecimal.valueOf(100)));
             }
         });
         return tradeQueryBeans;
