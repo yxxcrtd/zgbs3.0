@@ -210,11 +210,15 @@
                 </foreach>
                 )
             </if>
-            <if test="exerciseDateStart != null and exerciseDateStart != ''">
-                <![CDATA[AND  T.exerciseDate >= TO_DATE(#{exerciseDateStart},'YYYY-MM-DD')]]>
-            </if>
-            <if test="exerciseDateEnd != null and exerciseDateEnd != ''">
-                <![CDATA[AND  T.exerciseDate <= TO_DATE(#{exerciseDateEnd},'YYYY-MM-DD')]]>
+            <if test="(exerciseDateStart != null and exerciseDateStart != '') or (exerciseDateEnd != null and exerciseDateEnd != '')">
+                AND EXISTS ( select 1 from FIN_EXERCISE_PLAN P where p.FINPROD_ID=T.finprodId
+                <if test="exerciseDateStart != null and exerciseDateStart != ''">
+                    <![CDATA[AND P.EXERCISE_DATE >= TO_DATE(#{exerciseDateStart},'YYYY-MM-DD')]]>
+                </if>
+                <if test="exerciseDateEnd != null and exerciseDateEnd != ''">
+                    <![CDATA[AND P.EXERCISE_DATE <= TO_DATE(#{exerciseDateEnd},'YYYY-MM-DD')]]>
+                </if>
+                )
             </if>
             <if test="mGradeResultList != null and mGradeResultList.size() > 0">
                 AND T.mGradeResult in
