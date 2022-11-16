@@ -820,6 +820,7 @@ public enum DictCodeListExt3 implements BaseDictCodeList {
     中债评级类型_地方债(DictCode.中债评级类型, "03", "评级AA-级以下"),
     中债评级类型_短期融资券(DictCode.中债评级类型, "04", "无评级"),
     共通业务类型_手工交收(DictCode.共通业务类型,"STL06","手工交收"),
+    共通业务类型_券商对账参数设置(DictCode.共通业务类型,"STL08","券商对账参数设置"),
 
     /**
      * 分录类型_正常记账
