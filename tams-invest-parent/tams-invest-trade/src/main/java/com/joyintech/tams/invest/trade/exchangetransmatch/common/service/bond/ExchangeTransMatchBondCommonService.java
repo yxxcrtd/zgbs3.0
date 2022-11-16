@@ -212,9 +212,9 @@ public class ExchangeTransMatchBondCommonService extends BaseService {
         // 随交易支付费用
         dealTotal.setFeeAmtPay(entrustDto.getMarchFeeAmtPay());
         // 未随交易支付费用
-        dealTotal.setFeeAmtUnpay(entrustDto.getMarchFeeAmtPay());
+        dealTotal.setFeeAmtUnpay(entrustDto.getMarchFeeAmtUnPay());
         // 总交易费用
-        dealTotal.setFeeAmt(ArithmeticUtil.doAdd(entrustDto.getMarchFeeAmtPay(),entrustDto.getMarchFeeAmtPay()));
+        dealTotal.setFeeAmt(ArithmeticUtil.doAdd(entrustDto.getMarchFeeAmtPay(),entrustDto.getMarchFeeAmtUnPay()));
         // 交易方向
         dealTotal.setPs(entrustDto.getPs());
         // 投资目的

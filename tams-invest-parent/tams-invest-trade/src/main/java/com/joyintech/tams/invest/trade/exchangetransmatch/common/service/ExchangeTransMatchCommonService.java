@@ -10,13 +10,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 import com.joyintech.tams.common.base.dao.*;
 import com.joyintech.tams.common.base.entity.*;
+import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.BussinessDictCodeList;
 import com.joyintech.tams.invest.common.trade.dao.CreditLinesDealsMapper;
 import com.joyintech.tams.invest.common.trade.dto.MinTrdUnitLimitDto;
 import com.joyintech.tams.invest.common.trade.service.TrdCommonBaseService;
+import com.joyintech.tams.invest.common.util.SysDataUtil;
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.service.bidding.ExchangeTransMatchBidding1Service;
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.service.credit.ExchangeTransMatchCredit1Service;
-import com.joyintech.tools.util.ListUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,11 +35,6 @@ import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.component.business.trade.BaseTradeProductDealCommService;
-import com.joyintech.tams.constant.DictCodeList;
-import com.joyintech.tams.constant.DictCodeListExt1;
-import com.joyintech.tams.constant.DictCodeListExt2;
-import com.joyintech.tams.constant.DictCodeListExt3;
-import com.joyintech.tams.constant.DictCodeListStl;
 import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
 import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.trade.dto.FinProductTradeDto;
@@ -251,14 +247,14 @@ public class ExchangeTransMatchCommonService extends BaseService {
             //更新:汇总成交数据状态表（SETTLE_TRANS_DATA_TOTAL_STATUS）
             SettleTransDataTotalStatus settleTransDataTotalStatus = settleTransDataTotalStatusMapper.selectByPrimaryKey(dto.getSeqId());
             if(StringUtil.isNotEmpty(settleTransDataTotalStatus)) {
-                settleTransDataTotalStatus.setMatchStatus(DictCodeListExt3.下行交易匹配状态_匹配完成.getValue());
+                settleTransDataTotalStatus.setMatchStatus(下行交易匹配状态_匹配完成.getValue());
                 settleTransDataTotalStatus.setUpdateTime(new Date());
                 settleTransDataTotalStatus.setUpdateUser(StringUtil.isNotEmpty(LoginUserUtil.getUserName())?LoginUserUtil.getUserName():"system");
                 settleTransDataTotalStatusMapper.updateByPrimaryKey(settleTransDataTotalStatus);
             } else {
                 settleTransDataTotalStatus = new SettleTransDataTotalStatus();
                 settleTransDataTotalStatus.setSeqNo(dto.getSeqId());
-                settleTransDataTotalStatus.setMatchStatus(DictCodeListExt3.下行交易匹配状态_匹配完成.getValue());
+                settleTransDataTotalStatus.setMatchStatus(下行交易匹配状态_匹配完成.getValue());
                 settleTransDataTotalStatus.setUpdateTime(new Date());
                 settleTransDataTotalStatus.setUpdateUser(StringUtil.isNotEmpty(LoginUserUtil.getUserName())?LoginUserUtil.getUserName():"system");
                 settleTransDataTotalStatusMapper.insert(settleTransDataTotalStatus);
@@ -292,7 +288,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     //取得剩余匹配份额
                     BigDecimal remainNum = exchangeTransMatchCommonMapper.getRemainNum(totalSeqId);
                     settleTransDataTotalStatus.setMatchStatus(BigDecimal.ZERO.compareTo(remainNum) >=0
-                            ?DictCodeListExt3.下行交易匹配状态_未匹配.getValue():DictCodeListExt3.下行交易匹配状态_部分匹配.getValue());
+                            ?下行交易匹配状态_未匹配.getValue():下行交易匹配状态_部分匹配.getValue());
                     settleTransDataTotalStatus.setUpdateTime(new Date());
                     settleTransDataTotalStatus.setUpdateUser(StringUtil.isNotEmpty(LoginUserUtil.getUserName())?LoginUserUtil.getUserName():"system");
                     settleTransDataTotalStatusMapper.updateByPrimaryKey(settleTransDataTotalStatus);
@@ -337,12 +333,12 @@ public class ExchangeTransMatchCommonService extends BaseService {
         entrustMap.put("ENTRUST_STATUS_03",DictCodeList.委托状态_已接收.getValue());
         entrustMap.put("FINPROD_TYPE_TG_F02", DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue());
         entrustMap.put("FINPROD_TYPE_TG_F03", DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue());
-        entrustMap.put("PS_T93", DictCodeListExt3.交易方向_解除质押.getValue());
-        entrustMap.put("PS_T94", DictCodeListExt3.交易方向_中途换券.getValue());
-        entrustMap.put("TARGET_CLASS_01", DictCodeListExt3.目标类型_数量.getValue());
-        entrustMap.put("TARGET_CLASS_02", DictCodeListExt3.目标类型_金额.getValue());
-		entrustMap.put("DISPLACE_DIRECTION_01", DictCodeListExt3.质押券置换_置换方向_换入.getValue());
-        entrustMap.put("DISPLACE_DIRECTION_02", DictCodeListExt3.质押券置换_置换方向_换出.getValue());
+        entrustMap.put("PS_T93", 交易方向_解除质押.getValue());
+        entrustMap.put("PS_T94", 交易方向_中途换券.getValue());
+        entrustMap.put("TARGET_CLASS_01", 目标类型_数量.getValue());
+        entrustMap.put("TARGET_CLASS_02", 目标类型_金额.getValue());
+		entrustMap.put("DISPLACE_DIRECTION_01", 质押券置换_置换方向_换入.getValue());
+        entrustMap.put("DISPLACE_DIRECTION_02", 质押券置换_置换方向_换出.getValue());
 
 
         List<ExchangeTransMatchCommonEntrustDto> commonEntrustDtoList;
@@ -355,22 +351,29 @@ public class ExchangeTransMatchCommonService extends BaseService {
             commonEntrustDtoList = exchangeTransMatchCommonMapper.getEtrEntrustByIdList(entrustMap);
         }
         if(!StringUtil.isEmptyList(commonEntrustDtoList)) {
-            String matchStatus = DictCodeListExt3.下行交易匹配状态_未匹配.getValue();
+            logger.debug("处理成交匹配数据---处理份额，金额及费用---开始");
+            logger.debug("处理成交匹配数据 commonEntrustDtoList => 【{}】", JsonUtils.object2Json(commonEntrustDtoList));
+            String matchStatus = 下行交易匹配状态_未匹配.getValue();
             // ZGCPCN-1694:方法内部对list进行clear操作,须通过返回list对象进行实现 modify by fuyongsheng 20220624 start
             Pair<String, List<ExchangeTransMatchCommonEntrustDto>> pair;
-            if((StringUtil.equals(dto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
-                    || StringUtil.equals(dto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue()))
+            if((this.isRepo(dto.getFinprodType2()))
                 && StringUtil.equals(dto.getSettleTransDataTotalAdd().getRepoType(),DictCodeList.回购类型_质押式协议回购.getValue())){
                  pair = this.calcAgreRepShareAndAmount(dto,commonEntrustDtoList,matchStatus);
             }
             else {
                  pair = this.calcShareAndAmount(dto,commonEntrustDtoList,matchStatus);
             }
+            logger.debug("处理成交匹配数据---处理份额，金额及费用---结束");
+            logger.debug("处理成交匹配数据 commonEntrustDtoList => 【{}】， matchStatus = 【{}】",
+                    JsonUtils.object2Json(commonEntrustDtoList),
+                    SysDataUtil.getNameFromDataDict(DictCode.下行交易匹配状态, pair.getFirst()));
             // ZGCPCN-1694:方法内部对list进行clear操作,须通过返回list对象进行实现 modify by fuyongsheng 20220624 end
             matchStatus = pair.getFirst();
             commonEntrustDtoList = pair.getSecond();
             // 处理多组合系列户指令的组合分配
+            logger.debug("处理成交匹配数据---处理多组合系列户指令的组合分配---开始");
             this.handleMultiPortfolioAllocation(dto, commonEntrustDtoList);
+            logger.debug("处理成交匹配数据---处理多组合系列户指令的组合分配---结束");
 
             //处理匹配成交相关的表
             this.handleSettleTransTableInfo(dto,commonEntrustDtoList,matchStatus);
@@ -385,7 +388,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
     private void handleMultiPortfolioAllocation(ExchangeTransMatchCommonDto matchDto, List<ExchangeTransMatchCommonEntrustDto> commonEntrustDtoList){
         //系列户指令处理组合分配
         commonEntrustDtoList.stream()
-                .filter(item->StringUtil.equals(item.getEntrustClass(),DictCodeListExt3.投资指令类型_多组合单资产指令.getValue()))
+                .filter(item->StringUtil.equals(item.getEntrustClass(),投资指令类型_多组合单资产指令.getValue()))
                 .forEach(item->{
             // 获取指令明细信息
             List<ExchangeTransMatchCommonEntrustDetailDto> entrustDetailDtoList = exchangeTransMatchCommonMapper.getEntrustDetailList(item.getEntrustId());
@@ -513,12 +516,12 @@ public class ExchangeTransMatchCommonService extends BaseService {
     /**
      * 计算组合分配的金额和交易支付费用
      * @param matchDto
-     * @param item
+     * @param entrust
      * @param portfolioMatchQtyMap
      * @param portfolioRemainQtyList
      * @param entrustDetailDtoList
      */
-    private void calculatePortFolioMatchAmt(ExchangeTransMatchCommonDto matchDto, ExchangeTransMatchCommonEntrustDto item,
+    private void calculatePortFolioMatchAmt(ExchangeTransMatchCommonDto matchDto, ExchangeTransMatchCommonEntrustDto entrust,
                     Map<String, BigDecimal> portfolioMatchQtyMap, List<Map.Entry<String, BigDecimal>> portfolioRemainQtyList,
                                             List<ExchangeTransMatchCommonEntrustDetailDto> entrustDetailDtoList, BigDecimal marchAmt){
         // 本次各组合分配金额
@@ -538,39 +541,32 @@ public class ExchangeTransMatchCommonService extends BaseService {
             String portfolioId = portfolioEntry.getKey();
             BigDecimal matchQty = portfolioMatchQtyMap.get(portfolioId);
 
-            if(StringUtil.equals(item.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
-                if(StringUtil.equals(item.getPs(), DictCodeListExt3.交易方向_质押券入库.getValue())
-                        || StringUtil.equals(item.getPs(), DictCodeListExt3.交易方向_质押券出库.getValue())) {
-                    portfolioMatchAmtMap.put(portfolioId, ArithmeticUtil.multiply(matchQty,item.getPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
+            if (this.isBond(entrust.getFinprodType2())) {
+                if (this.isPledgeCouponsInOrOut(entrust.getPs())) {
+                    portfolioMatchAmtMap.put(portfolioId, this.multiplyWithScale2(matchQty, entrust.getPrice()));
                 }
                 // 债转股不重新计算分配金额
-                else if(StringUtil.equals(item.getPs(), DictCodeListExt3.交易方向_债转股.getValue())){
+                else if (this.isBond2Stock(entrust.getPs())) {
                     portfolioMatchAmtMap.put(portfolioId, matchDto.getTradeAmt());
                 }
                 else {
-                    portfolioMatchAmtMap.put(portfolioId, ArithmeticUtil.multiply(matchQty,matchDto.getUnitFprice()).setScale(2, BigDecimal.ROUND_HALF_UP));
+                    portfolioMatchAmtMap.put(portfolioId, this.multiplyWithScale2(matchQty,matchDto.getUnitFprice()));
                 }
             }
             else {
-                portfolioMatchAmtMap.put(portfolioId, ArithmeticUtil.multiply(matchQty,matchDto.getUnitCprice()).setScale(2, BigDecimal.ROUND_HALF_UP));
+                portfolioMatchAmtMap.put(portfolioId, this.multiplyWithScale2(matchQty,matchDto.getUnitCprice()));
             }
 
-            BigDecimal matchFeeAmtPay;
-            BigDecimal matchFeeAmtUnPay;
-            if(index != length-1){
-                matchFeeAmtPay = ArithmeticUtil.divide(ArithmeticUtil.multiply(item.getMarchFeeAmtPay(), matchQty),
-                        item.getMarchQty(), 4);
+            if (Objects.nonNull(entrust.getMarchFeeAmtPay())) {
+                BigDecimal matchFeeAmtPay = this.divideWithScale2(this.multiply(entrust.getMarchFeeAmtPay(), matchQty), entrust.getMarchQty());
                 marchTotalFeeAmtPay = ArithmeticUtil.doAdd(marchTotalFeeAmtPay, matchFeeAmtPay);
-
-                matchFeeAmtUnPay = ArithmeticUtil.divide(ArithmeticUtil.multiply(item.getMarchFeeAmtUnPay(), matchQty),
-                        item.getMarchQty(), 4);
-                marchTotalFeeAmtUnPay = ArithmeticUtil.doAdd(marchTotalFeeAmtUnPay, matchFeeAmtUnPay);
-
                 portfolioMatchFeeAmtPayMap.put(portfolioId, matchFeeAmtPay);
+            }
+
+            if (Objects.nonNull(entrust.getMarchFeeAmtUnPay())) {
+                BigDecimal matchFeeAmtUnPay = this.divideWithScale2(this.multiply(entrust.getMarchFeeAmtUnPay(), matchQty), entrust.getMarchQty());
+                marchTotalFeeAmtUnPay = ArithmeticUtil.doAdd(marchTotalFeeAmtUnPay, matchFeeAmtUnPay);
                 portfolioMatchFeeAmtUnPayMap.put(portfolioId, matchFeeAmtUnPay);
-            }else{
-                portfolioMatchFeeAmtPayMap.put(portfolioId, ArithmeticUtil.subtract(item.getMarchFeeAmtPay(), marchTotalFeeAmtPay));
-                portfolioMatchFeeAmtUnPayMap.put(portfolioId, ArithmeticUtil.subtract(item.getMarchFeeAmtUnPay(), marchTotalFeeAmtUnPay));
             }
         }
         // 将尾插分配到组合开始日最小的组合上
@@ -578,17 +574,28 @@ public class ExchangeTransMatchCommonService extends BaseService {
         logger.debug("尾插分配在组合 => 【{}】", minVdatePortfolioId);
         BigDecimal reduce = portfolioMatchAmtMap.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
         portfolioMatchAmtMap.put(minVdatePortfolioId, marchAmt.subtract(reduce).add(portfolioMatchAmtMap.get(minVdatePortfolioId)));
+        if (Objects.nonNull(entrust.getMarchFeeAmtPay())) {
+            BigDecimal reducePay = portfolioMatchFeeAmtPayMap.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+            portfolioMatchFeeAmtPayMap.put(minVdatePortfolioId, entrust.getMarchFeeAmtPay().subtract(reducePay).add(portfolioMatchFeeAmtPayMap.get(minVdatePortfolioId)));
+        }
+        if (Objects.nonNull(entrust.getMarchFeeAmtUnPay())) {
+            BigDecimal reduceUnPay = portfolioMatchFeeAmtUnPayMap.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+            portfolioMatchFeeAmtUnPayMap.put(minVdatePortfolioId, entrust.getMarchFeeAmtPay().subtract(reduceUnPay).add(portfolioMatchFeeAmtUnPayMap.get(minVdatePortfolioId)));
+        }
 
         for(ExchangeTransMatchCommonEntrustDetailDto entrustDetailDto : entrustDetailDtoList) {
-            entrustDetailDto.setMarchQty(null == portfolioMatchQtyMap.get(entrustDetailDto.getPortfolioId()) ?
-                    BigDecimal.ZERO : portfolioMatchQtyMap.get(entrustDetailDto.getPortfolioId()));
-            entrustDetailDto.setMarchAmt(null == portfolioMatchAmtMap.get(entrustDetailDto.getPortfolioId()) ?
-                    BigDecimal.ZERO : portfolioMatchAmtMap.get(entrustDetailDto.getPortfolioId()));
-            entrustDetailDto.setMarchFeeAmtPay(null == portfolioMatchFeeAmtPayMap.get(entrustDetailDto.getPortfolioId()) ?
-                    BigDecimal.ZERO : portfolioMatchFeeAmtPayMap.get(entrustDetailDto.getPortfolioId()));
-            entrustDetailDto.setMarchFeeAmtUnPay(null == portfolioMatchFeeAmtUnPayMap.get(entrustDetailDto.getPortfolioId()) ?
-                    BigDecimal.ZERO : portfolioMatchFeeAmtUnPayMap.get(entrustDetailDto.getPortfolioId()));
+            entrustDetailDto.setMarchQty(this.getValueOrZero(portfolioMatchQtyMap.get(entrustDetailDto.getPortfolioId())));
+            entrustDetailDto.setMarchAmt(this.getValueOrZero(portfolioMatchAmtMap.get(entrustDetailDto.getPortfolioId())));
+            entrustDetailDto.setMarchFeeAmtPay(this.getValueOrZero(portfolioMatchFeeAmtPayMap.get(entrustDetailDto.getPortfolioId())));
+            entrustDetailDto.setMarchFeeAmtUnPay(this.getValueOrZero(portfolioMatchFeeAmtUnPayMap.get(entrustDetailDto.getPortfolioId())));
         }
+    }
+
+    private BigDecimal getValueOrZero(BigDecimal value) {
+        if (Objects.isNull(value)) {
+            return BigDecimal.ZERO;
+        }
+        return value;
     }
 
     /**
@@ -598,8 +605,8 @@ public class ExchangeTransMatchCommonService extends BaseService {
      */
     private MinTrdUnitLimitDto getMinTrdUnitLimit(ExchangeTransMatchCommonEntrustDto entrustDto){
         String tradePlat = StringUtil.EMPTY;
-        if(DictCodeListExt3.交易平台_新债平台.getValue().equals(entrustDto.getTradePlat())){
-            tradePlat = StringUtil.isNotEmpty(entrustDto.getDealMode()) ? entrustDto.getDealMode() : DictCodeListExt3.指定交易方式_协商成交.getValue();
+        if(交易平台_新债平台.getValue().equals(entrustDto.getTradePlat())){
+            tradePlat = StringUtil.isNotEmpty(entrustDto.getDealMode()) ? entrustDto.getDealMode() : 指定交易方式_协商成交.getValue();
         }else{
             tradePlat = entrustDto.getTradePlat();
         }
@@ -744,7 +751,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
      */
     private void saveSettleTransDataTotalMatch(SettleTransDataTotalMatch settleTransDataTotalMatch){
         // ZGTFCP-931:手动匹配存在多次匹配需要更新匹配数据而不是重新插入 modify fuyongsheng 20220319 start
-        if(DictCodeListExt3.下行交易匹配类型_自动匹配.getValue().equals(settleTransDataTotalMatch.getMatchClass())){
+        if(下行交易匹配类型_自动匹配.getValue().equals(settleTransDataTotalMatch.getMatchClass())){
             // modify by etliu 20220220 start
             // GNS-928:【广农商场内清算】深交所竞价首期解析SJSMX1文件；重复跑批时，结算下行交易汇总批处理报错
             try {
@@ -782,7 +789,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                                                 SettleTransDataTotalMatch settleTransDataTotalMatch){
         for (SettleDataTotalPledgeMatch settleDataTotalPledgeMatch:settleDataTotalPledgeMatchList) {
             // ZGTFCP-931:手动匹配存在多次匹配需要更新匹配数据而不是重新插入 modify fuyongsheng 20220319 start
-            if(DictCodeListExt3.下行交易匹配类型_自动匹配.getValue().equals(settleTransDataTotalMatch.getMatchClass())){
+            if(下行交易匹配类型_自动匹配.getValue().equals(settleTransDataTotalMatch.getMatchClass())){
                 try {
                     settleDataTotalPledgeMatchMapper.insertSelective(settleDataTotalPledgeMatch);
                 } catch (Exception e) {
@@ -842,12 +849,12 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 List<ExchangeTransMatchBaseTradeDto> baseTradeProductDealDtList = exchangeTransMatchBond4Service.genFinProductTradeDto(dto,commonEntrustDto);
                 exchangeTransMatchBaseTradeDtos.addAll(baseTradeProductDealDtList);
             }
-            else if(StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_配债.getValue())) {
+            else if(StringUtil.equals(commonEntrustDto.getPs(), 交易方向_配债.getValue())) {
                 List<ExchangeTransMatchBaseTradeDto> baseTradeProductDealDtList = exchangeTransMatchBond5Service.genFinProductTradeDto(dto,commonEntrustDto);
                 exchangeTransMatchBaseTradeDtos.addAll(baseTradeProductDealDtList);
             }
-            else if (StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_质押券入库.getValue())
-            || StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_质押券出库.getValue())) {
+            else if (StringUtil.equals(commonEntrustDto.getPs(), 交易方向_质押券入库.getValue())
+            || StringUtil.equals(commonEntrustDto.getPs(), 交易方向_质押券出库.getValue())) {
                 List<ExchangeTransMatchBaseTradeDto> baseTradeProductDealDtList = exchangeTransMatchBond6Service.genFinProductTradeDto(dto,commonEntrustDto);
                 exchangeTransMatchBaseTradeDtos.addAll(baseTradeProductDealDtList);
             }
@@ -871,15 +878,15 @@ public class ExchangeTransMatchCommonService extends BaseService {
             //协议回购
             else {
                 List<ExchangeTransMatchBaseTradeDto> baseTradeProductDealDtList = null;
-                if(StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())
-                || StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())) {
+                if(StringUtil.equals(commonEntrustDto.getPs(), 交易方向_中途换券.getValue())
+                || StringUtil.equals(commonEntrustDto.getPs(), 交易方向_解除质押.getValue())) {
                     baseTradeProductDealDtList = exchangeTransMatchRepo3Service.genFinProductTradeDto(dto,commonEntrustDto);
                 }
-                else if (StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_到期续做.getValue())){
+                else if (StringUtil.equals(commonEntrustDto.getPs(), 交易方向_到期续做.getValue())){
                     baseTradeProductDealDtList = exchangeTransMatchRepo4Service.genFinProductTradeDto(dto,commonEntrustDto);
                 }
-                else if (StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_提前购回.getValue())
-                || StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_到期购回.getValue())){
+                else if (StringUtil.equals(commonEntrustDto.getPs(), 交易方向_提前购回.getValue())
+                || StringUtil.equals(commonEntrustDto.getPs(), 交易方向_到期购回.getValue())){
                     baseTradeProductDealDtList = exchangeTransMatchRepo5Service.genFinProductTradeDto(dto,commonEntrustDto);
                 }
                 else { // 首期
@@ -917,8 +924,8 @@ public class ExchangeTransMatchCommonService extends BaseService {
         // modify by etliu 20220110 end
 
         //中途换券和解除质押时需要处理 质押券置换和质押券置换结果
-        if(StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())
-                || StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())) {
+        if(StringUtil.equals(commonEntrustDto.getPs(), 交易方向_中途换券.getValue())
+                || StringUtil.equals(commonEntrustDto.getPs(), 交易方向_解除质押.getValue())) {
             TrdFinProductDealTotal trdFinProductDealTotal = exchangeTransMatchBaseTradeDtos.get(0).getTrdFinProductDealTotal();
             FinPledgeDisplace finPledgeDisplace = exchangeTransMatchRepo3Service.genFinPledgeDisplace(trdFinProductDealTotal);
             finPledgeDisplaceMapper.insertSelective(finPledgeDisplace);
@@ -929,9 +936,9 @@ public class ExchangeTransMatchCommonService extends BaseService {
 
                     // modify by etliu 20220110 start
                     // GZYHTZJY-1032: 协议回购的头寸处理，需要走PTL_POSITION_FLOW_CFG配置
-                    if (StringUtil.equals(DictCodeListExt3.质押券置换_置换方向_换出.getValue(), finPledgeDisplaceDetail.getTradeType())) {
+                    if (StringUtil.equals(质押券置换_置换方向_换出.getValue(), finPledgeDisplaceDetail.getTradeType())) {
                         finPledgeDisplaceDetailHuanChu = finPledgeDisplaceDetail;
-                    }else if(StringUtil.equals(DictCodeListExt3.质押券置换_置换方向_换入.getValue(), finPledgeDisplaceDetail.getTradeType())){
+                    }else if(StringUtil.equals(质押券置换_置换方向_换入.getValue(), finPledgeDisplaceDetail.getTradeType())){
                         finPledgeDisplaceDetailHuanRu = finPledgeDisplaceDetail;
                     }
                     // modify by etliu 20220110 end
@@ -953,7 +960,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 for(FinPledgeDisplaceResult finPledgeDisplaceResult:finPledgeDisplaceResultList) {
                     finPledgeDisplaceResultMapper.insertSelective(finPledgeDisplaceResult);
                 }
-                if(StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())){
+                if(StringUtil.equals(commonEntrustDto.getPs(), 交易方向_解除质押.getValue())){
                     firstFinDealPledgeTempList.addAll(firstFinDealPledgeList);
                 }
             }
@@ -1062,8 +1069,8 @@ public class ExchangeTransMatchCommonService extends BaseService {
             }
 
             //质押券出入库需要处理标准券入出库表和标准券入出库明细表
-            if (StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_质押券入库.getValue())
-                    || StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_质押券出库.getValue())) {
+            if (StringUtil.equals(commonEntrustDto.getPs(), 交易方向_质押券入库.getValue())
+                    || StringUtil.equals(commonEntrustDto.getPs(), 交易方向_质押券出库.getValue())) {
                 TrdStasecFlow trdStasecFlow = exchangeTransMatchBond6Service.generateTrdStasecFlow(dto,commonEntrustDto,baseTradeProductDealDto.getTrdProductDeal());
                 trdStasecFlowMapper.insertSelective(trdStasecFlow);
 
@@ -1138,8 +1145,8 @@ public class ExchangeTransMatchCommonService extends BaseService {
             exchangeTransMatchRepoCommonService.handlePositionOfXyhg(dto, commonEntrustDto, exchangeTransMatchBaseTradeDtos,
                     finPledgeDisplaceDetailHuanChu, finPledgeDisplaceDetailHuanRu, firstFinDealPledgeTempList);
         }
-        else if(StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_质押券入库.getValue())
-                || StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_质押券出库.getValue())){
+        else if(StringUtil.equals(commonEntrustDto.getPs(), 交易方向_质押券入库.getValue())
+                || StringUtil.equals(commonEntrustDto.getPs(), 交易方向_质押券出库.getValue())){
             // 处理质押券出入库头寸
             exchangeTransMatchBondCommonService.handlePositionOfZyQ(finProductTradeDto);
         }
@@ -1162,7 +1169,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                                               List<FinDealPledge> firstFinDealPledgeList, ExchangeTransMatchCommonEntrustDto commonEntrustDto){
         List<FinDealPledge> finDealPledgeList = new ArrayList<>();
         //中途换券需要更新首期的质押品信息
-        if(StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_中途换券.getValue())) {
+        if(StringUtil.equals(commonEntrustDto.getPs(), 交易方向_中途换券.getValue())) {
             // 更新首期质押品信息FinDealPledge
             if(!DictCodeListStl.业务场景分类明细_债券协议正回购_换券_换钱.getValue().equals(dto.getBusiSceneCalss())){
                 for(FinDealPledge finDealPledge:firstFinDealPledgeList) {
@@ -1178,9 +1185,9 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     // 金融产品代码
                     newFinDealPledge.setFinprodId(dealTotal.getFinprodId());
                     // 换入质押券
-                    SettleTransDataTotalPledge inPledge = table.get(newFinDealPledge.getPledgeFinprodId(), DictCodeListExt3.质押券置换_置换方向_换入.getValue());
+                    SettleTransDataTotalPledge inPledge = table.get(newFinDealPledge.getPledgeFinprodId(), 质押券置换_置换方向_换入.getValue());
                     // 换出质押券
-                    SettleTransDataTotalPledge outPledge = table.get(newFinDealPledge.getPledgeFinprodId(), DictCodeListExt3.质押券置换_置换方向_换出.getValue());
+                    SettleTransDataTotalPledge outPledge = table.get(newFinDealPledge.getPledgeFinprodId(), 质押券置换_置换方向_换出.getValue());
                     if(null != inPledge){
                         // 如果换入的质押券跟首期一致,则券面总额、质押券数量相加
                         newFinDealPledge.setPledgeNumber(ArithmeticUtil.doAdd(newFinDealPledge.getPledgeNumber(), inPledge.getPledgeNumber()));
@@ -1200,7 +1207,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                         .collect(Collectors.toList());
                 // 筛选出此次换入并且不在首期里的质押券
                 List<SettleTransDataTotalPledge> inpledges = dto.getSettleTransDataTotalPledgeList().stream()
-                        .filter(item -> DictCodeListExt3.质押券置换_置换方向_换入.getValue().equals(item.getDisplaceDirection())
+                        .filter(item -> 质押券置换_置换方向_换入.getValue().equals(item.getDisplaceDirection())
                                 && !firstPladgeFinprodIds.contains(item.getPledgeFinprodId()))
                         .collect(Collectors.toList());
                 if(CollectionUtils.isNotEmpty(inpledges)){
@@ -1235,7 +1242,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
             }
         }
         // 解除质押需要删除首期的质押品信息 解除质押原先删除是为了防止再次操作,但实际也不会再次操作,所以可以不用删除
-//        else if(StringUtil.equals(commonEntrustDto.getPs(), DictCodeListExt3.交易方向_解除质押.getValue())){
+//        else if(StringUtil.equals(commonEntrustDto.getPs(), 交易方向_解除质押.getValue())){
 //            for(FinDealPledge finDealPledge:firstFinDealPledgeList) {
 //                finDealPledgeMapper.deleteByPrimaryKey(finDealPledge);
 //            }
@@ -1314,11 +1321,11 @@ public class ExchangeTransMatchCommonService extends BaseService {
             settleDataTotalPledgeMatchList.add(settleDataTotalPledgeMatch);
         }
         //匹配类别选择记录的质押品不为空 and 交易方向 = 中途换券 or 解除质押
-        else if(StringUtil.equals(dealDto.getPs(),DictCodeListExt3.交易方向_中途换券.getValue())
-        || StringUtil.equals(dealDto.getPs(),DictCodeListExt3.交易方向_解除质押.getValue())) {
+        else if(StringUtil.equals(dealDto.getPs(),交易方向_中途换券.getValue())
+        || StringUtil.equals(dealDto.getPs(),交易方向_解除质押.getValue())) {
             for(SettleTransDataTotalPledge settleTransDataTotalPledge:dealDto.getSettleTransDataTotalPledgeList()) {
                 SettleDataTotalPledgeMatch settleDataTotalPledgeMatch = new SettleDataTotalPledgeMatch();
-                if(StringUtil.equals(dealDto.getPs(),DictCodeListExt3.交易方向_中途换券.getValue())) {
+                if(StringUtil.equals(dealDto.getPs(),交易方向_中途换券.getValue())) {
                     //成交列表选择记录.流水号
                     settleDataTotalPledgeMatch.setSeqNo(dealDto.getSeqId());
                     //匹配列表选择记录.业务编号
@@ -1343,7 +1350,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     settleDataTotalPledgeMatch.setDisplaceDirection(settleTransDataTotalPledge.getDisplaceDirection());
 
                 }
-                else if(StringUtil.equals(dealDto.getPs(),DictCodeListExt3.交易方向_解除质押.getValue())){
+                else if(StringUtil.equals(dealDto.getPs(),交易方向_解除质押.getValue())){
                     //成交列表选择记录.流水号
                     settleDataTotalPledgeMatch.setSeqNo(dealDto.getSeqId());
                     //匹配列表选择记录.业务编号
@@ -1564,7 +1571,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
             //质押式协议回购处理质押券置换，质押券置换明细，质押券置换结果，回购质押品 表数据
             List<ExchangeTransMatchCommonRevokeDto> repoRevokeDtoList = dtoList.stream()
                     .filter(item -> StringUtil.equals(item.getIsTotalDeal(),DictCodeList.是否_是.getValue())
-                            && (StringUtil.equals(item.getPs(), DictCodeListExt3.交易方向_中途换券.getValue()) || StringUtil.equals(item.getPs(), DictCodeListExt3.交易方向_解除质押.getValue()))).collect(Collectors.toList());
+                            && (StringUtil.equals(item.getPs(), 交易方向_中途换券.getValue()) || StringUtil.equals(item.getPs(), 交易方向_解除质押.getValue()))).collect(Collectors.toList());
             if(!StringUtil.isEmptyList(repoRevokeDtoList)) {
                 //以汇总交易编号分组处理 质押券置换，质押券置换明细
                 Map<String,List<ExchangeTransMatchCommonRevokeDto>> repoRevokeDtoListMap = repoRevokeDtoList.stream().collect(Collectors.groupingBy(ExchangeTransMatchCommonRevokeDto::getTradeIdTg));
@@ -1589,15 +1596,15 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     if(!StringUtil.isEmptyList(finPledgeDisplaceResultList)) {
                         //更新首期的质押品信息
                         // ZGTFCP-1805 : 先filter再findFirst modify by fuyongsheng 20220324 start
-                        // FinPledgeDisplaceResult finPledgeDisplaceResult = finPledgeDisplaceResultList.stream().findFirst().filter(result->StringUtil.equals(result.getResultType(),DictCodeListExt3.质押券置换_置换结果_置换前.getValue())).get();
-                        // FinPledgeDisplaceResult finPledgeDisplaceResult = finPledgeDisplaceResultList.stream().filter(result->StringUtil.equals(result.getResultType(),DictCodeListExt3.质押券置换_置换结果_置换前.getValue())).findFirst().get();
+                        // FinPledgeDisplaceResult finPledgeDisplaceResult = finPledgeDisplaceResultList.stream().findFirst().filter(result->StringUtil.equals(result.getResultType(),质押券置换_置换结果_置换前.getValue())).get();
+                        // FinPledgeDisplaceResult finPledgeDisplaceResult = finPledgeDisplaceResultList.stream().filter(result->StringUtil.equals(result.getResultType(),质押券置换_置换结果_置换前.getValue())).findFirst().get();
                         // ZGTFCP-1805 : 先filter再findFirst modify by fuyongsheng 20220324 end
                         List<FinPledgeDisplaceResult> finPledgeDisplaceResults = finPledgeDisplaceResultList
                                 .stream()
-                                .filter(result->StringUtil.equals(result.getResultType(),DictCodeListExt3.质押券置换_置换结果_置换前.getValue()))
+                                .filter(result->StringUtil.equals(result.getResultType(),质押券置换_置换结果_置换前.getValue()))
                                 .collect(Collectors.toList());
                         // modify by fuyongsheng 撤销中途换券交易,要删除质押品表,登录质押品置换表置换前数据
-                        if(StringUtil.equals(itemList.get(0).getPs(), DictCodeListExt3.交易方向_中途换券.getValue())){
+                        if(StringUtil.equals(itemList.get(0).getPs(), 交易方向_中途换券.getValue())){
 //                            List<FinDealPledge> firstFinDealPledgeList = exchangeTransMatchRepo3Service.getFirstRepoFinDealPledge(settleTransDataTotal.getfCjbh(),settleTransDataTotal.getVdate(),itemList.get(0).getPortfolioId());
                             List<FinDealPledge> firstFinDealPledgeList = exchangeTransMatchRepo3Service.getFirstRepoFinDealPledge(
                                     settleTransDataTotal.getfCjbh(),settleTransDataTotal.getVdate(),
@@ -1697,10 +1704,10 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 //取得剩余匹配份额
                 BigDecimal remainNum = exchangeTransMatchCommonMapper.getRemainNum(dto.getSeqNo());
                 if(settleTransDataTotalAdd != null && DictCodeList.回购类型_质押式协议回购.getValue().equals(settleTransDataTotalAdd.getRepoType())){
-                    settleTransDataTotalStatus.setMatchStatus(DictCodeListExt3.下行交易匹配状态_未匹配.getValue());
+                    settleTransDataTotalStatus.setMatchStatus(下行交易匹配状态_未匹配.getValue());
                 }else{
                     settleTransDataTotalStatus.setMatchStatus(BigDecimal.ZERO.compareTo(remainNum) >=0
-                            ?DictCodeListExt3.下行交易匹配状态_未匹配.getValue():DictCodeListExt3.下行交易匹配状态_部分匹配.getValue());
+                            ?下行交易匹配状态_未匹配.getValue():下行交易匹配状态_部分匹配.getValue());
                 }
                 settleTransDataTotalStatus.setUpdateTime(new Date());
                 settleTransDataTotalStatus.setUpdateUser(StringUtil.isNotEmpty(LoginUserUtil.getUserName())?LoginUserUtil.getUserName():"system");
@@ -1711,10 +1718,10 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 //取得剩余匹配份额
                 BigDecimal remainNum = exchangeTransMatchCommonMapper.getRemainNum(dto.getSeqNo());
                 if(settleTransDataTotalAdd != null && DictCodeList.回购类型_质押式协议回购.getValue().equals(settleTransDataTotalAdd.getRepoType())){
-                    settleTransDataTotalStatus.setMatchStatus(DictCodeListExt3.下行交易匹配状态_未匹配.getValue());
+                    settleTransDataTotalStatus.setMatchStatus(下行交易匹配状态_未匹配.getValue());
                 }else{
                     settleTransDataTotalStatus.setMatchStatus(BigDecimal.ZERO.compareTo(remainNum) >=0
-                            ?DictCodeListExt3.下行交易匹配状态_未匹配.getValue():DictCodeListExt3.下行交易匹配状态_部分匹配.getValue());
+                            ?下行交易匹配状态_未匹配.getValue():下行交易匹配状态_部分匹配.getValue());
                 }
                 // XYHGFXSJ-782:协议回购没有部分匹配,所以撤销肯定是未匹配 modify by fuyongsheng 20220802 end
                 settleTransDataTotalStatus.setUpdateTime(new Date());
@@ -1730,7 +1737,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
      * @param commonEntrustDtoList
      * @param matchStatus
      */
-    private Pair<String, List<ExchangeTransMatchCommonEntrustDto>> calcShareAndAmount(ExchangeTransMatchCommonDto dto,List<ExchangeTransMatchCommonEntrustDto> commonEntrustDtoList,String matchStatus){
+    private Pair<String, List<ExchangeTransMatchCommonEntrustDto>> calcShareAndAmountV0(ExchangeTransMatchCommonDto dto,List<ExchangeTransMatchCommonEntrustDto> commonEntrustDtoList,String matchStatus){
         //只有一条匹配指令时
         if(dto.getEntrustIdList().size() == 1) {
             ExchangeTransMatchCommonEntrustDto commonEntrustDto = commonEntrustDtoList.get(0);
@@ -1751,33 +1758,45 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 commonEntrustDto.setMarchQtyEn(marchQty);
 
             }
-            else if(StringUtil.equals(commonEntrustDto.getTargetType(),DictCodeListExt3.目标类型_数量.getValue())) {
+            else if(StringUtil.equals(commonEntrustDto.getTargetType(),目标类型_数量.getValue())) {
                 //已匹配份额
                 BigDecimal marchQty = BigDecimal.ZERO.compareTo(ArithmeticUtil.subtract(dto.getRemainNum(), commonEntrustDto.getRemainEntrustNum()))>0?dto.getRemainNum() : commonEntrustDto.getRemainEntrustNum();
                 commonEntrustDto.setMarchQty(marchQty);
                 //已匹配金额
                 if(StringUtil.equals(dto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
                     //质押券出入库成交信息中只有质押券的数量，目标类型只有数量，需要根据折算率计算标准券数量
-                    if(StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_质押券入库.getValue())
-                            || StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_质押券出库.getValue())) {
+                    if(StringUtil.equals(dto.getPs(), 交易方向_质押券入库.getValue())
+                            || StringUtil.equals(dto.getPs(), 交易方向_质押券出库.getValue())) {
                         //已匹配金额
-                        commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(marchQty,commonEntrustDto.getPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
+                        if (marchQty.compareTo(dto.getRemainNum()) == 0) {
+                            commonEntrustDto.setMarchAmt(dto.getRemainAmount());
+                        } else {
+                            commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(marchQty, commonEntrustDto.getPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
+                        }
                     }
                     // modify by etliu 20220227 start
                     // 广农商二阶段 GNS-920:【广农商场内清算】广农商场内债转股清算交易生成后，对应的持仓流水更新有误
-                    else if (StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_债转股.getValue())) {
+                    else if (StringUtil.equals(dto.getPs(), 交易方向_债转股.getValue())) {
                         //已匹配金额（债转股只考虑成交数据和指令一对一的场景）
                         commonEntrustDto.setMarchAmt(dto.getFpriceAmt());
                     }
                     // modify by etliu 20220227 end
                     else {
                         //已匹配金额
-                        commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(marchQty,dto.getUnitFprice()).setScale(2, BigDecimal.ROUND_HALF_UP));
+                        if (marchQty.compareTo(dto.getRemainNum()) == 0) {
+                            commonEntrustDto.setMarchAmt(dto.getRemainAmount());
+                        } else {
+                            commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(marchQty,dto.getUnitFprice()).setScale(2, BigDecimal.ROUND_HALF_UP));
+                         }
                     }
 
                 }
                 else {
-                    commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(marchQty,dto.getUnitCprice()).setScale(2, BigDecimal.ROUND_HALF_UP));
+                    if (marchQty.compareTo(dto.getRemainNum()) == 0) {
+                        commonEntrustDto.setMarchAmt(dto.getRemainAmount());
+                    } else {
+                        commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(marchQty, dto.getUnitCprice()).setScale(2, BigDecimal.ROUND_HALF_UP));
+                    }
                 }
 
                 //指令已匹配份额
@@ -1810,23 +1829,23 @@ public class ExchangeTransMatchCommonService extends BaseService {
             if(StringUtil.equals(dto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
                     || StringUtil.equals(dto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())) {
                 if(BigDecimal.ZERO.compareTo(ArithmeticUtil.subtract(dto.getRemainNum(),commonEntrustDto.getRemainEntrustAmt())) >=0) {
-                    matchStatus = DictCodeListExt3.下行交易匹配状态_匹配完成.getValue();
+                    matchStatus = 下行交易匹配状态_匹配完成.getValue();
                 }
                 else {
-                    matchStatus = DictCodeListExt3.下行交易匹配状态_部分匹配.getValue();
+                    matchStatus = 下行交易匹配状态_部分匹配.getValue();
                 }
             }
-            else if((StringUtil.equals(commonEntrustDto.getTargetType(),DictCodeListExt3.目标类型_数量.getValue())
+            else if((StringUtil.equals(commonEntrustDto.getTargetType(),目标类型_数量.getValue())
                     && BigDecimal.ZERO.compareTo(ArithmeticUtil.subtract(dto.getRemainNum(),commonEntrustDto.getRemainEntrustNum())) >=0)
-                    || (StringUtil.equals(commonEntrustDto.getTargetType(),DictCodeListExt3.目标类型_金额.getValue())
+                    || (StringUtil.equals(commonEntrustDto.getTargetType(),目标类型_金额.getValue())
                     && BigDecimal.ZERO.compareTo(ArithmeticUtil.subtract(dto.getRemainNum(),ArithmeticUtil.divide(commonEntrustDto.getRemainEntrustAmt(),dto.getUnitCprice(),4))) >=0)) {
-                matchStatus = DictCodeListExt3.下行交易匹配状态_匹配完成.getValue();
+                matchStatus = 下行交易匹配状态_匹配完成.getValue();
             }
-            else if((StringUtil.equals(commonEntrustDto.getTargetType(),DictCodeListExt3.目标类型_数量.getValue())
+            else if((StringUtil.equals(commonEntrustDto.getTargetType(),目标类型_数量.getValue())
                     && BigDecimal.ZERO.compareTo(ArithmeticUtil.subtract(dto.getRemainNum(),commonEntrustDto.getRemainEntrustNum())) < 0)
-                    || (StringUtil.equals(commonEntrustDto.getTargetType(),DictCodeListExt3.目标类型_金额.getValue())
+                    || (StringUtil.equals(commonEntrustDto.getTargetType(),目标类型_金额.getValue())
                     && BigDecimal.ZERO.compareTo(ArithmeticUtil.subtract(dto.getRemainNum(),ArithmeticUtil.divide(commonEntrustDto.getRemainEntrustAmt(),dto.getUnitCprice(),4))) < 0)){
-                matchStatus = DictCodeListExt3.下行交易匹配状态_部分匹配.getValue();
+                matchStatus = 下行交易匹配状态_部分匹配.getValue();
             }
             // modify by etliu 20220228 start
             // 广农商二阶段 GNS-834:【广农商场内清算】上交所基金买入卖出，手动匹配生成的交易，随交易支付费用值没登
@@ -1838,18 +1857,18 @@ public class ExchangeTransMatchCommonService extends BaseService {
         else {
             //处理可分配份额和可分配金额
             BigDecimal totalMarchQty = BigDecimal.ZERO;
-            matchStatus = DictCodeListExt3.下行交易匹配状态_未匹配.getValue();
+            matchStatus = 下行交易匹配状态_未匹配.getValue();
             for(ExchangeTransMatchCommonEntrustDto commonEntrustDto : commonEntrustDtoList) {
                 if(StringUtil.equals(dto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue())
                         || StringUtil.equals(dto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())) {
                     commonEntrustDto.setMarchQty(commonEntrustDto.getRemainEntrustAmt());
                     commonEntrustDto.setMarchAmt(commonEntrustDto.getRemainEntrustAmt());
                 }
-                else if(StringUtil.equals(commonEntrustDto.getTargetType(),DictCodeListExt3.目标类型_数量.getValue())) {
+                else if(StringUtil.equals(commonEntrustDto.getTargetType(),目标类型_数量.getValue())) {
                     commonEntrustDto.setMarchQty(commonEntrustDto.getRemainEntrustNum());
                     if(StringUtil.equals(dto.getFinprodType2(),DictCodeListExt1.金融产品类型_投管用_债券.getValue())) {
-                        if(StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_质押券入库.getValue())
-                                || StringUtil.equals(dto.getPs(), DictCodeListExt3.交易方向_质押券出库.getValue())) {
+                        if(StringUtil.equals(dto.getPs(), 交易方向_质押券入库.getValue())
+                                || StringUtil.equals(dto.getPs(), 交易方向_质押券出库.getValue())) {
                             commonEntrustDto.setMarchAmt(ArithmeticUtil.multiply(commonEntrustDto.getRemainEntrustNum(),commonEntrustDto.getPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
                         }
                         else {
@@ -1884,7 +1903,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                         commonEntrustDto.setMarchQtyEn(ArithmeticUtil.divide(commonEntrustDto.getRemainEntrustNum(),new BigDecimal(100),2));
                         commonEntrustDto.setMarchAmtEn(commonEntrustDto.getRemainEntrustAmt());
                     }
-                    else if(StringUtil.equals(commonEntrustDto.getTargetType(),DictCodeListExt3.目标类型_数量.getValue())) {
+                    else if(StringUtil.equals(commonEntrustDto.getTargetType(),目标类型_数量.getValue())) {
                         commonEntrustDto.setMarchQtyEn(commonEntrustDto.getRemainEntrustNum());
                         commonEntrustDto.setMarchAmtEn(ArithmeticUtil.multiply(commonEntrustDto.getRemainEntrustNum(),commonEntrustDto.getPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
                     }
@@ -1899,8 +1918,8 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     commonEntrustDto.setMarchFeeAmtUnPay(ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),dto.getRemainNum(),4),dto.getTotalUnFeeAmtPay()).setScale(2, BigDecimal.ROUND_HALF_UP));
                     // modify by etliu 20220228 end
                 }
-//                matchStatus = DictCodeListExt3.下行交易匹配状态_匹配完成.getValue();
-                matchStatus = DictCodeListExt3.下行交易匹配状态_部分匹配.getValue();
+//                matchStatus = 下行交易匹配状态_匹配完成.getValue();
+                matchStatus = 下行交易匹配状态_部分匹配.getValue();
             }
             else {
                 //临时存储
@@ -1940,7 +1959,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                                 commonEntrustDto.setMarchQtyEn(ArithmeticUtil.divide(commonEntrustDto.getRemainEntrustNum(),new BigDecimal(100),2));
                                 commonEntrustDto.setMarchAmtEn(commonEntrustDto.getRemainEntrustAmt());
                             }
-                            else if(StringUtil.equals(commonEntrustDto.getTargetType(),DictCodeListExt3.目标类型_数量.getValue())) {
+                            else if(StringUtil.equals(commonEntrustDto.getTargetType(),目标类型_数量.getValue())) {
                                 commonEntrustDto.setMarchQtyEn(commonEntrustDto.getRemainEntrustNum());
                                 commonEntrustDto.setMarchAmtEn(ArithmeticUtil.multiply(commonEntrustDto.getRemainEntrustNum(),commonEntrustDto.getPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
                             }
@@ -1970,7 +1989,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                                 commonEntrustDto.setMarchQtyEn(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),new BigDecimal(100),2) );
                                 commonEntrustDto.setMarchAmtEn(commonEntrustDto.getMarchAmt());
                             }
-                            else if(StringUtil.equals(commonEntrustDto.getTargetType(),DictCodeListExt3.目标类型_数量.getValue())) {
+                            else if(StringUtil.equals(commonEntrustDto.getTargetType(),目标类型_数量.getValue())) {
                                 //指令已匹配份额
                                 commonEntrustDto.setMarchQtyEn(commonEntrustDto.getMarchQty());
                                 //指令已匹配金额
@@ -2029,7 +2048,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
 
                         commonEntrustDto.setMarchQty(marchQty);
                         commonEntrustDto.setMarchAmt(marchAmt);
-                        if(StringUtil.equals(commonEntrustDto.getTargetType(),DictCodeListExt3.目标类型_数量.getValue())) {
+                        if(StringUtil.equals(commonEntrustDto.getTargetType(),目标类型_数量.getValue())) {
                             commonEntrustDto.setMarchQtyEn(ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),totalMarchQty,4),dto.getRemainNum()));
                             commonEntrustDto.setMarchAmtEn(ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),totalMarchQty,4),dto.getRemainNum(),commonEntrustDto.getPrice()));
                         }
@@ -2051,14 +2070,336 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 commonEntrustDtoList = new ArrayList<>();
                 commonEntrustDtoList.addAll(commonEntrustDtoListTmp);
                 if(dto.getRemainNum().compareTo(totalFinishMarchQty) >0 || dto.getRemainAmount().compareTo(totalFinishMarchAmt) >0){
-                    matchStatus = DictCodeListExt3.下行交易匹配状态_部分匹配.getValue();
+                    matchStatus = 下行交易匹配状态_部分匹配.getValue();
                 }else{
-                    matchStatus = DictCodeListExt3.下行交易匹配状态_匹配完成.getValue();
+                    matchStatus = 下行交易匹配状态_匹配完成.getValue();
                 }
             }
         }
 
         return Pair.of(matchStatus, commonEntrustDtoList);
+    }
+
+    /**
+     * 计算处理已分配份额，已分配金额，指令已分配金额，指令已分配份额
+     * @param dto
+     * @param commonEntrustDtoList
+     * @param matchStatus
+     */
+    private Pair<String, List<ExchangeTransMatchCommonEntrustDto>> calcShareAndAmount(ExchangeTransMatchCommonDto dto,List<ExchangeTransMatchCommonEntrustDto> commonEntrustDtoList,String matchStatus){
+        //只有一条匹配指令时
+        if(dto.getEntrustIdList().size() == 1) {
+            ExchangeTransMatchCommonEntrustDto commonEntrustDto = commonEntrustDtoList.get(0);
+            matchStatus = calcShareAndAmountWithSingleEntrust(dto, commonEntrustDto);
+        }
+        //多条指令匹配时
+        else {
+            matchStatus = calcShareAndAmountWithMultiEntrust(dto, commonEntrustDtoList);
+        }
+
+        return Pair.of(matchStatus, commonEntrustDtoList);
+    }
+
+    private String calcShareAndAmountWithSingleEntrust(ExchangeTransMatchCommonDto dto,ExchangeTransMatchCommonEntrustDto entrust) {
+        // 出参 匹配状态
+        String matchStatus = 下行交易匹配状态_未匹配.getValue();
+
+        //特殊处理质押式竞价回购的分配逻辑
+        if(this.isRepo(dto.getFinprodType2())) {
+            //已匹配份额
+            BigDecimal marchQty = this.min(entrust.getRemainEntrustNum(), this.divide100(dto.getRemainNum()));
+            entrust.setMarchQty(this.multiply100(marchQty));
+            //已匹配金额
+            entrust.setMarchAmt(entrust.getMarchQty());
+            //指令已匹配份额
+            entrust.setMarchQtyEn(marchQty);
+            //指令已匹配金额
+            entrust.setMarchAmtEn(entrust.getMarchAmt());
+            //匹配状态
+            matchStatus = this.bigThan(dto.getRemainNum(),entrust.getRemainEntrustAmt()) ?
+                    下行交易匹配状态_部分匹配.getValue() : 下行交易匹配状态_匹配完成.getValue();
+        }
+        else if(isNumEntrust(entrust.getTargetType())) {
+            //已匹配份额
+            BigDecimal marchQty = this.min(dto.getRemainNum(), entrust.getRemainEntrustNum());
+            entrust.setMarchQty(marchQty);
+            //已匹配金额
+            if(this.isBond(dto.getFinprodType2())) {
+                //质押券出入库成交信息中只有质押券的数量，目标类型只有数量，需要根据折算率计算标准券数量
+                if(this.isPledgeCouponsInOrOut(dto.getPs())) {
+                    entrust.setMarchAmt(this.equals(marchQty, dto.getRemainNum()) ? dto.getRemainNum() : this.multiplyWithScale2(marchQty, entrust.getPrice()));
+                }
+                // 广农商二阶段 GNS-920:【广农商场内清算】广农商场内债转股清算交易生成后，对应的持仓流水更新有误
+                else if (isBond2Stock(dto.getPs())) {
+                    //已匹配金额（债转股只考虑成交数据和指令一对一的场景）
+                    entrust.setMarchAmt(dto.getFpriceAmt());
+                }
+                else {
+                    entrust.setMarchAmt(this.equals(marchQty,dto.getRemainNum()) ? dto.getRemainAmount() : this.multiplyWithScale2(marchQty,dto.getUnitFprice()));
+                }
+            }
+            else {
+                entrust.setMarchAmt(this.equals(marchQty, dto.getRemainNum()) ? dto.getRemainAmount() : this.multiplyWithScale2(marchQty, dto.getUnitCprice()));
+            }
+
+            //指令已匹配份额
+            BigDecimal marchQtyEn = this.min(dto.getRemainNum(), entrust.getRemainEntrustNum());
+            entrust.setMarchQtyEn(marchQtyEn);
+            //指令已匹配金额
+            entrust.setMarchAmtEn(this.multiplyWithScale2(marchQtyEn, entrust.getPrice()));
+            //匹配状态
+            matchStatus = this.bigThan(dto.getRemainNum(),entrust.getRemainEntrustNum()) ?
+                    下行交易匹配状态_部分匹配.getValue() : 下行交易匹配状态_匹配完成.getValue();
+        }
+        else {
+            //已匹配份额
+            BigDecimal entrustQty = ArithmeticUtil.divide(entrust.getRemainEntrustAmt(),dto.getUnitCprice(),4);
+            entrust.setMarchQty(this.min(dto.getRemainNum(), entrustQty));
+            //已匹配金额
+            BigDecimal entrustAmt = this.multiplyWithScale2(entrustQty, this.isBond(dto.getFinprodType2()) ? dto.getUnitFprice() : dto.getUnitCprice());
+            entrust.setMarchAmt(this.min(dto.getRemainAmount(),entrustAmt));
+            //指令已匹配份额
+            BigDecimal marchAmtEn = this.multiplyWithScale2(dto.getRemainNum(),dto.getUnitCprice());
+            entrust.setMarchQtyEn(ArithmeticUtil.divide(this.min(marchAmtEn,entrust.getRemainEntrustAmt()),entrust.getPrice(),4));
+            //指令已匹配金额
+            entrust.setMarchAmtEn(this.min(marchAmtEn,entrust.getRemainEntrustAmt()));
+            //匹配状态
+            matchStatus = this.bigThan(dto.getRemainNum(),this.divideWithScale4(entrust.getRemainEntrustAmt(),dto.getUnitCprice())) ?
+                    下行交易匹配状态_部分匹配.getValue() : 下行交易匹配状态_匹配完成.getValue();
+        }
+
+        if (Objects.nonNull(dto.getTotalFeeAmtPay())) {
+            entrust.setMarchFeeAmtPay(this.divideWithScale2(this.multiply(entrust.getMarchQty(), dto.getTotalFeeAmtPay()), dto.getRemainNum()));
+        }
+        if (Objects.nonNull(dto.getTotalUnFeeAmtPay())) {
+            entrust.setMarchFeeAmtUnPay(this.divideWithScale2(this.multiply(entrust.getMarchQty(), dto.getTotalUnFeeAmtPay()), dto.getRemainNum()));
+        }
+
+        return matchStatus;
+    }
+
+    private String calcShareAndAmountWithMultiEntrust(ExchangeTransMatchCommonDto dto, List<ExchangeTransMatchCommonEntrustDto> commonEntrustDtoList) {
+        // 出参 匹配状态
+        String matchStatus = 下行交易匹配状态_未匹配.getValue();
+
+        //处理可分配份额和可分配金额
+        BigDecimal totalMarchQty = BigDecimal.ZERO;
+        for(ExchangeTransMatchCommonEntrustDto entrust : commonEntrustDtoList) {
+            if (this.isRepo(dto.getFinprodType2())) {
+                entrust.setMarchQty(entrust.getRemainEntrustAmt());
+                entrust.setMarchAmt(entrust.getRemainEntrustAmt());
+            }
+            else if(isNumEntrust(entrust.getTargetType())) {
+                entrust.setMarchQty(entrust.getRemainEntrustNum());
+                if(this.isBond(dto.getFinprodType2())) {
+                    entrust.setMarchAmt(this.multiplyWithScale2(entrust.getRemainEntrustNum(),
+                            isPledgeCouponsInOrOut(dto.getPs()) ? entrust.getPrice() : dto.getUnitFprice()));
+                }
+                else {
+                    entrust.setMarchAmt(this.multiplyWithScale2(entrust.getRemainEntrustNum(),dto.getUnitCprice()));
+                }
+            }
+            else {
+                entrust.setMarchQty(this.divideWithScale4(entrust.getRemainEntrustAmt(),dto.getUnitCprice()));
+                entrust.setMarchAmt(this.isBond(dto.getFinprodType2()) ?
+                        this.divideWithScale2(entrust.getRemainEntrustAmt().multiply(dto.getUnitFprice()), dto.getUnitCprice())
+                        : entrust.getRemainEntrustAmt());
+            }
+            totalMarchQty = ArithmeticUtil.doAdd(totalMarchQty,entrust.getMarchQty());
+        }
+
+        // 未能完全匹配的场景
+        if (this.bigThan(dto.getRemainNum(), totalMarchQty)) {
+            matchStatus = 下行交易匹配状态_部分匹配.getValue();
+            for(ExchangeTransMatchCommonEntrustDto entrust : commonEntrustDtoList) {
+                if (this.isRepo(dto.getFinprodType2())) {
+                    entrust.setMarchQtyEn(this.divide100(entrust.getRemainEntrustNum()));
+                    entrust.setMarchAmtEn(entrust.getRemainEntrustAmt());
+                }
+                else if(isNumEntrust(entrust.getTargetType())) {
+                    entrust.setMarchQtyEn(entrust.getRemainEntrustNum());
+                    entrust.setMarchAmtEn(this.multiplyWithScale2(entrust.getRemainEntrustNum(),entrust.getPrice()));
+                }
+                else {
+                    entrust.setMarchQtyEn(this.divideWithScale4(entrust.getRemainEntrustAmt(),entrust.getPrice()));
+                    entrust.setMarchAmtEn(entrust.getRemainEntrustAmt());
+                }
+                if (Objects.nonNull(dto.getTotalFeeAmtPay())) {
+                    entrust.setMarchFeeAmtPay(this.divideWithScale2(entrust.getMarchQty().multiply(dto.getTotalFeeAmtPay()), dto.getRemainNum()));
+                }
+                if (Objects.nonNull(dto.getTotalUnFeeAmtPay())) {
+                    entrust.setMarchFeeAmtUnPay(this.divideWithScale2(entrust.getMarchQty().multiply(dto.getTotalUnFeeAmtPay()), dto.getRemainNum()));
+                }
+            }
+        }
+        // 完全匹配的场景
+        else {
+            //临时存储
+            List<ExchangeTransMatchCommonEntrustDto> commonEntrustDtoListTmp = new ArrayList<>();
+            //已经完全匹配的可匹配份额
+            BigDecimal totalFinishMarchQty = BigDecimal.ZERO;
+            //已经完全匹配的可匹配金额
+            BigDecimal totalFinishMarchAmt = BigDecimal.ZERO;
+            //已经完全匹配的可分配随交易费用
+            BigDecimal totalFinishMarchFeeAmtPay = BigDecimal.ZERO;
+            //已经完全匹配的可分配不随交易费用
+            BigDecimal totalFinishMarchUnFeeAmtPay = BigDecimal.ZERO;
+
+            //系统参数.匹配规则
+            String matchRule = CacheUtil.getSysParam("MATCH_RULE");
+            //系统参数.匹配规则 = 按照指令下达时间顺序匹配
+            if(StringUtil.equals(matchRule,"01")) {
+                commonEntrustDtoList = commonEntrustDtoList.stream().sorted(Comparator.comparing(ExchangeTransMatchCommonEntrustDto::getUpdateTime)).collect(Collectors.toList());
+            }
+            //系统参数.匹配规则 = 按照指令金额从高到低匹配
+            else if(StringUtil.equals(matchRule,"02")) {
+                commonEntrustDtoList = commonEntrustDtoList.stream()
+                        .sorted(Comparator.comparing(ExchangeTransMatchCommonEntrustDto::getRemainEntrustAmt).reversed()
+                            .thenComparing(ExchangeTransMatchCommonEntrustDto::getUpdateTime))
+                        .collect(Collectors.toList());
+            }
+
+            if(StringUtil.equals(matchRule,"01") || StringUtil.equals(matchRule,"02")) {
+                for(ExchangeTransMatchCommonEntrustDto entrust : commonEntrustDtoList) {
+                    //已完全匹配的可匹配份额 大于等于 剩余成交数量 时不再继续分配
+                    if (this.bigThanOrEquals(totalFinishMarchQty, dto.getRemainNum())) {
+                        break;
+                    }
+
+                    //能完全分配数据的指令
+                    if (this.bigThan(dto.getRemainNum(), totalFinishMarchQty.add(entrust.getMarchQty()))) {
+                        if(this.isRepo(dto.getFinprodType2())) {
+                            entrust.setMarchQtyEn(this.divide100(entrust.getRemainEntrustNum()));
+                            entrust.setMarchAmtEn(entrust.getRemainEntrustAmt());
+                        }
+                        else if(isNumEntrust(entrust.getTargetType())) {
+                            entrust.setMarchQtyEn(entrust.getRemainEntrustNum());
+                            entrust.setMarchAmtEn(this.multiplyWithScale2(entrust.getRemainEntrustNum(),entrust.getPrice()));
+                        }
+                        else {
+                            entrust.setMarchQtyEn(this.divideWithScale4(entrust.getRemainEntrustAmt(),entrust.getPrice()));
+                            entrust.setMarchAmtEn(entrust.getRemainEntrustAmt());
+                        }
+
+                        entrust.setMarchAmt(entrust.getMarchAmt().setScale(2, BigDecimal.ROUND_HALF_UP));
+                        if (Objects.nonNull(dto.getTotalFeeAmtPay())) {
+                            entrust.setMarchFeeAmtPay(this.divideWithScale2(entrust.getMarchQty().multiply(dto.getTotalFeeAmtPay()), dto.getRemainNum()));
+                        }
+                        if (Objects.nonNull(dto.getTotalUnFeeAmtPay())) {
+                            entrust.setMarchFeeAmtUnPay(this.divideWithScale2(entrust.getMarchQty().multiply(dto.getTotalUnFeeAmtPay()), dto.getRemainNum()));
+                        }
+
+                        entrust.setLastEntrust(false);
+                    }
+                    //最后一笔未能完全分配数据指令
+                    else {
+                        //成交列表选择记录.剩余成交数量 - 匹配列表选择记录中已经完全匹配的可匹配份额
+                        entrust.setMarchQty(ArithmeticUtil.subtract(dto.getRemainNum(),totalFinishMarchQty));
+                        //成交列表选择记录.剩余成交金额 - 匹配列表选择记录中已经完全匹配的可匹配金额
+                        entrust.setMarchAmt(ArithmeticUtil.subtract(dto.getRemainAmount(),totalFinishMarchAmt));
+
+                        if (Objects.nonNull(dto.getTotalFeeAmtPay())) {
+                            entrust.setMarchFeeAmtPay(ArithmeticUtil.subtract(dto.getTotalFeeAmtPay(), totalFinishMarchFeeAmtPay));
+                        }
+                        if (Objects.nonNull(dto.getTotalUnFeeAmtPay())) {
+                            entrust.setMarchFeeAmtUnPay(ArithmeticUtil.subtract(dto.getTotalUnFeeAmtPay(), totalFinishMarchUnFeeAmtPay));
+                        }
+
+                        if(this.isRepo(dto.getFinprodType2())) {
+                            entrust.setMarchQtyEn(this.divide100(entrust.getMarchQty()) );
+                            entrust.setMarchAmtEn(entrust.getMarchAmt());
+                        }
+                        else if(isNumEntrust(entrust.getTargetType())) {
+                            entrust.setMarchQtyEn(entrust.getMarchQty());
+                            entrust.setMarchAmtEn(ArithmeticUtil.multiply(entrust.getMarchQty(),entrust.getPrice()));
+                        }
+                        else {
+                            entrust.setMarchQtyEn(ArithmeticUtil.divide(entrust.getMarchAmt(),entrust.getPrice(),4));
+                            entrust.setMarchAmtEn(entrust.getMarchAmt());
+                        }
+                        entrust.setLastEntrust(true);
+                    }
+
+                    totalFinishMarchQty = ArithmeticUtil.doAdd(totalFinishMarchQty,entrust.getMarchQty());
+                    totalFinishMarchAmt = ArithmeticUtil.doAdd(totalFinishMarchAmt,entrust.getMarchAmt());
+                    totalFinishMarchFeeAmtPay = ArithmeticUtil.doAdd(totalFinishMarchFeeAmtPay,entrust.getMarchFeeAmtPay());
+                    totalFinishMarchUnFeeAmtPay = ArithmeticUtil.doAdd(totalFinishMarchUnFeeAmtPay,entrust.getMarchFeeAmtUnPay());
+
+                    commonEntrustDtoListTmp.add(entrust);
+                }
+            }
+            //系统参数.匹配规则 = 按照指令金额总体占比分配
+            else if(StringUtil.equals(matchRule,"03")) {
+                // 根据组合代码批量设置组合开始日
+                this.fillVdateToExchangeTransMatchCommonEntrustDto(commonEntrustDtoList);
+                // 根据组合开始日逆序排列
+                commonEntrustDtoList = commonEntrustDtoList.stream()
+                        .sorted(Comparator.comparing(ExchangeTransMatchCommonEntrustDto::getPortfolioVdate).reversed())
+                        .collect(Collectors.toList());
+
+                for(int i = 0 ;i< commonEntrustDtoList.size(); i++) {
+                    ExchangeTransMatchCommonEntrustDto entrust = commonEntrustDtoList.get(i);
+                    BigDecimal marchQty = BigDecimal.ZERO;
+                    BigDecimal marchAmt = BigDecimal.ZERO;
+
+                    if(i<commonEntrustDtoList.size()-1) {
+                        marchQty = this.divideWithScale2(this.multiply(entrust.getMarchQty(), dto.getRemainNum()), totalMarchQty);
+                        marchAmt = this.divideWithScale2(this.multiply(entrust.getMarchQty(), dto.getRemainAmount()), totalMarchQty);
+
+                        if (Objects.nonNull(dto.getTotalFeeAmtPay())) {
+                            entrust.setMarchFeeAmtPay(this.divideWithScale2(this.multiply(marchQty, dto.getTotalFeeAmtPay()), dto.getRemainNum()));
+                        }
+                        if (Objects.nonNull(dto.getTotalUnFeeAmtPay())) {
+                            entrust.setMarchFeeAmtUnPay(this.divideWithScale2(this.multiply(marchQty, dto.getTotalUnFeeAmtPay()), dto.getRemainNum()));
+                        }
+
+                        entrust.setLastEntrust(false);
+                    }
+                    else {
+                        marchQty = ArithmeticUtil.subtract(dto.getRemainNum(),totalFinishMarchQty);
+                        marchAmt = ArithmeticUtil.subtract(dto.getRemainAmount(),totalFinishMarchAmt);
+
+                        if (Objects.nonNull(dto.getTotalFeeAmtPay())) {
+                            entrust.setMarchFeeAmtPay(ArithmeticUtil.subtract(dto.getTotalFeeAmtPay(), totalFinishMarchFeeAmtPay));
+                        }
+                        if (Objects.nonNull(dto.getTotalUnFeeAmtPay())) {
+                            entrust.setMarchFeeAmtUnPay(ArithmeticUtil.subtract(dto.getTotalUnFeeAmtPay(), totalFinishMarchUnFeeAmtPay));
+                        }
+
+                        entrust.setLastEntrust(true);
+                    }
+
+                    entrust.setMarchQty(marchQty);
+                    entrust.setMarchAmt(marchAmt);
+                    if(isNumEntrust(entrust.getTargetType())) {
+                        entrust.setMarchQtyEn(ArithmeticUtil.multiply(ArithmeticUtil.divide(entrust.getMarchQty(),totalMarchQty,4),dto.getRemainNum()));
+                        entrust.setMarchAmtEn(ArithmeticUtil.multiply(ArithmeticUtil.divide(entrust.getMarchQty(),totalMarchQty,4),dto.getRemainNum(),entrust.getPrice()));
+                    }
+                    else {
+                        entrust.setMarchAmtEn(ArithmeticUtil.multiply(ArithmeticUtil.divide(entrust.getMarchQty(),totalMarchQty,4),dto.getRemainNum(),dto.getUnitCprice()));
+                        entrust.setMarchQtyEn(ArithmeticUtil.divide(entrust.getMarchAmtEn(),entrust.getPrice(),4));
+                    }
+
+                    totalFinishMarchQty = ArithmeticUtil.doAdd(totalFinishMarchQty,entrust.getMarchQty());
+                    totalFinishMarchAmt = ArithmeticUtil.doAdd(totalFinishMarchAmt,entrust.getMarchAmt());
+                    totalFinishMarchFeeAmtPay = ArithmeticUtil.doAdd(totalFinishMarchFeeAmtPay,entrust.getMarchFeeAmtPay());
+                    totalFinishMarchUnFeeAmtPay = ArithmeticUtil.doAdd(totalFinishMarchUnFeeAmtPay,entrust.getMarchFeeAmtUnPay());
+
+                    commonEntrustDtoListTmp.add(entrust);
+                }
+            }
+
+            commonEntrustDtoList = new ArrayList<>();
+            commonEntrustDtoList.addAll(commonEntrustDtoListTmp);
+
+            if(dto.getRemainNum().compareTo(totalFinishMarchQty) >0
+                    || dto.getRemainAmount().compareTo(totalFinishMarchAmt) >0){
+                matchStatus = 下行交易匹配状态_部分匹配.getValue();
+            }else{
+                matchStatus = 下行交易匹配状态_匹配完成.getValue();
+            }
+        }
+        return matchStatus;
     }
 
     /**
@@ -2106,7 +2447,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
         //只有一条匹配指令时
         if(dto.getEntrustIdList().size() == 1) {
             ExchangeTransMatchCommonEntrustDto commonEntrustDto = commonEntrustDtoList.get(0);
-            if(StringUtil.equals(commonEntrustDto.getTargetType(),DictCodeListExt3.目标类型_数量.getValue())) {
+            if(isNumEntrust(commonEntrustDto.getTargetType())) {
                 //已匹配份额
                 BigDecimal marchQty =dto.getRemainNum();
                 commonEntrustDto.setMarchQty(marchQty);
@@ -2121,7 +2462,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
             }
             commonEntrustDto.setMarchFeeAmtPay(dto.getTotalFeeAmtPay());
             commonEntrustDto.setMarchFeeAmtUnPay(dto.getTotalUnFeeAmtPay());
-            matchStatus = DictCodeListExt3.下行交易匹配状态_匹配完成.getValue();
+            matchStatus = 下行交易匹配状态_匹配完成.getValue();
         }
         //多条指令匹配时(协议回购只有首期会有多条指令)
         else {
@@ -2139,7 +2480,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     commonEntrustDto.setMarchQtyEn(commonEntrustDto.getRemainEntrustNum());
                     commonEntrustDto.setMarchAmtEn(commonEntrustDto.getRemainEntrustAmt());
                 }
-                matchStatus = DictCodeListExt3.下行交易匹配状态_匹配完成.getValue();
+                matchStatus = 下行交易匹配状态_匹配完成.getValue();
             }
             else {
                 //临时存储
@@ -2234,7 +2575,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
 
                         commonEntrustDto.setMarchQty(marchQty);
                         commonEntrustDto.setMarchAmt(marchAmt);
-                        if(StringUtil.equals(commonEntrustDto.getTargetType(),DictCodeListExt3.目标类型_数量.getValue())) {
+                        if(isNumEntrust(commonEntrustDto.getTargetType())) {
                             commonEntrustDto.setMarchQtyEn(ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),totalMarchQty,4),dto.getRemainNum()));
                             commonEntrustDto.setMarchAmtEn(ArithmeticUtil.multiply(ArithmeticUtil.divide(commonEntrustDto.getMarchQty(),totalMarchQty,4),dto.getRemainNum(),commonEntrustDto.getPrice()));
                         }
@@ -2255,7 +2596,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
 
                 commonEntrustDtoList = new ArrayList<>();
                 commonEntrustDtoList.addAll(commonEntrustDtoListTmp);
-                matchStatus = DictCodeListExt3.下行交易匹配状态_部分匹配.getValue();
+                matchStatus = 下行交易匹配状态_部分匹配.getValue();
             }
         }
 
@@ -2303,5 +2644,98 @@ public class ExchangeTransMatchCommonService extends BaseService {
         params.put("tradeDate", com.joyintech.framework.util.DateUtil.platDateFromCache());
         BigDecimal faceValue = creditLinesDealsMapper.getFaceValue(params);
         return null == faceValue ? new BigDecimal(100) : faceValue;
+    }
+
+    public BigDecimal min(BigDecimal num1, BigDecimal num2) {
+       return this.bigThan(num1, num2) ? num2 : num1;
+    }
+
+    public BigDecimal max(BigDecimal num1, BigDecimal num2) {
+        return this.bigThan(num1, num2) ? num1 : num2;
+    }
+
+    public boolean bigThan(BigDecimal d, BigDecimal decimal) {
+        if (Objects.nonNull(d) && Objects.nonNull(decimal)) {
+            return d.compareTo(decimal) > 0;
+        }
+        return false;
+    }
+
+    public boolean bigThanOrEquals(BigDecimal d, BigDecimal decimal) {
+        if (Objects.nonNull(d) && Objects.nonNull(decimal)) {
+            return d.compareTo(decimal) >= 0;
+        }
+        return false;
+    }
+
+    public boolean equals(BigDecimal d, BigDecimal decimal) {
+        if (Objects.nonNull(d) && Objects.nonNull(decimal)) {
+            return d.compareTo(decimal) == 0;
+        }
+        return false;
+    }
+
+    public boolean bigThanZero(BigDecimal value) {
+        return bigThan(value, BigDecimal.ZERO);
+    }
+
+    public BigDecimal multiply(BigDecimal d, BigDecimal num) {
+        return ArithmeticUtil.multiply(d, num);
+    }
+
+    public BigDecimal multiplyWithScale2(BigDecimal d, BigDecimal num) {
+        return ArithmeticUtil.multiply(d, num).setScale(2, RoundingMode.HALF_UP);
+    }
+
+    public BigDecimal divideWithScale4(BigDecimal d, BigDecimal num) {
+        return ArithmeticUtil.divide(d, num, 4, RoundingMode.HALF_UP);
+    }
+
+    public BigDecimal divideWithScale2(BigDecimal d, BigDecimal num) {
+        return ArithmeticUtil.divide(d, num, 2, RoundingMode.HALF_UP);
+    }
+
+    public BigDecimal divide100(BigDecimal num) {
+        return this.divideWithScale2(num, new BigDecimal(100));
+    }
+
+    public BigDecimal multiply100(BigDecimal num) {
+        return this.multiplyWithScale2(num, new BigDecimal(100));
+    }
+
+    /**
+     * 根据交易方向判断是否是质押券出入库交易
+     * @param ps 交易方向
+     * @return  是否是质押券出入库交易
+     */
+    private boolean isPledgeCouponsInOrOut(String ps) {
+        return StringUtil.equals(ps, 交易方向_质押券入库.getValue())
+                || StringUtil.equals(ps, 交易方向_质押券出库.getValue());
+    }
+
+    private boolean isBond(String finprodType) {
+        return DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(finprodType);
+    }
+
+    private boolean isRepo(String finprodType) {
+        return DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue().equals(finprodType)
+                || DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue().equals(finprodType);
+    }
+
+    /**
+     * 根据交易方向判断是否是债转股交易
+     * @param ps 交易方向
+     * @return  是否是债转股交易
+     */
+    private boolean isBond2Stock(String ps) {
+        return StringUtil.equals(ps, 交易方向_债转股.getValue());
+    }
+
+    private boolean isAmtEntrust(String targetType) {
+        return StringUtil.equals(targetType, 目标类型_金额.getValue());
+    }
+
+    private boolean isNumEntrust(String targetType) {
+        return StringUtil.equals(targetType, 目标类型_数量.getValue());
     }
 }
