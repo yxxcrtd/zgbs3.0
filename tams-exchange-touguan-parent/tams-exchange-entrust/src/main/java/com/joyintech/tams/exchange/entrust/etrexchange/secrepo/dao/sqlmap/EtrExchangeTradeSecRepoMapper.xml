@@ -475,7 +475,7 @@
                    INV_AIM,BUSINESS_MODEL
             FROM (
             select
-            a.INV_AIM ,a.BUSINESS_MODEL, a.TRADE_DATE ,a.FINPROD_ID,b.PORTFOLIO_ID,
+            nvl(a.INV_AIM,a.BUSINESS_MODEL) INV_AIM ,nvl(a.BUSINESS_MODEL,a.INV_AIM) BUSINESS_MODEL, a.TRADE_DATE ,a.FINPROD_ID,b.PORTFOLIO_ID,
                    <!--a.TRADE_PLAT,-->
             ROW_NUMBER () over(
             PARTITION BY a.TRADE_ID
@@ -490,12 +490,12 @@
                     #{item}
                 </foreach>
             </if>
-            AND a.TRADE_DATE &lt;= #{sysDate}
+            AND a.TRADE_DATE &lt;= #{sysDate} and (a.BUSINESS_MODEL is not null or a.INV_AIM is not null)
             ) WHERE rn = 1
             UNION
             SELECT a.FINPROD_ID, b.PORTFOLIO_ID,
                    <!--a.TRADE_PLAT,-->
-                   a.INV_AIM,a.BUSINESS_MODEL
+            nvl(a.INV_AIM,a.BUSINESS_MODEL) INV_AIM,nvl(a.BUSINESS_MODEL,a.INV_AIM) BUSINESS_MODEL
             from TRD_PRODUCT_TEMP_DEAL a
             LEFT JOIN TRD_PRODUCT_TEMP_DEAL_ADD b ON a.TRADE_ID =b.TRADE_ID
             WHERE 1=1
@@ -505,7 +505,7 @@
                     #{item}
                 </foreach>
             </if>
-            AND a.TRADE_DATE = #{sysDate}
+            AND a.TRADE_DATE = #{sysDate} and (a.BUSINESS_MODEL is not null or a.INV_AIM is not null)
             ) GROUP BY FINPROD_ID, PORTFOLIO_ID
                      <!--,TRADE_PLAT-->
         ) invaim on invaim.FINPROD_ID=TEMP.FINPROD_ID and invaim.PORTFOLIO_ID=TEMP.PORTFOLIO_ID
@@ -1443,7 +1443,7 @@
         LEFT JOIN FIN_PRODUCT_TYPE c ON a.FINPROD_ID =c.FINPROD_ID
         WHERE   (( b.FINPROD_TYPE2 =#{FINPROD_TYPE_TG_F01} AND b.TRADE_MARKET=#{SVR_TRADE_MARKET_01} )
         or (b.TRADE_MARKET in (#{SVR_TRADE_MARKET_03} ,#{SVR_TRADE_MARKET_04})))
-          AND a.CDATE =#{cdate}
+        AND a.CDATE =to_date(#{cdate,jdbcType=VARCHAR},'yyyy-MM-dd')
         <if test="portfolioIdList != null">
             AND a.PORTFOLIO_ID in
             <foreach collection="portfolioIdList" item="item" open="(" close=")" separator=",">
@@ -1460,7 +1460,6 @@
             and c.TYPE_8 = #{secType1,jdbcType=VARCHAR}
         </if>
         GROUP BY a.PORTFOLIO_ID, a.FINPROD_ID
-        ORDER BY a.PORTFOLIO_ID, a.FINPROD_ID
     </select>
 
     <!-- 当日交易数据查询 -->
