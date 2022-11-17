@@ -249,7 +249,7 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
                 .put("SVR_TRADE_MARKET_01", DictCodeListExt1.交易场所_银行间.getValue())
                 .put("SVR_TRADE_MARKET_03", DictCodeListExt1.交易场所_上海证券交易所.getValue())
                 .put("SVR_TRADE_MARKET_04", DictCodeListExt1.交易场所_深圳证券交易所.getValue())
-                .put("cdate", DateUtil.addDay(cdate, -1));
+                .put("cdate", DateUtil.format(DateUtil.addDay(cdate, -1),DateUtil.DEFAULT_DATE_FORMAT_EN));
 
         if (portfolioIdList != null && !portfolioIdList.isEmpty()) reqMap.put("portfolioIdList", portfolioIdList);
         if (finprodIdList != null && !finprodIdList.isEmpty()) reqMap.put("finprodIdList", finprodIdList);
@@ -385,13 +385,13 @@ public class EtrExchangeTradeSecRepo002Service extends BaseService {
     }
 
     public static String getKey(BaseMap bm) {
-        return bm.getString("PORTFOLIO_ID") + bm.get("SECACCTID") + bm.get("FINPROD_ID");
+        return bm.getString("PORTFOLIO_ID") + bm.get("FINPROD_ID");
     }
 
     private Page<EtrExchangeTradePositionsSecRepoResponse> calculationAmount(Map<String, EtrExchangeUnitCostDto> unitCostMap, Page<EtrExchangeTradePositionsSecRepoResponse> pages, String platDate) {
         if (pages != null && pages.getRoot() != null && !pages.getRoot().isEmpty()) {
             pages.getRoot().forEach(r -> {
-                EtrExchangeUnitCostDto dto = unitCostMap.get(r.getPortfolioId() +r.getSecAcctId()+ r.getFinprodId());
+                EtrExchangeUnitCostDto dto = unitCostMap.get(r.getPortfolioId() + r.getFinprodId());
                 if (dto != null) {
                     // 1.持仓成本（元）
                     r.setPositionsAmt(dto.getBuyCostAmt());

@@ -56,7 +56,18 @@ public class ExchangeTransMatchBond1Service extends ExchangeTransMatchBondCommon
             trdFinProductDealTotal.setPrinAmt(trdFinProductDealTotal.getCpriceAmt());
         }
         // 交易金额
-        trdFinProductDealTotal.setTradeAmt(ArithmeticUtil.subtract(trdFinProductDealTotal.getFpriceAmt(),entrustDto.getMarchFeeAmtPay()));
+        if (StringUtil.equals(entrustDto.getPs(), DictCodeList.交易方向_买入.getValue())
+            || StringUtil.equals(entrustDto.getPs(), DictCodeList.交易方向_申购.getValue())
+            || StringUtil.equals(entrustDto.getPs(), DictCodeList.交易方向_申购确认.getValue())
+            || StringUtil.equals(entrustDto.getPs(), DictCodeListExt3.交易方向_配债.getValue())
+        ) {
+            trdFinProductDealTotal.setTradeAmt(ArithmeticUtil.doAdd(trdFinProductDealTotal.getFpriceAmt(),entrustDto.getMarchFeeAmtPay()));
+        } else if (StringUtil.equals(entrustDto.getPs(), DictCodeList.交易方向_卖出.getValue())
+                || StringUtil.equals(entrustDto.getPs(), DictCodeList.交易方向_行权_回售.getValue())) {
+            trdFinProductDealTotal.setTradeAmt(ArithmeticUtil.subtract(trdFinProductDealTotal.getFpriceAmt(),entrustDto.getMarchFeeAmtPay()));
+        } else {
+            trdFinProductDealTotal.setTradeAmt(trdFinProductDealTotal.getFpriceAmt());
+        }
         // 利息总额  =  全价总额- 净价总额
         trdFinProductDealTotal.setIntAmt(ArithmeticUtil.subtract(trdFinProductDealTotal.getFpriceAmt(),trdFinProductDealTotal.getCpriceAmt()));
         // 到期收益率--在TrdProductDeal生成的时候同时设值

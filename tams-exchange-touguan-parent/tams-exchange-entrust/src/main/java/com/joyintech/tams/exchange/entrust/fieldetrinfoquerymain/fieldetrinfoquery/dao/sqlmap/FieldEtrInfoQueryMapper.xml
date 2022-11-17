@@ -114,6 +114,8 @@
             ROUND( decode(nvl( T5.ENT_FINISH_AMT, 0 ),0,0,nvl( T5.ENT_FINISH_AMT, 0 ) / nvl( decode(ETR_ENTRUST.ENTRUST_AMT, 0, 1,ETR_ENTRUST.ENTRUST_AMT), 1 )), 4 )*100
             when etr_entrust.ps = 'T93' and etr_entrust.TRADE_MARKET = '04' and etr_entrust.ENTRUST_TYPE = '22' then
             ROUND(nvl( T5.ENT_FINISH_AMT, 0 ) / nullif( etr_entrust.ENTRUST_NUM, 0 ) , 4 )*100
+            WHEN etr_entrust.ps = 'T04' then ROUND(nvl(ETR_FINISH_STATUSA.FINISH_AMT, 0) /
+                decode(ETR_ENTRUST.ENTRUST_NUM, 0, 1, null, 1, ETR_ENTRUST.ENTRUST_NUM), 4) *100
             WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
                 ROUND( nvl( T5.ENT_FINISH_AMT, 0 ) / nullif( etr_entrust.ENTRUST_AMT, 0 ), 4 ) * 100
             WHEN ETR_ENTRUST_ADD.TARGET_TYPE = '01' THEN
@@ -150,18 +152,20 @@
         CASE
         WHEN etr_entrust.PS = 'T94' THEN
         decode(etr_entrust.ENTRUST_TYPE,'21',ROUND( nvl( T5.ENT_FINISH_AMT, 0 ), 4 )/100,ROUND( nvl( T5.ENT_FINISH_AMT, 0 ), 4 ))
+        WHEN etr_entrust.ps = 'T04' then ROUND(nvl(ETR_FINISH_STATUSA.FINISH_AMT, 0),4)
         when etr_entrust.ps = 'T93' and ETR_ENTRUST.ENTRUST_TYPE = '22' then ROUND( nvl( T5.ENT_FINISH_AMT, 0 ), 4 )/100
-            WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
-                decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,
-                'EX017',ROUND( nvl( T5.ENT_FINISH_AMT/100, 0 ), 4 ),
-                'EX018',ROUND( nvl( T5.ENT_FINISH_AMT/100, 0 ), 4 ),
-                'EX019',ROUND( nvl( T5.ENT_FINISH_AMT/100, 0 ), 4 ),
-                ROUND( nvl( T5.ENT_FINISH_AMT, 0 ), 4 ))
-            ELSE ROUND( nvl( T5.ENT_FINISH_AMT, 0 ), 4 )
+        WHEN etr_entrust_add.TARGET_TYPE = '01' THEN
+            decode(ETR_ENTRUST_ADD.BUSI_TYPE_POSITION,
+            'EX017',ROUND( nvl( T5.ENT_FINISH_AMT/100, 0 ), 4 ),
+            'EX018',ROUND( nvl( T5.ENT_FINISH_AMT/100, 0 ), 4 ),
+            'EX019',ROUND( nvl( T5.ENT_FINISH_AMT/100, 0 ), 4 ),
+            ROUND( nvl( T5.ENT_FINISH_AMT, 0 ), 4 ))
+        ELSE ROUND( nvl( T5.ENT_FINISH_AMT, 0 ), 4 )
         END AS transFinishAmt,
         CASE
         when etr_entrust.ps = 'T93' then
         decode(ETR_ENTRUST.ENTRUST_TYPE,'32',ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ), 4 ),ROUND( nvl( etr_entrust.ENTRUST_NUM, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ), 4 )/100)
+        WHEN etr_entrust.ps = 'T04' then ROUND(nvl(etr_entrust.ENTRUST_NUM, 0) - nvl(ETR_FINISH_STATUSA.FINISH_AMT, 0),4)
         WHEN etr_entrust.ENTRUST_TYPE = '31' THEN
         ROUND( nvl( etr_entrust.ENTRUST_AMT, 0 ) - nvl( T5.ENT_FINISH_AMT, 0 ), 4 )
         WHEN etr_entrust.ENTRUST_TYPE = '21' THEN

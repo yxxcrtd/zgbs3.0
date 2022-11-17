@@ -99,26 +99,26 @@ public class FieldEtrInfoQueryService extends BaseService {
             pageParam.put("entrustStatusList", listTemp);
         }
         String portfolioId = (String) pageParam.get("portfolioId");
-        if (StringUtil.isNotEmpty(pageParam.get("portfolioId"))) {
-            List<String> portfolioIdList = StringUtil.splitToList(",", (String) pageParam.get("portfolioId"));
+        if (StringUtil.isNotEmpty(portfolioId)) {
+            List<String> portfolioIdList = StringUtil.splitToList(",", portfolioId);
             pageParam.put("portfolioIdList", portfolioIdList);
         }
 
         String finprodMarketId = (String) pageParam.get("finprodMarketId");
-        if (StringUtil.isNotEmpty(pageParam.get("finprodMarketId"))) {
-            List<String> finprodMarketIdList = StringUtil.splitToList(",", (String) pageParam.get("finprodMarketId"));
+        if (StringUtil.isNotEmpty(finprodMarketId)) {
+            List<String> finprodMarketIdList = StringUtil.splitToList(",", finprodMarketId);
             pageParam.put("finprodMarketIdList", finprodMarketIdList);
         }
 
         String secAcctId = (String) pageParam.get("secAcctId");
-        if (StringUtil.isNotEmpty(pageParam.get("secAcctId"))) {
-            List<String> secAcctIdList = StringUtil.splitToList(",", (String) pageParam.get("secAcctId"));
+        if (StringUtil.isNotEmpty(secAcctId)) {
+            List<String> secAcctIdList = StringUtil.splitToList(",", secAcctId);
             pageParam.put("secAcctIdList", secAcctIdList);
         }
 
         String invManagerId = (String) pageParam.get("invManagerId");
-        if (StringUtil.isNotEmpty(pageParam.get("invManagerId"))) {
-            List<String> invManagerIdList = StringUtil.splitToList(",", (String) pageParam.get("invManagerId"));
+        if (StringUtil.isNotEmpty(invManagerId)) {
+            List<String> invManagerIdList = StringUtil.splitToList(",", invManagerId);
             pageParam.put("invManagerIdList", invManagerIdList);
         }
 
@@ -182,7 +182,7 @@ public class FieldEtrInfoQueryService extends BaseService {
             pageParam.put("declaTypeList", null);
         }
         //根据组合权限表添加检索权限
-        Page<FieldEtrInfoQueryListResponse> pageLimit = new Page<FieldEtrInfoQueryListResponse>();
+        Page<FieldEtrInfoQueryListResponse> pageLimit = new Page<>();
         if (StringUtil.isNotEmpty(SecurityUtil.getLoginUser())) {
             //查询登录用户是否是领导、交易处长岗位
             Map<String, Object> map = new HashMap<>();
