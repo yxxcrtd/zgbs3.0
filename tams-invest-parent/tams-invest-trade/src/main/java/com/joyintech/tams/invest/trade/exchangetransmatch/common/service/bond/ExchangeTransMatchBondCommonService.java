@@ -84,8 +84,9 @@ public class ExchangeTransMatchBondCommonService extends BaseService {
                 entrustDtoTmp.setPortfolioId(detailDto.getPortfolioId());
                 entrustDtoTmp.setMarchQty(detailDto.getMarchQty());
                 entrustDtoTmp.setMarchAmt(detailDto.getMarchAmt());
-                entrustDtoTmp.setMarchFeeAmtUnPay(detailDto.getMarchFeeAmtUnPay());
+                entrustDtoTmp.setMarchCpriceAmt(detailDto.getMarchCpriceAmt());
                 entrustDtoTmp.setMarchFeeAmtPay(detailDto.getMarchFeeAmtPay());
+                entrustDtoTmp.setMarchFeeAmtUnPay(detailDto.getMarchFeeAmtUnPay());
 
                 ExchangeTransMatchBaseTradeDto baseTradeProductDealDto = new ExchangeTransMatchBaseTradeDto();
                 //生成金融产品汇总交易信息
@@ -753,13 +754,14 @@ public class ExchangeTransMatchBondCommonService extends BaseService {
 
     protected void calcFeeAmtPay(ExchangeTransMatchCommonDto dealDto,ExchangeTransMatchCommonEntrustDto entrustDto,TrdProductDeal trdProductDeal) {
         // 净价总额
-        trdProductDeal.setCpriceAmt(ArithmeticUtil.multiply(dealDto.getUnitCprice(),entrustDto.getMarchQty()).setScale(2, RoundingMode.HALF_UP));
+        trdProductDeal.setCpriceAmt(entrustDto.getMarchCpriceAmt());
+//        trdProductDeal.setCpriceAmt(ArithmeticUtil.multiply(dealDto.getUnitCprice(),entrustDto.getMarchQty()).setScale(2, RoundingMode.HALF_UP));
         // 交易份额
         trdProductDeal.setShareAmt(entrustDto.getMarchQty());
         // 交易本金
         trdProductDeal.setPrinAmt(ArithmeticUtil.multiply(entrustDto.getMarchQty(),new BigDecimal(100)));
         // 全价总额
-        trdProductDeal.setFpriceAmt(entrustDto.getMarchAmt().setScale(2, BigDecimal.ROUND_HALF_UP));
+        trdProductDeal.setFpriceAmt(entrustDto.getMarchAmt());
         // 利息总额   =  全价总额- 净价总额
 //        trdProductDeal.setIntAmt(ArithmeticUtil.multiply(entrustDto.getMarchQty(),dealDto.getUnitInt()));
         trdProductDeal.setIntAmt(ArithmeticUtil.subtract(trdProductDeal.getFpriceAmt(),trdProductDeal.getCpriceAmt()));

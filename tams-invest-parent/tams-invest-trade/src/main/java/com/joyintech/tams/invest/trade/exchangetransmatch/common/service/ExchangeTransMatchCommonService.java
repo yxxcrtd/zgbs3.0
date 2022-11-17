@@ -504,7 +504,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 }
                 logger.debug("【指令编号:{},证券账户:{},最终分配数量结果为:{}】", item.getEntrustId(), item.getSecAcctId(), JSON.toJSONString(portfolioMatchQtyMap));
                 // 5、根据本次分配数量计算 分配金额和交易支付费用
-                this.calculatePortFolioMatchAmt(matchDto, item, portfolioMatchQtyMap, portfolioRemainQtyList, entrustDetailDtoList, item.getMarchAmt());
+                this.calculatePortFolioMatchAmt(matchDto, item, portfolioMatchQtyMap, portfolioRemainQtyList, entrustDetailDtoList, item.getMarchAmt(), this.multiply(item.getMarchQty(), matchDto.getUnitCprice()));
             }
             logger.debug("【指令编号:{},证券账户:{},最终结果为:{}】", item.getEntrustId(), item.getSecAcctId(), JSON.toJSONString(entrustDetailDtoList));
             // ZGCPCN-1551:modify by fuyongsheng 20220620 start
@@ -523,9 +523,11 @@ public class ExchangeTransMatchCommonService extends BaseService {
      */
     private void calculatePortFolioMatchAmt(ExchangeTransMatchCommonDto matchDto, ExchangeTransMatchCommonEntrustDto entrust,
                     Map<String, BigDecimal> portfolioMatchQtyMap, List<Map.Entry<String, BigDecimal>> portfolioRemainQtyList,
-                                            List<ExchangeTransMatchCommonEntrustDetailDto> entrustDetailDtoList, BigDecimal marchAmt){
+                                            List<ExchangeTransMatchCommonEntrustDetailDto> entrustDetailDtoList, BigDecimal marchAmt, BigDecimal mrachCpriceAmt){
         // 本次各组合分配金额
         Map<String, BigDecimal> portfolioMatchAmtMap = new HashMap<>();
+        // 本次各组合分配净值金额
+        Map<String, BigDecimal> portfolioMatchCpriceAmtMap = new HashMap<>();
         // 本次各组合分配随交易支付费用
         Map<String, BigDecimal> portfolioMatchFeeAmtPayMap = new HashMap<>();
         // 本次各组合分配不随交易支付费用
@@ -557,6 +559,8 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 portfolioMatchAmtMap.put(portfolioId, this.multiplyWithScale2(matchQty,matchDto.getUnitCprice()));
             }
 
+            portfolioMatchCpriceAmtMap.put(portfolioId, this.multiplyWithScale2(matchQty, matchDto.getUnitCprice()));
+
             if (Objects.nonNull(entrust.getMarchFeeAmtPay())) {
                 BigDecimal matchFeeAmtPay = this.divideWithScale2(this.multiply(entrust.getMarchFeeAmtPay(), matchQty), entrust.getMarchQty());
                 marchTotalFeeAmtPay = ArithmeticUtil.doAdd(marchTotalFeeAmtPay, matchFeeAmtPay);
@@ -572,12 +576,18 @@ public class ExchangeTransMatchCommonService extends BaseService {
         // 将尾插分配到组合开始日最小的组合上
         String minVdatePortfolioId = this.getPortfolioIdByMinVdate(Lists.newArrayList(portfolioMatchQtyMap.keySet()));
         logger.debug("尾插分配在组合 => 【{}】", minVdatePortfolioId);
+
         BigDecimal reduce = portfolioMatchAmtMap.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
         portfolioMatchAmtMap.put(minVdatePortfolioId, marchAmt.subtract(reduce).add(portfolioMatchAmtMap.get(minVdatePortfolioId)));
+
+        BigDecimal reduceCprice = portfolioMatchCpriceAmtMap.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+        portfolioMatchCpriceAmtMap.put(minVdatePortfolioId, mrachCpriceAmt.subtract(reduceCprice).add(portfolioMatchCpriceAmtMap.get(minVdatePortfolioId)));
+
         if (Objects.nonNull(entrust.getMarchFeeAmtPay())) {
             BigDecimal reducePay = portfolioMatchFeeAmtPayMap.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
             portfolioMatchFeeAmtPayMap.put(minVdatePortfolioId, entrust.getMarchFeeAmtPay().subtract(reducePay).add(portfolioMatchFeeAmtPayMap.get(minVdatePortfolioId)));
         }
+
         if (Objects.nonNull(entrust.getMarchFeeAmtUnPay())) {
             BigDecimal reduceUnPay = portfolioMatchFeeAmtUnPayMap.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
             portfolioMatchFeeAmtUnPayMap.put(minVdatePortfolioId, entrust.getMarchFeeAmtPay().subtract(reduceUnPay).add(portfolioMatchFeeAmtUnPayMap.get(minVdatePortfolioId)));
@@ -586,6 +596,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
         for(ExchangeTransMatchCommonEntrustDetailDto entrustDetailDto : entrustDetailDtoList) {
             entrustDetailDto.setMarchQty(this.getValueOrZero(portfolioMatchQtyMap.get(entrustDetailDto.getPortfolioId())));
             entrustDetailDto.setMarchAmt(this.getValueOrZero(portfolioMatchAmtMap.get(entrustDetailDto.getPortfolioId())));
+            entrustDetailDto.setMarchCpriceAmt(this.getValueOrZero(portfolioMatchCpriceAmtMap.get(entrustDetailDto.getPortfolioId())));
             entrustDetailDto.setMarchFeeAmtPay(this.getValueOrZero(portfolioMatchFeeAmtPayMap.get(entrustDetailDto.getPortfolioId())));
             entrustDetailDto.setMarchFeeAmtUnPay(this.getValueOrZero(portfolioMatchFeeAmtUnPayMap.get(entrustDetailDto.getPortfolioId())));
         }
