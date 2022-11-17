@@ -92,6 +92,8 @@
                 A.SETTLE_MODE,
                 A.SHARE_AMT shareAmt,
                 A.FPRICE_AMT fpriceAmt,
+                A.CPRICE_AMT cpriceAmt,
+                A.PAR_VALUE ,
                 A.INT_AMT,
                 A.PRIN_AMT,
                 A.TRADE_AMT,

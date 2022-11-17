@@ -104,7 +104,7 @@ public class ExchangeTransMatchBond1Service extends ExchangeTransMatchBondCommon
         // 单位全价
         trdProductDeal.setUnitFprice(dealDto.getUnitFprice());
         // 单位面值
-        trdProductDeal.setParValue(null);
+        trdProductDeal.setParValue(dealDto.getParValue());
         // 净价总额，交易份额，交易本金，利息总额，全价总额，随交易支付费用，交易金额，未随交易支付费用，总交易费用
         calcFeeAmtPay(dealDto, entrustDto,trdProductDeal);
         // 交易方向

@@ -2259,10 +2259,14 @@ public class ExchangeTransMatchCommonService extends BaseService {
             BigDecimal totalFinishMarchQty = BigDecimal.ZERO;
             //已经完全匹配的可匹配金额
             BigDecimal totalFinishMarchAmt = BigDecimal.ZERO;
+            //已经完全匹配的可匹配净价金额
+            BigDecimal totalFinishMarchCpriceAmt = BigDecimal.ZERO;
             //已经完全匹配的可分配随交易费用
             BigDecimal totalFinishMarchFeeAmtPay = BigDecimal.ZERO;
             //已经完全匹配的可分配不随交易费用
             BigDecimal totalFinishMarchUnFeeAmtPay = BigDecimal.ZERO;
+            //净价总额
+            BigDecimal cpriceAmt = this.multiply(dto.getRemainNum(), dto.getUnitCprice());
 
             //系统参数.匹配规则
             String matchRule = CacheUtil.getSysParam("MATCH_RULE");
@@ -2288,7 +2292,8 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     //能完全分配数据的指令
                     if (this.bigThan(dto.getRemainNum(), totalFinishMarchQty.add(entrust.getMarchQty()))) {
                         if(this.isRepo(dto.getFinprodType2())) {
-                            entrust.setMarchQtyEn(this.divide100(entrust.getRemainEntrustNum()));
+//                            entrust.setMarchQtyEn(this.divide100(entrust.getRemainEntrustNum()));
+                            entrust.setMarchQtyEn(entrust.getRemainEntrustNum());
                             entrust.setMarchAmtEn(entrust.getRemainEntrustAmt());
                         }
                         else if(isNumEntrust(entrust.getTargetType())) {
@@ -2301,6 +2306,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                         }
 
                         entrust.setMarchAmt(entrust.getMarchAmt().setScale(2, BigDecimal.ROUND_HALF_UP));
+                        entrust.setMarchCpriceAmt(this.divideWithScale2(entrust.getMarchQty().multiply(cpriceAmt), dto.getRemainNum()));
                         if (Objects.nonNull(dto.getTotalFeeAmtPay())) {
                             entrust.setMarchFeeAmtPay(this.divideWithScale2(entrust.getMarchQty().multiply(dto.getTotalFeeAmtPay()), dto.getRemainNum()));
                         }
@@ -2316,6 +2322,8 @@ public class ExchangeTransMatchCommonService extends BaseService {
                         entrust.setMarchQty(ArithmeticUtil.subtract(dto.getRemainNum(),totalFinishMarchQty));
                         //成交列表选择记录.剩余成交金额 - 匹配列表选择记录中已经完全匹配的可匹配金额
                         entrust.setMarchAmt(ArithmeticUtil.subtract(dto.getRemainAmount(),totalFinishMarchAmt));
+                        //成交列表选择记录.剩余成交净价金额 - 匹配列表选择记录中已经完全匹配的可匹配净价金额
+                        entrust.setMarchCpriceAmt(ArithmeticUtil.subtract(cpriceAmt,totalFinishMarchCpriceAmt));
 
                         if (Objects.nonNull(dto.getTotalFeeAmtPay())) {
                             entrust.setMarchFeeAmtPay(ArithmeticUtil.subtract(dto.getTotalFeeAmtPay(), totalFinishMarchFeeAmtPay));
@@ -2325,7 +2333,8 @@ public class ExchangeTransMatchCommonService extends BaseService {
                         }
 
                         if(this.isRepo(dto.getFinprodType2())) {
-                            entrust.setMarchQtyEn(this.divide100(entrust.getMarchQty()) );
+//                            entrust.setMarchQtyEn(this.divide100(entrust.getMarchQty()) );
+                            entrust.setMarchQtyEn(entrust.getMarchQty());
                             entrust.setMarchAmtEn(entrust.getMarchAmt());
                         }
                         else if(isNumEntrust(entrust.getTargetType())) {
@@ -2341,6 +2350,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
 
                     totalFinishMarchQty = ArithmeticUtil.doAdd(totalFinishMarchQty,entrust.getMarchQty());
                     totalFinishMarchAmt = ArithmeticUtil.doAdd(totalFinishMarchAmt,entrust.getMarchAmt());
+                    totalFinishMarchCpriceAmt = ArithmeticUtil.doAdd(totalFinishMarchCpriceAmt,entrust.getMarchCpriceAmt());
                     totalFinishMarchFeeAmtPay = ArithmeticUtil.doAdd(totalFinishMarchFeeAmtPay,entrust.getMarchFeeAmtPay());
                     totalFinishMarchUnFeeAmtPay = ArithmeticUtil.doAdd(totalFinishMarchUnFeeAmtPay,entrust.getMarchFeeAmtUnPay());
 
@@ -2360,10 +2370,12 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     ExchangeTransMatchCommonEntrustDto entrust = commonEntrustDtoList.get(i);
                     BigDecimal marchQty = BigDecimal.ZERO;
                     BigDecimal marchAmt = BigDecimal.ZERO;
+                    BigDecimal marchCpriceAmt = BigDecimal.ZERO;
 
                     if(i<commonEntrustDtoList.size()-1) {
                         marchQty = this.divideWithScale2(this.multiply(entrust.getMarchQty(), dto.getRemainNum()), totalMarchQty);
                         marchAmt = this.divideWithScale2(this.multiply(entrust.getMarchQty(), dto.getRemainAmount()), totalMarchQty);
+                        marchCpriceAmt = this.divideWithScale2(this.multiply(entrust.getMarchQty(), cpriceAmt), totalMarchQty);
 
                         if (Objects.nonNull(dto.getTotalFeeAmtPay())) {
                             entrust.setMarchFeeAmtPay(this.divideWithScale2(this.multiply(marchQty, dto.getTotalFeeAmtPay()), dto.getRemainNum()));
@@ -2377,6 +2389,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     else {
                         marchQty = ArithmeticUtil.subtract(dto.getRemainNum(),totalFinishMarchQty);
                         marchAmt = ArithmeticUtil.subtract(dto.getRemainAmount(),totalFinishMarchAmt);
+                        marchCpriceAmt = ArithmeticUtil.subtract(cpriceAmt,totalFinishMarchCpriceAmt);
 
                         if (Objects.nonNull(dto.getTotalFeeAmtPay())) {
                             entrust.setMarchFeeAmtPay(ArithmeticUtil.subtract(dto.getTotalFeeAmtPay(), totalFinishMarchFeeAmtPay));
@@ -2390,7 +2403,13 @@ public class ExchangeTransMatchCommonService extends BaseService {
 
                     entrust.setMarchQty(marchQty);
                     entrust.setMarchAmt(marchAmt);
-                    if(isNumEntrust(entrust.getTargetType())) {
+                    entrust.setMarchCpriceAmt(marchCpriceAmt);
+
+                    if(this.isRepo(dto.getFinprodType2())) {
+                        entrust.setMarchQtyEn(this.divide100(ArithmeticUtil.multiply(ArithmeticUtil.divide(entrust.getMarchQty(),totalMarchQty,4),dto.getRemainNum())));
+                        entrust.setMarchAmtEn(ArithmeticUtil.multiply(ArithmeticUtil.divide(entrust.getMarchQty(),totalMarchQty,4),dto.getRemainNum()));
+                    }
+                    else if(isNumEntrust(entrust.getTargetType())) {
                         entrust.setMarchQtyEn(ArithmeticUtil.multiply(ArithmeticUtil.divide(entrust.getMarchQty(),totalMarchQty,4),dto.getRemainNum()));
                         entrust.setMarchAmtEn(ArithmeticUtil.multiply(ArithmeticUtil.divide(entrust.getMarchQty(),totalMarchQty,4),dto.getRemainNum(),entrust.getPrice()));
                     }
@@ -2401,6 +2420,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
 
                     totalFinishMarchQty = ArithmeticUtil.doAdd(totalFinishMarchQty,entrust.getMarchQty());
                     totalFinishMarchAmt = ArithmeticUtil.doAdd(totalFinishMarchAmt,entrust.getMarchAmt());
+                    totalFinishMarchCpriceAmt = ArithmeticUtil.doAdd(totalFinishMarchCpriceAmt,entrust.getMarchCpriceAmt());
                     totalFinishMarchFeeAmtPay = ArithmeticUtil.doAdd(totalFinishMarchFeeAmtPay,entrust.getMarchFeeAmtPay());
                     totalFinishMarchUnFeeAmtPay = ArithmeticUtil.doAdd(totalFinishMarchUnFeeAmtPay,entrust.getMarchFeeAmtUnPay());
 

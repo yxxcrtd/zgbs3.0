@@ -749,6 +749,15 @@ public class ExchangeTransMatchBondCommonService extends BaseService {
                     productDeal.setExerYield(productDeal.getExerYield().divide(BigDecimal.valueOf(100)));
                 }
             }
+            else if (result instanceof TrdBondInvestTradeDto) {
+                TrdBondInvestTradeDto trdBondInvestTradeDto = (TrdBondInvestTradeDto)result;
+                if (Objects.nonNull(trdBondInvestTradeDto.getYield())) {
+                    productDeal.setYield(trdBondInvestTradeDto.getYield().divide(BigDecimal.valueOf(100)));
+                }
+                if (Objects.nonNull(trdBondInvestTradeDto.getExerYield())) {
+                    productDeal.setExerYield(trdBondInvestTradeDto.getExerYield().divide(BigDecimal.valueOf(100)));
+                }
+            }
         }
     }
 
@@ -759,7 +768,7 @@ public class ExchangeTransMatchBondCommonService extends BaseService {
         // 交易份额
         trdProductDeal.setShareAmt(entrustDto.getMarchQty());
         // 交易本金
-        trdProductDeal.setPrinAmt(ArithmeticUtil.multiply(entrustDto.getMarchQty(),new BigDecimal(100)));
+        trdProductDeal.setPrinAmt(entrustDto.getMarchCpriceAmt());
         // 全价总额
         trdProductDeal.setFpriceAmt(entrustDto.getMarchAmt());
         // 利息总额   =  全价总额- 净价总额
