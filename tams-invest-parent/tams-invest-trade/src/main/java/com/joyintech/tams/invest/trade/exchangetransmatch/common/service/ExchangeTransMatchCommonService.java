@@ -403,7 +403,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 // 获取各组合历史已分配指令数量
                 Map<String, BigDecimal> portfolioHisMatchEnMap = this.getPortfolioHisMatchEnInfo(item);
                 // 计算目前各组合剩余分配数量
-                Map<String, BigDecimal> portfolioRemainQtyMap = this.portfolioRemainQtyInfo(portfolioHisMatchEnMap, entrustDetailDtoList);
+                Map<String, BigDecimal> portfolioRemainQtyMap = this.portfolioRemainQtyInfo(portfolioHisMatchEnMap, entrustDetailDtoList, matchDto);
                 // 本次剩余分配总数
                 BigDecimal remainMatchQty = item.getMarchQty();
                 // 本次各组合分配数量
@@ -555,11 +555,18 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     portfolioMatchAmtMap.put(portfolioId, this.multiplyWithScale2(matchQty,matchDto.getUnitFprice()));
                 }
             }
+            else if (this.isRepo(matchDto.getFinprodType2())) {
+                portfolioMatchAmtMap.put(portfolioId, matchQty);
+            }
             else {
                 portfolioMatchAmtMap.put(portfolioId, this.multiplyWithScale2(matchQty,matchDto.getUnitCprice()));
             }
 
-            portfolioMatchCpriceAmtMap.put(portfolioId, this.multiplyWithScale2(matchQty, matchDto.getUnitCprice()));
+            if (this.isRepo(matchDto.getFinprodType2())) {
+                portfolioMatchCpriceAmtMap.put(portfolioId, matchQty);
+            } else {
+                portfolioMatchCpriceAmtMap.put(portfolioId, this.multiplyWithScale2(matchQty, matchDto.getUnitCprice()));
+            }
 
             if (Objects.nonNull(entrust.getMarchFeeAmtPay())) {
                 BigDecimal matchFeeAmtPay = this.divideWithScale2(this.multiply(entrust.getMarchFeeAmtPay(), matchQty), entrust.getMarchQty());
@@ -590,7 +597,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
 
         if (Objects.nonNull(entrust.getMarchFeeAmtUnPay())) {
             BigDecimal reduceUnPay = portfolioMatchFeeAmtUnPayMap.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
-            portfolioMatchFeeAmtUnPayMap.put(minVdatePortfolioId, entrust.getMarchFeeAmtPay().subtract(reduceUnPay).add(portfolioMatchFeeAmtUnPayMap.get(minVdatePortfolioId)));
+            portfolioMatchFeeAmtUnPayMap.put(minVdatePortfolioId, entrust.getMarchFeeAmtUnPay().subtract(reduceUnPay).add(portfolioMatchFeeAmtUnPayMap.get(minVdatePortfolioId)));
         }
 
         for(ExchangeTransMatchCommonEntrustDetailDto entrustDetailDto : entrustDetailDtoList) {
@@ -666,12 +673,13 @@ public class ExchangeTransMatchCommonService extends BaseService {
      * @return
      */
     private Map<String, BigDecimal> portfolioRemainQtyInfo(Map<String, BigDecimal> portfolioHisMatchEnMap,
-                                                           List<ExchangeTransMatchCommonEntrustDetailDto> entrustDetailDtoList){
+                                                           List<ExchangeTransMatchCommonEntrustDetailDto> entrustDetailDtoList,
+                                                           ExchangeTransMatchCommonDto matchDto){
         Map<String, BigDecimal> result = new HashMap<>();
         for(ExchangeTransMatchCommonEntrustDetailDto entrustDetailDto : entrustDetailDtoList){
             // 组合已分配数量
             BigDecimal matchQtyEn = portfolioHisMatchEnMap.get(entrustDetailDto.getPortfolioId());
-            result.put(entrustDetailDto.getPortfolioId(), ArithmeticUtil.subtract(entrustDetailDto.getEntrustNum(), matchQtyEn));
+            result.put(entrustDetailDto.getPortfolioId(), ArithmeticUtil.subtract(this.isRepo(matchDto.getFinprodType2())? this.multiply100(entrustDetailDto.getEntrustNum()):entrustDetailDto.getEntrustNum(), matchQtyEn));
         }
         return result;
     }
@@ -2127,7 +2135,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
             //指令已匹配金额
             entrust.setMarchAmtEn(entrust.getMarchAmt());
             //匹配状态
-            matchStatus = this.bigThan(dto.getRemainNum(),entrust.getRemainEntrustAmt()) ?
+            matchStatus = this.bigThan(this.divide100(dto.getRemainNum()),entrust.getRemainEntrustAmt()) ?
                     下行交易匹配状态_部分匹配.getValue() : 下行交易匹配状态_匹配完成.getValue();
         }
         else if(isNumEntrust(entrust.getTargetType())) {
