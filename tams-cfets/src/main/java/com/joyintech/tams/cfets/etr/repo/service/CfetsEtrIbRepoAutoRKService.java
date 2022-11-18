@@ -58,9 +58,8 @@ public class CfetsEtrIbRepoAutoRKService extends BaseService {
         });
         String repo_pledge_model = CacheUtil.getSysParam("repo_pledge_model");
         Map<String, Object> param = new HashMap<>();
-        if (!StringUtil.equals(repo_pledge_model, "03")) {
-            return;
-        }
+        // 质押券库改造，01：无质押库，02：单质押库， 03：多个质押库
+        // 01、02：默认添加至通用质押库，03：根据入库规则加入到对应的质押券库
         if (!(StringUtil.equals(finprodType2, DictCodeListExt1.金融产品类型_投管用_债券.getValue())
                 && StringUtil.equals(ps, DictCodeList.交易方向_买入.getValue()))) {
             return;
@@ -79,6 +78,21 @@ public class CfetsEtrIbRepoAutoRKService extends BaseService {
         List<CfetsEtrIbRepoRkDto> cfetsEtrIbRepoRkDtoPortList = new ArrayList<>();
         // 不存在的对应配置的组合
         List<String> portfolioIdsNotIn = new ArrayList<>();
+        // 01：无质押券库、02：单质押券库时,自动构建入库规则,添加至默认质押券库 999999,
+        if (StringUtil.equals(repo_pledge_model, "01") || StringUtil.equals(repo_pledge_model, "02")) {
+            for (String item : portfolioIds) {
+                CfetsEtrIbRepoRkDto cfetsEtrIbRepoRkDto = new CfetsEtrIbRepoRkDto();
+                cfetsEtrIbRepoRkDto.setPortfolioId(item);
+                cfetsEtrIbRepoRkDto.setPledgeStockId("999999");
+                CfetsEtrSecStockConfig cfetsEtrSecStockConfig = new CfetsEtrSecStockConfig();
+                cfetsEtrIbRepoRkDto.setCfetsEtrSecStockConfig(Collections.singletonList(cfetsEtrSecStockConfig));
+                this.formatRepoLibData(Collections.singletonList(cfetsEtrSecStockConfig), findprodInfo, pledgeBondList, item, finprodId, userId);
+            }
+            CfetsEtrIbRepoLibDto repoLibDto = new CfetsEtrIbRepoLibDto();
+            repoLibDto.setPledgeBondList(pledgeBondList);
+            cfetsIbRepoLibService.inSave(repoLibDto);
+            return;
+        }
         // 配置信息拆分
         cfetsEtrIbRepoRkDtoList.forEach(item -> {
             if (StringUtil.isNotEmpty(item.getPortfolioId())) {
@@ -229,7 +243,8 @@ public class CfetsEtrIbRepoAutoRKService extends BaseService {
                 pageParam.put("plateDate", iPlatformDate.getSysDateStr());
                 pageParam.put("finprodId", finprodId);
                 pageParam.put("portfolioId", portfolioId);
-                CfetsEtrIbRepoLibDto temp = cfetsEtrIbRepoinfoMapper.findSecPosition(pageParam);
+                // CfetsEtrIbRepoLibDto temp = cfetsEtrIbRepoinfoMapper.findSecPosition(pageParam);
+                CfetsEtrIbRepoLibDto temp = cfetsEtrIbRepoinfoMapper.findBasicInfo(pageParam);
                 // 组装数据
                 CfetsEtrIbRepoLibDto repoLibDto = new CfetsEtrIbRepoLibDto();
                 repoLibDto.setPortfolioId(portfolioId);
