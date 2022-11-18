@@ -398,8 +398,11 @@ public class ExchangeTransMatchCommonService extends BaseService {
                         .collect(Collectors.toList());
             }
             if(CollectionUtils.isNotEmpty(entrustDetailDtoList) && entrustDetailDtoList.size() > 1) {
-                // 获取最小交易单元
                 MinTrdUnitLimitDto minTrdUnitLimitDto = this.getMinTrdUnitLimit(item);
+                // 获取最小交易单元
+                BigDecimal minStep = minTrdUnitLimitDto.getMinStep();
+                // 最小交易数量
+                BigDecimal minNum = minTrdUnitLimitDto.getMinNum();
                 // 获取各组合历史已分配指令数量
                 Map<String, BigDecimal> portfolioHisMatchEnMap = this.getPortfolioHisMatchEnInfo(item);
                 // 计算目前各组合剩余分配数量
@@ -414,9 +417,9 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 // 2、循环第一轮
                 for(Map.Entry<String, BigDecimal> portfolioEntry : portfolioRemainQtyList){
                     // 判断最小交易数量是否超过该组合剩余分配数量
-                    if(minTrdUnitLimitDto.getMinNum().compareTo(portfolioEntry.getValue()) > 0){
+                    if (this.bigThan(minNum, portfolioEntry.getValue())) {
                         // 如最小交易数量超过该组合剩余分配数量, 则判断本次剩余分配总数 是否超过 组合剩余分配数量
-                        if(remainMatchQty.compareTo(portfolioEntry.getValue()) >= 0){
+                        if (this.bigThanOrEquals(remainMatchQty, portfolioEntry.getValue())) {
                             // 本次剩余分配总数 大于等于 组合剩余分配数量,则分配组合剩余分配数量,更新本次剩余分配总数
                             portfolioMatchQtyMap.put(portfolioEntry.getKey(), portfolioEntry.getValue());
                             remainMatchQty = ArithmeticUtil.subtract(remainMatchQty, portfolioEntry.getValue());
@@ -429,9 +432,9 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     }
                     else{
                         // 本次剩余分配总数 大于等于 最小交易数量,则分配 最小交易数量,更新本次剩余分配总数
-                        if(remainMatchQty.compareTo(minTrdUnitLimitDto.getMinNum()) >= 0){
-                            portfolioMatchQtyMap.put(portfolioEntry.getKey(), minTrdUnitLimitDto.getMinNum());
-                            remainMatchQty = ArithmeticUtil.subtract(remainMatchQty, minTrdUnitLimitDto.getMinNum());
+                        if (this.bigThanOrEquals(remainMatchQty, minNum)) {
+                            portfolioMatchQtyMap.put(portfolioEntry.getKey(), minNum);
+                            remainMatchQty = ArithmeticUtil.subtract(remainMatchQty, minNum);
                         }else{
                             // 本次剩余分配总数 小于 最小交易数量,则分配 本次剩余分配总数, 本次剩余分配总数置为0,跳出循环
                             portfolioMatchQtyMap.put(portfolioEntry.getKey(), remainMatchQty);
@@ -451,18 +454,16 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     secondPortfolioRemainQtyList.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
                     // 目前各组合剩余分配数量总数
                     BigDecimal portfolioRemainQtyTotal = secondPortfolioRemainQtyMap.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
-                    BigDecimal minStep = minTrdUnitLimitDto.getMinStep();
                     // 按比例拆分分配总数
                     BigDecimal rateMatchQtyTotal = BigDecimal.ZERO;
                     for (Map.Entry<String, BigDecimal> portfolioEntry : secondPortfolioRemainQtyList) {
                         BigDecimal portfolioRemainQty =  portfolioEntry.getValue();
-                        // 临时分配数量
-                        BigDecimal matchQtyTemp = ArithmeticUtil.divide(ArithmeticUtil.multiply(remainMatchQty, portfolioRemainQty),
-                                portfolioRemainQtyTotal, 4);
+                        // 临时分配数量 不能超过组合剩余分配数量
+                        BigDecimal matchQtyTemp = this.min(portfolioRemainQty, this.divideWithScale4(this.multiply(remainMatchQty, portfolioRemainQty), portfolioRemainQtyTotal));
                         // 最小交易单元整数倍
                         BigDecimal stepTimes = ArithmeticUtil.divide(matchQtyTemp, minStep, 0, RoundingMode.FLOOR);
                         // 分配数量
-                        BigDecimal matchQty = ArithmeticUtil.multiply(minStep, stepTimes);
+                        BigDecimal matchQty = this.multiply(minStep, stepTimes);
                         // 合并分配结果
                         portfolioMatchQtyMap.put(portfolioEntry.getKey(), ArithmeticUtil.doAdd(matchQty,
                                 portfolioMatchQtyMap.get(portfolioEntry.getKey())));
@@ -476,8 +477,8 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 logger.debug("【指令编号:{},证券账户:{},比例拆分完后 portfolioMatchQtyMap:{}, 剩余尾差数量为:{}】", item.getEntrustId(),
                         item.getSecAcctId(), JSON.toJSONString(portfolioMatchQtyMap), remainMatchQty);
 
-                // 4、如按比例拆分完,仍有剩余数量尾差,则按照最小交易单元按顺序依次分配,直至分配完为止
-                if(remainMatchQty.compareTo(BigDecimal.ZERO) > 0){
+                // 4、如按比例拆分完,仍有剩余数量尾差,则按照最小交易单元(minStep)按顺序依次分配,直至分配完为止
+                if (this.bigThanZero(remainMatchQty)) {
                     // 计算目前各组合剩余分配数量
                     Map<String, BigDecimal> thirdPortfolioRemainQtyMap = this.portfolioRemainQtyInfo(portfolioMatchQtyMap,
                             portfolioHisMatchEnMap, entrustDetailDtoList);
@@ -486,13 +487,14 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     // 尾差分配数量Map
                     Map<String, BigDecimal> tailMatchQtyMap = new HashMap<>();
                     for (Map.Entry<String, BigDecimal> portfolioEntry : thirdPortfolioRemainQtyList) {
-                        String portfolioId = portfolioEntry.getKey();
-                        // 分配数量
-                        BigDecimal matchQty = minTrdUnitLimitDto.getMinStep();
+                        // 组合剩余分配数量 <= 0 时不分配
+                        if (this.lessThanOrEqualsZero(portfolioEntry.getValue())) {
+                            continue;
+                        }
                         // 剩余分配数量
-                        remainMatchQty = ArithmeticUtil.subtract(remainMatchQty, matchQty);
-                        tailMatchQtyMap.put(portfolioId, ArithmeticUtil.doAdd(matchQty, tailMatchQtyMap.get(portfolioId)));
-                        if(remainMatchQty.compareTo(BigDecimal.ZERO) <= 0){
+                        remainMatchQty = ArithmeticUtil.subtract(remainMatchQty, minStep);
+                        tailMatchQtyMap.put(portfolioEntry.getKey(), ArithmeticUtil.doAdd(minStep, tailMatchQtyMap.get(portfolioEntry.getKey())));
+                        if (this.lessThanOrEqualsZero(remainMatchQty)) {
                             break;
                         }
                     }
@@ -2700,9 +2702,23 @@ public class ExchangeTransMatchCommonService extends BaseService {
         return false;
     }
 
+    public boolean lessThan(BigDecimal d, BigDecimal decimal) {
+        if (Objects.nonNull(d) && Objects.nonNull(decimal)) {
+            return d.compareTo(decimal) < 0;
+        }
+        return false;
+    }
+
     public boolean bigThanOrEquals(BigDecimal d, BigDecimal decimal) {
         if (Objects.nonNull(d) && Objects.nonNull(decimal)) {
             return d.compareTo(decimal) >= 0;
+        }
+        return false;
+    }
+
+    public boolean lessThanOrEquals(BigDecimal d, BigDecimal decimal) {
+        if (Objects.nonNull(d) && Objects.nonNull(decimal)) {
+            return d.compareTo(decimal) <= 0;
         }
         return false;
     }
@@ -2716,6 +2732,18 @@ public class ExchangeTransMatchCommonService extends BaseService {
 
     public boolean bigThanZero(BigDecimal value) {
         return bigThan(value, BigDecimal.ZERO);
+    }
+
+    public boolean bigThanOrEqualsZero(BigDecimal value) {
+        return bigThanOrEquals(value, BigDecimal.ZERO);
+    }
+
+    public boolean lessThanZero(BigDecimal value) {
+        return lessThan(value, BigDecimal.ZERO);
+    }
+
+    public boolean lessThanOrEqualsZero(BigDecimal value) {
+        return lessThanOrEquals(value, BigDecimal.ZERO);
     }
 
     public BigDecimal multiply(BigDecimal d, BigDecimal num) {

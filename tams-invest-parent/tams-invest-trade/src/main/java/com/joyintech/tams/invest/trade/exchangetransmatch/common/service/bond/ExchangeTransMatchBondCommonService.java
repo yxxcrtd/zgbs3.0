@@ -343,18 +343,11 @@ public class ExchangeTransMatchBondCommonService extends BaseService {
         // 净值日期
         trdProductDeal.setCpriceDate(null);
         // 投资目的
+
         if(StringUtil.isNotEmpty(entrustDto.getInvAim())){
             trdProductDeal.setInvAim(entrustDto.getInvAim());
         }else{
-            // 查询持仓的投资目的
-            Map<String,Object> param = new HashMap<>();
-            param.put("dealDate", trdProductDeal.getTradeDate());
-            param.put("finProductId",trdProductDeal.getFinprodId());
-            param.put("secManageAcctId",dealDto.getSecAcctId());
-            List<PtlSecPosition>  ptlSecPositions = exchangeTransMatchCommonMapper.searchPtlSecPositionList(param);
-            if(CollectionUtils.isNotEmpty(ptlSecPositions)){
-                trdProductDeal.setInvAim(ptlSecPositions.get(0).getInvAim());
-            }
+            trdProductDeal.setInvAim(entrustDto.getBusinessModel());
         }
 
         // 交易状态
