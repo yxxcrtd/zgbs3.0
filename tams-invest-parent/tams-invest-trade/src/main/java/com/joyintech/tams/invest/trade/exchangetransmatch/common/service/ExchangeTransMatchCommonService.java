@@ -427,7 +427,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                             // 本次剩余分配总数 小于 组合剩余分配数量,则分配 本次剩余分配总数, 本次剩余分配总数置为0,跳出循环
                             portfolioMatchQtyMap.put(portfolioEntry.getKey(), remainMatchQty);
                             remainMatchQty = BigDecimal.ZERO;
-                            break;
+//                            break;
                         }
                     }
                     else{
@@ -439,7 +439,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                             // 本次剩余分配总数 小于 最小交易数量,则分配 本次剩余分配总数, 本次剩余分配总数置为0,跳出循环
                             portfolioMatchQtyMap.put(portfolioEntry.getKey(), remainMatchQty);
                             remainMatchQty = BigDecimal.ZERO;
-                            break;
+//                            break;
                         }
                     }
                 }
