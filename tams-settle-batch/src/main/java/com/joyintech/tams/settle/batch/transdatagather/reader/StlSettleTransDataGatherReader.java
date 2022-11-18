@@ -165,7 +165,7 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                     //利息总额
                     BigDecimal totalIntAmt=BigDecimal.ZERO;
                     //全价总额
-                    BigDecimal totalFpriceamt=BigDecimal.ZERO;
+                    BigDecimal totalFpriceAmt=BigDecimal.ZERO;
                     //交易本金
                     BigDecimal prinAmt=BigDecimal.ZERO;
                     //总交易本金
@@ -217,7 +217,7 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                         totalShareAmt = ArithmeticUtil.doAdd(totalShareAmt, item.getShareAmt());
                         totalIntAmt = ArithmeticUtil.doAdd(totalIntAmt, item.getIntAmt());
                         totalPrinAmt = ArithmeticUtil.doAdd(totalPrinAmt, item.getPrinAmt());
-                        totalFpriceamt = ArithmeticUtil.doAdd(totalFpriceamt, item.getFpriceAmt());
+                        totalFpriceAmt = ArithmeticUtil.doAdd(totalFpriceAmt, item.getFpriceAmt());
                         totalStampFee= ArithmeticUtil.doAdd(totalStampFee, item.getStampFee());
                         totalJsfAmt= ArithmeticUtil.doAdd(totalJsfAmt, item.getJsfAmt());
                         totalGhfAmt= ArithmeticUtil.doAdd(totalGhfAmt, item.getGhfAmt());
@@ -251,15 +251,19 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                             // GNS-879:配债UNIT_CPRIE,CPRICE_AMT未登录 modify by fuyongsheng 20220217 end
                     )){
                         if(StringUtil.equals(settleTransDataDto.getPs(), DictCodeListExt3.交易方向_配债.getValue())){
-                            dealTotal.setFpriceAmt(totalFpriceamt);
+                            dealTotal.setFpriceAmt(totalFpriceAmt);
                             dealTotal.setUnitFprice(settleTransDataDto.getUnitFprice());
                         } else{
-                            unitCprice = ArithmeticUtil.divide(totalCpriceAmt, totalShareAmt, 8);
+//                            unitCprice = ArithmeticUtil.divide(totalCpriceAmt, totalShareAmt, 8);
                             dealTotal.setCpriceAmt(totalCpriceAmt);
-                            dealTotal.setUnitCprice(unitCprice);
-                            unitInt=settleTransDataDto.getUnitInt();
-                            dealTotal.setUnitInt(unitInt);
-                            dealTotal.setUnitFprice(ArithmeticUtil.doAdd(unitCprice,unitInt));
+//                            dealTotal.setUnitCprice(unitCprice);
+//                            unitInt=settleTransDataDto.getUnitInt();
+//                            dealTotal.setUnitInt(unitInt);
+//                            dealTotal.setUnitFprice(ArithmeticUtil.doAdd(unitCprice,unitInt));
+
+                            dealTotal.setUnitFprice(ArithmeticUtil.divide(totalFpriceAmt, totalShareAmt, 8));
+                            dealTotal.setUnitCprice(ArithmeticUtil.divide(totalCpriceAmt, totalShareAmt, 8));
+                            dealTotal.setUnitInt(ArithmeticUtil.subtract(dealTotal.getUnitFprice(), dealTotal.getUnitCprice()));
                         }
                         prinAmt=totalCpriceAmt;
                     }
@@ -286,17 +290,17 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                             ||StringUtil.equals(settleTransDataDto.getPs(), BussinessDictCodeList.交易方向_申购.getValue())
                             // GZYHTZJY-1016:成交明细汇总表未登录单位净价导致交易表金额为0 modify by fuyongsheng 20211231 end
                     ){
-                        unitCprice = ArithmeticUtil.divide(totalFpriceamt, totalShareAmt, 8);
+                        unitCprice = ArithmeticUtil.divide(totalFpriceAmt, totalShareAmt, 8);
                         dealTotal.setUnitCprice(unitCprice);
                         // ZGTFCP-917:对页面成交价格进行赋值 modify by fuyongsheng 20220314 start
                         dealTotal.setUnitFprice(unitCprice);
                         // ZGTFCP-917:对页面成交价格进行赋值 modify by fuyongsheng 20220314 end
-                        dealTotal.setCpriceAmt(totalFpriceamt);
-                        prinAmt=totalFpriceamt;
+                        dealTotal.setCpriceAmt(totalFpriceAmt);
+                        prinAmt=totalFpriceAmt;
                     }else  if(StringUtil.equals(settleTransDataDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_基金.getValue())
                             && (StringUtil.equals(settleTransDataDto.getPs(), BussinessDictCodeList.交易方向_买入.getValue())
                             ||StringUtil.equals(settleTransDataDto.getPs(), BussinessDictCodeList.交易方向_卖出.getValue()))) {
-                        unitCprice = ArithmeticUtil.divide(totalFpriceamt, totalShareAmt, 8);
+                        unitCprice = ArithmeticUtil.divide(totalFpriceAmt, totalShareAmt, 8);
                         dealTotal.setUnitCprice(unitCprice);
                         dealTotal.setUnitFprice(unitCprice);
                     }
@@ -318,7 +322,7 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                     // 利息总额
                     dealTotal.setIntAmt(totalIntAmt);
                     // 全价总额
-                    dealTotal.setFpriceAmt(totalFpriceamt);
+                    dealTotal.setFpriceAmt(totalFpriceAmt);
                     //印花税
                     dealTotal.setStampFee(totalStampFee);
                     //经手费

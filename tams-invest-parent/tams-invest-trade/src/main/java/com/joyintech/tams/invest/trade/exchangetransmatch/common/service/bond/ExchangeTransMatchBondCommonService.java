@@ -182,6 +182,8 @@ public class ExchangeTransMatchBondCommonService extends BaseService {
         dealTotal.setTotleTradeId(baseGetBusinessId.buildBussinessCode(codeParameter));
         // 交易金额
         dealTotal.setTradeAmt(ArithmeticUtil.subtract(entrustDto.getMarchAmt(),entrustDto.getMarchFeeAmtPay()));
+        // 交易方向
+        dealTotal.setPs(entrustDto.getPs());
         // 设置汇总交易信息
         setDealTotal(dealDto, entrustDto ,dealTotal);
         // 金融产品代码
@@ -216,8 +218,6 @@ public class ExchangeTransMatchBondCommonService extends BaseService {
         dealTotal.setFeeAmtUnpay(entrustDto.getMarchFeeAmtUnPay());
         // 总交易费用
         dealTotal.setFeeAmt(ArithmeticUtil.doAdd(entrustDto.getMarchFeeAmtPay(),entrustDto.getMarchFeeAmtUnPay()));
-        // 交易方向
-        dealTotal.setPs(entrustDto.getPs());
         // 投资目的
         if(StringUtil.isNotEmpty(entrustDto.getInvAim())){
             dealTotal.setInvAim(entrustDto.getInvAim());
