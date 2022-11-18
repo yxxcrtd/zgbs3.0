@@ -2,10 +2,11 @@ package com.joyintech.tams.common.base.dao;
 
 import com.joyintech.tams.common.base.entity.FinProductType;
 import com.joyintech.tams.common.base.entity.FinProductTypeKey;
+import com.joyintech.tams.common.base.mapper.BaseBatchMapper;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FinProductTypeMapper {
+public interface FinProductTypeMapper extends BaseBatchMapper<FinProductType, FinProductTypeKey> {
     int deleteByPrimaryKey(FinProductTypeKey key);
 
     int insert(FinProductType record);

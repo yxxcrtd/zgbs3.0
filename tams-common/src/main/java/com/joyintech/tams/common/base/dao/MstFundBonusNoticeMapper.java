@@ -2,10 +2,11 @@ package com.joyintech.tams.common.base.dao;
 
 import com.joyintech.tams.common.base.entity.MstFundBonusNotice;
 import com.joyintech.tams.common.base.entity.MstFundBonusNoticeKey;
+import com.joyintech.tams.common.base.mapper.BaseBatchMapper;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface MstFundBonusNoticeMapper {
+public interface MstFundBonusNoticeMapper extends BaseBatchMapper<MstFundBonusNotice, MstFundBonusNoticeKey> {
     int deleteByPrimaryKey(MstFundBonusNoticeKey key);
 
     int insert(MstFundBonusNotice record);

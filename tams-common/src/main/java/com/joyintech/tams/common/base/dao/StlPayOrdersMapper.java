@@ -2,13 +2,14 @@ package com.joyintech.tams.common.base.dao;
 
 import com.joyintech.tams.common.base.entity.StlCapacctInfo;
 import com.joyintech.tams.common.base.entity.StlPayOrders;
+import com.joyintech.tams.common.base.mapper.BaseBatchMapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface StlPayOrdersMapper {
+public interface StlPayOrdersMapper extends BaseBatchMapper<StlPayOrders, String> {
     int deleteByPrimaryKey(String orderId);
 
     int insert(StlPayOrders record);

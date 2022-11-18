@@ -2,10 +2,11 @@ package com.joyintech.tams.common.base.dao;
 
 import com.joyintech.tams.common.base.entity.TrdTradeFeeDetail;
 import com.joyintech.tams.common.base.entity.TrdTradeFeeDetailKey;
+import com.joyintech.tams.common.base.mapper.BaseBatchMapper;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TrdTradeFeeDetailMapper {
+public interface TrdTradeFeeDetailMapper extends BaseBatchMapper<TrdTradeFeeDetail, TrdTradeFeeDetailKey> {
     int deleteByPrimaryKey(TrdTradeFeeDetailKey key);
 
     int insert(TrdTradeFeeDetail record);

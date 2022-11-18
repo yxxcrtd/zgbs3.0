@@ -2,12 +2,13 @@ package com.joyintech.tams.common.base.dao;
 
 import com.joyintech.tams.common.base.entity.FinDealPledge;
 import com.joyintech.tams.common.base.entity.FinDealPledgeKey;
+import com.joyintech.tams.common.base.mapper.BaseBatchMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface FinDealPledgeMapper {
+public interface FinDealPledgeMapper extends BaseBatchMapper<FinDealPledge, FinDealPledgeKey> {
     int deleteByPrimaryKey(FinDealPledgeKey key);
 
     int insert(FinDealPledge record);
