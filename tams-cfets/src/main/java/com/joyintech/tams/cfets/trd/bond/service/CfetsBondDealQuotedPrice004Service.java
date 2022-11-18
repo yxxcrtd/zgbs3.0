@@ -201,6 +201,29 @@ public class CfetsBondDealQuotedPrice004Service extends BaseService<CfetsBondDea
     }
 
     /**
+     * 对手方对手方交易员是否必填
+     *
+     * @param counterId 对手方
+     * @return
+     * @author jiangpeng
+     * @date 2022/11/18 14:17
+     */
+    public boolean getResultIsTraderReq(String counterId) {
+        // 交易对手未绑定21位码,对手方交易员非必填
+        CfetsSearchInfoRequest cfetsSearchInfoRequest = new CfetsSearchInfoRequest();
+        cfetsSearchInfoRequest.setDealType("01");
+        cfetsSearchInfoRequest.setInitValue(counterId);
+        //对手方交易员需和对手方字段联动，显示选择对手方下的交易员。对手方按关联的银行间机构21位码，找到属于该机构下的银行间交易员数据，如对手方未关联，对手方交易员字段禁用，非必填；
+        // 如对手方存在关联，对手方交易员字段显示，此时当【报价方式】选择“对话报价”时，对手方交易员字段必填；
+        // 当【报价方式为】“请求报价”、“X-Bond”时，对手方交易员字段非必填
+        List<SelectOptionDto> mySideList = joyinbusinessCommonService.queryMySideOrCount(cfetsSearchInfoRequest);
+        // 存在唯一关联的21位码的交易对手且本币导出参数配置为01
+        return CollectionUtils.isNotEmpty(mySideList) && mySideList.size() <= 1
+                && StringUtil.isNotEmpty(mySideList.get(0).getObject())
+                && StringUtil.equals(CacheUtil.getSysParam("EXPORT_SHOW"), "01");
+    }
+
+    /**
      * 提交保存check 必填项
      *
      * @param entity 入参
@@ -238,16 +261,10 @@ public class CfetsBondDealQuotedPrice004Service extends BaseService<CfetsBondDea
                 errorList.add(new ValidMessage(getMessage("COMMON_0029",getMessage("CfetsBondDealQuotedPrice004.counterId"))));
             }
             // 交易对手未绑定21位码,对手方交易员非必填
-            CfetsSearchInfoRequest cfetsSearchInfoRequest = new CfetsSearchInfoRequest();
-            cfetsSearchInfoRequest.setDealType("01");
-            cfetsSearchInfoRequest.setInitValue(entity.getCounterId());
-            List<SelectOptionDto> list = joyinbusinessCommonService.queryMySideOrCount(cfetsSearchInfoRequest);
-            //对手方交易员需和对手方字段联动，显示选择对手方下的交易员。对手方按关联的银行间机构21位码，找到属于该机构下的银行间交易员数据，如对手方未关联，对手方交易员字段禁用，非必填；
+            // 对手方交易员需和对手方字段联动，显示选择对手方下的交易员。对手方按关联的银行间机构21位码，找到属于该机构下的银行间交易员数据，如对手方未关联，对手方交易员字段禁用，非必填；
             // 如对手方存在关联，对手方交易员字段显示，此时当【报价方式】选择“对话报价”时，对手方交易员字段必填；
             // 当【报价方式为】“请求报价”、“X-Bond”时，对手方交易员字段非必填
-            if (CollectionUtils.isNotEmpty(list)
-                    && StringUtil.isNotEmpty(list.get(0).getObject())
-                    && StringUtil.equals(CacheUtil.getSysParam("EXPORT_SHOW"), "01")
+            if (this.getResultIsTraderReq(entity.getCounterId())
                     && StringUtil.isEmpty(entity.getCounterTrader())
                     && (!StringUtil.equals(entity.getQuoteType(), BussinessDictCodeList.交易类型_登记报价.getValue())
                     || StringUtil.equals(entity.getQuoteStyle(), BussinessDictCodeList.报价方式_对话报价.getValue()))) {
@@ -655,9 +672,18 @@ public class CfetsBondDealQuotedPrice004Service extends BaseService<CfetsBondDea
                 } else if (StringUtil.equals(sysWflBusinessList.getProcessState(), ProcessState.NEW.toString())) {
                     positionRequestHandle.send(preparePosition(cfetsBondDealDbDto, DictCodeListExt3.系统动作_新建.getValue(), DictCodeListExt3.系统动作_新建.getValue(), OperationType.NEW, confirmOk));
                 }
+                newEntity = WorkFlowUtil.getBusinessObjectFromRequest(CfetsBondDealRegisterQuoteDto.class, true);
+                // 工作流ID
+                newEntity.setWorkflowId(entity.getWorkflowId());
+                newEntity.setStatus(entity.getStatus());
+                newEntity.setBusinessData(JsonUtils.object2Json(entity));
+                WorkflowContext.getProcessMarkService().insertIntoProcessMark(newEntity);
             } catch (PositionException e) {
                 Message message = PositionUtil.ajaxErrorReturn(e);
                 BaseMap bm = (BaseMap) message.getData();
+                if (bm == null) {
+                    WorkFlowUtil.showMessage(e.getMessage(), MessageType.错误消息);
+                }
                 String code = (String) bm.get("code");
                 String messageStr = JsonUtils.json2Object(bm.get("message").toString(), String.class);
                 if (StringUtil.isEmpty(confirmOk)
@@ -668,14 +694,6 @@ public class CfetsBondDealQuotedPrice004Service extends BaseService<CfetsBondDea
                     WorkFlowUtil.showMessage(messageStr, MessageType.错误消息);
                 }
                 throw new PositionException(messageStr);
-            }
-            try {
-                newEntity = WorkFlowUtil.getBusinessObjectFromRequest(CfetsBondDealRegisterQuoteDto.class, true);
-                // 工作流ID
-                newEntity.setWorkflowId(entity.getWorkflowId());
-                newEntity.setStatus(entity.getStatus());
-                newEntity.setBusinessData(JsonUtils.object2Json(entity));
-                WorkflowContext.getProcessMarkService().insertIntoProcessMark(newEntity);
             } catch (Exception e) {
                 e.printStackTrace();
             }

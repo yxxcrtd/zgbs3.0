@@ -14,10 +14,14 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.constant.GlobalConstant;
+import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.framework.util.*;
+import com.joyintech.framework.validation.ValidMessage;
 import com.joyintech.tams.business.common.dao.JoyinbusinessCommonMapper;
+import com.joyintech.tams.business.common.dto.CfetsSearchInfoRequest;
 import com.joyintech.tams.business.common.dto.FinProductSpecialDto;
 import com.joyintech.tams.business.common.pojo.Message;
+import com.joyintech.tams.business.common.service.JoyinbusinessCommonService;
 import com.joyintech.tams.business.common.util.PositionUtil;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealQuoteCommonDto;
 import com.joyintech.tams.cfets.trd.bond.dto.CfetsBondDealRegisterQuoteDto;
@@ -54,6 +58,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static com.joyintech.tams.invest.trade.bond.service.TrdBondInvestTrade002Service.getBussinessCodeParameter;
@@ -79,7 +84,7 @@ public class IbuQuoteBond004Controller extends BaseController {
     private BaseGetBusinessId baseGetBusinessId;
 
     @Autowired
-    private JoyinbusinessCommonMapper joyinbusinessCommonMapper;
+    private JoyinbusinessCommonService joyinbusinessCommonService;
 
     @Autowired
     private IbuQuoteBondService ibuQuoteBondService;
@@ -92,7 +97,7 @@ public class IbuQuoteBond004Controller extends BaseController {
     @Override
     public String init(Model model) {
         this.setSelectOptionToModel(model, BussinessDictCode.交易方向, BussinessDictCode.清算速度, DictCode.分配方式,
-            BussinessDictCode.结算方式, BussinessDictCode.清算类型, BussinessDictCode.币种,DictCode.业务模式,DictCode.价格模式);
+                BussinessDictCode.结算方式, BussinessDictCode.清算类型, BussinessDictCode.币种, DictCode.业务模式, DictCode.价格模式);
         model.addAttribute("ACCOUNT_SPEED_0", BussinessDictCodeList.清算速度_T加0.getValue());
         model.addAttribute("ACCOUNT_SPEED_1", BussinessDictCodeList.清算速度_T加1.getValue());
         model.addAttribute("ACCOUNT_SPEED_2", BussinessDictCodeList.清算速度_T加2.getValue());
@@ -104,46 +109,47 @@ public class IbuQuoteBond004Controller extends BaseController {
         CfetsBondDealRegisterQuoteDto cfetsBondDealRegisterQuoteDto = new CfetsBondDealRegisterQuoteDto();
         CfetsBondDealQuoteCommonDto cfetsBondDealQuoteCommonDto = new CfetsBondDealQuoteCommonDto();
         if (StringUtil.equals(this.getParam("workflowStatus"), BussinessDictCodeList.交易流程状态_流程中.getValue())
-            || (!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotBlank(getParam(GlobalConstant.WORKFLOW_ID)))) {
+                || (!WorkFlowUtil.isNotFromToDoList() && StringUtil.isNotBlank(getParam(GlobalConstant.WORKFLOW_ID)))) {
             cfetsBondDealRegisterQuoteDto = cfetsBondDealQuotedPrice004Service.getBussinessEntityByWorkflowId(getParam(GlobalConstant.WORKFLOW_ID));
-            model.addAttribute(GlobalConstant.WORKFLOW_ID,getParam(GlobalConstant.WORKFLOW_ID));
-            BeanUtil.copyPropertiesIgnoreNull(cfetsBondDealQuoteCommonDto,cfetsBondDealRegisterQuoteDto);
+            model.addAttribute(GlobalConstant.WORKFLOW_ID, getParam(GlobalConstant.WORKFLOW_ID));
+            BeanUtil.copyPropertiesIgnoreNull(cfetsBondDealQuoteCommonDto, cfetsBondDealRegisterQuoteDto);
             //收益率*100
-            if(null!=cfetsBondDealQuoteCommonDto.getMatureYield()){
-                cfetsBondDealQuoteCommonDto.setMatureYield(ArithmeticUtil.multiply(cfetsBondDealQuoteCommonDto.getMatureYield(),new BigDecimal(100)));
+            if (null != cfetsBondDealQuoteCommonDto.getMatureYield()) {
+                cfetsBondDealQuoteCommonDto.setMatureYield(ArithmeticUtil.multiply(cfetsBondDealQuoteCommonDto.getMatureYield(), new BigDecimal(100)));
             }
-            if(null!=cfetsBondDealQuoteCommonDto.getExerYield()){
-                cfetsBondDealQuoteCommonDto.setExerYield(ArithmeticUtil.multiply(cfetsBondDealQuoteCommonDto.getExerYield(),new BigDecimal(100)));
+            if (null != cfetsBondDealQuoteCommonDto.getExerYield()) {
+                cfetsBondDealQuoteCommonDto.setExerYield(ArithmeticUtil.multiply(cfetsBondDealQuoteCommonDto.getExerYield(), new BigDecimal(100)));
             }
             //券面万元
-            cfetsBondDealQuoteCommonDto.setShareAmt(ArithmeticUtil.divide(cfetsBondDealQuoteCommonDto.getShareAmt(),new BigDecimal(10000),2));
+            cfetsBondDealQuoteCommonDto.setShareAmt(ArithmeticUtil.divide(cfetsBondDealQuoteCommonDto.getShareAmt(), new BigDecimal(10000), 2));
             //分配列表元转化万元
-            if(CollectionUtils.isNotEmpty(cfetsBondDealQuoteCommonDto.getPtlAllocatios())){
-                cfetsBondDealQuoteCommonDto.getPtlAllocatios().stream().forEach(item ->{
-                    item.setAvaNum(ArithmeticUtil.divide(item.getAvaNum(),new BigDecimal(10000),2));
-                    item.setShareAmt(ArithmeticUtil.divide(item.getShareAmt(),new BigDecimal(10000),2));
-                    item.setOurEntNum(ArithmeticUtil.divide(item.getOurEntNum(),new BigDecimal(10000),2));
-                    item.setLendinEntNum(ArithmeticUtil.divide(item.getLendinEntNum(),new BigDecimal(10000),2));
-                    item.setSellAbleNum(ArithmeticUtil.divide(item.getSellAbleNum(),new BigDecimal(10000),2));
-                    item.setMatureYield(ArithmeticUtil.multiply(item.getMatureYield(),new BigDecimal(100)));
-                    item.setExerYield(ArithmeticUtil.multiply(item.getExerYield(),new BigDecimal(100)));
+            if (CollectionUtils.isNotEmpty(cfetsBondDealQuoteCommonDto.getPtlAllocatios())) {
+                cfetsBondDealQuoteCommonDto.getPtlAllocatios().forEach(item -> {
+                    item.setAvaNum(ArithmeticUtil.divide(item.getAvaNum(), new BigDecimal(10000), 2));
+                    item.setShareAmt(ArithmeticUtil.divide(item.getShareAmt(), new BigDecimal(10000), 2));
+                    item.setOurEntNum(ArithmeticUtil.divide(item.getOurEntNum(), new BigDecimal(10000), 2));
+                    item.setLendinEntNum(ArithmeticUtil.divide(item.getLendinEntNum(), new BigDecimal(10000), 2));
+                    item.setSellAbleNum(ArithmeticUtil.divide(item.getSellAbleNum(), new BigDecimal(10000), 2));
+                    item.setMatureYield(ArithmeticUtil.multiply(item.getMatureYield(), new BigDecimal(100)));
+                    item.setExerYield(ArithmeticUtil.multiply(item.getExerYield(), new BigDecimal(100)));
                 });
             }
         }
-        model.addAttribute("PRICE_MODEL_PRM01",DictCodeListExt2.价格模式_指定价格.getValue());
+        model.addAttribute("PRICE_MODEL_PRM01", DictCodeListExt2.价格模式_指定价格.getValue());
         model.addAttribute("PS_T01", DictCodeList.交易方向_买入.getValue());
         model.addAttribute("PS_T02", DictCodeList.交易方向_卖出.getValue());
         model.addAttribute("PS_T03", DictCodeList.交易方向_行权_回售.getValue());
-        model.addAttribute("quotaPageModel","new");
+        model.addAttribute("quotaPageModel", "new");
         model.addAttribute("ptlAllocatios", JsonUtils.object2Json(cfetsBondDealQuoteCommonDto.getPtlAllocatios()));
-        model.addAttribute("entity_RiskTrialRetList",  JsonUtils.object2Json(cfetsBondDealQuoteCommonDto.getRiskTrialRetDto()));
+        model.addAttribute("entity_RiskTrialRetList", JsonUtils.object2Json(cfetsBondDealQuoteCommonDto.getRiskTrialRetDto()));
         //分配方式
-        model.addAttribute("distribution",cfetsBondDealQuoteCommonDto.getDistribution());
+        model.addAttribute("distribution", cfetsBondDealQuoteCommonDto.getDistribution());
         //卖空模式
-        model.addAttribute("sellPara",CacheUtil.getSysParam("SHORT_SELLING_SUPPORTED"));
-        model.addAttribute("tradeDate", cfetsBondDealQuoteCommonDto.getTradeDate() !=null ? cfetsBondDealQuoteCommonDto.getTradeDate().getTime() : null);
+        model.addAttribute("sellPara", CacheUtil.getSysParam("SHORT_SELLING_SUPPORTED"));
+        model.addAttribute("tradeDate", cfetsBondDealQuoteCommonDto.getTradeDate() != null ? cfetsBondDealQuoteCommonDto.getTradeDate().getTime() : null);
         // 特殊债券信息查询
-        List<FinProductSpecialDto> list = joyinbusinessCommonMapper.queryFinProductSpecialByFinprodIds(Arrays.asList(cfetsBondDealQuoteCommonDto.getFinprodId()));
+        List<FinProductSpecialDto> list = joyinbusinessCommonService.queryFinProductSpecialByFinprodIds(
+                Collections.singletonList(cfetsBondDealQuoteCommonDto.getFinprodId()));
         if (CollectionUtils.isNotEmpty(list)) {
             cfetsBondDealQuoteCommonDto.setIsDefaultBondIndicator(list.get(0).getIsDefaultBondIndicator());
             cfetsBondDealQuoteCommonDto.setIsSpecialDebt(list.get(0).getIsSpecialDebt());
@@ -154,6 +160,7 @@ public class IbuQuoteBond004Controller extends BaseController {
                 cfetsBondDealQuoteCommonDto.setIsSpecial(DictCodeListExt1.是否_是.getValue());
             }
         }
+        model.addAttribute("isTraderRequired", cfetsBondDealQuotedPrice004Service.getResultIsTraderReq(cfetsBondDealQuoteCommonDto.getCounterId()));
         model.addAttribute(GlobalConstant.ENTITY, cfetsBondDealQuoteCommonDto);
         return super.init(model);
     }
