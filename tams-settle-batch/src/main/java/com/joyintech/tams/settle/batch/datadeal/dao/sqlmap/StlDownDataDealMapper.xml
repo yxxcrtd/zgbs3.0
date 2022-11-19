@@ -113,7 +113,7 @@
             )
         </where>
     </delete>
-    
+
     <delete id="deleteSettleTransDataPledge">
         DELETE FROM SETTLE_TRANS_DATA_PLEDGE
         <where>
@@ -122,7 +122,7 @@
             )
         </where>
     </delete>
-    
+
     <delete id="deleteSettleTransDataAdd">
         DELETE FROM SETTLE_TRANS_DATA_ADD
         <where>
@@ -131,7 +131,7 @@
             )
         </where>
     </delete>
-    
+
     <delete id="deleteCommisionCalcProcess">
         DELETE FROM COMMISSION_CACL_PROCESS
         <where>
@@ -143,13 +143,13 @@
             	WHERE
             		DEAL_DATE = #{dealDate,jdbcType=DATE}
             		<if test="portfolioIdList != null and portfolioIdList.size() > 0">
-	            		AND 
+	            		AND
 	            		<foreach collection="portfolioIdList" item="portfolioId" open="PORTFOLIO_ID IN (" close=")" separator=",">
 	            			#{portfolioId,jdbcType=VARCHAR}
 	            		</foreach>
             		</if>
             		<if test="secTypeList != null and secTypeList.size() > 0">
-	            		AND 
+	            		AND
 	            		<foreach collection="secTypeList" item="secType" open="SEC_TYPE IN (" close=")" separator=",">
 	            			#{secType,jdbcType=VARCHAR}
 	            		</foreach>
@@ -157,19 +157,19 @@
             )
         </where>
     </delete>
-    
+
     <delete id="deleteSettleTransData">
         DELETE FROM SETTLE_TRANS_DATA
         <where>
       		DEAL_DATE = #{dealDate,jdbcType=DATE}
        		<if test="portfolioIdList != null and portfolioIdList.size() > 0">
-           		AND 
+           		AND
            		<foreach collection="portfolioIdList" item="portfolioId" open="PORTFOLIO_ID IN (" close=")" separator=",">
            			#{portfolioId,jdbcType=VARCHAR}
            		</foreach>
        		</if>
        		<if test="secTypeList != null and secTypeList.size() > 0">
-           		AND 
+           		AND
            		<foreach collection="secTypeList" item="secType" open="SEC_TYPE IN (" close=")" separator=",">
            			#{secType,jdbcType=VARCHAR}
            		</foreach>
@@ -265,7 +265,7 @@
         	T1.IMPORT_DATE = #{dealDate,jdbcType=DATE} AND (upper(T1.DATA_FILE) LIKE CONCAT(#{dataFile}, '%')) AND T1.IS_SETTLE_TARGET = 'Y'
         	and (T3.CHECK_RESULT is null or T3.CHECK_RESULT in ('0', '2'))
         	<foreach item="searchMapValue" index="searchMapKey" collection="searchMap">
-        		AND ${searchMapKey} IN 
+        		AND ${searchMapKey} IN
         		<foreach collection="searchMapValue" item ="searchMapValueData" open="(" close=")" separator=",">
         			#{searchMapValueData}
         		</foreach>
@@ -344,12 +344,12 @@
 			T1.IMPORT_DATE = #{dealDate,jdbcType=DATE} AND (upper(T1.DATA_FILE) LIKE CONCAT(#{dataFile}, '%')) AND T1.IS_SETTLE_TARGET = 'Y'
 			and (T3.CHECK_RESULT is null or T3.CHECK_RESULT in ('0', '2'))
         	<foreach item="searchMapValue" index="searchMapKey" collection="searchMap">
-        		AND ${searchMapKey} IN 
+        		AND ${searchMapKey} IN
         		<foreach collection="searchMapValue" item ="searchMapValueData" open="(" close=")" separator=",">
         			#{searchMapValueData}
         		</foreach>
         	</foreach>
-			AND SZD_SJSJG.JGYWLB IS NULL
+			AND ((SZD_SJSJG.JGYWLB IS NULL and T1.MXJSFS not in ('R','Y','A')) or (T1.MXJSFS in ('R','Y','A')))
         </where>
     </select>
 
@@ -424,7 +424,7 @@
 			and (T3.CHECK_RESULT is null or T3.CHECK_RESULT in ('0', '2'))
         	AND ((T1.JGYWLB = 'PGQZ') OR (1 = 1
         	<foreach item="searchMapValue" index="searchMapKey" collection="searchMap">
-        		AND ${searchMapKey} IN 
+        		AND ${searchMapKey} IN
         		<foreach collection="searchMapValue" item ="searchMapValueData" open="(" close=")" separator=",">
         			#{searchMapValueData}
         		</foreach>
@@ -460,7 +460,7 @@
 			T1.IMPORT_DATE = #{dealDate,jdbcType=DATE} AND (upper(T1.DATA_FILE) LIKE CONCAT(#{dataFile}, '%')) AND T1.IS_SETTLE_TARGET = 'Y'
 			and (T3.CHECK_RESULT is null or T3.CHECK_RESULT in ('0', '2'))
         	<foreach item="searchMapValue" index="searchMapKey" collection="searchMap">
-        		AND ${searchMapKey} IN 
+        		AND ${searchMapKey} IN
         		<foreach collection="searchMapValue" item ="searchMapValueData" open="(" close=")" separator=",">
         			#{searchMapValueData}
         		</foreach>
@@ -473,9 +473,9 @@
         <include refid="com.joyintech.tams.common.base.dao.SzdZqbdMapper.Sql_All_Data"></include>
         <where>
         	IMPORT_DATE = #{dealDate,jdbcType=DATE} AND (upper(DATA_FILE) LIKE CONCAT(#{dataFile}, '%')) AND IS_SETTLE_TARGET = 'Y'
-        	AND ((ZQLB = 'PG' AND BDLX = '00K') OR (1 = 1 
+        	AND ((ZQLB = 'PG' AND BDLX = '00K') OR (1 = 1
         	<foreach item="searchMapValue" index="searchMapKey" collection="searchMap">
-        		AND ${searchMapKey} IN 
+        		AND ${searchMapKey} IN
         		<foreach collection="searchMapValue" item ="searchMapValueData" open="(" close=")" separator=",">
         			#{searchMapValueData}
         		</foreach>
@@ -490,7 +490,7 @@
         <where>
         	IMPORT_DATE = #{dealDate,jdbcType=DATE} AND (upper(DATA_FILE) LIKE CONCAT(#{dataFile}, '%')) AND IS_SETTLE_TARGET = 'Y'
         	<foreach item="searchMapValue" index="searchMapKey" collection="searchMap">
-        		AND ${searchMapKey} IN 
+        		AND ${searchMapKey} IN
         		<foreach collection="searchMapValue" item ="searchMapValueData" open="(" close=")" separator=",">
         			#{searchMapValueData}
         		</foreach>
@@ -504,7 +504,7 @@
         <where>
         	IMPORT_DATE = #{dealDate,jdbcType=DATE} AND (upper(DATA_FILE) LIKE CONCAT(#{dataFile}, '%')) AND IS_SETTLE_TARGET = 'Y'
         	<foreach item="searchMapValue" index="searchMapKey" collection="searchMap">
-        		AND ${searchMapKey} IN 
+        		AND ${searchMapKey} IN
         		<foreach collection="searchMapValue" item ="searchMapValueData" open="(" close=")" separator=",">
         			#{searchMapValueData}
         		</foreach>
@@ -535,13 +535,13 @@
         <where>
 	  		DEAL_DATE = #{dealDate,jdbcType=DATE}
   			<if test="portfolioIdList != null and portfolioIdList.size() > 0">
-   				AND 
+   				AND
    				<foreach collection="portfolioIdList" item="portfolioId" open="PORTFOLIO_ID IN (" close=")" separator=",">
 		   			#{portfolioId,jdbcType=VARCHAR}
    				</foreach>
   			</if>
   			<if test="secTypeList != null and secTypeList.size() > 0">
-		   		AND 
+		   		AND
    				<foreach collection="secTypeList" item="secType" open="SEC_TYPE IN (" close=")" separator=",">
 		   			#{secType,jdbcType=VARCHAR}
    				</foreach>
@@ -624,20 +624,20 @@
         <where>
       		CDATE = #{dealDate,jdbcType=DATE}
        		<if test="portfolioIdList != null and portfolioIdList.size() > 0">
-           		AND 
+           		AND
            		<foreach collection="portfolioIdList" item="portfolioId" open="PORTFOLIO_ID IN (" close=")" separator=",">
            			#{portfolioId,jdbcType=VARCHAR}
            		</foreach>
        		</if>
        		<if test="otherBusinessTypeList != null and otherBusinessTypeList.size() > 0">
-           		AND 
+           		AND
            		<foreach collection="otherBusinessTypeList" item="otherBusinessType" open="OTH_TYPE IN (" close=")" separator=",">
            			#{otherBusinessType,jdbcType=VARCHAR}
            		</foreach>
        		</if>
         </where>
     </delete>
-    
+
     <delete id="deleteFinProdQuotByXgsgBussType">
         DELETE FROM FIN_PRODUCT_QUTO
         <where>
@@ -666,7 +666,7 @@
         <where>
         	IMPORT_DATE = #{dealDate,jdbcType=DATE} AND (upper(DATA_FILE) LIKE CONCAT(#{dataFile}, '%')) AND IS_SETTLE_TARGET = 'Y'
         	<foreach item="searchMapValue" index="searchMapKey" collection="searchMap">
-        		AND ${searchMapKey} IN 
+        		AND ${searchMapKey} IN
         		<foreach collection="searchMapValue" item ="searchMapValueData" open="(" close=")" separator=",">
         			#{searchMapValueData}
         		</foreach>
