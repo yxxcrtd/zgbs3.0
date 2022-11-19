@@ -118,7 +118,6 @@
 </select>
 <sql id="sqlwhere">
   <where>
-  	<!--PTLACCT.ACCT_TYPE IN (#{TGZH},#{JYSZJZH})-->
 	  PTL.HODING_TYPE = #{POSITION_TYPE_03}
 	  AND FP.P_FINPROD_ID IS NULL
 	  <!--修复TISHKBS-1688bug,判断组合还是否挂有该账户,通过通道投资则不用判断 by jiangpeng on 20210421 start-->
@@ -130,7 +129,8 @@
 				  PTL_CAPACCT_INFO tpsp
 				  WHERE
 				  tpsp.PORTFOLIO_ID = PTL.PORTFOLIO_ID
-				  AND tpsp.ACCT_NO= PTL.ACCT_ID )
+				  AND tpsp.ACCT_NO= PTL.ACCT_ID
+	  				and tpsp.ACCT_TYPE IN (#{TGZH},#{JYSZJZH}))
 			)
 			  or PTL.CHL_FINPROD_ID is not null )
 	  <!--修复TISHKBS-1688bug,判断组合还是否挂有该账户,通过通道投资则不用判断 by jiangpeng 20210421 end-->

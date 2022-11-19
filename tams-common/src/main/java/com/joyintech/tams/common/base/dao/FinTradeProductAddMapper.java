@@ -2,10 +2,11 @@ package com.joyintech.tams.common.base.dao;
 
 import com.joyintech.tams.common.base.entity.FinTradeProductAdd;
 import com.joyintech.tams.common.base.entity.FinTradeProductAddKey;
+import com.joyintech.tams.common.base.mapper.BaseBatchMapper;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FinTradeProductAddMapper {
+public interface FinTradeProductAddMapper extends BaseBatchMapper<FinTradeProductAdd, FinTradeProductAddKey> {
     int deleteByPrimaryKey(FinTradeProductAddKey key);
 
     int insert(FinTradeProductAdd record);

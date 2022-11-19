@@ -1,9 +1,9 @@
 package com.joyintech.tams.common.base.dao;
 
 import com.joyintech.tams.common.base.entity.TrdBankManualSettleInfo;
-import org.springframework.stereotype.Repository;
+import com.joyintech.tams.common.base.mapper.BaseBatchMapper;
 
-public interface TrdBankManualSettleInfoMapper {
+public interface TrdBankManualSettleInfoMapper extends BaseBatchMapper<TrdBankManualSettleInfo, String> {
     int deleteByPrimaryKey(String settleSeqNo);
 
     int insert(TrdBankManualSettleInfo record);

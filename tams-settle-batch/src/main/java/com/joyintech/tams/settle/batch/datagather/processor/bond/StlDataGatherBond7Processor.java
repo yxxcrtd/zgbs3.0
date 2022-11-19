@@ -122,6 +122,7 @@ public class StlDataGatherBond7Processor extends BaseProcessor<NeedOperateEntity
                 temp.setOthCode(settleTransData.getFinprodId());
                 finProductOthCodes.add(temp);
                 if(CollectionUtils.isNotEmpty(finProductOthCodes)){
+                    FinProduct finProduct = finProductMapper.selectByPrimaryKey(settleTransData.getFinprodId());
                     for(FinProductOthCode finProductOthCode : finProductOthCodes){
                         String stockId = finProductOthCode.getOthCode();
                         //汇总交易(资产+组合维度)
@@ -136,7 +137,6 @@ public class StlDataGatherBond7Processor extends BaseProcessor<NeedOperateEntity
                                 ptlSecPositionsByFinprodId = finprodIdMap.get(settleTransData.getFinprodId());
                             }
                             // 兼容新头寸引擎 modify by fuyongsheng 20220328 end
-                            FinProduct finProduct = finProductMapper.selectByPrimaryKey(settleTransData.getFinprodId());
                             //BigDecimal amountTotal = ptlSecPositionsByFinprodId.stream().map(item2 -> item2.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add);
                             for (PtlSecPosition ptlSecPosition : ptlSecPositionsByFinprodId) {
                                 // 业务类型
