@@ -419,6 +419,9 @@ public class IbuQuoteRepoService extends BaseService {
             page = super.queryForPage(pageNo, pageSize, () -> cfetsIbuQuoteRepoMapper.selectUsableEntrustPledges(pageParam));
         } else {
             setParam(pageParam, 3);
+            if (StringUtil.equals(repo_pledge_model, "01")) {//无质押券库
+                pageParam.put("pledgeStockIdList",Collections.singletonList("999999"));
+            }
             page = super.queryForPage(pageNo, pageSize, () -> cfetsIbuQuoteRepoMapper.selectUsablePledges(pageParam));
         }
         for (RepoEntrustPledgeDto dto : page.getRoot()) {

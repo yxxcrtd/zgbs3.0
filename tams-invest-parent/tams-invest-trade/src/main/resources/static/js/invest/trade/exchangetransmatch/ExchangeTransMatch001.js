@@ -85,6 +85,8 @@
             {field:'dealDate', sortField:'dealDate',width:200, title: 'ExchangeTransMatch001.dealDate',type: 'date'},
             {field:'acctName', sortField:'acctNo',width:200, title: 'ExchangeTransMatch001.fundAccount'},
 
+            {field:'parValue', visible:false},
+            {field:'cpriceAmt', visible:false},
             {field:'matchStatus', visible:false},
             {field:'matchProgress', visible:false},
             {field:'finprodType2', visible:false},

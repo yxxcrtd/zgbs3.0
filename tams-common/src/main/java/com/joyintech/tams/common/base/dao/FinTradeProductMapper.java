@@ -5,13 +5,14 @@ import com.joyintech.tams.common.base.entity.FinTradeProductKey;
 
 import java.util.List;
 
+import com.joyintech.tams.common.base.mapper.BaseBatchMapper;
 import com.joyintech.tams.common.base.pojo.OriPledgeInfo;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FinTradeProductMapper {
+public interface FinTradeProductMapper extends BaseBatchMapper<FinTradeProduct, FinTradeProductKey> {
     int deleteByPrimaryKey(FinTradeProductKey key);
 
     int insert(FinTradeProduct record);

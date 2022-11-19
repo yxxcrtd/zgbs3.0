@@ -310,6 +310,7 @@
 		AND std.VDATE = stdsq.VDATE
 		AND std.CJBH = stdsq.CJBH
 		AND stdsq.PS = 'T01'
+		AND stdsq.FINPROD_TYPE2 in ('F02','F03')
 		<!--ZGTFCP-1317:修改查询到期数据条件 modify by fuyongsheng 20220318 end-->
 		INNER JOIN
 		<!--GNS-889:使用首期成交编号 modify by fuyongsheng 20220219 start-->
@@ -317,7 +318,7 @@
 		SETTLE_TRANS_TG_MAPPING M ON M.TRADE_ID = stdsq.TRADE_ID
 		<!--GNS-889:使用首期成交编号 modify by fuyongsheng 20220219 end-->
 		INNER JOIN TRD_PRODUCT_DEAL T1
-		ON (M.TRADE_ID_TG = T1.TRADE_ID OR M.TRADE_ID_TG = T1.TOTLE_TRADE_ID)
+		ON (M.TRADE_ID_TG = T1.TRADE_ID OR M.TRADE_ID_TG = T1.TOTLE_TRADE_ID) and T1.FINPROD_TYPE2 in ('F02','F03')
 		<!-- ON T1.F_TRADE_ID = std.CJBH
 		AND T1.SEAT_ID = std.SEAT_NUMBER
 		AND T1.VDATE = STD .TRADE_DATE -->
@@ -1892,9 +1893,19 @@
 		       DISTINCT *
 		FROM TRD_FIN_PRODUCT_DEAL_TOTAL t
 		where t.TOTLE_TRADE_ID IN
-		<foreach collection="tradeIdTgList" item="item" open="(" close=")" separator=",">
-			#{item,jdbcType=VARCHAR}
-		</foreach>
+		(
+			SELECT
+			DISTINCT  sttm.TRADE_ID_TG
+			FROM SETTLE_TRANS_TG_MAPPING sttm
+			WHERE sttm.TRADE_ID in(
+				SELECT std.TRADE_ID
+				FROM SETTLE_TRANS_DATA std
+				WHERE std.APPLY_TRADE_ID = #{applyTradeId, jdbcType=VARCHAR}
+				AND  std.TRADE_DATE = #{tradeDate,jdbcType=DATE}
+				AND std.SEC_ACCT_ID = #{secAcctId, jdbcType=VARCHAR}
+				AND std.SEAT_NUMBER = #{seatNumber, jdbcType=VARCHAR}
+			)
+		)
 	</select>
 
 	<select id="selectTradesByTotleTradeId" resultType="com.joyintech.tams.common.base.entity.TrdProductDeal">

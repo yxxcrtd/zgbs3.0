@@ -73,7 +73,7 @@
                             <span class="title-des" th:text="#{CfetsBondDealQuotedPrice002.baseinfo}">基本信息</span><i class="iconfont icon-arrow-down pro-down-icon"></i></h3>
                         <div class="pro-module-item">
                             <div class="layui-form-item">
-                                <div class="form-inline-wrap">
+                                <div class="form-inline-wrap" data-th-if="${entity?.ps} neq ${PS_T03}">
                                     <label class="layui-form-label">报价方式</label>
                                     <div class="layui-input-block">
                                         <input type="radio" name="quoteStyle" value="01" th:checked="'01' eq ${entity?.quoteStyle}" title="对话报价">
@@ -201,7 +201,7 @@
                                                data-th-value="${entity?.counterTraderName}"
                                                class="layui-input form-input" placeholder="请输入内容"
                                                data-th-placeholder="#{SysCommon.placeholder}">-->
-                                        <select required type="text" id="CfetsBondDealQuotedPrice004_counterTrader" name="counterTrader"
+                                        <select type="text" id="CfetsBondDealQuotedPrice004_counterTrader" name="counterTrader"
                                                 class="layui-input form-input input-select" parentIds="CfetsBondDealQuotedPrice004_counterId"
                                                 th:placeholder="#{SysCommon.placeholder}" placeholder="请输入内容"
                                                 th:data-url="@{/common/joyinbusinessCommon/queryMySideTraderListForSelect}" allowClear="true"
@@ -214,7 +214,7 @@
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap" data-th-text="#{CfetsBondDealQuotedPrice002.settleSpeed}" >清算速度</label>
                                     <div class="layui-input-inline input-inline buss-inline-wrap">
-                                        <select required type="text" id="CfetsBondDealQuotedPrice004_settleSpreed" name="settleSpreedCode"
+                                        <select type="text" id="CfetsBondDealQuotedPrice004_settleSpreed" name="settleSpreedCode"
                                                 class="layui-input form-input input-select"
                                                 placeholder="请输入内容" th:placeholder="#{SysCommon.placeholder}"
                                                 th:data-result='${ACCOUNT_SPEED}' allowClear="true" formatoption="true"
@@ -241,7 +241,7 @@
                                         <span id="calculateField_span_unitCprice" th:if="${entity?.calculateField != calcTypeUnitCprice}" data-th-text="#{CfetsBondDealQuotedPrice002.cleanPrice}"></span>
                                     </label>
                                     <div class="layui-input-inline input-inline">
-                                        <input required type="text" id="CfetsBondDealQuotedPrice004_unitCprice" name="priceShow"
+                                        <input type="text" id="CfetsBondDealQuotedPrice004_unitCprice" name="priceShow"
                                                class="layui-input form-input text-number" placeholder="请输入内容"
                                                data-fixtype="2" data-textrange="4"
                                                th:placeholder="#{SysCommon.placeholder}" th:value="${entity?.price}">
@@ -256,7 +256,7 @@
                                         <span id="calculateField_span_yield" th:if="${entity?.calculateField != calcTypeYield}" data-th-text="#{CfetsBondDealQuotedPrice002.mYield}"></span>
                                     </label>
                                     <div class="layui-input-inline input-inline buss-inline-wrap">
-                                        <input required type="text" id="CfetsBondDealQuotedPrice004_matureYield" name="matureYieldShow"
+                                        <input type="text" id="CfetsBondDealQuotedPrice004_matureYield" name="matureYieldShow"
                                                class="layui-input form-input text-number"
                                                data-fixtype="2" data-textrange="4" th:value="${entity?.matureYield}">
                                         <span class="input-right-show">%</span>
@@ -270,7 +270,7 @@
                                             <span id="calculateField_span_exerYield" th:if="${entity?.calculateField != calcTypeExecYield}" data-th-text="#{CfetsBondDealQuotedPrice002.exec}"></span>
                                         </label>
                                         <div class="layui-input-inline input-inline buss-inline-wrap">
-                                            <input required type="text" id="CfetsBondDealQuotedPrice004_exerYield" name="exerYieldShow"
+                                            <input type="text" id="CfetsBondDealQuotedPrice004_exerYield" name="exerYieldShow"
                                                    class="layui-input form-input text-number"
                                                    data-fixtype="2" data-textrange="4" th:value="${entity?.exerYield}">
                                             <span class="input-right-show">%</span>
@@ -381,7 +381,7 @@
                                 <div class="form-inline-wrap" id="dealFeeAmtDiv">
                                     <label class="layui-form-label form-label-wrap">交易手续费</label>
                                     <div class="layui-input-inline input-inline">
-                                        <input  type="text" id="dealFeeAmt" name="dealFeeAmt"
+                                        <input type="text" id="dealFeeAmt" name="dealFeeAmt"
                                                class="layui-input form-input text-number" placeholder="请输入内容"
                                                data-fixtype="2" data-textrange="2"
                                                th:placeholder="#{SysCommon.placeholder}" th:value="${entity?.dealFeeAmt}">
@@ -391,7 +391,7 @@
                                 <div class="form-inline-wrap">
                                     <label class="layui-form-label form-label-wrap">结算服务费</label>
                                     <div class="layui-input-inline input-inline">
-                                        <input type="text" required id="settFeeAmt" name="settFeeAmt"
+                                        <input type="text" id="settFeeAmt" name="settFeeAmt"
                                                class="layui-input form-input text-number" placeholder="请输入内容"
                                                data-fixtype="2" data-textrange="2"
                                                th:placeholder="#{SysCommon.placeholder}" th:value="${entity?.settFeeAmt}">
@@ -621,6 +621,7 @@
         var ps =  /*[[${entity?.ps}]]*/'';
         var PS_T03 = /*[[${PS_T03}]]*/'';
         var entity_RiskTrialRetList = eval(/*[[${entity_RiskTrialRetList}]]*/'');
+        var isTraderRequired = eval(/*[[${isTraderRequired}]]*/'false');
     </script>
     <script th:src="@{/js/cfets/bond/IbuQuoteBond004.js}" type="text/javascript"></script>
 </div>

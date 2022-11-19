@@ -76,9 +76,9 @@ public class StlDataGatherBond8Processor extends BaseProcessor<NeedOperateEntity
                 paraMap.put("tradeDate", settleTransDataTotal.getTradeDate());
                 paraMap.put("secAcctId", settleTransDataTotal.getSecAcctId());
                 paraMap.put("seatNumber", settleTransDataTotal.getSeatNumber());
-                List<String> tradeIdTgList = stlDataGatherMapper.selectTradeIdTgs(paraMap);
+//                List<String> tradeIdTgList = stlDataGatherMapper.selectTradeIdTgs(paraMap);
                 // 根据汇总交易编号查询所有通知的汇总交易
-                List<TrdFinProductDealTotal> notifyDealTotalList = stlDataGatherMapper.selectTotalTradesBytotleTradeId(tradeIdTgList);
+                List<TrdFinProductDealTotal> notifyDealTotalList = stlDataGatherMapper.selectTotalTradesBytotleTradeId(paraMap);
                 // 根据通知的汇总交易生成结果的汇总交易
                 Map<String, TotalTrdProductDealDto> resultDealTotalMap = this.createResultTrdFinProductDealTotalMap(settleTransDataTotal, notifyDealTotalList);
                 // 根据汇总的成交明细查询出原成交明细列表

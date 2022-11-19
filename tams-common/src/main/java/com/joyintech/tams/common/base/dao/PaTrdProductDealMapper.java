@@ -1,13 +1,11 @@
 package com.joyintech.tams.common.base.dao;
 
 import com.joyintech.tams.common.base.entity.PaTrdProductDeal;
-import org.apache.ibatis.annotations.Param;
+import com.joyintech.tams.common.base.mapper.BaseBatchMapper;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface PaTrdProductDealMapper {
+public interface PaTrdProductDealMapper extends BaseBatchMapper<PaTrdProductDeal, String> {
     int deleteByPrimaryKey(String tradeId);
 
     int insert(PaTrdProductDeal record);

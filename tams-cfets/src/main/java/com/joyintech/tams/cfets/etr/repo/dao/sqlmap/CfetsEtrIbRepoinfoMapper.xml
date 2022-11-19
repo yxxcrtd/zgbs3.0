@@ -1349,5 +1349,26 @@
             and TABLE01.FINPROD_ID = #{finprodId}
             and TABLE01.PORTFOLIO_ID = #{portfolioId}
     </select>
-
+    <select id="findBasicInfo" resultType="com.joyintech.tams.cfets.etr.repo.dto.CfetsEtrIbRepoLibDto">
+        SELECT
+            V.SEC_ACCT_ID AS secAcctId,
+            0 branch,
+            NVL(fscr.SCALE,1)*100 scale
+        FROM PTL_SEC_ACCT PSA, STL_SEC_ACCT_INFO V
+                                   LEFT JOIN FIN_PRODUCT R ON R.REGIST_ORG = V.REGIST_ORG
+                                   LEFT JOIN FIN_STDSEC_CONVERSE_RADIO fscr ON fscr.FINPROD_ID = R.FINPROD_ID AND fscr.BRANCH = 0 AND fscr.VDATE <![CDATA[<=]]> to_date(#{plateDate}, 'yyyy-MM-dd')
+            AND NOT EXISTS (
+                    SELECT  1 FROM FIN_STDSEC_CONVERSE_RADIO fscrInner
+                    WHERE fscrInner.FINPROD_ID = fscr.FINPROD_ID
+                      AND fscrInner.BRANCH = fscr.BRANCH
+                      AND fscrInner.VDATE <![CDATA[<=]]> to_date(#{plateDate}, 'yyyy-MM-dd')
+                      AND fscrInner.VDATE > fscr.VDATE
+                )
+        WHERE PSA.ACCT_NO = V.SEC_ACCT_ID
+          AND V.SEC_ACCT_TYPE = 'SEC'
+          AND V.TRADE_PLACE in ('01','02')
+          AND V.TRADE_PLACE = R.TRADE_MARKET
+          AND PSA.PORTFOLIO_ID = #{portfolioId}
+          AND R.FINPROD_ID = #{finprodId}
+    </select>
 </mapper>
