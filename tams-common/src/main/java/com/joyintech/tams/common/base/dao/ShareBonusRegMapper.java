@@ -1,17 +1,14 @@
 package com.joyintech.tams.common.base.dao;
 
 
-import com.joyintech.framework.select.SelectOptionDto;
 import com.joyintech.tams.common.base.entity.ShareBonusReg;
+import com.joyintech.tams.common.base.mapper.BaseBatchMapper;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Map;
-
 @Repository
-public interface ShareBonusRegMapper {
+public interface ShareBonusRegMapper extends BaseBatchMapper<ShareBonusReg, String> {
 
-    void insertSelective(ShareBonusReg entity);
+    int insertSelective(ShareBonusReg entity);
 
 
 

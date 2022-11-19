@@ -4,11 +4,12 @@ import com.joyintech.tams.common.base.entity.TrdProductDeal;
 
 import java.util.List;
 
+import com.joyintech.tams.common.base.mapper.BaseBatchMapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TrdProductDealMapper {
+public interface TrdProductDealMapper extends BaseBatchMapper<TrdProductDeal, String> {
     int deleteByPrimaryKey(String tradeId);
 
     int insert(TrdProductDeal record);

@@ -2,10 +2,11 @@ package com.joyintech.tams.common.base.dao;
 
 import com.joyintech.tams.common.base.entity.SettleTransTgMapping;
 import com.joyintech.tams.common.base.entity.SettleTransTgMappingKey;
+import com.joyintech.tams.common.base.mapper.BaseBatchMapper;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SettleTransTgMappingMapper {
+public interface SettleTransTgMappingMapper extends BaseBatchMapper<SettleTransTgMapping, SettleTransTgMappingKey> {
     int deleteByPrimaryKey(SettleTransTgMappingKey key);
 
     int insert(SettleTransTgMapping record);

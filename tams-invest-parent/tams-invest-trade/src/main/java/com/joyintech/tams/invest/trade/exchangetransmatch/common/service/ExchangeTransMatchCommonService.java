@@ -392,6 +392,10 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 .forEach(item->{
             // 获取指令明细信息
             List<ExchangeTransMatchCommonEntrustDetailDto> entrustDetailDtoList = exchangeTransMatchCommonMapper.getEntrustDetailList(item.getEntrustId());
+            // 回购时，数量取金额字段
+            if (this.isRepo(matchDto.getFinprodType2())) {
+                entrustDetailDtoList.forEach(dto -> dto.setEntrustNum(dto.getEntrustAmt()));
+            }
             if(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(item.getFinprodType2())){
                 entrustDetailDtoList = entrustDetailDtoList.stream()
                         .filter(dto -> dto.getSecAcctId().equals(item.getSecAcctId()))
@@ -427,7 +431,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                             // 本次剩余分配总数 小于 组合剩余分配数量,则分配 本次剩余分配总数, 本次剩余分配总数置为0,跳出循环
                             portfolioMatchQtyMap.put(portfolioEntry.getKey(), remainMatchQty);
                             remainMatchQty = BigDecimal.ZERO;
-                            break;
+//                            break;
                         }
                     }
                     else{
@@ -439,7 +443,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                             // 本次剩余分配总数 小于 最小交易数量,则分配 本次剩余分配总数, 本次剩余分配总数置为0,跳出循环
                             portfolioMatchQtyMap.put(portfolioEntry.getKey(), remainMatchQty);
                             remainMatchQty = BigDecimal.ZERO;
-                            break;
+//                            break;
                         }
                     }
                 }
@@ -506,7 +510,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 }
                 logger.debug("【指令编号:{},证券账户:{},最终分配数量结果为:{}】", item.getEntrustId(), item.getSecAcctId(), JSON.toJSONString(portfolioMatchQtyMap));
                 // 5、根据本次分配数量计算 分配金额和交易支付费用
-                this.calculatePortFolioMatchAmt(matchDto, item, portfolioMatchQtyMap, portfolioRemainQtyList, entrustDetailDtoList, item.getMarchAmt(), this.multiply(item.getMarchQty(), matchDto.getUnitCprice()));
+                this.calculatePortFolioMatchAmt(matchDto, item, portfolioMatchQtyMap, portfolioRemainQtyList, entrustDetailDtoList, item.getMarchAmt(), this.multiplyWithScale2(item.getMarchQty(), matchDto.getUnitCprice()));
             }
             logger.debug("【指令编号:{},证券账户:{},最终结果为:{}】", item.getEntrustId(), item.getSecAcctId(), JSON.toJSONString(entrustDetailDtoList));
             // ZGCPCN-1551:modify by fuyongsheng 20220620 start
@@ -2268,7 +2272,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
             //已经完全匹配的可分配不随交易费用
             BigDecimal totalFinishMarchUnFeeAmtPay = BigDecimal.ZERO;
             //净价总额
-            BigDecimal cpriceAmt = this.multiply(dto.getRemainNum(), dto.getUnitCprice());
+            BigDecimal cpriceAmt = this.multiplyWithScale2(dto.getRemainNum(), dto.getUnitCprice());
 
             //系统参数.匹配规则
             String matchRule = CacheUtil.getSysParam("MATCH_RULE");

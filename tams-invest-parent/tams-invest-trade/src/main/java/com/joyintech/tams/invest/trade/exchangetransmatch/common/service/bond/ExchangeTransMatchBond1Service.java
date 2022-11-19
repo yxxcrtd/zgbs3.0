@@ -12,6 +12,7 @@ import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.common.dto.BaseTradeProductDealDto;
 import com.joyintech.tams.invest.common.dto.StlPayOrdersDto;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonDto;
+import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonEntrustDetailDto;
 import com.joyintech.tams.invest.common.transmatch.dto.ExchangeTransMatchCommonEntrustDto;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +48,12 @@ public class ExchangeTransMatchBond1Service extends ExchangeTransMatchBondCommon
         // 单位面值
         trdFinProductDealTotal.setParValue(dealDto.getParValue());
         // 净价总额
-        trdFinProductDealTotal.setCpriceAmt(ArithmeticUtil.multiply(entrustDto.getMarchQty(),dealDto.getUnitCprice()).setScale(2, RoundingMode.HALF_UP));
+//        trdFinProductDealTotal.setCpriceAmt(ArithmeticUtil.multiply(entrustDto.getMarchQty(),dealDto.getUnitCprice()).setScale(2, RoundingMode.HALF_UP));
+        if(StringUtil.equals(entrustDto.getEntrustClass(),DictCodeListExt3.投资指令类型_多组合单资产指令.getValue())) {
+            trdFinProductDealTotal.setCpriceAmt(entrustDto.getEntrustDetailDtoList().stream().map(ExchangeTransMatchCommonEntrustDetailDto::getMarchCpriceAmt).reduce(BigDecimal.ZERO, BigDecimal::add));
+        } else {
+            trdFinProductDealTotal.setCpriceAmt(entrustDto.getMarchCpriceAmt());
+        }
         // 全价总额
         trdFinProductDealTotal.setFpriceAmt(entrustDto.getMarchAmt().setScale(2, BigDecimal.ROUND_HALF_UP));
         // 交易本金

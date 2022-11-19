@@ -23,7 +23,9 @@ import com.joyintech.tams.settle.batch.datagather.dto.*;
 import com.joyintech.tams.settle.batch.dealrevoke.dao.InvestDealRevokeMapper;
 import com.joyintech.tams.settle.batch.dealrevoke.service.*;
 import com.joyintech.tams.systemtools.util.CommonUtil;
+import com.joyintech.tams.systemtools.util.TamsDbUtil;
 import org.apache.commons.collections4.CollectionUtils;
+import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,77 +76,77 @@ public class StlDataGatherService {
     @Autowired
     private StlDataGatherMapper stlDataGatherMapper;
 
-    @Autowired
-    private TrdFinProductDealTotalMapper trdFinProductDealTotalMapper;
-
-    @Autowired
-    private PaTrdFinProductDealTotalMapper paTrdFinProductDealTotalMapper;
-
-    @Autowired
-    private TrdDealTotalAddMapper trdDealTotalAddMapper;
-
-    @Autowired
-    private TrdFinProductBarterTotalMapper trdBarterTotalMapper;
-
-    @Autowired
-    private TrdFinProductBarterMapper trdBarterMapper;
-
-    @Autowired
-    private TrdProductDealAddMapper trdProductDealAddMapper;
-
-    @Autowired
-    private StlPayOrdersMapper stlPayOrdersMapper;
-
-    @Autowired
-    private TrdProductDealMapper trdProductDealMapper;
-
-    @Autowired
-    private PtlTradeMapper ptlTradeMapper;
-
-    @Autowired
-    private TrdTradeFeeDetailMapper trdTradeFeeDetailMapper;
-
-    @Autowired
-    private FinTradeProductMapper finTradeProductMapper;
-
-    @Autowired
-    private FinTradeProductAddMapper finTradeProductAddMapper;
-
-    @Autowired
-    private FinDealPledgeMapper finDealPledgeMapper;
-
-    @Autowired
-    private TrdTradeFeeTotalMapper trdTradeFeeTotalMapper;
+//    @Autowired
+//    private TrdFinProductDealTotalMapper trdFinProductDealTotalMapper;
+//
+//    @Autowired
+//    private PaTrdFinProductDealTotalMapper paTrdFinProductDealTotalMapper;
+//
+//    @Autowired
+//    private TrdDealTotalAddMapper trdDealTotalAddMapper;
+//
+//    @Autowired
+//    private TrdFinProductBarterTotalMapper trdBarterTotalMapper;
+//
+//    @Autowired
+//    private TrdFinProductBarterMapper trdBarterMapper;
+//
+//    @Autowired
+//    private TrdProductDealAddMapper trdProductDealAddMapper;
+//
+//    @Autowired
+//    private StlPayOrdersMapper stlPayOrdersMapper;
+//
+//    @Autowired
+//    private TrdProductDealMapper trdProductDealMapper;
+//
+//    @Autowired
+//    private PtlTradeMapper ptlTradeMapper;
+//
+//    @Autowired
+//    private TrdTradeFeeDetailMapper trdTradeFeeDetailMapper;
+//
+//    @Autowired
+//    private FinTradeProductMapper finTradeProductMapper;
+//
+//    @Autowired
+//    private FinTradeProductAddMapper finTradeProductAddMapper;
+//
+//    @Autowired
+//    private FinDealPledgeMapper finDealPledgeMapper;
+//
+//    @Autowired
+//    private TrdTradeFeeTotalMapper trdTradeFeeTotalMapper;
 
     @Autowired
     private EtrEntrustAddMapper etrEntrustAddMapper;
 
-    @Autowired
-    private EtrFinishStatusMapper etrFinishStatusMapper;
+//    @Autowired
+//    private EtrFinishStatusMapper etrFinishStatusMapper;
 
     @Autowired
     private SettleCommonService settleCommonService;
 
-    @Autowired
-    private PaTrdProductDealMapper paTrdProductDealMapper;
-
-    @Autowired
-    private FinProductTypeMapper finProductTypeMapper;
-
-    @Autowired
-    private SettleTransTgMappingMapper settleTransTgMappingMapper;
-
-    @Autowired
-    private PtlSecPositionFlowMapper ptlSecPositionFlowMapper;
-
-    @Autowired
-    private EtrSecPositionFlowMapper etrSecPositionFlowMapper;
-
-    @Autowired
-    private TrdBankManualSettleInfoMapper trdBankManualSettleInfoMapper;
-
-    @Autowired
-    private TrdBankManualSettleFlowMapper trdBankManualSettleFlowMapper;
+//    @Autowired
+//    private PaTrdProductDealMapper paTrdProductDealMapper;
+//
+//    @Autowired
+//    private FinProductTypeMapper finProductTypeMapper;
+//
+//    @Autowired
+//    private SettleTransTgMappingMapper settleTransTgMappingMapper;
+//
+//    @Autowired
+//    private PtlSecPositionFlowMapper ptlSecPositionFlowMapper;
+//
+//    @Autowired
+//    private EtrSecPositionFlowMapper etrSecPositionFlowMapper;
+//
+//    @Autowired
+//    private TrdBankManualSettleInfoMapper trdBankManualSettleInfoMapper;
+//
+//    @Autowired
+//    private TrdBankManualSettleFlowMapper trdBankManualSettleFlowMapper;
 
 
     // modify by etliu 20220220 start
@@ -170,6 +172,9 @@ public class StlDataGatherService {
 
     @Autowired
     private InvestDealRevokeService investDealRevokeService;
+
+    @Autowired
+    private SqlSessionTemplate template;
 
     /**
      * 获取除权交易明细
@@ -366,6 +371,8 @@ public class StlDataGatherService {
             finTradeProductMap = tradeProductList.stream().collect(Collectors.toMap(FinTradeProductDto::getFinprodId, item -> item));
         }
 
+        List<TrdDealTotalAdd> trdDealTotalAddInsertList = new ArrayList<>(finProductDealTotalList.size());
+        List<PaTrdFinProductDealTotal> paProductDealTotalInsertList = new ArrayList<>(finProductDealTotalList.size());
         if (CollectionUtils.isNotEmpty(finProductDealTotalList)) {
             Map<String, List<TrdDealTotalAdd>> totleAddMap = new HashMap<String, List<TrdDealTotalAdd>>();
             if (CollectionUtils.isNotEmpty(trdDealTotalAddList)) {
@@ -373,13 +380,14 @@ public class StlDataGatherService {
             }
             for (TotalTrdProductDealDto totalTrdProductDealDto : finProductDealTotalList) {
                 // 汇总交易表
-                trdFinProductDealTotalMapper.insertSelective(totalTrdProductDealDto);
+//                trdFinProductDealTotalMapper.insertSelective(totalTrdProductDealDto);
 
                 if (!CollectionUtils.isNotEmpty(totleAddMap.get(totalTrdProductDealDto.getTotleTradeId()))) {
                     TrdDealTotalAdd trdDealTotalAdd = new TrdDealTotalAdd();
                     BeanUtil.copyProperties(trdDealTotalAdd, totalTrdProductDealDto);
                     // 汇总交易扩展表
-                    trdDealTotalAddMapper.insertSelective(trdDealTotalAdd);
+//                    trdDealTotalAddMapper.insertSelective(trdDealTotalAdd);
+                    trdDealTotalAddInsertList.add(trdDealTotalAdd);
                 }
 
                 PaTrdFinProductDealTotal paProductDealTotal = new PaTrdFinProductDealTotal();
@@ -402,21 +410,31 @@ public class StlDataGatherService {
                     paProductDealTotal.setTheoryPrin(totalTrdProductDealDto.getTheoryprinAmt());
                 }
                 // ZGZGST-4220:解决存续期详情画面字段为空问题 fuyongsheng add end
-                paTrdFinProductDealTotalMapper.insertSelective(paProductDealTotal);
+//                paTrdFinProductDealTotalMapper.insertSelective(paProductDealTotal);
+                paProductDealTotalInsertList.add(paProductDealTotal);
             }
         }
+        // 批量插入汇总交易表
+        TamsDbUtil.insertSelectiveBatch(template, TrdFinProductDealTotalMapper.class, finProductDealTotalList);
+        // 汇总附属
+        trdDealTotalAddInsertList.addAll(trdDealTotalAddList);
+        TamsDbUtil.insertSelectiveBatch(template, TrdDealTotalAddMapper.class, trdDealTotalAddInsertList);
+        TamsDbUtil.insertSelectiveBatch(template, PaTrdFinProductDealTotalMapper.class, paProductDealTotalInsertList);
+
         Map<String, TrdProductDealAdd> trdProductDealAddMap = new HashMap<>();
         if (CollectionUtils.isNotEmpty(trdProductDealAddList)) {
             for (TrdProductDealAdd trdProductDealAdd : trdProductDealAddList) {
                 trdProductDealAddMap.put(trdProductDealAdd.getTradeId(), trdProductDealAdd);
             }
         }
+        List<TrdProductDealAdd> trdProductDealAddInsertList = new ArrayList<>(productDealList.size());
+        List<PaTrdProductDeal> paTrdProductDealInsertList = new ArrayList<>(productDealList.size());
         Map<String, List<TrdProductDealDto>> dealMap = new HashMap<String, List<TrdProductDealDto>>();
         if (CollectionUtils.isNotEmpty(productDealList)) {
             dealMap = productDealList.stream().collect(Collectors.groupingBy(TrdProductDealDto::getTradeId));
             for (TrdProductDealDto productDealDto : productDealList) {
                 // 金融产品交易表
-                trdProductDealMapper.insertSelective(productDealDto);
+//                trdProductDealMapper.insertSelective(productDealDto);
                 TrdProductDealAdd trdProductDealAdd = trdProductDealAddMap.get(productDealDto.getTradeId());
                 if (trdProductDealAdd == null) {
                     // 金融产品交易扩展表
@@ -437,7 +455,8 @@ public class StlDataGatherService {
                     trdProductDealAdd.setBonusCfmDate(productDealDto.getBonusCfmDate());
                 }
                 trdProductDealAdd.setGenType("03");
-                trdProductDealAddMapper.insertSelective(trdProductDealAdd);
+//                trdProductDealAddMapper.insertSelective(trdProductDealAdd);
+                trdProductDealAddInsertList.add(trdProductDealAdd);
                 // 回购时登录PA_TRD_PRODUCT_DEAL表
                 if (StringUtil.equals(productDealDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue()) ||
                         StringUtil.equals(productDealDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue())) {
@@ -450,7 +469,8 @@ public class StlDataGatherService {
                         paTrdProductDeal.setPaBussType(DictCodeListExt1.平安业务类型_逆回购.getValue());
                         paTrdProductDeal.setBackLendDirection(DictCodeList.回购拆借方向_逆回购.getValue());
                     }
-                    paTrdProductDealMapper.insert(paTrdProductDeal);
+//                    paTrdProductDealMapper.insert(paTrdProductDeal);
+                    paTrdProductDealInsertList.add(paTrdProductDeal);
 
                     // add 处理现金流信息 20210825 start
                     // 写入现金流相关信息表
@@ -471,18 +491,27 @@ public class StlDataGatherService {
                 }
             }
         }
+        // 金融产品交易表
+        TamsDbUtil.insertSelectiveBatch(template, TrdProductDealMapper.class, productDealList);
+        // 金融产品交易扩展表
+        TamsDbUtil.insertSelectiveBatch(template, TrdProductDealAddMapper.class, trdProductDealAddInsertList);
+        // 回购时登录PA_TRD_PRODUCT_DEAL表
+        TamsDbUtil.insertSelectiveBatch(template, PaTrdProductDealMapper.class, paTrdProductDealInsertList);
 
-        if (CollectionUtils.isNotEmpty(ptlTradeList)) {
-            for (PtlTrade ptlTrade : ptlTradeList) {
-                // 组合交易表
-                ptlTradeMapper.insertSelective(ptlTrade);
-            }
-        }
+//        if (CollectionUtils.isNotEmpty(ptlTradeList)) {
+//            for (PtlTrade ptlTrade : ptlTradeList) {
+//                // 组合交易表
+//                ptlTradeMapper.insertSelective(ptlTrade);
+//            }
+//        }
+        // 组合交易表
+        TamsDbUtil.insertSelectiveBatch(template, PtlTradeMapper.class, ptlTradeList);
 
+        List<TrdTradeFeeTotal> trdTradeFeeTotalInsertList = new ArrayList<>(tradeFeeDetailList.size());
         if (CollectionUtils.isNotEmpty(tradeFeeDetailList)) {
             for (TrdTradeFeeDetail feeDetail : tradeFeeDetailList) {
                 // 金融产品交易费用明细
-                trdTradeFeeDetailMapper.insertSelective(feeDetail);
+//                trdTradeFeeDetailMapper.insertSelective(feeDetail);
 
                 // 费用交易汇总
                 if (CollectionUtils.isNotEmpty(dealMap.get(feeDetail.getTradeId())) && CollectionUtils.isNotEmpty(finProductDealTotalList)) {
@@ -494,34 +523,50 @@ public class StlDataGatherService {
                     if (totleTradeId != null) {
                         trdTradeFeeTotal.setTotleTradeId(dealMap.get(feeDetail.getTradeId()).get(0).getTotleTradeId());
                     }
-                    TrdTradeFeeTotalKey key = new TrdTradeFeeTotalKey();
-                    key.setTotleTradeId(trdTradeFeeTotal.getTotleTradeId());
-                    key.setFeeType(trdTradeFeeTotal.getFeeType());
-                    TrdTradeFeeTotal total = trdTradeFeeTotalMapper.selectByPrimaryKey(key);
-                    if(total != null){
-                        trdTradeFeeTotalMapper.deleteByPrimaryKey(key);
-                    }
-                    trdTradeFeeTotalMapper.insertSelective(trdTradeFeeTotal);
+//                    TrdTradeFeeTotalKey key = new TrdTradeFeeTotalKey();
+//                    key.setTotleTradeId(trdTradeFeeTotal.getTotleTradeId());
+//                    key.setFeeType(trdTradeFeeTotal.getFeeType());
+//                    TrdTradeFeeTotal total = trdTradeFeeTotalMapper.selectByPrimaryKey(key);
+//                    if(total != null){
+//                        trdTradeFeeTotalMapper.deleteByPrimaryKey(key);
+//                    }
+//                    trdTradeFeeTotalMapper.insertSelective(trdTradeFeeTotal);
+                    trdTradeFeeTotalInsertList.add(trdTradeFeeTotal);
                 }
             }
         }
+        // 金融产品交易费用明细
+        TamsDbUtil.insertSelectiveBatch(template, TrdTradeFeeDetailMapper.class, tradeFeeDetailList);
+        // 费用交易汇总
+        TamsDbUtil.deleteAndInsertSelectiveBatch(template, TrdTradeFeeTotalMapper.class, trdTradeFeeTotalInsertList, e -> {
+            TrdTradeFeeTotal trdTradeFeeTotal = (TrdTradeFeeTotal) e;
+            TrdTradeFeeTotalKey key = new TrdTradeFeeTotalKey();
+            key.setTotleTradeId(trdTradeFeeTotal.getTotleTradeId());
+            key.setFeeType(trdTradeFeeTotal.getFeeType());
+            return key;
+        });
 
-        if (CollectionUtils.isNotEmpty(stlPayOrdersList)) {
-            for (StlPayOrders stlPayOrders : stlPayOrdersList) {
-                // 划款指令
-                stlPayOrdersMapper.insertSelective(stlPayOrders);
-            }
-        }
+//        if (CollectionUtils.isNotEmpty(stlPayOrdersList)) {
+//            for (StlPayOrders stlPayOrders : stlPayOrdersList) {
+//                // 划款指令
+//                stlPayOrdersMapper.insertSelective(stlPayOrders);
+//            }
+//        }
+        // 划款指令
+        TamsDbUtil.insertSelectiveBatch(template, StlPayOrdersMapper.class, stlPayOrdersList);
 
+        List<FinTradeProductAdd> finTradeProductAddInsertList = new ArrayList<>(tradeProductList.size());
+        List<FinProductType> finProductTypeInsertList = new ArrayList<>(tradeProductList.size());
         if (CollectionUtils.isNotEmpty(tradeProductList)) {
             for (FinTradeProductDto tradeProductDto : tradeProductList) {
                 // 交易类金融产品表
-                finTradeProductMapper.insertSelective(tradeProductDto);
+//                finTradeProductMapper.insertSelective(tradeProductDto);
                 // 交易类金融产品附属表
                 FinTradeProductAdd finTradeProductAdd = new FinTradeProductAdd();
                 BeanUtil.copyProperties(finTradeProductAdd, tradeProductDto);
                 finTradeProductAdd.setRegistOrg(DictCodeList.登记托管机构_中债_中国证券登记结算有限责任公司.getValue());
-                finTradeProductAddMapper.insert(finTradeProductAdd);
+//                finTradeProductAddMapper.insert(finTradeProductAdd);
+                finTradeProductAddInsertList.add(finTradeProductAdd);
                 // FIN_PRODUCT_TYPE(固定设置质押式竞价回购)
                 FinProductType finProductType = new FinProductType();
                 finProductType.setFinprodId(tradeProductDto.getFinprodId());
@@ -549,54 +594,69 @@ public class StlDataGatherService {
                     }
                 }
                 // add end
-                finProductTypeMapper.insert(finProductType);
+//                finProductTypeMapper.insert(finProductType);
+                finProductTypeInsertList.add((finProductType));
             }
         }
+        // 交易类金融产品表
+        TamsDbUtil.insertSelectiveBatch(template, FinTradeProductMapper.class, tradeProductList);
+        // 交易类金融产品附属表
+        TamsDbUtil.insertSelectiveBatch(template, FinTradeProductAddMapper.class, finTradeProductAddInsertList);
+        // FIN_PRODUCT_TYPE(固定设置质押式竞价回购)
+        TamsDbUtil.insertSelectiveBatch(template, FinProductTypeMapper.class, finProductTypeInsertList);
 
-        if (CollectionUtils.isNotEmpty(dealPledgeList)) {
-            // 回购质押品
-            for (FinDealPledge finDealPledge : dealPledgeList) {
-                finDealPledgeMapper.insertSelective(finDealPledge);
-            }
-        }
+//        if (CollectionUtils.isNotEmpty(dealPledgeList)) {
+//            // 回购质押品
+//            for (FinDealPledge finDealPledge : dealPledgeList) {
+//                finDealPledgeMapper.insertSelective(finDealPledge);
+//            }
+//        }
+        // 回购质押品
+        TamsDbUtil.insertSelectiveBatch(template, FinDealPledgeMapper.class, dealPledgeList);
 
-        if (CollectionUtils.isNotEmpty(trdDealTotalAddList)) {
-            // 汇总附属
-            for (TrdDealTotalAdd trdDealTotalAdd : trdDealTotalAddList) {
-                trdDealTotalAddMapper.insertSelective(trdDealTotalAdd);
-            }
-        }
+//        if (CollectionUtils.isNotEmpty(trdDealTotalAddList)) {
+//            // 汇总附属
+//            for (TrdDealTotalAdd trdDealTotalAdd : trdDealTotalAddList) {
+//                trdDealTotalAddMapper.insertSelective(trdDealTotalAdd);
+//            }
+//        }
 
-        if (CollectionUtils.isNotEmpty(trdBarterTotalList)) {
-            // 实物汇总
-            for (TrdFinProductBarterTotal trdBarterTotal : trdBarterTotalList) {
-                trdBarterTotalMapper.insertSelective(trdBarterTotal);
-            }
-        }
+//        if (CollectionUtils.isNotEmpty(trdBarterTotalList)) {
+//            // 实物汇总
+//            for (TrdFinProductBarterTotal trdBarterTotal : trdBarterTotalList) {
+//                trdBarterTotalMapper.insertSelective(trdBarterTotal);
+//            }
+//        }
+        // 实物汇总
+        TamsDbUtil.insertSelectiveBatch(template, TrdFinProductBarterTotalMapper.class, trdBarterTotalList);
 
-        if (CollectionUtils.isNotEmpty(trdBarterList)) {
-            // 实物
-            for (TrdFinProductBarter trdFinProductBarter : trdBarterList) {
-                trdBarterMapper.insertSelective(trdFinProductBarter);
-            }
-        }
+//        if (CollectionUtils.isNotEmpty(trdBarterList)) {
+//            // 实物
+//            for (TrdFinProductBarter trdFinProductBarter : trdBarterList) {
+//                trdBarterMapper.insertSelective(trdFinProductBarter);
+//            }
+//        }
+        // 实物
+        TamsDbUtil.insertSelectiveBatch(template, TrdFinProductBarterMapper.class, trdBarterList);
 
         // 日间委托完成度表有一笔交易编号等于自身委托编号的记录，这条记录每次正向跑批时需要实时更新
-        if (CollectionUtils.isNotEmpty(etrFinishStatusList)) {
-            for (EtrFinishStatus etrFinishStatus : etrFinishStatusList) {
-                etrFinishStatus.setCreateTime(null);
-                etrFinishStatus.setCreateTime(null);
-                etrFinishStatus.setCreateDept(null);
-                etrFinishStatusMapper.updateByPrimaryKeySelective(etrFinishStatus);
-            }
-        }
+//        if (CollectionUtils.isNotEmpty(etrFinishStatusList)) {
+//            for (EtrFinishStatus etrFinishStatus : etrFinishStatusList) {
+//                etrFinishStatus.setCreateTime(null);
+//                etrFinishStatus.setCreateTime(null);
+//                etrFinishStatus.setCreateDept(null);
+//                etrFinishStatusMapper.updateByPrimaryKeySelective(etrFinishStatus);
+//            }
+//        }
+        TamsDbUtil.updateSelectiveBatch(template, EtrFinishStatusMapper.class, etrFinishStatusList);
 
         // 成交编号业务编号关联表（只针对除权登记数据）
-        if (CollectionUtils.isNotEmpty(settleTransTgMappingList)) {
-            for (SettleTransTgMapping settleTransTgMapping : settleTransTgMappingList) {
-                settleTransTgMappingMapper.insert(settleTransTgMapping);
-            }
-        }
+//        if (CollectionUtils.isNotEmpty(settleTransTgMappingList)) {
+//            for (SettleTransTgMapping settleTransTgMapping : settleTransTgMappingList) {
+//                settleTransTgMappingMapper.insert(settleTransTgMapping);
+//            }
+//        }
+        TamsDbUtil.insertSelectiveBatch(template, SettleTransTgMappingMapper.class, settleTransTgMappingList);
         // 组合持仓流水
         if (CollectionUtils.isNotEmpty(ptlSecPositionFlowList)) {
             for (PtlSecPositionFlow ptlSecPositionFlow : ptlSecPositionFlowList) {
@@ -618,29 +678,34 @@ public class StlDataGatherService {
             // modify by etliu 20220220 start
             // 广农商二阶段 GNS-880:【广农商场内清算】上交所配股上市流通前一日清算解析ZQBD文件后，交易和头寸未处理:组合持仓流水和指令持仓流水登录的都是对的，ETR_SEC_POSITION和PTL_SEC_POSITION未更新
             List<EtrSecPositionFlowDto> newEtrSecPositionFlowList = new ArrayList<>();
-            for (EtrSecPositionFlow etrSecPositionFlow : etrSecPositionFlowList) {
+            TamsDbUtil.insertBatch(template, EtrSecPositionFlowMapper.class, etrSecPositionFlowList, e -> {
+                EtrSecPositionFlow etrSecPositionFlow = (EtrSecPositionFlow) e;
+//            for (EtrSecPositionFlow etrSecPositionFlow : etrSecPositionFlowList) {
                 // modify by etliu 20220308 start
                 // 场内的头寸处理，全部已经对接了头寸引擎，需要标记下
                 etrSecPositionFlow.setIsExistNew(DictCodeList.是否_是.getValue());
                 // modify by etliu 20220308 end
-                etrSecPositionFlowMapper.insert(etrSecPositionFlow);
+//                etrSecPositionFlowMapper.insert(etrSecPositionFlow);
 
                 EtrSecPositionFlowDto newEtrSecPositionFlow = new EtrSecPositionFlowDto();
                 BeanUtil.copyPropertiesIgnoreNull(newEtrSecPositionFlow, etrSecPositionFlow);
                 newEtrSecPositionFlowList.add(newEtrSecPositionFlow);
-            }
+//            }
+            });
 
             EtrCommonCashPositionDealService.dealCommandPositionList(newEtrSecPositionFlowList);
             // modify by etliu 20220220 end
         }
         // TrdBankManualSettleInfo
-        for (TrdBankManualSettleInfo trdBankManualSettleInfo : trdBankManualSettleInfoList) {
-            trdBankManualSettleInfoMapper.insertSelective(trdBankManualSettleInfo);
-        }
+//        for (TrdBankManualSettleInfo trdBankManualSettleInfo : trdBankManualSettleInfoList) {
+//            trdBankManualSettleInfoMapper.insertSelective(trdBankManualSettleInfo);
+//        }
+        TamsDbUtil.insertSelectiveBatch(template, TrdBankManualSettleInfoMapper.class, trdBankManualSettleInfoList);
         // TrdBankManualSettleFlow
-        for (TrdBankManualSettleFlow trdBankManualSettleFlow : trdBankManualSettleFlowList) {
-            trdBankManualSettleFlowMapper.insertSelective(trdBankManualSettleFlow);
-        }
+//        for (TrdBankManualSettleFlow trdBankManualSettleFlow : trdBankManualSettleFlowList) {
+//            trdBankManualSettleFlowMapper.insertSelective(trdBankManualSettleFlow);
+//        }
+        TamsDbUtil.insertSelectiveBatch(template, TrdBankManualSettleFlowMapper.class, trdBankManualSettleFlowList);
     }
 
     private String getPaBussType(TotalTrdProductDealDto totalTrdProductDealDto, String secType, Map<String, FundInfoDto> fundInfoDtoMap) {
