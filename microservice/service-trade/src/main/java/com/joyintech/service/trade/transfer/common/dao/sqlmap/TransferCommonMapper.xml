@@ -64,7 +64,10 @@
             INNER JOIN PTL_SEC_ACCT psa ON psa.PORTFOLIO_ID = pp.PORTFOLIO_ID
             LEFT JOIN STL_SEC_ACCT_INFO ssai on  ssai.SEC_ACCT_ID = psa.ACCT_NO 
         </if>
-        LEFT JOIN PTL_CAPACCT_INFO pci ON pci.PORTFOLIO_ID = pp.PORTFOLIO_ID and ssai.TRD_ACCT_ID=pci.ACCT_NO
+        LEFT JOIN PTL_CAPACCT_INFO pci ON pci.PORTFOLIO_ID = pp.PORTFOLIO_ID
+        <if test="secAcctId!=null and secAcctId!=''">
+              and ssai.TRD_ACCT_ID=pci.ACCT_NO
+        </if>
         <if test="capacctType!=null and capacctType!=''">
         and pci.ACCT_TYPE = #{capacctType,jdbcType=VARCHAR}
         </if>
