@@ -459,7 +459,8 @@
 				NULL SEC_ACCT_ID2,
 				entrust.BROKER_ID CUSTOMER_ID,
 				entrust.PARA_VALUE,
-				entrust.SEAT_NUMBER
+				entrust.SEAT_NUMBER,
+				entrust.PS
 			FROM(
 				SELECT
 					std.FINPROD_ID,
@@ -471,7 +472,8 @@
 					std.APPLY_TRADE_ID,
 					#{CHECK_RESULT_2} CHECK_RESULT,
 					msd.BROKER_ID,
-					ssrp.PARA_VALUE
+					ssrp.PARA_VALUE,
+					std.PS
 				FROM
 					SETTLE_TRANS_DATA std
 				LEFT JOIN
@@ -518,7 +520,8 @@
 					std.FINPROD_TYPE2,
 					std.TRADE_MARKET,
 					msd.BROKER_ID,
-					ssrp.PARA_VALUE
+					ssrp.PARA_VALUE,
+					std.PS
 			) entrust
 			LEFT JOIN
 				FIN_PRODUCT fp ON entrust.FINPROD_ID = fp.FINPROD_ID
@@ -551,7 +554,8 @@
 				NULL SEC_ACCT_ID2,
 				securities.BROKER_ID CUSTOMER_ID,
 				securities.PARA_VALUE,
-				securities.SEAT_NUMBER
+				securities.SEAT_NUMBER,
+				securities.PS
 			FROM(
 				SELECT
 					std.FINPROD_ID,
@@ -562,7 +566,8 @@
 					std.SEAT_NUMBER,
 					#{CHECK_RESULT_2} CHECK_RESULT,
 					msd.BROKER_ID,
-					ssrp.PARA_VALUE
+					ssrp.PARA_VALUE,
+					std.PS
 				FROM
 					SETTLE_TRANS_DATA std
 				LEFT JOIN
@@ -608,7 +613,8 @@
 					std.FINPROD_TYPE2,
 					std.TRADE_MARKET,
 					msd.BROKER_ID,
-					ssrp.PARA_VALUE
+					ssrp.PARA_VALUE,
+					std.PS
 			) securities
 			LEFT JOIN
 				FIN_PRODUCT fp ON securities.FINPROD_ID = fp.FINPROD_ID
@@ -641,7 +647,8 @@
 				detail.SEC_ACCT_ID SEC_ACCT_ID2,
 				detail.BROKER_ID CUSTOMER_ID,
 				detail.PARA_VALUE,
-				detail.SEAT_NUMBER
+				detail.SEAT_NUMBER,
+				detail.PS
 			FROM(
 				SELECT
 					std.FINPROD_ID,
@@ -654,7 +661,8 @@
 					std.SEC_ACCT_ID,
 					#{CHECK_RESULT_2} CHECK_RESULT,
 					msd.BROKER_ID,
-					ssrp.PARA_VALUE
+					ssrp.PARA_VALUE,
+					std.PS
 				FROM
 					SETTLE_TRANS_DATA std
 				LEFT JOIN
@@ -717,7 +725,8 @@
 				std.SEC_ACCT_ID SEC_ACCT_ID2,
 				msd.BROKER_ID CUSTOMER_ID,
 				#{PARA_VALUE_02} PARA_VALUE,
-				std.SEAT_NUMBER
+				std.SEAT_NUMBER,
+				std.PS
 			FROM
 				SETTLE_TRANS_DATA std
 			LEFT JOIN
@@ -744,7 +753,8 @@
 				std.SEC_ACCT_ID,
 				msd.BROKER_ID,
 				std.SEAT_NUMBER,
-				std.ACCT_NO
+				std.ACCT_NO,
+				std.PS
 		)
 		SELECT * FROM temp1
 		UNION ALL
