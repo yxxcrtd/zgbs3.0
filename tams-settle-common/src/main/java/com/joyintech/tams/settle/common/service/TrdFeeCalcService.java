@@ -112,7 +112,7 @@ public class TrdFeeCalcService {
 
         // 数据清算附属信息（核算信息）全量获取
         Map<String, List<StlDownDataDealAccountInfoDto>> allStlDownDataDealAccountInfoDtoList
-                = settleCommonService.getAllStlDownDataDealAccountInfoDtoList(false);
+                = settleCommonService.getAllStlDownDataDealAccountInfoDtoWithSecAcctIdMap();
         List<StlDownDataDealAccountInfoDto> stlDownDataDealAccountInfoDtos = allStlDownDataDealAccountInfoDtoList.get(trdDetail.getSecManageAcctId());
         if (stlDownDataDealAccountInfoDtos != null && stlDownDataDealAccountInfoDtos.size() > 0) {
             stlDownDataDealAccountInfoDto = stlDownDataDealAccountInfoDtos.get(0);
@@ -283,7 +283,7 @@ public class TrdFeeCalcService {
 		StlDownDataDealAccountInfoDto stlDownDataDealAccountInfoDto = new StlDownDataDealAccountInfoDto();
 		// 数据清算附属信息（核算信息）全量获取
 		Map<String, List<StlDownDataDealAccountInfoDto>> allStlDownDataDealAccountInfoDtoList
-				= settleCommonService.getAllStlDownDataDealAccountInfoDtoList(false);
+				= settleCommonService.getAllStlDownDataDealAccountInfoDtoWithSecAcctIdMap();
 
         if (tradeFeatureInformation == null) {
             // if（【入参】交易特征信息 == null）
