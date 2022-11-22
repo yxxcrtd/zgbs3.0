@@ -1131,7 +1131,7 @@ public class CfetsPrimaryBidManageService extends BaseService<CfetsPrimaryBidMan
         //调用头寸
         CfetsBondPositionRequest req = new CfetsBondPositionRequest();
         if (StringUtil.equals(entity.getTradeMarket(),DictCodeListExt1.交易场所_上海证券交易所.getValue())
-         ||StringUtil.equals(entity.getTradeMarket(),DictCodeListExt1.交易场所_上海证券交易所.getValue()) ){
+         ||StringUtil.equals(entity.getTradeMarket(),DictCodeListExt1.交易场所_深圳证券交易所.getValue()) ){
             req.setInterfaceType("Bond002");//报文类型
             req.setTradePlace(entity.getTradeMarket());
             req.setPayType(entity.getPayType());//缴款方式
