@@ -138,6 +138,32 @@ public class StlSecRecon extends BaseEntity {
     private String entrustTradeId;
 
     /**
+     * 资金账号（截取:后的部分）
+     */
+    private String accout;
+
+    /**
+     * 资金账号
+     */
+    private String accouts;
+
+    public String getAccout() {
+        return accout;
+    }
+
+    public void setAccout(String accout) {
+        this.accout = accout;
+    }
+
+    public String getAccouts() {
+        return accouts;
+    }
+
+    public void setAccouts(String accouts) {
+        this.accouts = accouts;
+    }
+
+    /**
      * 取得 券商对账单流水号
      * @return 券商对账单流水号
      */
