@@ -577,8 +577,13 @@
                 el("#CfetsBondDealQuotedPrice004_intAmt").val(JoyinMath.doDiv(data.intAmt, 1, 2));
                 el("#CfetsBondDealQuotedPrice004_fpriceAmt").val(JoyinMath.doDiv(data.fpriceAmt, 1, 2));
                 el("#CfetsBondDealQuotedPrice004_fpriceAmtEdit").val(JoyinMath.doDiv(data.fpriceAmt, 1, 2));
-                el("#dealFeeAmt").val(JoyinMath.doDiv(data.dealFeeAmt, 1, 2));
-                el("#settFeeAmt").val(JoyinMath.doDiv(data.settFeeAmt, 1, 2));
+
+                if (data.dealFeeAmt) {
+                    el("#dealFeeAmt").val(JoyinMath.doDiv(data.dealFeeAmt, 1, 2));
+                }
+                if (data.settFeeAmt) {
+                    el("#settFeeAmt").val(JoyinMath.doDiv(data.settFeeAmt, 1, 2));
+                }
 
                 //hidden
                 el("#CfetsBondDealQuotedPrice004_hidden_price").val(data.price);
