@@ -73,18 +73,19 @@ public class AssetNameManagementService extends CommonExportService<RskAccessLis
         Page<RskAccessListDetailDto> resultPage = selectPageResult(pageParam);
         List<RskAccessListDetailDto> handleRskAccessListDetailList = new ArrayList<>();
         if(pageParam.containsKey("rskAccessListLogDtoList")){
-             handleRskAccessListDetailList= JsonUtils.json2List(pageParam.get("rskAccessListLogDtoList").toString(),RskAccessListDetailDto.class);
+            handleRskAccessListDetailList= JsonUtils.json2List(pageParam.get("rskAccessListLogDtoList").toString(),RskAccessListDetailDto.class);
+            pageParam.put("rskAccessListLogDtoList",handleRskAccessListDetailList);
         }
         //用户操作要映射到查询中  充当临时表
-        for(RskAccessListDetailDto rskAccessListDetailDto : resultPage.getRoot() ){
-            for(RskAccessListDetailDto rskAccessListDetailDto2 : handleRskAccessListDetailList){
-                if(StringUtil.equals(rskAccessListDetailDto.getListDetailName(),rskAccessListDetailDto2.getOldlistDetailName())
-                &&StringUtil.isNotEmpty(rskAccessListDetailDto2.getListDetailId())){
-                    rskAccessListDetailDto.setListDetailId(rskAccessListDetailDto2.getListDetailId());
-                    break;
-                }
-            }
-        }
+//        for(RskAccessListDetailDto rskAccessListDetailDto : resultPage.getRoot() ){
+//            for(RskAccessListDetailDto rskAccessListDetailDto2 : handleRskAccessListDetailList){
+//                if(StringUtil.equals(rskAccessListDetailDto.getListDetailName(),rskAccessListDetailDto2.getOldlistDetailName())
+//                &&StringUtil.isNotEmpty(rskAccessListDetailDto2.getListDetailId())){
+//                    rskAccessListDetailDto.setListDetailId(rskAccessListDetailDto2.getListDetailId());
+//                    break;
+//                }
+//            }
+//        }
         return resultPage;
     }
 
@@ -290,7 +291,7 @@ public class AssetNameManagementService extends CommonExportService<RskAccessLis
             ServiceApplication.RISK_SERVICE_NAME + "/AssetNameManagementDetail/getUnhandleRskAccessListDetailDtoList",
             param, RskAccessListDetailDto.class);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -300,7 +301,7 @@ public class AssetNameManagementService extends CommonExportService<RskAccessLis
             "/com/joyintech/tams/invest/risk/namelistmanage/assetnamelist/conf/export_conf.xml").dataSource(
                 DataSourceType.MASERT);
     }
-    
+
     /**
      * 导出模板
      */
@@ -311,13 +312,13 @@ public class AssetNameManagementService extends CommonExportService<RskAccessLis
         page.setRoot(list);
         return page;
     }
-    
+
     /**
      * <一句话功能简述>
      * <功能详细描述>
      * @param fileName
      * @return
-     * @throws Exception 
+     * @throws Exception
      * @see
      * @since 1.0
      */
@@ -350,16 +351,16 @@ public class AssetNameManagementService extends CommonExportService<RskAccessLis
                 List<RskAccessListDetail> entityList= restTemplate.postForList(
                     ServiceApplication.RISK_SERVICE_NAME + "/AssetNameManagement/getEntityList",
                     param, RskAccessListDetail.class);
-                
+
                 for(int i=1; i<dataList.size(); i++){
                     if(StringUtil.isNotEmpty(dataList.get(i))){
                         RskAccessListDetailDto dto=new RskAccessListDetailDto();
-                        
+
                         if(StringUtil.isNotEmpty(dataList.get(i).get(1))){
                             String finprodName=dataList.get(i).get(1);
                             //把表里的资产名称封装进去
                             nameList.add(finprodName);
-                            dto.setListDetailName(finprodName); 
+                            dto.setListDetailName(finprodName);
                             dto.setOldlistDetailName("");
                             param.put("finprodName", finprodName);
                            int count= restTemplate.postForObject(
@@ -384,10 +385,10 @@ public class AssetNameManagementService extends CommonExportService<RskAccessLis
                         if(StringUtil.isNotEmpty(dataList.get(i).get(0))){
                             dto.setListDetailId(dataList.get(i).get(0));
                         }
-                        
+
                         list.add(dto);
                     }
-                    
+
                 }
                 //全量导入,把库里有，表里没有的数据状态变更为删除
                 if(inputType.equals("01")){
@@ -402,9 +403,9 @@ public class AssetNameManagementService extends CommonExportService<RskAccessLis
                             dto.setListId(listId);
                             dto.setListDetailType(DictCodeListExt2.名单主体类型_资产.getValue());
                             list.add(dto);
-                            
+
                         }
-                        
+
                     }
                 }
                 detailDto.setList(list);
@@ -483,7 +484,7 @@ public class AssetNameManagementService extends CommonExportService<RskAccessLis
                 ServiceApplication.RISK_SERVICE_NAME + "/AssetNameManagement/selectListId",
                 param, SelectOptionDto.class);
     }
-    
+
     /**
      * 非一个体系的名单明细
      * @param param
