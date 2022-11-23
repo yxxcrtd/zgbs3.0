@@ -27,17 +27,7 @@ import com.joyintech.tams.cfets.etr.bond.dto.CfetsEtrIbdoRiskcalRequest;
 import com.joyintech.tams.cfets.etrdispatcher.service.CfetsEtrDispatcherService;
 import com.joyintech.tams.cfets.trd.bond.dao.CfetsIbuQuoteBondEtrMapper;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dao.CfetsTrdFirstBidFirm001Mapper;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirsBidFirmBidOrderDetailDto;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirsBidFirmDetailDto;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmEntrustRequest;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmEtrRequest;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmProductDto;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdBondFirstBidFirmUndoSumRequest;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmDistributionInfoDto;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmDistributionInfoRequest;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmEntrustDto;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmTenderInfoDto;
-import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmTenderInfoRequest;
+import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.*;
 import com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstsub.service.CfetsTrdBondFirstSub001Service;
 import com.joyintech.tams.common.base.dao.EtrEntrustMapper;
 import com.joyintech.tams.common.base.dao.TotalEtrEntrustRelMapper;
@@ -763,7 +753,7 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
      */
     private List<CfetsTrdFirstBidFirmEntrustDto> getSortByBidFirmList(List<CfetsTrdFirstBidFirmEntrustDto> bidFirmSumDtoList, String sort, String direction) {
         if (StringUtil.isEmpty(sort)) {
-            return bidFirmSumDtoList;
+            return this.etrSort(bidFirmSumDtoList);
         }
         if ("entrustStatus".equals(sort)) {
             if ("desc".equals(direction)) {
@@ -853,6 +843,30 @@ public class CfetsTrdFirstBidFirm001Service extends BaseService {
         }
 
         return bidFirmSumDtoList;
+    }
+
+    /**
+     * 指令列表默认排序
+     *
+     * @param list 指令列表
+     * @return java.util.List<com.joyintech.tams.cfets.trd.firstbidfirm.bondfirstfirm.dto.CfetsTrdFirstBidFirmProductDto>
+     * @author jiangpeng
+     * @date 2022/6/20 15:27
+     */
+    private List<CfetsTrdFirstBidFirmEntrustDto> etrSort(List<CfetsTrdFirstBidFirmEntrustDto> list) {
+        // 待接收and已接收（待接收、已接收不区分）、已完成、已退回、已关闭
+        Comparator<CfetsTrdFirstBidFirmEntrustDto> byEntrustStatusASC = Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getEntrustStatus);
+        // 再按资产代码+投标截止日顺序排序
+        Comparator<CfetsTrdFirstBidFirmEntrustDto> byFinIdASC = Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getFinprodMarketId);
+        Comparator<CfetsTrdFirstBidFirmEntrustDto> byIssueDateEndASC = Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getIssueDateEnd);
+        // 再按指令日期+下达时间顺序排序
+        Comparator<CfetsTrdFirstBidFirmEntrustDto> byEntrustDateASC = Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getEntrustDate);
+        Comparator<CfetsTrdFirstBidFirmEntrustDto> byTransmitTimeASC = Comparator.comparing(CfetsTrdFirstBidFirmEntrustDto::getTransmitTime);
+        // 联合排序
+        Comparator<CfetsTrdFirstBidFirmEntrustDto> finalComparator = byEntrustStatusASC.thenComparing(byFinIdASC).thenComparing(byIssueDateEndASC)
+                .thenComparing(byEntrustDateASC).thenComparing(byTransmitTimeASC);
+
+        return list.stream().sorted(finalComparator).collect(Collectors.toList());
     }
 
     /**
