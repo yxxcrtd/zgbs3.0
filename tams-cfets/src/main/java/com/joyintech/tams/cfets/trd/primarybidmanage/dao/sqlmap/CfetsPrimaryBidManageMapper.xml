@@ -146,7 +146,7 @@
                 || '|' || ss.bidId || '|' || sdl_tp.ITEM_VALUE || '|' || sdl_tt.ITEM_VALUE || '|' || sdl_wt.ITEM_VALUE
                 || '|' || sdl_ept.ITEM_VALUE || '|' || ss.bidPrice || '|' || ss.counterName || '|' || ss.acctName
                 || '|' || ss.remark
-                like '%' || #{search} || '%'
+                like #{searchLike}
                 or to_char(ss.bidPrinAmt)=#{search}
                 or to_char(ss.totalBiddingNum)=#{search}
                 or to_char(ss.bidDateStart,'YYYY-MM-DD')=#{search}

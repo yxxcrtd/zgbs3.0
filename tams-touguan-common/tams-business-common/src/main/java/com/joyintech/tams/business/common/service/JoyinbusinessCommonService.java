@@ -103,13 +103,21 @@ public class JoyinbusinessCommonService extends BaseService {
         Map<String, Object> param = new HashMap<>();
         param.put("search", dto.getSearch());
         List<String> assestTypes = new ArrayList<>();
+        // 交易场所 LCTZJYXT-220
+        List<String> tradeMarkets = new ArrayList<>();
+        tradeMarkets.add(DictCodeListExt1.交易场所_银行间.getValue());
+        tradeMarkets.add(DictCodeListExt1.交易场所_商业银行柜台.getValue());
         if (!StringUtil.equals(dto.getIsOnlyNewBond(), DictCodeList.是否_否.getValue())) {
             assestTypes.add(DictCodeListExt1.金融产品类型_投管用_债券.getValue());
         }
         // 部分接口不需要查询新债信息
         if (!StringUtil.equals(dto.getIsNewBond(), DictCodeList.是否_否.getValue())) {
             assestTypes.add(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+            tradeMarkets.add(DictCodeListExt1.交易场所_上海证券交易所.getValue());
+            tradeMarkets.add(DictCodeListExt1.交易场所_深圳证券交易所.getValue());
+            tradeMarkets.add(DictCodeListExt1.交易场所_OTC场外.getValue());
         }
+        param.put("tradeMarkets", tradeMarkets);
         param.put("assestType", assestTypes);
         param.put("TRADE_PLACE_01", DictCodeListExt1.交易场所_银行间.getValue());
         param.put("TRADE_PLACE_02", DictCodeListExt1.交易场所_商业银行柜台.getValue());

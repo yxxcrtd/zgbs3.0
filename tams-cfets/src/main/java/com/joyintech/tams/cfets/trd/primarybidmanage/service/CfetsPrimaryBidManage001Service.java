@@ -103,6 +103,10 @@ public class CfetsPrimaryBidManage001Service extends BaseService{
         pageParam.put("userId",SecurityUtil.getLoginUser().getUserName());
         pageParam.put("YN_N",DictCodeList.是否_否.getValue());
         pageParam.put("TRADE_STATUS_01", DictCodeListExt1.交易状态_初始.getValue());
+        String search = (String) pageParam.get("search");
+        if(StringUtil.isNotEmpty(search)) {
+            pageParam.put("searchLike", "%" + search + "%");
+        }
         Page<CfetsPrimaryBidManageCfmResponse> page
                 =  super.queryForPage(request.getPageMode().getPageNo(), request.getPageMode().getPageSize(),
                 () -> cfetsPrimaryBidManageMapper.selectCfmForPage(pageParam));

@@ -2006,10 +2006,12 @@ public class CfetsTrdConfirm001Service extends BaseService {
                     posport.setCashAcctId(cashAcctId); // 托管户
                 }
             }
+            BigDecimal shareAmt = ArithmeticUtil.multiply(dto.getShareAmt() == null ? BigDecimal.ZERO : dto.getShareAmt(), new BigDecimal(100));
+            shareAmt = ArithmeticUtil.round(shareAmt,2,RoundingMode.DOWN);
             posport.setEtrId(dto.getEntrustId());
             posport.setSecAcctId(entity.getSecManageAcctId());
-            posport.setSecAmount(ArithmeticUtil.multiply(dto.getShareAmt() == null ? BigDecimal.ZERO : dto.getShareAmt(), new BigDecimal(100)));
-            posport.setOwnSecAmount(ArithmeticUtil.multiply(dto.getShareAmt() == null ? BigDecimal.ZERO : dto.getShareAmt(), new BigDecimal(100)));
+            posport.setSecAmount(shareAmt);
+            posport.setOwnSecAmount(shareAmt);
             posport.setCashAmount(dto.getTradeAmt() == null ? BigDecimal.ZERO : dto.getTradeAmt());
             BigDecimal etrSecAmount = BigDecimal.ZERO;
             etrSecAmount = ArithmeticUtil.doAdd(etrSecAmount, cfetsTrdConfirmMapper.selectEtrNum(dto.getPortfolioId(), dto.getEntrustId()));
