@@ -103,7 +103,7 @@ public class JoyinbusinessCommonService extends BaseService {
         Map<String, Object> param = new HashMap<>();
         param.put("search", dto.getSearch());
         List<String> assestTypes = new ArrayList<>();
-        // 交易场所
+        // 交易场所 LCTZJYXT-220
         List<String> tradeMarkets = new ArrayList<>();
         tradeMarkets.add(DictCodeListExt1.交易场所_银行间.getValue());
         tradeMarkets.add(DictCodeListExt1.交易场所_商业银行柜台.getValue());
