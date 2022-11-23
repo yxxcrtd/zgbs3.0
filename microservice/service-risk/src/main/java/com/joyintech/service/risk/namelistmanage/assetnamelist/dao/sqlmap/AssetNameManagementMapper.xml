@@ -11,7 +11,7 @@
                 LIST_TYPE LIST_TYPE,
                 LIST_LEVEL LIST_LEVEL,
                 EFFDATE,
-                DELDATE, 
+                DELDATE,
                 WORKFLOW_ID,
                 WORKFLOW_STATUS
                 FROM
@@ -104,6 +104,12 @@
             </if>
             <if test="listDetailName != null and listDetailName != ''">
                 AND LIST_DETAIL_NAME  LIKE CONCAT('%', CONCAT(#{listDetailName}, '%'))
+            </if>
+            <if test="rskAccessListLogDtoList != null and rskAccessListLogDtoList.size() > 0">
+                AND (LIST_ID || LIST_DETAIL_NAME)
+                <foreach collection="rskAccessListLogDtoList" open=" not in (" item="rskAccessListLogDto" separator="," close=")">
+                    #{rskAccessListLogDto.listId} || #{rskAccessListLogDto.listDetailName}
+                </foreach>
             </if>
         </where>
     </select>
