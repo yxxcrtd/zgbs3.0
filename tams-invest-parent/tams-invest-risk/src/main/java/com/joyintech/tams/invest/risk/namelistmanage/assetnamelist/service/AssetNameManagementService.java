@@ -70,12 +70,12 @@ public class AssetNameManagementService extends CommonExportService<RskAccessLis
      * @throws Exception 异常信息
      */
     public Page<RskAccessListDetailDto> selectForDetailPage(Map<String, Object> pageParam) throws IOException {
-        Page<RskAccessListDetailDto> resultPage = selectPageResult(pageParam);
         List<RskAccessListDetailDto> handleRskAccessListDetailList = new ArrayList<>();
         if(pageParam.containsKey("rskAccessListLogDtoList")){
             handleRskAccessListDetailList= JsonUtils.json2List(pageParam.get("rskAccessListLogDtoList").toString(),RskAccessListDetailDto.class);
             pageParam.put("rskAccessListLogDtoList",handleRskAccessListDetailList);
         }
+        Page<RskAccessListDetailDto> resultPage = selectPageResult(pageParam);
         //用户操作要映射到查询中  充当临时表
 //        for(RskAccessListDetailDto rskAccessListDetailDto : resultPage.getRoot() ){
 //            for(RskAccessListDetailDto rskAccessListDetailDto2 : handleRskAccessListDetailList){

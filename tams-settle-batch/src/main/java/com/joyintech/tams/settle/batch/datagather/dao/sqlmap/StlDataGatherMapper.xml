@@ -308,7 +308,7 @@
 		<!--AND std.VDATE = stdsq.TRADE_DATE
 		AND std.APPLY_TRADE_ID = stdsq.CJBH-->
 		AND std.VDATE = stdsq.VDATE
-		AND std.CJBH = stdsq.CJBH
+		AND ((std.CJBH = stdsq.CJBH AND std.TRADE_MARKET = '03') OR (std.APPLY_TRADE_ID = stdsq.APPLY_TRADE_ID AND std.TRADE_MARKET = '04'))
 		AND stdsq.PS = 'T01'
 		AND stdsq.FINPROD_TYPE2 in ('F02','F03')
 		<!--ZGTFCP-1317:修改查询到期数据条件 modify by fuyongsheng 20220318 end-->
