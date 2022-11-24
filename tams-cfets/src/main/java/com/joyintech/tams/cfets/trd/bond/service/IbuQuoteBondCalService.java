@@ -356,7 +356,7 @@ public class IbuQuoteBondCalService extends BaseService {
                         continue;
                     }
                 } else {
-                    if (BigDecimalUtil.ACompareToB(item.getAvaNum(), addDimension, 2) >= 0) {
+                    if (BigDecimalUtil.ACompareToB(addDimension, item.getAvaNum(), 2) >= 0) {
                         item.setShareAmt(ArithmeticUtil.doAdd(item.getShareAmt(), item.getAvaNum()));
                         item.setAvaNum(BigDecimal.ZERO);
                     } else {
