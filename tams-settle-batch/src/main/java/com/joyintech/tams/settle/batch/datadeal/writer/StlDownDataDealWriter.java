@@ -102,8 +102,14 @@ public class StlDownDataDealWriter extends BaseWriter<NeedToWriteEntity> {
 					if(CollectionUtils.isNotEmpty(stlDownDataDealWriteBaseDtoList)) {
 						stlDownDataDealWriteBaseDtoList.forEach(dataDealWriteBaseDto -> {
 							this.saveDealData(dataDealWriteBaseDto);
-							settleTransInsertList.add(dataDealWriteBaseDto.getSettleTransData());
-							settleTransDataAddInsertList.add(dataDealWriteBaseDto.getSettleTransDataAdd());
+							SettleTransData settleTransData = dataDealWriteBaseDto.getSettleTransData();
+							if(null != settleTransData && StringUtil.isNotEmpty(settleTransData.getTradeId())) {
+								settleTransInsertList.add(settleTransData);
+							}
+							SettleTransDataAdd settleTransDataAdd = dataDealWriteBaseDto.getSettleTransDataAdd();
+							if(null != settleTransDataAdd && StringUtil.isNotEmpty(settleTransDataAdd.getTradeId())) {
+								settleTransDataAddInsertList.add(settleTransDataAdd);
+							}
 							settleTransDataPledgeInsertList.addAll(dataDealWriteBaseDto.getSettleTransDataPledgeList());
 						});
 					}
