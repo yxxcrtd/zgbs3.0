@@ -320,4 +320,5 @@ public interface StlDataGatherMapper {
      */
     List<SettleTransDataDto> selectBondFirstBiddingData(Map<String, Object> searchParam);
 
+    List<PtlSecPosition> searchPtlSecPositionList(Map<String, Object> paraMap);
 }

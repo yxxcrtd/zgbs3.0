@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.joyintech.tams.invest.batch.common.dao.ValBatchCronJobMapper">
+
+    <select id="findAllTaskbyGroup" resultType="java.lang.String" >
+        select
+        TASK_ID
+        from
+        SYS_BATCH_JOB
+        WHERE
+        1 = 1
+        <if test="taskGrpId != null">
+            AND BATCH_SEQ_NO=#{taskGrpId, jdbcType=VARCHAR}
+        </if>
+    </select>
+
+    <select id="findAllProdbyGroup" resultType="java.lang.String" >
+        select
+        PRODUCT_ID prodId
+        from
+        SYS_BATCH_GRP_PRDLINK
+        WHERE
+        1 = 1
+        <if test="prodGrpId != null">
+            AND GROUP_SEQ = #{prodGrpId, jdbcType=VARCHAR}
+        </if>
+    </select>
+
+    <select id="getSysDate" resultType="java.util.Date">
+		select CUR_DATE from SYS_DATE
+	</select>
+    <select id="getCommonSysDate" resultType="java.util.Date">
+        select CUR_DATE from SYS_DATE where institution_code = 'ALL'
+        or institution_code in ( select institution_code from sys_institution
+        where institution_type = '01')
+    </select>
+
+</mapper>
