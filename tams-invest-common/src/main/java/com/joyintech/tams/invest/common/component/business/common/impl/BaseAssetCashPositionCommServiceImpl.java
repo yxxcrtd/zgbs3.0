@@ -152,10 +152,11 @@ public class BaseAssetCashPositionCommServiceImpl implements BaseAssetCashPositi
         	if(StringUtil.isEmpty(invAim)){
         		invAim = etrEntrust.getBusinessModel();
         	}
-        	resultDto.setInvAim(StringUtil.isEmpty(invAim) ? "999999" : invAim);
-        }else {
-        	resultDto.setInvAim(StringUtil.isEmpty(deal.getInvAim()) ? "999999" : deal.getInvAim());
         }
+        if(StringUtil.isEmpty(invAim)) {
+            invAim = deal.getInvAim();
+        }
+        resultDto.setInvAim(StringUtil.isEmpty(invAim) ? "999999" : invAim);
         resultDto.setHodingType(inputDto.getPositionType());
         resultDto.setCcy(deal.getCcy());
         resultDto.setTradeId(deal.getTradeId());
