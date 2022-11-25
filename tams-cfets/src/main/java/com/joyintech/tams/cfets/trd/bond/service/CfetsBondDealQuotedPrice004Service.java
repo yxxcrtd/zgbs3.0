@@ -373,7 +373,7 @@ public class CfetsBondDealQuotedPrice004Service extends BaseService<CfetsBondDea
                 if (ptlAllocatio.getAvaNum().compareTo(ptlAllocatio.getShareAmt()) < 0) {
                     // 登记指令剩余额度不能小于券面总额！
                     errorList.add(new ValidMessage(getMessage("COMMON_0032", getMessage("CfetsBondDealQuotedPrice004.ptlAllocatio.avaNum"),
-                            getMessage("CfetsBondDealQuotedPrice004.CfetsBondDealQuotedPrice004.shareAmt"))));
+                            getMessage("CfetsBondDealQuotedPrice004.ptlAllocatio.shareAmt"))));
                 }
                 if (null != ptlAllocatio.getShareAmt()) {
                     BigDecimal avaNum = cfetsQuotedCommonService.getWflShareAmtByEntrustId(ptlAllocatio.getEntrustId(), entity.getQuoteId());
