@@ -115,6 +115,16 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
                 if(!finprodIdMap.containsKey(settleKey)){
                     continue;
                 }
+                // 查询持仓的投资目的
+                String invAim = null;
+                Map<String,Object> invAimParam = new HashMap<>();
+                invAimParam.put("dealDate", DateUtil.parse(DateUtil.getYesterDayDate(executeDate)));
+                invAimParam.put("finProductId",settleTransData.getFinprodId());
+                invAimParam.put("secManageAcctId",settleTransData.getSecAcctId());
+                List<PtlSecPosition> invAimPtlSecPositions = stlDataGatherMapper.searchPtlSecPositionList(invAimParam);
+                if(CollectionUtils.isNotEmpty(invAimPtlSecPositions)){
+                    invAim = invAimPtlSecPositions.get(0).getInvAim();
+                }
                 // ZGCPCN-1527:必须当日有持仓才会生成交易相关数据 modify by fuyongsheng 20220620 end
                 // GNS-860:还原债券存续期 modify by fuyongsheng 20220214 start
                handTrdProductDeal(Collections.singletonList(settleTransData));
@@ -144,6 +154,7 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
                 // modify by etliu 20220227 end
 
                 createTotalDeal(totalTrdProductDealDto,settleTransData);
+                totalTrdProductDealDto.setInvAim(invAim);
                 // finProductDealTotalList.add(totalTrdProductDealDto);
                totalProductDealList.add(totalTrdProductDealDto);
                //投管交易关系
@@ -191,6 +202,7 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
                         // modify by etliu 20220227 end
 
                         createTotalDeal(totalTrdProductDealDtoDetaile, settleTransData);
+                        totalTrdProductDealDtoDetaile.setInvAim(invAim);
                         totalProductDealList.add(totalTrdProductDealDtoDetaile);
                         //划款指令
                         stlPayOrdersList.add(createStlPayOrders(totalTrdProductDealDtoDetaile, settleTransData.getAcctNo()));
@@ -215,7 +227,7 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
 
                             // modify by etliu 20220227 start
                             // 广农商二阶段 GNS-975：【广农商场内清算】场内债券存续期-行权赎回交易生成时，处理相关头寸有误
-                            trdProductDeal.setInvAim(ptlSecPosition.getInvAim());
+                            trdProductDeal.setInvAim(invAim);
                             // modify by etliu 20220227 end
 
                             TrdProductDealAdd trdProductDealAdd = new TrdProductDealAdd();

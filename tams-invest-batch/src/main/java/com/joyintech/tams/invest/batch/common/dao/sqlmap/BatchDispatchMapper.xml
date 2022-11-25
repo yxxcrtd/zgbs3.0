@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper
+	namespace="com.joyintech.tams.invest.batch.common.dao.BatchDispatchMapper">
+
+    <select id="selectBatchJob" resultType="com.joyintech.tams.invest.batch.common.dto.BatchTaskInfo">
+        SELECT
+            A.BATCH_SEQ_NO,
+            A.TASK_ID,
+            B.TASK_PRI
+        FROM SYS_BATCH_JOB A
+        INNER JOIN SYS_BATCH_TASK B
+            ON A.TASK_ID  = B.TASK_ID
+        WHERE 1 = 1
+            <if test="list != null and list.size > 0">
+                AND A.BATCH_SEQ_NO IN
+                <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+                        #{item}
+                </foreach>
+            </if>
+        ORDER BY B.TASK_PRI
+    </select>
+    
+    <select id="selectBatchTaskLink" resultType="com.joyintech.tams.common.base.entity.BokBatchTaskLink" parameterType="java.util.Map" >
+        SELECT
+            A.TASK_ID,
+            A.P_TASK_ID
+        FROM BOK_BATCH_TASK_LINK A
+    </select>
+    
+	<select id="selectDealAccounting" resultType="com.joyintech.tams.invest.batch.common.dto.DealAccountingTodo" parameterType="java.util.Map">
+		WITH
+        T0 AS (
+            SELECT BOOKSET_ID 
+            <if test="booksetDate == null">
+            ,BOOKSET_DATE
+            </if>
+            <if test="booksetDate != null">
+            ,to_date(#{booksetDate},'yyyy-MM-dd') BOOKSET_DATE
+            </if>
+            FROM BOK_BOOKSET_DATE
+        ),
+		T1 AS (
+		     /**入账信息**/
+		    SELECT 
+		        S.BOOKSET_ID, 
+                S.START_DATE,
+                S.END_DATE,
+                S.BOOKSET_TYPE,
+                C.BOOKSET_DATE,
+                MIN(S.START_DATE) AS MINDATE,
+		        MIN(NVL(B.BOOK_DATE,C.BOOKSET_DATE)) AS MINBOOKDATE,
+		        DECODE(D.BOOKSET_ID_SON,NULL,'02','01') AS IS_SUB_BOOKSET
+		    FROM BOK_BOOKSET S
+		    INNER JOIN T0 C ON C.BOOKSET_ID = S.BOOKSET_ID
+                AND C.BOOKSET_DATE >= S.START_DATE AND S.END_DATE >= C.BOOKSET_DATE
+		    LEFT JOIN BOK_DEAL_ACCOUNTING B ON B.BOOKSET_ID = S.BOOKSET_ID 
+                AND B.BOOKSET_DATE = C.BOOKSET_DATE
+            LEFT JOIN BOK_BOOKSET_RE D
+            	ON D.BOOKSET_ID_SON = S.BOOKSET_ID
+		    <if test="busiId != null">
+		    INNER JOIN BOK_DETAIL_ID E ON E.BOK_DETAIL_ID = B.BOK_DETAIL_ID AND E.BUSI_ID = #{busiId,jdbcType=VARCHAR}
+		    </if>
+		    WHERE 1=1
+		    AND S.BOOKSET_TYPE = '02'
+		    <if test="BOOKSETS != null and BOOKSETS.size > 0">
+		    	AND(
+		    	S.BOOKSET_ID IN
+		    	<foreach item="item" index="index" collection="BOOKSETS" open="(" separator="," close=")">
+                        #{item}
+                </foreach>
+                OR D.BOOKSET_ID IN 
+                <foreach item="item" index="index" collection="BOOKSETS" open="(" separator="," close=")">
+                        #{item}
+                </foreach>
+                )
+      	  	</if>
+		    GROUP BY S.BOOKSET_ID,S.BOOKSET_TYPE,C.BOOKSET_DATE,S.START_DATE,S.END_DATE,D.BOOKSET_ID_SON
+		),
+		T2 AS (
+		    /**日期**/
+		    SELECT (MINDATE+ROWNUM-1) AS GDATE
+		    FROM(
+		        SELECT
+			        MAX(BOOKSET_DATE) MAXDATE,
+			        MIN(MINDATE) MINDATE
+		        FROM T1
+		    )CONNECT BY (MAXDATE - MINDATE) >= ROWNUM -1
+		),
+		T3 AS (
+		    /**入账日**/
+		    SELECT 
+		        T1.BOOKSET_ID,
+                T1.BOOKSET_DATE,
+                T1.START_DATE,
+                T1.END_DATE,
+                T1.BOOKSET_TYPE,
+		        T2.GDATE BOOK_DATE,
+                MIN(NVL(B.HAPPEN_DATE,T2.GDATE)) MINHAPPENDATE,
+                T1.IS_SUB_BOOKSET
+		    FROM T1 
+		    INNER JOIN T2 ON T1.BOOKSET_DATE >= T2.GDATE AND T2.GDATE >= T1.MINBOOKDATE
+            LEFT JOIN BOK_DEAL_ACCOUNTING B
+                ON B.BOOKSET_ID = T1.BOOKSET_ID AND B.BOOK_DATE = T2.GDATE
+            GROUP BY T1.BOOKSET_ID, T1.BOOKSET_TYPE,T1.BOOKSET_DATE, T2.GDATE,T1.START_DATE,T1.END_DATE,T1.IS_SUB_BOOKSET
+		)
+		
+		SELECT
+            T3.BOOK_DATE,
+            T2.GDATE HAPPEN_DATE,
+            T3.BOOKSET_ID,
+            T3.BOOKSET_DATE,
+            T3.START_DATE,
+            T3.END_DATE,
+            T3.BOOKSET_TYPE,
+		 	E.BUSI_TYPE,
+            E.BOK_DETAIL_ID,
+	        T3.IS_SUB_BOOKSET
+		FROM 
+            T3
+            INNER JOIN T2
+                ON T3.BOOK_DATE >= T2.GDATE AND T2.GDATE >= T3.MINHAPPENDATE
+            LEFT JOIN BOK_DEAL_ACCOUNTING B 
+                ON B.BOOKSET_ID = T3.BOOKSET_ID AND B.BOOK_DATE = T3.BOOK_DATE AND T2.GDATE >= B.HAPPEN_DATE
+            LEFT JOIN BOK_DEAL_ACCOUNTING_DETAIL E 
+                ON B.BOOKSET_ID = E.BOOKSET_ID AND B.BUSI_NO = E.BUSI_NO AND B.BUSI_TABLE = E.BUSI_TABLE
+		GROUP BY
+            T3.BOOK_DATE,
+            T2.GDATE,
+            T3.BOOKSET_ID,
+            T3.BOOKSET_DATE,
+            T3.START_DATE,
+            T3.END_DATE,
+            T3.BOOKSET_TYPE,
+            E.BUSI_TYPE,
+            E.BOK_DETAIL_ID,
+            T3.IS_SUB_BOOKSET
+        ORDER BY 
+            T3.BOOK_DATE,
+            T2.GDATE,
+            T3.BOOKSET_ID,
+            T3.BOOKSET_DATE
+	</select>
+
+
+    <select id="selectDealAccountingNoBackValue"
+            resultType="com.joyintech.tams.invest.batch.common.dto.DealAccountingTodo" parameterType="java.util.Map">
+        WITH
+        T0 AS (
+        SELECT BOOKSET_ID
+        <if test="booksetDate == null">
+            ,BOOKSET_DATE
+        </if>
+        <if test="booksetDate != null">
+            ,to_date(#{booksetDate},'yyyy-MM-dd') BOOKSET_DATE
+        </if>
+        FROM BOK_BOOKSET_DATE
+        )
+        /**入账信息**/
+        SELECT
+        S.BOOKSET_ID,
+        S.START_DATE,
+        S.END_DATE,
+        C.BOOKSET_DATE,
+        C.BOOKSET_DATE BOOK_DATE,
+        C.BOOKSET_DATE HAPPEN_DATE
+        FROM BOK_BOOKSET S
+        INNER JOIN T0 C ON C.BOOKSET_ID = S.BOOKSET_ID
+        AND C.BOOKSET_DATE >= S.START_DATE AND S.END_DATE >= C.BOOKSET_DATE
+        WHERE 1=1
+        <if test="BOOKSETS != null and BOOKSETS.size > 0">
+            AND S.BOOKSET_ID IN
+            <foreach item="item" index="index" collection="BOOKSETS" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY S.BOOKSET_ID ,C.BOOKSET_DATE,S.START_DATE,S.END_DATE
+    </select>
+
+    <select id="selectBatchTaskTodo" resultType="com.joyintech.tams.common.base.entity.BokBatchTaskTodo" parameterType="java.util.Map" >
+        SELECT
+            A.SEQ_NO,
+            A.BOOKSET_ID,
+            A.HAPPEN_DATE,
+            A.TASK_ID,
+            A.BOOKSET_DATE,
+            A.BOOK_DATE,
+            A.IS_SUB_BOOKSET
+        FROM BOK_BATCH_TASK_TODO A
+        WHERE A.SEQ_NO = #{seqNo}
+        GROUP BY
+            A.SEQ_NO,
+            A.BOOKSET_ID,
+            A.HAPPEN_DATE,
+            A.TASK_ID,
+            A.BOOKSET_DATE,
+            A.BOOK_DATE,
+            A.IS_SUB_BOOKSET
+        ORDER BY
+            A.SEQ_NO,
+            A.BOOKSET_DATE,
+            A.BOOK_DATE,
+            A.HAPPEN_DATE,
+            A.IS_SUB_BOOKSET,
+            A.BOOKSET_ID,
+            A.TASK_ID
+    </select>
+    
+    <select id="selectBatchDimensionConfig" resultType="com.joyintech.tams.invest.batch.common.dto.BatchDimensionConfig" parameterType="java.util.Map" >
+        SELECT
+            SEQ_NO, DIMENSION_NAME, PRI, REMARK
+        FROM SYS_BATCH_DIMENSION_CONFIG
+        ORDER BY PRI
+    </select>
+    
+    <insert id="insertDimValue">
+        insert into SYS_BATCH_DIMENSION_VALUE (GROUP_INS_SEQ_NO, DIMENSION_SEQ_NO, DIMENSION_VALUE, 
+            CREATE_TIME, UPDATE_TIME, CREATE_DEPT, 
+            CREATE_USER, UPDATE_USER)
+        <foreach collection="list" item="item" separator="from dual union all select" open="select * from (select "
+             close="from dual)">
+            #{item.groupInsSeqNo,jdbcType=VARCHAR}, #{item.dimensionSeqNo,jdbcType=VARCHAR}, #{item.dimensionValue,jdbcType=VARCHAR}, 
+            #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, #{item.createDept,jdbcType=VARCHAR}, 
+            #{item.createUser,jdbcType=VARCHAR}, #{item.updateUser,jdbcType=VARCHAR}
+        </foreach>
+    </insert>
+    
+    <insert id="insertBatchGrpPri">
+        insert into SYS_BATCH_GRP_PRI (DETAIL_SEQ_NO, GROUP_SEQ_NO, EXECUTE_DATE, 
+            PRI, CREATE_TIME, UPDATE_TIME, 
+            CREATE_DEPT, CREATE_USER, UPDATE_USER)
+        <foreach collection="list" item="item" separator="from dual union all select" open="select * from (select "
+             close="from dual)">
+            #{item.detailSeqNo,jdbcType=VARCHAR}, #{item.groupSeqNo,jdbcType=VARCHAR}, #{item.executeDate,jdbcType=TIMESTAMP}, 
+            #{item.pri,jdbcType=DECIMAL}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}, 
+            #{item.createDept,jdbcType=VARCHAR}, #{item.createUser,jdbcType=VARCHAR}, #{item.updateUser,jdbcType=VARCHAR}
+        </foreach>
+    </insert>
+    
+    <insert id="insertBatchJob">
+        insert into SYS_BATCH_JOB_INST (BATCH_SEQ_NO, TASK_ID, CREATE_USER, 
+            CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
+            UPDATE_TIME)
+        <foreach collection="list" item="item" separator="from dual union all select" open="select * from (select "
+             close="from dual)">
+            #{item.batchSeqNo,jdbcType=VARCHAR}, #{item.taskId,jdbcType=VARCHAR}, #{item.createUser,jdbcType=VARCHAR}, 
+            #{item.createDept,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateUser,jdbcType=VARCHAR}, 
+            #{item.updateTime,jdbcType=TIMESTAMP}
+        </foreach>
+    </insert>
+    
+    <insert id="insertBokBatchTaskTodo">
+        insert into BOK_BATCH_TASK_TODO (SEQ_NO, BOOKSET_ID, HAPPEN_DATE, 
+            TASK_ID, BOOKSET_DATE, BOK_DETAIL_ID, 
+            BOOK_DATE, IS_BACK_VALUE, CREATE_USER, 
+            CREATE_DEPT, CREATE_TIME, UPDATE_USER, 
+            UPDATE_TIME, IS_SUB_BOOKSET)
+        <foreach collection="list" item="item" separator="from dual union all select" open="select * from (select "
+             close="from dual)">
+            #{item.seqNo,jdbcType=VARCHAR}, #{item.booksetId,jdbcType=VARCHAR}, #{item.happenDate,jdbcType=DATE}, 
+            #{item.taskId,jdbcType=VARCHAR}, #{item.booksetDate,jdbcType=DATE}, #{item.bokDetailId,jdbcType=VARCHAR}, 
+            #{item.bookDate,jdbcType=DATE}, #{item.isBackValue,jdbcType=VARCHAR}, #{item.createUser,jdbcType=VARCHAR}, 
+            #{item.createDept,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateUser,jdbcType=VARCHAR}, 
+            #{item.updateTime,jdbcType=TIMESTAMP},#{item.isSubBookset,jdbcType=TIMESTAMP}
+        </foreach>
+    </insert>
+    
+    <delete id="deleteOldData">
+		DELETE FROM BOK_BATCH_TASK_TODO
+		WHERE 
+           CREATE_TIME &lt; #{oldDate}
+	</delete>
+</mapper>
