@@ -221,7 +221,11 @@ public class ExchangeTransMatchBondCommonService extends BaseService {
         // 投资目的
         if(StringUtil.isNotEmpty(entrustDto.getInvAim())){
             dealTotal.setInvAim(entrustDto.getInvAim());
-        }else{
+        }
+        else if(StringUtil.isNotEmpty(entrustDto.getBusinessModel())){
+            dealTotal.setInvAim(entrustDto.getBusinessModel());
+        }
+        else{
             // 查询持仓的投资目的
             Map<String,Object> param = new HashMap<>();
             param.put("dealDate", dealTotal.getTradeDate());
@@ -346,10 +350,21 @@ public class ExchangeTransMatchBondCommonService extends BaseService {
 
         if(StringUtil.isNotEmpty(entrustDto.getInvAim())){
             trdProductDeal.setInvAim(entrustDto.getInvAim());
-        }else{
+        }
+        else if(StringUtil.isNotEmpty(entrustDto.getBusinessModel())){
             trdProductDeal.setInvAim(entrustDto.getBusinessModel());
         }
-
+        else{
+            // 查询持仓的投资目的
+            Map<String,Object> param = new HashMap<>();
+            param.put("dealDate", trdProductDeal.getTradeDate());
+            param.put("finProductId",trdProductDeal.getFinprodId());
+            param.put("secManageAcctId",dealDto.getSecAcctId());
+            List<PtlSecPosition> ptlSecPositions = exchangeTransMatchCommonMapper.searchPtlSecPositionList(param);
+            if(CollectionUtils.isNotEmpty(ptlSecPositions)){
+                trdProductDeal.setInvAim(ptlSecPositions.get(0).getInvAim());
+            }
+        }
         // 交易状态
         trdProductDeal.setTradeStatus(DictCodeListExt1.交易状态_初始.getValue());
         // 是否已撤销
