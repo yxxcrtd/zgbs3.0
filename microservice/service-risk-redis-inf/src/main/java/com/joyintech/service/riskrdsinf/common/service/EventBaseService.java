@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import com.joyintech.framework.security.LoginUserUtil;
 import com.joyintech.framework.security.MultilevelDataAuthorityUtil;
 import com.joyintech.framework.util.*;
+import com.joyintech.service.riskrdsinf.common.dto.TrialSort;
 import com.joyintech.service.riskrdsinf.event.rsk007.service.Rsk007Service;
 import com.joyintech.tams.invest.common.redisinit.dto.ImplCond;
 import com.joyintech.tams.invest.common.redisinit.service.RiskRedisInitService;
@@ -2043,6 +2044,7 @@ public abstract class EventBaseService<V> extends InfBaseService<V> {
             return;
         }
         List<Map<String, Object>> rskList = new ArrayList<>();
+        List<TrialSort> rskSortList = new ArrayList<>();
         Map<String,Object> ptlMap = (Map<String, Object>) getServiceInfo("PTL_NAME");
         resMap.entrySet().forEach(en -> {
             IIndicator ind = en.getValue();
@@ -2054,7 +2056,11 @@ public abstract class EventBaseService<V> extends InfBaseService<V> {
                 String ptlCode = resEn.getKey();
                 String ptlName = (String) ptlMap.get(ptlCode);
                 IIndicatorResult res = resEn.getValue();
-                rskList.add(getResMap(response, ptlCode, ptlName, ind, res, resMap));
+                Map<String,Object> map = getResMap(response, ptlCode, ptlName, ind, res, resMap);
+                TrialSort trialSort = BeanUtil.mapToObject(map,TrialSort.class);
+                trialSort.setSort(null);
+                rskSortList.add(trialSort);
+                //rskList.add(map);
             });
         });
         if (CommonUtil.isType((String)response.getBodyField(RSKSTATUS), BussinessDictCodeListRds.指标状态_异常_除0)) {
@@ -2062,6 +2068,11 @@ public abstract class EventBaseService<V> extends InfBaseService<V> {
             String msgKey = InfColumns.COM_RTNMSG.fieldName();
             setRtnMsg(response, CommonUtil.replaceMsgWithName((String)response.getHeadField(msgKey), paraMap));
             //return;
+        }
+        //按照【状态】+【组合】进行排序，优先状态 GLYHSCWT-268
+        if(!CollectionUtils.isEmpty(rskSortList)) {
+            List<TrialSort> tempList = rskSortList.stream().sorted(Comparator.comparing(TrialSort::getSort, Comparator.reverseOrder())).collect(Collectors.toList());
+            tempList.forEach(e -> rskList.add(BeanUtil.object2Map(e)));
         }
         response.setBodyField(RSK_LIST, rskList);
     }
