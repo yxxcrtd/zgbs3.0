@@ -273,6 +273,7 @@
             data.listDetailType = $('#listDetailType').val();
             assetNameNewDetailTbl.addRow(data);
         }
+        assetNameHistoryDetailTBL.reload();
     });
 
     /**
