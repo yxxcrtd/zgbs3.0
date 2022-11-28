@@ -2000,6 +2000,9 @@ public class StlDataDealSzdSjsjgProcessService {
            if(StringUtil.isEmpty(settleTransData.getApplyTradeId())){
                settleTransData.setApplyTradeId(StringUtil.isNotEmpty(szdSjsjg.getJgzxbh())?szdSjsjg.getJgzxbh():szdSjsjg.getJgywlsh());
            }
+           if(StringUtil.isEmpty(settleTransData.getApplyTradeId())){
+               settleTransData.setApplyTradeId("0");
+           }
        }
     }
 }
