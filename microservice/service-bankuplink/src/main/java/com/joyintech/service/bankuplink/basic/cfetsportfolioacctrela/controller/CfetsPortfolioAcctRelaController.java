@@ -18,6 +18,7 @@ import com.joyintech.framework.base.entity.ProcessMark;
 import com.joyintech.framework.util.EncryptUtil;
 import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.workflow.engine.WorkflowContext;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -162,8 +163,11 @@ public class CfetsPortfolioAcctRelaController {
         else {
         	param.put("portfolioIdList", new ArrayList<>());
         }
-    	
-        return cfetsPortfolioAcctRelaService.selectForPage(page, length, param);
+        Page<CfetsPortfolioAcctRela001Dto> resultPage = cfetsPortfolioAcctRelaService.selectForPage(page, length, param);
+        if (StringUtil.isNotEmpty(resultPage) && CollectionUtils.isNotEmpty(resultPage.getRoot())) {
+            resultPage.getRoot().forEach(item -> item.setPortfolioIdMd5(EncryptUtil.getInstance().md5(item.getPortfolioId())));
+        }
+        return resultPage;
     }
 
     /**
