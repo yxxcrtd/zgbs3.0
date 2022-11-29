@@ -3,6 +3,7 @@ package com.joyintech.service.risk.namelistmanage.assetnamelist.service;
 
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.service.risk.namelistmanage.assetnamelist.dao.AssetNameManagementDetailMapper;
 import com.joyintech.service.risk.namelistmanage.assetnamelist.dao.AssetNameManagementMapper;
@@ -12,6 +13,8 @@ import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -45,8 +48,13 @@ public class AssetNameManagementDetailService extends BaseService<RskAccessListD
      * @see
      * @since 1.0
      */
-    public Page<RskAccessListDetailDto> selectForPage(int page, int length, Map<String, Object> pageParam)
+    public Page<RskAccessListDetailDto> selectForPage(int page, int length, Map<String, Object> pageParam) throws IOException
     {
+        List<RskAccessListDetailDto> handleRskAccessListDetailList = new ArrayList<>();
+        if(pageParam.containsKey("rskAccessListLogDtoList")){
+            handleRskAccessListDetailList= JsonUtils.json2List(pageParam.get("rskAccessListLogDtoList").toString(),RskAccessListDetailDto.class);
+            pageParam.put("rskAccessListLogDtoList",handleRskAccessListDetailList);
+        }
         pageParam.put("sysDate",iPlatformDate.getSysDate());
         Page<RskAccessListDetailDto> pageDto = super.queryForPage(page, length, () -> assetNameManagementMapper.queryDetailForPage(pageParam));
         return pageDto;
@@ -111,7 +119,7 @@ public class AssetNameManagementDetailService extends BaseService<RskAccessListD
     public int getNameDetailCount(Map<String, Object> param){
         return assetNameManagementDetailMapper.getNameDetailCount(param);
     }
-    
+
     /**
      * 非一个体系的名单明细
      * @param param
