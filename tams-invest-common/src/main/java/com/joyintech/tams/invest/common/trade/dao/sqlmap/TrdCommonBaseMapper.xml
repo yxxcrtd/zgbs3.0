@@ -1053,6 +1053,7 @@
 		SELECT COUNT(1)
 		  FROM (SELECT T.FINPROD_ID
 		          FROM FIN_CASH_PLAN T
+                  left join FIN_PRODUCT fp on t.FINPROD_ID = fp.FINPROD_ID
 		         WHERE NOT EXISTS (SELECT 1
 		                  FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL W
 		                 WHERE W.FINPROD_ID = #{finprodId, jdbcType=VARCHAR}
@@ -1068,7 +1069,8 @@
 		                   AND TF.TRADE_STATUS = '01'
 		                   AND TF.IS_CANCEL = 'N')
 		           AND T.FINPROD_ID = #{finprodId, jdbcType=VARCHAR}
-		           AND T.PAY_DATE = #{payDate, jdbcType=DATE}
+		           AND ((fp.TRADE_MARKET in ('01', '02') and T.PAY_DATE = #{payDate, jdbcType=DATE})
+                            or (fp.TRADE_MARKET in ('03', '04') and T.MDATE = #{payDate, jdbcType=DATE}))
 		        UNION ALL
 		        SELECT T.FINPROD_ID
 		          FROM WFL_TRD_FIN_PRODUCT_DEAL_TOTAL T
