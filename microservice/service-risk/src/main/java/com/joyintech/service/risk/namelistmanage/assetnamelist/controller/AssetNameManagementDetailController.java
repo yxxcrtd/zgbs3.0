@@ -10,6 +10,7 @@ import com.joyintech.tams.systemtools.interf.IPlatformDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +35,7 @@ public class AssetNameManagementDetailController {
      */
     @PostMapping("findPage/{page}/{length}")
     public Page<RskAccessListDetailDto> selectAll(@RequestBody Map<String, Object> param,
-                                                  @PathVariable("page") int page, @PathVariable("length") int length) {
+                                                  @PathVariable("page") int page, @PathVariable("length") int length) throws IOException {
         return assetNameManagementDetailService.selectForPage(page, length, param);
     }
 
