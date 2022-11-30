@@ -113,6 +113,8 @@ public class JoyinbusinessCommonService extends BaseService {
         // 部分接口不需要查询新债信息
         if (!StringUtil.equals(dto.getIsNewBond(), DictCodeList.是否_否.getValue())) {
             assestTypes.add(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue());
+        }
+        if(!StringUtil.equals(dto.getIsSubDeal(), DictCodeList.是否_是.getValue())){
             tradeMarkets.add(DictCodeListExt1.交易场所_上海证券交易所.getValue());
             tradeMarkets.add(DictCodeListExt1.交易场所_深圳证券交易所.getValue());
             tradeMarkets.add(DictCodeListExt1.交易场所_OTC场外.getValue());

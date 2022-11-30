@@ -51,6 +51,7 @@
         LEFT JOIN PTL_PORTFOLIO pp on pp.PORTFOLIO_ID = T1.PORTFOLIO_ID
         <where>
             T1.AMOUNT > 0
+            T1.CDATE = #{PLATEFORM_DATE}
             <!--AND T1.HODING_TYPE IN ('03', '05', '06', '11')-->
             AND T1.HODING_TYPE = 'A_001'
             and nvl(pp.PARENT_PORTFOLIO_ID, 'null') = 'null'
