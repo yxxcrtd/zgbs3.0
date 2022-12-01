@@ -487,4 +487,17 @@ public class DayEndAccountDto extends StlSecRecon {
 	public String getFinprodTypeStr1() {
 		return SysDataUtil.getNameFromDataDict(BussinessDictCode.平安资产类型, this.getFinprodType());
 	}
+
+	/**
+	 * 佣金是否随交易支付
+	 */
+	private String isPayWithTrade;
+
+	public String getIsPayWithTrade() {
+		return isPayWithTrade;
+	}
+
+	public void setIsPayWithTrade(String isPayWithTrade) {
+		this.isPayWithTrade = isPayWithTrade;
+	}
 }

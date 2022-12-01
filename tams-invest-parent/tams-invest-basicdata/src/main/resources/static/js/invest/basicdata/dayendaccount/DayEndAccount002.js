@@ -68,6 +68,7 @@ $(function() {
         ,{field: 'settleFeeFlg', type:'money', width: 150, visible: false}
         ,{field: 'ghfAmtFlg', type:'money', width: 150, visible: false}
         ,{field:'finprodId',sortable: false,width:120, visible: false}
+        ,{field:'isPayWithTrade',sortable: false,width:120, visible: false}
     ];
     var dataDetailTable = $("#dataDetailTable").joyintable({
         ajax: {
