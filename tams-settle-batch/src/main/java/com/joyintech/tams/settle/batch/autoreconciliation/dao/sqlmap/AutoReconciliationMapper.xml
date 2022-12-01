@@ -136,7 +136,7 @@
 				std.TRADE_DATE,
 				std.SEC_ACCT_ID,
 				stda.REPO_TYPE
-			) entrust ON tmp.INSTRUCTION_ID = entrust.APPLY_TRADE_ID AND tmp.TRADE_DATE = entrust.TRADE_DATE
+			) entrust ON tmp.INSTRUCTION_ID = entrust.APPLY_TRADE_ID AND tmp.SEC_ACCT_ID = entrust.SEC_ACCT_ID AND tmp.TRADE_DATE = entrust.TRADE_DATE
 		WHERE
 			tmp.PARA_VALUE = #{PARA_VALUE_02}
 			AND (entrust.REPO_TYPE IS NULL OR entrust.REPO_TYPE != #{TARGET_BACK_TYPE_H01})
@@ -221,7 +221,7 @@
 				std.TRADE_DATE,
 				std.SEC_ACCT_ID,
 				stda.REPO_TYPE
-			) securities ON tmp.FINPROD_ID = securities.FINPROD_ID AND tmp.TRADE_DATE = securities.TRADE_DATE
+			) securities ON tmp.FINPROD_ID = securities.FINPROD_ID AND tmp.SEC_ACCT_ID = securities.SEC_ACCT_ID AND tmp.TRADE_DATE = securities.TRADE_DATE
 		WHERE
 			tmp.PARA_VALUE = #{PARA_VALUE_01}
 			AND (securities.REPO_TYPE IS NULL OR securities.REPO_TYPE != #{TARGET_BACK_TYPE_H01})

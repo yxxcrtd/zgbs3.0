@@ -175,6 +175,9 @@ where
 			<if test="account != null" >
 				ACCOUT,
 			</if>
+			<if test="secAcctId != null" >
+				SEC_ACCT_ID,
+			</if>
 			<if test="checkResult != null" >
 				CHECK_RESULT,
 			</if>
@@ -227,6 +230,9 @@ where
 			</if>
 			<if test="account != null" >
 				#{account,jdbcType=VARCHAR},
+			</if>
+			<if test="secAcctId != null" >
+				#{secAcctId,jdbcType=VARCHAR},
 			</if>
 			<if test="checkResult != null" >
 				#{checkResult,jdbcType=VARCHAR},

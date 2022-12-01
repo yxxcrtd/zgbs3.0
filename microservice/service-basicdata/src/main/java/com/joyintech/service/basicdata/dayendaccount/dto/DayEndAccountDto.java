@@ -464,4 +464,17 @@ public class DayEndAccountDto extends StlSecRecon {
 	public void setTradeId(String tradeId) {
 		this.tradeId = tradeId;
 	}
+
+	/**
+	 * 佣金是否随交易支付
+	 */
+	private String isPayWithTrade;
+
+	public String getIsPayWithTrade() {
+		return isPayWithTrade;
+	}
+
+	public void setIsPayWithTrade(String isPayWithTrade) {
+		this.isPayWithTrade = isPayWithTrade;
+	}
 }

@@ -415,164 +415,6 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
             reconDealInfo.setTradeAmt(stlSecReconDeal.getTradeAmt());
             reconDealInfo.setTradeNum(stlSecReconDeal.getTradeNum());
             reconDealInfoList.add(reconDealInfo);
-
-            //查询证券账户信息
-            StlSecAcctInfo stlSecAcctInfo = stlSecAcctInfoMapper.selectByPrimaryKey(stlSecReconDeal.getSecAcctId());
-            //变量.标的分类信息
-            FinProductTypeKey finProductTypeKey = new FinProductTypeKey();
-            finProductTypeKey.setBranch(0L);
-            finProductTypeKey.setFinprodId(stlSecReconDeal.getFinprodId());
-            FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(finProductTypeKey);
-
-            //有差额费用统计
-            List<String> feeList = new ArrayList<String>();
-            feeList.add(DictCodeListExt1.一次性费用类型_印花税.getValue());
-            feeList.add(DictCodeListExt1.一次性费用类型_经手费.getValue());
-            feeList.add(DictCodeListExt1.一次性费用类型_过户费.getValue());
-            feeList.add(DictCodeListExt1.一次性费用类型_证管费.getValue());
-            feeList.add(DictCodeListExt1.一次性费用类型_交易手续费.getValue());
-            feeList.add(DictCodeListExt1.一次性费用类型_结算费.getValue());
-            feeList.add(DictCodeListExt1.一次性费用类型_佣金.getValue());
-
-            for (String feeType : feeList) {
-                AccountPlanSearchInfo localPlanSearchInfo = new AccountPlanSearchInfo();
-                // 交易场所
-                if (StringUtil.isNotEmpty(stlSecReconDeal.getTradeMarket())) {
-                    localPlanSearchInfo.setTradeMarket(stlSecReconDeal.getTradeMarket());
-                }
-                // 交易平台
-                if (StringUtil.isNotEmpty(stlSecReconDeal.getTradePlat())) {
-                    localPlanSearchInfo.setTradePlatform(stlSecReconDeal.getTradePlat());
-                }
-                // 费用类型
-                if (StringUtil.isNotEmpty(feeType)) {
-                    localPlanSearchInfo.setFeeType(feeType);
-                }
-                // 登记托管机构
-                if (StringUtil.isNotEmpty(stlSecAcctInfo.getRegistOrg())) {
-                    localPlanSearchInfo.setRegistOrg(stlSecAcctInfo.getRegistOrg());
-                }
-                // 交易品种
-                String tradeType = stlSecReconDeal.getFinprodType();
-                if (StringUtil.isNotEmpty(tradeType)) {
-                    if (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue(), tradeType)) {
-                        tradeType = DictCodeList.平安资产类型_债券.getValue();
-                    }
-                    if (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_债券质押式正回购.getValue(), tradeType)
-                            || StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_债券质押式逆回购.getValue(), tradeType)) {
-                        tradeType = DictCodeList.平安资产类型_质押式回购.getValue();
-                    }
-                    if (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_基金.getValue(), tradeType)) {
-                        tradeType = DictCodeList.平安资产类型_基金.getValue();
-                    }
-                    if (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_股票.getValue(), tradeType)) {
-                        tradeType = DictCodeListExt2.平安资产类型_股票.getValue();
-                    }
-                    localPlanSearchInfo.setTradeType(tradeType);
-                }
-                // 交易方向
-                if (StringUtil.isNotEmpty(stlSecReconDeal.getPs())) {
-                    localPlanSearchInfo.setPs(stlSecReconDeal.getPs());
-                }
-//            // 期限品种
-//            if (StringUtil.isNotEmpty(stlSecReconDeal.getTermType())) {
-//                localPlanSearchInfo.setTermType(stlSecReconDeal.getTermType());
-//            }
-                // 证券账户
-                if (StringUtil.isNotEmpty(stlSecReconDeal.getSecAcctId())) {
-                    localPlanSearchInfo.setSecAcctId(stlSecReconDeal.getSecAcctId());
-                }
-                // 券商代码
-                if (StringUtil.isNotEmpty(stlSecReconDeal.getCustomerId())) {
-                    localPlanSearchInfo.setBrokerageNo(stlSecReconDeal.getCustomerId());
-                }
-                // 证券分类1
-                if (finProductType != null && StringUtil.isNotEmpty(finProductType.getType9())) {
-                    localPlanSearchInfo.setAssetClassify1(finProductType.getType9());
-                }
-                // 证券分类2
-                if (finProductType != null && StringUtil.isNotEmpty(finProductType.getType10())) {
-                    localPlanSearchInfo.setAssetClassify2(finProductType.getType10());
-                }
-                // 证券分类3
-                if (finProductType != null && StringUtil.isNotEmpty(finProductType.getType11())) {
-                    localPlanSearchInfo.setAssetClassify3(finProductType.getType11());
-                }
-                // 组合代码
-                if (StringUtil.isNotEmpty(stlSecReconDeal.getPortfolioId())) {
-                    localPlanSearchInfo.setPortfolioId(stlSecReconDeal.getPortfolioId());
-                }
-                //调用共通方法【费用方案获取】
-                AccountFeePlan feePlan = reconciliationCommonService.getFeePlan(localPlanSearchInfo, DateUtil.format(stlSecReconDeal.getTradeDate()));
-                String isPay = feePlan == null || feePlan.getTrdFeeConfig() == null ? null : feePlan.getTrdFeeConfig().getIsPayWithTrade();
-                //费用信息.是否随交易支付 = 是 and 费用信息.费用类型 = 佣金
-                if (DictCodeListExt1.是否_是.getValue().equals(isPay)
-                        && DictCodeListExt1.一次性费用类型_佣金.getValue().equals(feeType)) {
-                    //if 待对账数据.交易方向 = 买入 or 正回购
-                    if (DictCodeList.交易方向_买入.getValue().equals(stlSecReconDeal.getPs())
-                            || DictCodeList.回购拆借方向_正回购.getValue().equals(stlSecReconDeal.getPs())) {
-                        commissionAmtFlg = BigDecimal.ONE;
-                    } else if (DictCodeList.交易方向_卖出.getValue().equals(stlSecReconDeal.getPs())
-                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(stlSecReconDeal.getPs())) {
-                        commissionAmtFlg = BigDecimal.ONE.negate();
-                    }
-                } else if (DictCodeListExt1.是否_是.getValue().equals(isPay)
-                        && DictCodeListExt1.一次性费用类型_经手费.getValue().equals(feeType)) {
-                    if (DictCodeList.交易方向_买入.getValue().equals(stlSecReconDeal.getPs())
-                            || DictCodeList.回购拆借方向_正回购.getValue().equals(stlSecReconDeal.getPs())
-                            || DictCodeList.交易方向_申购.getValue().equals(stlSecReconDeal.getPs())) {
-                        jsfAmtFlg = BigDecimal.ONE;
-                    } else if (DictCodeList.交易方向_卖出.getValue().equals(stlSecReconDeal.getPs())
-                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(stlSecReconDeal.getPs())) {
-                        jsfAmtFlg = BigDecimal.ONE.negate();
-                    }
-                } else if (DictCodeListExt1.是否_是.getValue().equals(isPay)
-                        && DictCodeListExt1.一次性费用类型_证管费.getValue().equals(feeType)) {
-                    if (DictCodeList.交易方向_买入.getValue().equals(stlSecReconDeal.getPs())
-                            || DictCodeList.回购拆借方向_正回购.getValue().equals(stlSecReconDeal.getPs())) {
-                        zgfAmtFlg = BigDecimal.ONE;
-                    } else if (DictCodeList.交易方向_卖出.getValue().equals(stlSecReconDeal.getPs())
-                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(stlSecReconDeal.getPs())) {
-                        zgfAmtFlg = BigDecimal.ONE.negate();
-                    }
-                } else if (DictCodeListExt1.是否_是.getValue().equals(isPay)
-                        && DictCodeListExt1.一次性费用类型_印花税.getValue().equals(feeType)) {
-                    if (DictCodeList.交易方向_买入.getValue().equals(stlSecReconDeal.getPs())
-                            || DictCodeList.回购拆借方向_正回购.getValue().equals(stlSecReconDeal.getPs())) {
-                        stampFeeFlg = BigDecimal.ONE;
-                    } else if (DictCodeList.交易方向_卖出.getValue().equals(stlSecReconDeal.getPs())
-                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(stlSecReconDeal.getPs())) {
-                        stampFeeFlg = BigDecimal.ONE.negate();
-                    }
-                } else if (DictCodeListExt1.是否_是.getValue().equals(isPay)
-                        && DictCodeListExt1.一次性费用类型_结算费.getValue().equals(feeType)) {
-                    if (DictCodeList.交易方向_买入.getValue().equals(stlSecReconDeal.getPs())
-                            || DictCodeList.回购拆借方向_正回购.getValue().equals(stlSecReconDeal.getPs())) {
-                        settleFeeFlg = BigDecimal.ONE;
-                    } else if (DictCodeList.交易方向_卖出.getValue().equals(stlSecReconDeal.getPs())
-                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(stlSecReconDeal.getPs())) {
-                        settleFeeFlg = BigDecimal.ONE.negate();
-                    }
-                } else if (DictCodeListExt1.是否_是.getValue().equals(isPay)
-                        && DictCodeListExt1.一次性费用类型_过户费.getValue().equals(feeType)) {
-                    if (DictCodeList.交易方向_买入.getValue().equals(stlSecReconDeal.getPs())
-                            || DictCodeList.回购拆借方向_正回购.getValue().equals(stlSecReconDeal.getPs())) {
-                        ghfAmtFlg = BigDecimal.ONE;
-                    } else if (DictCodeList.交易方向_卖出.getValue().equals(stlSecReconDeal.getPs())
-                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(stlSecReconDeal.getPs())) {
-                        ghfAmtFlg = BigDecimal.ONE.negate();
-                    }
-                } else if (DictCodeListExt1.是否_是.getValue().equals(isPay)
-                        && DictCodeListExt1.一次性费用类型_交易手续费.getValue().equals(feeType)) {
-                    if (DictCodeList.交易方向_买入.getValue().equals(stlSecReconDeal.getPs())
-                            || DictCodeList.回购拆借方向_正回购.getValue().equals(stlSecReconDeal.getPs())) {
-                        sxfAmtFlg = BigDecimal.ONE;
-                    } else if (DictCodeList.交易方向_卖出.getValue().equals(stlSecReconDeal.getPs())
-                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(stlSecReconDeal.getPs())) {
-                        sxfAmtFlg = BigDecimal.ONE.negate();
-                    }
-                }
-            }
         }
 
         List<SettleTransData> listSettleTransData = dayEndAccountMapper.selectAllSettleTransData(param);
@@ -595,6 +437,82 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                 dealDetail.setTradeAmt(settleTransData.getFpriceAmt());
                 dealDetail.setTradeNum(settleTransData.getShareAmt());
                 dealDetail.setTradeId(settleTransData.getTradeId());
+                dealDetail.setIsPayWithTrade(settleTransData.getIsPayWithTrade());
+
+                String isPay = settleTransData.getIsPayWithTrade();
+                //费用信息.是否随交易支付 = 是 and 费用信息.费用类型 = 佣金
+                if (DictCodeListExt1.是否_是.getValue().equals(isPay)) {
+                    //if 待对账数据.交易方向 = 买入 or 正回购
+                    if (DictCodeList.交易方向_买入.getValue().equals(settleTransData.getPs())
+                            || DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())
+                            || DictCodeList.回购拆借方向_正回购.getValue().equals(settleTransData.getPs())) {
+                        commissionAmtFlg = BigDecimal.ONE;
+                    } else if (DictCodeList.交易方向_卖出.getValue().equals(settleTransData.getPs())
+                            || DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())
+                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(settleTransData.getPs())) {
+                        commissionAmtFlg = BigDecimal.ONE.negate();
+                    }
+                }
+                if (DictCodeList.交易方向_买入.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.回购拆借方向_正回购.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())) {
+                    jsfAmtFlg = BigDecimal.ONE;
+                } else if (DictCodeList.交易方向_卖出.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.回购拆借方向_逆回购.getValue().equals(settleTransData.getPs())) {
+                    jsfAmtFlg = BigDecimal.ONE.negate();
+                }
+
+                if (DictCodeList.交易方向_买入.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.回购拆借方向_正回购.getValue().equals(settleTransData.getPs())) {
+                    zgfAmtFlg = BigDecimal.ONE;
+                } else if (DictCodeList.交易方向_卖出.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.回购拆借方向_逆回购.getValue().equals(settleTransData.getPs())) {
+                    zgfAmtFlg = BigDecimal.ONE.negate();
+                }
+
+                if (DictCodeList.交易方向_买入.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.回购拆借方向_正回购.getValue().equals(settleTransData.getPs())) {
+                    stampFeeFlg = BigDecimal.ONE;
+                } else if (DictCodeList.交易方向_卖出.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.回购拆借方向_逆回购.getValue().equals(settleTransData.getPs())) {
+                    stampFeeFlg = BigDecimal.ONE.negate();
+                }
+
+                if (DictCodeList.交易方向_买入.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.回购拆借方向_正回购.getValue().equals(settleTransData.getPs())) {
+                    settleFeeFlg = BigDecimal.ONE;
+                } else if (DictCodeList.交易方向_卖出.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.回购拆借方向_逆回购.getValue().equals(settleTransData.getPs())) {
+                    settleFeeFlg = BigDecimal.ONE.negate();
+                }
+
+                if (DictCodeList.交易方向_买入.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.回购拆借方向_正回购.getValue().equals(settleTransData.getPs())) {
+                    ghfAmtFlg = BigDecimal.ONE;
+                } else if (DictCodeList.交易方向_卖出.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.回购拆借方向_逆回购.getValue().equals(settleTransData.getPs())) {
+                    ghfAmtFlg = BigDecimal.ONE.negate();
+                }
+
+                if (DictCodeList.交易方向_买入.getValue().equals(stlSecReconDeal.getPs())
+                        || DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.回购拆借方向_正回购.getValue().equals(stlSecReconDeal.getPs())) {
+                    sxfAmtFlg = BigDecimal.ONE;
+                } else if (DictCodeList.交易方向_卖出.getValue().equals(stlSecReconDeal.getPs())
+                        || DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.回购拆借方向_逆回购.getValue().equals(stlSecReconDeal.getPs())) {
+                    sxfAmtFlg = BigDecimal.ONE.negate();
+                }
+
                 //费用标识，没有0，增加1，扣减-1
                 dealDetail.setCommissionAmtFlg(commissionAmtFlg);
                 dealDetail.setJsfAmtFlg(jsfAmtFlg);
@@ -625,57 +543,6 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
         return dto;
     }
 
-    public DayEndAccount002Dto getDealDetailInfo(Map<String, Object> param) {
-        DayEndAccount002Dto dto = new DayEndAccount002Dto();
-        //费用加减标识
-        BigDecimal stampFeeFlg = BigDecimal.ZERO;
-        BigDecimal jsfAmtFlg = BigDecimal.ZERO;
-        BigDecimal ghfAmtFlg = BigDecimal.ZERO;
-        BigDecimal zgfAmtFlg = BigDecimal.ZERO;
-        BigDecimal sxfAmtFlg = BigDecimal.ZERO;
-        BigDecimal settleFeeFlg = BigDecimal.ZERO;
-        BigDecimal commissionAmtFlg = BigDecimal.ZERO;
-        List<SettleTransData> listSettleTransData = dayEndAccountMapper.selectSettleTransData(param);
-        List<DayEndAccountDto> dealDetailList = new ArrayList<DayEndAccountDto>();
-        if (listSettleTransData != null && listSettleTransData.size() > 0) {
-            for (SettleTransData settleTransData : listSettleTransData) {
-                DayEndAccountDto dealDetail = new DayEndAccountDto();
-                dealDetail.setCommissionAmt(settleTransData.getCommissionAmt());
-                dealDetail.setCjbh(settleTransData.getCjbh());
-                dealDetail.setPs(settleTransData.getPs());
-                dealDetail.setJsfAmt(settleTransData.getJsfAmt());
-                dealDetail.setZgfAmt(settleTransData.getZgfAmt());
-                dealDetail.setStampFee(settleTransData.getStampFee());
-                dealDetail.setSettleFee(settleTransData.getSettleFee());
-                dealDetail.setSxfAmt(settleTransData.getSxfAmt());
-                dealDetail.setGhfAmt(settleTransData.getGhfAmt());
-                dealDetail.setTradeAmt(settleTransData.getFpriceAmt());
-                dealDetail.setTradeNum(settleTransData.getShareAmt());
-                dealDetail.setTradeId(settleTransData.getTradeId());
-                //费用标识，没有0，增加1，扣减-1
-                dealDetail.setCommissionAmtFlg(commissionAmtFlg);
-                dealDetail.setJsfAmtFlg(jsfAmtFlg);
-                dealDetail.setZgfAmtFlg(zgfAmtFlg);
-                dealDetail.setStampFeeFlg(stampFeeFlg);
-                dealDetail.setSettleFeeFlg(settleFeeFlg);
-                dealDetail.setSxfAmtFlg(sxfAmtFlg);
-                dealDetail.setGhfAmtFlg(ghfAmtFlg);
-                //隐藏用于记录调整值字段
-                dealDetail.setCommissionAmt2(settleTransData.getCommissionAmt());
-                dealDetail.setJsfAmt2(settleTransData.getJsfAmt());
-                dealDetail.setZgfAmt2(settleTransData.getZgfAmt());
-                dealDetail.setStampFee2(settleTransData.getStampFee());
-                dealDetail.setSettleFee2(settleTransData.getSettleFee());
-                dealDetail.setSxfAmt2(settleTransData.getSxfAmt());
-                dealDetail.setGhfAmt2(settleTransData.getGhfAmt());
-                dealDetail.setTradeAmt2(BigDecimal.ZERO);
-                dealDetailList.add(dealDetail);
-            }
-        }
-        dto.setDealDetailList(dealDetailList);
-        return dto;
-    }
-
     /**
      * 实现docomplement方法
      */
@@ -685,10 +552,6 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
             for (DayEndAccountDto dto : entity.getDealDetailList()) {
                 SettleTransData data = new SettleTransData();
                 data.setCommissionAmt(dto.getCommissionAmt() == null ? BigDecimal.ZERO : dto.getCommissionAmt());
-                if (dto.getCommissionAmtFlg() != null && StringUtil.isEmpty(data.getIsPayWithTrade())) {
-                    data.setIsPayWithTrade(dto.getCommissionAmtFlg().compareTo(BigDecimal.ZERO) == 0
-                            ? DictCodeListExt1.是否_否.getValue() : DictCodeListExt1.是否_是.getValue());
-                }
                 data.setJsfAmt(dto.getJsfAmt() == null ? BigDecimal.ZERO : dto.getJsfAmt());
                 data.setZgfAmt(dto.getZgfAmt() == null ? BigDecimal.ZERO : dto.getZgfAmt());
                 data.setStampFee(dto.getStampFee() == null ? BigDecimal.ZERO : dto.getStampFee());
@@ -696,19 +559,56 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                 data.setGhfAmt(dto.getGhfAmt() == null ? BigDecimal.ZERO : dto.getGhfAmt());
                 data.setShareAmt(dto.getTradeNum() == null ? BigDecimal.ZERO : dto.getTradeNum());
                 data.setFpriceAmt(dto.getTradeAmt() == null ? BigDecimal.ZERO : dto.getTradeAmt());
-                //2021-07-13修改，原交易金额为0
-                //data.setTradeAmt(ArithmeticUtil.doAdd(data.getTradeAmt(), dto.getTradeAmt2()));
-                data.setTradeAmt(ArithmeticUtil.doAdd(dto.getTradeAmt(), dto.getTradeAmt2()));
+                data.setTradeAmt(dto.getTradeAmt() == null ? BigDecimal.ZERO : dto.getTradeAmt());
+
+                data.setIsPayWithTrade(dto.getIsPayWithTrade());
+                if(DictCodeListExt1.是否_是.getValue().equals(data.getIsPayWithTrade())){
+                    if(dto.getCommissionAmtFlg() != null && dto.getCommissionAmtFlg().compareTo(BigDecimal.ZERO) > 0){
+                        data.setTradeAmt(ArithmeticUtil.doAdd(data.getTradeAmt(), dto.getCommissionAmt()));
+                    }
+                    else if(dto.getCommissionAmtFlg() != null && dto.getCommissionAmtFlg().compareTo(BigDecimal.ZERO) < 0){
+                        data.setTradeAmt(ArithmeticUtil.subtract(data.getTradeAmt(), dto.getCommissionAmt()));
+                    }
+                }
+
+                if(dto.getJsfAmtFlg() != null && dto.getJsfAmtFlg().compareTo(BigDecimal.ZERO) > 0){
+                    data.setTradeAmt(ArithmeticUtil.doAdd(data.getTradeAmt(), dto.getJsfAmt()));
+                }
+                else if(dto.getJsfAmtFlg() != null && dto.getJsfAmtFlg().compareTo(BigDecimal.ZERO) < 0){
+                    data.setTradeAmt(ArithmeticUtil.subtract(data.getTradeAmt(), dto.getJsfAmt()));
+                }
+
+                if(dto.getZgfAmtFlg() != null && dto.getZgfAmtFlg().compareTo(BigDecimal.ZERO) > 0){
+                    data.setTradeAmt(ArithmeticUtil.doAdd(data.getTradeAmt(), dto.getZgfAmt()));
+                }
+                else if(dto.getZgfAmtFlg() != null && dto.getZgfAmtFlg().compareTo(BigDecimal.ZERO) < 0){
+                    data.setTradeAmt(ArithmeticUtil.subtract(data.getTradeAmt(), dto.getZgfAmt()));
+                }
+
+                if(dto.getStampFeeFlg() != null && dto.getStampFeeFlg().compareTo(BigDecimal.ZERO) > 0){
+                    data.setTradeAmt(ArithmeticUtil.doAdd(data.getTradeAmt(), dto.getStampFee()));
+                }
+                else if(dto.getStampFeeFlg() != null && dto.getStampFeeFlg().compareTo(BigDecimal.ZERO) < 0){
+                    data.setTradeAmt(ArithmeticUtil.subtract(data.getTradeAmt(), dto.getStampFee()));
+                }
+
+                if(dto.getSettleFeeFlg() != null && dto.getSettleFeeFlg().compareTo(BigDecimal.ZERO) > 0){
+                    data.setTradeAmt(ArithmeticUtil.doAdd(data.getTradeAmt(), dto.getSettleFee()));
+                }
+                else if(dto.getSettleFeeFlg() != null && dto.getSettleFeeFlg().compareTo(BigDecimal.ZERO) < 0){
+                    data.setTradeAmt(ArithmeticUtil.subtract(data.getTradeAmt(), dto.getSettleFee()));
+                }
+
+                if(dto.getGhfAmtFlg() != null && dto.getGhfAmtFlg().compareTo(BigDecimal.ZERO) > 0){
+                    data.setTradeAmt(ArithmeticUtil.doAdd(data.getTradeAmt(), dto.getGhfAmt()));
+                }
+                else if(dto.getGhfAmtFlg() != null && dto.getGhfAmtFlg().compareTo(BigDecimal.ZERO) < 0){
+                    data.setTradeAmt(ArithmeticUtil.subtract(data.getTradeAmt(), dto.getGhfAmt()));
+                }
                 data.setTradeId(dto.getTradeId());
                 data.setIsModify(DictCodeListExt1.是否_是.getValue());
                 settleTransDataMapper.updateByPrimaryKeySelective(data);
             }
-//
-//            //新数据进行对账
-//            //处理对账逻辑
-//            Map<String, Object> param = new HashMap<String, Object>();
-//            param.put("seqNo", entity.getSeqNo());
-//            chuliAccount(param);
         }
     }
 

@@ -129,11 +129,9 @@ public class DayEndAccount002Controller extends BaseController {
         if (StringUtil.isNotEmpty(workflowId)) {
             DayEndAccount002Dto dayEndAccount002Dto  = dayEndAccount002Service.getBussinessEntityByWorkflowId(workflowId);
             page.setRoot(dayEndAccount002Dto.getDealDetailList());
-        } else if (StringUtil.isNotEmpty(seqNo)) {
+        }
+        else{
             DayEndAccount002Dto dayEndAccount002Dto = dayEndAccount001Service.getReconDealInfo(pageParam);
-            page.setRoot(dayEndAccount002Dto.getDealDetailList());
-        }else{
-            DayEndAccount002Dto dayEndAccount002Dto = dayEndAccount001Service.getDealDetailInfo(pageParam);
             page.setRoot(dayEndAccount002Dto.getDealDetailList());
         }
         return page;
