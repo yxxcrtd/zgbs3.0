@@ -605,7 +605,10 @@ public class CfetsTrdConfirmService extends BaseService {
                 intAmt = ArithmeticUtil.subtract(intAmt, result.getTrdProductDeals().get(i).getIntAmt());
             }
             for (BussTrdTransferOrderDto item : result.getBussTrdTransferOrder()) {
-                item.setSettleAmt(result.getTrdProductDeals().get(i).getFpriceAmt());
+                if(StringUtil.equals(item.getTradeId(),result.getTrdProductDeals().get(i).getTradeId())) {
+                    item.setSettleAmt(result.getTrdProductDeals().get(i).getFpriceAmt());
+                    break;
+                }
             }
         }
         logger.info("处理后数据:{}", JsonUtils.object2Json(result));
