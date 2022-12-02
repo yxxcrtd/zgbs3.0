@@ -528,27 +528,6 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                     sxfAmtFlg = BigDecimal.ONE.negate();
                 }
 
-        List<SettleTransData> listSettleTransData = dayEndAccountMapper.selectAllSettleTransData(param);
-        List<DayEndAccountDto> dealDetailList = new ArrayList<DayEndAccountDto>();
-
-        if (listSettleTransData != null && listSettleTransData.size() > 0) {
-            for (SettleTransData settleTransData : listSettleTransData) {
-                DayEndAccountDto dealDetail = new DayEndAccountDto();
-                dealDetail.setFinprodType2(settleTransData.getFinprodType2());
-                dealDetail.setFinprodId(settleTransData.getFinprodId());
-                dealDetail.setPs(settleTransData.getPs());
-                dealDetail.setCjbh(settleTransData.getCjbh());
-                dealDetail.setCommissionAmt(settleTransData.getCommissionAmt());
-                dealDetail.setNetCommissionAmt(settleTransData.getNetCommissionAmt());
-                dealDetail.setJsfAmt(settleTransData.getJsfAmtRaw());
-                dealDetail.setZgfAmt(settleTransData.getZgfAmtRaw());
-                dealDetail.setStampFee(settleTransData.getStampFeeRaw());
-                dealDetail.setSettleFee(settleTransData.getSettleFeeRaw());
-                dealDetail.setSxfAmt(settleTransData.getSxfAmtRaw());
-                dealDetail.setGhfAmt(settleTransData.getGhfAmtRaw());
-                dealDetail.setTradeAmt(settleTransData.getFpriceAmt());
-                dealDetail.setTradeNum(settleTransData.getShareAmt());
-                dealDetail.setTradeId(settleTransData.getTradeId());
                 //费用标识，没有0，增加1，扣减-1
                 dealDetail.setCommissionAmtFlg(commissionAmtFlg);
                 dealDetail.setJsfAmtFlg(jsfAmtFlg);
