@@ -27,35 +27,35 @@
         <result column="TRADE_NUM" property="tradeNum" jdbcType="DECIMAL" />
     </resultMap>
     <resultMap id="ResultMapWithBLOBs" type="com.joyintech.tams.common.base.entity.StlSecRecon" extends="BaseResultMap" >
-        <result column="RECON_INFO" property="reconInfo" jdbcType="LONGVARBINARY" />
+        <result column="RECON_INFO" property="reconInfo" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Base_Column_List" >
-        SEQ_NO SEQ_NO, CUSTOMER_ID CUSTOMER_ID, PORTFOLIO_ID PORTFOLIO_ID, FINPROD_ID FINPROD_ID, 
-        MARKET_ID MARKET_ID, SETTLE_DATE SETTLE_DATE, TRADE_MARKET TRADE_MARKET, CHECK_RESULT CHECK_RESULT, 
-        STL_SEC_DEME STL_SEC_DEME, create_user create_user, create_dept create_dept, create_time create_time, 
-        update_user update_user, update_time update_time, COMMISSION_AMT COMMISSION_AMT, 
-        JSF_AMT JSF_AMT, ZGF_AMT ZGF_AMT, STAMP_FEE STAMP_FEE, SETTLE_FEE SETTLE_FEE, GHF_AMT GHF_AMT, 
+        SEQ_NO SEQ_NO, CUSTOMER_ID CUSTOMER_ID, PORTFOLIO_ID PORTFOLIO_ID, FINPROD_ID FINPROD_ID,
+        MARKET_ID MARKET_ID, SETTLE_DATE SETTLE_DATE, TRADE_MARKET TRADE_MARKET, CHECK_RESULT CHECK_RESULT,
+        STL_SEC_DEME STL_SEC_DEME, create_user create_user, create_dept create_dept, create_time create_time,
+        update_user update_user, update_time update_time, COMMISSION_AMT COMMISSION_AMT,
+        JSF_AMT JSF_AMT, ZGF_AMT ZGF_AMT, STAMP_FEE STAMP_FEE, SETTLE_FEE SETTLE_FEE, GHF_AMT GHF_AMT,
         SXF_AMT SXF_AMT, FPRICE_AMT FPRICE_AMT, TRADE_NUM TRADE_NUM
     </sql>
     <sql id="Blob_Column_List" >
         RECON_INFO
     </sql>
     <sql id="Sql_All_Data" >
-        select 
+        select
         <include refid="com.joyintech.tams.common.base.dao.StlSecReconMapper.Base_Column_List" />
         ,
         <include refid="com.joyintech.tams.common.base.dao.StlSecReconMapper.Blob_Column_List" />
         from stl_sec_recon
     </sql>
     <sql id="Sql_All_Effective_Data" >
-        select 
+        select
         <include refid="com.joyintech.tams.common.base.dao.StlSecReconMapper.Base_Column_List" />
         ,
         <include refid="com.joyintech.tams.common.base.dao.StlSecReconMapper.Blob_Column_List" />
         from stl_sec_recon
     </sql>
     <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String" >
-        select 
+        select
         <include refid="com.joyintech.tams.common.base.dao.StlSecReconMapper.Base_Column_List" />
         ,
         <include refid="com.joyintech.tams.common.base.dao.StlSecReconMapper.Blob_Column_List" />
@@ -67,23 +67,23 @@
         where SEQ_NO = #{seqNo,jdbcType=VARCHAR}
     </delete>
     <insert id="insert" parameterType="com.joyintech.tams.common.base.entity.StlSecRecon" >
-        insert into stl_sec_recon (SEQ_NO, CUSTOMER_ID, PORTFOLIO_ID, 
-            FINPROD_ID, MARKET_ID, SETTLE_DATE, 
-            TRADE_MARKET, CHECK_RESULT, STL_SEC_DEME, 
-            create_user, create_dept, create_time, 
-            update_user, update_time, COMMISSION_AMT, 
-            JSF_AMT, ZGF_AMT, STAMP_FEE, 
-            SETTLE_FEE, GHF_AMT, SXF_AMT, 
+        insert into stl_sec_recon (SEQ_NO, CUSTOMER_ID, PORTFOLIO_ID,
+            FINPROD_ID, MARKET_ID, SETTLE_DATE,
+            TRADE_MARKET, CHECK_RESULT, STL_SEC_DEME,
+            create_user, create_dept, create_time,
+            update_user, update_time, COMMISSION_AMT,
+            JSF_AMT, ZGF_AMT, STAMP_FEE,
+            SETTLE_FEE, GHF_AMT, SXF_AMT,
             FPRICE_AMT, TRADE_NUM, RECON_INFO
             )
-        values (#{seqNo,jdbcType=VARCHAR}, #{customerId,jdbcType=VARCHAR}, #{portfolioId,jdbcType=VARCHAR}, 
-            #{finprodId,jdbcType=VARCHAR}, #{marketId,jdbcType=VARCHAR}, #{settleDate,jdbcType=TIMESTAMP}, 
-            #{tradeMarket,jdbcType=VARCHAR}, #{checkResult,jdbcType=VARCHAR}, #{stlSecDeme,jdbcType=VARCHAR}, 
-            #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-            #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{commissionAmt,jdbcType=DECIMAL}, 
-            #{jsfAmt,jdbcType=DECIMAL}, #{zgfAmt,jdbcType=DECIMAL}, #{stampFee,jdbcType=DECIMAL}, 
-            #{settleFee,jdbcType=DECIMAL}, #{ghfAmt,jdbcType=DECIMAL}, #{sxfAmt,jdbcType=DECIMAL}, 
-            #{fpriceAmt,jdbcType=DECIMAL}, #{tradeNum,jdbcType=DECIMAL}, #{reconInfo,jdbcType=LONGVARBINARY}
+        values (#{seqNo,jdbcType=VARCHAR}, #{customerId,jdbcType=VARCHAR}, #{portfolioId,jdbcType=VARCHAR},
+            #{finprodId,jdbcType=VARCHAR}, #{marketId,jdbcType=VARCHAR}, #{settleDate,jdbcType=TIMESTAMP},
+            #{tradeMarket,jdbcType=VARCHAR}, #{checkResult,jdbcType=VARCHAR}, #{stlSecDeme,jdbcType=VARCHAR},
+            #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+            #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{commissionAmt,jdbcType=DECIMAL},
+            #{jsfAmt,jdbcType=DECIMAL}, #{zgfAmt,jdbcType=DECIMAL}, #{stampFee,jdbcType=DECIMAL},
+            #{settleFee,jdbcType=DECIMAL}, #{ghfAmt,jdbcType=DECIMAL}, #{sxfAmt,jdbcType=DECIMAL},
+            #{fpriceAmt,jdbcType=DECIMAL}, #{tradeNum,jdbcType=DECIMAL}, #{reconInfo,jdbcType=VARCHAR}
             )
     </insert>
     <insert id="insertSelective" parameterType="com.joyintech.tams.common.base.entity.StlSecRecon" >
@@ -233,18 +233,18 @@
                 #{tradeNum,jdbcType=DECIMAL},
             </if>
             <if test="reconInfo != null" >
-                #{reconInfo,jdbcType=LONGVARBINARY},
+                #{reconInfo,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
     <insert id="insertBasicByBasicInfo" parameterType="com.joyintech.tams.common.base.entity.StlSecRecon" >
-        insert into stl_sec_recon(SEQ_NO, CUSTOMER_ID, PORTFOLIO_ID, FINPROD_ID, MARKET_ID, 
-        SETTLE_DATE, TRADE_MARKET, CHECK_RESULT, STL_SEC_DEME, create_user, create_dept, 
-        create_time, update_user, update_time, COMMISSION_AMT, JSF_AMT, ZGF_AMT, STAMP_FEE, 
+        insert into stl_sec_recon(SEQ_NO, CUSTOMER_ID, PORTFOLIO_ID, FINPROD_ID, MARKET_ID,
+        SETTLE_DATE, TRADE_MARKET, CHECK_RESULT, STL_SEC_DEME, create_user, create_dept,
+        create_time, update_user, update_time, COMMISSION_AMT, JSF_AMT, ZGF_AMT, STAMP_FEE,
         SETTLE_FEE, GHF_AMT, SXF_AMT, FPRICE_AMT, TRADE_NUM, RECON_INFO)
-        select SEQ_NO, CUSTOMER_ID, PORTFOLIO_ID, FINPROD_ID, MARKET_ID, 
-            SETTLE_DATE, TRADE_MARKET, CHECK_RESULT, STL_SEC_DEME, create_user, create_dept, 
-            create_time, update_user, update_time, COMMISSION_AMT, JSF_AMT, ZGF_AMT, STAMP_FEE, 
+        select SEQ_NO, CUSTOMER_ID, PORTFOLIO_ID, FINPROD_ID, MARKET_ID,
+            SETTLE_DATE, TRADE_MARKET, CHECK_RESULT, STL_SEC_DEME, create_user, create_dept,
+            create_time, update_user, update_time, COMMISSION_AMT, JSF_AMT, ZGF_AMT, STAMP_FEE,
             SETTLE_FEE, GHF_AMT, SXF_AMT, FPRICE_AMT, TRADE_NUM, RECON_INFO
              from stl_sec_recon
              where 1 = 1 and SEQ_NO = #{seqNo,jdbcType=VARCHAR}
@@ -319,7 +319,7 @@
                 TRADE_NUM = #{tradeNum,jdbcType=DECIMAL},
             </if>
             <if test="reconInfo != null" >
-                RECON_INFO = #{reconInfo,jdbcType=LONGVARBINARY},
+                RECON_INFO = #{reconInfo,jdbcType=VARCHAR},
             </if>
         </set>
         where SEQ_NO = #{seqNo,jdbcType=VARCHAR}
@@ -348,7 +348,7 @@
             SXF_AMT = #{sxfAmt,jdbcType=DECIMAL},
             FPRICE_AMT = #{fpriceAmt,jdbcType=DECIMAL},
             TRADE_NUM = #{tradeNum,jdbcType=DECIMAL},
-            RECON_INFO = #{reconInfo,jdbcType=LONGVARBINARY}
+            RECON_INFO = #{reconInfo,jdbcType=VARCHAR}
         where SEQ_NO = #{seqNo,jdbcType=VARCHAR}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.joyintech.tams.common.base.entity.StlSecRecon" >

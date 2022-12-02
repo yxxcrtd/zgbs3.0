@@ -130,7 +130,7 @@ public class StlSecRecon extends BaseEntity {
     /**
      * 对账信息
      */
-    private byte[] reconInfo;
+    private String reconInfo;
 
     /**
      * 委托编号/成交编号
@@ -464,7 +464,7 @@ public class StlSecRecon extends BaseEntity {
      * 取得 对账信息
      * @return 对账信息
      */
-    public byte[] getReconInfo() {
+    public String getReconInfo() {
         return reconInfo;
     }
 
@@ -472,7 +472,7 @@ public class StlSecRecon extends BaseEntity {
      * 设置 对账信息
      * @param reconInfo 对账信息
      */
-    public void setReconInfo(byte[] reconInfo) {
+    public void setReconInfo(String reconInfo) {
         this.reconInfo = reconInfo;
     }
 

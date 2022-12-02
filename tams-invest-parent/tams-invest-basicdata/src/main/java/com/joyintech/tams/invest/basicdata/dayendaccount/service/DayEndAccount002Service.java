@@ -11,11 +11,14 @@
 package com.joyintech.tams.invest.basicdata.dayendaccount.service;
 
 import com.joyintech.framework.export.CommonExportService;
+import com.joyintech.tams.common.base.dao.SettleTransDataMapper;
+import com.joyintech.tams.common.base.entity.SettleTransData;
 import com.joyintech.tams.invest.basicdata.dayendaccount.controller.DayEndAccount001Controller;
 import com.joyintech.tams.invest.basicdata.dayendaccount.dto.DayEndAccount002Dto;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
 import com.joyintech.workflow.engine.constant.OperationType;
 import com.joyintech.workflow.engine.service.BaseProcessService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,10 +35,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class DayEndAccount002Service extends CommonExportService<DayEndAccount002Dto>
     implements BaseProcessService<DayEndAccount002Dto> {
 
+    @Autowired
+    private SettleTransDataMapper settleTransDataMapper;
 
     @Override
     public void doComplete(DayEndAccount002Dto dayEndAccount002Dto, OperationType operationType) {
         restTemplate.postForObject(ServiceApplication.BASICDATA_SERVICE_NAME
                 + "/DayEndAccount/doComplete/" + operationType, dayEndAccount002Dto, Integer.class);
+    }
+
+    public SettleTransData findSettleTransDataById(String id) {
+        return settleTransDataMapper.selectByPrimaryKey(id);
     }
 }

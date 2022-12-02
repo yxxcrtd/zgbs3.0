@@ -312,6 +312,11 @@ public enum DictCodeListStl implements BaseDictCodeList {
 	参数代码_对账维度(DictCode.参数代码, "02", "对账维度"),
 
 	/**
+	 * 对账参数- 参数代码-佣金对账方式
+	 */
+	参数代码_佣金对账方式(DictCode.参数代码, "03", "佣金对账方式"),
+
+	/**
 	 * 对账参数- 对账维度- 证券汇总
 	 */
 	对账维度_证券汇总(DictCode.对账维度, "01", "证券汇总"),
@@ -320,10 +325,23 @@ public enum DictCodeListStl implements BaseDictCodeList {
 	 * 对账参数- 对账维度- 委托汇总
 	 */
 	对账维度_委托汇总(DictCode.对账维度, "02", "委托汇总"),
+
 	/**
 	 * 对账参数- 对账维度- 成交明细
 	 */
 	对账维度_成交明细(DictCode.对账维度, "03", "成交明细"),
+
+
+	/**
+	 * 对账参数- 佣金对账方式- 全佣金
+	 */
+	佣金对账方式_全佣金(DictCode.佣金对账方式, "QYJ", "全佣金"),
+
+	/**
+	 * 对账参数- 佣金对账方式- 净佣金
+	 */
+	佣金对账方式_净佣金(DictCode.佣金对账方式, "JYJ", "净佣金"),
+
 
 	//add by chenjiaxing 20211015 end
 	//add by likaitao 20220513 start

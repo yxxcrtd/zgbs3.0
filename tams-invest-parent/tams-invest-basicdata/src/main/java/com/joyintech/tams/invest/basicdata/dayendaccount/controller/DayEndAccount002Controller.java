@@ -4,10 +4,12 @@ import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.annotation.PageId;
 import com.joyintech.framework.base.BaseController;
 import com.joyintech.framework.grid.Page;
+import com.joyintech.framework.util.CacheUtil;
 import com.joyintech.framework.util.DateUtil;
 import com.joyintech.framework.util.RequestUtil;
 import com.joyintech.framework.util.StringUtil;
 import com.joyintech.framework.validation.groups.ValidateGroupEdit;
+import com.joyintech.tams.common.base.entity.SettleTransData;
 import com.joyintech.tams.constant.DictCode;
 import com.joyintech.tams.constant.DictCodeListExt3;
 import com.joyintech.tams.invest.basicdata.dayendaccount.dto.DayEndAccount002Dto;
@@ -79,6 +81,8 @@ public class DayEndAccount002Controller extends BaseController {
             dayEndAccountDto.setSettleDate(new Date(Long.valueOf(getParam("settleDate"))));
         	model.addAttribute("entity", dayEndAccountDto);
         }
+        // 系统参数：系统参数.是否可修改结算文件中的费用数据
+        model.addAttribute("stlModifyCommission", CacheUtil.getSysParam("STL_MODIFY_COMMISSION"));
         return super.init(model);
     }
 
@@ -193,6 +197,22 @@ public class DayEndAccount002Controller extends BaseController {
         parameter.setWorkFlowParameter(params);
         String msg = dayEndAccount002Service.start(parameter, dto);
         return new AjaxResult(msg);
+    }
+
+    /**
+     *
+     * 根据主键查询成交明细
+     * <功能详细描述>
+     * @return SettleTransData
+     * @throws Exception Exception
+     * @see
+     * @since 1.0
+     */
+    @ResponseBody
+    @RequestMapping("findSettleTransDataById")
+    public SettleTransData findSettleTransDataById(String tradeId)
+            throws Exception {
+        return dayEndAccount002Service.findSettleTransDataById(tradeId);
     }
 
 }

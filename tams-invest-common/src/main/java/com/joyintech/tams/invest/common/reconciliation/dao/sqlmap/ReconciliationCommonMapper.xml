@@ -241,7 +241,7 @@ where
 				#{stlSecDeme,jdbcType=VARCHAR},
 			</if>
 			<if test="reconInfo != null" >
-				#{reconInfo,jdbcType=LONGVARBINARY},
+				#{reconInfo,jdbcType=VARCHAR},
 			</if>
 			<if test="entrustTradeId != null" >
 				#{entrustTradeId,jdbcType=VARCHAR},

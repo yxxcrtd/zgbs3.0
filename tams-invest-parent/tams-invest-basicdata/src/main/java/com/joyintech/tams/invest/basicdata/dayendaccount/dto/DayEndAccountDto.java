@@ -127,6 +127,12 @@ public class DayEndAccountDto extends StlSecRecon {
 	private BigDecimal commissionAmt;
 
 	/**
+	 * 净佣金
+	 */
+	@JsonSerialize(using=BigDecimalSerializer.class)
+	private BigDecimal netCommissionAmt;
+
+	/**
 	 * 成交金额
 	 */
 	@JsonSerialize(using=BigDecimalSerializer.class)
@@ -238,6 +244,19 @@ public class DayEndAccountDto extends StlSecRecon {
 	 * 席位号
 	 */
 	private String seatNumber;
+
+	/**
+	 * 佣金类型（全佣金，净佣金）
+	 */
+	private String commissionType;
+
+	public String getCommissionType() {
+		return commissionType;
+	}
+
+	public void setCommissionType(String commissionType) {
+		this.commissionType = commissionType;
+	}
 
 	public String getSeatNumber() {
 		return seatNumber;

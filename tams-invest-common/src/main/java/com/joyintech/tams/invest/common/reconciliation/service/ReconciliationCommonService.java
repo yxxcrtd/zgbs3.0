@@ -137,7 +137,7 @@ public class ReconciliationCommonService {
             wuChaZhi = wuCha.get("99");
         }
         //其他费用拆分（经手费+证管费+印花税+结算费+过户费+手续费）
-        chuliOtherFee(dto);
+//        chuliOtherFee(dto);
         //误差不为空时
         if (wuChaZhi != null) {
             //if （abs（待对账数据.成交金额 - 待对账数据.清算成交金额）<= 变量.误差 and abs（待对账数据.成交数量- 待对账数据.清算成交数量）<=变量.误差 and
@@ -148,8 +148,9 @@ public class ReconciliationCommonService {
             //and		待对账数据.交易场所 = 待对账数据.清算交易场所 and 待对账数据.交易日期 = 待对账数据.清算交易日期
             //and		待对账数据.证券账户 = 待对账数据.清算证券账户
             BigDecimal otherFee = ArithmeticUtil.doAdd(dto.getJsfAmt2(),dto.getZgfAmt2(),dto.getSettleFee2());
-            if (ArithmeticUtil.subtract(dto.getTradeAmt(), dto.getTradeAmt2()).abs().compareTo(wuChaZhi) <= 0
-                    && ArithmeticUtil.subtract(dto.getTradeNum(), dto.getTradeNum2()).abs().compareTo(wuChaZhi) <= 0
+            if (
+//                    ArithmeticUtil.subtract(dto.getTradeAmt(), dto.getTradeAmt2()).abs().compareTo(wuChaZhi) <= 0
+                    ArithmeticUtil.subtract(dto.getTradeNum(), dto.getTradeNum2()).abs().compareTo(wuChaZhi) <= 0
 //                    && ArithmeticUtil.subtract(dto.getStampFee(), dto.getStampFee2()).abs().compareTo(wuChaZhi) <= 0
 //                        && ArithmeticUtil.subtract(dto.getOtherFeeamt(), otherFee).abs().compareTo(wuChaZhi) <= 0
 //                    && ArithmeticUtil.subtract(dto.getGhfAmt(), dto.getGhfAmt2()).abs().compareTo(wuChaZhi) <= 0
@@ -169,12 +170,12 @@ public class ReconciliationCommonService {
             } else {
                 dto.setCheckResult(DictCodeListExt3.对账状态结果_不一致.getValue());
                 String checkInfo = "";
-                //待对账数据.成交金额 ！= 待对账数据.清算成交金额
-                if (ArithmeticUtil.subtract(dto.getTradeAmt(), dto.getTradeAmt2()).compareTo(BigDecimal.ZERO) != 0) {
-                    String tradeAmt2 = dto.getTradeAmt2() == null ? "空" : dto.getTradeAmt2().toString();
-                    String tradeAmt = dto.getTradeAmt() == null ? "空" : dto.getTradeAmt().toString();
-                    checkInfo = checkInfo + "成交金额结算数据【" + tradeAmt2 + "】对账单【" + tradeAmt + "】\n";
-                }
+//                //待对账数据.成交金额 ！= 待对账数据.清算成交金额
+//                if (ArithmeticUtil.subtract(dto.getTradeAmt(), dto.getTradeAmt2()).compareTo(BigDecimal.ZERO) != 0) {
+//                    String tradeAmt2 = dto.getTradeAmt2() == null ? "空" : dto.getTradeAmt2().toString();
+//                    String tradeAmt = dto.getTradeAmt() == null ? "空" : dto.getTradeAmt().toString();
+//                    checkInfo = checkInfo + "成交金额结算数据【" + tradeAmt2 + "】对账单【" + tradeAmt + "】\n";
+//                }
                 //待对账数据.佣金 ！= 待对账数据.清算佣金
                 if (ArithmeticUtil.subtract(dto.getCommissionAmt(), dto.getCommissionAmt2()).compareTo(BigDecimal.ZERO) != 0) {
                     String commissionAmt2 = dto.getCommissionAmt2() == null ? "空" : dto.getCommissionAmt2().toString();
@@ -211,31 +212,31 @@ public class ReconciliationCommonService {
 //                    String getSxfAmt = dto.getSxfAmt() == null ? "空" : dto.getSxfAmt().toString();
 //                    checkInfo = checkInfo + "手续费结算数据【" + getSxfAmt2 + "】对账单【" + getSxfAmt + "】\n";
 //                }
-                // 待对账数据.成交数量 ！= 待对账数据.清算成交数量
-                if (ArithmeticUtil.subtract(dto.getTradeNum(), dto.getTradeNum2()).compareTo(BigDecimal.ZERO) != 0) {
-                    String getTradeNum2 = dto.getTradeNum2() == null ? "空" : dto.getTradeNum2().toString();
-                    String getTradeNum = dto.getTradeNum() == null ? "空" : dto.getTradeNum().toString();
-                    checkInfo = checkInfo + "成交数量结算数据【" + getTradeNum2 + "】对账单【" + getTradeNum + "】\n";
-                }
-                if (dto.getFinprodType() !=null && !dto.getFinprodType().equals(dto.getFinprodType2())) {
-                    checkInfo = checkInfo + "金融产品类型结算数据【" + dto.getFinprodType2() + "】对账单【" + dto.getFinprodType() + "】\n";
-                }
-                //待对账数据.交易方向 ！= 待对账数据.清算交易方向
-                if (dto.getPs() != null && !dto.getPs().equals(dto.getPs2())) {
-                    checkInfo = checkInfo + "交易方向结算数据【" + dto.getPs2() + "】对账单【" + dto.getPs() + "】\n";
-                }
-                //待对账数据.交易场所 ！= 待对账数据.清算交易场所
-                if (dto.getTradeMarket() != null && !dto.getTradeMarket().equals(dto.getTradeMarket2())) {
-                    checkInfo = checkInfo + "交易场所结算数据【" + dto.getTradeMarket2() + "】对账单【" + dto.getTradeMarket() + "】\n";
-                }
-                //待对账数据.交易日期 ！= 待对账数据.清算交易日期
-                if (dto.getTradeDate() != null && dto.getTradeDate().equals(dto.getTradeDate2())) {
-                    checkInfo = checkInfo + "交易日期结算数据【" + DateUtil.format(dto.getTradeDate2()) + "】对账单【" + DateUtil.format(dto.getTradeDate()) + "】\n";
-                }
-                //待对账数据.证券账户 ！= 待对账数据.清算证券账户
-                if (dto.getSecAcctId() != null && !dto.getSecAcctId().equals(dto.getSecAcctId2())) {
-                    checkInfo = checkInfo + "证券账户结算数据【" + dto.getSecAcctId2() + "】对账单【" + dto.getSecAcctId() + "】\n";
-                }
+//                // 待对账数据.成交数量 ！= 待对账数据.清算成交数量
+//                if (ArithmeticUtil.subtract(dto.getTradeNum(), dto.getTradeNum2()).compareTo(BigDecimal.ZERO) != 0) {
+//                    String getTradeNum2 = dto.getTradeNum2() == null ? "空" : dto.getTradeNum2().toString();
+//                    String getTradeNum = dto.getTradeNum() == null ? "空" : dto.getTradeNum().toString();
+//                    checkInfo = checkInfo + "成交数量结算数据【" + getTradeNum2 + "】对账单【" + getTradeNum + "】\n";
+//                }
+//                if (dto.getFinprodType() !=null && !dto.getFinprodType().equals(dto.getFinprodType2())) {
+//                    checkInfo = checkInfo + "金融产品类型结算数据【" + dto.getFinprodType2() + "】对账单【" + dto.getFinprodType() + "】\n";
+//                }
+//                //待对账数据.交易方向 ！= 待对账数据.清算交易方向
+//                if (dto.getPs() != null && !dto.getPs().equals(dto.getPs2())) {
+//                    checkInfo = checkInfo + "交易方向结算数据【" + dto.getPs2() + "】对账单【" + dto.getPs() + "】\n";
+//                }
+//                //待对账数据.交易场所 ！= 待对账数据.清算交易场所
+//                if (dto.getTradeMarket() != null && !dto.getTradeMarket().equals(dto.getTradeMarket2())) {
+//                    checkInfo = checkInfo + "交易场所结算数据【" + dto.getTradeMarket2() + "】对账单【" + dto.getTradeMarket() + "】\n";
+//                }
+//                //待对账数据.交易日期 ！= 待对账数据.清算交易日期
+//                if (dto.getTradeDate() != null && dto.getTradeDate().equals(dto.getTradeDate2())) {
+//                    checkInfo = checkInfo + "交易日期结算数据【" + DateUtil.format(dto.getTradeDate2()) + "】对账单【" + DateUtil.format(dto.getTradeDate()) + "】\n";
+//                }
+//                //待对账数据.证券账户 ！= 待对账数据.清算证券账户
+//                if (dto.getSecAcctId() != null && !dto.getSecAcctId().equals(dto.getSecAcctId2())) {
+//                    checkInfo = checkInfo + "证券账户结算数据【" + dto.getSecAcctId2() + "】对账单【" + dto.getSecAcctId() + "】\n";
+//                }
                 dto.setReconInfo(checkInfo);
             }
         } else {
@@ -284,14 +285,14 @@ public class ReconciliationCommonService {
      * @param dto
      */
     public void chuliWucha(DayEndAccountDaichuliDto dto) {
-        dto.setTradeAmtCe(ArithmeticUtil.subtract(dto.getTradeAmt().abs(), dto.getTradeAmt2().abs()));
-        dto.setTradeNumCe(ArithmeticUtil.subtract(dto.getTradeNum().abs(), dto.getTradeNum2().abs()));
-        dto.setStampFeeCe(ArithmeticUtil.subtract(dto.getStampFee(), dto.getStampFee2()));
-        dto.setJsfAmtCe(ArithmeticUtil.subtract(dto.getJsfAmt(), dto.getJsfAmt2()));
-        dto.setGhfAmtCe(ArithmeticUtil.subtract(dto.getGhfAmt(), dto.getGhfAmt2()));
-        dto.setZgfAmtCe(ArithmeticUtil.subtract(dto.getZgfAmt(), dto.getZgfAmt2()));
-        dto.setSxfAmtCe(ArithmeticUtil.subtract(dto.getSxfAmt(), dto.getSxfAmt2()));
-        dto.setSettleFeeCe(ArithmeticUtil.subtract(dto.getSettleFee(), dto.getSettleFee2()));
+//        dto.setTradeAmtCe(ArithmeticUtil.subtract(dto.getTradeAmt().abs(), dto.getTradeAmt2().abs()));
+//        dto.setTradeNumCe(ArithmeticUtil.subtract(dto.getTradeNum().abs(), dto.getTradeNum2().abs()));
+//        dto.setStampFeeCe(ArithmeticUtil.subtract(dto.getStampFee(), dto.getStampFee2()));
+//        dto.setJsfAmtCe(ArithmeticUtil.subtract(dto.getJsfAmt(), dto.getJsfAmt2()));
+//        dto.setGhfAmtCe(ArithmeticUtil.subtract(dto.getGhfAmt(), dto.getGhfAmt2()));
+//        dto.setZgfAmtCe(ArithmeticUtil.subtract(dto.getZgfAmt(), dto.getZgfAmt2()));
+//        dto.setSxfAmtCe(ArithmeticUtil.subtract(dto.getSxfAmt(), dto.getSxfAmt2()));
+//        dto.setSettleFeeCe(ArithmeticUtil.subtract(dto.getSettleFee(), dto.getSettleFee2()));
         dto.setCommissionAmtCe(ArithmeticUtil.subtract(dto.getCommissionAmt(), dto.getCommissionAmt2()));
 
         //查询证券账户信息
@@ -304,24 +305,24 @@ public class ReconciliationCommonService {
 
         //有差额费用统计
         List<String> feeList = new ArrayList<String>();
-        if (BigDecimal.ZERO.compareTo(dto.getStampFeeCe()) != 0) {
-            feeList.add(DictCodeListExt1.一次性费用类型_印花税.getValue());
-        }
-        if (BigDecimal.ZERO.compareTo(dto.getJsfAmtCe()) != 0) {
-            feeList.add(DictCodeListExt1.一次性费用类型_经手费.getValue());
-        }
-        if (BigDecimal.ZERO.compareTo(dto.getGhfAmtCe()) != 0) {
-            feeList.add(DictCodeListExt1.一次性费用类型_过户费.getValue());
-        }
-        if (BigDecimal.ZERO.compareTo(dto.getZgfAmtCe()) != 0) {
-            feeList.add(DictCodeListExt1.一次性费用类型_证管费.getValue());
-        }
-        if (BigDecimal.ZERO.compareTo(dto.getSxfAmtCe()) != 0) {
-            feeList.add(DictCodeListExt1.一次性费用类型_交易手续费.getValue());
-        }
-        if (BigDecimal.ZERO.compareTo(dto.getSettleFeeCe()) != 0) {
-            feeList.add(DictCodeListExt1.一次性费用类型_结算费.getValue());
-        }
+//        if (BigDecimal.ZERO.compareTo(dto.getStampFeeCe()) != 0) {
+//            feeList.add(DictCodeListExt1.一次性费用类型_印花税.getValue());
+//        }
+//        if (BigDecimal.ZERO.compareTo(dto.getJsfAmtCe()) != 0) {
+//            feeList.add(DictCodeListExt1.一次性费用类型_经手费.getValue());
+//        }
+//        if (BigDecimal.ZERO.compareTo(dto.getGhfAmtCe()) != 0) {
+//            feeList.add(DictCodeListExt1.一次性费用类型_过户费.getValue());
+//        }
+//        if (BigDecimal.ZERO.compareTo(dto.getZgfAmtCe()) != 0) {
+//            feeList.add(DictCodeListExt1.一次性费用类型_证管费.getValue());
+//        }
+//        if (BigDecimal.ZERO.compareTo(dto.getSxfAmtCe()) != 0) {
+//            feeList.add(DictCodeListExt1.一次性费用类型_交易手续费.getValue());
+//        }
+//        if (BigDecimal.ZERO.compareTo(dto.getSettleFeeCe()) != 0) {
+//            feeList.add(DictCodeListExt1.一次性费用类型_结算费.getValue());
+//        }
         if (BigDecimal.ZERO.compareTo(dto.getCommissionAmtCe()) != 0) {
             feeList.add(DictCodeListExt1.一次性费用类型_佣金.getValue());
         }
@@ -417,98 +418,99 @@ public class ReconciliationCommonService {
                         //待对账数据.清算金额差额 = 待对账数据.清算金额差额 - 待清算数据.清算佣金差额
                         dto.setSettleAmtCe(ArithmeticUtil.subtract(dto.getSettleAmtCe(), dto.getCommissionAmtCe()));
                     }
-                } else if (DictCodeListExt1.是否_是.getValue().equals(isPay)
-                        && DictCodeListExt1.一次性费用类型_经手费.getValue().equals(feeType)) {
-                    if (DictCodeList.交易方向_买入.getValue().equals(dto.getPs())
-                        || DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getPs())
-                        || DictCodeList.交易方向_申购.getValue().equals(dto.getPs())
-                        // add by fuyongsheng 20211207 自动对账批处理开发 start
-                        || DictCodeListExt1.交易方向_债转股.getValue().equals(dto.getPs())
-                        // add by fuyongsheng 20211207 自动对账批处理开发 end
-                    ) {
-                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 + 待清算数据.清算经手费差额
-                        dto.setSettleAmtCe(ArithmeticUtil.doAdd(dto.getSettleAmtCe(), dto.getJsfAmtCe()));
-                    } else if (DictCodeList.交易方向_卖出.getValue().equals(dto.getPs())
-                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(dto.getPs())) {
-                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 - 待清算数据.清算佣金差额
-                        dto.setSettleAmtCe(ArithmeticUtil.subtract(dto.getSettleAmtCe(), dto.getJsfAmtCe()));
-                    }
-                } else if (DictCodeListExt1.是否_是.getValue().equals(isPay)
-                        && DictCodeListExt1.一次性费用类型_证管费.getValue().equals(feeType)) {
-                    if (DictCodeList.交易方向_买入.getValue().equals(dto.getPs())
-                        || DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getPs())
-                        // add by fuyongsheng 20211207 自动对账批处理开发 start
-                        || DictCodeListExt1.交易方向_债转股.getValue().equals(dto.getPs())
-                        // add by fuyongsheng 20211207 自动对账批处理开发 end
-                    ) {
-                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 + 待清算数据.清算证管费差额
-                        dto.setSettleAmtCe(ArithmeticUtil.doAdd(dto.getSettleAmtCe(), dto.getZgfAmtCe()));
-                    } else if (DictCodeList.交易方向_卖出.getValue().equals(dto.getPs())
-                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(dto.getPs())) {
-                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 - 待清算数据.清算证管费差额
-                        dto.setSettleAmtCe(ArithmeticUtil.subtract(dto.getSettleAmtCe(), dto.getZgfAmtCe()));
-                    }
-                } else if (DictCodeListExt1.是否_是.getValue().equals(isPay)
-                        && DictCodeListExt1.一次性费用类型_印花税.getValue().equals(feeType)) {
-                    if (DictCodeList.交易方向_买入.getValue().equals(dto.getPs())
-                        || DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getPs())
-                        // add by fuyongsheng 20211207 自动对账批处理开发 start
-                        || DictCodeListExt1.交易方向_债转股.getValue().equals(dto.getPs())
-                        // add by fuyongsheng 20211207 自动对账批处理开发 end
-                    ) {
-                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 + 待清算数据.清算印花税差额
-                        dto.setSettleAmtCe(ArithmeticUtil.doAdd(dto.getSettleAmtCe(), dto.getStampFeeCe()));
-                    } else if (DictCodeList.交易方向_卖出.getValue().equals(dto.getPs())
-                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(dto.getPs())) {
-                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 - 待清算数据.清算印花税差额
-                        dto.setSettleAmtCe(ArithmeticUtil.subtract(dto.getSettleAmtCe(), dto.getStampFeeCe()));
-                    }
-                } else if (DictCodeListExt1.是否_是.getValue().equals(isPay)
-                        && DictCodeListExt1.一次性费用类型_结算费.getValue().equals(feeType)) {
-                    if (DictCodeList.交易方向_买入.getValue().equals(dto.getPs())
-                        || DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getPs())
-                        // add by fuyongsheng 20211207 自动对账批处理开发 start
-                        || DictCodeListExt1.交易方向_债转股.getValue().equals(dto.getPs())
-                        // add by fuyongsheng 20211207 自动对账批处理开发 end
-                    ) {
-                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 + 待清算数据.清算结算费差额
-                        dto.setSettleAmtCe(ArithmeticUtil.doAdd(dto.getSettleAmtCe(), dto.getSettleFeeCe()));
-                    } else if (DictCodeList.交易方向_卖出.getValue().equals(dto.getPs())
-                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(dto.getPs())) {
-                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 - 待清算数据.清算结算费差额
-                        dto.setSettleAmtCe(ArithmeticUtil.subtract(dto.getSettleAmtCe(), dto.getSettleFeeCe()));
-                    }
-                } else if (DictCodeListExt1.是否_是.getValue().equals(isPay)
-                        && DictCodeListExt1.一次性费用类型_过户费.getValue().equals(feeType)) {
-                    if (DictCodeList.交易方向_买入.getValue().equals(dto.getPs())
-                        || DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getPs())
-                        // add by fuyongsheng 20211207 自动对账批处理开发 start
-                        || DictCodeListExt1.交易方向_债转股.getValue().equals(dto.getPs())
-                        // add by fuyongsheng 20211207 自动对账批处理开发 end
-                    ) {
-                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 + 待清算数据.清算过户费差额
-                        dto.setSettleAmtCe(ArithmeticUtil.doAdd(dto.getSettleAmtCe(), dto.getGhfAmtCe()));
-                    } else if (DictCodeList.交易方向_卖出.getValue().equals(dto.getPs())
-                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(dto.getPs())) {
-                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 - 待清算数据.清算过户费差额
-                        dto.setSettleAmtCe(ArithmeticUtil.subtract(dto.getSettleAmtCe(), dto.getGhfAmtCe()));
-                    }
-                } else if (DictCodeListExt1.是否_是.getValue().equals(isPay)
-                        && DictCodeListExt1.一次性费用类型_交易手续费.getValue().equals(feeType)) {
-                    if (DictCodeList.交易方向_买入.getValue().equals(dto.getPs())
-                        || DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getPs())
-                        // add by fuyongsheng 20211207 自动对账批处理开发 start
-                        || DictCodeListExt1.交易方向_债转股.getValue().equals(dto.getPs())
-                        // add by fuyongsheng 20211207 自动对账批处理开发 end
-                    ) {
-                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 + 待清算数据.清算手续费差额
-                        dto.setSettleAmtCe(ArithmeticUtil.doAdd(dto.getSettleAmtCe(), dto.getSxfAmtCe()));
-                    } else if (DictCodeList.交易方向_卖出.getValue().equals(dto.getPs())
-                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(dto.getPs())) {
-                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 - 待清算数据.清算手续费差额
-                        dto.setSettleAmtCe(ArithmeticUtil.subtract(dto.getSettleAmtCe(), dto.getSxfAmtCe()));
-                    }
                 }
+//                else if (DictCodeListExt1.是否_是.getValue().equals(isPay)
+//                        && DictCodeListExt1.一次性费用类型_经手费.getValue().equals(feeType)) {
+//                    if (DictCodeList.交易方向_买入.getValue().equals(dto.getPs())
+//                        || DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getPs())
+//                        || DictCodeList.交易方向_申购.getValue().equals(dto.getPs())
+//                        // add by fuyongsheng 20211207 自动对账批处理开发 start
+//                        || DictCodeListExt1.交易方向_债转股.getValue().equals(dto.getPs())
+//                        // add by fuyongsheng 20211207 自动对账批处理开发 end
+//                    ) {
+//                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 + 待清算数据.清算经手费差额
+//                        dto.setSettleAmtCe(ArithmeticUtil.doAdd(dto.getSettleAmtCe(), dto.getJsfAmtCe()));
+//                    } else if (DictCodeList.交易方向_卖出.getValue().equals(dto.getPs())
+//                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(dto.getPs())) {
+//                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 - 待清算数据.清算佣金差额
+//                        dto.setSettleAmtCe(ArithmeticUtil.subtract(dto.getSettleAmtCe(), dto.getJsfAmtCe()));
+//                    }
+//                } else if (DictCodeListExt1.是否_是.getValue().equals(isPay)
+//                        && DictCodeListExt1.一次性费用类型_证管费.getValue().equals(feeType)) {
+//                    if (DictCodeList.交易方向_买入.getValue().equals(dto.getPs())
+//                        || DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getPs())
+//                        // add by fuyongsheng 20211207 自动对账批处理开发 start
+//                        || DictCodeListExt1.交易方向_债转股.getValue().equals(dto.getPs())
+//                        // add by fuyongsheng 20211207 自动对账批处理开发 end
+//                    ) {
+//                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 + 待清算数据.清算证管费差额
+//                        dto.setSettleAmtCe(ArithmeticUtil.doAdd(dto.getSettleAmtCe(), dto.getZgfAmtCe()));
+//                    } else if (DictCodeList.交易方向_卖出.getValue().equals(dto.getPs())
+//                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(dto.getPs())) {
+//                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 - 待清算数据.清算证管费差额
+//                        dto.setSettleAmtCe(ArithmeticUtil.subtract(dto.getSettleAmtCe(), dto.getZgfAmtCe()));
+//                    }
+//                } else if (DictCodeListExt1.是否_是.getValue().equals(isPay)
+//                        && DictCodeListExt1.一次性费用类型_印花税.getValue().equals(feeType)) {
+//                    if (DictCodeList.交易方向_买入.getValue().equals(dto.getPs())
+//                        || DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getPs())
+//                        // add by fuyongsheng 20211207 自动对账批处理开发 start
+//                        || DictCodeListExt1.交易方向_债转股.getValue().equals(dto.getPs())
+//                        // add by fuyongsheng 20211207 自动对账批处理开发 end
+//                    ) {
+//                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 + 待清算数据.清算印花税差额
+//                        dto.setSettleAmtCe(ArithmeticUtil.doAdd(dto.getSettleAmtCe(), dto.getStampFeeCe()));
+//                    } else if (DictCodeList.交易方向_卖出.getValue().equals(dto.getPs())
+//                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(dto.getPs())) {
+//                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 - 待清算数据.清算印花税差额
+//                        dto.setSettleAmtCe(ArithmeticUtil.subtract(dto.getSettleAmtCe(), dto.getStampFeeCe()));
+//                    }
+//                } else if (DictCodeListExt1.是否_是.getValue().equals(isPay)
+//                        && DictCodeListExt1.一次性费用类型_结算费.getValue().equals(feeType)) {
+//                    if (DictCodeList.交易方向_买入.getValue().equals(dto.getPs())
+//                        || DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getPs())
+//                        // add by fuyongsheng 20211207 自动对账批处理开发 start
+//                        || DictCodeListExt1.交易方向_债转股.getValue().equals(dto.getPs())
+//                        // add by fuyongsheng 20211207 自动对账批处理开发 end
+//                    ) {
+//                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 + 待清算数据.清算结算费差额
+//                        dto.setSettleAmtCe(ArithmeticUtil.doAdd(dto.getSettleAmtCe(), dto.getSettleFeeCe()));
+//                    } else if (DictCodeList.交易方向_卖出.getValue().equals(dto.getPs())
+//                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(dto.getPs())) {
+//                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 - 待清算数据.清算结算费差额
+//                        dto.setSettleAmtCe(ArithmeticUtil.subtract(dto.getSettleAmtCe(), dto.getSettleFeeCe()));
+//                    }
+//                } else if (DictCodeListExt1.是否_是.getValue().equals(isPay)
+//                        && DictCodeListExt1.一次性费用类型_过户费.getValue().equals(feeType)) {
+//                    if (DictCodeList.交易方向_买入.getValue().equals(dto.getPs())
+//                        || DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getPs())
+//                        // add by fuyongsheng 20211207 自动对账批处理开发 start
+//                        || DictCodeListExt1.交易方向_债转股.getValue().equals(dto.getPs())
+//                        // add by fuyongsheng 20211207 自动对账批处理开发 end
+//                    ) {
+//                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 + 待清算数据.清算过户费差额
+//                        dto.setSettleAmtCe(ArithmeticUtil.doAdd(dto.getSettleAmtCe(), dto.getGhfAmtCe()));
+//                    } else if (DictCodeList.交易方向_卖出.getValue().equals(dto.getPs())
+//                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(dto.getPs())) {
+//                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 - 待清算数据.清算过户费差额
+//                        dto.setSettleAmtCe(ArithmeticUtil.subtract(dto.getSettleAmtCe(), dto.getGhfAmtCe()));
+//                    }
+//                } else if (DictCodeListExt1.是否_是.getValue().equals(isPay)
+//                        && DictCodeListExt1.一次性费用类型_交易手续费.getValue().equals(feeType)) {
+//                    if (DictCodeList.交易方向_买入.getValue().equals(dto.getPs())
+//                        || DictCodeList.回购拆借方向_正回购.getValue().equals(dto.getPs())
+//                        // add by fuyongsheng 20211207 自动对账批处理开发 start
+//                        || DictCodeListExt1.交易方向_债转股.getValue().equals(dto.getPs())
+//                        // add by fuyongsheng 20211207 自动对账批处理开发 end
+//                    ) {
+//                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 + 待清算数据.清算手续费差额
+//                        dto.setSettleAmtCe(ArithmeticUtil.doAdd(dto.getSettleAmtCe(), dto.getSxfAmtCe()));
+//                    } else if (DictCodeList.交易方向_卖出.getValue().equals(dto.getPs())
+//                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(dto.getPs())) {
+//                        //待对账数据.清算金额差额 = 待对账数据.清算金额差额 - 待清算数据.清算手续费差额
+//                        dto.setSettleAmtCe(ArithmeticUtil.subtract(dto.getSettleAmtCe(), dto.getSxfAmtCe()));
+//                    }
+//                }
             }
         }
     }
@@ -658,7 +660,7 @@ public class ReconciliationCommonService {
         stlSecRecon.setAccount(dto.getAccout());
         stlSecRecon.setSecAcctId(dto.getSecAcctId());
         stlSecRecon.setEntrustTradeId(dto.getTradeId2());
-        stlSecRecon.setReconInfo(StringUtil.isEmpty(dto.getReconInfo()) ? null : dto.getReconInfo().getBytes());
+        stlSecRecon.setReconInfo(dto.getReconInfo());
         reconciliationCommonMapper.insertStlSecRecon(stlSecRecon);
     }
 
@@ -732,6 +734,7 @@ public class ReconciliationCommonService {
             param.put("finprodId", dto.getFinprodId());
             param.put("dealDate", dto.getTradeDate());
             param.put("seatNumber", dto.getSeatNumber());
+            param.put("finprodType2", dto.getFinprodType2());
             param.put("secAcctId", dto.getSecAcctId());
         }else if(DictCodeListStl.对账维度_成交明细.getValue().equals(dto.getParaValue())){
             if(StringUtil.isEmpty(dto.getTradeId())){
@@ -786,7 +789,16 @@ public class ReconciliationCommonService {
         SettleTransData settleTransDataNew = new SettleTransData();
         settleTransDataNew.setTradeId(settleTransData.getTradeId());
         //成交数据明细表.佣金									=	成交数据明细表.佣金 + 待对账数据.清算佣金差额
-        settleTransDataNew.setCommissionAmt(ArithmeticUtil.doAdd(settleTransData.getCommissionAmt(), dto.getCommissionAmtCe()));
+//        settleTransDataNew.setCommissionAmt(ArithmeticUtil.doAdd(settleTransData.getCommissionAmt(), dto.getCommissionAmtCe()));
+        // IF 券商佣金对账参数.参数值 = QYJ 成交数据明细表.佣金
+        // ELSE IF 券商佣金对账参数.参数值 = JYJ 成交数据明细表.净佣金
+        // 成交数据明细表.佣金
+        if (StringUtil.equals(dto.getParaValue1(), DictCodeListStl.佣金对账方式_全佣金.getValue())) {
+            settleTransDataNew.setCommissionAmt(ArithmeticUtil.doAdd(settleTransData.getCommissionAmt(), dto.getCommissionAmtCe()));
+        } else if(StringUtil.equals(dto.getParaValue1(), DictCodeListStl.佣金对账方式_净佣金.getValue())) {
+            settleTransDataNew.setNetCommissionAmt(ArithmeticUtil.doAdd(settleTransData.getNetCommissionAmt(), dto.getCommissionAmtCe()));
+            settleTransDataNew.setCommissionAmt(ArithmeticUtil.doAdd(settleTransData.getCommissionAmt(), dto.getCommissionAmtCe()));
+        }
         if (settleTransDataNew.getCommissionAmt() != null
                 && settleTransDataNew.getCommissionAmt().compareTo(BigDecimal.ZERO) != 0
                 && StringUtil.isNotEmpty(settleTransData.getIsPayWithTrade())) {
@@ -796,24 +808,24 @@ public class ReconciliationCommonService {
                 && settleTransDataNew.getCommissionAmt().compareTo(BigDecimal.ZERO) != 0) {
             settleTransDataNew.setIsPayWithTrade(DictCodeListExt1.是否_否.getValue());
         }
-        //成交数据明细表.经手费									=	成交数据明细表.经手费 + 待对账数据.清算经手费差额
-        settleTransDataNew.setJsfAmt(ArithmeticUtil.doAdd(settleTransData.getJsfAmt(), dto.getJsfAmtCe()));
-        //成交数据明细表.证管费									=	成交数据明细表.证管费 + 待对账数据.清算证管费差额
-        settleTransDataNew.setZgfAmt(ArithmeticUtil.doAdd(settleTransData.getZgfAmt(), dto.getZgfAmtCe()));
-        //成交数据明细表.印花税									=	成交数据明细表.印花税 + 待对账数据.清算印花税差额
-        settleTransDataNew.setStampFee(ArithmeticUtil.doAdd(settleTransData.getStampFee(), dto.getStampFeeCe()));
-        //成交数据明细表.结算费									=	成交数据明细表.结算费 + 待对账数据.清算结算费差额
-        settleTransDataNew.setSettleFee(ArithmeticUtil.doAdd(settleTransData.getSettleFee(), dto.getSettleFeeCe()));
-        //成交数据明细表.过户费									=	成交数据明细表.过户费 +待对账数据.清算过户费差额
-        settleTransDataNew.setGhfAmt(ArithmeticUtil.doAdd(settleTransData.getGhfAmt(), dto.getGhfAmtCe()));
-        //成交数据明细表.手续费									=	成交数据明细表.手续费 +待对账数据.清算手续费差额
-        settleTransDataNew.setSxfAmt(ArithmeticUtil.doAdd(settleTransData.getSxfAmt(), dto.getSxfAmtCe()));
+//        //成交数据明细表.经手费									=	成交数据明细表.经手费 + 待对账数据.清算经手费差额
+//        settleTransDataNew.setJsfAmt(ArithmeticUtil.doAdd(settleTransData.getJsfAmt(), dto.getJsfAmtCe()));
+//        //成交数据明细表.证管费									=	成交数据明细表.证管费 + 待对账数据.清算证管费差额
+//        settleTransDataNew.setZgfAmt(ArithmeticUtil.doAdd(settleTransData.getZgfAmt(), dto.getZgfAmtCe()));
+//        //成交数据明细表.印花税									=	成交数据明细表.印花税 + 待对账数据.清算印花税差额
+//        settleTransDataNew.setStampFee(ArithmeticUtil.doAdd(settleTransData.getStampFee(), dto.getStampFeeCe()));
+//        //成交数据明细表.结算费									=	成交数据明细表.结算费 + 待对账数据.清算结算费差额
+//        settleTransDataNew.setSettleFee(ArithmeticUtil.doAdd(settleTransData.getSettleFee(), dto.getSettleFeeCe()));
+//        //成交数据明细表.过户费									=	成交数据明细表.过户费 +待对账数据.清算过户费差额
+//        settleTransDataNew.setGhfAmt(ArithmeticUtil.doAdd(settleTransData.getGhfAmt(), dto.getGhfAmtCe()));
+//        //成交数据明细表.手续费									=	成交数据明细表.手续费 +待对账数据.清算手续费差额
+//        settleTransDataNew.setSxfAmt(ArithmeticUtil.doAdd(settleTransData.getSxfAmt(), dto.getSxfAmtCe()));
         //成交数据明细表.全价总额									=	成交数据明细表.成交金额 +待对账数据.清算成交金额差额
         settleTransDataNew.setFpriceAmt(ArithmeticUtil.doAdd(settleTransData.getFpriceAmt(), dto.getTradeAmtCe()));
         //成交数据明细表.清算金额									=	成交数据明细表.清算金额 +待对账数据.清算金额差额
         settleTransDataNew.setTradeAmt(ArithmeticUtil.doAdd(settleTransData.getTradeAmt(), dto.getSettleAmtCe(), dto.getTradeAmtCe()));
-        //成交数据明细表.成交数量									=	成交数据明细表.成交数量 +待对账数据.清算成交数量差额
-        settleTransDataNew.setShareAmt(ArithmeticUtil.doAdd(settleTransData.getShareAmt(), dto.getTradeNumCe()));
+//        //成交数据明细表.成交数量									=	成交数据明细表.成交数量 +待对账数据.清算成交数量差额
+//        settleTransDataNew.setShareAmt(ArithmeticUtil.doAdd(settleTransData.getShareAmt(), dto.getTradeNumCe()));
         return settleTransDataNew;
     }
 }

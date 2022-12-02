@@ -201,6 +201,12 @@ public class SettleTransData extends BaseEntity {
     private BigDecimal commissionAmt;
 
     /**
+     * 净佣金
+     */
+    @JsonSerialize(using=BigDecimalSerializer.class)
+    private BigDecimal netCommissionAmt;
+
+    /**
      * 佣金是否随交易支付
      */
     private String isPayWithTrade;
@@ -949,6 +955,22 @@ public class SettleTransData extends BaseEntity {
      */
     public void setCommissionAmt(BigDecimal commissionAmt) {
         this.commissionAmt = commissionAmt;
+    }
+
+    /**
+     * 取得 净佣金
+     * @return 净佣金
+     */
+    public BigDecimal getNetCommissionAmt() {
+        return netCommissionAmt;
+    }
+
+    /**
+     * 设置 净佣金
+     * @param netCommissionAmt 净佣金
+     */
+    public void setNetCommissionAmt(BigDecimal netCommissionAmt) {
+        this.netCommissionAmt = netCommissionAmt;
     }
 
     /**

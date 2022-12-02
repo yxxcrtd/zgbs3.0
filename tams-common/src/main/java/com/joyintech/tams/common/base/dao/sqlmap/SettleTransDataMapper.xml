@@ -37,6 +37,7 @@
         <result column="SXF_AMT" property="sxfAmt" jdbcType="DECIMAL" />
         <result column="SETTLE_FEE" property="settleFee" jdbcType="DECIMAL" />
         <result column="COMMISSION_AMT" property="commissionAmt" jdbcType="DECIMAL" />
+        <result column="NET_COMMISSION_AMT" property="netCommissionAmt" jdbcType="DECIMAL" />
         <result column="IS_PAY_WITH_TRADE" property="isPayWithTrade" jdbcType="VARCHAR" />
         <result column="TRADE_AMT" property="tradeAmt" jdbcType="DECIMAL" />
         <result column="PS" property="ps" jdbcType="VARCHAR" />
@@ -85,7 +86,7 @@
         CCY CCY, UNIT_CPRICE UNIT_CPRICE, UNIT_INT UNIT_INT, UNIT_FPRICE UNIT_FPRICE, PAR_VALUE PAR_VALUE, 
         CPRICE_AMT CPRICE_AMT, SHARE_AMT SHARE_AMT, PRIN_AMT PRIN_AMT, INT_AMT INT_AMT, FPRICE_AMT FPRICE_AMT, 
         STAMP_FEE STAMP_FEE, JSF_AMT JSF_AMT, GHF_AMT GHF_AMT, ZGF_AMT ZGF_AMT, SXF_AMT SXF_AMT, 
-        SETTLE_FEE SETTLE_FEE, COMMISSION_AMT COMMISSION_AMT, IS_PAY_WITH_TRADE IS_PAY_WITH_TRADE, 
+        SETTLE_FEE SETTLE_FEE, COMMISSION_AMT COMMISSION_AMT, NET_COMMISSION_AMT NET_COMMISSION_AMT, IS_PAY_WITH_TRADE IS_PAY_WITH_TRADE, 
         TRADE_AMT TRADE_AMT, PS PS, TRADE_MARKET TRADE_MARKET, TRADE_MARKET_MODE TRADE_MARKET_MODE, 
         TRADE_PLAT TRADE_PLAT, PLEDGE_SEC_NUM PLEDGE_SEC_NUM, SEAT_NUMBER SEAT_NUMBER, PORTFOLIO_ID PORTFOLIO_ID, 
         SEC_ACCT_ID SEC_ACCT_ID, ACCT_NO ACCT_NO, BATCH_NUMBER BATCH_NUMBER, M_PRIN_AMT M_PRIN_AMT, 
@@ -129,7 +130,7 @@
             PRIN_AMT, INT_AMT, FPRICE_AMT, 
             STAMP_FEE, JSF_AMT, GHF_AMT, 
             ZGF_AMT, SXF_AMT, SETTLE_FEE, 
-            COMMISSION_AMT, IS_PAY_WITH_TRADE, TRADE_AMT, 
+            COMMISSION_AMT, NET_COMMISSION_AMT, IS_PAY_WITH_TRADE, TRADE_AMT, 
             PS, TRADE_MARKET, TRADE_MARKET_MODE, 
             TRADE_PLAT, PLEDGE_SEC_NUM, SEAT_NUMBER, 
             PORTFOLIO_ID, SEC_ACCT_ID, ACCT_NO, 
@@ -155,7 +156,7 @@
             #{prinAmt,jdbcType=DECIMAL}, #{intAmt,jdbcType=DECIMAL}, #{fpriceAmt,jdbcType=DECIMAL}, 
             #{stampFee,jdbcType=DECIMAL}, #{jsfAmt,jdbcType=DECIMAL}, #{ghfAmt,jdbcType=DECIMAL}, 
             #{zgfAmt,jdbcType=DECIMAL}, #{sxfAmt,jdbcType=DECIMAL}, #{settleFee,jdbcType=DECIMAL}, 
-            #{commissionAmt,jdbcType=DECIMAL}, #{isPayWithTrade,jdbcType=VARCHAR}, #{tradeAmt,jdbcType=DECIMAL}, 
+            #{commissionAmt,jdbcType=DECIMAL}, #{netCommissionAmt,jdbcType=DECIMAL}, #{isPayWithTrade,jdbcType=VARCHAR}, #{tradeAmt,jdbcType=DECIMAL},
             #{ps,jdbcType=VARCHAR}, #{tradeMarket,jdbcType=VARCHAR}, #{tradeMarketMode,jdbcType=VARCHAR}, 
             #{tradePlat,jdbcType=VARCHAR}, #{pledgeSecNum,jdbcType=DECIMAL}, #{seatNumber,jdbcType=VARCHAR}, 
             #{portfolioId,jdbcType=VARCHAR}, #{secAcctId,jdbcType=VARCHAR}, #{acctNo,jdbcType=VARCHAR}, 
@@ -278,6 +279,9 @@
             </if>
             <if test="commissionAmt != null" >
                 COMMISSION_AMT,
+            </if>
+            <if test="netCommissionAmt != null" >
+                NET_COMMISSION_AMT,
             </if>
             <if test="isPayWithTrade != null" >
                 IS_PAY_WITH_TRADE,
@@ -503,6 +507,9 @@
             <if test="commissionAmt != null" >
                 #{commissionAmt,jdbcType=DECIMAL},
             </if>
+            <if test="netCommissionAmt != null" >
+                #{netCommissionAmt,jdbcType=DECIMAL},
+            </if>
             <if test="isPayWithTrade != null" >
                 #{isPayWithTrade,jdbcType=VARCHAR},
             </if>
@@ -627,7 +634,7 @@
         FINPROD_ID, FINPROD_TYPE, FINPROD_TYPE2, BRANCH, BUSI_TYPE, TRADE_DATE, SETTLE_DATE, 
         VDATE, MDATE, VPAY_DATE, MPAY_DATE, TERM_TYPE, SETTLE_SPEED, CCY, UNIT_CPRICE, UNIT_INT, 
         UNIT_FPRICE, PAR_VALUE, CPRICE_AMT, SHARE_AMT, PRIN_AMT, INT_AMT, FPRICE_AMT, STAMP_FEE, 
-        JSF_AMT, GHF_AMT, ZGF_AMT, SXF_AMT, SETTLE_FEE, COMMISSION_AMT, IS_PAY_WITH_TRADE, 
+        JSF_AMT, GHF_AMT, ZGF_AMT, SXF_AMT, SETTLE_FEE, COMMISSION_AMT, NET_COMMISSION_AMT, IS_PAY_WITH_TRADE, 
         TRADE_AMT, PS, TRADE_MARKET, TRADE_MARKET_MODE, TRADE_PLAT, PLEDGE_SEC_NUM, SEAT_NUMBER, 
         PORTFOLIO_ID, SEC_ACCT_ID, ACCT_NO, BATCH_NUMBER, M_PRIN_AMT, M_INT_AMT, M_TRADE_AMT, 
         INT_RATE, BASIS, BUSI_SCENE_CALSS, SETTLE_MODE, STAMP_FEE_RAW, JSF_AMT_RAW, GHF_AMT_RAW, 
@@ -638,7 +645,7 @@
             FINPROD_ID, FINPROD_TYPE, FINPROD_TYPE2, BRANCH, BUSI_TYPE, TRADE_DATE, SETTLE_DATE, 
             VDATE, MDATE, VPAY_DATE, MPAY_DATE, TERM_TYPE, SETTLE_SPEED, CCY, UNIT_CPRICE, UNIT_INT, 
             UNIT_FPRICE, PAR_VALUE, CPRICE_AMT, SHARE_AMT, PRIN_AMT, INT_AMT, FPRICE_AMT, STAMP_FEE, 
-            JSF_AMT, GHF_AMT, ZGF_AMT, SXF_AMT, SETTLE_FEE, COMMISSION_AMT, IS_PAY_WITH_TRADE, 
+            JSF_AMT, GHF_AMT, ZGF_AMT, SXF_AMT, SETTLE_FEE, COMMISSION_AMT, NET_COMMISSION_AMT, IS_PAY_WITH_TRADE, 
             TRADE_AMT, PS, TRADE_MARKET, TRADE_MARKET_MODE, TRADE_PLAT, PLEDGE_SEC_NUM, SEAT_NUMBER, 
             PORTFOLIO_ID, SEC_ACCT_ID, ACCT_NO, BATCH_NUMBER, M_PRIN_AMT, M_INT_AMT, M_TRADE_AMT, 
             INT_RATE, BASIS, BUSI_SCENE_CALSS, SETTLE_MODE, STAMP_FEE_RAW, JSF_AMT_RAW, GHF_AMT_RAW, 
@@ -752,6 +759,9 @@
             </if>
             <if test="commissionAmt != null" >
                 COMMISSION_AMT = #{commissionAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="netCommissionAmt != null" >
+                NET_COMMISSION_AMT = #{netCommissionAmt,jdbcType=DECIMAL},
             </if>
             <if test="isPayWithTrade != null" >
                 IS_PAY_WITH_TRADE = #{isPayWithTrade,jdbcType=VARCHAR},
@@ -900,6 +910,7 @@
             SXF_AMT = #{sxfAmt,jdbcType=DECIMAL},
             SETTLE_FEE = #{settleFee,jdbcType=DECIMAL},
             COMMISSION_AMT = #{commissionAmt,jdbcType=DECIMAL},
+            NET_COMMISSION_AMT = #{netCommissionAmt,jdbcType=DECIMAL},
             IS_PAY_WITH_TRADE = #{isPayWithTrade,jdbcType=VARCHAR},
             TRADE_AMT = #{tradeAmt,jdbcType=DECIMAL},
             PS = #{ps,jdbcType=VARCHAR},
