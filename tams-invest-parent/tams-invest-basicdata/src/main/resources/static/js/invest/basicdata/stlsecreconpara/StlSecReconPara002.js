@@ -1,4 +1,4 @@
-$(function () {
+(function () {
     // 提交或保存
     function saveOrSubmit(operateType) {
         // 画面数据体
@@ -8,9 +8,12 @@ $(function () {
         object.customerId = $('#customerId').val()
         // 参数名称
         object.paraCode = $('#paraCode').val()
-        if (object.paraCode == RECON_PARA_CODE_02) {
+        if (object.paraCode === RECON_PARA_CODE_02) {
             // 对账维度
             object.paraValue = $('#paraValue2').val()
+        } else if (object.paraCode === RECON_PARA_CODE_03) {
+            // 佣金对账方式
+            object.paraValue = $('#paraValue3').val()
         } else {
             // 误差值
             object.paraValue = $('#paraValue1').val()
@@ -26,11 +29,9 @@ $(function () {
         // 操作类型
         object.operateType = operateType;
         object.pageModel = pageModel;
-        // 新建
-        if (pageModel == PAGE_MODEL_NEW) {
+        if (pageModel === PAGE_MODEL_NEW) {
             object.operateType = 'new';
-        } else if (pageModel == PAGE_MODEL_EDIT) {
-            // 编辑
+        } else if (pageModel === PAGE_MODEL_EDIT) {
             object.operateType = 'update';
         }
 
@@ -48,16 +49,24 @@ $(function () {
         });
     }
 
+    /**
+     * 隐藏参数名称DIV
+     */
+    function hideParaValueDiv() {
+        $('#DIV_paraValue01').hide();
+        $('#DIV_paraValue02').hide();
+        $('#DIV_paraValue03').hide();
+    }
+
     // 画面初始化
     function init() {
-        if ($('#paraCode').val() == RECON_PARA_CODE_02) {
+        hideParaValueDiv();
+        if ($('#paraCode').val() === RECON_PARA_CODE_02) {
             $('#DIV_paraValue02').show()
-            $('#DIV_paraValue01').hide()
-        }
-        else {
-            // 误差值
+        } else if ($('#paraCode').val() === RECON_PARA_CODE_03) {
+            $('#DIV_paraValue03').show()
+        } else {
             $('#DIV_paraValue01').show()
-            $('#DIV_paraValue02').hide()
         }
         // 编辑画面禁止修改参数名称和券商ID
         if (pageModel === PAGE_MODEL_EDIT) {
@@ -74,26 +83,30 @@ $(function () {
          * 参数名称下拉框联动
          */
         $('#paraCode').change(function() {
-            // 对账维度
-            if ($('#paraCode').val() == RECON_PARA_CODE_02) {
+            hideParaValueDiv();
+
+            if ($('#paraCode').val() === RECON_PARA_CODE_02) {
+                // 对账维度
                 $('#DIV_paraValue02').show()
-                $('#DIV_paraValue01').hide()
-                $('#paraValue1').val('').trigger('change');
-                $('#paraValue2').val('').trigger('change');
-            }
-            else {
+            } else if ($('#paraCode').val() === RECON_PARA_CODE_03) {
+                // 佣金对账方式
+                $('#DIV_paraValue03').show()
+            } else {
                 // 误差值
                 $('#DIV_paraValue01').show()
-                $('#DIV_paraValue02').hide()
-                $('#paraValue1').val('').trigger('change');
-                $('#paraValue2').val('').trigger('change');
             }
+            
+            $('#paraValue1').val('').trigger('change');
+            $('#paraValue2').val('').trigger('change');
+            $('#paraValue3').val('').trigger('change');
         });
     });
+
     // 绑定按钮事件
     $('#StlSecReconPara002_btn_save').click(function() {
         saveOrSubmit('save');
     });
+
     // 绑定按钮事件
     $('#StlSecReconPara002_btn_submit').click(function() {
         saveOrSubmit('submit');

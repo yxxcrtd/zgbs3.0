@@ -1,4 +1,4 @@
-$(function (){
+(function (){
     /**
      * 获取查询参数
      */
@@ -9,9 +9,12 @@ $(function (){
         object.customerId = $('#customerId').val()
         // 参数名称
         object.paraCode = $('#paraCode').val()
-        if (object.paraCode == RECON_PARA_CODE_02) {
+        if (object.paraCode === RECON_PARA_CODE_02) {
             // 对账维度
             object.paraValue = $('#paraValue2').val()
+        } else if (object.paraCode === RECON_PARA_CODE_03) {
+            // 佣金对账方式
+            object.paraValue = $('#paraValue3').val()
         } else {
             // 误差值
             object.paraValue = $('#paraValue1').val()
@@ -28,6 +31,7 @@ $(function (){
     function showDialog() {
         Joyin.dialog(JoyinUtil.getLabel('StlSecReconPara002'), '../StlSecReconPara002/init', '98%', '98%')
     }
+
     /**
      * 定义数据表格
      */
@@ -134,20 +138,19 @@ $(function (){
          * 参数名称下拉框联动
          */
         $('#paraCode').change(function() {
-            // 对账维度
-            if ($('#paraCode').val() == RECON_PARA_CODE_02) {
-                $('#DIV_paraValue02').show()
-                $('#DIV_paraValue01').hide()
-                $('#paraValue1').val('').trigger('change');
-                $('#paraValue2').val('').trigger('change');
+            $('#DIV_paraValue01').hide();
+            $('#DIV_paraValue02').hide();
+            $('#DIV_paraValue03').hide();
+            if ($('#paraCode').val() === RECON_PARA_CODE_02) {
+                $('#DIV_paraValue02').show();
+            } else if ($('#paraCode').val() === RECON_PARA_CODE_03) {
+                $('#DIV_paraValue03').show();
+            } else {
+                $('#DIV_paraValue01').show();
             }
-            else {
-                // 误差值
-                $('#DIV_paraValue01').show()
-                $('#DIV_paraValue02').hide()
-                $('#paraValue1').val('').trigger('change');
-                $('#paraValue2').val('').trigger('change');
-            }
+            $('#paraValue1').val('').trigger('change');
+            $('#paraValue2').val('').trigger('change');
+            $('#paraValue3').val('').trigger('change');
         });
     });
 }())

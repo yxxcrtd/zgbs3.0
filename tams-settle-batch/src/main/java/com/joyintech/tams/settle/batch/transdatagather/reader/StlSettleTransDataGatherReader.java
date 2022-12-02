@@ -194,11 +194,13 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                     BigDecimal totalmTradeAmt=BigDecimal.ZERO;
                     //总印花税_原始
                     BigDecimal totalStampFeeRaw=BigDecimal.ZERO;
-                    //总过户费_原始
+                    //总经手费_原始
                     BigDecimal totalJsfAmtRaw=BigDecimal.ZERO;
+                    //总过户费_原始
+                    BigDecimal totalGhfAmtRaw=BigDecimal.ZERO;
                     //总证管费_原始
                     BigDecimal totalZgfAmtRaw=BigDecimal.ZERO;
-                    //总经手费_原始
+                    //总手续费_原始
                     BigDecimal totalSxfAmtRaw=BigDecimal.ZERO;
                     //总结算费_原始
                     BigDecimal totalSettleFeeRaw=BigDecimal.ZERO;
@@ -233,6 +235,7 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                         // ZGZGST-4156:计算佣金汇总 fuyongsheng 20211208 add end
                         totalStampFeeRaw=ArithmeticUtil.doAdd(totalStampFeeRaw, item.getStampFeeRaw());
                         totalJsfAmtRaw=ArithmeticUtil.doAdd(totalJsfAmtRaw, item.getJsfAmtRaw());
+                        totalGhfAmtRaw=ArithmeticUtil.doAdd(totalGhfAmtRaw, item.getGhfAmtRaw());
                         totalZgfAmtRaw=ArithmeticUtil.doAdd(totalZgfAmtRaw, item.getZgfAmtRaw());
                         totalSxfAmtRaw=ArithmeticUtil.doAdd(totalSxfAmtRaw, item.getSxfAmtRaw());
                         totalSettleFeeRaw=ArithmeticUtil.doAdd(totalSettleFeeRaw, item.getSettleFeeRaw());
@@ -371,11 +374,13 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                     dealTotal.setSettleMode(settleTransDataDto.getSettleMode());
                     //印花税_原始
                     dealTotal.setStampFeeRaw(totalStampFeeRaw);
-                    //过户费_原始
+                    //经手费_原始
                     dealTotal.setJsfAmtRaw(totalJsfAmtRaw);
+                    //过户费_原始
+                    dealTotal.setGhfAmtRaw(totalGhfAmtRaw);
                     //证管费_原始
                     dealTotal.setZgfAmtRaw(totalZgfAmtRaw);
-                    //经手费_原始
+                    //手续费费_原始
                     dealTotal.setSxfAmtRaw(totalSxfAmtRaw);
                     //结算费_原始
                     dealTotal.setSettleFeeRaw(totalSettleFeeRaw);
@@ -547,11 +552,13 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                                 dealTotal.setIntRate(item.getIntRate());
                                 //印花税_原始
                                 dealTotal.setStampFeeRaw(item.getStampFeeRaw());
-                                //过户费_原始
+                                //经手费_原始
                                 dealTotal.setJsfAmtRaw(item.getJsfAmtRaw());
+                                //经手费_原始
+                                dealTotal.setGhfAmtRaw(item.getGhfAmtRaw());
                                 //证管费_原始
                                 dealTotal.setZgfAmtRaw(item.getZgfAmtRaw());
-                                //经手费_原始
+                                //手续费_原始
                                 dealTotal.setSxfAmtRaw(item.getSxfAmtRaw());
                                 //结算费_原始
                                 dealTotal.setSettleFeeRaw(item.getSettleFeeRaw());
@@ -768,14 +775,15 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                                 totalZgfAmt= ArithmeticUtil.doAdd(totalZgfAmt, item.getZgfAmt());
                                 totalSxfAmt= ArithmeticUtil.doAdd(totalSxfAmt, item.getSxfAmt());
                                 totalSettleFee= ArithmeticUtil.doAdd(totalSettleFee, item.getSettleFee());
+                                totalCommissionAmt= ArithmeticUtil.doAdd(totalCommissionAmt, item.getCommissionAmt());
                                 totalTradeAmt= ArithmeticUtil.doAdd(totalTradeAmt, item.getTradeAmt());
                                 totalmPrinAmt= ArithmeticUtil.doAdd(totalmPrinAmt, item.getmPrinAmt());
                                 totalmIntAmt= ArithmeticUtil.doAdd(totalmIntAmt, item.getmIntAmt());
                                 totalmTradeAmt= ArithmeticUtil.doAdd(totalmTradeAmt, item.getmTradeAmt());
                                 totalStampFeeRaw=ArithmeticUtil.doAdd(totalStampFeeRaw, item.getStampFeeRaw());
                                 totalJsfAmtRaw=ArithmeticUtil.doAdd(totalJsfAmtRaw, item.getJsfAmtRaw());
-                                totalZgfAmtRaw=ArithmeticUtil.doAdd(totalZgfAmtRaw, item.getZgfAmtRaw());
                                 totalGhfAmtRaw=ArithmeticUtil.doAdd(totalGhfAmtRaw, item.getGhfAmtRaw());
+                                totalZgfAmtRaw=ArithmeticUtil.doAdd(totalZgfAmtRaw, item.getZgfAmtRaw());
                                 totalSxfAmtRaw=ArithmeticUtil.doAdd(totalSxfAmtRaw, item.getSxfAmtRaw());
                                 totalSettleFeeRaw=ArithmeticUtil.doAdd(totalSettleFeeRaw, item.getSettleFeeRaw());
                                 totalCommissionAmtRaw=ArithmeticUtil.doAdd(totalCommissionAmtRaw, item.getCommissionAmt());
@@ -1066,11 +1074,13 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                             dealTotal.setSettleMode(item.getSettleMode());
                             //印花税_原始
                             dealTotal.setStampFeeRaw(item.getStampFeeRaw());
-                            //过户费_原始
+                            //经手费_原始
                             dealTotal.setJsfAmtRaw(item.getJsfAmtRaw());
+                            //过户费_原始
+                            dealTotal.setGhfAmtRaw(item.getGhfAmtRaw());
                             //证管费_原始
                             dealTotal.setZgfAmtRaw(item.getZgfAmtRaw());
-                            //经手费_原始
+                            //手续费_原始
                             dealTotal.setSxfAmtRaw(item.getSxfAmtRaw());
                             //结算费_原始
                             dealTotal.setSettleFeeRaw(item.getSettleFeeRaw());

@@ -1,4 +1,4 @@
-$(function() {
+(function() {
     //初始化委托列表
     /**
      * 定义数据表格
@@ -9,14 +9,20 @@ $(function() {
         ,{field:'finprodId',sortable: false, title: 'DayEndAccount001.finprodId',width:120}
         ,{field:'tradeMarketStr',sortable: false, title: 'DayEndAccount001.tradeMarket',width:120}
         ,{field:'finprodTypeStr',sortable: false, title: 'DayEndAccount001.finprodType',width:120}
-        ,{field:'commissionAmt', type:'money',sortable: false, title: 'DayEndAccount001.commissionAmt',width:120}
-        ,{field:'jsfAmt', type:'money',sortable: false, title: 'DayEndAccount001.jsfAmt',width:120}
-        ,{field:'zgfAmt', type:'money',sortable: false, title: 'DayEndAccount001.zgfAmt',width:120}
-        ,{field:'stampFee', type:'money',sortable: false, title: 'DayEndAccount001.stampFee',width:120}
-        ,{field:'settleFee', type:'money',sortable: false, title: 'DayEndAccount001.settleFee',width:120}
-        ,{field:'ghfAmt', type:'money',sortable: false, title: 'DayEndAccount001.ghfAmt',width:120}
-        ,{field:'tradeAmt', type:'money',sortable: false, title: 'DayEndAccount001.tradeAmt',width:120}
-        ,{field:'tradeNum', type:'money',sortable: false, title: 'DayEndAccount001.tradeNum',width:120}
+        ,{field:'commissionAmt', type:'money',sortable: false, title: 'DayEndAccount001.commissionAmt',width:120,digit: 2,
+            render: function (data, type, row, meta) {
+                if (row.commissionType === 'QYJ')
+                    return Number(row.commissionAmt).toFixed(2);
+                else
+                    return Number(row.netCommissionAmt).toFixed(2);
+            }}
+        ,{field:'jsfAmt', type:'money',sortable: false, title: 'DayEndAccount001.jsfAmt',width:120,digit: 2}
+        ,{field:'zgfAmt', type:'money',sortable: false, title: 'DayEndAccount001.zgfAmt',width:120,digit: 2}
+        ,{field:'stampFee', type:'money',sortable: false, title: 'DayEndAccount001.stampFee',width:120,digit: 2}
+        ,{field:'settleFee', type:'money',sortable: false, title: 'DayEndAccount001.settleFee',width:120,digit: 2}
+        ,{field:'ghfAmt', type:'money',sortable: false, title: 'DayEndAccount001.ghfAmt',width:120,digit: 2}
+        ,{field:'tradeAmt', type:'money',sortable: false, title: 'DayEndAccount001.tradeAmt',width:120,digit: 2}
+        ,{field:'tradeNum', type:'money',sortable: false, title: 'DayEndAccount001.tradeNum',width:120,digit: 2}
         ,{field: 'seqNo', width: 150, visible: false}
         ,{field: 'tradeMarket', width: 150, visible: false}
         ,{field: 'finprodType', width: 150, visible: false}
@@ -46,14 +52,20 @@ $(function() {
     var colsDetail = [
          {field:'cjbh',sortable: false, title: 'DayEndAccount001.tradeId',width:120}
         ,{field:'psStr',sortable: false, title: 'DayEndAccount001.ps',width:120}
-        ,{field:'commissionAmt', type:'money',edit: true,sortable: false, title: 'DayEndAccount001.commissionAmt',width:120}
-        ,{field:'jsfAmt', type:'money',edit: true,sortable: false, title: 'DayEndAccount001.jsfAmt',width:120}
-        ,{field:'zgfAmt', type:'money',edit: true,sortable: false, title: 'DayEndAccount001.zgfAmt',width:120}
-        ,{field:'stampFee', type:'money',edit: true,sortable: false, title: 'DayEndAccount001.stampFee',width:120}
-        ,{field:'settleFee', type:'money',edit: true,sortable: false, title: 'DayEndAccount001.settleFee',width:120}
-        ,{field:'ghfAmt', type:'money',edit: true,sortable: false, title: 'DayEndAccount001.ghfAmt',width:120}
-        ,{field:'tradeAmt', type:'money',edit: true,sortable: false, title: 'DayEndAccount001.tradeAmt',width:120}
-        ,{field:'tradeNum', type:'money',sortable: false, title: 'DayEndAccount001.tradeNum',width:120}
+        ,{field:'commissionAmt', type:'money',edit: true,sortable: false, title: 'DayEndAccount001.commissionAmt',width:120,digit: 2,
+            render: function (data, type, row, meta) {
+                if (row.commissionType === 'QYJ')
+                    return Number(row.commissionAmt).toFixed(2);
+                else
+                    return Number(row.netCommissionAmt).toFixed(2);
+            }}
+        ,{field:'jsfAmt', type:'money',edit: true,sortable: false, title: 'DayEndAccount001.jsfAmt',width:120,digit: 2}
+        ,{field:'zgfAmt', type:'money',edit: true,sortable: false, title: 'DayEndAccount001.zgfAmt',width:120,digit: 2}
+        ,{field:'stampFee', type:'money',edit: true,sortable: false, title: 'DayEndAccount001.stampFee',width:120,digit: 2}
+        ,{field:'settleFee', type:'money',edit: true,sortable: false, title: 'DayEndAccount001.settleFee',width:120,digit: 2}
+        ,{field:'ghfAmt', type:'money',edit: true,sortable: false, title: 'DayEndAccount001.ghfAmt',width:120,digit: 2}
+        ,{field:'tradeAmt', type:'money',edit: true,sortable: false, title: 'DayEndAccount001.tradeAmt',width:120,digit: 2}
+        ,{field:'tradeNum', type:'money',sortable: false, title: 'DayEndAccount001.tradeNum',width:120,digit: 2}
         ,{field: 'commissionAmt2', type:'money', width: 150, visible: false}
         ,{field: 'jsfAmt2', type:'money', width: 150, visible: false}
         ,{field: 'zgfAmt2', type:'money', width: 150, visible: false}
@@ -68,6 +80,7 @@ $(function() {
         ,{field: 'settleFeeFlg', type:'money', width: 150, visible: false}
         ,{field: 'ghfAmtFlg', type:'money', width: 150, visible: false}
         ,{field:'finprodId',sortable: false,width:120, visible: false}
+        ,{field:'isPayWithTrade',sortable: false,width:120, visible: false}
     ];
     var dataDetailTable = $("#dataDetailTable").joyintable({
         ajax: {
@@ -84,10 +97,46 @@ $(function() {
         addbtn:true,
         // GZYHTZJY-1127:回购时.成交金额不准许修改 modify fuyongsheng start
         beforeEditCell: function(preVal, field, rowData){
-            if(field == "tradeAmt" && (rowData.finprodType2 == 'F02' || rowData.finprodType2 == 'F03'
-                || rowData.finprodType2 == 'F04' || rowData.finprodType2 == 'F05')){
+            if(field === "tradeAmt"
+                && (rowData.finprodType2 === 'F02'
+                    || rowData.finprodType2 === 'F03'
+                    || rowData.finprodType2 === 'F04'
+                    || rowData.finprodType2 === 'F05')){
                 return false;
-            }else{
+            } else {
+
+                // IF 系统参数.是否可修改结算文件中的费用数据 = 是
+                // 	场内清算数据的					经手费、证管费、印花税、结算费、过户费 可编辑
+                //
+                // 	1.调用【成交明细查询】，看佣金是否包含其他一次性费用
+                // 			IF 返回.经手费 = 0 or 空
+                // 				场内清算数据的 经手费不可编辑
+                // 			IF 返回.证管费 = 0 or 空
+                // 				场内清算数据的 证管费不可编辑
+                // 			IF 返回.印花税 = 0 or 空
+                // 				场内清算数据的 印花税不可编辑
+                // 			IF 返回.过户费 = 0 or 空
+                // 				场内清算数据的 结算费不可编辑
+                // 			IF 返回.过户费 = 0 or 空
+                // 				场内清算数据的 结算费不可编辑
+                //
+                // IF 系统参数.是否可修改结算文件中的费用数据 = 否
+                // 	场内清算数据的					经手费、证管费、印花税、结算费、过户费 不可编辑
+                if (stlModifyCommission === 'N'
+                    && (
+                        field === 'jsfAmt' || field === 'zgfAmt' || field === 'stampFee' || field === 'settleFee' || field === 'ghfAmt'
+                    )) {
+                    return false;
+                }
+                if (stlModifyCommission === 'Y' && (field === 'jsfAmt' || field === 'zgfAmt' || field === 'stampFee' || field === 'settleFee' || field === 'ghfAmt')) {
+                    let ret = true;
+                    ret = (field === 'jsfAmt' && rowData.jsfAmt2)
+                        || (field === 'zgfAmt' && rowData.zgfAmt2)
+                        || (field === 'stampFee' && rowData.stampFee2)
+                        || (field === 'settleFee' && rowData.settleFee2)
+                        || (field === 'ghfAmt' && rowData.ghfAmt2);
+                    return ret;
+                }
                 return true;
             }
         },

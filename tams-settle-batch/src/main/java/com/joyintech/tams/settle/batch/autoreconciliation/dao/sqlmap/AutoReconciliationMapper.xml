@@ -12,7 +12,8 @@
 				ssrd.TRADE_MARKET,
 				ssrd.CUSTOMER_ID,
 			    ssrd.ACCOUT,
-				ssrp.PARA_VALUE,
+				ssrp.PARA_VALUE PARA_VALUE,		<!--对账参数-->
+				ssrp1.PARA_VALUE PARA_VALUE1,	<!--佣金对账参数参数-->
 				ssrd.FINPROD_TYPE,
 				ssrd.PS,
 				ssrd.TRADE_DATE,
@@ -20,7 +21,7 @@
 				ssrd.SEC_ACCT_ID,
 				ssr.CHECK_RESULT,
 				ssrd.SEAT_NUMBER,
-				ssrd.COMMISSION_AMT,
+				decode(ssrp1.PARA_VALUE, #{PARA_VALUE_QYJ}, ssrd.COMMISSION_AMT, ssrd.NET_COMMISSION_AMT) COMMISSION_AMT,
 				ssrd.JSF_AMT,
 				ssrd.ZGF_AMT,
 				ssrd.STAMP_FEE,
@@ -49,12 +50,28 @@
 						CUSTOMER_ID,
 						PARA_VALUE
 				)ssrp ON ssrd.CUSTOMER_ID = ssrp.CUSTOMER_ID
+				LEFT JOIN
+				(
+					SELECT
+						CUSTOMER_ID,
+						PARA_VALUE,
+						MAX(CONFIG_DATE)
+					FROM
+						STL_SEC_RECON_PARA
+					WHERE
+						<![CDATA[CONFIG_DATE <= TO_DATE(#{batchDate},'YYYY-MM-DD')]]>
+						AND PARA_CODE = #{PARA_CODE_03}
+					GROUP BY
+						CUSTOMER_ID,
+						PARA_VALUE
+				)ssrp1 ON ssrd.CUSTOMER_ID = ssrp1.CUSTOMER_ID
 			WHERE
 				(ssr.CHECK_RESULT is NULL or ssr.CHECK_RESULT in (#{CHECK_RESULT_0}, #{CHECK_RESULT_2}))
 		    	AND ssrd.TRADE_DATE = TO_DATE(#{batchDate},'YYYY-MM-DD')
 		    	AND (ssrd.REPO_TYPE IS NULL OR ssrd.REPO_TYPE != #{TARGET_BACK_TYPE_H01})
 		)
-		SELECT <!-- 查询委托汇总数据 -->
+		<!-- 查询委托汇总数据 -->
+		SELECT
 			tmp.SEQ_NO,
 			tmp.TRADE_ID,
 			tmp.FINPROD_ID,
@@ -62,6 +79,7 @@
 			tmp.CUSTOMER_ID,
 		    tmp.ACCOUT,
 			tmp.PARA_VALUE,
+			tmp.PARA_VALUE1,
 			tmp.FINPROD_TYPE,
 			tmp.PS,
 			tmp.TRADE_DATE,
@@ -79,7 +97,7 @@
 			tmp.TRADE_NUM,
 			tmp.TOTAL_TEEAMT,
 			entrust.APPLY_TRADE_ID TRADE_ID2,
-			entrust.COMMISSION_AMT2,
+			decode(tmp.PARA_VALUE1, #{PARA_VALUE_QYJ},entrust.COMMISSION_AMT3,entrust.COMMISSION_AMT2) COMMISSION_AMT2,
 			entrust.JSF_AMT2,
 			entrust.ZGF_AMT2,
 			entrust.STAMP_FEE2,
@@ -98,13 +116,14 @@
 		LEFT JOIN (
 			SELECT
 				std.APPLY_TRADE_ID,
-				SUM(std.COMMISSION_AMT) COMMISSION_AMT2,
-				SUM(std.JSF_AMT) JSF_AMT2,
-				SUM(std.ZGF_AMT) ZGF_AMT2,
-				SUM(std.STAMP_FEE) STAMP_FEE2,
-				SUM(std.SETTLE_FEE) SETTLE_FEE2,
-				SUM(std.GHF_AMT) GHF_AMT2,
-				SUM(std.SXF_AMT) SXF_AMT2,
+				SUM(std.NET_COMMISSION_AMT) COMMISSION_AMT2,	<!-- 清算佣金 -->
+				SUM(std.COMMISSION_AMT) COMMISSION_AMT3,		<!-- 清算全佣金 -->
+				SUM(std.JSF_AMT_RAW) JSF_AMT2,
+				SUM(std.ZGF_AMT_RAW) ZGF_AMT2,
+				SUM(std.STAMP_FEE_RAW) STAMP_FEE2,
+				SUM(std.SETTLE_FEE_RAW) SETTLE_FEE2,
+				SUM(std.GHF_AMT_RAW) GHF_AMT2,
+				SUM(std.SXF_AMT_RAW) SXF_AMT2,
 				SUM(
 					CASE WHEN std.PS = #{PS_T01} AND std.FINPROD_TYPE2 != #{prodType2_F02} THEN std.FPRICE_AMT*-1
 					WHEN std.PS IN (#{PS_T07},#{PS_T54},#{PS_T55},#{PS_T56},#{PS_T95},#{PS_T96}) AND std.FINPROD_TYPE2 = #{prodType2_F02} THEN std.FPRICE_AMT*-1
@@ -136,7 +155,7 @@
 				std.TRADE_DATE,
 				std.SEC_ACCT_ID,
 				stda.REPO_TYPE
-			) entrust ON tmp.INSTRUCTION_ID = entrust.APPLY_TRADE_ID AND tmp.TRADE_DATE = entrust.TRADE_DATE
+			) entrust ON tmp.INSTRUCTION_ID = entrust.APPLY_TRADE_ID AND tmp.SEC_ACCT_ID = entrust.SEC_ACCT_ID AND tmp.TRADE_DATE = entrust.TRADE_DATE
 		WHERE
 			tmp.PARA_VALUE = #{PARA_VALUE_02}
 			AND (entrust.REPO_TYPE IS NULL OR entrust.REPO_TYPE != #{TARGET_BACK_TYPE_H01})
@@ -150,6 +169,7 @@
 			tmp.CUSTOMER_ID,
 		    tmp.ACCOUT,
 			tmp.PARA_VALUE,
+			tmp.PARA_VALUE1,
 			tmp.FINPROD_TYPE,
 			tmp.PS,
 			tmp.TRADE_DATE,
@@ -167,7 +187,7 @@
 			tmp.TRADE_NUM,
 			tmp.TOTAL_TEEAMT,
 		    NULL TRADE_ID2,
-			securities.COMMISSION_AMT2,
+			decode(tmp.PARA_VALUE1, #{PARA_VALUE_QYJ},securities.COMMISSION_AMT3,securities.COMMISSION_AMT2) COMMISSION_AMT2,
 			securities.JSF_AMT2,
 			securities.ZGF_AMT2,
 			securities.STAMP_FEE2,
@@ -186,13 +206,14 @@
 		LEFT JOIN (
 			SELECT
 				std.FINPROD_ID,
-				SUM(std.COMMISSION_AMT) COMMISSION_AMT2,
-				SUM(std.JSF_AMT) JSF_AMT2,
-				SUM(std.ZGF_AMT) ZGF_AMT2,
-				SUM(std.STAMP_FEE) STAMP_FEE2,
-				SUM(std.SETTLE_FEE) SETTLE_FEE2,
-				SUM(std.GHF_AMT) GHF_AMT2,
-				SUM(std.SXF_AMT) SXF_AMT2,
+				SUM(std.NET_COMMISSION_AMT) COMMISSION_AMT2,	<!-- 清算佣金 -->
+				SUM(std.COMMISSION_AMT) COMMISSION_AMT3,		<!-- 清算全佣金 -->
+				SUM(std.JSF_AMT_RAW) JSF_AMT2,
+				SUM(std.ZGF_AMT_RAW) ZGF_AMT2,
+				SUM(std.STAMP_FEE_RAW) STAMP_FEE2,
+				SUM(std.SETTLE_FEE_RAW) SETTLE_FEE2,
+				SUM(std.GHF_AMT_RAW) GHF_AMT2,
+				SUM(std.SXF_AMT_RAW) SXF_AMT2,
 				SUM(
 					CASE WHEN std.PS = #{PS_T01} AND std.FINPROD_TYPE2 != #{prodType2_F02} THEN std.FPRICE_AMT*-1
 					WHEN std.PS IN (#{PS_T07},#{PS_T54},#{PS_T55},#{PS_T56},#{PS_T95},#{PS_T96}) AND std.FINPROD_TYPE2 = #{prodType2_F02} THEN std.FPRICE_AMT*-1
@@ -207,21 +228,26 @@
 				std.TRADE_MARKET,
 				std.TRADE_DATE,
 				std.SEC_ACCT_ID,
-				stda.REPO_TYPE
+				stda.REPO_TYPE,
+				std.ACCT_NO,
+				std.IS_PAY_WITH_TRADE
 			FROM
 				SETTLE_TRANS_DATA std
 			LEFT JOIN
 				SETTLE_TRANS_DATA_ADD stda ON std.TRADE_ID = stda.TRADE_ID
 			WHERE
-				std.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02})
+				std.DELIVERY_RESULT IN (#{DELIVERY_RESULT_01}, #{DELIVERY_RESULT_02}) and std.PS not in ('T68','T69')
 			GROUP BY
 				std.FINPROD_ID,
 				std.FINPROD_TYPE2,
 				std.TRADE_MARKET,
 				std.TRADE_DATE,
 				std.SEC_ACCT_ID,
-				stda.REPO_TYPE
-			) securities ON tmp.FINPROD_ID = securities.FINPROD_ID AND tmp.TRADE_DATE = securities.TRADE_DATE
+				stda.REPO_TYPE,
+				std.ACCT_NO,
+				std.IS_PAY_WITH_TRADE
+			) securities ON tmp.FINPROD_ID = securities.FINPROD_ID AND tmp.TRADE_DATE = securities.TRADE_DATE and tmp.ACCOUT = securities.ACCT_NO  AND tmp.SEC_ACCT_ID = securities.SEC_ACCT_ID
+		and tmp.FINPROD_TYPE = securities.FINPROD_TYPE2
 		WHERE
 			tmp.PARA_VALUE = #{PARA_VALUE_01}
 			AND (securities.REPO_TYPE IS NULL OR securities.REPO_TYPE != #{TARGET_BACK_TYPE_H01})
@@ -235,6 +261,7 @@
 			tmp.CUSTOMER_ID,
 		    tmp.ACCOUT,
 			tmp.PARA_VALUE,
+			tmp.PARA_VALUE1,
 			tmp.FINPROD_TYPE,
 			tmp.PS,
 			tmp.TRADE_DATE,
@@ -252,13 +279,13 @@
 			tmp.TRADE_NUM,
 			tmp.TOTAL_TEEAMT,
 			std.TRADE_ID TRADE_ID2,
-			std.COMMISSION_AMT COMMISSION_AMT2,
-			std.JSF_AMT JSF_AMT2,
-			std.ZGF_AMT ZGF_AMT2,
-			std.STAMP_FEE STAMP_FEE2,
-			std.SETTLE_FEE SETTLE_FEE2,
-			std.GHF_AMT GHF_AMT2,
-			std.SXF_AMT SXF_AMT2,
+			decode(tmp.PARA_VALUE1, #{PARA_VALUE_QYJ}, std.COMMISSION_AMT, std.NET_COMMISSION_AMT) COMMISSION_AMT2,
+			std.JSF_AMT_RAW JSF_AMT2,
+			std.ZGF_AMT_RAW ZGF_AMT2,
+			std.STAMP_FEE_RAW STAMP_FEE2,
+			std.SETTLE_FEE_RAW SETTLE_FEE2,
+			std.GHF_AMT_RAW GHF_AMT2,
+			std.SXF_AMT_RAW SXF_AMT2,
 			CASE WHEN std.PS = #{PS_T01} AND std.FINPROD_TYPE2 != #{prodType2_F02} THEN std.FPRICE_AMT*-1
 			WHEN std.PS IN (#{PS_T07},#{PS_T54},#{PS_T55},#{PS_T56},#{PS_T95},#{PS_T96}) AND std.FINPROD_TYPE2 = #{prodType2_F02} THEN std.FPRICE_AMT*-1
 			ELSE FPRICE_AMT END TRADE_AMT2,
@@ -291,6 +318,7 @@
 			tmp.CUSTOMER_ID,
 		    tmp.ACCOUT,
 			tmp.PARA_VALUE,
+			tmp.PARA_VALUE1,
 			tmp.FINPROD_TYPE,
 			tmp.PS,
 			tmp.TRADE_DATE,
@@ -308,13 +336,13 @@
 			tmp.TRADE_NUM,
 			tmp.TOTAL_TEEAMT,
 			std.TRADE_ID TRADE_ID2,
-			std.COMMISSION_AMT COMMISSION_AMT2,
-			std.JSF_AMT JSF_AMT2,
-			std.ZGF_AMT ZGF_AMT2,
-			std.STAMP_FEE STAMP_FEE2,
-			std.SETTLE_FEE SETTLE_FEE2,
-			std.GHF_AMT GHF_AMT2,
-			std.SXF_AMT SXF_AMT2,
+			decode(tmp.PARA_VALUE1, #{PARA_VALUE_QYJ}, std.COMMISSION_AMT, std.NET_COMMISSION_AMT) COMMISSION_AMT2,
+			std.JSF_AMT_RAW JSF_AMT2,
+			std.ZGF_AMT_RAW ZGF_AMT2,
+			std.STAMP_FEE_RAW STAMP_FEE2,
+			std.SETTLE_FEE_RAW SETTLE_FEE2,
+			std.GHF_AMT_RAW GHF_AMT2,
+			std.SXF_AMT_RAW SXF_AMT2,
 			CASE WHEN std.PS = #{PS_T01} AND std.FINPROD_TYPE2 != #{prodType2_F02} THEN std.FPRICE_AMT*-1
 			WHEN std.PS IN (#{PS_T07},#{PS_T54},#{PS_T55},#{PS_T56},#{PS_T95},#{PS_T96}) AND std.FINPROD_TYPE2 = #{prodType2_F02} THEN std.FPRICE_AMT*-1
 			ELSE FPRICE_AMT END TRADE_AMT2,
@@ -347,6 +375,7 @@
 			ssrd.CUSTOMER_ID,
 			ssrd.ACCOUT,
 			#{PARA_VALUE_02} PARA_VALUE,
+			ssrp1.PARA_VALUE PARA_VALUE1,
 			ssrd.FINPROD_TYPE,
 			ssrd.PS,
 			ssrd.TRADE_DATE,
@@ -364,7 +393,7 @@
 			ssrd.TRADE_NUM,
 			ssrd.TOTAL_TEEAMT,
 			entrust.APPLY_TRADE_ID TRADE_ID2,
-			entrust.COMMISSION_AMT2,
+			decode(ssrp1.PARA_VALUE, #{PARA_VALUE_QYJ},entrust.COMMISSION_AMT3,entrust.COMMISSION_AMT2) COMMISSION_AMT2,
 			entrust.JSF_AMT2,
 			entrust.ZGF_AMT2,
 			entrust.STAMP_FEE2,
@@ -382,16 +411,32 @@
 			STL_SEC_RECON_DEAL ssrd
 		LEFT JOIN
 			STL_SEC_RECON ssr ON ssrd.SEQ_NO = ssr.SEQ_NO
+		LEFT JOIN
+		(
+			SELECT
+				CUSTOMER_ID,
+				PARA_VALUE,
+				MAX(CONFIG_DATE)
+			FROM
+				STL_SEC_RECON_PARA
+			WHERE
+				<![CDATA[CONFIG_DATE <= TO_DATE(#{batchDate},'YYYY-MM-DD')]]>
+				AND PARA_CODE = #{PARA_CODE_03}
+			GROUP BY
+				CUSTOMER_ID,
+				PARA_VALUE
+		)ssrp1 ON ssrd.CUSTOMER_ID = ssrp1.CUSTOMER_ID
 		INNER JOIN (
 			SELECT
 				std.APPLY_TRADE_ID,
-				SUM(std.COMMISSION_AMT) COMMISSION_AMT2,
-				SUM(std.JSF_AMT) JSF_AMT2,
-				SUM(std.ZGF_AMT) ZGF_AMT2,
-				SUM(std.STAMP_FEE) STAMP_FEE2,
-				SUM(std.SETTLE_FEE) SETTLE_FEE2,
-				SUM(std.GHF_AMT) GHF_AMT2,
-				SUM(std.SXF_AMT) SXF_AMT2,
+				SUM(std.NET_COMMISSION_AMT) COMMISSION_AMT2,	<!-- 清算佣金 -->
+				SUM(std.COMMISSION_AMT) COMMISSION_AMT3,		<!-- 清算全佣金 -->
+				SUM(std.JSF_AMT_RAW) JSF_AMT2,
+				SUM(std.ZGF_AMT_RAW) ZGF_AMT2,
+				SUM(std.STAMP_FEE_RAW) STAMP_FEE2,
+				SUM(std.SETTLE_FEE_RAW) SETTLE_FEE2,
+				SUM(std.GHF_AMT_RAW) GHF_AMT2,
+				SUM(std.SXF_AMT_RAW) SXF_AMT2,
 				SUM(
 					CASE WHEN std.PS = #{PS_T01} AND std.FINPROD_TYPE2 != #{prodType2_F02} THEN std.FPRICE_AMT*-1
 					WHEN std.PS = #{PS_T56} AND std.BUSI_SCENE_CALSS = #{BUSI_SCENE_CALSS_0902RS03} AND std.TRADE_MARKET = #{TRADE_MARKET_03} THEN std.FPRICE_AMT*-1

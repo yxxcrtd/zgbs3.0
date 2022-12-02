@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import static com.joyintech.tams.constant.DictCodeListStl.*;
+
 @Controller
 @PageId("StlSecReconPara002")
 @RequestMapping("/invest/basicdata/stlsecreconpara/StlSecReconPara002")
@@ -45,7 +47,7 @@ public class StlSecReconPara002Controller extends BaseController {
     @RequestMapping(PAGE_INIT)
     public String init(Model model) {
         setSelectOptionToModel(model, new DictCode[]{
-                DictCode.参数代码, DictCode.对账维度
+                DictCode.参数代码, DictCode.对账维度, DictCode.佣金对账方式
         });
         // 获取流程ID
         String workflowId = getParam("workflowId");
@@ -71,8 +73,9 @@ public class StlSecReconPara002Controller extends BaseController {
         // 平台日
         model.addAttribute("iPlatformDate", iPlatformDate.getSysDate());
         model.addAttribute(GlobalConstant.ENTITY, entity);
-        model.addAttribute("RECON_PARA_CODE_01", DictCodeListStl.参数代码_误差值.getValue());
-        model.addAttribute("RECON_PARA_CODE_02", DictCodeListStl.参数代码_对账维度.getValue());
+        model.addAttribute("RECON_PARA_CODE_01", 参数代码_误差值.getValue());
+        model.addAttribute("RECON_PARA_CODE_02", 参数代码_对账维度.getValue());
+        model.addAttribute("RECON_PARA_CODE_03", 参数代码_佣金对账方式.getValue());
         return super.init(model);
     }
 

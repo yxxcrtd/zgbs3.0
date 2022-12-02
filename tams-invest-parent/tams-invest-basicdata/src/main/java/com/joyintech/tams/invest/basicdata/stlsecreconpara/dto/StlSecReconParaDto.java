@@ -89,6 +89,8 @@ public class StlSecReconParaDto extends StlSecReconPara implements ITableRow, Pr
         // 返回数据字典值
         if (StringUtil.equals(getParaCode(), DictCodeListStl.参数代码_对账维度.getValue())) {
             return SysDataUtil.getNameFromDataDict(DictCode.对账维度, getParaValue());
+        } else if (StringUtil.equals(getParaCode(), DictCodeListStl.参数代码_佣金对账方式.getValue())) {
+            return SysDataUtil.getNameFromDataDict(DictCode.佣金对账方式, getParaValue());
         }
         // 误差值
         return getParaValue();

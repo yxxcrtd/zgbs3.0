@@ -61,6 +61,16 @@
                     >
                     </select>
                 </div>
+                <!--当参数使用佣金对账方式时-->
+                <div id="DIV_paraValue03" class="layui-input-inline input-inline" style="display: none">
+                    <select type="text" id="paraValue3" name="paraValue3"
+                            class="layui-input form-input input-select"
+                            th:placeholder="请输入内容" data-th-placeholder="#{SysCommon.placeholder}"
+                            th:formatoption="false" data-th-data-result='${COMMISSION_TYPE}'
+                            data-th-initValue="${entity?.paraValue}"
+                    >
+                    </select>
+                </div>
             </div>
         </div>
 <!--        <div class="layui-form-item">-->
@@ -90,6 +100,8 @@
         var RECON_PARA_CODE_01  = /*[[${RECON_PARA_CODE_01}]]*/'';
         // 参数代码_对账维度
         var RECON_PARA_CODE_02  = /*[[${RECON_PARA_CODE_02}]]*/'';
+        // 参数代码_佣金对账方式
+        var RECON_PARA_CODE_03  = /*[[${RECON_PARA_CODE_03}]]*/'';
     </script>
     <script data-th-src="@{/js/invest/basicdata/stlsecreconpara/StlSecReconPara002.js}" type="text/javascript"></script>
 </div>

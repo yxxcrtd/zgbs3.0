@@ -177,6 +177,14 @@ public class StlDataDealSzdSjsmxProcessService {
             setBondDeal(szdSjsmx, settleTransData);
             // 交易份额
             settleTransData.setShareAmt(abs(szdSjsmx.getMxqssl()));
+            // 净价总额 round（清算数据Entity.成交价格*变量.交易份额，2）
+            settleTransData.setCpriceAmt(szdSjsmx.getMxcjjg().multiply(settleTransData.getShareAmt()).abs().setScale(2, RoundingMode.HALF_UP));
+            // 单位利息  round（（全价总额-净价总额）/变量.交易份额，8）
+            settleTransData.setIntRate(ArithmeticUtil.divide(ArithmeticUtil.subtract(settleTransData.getFpriceAmt(), settleTransData.getCpriceAmt()), settleTransData.getShareAmt(), 8, RoundingMode.HALF_UP));
+            // 利息总额  全价总额 - 净价总额
+            settleTransData.setIntAmt(ArithmeticUtil.subtract(settleTransData.getFpriceAmt(), settleTransData.getCpriceAmt()));
+            // 单位面值 调用【当前面值】
+            settleTransData.setParValue(stlDataDealProcessCommonService.getUnitPrice(settleTransData.getFinprodId(), settleTransData.getTradeDate()));
             // 清算速度
             settleTransData.setSettleSpeed(0L);
             if (DateUtil.compareDate(settleTransData.getTradeDate(), settleTransData.getSettleDate()) != 0){

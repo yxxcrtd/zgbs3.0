@@ -2140,6 +2140,8 @@ public class ExchangeTransMatchCommonService extends BaseService {
             entrust.setMarchQtyEn(marchQty);
             //指令已匹配金额
             entrust.setMarchAmtEn(entrust.getMarchAmt());
+            //净价总额
+            entrust.setMarchCpriceAmt(entrust.getMarchAmt());
             //匹配状态
             matchStatus = this.bigThan(this.divide100(dto.getRemainNum()),entrust.getRemainEntrustAmt()) ?
                     下行交易匹配状态_部分匹配.getValue() : 下行交易匹配状态_匹配完成.getValue();
@@ -2153,18 +2155,22 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 //质押券出入库成交信息中只有质押券的数量，目标类型只有数量，需要根据折算率计算标准券数量
                 if(this.isPledgeCouponsInOrOut(dto.getPs())) {
                     entrust.setMarchAmt(this.equals(marchQty, dto.getRemainNum()) ? dto.getRemainNum() : this.multiplyWithScale2(marchQty, entrust.getPrice()));
+                    entrust.setMarchCpriceAmt(this.equals(marchQty, dto.getRemainNum()) ? dto.getRemainNum() : this.multiplyWithScale2(marchQty, entrust.getPrice()));
                 }
                 // 广农商二阶段 GNS-920:【广农商场内清算】广农商场内债转股清算交易生成后，对应的持仓流水更新有误
                 else if (isBond2Stock(dto.getPs())) {
                     //已匹配金额（债转股只考虑成交数据和指令一对一的场景）
                     entrust.setMarchAmt(dto.getFpriceAmt());
+                    entrust.setMarchCpriceAmt(dto.getCpriceAmt());
                 }
                 else {
                     entrust.setMarchAmt(this.equals(marchQty,dto.getRemainNum()) ? dto.getRemainAmount() : this.multiplyWithScale2(marchQty,dto.getUnitFprice()));
+                    entrust.setMarchCpriceAmt(this.multiplyWithScale2(marchQty,dto.getUnitCprice()));
                 }
             }
             else {
                 entrust.setMarchAmt(this.equals(marchQty, dto.getRemainNum()) ? dto.getRemainAmount() : this.multiplyWithScale2(marchQty, dto.getUnitCprice()));
+                entrust.setMarchCpriceAmt(this.equals(marchQty, dto.getRemainNum()) ? dto.getRemainAmount() : this.multiplyWithScale2(marchQty, dto.getUnitCprice()));
             }
 
             //指令已匹配份额
@@ -2183,6 +2189,9 @@ public class ExchangeTransMatchCommonService extends BaseService {
             //已匹配金额
             BigDecimal entrustAmt = this.multiplyWithScale2(entrustQty, this.isBond(dto.getFinprodType2()) ? dto.getUnitFprice() : dto.getUnitCprice());
             entrust.setMarchAmt(this.min(dto.getRemainAmount(),entrustAmt));
+            //已匹配净价总额
+            BigDecimal entrustCAmt = this.multiplyWithScale2(entrustQty,  dto.getUnitCprice());
+            entrust.setMarchCpriceAmt(this.min(dto.getRemainAmount(),entrustCAmt));
             //指令已匹配份额
             BigDecimal marchAmtEn = this.multiplyWithScale2(dto.getRemainNum(),dto.getUnitCprice());
             entrust.setMarchQtyEn(ArithmeticUtil.divide(this.min(marchAmtEn,entrust.getRemainEntrustAmt()),entrust.getPrice(),4));

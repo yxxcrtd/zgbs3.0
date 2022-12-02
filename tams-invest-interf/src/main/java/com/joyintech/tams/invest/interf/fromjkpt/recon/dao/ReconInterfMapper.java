@@ -46,6 +46,13 @@ public interface ReconInterfMapper {
     List<StlSecReconPara> listStlSecReconPara(Map<String,Object> param);
 
     /**
+     * 佣金对账参数
+     * @param param
+     * @return
+     */
+    List<StlSecReconPara> listStlSecReconCommissionPara(Map<String,Object> param);
+
+    /**
      * 对账单明细
      * @param param
      * @return
