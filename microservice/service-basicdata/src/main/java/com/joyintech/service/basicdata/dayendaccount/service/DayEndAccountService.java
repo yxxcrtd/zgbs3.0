@@ -461,71 +461,71 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                     //if 待对账数据.交易方向 = 买入 or 正回购
                     if (DictCodeList.交易方向_买入.getValue().equals(settleTransData.getPs())
                             || DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())
-                            || DictCodeList.回购拆借方向_正回购.getValue().equals(settleTransData.getPs())) {
+                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(settleTransData.getPs())) {
                         commissionAmtFlg = BigDecimal.ONE;
                     } else if (DictCodeList.交易方向_卖出.getValue().equals(settleTransData.getPs())
                             || DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())
-                            || DictCodeList.回购拆借方向_逆回购.getValue().equals(settleTransData.getPs())) {
+                            || DictCodeList.回购拆借方向_正回购.getValue().equals(settleTransData.getPs())) {
                         commissionAmtFlg = BigDecimal.ONE.negate();
                     }
                 }
                 if (DictCodeList.交易方向_买入.getValue().equals(settleTransData.getPs())
-                        || DictCodeList.回购拆借方向_正回购.getValue().equals(settleTransData.getPs())
+                        || DictCodeList.回购拆借方向_逆回购.getValue().equals(settleTransData.getPs())
                         || DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())) {
                     jsfAmtFlg = BigDecimal.ONE;
                 } else if (DictCodeList.交易方向_卖出.getValue().equals(settleTransData.getPs())
                         || DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())
-                        || DictCodeList.回购拆借方向_逆回购.getValue().equals(settleTransData.getPs())) {
+                        || DictCodeList.回购拆借方向_正回购.getValue().equals(settleTransData.getPs())) {
                     jsfAmtFlg = BigDecimal.ONE.negate();
                 }
 
                 if (DictCodeList.交易方向_买入.getValue().equals(settleTransData.getPs())
                         || DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())
-                        || DictCodeList.回购拆借方向_正回购.getValue().equals(settleTransData.getPs())) {
+                        || DictCodeList.回购拆借方向_逆回购.getValue().equals(settleTransData.getPs())) {
                     zgfAmtFlg = BigDecimal.ONE;
                 } else if (DictCodeList.交易方向_卖出.getValue().equals(settleTransData.getPs())
                         || DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())
-                        || DictCodeList.回购拆借方向_逆回购.getValue().equals(settleTransData.getPs())) {
+                        || DictCodeList.回购拆借方向_正回购.getValue().equals(settleTransData.getPs())) {
                     zgfAmtFlg = BigDecimal.ONE.negate();
                 }
 
                 if (DictCodeList.交易方向_买入.getValue().equals(settleTransData.getPs())
                         || DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())
-                        || DictCodeList.回购拆借方向_正回购.getValue().equals(settleTransData.getPs())) {
+                        || DictCodeList.回购拆借方向_逆回购.getValue().equals(settleTransData.getPs())) {
                     stampFeeFlg = BigDecimal.ONE;
                 } else if (DictCodeList.交易方向_卖出.getValue().equals(settleTransData.getPs())
                         || DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())
-                        || DictCodeList.回购拆借方向_逆回购.getValue().equals(settleTransData.getPs())) {
+                        || DictCodeList.回购拆借方向_正回购.getValue().equals(settleTransData.getPs())) {
                     stampFeeFlg = BigDecimal.ONE.negate();
                 }
 
                 if (DictCodeList.交易方向_买入.getValue().equals(settleTransData.getPs())
                         || DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())
-                        || DictCodeList.回购拆借方向_正回购.getValue().equals(settleTransData.getPs())) {
+                        || DictCodeList.回购拆借方向_逆回购.getValue().equals(settleTransData.getPs())) {
                     settleFeeFlg = BigDecimal.ONE;
                 } else if (DictCodeList.交易方向_卖出.getValue().equals(settleTransData.getPs())
                         || DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())
-                        || DictCodeList.回购拆借方向_逆回购.getValue().equals(settleTransData.getPs())) {
+                        || DictCodeList.回购拆借方向_正回购.getValue().equals(settleTransData.getPs())) {
                     settleFeeFlg = BigDecimal.ONE.negate();
                 }
 
                 if (DictCodeList.交易方向_买入.getValue().equals(settleTransData.getPs())
                         || DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())
-                        || DictCodeList.回购拆借方向_正回购.getValue().equals(settleTransData.getPs())) {
+                        || DictCodeList.回购拆借方向_逆回购.getValue().equals(settleTransData.getPs())) {
                     ghfAmtFlg = BigDecimal.ONE;
                 } else if (DictCodeList.交易方向_卖出.getValue().equals(settleTransData.getPs())
                         || DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())
-                        || DictCodeList.回购拆借方向_逆回购.getValue().equals(settleTransData.getPs())) {
+                        || DictCodeList.回购拆借方向_正回购.getValue().equals(settleTransData.getPs())) {
                     ghfAmtFlg = BigDecimal.ONE.negate();
                 }
 
                 if (DictCodeList.交易方向_买入.getValue().equals(stlSecReconDeal.getPs())
                         || DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())
-                        || DictCodeList.回购拆借方向_正回购.getValue().equals(stlSecReconDeal.getPs())) {
+                        || DictCodeList.回购拆借方向_逆回购.getValue().equals(stlSecReconDeal.getPs())) {
                     sxfAmtFlg = BigDecimal.ONE;
                 } else if (DictCodeList.交易方向_卖出.getValue().equals(stlSecReconDeal.getPs())
                         || DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())
-                        || DictCodeList.回购拆借方向_逆回购.getValue().equals(stlSecReconDeal.getPs())) {
+                        || DictCodeList.回购拆借方向_正回购.getValue().equals(stlSecReconDeal.getPs())) {
                     sxfAmtFlg = BigDecimal.ONE.negate();
                 }
 
@@ -539,13 +539,12 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                 dealDetail.setGhfAmtFlg(ghfAmtFlg);
                 //隐藏用于记录调整值字段
                 dealDetail.setCommissionAmt2(settleTransData.getCommissionAmt());
-                dealDetail.setJsfAmt2(settleTransData.getJsfAmtRaw());
-                dealDetail.setZgfAmt2(settleTransData.getZgfAmtRaw());
-                dealDetail.setStampFee2(settleTransData.getStampFeeRaw());
-                dealDetail.setSettleFee2(settleTransData.getSettleFeeRaw());
-                dealDetail.setSxfAmt2(settleTransData.getSxfAmtRaw());
-                dealDetail.setGhfAmt2(settleTransData.getGhfAmtRaw());
-                dealDetail.setTradeAmt2(BigDecimal.ZERO);
+                dealDetail.setJsfAmt2(settleTransData.getJsfAmt());
+                dealDetail.setZgfAmt2(settleTransData.getZgfAmt());
+                dealDetail.setStampFee2(settleTransData.getStampFee());
+                dealDetail.setSettleFee2(settleTransData.getSettleFee());
+                dealDetail.setSxfAmt2(settleTransData.getSxfAmt());
+                dealDetail.setGhfAmt2(settleTransData.getGhfAmt());
                 dealDetail.setCommissionType(stlSecReconPara3);
                 dealDetailList.add(dealDetail);
             }
@@ -624,16 +623,29 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                     data.setCommissionAmt(dto.getCommissionAmt() == null ? BigDecimal.ZERO : dto.getCommissionAmt());
                 } else {
                     data.setNetCommissionAmt(dto.getCommissionAmt() == null ? BigDecimal.ZERO : dto.getCommissionAmt());
+                    BigDecimal commissionAmt = data.getNetCommissionAmt();
+                    if(null == dto.getJsfAmt2()){
+                        commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getJsfAmt());
+                    }
+                    if(null == dto.getZgfAmt2()){
+                        commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getZgfAmt());
+                    }
+                    if(null == dto.getStampFee2()){
+                        commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getStampFee());
+                    }
+                    if(null == dto.getSettleFee2()){
+                        commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getSettleFee());
+                    }
+                    if(null == dto.getGhfAmt2()){
+                        commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getGhfAmt());
+                    }
+                    data.setCommissionAmt(commissionAmt);
                 }
-                if (dto.getCommissionAmtFlg() != null && StringUtil.isEmpty(data.getIsPayWithTrade())) {
-                    data.setIsPayWithTrade(dto.getCommissionAmtFlg().compareTo(BigDecimal.ZERO) == 0
-                            ? DictCodeListExt1.是否_否.getValue() : DictCodeListExt1.是否_是.getValue());
-                }
-                data.setJsfAmt(dto.getJsfAmt());
-                data.setZgfAmt(dto.getZgfAmt());
-                data.setStampFee(dto.getStampFee());
-                data.setSettleFee(dto.getSettleFee());
-                data.setGhfAmt(dto.getGhfAmt());
+                data.setJsfAmt(null == dto.getJsfAmt2() ? null : dto.getJsfAmt());
+                data.setZgfAmt(null == dto.getZgfAmt2() ? null :dto.getZgfAmt());
+                data.setStampFee(null == dto.getStampFee2() ? null :dto.getStampFee());
+                data.setSettleFee(null == dto.getSettleFee2() ? null :dto.getSettleFee());
+                data.setGhfAmt(null == dto.getGhfAmt2() ? null :dto.getGhfAmt());
                 data.setJsfAmtRaw(dto.getJsfAmt());
                 data.setZgfAmtRaw(dto.getZgfAmt());
                 data.setStampFeeRaw(dto.getStampFee());
@@ -642,7 +654,6 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
 
                 data.setShareAmt(dto.getTradeNum() == null ? BigDecimal.ZERO : dto.getTradeNum());
                 data.setFpriceAmt(dto.getTradeAmt() == null ? BigDecimal.ZERO : dto.getTradeAmt());
-                data.setTradeAmt(dto.getTradeAmt() == null ? BigDecimal.ZERO : dto.getTradeAmt());
 
                 data.setIsPayWithTrade(dto.getIsPayWithTrade());
                 if(DictCodeListExt1.是否_是.getValue().equals(data.getIsPayWithTrade())){
@@ -654,40 +665,51 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                     }
                 }
 
-                if(dto.getJsfAmtFlg() != null && dto.getJsfAmtFlg().compareTo(BigDecimal.ZERO) > 0){
-                    data.setTradeAmt(ArithmeticUtil.doAdd(data.getTradeAmt(), dto.getJsfAmt()));
-                }
-                else if(dto.getJsfAmtFlg() != null && dto.getJsfAmtFlg().compareTo(BigDecimal.ZERO) < 0){
-                    data.setTradeAmt(ArithmeticUtil.subtract(data.getTradeAmt(), dto.getJsfAmt()));
-                }
-
-                if(dto.getZgfAmtFlg() != null && dto.getZgfAmtFlg().compareTo(BigDecimal.ZERO) > 0){
-                    data.setTradeAmt(ArithmeticUtil.doAdd(data.getTradeAmt(), dto.getZgfAmt()));
-                }
-                else if(dto.getZgfAmtFlg() != null && dto.getZgfAmtFlg().compareTo(BigDecimal.ZERO) < 0){
-                    data.setTradeAmt(ArithmeticUtil.subtract(data.getTradeAmt(), dto.getZgfAmt()));
+                if(dto.getJsfAmt2() != null){
+                    if(dto.getJsfAmtFlg() != null && dto.getJsfAmtFlg().compareTo(BigDecimal.ZERO) > 0){
+                        data.setTradeAmt(ArithmeticUtil.doAdd(data.getTradeAmt(), dto.getJsfAmt()));
+                    }
+                    else if(dto.getJsfAmtFlg() != null && dto.getJsfAmtFlg().compareTo(BigDecimal.ZERO) < 0){
+                        data.setTradeAmt(ArithmeticUtil.subtract(data.getTradeAmt(), dto.getJsfAmt()));
+                    }
                 }
 
-                if(dto.getStampFeeFlg() != null && dto.getStampFeeFlg().compareTo(BigDecimal.ZERO) > 0){
-                    data.setTradeAmt(ArithmeticUtil.doAdd(data.getTradeAmt(), dto.getStampFee()));
-                }
-                else if(dto.getStampFeeFlg() != null && dto.getStampFeeFlg().compareTo(BigDecimal.ZERO) < 0){
-                    data.setTradeAmt(ArithmeticUtil.subtract(data.getTradeAmt(), dto.getStampFee()));
-                }
-
-                if(dto.getSettleFeeFlg() != null && dto.getSettleFeeFlg().compareTo(BigDecimal.ZERO) > 0){
-                    data.setTradeAmt(ArithmeticUtil.doAdd(data.getTradeAmt(), dto.getSettleFee()));
-                }
-                else if(dto.getSettleFeeFlg() != null && dto.getSettleFeeFlg().compareTo(BigDecimal.ZERO) < 0){
-                    data.setTradeAmt(ArithmeticUtil.subtract(data.getTradeAmt(), dto.getSettleFee()));
+                if(dto.getZgfAmt2() != null){
+                    if(dto.getZgfAmtFlg() != null && dto.getZgfAmtFlg().compareTo(BigDecimal.ZERO) > 0){
+                        data.setTradeAmt(ArithmeticUtil.doAdd(data.getTradeAmt(), dto.getZgfAmt()));
+                    }
+                    else if(dto.getZgfAmtFlg() != null && dto.getZgfAmtFlg().compareTo(BigDecimal.ZERO) < 0){
+                        data.setTradeAmt(ArithmeticUtil.subtract(data.getTradeAmt(), dto.getZgfAmt()));
+                    }
                 }
 
-                if(dto.getGhfAmtFlg() != null && dto.getGhfAmtFlg().compareTo(BigDecimal.ZERO) > 0){
-                    data.setTradeAmt(ArithmeticUtil.doAdd(data.getTradeAmt(), dto.getGhfAmt()));
+                if(dto.getStampFee2() != null){
+                    if(dto.getStampFeeFlg() != null && dto.getStampFeeFlg().compareTo(BigDecimal.ZERO) > 0){
+                        data.setTradeAmt(ArithmeticUtil.doAdd(data.getTradeAmt(), dto.getStampFee()));
+                    }
+                    else if(dto.getStampFeeFlg() != null && dto.getStampFeeFlg().compareTo(BigDecimal.ZERO) < 0){
+                        data.setTradeAmt(ArithmeticUtil.subtract(data.getTradeAmt(), dto.getStampFee()));
+                    }
                 }
-                else if(dto.getGhfAmtFlg() != null && dto.getGhfAmtFlg().compareTo(BigDecimal.ZERO) < 0){
-                    data.setTradeAmt(ArithmeticUtil.subtract(data.getTradeAmt(), dto.getGhfAmt()));
+
+                if(dto.getSettleFee2() != null){
+                    if(dto.getSettleFeeFlg() != null && dto.getSettleFeeFlg().compareTo(BigDecimal.ZERO) > 0){
+                        data.setTradeAmt(ArithmeticUtil.doAdd(data.getTradeAmt(), dto.getSettleFee()));
+                    }
+                    else if(dto.getSettleFeeFlg() != null && dto.getSettleFeeFlg().compareTo(BigDecimal.ZERO) < 0){
+                        data.setTradeAmt(ArithmeticUtil.subtract(data.getTradeAmt(), dto.getSettleFee()));
+                    }
                 }
+
+                if(dto.getGhfAmt2() != null){
+                    if(dto.getGhfAmtFlg() != null && dto.getGhfAmtFlg().compareTo(BigDecimal.ZERO) > 0){
+                        data.setTradeAmt(ArithmeticUtil.doAdd(data.getTradeAmt(), dto.getGhfAmt()));
+                    }
+                    else if(dto.getGhfAmtFlg() != null && dto.getGhfAmtFlg().compareTo(BigDecimal.ZERO) < 0){
+                        data.setTradeAmt(ArithmeticUtil.subtract(data.getTradeAmt(), dto.getGhfAmt()));
+                    }
+                }
+
                 data.setTradeId(dto.getTradeId());
                 data.setIsModify(DictCodeListExt1.是否_是.getValue());
                 settleTransDataMapper.updateByPrimaryKeySelective(data);

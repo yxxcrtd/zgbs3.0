@@ -150,7 +150,7 @@ public class ReconciliationCommonService {
             BigDecimal otherFee = ArithmeticUtil.doAdd(dto.getJsfAmt2(),dto.getZgfAmt2(),dto.getSettleFee2());
             if (
 //                    ArithmeticUtil.subtract(dto.getTradeAmt(), dto.getTradeAmt2()).abs().compareTo(wuChaZhi) <= 0
-                    ArithmeticUtil.subtract(dto.getTradeNum(), dto.getTradeNum2()).abs().compareTo(wuChaZhi) <= 0
+//                    ArithmeticUtil.subtract(dto.getTradeNum(), dto.getTradeNum2()).abs().compareTo(wuChaZhi) <= 0
 //                    && ArithmeticUtil.subtract(dto.getStampFee(), dto.getStampFee2()).abs().compareTo(wuChaZhi) <= 0
 //                        && ArithmeticUtil.subtract(dto.getOtherFeeamt(), otherFee).abs().compareTo(wuChaZhi) <= 0
 //                    && ArithmeticUtil.subtract(dto.getGhfAmt(), dto.getGhfAmt2()).abs().compareTo(wuChaZhi) <= 0
@@ -158,12 +158,13 @@ public class ReconciliationCommonService {
 //                    && ArithmeticUtil.subtract(dto.getJsfAmt(), dto.getJsfAmt2()).abs().compareTo(wuChaZhi) <= 0
 //                    && ArithmeticUtil.subtract(dto.getZgfAmt(), dto.getZgfAmt2()).abs().compareTo(wuChaZhi) <= 0
 //                    && ArithmeticUtil.subtract(dto.getSettleFee(), dto.getSettleFee2()).abs().compareTo(wuChaZhi) <= 0
-                    && ArithmeticUtil.subtract(dto.getCommissionAmt(), dto.getCommissionAmt2()).abs().compareTo(wuChaZhi) <= 0
+                     ArithmeticUtil.subtract(dto.getCommissionAmt(), dto.getCommissionAmt2()).abs().compareTo(wuChaZhi) <= 0
 //                    && dto.getFinprodType() != null && dto.getFinprodType().equals(dto.getFinprodType2())
 //                    && dto.getPs() != null && dto.getPs().equals(dto.getPs2())
-                    && dto.getTradeMarket() != null && dto.getTradeMarket().equals(dto.getTradeMarket2())
-                    && dto.getTradeDate() != null && dto.getTradeDate().compareTo(dto.getTradeDate2()) == 0
-                    && dto.getSecAcctId() != null && dto.getSecAcctId().equals(dto.getSecAcctId2())) {
+//                    && dto.getTradeMarket() != null && dto.getTradeMarket().equals(dto.getTradeMarket2())
+//                    && dto.getTradeDate() != null && dto.getTradeDate().compareTo(dto.getTradeDate2()) == 0
+//                    && dto.getSecAcctId() != null && dto.getSecAcctId().equals(dto.getSecAcctId2())
+            ) {
                 dto.setCheckResult(DictCodeListExt3.对账状态结果_一致.getValue());
                 //误差处理
                 chuliWucha(dto);
@@ -808,24 +809,8 @@ public class ReconciliationCommonService {
                 && settleTransDataNew.getCommissionAmt().compareTo(BigDecimal.ZERO) != 0) {
             settleTransDataNew.setIsPayWithTrade(DictCodeListExt1.是否_否.getValue());
         }
-//        //成交数据明细表.经手费									=	成交数据明细表.经手费 + 待对账数据.清算经手费差额
-//        settleTransDataNew.setJsfAmt(ArithmeticUtil.doAdd(settleTransData.getJsfAmt(), dto.getJsfAmtCe()));
-//        //成交数据明细表.证管费									=	成交数据明细表.证管费 + 待对账数据.清算证管费差额
-//        settleTransDataNew.setZgfAmt(ArithmeticUtil.doAdd(settleTransData.getZgfAmt(), dto.getZgfAmtCe()));
-//        //成交数据明细表.印花税									=	成交数据明细表.印花税 + 待对账数据.清算印花税差额
-//        settleTransDataNew.setStampFee(ArithmeticUtil.doAdd(settleTransData.getStampFee(), dto.getStampFeeCe()));
-//        //成交数据明细表.结算费									=	成交数据明细表.结算费 + 待对账数据.清算结算费差额
-//        settleTransDataNew.setSettleFee(ArithmeticUtil.doAdd(settleTransData.getSettleFee(), dto.getSettleFeeCe()));
-//        //成交数据明细表.过户费									=	成交数据明细表.过户费 +待对账数据.清算过户费差额
-//        settleTransDataNew.setGhfAmt(ArithmeticUtil.doAdd(settleTransData.getGhfAmt(), dto.getGhfAmtCe()));
-//        //成交数据明细表.手续费									=	成交数据明细表.手续费 +待对账数据.清算手续费差额
-//        settleTransDataNew.setSxfAmt(ArithmeticUtil.doAdd(settleTransData.getSxfAmt(), dto.getSxfAmtCe()));
-        //成交数据明细表.全价总额									=	成交数据明细表.成交金额 +待对账数据.清算成交金额差额
-        settleTransDataNew.setFpriceAmt(ArithmeticUtil.doAdd(settleTransData.getFpriceAmt(), dto.getTradeAmtCe()));
         //成交数据明细表.清算金额									=	成交数据明细表.清算金额 +待对账数据.清算金额差额
         settleTransDataNew.setTradeAmt(ArithmeticUtil.doAdd(settleTransData.getTradeAmt(), dto.getSettleAmtCe(), dto.getTradeAmtCe()));
-//        //成交数据明细表.成交数量									=	成交数据明细表.成交数量 +待对账数据.清算成交数量差额
-//        settleTransDataNew.setShareAmt(ArithmeticUtil.doAdd(settleTransData.getShareAmt(), dto.getTradeNumCe()));
         return settleTransDataNew;
     }
 }

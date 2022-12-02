@@ -130,14 +130,11 @@
                 }
                 if (stlModifyCommission === 'Y' && (field === 'jsfAmt' || field === 'zgfAmt' || field === 'stampFee' || field === 'settleFee' || field === 'ghfAmt')) {
                     let ret = true;
-                    Joyin.ajaxSync(basePath + 'invest/basicdata/dayendaccount/DayEndAccount002/findSettleTransDataById', {tradeId : rowData.tradeId}, function (result) {
-                        ret = (field === 'jsfAmt' && result.jsfAmt)
-                            || (field === 'zgfAmt' && result.zgfAmt)
-                            || (field === 'stampFee' && result.stampFee)
-                            || (field === 'settleFee' && result.settleFee)
-                            || (field === 'ghfAmt' && result.ghfAmt);
-                        return ret;
-                    });
+                    ret = (field === 'jsfAmt' && rowData.jsfAmt2)
+                        || (field === 'zgfAmt' && rowData.zgfAmt2)
+                        || (field === 'stampFee' && rowData.stampFee2)
+                        || (field === 'settleFee' && rowData.settleFee2)
+                        || (field === 'ghfAmt' && rowData.ghfAmt2);
                     return ret;
                 }
                 return true;
