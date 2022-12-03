@@ -390,6 +390,14 @@ public class DayEndAccountDto extends StlSecRecon {
 		this.commissionAmt = commissionAmt;
 	}
 
+	public BigDecimal getNetCommissionAmt() {
+		return netCommissionAmt;
+	}
+
+	public void setNetCommissionAmt(BigDecimal netCommissionAmt) {
+		this.netCommissionAmt = netCommissionAmt;
+	}
+
 	public BigDecimal getTradeAmt() {
 		return tradeAmt;
 	}
