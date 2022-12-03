@@ -201,7 +201,7 @@ public class ExchangeTransMatchCommonDto extends SettleTransDataTotal {
     }
 
     public BigDecimal getTotalUnFeeAmtPay() {
-        if(!StringUtil.equals(getIsPayWithTrade(), DictCodeList.是否_否.getValue())) {
+        if(!StringUtil.equals(getIsPayWithTrade(), DictCodeList.是否_是.getValue())) {
             return getCommissionAmt();
         }
         else {
