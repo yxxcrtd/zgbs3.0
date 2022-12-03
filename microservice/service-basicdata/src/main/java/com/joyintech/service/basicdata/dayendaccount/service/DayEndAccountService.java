@@ -627,8 +627,8 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                 if (DictCodeListStl.佣金对账方式_全佣金.getValue().equals(dto.getCommissionType())) {
                     data.setCommissionAmt(dto.getCommissionAmt() == null ? BigDecimal.ZERO : dto.getCommissionAmt());
                 } else {
-                    data.setNetCommissionAmt(dto.getNetCommissionAmt() == null ? BigDecimal.ZERO : dto.getNetCommissionAmt());
-                    BigDecimal commissionAmt = data.getNetCommissionAmt();
+                    data.setNetCommissionAmt(dto.getCommissionAmt() == null ? BigDecimal.ZERO : dto.getCommissionAmt());
+                    BigDecimal commissionAmt = dto.getCommissionAmt();
                     // 判断佣金是否被修改
                     if(commissionAmt != null && !commissionAmt.equals(dto.getCommissionAmt2())){
                         if(null == dto.getJsfAmt2()){

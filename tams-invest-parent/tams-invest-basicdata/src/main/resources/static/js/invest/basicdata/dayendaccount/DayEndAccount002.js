@@ -191,7 +191,7 @@
                 dataDetailTable.renderRow(data.LAY_TABLE_INDEX, rowData);
             }
             if(data.commissionType === 'JYJ'){
-                rowData.netCommissionAmt = data.commissionAmt;
+                data.netCommissionAmt = data.commissionAmt;
             }
         }
     });
