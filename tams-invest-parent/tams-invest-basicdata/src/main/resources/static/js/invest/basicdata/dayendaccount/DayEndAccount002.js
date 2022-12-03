@@ -144,52 +144,54 @@
         editCell : function(value, data, field, cell, column){
             if(field=='commissionAmt') {
                 var rowData = {};
-                var amtCe = JoyinMath.doMinus(data.commissionAmt,data.commissionAmt2);
-                amtCe = JoyinMath.doMul(amtCe, data.commissionAmtFlg);
-                rowData.tradeAmt2 = JoyinMath.doAdd(data.tradeAmt2, amtCe);
-                rowData.tradeAmt = JoyinMath.doAdd(data.tradeAmt, amtCe);
-                rowData.commissionAmt2 = data.commissionAmt;
+                // var amtCe = JoyinMath.doMinus(data.commissionAmt,data.commissionAmt2);
+                // amtCe = JoyinMath.doMul(amtCe, data.commissionAmtFlg);
+                // rowData.tradeAmt2 = JoyinMath.doAdd(data.tradeAmt2, amtCe);
+                // rowData.tradeAmt = JoyinMath.doAdd(data.tradeAmt, amtCe);
                 dataDetailTable.renderRow(data.LAY_TABLE_INDEX, rowData);
             } else if (field=='jsfAmt') {
                 var rowData = {};
-                var amtCe = JoyinMath.doMinus(data.jsfAmt,data.jsfAmt2);
-                amtCe = JoyinMath.doMul(amtCe, data.jsfAmtFlg);
-                rowData.tradeAmt2 = JoyinMath.doAdd(data.tradeAmt2, amtCe);
-                rowData.tradeAmt = JoyinMath.doAdd(data.tradeAmt, amtCe);
+                // var amtCe = JoyinMath.doMinus(data.jsfAmt,data.jsfAmt2);
+                // amtCe = JoyinMath.doMul(amtCe, data.jsfAmtFlg);
+                // rowData.tradeAmt2 = JoyinMath.doAdd(data.tradeAmt2, amtCe);
+                // rowData.tradeAmt = JoyinMath.doAdd(data.tradeAmt, amtCe);
                 rowData.jsfAmt2 = data.jsfAmt;
                 dataDetailTable.renderRow(data.LAY_TABLE_INDEX, rowData);
             } else if (field=='zgfAmt') {
                 var rowData = {};
-                var amtCe = JoyinMath.doMinus(data.zgfAmt,data.zgfAmt2);
-                amtCe = JoyinMath.doMul(amtCe, data.zgfAmtFlg);
-                rowData.tradeAmt2 = JoyinMath.doAdd(data.tradeAmt2, amtCe);
-                rowData.tradeAmt = JoyinMath.doAdd(data.tradeAmt, amtCe);
+                // var amtCe = JoyinMath.doMinus(data.zgfAmt,data.zgfAmt2);
+                // amtCe = JoyinMath.doMul(amtCe, data.zgfAmtFlg);
+                // rowData.tradeAmt2 = JoyinMath.doAdd(data.tradeAmt2, amtCe);
+                // rowData.tradeAmt = JoyinMath.doAdd(data.tradeAmt, amtCe);
                 rowData.zgfAmt2 = data.zgfAmt;
                 dataDetailTable.renderRow(data.LAY_TABLE_INDEX, rowData);
             } else if (field=='stampFee') {
                 var rowData = {};
-                var amtCe = JoyinMath.doMinus(data.stampFee,data.stampFee2);
-                amtCe = JoyinMath.doMul(amtCe, data.stampFeeFlg);
-                rowData.tradeAmt2 = JoyinMath.doAdd(data.tradeAmt2, amtCe);
-                rowData.tradeAmt = JoyinMath.doAdd(data.tradeAmt, amtCe);
+                // var amtCe = JoyinMath.doMinus(data.stampFee,data.stampFee2);
+                // amtCe = JoyinMath.doMul(amtCe, data.stampFeeFlg);
+                // rowData.tradeAmt2 = JoyinMath.doAdd(data.tradeAmt2, amtCe);
+                // rowData.tradeAmt = JoyinMath.doAdd(data.tradeAmt, amtCe);
                 rowData.stampFee2 = data.stampFee;
                 dataDetailTable.renderRow(data.LAY_TABLE_INDEX, rowData);
             } else if (field=='settleFee') {
                 var rowData = {};
-                var amtCe = JoyinMath.doMinus(data.settleFee,data.settleFee2);
-                amtCe = JoyinMath.doMul(amtCe, data.settleFeeFlg);
-                rowData.tradeAmt2 = JoyinMath.doAdd(data.tradeAmt2, amtCe);
-                rowData.tradeAmt = JoyinMath.doAdd(data.tradeAmt, amtCe);
+                // var amtCe = JoyinMath.doMinus(data.settleFee,data.settleFee2);
+                // amtCe = JoyinMath.doMul(amtCe, data.settleFeeFlg);
+                // rowData.tradeAmt2 = JoyinMath.doAdd(data.tradeAmt2, amtCe);
+                // rowData.tradeAmt = JoyinMath.doAdd(data.tradeAmt, amtCe);
                 rowData.settleFee2 = data.settleFee;
                 dataDetailTable.renderRow(data.LAY_TABLE_INDEX, rowData);
             } else if (field=='ghfAmt') {
                 var rowData = {};
-                var amtCe = JoyinMath.doMinus(data.ghfAmt,data.ghfAmt2);
-                amtCe = JoyinMath.doMul(amtCe, data.ghfAmtFlg);
-                rowData.tradeAmt2 = JoyinMath.doAdd(data.tradeAmt2, amtCe);
-                rowData.tradeAmt = JoyinMath.doAdd(data.tradeAmt, amtCe);
+                // var amtCe = JoyinMath.doMinus(data.ghfAmt,data.ghfAmt2);
+                // amtCe = JoyinMath.doMul(amtCe, data.ghfAmtFlg);
+                // rowData.tradeAmt2 = JoyinMath.doAdd(data.tradeAmt2, amtCe);
+                // rowData.tradeAmt = JoyinMath.doAdd(data.tradeAmt, amtCe);
                 rowData.ghfAmt2 = data.ghfAmt;
                 dataDetailTable.renderRow(data.LAY_TABLE_INDEX, rowData);
+            }
+            if(data.commissionType === 'JYJ'){
+                rowData.netCommissionAmt = data.commissionAmt;
             }
         }
     });

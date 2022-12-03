@@ -68,10 +68,10 @@
             tfg.SEC_ACCT_ID = #{planInfo.secAcctId, jdbcType=VARCHAR}
         </if> -->
 
-        <if test="planInfo.brokerageNo != null and planInfo.brokerageNo != '' ">
+        <!--<if test="planInfo.brokerageNo != null and planInfo.brokerageNo != '' ">
             AND
             tfg.CUSTOMER_ID = #{planInfo.brokerageNo, jdbcType=VARCHAR}
-        </if>
+        </if>-->
         <if test="planInfo.assetClassify1 != null and planInfo.assetClassify1 != '' ">
             AND
             tfg.ASSET_CLASSIFY1 = #{planInfo.assetClassify1, jdbcType=VARCHAR}

@@ -243,6 +243,7 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
             Map<String, Object> param = new HashMap<>();
             param.put("finprodId", dto.getFinprodId());
             param.put("dealDate", dto.getSettleDate());
+            param.put("secAcctId", dto.getSecAcctId());
             param.put("seatNumber", dto.getSeatNumber());
             settleTransDatas = reconciliationCommonMapper.getSettleTransData(param);
         }else if(DictCodeListStl.对账维度_成交明细.getValue().equals(dto.getStlSecDeme())){
@@ -519,13 +520,13 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                     ghfAmtFlg = BigDecimal.ONE.negate();
                 }
 
-                if (DictCodeList.交易方向_买入.getValue().equals(stlSecReconDeal.getPs())
+                if (DictCodeList.交易方向_买入.getValue().equals(settleTransData.getPs())
                         || DictCodeList.交易方向_申购.getValue().equals(settleTransData.getPs())
-                        || DictCodeList.回购拆借方向_逆回购.getValue().equals(stlSecReconDeal.getPs())) {
+                        || DictCodeList.回购拆借方向_逆回购.getValue().equals(settleTransData.getPs())) {
                     sxfAmtFlg = BigDecimal.ONE;
-                } else if (DictCodeList.交易方向_卖出.getValue().equals(stlSecReconDeal.getPs())
+                } else if (DictCodeList.交易方向_卖出.getValue().equals(settleTransData.getPs())
                         || DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())
-                        || DictCodeList.回购拆借方向_正回购.getValue().equals(stlSecReconDeal.getPs())) {
+                        || DictCodeList.回购拆借方向_正回购.getValue().equals(settleTransData.getPs())) {
                     sxfAmtFlg = BigDecimal.ONE.negate();
                 }
 
@@ -538,7 +539,11 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                 dealDetail.setSxfAmtFlg(sxfAmtFlg);
                 dealDetail.setGhfAmtFlg(ghfAmtFlg);
                 //隐藏用于记录调整值字段
-                dealDetail.setCommissionAmt2(settleTransData.getCommissionAmt());
+                if(stlSecReconPara3.equals("QYJ")){
+                    dealDetail.setCommissionAmt2(settleTransData.getCommissionAmt());
+                }else{
+                    dealDetail.setCommissionAmt2(settleTransData.getNetCommissionAmt());
+                }
                 dealDetail.setJsfAmt2(settleTransData.getJsfAmt());
                 dealDetail.setZgfAmt2(settleTransData.getZgfAmt());
                 dealDetail.setStampFee2(settleTransData.getStampFee());
@@ -622,24 +627,31 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                 if (DictCodeListStl.佣金对账方式_全佣金.getValue().equals(dto.getCommissionType())) {
                     data.setCommissionAmt(dto.getCommissionAmt() == null ? BigDecimal.ZERO : dto.getCommissionAmt());
                 } else {
-                    data.setNetCommissionAmt(dto.getCommissionAmt() == null ? BigDecimal.ZERO : dto.getCommissionAmt());
+                    data.setNetCommissionAmt(dto.getNetCommissionAmt() == null ? BigDecimal.ZERO : dto.getNetCommissionAmt());
                     BigDecimal commissionAmt = data.getNetCommissionAmt();
-                    if(null == dto.getJsfAmt2()){
-                        commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getJsfAmt());
+                    // 判断佣金是否被修改
+                    if(commissionAmt != null && !commissionAmt.equals(dto.getCommissionAmt2())){
+                        if(null == dto.getJsfAmt2()){
+                            commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getJsfAmt());
+                        }
+                        if(null == dto.getZgfAmt2()){
+                            commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getZgfAmt());
+                        }
+                        if(null == dto.getStampFee2()){
+                            commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getStampFee());
+                        }
+                        if(null == dto.getSettleFee2()){
+                            commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getSettleFee());
+                        }
+                        if(null == dto.getGhfAmt2()){
+                            commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getGhfAmt());
+                        }
+                        data.setCommissionAmt(commissionAmt);
                     }
-                    if(null == dto.getZgfAmt2()){
-                        commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getZgfAmt());
+                    else{
+                        // 设置null为了后续sql不更新该字段
+                        data.setCommissionAmt(null);
                     }
-                    if(null == dto.getStampFee2()){
-                        commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getStampFee());
-                    }
-                    if(null == dto.getSettleFee2()){
-                        commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getSettleFee());
-                    }
-                    if(null == dto.getGhfAmt2()){
-                        commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getGhfAmt());
-                    }
-                    data.setCommissionAmt(commissionAmt);
                 }
                 data.setJsfAmt(null == dto.getJsfAmt2() ? null : dto.getJsfAmt());
                 data.setZgfAmt(null == dto.getZgfAmt2() ? null :dto.getZgfAmt());
@@ -654,14 +666,14 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
 
                 data.setShareAmt(dto.getTradeNum() == null ? BigDecimal.ZERO : dto.getTradeNum());
                 data.setFpriceAmt(dto.getTradeAmt() == null ? BigDecimal.ZERO : dto.getTradeAmt());
-
+                data.setTradeAmt(dto.getTradeAmt() == null ? BigDecimal.ZERO : dto.getTradeAmt());
                 data.setIsPayWithTrade(dto.getIsPayWithTrade());
                 if(DictCodeListExt1.是否_是.getValue().equals(data.getIsPayWithTrade())){
                     if(dto.getCommissionAmtFlg() != null && dto.getCommissionAmtFlg().compareTo(BigDecimal.ZERO) > 0){
-                        data.setTradeAmt(ArithmeticUtil.doAdd(data.getTradeAmt(), dto.getCommissionAmt()));
+                        data.setTradeAmt(ArithmeticUtil.doAdd(data.getTradeAmt(), data.getCommissionAmt()));
                     }
                     else if(dto.getCommissionAmtFlg() != null && dto.getCommissionAmtFlg().compareTo(BigDecimal.ZERO) < 0){
-                        data.setTradeAmt(ArithmeticUtil.subtract(data.getTradeAmt(), dto.getCommissionAmt()));
+                        data.setTradeAmt(ArithmeticUtil.subtract(data.getTradeAmt(), data.getCommissionAmt()));
                     }
                 }
 
