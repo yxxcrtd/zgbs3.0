@@ -237,6 +237,9 @@ public class StlDataDealSzdJsmxProcessService {
 						// 利息总额  IF （变量.全价总额 - 变量.净价总额 >0） THEN  变量.全价总额 - 变量.净价总额  ELSE 参照原逻辑
 						settleTransData.setIntAmt(ArithmeticUtil.subtract(settleTransData.getFpriceAmt(), settleTransData.getCpriceAmt()));
 					}
+					if(szdJsmx.getJg2().equals(szdJsmx.getJg1())){
+						settleTransData.setUnitFprice(ArithmeticUtil.divide(settleTransData.getFpriceAmt(), settleTransData.getShareAmt(), 8, RoundingMode.HALF_UP));
+					}
 				}
 				// 单位面值 调用【当前面值】
 				settleTransData.setParValue(stlDataDealProcessCommonService.getUnitPrice(settleTransData.getFinprodId(),
