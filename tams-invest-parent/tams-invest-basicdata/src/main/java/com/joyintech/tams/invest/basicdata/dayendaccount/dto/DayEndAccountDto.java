@@ -527,4 +527,17 @@ public class DayEndAccountDto extends StlSecRecon {
 	public void setIsPayWithTrade(String isPayWithTrade) {
 		this.isPayWithTrade = isPayWithTrade;
 	}
+
+	/**
+	 * 参数值——佣金对账方式参数
+	 */
+	private String paraValue1;
+
+	public String getParaValue1() {
+		return paraValue1;
+	}
+
+	public void setParaValue1(String paraValue1) {
+		this.paraValue1 = paraValue1;
+	}
 }

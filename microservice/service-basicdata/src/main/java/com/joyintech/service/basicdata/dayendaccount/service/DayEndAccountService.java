@@ -274,7 +274,6 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
             return;
         }
         if(DictCodeListExt3.对账状态结果_不一致.getValue().equals(dto.getCheckResult())){
-            StlSecReconDeal stlSecReconDeal = stlSecReconDealMapper.selectByPrimaryKey(dto.getSeqNo());
             boolean isModify = false;
             // 判断成交明细数据是否有人工修改
             for(SettleTransData settleTransData : settleTransDatas){
@@ -714,7 +713,8 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                 }
 
                 data.setTradeId(dto.getTradeId());
-                data.setIntAmt(ArithmeticUtil.subtract(data.getFpriceAmt(), data.getTradeAmt()));
+                SettleTransData settleTransData = settleTransDataMapper.selectByPrimaryKey(data.getTradeId());
+                data.setIntAmt(ArithmeticUtil.subtract(data.getFpriceAmt(), settleTransData.getCpriceAmt()));
                 data.setIsModify(DictCodeListExt1.是否_是.getValue());
                 settleTransDataMapper.updateByPrimaryKeySelective(data);
             }
