@@ -100,7 +100,7 @@ public class ExchangeTransMatchBond5Service extends ExchangeTransMatchBondCommon
         // 交易方向
         trdProductDeal.setPs(entrustDto.getPs());
         // 到期收益率和行权收益率
-        this.calc(trdProductDeal);
+        this.calc(trdProductDeal, entrustDto);
 
         // GNS-879: 赋值投管业务类型 modify by fuyongsheng 20220217 start
         // trdProductDeal.setTgBusiType("163");

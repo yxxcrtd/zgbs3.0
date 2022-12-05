@@ -80,7 +80,7 @@ public class ExchangeTransMatchBond4Service extends ExchangeTransMatchBondCommon
         // 交易方向
         trdProductDeal.setPs(entrustDto.getPs());
         // 到期收益率和行权收益率
-        this.calc(trdProductDeal);
+        this.calc(trdProductDeal, entrustDto);
 
         trdProductDeal.setTgBusiType( DictCodeListExt3.平安业务类型_债转股.getValue());
 

@@ -276,4 +276,30 @@ public class ExchangeTransMatchCommonEntrustDto extends EtrEntrust {
     public void setPortfolioVdate(Date portfolioVdate) {
         this.portfolioVdate = portfolioVdate;
     }
+
+    /**
+     * 行权收益率
+     */
+    private BigDecimal exerYield;
+
+    /**
+     * 到期收益率
+     */
+    private BigDecimal matureYield;
+
+    public BigDecimal getExerYield() {
+        return exerYield;
+    }
+
+    public void setExerYield(BigDecimal exerYield) {
+        this.exerYield = exerYield;
+    }
+
+    public BigDecimal getMatureYield() {
+        return matureYield;
+    }
+
+    public void setMatureYield(BigDecimal matureYield) {
+        this.matureYield = matureYield;
+    }
 }

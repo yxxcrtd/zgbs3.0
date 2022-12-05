@@ -116,7 +116,7 @@ public class ExchangeTransMatchBond1Service extends ExchangeTransMatchBondCommon
         // 交易方向
         trdProductDeal.setPs(entrustDto.getPs());
         // 到期收益率和行权收益率
-        this.calc(trdProductDeal);
+        this.calc(trdProductDeal, entrustDto);
         trdProductDeal.setTgBusiType(getTgBusiType(entrustDto.getPs()));
 
         // 到期收益率
