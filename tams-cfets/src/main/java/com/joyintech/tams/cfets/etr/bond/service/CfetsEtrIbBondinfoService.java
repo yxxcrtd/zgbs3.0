@@ -1912,10 +1912,13 @@ public class CfetsEtrIbBondinfoService extends BaseService{
             param.put("finprodId", allDto.getFinprodId());
             param.put("platDate", iPlatformDate.getSysDate());
             FinExercisePlan finExercisePlan = cfetsetrIbBondinfoMapper.findAssetExercise(param);
-            if (!StringUtil.isNotEmpty(finExercisePlan)
+            if (StringUtil.isNotEmpty(finExercisePlan)
                     || !StringUtil.isNotEmpty(finExercisePlan.getExercisePrice())) {
                 messages.add(new ValidMessage("债券回售的行权净价为空，不可进行交易！"));
             }
+        }
+        if (this.queryAssetIsRight(allDto.getFinprodId()) && !StringUtil.isNotEmpty(allDto.getExerYield())) {
+            messages.add(new ValidMessage("请输入行权收益率"));
         }
         if(!StringUtil.isNotEmpty(allDto.getPriceModel())){
             messages.add(new ValidMessage("请输入价格模式。"));
@@ -2515,12 +2518,12 @@ public class CfetsEtrIbBondinfoService extends BaseService{
         param.put("platDate", DateUtil.platDateFromCache());
         param.put("finprodId", secId);
         boolean assetIsRight = cfetsetrIbBondinfoMapper.queryAssetIsRight(param);
-        boolean priceIsNull = true;
+        boolean priceIsNull = false;
         // 查询行权净价为空的数据
-        param.put("isNull", DictCodeList.是否_是.getValue());
+//        param.put("isNotNull", DictCodeList.是否_是.getValue());
         FinExercisePlan finExercisePlan = cfetsetrIbBondinfoMapper.findAssetExercise(param);
         if (StringUtil.isNotEmpty(finExercisePlan)) {
-            priceIsNull = false;
+            priceIsNull = true;
         }
         return assetIsRight && priceIsNull;
     }
