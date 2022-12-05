@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.joyintech.tams.common.basicdata.marketdata.externaloptions.dao.ComExternalOptionsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -40,9 +39,6 @@ public class ComExternalOptions001Service extends CommonExportService<ComExterna
     @Autowired
     private ComExternalOptions002Service comExternalOptions002Service;
 
-    @Autowired
-    ComExternalOptionsMapper comExternalOptionsMapper;
-    
     /**
      * 分页查询
      * @param params
@@ -53,18 +49,21 @@ public class ComExternalOptions001Service extends CommonExportService<ComExterna
         //System.out.println(str);
 
         params.put("BENCHMARK_TYPE2",str);
-        int page = StringUtil.isNotEmpty(params.get("page"))? Integer.parseInt(params.get("page").toString()) : 0;
-        int length = StringUtil.isNotEmpty(params.get("length"))? Integer.parseInt(params.get("length").toString()) : 0;
-        return super.queryForPage(page, length, () -> comExternalOptionsMapper.selectList(params));
+        return restTemplate.postForPage(ServiceApplication.CommonBasicDataService + "/ComExternalOptions/findPage",
+                params, ComExternalOptions001Dto.class);
     }
 
 
     public List<SuggestDto> findTargetId(Map<String, Object> params) {
-        return comExternalOptionsMapper.findTargetId(params);
+
+        return restTemplate.postForList(ServiceApplication.CommonBasicDataService + "/ComExternalOptions/findTargetId",
+                params, SuggestDto.class);
     }
 
     public List<SuggestDto> findFinprodId(Map<String, Object> params) {
-        return comExternalOptionsMapper.findFinprodId(params);
+
+        return restTemplate.postForList(ServiceApplication.CommonBasicDataService + "/ComExternalOptions/findFinprodId",
+                params, SuggestDto.class);
     }
 
     /**
@@ -74,10 +73,14 @@ public class ComExternalOptions001Service extends CommonExportService<ComExterna
      */
     public List<ComExternalOptions001Dto> queryAllList(Map<String, Object> params){
         String str = DictCodeListExt3.基准类型_2_合约标的.getValue(); //07
+        //System.out.println(str);
+
         params.put("BENCHMARK_TYPE2",str);
-        return comExternalOptionsMapper.selectList(params);
+        return restTemplate.postForList(
+                ServiceApplication.CommonBasicDataService + "/ComExternalOptions/queryAllList",
+                params, ComExternalOptions001Dto.class);
     }
-    
+
     /**
      * 导入check
      * @param fileName
@@ -176,7 +179,7 @@ public class ComExternalOptions001Service extends CommonExportService<ComExterna
      * 期权行情信息
      * @param tempList
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     public ComExternalOptions002Dto getValNetAssetQuotationInfoListData(String tempList)   {
         ComExternalOptions002Dto dto = new ComExternalOptions002Dto();
@@ -230,7 +233,7 @@ public class ComExternalOptions001Service extends CommonExportService<ComExterna
      * 导入
      * @param param
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     public AjaxResult importFile(Map<String, Object> param) {
         AjaxResult ajaxResult = new AjaxResult();
