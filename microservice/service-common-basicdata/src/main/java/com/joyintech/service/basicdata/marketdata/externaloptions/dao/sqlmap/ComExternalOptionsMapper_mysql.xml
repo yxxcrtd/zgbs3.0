@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.joyintech.service.basicdata.marketdata.externaloptions.dao.ComExternalOptionsMapper_mysql">
+	<select id="selectByPrimaryKey" resultType="com.joyintech.service.basicdata.marketdata.externaloptions.dto.ComExternalOptions002Dto">
+         
+          
+         SELECT opt.TARGET_ID as targetId , mst.VALUATION, DATE_FORMAT(mst.VAL_DATE, '%Y-%m-%d') as valDate ,mst.FINPROD_ID2,DATE_FORMAT(mst.PUBLISH_DATE, '%Y-%m-%d') as publishDate
+         FROM MST_VAL_OP mst LEFT JOIN FIN_RATE_INFO fin  ON fin.FINPROD_ID=mst.FINPROD_ID2
+         AND		fin.BENCHMARK_TYPE = #{BENCHMARK_TYPE2}
+         LEFT JOIN OPT_TARGET_INFO opt ON opt.TARGET_ID = fin.BENCHMARK_ID
+         where mst.FINPROD_ID2 = #{finprodId2,jdbcType=VARCHAR} and mst.VAL_DATE = STR_TO_DATE(#{valDate}, '%Y-%m-%d')
+     </select>
+	<select id="selectList" resultType="com.joyintech.service.basicdata.marketdata.externaloptions.dto.ComExternalOptions001Dto">
+    SELECT opt.TARGET_ID as targetId , mst.VALUATION, DATE_FORMAT(mst.VAL_DATE, '%Y-%m-%d') as valDate ,mst.FINPROD_ID2,DATE_FORMAT(mst.PUBLISH_DATE, '%Y-%m-%d') as publishDate
+    FROM MST_VAL_OP mst LEFT JOIN FIN_RATE_INFO fin  ON fin.FINPROD_ID=mst.FINPROD_ID2
+    AND		fin.BENCHMARK_TYPE = #{BENCHMARK_TYPE2}
+    LEFT JOIN OPT_TARGET_INFO opt ON opt.TARGET_ID = fin.BENCHMARK_ID
+    <where>
+        <if test="targetId != null  and targetId !=''">
+            fin.BENCHMARK_ID= #{targetId}
+        </if>
+        <if test="finprodId != null  and finprodId !=''">
+            AND fin.FINPROD_ID = #{finprodId}
+        </if>
+        <if test="valDate != null  and valDate !=''">
+            AND mst.VAL_DATE = STR_TO_DATE(#{valDate},'%Y-%m-%d')
+        </if>
+
+    </where>
+    GROUP BY opt.TARGET_ID , mst.VALUATION, mst.VAL_DATE,mst.FINPROD_ID2,mst.PUBLISH_DATE
+     </select>
+	<select id="dateCheck" resultType="com.joyintech.service.basicdata.marketdata.externaloptions.dto.ComExternalOptions002Dto">
+	     select DATE_FORMAT(ftp.VDATE, '%Y-%m-%d') as vdate ,DATE_FORMAT(ftp.MDATE, '%Y-%m-%d') as mdate
+	     FROM FIN_TRADE_PRODUCT ftp
+	     where ftp.FINPROD_ID = #{finprodId2}
+	     and ftp.BRANCH = #{branch}
+	</select>
+</mapper>
