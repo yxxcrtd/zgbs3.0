@@ -1971,4 +1971,28 @@
 		AND FINPROD_ID = #{finProductId,jdbcType=VARCHAR}
 		AND SEC_ACCT_ID = #{secManageAcctId,jdbcType=VARCHAR}
 	</select>
+
+	<!--查询当日回售交易持仓 add by fuyongsheng 20221203 start-->
+	<select id="getCurDayPutTradePosition" resultType="com.joyintech.tams.common.base.entity.PtlSecPosition">
+		SELECT
+			tpd.SEC_MANAGE_ACCT_ID SEC_ACCT_ID,
+			tpd.FINPROD_ID,
+			tpda.PORTFOLIO_ID,
+			SUM(tpd.SHARE_AMT) AMOUNT
+		FROM
+			TRD_PRODUCT_DEAL tpd
+		LEFT JOIN
+			TRD_PRODUCT_DEAL_ADD tpda ON tpd.TRADE_ID = tpda.TRADE_ID
+		WHERE
+			tpd.TRADE_DATE = #{dealDate,jdbcType=DATE}
+			AND tpd.TRADE_STATUS = '01'
+			AND tpd.IS_CANCEL = 'N'
+		  	AND tpd.PS ='T03'
+		  	AND tpd.TRADE_MARKET IN ('03','04')
+		GROUP BY
+			tpd.SEC_MANAGE_ACCT_ID,
+			tpd.FINPROD_ID,
+			tpda.PORTFOLIO_ID
+	</select>
+	<!--查询当日回售交易持仓 add by fuyongsheng 20221203 end-->
 </mapper>

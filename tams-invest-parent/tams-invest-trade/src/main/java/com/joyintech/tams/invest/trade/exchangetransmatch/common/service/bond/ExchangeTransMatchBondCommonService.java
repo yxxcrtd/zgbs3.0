@@ -1,5 +1,6 @@
 package com.joyintech.tams.invest.trade.exchangetransmatch.common.service.bond;
 
+import com.alibaba.fastjson.JSON;
 import com.joyintech.framework.ajax.AjaxResult;
 import com.joyintech.framework.base.BaseService;
 import com.joyintech.framework.util.*;
@@ -28,6 +29,8 @@ import com.joyintech.tams.invest.trade.exchangetransmatch.common.dao.ExchangeTra
 import com.joyintech.tams.invest.trade.exchangetransmatch.common.dto.ExchangeTransMatchBaseTradeDto;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -39,6 +42,7 @@ import java.util.*;
 
 @Service
 public class ExchangeTransMatchBondCommonService extends BaseService {
+    private Logger logger = LoggerFactory.getLogger(ExchangeTransMatchBondCommonService.class);
 
     @Autowired(required = false)
     private BaseGetBusinessId baseGetBusinessId;
@@ -710,7 +714,7 @@ public class ExchangeTransMatchBondCommonService extends BaseService {
      * 计算债券到期收益率和行权收益率
      * @param productDeal
      */
-    public void calc(TrdProductDeal productDeal) {
+    public void calc(TrdProductDeal productDeal, ExchangeTransMatchCommonEntrustDto entrustDto) {
         // 设置计算参数
         TrdBondInvestTradeDto  dealParam = new TrdBondInvestTradeDto();
         dealParam.setFinprodId(productDeal.getFinprodId());
@@ -728,45 +732,53 @@ public class ExchangeTransMatchBondCommonService extends BaseService {
         dealParam.setFpriceAmt(productDeal.getFpriceAmt());
         dealParam.setIntAmt(productDeal.getIntAmt());
         dealParam.setInvAim(productDeal.getInvAim());
+        // LCTZJYXT-235:行权、到期收益率计算错误时，使用指令上的行权、到期收益率信息 modify by fuyongsheng 20221205 start
+        try{
+            // 调用债券交易计算逻辑
+            AjaxResult ajaxResult = trdBondInvestTrade002Service.calculateData(dealParam);
 
-        // 调用债券交易计算逻辑
-        AjaxResult ajaxResult = trdBondInvestTrade002Service.calculateData(dealParam);
-
-        if (ajaxResult != null && StringUtil.isNotEmpty(ajaxResult.getData())) {
-            Object result = ajaxResult.getData();
-            if(result instanceof Map) {
-                Map<String, Object> calcResult = (Map)result;
-                Object yield = calcResult.get("yield");
-                Object exerYield = calcResult.get("exerYield");
-                if(yield instanceof BigDecimal) {
-                    productDeal.setYield((BigDecimal)yield);
+            if (ajaxResult != null && StringUtil.isNotEmpty(ajaxResult.getData())) {
+                Object result = ajaxResult.getData();
+                if(result instanceof Map) {
+                    Map<String, Object> calcResult = (Map)result;
+                    Object yield = calcResult.get("yield");
+                    Object exerYield = calcResult.get("exerYield");
+                    if(yield instanceof BigDecimal) {
+                        productDeal.setYield((BigDecimal)yield);
+                    }
+                    else if (yield != null) {
+                        productDeal.setYield(new BigDecimal(yield.toString()));
+                    }
+                    if(exerYield instanceof BigDecimal) {
+                        productDeal.setExerYield((BigDecimal)exerYield);
+                    }
+                    else if (exerYield != null) {
+                        productDeal.setExerYield(new BigDecimal(exerYield.toString()));
+                    }
+                    if (productDeal.getYield() != null){
+                        productDeal.setYield(productDeal.getYield().divide(BigDecimal.valueOf(100)));
+                    }
+                    if (productDeal.getExerYield() != null){
+                        productDeal.setExerYield(productDeal.getExerYield().divide(BigDecimal.valueOf(100)));
+                    }
                 }
-                else if (yield != null) {
-                    productDeal.setYield(new BigDecimal(yield.toString()));
-                }
-                if(exerYield instanceof BigDecimal) {
-                    productDeal.setExerYield((BigDecimal)exerYield);
-                }
-                else if (exerYield != null) {
-                    productDeal.setExerYield(new BigDecimal(exerYield.toString()));
-                }
-                if (productDeal.getYield() != null){
-                    productDeal.setYield(productDeal.getYield().divide(BigDecimal.valueOf(100)));
-                }
-                if (productDeal.getExerYield() != null){
-                    productDeal.setExerYield(productDeal.getExerYield().divide(BigDecimal.valueOf(100)));
+                else if (result instanceof TrdBondInvestTradeDto) {
+                    TrdBondInvestTradeDto trdBondInvestTradeDto = (TrdBondInvestTradeDto)result;
+                    if (Objects.nonNull(trdBondInvestTradeDto.getYield())) {
+                        productDeal.setYield(trdBondInvestTradeDto.getYield().divide(BigDecimal.valueOf(100)));
+                    }
+                    if (Objects.nonNull(trdBondInvestTradeDto.getExerYield())) {
+                        productDeal.setExerYield(trdBondInvestTradeDto.getExerYield().divide(BigDecimal.valueOf(100)));
+                    }
                 }
             }
-            else if (result instanceof TrdBondInvestTradeDto) {
-                TrdBondInvestTradeDto trdBondInvestTradeDto = (TrdBondInvestTradeDto)result;
-                if (Objects.nonNull(trdBondInvestTradeDto.getYield())) {
-                    productDeal.setYield(trdBondInvestTradeDto.getYield().divide(BigDecimal.valueOf(100)));
-                }
-                if (Objects.nonNull(trdBondInvestTradeDto.getExerYield())) {
-                    productDeal.setExerYield(trdBondInvestTradeDto.getExerYield().divide(BigDecimal.valueOf(100)));
-                }
-            }
+        }catch (Exception e){
+            logger.error("[计算债权到期收益率异常],dealParam={},exception={}", JSON.toJSONString(dealParam), e);
+            logger.info("[计算债权到期收益率异常,取指令上的行权收益率和到期收益率], entrustInfo={}", JSON.toJSONString(entrustDto));
+            productDeal.setExerYield(entrustDto.getExerYield());
+            productDeal.setYield(entrustDto.getMatureYield());
         }
+        // LCTZJYXT-235:行权、到期收益率计算错误时，使用指令上的行权、到期收益率信息 modify by fuyongsheng 20221205 end
     }
 
     protected void calcFeeAmtPay(ExchangeTransMatchCommonDto dealDto,ExchangeTransMatchCommonEntrustDto entrustDto,TrdProductDeal trdProductDeal) {

@@ -321,4 +321,11 @@ public interface StlDataGatherMapper {
     List<SettleTransDataDto> selectBondFirstBiddingData(Map<String, Object> searchParam);
 
     List<PtlSecPosition> searchPtlSecPositionList(Map<String, Object> paraMap);
+
+    /**
+     * 查询当日回售交易持仓
+     * @param param
+     * @return
+     */
+    List<PtlSecPosition> getCurDayPutTradePosition(Map<String,Object> param);
 }

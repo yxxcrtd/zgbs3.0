@@ -210,12 +210,14 @@ public AjaxResult checkTrd(@RequestBody TrdProductDeal trdProductDeal) {
     if (DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(trdProductDeal.getFinprodType2())
             || DictCodeListExt1.金融产品类型_投管用_计划类资产.getValue().equals(trdProductDeal.getFinprodType2())
             || DictCodeListExt1.金融产品类型_投管用_项目类资产.getValue().equals(trdProductDeal.getFinprodType2())) {
-
-        int counts = tradeCommonService.selectTrdOnPayDate(map);
-        if (counts > 0) {
-            wr.setStatuCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            wr.setMessage("该资产当天存在存续期待处理或流程中交易，请先处理！", MessageType.错误消息);
-            return wr;
+        // 删除当日存在待处理存续期交易时不允许转仓的限制。
+        if(!DictCodeListExt1.金融产品类型_投管用_债券.getValue().equals(trdProductDeal.getFinprodType2())) {
+            int counts = tradeCommonService.selectTrdOnPayDate(map);
+            if (counts > 0) {
+                wr.setStatuCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+                wr.setMessage("该资产当天存在存续期待处理或流程中交易，请先处理！", MessageType.错误消息);
+                return wr;
+            }
         }
 
         map.put("balanceDate", DateUtil.addDay(DateUtil.parse(DateUtil.getSysDate()), -1));

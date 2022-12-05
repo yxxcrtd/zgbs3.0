@@ -53,12 +53,12 @@ public class ComExternalOptions002Service extends CommonExportService<ComExterna
         String str = new String();
         return restTemplate.postForObject(ServiceApplication.CommonBasicDataService
                         + "/ComExternalOptions/findByBenchmarkId?finprodId2="+finprodId2,str,
-                 String.class);
+                String.class);
     }
-    
+
     public ComExternalOptions002Dto dateCheck(Map<String, Object> params){
         return restTemplate.postForObject(ServiceApplication.CommonBasicDataService
-                        + "/ComExternalOptions/dateCheck", params, ComExternalOptions002Dto.class);
+                + "/ComExternalOptions/dateCheck", params, ComExternalOptions002Dto.class);
     }
 
     public ComExternalOptions002Dto getTargetInfo(Map<String, Object> param) {

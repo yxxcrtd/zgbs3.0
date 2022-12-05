@@ -38,7 +38,7 @@ public class ComExternalOptions001Service extends CommonExportService<ComExterna
 
     @Autowired
     private ComExternalOptions002Service comExternalOptions002Service;
-    
+
     /**
      * 分页查询
      * @param params
@@ -80,7 +80,7 @@ public class ComExternalOptions001Service extends CommonExportService<ComExterna
                 ServiceApplication.CommonBasicDataService + "/ComExternalOptions/queryAllList",
                 params, ComExternalOptions001Dto.class);
     }
-    
+
     /**
      * 导入check
      * @param fileName
@@ -179,7 +179,7 @@ public class ComExternalOptions001Service extends CommonExportService<ComExterna
      * 期权行情信息
      * @param tempList
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     public ComExternalOptions002Dto getValNetAssetQuotationInfoListData(String tempList)   {
         ComExternalOptions002Dto dto = new ComExternalOptions002Dto();
@@ -233,7 +233,7 @@ public class ComExternalOptions001Service extends CommonExportService<ComExterna
      * 导入
      * @param param
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     public AjaxResult importFile(Map<String, Object> param) {
         AjaxResult ajaxResult = new AjaxResult();

@@ -7,6 +7,8 @@
                 T2.TARGET_TYPE targetType,
                 T2.TRADER trader,
                 T2.DEAL_MODE,
+                T2.EXER_YIELD,
+                T2.MATURE_YIELD,
                 CASE
                     WHEN (T1.FINPROD_TYPE2 IN (#{FINPROD_TYPE_TG_F02}, #{FINPROD_TYPE_TG_F03}) AND T1.PS IN (#{PS_T93}) AND T1.ENTRUST_TYPE = #{ENTRUST_TYPE_22}) THEN
                         NVL(T4.PLEDGE_NUMBER,0) - NVL(ST93.MARCH_QTY_EN,0)
@@ -100,6 +102,8 @@
                 T2.TARGET_TYPE targetType,
                 T2.TRADER trader,
                 T2.DEAL_MODE,
+                T2.EXER_YIELD,
+                T2.MATURE_YIELD,
                 NVL(EED.ENTRUST_NUM,0) - NVL(S.MARCH_QTY_EN,0)  remainEntrustNum,
                 NVL(EED.ENTRUST_AMT,0) - NVL(S.MARCH_AMT_EN,0) remainEntrustAmt,
                 EED.SEC_ACCT_ID,

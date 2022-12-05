@@ -865,12 +865,12 @@ public class IbuQuoteBondService extends BaseService {
             }
         }else{
             FinProduct finProduct = finProductMapper.selectByPrimaryKey(entrustDtos.get(0).getFinprodId());
-            // 查询行权净价为空的数据
+            // 查询行权净价不为空的数据
             Map<String, Object> param = new HashMap<>();
             param.put("finprodId", entrustDtos.get(0).getFinprodId());
-            param.put("isNull", DictCodeList.是否_是.getValue());
+            param.put("isNotNull", DictCodeList.是否_是.getValue());
             FinExercisePlan finExercisePlan = cfetsetrIbBondinfoMapper.findAssetExercise(param);
-            if (StringUtil.equals(finProduct.getIsRight(), DictCodeList.是否_是.getValue()) && !StringUtil.isNotEmpty(finExercisePlan)) {
+            if (StringUtil.equals(finProduct.getIsRight(), DictCodeList.是否_是.getValue()) && StringUtil.isNotEmpty(finExercisePlan)) {
                 //锚定值非行权收益率，在交易执行面板，应该默认选择到期收益率
                 if(!groupByCalculateField.containsKey("03")){
                     translateKey = "02";

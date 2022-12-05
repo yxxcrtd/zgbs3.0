@@ -723,6 +723,7 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                 }
 
                 data.setTradeId(dto.getTradeId());
+                data.setIntAmt(ArithmeticUtil.subtract(data.getFpriceAmt(), data.getTradeAmt()));
                 data.setIsModify(DictCodeListExt1.是否_是.getValue());
                 settleTransDataMapper.updateByPrimaryKeySelective(data);
             }

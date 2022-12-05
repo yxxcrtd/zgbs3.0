@@ -1396,8 +1396,8 @@ from
         <if test="ps != null and ps.equals('T39')">
             and pd.exercise_type='01'
         </if>
-        <if test="isNull != null and isNull != ''">
-            and pd.EXERCISE_PRICE is null
+        <if test="isNotNull != null and isNotNull != ''">
+            and pd.EXERCISE_PRICE is not null
         </if>
     order by pd.exercise_date desc
     </select>
