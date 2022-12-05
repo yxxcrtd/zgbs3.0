@@ -7,7 +7,7 @@
  * 修改内容：新建
  * 系统名称：理财资管管理系统V2.0
  */
- 
+
 package com.joyintech.tams.component.business.asset.impl;
 
 import com.joyintech.framework.base.BaseService;
@@ -46,26 +46,26 @@ import java.util.*;
  */
 @Service
 public class FinPayInterestStdInfoImplService extends BaseService<FinPayInterestStdInfoDto> implements FinPayInterestStdInfoService{
-    
+
     @Autowired(required = false)
     private IPlatformDate iPlatformDate;
-    
+
     @Autowired
     private CommonRateAdjustService commonRateAdjustService;
-    
+
     /**
      * 付息计划，开放计划，利率重置，申购计划，赎回计划计算用和日期关联的Service
      */
     @Autowired
     private DateCalService dateCalService;
-    
+
     @Override
     public IDictCode[] getInitDictCode() {
     	// 一体化对应etliu
 //        return new DictCode[] {DictCode.营业日准则,DictCode.支付频率_付息频率,DictCode.推算方法};
     	return new DictCode[] {DictCode.营业日准则,DictCode.频率,DictCode.推算方式,DictCode.日期号,DictCode.月};
     }
-    
+
     /**
      * 输入：FinInterestFactorDto
      * 输出:按要求封装entity--输出 FinInterestFactorDto
@@ -77,8 +77,8 @@ public class FinPayInterestStdInfoImplService extends BaseService<FinPayInterest
         dto.setFinCashPayRule(finCashPayRule);
         return dto;
     }
-    
-    
+
+
     /**
      * 初始化支付规则
      * {@inheritDoc}
@@ -92,7 +92,7 @@ public class FinPayInterestStdInfoImplService extends BaseService<FinPayInterest
             +"&finprodType="+finprodType,
             FinPayInterestStdInfoDto.class);
     }
-    
+
     /**
      * 初始化付息计划
      * {@inheritDoc}
@@ -105,11 +105,11 @@ public class FinPayInterestStdInfoImplService extends BaseService<FinPayInterest
             +"&finprodType="+finprodType+"&finprodType2="+finprodType2,
             FinCashPlanDto.class);
     }
-   
+
     /**
      * 生成付息计划
      * {@inheritDoc}
-     * @throws ParseException 
+     * @throws ParseException
      */
     @Override
     public List<FinCashPlanDto> createAssetPayInteresPlan(FinPayInterestStdInfoDto dto) throws ParseException {
@@ -188,11 +188,11 @@ public class FinPayInterestStdInfoImplService extends BaseService<FinPayInterest
         if(StringUtil.isEmpty(dto.getFinInterestFactorDto().getBasisStyle())){
             scai.setIntpayRule(DictCodeListExt1.利息分配方式_按照实际天数分配.getValue());
         }else{
-            scai.setIntpayRule(dto.getFinInterestFactorDto().getBasisStyle()); 
+            scai.setIntpayRule(dto.getFinInterestFactorDto().getBasisStyle());
         }
         // 平台日期
         Date platDate = iPlatformDate.getSysDate();
-        // 获取付息区间列表 
+        // 获取付息区间列表
         List<FinCashPlanDto> scheList = new ArrayList<FinCashPlanDto>();
         //是否计划区间利息计算(计划明细查看)
         if(Boolean.parseBoolean(dto.getIsSubAmtCal())){
@@ -249,9 +249,9 @@ public class FinPayInterestStdInfoImplService extends BaseService<FinPayInterest
         }else{
             //重新生成计划
             //前台传入的交易中的付息计划
-            List<FinCashPlanDto> oldScheList = new ArrayList<FinCashPlanDto>();
+            List<FinCashPlanDto> oldScheList1 = new ArrayList<FinCashPlanDto>();
             if(null!=dto.getMaxTradeDate()){
-                oldScheList = dto.getInvScheduleList();
+                List<FinCashPlanDto> oldScheList = dto.getInvScheduleList();
             //筛选付息计划最大计息截止日(交易前计划不可变更,交易后计划可以重新按规则生成)
                 if(null!=oldScheList&&!oldScheList.isEmpty()){
                 for(FinCashPlanDto finCashPlanDto:oldScheList){
@@ -259,6 +259,7 @@ public class FinPayInterestStdInfoImplService extends BaseService<FinPayInterest
                             &&DateUtil.compareDate(finCashPlanDto.getMdate(), dto.getMaxTradeDate())>-1){
                             /*finCashPlanDto.setMdate(dto.getMaxTradeDate());*/
                             scai.setVdate(finCashPlanDto.getMdate());
+                            oldScheList1.add(finCashPlanDto);
                             break;
                     }
                 }
@@ -268,13 +269,13 @@ public class FinPayInterestStdInfoImplService extends BaseService<FinPayInterest
             }
             if(DateUtil.compareDate(dto.getMdate(), scai.getVdate())<=0){
                 scai.setVdate(dto.getVdate());
-                scheList.addAll(oldScheList);
+                scheList.addAll(oldScheList1);
             } else {
-                scheList = AssetInterestCal.cal(is, scai, holidayList, false,FinCashPlanDto.class);
                 if(null!=dto.getMaxTradeDate()){
                     scai.setVdate(dto.getVdate());
-                    scheList.addAll(oldScheList);
+                    scheList.addAll(oldScheList1);
                 }
+                scheList.addAll( AssetInterestCal.cal(is, scai, holidayList, false,FinCashPlanDto.class));
             }
             rateList = commonRateAdjustService.escapRateAdjust(scai,is,scheList,holidayList);
             //计算付息区间利息
@@ -310,7 +311,7 @@ public class FinPayInterestStdInfoImplService extends BaseService<FinPayInterest
         }
         return scheList;
     }
-    
+
     /**
      * 构建还本计划
      * <功能详细描述>

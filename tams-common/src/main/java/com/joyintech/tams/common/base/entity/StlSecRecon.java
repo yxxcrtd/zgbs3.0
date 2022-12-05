@@ -130,12 +130,38 @@ public class StlSecRecon extends BaseEntity {
     /**
      * 对账信息
      */
-    private byte[] reconInfo;
+    private String reconInfo;
 
     /**
      * 委托编号/成交编号
      */
     private String entrustTradeId;
+
+    /**
+     * 资金账号（截取:后的部分）
+     */
+    private String accout;
+
+    /**
+     * 资金账号
+     */
+    private String accouts;
+
+    public String getAccout() {
+        return accout;
+    }
+
+    public void setAccout(String accout) {
+        this.accout = accout;
+    }
+
+    public String getAccouts() {
+        return accouts;
+    }
+
+    public void setAccouts(String accouts) {
+        this.accouts = accouts;
+    }
 
     /**
      * 取得 券商对账单流水号
@@ -438,7 +464,7 @@ public class StlSecRecon extends BaseEntity {
      * 取得 对账信息
      * @return 对账信息
      */
-    public byte[] getReconInfo() {
+    public String getReconInfo() {
         return reconInfo;
     }
 
@@ -446,7 +472,7 @@ public class StlSecRecon extends BaseEntity {
      * 设置 对账信息
      * @param reconInfo 对账信息
      */
-    public void setReconInfo(byte[] reconInfo) {
+    public void setReconInfo(String reconInfo) {
         this.reconInfo = reconInfo;
     }
 

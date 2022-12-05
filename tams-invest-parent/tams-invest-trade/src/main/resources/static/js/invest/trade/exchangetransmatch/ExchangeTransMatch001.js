@@ -75,16 +75,20 @@
             {field:'psStr', sortField:'ps',width:200, title: 'ExchangeTransMatch001.ps'},
             {field:'remainAmount', sortField:'remainAmount',width:200, title: 'ExchangeTransMatch001.remainAmount',type: 'money'},
             {field:'remainNum', sortField:'remainNum',width:200, title: 'ExchangeTransMatch001.remainNum',type: 'number'},
-            {field:'unitFprice', sortField:'unitFprice',width:200, title: 'ExchangeTransMatch001.dealPrice',type: 'number', render: function(data, type, row, meta) {
+            //ExchangeTransMatch001.dealPrice
+            {field:'unitFprice', sortField:'unitFprice',width:200, title: '全价',type: 'number', render: function(data, type, row, meta) {
                     if (row.finprodType2 === "F01") {
                         return parseFloat(row.unitFprice).toFixed(8);
                     } else {
                         return parseFloat(row.unitFprice).toFixed(4);
                     }
                 }},
+            {field:'unitCprice', sortField:'unitCprice',width:200, title: '净价',type: 'number',digit: 4},
             {field:'dealDate', sortField:'dealDate',width:200, title: 'ExchangeTransMatch001.dealDate',type: 'date'},
             {field:'acctName', sortField:'acctNo',width:200, title: 'ExchangeTransMatch001.fundAccount'},
 
+            {field:'parValue', visible:false},
+            {field:'cpriceAmt', visible:false},
             {field:'matchStatus', visible:false},
             {field:'matchProgress', visible:false},
             {field:'finprodType2', visible:false},

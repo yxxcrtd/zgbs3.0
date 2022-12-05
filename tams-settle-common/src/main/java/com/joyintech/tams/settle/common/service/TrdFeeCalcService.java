@@ -19,7 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import cn.hutool.core.collection.CollUtil;
+import com.joyintech.framework.util.JsonUtils;
 import com.joyintech.tams.constant.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -59,6 +63,8 @@ import com.joyintech.tams.settle.common.dto.TrdTradeFeeDetailExtDto;
 @Service
 public class TrdFeeCalcService {
 
+	private static final Logger log = LoggerFactory.getLogger(TrdFeeCalcService.class);
+
     @Autowired
     private TrdFeeCalcMapper trdFeeCalcMapper;
 
@@ -76,7 +82,7 @@ public class TrdFeeCalcService {
 
     @Autowired
     private SettleCommonService settleCommonService;
-    
+
     /**
      * 金融产品附属表
      */
@@ -112,7 +118,7 @@ public class TrdFeeCalcService {
 
         // 数据清算附属信息（核算信息）全量获取
         Map<String, List<StlDownDataDealAccountInfoDto>> allStlDownDataDealAccountInfoDtoList
-                = settleCommonService.getAllStlDownDataDealAccountInfoDtoList(false);
+                = settleCommonService.getAllStlDownDataDealAccountInfoDtoWithSecAcctIdMap();
         List<StlDownDataDealAccountInfoDto> stlDownDataDealAccountInfoDtos = allStlDownDataDealAccountInfoDtoList.get(trdDetail.getSecManageAcctId());
         if (stlDownDataDealAccountInfoDtos != null && stlDownDataDealAccountInfoDtos.size() > 0) {
             stlDownDataDealAccountInfoDto = stlDownDataDealAccountInfoDtos.get(0);
@@ -177,7 +183,7 @@ public class TrdFeeCalcService {
 				if (StringUtil.isNotEmpty(stlDownDataDealAccountInfoDto.getAcctNo())) {
 					localPlanSearchInfo.setCapitalAccountNo(stlDownDataDealAccountInfoDto.getAcctNo());
 				}
-            } 
+            }
             else {
                 // 变量.方案查询信息 = 【入参】方案查询信息
                 localPlanSearchInfo = planSearchInfo;
@@ -187,7 +193,7 @@ public class TrdFeeCalcService {
 
             // 1.2 查询费用方案
             FeePlan feePlan = getFeePlan(localPlanSearchInfo, trdDetail.getTradeDate());
-            
+
             if (feePlan != null){
                 // 变量.费用信息.是否随交易支付 = 变量.费用方案.是否随交易支付
                 feeInfo.setIsPayWithTrade(feePlan.getTrdFeeConfig().getIsPayWithTrade());
@@ -244,11 +250,13 @@ public class TrdFeeCalcService {
             , Integer retentionBit, String batch, String isAlloc, String tradeType) {
         // 出参 - 佣金金额
         BigDecimal commfeeAmount = BigDecimal.ZERO;
-        // 出参- 佣金计算过程明细列表
+		// 出参 - 净佣金金额
+		BigDecimal netCommfeeAmount = BigDecimal.ZERO;
+		// 出参- 佣金计算过程明细列表
         List<CommissionCalcDetail> commissionCalcDetailList = new ArrayList<>();
-
         // 佣金明细列表
         List<CommisionDetail> commisionDetailList = new ArrayList<>();
+
         if (retentionBit == null) {
 			retentionBit = 2;
 		}
@@ -258,7 +266,7 @@ public class TrdFeeCalcService {
 		}
 		// 交易日期
     	Date dealDate = null;
-    	
+
     	// 交易品种转换（和曹国商量了一下，该处暂时强转，等曹国和金强商量完结果再说）
     	if (StringUtil.equals(DictCodeListExt1.证券品种_债券.getValue(), tradeType)) {
     		tradeType = DictCodeList.平安资产类型_债券.getValue();
@@ -283,8 +291,9 @@ public class TrdFeeCalcService {
 		StlDownDataDealAccountInfoDto stlDownDataDealAccountInfoDto = new StlDownDataDealAccountInfoDto();
 		// 数据清算附属信息（核算信息）全量获取
 		Map<String, List<StlDownDataDealAccountInfoDto>> allStlDownDataDealAccountInfoDtoList
-				= settleCommonService.getAllStlDownDataDealAccountInfoDtoList(false);
+				= settleCommonService.getAllStlDownDataDealAccountInfoDtoWithSecAcctIdMap();
 
+		// region 方案查询信息赋值
         if (tradeFeatureInformation == null) {
             // if（【入参】交易特征信息 == null）
 			// 变量.交易明细 = 【入参】交易明细列表get(0)
@@ -296,7 +305,7 @@ public class TrdFeeCalcService {
 			finProductTypeKey.setFinprodId(trdDetail.getFinprodId());
 			// 变量.标的分类信息 = 根据主键【交易明细.金融产品代码+分支序号】查询金融产品分类表
 			FinProductType finProductType = finProductTypeMapper.selectByPrimaryKey(finProductTypeKey);
-			
+
 			List<StlDownDataDealAccountInfoDto> stlDownDataDealAccountInfoDtos = allStlDownDataDealAccountInfoDtoList.get(trdDetail.getSecManageAcctId());
 			if (stlDownDataDealAccountInfoDtos != null && stlDownDataDealAccountInfoDtos.size() > 0) {
 				stlDownDataDealAccountInfoDto = stlDownDataDealAccountInfoDtos.get(0);
@@ -365,44 +374,28 @@ public class TrdFeeCalcService {
 
 			List<StlDownDataDealAccountInfoDto> stlDownDataDealAccountInfoDtos
 					= allStlDownDataDealAccountInfoDtoList.get(tradeFeatureInformation.getSecAcctId());
-			if (stlDownDataDealAccountInfoDtos != null && stlDownDataDealAccountInfoDtos.size() > 0) {
+			if (CollUtil.isNotEmpty(stlDownDataDealAccountInfoDtos)) {
 				stlDownDataDealAccountInfoDto = stlDownDataDealAccountInfoDtos.get(0);
 			}
 
 			// 交易场所
-			if (StringUtil.isNotEmpty(tradeFeatureInformation.getTradeMarket())) {
-				localPlanSearchInfo.setTradeMarket(tradeFeatureInformation.getTradeMarket());
-			}
+			localPlanSearchInfo.setTradeMarket(tradeFeatureInformation.getTradeMarket());
 			// 交易平台
-			if (StringUtil.isNotEmpty(tradeFeatureInformation.getTradePlat())) {
-				localPlanSearchInfo.setTradePlatform(tradeFeatureInformation.getTradePlat());
-			}
+			localPlanSearchInfo.setTradePlatform(tradeFeatureInformation.getTradePlat());
 			// 费用类型
 			localPlanSearchInfo.setFeeType(DictCodeListExt1.一次性费用类型_佣金.getValue());
 			// 登记托管机构
-			if (StringUtil.isNotEmpty(stlDownDataDealAccountInfoDto.getRegistOrg())) {
-				localPlanSearchInfo.setRegistOrg(stlDownDataDealAccountInfoDto.getRegistOrg());
-			}
+			localPlanSearchInfo.setRegistOrg(stlDownDataDealAccountInfoDto.getRegistOrg());
 			// 交易品种
-			if (StringUtil.isNotEmpty(tradeType)) {
-				localPlanSearchInfo.setTradeType(tradeType);
-			}
+			localPlanSearchInfo.setTradeType(tradeType);
 			// 交易方向
-			if (StringUtil.isNotEmpty(tradeFeatureInformation.getPs())) {
-				localPlanSearchInfo.setPs(tradeFeatureInformation.getPs());
-			}
+			localPlanSearchInfo.setPs(tradeFeatureInformation.getPs());
 			// 期限品种
-			if (StringUtil.isNotEmpty(tradeFeatureInformation.getTermType())) {
-				localPlanSearchInfo.setTermType(tradeFeatureInformation.getTermType());
-			}
+			localPlanSearchInfo.setTermType(tradeFeatureInformation.getTermType());
 			// 证券账户
-			if (StringUtil.isNotEmpty(tradeFeatureInformation.getSecAcctId())) {
-				localPlanSearchInfo.setSecAcctId(tradeFeatureInformation.getSecAcctId());
-			}
+			localPlanSearchInfo.setSecAcctId(tradeFeatureInformation.getSecAcctId());
 			// 券商代码
-			if (StringUtil.isNotEmpty(stlDownDataDealAccountInfoDto.getBrokerId())) {
-				localPlanSearchInfo.setBrokerageNo(stlDownDataDealAccountInfoDto.getBrokerId());
-			}
+			localPlanSearchInfo.setBrokerageNo(stlDownDataDealAccountInfoDto.getBrokerId());
 			// 证券分类1
 			if (finProductType != null && StringUtil.isNotEmpty(finProductType.getType6())) {
 				localPlanSearchInfo.setAssetClassify1(finProductType.getType6());
@@ -411,6 +404,10 @@ public class TrdFeeCalcService {
 			if (finProductType != null && StringUtil.isNotEmpty(finProductType.getType7())) {
 				localPlanSearchInfo.setAssetClassify2(finProductType.getType7());
 			}
+			// 组合代码
+			localPlanSearchInfo.setPortfolioId(tradeFeatureInformation.getPortfolioId());
+			// 资金账户
+			localPlanSearchInfo.setCapitalAccountNo(stlDownDataDealAccountInfoDto.getAcctNo());
 			// 结算数据下行相关处理（针对上农商只有竞价回购）
 			// modify by etliu 20220104 start
 			// GZYHTZJY-868: 日终清算，协议回购的佣金没有计算出来
@@ -454,20 +451,12 @@ public class TrdFeeCalcService {
 				// modify by etliu 20220117 end
 			}
 			// modify by etliu 20220104 end
-			
+
 			if (StringUtil.equals(tradeType, DictCodeList.平安资产类型_基金.getValue())){
 			    FinProductAdd finProductAdd = finProductAddMapper.selectByPrimaryKey(tradeFeatureInformation.getFinprodId());
 			    if (finProductAdd != null){
 			        localPlanSearchInfo.setAssetClassify2(finProductAdd.getTrmFundType());
 			    }
-			}
-			// 组合代码
-			if (StringUtil.isNotEmpty(tradeFeatureInformation.getPortfolioId())) {
-				localPlanSearchInfo.setPortfolioId(tradeFeatureInformation.getPortfolioId());
-			}
-			// 资金账户
-			if (StringUtil.isNotEmpty(stlDownDataDealAccountInfoDto.getAcctNo())) {
-				localPlanSearchInfo.setCapitalAccountNo(stlDownDataDealAccountInfoDto.getAcctNo());
 			}
 		}
 
@@ -490,14 +479,21 @@ public class TrdFeeCalcService {
 		}
 		// ZGCPCN-1541:费用计算增加信用保护凭证 modify by fuyongsheng 20220620 end
 		// add by etliu 20220126 end
+		// endregion
 
-        // 查询费用方案
+        // region 查询费用方案
+		log.debug("开始查询费用方案 getFeePlan() called with parameters => 【localPlanSearchInfo = {}】, 【dealDate = {}】",
+				JsonUtils.object2Json(localPlanSearchInfo), dealDate);
 		FeePlan feePlan = getFeePlan(localPlanSearchInfo, dealDate);
+		log.debug("完成查询费用方案 getFeePlan() called with result => 【feePlan = {}】", JsonUtils.object2Json(feePlan));
+		// endregion
 
 		if (feePlan != null){
 
+			// region 佣金包含费用处理
 	        // 2.佣金包含费用处理
 	        Map<String, List<TrdDetailDto>> mapTrdDetail = new HashMap<String,  List<TrdDetailDto>>();
+			// 变量.佣金需处理费用列表
 	        List<FeeInfo> feeInfos = new ArrayList<>();
 
 			if (StringUtil.isNotEmpty(feePlan.getTrdFeeConfig().getCommCalMethod())) {
@@ -506,6 +502,7 @@ public class TrdFeeCalcService {
 				}
 			}
 
+			// region 佣金承担费用方案查询
 	        // 1.3 佣金承担费用方案查询
 	        // 变量.佣金需处理费用列表 = 变量.费用方案.费用由券商承担 按照逗号分隔
 	        if (StringUtil.isNotEmpty(feePlan.getTrdFeeConfig().getBrokerBaerFee())) {
@@ -518,45 +515,49 @@ public class TrdFeeCalcService {
 	                feeInfos.add(feeInfo);
 	            }
 	            if (StringUtil.isNotEmpty(feePlan.getTrdFeeConfig().getCommCalMethod())) {
+					// 佣金计算方式 = 按申请编号汇总
 	                if (feePlan.getTrdFeeConfig().getCommCalMethod().equals(DictCodeListExt3.佣金计算方式_按申请编号汇总.getValue())) {
 	                    mapTrdDetail = detailDtos.stream().collect(Collectors.groupingBy(TrdDetailDto::getApplyTradeId));
 	                }
 	            }
-	            for (TrdDetailDto detailDto : detailDtos) {
-	                Integer retentionBitTemp = null;
-	                if (feePlan.getTrdFeeConfig().getRetentionBit() != null) {
-	                    retentionBitTemp = feePlan.getTrdFeeConfig().getRetentionBit().intValue();
-	                }
-	                List<FeeInfo> commFeeInfos = firstFeeCalc(detailDto, feeInfos, localPlanSearchInfo, tradeType, retentionBitTemp);
-	                // 循环 返回值费用列表
-	                List<TrdTradeFeeDetailExtDto> listTrdTradeFeeDetailExtDto = new ArrayList<TrdTradeFeeDetailExtDto>();
-	                for (FeeInfo commFeeInfo : commFeeInfos) {
-	                    TrdTradeFeeDetailExtDto trdTradeFeeDetailExtDto = new TrdTradeFeeDetailExtDto();
-	                    trdTradeFeeDetailExtDto.setFeeType(commFeeInfo.getFeeType());
-	                    trdTradeFeeDetailExtDto.setFeeAmount(commFeeInfo.getFeeAmount());
-	                    listTrdTradeFeeDetailExtDto.add(trdTradeFeeDetailExtDto);
-	                    /*// 循环 变量.交易明细.交易费用明细表列表
-	                    for (TrdTradeFeeDetailExtDto trdTradeFeeDetailExtDto : detailDto.getListTrdTradeFeeDetailExtDto()) {
-	                        if (trdTradeFeeDetailExtDto.getFeeType().equals(commFeeInfo.getFeeType())) {
-	                            // 变量.交易费用明细表.佣金计算过程中费用金额 = 变量.佣金计算过程中费用信息.金额
-	                            trdTradeFeeDetailExtDto.setFeeAmount(commFeeInfo.getFeeAmount());
-	                        }
-	                    }*/
-	                    CommisionDetail commisionDetail = new CommisionDetail();
-	                    //交易编号
-	                    commisionDetail.setTradeId(detailDto.getTradeId());
-	                    // 费用类型
-	                    commisionDetail.setFeeType(commFeeInfo.getFeeType());
-	                    // 是否随交易支付
-	                    commisionDetail.setIsPayWithTrade(DictCodeList.是否_是.getValue());
-	                    // 费用金额
-	                    commisionDetail.setFeeAmt(commFeeInfo.getFeeAmount());
-	                    commisionDetailList.add(commisionDetail);
-	                }
-	                detailDto.setListTrdTradeFeeDetailExtDto(listTrdTradeFeeDetailExtDto);
-	            }
+//	            for (TrdDetailDto detailDto : detailDtos) {
+//	                Integer retentionBitTemp = null;
+//	                if (feePlan.getTrdFeeConfig().getRetentionBit() != null) {
+//	                    retentionBitTemp = feePlan.getTrdFeeConfig().getRetentionBit().intValue();
+//	                }
+//	                List<FeeInfo> commFeeInfos = firstFeeCalc(detailDto, feeInfos, localPlanSearchInfo, tradeType, retentionBitTemp);
+//	                // 循环 返回值费用列表
+//	                List<TrdTradeFeeDetailExtDto> listTrdTradeFeeDetailExtDto = new ArrayList<TrdTradeFeeDetailExtDto>();
+//	                for (FeeInfo commFeeInfo : commFeeInfos) {
+//	                    TrdTradeFeeDetailExtDto trdTradeFeeDetailExtDto = new TrdTradeFeeDetailExtDto();
+//	                    trdTradeFeeDetailExtDto.setFeeType(commFeeInfo.getFeeType());
+//	                    trdTradeFeeDetailExtDto.setFeeAmount(commFeeInfo.getFeeAmount());
+//	                    listTrdTradeFeeDetailExtDto.add(trdTradeFeeDetailExtDto);
+//	                    /*// 循环 变量.交易明细.交易费用明细表列表
+//	                    for (TrdTradeFeeDetailExtDto trdTradeFeeDetailExtDto : detailDto.getListTrdTradeFeeDetailExtDto()) {
+//	                        if (trdTradeFeeDetailExtDto.getFeeType().equals(commFeeInfo.getFeeType())) {
+//	                            // 变量.交易费用明细表.佣金计算过程中费用金额 = 变量.佣金计算过程中费用信息.金额
+//	                            trdTradeFeeDetailExtDto.setFeeAmount(commFeeInfo.getFeeAmount());
+//	                        }
+//	                    }*/
+//	                    CommisionDetail commisionDetail = new CommisionDetail();
+//	                    //交易编号
+//	                    commisionDetail.setTradeId(detailDto.getTradeId());
+//	                    // 费用类型
+//	                    commisionDetail.setFeeType(commFeeInfo.getFeeType());
+//	                    // 是否随交易支付
+//	                    commisionDetail.setIsPayWithTrade(DictCodeList.是否_是.getValue());
+//	                    // 费用金额
+//	                    commisionDetail.setFeeAmt(commFeeInfo.getFeeAmount());
+//	                    commisionDetailList.add(commisionDetail);
+//	                }
+//	                detailDto.setListTrdTradeFeeDetailExtDto(listTrdTradeFeeDetailExtDto);
+//	            }
 	        }
-	        
+			// endregion
+			// endregion
+
+			// region 费用计算
 	        // 3.费用计算
 	        //变量.交易汇总列表
 	        /*List<TrdDetailDto> trdDetailDtos = null;
@@ -567,8 +568,9 @@ public class TrdFeeCalcService {
 	        else {
 	            trdDetailDtos = detailDtos;
 	        }*/
+			// 交易汇总列表
 	        List<TrdDetailDto> trdDetailDtos = trdAmtAll(detailDtos, feePlan.getTrdFeeConfig().getCommCalMethod(), String.valueOf(batch));
-	        
+
 	        // 按证券代码计算时佣金费用金额
             BigDecimal commFeeAmountFinId =  BigDecimal.ZERO;
             // 按证券代码计算时调用共通方法【计算信息设置】
@@ -587,61 +589,60 @@ public class TrdFeeCalcService {
 	                    calcBasis = trdDetailDto.getShareAmt().multiply(BigDecimal.valueOf(100));
 	                }
 	            }
-	            // 调用共通方法【计算信息设置】
+	            // region 调用共通方法【计算信息设置】
+				// 计算参数列表
 	            List<CalcParamDto> calcParamDtos = calcInfoSet(feePlan, calcBasis, feePlan.getTrdFeeConfig().getRetentionBit().intValue());
+				// endregion
+
+				// region 费用计算
 	            // 佣金包含经手费金额
 	            BigDecimal includeJsfAmt = BigDecimal.ZERO;
 	            // 佣金包含结算费金额
 	            BigDecimal includeSettleFee = BigDecimal.ZERO;
-
 	            // 佣金包含证管费金额
 	            BigDecimal includeZgfAmt = BigDecimal.ZERO ;
-
 	            // 佣金包含过户费金额
 	            BigDecimal includeGhfAmt = BigDecimal.ZERO;
-
 	            // 佣金包含印花税金额
 	            BigDecimal includeStampFee = BigDecimal.ZERO;
-
 	            // 佣金费用金额
 	            BigDecimal commFeeAmount =  BigDecimal.ZERO;
-
+				// 净佣金费用金额
+				BigDecimal netCommFeeAmount =  BigDecimal.ZERO;
 
 	            for (CalcParamDto calcParamDto : calcParamDtos) {
 	                // 调用共通方法【费用金额计算】
 	                BigDecimal amount = feeAmountCalc(calcParamDto);
-
 	                // 限额处理
 	                amount = limitResolve(calcParamDto, amount).setScale(retentionBit, RoundingMode.HALF_UP);
-	                
 	                // 变量.佣金费用金额 = 变量.佣金费用金额 + 上述返回金额
 	                commFeeAmount = commFeeAmount.add(amount);
 	            }
-	            
-	            if (trdDetailDto.getListTrdTradeFeeDetailExtDto() != null && trdDetailDto.getListTrdTradeFeeDetailExtDto().size() > 0) {
-	                for (TrdTradeFeeDetailExtDto trdTradeFeeDetailExtDto : trdDetailDto.getListTrdTradeFeeDetailExtDto()) {
-	                    if (StringUtil.equals(trdTradeFeeDetailExtDto.getFeeType(), DictCodeListExt1.一次性费用类型_经手费.getValue())) {
-	                        includeJsfAmt = trdTradeFeeDetailExtDto.getFeeAmount();
-	                    }
-	                    if (StringUtil.equals(trdTradeFeeDetailExtDto.getFeeType(), DictCodeListExt1.一次性费用类型_结算费.getValue())) {
-	                        includeSettleFee = trdTradeFeeDetailExtDto.getFeeAmount();
-	                    }
-	                    if (StringUtil.equals(trdTradeFeeDetailExtDto.getFeeType(), DictCodeListExt1.一次性费用类型_证管费.getValue())) {
-	                        includeZgfAmt = trdTradeFeeDetailExtDto.getFeeAmount();
-	                    }
-	                    if (StringUtil.equals(trdTradeFeeDetailExtDto.getFeeType(), DictCodeListExt1.一次性费用类型_过户费.getValue())) {
-	                        includeGhfAmt = trdTradeFeeDetailExtDto.getFeeAmount();
-	                    }
-	                    if (StringUtil.equals(trdTradeFeeDetailExtDto.getFeeType(), DictCodeListExt1.一次性费用类型_印花税.getValue())) {
-	                        includeStampFee = trdTradeFeeDetailExtDto.getFeeAmount();
-	                    }
-	    
-	                }
-	            }
-	            // 变量.佣金费用金额 = 变量.佣金费用金额 - 变量.汇总交易.佣金计算过程中费用金额
-	            if (trdDetailDto.getFeeAmount() != null) {
-	                commFeeAmount = commFeeAmount.subtract(trdDetailDto.getFeeAmount());
-	            }
+
+//	            if (trdDetailDto.getListTrdTradeFeeDetailExtDto() != null && trdDetailDto.getListTrdTradeFeeDetailExtDto().size() > 0) {
+//	                for (TrdTradeFeeDetailExtDto trdTradeFeeDetailExtDto : trdDetailDto.getListTrdTradeFeeDetailExtDto()) {
+//	                    if (StringUtil.equals(trdTradeFeeDetailExtDto.getFeeType(), DictCodeListExt1.一次性费用类型_经手费.getValue())) {
+//	                        includeJsfAmt = trdTradeFeeDetailExtDto.getFeeAmount();
+//	                    }
+//	                    if (StringUtil.equals(trdTradeFeeDetailExtDto.getFeeType(), DictCodeListExt1.一次性费用类型_结算费.getValue())) {
+//	                        includeSettleFee = trdTradeFeeDetailExtDto.getFeeAmount();
+//	                    }
+//	                    if (StringUtil.equals(trdTradeFeeDetailExtDto.getFeeType(), DictCodeListExt1.一次性费用类型_证管费.getValue())) {
+//	                        includeZgfAmt = trdTradeFeeDetailExtDto.getFeeAmount();
+//	                    }
+//	                    if (StringUtil.equals(trdTradeFeeDetailExtDto.getFeeType(), DictCodeListExt1.一次性费用类型_过户费.getValue())) {
+//	                        includeGhfAmt = trdTradeFeeDetailExtDto.getFeeAmount();
+//	                    }
+//	                    if (StringUtil.equals(trdTradeFeeDetailExtDto.getFeeType(), DictCodeListExt1.一次性费用类型_印花税.getValue())) {
+//	                        includeStampFee = trdTradeFeeDetailExtDto.getFeeAmount();
+//	                    }
+//
+//	                }
+//	            }
+//	            // 变量.佣金费用金额 = 变量.佣金费用金额 - 变量.汇总交易.佣金计算过程中费用金额
+//	            if (trdDetailDto.getFeeAmount() != null) {
+//	                commFeeAmount = commFeeAmount.subtract(trdDetailDto.getFeeAmount());
+//	            }
 	            /*if (commFeeAmount != null) {
 	                commFeeAmount = limitResolve(calcParamDtos.get(0), commFeeAmount).setScale(2, RoundingMode.HALF_UP);
 	            }*/
@@ -662,20 +663,20 @@ public class TrdFeeCalcService {
 	                // 费率
 	                commissionCalcDetail.setFeeRate(calcParamDtos.get(0).getCalcRate());
 
-	                // 佣金包含经手费金额
-	                commissionCalcDetail.setIncludeJsfAmt(includeJsfAmt);
-
-	                //佣金包含结算费金额
-	                commissionCalcDetail.setIncludeSettleFee(includeSettleFee);
-
-	                // 佣金包含证管费金额
-	                commissionCalcDetail.setIncludeZgfAmt(includeZgfAmt);
-
-	                // 佣金包含过户费金额
-	                commissionCalcDetail.setIncludeGhfAmt(includeGhfAmt);
-
-	                // 佣金包含印花税金额
-	                commissionCalcDetail.setIncludeStampFee(includeStampFee);
+//	                // 佣金包含经手费金额
+//	                commissionCalcDetail.setIncludeJsfAmt(includeJsfAmt);
+//
+//	                //佣金包含结算费金额
+//	                commissionCalcDetail.setIncludeSettleFee(includeSettleFee);
+//
+//	                // 佣金包含证管费金额
+//	                commissionCalcDetail.setIncludeZgfAmt(includeZgfAmt);
+//
+//	                // 佣金包含过户费金额
+//	                commissionCalcDetail.setIncludeGhfAmt(includeGhfAmt);
+//
+//	                // 佣金包含印花税金额
+//	                commissionCalcDetail.setIncludeStampFee(includeStampFee);
 
 	                // 限额最大值
 	                commissionCalcDetail.setMaxQuotaAmt(calcParamDtos.get(0).getFeeMaxi());
@@ -683,7 +684,7 @@ public class TrdFeeCalcService {
 	                // 限额最小值
 	                commissionCalcDetail.setMinQuotaAmt(calcParamDtos.get(0).getFeeMini());
 
-	               //佣金金额
+	                // 佣金金额
 	                commissionCalcDetail.setCommissionAmt(commFeeAmount);
 
 	                // 批次号
@@ -694,7 +695,7 @@ public class TrdFeeCalcService {
 
 	            if (feePlan.getTrdFeeConfig().getCommCalMethod().equals(DictCodeListExt3.佣金计算方式_按成交编号计算.getValue())) {
 	                CommisionDetail commisionDetail = new CommisionDetail();
-	                //交易编号
+	                // 交易编号
 	                commisionDetail.setTradeId(trdDetailDto.getTradeId());
 	                // 费用类型
 	                commisionDetail.setFeeType(DictCodeListExt1.一次性费用类型_佣金.getValue());
@@ -702,6 +703,33 @@ public class TrdFeeCalcService {
 	                commisionDetail.setIsPayWithTrade(feePlan.getTrdFeeConfig().getIsPayWithTrade());
 	                // 费用金额
 	                commisionDetail.setFeeAmt(commFeeAmount);
+					// 变量.净佣金 = 变量.净佣金 + 费用金额
+					netCommFeeAmount = netCommFeeAmount.add(commFeeAmount);
+					// 循环 佣金需处理费用列表
+					log.debug("开始净佣金处理 => 【feeInfos = {}】,【listTrdTradeFeeDetailExtDtos = {}】,【netCommFeeAmount = {}】",
+							JsonUtils.object2Json(feeInfos),
+							JsonUtils.object2Json(trdDetailDto.getListTrdTradeFeeDetailExtDto()),
+							netCommFeeAmount);
+					for (FeeInfo feeInfo : feeInfos) {
+						// 循环  交易明细.交易费用明细表DTO
+						for (TrdTradeFeeDetailExtDto item :  trdDetailDto.getListTrdTradeFeeDetailExtDto()) {
+							if (StringUtil.equals(item.getFeeType(), feeInfo.getFeeType())) {
+								// 变量.净佣金 = 变量.净佣金 -变量.交易费用明细表.费用金额
+								netCommFeeAmount = netCommFeeAmount.subtract(item.getFeeAmt());
+								// 变量.交易费用明细表.费用金额 = 0
+								// item.setFeeAmt(BigDecimal.ZERO);
+								CommisionDetail commisionDetailNew = new CommisionDetail();
+								commisionDetailNew.setTradeId(trdDetailDto.getTradeId());
+								commisionDetailNew.setFeeType(item.getFeeType());
+								commisionDetailNew.setFeeAmt(null);
+								commisionDetailList.add(commisionDetailNew);
+							}
+						}
+					}
+					log.debug("完成净佣金处理 => 【netCommFeeAmount = {}】", netCommFeeAmount);
+					commisionDetail.setNetFeeAmt(netCommFeeAmount);
+					// 【出参】净佣金金额 =+ 变量.佣金费用金额
+					netCommfeeAmount = netCommfeeAmount.add(netCommFeeAmount);
 	                commisionDetailList.add(commisionDetail);
 	            }
 	            else if (feePlan.getTrdFeeConfig().getCommCalMethod().equals(DictCodeListExt3.佣金计算方式_按申请编号汇总.getValue())) {
@@ -739,6 +767,37 @@ public class TrdFeeCalcService {
 							commisionDetail.setIsPayWithTrade(feePlan.getTrdFeeConfig().getIsPayWithTrade());
 							// 费用金额
 							commisionDetail.setFeeAmt(detailAmount.getAllotAmountList()[0]);
+							// 变量.净佣金 = 变量.净佣金 + 费用金额
+							netCommFeeAmount = netCommFeeAmount.add(detailAmount.getAllotAmountList()[0]);
+							// 循环 佣金需处理费用列表
+							log.debug("开始净佣金处理 => 【feeInfos = {}】,【trdDetailDto = {}】,【detailAmount1 = {}】,【netCommFeeAmount = {}】",
+									JsonUtils.object2Json(feeInfos),
+									JsonUtils.object2Json(trdDetailDto),
+									JsonUtils.object2Json(detailAmount),
+									netCommFeeAmount);
+							for (FeeInfo feeInfo : feeInfos) {
+								// 循环  交易明细.交易费用明细表DTO
+								for (TrdTradeFeeDetailExtDto item :  trdDetailDto.getListTrdTradeFeeDetailExtDto()) {
+									// 变量.交易费用明细表.费用类型 = 变量.佣金计算过程中费用信息.费用类型
+									// and 变量.交易费用明细表.交易编号 = 返回值.交易编号
+									if (StringUtil.equals(item.getFeeType(), feeInfo.getFeeType())
+										&& StringUtil.equals(item.getTradeId(), detailAmount.getDetailNo())) {
+										// 变量.净佣金 = 变量.净佣金 -变量.交易费用明细表.费用金额
+										netCommFeeAmount = netCommFeeAmount.subtract(item.getFeeAmt());
+										// 变量.交易费用明细表.费用金额 = 0
+										// item.setFeeAmt(BigDecimal.ZERO);
+										CommisionDetail commisionDetailNew = new CommisionDetail();
+										commisionDetailNew.setTradeId(detailAmount.getDetailNo());
+										commisionDetailNew.setFeeType(item.getFeeType());
+										commisionDetailNew.setFeeAmt(null);
+										commisionDetailList.add(commisionDetailNew);
+									}
+								}
+							}
+							log.debug("完成净佣金处理 => 【netCommFeeAmount = {}】", netCommFeeAmount);
+							commisionDetail.setNetFeeAmt(netCommFeeAmount);
+							// 【出参】净佣金金额 =+ 变量.佣金费用金额
+							netCommfeeAmount = netCommfeeAmount.add(netCommFeeAmount);
 							commisionDetailList.add(commisionDetail);
 						}
 					}
@@ -768,6 +827,7 @@ public class TrdFeeCalcService {
 	            // 调用共通方法【金额平均分配】
                 List<DetailAmount> detailAmounts = amountEvenlyDistributed(amounts, jsjeFinId, allAllotAmounts, retentionBit);
                 for (DetailAmount detailAmount1 : detailAmounts) {
+					BigDecimal netCommFeeAmount = BigDecimal.ZERO;
                     CommisionDetail commisionDetail = new CommisionDetail();
                     //交易编号
                     commisionDetail.setTradeId(detailAmount1.getDetailNo());
@@ -777,15 +837,48 @@ public class TrdFeeCalcService {
                     commisionDetail.setIsPayWithTrade(feePlan.getTrdFeeConfig().getIsPayWithTrade());
                     // 费用金额
                     commisionDetail.setFeeAmt(detailAmount1.getAllotAmountList()[0]);
+					// 变量.净佣金 = 变量.净佣金 + 费用金额
+					netCommFeeAmount = netCommFeeAmount.add(detailAmount1.getAllotAmountList()[0]);
+					// 循环 佣金需处理费用列表
+					for (TrdDetailDto trdDetailDto : detailDtos) {
+						log.debug("开始净佣金处理 => 【feeInfos = {}】,【trdDetailDto = {}】,【detailAmount1 = {}】,【netCommFeeAmount = {}】",
+								JsonUtils.object2Json(feeInfos),
+								JsonUtils.object2Json(trdDetailDto),
+								JsonUtils.object2Json(detailAmount1),
+								netCommFeeAmount);
+						for (FeeInfo feeInfo : feeInfos) {
+							// 循环  交易明细.交易费用明细表DTO
+							for (TrdTradeFeeDetailExtDto item : trdDetailDto.getListTrdTradeFeeDetailExtDto()) {
+								// 变量.交易费用明细表.费用类型 = 变量.佣金计算过程中费用信息.费用类型
+								// and 变量.交易费用明细表.交易编号 = 返回值.交易编号
+								if (StringUtil.equals(item.getFeeType(), feeInfo.getFeeType())
+										&& StringUtil.equals(item.getTradeId(), detailAmount1.getDetailNo())) {
+									// 变量.净佣金 = 变量.净佣金 -变量.交易费用明细表.费用金额
+									netCommFeeAmount = netCommFeeAmount.subtract(item.getFeeAmt());
+									// 变量.交易费用明细表.费用金额 = 0
+									// item.setFeeAmt(BigDecimal.ZERO);
+									CommisionDetail commisionDetailNew = new CommisionDetail();
+									commisionDetailNew.setTradeId(detailAmount1.getDetailNo());
+									commisionDetailNew.setFeeType(item.getFeeType());
+									commisionDetailNew.setFeeAmt(null);
+									commisionDetailList.add(commisionDetailNew);
+								}
+							}
+						}
+						log.debug("完成净佣金处理 => 【netCommFeeAmount = {}】", netCommFeeAmount);
+					}
+					commisionDetail.setNetFeeAmt(netCommFeeAmount);
+					// 【出参】净佣金金额 =+ 变量.佣金费用金额
+					netCommfeeAmount = netCommfeeAmount.add(netCommFeeAmount);
                     commisionDetailList.add(commisionDetail);
                 }
             }
+			// endregion
 		}
-		
-        
 
         CommissionCalcDto res = new CommissionCalcDto();
 		res.setCommisionAmount(commfeeAmount.setScale(retentionBit, RoundingMode.HALF_UP));
+		res.setNetCommisionAmount(netCommfeeAmount.setScale(retentionBit, RoundingMode.HALF_UP));
 		res.setCommisionDetailList(commisionDetailList);
         res.setCommissionCalcDetailList(commissionCalcDetailList);
 		return res;
@@ -865,7 +958,7 @@ public class TrdFeeCalcService {
             BigDecimal remainBal = value;
             // 逐档金额 = 0
             BigDecimal gradeBal = BigDecimal.ZERO;
-            
+
             // 循环 【入参】费用方案.方案明细列表
             for (int i = 0 ; i < feePlan.getTrdFeeConfigDetails().size(); i ++ ){
                 TrdFeeConfigDetail detail = feePlan.getTrdFeeConfigDetails().get(i);
@@ -1134,6 +1227,7 @@ public class TrdFeeCalcService {
                 feeAmt = ArithmeticUtil.doAdd(feeAmt, trdTradeFeeDetailExtDto.getFeeAmt());
                 feeAmount = ArithmeticUtil.doAdd(feeAmount, trdTradeFeeDetailExtDto.getFeeAmount());
             }
+			dto.setTradeId(y.get(0).getTradeId());
             /*y.forEach(trdTradeFeeDetailExtDto -> {
                 feeAmt.add(trdTradeFeeDetailExtDto.getFeeAmt());
                 feeAmount.add(trdTradeFeeDetailExtDto.getFeeAmount());

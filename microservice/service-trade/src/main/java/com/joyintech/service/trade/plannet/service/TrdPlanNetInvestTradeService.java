@@ -849,6 +849,9 @@ public class TrdPlanNetInvestTradeService extends BaseService<TrdPlanNetInvestTr
         cashT = com.joyintech.calculation.util.ArithmeticUtil.doAdd(cashT, cashT0_new);
         result.put("cashT", cashT);
 
+        cashT2 = com.joyintech.calculation.util.ArithmeticUtil.doAdd(cashT2, cashT0_new);
+        result.put("cashT2", cashT2);
+
         if (StringUtil.isNotEmpty(param.get("chlId"))) {
             dto.setNeedAcctType(false);
             dto.setChlFinprodId((String)param.get("chlId"));

@@ -1,21 +1,20 @@
 package com.joyintech.tams.settle.batch.datadeal.service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.google.common.collect.Lists;
 import com.joyintech.framework.JoyinRestTemplate;
+import com.joyintech.framework.util.*;
 import com.joyintech.tams.common.base.dao.FinProductTypeMapper;
 import com.joyintech.tams.common.base.entity.FinProductType;
 import com.joyintech.tams.common.base.entity.FinProductTypeKey;
 import com.joyintech.tams.common.base.entity.SettleTransData;
 import com.joyintech.tams.constant.*;
 import com.joyintech.tams.invest.common.constant.ServiceApplication;
+import com.joyintech.tams.settle.common.dto.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,26 +22,17 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.joyintech.framework.util.ArithmeticUtil;
-import com.joyintech.framework.util.DateUtil;
-import com.joyintech.framework.util.IDGenerator;
-import com.joyintech.framework.util.StringUtil;
 import com.joyintech.tams.common.base.entity.CommissionCaclProcess;
 import com.joyintech.tams.settle.batch.datadeal.constant.StlDataDealProcessConstant;
 import com.joyintech.tams.settle.batch.datadeal.dao.StlDownDataDealMapper;
 import com.joyintech.tams.settle.batch.datadeal.dto.StlDownDataDealOperatorDto;
 import com.joyintech.tams.settle.batch.datadeal.dto.StlDownDataDealWriteDto;
 import com.joyintech.tams.settle.batch.datadeal.dto.step2.StlDownDataDealWriteBaseDto;
-import com.joyintech.tams.settle.common.dto.CommisionDetail;
-import com.joyintech.tams.settle.common.dto.CommissionCalcDetail;
-import com.joyintech.tams.settle.common.dto.CommissionCalcDto;
-import com.joyintech.tams.settle.common.dto.TradeFeatureInformation;
-import com.joyintech.tams.settle.common.dto.TrdDetailDto;
 import com.joyintech.tams.settle.common.service.TrdFeeCalcService;
 
 /**
  * 数据清算step2 processor 共通Service
- * 
+ *
  * @author 陈卓
  * @date 2020/7/9
  * @see StlDataDealProcessCommonService
@@ -51,10 +41,12 @@ import com.joyintech.tams.settle.common.service.TrdFeeCalcService;
 @Service
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class StlDataDealProcessCommonService {
-	
+
+	private static final Logger log = LoggerFactory.getLogger(StlDataDealProcessCommonService.class);
+
 	@Autowired
     protected StlDownDataDealMapper stlDownDataDealMapper;
-	
+
 	@Autowired
     protected TrdFeeCalcService trdFeeCalcService;
 
@@ -102,7 +94,7 @@ public class StlDataDealProcessCommonService {
 		}
 		return DictCodeList.币种_人民币_CNY.getValue();
 	}
-	
+
 	// 交易平台取得
 	public String getTradePlat(String jsfs) {
 		// 普通交易-撮合交易平台
@@ -147,7 +139,7 @@ public class StlDataDealProcessCommonService {
 		}
 		return DictCodeList.交易平台_竞价撮合平台.getValue();
 	}
-	
+
 	// 交收方式取得
 	public String getSettleMode(String jsfs) {
 		if (StringUtil.equals(StlDataDealProcessConstant.JSFS_001, jsfs) || StringUtil.equals(StlDataDealProcessConstant.SJSMX_JSFS_A, jsfs) || StringUtil.equals(StlDataDealProcessConstant.SJSMX_JSFS_Y, jsfs)) {
@@ -176,7 +168,7 @@ public class StlDataDealProcessCommonService {
 		return DictCodeListExt4.交收结果_交收失败.getValue();
 	}
 
-	
+
 	// 获取下个工作日
 	public Date getNextWorkDay(Date nowday, String calendarId) {
 		return stlDownDataDealMapper.getNextWorkDay(nowday, calendarId);
@@ -199,12 +191,12 @@ public class StlDataDealProcessCommonService {
 	public Date getBeforeWorkDay(Date nowday, String calendarId) {
 		return stlDownDataDealMapper.getBeforeWorkDay(nowday, calendarId);
 	}
-    
+
     // 删除【成交数据与投管交易关系】
     public int deleteSettleBatchPara(Date dealDate, List<String> portfolioIdList, List<String> secTypeList) {
     	return stlDownDataDealMapper.deleteSettleBatchPara(dealDate, portfolioIdList, secTypeList);
     }
-	
+
 	// 佣金计算
 	public StlDownDataDealWriteDto calcCommsionAmt(StlDownDataDealOperatorDto stlDownDataDealOperatorDto, StlDownDataDealWriteDto stlDownDataDealWriteDto) {
 		// 小数位数
@@ -287,86 +279,14 @@ public class StlDataDealProcessCommonService {
 					tradeFeatureInformation.setRepoType(keyStrArray[10]);
 				}
 				// add by etliu 20220104 end
-				List<TrdDetailDto> detailDtos = new ArrayList<TrdDetailDto>();
-				for (StlDownDataDealWriteBaseDto stlDownDataDealWriteBaseDto : list) {
-					// 无需计算佣金场景跳过
-					if(NO_NEED_CALCULATE_COMMISSION_LIST.contains(stlDownDataDealWriteBaseDto.getSettleTransData().getBusiSceneCalss())){
-						continue;
-					}
-					TrdDetailDto trdDetailDto = new TrdDetailDto();
-					// 交易日期
-					trdDetailDto.setTradeDate(stlDownDataDealWriteBaseDto.getSettleTransData().getTradeDate());
-					// 金融产品代码
-					trdDetailDto.setFinprodId(stlDownDataDealWriteBaseDto.getSettleTransData().getFinprodId());
-					// 证券账户代码
-					trdDetailDto.setSecManageAcctId(stlDownDataDealWriteBaseDto.getSettleTransData().getSecAcctId());
-					// 交易场所
-					trdDetailDto.setTradeMarket(stlDownDataDealWriteBaseDto.getSettleTransData().getTradeMarket());
-					// 交易平台
-					trdDetailDto.setTradePlat(stlDownDataDealWriteBaseDto.getSettleTransData().getTradePlat());
-
-					// add by etliu 20220118 start
-					// GZYHTZJY-1080: 【场内对账清结算1231】深交所协议回购 逆回购首期佣金没有计算出来，正回购到期续作佣金计算有误【解决日期：2022-01-12】
-					boolean fpriceAmtBeSet = false;
-					// add by etliu 20220118 end
-					
-					String busiSceneCalss = stlDownDataDealWriteBaseDto.getSettleTransData().getBusiSceneCalss();
-					if ((StringUtil.equals(busiSceneCalss,DictCodeListStl.业务场景分类明细_债券协议正回购_到期续作.getValue()) ||
-							StringUtil.equals(busiSceneCalss,DictCodeListStl.业务场景分类明细_债券协议正回购_首期_买入.getValue())) /*&&
-						BigDecimal.ZERO.compareTo(stlDownDataDealWriteBaseDto.getSettleTransData().getPrinAmt()) < 0*/){
-						// 交易方向
-						trdDetailDto.setPs(DictCodeListExt3.交易方向_正回购.getValue());
-						// add by etliu 20220118 start
-						// GZYHTZJY-1080: 【场内对账清结算1231】深交所协议回购 逆回购首期佣金没有计算出来，正回购到期续作佣金计算有误【解决日期：2022-01-12】
-						trdDetailDto.setFpriceAmt(stlDownDataDealWriteBaseDto.getSettleTransData().getShareAmt());
-						fpriceAmtBeSet = true;
-						// add by etliu 20220118 end
-					}else if ((StringUtil.equals(busiSceneCalss,DictCodeListStl.业务场景分类明细_债券协议逆回购_到期续作.getValue()) ||
-								StringUtil.equals(busiSceneCalss,DictCodeListStl.业务场景分类明细_债券协议逆回购_首期_买入.getValue())) /*&&
-							BigDecimal.ZERO.compareTo(stlDownDataDealWriteBaseDto.getSettleTransData().getPrinAmt()) > 0*/){
-						// 交易方向
-						trdDetailDto.setPs(DictCodeListExt3.交易方向_逆回购.getValue());
-						// add by etliu 20220118 start
-						// GZYHTZJY-1080: 【场内对账清结算1231】深交所协议回购 逆回购首期佣金没有计算出来，正回购到期续作佣金计算有误【解决日期：2022-01-12】
-						trdDetailDto.setFpriceAmt(stlDownDataDealWriteBaseDto.getSettleTransData().getShareAmt());
-						fpriceAmtBeSet = true;
-						// add by etliu 20220118 end
-					}else {
-						// 交易方向
-						trdDetailDto.setPs(stlDownDataDealWriteBaseDto.getSettleTransData().getPs());	
-					}
-					
-					// 期限品种
-					trdDetailDto.setTermType(stlDownDataDealWriteBaseDto.getSettleTransData().getTermType());
-
-					// add by etliu 20220118 start
-					// GZYHTZJY-1080: 【场内对账清结算1231】深交所协议回购 逆回购首期佣金没有计算出来，正回购到期续作佣金计算有误【解决日期：2022-01-12】
-//					// 全价总额
-//					trdDetailDto.setFpriceAmt(stlDownDataDealWriteBaseDto.getSettleTransData().getFpriceAmt());
-					if (!fpriceAmtBeSet) {
-						// 全价总额
-						trdDetailDto.setFpriceAmt(stlDownDataDealWriteBaseDto.getSettleTransData().getFpriceAmt());
-					}
-					// add by etliu 20220118 end
-
-					// 交易份额
-					trdDetailDto.setShareAmt(stlDownDataDealWriteBaseDto.getSettleTransData().getShareAmt());
-					// 申请编号
-					trdDetailDto.setApplyTradeId(stlDownDataDealWriteBaseDto.getSettleTransData().getApplyTradeId());
-					// 成交编号
-					trdDetailDto.setTradeId(stlDownDataDealWriteBaseDto.getSettleTransData().getTradeId());
-					// 净价总额
-					trdDetailDto.setCpriceAmt(stlDownDataDealWriteBaseDto.getSettleTransData().getCpriceAmt());
-					// 利息总额
-					trdDetailDto.setIntAmt(stlDownDataDealWriteBaseDto.getSettleTransData().getIntAmt());
-					// 交易本金
-					trdDetailDto.setPrinAmt(stlDownDataDealWriteBaseDto.getSettleTransData().getPrinAmt());
-					// BRANCH
-					trdDetailDto.setBranch(stlDownDataDealWriteBaseDto.getSettleTransData().getBranch());
-					detailDtos.add(trdDetailDto);
-				}
+				log.debug("开始交易明细组装");
+				List<TrdDetailDto> detailDtos = createTrdDetailDtoList(list);
+				log.debug("完成交易明细组装 => 【{}】", JsonUtils.object2Json(detailDtos));
 				// 设置成交数据List
 				for (StlDownDataDealWriteBaseDto stlDownDataDealWriteBaseDto : map.get(key)) {
+					//处理费用 为NULL时 置0
+					handleStlDownDataDealWriteBaseDtoFee(stlDownDataDealWriteBaseDto);
+
 					result.getStlDownDataDealWriteBaseDtoList().add(stlDownDataDealWriteBaseDto);
 				}
 				commissionCalcDto = trdFeeCalcService.calcWayCommon(detailDtos, tradeFeatureInformation, retentionBit, batch, isAlloc, tradeType);
@@ -416,6 +336,7 @@ public class StlDataDealProcessCommonService {
 							if (StringUtil.equals(commisionDetail.getTradeId(), stlDownDataDealWriteBaseDto.getSettleTransData().getTradeId())) {
 								stlDownDataDealWriteBaseDto.getSettleTransData().setBatchNumber(batch);
 								if (StringUtil.equals(commisionDetail.getFeeType(), DictCodeListExt1.一次性费用类型_佣金.getValue())){
+									stlDownDataDealWriteBaseDto.getSettleTransData().setNetCommissionAmt(commisionDetail.getNetFeeAmt());
 									stlDownDataDealWriteBaseDto.getSettleTransData().setCommissionAmt(commisionDetail.getFeeAmt());
 									stlDownDataDealWriteBaseDto.getSettleTransData().setCommissionAmtRaw(commisionDetail.getFeeAmt());
 									stlDownDataDealWriteBaseDto.getSettleTransData().setIsPayWithTrade(commisionDetail.getIsPayWithTrade());
@@ -438,24 +359,8 @@ public class StlDataDealProcessCommonService {
 									else{
 										feeMap.put(commisionDetail.getTradeId(), Arrays.asList(commisionDetail.getFeeType()));
 									}
-									if (StringUtil.equals(commisionDetail.getFeeType(), DictCodeListExt1.一次性费用类型_经手费.getValue())){
-										stlDownDataDealWriteBaseDto.getSettleTransData().setJsfAmt(commisionDetail.getFeeAmt());
-									}
-									else if (StringUtil.equals(commisionDetail.getFeeType(), DictCodeListExt1.一次性费用类型_过户费.getValue())){
-										stlDownDataDealWriteBaseDto.getSettleTransData().setGhfAmt(commisionDetail.getFeeAmt());
-									}
-									else if (StringUtil.equals(commisionDetail.getFeeType(), DictCodeListExt1.一次性费用类型_证管费.getValue())){
-										stlDownDataDealWriteBaseDto.getSettleTransData().setZgfAmt(commisionDetail.getFeeAmt());
-									}
-									else if (StringUtil.equals(commisionDetail.getFeeType(), DictCodeListExt1.一次性费用类型_交易手续费.getValue())){
-										stlDownDataDealWriteBaseDto.getSettleTransData().setSxfAmt(commisionDetail.getFeeAmt());
-									}
-									else if (StringUtil.equals(commisionDetail.getFeeType(), DictCodeListExt1.一次性费用类型_结算费.getValue())){
-										stlDownDataDealWriteBaseDto.getSettleTransData().setSettleFee(commisionDetail.getFeeAmt());
-									}
-									else if (StringUtil.equals(commisionDetail.getFeeType(), DictCodeListExt1.一次性费用类型_印花税.getValue())){
-										stlDownDataDealWriteBaseDto.getSettleTransData().setStampFee(commisionDetail.getFeeAmt());
-									}
+
+									updateChargeByType(commisionDetail, stlDownDataDealWriteBaseDto);
 								}
 							}
 						}
@@ -466,33 +371,33 @@ public class StlDataDealProcessCommonService {
 
 		for (StlDownDataDealWriteBaseDto stlDownDataDealWriteBaseDto : result.getStlDownDataDealWriteBaseDtoList()) {
 			// 表示有券商承担的费用
-			if (feeMap.containsKey(stlDownDataDealWriteBaseDto.getSettleTransData().getTradeId())){
-				List<String> feeTypeList = feeMap.get(stlDownDataDealWriteBaseDto.getSettleTransData().getTradeId());
-
-				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_经手费.getValue())){
-					stlDownDataDealWriteBaseDto.getSettleTransData().setJsfAmt(null);
-				}
-				// else
-				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_过户费.getValue())){
-					stlDownDataDealWriteBaseDto.getSettleTransData().setGhfAmt(null);
-				}
-				// else
-				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_证管费.getValue())){
-					stlDownDataDealWriteBaseDto.getSettleTransData().setZgfAmt(null);
-				}
-				// else
-				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_交易手续费.getValue())){
-					stlDownDataDealWriteBaseDto.getSettleTransData().setSxfAmt(null);
-				}
-				// else
-				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_结算费.getValue())){
-					stlDownDataDealWriteBaseDto.getSettleTransData().setSettleFee(null);
-				}
-				// else
-				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_印花税.getValue())){
-					stlDownDataDealWriteBaseDto.getSettleTransData().setStampFee(null);
-				}
-			}
+//			if (feeMap.containsKey(stlDownDataDealWriteBaseDto.getSettleTransData().getTradeId())){
+//				List<String> feeTypeList = feeMap.get(stlDownDataDealWriteBaseDto.getSettleTransData().getTradeId());
+//
+//				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_经手费.getValue())){
+//					stlDownDataDealWriteBaseDto.getSettleTransData().setJsfAmt(null);
+//				}
+//				// else
+//				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_过户费.getValue())){
+//					stlDownDataDealWriteBaseDto.getSettleTransData().setGhfAmt(null);
+//				}
+//				// else
+//				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_证管费.getValue())){
+//					stlDownDataDealWriteBaseDto.getSettleTransData().setZgfAmt(null);
+//				}
+//				// else
+//				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_交易手续费.getValue())){
+//					stlDownDataDealWriteBaseDto.getSettleTransData().setSxfAmt(null);
+//				}
+//				// else
+//				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_结算费.getValue())){
+//					stlDownDataDealWriteBaseDto.getSettleTransData().setSettleFee(null);
+//				}
+//				// else
+//				if (!feeTypeList.contains(DictCodeListExt1.一次性费用类型_印花税.getValue())){
+//					stlDownDataDealWriteBaseDto.getSettleTransData().setStampFee(null);
+//				}
+//			}
 			// 一次性费用都是随交易支付的
 			if (!StringUtil.equals(DictCodeListExt1.证券品种_回购.getValue(), tradeType)) {
 				if (StringUtil.equals(stlDownDataDealWriteBaseDto.getSettleTransData().getPs(), DictCodeList.交易方向_买入.getValue())){
@@ -529,7 +434,160 @@ public class StlDataDealProcessCommonService {
 		}
 		return result;
 	}
-	
+
+	/**
+	 * 根据费用类型更新费用值
+	 * @param commisionDetail
+	 * @param stlDownDataDealWriteBaseDto
+	 */
+	private void updateChargeByType(CommisionDetail commisionDetail, StlDownDataDealWriteBaseDto stlDownDataDealWriteBaseDto) {
+		SettleTransData settleTransData = stlDownDataDealWriteBaseDto.getSettleTransData();
+		if (StringUtil.equals(commisionDetail.getFeeType(), DictCodeListExt1.一次性费用类型_经手费.getValue())){
+			settleTransData.setJsfAmt(commisionDetail.getFeeAmt());
+		}
+		else if (StringUtil.equals(commisionDetail.getFeeType(), DictCodeListExt1.一次性费用类型_过户费.getValue())){
+			settleTransData.setGhfAmt(commisionDetail.getFeeAmt());
+		}
+		else if (StringUtil.equals(commisionDetail.getFeeType(), DictCodeListExt1.一次性费用类型_证管费.getValue())){
+			settleTransData.setZgfAmt(commisionDetail.getFeeAmt());
+		}
+		else if (StringUtil.equals(commisionDetail.getFeeType(), DictCodeListExt1.一次性费用类型_交易手续费.getValue())){
+			settleTransData.setSxfAmt(commisionDetail.getFeeAmt());
+		}
+		else if (StringUtil.equals(commisionDetail.getFeeType(), DictCodeListExt1.一次性费用类型_结算费.getValue())){
+			settleTransData.setSettleFee(commisionDetail.getFeeAmt());
+		}
+		else if (StringUtil.equals(commisionDetail.getFeeType(), DictCodeListExt1.一次性费用类型_印花税.getValue())){
+			settleTransData.setStampFee(commisionDetail.getFeeAmt());
+		}
+	}
+
+	/**
+	 * 组装交易明细列表
+	 * @param list
+	 * @return
+	 */
+	private List<TrdDetailDto> createTrdDetailDtoList(List<StlDownDataDealWriteBaseDto> list) {
+		List<TrdDetailDto> detailDtos = Lists.newArrayListWithExpectedSize(list.size());
+		TrdDetailDto trdDetailDto = null;
+		for (StlDownDataDealWriteBaseDto stlDownDataDealWriteBaseDto : list) {
+			// 无需计算佣金场景跳过
+			SettleTransData settleTransData = stlDownDataDealWriteBaseDto.getSettleTransData();
+			if(NO_NEED_CALCULATE_COMMISSION_LIST.contains(settleTransData.getBusiSceneCalss())){
+				continue;
+			}
+			trdDetailDto = new TrdDetailDto();
+			// 交易日期
+			trdDetailDto.setTradeDate(settleTransData.getTradeDate());
+			// 金融产品代码
+			trdDetailDto.setFinprodId(settleTransData.getFinprodId());
+			// 证券账户代码
+			trdDetailDto.setSecManageAcctId(settleTransData.getSecAcctId());
+			// 交易场所
+			trdDetailDto.setTradeMarket(settleTransData.getTradeMarket());
+			// 交易平台
+			trdDetailDto.setTradePlat(settleTransData.getTradePlat());
+
+			// add by etliu 20220118 start
+			// GZYHTZJY-1080: 【场内对账清结算1231】深交所协议回购 逆回购首期佣金没有计算出来，正回购到期续作佣金计算有误【解决日期：2022-01-12】
+			boolean fpriceAmtBeSet = false;
+			// add by etliu 20220118 end
+
+			String busiSceneCalss = settleTransData.getBusiSceneCalss();
+			if ((StringUtil.equals(busiSceneCalss,DictCodeListStl.业务场景分类明细_债券协议正回购_到期续作.getValue()) ||
+					StringUtil.equals(busiSceneCalss,DictCodeListStl.业务场景分类明细_债券协议正回购_首期_买入.getValue())) /*&&
+				BigDecimal.ZERO.compareTo(stlDownDataDealWriteBaseDto.getSettleTransData().getPrinAmt()) < 0*/){
+				// 交易方向
+				trdDetailDto.setPs(DictCodeListExt3.交易方向_正回购.getValue());
+				// add by etliu 20220118 start
+				// GZYHTZJY-1080: 【场内对账清结算1231】深交所协议回购 逆回购首期佣金没有计算出来，正回购到期续作佣金计算有误【解决日期：2022-01-12】
+				trdDetailDto.setFpriceAmt(settleTransData.getShareAmt());
+				fpriceAmtBeSet = true;
+				// add by etliu 20220118 end
+			}else if ((StringUtil.equals(busiSceneCalss,DictCodeListStl.业务场景分类明细_债券协议逆回购_到期续作.getValue()) ||
+						StringUtil.equals(busiSceneCalss,DictCodeListStl.业务场景分类明细_债券协议逆回购_首期_买入.getValue())) /*&&
+					BigDecimal.ZERO.compareTo(stlDownDataDealWriteBaseDto.getSettleTransData().getPrinAmt()) > 0*/){
+				// 交易方向
+				trdDetailDto.setPs(DictCodeListExt3.交易方向_逆回购.getValue());
+				// add by etliu 20220118 start
+				// GZYHTZJY-1080: 【场内对账清结算1231】深交所协议回购 逆回购首期佣金没有计算出来，正回购到期续作佣金计算有误【解决日期：2022-01-12】
+				trdDetailDto.setFpriceAmt(settleTransData.getShareAmt());
+				fpriceAmtBeSet = true;
+				// add by etliu 20220118 end
+			}else {
+				// 交易方向
+				trdDetailDto.setPs(settleTransData.getPs());
+			}
+
+			// 期限品种
+			trdDetailDto.setTermType(settleTransData.getTermType());
+
+			// add by etliu 20220118 start
+			// GZYHTZJY-1080: 【场内对账清结算1231】深交所协议回购 逆回购首期佣金没有计算出来，正回购到期续作佣金计算有误【解决日期：2022-01-12】
+//					// 全价总额
+//					trdDetailDto.setFpriceAmt(stlDownDataDealWriteBaseDto.getSettleTransData().getFpriceAmt());
+			if (!fpriceAmtBeSet) {
+				// 全价总额
+				trdDetailDto.setFpriceAmt(settleTransData.getFpriceAmt());
+			}
+			// add by etliu 20220118 end
+
+			// 交易份额
+			trdDetailDto.setShareAmt(settleTransData.getShareAmt());
+			// 申请编号
+			trdDetailDto.setApplyTradeId(settleTransData.getApplyTradeId());
+			// 成交编号
+			trdDetailDto.setTradeId(settleTransData.getTradeId());
+			// 净价总额
+			trdDetailDto.setCpriceAmt(settleTransData.getCpriceAmt());
+			// 利息总额
+			trdDetailDto.setIntAmt(settleTransData.getIntAmt());
+			// 交易本金
+			trdDetailDto.setPrinAmt(settleTransData.getPrinAmt());
+			// BRANCH
+			trdDetailDto.setBranch(settleTransData.getBranch());
+			List<TrdTradeFeeDetailExtDto> extDtoList = Lists.newArrayList();
+			trdDetailDto.setListTrdTradeFeeDetailExtDto(extDtoList);
+			if (this.bigThanZero(settleTransData.getJsfAmtRaw())) {
+				TrdTradeFeeDetailExtDto trdTradeFeeDetailExtDto = new TrdTradeFeeDetailExtDto();
+				trdTradeFeeDetailExtDto.setFeeAmt(settleTransData.getJsfAmtRaw());
+				trdTradeFeeDetailExtDto.setFeeType(DictCodeListExt1.一次性费用类型_经手费.getValue());
+				trdTradeFeeDetailExtDto.setTradeId(settleTransData.getTradeId());
+				extDtoList.add(trdTradeFeeDetailExtDto);
+			}
+			if (this.bigThanZero(settleTransData.getStampFeeRaw())) {
+				TrdTradeFeeDetailExtDto trdTradeFeeDetailExtDto = new TrdTradeFeeDetailExtDto();
+				trdTradeFeeDetailExtDto.setFeeAmt(settleTransData.getStampFeeRaw());
+				trdTradeFeeDetailExtDto.setFeeType(DictCodeListExt1.一次性费用类型_印花税.getValue());
+				trdTradeFeeDetailExtDto.setTradeId(settleTransData.getTradeId());
+				extDtoList.add(trdTradeFeeDetailExtDto);
+			}
+			if (this.bigThanZero(settleTransData.getZgfAmtRaw())) {
+				TrdTradeFeeDetailExtDto trdTradeFeeDetailExtDto = new TrdTradeFeeDetailExtDto();
+				trdTradeFeeDetailExtDto.setFeeAmt(settleTransData.getZgfAmtRaw());
+				trdTradeFeeDetailExtDto.setFeeType(DictCodeListExt1.一次性费用类型_证管费.getValue());
+				trdTradeFeeDetailExtDto.setTradeId(settleTransData.getTradeId());
+				extDtoList.add(trdTradeFeeDetailExtDto);
+			}
+			if (this.bigThanZero(settleTransData.getGhfAmtRaw())) {
+				TrdTradeFeeDetailExtDto trdTradeFeeDetailExtDto = new TrdTradeFeeDetailExtDto();
+				trdTradeFeeDetailExtDto.setFeeAmt(settleTransData.getGhfAmtRaw());
+				trdTradeFeeDetailExtDto.setFeeType(DictCodeListExt1.一次性费用类型_过户费.getValue());
+				trdTradeFeeDetailExtDto.setTradeId(settleTransData.getTradeId());
+				extDtoList.add(trdTradeFeeDetailExtDto);
+			}
+			if (this.bigThanZero(settleTransData.getSettleFeeRaw())) {
+				TrdTradeFeeDetailExtDto trdTradeFeeDetailExtDto = new TrdTradeFeeDetailExtDto();
+				trdTradeFeeDetailExtDto.setFeeAmt(settleTransData.getSettleFeeRaw());
+				trdTradeFeeDetailExtDto.setFeeType(DictCodeListExt1.一次性费用类型_结算费.getValue());
+				trdTradeFeeDetailExtDto.setTradeId(settleTransData.getTradeId());
+				extDtoList.add(trdTradeFeeDetailExtDto);
+			}
+			detailDtos.add(trdDetailDto);
+		}
+		return detailDtos;
+	}
+
 	// 获取组合的收益类型
 	public String getPortfolioProfitType(String portfolioId) {
 		List<String> result = stlDownDataDealMapper.getPortfolioProfitType(portfolioId);
@@ -611,5 +669,67 @@ public class StlDataDealProcessCommonService {
 			return Integer.parseInt("182");
 		}
 		return Integer.parseInt("0");
+	}
+
+	private boolean bigThan(BigDecimal d, BigDecimal decimal) {
+		if (Objects.nonNull(d) && Objects.nonNull(decimal)) {
+			return d.compareTo(decimal) == 1;
+		} else {
+			return false;
+		}
+	}
+
+	private boolean bigThanZero(BigDecimal d) {
+		if (Objects.nonNull(d)) {
+			return d.compareTo(BigDecimal.ZERO) == 1;
+		} else {
+			return false;
+		}
+	}
+
+	private void handleStlDownDataDealWriteBaseDtoFee(StlDownDataDealWriteBaseDto stlDownDataDealWriteBaseDto) {
+		SettleTransData settleTransData = stlDownDataDealWriteBaseDto.getSettleTransData();
+
+		if (null == settleTransData.getJsfAmt()) {
+			settleTransData.setJsfAmt(BigDecimal.ZERO);
+		}
+		if (null == settleTransData.getJsfAmtRaw()) {
+			settleTransData.setJsfAmtRaw(BigDecimal.ZERO);
+		}
+
+		if (null == settleTransData.getGhfAmt()) {
+			settleTransData.setGhfAmt(BigDecimal.ZERO);
+		}
+		if (null == settleTransData.getGhfAmtRaw()) {
+			settleTransData.setGhfAmtRaw(BigDecimal.ZERO);
+		}
+
+		if (null == settleTransData.getZgfAmt()) {
+			settleTransData.setZgfAmt(BigDecimal.ZERO);
+		}
+		if (null == settleTransData.getZgfAmtRaw()) {
+			settleTransData.setZgfAmtRaw(BigDecimal.ZERO);
+		}
+
+		if (null == settleTransData.getSxfAmt()) {
+			settleTransData.setSxfAmt(BigDecimal.ZERO);
+		}
+		if (null == settleTransData.getSxfAmtRaw()) {
+			settleTransData.setSxfAmtRaw(BigDecimal.ZERO);
+		}
+
+		if (null == settleTransData.getSettleFee()) {
+			settleTransData.setSettleFee(BigDecimal.ZERO);
+		}
+		if (null == settleTransData.getSettleFeeRaw()) {
+			settleTransData.setSettleFeeRaw(BigDecimal.ZERO);
+		}
+
+		if (null == settleTransData.getStampFee()) {
+			settleTransData.setStampFee(BigDecimal.ZERO);
+		}
+		if (null == settleTransData.getStampFeeRaw()) {
+			settleTransData.setStampFeeRaw(BigDecimal.ZERO);
+		}
 	}
 }

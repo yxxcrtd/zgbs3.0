@@ -80,7 +80,7 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
             // Date mdate2 = settleTransDataDtos.get(0).getMdate2();
             List<PtlSecPosition> ptlSecPositions = Lists.newArrayList();
             // if(null != mdate2){
-                param.put("dealDate", DateUtil.parse(DateUtil.getYesterDayDate(executeDate)));
+                param.put("dealDate", executeDate);
                 // ZGZGST-4216: 查询持仓时日期使用当日持仓 fuyongsheng 20211214 modify end
                 param.put("hodingType",DictCodeList.持仓类型_实际.getValue());
                 // ZGTFCP-1363:通过开关控制查询新老头寸,默认查询新头寸 modify by fuyongsheng 20220321 start
@@ -103,6 +103,10 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
                 }
                 // ZGTFCP-1363:通过开关控制查询新老头寸,默认查询新头寸 modify by fuyongsheng 20220321 end
             // }
+            // 查询当日回售交易持仓
+            List<PtlSecPosition> curDayPutTradePositions = stlDataGatherMapper.getCurDayPutTradePosition(param);
+            // 存续期持仓=当日持仓余额+当日回售交易持仓
+            ptlSecPositions.addAll(curDayPutTradePositions);
             //按 金融产品代码+证券账户 分组
             Map<String,List<PtlSecPosition> > finprodIdMap = new HashMap<>();
             if(CollectionUtils.isNotEmpty(ptlSecPositions)) {
@@ -115,6 +119,8 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
                 if(!finprodIdMap.containsKey(settleKey)){
                     continue;
                 }
+                // 查询持仓的投资目的
+                String invAim = this.getPositionInvAim(settleTransData, executeDate);
                 // ZGCPCN-1527:必须当日有持仓才会生成交易相关数据 modify by fuyongsheng 20220620 end
                 // GNS-860:还原债券存续期 modify by fuyongsheng 20220214 start
                handTrdProductDeal(Collections.singletonList(settleTransData));
@@ -144,6 +150,7 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
                 // modify by etliu 20220227 end
 
                 createTotalDeal(totalTrdProductDealDto,settleTransData);
+                totalTrdProductDealDto.setInvAim(invAim);
                 // finProductDealTotalList.add(totalTrdProductDealDto);
                totalProductDealList.add(totalTrdProductDealDto);
                //投管交易关系
@@ -191,6 +198,7 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
                         // modify by etliu 20220227 end
 
                         createTotalDeal(totalTrdProductDealDtoDetaile, settleTransData);
+                        totalTrdProductDealDtoDetaile.setInvAim(invAim);
                         totalProductDealList.add(totalTrdProductDealDtoDetaile);
                         //划款指令
                         stlPayOrdersList.add(createStlPayOrders(totalTrdProductDealDtoDetaile, settleTransData.getAcctNo()));
@@ -215,7 +223,7 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
 
                             // modify by etliu 20220227 start
                             // 广农商二阶段 GNS-975：【广农商场内清算】场内债券存续期-行权赎回交易生成时，处理相关头寸有误
-                            trdProductDeal.setInvAim(ptlSecPosition.getInvAim());
+                            trdProductDeal.setInvAim(invAim);
                             // modify by etliu 20220227 end
 
                             TrdProductDealAdd trdProductDealAdd = new TrdProductDealAdd();
@@ -291,6 +299,25 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
             investTradeWriteDto.setSecType(DictCodeListExt1.证券品种_债券.getValue());
         }
         return investTradeWriteDto;
+    }
+
+    /**
+     * 获取投资目的
+     * @param settleTransData
+     * @param executeDate
+     * @return
+     */
+    private String getPositionInvAim(SettleTransDataDto settleTransData, Date executeDate){
+        String invAim = null;
+        Map<String,Object> invAimParam = new HashMap<>();
+        invAimParam.put("dealDate", executeDate);
+        invAimParam.put("finProductId",settleTransData.getFinprodId());
+        invAimParam.put("secManageAcctId",settleTransData.getSecAcctId());
+        List<PtlSecPosition> invAimPtlSecPositions = stlDataGatherMapper.searchPtlSecPositionList(invAimParam);
+        if(CollectionUtils.isNotEmpty(invAimPtlSecPositions)){
+            invAim = invAimPtlSecPositions.get(0).getInvAim();
+        }
+        return invAim;
     }
 
     /**

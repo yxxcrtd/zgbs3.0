@@ -9,6 +9,8 @@
  */
 package com.joyintech.tams.settle.common.service;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.base.BaseDictCodeList;
 import com.joyintech.tams.common.base.dao.FinProductMapper;
@@ -87,6 +89,27 @@ public class SettleCommonService {
 					valueList.add(stlDownDataDealAccountInfoDto);
 					map.put(key, valueList);
 				}
+			}
+		}
+		return map;
+	}
+
+	/**
+	 * 数据清算附属信息（核算信息）全量获取
+	 * key - 证券账号
+	 * value - 数据清算附属信息
+	 */
+	public Map<String, List<StlDownDataDealAccountInfoDto>> getAllStlDownDataDealAccountInfoDtoWithSecAcctIdMap() {
+		List<StlDownDataDealAccountInfoDto> list = settleCommonMapper.selectAllStlDownDataDealAccountInfoDtoList();
+		Map<String, List<StlDownDataDealAccountInfoDto>> map = Maps.newHashMap();
+		for (StlDownDataDealAccountInfoDto dto : list) {
+			String key = dto.getSecAcctId();
+			if (map.containsKey(key)) {
+				map.get(key).add(dto);
+			} else {
+				List<StlDownDataDealAccountInfoDto> valueList = Lists.newArrayList();
+				valueList.add(dto);
+				map.put(key, valueList);
 			}
 		}
 		return map;

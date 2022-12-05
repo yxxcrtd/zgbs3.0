@@ -294,10 +294,10 @@ public interface StlDataGatherMapper {
     int selectDzcjList(Map<String, Object> searchParam);
     /**
      * 根据汇总交易编号查询出所有汇总交易
-     * @param tradeIdTgList
+     * @param paraMap
      * @return 所有汇总交易
      */
-    List<TrdFinProductDealTotal>  selectTotalTradesBytotleTradeId(@Param("tradeIdTgList") List<String> tradeIdTgList);
+    List<TrdFinProductDealTotal>  selectTotalTradesBytotleTradeId(Map<String, Object> paraMap);
 
     /**
      * 根据汇总交易编号查询出所有交易
@@ -320,4 +320,12 @@ public interface StlDataGatherMapper {
      */
     List<SettleTransDataDto> selectBondFirstBiddingData(Map<String, Object> searchParam);
 
+    List<PtlSecPosition> searchPtlSecPositionList(Map<String, Object> paraMap);
+
+    /**
+     * 查询当日回售交易持仓
+     * @param param
+     * @return
+     */
+    List<PtlSecPosition> getCurDayPutTradePosition(Map<String,Object> param);
 }

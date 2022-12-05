@@ -66,8 +66,8 @@ public class PtlFundAcctPosiService extends BaseService<PtlFundAcctPosiDto>{
         pageParam.put("endCDate", DateUtil.parse((String)pageParam.get("endCDate")));
         // add by caiqun 20200819 东莞 工单YHZGCPB20200814003  end
     	//  bug fixed:TISHKBS-75  只统计资金账户、券商账户余额，经代码核实只查询账户编码为A01/A07账户
-//    	    pageParam.put("TGZH", DictCodeListExt1.资金账户类型_产品托管户.getValue());
-//          pageParam.put("JYSZJZH", DictCodeListExt1.资金账户类型_券商资金账户.getValue());
+		pageParam.put("TGZH", DictCodeListExt1.资金账户类型_产品托管户.getValue());
+	    pageParam.put("JYSZJZH", DictCodeListExt1.资金账户类型_券商资金账户.getValue());
         if(MultilevelDataAuthorityUtil.isEnabled()) {
         	pageParam.put("isMultiLevel", "01");
         }

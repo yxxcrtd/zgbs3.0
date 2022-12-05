@@ -165,7 +165,7 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                     //利息总额
                     BigDecimal totalIntAmt=BigDecimal.ZERO;
                     //全价总额
-                    BigDecimal totalFpriceamt=BigDecimal.ZERO;
+                    BigDecimal totalFpriceAmt=BigDecimal.ZERO;
                     //交易本金
                     BigDecimal prinAmt=BigDecimal.ZERO;
                     //总交易本金
@@ -194,11 +194,13 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                     BigDecimal totalmTradeAmt=BigDecimal.ZERO;
                     //总印花税_原始
                     BigDecimal totalStampFeeRaw=BigDecimal.ZERO;
-                    //总过户费_原始
+                    //总经手费_原始
                     BigDecimal totalJsfAmtRaw=BigDecimal.ZERO;
+                    //总过户费_原始
+                    BigDecimal totalGhfAmtRaw=BigDecimal.ZERO;
                     //总证管费_原始
                     BigDecimal totalZgfAmtRaw=BigDecimal.ZERO;
-                    //总经手费_原始
+                    //总手续费_原始
                     BigDecimal totalSxfAmtRaw=BigDecimal.ZERO;
                     //总结算费_原始
                     BigDecimal totalSettleFeeRaw=BigDecimal.ZERO;
@@ -217,7 +219,7 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                         totalShareAmt = ArithmeticUtil.doAdd(totalShareAmt, item.getShareAmt());
                         totalIntAmt = ArithmeticUtil.doAdd(totalIntAmt, item.getIntAmt());
                         totalPrinAmt = ArithmeticUtil.doAdd(totalPrinAmt, item.getPrinAmt());
-                        totalFpriceamt = ArithmeticUtil.doAdd(totalFpriceamt, item.getFpriceAmt());
+                        totalFpriceAmt = ArithmeticUtil.doAdd(totalFpriceAmt, item.getFpriceAmt());
                         totalStampFee= ArithmeticUtil.doAdd(totalStampFee, item.getStampFee());
                         totalJsfAmt= ArithmeticUtil.doAdd(totalJsfAmt, item.getJsfAmt());
                         totalGhfAmt= ArithmeticUtil.doAdd(totalGhfAmt, item.getGhfAmt());
@@ -233,6 +235,7 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                         // ZGZGST-4156:计算佣金汇总 fuyongsheng 20211208 add end
                         totalStampFeeRaw=ArithmeticUtil.doAdd(totalStampFeeRaw, item.getStampFeeRaw());
                         totalJsfAmtRaw=ArithmeticUtil.doAdd(totalJsfAmtRaw, item.getJsfAmtRaw());
+                        totalGhfAmtRaw=ArithmeticUtil.doAdd(totalGhfAmtRaw, item.getGhfAmtRaw());
                         totalZgfAmtRaw=ArithmeticUtil.doAdd(totalZgfAmtRaw, item.getZgfAmtRaw());
                         totalSxfAmtRaw=ArithmeticUtil.doAdd(totalSxfAmtRaw, item.getSxfAmtRaw());
                         totalSettleFeeRaw=ArithmeticUtil.doAdd(totalSettleFeeRaw, item.getSettleFeeRaw());
@@ -251,15 +254,19 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                             // GNS-879:配债UNIT_CPRIE,CPRICE_AMT未登录 modify by fuyongsheng 20220217 end
                     )){
                         if(StringUtil.equals(settleTransDataDto.getPs(), DictCodeListExt3.交易方向_配债.getValue())){
-                            dealTotal.setFpriceAmt(totalFpriceamt);
+                            dealTotal.setFpriceAmt(totalFpriceAmt);
                             dealTotal.setUnitFprice(settleTransDataDto.getUnitFprice());
                         } else{
-                            unitCprice = ArithmeticUtil.divide(totalCpriceAmt, totalShareAmt, 8);
+//                            unitCprice = ArithmeticUtil.divide(totalCpriceAmt, totalShareAmt, 8);
                             dealTotal.setCpriceAmt(totalCpriceAmt);
-                            dealTotal.setUnitCprice(unitCprice);
-                            unitInt=settleTransDataDto.getUnitInt();
-                            dealTotal.setUnitInt(unitInt);
-                            dealTotal.setUnitFprice(ArithmeticUtil.doAdd(unitCprice,unitInt));
+//                            dealTotal.setUnitCprice(unitCprice);
+//                            unitInt=settleTransDataDto.getUnitInt();
+//                            dealTotal.setUnitInt(unitInt);
+//                            dealTotal.setUnitFprice(ArithmeticUtil.doAdd(unitCprice,unitInt));
+
+                            dealTotal.setUnitFprice(ArithmeticUtil.divide(totalFpriceAmt, totalShareAmt, 8));
+                            dealTotal.setUnitCprice(ArithmeticUtil.divide(totalCpriceAmt, totalShareAmt, 8));
+                            dealTotal.setUnitInt(ArithmeticUtil.subtract(dealTotal.getUnitFprice(), dealTotal.getUnitCprice()));
                         }
                         prinAmt=totalCpriceAmt;
                     }
@@ -286,17 +293,17 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                             ||StringUtil.equals(settleTransDataDto.getPs(), BussinessDictCodeList.交易方向_申购.getValue())
                             // GZYHTZJY-1016:成交明细汇总表未登录单位净价导致交易表金额为0 modify by fuyongsheng 20211231 end
                     ){
-                        unitCprice = ArithmeticUtil.divide(totalFpriceamt, totalShareAmt, 8);
+                        unitCprice = ArithmeticUtil.divide(totalFpriceAmt, totalShareAmt, 8);
                         dealTotal.setUnitCprice(unitCprice);
                         // ZGTFCP-917:对页面成交价格进行赋值 modify by fuyongsheng 20220314 start
                         dealTotal.setUnitFprice(unitCprice);
                         // ZGTFCP-917:对页面成交价格进行赋值 modify by fuyongsheng 20220314 end
-                        dealTotal.setCpriceAmt(totalFpriceamt);
-                        prinAmt=totalFpriceamt;
+                        dealTotal.setCpriceAmt(totalFpriceAmt);
+                        prinAmt=totalFpriceAmt;
                     }else  if(StringUtil.equals(settleTransDataDto.getFinprodType2(), DictCodeListExt1.金融产品类型_投管用_基金.getValue())
                             && (StringUtil.equals(settleTransDataDto.getPs(), BussinessDictCodeList.交易方向_买入.getValue())
                             ||StringUtil.equals(settleTransDataDto.getPs(), BussinessDictCodeList.交易方向_卖出.getValue()))) {
-                        unitCprice = ArithmeticUtil.divide(totalFpriceamt, totalShareAmt, 8);
+                        unitCprice = ArithmeticUtil.divide(totalFpriceAmt, totalShareAmt, 8);
                         dealTotal.setUnitCprice(unitCprice);
                         dealTotal.setUnitFprice(unitCprice);
                     }
@@ -318,7 +325,7 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                     // 利息总额
                     dealTotal.setIntAmt(totalIntAmt);
                     // 全价总额
-                    dealTotal.setFpriceAmt(totalFpriceamt);
+                    dealTotal.setFpriceAmt(totalFpriceAmt);
                     //印花税
                     dealTotal.setStampFee(totalStampFee);
                     //经手费
@@ -367,11 +374,13 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                     dealTotal.setSettleMode(settleTransDataDto.getSettleMode());
                     //印花税_原始
                     dealTotal.setStampFeeRaw(totalStampFeeRaw);
-                    //过户费_原始
+                    //经手费_原始
                     dealTotal.setJsfAmtRaw(totalJsfAmtRaw);
+                    //过户费_原始
+                    dealTotal.setGhfAmtRaw(totalGhfAmtRaw);
                     //证管费_原始
                     dealTotal.setZgfAmtRaw(totalZgfAmtRaw);
-                    //经手费_原始
+                    //手续费费_原始
                     dealTotal.setSxfAmtRaw(totalSxfAmtRaw);
                     //结算费_原始
                     dealTotal.setSettleFeeRaw(totalSettleFeeRaw);
@@ -543,11 +552,13 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                                 dealTotal.setIntRate(item.getIntRate());
                                 //印花税_原始
                                 dealTotal.setStampFeeRaw(item.getStampFeeRaw());
-                                //过户费_原始
+                                //经手费_原始
                                 dealTotal.setJsfAmtRaw(item.getJsfAmtRaw());
+                                //经手费_原始
+                                dealTotal.setGhfAmtRaw(item.getGhfAmtRaw());
                                 //证管费_原始
                                 dealTotal.setZgfAmtRaw(item.getZgfAmtRaw());
-                                //经手费_原始
+                                //手续费_原始
                                 dealTotal.setSxfAmtRaw(item.getSxfAmtRaw());
                                 //结算费_原始
                                 dealTotal.setSettleFeeRaw(item.getSettleFeeRaw());
@@ -764,14 +775,15 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                                 totalZgfAmt= ArithmeticUtil.doAdd(totalZgfAmt, item.getZgfAmt());
                                 totalSxfAmt= ArithmeticUtil.doAdd(totalSxfAmt, item.getSxfAmt());
                                 totalSettleFee= ArithmeticUtil.doAdd(totalSettleFee, item.getSettleFee());
+                                totalCommissionAmt= ArithmeticUtil.doAdd(totalCommissionAmt, item.getCommissionAmt());
                                 totalTradeAmt= ArithmeticUtil.doAdd(totalTradeAmt, item.getTradeAmt());
                                 totalmPrinAmt= ArithmeticUtil.doAdd(totalmPrinAmt, item.getmPrinAmt());
                                 totalmIntAmt= ArithmeticUtil.doAdd(totalmIntAmt, item.getmIntAmt());
                                 totalmTradeAmt= ArithmeticUtil.doAdd(totalmTradeAmt, item.getmTradeAmt());
                                 totalStampFeeRaw=ArithmeticUtil.doAdd(totalStampFeeRaw, item.getStampFeeRaw());
                                 totalJsfAmtRaw=ArithmeticUtil.doAdd(totalJsfAmtRaw, item.getJsfAmtRaw());
-                                totalZgfAmtRaw=ArithmeticUtil.doAdd(totalZgfAmtRaw, item.getZgfAmtRaw());
                                 totalGhfAmtRaw=ArithmeticUtil.doAdd(totalGhfAmtRaw, item.getGhfAmtRaw());
+                                totalZgfAmtRaw=ArithmeticUtil.doAdd(totalZgfAmtRaw, item.getZgfAmtRaw());
                                 totalSxfAmtRaw=ArithmeticUtil.doAdd(totalSxfAmtRaw, item.getSxfAmtRaw());
                                 totalSettleFeeRaw=ArithmeticUtil.doAdd(totalSettleFeeRaw, item.getSettleFeeRaw());
                                 totalCommissionAmtRaw=ArithmeticUtil.doAdd(totalCommissionAmtRaw, item.getCommissionAmt());
@@ -1062,11 +1074,13 @@ public class StlSettleTransDataGatherReader extends BaseReader<StlSettleTransDat
                             dealTotal.setSettleMode(item.getSettleMode());
                             //印花税_原始
                             dealTotal.setStampFeeRaw(item.getStampFeeRaw());
-                            //过户费_原始
+                            //经手费_原始
                             dealTotal.setJsfAmtRaw(item.getJsfAmtRaw());
+                            //过户费_原始
+                            dealTotal.setGhfAmtRaw(item.getGhfAmtRaw());
                             //证管费_原始
                             dealTotal.setZgfAmtRaw(item.getZgfAmtRaw());
-                            //经手费_原始
+                            //手续费_原始
                             dealTotal.setSxfAmtRaw(item.getSxfAmtRaw());
                             //结算费_原始
                             dealTotal.setSettleFeeRaw(item.getSettleFeeRaw());

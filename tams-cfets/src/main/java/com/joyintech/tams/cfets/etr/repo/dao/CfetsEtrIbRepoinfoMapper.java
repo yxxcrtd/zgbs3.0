@@ -129,4 +129,7 @@ public interface CfetsEtrIbRepoinfoMapper {
     CfetsEtrSecStockConfig selectFinprodInfo(Map<String, Object> param);
 
     CfetsEtrIbRepoLibDto findSecPosition(Map<String, Object> param);
+
+
+    CfetsEtrIbRepoLibDto findBasicInfo(Map<String, Object> pageParam);
 }

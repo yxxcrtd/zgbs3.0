@@ -108,6 +108,7 @@
         FROM
             FIN_PRODUCT T1
         LEFT JOIN FIN_PRODUCT_TYPE T2 ON T1.FINPROD_ID = T2.FINPROD_ID
+        LEFT JOIN  FIN_PRODUCT_ISSUE fpi ON T1.FINPROD_ID = fpi.FINPROD_ID
         left join FIN_PRODUCT_TYPE fpt on T1.FINPROD_ID = fpt.FINPROD_ID
         left join FIN_PRODUCT_SPECIAL fps on fps.FINPROD_MARKET_ID = T1.FINPROD_MARKET_ID
         LEFT JOIN MST_BOND_MARKET_INFO mbmi  ON T1.FINPROD_MARKET_ID  = mbmi.SEC_ID
@@ -124,6 +125,7 @@
         FROM
         FIN_PRODUCT T1
         LEFT JOIN FIN_PRODUCT_TYPE T2 ON T1.FINPROD_ID = T2.FINPROD_ID
+        LEFT JOIN  FIN_PRODUCT_ISSUE fpi ON T1.FINPROD_ID = fpi.FINPROD_ID
         left join FIN_PRODUCT_TYPE fpt on T1.FINPROD_ID = fpt.FINPROD_ID
         left join FIN_PRODUCT_SPECIAL fps on fps.FINPROD_MARKET_ID = T1.FINPROD_MARKET_ID
         LEFT JOIN MST_BOND_MARKET_INFO mbmi  ON T1.FINPROD_MARKET_ID  = mbmi.SEC_ID
@@ -233,7 +235,9 @@
     <sql id="getfinprodIdForAddWhere">
         <where>
             T1.CCY = 'CNY'
-            AND T1.VDATE <![CDATA[<=]]> #{platDate,jdbcType=DATE}
+            AND (( T1.VDATE <![CDATA[<=]]> #{platDate,jdbcType=DATE} and T1.FINPROD_TYPE2 = 'F01')
+                or ((fpi.ISSUE_DATE <![CDATA[<=]]> #{platDate,jdbcType=DATE}
+                       or fpi.TENDER_SDATE <![CDATA[<=]]> #{platDate,jdbcType=DATE}) and T1.FINPROD_TYPE2 = 'F32' ))
             AND ( ( T1.DELISTING_DATE <![CDATA[>=]]> #{platDate,jdbcType=DATE} and T1.FINPROD_TYPE2 = 'F01')
             OR (T1.MDATE <![CDATA[>=]]> #{platDate,jdbcType=DATE} and T1.FINPROD_TYPE2 = 'F32') )
             AND (mbmi.MARKET_AMT > 0 OR mbmi.MARKET_AMT IS NULL )
@@ -243,7 +247,12 @@
                     #{item}
                 </foreach>
             </if>
-            AND T1.TRADE_MARKET in(#{TRADE_PLACE_01},#{TRADE_PLACE_02})
+            <if test="tradeMarkets != null and tradeMarkets.size() > 0">
+                AND T1.TRADE_MARKET in
+                <foreach collection="tradeMarkets" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
             <if test="initValue != null and !initValue.equals('')">
                 and T1.FINPROD_MARKET_ID = #{initValue}
             </if>
@@ -263,6 +272,7 @@
         T1.FINPROD_ID
         FROM
         FIN_PRODUCT T1
+        LEFT JOIN  FIN_PRODUCT_ISSUE fpi ON T1.FINPROD_ID = fpi.FINPROD_ID
         LEFT JOIN
         FIN_PRODUCT_TYPE T2
         ON T1.FINPROD_ID = T2.FINPROD_ID

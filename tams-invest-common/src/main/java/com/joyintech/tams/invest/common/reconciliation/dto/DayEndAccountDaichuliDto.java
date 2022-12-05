@@ -10,9 +10,14 @@ import java.util.Date;
 public class DayEndAccountDaichuliDto extends StlSecReconDeal {
 
 	/**
-	 * 参数值
+	 * 参数值——对账维度参数
 	 */
 	private String paraValue;
+
+	/**
+	 * 参数值——佣金对账方式参数
+	 */
+	private String paraValue1;
 
 	/**
 	 * 清算成交编号
@@ -259,6 +264,14 @@ public class DayEndAccountDaichuliDto extends StlSecReconDeal {
 
 	public void setParaValue(String paraValue) {
 		this.paraValue = paraValue;
+	}
+
+	public String getParaValue1() {
+		return paraValue1;
+	}
+
+	public void setParaValue1(String paraValue1) {
+		this.paraValue1 = paraValue1;
 	}
 
 	public String getTradeId2() {

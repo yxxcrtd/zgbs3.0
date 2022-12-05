@@ -185,7 +185,8 @@ public class TradeHelper {
         List<IntegratedEntrust> integratedEntrustList = integratedEntrustService.findAll();
         if (Objects.nonNull(integratedEntrustList)) {
             integratedEntrustList.forEach(iEntrust -> {
-                if (EntrustStatus.isUnCompleteCancelEntrust(iEntrust.getEntrustStatus())) {
+                if (EntrustStatus.isUnCompleteCancelEntrust(iEntrust.getEntrustStatus())
+                        || iEntrust.getEntrustStatus() == EntrustStatus.SUCCEEDED.value) {
                     String key = AgentServerUtil.GetTradeCacheKey("I", iEntrust.getAccountId(), iEntrust.getBrokerEntrustId());
                     entrustMap.put(key, iEntrust.getId());
                 }

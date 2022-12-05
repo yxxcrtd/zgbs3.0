@@ -20,8 +20,8 @@
         </if>
         <if test="finprodIds != null and finprodIds.size()>0">
             and  FINPROD_ID not in
-            <foreach item="item" index="index" collection="finprodIds" open="(" separator=","  close=")">
-                #{item.finprodId}
+            <foreach item="item" index="index" collection="finprodIds" open="(" separator="or"  close=")">
+                (FINPROD_ID != #{item.finprodId} and ACCOUT = #{item.accouts})
             </foreach>
         </if>
         <if test="entrustIds != null and entrustIds.size()>0">
@@ -61,53 +61,64 @@
     </delete>
     <!--查询对账单参数-->
     <select id="listStlSecReconPara" resultType="com.joyintech.tams.common.base.entity.StlSecReconPara">
-    SELECT
-        CUSTOMER_ID,
-        PARA_CODE,
-        PARA_VALUE,
-        CONFIG_DATE
-    FROM
-        STL_SEC_RECON_PARA T1
-    WHERE
-        PARA_CODE = #{RECON_PARA_CODE_02}
-    <!--AND <![CDATA[ CONFIG_DATE <= to_date(#{execDate,jdbcType=VARCHAR},'yyyyMMdd') ]]>
-    AND EXISTS (
-    SELECT
-        1
-    FROM
-        (
         SELECT
             CUSTOMER_ID,
-            MAX(CONFIG_DATE) CONFIG_DATE
+            PARA_CODE,
+            PARA_VALUE,
+            CONFIG_DATE
         FROM
-            STL_SEC_RECON_PARA
-        GROUP BY
-            CUSTOMER_ID) T2
-    WHERE
-    T2.CUSTOMER_ID = T1.CUSTOMER_ID
-    AND T1.CONFIG_DATE = T2.CONFIG_DATE)-->
-</select>
+            STL_SEC_RECON_PARA T1
+        WHERE
+            PARA_CODE = #{RECON_PARA_CODE_02}
+        <!--AND <![CDATA[ CONFIG_DATE <= to_date(#{execDate,jdbcType=VARCHAR},'yyyyMMdd') ]]>
+        AND EXISTS (
+        SELECT
+            1
+        FROM
+            (
+            SELECT
+                CUSTOMER_ID,
+                MAX(CONFIG_DATE) CONFIG_DATE
+            FROM
+                STL_SEC_RECON_PARA
+            GROUP BY
+                CUSTOMER_ID) T2
+        WHERE
+        T2.CUSTOMER_ID = T1.CUSTOMER_ID
+        AND T1.CONFIG_DATE = T2.CONFIG_DATE)-->
+    </select>
 
-<!--查询对账结果-->
+    <!--查询佣金对账参数-->
+    <select id="listStlSecReconCommissionPara" resultType="com.joyintech.tams.common.base.entity.StlSecReconPara">
+        SELECT CUSTOMER_ID,PARA_CODE,PARA_VALUE,CONFIG_DATE
+        FROM STL_SEC_RECON_PARA T1
+        WHERE PARA_CODE = #{RECON_PARA_CODE_03}
+    </select>
+
+    <!--查询对账结果-->
     <select id="listStlSecRecon" resultType="com.joyintech.tams.common.base.entity.StlSecRecon">
     SELECT
-        FINPROD_ID,
-        ENTRUST_TRADE_ID
+        ssr.FINPROD_ID,
+        ssr.ENTRUST_TRADE_ID,
+        substr(ssr.ACCOUT,instr(ssr.ACCOUT,':')+1) AS accout,
+        ssr.ACCOUT AS accouts,
+        ssrd.FINPROD_TYPE
     FROM
-        STL_SEC_RECON
+        STL_SEC_RECON ssr
+        LEFT JOIN STL_SEC_RECON_DEAL ssrd ON ssrd.SEQ_NO = ssr.SEQ_NO
     WHERE
         (CHECK_RESULT = '1' OR CHECK_RESULT = '3')
         <if test="execDate != null">
-            AND SETTLE_DATE = TO_DATE(#{execDate,jdbcType=VARCHAR},'yyyyMMdd')
+            AND ssr.SETTLE_DATE = TO_DATE(#{execDate,jdbcType=VARCHAR},'yyyyMMdd')
         </if>
         <if test="tradeIds != null and tradeIds.size()>0">
-            and ENTRUST_TRADE_ID  in
+            and ssr.ENTRUST_TRADE_ID  in
             <foreach item="item" index="index" collection="tradeIds" open="(" separator=","  close=")">
                 #{item.tradeId}
             </foreach>
         </if>
         <if test="entrustIds != null and entrustIds.size()>0">
-            and ENTRUST_TRADE_ID  in
+            and ssr.ENTRUST_TRADE_ID  in
             <foreach item="item" index="index" collection="entrustIds" open="(" separator=","  close=")">
                 #{item.instructionId}
             </foreach>
@@ -219,6 +230,7 @@ END CCY,
     NULL TRADE_FEE,
     NULL OTHER_FEEAMT,
     YJ COMMISSION_AMT,
+    JYJ NET_COMMISSION_AMT,
     CASE
         WHEN YWBS = '4023' THEN 'T49'
         WHEN YWBS != '4023' AND CJJE >0 THEN 'T02'
@@ -235,6 +247,8 @@ END CCY,
     END FINPROD_ID,
     CASE
         WHEN T3.FINPROD_TYPE2 IS NOT NULL THEN T3.FINPROD_TYPE2
+        WHEN T1.YWBS = '质押回购拆出' THEN 'F03'
+        WHEN T1.YWBS = '质押回购拆入' THEN 'F02'
         ELSE FPT.TYPE_8
     END FINPROD_TYPE
 FROM
@@ -292,7 +306,7 @@ FROM
             </foreach>
         </if>
         <if test="finprodIds != null and finprodIds.size()>0">
-            and T3.FINPROD_ID not in
+            and ifnull(T3.FINPROD_ID,T1.ZQDM) not in
             <foreach item="item" index="index" collection="finprodIds" open="(" separator=","  close=")">
                 #{item.finprodId}
             </foreach>
@@ -355,7 +369,8 @@ SELECT
     QSF SETTLE_FEE,
     JYGF TRADE_FEE,
     QTF OTHER_FEEAMT,
-    JYJ COMMISSION_AMT,
+    FYHJ COMMISSION_AMT,
+    JYJ NET_COMMISSION_AMT,
     CASE
         WHEN ZYDM = '220142' THEN 'T49'
         WHEN ZYDM != '220142' AND QJCJJE >0 THEN 'T02'
@@ -372,7 +387,9 @@ SELECT
     END FINPROD_ID,
     CASE
         WHEN T3.FINPROD_TYPE2 IS NOT NULL THEN T3.FINPROD_TYPE2
-        ELSE FPT.TYPE_8
+        WHEN T1.ZYDM = '221002' THEN 'F02'
+        WHEN T1.ZYDM = '220003' THEN 'F03'
+    ELSE FPT.TYPE_8
     END FINPROD_TYPE
 FROM
     INTERF_ZX_ZJGFLS T1
@@ -429,7 +446,7 @@ WHERE
         </foreach>
     </if>
     <if test="finprodIds != null and finprodIds.size()>0">
-        and T3.FINPROD_ID not in
+        and ifnull(T3.FINPROD_ID,T1.ZQDM) not in
         <foreach item="item" index="index" collection="finprodIds" open="(" separator=","  close=")">
             #{item.finprodId}
         </foreach>
@@ -492,6 +509,7 @@ WHERE
         NULL TRADE_FEE,
         NULL OTHER_FEEAMT,
         YJ COMMISSION_AMT,
+        JYJ NET_COMMISSION_AMT,
         CASE
             WHEN YWBS = '4023' THEN 'T49'
             WHEN YWBS != '4023' AND CJJE >0 THEN 'T02'
@@ -639,7 +657,8 @@ WHERE
         QSF SETTLE_FEE,
         JYGF TRADE_FEE,
         QTF OTHER_FEEAMT,
-        JYJ COMMISSION_AMT,
+        FYHJ COMMISSION_AMT,
+        JYJ NET_COMMISSION_AMT,
         CASE
         WHEN ZYDM = '220142' THEN 'T49'
         WHEN ZYDM != '220142' AND QJCJJE >0 THEN 'T02'
@@ -777,6 +796,7 @@ WHERE
         SUM(SETTLE_FEE) SETTLE_FEE,
         SUM(TRADE_FEE) TRADE_FEE,
         SUM(COMMISSION_AMT) COMMISSION_AMT,
+        SUM(NET_COMMISSION_AMT) NET_COMMISSION_AMT,
         SUM(OTHER_FEEAMT) OTHER_FEEAMT,
         SUM(TOTAL_TEEAMT) TOTAL_TEEAMT
         FROM
@@ -821,6 +841,7 @@ WHERE
         SUM(SETTLE_FEE) SETTLE_FEE,
         SUM(TRADE_FEE) TRADE_FEE,
         SUM(COMMISSION_AMT) COMMISSION_AMT,
+        SUM(NET_COMMISSION_AMT) NET_COMMISSION_AMT,
         SUM(OTHER_FEEAMT) OTHER_FEEAMT,
         SUM(TOTAL_TEEAMT) TOTAL_TEEAMT
         FROM
@@ -839,8 +860,6 @@ WHERE
         SEC_ACCT_ID,
         CCY
     </select>
-
-
 
     <!--协议回购深交所委托编号汇总-->
     <select id="listStlSecReconDealIntegratedRepTotal" resultType="com.joyintech.tams.invest.interf.fromjkpt.recon.dto.StlSecReconDealDto">
@@ -870,6 +889,7 @@ WHERE
             SUM(SETTLE_FEE) SETTLE_FEE,
             SUM(TRADE_FEE) TRADE_FEE,
             SUM(COMMISSION_AMT) COMMISSION_AMT,
+            SUM(NET_COMMISSION_AMT) NET_COMMISSION_AMT,
             SUM(OTHER_FEEAMT) OTHER_FEEAMT,
             SUM(TOTAL_TEEAMT) TOTAL_TEEAMT
         FROM
@@ -916,6 +936,7 @@ WHERE
                 NULL TRADE_FEE,
                 NULL OTHER_FEEAMT,
                 YJ COMMISSION_AMT,
+                JYJ NET_COMMISSION_AMT,
                 WTBH ENTRUST_ID,
                 CASE
                     WHEN YWBS = '4429' and MMFX= '1' then '04'
@@ -1093,6 +1114,7 @@ WHERE
             SUM(SETTLE_FEE) SETTLE_FEE,
             SUM(TRADE_FEE) TRADE_FEE,
             SUM(COMMISSION_AMT) COMMISSION_AMT,
+            SUM(NET_COMMISSION_AMT) NET_COMMISSION_AMT,
             SUM(OTHER_FEEAMT) OTHER_FEEAMT,
             SUM(TOTAL_TEEAMT) TOTAL_TEEAMT
         FROM
@@ -1179,7 +1201,8 @@ WHERE
                 ZGF ZGF_AMT,
                 QSF SETTLE_FEE,
                 JYGF TRADE_FEE,
-                JYJ COMMISSION_AMT,
+                FYHJ COMMISSION_AMT,
+                JYJ NET_COMMISSION_AMT,
                 QTF OTHER_FEEAMT,
                 FYHJ TOTAL_TEEAMT
             FROM
@@ -1278,6 +1301,7 @@ WHERE
         SUM(SETTLE_FEE) SETTLE_FEE,
         SUM(TRADE_FEE) TRADE_FEE,
         SUM(COMMISSION_AMT) COMMISSION_AMT,
+        SUM(NET_COMMISSION_AMT) NET_COMMISSION_AMT,
         SUM(OTHER_FEEAMT),
         SUM(TOTAL_TEEAMT)
         FROM
@@ -1314,6 +1338,7 @@ WHERE
         NULL TRADE_FEE,
         NULL OTHER_FEEAMT,
         YJ COMMISSION_AMT,
+        JYJ NET_COMMISSION_AMT,
         WTBH ENTRUST_ID,
         CASE WHEN YWBS = '4429' and MMFX= '2' then '03'
         WHEN YWBS = '4429' and MMFX= '1' then '03'
@@ -1398,6 +1423,7 @@ WHERE
         SUM(SETTLE_FEE) SETTLE_FEE,
         SUM(TRADE_FEE) TRADE_FEE,
         SUM(COMMISSION_AMT) COMMISSION_AMT,
+        SUM(NET_COMMISSION_AMT) NET_COMMISSION_AMT,
         SUM(OTHER_FEEAMT),
         SUM(TOTAL_TEEAMT)
         FROM(
@@ -1433,6 +1459,7 @@ WHERE
         NULL TRADE_FEE,
         NULL OTHER_FEEAMT,
         YJ COMMISSION_AMT,
+        JYJ NET_COMMISSION_AMT,
         CASE WHEN YWBS = '4429' and MMFX= '2' then '03'
         WHEN YWBS = '4429' and MMFX= '1' then '03'
         WHEN YWBS = '4430' and MMFX= '1' then 'T95'
@@ -1540,7 +1567,8 @@ WHERE
         QSF SETTLE_FEE,
         JYGF TRADE_FEE,
         QTF OTHER_FEEAMT,
-        JYJ COMMISSION_AMT,
+        FYHJ COMMISSION_AMT,
+        JYJ NET_COMMISSION_AMT,
         WTBH ENTRUST_ID,
         CASE WHEN ZYDM = '220131' then '03'
         WHEN ZYDM = '220132 '  then '04'

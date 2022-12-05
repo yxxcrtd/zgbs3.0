@@ -233,6 +233,9 @@
      */
     assetNameNewDetailTbl.bind('click', '.del', function(data, index) {
         assetNameNewDetailTbl.removeRow(data);
+        if (data.operatePs == RSK_OPERATE_PS_01 || data.operatePs == RSK_OPERATE_PS_03){
+            assetNameHistoryDetailTBL.reload();
+        }
     });
 
     /**
@@ -273,6 +276,7 @@
             data.listDetailType = $('#listDetailType').val();
             assetNameNewDetailTbl.addRow(data);
         }
+        assetNameHistoryDetailTBL.reload();
     });
 
     /**
@@ -280,6 +284,9 @@
      */
     assetNameNewDetailTbl.bind('click', '.delt', function(data, index) {
         assetNameNewDetailTbl.removeRow(data);
+        if (data.operatePs == RSK_OPERATE_PS_01 || data.operatePs == RSK_OPERATE_PS_03){
+            assetNameHistoryDetailTBL.reload();
+        }
     });
 
     /**

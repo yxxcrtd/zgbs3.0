@@ -64,7 +64,9 @@
     <select id="listStlSecRecon" resultType="com.joyintech.tams.common.base.entity.StlSecRecon">
     SELECT
         FINPROD_ID,
-        ENTRUST_TRADE_ID
+        ENTRUST_TRADE_ID,
+        substring_index(ACCOUT,":",-1) AS accout,
+        ACCOUT AS accouts
     FROM
         STL_SEC_RECON
     WHERE
@@ -184,6 +186,7 @@
             NULL TRADE_FEE,
             NULL OTHER_FEEAMT,
             YJ COMMISSION_AMT,
+            JYJ NET_COMMISSION_AMT,
             CASE
                 WHEN YWBS = '4023' THEN 'T49'
                 WHEN YWBS != '4023' AND CJJE >0 THEN 'T02'
@@ -322,7 +325,8 @@
             QSF SETTLE_FEE,
             JYGF TRADE_FEE,
             QTF OTHER_FEEAMT,
-            JYJ COMMISSION_AMT,
+            FYHJ COMMISSION_AMT,
+            JYJ NET_COMMISSION_AMT,
             CASE
                 WHEN ZYDM = '220142' THEN 'T49'
                 WHEN ZYDM != '220142' AND QJCJJE >0 THEN 'T02'
@@ -447,6 +451,7 @@
         SUM(SETTLE_FEE) SETTLE_FEE,
         SUM(TRADE_FEE) TRADE_FEE,
         SUM(COMMISSION_AMT) COMMISSION_AMT,
+        SUM(NET_COMMISSION_AMT) NET_COMMISSION_AMT,
         SUM(OTHER_FEEAMT) OTHER_FEEAMT,
         SUM(TOTAL_TEEAMT) TOTAL_TEEAMT
         FROM
@@ -491,6 +496,7 @@
         SUM(SETTLE_FEE) SETTLE_FEE,
         SUM(TRADE_FEE) TRADE_FEE,
         SUM(COMMISSION_AMT) COMMISSION_AMT,
+        SUM(NET_COMMISSION_AMT) NET_COMMISSION_AMT,
         SUM(OTHER_FEEAMT) OTHER_FEEAMT,
         SUM(TOTAL_TEEAMT) TOTAL_TEEAMT
         FROM
@@ -545,6 +551,7 @@
         NULL TRADE_FEE,
         NULL OTHER_FEEAMT,
         YJ COMMISSION_AMT,
+        JYJ NET_COMMISSION_AMT,
         CASE WHEN YWBS = '4429' and MMFX= '2' then '03'
         WHEN YWBS = '4429' and MMFX= '1' then '03'
         WHEN YWBS = '4430' and MMFX= '1' then 'T95'
@@ -641,7 +648,8 @@
         QSF SETTLE_FEE,
         JYGF TRADE_FEE,
         QTF OTHER_FEEAMT,
-        JYJ COMMISSION_AMT,
+        FYHJ COMMISSION_AMT,
+        JYJ NET_COMMISSION_AMT,
         CASE WHEN ZYDM = '220131' then '03'
         WHEN ZYDM = '220132 '  then '04'
         WHEN ZYDM = '220143'  then 'T54'
@@ -723,6 +731,7 @@
             SUM(SETTLE_FEE) SETTLE_FEE,
             SUM(TRADE_FEE) TRADE_FEE,
             SUM(COMMISSION_AMT) COMMISSION_AMT,
+            SUM(NET_COMMISSION_AMT) NET_COMMISSION_AMT,
             SUM(OTHER_FEEAMT) OTHER_FEEAMT,
             SUM(TOTAL_TEEAMT) TOTAL_TEEAMT
         FROM
@@ -769,6 +778,7 @@
                 NULL TRADE_FEE,
                 NULL OTHER_FEEAMT,
                 YJ COMMISSION_AMT,
+                JYJ NET_COMMISSION_AMT,
                 WTBH ENTRUST_ID,
                 CASE
                     WHEN YWBS = '4429' and MMFX= '1' then '03'
@@ -947,6 +957,7 @@
         SUM(SETTLE_FEE) SETTLE_FEE,
         SUM(TRADE_FEE) TRADE_FEE,
         SUM(COMMISSION_AMT) COMMISSION_AMT,
+        SUM(NET_COMMISSION_AMT) NET_COMMISSION_AMT,
         SUM(OTHER_FEEAMT) OTHER_FEEAMT,
         SUM(TOTAL_TEEAMT) TOTAL_TEEAMT
         FROM
@@ -1035,7 +1046,8 @@
             ZGF ZGF_AMT,
             QSF SETTLE_FEE,
             JYGF TRADE_FEE,
-            JYJ COMMISSION_AMT,
+            FYHJ COMMISSION_AMT,
+            JYJ NET_COMMISSION_AMT,
             QTF OTHER_FEEAMT,
             FYHJ TOTAL_TEEAMT
         FROM
@@ -1154,6 +1166,7 @@
             NULL TRADE_FEE,
             NULL OTHER_FEEAMT,
             YJ COMMISSION_AMT,
+            JYJ NET_COMMISSION_AMT,
             CASE
                 WHEN YWBS = '4023' THEN 'T49'
                 WHEN YWBS != '4023' AND CJJE >0 THEN 'T02'
@@ -1303,7 +1316,8 @@
             QSF SETTLE_FEE,
             JYGF TRADE_FEE,
             QTF OTHER_FEEAMT,
-            JYJ COMMISSION_AMT,
+            FYHJ COMMISSION_AMT,
+            JYJ NET_COMMISSION_AMT,
             CASE
                 WHEN ZYDM = '220142' THEN 'T49'
                 WHEN ZYDM != '220142' AND QJCJJE >0 THEN 'T02'

@@ -530,7 +530,7 @@ from
 			#{item.updateUser,jdbcType=VARCHAR}, #{item.updateTime,jdbcType=TIMESTAMP},#{item.commissionAmt,jdbcType=DECIMAL},
 			#{item.jsfAmt,jdbcType=DECIMAL}, #{item.zgfAmt,jdbcType=DECIMAL}, #{item.stampFee,jdbcType=DECIMAL},
 			#{item.settleFee,jdbcType=DECIMAL}, #{item.ghfAmt,jdbcType=DECIMAL}, #{item.sxfAmt,jdbcType=DECIMAL},
-			#{item.fpriceAmt,jdbcType=DECIMAL}, #{item.tradeNum,jdbcType=DECIMAL}, #{item.reconInfo,jdbcType=LONGVARBINARY}
+			#{item.fpriceAmt,jdbcType=DECIMAL}, #{item.tradeNum,jdbcType=DECIMAL}, #{item.reconInfo,jdbcType=VARCHAR}
 			)
 		</foreach>
 	</insert>

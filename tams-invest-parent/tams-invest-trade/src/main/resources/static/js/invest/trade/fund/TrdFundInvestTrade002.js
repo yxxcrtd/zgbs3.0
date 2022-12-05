@@ -7,6 +7,9 @@ $(function () {
     var initFlag = true;
     // 计算交易金额
     var calcTradeAmt = function () {
+        if (pageModel === PAGE_MODEL_REFERENCE){
+            return;
+        }
         if (!initFlag && !isTradeMarketFundMrMcDeal()) {
             var unitCprice = $('#unitCprice').val();
             var ps = $('#ps').val();
@@ -357,7 +360,7 @@ $(function () {
 	        if (window.BussTrdTransferOrder['bussTrdTransferOrder'].isCalcConditionChanged()) {
 	            return;
 	        }
-	
+
 	        var object = $.serializeToObject('#submitForm', true);
 	        if ($('#select2-finprodId-container').attr('title')){
 	            object.finprodName = $('#select2-finprodId-container').attr('title');
@@ -365,21 +368,21 @@ $(function () {
 	        object.pageModel = pageModel;
 	        object.operateType = operateType;
 	        object.tradeId = $('#tradeId').val();
-	
+
 	        var tradeMarket = $("#tradeMarket").val();
 	        var ps = $("#ps").val();
 	        if (ps == T65 && tradeMarket != TRADE_PLACE_06) {
 	            Joyin.error("只有场外基金才能做转换。");
 	            return;
 	        }
-	
+
 	        if ($('#changeToFinprodMarketId').val() && $('#changeToFinprodMarketId').select2('data')[0].object) {
 	            tradeMarket = $('#changeToFinprodMarketId').select2('data')[0].object.tradeMarket
 	            if (ps == T65 && tradeMarket && tradeMarket != TRADE_PLACE_06) {
 	                Joyin.error("转入基金是场外基金才能做转换。");
 	                return;
 	            }
-	
+
 	            var issuer1 = $('#finprodId').select2('data')[0].object.issuer;
 	            var issuer = $('#changeToFinprodMarketId').select2('data')[0].object.issuer;
 	            if (issuer1 && issuer && issuer1 != issuer) {
@@ -387,11 +390,11 @@ $(function () {
 	                return;
 	            }
 	        }
-	
+
 	        if ($('#changeToFinprodMarketId').val() && $('#changeToFinprodMarketId').select2('data')[0].object && $('#changeToFinprodMarketId').select2('data')[0].object.finprodId) {
 	            object.rFinprodId = $('#changeToFinprodMarketId').select2('data')[0].object.finprodId;
 	        }
-	
+
 	        if (object.shareAmt && object.unitCprice) {
 	            object.prinAmt = Number(object.shareAmt) * Number(object.unitCprice);
 	        } else {
@@ -410,7 +413,7 @@ $(function () {
 	        if (data && data.object) {
 	            object.payType = data.object.payType;
 	        }
-	
+
 	        if (FileCommon) {
 	            object.fileArray = FileCommon.getUploadFileInfo();
 	            if (object.fileArray && _.isArray(object.fileArray)) {
@@ -447,7 +450,7 @@ $(function () {
 	        } else {
 	            Joyin.error("请输入资产代码。")
 	        }
-    	 });   
+    	 });
 	};
 
     // <!-- 通道交易 新增 强成西 2019/03/26 start -->
@@ -530,7 +533,7 @@ $(function () {
             $("#channelAmt").val("").trigger("blur");
             $("#channelAmt").trigger("change");
             $("#channelAmt").prop("disabled", true);
-            // 
+            //
         } else {
             $("#chlId").prop("disabled", false);
             $("#channelAmt").prop("disabled", false);

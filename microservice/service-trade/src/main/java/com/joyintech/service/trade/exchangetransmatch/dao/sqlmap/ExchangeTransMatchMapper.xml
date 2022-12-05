@@ -92,6 +92,8 @@
                 A.SETTLE_MODE,
                 A.SHARE_AMT shareAmt,
                 A.FPRICE_AMT fpriceAmt,
+                A.CPRICE_AMT cpriceAmt,
+                A.PAR_VALUE ,
                 A.INT_AMT,
                 A.PRIN_AMT,
                 A.TRADE_AMT,
@@ -671,12 +673,17 @@
         A.ENTRUNST_TRADE_ID busiCode,
         C.TRADE_MARKET tradeMarket,
         C.APPLY_TRADE_ID applyTradeId,
-        det.PORTFOLIO_ID portfolioId,
+        CASE
+        WHEN D.ENTRUST_CLASS =  #{ENTRUST_CLASS_02} THEN
+        det.PORTFOLIO_ID
+        ELSE
+        F.PORTFOLIO_ID
+        END  portfolioId,
         CASE
         WHEN D.ENTRUST_CLASS =  #{ENTRUST_CLASS_02} THEN
             det.PORTFOLIO_NAME
         ELSE
-            det.PORTFOLIO_NAME
+            F.PORTFOLIO_NAME
         END portfolioName,
         CASE
             WHEN C.SEC_TYPE = #{SEC_TYPE_09} THEN NULL

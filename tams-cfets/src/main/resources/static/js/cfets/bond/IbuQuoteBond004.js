@@ -462,18 +462,13 @@
                 Joyin.error("有*必填项未填写,请填写完整")
                 return false;
             }
-            if(quoteStyle === '01') {
+            if (quoteStyle === '01' && isTraderRequired) {
                 if(!el("#CfetsBondDealQuotedPrice004_counterTrader").val()) {
                     Joyin.error("有*必填项未填写,请填写完整")
                     return false;
                 }
             }
 
-        }else {
-            if(!el("#settFeeAmt").val()) {
-                Joyin.error("结算服务费不能为空")
-                return false;
-            }
         }
         if (object.cfetsBondDealDialogueQuoteDtoList) {
             let sumShareAmt = 0;
@@ -582,8 +577,13 @@
                 el("#CfetsBondDealQuotedPrice004_intAmt").val(JoyinMath.doDiv(data.intAmt, 1, 2));
                 el("#CfetsBondDealQuotedPrice004_fpriceAmt").val(JoyinMath.doDiv(data.fpriceAmt, 1, 2));
                 el("#CfetsBondDealQuotedPrice004_fpriceAmtEdit").val(JoyinMath.doDiv(data.fpriceAmt, 1, 2));
-                el("#dealFeeAmt").val(JoyinMath.doDiv(data.dealFeeAmt, 1, 2));
-                el("#settFeeAmt").val(JoyinMath.doDiv(data.settFeeAmt, 1, 2));
+
+                if (data.dealFeeAmt) {
+                    el("#dealFeeAmt").val(JoyinMath.doDiv(data.dealFeeAmt, 1, 2));
+                }
+                if (data.settFeeAmt) {
+                    el("#settFeeAmt").val(JoyinMath.doDiv(data.settFeeAmt, 1, 2));
+                }
 
                 //hidden
                 el("#CfetsBondDealQuotedPrice004_hidden_price").val(data.price);
@@ -695,6 +695,24 @@
             $('#unitIntEditDiv').hide();
             $('#fpriceAmtEditDiv').show();
         }
+        if ($("[name=quoteStyle]:checked").val() === '01') {
+            extracted(true);
+        } else {
+            extracted(false);
+        }
+        star();
+    }
+
+    /**
+     * 初始化设置 对手方 对手方交易员 净价 到期收益率 行权净价
+     * @param required
+     */
+    function extracted(required) {
+        $('#CfetsBondDealQuotedPrice004_counterId').attr('required', required);
+        $('#CfetsBondDealQuotedPrice004_counterTrader').attr('required', isTraderRequired);
+        $('#CfetsBondDealQuotedPrice004_unitCprice').attr('required', required);
+        $('#CfetsBondDealQuotedPrice004_matureYield').attr('required', required);
+        $('#CfetsBondDealQuotedPrice004_exerYield').attr('required', required);
     }
 
 
@@ -822,7 +840,7 @@
                 let quoteStyleField = $("[name=quoteStyle]:checked").val();
                 if (quoteStyleField === '01') {
                     $('#CfetsBondDealQuotedPrice004_counterId').attr('required', true);
-                    $('#CfetsBondDealQuotedPrice004_counterTrader').attr('required', true);
+                    $('#CfetsBondDealQuotedPrice004_counterTrader').attr('required', isTraderRequired);
                     $('#CfetsBondDealQuotedPrice004_unitCprice').attr('required', true);
                     $('#CfetsBondDealQuotedPrice004_matureYield').attr('required', true);
                     $('#CfetsBondDealQuotedPrice004_exerYield').attr('required', true);

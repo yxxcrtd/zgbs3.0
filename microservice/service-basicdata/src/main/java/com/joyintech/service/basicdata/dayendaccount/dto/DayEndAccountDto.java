@@ -29,6 +29,19 @@ public class DayEndAccountDto extends StlSecRecon {
 	 */
 	private String cjbh;
 
+	/**
+	 * 佣金类型（全佣金，净佣金）
+	 */
+	private String commissionType;
+
+	public String getCommissionType() {
+		return commissionType;
+	}
+
+	public void setCommissionType(String commissionType) {
+		this.commissionType = commissionType;
+	}
+
 	public String getCjbh() {
 		return cjbh;
 	}
@@ -117,6 +130,12 @@ public class DayEndAccountDto extends StlSecRecon {
 	 */
 	@JsonSerialize(using=BigDecimalSerializer.class)
 	private BigDecimal commissionAmt;
+
+	/**
+	 * 净佣金
+	 */
+	@JsonSerialize(using=BigDecimalSerializer.class)
+	private BigDecimal netCommissionAmt;
 
 	/**
 	 * 成交金额
@@ -352,6 +371,14 @@ public class DayEndAccountDto extends StlSecRecon {
 		this.commissionAmt = commissionAmt;
 	}
 
+	public BigDecimal getNetCommissionAmt() {
+		return netCommissionAmt;
+	}
+
+	public void setNetCommissionAmt(BigDecimal netCommissionAmt) {
+		this.netCommissionAmt = netCommissionAmt;
+	}
+
 	public BigDecimal getTradeAmt() {
 		return tradeAmt;
 	}
@@ -463,5 +490,18 @@ public class DayEndAccountDto extends StlSecRecon {
 
 	public void setTradeId(String tradeId) {
 		this.tradeId = tradeId;
+	}
+
+	/**
+	 * 佣金是否随交易支付
+	 */
+	private String isPayWithTrade;
+
+	public String getIsPayWithTrade() {
+		return isPayWithTrade;
+	}
+
+	public void setIsPayWithTrade(String isPayWithTrade) {
+		this.isPayWithTrade = isPayWithTrade;
 	}
 }

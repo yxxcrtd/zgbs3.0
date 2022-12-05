@@ -40,6 +40,9 @@ public class CfetsSearchInfoRequest {
     @ApiModelProperty(name="portfolioId",value="组合代码",example="历史：01")
     private String portfolioId;
 
+    @ApiModelProperty(name="isSubDeal",value="是否一级申购",example="Y")
+    private String isSubDeal;
+
     private String counterId;
 
     private Integer page = 1;
@@ -165,5 +168,13 @@ public class CfetsSearchInfoRequest {
 
     public void setPortfolioId(String portfolioId) {
         this.portfolioId = portfolioId;
+    }
+
+    public String getIsSubDeal() {
+        return isSubDeal;
+    }
+
+    public void setIsSubDeal(String isSubDeal) {
+        this.isSubDeal = isSubDeal;
     }
 }

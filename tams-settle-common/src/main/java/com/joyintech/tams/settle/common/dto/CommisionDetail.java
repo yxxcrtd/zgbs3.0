@@ -41,6 +41,11 @@ public class CommisionDetail {
      */
     private BigDecimal feeAmt;
 
+    /**
+     * 净费用金额
+     */
+    private BigDecimal netFeeAmt;
+
     public String getTradeId() {
         return tradeId;
     }
@@ -71,5 +76,13 @@ public class CommisionDetail {
 
     public void setFeeAmt(BigDecimal feeAmt) {
         this.feeAmt = feeAmt;
+    }
+
+    public BigDecimal getNetFeeAmt() {
+        return netFeeAmt;
+    }
+
+    public void setNetFeeAmt(BigDecimal netFeeAmt) {
+        this.netFeeAmt = netFeeAmt;
     }
 }

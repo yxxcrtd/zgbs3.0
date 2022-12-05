@@ -22,6 +22,12 @@ public class ExchangeTransMatchCommonEntrustDto extends EtrEntrust {
     private BigDecimal marchAmt;
 
     /**
+     * 已匹配净价金额
+     */
+    @JsonSerialize(using=BigDecimalSerializer.class)
+    private BigDecimal marchCpriceAmt;
+
+    /**
      * 已分配随交易费用
      */
     @JsonSerialize(using=BigDecimalSerializer.class)
@@ -114,6 +120,14 @@ public class ExchangeTransMatchCommonEntrustDto extends EtrEntrust {
 
     public void setMarchAmt(BigDecimal marchAmt) {
         this.marchAmt = marchAmt;
+    }
+
+    public BigDecimal getMarchCpriceAmt() {
+        return marchCpriceAmt;
+    }
+
+    public void setMarchCpriceAmt(BigDecimal marchCpriceAmt) {
+        this.marchCpriceAmt = marchCpriceAmt;
     }
 
     public BigDecimal getMarchQtyEn() {
@@ -261,5 +275,31 @@ public class ExchangeTransMatchCommonEntrustDto extends EtrEntrust {
 
     public void setPortfolioVdate(Date portfolioVdate) {
         this.portfolioVdate = portfolioVdate;
+    }
+
+    /**
+     * 行权收益率
+     */
+    private BigDecimal exerYield;
+
+    /**
+     * 到期收益率
+     */
+    private BigDecimal matureYield;
+
+    public BigDecimal getExerYield() {
+        return exerYield;
+    }
+
+    public void setExerYield(BigDecimal exerYield) {
+        this.exerYield = exerYield;
+    }
+
+    public BigDecimal getMatureYield() {
+        return matureYield;
+    }
+
+    public void setMatureYield(BigDecimal matureYield) {
+        this.matureYield = matureYield;
     }
 }

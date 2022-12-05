@@ -51,10 +51,11 @@ public class StlSecReconPara001Controller extends BaseController {
     @RequestMapping(PAGE_INIT)
     public String init(Model model) {
         setSelectOptionToModel(model, new DictCode[]{
-            DictCode.参数代码, DictCode.对账维度
+            DictCode.参数代码, DictCode.对账维度, DictCode.佣金对账方式
         });
         model.addAttribute("RECON_PARA_CODE_01", DictCodeListStl.参数代码_误差值.getValue());
         model.addAttribute("RECON_PARA_CODE_02", DictCodeListStl.参数代码_对账维度.getValue());
+        model.addAttribute("RECON_PARA_CODE_03", DictCodeListStl.参数代码_佣金对账方式.getValue());
         return super.init(model);
     }
 

@@ -1,5 +1,6 @@
 package com.joyintech.tams.settle.batch.datadeal.service;
 
+import com.alibaba.fastjson.JSON;
 import com.joyintech.framework.JoyinRestTemplate;
 import com.joyintech.framework.util.ArithmeticUtil;
 import com.joyintech.framework.util.StringUtil;
@@ -10,6 +11,8 @@ import com.joyintech.tams.constant.DictCodeListExt1;
 import com.joyintech.tams.settle.batch.datadeal.dao.StlDownDataDealMapper;
 import com.joyintech.tams.settle.batch.datagather.dto.BondTradeDealParam;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +38,7 @@ import java.util.Map;
 @Service
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class StlDownDataDealService {
+    private Logger logger = LoggerFactory.getLogger(StlDataDealSzdJsmxProcessService.class);
 
     /**
      * 是否单体服务
@@ -65,7 +69,7 @@ public class StlDownDataDealService {
     
     /**
      * 计算债券到期收益率和行权收益率
-     * @param productDeal
+     * @param settleTransData
      */
     public void calc(SettleTransData settleTransData) {
         // 设置计算参数
@@ -90,27 +94,34 @@ public class StlDownDataDealService {
         if (!StringUtil.equals(profitType, DictCodeList.收益类型_净值型.getValue())) {
         	dealParam.setInvAim(DictCodeListExt1.投资目的_以收取该金融资产合同现金流量为目的.getValue());
         }
-        
         // 调用债券交易计算逻辑
-        Map ajaxResult = new HashMap();
-        if (isSingle) {
-            ajaxResult = simpleRestTemplate.postForObject(tamsSerever + "/invest/trade/bond/TrdBondInvestTrade002/calculateData", dealParam, Map.class);
-        } else {
-            ajaxResult = restTemplate.postForObject(tamsSerever + "/invest/trade/bond/TrdBondInvestTrade002/calculateData", dealParam, Map.class);
-        }
-        if (ajaxResult != null && ajaxResult.containsKey("data")) {
-            Object result = ajaxResult.get("data");
-            if(result instanceof Map) {
-                Map<String, Object> calcResult = (Map)result;
-                Object unitInt = calcResult.get("unitInt");
-                if(StringUtil.isNotEmpty(unitInt)) {
-                    BigDecimal unitIntNum = BigDecimal.valueOf(Double.parseDouble(unitInt.toString()));
-                    settleTransData.setUnitInt(unitIntNum);
+        // LCTZJYXT-252:清算文件的应计利息为空或者为0时,再调用画面逻辑进行计算 modify by fuyongsheng 20221205 start
+        if(null == settleTransData.getUnitInt() || settleTransData.getUnitInt().compareTo(BigDecimal.ZERO) == 0){
+            try {
+                Map ajaxResult = new HashMap();
+                if (isSingle) {
+                    ajaxResult = simpleRestTemplate.postForObject(tamsSerever + "/invest/trade/bond/TrdBondInvestTrade002/calculateData", dealParam, Map.class);
+                } else {
+                    ajaxResult = restTemplate.postForObject(tamsSerever + "/invest/trade/bond/TrdBondInvestTrade002/calculateData", dealParam, Map.class);
                 }
-                settleTransData.setUnitCprice(ArithmeticUtil.subtract(settleTransData.getUnitFprice(), settleTransData.getUnitInt()));
-                settleTransData.setCpriceAmt(ArithmeticUtil.multiply(settleTransData.getUnitCprice(), settleTransData.getShareAmt()).setScale(2, RoundingMode.HALF_UP));
-                settleTransData.setIntAmt(ArithmeticUtil.subtract(settleTransData.getFpriceAmt(), settleTransData.getCpriceAmt()).setScale(2, RoundingMode.HALF_UP));
+                if (ajaxResult != null && ajaxResult.containsKey("data")) {
+                    Object result = ajaxResult.get("data");
+                    if(result instanceof Map) {
+                        Map<String, Object> calcResult = (Map)result;
+                        Object unitInt = calcResult.get("unitInt");
+                        if(StringUtil.isNotEmpty(unitInt)) {
+                            BigDecimal unitIntNum = BigDecimal.valueOf(Double.parseDouble(unitInt.toString()));
+                            settleTransData.setUnitInt(unitIntNum);
+                        }
+                        settleTransData.setUnitCprice(ArithmeticUtil.subtract(settleTransData.getUnitFprice(), settleTransData.getUnitInt()));
+                        settleTransData.setCpriceAmt(ArithmeticUtil.multiply(settleTransData.getUnitCprice(), settleTransData.getShareAmt()).setScale(2, RoundingMode.HALF_UP));
+                        settleTransData.setIntAmt(ArithmeticUtil.subtract(settleTransData.getFpriceAmt(), settleTransData.getCpriceAmt()).setScale(2, RoundingMode.HALF_UP));
+                    }
+                }
+            } catch(Exception exception){
+                logger.error("[计算债券应计利息出错],settleTransData={},exception={}", JSON.toJSONString(settleTransData), exception);
             }
         }
+        // LCTZJYXT-252:清算文件的应计利息为空时,再调用画面逻辑进行计算 modify by fuyongsheng 20221205 end
     }
 }

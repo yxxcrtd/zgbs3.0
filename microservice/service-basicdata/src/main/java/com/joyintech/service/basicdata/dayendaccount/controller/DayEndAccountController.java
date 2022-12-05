@@ -68,10 +68,10 @@ public class DayEndAccountController {
         return dayEndAccountService.getReconDealInfo(param);
     }
 
-    @RequestMapping("getDealDetailInfo")
-    public DayEndAccount002Dto getDealDetailInfo(@RequestBody Map<String, Object> param) {
-        return dayEndAccountService.getDealDetailInfo(param);
-    }
+//    @RequestMapping("getDealDetailInfo")
+//    public DayEndAccount002Dto getDealDetailInfo(@RequestBody Map<String, Object> param) {
+//        return dayEndAccountService.getDealDetailInfo(param);
+//    }
 
     /**
      *

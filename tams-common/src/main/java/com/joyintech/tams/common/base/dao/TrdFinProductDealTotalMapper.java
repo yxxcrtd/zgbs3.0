@@ -3,11 +3,12 @@ package com.joyintech.tams.common.base.dao;
 import com.joyintech.tams.common.base.entity.DebtBaseInfo;
 import com.joyintech.tams.common.base.entity.TrdFinProductDealTotal;
 
+import com.joyintech.tams.common.base.mapper.BaseBatchMapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TrdFinProductDealTotalMapper {
+public interface TrdFinProductDealTotalMapper extends BaseBatchMapper<TrdFinProductDealTotal, String> {
     int deleteByPrimaryKey(String totleTradeId);
 
     int insert(TrdFinProductDealTotal record);

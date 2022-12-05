@@ -392,18 +392,25 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 .forEach(item->{
             // 获取指令明细信息
             List<ExchangeTransMatchCommonEntrustDetailDto> entrustDetailDtoList = exchangeTransMatchCommonMapper.getEntrustDetailList(item.getEntrustId());
+            // 回购时，数量取金额字段
+            if (this.isRepo(matchDto.getFinprodType2())) {
+                entrustDetailDtoList.forEach(dto -> dto.setEntrustNum(dto.getEntrustAmt()));
+            }
             if(DictCodeListExt2.金融产品类型_投管用_一级投标债券.getValue().equals(item.getFinprodType2())){
                 entrustDetailDtoList = entrustDetailDtoList.stream()
                         .filter(dto -> dto.getSecAcctId().equals(item.getSecAcctId()))
                         .collect(Collectors.toList());
             }
             if(CollectionUtils.isNotEmpty(entrustDetailDtoList) && entrustDetailDtoList.size() > 1) {
-                // 获取最小交易单元
                 MinTrdUnitLimitDto minTrdUnitLimitDto = this.getMinTrdUnitLimit(item);
+                // 获取最小交易单元
+                BigDecimal minStep = minTrdUnitLimitDto.getMinStep();
+                // 最小交易数量
+                BigDecimal minNum = minTrdUnitLimitDto.getMinNum();
                 // 获取各组合历史已分配指令数量
                 Map<String, BigDecimal> portfolioHisMatchEnMap = this.getPortfolioHisMatchEnInfo(item);
                 // 计算目前各组合剩余分配数量
-                Map<String, BigDecimal> portfolioRemainQtyMap = this.portfolioRemainQtyInfo(portfolioHisMatchEnMap, entrustDetailDtoList);
+                Map<String, BigDecimal> portfolioRemainQtyMap = this.portfolioRemainQtyInfo(portfolioHisMatchEnMap, entrustDetailDtoList, matchDto);
                 // 本次剩余分配总数
                 BigDecimal remainMatchQty = item.getMarchQty();
                 // 本次各组合分配数量
@@ -414,9 +421,9 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 // 2、循环第一轮
                 for(Map.Entry<String, BigDecimal> portfolioEntry : portfolioRemainQtyList){
                     // 判断最小交易数量是否超过该组合剩余分配数量
-                    if(minTrdUnitLimitDto.getMinNum().compareTo(portfolioEntry.getValue()) > 0){
+                    if (this.bigThan(minNum, portfolioEntry.getValue())) {
                         // 如最小交易数量超过该组合剩余分配数量, 则判断本次剩余分配总数 是否超过 组合剩余分配数量
-                        if(remainMatchQty.compareTo(portfolioEntry.getValue()) >= 0){
+                        if (this.bigThanOrEquals(remainMatchQty, portfolioEntry.getValue())) {
                             // 本次剩余分配总数 大于等于 组合剩余分配数量,则分配组合剩余分配数量,更新本次剩余分配总数
                             portfolioMatchQtyMap.put(portfolioEntry.getKey(), portfolioEntry.getValue());
                             remainMatchQty = ArithmeticUtil.subtract(remainMatchQty, portfolioEntry.getValue());
@@ -424,19 +431,19 @@ public class ExchangeTransMatchCommonService extends BaseService {
                             // 本次剩余分配总数 小于 组合剩余分配数量,则分配 本次剩余分配总数, 本次剩余分配总数置为0,跳出循环
                             portfolioMatchQtyMap.put(portfolioEntry.getKey(), remainMatchQty);
                             remainMatchQty = BigDecimal.ZERO;
-                            break;
+//                            break;
                         }
                     }
                     else{
                         // 本次剩余分配总数 大于等于 最小交易数量,则分配 最小交易数量,更新本次剩余分配总数
-                        if(remainMatchQty.compareTo(minTrdUnitLimitDto.getMinNum()) >= 0){
-                            portfolioMatchQtyMap.put(portfolioEntry.getKey(), minTrdUnitLimitDto.getMinNum());
-                            remainMatchQty = ArithmeticUtil.subtract(remainMatchQty, minTrdUnitLimitDto.getMinNum());
+                        if (this.bigThanOrEquals(remainMatchQty, minNum)) {
+                            portfolioMatchQtyMap.put(portfolioEntry.getKey(), minNum);
+                            remainMatchQty = ArithmeticUtil.subtract(remainMatchQty, minNum);
                         }else{
                             // 本次剩余分配总数 小于 最小交易数量,则分配 本次剩余分配总数, 本次剩余分配总数置为0,跳出循环
                             portfolioMatchQtyMap.put(portfolioEntry.getKey(), remainMatchQty);
                             remainMatchQty = BigDecimal.ZERO;
-                            break;
+//                            break;
                         }
                     }
                 }
@@ -451,18 +458,16 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     secondPortfolioRemainQtyList.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
                     // 目前各组合剩余分配数量总数
                     BigDecimal portfolioRemainQtyTotal = secondPortfolioRemainQtyMap.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
-                    BigDecimal minStep = minTrdUnitLimitDto.getMinStep();
                     // 按比例拆分分配总数
                     BigDecimal rateMatchQtyTotal = BigDecimal.ZERO;
                     for (Map.Entry<String, BigDecimal> portfolioEntry : secondPortfolioRemainQtyList) {
                         BigDecimal portfolioRemainQty =  portfolioEntry.getValue();
-                        // 临时分配数量
-                        BigDecimal matchQtyTemp = ArithmeticUtil.divide(ArithmeticUtil.multiply(remainMatchQty, portfolioRemainQty),
-                                portfolioRemainQtyTotal, 4);
+                        // 临时分配数量 不能超过组合剩余分配数量
+                        BigDecimal matchQtyTemp = this.min(portfolioRemainQty, this.divideWithScale4(this.multiply(remainMatchQty, portfolioRemainQty), portfolioRemainQtyTotal));
                         // 最小交易单元整数倍
                         BigDecimal stepTimes = ArithmeticUtil.divide(matchQtyTemp, minStep, 0, RoundingMode.FLOOR);
                         // 分配数量
-                        BigDecimal matchQty = ArithmeticUtil.multiply(minStep, stepTimes);
+                        BigDecimal matchQty = this.multiply(minStep, stepTimes);
                         // 合并分配结果
                         portfolioMatchQtyMap.put(portfolioEntry.getKey(), ArithmeticUtil.doAdd(matchQty,
                                 portfolioMatchQtyMap.get(portfolioEntry.getKey())));
@@ -476,8 +481,8 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 logger.debug("【指令编号:{},证券账户:{},比例拆分完后 portfolioMatchQtyMap:{}, 剩余尾差数量为:{}】", item.getEntrustId(),
                         item.getSecAcctId(), JSON.toJSONString(portfolioMatchQtyMap), remainMatchQty);
 
-                // 4、如按比例拆分完,仍有剩余数量尾差,则按照最小交易单元按顺序依次分配,直至分配完为止
-                if(remainMatchQty.compareTo(BigDecimal.ZERO) > 0){
+                // 4、如按比例拆分完,仍有剩余数量尾差,则按照最小交易单元(minStep)按顺序依次分配,直至分配完为止
+                if (this.bigThanZero(remainMatchQty)) {
                     // 计算目前各组合剩余分配数量
                     Map<String, BigDecimal> thirdPortfolioRemainQtyMap = this.portfolioRemainQtyInfo(portfolioMatchQtyMap,
                             portfolioHisMatchEnMap, entrustDetailDtoList);
@@ -486,13 +491,14 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     // 尾差分配数量Map
                     Map<String, BigDecimal> tailMatchQtyMap = new HashMap<>();
                     for (Map.Entry<String, BigDecimal> portfolioEntry : thirdPortfolioRemainQtyList) {
-                        String portfolioId = portfolioEntry.getKey();
-                        // 分配数量
-                        BigDecimal matchQty = minTrdUnitLimitDto.getMinStep();
+                        // 组合剩余分配数量 <= 0 时不分配
+                        if (this.lessThanOrEqualsZero(portfolioEntry.getValue())) {
+                            continue;
+                        }
                         // 剩余分配数量
-                        remainMatchQty = ArithmeticUtil.subtract(remainMatchQty, matchQty);
-                        tailMatchQtyMap.put(portfolioId, ArithmeticUtil.doAdd(matchQty, tailMatchQtyMap.get(portfolioId)));
-                        if(remainMatchQty.compareTo(BigDecimal.ZERO) <= 0){
+                        remainMatchQty = ArithmeticUtil.subtract(remainMatchQty, minStep);
+                        tailMatchQtyMap.put(portfolioEntry.getKey(), ArithmeticUtil.doAdd(minStep, tailMatchQtyMap.get(portfolioEntry.getKey())));
+                        if (this.lessThanOrEqualsZero(remainMatchQty)) {
                             break;
                         }
                     }
@@ -504,7 +510,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 }
                 logger.debug("【指令编号:{},证券账户:{},最终分配数量结果为:{}】", item.getEntrustId(), item.getSecAcctId(), JSON.toJSONString(portfolioMatchQtyMap));
                 // 5、根据本次分配数量计算 分配金额和交易支付费用
-                this.calculatePortFolioMatchAmt(matchDto, item, portfolioMatchQtyMap, portfolioRemainQtyList, entrustDetailDtoList, item.getMarchAmt());
+                this.calculatePortFolioMatchAmt(matchDto, item, portfolioMatchQtyMap, portfolioRemainQtyList, entrustDetailDtoList, item.getMarchAmt(), this.multiplyWithScale2(item.getMarchQty(), matchDto.getUnitCprice()));
             }
             logger.debug("【指令编号:{},证券账户:{},最终结果为:{}】", item.getEntrustId(), item.getSecAcctId(), JSON.toJSONString(entrustDetailDtoList));
             // ZGCPCN-1551:modify by fuyongsheng 20220620 start
@@ -523,9 +529,11 @@ public class ExchangeTransMatchCommonService extends BaseService {
      */
     private void calculatePortFolioMatchAmt(ExchangeTransMatchCommonDto matchDto, ExchangeTransMatchCommonEntrustDto entrust,
                     Map<String, BigDecimal> portfolioMatchQtyMap, List<Map.Entry<String, BigDecimal>> portfolioRemainQtyList,
-                                            List<ExchangeTransMatchCommonEntrustDetailDto> entrustDetailDtoList, BigDecimal marchAmt){
+                                            List<ExchangeTransMatchCommonEntrustDetailDto> entrustDetailDtoList, BigDecimal marchAmt, BigDecimal mrachCpriceAmt){
         // 本次各组合分配金额
         Map<String, BigDecimal> portfolioMatchAmtMap = new HashMap<>();
+        // 本次各组合分配净值金额
+        Map<String, BigDecimal> portfolioMatchCpriceAmtMap = new HashMap<>();
         // 本次各组合分配随交易支付费用
         Map<String, BigDecimal> portfolioMatchFeeAmtPayMap = new HashMap<>();
         // 本次各组合分配不随交易支付费用
@@ -553,8 +561,17 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     portfolioMatchAmtMap.put(portfolioId, this.multiplyWithScale2(matchQty,matchDto.getUnitFprice()));
                 }
             }
+            else if (this.isRepo(matchDto.getFinprodType2())) {
+                portfolioMatchAmtMap.put(portfolioId, matchQty);
+            }
             else {
                 portfolioMatchAmtMap.put(portfolioId, this.multiplyWithScale2(matchQty,matchDto.getUnitCprice()));
+            }
+
+            if (this.isRepo(matchDto.getFinprodType2())) {
+                portfolioMatchCpriceAmtMap.put(portfolioId, matchQty);
+            } else {
+                portfolioMatchCpriceAmtMap.put(portfolioId, this.multiplyWithScale2(matchQty, matchDto.getUnitCprice()));
             }
 
             if (Objects.nonNull(entrust.getMarchFeeAmtPay())) {
@@ -572,20 +589,27 @@ public class ExchangeTransMatchCommonService extends BaseService {
         // 将尾插分配到组合开始日最小的组合上
         String minVdatePortfolioId = this.getPortfolioIdByMinVdate(Lists.newArrayList(portfolioMatchQtyMap.keySet()));
         logger.debug("尾插分配在组合 => 【{}】", minVdatePortfolioId);
+
         BigDecimal reduce = portfolioMatchAmtMap.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
         portfolioMatchAmtMap.put(minVdatePortfolioId, marchAmt.subtract(reduce).add(portfolioMatchAmtMap.get(minVdatePortfolioId)));
+
+        BigDecimal reduceCprice = portfolioMatchCpriceAmtMap.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+        portfolioMatchCpriceAmtMap.put(minVdatePortfolioId, mrachCpriceAmt.subtract(reduceCprice).add(portfolioMatchCpriceAmtMap.get(minVdatePortfolioId)));
+
         if (Objects.nonNull(entrust.getMarchFeeAmtPay())) {
             BigDecimal reducePay = portfolioMatchFeeAmtPayMap.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
             portfolioMatchFeeAmtPayMap.put(minVdatePortfolioId, entrust.getMarchFeeAmtPay().subtract(reducePay).add(portfolioMatchFeeAmtPayMap.get(minVdatePortfolioId)));
         }
+
         if (Objects.nonNull(entrust.getMarchFeeAmtUnPay())) {
             BigDecimal reduceUnPay = portfolioMatchFeeAmtUnPayMap.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
-            portfolioMatchFeeAmtUnPayMap.put(minVdatePortfolioId, entrust.getMarchFeeAmtPay().subtract(reduceUnPay).add(portfolioMatchFeeAmtUnPayMap.get(minVdatePortfolioId)));
+            portfolioMatchFeeAmtUnPayMap.put(minVdatePortfolioId, entrust.getMarchFeeAmtUnPay().subtract(reduceUnPay).add(portfolioMatchFeeAmtUnPayMap.get(minVdatePortfolioId)));
         }
 
         for(ExchangeTransMatchCommonEntrustDetailDto entrustDetailDto : entrustDetailDtoList) {
             entrustDetailDto.setMarchQty(this.getValueOrZero(portfolioMatchQtyMap.get(entrustDetailDto.getPortfolioId())));
             entrustDetailDto.setMarchAmt(this.getValueOrZero(portfolioMatchAmtMap.get(entrustDetailDto.getPortfolioId())));
+            entrustDetailDto.setMarchCpriceAmt(this.getValueOrZero(portfolioMatchCpriceAmtMap.get(entrustDetailDto.getPortfolioId())));
             entrustDetailDto.setMarchFeeAmtPay(this.getValueOrZero(portfolioMatchFeeAmtPayMap.get(entrustDetailDto.getPortfolioId())));
             entrustDetailDto.setMarchFeeAmtUnPay(this.getValueOrZero(portfolioMatchFeeAmtUnPayMap.get(entrustDetailDto.getPortfolioId())));
         }
@@ -655,12 +679,13 @@ public class ExchangeTransMatchCommonService extends BaseService {
      * @return
      */
     private Map<String, BigDecimal> portfolioRemainQtyInfo(Map<String, BigDecimal> portfolioHisMatchEnMap,
-                                                           List<ExchangeTransMatchCommonEntrustDetailDto> entrustDetailDtoList){
+                                                           List<ExchangeTransMatchCommonEntrustDetailDto> entrustDetailDtoList,
+                                                           ExchangeTransMatchCommonDto matchDto){
         Map<String, BigDecimal> result = new HashMap<>();
         for(ExchangeTransMatchCommonEntrustDetailDto entrustDetailDto : entrustDetailDtoList){
             // 组合已分配数量
             BigDecimal matchQtyEn = portfolioHisMatchEnMap.get(entrustDetailDto.getPortfolioId());
-            result.put(entrustDetailDto.getPortfolioId(), ArithmeticUtil.subtract(entrustDetailDto.getEntrustNum(), matchQtyEn));
+            result.put(entrustDetailDto.getPortfolioId(), ArithmeticUtil.subtract(this.isRepo(matchDto.getFinprodType2())? this.multiply100(entrustDetailDto.getEntrustNum()):entrustDetailDto.getEntrustNum(), matchQtyEn));
         }
         return result;
     }
@@ -2115,8 +2140,10 @@ public class ExchangeTransMatchCommonService extends BaseService {
             entrust.setMarchQtyEn(marchQty);
             //指令已匹配金额
             entrust.setMarchAmtEn(entrust.getMarchAmt());
+            //净价总额
+            entrust.setMarchCpriceAmt(entrust.getMarchAmt());
             //匹配状态
-            matchStatus = this.bigThan(dto.getRemainNum(),entrust.getRemainEntrustAmt()) ?
+            matchStatus = this.bigThan(this.divide100(dto.getRemainNum()),entrust.getRemainEntrustAmt()) ?
                     下行交易匹配状态_部分匹配.getValue() : 下行交易匹配状态_匹配完成.getValue();
         }
         else if(isNumEntrust(entrust.getTargetType())) {
@@ -2128,18 +2155,22 @@ public class ExchangeTransMatchCommonService extends BaseService {
                 //质押券出入库成交信息中只有质押券的数量，目标类型只有数量，需要根据折算率计算标准券数量
                 if(this.isPledgeCouponsInOrOut(dto.getPs())) {
                     entrust.setMarchAmt(this.equals(marchQty, dto.getRemainNum()) ? dto.getRemainNum() : this.multiplyWithScale2(marchQty, entrust.getPrice()));
+                    entrust.setMarchCpriceAmt(this.equals(marchQty, dto.getRemainNum()) ? dto.getRemainNum() : this.multiplyWithScale2(marchQty, entrust.getPrice()));
                 }
                 // 广农商二阶段 GNS-920:【广农商场内清算】广农商场内债转股清算交易生成后，对应的持仓流水更新有误
                 else if (isBond2Stock(dto.getPs())) {
                     //已匹配金额（债转股只考虑成交数据和指令一对一的场景）
                     entrust.setMarchAmt(dto.getFpriceAmt());
+                    entrust.setMarchCpriceAmt(dto.getCpriceAmt());
                 }
                 else {
                     entrust.setMarchAmt(this.equals(marchQty,dto.getRemainNum()) ? dto.getRemainAmount() : this.multiplyWithScale2(marchQty,dto.getUnitFprice()));
+                    entrust.setMarchCpriceAmt(this.multiplyWithScale2(marchQty,dto.getUnitCprice()));
                 }
             }
             else {
                 entrust.setMarchAmt(this.equals(marchQty, dto.getRemainNum()) ? dto.getRemainAmount() : this.multiplyWithScale2(marchQty, dto.getUnitCprice()));
+                entrust.setMarchCpriceAmt(this.equals(marchQty, dto.getRemainNum()) ? dto.getRemainAmount() : this.multiplyWithScale2(marchQty, dto.getUnitCprice()));
             }
 
             //指令已匹配份额
@@ -2158,6 +2189,9 @@ public class ExchangeTransMatchCommonService extends BaseService {
             //已匹配金额
             BigDecimal entrustAmt = this.multiplyWithScale2(entrustQty, this.isBond(dto.getFinprodType2()) ? dto.getUnitFprice() : dto.getUnitCprice());
             entrust.setMarchAmt(this.min(dto.getRemainAmount(),entrustAmt));
+            //已匹配净价总额
+            BigDecimal entrustCAmt = this.multiplyWithScale2(entrustQty,  dto.getUnitCprice());
+            entrust.setMarchCpriceAmt(this.min(dto.getRemainAmount(),entrustCAmt));
             //指令已匹配份额
             BigDecimal marchAmtEn = this.multiplyWithScale2(dto.getRemainNum(),dto.getUnitCprice());
             entrust.setMarchQtyEn(ArithmeticUtil.divide(this.min(marchAmtEn,entrust.getRemainEntrustAmt()),entrust.getPrice(),4));
@@ -2240,10 +2274,14 @@ public class ExchangeTransMatchCommonService extends BaseService {
             BigDecimal totalFinishMarchQty = BigDecimal.ZERO;
             //已经完全匹配的可匹配金额
             BigDecimal totalFinishMarchAmt = BigDecimal.ZERO;
+            //已经完全匹配的可匹配净价金额
+            BigDecimal totalFinishMarchCpriceAmt = BigDecimal.ZERO;
             //已经完全匹配的可分配随交易费用
             BigDecimal totalFinishMarchFeeAmtPay = BigDecimal.ZERO;
             //已经完全匹配的可分配不随交易费用
             BigDecimal totalFinishMarchUnFeeAmtPay = BigDecimal.ZERO;
+            //净价总额
+            BigDecimal cpriceAmt = this.multiplyWithScale2(dto.getRemainNum(), dto.getUnitCprice());
 
             //系统参数.匹配规则
             String matchRule = CacheUtil.getSysParam("MATCH_RULE");
@@ -2269,7 +2307,8 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     //能完全分配数据的指令
                     if (this.bigThan(dto.getRemainNum(), totalFinishMarchQty.add(entrust.getMarchQty()))) {
                         if(this.isRepo(dto.getFinprodType2())) {
-                            entrust.setMarchQtyEn(this.divide100(entrust.getRemainEntrustNum()));
+//                            entrust.setMarchQtyEn(this.divide100(entrust.getRemainEntrustNum()));
+                            entrust.setMarchQtyEn(entrust.getRemainEntrustNum());
                             entrust.setMarchAmtEn(entrust.getRemainEntrustAmt());
                         }
                         else if(isNumEntrust(entrust.getTargetType())) {
@@ -2282,6 +2321,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                         }
 
                         entrust.setMarchAmt(entrust.getMarchAmt().setScale(2, BigDecimal.ROUND_HALF_UP));
+                        entrust.setMarchCpriceAmt(this.divideWithScale2(entrust.getMarchQty().multiply(cpriceAmt), dto.getRemainNum()));
                         if (Objects.nonNull(dto.getTotalFeeAmtPay())) {
                             entrust.setMarchFeeAmtPay(this.divideWithScale2(entrust.getMarchQty().multiply(dto.getTotalFeeAmtPay()), dto.getRemainNum()));
                         }
@@ -2297,6 +2337,8 @@ public class ExchangeTransMatchCommonService extends BaseService {
                         entrust.setMarchQty(ArithmeticUtil.subtract(dto.getRemainNum(),totalFinishMarchQty));
                         //成交列表选择记录.剩余成交金额 - 匹配列表选择记录中已经完全匹配的可匹配金额
                         entrust.setMarchAmt(ArithmeticUtil.subtract(dto.getRemainAmount(),totalFinishMarchAmt));
+                        //成交列表选择记录.剩余成交净价金额 - 匹配列表选择记录中已经完全匹配的可匹配净价金额
+                        entrust.setMarchCpriceAmt(ArithmeticUtil.subtract(cpriceAmt,totalFinishMarchCpriceAmt));
 
                         if (Objects.nonNull(dto.getTotalFeeAmtPay())) {
                             entrust.setMarchFeeAmtPay(ArithmeticUtil.subtract(dto.getTotalFeeAmtPay(), totalFinishMarchFeeAmtPay));
@@ -2306,7 +2348,8 @@ public class ExchangeTransMatchCommonService extends BaseService {
                         }
 
                         if(this.isRepo(dto.getFinprodType2())) {
-                            entrust.setMarchQtyEn(this.divide100(entrust.getMarchQty()) );
+//                            entrust.setMarchQtyEn(this.divide100(entrust.getMarchQty()) );
+                            entrust.setMarchQtyEn(entrust.getMarchQty());
                             entrust.setMarchAmtEn(entrust.getMarchAmt());
                         }
                         else if(isNumEntrust(entrust.getTargetType())) {
@@ -2322,6 +2365,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
 
                     totalFinishMarchQty = ArithmeticUtil.doAdd(totalFinishMarchQty,entrust.getMarchQty());
                     totalFinishMarchAmt = ArithmeticUtil.doAdd(totalFinishMarchAmt,entrust.getMarchAmt());
+                    totalFinishMarchCpriceAmt = ArithmeticUtil.doAdd(totalFinishMarchCpriceAmt,entrust.getMarchCpriceAmt());
                     totalFinishMarchFeeAmtPay = ArithmeticUtil.doAdd(totalFinishMarchFeeAmtPay,entrust.getMarchFeeAmtPay());
                     totalFinishMarchUnFeeAmtPay = ArithmeticUtil.doAdd(totalFinishMarchUnFeeAmtPay,entrust.getMarchFeeAmtUnPay());
 
@@ -2341,10 +2385,12 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     ExchangeTransMatchCommonEntrustDto entrust = commonEntrustDtoList.get(i);
                     BigDecimal marchQty = BigDecimal.ZERO;
                     BigDecimal marchAmt = BigDecimal.ZERO;
+                    BigDecimal marchCpriceAmt = BigDecimal.ZERO;
 
                     if(i<commonEntrustDtoList.size()-1) {
                         marchQty = this.divideWithScale2(this.multiply(entrust.getMarchQty(), dto.getRemainNum()), totalMarchQty);
                         marchAmt = this.divideWithScale2(this.multiply(entrust.getMarchQty(), dto.getRemainAmount()), totalMarchQty);
+                        marchCpriceAmt = this.divideWithScale2(this.multiply(entrust.getMarchQty(), cpriceAmt), totalMarchQty);
 
                         if (Objects.nonNull(dto.getTotalFeeAmtPay())) {
                             entrust.setMarchFeeAmtPay(this.divideWithScale2(this.multiply(marchQty, dto.getTotalFeeAmtPay()), dto.getRemainNum()));
@@ -2358,6 +2404,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
                     else {
                         marchQty = ArithmeticUtil.subtract(dto.getRemainNum(),totalFinishMarchQty);
                         marchAmt = ArithmeticUtil.subtract(dto.getRemainAmount(),totalFinishMarchAmt);
+                        marchCpriceAmt = ArithmeticUtil.subtract(cpriceAmt,totalFinishMarchCpriceAmt);
 
                         if (Objects.nonNull(dto.getTotalFeeAmtPay())) {
                             entrust.setMarchFeeAmtPay(ArithmeticUtil.subtract(dto.getTotalFeeAmtPay(), totalFinishMarchFeeAmtPay));
@@ -2371,7 +2418,13 @@ public class ExchangeTransMatchCommonService extends BaseService {
 
                     entrust.setMarchQty(marchQty);
                     entrust.setMarchAmt(marchAmt);
-                    if(isNumEntrust(entrust.getTargetType())) {
+                    entrust.setMarchCpriceAmt(marchCpriceAmt);
+
+                    if(this.isRepo(dto.getFinprodType2())) {
+                        entrust.setMarchQtyEn(this.divide100(ArithmeticUtil.multiply(ArithmeticUtil.divide(entrust.getMarchQty(),totalMarchQty,4),dto.getRemainNum())));
+                        entrust.setMarchAmtEn(ArithmeticUtil.multiply(ArithmeticUtil.divide(entrust.getMarchQty(),totalMarchQty,4),dto.getRemainNum()));
+                    }
+                    else if(isNumEntrust(entrust.getTargetType())) {
                         entrust.setMarchQtyEn(ArithmeticUtil.multiply(ArithmeticUtil.divide(entrust.getMarchQty(),totalMarchQty,4),dto.getRemainNum()));
                         entrust.setMarchAmtEn(ArithmeticUtil.multiply(ArithmeticUtil.divide(entrust.getMarchQty(),totalMarchQty,4),dto.getRemainNum(),entrust.getPrice()));
                     }
@@ -2382,6 +2435,7 @@ public class ExchangeTransMatchCommonService extends BaseService {
 
                     totalFinishMarchQty = ArithmeticUtil.doAdd(totalFinishMarchQty,entrust.getMarchQty());
                     totalFinishMarchAmt = ArithmeticUtil.doAdd(totalFinishMarchAmt,entrust.getMarchAmt());
+                    totalFinishMarchCpriceAmt = ArithmeticUtil.doAdd(totalFinishMarchCpriceAmt,entrust.getMarchCpriceAmt());
                     totalFinishMarchFeeAmtPay = ArithmeticUtil.doAdd(totalFinishMarchFeeAmtPay,entrust.getMarchFeeAmtPay());
                     totalFinishMarchUnFeeAmtPay = ArithmeticUtil.doAdd(totalFinishMarchUnFeeAmtPay,entrust.getMarchFeeAmtUnPay());
 
@@ -2661,9 +2715,23 @@ public class ExchangeTransMatchCommonService extends BaseService {
         return false;
     }
 
+    public boolean lessThan(BigDecimal d, BigDecimal decimal) {
+        if (Objects.nonNull(d) && Objects.nonNull(decimal)) {
+            return d.compareTo(decimal) < 0;
+        }
+        return false;
+    }
+
     public boolean bigThanOrEquals(BigDecimal d, BigDecimal decimal) {
         if (Objects.nonNull(d) && Objects.nonNull(decimal)) {
             return d.compareTo(decimal) >= 0;
+        }
+        return false;
+    }
+
+    public boolean lessThanOrEquals(BigDecimal d, BigDecimal decimal) {
+        if (Objects.nonNull(d) && Objects.nonNull(decimal)) {
+            return d.compareTo(decimal) <= 0;
         }
         return false;
     }
@@ -2677,6 +2745,18 @@ public class ExchangeTransMatchCommonService extends BaseService {
 
     public boolean bigThanZero(BigDecimal value) {
         return bigThan(value, BigDecimal.ZERO);
+    }
+
+    public boolean bigThanOrEqualsZero(BigDecimal value) {
+        return bigThanOrEquals(value, BigDecimal.ZERO);
+    }
+
+    public boolean lessThanZero(BigDecimal value) {
+        return lessThan(value, BigDecimal.ZERO);
+    }
+
+    public boolean lessThanOrEqualsZero(BigDecimal value) {
+        return lessThanOrEquals(value, BigDecimal.ZERO);
     }
 
     public BigDecimal multiply(BigDecimal d, BigDecimal num) {

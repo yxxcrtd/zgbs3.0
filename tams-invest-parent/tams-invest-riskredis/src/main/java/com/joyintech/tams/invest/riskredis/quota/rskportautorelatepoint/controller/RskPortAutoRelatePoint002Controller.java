@@ -128,7 +128,7 @@ public class RskPortAutoRelatePoint002Controller extends BaseController {
             dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
             listFloatRate.add(dto);
         }
-        SelectDto selectDto8 = this.getSelectDataFromDataDic(BussinessDictCodeRds.是否, null);
+        SelectDto selectDto8 = this.getSelectDataFromDataDic(BussinessDictCodeRds.是否现金管理类产品, null);
         for (SelectOptionDto dto : selectDto8.getOptions()) {
             dto.setId(dto.getCol() + GlobalConstant.POINT + dto.getId());
             listFloatRate.add(dto);

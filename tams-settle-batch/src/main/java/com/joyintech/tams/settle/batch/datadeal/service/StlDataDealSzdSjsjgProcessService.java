@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.util.*;
 
@@ -229,6 +230,14 @@ public class StlDataDealSzdSjsjgProcessService {
             settleTransData.setShareAmt(abs(szdSjsjg.getJgqssl()));
             // 全价总额
             settleTransData.setFpriceAmt(abs(szdSjsjg.getJgqsbj()));
+            // 净价总额 round（清算数据Entity.成交价格*变量.交易份额，2）
+            settleTransData.setCpriceAmt(szdSjsjg.getJgcjjg().multiply(settleTransData.getShareAmt()).abs().setScale(2, RoundingMode.HALF_UP));
+            // 单位利息  round（（全价总额-净价总额）/变量.交易份额，8）
+            settleTransData.setUnitInt(ArithmeticUtil.divide(ArithmeticUtil.subtract(settleTransData.getFpriceAmt(), settleTransData.getCpriceAmt()), settleTransData.getShareAmt(), 8, RoundingMode.HALF_UP));
+            // 利息总额  全价总额 - 净价总额
+            settleTransData.setIntAmt(ArithmeticUtil.subtract(settleTransData.getFpriceAmt(), settleTransData.getCpriceAmt()));
+            // 单位面值 调用【当前面值】
+            settleTransData.setParValue(stlDataDealProcessCommonService.getUnitPrice(settleTransData.getFinprodId(), settleTransData.getTradeDate()));
             // 业务类型
             settleTransData.setBusiType(DictCodeList.业务类型_债券交易.getValue());
             // 单位面值 调用【当前面值】
@@ -1999,6 +2008,9 @@ public class StlDataDealSzdSjsjgProcessService {
        if(DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())){
            if(StringUtil.isEmpty(settleTransData.getApplyTradeId())){
                settleTransData.setApplyTradeId(StringUtil.isNotEmpty(szdSjsjg.getJgzxbh())?szdSjsjg.getJgzxbh():szdSjsjg.getJgywlsh());
+           }
+           if(StringUtil.isEmpty(settleTransData.getApplyTradeId())){
+               settleTransData.setApplyTradeId("0");
            }
        }
     }

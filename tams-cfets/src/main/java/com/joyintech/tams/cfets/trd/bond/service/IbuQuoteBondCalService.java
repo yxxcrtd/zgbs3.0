@@ -356,7 +356,13 @@ public class IbuQuoteBondCalService extends BaseService {
                         continue;
                     }
                 } else {
-                    item.setShareAmt(ArithmeticUtil.doAdd(item.getShareAmt(), addDimension));
+                    if (BigDecimalUtil.ACompareToB(addDimension, item.getAvaNum(), 2) >= 0) {
+                        item.setShareAmt(ArithmeticUtil.doAdd(item.getShareAmt(), item.getAvaNum()));
+                        item.setAvaNum(BigDecimal.ZERO);
+                    } else {
+                        item.setShareAmt(ArithmeticUtil.doAdd(item.getShareAmt(), addDimension));
+                        item.setAvaNum(ArithmeticUtil.subtract(item.getAvaNum(), addDimension));
+                    }
                     tailDifference = ArithmeticUtil.subtract(tailDifference, addDimension);
                 }
             }
@@ -451,8 +457,8 @@ public class IbuQuoteBondCalService extends BaseService {
                     item.setSellAbleNum(shareAmt);
                 }
             }*/
-            item.setCpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(shareAmt, request.getCpriceAmt()), request.getShareAmt(), 2, RoundingMode.HALF_DOWN));
-            item.setFpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(shareAmt, request.getFpriceAmt()), request.getShareAmt(), 2, RoundingMode.HALF_DOWN));
+            item.setCpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(shareAmt, request.getCpriceAmt()), request.getShareAmt(), 2, RoundingMode.DOWN));
+            item.setFpriceAmt(ArithmeticUtil.divide(ArithmeticUtil.multiply(shareAmt, request.getFpriceAmt()), request.getShareAmt(), 2, RoundingMode.DOWN));
             tailDifferenceCpriceAmt = ArithmeticUtil.subtract(tailDifferenceCpriceAmt, item.getCpriceAmt());
             tailDifferenceFpriceAmt = ArithmeticUtil.subtract(tailDifferenceFpriceAmt, item.getFpriceAmt());
         }
