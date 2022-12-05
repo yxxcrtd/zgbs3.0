@@ -1,9 +1,8 @@
-package com.joyintech.service.basicdata.marketdata.externaloptions.dao;
+package com.joyintech.tams.common.basicdata.marketdata.externaloptions.dao;
 
 import com.joyintech.framework.select.SuggestDto;
-import com.joyintech.service.basicdata.marketdata.externaloptions.dto.ComExternalOptions001Dto;
-import com.joyintech.service.basicdata.marketdata.externaloptions.dto.ComExternalOptions002Dto;
-
+import com.joyintech.tams.common.basicdata.marketdata.externaloptions.dto.ComExternalOptions001Dto;
+import com.joyintech.tams.common.basicdata.marketdata.externaloptions.dto.ComExternalOptions002Dto;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

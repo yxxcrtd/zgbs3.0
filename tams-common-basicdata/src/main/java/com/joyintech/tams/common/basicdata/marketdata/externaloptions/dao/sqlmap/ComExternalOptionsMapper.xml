@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 
-<mapper namespace="com.joyintech.service.basicdata.marketdata.externaloptions.dao.ComExternalOptionsMapper">
+<mapper namespace="com.joyintech.tams.common.basicdata.marketdata.externaloptions.dao.ComExternalOptionsMapper">
 
 <select id="findFinRateInfoByBenchmarkId"  resultType="com.joyintech.framework.select.SuggestDto">
      select distinct A.FINPROD_ID as code, A.BENCHMARK_ID as shortName , A.FINPROD_ID as hidCode
@@ -36,7 +36,7 @@
 
 
 
-     <select id="selectByPrimaryKey" resultType="com.joyintech.service.basicdata.marketdata.externaloptions.dto.ComExternalOptions002Dto">
+     <select id="selectByPrimaryKey" resultType="com.joyintech.tams.common.basicdata.marketdata.externaloptions.dto.ComExternalOptions002Dto">
          <!--
           select
           FINPROD_ID2  finprodId2
@@ -57,7 +57,7 @@
 
 
 
-     <select id="selectList" resultType="com.joyintech.service.basicdata.marketdata.externaloptions.dto.ComExternalOptions001Dto">
+     <select id="selectList" resultType="com.joyintech.tams.common.basicdata.marketdata.externaloptions.dto.ComExternalOptions001Dto">
     SELECT opt.TARGET_ID as targetId ,opt.TARGET_NAME targetName,opt.TARGET_TYPE targetType, mst.VALUATION, TO_CHAR(mst.VAL_DATE, 'yyyy-MM-dd') as valDate ,mst.FINPROD_ID2,TO_CHAR(mst.PUBLISH_DATE, 'yyyy-MM-dd') as publishDate
     FROM MST_VAL_OP mst LEFT JOIN FIN_RATE_INFO fin  ON fin.FINPROD_ID=mst.FINPROD_ID2
     AND		fin.BENCHMARK_TYPE = #{BENCHMARK_TYPE2}
@@ -81,14 +81,14 @@
      </select>
      
      <!-- add by tanxuan on 20200210 -->
-	<select id="dateCheck" resultType="com.joyintech.service.basicdata.marketdata.externaloptions.dto.ComExternalOptions002Dto">
+	<select id="dateCheck" resultType="com.joyintech.tams.common.basicdata.marketdata.externaloptions.dto.ComExternalOptions002Dto">
 	     select TO_CHAR(ftp.VDATE, 'yyyy-MM-dd') as vdate ,TO_CHAR(ftp.MDATE, 'yyyy-MM-dd') as mdate
 	     FROM FIN_TRADE_PRODUCT ftp
 	     where ftp.FINPROD_ID = #{finprodId2}
 	     and ftp.BRANCH = #{branch}
 	</select>
 
-    <select id="getTargetInfo" resultType="com.joyintech.service.basicdata.marketdata.externaloptions.dto.ComExternalOptions002Dto">
+    <select id="getTargetInfo" resultType="com.joyintech.tams.common.basicdata.marketdata.externaloptions.dto.ComExternalOptions002Dto">
          select distinct
             A.FINPROD_ID ,
             B.TARGET_ID,
