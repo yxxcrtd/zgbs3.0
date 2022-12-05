@@ -228,7 +228,19 @@ public class StlDataDealSzdJsmxProcessService {
 				// 单位净价
 				if (StringUtil.isNotEmpty(szdJsmx.getJg2())) {
 					settleTransData.setUnitCprice(new BigDecimal(szdJsmx.getJg2()));// 配债此字段未空，需要判断
+					// 净价总额
+					settleTransData.setCpriceAmt(settleTransData.getUnitCprice().multiply(settleTransData.getShareAmt().abs()));
+					// 全价总额 > 净价总额
+					if (settleTransData.getFpriceAmt().compareTo(settleTransData.getCpriceAmt()) > 0) {
+						// 单位利息  IF （变量.全价总额 - 变量.净价总额 >0） THEN  round（（变量.全价总额 - 变量.净价总额）/变量.交易份额，8）  ELSE 参照原逻辑
+						settleTransData.setIntRate(ArithmeticUtil.divide(ArithmeticUtil.subtract(settleTransData.getFpriceAmt(), settleTransData.getCpriceAmt()), settleTransData.getShareAmt(), 8, RoundingMode.HALF_UP));
+						// 利息总额  IF （变量.全价总额 - 变量.净价总额 >0） THEN  变量.全价总额 - 变量.净价总额  ELSE 参照原逻辑
+						settleTransData.setIntAmt(ArithmeticUtil.subtract(settleTransData.getFpriceAmt(), settleTransData.getCpriceAmt()));
+					}
 				}
+				// 单位面值 调用【当前面值】
+				settleTransData.setParValue(stlDataDealProcessCommonService.getUnitPrice(settleTransData.getFinprodId(),
+						settleTransData.getTradeDate()));
 				// 交易币种
 				settleTransData.setCcy(stlDataDealProcessCommonService.getCcy(szdJsmx.getBz()));
 				// 交收方式

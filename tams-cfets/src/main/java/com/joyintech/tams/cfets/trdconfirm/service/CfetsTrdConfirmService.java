@@ -605,7 +605,10 @@ public class CfetsTrdConfirmService extends BaseService {
                 intAmt = ArithmeticUtil.subtract(intAmt, result.getTrdProductDeals().get(i).getIntAmt());
             }
             for (BussTrdTransferOrderDto item : result.getBussTrdTransferOrder()) {
-                item.setSettleAmt(result.getTrdProductDeals().get(i).getFpriceAmt());
+                if(StringUtil.equals(item.getTradeId(),result.getTrdProductDeals().get(i).getTradeId())) {
+                    item.setSettleAmt(result.getTrdProductDeals().get(i).getFpriceAmt());
+                    break;
+                }
             }
         }
         logger.info("处理后数据:{}", JsonUtils.object2Json(result));
@@ -918,6 +921,8 @@ public class CfetsTrdConfirmService extends BaseService {
             deal.setbTradeId(regDeal.getTradeId());
             deal.setTradeMarket(dtoReg.getTradeMarket());
             deal.setIsOutTrade(BussinessDictCodeList.是否_是.getValue());
+            // 交易市场
+            deal.setTradeMarketMode(BussinessDictCodeList.交易市场_一级市场.getValue());
             deals.add(deal);
             // =====================划款指令信息=====================
             bussTrdTransferOrderDtoList.addAll(this.dealOrders(deal, dtoReg.getPs()));

@@ -175,6 +175,9 @@ where
 			<if test="account != null" >
 				ACCOUT,
 			</if>
+			<if test="secAcctId != null" >
+				SEC_ACCT_ID,
+			</if>
 			<if test="checkResult != null" >
 				CHECK_RESULT,
 			</if>
@@ -228,6 +231,9 @@ where
 			<if test="account != null" >
 				#{account,jdbcType=VARCHAR},
 			</if>
+			<if test="secAcctId != null" >
+				#{secAcctId,jdbcType=VARCHAR},
+			</if>
 			<if test="checkResult != null" >
 				#{checkResult,jdbcType=VARCHAR},
 			</if>
@@ -235,7 +241,7 @@ where
 				#{stlSecDeme,jdbcType=VARCHAR},
 			</if>
 			<if test="reconInfo != null" >
-				#{reconInfo,jdbcType=LONGVARBINARY},
+				#{reconInfo,jdbcType=VARCHAR},
 			</if>
 			<if test="entrustTradeId != null" >
 				#{entrustTradeId,jdbcType=VARCHAR},

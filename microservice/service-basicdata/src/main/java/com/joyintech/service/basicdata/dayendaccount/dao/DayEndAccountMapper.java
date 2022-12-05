@@ -93,6 +93,13 @@ public interface DayEndAccountMapper {
 
     StlSecReconDeal getStlSecReconDeal(String seqno);
 
+    /**
+     * 查询佣金对账方式
+     * @param customerId
+     * @return
+     */
+    List<String> getStlSecReconPara3(Map<String, Object> param);
+
     List<DayEndAccountDto> selectPageNew(Map<String, Object> param);
     List<DayEndAccountDto> selectPageNew1(Map<String, Object> param);
     List<DayEndAccountDto> selectPageNew2(Map<String, Object> param);

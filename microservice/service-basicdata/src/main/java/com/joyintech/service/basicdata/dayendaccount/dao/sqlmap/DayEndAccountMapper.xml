@@ -23,7 +23,7 @@
             ssr.STL_SEC_DEME,
             ssrd.TRADE_ID,
             ssrd.SEAT_NUMBER,
-            NVL(ssrd.COMMISSION_AMT,0) COMMISSION_AMT,
+            NVL(decode(ssrp.PARA_VALUE, #{PARA_VALUE_QYJ}, ssrd.COMMISSION_AMT, ssrd.NET_COMMISSION_AMT),0) COMMISSION_AMT,
             NVL(ssrd.JSF_AMT,0) JSF_AMT,
             NVL(ssrd.ZGF_AMT,0) ZGF_AMT,
             NVL(ssrd.STAMP_FEE,0) STAMP_FEE,
@@ -34,7 +34,7 @@
             NVL(ssrd.TRADE_NUM,0) TRADE_NUM,
             ssrd.PS,
             ssrd.SEC_ACCT_ID,
-            NVL(settle.COMMISSION_AMT,0) COMMISSION_AMT2,
+            NVL(decode(ssrp.PARA_VALUE, #{PARA_VALUE_QYJ}, settle.COMMISSION_AMT, settle.NET_COMMISSION_AMT),0) COMMISSION_AMT2,
             NVL(settle.JSF_AMT,0) JSF_AMT2,
             NVL(settle.ZGF_AMT,0) ZGF_AMT2,
             NVL(settle.STAMP_FEE,0) STAMP_FEE2,
@@ -52,12 +52,13 @@
                 detail.SEQ_NO,
                 std.FINPROD_TYPE2,
                 SUM(std.COMMISSION_AMT) COMMISSION_AMT,
-                SUM(std.JSF_AMT) JSF_AMT,
-                SUM(std.ZGF_AMT) ZGF_AMT,
-                SUM(std.STAMP_FEE) STAMP_FEE,
-                SUM(std.SETTLE_FEE) SETTLE_FEE,
-                SUM(std.GHF_AMT) GHF_AMT,
-                SUM(std.SXF_AMT) SXF_AMT,
+                SUM(std.NET_COMMISSION_AMT) NET_COMMISSION_AMT,
+                SUM(std.JSF_AMT_RAW) JSF_AMT,
+                SUM(std.ZGF_AMT_RAW) ZGF_AMT,
+                SUM(std.STAMP_FEE_RAW) STAMP_FEE,
+                SUM(std.SETTLE_FEE_RAW) SETTLE_FEE,
+                SUM(std.GHF_AMT_RAW) GHF_AMT,
+                SUM(std.SXF_AMT_RAW) SXF_AMT,
                 SUM(
                     CASE WHEN std.PS = #{PS_T01} AND std.FINPROD_TYPE2 != #{prodType2_F02} THEN std.FPRICE_AMT*-1
                     WHEN std.PS = #{PS_T56} AND std.BUSI_SCENE_CALSS = #{BUSI_SCENE_CALSS_0902RS03} AND std.TRADE_MARKET = #{TRADE_MARKET_03} THEN std.FPRICE_AMT*-1
@@ -91,6 +92,20 @@
                 CASE WHEN ssr.TRADE_MARKET = #{TRADE_MARKET_03} THEN 'SH'
                 WHEN ssr.TRADE_MARKET = #{TRADE_MARKET_04} THEN 'SZ'
                 END = ins.STOCK_CODE
+        LEFT JOIN
+            (
+                SELECT
+                    CUSTOMER_ID,
+                    PARA_VALUE,
+                    MAX(CONFIG_DATE)
+                FROM STL_SEC_RECON_PARA
+                WHERE
+                    <![CDATA[CONFIG_DATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+                    AND PARA_CODE = #{PARA_CODE_03}
+                GROUP BY
+                    CUSTOMER_ID,
+                    PARA_VALUE
+            )ssrp ON ssrd.CUSTOMER_ID = ssrp.CUSTOMER_ID
         WHERE
             1=1
             <if test="accountList != null and accountList.size() > 0">
@@ -603,7 +618,7 @@
             #{item.jsfAmt,jdbcType=DECIMAL}, #{item.zgfAmt,jdbcType=DECIMAL}, #{item.stampFee,jdbcType=DECIMAL},
             #{item.settleFee,jdbcType=DECIMAL}, #{item.ghfAmt,jdbcType=DECIMAL}, #{item.sxfAmt,jdbcType=DECIMAL},
             #{item.fpriceAmt,jdbcType=DECIMAL}, #{item.tradeNum,jdbcType=DECIMAL},
-            #{item.reconInfo,jdbcType=LONGVARBINARY}
+            #{item.reconInfo,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -648,17 +663,18 @@
                std.UNIT_FPRICE,
                std.PAR_VALUE,
                std.CPRICE_AMT,
-               NVL(std.SHARE_AMT,0) SHARE_AMT,
-               NVL(std.PRIN_AMT,0) PRIN_AMT,
-               NVL(std.INT_AMT,0) INT_AMT,
-               NVL(std.FPRICE_AMT,0) FPRICE_AMT,
-               NVL(std.STAMP_FEE,0) STAMP_FEE,
-               NVL(std.JSF_AMT,0) JSF_AMT,
-               NVL(std.GHF_AMT,0) GHF_AMT,
-               NVL(std.ZGF_AMT,0) ZGF_AMT,
-               NVL(std.SXF_AMT,0) SXF_AMT,
-               NVL(std.SETTLE_FEE,0) SETTLE_FEE,
-               NVL(std.COMMISSION_AMT,0) COMMISSION_AMT,
+               std.SHARE_AMT SHARE_AMT,
+               std.PRIN_AMT PRIN_AMT,
+               std.INT_AMT INT_AMT,
+               std.FPRICE_AMT FPRICE_AMT,
+               std.STAMP_FEE STAMP_FEE,
+               std.JSF_AMT JSF_AMT,
+               std.GHF_AMT GHF_AMT,
+               std.ZGF_AMT ZGF_AMT,
+               std.SXF_AMT SXF_AMT,
+               std.SETTLE_FEE SETTLE_FEE,
+               std.COMMISSION_AMT COMMISSION_AMT,
+               std.NET_COMMISSION_AMT NET_COMMISSION_AMT,
                std.IS_PAY_WITH_TRADE,
                std.TRADE_AMT,
                std.PS,
@@ -712,7 +728,7 @@
         std.PRIN_AMT, std.INT_AMT, std.FPRICE_AMT,
         std.STAMP_FEE, std.JSF_AMT, std.GHF_AMT,
         std.ZGF_AMT, std.SXF_AMT, std.SETTLE_FEE,
-        std.COMMISSION_AMT, std.IS_PAY_WITH_TRADE, std.TRADE_AMT,
+        std.COMMISSION_AMT, std.NET_COMMISSION_AMT, std.IS_PAY_WITH_TRADE, std.TRADE_AMT,
         std.PS, std.TRADE_MARKET, std.TRADE_MARKET_MODE,
         std.TRADE_PLAT, std.PLEDGE_SEC_NUM, std.SEAT_NUMBER,
         std.PORTFOLIO_ID, std.SEC_ACCT_ID, std.ACCT_NO,
@@ -949,7 +965,7 @@
         SUM(p1.AMOUNT) AMOUNT
         FROM PTL_SEC_POSITION p1
         LEFT JOIN STL_SEC_ACCT_INFO s1
-        ON p1.SEC_ACCT_ID=s1.SEC_ACCT_ID
+        ON p1.SEC_ACCT_ID=s1.BOND_ID
         LEFT JOIN PTL_CAPACCT_INFO p2
         ON s1.TRD_ACCT_ID=p2.ACCT_NO
         AND s1.TRD_ACCT_CCY=p2.CCY
@@ -1012,7 +1028,7 @@
         GROUP BY f1.TERM_TYPE,s1.BOND_ID,p1.CDATE
         ) t1
         LEFT JOIN STL_SEC_ACCT_INFO s1
-        ON t1.SEC_ACCT_ID=s1.SEC_ACCT_ID
+        ON t1.SEC_ACCT_ID=s1.BOND_ID
         LEFT JOIN STL_CAPACCT_INFO s2
         ON s1.TRD_ACCT_ID=s2.ACCT_NO
         AND s1.TRD_ACCT_CCY=s2.CCY
@@ -1224,6 +1240,7 @@
         table2.*,nvl(table2.portfolioId,'null')||','||'2'||','||table2.finprodId||','||to_char(table2.settleDate,'yyyy-MM-dd')||','||table2.secAcctId||','||nvl(table2.termType,'null') childInfo
         from (
         SELECT
+         distinct
         'root' parentInfo,
         null ccy,
         m2.CUSTOMER_NAME customerName,
@@ -1375,7 +1392,7 @@
         GROUP BY f1.TERM_TYPE,s1.BOND_ID,p1.CDATE
         ) t1
         LEFT JOIN STL_SEC_ACCT_INFO s1
-        ON t1.SEC_ACCT_ID=s1.SEC_ACCT_ID
+        ON t1.SEC_ACCT_ID=s1.BOND_ID
         LEFT JOIN STL_CAPACCT_INFO s2
         ON s1.TRD_ACCT_ID=s2.ACCT_NO
         AND s1.TRD_ACCT_CCY=s2.CCY
@@ -1545,6 +1562,7 @@
             NVL(ssrd.SETTLE_FEE,0) SETTLE_FEE,
             NVL(ssrd.TRADE_FEE,0) TRADE_FEE,
             NVL(ssrd.COMMISSION_AMT,0) COMMISSION_AMT,
+            NVL(ssrd.NET_COMMISSION_AMT,0) NET_COMMISSION_AMT,
             NVL(ssrd.TOTAL_TEEAMT,0) TOTAL_TEEAMT
         FROM
             STL_SEC_RECON_DEAL ssrd
@@ -1554,5 +1572,16 @@
             T_INSTRUMENT ins ON ssrd.FINPROD_ID = ins.STOCK_CODE
         WHERE
             ssrd.SEQ_NO = #{seqNo,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getStlSecReconPara3" resultType="java.lang.String">
+        SELECT PARA_VALUE FROM STL_SEC_RECON_PARA
+        WHERE
+            <![CDATA[CONFIG_DATE <= TO_DATE(#{sysDate},'YYYY-MM-DD')]]>
+            AND PARA_CODE = '03'
+            AND CUSTOMER_ID = #{customerId}
+        GROUP BY
+            CUSTOMER_ID,
+            PARA_VALUE
     </select>
 </mapper>

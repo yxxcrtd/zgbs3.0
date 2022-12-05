@@ -14,6 +14,11 @@ import com.joyintech.framework.util.StringUtil;
  * @since 1.0
  */
 public enum BussinessDictCodeRds implements com.joyintech.framework.base.BaseDictCode{
+
+    /**
+     * 	是否现金管理类产品
+     */
+    是否现金管理类产品("CASH_YES_OR_NO"),
 	/**
 	 * REDIS模块
 	 */

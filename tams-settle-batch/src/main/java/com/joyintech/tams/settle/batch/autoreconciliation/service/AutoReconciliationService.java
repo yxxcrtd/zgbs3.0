@@ -48,6 +48,9 @@ public class AutoReconciliationService {
         param.put("PARA_VALUE_01", DictCodeListStl.对账维度_证券汇总.getValue());
         param.put("PARA_VALUE_02", DictCodeListStl.对账维度_委托汇总.getValue());
         param.put("PARA_VALUE_03", DictCodeListStl.对账维度_成交明细.getValue());
+        param.put("PARA_CODE_03", DictCodeListStl.参数代码_佣金对账方式.getValue());
+        param.put("PARA_VALUE_QYJ", DictCodeListStl.佣金对账方式_全佣金.getValue());
+        param.put("PARA_VALUE_JYJ", DictCodeListStl.佣金对账方式_净佣金.getValue());
         param.put("CHECK_RESULT_0", DictCodeListExt3.对账状态结果_不一致.getValue());
         param.put("CHECK_RESULT_2", DictCodeListExt3.对账状态结果_待处理.getValue());
         // 删除对账结果不一致和待处理数据

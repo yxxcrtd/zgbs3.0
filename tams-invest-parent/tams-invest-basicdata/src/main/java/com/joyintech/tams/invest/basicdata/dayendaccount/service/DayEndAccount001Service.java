@@ -107,11 +107,11 @@ public class DayEndAccount001Service extends CommonExportService<DayEndAccountDt
 	 * @param param
 	 * @return
 	 */
-	public DayEndAccount002Dto getDealDetailInfo(Map<String, Object> param) {
-		return restTemplate.postForObject(
-				ServiceApplication.BASICDATA_SERVICE_NAME + "/DayEndAccount/getDealDetailInfo", param,
-				DayEndAccount002Dto.class);
-	}
+//	public DayEndAccount002Dto getDealDetailInfo(Map<String, Object> param) {
+//		return restTemplate.postForObject(
+//				ServiceApplication.BASICDATA_SERVICE_NAME + "/DayEndAccount/getDealDetailInfo", param,
+//				DayEndAccount002Dto.class);
+//	}
 
 	public Page<SelectOptionDto> selectCustomerId(Map<String, Object> param) {
 		return restTemplate.postForPage(

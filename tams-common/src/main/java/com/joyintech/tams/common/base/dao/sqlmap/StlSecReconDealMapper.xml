@@ -41,6 +41,7 @@
         <result column="SETTLE_FEE" property="settleFee" jdbcType="DECIMAL" />
         <result column="TRADE_FEE" property="tradeFee" jdbcType="DECIMAL" />
         <result column="COMMISSION_AMT" property="commissionAmt" jdbcType="DECIMAL" />
+        <result column="NET_COMMISSION_AMT" property="netCommissionAmt" jdbcType="DECIMAL" />
         <result column="TOTAL_TEEAMT" property="totalTeeamt" jdbcType="DECIMAL" />
         <result column="CREATE_USER" property="createUser" jdbcType="VARCHAR" />
         <result column="CREATE_DEPT" property="createDept" jdbcType="VARCHAR" />
@@ -58,7 +59,7 @@
         CCY CCY, TRADE_NUM TRADE_NUM, TRADE_AMT TRADE_AMT, HAPPEN_AMT HAPPEN_AMT, PRICE PRICE, 
         FULL_PRICE FULL_PRICE, UNIT UNIT, INT_AMT INT_AMT, HGDQJE HGDQJE, HGDQR HGDQR, STAMP_FEE STAMP_FEE, 
         JSF_AMT JSF_AMT, GHF_AMT GHF_AMT, ZGF_AMT ZGF_AMT, SXF_AMT SXF_AMT, SETTLE_FEE SETTLE_FEE, 
-        TRADE_FEE TRADE_FEE, COMMISSION_AMT COMMISSION_AMT, TOTAL_TEEAMT TOTAL_TEEAMT, CREATE_USER CREATE_USER, 
+        TRADE_FEE TRADE_FEE, COMMISSION_AMT COMMISSION_AMT,NET_COMMISSION_AMT NET_COMMISSION_AMT, TOTAL_TEEAMT TOTAL_TEEAMT, CREATE_USER CREATE_USER,
         CREATE_DEPT CREATE_DEPT, CREATE_TIME CREATE_TIME, UPDATE_TIME UPDATE_TIME, UPDATE_USER UPDATE_USER,
         REPO_TYPE REPO_TYPE
     </sql>
@@ -95,8 +96,8 @@
             UNIT, INT_AMT, HGDQJE, 
             HGDQR, STAMP_FEE, JSF_AMT, 
             GHF_AMT, ZGF_AMT, SXF_AMT, 
-            SETTLE_FEE, TRADE_FEE, COMMISSION_AMT, 
-            TOTAL_TEEAMT, CREATE_USER, CREATE_DEPT, 
+            SETTLE_FEE, TRADE_FEE, COMMISSION_AMT, NET_COMMISSION_AMT,
+            TOTAL_TEEAMT, CREATE_USER, CREATE_DEPT,
             CREATE_TIME, UPDATE_TIME, UPDATE_USER,
             REPO_TYPE
             )
@@ -112,7 +113,7 @@
             #{unit,jdbcType=DECIMAL}, #{intAmt,jdbcType=DECIMAL}, #{hgdqje,jdbcType=DECIMAL}, 
             #{hgdqr,jdbcType=DATE}, #{stampFee,jdbcType=DECIMAL}, #{jsfAmt,jdbcType=DECIMAL}, 
             #{ghfAmt,jdbcType=DECIMAL}, #{zgfAmt,jdbcType=DECIMAL}, #{sxfAmt,jdbcType=DECIMAL}, 
-            #{settleFee,jdbcType=DECIMAL}, #{tradeFee,jdbcType=DECIMAL}, #{commissionAmt,jdbcType=DECIMAL}, 
+            #{settleFee,jdbcType=DECIMAL}, #{tradeFee,jdbcType=DECIMAL}, #{commissionAmt,jdbcType=DECIMAL}, #{netCommissionAmt,jdbcType=DECIMAL}, 
             #{totalTeeamt,jdbcType=DECIMAL}, #{createUser,jdbcType=VARCHAR}, #{createDept,jdbcType=VARCHAR}, 
             #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR},
             #{repoType,jdbcType=VARCHAR}
@@ -237,6 +238,9 @@
             </if>
             <if test="commissionAmt != null" >
                 COMMISSION_AMT,
+            </if>
+            <if test="netCommissionAmt != null" >
+                NET_COMMISSION_AMT,
             </if>
             <if test="totalTeeamt != null" >
                 TOTAL_TEEAMT,
@@ -378,6 +382,9 @@
             <if test="commissionAmt != null" >
                 #{commissionAmt,jdbcType=DECIMAL},
             </if>
+            <if test="netCommissionAmt != null" >
+                #{netCommissionAmt,jdbcType=DECIMAL},
+            </if>
             <if test="totalTeeamt != null" >
                 #{totalTeeamt,jdbcType=DECIMAL},
             </if>
@@ -407,14 +414,14 @@
         TRADE_MARKET, TRADE_PLAT, TRADE_DATE, SETTLE_DATE, ACCOUT, SEC_ACCT_ID, PS, SETTLEMEN_TYPE, 
         ORDER_DATE, CCY, TRADE_NUM, TRADE_AMT, HAPPEN_AMT, PRICE, FULL_PRICE, UNIT, INT_AMT, 
         HGDQJE, HGDQR, STAMP_FEE, JSF_AMT, GHF_AMT, ZGF_AMT, SXF_AMT, SETTLE_FEE, TRADE_FEE, 
-        COMMISSION_AMT, TOTAL_TEEAMT, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_TIME, 
+        COMMISSION_AMT, NET_COMMISSION_AMT, TOTAL_TEEAMT, CREATE_USER, CREATE_DEPT, CREATE_TIME, UPDATE_TIME,
         UPDATE_USER, REPO_TYPE)
         select SEQ_NO, TRADE_ID, INSTRUCTION_ID, CUSTOMER_ID, TRADE_NO, 
             SALE_DEPID, SEAT_NUMBER, PORTFOLIO_ID, FINPROD_ID, FINPROD_TYPE, MARKET_ID, FINPROD_NAME, 
             TRADE_MARKET, TRADE_PLAT, TRADE_DATE, SETTLE_DATE, ACCOUT, SEC_ACCT_ID, PS, SETTLEMEN_TYPE, 
             ORDER_DATE, CCY, TRADE_NUM, TRADE_AMT, HAPPEN_AMT, PRICE, FULL_PRICE, UNIT, INT_AMT, 
             HGDQJE, HGDQR, STAMP_FEE, JSF_AMT, GHF_AMT, ZGF_AMT, SXF_AMT, SETTLE_FEE, TRADE_FEE, 
-            COMMISSION_AMT, TOTAL_TEEAMT, CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME, 
+            COMMISSION_AMT, NET_COMMISSION_AMT, TOTAL_TEEAMT, CREATE_USER, CREATE_DEPT, CREATE_TIME, #{updateTime,jdbcType=TIMESTAMP} UPDATE_TIME,
             #{updateUser,jdbcType=VARCHAR} UPDATE_USER, REPO_TYPE
              from STL_SEC_RECON_DEAL
              where 1 = 1 and SEQ_NO = #{seqNo,jdbcType=VARCHAR}
@@ -536,6 +543,9 @@
             <if test="commissionAmt != null" >
                 COMMISSION_AMT = #{commissionAmt,jdbcType=DECIMAL},
             </if>
+            <if test="netCommissionAmt != null" >
+                NET_COMMISSION_AMT = #{netCommissionAmt,jdbcType=DECIMAL},
+            </if>
             <if test="totalTeeamt != null" >
                 TOTAL_TEEAMT = #{totalTeeamt,jdbcType=DECIMAL},
             </if>
@@ -591,6 +601,7 @@
             SETTLE_FEE = #{settleFee,jdbcType=DECIMAL},
             TRADE_FEE = #{tradeFee,jdbcType=DECIMAL},
             COMMISSION_AMT = #{commissionAmt,jdbcType=DECIMAL},
+            NET_COMMISSION_AMT = #{netCommissionAmt,jdbcType=DECIMAL},
             TOTAL_TEEAMT = #{totalTeeamt,jdbcType=DECIMAL},
             UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
             UPDATE_USER = #{updateUser,jdbcType=VARCHAR},

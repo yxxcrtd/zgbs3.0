@@ -1,5 +1,5 @@
 $(function() {
-	
+
     function saveOrSubmit(operateType) {
     	var mstBondCreditRating = table.getAllRows();
         var object = $.serializeToObject('#submitForm');
@@ -34,7 +34,7 @@ $(function() {
             });
         });
     };
-    
+
     /**
      * 页面加载初始化
      */
@@ -55,7 +55,7 @@ $(function() {
         cols:[
             {field:'noticeDate', title: 'MstMarketInstitutions002.noticeDate', edit:true, type:'date', sortable:false},
             {field:'gradeDate', title: 'MstMarketInstitutions002.gradeDate', edit:true, type:'date', sortable:false},
-            {field:'shortLongTerm', title: 'MstMarketInstitutions002.gradeType', edit:true, editOption:{type:'select', result: LONG_SHORT_TERM}, sortable:false},
+            {field:'shortLongTerm', title: 'MstMarketInstitutions002.shortLongTerm', edit:true, editOption:{type:'select', result: LONG_SHORT_TERM}, sortable:false},
             {field:'gradeResult', title: 'MstMarketInstitutions002.gradeResult', edit:true, editOption:{type:'select', result: MAIN_GRADE_RESULT, autosort:false}, sortable:false},
             {field:'gradeExpectation', title: 'MstMarketInstitutions002.gradeExpectation', edit:true, editOption:{type:'select', result: RATING_OUTLOOK}, sortable:false},
             {field:'directionChange', title: 'MstMarketInstitutions002.directionChange', edit:true , editOption:{type:'select', result: CHANGE_DIRECTION}, sortable:false},
@@ -64,7 +64,7 @@ $(function() {
             {field:'operation', title: 'SysCommon.operation', type:'action', buttons: ['delt']}
         ]
     };
-    
+
     /*
      * 绑定表格事件
      */
@@ -89,7 +89,7 @@ $(function() {
     if(CLOSE_FUNC_NAME) {//如果是从其他页面打开则隐藏关闭按钮
     	$("#MstMarketInstitutions002_btn_cancel").hide();
 	}
-    
+
     /**
      * BECIF
      */

@@ -15,23 +15,23 @@
 			<form class="layui-form" id="searchForm">
 				<div class="layui-form-item">
                     <div class="layui-inline layui-col-xs4 layui-col-md4  layui-col-sm4 layui-col-lg4">
-						<label class="layui-form-label form-lable">对象类型</label>
+						<label class="layui-form-label form-lable">评级类型</label>
 						<div class="layui-input-inline input-inline">
 							<input type="text" id="oType" name="oType"
-								class="layui-input form-input input-select" placeholder="请选择"								 
+								class="layui-input form-input input-select" placeholder="请选择"
 								data-th-data-result="${MAIN_GRADE_TYPE}" allowClear="true">
 						</div>
 					</div>
                     <div class="layui-inline layui-col-xs4 layui-col-md4  layui-col-sm4 layui-col-lg4">
 						<label class="layui-form-label form-lable">对象名称</label>
 						 <div class="layui-input-inline input-inline">
-                            <input type="text" id="finprodName" name="finprodName" class="layui-input form-input input-lenovoselect" data-th-value='${finprodId}'  
+                            <input type="text" id="finprodName" name="finprodName" class="layui-input form-input input-lenovoselect" data-th-value='${finprodId}'
                             	placeholder="请输入内容" data-th-data-url="@{/invest/basicdata/mstmarketmanagement/MstMarketManagement001/getFinprodName}"
                             	data-th-data-effectivefieldsalias='|{"code":"#{MstMarketManagement001.secId}","shortName":"#{MstMarketManagement001.finprodName}"}|'
-                             		data-th-placeholder="#{SysCommon.placeholder}">                            
+                             		data-th-placeholder="#{SysCommon.placeholder}">
                         </div>
 					</div>
-			</div>				 
+			</div>
 				<div class="layui-form-item" id ='selectArea' >
                     <div class="layui-inline layui-col-xs4 layui-col-md4  layui-col-sm4 layui-col-lg4">
 						<label class="layui-form-label form-lable">评级历史</label>
@@ -39,7 +39,7 @@
 							<input type="text" id="ratingHistory" name="ratingHistory"
 								class="layui-input form-input input-select" placeholder="请选择"
 								 data-result="[{&quot;id&quot;:&quot;99&quot;,&quot;text&quot;:&quot;查看全部&quot;,&quot;col&quot;:&quot;&quot;},{&quot;id&quot;:&quot;01&quot;,&quot;text&quot;:&quot;只看最新&quot;,&quot;col&quot;:&quot;&quot;}]"
-								 initValue ='01' 
+								 initValue ='01'
 								  allowClear="true">
 						</div>
 					</div>
@@ -47,7 +47,7 @@
 						<label class="layui-form-label form-lable">内评/外评</label>
 						<div class="layui-input-inline input-inline">
 							<input type="text" id="gradeSourceType" name="gradeSourceType"
-								class="layui-input form-input input-select" placeholder="请选择"			 
+								class="layui-input form-input input-select" placeholder="请选择"
 								 data-result="[{&quot;id&quot;:&quot;01&quot;,&quot;text&quot;:&quot;外部评级&quot;,&quot;col&quot;:&quot;&quot;}
 								 ,{&quot;id&quot;:&quot;02&quot;,&quot;text&quot;:&quot;内部评级&quot;,&quot;col&quot;:&quot;&quot;}]"
 								   initValue =''
@@ -55,11 +55,11 @@
 						</div>
 					</div>
                     <div class="layui-inline layui-col-xs4 layui-col-md4  layui-col-sm4 layui-col-lg4">
-						<label class="layui-form-label form-lable">评级类型</label>
+						<label class="layui-form-label form-lable">长短期</label>
 						<div class="layui-input-inline input-inline">
 							<input type="text" id="shortLongTerm" name="shortLongTerm"
 								class="layui-input form-input input-select" placeholder="请选择"
-								 data-th-data-result="${LONG_SHORT_TERM}" allowClear="true">																  
+								 data-th-data-result="${LONG_SHORT_TERM}" allowClear="true">
 						</div>
 					</div>
 				</div>
@@ -71,40 +71,40 @@
 								class="layui-input form-input input-dateRangeSelect"  data-th-value = '${quaryDate}'
 								placeholder="请选择、支持区间"  >
 						</div>
-                	</div>  
+                	</div>
                     <div class="layui-inline layui-col-xs4 layui-col-md4  layui-col-sm4 layui-col-lg4">
-						<label class="layui-form-label form-lable">评级结果</label>					 
+						<label class="layui-form-label form-lable">评级结果</label>
 						  <div class="layui-input-inline input-inline">
                         <select id="gradeResult" name="gradeResult" formatoption="false"
-                                class="layui-input form-input input-select"                              
-                                data-th-data-result="${MAIN_GRADE_RESULT}" 
-                                 allowClear="true" placeholder="请输入内容" 
+                                class="layui-input form-input input-select"
+                                data-th-data-result="${MAIN_GRADE_RESULT}"
+                                 allowClear="true" placeholder="请输入内容"
                                 parentId ='internaLevaluation'
                                 >
-                        </select>	
+                        </select>
 					</div>
 					</div>
                     <div class="layui-inline layui-col-xs4 layui-col-md4  layui-col-sm4 layui-col-lg4">
-						 <label class="layui-form-label form-lable">评级机构</label>                    
+						 <label class="layui-form-label form-lable">评级机构</label>
                          <div class="layui-input-inline input-inline">
                         <select id="gradeOrgId" name="gradeOrgId" formatoption="false"
-                                class="layui-input form-input input-select"                                
-                                data-th-data-result="${GRADE_PARTY}" 
-                                allowClear="true" placeholder="请输入内容" 
+                                class="layui-input form-input input-select"
+                                data-th-data-result="${GRADE_PARTY}"
+                                allowClear="true" placeholder="请输入内容"
                                 >
-                        </select>	
+                        </select>
                     </div>
 						</div>
 					</div>
-				 
+
 				 </form>
 				 </div>
-				 
+
             <div>
             <table class="layui-table" id="dataTable"></table>
         </div>
-              
-          
+
+
        </div>
   <div layout:fragment="script">
   		<script data-th-inline="javascript" type="text/javascript">

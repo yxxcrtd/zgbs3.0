@@ -224,6 +224,12 @@ public class StlSecReconDeal extends BaseEntity {
     private BigDecimal commissionAmt;
 
     /**
+     * 净佣金
+     */
+    @JsonSerialize(using=BigDecimalSerializer.class)
+    private BigDecimal netCommissionAmt;
+
+    /**
      * 一级总费用
      */
     @JsonSerialize(using=BigDecimalSerializer.class)
@@ -880,6 +886,22 @@ public class StlSecReconDeal extends BaseEntity {
      */
     public void setCommissionAmt(BigDecimal commissionAmt) {
         this.commissionAmt = commissionAmt;
+    }
+
+    /**
+     * 取得 净佣金
+     * @return 净佣金
+     */
+    public BigDecimal getNetCommissionAmt() {
+        return netCommissionAmt;
+    }
+
+    /**
+     * 设置 净佣金
+     * @param netCommissionAmt 净佣金
+     */
+    public void setNetCommissionAmt(BigDecimal netCommissionAmt) {
+        this.netCommissionAmt = netCommissionAmt;
     }
 
     /**

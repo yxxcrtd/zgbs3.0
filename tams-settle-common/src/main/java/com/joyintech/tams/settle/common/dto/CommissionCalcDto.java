@@ -25,6 +25,9 @@ public class CommissionCalcDto {
     // 佣金金额
     private BigDecimal commisionAmount;
 
+    // 净佣金
+    private BigDecimal netCommisionAmount;
+
     // 佣金计算过程明细列表
     private List<CommissionCalcDetail> commissionCalcDetailList;
 
@@ -37,6 +40,14 @@ public class CommissionCalcDto {
 
     public void setCommisionAmount(BigDecimal commisionAmount) {
         this.commisionAmount = commisionAmount;
+    }
+
+    public BigDecimal getNetCommisionAmount() {
+        return netCommisionAmount;
+    }
+
+    public void setNetCommisionAmount(BigDecimal netCommisionAmount) {
+        this.netCommisionAmount = netCommisionAmount;
     }
 
     public List<CommissionCalcDetail> getCommissionCalcDetailList() {

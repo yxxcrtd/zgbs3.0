@@ -7,7 +7,7 @@
  * 修改内容：新建
  * 系统名称：理财资管管理系统V2.0
  */
- 
+
 package com.joyintech.service.asset.project.service;
 
 import com.joyintech.framework.base.BaseService;
@@ -65,43 +65,43 @@ public class FinProjectTargetAssetService extends BaseService<FinProjectTargetAs
 
     @Autowired
     private FinProjectTargetAssetMapper finProjectTargetAssetMapper;
-    
+
     @Autowired
     private BaseFinProductBaseInfoService baseFinProductBaseInfoService;
-    
+
     @Autowired(required = false)
     private FinInterestFactorService finInterestFactorService;
-    
+
     /**
      * 非标资产(票据或信用)报送信息(基础组件)
      */
     @Autowired(required = false)
     private BaseRepAssetAstBillInfoService baseRepAssetAstBillInfoService;
-    
+
     /**
      * 信贷及非标资产报送(基础组件)
      */
     @Autowired(required = false)
     private BaseRepAssetCreditNonstdInfoService baseRepAssetCreditNonstdInfoService;
-    
+
     /**
      * 权益类资产中债报送(基础组件)
      */
     @Autowired(required = false)
     private BaseRepAssetEquityInfoService baseRepAssetEquityInfoService;
-    
+
     /**
      * 其他资产报送信息
      */
     @Autowired(required = false)
     private BaseRepOtherInvestTargetInfoService baseRepOtherInvestTargetInfoService;
-    
+
     /**
      * 基金资产报送信息
      */
     @Autowired(required = false)
     private BaseRepFundAssetInfoService baseRepFundAssetInfoService;
-    
+
     /**
      * 债券资产报送
      */
@@ -118,7 +118,7 @@ public class FinProjectTargetAssetService extends BaseService<FinProjectTargetAs
      */
     @Autowired(required = false)
     private BaseRepAssetDeptInfoService baseRepAssetDeptInfoService;
-    
+
     /**
      * 金融产品扩展(平安)
      */
@@ -129,43 +129,43 @@ public class FinProjectTargetAssetService extends BaseService<FinProjectTargetAs
      */
     @Autowired
     private PaFinProductBuyoutRateMapper paFinProductBuyoutRateMapper;
-    
+
     /**
      * 金融产品买断利率(平安,组件)
      */
     @Autowired
     private BussPaFinProductBuyoutRateMapper bussPaFinProductBuyoutRateMapper;
-    
+
     /**
      * 投后信息
      */
     @Autowired
     private FinPostInvestInfoMapper finPostInvestInfoMapper;
-    
+
     /**
      * 减持信息(生成)
      */
     @Autowired
     private FinReduceShareInfoMapper finReduceShareInfoMapper;
-    
+
     /**
      * 减持信息(组件)
      */
     @Autowired
     private BussReduceShareInfoMapper bussReduceShareInfoMapper;
-    
+
     /**
      * 认购信息(生成)
      */
     @Autowired
     private FinSubscriptionInfoMapper finSubscriptionInfoMapper;
-    
+
     /**
      * 认购信息(组件)
      */
     @Autowired
     private BussSubscriptionInfoMapper  bussSubscriptionInfoMapper;
-    
+
     /**
      * 平安附件信息(生成)
      */
@@ -174,13 +174,13 @@ public class FinProjectTargetAssetService extends BaseService<FinProjectTargetAs
   //标的共通service
     @Autowired(required=false)
     private AssetCommonService assetCommonService;
-    
+
     /**
      * 组合表mapper
      */
     @Autowired
     private PtlPortfolioMapper ptlPortfolioMapper;
-    
+
     /**
      * 查询是否自动创建组合AssetTypeConfigMapper
      */
@@ -198,16 +198,16 @@ public class FinProjectTargetAssetService extends BaseService<FinProjectTargetAs
 
     @Autowired(required = false)
     private BaseRepOtherInfoService baseRepOtherInfoService;
-    
+
     @Autowired
     private MstBondCreditRatingMapper  mstBondCreditRatingMapper;
-    
+
     @Autowired(required = false)
     private BusiFinBondRatingInfoService busiFinBondRatingInfoService;
 
     @Autowired
     private BasePtlRecePositionService basePtlRecePositionService;
-    
+
     @Autowired
     private AssetCommonMapper assetCommonMapper;
     /**
@@ -225,7 +225,7 @@ public class FinProjectTargetAssetService extends BaseService<FinProjectTargetAs
     {
         return super.queryForPage(page, length, () -> finProjectTargetAssetMapper.queryForPage(pageParam));
     }
-    
+
     /**
      * 插入
      * @param entity
@@ -271,7 +271,7 @@ public class FinProjectTargetAssetService extends BaseService<FinProjectTargetAs
         if(null!=baseRepAssetAstBillInfoService){
             if(null!=entity.getBaseRepAssetAstBillInfoDto()){
                 List<RepAssetAstBill> bills = entity.getBaseRepAssetAstBillInfoDto().getRepAssetAstBillList();
-//                for (RepAssetAstBill r: bills) {  
+//                for (RepAssetAstBill r: bills) {
 //                    r.setRepIndustry(entity.getPaFinProduct().getProjInvestIndustry());
 //                    r.setRepIndustryLevel2(entity.getPaFinProduct().getProjInvestIndustry2());
 //                }
@@ -299,7 +299,7 @@ public class FinProjectTargetAssetService extends BaseService<FinProjectTargetAs
         if(null!=baseRepAssetEquityInfoService){
             if(null!=entity.getBaseRepAssetEquityInfoDto()){
                 List<RepAssetEquity> list = entity.getBaseRepAssetEquityInfoDto().getRepAssetEquityList();
-                for (RepAssetEquity e:list) {                  
+                for (RepAssetEquity e:list) {
                     //中债需求  当资产类别=P02时，没有股票代码，则REP_SHARES_ID取资产代码
                     if (StringUtil.isEmpty(entity.getBussPostInvestInfoDto().getShareCode())){
                         e.setRepSharesId(entity.getFinprodMarketId());
@@ -402,18 +402,19 @@ public class FinProjectTargetAssetService extends BaseService<FinProjectTargetAs
          * 20191126	add
          * 评级信息
          */
-        if(entity.getBusiFinBondRatingInfoDto() != null 
+        if(entity.getBusiFinBondRatingInfoDto() != null
         		&& !entity.getBusiFinBondRatingInfoDto().getMstBondCreditRatingList().isEmpty()){
         	List<MstBondCreditRating> MstBondCreditRatingList = entity.getBusiFinBondRatingInfoDto().getMstBondCreditRatingList();
         	for(MstBondCreditRating mstBondCreditRating : MstBondCreditRatingList) {
 //        		if("02".equals(mstBondCreditRating.getoType())) {
         			mstBondCreditRating.setoCode(entity.getFinprodMarketId());
+        			mstBondCreditRating.setShortLongTerm(DictCodeList.长期短期_长期.getValue());
             		mstBondCreditRatingMapper.insert(mstBondCreditRating);
 //            	}
         	}
         }
     }
-    
+
     /**
      * 修改
      * @param entity
@@ -443,7 +444,7 @@ public class FinProjectTargetAssetService extends BaseService<FinProjectTargetAs
             paFinProductBuyoutRateMapper.deleteByPrimaryKey(key);
             paFinProductBuyoutRateMapper.insert(entity.getPaFinProductBuyoutRate());
         }
-        //投后信息 
+        //投后信息
         if(null!=entity.getBussPostInvestInfoDto()){
             finPostInvestInfoMapper.deleteByPrimaryKey(entity.getFinprodId());
             finPostInvestInfoMapper.insert(entity.getBussPostInvestInfoDto());
@@ -615,6 +616,7 @@ public class FinProjectTargetAssetService extends BaseService<FinProjectTargetAs
                 for(MstBondCreditRating mstBondCreditRatingEntity:mstBondCreditRatingList){
                 	//20191125	add  债券标的评级修改，只处理债项数据。
 //                	if("02".equals(mstBondCreditRatingEntity.getoType())) {
+                        mstBondCreditRatingEntity.setShortLongTerm(DictCodeList.长期短期_长期.getValue());
                 		mstBondCreditRatingEntity.setoCode(entity.getFinprodMarketId());
                 		mstBondCreditRatingMapper.insert(mstBondCreditRatingEntity);
 //                	}
@@ -622,7 +624,7 @@ public class FinProjectTargetAssetService extends BaseService<FinProjectTargetAs
             }
         }
     }
-    
+
     /**
      * 删除
      * @param entity
@@ -727,7 +729,7 @@ public class FinProjectTargetAssetService extends BaseService<FinProjectTargetAs
         }
         //计算规则扩展--单独针对平安
         if(null!=finInterestFactorService){
-            finInterestFactorService.deletePaFinCashCalcRule(entity.getFinInterestFactorDto().getPaFinCashCalcRule()); 
+            finInterestFactorService.deletePaFinCashCalcRule(entity.getFinInterestFactorDto().getPaFinCashCalcRule());
         }
         //删除委外组合 add wangpeng 2019.07.23
         if(StringUtil.isNotEmpty(entity.getFinprodMarketId())){
@@ -741,7 +743,7 @@ public class FinProjectTargetAssetService extends BaseService<FinProjectTargetAs
         // 评级删除	20191126
         busiFinBondRatingInfoService.deleteMstBondCreditRatingByProductId(entity.getFinprodMarketId());
     }
-    
+
     /**
      * 获取基本信息--修改/详细
      * @param param
@@ -752,7 +754,7 @@ public class FinProjectTargetAssetService extends BaseService<FinProjectTargetAs
     public FinProjectTargetAssetDto getBasicInfo(@RequestBody Map<String,Object> param){
         return finProjectTargetAssetMapper.getBasicInfo(param);
     }
-    
+
     /**
      * 获取CMS信息
      * <功能详细描述>
@@ -764,7 +766,7 @@ public class FinProjectTargetAssetService extends BaseService<FinProjectTargetAs
     public FinProjectTargetAssetCmsDto getCmsInfoBycashOutNo(@RequestBody Map<String, Object> param){
         return finProjectTargetAssetMapper.getCmsInfoBycashOutNo(param);
     }
-    
+
     /**
      *  获取cms附件 businessId
      * <一句话功能简述>
@@ -785,53 +787,53 @@ public class FinProjectTargetAssetService extends BaseService<FinProjectTargetAs
         return finProjectTargetAssetMapper.checkMarketExists(map);
     }
     public void deleteRepInfoById(List<String> finprodIdList){
-        //非标资产(票据或信用)报送信息 
+        //非标资产(票据或信用)报送信息
     	if(null!=baseRepAssetAstBillInfoService){
     		   BaseRepAssetAstBillInfoDto dtoBillInfo=new BaseRepAssetAstBillInfoDto();
     	    	dtoBillInfo.setRepFinprodIdList(finprodIdList);
-    	    	baseRepAssetAstBillInfoService.delete(dtoBillInfo); 
+    	    	baseRepAssetAstBillInfoService.delete(dtoBillInfo);
     	 }
     	 //信贷及非标资产报送
         if(null!=baseRepAssetCreditNonstdInfoService){
         	BaseRepAssetCreditNonstdInfoDto dtoAssetCreditInfo=new BaseRepAssetCreditNonstdInfoDto();
         	dtoAssetCreditInfo.setRepFinprodIdList(finprodIdList);
             baseRepAssetCreditNonstdInfoService.delete(dtoAssetCreditInfo);
-           
+
         }
         //权益类资产中债报送
         if(null!=baseRepAssetEquityInfoService){
-        	BaseRepAssetEquityInfoDto dtoAssetEquityInfo=new BaseRepAssetEquityInfoDto(); 
+        	BaseRepAssetEquityInfoDto dtoAssetEquityInfo=new BaseRepAssetEquityInfoDto();
         	dtoAssetEquityInfo.setRepFinprodIdList(finprodIdList);
             baseRepAssetEquityInfoService.delete(dtoAssetEquityInfo);
-            
+
         }
         //其他资产报送信息
         if(null!=baseRepOtherInvestTargetInfoService){
         	BaseRepOtherInvestTargetInfoDto dtoOtherTargetInfo=new BaseRepOtherInvestTargetInfoDto();
         	dtoOtherTargetInfo.setRepFinprodIdList(finprodIdList);
         	baseRepOtherInvestTargetInfoService.delete(dtoOtherTargetInfo);
-            
+
         }
         //基金资产报送信息
         if(null!=baseRepFundAssetInfoService){
         	BaseRepFundAssetInfoDto dtoFundAsset=new BaseRepFundAssetInfoDto();
         	dtoFundAsset.setRepFinprodIdList(finprodIdList);
             baseRepFundAssetInfoService.delete(dtoFundAsset);
-            
+
         }
         //债券资产报送
         if(null!=baseRepBondAssetInfoService){
         	BaseRepBondAssetInfoDto dtoBondAsset=new BaseRepBondAssetInfoDto();
         	dtoBondAsset.setRepFinprodIdList(finprodIdList);
             baseRepBondAssetInfoService.delete(dtoBondAsset);
-            
+
         }
         //计划类报送
         if(null!=baseRepMngAssetPlanInfoService){
         	BaseRepMngAssetPlanInfoDto dtoMngAssetPlanInfo=new BaseRepMngAssetPlanInfoDto();
         	dtoMngAssetPlanInfo.setRepFinprodIdList(finprodIdList);
             baseRepMngAssetPlanInfoService.delete(dtoMngAssetPlanInfo);
-       
+
         }
     }
 }
