@@ -313,8 +313,8 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
         }
         List<PtlSecPosition> mergePtlSecPositions = new ArrayList<>();
         Map<String, List<PtlSecPosition>> finprodIdMap = new HashMap<>();
-        if(CollectionUtils.isNotEmpty(mergePtlSecPositions)) {
-            mergePtlSecPositions.stream().collect(Collectors.groupingBy(position ->
+        if(CollectionUtils.isNotEmpty(ptlSecPositions)) {
+            ptlSecPositions.stream().collect(Collectors.groupingBy(position ->
                             position.getFinprodId() + '_' + position.getSecAcctId() + '_' + position.getPortfolioId(),
                     Collectors.toList()))
                     .forEach(finprodIdMap::put);
