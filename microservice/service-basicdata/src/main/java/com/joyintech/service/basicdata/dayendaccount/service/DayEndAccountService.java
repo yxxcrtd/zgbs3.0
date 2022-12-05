@@ -274,6 +274,7 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
             return;
         }
         if(DictCodeListExt3.对账状态结果_不一致.getValue().equals(dto.getCheckResult())){
+            StlSecReconDeal stlSecReconDeal = stlSecReconDealMapper.selectByPrimaryKey(dto.getSeqNo());
             boolean isModify = false;
             // 判断成交明细数据是否有人工修改
             for(SettleTransData settleTransData : settleTransDatas){
@@ -303,22 +304,11 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                     SettleTransData std = reconciliationCommonService.getReCalSettleTransData(updateSettleTransData,daichuliDto);
                     settleTransDataMapper.updateByPrimaryKeySelective(std);
                 }else if(DictCodeListStl.对账维度_成交明细.getValue().equals(dto.getStlSecDeme())){
+                    DayEndAccountDaichuliDto daichuliDto = covertToDaichuliDto(dto);
+                    reconciliationCommonService.chuliWucha(daichuliDto);
                     for(SettleTransData settleTransData : settleTransDatas){
-                        // ZGZGST-4148 fuyongsheng 20211207 edit start
-                        // settleTransData.setTradeId(dto.getTradeId()); // 流水号
-                        settleTransData.setTradeId(settleTransData.getTradeId()); // 流水号
-                        // ZGZGST-4148 fuyongsheng 20211207 edit end
-                        settleTransData.setCommissionAmt(dto.getCommissionAmt()); // 佣金
-                        settleTransData.setJsfAmt(dto.getJsfAmt()); // 经手费
-                        settleTransData.setZgfAmt(dto.getZgfAmt()); // 证管费
-                        settleTransData.setStampFee(dto.getStampFee()); // 印花税
-                        settleTransData.setSettleFee(dto.getSettleFee()); // 结算费
-                        settleTransData.setSxfAmt(dto.getSxfAmt()); // 结算费
-                        // GLLCUAT-358:modify by fuyongsehng 20220906 start
-                        settleTransData.setTradeAmt(dto.getTradeAmt().abs()); // 成交金额
-                        settleTransData.setShareAmt(dto.getTradeNum().abs()); // 成交份额
-                        // GLLCUAT-358:modify by fuyongsehng 20220906 end
-                        settleTransDataMapper.updateByPrimaryKeySelective(settleTransData);
+                        SettleTransData std = reconciliationCommonService.getReCalSettleTransData(settleTransData,daichuliDto);
+                        settleTransDataMapper.updateByPrimaryKeySelective(std);
                     }
                 }
             }
@@ -357,6 +347,7 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
         daichuliDto.setTradeAmt2(dto.getTradeAmt2()); // 清算成交金额
         daichuliDto.setTradeNum(dto.getTradeNum()); // 成交数量
         daichuliDto.setTradeNum2(dto.getTradeNum2()); // 清算成交数量
+        daichuliDto.setParaValue1(dto.getParaValue1()); // 佣金对账方式参数
         return daichuliDto;
     }
 
