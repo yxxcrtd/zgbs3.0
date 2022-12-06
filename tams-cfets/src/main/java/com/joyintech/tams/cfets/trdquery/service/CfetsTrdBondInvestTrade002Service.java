@@ -2250,6 +2250,7 @@ public class CfetsTrdBondInvestTrade002Service extends BaseService<CfetsTrdBondI
                 schedule.setActualStartDate(toLocalDate(item.getVdate()));
                 schedule.setActualCutoffDate(toLocalDate(item.getMdate()));
                 schedule.setAmount(item.getIntAmt());
+				schedule.setCorpus(ArithmeticUtil.divide(item.getIntPrinAmt(), new BigDecimal(100), 12));
                 invScheduleList.add(schedule);
                 intSchList.add(item);
             }
