@@ -148,6 +148,8 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
                 //成交确认提交方法
                 cfetsTrdConfirm001Service.doCompleteBidMethod(entity, OperationType.NEW, DictCodeListExt1.生成方式_接口接入.getValue());
             }
+        } else {
+            cfetsTrdConfirmMapper.insertTrdQutoMatchInfo(matchDto);
         }
         logger.info("-----------银行间CSTP成交回报-自动匹配End-------------");
     }
