@@ -225,22 +225,6 @@ public class StlDataDealSzdJsmxProcessService {
 				if (!StringUtil.equals(szdJsmx.getQsrq(), szdJsmx.getJsrq())){
 					settleTransData.setSettleSpeed(1L);
 				}
-				// 单位净价
-				if (StringUtil.isNotEmpty(szdJsmx.getJg2())) {
-					settleTransData.setUnitCprice(new BigDecimal(szdJsmx.getJg2()));// 配债此字段未空，需要判断
-					// 净价总额
-					settleTransData.setCpriceAmt(settleTransData.getUnitCprice().multiply(settleTransData.getShareAmt().abs()));
-					// 全价总额 > 净价总额
-					if (settleTransData.getFpriceAmt().compareTo(settleTransData.getCpriceAmt()) > 0) {
-						// 单位利息  IF （变量.全价总额 - 变量.净价总额 >0） THEN  round（（变量.全价总额 - 变量.净价总额）/变量.交易份额，8）  ELSE 参照原逻辑
-						settleTransData.setUnitInt(ArithmeticUtil.divide(ArithmeticUtil.subtract(settleTransData.getFpriceAmt(), settleTransData.getCpriceAmt()), settleTransData.getShareAmt(), 8, RoundingMode.HALF_UP));
-						// 利息总额  IF （变量.全价总额 - 变量.净价总额 >0） THEN  变量.全价总额 - 变量.净价总额  ELSE 参照原逻辑
-						settleTransData.setIntAmt(ArithmeticUtil.subtract(settleTransData.getFpriceAmt(), settleTransData.getCpriceAmt()));
-					}
-					if(szdJsmx.getJg2().equals(szdJsmx.getJg1())){
-						settleTransData.setUnitFprice(ArithmeticUtil.divide(settleTransData.getFpriceAmt(), settleTransData.getShareAmt(), 8, RoundingMode.HALF_UP));
-					}
-				}
 				// 单位面值 调用【当前面值】
 				settleTransData.setParValue(stlDataDealProcessCommonService.getUnitPrice(settleTransData.getFinprodId(),
 						settleTransData.getTradeDate()));
@@ -253,6 +237,32 @@ public class StlDataDealSzdJsmxProcessService {
 				// 交易方向
 				settleTransData.setPs(getSzdJsmxBondPs(stlDownDataDealOperatorDto.getDataFile(), szdJsmx.getMmbz(), szdJsmx.getYwlx(),
 						szdJsmx.getZqlb(), szdJsmx.getJllx(), szdJsmx.getQsbz(), szdJsmx.getGhlx(),szdJsmx.getJgdm()));
+				// 单位净价
+				if(StringUtil.isEmpty(szdJsmx.getJg2()) || new BigDecimal(szdJsmx.getJg2()).compareTo(BigDecimal.ZERO) == 0){
+					szdJsmx.setJg2(szdJsmx.getJg1());
+				}
+				if (DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())) {
+					settleTransData.setUnitCprice(new BigDecimal(szdJsmx.getJg2()));
+					settleTransData.setCpriceAmt(settleTransData.getUnitCprice().multiply(settleTransData.getShareAmt().abs()));
+					settleTransData.setIntAmt(ArithmeticUtil.subtract(settleTransData.getFpriceAmt(), settleTransData.getCpriceAmt()));
+					settleTransData.setUnitInt(ArithmeticUtil.divide(settleTransData.getIntAmt(), settleTransData.getShareAmt(), 8, RoundingMode.HALF_UP));
+				}
+				else{
+					if(szdJsmx.getJg2().equals(szdJsmx.getJg1())){
+						settleTransData.setUnitFprice(ArithmeticUtil.divide(settleTransData.getFpriceAmt(), settleTransData.getShareAmt(), 8, RoundingMode.HALF_UP));
+					}
+					settleTransData.setUnitCprice(new BigDecimal(szdJsmx.getJg2()));// 配债此字段未空，需要判断
+					// 净价总额
+					settleTransData.setCpriceAmt(settleTransData.getUnitCprice().multiply(settleTransData.getShareAmt().abs()));
+					// 全价总额 > 净价总额
+					if (settleTransData.getFpriceAmt().compareTo(settleTransData.getCpriceAmt()) > 0) {
+						// 利息总额  IF （变量.全价总额 - 变量.净价总额 >0） THEN  变量.全价总额 - 变量.净价总额  ELSE 参照原逻辑
+						settleTransData.setIntAmt(ArithmeticUtil.subtract(settleTransData.getFpriceAmt(), settleTransData.getCpriceAmt()));
+						// 单位利息  IF （变量.全价总额 - 变量.净价总额 >0） THEN  round（（变量.全价总额 - 变量.净价总额）/变量.交易份额，8）  ELSE 参照原逻辑
+						settleTransData.setUnitInt(ArithmeticUtil.divide(settleTransData.getIntAmt(), settleTransData.getShareAmt(), 8, RoundingMode.HALF_UP));
+					}
+				}
+
 				// 针对债券-回售特殊处理为竞价平台
 				if (StringUtil.equals(settleTransData.getPs(), DictCodeList.交易方向_行权_回售.getValue())){
 					settleTransData.setTradePlat(DictCodeList.交易平台_竞价撮合平台.getValue());
