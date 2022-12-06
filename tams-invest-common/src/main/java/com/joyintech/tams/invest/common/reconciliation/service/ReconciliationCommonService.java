@@ -548,43 +548,43 @@ public class ReconciliationCommonService {
         }
     }
 
-    /**
-     * 获取费用方案
-     *
-     * @return
-     */
-    public AccountFeePlan getFeePlan(AccountPlanSearchInfo planSearchInfo, String feeDate) {
-        AccountFeePlan feePlan = null;
-        Map<String, Object> searchParam = new HashMap<>();
-        // 1.1 交易费用配置查询
-        searchParam.put("planInfo", planSearchInfo);
-        searchParam.put("feeDate", feeDate);
-        List<TrdFeeConfig> trdFeeConfigs = reconciliationCommonMapper.getTrdFeeConfig(searchParam);
-        if (trdFeeConfigs != null && !trdFeeConfigs.isEmpty()) {
-            feePlan = new AccountFeePlan();
-            TrdFeeConfig trdFeetConfig = trdFeeConfigs.get(0);
-            // 资金账户不为空
-            if(StringUtil.isNotEmpty(planSearchInfo.getCapitalAccountNo())){
-                List<TrdFeeConfig> trdFeeConfigs_capitalAccountNo = trdFeeConfigs.stream().filter(x->StringUtil.equals(x.getCapitalAccountNo(),planSearchInfo.getCapitalAccountNo())).collect(Collectors.toList());
-                if (!trdFeeConfigs_capitalAccountNo.isEmpty()) {
-                    trdFeetConfig = trdFeeConfigs_capitalAccountNo.get(0);
-                }
-            }else if(StringUtil.isNotEmpty(planSearchInfo.getBrokerageNo())){
-                List<TrdFeeConfig> trdFeeConfigs_brokerageNo = trdFeeConfigs.stream().filter(x->
-                        StringUtil.equals(x.getCustomerId(),planSearchInfo.getBrokerageNo())
-                                &&!StringUtil.isNotEmpty(planSearchInfo.getCapitalAccountNo())
-                ).collect(Collectors.toList());
-                if (!trdFeeConfigs_brokerageNo.isEmpty()) {
-                    trdFeetConfig = trdFeeConfigs_brokerageNo.get(0);
-                }
-            }
-            feePlan.setTrdFeeConfig(trdFeetConfig);
-            // 1.2 交易费用配置明细
-            List<TrdFeeConfigDetail> trdFeeConfigDetails = reconciliationCommonMapper.getTrdFeeConfigDetail(trdFeetConfig.getSeqNo());
-            feePlan.setTrdFeeConfigDetails(trdFeeConfigDetails);
-        }
-        return feePlan;
-    }
+//    /**
+//     * 获取费用方案
+//     *
+//     * @return
+//     */
+//    public AccountFeePlan getFeePlan(AccountPlanSearchInfo planSearchInfo, String feeDate) {
+//        AccountFeePlan feePlan = null;
+//        Map<String, Object> searchParam = new HashMap<>();
+//        // 1.1 交易费用配置查询
+//        searchParam.put("planInfo", planSearchInfo);
+//        searchParam.put("feeDate", feeDate);
+//        List<TrdFeeConfig> trdFeeConfigs = reconciliationCommonMapper.getTrdFeeConfig(searchParam);
+//        if (trdFeeConfigs != null && !trdFeeConfigs.isEmpty()) {
+//            feePlan = new AccountFeePlan();
+//            TrdFeeConfig trdFeetConfig = trdFeeConfigs.get(0);
+//            // 资金账户不为空
+//            if(StringUtil.isNotEmpty(planSearchInfo.getCapitalAccountNo())){
+//                List<TrdFeeConfig> trdFeeConfigs_capitalAccountNo = trdFeeConfigs.stream().filter(x->StringUtil.equals(x.getCapitalAccountNo(),planSearchInfo.getCapitalAccountNo())).collect(Collectors.toList());
+//                if (!trdFeeConfigs_capitalAccountNo.isEmpty()) {
+//                    trdFeetConfig = trdFeeConfigs_capitalAccountNo.get(0);
+//                }
+//            }else if(StringUtil.isNotEmpty(planSearchInfo.getBrokerageNo())){
+//                List<TrdFeeConfig> trdFeeConfigs_brokerageNo = trdFeeConfigs.stream().filter(x->
+//                        StringUtil.equals(x.getCustomerId(),planSearchInfo.getBrokerageNo())
+//                                &&!StringUtil.isNotEmpty(planSearchInfo.getCapitalAccountNo())
+//                ).collect(Collectors.toList());
+//                if (!trdFeeConfigs_brokerageNo.isEmpty()) {
+//                    trdFeetConfig = trdFeeConfigs_brokerageNo.get(0);
+//                }
+//            }
+//            feePlan.setTrdFeeConfig(trdFeetConfig);
+//            // 1.2 交易费用配置明细
+//            List<TrdFeeConfigDetail> trdFeeConfigDetails = reconciliationCommonMapper.getTrdFeeConfigDetail(trdFeetConfig.getSeqNo());
+//            feePlan.setTrdFeeConfigDetails(trdFeeConfigDetails);
+//        }
+//        return feePlan;
+//    }
 
     /**
      * 登录自动对账结果数据
