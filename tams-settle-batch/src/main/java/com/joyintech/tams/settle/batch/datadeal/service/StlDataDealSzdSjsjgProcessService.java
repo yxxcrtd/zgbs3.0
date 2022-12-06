@@ -495,12 +495,17 @@ public class StlDataDealSzdSjsjgProcessService {
 //            settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券_赎回.getValue());
 //    	}
     	// 债券回售
-    	if ((StringUtil.equals(StlDataDealProcessConstant.SJSJG_YWLB_ZQHS, szdSjsjg.getJgywlb()) || StringUtil.equals(StlDataDealProcessConstant.SJSJG_YWLB_ZQHZ, szdSjsjg.getJgywlb())) &&
+    	if ((StringUtil.equals(StlDataDealProcessConstant.SJSJG_YWLB_ZQHZ, szdSjsjg.getJgywlb())) &&
     			StringUtil.equals(StlDataDealProcessConstant.SJSMX_GFXZ_00, szdSjsjg.getJggfxz())) {
     		settleTransData.setPs(DictCodeList.交易方向_行权_回售.getValue());
     		settleTransData.setIntAmt(abs(szdSjsjg.getJgzjje()));
-    		settleTransData.setPrinAmt(abs(szdSjsjg.getJgzjje()));
     		settleTransData.setShareAmt(abs(szdSjsjg.getJgjssl()));
+            settleTransData.setFpriceAmt(ArithmeticUtil.doAdd(settleTransData.getIntAmt(), abs(szdSjsjg.getJgqsbj())));
+            settleTransData.setCpriceAmt(ArithmeticUtil.subtract(settleTransData.getFpriceAmt(), settleTransData.getIntAmt()));
+            settleTransData.setPrinAmt(settleTransData.getCpriceAmt());
+            settleTransData.setUnitCprice(ArithmeticUtil.divide(settleTransData.getCpriceAmt(), settleTransData.getShareAmt(), 8, RoundingMode.HALF_UP));
+            settleTransData.setUnitFprice(ArithmeticUtil.divide(settleTransData.getFpriceAmt(), settleTransData.getShareAmt(), 8, RoundingMode.HALF_UP));
+            settleTransData.setUnitInt(ArithmeticUtil.subtract(settleTransData.getUnitFprice(), settleTransData.getUnitCprice()));
             settleTransData.setBusiSceneCalss(DictCodeListStl.业务场景分类明细_债券_回售_行权回售.getValue());
             // 针对债券-回售特殊处理为竞价平台
             settleTransData.setTradePlat(DictCodeList.交易平台_竞价撮合平台.getValue());
@@ -1456,7 +1461,10 @@ public class StlDataDealSzdSjsjgProcessService {
                 handleSzdSjsjgsetApplyTradeId(settleTransData, szdSjsjg);
                 // 日终过来的文件结算价格就是全价的，需要反算净价总额、应计利息总额
                 if (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue(), settleTransData.getFinprodType2())) {
-                    stlDownDataDealService.calc(settleTransData);
+                    // 回售无需重新计算应计利息
+                    if(!DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())){
+                        stlDownDataDealService.calc(settleTransData);
+                    }
                 }
                 stlDownDataDealWriteBaseDto.setSettleTransData(settleTransData);
                 if (settleTransDataAdd != null && StringUtil.isNotEmpty(settleTransData.getTradeId())) {

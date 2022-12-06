@@ -34,6 +34,7 @@
             NVL(ssrd.TRADE_NUM,0) TRADE_NUM,
             ssrd.PS,
             ssrd.SEC_ACCT_ID,
+            ssrp.PARA_VALUE paraValue1,
             NVL(decode(ssrp.PARA_VALUE, #{PARA_VALUE_QYJ}, settle.COMMISSION_AMT, settle.NET_COMMISSION_AMT),0) COMMISSION_AMT2,
             NVL(settle.JSF_AMT,0) JSF_AMT2,
             NVL(settle.ZGF_AMT,0) ZGF_AMT2,
