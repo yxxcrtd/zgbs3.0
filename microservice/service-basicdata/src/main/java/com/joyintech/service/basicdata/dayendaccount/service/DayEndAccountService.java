@@ -57,7 +57,7 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
     private SettleTransDataStatusMapper settleTransDataStatusMapper;
 
     @Autowired
-    private StlSecReconDealMapper stlSecReconDealMapper;
+    private SettleTransDataAddMapper settleTransDataAddMapper;
 
     @Autowired
     private ReconciliationCommonService reconciliationCommonService;
@@ -245,6 +245,7 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
             param.put("dealDate", dto.getSettleDate());
             param.put("secAcctId", dto.getSecAcctId());
             param.put("seatNumber", dto.getSeatNumber());
+            param.put("ps", dto.getPs());
             settleTransDatas = reconciliationCommonMapper.getSettleTransData(param);
         }else if(DictCodeListStl.对账维度_成交明细.getValue().equals(dto.getStlSecDeme())){
             //调用【清算明细查询】
@@ -287,38 +288,42 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                     // 处理误差值
                     DayEndAccountDaichuliDto daichuliDto = covertToDaichuliDto(dto);
                     reconciliationCommonService.chuliWucha(daichuliDto);
-                    // GZYHTZJY-1106: 协议回购到期续作,更新首期的成交明细 modify fuyongsheng 20220112 start
-                    SettleTransData updateSettleTransData = settleTransDatas.get(0);
-                    // 协议回购到期续作更新成交明细更新首期
-                    if(DictCodeListExt3.交易方向_到期续做.getValue().equals(settleTransDatas.get(0).getPs())){
+                    // 对账维度为证券维度,并且成交明细数量大于1的要将误差进行拆分
+                    if(DictCodeListStl.对账维度_证券汇总.getValue().equals(dto.getStlSecDeme()) && settleTransDatas.size() > 1){
+                        // 获取分配误差Map
+                        Map<String, DayEndAccountDaichuliDto> ceMap = reconciliationCommonService.distributeSettleTransDataCe(daichuliDto, settleTransDatas);
                         for(SettleTransData settleTransData : settleTransDatas){
-                            if(DictCodeListStl.业务场景分类明细_债券协议逆回购_首期_买入.getValue().equals(settleTransData.getBusiSceneCalss())
-                            || DictCodeListStl.业务场景分类明细_债券协议正回购_首期_买入.getValue().equals(settleTransData.getBusiSceneCalss())){
-                                updateSettleTransData = settleTransData;
-                            }
+                            DayEndAccountDaichuliDto daichuli = ceMap.get(settleTransData.getTradeId());
+                            // 重新结算交易明细数据
+                            SettleTransData std = reconciliationCommonService.getReCalSettleTransData(settleTransData, daichuli);
+                            // 更新成交明细数据
+                            settleTransDataMapper.updateByPrimaryKeySelective(std);
                         }
                     }
-                    // GZYHTZJY-1106: 协议回购到期续作,更新首期的成交明细 modify fuyongsheng 20220112 end
-                    // 重新结算交易明细数据
-                    SettleTransData std = reconciliationCommonService.getReCalSettleTransData(updateSettleTransData,daichuliDto);
-                    settleTransDataMapper.updateByPrimaryKeySelective(std);
-                }else if(DictCodeListStl.对账维度_成交明细.getValue().equals(dto.getStlSecDeme())){
+                    else{
+                        // GZYHTZJY-1106: 协议回购到期续作,更新首期的成交明细 modify fuyongsheng 20220112 start
+                        SettleTransData updateSettleTransData = settleTransDatas.get(0);
+                        // 协议回购到期续作更新成交明细更新首期
+                        if(DictCodeListExt3.交易方向_到期续做.getValue().equals(settleTransDatas.get(0).getPs())){
+                            for(SettleTransData settleTransData : settleTransDatas){
+                                if(DictCodeListStl.业务场景分类明细_债券协议逆回购_首期_买入.getValue().equals(settleTransData.getBusiSceneCalss())
+                                        || DictCodeListStl.业务场景分类明细_债券协议正回购_首期_买入.getValue().equals(settleTransData.getBusiSceneCalss())){
+                                    updateSettleTransData = settleTransData;
+                                }
+                            }
+                        }
+                        // GZYHTZJY-1106: 协议回购到期续作,更新首期的成交明细 modify fuyongsheng 20220112 end
+                        // 重新结算交易明细数据
+                        SettleTransData std = reconciliationCommonService.getReCalSettleTransData(updateSettleTransData,daichuliDto);
+                        settleTransDataMapper.updateByPrimaryKeySelective(std);
+                    }
+                }
+                else if(DictCodeListStl.对账维度_成交明细.getValue().equals(dto.getStlSecDeme())){
+                    DayEndAccountDaichuliDto daichuliDto = covertToDaichuliDto(dto);
+                    reconciliationCommonService.chuliWucha(daichuliDto);
                     for(SettleTransData settleTransData : settleTransDatas){
-                        // ZGZGST-4148 fuyongsheng 20211207 edit start
-                        // settleTransData.setTradeId(dto.getTradeId()); // 流水号
-                        settleTransData.setTradeId(settleTransData.getTradeId()); // 流水号
-                        // ZGZGST-4148 fuyongsheng 20211207 edit end
-                        settleTransData.setCommissionAmt(dto.getCommissionAmt()); // 佣金
-                        settleTransData.setJsfAmt(dto.getJsfAmt()); // 经手费
-                        settleTransData.setZgfAmt(dto.getZgfAmt()); // 证管费
-                        settleTransData.setStampFee(dto.getStampFee()); // 印花税
-                        settleTransData.setSettleFee(dto.getSettleFee()); // 结算费
-                        settleTransData.setSxfAmt(dto.getSxfAmt()); // 结算费
-                        // GLLCUAT-358:modify by fuyongsehng 20220906 start
-                        settleTransData.setTradeAmt(dto.getTradeAmt().abs()); // 成交金额
-                        settleTransData.setShareAmt(dto.getTradeNum().abs()); // 成交份额
-                        // GLLCUAT-358:modify by fuyongsehng 20220906 end
-                        settleTransDataMapper.updateByPrimaryKeySelective(settleTransData);
+                        SettleTransData std = reconciliationCommonService.getReCalSettleTransData(settleTransData,daichuliDto);
+                        settleTransDataMapper.updateByPrimaryKeySelective(std);
                     }
                 }
             }
@@ -357,6 +362,9 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
         daichuliDto.setTradeAmt2(dto.getTradeAmt2()); // 清算成交金额
         daichuliDto.setTradeNum(dto.getTradeNum()); // 成交数量
         daichuliDto.setTradeNum2(dto.getTradeNum2()); // 清算成交数量
+        daichuliDto.setParaValue1(dto.getParaValue1()); // 佣金对账方式参数
+        daichuliDto.setTradeDate(dto.getSettleDate()); // 清算日期
+        daichuliDto.setIsPayWithTrade(dto.getIsPayWithTrade()); // 是否随交易支付
         return daichuliDto;
     }
 
@@ -629,29 +637,22 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                 } else {
                     data.setNetCommissionAmt(dto.getCommissionAmt() == null ? BigDecimal.ZERO : dto.getCommissionAmt());
                     BigDecimal commissionAmt = dto.getCommissionAmt();
-                    // 判断佣金是否被修改
-                    if(commissionAmt != null && !commissionAmt.equals(dto.getCommissionAmt2())){
-                        if(null == dto.getJsfAmt2()){
-                            commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getJsfAmt());
-                        }
-                        if(null == dto.getZgfAmt2()){
-                            commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getZgfAmt());
-                        }
-                        if(null == dto.getStampFee2()){
-                            commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getStampFee());
-                        }
-                        if(null == dto.getSettleFee2()){
-                            commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getSettleFee());
-                        }
-                        if(null == dto.getGhfAmt2()){
-                            commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getGhfAmt());
-                        }
-                        data.setCommissionAmt(commissionAmt);
+                    if(null == dto.getJsfAmt2()){
+                        commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getJsfAmt());
                     }
-                    else{
-                        // 设置null为了后续sql不更新该字段
-                        data.setCommissionAmt(null);
+                    if(null == dto.getZgfAmt2()){
+                        commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getZgfAmt());
                     }
+                    if(null == dto.getStampFee2()){
+                        commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getStampFee());
+                    }
+                    if(null == dto.getSettleFee2()){
+                        commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getSettleFee());
+                    }
+                    if(null == dto.getGhfAmt2()){
+                        commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getGhfAmt());
+                    }
+                    data.setCommissionAmt(commissionAmt);
                 }
                 data.setJsfAmt(null == dto.getJsfAmt2() ? null : dto.getJsfAmt());
                 data.setZgfAmt(null == dto.getZgfAmt2() ? null :dto.getZgfAmt());
@@ -723,8 +724,16 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                 }
 
                 data.setTradeId(dto.getTradeId());
-                data.setIntAmt(ArithmeticUtil.subtract(data.getFpriceAmt(), data.getTradeAmt()));
+                SettleTransData settleTransData = settleTransDataMapper.selectByPrimaryKey(data.getTradeId());
+                data.setIntAmt(ArithmeticUtil.subtract(data.getFpriceAmt(), settleTransData.getCpriceAmt()));
                 data.setIsModify(DictCodeListExt1.是否_是.getValue());
+                if (DictCodeListStl.佣金对账方式_净佣金.getValue().equals(dto.getCommissionType())) {
+                    // 判断净佣金是否被修改
+                    if(dto.getCommissionAmt() != null && dto.getCommissionAmt().equals(dto.getCommissionAmt2())){
+                        // 如果净佣金未被修改,则将全佣金字段设置null,为了后续sql不更新该字段
+                        data.setCommissionAmt(null);
+                    }
+                }
                 settleTransDataMapper.updateByPrimaryKeySelective(data);
             }
         }

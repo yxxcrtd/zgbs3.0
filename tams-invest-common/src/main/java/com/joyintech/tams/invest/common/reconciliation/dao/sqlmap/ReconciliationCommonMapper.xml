@@ -205,6 +205,9 @@ where
 			<if test="updateTime != null" >
 				UPDATE_TIME,
 			</if>
+			<if test="ps != null" >
+				PS,
+			</if>
 		</trim>
 		<trim prefix="values (" suffix=")" suffixOverrides="," >
 			<if test="seqNo != null" >
@@ -260,6 +263,9 @@ where
 			</if>
 			<if test="updateTime != null" >
 				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="ps != null" >
+				#{ps,jdbcType=VARCHAR},
 			</if>
 		</trim>
 	</insert>

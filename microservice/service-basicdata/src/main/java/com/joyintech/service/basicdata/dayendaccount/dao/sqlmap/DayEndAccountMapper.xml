@@ -34,6 +34,7 @@
             NVL(ssrd.TRADE_NUM,0) TRADE_NUM,
             ssrd.PS,
             ssrd.SEC_ACCT_ID,
+            ssrp.PARA_VALUE paraValue1,
             NVL(decode(ssrp.PARA_VALUE, #{PARA_VALUE_QYJ}, settle.COMMISSION_AMT, settle.NET_COMMISSION_AMT),0) COMMISSION_AMT2,
             NVL(settle.JSF_AMT,0) JSF_AMT2,
             NVL(settle.ZGF_AMT,0) ZGF_AMT2,
@@ -42,7 +43,8 @@
             NVL(settle.GHF_AMT,0) GHF_AMT2,
             NVL(settle.SXF_AMT,0) SXF_AMT2,
             NVL(settle.FPRICE_AMT,0) TRADE_AMT2,
-            NVL(settle.SHARE_AMT,0) TRADE_NUM2
+            NVL(settle.SHARE_AMT,0) TRADE_NUM2,
+            settle.IS_PAY_WITH_TRADE
         FROM
             STL_SEC_RECON ssr
         LEFT JOIN
@@ -51,6 +53,7 @@
             SELECT
                 detail.SEQ_NO,
                 std.FINPROD_TYPE2,
+                std.IS_PAY_WITH_TRADE,
                 SUM(std.COMMISSION_AMT) COMMISSION_AMT,
                 SUM(std.NET_COMMISSION_AMT) NET_COMMISSION_AMT,
                 SUM(std.JSF_AMT_RAW) JSF_AMT,
@@ -83,7 +86,8 @@
                 SETTLE_TRANS_DATA std ON detail.TRADE_ID = std.TRADE_ID
             GROUP BY
                 detail.SEQ_NO,
-                std.FINPROD_TYPE2
+                std.FINPROD_TYPE2,
+                std.IS_PAY_WITH_TRADE
             )settle ON ssr.SEQ_NO = settle.SEQ_NO
         LEFT JOIN
             FIN_PRODUCT_TYPE fpt ON ssr.FINPROD_ID = fpt.FINPROD_ID
@@ -105,7 +109,7 @@
                 GROUP BY
                     CUSTOMER_ID,
                     PARA_VALUE
-            )ssrp ON ssrd.CUSTOMER_ID = ssrp.CUSTOMER_ID
+            )ssrp ON ssr.CUSTOMER_ID = ssrp.CUSTOMER_ID
         WHERE
             1=1
             <if test="accountList != null and accountList.size() > 0">
@@ -673,8 +677,8 @@
                std.ZGF_AMT ZGF_AMT,
                std.SXF_AMT SXF_AMT,
                std.SETTLE_FEE SETTLE_FEE,
-               std.COMMISSION_AMT COMMISSION_AMT,
-               std.NET_COMMISSION_AMT NET_COMMISSION_AMT,
+               NVL(std.COMMISSION_AMT,0) COMMISSION_AMT,
+               NVL(std.NET_COMMISSION_AMT,0) NET_COMMISSION_AMT,
                std.IS_PAY_WITH_TRADE,
                std.TRADE_AMT,
                std.PS,

@@ -830,6 +830,7 @@ WHERE
         ACCOUT,
         SEC_ACCT_ID,
         CCY,
+        PS,
         SUM(TRADE_NUM) TRADE_NUM,
         SUM(TRADE_AMT) TRADE_AMT,
         SUM(INT_AMT) INT_AMT,
@@ -858,7 +859,8 @@ WHERE
         TRADE_DATE,
         ACCOUT,
         SEC_ACCT_ID,
-        CCY
+        CCY,
+        PS
     </select>
 
     <!--协议回购深交所委托编号汇总-->

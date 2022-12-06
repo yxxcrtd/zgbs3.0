@@ -26,6 +26,7 @@
         ,{field: 'seqNo', width: 150, visible: false}
         ,{field: 'tradeMarket', width: 150, visible: false}
         ,{field: 'finprodType', width: 150, visible: false}
+        ,{field: 'netCommissionAmt', width: 150, visible: false}
     ];
     var dataTable = $("#dataTable").joyintable({
         ajax: {
@@ -57,6 +58,7 @@
                 if (row.commissionType === 'QYJ')
                     return Number(row.commissionAmt).toFixed(2);
                 else
+                    row.commissionAmt = row.netCommissionAmt;
                     return Number(row.netCommissionAmt).toFixed(2);
             }}
         ,{field:'jsfAmt', type:'money',edit: true,sortable: false, title: 'DayEndAccount001.jsfAmt',width:120,digit: 2}

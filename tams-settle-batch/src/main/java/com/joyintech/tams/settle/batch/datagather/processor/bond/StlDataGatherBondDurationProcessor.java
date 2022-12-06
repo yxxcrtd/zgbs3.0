@@ -107,10 +107,11 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
             List<PtlSecPosition> curDayPutTradePositions = stlDataGatherMapper.getCurDayPutTradePosition(param);
             // 存续期持仓=当日持仓余额+当日回售交易持仓
             ptlSecPositions.addAll(curDayPutTradePositions);
+            List<PtlSecPosition> mergePtlSecPositions = this.mergePtlSecPositions(ptlSecPositions);
             //按 金融产品代码+证券账户 分组
             Map<String,List<PtlSecPosition> > finprodIdMap = new HashMap<>();
-            if(CollectionUtils.isNotEmpty(ptlSecPositions)) {
-                ptlSecPositions.stream().collect(Collectors.groupingBy(position ->  position.getFinprodId() + '_' + position.getSecAcctId(),
+            if(CollectionUtils.isNotEmpty(mergePtlSecPositions)) {
+                mergePtlSecPositions.stream().collect(Collectors.groupingBy(position ->  position.getFinprodId() + '_' + position.getSecAcctId(),
                         Collectors.toList())).forEach(finprodIdMap::put);
             }
             for (SettleTransDataDto settleTransData : settleTransDataDtos) {
@@ -299,6 +300,33 @@ public class StlDataGatherBondDurationProcessor extends BaseProcessor<NeedOperat
             investTradeWriteDto.setSecType(DictCodeListExt1.证券品种_债券.getValue());
         }
         return investTradeWriteDto;
+    }
+
+    /**
+     * 合并相同组合的持仓
+     * @param ptlSecPositions
+     * @return
+     */
+    private List<PtlSecPosition> mergePtlSecPositions(List<PtlSecPosition> ptlSecPositions){
+        if(CollectionUtils.isEmpty(ptlSecPositions)){
+            return new ArrayList<>();
+        }
+        List<PtlSecPosition> mergePtlSecPositions = new ArrayList<>();
+        Map<String, List<PtlSecPosition>> finprodIdMap = new HashMap<>();
+        if(CollectionUtils.isNotEmpty(ptlSecPositions)) {
+            ptlSecPositions.stream().collect(Collectors.groupingBy(position ->
+                            position.getFinprodId() + '_' + position.getSecAcctId() + '_' + position.getPortfolioId(),
+                    Collectors.toList()))
+                    .forEach(finprodIdMap::put);
+        }
+        for(String key : finprodIdMap.keySet()){
+            List<PtlSecPosition> positions = finprodIdMap.get(key);
+            PtlSecPosition mergerPosition = new PtlSecPosition();
+            BeanUtil.copyPropertiesIgnoreNull(mergerPosition, positions.get(0));
+            mergerPosition.setAmount(positions.stream().map(PtlSecPosition::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add));
+            mergePtlSecPositions.add(mergerPosition);
+        }
+        return mergePtlSecPositions;
     }
 
     /**
