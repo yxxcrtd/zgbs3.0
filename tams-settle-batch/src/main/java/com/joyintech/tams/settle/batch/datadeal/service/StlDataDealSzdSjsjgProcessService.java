@@ -1461,7 +1461,10 @@ public class StlDataDealSzdSjsjgProcessService {
                 handleSzdSjsjgsetApplyTradeId(settleTransData, szdSjsjg);
                 // 日终过来的文件结算价格就是全价的，需要反算净价总额、应计利息总额
                 if (StringUtil.equals(DictCodeListExt1.金融产品类型_投管用_债券.getValue(), settleTransData.getFinprodType2())) {
-                    stlDownDataDealService.calc(settleTransData);
+                    // 回售无需重新计算应计利息
+                    if(!DictCodeList.交易方向_行权_回售.getValue().equals(settleTransData.getPs())){
+                        stlDownDataDealService.calc(settleTransData);
+                    }
                 }
                 stlDownDataDealWriteBaseDto.setSettleTransData(settleTransData);
                 if (settleTransDataAdd != null && StringUtil.isNotEmpty(settleTransData.getTradeId())) {
