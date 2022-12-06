@@ -619,29 +619,22 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                 } else {
                     data.setNetCommissionAmt(dto.getCommissionAmt() == null ? BigDecimal.ZERO : dto.getCommissionAmt());
                     BigDecimal commissionAmt = dto.getCommissionAmt();
-                    // 判断佣金是否被修改
-                    if(commissionAmt != null && !commissionAmt.equals(dto.getCommissionAmt2())){
-                        if(null == dto.getJsfAmt2()){
-                            commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getJsfAmt());
-                        }
-                        if(null == dto.getZgfAmt2()){
-                            commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getZgfAmt());
-                        }
-                        if(null == dto.getStampFee2()){
-                            commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getStampFee());
-                        }
-                        if(null == dto.getSettleFee2()){
-                            commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getSettleFee());
-                        }
-                        if(null == dto.getGhfAmt2()){
-                            commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getGhfAmt());
-                        }
-                        data.setCommissionAmt(commissionAmt);
+                    if(null == dto.getJsfAmt2()){
+                        commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getJsfAmt());
                     }
-                    else{
-                        // 设置null为了后续sql不更新该字段
-                        data.setCommissionAmt(null);
+                    if(null == dto.getZgfAmt2()){
+                        commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getZgfAmt());
                     }
+                    if(null == dto.getStampFee2()){
+                        commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getStampFee());
+                    }
+                    if(null == dto.getSettleFee2()){
+                        commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getSettleFee());
+                    }
+                    if(null == dto.getGhfAmt2()){
+                        commissionAmt = ArithmeticUtil.doAdd(commissionAmt, dto.getGhfAmt());
+                    }
+                    data.setCommissionAmt(commissionAmt);
                 }
                 data.setJsfAmt(null == dto.getJsfAmt2() ? null : dto.getJsfAmt());
                 data.setZgfAmt(null == dto.getZgfAmt2() ? null :dto.getZgfAmt());
@@ -716,6 +709,13 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                 SettleTransData settleTransData = settleTransDataMapper.selectByPrimaryKey(data.getTradeId());
                 data.setIntAmt(ArithmeticUtil.subtract(data.getFpriceAmt(), settleTransData.getCpriceAmt()));
                 data.setIsModify(DictCodeListExt1.是否_是.getValue());
+                if (DictCodeListStl.佣金对账方式_净佣金.getValue().equals(dto.getCommissionType())) {
+                    // 判断净佣金是否被修改
+                    if(dto.getCommissionAmt() != null && dto.getCommissionAmt().equals(dto.getCommissionAmt2())){
+                        // 如果净佣金未被修改,则将全佣金字段设置null,为了后续sql不更新该字段
+                        data.setCommissionAmt(null);
+                    }
+                }
                 settleTransDataMapper.updateByPrimaryKeySelective(data);
             }
         }
