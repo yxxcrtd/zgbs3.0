@@ -496,6 +496,10 @@ public class StlSecRecon extends BaseEntity {
 
     //证券账户账号
     private String secAcctId;
+
+    //交易方向
+    private String ps;
+
     //资金账户账号
     private String busiAcctNo;
     //资金账户名称
@@ -589,5 +593,13 @@ public class StlSecRecon extends BaseEntity {
 
     public void setChildInfo(String childInfo) {
         this.childInfo = childInfo;
+    }
+
+    public String getPs() {
+        return ps;
+    }
+
+    public void setPs(String ps) {
+        this.ps = ps;
     }
 }

@@ -57,7 +57,7 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
     private SettleTransDataStatusMapper settleTransDataStatusMapper;
 
     @Autowired
-    private StlSecReconDealMapper stlSecReconDealMapper;
+    private SettleTransDataAddMapper settleTransDataAddMapper;
 
     @Autowired
     private ReconciliationCommonService reconciliationCommonService;
@@ -245,6 +245,7 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
             param.put("dealDate", dto.getSettleDate());
             param.put("secAcctId", dto.getSecAcctId());
             param.put("seatNumber", dto.getSeatNumber());
+            param.put("ps", dto.getPs());
             settleTransDatas = reconciliationCommonMapper.getSettleTransData(param);
         }else if(DictCodeListStl.对账维度_成交明细.getValue().equals(dto.getStlSecDeme())){
             //调用【清算明细查询】
@@ -287,22 +288,37 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
                     // 处理误差值
                     DayEndAccountDaichuliDto daichuliDto = covertToDaichuliDto(dto);
                     reconciliationCommonService.chuliWucha(daichuliDto);
-                    // GZYHTZJY-1106: 协议回购到期续作,更新首期的成交明细 modify fuyongsheng 20220112 start
-                    SettleTransData updateSettleTransData = settleTransDatas.get(0);
-                    // 协议回购到期续作更新成交明细更新首期
-                    if(DictCodeListExt3.交易方向_到期续做.getValue().equals(settleTransDatas.get(0).getPs())){
+                    // 对账维度为证券维度,并且成交明细数量大于1的要将误差进行拆分
+                    if(DictCodeListStl.对账维度_证券汇总.getValue().equals(dto.getStlSecDeme()) && settleTransDatas.size() > 1){
+                        // 获取分配误差Map
+                        Map<String, DayEndAccountDaichuliDto> ceMap = reconciliationCommonService.distributeSettleTransDataCe(daichuliDto, settleTransDatas);
                         for(SettleTransData settleTransData : settleTransDatas){
-                            if(DictCodeListStl.业务场景分类明细_债券协议逆回购_首期_买入.getValue().equals(settleTransData.getBusiSceneCalss())
-                            || DictCodeListStl.业务场景分类明细_债券协议正回购_首期_买入.getValue().equals(settleTransData.getBusiSceneCalss())){
-                                updateSettleTransData = settleTransData;
-                            }
+                            DayEndAccountDaichuliDto daichuli = ceMap.get(settleTransData.getTradeId());
+                            // 重新结算交易明细数据
+                            SettleTransData std = reconciliationCommonService.getReCalSettleTransData(settleTransData, daichuli);
+                            // 更新成交明细数据
+                            settleTransDataMapper.updateByPrimaryKeySelective(std);
                         }
                     }
-                    // GZYHTZJY-1106: 协议回购到期续作,更新首期的成交明细 modify fuyongsheng 20220112 end
-                    // 重新结算交易明细数据
-                    SettleTransData std = reconciliationCommonService.getReCalSettleTransData(updateSettleTransData,daichuliDto);
-                    settleTransDataMapper.updateByPrimaryKeySelective(std);
-                }else if(DictCodeListStl.对账维度_成交明细.getValue().equals(dto.getStlSecDeme())){
+                    else{
+                        // GZYHTZJY-1106: 协议回购到期续作,更新首期的成交明细 modify fuyongsheng 20220112 start
+                        SettleTransData updateSettleTransData = settleTransDatas.get(0);
+                        // 协议回购到期续作更新成交明细更新首期
+                        if(DictCodeListExt3.交易方向_到期续做.getValue().equals(settleTransDatas.get(0).getPs())){
+                            for(SettleTransData settleTransData : settleTransDatas){
+                                if(DictCodeListStl.业务场景分类明细_债券协议逆回购_首期_买入.getValue().equals(settleTransData.getBusiSceneCalss())
+                                        || DictCodeListStl.业务场景分类明细_债券协议正回购_首期_买入.getValue().equals(settleTransData.getBusiSceneCalss())){
+                                    updateSettleTransData = settleTransData;
+                                }
+                            }
+                        }
+                        // GZYHTZJY-1106: 协议回购到期续作,更新首期的成交明细 modify fuyongsheng 20220112 end
+                        // 重新结算交易明细数据
+                        SettleTransData std = reconciliationCommonService.getReCalSettleTransData(updateSettleTransData,daichuliDto);
+                        settleTransDataMapper.updateByPrimaryKeySelective(std);
+                    }
+                }
+                else if(DictCodeListStl.对账维度_成交明细.getValue().equals(dto.getStlSecDeme())){
                     DayEndAccountDaichuliDto daichuliDto = covertToDaichuliDto(dto);
                     reconciliationCommonService.chuliWucha(daichuliDto);
                     for(SettleTransData settleTransData : settleTransDatas){
@@ -347,6 +363,8 @@ public class DayEndAccountService extends BaseService<DayEndAccountDto>{
         daichuliDto.setTradeNum(dto.getTradeNum()); // 成交数量
         daichuliDto.setTradeNum2(dto.getTradeNum2()); // 清算成交数量
         daichuliDto.setParaValue1(dto.getParaValue1()); // 佣金对账方式参数
+        daichuliDto.setTradeDate(dto.getSettleDate()); // 清算日期
+        daichuliDto.setIsPayWithTrade(dto.getIsPayWithTrade()); // 是否随交易支付
         return daichuliDto;
     }
 

@@ -110,7 +110,8 @@
 			entrust.PS PS2,
 			entrust.TRADE_MARKET TRADE_MARKET2,
 			entrust.TRADE_DATE TRADE_DATE2,
-			entrust.SEC_ACCT_ID SEC_ACCT_ID2
+			entrust.SEC_ACCT_ID SEC_ACCT_ID2,
+			entrust.IS_PAY_WITH_TRADE
 		FROM
 			tmp
 		LEFT JOIN (
@@ -139,7 +140,8 @@
 				std.TRADE_MARKET,
 				std.TRADE_DATE,
 				std.SEC_ACCT_ID,
-				stda.REPO_TYPE
+				stda.REPO_TYPE,
+				std.IS_PAY_WITH_TRADE
 			FROM
 				SETTLE_TRANS_DATA std
 			LEFT JOIN
@@ -154,7 +156,8 @@
 				std.TRADE_MARKET,
 				std.TRADE_DATE,
 				std.SEC_ACCT_ID,
-				stda.REPO_TYPE
+				stda.REPO_TYPE,
+				std.IS_PAY_WITH_TRADE
 			) entrust ON tmp.INSTRUCTION_ID = entrust.APPLY_TRADE_ID AND tmp.SEC_ACCT_ID = entrust.SEC_ACCT_ID AND tmp.TRADE_DATE = entrust.TRADE_DATE
 		WHERE
 			tmp.PARA_VALUE = #{PARA_VALUE_02}
@@ -197,10 +200,11 @@
 			securities.FPRICE_AMT2 TRADE_AMT2,
 			securities.SHARE_AMT2 TRADE_NUM2,
 			securities.FINPROD_TYPE2 FINPROD_TYPE2,
-		    NULL PS2,
+			securities.PS PS2,
 			securities.TRADE_MARKET TRADE_MARKET2,
 			securities.TRADE_DATE TRADE_DATE2,
-			securities.SEC_ACCT_ID SEC_ACCT_ID2
+			securities.SEC_ACCT_ID SEC_ACCT_ID2,
+			securities.IS_PAY_WITH_TRADE
 		FROM
 			tmp
 		LEFT JOIN (
@@ -230,7 +234,8 @@
 				std.SEC_ACCT_ID,
 				stda.REPO_TYPE,
 				std.ACCT_NO,
-				std.IS_PAY_WITH_TRADE
+				std.IS_PAY_WITH_TRADE,
+				std.PS
 			FROM
 				SETTLE_TRANS_DATA std
 			LEFT JOIN
@@ -245,9 +250,14 @@
 				std.SEC_ACCT_ID,
 				stda.REPO_TYPE,
 				std.ACCT_NO,
-				std.IS_PAY_WITH_TRADE
-			) securities ON tmp.FINPROD_ID = securities.FINPROD_ID AND tmp.TRADE_DATE = securities.TRADE_DATE and tmp.ACCOUT = securities.ACCT_NO  AND tmp.SEC_ACCT_ID = securities.SEC_ACCT_ID
-		and tmp.FINPROD_TYPE = securities.FINPROD_TYPE2
+				std.IS_PAY_WITH_TRADE,
+			    std.PS
+			) securities ON tmp.FINPROD_ID = securities.FINPROD_ID
+			                    AND tmp.TRADE_DATE = securities.TRADE_DATE
+								AND tmp.ACCOUT = securities.ACCT_NO
+			                    AND tmp.SEC_ACCT_ID = securities.SEC_ACCT_ID
+								AND tmp.FINPROD_TYPE = securities.FINPROD_TYPE2
+								AND tmp.PS = securities.PS
 		WHERE
 			tmp.PARA_VALUE = #{PARA_VALUE_01}
 			AND (securities.REPO_TYPE IS NULL OR securities.REPO_TYPE != #{TARGET_BACK_TYPE_H01})
@@ -296,7 +306,8 @@
 			std.PS PS2,
 			std.TRADE_MARKET TRADE_MARKET2,
 			std.TRADE_DATE TRADE_DATE2,
-			std.SEC_ACCT_ID SEC_ACCT_ID2
+			std.SEC_ACCT_ID SEC_ACCT_ID2,
+			std.IS_PAY_WITH_TRADE
 		FROM
 			tmp
 		LEFT JOIN
@@ -353,7 +364,8 @@
 			std.PS PS2,
 			std.TRADE_MARKET TRADE_MARKET2,
 			std.TRADE_DATE TRADE_DATE2,
-			std.SEC_ACCT_ID SEC_ACCT_ID2
+			std.SEC_ACCT_ID SEC_ACCT_ID2,
+			std.IS_PAY_WITH_TRADE
 		FROM
 			tmp
 		LEFT JOIN
@@ -406,7 +418,8 @@
 			entrust.PS PS2,
 			entrust.TRADE_MARKET TRADE_MARKET2,
 			entrust.TRADE_DATE TRADE_DATE2,
-			entrust.SEC_ACCT_ID SEC_ACCT_ID2
+			entrust.SEC_ACCT_ID SEC_ACCT_ID2,
+			entrust.IS_PAY_WITH_TRADE
 		FROM
 			STL_SEC_RECON_DEAL ssrd
 		LEFT JOIN
@@ -458,7 +471,8 @@
 				std.TRADE_MARKET,
 				std.TRADE_DATE,
 				std.SEC_ACCT_ID,
-			    std.SEAT_NUMBER
+			    std.SEAT_NUMBER,
+				std.IS_PAY_WITH_TRADE
 			FROM
 				SETTLE_TRANS_DATA std
 			LEFT JOIN
@@ -473,7 +487,8 @@
 				std.TRADE_MARKET,
 				std.TRADE_DATE,
 				std.SEC_ACCT_ID,
-			    std.SEAT_NUMBER
+			    std.SEAT_NUMBER,
+				std.IS_PAY_WITH_TRADE
 		) entrust ON ssrd.INSTRUCTION_ID = entrust.APPLY_TRADE_ID AND ssrd.SEAT_NUMBER = entrust.SEAT_NUMBER AND ssrd.TRADE_DATE = entrust.TRADE_DATE
 		INNER JOIN
 			MST_SALE_DEPARTMENT msd ON ssrd.CUSTOMER_ID = msd.BROKER_ID AND (entrust.SEAT_NUMBER = msd.SH_SEATNO OR entrust.SEAT_NUMBER = msd.SZ_SEATNO)
@@ -505,7 +520,8 @@
 				entrust.BROKER_ID CUSTOMER_ID,
 				entrust.PARA_VALUE,
 				entrust.SEAT_NUMBER,
-				entrust.PS
+				entrust.PS,
+				entrust.IS_PAY_WITH_TRADE
 			FROM(
 				SELECT
 					std.FINPROD_ID,
@@ -518,7 +534,8 @@
 					#{CHECK_RESULT_2} CHECK_RESULT,
 					msd.BROKER_ID,
 					ssrp.PARA_VALUE,
-					std.PS
+					std.PS,
+					std.IS_PAY_WITH_TRADE
 				FROM
 					SETTLE_TRANS_DATA std
 				LEFT JOIN
@@ -566,7 +583,8 @@
 					std.TRADE_MARKET,
 					msd.BROKER_ID,
 					ssrp.PARA_VALUE,
-					std.PS
+					std.PS,
+					std.IS_PAY_WITH_TRADE
 			) entrust
 			LEFT JOIN
 				FIN_PRODUCT fp ON entrust.FINPROD_ID = fp.FINPROD_ID
@@ -600,7 +618,8 @@
 				securities.BROKER_ID CUSTOMER_ID,
 				securities.PARA_VALUE,
 				securities.SEAT_NUMBER,
-				securities.PS
+				securities.PS,
+				securities.IS_PAY_WITH_TRADE
 			FROM(
 				SELECT
 					std.FINPROD_ID,
@@ -613,7 +632,8 @@
 					msd.BROKER_ID,
 					ssrp.PARA_VALUE,
 					std.PS,
-					std.SEC_ACCT_ID
+					std.SEC_ACCT_ID,
+					std.IS_PAY_WITH_TRADE
 				FROM
 					SETTLE_TRANS_DATA std
 				LEFT JOIN
@@ -661,7 +681,8 @@
 					msd.BROKER_ID,
 					ssrp.PARA_VALUE,
 					std.PS,
-					std.SEC_ACCT_ID
+					std.SEC_ACCT_ID,
+					std.IS_PAY_WITH_TRADE
 			) securities
 			LEFT JOIN
 				FIN_PRODUCT fp ON securities.FINPROD_ID = fp.FINPROD_ID
@@ -695,7 +716,8 @@
 				detail.BROKER_ID CUSTOMER_ID,
 				detail.PARA_VALUE,
 				detail.SEAT_NUMBER,
-				detail.PS
+				detail.PS,
+				detail.IS_PAY_WITH_TRADE
 			FROM(
 				SELECT
 					std.FINPROD_ID,
@@ -709,7 +731,8 @@
 					#{CHECK_RESULT_2} CHECK_RESULT,
 					msd.BROKER_ID,
 					ssrp.PARA_VALUE,
-					std.PS
+					std.PS,
+					std.IS_PAY_WITH_TRADE
 				FROM
 					SETTLE_TRANS_DATA std
 				LEFT JOIN
@@ -773,7 +796,8 @@
 				msd.BROKER_ID CUSTOMER_ID,
 				#{PARA_VALUE_02} PARA_VALUE,
 				std.SEAT_NUMBER,
-				std.PS
+				std.PS,
+				std.IS_PAY_WITH_TRADE
 			FROM
 				SETTLE_TRANS_DATA std
 			LEFT JOIN
@@ -801,7 +825,8 @@
 				msd.BROKER_ID,
 				std.SEAT_NUMBER,
 				std.ACCT_NO,
-				std.PS
+				std.PS,
+				std.IS_PAY_WITH_TRADE
 		)
 		SELECT * FROM temp1
 		UNION ALL
