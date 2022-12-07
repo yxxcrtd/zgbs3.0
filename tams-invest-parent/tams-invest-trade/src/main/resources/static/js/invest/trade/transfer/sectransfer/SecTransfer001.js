@@ -457,6 +457,10 @@ $(function () {
     $("#tradeAmt").change(function () {
         indexCount = 0;
     });
+    //添加净价更改事件
+    $("#unitCprice").change(function () {
+        indexCount = 0;
+    });
     //add by xuzhihao end
     //计算所需的要素
     function getCalcParam() {
