@@ -3,6 +3,9 @@ package com.joyintech.tams.exchange.service.trade.processor.check;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.extra.validation.BeanValidationResult;
 import com.joyintech.exchange.service.quote.service.QuoteService;
+import com.joyintech.framework.util.CacheUtil;
+import com.joyintech.framework.util.StringUtil;
+import com.joyintech.tams.constant.DictCodeList;
 import com.joyintech.tams.exchange.common.BusinessResultException;
 import com.joyintech.tams.exchange.common.bean.ResultBean;
 import com.joyintech.tams.exchange.common.bean.TickBean;
@@ -98,6 +101,15 @@ public abstract class BaseCheckKit {
         //信用保护凭证不需要检查行情
         if (BussTypeEnum.CREDIT_PROTECTION_CERTIFICATE.codeEquals(instruction.getBusiTypeTg())
                 || EntrustUtils.isPledgeAgreementRepurchase(instruction.getBusiTypeTg())) {
+            return false;
+        }
+        // 九江JJSCWT-14 协商成交 不检查行情
+        if (BussTypeEnum.COUPON.codeEquals(instruction.getBusiTypeTg())) {
+            return false;
+        }
+
+        // 系统参数：场内是否使用五档行情为否时 不检查行情
+        if (StringUtil.equals(DictCodeList.是否_否.getValue(), CacheUtil.getSysParam("TRD_USE_QUOTE"))) {
             return false;
         }
 
