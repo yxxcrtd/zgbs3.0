@@ -109,7 +109,7 @@
                 GROUP BY
                     CUSTOMER_ID,
                     PARA_VALUE
-            )ssrp ON ssrd.CUSTOMER_ID = ssrp.CUSTOMER_ID
+            )ssrp ON ssr.CUSTOMER_ID = ssrp.CUSTOMER_ID
         WHERE
             1=1
             <if test="accountList != null and accountList.size() > 0">
