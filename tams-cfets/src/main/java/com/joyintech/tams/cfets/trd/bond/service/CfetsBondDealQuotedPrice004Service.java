@@ -750,6 +750,7 @@ public class CfetsBondDealQuotedPrice004Service extends BaseService<CfetsBondDea
         }
         //处理指令执行进度
         insertEtrFinishStatus(cfetsBondDealDbDto, operationType);
+        entity.setYield(entity.getMatureYield());
         cfetsTrdConfirmAutoMatchService.cstpAutoMatchAfterReg(entity, null, null);
     }
 
