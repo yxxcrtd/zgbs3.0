@@ -1304,7 +1304,9 @@
         stlinfo.sec_acct_name as acctNoName,
         I.LASTQTY/10000 as lastqty,
         decode(I.BUSINESSTYPE, 'BOND', I.yield2*100, 'REPO', I.PRICE*100) tradeYield,
-        null tradeYieldStr,
+        <!-- 银行间成交确认界面该字段取不到值,之前默认给null update by wsc 20220726 start-->
+        decode(I.BUSINESSTYPE, 'BOND', I.yield2*100, 'REPO', I.PRICE*100) || '%' tradeYieldStr,
+        <!-- 银行间成交确认界面该字段取不到值,之前默认给null update by wsc 20220726 end-->
         I.TRADELIMITDAYS termDays,
         decode(I.BUSINESSTYPE, 'BOND', I.SETTLCURRAMT, 'REPO', DECODE(I.MARKETINDICATOR, 9, I.TRADECASHAMT, 10, I.SETTLCURRAMT))  as tradeAmt,
         I.quoteid as quoteid,
