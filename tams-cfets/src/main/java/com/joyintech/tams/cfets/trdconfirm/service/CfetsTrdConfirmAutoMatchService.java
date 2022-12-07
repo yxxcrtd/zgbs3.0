@@ -239,16 +239,16 @@ public class CfetsTrdConfirmAutoMatchService extends BaseService {
             param.put("settleDate", bondDto.getSettleDate());
         }
         if (map.get("deliveryType") != null && StringUtil.equals(map.get("deliveryType").getType(), "01")) {
-            if(!StringUtil.isNotEmpty(bondDto.getDeliveryType())){
-                logger.info("基础要素{}为空值不自动匹配",getMessage("matchDetFeatures.tradeDate"));
+            if(!StringUtil.isNotEmpty(bondDto.getSettleMethod())){
+                logger.info("基础要素{}为空值不自动匹配",getMessage("matchDetFeatures.deliveryType"));
                 return null;
             }
             // 结算方式
-            if (StringUtil.equals(bondDto.getDeliveryType(), "03")) {
+            if (StringUtil.equals(bondDto.getSettleMethod(), "03")) {
                 param.put("deliveryType", "0");
-            } else if (StringUtil.equals(bondDto.getDeliveryType(), "02")) {
+            } else if (StringUtil.equals(bondDto.getSettleMethod(), "02")) {
                 param.put("deliveryType", "5");
-            } else if (StringUtil.equals(bondDto.getDeliveryType(), "01")) {
+            } else if (StringUtil.equals(bondDto.getSettleMethod(), "01")) {
                 param.put("deliveryType", "4");
             }
         }
