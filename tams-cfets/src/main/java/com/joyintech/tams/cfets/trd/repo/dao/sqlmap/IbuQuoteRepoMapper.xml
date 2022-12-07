@@ -1020,7 +1020,7 @@
                 </foreach>
             </if>
             <if test="finprodIdList != null and finprodIdList.size() > 0">
-                AND fp.FINPROD_ID in
+                AND FIN_PRODUCT.FINPROD_ID in
                 <foreach  collection="finprodIdList" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
