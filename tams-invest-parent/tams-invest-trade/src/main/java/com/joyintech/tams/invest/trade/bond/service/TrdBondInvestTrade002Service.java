@@ -938,6 +938,7 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
             if(!StringUtil.equals(entity.getIsOfferFlag(), "01")) {//非报价信息
                 String tradeId = trdProductDeal.getTradeId();
                 trdProductDeal.setTradeId(entity.getTotleTradeId()); // 让生成的组合流水的tradeId是汇总表的值
+                finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
                 baseTradeProductDealCommService.execute(finProductTradeDto);
                 if (StringUtil.isNotEmpty(entity.getActPortfolioId())
                     && !entity.getActPortfolioId().equals(entity.getPortfolioId())) {
@@ -1249,6 +1250,7 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
             }
             String tradeId = trdProductDeal.getTradeId();
             trdProductDeal.setTradeId(entity.getTotleTradeId()); // 让生成的组合流水的tradeId是汇总表的值
+            finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
             baseTradeProductDealCommService.execute(finProductTradeDto);
             if (StringUtil.isNotEmpty(entity.getActPortfolioId())
                 && !entity.getActPortfolioId().equals(entity.getPortfolioId())) {
@@ -1810,6 +1812,7 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
                 }
                 String tradeId1 = trdProductDeal.getTradeId();
                 trdProductDeal.setTradeId(entity.getTotleTradeId()); // 让生成的组合流水的tradeId是汇总表的值
+//                finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
                 baseTradeProductDealCommService.execute(finProductTradeDto);
                 if (StringUtil.isNotEmpty(entity.getActPortfolioId())
                     && !entity.getActPortfolioId().equals(entity.getPortfolioId())) {
@@ -4785,7 +4788,8 @@ public class TrdBondInvestTrade002Service extends BaseService<TrdBondInvestTrade
                         finProductTradeDto.getIsOverdueDeal());
                 }
                 // add by etliu 20210128 end
-                
+
+                finProductTradeDto.setIsExistNew(DictCodeList.是否_是.getValue());
                 baseTradeProductDealCommService.execute(finProductTradeDto);
                 
                 if (StringUtil.isNotEmpty(entity.getActPortfolioId())
